@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>SchemeUserState</key>
+	<dict>
+		<key>MRM (AU).xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>3</integer>
+		</dict>
+		<key>MRM (All).xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>0</integer>
+		</dict>
+		<key>MRM (Shared Code).xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>4</integer>
+		</dict>
+		<key>MRM (VST).xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
+		<key>MRM (VST3).xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>33377D34412213B46E619284</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>339EDBA66EB1D040142AADCE</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>9F52BFA2160BDBBAECADD8A8</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>B1FBB101718F35A8F678E13F</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>FA069F64C917D858CA89CF7B</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+	</dict>
+</dict>
+</plist>
