@@ -1,15 +1,15 @@
 /*
   ==============================================================================
 
-    BKSampler.h
-    Created: 18 Oct 2016 9:28:55am
+    BKFixedNotePianoSampler.h
+    Created: 18 Oct 2016 11:54:49am
     Author:  Michael R Mulshine
 
   ==============================================================================
 */
 
-#ifndef BKSAMPLER_H_INCLUDED
-#define BKSAMPLER_H_INCLUDED
+#ifndef BKFIXEDNOTEPIANOSAMPLER_H_INCLUDED
+#define BKFIXEDNOTEPIANOSAMPLER_H_INCLUDED
 
 
 #include "../JuceLibraryCode/JuceHeader.h"
@@ -18,7 +18,7 @@
 
 #include "ReferenceCountedBuffer.h"
 
-class   BKSamplerSound    : public BKSynthesiserSound
+class   BKFixedNotePianoSamplerSound    : public BKSynthesiserSound
 {
 public:
     //==============================================================================
@@ -40,15 +40,15 @@ public:
      @param maxSampleLengthSeconds   a maximum length of audio to read from the audio
      source, in seconds
      */
-    BKSamplerSound (const String& name,
-                    AudioFormatReader& reader,
-                    const BigInteger& midiNotes,
-                    int rootMidiNote,
-                    const BigInteger& midiVelocities,
-                    double maxSampleLengthSeconds);
+    BKFixedNotePianoSamplerSound (const String& name,
+                             AudioFormatReader& reader,
+                             const BigInteger& midiNotes,
+                             int rootMidiNote,
+                             const BigInteger& midiVelocities,
+                             double maxSampleLengthSeconds);
     
     /** Destructor. */
-    ~BKSamplerSound();
+    ~BKFixedNotePianoSamplerSound();
     
     //==============================================================================
     /** Returns the sample's name */
@@ -68,7 +68,7 @@ public:
     
 private:
     //==============================================================================
-    friend class BKSamplerVoice;
+    friend class BKFixedNotePianoSamplerVoice;
     
     String name;
     
@@ -81,28 +81,28 @@ private:
     int rampOnSamples, rampOffSamples;
     int midiRootNote;
     
-    JUCE_LEAK_DETECTOR (BKSamplerSound)
+    JUCE_LEAK_DETECTOR (BKFixedNotePianoSamplerSound)
 };
 
 
 //==============================================================================
 /**
- A subclass of BKSynthesiserVoice that can play a BKSamplerSound.
+ A subclass of BKSynthesiserVoice that can play a BKFixedNotePianoSamplerSound.
  
- To use it, create a BKSynthesiser, add some BKSamplerVoice objects to it, then
- give it some BKSamplerSound objects to play.
+ To use it, create a BKSynthesiser, add some BKFixedNotePianoSamplerVoice objects to it, then
+ give it some BKFixedNotePianoSamplerSound objects to play.
  
- @see BKSamplerSound, BKSynthesiser, BKSynthesiserVoice
+ @see BKFixedNotePianoSamplerSound, BKSynthesiser, BKSynthesiserVoice
  */
-class  BKSamplerVoice    : public BKSynthesiserVoice
+class  BKFixedNotePianoSamplerVoice    : public BKSynthesiserVoice
 {
 public:
     //==============================================================================
-    /** Creates a BKSamplerVoice. */
-    BKSamplerVoice();
+    /** Creates a BKFixedNotePianoSamplerVoice. */
+    BKFixedNotePianoSamplerVoice();
     
     /** Destructor. */
-    ~BKSamplerVoice();
+    ~BKFixedNotePianoSamplerVoice();
     
     //==============================================================================
     bool canPlaySound (BKSynthesiserSound*) override;
@@ -123,8 +123,8 @@ private:
     float lgain, rgain, rampOnOffLevel, rampOnDelta, rampOffDelta;
     bool isInRampOn, isInRampOff;
     
-    JUCE_LEAK_DETECTOR (BKSamplerVoice)
+    JUCE_LEAK_DETECTOR (BKFixedNotePianoSamplerVoice)
 };
 
 
-#endif  // BKSAMPLER_H_INCLUDED
+#endif  // BKFIXEDNOTEPIANOSAMPLER_H_INCLUDED

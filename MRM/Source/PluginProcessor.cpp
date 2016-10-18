@@ -11,7 +11,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-#include "BKSampler.h"
+#include "BKMainPianoSampler.h"
 
 #include "AudioConstants.h"
 
@@ -25,7 +25,7 @@ MrmAudioProcessor::MrmAudioProcessor() {
     String path = "~/samples/";
     
     // 88 voices seems to go over just fine...
-    for (int i = 0; i < 88; i++) mainPianoSynth.addVoice(new BKSamplerVoice());
+    for (int i = 0; i < 88; i++) mainPianoSynth.addVoice(new BKMainPianoSamplerVoice());
     
     WavAudioFormat wavFormat;
     
@@ -82,7 +82,7 @@ MrmAudioProcessor::MrmAudioProcessor() {
                     BigInteger velocityRange;
                     velocityRange.setRange(aVelocityThresh[k], (aVelocityThresh[k+1] - aVelocityThresh[k]), true);
 
-                    mainPianoSynth.addSound( new BKSamplerSound(soundName,
+                    mainPianoSynth.addSound( new BKMainPianoSamplerSound(soundName,
                                                         *sampleReader,
                                                         noteRange,
                                                         root,

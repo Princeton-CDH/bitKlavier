@@ -1,24 +1,23 @@
 /*
   ==============================================================================
 
-    BKSampler.cpp
-    Adapted from SoundSampler.h/cpp
-    Created: 18 Oct 2016 9:28:55am
+    BKFixedNotePianoSampler.cpp
+    Created: 18 Oct 2016 11:54:49am
     Author:  Michael R Mulshine
 
   ==============================================================================
 */
 
-#include "BKSampler.h"
+#include "BKFixedNotePianoSampler.h"
 
 #include "AudioConstants.h"
 
-BKSamplerSound::BKSamplerSound (const String& soundName,
-                                AudioFormatReader& reader,
-                                const BigInteger& notes,
-                                const int rootMidiNote,
-                                const BigInteger& velocities,
-                                const double maxSampleLengthSeconds)
+BKFixedNotePianoSamplerSound::BKFixedNotePianoSamplerSound (const String& soundName,
+                                                  AudioFormatReader& reader,
+                                                  const BigInteger& notes,
+                                                  const int rootMidiNote,
+                                                  const BigInteger& velocities,
+                                                  const double maxSampleLengthSeconds)
 : name (soundName),
 midiNotes (notes),
 midiVelocities(velocities),
@@ -37,7 +36,7 @@ midiRootNote (rootMidiNote)
     else
     {
         length = jmin((int) reader.lengthInSamples,
-                                (int) (maxSampleLengthSeconds * sourceSampleRate));
+                      (int) (maxSampleLengthSeconds * sourceSampleRate));
         
         data = new AudioSampleBuffer (jmin (2, (int) reader.numChannels), length + 4);
         
@@ -48,27 +47,27 @@ midiRootNote (rootMidiNote)
     }
 }
 
-BKSamplerSound::~BKSamplerSound()
+BKFixedNotePianoSamplerSound::~BKFixedNotePianoSamplerSound()
 {
 }
 
-bool BKSamplerSound::appliesToNote (int midiNoteNumber)
+bool BKFixedNotePianoSamplerSound::appliesToNote (int midiNoteNumber)
 {
     return midiNotes [midiNoteNumber];
 }
 
-bool BKSamplerSound::appliesToVelocity(int midiNoteVelocity)
+bool BKFixedNotePianoSamplerSound::appliesToVelocity(int midiNoteVelocity)
 {
     return midiVelocities [midiNoteVelocity];
 }
 
-bool BKSamplerSound::appliesToChannel (int /*midiChannel*/)
+bool BKFixedNotePianoSamplerSound::appliesToChannel (int /*midiChannel*/)
 {
     return true;
 }
 
 //==============================================================================
-BKSamplerVoice::BKSamplerVoice() : pitchRatio (0.0),
+BKFixedNotePianoSamplerVoice::BKFixedNotePianoSamplerVoice() : pitchRatio (0.0),
 sourceSamplePosition (0.0),
 lgain (0.0f), rgain (0.0f),
 rampOnOffLevel (0),
@@ -78,21 +77,21 @@ isInRampOn (false), isInRampOff (false)
 {
 }
 
-BKSamplerVoice::~BKSamplerVoice()
+BKFixedNotePianoSamplerVoice::~BKFixedNotePianoSamplerVoice()
 {
 }
 
-bool BKSamplerVoice::canPlaySound (BKSynthesiserSound* sound)
+bool BKFixedNotePianoSamplerVoice::canPlaySound (BKSynthesiserSound* sound)
 {
-    return dynamic_cast<const BKSamplerSound*> (sound) != nullptr;
+    return dynamic_cast<const BKFixedNotePianoSamplerSound*> (sound) != nullptr;
 }
 
-void BKSamplerVoice::startNote (const int midiNoteNumber,
-                                const float velocity,
-                                BKSynthesiserSound* s,
-                                const int /*currentPitchWheelPosition*/)
+void BKFixedNotePianoSamplerVoice::startNote (const int midiNoteNumber,
+                                         const float velocity,
+                                         BKSynthesiserSound* s,
+                                         const int /*currentPitchWheelPosition*/)
 {
-    if (const BKSamplerSound* const sound = dynamic_cast<const BKSamplerSound*> (s))
+    if (const BKFixedNotePianoSamplerSound* const sound = dynamic_cast<const BKFixedNotePianoSamplerSound*> (s))
     {
         pitchRatio = pow (2.0, (midiNoteNumber - sound->midiRootNote) / 12.0)
         * sound->sourceSampleRate / getSampleRate();
@@ -135,7 +134,7 @@ void BKSamplerVoice::startNote (const int midiNoteNumber,
 
 
 
-void BKSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
+void BKFixedNotePianoSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
 {
     if (allowTailOff)
     {
@@ -148,19 +147,19 @@ void BKSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
     }
 }
 
-void BKSamplerVoice::pitchWheelMoved (const int /*newValue*/)
+void BKFixedNotePianoSamplerVoice::pitchWheelMoved (const int /*newValue*/)
 {
 }
 
-void BKSamplerVoice::controllerMoved (const int /*controllerNumber*/,
-                                      const int /*newValue*/)
+void BKFixedNotePianoSamplerVoice::controllerMoved (const int /*controllerNumber*/,
+                                               const int /*newValue*/)
 {
 }
 
 //==============================================================================
-void BKSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int startSample, int numSamples)
+void BKFixedNotePianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int startSample, int numSamples)
 {
-    if (const BKSamplerSound* const playingSound = static_cast<BKSamplerSound*> (getCurrentlyPlayingSound().get()))
+    if (const BKFixedNotePianoSamplerSound* const playingSound = static_cast<BKFixedNotePianoSamplerSound*> (getCurrentlyPlayingSound().get()))
     {
         
         const float* const inL = playingSound->data->getReadPointer (0);
@@ -231,4 +230,5 @@ void BKSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int start
         }
     }
 }
+
 
