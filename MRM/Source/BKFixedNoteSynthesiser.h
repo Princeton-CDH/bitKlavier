@@ -14,6 +14,8 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
+#include "AudioConstants.h"
+
 
 //==============================================================================
 /**
@@ -116,9 +118,10 @@ public:
      */
     virtual void startNote (int midiNoteNumber,
                             float velocity,
-                            BKFixedNoteSynthesiserSound* sound,
+                            PianoSamplerNoteType type,
                             uint32 length,
-                            int currentPitchWheelPosition ) = 0;
+                            BKFixedNoteSynthesiserSound* sound
+                            /*int currentPitchWheelPosition*/ ) = 0;
     
     /** Called to stop a note.
      
@@ -252,6 +255,7 @@ private:
     double currentSampleRate;
     int currentlyPlayingNote, currentPlayingMidiChannel;
     uint32 length;
+    PianoSamplerNoteType type; 
     uint32 noteOnTime;
     BKFixedNoteSynthesiserSound::Ptr currentlyPlayingSound;
     bool keyIsDown, sustainPedalDown, sostenutoPedalDown;
@@ -374,9 +378,10 @@ public:
      
      The midiChannel parameter is the channel, between 1 and 16 inclusive.
      */
-    virtual void fixedNoteKeyOn (int midiChannel,
+    virtual void keyOn (int midiChannel,
                          int midiNoteNumber,
                          float velocity,
+                         PianoSamplerNoteType type,
                          uint32 length);
     
     /** Triggers a note-off event.
@@ -391,9 +396,11 @@ public:
      
      The midiChannel parameter is the channel, between 1 and 16 inclusive.
      */
-    virtual void fixedNoteKeyOff (int midiChannel,
+    virtual void keyOff (int midiChannel,
                           int midiNoteNumber,
-                          float velocity);
+                          float velocity,
+                          PianoSamplerNoteType type,
+                          bool allowTailOff);
     
     /** Turns off all notes.
      
@@ -597,6 +604,7 @@ protected:
                      int midiChannel,
                      int midiNoteNumber,
                      float velocity,
+                     PianoSamplerNoteType type,
                      uint32 length);
     
     /** Stops a given voice.

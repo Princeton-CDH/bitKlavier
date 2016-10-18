@@ -85,9 +85,10 @@ bool BKFixedNotePianoSamplerVoice::canPlaySound (BKFixedNoteSynthesiserSound* so
 
 void BKFixedNotePianoSamplerVoice::startNote (const int midiNoteNumber,
                                          const float velocity,
-                                         BKFixedNoteSynthesiserSound* s,
-                                         const uint32 length, // ms
-                                         const int /*currentPitchWheelPosition*/)
+                                         PianoSamplerNoteType type,
+                                         const uint32 length,
+                                         BKFixedNoteSynthesiserSound* s
+                                         /*, const int */)
 {
     if (const BKFixedNotePianoSamplerSound* const sound = dynamic_cast<const BKFixedNotePianoSamplerSound*> (s))
     {
@@ -100,9 +101,16 @@ void BKFixedNotePianoSamplerVoice::startNote (const int midiNoteNumber,
         sourceSamplePosition = 0.0;
         lgain = velocity;
         rgain = velocity;
-        playLength = length;
+        
         isInRampOn = (sound->rampOnSamples > 0);
         isInRampOff = false;
+        
+        playType = type;
+        if (playType == PianoSamplerNoteTypeFixed) {
+            playLength = length;
+        } else {
+            playLength = 30.0;
+        }
         
         if (isInRampOn)
         {
@@ -220,9 +228,12 @@ void BKFixedNotePianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuf
             
             sourceSamplePosition += pitchRatio;
             
-            if (!isInRampOff && sourceSamplePosition > playLength)
+            if (playType == PianoSamplerNoteTypeFixed)
             {
-                stopNote (0.0f, true);
+                if (!isInRampOff && sourceSamplePosition > playLength)
+                {
+                    stopNote (0.0f, true);
+                }
             }
         }
     }

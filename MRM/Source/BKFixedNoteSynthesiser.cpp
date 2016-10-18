@@ -10,8 +10,6 @@
 
 #include "BKFixedNoteSynthesiser.h"
 
-#include "AudioConstants.h"
-
 
 BKFixedNoteSynthesiserSound::BKFixedNoteSynthesiserSound() {}
 BKFixedNoteSynthesiserSound::~BKFixedNoteSynthesiserSound() {}
@@ -243,12 +241,14 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
         
         if (m.isNoteOn())
         {
-            float time = 1.0;
-            fixedNoteKeyOn(channel,m.getNoteNumber(),m.getFloatVelocity(), (time * getSampleRate()));
+            float time = .1;
+            keyOn(channel,m.getNoteNumber(), m.getFloatVelocity(), PianoSamplerNoteTypeNormal, (time * getSampleRate()));
+            keyOn(channel,m.getNoteNumber(), m.getFloatVelocity(), PianoSamplerNoteTypeFixed, (time * getSampleRate()));
         }
         else if (m.isNoteOff())
         {
-            fixedNoteKeyOff (channel, m.getNoteNumber(), m.getFloatVelocity());
+            keyOff(channel, m.getNoteNumber(), m.getFloatVelocity(), PianoSamplerNoteTypeNormal, true);
+            keyOff(channel, m.getNoteNumber(), m.getFloatVelocity(), PianoSamplerNoteTypeFixed, true);
         }
         else if (m.isAllNotesOff() || m.isAllSoundOff())
         {
@@ -279,9 +279,10 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
     }
     
     //==============================================================================
-    void BKFixedNoteSynthesiser::fixedNoteKeyOn (const int midiChannel,
+    void BKFixedNoteSynthesiser::keyOn (const int midiChannel,
                                 const int midiNoteNumber,
                                 const float velocity,
+                                PianoSamplerNoteType type,
                                 const uint32 length)
     {
         const ScopedLock sl (lock);
@@ -307,7 +308,7 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
                 }
                 
                 startVoice (findFreeVoice (sound, midiChannel, midiNoteNumber, shouldStealNotes),
-                            sound, midiChannel, midiNoteNumber, velocity, length);
+                            sound, midiChannel, midiNoteNumber, velocity, type, length);
             }
         }
     }
@@ -317,6 +318,7 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
                                     const int midiChannel,
                                     const int midiNoteNumber,
                                     const float velocity,
+                                    PianoSamplerNoteType type,
                                     const uint32 length)
     {
         if (voice != nullptr && sound != nullptr)
@@ -326,6 +328,7 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
             
             voice->currentlyPlayingNote = midiNoteNumber;
             voice->length = length;
+            voice->type = type;
             voice->currentPlayingMidiChannel = midiChannel;
             voice->noteOnTime = ++lastNoteOnCounter;
             voice->currentlyPlayingSound = sound;
@@ -333,8 +336,8 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
             voice->sostenutoPedalDown = false;
             voice->sustainPedalDown = sustainPedalsDown[midiChannel];
             
-            voice->startNote (midiNoteNumber, velocity, sound, length,
-                              lastPitchWheelValues [midiChannel - 1]);
+            voice->startNote (midiNoteNumber, velocity, type, length, sound
+                              /*, lastPitchWheelValues [midiChannel - 1]*/);
         }
     }
     
@@ -348,9 +351,11 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
         jassert (allowTailOff || (voice->getCurrentlyPlayingNote() < 0 && voice->getCurrentlyPlayingSound() == 0));
     }
     
-    void BKFixedNoteSynthesiser::fixedNoteKeyOff (const int midiChannel,
+    void BKFixedNoteSynthesiser::keyOff (const int midiChannel,
                                  const int midiNoteNumber,
-                                 const float velocity)
+                                 const float velocity,
+                                 PianoSamplerNoteType type,
+                                 bool allowTailOff)
     {
         const ScopedLock sl (lock);
         
@@ -372,11 +377,9 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
                         voice->keyIsDown = false;
                         
                         
-                        //...but don't turn off note.
-                        /*
-                        if (! (voice->sustainPedalDown || voice->sostenutoPedalDown))
+                        if (! ((voice->type == PianoSamplerNoteTypeFixed) || voice->sustainPedalDown || voice->sostenutoPedalDown)) {
                             stopVoice (voice, velocity, allowTailOff);
-                         */
+                        }
                     }
                 }
             }

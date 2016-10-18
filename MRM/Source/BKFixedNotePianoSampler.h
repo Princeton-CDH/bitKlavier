@@ -18,6 +18,8 @@
 
 #include "ReferenceCountedBuffer.h"
 
+#include "AudioConstants.h"
+
 class   BKFixedNotePianoSamplerSound    : public BKFixedNoteSynthesiserSound
 {
 public:
@@ -107,7 +109,7 @@ public:
     //==============================================================================
     bool canPlaySound (BKFixedNoteSynthesiserSound*) override;
     
-    void startNote (int midiNoteNumber, float velocity, BKFixedNoteSynthesiserSound*, uint32 length, int pitchWheel) override;
+    void startNote (int midiNoteNumber, float velocity, PianoSamplerNoteType type, uint32 length, BKFixedNoteSynthesiserSound* /*int pitchWheel*/) override;
     void stopNote (float velocity, bool allowTailOff) override;
     
     void pitchWheelMoved (int newValue) override;
@@ -122,6 +124,7 @@ private:
     double sourceSamplePosition;
     uint32 sourceSampleCount;
     uint32 playLength;
+    PianoSamplerNoteType playType;
     float lgain, rgain, rampOnOffLevel, rampOnDelta, rampOffDelta;
     bool isInRampOn, isInRampOff;
     

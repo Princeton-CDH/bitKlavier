@@ -11,6 +11,12 @@
 #ifndef AUDIOCONSTANTS_H_INCLUDED
 #define AUDIOCONSTANTS_H_INCLUDED
 
+typedef enum PianoSamplerNoteType {
+    PianoSamplerNoteTypeNormal = 0,
+    PianoSamplerNoteTypeFixed,
+    PianoSamplerNoteTypeNil
+} PianoSamplerNoteType;
+
 
 static const float aRampOnTimeSec = 0.005f;
 static const float aRampOffTimeSec = 0.005f;
