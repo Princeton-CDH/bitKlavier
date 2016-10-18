@@ -13,35 +13,20 @@
 #include "AudioConstants.h"
 
 BKFixedNotePianoSamplerSound::BKFixedNotePianoSamplerSound (const String& soundName,
-                                                  AudioFormatReader& reader,
+                                                  ReferenceCountedBuffer::Ptr buffer,
+                                                  double sourceSampleRate,
                                                   const BigInteger& notes,
                                                   const int rootMidiNote,
-                                                  const BigInteger& velocities,
-                                                  const double maxSampleLengthSeconds)
+                                                  const BigInteger& velocities)
 : name (soundName),
+data(buffer),
+sourceSampleRate(sourceSampleRate),
 midiNotes (notes),
 midiVelocities(velocities),
 midiRootNote (rootMidiNote)
 {
-        sourceSampleRate = reader.sampleRate;
-    
-    if (sourceSampleRate <= 0 || reader.lengthInSamples <= 0)
-    {
-        maxLength = 0;
-        
-    }
-    else
-    {
-        maxLength = jmin((int) reader.lengthInSamples,
-                      (int) (maxSampleLengthSeconds * sourceSampleRate));
-        
-        data = new AudioSampleBuffer (jmin (2, (int) reader.numChannels), maxLength + 4);
-        
-        reader.read(data, 0, maxLength + 4, 0, true, true);
-        
-        rampOnSamples = roundToInt (aRampOnTimeSec* sourceSampleRate);
-        rampOffSamples = roundToInt (aRampOffTimeSec * sourceSampleRate);
-    }
+    rampOnSamples = roundToInt (aRampOnTimeSec* sourceSampleRate);
+    rampOffSamples = roundToInt (aRampOffTimeSec * sourceSampleRate);
 }
 
 BKFixedNotePianoSamplerSound::~BKFixedNotePianoSamplerSound()
@@ -95,9 +80,6 @@ void BKFixedNotePianoSamplerVoice::startNote (const int midiNoteNumber,
         pitchRatio = pow (2.0, (midiNoteNumber - sound->midiRootNote) / 12.0)
         * sound->sourceSampleRate / getSampleRate();
         
-        DBG(sound->getName());
-        
-        
         sourceSamplePosition = 0.0;
         lgain = velocity;
         rgain = velocity;
@@ -106,7 +88,7 @@ void BKFixedNotePianoSamplerVoice::startNote (const int midiNoteNumber,
         isInRampOff = false;
         
         playType = type;
-        if (playType == PianoSamplerNoteTypeFixed) {
+        if (playType == ForwardFixed) {
             playLength = length;
         } else {
             playLength = 30.0;
@@ -168,9 +150,10 @@ void BKFixedNotePianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuf
     if (const BKFixedNotePianoSamplerSound* const playingSound = static_cast<BKFixedNotePianoSamplerSound*> (getCurrentlyPlayingSound().get()))
     {
         
-        const float* const inL = playingSound->data->getReadPointer (0);
-        const float* const inR = playingSound->data->getNumChannels() > 1
-        ? playingSound->data->getReadPointer (1) : nullptr;
+        const float* const inL = playingSound->data->getAudioSampleBuffer()->getReadPointer (0);
+        const float* const inR = playingSound->data->getAudioSampleBuffer()->getNumChannels() > 1
+        ? playingSound->data->getAudioSampleBuffer()->getReadPointer (1) : nullptr;
+        
         
         float* outL = outputBuffer.getWritePointer (0, startSample);
         float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
@@ -183,11 +166,11 @@ void BKFixedNotePianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuf
             
             // just using a very simple linear interpolation here..
             float l = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-            float r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha)
-            : l;
+            float r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l;
             
             l *= lgain;
             r *= rgain;
+            
             
             if (isInRampOn)
             {
@@ -228,7 +211,7 @@ void BKFixedNotePianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuf
             
             sourceSamplePosition += pitchRatio;
             
-            if (playType == PianoSamplerNoteTypeFixed)
+            if (playType == ForwardFixed)
             {
                 if (!isInRampOff && sourceSamplePosition > playLength)
                 {

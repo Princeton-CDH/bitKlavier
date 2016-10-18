@@ -43,11 +43,11 @@ public:
      source, in seconds
      */
     BKFixedNotePianoSamplerSound (const String& name,
-                             AudioFormatReader& reader,
+                             ReferenceCountedBuffer::Ptr buffer,
+                             double sourceSampleRate,
                              const BigInteger& midiNotes,
                              int rootMidiNote,
-                             const BigInteger& midiVelocities,
-                             double maxSampleLengthSeconds);
+                             const BigInteger& midiVelocities);
     
     /** Destructor. */
     ~BKFixedNotePianoSamplerSound();
@@ -60,7 +60,7 @@ public:
      This could return nullptr if there was a problem loading the data.
      */
     
-    AudioSampleBuffer* getAudioData() const noexcept { return data; }
+    AudioSampleBuffer* getAudioData() const noexcept { return data->getAudioSampleBuffer(); }
     
     //==============================================================================
     bool appliesToNote (int midiNoteNumber) override;
@@ -74,7 +74,7 @@ private:
     
     String name;
     
-    ScopedPointer<AudioSampleBuffer> data;
+    ReferenceCountedBuffer::Ptr data;
     
     double sourceSampleRate;
     BigInteger midiNotes;

@@ -30,9 +30,10 @@ public:
     AudioSampleBuffer* getAudioSampleBuffer();
 
     int position;
+    String name;
     
 private:
-    String name;
+    
     AudioSampleBuffer buffer;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ReferenceCountedBuffer)

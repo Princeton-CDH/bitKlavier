@@ -12,11 +12,15 @@
 #define AUDIOCONSTANTS_H_INCLUDED
 
 typedef enum PianoSamplerNoteType {
-    PianoSamplerNoteTypeNormal = 0,
-    PianoSamplerNoteTypeFixed,
+    ForwardNormal = 0,
+    ForwardFixed,
+    ReverseNormal,
+    ReverseFixed,
     PianoSamplerNoteTypeNil
 } PianoSamplerNoteType;
 
+
+static const float aMaxSampleLengthSec = 30.0;
 
 static const float aRampOnTimeSec = 0.005f;
 static const float aRampOffTimeSec = 0.005f;

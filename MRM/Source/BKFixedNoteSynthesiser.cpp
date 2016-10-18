@@ -241,14 +241,13 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
         
         if (m.isNoteOn())
         {
-            float time = .1;
-            keyOn(channel,m.getNoteNumber(), m.getFloatVelocity(), PianoSamplerNoteTypeNormal, (time * getSampleRate()));
-            keyOn(channel,m.getNoteNumber(), m.getFloatVelocity(), PianoSamplerNoteTypeFixed, (time * getSampleRate()));
+            float time = 3.0;
+            keyOn(channel,m.getNoteNumber(), m.getFloatVelocity(), ForwardNormal, (time * getSampleRate()));
+            keyOn(channel,m.getNoteNumber(), m.getFloatVelocity(), ForwardFixed, (time * getSampleRate()));
         }
         else if (m.isNoteOff())
         {
-            keyOff(channel, m.getNoteNumber(), m.getFloatVelocity(), PianoSamplerNoteTypeNormal, true);
-            keyOff(channel, m.getNoteNumber(), m.getFloatVelocity(), PianoSamplerNoteTypeFixed, true);
+            keyOff(channel, m.getNoteNumber(), m.getFloatVelocity(), true);
         }
         else if (m.isAllNotesOff() || m.isAllSoundOff())
         {
@@ -298,15 +297,16 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
             {
                 // If hitting a note that's still ringing, stop it first (it could be
                 // still playing because of the sustain or sostenuto pedal).
-                for (int j = voices.size(); --j >= 0;)
-                {
-                    BKFixedNoteSynthesiserVoice* const voice = voices.getUnchecked (j);
-                    
-                    if (voice->getCurrentlyPlayingNote() == midiNoteNumber
-                        && voice->isPlayingChannel (midiChannel))
-                        stopVoice (voice, 1.0f, true);
+                if ((type == ForwardNormal) || (type == ReverseNormal)) {
+                    for (int j = voices.size(); --j >= 0;)
+                    {
+                        BKFixedNoteSynthesiserVoice* const voice = voices.getUnchecked (j);
+                        
+                        if (voice->getCurrentlyPlayingNote() == midiNoteNumber
+                            && voice->isPlayingChannel (midiChannel))
+                            stopVoice (voice, 1.0f, true);
+                    }
                 }
-                
                 startVoice (findFreeVoice (sound, midiChannel, midiNoteNumber, shouldStealNotes),
                             sound, midiChannel, midiNoteNumber, velocity, type, length);
             }
@@ -354,7 +354,6 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
     void BKFixedNoteSynthesiser::keyOff (const int midiChannel,
                                  const int midiNoteNumber,
                                  const float velocity,
-                                 PianoSamplerNoteType type,
                                  bool allowTailOff)
     {
         const ScopedLock sl (lock);
@@ -377,7 +376,7 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
                         voice->keyIsDown = false;
                         
                         
-                        if (! ((voice->type == PianoSamplerNoteTypeFixed) || voice->sustainPedalDown || voice->sostenutoPedalDown)) {
+                        if (! ((voice->type == ForwardFixed) || (voice->type == ReverseFixed) || voice->sustainPedalDown || voice->sostenutoPedalDown)) {
                             stopVoice (voice, velocity, allowTailOff);
                         }
                     }

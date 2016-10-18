@@ -13,6 +13,8 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
+#include "ReferenceCountedBuffer.h"
+
 #include "BKSynthesiser.h"
 #include "BKFixedNoteSynthesiser.h"
 
@@ -38,6 +40,11 @@ public:
     BKFixedNoteSynthesiser fixedNotePianoSynth;
     
     ScopedPointer<AudioFormatReader> sampleReader;
+    ScopedPointer<AudioSampleBuffer> sampleBuffer;
+    
+    ReferenceCountedArray<ReferenceCountedBuffer, CriticalSection> sampleBuffers;
+    
+    //ScopedArray<AudioSampleBuffer> sampleBuffers;
     int position;
     bool off,end,ramp;
     bool lastnotetype;

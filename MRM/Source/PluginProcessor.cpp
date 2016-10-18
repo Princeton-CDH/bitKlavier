@@ -40,6 +40,8 @@ MrmAudioProcessor::MrmAudioProcessor() {
 #endif
     fixedNotePianoSynth.clearSounds();
     
+    int numSamples = 0;
+    
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 4; j++) {
             if ((i == 0) && (j > 0)) continue;
@@ -100,12 +102,45 @@ MrmAudioProcessor::MrmAudioProcessor() {
                                                         30.0 ));
 #endif
                     
-                    fixedNotePianoSynth.addSound(new BKFixedNotePianoSamplerSound(soundName,
-                                                                                 *sampleReader,
-                                                                                 noteRange,
-                                                                                 root,
-                                                                                 velocityRange,
-                                                                                 30.0));
+                    double sourceSampleRate = sampleReader->sampleRate;
+                    const int numChannels = sampleReader->numChannels;
+                    int maxLength;
+                    
+                    
+                    if (sourceSampleRate <= 0 || sampleReader->lengthInSamples <= 0)
+                    {
+                        maxLength = 0;
+                        
+                    }
+                    else
+                    {
+                        maxLength = jmin((int) sampleReader->lengthInSamples,
+                                         (int) (aMaxSampleLengthSec * sourceSampleRate));
+                        
+                        /*
+                        ReferenceCountedBuffer::Ptr newBuffer = new ReferenceCountedBuffer (file.getFileName(), reader->numChannels, reader->lengthInSamples);
+                        reader->read (newBuffer->getAudioSampleBuffer(), 0, reader->lengthInSamples, 0, true, true);
+                        currentBuffer = newBuffer;
+                        buffers.add (newBuffer);
+                        */
+                        
+                        ReferenceCountedBuffer::Ptr newBuffer = new ReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels),sampleReader->lengthInSamples);
+                        sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, sampleReader->lengthInSamples, 0, true, true);
+                        sampleBuffers.insert(numSamples, newBuffer);
+                        //sampleBuffers.add(newBuffer);
+                        
+                        fixedNotePianoSynth.addSound(new BKFixedNotePianoSamplerSound(soundName,
+                                                                                      newBuffer,
+                                                                                      sourceSampleRate,
+                                                                                      noteRange,
+                                                                                      root,
+                                                                                      velocityRange));
+                        
+                    }
+                    
+                    
+                    
+                    
                     
                 } else {
                     DBG("file not opened OK: " + temp);

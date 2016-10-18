@@ -96,9 +96,6 @@ void BKMainPianoSamplerVoice::startNote (const int midiNoteNumber,
         pitchRatio = pow (2.0, (midiNoteNumber - sound->midiRootNote) / 12.0)
         * sound->sourceSampleRate / getSampleRate();
         
-        DBG(sound->getName());
-        
-        
         sourceSamplePosition = 0.0;
         lgain = velocity;
         rgain = velocity;

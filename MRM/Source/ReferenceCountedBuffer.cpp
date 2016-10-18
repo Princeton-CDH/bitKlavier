@@ -20,13 +20,13 @@ name (nameToUse),
 buffer (numChannels, numSamples)
 {
 
-    DBG (String ("Buffer named '") + name + "' constructed. numChannels = " + String (numChannels) + ", numSamples = " + String (numSamples));
+    //DBG (String ("Buffer named '") + name + "' constructed. numChannels = " + String (numChannels) + ", numSamples = " + String (numSamples));
     
 }
 
 ReferenceCountedBuffer::~ReferenceCountedBuffer()
 {
-    DBG (String ("Buffer named '") + name + "' destroyed");
+    //DBG (String ("Buffer named '") + name + "' destroyed");
 }
 
 AudioSampleBuffer* ReferenceCountedBuffer::getAudioSampleBuffer()

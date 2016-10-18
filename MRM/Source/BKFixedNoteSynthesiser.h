@@ -399,7 +399,6 @@ public:
     virtual void keyOff (int midiChannel,
                           int midiNoteNumber,
                           float velocity,
-                          PianoSamplerNoteType type,
                           bool allowTailOff);
     
     /** Turns off all notes.
