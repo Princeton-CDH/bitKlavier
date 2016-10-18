@@ -14,6 +14,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 
 #include "BKSynthesiser.h"
+#include "BKFixedNoteSynthesiser.h"
 
 
 
@@ -34,6 +35,7 @@ public:
     AudioFormatManager formatManager;
 
     BKSynthesiser mainPianoSynth;
+    BKFixedNoteSynthesiser fixedNotePianoSynth;
     
     ScopedPointer<AudioFormatReader> sampleReader;
     int position;

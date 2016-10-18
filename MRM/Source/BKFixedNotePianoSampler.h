@@ -14,11 +14,11 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-#include "BKSynthesiser.h"
+#include "BKFixedNoteSynthesiser.h"
 
 #include "ReferenceCountedBuffer.h"
 
-class   BKFixedNotePianoSamplerSound    : public BKSynthesiserSound
+class   BKFixedNotePianoSamplerSound    : public BKFixedNoteSynthesiserSound
 {
 public:
     //==============================================================================
@@ -31,12 +31,12 @@ public:
      @param source       the audio to load. This object can be safely deleted by the
      caller after this constructor returns
      @param midiNotes    the set of midi keys that this sound should be played on. This
-     is used by the BKSynthesiserSound::appliesToNote() method
+     is used by the BKFixedNoteSynthesiserSound::appliesToNote() method
      @param rootMidiNote   the midi note at which the sample should be played
      with its natural rate. All other notes will be pitched
      up or down relative to this one
      @param midiVelocities    the set of midi velocities that this sound should be played on. This
-     is used by the BKSynthesiserSound::appliesToVelocity() method
+     is used by the BKFixedNoteSynthesiserSound::appliesToVelocity() method
      @param maxSampleLengthSeconds   a maximum length of audio to read from the audio
      source, in seconds
      */
@@ -77,7 +77,7 @@ private:
     double sourceSampleRate;
     BigInteger midiNotes;
     BigInteger midiVelocities;
-    int length;
+    int maxLength;
     int rampOnSamples, rampOffSamples;
     int midiRootNote;
     
@@ -87,14 +87,14 @@ private:
 
 //==============================================================================
 /**
- A subclass of BKSynthesiserVoice that can play a BKFixedNotePianoSamplerSound.
+ A subclass of BKFixedNoteSynthesiserVoice that can play a BKFixedNotePianoSamplerSound.
  
  To use it, create a BKSynthesiser, add some BKFixedNotePianoSamplerVoice objects to it, then
  give it some BKFixedNotePianoSamplerSound objects to play.
  
- @see BKFixedNotePianoSamplerSound, BKSynthesiser, BKSynthesiserVoice
+ @see BKFixedNotePianoSamplerSound, BKSynthesiser, BKFixedNoteSynthesiserVoice
  */
-class  BKFixedNotePianoSamplerVoice    : public BKSynthesiserVoice
+class  BKFixedNotePianoSamplerVoice    : public BKFixedNoteSynthesiserVoice
 {
 public:
     //==============================================================================
@@ -105,9 +105,9 @@ public:
     ~BKFixedNotePianoSamplerVoice();
     
     //==============================================================================
-    bool canPlaySound (BKSynthesiserSound*) override;
+    bool canPlaySound (BKFixedNoteSynthesiserSound*) override;
     
-    void startNote (int midiNoteNumber, float velocity, BKSynthesiserSound*, int pitchWheel) override;
+    void startNote (int midiNoteNumber, float velocity, BKFixedNoteSynthesiserSound*, uint32 length, int pitchWheel) override;
     void stopNote (float velocity, bool allowTailOff) override;
     
     void pitchWheelMoved (int newValue) override;
@@ -120,6 +120,8 @@ private:
     //==============================================================================
     double pitchRatio;
     double sourceSamplePosition;
+    uint32 sourceSampleCount;
+    uint32 playLength;
     float lgain, rgain, rampOnOffLevel, rampOnDelta, rampOffDelta;
     bool isInRampOn, isInRampOff;
     

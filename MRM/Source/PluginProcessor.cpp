@@ -12,9 +12,11 @@
 #include "PluginEditor.h"
 
 #include "BKMainPianoSampler.h"
+#include "BKFixedNotePianoSampler.h"
 
 #include "AudioConstants.h"
 
+#define USE_MAIN_PIANO 0
 
 String notes[4] = {"A","C","D#","F#"};
 
@@ -25,11 +27,18 @@ MrmAudioProcessor::MrmAudioProcessor() {
     String path = "~/samples/";
     
     // 88 voices seems to go over just fine...
-    for (int i = 0; i < 88; i++) mainPianoSynth.addVoice(new BKMainPianoSamplerVoice());
+    for (int i = 0; i < 88; i++) {
+#if USE_MAIN_PIANO
+        mainPianoSynth.addVoice(new BKMainPianoSamplerVoice());
+#endif
+        fixedNotePianoSynth.addVoice(new BKFixedNotePianoSamplerVoice());
+    }
     
     WavAudioFormat wavFormat;
-    
+#if USE_MAIN_PIANO
     mainPianoSynth.clearSounds();
+#endif
+    fixedNotePianoSynth.clearSounds();
     
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 4; j++) {
@@ -82,12 +91,21 @@ MrmAudioProcessor::MrmAudioProcessor() {
                     BigInteger velocityRange;
                     velocityRange.setRange(aVelocityThresh[k], (aVelocityThresh[k+1] - aVelocityThresh[k]), true);
 
+#if USE_MAIN_PIANO
                     mainPianoSynth.addSound( new BKMainPianoSamplerSound(soundName,
                                                         *sampleReader,
                                                         noteRange,
                                                         root,
                                                         velocityRange,
                                                         30.0 ));
+#endif
+                    
+                    fixedNotePianoSynth.addSound(new BKFixedNotePianoSamplerSound(soundName,
+                                                                                 *sampleReader,
+                                                                                 noteRange,
+                                                                                 root,
+                                                                                 velocityRange,
+                                                                                 30.0));
                     
                 } else {
                     DBG("file not opened OK: " + temp);
@@ -173,7 +191,10 @@ void MrmAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 
+#if USE_MAIN_PIANO
     mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
+#endif
+    fixedNotePianoSynth.setCurrentPlaybackSampleRate(sampleRate);
     
 }
 
@@ -260,9 +281,12 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     midiMessages.swapWith (processedMidi);
     
     
-    mainPianoSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples()
-                           );
-   
+#if USE_MAIN_PIANO
+    mainPianoSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
+#endif
+    
+    fixedNotePianoSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
+    
     
 
     // This is the place where you'd normally do the guts of your plugin's

@@ -23,24 +23,21 @@ midiNotes (notes),
 midiVelocities(velocities),
 midiRootNote (rootMidiNote)
 {
-    rampOnSamples = 0;
-    rampOffSamples = 0;
-    
-    sourceSampleRate = reader.sampleRate;
+        sourceSampleRate = reader.sampleRate;
     
     if (sourceSampleRate <= 0 || reader.lengthInSamples <= 0)
     {
-        length = 0;
+        maxLength = 0;
         
     }
     else
     {
-        length = jmin((int) reader.lengthInSamples,
+        maxLength = jmin((int) reader.lengthInSamples,
                       (int) (maxSampleLengthSeconds * sourceSampleRate));
         
-        data = new AudioSampleBuffer (jmin (2, (int) reader.numChannels), length + 4);
+        data = new AudioSampleBuffer (jmin (2, (int) reader.numChannels), maxLength + 4);
         
-        reader.read(data, 0, length + 4, 0, true, true);
+        reader.read(data, 0, maxLength + 4, 0, true, true);
         
         rampOnSamples = roundToInt (aRampOnTimeSec* sourceSampleRate);
         rampOffSamples = roundToInt (aRampOffTimeSec * sourceSampleRate);
@@ -81,14 +78,15 @@ BKFixedNotePianoSamplerVoice::~BKFixedNotePianoSamplerVoice()
 {
 }
 
-bool BKFixedNotePianoSamplerVoice::canPlaySound (BKSynthesiserSound* sound)
+bool BKFixedNotePianoSamplerVoice::canPlaySound (BKFixedNoteSynthesiserSound* sound)
 {
     return dynamic_cast<const BKFixedNotePianoSamplerSound*> (sound) != nullptr;
 }
 
 void BKFixedNotePianoSamplerVoice::startNote (const int midiNoteNumber,
                                          const float velocity,
-                                         BKSynthesiserSound* s,
+                                         BKFixedNoteSynthesiserSound* s,
+                                         const uint32 length, // ms
                                          const int /*currentPitchWheelPosition*/)
 {
     if (const BKFixedNotePianoSamplerSound* const sound = dynamic_cast<const BKFixedNotePianoSamplerSound*> (s))
@@ -102,7 +100,7 @@ void BKFixedNotePianoSamplerVoice::startNote (const int midiNoteNumber,
         sourceSamplePosition = 0.0;
         lgain = velocity;
         rgain = velocity;
-        
+        playLength = length;
         isInRampOn = (sound->rampOnSamples > 0);
         isInRampOff = false;
         
@@ -222,10 +220,9 @@ void BKFixedNotePianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuf
             
             sourceSamplePosition += pitchRatio;
             
-            if (sourceSamplePosition > playingSound->length)
+            if (!isInRampOff && sourceSamplePosition > playLength)
             {
-                stopNote (0.0f, false);
-                break;
+                stopNote (0.0f, true);
             }
         }
     }
