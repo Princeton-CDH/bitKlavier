@@ -395,7 +395,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                         voice->keyIsDown = false;
                         
                         
-                        if (! ((voice->type == FixedLengthFixedStart) || voice->sustainPedalDown || voice->sostenutoPedalDown)) {
+                        if (! ((voice->type == FixedLengthFixedStart) || (voice->type == FixedLength) || voice->sustainPedalDown || voice->sostenutoPedalDown)) {
                             stopVoice (voice, velocity, allowTailOff);
                         }
                     }

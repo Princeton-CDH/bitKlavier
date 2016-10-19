@@ -286,7 +286,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
         if (m.isNoteOn())
         {
             
-            Array<float> offsets = Array<float>(aPartialTuning,aNumScaleDegrees);
+            Array<float> tuningOffsets = Array<float>(aPartialTuning,aNumScaleDegrees);
             
             int tuningBasePitch = 4;
             
@@ -294,12 +294,12 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                                  m.getChannel(),
                                  m.getNoteNumber(),
                                  m.getFloatVelocity(),
-                                 offsets,
+                                 tuningOffsets,
                                  tuningBasePitch,
-                                 Reverse,
+                                 Forward,
                                  FixedLength,
-                                 2000, // start
-                                 6000 // length
+                                 0, // start
+                                 1500 // length
                                  );
             
         }
