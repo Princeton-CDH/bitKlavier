@@ -105,7 +105,7 @@ MrmAudioProcessor::MrmAudioProcessor() {
                         
                         mainPianoSynth.addSound(new BKPianoSamplerSound(soundName,
                                                                                       newBuffer,
-                                                                                    maxLength,
+                                                                                      maxLength,
                                                                                       sourceSampleRate,
                                                                                       noteRange,
                                                                                       root,
@@ -297,8 +297,8 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                                  tuningOffsets,
                                  tuningBasePitch,
                                  Forward,
-                                 FixedLength,
-                                 0, // start
+                                 Normal,
+                                 3000, // start
                                  1500 // length
                                  );
             
