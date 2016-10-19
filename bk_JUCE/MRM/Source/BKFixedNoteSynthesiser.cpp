@@ -243,7 +243,7 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
         {
             float time = 3.0;
             keyOn(channel,m.getNoteNumber(), m.getFloatVelocity(), ForwardNormal, (time * getSampleRate()));
-            keyOn(channel,m.getNoteNumber(), m.getFloatVelocity(), ForwardFixed, (time * getSampleRate()));
+            //keyOn(channel,m.getNoteNumber(), m.getFloatVelocity(), ForwardFixed, (time * getSampleRate()));
         }
         else if (m.isNoteOff())
         {

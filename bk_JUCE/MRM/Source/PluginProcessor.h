@@ -36,8 +36,8 @@ public:
     // MidiInput midiInput;
     AudioFormatManager formatManager;
 
-    BKSynthesiser mainPianoSynth;
-    BKFixedNoteSynthesiser fixedNotePianoSynth;
+    BKFixedNoteSynthesiser mainPianoSynth;
+    BKFixedNoteSynthesiser secondaryPianoSynth;
     
     ScopedPointer<AudioFormatReader> sampleReader;
     ScopedPointer<AudioSampleBuffer> sampleBuffer;

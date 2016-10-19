@@ -143,7 +143,7 @@ void BKFixedNotePianoSamplerVoice::controllerMoved (const int /*controllerNumber
                                                const int /*newValue*/)
 {
 }
-
+float masterGain = 0.5f;
 //==============================================================================
 void BKFixedNotePianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int startSample, int numSamples)
 {
@@ -201,12 +201,12 @@ void BKFixedNotePianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuf
             
             if (outR != nullptr)
             {
-                *outL++ += l;
-                *outR++ += r;
+                *outL++ += (l * masterGain);
+                *outR++ += (r * masterGain);
             }
             else
             {
-                *outL++ += (l + r) * 0.5f;
+                *outL++ += ((l + r) * 0.5f) * masterGain;
             }
             
             sourceSamplePosition += pitchRatio;

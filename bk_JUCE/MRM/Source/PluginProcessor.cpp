@@ -16,7 +16,7 @@
 
 #include "AudioConstants.h"
 
-#define USE_MAIN_PIANO 0
+#define USE_SECOND_SYNTH 0
 
 String notes[4] = {"A","C","D#","F#"};
 
@@ -27,19 +27,20 @@ MrmAudioProcessor::MrmAudioProcessor() {
     String path = "~/samples/";
     
     // 88 voices seems to go over just fine...
-    for (int i = 0; i < 88; i++) {
-#if USE_MAIN_PIANO
-        mainPianoSynth.addVoice(new BKMainPianoSamplerVoice());
+    for (int i = 0; i < 44; i++) {
+        mainPianoSynth.addVoice(new BKFixedNotePianoSamplerVoice());
+#if USE_SECOND_SYNTH
+        secondaryPianoSynth.addVoice(new BKFixedNotePianoSamplerVoice());
 #endif
-        fixedNotePianoSynth.addVoice(new BKFixedNotePianoSamplerVoice());
+    
     }
     
     WavAudioFormat wavFormat;
-#if USE_MAIN_PIANO
+
     mainPianoSynth.clearSounds();
+#if USE_SECOND_SYNTH
+    secondaryPianoSynth.clearSounds();
 #endif
-    fixedNotePianoSynth.clearSounds();
-    
     int numSamples = 0;
     
     for (int i = 0; i < 8; i++) {
@@ -68,24 +69,30 @@ MrmAudioProcessor::MrmAudioProcessor() {
                     sampleReader = wavFormat.createReaderFor(new FileInputStream(file), true);
                     
                     BigInteger noteRange;
+                    BigInteger noteRange2;
                     int root = 0;
                     if (j == 0) {
                         root = 9+12*i;
                         if (i == 7) {
                             // High C.
                             noteRange.setRange(root,4,true);
+                            noteRange2.setRange(root+12,4,true);
                         }else {
                             noteRange.setRange(root,3,true);
+                            noteRange2.setRange(root+12,3,true);
                         }
                     } else if (j == 1) {
                         root = 0+12*i;
                         noteRange.setRange(root,3,true);
+                        noteRange2.setRange(root+12,3,true);
                     } else if (j == 2) {
                         root = 3+12*i;
                         noteRange.setRange(root,3,true);
+                        noteRange2.setRange(root+12,3,true);
                     } else if (j == 3) {
                         root = 6+12*i;
                         noteRange.setRange(root,3,true);
+                        noteRange2.setRange(root+12,3,true);
                     } else {
                         
                     }
@@ -93,48 +100,36 @@ MrmAudioProcessor::MrmAudioProcessor() {
                     BigInteger velocityRange;
                     velocityRange.setRange(aVelocityThresh[k], (aVelocityThresh[k+1] - aVelocityThresh[k]), true);
 
-#if USE_MAIN_PIANO
-                    mainPianoSynth.addSound( new BKMainPianoSamplerSound(soundName,
-                                                        *sampleReader,
-                                                        noteRange,
-                                                        root,
-                                                        velocityRange,
-                                                        30.0 ));
-#endif
                     
                     double sourceSampleRate = sampleReader->sampleRate;
                     const int numChannels = sampleReader->numChannels;
                     int maxLength;
                     
-                    
-                    if (sourceSampleRate <= 0 || sampleReader->lengthInSamples <= 0)
-                    {
+                    if (sourceSampleRate <= 0 || sampleReader->lengthInSamples <= 0) {
                         maxLength = 0;
                         
-                    }
-                    else
-                    {
-                        maxLength = jmin((int) sampleReader->lengthInSamples,
-                                         (int) (aMaxSampleLengthSec * sourceSampleRate));
-                        
-                        /*
-                        ReferenceCountedBuffer::Ptr newBuffer = new ReferenceCountedBuffer (file.getFileName(), reader->numChannels, reader->lengthInSamples);
-                        reader->read (newBuffer->getAudioSampleBuffer(), 0, reader->lengthInSamples, 0, true, true);
-                        currentBuffer = newBuffer;
-                        buffers.add (newBuffer);
-                        */
+                    } else {
+                        maxLength = jmin((int)sampleReader->lengthInSamples, (int) (aMaxSampleLengthSec * sourceSampleRate));
                         
                         ReferenceCountedBuffer::Ptr newBuffer = new ReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels),sampleReader->lengthInSamples);
                         sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, sampleReader->lengthInSamples, 0, true, true);
                         sampleBuffers.insert(numSamples, newBuffer);
-                        //sampleBuffers.add(newBuffer);
                         
-                        fixedNotePianoSynth.addSound(new BKFixedNotePianoSamplerSound(soundName,
+                        mainPianoSynth.addSound(new BKFixedNotePianoSamplerSound(soundName,
                                                                                       newBuffer,
                                                                                       sourceSampleRate,
                                                                                       noteRange,
                                                                                       root,
                                                                                       velocityRange));
+                        
+#if USE_SECOND_SYNTH
+                        secondaryPianoSynth.addSound(new BKFixedNotePianoSamplerSound(soundName,
+                                                                                 newBuffer,
+                                                                                 sourceSampleRate,
+                                                                                 noteRange,
+                                                                                 root+12,
+                                                                                 velocityRange));
+#endif
                         
                     }
                     
@@ -224,12 +219,14 @@ void MrmAudioProcessor::changeProgramName (int index, const String& newName) {
 void MrmAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
     
     // Use this method as the place to do any pre-playback
-    // initialisation that you need..
-
-#if USE_MAIN_PIANO
+    // initialisation that you need.
+    
     mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
+#if USE_SECOND_SYNTH
+    secondaryPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
 #endif
-    fixedNotePianoSynth.setCurrentPlaybackSampleRate(sampleRate);
+
+    
     
 }
 
@@ -316,12 +313,10 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     midiMessages.swapWith (processedMidi);
     
     
-#if USE_MAIN_PIANO
     mainPianoSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
+#if USE_SECOND_SYNTH
+    secondaryPianoSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
 #endif
-    
-    fixedNotePianoSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
-    
     
 
     // This is the place where you'd normally do the guts of your plugin's
