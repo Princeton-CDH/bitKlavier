@@ -253,13 +253,13 @@
  #define JucePlugin_Build_STANDALONE       0
 #endif
 #ifndef  JucePlugin_Name
- #define JucePlugin_Name                   "DLT"
+ #define JucePlugin_Name                   "MRM"
 #endif
 #ifndef  JucePlugin_Desc
- #define JucePlugin_Desc                   "DLT"
+ #define JucePlugin_Desc                   "MRM"
 #endif
 #ifndef  JucePlugin_Manufacturer
- #define JucePlugin_Manufacturer           "DLT"
+ #define JucePlugin_Manufacturer           "MRM"
 #endif
 #ifndef  JucePlugin_ManufacturerWebsite
  #define JucePlugin_ManufacturerWebsite    ""
@@ -310,16 +310,16 @@
  #define JucePlugin_AUSubType              JucePlugin_PluginCode
 #endif
 #ifndef  JucePlugin_AUExportPrefix
- #define JucePlugin_AUExportPrefix         DLTAU
+ #define JucePlugin_AUExportPrefix         MRMAU
 #endif
 #ifndef  JucePlugin_AUExportPrefixQuoted
- #define JucePlugin_AUExportPrefixQuoted   "DLTAU"
+ #define JucePlugin_AUExportPrefixQuoted   "MRMAU"
 #endif
 #ifndef  JucePlugin_AUManufacturerCode
  #define JucePlugin_AUManufacturerCode     JucePlugin_ManufacturerCode
 #endif
 #ifndef  JucePlugin_CFBundleIdentifier
- #define JucePlugin_CFBundleIdentifier     com.DLT.DLTTest1
+ #define JucePlugin_CFBundleIdentifier     com.MRM.MRMTest1
 #endif
 #ifndef  JucePlugin_RTASCategory
  #define JucePlugin_RTASCategory           ePlugInCategory_SWGenerators
