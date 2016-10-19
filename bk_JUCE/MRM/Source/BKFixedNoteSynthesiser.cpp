@@ -10,7 +10,6 @@
 
 #include "BKFixedNoteSynthesiser.h"
 
-
 BKFixedNoteSynthesiserSound::BKFixedNoteSynthesiserSound() {}
 BKFixedNoteSynthesiserSound::~BKFixedNoteSynthesiserSound() {}
 
@@ -241,13 +240,19 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
         
         if (m.isNoteOn())
         {
+#if USE_SYNTH_INTERNAL
             float time = 3.0;
-            keyOn(channel,m.getNoteNumber(), m.getFloatVelocity(), ForwardNormal, (time * getSampleRate()));
-            //keyOn(channel,m.getNoteNumber(), m.getFloatVelocity(), ForwardFixed, (time * getSampleRate()));
+
+            Array<float> offsets = Array<float>(aJustTuning,aNumScaleDegrees);
+            
+            keyOn(channel,m.getNoteNumber(), m.getFloatVelocity(), offsets, ForwardNormal, (time * getSampleRate()));
+#endif
         }
         else if (m.isNoteOff())
         {
+#if USE_SYNTH_INTERNAL
             keyOff(channel, m.getNoteNumber(), m.getFloatVelocity(), true);
+#endif
         }
         else if (m.isAllNotesOff() || m.isAllSoundOff())
         {
@@ -281,6 +286,8 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
     void BKFixedNoteSynthesiser::keyOn (const int midiChannel,
                                 const int midiNoteNumber,
                                 const float velocity,
+                                Array<float> midiNoteOffsets,
+                                const int midiNoteTuningBase,
                                 PianoSamplerNoteType type,
                                 const uint32 length)
     {
@@ -307,8 +314,11 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
                             stopVoice (voice, 1.0f, true);
                     }
                 }
+                float midiNoteNumberOffset = aJustTuning[(midiNoteNumber - midiNoteTuningBase)%12];
+                
                 startVoice (findFreeVoice (sound, midiChannel, midiNoteNumber, shouldStealNotes),
-                            sound, midiChannel, midiNoteNumber, velocity, type, length);
+                            sound, midiChannel, midiNoteNumber, midiNoteNumberOffset, velocity, type, length);
+
             }
         }
     }
@@ -317,6 +327,7 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
                                     BKFixedNoteSynthesiserSound* const sound,
                                     const int midiChannel,
                                     const int midiNoteNumber,
+                                    const float midiNoteNumberOffset,
                                     const float velocity,
                                     PianoSamplerNoteType type,
                                     const uint32 length)
@@ -326,7 +337,11 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
             if (voice->currentlyPlayingSound != nullptr)
                 voice->stopNote (0.0f, false);
             
+#if CRAY_COOL_MUSIC_MAKER
+            voice->currentlyPlayingNote = (float)midiNoteNumber + midiNoteNumberOffset;
+#else
             voice->currentlyPlayingNote = midiNoteNumber;
+#endif
             voice->length = length;
             voice->type = type;
             voice->currentPlayingMidiChannel = midiChannel;
@@ -336,7 +351,7 @@ bool BKFixedNoteSynthesiserVoice::wasStartedBefore (const BKFixedNoteSynthesiser
             voice->sostenutoPedalDown = false;
             voice->sustainPedalDown = sustainPedalsDown[midiChannel];
             
-            voice->startNote (midiNoteNumber, velocity, type, length, sound
+            voice->startNote ((float)midiNoteNumber+midiNoteNumberOffset, velocity, type, length, sound
                               /*, lastPitchWheelValues [midiChannel - 1]*/);
         }
     }

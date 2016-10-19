@@ -1,12 +1,3 @@
-/*
-  ==============================================================================
-
-    This file was auto-generated!
-
-    It contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
-*/
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
@@ -15,8 +6,6 @@
 #include "BKFixedNotePianoSampler.h"
 
 #include "AudioConstants.h"
-
-#define USE_SECOND_SYNTH 0
 
 String notes[4] = {"A","C","D#","F#"};
 
@@ -296,9 +285,31 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     {
         if (m.isNoteOn())
         {
+            float time = 3.0;
+            
+            Array<float> offsets = Array<float>(aPartialTuning,aNumScaleDegrees);
+            
+            int tuningBasePitch = 4;
+            
+            mainPianoSynth.keyOn(
+                                 m.getChannel(),
+                                 m.getNoteNumber(),
+                                 m.getFloatVelocity(),
+                                 offsets,
+                                 tuningBasePitch,
+                                 ForwardNormal,
+                                 (time * getSampleRate())
+                                 );
+            
         }
         else if (m.isNoteOff())
         {
+            mainPianoSynth.keyOff(
+                                  m.getChannel(),
+                                  m.getNoteNumber(),
+                                  m.getFloatVelocity(),
+                                  true
+                                  );
         }
         else if (m.isAftertouch())
         {

@@ -109,7 +109,7 @@ public:
     //==============================================================================
     bool canPlaySound (BKFixedNoteSynthesiserSound*) override;
     
-    void startNote (int midiNoteNumber, float velocity, PianoSamplerNoteType type, uint32 length, BKFixedNoteSynthesiserSound* /*int pitchWheel*/) override;
+    void startNote (float midiNoteNumber, float velocity, PianoSamplerNoteType type, uint32 length, BKFixedNoteSynthesiserSound* /*int pitchWheel*/) override;
     void stopNote (float velocity, bool allowTailOff) override;
     
     void pitchWheelMoved (int newValue) override;

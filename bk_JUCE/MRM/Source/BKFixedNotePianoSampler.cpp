@@ -68,7 +68,7 @@ bool BKFixedNotePianoSamplerVoice::canPlaySound (BKFixedNoteSynthesiserSound* so
     return dynamic_cast<const BKFixedNotePianoSamplerSound*> (sound) != nullptr;
 }
 
-void BKFixedNotePianoSamplerVoice::startNote (const int midiNoteNumber,
+void BKFixedNotePianoSamplerVoice::startNote (const float midiNoteNumber,
                                          const float velocity,
                                          PianoSamplerNoteType type,
                                          const uint32 length,
@@ -77,8 +77,8 @@ void BKFixedNotePianoSamplerVoice::startNote (const int midiNoteNumber,
 {
     if (const BKFixedNotePianoSamplerSound* const sound = dynamic_cast<const BKFixedNotePianoSamplerSound*> (s))
     {
-        pitchRatio = pow (2.0, (midiNoteNumber - sound->midiRootNote) / 12.0)
-        * sound->sourceSampleRate / getSampleRate();
+        DBG(String(midiNoteNumber));
+        pitchRatio = powf(2.0f, (midiNoteNumber - (float)sound->midiRootNote) / 12.0f) * sound->sourceSampleRate / getSampleRate();
         
         sourceSamplePosition = 0.0;
         lgain = velocity;
@@ -143,7 +143,7 @@ void BKFixedNotePianoSamplerVoice::controllerMoved (const int /*controllerNumber
                                                const int /*newValue*/)
 {
 }
-float masterGain = 0.5f;
+
 //==============================================================================
 void BKFixedNotePianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int startSample, int numSamples)
 {
@@ -201,12 +201,12 @@ void BKFixedNotePianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuf
             
             if (outR != nullptr)
             {
-                *outL++ += (l * masterGain);
-                *outR++ += (r * masterGain);
+                *outL++ += (l * 1.0f);
+                *outR++ += (r * 1.0f);
             }
             else
             {
-                *outL++ += ((l + r) * 0.5f) * masterGain;
+                *outL++ += ((l + r) * 0.5f) * 1.0f;
             }
             
             sourceSamplePosition += pitchRatio;

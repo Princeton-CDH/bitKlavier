@@ -116,7 +116,7 @@ public:
     /** Called to start a new note.
      This will be called during the rendering callback, so must be fast and thread-safe.
      */
-    virtual void startNote (int midiNoteNumber,
+    virtual void startNote (float midiNoteNumber,
                             float velocity,
                             PianoSamplerNoteType type,
                             uint32 length,
@@ -381,6 +381,8 @@ public:
     virtual void keyOn (int midiChannel,
                          int midiNoteNumber,
                          float velocity,
+                         Array<float> midiNoteOffsets,
+                         int midiNoteTuningBase,
                          PianoSamplerNoteType type,
                          uint32 length);
     
@@ -602,6 +604,7 @@ protected:
                      BKFixedNoteSynthesiserSound* sound,
                      int midiChannel,
                      int midiNoteNumber,
+                     float midiNoteNumberOffset,
                      float velocity,
                      PianoSamplerNoteType type,
                      uint32 length);
