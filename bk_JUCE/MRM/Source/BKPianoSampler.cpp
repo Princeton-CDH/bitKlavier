@@ -88,27 +88,30 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         playType = type;
         playDirection = direction;
         
+        double playLength = ( length - sound->rampOffSamples ) * pitchRatio;
+        double maxLength = sound->soundLength - sound->rampOffSamples;
+        
         if (playDirection == Forward)
         {
             if (playType == Normal)
             {
                 sourceSamplePosition = 0.0;
-                playEndPosition = sound->soundLength - sound->rampOffSamples;
+                playEndPosition = maxLength - 1;
             }
             else if (playType == NormalFixedStart)
             {
                 sourceSamplePosition = startingPosition;
-                playEndPosition = sound->soundLength - sound->rampOffSamples;
+                playEndPosition = maxLength - 1;
             }
             else if (playType == FixedLength)
             {
                 sourceSamplePosition = 0.0;
-                playEndPosition = jmin((double)(startingPosition + length), (double)(length - sound->rampOffSamples));
+                playEndPosition = jmin(playLength, maxLength) - 1;
             }
             else if (playType == FixedLengthFixedStart)
             {
                 sourceSamplePosition = startingPosition;
-                playEndPosition = jmin((double)(startingPosition + length), (double)(length - sound->rampOffSamples));
+                playEndPosition = jmin( (startingPosition + playLength), maxLength) - 1;
             }
             else
             {
@@ -141,28 +144,26 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             else if (playType == FixedLength)
             {
                 sourceSamplePosition = sound->soundLength - 1;
-                if (length >= sourceSamplePosition)
+                if (playLength >= sourceSamplePosition)
                 {
                     playEndPosition = (double)sound->rampOffSamples;
-                    DBG(" in 1");
                 }
                 else
                 {
-                    playEndPosition = (double)(sourceSamplePosition - length);
-                    DBG(" in 2");
+                    playEndPosition = (double)(sourceSamplePosition - playLength);
                 }
                 DBG(String(playEndPosition));
             }
             else if (playType == FixedLengthFixedStart)
             {
                 sourceSamplePosition = startingPosition;
-                if (length >= sourceSamplePosition)
+                if (playLength >= sourceSamplePosition)
                 {
                     playEndPosition = (double)sound->rampOffSamples;
                 }
                 else
                 {
-                    playEndPosition = (double)(startingPosition - length);
+                    playEndPosition = (double)(startingPosition - playLength);
                 }
             }
             else
