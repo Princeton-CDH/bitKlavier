@@ -7,7 +7,6 @@
 #include "ReferenceCountedBuffer.h"
 
 #include "BKSynthesiser.h"
-#include "BKFixedNoteSynthesiser.h"
 
 
 
@@ -27,8 +26,8 @@ public:
     // MidiInput midiInput;
     AudioFormatManager formatManager;
 
-    BKFixedNoteSynthesiser mainPianoSynth;
-    BKFixedNoteSynthesiser secondaryPianoSynth;
+    BKSynthesiser mainPianoSynth;
+    BKSynthesiser secondaryPianoSynth;
     
     ScopedPointer<AudioFormatReader> sampleReader;
     ScopedPointer<AudioSampleBuffer> sampleBuffer;

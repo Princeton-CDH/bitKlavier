@@ -12,21 +12,13 @@
               maxBinaryFileSize="">
   <MAINGROUP id="s4R02g" name="MRM">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
-      <FILE id="gfXVOl" name="BKFixedNoteSynthesiser.cpp" compile="1" resource="0"
-            file="Source/BKFixedNoteSynthesiser.cpp"/>
-      <FILE id="fKkOy1" name="BKFixedNoteSynthesiser.h" compile="0" resource="0"
-            file="Source/BKFixedNoteSynthesiser.h"/>
-      <FILE id="Po9B77" name="BKFixedNotePianoSampler.cpp" compile="1" resource="0"
-            file="Source/BKFixedNotePianoSampler.cpp"/>
-      <FILE id="S3wesE" name="BKFixedNotePianoSampler.h" compile="0" resource="0"
-            file="Source/BKFixedNotePianoSampler.h"/>
-      <FILE id="nHKwRh" name="BKMainPianoSampler.cpp" compile="1" resource="0"
-            file="Source/BKMainPianoSampler.cpp"/>
-      <FILE id="sHd4nc" name="BKMainPianoSampler.h" compile="0" resource="0"
-            file="Source/BKMainPianoSampler.h"/>
-      <FILE id="T4cHHd" name="BKSynthesiser.cpp" compile="1" resource="0"
+      <FILE id="HVbOmG" name="BKPianoSampler.cpp" compile="1" resource="0"
+            file="Source/BKPianoSampler.cpp"/>
+      <FILE id="Spprlk" name="BKPianoSampler.h" compile="0" resource="0"
+            file="Source/BKPianoSampler.h"/>
+      <FILE id="SMTrU8" name="BKSynthesiser.cpp" compile="1" resource="0"
             file="Source/BKSynthesiser.cpp"/>
-      <FILE id="K588WO" name="BKSynthesiser.h" compile="0" resource="0" file="Source/BKSynthesiser.h"/>
+      <FILE id="vAQRhg" name="BKSynthesiser.h" compile="0" resource="0" file="Source/BKSynthesiser.h"/>
       <FILE id="VaGwGg" name="ReferenceCountedBuffer.cpp" compile="1" resource="0"
             file="Source/ReferenceCountedBuffer.cpp"/>
       <FILE id="Hf4u51" name="ReferenceCountedBuffer.h" compile="0" resource="0"

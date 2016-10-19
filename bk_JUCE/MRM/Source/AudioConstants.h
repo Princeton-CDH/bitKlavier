@@ -15,20 +15,27 @@
 
 #define USE_SYNTH_INTERNAL 0
 #define CRAY_COOL_MUSIC_MAKER 0
+#define CRAY_COOL_MUSIC_MAKER_2 0
 #define USE_SECOND_SYNTH 0
 
 
 
 typedef enum PianoSamplerNoteType {
-    ForwardNormal = 0,
-    ForwardFixed,
-    ReverseNormal,
-    ReverseFixed,
+    Normal = 0,
+    NormalFixedStart,
+    FixedLength,
+    FixedLengthFixedStart,
     PianoSamplerNoteTypeNil
 } PianoSamplerNoteType;
 
+typedef enum PianoSamplerNoteDirection {
+    Forward,
+    Reverse,
+    PianoSamplerPlaybackDirectionNil
+} PianoSamplerNoteDirection;
 
-static const float aMaxSampleLengthSec = 30.0;
+
+static const float aMaxSampleLengthSec = 30.0f;
 
 static const float aRampOnTimeSec = 0.005f;
 static const float aRampOffTimeSec = 0.005f;

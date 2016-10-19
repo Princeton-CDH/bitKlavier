@@ -2,8 +2,7 @@
   ==============================================================================
 
     BKSynthesiser.h
-    Adapted from juce_Synthesiser.h/cpp.
-    Created: 18 Oct 2016 9:22:00am
+    Created: 19 Oct 2016 9:59:49am
     Author:  Michael R Mulshine
 
   ==============================================================================
@@ -13,6 +12,8 @@
 #define BKSYNTHESISER_H_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
+
+#include "AudioConstants.h"
 
 
 //==============================================================================
@@ -114,10 +115,14 @@ public:
     /** Called to start a new note.
      This will be called during the rendering callback, so must be fast and thread-safe.
      */
-    virtual void startNote (int midiNoteNumber,
+    virtual void startNote (float midiNoteNumber,
                             float velocity,
-                            BKSynthesiserSound* sound,
-                            int currentPitchWheelPosition) = 0;
+                            PianoSamplerNoteDirection direction,
+                            PianoSamplerNoteType type,
+                            uint64 startingPosition,
+                            uint64 length,
+                            BKSynthesiserSound* sound
+    /*int currentPitchWheelPosition*/ ) = 0;
     
     /** Called to stop a note.
      
@@ -250,6 +255,9 @@ private:
     
     double currentSampleRate;
     int currentlyPlayingNote, currentPlayingMidiChannel;
+    uint32 length;
+    PianoSamplerNoteType direction;
+    PianoSamplerNoteType type;
     uint32 noteOnTime;
     BKSynthesiserSound::Ptr currentlyPlayingSound;
     bool keyIsDown, sustainPedalDown, sostenutoPedalDown;
@@ -372,9 +380,15 @@ public:
      
      The midiChannel parameter is the channel, between 1 and 16 inclusive.
      */
-    virtual void noteOn (int midiChannel,
-                         int midiNoteNumber,
-                         float velocity);
+    virtual void keyOn (int midiChannel,
+                        int midiNoteNumber,
+                        float velocity,
+                        Array<float> midiNoteOffsets,
+                        int midiNoteTuningBase,
+                        PianoSamplerNoteDirection direction,
+                        PianoSamplerNoteType type,
+                        float startingPositionMS,
+                        float lengthMS);
     
     /** Triggers a note-off event.
      
@@ -388,10 +402,10 @@ public:
      
      The midiChannel parameter is the channel, between 1 and 16 inclusive.
      */
-    virtual void noteOff (int midiChannel,
-                          int midiNoteNumber,
-                          float velocity,
-                          bool allowTailOff);
+    virtual void keyOff (int midiChannel,
+                         int midiNoteNumber,
+                         float velocity,
+                         bool allowTailOff);
     
     /** Turns off all notes.
      
@@ -573,9 +587,9 @@ protected:
      method, or (preferably) override findVoiceToSteal().
      */
     virtual BKSynthesiserVoice* findFreeVoice (BKSynthesiserSound* soundToPlay,
-                                             int midiChannel,
-                                             int midiNoteNumber,
-                                             bool stealIfNoneAvailable) const;
+                                                        int midiChannel,
+                                                        int midiNoteNumber,
+                                                        bool stealIfNoneAvailable) const;
     
     /** Chooses a voice that is most suitable for being re-used.
      The default method will attempt to find the oldest voice that isn't the
@@ -583,8 +597,8 @@ protected:
      you can override this method and do something more cunning instead.
      */
     virtual BKSynthesiserVoice* findVoiceToSteal (BKSynthesiserSound* soundToPlay,
-                                                int midiChannel,
-                                                int midiNoteNumber) const;
+                                                           int midiChannel,
+                                                           int midiNoteNumber) const;
     
     /** Starts a specified voice playing a particular sound.
      You'll probably never need to call this, it's used internally by noteOn(), but
@@ -594,7 +608,12 @@ protected:
                      BKSynthesiserSound* sound,
                      int midiChannel,
                      int midiNoteNumber,
-                     float velocity);
+                     float midiNoteNumberOffset,
+                     float velocity,
+                     PianoSamplerNoteDirection direction,
+                     PianoSamplerNoteType type,
+                     uint64 startingPosition,
+                     uint64 length);
     
     /** Stops a given voice.
      You should never need to call this, it's used internally by noteOff, but is protected
@@ -631,5 +650,6 @@ private:
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSynthesiser)
 };
+
 
 #endif  // BKSYNTHESISER_H_INCLUDED

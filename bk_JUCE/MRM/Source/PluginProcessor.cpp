@@ -2,8 +2,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-#include "BKMainPianoSampler.h"
-#include "BKFixedNotePianoSampler.h"
+#include "BKPianoSampler.h"
 
 #include "AudioConstants.h"
 
@@ -17,9 +16,9 @@ MrmAudioProcessor::MrmAudioProcessor() {
     
     // 88 voices seems to go over just fine...
     for (int i = 0; i < 44; i++) {
-        mainPianoSynth.addVoice(new BKFixedNotePianoSamplerVoice());
+        mainPianoSynth.addVoice(new BKPianoSamplerVoice());
 #if USE_SECOND_SYNTH
-        secondaryPianoSynth.addVoice(new BKFixedNotePianoSamplerVoice());
+        secondaryPianoSynth.addVoice(new BKPianoSamplerVoice());
 #endif
     
     }
@@ -92,27 +91,28 @@ MrmAudioProcessor::MrmAudioProcessor() {
                     
                     double sourceSampleRate = sampleReader->sampleRate;
                     const int numChannels = sampleReader->numChannels;
-                    int maxLength;
+                    uint64 maxLength;
                     
                     if (sourceSampleRate <= 0 || sampleReader->lengthInSamples <= 0) {
                         maxLength = 0;
                         
                     } else {
-                        maxLength = jmin((int)sampleReader->lengthInSamples, (int) (aMaxSampleLengthSec * sourceSampleRate));
+                        maxLength = jmin((uint64)sampleReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
                         
-                        ReferenceCountedBuffer::Ptr newBuffer = new ReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels),sampleReader->lengthInSamples);
+                        ReferenceCountedBuffer::Ptr newBuffer = new ReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels),maxLength);
                         sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, sampleReader->lengthInSamples, 0, true, true);
                         sampleBuffers.insert(numSamples, newBuffer);
                         
-                        mainPianoSynth.addSound(new BKFixedNotePianoSamplerSound(soundName,
+                        mainPianoSynth.addSound(new BKPianoSamplerSound(soundName,
                                                                                       newBuffer,
+                                                                                    maxLength,
                                                                                       sourceSampleRate,
                                                                                       noteRange,
                                                                                       root,
                                                                                       velocityRange));
                         
 #if USE_SECOND_SYNTH
-                        secondaryPianoSynth.addSound(new BKFixedNotePianoSamplerSound(soundName,
+                        secondaryPianoSynth.addSound(new BKPianoSamplerSound(soundName,
                                                                                  newBuffer,
                                                                                  sourceSampleRate,
                                                                                  noteRange,
@@ -285,7 +285,6 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     {
         if (m.isNoteOn())
         {
-            float time = 3.0;
             
             Array<float> offsets = Array<float>(aPartialTuning,aNumScaleDegrees);
             
@@ -297,8 +296,10 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                                  m.getFloatVelocity(),
                                  offsets,
                                  tuningBasePitch,
-                                 ForwardNormal,
-                                 (time * getSampleRate())
+                                 Forward,
+                                 Normal,
+                                 2000, // start
+                                 1000  // length
                                  );
             
         }

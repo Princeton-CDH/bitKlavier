@@ -2,16 +2,13 @@
   ==============================================================================
 
     BKSynthesiser.cpp
-    Adapted from juce_Synthesiser.h/cpp.
-    Created: 18 Oct 2016 9:22:00am
+    Created: 19 Oct 2016 9:59:49am
     Author:  Michael R Mulshine
 
   ==============================================================================
 */
 
 #include "BKSynthesiser.h"
-#include "AudioConstants.h"
-
 
 BKSynthesiserSound::BKSynthesiserSound() {}
 BKSynthesiserSound::~BKSynthesiserSound() {}
@@ -63,7 +60,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     }
     
     void BKSynthesiserVoice::renderNextBlock (AudioBuffer<double>& outputBuffer,
-                                            int startSample, int numSamples)
+                                                       int startSample, int numSamples)
     {
         AudioBuffer<double> subBuffer (outputBuffer.getArrayOfWritePointers(),
                                        outputBuffer.getNumChannels(),
@@ -164,9 +161,9 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     
     template <typename floatType>
     void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
-                                        const MidiBuffer& midiData,
-                                        int startSample,
-                                        int numSamples)
+                                                   const MidiBuffer& midiData,
+                                                   int startSample,
+                                                   int numSamples)
     {
         // must set the sample rate before using this!
         jassert (sampleRate != 0);
@@ -217,13 +214,13 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     
     // explicit template instantiation
     template void BKSynthesiser::processNextBlock<float> (AudioBuffer<float>& outputAudio,
-                                                        const MidiBuffer& midiData,
-                                                        int startSample,
-                                                        int numSamples);
+                                                                   const MidiBuffer& midiData,
+                                                                   int startSample,
+                                                                   int numSamples);
     template void BKSynthesiser::processNextBlock<double> (AudioBuffer<double>& outputAudio,
-                                                         const MidiBuffer& midiData,
-                                                         int startSample,
-                                                         int numSamples);
+                                                                    const MidiBuffer& midiData,
+                                                                    int startSample,
+                                                                    int numSamples);
     
     void BKSynthesiser::renderVoices (AudioBuffer<float>& buffer, int startSample, int numSamples)
     {
@@ -243,13 +240,19 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
         
         if (m.isNoteOn())
         {
+#if USE_SYNTH_INTERNAL
+            float time = 3.0;
             
-            noteOn (channel, m.getNoteNumber(), m.getFloatVelocity());
+            Array<float> offsets = Array<float>(aJustTuning,aNumScaleDegrees);
+            
+            keyOn(channel,m.getNoteNumber(), m.getFloatVelocity(), offsets, ForwardNormal, (time * getSampleRate()));
+#endif
         }
         else if (m.isNoteOff())
         {
-            
-            noteOff (channel, m.getNoteNumber(), m.getFloatVelocity(), true);
+#if USE_SYNTH_INTERNAL
+            keyOff(channel, m.getNoteNumber(), m.getFloatVelocity(), true);
+#endif
         }
         else if (m.isAllNotesOff() || m.isAllSoundOff())
         {
@@ -280,9 +283,15 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     }
     
     //==============================================================================
-    void BKSynthesiser::noteOn (const int midiChannel,
-                              const int midiNoteNumber,
-                              const float velocity)
+    void BKSynthesiser::keyOn (const int midiChannel,
+                                        const int midiNoteNumber,
+                                        const float velocity,
+                                        Array<float> midiNoteOffsets,
+                                        const int midiNoteTuningBase,
+                                        PianoSamplerNoteDirection direction,
+                                        PianoSamplerNoteType type,
+                                        const float startingPositionMS,
+                                        const float lengthMS)
     {
         const ScopedLock sl (lock);
         
@@ -297,33 +306,48 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             {
                 // If hitting a note that's still ringing, stop it first (it could be
                 // still playing because of the sustain or sostenuto pedal).
-                for (int j = voices.size(); --j >= 0;)
-                {
-                    BKSynthesiserVoice* const voice = voices.getUnchecked (j);
-                    
-                    if (voice->getCurrentlyPlayingNote() == midiNoteNumber
-                        && voice->isPlayingChannel (midiChannel))
-                        stopVoice (voice, 1.0f, true);
+                if (type == Normal || type == NormalFixedStart) {
+                    for (int j = voices.size(); --j >= 0;)
+                    {
+                        BKSynthesiserVoice* const voice = voices.getUnchecked (j);
+                        
+                        if (voice->getCurrentlyPlayingNote() == midiNoteNumber
+                            && voice->isPlayingChannel (midiChannel))
+                            stopVoice (voice, 1.0f, true);
+                    }
                 }
+                float midiNoteNumberOffset = aJustTuning[(midiNoteNumber - midiNoteTuningBase)%12];
                 
                 startVoice (findFreeVoice (sound, midiChannel, midiNoteNumber, shouldStealNotes),
-                            sound, midiChannel, midiNoteNumber, velocity);
+                            sound, midiChannel, midiNoteNumber, midiNoteNumberOffset, velocity, direction, type, (uint64)((startingPositionMS * 0.001f) * getSampleRate()), (uint64)(lengthMS*0.001f* getSampleRate()));
+                
             }
         }
     }
     
     void BKSynthesiser::startVoice (BKSynthesiserVoice* const voice,
-                                  BKSynthesiserSound* const sound,
-                                  const int midiChannel,
-                                  const int midiNoteNumber,
-                                  const float velocity)
+                                             BKSynthesiserSound* const sound,
+                                             const int midiChannel,
+                                             const int midiNoteNumber,
+                                             const float midiNoteNumberOffset,
+                                             const float velocity,
+                                             PianoSamplerNoteDirection direction,
+                                             PianoSamplerNoteType type,
+                                             const uint64 startingPosition,
+                                             const uint64 length)
     {
         if (voice != nullptr && sound != nullptr)
         {
             if (voice->currentlyPlayingSound != nullptr)
                 voice->stopNote (0.0f, false);
             
+#if CRAY_COOL_MUSIC_MAKER
+            voice->currentlyPlayingNote = (float)midiNoteNumber + midiNoteNumberOffset;
+#else
             voice->currentlyPlayingNote = midiNoteNumber;
+#endif
+            voice->length = length;
+            voice->type = type;
             voice->currentPlayingMidiChannel = midiChannel;
             voice->noteOnTime = ++lastNoteOnCounter;
             voice->currentlyPlayingSound = sound;
@@ -331,8 +355,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             voice->sostenutoPedalDown = false;
             voice->sustainPedalDown = sustainPedalsDown[midiChannel];
             
-            voice->startNote (midiNoteNumber, velocity, sound,
-                              lastPitchWheelValues [midiChannel - 1]);
+            voice->startNote ((float)midiNoteNumber+midiNoteNumberOffset, velocity, direction, type, startingPosition, length, sound
+                              /*, lastPitchWheelValues [midiChannel - 1]*/);
         }
     }
     
@@ -346,10 +370,10 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
         jassert (allowTailOff || (voice->getCurrentlyPlayingNote() < 0 && voice->getCurrentlyPlayingSound() == 0));
     }
     
-    void BKSynthesiser::noteOff (const int midiChannel,
-                               const int midiNoteNumber,
-                               const float velocity,
-                               const bool allowTailOff)
+    void BKSynthesiser::keyOff (const int midiChannel,
+                                         const int midiNoteNumber,
+                                         const float velocity,
+                                         bool allowTailOff)
     {
         const ScopedLock sl (lock);
         
@@ -367,10 +391,13 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                     {
                         jassert (! voice->keyIsDown || voice->sustainPedalDown == sustainPedalsDown [midiChannel]);
                         
+                        // Let synthesiser know that key is no longer down,
                         voice->keyIsDown = false;
                         
-                        if (! (voice->sustainPedalDown || voice->sostenutoPedalDown))
+                        
+                        if (! ((voice->type == FixedLengthFixedStart) || voice->sustainPedalDown || voice->sostenutoPedalDown)) {
                             stopVoice (voice, velocity, allowTailOff);
+                        }
                     }
                 }
             }
@@ -406,8 +433,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     }
     
     void BKSynthesiser::handleController (const int midiChannel,
-                                        const int controllerNumber,
-                                        const int controllerValue)
+                                                   const int controllerNumber,
+                                                   const int controllerValue)
     {
         switch (controllerNumber)
         {
@@ -524,8 +551,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     
     //==============================================================================
     BKSynthesiserVoice* BKSynthesiser::findFreeVoice (BKSynthesiserSound* soundToPlay,
-                                                  int midiChannel, int midiNoteNumber,
-                                                  const bool stealIfNoneAvailable) const
+                                                                        int midiChannel, int midiNoteNumber,
+                                                                        const bool stealIfNoneAvailable) const
     {
         const ScopedLock sl (lock);
         
@@ -552,7 +579,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     };
     
     BKSynthesiserVoice* BKSynthesiser::findVoiceToSteal (BKSynthesiserSound* soundToPlay,
-                                                     int /*midiChannel*/, int midiNoteNumber) const
+                                                                           int /*midiChannel*/, int midiNoteNumber) const
     {
         // This voice-stealing algorithm applies the following heuristics:
         // - Re-use the oldest notes first
@@ -644,3 +671,4 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
         
         return low;
     }
+    
