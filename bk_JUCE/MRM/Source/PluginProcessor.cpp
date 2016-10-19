@@ -296,10 +296,10 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                                  m.getFloatVelocity(),
                                  offsets,
                                  tuningBasePitch,
-                                 Forward,
-                                 Normal,
+                                 Reverse,
+                                 FixedLength,
                                  2000, // start
-                                 1000  // length
+                                 6000 // length
                                  );
             
         }

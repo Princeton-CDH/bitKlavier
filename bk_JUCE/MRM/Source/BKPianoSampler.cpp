@@ -144,11 +144,14 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                 if (length >= sourceSamplePosition)
                 {
                     playEndPosition = (double)sound->rampOffSamples;
+                    DBG(" in 1");
                 }
                 else
                 {
-                    playEndPosition = (double)(startingPosition - length);
+                    playEndPosition = (double)(sourceSamplePosition - length);
+                    DBG(" in 2");
                 }
+                DBG(String(playEndPosition));
             }
             else if (playType == FixedLengthFixedStart)
             {
