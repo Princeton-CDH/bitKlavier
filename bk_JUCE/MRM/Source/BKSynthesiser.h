@@ -119,10 +119,10 @@ public:
                             float velocity,
                             PianoSamplerNoteDirection direction,
                             PianoSamplerNoteType type,
+                            BKNoteType bktype,
                             uint64 startingPosition,
                             uint64 length,
-                            BKSynthesiserSound* sound
-    /*int currentPitchWheelPosition*/ ) = 0;
+                            BKSynthesiserSound* sound) = 0;
     
     /** Called to stop a note.
      
@@ -353,6 +353,15 @@ public:
     void removeSound (int index);
     
     //==============================================================================
+    // Synchronic sounds.
+    
+    void clearSynchronicSounds();
+    
+    BKSynthesiserSound* addSynchronicSound (const BKSynthesiserSound::Ptr& synchronicSound);
+    
+    void removeSynchronicSound (const int index);
+    
+    //==============================================================================
     /** If set to true, then the synth will try to take over an existing voice if
      it runs out and needs to play another note.
      
@@ -387,6 +396,7 @@ public:
                         int midiNoteTuningBase,
                         PianoSamplerNoteDirection direction,
                         PianoSamplerNoteType type,
+                        BKNoteType bktype, 
                         float startingPositionMS,
                         float lengthMS);
     
@@ -566,6 +576,8 @@ protected:
     OwnedArray<BKSynthesiserVoice> voices;
     ReferenceCountedArray<BKSynthesiserSound> sounds;
     
+    ReferenceCountedArray<BKSynthesiserSound> synchronicSounds; 
+    
     /** The last pitch-wheel values for each midi channel. */
     int lastPitchWheelValues [16];
     
@@ -612,6 +624,7 @@ protected:
                      float velocity,
                      PianoSamplerNoteDirection direction,
                      PianoSamplerNoteType type,
+                     BKNoteType bktype,
                      uint64 startingPosition,
                      uint64 length);
     

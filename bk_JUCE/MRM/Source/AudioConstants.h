@@ -28,6 +28,13 @@ typedef enum PianoSamplerNoteType {
     PianoSamplerNoteTypeNil
 } PianoSamplerNoteType;
 
+typedef enum BKNoteType {
+    Synchronic = 0,
+    Nostalgic,
+    Direct,
+    BKNoteTypeNil,
+} BKNoteType;
+
 typedef enum PianoSamplerNoteDirection {
     Forward,
     Reverse,

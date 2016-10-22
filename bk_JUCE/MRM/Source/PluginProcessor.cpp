@@ -258,7 +258,10 @@ bool MrmAudioProcessor::setPreferredBusArrangement (bool isInput, int bus, const
 }
 #endif
 
+
 #define LAYERS 0
+uint64 time_ms = 0;
+uint64 time_samp = 0;
 void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages) {
     
     const int totalNumInputChannels  = getTotalNumInputChannels();
@@ -288,7 +291,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
             
             Array<float> tuningOffsets = Array<float>(aPartialTuning,aNumScaleDegrees);
             
-            int tuningBasePitch = 4;
+            int tuningBasePitch = 0;
             
             mainPianoSynth.keyOn(
                                  m.getChannel(),
@@ -297,9 +300,10 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                                  tuningOffsets,
                                  tuningBasePitch,
                                  Forward,
-                                 Normal,
-                                 3000, // start
-                                 1500 // length
+                                 FixedLength,
+                                 Synchronic,
+                                 0, // start
+                                 100 // length
                                  );
             
         }
@@ -323,9 +327,10 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     }
     
     midiMessages.swapWith (processedMidi);
-    
+
     
     mainPianoSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
+    
 #if USE_SECOND_SYNTH
     secondaryPianoSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
 #endif

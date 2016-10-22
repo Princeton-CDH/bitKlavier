@@ -131,6 +131,24 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
         sounds.remove (index);
     }
     
+    void BKSynthesiser::clearSynchronicSounds()
+    {
+        const ScopedLock sl (lock);
+        synchronicSounds.clear();
+    }
+    
+    BKSynthesiserSound* BKSynthesiser::addSynchronicSound (const BKSynthesiserSound::Ptr& synchronicSound)
+    {
+        const ScopedLock sl (lock);
+        return synchronicSounds.add (synchronicSound);
+    }
+    
+    void BKSynthesiser::removeSynchronicSound (const int index)
+    {
+        const ScopedLock sl (lock);
+        synchronicSounds.remove (index);
+    }
+    
     void BKSynthesiser::setNoteStealingEnabled (const bool shouldSteal)
     {
         shouldStealNotes = shouldSteal;
@@ -290,6 +308,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                         const int midiNoteTuningBase,
                                         PianoSamplerNoteDirection direction,
                                         PianoSamplerNoteType type,
+                                        BKNoteType bktype,
                                         const float startingPositionMS,
                                         const float lengthMS)
     {
@@ -299,13 +318,12 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
         {
             BKSynthesiserSound* const sound = sounds.getUnchecked(i);
             
-            // DBG(velocity);
+            // Check if sound applies to note, velocity, and channel. 
             if (sound->appliesToNote (midiNoteNumber)
                 && sound->appliesToVelocity((int)(velocity * 127.0))
                 && sound->appliesToChannel (midiChannel))
             {
-                // If hitting a note that's still ringing, stop it first (it could be
-                // still playing because of the sustain or sostenuto pedal).
+                // If a Normal or NormalFixedStart note is struck while it is still playing, turn old one off.
                 if (type == Normal || type == NormalFixedStart) {
                     for (int j = voices.size(); --j >= 0;)
                     {
@@ -317,9 +335,9 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                     }
                 }
                 float midiNoteNumberOffset = aJustTuning[(midiNoteNumber - midiNoteTuningBase)%12];
-    
+                
                 startVoice (findFreeVoice (sound, midiChannel, midiNoteNumber, shouldStealNotes),
-                            sound, midiChannel, midiNoteNumber, midiNoteNumberOffset, velocity, direction, type, (uint64)((startingPositionMS * 0.001f) * getSampleRate()), (uint64)(lengthMS*0.001f* getSampleRate()));
+                            sound, midiChannel, midiNoteNumber, midiNoteNumberOffset, velocity, direction, type, bktype, (uint64)((startingPositionMS * 0.001f) * getSampleRate()), (uint64)(lengthMS*0.001f* getSampleRate()));
                 
             }
         }
@@ -333,6 +351,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                              const float velocity,
                                              PianoSamplerNoteDirection direction,
                                              PianoSamplerNoteType type,
+                                             BKNoteType bktype,
                                              const uint64 startingPosition,
                                              const uint64 length)
     {
@@ -355,8 +374,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             voice->sostenutoPedalDown = false;
             voice->sustainPedalDown = sustainPedalsDown[midiChannel];
             
-            voice->startNote ((float)midiNoteNumber+midiNoteNumberOffset, velocity, direction, type, startingPosition, length, sound
-                              /*, lastPitchWheelValues [midiChannel - 1]*/);
+            voice->startNote ((float)midiNoteNumber+midiNoteNumberOffset, velocity, direction, type, bktype, startingPosition, length, sound);
         }
     }
     
