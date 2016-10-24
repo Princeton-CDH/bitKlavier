@@ -61,6 +61,8 @@ static const int aVelocityThresh[8] = {
 
 
 
+
+
 // Just: 1/1, 16/15, 9/8, 6/5, 5/4, 4/3,  7/5, 3/2, 8/5, 5/3, 7/4,  15/8
 static const float aJustTuning[aNumScaleDegrees] = {0., .117313, .039101,  .156414, -.13686, -.019547, -.174873, .019547, .136864, -.15641, -.311745, -.11731};
 

@@ -297,7 +297,7 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
                 
                 if (rampOnOffLevel <= 0.0f)
                 {
-                    if (bkType == Synchronic && numPulses < maxPulses)
+                    if (playType != Normal && playType != NormalFixedStart && bkType == Synchronic && numPulses < maxPulses)
                     {
                         numPulses++;
                         

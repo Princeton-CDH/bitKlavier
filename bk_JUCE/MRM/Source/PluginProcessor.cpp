@@ -284,14 +284,36 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     int time;
     MidiMessage m;
     
+    Array<float> tuningOffsets = Array<float>(aPartialTuning,aNumScaleDegrees);
+    int tuningBasePitch = 0;
+    
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
         if (m.isNoteOn())
         {
+            mainPianoSynth.keyOn(
+                                 m.getChannel(),
+                                 m.getNoteNumber(),
+                                 m.getFloatVelocity(),
+                                 tuningOffsets,
+                                 tuningBasePitch,
+                                 Forward,
+                                 Normal,
+                                 BKNoteTypeNil,
+                                 1000, // start
+                                 250 // length
+                                 );
             
-            Array<float> tuningOffsets = Array<float>(aPartialTuning,aNumScaleDegrees);
             
-            int tuningBasePitch = 0;
+        }
+        else if (m.isNoteOff())
+        {
+            mainPianoSynth.keyOff(
+                                  m.getChannel(),
+                                  m.getNoteNumber(),
+                                  m.getFloatVelocity(),
+                                  true
+                                  );
             
             mainPianoSynth.keyOn(
                                  m.getChannel(),
@@ -303,18 +325,8 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                                  FixedLength,
                                  Synchronic,
                                  0, // start
-                                 100 // length
+                                 200 // length
                                  );
-            
-        }
-        else if (m.isNoteOff())
-        {
-            mainPianoSynth.keyOff(
-                                  m.getChannel(),
-                                  m.getNoteNumber(),
-                                  m.getFloatVelocity(),
-                                  true
-                                  );
         }
         else if (m.isAftertouch())
         {
