@@ -32,6 +32,8 @@ public:
     ScopedPointer<AudioFormatReader> sampleReader;
     ScopedPointer<AudioSampleBuffer> sampleBuffer;
     
+    Array<uint32> synchronicTimers; // max 10000 ms
+    
     ReferenceCountedArray<ReferenceCountedBuffer, CriticalSection> sampleBuffers;
     
     //ScopedArray<AudioSampleBuffer> sampleBuffers;
