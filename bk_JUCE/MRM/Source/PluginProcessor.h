@@ -29,6 +29,9 @@ public:
     BKSynthesiser mainPianoSynth;
     BKSynthesiser secondaryPianoSynth;
     
+    BKSynthesiser hammerReleaseSynth;
+    BKSynthesiser resonanceReleaseSynth;
+    
     ScopedPointer<AudioFormatReader> sampleReader;
     ScopedPointer<AudioSampleBuffer> sampleBuffer;
     

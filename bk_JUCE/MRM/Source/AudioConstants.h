@@ -16,7 +16,12 @@
 #define USE_SYNTH_INTERNAL 0
 #define CRAY_COOL_MUSIC_MAKER 0
 #define CRAY_COOL_MUSIC_MAKER_2 0
-#define USE_SECOND_SYNTH 0
+
+
+static const float aMaxSampleLengthSec = 30.0f;
+static const float aRampOnTimeSec = 0.004f;
+static const float aRampOffTimeSec = 0.004f;
+static const int aNumScaleDegrees = 12;
 
 
 
@@ -41,24 +46,24 @@ typedef enum PianoSamplerNoteDirection {
     PianoSamplerPlaybackDirectionNil
 } PianoSamplerNoteDirection;
 
-
-static const float aMaxSampleLengthSec = 30.0f;
-
-static const float aRampOnTimeSec = 0.005f;
-static const float aRampOffTimeSec = 0.005f;
-static const int aNumScaleDegrees = 12;
-
-static const int aVelocityThresh[8] = {
+static const int aVelocityThresh[9] = {
     0,
-    32,
-    48,
-    64,
-    80,
-    96,
-    112,
+    25,
+    42,
+    60,
+    76,
+    90,
+    104,
+    116,
     128
 };
 
+static const int aResonanceVelocityThresh[4] = {
+    0,
+    40,
+    85,
+    128
+};
 
 
 
