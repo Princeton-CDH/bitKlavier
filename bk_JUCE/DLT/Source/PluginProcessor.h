@@ -29,6 +29,9 @@ public:
     BKSynthesiser mainPianoSynth;
     BKSynthesiser secondaryPianoSynth;
     
+    BKSynthesiser hammerReleaseSynth;
+    BKSynthesiser resonanceReleaseSynth;
+    
     ScopedPointer<AudioFormatReader> sampleReader;
     ScopedPointer<AudioSampleBuffer> sampleBuffer;
     
@@ -41,6 +44,9 @@ public:
     float decay,val;
     int samplesDecay;
     int decayCount;
+    
+    BigInteger sampleCounter; 
+    double currentTime;
     
     // Change listener callback implementation
     void changeListenerCallback(ChangeBroadcaster *source) override;

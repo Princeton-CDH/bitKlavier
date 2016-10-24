@@ -52,6 +52,13 @@ static const int aVelocityThresh[8] = {
     128
 };
 
+static const int resonanceVelocityThresh[4] = {
+    0,
+    40,
+    85,
+    128
+};
+
 
 
 // Just: 1/1, 16/15, 9/8, 6/5, 5/4, 4/3,  7/5, 3/2, 8/5, 5/3, 7/4,  15/8

@@ -612,8 +612,8 @@ protected:
                      float velocity,
                      PianoSamplerNoteDirection direction,
                      PianoSamplerNoteType type,
-                     uint64 startingPosition,
-                     uint64 length);
+                     const uint64 startingPosition,
+                     const uint64 length);
     
     /** Stops a given voice.
      You should never need to call this, it's used internally by noteOff, but is protected
