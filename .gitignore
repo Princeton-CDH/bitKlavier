@@ -8,4 +8,5 @@ Builds/
 *.component
 *.xcuserstate
 *.zip
+*.swp
 
