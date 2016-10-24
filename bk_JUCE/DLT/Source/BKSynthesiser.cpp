@@ -302,22 +302,28 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             // DBG(velocity);
             if (sound->appliesToNote (midiNoteNumber)
                 && sound->appliesToVelocity((int)(velocity * 127.0))
-                && sound->appliesToChannel (midiChannel))
+                && sound->appliesToChannel (midiChannel)) 
             {
                 // If hitting a note that's still ringing, stop it first (it could be
                 // still playing because of the sustain or sostenuto pedal).
+                // DT: we need to make sure we aren't cutting off FixedNotes here...
+                
                 if (type == Normal || type == NormalFixedStart) {
                     for (int j = voices.size(); --j >= 0;)
                     {
                         BKSynthesiserVoice* const voice = voices.getUnchecked (j);
                         
                         if (voice->getCurrentlyPlayingNote() == midiNoteNumber
-                            && voice->isPlayingChannel (midiChannel))
+                            && voice->isPlayingChannel (midiChannel)) 
                             stopVoice (voice, 1.0f, true);
                     }
                 }
+                 
+                
+            
                 float midiNoteNumberOffset = aJustTuning[(midiNoteNumber - midiNoteTuningBase)%12];
                 
+                DBG("about to startVoice, velocity: " + std::to_string(velocity) );
                 startVoice (findFreeVoice (sound, midiChannel, midiNoteNumber, shouldStealNotes),
                             sound, midiChannel, midiNoteNumber, midiNoteNumberOffset, velocity, direction, type, (uint64)((startingPositionMS * 0.001f) * getSampleRate()), (uint64)(lengthMS*0.001f* getSampleRate()));
                 
@@ -354,7 +360,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             voice->keyIsDown = true;
             voice->sostenutoPedalDown = false;
             voice->sustainPedalDown = sustainPedalsDown[midiChannel];
-            
+            DBG("about to start note, velocity: " + std::to_string(velocity) );
             voice->startNote ((float)midiNoteNumber+midiNoteNumberOffset, velocity, direction, type, startingPosition, length, sound
                               /*, lastPitchWheelValues [midiChannel - 1]*/);
         }
@@ -394,14 +400,13 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                         // Let synthesiser know that key is no longer down,
                         voice->keyIsDown = false;
                         
-                        
                         if (! ((voice->type == FixedLengthFixedStart) || (voice->type == FixedLength) || voice->sustainPedalDown || voice->sostenutoPedalDown)) {
                             stopVoice (voice, velocity, allowTailOff);
                         }
                     }
                 }
             }
-        }
+        }  
     }
     
     void BKSynthesiser::allNotesOff (const int midiChannel, const bool allowTailOff)

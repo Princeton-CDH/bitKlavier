@@ -78,9 +78,9 @@ private:
     ReferenceCountedBuffer::Ptr data;
     
     double sourceSampleRate;
+    uint64 soundLength;
     BigInteger midiNotes;
     BigInteger midiVelocities;
-    uint64 soundLength;
     int rampOnSamples, rampOffSamples;
     int midiRootNote;
     

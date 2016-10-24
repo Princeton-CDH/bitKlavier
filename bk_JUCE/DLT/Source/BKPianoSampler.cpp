@@ -21,8 +21,8 @@ BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                                             const BigInteger& velocities)
 : name (soundName),
 data(buffer),
-soundLength(soundLength),
 sourceSampleRate(sourceSampleRate),
+soundLength(soundLength),
 midiNotes (notes),
 midiVelocities(velocities),
 midiRootNote (rootMidiNote)
@@ -106,6 +106,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             else if (playType == FixedLength)
             {
                 sourceSamplePosition = 0.0;
+                DBG("about to play fixed length: " + std::to_string(length) );
                 playEndPosition = jmin(playLength, maxLength) - 1;
             }
             else if (playType == FixedLengthFixedStart)
