@@ -13,12 +13,17 @@ MrmAudioProcessor::MrmAudioProcessor() {
     
     // For testing and developing, let's keep directory of samples in home folder on disk.
     String path = "~/samples/";
-    
+
     // 88 voices seems to go over just fine...
     for (int i = 0; i < 44; i++) {
         mainPianoSynth.addVoice(new BKPianoSamplerVoice());
-        
+    }
     
+    synchronicTimers = Array<uint64>();
+    synchronicOn = Array<int>();
+    synchronicTimers.ensureStorageAllocated(88);
+    for (int i = 0; i < 88; i++) {
+        synchronicTimers.insert(i,0);
     }
     
     for (int i = 0; i < 8; i++) {
@@ -63,22 +68,22 @@ MrmAudioProcessor::MrmAudioProcessor() {
                     
                     int root = 0;
                     if (j == 0) {
-                        root = 1 + (9+12*i);
+                        root = (9+12*i);
                         if (i == 7) {
                             // High C.
-                            noteRange.setRange(root,4,true);
+                            noteRange.setRange(root-1,4,true);
                         }else {
-                            noteRange.setRange(root,3,true);
+                            noteRange.setRange(root-1,3,true);
                         }
                     } else if (j == 1) {
-                        root = 1 + (0+12*i);
-                        noteRange.setRange(root,3,true);
+                        root = (0+12*i);
+                        noteRange.setRange(root-1,3,true);
                     } else if (j == 2) {
-                        root = 1 + (3+12*i);
-                        noteRange.setRange(root,3,true);
+                        root = (3+12*i);
+                        noteRange.setRange(root-1,3,true);
                     } else if (j == 3) {
-                        root = 1 + (6+12*i);
-                        noteRange.setRange(root,3,true);
+                        root = (6+12*i);
+                        noteRange.setRange(root-1,3,true);
                     } else {
                         
                     }
@@ -207,17 +212,17 @@ MrmAudioProcessor::MrmAudioProcessor() {
                     BigInteger noteRange;
                     int root = 0;
                     if (j == 0) {
-                        root = 1 + (9+12*i);
-                        noteRange.setRange(root,3,true);
+                        root = (9+12*i);
+                        noteRange.setRange(root-1,3,true);
                     } else if (j == 1) {
-                        root = 1 + (0+12*i);
-                        noteRange.setRange(root,3,true);
+                        root = (0+12*i);
+                        noteRange.setRange(root-1,3,true);
                     } else if (j == 2) {
-                        root = 1 + (3+12*i);
-                        noteRange.setRange(root,3,true);
+                        root = (3+12*i);
+                        noteRange.setRange(root-1,3,true);
                     } else if (j == 3) {
-                        root = 1 + (6+12*i);
-                        noteRange.setRange(root,3,true);
+                        root = (6+12*i);
+                        noteRange.setRange(root-1,3,true);
                     }
                     
                     //velocity switching
@@ -391,10 +396,32 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     Array<float> tuningOffsets = Array<float>(aPartialTuning,aNumScaleDegrees);
     int tuningBasePitch = 0;
     
+    
+    int numSamples = buffer.getNumSamples();
+    for (int i = (synchronicOn.size()-1); i >= 0; i--){
+        int noteNumber = synchronicOn[i];
+        if (synchronicTimers[noteNumber] < (getSampleRate() * 8))
+        {
+            synchronicTimers.set(noteNumber,synchronicTimers[noteNumber]+numSamples);
+            //DBG("synchronic note number: \n");
+            //DBG(String(i));
+            //DBG("timer: \n");
+            //DBG(String(synchronicTimers[noteNumber]));
+        }
+        else
+        {
+            synchronicTimers.set(noteNumber,0);
+            synchronicOn.remove(i);
+        }
+    }
+    
+    
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
         if (m.isNoteOn())
         {
+            synchronicOn.add(m.getNoteNumber()-9);
+            synchronicTimers.set(m.getNoteNumber()-9,0);
             mainPianoSynth.keyOn(
                                  m.getChannel(),
                                  m.getNoteNumber(),
@@ -423,7 +450,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
             hammerReleaseSynth.keyOn(
                                      m.getChannel(),
                                      m.getNoteNumber(),
-                                     m.getFloatVelocity() * 0.01, //will want hammerGain multipler that user can set
+                                     m.getFloatVelocity() * 0.0025, //will want hammerGain multipler that user can set
                                      tuningOffsets,
                                      tuningBasePitch,
                                      Forward,
@@ -436,7 +463,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
             resonanceReleaseSynth.keyOn(
                                         m.getChannel(),
                                         m.getNoteNumber(),
-                                        m.getFloatVelocity(), //will also want multiplier for resonance gain, though not here...
+                                        m.getFloatVelocity() * 0.5, //will also want multiplier for resonance gain, though not here...
                                         tuningOffsets,
                                         tuningBasePitch,
                                         Forward,

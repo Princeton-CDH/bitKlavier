@@ -353,15 +353,6 @@ public:
     void removeSound (int index);
     
     //==============================================================================
-    // Synchronic sounds.
-    
-    void clearSynchronicSounds();
-    
-    BKSynthesiserSound* addSynchronicSound (const BKSynthesiserSound::Ptr& synchronicSound);
-    
-    void removeSynchronicSound (const int index);
-    
-    //==============================================================================
     /** If set to true, then the synth will try to take over an existing voice if
      it runs out and needs to play another note.
      
@@ -576,8 +567,6 @@ protected:
     OwnedArray<BKSynthesiserVoice> voices;
     ReferenceCountedArray<BKSynthesiserSound> sounds;
     
-    ReferenceCountedArray<BKSynthesiserSound> synchronicSounds; 
-    
     /** The last pitch-wheel values for each midi channel. */
     int lastPitchWheelValues [16];
     
@@ -646,6 +635,7 @@ private:
                            int startSample,
                            int numSamples);
     //==============================================================================
+    
     double sampleRate;
     uint32 lastNoteOnCounter;
     int minimumSubBlockSize;

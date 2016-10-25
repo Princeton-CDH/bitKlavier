@@ -80,7 +80,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     shouldStealNotes (true)
     {
         for (int i = 0; i < numElementsInArray (lastPitchWheelValues); ++i)
-            lastPitchWheelValues[i] = 0x2000;
+            lastPitchWheelValues[i] = 0x2000;        
+        
     }
     
     BKSynthesiser::~BKSynthesiser()
@@ -129,24 +130,6 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     {
         const ScopedLock sl (lock);
         sounds.remove (index);
-    }
-    
-    void BKSynthesiser::clearSynchronicSounds()
-    {
-        const ScopedLock sl (lock);
-        synchronicSounds.clear();
-    }
-    
-    BKSynthesiserSound* BKSynthesiser::addSynchronicSound (const BKSynthesiserSound::Ptr& synchronicSound)
-    {
-        const ScopedLock sl (lock);
-        return synchronicSounds.add (synchronicSound);
-    }
-    
-    void BKSynthesiser::removeSynchronicSound (const int index)
-    {
-        const ScopedLock sl (lock);
-        synchronicSounds.remove (index);
     }
     
     void BKSynthesiser::setNoteStealingEnabled (const bool shouldSteal)
@@ -258,19 +241,11 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
         
         if (m.isNoteOn())
         {
-#if USE_SYNTH_INTERNAL
-            float time = 3.0;
             
-            Array<float> offsets = Array<float>(aJustTuning,aNumScaleDegrees);
-            
-            keyOn(channel,m.getNoteNumber(), m.getFloatVelocity(), offsets, ForwardNormal, (time * getSampleRate()));
-#endif
         }
         else if (m.isNoteOff())
         {
-#if USE_SYNTH_INTERNAL
-            keyOff(channel, m.getNoteNumber(), m.getFloatVelocity(), true);
-#endif
+
         }
         else if (m.isAllNotesOff() || m.isAllSoundOff())
         {
