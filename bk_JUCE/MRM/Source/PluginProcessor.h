@@ -8,7 +8,10 @@
 
 #include "BKSynthesiser.h"
 
-
+struct SynchronicNote {
+    uint64 timer;
+    uint32 noteLen;
+};
 
 //==============================================================================
 /**
@@ -37,6 +40,9 @@ public:
     
     Array<int> synchronicOn;
     Array<uint64> synchronicTimers; // max 10000 ms
+    Array<uint32> synchronicNumBeats; // max 10000 ms
+    Array<uint32> synchronicCurrentBeats; // max 10000 ms
+    Array<float> synchronicBeatMultipliers;
     
     ReferenceCountedArray<ReferenceCountedBuffer, CriticalSection> sampleBuffers;
     

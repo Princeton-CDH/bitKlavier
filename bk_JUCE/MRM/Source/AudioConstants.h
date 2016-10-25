@@ -66,6 +66,8 @@ static const int aResonanceVelocityThresh[4] = {
 };
 
 
+static const float aSynchronicBeatMultipliers[8] = {1.0,0.5,0.5,0.5,0.25,0.25,0.5,0.5};
+
 
 
 // Just: 1/1, 16/15, 9/8, 6/5, 5/4, 4/3,  7/5, 3/2, 8/5, 5/3, 7/4,  15/8
