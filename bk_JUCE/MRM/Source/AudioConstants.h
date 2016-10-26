@@ -19,7 +19,12 @@
 
 static const float aSynchronicClusterThreshold = 0.5;
 static const int aSynchronicClusterMin = 2;
-
+static const int aSynchronicClusterMax = 5;
+static const float aSynchronicTempo = 60.0;
+static const float aSynchronicBeatMultipliers[8] = {1.0, 1.0, 1.0, 0.5, 0.5, 0.25, 0.25, 0.25};
+static const float aSynchronicLengthMultipliers[7] = {1.0, 0.5, 0.4, 1.5, .3, .3, .3};
+static const float aSynchronicAccentMultipliers[6] = {.5, 1.0, .2, .4, .8, .8};
+static const int aSynchronicNumPulses = 16;
 
 static const float aMaxSampleLengthSec = 30.0f;
 static const float aRampOnTimeSec = 0.004f;
@@ -61,6 +66,14 @@ static const int aVelocityThresh[9] = {
     128
 };
 
+static const int aVelocityThresh_FourLayers[5] = {
+    0,
+    42,
+    76,
+    104,
+    128
+};
+
 static const int aResonanceVelocityThresh[4] = {
     0,
     40,
@@ -69,7 +82,7 @@ static const int aResonanceVelocityThresh[4] = {
 };
 
 
-static const float aSynchronicBeatMultipliers[8] = {1.0,0.5,0.5,0.5,0.25,0.25,0.5,0.5};
+
 
 
 
