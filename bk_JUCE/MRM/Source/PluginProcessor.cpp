@@ -11,6 +11,7 @@ String notes[4] = {"A","C","D#","F#"};
 //==============================================================================
 MrmAudioProcessor::MrmAudioProcessor() {
     
+    clusterSize = 0;
     synchronicBeatMultipliers = Array<float>(aSynchronicBeatMultipliers,8);
     for (int i = 0; i < synchronicBeatMultipliers.size(); i++){
         DBG(String(synchronicBeatMultipliers[i]));
@@ -30,6 +31,12 @@ MrmAudioProcessor::MrmAudioProcessor() {
     synchronicTimers.ensureStorageAllocated(88);
     for (int i = 0; i < 88; i++) {
         synchronicTimers.insert(i,0);
+    }
+    
+    synchronicPhasors = Array<uint64>();
+    synchronicPhasors.ensureStorageAllocated(88);
+    for (int i = 0; i < 88; i++) {
+        synchronicPhasors.insert(i,0);
     }
     
     synchronicNumBeats = Array<uint32>();
@@ -415,23 +422,20 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     
     Array<float> tuningOffsets = Array<float>(aPartialTuning,aNumScaleDegrees);
     int tuningBasePitch = 0;
-    
+    float tempo = 120.0;
     int numSamples = buffer.getNumSamples();
     for (int i = (synchronicOn.size()-1); i >= 0; i--){
         int noteNumber = synchronicOn[i];
-        uint32 timer = synchronicTimers[noteNumber];
         uint32 totalBeats = synchronicNumBeats[noteNumber];
         uint8 beat = synchronicCurrentBeats[noteNumber];
         
         if (totalBeats < 8)
         {
             synchronicTimers.set(noteNumber,synchronicTimers[noteNumber]+numSamples);
-            if (timer >= (synchronicBeatMultipliers[beat] * getSampleRate()))
+            synchronicPhasors.set(noteNumber,synchronicPhasors[noteNumber]+numSamples);
+            
+            if (synchronicPhasors[noteNumber] >= (synchronicBeatMultipliers[beat] * getSampleRate() * (60.0/tempo)))
             {
-                DBG("synchronic pulse: ");
-                DBG(String(noteNumber));
-                DBG("synchronic beat multiplier: ");
-                DBG(String(synchronicBeatMultipliers[beat]));
                 mainPianoSynth.keyOn(
                                      m.getChannel(),
                                      noteNumber+9,
@@ -442,7 +446,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                                      FixedLengthFixedStart,
                                      BKNoteTypeNil,
                                      0, // start
-                                     250 // length
+                                     100 // length
                                      );
                 
                 
@@ -452,13 +456,12 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                 
                 synchronicNumBeats.set(noteNumber,totalBeats+1);
                 
-                synchronicTimers.set(noteNumber,0);
+                synchronicPhasors.set(noteNumber,0);
             }
             
         }
         else
         {
-            synchronicTimers.set(noteNumber,0);
             synchronicOn.remove(i);
         }
     }
@@ -469,21 +472,50 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
         if (m.isNoteOn())
         {
             
-
-            //synchronicTimers.set(m.getNoteNumber()-9,0);
-            //synchronicCurrentBeats.set(m.getNoteNumber()-9,0);
-            //synchronicNumBeats.set(m.getNoteNumber()-9,0);
-            if (!synchronicOn.contains(m.getNoteNumber()-9)){
-                synchronicOn.add(m.getNoteNumber()-9);
-            }
-
-            for (int i = (synchronicOn.size()-1); i >= 0; i--){
+#if 1
+            
+            
+            
+            
+            // implement synchronic cluster min and such
+            int synchronicCount = synchronicOn.size();
+            
+            int addToCluster = 1;
+            int noteToAdd = m.getNoteNumber()-9;
+            for (int i = (synchronicOn.size()-1); i >= 0; i--)
+            {
                 int note = synchronicOn[i];
-                synchronicTimers.set(note,0);
-                synchronicCurrentBeats.set(note,0);
-                synchronicNumBeats.set(note,0);
+                if (note == noteToAdd)
+                {
+                    addToCluster = 0;
+                }
+                
+                // cluster threshold
+                if ((synchronicTimers[note] < (aSynchronicClusterThreshold * getSampleRate())))
+                {
+                    //if (clusterSize >= aSynchronicClusterMin)
+                    {
+                        DBG(String(clusterSize));
+                        synchronicPhasors.set(note,0);
+                        synchronicCurrentBeats.set(note,0);
+                        synchronicNumBeats.set(note,0);
+                    }
+                }
+                else
+                {
+                    synchronicOn.remove(note);
+                }
             }
             
+            if (addToCluster){
+                synchronicOn.add(noteToAdd);
+                //clusterSize++;
+                synchronicTimers.set(noteToAdd,0);
+                synchronicPhasors.set(noteToAdd,0);
+                synchronicCurrentBeats.set(noteToAdd,0);
+                synchronicNumBeats.set(noteToAdd,0);
+            }
+#endif
             mainPianoSynth.keyOn(
                                  m.getChannel(),
                                  m.getNoteNumber(),
@@ -494,7 +526,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                                  Normal,
                                  BKNoteTypeNil,
                                  1000, // start
-                                 250 // length
+                                 100 // length
                                  );
             
             

@@ -17,6 +17,9 @@
 #define CRAY_COOL_MUSIC_MAKER 0
 #define CRAY_COOL_MUSIC_MAKER_2 0
 
+static const float aSynchronicClusterThreshold = 0.5;
+static const int aSynchronicClusterMin = 2;
+
 
 static const float aMaxSampleLengthSec = 30.0f;
 static const float aRampOnTimeSec = 0.004f;

@@ -39,10 +39,14 @@ public:
     ScopedPointer<AudioSampleBuffer> sampleBuffer;
     
     Array<int> synchronicOn;
+    Array<int> synchronicCluster;
     Array<uint64> synchronicTimers; // max 10000 ms
+    Array<uint64> synchronicPhasors; // max 10000 ms
     Array<uint32> synchronicNumBeats; // max 10000 ms
     Array<uint32> synchronicCurrentBeats; // max 10000 ms
     Array<float> synchronicBeatMultipliers;
+    
+    int clusterSize;
     
     ReferenceCountedArray<ReferenceCountedBuffer, CriticalSection> sampleBuffers;
     
