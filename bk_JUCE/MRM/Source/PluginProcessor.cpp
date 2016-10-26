@@ -14,7 +14,7 @@ MrmAudioProcessor::MrmAudioProcessor() {
     clusterSize = 0;
     
     // Synchronic beat multiplier initialization
-    synchronicBeatMultipliers = Array<float>(aSynchronicBeatMultipliers,8);
+    synchronicBeatMultipliers = Array<float>(aSynchronicBeatMultipliers,4);
     synchronicCurrentBeats = Array<uint32>();
     synchronicCurrentBeats.ensureStorageAllocated(88);
     for (int i = 0; i < 88; i++) {
@@ -22,7 +22,7 @@ MrmAudioProcessor::MrmAudioProcessor() {
     }
     
     // Synchronic length multiplier initialization
-    synchronicLengthMultipliers = Array<float>(aSynchronicLengthMultipliers,7);
+    synchronicLengthMultipliers = Array<float>(aSynchronicLengthMultipliers,4);
     synchronicCurrentLengths = Array<uint32>();
     synchronicCurrentLengths.ensureStorageAllocated(88);
     for (int i = 0; i < 88; i++) {
@@ -30,7 +30,7 @@ MrmAudioProcessor::MrmAudioProcessor() {
     }
     
     // Synchronic accent multiplier initialization
-    synchronicAccentMultipliers = Array<float>(aSynchronicAccentMultipliers,6);
+    synchronicAccentMultipliers = Array<float>(aSynchronicAccentMultipliers,4);
     synchronicCurrentAccents = Array<uint32>();
     synchronicCurrentAccents.ensureStorageAllocated(88);
     for (int i = 0; i < 88; i++) {
@@ -455,9 +455,12 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     Array<float> tuningOffsets = Array<float>(aPartialTuning,aNumScaleDegrees);
     int tuningBasePitch = 0;
     int numSamples = buffer.getNumSamples();
+    
     int synchronicOnSize = synchronicOn.size();
+    
     for (int i = (synchronicOnSize-1); i >= 0; i--){
         int noteIndex = synchronicOn[i];
+        
         uint32 totalPulses = synchronicNumPulses[noteIndex];
         uint8 beat = synchronicCurrentBeats[noteIndex];
         uint8 length = synchronicCurrentBeats[noteIndex];
@@ -467,18 +470,39 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
         {
             if (synchronicPhasors[noteIndex] >= (synchronicBeatMultipliers[beat] * getSampleRate() * (60.0/aSynchronicTempo)))
             {
-                mainPianoSynth.keyOn(
-                                     m.getChannel(),
-                                     noteIndex+9,
-                                     synchronicAccentMultipliers[accent],
-                                     tuningOffsets,
-                                     tuningBasePitch,
-                                     Forward,
-                                     FixedLengthFixedStart,
-                                     BKNoteTypeNil,
-                                     0, // start
-                                     (synchronicLengthMultipliers[length] * (60.0/aSynchronicTempo) * 1000.0)
-                                     );
+                PianoSamplerNoteDirection direction;
+                if (synchronicLengthMultipliers[length] < 0)
+                {
+                    mainPianoSynth.keyOn(
+                                         m.getChannel(),
+                                         noteIndex+9,
+                                         synchronicAccentMultipliers[accent],
+                                         tuningOffsets,
+                                         tuningBasePitch,
+                                         Reverse,
+                                         FixedLengthFixedStart,
+                                         BKNoteTypeNil,
+                                         (fabs(synchronicLengthMultipliers[length]) * (60.0/aSynchronicTempo) * 1000.0), // start
+                                         (fabs(synchronicLengthMultipliers[length]) * (60.0/aSynchronicTempo) * 1000.0)
+                                         );
+                }
+                else
+                {
+                    mainPianoSynth.keyOn(
+                                         m.getChannel(),
+                                         noteIndex+9,
+                                         synchronicAccentMultipliers[accent],
+                                         tuningOffsets,
+                                         tuningBasePitch,
+                                         Forward,
+                                         FixedLength,
+                                         BKNoteTypeNil,
+                                         0, // start
+                                         (fabs(synchronicLengthMultipliers[length]) * (60.0/aSynchronicTempo) * 1000.0)
+                                         );
+                }
+                
+                
                 
                 
                 if (++beat >= synchronicBeatMultipliers.size())
@@ -545,6 +569,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
             for (int n = (clusterSize-1); n >= 0; n--)
             {
                 int note = synchronicCluster[n];
+                
                 if ((clusterSize >= aSynchronicClusterMin) &&
                     (clusterSize <= aSynchronicClusterMax))
                 {
@@ -555,6 +580,8 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                     }
                     synchronicPhasors.set(note,0);
                     synchronicCurrentBeats.set(note,0);
+                    synchronicCurrentAccents.set(note,0);
+                    synchronicCurrentLengths.set(note,0);
                     synchronicNumPulses.set(note,0);
                 }
             }
