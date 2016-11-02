@@ -4,8 +4,6 @@
 
 #include "BKPianoSampler.h"
 
-#include "AudioConstants.h"
-
 String notes[4] = {"A","C","D#","F#"};
 
 //==============================================================================
@@ -470,7 +468,6 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
         {
             if (synchronicPhasors[noteIndex] >= (synchronicBeatMultipliers[beat] * getSampleRate() * (60.0/aSynchronicTempo)))
             {
-                PianoSamplerNoteDirection direction;
                 if (synchronicLengthMultipliers[length] < 0)
                 {
                     mainPianoSynth.keyOn(
@@ -554,8 +551,6 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     {
         if (m.isNoteOn())
         {
-            
-#if 1
             int noteIndex = m.getNoteNumber()-9;
             
             synchronicTimers.set(noteIndex,0);
@@ -565,6 +560,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
             synchronicClusterTimers.set(noteIndex,0);
             
             int clusterSize = synchronicCluster.size();
+            int firstNote = synchronicCluster.getFirst();
             
             for (int n = (clusterSize-1); n >= 0; n--)
             {
@@ -578,15 +574,30 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                         inSynchronicOn.set(note, true);
                         synchronicOn.add(note);
                     }
-                    synchronicPhasors.set(note,0);
-                    synchronicCurrentBeats.set(note,0);
-                    synchronicCurrentAccents.set(note,0);
-                    synchronicCurrentLengths.set(note,0);
-                    synchronicNumPulses.set(note,0);
+                    if (aSynchronicSyncMode == FirstNoteSync)
+                    {   // NOT WORKING
+                        synchronicPhasors.set(note, synchronicPhasors[firstNote]);
+                        synchronicCurrentBeats.set(note, synchronicCurrentBeats[firstNote]);
+                        synchronicCurrentAccents.set(note, synchronicCurrentAccents[firstNote]);
+                        synchronicCurrentLengths.set(note, synchronicCurrentLengths[firstNote]);
+                        synchronicNumPulses.set(note, synchronicNumPulses[firstNote]);
+                         
+                    }
+                    else if (aSynchronicSyncMode == LastNoteSync)
+                    {
+                        synchronicPhasors.set(note,0);
+                        synchronicCurrentBeats.set(note,0);
+                        synchronicCurrentAccents.set(note,0);
+                        synchronicCurrentLengths.set(note,0);
+                        synchronicNumPulses.set(note,0);
+                    }
+                   else
+                    {
+                        
+                    }
                 }
             }
             
-#endif
             mainPianoSynth.keyOn(
                                  m.getChannel(),
                                  m.getNoteNumber(),

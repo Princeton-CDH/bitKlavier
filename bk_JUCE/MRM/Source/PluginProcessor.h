@@ -6,6 +6,8 @@
 
 #include "ReferenceCountedBuffer.h"
 
+#include "AudioConstants.h"
+
 #include "BKSynthesiser.h"
 
 struct SynchronicNote {
@@ -28,15 +30,15 @@ public:
     // Public instance varables.
     // MidiInput midiInput;
     AudioFormatManager formatManager;
-
-    BKSynthesiser mainPianoSynth;
-    BKSynthesiser secondaryPianoSynth;
-    
-    BKSynthesiser hammerReleaseSynth;
-    BKSynthesiser resonanceReleaseSynth;
     
     ScopedPointer<AudioFormatReader> sampleReader;
     ScopedPointer<AudioSampleBuffer> sampleBuffer;
+    
+    BKSynthesiser mainPianoSynth;
+    
+    BKSynthesiser hammerReleaseSynth;
+    
+    BKSynthesiser resonanceReleaseSynth;
     
     Array<int> synchronicCluster;
     Array<int> inSynchronicCluster;
