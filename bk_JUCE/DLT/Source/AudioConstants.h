@@ -16,7 +16,20 @@
 #define USE_SYNTH_INTERNAL 0
 #define CRAY_COOL_MUSIC_MAKER 0
 #define CRAY_COOL_MUSIC_MAKER_2 0
-#define USE_SECOND_SYNTH 0
+
+static const float aSynchronicClusterThreshold = 0.5;
+static const int aSynchronicClusterMin = 2;
+static const int aSynchronicClusterMax = 10;
+static const float aSynchronicTempo = 120.0;
+static const float aSynchronicBeatMultipliers[4] = {1.0, 1.0, 1.0, 1.0};
+static const float aSynchronicLengthMultipliers[4] = {1.0, -1.0, 1.0, -1.0};
+static const float aSynchronicAccentMultipliers[4] = {1.0, 1.0, 1.0, 1.0};
+static const int aSynchronicNumPulses = 16;
+
+static const float aMaxSampleLengthSec = 30.0f;
+static const float aRampOnTimeSec = 0.004f;
+static const float aRampOffTimeSec = 0.004f;
+static const int aNumScaleDegrees = 12;
 
 
 
@@ -28,36 +41,48 @@ typedef enum PianoSamplerNoteType {
     PianoSamplerNoteTypeNil
 } PianoSamplerNoteType;
 
+typedef enum BKNoteType {
+    Synchronic = 0,
+    Nostalgic,
+    Direct,
+    BKNoteTypeNil,
+} BKNoteType;
+
 typedef enum PianoSamplerNoteDirection {
     Forward,
     Reverse,
     PianoSamplerPlaybackDirectionNil
 } PianoSamplerNoteDirection;
 
-
-static const float aMaxSampleLengthSec = 30.0f;
-
-static const float aRampOnTimeSec = 0.005f;
-static const float aRampOffTimeSec = 0.005f;
-static const int aNumScaleDegrees = 12;
-
-static const int aVelocityThresh[8] = {
+static const int aVelocityThresh[9] = {
     0,
-    32,
-    48,
-    64,
-    80,
-    96,
-    112,
+    25,
+    42,
+    60,
+    76,
+    90,
+    104,
+    116,
     128
 };
 
-static const int resonanceVelocityThresh[4] = {
+static const int aVelocityThresh_FourLayers[5] = {
+    0,
+    42,
+    76,
+    104,
+    128
+};
+
+static const int aResonanceVelocityThresh[4] = {
     0,
     40,
     85,
     128
 };
+
+
+
 
 
 

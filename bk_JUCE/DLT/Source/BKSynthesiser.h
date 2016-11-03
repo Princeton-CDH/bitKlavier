@@ -119,10 +119,10 @@ public:
                             float velocity,
                             PianoSamplerNoteDirection direction,
                             PianoSamplerNoteType type,
+                            BKNoteType bktype,
                             uint64 startingPosition,
                             uint64 length,
-                            BKSynthesiserSound* sound
-    /*int currentPitchWheelPosition*/ ) = 0;
+                            BKSynthesiserSound* sound) = 0;
     
     /** Called to stop a note.
      
@@ -387,6 +387,7 @@ public:
                         int midiNoteTuningBase,
                         PianoSamplerNoteDirection direction,
                         PianoSamplerNoteType type,
+                        BKNoteType bktype, 
                         float startingPositionMS,
                         float lengthMS);
     
@@ -612,8 +613,9 @@ protected:
                      float velocity,
                      PianoSamplerNoteDirection direction,
                      PianoSamplerNoteType type,
-                     const uint64 startingPosition,
-                     const uint64 length);
+                     BKNoteType bktype,
+                     uint64 startingPosition,
+                     uint64 length);
     
     /** Stops a given voice.
      You should never need to call this, it's used internally by noteOff, but is protected
@@ -633,6 +635,7 @@ private:
                            int startSample,
                            int numSamples);
     //==============================================================================
+    
     double sampleRate;
     uint32 lastNoteOnCounter;
     int minimumSubBlockSize;

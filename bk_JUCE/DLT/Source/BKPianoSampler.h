@@ -68,7 +68,6 @@ public:
     bool appliesToVelocity (int midiNoteVelocity) override;
     bool appliesToChannel (int midiChannel) override;
     
-    
 private:
     //==============================================================================
     friend class BKPianoSamplerVoice;
@@ -78,9 +77,9 @@ private:
     ReferenceCountedBuffer::Ptr data;
     
     double sourceSampleRate;
-    uint64 soundLength;
     BigInteger midiNotes;
     BigInteger midiVelocities;
+    uint64 soundLength;
     int rampOnSamples, rampOffSamples;
     int midiRootNote;
     
@@ -110,7 +109,7 @@ public:
     //==============================================================================
     bool canPlaySound (BKSynthesiserSound*) override;
     
-    void startNote (float midiNoteNumber, float velocity, PianoSamplerNoteDirection direction, PianoSamplerNoteType type, uint64 startingPosition, uint64 length, BKSynthesiserSound* /*int pitchWheel*/) override;
+    void startNote (float midiNoteNumber, float velocity, PianoSamplerNoteDirection direction, PianoSamplerNoteType type, BKNoteType bktype, uint64 startingPosition, uint64 length, BKSynthesiserSound* sound) override;
     void stopNote (float velocity, bool allowTailOff) override;
     
     void pitchWheelMoved (int newValue) override;
@@ -119,13 +118,20 @@ public:
     void renderNextBlock (AudioSampleBuffer&, int startSample, int numSamples) override;
     
     
+    
+    
 private:
     //==============================================================================
+    int noteNumber;
+    float noteVelocity;
+    uint64 noteStartingPosition, noteEndPosition;
     double pitchRatio;
     double sourceSamplePosition;
     double playEndPosition;
-    uint32 sourceSampleCount;
     uint32 playLength;
+    uint64 timer;
+    int maxPulses, numPulses;
+    BKNoteType bkType;
     PianoSamplerNoteType playType;
     PianoSamplerNoteDirection playDirection;
     float lgain, rgain, rampOnOffLevel, rampOnDelta, rampOffDelta;
