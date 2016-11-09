@@ -8,7 +8,7 @@
               pluginIsSynth="1" pluginWantsMidiIn="1" pluginProducesMidiOut="1"
               pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="1" pluginAUExportPrefix="DLTAU"
               pluginRTASCategory="" aaxIdentifier="com.yourcompany.MRM" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
-              jucerVersion="4.2.4" companyName="mrmulshine" companyEmail="mrmulshine@gmail.com"
+              jucerVersion="4.3.0" companyName="mrmulshine" companyEmail="mrmulshine@gmail.com"
               maxBinaryFileSize="">
   <MAINGROUP id="s4R02g" name="DLT">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
@@ -19,6 +19,10 @@
       <FILE id="SMTrU8" name="BKSynthesiser.cpp" compile="1" resource="0"
             file="Source/BKSynthesiser.cpp"/>
       <FILE id="vAQRhg" name="BKSynthesiser.h" compile="0" resource="0" file="Source/BKSynthesiser.h"/>
+      <FILE id="vjiHes" name="NostalgicPreparation.cpp" compile="1" resource="0"
+            file="Source/NostalgicPreparation.cpp"/>
+      <FILE id="YnKItb" name="NostalgicPreparation.h" compile="0" resource="0"
+            file="Source/NostalgicPreparation.h"/>
       <FILE id="VaGwGg" name="ReferenceCountedBuffer.cpp" compile="1" resource="0"
             file="Source/ReferenceCountedBuffer.cpp"/>
       <FILE id="Hf4u51" name="ReferenceCountedBuffer.h" compile="0" resource="0"

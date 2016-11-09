@@ -6,44 +6,104 @@
 
 #include "AudioConstants.h"
 
+#include "NostalgicPreparation.h"
+
 String notes[4] = {"A","C","D#","F#"};
 
 //==============================================================================
 MrmAudioProcessor::MrmAudioProcessor() {
     
-    // For testing and developing, let's keep directory of samples in home folder on disk.
-    String path = "~/samples/";
+    clusterSize = 0;
     
-    for (int i = 0; i < 44; i++) { //i'm betting that we will be fine with, say, 25 voices... but, not sure how much it matters
-        mainPianoSynth.addVoice(new BKPianoSamplerVoice());
-#if USE_SECOND_SYNTH
-        secondaryPianoSynth.addVoice(new BKPianoSamplerVoice());
-#endif
-    
+    // Synchronic beat multiplier initialization
+    synchronicBeatMultipliers = Array<float>(aSynchronicBeatMultipliers,4);
+    synchronicCurrentBeats = Array<uint32>();
+    synchronicCurrentBeats.ensureStorageAllocated(88);
+    for (int i = 0; i < 88; i++) {
+        synchronicCurrentBeats.insert(i,0);
     }
     
-    //fewer voices for release samples....
-    for (int i = 0; i < 4; i++) {
+    // Synchronic length multiplier initialization
+    synchronicLengthMultipliers = Array<float>(aSynchronicLengthMultipliers,4);
+    synchronicCurrentLengths = Array<uint32>();
+    synchronicCurrentLengths.ensureStorageAllocated(88);
+    for (int i = 0; i < 88; i++) {
+        synchronicCurrentLengths.insert(i,0);
+    }
+    
+    // Synchronic accent multiplier initialization
+    synchronicAccentMultipliers = Array<float>(aSynchronicAccentMultipliers,4);
+    synchronicCurrentAccents = Array<uint32>();
+    synchronicCurrentAccents.ensureStorageAllocated(88);
+    for (int i = 0; i < 88; i++) {
+        synchronicCurrentAccents.insert(i,0);
+    }
+    
+    // For testing and developing, let's keep directory of samples in home folder on disk.
+    String path = "~/samples/";
+
+    // 88 voices seems to go over just fine...
+    for (int i = 0; i < 44; i++) {
+        mainPianoSynth.addVoice(new BKPianoSamplerVoice());
+    }
+    
+    synchronicOn = Array<int>();
+    inSynchronicOn= Array<int>();
+    inSynchronicOn.ensureStorageAllocated(88);
+    for (int i = 0; i < 88; i++) {
+        inSynchronicOn.insert(i,0);
+    }
+    
+    synchronicCluster = Array<int>();
+    inSynchronicCluster = Array<int>();
+    inSynchronicCluster.ensureStorageAllocated(88);
+    for (int i = 0; i < 88; i++) {
+        inSynchronicCluster.insert(i,0);
+    }
+
+    
+    synchronicTimers = Array<uint64>();
+    synchronicTimers.ensureStorageAllocated(88);
+    for (int i = 0; i < 88; i++) {
+        synchronicTimers.insert(i,0);
+    }
+    
+    synchronicClusterTimers = Array<uint64>();
+    synchronicClusterTimers.ensureStorageAllocated(88);
+    for (int i = 0; i < 88; i++) {
+        synchronicClusterTimers.insert(i,0);
+    }
+    
+    synchronicPhasors = Array<uint64>();
+    synchronicPhasors.ensureStorageAllocated(88);
+    for (int i = 0; i < 88; i++) {
+        synchronicPhasors.insert(i,0);
+    }
+    
+    synchronicNumPulses = Array<uint32>();
+    synchronicNumPulses.ensureStorageAllocated(88);
+    for (int i = 0; i < 88; i++) {
+        synchronicNumPulses.insert(i,0);
+    }
+    
+    for (int i = 0; i < 8; i++) {
         hammerReleaseSynth.addVoice(new BKPianoSamplerVoice() );
         resonanceReleaseSynth.addVoice(new BKPianoSamplerVoice() );
     }
     
     WavAudioFormat wavFormat;
-
+    
     mainPianoSynth.clearSounds();
     hammerReleaseSynth.clearSounds();
     resonanceReleaseSynth.clearSounds();
-#if USE_SECOND_SYNTH
-    secondaryPianoSynth.clearSounds();
-#endif
-
-
-    //load main samples, with velocity layers
+    
     int numSamples = 0;
-    for (int i = 0; i < 8; i++) { 
+    
+    for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 4; j++) {
             if ((i == 0) && (j > 0)) continue;
-            for (int k = 0; k < 7; k++)
+            
+            for (int k = 0; k < 8; k++)
             {
         
                 String temp = path;
@@ -52,48 +112,46 @@ MrmAudioProcessor::MrmAudioProcessor() {
                 temp.append("v",2);
                 temp.append(String(((k*2)+1)),3);
                 temp.append(".wav",5);
-                
                 File file(temp);
+                
                 FileInputStream inputStream(file);
                 
                 if (inputStream.openedOk()) {
                     
-                    DBG("file opened OK: " + file.getFileName());
+                    //DBG("file opened OK: " + file.getFileName());
                     
                     String soundName = file.getFileName();
                 
                     sampleReader = wavFormat.createReaderFor(new FileInputStream(file), true);
                     
                     BigInteger noteRange;
-                    //BigInteger noteRange2;
+                    
                     int root = 0;
                     if (j == 0) {
-                        root = 9+12*i;
+                        root = (9+12*i) + 12; //octave offset
                         if (i == 7) {
                             // High C.
-                            noteRange.setRange(root,4,true); //we should verify that this is setting the mapping to nearest neighbors of the untransposed sample
-                            //noteRange2.setRange(root+12,4,true);
+                            noteRange.setRange(root-1,5,true);
                         }else {
-                            noteRange.setRange(root,3,true);
-                            //noteRange2.setRange(root+12,3,true);
+                            noteRange.setRange(root-1,3,true);
                         }
                     } else if (j == 1) {
-                        root = 0+12*i;
-                        noteRange.setRange(root,3,true);
-                        //noteRange2.setRange(root+12,3,true);
+                        root = (0+12*i) + 12;
+                        noteRange.setRange(root-1,3,true);
                     } else if (j == 2) {
-                        root = 3+12*i;
-                        noteRange.setRange(root,3,true);
-                        //noteRange2.setRange(root+12,3,true);
+                        root = (3+12*i) + 12;
+                        noteRange.setRange(root-1,3,true);
                     } else if (j == 3) {
-                        root = 6+12*i;
-                        noteRange.setRange(root,3,true);
-                        //noteRange2.setRange(root+12,3,true);
-                    } 
+                        root = (6+12*i) + 12;
+                        noteRange.setRange(root-1,3,true);
+                    } else {
+                        
+                    }
                     
                     BigInteger velocityRange;
                     velocityRange.setRange(aVelocityThresh[k], (aVelocityThresh[k+1] - aVelocityThresh[k]), true);
 
+                    
                     double sourceSampleRate = sampleReader->sampleRate;
                     const int numChannels = sampleReader->numChannels;
                     uint64 maxLength;
@@ -108,29 +166,26 @@ MrmAudioProcessor::MrmAudioProcessor() {
                         sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, sampleReader->lengthInSamples, 0, true, true);
                         sampleBuffers.insert(numSamples, newBuffer);
                         
-                        //DBG("added main sample: " + std::to_string(noteRange.toInteger()) + " " + std::to_string(root) + " " + std::to_string(velocityRange.toInteger()) );
                         mainPianoSynth.addSound(new BKPianoSamplerSound(soundName,
-                                                                                  newBuffer,
-                                                                                  maxLength,
-                                                                                  sourceSampleRate,
-                                                                                  noteRange,
-                                                                                  root,
-                                                                                  velocityRange));
-                        
-#if USE_SECOND_SYNTH
-                        secondaryPianoSynth.addSound(new BKPianoSamplerSound(soundName,
-                                                                                 newBuffer,
-                                                                                 sourceSampleRate,
-                                                                                 noteRange,
-                                                                                 root+12,
-                                                                                 velocityRange));
-#endif
+                                                                                      newBuffer,
+                                                                                      maxLength,
+                                                                                      sourceSampleRate,
+                                                                                      noteRange,
+                                                                                      root,
+                                                                                      velocityRange));
                         
                     }
+                    
+                    
+                    
+                    
+                    
                 } else {
                     DBG("file not opened OK: " + temp);
                 }
+                          
             }
+            
         }
     }
     
@@ -141,13 +196,13 @@ MrmAudioProcessor::MrmAudioProcessor() {
         temp += "rel";
         temp += std::to_string(i);
         temp += ".wav";
-
+        
         File file(temp);
         FileInputStream inputStream(file);
         
         if (inputStream.openedOk()) {
             
-            DBG("file opened OK: " + file.getFileName());
+            //DBG("file opened OK: " + file.getFileName());
             String soundName = file.getFileName();
             sampleReader = wavFormat.createReaderFor(new FileInputStream(file), true);
             
@@ -174,12 +229,12 @@ MrmAudioProcessor::MrmAudioProcessor() {
                 sampleBuffers.insert(numSamples, newBuffer);
                 
                 hammerReleaseSynth.addSound(new BKPianoSamplerSound(soundName,
-                                                                newBuffer,
-                                                                maxLength,
-                                                                sourceSampleRate,
-                                                                noteRange,
-                                                                root,
-                                                                velocityRange));
+                                                                    newBuffer,
+                                                                    maxLength,
+                                                                    sourceSampleRate,
+                                                                    noteRange,
+                                                                    root,
+                                                                    velocityRange));
             }
         } else {
             DBG("file not opened OK: " + temp);
@@ -203,13 +258,13 @@ MrmAudioProcessor::MrmAudioProcessor() {
                 temp += notes[j];
                 temp += std::to_string(i);
                 temp += ".wav";
-
+                
                 File file(temp);
                 FileInputStream inputStream(file);
                 
                 if (inputStream.openedOk()) {
                     
-                    DBG("file opened OK: " + file.getFileName());
+                    //DBG("file opened OK: " + file.getFileName());
                     String soundName = file.getFileName();
                     sampleReader = wavFormat.createReaderFor(new FileInputStream(file), true);
                     
@@ -217,22 +272,22 @@ MrmAudioProcessor::MrmAudioProcessor() {
                     BigInteger noteRange;
                     int root = 0;
                     if (j == 0) {
-                        root = 9+12*i;
-                        noteRange.setRange(root,3,true);
+                        root = (9+12*i) + 12;
+                        noteRange.setRange(root-1,3,true);
                     } else if (j == 1) {
-                        root = 0+12*i;
-                        noteRange.setRange(root,3,true);
+                        root = (0+12*i) + 12;
+                        noteRange.setRange(root-1,3,true);
                     } else if (j == 2) {
-                        root = 3+12*i;
-                        noteRange.setRange(root,3,true);
+                        root = (3+12*i) + 12;
+                        noteRange.setRange(root-1,3,true);
                     } else if (j == 3) {
-                        root = 6+12*i;
-                        noteRange.setRange(root,3,true);
+                        root = (6+12*i) + 12;
+                        noteRange.setRange(root-1,3,true);
                     }
                     
                     //velocity switching
                     BigInteger velocityRange;
-                    velocityRange.setRange(resonanceVelocityThresh[k], (resonanceVelocityThresh[k+1] - resonanceVelocityThresh[k]), true);
+                    velocityRange.setRange(aResonanceVelocityThresh[k], (aResonanceVelocityThresh[k+1] - aResonanceVelocityThresh[k]), true);
                     
                     //load the sample, add to synth
                     double sourceSampleRate = sampleReader->sampleRate;
@@ -249,14 +304,14 @@ MrmAudioProcessor::MrmAudioProcessor() {
                         sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, sampleReader->lengthInSamples, 0, true, true);
                         sampleBuffers.insert(numSamples, newBuffer);
                         
-                        DBG("added resonance: " + std::to_string(noteRange.toInteger()) + " " + std::to_string(root) + " " + std::to_string(velocityRange.toInteger()) );
+                        //DBG("added resonance: " + std::to_string(noteRange.toInteger()) + " " + std::to_string(root) + " " + std::to_string(velocityRange.toInteger()) );
                         resonanceReleaseSynth.addSound(new BKPianoSamplerSound(soundName,
-                                                                        newBuffer,
-                                                                        maxLength,
-                                                                        sourceSampleRate,
-                                                                        noteRange,
-                                                                        root,
-                                                                        velocityRange));
+                                                                               newBuffer,
+                                                                               maxLength,
+                                                                               sourceSampleRate,
+                                                                               noteRange,
+                                                                               root,
+                                                                               velocityRange));
                     }
                 } else {
                     DBG("file not opened OK: " + temp);
@@ -331,12 +386,6 @@ void MrmAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
     mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
     hammerReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     resonanceReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
-#if USE_SECOND_SYNTH
-    secondaryPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
-#endif
-
-    
-    
 }
 
 /*
@@ -374,11 +423,15 @@ bool MrmAudioProcessor::setPreferredBusArrangement (bool isInput, int bus, const
         return false;
    #endif
 
-    return AudioProcessor::setPreferredBusArrangement (isInput, bus, preferredSet);
+    return setPreferredBusArrangement (isInput, bus, preferredSet);
 }
 #endif
 
+
 #define LAYERS 0
+uint64 time_ms = 0;
+uint64 time_samp = 0;
+
 void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages) {
     
     const int totalNumInputChannels  = getTotalNumInputChannels();
@@ -396,22 +449,158 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     }
     
     buffer.clear();
-    sampleCounter += buffer.getNumSamples(); //advance time counter
-    //currentTime = sampleCounter / sampleReader->sampleRate;
     
     MidiBuffer processedMidi;
     int time;
     MidiMessage m;
     
+    Array<float> tuningOffsets = Array<float>(aPartialTuning,aNumScaleDegrees);
+    int tuningBasePitch = 0;
+    
+    
+    nostalgic.incrementTimer(buffer.getNumSamples());
+    
+    
+    /*
+    int numSamples = buffer.getNumSamples();
+    int synchronicOnSize = synchronicOn.size();
+    
+    
+    for (int i = (synchronicOnSize-1); i >= 0; i--){
+        int noteIndex = synchronicOn[i];
+        
+        uint32 totalPulses = synchronicNumPulses[noteIndex];
+        uint8 beat = synchronicCurrentBeats[noteIndex];
+        uint8 length = synchronicCurrentBeats[noteIndex];
+        uint8 accent = synchronicCurrentAccents[noteIndex];
+        
+        if (totalPulses < aSynchronicNumPulses)
+        {
+            if (synchronicPhasors[noteIndex] >= (synchronicBeatMultipliers[beat] * getSampleRate() * (60.0/aSynchronicTempo)))
+            {
+                PianoSamplerNoteDirection direction;
+                if (synchronicLengthMultipliers[length] < 0)
+                {
+                    mainPianoSynth.keyOn(
+                                         m.getChannel(),
+                                         noteIndex+9,
+                                         synchronicAccentMultipliers[accent],
+                                         tuningOffsets,
+                                         tuningBasePitch,
+                                         Reverse,
+                                         FixedLengthFixedStart,
+                                         BKNoteTypeNil,
+                                         (fabs(synchronicLengthMultipliers[length]) * (60.0/aSynchronicTempo) * 1000.0), // start
+                                         (fabs(synchronicLengthMultipliers[length]) * (60.0/aSynchronicTempo) * 1000.0)
+                                         );
+                }
+                else
+                {
+                    mainPianoSynth.keyOn(
+                                         m.getChannel(),
+                                         noteIndex+9,
+                                         synchronicAccentMultipliers[accent],
+                                         tuningOffsets,
+                                         tuningBasePitch,
+                                         Forward,
+                                         FixedLength,
+                                         BKNoteTypeNil,
+                                         0, // start
+                                         (fabs(synchronicLengthMultipliers[length]) * (60.0/aSynchronicTempo) * 1000.0)
+                                         );
+                }
+                
+                
+                
+                
+                if (++beat >= synchronicBeatMultipliers.size())
+                    beat = 0;
+                synchronicCurrentBeats.set(noteIndex,beat);
+                
+                if (++length >= synchronicLengthMultipliers.size())
+                    length = 0;
+                synchronicCurrentLengths.set(noteIndex,length);
+                
+                if (++accent >= synchronicAccentMultipliers.size())
+                    accent = 0;
+                synchronicCurrentAccents.set(noteIndex,accent);
+                
+                synchronicNumPulses.set(noteIndex,totalPulses+1);
+                
+                synchronicPhasors.set(noteIndex,0);
+            }
+            
+        }
+        else
+        {
+            inSynchronicOn.set(noteIndex,false);
+            synchronicOn.remove(i);
+        }
+        
+        synchronicTimers.set(noteIndex,synchronicTimers[noteIndex]+numSamples);
+        synchronicPhasors.set(noteIndex,synchronicPhasors[noteIndex]+numSamples);
+    }
+    
+    int clusterSize = synchronicCluster.size();
+    for (int n = (clusterSize-1); n >= 0; n--)
+    {
+        int noteIndex = synchronicCluster[n];
+        if (inSynchronicCluster[noteIndex] &&
+            (synchronicClusterTimers[noteIndex] >= (aSynchronicClusterThreshold * getSampleRate())))
+        {
+            synchronicCluster.remove(n);
+            inSynchronicCluster.set(noteIndex,inSynchronicCluster[noteIndex] - 1);
+        }
+        synchronicClusterTimers.set(noteIndex,synchronicClusterTimers[noteIndex]+numSamples);
+        
+    }
+    
+    */
+    
+    // NOTE ON NOTE OFF
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
         if (m.isNoteOn())
         {
+
+            /*
+#if 1
+            int noteIndex = m.getNoteNumber()-9;
             
-            Array<float> tuningOffsets = Array<float>(aPartialTuning,aNumScaleDegrees);     
-            int tuningBasePitch = 4;
+            synchronicTimers.set(noteIndex,0);
             
-            //DBG("on velocity " + std::to_string(m.getFloatVelocity()) );
+            inSynchronicCluster.set(noteIndex,inSynchronicCluster[noteIndex] + 1);
+            synchronicCluster.add(noteIndex);
+            synchronicClusterTimers.set(noteIndex,0);
+            
+            int clusterSize = synchronicCluster.size();
+            
+            for (int n = (clusterSize-1); n >= 0; n--)
+            {
+                int note = synchronicCluster[n];
+                
+                if ((clusterSize >= aSynchronicClusterMin) &&
+                    (clusterSize <= aSynchronicClusterMax))
+                {
+                    if (!inSynchronicOn[note])
+                    {
+                        inSynchronicOn.set(note, true);
+                        synchronicOn.add(note);
+                    }
+                    synchronicPhasors.set(note,0);
+                    synchronicCurrentBeats.set(note,0);
+                    synchronicCurrentAccents.set(note,0);
+                    synchronicCurrentLengths.set(note,0);
+                    synchronicNumPulses.set(note,0);
+                }
+            }
+            
+#endif
+             */
+            
+            
+            nostalgic.startTimer(m.getNoteNumber(), m.getFloatVelocity()); //start measuring note length
+            
             mainPianoSynth.keyOn(
                                  m.getChannel(),
                                  m.getNoteNumber(),
@@ -420,13 +609,38 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                                  tuningBasePitch,
                                  Forward,
                                  Normal,
-                                 0, // start
-                                 540 // length
+                                 BKNoteTypeNil,
+                                 1000, // start
+                                 100 // length
                                  );
+            
             
         }
         else if (m.isNoteOff())
         {
+            
+            
+            float tempDuration = nostalgic.getTimer(m.getNoteNumber()) * (1000. / getSampleRate() );
+            DBG("nostalgic note duration (ms) = " + std::to_string(tempDuration));
+            
+            //play nostalgic note
+            mainPianoSynth.keyOn(
+                                 m.getChannel(),
+                                 m.getNoteNumber(),
+                                 nostalgic.getVelocity(m.getNoteNumber()),
+                                 tuningOffsets,
+                                 tuningBasePitch,
+                                 Reverse,
+                                 FixedLengthFixedStart,
+                                 BKNoteTypeNil,
+                                 tempDuration, // start
+                                 tempDuration // length
+                                 );
+            
+            nostalgic.clearNote(m.getNoteNumber());
+             
+            
+            
             mainPianoSynth.keyOff(
                                   m.getChannel(),
                                   m.getNoteNumber(),
@@ -434,34 +648,33 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                                   true
                                   );
             
-            //hammer and resonance
-            Array<float> tuningOffsets = Array<float>(aPartialTuning,aNumScaleDegrees);
-            int tuningBasePitch = 4; 
-           
             //DBG("off velocity " + std::to_string(m.getFloatVelocity()) );
             hammerReleaseSynth.keyOn(
-                                 m.getChannel(),
-                                 m.getNoteNumber(),
-                                 m.getFloatVelocity() * 0.01, //will want hammerGain multipler that user can set
-                                 tuningOffsets,
-                                 tuningBasePitch,
-                                 Forward,
-                                 FixedLength,
-                                 0,
-                                 2000
-                                 );
+                                     m.getChannel(),
+                                     m.getNoteNumber(),
+                                     m.getFloatVelocity() * 0.01, //will want hammerGain multipler that user can set
+                                     tuningOffsets,
+                                     tuningBasePitch,
+                                     Forward,
+                                     FixedLength,
+                                     BKNoteTypeNil,
+                                     0,
+                                     2000
+                                     );
             
             resonanceReleaseSynth.keyOn(
-                                 m.getChannel(),
-                                 m.getNoteNumber(),
-                                 m.getFloatVelocity(), //will also want multiplier for resonance gain, though not here...
-                                 tuningOffsets,
-                                 tuningBasePitch,
-                                 Forward,
-                                 FixedLength,
-                                 0,
-                                 2000
-                                 );
+                                        m.getChannel(),
+                                        m.getNoteNumber(),
+                                        m.getFloatVelocity() * 0.5, //will also want multiplier for resonance gain, though not here...
+                                        tuningOffsets,
+                                        tuningBasePitch,
+                                        Forward,
+                                        FixedLength,
+                                        BKNoteTypeNil,
+                                        0,
+                                        2000
+                                        );
+            
         }
         else if (m.isAftertouch())
         {
@@ -474,15 +687,11 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     }
     
     midiMessages.swapWith (processedMidi);
-    
+
     
     mainPianoSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
     hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
     resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
-#if USE_SECOND_SYNTH
-    secondaryPianoSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
-#endif
-    
 
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...

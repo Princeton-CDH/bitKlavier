@@ -8,7 +8,12 @@
 
 #include "BKSynthesiser.h"
 
+#include "NostalgicPreparation.h"
 
+struct SynchronicNote {
+    uint64 timer;
+    uint32 noteLen;
+};
 
 //==============================================================================
 /**
@@ -35,6 +40,30 @@ public:
     ScopedPointer<AudioFormatReader> sampleReader;
     ScopedPointer<AudioSampleBuffer> sampleBuffer;
     
+    Array<int> synchronicCluster;
+    Array<int> inSynchronicCluster;
+    
+    Array<int> synchronicOn;
+    Array<int> inSynchronicOn;
+    
+    Array<uint64> synchronicTimers; // max 10000 ms
+    Array<uint64> synchronicClusterTimers; // max 10000 ms
+    Array<uint64> synchronicPhasors; // max 10000 ms
+    Array<uint32> synchronicNumPulses; // max 10000 ms
+   
+    Array<uint32> synchronicCurrentLengths; // max 10000 ms
+    Array<float> synchronicLengthMultipliers;
+    
+    Array<uint32> synchronicCurrentBeats; // max 10000 ms
+    Array<float> synchronicBeatMultipliers;
+    
+    Array<uint32> synchronicCurrentAccents; // max 10000 ms
+    Array<float> synchronicAccentMultipliers;
+
+
+    
+    int clusterSize;
+    
     ReferenceCountedArray<ReferenceCountedBuffer, CriticalSection> sampleBuffers;
     
     //ScopedArray<AudioSampleBuffer> sampleBuffers;
@@ -45,9 +74,6 @@ public:
     int samplesDecay;
     int decayCount;
     
-    BigInteger sampleCounter; 
-    double currentTime;
-    
     // Change listener callback implementation
     void changeListenerCallback(ChangeBroadcaster *source) override;
     
@@ -56,7 +82,7 @@ public:
     void releaseResources() override;
 
    #ifndef JucePlugin_PreferredChannelConfigurations
-    bool setPreferredBusArrangement (bool isInput, int bus, const AudioChannelSet& preferredSet) override;
+    bool setPreferredBusArrangement (bool isInput, int bus, const AudioChannelSet& preferredSet) ;
    #endif
 
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
@@ -85,6 +111,8 @@ public:
     
 
 private:
+    
+    NostalgicPreparation nostalgic;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MrmAudioProcessor)
 };

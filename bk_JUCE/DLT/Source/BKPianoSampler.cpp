@@ -12,6 +12,9 @@
 
 #include "AudioConstants.h"
 
+
+
+
 BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                                             ReferenceCountedBuffer::Ptr buffer,
                                                             uint64 soundLength,
@@ -21,8 +24,8 @@ BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                                             const BigInteger& velocities)
 : name (soundName),
 data(buffer),
-sourceSampleRate(sourceSampleRate),
 soundLength(soundLength),
+sourceSampleRate(sourceSampleRate),
 midiNotes (notes),
 midiVelocities(velocities),
 midiRootNote (rootMidiNote)
@@ -60,6 +63,8 @@ rampOnDelta (0),
 rampOffDelta (0),
 isInRampOn (false), isInRampOff (false)
 {
+    numPulses = 0;
+    maxPulses = 16;
 }
 
 BKPianoSamplerVoice::~BKPianoSamplerVoice()
@@ -75,16 +80,19 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                                               const float velocity,
                                               PianoSamplerNoteDirection direction,
                                               PianoSamplerNoteType type,
+                                              BKNoteType bktype,
                                               const uint64 startingPosition,
                                               const uint64 length,
-                                              BKSynthesiserSound* s
-/*, const int */)
+                                              BKSynthesiserSound* s)
 {
     if (const BKPianoSamplerSound* const sound = dynamic_cast<const BKPianoSamplerSound*> (s))
     {
-        DBG(String(midiNoteNumber));
+        
+        numPulses = 0;
+        maxPulses = 16;
         pitchRatio = powf(2.0f, (midiNoteNumber - (float)sound->midiRootNote) / 12.0f) * sound->sourceSampleRate / getSampleRate();
         
+        bkType = bktype;
         playType = type;
         playDirection = direction;
         
@@ -106,7 +114,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             else if (playType == FixedLength)
             {
                 sourceSamplePosition = 0.0;
-                DBG("about to play fixed length: " + std::to_string(length) );
                 playEndPosition = jmin(playLength, maxLength) - 1;
             }
             else if (playType == FixedLengthFixedStart)
@@ -177,12 +184,15 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             DBG("Invalid note direction.");
         }
         
-        
         lgain = velocity;
         rgain = velocity;
         
         isInRampOn = (sound->rampOnSamples > 0);
         isInRampOff = false;
+        
+        noteStartingPosition = sourceSamplePosition;
+        noteEndPosition = playEndPosition;
+        
 
         if (isInRampOn)
         {
@@ -252,6 +262,7 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
         
         while (--numSamples >= 0)
         {
+            timer++;
             const int pos = (int) sourceSamplePosition;
             const float alpha = (float) (sourceSamplePosition - pos);
             const float invAlpha = 1.0f - alpha;
@@ -286,8 +297,21 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
                 
                 if (rampOnOffLevel <= 0.0f)
                 {
-                    stopNote (0.0f, false);
-                    break;
+                    // allow interruption of synchronic pulses here if receive synchronic note off.
+                    if (playType != Normal && playType != NormalFixedStart && bkType == Synchronic && numPulses < maxPulses)
+                    {
+                        numPulses++;
+                        
+                        isInRampOff = 0;
+                        isInRampOn = 1;
+                        sourceSamplePosition = noteStartingPosition;
+
+                    }
+                    else
+                    {
+                        stopNote (0.0f, false);
+                        break;
+                    }
                 }
             }
             
@@ -300,7 +324,6 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
             {
                 *outL++ += ((l + r) * 0.5f) * 1.0f;
             }
-            
             
             if (playDirection == Forward)
             {
