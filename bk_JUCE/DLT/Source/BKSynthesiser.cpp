@@ -309,7 +309,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                             stopVoice (voice, 1.0f, true);
                     }
                 }
-                float midiNoteNumberOffset = aJustTuning[(midiNoteNumber - midiNoteTuningBase)%12];
+                float midiNoteNumberOffset = aJustTuning[(midiNoteNumber - midiNoteTuningBase) % 12];
                 
                 startVoice (findFreeVoice (sound, midiChannel, midiNoteNumber, shouldStealNotes),
                             sound, midiChannel, midiNoteNumber, midiNoteNumberOffset, velocity, direction, type, bktype, (uint64)((startingPositionMS * 0.001f) * getSampleRate()), (uint64)(lengthMS*0.001f* getSampleRate()));

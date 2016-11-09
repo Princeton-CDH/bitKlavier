@@ -24,10 +24,10 @@ BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                                             const BigInteger& velocities)
 : name (soundName),
 data(buffer),
-soundLength(soundLength),
 sourceSampleRate(sourceSampleRate),
 midiNotes (notes),
 midiVelocities(velocities),
+soundLength(soundLength),
 midiRootNote (rootMidiNote)
 {
     rampOnSamples = roundToInt (aRampOnTimeSec* sourceSampleRate);

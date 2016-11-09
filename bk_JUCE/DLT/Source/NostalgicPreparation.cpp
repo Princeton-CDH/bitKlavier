@@ -12,18 +12,25 @@
 NostalgicPreparation::NostalgicPreparation()
 {
     
+    timers.ensureStorageAllocated(128);
+    velocities.ensureStorageAllocated(128);
+    
     for(int i=0;i<128;i++)
     {
         timers.insert(i, 0); //initialize timers for all notes
-        DBG("nostalgic initialized timer " + std::to_string(i) + " to " + std::to_string( timers.getUnchecked(i) ) );
+        //DBG("nostalgic initialized timer " + std::to_string(i) + " to " + std::to_string( timers.getUnchecked(i) ) );
         
         velocities.insert(i, 0); //store noteOn velocities to set Nostalgic velocities
     }
+    
+    waveDistance = 200; //for testing
+    undertow = 2000; //again, for testing
 
 }
 
 //destructor
 NostalgicPreparation::~NostalgicPreparation() {}
+
 
 //start timer for length of a particular note
 void NostalgicPreparation::startTimer(int midiNoteNumber, float midiNoteVelocity)
@@ -35,20 +42,21 @@ void NostalgicPreparation::startTimer(int midiNoteNumber, float midiNoteVelocity
 
 
 //get length of note
-int NostalgicPreparation::getTimer(int midiNoteNumber)
+int NostalgicPreparation::getTimer(int midiNoteNumber) const noexcept
 {
     return timers.getUnchecked(midiNoteNumber);
 }
 
-float NostalgicPreparation::getVelocity(int midiNoteNumber)
+float NostalgicPreparation::getVelocity(int midiNoteNumber) const noexcept
 {
     return velocities.getUnchecked(midiNoteNumber);
 }
 
+
 //increment timer for all active notes
-void NostalgicPreparation::incrementTimer(int numSamples)
+void NostalgicPreparation::incrementTimers(int numSamples)
 {
-    for(int i=0;i<activeNotes.size();i++)
+    for(int i = (activeNotes.size() - 1); i >= 0; --i)
     {
         timers.set(activeNotes.getUnchecked(i), timers.getUnchecked(activeNotes.getUnchecked(i)) + numSamples);
     }

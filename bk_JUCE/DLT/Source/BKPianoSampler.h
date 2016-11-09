@@ -80,8 +80,8 @@ private:
     BigInteger midiNotes;
     BigInteger midiVelocities;
     uint64 soundLength;
-    int rampOnSamples, rampOffSamples;
     int midiRootNote;
+    int rampOnSamples, rampOffSamples;
     
     JUCE_LEAK_DETECTOR (BKPianoSamplerSound)
 };

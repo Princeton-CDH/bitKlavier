@@ -27,8 +27,8 @@ static const float aSynchronicAccentMultipliers[4] = {1.0, 1.0, 1.0, 1.0};
 static const int aSynchronicNumPulses = 16;
 
 static const float aMaxSampleLengthSec = 30.0f;
-static const float aRampOnTimeSec = 0.004f;
-static const float aRampOffTimeSec = 0.004f;
+static const float aRampOnTimeSec = 0.01f; //in original bK, we only rampUp (30ms) when starting reverse notes
+static const float aRampOffTimeSec = 0.03f; //30ms in original bK
 static const int aNumScaleDegrees = 12;
 
 
