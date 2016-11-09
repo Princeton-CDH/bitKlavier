@@ -4,14 +4,17 @@
               bundleIdentifier="com.MRM.MRMTest1" includeBinaryInAppConfig="1"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" pluginName="MRM" pluginDesc="MRM" pluginManufacturer="MRM"
-              pluginManufacturerCode="Manu" pluginCode="R4yq" pluginChannelConfigs=""
+              pluginManufacturerCode="Manu" pluginCode="R4yq" pluginChannelConfigs="{1,1},{2,2}"
               pluginIsSynth="1" pluginWantsMidiIn="1" pluginProducesMidiOut="1"
               pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="1" pluginAUExportPrefix="MRMAU"
               pluginRTASCategory="" aaxIdentifier="com.yourcompany.MRM" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
-              jucerVersion="4.2.4" companyName="mrmulshine" companyEmail="mrmulshine@gmail.com"
+              jucerVersion="4.3.0" companyName="mrmulshine" companyEmail="mrmulshine@gmail.com"
               maxBinaryFileSize="">
   <MAINGROUP id="s4R02g" name="MRM">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
+      <FILE id="NQ4Aaw" name="Preparations.cpp" compile="1" resource="0"
+            file="Source/Preparations.cpp"/>
+      <FILE id="EF5gMj" name="Preparations.h" compile="0" resource="0" file="Source/Preparations.h"/>
       <FILE id="HVbOmG" name="BKPianoSampler.cpp" compile="1" resource="0"
             file="Source/BKPianoSampler.cpp"/>
       <FILE id="Spprlk" name="BKPianoSampler.h" compile="0" resource="0"

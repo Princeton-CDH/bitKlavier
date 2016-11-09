@@ -13,25 +13,10 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
+
 #define USE_SYNTH_INTERNAL 0
 #define CRAY_COOL_MUSIC_MAKER 0
 #define CRAY_COOL_MUSIC_MAKER_2 0
-
-static const float aSynchronicClusterThreshold = 0.5;
-static const int aSynchronicClusterMin = 2;
-static const int aSynchronicClusterMax = 10;
-static const float aSynchronicTempo = 120.0;
-static const float aSynchronicBeatMultipliers[4] = {1.0, 1.0, 1.0, 1.0};
-static const float aSynchronicLengthMultipliers[4] = {1.0, -1.0, 1.0, -1.0};
-static const float aSynchronicAccentMultipliers[4] = {1.0, 1.0, 1.0, 1.0};
-static const int aSynchronicNumPulses = 16;
-
-static const float aMaxSampleLengthSec = 30.0f;
-static const float aRampOnTimeSec = 0.004f;
-static const float aRampOffTimeSec = 0.004f;
-static const int aNumScaleDegrees = 12;
-
-
 
 typedef enum PianoSamplerNoteType {
     Normal = 0,
@@ -49,12 +34,35 @@ typedef enum BKNoteType {
 } BKNoteType;
 
 typedef enum PianoSamplerNoteDirection {
-    Forward,
+    Forward = 0,
     Reverse,
     PianoSamplerPlaybackDirectionNil
 } PianoSamplerNoteDirection;
 
-static const int aVelocityThresh[9] = {
+
+typedef enum SynchronicSyncMode {
+    FirstNoteSync = 0,
+    LastNoteSync,
+    SynchronicSyncModeNil
+}SynchronicSyncMode;
+
+static const SynchronicSyncMode aSynchronicSyncMode = LastNoteSync;
+static const float aSynchronicClusterThreshold = 0.5;
+static const int aSynchronicClusterMin = 2;
+static const int aSynchronicClusterMax = 10;
+static const float aSynchronicTempo = 60.0;
+static const float aSynchronicBeatMultipliers[4] = {1.0, 1.0, 1.0, 1.0};
+static const float aSynchronicLengthMultipliers[4] = {1.0, -0.5, 1.0, -0.5};
+static const float aSynchronicAccentMultipliers[4] = {.5, .25, .25, .2};
+static const int aSynchronicNumPulses = 16;
+
+static const float aMaxSampleLengthSec = 30.0f;
+static const float aRampOnTimeSec = 0.004f;
+static const float aRampOffTimeSec = 0.004f;
+static const int aNumScaleDegrees = 12;
+
+static const int NumLayers = 2;
+static const int aVelocityThresh_Eight[9] = {
     0,
     25,
     42,
@@ -66,11 +74,17 @@ static const int aVelocityThresh[9] = {
     128
 };
 
-static const int aVelocityThresh_FourLayers[5] = {
+static const int aVelocityThresh_Four[5] = {
     0,
     42,
     76,
     104,
+    128
+};
+
+static const int aVelocityThresh_Two[3] = {
+    0,
+    76,
     128
 };
 
