@@ -380,12 +380,12 @@ void MrmAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
 #endif
 
     
-    synchronic1.set(120.,                              // tempo
+    synchronic1.set(120,                              // tempo
                     8,                                  // number of pulses
                     2,                                  // cluster min
                     5,                                  // cluster max
-                    500,                                // cluster threshold (ms)
-                    LastNoteSync,                      // mode
+                    200,                                // cluster threshold (ms)
+                    FirstNoteSync,                      // mode
                     0,                                  // beats to skip
                     Array<float>({1.0}),    // beat multipliers
                     Array<float>({.5}), // length multipliers
@@ -395,11 +395,11 @@ void MrmAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
     
 #if USE_SYNCHRONIC_TWO
     synchronic2.set(60.,                                      // tempo
-                    5,                                         // number of pulses
+                    4,                                         // number of pulses
                     2,                                          // cluster min
                     5,                                          // cluster max
-                    500,                                        // cluster threshold (ms)
-                    LastNoteSync,                              // mode
+                    200,                                        // cluster threshold (ms)
+                    FirstNoteSync,                              // mode
                     0,                                          // beats to skip
                     Array<float>({1.0}),    // beat multipliers
                     Array<float>({1.0}),          // length multipliers
@@ -474,9 +474,10 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     int numSamples = buffer.getNumSamples();
     
     
-    synchronic1.tick(channel,numSamples);
+    synchronic1.renderNextBlock(channel,numSamples);
+    
 #if USE_SYNCHRONIC_TWO
-    synchronic2.tick(channel,numSamples);
+    synchronic2.renderNextBlock(channel,numSamples);
 #endif
     
     // NOTE ON NOTE OFF
@@ -488,6 +489,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
             channel = m.getChannel();
             
             synchronic1.notePlayed(noteIndex, m.getVelocity());
+            
 #if USE_SYNCHRONIC_TWO
             synchronic2.notePlayed(noteIndex, m.getVelocity());
 #endif

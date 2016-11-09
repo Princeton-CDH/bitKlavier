@@ -16,7 +16,7 @@
 #include "BKSynthesiser.h"
 
 
-class SynchronicProcessor
+class SynchronicProcessor 
 {
     
 public:
@@ -48,13 +48,9 @@ public:
     
     void attachToSynth(BKSynthesiser *synth);
     
-    bool tick(int channel, int numSamples);
+    void renderNextBlock(int channel, int numSamples);
     
     void notePlayed(int noteNumber, int velocity);
-    
-    void setTuningOffsets(Array<float> newOffsets);
-    void setTuningBasePitch(int basePitch);
-    
     
 private:
     void playNote(int channel, int note);
@@ -77,10 +73,8 @@ private:
     uint64 numSamplesBeat;
     
     Array<int> cluster;
-    Array<int> inCluster;
     
     Array<int> on;
-    Array<int> inOn;
     
     JUCE_LEAK_DETECTOR(SynchronicProcessor);
     

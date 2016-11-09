@@ -22,12 +22,6 @@ SynchronicProcessor::SynchronicProcessor()
     cluster = Array<int>();
     on = Array<int>();
     
-    inCluster = Array<int>();
-    inCluster.ensureStorageAllocated(88);
-    
-    inOn = Array<int>();
-    inOn.ensureStorageAllocated(88);
-    
     beatMultipliers = Array<float>();
     accentMultipliers = Array<float>();
     lengthMultipliers = Array<float>();
@@ -68,46 +62,6 @@ void SynchronicProcessor::set(float t,
     
 }
 
-void SynchronicProcessor::attachToSynth(BKSynthesiser *s)
-{
-    synth = s;
-    sampleRate = s->getSampleRate();
-}
-
-void SynchronicProcessor::notePlayed(int noteNumber, int velocity)
-{
-    on.clearQuick();
-    
-    if (!cluster.size())
-    {
-        firstNoteTimer = 0;
-    }
-    
-    cluster.add(noteNumber);
-    
-    DBG("CLUSTER: ");
-    for (auto n : cluster)
-    {
-        DBG(String(n));
-    }
-    
-    
-    endCluster = false;
-    lastNoteTimer = 0;
-    clusterTimer = 0;
-    
-}
-
-void SynchronicProcessor::setTuningOffsets(Array<float> newOffsets)
-{
-    tuningOffsets.swapWith(newOffsets);
-}
-
-void SynchronicProcessor::setTuningBasePitch(int basePitch)
-{
-    tuningBasePitch = basePitch;
-}
-
 void SynchronicProcessor::playNote(int channel, int note)
 {
     PianoSamplerNoteDirection noteDirection = Forward;
@@ -135,7 +89,37 @@ void SynchronicProcessor::playNote(int channel, int note)
                  );
 }
 
-bool SynchronicProcessor::tick(int channel, int numSamples)
+void SynchronicProcessor::attachToSynth(BKSynthesiser *s)
+{
+    synth = s;
+    sampleRate = s->getSampleRate();
+}
+
+void SynchronicProcessor::notePlayed(int noteNumber, int velocity)
+{
+    
+    if (endCluster)
+    {
+        endCluster = false;
+        on.clearQuick();
+    }
+    
+    if (syncMode == FirstNoteSync)
+    {
+        if (!cluster.size())
+        {
+            clusterTimer = 0;
+        }
+    }
+    else
+    {
+        clusterTimer = 0;
+    }
+    
+    cluster.add(noteNumber);
+}
+
+void SynchronicProcessor::renderNextBlock(int channel, int numSamples)
 {
     
     if (!endCluster)
@@ -148,88 +132,45 @@ bool SynchronicProcessor::tick(int channel, int numSamples)
                 (cluster.size() <= clusterMax))
             {
                 on.clearQuick();
+                
                 for (auto n : cluster)
                 {
                     on.add(n);
                 }
+                //on.swapWith(cluster);
+                
                 inPulses = true;
             }
             
             cluster.clearQuick();
             
             pulse = 1;
-            
             beat = 0;
             length = 0;
             accent = 0;
             
-            if (syncMode == FirstNoteSync)
-            {
-                phasor = firstNoteTimer;
-                numSamplesBeat = (beatMultipliers[beat] * sampleRate * (60.0/tempo));
-                if (phasor > numSamplesBeat)
-                {
-                    phasor -= numSamplesBeat;
-                }
-            }
-            else if (syncMode == LastNoteSync)
-            {
-                phasor = lastNoteTimer;
-                
-            }
+            phasor = clusterThresholdSamples;
+            
         }
         else
         {
             clusterTimer += numSamples;
-            firstNoteTimer += numSamples;
-            lastNoteTimer += numSamples;
         }
     }
     
-    if (pulse >= numPulses)
-    {
-        on.clearQuick();
-        pulse = 0;
-        inPulses = false;
-    }
     
     if (inPulses)
     {
-        /*
-        if (tempo == 120.0)
-        {
-            DBG("ONE: " + String(phasor));
-        }
-        else
-        {
-            DBG("TWO: " + String(phasor));
-        }
-        */
         numSamplesBeat = (beatMultipliers[beat] * sampleRate * (60.0/tempo));
         
         if (phasor >= numSamplesBeat)
         {
             phasor -= numSamplesBeat;
             
-            pulse += 1;
-            
             for (auto note : on)
             {
                 playNote(channel, note);
-                
             }
-            
-            /*
-            if (tempo == 120.0)
-            {
-                DBG("ONE: " + String(pulse));
-            }
-            else
-            {
-                DBG("TWO: " + String(pulse));
-            }
-             */
-            
             
             if (++beat >= beatMultipliers.size())        beat = 0;
             
@@ -237,17 +178,20 @@ bool SynchronicProcessor::tick(int channel, int numSamples)
             
             if (++accent >= accentMultipliers.size())    accent = 0;
             
+            if (++pulse >= numPulses)
+            {
+                on.clearQuick();
+                pulse = 0;
+                inPulses = false;
+            }
+            
         }
 
         phasor += numSamples;
         
     }
     
-   
     
     
-    
-    return false;
-
 }
 
