@@ -6,14 +6,14 @@
 
 #include "ReferenceCountedBuffer.h"
 
+#include "Preparations.h"
+
 #include "AudioConstants.h"
 
 #include "BKSynthesiser.h"
 
-struct SynchronicNote {
-    uint64 timer;
-    uint32 noteLen;
-};
+#define USE_SECOND_SYNTH 0
+#define USE_SYNCHRONIC_TWO 1
 
 //==============================================================================
 /**
@@ -35,37 +35,19 @@ public:
     ScopedPointer<AudioSampleBuffer> sampleBuffer;
     
     BKSynthesiser mainPianoSynth;
+#if USE_SECOND_SYNTH
+    BKSynthesiser secondPianoSynth;
+#endif
     
     BKSynthesiser hammerReleaseSynth;
     
     BKSynthesiser resonanceReleaseSynth;
     
-    Array<int> synchronicCluster;
-    Array<int> inSynchronicCluster;
-    
-    Array<int> synchronicOn;
-    Array<int> inSynchronicOn;
-    
-    Array<uint64> synchronicTimers; // max 10000 ms
-    Array<uint64> synchronicClusterTimers; // max 10000 ms
-    Array<uint64> synchronicPhasors; // max 10000 ms
-    Array<uint32> synchronicNumPulses; // max 10000 ms
-   
-    Array<uint32> synchronicCurrentLengths; // max 10000 ms
-    Array<float> synchronicLengthMultipliers;
-    
-    Array<uint32> synchronicCurrentBeats; // max 10000 ms
-    Array<float> synchronicBeatMultipliers;
-    
-    Array<uint32> synchronicCurrentAccents; // max 10000 ms
-    Array<float> synchronicAccentMultipliers;
-
-
-    
-    int clusterSize;
-    
     ReferenceCountedArray<ReferenceCountedBuffer, CriticalSection> sampleBuffers;
+
+    SynchronicProcessor synchronic1, synchronic2;
     
+    int channel;
     //ScopedArray<AudioSampleBuffer> sampleBuffers;
     int position;
     bool off,end,ramp;

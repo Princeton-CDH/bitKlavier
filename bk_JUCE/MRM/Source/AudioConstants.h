@@ -61,8 +61,8 @@ static const float aRampOnTimeSec = 0.004f;
 static const float aRampOffTimeSec = 0.004f;
 static const int aNumScaleDegrees = 12;
 
-
-static const int aVelocityThresh[9] = {
+static const int NumLayers = 2;
+static const int aVelocityThresh_Eight[9] = {
     0,
     25,
     42,
@@ -74,11 +74,17 @@ static const int aVelocityThresh[9] = {
     128
 };
 
-static const int aVelocityThresh_FourLayers[5] = {
+static const int aVelocityThresh_Four[5] = {
     0,
     42,
     76,
     104,
+    128
+};
+
+static const int aVelocityThresh_Two[3] = {
+    0,
+    76,
     128
 };
 
