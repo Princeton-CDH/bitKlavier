@@ -458,9 +458,12 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     int tuningBasePitch = 0;
     
     
-    nostalgic.incrementTimer(buffer.getNumSamples());
+    //move timers forward for all active notes, by the buffer size
+    nostalgic.incrementTimers(buffer.getNumSamples());
     
+    //check timers to see if any are at an undertow turnaround point, then call keyOn(forward) and keyOff, with 50ms ramps
     
+
     /*
     int numSamples = buffer.getNumSamples();
     int synchronicOnSize = synchronicOn.size();
@@ -598,7 +601,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
 #endif
              */
             
-            
+            //start timing note lengths for nostalgic preparations
             nostalgic.startTimer(m.getNoteNumber(), m.getFloatVelocity()); //start measuring note length
             
             mainPianoSynth.keyOn(
@@ -619,8 +622,8 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
         else if (m.isNoteOff())
         {
             
-            
-            float tempDuration = nostalgic.getTimer(m.getNoteNumber()) * (1000. / getSampleRate() );
+            //get length of played notes, subtract wave distance to set nostalgic reverse note length
+            float tempDuration = nostalgic.getTimer(m.getNoteNumber()) * (1000. / getSampleRate());
             DBG("nostalgic note duration (ms) = " + std::to_string(tempDuration));
             
             //play nostalgic note
@@ -633,9 +636,10 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                                  Reverse,
                                  FixedLengthFixedStart,
                                  BKNoteTypeNil,
-                                 tempDuration, // start
+                                 tempDuration + nostalgic.getWaveDistance(), // start
                                  tempDuration // length
                                  );
+            //need to update so that if the start point is greater than the length of the file, it waits appropriately.
             
             nostalgic.clearNote(m.getNoteNumber());
              
