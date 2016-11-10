@@ -15,8 +15,10 @@ SynchronicProcessor::SynchronicProcessor()
 {    
     clusterTimer = 0;
     phasor = 0;
+    
     inPulses = false;
-    endCluster = false;
+    inCluster = false;
+    
     firstNoteTimer = 0;
     
     cluster = Array<int>();
@@ -47,11 +49,18 @@ void SynchronicProcessor::set(float t,
          int basePitch)
 {
     tempo = t;
+    tempoPeriod = (60.0/tempo) * 1000.0;
+    
+    clusterThreshold = tempoPeriod * cThreshold;
+    clusterThresholdSamples = (clusterThreshold * sampleRate * 0.001);
+    
+    pulseThreshold = tempoPeriod;
+    pulseThresholdSamples = (60.0/tempo) * sampleRate;
+    
     numPulses = pulses;
     clusterMin = cMin;
     clusterMax = cMax;
-    clusterThreshold = cThreshold;
-    clusterThresholdSamples = (clusterThreshold * sampleRate * 0.001);
+    
     syncMode = mode;
     pulsesToSkip = toSkip;
     beatMultipliers = beats;
@@ -66,7 +75,7 @@ void SynchronicProcessor::playNote(int channel, int note)
 {
     PianoSamplerNoteDirection noteDirection = Forward;
     float noteStartPos = 0.0;
-    float noteLength = (fabs(lengthMultipliers[length]) * (60.0/tempo) * 1000.0);
+    float noteLength = (fabs(lengthMultipliers[length]) * tempoPeriod);
     
     if (lengthMultipliers[length] < 0)
     {
@@ -97,67 +106,101 @@ void SynchronicProcessor::attachToSynth(BKSynthesiser *s)
 
 void SynchronicProcessor::notePlayed(int noteNumber, int velocity)
 {
-    
-    if (endCluster)
+    if (inCluster)
     {
-        endCluster = false;
-        on.clearQuick();
-    }
-    
-    if (syncMode == FirstNoteSync)
-    {
-        if (!cluster.size())
+        // If LastNoteSync mode, reset phasor and multiplier indices.
+        if (syncMode == LastNoteSync)
         {
-            clusterTimer = 0;
-        }
-    }
-    else
-    {
-        clusterTimer = 0;
-    }
-    
-    cluster.add(noteNumber);
-}
-
-void SynchronicProcessor::renderNextBlock(int channel, int numSamples)
-{
-    
-    if (!endCluster)
-    {
-        if (clusterTimer >= clusterThresholdSamples)
-        {
-            endCluster = true;
+            phasor = pulseThresholdSamples;
             
-            if ((cluster.size() >= clusterMin) &&
-                (cluster.size() <= clusterMax))
+            if (clusterThresholdSamples > pulseThresholdSamples)
             {
-                on.clearQuick();
-                
-                for (auto n : cluster)
-                {
-                    on.add(n);
-                }
-                //on.swapWith(cluster);
-                
-                inPulses = true;
+                pulse = 0;
             }
-            
-            cluster.clearQuick();
-            
-            pulse = 1;
+            else
+            {
+                pulse = 1;
+            }
             beat = 0;
             length = 0;
             accent = 0;
             
-            phasor = clusterThresholdSamples;
+            inPrePulses = true;
+            pulseThresholdTimer = 0;
+        }
+        
+        
+    }
+    else
+    {
+        on.clearQuick();
+        inPulses = false;
+        
+        // Start first note timer, since this is beginning of new cluster.
+        if (syncMode == FirstNoteSync)
+        {
+            firstNoteTimer = 0;
+        }
+        
+        inPrePulses = true;
+        pulseThresholdTimer = 0;
+        
+        inCluster = true;
+    }
+    
+    if (inCluster)
+    {
+        clusterThresholdTimer = 0;
+        on.add(noteNumber);
+    }
+    
+    for (auto note : cluster)
+    {
+        DBG("cluster: " + String(note));
+    }
+   
+}
+
+void SynchronicProcessor::renderNextBlock(int channel, int numSamples)
+{
+
+    if (inCluster)
+    {
+        if (clusterThresholdTimer >= clusterThresholdSamples)
+        {
+            inCluster = false;
+        }
+        else
+        {
+            clusterThresholdTimer += numSamples;
+            firstNoteTimer += numSamples;
+        }
+    }
+    
+    if (inPrePulses)
+    {
+        if (pulseThresholdTimer >= pulseThresholdSamples)
+        {
+            inPrePulses = false;
+            
+            if (syncMode == FirstNoteSync)
+            {
+                phasor = pulseThresholdSamples;
+                
+                pulse = 1;
+                beat = 0;
+                length = 0;
+                accent = 0;
+            }
+            
+            inPulses = true;
             
         }
         else
         {
-            clusterTimer += numSamples;
+            pulseThresholdTimer += numSamples;
         }
     }
-    
     
     if (inPulses)
     {
@@ -166,10 +209,14 @@ void SynchronicProcessor::renderNextBlock(int channel, int numSamples)
         if (phasor >= numSamplesBeat)
         {
             phasor -= numSamplesBeat;
-            
-            for (auto note : on)
+            DBG("PULSE");
+            if (on.size() >= clusterMin && on.size() <= clusterMax)
             {
-                playNote(channel, note);
+                for (auto note : on)
+                {
+                    DBG("on: " + String(note));
+                    playNote(channel, note);
+                }
             }
             
             if (++beat >= beatMultipliers.size())        beat = 0;
@@ -181,17 +228,15 @@ void SynchronicProcessor::renderNextBlock(int channel, int numSamples)
             if (++pulse >= numPulses)
             {
                 on.clearQuick();
-                pulse = 0;
                 inPulses = false;
             }
             
+            
         }
-
+        
         phasor += numSamples;
         
     }
-    
-    
-    
+
 }
 

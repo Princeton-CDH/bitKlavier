@@ -383,9 +383,9 @@ void MrmAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
     synchronic1.set(120,                              // tempo
                     8,                                  // number of pulses
                     2,                                  // cluster min
-                    5,                                  // cluster max
-                    200,                                // cluster threshold (ms)
-                    FirstNoteSync,                      // mode
+                    10,                                  // cluster max
+                    4,                                // cluster threshold (beats)
+                    LastNoteSync,                      // mode
                     0,                                  // beats to skip
                     Array<float>({1.0}),    // beat multipliers
                     Array<float>({.5}), // length multipliers
@@ -398,7 +398,7 @@ void MrmAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
                     4,                                         // number of pulses
                     2,                                          // cluster min
                     5,                                          // cluster max
-                    200,                                        // cluster threshold (ms)
+                    4,                                        // cluster threshold (beats)
                     FirstNoteSync,                              // mode
                     0,                                          // beats to skip
                     Array<float>({1.0}),    // beat multipliers

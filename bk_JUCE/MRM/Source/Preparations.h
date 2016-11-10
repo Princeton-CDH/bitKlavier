@@ -30,8 +30,16 @@ public:
     int pulsesToSkip;
     int numPulses;
     
-    float clusterThreshold; // ms
-    double clusterThresholdSamples;
+    
+    float clusterThreshold; // beats
+    uint64 clusterThresholdSamples;
+    uint64 clusterThresholdTimer;
+    
+    float pulseThreshold; //beats
+    uint64 pulseThresholdSamples;
+    uint64 pulseThresholdTimer;
+    
+    
     float tempo; // BPM
     
     Array<float> beatMultipliers;
@@ -55,13 +63,17 @@ public:
 private:
     void playNote(int channel, int note);
     
-    bool inPulses, tickCT;
+    double tempoPeriod;
+    uint64 tempoPeriodSamples;
+    
+    bool inPulses, inCluster, inPrePulses;
     BKSynthesiser *synth;
     double sampleRate;
     
-    bool endCluster;
+
     
     uint64 firstNoteTimer;
+    uint64 tempoPeriodTimer;
     uint64 lastNoteTimer;
     
     Array<float> tuningOffsets;

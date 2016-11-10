@@ -13,7 +13,7 @@
 #include "BKSynthesiser.h"
 
 #define USE_SECOND_SYNTH 0
-#define USE_SYNCHRONIC_TWO 1
+#define USE_SYNCHRONIC_TWO 0
 
 //==============================================================================
 /**

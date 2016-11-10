@@ -139,10 +139,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                 {
                     sourceSamplePosition = sound->rampOffSamples;
                 }
-                else if (startingPosition >= sound->soundLength)
-                {
-                    sourceSamplePosition = (sound->soundLength - 1);
-                }
                 else
                 {
                     sourceSamplePosition = startingPosition;
@@ -267,9 +263,16 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
             const float alpha = (float) (sourceSamplePosition - pos);
             const float invAlpha = 1.0f - alpha;
             
-            // just using a very simple linear interpolation here..
-            float l = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-            float r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l;
+            float l = 0.0;
+            float r = 0.0;
+            
+            // If pointer not past end of buffer, sample the buffer. 
+            if (pos < playingSound->soundLength)
+            {
+                // just using a very simple linear interpolation here..
+                l = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
+                r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l;
+            }
             
             l *= lgain;
             r *= rgain;
