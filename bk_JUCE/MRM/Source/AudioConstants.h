@@ -61,7 +61,7 @@ static const float aRampOnTimeSec = 0.004f;
 static const float aRampOffTimeSec = 0.004f;
 static const int aNumScaleDegrees = 12;
 
-static const int NumLayers = 2;
+static const int NumLayers = 8;
 static const int aVelocityThresh_Eight[9] = {
     0,
     25,

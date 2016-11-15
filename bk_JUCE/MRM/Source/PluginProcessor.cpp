@@ -385,7 +385,7 @@ void MrmAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
                     2,                                  // cluster min
                     10,                                  // cluster max
                     4,                                // cluster threshold (beats)
-                    LastNoteSync,                      // mode
+                    FirstNoteSync,                      // mode
                     0,                                  // beats to skip
                     Array<float>({1.0}),    // beat multipliers
                     Array<float>({.5}), // length multipliers
@@ -483,11 +483,11 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     // NOTE ON NOTE OFF
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
+        int noteIndex = m.getNoteNumber()-9;
+        channel = m.getChannel();
+        
         if (m.isNoteOn())
         {
-            int noteIndex = m.getNoteNumber()-9;
-            channel = m.getChannel();
-            
             synchronic1.notePlayed(noteIndex, m.getVelocity());
             
 #if USE_SYNCHRONIC_TWO
@@ -511,6 +511,9 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
         }
         else if (m.isNoteOff())
         {
+            
+            //synchronic1.notePlayed(noteIndex, m.getVelocity());
+            
             mainPianoSynth.keyOff(
                                   m.getChannel(),
                                   m.getNoteNumber(),

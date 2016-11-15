@@ -209,12 +209,11 @@ void SynchronicProcessor::renderNextBlock(int channel, int numSamples)
         if (phasor >= numSamplesBeat)
         {
             phasor -= numSamplesBeat;
-            DBG("PULSE");
+            
             if (on.size() >= clusterMin && on.size() <= clusterMax)
             {
                 for (auto note : on)
                 {
-                    DBG("on: " + String(note));
                     playNote(channel, note);
                 }
             }
