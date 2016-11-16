@@ -47,7 +47,7 @@ public:
     
     ReferenceCountedArray<ReferenceCountedBuffer, CriticalSection> sampleBuffers;
 
-    OwnedArray<SynchronicProcessor> synchronic; 
+    OwnedArray<SynchronicProcessor, CriticalSection> synchronic;
     
     int channel;
     

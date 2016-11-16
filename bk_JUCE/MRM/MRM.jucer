@@ -19,13 +19,17 @@
               file="Source/GraphicsConstants.h"/>
       </GROUP>
       <GROUP id="{754B7718-DE02-827A-21E1-1FB69E01DE50}" name="Utilities">
+        <FILE id="QKqEY2" name="BKList.cpp" compile="1" resource="0" file="Source/BKList.cpp"/>
+        <FILE id="dmllNf" name="BKList.h" compile="0" resource="0" file="Source/BKList.h"/>
+        <FILE id="N85SXV" name="BKUtilities.cpp" compile="1" resource="0" file="Source/BKUtilities.cpp"/>
+        <FILE id="WL9668" name="BKUtilities.h" compile="0" resource="0" file="Source/BKUtilities.h"/>
         <FILE id="VaGwGg" name="ReferenceCountedBuffer.cpp" compile="1" resource="0"
               file="Source/ReferenceCountedBuffer.cpp"/>
         <FILE id="Hf4u51" name="ReferenceCountedBuffer.h" compile="0" resource="0"
               file="Source/ReferenceCountedBuffer.h"/>
       </GROUP>
       <GROUP id="{E01F59AF-FEAD-7AEA-32C2-F665B05A05F1}" name="Model">
-        <FILE id="QTcAuL" name="UIState.h" compile="0" resource="0" file="Source/UIState.h"/>
+        <FILE id="QTcAuL" name="BKState.h" compile="0" resource="0" file="Source/BKState.h"/>
         <FILE id="GHmNVp" name="PluginProcessor.cpp" compile="1" resource="0"
               file="Source/PluginProcessor.cpp"/>
         <FILE id="oVHIQ3" name="PluginProcessor.h" compile="0" resource="0"

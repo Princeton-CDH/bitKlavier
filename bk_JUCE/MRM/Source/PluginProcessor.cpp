@@ -28,7 +28,7 @@ MrmAudioProcessor::MrmAudioProcessor() {
     // For testing and developing, let's keep directory of samples in home folder on disk.
     String path = "~/samples/";
     
-    synchronic = OwnedArray<SynchronicProcessor>();
+    synchronic = OwnedArray<SynchronicProcessor,CriticalSection>();
     synchronic.ensureStorageAllocated(numSynchronicLayers);
     
     for (int i = 0; i < numSynchronicLayers; i++)

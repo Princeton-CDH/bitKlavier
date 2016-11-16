@@ -11,69 +11,98 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "SynchronicViewController.h"
 
-#include "UIState.h"
+#include "BKState.h"
+
+#include "BKUtilities.h"
 
 //==============================================================================
 SynchronicViewController::SynchronicViewController()
 {
+    BKState *bk = BKState::getInstance();
+    
     // Text Fields
+    addAndMakeVisible(sKeymapTF);
+    sKeymapTF.addListener(this);
+    sKeymapTF.setName("SynchronicKeymap");
+    sKeymapTF.setText( intArrayToString( bk->sKeymap));
+    
+    
     addAndMakeVisible(sNumLayersTF);
     sNumLayersTF.addListener(this);
     sNumLayersTF.setName("NumSynchronicLayers");
+    sNumLayersTF.setText( String( bk->numSynchronicLayers));
     
     addAndMakeVisible(sCurrentLayerTF);
     sCurrentLayerTF.addListener(this);
     sCurrentLayerTF.setName("CurrentSynchronicLayer");
+    sCurrentLayerTF.setText( String( bk->currentSynchronicLayer));
     
     addAndMakeVisible(sTempoTF);
     sTempoTF.addListener(this);
-    sTempoTF.setName(cSynchronicParameterTypes[SynchronicTempo]);
+    sTempoTF.setName( cSynchronicParameterTypes[SynchronicTempo]);
+    sTempoTF.setText( String( bk->sTempo));
     
     addAndMakeVisible(sNumPulsesTF);
     sNumPulsesTF.addListener(this);
     sNumPulsesTF.setName(cSynchronicParameterTypes[SynchronicNumPulses]);
+    sNumPulsesTF.setText( String( bk->sNumPulses));
     
     addAndMakeVisible(sClusterMinTF);
     sClusterMinTF.addListener(this);
     sClusterMinTF.setName(cSynchronicParameterTypes[SynchronicClusterMin]);
+    sClusterMinTF.setText( String( bk->sClusterMin));
     
     addAndMakeVisible(sClusterMaxTF);
     sClusterMaxTF.addListener(this);
     sClusterMaxTF.setName(cSynchronicParameterTypes[SynchronicClusterMax]);
+    sClusterMaxTF.setText( String( bk->sClusterMax));
     
     addAndMakeVisible(sClusterThreshTF);
     sClusterThreshTF.addListener(this);
     sClusterThreshTF.setName(cSynchronicParameterTypes[SynchronicClusterThresh]);
+    sClusterThreshTF.setText( String( bk->sClusterThresh));
     
     addAndMakeVisible(sModeTF);
     sModeTF.addListener(this);
     sModeTF.setName(cSynchronicParameterTypes[SynchronicMode]);
+    sModeTF.setText( String( bk->sMode));
     
     addAndMakeVisible(sBeatsToSkipTF);
     sBeatsToSkipTF.addListener(this);
     sBeatsToSkipTF.setName(cSynchronicParameterTypes[SynchronicBeatsToSkip]);
+    sBeatsToSkipTF.setText( String( bk->sBeatsToSkip));
     
     addAndMakeVisible(sBeatMultipliersTF);
     sBeatMultipliersTF.addListener(this);
     sBeatMultipliersTF.setName(cSynchronicParameterTypes[SynchronicBeatMultipliers]);
+    sBeatMultipliersTF.setText( floatArrayToString( bk->sBeatMultipliers));
     
     addAndMakeVisible(sLengthMultipliersTF);
     sLengthMultipliersTF.addListener(this);
     sLengthMultipliersTF.setName(cSynchronicParameterTypes[SynchronicLengthMultipliers]);
+    sLengthMultipliersTF.setText( floatArrayToString( bk->sLengthMultipliers));
     
     addAndMakeVisible(sAccentMultipliersTF);
     sAccentMultipliersTF.addListener(this);
     sAccentMultipliersTF.setName(cSynchronicParameterTypes[SynchronicAccentMultipliers]);
+    sAccentMultipliersTF.setText( floatArrayToString( bk->sAccentMultipliers));
     
     addAndMakeVisible(sTuningOffsetsTF);
     sTuningOffsetsTF.addListener(this);
     sTuningOffsetsTF.setName(cSynchronicParameterTypes[SynchronicTuningOffsets]);
+    sTuningOffsetsTF.setText( floatArrayToString( bk->sTuningOffsets));
     
     addAndMakeVisible(sBasePitchTF);
     sBasePitchTF.addListener(this);
     sBasePitchTF.setName(cSynchronicParameterTypes[SynchronicBasePitch]);
+    sBasePitchTF.setText( String( bk->sBasePitch));
     
     // Labels
+    addAndMakeVisible(sKeymapL);
+    sKeymapL.setName("SynchronicKeymap");
+    sKeymapL.setText("SynchronicKeymap", NotificationType::dontSendNotification);
+    
+    
     addAndMakeVisible(sNumLayersL);
     sNumLayersL.setName("NumSynchronicLayers");
     sNumLayersL.setText("NumSynchronicLayers", NotificationType::dontSendNotification);
@@ -91,7 +120,7 @@ SynchronicViewController::SynchronicViewController()
     
     addAndMakeVisible(sNumPulsesL);
     sNumPulsesL.setName(cSynchronicParameterTypes[SynchronicNumPulses]);
-    sNumLayersL.setText(cSynchronicParameterTypes[SynchronicNumPulses], NotificationType::dontSendNotification);
+    sNumPulsesL.setText(cSynchronicParameterTypes[SynchronicNumPulses], NotificationType::dontSendNotification);
     
     
     addAndMakeVisible(sClusterMinL);
@@ -145,81 +174,94 @@ SynchronicViewController::SynchronicViewController()
     
 }
 
+
 SynchronicViewController::~SynchronicViewController()
 {
     
     
 }
 
-void SynchronicViewController::textEditorTextChanged (TextEditor& tf)
+void SynchronicViewController::textFieldDidChange(TextEditor& tf)
 {
-    String tfText = tf.getText();
-    String tfName = tf.getName();
+    String text = tf.getText();
+    String name = tf.getName();
+    
+    if (!text.containsNonWhitespaceChars())
+    {
+        text = "0";
+    }
     
     
-    float f = tfText.getFloatValue();
-    int i = tfText.getIntValue();
+    float f = text.getFloatValue();
+    int i = text.getIntValue();
     
+    DBG(name + ": |" + text + "|");
     
-    DBG(tfName + ": " + tfText);
+    BKState *bk = BKState::getInstance();
     
-    UIState *state = UIState::getInstance();
-    
-    if (tfName == cSynchronicParameterTypes[SynchronicTempo])
+    if (name == cSynchronicParameterTypes[SynchronicTempo])
     {
-        state->sTempo = f;
+        bk->sTempo = f;
     }
-    else if (tfName == cSynchronicParameterTypes[SynchronicNumPulses])
+    else if (name == cSynchronicParameterTypes[SynchronicNumPulses])
     {
-        state->sNumPulses = i;
+        bk->sNumPulses = i;
     }
-    else if (tfName == cSynchronicParameterTypes[SynchronicClusterMin])
+    else if (name == cSynchronicParameterTypes[SynchronicClusterMin])
     {
-        state->sClusterMin = i;
+        bk->sClusterMin = i;
     }
-    else if (tfName == cSynchronicParameterTypes[SynchronicClusterMax])
+    else if (name == cSynchronicParameterTypes[SynchronicClusterMax])
     {
-        state->sClusterMax = i;
+        bk->sClusterMax = i;
     }
-    else if (tfName == cSynchronicParameterTypes[SynchronicClusterThresh])
+    else if (name == cSynchronicParameterTypes[SynchronicClusterThresh])
     {
-        state->sClusterThresh = f;
+        bk->sClusterThresh = f;
     }
-    else if (tfName == cSynchronicParameterTypes[SynchronicMode])
+    else if (name == cSynchronicParameterTypes[SynchronicMode])
     {
-        state->sMode = (SynchronicSyncMode)i;
+        bk->sMode = (SynchronicSyncMode)i;
     }
-    else if (tfName == cSynchronicParameterTypes[SynchronicBeatsToSkip])
+    else if (name == cSynchronicParameterTypes[SynchronicBeatsToSkip])
     {
-        state->sBeatsToSkip = f;
+        bk->sBeatsToSkip = f;
     }
-    else if (tfName == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+    else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
     {
-        //sBeatMultipliers = ;
+        Array<float> beatMults = stringToFloatArray(text);
+        for (auto bm : beatMults)
+        {
+            DBG("bm: " + String(bm));
+        }
     }
-    else if (tfName == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+    else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
     {
         
     }
-    else if (tfName == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+    else if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
     {
         
     }
-    else if (tfName == cSynchronicParameterTypes[SynchronicTuningOffsets])
+    else if (name == cSynchronicParameterTypes[SynchronicTuningOffsets])
     {
         
     }
-    else if (tfName == cSynchronicParameterTypes[SynchronicBasePitch])
+    else if (name == cSynchronicParameterTypes[SynchronicBasePitch])
     {
-        state->sBasePitch = i;
+        bk->sBasePitch = i;
     }
-    else if (tfName == "NumSynchronicLayers")
+    else if (name == "NumSynchronicLayers")
     {
-        state->numSynchronicLayers = i;
+        bk->numSynchronicLayers = i;
     }
-    else if (tfName == "CurrentSynchronicLayer")
+    else if (name == "CurrentSynchronicLayer")
     {
-        state->currentSynchronicLayer = i;
+        bk->currentSynchronicLayer = i;
+    }
+    else if (name == "SynchronicKeymap")
+    {
+        
     }
     else
     {
@@ -227,8 +269,43 @@ void SynchronicViewController::textEditorTextChanged (TextEditor& tf)
     }
     
     /// say that state has been updated
+    //synchronic[i]->set(. . . )
 }
 
+#if !TEXT_CHANGE_INTERNAL
+void SynchronicViewController::textEditorFocusLost(TextEditor& tf)
+{
+    if (shouldChange)
+    {
+        textFieldDidChange(tf);
+        shouldChange = false;
+    }
+}
+
+void SynchronicViewController::textEditorReturnKeyPressed(TextEditor& tf)
+{
+    if (shouldChange)
+    {
+        textFieldDidChange(tf);
+        shouldChange = false;
+    }
+}
+
+void SynchronicViewController::textEditorEscapeKeyPressed(TextEditor& tf)
+{
+    if (shouldChange)
+    {
+        textFieldDidChange(tf);
+        shouldChange = false;
+    }
+}
+
+
+void SynchronicViewController::textEditorTextChanged(TextEditor& tf)
+{
+    shouldChange = true;
+}
+#endif
 void SynchronicViewController::paint (Graphics& g)
 {
     /* This demo code just fills the component's background and
@@ -251,6 +328,9 @@ void SynchronicViewController::resized()
                                    i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sCurrentLayerL.setTopLeftPosition(0,
+                                      i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+    
+    sKeymapL.setTopLeftPosition(0,
                                       i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sTempoL.setTopLeftPosition(0,
@@ -296,6 +376,9 @@ void SynchronicViewController::resized()
                                     i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sCurrentLayerTF.setTopLeftPosition(tfX,
+                                       i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+    
+    sKeymapTF.setTopLeftPosition(tfX,
                                        i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sTempoTF.setTopLeftPosition(tfX,

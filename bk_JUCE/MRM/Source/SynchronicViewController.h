@@ -58,6 +58,8 @@ public:
     BKTextField sTuningOffsetsTF;
     BKTextField sBasePitchTF;
     
+    BKTextField sKeymapTF;
+    
     // BKLabels
     BKLabel sNumLayersL;
     BKLabel sCurrentLayerL;
@@ -75,10 +77,21 @@ public:
     BKLabel sTuningOffsetsL;
     BKLabel sBasePitchL;
     
+    BKLabel sKeymapL;
     
-    void textEditorTextChanged (TextEditor&) override;
+    bool shouldChange;
+    
+    
 
 private:
+    
+    // TextEditor input parsing
+    void textFieldDidChange(TextEditor&);
+    void textEditorTextChanged(TextEditor&) override;
+    void textEditorFocusLost(TextEditor&) override;
+    void textEditorReturnKeyPressed(TextEditor&) override;
+    void textEditorEscapeKeyPressed(TextEditor&) override;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicViewController)
 };
 

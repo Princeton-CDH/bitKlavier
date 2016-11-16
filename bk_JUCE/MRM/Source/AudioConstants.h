@@ -13,6 +13,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
+#define TEXT_CHANGE_INTERNAL 0
 
 #define USE_SYNTH_INTERNAL 0
 #define CRAY_COOL_MUSIC_MAKER 0

@@ -1,26 +1,26 @@
 /*
   ==============================================================================
 
-    UIState.h
+    BKState.h
     Created: 15 Nov 2016 6:36:33pm
     Author:  Michael R Mulshine
 
   ==============================================================================
 */
 
-#ifndef UISTATE_H_INCLUDED
-#define UISTATE_H_INCLUDED
+#ifndef BKSTATE_H_INCLUDED
+#define BKSTATE_H_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
 #include "AudioConstants.h"
 
-class UIState
+class BKState
 {
 public:
-    UIState()
+    BKState()
     {
-        numSynchronicLayers = 0;
+        numSynchronicLayers = 2;
         currentSynchronicLayer = 0;
         sTempo = 120;
         sNumPulses = 2;
@@ -29,14 +29,15 @@ public:
         sClusterThresh = 1.0;
         sMode = FirstNoteSync;
         sBeatsToSkip = 0;
+        sKeymap = Array<int>({60});
         sBeatMultipliers = Array<float>({1.0});
         sLengthMultipliers = Array<float>({1.0});
         sAccentMultipliers = Array<float>({1.0});
-        sTuningOffsets = Array<float>(aEqualTuning);
+        sTuningOffsets = Array<float>(aEqualTuning,12);
         sBasePitch = 0;
     }
     
-    ~UIState()
+    ~BKState()
     {
         clearSingletonInstance();
     }
@@ -52,13 +53,44 @@ public:
     Array<float> sLengthMultipliers;
     Array<float> sAccentMultipliers;
     Array<float> sTuningOffsets;
+    Array<int> sKeymap;
     int sBasePitch; // float?
     
-    juce_DeclareSingleton (UIState, false);
+    
+    String floatArrayToString(Array<float> arr)
+    {
+        String s = "";
+        for (auto key : arr)
+        {
+            s.append(String(key), 3);
+            s.append(" ", 1);
+        }
+        return s;
+    }
+    
+    String intArrayToString(Array<int> arr)
+    {
+        String s = "";
+        for (auto key : arr)
+        {
+            s.append(String(key), 3);
+            s.append(" ", 1);
+        }
+        return s;
+    }
+    
+    /*
+    Array<int> stringToIntArray(String s)
+    {
+        Array<int> arr = Array<int>({0});
+        return arr;
+    }
+    */
+    juce_DeclareSingleton (BKState, false);
     
 };
 
-juce_ImplementSingleton(UIState);
+juce_ImplementSingleton(BKState);
 
 
-#endif  // UISTATE_H_INCLUDED
+#endif  // BKSTATE_H_INCLUDED
