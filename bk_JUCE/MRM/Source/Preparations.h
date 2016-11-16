@@ -85,7 +85,7 @@ private:
     uint64 numSamplesBeat;
     
     Array<int> cluster;
-    
+    Array<int> toAdd; 
     Array<int> on;
     
     JUCE_LEAK_DETECTOR(SynchronicProcessor);

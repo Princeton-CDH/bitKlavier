@@ -13,13 +13,14 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
-
+#include "SynchronicViewController.h"
 
 //==============================================================================
 /**
 */
 class MrmAudioProcessorEditor : public AudioProcessorEditor,
-                                private Button::Listener
+                                private TextEditor::Listener
+
 {
     
 public:
@@ -34,10 +35,8 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it
     MrmAudioProcessor& processor;
-    // GUI components
-    TextButton button1;
-
-    void buttonClicked(Button *) override;
+    
+    SynchronicViewController svc;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MrmAudioProcessorEditor)
 };

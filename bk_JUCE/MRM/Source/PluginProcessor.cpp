@@ -9,12 +9,35 @@ String notes[4] = {"A","C","D#","F#"};
 //==============================================================================
 MrmAudioProcessor::MrmAudioProcessor() {
 
+    currentSynchronicLayer = 0;
+    numSynchronicLayers = 2;
+    sTempo = 120;
+    sNumPulses = 2;
+    sClusterMin = 2;
+    sClusterMax = 10;
+    sClusterThresh = 1.0;
+    sMode = FirstNoteSync;
+    sBeatsToSkip = 0;
+    sBeatMultipliers = Array<float>({1.0});
+    sLengthMultipliers = Array<float>({1.0});
+    sAccentMultipliers = Array<float>({0.5});
+    sTuningOffsets = Array<float>(aEqualTuning);
+    sBasePitch = 0;
+    
     
     // For testing and developing, let's keep directory of samples in home folder on disk.
     String path = "~/samples/";
     
-    synchronic1 = SynchronicProcessor();
-    synchronic2 = SynchronicProcessor();
+    synchronic = OwnedArray<SynchronicProcessor>();
+    synchronic.ensureStorageAllocated(numSynchronicLayers);
+    
+    for (int i = 0; i < numSynchronicLayers; i++)
+    {
+        synchronic.set(i, new SynchronicProcessor());
+    }
+    
+    
+    
 
     // 88 voices seems to go over just fine...
     for (int i = 0; i < 44; i++) {
@@ -305,6 +328,7 @@ MrmAudioProcessor::MrmAudioProcessor() {
 
 MrmAudioProcessor::~MrmAudioProcessor()
 {
+    
 }
 
 //==============================================================================
@@ -374,39 +398,29 @@ void MrmAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
     hammerReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     resonanceReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     
-    synchronic1.attachToSynth(&mainPianoSynth);
-#if USE_SYNCHRONIC_TWO
-    synchronic2.attachToSynth(&mainPianoSynth);
-#endif
+    float scalar = 1.0;
+    float offset = 0;
+    for (auto s : synchronic)
+    {
+        s->attachToSynth(&mainPianoSynth);
+        
+        s->set(sTempo,                              // tempo
+               sNumPulses,                                  // number of pulses
+               sClusterMin,                                  // cluster min
+               sClusterMax,                                  // cluster max
+               sClusterThresh,                                // cluster threshold (beats)
+               sMode,                      // mode
+               sBeatsToSkip,                                  // beats to skip
+               sBeatMultipliers,    // beat multipliers
+               sLengthMultipliers, // length multipliers
+               sAccentMultipliers, // accent multipliers
+               sTuningOffsets,         // tuning offsets
+               sBasePitch   );                              // base pitch
+        
+        scalar += .5;
+        offset += 1;
+    }
 
-    
-    synchronic1.set(120,                              // tempo
-                    8,                                  // number of pulses
-                    2,                                  // cluster min
-                    10,                                  // cluster max
-                    4,                                // cluster threshold (beats)
-                    FirstNoteSync,                      // mode
-                    0,                                  // beats to skip
-                    Array<float>({1.0}),    // beat multipliers
-                    Array<float>({.5}), // length multipliers
-                    Array<float>({.75}), // accent multipliers
-                    Array<float>(aEqualTuning),         // tuning offsets
-                    0   );                              // base pitch
-    
-#if USE_SYNCHRONIC_TWO
-    synchronic2.set(60.,                                      // tempo
-                    4,                                         // number of pulses
-                    2,                                          // cluster min
-                    5,                                          // cluster max
-                    4,                                        // cluster threshold (beats)
-                    FirstNoteSync,                              // mode
-                    0,                                          // beats to skip
-                    Array<float>({1.0}),    // beat multipliers
-                    Array<float>({1.0}),          // length multipliers
-                    Array<float>({1.0}),              // accent multipliers
-                    Array<float>(aJustTuning),                 // tuning offsets
-                    6   );
-#endif
 }
 
 void MrmAudioProcessor::releaseResources() {
@@ -473,12 +487,10 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     int tuningBasePitch = 0;
     int numSamples = buffer.getNumSamples();
     
-    
-    synchronic1.renderNextBlock(channel,numSamples);
-    
-#if USE_SYNCHRONIC_TWO
-    synchronic2.renderNextBlock(channel,numSamples);
-#endif
+    for (auto s : synchronic)
+    {
+        s->renderNextBlock(channel,numSamples);
+    }
     
     // NOTE ON NOTE OFF
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
@@ -488,16 +500,15 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
         
         if (m.isNoteOn())
         {
-            synchronic1.notePlayed(noteIndex, m.getVelocity());
-            
-#if USE_SYNCHRONIC_TWO
-            synchronic2.notePlayed(noteIndex, m.getVelocity());
-#endif
+            for (auto s : synchronic)
+            {
+                s->notePlayed(noteIndex, m.getVelocity());
+            }
             
             mainPianoSynth.keyOn(
                                  m.getChannel(),
                                  m.getNoteNumber(),
-                                 m.getFloatVelocity(),
+                                 m.getFloatVelocity() * .5,
                                  tuningOffsets,
                                  tuningBasePitch,
                                  Forward,
@@ -538,7 +549,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
             resonanceReleaseSynth.keyOn(
                                         m.getChannel(),
                                         m.getNoteNumber(),
-                                        m.getFloatVelocity() * 0.5, //will also want multiplier for resonance gain, though not here...
+                                        m.getFloatVelocity(), //will also want multiplier for resonance gain, though not here...
                                         tuningOffsets,
                                         tuningBasePitch,
                                         Forward,
@@ -583,33 +594,36 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
 }
 
 
-
-
 //==============================================================================
-void MrmAudioProcessor::changeListenerCallback(ChangeBroadcaster *source) {
+void MrmAudioProcessor::changeListenerCallback(ChangeBroadcaster *source)
+{
     
 }
 
 //==============================================================================
-bool MrmAudioProcessor::hasEditor() const {
+bool MrmAudioProcessor::hasEditor() const
+{
     
     return true; // (change this to false if you choose to not supply an editor)
 }
 
-AudioProcessorEditor* MrmAudioProcessor::createEditor() {
+AudioProcessorEditor* MrmAudioProcessor::createEditor()
+{
     
     return new MrmAudioProcessorEditor (*this);
 }
 
 //==============================================================================
-void MrmAudioProcessor::getStateInformation (MemoryBlock& destData) {
+void MrmAudioProcessor::getStateInformation (MemoryBlock& destData)
+{
     
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 }
 
-void MrmAudioProcessor::setStateInformation (const void* data, int sizeInBytes) {
+void MrmAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+{
     
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
@@ -617,7 +631,8 @@ void MrmAudioProcessor::setStateInformation (const void* data, int sizeInBytes) 
 
 //==============================================================================
 // This creates new instances of the plugin..
-AudioProcessor* JUCE_CALLTYPE createPluginFilter() {
+AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+{
     
     return new MrmAudioProcessor();
 }

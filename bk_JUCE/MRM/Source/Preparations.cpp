@@ -133,7 +133,7 @@ void SynchronicProcessor::notePlayed(int noteNumber, int velocity)
     }
     else
     {
-        on.clearQuick();
+        cluster.clearQuick();
         inPulses = false;
         
         // Start first note timer, since this is beginning of new cluster.
@@ -150,20 +150,17 @@ void SynchronicProcessor::notePlayed(int noteNumber, int velocity)
     
     if (inCluster)
     {
+
+        cluster.add(noteNumber);
         clusterThresholdTimer = 0;
-        on.add(noteNumber);
     }
-    
-    for (auto note : cluster)
-    {
-        DBG("cluster: " + String(note));
-    }
-   
 }
 
 void SynchronicProcessor::renderNextBlock(int channel, int numSamples)
 {
 
+    int clusterSize = cluster.size();
+    
     if (inCluster)
     {
         if (clusterThresholdTimer >= clusterThresholdSamples)
@@ -205,16 +202,17 @@ void SynchronicProcessor::renderNextBlock(int channel, int numSamples)
     if (inPulses)
     {
         numSamplesBeat = (beatMultipliers[beat] * sampleRate * (60.0/tempo));
+
         
         if (phasor >= numSamplesBeat)
         {
             phasor -= numSamplesBeat;
             
-            if (on.size() >= clusterMin && on.size() <= clusterMax)
+            if (clusterSize >= clusterMin && clusterSize <= clusterMax)
             {
-                for (auto note : on)
+                for (int n = 0; n < clusterSize; n++)
                 {
-                    playNote(channel, note);
+                    playNote(channel, cluster[n]);
                 }
             }
             
@@ -226,7 +224,8 @@ void SynchronicProcessor::renderNextBlock(int channel, int numSamples)
             
             if (++pulse >= numPulses)
             {
-                on.clearQuick();
+                cluster.clearQuick();
+                toAdd.clearQuick();
                 inPulses = false;
             }
             

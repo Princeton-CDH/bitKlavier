@@ -45,6 +45,49 @@ typedef enum SynchronicSyncMode {
     LastNoteSync,
     SynchronicSyncModeNil
 }SynchronicSyncMode;
+/*
+s->set(5 * scalar,                              // tempo
+       3,                                  // number of pulses
+       2,                                  // cluster min
+       20,                                  // cluster max
+       1,                                // cluster threshold (beats)
+       FirstNoteSync,                      // mode
+       0,                                  // beats to skip
+       Array<float>({1.0}),    // beat multipliers
+       Array<float>({.5}), // length multipliers
+       Array<float>({.02}), // accent multipliers
+       Array<float>(aEqualTuning),         // tuning offsets
+       0   );                              // base pitch
+*/
+typedef enum SynchronicParameterType {
+    SynchronicTempo = 0,
+    SynchronicNumPulses,
+    SynchronicClusterMin,
+    SynchronicClusterMax,
+    SynchronicClusterThresh,
+    SynchronicMode,
+    SynchronicBeatsToSkip,
+    SynchronicBeatMultipliers,
+    SynchronicLengthMultipliers,
+    SynchronicAccentMultipliers,
+    SynchronicTuningOffsets,
+    SynchronicBasePitch
+}SynchronicParameterType;
+
+static const std::vector<std::string> cSynchronicParameterTypes = {
+    "SynchronicTempo",
+    "SynchronicNumPulses",
+    "SynchronicClusterMin",
+    "SynchronicClusterMax",
+    "SynchronicClusterThresh",
+    "SynchronicMode",
+    "SynchronicBeatsToSkip",
+    "SynchronicBeatMultipliers",
+    "SynchronicLengthMultipliers",
+    "SynchronicAccentMultipliers",
+    "SynchronicTuningOffsets",
+    "SynchronicBasePitch"
+};
 
 static const SynchronicSyncMode aSynchronicSyncMode = LastNoteSync;
 static const float aSynchronicClusterThreshold = 0.5;
@@ -61,7 +104,7 @@ static const float aRampOnTimeSec = 0.004f;
 static const float aRampOffTimeSec = 0.004f;
 static const int aNumScaleDegrees = 12;
 
-static const int NumLayers = 8;
+static const int NumLayers = 2;
 static const int aVelocityThresh_Eight[9] = {
     0,
     25,
