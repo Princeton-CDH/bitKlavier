@@ -19,7 +19,7 @@ NostalgicPreparation::NostalgicPreparation()
     reverseTargetLength.ensureStorageAllocated(128);
     undertowVelocities.ensureStorageAllocated(128);
     
-    keymap.ensureStorageAllocated(128);
+    keymap.ensureStorageAllocated(128);`
     
     for(int i=0;i<128;i++)
     {
@@ -156,7 +156,7 @@ void NostalgicPreparation::processBlock(int numSamples, int midiChannel)
                          getWaveDistance(), // start
                          getUndertow(), // length
                          aRampUndertowCrossMS, //ramp up
-                         getUndertow() - aRampUndertowCrossMS); //ramp down; make these consts in AudioConstants.h
+                         getUndertow() - aRampUndertowCrossMS); //ramp down
 
             //remove from active notes list
             activeReverseNotes.removeFirstMatchingValue(tempnote);
@@ -184,7 +184,7 @@ int NostalgicPreparation::getReverseNoteLengthTimer(int midiNoteNumber) const no
 }
 
 
-//increment timer for all active notes, and all currently reversing notes
+//increment timers for all active notes, and all currently reversing notes
 void NostalgicPreparation::incrementTimers(int numSamples)
 {
     for(int i = (activeNotes.size() - 1); i >= 0; --i)
