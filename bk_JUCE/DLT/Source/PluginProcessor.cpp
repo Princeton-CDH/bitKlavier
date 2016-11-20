@@ -479,6 +479,8 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
         else if (m.isNoteOff())
         {
             
+            //DBG("noteOff " + std::to_string(m.getNoteNumber()) + " " + std::to_string(m.getFloatVelocity()));
+            
             nostalgic.playNote(m.getNoteNumber(), m.getChannel());
 
             mainPianoSynth.keyOff(
@@ -490,7 +492,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
             hammerReleaseSynth.keyOn(
                                      m.getChannel(),
                                      m.getNoteNumber(),
-                                     m.getFloatVelocity() * 0.01, //will want hammerGain multipler that user can set
+                                     m.getFloatVelocity() * .02, //will want hammerGain multipler that user can set
                                      tuningOffsets,
                                      tuningBasePitch,
                                      Forward,
@@ -504,7 +506,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
             resonanceReleaseSynth.keyOn(
                                         m.getChannel(),
                                         m.getNoteNumber(),
-                                        m.getFloatVelocity() * 0.5, //will also want multiplier for resonance gain, though not here...
+                                        m.getFloatVelocity() * .5, //will also want multiplier for resonance gain, though not here...
                                         tuningOffsets,
                                         tuningBasePitch,
                                         Forward,

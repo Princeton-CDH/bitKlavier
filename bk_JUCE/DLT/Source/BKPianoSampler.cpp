@@ -118,6 +118,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             {
                 sourceSamplePosition = 0.0;
                 playEndPosition = jmin(playLength, maxLength) - 1;
+                //DBG("playing FixedLength note " + std::to_string(velocity));
             }
             else if (playType == FixedLengthFixedStart)
             {
