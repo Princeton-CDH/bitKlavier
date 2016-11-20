@@ -13,11 +13,8 @@
 
 
 #include "../JuceLibraryCode/JuceHeader.h"
-
 #include "BKSynthesiser.h"
-
 #include "ReferenceCountedBuffer.h"
-
 #include "AudioConstants.h"
 
 class   BKPianoSamplerSound    : public BKSynthesiserSound
@@ -67,6 +64,7 @@ public:
     bool appliesToNote (int midiNoteNumber) override;
     bool appliesToVelocity (int midiNoteVelocity) override;
     bool appliesToChannel (int midiChannel) override;
+    double returnPlaybackRate (int midiNoteNumber) override;
     
 private:
     //==============================================================================
@@ -109,7 +107,19 @@ public:
     //==============================================================================
     bool canPlaySound (BKSynthesiserSound*) override;
     
-    void startNote (float midiNoteNumber, float velocity, PianoSamplerNoteDirection direction, PianoSamplerNoteType type, BKNoteType bktype, uint64 startingPosition, uint64 length, BKSynthesiserSound* sound) override;
+    void startNote (
+                    float midiNoteNumber,
+                    float velocity,
+                    PianoSamplerNoteDirection direction,
+                    PianoSamplerNoteType type,
+                    BKNoteType bktype,
+                    uint64 startingPosition,
+                    uint64 length,
+                    int voiceRampOn,
+                    int voiceRampOff,
+                    BKSynthesiserSound* sound
+                    ) override;
+    
     void stopNote (float velocity, bool allowTailOff) override;
     
     void pitchWheelMoved (int newValue) override;
