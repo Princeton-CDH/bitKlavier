@@ -64,7 +64,6 @@ public:
     bool appliesToNote (int midiNoteNumber) override;
     bool appliesToVelocity (int midiNoteVelocity) override;
     bool appliesToChannel (int midiChannel) override;
-    double returnPlaybackRate (int midiNoteNumber) override;
     
 private:
     //==============================================================================

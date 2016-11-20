@@ -51,11 +51,6 @@ bool BKPianoSamplerSound::appliesToChannel (int /*midiChannel*/)
     return true;
 }
 
-double BKPianoSamplerSound::returnPlaybackRate (int midiNoteNumber)
-{
-    return powf(2.0f, (midiNoteNumber - midiRootNote) / 12.0f);
-}
-
 
 //==============================================================================
 BKPianoSamplerVoice::BKPianoSamplerVoice() : pitchRatio (0.0),
@@ -182,7 +177,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             }
             else if (playType == FixedLengthFixedStart)
             {
-                sourceSamplePosition = startingPosition;
+                //sourceSamplePosition = startingPosition; //* pitchRatio! do this here, instead of outside as it is now?
+                sourceSamplePosition = startingPosition * pitchRatio;
                 if (playLength >= sourceSamplePosition)
                 {
                     //playEndPosition = (double)sound->rampOffSamples;
@@ -190,7 +186,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                 }
                 else
                 {
-                    playEndPosition = (double)(startingPosition - playLength);
+                    //playEndPosition = (double)(startingPosition - playLength);
+                    playEndPosition = (double)(startingPosition * pitchRatio - playLength);
                 }
             }
             else

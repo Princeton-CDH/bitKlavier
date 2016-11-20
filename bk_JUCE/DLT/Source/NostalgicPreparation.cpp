@@ -33,7 +33,16 @@ NostalgicPreparation::NostalgicPreparation()
     }
     
     waveDistance = 200; //for testing
-    undertow = 2500; //again, for testing
+    undertow = 1000; //again, for testing
+    /*
+     one thing i discovered is that the original bK actually plays the forward undertow
+     sample for TWICE this value; the first half at steady gain, and then the second
+     half with a ramp down. i'm not sure why, and i'm not sure i want to keep that
+     behavior, but if we don't, then the instrument will sound different when we import
+     old presets
+     --dt
+     */
+    
 
 }
 
@@ -67,12 +76,12 @@ void NostalgicPreparation::playNote(int midiNoteNumber, int midiChannel) {
                  Reverse,
                  FixedLengthFixedStart,
                  Nostalgic,
-                 (tempDuration + getWaveDistance()) * synth->getPlaybackRate(midiNoteNumber), // start
+                 //(tempDuration + getWaveDistance()) * synth->getPlaybackRate(midiNoteNumber), // start
+                 tempDuration + getWaveDistance(),
                  tempDuration, // length
                  30, //ramp up (ms)
-                 50  //ramp off
-                 );
-    
+                 50); //ramp off
+
     noteLengthTimerOff(midiNoteNumber);
     
     //time how long the reverse note has played, to trigger undertow note

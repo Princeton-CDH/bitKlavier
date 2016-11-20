@@ -62,11 +62,6 @@ public:
     virtual bool appliesToChannel (int midiChannel) = 0;
     
     
-    /** Returns the playback rate for the given sound, for transposing keymaps
-     */
-    virtual double returnPlaybackRate (int midiNoteNumber) {return 1.;};
-    
-    
     /** The class is reference-counted, so this is a handy pointer class for it. */
     typedef ReferenceCountedObjectPtr<BKSynthesiserSound> Ptr;
     
@@ -436,8 +431,6 @@ public:
     virtual void allNotesOff (int midiChannel,
                               bool allowTailOff);
     
-    
-    double getPlaybackRate (int midiNoteNumber);
     
     /** Sends a pitch-wheel message to any active voices.
      

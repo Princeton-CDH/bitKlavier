@@ -426,22 +426,6 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             }
         }
     }
-    
-    double BKSynthesiser::getPlaybackRate (int midiNoteNumber)
-    {
-        for (int i = sounds.size(); --i >= 0;)
-        {
-            BKSynthesiserSound* const sound = sounds.getUnchecked(i);
-            
-            // Check if sound applies to note, velocity, and channel.
-            if (sound->appliesToNote (midiNoteNumber))
-            {
-                return sound->returnPlaybackRate(midiNoteNumber);
-            }
-        }
-        
-        return 1.;
-    }
 
     
     void BKSynthesiser::allNotesOff (const int midiChannel, const bool allowTailOff)
