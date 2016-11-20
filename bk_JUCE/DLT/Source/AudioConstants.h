@@ -30,6 +30,7 @@ static const float aMaxSampleLengthSec = 30.0f;
 static const float aRampOnTimeSec = 0.01f; //in original bK, we only rampUp (30ms) when starting reverse notes
 static const float aRampOffTimeSec = 0.03f; //30ms in original bK
 static const int aNumScaleDegrees = 12;
+static const int aRampUndertowCrossMS = 50;
 
 
 

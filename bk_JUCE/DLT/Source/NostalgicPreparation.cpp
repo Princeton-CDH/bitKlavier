@@ -80,7 +80,7 @@ void NostalgicPreparation::playNote(int midiNoteNumber, int midiChannel) {
                  tempDuration + getWaveDistance(),
                  tempDuration, // length
                  30, //ramp up (ms)
-                 50); //ramp off
+                 aRampUndertowCrossMS); //ramp off
 
     noteLengthTimerOff(midiNoteNumber);
     
@@ -115,7 +115,7 @@ void NostalgicPreparation::reverseNoteLengthTimerOn(int midiNoteNumber, float no
 {
     activeReverseNotes.addIfNotAlreadyThere(midiNoteNumber);
     reverseLengthTimers.set(midiNoteNumber, 0);
-    reverseTargetLength.set(midiNoteNumber, (noteLength - 50) * sampleRate/1000.); //to schedule undertow note
+    reverseTargetLength.set(midiNoteNumber, (noteLength - aRampUndertowCrossMS) * sampleRate/1000.); //to schedule undertow note
     
     //store target note length
     //DBG("nostalgic added active reverse note " + std::to_string(midiNoteNumber));
@@ -155,8 +155,8 @@ void NostalgicPreparation::processBlock(int numSamples, int midiChannel)
                          Nostalgic,
                          getWaveDistance(), // start
                          getUndertow(), // length
-                         50, //ramp up
-                         getUndertow() - 50); //ramp down; make these consts in AudioConstants.h
+                         aRampUndertowCrossMS, //ramp up
+                         getUndertow() - aRampUndertowCrossMS); //ramp down; make these consts in AudioConstants.h
 
             //remove from active notes list
             activeReverseNotes.removeFirstMatchingValue(tempnote);

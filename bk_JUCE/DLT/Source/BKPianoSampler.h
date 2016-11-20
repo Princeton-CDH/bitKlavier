@@ -40,12 +40,12 @@ public:
      source, in seconds
      */
     BKPianoSamplerSound (const String& name,
-                                  ReferenceCountedBuffer::Ptr buffer,
-                                  uint64 soundLength,
-                                  double sourceSampleRate,
-                                  const BigInteger& midiNotes,
-                                  int rootMidiNote,
-                                  const BigInteger& midiVelocities);
+                         ReferenceCountedBuffer::Ptr buffer,
+                         uint64 soundLength,
+                         double sourceSampleRate,
+                         const BigInteger& midiNotes,
+                         int rootMidiNote,
+                         const BigInteger& midiVelocities);
     
     /** Destructor. */
     ~BKPianoSamplerSound();
