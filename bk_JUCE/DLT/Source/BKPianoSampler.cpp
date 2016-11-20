@@ -123,11 +123,13 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             {
                 sourceSamplePosition = startingPosition;
                 playEndPosition = jmin( (startingPosition + playLength), maxLength) - 1;
-                DBG("starting forward note, starting position = "
+                /*
+                 DBG("starting forward note, starting position = "
                     + std::to_string(startingPosition * 1000./getSampleRate())
                     + " ending position = "
                     + std::to_string(playEndPosition * 1000./getSampleRate())
                     );
+                 */
             }
             else
             {
@@ -173,7 +175,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                 {
                     playEndPosition = (double)(sourceSamplePosition - playLength);
                 }
-                DBG(String(playEndPosition));
+                //DBG(String(playEndPosition));
             }
             else if (playType == FixedLengthFixedStart)
             {
@@ -247,7 +249,7 @@ void BKPianoSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
     {
         isInRampOn = false;
         isInRampOff = true;
-        DBG("ramping off");
+        //DBG("ramping off");
     }
     else
     {
@@ -380,7 +382,7 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
                         if (sourceSamplePosition >= playEndPosition)
                         {
                             stopNote (0.0f, true);
-                            DBG("stopping forward note, playEndPosition = " + std::to_string(playEndPosition * 1000./getSampleRate()));
+                            //DBG("stopping forward note, playEndPosition = " + std::to_string(playEndPosition * 1000./getSampleRate()));
                         }
                     }
                 }

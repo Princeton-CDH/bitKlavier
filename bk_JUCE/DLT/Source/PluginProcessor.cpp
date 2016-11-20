@@ -164,12 +164,12 @@ MrmAudioProcessor::MrmAudioProcessor() {
                         sampleBuffers.insert(numSamples, newBuffer);
                         
                         mainPianoSynth.addSound(new BKPianoSamplerSound(soundName,
-                                                                                      newBuffer,
-                                                                                      maxLength,
-                                                                                      sourceSampleRate,
-                                                                                      noteRange,
-                                                                                      root,
-                                                                                      velocityRange));
+                                                                        newBuffer,
+                                                                        maxLength,
+                                                                        sourceSampleRate,
+                                                                        noteRange,
+                                                                        root,
+                                                                        velocityRange));
                     }
                     
                 } else {
@@ -486,7 +486,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                                   m.getNoteNumber(),
                                   m.getFloatVelocity(),
                                   true);
-            /*
+            
             hammerReleaseSynth.keyOn(
                                      m.getChannel(),
                                      m.getNoteNumber(),
@@ -514,7 +514,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                                         2000,
                                         4,
                                         4);
-             */
+             
             
         }
         else if (m.isAftertouch())

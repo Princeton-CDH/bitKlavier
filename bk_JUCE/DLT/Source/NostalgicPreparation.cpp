@@ -64,7 +64,7 @@ void NostalgicPreparation::playNote(int midiNoteNumber, int midiChannel) {
     
     //get length of played notes, subtract wave distance to set nostalgic reverse note length
     float tempDuration = getNoteLengthTimer(midiNoteNumber) * (1000. / sampleRate);
-    DBG("nostalgic note duration (ms) = " + std::to_string(tempDuration));
+    //DBG("nostalgic note duration (ms) = " + std::to_string(tempDuration));
     
     //play nostalgic note
     synth->keyOn(
@@ -97,7 +97,7 @@ void NostalgicPreparation::noteLengthTimerOn(int midiNoteNumber, float midiNoteV
     activeNotes.addIfNotAlreadyThere(midiNoteNumber);
     noteLengthTimers.set(midiNoteNumber, 0);
     velocities.set(midiNoteNumber, midiNoteVelocity);
-    DBG("nostalgic added active note " + std::to_string(midiNoteNumber) + " " + std::to_string(midiNoteVelocity));
+    //DBG("nostalgic added active note " + std::to_string(midiNoteNumber) + " " + std::to_string(midiNoteVelocity));
 }
 
 
@@ -106,7 +106,7 @@ void NostalgicPreparation::noteLengthTimerOff(int midiNoteNumber)
 {
     activeNotes.removeFirstMatchingValue(midiNoteNumber);
     noteLengthTimers.set(midiNoteNumber, 0);
-    DBG("nostalgic removed active note " + std::to_string(midiNoteNumber));
+    //DBG("nostalgic removed active note " + std::to_string(midiNoteNumber));
 }
 
 
@@ -118,7 +118,7 @@ void NostalgicPreparation::reverseNoteLengthTimerOn(int midiNoteNumber, float no
     reverseTargetLength.set(midiNoteNumber, (noteLength - 50) * sampleRate/1000.); //to schedule undertow note
     
     //store target note length
-    DBG("nostalgic added active reverse note " + std::to_string(midiNoteNumber));
+    //DBG("nostalgic added active reverse note " + std::to_string(midiNoteNumber));
 }
 
 
@@ -143,7 +143,7 @@ void NostalgicPreparation::processBlock(int numSamples, int midiChannel)
         if (getReverseNoteLengthTimer(tempnote) > reverseTargetLength.getUnchecked(tempnote))
         {
             //play forward note for undertow dur and ramp
-            DBG("nostalgic forward note " + std::to_string(tempnote) + " " + std::to_string(getVelocity(tempnote)));
+            //DBG("nostalgic forward note " + std::to_string(tempnote) + " " + std::to_string(getVelocity(tempnote)));
             synth->keyOn(
                          midiChannel,
                          tempnote,
