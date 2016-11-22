@@ -11,91 +11,96 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "SynchronicViewController.h"
 
-#include "BKState.h"
-
 #include "BKUtilities.h"
 
 //==============================================================================
-SynchronicViewController::SynchronicViewController()
+SynchronicViewController::SynchronicViewController(MrmAudioProcessor& p):
+processor(p)
 {
-    BKState *bk = BKState::getInstance();
+    SynchronicPreparation::Ptr layer = processor.sPrep;
     
     // Text Fields
     addAndMakeVisible(sKeymapTF);
     sKeymapTF.addListener(this);
     sKeymapTF.setName("SynchronicKeymap");
-    sKeymapTF.setText( intArrayToString( bk->sKeymap));
+    //sKeymapTF.setText( intArrayToString( processor.sKeymap));
     
     
     addAndMakeVisible(sNumLayersTF);
     sNumLayersTF.addListener(this);
     sNumLayersTF.setName("NumSynchronicLayers");
-    sNumLayersTF.setText( String( bk->numSynchronicLayers));
+    sNumLayersTF.setText( String( processor.numSynchronicLayers));
     
     addAndMakeVisible(sCurrentLayerTF);
     sCurrentLayerTF.addListener(this);
     sCurrentLayerTF.setName("CurrentSynchronicLayer");
-    sCurrentLayerTF.setText( String( bk->currentSynchronicLayer));
+    sCurrentLayerTF.setText( String( processor.currentSynchronicLayer));
     
     addAndMakeVisible(sTempoTF);
     sTempoTF.addListener(this);
     sTempoTF.setName( cSynchronicParameterTypes[SynchronicTempo]);
-    sTempoTF.setText( String( bk->sTempo));
+    sTempoTF.setText( String( layer->getTempo()));
     
     addAndMakeVisible(sNumPulsesTF);
     sNumPulsesTF.addListener(this);
     sNumPulsesTF.setName(cSynchronicParameterTypes[SynchronicNumPulses]);
-    sNumPulsesTF.setText( String( bk->sNumPulses));
+    sNumPulsesTF.setText( String( layer->getNumPulses()));
     
     addAndMakeVisible(sClusterMinTF);
     sClusterMinTF.addListener(this);
     sClusterMinTF.setName(cSynchronicParameterTypes[SynchronicClusterMin]);
-    sClusterMinTF.setText( String( bk->sClusterMin));
+    sClusterMinTF.setText( String( layer->getClusterMin()));
     
     addAndMakeVisible(sClusterMaxTF);
     sClusterMaxTF.addListener(this);
     sClusterMaxTF.setName(cSynchronicParameterTypes[SynchronicClusterMax]);
-    sClusterMaxTF.setText( String( bk->sClusterMax));
+    sClusterMaxTF.setText( String( layer->getClusterMax()));
     
     addAndMakeVisible(sClusterThreshTF);
     sClusterThreshTF.addListener(this);
     sClusterThreshTF.setName(cSynchronicParameterTypes[SynchronicClusterThresh]);
-    sClusterThreshTF.setText( String( bk->sClusterThresh));
+    sClusterThreshTF.setText( String( layer->getClusterThresh()));
     
     addAndMakeVisible(sModeTF);
     sModeTF.addListener(this);
     sModeTF.setName(cSynchronicParameterTypes[SynchronicMode]);
-    sModeTF.setText( String( bk->sMode));
+    sModeTF.setText( String( layer->getMode()));
     
     addAndMakeVisible(sBeatsToSkipTF);
     sBeatsToSkipTF.addListener(this);
     sBeatsToSkipTF.setName(cSynchronicParameterTypes[SynchronicBeatsToSkip]);
-    sBeatsToSkipTF.setText( String( bk->sBeatsToSkip));
+    sBeatsToSkipTF.setText( String( layer->getBeatsToSkip()));
     
     addAndMakeVisible(sBeatMultipliersTF);
     sBeatMultipliersTF.addListener(this);
     sBeatMultipliersTF.setName(cSynchronicParameterTypes[SynchronicBeatMultipliers]);
-    sBeatMultipliersTF.setText( floatArrayToString( bk->sBeatMultipliers));
+    sBeatMultipliersTF.setText( floatArrayToString( layer->getBeatMultipliers()));
     
     addAndMakeVisible(sLengthMultipliersTF);
     sLengthMultipliersTF.addListener(this);
     sLengthMultipliersTF.setName(cSynchronicParameterTypes[SynchronicLengthMultipliers]);
-    sLengthMultipliersTF.setText( floatArrayToString( bk->sLengthMultipliers));
+    sLengthMultipliersTF.setText( floatArrayToString( layer->getLengthMultipliers()));
     
     addAndMakeVisible(sAccentMultipliersTF);
     sAccentMultipliersTF.addListener(this);
     sAccentMultipliersTF.setName(cSynchronicParameterTypes[SynchronicAccentMultipliers]);
-    sAccentMultipliersTF.setText( floatArrayToString( bk->sAccentMultipliers));
+    sAccentMultipliersTF.setText( floatArrayToString( layer->getAccentMultipliers()));
     
     addAndMakeVisible(sTuningOffsetsTF);
     sTuningOffsetsTF.addListener(this);
     sTuningOffsetsTF.setName(cSynchronicParameterTypes[SynchronicTuningOffsets]);
-    sTuningOffsetsTF.setText( floatArrayToString( bk->sTuningOffsets));
+    sTuningOffsetsTF.setText( floatArrayToString( layer->getTuningOffsets()));
+    
+    for (auto n : layer->getTuningOffsets())
+    {
+        DBG("offset: " + String(n));
+    }
+    DBG("farraytostring: " + floatArrayToString( layer->getTuningOffsets()));
     
     addAndMakeVisible(sBasePitchTF);
     sBasePitchTF.addListener(this);
     sBasePitchTF.setName(cSynchronicParameterTypes[SynchronicBasePitch]);
-    sBasePitchTF.setText( String( bk->sBasePitch));
+    sBasePitchTF.setText( String( layer->getBasePitch()));
     
     // Labels
     addAndMakeVisible(sKeymapL);
@@ -170,14 +175,12 @@ SynchronicViewController::SynchronicViewController()
     addAndMakeVisible(sBasePitchL);
     sBasePitchL.setName(cSynchronicParameterTypes[SynchronicBasePitch]);
     sBasePitchL.setText(cSynchronicParameterTypes[SynchronicBasePitch], NotificationType::dontSendNotification);
-    
-    
+
 }
 
 
 SynchronicViewController::~SynchronicViewController()
 {
-    
     
 }
 
@@ -186,78 +189,78 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
     String text = tf.getText();
     String name = tf.getName();
     
-    if (!text.containsNonWhitespaceChars())
-    {
-        text = "0";
-    }
-    
-    
     float f = text.getFloatValue();
     int i = text.getIntValue();
     
     DBG(name + ": |" + text + "|");
     
-    BKState *bk = BKState::getInstance();
+    //BKState *bk = BKState::getInstance();
+    SynchronicPreparation::Ptr layer = processor.sPrep;
     
     if (name == cSynchronicParameterTypes[SynchronicTempo])
     {
-        bk->sTempo = f;
+        layer->setTempo(f);
     }
     else if (name == cSynchronicParameterTypes[SynchronicNumPulses])
     {
-        bk->sNumPulses = i;
+        layer->setNumPulses(i);
     }
     else if (name == cSynchronicParameterTypes[SynchronicClusterMin])
     {
-        bk->sClusterMin = i;
+        layer->setClusterMin(i);
     }
     else if (name == cSynchronicParameterTypes[SynchronicClusterMax])
     {
-        bk->sClusterMax = i;
+        layer->setClusterMax(i);
     }
     else if (name == cSynchronicParameterTypes[SynchronicClusterThresh])
     {
-        bk->sClusterThresh = f;
+        layer->setClusterThresh(f);
     }
     else if (name == cSynchronicParameterTypes[SynchronicMode])
     {
-        bk->sMode = (SynchronicSyncMode)i;
+        layer->setMode((SynchronicSyncMode) i);
     }
     else if (name == cSynchronicParameterTypes[SynchronicBeatsToSkip])
     {
-        bk->sBeatsToSkip = f;
+        layer->setBeatsToSkip(i);
     }
     else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
     {
         Array<float> beatMults = stringToFloatArray(text);
-        for (auto bm : beatMults)
-        {
-            DBG("bm: " + String(bm));
-        }
+        layer->setBeatMultipliers(beatMults);
     }
     else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
     {
-        
+        Array<float> lenMults = stringToFloatArray(text);
+        for (auto n : lenMults)
+        {
+            DBG("len: " + String(n));
+        }
+        DBG("len to string: " + floatArrayToString(lenMults));
+        layer->setLengthMultipliers(lenMults);
     }
     else if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
     {
-        
+        Array<float> accentMults = stringToFloatArray(text);
+        layer->setAccentMultipliers(accentMults);
     }
     else if (name == cSynchronicParameterTypes[SynchronicTuningOffsets])
     {
-        
+        Array<float> tuningOffsets = stringToFloatArray(text);
+        layer->setTuningOffsets(tuningOffsets);
     }
     else if (name == cSynchronicParameterTypes[SynchronicBasePitch])
     {
-        bk->sBasePitch = i;
+        layer->setBasePitch(i);
     }
     else if (name == "NumSynchronicLayers")
     {
-        bk->numSynchronicLayers = i;
+        processor.numSynchronicLayers = i;
     }
     else if (name == "CurrentSynchronicLayer")
     {
-        bk->currentSynchronicLayer = i;
+        processor.currentSynchronicLayer = i;
     }
     else if (name == "SynchronicKeymap")
     {
@@ -305,6 +308,7 @@ void SynchronicViewController::textEditorTextChanged(TextEditor& tf)
 {
     shouldChange = true;
 }
+
 #endif
 void SynchronicViewController::paint (Graphics& g)
 {
@@ -325,97 +329,97 @@ void SynchronicViewController::resized()
     
     // Labels
     sNumLayersL.setTopLeftPosition(0,
-                                   i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                   gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sCurrentLayerL.setTopLeftPosition(0,
-                                      i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                      gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sKeymapL.setTopLeftPosition(0,
-                                      i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                      gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sTempoL.setTopLeftPosition(0,
-                               i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                               gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sNumPulsesL.setTopLeftPosition(0,
-                                   i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                   gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sClusterMinL.setTopLeftPosition(0,
-                                    i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                    gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sClusterMaxL.setTopLeftPosition(0,
-                                    i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                    gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sClusterThreshL.setTopLeftPosition(0,
-                                       i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                       gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sModeL.setTopLeftPosition(0,
-                              i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                              gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sBeatsToSkipL.setTopLeftPosition(0,
-                                     i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                     gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sBeatMultipliersL.setTopLeftPosition(0,
-                                         i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                         gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sLengthMultipliersL.setTopLeftPosition(0,
-                                           i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                           gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sAccentMultipliersL.setTopLeftPosition(0,
-                                           i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                           gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sTuningOffsetsL.setTopLeftPosition(0,
-                                       i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                       gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sBasePitchL.setTopLeftPosition(0,
-                          i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                          gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     // Text fields
     int tfX = gSynchronicL_Width + gSynchronic_XSpacing;
     i = 0;
     sNumLayersTF.setTopLeftPosition(tfX,
-                                    i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                    gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sCurrentLayerTF.setTopLeftPosition(tfX,
-                                       i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                       gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sKeymapTF.setTopLeftPosition(tfX,
-                                       i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                       gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sTempoTF.setTopLeftPosition(tfX,
-                                i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sNumPulsesTF.setTopLeftPosition(tfX,
-                                    i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                    gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sClusterMinTF.setTopLeftPosition(tfX,
-                                     i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                     gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sClusterMaxTF.setTopLeftPosition(tfX,
-                                     i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                     gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sClusterThreshTF.setTopLeftPosition(tfX,
-                                        i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                        gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sModeTF.setTopLeftPosition(tfX,
-                               i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                               gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sBeatsToSkipTF.setTopLeftPosition(tfX,
-                                      i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                       gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sBeatMultipliersTF.setTopLeftPosition(tfX,
-                                          i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                           gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sLengthMultipliersTF.setTopLeftPosition(tfX,
-                                            i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                            gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sAccentMultipliersTF.setTopLeftPosition(tfX,
-                                            i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                            gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sTuningOffsetsTF.setTopLeftPosition(tfX,
-                                        i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                                        gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
     sBasePitchTF.setTopLeftPosition(tfX,
-                           i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+                           gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
 
 }
 

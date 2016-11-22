@@ -41,6 +41,8 @@
           <FILE id="NQ4Aaw" name="Preparations.cpp" compile="1" resource="0"
                 file="Source/Preparations.cpp"/>
           <FILE id="EF5gMj" name="Preparations.h" compile="0" resource="0" file="Source/Preparations.h"/>
+          <FILE id="cJBq5t" name="Processors.cpp" compile="1" resource="0" file="Source/Processors.cpp"/>
+          <FILE id="IRvhll" name="Processors.h" compile="0" resource="0" file="Source/Processors.h"/>
         </GROUP>
         <GROUP id="{D6A5380E-86D4-5EEB-83A3-296DC1BDB7DF}" name="Synthesiser (Sound/Voice)">
           <FILE id="HVbOmG" name="BKPianoSampler.cpp" compile="1" resource="0"
@@ -53,6 +55,10 @@
         </GROUP>
       </GROUP>
       <GROUP id="{07677963-38EF-2F51-36FA-17646727446F}" name="Controller">
+        <FILE id="DblE68" name="PreparationViewController.cpp" compile="1"
+              resource="0" file="Source/PreparationViewController.cpp"/>
+        <FILE id="Kze7uZ" name="PreparationViewController.h" compile="0" resource="0"
+              file="Source/PreparationViewController.h"/>
         <FILE id="Bo4JI6" name="SynchronicViewController.cpp" compile="1" resource="0"
               file="Source/SynchronicViewController.cpp"/>
         <FILE id="OJ2tuE" name="SynchronicViewController.h" compile="0" resource="0"

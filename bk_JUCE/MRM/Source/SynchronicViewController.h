@@ -25,6 +25,7 @@
 
 #include "BKLabel.h"
 
+#include "Preparations.h"
 
 //==============================================================================
 /*
@@ -33,13 +34,25 @@ class SynchronicViewController    : public PreparationView,
                                     private TextEditor::Listener
 {
 public:
-    SynchronicViewController();
+    SynchronicViewController(MrmAudioProcessor&);
     ~SynchronicViewController();
 
     void paint (Graphics&) override;
     void resized() override;
     
-    
+    int numSynchronicLayers;
+    int currentSynchronicLayer;
+    float sTempo;
+    int sNumPulses,sClusterMin,sClusterMax;
+    float sClusterThresh;
+    SynchronicSyncMode sMode;
+    int sBeatsToSkip; // float?
+    Array<float> sBeatMultipliers;
+    Array<float> sLengthMultipliers;
+    Array<float> sAccentMultipliers;
+    Array<float> sTuningOffsets;
+    Array<int> sKeymap;
+    int sBasePitch; // float?
     
     // Text Fields
     BKTextField sNumLayersTF;
@@ -80,13 +93,13 @@ public:
     BKLabel sKeymapL;
     
     bool shouldChange;
-    
-    
 
 private:
+    MrmAudioProcessor& processor;
     
     // TextEditor input parsing
     void textFieldDidChange(TextEditor&);
+    
     void textEditorTextChanged(TextEditor&) override;
     void textEditorFocusLost(TextEditor&) override;
     void textEditorReturnKeyPressed(TextEditor&) override;

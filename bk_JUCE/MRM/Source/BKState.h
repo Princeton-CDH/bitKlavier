@@ -22,7 +22,7 @@ public:
     {
         numSynchronicLayers = 2;
         currentSynchronicLayer = 0;
-        sTempo = 120;
+        sTempo = 60;
         sNumPulses = 2;
         sClusterMin = 2;
         sClusterMax = 8;
@@ -55,29 +55,6 @@ public:
     Array<float> sTuningOffsets;
     Array<int> sKeymap;
     int sBasePitch; // float?
-    
-    
-    String floatArrayToString(Array<float> arr)
-    {
-        String s = "";
-        for (auto key : arr)
-        {
-            s.append(String(key), 3);
-            s.append(" ", 1);
-        }
-        return s;
-    }
-    
-    String intArrayToString(Array<int> arr)
-    {
-        String s = "";
-        for (auto key : arr)
-        {
-            s.append(String(key), 3);
-            s.append(" ", 1);
-        }
-        return s;
-    }
     
     /*
     Array<int> stringToIntArray(String s)

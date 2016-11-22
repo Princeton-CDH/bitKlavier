@@ -21,10 +21,12 @@ class BKTextField    : public TextEditor, public TextEditor::Listener
 public:
     BKTextField()
     {
-        setSize(150,20);
+        setSize(300,20);
         setColour(TextEditor::backgroundColourId, Colours::lightgoldenrodyellow);
         setColour(TextEditor::textColourId, Colours::black);
+#if TEXT_CHANGE_INTERNAL
         addListener(this);
+#endif
         lookAndFeelChanged();
     }
 

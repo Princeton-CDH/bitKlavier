@@ -7,6 +7,7 @@
 #include "ReferenceCountedBuffer.h"
 
 #include "Preparations.h"
+#include "Processors.h"
 
 #include "AudioConstants.h"
 
@@ -28,6 +29,10 @@ public:
     //==============================================================================
     MrmAudioProcessor();
     ~MrmAudioProcessor();
+    
+    
+    int numSynchronicLayers;
+    int currentSynchronicLayer;
 
     // Public instance varables.
     // MidiInput midiInput;
@@ -41,28 +46,16 @@ public:
     BKSynthesiser secondPianoSynth;
 #endif
     
+    SynchronicPreparation::Ptr sPrep;
+    ScopedPointer<SynchronicProcessor> sProcess;
+    
     BKSynthesiser hammerReleaseSynth;
     
     BKSynthesiser resonanceReleaseSynth;
     
-    ReferenceCountedArray<ReferenceCountedBuffer, CriticalSection> sampleBuffers;
-
     OwnedArray<SynchronicProcessor, CriticalSection> synchronic;
     
     int channel;
-    
-    int numSynchronicLayers;
-    int currentSynchronicLayer;
-    float sTempo;
-    int sNumPulses,sClusterMin,sClusterMax;
-    float sClusterThresh;
-    SynchronicSyncMode sMode;
-    int sBeatsToSkip; // float?
-    Array<float> sBeatMultipliers;
-    Array<float> sAccentMultipliers;
-    Array<float> sLengthMultipliers;
-    Array<float> sTuningOffsets;
-    int sBasePitch; // float?
     
     // Change listener callback implementation
     void changeListenerCallback(ChangeBroadcaster *source) override;
@@ -103,6 +96,10 @@ public:
     
 
 private:
+    void loadMainPianoSamples(BKSynthesiser *synth, int numLayers);
+    void loadResonanceRelaseSamples(BKSynthesiser *synth);
+    void loadHammerReleaseSamples(BKSynthesiser *synth);
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MrmAudioProcessor)
 };
