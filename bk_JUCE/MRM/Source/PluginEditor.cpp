@@ -15,26 +15,20 @@
 
 //==============================================================================
 MrmAudioProcessorEditor::MrmAudioProcessorEditor (MrmAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p)
+:
+    AudioProcessorEditor (&p),
+    processor (p),
+    svc(p)
 {
-        
-    setSize (gMainComponentWidth, gMainComponentHeight);
+    addAndMakeVisible(svc);
     
-    addAndMakeVisible (&button1);
-    button1.setButtonText ("1");
-    button1.addListener (this);
-    button1.setColour (TextButton::buttonColourId, Colours::black);
-    button1.setEnabled(false);
-    
+    setSize(gMainComponentWidth, gMainComponentHeight);
+
 }
 
 MrmAudioProcessorEditor::~MrmAudioProcessorEditor()
 {
     
-}
-
-void MrmAudioProcessorEditor::buttonClicked(Button *button)
-{
 }
 
 //==============================================================================
@@ -46,9 +40,6 @@ void MrmAudioProcessorEditor::paint (Graphics& g)
 
 void MrmAudioProcessorEditor::resized()
 {
+    svc.setBounds(gSynchronic_LeftOffset,gSynchronic_TopOffset,500,500);
     
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
-    
-    button1.setBounds(10, 50, 30, getHeight() - 70);
 }

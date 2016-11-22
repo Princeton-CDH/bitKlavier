@@ -7,10 +7,13 @@
 #include "ReferenceCountedBuffer.h"
 
 #include "Preparations.h"
+#include "Processors.h"
 
 #include "AudioConstants.h"
 
 #include "BKSynthesiser.h"
+
+#include "BKTextField.h"
 
 #define USE_SECOND_SYNTH 0
 #define USE_SYNCHRONIC_TWO 0
@@ -26,6 +29,10 @@ public:
     //==============================================================================
     MrmAudioProcessor();
     ~MrmAudioProcessor();
+    
+    
+    int numSynchronicLayers;
+    int currentSynchronicLayer;
 
     // Public instance varables.
     // MidiInput midiInput;
@@ -39,25 +46,20 @@ public:
     BKSynthesiser secondPianoSynth;
 #endif
     
+    SynchronicPreparation::Ptr sPrep;
+    ScopedPointer<SynchronicProcessor> sProcess;
+    
     BKSynthesiser hammerReleaseSynth;
     
     BKSynthesiser resonanceReleaseSynth;
     
-    ReferenceCountedArray<ReferenceCountedBuffer, CriticalSection> sampleBuffers;
-
-    SynchronicProcessor synchronic1, synchronic2;
+    OwnedArray<SynchronicProcessor, CriticalSection> synchronic;
     
     int channel;
-    //ScopedArray<AudioSampleBuffer> sampleBuffers;
-    int position;
-    bool off,end,ramp;
-    bool lastnotetype;
-    float decay,val;
-    int samplesDecay;
-    int decayCount;
     
     // Change listener callback implementation
     void changeListenerCallback(ChangeBroadcaster *source) override;
+    
     
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -91,8 +93,13 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     
+    
 
 private:
+    void loadMainPianoSamples(BKSynthesiser *synth, int numLayers);
+    void loadResonanceRelaseSamples(BKSynthesiser *synth);
+    void loadHammerReleaseSamples(BKSynthesiser *synth);
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MrmAudioProcessor)
 };

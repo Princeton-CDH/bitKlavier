@@ -13,6 +13,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
+#define TEXT_CHANGE_INTERNAL 0
 
 #define USE_SYNTH_INTERNAL 0
 #define CRAY_COOL_MUSIC_MAKER 0
@@ -46,6 +47,37 @@ typedef enum SynchronicSyncMode {
     SynchronicSyncModeNil
 }SynchronicSyncMode;
 
+
+typedef enum SynchronicParameterType {
+    SynchronicTempo = 0,
+    SynchronicNumPulses,
+    SynchronicClusterMin,
+    SynchronicClusterMax,
+    SynchronicClusterThresh,
+    SynchronicMode,
+    SynchronicBeatsToSkip,
+    SynchronicBeatMultipliers,
+    SynchronicLengthMultipliers,
+    SynchronicAccentMultipliers,
+    SynchronicTuningOffsets,
+    SynchronicBasePitch
+}SynchronicParameterType;
+
+static const std::vector<std::string> cSynchronicParameterTypes = {
+    "SynchronicTempo",
+    "SynchronicNumPulses",
+    "SynchronicClusterMin",
+    "SynchronicClusterMax",
+    "SynchronicClusterThresh",
+    "SynchronicMode",
+    "SynchronicBeatsToSkip",
+    "SynchronicBeatMultipliers",
+    "SynchronicLengthMultipliers",
+    "SynchronicAccentMultipliers",
+    "SynchronicTuningOffsets",
+    "SynchronicBasePitch"
+};
+
 static const SynchronicSyncMode aSynchronicSyncMode = LastNoteSync;
 static const float aSynchronicClusterThreshold = 0.5;
 static const int aSynchronicClusterMin = 2;
@@ -61,7 +93,7 @@ static const float aRampOnTimeSec = 0.004f;
 static const float aRampOffTimeSec = 0.004f;
 static const int aNumScaleDegrees = 12;
 
-static const int NumLayers = 8;
+static const int aNumLayers = 2;
 static const int aVelocityThresh_Eight[9] = {
     0,
     25,

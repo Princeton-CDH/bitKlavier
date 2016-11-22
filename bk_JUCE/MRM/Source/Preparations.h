@@ -13,118 +13,102 @@
 
 #include "AudioConstants.h"
 
-#include "BKSynthesiser.h"
+#include "BKUtilities.h"
 
-
-class SynchronicProcessor 
+class SynchronicPreparation : public ReferenceCountedObject
 {
-    
 public:
-    SynchronicProcessor();
-    ~SynchronicProcessor();
+    typedef ReferenceCountedObjectPtr<SynchronicPreparation> Ptr;
     
-    SynchronicSyncMode syncMode;
+    SynchronicPreparation(float tempo,
+                                                 int numPulses,
+                                                 int clusterMin,
+                                                 int clusterMax,
+                                                 float clusterThresh,
+                                                 SynchronicSyncMode mode,
+                                                 int beatsToSkip,
+                                                 Array<float> beatMultipliers,
+                                                 Array<float> accentMultipliers,
+                                                 Array<float> lengthMultipliers,
+                                                 Array<float> tuningOffsets,
+                                                 int basePitch):
+    sTempo(tempo),
+    sNumPulses(numPulses),
+    sClusterMin(clusterMin),
+    sClusterMax(clusterMax),
+    sClusterThresh(clusterThresh),
+    sMode(mode),
+    sBeatsToSkip(beatsToSkip),
+    sBeatMultipliers(beatMultipliers),
+    sAccentMultipliers(accentMultipliers),
+    sLengthMultipliers(lengthMultipliers),
+    sTuningOffsets(tuningOffsets),
+    sBasePitch(basePitch)
+    {
+        
+    }
     
-    int clusterMin;
-    int clusterMax;
-    int pulsesToSkip;
-    int numPulses;
+    SynchronicPreparation()
+    {
+        
+    }
     
+    void print(void)
+    {
+        DBG("sTempo: " + String(sTempo));
+        DBG("sNumPulses: " + String(sNumPulses));
+        DBG("sClusterMin: " + String(sClusterMin));
+        DBG("sClusterMax: " + String(sClusterMax));
+        DBG("sClusterThresh: " + String(sClusterThresh));
+        DBG("sMode: " + String(sMode));
+        DBG("sBeatsToSkip: " + String(sBeatsToSkip));
+        DBG("sBeatMultipliers: " + floatArrayToString(sBeatMultipliers));
+        DBG("sLengthMultipliers: " + floatArrayToString(sLengthMultipliers));
+        DBG("sAccentMultipliers: " + floatArrayToString(sAccentMultipliers));
+        DBG("sTuningOffsets: " + floatArrayToString(sTuningOffsets));
+        DBG("sBasePitch: " + String(sBasePitch));
+    }
+
+    const float getTempo() const noexcept                       {return sTempo;                 }
+    const int getNumPulses() const noexcept                     {return sNumPulses;             }
+    const int getClusterMin() const noexcept                    {return sClusterMin;            }
+    const int getClusterMax() const noexcept                    {return sClusterMax;            }
+    const float getClusterThresh() const noexcept               {return sClusterThresh;         }
+    const SynchronicSyncMode getMode() const noexcept           {return sMode;                  }
+    const int getBeatsToSkip() const noexcept                   {return sBeatsToSkip;           }
+    const Array<float> getBeatMultipliers() const noexcept      {return sBeatMultipliers;       }
+    const Array<float> getAccentMultipliers() const noexcept    {return sAccentMultipliers;     }
+    const Array<float> getLengthMultipliers() const noexcept    {return sLengthMultipliers;     }
+    const Array<float> getTuningOffsets() const noexcept        {return sTuningOffsets;         }
+    const int getBasePitch() const noexcept                     {return sBasePitch;             }
     
-    float clusterThreshold; // beats
-    uint64 clusterThresholdSamples;
-    uint64 clusterThresholdTimer;
-    
-    float pulseThreshold; //beats
-    uint64 pulseThresholdSamples;
-    uint64 pulseThresholdTimer;
-    
-    
-    float tempo; // BPM
-    
-    Array<float> beatMultipliers;
-    Array<float> lengthMultipliers;
-    Array<float> accentMultipliers;
-    
-    int pulse;
-    int beat;
-    int accent;
-    int length;
-    int clusterSize;
-    
-    void set(float tempo, int numPulses, int clusterMin, int clusterMax, float clusterThreshold, SynchronicSyncMode mode, int pulsesToSkip, Array<float> beats, Array<float> lengths, Array<float> accents, Array<float> tuning, int basePitch);
-    
-    void attachToSynth(BKSynthesiser *synth);
-    
-    void renderNextBlock(int channel, int numSamples);
-    
-    void notePlayed(int noteNumber, int velocity);
+    void setTempo(float tempo)                                  {sTempo = tempo;                                    }
+    void setNumPulses(int numPulses)                            {sNumPulses = numPulses;                            }
+    void setClusterMin(int clusterMin)                          {sClusterMin = clusterMin;                          }
+    void setClusterMax(int clusterMax)                          {sClusterMax = clusterMax;                          }
+    void setClusterThresh(float clusterThresh)                  {sClusterThresh = clusterThresh;                    }
+    void setMode(SynchronicSyncMode mode)                       {sMode = mode;                                      }
+    void setBeatsToSkip(int beatsToSkip)                        {sBeatsToSkip = beatsToSkip;                        }
+    void setBeatMultipliers(Array<float> beatMultipliers)       {sBeatMultipliers.swapWith(beatMultipliers);        }
+    void setAccentMultipliers(Array<float> accentMultipliers)   {sAccentMultipliers.swapWith(accentMultipliers);    }
+    void setLengthMultipliers(Array<float> lengthMultipliers)   {sLengthMultipliers.swapWith(lengthMultipliers);    }
+    void setTuningOffsets(Array<float> tuningOffsets)           {sTuningOffsets = tuningOffsets;                    }
+    void setBasePitch(int basePitch)                            {sBasePitch = basePitch;                            }
     
 private:
-    void playNote(int channel, int note);
-    
-    double tempoPeriod;
-    uint64 tempoPeriodSamples;
-    
-    bool inPulses, inCluster, inPrePulses;
-    BKSynthesiser *synth;
-    double sampleRate;
-    
-
-    
-    uint64 firstNoteTimer;
-    uint64 tempoPeriodTimer;
-    uint64 lastNoteTimer;
-    
-    Array<float> tuningOffsets;
-    int tuningBasePitch;
-    
-    uint64 clusterTimer;
-    uint64 pulseTimer;
-    uint64 phasor;
-    uint64 numSamplesBeat;
-    
-    Array<int> cluster;
-    
-    Array<int> on;
-    
-    JUCE_LEAK_DETECTOR(SynchronicProcessor);
-    
-};
-
-
-#if 0
-class SynchronicPreparation
-{
-    
-public:
-    SynchronicPreparation();
-    ~SynchronicPreparation();
-    
-    SynchronicSyncMode syncMode;
-    //OtherMode otherMode; //for tethered to keyboard/metro or not
-    
-    int clusterMin;
-    int clusterMax;
-    int pulsesToSkip;
-    int numPulses;
-    
-    float clusterThreshold; // ms
-    float tempo; // BPM
-    
-    Array<float> beatMultipliers;
-    Array<float> lengthMultipliers;
-    Array<float> accentMultipliers;
-    
-    int pulse;
-    int beat;
-    int accent;
-    int length;
-    int clusterSize;
+    float sTempo;
+    int sNumPulses,sClusterMin,sClusterMax;
+    float sClusterThresh;
+    SynchronicSyncMode sMode;
+    int sBeatsToSkip; // float?
+    Array<float> sBeatMultipliers;
+    Array<float> sAccentMultipliers;
+    Array<float> sLengthMultipliers;
+    Array<float> sTuningOffsets;
+    int sBasePitch; // float?
     
     JUCE_LEAK_DETECTOR(SynchronicPreparation);
 };
-#endif
 
 
 #endif  // PREPARATIONS_H_INCLUDED
