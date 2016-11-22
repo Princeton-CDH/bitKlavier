@@ -13,11 +13,8 @@
 
 
 #include "../JuceLibraryCode/JuceHeader.h"
-
 #include "BKSynthesiser.h"
-
 #include "ReferenceCountedBuffer.h"
-
 #include "AudioConstants.h"
 
 class   BKPianoSamplerSound    : public BKSynthesiserSound
@@ -43,12 +40,12 @@ public:
      source, in seconds
      */
     BKPianoSamplerSound (const String& name,
-                                  ReferenceCountedBuffer::Ptr buffer,
-                                  uint64 soundLength,
-                                  double sourceSampleRate,
-                                  const BigInteger& midiNotes,
-                                  int rootMidiNote,
-                                  const BigInteger& midiVelocities);
+                         ReferenceCountedBuffer::Ptr buffer,
+                         uint64 soundLength,
+                         double sourceSampleRate,
+                         const BigInteger& midiNotes,
+                         int rootMidiNote,
+                         const BigInteger& midiVelocities);
     
     /** Destructor. */
     ~BKPianoSamplerSound();
@@ -109,7 +106,19 @@ public:
     //==============================================================================
     bool canPlaySound (BKSynthesiserSound*) override;
     
-    void startNote (float midiNoteNumber, float velocity, PianoSamplerNoteDirection direction, PianoSamplerNoteType type, BKNoteType bktype, uint64 startingPosition, uint64 length, BKSynthesiserSound* sound) override;
+    void startNote (
+                    float midiNoteNumber,
+                    float velocity,
+                    PianoSamplerNoteDirection direction,
+                    PianoSamplerNoteType type,
+                    BKNoteType bktype,
+                    uint64 startingPosition,
+                    uint64 length,
+                    int voiceRampOn,
+                    int voiceRampOff,
+                    BKSynthesiserSound* sound
+                    ) override;
+    
     void stopNote (float velocity, bool allowTailOff) override;
     
     void pitchWheelMoved (int newValue) override;

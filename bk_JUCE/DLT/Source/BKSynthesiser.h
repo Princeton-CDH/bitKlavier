@@ -61,6 +61,7 @@ public:
      */
     virtual bool appliesToChannel (int midiChannel) = 0;
     
+    
     /** The class is reference-counted, so this is a handy pointer class for it. */
     typedef ReferenceCountedObjectPtr<BKSynthesiserSound> Ptr;
     
@@ -122,6 +123,8 @@ public:
                             BKNoteType bktype,
                             uint64 startingPosition,
                             uint64 length,
+                            int voiceRampOn,
+                            int voiceRampOff,
                             BKSynthesiserSound* sound) = 0;
     
     /** Called to stop a note.
@@ -258,6 +261,7 @@ private:
     uint32 length;
     PianoSamplerNoteType direction;
     PianoSamplerNoteType type;
+    BKNoteType bktype;
     uint32 noteOnTime;
     BKSynthesiserSound::Ptr currentlyPlayingSound;
     bool keyIsDown, sustainPedalDown, sostenutoPedalDown;
@@ -389,7 +393,9 @@ public:
                         PianoSamplerNoteType type,
                         BKNoteType bktype, 
                         float startingPositionMS,
-                        float lengthMS);
+                        float lengthMS,
+                        float rampOnMS,
+                        float rampOffMS);
     
     /** Triggers a note-off event.
      
@@ -424,6 +430,7 @@ public:
      */
     virtual void allNotesOff (int midiChannel,
                               bool allowTailOff);
+    
     
     /** Sends a pitch-wheel message to any active voices.
      
@@ -536,7 +543,7 @@ public:
      Subclasses may need to know this so that they can pitch things correctly.
      */
     double getSampleRate() const noexcept                       { return sampleRate; }
-    
+
     /** Sets a minimum limit on the size to which audio sub-blocks will be divided when rendering.
      
      When rendering, the audio blocks that are passed into renderNextBlock() will be split up
@@ -615,7 +622,9 @@ protected:
                      PianoSamplerNoteType type,
                      BKNoteType bktype,
                      uint64 startingPosition,
-                     uint64 length);
+                     uint64 length,
+                     int voiceRampOn,
+                     int voiceRampOff);
     
     /** Stops a given voice.
      You should never need to call this, it's used internally by noteOff, but is protected

@@ -156,7 +156,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                 {
                     playEndPosition = (double)(sourceSamplePosition - playLength);
                 }
-                DBG(String(playEndPosition));
+                //DBG(String(playEndPosition));
             }
             else if (playType == FixedLengthFixedStart)
             {

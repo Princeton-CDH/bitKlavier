@@ -1,11 +1,8 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-
 #include "BKPianoSampler.h"
-
 #include "AudioConstants.h"
-
 #include "NostalgicPreparation.h"
 
 String notes[4] = {"A","C","D#","F#"};
@@ -167,18 +164,13 @@ MrmAudioProcessor::MrmAudioProcessor() {
                         sampleBuffers.insert(numSamples, newBuffer);
                         
                         mainPianoSynth.addSound(new BKPianoSamplerSound(soundName,
-                                                                                      newBuffer,
-                                                                                      maxLength,
-                                                                                      sourceSampleRate,
-                                                                                      noteRange,
-                                                                                      root,
-                                                                                      velocityRange));
-                        
+                                                                        newBuffer,
+                                                                        maxLength,
+                                                                        sourceSampleRate,
+                                                                        noteRange,
+                                                                        root,
+                                                                        velocityRange));
                     }
-                    
-                    
-                    
-                    
                     
                 } else {
                     DBG("file not opened OK: " + temp);
@@ -386,6 +378,8 @@ void MrmAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
     mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
     hammerReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     resonanceReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
+    
+    nostalgic.attachToSynth(&mainPianoSynth);
 }
 
 /*
@@ -457,108 +451,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     Array<float> tuningOffsets = Array<float>(aPartialTuning,aNumScaleDegrees);
     int tuningBasePitch = 0;
     
-    
-    //move timers forward for all active notes, by the buffer size
-    nostalgic.incrementTimers(buffer.getNumSamples());
-    
-    //check timers to see if any are at an undertow turnaround point, then call keyOn(forward) and keyOff, with 50ms ramps
-    
-
-    /*
-    int numSamples = buffer.getNumSamples();
-    int synchronicOnSize = synchronicOn.size();
-    
-    
-    for (int i = (synchronicOnSize-1); i >= 0; i--){
-        int noteIndex = synchronicOn[i];
-        
-        uint32 totalPulses = synchronicNumPulses[noteIndex];
-        uint8 beat = synchronicCurrentBeats[noteIndex];
-        uint8 length = synchronicCurrentBeats[noteIndex];
-        uint8 accent = synchronicCurrentAccents[noteIndex];
-        
-        if (totalPulses < aSynchronicNumPulses)
-        {
-            if (synchronicPhasors[noteIndex] >= (synchronicBeatMultipliers[beat] * getSampleRate() * (60.0/aSynchronicTempo)))
-            {
-                PianoSamplerNoteDirection direction;
-                if (synchronicLengthMultipliers[length] < 0)
-                {
-                    mainPianoSynth.keyOn(
-                                         m.getChannel(),
-                                         noteIndex+9,
-                                         synchronicAccentMultipliers[accent],
-                                         tuningOffsets,
-                                         tuningBasePitch,
-                                         Reverse,
-                                         FixedLengthFixedStart,
-                                         BKNoteTypeNil,
-                                         (fabs(synchronicLengthMultipliers[length]) * (60.0/aSynchronicTempo) * 1000.0), // start
-                                         (fabs(synchronicLengthMultipliers[length]) * (60.0/aSynchronicTempo) * 1000.0)
-                                         );
-                }
-                else
-                {
-                    mainPianoSynth.keyOn(
-                                         m.getChannel(),
-                                         noteIndex+9,
-                                         synchronicAccentMultipliers[accent],
-                                         tuningOffsets,
-                                         tuningBasePitch,
-                                         Forward,
-                                         FixedLength,
-                                         BKNoteTypeNil,
-                                         0, // start
-                                         (fabs(synchronicLengthMultipliers[length]) * (60.0/aSynchronicTempo) * 1000.0)
-                                         );
-                }
-                
-                
-                
-                
-                if (++beat >= synchronicBeatMultipliers.size())
-                    beat = 0;
-                synchronicCurrentBeats.set(noteIndex,beat);
-                
-                if (++length >= synchronicLengthMultipliers.size())
-                    length = 0;
-                synchronicCurrentLengths.set(noteIndex,length);
-                
-                if (++accent >= synchronicAccentMultipliers.size())
-                    accent = 0;
-                synchronicCurrentAccents.set(noteIndex,accent);
-                
-                synchronicNumPulses.set(noteIndex,totalPulses+1);
-                
-                synchronicPhasors.set(noteIndex,0);
-            }
-            
-        }
-        else
-        {
-            inSynchronicOn.set(noteIndex,false);
-            synchronicOn.remove(i);
-        }
-        
-        synchronicTimers.set(noteIndex,synchronicTimers[noteIndex]+numSamples);
-        synchronicPhasors.set(noteIndex,synchronicPhasors[noteIndex]+numSamples);
-    }
-    
-    int clusterSize = synchronicCluster.size();
-    for (int n = (clusterSize-1); n >= 0; n--)
-    {
-        int noteIndex = synchronicCluster[n];
-        if (inSynchronicCluster[noteIndex] &&
-            (synchronicClusterTimers[noteIndex] >= (aSynchronicClusterThreshold * getSampleRate())))
-        {
-            synchronicCluster.remove(n);
-            inSynchronicCluster.set(noteIndex,inSynchronicCluster[noteIndex] - 1);
-        }
-        synchronicClusterTimers.set(noteIndex,synchronicClusterTimers[noteIndex]+numSamples);
-        
-    }
-    
-    */
+    nostalgic.processBlock(buffer.getNumSamples(), m.getChannel());
     
     // NOTE ON NOTE OFF
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
@@ -566,43 +459,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
         if (m.isNoteOn())
         {
 
-            /*
-#if 1
-            int noteIndex = m.getNoteNumber()-9;
-            
-            synchronicTimers.set(noteIndex,0);
-            
-            inSynchronicCluster.set(noteIndex,inSynchronicCluster[noteIndex] + 1);
-            synchronicCluster.add(noteIndex);
-            synchronicClusterTimers.set(noteIndex,0);
-            
-            int clusterSize = synchronicCluster.size();
-            
-            for (int n = (clusterSize-1); n >= 0; n--)
-            {
-                int note = synchronicCluster[n];
-                
-                if ((clusterSize >= aSynchronicClusterMin) &&
-                    (clusterSize <= aSynchronicClusterMax))
-                {
-                    if (!inSynchronicOn[note])
-                    {
-                        inSynchronicOn.set(note, true);
-                        synchronicOn.add(note);
-                    }
-                    synchronicPhasors.set(note,0);
-                    synchronicCurrentBeats.set(note,0);
-                    synchronicCurrentAccents.set(note,0);
-                    synchronicCurrentLengths.set(note,0);
-                    synchronicNumPulses.set(note,0);
-                }
-            }
-            
-#endif
-             */
-            
-            //start timing note lengths for nostalgic preparations
-            nostalgic.startTimer(m.getNoteNumber(), m.getFloatVelocity()); //start measuring note length
+            nostalgic.noteLengthTimerOn(m.getNoteNumber(), m.getFloatVelocity()); //start measuring note length
             
             mainPianoSynth.keyOn(
                                  m.getChannel(),
@@ -614,70 +471,52 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                                  Normal,
                                  BKNoteTypeNil,
                                  1000, // start
-                                 100 // length
-                                 );
-            
+                                 100, // length
+                                 0,
+                                 30);
             
         }
         else if (m.isNoteOff())
         {
             
-            //get length of played notes, subtract wave distance to set nostalgic reverse note length
-            float tempDuration = nostalgic.getTimer(m.getNoteNumber()) * (1000. / getSampleRate());
-            DBG("nostalgic note duration (ms) = " + std::to_string(tempDuration));
+            //DBG("noteOff " + std::to_string(m.getNoteNumber()) + " " + std::to_string(m.getFloatVelocity()));
             
-            //play nostalgic note
-            mainPianoSynth.keyOn(
-                                 m.getChannel(),
-                                 m.getNoteNumber(),
-                                 nostalgic.getVelocity(m.getNoteNumber()),
-                                 tuningOffsets,
-                                 tuningBasePitch,
-                                 Reverse,
-                                 FixedLengthFixedStart,
-                                 BKNoteTypeNil,
-                                 tempDuration + nostalgic.getWaveDistance(), // start
-                                 tempDuration // length
-                                 );
-            //need to update so that if the start point is greater than the length of the file, it waits appropriately.
-            
-            nostalgic.clearNote(m.getNoteNumber());
-             
-            
-            
+            nostalgic.playNote(m.getNoteNumber(), m.getChannel());
+
             mainPianoSynth.keyOff(
                                   m.getChannel(),
                                   m.getNoteNumber(),
                                   m.getFloatVelocity(),
-                                  true
-                                  );
+                                  true);
             
-            //DBG("off velocity " + std::to_string(m.getFloatVelocity()) );
             hammerReleaseSynth.keyOn(
                                      m.getChannel(),
                                      m.getNoteNumber(),
-                                     m.getFloatVelocity() * 0.01, //will want hammerGain multipler that user can set
+                                     m.getFloatVelocity() * .02, //will want hammerGain multipler that user can set
                                      tuningOffsets,
                                      tuningBasePitch,
                                      Forward,
                                      FixedLength,
                                      BKNoteTypeNil,
                                      0,
-                                     2000
-                                     );
+                                     2000,
+                                     4,
+                                     4);
             
             resonanceReleaseSynth.keyOn(
                                         m.getChannel(),
                                         m.getNoteNumber(),
-                                        m.getFloatVelocity() * 0.5, //will also want multiplier for resonance gain, though not here...
+                                        m.getFloatVelocity() * .5, //will also want multiplier for resonance gain, though not here...
                                         tuningOffsets,
                                         tuningBasePitch,
                                         Forward,
                                         FixedLength,
                                         BKNoteTypeNil,
                                         0,
-                                        2000
-                                        );
+                                        2000,
+                                        4,
+                                        4);
+             
             
         }
         else if (m.isAftertouch())
@@ -691,22 +530,11 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     }
     
     midiMessages.swapWith (processedMidi);
-
     
     mainPianoSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
     hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
     resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    /*
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        float* channelData = buffer.getWritePointer(channel);//.getWritePointer (channel);
-        
-        // ..do something to the data...
-    }
-     */
 }
 
 
