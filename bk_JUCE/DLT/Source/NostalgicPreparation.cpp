@@ -19,7 +19,7 @@ NostalgicPreparation::NostalgicPreparation()
     reverseTargetLength.ensureStorageAllocated(128);
     undertowVelocities.ensureStorageAllocated(128);
     
-    keymap.ensureStorageAllocated(128);`
+    keymap.ensureStorageAllocated(128);
     
     for(int i=0;i<128;i++)
     {
