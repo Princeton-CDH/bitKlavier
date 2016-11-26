@@ -122,9 +122,9 @@ void MrmAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
                                      2000,                          //undertow (ms)
                                      0.,                            //transposition
                                      1.,                            //gain
-                                     1.,                            //length multiplier
-                                     0.,                            //beats to skip
-                                     NostalgicSyncNoteLength,       //sync mode
+                                     1.,                            //length multiplier (only applies in NostalgicSyncNoteLength mode)
+                                     0.,                            //beats to skip (only applies in NostalgicSyncSynchronic mode)
+                                     NostalgicSyncSynchronic,       //sync mode: NostalgicSyncNoteLength or NostalgicSyncSynchronic
                                      0,                             //sync target (synchronic layer num)
                                      Array<float>(aJustTuning,12),  //tuning
                                      0);                            //tuning fundamental
@@ -215,7 +215,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
             mainPianoSynth.keyOn(
                                  m.getChannel(),
                                  m.getNoteNumber(),
-                                 m.getFloatVelocity(), //not sure where best to do main and global gain multiply...
+                                 m.getFloatVelocity() * aGlobalGain,
                                  tuningOffsets,
                                  tuningBasePitch,
                                  Forward,
@@ -231,7 +231,8 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
         else if (m.isNoteOff())
         {
             
-            nProcess->playNote(m.getNoteNumber(), m.getChannel());
+            //need to integrate sProcess layer number here as well, just defaulting for the moment
+            nProcess->playNote(m.getNoteNumber(), m.getChannel(), sProcess->getTimeToNext(), sProcess->getBeatLength());
             
             mainPianoSynth.keyOff(
                                   m.getChannel(),
@@ -243,7 +244,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
             hammerReleaseSynth.keyOn(
                                      m.getChannel(),
                                      m.getNoteNumber(),
-                                     m.getFloatVelocity() * 0.0025, //will want hammerGain multipler that user can set
+                                     m.getFloatVelocity() * 0.0025 * aGlobalGain, //will want hammerGain multipler that user can set
                                      tuningOffsets,
                                      tuningBasePitch,
                                      Forward,
@@ -257,7 +258,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
             resonanceReleaseSynth.keyOn(
                                         m.getChannel(),
                                         m.getNoteNumber(),
-                                        m.getFloatVelocity(), //will also want multiplier for resonance gain, though not here...
+                                        m.getFloatVelocity() * aGlobalGain, //will also want multiplier for resonance gain...
                                         tuningOffsets,
                                         tuningBasePitch,
                                         Forward,

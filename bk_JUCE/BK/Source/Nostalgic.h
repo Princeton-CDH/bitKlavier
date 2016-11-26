@@ -138,7 +138,7 @@ public:
     virtual ~NostalgicProcessor();
     
     //begin playing reverse note
-    void playNote(int midiNoteNumber, int midiChannel);
+    void playNote(int midiNoteNumber, int midiChannel, int timeToNext, int beatLength);
     
     //called with every audio vector
     void processBlock(int numSamples, int midiChannel);

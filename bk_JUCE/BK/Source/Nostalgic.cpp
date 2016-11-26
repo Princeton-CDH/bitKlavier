@@ -41,35 +41,72 @@ NostalgicProcessor::~NostalgicProcessor() {}
 
 
 //begin reverse note; called when key is released
-void NostalgicProcessor::playNote(int midiNoteNumber, int midiChannel) {
+void NostalgicProcessor::playNote(int midiNoteNumber, int midiChannel, int timeToNext, int beatLength) {
     
-    //get length of played notes, subtract wave distance to set nostalgic reverse note length
-    float tempDuration = getNoteLengthTimer(midiNoteNumber) * (1000. / sampleRate);
-    //DBG("nostalgic note duration (ms) = " + std::to_string(tempDuration));
+    //note-length sync
+    if(preparation->getMode() == NostalgicSyncNoteLength)
+    {
     
-    //play nostalgic note
-    synth->keyOn(
-                 midiChannel,
-                 midiNoteNumber + preparation->getTransposition(), //need to store this, so that undertow retains this in the event of a preparation change
-                 getVelocity(midiNoteNumber) * preparation->getGain(),
-                 preparation->getTuningOffsets(),
-                 preparation->getBasePitch(),
-                 Reverse,
-                 FixedLengthFixedStart,
-                 Nostalgic,
-                 tempDuration + preparation->getWavedistance(),
-                 tempDuration, // length
-                 30, //ramp up (ms)
-                 aRampUndertowCrossMS); //ramp off
+        //get length of played notes, subtract wave distance to set nostalgic reverse note length
+        float tempDuration = getNoteLengthTimer(midiNoteNumber) * preparation->getLengthMultiplier() * (1000. / sampleRate);
+        //DBG("nostalgic note duration (ms) = " + std::to_string(tempDuration));
+        
+        //play nostalgic note
+        synth->keyOn(
+                     midiChannel,
+                     midiNoteNumber + preparation->getTransposition(), //need to store this, so that undertow retains this in the event of a preparation change
+                     getVelocity(midiNoteNumber) * preparation->getGain() * aGlobalGain,
+                     preparation->getTuningOffsets(),
+                     preparation->getBasePitch(),
+                     Reverse,
+                     FixedLengthFixedStart,
+                     Nostalgic,
+                     tempDuration + preparation->getWavedistance(),
+                     tempDuration, // length
+                     30, //ramp up (ms)
+                     aRampUndertowCrossMS); //ramp off
+        
+        noteLengthTimerOff(midiNoteNumber);
+        
+        //time how long the reverse note has played, to trigger undertow note
+        reverseNoteLengthTimerOn(midiNoteNumber, tempDuration);
+        
+        //store values for when undertow note is played (in the event the preparation changes in the meantime)
+        undertowVelocities.set(midiNoteNumber, getVelocity(midiNoteNumber) * preparation->getGain());
+        undertowPreparations.set(midiNoteNumber, preparation); //it might be better to do this by copy, instead of by pointer, in the off chance that the preparation disappears because of a library switch or something...
+        
+    }
     
-    noteLengthTimerOff(midiNoteNumber);
-    
-    //time how long the reverse note has played, to trigger undertow note
-    reverseNoteLengthTimerOn(midiNoteNumber, tempDuration);
-    
-    //store values for when undertow note is played (in the event the preparation changes in the meantime)
-    undertowVelocities.set(midiNoteNumber, getVelocity(midiNoteNumber) * preparation->getGain());
-    undertowPreparations.set(midiNoteNumber, preparation); //it might be better to do this by copy, instead of by pointer, in the off chance that the preparation disappears because of a library switch or something...
+    //synchronic sync
+    else if(preparation->getMode() == NostalgicSyncSynchronic)
+    {
+        
+        float tempDuration = timeToNext + preparation->getBeatsToSkip() * beatLength;
+        
+        //play nostalgic note
+        synth->keyOn(
+                     midiChannel,
+                     midiNoteNumber + preparation->getTransposition(), //need to store this, so that undertow retains this in the event of a preparation change
+                     getVelocity(midiNoteNumber) * preparation->getGain() * aGlobalGain,
+                     preparation->getTuningOffsets(),
+                     preparation->getBasePitch(),
+                     Reverse,
+                     FixedLengthFixedStart,
+                     Nostalgic,
+                     tempDuration + preparation->getWavedistance(), //need to implement skipBeats as well
+                     tempDuration, // length
+                     30, //ramp up (ms)
+                     aRampUndertowCrossMS); //ramp off
+        
+        noteLengthTimerOff(midiNoteNumber);
+        
+        //time how long the reverse note has played, to trigger undertow note
+        reverseNoteLengthTimerOn(midiNoteNumber, tempDuration);
+        
+        //store values for when undertow note is played (in the event the preparation changes in the meantime)
+        undertowVelocities.set(midiNoteNumber, getVelocity(midiNoteNumber) * preparation->getGain());
+        undertowPreparations.set(midiNoteNumber, preparation); //it might be better to do this by copy, instead of by pointer, in the off chance that the preparation disappears because of a library switch or something...
+    }
     
 }
 
@@ -122,8 +159,8 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
             if(undertowPrep->getUndertow() > 0) {
                 synth->keyOn(
                              midiChannel,
-                             tempnote,
-                             undertowVelocities.getUnchecked(tempnote),
+                             tempnote + undertowPrep->getTransposition(),
+                             undertowVelocities.getUnchecked(tempnote) * aGlobalGain,
                              undertowPrep->getTuningOffsets(),
                              undertowPrep->getBasePitch(),
                              Forward,

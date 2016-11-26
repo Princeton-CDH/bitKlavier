@@ -83,6 +83,8 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "SynchronicBasePitch"
 };
 
+static const float aGlobalGain = 0.5; //make this user settable
+
 static const SynchronicSyncMode aSynchronicSyncMode = LastNoteSync;
 static const float aSynchronicClusterThreshold = 0.5;
 static const int aSynchronicClusterMin = 2;
