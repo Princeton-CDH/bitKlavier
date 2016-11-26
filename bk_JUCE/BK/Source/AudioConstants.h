@@ -62,6 +62,12 @@ typedef enum SynchronicParameterType {
     SynchronicBasePitch
 }SynchronicParameterType;
 
+    
+typedef enum NostalgicSyncMode {
+    NostalgicSyncNoteLength = 0, //reverse note length set by played note length
+    NostalgicSyncSynchronic,     //reverse note length set by next synchronic pulse
+} NostalgicSyncMode;
+
 static const std::vector<std::string> cSynchronicParameterTypes = {
     "SynchronicTempo",
     "SynchronicNumPulses",

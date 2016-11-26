@@ -10,18 +10,18 @@
 
 #include "Nostalgic.h"
 
-
-
-NostalgicProcessor::NostalgicProcessor()
+NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s, NostalgicPreparation::Ptr prep)
+:
+    synth(s),
+    preparation(prep)
 {
+    sampleRate = synth->getSampleRate();
     
     noteLengthTimers.ensureStorageAllocated(128);
     velocities.ensureStorageAllocated(128);
     reverseLengthTimers.ensureStorageAllocated(128);
     reverseTargetLength.ensureStorageAllocated(128);
     undertowVelocities.ensureStorageAllocated(128);
-    
-    keymap.ensureStorageAllocated(128);
     
     for(int i=0;i<128;i++)
     {
@@ -30,12 +30,9 @@ NostalgicProcessor::NostalgicProcessor()
         reverseLengthTimers.insert(i, 0); //initialize timers for handling wavedistance/undertow
         reverseTargetLength.insert(i, 0);
         undertowVelocities.insert(i, 0);
-        
-        keymap.insert(i, FALSE); //keymap is all off to start
+
     }
     
-    waveDistance = 200; //for testing
-    undertow = 1000; //again, for testing
     /*
      one thing i discovered is that the original bK actually plays the forward undertow
      sample for TWICE this value; the first half at steady gain, and then the second
@@ -50,13 +47,6 @@ NostalgicProcessor::NostalgicProcessor()
 
 NostalgicProcessor::~NostalgicProcessor() {}
 
-
-//get pointer to synth
-void NostalgicProcessor::attachToSynth(BKSynthesiser *s)
-{
-    synth = s;
-    sampleRate = s->getSampleRate(); //we'll have to take care to make sure this gets updated as needed
-}
 
 
 //begin reverse note; called when key is released
@@ -77,7 +67,8 @@ void NostalgicProcessor::playNote(int midiNoteNumber, int midiChannel) {
                  FixedLengthFixedStart,
                  Nostalgic,
                  //(tempDuration + getWaveDistance()) * synth->getPlaybackRate(midiNoteNumber), // start
-                 tempDuration + getWaveDistance(),
+                 //tempDuration + getWaveDistance(),
+                 tempDuration + preparation->getWavedistance(),
                  tempDuration, // length
                  30, //ramp up (ms)
                  aRampUndertowCrossMS); //ramp off
@@ -122,13 +113,6 @@ void NostalgicProcessor::reverseNoteLengthTimerOn(int midiNoteNumber, float note
 }
 
 
-//turn on/off particular key in keymap
-void NostalgicProcessor::keymapSet(int midiNoteNumber, bool on)
-{
-    keymap.set(midiNoteNumber, on);
-}
-
-
 //main scheduling function
 void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
 {
@@ -144,19 +128,22 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
         {
             //play forward note for undertow dur and ramp
             //DBG("nostalgic forward note " + std::to_string(tempnote) + " " + std::to_string(getVelocity(tempnote)));
-            synth->keyOn(
-                         midiChannel,
-                         tempnote,
-                         undertowVelocities.getUnchecked(tempnote),
-                         tuningOffsets,
-                         tuningBasePitch,
-                         Forward,
-                         FixedLengthFixedStart,
-                         Nostalgic,
-                         getWaveDistance(), // start
-                         getUndertow(), // length
-                         aRampUndertowCrossMS, //ramp up
-                         getUndertow() - aRampUndertowCrossMS); //ramp down
+            
+            if(preparation->getUndertow() > 0) {
+                synth->keyOn(
+                             midiChannel,
+                             tempnote,
+                             undertowVelocities.getUnchecked(tempnote),
+                             tuningOffsets,
+                             tuningBasePitch,
+                             Forward,
+                             FixedLengthFixedStart,
+                             Nostalgic,
+                             preparation->getWavedistance(),                        //start
+                             preparation->getUndertow(),                            //length
+                             aRampUndertowCrossMS,                                  //ramp up
+                             preparation->getUndertow() - aRampUndertowCrossMS);    //ramp down
+            }
             
             //remove from active notes list
             activeReverseNotes.removeFirstMatchingValue(tempnote);
