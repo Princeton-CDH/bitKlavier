@@ -27,8 +27,8 @@ public:
     
     NostalgicPreparation(int waveDistance,
                          int undertow,
-                         int transposition,
-                         int gain,
+                         float transposition,
+                         float gain,
                          float lengthMultiplier,
                          float beatsToSkip,
                          NostalgicSyncMode mode,
@@ -106,8 +106,17 @@ public:
 
     
 private:
-    int nWaveDistance;          //ms; distance from beginning of sample to stop reverse playback and begin undertow
-    int nUndertow;              //ms; length of time to play forward after directional change
+    int nWaveDistance;  //ms; distance from beginning of sample to stop reverse playback and begin undertow
+    int nUndertow;      //ms; length of time to play forward after directional change
+    /*
+     one thing i discovered is that the original bK actually plays the forward undertow
+     sample for TWICE this value; the first half at steady gain, and then the second
+     half with a ramp down. i'm not sure why, and i'm not sure i want to keep that
+     behavior, but if we don't, then the instrument will sound different when we import
+     old presets
+     --dt
+     */
+    
     float nTransposition;       //transposition, in half steps
     float nGain;                //gain multiplier
     float nLengthMultiplier;    //note-length mode: toscale reverse playback time
@@ -128,56 +137,45 @@ public:
     NostalgicProcessor(BKSynthesiser *s, NostalgicPreparation::Ptr prep);
     virtual ~NostalgicProcessor();
     
+    //begin playing reverse note
+    void playNote(int midiNoteNumber, int midiChannel);
+    
+    //called with every audio vector
+    void processBlock(int numSamples, int midiChannel);
+    
     //begin timing played note length, called with noteOn
     void noteLengthTimerOn(int midiNoteNumber, float midiNoteVelocity);
+    
+private:
     
     //finish timing played note length, called with noteOff
     void noteLengthTimerOff(int midiNoteNumber);
     
-    //begin playing reverse note
-    void playNote(int midiNoteNumber, int midiChannel);
-    
     //begin timing reverse note play time
     void reverseNoteLengthTimerOn(int midiNoteNumber, float noteLength);
     
-    //called with every audio vector
-    void processBlock(int numSamples, int midiChannel);
     void incrementTimers(int numSamples);
     
     //data retrieval callbacks
     int getNoteLengthTimer(int midiNoteNumber) const noexcept;
     float getVelocity(int midiNoteNumber) const noexcept;
     int getReverseNoteLengthTimer(int midiNoteNumber) const noexcept;
-      
-private:
 
     BKSynthesiser *synth;
     NostalgicPreparation::Ptr preparation;
     double sampleRate;
 
-    Array<int> noteLengthTimers; //store current length of played notes here
-    Array<int> activeNotes; //table of notes currently being played by player
-    Array<float> velocities; //table of velocities played
+    Array<int> noteLengthTimers;        //store current length of played notes here
+    Array<int> activeNotes;             //table of notes currently being played by player
+    Array<float> velocities;            //table of velocities played
     
-    Array<int> reverseLengthTimers; //keep track of how long reverse notes have been playing
-    Array<int> activeReverseNotes; //table of active reverse notes
-    Array<int> reverseTargetLength; //target reverse length (in samples)
-    Array<float> undertowVelocities; //velocities stored for undertow
+    Array<int> reverseLengthTimers;     //keep track of how long reverse notes have been playing
+    Array<int> activeReverseNotes;      //table of active reverse notes
+    Array<int> reverseTargetLength;     //target reverse length (in samples)
     
-    /** primary user parameters
-    int waveDistance; //ms; distance from beginning of sample to stop reverse playback and begin undertow
-    int undertow;     //ms; length of time to play forward after directional change
-    float transposition; //transposition, in half steps
-    float gain; //gain multiplier
-    float lengthMultiplier; //note-length mode: toscale reverse playback time
-    float beatsToSkip; //synchronic mode: beats to skip before reverse peak
-    
-    NostalgicSyncMode syncMode = NostalgicSyncNoteLength;
-     */
-    
-    //need callbacks to set/get these....
-    Array<float> tuningOffsets = Array<float>(aPartialTuning,aNumScaleDegrees);
-    int tuningBasePitch = 0;
+    //store values so that undertow note retains preparation from reverse note
+    Array<float> undertowVelocities;
+    Array<NostalgicPreparation::Ptr> undertowPreparations;
     
     JUCE_LEAK_DETECTOR (NostalgicProcessor) //is this the right one to use here?
 };

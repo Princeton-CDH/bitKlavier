@@ -103,25 +103,25 @@ void MrmAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
     
     resonanceReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     
-    sPrep = new SynchronicPreparation(120.0,
-                                      8,
-                                      2,
-                                      5,
-                                      1.0,
-                                      FirstNoteSync,
-                                      0,
-                                      Array<float>({1.0}),
-                                      Array<float>({1.0}),
-                                      Array<float>({1.0}),
-                                      Array<float>(aJustTuning,12),
-                                      0);
+    sPrep = new SynchronicPreparation(120.0,                        //tempo
+                                      8,                            //num pulses
+                                      2,                            //cluster min
+                                      5,                            //cluster max
+                                      1.0,                          //cluster thresh (ms????)
+                                      FirstNoteSync,                //sync mode
+                                      0,                            //beats to skip
+                                      Array<float>({1.0}),          //beat length multipliers
+                                      Array<float>({1.0}),          //accent multipliers
+                                      Array<float>({1.0}),          //note sustain length multipliers
+                                      Array<float>(aJustTuning,12), //tuning
+                                      0);                           //tuning fundamental
     
     sProcess = new SynchronicProcessor(&mainPianoSynth, sPrep);
     
-    nPrep = new NostalgicPreparation(0,                             //wave distance
-                                     0,                             //undertow
-                                     0,                             //transposition
-                                     1,                             //gain
+    nPrep = new NostalgicPreparation(200,                           //wave distance (ms)
+                                     2000,                          //undertow (ms)
+                                     0.,                            //transposition
+                                     1.,                            //gain
                                      1.,                            //length multiplier
                                      0.,                            //beats to skip
                                      NostalgicSyncNoteLength,       //sync mode
@@ -208,13 +208,14 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
         
         if (m.isNoteOn())
         {
+            
             sProcess->notePlayed(noteIndex, m.getVelocity());
             nProcess->noteLengthTimerOn(m.getNoteNumber(), m.getFloatVelocity());
             
             mainPianoSynth.keyOn(
                                  m.getChannel(),
                                  m.getNoteNumber(),
-                                 m.getFloatVelocity() * .5,
+                                 m.getFloatVelocity(), //not sure where best to do main and global gain multiply...
                                  tuningOffsets,
                                  tuningBasePitch,
                                  Forward,
@@ -239,7 +240,6 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                                   true
                                   );
             
-            //DBG("off velocity " + std::to_string(m.getFloatVelocity()) );
             hammerReleaseSynth.keyOn(
                                      m.getChannel(),
                                      m.getNoteNumber(),
@@ -290,16 +290,6 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
     resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    /*
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        float* channelData = buffer.getWritePointer(channel);//.getWritePointer (channel);
-        
-        // ..do something to the data...
-    }
-     */
 }
 
 
