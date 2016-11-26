@@ -122,9 +122,9 @@ void MrmAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
                                      2000,                          //undertow (ms)
                                      0.,                            //transposition
                                      1.,                            //gain
-                                     1.,                            //length multiplier (only applies in NostalgicSyncNoteLength mode)
-                                     0.,                            //beats to skip (only applies in NostalgicSyncSynchronic mode)
-                                     NostalgicSyncSynchronic,       //sync mode: NostalgicSyncNoteLength or NostalgicSyncSynchronic
+                                     1.,                            //length multiplier (only applies in NoteLengthSync mode)
+                                     0.,                            //beats to skip (only applies in SynchronicSync mode)
+                                     SynchronicSync,                //sync mode: NoteLengthSync or SynchronicSync
                                      0,                             //sync target (synchronic layer num)
                                      Array<float>(aJustTuning,12),  //tuning
                                      0);                            //tuning fundamental

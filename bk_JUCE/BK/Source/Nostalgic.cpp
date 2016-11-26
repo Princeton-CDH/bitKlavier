@@ -44,7 +44,7 @@ NostalgicProcessor::~NostalgicProcessor() {}
 void NostalgicProcessor::playNote(int midiNoteNumber, int midiChannel, int timeToNext, int beatLength) {
     
     //note-length sync
-    if(preparation->getMode() == NostalgicSyncNoteLength)
+    if(preparation->getMode() == NoteLengthSync)
     {
     
         //get length of played notes, subtract wave distance to set nostalgic reverse note length
@@ -62,9 +62,9 @@ void NostalgicProcessor::playNote(int midiNoteNumber, int midiChannel, int timeT
                      FixedLengthFixedStart,
                      Nostalgic,
                      tempDuration + preparation->getWavedistance(),
-                     tempDuration, // length
-                     30, //ramp up (ms)
-                     aRampUndertowCrossMS); //ramp off
+                     tempDuration,                                      // length
+                     30,                                                //ramp up (ms)
+                     aRampUndertowCrossMS);                             //ramp off
         
         noteLengthTimerOff(midiNoteNumber);
         
@@ -78,7 +78,7 @@ void NostalgicProcessor::playNote(int midiNoteNumber, int midiChannel, int timeT
     }
     
     //synchronic sync
-    else if(preparation->getMode() == NostalgicSyncSynchronic)
+    else if(preparation->getMode() == SynchronicSync)
     {
         
         float tempDuration = timeToNext + preparation->getBeatsToSkip() * beatLength;

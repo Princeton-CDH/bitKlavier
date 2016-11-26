@@ -57,7 +57,7 @@ public:
         nGain = 1.;
         nLengthMultiplier = 1.;
         nBeatsToSkip = 0.;
-        nMode = NostalgicSyncNoteLength;
+        nMode = NoteLengthSync,
         nSyncTarget = 0;
         nTuningOffsets = Array<float>(aEqualTuning);
         nBasePitch = 0;
@@ -154,6 +154,7 @@ private:
     //begin timing reverse note play time
     void reverseNoteLengthTimerOn(int midiNoteNumber, float noteLength);
     
+    //move timers forward by blocksize
     void incrementTimers(int numSamples);
     
     //data retrieval callbacks
@@ -161,6 +162,8 @@ private:
     float getVelocity(int midiNoteNumber) const noexcept;
     int getReverseNoteLengthTimer(int midiNoteNumber) const noexcept;
 
+    
+    //data and pointers
     BKSynthesiser *synth;
     NostalgicPreparation::Ptr preparation;
     double sampleRate;
