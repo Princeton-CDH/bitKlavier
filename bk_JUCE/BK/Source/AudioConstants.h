@@ -44,7 +44,7 @@ typedef enum SynchronicSyncMode {
     FirstNoteSync = 0,
     LastNoteSync,
     SynchronicSyncModeNil
-}SynchronicSyncMode;
+} SynchronicSyncMode;
 
 
 typedef enum SynchronicParameterType {
@@ -60,7 +60,14 @@ typedef enum SynchronicParameterType {
     SynchronicAccentMultipliers,
     SynchronicTuningOffsets,
     SynchronicBasePitch
-}SynchronicParameterType;
+} SynchronicParameterType;
+
+    
+typedef enum NostalgicSyncMode {
+    NoteLengthSync = 0, //reverse note length set by played note length
+    SynchronicSync,     //reverse note length set by next synchronic pulse
+    NostalgicSyncModeNil
+} NostalgicSyncMode;
 
 static const std::vector<std::string> cSynchronicParameterTypes = {
     "SynchronicTempo",
@@ -76,6 +83,8 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "SynchronicTuningOffsets",
     "SynchronicBasePitch"
 };
+
+static const float aGlobalGain = 0.5; //make this user settable
 
 static const SynchronicSyncMode aSynchronicSyncMode = LastNoteSync;
 static const float aSynchronicClusterThreshold = 0.5;

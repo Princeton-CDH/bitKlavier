@@ -33,6 +33,9 @@ public:
     
     int numSynchronicLayers;
     int currentSynchronicLayer;
+    
+    int numNostalgicLayers;
+    int currentNostalgicLayer;
 
     // Public instance varables.
     // MidiInput midiInput;
@@ -49,13 +52,14 @@ public:
     SynchronicPreparation::Ptr sPrep;
     ScopedPointer<SynchronicProcessor> sProcess;
     
-    NostalgicProcessor nostalgic;
+    NostalgicPreparation::Ptr nPrep;
+    ScopedPointer<NostalgicProcessor> nProcess;
     
     BKSynthesiser hammerReleaseSynth;
-    
     BKSynthesiser resonanceReleaseSynth;
     
     OwnedArray<SynchronicProcessor, CriticalSection> synchronic;
+    OwnedArray<NostalgicProcessor, CriticalSection> nostalgic;
     
     int channel;
     

@@ -138,6 +138,9 @@ public:
     
     void notePlayed(int noteNumber, int velocity);
     
+    int getTimeToNext() const { return (numSamplesBeat - phasor) * 1000./sampleRate; }; //returns time to next pulse, in ms
+    int getBeatLength() const { return numSamplesBeat * 1000./sampleRate; };
+    
 private:
     
     BKSynthesiser *synth;

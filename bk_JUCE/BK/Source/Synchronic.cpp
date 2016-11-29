@@ -45,7 +45,8 @@ void SynchronicProcessor::playNote(int channel, int note)
 {
     PianoSamplerNoteDirection noteDirection = Forward;
     float noteStartPos = 0.0;
-    float noteLength = (fabs(preparation->getLengthMultipliers()[length]) * tempoPeriod);
+    //float noteLength = (fabs(preparation->getLengthMultipliers()[length]) * tempoPeriod);
+    float noteLength = (fabs(preparation->getLengthMultipliers()[length]) * 50.); //we can change to tempoPeriod multiplier, but need to think about consistency with older behavior
     
     if (preparation->getLengthMultipliers()[length] < 0)
     {
@@ -57,7 +58,7 @@ void SynchronicProcessor::playNote(int channel, int note)
     synth->keyOn(
                  channel,
                  note + 9,
-                 preparation->getAccentMultipliers()[accent] * .5,
+                 preparation->getAccentMultipliers()[accent] * aGlobalGain,
                  preparation->getTuningOffsets(),
                  preparation->getBasePitch(),
                  noteDirection,
@@ -203,3 +204,5 @@ void SynchronicProcessor::renderNextBlock(int channel, int numSamples)
     }
     
 }
+
+

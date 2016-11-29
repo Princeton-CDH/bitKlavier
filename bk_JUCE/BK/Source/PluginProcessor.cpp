@@ -13,11 +13,17 @@ MrmAudioProcessor::MrmAudioProcessor() {
     
     numSynchronicLayers = 2;
     currentSynchronicLayer = 0;
-    // For testing and developing, let's keep directory of samples in home folder on disk.
     
-    synchronic = OwnedArray<SynchronicProcessor,CriticalSection>();
+    numNostalgicLayers = 2;
+    currentNostalgicLayer = 0;
+
+    synchronic = OwnedArray<SynchronicProcessor, CriticalSection>();
     synchronic.ensureStorageAllocated(numSynchronicLayers);
     
+    nostalgic = OwnedArray<NostalgicProcessor, CriticalSection>();
+    nostalgic.ensureStorageAllocated(numNostalgicLayers);
+    
+    // For testing and developing, let's keep directory of samples in home folder on disk.
     loadMainPianoSamples(&mainPianoSynth, aNumLayers);
     loadHammerReleaseSamples(&hammerReleaseSynth);
     loadResonanceRelaseSamples(&resonanceReleaseSynth);
@@ -97,22 +103,34 @@ void MrmAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
     
     resonanceReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     
-    sPrep = new SynchronicPreparation(120.0,
-                                      8,
-                                      2,
-                                      5,
-                                      1.0,
-                                      FirstNoteSync,
-                                      0,
-                                      Array<float>({1.0}),
-                                      Array<float>({1.0}),
-                                      Array<float>({1.0}),
-                                      Array<float>(aJustTuning,12),
-                                      0);
+    sPrep = new SynchronicPreparation(120.0,                        //tempo
+                                      8,                            //num pulses
+                                      2,                            //cluster min
+                                      5,                            //cluster max
+                                      1.0,                          //cluster thresh (ms????)
+                                      FirstNoteSync,                //sync mode
+                                      0,                            //beats to skip
+                                      Array<float>({1.0}),          //beat length multipliers
+                                      Array<float>({1.0}),          //accent multipliers
+                                      Array<float>({1.0}),          //note sustain length multipliers
+                                      Array<float>(aJustTuning,12), //tuning
+                                      0);                           //tuning fundamental
     
     sProcess = new SynchronicProcessor(&mainPianoSynth, sPrep);
     
-    nostalgic.attachToSynth(&mainPianoSynth);
+    nPrep = new NostalgicPreparation(200,                           //wave distance (ms)
+                                     2000,                          //undertow (ms)
+                                     0.,                            //transposition
+                                     1.,                            //gain
+                                     1.,                            //length multiplier (only applies in NoteLengthSync mode)
+                                     0.,                            //beats to skip (only applies in SynchronicSync mode)
+                                     SynchronicSync,                //sync mode: NoteLengthSync or SynchronicSync
+                                     0,                             //sync target (synchronic layer num)
+                                     Array<float>(aJustTuning,12),  //tuning
+                                     0);                            //tuning fundamental
+    
+    nProcess = new NostalgicProcessor(&mainPianoSynth, nPrep);
+    
 
 }
 
@@ -162,7 +180,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
     // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
+    // This is here to avoid people getting screaming fee`dback
     // when they first compile a plugin, but obviously you don't need to keep
     // this code if your algorithm always overwrites all the output channels.
     
@@ -181,7 +199,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     int numSamples = buffer.getNumSamples();
     
     sProcess->renderNextBlock(channel, numSamples);
-    //nostalgic.processBlock(buffer.getNumSamples(), m.getChannel());
+    nProcess->processBlock(buffer.getNumSamples(), m.getChannel());
     
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
@@ -190,14 +208,14 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
         
         if (m.isNoteOn())
         {
-            sProcess->notePlayed(noteIndex, m.getVelocity());
             
-            //nostalgic.noteLengthTimerOn(m.getNoteNumber(), m.getFloatVelocity()); //start measuring note length
+            sProcess->notePlayed(noteIndex, m.getVelocity());
+            nProcess->noteLengthTimerOn(m.getNoteNumber(), m.getFloatVelocity());
             
             mainPianoSynth.keyOn(
                                  m.getChannel(),
                                  m.getNoteNumber(),
-                                 m.getFloatVelocity() * .5,
+                                 m.getFloatVelocity() * aGlobalGain,
                                  tuningOffsets,
                                  tuningBasePitch,
                                  Forward,
@@ -213,7 +231,8 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
         else if (m.isNoteOff())
         {
             
-            nostalgic.playNote(m.getNoteNumber(), m.getChannel());
+            //need to integrate sProcess layer number here as well, just defaulting for the moment
+            nProcess->playNote(m.getNoteNumber(), m.getChannel(), sProcess->getTimeToNext(), sProcess->getBeatLength());
             
             mainPianoSynth.keyOff(
                                   m.getChannel(),
@@ -222,11 +241,10 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                                   true
                                   );
             
-            //DBG("off velocity " + std::to_string(m.getFloatVelocity()) );
             hammerReleaseSynth.keyOn(
                                      m.getChannel(),
                                      m.getNoteNumber(),
-                                     m.getFloatVelocity() * 0.0025, //will want hammerGain multipler that user can set
+                                     m.getFloatVelocity() * 0.0025 * aGlobalGain, //will want hammerGain multipler that user can set
                                      tuningOffsets,
                                      tuningBasePitch,
                                      Forward,
@@ -240,7 +258,7 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
             resonanceReleaseSynth.keyOn(
                                         m.getChannel(),
                                         m.getNoteNumber(),
-                                        m.getFloatVelocity(), //will also want multiplier for resonance gain, though not here...
+                                        m.getFloatVelocity() * aGlobalGain, //will also want multiplier for resonance gain...
                                         tuningOffsets,
                                         tuningBasePitch,
                                         Forward,
@@ -273,16 +291,6 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
     resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    /*
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        float* channelData = buffer.getWritePointer(channel);//.getWritePointer (channel);
-        
-        // ..do something to the data...
-    }
-     */
 }
 
 
@@ -389,21 +397,21 @@ void MrmAudioProcessor::loadMainPianoSamples(BKSynthesiser *synth, int numLayers
                     
                     int root = 0;
                     if (j == 0) {
-                        root = (9+12*i);
+                        root = (9+12*i) + 12;
                         if (i == 7) {
                             // High C.
-                            noteRange.setRange(root-1,4,true);
+                            noteRange.setRange(root-1,5,true);
                         }else {
                             noteRange.setRange(root-1,3,true);
                         }
                     } else if (j == 1) {
-                        root = (0+12*i);
+                        root = (0+12*i) + 12;
                         noteRange.setRange(root-1,3,true);
                     } else if (j == 2) {
-                        root = (3+12*i);
+                        root = (3+12*i) + 12;
                         noteRange.setRange(root-1,3,true);
                     } else if (j == 3) {
-                        root = (6+12*i);
+                        root = (6+12*i) + 12;
                         noteRange.setRange(root-1,3,true);
                     } else {
                         
@@ -509,22 +517,22 @@ void MrmAudioProcessor::loadResonanceRelaseSamples(BKSynthesiser *synth)
                     int root = 0;
                     if (j == 0)
                     {
-                        root = (9+12*i);
+                        root = (9+12*i) + 12;
                         noteRange.setRange(root-1,3,true);
                     }
                     else if (j == 1)
                     {
-                        root = (0+12*i);
+                        root = (0+12*i) + 12;
                         noteRange.setRange(root-1,3,true);
                     }
                     else if (j == 2)
                     {
-                        root = (3+12*i);
+                        root = (3+12*i) + 12;
                         noteRange.setRange(root-1,3,true);
                     }
                     else if (j == 3)
                     {
-                        root = (6+12*i);
+                        root = (6+12*i) + 12;
                         noteRange.setRange(root-1,3,true);
                     }
                     
