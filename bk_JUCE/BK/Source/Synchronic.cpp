@@ -28,6 +28,14 @@ SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s, SynchronicPreparation
     cluster = Array<int>();
     on = Array<int>();
     
+    // Initialize keymap.
+    keymap = Array<int>();
+    keymap.ensureStorageAllocated(128);
+    for (int i = 0; i < 128; i++)
+    {
+        keymap.set(i,0);
+    }
+    
     tempoPeriod = (60.0/preparation->getTempo()) * 1000.0;
     
     clusterThreshold = tempoPeriod * preparation->getClusterThresh();
@@ -41,19 +49,21 @@ SynchronicProcessor::~SynchronicProcessor()
 {
 }
 
+
+
 void SynchronicProcessor::playNote(int channel, int note)
 {
     PianoSamplerNoteDirection noteDirection = Forward;
     float noteStartPos = 0.0;
+    
     //float noteLength = (fabs(preparation->getLengthMultipliers()[length]) * tempoPeriod);
-    float noteLength = (fabs(preparation->getLengthMultipliers()[length]) * 50.); //we can change to tempoPeriod multiplier, but need to think about consistency with older behavior
+    float noteLength = (fabs(preparation->getLengthMultipliers()[length]) * 50.0); //we can change to tempoPeriod multiplier, but need to think about consistency with older behavior
     
     if (preparation->getLengthMultipliers()[length] < 0)
     {
         noteDirection = Reverse;
         noteStartPos = noteLength;
     }
-    
     
     synth->keyOn(
                  channel,
@@ -71,59 +81,64 @@ void SynchronicProcessor::playNote(int channel, int note)
                  );
 }
 
-void SynchronicProcessor::notePlayed(int noteNumber, int velocity)
+
+void SynchronicProcessor::keyOn(int noteNumber, int velocity)
 {
-    if (inCluster)
+    //if (keymap[noteNumber])
     {
-        // If LastNoteSync mode, reset phasor and multiplier indices.
-        if (preparation->getMode() == LastNoteSync)
+        if (inCluster)
         {
-            phasor = pulseThresholdSamples;
+            // If LastNoteSync mode, reset phasor and multiplier indices.
+            if (preparation->getMode() == LastNoteSync)
+            {
+                phasor = pulseThresholdSamples;
+                
+                if (clusterThresholdSamples > pulseThresholdSamples)
+                {
+                    pulse = 0;
+                }
+                else
+                {
+                    pulse = 1;
+                }
+                beat = 0;
+                length = 0;
+                accent = 0;
+                
+                inPrePulses = true;
+                pulseThresholdTimer = 0;
+            }
             
-            if (clusterThresholdSamples > pulseThresholdSamples)
+            
+        }
+        else
+        {
+            cluster.clearQuick();
+            inPulses = false;
+            
+            // Start first note timer, since this is beginning of new cluster.
+            if (preparation->getMode() == FirstNoteSync)
             {
-                pulse = 0;
+                firstNoteTimer = 0;
             }
-            else
-            {
-                pulse = 1;
-            }
-            beat = 0;
-            length = 0;
-            accent = 0;
             
             inPrePulses = true;
             pulseThresholdTimer = 0;
+            
+            inCluster = true;
         }
         
-        
-    }
-    else
-    {
-        cluster.clearQuick();
-        inPulses = false;
-        
-        // Start first note timer, since this is beginning of new cluster.
-        if (preparation->getMode() == FirstNoteSync)
+        if (inCluster)
         {
-            firstNoteTimer = 0;
+            
+            cluster.add(noteNumber);
+            clusterThresholdTimer = 0;
         }
-        
-        inPrePulses = true;
-        pulseThresholdTimer = 0;
-        
-        inCluster = true;
     }
     
-    if (inCluster)
-    {
-        
-        cluster.add(noteNumber);
-        clusterThresholdTimer = 0;
-    }
 }
 
-void SynchronicProcessor::renderNextBlock(int channel, int numSamples)
+void SynchronicProcessor::processBlock(int numSamples, int channel)
 {
     
     int clusterSize = cluster.size();

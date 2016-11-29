@@ -59,7 +59,8 @@ typedef enum SynchronicParameterType {
     SynchronicLengthMultipliers,
     SynchronicAccentMultipliers,
     SynchronicTuningOffsets,
-    SynchronicBasePitch
+    SynchronicBasePitch,
+    SynchronicParameterTypeNil
 } SynchronicParameterType;
 
     
@@ -84,6 +85,8 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "SynchronicBasePitch"
 };
 
+
+static const int aNumLayers = 5;
 static const float aGlobalGain = 0.5; //make this user settable
 
 static const SynchronicSyncMode aSynchronicSyncMode = LastNoteSync;
@@ -102,7 +105,7 @@ static const float aRampOffTimeSec = 0.004f;
 static const int aNumScaleDegrees = 12;
 static const int aRampUndertowCrossMS = 50;
 
-static const int aNumLayers = 2;
+static const int aNumSampleLayers = 2;
 static const int aVelocityThresh_Eight[9] = {
     0,
     25,

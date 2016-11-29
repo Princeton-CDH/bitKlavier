@@ -14,10 +14,13 @@
 #include "BKUtilities.h"
 
 //==============================================================================
-SynchronicViewController::SynchronicViewController(MrmAudioProcessor& p):
-processor(p)
+SynchronicViewController::SynchronicViewController(BKAudioProcessor& p)
+:
+    processor(p),
+    currentSynchronicLayer(0)
 {
-    SynchronicPreparation::Ptr layer = processor.sPrep;
+    
+    SynchronicPreparation::Ptr layer = processor.sPreparation[currentSynchronicLayer];
     
     // Text Fields
     addAndMakeVisible(sKeymapTF);
@@ -34,7 +37,7 @@ processor(p)
     addAndMakeVisible(sCurrentLayerTF);
     sCurrentLayerTF.addListener(this);
     sCurrentLayerTF.setName("CurrentSynchronicLayer");
-    sCurrentLayerTF.setText( String( processor.currentSynchronicLayer));
+    sCurrentLayerTF.setText( String( currentSynchronicLayer));
     
     addAndMakeVisible(sTempoTF);
     sTempoTF.addListener(this);
@@ -90,12 +93,6 @@ processor(p)
     sTuningOffsetsTF.addListener(this);
     sTuningOffsetsTF.setName(cSynchronicParameterTypes[SynchronicTuningOffsets]);
     sTuningOffsetsTF.setText( floatArrayToString( layer->getTuningOffsets()));
-    
-    for (auto n : layer->getTuningOffsets())
-    {
-        DBG("offset: " + String(n));
-    }
-    DBG("farraytostring: " + floatArrayToString( layer->getTuningOffsets()));
     
     addAndMakeVisible(sBasePitchTF);
     sBasePitchTF.addListener(this);
@@ -179,9 +176,47 @@ processor(p)
 }
 
 
+
 SynchronicViewController::~SynchronicViewController()
 {
     
+}
+
+void SynchronicViewController::switchToLayer(int numLayer)
+{
+    
+    currentSynchronicLayer = numLayer;
+    
+    SynchronicPreparation::Ptr layer = processor.sPreparation[numLayer];
+    
+    // Set text.
+    //sKeymapTF.setText( intArrayToString( processor.sKeymap));
+    
+    sCurrentLayerTF.setText( String( numLayer));
+
+    sTempoTF.setText( String( layer->getTempo()));
+    
+    sNumPulsesTF.setText( String( layer->getNumPulses()));
+
+    sClusterMinTF.setText( String( layer->getClusterMin()));
+
+    sClusterMaxTF.setText( String( layer->getClusterMax()));
+;
+    sClusterThreshTF.setText( String( layer->getClusterThresh()));
+
+    sModeTF.setText( String( layer->getMode()));
+
+    sBeatsToSkipTF.setText( String( layer->getBeatsToSkip()));
+    
+    sBeatMultipliersTF.setText( floatArrayToString( layer->getBeatMultipliers()));
+
+    sLengthMultipliersTF.setText( floatArrayToString( layer->getLengthMultipliers()));
+
+    sAccentMultipliersTF.setText( floatArrayToString( layer->getAccentMultipliers()));
+
+    sTuningOffsetsTF.setText( floatArrayToString( layer->getTuningOffsets()));
+    
+    sBasePitchTF.setText( String( layer->getBasePitch()));
 }
 
 void SynchronicViewController::textFieldDidChange(TextEditor& tf)
@@ -195,7 +230,7 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
     DBG(name + ": |" + text + "|");
     
     //BKState *bk = BKState::getInstance();
-    SynchronicPreparation::Ptr layer = processor.sPrep;
+    SynchronicPreparation::Ptr layer = processor.sPreparation[currentSynchronicLayer];
     
     if (name == cSynchronicParameterTypes[SynchronicTempo])
     {
@@ -256,11 +291,11 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
     }
     else if (name == "NumSynchronicLayers")
     {
-        processor.numSynchronicLayers = i;
+        //processor.numSynchronicLayers = i;
     }
     else if (name == "CurrentSynchronicLayer")
     {
-        processor.currentSynchronicLayer = i;
+        switchToLayer(i);
     }
     else if (name == "SynchronicKeymap")
     {
@@ -270,9 +305,6 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
     {
         DBG("Unregistered text field entered input.");
     }
-    
-    /// say that state has been updated
-    //synchronic[i]->set(. . . )
 }
 
 #if !TEXT_CHANGE_INTERNAL

@@ -32,14 +32,13 @@ class SynchronicViewController    : public PreparationView,
                                     private TextEditor::Listener
 {
 public:
-    SynchronicViewController(MrmAudioProcessor&);
+    SynchronicViewController(BKAudioProcessor&);
     ~SynchronicViewController();
 
     void paint (Graphics&) override;
     void resized() override;
     
     int numSynchronicLayers;
-    int currentSynchronicLayer;
     float sTempo;
     int sNumPulses,sClusterMin,sClusterMax;
     float sClusterThresh;
@@ -93,8 +92,10 @@ public:
     bool shouldChange;
 
 private:
-    MrmAudioProcessor& processor;
+    BKAudioProcessor& processor;
+    int currentSynchronicLayer;
     
+    void switchToLayer(int numLayer);
     // TextEditor input parsing
     void textFieldDidChange(TextEditor&);
     

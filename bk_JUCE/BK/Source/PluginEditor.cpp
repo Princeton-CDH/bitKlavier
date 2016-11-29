@@ -14,7 +14,7 @@
 
 
 //==============================================================================
-MrmAudioProcessorEditor::MrmAudioProcessorEditor (MrmAudioProcessor& p)
+BKAudioProcessorEditor::BKAudioProcessorEditor (BKAudioProcessor& p)
 :
     AudioProcessorEditor (&p),
     processor (p),
@@ -27,19 +27,19 @@ MrmAudioProcessorEditor::MrmAudioProcessorEditor (MrmAudioProcessor& p)
     
 }
 
-MrmAudioProcessorEditor::~MrmAudioProcessorEditor()
+BKAudioProcessorEditor::~BKAudioProcessorEditor()
 {
     
 }
 
 //==============================================================================
-void MrmAudioProcessorEditor::paint (Graphics& g)
+void BKAudioProcessorEditor::paint (Graphics& g)
 {
     g.fillAll(gMainComponentColor);
     
 }
 
-void MrmAudioProcessorEditor::resized()
+void BKAudioProcessorEditor::resized()
 {
     svc.setBounds(gSynchronic_LeftOffset,
                   gSynchronic_TopOffset,

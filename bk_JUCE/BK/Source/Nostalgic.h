@@ -53,10 +53,10 @@ public:
     {
         nWaveDistance = 0;
         nUndertow = 0;
-        nTransposition = 0.;
-        nGain = 1.;
-        nLengthMultiplier = 1.;
-        nBeatsToSkip = 0.;
+        nTransposition = 0.0;
+        nGain = 1.0;
+        nLengthMultiplier = 1.0;
+        nBeatsToSkip = 0.0;
         nMode = NoteLengthSync,
         nSyncTarget = 0;
         nTuningOffsets = Array<float>(aEqualTuning);
@@ -137,16 +137,18 @@ public:
     NostalgicProcessor(BKSynthesiser *s, NostalgicPreparation::Ptr prep);
     virtual ~NostalgicProcessor();
     
-    //begin playing reverse note
-    void playNote(int midiNoteNumber, int midiChannel, int timeToNext, int beatLength);
-    
     //called with every audio vector
     void processBlock(int numSamples, int midiChannel);
     
     //begin timing played note length, called with noteOn
-    void noteLengthTimerOn(int midiNoteNumber, float midiNoteVelocity);
+    void keyOn(int midiNoteNumber, float midiNoteVelocity);
+    
+    //begin playing reverse note, called with noteOff
+    void keyOff(int midiNoteNumber, int midiChannel, int timeToNext, int beatLength);
     
 private:
+    
+    void playNote(int channel, int note);
     
     //finish timing played note length, called with noteOff
     void noteLengthTimerOff(int midiNoteNumber);
@@ -156,12 +158,6 @@ private:
     
     //move timers forward by blocksize
     void incrementTimers(int numSamples);
-    
-    //data retrieval callbacks
-    int getNoteLengthTimer(int midiNoteNumber) const noexcept;
-    float getVelocity(int midiNoteNumber) const noexcept;
-    int getReverseNoteLengthTimer(int midiNoteNumber) const noexcept;
-
     
     //data and pointers
     BKSynthesiser *synth;

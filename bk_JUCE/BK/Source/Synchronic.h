@@ -134,17 +134,28 @@ public:
     SynchronicProcessor(BKSynthesiser *s, SynchronicPreparation::Ptr prep);
     ~SynchronicProcessor();
     
-    void renderNextBlock(int channel, int numSamples);
+    void processBlock(int numSamples, int channel);
     
-    void notePlayed(int noteNumber, int velocity);
+    void keyOn(int noteNumber, int velocity);
     
-    int getTimeToNext() const { return (numSamplesBeat - phasor) * 1000./sampleRate; }; //returns time to next pulse, in ms
-    int getBeatLength() const { return numSamplesBeat * 1000./sampleRate; };
+    void addNoteToKeymap(int note)      {  keymap.set(note,1);  }
+    
+    void removeNoteToKeymap(int note)   {  keymap.set(note,0);  }
+    
+    void clearKeymap(void)              {  keymap.clearQuick(); }
+    
+    int getCurrentNumSamplesBeat()  const { return numSamplesBeat;  }
+    int getCurrentPhasor()          const { return phasor;          }
+    
+    int getTimeToNext() const { return ((numSamplesBeat - phasor) * 1000.0)/sampleRate;    }; //returns time to next pulse, in ms
+    int getBeatLength() const { return (numSamplesBeat * 1000.0)/sampleRate;               };
     
 private:
     
     BKSynthesiser *synth;
     SynchronicPreparation::Ptr preparation;
+    
+    Array<int> keymap;
     
     float clusterThreshold; // beats
     uint64 clusterThresholdSamples;

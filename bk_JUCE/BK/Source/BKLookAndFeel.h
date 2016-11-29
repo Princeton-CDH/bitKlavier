@@ -18,18 +18,8 @@ class BKTextFieldLAF : public LookAndFeel_V3
 public:
     BKTextFieldLAF()
     {
-        setColour(TextEditor::backgroundColourId,   Colours::orange);
+        setColour(TextEditor::backgroundColourId,   Colours::lightgoldenrodyellow);
         setColour(TextEditor::textColourId,         Colours::black);
-        
-    }
-    
-    void fillTextEditorBackground (Graphics&, int width, int height, TextEditor&)
-    {
-        
-    }
-    
-    void drawTextEditorOutline (Graphics&, int width, int height, TextEditor&);
-    {
         
     }
 };

@@ -4,175 +4,71 @@
 
 #include "BKPianoSampler.h"
 
-//#include "BKState.h"
+#define NOST_KEY_OFF 0
 
 String notes[4] = {"A","C","D#","F#"};
 
 //==============================================================================
-MrmAudioProcessor::MrmAudioProcessor() {
+BKAudioProcessor::BKAudioProcessor() {
     
-    numSynchronicLayers = 2;
-    currentSynchronicLayer = 0;
+    numSynchronicLayers = aNumLayers;
     
-    numNostalgicLayers = 2;
-    currentNostalgicLayer = 0;
+    numNostalgicLayers = aNumLayers;
 
-    synchronic = OwnedArray<SynchronicProcessor, CriticalSection>();
-    synchronic.ensureStorageAllocated(numSynchronicLayers);
+    sProcessor = OwnedArray<SynchronicProcessor, CriticalSection>();
+    sProcessor.ensureStorageAllocated(numSynchronicLayers);
     
-    nostalgic = OwnedArray<NostalgicProcessor, CriticalSection>();
-    nostalgic.ensureStorageAllocated(numNostalgicLayers);
+    nProcessor = OwnedArray<NostalgicProcessor, CriticalSection>();
+    nProcessor.ensureStorageAllocated(numNostalgicLayers);
+    
+    sPreparation = Array<SynchronicPreparation::Ptr, CriticalSection>();
+    
+    nPreparation = Array<NostalgicPreparation::Ptr, CriticalSection>();
+    
+    
     
     // For testing and developing, let's keep directory of samples in home folder on disk.
-    loadMainPianoSamples(&mainPianoSynth, aNumLayers);
+    loadMainPianoSamples(&mainPianoSynth, aNumSampleLayers);
     loadHammerReleaseSamples(&hammerReleaseSynth);
     loadResonanceRelaseSamples(&resonanceReleaseSynth);
 }
 
-MrmAudioProcessor::~MrmAudioProcessor()
+BKAudioProcessor::~BKAudioProcessor()
 {
     
 }
 
 //==============================================================================
-const String MrmAudioProcessor::getName() const {
-    
-    return JucePlugin_Name;
-}
-
-bool MrmAudioProcessor::acceptsMidi() const {
-    
-   #if JucePlugin_WantsMidiInput
-    return true;
-   #else
-    return false;
-   #endif
-}
-
-bool MrmAudioProcessor::producesMidi() const {
-    
-   #if JucePlugin_ProducesMidiOutput
-    return true;
-   #else
-    return false;
-   #endif
-}
-
-double MrmAudioProcessor::getTailLengthSeconds() const {
-    
-    return 0.0;
-}
-
-int MrmAudioProcessor::getNumPrograms() {
-    
-    return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
-                // so this should be at least 1, even if you're not really implementing programs.
-}
-
-int MrmAudioProcessor::getCurrentProgram() {
-    
-    return 0;
-}
-
-void MrmAudioProcessor::setCurrentProgram (int index) {
-    
-}
-
-const String MrmAudioProcessor::getProgramName (int index) {
-    
-    return String("bitKlavier");
-}
-
-void MrmAudioProcessor::changeProgramName (int index, const String& newName) {
-    
-}
-
-//==============================================================================
-void MrmAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
+void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
     
     // Use this method as the place to do any pre-playback
     // initialisation that you need.
     
     mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
     
-#if USE_SECOND_SYNTH
-    secondPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
-#endif
-    
     hammerReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     
     resonanceReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     
-    sPrep = new SynchronicPreparation(120.0,                        //tempo
-                                      8,                            //num pulses
-                                      2,                            //cluster min
-                                      5,                            //cluster max
-                                      1.0,                          //cluster thresh (ms????)
-                                      FirstNoteSync,                //sync mode
-                                      0,                            //beats to skip
-                                      Array<float>({1.0}),          //beat length multipliers
-                                      Array<float>({1.0}),          //accent multipliers
-                                      Array<float>({1.0}),          //note sustain length multipliers
-                                      Array<float>(aJustTuning,12), //tuning
-                                      0);                           //tuning fundamental
     
-    sProcess = new SynchronicProcessor(&mainPianoSynth, sPrep);
     
-    nPrep = new NostalgicPreparation(200,                           //wave distance (ms)
-                                     2000,                          //undertow (ms)
-                                     0.,                            //transposition
-                                     1.,                            //gain
-                                     1.,                            //length multiplier (only applies in NoteLengthSync mode)
-                                     0.,                            //beats to skip (only applies in SynchronicSync mode)
-                                     SynchronicSync,                //sync mode: NoteLengthSync or SynchronicSync
-                                     0,                             //sync target (synchronic layer num)
-                                     Array<float>(aJustTuning,12),  //tuning
-                                     0);                            //tuning fundamental
+    for (int i = 0; i < aNumLayers; i++)
+    {
+        SynchronicPreparation::Ptr sPrep = new SynchronicPreparation();
+        sPreparation.insert(i, sPrep);
+        sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, sPrep));
+        
+        
+        NostalgicPreparation::Ptr nPrep = new NostalgicPreparation();
+        nPreparation.insert(i, nPrep);
+        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, nPrep));
+    }
     
-    nProcess = new NostalgicProcessor(&mainPianoSynth, nPrep);
-    
-
+    currentSynchronicPreparation = sPreparation.getUnchecked(0);
+    currentNostalgicPreparation = nPreparation.getUnchecked(0);
 }
 
-void MrmAudioProcessor::releaseResources() {
-    
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
-    //fileBuffer.setSize (0, 0);
-    
-}
-
-#ifndef JucePlugin_PreferredChannelConfigurations
-bool MrmAudioProcessor::setPreferredBusArrangement (bool isInput, int bus, const AudioChannelSet& preferredSet) {
-    
-    // Reject any bus arrangements that are not compatible with your plugin
-
-    const int numChannels = preferredSet.size();
-
-   #if JucePlugin_IsMidiEffect
-    if (numChannels != 0)
-        return false;
-   #elif JucePlugin_IsSynth
-    if (isInput || (numChannels != 1 && numChannels != 2))
-        return false;
-   #else
-    if (numChannels != 1 && numChannels != 2)
-        return false;
-
-    if (! AudioProcessor::setPreferredBusArrangement (! isInput, bus, preferredSet))
-        return false;
-   #endif
-
-    return AudioProcessor::setPreferredBusArrangement (isInput, bus, preferredSet);
-}
-#endif
-
-
-#define LAYERS 0
-uint64 time_ms = 0;
-uint64 time_samp = 0;
-
-void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages) {
+void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages) {
     
     const int totalNumInputChannels  = getTotalNumInputChannels();
     const int totalNumOutputChannels = getTotalNumOutputChannels();
@@ -196,26 +92,41 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     
     Array<float> tuningOffsets = Array<float>(aPartialTuning,aNumScaleDegrees);
     int tuningBasePitch = 0;
+    
     int numSamples = buffer.getNumSamples();
     
-    sProcess->renderNextBlock(channel, numSamples);
-    nProcess->processBlock(buffer.getNumSamples(), m.getChannel());
+    
+    // Process each layer.
+    // Could but nostalgic->keyOff/playNote here: (1) have synchronic->processBlock return 1 if pulse happened, otherwise 0. if nostalgic->mode == SynchronicSync and make sure layer corresponds
+    for (int i = 0; i < aNumLayers; i++)
+    {
+        sProcessor[i]->processBlock(numSamples, m.getChannel());
+        nProcessor[i]->processBlock(numSamples, m.getChannel());
+    }
+    
     
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
-        int noteIndex = m.getNoteNumber()-9;
+        int noteNumber = m.getNoteNumber();
+        float velocity = m.getFloatVelocity();
         channel = m.getChannel();
         
         if (m.isNoteOn())
         {
             
-            sProcess->notePlayed(noteIndex, m.getVelocity());
-            nProcess->noteLengthTimerOn(m.getNoteNumber(), m.getFloatVelocity());
+            // Send key on to each layer.
+            for (int i = 0; i < aNumLayers; i++)
+            {
+                sProcessor[i]->keyOn(noteNumber - 9, velocity);
+                nProcessor[i]->keyOn(noteNumber, velocity);
+            }
+            
+            
             
             mainPianoSynth.keyOn(
-                                 m.getChannel(),
-                                 m.getNoteNumber(),
-                                 m.getFloatVelocity() * aGlobalGain,
+                                 channel,
+                                 noteNumber,
+                                 velocity * aGlobalGain,
                                  tuningOffsets,
                                  tuningBasePitch,
                                  Forward,
@@ -231,20 +142,38 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
         else if (m.isNoteOff())
         {
             
+#if NOST_KEY_OFF
             //need to integrate sProcess layer number here as well, just defaulting for the moment
-            nProcess->playNote(m.getNoteNumber(), m.getChannel(), sProcess->getTimeToNext(), sProcess->getBeatLength());
-            
+            for (int i = 0; i < aNumLayers; i++)
+            {
+                //int phasor = sProcessor[i]->getCurrentPhasor();
+                //int timeToNext = sProcessor[i]->getCurrentNumSamplesBeat() - phasor * 1000;
+                /*
+                nProcessor[i]->keyOff(
+                                                   noteNumber,
+                                                   channel,
+                                                   sProcessor[i]->getTimeToNext(), // [i] should really be [target]
+                                                   sProcessor[i]->getBeatLength());
+                */
+                
+                nProcessor[i]->keyOff(
+                                                   noteNumber,
+                                                   channel,
+                                                   0,
+                                                   0);
+            }
+#endif
             mainPianoSynth.keyOff(
-                                  m.getChannel(),
-                                  m.getNoteNumber(),
-                                  m.getFloatVelocity(),
+                                  channel,
+                                  noteNumber,
+                                  velocity,
                                   true
                                   );
             
             hammerReleaseSynth.keyOn(
-                                     m.getChannel(),
-                                     m.getNoteNumber(),
-                                     m.getFloatVelocity() * 0.0025 * aGlobalGain, //will want hammerGain multipler that user can set
+                                     channel,
+                                     noteNumber,
+                                     velocity * 0.0025 * aGlobalGain, //will want hammerGain multipler that user can set
                                      tuningOffsets,
                                      tuningBasePitch,
                                      Forward,
@@ -256,9 +185,9 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
                                      4 );
             
             resonanceReleaseSynth.keyOn(
-                                        m.getChannel(),
-                                        m.getNoteNumber(),
-                                        m.getFloatVelocity() * aGlobalGain, //will also want multiplier for resonance gain...
+                                        channel,
+                                        noteNumber,
+                                        velocity * aGlobalGain, //will also want multiplier for resonance gain...
                                         tuningOffsets,
                                         tuningBasePitch,
                                         Forward,
@@ -282,39 +211,68 @@ void MrmAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mid
     
     midiMessages.swapWith (processedMidi);
 
-    
-    mainPianoSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
-#if USE_SECOND_SYNTH
-    secondPianoSynth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
-#endif
-    
-    hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
-    resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0,buffer.getNumSamples());
+    mainPianoSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
+    hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
+    resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
 
 }
 
+void BKAudioProcessor::releaseResources() {
+    
+    // When playback stops, you can use this as an opportunity to free up any
+    // spare memory, etc.
+    //fileBuffer.setSize (0, 0);
+    
+}
+
+#ifndef JucePlugin_PreferredChannelConfigurations
+bool BKAudioProcessor::setPreferredBusArrangement (bool isInput, int bus, const AudioChannelSet& preferredSet) {
+    
+    // Reject any bus arrangements that are not compatible with your plugin
+    
+    const int numChannels = preferredSet.size();
+    
+#if JucePlugin_IsMidiEffect
+    if (numChannels != 0)
+        return false;
+#elif JucePlugin_IsSynth
+    if (isInput || (numChannels != 1 && numChannels != 2))
+        return false;
+#else
+    if (numChannels != 1 && numChannels != 2)
+        return false;
+    
+    if (! AudioProcessor::setPreferredBusArrangement (! isInput, bus, preferredSet))
+        return false;
+#endif
+    
+    return AudioProcessor::setPreferredBusArrangement (isInput, bus, preferredSet);
+}
+#endif
+
+
 
 //==============================================================================
-void MrmAudioProcessor::changeListenerCallback(ChangeBroadcaster *source)
+void BKAudioProcessor::changeListenerCallback(ChangeBroadcaster *source)
 {
     
 }
 
 //==============================================================================
-bool MrmAudioProcessor::hasEditor() const
+bool BKAudioProcessor::hasEditor() const
 {
     
     return true; // (change this to false if you choose to not supply an editor)
 }
 
-AudioProcessorEditor* MrmAudioProcessor::createEditor()
+AudioProcessorEditor* BKAudioProcessor::createEditor()
 {
     
-    return new MrmAudioProcessorEditor (*this);
+    return new BKAudioProcessorEditor (*this);
 }
 
 //==============================================================================
-void MrmAudioProcessor::getStateInformation (MemoryBlock& destData)
+void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
     
     // You should use this method to store your parameters in the memory block.
@@ -322,7 +280,7 @@ void MrmAudioProcessor::getStateInformation (MemoryBlock& destData)
     // as intermediaries to make it easy to save and load complex data.
 }
 
-void MrmAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     
     // You should use this method to restore your parameters from this memory block,
@@ -330,21 +288,74 @@ void MrmAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 }
 
 //==============================================================================
+const String BKAudioProcessor::getName() const {
+    
+    return JucePlugin_Name;
+}
+
+bool BKAudioProcessor::acceptsMidi() const {
+    
+#if JucePlugin_WantsMidiInput
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool BKAudioProcessor::producesMidi() const {
+    
+#if JucePlugin_ProducesMidiOutput
+    return true;
+#else
+    return false;
+#endif
+}
+
+double BKAudioProcessor::getTailLengthSeconds() const {
+    
+    return 0.0;
+}
+
+int BKAudioProcessor::getNumPrograms() {
+    
+    return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
+    // so this should be at least 1, even if you're not really implementing programs.
+}
+
+int BKAudioProcessor::getCurrentProgram() {
+    
+    return 0;
+}
+
+void BKAudioProcessor::setCurrentProgram (int index) {
+    
+}
+
+const String BKAudioProcessor::getProgramName (int index) {
+    
+    return String("bitKlavier");
+}
+
+void BKAudioProcessor::changeProgramName (int index, const String& newName) {
+    
+}
+
+//==============================================================================
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     
-    return new MrmAudioProcessor();
+    return new BKAudioProcessor();
 }
 
-void MrmAudioProcessor::loadMainPianoSamples(BKSynthesiser *synth, int numLayers)
+void BKAudioProcessor::loadMainPianoSamples(BKSynthesiser *synth, int numLayers)
 {
     WavAudioFormat wavFormat;
     
     String path = "~/samples/";
     
-    // 88 voices seems to go over just fine...
-    for (int i = 0; i < 88; i++)
+    // 88 or more seems to work well
+    for (int i = 0; i < 100; i++)
     {
         mainPianoSynth.addVoice(new BKPianoSamplerVoice());
     }
@@ -472,7 +483,7 @@ void MrmAudioProcessor::loadMainPianoSamples(BKSynthesiser *synth, int numLayers
     }
 }
 
-void MrmAudioProcessor::loadResonanceRelaseSamples(BKSynthesiser *synth)
+void BKAudioProcessor::loadResonanceRelaseSamples(BKSynthesiser *synth)
 {
     WavAudioFormat wavFormat;
     
@@ -575,7 +586,7 @@ void MrmAudioProcessor::loadResonanceRelaseSamples(BKSynthesiser *synth)
     }
 }
 
-void MrmAudioProcessor::loadHammerReleaseSamples(BKSynthesiser *synth)
+void BKAudioProcessor::loadHammerReleaseSamples(BKSynthesiser *synth)
 {
     WavAudioFormat wavFormat;
     

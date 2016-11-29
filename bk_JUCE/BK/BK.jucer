@@ -30,7 +30,6 @@
               file="Source/ReferenceCountedBuffer.h"/>
       </GROUP>
       <GROUP id="{E01F59AF-FEAD-7AEA-32C2-F665B05A05F1}" name="Model">
-        <FILE id="QTcAuL" name="BKState.h" compile="0" resource="0" file="Source/BKState.h"/>
         <FILE id="GHmNVp" name="PluginProcessor.cpp" compile="1" resource="0"
               file="Source/PluginProcessor.cpp"/>
         <FILE id="oVHIQ3" name="PluginProcessor.h" compile="0" resource="0"

@@ -15,20 +15,19 @@
 
 #include "BKTextField.h"
 
-#define USE_SECOND_SYNTH 0
 #define USE_SYNCHRONIC_TWO 0
 
 //==============================================================================
 /**
 */
-class MrmAudioProcessor  : public AudioProcessor,
+class BKAudioProcessor  : public AudioProcessor,
                            public ChangeListener
 {
     
 public:
     //==============================================================================
-    MrmAudioProcessor();
-    ~MrmAudioProcessor();
+    BKAudioProcessor();
+    ~BKAudioProcessor();
     
     
     int numSynchronicLayers;
@@ -37,29 +36,25 @@ public:
     int numNostalgicLayers;
     int currentNostalgicLayer;
 
-    // Public instance varables.
-    // MidiInput midiInput;
+    // Sample loading.
     AudioFormatManager formatManager;
-    
     ScopedPointer<AudioFormatReader> sampleReader;
     ScopedPointer<AudioSampleBuffer> sampleBuffer;
     
+    // Synthesisers.
     BKSynthesiser mainPianoSynth;
-#if USE_SECOND_SYNTH
-    BKSynthesiser secondPianoSynth;
-#endif
-    
-    SynchronicPreparation::Ptr sPrep;
-    ScopedPointer<SynchronicProcessor> sProcess;
-    
-    NostalgicPreparation::Ptr nPrep;
-    ScopedPointer<NostalgicProcessor> nProcess;
-    
     BKSynthesiser hammerReleaseSynth;
     BKSynthesiser resonanceReleaseSynth;
+
+    // Preparations.
+    SynchronicPreparation::Ptr currentSynchronicPreparation;
+    NostalgicPreparation::Ptr currentNostalgicPreparation;
     
-    OwnedArray<SynchronicProcessor, CriticalSection> synchronic;
-    OwnedArray<NostalgicProcessor, CriticalSection> nostalgic;
+    OwnedArray<SynchronicProcessor, CriticalSection>    sProcessor;
+    OwnedArray<NostalgicProcessor, CriticalSection>     nProcessor;
+    
+    Array<SynchronicPreparation::Ptr, CriticalSection> sPreparation;
+    Array<NostalgicPreparation::Ptr, CriticalSection> nPreparation;
     
     int channel;
     
@@ -107,7 +102,7 @@ private:
     void loadHammerReleaseSamples(BKSynthesiser *synth);
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MrmAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)
 };
 
 
