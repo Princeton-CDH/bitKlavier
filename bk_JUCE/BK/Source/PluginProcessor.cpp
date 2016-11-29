@@ -4,7 +4,7 @@
 
 #include "BKPianoSampler.h"
 
-#define NOST_KEY_OFF 0
+#define NOST_KEY_OFF 1
 
 String notes[4] = {"A","C","D#","F#"};
 
