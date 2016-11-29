@@ -22,84 +22,10 @@ SynchronicViewController::SynchronicViewController(BKAudioProcessor& p)
     
     SynchronicPreparation::Ptr layer = processor.sPreparation[currentSynchronicLayer];
     
-    // Text Fields
-    addAndMakeVisible(sKeymapTF);
-    sKeymapTF.addListener(this);
-    sKeymapTF.setName("SynchronicKeymap");
-    //sKeymapTF.setText( intArrayToString( processor.sKeymap));
-    
-    
-    addAndMakeVisible(sNumLayersTF);
-    sNumLayersTF.addListener(this);
-    sNumLayersTF.setName("NumSynchronicLayers");
-    sNumLayersTF.setText( String( processor.numSynchronicLayers));
-    
-    addAndMakeVisible(sCurrentLayerTF);
-    sCurrentLayerTF.addListener(this);
-    sCurrentLayerTF.setName("CurrentSynchronicLayer");
-    sCurrentLayerTF.setText( String( currentSynchronicLayer));
-    
-    addAndMakeVisible(sTempoTF);
-    sTempoTF.addListener(this);
-    sTempoTF.setName( cSynchronicParameterTypes[SynchronicTempo]);
-    sTempoTF.setText( String( layer->getTempo()));
-    
-    addAndMakeVisible(sNumPulsesTF);
-    sNumPulsesTF.addListener(this);
-    sNumPulsesTF.setName(cSynchronicParameterTypes[SynchronicNumPulses]);
-    sNumPulsesTF.setText( String( layer->getNumPulses()));
-    
-    addAndMakeVisible(sClusterMinTF);
-    sClusterMinTF.addListener(this);
-    sClusterMinTF.setName(cSynchronicParameterTypes[SynchronicClusterMin]);
-    sClusterMinTF.setText( String( layer->getClusterMin()));
-    
-    addAndMakeVisible(sClusterMaxTF);
-    sClusterMaxTF.addListener(this);
-    sClusterMaxTF.setName(cSynchronicParameterTypes[SynchronicClusterMax]);
-    sClusterMaxTF.setText( String( layer->getClusterMax()));
-    
-    addAndMakeVisible(sClusterThreshTF);
-    sClusterThreshTF.addListener(this);
-    sClusterThreshTF.setName(cSynchronicParameterTypes[SynchronicClusterThresh]);
-    sClusterThreshTF.setText( String( layer->getClusterThresh()));
-    
-    addAndMakeVisible(sModeTF);
-    sModeTF.addListener(this);
-    sModeTF.setName(cSynchronicParameterTypes[SynchronicMode]);
-    sModeTF.setText( String( layer->getMode()));
-    
-    addAndMakeVisible(sBeatsToSkipTF);
-    sBeatsToSkipTF.addListener(this);
-    sBeatsToSkipTF.setName(cSynchronicParameterTypes[SynchronicBeatsToSkip]);
-    sBeatsToSkipTF.setText( String( layer->getBeatsToSkip()));
-    
-    addAndMakeVisible(sBeatMultipliersTF);
-    sBeatMultipliersTF.addListener(this);
-    sBeatMultipliersTF.setName(cSynchronicParameterTypes[SynchronicBeatMultipliers]);
-    sBeatMultipliersTF.setText( floatArrayToString( layer->getBeatMultipliers()));
-    
-    addAndMakeVisible(sLengthMultipliersTF);
-    sLengthMultipliersTF.addListener(this);
-    sLengthMultipliersTF.setName(cSynchronicParameterTypes[SynchronicLengthMultipliers]);
-    sLengthMultipliersTF.setText( floatArrayToString( layer->getLengthMultipliers()));
-    
-    addAndMakeVisible(sAccentMultipliersTF);
-    sAccentMultipliersTF.addListener(this);
-    sAccentMultipliersTF.setName(cSynchronicParameterTypes[SynchronicAccentMultipliers]);
-    sAccentMultipliersTF.setText( floatArrayToString( layer->getAccentMultipliers()));
-    
-    addAndMakeVisible(sTuningOffsetsTF);
-    sTuningOffsetsTF.addListener(this);
-    sTuningOffsetsTF.setName(cSynchronicParameterTypes[SynchronicTuningOffsets]);
-    sTuningOffsetsTF.setText( floatArrayToString( layer->getTuningOffsets()));
-    
-    addAndMakeVisible(sBasePitchTF);
-    sBasePitchTF.addListener(this);
-    sBasePitchTF.setName(cSynchronicParameterTypes[SynchronicBasePitch]);
-    sBasePitchTF.setText( String( layer->getBasePitch()));
-    
-    // Labels
+     // Labels
+    synchronicL = OwnedArray<BKLabel>();
+    synchronicL.ensureStorageAllocated(cSynchronicParameterTypes.size());
+
     addAndMakeVisible(sKeymapL);
     sKeymapL.setName("SynchronicKeymap");
     sKeymapL.setText("SynchronicKeymap", NotificationType::dontSendNotification);
@@ -114,65 +40,44 @@ SynchronicViewController::SynchronicViewController(BKAudioProcessor& p)
     sCurrentLayerL.setName("CurrentSynchronicLayer");
     sCurrentLayerL.setText("CurrentSynchronicLayer", NotificationType::dontSendNotification);
     
-    
-    addAndMakeVisible(sTempoL);
-    sTempoL.setName(cSynchronicParameterTypes[SynchronicTempo]);
-    sTempoL.setText(cSynchronicParameterTypes[SynchronicTempo], NotificationType::dontSendNotification);
-    
-    
-    addAndMakeVisible(sNumPulsesL);
-    sNumPulsesL.setName(cSynchronicParameterTypes[SynchronicNumPulses]);
-    sNumPulsesL.setText(cSynchronicParameterTypes[SynchronicNumPulses], NotificationType::dontSendNotification);
+    for (int i = 0; i < cSynchronicParameterTypes.size(); i++)
+    {
+        synchronicL.set(i, new BKLabel());
+        addAndMakeVisible(synchronicL[i]);
+        synchronicL[i]->setName(cSynchronicParameterTypes[i]);
+        synchronicL[i]->setText(cSynchronicParameterTypes[i], NotificationType::dontSendNotification);
+    }
     
     
-    addAndMakeVisible(sClusterMinL);
-    sClusterMinL.setName(cSynchronicParameterTypes[SynchronicClusterMin]);
-    sClusterMinL.setText(cSynchronicParameterTypes[SynchronicClusterMin], NotificationType::dontSendNotification);
     
-    addAndMakeVisible(sClusterMaxL);
-    sClusterMaxL.setName(cSynchronicParameterTypes[SynchronicClusterMax]);
-    sClusterMaxL.setText(cSynchronicParameterTypes[SynchronicClusterMax], NotificationType::dontSendNotification);
+    // Text Fields
+    synchronicTF = OwnedArray<BKTextField>();
+    synchronicTF.ensureStorageAllocated(cSynchronicParameterTypes.size());
     
     
-    addAndMakeVisible(sClusterThreshL);
-    sClusterThreshL.setName(cSynchronicParameterTypes[SynchronicClusterThresh]);
-    sClusterThreshL.setText(cSynchronicParameterTypes[SynchronicClusterThresh], NotificationType::dontSendNotification);
+    addAndMakeVisible(sNumLayersTF);
+    sNumLayersTF.addListener(this);
+    sNumLayersTF.setName("NumSynchronicLayers");
+    sNumLayersTF.setText( String( processor.numSynchronicLayers));
     
     
-    addAndMakeVisible(sModeL);
-    sModeL.setName(cSynchronicParameterTypes[SynchronicMode]);
-    sModeL.setText(cSynchronicParameterTypes[SynchronicMode], NotificationType::dontSendNotification);
+    addAndMakeVisible(sKeymapTF);
+    sKeymapTF.addListener(this);
+    sKeymapTF.setName("SynchronicKeymap");
     
+    addAndMakeVisible(sCurrentLayerTF);
+    sCurrentLayerTF.addListener(this);
+    sCurrentLayerTF.setName("CurrentSynchronicLayer");
     
-    addAndMakeVisible(sBeatsToSkipL);
-    sBeatsToSkipL.setName(cSynchronicParameterTypes[SynchronicBeatsToSkip]);
-    sBeatsToSkipL.setText(cSynchronicParameterTypes[SynchronicBeatsToSkip], NotificationType::dontSendNotification);
+    for (int i = 0; i < cSynchronicParameterTypes.size(); i++)
+    {
+        synchronicTF.set(i, new BKTextField());
+        addAndMakeVisible(synchronicTF[i]);
+        synchronicTF[i]->addListener(this);
+        synchronicTF[i]->setName(cSynchronicParameterTypes[i]);
+    }
     
-    
-    addAndMakeVisible(sBeatMultipliersL);
-    sBeatMultipliersL.setColour(TextEditor::backgroundColourId, Colours::lightgoldenrodyellow);
-    sBeatMultipliersL.setText(cSynchronicParameterTypes[SynchronicBeatMultipliers], NotificationType::dontSendNotification);
-    
-    
-    addAndMakeVisible(sLengthMultipliersL);
-    sLengthMultipliersL.setName(cSynchronicParameterTypes[SynchronicLengthMultipliers]);
-    sLengthMultipliersL.setText(cSynchronicParameterTypes[SynchronicLengthMultipliers], NotificationType::dontSendNotification);
-    
-    
-    addAndMakeVisible(sAccentMultipliersL);
-    sAccentMultipliersL.setName(cSynchronicParameterTypes[SynchronicAccentMultipliers]);
-    sAccentMultipliersL.setText(cSynchronicParameterTypes[SynchronicAccentMultipliers], NotificationType::dontSendNotification);
-    
-    
-    addAndMakeVisible(sTuningOffsetsL);
-    sTuningOffsetsL.setName(cSynchronicParameterTypes[SynchronicTuningOffsets]);
-    sTuningOffsetsL.setText(cSynchronicParameterTypes[SynchronicTuningOffsets], NotificationType::dontSendNotification);
-    
-    
-    addAndMakeVisible(sBasePitchL);
-    sBasePitchL.setName(cSynchronicParameterTypes[SynchronicBasePitch]);
-    sBasePitchL.setText(cSynchronicParameterTypes[SynchronicBasePitch], NotificationType::dontSendNotification);
-
+    updateFieldsForLayer(currentSynchronicLayer);
 }
 
 
@@ -182,7 +87,7 @@ SynchronicViewController::~SynchronicViewController()
     
 }
 
-void SynchronicViewController::switchToLayer(int numLayer)
+void SynchronicViewController::updateFieldsForLayer(int numLayer)
 {
     
     currentSynchronicLayer = numLayer;
@@ -194,29 +99,18 @@ void SynchronicViewController::switchToLayer(int numLayer)
     
     sCurrentLayerTF.setText( String( numLayer));
 
-    sTempoTF.setText( String( layer->getTempo()));
-    
-    sNumPulsesTF.setText( String( layer->getNumPulses()));
-
-    sClusterMinTF.setText( String( layer->getClusterMin()));
-
-    sClusterMaxTF.setText( String( layer->getClusterMax()));
-;
-    sClusterThreshTF.setText( String( layer->getClusterThresh()));
-
-    sModeTF.setText( String( layer->getMode()));
-
-    sBeatsToSkipTF.setText( String( layer->getBeatsToSkip()));
-    
-    sBeatMultipliersTF.setText( floatArrayToString( layer->getBeatMultipliers()));
-
-    sLengthMultipliersTF.setText( floatArrayToString( layer->getLengthMultipliers()));
-
-    sAccentMultipliersTF.setText( floatArrayToString( layer->getAccentMultipliers()));
-
-    sTuningOffsetsTF.setText( floatArrayToString( layer->getTuningOffsets()));
-    
-    sBasePitchTF.setText( String( layer->getBasePitch()));
+    synchronicTF[SynchronicTempo]->setText( String( layer->getTempo()));
+    synchronicTF[SynchronicNumPulses]->setText( String( layer->getNumPulses()));
+    synchronicTF[SynchronicClusterMin]->setText( String( layer->getClusterMin()));
+    synchronicTF[SynchronicClusterMax]->setText( String( layer->getClusterMax()));
+    synchronicTF[SynchronicClusterThresh]->setText( String( layer->getClusterThresh()));
+    synchronicTF[SynchronicMode]->setText( String( layer->getMode()));
+    synchronicTF[SynchronicBeatsToSkip]->setText( String( layer->getBeatsToSkip()));
+    synchronicTF[SynchronicBeatMultipliers]->setText( floatArrayToString( layer->getBeatMultipliers()));
+    synchronicTF[SynchronicLengthMultipliers]->setText( floatArrayToString( layer->getLengthMultipliers()));
+    synchronicTF[SynchronicAccentMultipliers]->setText( floatArrayToString( layer->getAccentMultipliers()));
+    synchronicTF[SynchronicTuningOffsets]->setText( floatArrayToString( layer->getTuningOffsets()));
+    synchronicTF[SynchronicBasePitch]->setText( String( layer->getBasePitch()));
 }
 
 void SynchronicViewController::textFieldDidChange(TextEditor& tf)
@@ -291,11 +185,11 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
     }
     else if (name == "NumSynchronicLayers")
     {
-        //processor.numSynchronicLayers = i;
+        processor.numSynchronicLayers = i;
     }
     else if (name == "CurrentSynchronicLayer")
     {
-        switchToLayer(i);
+        updateFieldsForLayer(i);
     }
     else if (name == "SynchronicKeymap")
     {
@@ -369,41 +263,11 @@ void SynchronicViewController::resized()
     sKeymapL.setTopLeftPosition(0,
                                       gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
-    sTempoL.setTopLeftPosition(0,
-                               gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sNumPulsesL.setTopLeftPosition(0,
-                                   gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sClusterMinL.setTopLeftPosition(0,
-                                    gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sClusterMaxL.setTopLeftPosition(0,
-                                    gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sClusterThreshL.setTopLeftPosition(0,
-                                       gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sModeL.setTopLeftPosition(0,
-                              gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sBeatsToSkipL.setTopLeftPosition(0,
-                                     gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sBeatMultipliersL.setTopLeftPosition(0,
-                                         gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sLengthMultipliersL.setTopLeftPosition(0,
-                                           gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sAccentMultipliersL.setTopLeftPosition(0,
-                                           gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sTuningOffsetsL.setTopLeftPosition(0,
-                                       gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sBasePitchL.setTopLeftPosition(0,
-                          gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+    for (int n = 0; n < cSynchronicParameterTypes.size(); n++)
+    {
+        synchronicL[n]->setTopLeftPosition(0,
+                                   gSynchronicTF_TopOffset + (n+3) * (gSynchronicL_Height + gSynchronic_YSpacing));
+    }
     
     // Text fields
     int tfX = gSynchronicL_Width + gSynchronic_XSpacing;
@@ -417,41 +281,12 @@ void SynchronicViewController::resized()
     sKeymapTF.setTopLeftPosition(tfX,
                                        gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
-    sTempoTF.setTopLeftPosition(tfX,
-                                gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
     
-    sNumPulsesTF.setTopLeftPosition(tfX,
-                                    gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sClusterMinTF.setTopLeftPosition(tfX,
-                                     gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sClusterMaxTF.setTopLeftPosition(tfX,
-                                     gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sClusterThreshTF.setTopLeftPosition(tfX,
-                                        gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sModeTF.setTopLeftPosition(tfX,
-                               gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sBeatsToSkipTF.setTopLeftPosition(tfX,
-                                       gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sBeatMultipliersTF.setTopLeftPosition(tfX,
-                                           gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sLengthMultipliersTF.setTopLeftPosition(tfX,
-                                            gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sAccentMultipliersTF.setTopLeftPosition(tfX,
-                                            gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sTuningOffsetsTF.setTopLeftPosition(tfX,
-                                        gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sBasePitchTF.setTopLeftPosition(tfX,
-                           gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
+    for (int n = 0; n < cSynchronicParameterTypes.size(); n++)
+    {
+        synchronicTF[n]->setTopLeftPosition(tfX,
+                                    gSynchronicTF_TopOffset + (n+3) * (gSynchronicL_Height + gSynchronic_YSpacing));
+    }
 
 }
 

@@ -35,15 +35,9 @@ SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s, SynchronicPreparation
     {
         keymap.set(i,0);
     }
-    
-    tempoPeriod = (60.0/preparation->getTempo()) * 1000.0;
-    
-    clusterThreshold = tempoPeriod * preparation->getClusterThresh();
-    clusterThresholdSamples = (clusterThreshold * sampleRate * 0.001);
-    
-    pulseThreshold = tempoPeriod;
-    pulseThresholdSamples = (60.0/preparation->getTempo()) * sampleRate;
 }
+
+
 
 SynchronicProcessor::~SynchronicProcessor()
 {
@@ -73,7 +67,7 @@ void SynchronicProcessor::playNote(int channel, int note)
                  preparation->getBasePitch(),
                  noteDirection,
                  FixedLengthFixedStart,
-                 BKNoteTypeNil,
+                 Synchronic,
                  noteStartPos, // start
                  noteLength,
                  0,
@@ -143,6 +137,10 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
     
     int clusterSize = cluster.size();
     
+    clusterThresholdSamples = (preparation->getClusterThresh() * sampleRate);
+    
+    pulseThresholdSamples = (preparation->getPulseThresh() * sampleRate);
+    
     if (inCluster)
     {
         if (clusterThresholdTimer >= clusterThresholdSamples)
@@ -183,7 +181,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
     
     if (inPulses)
     {
-        numSamplesBeat = (preparation->getBeatMultipliers()[beat] * sampleRate * (60.0/preparation->getTempo()));
+        numSamplesBeat = (preparation->getBeatMultipliers()[beat] * pulseThresholdSamples);
         
         
         if (phasor >= numSamplesBeat)

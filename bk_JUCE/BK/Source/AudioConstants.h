@@ -86,7 +86,7 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
 };
 
 
-static const int aNumLayers = 5;
+static const int aMaxNumLayers = 50;
 static const float aGlobalGain = 0.5; //make this user settable
 
 static const SynchronicSyncMode aSynchronicSyncMode = LastNoteSync;

@@ -16,14 +16,13 @@
 class BKTextFieldLAF : public LookAndFeel_V3
 {
 public:
+    
     BKTextFieldLAF()
     {
-        setColour(TextEditor::backgroundColourId,   Colours::lightgoldenrodyellow);
+        setColour(TextEditor::backgroundColourId,   Colours::goldenrod);
         setColour(TextEditor::textColourId,         Colours::black);
         
     }
 };
-
-
 
 #endif  // BKLOOKANDFEEL_H_INCLUDED

@@ -310,8 +310,10 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                         
                         if (voice->getCurrentlyPlayingNote() == midiNoteNumber
                             && voice->isPlayingChannel (midiChannel)
-                            && voice->bktype != Nostalgic) //doesn't it make sense to handle the Synchronic voices this way as well?
+                            && voice->bktype != Nostalgic)
+                        {
                             stopVoice (voice, 1.0f, true);
+                        }
                     }
                 }
                 float midiNoteNumberOffset = aJustTuning[(midiNoteNumber - midiNoteTuningBase) % 12];

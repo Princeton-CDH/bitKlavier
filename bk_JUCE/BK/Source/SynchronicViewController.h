@@ -51,6 +51,9 @@ public:
     Array<int> sKeymap;
     int sBasePitch; // float?
     
+    OwnedArray<BKLabel> synchronicL;
+    OwnedArray<BKTextField> synchronicTF;
+    
     // Text Fields
     BKTextField sNumLayersTF;
     BKTextField sCurrentLayerTF;
@@ -95,7 +98,7 @@ private:
     BKAudioProcessor& processor;
     int currentSynchronicLayer;
     
-    void switchToLayer(int numLayer);
+    void updateFieldsForLayer(int numLayer);
     // TextEditor input parsing
     void textFieldDidChange(TextEditor&);
     

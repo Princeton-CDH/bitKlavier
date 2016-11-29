@@ -11,20 +11,18 @@ String notes[4] = {"A","C","D#","F#"};
 //==============================================================================
 BKAudioProcessor::BKAudioProcessor() {
     
-    numSynchronicLayers = aNumLayers;
+    numSynchronicLayers = 1;
     
-    numNostalgicLayers = aNumLayers;
+    numNostalgicLayers = 1;
 
     sProcessor = OwnedArray<SynchronicProcessor, CriticalSection>();
-    sProcessor.ensureStorageAllocated(numSynchronicLayers);
+    sProcessor.ensureStorageAllocated(aMaxNumLayers);
     
     nProcessor = OwnedArray<NostalgicProcessor, CriticalSection>();
-    nProcessor.ensureStorageAllocated(numNostalgicLayers);
+    nProcessor.ensureStorageAllocated(aMaxNumLayers);
     
     sPreparation = Array<SynchronicPreparation::Ptr, CriticalSection>();
-    
     nPreparation = Array<NostalgicPreparation::Ptr, CriticalSection>();
-    
     
     
     // For testing and developing, let's keep directory of samples in home folder on disk.
@@ -52,13 +50,15 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
     
     
     
-    for (int i = 0; i < aNumLayers; i++)
+    for (int i = 0; i < numSynchronicLayers; i++)
     {
         SynchronicPreparation::Ptr sPrep = new SynchronicPreparation();
         sPreparation.insert(i, sPrep);
         sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, sPrep));
-        
-        
+    }
+    
+    for (int i = 0; i < numNostalgicLayers; i++)
+    {
         NostalgicPreparation::Ptr nPrep = new NostalgicPreparation();
         nPreparation.insert(i, nPrep);
         nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, nPrep));
@@ -96,32 +96,40 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     int numSamples = buffer.getNumSamples();
     
     
+    
+    
     // Process each layer.
     // Could but nostalgic->keyOff/playNote here: (1) have synchronic->processBlock return 1 if pulse happened, otherwise 0. if nostalgic->mode == SynchronicSync and make sure layer corresponds
-    for (int i = 0; i < aNumLayers; i++)
+    for (int layer = 0; layer < numSynchronicLayers; layer++)
     {
-        sProcessor[i]->processBlock(numSamples, m.getChannel());
-        nProcessor[i]->processBlock(numSamples, m.getChannel());
+        sProcessor[layer]->processBlock(numSamples, m.getChannel());
     }
     
+    for (int layer = 0; layer < numNostalgicLayers; layer++)
+    {
+        nProcessor[layer]->processBlock(numSamples, m.getChannel());
+    }
     
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
         int noteNumber = m.getNoteNumber();
         float velocity = m.getFloatVelocity();
+        
         channel = m.getChannel();
         
         if (m.isNoteOn())
         {
             
             // Send key on to each layer.
-            for (int i = 0; i < aNumLayers; i++)
+            for (int layer = 0; layer < numSynchronicLayers; layer++)
             {
-                sProcessor[i]->keyOn(noteNumber - 9, velocity);
-                nProcessor[i]->keyOn(noteNumber, velocity);
+                sProcessor[layer]->keyOn(noteNumber - 9, velocity);
             }
             
-            
+            for (int layer = 0; layer < numNostalgicLayers; layer++)
+            {
+                nProcessor[layer]->keyOn(noteNumber, velocity);
+            }
             
             mainPianoSynth.keyOn(
                                  channel,
@@ -142,18 +150,14 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         else if (m.isNoteOff())
         {
             
-#if NOST_KEY_OFF
             //need to integrate sProcess layer number here as well, just defaulting for the moment
-            for (int i = 0; i < aNumLayers; i++)
+            for (int i = 0; i < numNostalgicLayers; i++)
             {
-                //int phasor = sProcessor[i]->getCurrentPhasor();
-                //int timeToNext = sProcessor[i]->getCurrentNumSamplesBeat() - phasor * 1000;
-                
                 nProcessor[i]->keyOff(
                                                    noteNumber,
                                                    channel,
                                                    sProcessor[i]->getTimeToNext(), // [i] should really be [target]
-                                                   sProcessor[i]->getBeatLength());
+                                                   sProcessor[i]->getBeatLength()); // should be in preparation/processor 
                 
             /*
                 nProcessor[i]->keyOff(
@@ -163,7 +167,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
                                                    0);
              */
             }
-#endif
+            
             mainPianoSynth.keyOff(
                                   channel,
                                   noteNumber,
