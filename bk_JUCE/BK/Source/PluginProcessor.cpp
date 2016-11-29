@@ -148,19 +148,20 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             {
                 //int phasor = sProcessor[i]->getCurrentPhasor();
                 //int timeToNext = sProcessor[i]->getCurrentNumSamplesBeat() - phasor * 1000;
-                /*
+                
                 nProcessor[i]->keyOff(
                                                    noteNumber,
                                                    channel,
                                                    sProcessor[i]->getTimeToNext(), // [i] should really be [target]
                                                    sProcessor[i]->getBeatLength());
-                */
                 
+            /*
                 nProcessor[i]->keyOff(
                                                    noteNumber,
                                                    channel,
                                                    0,
                                                    0);
+             */
             }
 #endif
             mainPianoSynth.keyOff(
