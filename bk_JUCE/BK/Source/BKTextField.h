@@ -13,17 +13,18 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
+#include "BKLookAndFeel.h"
+
 //==============================================================================
-/*
-*/
+
 class BKTextField    : public TextEditor, public TextEditor::Listener
 {
 public:
     BKTextField()
     {
-        setSize(300,20);
-        setColour(TextEditor::backgroundColourId, Colours::lightgoldenrodyellow);
-        setColour(TextEditor::textColourId, Colours::black);
+        setLookAndFeel(&laf);
+        setSize(300,20);        
+        
 #if TEXT_CHANGE_INTERNAL
         addListener(this);
 #endif
@@ -95,6 +96,7 @@ public:
 #endif
     
 private:
+    BKTextFieldLAF laf;
 #if TEXT_CHANGE_INTERNAL
     bool shouldChange;
 #endif
