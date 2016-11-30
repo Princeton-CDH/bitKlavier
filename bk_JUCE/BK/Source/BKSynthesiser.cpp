@@ -311,7 +311,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                         
                         if (voice->getCurrentlyPlayingNote() == midiNoteNumber
                             && voice->isPlayingChannel (midiChannel)
-                            && voice->bktype != Nostalgic)
+                            && voice->bktype != Nostalgic
+                            && voice->bktype != Synchronic)
                         {
                             stopVoice (voice, 1.0f, true);
                         }

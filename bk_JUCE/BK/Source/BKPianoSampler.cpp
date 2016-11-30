@@ -335,21 +335,8 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
                 
                 if (rampOnOffLevel <= 0.0f)
                 {
-                    // allow interruption of synchronic pulses here if receive synchronic note off.
-                    if (playType != Normal && playType != NormalFixedStart && bkType == Synchronic && numPulses < maxPulses)
-                    {
-                        numPulses++;
-                        
-                        isInRampOff = 0;
-                        isInRampOn = 1;
-                        sourceSamplePosition = noteStartingPosition;
-                        
-                    }
-                    else
-                    {
-                        stopNote (0.0f, false);
-                        break;
-                    }
+                    stopNote (0.0f, false);
+                    break;
                 }
             }
             

@@ -68,7 +68,7 @@ void SynchronicProcessor::playNote(int channel, int note)
                  preparation->getBasePitch(),
                  noteDirection,
                  FixedLengthFixedStart,
-                 BKNoteTypeNil,
+                 Synchronic,
                  noteStartPos, // start
                  noteLength,
                  3,
@@ -77,7 +77,7 @@ void SynchronicProcessor::playNote(int channel, int note)
 }
 
 
-void SynchronicProcessor::keyOn(int noteNumber, int velocity)
+void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
     //if (keymap[noteNumber])
     {
@@ -131,6 +131,11 @@ void SynchronicProcessor::keyOn(int noteNumber, int velocity)
             clusterThresholdTimer = 0;
         }
     }
+    
+}
+
+void SynchronicProcessor::keyReleased(int noteNumber)
+{
     
 }
 

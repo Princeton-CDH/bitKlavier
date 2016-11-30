@@ -9,7 +9,8 @@
 String notes[4] = {"A","C","D#","F#"};
 
 //==============================================================================
-BKAudioProcessor::BKAudioProcessor() {
+BKAudioProcessor::BKAudioProcessor()
+{
     
     numSynchronicLayers = 1;
     
@@ -118,12 +119,12 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             // Send key on to each layer.
             for (int layer = 0; layer < numSynchronicLayers; layer++)
             {
-                sProcessor[layer]->keyOn(noteNumber, velocity);
+                sProcessor[layer]->keyPressed(noteNumber, velocity);
             }
             
             for (int layer = 0; layer < numNostalgicLayers; layer++)
             {
-                nProcessor[layer]->keyOn(noteNumber, velocity);
+                nProcessor[layer]->keyPressed(noteNumber, velocity);
             }
             
             mainPianoSynth.keyOn(
@@ -149,12 +150,17 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             //need to integrate sProcess layer number here as well, just defaulting for the moment
             for (int i = 0; i < numNostalgicLayers; i++)
             {
-                nProcessor[i]->keyOff(
+                nProcessor[i]->keyReleased(
                                                    noteNumber,
                                                    channel,
                                                    sProcessor[i]->getTimeToNext(), // [i] should really be [target]
                                                    sProcessor[i]->getBeatLength()); // should be in preparation/processor 
                 
+            }
+            
+            for (int i = 0; i < numSynchronicLayers; i++)
+            {
+                sProcessor[i]->keyReleased(noteNumber);
             }
             
             mainPianoSynth.keyOff(

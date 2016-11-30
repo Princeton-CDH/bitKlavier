@@ -46,7 +46,7 @@ void NostalgicProcessor::playNote(int channel, int note)
 }
 
 //begin reverse note; called when key is released
-void NostalgicProcessor::keyOff(int midiNoteNumber, int midiChannel, int timeToNext, int beatLength)
+void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel, int timeToNext, int beatLength)
 {
     float duration = 0.0;
     
@@ -57,7 +57,14 @@ void NostalgicProcessor::keyOff(int midiNoteNumber, int midiChannel, int timeToN
     }
     else //SynchronicSync
     {
-        duration = timeToNext + preparation->getBeatsToSkip() * beatLength;
+        //duration = timeToNext + preparation->getBeatsToSkip() * beatLength;
+        uint32 phasor = syncProcessor[preparation->getSyncTarget()].getCurrentPhasor();
+        uint32 beatSamples = syncProcessor[preparation->getSyncTarget()].getCurrentNumSamplesBeat();
+        
+        //uint32 timeToNext = (beatSamples - phasor) * 1000.0 / sampleRate;
+        //uint32 beatLength = beatSamples * 1000.0 / sampleRate;
+        
+        duration =  ((beatSamples - phasor) + preparation->getBeatsToSkip() * beatSamples) * (1000.0/sampleRate);
     }
     
     //play nostalgic note
@@ -97,7 +104,7 @@ void NostalgicProcessor::keyOff(int midiNoteNumber, int midiChannel, int timeToN
 
 
 //start timer for length of a particular note; called when key is pressed
-void NostalgicProcessor::keyOn(int midiNoteNumber, float midiNoteVelocity)
+void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity)
 {
     activeNotes.addIfNotAlreadyThere(midiNoteNumber);
     noteLengthTimers.set(midiNoteNumber, 0);

@@ -13,6 +13,8 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
+#include "Synchronic.h"
+
 #include "AudioConstants.h"
 
 #include "BKSynthesiser.h"
@@ -130,9 +132,10 @@ private:
     JUCE_LEAK_DETECTOR(NostalgicPreparation);
 };
 
-class NostalgicProcessor
+class NostalgicProcessor : public ReferenceCountedObject
 {
 public:
+    typedef ReferenceCountedObjectPtr<NostalgicProcessor> Ptr;
 
     NostalgicProcessor(BKSynthesiser *s, NostalgicPreparation::Ptr prep);
     virtual ~NostalgicProcessor();
@@ -141,10 +144,10 @@ public:
     void processBlock(int numSamples, int midiChannel);
     
     //begin timing played note length, called with noteOn
-    void keyOn(int midiNoteNumber, float midiNoteVelocity);
+    void keyPressed(int midiNoteNumber, float midiNoteVelocity);
     
     //begin playing reverse note, called with noteOff
-    void keyOff(int midiNoteNumber, int midiChannel, int timeToNext, int beatLength);
+    void keyReleased(int midiNoteNumber, int midiChannel, int timeToNext, int beatLength);
     
 private:
     
@@ -162,6 +165,8 @@ private:
     //data and pointers
     BKSynthesiser *synth;
     NostalgicPreparation::Ptr preparation;
+    SynchronicProcessor::Ptr syncProcessor;
+    
     double sampleRate;
 
     Array<uint64> noteLengthTimers;        //store current length of played notes here

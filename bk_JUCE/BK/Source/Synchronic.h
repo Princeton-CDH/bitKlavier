@@ -168,16 +168,20 @@ private:
     JUCE_LEAK_DETECTOR(SynchronicPreparation);
 };
 
-class SynchronicProcessor
+class SynchronicProcessor: public ReferenceCountedObject
 {
     
 public:
+    typedef ReferenceCountedObjectPtr<SynchronicProcessor> Ptr;
+    
     SynchronicProcessor(BKSynthesiser *s, SynchronicPreparation::Ptr prep);
     ~SynchronicProcessor();
     
     void processBlock(int numSamples, int channel);
     
-    void keyOn(int noteNumber, int velocity);
+    void keyPressed(int noteNumber, float velocity);
+    
+    void keyReleased(int noteNumber);
     
     void addNoteToKeymap(int note)      {  keymap.set(note,1);  }
     
@@ -187,9 +191,6 @@ public:
     
     int getCurrentNumSamplesBeat()  const { return numSamplesBeat;  }
     int getCurrentPhasor()          const { return phasor;          }
-    
-    int getTimeToNext() const { return ((numSamplesBeat - phasor) * 1000.0)/sampleRate;    }; //returns time to next pulse, in ms
-    int getBeatLength() const { return (numSamplesBeat * 1000.0)/sampleRate;               };
     
 private:
     
