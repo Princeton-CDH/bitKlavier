@@ -18,9 +18,11 @@ BKAudioProcessorEditor::BKAudioProcessorEditor (BKAudioProcessor& p)
 :
     AudioProcessorEditor (&p),
     processor (p),
-    svc(p)
+    svc(p),
+    nvc(p)
 {
     addAndMakeVisible(svc);
+    addAndMakeVisible(nvc);
     
     setSize(gMainComponentWidth,
             gMainComponentHeight);
@@ -35,15 +37,21 @@ BKAudioProcessorEditor::~BKAudioProcessorEditor()
 //==============================================================================
 void BKAudioProcessorEditor::paint (Graphics& g)
 {
-    g.fillAll(gMainComponentColor);
+    g.fillAll(Colours::dimgrey);
     
 }
 
 void BKAudioProcessorEditor::resized()
 {
-    svc.setBounds(gSynchronic_LeftOffset,
-                  gSynchronic_TopOffset,
+    svc.setBounds(gComponentLeftOffset,
+                  gComponentTopOffset,
                   500,
                   500);
+    
+    nvc.setBounds(gComponentLeftOffset + 500 + 5,
+                  gComponentTopOffset,
+                  500,
+                  500);
+     
     
 }

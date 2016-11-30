@@ -35,6 +35,7 @@ public:
                           Array<float> beatMultipliers,
                           Array<float> accentMultipliers,
                           Array<float> lengthMultipliers,
+                          Array<float> transpOffsets,
                           Array<float> tuningOffsets,
                           int basePitch):
     sTempo(tempo),
@@ -47,32 +48,39 @@ public:
     sBeatMultipliers(beatMultipliers),
     sAccentMultipliers(accentMultipliers),
     sLengthMultipliers(lengthMultipliers),
+    sTranspOffsets(transpOffsets),
     sTuningOffsets(tuningOffsets),
-    sBasePitch(basePitch)
+    sBasePitch(basePitch),
+    sPulseThreshSec(60.0/sTempo),
+    sClusterThreshSec(sPulseThreshSec * sClusterThresh)
     {
-        
+        print();
     }
+
     
-    SynchronicPreparation()
+    SynchronicPreparation():
+    sTempo(120),
+    sNumPulses(0),
+    sClusterMin(1),
+    sClusterMax(100),
+    sClusterThresh(1.0),
+    sMode(FirstNoteSync),
+    sBeatsToSkip(0),
+    sBeatMultipliers(Array<float>({1.0})),
+    sAccentMultipliers(Array<float>({1.0})),
+    sLengthMultipliers(Array<float>({1.0})),
+    sTranspOffsets(Array<float>({0.0})),
+    sTuningOffsets(Array<float>(aEqualTuning, 12)),
+    sBasePitch(0),
+    sPulseThreshSec(60.0/sTempo),
+    sClusterThreshSec(sPulseThreshSec * sClusterThresh)
     {
-        setTempo(120);
-        setClusterThresh(1.0);
-        
-        sNumPulses = 0;
-        sClusterMin = 1;
-        sClusterMax = 100;
-        sMode = FirstNoteSync;
-        sBeatsToSkip = 0;
-        sAccentMultipliers = Array<float>({1.0});
-        sBeatMultipliers = Array<float>({1.0});
-        sLengthMultipliers = Array<float>({1.0});
-        sTuningOffsets = Array<float>(aEqualTuning);
-        sBasePitch = 0;
-        
+        print();
     }
     
     void print(void)
     {
+        DBG("| - - - Synchronic Preparation - - - |");
         DBG("sTempo: " + String(sTempo));
         DBG("sNumPulses: " + String(sNumPulses));
         DBG("sClusterMin: " + String(sClusterMin));
@@ -83,8 +91,12 @@ public:
         DBG("sBeatMultipliers: " + floatArrayToString(sBeatMultipliers));
         DBG("sLengthMultipliers: " + floatArrayToString(sLengthMultipliers));
         DBG("sAccentMultipliers: " + floatArrayToString(sAccentMultipliers));
+        DBG("sTranspOffsets: " + floatArrayToString(sTranspOffsets));
         DBG("sTuningOffsets: " + floatArrayToString(sTuningOffsets));
         DBG("sBasePitch: " + String(sBasePitch));
+        DBG("sPulseThreshSec: " + String(sPulseThreshSec));
+        DBG("sClusterThreshSec: " + String(sClusterThreshSec));
+        DBG("| - - - - - - - - -- - - - - - - - - |");
     }
     
     const float getTempo() const noexcept                       {return sTempo;                 }
@@ -100,6 +112,7 @@ public:
     const Array<float> getAccentMultipliers() const noexcept    {return sAccentMultipliers;     }
     const Array<float> getLengthMultipliers() const noexcept    {return sLengthMultipliers;     }
     const Array<float> getTuningOffsets() const noexcept        {return sTuningOffsets;         }
+    const Array<float> getTranspOffsets() const noexcept        {return sTranspOffsets;         }
     const int getBasePitch() const noexcept                     {return sBasePitch;             }
     
     
@@ -127,6 +140,7 @@ public:
     void setBeatsToSkip(int beatsToSkip)                        {sBeatsToSkip = beatsToSkip;                        }
     void setBeatMultipliers(Array<float> beatMultipliers)       {sBeatMultipliers.swapWith(beatMultipliers);        }
     void setAccentMultipliers(Array<float> accentMultipliers)   {sAccentMultipliers.swapWith(accentMultipliers);    }
+    void setTranspOffsets(Array<float> transpOffsets)           {sTranspOffsets.swapWith(transpOffsets);    }
     void setLengthMultipliers(Array<float> lengthMultipliers)   {sLengthMultipliers.swapWith(lengthMultipliers);    }
     void setTuningOffsets(Array<float> tuningOffsets)           {sTuningOffsets = tuningOffsets;                    }
     void setBasePitch(int basePitch)                            {sBasePitch = basePitch;                            }
@@ -140,11 +154,13 @@ private:
     Array<float> sBeatMultipliers;
     Array<float> sAccentMultipliers;
     Array<float> sLengthMultipliers;
+    Array<float> sTranspOffsets;
     Array<float> sTuningOffsets;
     int sBasePitch; // float?
     
-    float sClusterThreshSec;
     float sPulseThreshSec;
+    float sClusterThreshSec;
+    
     
     
     
@@ -183,10 +199,11 @@ private:
     Array<int> keymap;
     
     int pulse;
+    
     int beat;
     int accent;
     int length;
-    int clusterSize;
+    int transp;
     
     void playNote(int channel, int note);
     

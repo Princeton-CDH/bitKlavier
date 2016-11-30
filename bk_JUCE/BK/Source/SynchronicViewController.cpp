@@ -7,8 +7,6 @@
 
   ==============================================================================
 */
-
-#include "../JuceLibraryCode/JuceHeader.h"
 #include "SynchronicViewController.h"
 
 #include "BKUtilities.h"
@@ -77,7 +75,7 @@ SynchronicViewController::SynchronicViewController(BKAudioProcessor& p)
         synchronicTF[i]->setName(cSynchronicParameterTypes[i]);
     }
     
-    updateFieldsForLayer(currentSynchronicLayer);
+    updateFieldsToLayer(currentSynchronicLayer);
 }
 
 
@@ -87,30 +85,46 @@ SynchronicViewController::~SynchronicViewController()
     
 }
 
-void SynchronicViewController::updateFieldsForLayer(int numLayer)
+void SynchronicViewController::paint (Graphics& g)
 {
-    
-    currentSynchronicLayer = numLayer;
-    
-    SynchronicPreparation::Ptr layer = processor.sPreparation[numLayer];
-    
-    // Set text.
-    //sKeymapTF.setText( intArrayToString( processor.sKeymap));
-    
-    sCurrentLayerTF.setText( String( numLayer));
+    g.setColour(Colours::goldenrod);
+    g.drawRect(getLocalBounds(), 1);
+}
 
-    synchronicTF[SynchronicTempo]->setText( String( layer->getTempo()));
-    synchronicTF[SynchronicNumPulses]->setText( String( layer->getNumPulses()));
-    synchronicTF[SynchronicClusterMin]->setText( String( layer->getClusterMin()));
-    synchronicTF[SynchronicClusterMax]->setText( String( layer->getClusterMax()));
-    synchronicTF[SynchronicClusterThresh]->setText( String( layer->getClusterThresh()));
-    synchronicTF[SynchronicMode]->setText( String( layer->getMode()));
-    synchronicTF[SynchronicBeatsToSkip]->setText( String( layer->getBeatsToSkip()));
-    synchronicTF[SynchronicBeatMultipliers]->setText( floatArrayToString( layer->getBeatMultipliers()));
-    synchronicTF[SynchronicLengthMultipliers]->setText( floatArrayToString( layer->getLengthMultipliers()));
-    synchronicTF[SynchronicAccentMultipliers]->setText( floatArrayToString( layer->getAccentMultipliers()));
-    synchronicTF[SynchronicTuningOffsets]->setText( floatArrayToString( layer->getTuningOffsets()));
-    synchronicTF[SynchronicBasePitch]->setText( String( layer->getBasePitch()));
+void SynchronicViewController::resized()
+{
+    // Labels
+    int i = 0;
+    int lX = 0;
+    int lY = gComponentLabelHeight + gComponentYSpacing;
+    
+    sNumLayersL.setTopLeftPosition(lX,      gComponentTopOffset + i++ * lY);
+    
+    sCurrentLayerL.setTopLeftPosition(lX,   gComponentTopOffset + i++ * lY);
+    
+    sKeymapL.setTopLeftPosition(lX,         gComponentTopOffset + i++ * lY);
+    
+    for (int n = 0; n < cSynchronicParameterTypes.size(); n++)
+    {
+        synchronicL[n]->setTopLeftPosition(lX, gComponentTopOffset + (n+3) * lY);
+    }
+    
+    // Text fields
+    i = 0;
+    int tfX = gComponentLabelWidth + gComponentXSpacing;
+    int tfY = gComponentTextFieldHeight + gComponentYSpacing;
+    sNumLayersTF.setTopLeftPosition(tfX, gComponentTopOffset + i++ * tfY);
+    
+    sCurrentLayerTF.setTopLeftPosition(tfX, gComponentTopOffset + i++ * tfY);
+    
+    sKeymapTF.setTopLeftPosition(tfX, gComponentTopOffset + i++ * tfY);
+    
+    
+    for (int n = 0; n < cSynchronicParameterTypes.size(); n++)
+    {
+        synchronicTF[n]->setTopLeftPosition(tfX, gComponentTopOffset + (n+3) * tfY);
+    }
+
 }
 
 void SynchronicViewController::textFieldDidChange(TextEditor& tf)
@@ -123,10 +137,21 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
     
-    //BKState *bk = BKState::getInstance();
     SynchronicPreparation::Ptr layer = processor.sPreparation[currentSynchronicLayer];
     
-    if (name == cSynchronicParameterTypes[SynchronicTempo])
+    if (name == "NumSynchronicLayers")
+    {
+        processor.numSynchronicLayers = i;
+    }
+    else if (name == "CurrentSynchronicLayer")
+    {
+        updateFieldsToLayer(i);
+    }
+    else if (name == "SynchronicKeymap")
+    {
+        
+    }
+    else if (name == cSynchronicParameterTypes[SynchronicTempo])
     {
         layer->setTempo(f);
     }
@@ -162,11 +187,6 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
     else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
     {
         Array<float> lenMults = stringToFloatArray(text);
-        for (auto n : lenMults)
-        {
-            DBG("len: " + String(n));
-        }
-        DBG("len to string: " + floatArrayToString(lenMults));
         layer->setLengthMultipliers(lenMults);
     }
     else if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
@@ -174,26 +194,22 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
         Array<float> accentMults = stringToFloatArray(text);
         layer->setAccentMultipliers(accentMults);
     }
+#if OFFSETS
+    else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
+    {
+        Array<float> transpOffsets = stringToFloatArray(text);
+        layer->setTranspOffsets(transpOffsets);
+    }
+#endif
     else if (name == cSynchronicParameterTypes[SynchronicTuningOffsets])
     {
         Array<float> tuningOffsets = stringToFloatArray(text);
         layer->setTuningOffsets(tuningOffsets);
     }
+
     else if (name == cSynchronicParameterTypes[SynchronicBasePitch])
     {
         layer->setBasePitch(i);
-    }
-    else if (name == "NumSynchronicLayers")
-    {
-        processor.numSynchronicLayers = i;
-    }
-    else if (name == "CurrentSynchronicLayer")
-    {
-        updateFieldsForLayer(i);
-    }
-    else if (name == "SynchronicKeymap")
-    {
-        
     }
     else
     {
@@ -201,93 +217,35 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
     }
 }
 
-#if !TEXT_CHANGE_INTERNAL
-void SynchronicViewController::textEditorFocusLost(TextEditor& tf)
+
+void SynchronicViewController::updateFieldsToLayer(int numLayer)
 {
-    if (shouldChange)
-    {
-        textFieldDidChange(tf);
-        shouldChange = false;
-    }
-}
-
-void SynchronicViewController::textEditorReturnKeyPressed(TextEditor& tf)
-{
-    if (shouldChange)
-    {
-        textFieldDidChange(tf);
-        shouldChange = false;
-    }
-}
-
-void SynchronicViewController::textEditorEscapeKeyPressed(TextEditor& tf)
-{
-    if (shouldChange)
-    {
-        textFieldDidChange(tf);
-        shouldChange = false;
-    }
-}
-
-
-void SynchronicViewController::textEditorTextChanged(TextEditor& tf)
-{
-    shouldChange = true;
-}
-
+    
+    currentSynchronicLayer = numLayer;
+    
+    SynchronicPreparation::Ptr layer = processor.sPreparation[numLayer];
+    
+    // Set text.
+    //sKeymapTF.setText( intArrayToString( processor.sKeymap));
+    
+    sCurrentLayerTF.setText( String( numLayer));
+    
+    synchronicTF[SynchronicTempo]->setText( String( layer->getTempo()));
+    synchronicTF[SynchronicNumPulses]->setText( String( layer->getNumPulses()));
+    synchronicTF[SynchronicClusterMin]->setText( String( layer->getClusterMin()));
+    synchronicTF[SynchronicClusterMax]->setText( String( layer->getClusterMax()));
+    synchronicTF[SynchronicClusterThresh]->setText( String( layer->getClusterThresh()));
+    synchronicTF[SynchronicMode]->setText( String( layer->getMode()));
+    synchronicTF[SynchronicBeatsToSkip]->setText( String( layer->getBeatsToSkip()));
+    synchronicTF[SynchronicBeatMultipliers]->setText( floatArrayToString( layer->getBeatMultipliers()));
+    synchronicTF[SynchronicLengthMultipliers]->setText( floatArrayToString( layer->getLengthMultipliers()));
+    synchronicTF[SynchronicAccentMultipliers]->setText( floatArrayToString( layer->getAccentMultipliers()));
+#if OFFSETS
+    synchronicTF[SynchronicTranspOffsets]->setText( floatArrayToString( layer->getTranspOffsets()));
 #endif
-void SynchronicViewController::paint (Graphics& g)
-{
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
-
-    g.setColour (Colours::grey);
-    g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
+    synchronicTF[SynchronicTuningOffsets]->setText( floatArrayToString( layer->getTuningOffsets()));
+    synchronicTF[SynchronicBasePitch]->setText( String( layer->getBasePitch()));
 }
 
-void SynchronicViewController::resized()
-{
-    int i = 0;
-    
-    // Labels
-    sNumLayersL.setTopLeftPosition(0,
-                                   gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sCurrentLayerL.setTopLeftPosition(0,
-                                      gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sKeymapL.setTopLeftPosition(0,
-                                      gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    for (int n = 0; n < cSynchronicParameterTypes.size(); n++)
-    {
-        synchronicL[n]->setTopLeftPosition(0,
-                                   gSynchronicTF_TopOffset + (n+3) * (gSynchronicL_Height + gSynchronic_YSpacing));
-    }
-    
-    // Text fields
-    int tfX = gSynchronicL_Width + gSynchronic_XSpacing;
-    i = 0;
-    sNumLayersTF.setTopLeftPosition(tfX,
-                                    gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sCurrentLayerTF.setTopLeftPosition(tfX,
-                                       gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    sKeymapTF.setTopLeftPosition(tfX,
-                                       gSynchronicTF_TopOffset + i++ * (gSynchronicL_Height + gSynchronic_YSpacing));
-    
-    
-    for (int n = 0; n < cSynchronicParameterTypes.size(); n++)
-    {
-        synchronicTF[n]->setTopLeftPosition(tfX,
-                                    gSynchronicTF_TopOffset + (n+3) * (gSynchronicL_Height + gSynchronic_YSpacing));
-    }
-
-}
 
 

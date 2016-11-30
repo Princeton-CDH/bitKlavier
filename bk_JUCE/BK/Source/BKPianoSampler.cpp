@@ -96,8 +96,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         playType = type;
         playDirection = direction;
         
-        if(voiceRampOn > 0.5 * length) voiceRampOn = 0.5 * length;
-        if(voiceRampOff > 0.5 * length) voiceRampOff = 0.5 * length;
+        if(voiceRampOn  > (0.5 * length))   voiceRampOn     = 0.5 * length;
+        if(voiceRampOff > (0.5 * length))   voiceRampOff    = 0.5 * length;
         
         double playLength = (length - voiceRampOff) * pitchRatio;
         double maxLength = sound->soundLength - voiceRampOff;
@@ -206,7 +206,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         lgain = velocity;
         rgain = velocity;
         
-        //isInRampOn = (sound->rampOnSamples > 0);
         isInRampOn = (voiceRampOn > 0);
         isInRampOff = false;
         
@@ -284,13 +283,11 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
         float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
         
         
-        //if reverse playback start position is beyond end of sound, render silent buffer and decrement read position
-        if (playDirection == Reverse && sourceSamplePosition > playingSound->soundLength)
+        while (--numSamples >= 0)
         {
-            while (--numSamples >= 0) {
-                
-                sourceSamplePosition -= pitchRatio;
-                
+            
+            if (playDirection == Reverse && sourceSamplePosition > playingSound->soundLength)
+            {
                 if (outR != nullptr)
                 {
                     *outL++ += 0;
@@ -300,118 +297,110 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
                 {
                     *outL++ += 0;
                 }
+                sourceSamplePosition -= pitchRatio;
+                continue;
             }
             
-            //if (sourceSamplePosition < playingSound->soundLength) sourceSamplePosition = playingSound->soundLength;
+            const int pos = (int) sourceSamplePosition;
+            const float alpha = (float) (sourceSamplePosition - pos);
+            const float invAlpha = 1.0f - alpha;
             
-        }
-        
-        //otherwise playback sample as usual
-        else
-        {
-            while (--numSamples >= 0)
+            // just using a very simple linear interpolation here..
+            float l = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
+            float r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l;
+            
+            l *= lgain;
+            r *= rgain;
+            
+            
+            if (isInRampOn)
             {
+                l *= rampOnOffLevel;
+                r *= rampOnOffLevel;
                 
-                const int pos = (int) sourceSamplePosition;
-                const float alpha = (float) (sourceSamplePosition - pos);
-                const float invAlpha = 1.0f - alpha;
+                rampOnOffLevel += rampOnDelta;
                 
-                // just using a very simple linear interpolation here..
-                float l = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-                float r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l;
-                
-                l *= lgain;
-                r *= rgain;
-                
-                
-                if (isInRampOn)
+                if (rampOnOffLevel >= 1.0f)
                 {
-                    l *= rampOnOffLevel;
-                    r *= rampOnOffLevel;
-                    
-                    rampOnOffLevel += rampOnDelta;
-                    
-                    if (rampOnOffLevel >= 1.0f)
-                    {
-                        rampOnOffLevel = 1.0f;
-                        isInRampOff = false;
-                    }
+                    rampOnOffLevel = 1.0f;
+                    isInRampOff = false;
                 }
-                else if (isInRampOff)
-                {
-                    l *= rampOnOffLevel;
-                    r *= rampOnOffLevel;
-                    
-                    rampOnOffLevel += rampOffDelta;
-                    
-                    if (rampOnOffLevel <= 0.0f)
-                    {
-                        // allow interruption of synchronic pulses here if receive synchronic note off.
-                        if (playType != Normal && playType != NormalFixedStart && bkType == Synchronic && numPulses < maxPulses)
-                        {
-                            numPulses++;
-                            
-                            isInRampOff = 0;
-                            isInRampOn = 1;
-                            sourceSamplePosition = noteStartingPosition;
-                            
-                        }
-                        else
-                        {
-                            stopNote (0.0f, false);
-                            break;
-                        }
-                    }
-                }
-                
-                if (outR != nullptr)
-                {
-                    *outL++ += (l * 1.0f);
-                    *outR++ += (r * 1.0f);
-                }
-                else
-                {
-                    *outL++ += ((l + r) * 0.5f) * 1.0f;
-                }
-                
-                if (playDirection == Forward)
-                {
-                    sourceSamplePosition += pitchRatio;
-                    
-                    if (!isInRampOff)
-                    {
-                        if (sourceSamplePosition >= playEndPosition)
-                        {
-                            stopNote (0.0f, true);
-                            //DBG("stopping forward note, playEndPosition = " + std::to_string(playEndPosition * 1000./getSampleRate()));
-                        }
-                    }
-                }
-                else if (playDirection == Reverse)
-                {
-                    sourceSamplePosition -= pitchRatio;
-                    
-#if !CRAY_COOL_MUSIC_MAKER_2
-                    if (!isInRampOff)
-                    {
-                        if (sourceSamplePosition <= playEndPosition)
-                        {
-                            stopNote (0.0f, true);
-                        }
-                    }
-                    
-#endif
-                }
-                else
-                {
-                    DBG("Invalid note direction.");
-                }
-                
-                
-                
             }
+            else if (isInRampOff)
+            {
+                l *= rampOnOffLevel;
+                r *= rampOnOffLevel;
+                
+                rampOnOffLevel += rampOffDelta;
+                
+                if (rampOnOffLevel <= 0.0f)
+                {
+                    // allow interruption of synchronic pulses here if receive synchronic note off.
+                    if (playType != Normal && playType != NormalFixedStart && bkType == Synchronic && numPulses < maxPulses)
+                    {
+                        numPulses++;
+                        
+                        isInRampOff = 0;
+                        isInRampOn = 1;
+                        sourceSamplePosition = noteStartingPosition;
+                        
+                    }
+                    else
+                    {
+                        stopNote (0.0f, false);
+                        break;
+                    }
+                }
+            }
+            
+            if (outR != nullptr)
+            {
+                *outL++ += (l * 1.0f);
+                *outR++ += (r * 1.0f);
+            }
+            else
+            {
+                *outL++ += ((l + r) * 0.5f) * 1.0f;
+            }
+            
+            if (playDirection == Forward)
+            {
+                sourceSamplePosition += pitchRatio;
+                
+                if (!isInRampOff)
+                {
+                    if (sourceSamplePosition >= playEndPosition)
+                    {
+                        stopNote (0.0f, true);
+                        //DBG("stopping forward note, playEndPosition = " + std::to_string(playEndPosition * 1000./getSampleRate()));
+                    }
+                }
+            }
+            else if (playDirection == Reverse)
+            {
+                sourceSamplePosition -= pitchRatio;
+                
+#if !CRAY_COOL_MUSIC_MAKER_2
+                if (!isInRampOff)
+                {
+                    if (sourceSamplePosition <= playEndPosition)
+                    {
+                        stopNote (0.0f, true);
+                    }
+                }
+                
+#endif
+            }
+            else
+            {
+                DBG("Invalid note direction.");
+            }
+            
+            
+            
         }
     }
+    
 }
 
 

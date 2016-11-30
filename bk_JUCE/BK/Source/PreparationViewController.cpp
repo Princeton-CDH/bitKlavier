@@ -9,6 +9,7 @@
 */
 
 #include "../JuceLibraryCode/JuceHeader.h"
+
 #include "PreparationViewController.h"
 
 //==============================================================================
@@ -22,16 +23,47 @@ PreparationViewController::~PreparationViewController()
     
 }
 
+
+
 void PreparationViewController::paint (Graphics& g)
 {
     
 }
 
-
-
 void PreparationViewController::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
 
+}
+
+void PreparationViewController::textEditorFocusLost(TextEditor& tf)
+{
+    if (shouldChange)
+    {
+        textFieldDidChange(tf);
+        shouldChange = false;
+    }
+}
+
+void PreparationViewController::textEditorReturnKeyPressed(TextEditor& tf)
+{
+    if (shouldChange)
+    {
+        textFieldDidChange(tf);
+        shouldChange = false;
+    }
+}
+
+void PreparationViewController::textEditorEscapeKeyPressed(TextEditor& tf)
+{
+    if (shouldChange)
+    {
+        textFieldDidChange(tf);
+        shouldChange = false;
+    }
+}
+
+
+void PreparationViewController::textEditorTextChanged(TextEditor& tf)
+{
+    shouldChange = true;
 }

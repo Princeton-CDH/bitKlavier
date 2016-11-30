@@ -386,6 +386,7 @@ public:
      */
     virtual void keyOn (int midiChannel,
                         int midiNoteNumber,
+                        float transp,
                         float velocity,
                         Array<float> midiNoteOffsets,
                         int midiNoteTuningBase,

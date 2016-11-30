@@ -10,10 +10,10 @@
 
 #include "Synchronic.h"
 
-SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s, SynchronicPreparation::Ptr prep)
+SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s, SynchronicPreparation::Ptr p)
 :
     synth(s),
-    preparation(prep)
+    preparation(p)
 {
     sampleRate = synth->getSampleRate();
     
@@ -61,17 +61,18 @@ void SynchronicProcessor::playNote(int channel, int note)
     
     synth->keyOn(
                  channel,
-                 note + 9,
+                 note,
+                 preparation->getTranspOffsets()[transp],
                  preparation->getAccentMultipliers()[accent] * aGlobalGain,
                  preparation->getTuningOffsets(),
                  preparation->getBasePitch(),
                  noteDirection,
                  FixedLengthFixedStart,
-                 Synchronic,
+                 BKNoteTypeNil,
                  noteStartPos, // start
                  noteLength,
-                 0,
-                 30
+                 3,
+                 3
                  );
 }
 
@@ -98,6 +99,7 @@ void SynchronicProcessor::keyOn(int noteNumber, int velocity)
                 beat = 0;
                 length = 0;
                 accent = 0;
+                transp = 0;
                 
                 inPrePulses = true;
                 pulseThresholdTimer = 0;
@@ -167,6 +169,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 pulse = 1;
                 beat = 0;
                 length = 0;
+                transp = 0;
                 accent = 0;
             }
             
@@ -196,11 +199,13 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 }
             }
             
-            if (++beat >= preparation->getBeatMultipliers().size())        beat = 0;
+            if (++beat >= preparation->getBeatMultipliers().size())         beat = 0;
             
-            if (++length >= preparation->getLengthMultipliers().size())    length = 0;
+            if (++length >= preparation->getLengthMultipliers().size())     length = 0;
             
-            if (++accent >= preparation->getAccentMultipliers().size())    accent = 0;
+            if (++accent >= preparation->getAccentMultipliers().size())     accent = 0;
+            
+            if (++transp >= preparation->getTranspOffsets().size())         transp = 0;
             
             if (++pulse >= preparation->getNumPulses())
             {

@@ -279,6 +279,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     //==============================================================================
     void BKSynthesiser::keyOn (const int midiChannel,
                                const int midiNoteNumber,
+                               const float transp,
                                const float velocity,
                                Array<float> midiNoteOffsets,
                                const int midiNoteTuningBase,
@@ -322,7 +323,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                             sound,
                             midiChannel,
                             midiNoteNumber,
-                            midiNoteNumberOffset,
+                            midiNoteNumberOffset + transp,
                             velocity,
                             direction,
                             type,

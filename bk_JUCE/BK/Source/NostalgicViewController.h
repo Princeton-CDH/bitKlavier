@@ -1,15 +1,15 @@
 /*
   ==============================================================================
 
-    SynchronicView.h
-    Created: 15 Nov 2016 4:02:15pm
+    NostalgicViewController.h
+    Created: 30 Nov 2016 9:43:47am
     Author:  Michael R Mulshine
 
   ==============================================================================
 */
 
-#ifndef SYNCHRONICVIEWCONTROLLER_H_INCLUDED
-#define SYNCHRONICVIEWCONTROLLER_H_INCLUDED
+#ifndef NOSTALGICVIEWCONTROLLER_H_INCLUDED
+#define NOSTALGICVIEWCONTROLLER_H_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
@@ -21,42 +21,41 @@
 
 #include "BKLabel.h"
 
+
 //==============================================================================
 /*
 */
-class SynchronicViewController    : public PreparationViewController
+class NostalgicViewController    : public PreparationViewController
 {
 public:
-    SynchronicViewController(BKAudioProcessor&);
-    ~SynchronicViewController();
+    NostalgicViewController(BKAudioProcessor&);
+    ~NostalgicViewController();
 
     void paint (Graphics&) override;
     void resized() override;
-    
-    
-    
+
 private:
     BKAudioProcessor& processor;
-    int currentSynchronicLayer;
+    int currentNostalgicLayer;
     
     // BKLabels
-    BKLabel sNumLayersL;
-    BKLabel sCurrentLayerL;
-    BKLabel sKeymapL;
-    OwnedArray<BKLabel> synchronicL;
+    BKLabel nNumLayersL;
+    BKLabel nCurrentLayerL;
+    BKLabel nKeymapL;
+    OwnedArray<BKLabel> nostalgicL;
     
     // Text Fields
-    BKTextField sNumLayersTF;
-    BKTextField sCurrentLayerTF;
-    BKTextField sKeymapTF;
-    OwnedArray<BKTextField> synchronicTF;
+    BKTextField nNumLayersTF;
+    BKTextField nCurrentLayerTF;
+    BKTextField nKeymapTF;
+    OwnedArray<BKTextField> nostalgicTF;
     
     void textFieldDidChange(TextEditor&) override;
     
     void updateFieldsToLayer(int numLayer);
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicViewController)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NostalgicViewController)
 };
 
 
-#endif  // SYNCHRONICVIEWCONTROLLER_H_INCLUDED
+#endif  // NOSTALGICVIEWCONTROLLER_H_INCLUDED

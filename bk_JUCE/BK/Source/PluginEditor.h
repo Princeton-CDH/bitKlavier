@@ -13,7 +13,9 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
+
 #include "SynchronicViewController.h"
+#include "NostalgicViewController.h"
 
 //==============================================================================
 /**
@@ -37,6 +39,7 @@ private:
     BKAudioProcessor& processor;
     
     SynchronicViewController svc;
+    NostalgicViewController nvc;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessorEditor)
 };

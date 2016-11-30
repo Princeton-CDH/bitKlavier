@@ -11,7 +11,7 @@
 #ifndef BKLOOKANDFEEL_H_INCLUDED
 #define BKLOOKANDFEEL_H_INCLUDED
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "BKUtilities.h"
 
 class BKTextFieldLAF : public LookAndFeel_V3
 {

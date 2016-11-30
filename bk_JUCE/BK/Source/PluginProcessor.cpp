@@ -24,7 +24,6 @@ BKAudioProcessor::BKAudioProcessor() {
     sPreparation = Array<SynchronicPreparation::Ptr, CriticalSection>();
     nPreparation = Array<NostalgicPreparation::Ptr, CriticalSection>();
     
-    
     // For testing and developing, let's keep directory of samples in home folder on disk.
     loadMainPianoSamples(&mainPianoSynth, aNumSampleLayers);
     loadHammerReleaseSamples(&hammerReleaseSynth);
@@ -48,16 +47,14 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
     
     resonanceReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     
-    
-    
-    for (int i = 0; i < numSynchronicLayers; i++)
+    for (int i = 0; i < aMaxNumLayers; i++)
     {
         SynchronicPreparation::Ptr sPrep = new SynchronicPreparation();
         sPreparation.insert(i, sPrep);
         sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, sPrep));
     }
     
-    for (int i = 0; i < numNostalgicLayers; i++)
+    for (int i = 0; i < aMaxNumLayers; i++)
     {
         NostalgicPreparation::Ptr nPrep = new NostalgicPreparation();
         nPreparation.insert(i, nPrep);
@@ -70,8 +67,8 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
 
 void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages) {
     
-    const int totalNumInputChannels  = getTotalNumInputChannels();
-    const int totalNumOutputChannels = getTotalNumOutputChannels();
+    //const int totalNumInputChannels  = getTotalNumInputChannels();
+    //const int totalNumOutputChannels = getTotalNumOutputChannels();
     
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
@@ -79,10 +76,11 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     // This is here to avoid people getting screaming fee`dback
     // when they first compile a plugin, but obviously you don't need to keep
     // this code if your algorithm always overwrites all the output channels.
-    
+    /*
     for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i) {
         buffer.clear (i, 0, buffer.getNumSamples());
     }
+     */
     
     buffer.clear();
     
@@ -94,9 +92,6 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     int tuningBasePitch = 0;
     
     int numSamples = buffer.getNumSamples();
-    
-    
-    
     
     // Process each layer.
     // Could but nostalgic->keyOff/playNote here: (1) have synchronic->processBlock return 1 if pulse happened, otherwise 0. if nostalgic->mode == SynchronicSync and make sure layer corresponds
@@ -123,7 +118,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             // Send key on to each layer.
             for (int layer = 0; layer < numSynchronicLayers; layer++)
             {
-                sProcessor[layer]->keyOn(noteNumber - 9, velocity);
+                sProcessor[layer]->keyOn(noteNumber, velocity);
             }
             
             for (int layer = 0; layer < numNostalgicLayers; layer++)
@@ -134,6 +129,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             mainPianoSynth.keyOn(
                                  channel,
                                  noteNumber,
+                                 0,
                                  velocity * aGlobalGain,
                                  tuningOffsets,
                                  tuningBasePitch,
@@ -141,9 +137,9 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
                                  Normal,
                                  BKNoteTypeNil,
                                  1000, // start
-                                 100, // length
-                                 0,
-                                 30 );
+                                 1000, // length
+                                 3,
+                                 3 );
             
             
         }
@@ -159,13 +155,6 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
                                                    sProcessor[i]->getTimeToNext(), // [i] should really be [target]
                                                    sProcessor[i]->getBeatLength()); // should be in preparation/processor 
                 
-            /*
-                nProcessor[i]->keyOff(
-                                                   noteNumber,
-                                                   channel,
-                                                   0,
-                                                   0);
-             */
             }
             
             mainPianoSynth.keyOff(
@@ -178,6 +167,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             hammerReleaseSynth.keyOn(
                                      channel,
                                      noteNumber,
+                                     0,
                                      velocity * 0.0025 * aGlobalGain, //will want hammerGain multipler that user can set
                                      tuningOffsets,
                                      tuningBasePitch,
@@ -186,12 +176,13 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
                                      BKNoteTypeNil,
                                      0,
                                      2000,
-                                     4,
-                                     4 );
+                                     3,
+                                     3 );
             
             resonanceReleaseSynth.keyOn(
                                         channel,
                                         noteNumber,
+                                        0,
                                         velocity * aGlobalGain, //will also want multiplier for resonance gain...
                                         tuningOffsets,
                                         tuningBasePitch,
@@ -200,8 +191,8 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
                                         BKNoteTypeNil,
                                         0,
                                         2000,
-                                        4,
-                                        4 );
+                                        3,
+                                        3 );
             
         }
         else if (m.isAftertouch())

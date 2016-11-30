@@ -63,7 +63,8 @@ void NostalgicProcessor::keyOff(int midiNoteNumber, int midiChannel, int timeToN
     //play nostalgic note
     synth->keyOn(
                  midiChannel,
-                 midiNoteNumber + preparation->getTransposition(), //need to store this, so that undertow retains this in the event of a preparation change
+                 midiNoteNumber, //need to store this, so that undertow retains this in the event of a preparation change
+                 preparation->getTransposition(),
                  velocities.getUnchecked(midiNoteNumber) * preparation->getGain() * aGlobalGain,
                  preparation->getTuningOffsets(),
                  preparation->getBasePitch(),
@@ -72,7 +73,7 @@ void NostalgicProcessor::keyOff(int midiNoteNumber, int midiChannel, int timeToN
                  Nostalgic,
                  duration + preparation->getWavedistance(),
                  duration,                                      // length
-                 30,                                                //ramp up (ms)
+                 4,                                               //ramp up (ms) - was 30 - why?
                  aRampUndertowCrossMS );                             //ramp off
     
     
@@ -125,7 +126,8 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
             {
                 synth->keyOn(
                              midiChannel,
-                             tempnote + undertowPrep->getTransposition(),
+                             tempnote,
+                             undertowPrep->getTransposition(),
                              undertowVelocities.getUnchecked(tempnote) * aGlobalGain,
                              undertowPrep->getTuningOffsets(),
                              undertowPrep->getBasePitch(),

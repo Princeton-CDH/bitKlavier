@@ -59,7 +59,7 @@ public:
         nBeatsToSkip = 0.0;
         nMode = NoteLengthSync,
         nSyncTarget = 0;
-        nTuningOffsets = Array<float>(aEqualTuning);
+        nTuningOffsets = Array<float>(aEqualTuning, 12);
         nBasePitch = 0;
     }
     
@@ -164,11 +164,11 @@ private:
     NostalgicPreparation::Ptr preparation;
     double sampleRate;
 
-    Array<int> noteLengthTimers;        //store current length of played notes here
+    Array<uint64> noteLengthTimers;        //store current length of played notes here
     Array<int> activeNotes;             //table of notes currently being played by player
     Array<float> velocities;            //table of velocities played
     
-    Array<int> reverseLengthTimers;     //keep track of how long reverse notes have been playing
+    Array<uint64> reverseLengthTimers;     //keep track of how long reverse notes have been playing
     Array<int> activeReverseNotes;      //table of active reverse notes
     Array<int> reverseTargetLength;     //target reverse length (in samples)
     

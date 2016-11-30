@@ -54,6 +54,10 @@
         </GROUP>
       </GROUP>
       <GROUP id="{07677963-38EF-2F51-36FA-17646727446F}" name="Controller">
+        <FILE id="nbTvaG" name="NostalgicViewController.cpp" compile="1" resource="0"
+              file="Source/NostalgicViewController.cpp"/>
+        <FILE id="rY4uUs" name="NostalgicViewController.h" compile="0" resource="0"
+              file="Source/NostalgicViewController.h"/>
         <FILE id="DblE68" name="PreparationViewController.cpp" compile="1"
               resource="0" file="Source/PreparationViewController.cpp"/>
         <FILE id="Kze7uZ" name="PreparationViewController.h" compile="0" resource="0"

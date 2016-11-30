@@ -15,6 +15,8 @@
 
 #define TEXT_CHANGE_INTERNAL 0
 
+#define OFFSETS 1
+
 #define USE_SYNTH_INTERNAL 0
 #define CRAY_COOL_MUSIC_MAKER 0
 #define CRAY_COOL_MUSIC_MAKER_2 0
@@ -40,13 +42,14 @@ typedef enum BKNoteType {
     BKNoteTypeNil,
 } BKNoteType;
 
+// Synchronic
 typedef enum SynchronicSyncMode {
     FirstNoteSync = 0,
     LastNoteSync,
     SynchronicSyncModeNil
 } SynchronicSyncMode;
 
-
+// Adding text field to SynchronicViewController is as easy as adding typedef and string to these two data types.
 typedef enum SynchronicParameterType {
     SynchronicTempo = 0,
     SynchronicNumPulses,
@@ -58,17 +61,13 @@ typedef enum SynchronicParameterType {
     SynchronicBeatMultipliers,
     SynchronicLengthMultipliers,
     SynchronicAccentMultipliers,
+#if OFFSETS
+    SynchronicTranspOffsets,
+#endif
     SynchronicTuningOffsets,
     SynchronicBasePitch,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
-
-    
-typedef enum NostalgicSyncMode {
-    NoteLengthSync = 0, //reverse note length set by played note length
-    SynchronicSync,     //reverse note length set by next synchronic pulse
-    NostalgicSyncModeNil
-} NostalgicSyncMode;
 
 static const std::vector<std::string> cSynchronicParameterTypes = {
     "SynchronicTempo",
@@ -81,23 +80,51 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "SynchronicBeatMultipliers",
     "SynchronicLengthMultipliers",
     "SynchronicAccentMultipliers",
+#if OFFSETS
+    "SynchronicTranspOffsets",
+#endif
     "SynchronicTuningOffsets",
     "SynchronicBasePitch"
 };
 
+// Nostalgic
+typedef enum NostalgicSyncMode {
+    NoteLengthSync = 0, //reverse note length set by played note length
+    SynchronicSync,     //reverse note length set by next synchronic pulse
+    NostalgicSyncModeNil
+} NostalgicSyncMode;
 
-static const int aMaxNumLayers = 50;
+// Adding text field to NostalgicViewController is as easy as adding typedef and string to these two data types.
+typedef enum NostalgicParameterType {
+    NostalgicWaveDistance = 0,
+    NostalgicUndertow,
+    NostalgicTransposition,
+    NostalgicGain,
+    NostalgicLengthMultiplier,
+    NostalgicBeatsToSkip,
+    NostalgicMode,
+    NostalgicSyncTarget,
+    NostalgicTuningOffsets,
+    NostalgicBasePitch,
+    NostalgicParameterTypeNil
+} NostalgicParameterType;
+
+static const std::vector<std::string> cNostalgicParameterTypes = {
+    "NostalgicWaveDistance",
+    "NostalgicUndertow",
+    "NostalgicTransposition",
+    "NostalgicGain",
+    "NostalgicLengthMultiplier",
+    "NostalgicBeatsToSkip",
+    "NostalgicMode",
+    "NostalgicSyncTarget",
+    "NostalgicTuningOffsets",
+    "NostalgicBasePitch",
+};
+
+// Globals
+static const int aMaxNumLayers = 12;
 static const float aGlobalGain = 0.5; //make this user settable
-
-static const SynchronicSyncMode aSynchronicSyncMode = LastNoteSync;
-static const float aSynchronicClusterThreshold = 0.5;
-static const int aSynchronicClusterMin = 2;
-static const int aSynchronicClusterMax = 10;
-static const float aSynchronicTempo = 60.0;
-static const float aSynchronicBeatMultipliers[4] = {1.0, 1.0, 1.0, 1.0};
-static const float aSynchronicLengthMultipliers[4] = {1.0, -0.5, 1.0, -0.5};
-static const float aSynchronicAccentMultipliers[4] = {.5, .25, .25, .2};
-static const int aSynchronicNumPulses = 16;
 
 static const float aMaxSampleLengthSec = 30.0f;
 static const float aRampOnTimeSec = 0.004f;
@@ -105,6 +132,7 @@ static const float aRampOffTimeSec = 0.004f;
 static const int aNumScaleDegrees = 12;
 static const int aRampUndertowCrossMS = 50;
 
+// Sample layers
 static const int aNumSampleLayers = 2;
 static const int aVelocityThresh_Eight[9] = {
     0,
@@ -142,8 +170,7 @@ static const int aResonanceVelocityThresh[4] = {
 
 
 
-
-
+// Tunings
 // Just: 1/1, 16/15, 9/8, 6/5, 5/4, 4/3,  7/5, 3/2, 8/5, 5/3, 7/4,  15/8
 static const float aJustTuning[aNumScaleDegrees] = {0., .117313, .039101,  .156414, -.13686, -.019547, -.174873, .019547, .136864, -.15641, -.311745, -.11731};
 
@@ -159,7 +186,6 @@ static const float aPartialTuning[aNumScaleDegrees] = {0., .117313, .039101, -.3
 
 // Equal temperament:
 static const float aEqualTuning[aNumScaleDegrees] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};
-
 
 // Other tunings, from Partch and Jeff Snyder
 

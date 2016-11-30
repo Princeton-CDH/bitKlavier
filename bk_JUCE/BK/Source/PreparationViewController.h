@@ -15,19 +15,32 @@
 
 #include "PluginProcessor.h"
 
+#include "PreparationView.h"
+
 //==============================================================================
 /*
 */
-class PreparationViewController    : public Component
+class PreparationViewController    : public PreparationView,
+                                     public TextEditor::Listener
 {
 public:
     PreparationViewController();
     ~PreparationViewController();
-
+    
     void paint (Graphics&) override;
     void resized() override;
     
 private:
+    // TextEditor input parsing
+    virtual void textFieldDidChange(TextEditor&) = 0;
+    
+    void textEditorTextChanged(TextEditor&) override;
+    void textEditorFocusLost(TextEditor&) override;
+    void textEditorReturnKeyPressed(TextEditor&) override;
+    void textEditorEscapeKeyPressed(TextEditor&) override;
+    
+    bool shouldChange;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreparationViewController)
 };
 
