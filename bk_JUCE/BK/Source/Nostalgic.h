@@ -137,7 +137,7 @@ class NostalgicProcessor : public ReferenceCountedObject
 public:
     typedef ReferenceCountedObjectPtr<NostalgicProcessor> Ptr;
 
-    NostalgicProcessor(BKSynthesiser *s, NostalgicPreparation::Ptr prep);
+    NostalgicProcessor(BKSynthesiser *s, NostalgicPreparation::Ptr, OwnedArray<SynchronicProcessor,CriticalSection>&);
     virtual ~NostalgicProcessor();
     
     //called with every audio vector
@@ -147,7 +147,7 @@ public:
     void keyPressed(int midiNoteNumber, float midiNoteVelocity);
     
     //begin playing reverse note, called with noteOff
-    void keyReleased(int midiNoteNumber, int midiChannel, int timeToNext, int beatLength);
+    void keyReleased(int midiNoteNumber, int midiChannel);
     
 private:
     
@@ -165,7 +165,7 @@ private:
     //data and pointers
     BKSynthesiser *synth;
     NostalgicPreparation::Ptr preparation;
-    SynchronicProcessor::Ptr syncProcessor;
+    OwnedArray<SynchronicProcessor,CriticalSection>& syncProcessor;
     
     double sampleRate;
 

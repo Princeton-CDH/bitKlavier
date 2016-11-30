@@ -181,7 +181,7 @@ public:
     
     void keyPressed(int noteNumber, float velocity);
     
-    void keyReleased(int noteNumber);
+    void keyReleased(int noteNumber, int channel);
     
     void addNoteToKeymap(int note)      {  keymap.set(note,1);  }
     
@@ -189,8 +189,8 @@ public:
     
     void clearKeymap(void)              {  keymap.clearQuick(); }
     
-    int getCurrentNumSamplesBeat()  const { return numSamplesBeat;  }
-    int getCurrentPhasor()          const { return phasor;          }
+    const uint64 getCurrentNumSamplesBeat()     const noexcept { return numSamplesBeat;  }
+    const uint64 getCurrentPhasor()             const noexcept { return phasor;          }
     
 private:
     

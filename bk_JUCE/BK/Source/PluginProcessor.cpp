@@ -59,7 +59,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
     {
         NostalgicPreparation::Ptr nPrep = new NostalgicPreparation();
         nPreparation.insert(i, nPrep);
-        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, nPrep));
+        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, nPrep, sProcessor));
     }
     
     currentSynchronicPreparation = sPreparation.getUnchecked(0);
@@ -150,17 +150,15 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             //need to integrate sProcess layer number here as well, just defaulting for the moment
             for (int i = 0; i < numNostalgicLayers; i++)
             {
-                nProcessor[i]->keyReleased(
-                                                   noteNumber,
-                                                   channel,
-                                                   sProcessor[i]->getTimeToNext(), // [i] should really be [target]
-                                                   sProcessor[i]->getBeatLength()); // should be in preparation/processor 
+                nProcessor[i]->keyReleased(noteNumber,
+                                           channel); // should be in preparation/processor
                 
             }
             
             for (int i = 0; i < numSynchronicLayers; i++)
             {
-                sProcessor[i]->keyReleased(noteNumber);
+                sProcessor[i]->keyReleased(noteNumber,
+                                           channel);
             }
             
             mainPianoSynth.keyOff(

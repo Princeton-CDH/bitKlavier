@@ -17,35 +17,31 @@
 //==============================================================================
 /*
 */
-class PreparationView    : public Component
+class BKView    : public Component
 {
+    // Doesn't do anything right now... figure this out. New virtual functions?
 public:
-    PreparationView()
+    BKView()
     {
-        // In your constructor, you should add any child components, and
-        // initialise any special settings that your component needs.
 
     }
 
-    ~PreparationView()
+    ~BKView()
     {
     }
 
     void paint (Graphics& g) override
     {
-        g.fillAll(Colours::transparentWhite);
 
     }
 
     void resized() override
     {
         
-
     }
 
-    //virtual void attachToModel()
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreparationView)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKView)
 };
 
 

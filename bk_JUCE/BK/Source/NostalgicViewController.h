@@ -15,7 +15,7 @@
 
 #include "PluginProcessor.h"
 
-#include "PreparationViewController.h"
+#include "BKViewController.h"
 
 #include "BKTextField.h"
 
@@ -25,7 +25,7 @@
 //==============================================================================
 /*
 */
-class NostalgicViewController    : public PreparationViewController
+class NostalgicViewController    : public BKViewController
 {
 public:
     NostalgicViewController(BKAudioProcessor&);

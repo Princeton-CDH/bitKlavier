@@ -1,31 +1,31 @@
 /*
   ==============================================================================
 
-    PreparationViewController.h
+    BKViewController.h
     Created: 20 Nov 2016 11:06:14am
     Author:  Michael R Mulshine
 
   ==============================================================================
 */
 
-#ifndef PREPARATIONVIEWCONTROLLER_H_INCLUDED
-#define PREPARATIONVIEWCONTROLLER_H_INCLUDED
+#ifndef BKVIEWCONTROLLER_H_INCLUDED
+#define BKVIEWCONTROLLER_H_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
 #include "PluginProcessor.h"
 
-#include "PreparationView.h"
+#include "BKView.h"
 
 //==============================================================================
 /*
 */
-class PreparationViewController    : public PreparationView,
-                                     public TextEditor::Listener
+class BKViewController    : public BKView,
+                            public TextEditor::Listener
 {
 public:
-    PreparationViewController();
-    ~PreparationViewController();
+    BKViewController();
+    ~BKViewController();
     
     void paint (Graphics&) override;
     void resized() override;
@@ -41,8 +41,8 @@ private:
     
     bool shouldChange;
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreparationViewController)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKViewController)
 };
 
 
-#endif  // PREPARATIONVIEWCONTROLLER_H_INCLUDED
+#endif  // BKCONTROLLER_H_INCLUDED

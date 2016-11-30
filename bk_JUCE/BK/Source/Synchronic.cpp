@@ -134,7 +134,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     
 }
 
-void SynchronicProcessor::keyReleased(int noteNumber)
+void SynchronicProcessor::keyReleased(int noteNumber, int channel)
 {
     
 }

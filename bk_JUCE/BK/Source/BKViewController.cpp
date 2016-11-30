@@ -10,41 +10,32 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-#include "PreparationViewController.h"
+#include "BKViewController.h"
 
 //==============================================================================
-PreparationViewController::PreparationViewController()
+BKViewController::BKViewController()
 {
 
 }
 
-PreparationViewController::~PreparationViewController()
-{
-    
-}
-
-
-
-void PreparationViewController::paint (Graphics& g)
+BKViewController::~BKViewController()
 {
     
 }
 
-void PreparationViewController::resized()
+
+
+void BKViewController::paint (Graphics& g)
+{
+    
+}
+
+void BKViewController::resized()
 {
 
 }
 
-void PreparationViewController::textEditorFocusLost(TextEditor& tf)
-{
-    if (shouldChange)
-    {
-        textFieldDidChange(tf);
-        shouldChange = false;
-    }
-}
-
-void PreparationViewController::textEditorReturnKeyPressed(TextEditor& tf)
+void BKViewController::textEditorFocusLost(TextEditor& tf)
 {
     if (shouldChange)
     {
@@ -53,7 +44,16 @@ void PreparationViewController::textEditorReturnKeyPressed(TextEditor& tf)
     }
 }
 
-void PreparationViewController::textEditorEscapeKeyPressed(TextEditor& tf)
+void BKViewController::textEditorReturnKeyPressed(TextEditor& tf)
+{
+    if (shouldChange)
+    {
+        textFieldDidChange(tf);
+        shouldChange = false;
+    }
+}
+
+void BKViewController::textEditorEscapeKeyPressed(TextEditor& tf)
 {
     if (shouldChange)
     {
@@ -63,7 +63,7 @@ void PreparationViewController::textEditorEscapeKeyPressed(TextEditor& tf)
 }
 
 
-void PreparationViewController::textEditorTextChanged(TextEditor& tf)
+void BKViewController::textEditorTextChanged(TextEditor& tf)
 {
     shouldChange = true;
 }

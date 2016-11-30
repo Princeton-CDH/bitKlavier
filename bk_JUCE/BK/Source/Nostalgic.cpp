@@ -10,10 +10,11 @@
 
 #include "Nostalgic.h"
 
-NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s, NostalgicPreparation::Ptr prep)
+NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s, NostalgicPreparation::Ptr prep, OwnedArray<SynchronicProcessor,CriticalSection>& proc)
 :
     synth(s),
-    preparation(prep)
+    preparation(prep),
+    syncProcessor(proc)
 {
     sampleRate = synth->getSampleRate();
     
@@ -46,7 +47,7 @@ void NostalgicProcessor::playNote(int channel, int note)
 }
 
 //begin reverse note; called when key is released
-void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel, int timeToNext, int beatLength)
+void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
 {
     float duration = 0.0;
     
@@ -57,13 +58,10 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel, int ti
     }
     else //SynchronicSync
     {
-        //duration = timeToNext + preparation->getBeatsToSkip() * beatLength;
-        uint32 phasor = syncProcessor[preparation->getSyncTarget()].getCurrentPhasor();
-        uint32 beatSamples = syncProcessor[preparation->getSyncTarget()].getCurrentNumSamplesBeat();
-        
-        //uint32 timeToNext = (beatSamples - phasor) * 1000.0 / sampleRate;
-        //uint32 beatLength = beatSamples * 1000.0 / sampleRate;
-        
+        uint64 phasor = syncProcessor[preparation->getSyncTarget()]->getCurrentPhasor();
+        uint64 beatSamples = syncProcessor[preparation->getSyncTarget()]->getCurrentNumSamplesBeat();
+
+        // Don't we need to sum the beatSamples for each of the next beatsToSkip notes?
         duration =  ((beatSamples - phasor) + preparation->getBeatsToSkip() * beatSamples) * (1000.0/sampleRate);
     }
     
@@ -80,8 +78,8 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel, int ti
                  Nostalgic,
                  duration + preparation->getWavedistance(),
                  duration,                                      // length
-                 4,                                               //ramp up (ms) - was 30 - why?
-                 aRampUndertowCrossMS );                             //ramp off
+                 3,
+                 aRampUndertowCrossMS );                        //ramp off
     
     
     // turn note length timers off
