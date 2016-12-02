@@ -150,7 +150,7 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth, int numLayers)
     }
 }
 
-void BKSampleLoader::loadResonanceRelaseSamples(BKSynthesiser *synth)
+void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
 {
     WavAudioFormat wavFormat;
     

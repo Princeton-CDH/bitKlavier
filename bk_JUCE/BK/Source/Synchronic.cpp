@@ -10,9 +10,11 @@
 
 #include "Synchronic.h"
 
-SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s, SynchronicPreparation::Ptr p)
+SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s, Keymap::Ptr km, SynchronicPreparation::Ptr p, int layer)
 :
+    layer(layer),
     synth(s),
+    keymap(km),
     preparation(p)
 {
     sampleRate = synth->getSampleRate();
@@ -27,14 +29,6 @@ SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s, SynchronicPreparation
     
     cluster = Array<int>();
     on = Array<int>();
-    
-    // Initialize keymap.
-    keymap = Array<int>();
-    keymap.ensureStorageAllocated(128);
-    for (int i = 0; i < 128; i++)
-    {
-        keymap.set(i,0);
-    }
 }
 
 
@@ -79,7 +73,7 @@ void SynchronicProcessor::playNote(int channel, int note)
 
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
-    //if (keymap[noteNumber])
+    if (keymap->containsNote(noteNumber))
     {
         if (inCluster)
         {
@@ -136,6 +130,10 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 
 void SynchronicProcessor::keyReleased(int noteNumber, int channel)
 {
+    if (keymap->containsNote(noteNumber))
+    {
+        ;
+    }
     
 }
 

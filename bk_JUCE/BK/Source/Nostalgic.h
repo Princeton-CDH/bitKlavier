@@ -11,15 +11,13 @@
 #ifndef NOSTALGIC_H_INCLUDED
 #define NOSTALGIC_H_INCLUDED
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "BKUtilities.h"
 
 #include "Synchronic.h"
 
-#include "AudioConstants.h"
-
 #include "BKSynthesiser.h"
 
-#include "BKUtilities.h"
+#include "Keymap.h"
 
 
 class NostalgicPreparation : public ReferenceCountedObject
@@ -53,18 +51,19 @@ public:
         
     }
     
-    NostalgicPreparation()
+    NostalgicPreparation():
+    nWaveDistance(0),
+    nUndertow(0),
+    nTransposition(0.0),
+    nGain(1.0),
+    nLengthMultiplier(1.0),
+    nBeatsToSkip(0.0),
+    nMode(NoteLengthSync),
+    nSyncTarget(0),
+    nTuningOffsets(Array<float>(aEqualTuning, 12)),
+    nBasePitch(0)
     {
-        nWaveDistance = 0;
-        nUndertow = 0;
-        nTransposition = 0.0;
-        nGain = 1.0;
-        nLengthMultiplier = 1.0;
-        nBeatsToSkip = 0.0;
-        nMode = NoteLengthSync,
-        nSyncTarget = 0;
-        nTuningOffsets = Array<float>(aEqualTuning, 12);
-        nBasePitch = 0;
+
     }
     
     ~NostalgicPreparation()
@@ -72,19 +71,6 @@ public:
         
     }
     
-    void print(void)
-    {
-        DBG("nWaveDistance: " + String(nWaveDistance));
-        DBG("nUndertow: " + String(nUndertow));
-        DBG("nTransposition: " + String(nTransposition));
-        DBG("nGain: " + String(nGain));
-        DBG("nLengthMultiplier: " + String(nLengthMultiplier));
-        DBG("nBeatsToSkip: " + String(nBeatsToSkip));
-        DBG("nMode: " + String(nMode));
-        DBG("nSyncTarget: " + String(nSyncTarget));
-        DBG("nTuningOffsets: " + floatArrayToString(nTuningOffsets));
-        DBG("nBasePitch: " + String(nBasePitch));
-    }
     
     const int getWavedistance() const noexcept                      {return nWaveDistance;      }
     const int getUndertow() const noexcept                          {return nUndertow;          }
@@ -108,8 +94,21 @@ public:
     void setTuningOffsets(Array<float> tuningOffsets)               {nTuningOffsets = tuningOffsets;        }
     void setBasePitch(int basePitch)                                {nBasePitch = basePitch;                }
 
-    
+    void print(void)
+    {
+        DBG("nWaveDistance: " + String(nWaveDistance));
+        DBG("nUndertow: " + String(nUndertow));
+        DBG("nTransposition: " + String(nTransposition));
+        DBG("nGain: " + String(nGain));
+        DBG("nLengthMultiplier: " + String(nLengthMultiplier));
+        DBG("nBeatsToSkip: " + String(nBeatsToSkip));
+        DBG("nMode: " + String(nMode));
+        DBG("nSyncTarget: " + String(nSyncTarget));
+        DBG("nTuningOffsets: " + floatArrayToString(nTuningOffsets));
+        DBG("nBasePitch: " + String(nBasePitch));
+    }
 private:
+
     int nWaveDistance;  //ms; distance from beginning of sample to stop reverse playback and begin undertow
     int nUndertow;      //ms; length of time to play forward after directional change
     /*
@@ -142,7 +141,7 @@ public:
     typedef Array<NostalgicProcessor::Ptr, CriticalSection> CSArr;
     typedef Array<NostalgicProcessor::Ptr>                  Arr;
 
-    NostalgicProcessor(BKSynthesiser *s, NostalgicPreparation::Ptr, SynchronicProcessor::CSArr& proc);
+    NostalgicProcessor(BKSynthesiser *s, Keymap::Ptr km, NostalgicPreparation::Ptr prep, SynchronicProcessor::CSArr& proc, int layer);
     virtual ~NostalgicProcessor();
     
     //called with every audio vector
@@ -153,6 +152,18 @@ public:
     
     //begin playing reverse note, called with noteOff
     void keyReleased(int midiNoteNumber, int midiChannel);
+    
+    int layer;
+    
+    Keymap::Ptr getKeymap(void)
+    {
+        return keymap;
+    }
+    
+    NostalgicPreparation::Ptr getPreparation(void)
+    {
+        return preparation;
+    }
     
 private:
     
@@ -170,8 +181,10 @@ private:
     double sampleRate;
     
     //data and pointers
-    BKSynthesiser *synth;
-    NostalgicPreparation::Ptr preparation;
+    BKSynthesiser*              synth;
+    Keymap::Ptr                 keymap;
+    NostalgicPreparation::Ptr   preparation;
+    
     SynchronicProcessor::CSArr& syncProcessor;
     
     //store values so that undertow note retains preparation from reverse note
@@ -186,9 +199,6 @@ private:
     Array<uint64> reverseLengthTimers;     //keep track of how long reverse notes have been playing
     Array<int> activeReverseNotes;      //table of active reverse notes
     Array<int> reverseTargetLength;     //target reverse length (in samples)
-    
-    
-    
     
     
     JUCE_LEAK_DETECTOR (NostalgicProcessor) //is this the right one to use here?

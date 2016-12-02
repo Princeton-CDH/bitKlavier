@@ -11,14 +11,11 @@
 #ifndef SYNCHRONIC_H_INCLUDED
 #define SYNCHRONIC_H_INCLUDED
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "BKUtilities.h"
 
 #include "BKSynthesiser.h"
 
-#include "BKUtilities.h"
-
-#include "AudioConstants.h"
-
+#include "Keymap.h"
 
 class SynchronicPreparation : public ReferenceCountedObject
 {
@@ -57,7 +54,6 @@ public:
     sPulseThreshSec(60.0/sTempo),
     sClusterThreshSec(sPulseThreshSec * sClusterThresh)
     {
-        print();
     }
 
     
@@ -78,28 +74,6 @@ public:
     sPulseThreshSec(60.0/sTempo),
     sClusterThreshSec(sPulseThreshSec * sClusterThresh)
     {
-        print();
-    }
-    
-    void print(void)
-    {
-        DBG("| - - - Synchronic Preparation - - - |");
-        DBG("sTempo: " + String(sTempo));
-        DBG("sNumPulses: " + String(sNumPulses));
-        DBG("sClusterMin: " + String(sClusterMin));
-        DBG("sClusterMax: " + String(sClusterMax));
-        DBG("sClusterThresh: " + String(sClusterThresh));
-        DBG("sMode: " + String(sMode));
-        DBG("sBeatsToSkip: " + String(sBeatsToSkip));
-        DBG("sBeatMultipliers: " + floatArrayToString(sBeatMultipliers));
-        DBG("sLengthMultipliers: " + floatArrayToString(sLengthMultipliers));
-        DBG("sAccentMultipliers: " + floatArrayToString(sAccentMultipliers));
-        DBG("sTranspOffsets: " + floatArrayToString(sTranspOffsets));
-        DBG("sTuningOffsets: " + floatArrayToString(sTuningOffsets));
-        DBG("sBasePitch: " + String(sBasePitch));
-        DBG("sPulseThreshSec: " + String(sPulseThreshSec));
-        DBG("sClusterThreshSec: " + String(sClusterThreshSec));
-        DBG("| - - - - - - - - -- - - - - - - - - |");
     }
     
     const float getTempo() const noexcept                       {return sTempo;                 }
@@ -148,6 +122,27 @@ public:
     void setTuningOffsets(Array<float> tuningOffsets)           {sTuningOffsets = tuningOffsets;                    }
     void setBasePitch(int basePitch)                            {sBasePitch = basePitch;                            }
     
+    void print(void)
+    {
+        DBG("| - - - Synchronic Preparation - - - |");
+        DBG("sTempo: " + String(sTempo));
+        DBG("sNumPulses: " + String(sNumPulses));
+        DBG("sClusterMin: " + String(sClusterMin));
+        DBG("sClusterMax: " + String(sClusterMax));
+        DBG("sClusterThresh: " + String(sClusterThresh));
+        DBG("sMode: " + String(sMode));
+        DBG("sBeatsToSkip: " + String(sBeatsToSkip));
+        DBG("sBeatMultipliers: " + floatArrayToString(sBeatMultipliers));
+        DBG("sLengthMultipliers: " + floatArrayToString(sLengthMultipliers));
+        DBG("sAccentMultipliers: " + floatArrayToString(sAccentMultipliers));
+        DBG("sTranspOffsets: " + floatArrayToString(sTranspOffsets));
+        DBG("sTuningOffsets: " + floatArrayToString(sTuningOffsets));
+        DBG("sBasePitch: " + String(sBasePitch));
+        DBG("sPulseThreshSec: " + String(sPulseThreshSec));
+        DBG("sClusterThreshSec: " + String(sClusterThreshSec));
+        DBG("| - - - - - - - - -- - - - - - - - - |");
+    }
+    
 private:
     float sTempo;
     int sNumPulses,sClusterMin,sClusterMax;
@@ -179,7 +174,7 @@ public:
     typedef Array<SynchronicProcessor::Ptr, CriticalSection>    CSArr;
     typedef Array<SynchronicProcessor::Ptr>                     Arr;
     
-    SynchronicProcessor(BKSynthesiser *s, SynchronicPreparation::Ptr prep);
+    SynchronicProcessor(BKSynthesiser *s, Keymap::Ptr km, SynchronicPreparation::Ptr prep, int layer);
     ~SynchronicProcessor();
     
     void processBlock(int numSamples, int channel);
@@ -188,21 +183,26 @@ public:
     
     void keyReleased(int noteNumber, int channel);
     
-    void addNoteToKeymap(int note)      {  keymap.set(note,1);  }
-    
-    void removeNoteToKeymap(int note)   {  keymap.set(note,0);  }
-    
-    void clearKeymap(void)              {  keymap.clearQuick(); }
-    
     const uint64 getCurrentNumSamplesBeat()     const noexcept { return numSamplesBeat;  }
     const uint64 getCurrentPhasor()             const noexcept { return phasor;          }
     
+    int layer;
+    
+    Keymap::Ptr getKeymap(void)
+    {
+        return keymap;
+    }
+    
+    SynchronicPreparation::Ptr getPreparation(void)
+    {
+        return preparation;
+    }
+    
 private:
     
-    BKSynthesiser *synth;
-    SynchronicPreparation::Ptr preparation;
-    
-    Array<int> keymap;
+    BKSynthesiser*              synth;
+    Keymap::Ptr                 keymap;
+    SynchronicPreparation::Ptr  preparation;
     
     int pulse;
     

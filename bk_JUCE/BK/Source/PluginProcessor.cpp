@@ -14,19 +14,24 @@ BKAudioProcessor::BKAudioProcessor()
     
     numNostalgicLayers = 1;
 
-    sProcessor = SynchronicProcessor::CSArr();
-    sProcessor.ensureStorageAllocated(aMaxNumLayers);
+    sProcessor      =  SynchronicProcessor::CSArr();
+    nProcessor      =  NostalgicProcessor::Arr();
+    sPreparation    =  SynchronicPreparation::CSArr();
+    nPreparation    =  NostalgicPreparation::CSArr();
     
-    nProcessor = NostalgicProcessor::Arr();
+    sProcessor.ensureStorageAllocated(aMaxNumLayers);
     nProcessor.ensureStorageAllocated(aMaxNumLayers);
     
-    sPreparation = SynchronicPreparation::CSArr();
-    nPreparation = NostalgicPreparation::CSArr();
+    bkKeymaps          =  Keymap::CSArr();
+    
+    bkKeymaps.ensureStorageAllocated(aMaxNumLayers * 5);
+    
+    
     
     // For testing and developing, let's keep directory of samples in home folder on disk.
     BKSampleLoader::loadMainPianoSamples(&mainPianoSynth, aNumSampleLayers);
     BKSampleLoader::loadHammerReleaseSamples(&hammerReleaseSynth);
-    BKSampleLoader::loadResonanceRelaseSamples(&resonanceReleaseSynth);
+    BKSampleLoader::loadResonanceReleaseSamples(&resonanceReleaseSynth);
 }
 
 BKAudioProcessor::~BKAudioProcessor()
@@ -48,16 +53,24 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
     
     for (int i = 0; i < aMaxNumLayers; i++)
     {
-        SynchronicPreparation::Ptr sPrep = new SynchronicPreparation();
+        Keymap::Ptr keymap                      = new Keymap();
+        bkKeymaps.add(keymap);
+        
+        SynchronicPreparation::Ptr sPrep    = new SynchronicPreparation();
         sPreparation.insert(i, sPrep);
-        sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, sPrep));
+        
+        sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, keymap, sPrep, i));
     }
     
     for (int i = 0; i < aMaxNumLayers; i++)
     {
-        NostalgicPreparation::Ptr nPrep = new NostalgicPreparation();
+        Keymap::Ptr keymap                      = new Keymap();
+        bkKeymaps.add(keymap);
+        
+        NostalgicPreparation::Ptr nPrep     = new NostalgicPreparation();
         nPreparation.insert(i, nPrep);
-        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, nPrep, sProcessor));
+        
+        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, keymap, nPrep, sProcessor, i));
     }
 }
 
@@ -334,8 +347,6 @@ const String BKAudioProcessor::getProgramName (int index) {
 void BKAudioProcessor::changeProgramName (int index, const String& newName) {
     
 }
-
-
 
 //==============================================================================
 // This creates new instances of the plugin..

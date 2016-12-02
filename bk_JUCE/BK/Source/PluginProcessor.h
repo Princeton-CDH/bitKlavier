@@ -12,7 +12,7 @@
 
 #include "Nostalgic.h"
 
-#include "BKTextField.h"
+#include "Keymap.h"
 
 #define USE_SYNCHRONIC_TWO 0
 
@@ -42,14 +42,15 @@ public:
     BKSynthesiser resonanceReleaseSynth;
 
     // Processors.
-    SynchronicProcessor::CSArr   sProcessor;
-    NostalgicProcessor::Arr   nProcessor;
+    SynchronicProcessor::CSArr      sProcessor;
+    NostalgicProcessor::Arr         nProcessor;
     
     // Preparations.
-    SynchronicPreparation::CSArr  sPreparation;
-    NostalgicPreparation::CSArr   nPreparation;
+    SynchronicPreparation::CSArr    sPreparation;
+    NostalgicPreparation::CSArr     nPreparation;
     
     // Keymaps.
+    Keymap::CSArr                   bkKeymaps;
     
     int channel;
     

@@ -30,20 +30,24 @@
               file="Source/ReferenceCountedBuffer.h"/>
       </GROUP>
       <GROUP id="{E01F59AF-FEAD-7AEA-32C2-F665B05A05F1}" name="Model">
-        <FILE id="llDb7n" name="BKSampleLoader.cpp" compile="1" resource="0"
-              file="Source/BKSampleLoader.cpp"/>
-        <FILE id="wwKFGe" name="BKSampleLoader.h" compile="0" resource="0"
-              file="Source/BKSampleLoader.h"/>
+        <GROUP id="{1CB08EFA-DEC3-73DF-DE6C-B6E7D430054C}" name="Main">
+          <FILE id="GHmNVp" name="PluginProcessor.cpp" compile="1" resource="0"
+                file="Source/PluginProcessor.cpp"/>
+          <FILE id="oVHIQ3" name="PluginProcessor.h" compile="0" resource="0"
+                file="Source/PluginProcessor.h"/>
+          <FILE id="dgzM9u" name="PluginEditor.cpp" compile="1" resource="0"
+                file="Source/PluginEditor.cpp"/>
+          <FILE id="ubAlA4" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+        </GROUP>
+        <GROUP id="{07BDC391-C9D5-B462-E25F-2786307FBBDA}" name="Samples">
+          <FILE id="llDb7n" name="BKSampleLoader.cpp" compile="1" resource="0"
+                file="Source/BKSampleLoader.cpp"/>
+          <FILE id="wwKFGe" name="BKSampleLoader.h" compile="0" resource="0"
+                file="Source/BKSampleLoader.h"/>
+        </GROUP>
         <GROUP id="{D95FF283-C159-D64C-6BE8-DFE35BF1BDDA}" name="Keymap">
           <FILE id="hJbk7x" name="Keymap.h" compile="0" resource="0" file="Source/Keymap.h"/>
         </GROUP>
-        <FILE id="GHmNVp" name="PluginProcessor.cpp" compile="1" resource="0"
-              file="Source/PluginProcessor.cpp"/>
-        <FILE id="oVHIQ3" name="PluginProcessor.h" compile="0" resource="0"
-              file="Source/PluginProcessor.h"/>
-        <FILE id="dgzM9u" name="PluginEditor.cpp" compile="1" resource="0"
-              file="Source/PluginEditor.cpp"/>
-        <FILE id="ubAlA4" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
         <GROUP id="{BE0ACC3D-1AC5-1BB6-2D3E-F52EFBCC8E45}" name="Preparations">
           <FILE id="hzuh1H" name="Nostalgic.cpp" compile="1" resource="0" file="Source/Nostalgic.cpp"/>
           <FILE id="QU7LbV" name="Nostalgic.h" compile="0" resource="0" file="Source/Nostalgic.h"/>

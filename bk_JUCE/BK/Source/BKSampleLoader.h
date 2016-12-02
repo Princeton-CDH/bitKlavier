@@ -20,7 +20,7 @@ class BKSampleLoader
 {
 public:
     void loadMainPianoSamples(BKSynthesiser *synth, int numLayers);
-    void loadResonanceRelaseSamples(BKSynthesiser *synth);
+    void loadResonanceReleaseSamples(BKSynthesiser *synth);
     void loadHammerReleaseSamples(BKSynthesiser *synth);
     
 private:

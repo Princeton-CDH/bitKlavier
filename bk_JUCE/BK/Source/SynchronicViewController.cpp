@@ -11,13 +11,14 @@
 
 #include "BKUtilities.h"
 
+#include "Keymap.h"
+
 //==============================================================================
 SynchronicViewController::SynchronicViewController(BKAudioProcessor& p)
 :
     processor(p),
     currentSynchronicLayer(0)
 {
-    
     SynchronicPreparation::Ptr layer = processor.sPreparation[currentSynchronicLayer];
     
      // Labels
@@ -45,8 +46,6 @@ SynchronicViewController::SynchronicViewController(BKAudioProcessor& p)
         synchronicL[i]->setName(cSynchronicParameterTypes[i]);
         synchronicL[i]->setText(cSynchronicParameterTypes[i], NotificationType::dontSendNotification);
     }
-    
-    
     
     // Text Fields
     synchronicTF = OwnedArray<BKTextField>();
@@ -137,7 +136,12 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
     
-    SynchronicPreparation::Ptr layer = processor.sPreparation[currentSynchronicLayer];
+    SynchronicProcessor::Ptr   proc = processor.sProcessor[currentSynchronicLayer];
+    
+    SynchronicPreparation::Ptr prep = proc->getPreparation();
+    
+    Keymap::Ptr keymap              = proc->getKeymap();
+    
     
     if (name == "NumSynchronicLayers")
     {
@@ -149,67 +153,74 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
     }
     else if (name == "SynchronicKeymap")
     {
+        Array<int> keys = stringToIntArray(text);
+        
+        keymap->clear();
+        for (auto note : keys)
+        {
+            keymap->addNote(note);
+        }
         
     }
     else if (name == cSynchronicParameterTypes[SynchronicTempo])
     {
-        layer->setTempo(f);
+        prep->setTempo(f);
     }
     else if (name == cSynchronicParameterTypes[SynchronicNumPulses])
     {
-        layer->setNumPulses(i);
+        prep->setNumPulses(i);
     }
     else if (name == cSynchronicParameterTypes[SynchronicClusterMin])
     {
-        layer->setClusterMin(i);
+        prep->setClusterMin(i);
     }
     else if (name == cSynchronicParameterTypes[SynchronicClusterMax])
     {
-        layer->setClusterMax(i);
+        prep->setClusterMax(i);
     }
     else if (name == cSynchronicParameterTypes[SynchronicClusterThresh])
     {
-        layer->setClusterThresh(f);
+        prep->setClusterThresh(f);
     }
     else if (name == cSynchronicParameterTypes[SynchronicMode])
     {
-        layer->setMode((SynchronicSyncMode) i);
+        prep->setMode((SynchronicSyncMode) i);
     }
     else if (name == cSynchronicParameterTypes[SynchronicBeatsToSkip])
     {
-        layer->setBeatsToSkip(i);
+        prep->setBeatsToSkip(i);
     }
     else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
     {
         Array<float> beatMults = stringToFloatArray(text);
-        layer->setBeatMultipliers(beatMults);
+        prep->setBeatMultipliers(beatMults);
     }
     else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
     {
         Array<float> lenMults = stringToFloatArray(text);
-        layer->setLengthMultipliers(lenMults);
+        prep->setLengthMultipliers(lenMults);
     }
     else if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
     {
         Array<float> accentMults = stringToFloatArray(text);
-        layer->setAccentMultipliers(accentMults);
+        prep->setAccentMultipliers(accentMults);
     }
 #if OFFSETS
     else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
     {
         Array<float> transpOffsets = stringToFloatArray(text);
-        layer->setTranspOffsets(transpOffsets);
+        prep->setTranspOffsets(transpOffsets);
     }
 #endif
     else if (name == cSynchronicParameterTypes[SynchronicTuningOffsets])
     {
         Array<float> tuningOffsets = stringToFloatArray(text);
-        layer->setTuningOffsets(tuningOffsets);
+        prep->setTuningOffsets(tuningOffsets);
     }
 
     else if (name == cSynchronicParameterTypes[SynchronicBasePitch])
     {
-        layer->setBasePitch(i);
+        prep->setBasePitch(i);
     }
     else
     {
@@ -223,28 +234,30 @@ void SynchronicViewController::updateFieldsToLayer(int numLayer)
     
     currentSynchronicLayer = numLayer;
     
-    SynchronicPreparation::Ptr layer = processor.sPreparation[numLayer];
+    
+    SynchronicProcessor::Ptr proc   = processor.sProcessor[numLayer];
+    SynchronicPreparation::Ptr prep = proc->getPreparation();
+    Keymap::Ptr keymap              = proc->getKeymap();
+    
     
     // Set text.
-    //sKeymapTF.setText( intArrayToString( processor.sKeymap));
+    sKeymapTF.setText( intArrayToString( keymap->keys()));
     
     sCurrentLayerTF.setText( String( numLayer));
     
-    synchronicTF[SynchronicTempo]->setText( String( layer->getTempo()));
-    synchronicTF[SynchronicNumPulses]->setText( String( layer->getNumPulses()));
-    synchronicTF[SynchronicClusterMin]->setText( String( layer->getClusterMin()));
-    synchronicTF[SynchronicClusterMax]->setText( String( layer->getClusterMax()));
-    synchronicTF[SynchronicClusterThresh]->setText( String( layer->getClusterThresh()));
-    synchronicTF[SynchronicMode]->setText( String( layer->getMode()));
-    synchronicTF[SynchronicBeatsToSkip]->setText( String( layer->getBeatsToSkip()));
-    synchronicTF[SynchronicBeatMultipliers]->setText( floatArrayToString( layer->getBeatMultipliers()));
-    synchronicTF[SynchronicLengthMultipliers]->setText( floatArrayToString( layer->getLengthMultipliers()));
-    synchronicTF[SynchronicAccentMultipliers]->setText( floatArrayToString( layer->getAccentMultipliers()));
-#if OFFSETS
-    synchronicTF[SynchronicTranspOffsets]->setText( floatArrayToString( layer->getTranspOffsets()));
-#endif
-    synchronicTF[SynchronicTuningOffsets]->setText( floatArrayToString( layer->getTuningOffsets()));
-    synchronicTF[SynchronicBasePitch]->setText( String( layer->getBasePitch()));
+    synchronicTF[SynchronicTempo]               ->setText( String( prep->getTempo()));
+    synchronicTF[SynchronicNumPulses]           ->setText( String( prep->getNumPulses()));
+    synchronicTF[SynchronicClusterMin]          ->setText( String( prep->getClusterMin()));
+    synchronicTF[SynchronicClusterMax]          ->setText( String( prep->getClusterMax()));
+    synchronicTF[SynchronicClusterThresh]       ->setText( String( prep->getClusterThresh()));
+    synchronicTF[SynchronicMode]                ->setText( String( prep->getMode()));
+    synchronicTF[SynchronicBeatsToSkip]         ->setText( String( prep->getBeatsToSkip()));
+    synchronicTF[SynchronicBeatMultipliers]     ->setText( floatArrayToString( prep->getBeatMultipliers()));
+    synchronicTF[SynchronicLengthMultipliers]   ->setText( floatArrayToString( prep->getLengthMultipliers()));
+    synchronicTF[SynchronicAccentMultipliers]   ->setText( floatArrayToString( prep->getAccentMultipliers()));
+    synchronicTF[SynchronicTranspOffsets]       ->setText( floatArrayToString( prep->getTranspOffsets()));
+    synchronicTF[SynchronicTuningOffsets]       ->setText( floatArrayToString( prep->getTuningOffsets()));
+    synchronicTF[SynchronicBasePitch]           ->setText( String( prep->getBasePitch()));
 }
 
 

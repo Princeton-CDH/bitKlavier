@@ -21,12 +21,16 @@ typedef enum OctatonicType
     OctatonicNil
 } OctatonicType;
 
-class Keymap
+class Keymap : public ReferenceCountedObject
 {
 public:
+    typedef ReferenceCountedObjectPtr<Keymap>       Ptr;
+    typedef Array<Keymap::Ptr, CriticalSection>     CSArr;
+    typedef Array<Keymap::Ptr>                      Arr;
+    
     Keymap()
     {
-        keymap = Array<int>();
+        keymap = Array<bool>();
         keymap.ensureStorageAllocated(128);
         
         for (int i = 0; i < 128; i++)
@@ -41,42 +45,63 @@ public:
     }
     
     // Returns true if added, false if removed.
-    bool toggleNoteInKeymap(int noteNumber)
+    bool toggleNote(int noteNumber)
     {
         bool ret = !keymap[noteNumber];
         
-        keymap[noteNumber] = ret;
+        keymap.set(noteNumber, ret);
         
         return ret;
     }
     
     // Returns true if added. Returns false if not added (because it's already there).
-    bool addNoteToKeymap(int noteNumber)
+    bool addNote(int noteNumber)
     {
         bool ret = !keymap[noteNumber];
         
-        keymap[noteNumber] = true;
+        keymap.set(noteNumber, true);
         
         return ret;
     }
     
     // Returns true if removed. Returns false if not removed (because it's not there to begin with).
-    bool removeNoteFromKeymap(int noteNumber)
+    bool removeNote(int noteNumber)
     {
         bool ret = keymap[noteNumber];
         
-        keymap[noteNumber] = false;
+        keymap.set(noteNumber, false);
         
         return ret;
     }
     
+    bool containsNote(int noteNumber)
+    {
+        return keymap[noteNumber];
+    }
+    
     // Clears keymap.
-    void clearKeymap(void)
+    void clear(void)
     {
         for (int note = 0; note < 128; note++)
         {
-            keymap[note] = false;
+            keymap.set(note, false);
         }
+    }
+    
+    Array<int> keys(void)
+    {
+        Array<int> k = Array<int>();
+        k.ensureStorageAllocated(128);
+        
+        for (int note = 0; note < 128; note++)
+        {
+            if (keymap[note])
+            {
+                k.add(note);
+            }
+        }
+        
+        return k;
     }
     
     void setAllWhiteKeys(void);

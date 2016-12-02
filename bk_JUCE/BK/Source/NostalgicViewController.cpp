@@ -133,7 +133,12 @@ void NostalgicViewController::textFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
     
-    NostalgicPreparation::Ptr layer = processor.nPreparation[currentNostalgicLayer];
+    NostalgicProcessor::Ptr   proc = processor.nProcessor[currentNostalgicLayer];
+    
+    NostalgicPreparation::Ptr prep = proc->getPreparation();
+    
+    Keymap::Ptr keymap             = proc->getKeymap();
+    
     
     if (name == "NumNostalgicLayers")
     {
@@ -145,48 +150,55 @@ void NostalgicViewController::textFieldDidChange(TextEditor& tf)
     }
     else if (name == "NostalgicKeymap")
     {
-
+        Array<int> keys = stringToIntArray(text);
+        
+        keymap->clear();
+        for (auto note : keys)
+        {
+            keymap->addNote(note);
+        }
+        
     }
     else if (name == cNostalgicParameterTypes[NostalgicWaveDistance])
     {
-        layer->setWaveDistance(i);
+        prep->setWaveDistance(i);
     }
     else if (name == cNostalgicParameterTypes[NostalgicUndertow])
     {
-        layer->setUndertow(i);
+        prep->setUndertow(i);
     }
     else if (name == cNostalgicParameterTypes[NostalgicTransposition])
     {
-        layer->setTransposition(f);
+        prep->setTransposition(f);
     }
     else if (name == cNostalgicParameterTypes[NostalgicGain])
     {
-        layer->setGain(f);
+        prep->setGain(f);
     }
     else if (name == cNostalgicParameterTypes[NostalgicLengthMultiplier])
     {
-        layer->setLengthMultiplier(f);
+        prep->setLengthMultiplier(f);
     }
     else if (name == cNostalgicParameterTypes[NostalgicBeatsToSkip])
     {
-        layer->setBeatsToSkip(i);
+        prep->setBeatsToSkip(i);
     }
     else if (name == cNostalgicParameterTypes[NostalgicMode])
     {
-        layer->setMode((NostalgicSyncMode) i);
+        prep->setMode((NostalgicSyncMode) i);
     }
     else if (name == cNostalgicParameterTypes[NostalgicSyncTarget])
     {
-        layer->setSyncTarget(i);
+        prep->setSyncTarget(i);
     }
     else if (name == cNostalgicParameterTypes[NostalgicTuningOffsets])
     {
         Array<float> tuningOffsets = stringToFloatArray(text);
-        layer->setTuningOffsets(tuningOffsets);
+        prep->setTuningOffsets(tuningOffsets);
     }
     else if (name == cNostalgicParameterTypes[NostalgicBasePitch])
     {
-        layer->setBasePitch(i);
+        prep->setBasePitch(i);
     }
     else
     {
@@ -200,21 +212,25 @@ void NostalgicViewController::updateFieldsToLayer(int numLayer)
     
     currentNostalgicLayer = numLayer;
     
-    NostalgicPreparation::Ptr layer = processor.nPreparation[numLayer];
+    NostalgicProcessor::Ptr   proc = processor.nProcessor[currentNostalgicLayer];
+    
+    NostalgicPreparation::Ptr prep = proc->getPreparation();
+    
+    Keymap::Ptr keymap             = proc->getKeymap();
     
     // Set text.
-    //sKeymapTF.setText( intArrayToString( processor.sKeymap));
+    nKeymapTF.setText( intArrayToString( keymap->keys()));
     
     nCurrentLayerTF.setText( String( numLayer));
 
-    nostalgicTF[NostalgicWaveDistance]->setText( String( layer->getWavedistance()));
-    nostalgicTF[NostalgicUndertow]->setText( String( layer->getUndertow()));
-    nostalgicTF[NostalgicTransposition]->setText( String( layer->getTransposition()));
-    nostalgicTF[NostalgicGain]->setText( String( layer->getGain()));
-    nostalgicTF[NostalgicLengthMultiplier]->setText( String( layer->getLengthMultiplier()));
-    nostalgicTF[NostalgicBeatsToSkip]->setText( String( layer->getBeatsToSkip()));
-    nostalgicTF[NostalgicMode]->setText( String( layer->getMode()));
-    nostalgicTF[NostalgicSyncTarget]->setText( String( layer->getSyncTarget()));
-    nostalgicTF[NostalgicTuningOffsets]->setText( floatArrayToString( layer->getTuningOffsets()));
-    nostalgicTF[NostalgicBasePitch]->setText( String( layer->getBasePitch()));
+    nostalgicTF[NostalgicWaveDistance]      ->setText( String( prep->getWavedistance()));
+    nostalgicTF[NostalgicUndertow]          ->setText( String( prep->getUndertow()));
+    nostalgicTF[NostalgicTransposition]     ->setText( String( prep->getTransposition()));
+    nostalgicTF[NostalgicGain]              ->setText( String( prep->getGain()));
+    nostalgicTF[NostalgicLengthMultiplier]  ->setText( String( prep->getLengthMultiplier()));
+    nostalgicTF[NostalgicBeatsToSkip]       ->setText( String( prep->getBeatsToSkip()));
+    nostalgicTF[NostalgicMode]              ->setText( String( prep->getMode()));
+    nostalgicTF[NostalgicSyncTarget]        ->setText( String( prep->getSyncTarget()));
+    nostalgicTF[NostalgicTuningOffsets]     ->setText( floatArrayToString( prep->getTuningOffsets()));
+    nostalgicTF[NostalgicBasePitch]         ->setText( String( prep->getBasePitch()));
 }
