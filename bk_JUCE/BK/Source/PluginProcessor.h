@@ -2,16 +2,15 @@
 #ifndef PLUGINPROCESSOR_H_INCLUDED
 #define PLUGINPROCESSOR_H_INCLUDED
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "BKUtilities.h"
 
-#include "ReferenceCountedBuffer.h"
-
-#include "Synchronic.h"
-#include "Nostalgic.h"
-
-#include "AudioConstants.h"
+#include "BKSampleLoader.h"
 
 #include "BKSynthesiser.h"
+
+#include "Synchronic.h"
+
+#include "Nostalgic.h"
 
 #include "BKTextField.h"
 
@@ -21,7 +20,8 @@
 /**
 */
 class BKAudioProcessor  : public AudioProcessor,
-                           public ChangeListener
+                           public ChangeListener,
+                            public BKSampleLoader
 {
     
 public:
@@ -35,26 +35,21 @@ public:
     
     int numNostalgicLayers;
     int currentNostalgicLayer;
-
-    // Sample loading.
-    AudioFormatManager formatManager;
-    ScopedPointer<AudioFormatReader> sampleReader;
-    ScopedPointer<AudioSampleBuffer> sampleBuffer;
     
     // Synthesisers.
     BKSynthesiser mainPianoSynth;
     BKSynthesiser hammerReleaseSynth;
     BKSynthesiser resonanceReleaseSynth;
 
+    // Processors.
+    SynchronicProcessor::CSArr   sProcessor;
+    NostalgicProcessor::Arr   nProcessor;
+    
     // Preparations.
-    SynchronicPreparation::Ptr currentSynchronicPreparation;
-    NostalgicPreparation::Ptr currentNostalgicPreparation;
+    SynchronicPreparation::CSArr  sPreparation;
+    NostalgicPreparation::CSArr   nPreparation;
     
-    OwnedArray<SynchronicProcessor, CriticalSection>    sProcessor;
-    OwnedArray<NostalgicProcessor, CriticalSection>     nProcessor;
-    
-    Array<SynchronicPreparation::Ptr, CriticalSection> sPreparation;
-    Array<NostalgicPreparation::Ptr, CriticalSection> nPreparation;
+    // Keymaps.
     
     int channel;
     

@@ -10,7 +10,7 @@
 
 #include "Nostalgic.h"
 
-NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s, NostalgicPreparation::Ptr prep, OwnedArray<SynchronicProcessor,CriticalSection>& proc)
+NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s, NostalgicPreparation::Ptr prep, SynchronicProcessor::CSArr& proc)
 :
     synth(s),
     preparation(prep),
@@ -23,7 +23,7 @@ NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s, NostalgicPreparation::P
     reverseLengthTimers.ensureStorageAllocated(128);
     reverseTargetLength.ensureStorageAllocated(128);
     undertowVelocities.ensureStorageAllocated(128);
-    undertowPreparations.ensureStorageAllocated(128);
+    preparationAtKeyOn.ensureStorageAllocated(128);
     
     for (int i = 0; i < 128; i++)
     {
@@ -32,7 +32,7 @@ NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s, NostalgicPreparation::P
         reverseLengthTimers.insert(i, 0); //initialize timers for handling wavedistance/undertow
         reverseTargetLength.insert(i, 0);
         undertowVelocities.insert(i, 0);
-        undertowPreparations.insert(i, preparation);
+        preparationAtKeyOn.insert(i, preparation);
     }
 
 }
@@ -95,7 +95,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
     
     //store values for when undertow note is played (in the event the preparation changes in the meantime)
     undertowVelocities.set(midiNoteNumber, velocities.getUnchecked(midiNoteNumber) * preparation->getGain());
-    undertowPreparations.set(midiNoteNumber, preparation);
+    preparationAtKeyOn.set(midiNoteNumber, preparation);
     
     //it might be better to do this by copy, instead of by pointer, in the off chance that the preparation disappears because of a library switch or something...
 }
@@ -122,27 +122,27 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
         int tempnote = activeReverseNotes.getUnchecked(i);
         
         //need to use preparation values from when note was played, stored in undertowPreparations
-        NostalgicPreparation::Ptr undertowPrep = undertowPreparations.getUnchecked(tempnote);
+        NostalgicPreparation::Ptr noteOnPrep = preparationAtKeyOn.getUnchecked(tempnote);
         
         if (reverseLengthTimers.getUnchecked(tempnote) > reverseTargetLength.getUnchecked(tempnote))
         {
  
-            if(undertowPrep->getUndertow() > 0)
+            if(noteOnPrep->getUndertow() > 0)
             {
                 synth->keyOn(
                              midiChannel,
                              tempnote,
-                             undertowPrep->getTransposition(),
+                             noteOnPrep->getTransposition(),
                              undertowVelocities.getUnchecked(tempnote) * aGlobalGain,
-                             undertowPrep->getTuningOffsets(),
-                             undertowPrep->getBasePitch(),
+                             noteOnPrep->getTuningOffsets(),
+                             noteOnPrep->getBasePitch(),
                              Forward,
                              FixedLengthFixedStart,
                              Nostalgic,
-                             undertowPrep->getWavedistance(),                        //start position
-                             undertowPrep->getUndertow(),                            //play length
+                             noteOnPrep->getWavedistance(),                        //start position
+                             noteOnPrep->getUndertow(),                            //play length
                              aRampUndertowCrossMS,                                   //ramp up length
-                             undertowPrep->getUndertow() - aRampUndertowCrossMS);    //ramp down length
+                             noteOnPrep->getUndertow() - aRampUndertowCrossMS);    //ramp down length
             }
             
             //remove from active notes list

@@ -23,7 +23,10 @@
 class SynchronicPreparation : public ReferenceCountedObject
 {
 public:
-    typedef ReferenceCountedObjectPtr<SynchronicPreparation> Ptr;
+    typedef ReferenceCountedObjectPtr<SynchronicPreparation>    Ptr;
+    typedef Array<SynchronicPreparation::Ptr, CriticalSection>  CSArr;
+    typedef Array<SynchronicPreparation::Ptr>                   Arr;
+    
     
     SynchronicPreparation(float tempo,
                           int numPulses,
@@ -168,11 +171,13 @@ private:
     JUCE_LEAK_DETECTOR(SynchronicPreparation);
 };
 
-class SynchronicProcessor: public ReferenceCountedObject
+class SynchronicProcessor : public ReferenceCountedObject
 {
     
 public:
-    typedef ReferenceCountedObjectPtr<SynchronicProcessor> Ptr;
+    typedef ReferenceCountedObjectPtr<SynchronicProcessor>      Ptr;
+    typedef Array<SynchronicProcessor::Ptr, CriticalSection>    CSArr;
+    typedef Array<SynchronicProcessor::Ptr>                     Arr;
     
     SynchronicProcessor(BKSynthesiser *s, SynchronicPreparation::Ptr prep);
     ~SynchronicProcessor();

@@ -30,6 +30,13 @@
               file="Source/ReferenceCountedBuffer.h"/>
       </GROUP>
       <GROUP id="{E01F59AF-FEAD-7AEA-32C2-F665B05A05F1}" name="Model">
+        <FILE id="llDb7n" name="BKSampleLoader.cpp" compile="1" resource="0"
+              file="Source/BKSampleLoader.cpp"/>
+        <FILE id="wwKFGe" name="BKSampleLoader.h" compile="0" resource="0"
+              file="Source/BKSampleLoader.h"/>
+        <GROUP id="{D95FF283-C159-D64C-6BE8-DFE35BF1BDDA}" name="Keymap">
+          <FILE id="hJbk7x" name="Keymap.h" compile="0" resource="0" file="Source/Keymap.h"/>
+        </GROUP>
         <FILE id="GHmNVp" name="PluginProcessor.cpp" compile="1" resource="0"
               file="Source/PluginProcessor.cpp"/>
         <FILE id="oVHIQ3" name="PluginProcessor.h" compile="0" resource="0"

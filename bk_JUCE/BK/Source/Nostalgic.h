@@ -25,7 +25,9 @@
 class NostalgicPreparation : public ReferenceCountedObject
 {
 public:
-    typedef ReferenceCountedObjectPtr<NostalgicPreparation> Ptr;
+    typedef ReferenceCountedObjectPtr<NostalgicPreparation>     Ptr;
+    typedef Array<NostalgicPreparation::Ptr, CriticalSection>   CSArr;
+    typedef Array<NostalgicPreparation::Ptr>                    Arr;
     
     NostalgicPreparation(int waveDistance,
                          int undertow,
@@ -134,10 +136,13 @@ private:
 
 class NostalgicProcessor : public ReferenceCountedObject
 {
+    
 public:
-    typedef ReferenceCountedObjectPtr<NostalgicProcessor> Ptr;
+    typedef ReferenceCountedObjectPtr<NostalgicProcessor>   Ptr;
+    typedef Array<NostalgicProcessor::Ptr, CriticalSection> CSArr;
+    typedef Array<NostalgicProcessor::Ptr>                  Arr;
 
-    NostalgicProcessor(BKSynthesiser *s, NostalgicPreparation::Ptr, OwnedArray<SynchronicProcessor,CriticalSection>&);
+    NostalgicProcessor(BKSynthesiser *s, NostalgicPreparation::Ptr, SynchronicProcessor::CSArr& proc);
     virtual ~NostalgicProcessor();
     
     //called with every audio vector
@@ -162,12 +167,17 @@ private:
     //move timers forward by blocksize
     void incrementTimers(int numSamples);
     
+    double sampleRate;
+    
     //data and pointers
     BKSynthesiser *synth;
     NostalgicPreparation::Ptr preparation;
-    OwnedArray<SynchronicProcessor,CriticalSection>& syncProcessor;
+    SynchronicProcessor::CSArr& syncProcessor;
     
-    double sampleRate;
+    //store values so that undertow note retains preparation from reverse note
+    NostalgicPreparation::Arr preparationAtKeyOn;
+    Array<float> undertowVelocities;
+    
 
     Array<uint64> noteLengthTimers;        //store current length of played notes here
     Array<int> activeNotes;             //table of notes currently being played by player
@@ -177,9 +187,9 @@ private:
     Array<int> activeReverseNotes;      //table of active reverse notes
     Array<int> reverseTargetLength;     //target reverse length (in samples)
     
-    //store values so that undertow note retains preparation from reverse note
-    Array<float> undertowVelocities;
-    Array<NostalgicPreparation::Ptr> undertowPreparations;
+    
+    
+    
     
     JUCE_LEAK_DETECTOR (NostalgicProcessor) //is this the right one to use here?
 };

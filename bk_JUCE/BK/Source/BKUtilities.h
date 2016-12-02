@@ -13,11 +13,11 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
+#include "ReferenceCountedBuffer.h"
+
 #include "GraphicsConstants.h"
 
 #include "AudioConstants.h"
-
-
 
 String          intArrayToString(Array<int> arr);
 
