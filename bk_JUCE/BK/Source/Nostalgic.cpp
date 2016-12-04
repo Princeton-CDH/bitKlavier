@@ -150,7 +150,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
                              Nostalgic,
                              noteOnPrep->getWavedistance(),                        //start position
                              noteOnPrep->getUndertow(),                            //play length
-                             aRampUndertowCrossMS,                                   //ramp up length
+                             aRampUndertowCrossMS,                                 //ramp up length
                              noteOnPrep->getUndertow() - aRampUndertowCrossMS);    //ramp down length
             }
             

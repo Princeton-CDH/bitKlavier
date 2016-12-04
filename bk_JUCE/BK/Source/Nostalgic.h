@@ -35,7 +35,7 @@ public:
                          float beatsToSkip,
                          NostalgicSyncMode mode,
                          int syncTarget,
-                         Array<float> tuningOffsets,
+                         int tuning,
                          int basePitch):
     nWaveDistance(waveDistance),
     nUndertow(undertow),
@@ -45,7 +45,7 @@ public:
     nBeatsToSkip(beatsToSkip),
     nMode(mode),
     nSyncTarget(syncTarget),
-    nTuningOffsets(tuningOffsets),
+    nTuning(tuning),
     nBasePitch(basePitch)
     {
         
@@ -60,7 +60,7 @@ public:
     nBeatsToSkip(0.0),
     nMode(NoteLengthSync),
     nSyncTarget(0),
-    nTuningOffsets(Array<float>(aEqualTuning, 12)),
+    nTuning(2),
     nBasePitch(0)
     {
 
@@ -81,6 +81,7 @@ public:
     const NostalgicSyncMode getMode() const noexcept                {return nMode;              }
     const int getSyncTarget() const noexcept                        {return nSyncTarget;        }
     const Array<float> getTuningOffsets() const noexcept            {return nTuningOffsets;     }
+    const int getTuning() const noexcept                            {return nTuning;            }
     const int getBasePitch() const noexcept                         {return nBasePitch;         }
     
     void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
@@ -92,6 +93,7 @@ public:
     void setMode(NostalgicSyncMode mode)                            {nMode = mode;                          }
     void setSyncTarget(int syncTarget)                              {nSyncTarget = syncTarget;              }
     void setTuningOffsets(Array<float> tuningOffsets)               {nTuningOffsets = tuningOffsets;        }
+    void setTuning(int tuning)                                      {nTuning = tuning;                      }
     void setBasePitch(int basePitch)                                {nBasePitch = basePitch;                }
 
     void print(void)
@@ -128,6 +130,7 @@ private:
     int nSyncTarget;            //which synchronic layer to sync to, when nMode = NostalgicSyncSynchronic
     
     Array<float> nTuningOffsets;
+    int nTuning;
     int nBasePitch;
     
     JUCE_LEAK_DETECTOR(NostalgicPreparation);
@@ -192,11 +195,11 @@ private:
     Array<float> undertowVelocities;
     
 
-    Array<uint64> noteLengthTimers;        //store current length of played notes here
+    Array<uint64> noteLengthTimers;     //store current length of played notes here
     Array<int> activeNotes;             //table of notes currently being played by player
     Array<float> velocities;            //table of velocities played
     
-    Array<uint64> reverseLengthTimers;     //keep track of how long reverse notes have been playing
+    Array<uint64> reverseLengthTimers;  //keep track of how long reverse notes have been playing
     Array<int> activeReverseNotes;      //table of active reverse notes
     Array<int> reverseTargetLength;     //target reverse length (in samples)
     

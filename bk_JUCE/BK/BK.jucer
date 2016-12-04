@@ -53,6 +53,8 @@
           <FILE id="QU7LbV" name="Nostalgic.h" compile="0" resource="0" file="Source/Nostalgic.h"/>
           <FILE id="O8HjWt" name="Synchronic.cpp" compile="1" resource="0" file="Source/Synchronic.cpp"/>
           <FILE id="FXpKMX" name="Synchronic.h" compile="0" resource="0" file="Source/Synchronic.h"/>
+          <FILE id="ac8QzA" name="Tuning.cpp" compile="1" resource="0" file="Source/Tuning.cpp"/>
+          <FILE id="OrPhKl" name="Tuning.h" compile="0" resource="0" file="Source/Tuning.h"/>
         </GROUP>
         <GROUP id="{D6A5380E-86D4-5EEB-83A3-296DC1BDB7DF}" name="Synthesiser (Sound/Voice)">
           <FILE id="HVbOmG" name="BKPianoSampler.cpp" compile="1" resource="0"

@@ -104,7 +104,7 @@ typedef enum NostalgicParameterType {
     NostalgicBeatsToSkip,
     NostalgicMode,
     NostalgicSyncTarget,
-    NostalgicTuningOffsets,
+    NostalgicTuning,
     NostalgicBasePitch,
     NostalgicParameterTypeNil
 } NostalgicParameterType;
@@ -118,7 +118,7 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
     "NostalgicBeatsToSkip",
     "NostalgicMode",
     "NostalgicSyncTarget",
-    "NostalgicTuningOffsets",
+    "NostalgicTuning",
     "NostalgicBasePitch",
 };
 
@@ -198,5 +198,17 @@ static const float aOtonalTuning[aNumScaleDegrees] = {0.0,  .049553,  .039101, -
 // Utonal: 1/1, 16/15, 8/7, 32/27, 16/13, 4/3, 16/11, 32/21, 8/5, 32/19, 16/9, 32/17
 static const float aUtonalTuning[aNumScaleDegrees] = {0.0,  .117313,  .311745,  .156414, -.405273, -.019547,  .486824,  .292191,  .136864,  .024847, -.039101,  -.049553};
 
+typedef enum Tuning {
+    PartialTuning = 0,
+    JustTuning,
+    EqualTemperament,
+    AdaptiveTuning,
+    AdaptiveAnchoredTuning,
+    DuodeneTuning,
+    OtonalTuning,
+    UtonalTuning,
+    CustomTuning,
+    TuningNil
+} Tuning;
 
 #endif  // AUDIOCONSTANTS_H_INCLUDED
