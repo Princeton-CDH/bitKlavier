@@ -233,31 +233,30 @@ void SynchronicViewController::updateFieldsToLayer(int numLayer)
 {
     
     currentSynchronicLayer = numLayer;
-    
-    
+
     SynchronicProcessor::Ptr proc   = processor.sProcessor[numLayer];
     SynchronicPreparation::Ptr prep = proc->getPreparation();
     Keymap::Ptr keymap              = proc->getKeymap();
     
     
+    
     // Set text.
-    sKeymapTF.setText( intArrayToString( keymap->keys()));
-    
-    sCurrentLayerTF.setText( String( numLayer));
-    
-    synchronicTF[SynchronicTempo]               ->setText( String( prep->getTempo()));
-    synchronicTF[SynchronicNumPulses]           ->setText( String( prep->getNumPulses()));
-    synchronicTF[SynchronicClusterMin]          ->setText( String( prep->getClusterMin()));
-    synchronicTF[SynchronicClusterMax]          ->setText( String( prep->getClusterMax()));
-    synchronicTF[SynchronicClusterThresh]       ->setText( String( prep->getClusterThresh()));
-    synchronicTF[SynchronicMode]                ->setText( String( prep->getMode()));
-    synchronicTF[SynchronicBeatsToSkip]         ->setText( String( prep->getBeatsToSkip()));
-    synchronicTF[SynchronicBeatMultipliers]     ->setText( floatArrayToString( prep->getBeatMultipliers()));
-    synchronicTF[SynchronicLengthMultipliers]   ->setText( floatArrayToString( prep->getLengthMultipliers()));
-    synchronicTF[SynchronicAccentMultipliers]   ->setText( floatArrayToString( prep->getAccentMultipliers()));
-    synchronicTF[SynchronicTranspOffsets]       ->setText( floatArrayToString( prep->getTranspOffsets()));
-    synchronicTF[SynchronicTuningOffsets]       ->setText( floatArrayToString( prep->getTuningOffsets()));
-    synchronicTF[SynchronicBasePitch]           ->setText( String( prep->getBasePitch()));
+    sKeymapTF                                   .setText(   intArrayToString(    keymap->keys()));
+    sCurrentLayerTF                             .setText(   String(              numLayer));
+
+    synchronicTF[SynchronicTempo]               ->setText(  String(              prep->getTempo()));
+    synchronicTF[SynchronicNumPulses]           ->setText(  String(              prep->getNumPulses()));
+    synchronicTF[SynchronicClusterMin]          ->setText(  String(              prep->getClusterMin()));
+    synchronicTF[SynchronicClusterMax]          ->setText(  String(              prep->getClusterMax()));
+    synchronicTF[SynchronicClusterThresh]       ->setText(  String(              prep->getClusterThresh()));
+    synchronicTF[SynchronicMode]                ->setText(  String(              prep->getMode()));
+    synchronicTF[SynchronicBeatsToSkip]         ->setText(  String(              prep->getBeatsToSkip()));
+    synchronicTF[SynchronicBeatMultipliers]     ->setText(  floatArrayToString(  prep->getBeatMultipliers()));
+    synchronicTF[SynchronicLengthMultipliers]   ->setText(  floatArrayToString(  prep->getLengthMultipliers()));
+    synchronicTF[SynchronicAccentMultipliers]   ->setText(  floatArrayToString(  prep->getAccentMultipliers()));
+    synchronicTF[SynchronicTranspOffsets]       ->setText(  floatArrayToString(  prep->getTranspOffsets()));
+    synchronicTF[SynchronicTuningOffsets]       ->setText(  floatArrayToString(  prep->getTuningOffsets()));
+    synchronicTF[SynchronicBasePitch]           ->setText(  String(              prep->getBasePitch()));
 }
 
 
