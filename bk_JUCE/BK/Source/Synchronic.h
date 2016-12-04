@@ -198,6 +198,8 @@ public:
         return preparation;
     }
     
+    float getTimeToBeatMS(float beatsToSkip);
+    
 private:
     
     BKSynthesiser*              synth;

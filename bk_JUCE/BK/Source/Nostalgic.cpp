@@ -62,11 +62,11 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
         }
         else //SynchronicSync
         {
-            uint64 phasor = syncProcessor[preparation->getSyncTarget()]->getCurrentPhasor();
-            uint64 beatSamples = syncProcessor[preparation->getSyncTarget()]->getCurrentNumSamplesBeat();
+            //uint64 phasor = syncProcessor[preparation->getSyncTarget()]->getCurrentPhasor();
+            //uint64 beatSamples = syncProcessor[preparation->getSyncTarget()]->getCurrentNumSamplesBeat();
+            //duration =  ((beatSamples - phasor) + preparation->getBeatsToSkip() * beatSamples) * (1000.0/sampleRate); // not sum
             
-            // Don't we need to sum the beatSamples for each of the next beatsToSkip notes?
-            duration =  ((beatSamples - phasor) + preparation->getBeatsToSkip() * beatSamples) * (1000.0/sampleRate);
+            duration = syncProcessor[preparation->getSyncTarget()]->getTimeToBeatMS(preparation->getBeatsToSkip()); // sum
         }
         
         //play nostalgic note
