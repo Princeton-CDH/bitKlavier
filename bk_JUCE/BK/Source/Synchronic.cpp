@@ -80,7 +80,7 @@ void SynchronicProcessor::playNote(int channel, int note)
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
     //if (keymap[noteNumber])
-    if (noteNumber == 60)
+    //if (noteNumber == 60)
     {
         if (inCluster)
         {
