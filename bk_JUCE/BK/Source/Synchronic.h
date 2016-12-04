@@ -197,6 +197,8 @@ public:
     const uint64 getCurrentNumSamplesBeat()     const noexcept { return numSamplesBeat;  }
     const uint64 getCurrentPhasor()             const noexcept { return phasor;          }
     
+    float getTimeToBeatMS(float beatsToSkip);
+    
 private:
     
     BKSynthesiser *synth;

@@ -80,6 +80,7 @@ void SynchronicProcessor::playNote(int channel, int note)
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
     //if (keymap[noteNumber])
+    if (noteNumber == 60)
     {
         if (inCluster)
         {
@@ -226,6 +227,20 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
         
     }
     
+}
+
+float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip) //return time in ms to future beat, given beatsToSkip
+{
+    uint64 timeToReturn = numSamplesBeat - phasor; //next beat
+    int myBeat = beat;
+    
+    while(beatsToSkip-- > 0) {
+        if (++myBeat >= preparation->getBeatMultipliers().size()) myBeat = 0;
+        timeToReturn += (preparation->getBeatMultipliers()[myBeat] * pulseThresholdSamples);
+    }
+    
+    DBG("time in ms to skipped beat = " + std::to_string(timeToReturn * 1000./sampleRate));
+    return timeToReturn * 1000./sampleRate;
 }
 
 
