@@ -22,7 +22,7 @@ BKAudioProcessor::BKAudioProcessor()
     sProcessor.ensureStorageAllocated(aMaxNumLayers);
     nProcessor.ensureStorageAllocated(aMaxNumLayers);
     
-    bkKeymaps          =  Keymap::CSArr();
+    bkKeymaps       =  Keymap::CSArr();
     
     bkKeymaps.ensureStorageAllocated(aMaxNumLayers * 5);
     
@@ -53,24 +53,24 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
     
     for (int i = 0; i < aMaxNumLayers; i++)
     {
-        Keymap::Ptr keymap                      = new Keymap();
+        Keymap::Ptr keymap                  = new Keymap();
         bkKeymaps.add(keymap);
         
         SynchronicPreparation::Ptr sPrep    = new SynchronicPreparation();
         sPreparation.insert(i, sPrep);
         
-        sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, keymap, sPrep, i));
+        sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, keymap, sPrep, i, &tuner));
     }
     
     for (int i = 0; i < aMaxNumLayers; i++)
     {
-        Keymap::Ptr keymap                      = new Keymap();
+        Keymap::Ptr keymap                  = new Keymap();
         bkKeymaps.add(keymap);
         
         NostalgicPreparation::Ptr nPrep     = new NostalgicPreparation();
         nPreparation.insert(i, nPrep);
         
-        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, keymap, nPrep, sProcessor, i));
+        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, keymap, nPrep, sProcessor, i, &tuner));
     }
 }
 
@@ -96,9 +96,6 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     MidiBuffer processedMidi;
     int time;
     MidiMessage m;
-    
-    Array<float> tuningOffsets = Array<float>(aPartialTuning,aNumScaleDegrees);
-    int tuningBasePitch = 0;
     
     int numSamples = buffer.getNumSamples();
     
@@ -138,10 +135,8 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             mainPianoSynth.keyOn(
                                  channel,
                                  noteNumber,
-                                 0,
+                                 tuner.getOffset(noteNumber, mainTuning, tuningBasePitch), //will need to add Direct Transp here
                                  velocity * aGlobalGain,
-                                 tuningOffsets,
-                                 tuningBasePitch,
                                  Forward,
                                  Normal,
                                  BKNoteTypeNil,
@@ -181,8 +176,6 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
                                      noteNumber,
                                      0,
                                      velocity * 0.0025 * aGlobalGain, //will want hammerGain multipler that user can set
-                                     tuningOffsets,
-                                     tuningBasePitch,
                                      Forward,
                                      FixedLength,
                                      BKNoteTypeNil,
@@ -194,10 +187,8 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             resonanceReleaseSynth.keyOn(
                                         channel,
                                         noteNumber,
-                                        0,
+                                        tuner.getOffset(noteNumber, mainTuning, tuningBasePitch),
                                         velocity * aGlobalGain, //will also want multiplier for resonance gain...
-                                        tuningOffsets,
-                                        tuningBasePitch,
                                         Forward,
                                         FixedLength,
                                         BKNoteTypeNil,

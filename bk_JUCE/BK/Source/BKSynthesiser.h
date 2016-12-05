@@ -388,8 +388,6 @@ public:
                         int midiNoteNumber,
                         float transp,
                         float velocity,
-                        Array<float> midiNoteOffsets,
-                        int midiNoteTuningBase,
                         PianoSamplerNoteDirection direction,
                         PianoSamplerNoteType type,
                         BKNoteType bktype,

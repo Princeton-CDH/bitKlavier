@@ -17,6 +17,8 @@
 
 #include "Keymap.h"
 
+#include "Tuning.h"
+
 class SynchronicPreparation : public ReferenceCountedObject
 {
 public:
@@ -36,7 +38,7 @@ public:
                           Array<float> accentMultipliers,
                           Array<float> lengthMultipliers,
                           Array<float> transpOffsets,
-                          Array<float> tuningOffsets,
+                          TuningSystem tuning,
                           int basePitch):
     sTempo(tempo),
     sNumPulses(numPulses),
@@ -49,7 +51,7 @@ public:
     sAccentMultipliers(accentMultipliers),
     sLengthMultipliers(lengthMultipliers),
     sTranspOffsets(transpOffsets),
-    sTuningOffsets(tuningOffsets),
+    sTuning(tuning),
     sBasePitch(basePitch),
     sPulseThreshSec(60.0/sTempo),
     sClusterThreshSec(sPulseThreshSec * sClusterThresh)
@@ -69,7 +71,7 @@ public:
     sAccentMultipliers(Array<float>({1.0})),
     sLengthMultipliers(Array<float>({1.0})),
     sTranspOffsets(Array<float>({0.0})),
-    sTuningOffsets(Array<float>(aEqualTuning, 12)),
+    sTuning(PartialTuning),
     sBasePitch(0),
     sPulseThreshSec(60.0/sTempo),
     sClusterThreshSec(sPulseThreshSec * sClusterThresh)
@@ -88,8 +90,9 @@ public:
     const Array<float> getBeatMultipliers() const noexcept      {return sBeatMultipliers;       }
     const Array<float> getAccentMultipliers() const noexcept    {return sAccentMultipliers;     }
     const Array<float> getLengthMultipliers() const noexcept    {return sLengthMultipliers;     }
-    const Array<float> getTuningOffsets() const noexcept        {return sTuningOffsets;         }
     const Array<float> getTranspOffsets() const noexcept        {return sTranspOffsets;         }
+    
+    const TuningSystem getTuning() const noexcept               {return sTuning;             }
     const int getBasePitch() const noexcept                     {return sBasePitch;             }
     
     
@@ -117,9 +120,10 @@ public:
     void setBeatsToSkip(int beatsToSkip)                        {sBeatsToSkip = beatsToSkip;                        }
     void setBeatMultipliers(Array<float> beatMultipliers)       {sBeatMultipliers.swapWith(beatMultipliers);        }
     void setAccentMultipliers(Array<float> accentMultipliers)   {sAccentMultipliers.swapWith(accentMultipliers);    }
-    void setTranspOffsets(Array<float> transpOffsets)           {sTranspOffsets.swapWith(transpOffsets);    }
+    void setTranspOffsets(Array<float> transpOffsets)           {sTranspOffsets.swapWith(transpOffsets);            }
     void setLengthMultipliers(Array<float> lengthMultipliers)   {sLengthMultipliers.swapWith(lengthMultipliers);    }
-    void setTuningOffsets(Array<float> tuningOffsets)           {sTuningOffsets = tuningOffsets;                    }
+    
+    void setTuning(TuningSystem tuning)                         {sTuning = tuning;                                  }
     void setBasePitch(int basePitch)                            {sBasePitch = basePitch;                            }
     
     void print(void)
@@ -136,7 +140,7 @@ public:
         DBG("sLengthMultipliers: " + floatArrayToString(sLengthMultipliers));
         DBG("sAccentMultipliers: " + floatArrayToString(sAccentMultipliers));
         DBG("sTranspOffsets: " + floatArrayToString(sTranspOffsets));
-        DBG("sTuningOffsets: " + floatArrayToString(sTuningOffsets));
+        DBG("sTuning: " + String(sTuning));
         DBG("sBasePitch: " + String(sBasePitch));
         DBG("sPulseThreshSec: " + String(sPulseThreshSec));
         DBG("sClusterThreshSec: " + String(sClusterThreshSec));
@@ -153,8 +157,9 @@ private:
     Array<float> sAccentMultipliers;
     Array<float> sLengthMultipliers;
     Array<float> sTranspOffsets;
-    Array<float> sTuningOffsets;
-    int sBasePitch; // float?
+    
+    TuningSystem sTuning;
+    int sBasePitch;
     
     float sPulseThreshSec;
     float sClusterThreshSec;
@@ -174,7 +179,7 @@ public:
     typedef Array<SynchronicProcessor::Ptr, CriticalSection>    CSArr;
     typedef Array<SynchronicProcessor::Ptr>                     Arr;
     
-    SynchronicProcessor(BKSynthesiser *s, Keymap::Ptr km, SynchronicPreparation::Ptr prep, int layer);
+    SynchronicProcessor(BKSynthesiser *s, Keymap::Ptr km, SynchronicPreparation::Ptr prep, int layer, TuningProcessor *t);
     ~SynchronicProcessor();
     
     void processBlock(int numSamples, int channel);
@@ -205,6 +210,7 @@ private:
     BKSynthesiser*              synth;
     Keymap::Ptr                 keymap;
     SynchronicPreparation::Ptr  preparation;
+    TuningProcessor*            tuner;
     
     int pulse;
     

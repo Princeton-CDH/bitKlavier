@@ -10,12 +10,13 @@
 
 #include "Nostalgic.h"
 
-NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s, Keymap::Ptr km, NostalgicPreparation::Ptr prep, SynchronicProcessor::CSArr& proc, int layer)
+NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s, Keymap::Ptr km, NostalgicPreparation::Ptr prep, SynchronicProcessor::CSArr& proc, int layer, TuningProcessor *tuner)
 :
     layer(layer),
     synth(s),
     keymap(km),
     preparation(prep),
+    tuner(tuner),
     syncProcessor(proc)
 {
     sampleRate = synth->getSampleRate();
@@ -24,7 +25,8 @@ NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s, Keymap::Ptr km, Nostalg
     velocities.ensureStorageAllocated(128);
     reverseLengthTimers.ensureStorageAllocated(128);
     reverseTargetLength.ensureStorageAllocated(128);
-    undertowVelocities.ensureStorageAllocated(128);
+    tuningsAtKeyOn.ensureStorageAllocated(128);
+    velocitiesAtKeyOn.ensureStorageAllocated(128);
     preparationAtKeyOn.ensureStorageAllocated(128);
     
     for (int i = 0; i < 128; i++)
@@ -33,7 +35,8 @@ NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s, Keymap::Ptr km, Nostalg
         velocities.insert(i, 0); //store noteOn velocities to set Nostalgic velocities
         reverseLengthTimers.insert(i, 0); //initialize timers for handling wavedistance/undertow
         reverseTargetLength.insert(i, 0);
-        undertowVelocities.insert(i, 0);
+        tuningsAtKeyOn.insert(i, 0);
+        velocitiesAtKeyOn.insert(i, 0);
         preparationAtKeyOn.insert(i, preparation);
     }
 
@@ -62,21 +65,19 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
         }
         else //SynchronicSync
         {
-            //uint64 phasor = syncProcessor[preparation->getSyncTarget()]->getCurrentPhasor();
-            //uint64 beatSamples = syncProcessor[preparation->getSyncTarget()]->getCurrentNumSamplesBeat();
-            //duration =  ((beatSamples - phasor) + preparation->getBeatsToSkip() * beatSamples) * (1000.0/sampleRate); // not sum
-            
+            //get time in ms to target beat, summing over skipped beat lengths
             duration = syncProcessor[preparation->getSyncTarget()]->getTimeToBeatMS(preparation->getBeatsToSkip()); // sum
         }
         
         //play nostalgic note
         synth->keyOn(
                      midiChannel,
-                     midiNoteNumber, //need to store this, so that undertow retains this in the event of a preparation change
-                     preparation->getTransposition(),
+                     midiNoteNumber,
+                     tuner->getOffset(midiNoteNumber,
+                                      preparation->getTuning(),
+                                      preparation->getBasePitch())
+                                    + preparation->getTransposition(),
                      velocities.getUnchecked(midiNoteNumber) * preparation->getGain() * aGlobalGain,
-                     preparation->getTuningOffsets(),
-                     preparation->getBasePitch(),
                      Reverse,
                      FixedLengthFixedStart,
                      Nostalgic,
@@ -98,7 +99,10 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
         reverseTargetLength.set(midiNoteNumber, (duration - aRampUndertowCrossMS) * sampleRate/1000.); //to schedule undertow note
         
         //store values for when undertow note is played (in the event the preparation changes in the meantime)
-        undertowVelocities.set(midiNoteNumber, velocities.getUnchecked(midiNoteNumber) * preparation->getGain());
+        tuningsAtKeyOn.set(midiNoteNumber, tuner->getOffset(midiNoteNumber,
+                                                            preparation->getTuning(),
+                                                            preparation->getBasePitch()));
+        velocitiesAtKeyOn.set(midiNoteNumber, velocities.getUnchecked(midiNoteNumber) * preparation->getGain());
         preparationAtKeyOn.set(midiNoteNumber, preparation);
         
         //it might be better to do this by copy, instead of by pointer, in the off chance that the preparation disappears because of a library switch or something...
@@ -141,10 +145,8 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
                 synth->keyOn(
                              midiChannel,
                              tempnote,
-                             noteOnPrep->getTransposition(),
-                             undertowVelocities.getUnchecked(tempnote) * aGlobalGain,
-                             noteOnPrep->getTuningOffsets(),
-                             noteOnPrep->getBasePitch(),
+                             tuningsAtKeyOn.getUnchecked(tempnote) + noteOnPrep->getTransposition(),
+                             velocitiesAtKeyOn.getUnchecked(tempnote) * aGlobalGain,
                              Forward,
                              FixedLengthFixedStart,
                              Nostalgic,

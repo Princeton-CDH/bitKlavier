@@ -10,12 +10,13 @@
 
 #include "Synchronic.h"
 
-SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s, Keymap::Ptr km, SynchronicPreparation::Ptr p, int layer)
+SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s, Keymap::Ptr km, SynchronicPreparation::Ptr p, int layer, TuningProcessor *t)
 :
     layer(layer),
     synth(s),
     keymap(km),
-    preparation(p)
+    preparation(p),
+    tuner(t)
 {
     sampleRate = synth->getSampleRate();
     
@@ -56,10 +57,11 @@ void SynchronicProcessor::playNote(int channel, int note)
     synth->keyOn(
                  channel,
                  note,
-                 preparation->getTranspOffsets()[transp],
+                 tuner->getOffset(note,
+                                  preparation->getTuning(),
+                                  preparation->getBasePitch())
+                                + preparation->getTranspOffsets()[transp],
                  preparation->getAccentMultipliers()[accent] * aGlobalGain,
-                 preparation->getTuningOffsets(),
-                 preparation->getBasePitch(),
                  noteDirection,
                  FixedLengthFixedStart,
                  Synchronic,
@@ -237,7 +239,7 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip) //return time in m
         timeToReturn += (preparation->getBeatMultipliers()[myBeat] * pulseThresholdSamples);
     }
     
-    DBG("time in ms to skipped beat = " + std::to_string(timeToReturn * 1000./sampleRate));
+    //DBG("time in ms to skipped beat = " + std::to_string(timeToReturn * 1000./sampleRate));
     return timeToReturn * 1000./sampleRate;
 }
 

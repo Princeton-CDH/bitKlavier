@@ -14,6 +14,8 @@
 
 #include "Keymap.h"
 
+#include "Tuning.h"
+
 #define USE_SYNCHRONIC_TWO 0
 
 //==============================================================================
@@ -51,6 +53,9 @@ public:
     
     // Keymaps.
     Keymap::CSArr                   bkKeymaps;
+    
+    // Tuning.
+    TuningProcessor tuner;
     
     int channel;
     
@@ -96,6 +101,9 @@ private:
     void loadMainPianoSamples(BKSynthesiser *synth, int numLayers);
     void loadResonanceRelaseSamples(BKSynthesiser *synth);
     void loadHammerReleaseSamples(BKSynthesiser *synth);
+    
+    TuningSystem mainTuning = PartialTuning;
+    int tuningBasePitch = 0;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)

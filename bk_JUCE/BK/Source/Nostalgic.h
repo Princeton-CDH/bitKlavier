@@ -19,6 +19,8 @@
 
 #include "Keymap.h"
 
+#include "Tuning.h"
+
 
 class NostalgicPreparation : public ReferenceCountedObject
 {
@@ -35,7 +37,7 @@ public:
                          float beatsToSkip,
                          NostalgicSyncMode mode,
                          int syncTarget,
-                         int tuning,
+                         TuningSystem tuning,
                          int basePitch):
     nWaveDistance(waveDistance),
     nUndertow(undertow),
@@ -60,7 +62,7 @@ public:
     nBeatsToSkip(0.0),
     nMode(NoteLengthSync),
     nSyncTarget(0),
-    nTuning(2),
+    nTuning(PartialTuning),
     nBasePitch(0)
     {
 
@@ -80,8 +82,7 @@ public:
     const float getBeatsToSkip() const noexcept                     {return nBeatsToSkip;       }
     const NostalgicSyncMode getMode() const noexcept                {return nMode;              }
     const int getSyncTarget() const noexcept                        {return nSyncTarget;        }
-    const Array<float> getTuningOffsets() const noexcept            {return nTuningOffsets;     }
-    const int getTuning() const noexcept                            {return nTuning;            }
+    const TuningSystem getTuning() const noexcept                   {return nTuning;            }
     const int getBasePitch() const noexcept                         {return nBasePitch;         }
     
     void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
@@ -92,8 +93,7 @@ public:
     void setBeatsToSkip(float beatsToSkip)                          {nBeatsToSkip = beatsToSkip;            }
     void setMode(NostalgicSyncMode mode)                            {nMode = mode;                          }
     void setSyncTarget(int syncTarget)                              {nSyncTarget = syncTarget;              }
-    void setTuningOffsets(Array<float> tuningOffsets)               {nTuningOffsets = tuningOffsets;        }
-    void setTuning(int tuning)                                      {nTuning = tuning;                      }
+    void setTuning(TuningSystem tuning)                                      {nTuning = tuning;                      }
     void setBasePitch(int basePitch)                                {nBasePitch = basePitch;                }
 
     void print(void)
@@ -106,7 +106,6 @@ public:
         DBG("nBeatsToSkip: " + String(nBeatsToSkip));
         DBG("nMode: " + String(nMode));
         DBG("nSyncTarget: " + String(nSyncTarget));
-        DBG("nTuningOffsets: " + floatArrayToString(nTuningOffsets));
         DBG("nBasePitch: " + String(nBasePitch));
     }
 private:
@@ -129,8 +128,7 @@ private:
     NostalgicSyncMode nMode;    //which sync mode to use
     int nSyncTarget;            //which synchronic layer to sync to, when nMode = NostalgicSyncSynchronic
     
-    Array<float> nTuningOffsets;
-    int nTuning;
+    TuningSystem nTuning;
     int nBasePitch;
     
     JUCE_LEAK_DETECTOR(NostalgicPreparation);
@@ -144,7 +142,7 @@ public:
     typedef Array<NostalgicProcessor::Ptr, CriticalSection> CSArr;
     typedef Array<NostalgicProcessor::Ptr>                  Arr;
 
-    NostalgicProcessor(BKSynthesiser *s, Keymap::Ptr km, NostalgicPreparation::Ptr prep, SynchronicProcessor::CSArr& proc, int layer);
+    NostalgicProcessor(BKSynthesiser *s, Keymap::Ptr km, NostalgicPreparation::Ptr prep, SynchronicProcessor::CSArr& proc, int layer, TuningProcessor *tuner);
     virtual ~NostalgicProcessor();
     
     //called with every audio vector
@@ -187,12 +185,14 @@ private:
     BKSynthesiser*              synth;
     Keymap::Ptr                 keymap;
     NostalgicPreparation::Ptr   preparation;
+    TuningProcessor*            tuner;
     
     SynchronicProcessor::CSArr& syncProcessor;
     
     //store values so that undertow note retains preparation from reverse note
     NostalgicPreparation::Arr preparationAtKeyOn;
-    Array<float> undertowVelocities;
+    Array<float> tuningsAtKeyOn;
+    Array<float> velocitiesAtKeyOn;
     
 
     Array<uint64> noteLengthTimers;     //store current length of played notes here
