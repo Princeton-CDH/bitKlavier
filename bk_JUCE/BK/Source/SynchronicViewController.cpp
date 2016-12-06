@@ -212,10 +212,11 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
         prep->setTranspOffsets(transpOffsets);
     }
 #endif
-    else if (name == cSynchronicParameterTypes[SynchronicTuningOffsets])
+    else if (name == cSynchronicParameterTypes[SynchronicTuning])
     {
-        Array<float> tuningOffsets = stringToFloatArray(text);
-        prep->setTuningOffsets(tuningOffsets);
+        //Array<float> tuningOffsets = stringToFloatArray(text);
+        //prep->setTuningOffsets(tuningOffsets);
+        prep->setTuning(static_cast<TuningSystem>(i));
     }
 
     else if (name == cSynchronicParameterTypes[SynchronicBasePitch])
@@ -255,7 +256,7 @@ void SynchronicViewController::updateFieldsToLayer(int numLayer)
     synchronicTF[SynchronicLengthMultipliers]   ->setText(  floatArrayToString(  prep->getLengthMultipliers()));
     synchronicTF[SynchronicAccentMultipliers]   ->setText(  floatArrayToString(  prep->getAccentMultipliers()));
     synchronicTF[SynchronicTranspOffsets]       ->setText(  floatArrayToString(  prep->getTranspOffsets()));
-    synchronicTF[SynchronicTuningOffsets]       ->setText(  floatArrayToString(  prep->getTuningOffsets()));
+    synchronicTF[SynchronicTuning]              ->setText(  String(              prep->getTuning()));
     synchronicTF[SynchronicBasePitch]           ->setText(  String(              prep->getBasePitch()));
 }
 

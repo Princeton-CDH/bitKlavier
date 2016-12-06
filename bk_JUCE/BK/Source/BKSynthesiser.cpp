@@ -281,8 +281,6 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                const int midiNoteNumber,
                                const float transp,
                                const float velocity,
-                               Array<float> midiNoteOffsets,
-                               const int midiNoteTuningBase,
                                PianoSamplerNoteDirection direction,
                                PianoSamplerNoteType type,
                                BKNoteType bktype,
@@ -318,13 +316,12 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                         }
                     }
                 }
-                float midiNoteNumberOffset = aJustTuning[(midiNoteNumber - midiNoteTuningBase) % 12];
                 
                 startVoice (findFreeVoice (sound, midiChannel, midiNoteNumber, shouldStealNotes),
                             sound,
                             midiChannel,
                             midiNoteNumber,
-                            midiNoteNumberOffset + transp,
+                            transp,
                             velocity,
                             direction,
                             type,

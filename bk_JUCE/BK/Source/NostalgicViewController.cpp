@@ -191,10 +191,9 @@ void NostalgicViewController::textFieldDidChange(TextEditor& tf)
     {
         prep->setSyncTarget(i);
     }
-    else if (name == cNostalgicParameterTypes[NostalgicTuningOffsets])
+    else if (name == cNostalgicParameterTypes[NostalgicTuning])
     {
-        Array<float> tuningOffsets = stringToFloatArray(text);
-        prep->setTuningOffsets(tuningOffsets);
+        prep->setTuning(static_cast<TuningSystem>(i));
     }
     else if (name == cNostalgicParameterTypes[NostalgicBasePitch])
     {
@@ -231,6 +230,6 @@ void NostalgicViewController::updateFieldsToLayer(int numLayer)
     nostalgicTF[NostalgicBeatsToSkip]       ->setText( String( prep->getBeatsToSkip()));
     nostalgicTF[NostalgicMode]              ->setText( String( prep->getMode()));
     nostalgicTF[NostalgicSyncTarget]        ->setText( String( prep->getSyncTarget()));
-    nostalgicTF[NostalgicTuningOffsets]     ->setText( floatArrayToString( prep->getTuningOffsets()));
+    nostalgicTF[NostalgicTuning]            ->setText( String( prep->getTuning()));
     nostalgicTF[NostalgicBasePitch]         ->setText( String( prep->getBasePitch()));
 }
