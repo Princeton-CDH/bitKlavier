@@ -18,11 +18,15 @@ BKAudioProcessorEditor::BKAudioProcessorEditor (BKAudioProcessor& p)
 :
     AudioProcessorEditor (&p),
     processor (p),
+    gvc(p),
     svc(p),
-    nvc(p)
+    nvc(p),
+    dvc(p)
 {
+    addAndMakeVisible(gvc);
     addAndMakeVisible(svc);
     addAndMakeVisible(nvc);
+    addAndMakeVisible(dvc);
     
     setSize(gMainComponentWidth,
             gMainComponentHeight);
@@ -43,15 +47,35 @@ void BKAudioProcessorEditor::paint (Graphics& g)
 
 void BKAudioProcessorEditor::resized()
 {
-    svc.setBounds(gComponentLeftOffset,
-                  gComponentTopOffset,
-                  500,
-                  500);
+    float gvcH = cGeneralParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
+    float svcH = cSynchronicParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
+    float nvcH = cNostalgicParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) +  gYSpacing;
+    float dvcH = cDirectParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) +  gYSpacing;
     
-    nvc.setBounds(gComponentLeftOffset + 500 + 5,
+    gvc.setBounds(gComponentLeftOffset,
                   gComponentTopOffset,
-                  500,
-                  500);
+                  gGeneralVCWidth,
+                  gvcH);
+    
+    svc.setBounds(gComponentLeftOffset + gGeneralVCWidth + (1 * gXSpacing),
+                  gComponentTopOffset,
+                  gSynchronicVCWidth,
+                  svcH);
+    
+    nvc.setBounds(gComponentLeftOffset + gGeneralVCWidth + gSynchronicVCWidth + (2 * gXSpacing),
+                  gComponentTopOffset,
+                  gNostalgicVCWidth,
+                  nvcH);
+ 
+    dvc.setBounds(gComponentLeftOffset + gNostalgicVCWidth + gSynchronicVCWidth  + (2 * gXSpacing),
+                  gComponentTopOffset + nvcH + gYSpacing,
+                  gNostalgicVCWidth,
+                  dvcH);
+    
+    
+    
+    
+    
      
     
 }

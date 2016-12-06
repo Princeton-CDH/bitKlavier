@@ -24,20 +24,6 @@ SynchronicViewController::SynchronicViewController(BKAudioProcessor& p)
      // Labels
     synchronicL = OwnedArray<BKLabel>();
     synchronicL.ensureStorageAllocated(cSynchronicParameterTypes.size());
-
-    addAndMakeVisible(sKeymapL);
-    sKeymapL.setName("SynchronicKeymap");
-    sKeymapL.setText("SynchronicKeymap", NotificationType::dontSendNotification);
-    
-    
-    addAndMakeVisible(sNumLayersL);
-    sNumLayersL.setName("NumSynchronicLayers");
-    sNumLayersL.setText("NumSynchronicLayers", NotificationType::dontSendNotification);
-    
-    
-    addAndMakeVisible(sCurrentLayerL);
-    sCurrentLayerL.setName("CurrentSynchronicLayer");
-    sCurrentLayerL.setText("CurrentSynchronicLayer", NotificationType::dontSendNotification);
     
     for (int i = 0; i < cSynchronicParameterTypes.size(); i++)
     {
@@ -50,21 +36,6 @@ SynchronicViewController::SynchronicViewController(BKAudioProcessor& p)
     // Text Fields
     synchronicTF = OwnedArray<BKTextField>();
     synchronicTF.ensureStorageAllocated(cSynchronicParameterTypes.size());
-    
-    
-    addAndMakeVisible(sNumLayersTF);
-    sNumLayersTF.addListener(this);
-    sNumLayersTF.setName("NumSynchronicLayers");
-    sNumLayersTF.setText( String( processor.numSynchronicLayers));
-    
-    
-    addAndMakeVisible(sKeymapTF);
-    sKeymapTF.addListener(this);
-    sKeymapTF.setName("SynchronicKeymap");
-    
-    addAndMakeVisible(sCurrentLayerTF);
-    sCurrentLayerTF.addListener(this);
-    sCurrentLayerTF.setName("CurrentSynchronicLayer");
     
     for (int i = 0; i < cSynchronicParameterTypes.size(); i++)
     {
@@ -95,33 +66,22 @@ void SynchronicViewController::resized()
     // Labels
     int i = 0;
     int lX = 0;
-    int lY = gComponentLabelHeight + gComponentYSpacing;
-    
-    sNumLayersL.setTopLeftPosition(lX,      gComponentTopOffset + i++ * lY);
-    
-    sCurrentLayerL.setTopLeftPosition(lX,   gComponentTopOffset + i++ * lY);
-    
-    sKeymapL.setTopLeftPosition(lX,         gComponentTopOffset + i++ * lY);
+    int lY = gComponentLabelHeight + gYSpacing;
     
     for (int n = 0; n < cSynchronicParameterTypes.size(); n++)
     {
-        synchronicL[n]->setTopLeftPosition(lX, gComponentTopOffset + (n+3) * lY);
+        synchronicL[n]->setTopLeftPosition(lX, gYSpacing + lY * n);
     }
     
     // Text fields
     i = 0;
-    int tfX = gComponentLabelWidth + gComponentXSpacing;
-    int tfY = gComponentTextFieldHeight + gComponentYSpacing;
-    sNumLayersTF.setTopLeftPosition(tfX, gComponentTopOffset + i++ * tfY);
-    
-    sCurrentLayerTF.setTopLeftPosition(tfX, gComponentTopOffset + i++ * tfY);
-    
-    sKeymapTF.setTopLeftPosition(tfX, gComponentTopOffset + i++ * tfY);
-    
+    int tfX = gComponentLabelWidth + gXSpacing;
+    int tfY = gComponentTextFieldHeight + gYSpacing;
+
     
     for (int n = 0; n < cSynchronicParameterTypes.size(); n++)
     {
-        synchronicTF[n]->setTopLeftPosition(tfX, gComponentTopOffset + (n+3) * tfY);
+        synchronicTF[n]->setTopLeftPosition(tfX, gYSpacing + tfY * n);
     }
 
 }
@@ -143,15 +103,15 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
     Keymap::Ptr keymap              = proc->getKeymap();
     
     
-    if (name == "NumSynchronicLayers")
+    if (name == cSynchronicParameterTypes[SynchronicNumLayers])
     {
         processor.numSynchronicLayers = i;
     }
-    else if (name == "CurrentSynchronicLayer")
+    else if (name == cSynchronicParameterTypes[SynchronicCurrentLayer])
     {
         updateFieldsToLayer(i);
     }
-    else if (name == "SynchronicKeymap")
+    else if (name == cSynchronicParameterTypes[SynchronicKeymap])
     {
         Array<int> keys = stringToIntArray(text);
         
@@ -205,13 +165,11 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
         Array<float> accentMults = stringToFloatArray(text);
         prep->setAccentMultipliers(accentMults);
     }
-#if OFFSETS
     else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
     {
         Array<float> transpOffsets = stringToFloatArray(text);
         prep->setTranspOffsets(transpOffsets);
     }
-#endif
     else if (name == cSynchronicParameterTypes[SynchronicTuning])
     {
         //Array<float> tuningOffsets = stringToFloatArray(text);
@@ -221,7 +179,7 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
 
     else if (name == cSynchronicParameterTypes[SynchronicBasePitch])
     {
-        prep->setBasePitch(i);
+        prep->setBasePitch((PitchClass)i);
     }
     else
     {
@@ -239,25 +197,24 @@ void SynchronicViewController::updateFieldsToLayer(int numLayer)
     SynchronicPreparation::Ptr prep = proc->getPreparation();
     Keymap::Ptr keymap              = proc->getKeymap();
     
-    
-    
     // Set text.
-    sKeymapTF                                   .setText(   intArrayToString(    keymap->keys()));
-    sCurrentLayerTF                             .setText(   String(              numLayer));
-
-    synchronicTF[SynchronicTempo]               ->setText(  String(              prep->getTempo()));
-    synchronicTF[SynchronicNumPulses]           ->setText(  String(              prep->getNumPulses()));
-    synchronicTF[SynchronicClusterMin]          ->setText(  String(              prep->getClusterMin()));
-    synchronicTF[SynchronicClusterMax]          ->setText(  String(              prep->getClusterMax()));
-    synchronicTF[SynchronicClusterThresh]       ->setText(  String(              prep->getClusterThresh()));
-    synchronicTF[SynchronicMode]                ->setText(  String(              prep->getMode()));
-    synchronicTF[SynchronicBeatsToSkip]         ->setText(  String(              prep->getBeatsToSkip()));
-    synchronicTF[SynchronicBeatMultipliers]     ->setText(  floatArrayToString(  prep->getBeatMultipliers()));
-    synchronicTF[SynchronicLengthMultipliers]   ->setText(  floatArrayToString(  prep->getLengthMultipliers()));
-    synchronicTF[SynchronicAccentMultipliers]   ->setText(  floatArrayToString(  prep->getAccentMultipliers()));
-    synchronicTF[SynchronicTranspOffsets]       ->setText(  floatArrayToString(  prep->getTranspOffsets()));
-    synchronicTF[SynchronicTuning]              ->setText(  String(              prep->getTuning()));
-    synchronicTF[SynchronicBasePitch]           ->setText(  String(              prep->getBasePitch()));
+    synchronicTF[SynchronicNumLayers]           ->setText(  String(                 processor.numSynchronicLayers));
+    synchronicTF[SynchronicKeymap]              ->setText(  intArrayToString(       keymap->keys()));
+    synchronicTF[SynchronicCurrentLayer]        ->setText(  String(                 numLayer));
+    
+    synchronicTF[SynchronicTempo]               ->setText(  String(                 prep->getTempo()));
+    synchronicTF[SynchronicNumPulses]           ->setText(  String(                 prep->getNumPulses()));
+    synchronicTF[SynchronicClusterMin]          ->setText(  String(                 prep->getClusterMin()));
+    synchronicTF[SynchronicClusterMax]          ->setText(  String(                 prep->getClusterMax()));
+    synchronicTF[SynchronicClusterThresh]       ->setText(  String(                 prep->getClusterThresh()));
+    synchronicTF[SynchronicMode]                ->setText(  String(                 prep->getMode()));
+    synchronicTF[SynchronicBeatsToSkip]         ->setText(  String(                 prep->getBeatsToSkip()));
+    synchronicTF[SynchronicBeatMultipliers]     ->setText(  floatArrayToString(     prep->getBeatMultipliers()));
+    synchronicTF[SynchronicLengthMultipliers]   ->setText(  floatArrayToString(     prep->getLengthMultipliers()));
+    synchronicTF[SynchronicAccentMultipliers]   ->setText(  floatArrayToString(     prep->getAccentMultipliers()));
+    synchronicTF[SynchronicTranspOffsets]       ->setText(  floatArrayToString(     prep->getTranspOffsets()));
+    synchronicTF[SynchronicTuning]              ->setText(  String(                 prep->getTuning()));
+    synchronicTF[SynchronicBasePitch]           ->setText(  String(                 prep->getBasePitch()));
 }
 
 

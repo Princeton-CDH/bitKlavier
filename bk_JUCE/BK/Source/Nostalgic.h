@@ -38,7 +38,7 @@ public:
                          NostalgicSyncMode mode,
                          int syncTarget,
                          TuningSystem tuning,
-                         int basePitch):
+                         PitchClass basePitch):
     nWaveDistance(waveDistance),
     nUndertow(undertow),
     nTransposition(transposition),
@@ -63,7 +63,7 @@ public:
     nMode(NoteLengthSync),
     nSyncTarget(0),
     nTuning(PartialTuning),
-    nBasePitch(0)
+    nBasePitch(C)
     {
 
     }
@@ -83,7 +83,7 @@ public:
     const NostalgicSyncMode getMode() const noexcept                {return nMode;              }
     const int getSyncTarget() const noexcept                        {return nSyncTarget;        }
     const TuningSystem getTuning() const noexcept                   {return nTuning;            }
-    const int getBasePitch() const noexcept                         {return nBasePitch;         }
+    const PitchClass getBasePitch() const noexcept                  {return nBasePitch;         }
     
     void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
     void setUndertow(int undertow)                                  {nUndertow = undertow;                  }
@@ -93,8 +93,8 @@ public:
     void setBeatsToSkip(float beatsToSkip)                          {nBeatsToSkip = beatsToSkip;            }
     void setMode(NostalgicSyncMode mode)                            {nMode = mode;                          }
     void setSyncTarget(int syncTarget)                              {nSyncTarget = syncTarget;              }
-    void setTuning(TuningSystem tuning)                                      {nTuning = tuning;                      }
-    void setBasePitch(int basePitch)                                {nBasePitch = basePitch;                }
+    void setTuning(TuningSystem tuning)                             {nTuning = tuning;                      }
+    void setBasePitch(PitchClass basePitch)                         {nBasePitch = basePitch;                }
 
     void print(void)
     {
@@ -129,7 +129,7 @@ private:
     int nSyncTarget;            //which synchronic layer to sync to, when nMode = NostalgicSyncSynchronic
     
     TuningSystem nTuning;
-    int nBasePitch;
+    PitchClass nBasePitch;
     
     JUCE_LEAK_DETECTOR(NostalgicPreparation);
 };
@@ -142,8 +142,17 @@ public:
     typedef Array<NostalgicProcessor::Ptr, CriticalSection> CSArr;
     typedef Array<NostalgicProcessor::Ptr>                  Arr;
 
-    NostalgicProcessor(BKSynthesiser *s, Keymap::Ptr km, NostalgicPreparation::Ptr prep, SynchronicProcessor::CSArr& proc, int layer, TuningProcessor *tuner);
+    NostalgicProcessor(
+                       BKSynthesiser *s,
+                       Keymap::Ptr km,
+                       TuningProcessor::Ptr tuner,
+                       NostalgicPreparation::Ptr prep,
+                       SynchronicProcessor::CSArr& proc,
+                       int layer);
+    
     virtual ~NostalgicProcessor();
+    
+    inline void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr;}
     
     //called with every audio vector
     void processBlock(int numSamples, int midiChannel);
@@ -185,7 +194,7 @@ private:
     BKSynthesiser*              synth;
     Keymap::Ptr                 keymap;
     NostalgicPreparation::Ptr   preparation;
-    TuningProcessor*            tuner;
+    TuningProcessor::Ptr        tuner;
     
     SynchronicProcessor::CSArr& syncProcessor;
     

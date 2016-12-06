@@ -10,17 +10,19 @@
 
 #include "Nostalgic.h"
 
-NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s, Keymap::Ptr km, NostalgicPreparation::Ptr prep, SynchronicProcessor::CSArr& proc, int layer, TuningProcessor *tuner)
-:
-    layer(layer),
-    synth(s),
-    keymap(km),
-    preparation(prep),
-    tuner(tuner),
-    syncProcessor(proc)
+NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s,
+                                       Keymap::Ptr km,
+                                       TuningProcessor::Ptr tuner,
+                                       NostalgicPreparation::Ptr prep,
+                                       SynchronicProcessor::CSArr& proc,
+                                       int layer):
+layer(layer),
+synth(s),
+keymap(km),
+preparation(prep),
+tuner(tuner),
+syncProcessor(proc)
 {
-    sampleRate = synth->getSampleRate();
-    
     noteLengthTimers.ensureStorageAllocated(128);
     velocities.ensureStorageAllocated(128);
     reverseLengthTimers.ensureStorageAllocated(128);

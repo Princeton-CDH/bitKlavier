@@ -73,8 +73,9 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     }
     
     //==============================================================================
-    BKSynthesiser::BKSynthesiser()
-    : sampleRate (0),
+    BKSynthesiser::BKSynthesiser(GeneralSettings::Ptr gen):
+    generalSettings(gen),
+    sampleRate (0),
     lastNoteOnCounter (0),
     minimumSubBlockSize (32),
     subBlockSubdivisionIsStrict (false),
@@ -370,9 +371,39 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             voice->sostenutoPedalDown = false;
             voice->sustainPedalDown = sustainPedalsDown[midiChannel];
             
+            float gain = velocity;
+            
+            if (bktype == Main)
+            {
+                gain *= 1.0f;
+            }
+            else if (bktype == Synchronic)
+            {
+                gain *= generalSettings->getSynchronicGain();
+            }
+            else if (bktype == Nostalgic)
+            {
+                gain *= generalSettings->getNostalgicGain();
+            }
+            else if (bktype == Direct)
+            {
+                gain *= generalSettings->getDirectGain();
+            }
+            else if (bktype == Hammer)
+            {
+                gain *= generalSettings->getHammerGain();
+            }
+            else if (bktype == Resonance)
+            {
+                gain *= generalSettings->getResonanceGain();
+            }
+            
+            gain *= generalSettings->getGlobalGain();
+
+            
             voice->startNote (
                               (float)midiNoteNumber+midiNoteNumberOffset,
-                              velocity,
+                              gain,
                               direction,
                               type,
                               bktype,
@@ -512,6 +543,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
         jassert (midiChannel > 0 && midiChannel <= 16);
         const ScopedLock sl (lock);
         
+        // Invert sustain should be dealt with around here? 
         if (isDown)
         {
             sustainPedalsDown.setBit (midiChannel);

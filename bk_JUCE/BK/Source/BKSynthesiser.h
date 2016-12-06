@@ -15,6 +15,8 @@
 
 #include "AudioConstants.h"
 
+#include "General.h"
+
 
 //==============================================================================
 /**
@@ -117,7 +119,7 @@ public:
      This will be called during the rendering callback, so must be fast and thread-safe.
      */
     virtual void startNote (float midiNoteNumber,
-                            float velocity,
+                            float gain,
                             PianoSamplerNoteDirection direction,
                             PianoSamplerNoteType type,
                             BKNoteType bktype,
@@ -308,7 +310,7 @@ public:
     /** Creates a new BKSynthesiser.
      You'll need to add some sounds and voices before it'll make any sound.
      */
-    BKSynthesiser();
+    BKSynthesiser(GeneralSettings::Ptr);
     
     /** Destructor. */
     virtual ~BKSynthesiser();
@@ -573,6 +575,8 @@ protected:
     OwnedArray<BKSynthesiserVoice> voices;
     ReferenceCountedArray<BKSynthesiserSound> sounds;
     
+    GeneralSettings::Ptr generalSettings;
+    
     /** The last pitch-wheel values for each midi channel. */
     int lastPitchWheelValues [16];
     
@@ -636,6 +640,8 @@ protected:
     virtual void handleMidiEvent (const MidiMessage&);
     
 private:
+    
+    
     //==============================================================================
     template <typename floatType>
     void processNextBlock (AudioBuffer<floatType>& outputAudio,
@@ -643,6 +649,7 @@ private:
                            int startSample,
                            int numSamples);
     //==============================================================================
+    
     
     double sampleRate;
     uint32 lastNoteOnCounter;

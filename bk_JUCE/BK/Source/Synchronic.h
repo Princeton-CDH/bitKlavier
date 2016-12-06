@@ -39,7 +39,7 @@ public:
                           Array<float> lengthMultipliers,
                           Array<float> transpOffsets,
                           TuningSystem tuning,
-                          int basePitch):
+                          PitchClass basePitch):
     sTempo(tempo),
     sNumPulses(numPulses),
     sClusterMin(clusterMin),
@@ -72,7 +72,7 @@ public:
     sLengthMultipliers(Array<float>({1.0})),
     sTranspOffsets(Array<float>({0.0})),
     sTuning(PartialTuning),
-    sBasePitch(0),
+    sBasePitch(C),
     sPulseThreshSec(60.0/sTempo),
     sClusterThreshSec(sPulseThreshSec * sClusterThresh)
     {
@@ -93,7 +93,7 @@ public:
     const Array<float> getTranspOffsets() const noexcept        {return sTranspOffsets;         }
     
     const TuningSystem getTuning() const noexcept               {return sTuning;             }
-    const int getBasePitch() const noexcept                     {return sBasePitch;             }
+    const PitchClass getBasePitch() const noexcept              {return sBasePitch;             }
     
     
     void setTempo(float tempo)
@@ -124,7 +124,7 @@ public:
     void setLengthMultipliers(Array<float> lengthMultipliers)   {sLengthMultipliers.swapWith(lengthMultipliers);    }
     
     void setTuning(TuningSystem tuning)                         {sTuning = tuning;                                  }
-    void setBasePitch(int basePitch)                            {sBasePitch = basePitch;                            }
+    void setBasePitch(PitchClass basePitch)                            {sBasePitch = basePitch;                            }
     
     void print(void)
     {
@@ -159,7 +159,7 @@ private:
     Array<float> sTranspOffsets;
     
     TuningSystem sTuning;
-    int sBasePitch;
+    PitchClass sBasePitch;
     
     float sPulseThreshSec;
     float sClusterThreshSec;
@@ -179,8 +179,16 @@ public:
     typedef Array<SynchronicProcessor::Ptr, CriticalSection>    CSArr;
     typedef Array<SynchronicProcessor::Ptr>                     Arr;
     
-    SynchronicProcessor(BKSynthesiser *s, Keymap::Ptr km, SynchronicPreparation::Ptr prep, int layer, TuningProcessor *t);
+    SynchronicProcessor(
+                        BKSynthesiser *s,
+                        Keymap::Ptr km,
+                        TuningProcessor::Ptr t,
+                        SynchronicPreparation::Ptr prep,
+                        int layer);
+    
     ~SynchronicProcessor();
+    
+    inline void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr;}
     
     void processBlock(int numSamples, int channel);
     
@@ -210,7 +218,7 @@ private:
     BKSynthesiser*              synth;
     Keymap::Ptr                 keymap;
     SynchronicPreparation::Ptr  preparation;
-    TuningProcessor*            tuner;
+    TuningProcessor::Ptr            tuner;
     
     int pulse;
     
@@ -238,7 +246,7 @@ private:
     uint64 lastNoteTimer;
     
     Array<float> tuningOffsets;
-    int tuningBasePitch;
+    PitchClass tuningBasePitch;
     
     uint64 clusterTimer;
     uint64 pulseTimer;

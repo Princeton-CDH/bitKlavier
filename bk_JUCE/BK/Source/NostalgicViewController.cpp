@@ -24,20 +24,6 @@ NostalgicViewController::NostalgicViewController(BKAudioProcessor& p)
     nostalgicL = OwnedArray<BKLabel>();
     nostalgicL.ensureStorageAllocated(cNostalgicParameterTypes.size());
     
-    addAndMakeVisible(nKeymapL);
-    nKeymapL.setName("NostalgicKeymap");
-    nKeymapL.setText("NostalgicKeymap", NotificationType::dontSendNotification);
-    
-    
-    addAndMakeVisible(nNumLayersL);
-    nNumLayersL.setName("NumNostalgicLayers");
-    nNumLayersL.setText("NumNostalgicLayers", NotificationType::dontSendNotification);
-    
-    
-    addAndMakeVisible(nCurrentLayerL);
-    nCurrentLayerL.setName("CurrentNostalgicLayer");
-    nCurrentLayerL.setText("CurrentNostalgicLayer", NotificationType::dontSendNotification);
-    
     for (int i = 0; i < cNostalgicParameterTypes.size(); i++)
     {
         nostalgicL.set(i, new BKLabel());
@@ -51,21 +37,6 @@ NostalgicViewController::NostalgicViewController(BKAudioProcessor& p)
     // Text Fields
     nostalgicTF = OwnedArray<BKTextField>();
     nostalgicTF.ensureStorageAllocated(cNostalgicParameterTypes.size());
-    
-    
-    addAndMakeVisible(nNumLayersTF);
-    nNumLayersTF.addListener(this);
-    nNumLayersTF.setName("NumNostalgicLayers");
-    nNumLayersTF.setText( String( processor.numNostalgicLayers));
-    
-    
-    addAndMakeVisible(nKeymapTF);
-    nKeymapTF.addListener(this);
-    nKeymapTF.setName("NostalgicKeymap");
-    
-    addAndMakeVisible(nCurrentLayerTF);
-    nCurrentLayerTF.addListener(this);
-    nCurrentLayerTF.setName("CurrentNostalgicLayer");
     
     for (int i = 0; i < cNostalgicParameterTypes.size(); i++)
     {
@@ -93,32 +64,21 @@ void NostalgicViewController::resized()
     // Labels
     int i = 0;
     int lX = 0;
-    int lY = gComponentLabelHeight + gComponentYSpacing;
-    nNumLayersL.setTopLeftPosition(lX,      gComponentTopOffset + i++ * lY);
-    
-    nCurrentLayerL.setTopLeftPosition(lX,   gComponentTopOffset + i++ * lY);
-    
-    nKeymapL.setTopLeftPosition(lX,         gComponentTopOffset + i++ * lY);
+    int lY = gComponentLabelHeight + gYSpacing;
     
     for (int n = 0; n < cNostalgicParameterTypes.size(); n++)
     {
-        nostalgicL[n]->setTopLeftPosition(lX, gComponentTopOffset + (n+3) * lY);
+        nostalgicL[n]->setTopLeftPosition(lX, gYSpacing + lY * n);
     }
     
     // Text fields
     i = 0;
-    int tfX = gComponentLabelWidth + gComponentXSpacing;
-    int tfY = gComponentTextFieldHeight + gComponentYSpacing;
-    nNumLayersTF.setTopLeftPosition(tfX, gComponentTopOffset + i++ * tfY);
-    
-    nCurrentLayerTF.setTopLeftPosition(tfX, gComponentTopOffset + i++ * tfY);
-    
-    nKeymapTF.setTopLeftPosition(tfX, gComponentTopOffset + i++ * tfY);
-    
-    
+    int tfX = gComponentLabelWidth + gXSpacing;
+    int tfY = gComponentTextFieldHeight + gYSpacing;
+
     for (int n = 0; n < cNostalgicParameterTypes.size(); n++)
     {
-        nostalgicTF[n]->setTopLeftPosition(tfX, gComponentTopOffset + (n+3) * tfY);
+        nostalgicTF[n]->setTopLeftPosition(tfX, gYSpacing + tfY * n);
     }
     
 }
@@ -140,15 +100,15 @@ void NostalgicViewController::textFieldDidChange(TextEditor& tf)
     Keymap::Ptr keymap             = proc->getKeymap();
     
     
-    if (name == "NumNostalgicLayers")
+    if (name == cNostalgicParameterTypes[NostalgicNumLayers])
     {
         processor.numNostalgicLayers = i;
     }
-    else if (name == "CurrentNostalgicLayer")
+    else if (name == cNostalgicParameterTypes[NostalgicCurrentLayer])
     {
         updateFieldsToLayer(i);
     }
-    else if (name == "NostalgicKeymap")
+    else if (name == cNostalgicParameterTypes[NostalgicKeymap])
     {
         Array<int> keys = stringToIntArray(text);
         
@@ -197,7 +157,7 @@ void NostalgicViewController::textFieldDidChange(TextEditor& tf)
     }
     else if (name == cNostalgicParameterTypes[NostalgicBasePitch])
     {
-        prep->setBasePitch(i);
+        prep->setBasePitch((PitchClass)i);
     }
     else
     {
@@ -218,9 +178,9 @@ void NostalgicViewController::updateFieldsToLayer(int numLayer)
     Keymap::Ptr keymap             = proc->getKeymap();
     
     // Set text.
-    nKeymapTF.setText( intArrayToString( keymap->keys()));
-    
-    nCurrentLayerTF.setText( String( numLayer));
+    nostalgicTF[NostalgicNumLayers]         ->setText( String(                 processor.numNostalgicLayers));
+    nostalgicTF[NostalgicKeymap]            ->setText( intArrayToString( keymap->keys()));
+    nostalgicTF[NostalgicCurrentLayer]      ->setText( String( numLayer));
 
     nostalgicTF[NostalgicWaveDistance]      ->setText( String( prep->getWavedistance()));
     nostalgicTF[NostalgicUndertow]          ->setText( String( prep->getUndertow()));

@@ -21,6 +21,8 @@
 
 #include "BKLabel.h"
 
+#include "Direct.h"
+
 //==============================================================================
 /*
 */
@@ -35,19 +37,10 @@ public:
 
 private:
     BKAudioProcessor& processor;
-    int currentNostalgicLayer;
+    int currentDirectLayer;
     
-    // BKLabels
-    BKLabel nNumLayersL;
-    BKLabel nCurrentLayerL;
-    BKLabel nKeymapL;
-    OwnedArray<BKLabel> nostalgicL;
-    
-    // Text Fields
-    BKTextField nNumLayersTF;
-    BKTextField nCurrentLayerTF;
-    BKTextField nKeymapTF;
-    OwnedArray<BKTextField> nostalgicTF;
+    OwnedArray<BKLabel> directL;
+    OwnedArray<BKTextField> directTF;
     
     void textFieldDidChange(TextEditor&) override;
     

@@ -29,14 +29,14 @@ TuningProcessor::~TuningProcessor()
 }
 
 //returns offsets
-float TuningProcessor::getOffset(int midiNoteNumber, TuningSystem tuning, int basepitch) const
+float TuningProcessor::getOffset(int midiNoteNumber, TuningSystem tuning, PitchClass basepitch) const
 {
     
     if(tuning == AdaptiveTuning) return 0.; //need to implement
     if(tuning == AdaptiveAnchoredTuning) return 0.;
     
     Array<float> currentTuning = tuningLibrary.getUnchecked(tuning);
-    return(currentTuning[(midiNoteNumber - basepitch) % 12]);
+    return (currentTuning[(midiNoteNumber - basepitch) % 12]);
     
 }
 

@@ -7,26 +7,59 @@
 #define NOST_KEY_OFF 1
 
 //==============================================================================
-BKAudioProcessor::BKAudioProcessor()
+BKAudioProcessor::BKAudioProcessor():
+general                 (new GeneralSettings()),
+tuner                   (new TuningProcessor()),
+mainPianoSynth          (general),
+hammerReleaseSynth      (general),
+resonanceReleaseSynth   (general)
 {
-    
     numSynchronicLayers = 1;
-    
     numNostalgicLayers = 1;
-
-    sProcessor      =  SynchronicProcessor::CSArr();
-    nProcessor      =  NostalgicProcessor::Arr();
-    sPreparation    =  SynchronicPreparation::CSArr();
-    nPreparation    =  NostalgicPreparation::CSArr();
+    
+    
+    sProcessor      = SynchronicProcessor::CSArr();
+    nProcessor      = NostalgicProcessor::Arr();
+    dProcessor      = DirectProcessor::Arr();
+    
+    sPreparation    = SynchronicPreparation::CSArr();
+    nPreparation    = NostalgicPreparation::CSArr();
+    dPreparation    = DirectPreparation::CSArr();
+    
+    bkKeymaps       = Keymap::CSArr();
     
     sProcessor.ensureStorageAllocated(aMaxNumLayers);
     nProcessor.ensureStorageAllocated(aMaxNumLayers);
+    dProcessor.ensureStorageAllocated(aMaxNumLayers);
     
-    bkKeymaps       =  Keymap::CSArr();
+    bkKeymaps.ensureStorageAllocated(aMaxNumLayers * 3);
     
-    bkKeymaps.ensureStorageAllocated(aMaxNumLayers * 5);
-    
-    
+    for (int i = 0; i < aMaxNumLayers; i++)
+    {
+        Keymap::Ptr keymap                  = new Keymap();
+        bkKeymaps.add(keymap);
+        
+        SynchronicPreparation::Ptr sPrep    = new SynchronicPreparation();
+        sPreparation.insert(i, sPrep);
+        
+        sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, keymap, tuner, sPrep, i));
+        
+        keymap                              = new Keymap();
+        bkKeymaps.add(keymap);
+        
+        NostalgicPreparation::Ptr nPrep     = new NostalgicPreparation();
+        nPreparation.insert(i, nPrep);
+        
+        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, keymap, tuner, nPrep, sProcessor, i));
+        
+        keymap                              = new Keymap();
+        bkKeymaps.add(keymap);
+        
+        DirectPreparation::Ptr dPrep     = new DirectPreparation();
+        dPreparation.insert(i, dPrep);
+        
+        dProcessor.insert(i, new DirectProcessor(&mainPianoSynth, keymap, dPrep, i));
+    }
     
     // For testing and developing, let's keep directory of samples in home folder on disk.
     BKSampleLoader::loadMainPianoSamples(&mainPianoSynth, aNumSampleLayers);
@@ -40,10 +73,8 @@ BKAudioProcessor::~BKAudioProcessor()
 }
 
 //==============================================================================
-void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
-    
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need.
+void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+{
     
     mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
     
@@ -53,24 +84,8 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
     
     for (int i = 0; i < aMaxNumLayers; i++)
     {
-        Keymap::Ptr keymap                  = new Keymap();
-        bkKeymaps.add(keymap);
-        
-        SynchronicPreparation::Ptr sPrep    = new SynchronicPreparation();
-        sPreparation.insert(i, sPrep);
-        
-        sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, keymap, sPrep, i, &tuner));
-    }
-    
-    for (int i = 0; i < aMaxNumLayers; i++)
-    {
-        Keymap::Ptr keymap                  = new Keymap();
-        bkKeymaps.add(keymap);
-        
-        NostalgicPreparation::Ptr nPrep     = new NostalgicPreparation();
-        nPreparation.insert(i, nPrep);
-        
-        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, keymap, nPrep, sProcessor, i, &tuner));
+        sProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);
+        nProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);
     }
 }
 
@@ -132,10 +147,15 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
                 nProcessor[layer]->keyPressed(noteNumber, velocity);
             }
             
+            for (int layer = 0; layer < numDirectLayers; layer++)
+            {
+                dProcessor[layer]->keyPressed(noteNumber, velocity);
+            }
+            
             mainPianoSynth.keyOn(
                                  channel,
                                  noteNumber,
-                                 tuner.getOffset(noteNumber, mainTuning, tuningBasePitch), //will need to add Direct Transp here
+                                 tuner->getOffset(noteNumber, mainTuning, tuningBasePitch), //will need to add Direct Transp here
                                  velocity * aGlobalGain,
                                  Forward,
                                  Normal,
@@ -164,6 +184,12 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
                                            channel);
             }
             
+            for (int i = 0; i < numDirectLayers; i++)
+            {
+                dProcessor[i]->keyReleased(noteNumber,
+                                           channel);
+            }
+            
             mainPianoSynth.keyOff(
                                   channel,
                                   noteNumber,
@@ -171,31 +197,35 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
                                   true
                                   );
             
-            hammerReleaseSynth.keyOn(
-                                     channel,
-                                     noteNumber,
-                                     0,
-                                     velocity * 0.0025 * aGlobalGain, //will want hammerGain multipler that user can set
-                                     Forward,
-                                     FixedLength,
-                                     BKNoteTypeNil,
-                                     0,
-                                     2000,
-                                     3,
-                                     3 );
+            if (general->getResonanceAndHammer())
+            {
+                hammerReleaseSynth.keyOn(
+                                         channel,
+                                         noteNumber,
+                                         0,
+                                         velocity * 0.0025 * aGlobalGain, //will want hammerGain multipler that user can set
+                                         Forward,
+                                         FixedLength,
+                                         Hammer,
+                                         0,
+                                         2000,
+                                         3,
+                                         3 );
+                
+                resonanceReleaseSynth.keyOn(
+                                            channel,
+                                            noteNumber,
+                                            tuner->getOffset(noteNumber, mainTuning, tuningBasePitch),
+                                            velocity * aGlobalGain, //will also want multiplier for resonance gain...
+                                            Forward,
+                                            FixedLength,
+                                            Resonance,
+                                            0,
+                                            2000,
+                                            3,
+                                            3 );
+            }
             
-            resonanceReleaseSynth.keyOn(
-                                        channel,
-                                        noteNumber,
-                                        tuner.getOffset(noteNumber, mainTuning, tuningBasePitch),
-                                        velocity * aGlobalGain, //will also want multiplier for resonance gain...
-                                        Forward,
-                                        FixedLength,
-                                        BKNoteTypeNil,
-                                        0,
-                                        2000,
-                                        3,
-                                        3 );
             
         }
         else if (m.isAftertouch())
@@ -213,7 +243,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     mainPianoSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
-
+    
 }
 
 void BKAudioProcessor::releaseResources() {

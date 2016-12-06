@@ -1,19 +1,21 @@
 /*
   ==============================================================================
 
-    MainViewController.h
+    GeneralViewController.h
     Created: 30 Nov 2016 5:00:39pm
     Author:  Michael R Mulshine
 
   ==============================================================================
 */
 
-#ifndef MAINVIEWCONTROLLER_H_INCLUDED
-#define MAINVIEWCONTROLLER_H_INCLUDED
+#ifndef GeneralViewController_H_INCLUDED
+#define GeneralViewController_H_INCLUDED
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "BKUtilities.h"
 
 #include "PluginProcessor.h"
+
+#include "General.h"
 
 #include "BKViewController.h"
 
@@ -24,11 +26,11 @@
 //==============================================================================
 /*
 */
-class MainViewController    : public BKViewController
+class GeneralViewController    : public BKViewController
 {
 public:
-    MainViewController(BKAudioProcessor&);
-    ~MainViewController();
+    GeneralViewController(BKAudioProcessor&);
+    ~GeneralViewController();
 
     void paint (Graphics&) override;
     void resized() override;
@@ -38,14 +40,16 @@ private:
     int currentNostalgicLayer;
     
     // BKLabels
-    OwnedArray<BKLabel> mainL;
+    OwnedArray<BKLabel> generalL;
 
-    OwnedArray<BKTextField> mainTF;
+    OwnedArray<BKTextField> generalTF;
     
     void textFieldDidChange(TextEditor&) override;
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainViewController)
+    void updateFields(void);
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GeneralViewController)
 };
 
 
-#endif  // MAINVIEWCONTROLLER_H_INCLUDED
+#endif  // GeneralViewController_H_INCLUDED

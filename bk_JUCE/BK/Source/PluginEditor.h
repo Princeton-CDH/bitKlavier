@@ -16,6 +16,8 @@
 
 #include "SynchronicViewController.h"
 #include "NostalgicViewController.h"
+#include "DirectViewController.h"
+#include "GeneralViewController.h"
 
 //==============================================================================
 /**
@@ -36,11 +38,14 @@ public:
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it
+    
     BKAudioProcessor& processor;
     
-    SynchronicViewController svc;
-    NostalgicViewController nvc;
-
+    GeneralViewController       gvc;
+    SynchronicViewController    svc;
+    NostalgicViewController     nvc;
+    DirectViewController        dvc;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessorEditor)
 };
 

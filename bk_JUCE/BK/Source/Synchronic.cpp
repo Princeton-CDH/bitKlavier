@@ -10,7 +10,11 @@
 
 #include "Synchronic.h"
 
-SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s, Keymap::Ptr km, SynchronicPreparation::Ptr p, int layer, TuningProcessor *t)
+SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s,
+                                         Keymap::Ptr km,
+                                         TuningProcessor::Ptr t,
+                                         SynchronicPreparation::Ptr p,
+                                         int layer)
 :
     layer(layer),
     synth(s),
@@ -18,8 +22,6 @@ SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s, Keymap::Ptr km, Synch
     preparation(p),
     tuner(t)
 {
-    sampleRate = synth->getSampleRate();
-    
     clusterTimer = 0;
     phasor = 0;
     

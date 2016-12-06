@@ -23,7 +23,7 @@ public:
     BKTextField()
     {
         setLookAndFeel(&laf);
-        setSize(300,20);        
+        setSize(200,20);
     
         lookAndFeelChanged();
     }

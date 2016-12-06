@@ -39,16 +39,7 @@ private:
     BKAudioProcessor& processor;
     int currentSynchronicLayer;
     
-    // BKLabels
-    BKLabel sNumLayersL;
-    BKLabel sCurrentLayerL;
-    BKLabel sKeymapL;
     OwnedArray<BKLabel> synchronicL;
-    
-    // Text Fields
-    BKTextField sNumLayersTF;
-    BKTextField sCurrentLayerTF;
-    BKTextField sKeymapTF;
     OwnedArray<BKTextField> synchronicTF;
     
     void textFieldDidChange(TextEditor&) override;

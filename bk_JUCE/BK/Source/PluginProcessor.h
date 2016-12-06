@@ -12,9 +12,13 @@
 
 #include "Nostalgic.h"
 
+#include "Direct.h"
+
 #include "Keymap.h"
 
 #include "Tuning.h"
+
+#include "General.h"
 
 #define USE_SYNCHRONIC_TWO 0
 
@@ -31,12 +35,11 @@ public:
     BKAudioProcessor();
     ~BKAudioProcessor();
     
+    // General settings.
+    GeneralSettings::Ptr general;
     
-    int numSynchronicLayers;
-    int currentSynchronicLayer;
-    
-    int numNostalgicLayers;
-    int currentNostalgicLayer;
+    // Tuning.
+    TuningProcessor::Ptr tuner;
     
     // Synthesisers.
     BKSynthesiser mainPianoSynth;
@@ -46,16 +49,18 @@ public:
     // Processors.
     SynchronicProcessor::CSArr      sProcessor;
     NostalgicProcessor::Arr         nProcessor;
+    DirectProcessor::Arr            dProcessor;
+    
     
     // Preparations.
     SynchronicPreparation::CSArr    sPreparation;
     NostalgicPreparation::CSArr     nPreparation;
+    DirectPreparation::CSArr        dPreparation;
     
     // Keymaps.
     Keymap::CSArr                   bkKeymaps;
     
-    // Tuning.
-    TuningProcessor tuner;
+    int numSynchronicLayers, numNostalgicLayers, numDirectLayers;
     
     int channel;
     
@@ -103,7 +108,7 @@ private:
     void loadHammerReleaseSamples(BKSynthesiser *synth);
     
     TuningSystem mainTuning = PartialTuning;
-    int tuningBasePitch = 0;
+    PitchClass tuningBasePitch = C;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)

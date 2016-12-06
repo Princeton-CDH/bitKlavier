@@ -75,7 +75,7 @@ bool BKPianoSamplerVoice::canPlaySound (BKSynthesiserSound* sound)
 }
 
 void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
-                                     const float velocity,
+                                     const float gain,
                                      PianoSamplerNoteDirection direction,
                                      PianoSamplerNoteType type,
                                      BKNoteType bktype,
@@ -203,8 +203,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             DBG("Invalid note direction.");
         }
         
-        lgain = velocity;
-        rgain = velocity;
+        lgain = gain;
+        rgain = gain;
         
         isInRampOn = (voiceRampOn > 0);
         isInRampOff = false;

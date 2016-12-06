@@ -39,15 +39,7 @@ private:
     int currentNostalgicLayer;
     
     // BKLabels
-    BKLabel nNumLayersL;
-    BKLabel nCurrentLayerL;
-    BKLabel nKeymapL;
     OwnedArray<BKLabel> nostalgicL;
-    
-    // Text Fields
-    BKTextField nNumLayersTF;
-    BKTextField nCurrentLayerTF;
-    BKTextField nKeymapTF;
     OwnedArray<BKTextField> nostalgicTF;
     
     void textFieldDidChange(TextEditor&) override;

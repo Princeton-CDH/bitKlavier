@@ -15,12 +15,31 @@
 
 #define TEXT_CHANGE_INTERNAL 0
 
-#define OFFSETS 1
-
 #define USE_SYNTH_INTERNAL 0
 #define CRAY_COOL_MUSIC_MAKER 0
 #define CRAY_COOL_MUSIC_MAKER_2 0
 
+typedef enum PitchClass {
+    C = 0,
+    CSharp,
+    D,
+    DSharp,
+    E,
+    F,
+    FSharp,
+    G,
+    GSharp,
+    A,
+    ASharp,
+    B,
+    DFlat = CSharp,
+    EFlat = DSharp,
+    GFlat = FSharp,
+    AFlat = GSharp,
+    BFlat = ASharp,
+} PitchClass;
+
+#pragma mark - Synthesiser/Sampler
 typedef enum PianoSamplerNoteType {
     Normal = 0,
     NormalFixedStart,
@@ -39,19 +58,56 @@ typedef enum BKNoteType {
     Synchronic = 0,
     Nostalgic,
     Direct,
+    Main,
+    Hammer,
+    Resonance,
     BKNoteTypeNil,
 } BKNoteType;
 
-// Synchronic
+
+#pragma mark - General
+typedef enum GeneralParameterType
+{
+    GeneralTuningFundamental,
+    GeneralGlobalGain,
+    GeneralSynchronicGain,
+    GeneralNostalgicGain,
+    GeneralDirectGain,
+    GeneralResonanceGain,
+    GeneralHammerGain,
+    GeneralTempoMultiplier,
+    GeneralResAndHammer,
+    GeneralInvertSustain,
+    GeneralParameterTypeNil
+    
+} GeneralParameterType;
+
+static const std::vector<std::string> cGeneralParameterTypes = {
+    "GeneralTuningFundamental",
+    "GeneralGlobalGain",
+    "GeneralSynchronicGain",
+    "GeneralNostalgicGain",
+    "GeneralDirectGain",
+    "GeneralResonanceGain",
+    "GeneralHammerGain",
+    "GeneralTempoMultiplier",
+    "GeneralResAndHammer",
+    "GeneralInvertSustain"
+    
+};
+
+#pragma mark - Synchronic
 typedef enum SynchronicSyncMode {
     FirstNoteSync = 0,
     LastNoteSync,
     SynchronicSyncModeNil
 } SynchronicSyncMode;
 
-// Adding text field to SynchronicViewController is as easy as adding typedef and string to these two data types.
 typedef enum SynchronicParameterType {
-    SynchronicTempo = 0,
+    SynchronicKeymap = 0,
+    SynchronicNumLayers,
+    SynchronicCurrentLayer,
+    SynchronicTempo,
     SynchronicNumPulses,
     SynchronicClusterMin,
     SynchronicClusterMax,
@@ -61,15 +117,16 @@ typedef enum SynchronicParameterType {
     SynchronicBeatMultipliers,
     SynchronicLengthMultipliers,
     SynchronicAccentMultipliers,
-#if OFFSETS
     SynchronicTranspOffsets,
-#endif
     SynchronicTuning,
     SynchronicBasePitch,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
 static const std::vector<std::string> cSynchronicParameterTypes = {
+    "SynchronicKeymap",
+    "SynchronicNumLayers",
+    "SynchronicCurrentLayer",
     "SynchronicTempo",
     "SynchronicNumPulses",
     "SynchronicClusterMin",
@@ -80,23 +137,23 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "SynchronicBeatMultipliers",
     "SynchronicLengthMultipliers",
     "SynchronicAccentMultipliers",
-#if OFFSETS
     "SynchronicTranspOffsets",
-#endif
     "SynchronicTuning",
     "SynchronicBasePitch"
 };
 
-// Nostalgic
+#pragma mark - Nostalgic
 typedef enum NostalgicSyncMode {
     NoteLengthSync = 0, //reverse note length set by played note length
     SynchronicSync,     //reverse note length set by next synchronic pulse
     NostalgicSyncModeNil
 } NostalgicSyncMode;
 
-// Adding text field to NostalgicViewController is as easy as adding typedef and string to these two data types.
 typedef enum NostalgicParameterType {
-    NostalgicWaveDistance = 0,
+    NostalgicKeymap = 0,
+    NostalgicNumLayers,
+    NostalgicCurrentLayer,
+    NostalgicWaveDistance,
     NostalgicUndertow,
     NostalgicTransposition,
     NostalgicGain,
@@ -110,6 +167,9 @@ typedef enum NostalgicParameterType {
 } NostalgicParameterType;
 
 static const std::vector<std::string> cNostalgicParameterTypes = {
+    "NostalgicKeymap",
+    "NostalgicNumLayers",
+    "NostalgicCurrentLayer",
     "NostalgicWaveDistance",
     "NostalgicUndertow",
     "NostalgicTransposition",
@@ -121,6 +181,29 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
     "NostalgicTuning",
     "NostalgicBasePitch",
 };
+
+#pragma mark - Direct
+typedef enum DirectParameterType
+{
+    DirectKeymap = 0,
+    DirectNumLayers,
+    DirectCurrentLayer,
+    DirectTransposition,
+    DirectGain,
+    DirectOverlay,
+    DirectParameterTypeNil,
+    
+} DirectParameterType;
+
+static const std::vector<std::string> cDirectParameterTypes = {
+    "DirectKeymap",
+    "DirectNumLayers",
+    "DirectCurrentLayer",
+    "DirectTransposition",
+    "DirectGain",
+    "DirectOverlay"
+};
+
 
 // Globals
 static const int aMaxNumLayers = 12;
