@@ -24,7 +24,9 @@ TuningProcessor::TuningProcessor()
 
 }
 
-TuningProcessor::~TuningProcessor() {}
+TuningProcessor::~TuningProcessor()
+{
+}
 
 //returns offsets
 float TuningProcessor::getOffset(int midiNoteNumber, TuningSystem tuning, int basepitch) const
