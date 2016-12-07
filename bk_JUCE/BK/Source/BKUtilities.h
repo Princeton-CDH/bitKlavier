@@ -27,7 +27,9 @@ Array<int>      stringToIntArray(String s);
 
 Array<float>    stringToFloatArray(String s);
 
+double          mtof(double f);
 
+double          ftom(double f);
 
 
 

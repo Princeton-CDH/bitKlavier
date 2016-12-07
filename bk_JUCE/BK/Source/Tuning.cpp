@@ -41,5 +41,5 @@ float TuningProcessor::getOffset(int midiNoteNumber, TuningSystem tuning, int ba
 //for calculating adaptive tuning
 void TuningProcessor::keyOn(int midiNoteNumber)
 {
-    
+    mtof(60.);
 }
