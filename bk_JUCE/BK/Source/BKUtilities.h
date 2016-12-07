@@ -27,8 +27,9 @@ Array<int>      stringToIntArray(String s);
 
 Array<float>    stringToFloatArray(String s);
 
+double          mtof(double f);
 
-
+double          ftom(double f);
 
 
 #endif  // BKUTILITIES_H_INCLUDED
