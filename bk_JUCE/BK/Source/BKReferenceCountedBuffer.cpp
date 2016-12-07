@@ -9,10 +9,10 @@
 */
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "ReferenceCountedBuffer.h"
+#include "BKReferenceCountedBuffer.h"
 
 //==============================================================================
-ReferenceCountedBuffer::ReferenceCountedBuffer (const String& nameToUse,
+BKReferenceCountedBuffer::BKReferenceCountedBuffer (const String& nameToUse,
                                                 int numChannels,
                                                 int numSamples) :
 position (0),
@@ -24,12 +24,12 @@ buffer (numChannels, numSamples)
     
 }
 
-ReferenceCountedBuffer::~ReferenceCountedBuffer()
+BKReferenceCountedBuffer::~BKReferenceCountedBuffer()
 {
     //DBG (String ("Buffer named '") + name + "' destroyed");
 }
 
-AudioSampleBuffer* ReferenceCountedBuffer::getAudioSampleBuffer()
+AudioSampleBuffer* BKReferenceCountedBuffer::getAudioSampleBuffer()
 {
     return &buffer;
 }

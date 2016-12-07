@@ -16,7 +16,9 @@
 class GeneralSettings : public ReferenceCountedObject
 {
 public:
-    typedef ReferenceCountedObjectPtr<GeneralSettings> Ptr;
+    typedef ReferenceCountedObjectPtr<GeneralSettings>   Ptr;
+    typedef Array<GeneralSettings::Ptr>                  Arr;
+    typedef Array<GeneralSettings::Ptr, CriticalSection> CSArr;
     
     GeneralSettings():
         tuningFundamental(440.0),

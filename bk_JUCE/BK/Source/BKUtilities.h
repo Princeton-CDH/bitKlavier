@@ -13,7 +13,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-#include "ReferenceCountedBuffer.h"
+#include "BKReferenceCountedBuffer.h"
 
 #include "GraphicsConstants.h"
 

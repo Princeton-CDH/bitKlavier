@@ -13,7 +13,7 @@
 
 
 BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
-                                          ReferenceCountedBuffer::Ptr buffer,
+                                          BKReferenceCountedBuffer::Ptr buffer,
                                           uint64 soundLength,
                                           double sourceSampleRate,
                                           const BigInteger& notes,

@@ -22,13 +22,13 @@
 class DirectPreparation : public ReferenceCountedObject
 {
 public:
-    typedef ReferenceCountedObjectPtr<DirectPreparation>     Ptr;
-    typedef Array<DirectPreparation::Ptr, CriticalSection>   CSArr;
-    typedef Array<DirectPreparation::Ptr>                    Arr;
+    typedef ReferenceCountedObjectPtr<DirectPreparation>   Ptr;
+    typedef Array<DirectPreparation::Ptr>                  Arr;
+    typedef Array<DirectPreparation::Ptr, CriticalSection> CSArr;
     
     DirectPreparation(float transp,
-                         float gain,
-                         bool overlay):
+                      float gain,
+                      bool overlay):
     dTransposition(transp),
     dGain(gain),
     dOverlay(overlay)
@@ -50,13 +50,13 @@ public:
     }
     
     
-    const float getTransposition() const noexcept                   {return dTransposition; }
-    const float getGain() const noexcept                            {return dGain;          }
-    const bool getOverlay() const noexcept                          {return dOverlay;       }
+    inline const float getTransposition() const noexcept                   {return dTransposition; }
+    inline const float getGain() const noexcept                            {return dGain;          }
+    inline const bool getOverlay() const noexcept                          {return dOverlay;       }
     
-    void setTransposition(float val)                                {dTransposition = val;  }
-    void setGain(float val)                                         {dGain = val;           }
-    void setOverlay(bool val)                                       {dOverlay = val;        }
+    inline void setTransposition(float val)                                {dTransposition = val;  }
+    inline void setGain(float val)                                         {dGain = val;           }
+    inline void setOverlay(bool val)                                       {dOverlay = val;        }
     
     void print(void)
     {
@@ -69,7 +69,6 @@ private:
     float   dTransposition;       //transposition, in half steps
     float   dGain;                //gain multiplier
     bool    dOverlay;
-
     
     JUCE_LEAK_DETECTOR(DirectPreparation);
 };
@@ -79,9 +78,9 @@ class DirectProcessor : public ReferenceCountedObject
 {
     
 public:
-    typedef ReferenceCountedObjectPtr<DirectProcessor>      Ptr;
-    typedef Array<DirectProcessor::Ptr, CriticalSection>    CSArr;
-    typedef Array<DirectProcessor::Ptr>                     Arr;
+    typedef ReferenceCountedObjectPtr<DirectProcessor>   Ptr;
+    typedef Array<DirectProcessor::Ptr>                  Arr;
+    typedef Array<DirectProcessor::Ptr, CriticalSection> CSArr;
     
     DirectProcessor(
                         BKSynthesiser *s,

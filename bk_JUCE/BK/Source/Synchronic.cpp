@@ -32,6 +32,8 @@ SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s,
     
     cluster = Array<int>();
     on = Array<int>();
+    
+    
 }
 
 

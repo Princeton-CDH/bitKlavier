@@ -16,7 +16,9 @@
 class TuningProcessor : public ReferenceCountedObject
 {
 public:
-    typedef ReferenceCountedObjectPtr<TuningProcessor> Ptr;
+    typedef ReferenceCountedObjectPtr<TuningProcessor>   Ptr;
+    typedef Array<TuningProcessor::Ptr>                  Arr;
+    typedef Array<TuningProcessor::Ptr, CriticalSection> CSArr;
     
     TuningProcessor();
     ~TuningProcessor();

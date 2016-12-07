@@ -22,10 +22,9 @@
 class SynchronicPreparation : public ReferenceCountedObject
 {
 public:
-    typedef ReferenceCountedObjectPtr<SynchronicPreparation>    Ptr;
-    typedef Array<SynchronicPreparation::Ptr, CriticalSection>  CSArr;
-    typedef Array<SynchronicPreparation::Ptr>                   Arr;
-    
+    typedef ReferenceCountedObjectPtr<SynchronicPreparation>   Ptr;
+    typedef Array<SynchronicPreparation::Ptr>                  Arr;
+    typedef Array<SynchronicPreparation::Ptr, CriticalSection> CSArr;
     
     SynchronicPreparation(float tempo,
                           int numPulses,
@@ -78,25 +77,23 @@ public:
     {
     }
     
-    const float getTempo() const noexcept                       {return sTempo;                 }
-    const int getNumPulses() const noexcept                     {return sNumPulses;             }
-    const int getClusterMin() const noexcept                    {return sClusterMin;            }
-    const int getClusterMax() const noexcept                    {return sClusterMax;            }
-    const float getClusterThresh() const noexcept               {return sClusterThreshSec;      }
-    const float getPulseThresh() const noexcept              {return sPulseThreshSec;        }
-    const float getClusterThreshold() const noexcept            {return sClusterThresh;         }
-    const SynchronicSyncMode getMode() const noexcept           {return sMode;                  }
-    const int getBeatsToSkip() const noexcept                   {return sBeatsToSkip;           }
-    const Array<float> getBeatMultipliers() const noexcept      {return sBeatMultipliers;       }
-    const Array<float> getAccentMultipliers() const noexcept    {return sAccentMultipliers;     }
-    const Array<float> getLengthMultipliers() const noexcept    {return sLengthMultipliers;     }
-    const Array<float> getTranspOffsets() const noexcept        {return sTranspOffsets;         }
+    inline const float getTempo() const noexcept                       {return sTempo;                 }
+    inline const int getNumPulses() const noexcept                     {return sNumPulses;             }
+    inline const int getClusterMin() const noexcept                    {return sClusterMin;            }
+    inline const int getClusterMax() const noexcept                    {return sClusterMax;            }
+    inline const float getClusterThresh() const noexcept               {return sClusterThreshSec;      }
+    inline const float getPulseThresh() const noexcept              {return sPulseThreshSec;        }
+    inline const float getClusterThreshold() const noexcept            {return sClusterThresh;         }
+    inline const SynchronicSyncMode getMode() const noexcept           {return sMode;                  }
+    inline const int getBeatsToSkip() const noexcept                   {return sBeatsToSkip;           }
+    inline const Array<float> getBeatMultipliers() const noexcept      {return sBeatMultipliers;       }
+    inline const Array<float> getAccentMultipliers() const noexcept    {return sAccentMultipliers;     }
+    inline const Array<float> getLengthMultipliers() const noexcept    {return sLengthMultipliers;     }
+    inline const Array<float> getTranspOffsets() const noexcept        {return sTranspOffsets;         }
+    inline const TuningSystem getTuning() const noexcept               {return sTuning;             }
+    inline const PitchClass getBasePitch() const noexcept              {return sBasePitch;             }
     
-    const TuningSystem getTuning() const noexcept               {return sTuning;             }
-    const PitchClass getBasePitch() const noexcept              {return sBasePitch;             }
-    
-    
-    void setTempo(float tempo)
+    inline void setTempo(float tempo)
     {
         sTempo = tempo;
         
@@ -107,24 +104,23 @@ public:
         sPulseThreshSec = tempoPeriodS;
     }
     
-    void setClusterThresh(float clusterThresh)
+    inline void setClusterThresh(float clusterThresh)
     {
         sClusterThresh = clusterThresh;
         sClusterThreshSec = (60.0/sTempo) * clusterThresh;
     }
     
-    void setNumPulses(int numPulses)                            {sNumPulses = numPulses;                            }
-    void setClusterMin(int clusterMin)                          {sClusterMin = clusterMin;                          }
-    void setClusterMax(int clusterMax)                          {sClusterMax = clusterMax;                          }
-    void setMode(SynchronicSyncMode mode)                       {sMode = mode;                                      }
-    void setBeatsToSkip(int beatsToSkip)                        {sBeatsToSkip = beatsToSkip;                        }
-    void setBeatMultipliers(Array<float> beatMultipliers)       {sBeatMultipliers.swapWith(beatMultipliers);        }
-    void setAccentMultipliers(Array<float> accentMultipliers)   {sAccentMultipliers.swapWith(accentMultipliers);    }
-    void setTranspOffsets(Array<float> transpOffsets)           {sTranspOffsets.swapWith(transpOffsets);            }
-    void setLengthMultipliers(Array<float> lengthMultipliers)   {sLengthMultipliers.swapWith(lengthMultipliers);    }
-    
-    void setTuning(TuningSystem tuning)                         {sTuning = tuning;                                  }
-    void setBasePitch(PitchClass basePitch)                            {sBasePitch = basePitch;                            }
+    inline void setNumPulses(int numPulses)                            {sNumPulses = numPulses;                            }
+    inline void setClusterMin(int clusterMin)                          {sClusterMin = clusterMin;                          }
+    inline void setClusterMax(int clusterMax)                          {sClusterMax = clusterMax;                          }
+    inline void setMode(SynchronicSyncMode mode)                       {sMode = mode;                                      }
+    inline void setBeatsToSkip(int beatsToSkip)                        {sBeatsToSkip = beatsToSkip;                        }
+    inline void setBeatMultipliers(Array<float> beatMultipliers)       {sBeatMultipliers.swapWith(beatMultipliers);        }
+    inline void setAccentMultipliers(Array<float> accentMultipliers)   {sAccentMultipliers.swapWith(accentMultipliers);    }
+    inline void setTranspOffsets(Array<float> transpOffsets)           {sTranspOffsets.swapWith(transpOffsets);            }
+    inline void setLengthMultipliers(Array<float> lengthMultipliers)   {sLengthMultipliers.swapWith(lengthMultipliers);    }
+    inline void setTuning(TuningSystem tuning)                         {sTuning = tuning;                                  }
+    inline void setBasePitch(PitchClass basePitch)                     {sBasePitch = basePitch;                            }
     
     void print(void)
     {
@@ -164,10 +160,6 @@ private:
     float sPulseThreshSec;
     float sClusterThreshSec;
     
-    
-    
-    
-    
     JUCE_LEAK_DETECTOR(SynchronicPreparation);
 };
 
@@ -175,9 +167,9 @@ class SynchronicProcessor : public ReferenceCountedObject
 {
     
 public:
-    typedef ReferenceCountedObjectPtr<SynchronicProcessor>      Ptr;
-    typedef Array<SynchronicProcessor::Ptr, CriticalSection>    CSArr;
-    typedef Array<SynchronicProcessor::Ptr>                     Arr;
+    typedef ReferenceCountedObjectPtr<SynchronicProcessor>   Ptr;
+    typedef Array<SynchronicProcessor::Ptr>                  Arr;
+    typedef Array<SynchronicProcessor::Ptr, CriticalSection> CSArr;
     
     SynchronicProcessor(
                         BKSynthesiser *s,
@@ -189,6 +181,8 @@ public:
     ~SynchronicProcessor();
     
     inline void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr;}
+    inline const uint64 getCurrentNumSamplesBeat(void)     const noexcept { return numSamplesBeat;  }
+    inline const uint64 getCurrentPhasor(void)             const noexcept { return phasor;          }
     
     void processBlock(int numSamples, int channel);
     
@@ -196,8 +190,9 @@ public:
     
     void keyReleased(int noteNumber, int channel);
     
-    const uint64 getCurrentNumSamplesBeat()     const noexcept { return numSamplesBeat;  }
-    const uint64 getCurrentPhasor()             const noexcept { return phasor;          }
+    
+    
+    
     
     int layer;
     

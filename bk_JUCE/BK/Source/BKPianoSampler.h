@@ -14,7 +14,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "BKSynthesiser.h"
-#include "ReferenceCountedBuffer.h"
+#include "BKReferenceCountedBuffer.h"
 #include "AudioConstants.h"
 
 class   BKPianoSamplerSound    : public BKSynthesiserSound
@@ -40,7 +40,7 @@ public:
      source, in seconds
      */
     BKPianoSamplerSound (const String& name,
-                         ReferenceCountedBuffer::Ptr buffer,
+                         BKReferenceCountedBuffer::Ptr buffer,
                          uint64 soundLength,
                          double sourceSampleRate,
                          const BigInteger& midiNotes,
@@ -71,7 +71,7 @@ private:
     
     String name;
     
-    ReferenceCountedBuffer::Ptr data;
+    BKReferenceCountedBuffer::Ptr data;
     
     double sourceSampleRate;
     BigInteger midiNotes;

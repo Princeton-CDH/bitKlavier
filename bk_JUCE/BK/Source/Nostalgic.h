@@ -25,9 +25,9 @@
 class NostalgicPreparation : public ReferenceCountedObject
 {
 public:
-    typedef ReferenceCountedObjectPtr<NostalgicPreparation>     Ptr;
-    typedef Array<NostalgicPreparation::Ptr, CriticalSection>   CSArr;
-    typedef Array<NostalgicPreparation::Ptr>                    Arr;
+    typedef ReferenceCountedObjectPtr<NostalgicPreparation>   Ptr;
+    typedef Array<NostalgicPreparation::Ptr>                  Arr;
+    typedef Array<NostalgicPreparation::Ptr, CriticalSection> CSArr;
     
     NostalgicPreparation(int waveDistance,
                          int undertow,
@@ -74,27 +74,27 @@ public:
     }
     
     
-    const int getWavedistance() const noexcept                      {return nWaveDistance;      }
-    const int getUndertow() const noexcept                          {return nUndertow;          }
-    const float getTransposition() const noexcept                   {return nTransposition;     }
-    const float getGain() const noexcept                            {return nGain;              }
-    const float getLengthMultiplier() const noexcept                {return nLengthMultiplier;  }
-    const float getBeatsToSkip() const noexcept                     {return nBeatsToSkip;       }
-    const NostalgicSyncMode getMode() const noexcept                {return nMode;              }
-    const int getSyncTarget() const noexcept                        {return nSyncTarget;        }
-    const TuningSystem getTuning() const noexcept                   {return nTuning;            }
-    const PitchClass getBasePitch() const noexcept                  {return nBasePitch;         }
+    inline const int getWavedistance() const noexcept                      {return nWaveDistance;      }
+    inline const int getUndertow() const noexcept                          {return nUndertow;          }
+    inline const float getTransposition() const noexcept                   {return nTransposition;     }
+    inline const float getGain() const noexcept                            {return nGain;              }
+    inline const float getLengthMultiplier() const noexcept                {return nLengthMultiplier;  }
+    inline const float getBeatsToSkip() const noexcept                     {return nBeatsToSkip;       }
+    inline const NostalgicSyncMode getMode() const noexcept                {return nMode;              }
+    inline const int getSyncTarget() const noexcept                        {return nSyncTarget;        }
+    inline const TuningSystem getTuning() const noexcept                   {return nTuning;            }
+    inline const PitchClass getBasePitch() const noexcept                  {return nBasePitch;         }
     
-    void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
-    void setUndertow(int undertow)                                  {nUndertow = undertow;                  }
-    void setTransposition(float transposition)                      {nTransposition = transposition;        }
-    void setGain(float gain)                                        {nGain = gain;                          }
-    void setLengthMultiplier(float lengthMultiplier)                {nLengthMultiplier = lengthMultiplier;  }
-    void setBeatsToSkip(float beatsToSkip)                          {nBeatsToSkip = beatsToSkip;            }
-    void setMode(NostalgicSyncMode mode)                            {nMode = mode;                          }
-    void setSyncTarget(int syncTarget)                              {nSyncTarget = syncTarget;              }
-    void setTuning(TuningSystem tuning)                             {nTuning = tuning;                      }
-    void setBasePitch(PitchClass basePitch)                         {nBasePitch = basePitch;                }
+    inline void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
+    inline void setUndertow(int undertow)                                  {nUndertow = undertow;                  }
+    inline void setTransposition(float transposition)                      {nTransposition = transposition;        }
+    inline void setGain(float gain)                                        {nGain = gain;                          }
+    inline void setLengthMultiplier(float lengthMultiplier)                {nLengthMultiplier = lengthMultiplier;  }
+    inline void setBeatsToSkip(float beatsToSkip)                          {nBeatsToSkip = beatsToSkip;            }
+    inline void setMode(NostalgicSyncMode mode)                            {nMode = mode;                          }
+    inline void setSyncTarget(int syncTarget)                              {nSyncTarget = syncTarget;              }
+    inline void setTuning(TuningSystem tuning)                             {nTuning = tuning;                      }
+    inline void setBasePitch(PitchClass basePitch)                         {nBasePitch = basePitch;                }
 
     void print(void)
     {
@@ -139,9 +139,9 @@ class NostalgicProcessor : public ReferenceCountedObject
     
 public:
     typedef ReferenceCountedObjectPtr<NostalgicProcessor>   Ptr;
-    typedef Array<NostalgicProcessor::Ptr, CriticalSection> CSArr;
     typedef Array<NostalgicProcessor::Ptr>                  Arr;
-
+    typedef Array<NostalgicProcessor::Ptr, CriticalSection> CSArr;
+    
     NostalgicProcessor(
                        BKSynthesiser *s,
                        Keymap::Ptr km,

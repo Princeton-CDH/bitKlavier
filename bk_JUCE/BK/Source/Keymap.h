@@ -24,13 +24,13 @@ typedef enum OctatonicType
 class Keymap : public ReferenceCountedObject
 {
 public:
-    typedef ReferenceCountedObjectPtr<Keymap>       Ptr;
-    typedef Array<Keymap::Ptr, CriticalSection>     CSArr;
-    typedef Array<Keymap::Ptr>                      Arr;
+    typedef ReferenceCountedObjectPtr<Keymap>   Ptr;
+    typedef Array<Keymap::Ptr>                  Arr;
+    typedef Array<Keymap::Ptr, CriticalSection> CSArr;
     
-    Keymap()
+    Keymap():
+    keymap(Array<bool>())
     {
-        keymap = Array<bool>();
         keymap.ensureStorageAllocated(128);
         
         for (int i = 0; i < 128; i++)

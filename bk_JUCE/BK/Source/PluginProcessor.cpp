@@ -12,22 +12,18 @@ general                 (new GeneralSettings()),
 tuner                   (new TuningProcessor()),
 mainPianoSynth          (general),
 hammerReleaseSynth      (general),
-resonanceReleaseSynth   (general)
+resonanceReleaseSynth   (general),
+sProcessor(SynchronicProcessor::CSArr()),
+nProcessor(NostalgicProcessor::Arr()),
+dProcessor(DirectProcessor::Arr()),
+sPreparation(SynchronicPreparation::CSArr()),
+nPreparation(NostalgicPreparation::CSArr()),
+dPreparation(DirectPreparation::CSArr()),
+bkKeymaps(Keymap::CSArr()),
+numSynchronicLayers(1),
+numNostalgicLayers(1),
+numDirectLayers(1)
 {
-    numSynchronicLayers = 1;
-    numNostalgicLayers = 1;
-    
-    
-    sProcessor      = SynchronicProcessor::CSArr();
-    nProcessor      = NostalgicProcessor::Arr();
-    dProcessor      = DirectProcessor::Arr();
-    
-    sPreparation    = SynchronicPreparation::CSArr();
-    nPreparation    = NostalgicPreparation::CSArr();
-    dPreparation    = DirectPreparation::CSArr();
-    
-    bkKeymaps       = Keymap::CSArr();
-    
     sProcessor.ensureStorageAllocated(aMaxNumLayers);
     nProcessor.ensureStorageAllocated(aMaxNumLayers);
     dProcessor.ensureStorageAllocated(aMaxNumLayers);
@@ -37,7 +33,7 @@ resonanceReleaseSynth   (general)
     for (int i = 0; i < aMaxNumLayers; i++)
     {
         Keymap::Ptr keymap                  = new Keymap();
-        bkKeymaps.add(keymap);
+        bkKeymaps.insert(3*i, keymap);
         
         SynchronicPreparation::Ptr sPrep    = new SynchronicPreparation();
         sPreparation.insert(i, sPrep);
@@ -48,7 +44,7 @@ resonanceReleaseSynth   (general)
         bkKeymaps.add(keymap);
         
         NostalgicPreparation::Ptr nPrep     = new NostalgicPreparation();
-        nPreparation.insert(i, nPrep);
+        nPreparation.insert(3*i+1, nPrep);
         
         nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, keymap, tuner, nPrep, sProcessor, i));
         
@@ -56,7 +52,7 @@ resonanceReleaseSynth   (general)
         bkKeymaps.add(keymap);
         
         DirectPreparation::Ptr dPrep     = new DirectPreparation();
-        dPreparation.insert(i, dPrep);
+        dPreparation.insert(3*i+2, dPrep);
         
         dProcessor.insert(i, new DirectProcessor(&mainPianoSynth, keymap, dPrep, i));
     }

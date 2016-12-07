@@ -24,12 +24,18 @@
         <FILE id="dmllNf" name="BKList.h" compile="0" resource="0" file="Source/BKList.h"/>
         <FILE id="N85SXV" name="BKUtilities.cpp" compile="1" resource="0" file="Source/BKUtilities.cpp"/>
         <FILE id="WL9668" name="BKUtilities.h" compile="0" resource="0" file="Source/BKUtilities.h"/>
-        <FILE id="VaGwGg" name="ReferenceCountedBuffer.cpp" compile="1" resource="0"
-              file="Source/ReferenceCountedBuffer.cpp"/>
-        <FILE id="Hf4u51" name="ReferenceCountedBuffer.h" compile="0" resource="0"
-              file="Source/ReferenceCountedBuffer.h"/>
+        <FILE id="Yd8HYd" name="BKReferenceCountedObject.h" compile="0" resource="0"
+              file="Source/BKReferenceCountedObject.h"/>
+        <FILE id="VaGwGg" name="BKReferenceCountedBuffer.cpp" compile="1" resource="0"
+              file="Source/BKReferenceCountedBuffer.cpp"/>
+        <FILE id="Hf4u51" name="BKReferenceCountedBuffer.h" compile="0" resource="0"
+              file="Source/BKReferenceCountedBuffer.h"/>
       </GROUP>
       <GROUP id="{E01F59AF-FEAD-7AEA-32C2-F665B05A05F1}" name="Model">
+        <FILE id="VHt2m9" name="Library.cpp" compile="1" resource="0" file="Source/Library.cpp"/>
+        <FILE id="x0g8Ul" name="Library.h" compile="0" resource="0" file="Source/Library.h"/>
+        <FILE id="SPsY4L" name="Preset.cpp" compile="1" resource="0" file="Source/Preset.cpp"/>
+        <FILE id="eStbij" name="Preset.h" compile="0" resource="0" file="Source/Preset.h"/>
         <FILE id="gu3W3U" name="General.h" compile="0" resource="0" file="Source/General.h"/>
         <GROUP id="{1CB08EFA-DEC3-73DF-DE6C-B6E7D430054C}" name="Main">
           <FILE id="GHmNVp" name="PluginProcessor.cpp" compile="1" resource="0"
