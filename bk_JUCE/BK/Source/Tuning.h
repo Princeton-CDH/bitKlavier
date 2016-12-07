@@ -77,6 +77,7 @@ private:
      float 				lastNote[128];
      for(0=>int i;i<128;i++) 60.0 => lastNote[i];
      */
+    float globalOffset;
     
     JUCE_LEAK_DETECTOR(TuningProcessor);
 };
