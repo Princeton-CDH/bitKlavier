@@ -32,27 +32,27 @@ numDirectLayers(1)
     
     for (int i = 0; i < aMaxNumLayers; i++)
     {
-        Keymap::Ptr keymap                  = new Keymap();
+        Keymap::Ptr keymap                  = new Keymap(3*i);
         bkKeymaps.insert(3*i, keymap);
         
-        SynchronicPreparation::Ptr sPrep    = new SynchronicPreparation();
+        SynchronicPreparation::Ptr sPrep    = new SynchronicPreparation(i);
         sPreparation.insert(i, sPrep);
         
         sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, keymap, tuner, sPrep, i));
         
-        keymap                              = new Keymap();
-        bkKeymaps.add(keymap);
+        keymap                              = new Keymap(3*i+1);
+        bkKeymaps.insert(3*i+1, keymap);
         
-        NostalgicPreparation::Ptr nPrep     = new NostalgicPreparation();
-        nPreparation.insert(3*i+1, nPrep);
+        NostalgicPreparation::Ptr nPrep     = new NostalgicPreparation(i);
+        nPreparation.insert(i, nPrep);
         
         nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, keymap, tuner, nPrep, sProcessor, i));
         
-        keymap                              = new Keymap();
-        bkKeymaps.add(keymap);
+        keymap                              = new Keymap(3*i+2);
+        bkKeymaps.insert(3*i+2, keymap);
         
-        DirectPreparation::Ptr dPrep     = new DirectPreparation();
-        dPreparation.insert(3*i+2, dPrep);
+        DirectPreparation::Ptr dPrep     = new DirectPreparation(i);
+        dPreparation.insert(i, dPrep);
         
         dProcessor.insert(i, new DirectProcessor(&mainPianoSynth, keymap, dPrep, i));
     }

@@ -26,9 +26,11 @@ public:
     typedef Array<DirectPreparation::Ptr>                  Arr;
     typedef Array<DirectPreparation::Ptr, CriticalSection> CSArr;
     
-    DirectPreparation(float transp,
+    DirectPreparation(int Id,
+                      float transp,
                       float gain,
                       bool overlay):
+    Id(Id),
     dTransposition(transp),
     dGain(gain),
     dOverlay(overlay)
@@ -36,7 +38,8 @@ public:
         
     }
     
-    DirectPreparation():
+    DirectPreparation(int Id):
+    Id(Id),
     dTransposition(0.0),
     dGain(1.0),
     dOverlay(false)
@@ -58,6 +61,8 @@ public:
     inline void setGain(float val)                                         {dGain = val;           }
     inline void setOverlay(bool val)                                       {dOverlay = val;        }
     
+    inline int getId(void) {   return Id; }
+    
     void print(void)
     {
         DBG("dTransposition: "  + String(dTransposition));
@@ -65,7 +70,7 @@ public:
         DBG("dOverlay: "        + String((int)dOverlay));
     }
 private:
-    
+    int Id;
     float   dTransposition;       //transposition, in half steps
     float   dGain;                //gain multiplier
     bool    dOverlay;

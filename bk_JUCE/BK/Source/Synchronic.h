@@ -26,7 +26,8 @@ public:
     typedef Array<SynchronicPreparation::Ptr>                  Arr;
     typedef Array<SynchronicPreparation::Ptr, CriticalSection> CSArr;
     
-    SynchronicPreparation(float tempo,
+    SynchronicPreparation(int Id,
+                          float tempo,
                           int numPulses,
                           int clusterMin,
                           int clusterMax,
@@ -39,6 +40,7 @@ public:
                           Array<float> transpOffsets,
                           TuningSystem tuning,
                           PitchClass basePitch):
+    Id(Id),
     sTempo(tempo),
     sNumPulses(numPulses),
     sClusterMin(clusterMin),
@@ -58,7 +60,8 @@ public:
     }
 
     
-    SynchronicPreparation():
+    SynchronicPreparation(int Id):
+    Id(Id),
     sTempo(120),
     sNumPulses(0),
     sClusterMin(1),
@@ -92,6 +95,8 @@ public:
     inline const Array<float> getTranspOffsets() const noexcept        {return sTranspOffsets;         }
     inline const TuningSystem getTuning() const noexcept               {return sTuning;             }
     inline const PitchClass getBasePitch() const noexcept              {return sBasePitch;             }
+    
+    inline int getId(void) {   return Id; }
     
     inline void setTempo(float tempo)
     {
@@ -144,6 +149,7 @@ public:
     }
     
 private:
+    int Id;
     float sTempo;
     int sNumPulses,sClusterMin,sClusterMax;
     float sClusterThresh; // beats
@@ -171,8 +177,7 @@ public:
     typedef Array<SynchronicProcessor::Ptr>                  Arr;
     typedef Array<SynchronicProcessor::Ptr, CriticalSection> CSArr;
     
-    SynchronicProcessor(
-                        BKSynthesiser *s,
+    SynchronicProcessor(BKSynthesiser *s,
                         Keymap::Ptr km,
                         TuningProcessor::Ptr t,
                         SynchronicPreparation::Ptr prep,

@@ -29,7 +29,8 @@ public:
     typedef Array<NostalgicPreparation::Ptr>                  Arr;
     typedef Array<NostalgicPreparation::Ptr, CriticalSection> CSArr;
     
-    NostalgicPreparation(int waveDistance,
+    NostalgicPreparation(int Id,
+                         int waveDistance,
                          int undertow,
                          float transposition,
                          float gain,
@@ -39,6 +40,7 @@ public:
                          int syncTarget,
                          TuningSystem tuning,
                          PitchClass basePitch):
+    Id(Id),
     nWaveDistance(waveDistance),
     nUndertow(undertow),
     nTransposition(transposition),
@@ -53,7 +55,8 @@ public:
         
     }
     
-    NostalgicPreparation():
+    NostalgicPreparation(int Id):
+    Id(Id),
     nWaveDistance(0),
     nUndertow(0),
     nTransposition(0.0),
@@ -85,6 +88,8 @@ public:
     inline const TuningSystem getTuning() const noexcept                   {return nTuning;            }
     inline const PitchClass getBasePitch() const noexcept                  {return nBasePitch;         }
     
+    inline int getId(void) {   return Id; }
+    
     inline void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
     inline void setUndertow(int undertow)                                  {nUndertow = undertow;                  }
     inline void setTransposition(float transposition)                      {nTransposition = transposition;        }
@@ -95,6 +100,8 @@ public:
     inline void setSyncTarget(int syncTarget)                              {nSyncTarget = syncTarget;              }
     inline void setTuning(TuningSystem tuning)                             {nTuning = tuning;                      }
     inline void setBasePitch(PitchClass basePitch)                         {nBasePitch = basePitch;                }
+    
+    
 
     void print(void)
     {
@@ -109,7 +116,7 @@ public:
         DBG("nBasePitch: " + String(nBasePitch));
     }
 private:
-
+    int Id;
     int nWaveDistance;  //ms; distance from beginning of sample to stop reverse playback and begin undertow
     int nUndertow;      //ms; length of time to play forward after directional change
     /*

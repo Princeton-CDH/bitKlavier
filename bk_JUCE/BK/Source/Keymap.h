@@ -28,7 +28,8 @@ public:
     typedef Array<Keymap::Ptr>                  Arr;
     typedef Array<Keymap::Ptr, CriticalSection> CSArr;
     
-    Keymap():
+    Keymap(int Id):
+    Id(Id),
     keymap(Array<bool>())
     {
         keymap.ensureStorageAllocated(128);
@@ -43,6 +44,8 @@ public:
     {
         
     }
+    
+    inline int getId(void) {   return Id; }
     
     // Returns true if added, false if removed.
     bool toggleNote(int noteNumber)
@@ -110,6 +113,7 @@ public:
     
     
 private:
+    int Id;
     Array<bool> keymap;
     
     JUCE_LEAK_DETECTOR (Keymap)
