@@ -17,9 +17,9 @@
 SynchronicViewController::SynchronicViewController(BKAudioProcessor& p)
 :
     processor(p),
-    currentSynchronicLayer(0)
+    currentSynchronicId(0)
 {
-    SynchronicPreparation::Ptr layer = processor.sPreparation[currentSynchronicLayer];
+    SynchronicPreparation::Ptr prep = processor.sPreparation[currentSynchronicId];
     
      // Labels
     synchronicL = OwnedArray<BKLabel>();
@@ -45,7 +45,7 @@ SynchronicViewController::SynchronicViewController(BKAudioProcessor& p)
         synchronicTF[i]->setName(cSynchronicParameterTypes[i]);
     }
     
-    updateFieldsToLayer(currentSynchronicLayer);
+    updateFields(currentSynchronicId);
 }
 
 
@@ -96,31 +96,12 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
     
-    SynchronicProcessor::Ptr   proc = processor.sProcessor[currentSynchronicLayer];
+    SynchronicPreparation::Ptr prep = processor.sPreparation[currentSynchronicId];
     
-    SynchronicPreparation::Ptr prep = proc->getPreparation();
-    
-    Keymap::Ptr keymap              = proc->getKeymap();
-    
-    
-    if (name == cSynchronicParameterTypes[SynchronicNumLayers])
+    if (name == cSynchronicParameterTypes[SynchronicId])
     {
-        processor.numSynchronicLayers = i;
-    }
-    else if (name == cSynchronicParameterTypes[SynchronicCurrentLayer])
-    {
-        updateFieldsToLayer(i);
-    }
-    else if (name == cSynchronicParameterTypes[SynchronicKeymap])
-    {
-        Array<int> keys = stringToIntArray(text);
-        
-        keymap->clear();
-        for (auto note : keys)
-        {
-            keymap->addNote(note);
-        }
-        
+        currentSynchronicId = i;
+        updateFields(currentSynchronicId);
     }
     else if (name == cSynchronicParameterTypes[SynchronicTempo])
     {
@@ -188,20 +169,12 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
 }
 
 
-void SynchronicViewController::updateFieldsToLayer(int numLayer)
+void SynchronicViewController::updateFields(int synchronicId)
 {
-    
-    currentSynchronicLayer = numLayer;
-
-    SynchronicProcessor::Ptr proc   = processor.sProcessor[numLayer];
-    SynchronicPreparation::Ptr prep = proc->getPreparation();
-    Keymap::Ptr keymap              = proc->getKeymap();
+    SynchronicPreparation::Ptr prep   = processor.sPreparation[synchronicId];
     
     // Set text.
-    synchronicTF[SynchronicNumLayers]           ->setText(  String(                 processor.numSynchronicLayers));
-    synchronicTF[SynchronicKeymap]              ->setText(  intArrayToString(       keymap->keys()));
-    synchronicTF[SynchronicCurrentLayer]        ->setText(  String(                 numLayer));
-    
+    synchronicTF[SynchronicId]                  ->setText(  String( prep->getId()));
     synchronicTF[SynchronicTempo]               ->setText(  String(                 prep->getTempo()));
     synchronicTF[SynchronicNumPulses]           ->setText(  String(                 prep->getNumPulses()));
     synchronicTF[SynchronicClusterMin]          ->setText(  String(                 prep->getClusterMin()));
@@ -217,5 +190,15 @@ void SynchronicViewController::updateFieldsToLayer(int numLayer)
     synchronicTF[SynchronicBasePitch]           ->setText(  String(                 prep->getBasePitch()));
 }
 
+
+void SynchronicViewController::actionListenerCallback (const String& message)
+{
+    if (message == "synchronic/update")
+    {
+        int synchronicId = processor.currentLayer->getPreparation();
+        
+        updateFields(synchronicId);
+    }
+}
 
 

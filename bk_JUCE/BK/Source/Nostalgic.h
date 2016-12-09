@@ -172,6 +172,21 @@ public:
     
     int layer;
     
+    inline void setKeymap(Keymap::Ptr km)
+    {
+        keymap = km;
+    }
+    
+    inline void setPreparation(NostalgicPreparation::Ptr prep)
+    {
+        preparation = prep;
+    }
+    
+    inline void setTuning(TuningProcessor::Ptr t)
+    {
+        tuner = t;
+    }
+    
     Keymap::Ptr getKeymap(void)
     {
         return keymap;

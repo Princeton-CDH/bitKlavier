@@ -8,15 +8,14 @@
   ==============================================================================
 */
 
-#include "../JuceLibraryCode/JuceHeader.h"
 #include "DirectViewController.h"
 
 //==============================================================================
 DirectViewController::DirectViewController(BKAudioProcessor& p):
 processor(p),
-currentDirectLayer(0)
+currentDirectId(0)
 {
-    DirectPreparation::Ptr layer = processor.dPreparation[currentDirectLayer];
+    DirectPreparation::Ptr layer = processor.dPreparation[currentDirectId];
     
     // Labels
     directL = OwnedArray<BKLabel>();
@@ -42,7 +41,7 @@ currentDirectLayer(0)
         directTF[i]->setName(cDirectParameterTypes[i]);
     }
     
-    updateFieldsToLayer(currentDirectLayer);
+    updateFields(currentDirectId);
 }
 
 DirectViewController::~DirectViewController()
@@ -89,31 +88,12 @@ void DirectViewController::textFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
     
-    DirectProcessor::Ptr   proc = processor.dProcessor[currentDirectLayer];
+    DirectPreparation::Ptr prep = processor.dPreparation[currentDirectId];
     
-    DirectPreparation::Ptr prep = proc->getPreparation();
-    
-    Keymap::Ptr keymap             = proc->getKeymap();
-    
-    
-    if (name == cDirectParameterTypes[DirectNumLayers])
+    if (name == cDirectParameterTypes[DirectId])
     {
-        processor.numDirectLayers = i;
-    }
-    else if (name == cDirectParameterTypes[DirectCurrentLayer])
-    {
-        updateFieldsToLayer(i);
-    }
-    else if (name == cDirectParameterTypes[DirectKeymap])
-    {
-        Array<int> keys = stringToIntArray(text);
-        
-        keymap->clear();
-        for (auto note : keys)
-        {
-            keymap->addNote(note);
-        }
-        
+        currentDirectId = i;
+        updateFields(currentDirectId);
     }
     else if (name == cDirectParameterTypes[DirectTransposition])
     {
@@ -134,24 +114,26 @@ void DirectViewController::textFieldDidChange(TextEditor& tf)
 }
 
 
-void DirectViewController::updateFieldsToLayer(int numLayer)
+void DirectViewController::updateFields(int directId)
 {
     
-    currentDirectLayer = numLayer;
+    DirectPreparation::Ptr prep = processor.dPreparation[directId];
     
-    DirectProcessor::Ptr   proc = processor.dProcessor[currentDirectLayer];
-    
-    DirectPreparation::Ptr prep = proc->getPreparation();
-    
-    Keymap::Ptr keymap             = proc->getKeymap();
-    
-    // Set text.
-    directTF[DirectNumLayers]         ->setText( String( processor.numDirectLayers));
-    directTF[DirectKeymap]            ->setText( intArrayToString( keymap->keys()));
-    directTF[DirectCurrentLayer]      ->setText( String( numLayer));
-    
+    directTF[DirectId]                ->setText( String( directId));
     directTF[DirectTransposition]     ->setText( String( prep->getTransposition()));
     directTF[DirectGain]              ->setText( String( prep->getGain()));
     directTF[DirectOverlay]           ->setText( String( prep->getOverlay()));
 
 }
+
+void DirectViewController::actionListenerCallback (const String& message)
+{
+    if (message == "direct/update")
+    {
+        currentDirectId = processor.currentLayer->getPreparation();
+        
+        updateFields(currentDirectId);
+    }
+}
+
+

@@ -25,6 +25,8 @@ String          floatArrayToString(Array<float> arr);
 
 Array<int>      stringToIntArray(String s);
 
+Array<int>      keymapStringToIntArray(String s);
+
 Array<float>    stringToFloatArray(String s);
 
 double          mtof(double f);

@@ -151,3 +151,8 @@ void GeneralViewController::updateFields(void)
     generalTF[GeneralInvertSustain]     ->setText(   String( gen->getInvertSustain()));
     
 }
+
+void GeneralViewController::actionListenerCallback (const String& message)
+{
+    
+}

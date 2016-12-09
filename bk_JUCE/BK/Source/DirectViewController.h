@@ -11,7 +11,7 @@
 #ifndef DIRECTVIEWCONTROLLER_H_INCLUDED
 #define DIRECTVIEWCONTROLLER_H_INCLUDED
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "BKUtilities.h"
 
 #include "PluginProcessor.h"
 
@@ -26,7 +26,7 @@
 //==============================================================================
 /*
 */
-class DirectViewController    : public BKViewController
+class DirectViewController    : public BKViewController, public ActionListener
 {
 public:
     DirectViewController(BKAudioProcessor&);
@@ -37,14 +37,16 @@ public:
 
 private:
     BKAudioProcessor& processor;
-    int currentDirectLayer;
+    int currentDirectId;
     
     OwnedArray<BKLabel> directL;
     OwnedArray<BKTextField> directTF;
     
     void textFieldDidChange(TextEditor&) override;
     
-    void updateFieldsToLayer(int numLayer);
+    void updateFields(int directId);
+    
+    void actionListenerCallback (const String& message) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DirectViewController)
 };

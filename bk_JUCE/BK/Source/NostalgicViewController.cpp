@@ -16,9 +16,9 @@
 NostalgicViewController::NostalgicViewController(BKAudioProcessor& p)
 :
     processor(p),
-    currentNostalgicLayer(0)
+    currentNostalgicId(0)
 {
-    NostalgicPreparation::Ptr layer = processor.nPreparation[currentNostalgicLayer];
+    NostalgicPreparation::Ptr layer = processor.nPreparation[currentNostalgicId];
     
     // Labels
     nostalgicL = OwnedArray<BKLabel>();
@@ -46,7 +46,7 @@ NostalgicViewController::NostalgicViewController(BKAudioProcessor& p)
         nostalgicTF[i]->setName(cNostalgicParameterTypes[i]);
     }
     
-    updateFieldsToLayer(currentNostalgicLayer);
+    updateFields(currentNostalgicId);
 }
 
 NostalgicViewController::~NostalgicViewController()
@@ -93,31 +93,12 @@ void NostalgicViewController::textFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
     
-    NostalgicProcessor::Ptr   proc = processor.nProcessor[currentNostalgicLayer];
+    NostalgicPreparation::Ptr prep = processor.nPreparation[currentNostalgicId];
     
-    NostalgicPreparation::Ptr prep = proc->getPreparation();
-    
-    Keymap::Ptr keymap             = proc->getKeymap();
-    
-    
-    if (name == cNostalgicParameterTypes[NostalgicNumLayers])
+    if (name == cNostalgicParameterTypes[NostalgicId])
     {
-        processor.numNostalgicLayers = i;
-    }
-    else if (name == cNostalgicParameterTypes[NostalgicCurrentLayer])
-    {
-        updateFieldsToLayer(i);
-    }
-    else if (name == cNostalgicParameterTypes[NostalgicKeymap])
-    {
-        Array<int> keys = stringToIntArray(text);
-        
-        keymap->clear();
-        for (auto note : keys)
-        {
-            keymap->addNote(note);
-        }
-        
+        currentNostalgicId = i;
+        updateFields(currentNostalgicId);
     }
     else if (name == cNostalgicParameterTypes[NostalgicWaveDistance])
     {
@@ -166,22 +147,12 @@ void NostalgicViewController::textFieldDidChange(TextEditor& tf)
 }
 
 
-void NostalgicViewController::updateFieldsToLayer(int numLayer)
+void NostalgicViewController::updateFields(int nostalgicId)
 {
     
-    currentNostalgicLayer = numLayer;
-    
-    NostalgicProcessor::Ptr   proc = processor.nProcessor[currentNostalgicLayer];
-    
-    NostalgicPreparation::Ptr prep = proc->getPreparation();
-    
-    Keymap::Ptr keymap             = proc->getKeymap();
-    
-    // Set text.
-    nostalgicTF[NostalgicNumLayers]         ->setText( String(                 processor.numNostalgicLayers));
-    nostalgicTF[NostalgicKeymap]            ->setText( intArrayToString( keymap->keys()));
-    nostalgicTF[NostalgicCurrentLayer]      ->setText( String( numLayer));
+    NostalgicPreparation::Ptr prep = processor.nPreparation[nostalgicId];
 
+    nostalgicTF[NostalgicId]                ->setText( String( nostalgicId));
     nostalgicTF[NostalgicWaveDistance]      ->setText( String( prep->getWavedistance()));
     nostalgicTF[NostalgicUndertow]          ->setText( String( prep->getUndertow()));
     nostalgicTF[NostalgicTransposition]     ->setText( String( prep->getTransposition()));
@@ -192,4 +163,14 @@ void NostalgicViewController::updateFieldsToLayer(int numLayer)
     nostalgicTF[NostalgicSyncTarget]        ->setText( String( prep->getSyncTarget()));
     nostalgicTF[NostalgicTuning]            ->setText( String( prep->getTuning()));
     nostalgicTF[NostalgicBasePitch]         ->setText( String( prep->getBasePitch()));
+}
+
+void NostalgicViewController::actionListenerCallback (const String& message)
+{
+    if (message == "nostalgic/update")
+    {
+        currentNostalgicId = processor.currentLayer->getPreparation();
+        
+        updateFields(currentNostalgicId);
+    }
 }

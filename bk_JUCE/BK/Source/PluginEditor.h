@@ -18,6 +18,8 @@
 #include "NostalgicViewController.h"
 #include "DirectViewController.h"
 #include "GeneralViewController.h"
+#include "LayerViewController.h"
+#include "KeymapViewController.h"
 
 //==============================================================================
 /**
@@ -41,10 +43,13 @@ private:
     
     BKAudioProcessor& processor;
     
+    LayerViewController         lvc;
+    KeymapViewController        kvc;
     GeneralViewController       gvc;
     SynchronicViewController    svc;
     NostalgicViewController     nvc;
     DirectViewController        dvc;
+    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessorEditor)
 };

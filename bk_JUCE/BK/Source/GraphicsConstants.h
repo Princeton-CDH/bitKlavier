@@ -40,6 +40,15 @@ static const int gNostalgicVCHeight = gVCHeight;
 static const int gGeneralVCWidth = gVCWidth;
 static const int gGeneralVCHeight = gVCHeight;
 
+static const int gDirectVCWidth = gVCWidth;
+static const int gDirectVCHeight = gVCHeight;
+
+static const int gKeymapVCWidth = gVCWidth;
+static const int gKeymapVCHeight = gVCHeight;
+
+static const int gLayerVCWidth = gVCWidth;
+static const int gLayerVCHeight = gVCHeight;
+
 static const int gXSpacing = 5;
 static const int gYSpacing = 5;
 

@@ -11,7 +11,7 @@
 #ifndef BKLABEL_H_INCLUDED
 #define BKLABEL_H_INCLUDED
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "BKLookAndFeel.h"
 
 //==============================================================================
 /*

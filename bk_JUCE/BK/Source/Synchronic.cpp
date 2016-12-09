@@ -12,15 +12,15 @@
 
 SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s,
                                          Keymap::Ptr km,
-                                         TuningProcessor::Ptr t,
                                          SynchronicPreparation::Ptr p,
-                                         int layer)
+                                         TuningProcessor::Ptr t,
+                                         int Id)
 :
-    layer(layer),
-    synth(s),
-    keymap(km),
-    preparation(p),
-    tuner(t)
+Id(Id),
+synth(s),
+keymap(km),
+preparation(p),
+tuner(t)
 {
     clusterTimer = 0;
     phasor = 0;
@@ -246,5 +246,9 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip) //return time in m
     //DBG("time in ms to skipped beat = " + std::to_string(timeToReturn * 1000./sampleRate));
     return timeToReturn * 1000./sampleRate;
 }
+
+
+
+    
 
 

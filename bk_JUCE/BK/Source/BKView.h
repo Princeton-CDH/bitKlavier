@@ -11,8 +11,7 @@
 #ifndef PREPARATIONVIEW_H_INCLUDED
 #define PREPARATIONVIEW_H_INCLUDED
 
-#include "../JuceLibraryCode/JuceHeader.h"
-
+#include "BKLookAndFeel.h"
 
 //==============================================================================
 /*

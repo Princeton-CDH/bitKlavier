@@ -1,43 +1,39 @@
 /*
   ==============================================================================
 
-    BKTextField.h
-    Created: 15 Nov 2016 4:19:33pm
+    BKMenu.h
+    Created: 9 Dec 2016 3:31:21pm
     Author:  Michael R Mulshine
 
   ==============================================================================
 */
 
-#ifndef BKTEXTFIELD_H_INCLUDED
-#define BKTEXTFIELD_H_INCLUDED
+#ifndef BKMENU_H_INCLUDED
+#define BKMENU_H_INCLUDED
 
 #include "BKLookAndFeel.h"
 
 //==============================================================================
-
-class BKTextField    : public TextEditor, public TextEditor::Listener
+/*
+*/
+class BKComboBox    : public ComboBox
 {
 public:
-    BKTextField()
+    BKComboBox()
     {
-        setLookAndFeel(&laf);
         setSize(200,20);
-    
+        
         lookAndFeelChanged();
     }
-
-    ~BKTextField()
+    
+    ~BKComboBox()
     {
-        
     }
-    
-    
-private:
-    BKTextFieldLAF laf;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKTextField)
-    
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKComboBox)
 };
 
 
-#endif  // BKTEXTFIELD_H_INCLUDED
+#endif  // BKMENU_H_INCLUDED

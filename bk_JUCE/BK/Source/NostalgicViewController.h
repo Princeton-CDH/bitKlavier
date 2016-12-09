@@ -11,7 +11,7 @@
 #ifndef NOSTALGICVIEWCONTROLLER_H_INCLUDED
 #define NOSTALGICVIEWCONTROLLER_H_INCLUDED
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "BKUtilities.h"
 
 #include "PluginProcessor.h"
 
@@ -25,7 +25,7 @@
 //==============================================================================
 /*
 */
-class NostalgicViewController    : public BKViewController
+class NostalgicViewController    : public BKViewController, public ActionListener
 {
 public:
     NostalgicViewController(BKAudioProcessor&);
@@ -36,7 +36,7 @@ public:
 
 private:
     BKAudioProcessor& processor;
-    int currentNostalgicLayer;
+    int currentNostalgicId;
     
     // BKLabels
     OwnedArray<BKLabel> nostalgicL;
@@ -44,7 +44,9 @@ private:
     
     void textFieldDidChange(TextEditor&) override;
     
-    void updateFieldsToLayer(int numLayer);
+    void updateFields(int nostalgicId);
+    
+    void actionListenerCallback (const String& message) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NostalgicViewController)
 };

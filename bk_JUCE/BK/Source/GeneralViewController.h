@@ -26,7 +26,7 @@
 //==============================================================================
 /*
 */
-class GeneralViewController    : public BKViewController
+class GeneralViewController    : public BKViewController, public ActionListener
 {
 public:
     GeneralViewController(BKAudioProcessor&);
@@ -47,6 +47,8 @@ private:
     void textFieldDidChange(TextEditor&) override;
     
     void updateFields(void);
+    
+    void actionListenerCallback (const String& message) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GeneralViewController)
 };

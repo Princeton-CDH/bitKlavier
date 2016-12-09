@@ -64,6 +64,23 @@ typedef enum BKNoteType {
     BKNoteTypeNil,
 } BKNoteType;
 
+typedef enum BKPreparationType {
+    PreparationTypeDirect = 0,
+    PreparationTypeSynchronic,
+    PreparationTypeNostalgic,
+    PreparationTypeTuning,
+    BKPreparationTypeNil,
+} BKPreparationType;
+
+static const std::vector<std::string> cPreparationTypes = {
+    "Main/Direct",
+    "Synchronic",
+    "Nostalgic",
+    "Tuning"
+};
+
+
+
 
 #pragma mark - General
 typedef enum GeneralParameterType
@@ -104,9 +121,7 @@ typedef enum SynchronicSyncMode {
 } SynchronicSyncMode;
 
 typedef enum SynchronicParameterType {
-    SynchronicKeymap = 0,
-    SynchronicNumLayers,
-    SynchronicCurrentLayer,
+    SynchronicId = 0,
     SynchronicTempo,
     SynchronicNumPulses,
     SynchronicClusterMin,
@@ -124,9 +139,7 @@ typedef enum SynchronicParameterType {
 } SynchronicParameterType;
 
 static const std::vector<std::string> cSynchronicParameterTypes = {
-    "SynchronicKeymap",
-    "SynchronicNumLayers",
-    "SynchronicCurrentLayer",
+    "Synchronic Id",
     "SynchronicTempo",
     "SynchronicNumPulses",
     "SynchronicClusterMin",
@@ -150,9 +163,7 @@ typedef enum NostalgicSyncMode {
 } NostalgicSyncMode;
 
 typedef enum NostalgicParameterType {
-    NostalgicKeymap = 0,
-    NostalgicNumLayers,
-    NostalgicCurrentLayer,
+    NostalgicId = 0,
     NostalgicWaveDistance,
     NostalgicUndertow,
     NostalgicTransposition,
@@ -167,9 +178,7 @@ typedef enum NostalgicParameterType {
 } NostalgicParameterType;
 
 static const std::vector<std::string> cNostalgicParameterTypes = {
-    "NostalgicKeymap",
-    "NostalgicNumLayers",
-    "NostalgicCurrentLayer",
+    "Nostalgic Id",
     "NostalgicWaveDistance",
     "NostalgicUndertow",
     "NostalgicTransposition",
@@ -185,9 +194,7 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
 #pragma mark - Direct
 typedef enum DirectParameterType
 {
-    DirectKeymap = 0,
-    DirectNumLayers,
-    DirectCurrentLayer,
+    DirectId = 0,
     DirectTransposition,
     DirectGain,
     DirectOverlay,
@@ -196,12 +203,43 @@ typedef enum DirectParameterType
 } DirectParameterType;
 
 static const std::vector<std::string> cDirectParameterTypes = {
-    "DirectKeymap",
-    "DirectNumLayers",
-    "DirectCurrentLayer",
+    "Direct Id",
     "DirectTransposition",
     "DirectGain",
     "DirectOverlay"
+};
+
+#pragma mark - Layer
+typedef enum LayerParameterType
+{
+    LayerNumber = 0,
+    LayerKeymapId,
+    LayerPreparationId,
+    LayerTuningId,
+    LayerParameterTypeNil
+    
+} LayerParameterType;
+
+static const std::vector<std::string> cLayerParameterTypes = {
+    "LayerType",
+    "LayerNumber",
+    "LayerKeymap Id",
+    "LayerPreparation Id",
+    "LayerTuning Id"
+};
+
+#pragma mark - Keymap
+typedef enum KeymapParameterType
+{
+    KeymapId = 0,
+    KeymapField,
+    KeymapParameterTypeNil
+    
+} KeymapParameterType;
+
+static const std::vector<std::string> cKeymapParameterTypes = {
+    "Keymap Id",
+    "Keymap"
 };
 
 

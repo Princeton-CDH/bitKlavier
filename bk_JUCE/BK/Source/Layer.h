@@ -2,7 +2,7 @@
   ==============================================================================
 
     Layer.h
-    Created: 7 Dec 2016 3:33:44pm
+    Created: 8 Dec 2016 12:59:46am
     Author:  Michael R Mulshine
 
   ==============================================================================
@@ -13,77 +13,57 @@
 
 #include "BKUtilities.h"
 
-#include "Keymap.h"
-
-#include "Synchronic.h"
-
-#include "Tuning.h"
-
-class SynchronicLayer : public ReferenceCountedObject
+class Layer : public ReferenceCountedObject
 {
-    
 public:
+    typedef ReferenceCountedObjectPtr<Layer>    Ptr;
+    typedef Array<Layer::Ptr>                   Arr;
+    typedef Array<Layer::Ptr, CriticalSection>  CSArr;
     
-    typedef ReferenceCountedObjectPtr<SynchronicLayer>      Ptr;
-    typedef Array<SynchronicLayer::Ptr>                     Arr;
-    typedef Array<SynchronicLayer::Ptr, CriticalSection>    CSArr;
-    
-    SynchronicLayer(Keymap::Ptr km, SynchronicPreparation::Ptr prep, int ID):
-    ID(ID),
-    keymap(km),
-    preparation(prep),
-    keymapID(keymap->getID()),
-    preparationID(preparation->getID())
+    Layer(BKPreparationType type, int layerNum, int keymapId, int preparationId, int tuningId):
+    type(type),
+    layerNumber(layerNum),
+    keymapId(keymapId),
+    preparationId(preparationId),
+    tuningId(tuningId)
     {
-
-    }
-    
-    ~SynchronicLayer()
-    {
-    }
-    
-    inline const int getID(void) const noexcept { return ID; }
-    
-    SynchronicPreparation::Ptr  getPreparation(void)    { return preparation;            }
-    Keymap::Ptr                 getKeymap(void)         { return keymap;                 }
-    //inline TuningPreparation::Ptr      getTuning(void)         { return tuning;         }
-    
-    void setPreparation(SynchronicPreparation::Ptr p)
-    {
-        preparation = p;
         
-        preparationID = preparation->getID();
     }
     
-    void setKeymap(Keymap::Ptr k)
+    ~Layer()
     {
-        keymap = k;
-        
-        keymapID = keymap->getID();
     }
-   
-    /*
-    inline void setTuning(TuningPreparation::Ptr t)
+    
+    inline void setType(BKPreparationType val)  {   type = val; print();           }
+    inline void setLayerNumber(int val)         {   layerNumber = val; print();      }
+    inline void setKeymap(int val)              {   keymapId = val;  print();       }
+    inline void setPreparation(int val)         {   preparationId = val; print();   }
+    inline void setTuning(int val)              {   tuningId = val; print();        }
+    
+    inline BKPreparationType getType(void)      {   return type;            }
+    inline int getLayerNumber(void)             {   return layerNumber;     }
+    inline int getKeymap(void)                  {   return keymapId;        }
+    inline int getPreparation(void)             {   return preparationId;   }
+    inline int getTuning(void)                  {   return tuningId;        }
+    
+    
+    void print(void)
     {
-        tuning = t;
-        
-        tuningID = tuning->getID();
+        DBG("type: " + String(type));
+        DBG("layerNum: " + String(layerNumber));
+        DBG("keymapId: " + String(keymapId));
+        DBG("preparationId: " + String(preparationId));
+        DBG("tuningId:" + String(tuningId));
     }
-    */
     
 private:
-    int ID;
+    BKPreparationType type;
+    int layerNumber;
+    int keymapId;
+    int preparationId;
+    int tuningId;
     
-    Keymap::Ptr                 keymap;
-    SynchronicPreparation::Ptr  preparation;
-    //TuningPreparation::Ptr      tuning;
-    
-    int keymapID;
-    int preparationID;
-    //int tuningID;
-    
-    JUCE_LEAK_DETECTOR(SynchronicLayer);
-    
+    JUCE_LEAK_DETECTOR(Layer)
 };
 
 

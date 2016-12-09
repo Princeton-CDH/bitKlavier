@@ -8,6 +8,7 @@
 
 //==============================================================================
 BKAudioProcessor::BKAudioProcessor():
+currentLayer            (new Layer(PreparationTypeDirect, 0 , 0 , 0, 0)),
 general                 (new GeneralSettings()),
 tuner                   (new TuningProcessor()),
 mainPianoSynth          (general),
@@ -20,9 +21,9 @@ sPreparation(SynchronicPreparation::CSArr()),
 nPreparation(NostalgicPreparation::CSArr()),
 dPreparation(DirectPreparation::CSArr()),
 bkKeymaps(Keymap::CSArr()),
-numSynchronicLayers(1),
-numNostalgicLayers(1),
-numDirectLayers(1)
+numSynchronicLayers(12),
+numNostalgicLayers(12),
+numDirectLayers(12)
 {
     sProcessor.ensureStorageAllocated(aMaxNumLayers);
     nProcessor.ensureStorageAllocated(aMaxNumLayers);
@@ -30,31 +31,23 @@ numDirectLayers(1)
     
     bkKeymaps.ensureStorageAllocated(aMaxNumLayers * 3);
     
+    for (int i = 0; i < 3 * aMaxNumLayers; i++)
+    {
+        bkKeymaps.add(new Keymap(i));
+    }
+    
     for (int i = 0; i < aMaxNumLayers; i++)
     {
-        Keymap::Ptr keymap                  = new Keymap(3*i);
-        bkKeymaps.insert(3*i, keymap);
-        
-        SynchronicPreparation::Ptr sPrep    = new SynchronicPreparation(i);
-        sPreparation.insert(i, sPrep);
-        
-        sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, keymap, tuner, sPrep, i));
-        
-        keymap                              = new Keymap(3*i+1);
-        bkKeymaps.insert(3*i+1, keymap);
-        
-        NostalgicPreparation::Ptr nPrep     = new NostalgicPreparation(i);
-        nPreparation.insert(i, nPrep);
-        
-        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, keymap, tuner, nPrep, sProcessor, i));
-        
-        keymap                              = new Keymap(3*i+2);
-        bkKeymaps.insert(3*i+2, keymap);
-        
-        DirectPreparation::Ptr dPrep     = new DirectPreparation(i);
-        dPreparation.insert(i, dPrep);
-        
-        dProcessor.insert(i, new DirectProcessor(&mainPianoSynth, keymap, dPrep, i));
+        sPreparation.add(new SynchronicPreparation(i));
+        nPreparation.add(new NostalgicPreparation(i));
+        dPreparation.add(new DirectPreparation(i));
+    }
+    
+    for (int i = 0; i < aMaxNumLayers; i++)
+    {
+        sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, bkKeymaps[3*i], sPreparation[i], tuner, i));
+        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, bkKeymaps[3*i+1], tuner, nPreparation[i], sProcessor, i));
+        dProcessor.insert(i, new DirectProcessor(&mainPianoSynth, bkKeymaps[3*i+2], dPreparation[i], i));
     }
     
     // For testing and developing, let's keep directory of samples in home folder on disk.

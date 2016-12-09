@@ -11,7 +11,7 @@
 #ifndef SYNCHRONICVIEWCONTROLLER_H_INCLUDED
 #define SYNCHRONICVIEWCONTROLLER_H_INCLUDED
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "BKUtilities.h"
 
 #include "PluginProcessor.h"
 
@@ -24,7 +24,7 @@
 //==============================================================================
 /*
 */
-class SynchronicViewController    : public BKViewController
+class SynchronicViewController    : public BKViewController, public ActionListener
 {
 public:
     SynchronicViewController(BKAudioProcessor&);
@@ -37,14 +37,16 @@ public:
     
 private:
     BKAudioProcessor& processor;
-    int currentSynchronicLayer;
+    int currentSynchronicId;
     
     OwnedArray<BKLabel> synchronicL;
     OwnedArray<BKTextField> synchronicTF;
     
     void textFieldDidChange(TextEditor&) override;
     
-    void updateFieldsToLayer(int numLayer);
+    void updateFields(int synchronicId);
+    
+    void actionListenerCallback (const String& message) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicViewController)
 };

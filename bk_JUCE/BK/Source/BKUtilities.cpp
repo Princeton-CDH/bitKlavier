@@ -11,6 +11,25 @@
 #include "BKUtilities.h"
 
 
+String boolArrayToString(Array<bool> arr)
+{
+    String s = "";
+    for (auto key : arr)
+    {
+        if (key)
+        {
+            s.append(String(1), 1);
+            s.append(" ", 1);
+        }
+        else
+        {
+            s.append(String(0), 1);
+            s.append(" ", 1);
+        }
+    }
+    return s;
+}
+
 String intArrayToString(Array<int> arr)
 {
     String s = "";
@@ -33,6 +52,74 @@ String floatArrayToString(Array<float> arr)
     return s;
 }
 
+Array<int> keymapStringToIntArray(String s)
+{
+    Array<int> arr = Array<int>();
+    
+    String temp = "";
+    
+    bool inNumber = false;
+    bool inVector = false;
+    
+    String::CharPointerType c = s.getCharPointer();
+    
+    juce_wchar dash = '-';
+    juce_wchar arrow = '>';
+    
+    int last;
+    
+    for (int i = 0; i < (s.length()+1); i++)
+    {
+        juce_wchar c1 = c.getAndAdvance();
+        
+        bool isArrow = !CharacterFunctions::compare(c1, arrow);
+        bool isDash = !CharacterFunctions::compare(c1, dash);
+        
+        bool isNumChar = CharacterFunctions::isDigit(c1) || isDash;
+        
+        if (!isNumChar)
+        {
+            if (inNumber)
+            {
+                if (isArrow)
+                {
+                    inVector = true;
+                    last  = temp.getIntValue();
+                }
+                else if (inVector)
+                {
+                    inVector = false;
+                    int curr = temp.getIntValue();
+                    if ((last <= curr) && (curr < 128))
+                    {
+                        for (int n = last; n <= temp.getIntValue(); n++) arr.add(n);
+                    }
+                }
+                else
+                {
+                    inVector = false;
+                    arr.add(temp.getIntValue());
+                    
+                }
+
+                temp = "";
+            }
+            
+            inNumber = false;
+            continue;
+        }
+        else
+        {
+            inNumber = true;
+            
+            temp += c1;
+        }
+        
+    }
+    
+    return arr;
+}
+
 Array<int> stringToIntArray(String s)
 {
     Array<int> arr = Array<int>();
@@ -50,6 +137,7 @@ Array<int> stringToIntArray(String s)
         juce_wchar c1 = c.getAndAdvance();
         
         bool isDash = !CharacterFunctions::compare(c1, dash);
+        
         bool isNumChar = CharacterFunctions::isDigit(c1) || isDash;
         
         if (!isNumChar)

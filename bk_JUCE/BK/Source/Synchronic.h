@@ -169,7 +169,7 @@ private:
     JUCE_LEAK_DETECTOR(SynchronicPreparation);
 };
 
-class SynchronicProcessor : public ReferenceCountedObject
+class SynchronicProcessor  : public ReferenceCountedObject
 {
     
 public:
@@ -177,11 +177,7 @@ public:
     typedef Array<SynchronicProcessor::Ptr>                  Arr;
     typedef Array<SynchronicProcessor::Ptr, CriticalSection> CSArr;
     
-    SynchronicProcessor(BKSynthesiser *s,
-                        Keymap::Ptr km,
-                        TuningProcessor::Ptr t,
-                        SynchronicPreparation::Ptr prep,
-                        int layer);
+    SynchronicProcessor(BKSynthesiser *synth, Keymap::Ptr km, SynchronicPreparation::Ptr prep, TuningProcessor::Ptr tuning, int Id);
     
     ~SynchronicProcessor();
     
@@ -195,13 +191,22 @@ public:
     
     void keyReleased(int noteNumber, int channel);
     
+    inline void setKeymap(Keymap::Ptr km)
+    {
+        keymap = km;
+    }
     
+    inline void setPreparation(SynchronicPreparation::Ptr prep)
+    {
+        preparation = prep;
+    }
     
+    inline void setTuning(TuningProcessor::Ptr t)
+    {
+        tuner = t;
+    }
     
-    
-    int layer;
-    
-    Keymap::Ptr getKeymap(void)
+    inline Keymap::Ptr getKeymap(void)
     {
         return keymap;
     }
@@ -214,7 +219,7 @@ public:
     float getTimeToBeatMS(float beatsToSkip);
     
 private:
-    
+    int Id;
     BKSynthesiser*              synth;
     Keymap::Ptr                 keymap;
     SynchronicPreparation::Ptr  preparation;
@@ -259,5 +264,8 @@ private:
     
     JUCE_LEAK_DETECTOR(SynchronicProcessor);
 };
+
+
+
 
 #endif  // SYNCHRONIC_H_INCLUDED

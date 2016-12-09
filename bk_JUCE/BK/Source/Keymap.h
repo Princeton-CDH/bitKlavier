@@ -57,6 +57,17 @@ public:
         return ret;
     }
     
+    void setKeymap(Array<int> km)
+    {
+        clear();
+        
+        for (auto note : km)
+        {
+            keymap.set(note, true);
+        }
+        print();
+    }
+    
     // Returns true if added. Returns false if not added (because it's already there).
     bool addNote(int noteNumber)
     {
@@ -110,6 +121,12 @@ public:
     void setAllWhiteKeys(void);
     void setAllBlackKeys(void);
     void setAllOctatonicKeys(OctatonicType type);
+    
+    void print(void)
+    {
+        DBG("Id: " + String(Id));
+        DBG("Keymap: "+ intArrayToString(keys()));
+    }
     
     
 private:
