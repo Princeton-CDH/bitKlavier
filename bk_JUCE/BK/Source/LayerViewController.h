@@ -44,7 +44,7 @@ private:
     
     Layer::Ptr current;
     
-    BKComboBox typeComboBox;
+    OwnedArray<BKComboBox> layerCB;
     
     // BKLabels
     OwnedArray<BKLabel> layerL;

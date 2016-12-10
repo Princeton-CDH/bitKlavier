@@ -79,6 +79,33 @@ static const std::vector<std::string> cPreparationTypes = {
     "Tuning"
 };
 
+typedef enum BKLayerCBType {
+    LayerCBType,
+    LayerCBNumber,
+    BKLayerCBTypeNil,
+} BKLayerCBType;
+
+static const std::vector<std::string> cLayerCBType = {
+    "LayerType",
+    "LayerNumber"
+};
+
+static const std::vector<std::string> cLayerNumberName= {
+    "One",
+    "Two",
+    "Three",
+    "Four",
+    "Five",
+    "Six",
+    "Seven",
+    "Eigth",
+    "Nine",
+    "Ten",
+    "Eleven",
+    "Twelve"
+};
+
+
 
 
 
@@ -210,15 +237,14 @@ static const std::vector<std::string> cDirectParameterTypes = {
 };
 
 #pragma mark - Layer
-typedef enum LayerParameterType
+typedef enum LayerTFIndex
 {
-    LayerNumber = 0,
-    LayerKeymapId,
+    LayerKeymapId = 0,
     LayerPreparationId,
     LayerTuningId,
     LayerParameterTypeNil
     
-} LayerParameterType;
+} LayerTFIndex;
 
 static const std::vector<std::string> cLayerParameterTypes = {
     "LayerType",

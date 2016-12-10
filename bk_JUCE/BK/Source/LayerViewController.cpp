@@ -34,25 +34,36 @@ layerTF(OwnedArray<BKTextField>())
     layerTF = OwnedArray<BKTextField>();
     layerTF.ensureStorageAllocated(cLayerParameterTypes.size());
     
-    for (int i = 0; i < cLayerParameterTypes.size(); i++)
+    for (int i = 0; i < cLayerParameterTypes.size()-2; i++)
     {
         layerTF.set(i, new BKTextField());
         addAndMakeVisible(layerTF[i]);
         layerTF[i]->addListener(this);
-        layerTF[i]->setName(cLayerParameterTypes[i]);
+        layerTF[i]->setName(cLayerParameterTypes[i+2]);
     }
     
     
-    typeComboBox.setName("CBType");
+    for (int i = 0; i < cLayerCBType.size(); i++)
+    {
+        layerCB.set(i, new BKComboBox());
+        layerCB[i]->setName(cLayerCBType[i]);
+        layerCB[i]->addSeparator();
+        layerCB[i]->addListener(this);
+        addAndMakeVisible(layerCB[i]);
+    }
+    
     for (int i = 0; i < cPreparationTypes.size(); i++)
     {
-        typeComboBox.addItem(cPreparationTypes[i], i+1);
+        layerCB[LayerCBType]->addItem(cPreparationTypes[i], i+1);
     }
-    typeComboBox.addSeparator();
-    typeComboBox.addListener(this);
-    addAndMakeVisible(typeComboBox);
-    typeComboBox.setSelectedItemIndex(0);
     
+    for (int i = 0; i < aMaxNumLayers; i++)
+    {
+        layerCB[LayerCBNumber]->addItem(cLayerNumberName[i], i+1);
+    }
+    
+    layerCB[LayerCBType]->setSelectedItemIndex(0);
+    layerCB[LayerCBNumber]->setSelectedItemIndex(0);
     
     updateFields();
 }
@@ -86,11 +97,14 @@ void LayerViewController::resized()
     int tfX = gComponentLabelWidth + gXSpacing;
     int tfY = gComponentTextFieldHeight + gYSpacing;
     
-    typeComboBox.setTopLeftPosition(tfX, gYSpacing);
-    
-    for (int n = 0; n < cLayerParameterTypes.size(); n++)
+    for (int n = 0; n < cLayerCBType.size(); n++)
     {
-        layerTF[n]->setTopLeftPosition(tfX, gYSpacing + tfY * (n+1));
+        layerCB[n]->setTopLeftPosition(tfX, gYSpacing + tfY * n);
+    }
+    
+    for (int n = 0; n < cLayerParameterTypes.size()-2; n++)
+    {
+        layerTF[n]->setTopLeftPosition(tfX, gYSpacing + tfY * (n+2));
     }
     
 }
@@ -105,44 +119,7 @@ void LayerViewController::textFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
 
-    if (name == cLayerParameterTypes[LayerNumber])
-    {
-        current->setLayerNumber(i);
-    
-        BKPreparationType type = current->getType();
-        
-        String s = "";
-        
-        if (type == PreparationTypeSynchronic)
-        {
-            SynchronicProcessor::Ptr proc = processor.sProcessor[i];
-            current->setPreparation(proc->getPreparationId());
-            current->setKeymap(proc->getKeymapId());
-            sendActionMessage("synchronic/update");
-        }
-        else if (type == PreparationTypeNostalgic)
-        {
-            NostalgicProcessor::Ptr proc = processor.nProcessor[i];
-            current->setPreparation(proc->getPreparationId());
-            current->setKeymap(proc->getKeymapId());
-            sendActionMessage("nostalgic/update");
-        }
-        else if (type == PreparationTypeDirect)
-        {
-            DirectProcessor::Ptr proc = processor.dProcessor[i];
-            current->setPreparation(proc->getPreparationId());
-            current->setKeymap(proc->getKeymapId());
-            sendActionMessage("direct/update");
-        }
-        else if (type == PreparationTypeTuning)
-        {
-            sendActionMessage("tuning/update");
-        }
-        
-        sendActionMessage("keymap/update");
-        updateFields();
-    }
-    else if (name == cLayerParameterTypes[LayerKeymapId])
+    if (name == cLayerParameterTypes[LayerKeymapId+2])
     {
         current->setKeymap(i);
         
@@ -171,7 +148,7 @@ void LayerViewController::textFieldDidChange(TextEditor& tf)
         sendActionMessage("keymap/update");
         
     }
-    else if (name == cLayerParameterTypes[LayerPreparationId])
+    else if (name == cLayerParameterTypes[LayerPreparationId+2])
     {
         current->setPreparation(i);
         
@@ -201,7 +178,7 @@ void LayerViewController::textFieldDidChange(TextEditor& tf)
             
         }
     }
-    else if (name == cLayerParameterTypes[LayerTuningId])
+    else if (name == cLayerParameterTypes[LayerTuningId+2])
     {
         current->setTuning(i);
         
@@ -267,8 +244,6 @@ void LayerViewController::updateFields(void)
 {
     
     // Set text.
-    //layerTF[LayerType]          ->setText( String(current->getType()));
-    layerTF[LayerNumber]        ->setText( String(current->getLayerNumber()));
     layerTF[LayerKeymapId]        ->setText( String(current->getKeymap()));
     layerTF[LayerPreparationId]   ->setText( String(current->getPreparation()));
     layerTF[LayerTuningId]        ->setText( String(current->getTuning()));
@@ -277,7 +252,7 @@ void LayerViewController::updateFields(void)
 
 void LayerViewController::comboBoxChanged (ComboBox* box)
 {
-    if (box->getName() == "CBType")
+    if (box->getName() == "LayerType")
     {
         int which = box->getSelectedId() - 1;
         
@@ -312,6 +287,47 @@ void LayerViewController::comboBoxChanged (ComboBox* box)
             
         }
 
+        updateFields();
+    }
+    else if (box->getName() == "LayerNumber")
+    {
+        int whichLayer = box->getSelectedId();
+        
+        DBG("which: "+String(whichLayer));
+        
+        current->setLayerNumber(whichLayer);
+        
+        BKPreparationType type = current->getType();
+        
+        String s = "";
+        
+        if (type == PreparationTypeSynchronic)
+        {
+            SynchronicProcessor::Ptr proc = processor.sProcessor[whichLayer];
+            current->setPreparation(proc->getPreparationId());
+            current->setKeymap(proc->getKeymapId());
+            sendActionMessage("synchronic/update");
+        }
+        else if (type == PreparationTypeNostalgic)
+        {
+            NostalgicProcessor::Ptr proc = processor.nProcessor[whichLayer];
+            current->setPreparation(proc->getPreparationId());
+            current->setKeymap(proc->getKeymapId());
+            sendActionMessage("nostalgic/update");
+        }
+        else if (type == PreparationTypeDirect)
+        {
+            DirectProcessor::Ptr proc = processor.dProcessor[whichLayer];
+            current->setPreparation(proc->getPreparationId());
+            current->setKeymap(proc->getKeymapId());
+            sendActionMessage("direct/update");
+        }
+        else if (type == PreparationTypeTuning)
+        {
+            sendActionMessage("tuning/update");
+        }
+        
+        sendActionMessage("keymap/update");
         updateFields();
     }
 }
