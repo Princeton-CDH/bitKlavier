@@ -22,7 +22,8 @@ public:
     typedef Array<TuningPreparation::Ptr>                  Arr;
     typedef Array<TuningPreparation::Ptr, CriticalSection> CSArr;
     
-    TuningPreparation(TuningSystem whichTuning,
+    TuningPreparation(int Id,
+                      TuningSystem whichTuning,
                       PitchClass fundamental,
                       TuningSystem adaptiveIntervalScale,
                       bool adaptiveInversional,
@@ -31,6 +32,7 @@ public:
                       uint64 adaptiveClusterThresh,
                       int adaptiveHistory,
                       Array<float> customScale):
+    Id(Id),
     tWhichTuning(whichTuning),
     tFundamental(fundamental),
     tAdaptiveIntervalScale(adaptiveIntervalScale),
@@ -44,7 +46,8 @@ public:
         
     }
     
-    TuningPreparation():
+    TuningPreparation(int Id):
+    Id(Id),
     tWhichTuning(EqualTemperament),
     tFundamental(C),
     tAdaptiveIntervalScale(JustTuning),
@@ -63,7 +66,7 @@ public:
         
     }
     
-    
+    inline const int getID() const noexcept                                 {return Id;                         }
     inline const TuningSystem getTuning() const noexcept                    {return tWhichTuning;               }
     inline const PitchClass getFundamental() const noexcept                 {return tFundamental;               }
     inline const TuningSystem getAdaptiveIntervalScale() const noexcept     {return tAdaptiveIntervalScale;     }
@@ -100,6 +103,8 @@ public:
     }
 private:
     
+    int Id;
+    
     // basic tuning settings, for static tuning
     TuningSystem    tWhichTuning;               //which tuning system to use
     PitchClass      tFundamental;               //fundamental for tuning system
@@ -131,8 +136,10 @@ public:
     TuningProcessor(TuningPreparation::Ptr prep, int layer);;
     ~TuningProcessor();
     
+    void setPreparation(TuningPreparation::Ptr prep) {preparation = prep;}
+    
     //returns tuning offsets; add to integer PitchClass
-    float getOffset(int midiNoteNumber, TuningSystem tuning, PitchClass basepitch) const;
+    float getOffset(int midiNoteNumber) const;
     
     //for calculating adaptive tuning
     void keyOn(int midiNoteNumber);

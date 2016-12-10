@@ -177,66 +177,40 @@ public:
     typedef Array<SynchronicProcessor::Ptr>                  Arr;
     typedef Array<SynchronicProcessor::Ptr, CriticalSection> CSArr;
     
-    SynchronicProcessor(BKSynthesiser *synth, Keymap::Ptr km, SynchronicPreparation::Ptr prep, TuningProcessor::Ptr tuning, int Id);
+    SynchronicProcessor(
+                        BKSynthesiser *synth,
+                        Keymap::Ptr km,
+                        SynchronicPreparation::Ptr prep,
+                        TuningPreparation::Ptr tPrep,
+                        int Id);
     
     ~SynchronicProcessor();
     
-    inline void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr;}
-    inline const uint64 getCurrentNumSamplesBeat(void)     const noexcept { return numSamplesBeat;  }
-    inline const uint64 getCurrentPhasor(void)             const noexcept { return phasor;          }
+    inline void         setCurrentPlaybackSampleRate(double sr)         { sampleRate = sr;          }
+    inline const uint64 getCurrentNumSamplesBeat(void) const noexcept   { return numSamplesBeat;    }
+    inline const uint64 getCurrentPhasor(void) const noexcept           { return phasor;            }
     
     void processBlock(int numSamples, int channel);
-    
     void keyPressed(int noteNumber, float velocity);
-    
     void keyReleased(int noteNumber, int channel);
-    
-    inline void setKeymap(Keymap::Ptr km)
-    {
-        keymap = km;
-    }
-    
-    inline void setPreparation(SynchronicPreparation::Ptr prep)
-    {
-        preparation = prep;
-    }
-    
-    inline void setTuning(TuningProcessor::Ptr t)
-    {
-        tuner = t;
-    }
-    
-    inline Keymap::Ptr getKeymap(void)
-    {
-        return keymap;
-    }
-    
-    inline int getKeymapId(void)
-    {
-        return keymap->getId();
-    }
-    
-    SynchronicPreparation::Ptr getPreparation(void)
-    {
-        return preparation;
-    }
-    
-    int getPreparationId(void)
-    {
-        return preparation->getId();
-    }
-    
     float getTimeToBeatMS(float beatsToSkip);
+    
+    inline void                     setKeymap(Keymap::Ptr km)                               { keymap = km;                  }
+    inline void                     setPreparation(SynchronicPreparation::Ptr prep)         { preparation = prep;           }
+    inline Keymap::Ptr              getKeymap(void)                                         { return keymap;                }
+    inline int                      getKeymapId(void)                                       { return keymap->getId();       }
+    SynchronicPreparation::Ptr      getPreparation(void)                                    { return preparation;           }
+    int                             getPreparationId(void)                                  { return preparation->getId();  }
     
 private:
     int Id;
     BKSynthesiser*              synth;
     Keymap::Ptr                 keymap;
     SynchronicPreparation::Ptr  preparation;
-    TuningProcessor::Ptr            tuner;
+    TuningPreparation::Ptr      tPreparation;
+    TuningProcessor             tuner;
     
     int pulse;
-    
     int beat;
     int accent;
     int length;

@@ -22,6 +22,7 @@
 class DirectPreparation : public ReferenceCountedObject
 {
 public:
+    
     typedef ReferenceCountedObjectPtr<DirectPreparation>   Ptr;
     typedef Array<DirectPreparation::Ptr>                  Arr;
     typedef Array<DirectPreparation::Ptr, CriticalSection> CSArr;
@@ -69,7 +70,9 @@ public:
         DBG("dGain: "           + String(dGain));
         DBG("dOverlay: "        + String((int)dOverlay));
     }
+
 private:
+    
     int Id;
     float   dTransposition;       //transposition, in half steps
     float   dGain;                //gain multiplier
@@ -88,62 +91,36 @@ public:
     typedef Array<DirectProcessor::Ptr, CriticalSection> CSArr;
     
     DirectProcessor(
-                        BKSynthesiser *s,
-                        Keymap::Ptr km,
-                        DirectPreparation::Ptr prep,
-                        int layer);
+                    BKSynthesiser *s,
+                    Keymap::Ptr km,
+                    DirectPreparation::Ptr prep,
+                    TuningPreparation::Ptr tPrep,
+                    int Id);
     
     ~DirectProcessor();
-
-    void keyPressed(int noteNumber, float velocity);
     
-    void keyReleased(int noteNumber, int channel);
+    inline void             setKeymap(Keymap::Ptr km)                   { keymap = km;                      }
+    inline void             setPreparation(DirectPreparation::Ptr prep) { preparation = prep;               }
     
-    int layer;
+    int                     getId(void)                                 { return Id;                        } 
+    Keymap::Ptr             getKeymap(void) const                       { return keymap;                    }
+    DirectPreparation::Ptr  getPreparation(void) const                  { return preparation;               }
+    TuningPreparation::Ptr  getTuningPreparation(void) const            { return tPreparation;              }
     
-    inline void setKeymap(Keymap::Ptr km)
-    {
-        keymap = km;
-    }
+    int                     getKeymapId(void) const                     { return keymap->getId();           }
+    int                     getPreparationId(void) const                { return preparation->getId();      }
+    int                     getTuningPreparationId(void) const          { return tPreparation->getID();     }
     
-    inline void setPreparation(DirectPreparation::Ptr prep)
-    {
-        preparation = prep;
-    }
-    
-    /*
-    inline void setTuning(TuningProcessor::Ptr t)
-    {
-        tuner = t;
-    }
-    */
-    Keymap::Ptr getKeymap(void)
-    {
-        return keymap;
-    }
-    
-    DirectPreparation::Ptr getPreparation(void)
-    {
-        return preparation;
-    }
-    
-    int getKeymapId(void)
-    {
-        return keymap->getId();
-    }
-    
-    int getPreparationId(void)
-    {
-        return preparation->getId();
-    }
-    
-    float getTimeToBeatMS(float beatsToSkip);
+    void    keyPressed(int noteNumber, float velocity, int channel);
+    void    keyReleased(int noteNumber, float velocity, int channel);
     
 private:
-    
+    int                         Id;
     BKSynthesiser*              synth;
     Keymap::Ptr                 keymap;
     DirectPreparation::Ptr      preparation;
+    TuningPreparation::Ptr      tPreparation;
+    TuningProcessor             tuner;
     
     double sampleRate;
     

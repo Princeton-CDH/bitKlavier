@@ -152,10 +152,10 @@ public:
     NostalgicProcessor(
                        BKSynthesiser *s,
                        Keymap::Ptr km,
-                       TuningProcessor::Ptr tuner,
                        NostalgicPreparation::Ptr prep,
+                       TuningPreparation::Ptr tPrep,
                        SynchronicProcessor::CSArr& proc,
-                       int layer);
+                       int Id);
     
     virtual ~NostalgicProcessor();
     
@@ -170,45 +170,44 @@ public:
     //begin playing reverse note, called with noteOff
     void keyReleased(int midiNoteNumber, int midiChannel);
     
-    int layer;
+    inline void setKeymap(Keymap::Ptr km)   { keymap = km;  }
+    inline void setPreparation(NostalgicPreparation::Ptr prep)  { preparation = prep;   }
+    //inline void setTuning(TuningProcessor::Ptr t)   { tuner = t;    }
     
-    inline void setKeymap(Keymap::Ptr km)
-    {
-        keymap = km;
-    }
+    int                         getId(void)             { return Id;            }    
+    Keymap::Ptr                 getKeymap(void)         { return keymap;        }
+    NostalgicPreparation::Ptr   getPreparation(void)    { return preparation;   }
     
-    inline void setPreparation(NostalgicPreparation::Ptr prep)
-    {
-        preparation = prep;
-    }
-    
-    inline void setTuning(TuningProcessor::Ptr t)
-    {
-        tuner = t;
-    }
-    
-    Keymap::Ptr getKeymap(void)
-    {
-        return keymap;
-    }
-    
-    NostalgicPreparation::Ptr getPreparation(void)
-    {
-        return preparation;
-    }
-    
-    int getKeymapId(void)
-    {
-        return keymap->getId();
-    }
-    
-    int getPreparationId(void)
-    {
-        return preparation->getId();
-    }
+    int getKeymapId(void)       { return keymap->getId();       }
+    int getPreparationId(void)  { return preparation->getId();  }
     
 private:
+    int Id;
+    BKSynthesiser*              synth;
+    Keymap::Ptr                 keymap;
+    NostalgicPreparation::Ptr   preparation;
+    TuningPreparation::Ptr      tPreparation;
+    TuningProcessor             tuner;
     
+    //target Synchronic layer
+    SynchronicProcessor::CSArr& syncProcessor;
+    
+    //store values so that undertow note retains preparation from reverse note
+    NostalgicPreparation::Arr preparationAtKeyOn;
+    Array<float> tuningsAtKeyOn;
+    Array<float> velocitiesAtKeyOn;
+    
+    Array<uint64> noteLengthTimers;     //store current length of played notes here
+    Array<int> activeNotes;             //table of notes currently being played by player
+    Array<float> velocities;            //table of velocities played
+    
+    Array<uint64> reverseLengthTimers;  //keep track of how long reverse notes have been playing
+    Array<int> activeReverseNotes;      //table of active reverse notes
+    Array<int> reverseTargetLength;     //target reverse length (in samples)
+    
+    double sampleRate;
+    
+    //functions
     void playNote(int channel, int note);
     
     //finish timing played note length, called with noteOff
@@ -219,31 +218,6 @@ private:
     
     //move timers forward by blocksize
     void incrementTimers(int numSamples);
-    
-    double sampleRate;
-    
-    //data and pointers
-    BKSynthesiser*              synth;
-    Keymap::Ptr                 keymap;
-    NostalgicPreparation::Ptr   preparation;
-    TuningProcessor::Ptr        tuner;
-    
-    SynchronicProcessor::CSArr& syncProcessor;
-    
-    //store values so that undertow note retains preparation from reverse note
-    NostalgicPreparation::Arr preparationAtKeyOn;
-    Array<float> tuningsAtKeyOn;
-    Array<float> velocitiesAtKeyOn;
-    
-
-    Array<uint64> noteLengthTimers;     //store current length of played notes here
-    Array<int> activeNotes;             //table of notes currently being played by player
-    Array<float> velocities;            //table of velocities played
-    
-    Array<uint64> reverseLengthTimers;  //keep track of how long reverse notes have been playing
-    Array<int> activeReverseNotes;      //table of active reverse notes
-    Array<int> reverseTargetLength;     //target reverse length (in samples)
-    
     
     JUCE_LEAK_DETECTOR (NostalgicProcessor) //is this the right one to use here?
 };
