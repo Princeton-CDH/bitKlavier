@@ -115,22 +115,32 @@ void LayerViewController::textFieldDidChange(TextEditor& tf)
         
         if (type == PreparationTypeSynchronic)
         {
-            s = "synchronic/update";
+            SynchronicProcessor::Ptr proc = processor.sProcessor[i];
+            current->setPreparation(proc->getPreparationId());
+            current->setKeymap(proc->getKeymapId());
+            sendActionMessage("synchronic/update");
         }
         else if (type == PreparationTypeNostalgic)
         {
-            s = "nostalgic/update";
+            NostalgicProcessor::Ptr proc = processor.nProcessor[i];
+            current->setPreparation(proc->getPreparationId());
+            current->setKeymap(proc->getKeymapId());
+            sendActionMessage("nostalgic/update");
         }
         else if (type == PreparationTypeDirect)
         {
-            s = "direct/update";
+            DirectProcessor::Ptr proc = processor.dProcessor[i];
+            current->setPreparation(proc->getPreparationId());
+            current->setKeymap(proc->getKeymapId());
+            sendActionMessage("direct/update");
         }
         else if (type == PreparationTypeTuning)
         {
-            s = "tuning/update";
+            sendActionMessage("tuning/update");
         }
         
-        sendActionMessage(s);
+        sendActionMessage("keymap/update");
+        updateFields();
     }
     else if (name == cLayerParameterTypes[LayerKeymapId])
     {
@@ -223,6 +233,35 @@ void LayerViewController::textFieldDidChange(TextEditor& tf)
     }
 }
 
+void LayerViewController::switchToLayer(BKPreparationType type, int layer)
+{
+    if (type == PreparationTypeDirect)
+    {
+        DirectProcessor::Ptr proc = processor.dProcessor[layer];
+        current->setPreparation(proc->getPreparationId());
+        current->setKeymap(proc->getKeymapId());
+        sendActionMessage("direct/update");
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        SynchronicProcessor::Ptr proc = processor.sProcessor[layer];
+        current->setPreparation(proc->getPreparationId());
+        current->setKeymap(proc->getKeymapId());
+        sendActionMessage("synchronic/update");
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        NostalgicProcessor::Ptr proc = processor.nProcessor[layer];
+        current->setPreparation(proc->getPreparationId());
+        current->setKeymap(proc->getKeymapId());
+        sendActionMessage("nostalgic/update");
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        
+    }
+}
+
 
 void LayerViewController::updateFields(void)
 {
@@ -244,24 +283,36 @@ void LayerViewController::comboBoxChanged (ComboBox* box)
         
         DBG(cPreparationTypes[which]);
         
+        current->setType((BKPreparationType) which);
+        current->setLayerNumber(0);
+        
         if (which == PreparationTypeDirect)
         {
-            
+            DirectProcessor::Ptr proc = processor.dProcessor[0];
+            current->setPreparation(proc->getPreparationId());
+            current->setKeymap(proc->getKeymapId());
+            sendActionMessage("direct/update");
         }
         else if (which == PreparationTypeSynchronic)
         {
-            
+            SynchronicProcessor::Ptr proc = processor.sProcessor[0];
+            current->setPreparation(proc->getPreparationId());
+            current->setKeymap(proc->getKeymapId());
+            sendActionMessage("synchronic/update");
         }
         else if (which == PreparationTypeNostalgic)
         {
-            
+            NostalgicProcessor::Ptr proc = processor.nProcessor[0];
+            current->setPreparation(proc->getPreparationId());
+            current->setKeymap(proc->getKeymapId());
+            sendActionMessage("nostalgic/update");
         }
         else if (which == PreparationTypeTuning)
         {
             
         }
-        
-        current->setType((BKPreparationType) which);
+
+        updateFields();
     }
 }
 

@@ -197,6 +197,16 @@ public:
         return preparation;
     }
     
+    int getKeymapId(void)
+    {
+        return keymap->getId();
+    }
+    
+    int getPreparationId(void)
+    {
+        return preparation->getId();
+    }
+    
 private:
     
     void playNote(int channel, int note);

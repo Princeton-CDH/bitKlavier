@@ -195,9 +195,9 @@ void SynchronicViewController::actionListenerCallback (const String& message)
 {
     if (message == "synchronic/update")
     {
-        int synchronicId = processor.currentLayer->getPreparation();
+        currentSynchronicId = processor.currentLayer->getPreparation();
         
-        updateFields(synchronicId);
+        updateFields(currentSynchronicId);
     }
 }
 

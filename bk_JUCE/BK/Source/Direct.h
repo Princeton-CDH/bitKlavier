@@ -127,6 +127,16 @@ public:
         return preparation;
     }
     
+    int getKeymapId(void)
+    {
+        return keymap->getId();
+    }
+    
+    int getPreparationId(void)
+    {
+        return preparation->getId();
+    }
+    
     float getTimeToBeatMS(float beatsToSkip);
     
 private:

@@ -55,6 +55,8 @@ private:
     
     void textFieldDidChange(TextEditor&) override;
     
+    void switchToLayer(BKPreparationType type, int layer);
+    
     void updateFields(void);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LayerViewController)

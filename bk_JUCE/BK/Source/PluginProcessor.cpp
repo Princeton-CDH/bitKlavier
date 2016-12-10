@@ -31,7 +31,7 @@ numDirectLayers(12)
     
     bkKeymaps.ensureStorageAllocated(aMaxNumLayers * 3);
     
-    for (int i = 0; i < 3 * aMaxNumLayers; i++)
+    for (int i = 0; i < (3 * aMaxNumLayers); i++)
     {
         bkKeymaps.add(new Keymap(i));
     }
@@ -45,9 +45,9 @@ numDirectLayers(12)
     
     for (int i = 0; i < aMaxNumLayers; i++)
     {
-        sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, bkKeymaps[3*i], sPreparation[i], tuner, i));
-        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, bkKeymaps[3*i+1], tuner, nPreparation[i], sProcessor, i));
-        dProcessor.insert(i, new DirectProcessor(&mainPianoSynth, bkKeymaps[3*i+2], dPreparation[i], i));
+        sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, bkKeymaps[0], sPreparation[0], tuner, i));
+        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, bkKeymaps[0], tuner, nPreparation[0], sProcessor, i));
+        dProcessor.insert(i, new DirectProcessor(&mainPianoSynth, bkKeymaps[0], dPreparation[0], i));
     }
     
     // For testing and developing, let's keep directory of samples in home folder on disk.

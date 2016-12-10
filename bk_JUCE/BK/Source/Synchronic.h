@@ -211,9 +211,19 @@ public:
         return keymap;
     }
     
+    inline int getKeymapId(void)
+    {
+        return keymap->getId();
+    }
+    
     SynchronicPreparation::Ptr getPreparation(void)
     {
         return preparation;
+    }
+    
+    int getPreparationId(void)
+    {
+        return preparation->getId();
     }
     
     float getTimeToBeatMS(float beatsToSkip);
