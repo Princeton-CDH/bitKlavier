@@ -38,15 +38,15 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
         synth->keyOn(
                      channel,
                      noteNumber,
-                     tuner.getOffset(noteNumber), //will need to add Direct Transp here
-                     velocity * aGlobalGain,
+                     tuner.getOffset(noteNumber) + preparation->getTransposition(),
+                     velocity * preparation->getGain() * aGlobalGain,
                      Forward,
                      Normal,
                      BKNoteTypeNil,
                      1000, // start
                      1000, // length
                      3,
-                     3 );
+                     3);
         
     }
 }
@@ -59,8 +59,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
                       channel,
                       noteNumber,
                       velocity,
-                      true
-                      );
+                      true);
     }
 }
 
