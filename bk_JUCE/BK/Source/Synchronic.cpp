@@ -143,6 +143,8 @@ void SynchronicProcessor::keyReleased(int noteNumber, int channel)
 void SynchronicProcessor::processBlock(int numSamples, int channel)
 {
     
+    tuner.incrementAdaptiveClusterTime(numSamples);
+    
     int clusterSize = cluster.size();
     
     clusterThresholdSamples = (preparation->getClusterThresh() * sampleRate);

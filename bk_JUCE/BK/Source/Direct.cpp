@@ -63,3 +63,8 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
     }
 }
 
+void DirectProcessor::processBlock(int numSamples, int midiChannel)
+{
+    tuner.incrementAdaptiveClusterTime(numSamples);
+}
+

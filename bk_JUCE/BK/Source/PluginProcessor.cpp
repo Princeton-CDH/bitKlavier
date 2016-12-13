@@ -105,7 +105,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     int numSamples = buffer.getNumSamples();
     
     // Process each layer.
-    // Could but nostalgic->keyOff/playNote here: (1) have synchronic->processBlock return 1 if pulse happened, otherwise 0. if nostalgic->mode == SynchronicSync and make sure layer corresponds
+    // Could put nostalgic->keyOff/playNote here: (1) have synchronic->processBlock return 1 if pulse happened, otherwise 0. if nostalgic->mode == SynchronicSync and make sure layer corresponds
     for (int layer = 0; layer < numSynchronicLayers; layer++)
     {
         sProcessor[layer]->processBlock(numSamples, m.getChannel());
@@ -115,6 +115,12 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     {
         nProcessor[layer]->processBlock(numSamples, m.getChannel());
     }
+    
+    for (int layer = 0; layer < numDirectLayers; layer++)
+    {
+        dProcessor[layer]->processBlock(numSamples, m.getChannel());
+    }
+    
     
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
@@ -190,6 +196,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
                                   );
              */
             
+            //embed these in Direct, have toggle in DirectPreparation to turn these on, have on by default in layer 1 only
             if (general->getResonanceAndHammer())
             {
                 hammerReleaseSynth.keyOn(

@@ -13,8 +13,8 @@
 
 TuningProcessor::TuningProcessor(TuningPreparation::Ptr prep, int Id)
 :
-preparation(prep),
-Id(Id)
+Id(Id),
+preparation(prep)
 {
     
     tuningLibrary.ensureStorageAllocated(6);
@@ -34,7 +34,11 @@ TuningProcessor::~TuningProcessor()
 
 void TuningProcessor::incrementAdaptiveClusterTime(int numSamples)
 {
-    if(clusterTime <= preparation->getAdaptiveClusterThresh()) clusterTime += numSamples;
+    if(preparation->getTuning() == AdaptiveTuning || preparation->getTuning() == AdaptiveAnchoredTuning) {
+        
+        if(clusterTime <= preparation->getAdaptiveClusterThresh()) clusterTime += numSamples;
+        
+    }
 }
 
 //returns offsets
