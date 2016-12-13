@@ -48,7 +48,7 @@ float TuningProcessor::getOffset(int midiNoteNumber) const
     if(preparation->getTuning() == AdaptiveTuning) return 0.; //need to implement
     if(preparation->getTuning() == AdaptiveAnchoredTuning) return 0.;
     
-    Array<float> currentTuning = tuningLibrary.getUnchecked(preparation->getTuning());
+    const Array<float> currentTuning = tuningLibrary.getUnchecked(preparation->getTuning());
     return (currentTuning[(midiNoteNumber - preparation->getFundamental()) % 12] + preparation->getFundamentalOffset());
     
 }
@@ -57,4 +57,13 @@ float TuningProcessor::getOffset(int midiNoteNumber) const
 void TuningProcessor::keyOn(int midiNoteNumber)
 {
     mtof(60.);
+    
+    if(preparation->getTuning() == AdaptiveTuning)
+    {
+        //
+    }
+    else if(preparation->getTuning() == AdaptiveAnchoredTuning)
+    {
+        //
+    }
 }
