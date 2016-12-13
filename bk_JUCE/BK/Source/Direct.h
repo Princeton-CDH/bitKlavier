@@ -74,6 +74,7 @@ public:
 private:
     
     int Id;
+    
     float   dTransposition;       //transposition, in half steps
     float   dGain;                //gain multiplier
     bool    dOverlay;
@@ -115,7 +116,9 @@ public:
     void    keyReleased(int noteNumber, float velocity, int channel);
     
 private:
+    
     int                         Id;
+    
     BKSynthesiser*              synth;
     Keymap::Ptr                 keymap;
     DirectPreparation::Ptr      preparation;

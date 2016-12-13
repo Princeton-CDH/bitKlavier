@@ -11,10 +11,10 @@
 #include "Tuning.h"
 
 
-TuningProcessor::TuningProcessor(TuningPreparation::Ptr prep, int layer)
+TuningProcessor::TuningProcessor(TuningPreparation::Ptr prep, int Id)
 :
 preparation(prep),
-layer(layer)
+Id(Id)
 {
     
     tuningLibrary.ensureStorageAllocated(6);
@@ -45,7 +45,7 @@ float TuningProcessor::getOffset(int midiNoteNumber) const
     if(preparation->getTuning() == AdaptiveAnchoredTuning) return 0.;
     
     Array<float> currentTuning = tuningLibrary.getUnchecked(preparation->getTuning());
-    return (currentTuning[(midiNoteNumber - preparation->getFundamental()) % 12]);
+    return (currentTuning[(midiNoteNumber - preparation->getFundamental()) % 12] + preparation->getFundamentalOffset());
     
 }
 

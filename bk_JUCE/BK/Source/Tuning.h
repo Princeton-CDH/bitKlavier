@@ -25,6 +25,7 @@ public:
     TuningPreparation(int Id,
                       TuningSystem whichTuning,
                       PitchClass fundamental,
+                      float fundamentalOffset,
                       TuningSystem adaptiveIntervalScale,
                       bool adaptiveInversional,
                       TuningSystem adaptiveAnchorScale,
@@ -35,6 +36,7 @@ public:
     Id(Id),
     tWhichTuning(whichTuning),
     tFundamental(fundamental),
+    tFundamentalOffset(fundamentalOffset),
     tAdaptiveIntervalScale(adaptiveIntervalScale),
     tAdaptiveInversional(adaptiveInversional),
     tAdaptiveAnchorScale(adaptiveAnchorScale),
@@ -50,6 +52,7 @@ public:
     Id(Id),
     tWhichTuning(EqualTemperament),
     tFundamental(C),
+    tFundamentalOffset(0.),
     tAdaptiveIntervalScale(JustTuning),
     tAdaptiveInversional(true),
     tAdaptiveAnchorScale(EqualTemperament),
@@ -69,6 +72,7 @@ public:
     inline const int getID() const noexcept                                 {return Id;                         }
     inline const TuningSystem getTuning() const noexcept                    {return tWhichTuning;               }
     inline const PitchClass getFundamental() const noexcept                 {return tFundamental;               }
+    inline const float getFundamentalOffset() const noexcept                {return tFundamentalOffset;         }
     inline const TuningSystem getAdaptiveIntervalScale() const noexcept     {return tAdaptiveIntervalScale;     }
     inline const bool getAdaptiveInversional() const noexcept               {return tAdaptiveInversional;       }
     inline const TuningSystem getAdaptiveAnchorScale() const noexcept       {return tAdaptiveAnchorScale;       }
@@ -80,6 +84,7 @@ public:
     
     inline void setTuning(TuningSystem tuning)                                      {tWhichTuning = tuning;                                 }
     inline void setFundamental(PitchClass fundamental)                              {tFundamental = fundamental;                            }
+    inline void setFundamentalOffset(float offset)                                  {tFundamentalOffset = offset;                            }
     inline void setAdaptiveIntervalScale(TuningSystem adaptiveIntervalScale)        {tAdaptiveIntervalScale = adaptiveIntervalScale;        }
     inline void setAdaptiveInversional(bool adaptiveInversional)                    {tAdaptiveInversional = adaptiveInversional;            }
     inline void setAdaptiveAnchorScale(TuningSystem adaptiveAnchorScale)            {tAdaptiveAnchorScale = adaptiveAnchorScale;            }
@@ -93,6 +98,7 @@ public:
     {
         DBG("tWhichTuning: " +                  String(tWhichTuning));
         DBG("tFundamental: " +                  String(tFundamental));
+        DBG("tFundamentalOffset: " +            String(tFundamentalOffset));
         DBG("tAdaptiveIntervalScale: " +        String(tAdaptiveIntervalScale));
         DBG("tAdaptiveInversional: " +          String(tAdaptiveInversional));
         DBG("tAdaptiveAnchorScale: " +          String(tAdaptiveAnchorScale));
@@ -108,6 +114,7 @@ private:
     // basic tuning settings, for static tuning
     TuningSystem    tWhichTuning;               //which tuning system to use
     PitchClass      tFundamental;               //fundamental for tuning system
+    float           tFundamentalOffset;         //offset
     
     // adaptive tuning params
     TuningSystem    tAdaptiveIntervalScale;     //scale to use to determine successive interval tuning
@@ -133,7 +140,7 @@ public:
     typedef Array<TuningProcessor::Ptr>                  Arr;
     typedef Array<TuningProcessor::Ptr, CriticalSection> CSArr;
     
-    TuningProcessor(TuningPreparation::Ptr prep, int layer);;
+    TuningProcessor(TuningPreparation::Ptr prep, int Id);;
     ~TuningProcessor();
     
     void setPreparation(TuningPreparation::Ptr prep) {preparation = prep;}
@@ -153,10 +160,10 @@ public:
     
 private:
     
-    Array<Array<float>> tuningLibrary;
+    int Id;
     
+    Array<Array<float>> tuningLibrary;
     TuningPreparation::Ptr preparation;
-    int layer;
     
     float   intervalToRatio(float interval) const noexcept { return mtof(interval + 60.) / mtof(60.); }
     
@@ -182,12 +189,12 @@ private:
      Otonal:     1/1,    17/16,  9/8,    19/16, 5/4,    21/16,  11/8,   3/2,    13/8,   27/16,  7/4,    15/8
      Utonal:     1/1,    16/15,  8/7,    32/27, 16/13,  4/3,    16/11,  32/21,  8/5,    32/19,  16/9,   32/17
      */
-    Array<float> tEqualTuning       = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};
-    Array<float> tJustTuning        = {0., .117313, .039101,  .156414, -.13686, -.019547, -.174873, .019547, .136864, -.15641, -.311745, -.11731};
-    Array<float> tPartialTuning     = {0., .117313, .039101, -.331291, -.13686, -.019547, -.486824, .019547, .405273, -.15641, -.311745, -.506371};
-    Array<float> tDuodeneTuning     = {0., .117313, .039101, .156414, -.13686, -.019547, -.097763, .019547, .136864, -.15641, -.039101, -.11731};
-    Array<float> tOtonalTuning      = {0., .049553, .039101, -.02872, -.13686, -.292191, -.486824, .019547, .405273, .058647, -.311745, -.11731};
-    Array<float> tUtonalTuning      = {0., .117313, .311745, .156414, -.405273, -.019547, .486824, .292191, .136864, .024847, -.039101,  -.049553};
+    const Array<float> tEqualTuning       = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};
+    const Array<float> tJustTuning        = {0., .117313, .039101,  .156414, -.13686, -.019547, -.174873, .019547, .136864, -.15641, -.311745, -.11731};
+    const Array<float> tPartialTuning     = {0., .117313, .039101, -.331291, -.13686, -.019547, -.486824, .019547, .405273, -.15641, -.311745, -.506371};
+    const Array<float> tDuodeneTuning     = {0., .117313, .039101, .156414, -.13686, -.019547, -.097763, .019547, .136864, -.15641, -.039101, -.11731};
+    const Array<float> tOtonalTuning      = {0., .049553, .039101, -.02872, -.13686, -.292191, -.486824, .019547, .405273, .058647, -.311745, -.11731};
+    const Array<float> tUtonalTuning      = {0., .117313, .311745, .156414, -.405273, -.019547, .486824, .292191, .136864, .024847, -.039101,  -.049553};
     
     JUCE_LEAK_DETECTOR(TuningProcessor);
 };
