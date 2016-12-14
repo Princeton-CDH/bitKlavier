@@ -111,7 +111,7 @@ private:
     void loadResonanceRelaseSamples(BKSynthesiser *synth);
     void loadHammerReleaseSamples(BKSynthesiser *synth);
     
-    TuningSystem mainTuning = JustTuning;
+    TuningSystem mainTuning = EqualTemperament;
     PitchClass tuningBasePitch = C;
 
     //==============================================================================
