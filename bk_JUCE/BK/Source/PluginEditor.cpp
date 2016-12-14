@@ -14,16 +14,16 @@
 
 
 //==============================================================================
-BKAudioProcessorEditor::BKAudioProcessorEditor (BKAudioProcessor& p)
-:
-    AudioProcessorEditor (&p),
-    processor (p),
-    lvc(p, p.currentLayer),
-    kvc(p),
-    gvc(p),
-    svc(p),
-    nvc(p),
-    dvc(p)
+BKAudioProcessorEditor::BKAudioProcessorEditor (BKAudioProcessor& p):
+AudioProcessorEditor (&p),
+processor (p),
+lvc(p, p.currentLayer),
+kvc(p),
+gvc(p),
+svc(p),
+nvc(p),
+dvc(p),
+tvc(p)
 {
     addAndMakeVisible(gvc);
     addAndMakeVisible(svc);
@@ -31,12 +31,14 @@ BKAudioProcessorEditor::BKAudioProcessorEditor (BKAudioProcessor& p)
     addAndMakeVisible(dvc);
     addAndMakeVisible(lvc);
     addAndMakeVisible(kvc);
+    addAndMakeVisible(tvc);
     
     lvc.addActionListener(&gvc);
     lvc.addActionListener(&svc);
     lvc.addActionListener(&nvc);
     lvc.addActionListener(&dvc);
     lvc.addActionListener(&kvc);
+    lvc.addActionListener(&tvc);
     
     setSize(gMainComponentWidth,
             gMainComponentHeight);
@@ -63,6 +65,8 @@ void BKAudioProcessorEditor::resized()
     float svcH = cSynchronicParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
     float nvcH = cNostalgicParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) +  gYSpacing;
     float dvcH = cDirectParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) +  gYSpacing;
+    float tvcH = cTuningParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) +  gYSpacing;
+    
     
     
     gvc.setBounds(gComponentLeftOffset,
@@ -84,6 +88,11 @@ void BKAudioProcessorEditor::resized()
                   gComponentTopOffset + lvcH + kvcH + 2*gYSpacing,
                   gDirectVCWidth,
                   dvcH);
+    
+    tvc.setBounds(gComponentLeftOffset + gGeneralVCWidth + gXSpacing,
+                  gComponentTopOffset + lvcH + kvcH + dvcH + 3*gYSpacing,
+                  gTuningVCWidth,
+                  tvcH);
     
     svc.setBounds(gComponentLeftOffset + gGeneralVCWidth + gLayerVCWidth + (2 * gXSpacing),
                   gComponentTopOffset,

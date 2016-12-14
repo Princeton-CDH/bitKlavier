@@ -181,12 +181,16 @@ public:
     int getKeymapId(void)       { return keymap->getId();       }
     int getPreparationId(void)  { return preparation->getId();  }
     
+    inline void                             setTuning(TuningPreparation::Ptr t) { tuning = t;  tuner.setPreparation(tuning);         }
+    inline TuningPreparation::Ptr           getTuning(void)                     { return tuning;           }
+    inline int                              getTuningId(void)                   { return tuning->getId();  }
+    
 private:
     int Id;
     BKSynthesiser*              synth;
     Keymap::Ptr                 keymap;
     NostalgicPreparation::Ptr   preparation;
-    TuningPreparation::Ptr      tPreparation;
+    TuningPreparation::Ptr      tuning;
     TuningProcessor             tuner;
     
     //target Synchronic layer

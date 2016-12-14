@@ -69,7 +69,7 @@ public:
         
     }
     
-    inline const int getID() const noexcept                                 {return Id;                         }
+    inline const int getId() const noexcept                                 {return Id;                         }
     inline const TuningSystem getTuning() const noexcept                    {return tWhichTuning;               }
     inline const PitchClass getFundamental() const noexcept                 {return tFundamental;               }
     inline const float getFundamentalOffset() const noexcept                {return tFundamentalOffset;         }

@@ -37,9 +37,7 @@ public:
                           Array<float> beatMultipliers,
                           Array<float> accentMultipliers,
                           Array<float> lengthMultipliers,
-                          Array<float> transpOffsets,
-                          TuningSystem tuning,
-                          PitchClass basePitch):
+                          Array<float> transpOffsets):
     Id(Id),
     sTempo(tempo),
     sNumPulses(numPulses),
@@ -52,8 +50,6 @@ public:
     sAccentMultipliers(accentMultipliers),
     sLengthMultipliers(lengthMultipliers),
     sTranspOffsets(transpOffsets),
-    sTuning(tuning),
-    sBasePitch(basePitch),
     sPulseThreshSec(60.0/sTempo),
     sClusterThreshSec(sPulseThreshSec * sClusterThresh)
     {
@@ -73,8 +69,6 @@ public:
     sAccentMultipliers(Array<float>({1.0})),
     sLengthMultipliers(Array<float>({1.0})),
     sTranspOffsets(Array<float>({0.0})),
-    sTuning(PartialTuning),
-    sBasePitch(C),
     sPulseThreshSec(60.0/sTempo),
     sClusterThreshSec(sPulseThreshSec * sClusterThresh)
     {
@@ -93,8 +87,6 @@ public:
     inline const Array<float> getAccentMultipliers() const noexcept    {return sAccentMultipliers;     }
     inline const Array<float> getLengthMultipliers() const noexcept    {return sLengthMultipliers;     }
     inline const Array<float> getTranspOffsets() const noexcept        {return sTranspOffsets;         }
-    inline const TuningSystem getTuning() const noexcept               {return sTuning;             }
-    inline const PitchClass getBasePitch() const noexcept              {return sBasePitch;             }
     
     inline int getId(void) {   return Id; }
     
@@ -124,8 +116,6 @@ public:
     inline void setAccentMultipliers(Array<float> accentMultipliers)   {sAccentMultipliers.swapWith(accentMultipliers);    }
     inline void setTranspOffsets(Array<float> transpOffsets)           {sTranspOffsets.swapWith(transpOffsets);            }
     inline void setLengthMultipliers(Array<float> lengthMultipliers)   {sLengthMultipliers.swapWith(lengthMultipliers);    }
-    inline void setTuning(TuningSystem tuning)                         {sTuning = tuning;                                  }
-    inline void setBasePitch(PitchClass basePitch)                     {sBasePitch = basePitch;                            }
     
     void print(void)
     {
@@ -141,8 +131,6 @@ public:
         DBG("sLengthMultipliers: " + floatArrayToString(sLengthMultipliers));
         DBG("sAccentMultipliers: " + floatArrayToString(sAccentMultipliers));
         DBG("sTranspOffsets: " + floatArrayToString(sTranspOffsets));
-        DBG("sTuning: " + String(sTuning));
-        DBG("sBasePitch: " + String(sBasePitch));
         DBG("sPulseThreshSec: " + String(sPulseThreshSec));
         DBG("sClusterThreshSec: " + String(sClusterThreshSec));
         DBG("| - - - - - - - - -- - - - - - - - - |");
@@ -159,10 +147,7 @@ private:
     Array<float> sAccentMultipliers;
     Array<float> sLengthMultipliers;
     Array<float> sTranspOffsets;
-    
-    TuningSystem sTuning;
-    PitchClass sBasePitch;
-    
+
     float sPulseThreshSec;
     float sClusterThreshSec;
     
@@ -195,19 +180,26 @@ public:
     void keyReleased(int noteNumber, int channel);
     float getTimeToBeatMS(float beatsToSkip);
     
-    inline void                     setKeymap(Keymap::Ptr km)                               { keymap = km;                  }
-    inline void                     setPreparation(SynchronicPreparation::Ptr prep)         { preparation = prep;           }
-    inline Keymap::Ptr              getKeymap(void)                                         { return keymap;                }
-    inline int                      getKeymapId(void)                                       { return keymap->getId();       }
-    SynchronicPreparation::Ptr      getPreparation(void)                                    { return preparation;           }
-    int                             getPreparationId(void)                                  { return preparation->getId();  }
+    inline void                     setKeymap(Keymap::Ptr km)   { keymap = km;                  }
+    inline Keymap::Ptr              getKeymap(void)             { return keymap;                }
+    inline int                      getKeymapId(void)           { return keymap->getId();       }
+    
+    inline void                             setPreparation(SynchronicPreparation::Ptr prep) { preparation = prep;           }
+    inline SynchronicPreparation::Ptr       getPreparation(void)                            { return preparation;           }
+    inline int                              getPreparationId(void)                          { return preparation->getId();  }
+    
+    inline void                             setTuning(TuningPreparation::Ptr t) { tuning = t; tuner.setPreparation(tuning);       }
+    inline TuningPreparation::Ptr           getTuning(void)                     { return tuning;           }
+    inline int                              getTuningId(void)                   { return tuning->getId();  }
     
 private:
     int Id;
     BKSynthesiser*              synth;
     Keymap::Ptr                 keymap;
     SynchronicPreparation::Ptr  preparation;
-    TuningPreparation::Ptr      tPreparation;
+    
+    TuningPreparation::Ptr      tuning;
+    
     TuningProcessor             tuner;
     
     int pulse;

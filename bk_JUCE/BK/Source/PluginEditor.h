@@ -17,9 +17,13 @@
 #include "SynchronicViewController.h"
 #include "NostalgicViewController.h"
 #include "DirectViewController.h"
+#include "TuningViewController.h"
+
 #include "GeneralViewController.h"
+
 #include "LayerViewController.h"
 #include "KeymapViewController.h"
+
 
 //==============================================================================
 /**
@@ -49,6 +53,7 @@ private:
     SynchronicViewController    svc;
     NostalgicViewController     nvc;
     DirectViewController        dvc;
+    TuningViewController        tvc;
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessorEditor)

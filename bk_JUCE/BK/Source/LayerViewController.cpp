@@ -185,24 +185,26 @@ void LayerViewController::textFieldDidChange(TextEditor& tf)
         BKPreparationType type = current->getType();
         int layerNum = current->getLayerNumber();
         
-        //TuningProcessor::Ptr tune = processor.bkTunings[i];
+        TuningPreparation::Ptr tuning = processor.tPreparation[i];
         
         if (type == PreparationTypeSynchronic)
         {
-            //processor.sProcessor[layerNum]->setTuning(tune);
+            processor.sProcessor[layerNum]->setTuning(tuning);
         }
         else if (type == PreparationTypeNostalgic)
         {
-            //processor.nProcessor[layerNum]->setTuning(tune);
+            processor.nProcessor[layerNum]->setTuning(tuning);
         }
         else if (type == PreparationTypeDirect)
         {
-            //processor.dProcessor[layerNum]->setTuning(tune);
+            processor.dProcessor[layerNum]->setTuning(tuning);
         }
         else //PreparationTypeTuning
         {
-            sendActionMessage("tuning/update");
+            
         }
+        
+        sendActionMessage("tuning/update");
     }
     else
     {
@@ -212,9 +214,12 @@ void LayerViewController::textFieldDidChange(TextEditor& tf)
 
 void LayerViewController::switchToLayer(BKPreparationType type, int layer)
 {
+    TuningPreparation::Ptr tuning;
+    
     if (type == PreparationTypeDirect)
     {
         DirectProcessor::Ptr proc = processor.dProcessor[layer];
+        tuning = proc->getTuning();
         current->setPreparation(proc->getPreparationId());
         current->setKeymap(proc->getKeymapId());
         sendActionMessage("direct/update");
@@ -222,6 +227,7 @@ void LayerViewController::switchToLayer(BKPreparationType type, int layer)
     else if (type == PreparationTypeSynchronic)
     {
         SynchronicProcessor::Ptr proc = processor.sProcessor[layer];
+        tuning = proc->getTuning();
         current->setPreparation(proc->getPreparationId());
         current->setKeymap(proc->getKeymapId());
         sendActionMessage("synchronic/update");
@@ -229,14 +235,14 @@ void LayerViewController::switchToLayer(BKPreparationType type, int layer)
     else if (type == PreparationTypeNostalgic)
     {
         NostalgicProcessor::Ptr proc = processor.nProcessor[layer];
+        tuning = proc->getTuning();
         current->setPreparation(proc->getPreparationId());
         current->setKeymap(proc->getKeymapId());
         sendActionMessage("nostalgic/update");
     }
-    else if (type == PreparationTypeTuning)
-    {
-        
-    }
+    
+    current->setTuning(tuning->getId());
+    sendActionMessage("tuning/update");
 }
 
 

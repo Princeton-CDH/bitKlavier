@@ -43,6 +43,9 @@ static const int gGeneralVCHeight = gVCHeight;
 static const int gDirectVCWidth = gVCWidth;
 static const int gDirectVCHeight = gVCHeight;
 
+static const int gTuningVCWidth = gVCWidth;
+static const int gTuningVCHeight = gVCHeight;
+
 static const int gKeymapVCWidth = gVCWidth;
 static const int gKeymapVCHeight = gVCHeight;
 

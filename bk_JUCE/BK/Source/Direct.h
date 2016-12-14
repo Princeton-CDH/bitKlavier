@@ -108,11 +108,13 @@ public:
     int                     getId(void)                                 { return Id;                        } 
     Keymap::Ptr             getKeymap(void) const                       { return keymap;                    }
     DirectPreparation::Ptr  getPreparation(void) const                  { return preparation;               }
-    TuningPreparation::Ptr  getTuningPreparation(void) const            { return tPreparation;              }
     
     int                     getKeymapId(void) const                     { return keymap->getId();           }
     int                     getPreparationId(void) const                { return preparation->getId();      }
-    int                     getTuningPreparationId(void) const          { return tPreparation->getID();     }
+    
+    inline void                             setTuning(TuningPreparation::Ptr t) { tuning = t; tuner.setPreparation(tuning); }
+    inline TuningPreparation::Ptr           getTuning(void)                     { return tuning;           }
+    inline int                              getTuningId(void)                   { return tuning->getId();  }
     
     void    keyPressed(int noteNumber, float velocity, int channel);
     void    keyReleased(int noteNumber, float velocity, int channel);
@@ -124,7 +126,7 @@ private:
     BKSynthesiser*              synth;
     Keymap::Ptr                 keymap;
     DirectPreparation::Ptr      preparation;
-    TuningPreparation::Ptr      tPreparation;
+    TuningPreparation::Ptr      tuning;
     TuningProcessor             tuner;
     
     double sampleRate;

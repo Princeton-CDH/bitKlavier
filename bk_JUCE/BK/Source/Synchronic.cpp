@@ -20,7 +20,7 @@ Id(id),
 synth(s),
 keymap(km),
 preparation(p),
-tPreparation(t),
+tuning(t),
 tuner(t, Id)
 {
     clusterTimer = 0;

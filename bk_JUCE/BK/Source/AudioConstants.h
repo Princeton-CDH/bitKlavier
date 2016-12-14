@@ -160,8 +160,6 @@ typedef enum SynchronicParameterType {
     SynchronicLengthMultipliers,
     SynchronicAccentMultipliers,
     SynchronicTranspOffsets,
-    SynchronicTuning,
-    SynchronicBasePitch,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
@@ -177,9 +175,7 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "SynchronicBeatMultipliers",
     "SynchronicLengthMultipliers",
     "SynchronicAccentMultipliers",
-    "SynchronicTranspOffsets",
-    "SynchronicTuning",
-    "SynchronicBasePitch"
+    "SynchronicTranspOffsets"
 };
 
 #pragma mark - Nostalgic
@@ -199,8 +195,6 @@ typedef enum NostalgicParameterType {
     NostalgicBeatsToSkip,
     NostalgicMode,
     NostalgicSyncTarget,
-    NostalgicTuning,
-    NostalgicBasePitch,
     NostalgicParameterTypeNil
 } NostalgicParameterType;
 
@@ -213,9 +207,7 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
     "NostalgicLengthMultiplier",
     "NostalgicBeatsToSkip",
     "NostalgicMode",
-    "NostalgicSyncTarget",
-    "NostalgicTuning",
-    "NostalgicBasePitch",
+    "NostalgicSyncTarget"
 };
 
 #pragma mark - Direct
@@ -235,6 +227,39 @@ static const std::vector<std::string> cDirectParameterTypes = {
     "DirectGain",
     "DirectOverlay"
 };
+
+#pragma mark - Tuning
+typedef enum TuningParameterType
+{
+    TuningId = 0,
+    TuningScale,
+    TuningFundamental,
+    TuningOffset,
+    TuningA1IntervalScale,
+    TuningA1Inversional,
+    TuningA1AnchorScale,
+    TuningA1AnchorFundamental,
+    TuningA1ClusterThresh,
+    TuningA1History,
+    TuningCustomScale,
+    TuningParameterTypeNil
+    
+} TuningParameterType;
+
+static const std::vector<std::string> cTuningParameterTypes = {
+    "Tuning Id",
+    "TuningScale",
+    "TuningFundamental",
+    "TuningOffset",
+    "TuningA1IntervalScale",
+    "TuningA1Inversional",
+    "TuningA1AnchorScale",
+    "TuningA1AnchorFundamental",
+    "TuningA1ClusterThresh",
+    "TuningA1History",
+    "TuningCustomScale"
+};
+
 
 #pragma mark - Layer
 typedef enum LayerTFIndex

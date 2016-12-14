@@ -20,7 +20,7 @@ Id(id),
 synth(s),
 keymap(km),
 preparation(prep),
-tPreparation(tPrep),
+tuning(tPrep),
 tuner(tPrep, id),
 syncProcessor(proc)
 {
