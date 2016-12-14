@@ -166,21 +166,20 @@ private:
     TuningPreparation::Ptr preparation;
     
     float   intervalToRatio(float interval) const noexcept { return mtof(interval + 60.) / mtof(60.); }
+    float   lastNote[128];
+    float   globalTuningReference = 440.; //A440
+    
     
     //adaptive tuning functions
-    float   calculateRatio(int midiNoteNumber);
+    float   adaptiveCalculate(int midiNoteNumber) const;
     void    newNote(int midiNoteNumber, TuningSystem tuningType);
-    float   calculate(int midiNoteNumber, int anchored);
+    float   adaptiveCalculateRatio(int midiNoteNumber) const;
     uint64  clusterTime;
     
+    int     adaptiveFundamentalNote = 60; //moves with adaptive tuning
+    float   adaptiveFundamentalFreq = mtof(adaptiveFundamentalNote);
+    int     adaptiveHistoryCounter;
     
-    float   lastNote[128];
-    int     fundamentalNote; //moves with adaptive tuning
-    float   fundamentalFreq;
-    int     historyCounter;
-    bool    reset;
-    
-    float globalTuningReference = 440.; //A440
     
     /* Array of all the default tunings
      Just:       1/1,    16/15,  9/8,    6/5,   5/4,    4/3,    7/5,    3/2,    8/5,    5/3,    7/4,    15/8

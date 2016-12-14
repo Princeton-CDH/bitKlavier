@@ -32,6 +32,23 @@ TuningProcessor::~TuningProcessor()
 {
 }
 
+
+//returns offsets; main callback
+float TuningProcessor::getOffset(int midiNoteNumber) const
+{
+    
+    //do adaptive tunings if using
+    if(preparation->getTuning() == AdaptiveTuning || preparation->getTuning() == AdaptiveAnchoredTuning)
+        return adaptiveCalculate(midiNoteNumber);
+    
+    //else do regular tunings
+    const Array<float> currentTuning = tuningLibrary.getUnchecked(preparation->getTuning());
+    return (currentTuning[(midiNoteNumber - preparation->getFundamental()) % 12] + preparation->getFundamentalOffset());
+    
+}
+
+
+//for keeping track of current cluster size
 void TuningProcessor::incrementAdaptiveClusterTime(int numSamples)
 {
     if(preparation->getTuning() == AdaptiveTuning || preparation->getTuning() == AdaptiveAnchoredTuning) {
@@ -41,29 +58,71 @@ void TuningProcessor::incrementAdaptiveClusterTime(int numSamples)
     }
 }
 
-//returns offsets
-float TuningProcessor::getOffset(int midiNoteNumber) const
+
+//add note to the adaptive tuning history, update adaptive fundamental
+void TuningProcessor::keyOn(int midiNoteNumber)
 {
+
+    if(preparation->getTuning() == AdaptiveTuning)
+    {
+        if(clusterTime > preparation->getAdaptiveClusterThresh() || adaptiveHistoryCounter > preparation->getAdaptiveHistory())
+        {
+            adaptiveHistoryCounter = 0;
+            adaptiveFundamentalFreq = adaptiveFundamentalFreq * adaptiveCalculateRatio(midiNoteNumber);
+        }
+        else adaptiveHistoryCounter++;
+        
+    }
     
-    if(preparation->getTuning() == AdaptiveTuning) return 0.; //need to implement
-    if(preparation->getTuning() == AdaptiveAnchoredTuning) return 0.;
+    else if(preparation->getTuning() == AdaptiveAnchoredTuning)
+    {
+        if(clusterTime > preparation->getAdaptiveClusterThresh() || adaptiveHistoryCounter > preparation->getAdaptiveHistory())
+        {
+            adaptiveHistoryCounter = 0;
+            
+            const Array<float> anchorTuning = tuningLibrary.getUnchecked(preparation->getAdaptiveAnchorScale());
+            adaptiveFundamentalFreq = mtof(
+                                           midiNoteNumber +
+                                           anchorTuning[midiNoteNumber + preparation->getAdaptiveAnchorFundamental() % 12]
+                                           );
+        }
+        else adaptiveHistoryCounter++;
+    }
     
-    const Array<float> currentTuning = tuningLibrary.getUnchecked(preparation->getTuning());
-    return (currentTuning[(midiNoteNumber - preparation->getFundamental()) % 12] + preparation->getFundamentalOffset());
+    clusterTime = 0;
     
 }
 
-//for calculating adaptive tuning
-void TuningProcessor::keyOn(int midiNoteNumber)
+float TuningProcessor::adaptiveCalculateRatio(const int midiNoteNumber) const
 {
-    mtof(60.);
+    int tempnote = midiNoteNumber;
+    float newnote;
+    float newratio = 1.;
     
-    if(preparation->getTuning() == AdaptiveTuning)
+    const Array<float> intervalScale = tuningLibrary.getUnchecked(preparation->getAdaptiveIntervalScale());
+    
+    if(!preparation->getAdaptiveInversional() || tempnote >= adaptiveFundamentalNote)
     {
-        //
+        
+        while((tempnote - adaptiveFundamentalNote) < 0) tempnote += 12;
+    
+        newnote = midiNoteNumber + intervalScale[(tempnote - adaptiveFundamentalNote) % 12];
+        newratio = intervalToRatio(newnote - adaptiveFundamentalNote);
+        
+        return newratio;
+        
     }
-    else if(preparation->getTuning() == AdaptiveAnchoredTuning)
-    {
-        //
-    }
+    //else
+    newnote = midiNoteNumber - intervalScale[(adaptiveFundamentalNote - tempnote) % 12];
+    newratio = intervalToRatio(newnote - adaptiveFundamentalNote);
+    
+    return newratio;
 }
+
+float TuningProcessor::adaptiveCalculate(int midiNoteNumber) const
+{
+    float newnote = adaptiveFundamentalFreq * adaptiveCalculateRatio(midiNoteNumber);
+    return ftom(newnote);
+}
+
+
