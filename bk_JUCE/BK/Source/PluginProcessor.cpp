@@ -147,23 +147,6 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             {
                 dProcessor[layer]->keyPressed(noteNumber, velocity, channel);
             }
-            
-            /*
-            mainPianoSynth.keyOn(
-                                 channel,
-                                 noteNumber,
-                                 tuner->getOffset(noteNumber, mainTuning, tuningBasePitch), //will need to add Direct Transp here
-                                 velocity * aGlobalGain,
-                                 Forward,
-                                 Normal,
-                                 BKNoteTypeNil,
-                                 1000, // start
-                                 1000, // length
-                                 3,
-                                 3 );
-             */
-            
-            
         }
         else if (m.isNoteOff())
         {

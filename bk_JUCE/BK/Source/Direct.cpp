@@ -43,8 +43,8 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                      Forward,
                      Normal,
                      BKNoteTypeNil,
-                     1000, // start
-                     1000, // length
+                     0, // start
+                     0, // length
                      3,
                      3);
         
