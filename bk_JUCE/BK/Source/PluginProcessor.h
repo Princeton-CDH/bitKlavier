@@ -42,9 +42,6 @@ public:
     // General settings.
     GeneralSettings::Ptr general;
     
-    // Tuning.
-    TuningProcessor::Ptr tuner;
-    
     // Synthesisers.
     BKSynthesiser mainPianoSynth;
     BKSynthesiser hammerReleaseSynth;
@@ -60,6 +57,7 @@ public:
     SynchronicPreparation::CSArr    sPreparation;
     NostalgicPreparation::CSArr     nPreparation;
     DirectPreparation::CSArr        dPreparation;
+    TuningPreparation::CSArr        tPreparation;
     
     // Keymaps.
     Keymap::CSArr                   bkKeymaps;
@@ -110,9 +108,6 @@ private:
     void loadMainPianoSamples(BKSynthesiser *synth, int numLayers);
     void loadResonanceRelaseSamples(BKSynthesiser *synth);
     void loadHammerReleaseSamples(BKSynthesiser *synth);
-    
-    TuningSystem mainTuning = EqualTemperament;
-    PitchClass tuningBasePitch = C;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)

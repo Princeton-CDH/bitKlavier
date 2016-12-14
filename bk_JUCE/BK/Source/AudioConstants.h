@@ -280,7 +280,7 @@ static const int aNumScaleDegrees = 12;
 static const int aRampUndertowCrossMS = 50;
 
 // Sample layers
-static const int aNumSampleLayers = 8;
+static const int aNumSampleLayers = 2;
 static const int aVelocityThresh_Eight[9] = {
     0,
     25,

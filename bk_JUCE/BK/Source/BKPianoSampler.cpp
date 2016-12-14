@@ -96,11 +96,16 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         playType = type;
         playDirection = direction;
         
-        if(voiceRampOn  > (0.5 * length))   voiceRampOn     = 0.5 * length;
-        if(voiceRampOff > (0.5 * length))   voiceRampOff    = 0.5 * length;
-        
-        double playLength = (length - voiceRampOff) * pitchRatio;
+        double playLength = 0.0;
         double maxLength = sound->soundLength - voiceRampOff;
+        
+        if (bkType != Main)
+        {
+            if(voiceRampOn  > (0.5 * length))   voiceRampOn     = 0.5 * length;
+            if(voiceRampOff > (0.5 * length))   voiceRampOff    = 0.5 * length;
+            
+            playLength = (length - voiceRampOff) * pitchRatio;
+        }
         
         if (playDirection == Forward)
         {
@@ -118,7 +123,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             {
                 sourceSamplePosition = 0.0;
                 playEndPosition = jmin(playLength, maxLength) - 1;
-                //DBG("playing FixedLength note " + std::to_string(velocity));
             }
             else if (playType == FixedLengthFixedStart)
             {
@@ -142,7 +146,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             if (playType == Normal)
             {
                 sourceSamplePosition = sound->soundLength - 1;
-                //playEndPosition = sound->rampOffSamples;
                 playEndPosition = voiceRampOff;
             }
             else if (playType == NormalFixedStart)
@@ -227,7 +230,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         
         if (voiceRampOff > 0)
         {
-            //rampOffDelta = (float) (-pitchRatio / sound->rampOffSamples);
             rampOffDelta = (float) (-pitchRatio / voiceRampOff);
         }
         else

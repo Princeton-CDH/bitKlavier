@@ -10,7 +10,6 @@
 BKAudioProcessor::BKAudioProcessor():
 currentLayer            (new Layer(PreparationTypeDirect, 0 , 0 , 0, 0)),
 general                 (new GeneralSettings()),
-tuner                   (new TuningProcessor()),
 mainPianoSynth          (general),
 hammerReleaseSynth      (general),
 resonanceReleaseSynth   (general),
@@ -29,11 +28,13 @@ numDirectLayers(12)
     nProcessor.ensureStorageAllocated(aMaxNumLayers);
     dProcessor.ensureStorageAllocated(aMaxNumLayers);
     
+    tPreparation.ensureStorageAllocated(aMaxNumLayers * 3);
     bkKeymaps.ensureStorageAllocated(aMaxNumLayers * 3);
     
     for (int i = 0; i < (3 * aMaxNumLayers); i++)
     {
         bkKeymaps.add(new Keymap(i));
+        tPreparation.add(new TuningPreparation(i));
     }
     
     for (int i = 0; i < aMaxNumLayers; i++)
@@ -45,9 +46,9 @@ numDirectLayers(12)
     
     for (int i = 0; i < aMaxNumLayers; i++)
     {
-        sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, bkKeymaps[0], sPreparation[0], tuner, i));
-        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, bkKeymaps[0], tuner, nPreparation[0], sProcessor, i));
-        dProcessor.insert(i, new DirectProcessor(&mainPianoSynth, bkKeymaps[0], dPreparation[0], i));
+        sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, bkKeymaps[0], sPreparation[0], tPreparation[0], i));
+        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, bkKeymaps[0], nPreparation[0], tPreparation[0], sProcessor, i));
+        dProcessor.insert(i, new DirectProcessor(&mainPianoSynth, bkKeymaps[0], dPreparation[0], tPreparation[0], i));
     }
     
     // For testing and developing, let's keep directory of samples in home folder on disk.
@@ -104,7 +105,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     int numSamples = buffer.getNumSamples();
     
     // Process each layer.
-    // Could but nostalgic->keyOff/playNote here: (1) have synchronic->processBlock return 1 if pulse happened, otherwise 0. if nostalgic->mode == SynchronicSync and make sure layer corresponds
+    // Could put nostalgic->keyOff/playNote here: (1) have synchronic->processBlock return 1 if pulse happened, otherwise 0. if nostalgic->mode == SynchronicSync and make sure layer corresponds
     for (int layer = 0; layer < numSynchronicLayers; layer++)
     {
         sProcessor[layer]->processBlock(numSamples, m.getChannel());
@@ -114,6 +115,12 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     {
         nProcessor[layer]->processBlock(numSamples, m.getChannel());
     }
+    
+    for (int layer = 0; layer < numDirectLayers; layer++)
+    {
+        dProcessor[layer]->processBlock(numSamples, m.getChannel());
+    }
+    
     
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
@@ -138,23 +145,8 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             
             for (int layer = 0; layer < numDirectLayers; layer++)
             {
-                dProcessor[layer]->keyPressed(noteNumber, velocity);
+                dProcessor[layer]->keyPressed(noteNumber, velocity, channel);
             }
-            
-            mainPianoSynth.keyOn(
-                                 channel,
-                                 noteNumber,
-                                 tuner->getOffset(noteNumber, mainTuning, tuningBasePitch), //will need to add Direct Transp here
-                                 velocity * aGlobalGain,
-                                 Forward,
-                                 Normal,
-                                 BKNoteTypeNil,
-                                 1000, // start
-                                 1000, // length
-                                 3,
-                                 3 );
-            
-            
         }
         else if (m.isNoteOff())
         {
@@ -162,30 +154,32 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             //need to integrate sProcess layer number here as well, just defaulting for the moment
             for (int i = 0; i < numNostalgicLayers; i++)
             {
-                nProcessor[i]->keyReleased(noteNumber,
-                                           channel); // should be in preparation/processor
+                nProcessor[i]->keyReleased(noteNumber, channel); // should be in preparation/processor
                 
             }
             
             for (int i = 0; i < numSynchronicLayers; i++)
             {
-                sProcessor[i]->keyReleased(noteNumber,
-                                           channel);
+                sProcessor[i]->keyReleased(noteNumber, channel);
             }
             
             for (int i = 0; i < numDirectLayers; i++)
             {
                 dProcessor[i]->keyReleased(noteNumber,
+                                           velocity,
                                            channel);
             }
             
+            /*
             mainPianoSynth.keyOff(
                                   channel,
                                   noteNumber,
                                   velocity,
                                   true
                                   );
+             */
             
+            //embed these in Direct, have toggle in DirectPreparation to turn these on, have on by default in layer 1 only
             if (general->getResonanceAndHammer())
             {
                 hammerReleaseSynth.keyOn(
@@ -204,7 +198,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
                 resonanceReleaseSynth.keyOn(
                                             channel,
                                             noteNumber,
-                                            tuner->getOffset(noteNumber, mainTuning, tuningBasePitch),
+                                            0., //do we need to tune this? probably should put in Direct keyOff
                                             velocity * aGlobalGain, //will also want multiplier for resonance gain...
                                             Forward,
                                             FixedLength,

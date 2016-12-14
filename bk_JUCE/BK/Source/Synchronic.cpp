@@ -13,14 +13,15 @@
 SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s,
                                          Keymap::Ptr km,
                                          SynchronicPreparation::Ptr p,
-                                         TuningProcessor::Ptr t,
-                                         int Id)
+                                         TuningPreparation::Ptr t,
+                                         int id)
 :
-Id(Id),
+Id(id),
 synth(s),
 keymap(km),
 preparation(p),
-tuner(t)
+tPreparation(t),
+tuner(t, Id)
 {
     clusterTimer = 0;
     phasor = 0;
@@ -32,8 +33,6 @@ tuner(t)
     
     cluster = Array<int>();
     on = Array<int>();
-    
-    
 }
 
 
@@ -61,10 +60,7 @@ void SynchronicProcessor::playNote(int channel, int note)
     synth->keyOn(
                  channel,
                  note,
-                 tuner->getOffset(note,
-                                  preparation->getTuning(),
-                                  preparation->getBasePitch())
-                                + preparation->getTranspOffsets()[transp],
+                 tuner.getOffset(note) + preparation->getTranspOffsets()[transp],
                  preparation->getAccentMultipliers()[accent] * aGlobalGain,
                  noteDirection,
                  FixedLengthFixedStart,
@@ -146,6 +142,8 @@ void SynchronicProcessor::keyReleased(int noteNumber, int channel)
 
 void SynchronicProcessor::processBlock(int numSamples, int channel)
 {
+    
+    tuner.incrementAdaptiveClusterTime(numSamples);
     
     int clusterSize = cluster.size();
     

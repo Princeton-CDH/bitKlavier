@@ -12,15 +12,16 @@
 
 NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s,
                                        Keymap::Ptr km,
-                                       TuningProcessor::Ptr tuner,
                                        NostalgicPreparation::Ptr prep,
+                                       TuningPreparation::Ptr tPrep,
                                        SynchronicProcessor::CSArr& proc,
-                                       int layer):
-layer(layer),
+                                       int id):
+Id(id),
 synth(s),
 keymap(km),
 preparation(prep),
-tuner(tuner),
+tPreparation(tPrep),
+tuner(tPrep, id),
 syncProcessor(proc)
 {
     noteLengthTimers.ensureStorageAllocated(128);
@@ -75,10 +76,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
         synth->keyOn(
                      midiChannel,
                      midiNoteNumber,
-                     tuner->getOffset(midiNoteNumber,
-                                      preparation->getTuning(),
-                                      preparation->getBasePitch())
-                                    + preparation->getTransposition(),
+                     tuner.getOffset(midiNoteNumber) + preparation->getTransposition(),
                      velocities.getUnchecked(midiNoteNumber) * preparation->getGain() * aGlobalGain,
                      Reverse,
                      FixedLengthFixedStart,
@@ -101,9 +99,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
         reverseTargetLength.set(midiNoteNumber, (duration - aRampUndertowCrossMS) * sampleRate/1000.); //to schedule undertow note
         
         //store values for when undertow note is played (in the event the preparation changes in the meantime)
-        tuningsAtKeyOn.set(midiNoteNumber, tuner->getOffset(midiNoteNumber,
-                                                            preparation->getTuning(),
-                                                            preparation->getBasePitch()));
+        tuningsAtKeyOn.set(midiNoteNumber, tuner.getOffset(midiNoteNumber));
         velocitiesAtKeyOn.set(midiNoteNumber, velocities.getUnchecked(midiNoteNumber) * preparation->getGain());
         preparationAtKeyOn.set(midiNoteNumber, preparation);
         
@@ -130,6 +126,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
 {
     
     incrementTimers(numSamples);
+    tuner.incrementAdaptiveClusterTime(numSamples);
     
     //check timers to see if any are at an undertow turnaround point, then call keyOn(forward) and keyOff, with 50ms ramps
     for(int i = (activeReverseNotes.size() - 1); i >= 0; --i)
