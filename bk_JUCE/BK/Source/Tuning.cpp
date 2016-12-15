@@ -42,7 +42,10 @@ float TuningProcessor::getOffset(int midiNoteNumber) const
         return adaptiveCalculate(midiNoteNumber);
     
     //else do regular tunings
-    const Array<float> currentTuning = tuningLibrary.getUnchecked(preparation->getTuning());
+    Array<float> currentTuning;
+    if(preparation->getTuning() == CustomTuning) currentTuning = preparation->getCustomScale();
+    else currentTuning = tuningLibrary.getUnchecked(preparation->getTuning());
+    
     return (currentTuning[(midiNoteNumber - preparation->getFundamental()) % 12] + preparation->getFundamentalOffset());
     
 }
