@@ -73,6 +73,11 @@ public:
     sTranspOffsets(Array<float>({0.0})),
     sPulseThreshSec(60.0/sTempo),
     sClusterThreshSec(sPulseThreshSec * sClusterThresh),
+    at1History(1),
+    at1Min(100),
+    at1Max(2000),
+    at1Subdivisions(4.0f),
+    at1Mode(TimeBetweenNotes),
     tuning(t)
     {
     }
@@ -90,6 +95,13 @@ public:
     inline const Array<float> getAccentMultipliers() const noexcept    {return sAccentMultipliers;     }
     inline const Array<float> getLengthMultipliers() const noexcept    {return sLengthMultipliers;     }
     inline const Array<float> getTranspOffsets() const noexcept        {return sTranspOffsets;         }
+    
+    //Adaptive Tempo 1
+    inline AdaptiveTempo1Mode getAdaptiveTempo1Mode(void)   {return at1Mode;   }
+    inline int getAdaptiveTempo1History(void)               {return at1History;}
+    inline float getAdaptiveTempo1Subdivisions(void)        {return at1Subdivisions;}
+    inline float getAdaptiveTempo1Min(void)                 {return at1Min;}
+    inline float getAdaptiveTempo1Max(void)                 {return at1Max;}
     
     inline int getId(void) {   return Id; }
     
@@ -119,6 +131,13 @@ public:
     inline void setAccentMultipliers(Array<float> accentMultipliers)   {sAccentMultipliers.swapWith(accentMultipliers);    }
     inline void setTranspOffsets(Array<float> transpOffsets)           {sTranspOffsets.swapWith(transpOffsets);            }
     inline void setLengthMultipliers(Array<float> lengthMultipliers)   {sLengthMultipliers.swapWith(lengthMultipliers);    }
+    
+    //Adaptive Tempo 1
+    inline void setAdaptiveTempo1Mode(AdaptiveTempo1Mode mode)          {at1Mode = mode;    }
+    inline void setAdaptiveTempo1History(int hist)      {at1History = hist;}
+    inline void setAdaptiveTempo1Subdivisions(float sub)      {at1Subdivisions = sub;}
+    inline void setAdaptiveTempo1Min(float min)      {at1Min = min;}
+    inline void setAdaptiveTempo1Max(float max)      {at1Max = max;}
     
     inline const TuningPreparation::Ptr getTuning() const noexcept      {return tuning; }
     inline void setTuning(TuningPreparation::Ptr t)                       {tuning = t;  }
@@ -156,6 +175,12 @@ private:
 
     float sPulseThreshSec;
     float sClusterThreshSec;
+    
+    // Adaptive Tempo 1
+    int at1History;
+    float at1Min, at1Max;
+    float at1Subdivisions;
+    AdaptiveTempo1Mode at1Mode;
     
     TuningPreparation::Ptr tuning;
     

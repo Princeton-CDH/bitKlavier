@@ -155,6 +155,26 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
     {
         prep->setTuning(processor.tPreparation[i]);
     }
+    else if (name == cSynchronicParameterTypes[AT1Mode])
+    {
+        prep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode)i);
+    }
+    else if (name == cSynchronicParameterTypes[AT1History])
+    {
+        prep->setAdaptiveTempo1History(i);
+    }
+    else if (name == cSynchronicParameterTypes[AT1Subdivisions])
+    {
+        prep->setAdaptiveTempo1Subdivisions(f);
+    }
+    else if (name == cSynchronicParameterTypes[AT1Min])
+    {
+        prep->setAdaptiveTempo1Min(f);
+    }
+    else if (name == cSynchronicParameterTypes[AT1Max])
+    {
+        prep->setAdaptiveTempo1Max(f);
+    }
     else
     {
         DBG("Unregistered text field entered input.");
@@ -167,7 +187,7 @@ void SynchronicViewController::updateFields(int synchronicId)
     SynchronicPreparation::Ptr prep   = processor.sPreparation[synchronicId];
     
     // Set text.
-    synchronicTF[SynchronicId]                  ->setText(  String( prep->getId()));
+    synchronicTF[SynchronicId]                  ->setText(  String(                 prep->getId()));
     synchronicTF[SynchronicTempo]               ->setText(  String(                 prep->getTempo()));
     synchronicTF[SynchronicNumPulses]           ->setText(  String(                 prep->getNumPulses()));
     synchronicTF[SynchronicClusterMin]          ->setText(  String(                 prep->getClusterMin()));
@@ -179,7 +199,14 @@ void SynchronicViewController::updateFields(int synchronicId)
     synchronicTF[SynchronicLengthMultipliers]   ->setText(  floatArrayToString(     prep->getLengthMultipliers()));
     synchronicTF[SynchronicAccentMultipliers]   ->setText(  floatArrayToString(     prep->getAccentMultipliers()));
     synchronicTF[SynchronicTranspOffsets]       ->setText(  floatArrayToString(     prep->getTranspOffsets()));
-    synchronicTF[SynchronicTuning]              ->setText(  String(prep->getTuning()->getId()));
+    synchronicTF[SynchronicTuning]              ->setText(  String(                 prep->getTuning()->getId()));
+    
+    synchronicTF[AT1Mode]            ->setText(  String(                 prep->getAdaptiveTempo1Mode()));
+    synchronicTF[AT1History]         ->setText(  String(                 prep->getAdaptiveTempo1History()));
+    synchronicTF[AT1Subdivisions]    ->setText(  String(                 prep->getAdaptiveTempo1Subdivisions()));
+    synchronicTF[AT1Min]             ->setText(  String(                 prep->getAdaptiveTempo1Min()));
+    synchronicTF[AT1Max]             ->setText(  String(                 prep->getAdaptiveTempo1Max()));
+    
 }
 
 

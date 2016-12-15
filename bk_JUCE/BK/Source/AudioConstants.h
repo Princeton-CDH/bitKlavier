@@ -141,6 +141,12 @@ static const std::vector<std::string> cGeneralParameterTypes = {
 };
 
 #pragma mark - Synchronic
+typedef enum AdaptiveTempo1Mode {
+    TimeBetweenNotes,
+    NoteLength,
+    AdaptiveTempo1ModeNil
+}AdaptiveTempo1Mode;
+
 typedef enum SynchronicSyncMode {
     FirstNoteSync = 0,
     LastNoteSync,
@@ -149,6 +155,7 @@ typedef enum SynchronicSyncMode {
 
 typedef enum SynchronicParameterType {
     SynchronicId = 0,
+    SynchronicTuning,
     SynchronicTempo,
     SynchronicNumPulses,
     SynchronicClusterMin,
@@ -160,12 +167,17 @@ typedef enum SynchronicParameterType {
     SynchronicLengthMultipliers,
     SynchronicAccentMultipliers,
     SynchronicTranspOffsets,
-    SynchronicTuning,
+    AT1Mode,
+    AT1History,
+    AT1Subdivisions,
+    AT1Min,
+    AT1Max,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
 static const std::vector<std::string> cSynchronicParameterTypes = {
     "Synchronic Id",
+    "SynchronicTuning Id",
     "SynchronicTempo",
     "SynchronicNumPulses",
     "SynchronicClusterMin",
@@ -177,7 +189,11 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "SynchronicLengthMultipliers",
     "SynchronicAccentMultipliers",
     "SynchronicTranspOffsets",
-    "Tuning Id"
+    "AdaptiveTempo1Mode",
+    "AdaptiveTempo1History",
+    "AdaptiveTempo1Subdivisions",
+    "AdaptiveTempo1Min",
+    "AdaptiveTempo1Max"
 };
 
 #pragma mark - Nostalgic
@@ -189,6 +205,7 @@ typedef enum NostalgicSyncMode {
 
 typedef enum NostalgicParameterType {
     NostalgicId = 0,
+    NostalgicTuning,
     NostalgicWaveDistance,
     NostalgicUndertow,
     NostalgicTransposition,
@@ -197,13 +214,13 @@ typedef enum NostalgicParameterType {
     NostalgicBeatsToSkip,
     NostalgicMode,
     NostalgicSyncTarget,
-    NostalgicTuning,
     NostalgicParameterTypeNil
     
 } NostalgicParameterType;
 
 static const std::vector<std::string> cNostalgicParameterTypes = {
     "Nostalgic Id",
+    "NostalgicTuning Id",
     "NostalgicWaveDistance",
     "NostalgicUndertow",
     "NostalgicTransposition",
@@ -211,30 +228,29 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
     "NostalgicLengthMultiplier",
     "NostalgicBeatsToSkip",
     "NostalgicMode",
-    "NostalgicSyncTarget",
-    "Tuning Id"
+    "NostalgicSyncTarget"
 };
 
 #pragma mark - Direct
 typedef enum DirectParameterType
 {
     DirectId = 0,
+    DirectTuning,
     DirectTransposition,
     DirectGain,
     DirectResGain,
     DirectHammerGain,
-    DirectTuning,
     DirectParameterTypeNil,
     
 } DirectParameterType;
 
 static const std::vector<std::string> cDirectParameterTypes = {
     "Direct Id",
+    "DirectTuning Id",
     "DirectTransposition",
     "DirectGain",
     "DirectResGain",
-    "DirectHammerGain",
-    "Tuning Id"
+    "DirectHammerGain"
 };
 
 #pragma mark - Tuning

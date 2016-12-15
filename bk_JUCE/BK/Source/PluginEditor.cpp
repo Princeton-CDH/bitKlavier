@@ -67,49 +67,40 @@ void BKAudioProcessorEditor::resized()
     float dvcH = cDirectParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) +  gYSpacing;
     float tvcH = cTuningParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) +  gYSpacing;
     
+    Rectangle<int> upperLeft = Rectangle<int>(gComponentLeftOffset, gComponentTopOffset, gGeneralVCWidth, lvcH);
     
+    lvc.setBounds(upperLeft);
     
-    gvc.setBounds(gComponentLeftOffset,
-                  gComponentTopOffset,
-                  gGeneralVCWidth,
-                  gvcH);
- 
-    lvc.setBounds(gComponentLeftOffset + gGeneralVCWidth + gXSpacing,
-                  gComponentTopOffset,
-                  gLayerVCWidth,
-                  lvcH);
-    
-    kvc.setBounds(gComponentLeftOffset + gGeneralVCWidth + gXSpacing,
-                  gComponentTopOffset + lvcH + gYSpacing,
+    kvc.setBounds(upperLeft.getX(),
+                  upperLeft.getBottom() + gYSpacing,
                   gKeymapVCWidth,
                   kvcH);
     
-    dvc.setBounds(gComponentLeftOffset + gGeneralVCWidth + gXSpacing,
-                  gComponentTopOffset + lvcH + kvcH + 2*gYSpacing,
-                  gDirectVCWidth,
-                  dvcH);
-    
-    tvc.setBounds(gComponentLeftOffset + gGeneralVCWidth + gXSpacing,
-                  gComponentTopOffset + lvcH + kvcH + dvcH + 3*gYSpacing,
-                  gTuningVCWidth,
-                  tvcH);
-    
-    svc.setBounds(gComponentLeftOffset + gGeneralVCWidth + gLayerVCWidth + (2 * gXSpacing),
-                  gComponentTopOffset,
+    gvc.setBounds(upperLeft.getX(),
+                  kvc.getBottom() + gYSpacing,
+                  gGeneralVCWidth,
+                  gvcH);
+ 
+    svc.setBounds(upperLeft.getRight() + gXSpacing,
+                  upperLeft.getY(),
                   gSynchronicVCWidth,
                   svcH);
     
-    nvc.setBounds(gComponentLeftOffset + gGeneralVCWidth + gLayerVCWidth + (2 * gXSpacing),
-                  gComponentTopOffset + svcH + gYSpacing,
+    nvc.setBounds(svc.getX(),
+                  svc.getBottom() + gYSpacing,
                   gNostalgicVCWidth,
                   nvcH);
- 
+    
+    dvc.setBounds(svc.getRight() + gXSpacing,
+                  upperLeft.getY(),
+                  gDirectVCWidth,
+                  dvcH);
+    
+    tvc.setBounds(dvc.getX(),
+                  dvc.getBottom() + gYSpacing,
+                  gTuningVCWidth,
+                  tvcH);
     
     
-    
-    
-    
-    
-     
     
 }
