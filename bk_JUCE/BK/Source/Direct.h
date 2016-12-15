@@ -102,6 +102,8 @@ public:
     
     void processBlock(int numSamples, int midiChannel);
     
+    void setCurrentPlaybackSampleRate(double sr);
+    
     inline void             setKeymap(Keymap::Ptr km)                   { keymap = km;                      }
     inline void             setPreparation(DirectPreparation::Ptr prep) { preparation = prep;               }
     

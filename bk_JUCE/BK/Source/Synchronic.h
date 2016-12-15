@@ -171,7 +171,7 @@ public:
     
     ~SynchronicProcessor();
     
-    inline void         setCurrentPlaybackSampleRate(double sr)         { sampleRate = sr;          }
+    void         setCurrentPlaybackSampleRate(double sr);
     inline const uint64 getCurrentNumSamplesBeat(void) const noexcept   { return numSamplesBeat;    }
     inline const uint64 getCurrentPhasor(void) const noexcept           { return phasor;            }
     

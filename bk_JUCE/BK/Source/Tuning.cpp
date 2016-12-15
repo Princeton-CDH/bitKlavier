@@ -53,7 +53,7 @@ void TuningProcessor::incrementAdaptiveClusterTime(int numSamples)
 {
     if(preparation->getTuning() == AdaptiveTuning || preparation->getTuning() == AdaptiveAnchoredTuning) {
         
-        if(clusterTime <= preparation->getAdaptiveClusterThresh()) clusterTime += numSamples;
+        if(clusterTime <= preparation->getAdaptiveClusterThresh() * sampleRate * 0.001) clusterTime += numSamples;
         
     }
 }
@@ -65,10 +65,11 @@ void TuningProcessor::keyOn(int midiNoteNumber)
 
     if(preparation->getTuning() == AdaptiveTuning)
     {
-        if(clusterTime > preparation->getAdaptiveClusterThresh() || adaptiveHistoryCounter > preparation->getAdaptiveHistory())
+        if(clusterTime * (1000.0 / sampleRate) > preparation->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= preparation->getAdaptiveHistory() - 1)
         {
             adaptiveHistoryCounter = 0;
             adaptiveFundamentalFreq = adaptiveFundamentalFreq * adaptiveCalculateRatio(midiNoteNumber);
+            adaptiveFundamentalNote = midiNoteNumber;
         }
         else adaptiveHistoryCounter++;
         
@@ -76,19 +77,20 @@ void TuningProcessor::keyOn(int midiNoteNumber)
     
     else if(preparation->getTuning() == AdaptiveAnchoredTuning)
     {
-        if(clusterTime > preparation->getAdaptiveClusterThresh() || adaptiveHistoryCounter > preparation->getAdaptiveHistory())
+        if(clusterTime * (1000.0 / sampleRate) > preparation->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= preparation->getAdaptiveHistory() - 1)
         {
             adaptiveHistoryCounter = 0;
             
             const Array<float> anchorTuning = tuningLibrary.getUnchecked(preparation->getAdaptiveAnchorScale());
-            adaptiveFundamentalFreq = mtof(
-                                           midiNoteNumber +
-                                           anchorTuning[midiNoteNumber + preparation->getAdaptiveAnchorFundamental() % 12]
+            adaptiveFundamentalFreq = mtof(midiNoteNumber +
+                                           anchorTuning[(midiNoteNumber + preparation->getAdaptiveAnchorFundamental()) % 12]
                                            );
+            adaptiveFundamentalNote = midiNoteNumber;
         }
         else adaptiveHistoryCounter++;
     }
     
+    DBG("adaptive fundamental = " + std::to_string(ftom(adaptiveFundamentalFreq)));
     clusterTime = 0;
     
 }
@@ -97,7 +99,7 @@ float TuningProcessor::adaptiveCalculateRatio(const int midiNoteNumber) const
 {
     int tempnote = midiNoteNumber;
     float newnote;
-    float newratio = 1.;
+    float newratio;
     
     const Array<float> intervalScale = tuningLibrary.getUnchecked(preparation->getAdaptiveIntervalScale());
     
@@ -122,7 +124,7 @@ float TuningProcessor::adaptiveCalculateRatio(const int midiNoteNumber) const
 float TuningProcessor::adaptiveCalculate(int midiNoteNumber) const
 {
     float newnote = adaptiveFundamentalFreq * adaptiveCalculateRatio(midiNoteNumber);
-    return ftom(newnote);
+    return ftom(newnote) - midiNoteNumber;
 }
 
 

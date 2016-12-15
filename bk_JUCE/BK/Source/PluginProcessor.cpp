@@ -77,6 +77,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     {
         sProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);
         nProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);
+        dProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);
     }
 }
 

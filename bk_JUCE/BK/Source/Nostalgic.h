@@ -159,7 +159,7 @@ public:
     
     virtual ~NostalgicProcessor();
     
-    inline void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr;}
+    void setCurrentPlaybackSampleRate(double sr);
     
     //called with every audio vector
     void processBlock(int numSamples, int midiChannel);

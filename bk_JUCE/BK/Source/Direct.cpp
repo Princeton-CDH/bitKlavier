@@ -31,10 +31,17 @@ DirectProcessor::~DirectProcessor(void)
     
 }
 
+void DirectProcessor::setCurrentPlaybackSampleRate(double sr)
+{
+    sampleRate = sr;
+    tuner.setCurrentPlaybackSampleRate(sr);
+}
+
 void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 {
     if (keymap->containsNote(noteNumber))
     {
+        tuner.keyOn(noteNumber);
         synth->keyOn(
                      channel,
                      noteNumber,

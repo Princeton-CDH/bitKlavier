@@ -41,6 +41,12 @@ SynchronicProcessor::~SynchronicProcessor()
 {
 }
 
+void SynchronicProcessor::setCurrentPlaybackSampleRate(double sr)
+{
+    sampleRate = sr;
+    tuner.setCurrentPlaybackSampleRate(sr);
+}
+
 
 
 void SynchronicProcessor::playNote(int channel, int note)

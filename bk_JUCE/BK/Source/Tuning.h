@@ -145,6 +145,8 @@ public:
     
     void setPreparation(TuningPreparation::Ptr prep) {preparation = prep;}
     
+    inline void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr;}
+    
     //returns tuning offsets; add to integer PitchClass
     float getOffset(int midiNoteNumber) const;
     
@@ -178,7 +180,9 @@ private:
     
     int     adaptiveFundamentalNote = 60; //moves with adaptive tuning
     float   adaptiveFundamentalFreq = mtof(adaptiveFundamentalNote);
-    int     adaptiveHistoryCounter;
+    int     adaptiveHistoryCounter = 0;
+    
+    double sampleRate;
     
     
     /* Array of all the default tunings

@@ -49,6 +49,12 @@ NostalgicProcessor::~NostalgicProcessor()
 {
 }
 
+void NostalgicProcessor::setCurrentPlaybackSampleRate(double sr)
+{
+    sampleRate = sr;
+    tuner.setCurrentPlaybackSampleRate(sr);
+}
+
 void NostalgicProcessor::playNote(int channel, int note)
 {
     
