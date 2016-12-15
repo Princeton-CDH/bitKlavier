@@ -40,16 +40,16 @@ numDirectLayers(12)
     
     for (int i = 0; i < aMaxNumLayers; i++)
     {
-        sPreparation.add(new SynchronicPreparation(i));
-        nPreparation.add(new NostalgicPreparation(i));
-        dPreparation.add(new DirectPreparation(i));
+        sPreparation.add(new SynchronicPreparation(i, tPreparation[0]));
+        nPreparation.add(new NostalgicPreparation(i, tPreparation[0]));
+        dPreparation.add(new DirectPreparation(i, tPreparation[0]));
     }
     
     for (int i = 0; i < aMaxNumLayers; i++)
     {
-        sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, bkKeymaps[0], sPreparation[0], tPreparation[0], i));
-        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, bkKeymaps[0], nPreparation[0], tPreparation[0], sProcessor, i));
-        dProcessor.insert(i, new DirectProcessor(&mainPianoSynth, bkKeymaps[0], dPreparation[0], tPreparation[0], i));
+        sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, bkKeymaps[0], sPreparation[0], i));
+        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, bkKeymaps[0], nPreparation[0], sProcessor, i));
+        dProcessor.insert(i, new DirectProcessor(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, bkKeymaps[0], dPreparation[0], i));
     }
     
     // For testing and developing, let's keep directory of samples in home folder on disk.

@@ -151,6 +151,10 @@ void SynchronicViewController::textFieldDidChange(TextEditor& tf)
         Array<float> transpOffsets = stringToFloatArray(text);
         prep->setTranspOffsets(transpOffsets);
     }
+    else if (name == cSynchronicParameterTypes[SynchronicTuning])
+    {
+        prep->setTuning(processor.tPreparation[i]);
+    }
     else
     {
         DBG("Unregistered text field entered input.");
@@ -175,6 +179,7 @@ void SynchronicViewController::updateFields(int synchronicId)
     synchronicTF[SynchronicLengthMultipliers]   ->setText(  floatArrayToString(     prep->getLengthMultipliers()));
     synchronicTF[SynchronicAccentMultipliers]   ->setText(  floatArrayToString(     prep->getAccentMultipliers()));
     synchronicTF[SynchronicTranspOffsets]       ->setText(  floatArrayToString(     prep->getTranspOffsets()));
+    synchronicTF[SynchronicTuning]              ->setText(  String(prep->getTuning()->getId()));
 }
 
 

@@ -37,7 +37,8 @@ public:
                           Array<float> beatMultipliers,
                           Array<float> accentMultipliers,
                           Array<float> lengthMultipliers,
-                          Array<float> transpOffsets):
+                          Array<float> transpOffsets,
+                          TuningPreparation::Ptr t):
     Id(Id),
     sTempo(tempo),
     sNumPulses(numPulses),
@@ -51,12 +52,13 @@ public:
     sLengthMultipliers(lengthMultipliers),
     sTranspOffsets(transpOffsets),
     sPulseThreshSec(60.0/sTempo),
-    sClusterThreshSec(sPulseThreshSec * sClusterThresh)
+    sClusterThreshSec(sPulseThreshSec * sClusterThresh),
+    tuning(t)
     {
     }
 
     
-    SynchronicPreparation(int Id):
+    SynchronicPreparation(int Id, TuningPreparation::Ptr t):
     Id(Id),
     sTempo(120),
     sNumPulses(0),
@@ -70,7 +72,8 @@ public:
     sLengthMultipliers(Array<float>({1.0})),
     sTranspOffsets(Array<float>({0.0})),
     sPulseThreshSec(60.0/sTempo),
-    sClusterThreshSec(sPulseThreshSec * sClusterThresh)
+    sClusterThreshSec(sPulseThreshSec * sClusterThresh),
+    tuning(t)
     {
     }
     
@@ -117,6 +120,9 @@ public:
     inline void setTranspOffsets(Array<float> transpOffsets)           {sTranspOffsets.swapWith(transpOffsets);            }
     inline void setLengthMultipliers(Array<float> lengthMultipliers)   {sLengthMultipliers.swapWith(lengthMultipliers);    }
     
+    inline const TuningPreparation::Ptr getTuning() const noexcept      {return tuning; }
+    inline void setTuning(TuningPreparation::Ptr t)                       {tuning = t;  }
+    
     void print(void)
     {
         DBG("| - - - Synchronic Preparation - - - |");
@@ -151,6 +157,8 @@ private:
     float sPulseThreshSec;
     float sClusterThreshSec;
     
+    TuningPreparation::Ptr tuning;
+    
     JUCE_LEAK_DETECTOR(SynchronicPreparation);
 };
 
@@ -162,11 +170,9 @@ public:
     typedef Array<SynchronicProcessor::Ptr>                  Arr;
     typedef Array<SynchronicProcessor::Ptr, CriticalSection> CSArr;
     
-    SynchronicProcessor(
-                        BKSynthesiser *synth,
+    SynchronicProcessor(BKSynthesiser *synth,
                         Keymap::Ptr km,
                         SynchronicPreparation::Ptr prep,
-                        TuningPreparation::Ptr tPrep,
                         int Id);
     
     ~SynchronicProcessor();
@@ -188,17 +194,11 @@ public:
     inline SynchronicPreparation::Ptr       getPreparation(void)                            { return preparation;           }
     inline int                              getPreparationId(void)                          { return preparation->getId();  }
     
-    inline void                             setTuning(TuningPreparation::Ptr t) { tuning = t; tuner.setPreparation(tuning);       }
-    inline TuningPreparation::Ptr           getTuning(void)                     { return tuning;           }
-    inline int                              getTuningId(void)                   { return tuning->getId();  }
-    
 private:
     int Id;
     BKSynthesiser*              synth;
     Keymap::Ptr                 keymap;
     SynchronicPreparation::Ptr  preparation;
-    
-    TuningPreparation::Ptr      tuning;
     
     TuningProcessor             tuner;
     

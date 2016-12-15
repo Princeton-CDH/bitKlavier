@@ -13,15 +13,13 @@
 NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s,
                                        Keymap::Ptr km,
                                        NostalgicPreparation::Ptr prep,
-                                       TuningPreparation::Ptr tPrep,
                                        SynchronicProcessor::CSArr& proc,
                                        int id):
 Id(id),
 synth(s),
 keymap(km),
 preparation(prep),
-tuning(tPrep),
-tuner(tPrep, id),
+tuner(preparation->getTuning(), id),
 syncProcessor(proc)
 {
     noteLengthTimers.ensureStorageAllocated(128);
@@ -118,6 +116,8 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
 //start timer for length of a particular note; called when key is pressed
 void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity)
 {
+    tuner.setPreparation(preparation->getTuning());
+    
     if (keymap->containsNote(midiNoteNumber))
     {
         activeNotes.addIfNotAlreadyThere(midiNoteNumber);

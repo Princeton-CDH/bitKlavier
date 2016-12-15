@@ -22,7 +22,7 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth, int numLayers)
     String path = "~/samples/";
     
     // 88 or more seems to work well
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 150; i++)
     {
         synth->addVoice(new BKPianoSamplerVoice());
     }

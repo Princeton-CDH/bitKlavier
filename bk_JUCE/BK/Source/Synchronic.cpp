@@ -13,15 +13,13 @@
 SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s,
                                          Keymap::Ptr km,
                                          SynchronicPreparation::Ptr p,
-                                         TuningPreparation::Ptr t,
                                          int id)
 :
 Id(id),
 synth(s),
 keymap(km),
 preparation(p),
-tuning(t),
-tuner(t, Id)
+tuner(preparation->getTuning(), Id)
 {
     clusterTimer = 0;
     phasor = 0;
@@ -81,7 +79,8 @@ void SynchronicProcessor::playNote(int channel, int note)
 
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
-
+    tuner.setPreparation(preparation->getTuning());
+    
     if (keymap->containsNote(noteNumber))
     {
         if (inCluster)

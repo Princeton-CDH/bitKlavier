@@ -39,7 +39,8 @@ public:
                          NostalgicSyncMode mode,
                          int syncTarget,
                          TuningSystem tuning,
-                         PitchClass basePitch):
+                         PitchClass basePitch,
+                         TuningPreparation::Ptr t):
     Id(Id),
     nWaveDistance(waveDistance),
     nUndertow(undertow),
@@ -49,13 +50,12 @@ public:
     nBeatsToSkip(beatsToSkip),
     nMode(mode),
     nSyncTarget(syncTarget),
-    nTuning(tuning),
-    nBasePitch(basePitch)
+    tuning(t)
     {
         
     }
     
-    NostalgicPreparation(int Id):
+    NostalgicPreparation(int Id, TuningPreparation::Ptr t):
     Id(Id),
     nWaveDistance(0),
     nUndertow(0),
@@ -65,8 +65,7 @@ public:
     nBeatsToSkip(0.0),
     nMode(NoteLengthSync),
     nSyncTarget(0),
-    nTuning(PartialTuning),
-    nBasePitch(C)
+    tuning(t)
     {
 
     }
@@ -85,8 +84,6 @@ public:
     inline const float getBeatsToSkip() const noexcept                     {return nBeatsToSkip;       }
     inline const NostalgicSyncMode getMode() const noexcept                {return nMode;              }
     inline const int getSyncTarget() const noexcept                        {return nSyncTarget;        }
-    inline const TuningSystem getTuning() const noexcept                   {return nTuning;            }
-    inline const PitchClass getBasePitch() const noexcept                  {return nBasePitch;         }
     
     inline int getId(void) {   return Id; }
     
@@ -98,8 +95,9 @@ public:
     inline void setBeatsToSkip(float beatsToSkip)                          {nBeatsToSkip = beatsToSkip;            }
     inline void setMode(NostalgicSyncMode mode)                            {nMode = mode;                          }
     inline void setSyncTarget(int syncTarget)                              {nSyncTarget = syncTarget;              }
-    inline void setTuning(TuningSystem tuning)                             {nTuning = tuning;                      }
-    inline void setBasePitch(PitchClass basePitch)                         {nBasePitch = basePitch;                }
+    
+    inline const TuningPreparation::Ptr getTuning() const noexcept      {return tuning; }
+    inline void setTuning(TuningPreparation::Ptr t)                       {tuning = t;  }
     
     
 
@@ -113,8 +111,8 @@ public:
         DBG("nBeatsToSkip: " + String(nBeatsToSkip));
         DBG("nMode: " + String(nMode));
         DBG("nSyncTarget: " + String(nSyncTarget));
-        DBG("nBasePitch: " + String(nBasePitch));
     }
+    
 private:
     int Id;
     int nWaveDistance;  //ms; distance from beginning of sample to stop reverse playback and begin undertow
@@ -135,8 +133,7 @@ private:
     NostalgicSyncMode nMode;    //which sync mode to use
     int nSyncTarget;            //which synchronic layer to sync to, when nMode = NostalgicSyncSynchronic
     
-    TuningSystem nTuning;
-    PitchClass nBasePitch;
+    TuningPreparation::Ptr tuning;
     
     JUCE_LEAK_DETECTOR(NostalgicPreparation);
 };
@@ -153,7 +150,6 @@ public:
                        BKSynthesiser *s,
                        Keymap::Ptr km,
                        NostalgicPreparation::Ptr prep,
-                       TuningPreparation::Ptr tPrep,
                        SynchronicProcessor::CSArr& proc,
                        int Id);
     
@@ -172,7 +168,6 @@ public:
     
     inline void setKeymap(Keymap::Ptr km)   { keymap = km;  }
     inline void setPreparation(NostalgicPreparation::Ptr prep)  { preparation = prep;   }
-    //inline void setTuning(TuningProcessor::Ptr t)   { tuner = t;    }
     
     int                         getId(void)             { return Id;            }    
     Keymap::Ptr                 getKeymap(void)         { return keymap;        }
@@ -181,16 +176,12 @@ public:
     int getKeymapId(void)       { return keymap->getId();       }
     int getPreparationId(void)  { return preparation->getId();  }
     
-    inline void                             setTuning(TuningPreparation::Ptr t) { tuning = t;  tuner.setPreparation(tuning);         }
-    inline TuningPreparation::Ptr           getTuning(void)                     { return tuning;           }
-    inline int                              getTuningId(void)                   { return tuning->getId();  }
-    
 private:
     int Id;
     BKSynthesiser*              synth;
     Keymap::Ptr                 keymap;
     NostalgicPreparation::Ptr   preparation;
-    TuningPreparation::Ptr      tuning;
+
     TuningProcessor             tuner;
     
     //target Synchronic layer

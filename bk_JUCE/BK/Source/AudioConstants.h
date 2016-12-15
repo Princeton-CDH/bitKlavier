@@ -160,6 +160,7 @@ typedef enum SynchronicParameterType {
     SynchronicLengthMultipliers,
     SynchronicAccentMultipliers,
     SynchronicTranspOffsets,
+    SynchronicTuning,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
@@ -175,7 +176,8 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "SynchronicBeatMultipliers",
     "SynchronicLengthMultipliers",
     "SynchronicAccentMultipliers",
-    "SynchronicTranspOffsets"
+    "SynchronicTranspOffsets",
+    "Tuning Id"
 };
 
 #pragma mark - Nostalgic
@@ -195,7 +197,9 @@ typedef enum NostalgicParameterType {
     NostalgicBeatsToSkip,
     NostalgicMode,
     NostalgicSyncTarget,
+    NostalgicTuning,
     NostalgicParameterTypeNil
+    
 } NostalgicParameterType;
 
 static const std::vector<std::string> cNostalgicParameterTypes = {
@@ -207,7 +211,8 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
     "NostalgicLengthMultiplier",
     "NostalgicBeatsToSkip",
     "NostalgicMode",
-    "NostalgicSyncTarget"
+    "NostalgicSyncTarget",
+    "Tuning Id"
 };
 
 #pragma mark - Direct
@@ -216,7 +221,9 @@ typedef enum DirectParameterType
     DirectId = 0,
     DirectTransposition,
     DirectGain,
-    DirectOverlay,
+    DirectResGain,
+    DirectHammerGain,
+    DirectTuning,
     DirectParameterTypeNil,
     
 } DirectParameterType;
@@ -225,7 +232,9 @@ static const std::vector<std::string> cDirectParameterTypes = {
     "Direct Id",
     "DirectTransposition",
     "DirectGain",
-    "DirectOverlay"
+    "DirectResGain",
+    "DirectHammerGain",
+    "Tuning Id"
 };
 
 #pragma mark - Tuning
@@ -266,7 +275,6 @@ typedef enum LayerTFIndex
 {
     LayerKeymapId = 0,
     LayerPreparationId,
-    LayerTuningId,
     LayerParameterTypeNil
     
 } LayerTFIndex;
@@ -275,8 +283,7 @@ static const std::vector<std::string> cLayerParameterTypes = {
     "LayerType",
     "LayerNumber",
     "LayerKeymap Id",
-    "LayerPreparation Id",
-    "LayerTuning Id"
+    "LayerPreparation Id"
 };
 
 #pragma mark - Keymap
@@ -306,15 +313,16 @@ static const int aRampUndertowCrossMS = 50;
 
 // Sample layers
 static const int aNumSampleLayers = 2;
+
 static const int aVelocityThresh_Eight[9] = {
     0,
-    25,
-    42,
-    60,
-    76,
-    90,
-    104,
-    116,
+    30,
+    50,
+    68,
+    84,
+    98,
+    110,
+    120,
     128
 };
 

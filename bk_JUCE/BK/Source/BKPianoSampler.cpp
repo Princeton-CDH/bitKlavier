@@ -111,7 +111,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         {
             if (playType == Normal)
             {
-                sourceSamplePosition = 0.0;
+                sourceSamplePosition = 220; //was 0.0
                 playEndPosition = maxLength - 1;
             }
             else if (playType == NormalFixedStart)

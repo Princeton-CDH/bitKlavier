@@ -30,20 +30,27 @@ public:
     DirectPreparation(int Id,
                       float transp,
                       float gain,
-                      bool overlay):
+                      bool resAndHammer,
+                      float resGain,
+                      float hamGain,
+                      TuningPreparation::Ptr t):
     Id(Id),
     dTransposition(transp),
     dGain(gain),
-    dOverlay(overlay)
+    dResonanceGain(resGain),
+    dHammerGain(hamGain),
+    tuning(t)
     {
         
     }
     
-    DirectPreparation(int Id):
+    DirectPreparation(int Id, TuningPreparation::Ptr t):
     Id(Id),
     dTransposition(0.0),
     dGain(1.0),
-    dOverlay(false)
+    dResonanceGain(1.0),
+    dHammerGain(1.0),
+    tuning(t)
     {
         
     }
@@ -56,11 +63,15 @@ public:
     
     inline const float getTransposition() const noexcept                   {return dTransposition; }
     inline const float getGain() const noexcept                            {return dGain;          }
-    inline const bool getOverlay() const noexcept                          {return dOverlay;       }
+    inline const bool getResonanceGain() const noexcept                     {return dResonanceGain;       }
+    inline const bool getHammerGain() const noexcept                     {return dHammerGain;       }
+    inline const TuningPreparation::Ptr getTuning() const noexcept      {return tuning; }
     
     inline void setTransposition(float val)                                {dTransposition = val;  }
     inline void setGain(float val)                                         {dGain = val;           }
-    inline void setOverlay(bool val)                                       {dOverlay = val;        }
+    inline void setResonanceGain(float val)                                  {dResonanceGain = val;        }
+    inline void setHammerGain(float val)                                  {dHammerGain = val;        }
+    inline void setTuning(TuningPreparation::Ptr t)                       {tuning = t;  }
     
     inline int getId(void) {   return Id; }
     
@@ -68,7 +79,8 @@ public:
     {
         DBG("dTransposition: "  + String(dTransposition));
         DBG("dGain: "           + String(dGain));
-        DBG("dOverlay: "        + String((int)dOverlay));
+        DBG("dResGain: "        + String(dResonanceGain));
+        DBG("dHammerGain: "     + String(dHammerGain));
     }
 
 private:
@@ -77,7 +89,9 @@ private:
     
     float   dTransposition;       //transposition, in half steps
     float   dGain;                //gain multiplier
-    bool    dOverlay;
+    float dResonanceGain, dHammerGain;
+    
+    TuningPreparation::Ptr tuning;
     
     JUCE_LEAK_DETECTOR(DirectPreparation);
 };
@@ -91,11 +105,11 @@ public:
     typedef Array<DirectProcessor::Ptr>                  Arr;
     typedef Array<DirectProcessor::Ptr, CriticalSection> CSArr;
     
-    DirectProcessor(
-                    BKSynthesiser *s,
+    DirectProcessor(BKSynthesiser *s,
+                    BKSynthesiser *res,
+                    BKSynthesiser *ham,
                     Keymap::Ptr km,
                     DirectPreparation::Ptr prep,
-                    TuningPreparation::Ptr tPrep,
                     int Id);
     
     ~DirectProcessor();
@@ -114,10 +128,6 @@ public:
     int                     getKeymapId(void) const                     { return keymap->getId();           }
     int                     getPreparationId(void) const                { return preparation->getId();      }
     
-    inline void                             setTuning(TuningPreparation::Ptr t) { tuning = t; tuner.setPreparation(tuning); }
-    inline TuningPreparation::Ptr           getTuning(void)                     { return tuning;           }
-    inline int                              getTuningId(void)                   { return tuning->getId();  }
-    
     void    keyPressed(int noteNumber, float velocity, int channel);
     void    keyReleased(int noteNumber, float velocity, int channel);
     
@@ -126,9 +136,10 @@ private:
     int                         Id;
     
     BKSynthesiser*              synth;
+    BKSynthesiser*              resonanceSynth;
+    BKSynthesiser*              hammerSynth;
     Keymap::Ptr                 keymap;
     DirectPreparation::Ptr      preparation;
-    TuningPreparation::Ptr      tuning;
     TuningProcessor             tuner;
     
     double sampleRate;

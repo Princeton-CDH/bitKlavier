@@ -12,16 +12,18 @@
 
 
 DirectProcessor::DirectProcessor(BKSynthesiser *s,
-                Keymap::Ptr km,
-                DirectPreparation::Ptr prep,
-                TuningPreparation::Ptr tPrep,
-                int id):
+                                 BKSynthesiser *res,
+                                 BKSynthesiser *ham,
+                                 Keymap::Ptr km,
+                                 DirectPreparation::Ptr prep,
+                                 int id):
 Id(id),
 synth(s),
+resonanceSynth(res),
+hammerSynth(ham),
 keymap(km),
 preparation(prep),
-tuning(tPrep),
-tuner(tPrep, id)
+tuner(preparation->getTuning(), id)
 {
     
 }
@@ -39,6 +41,8 @@ void DirectProcessor::setCurrentPlaybackSampleRate(double sr)
 
 void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 {
+    tuner.setPreparation(preparation->getTuning());
+    
     if (keymap->containsNote(noteNumber))
     {
         tuner.keyOn(noteNumber);
@@ -67,6 +71,43 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
                       noteNumber,
                       velocity,
                       true);
+        
+        float hGain = preparation->getHammerGain();
+        float rGain = preparation->getResonanceGain();
+        
+        if (hGain > 0.0f)
+        {
+            DBG("hammer: " + String(hGain*velocity));
+            hammerSynth->keyOn(
+                                     channel,
+                                     noteNumber,
+                                     0,
+                                     hGain, //will want hammerGain multipler that user can set
+                                     Forward,
+                                     FixedLength,
+                                     Hammer,
+                                     0,
+                                     2000,
+                                     3,
+                                     3 );
+        }
+        
+        if (rGain > 0.0f)
+        {
+            DBG("release: " + String(rGain*velocity));
+            resonanceSynth->keyOn(
+                                        channel,
+                                        noteNumber,
+                                        0., //do we need to tune this? probably should put in Direct keyOff
+                                        rGain, //will also want multiplier for resonance gain...
+                                        Forward,
+                                        FixedLength,
+                                        Resonance,
+                                        0,
+                                        2000,
+                                        3,
+                                        3 );
+        }
     }
 }
 

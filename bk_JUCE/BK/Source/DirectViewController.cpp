@@ -103,9 +103,17 @@ void DirectViewController::textFieldDidChange(TextEditor& tf)
     {
         prep->setGain(f);
     }
-    else if (name == cDirectParameterTypes[DirectOverlay])
+    else if (name == cDirectParameterTypes[DirectHammerGain])
     {
-        prep->setOverlay((bool)i);
+        prep->setHammerGain(f);
+    }
+    else if (name == cDirectParameterTypes[DirectResGain])
+    {
+        prep->setResonanceGain(f);
+    }
+    else if (name == cDirectParameterTypes[DirectTuning])
+    {
+        prep->setTuning(processor.tPreparation[i]);
     }
     else
     {
@@ -119,10 +127,12 @@ void DirectViewController::updateFields(int directId)
     
     DirectPreparation::Ptr prep = processor.dPreparation[directId];
     
-    directTF[DirectId]                ->setText( String( directId));
-    directTF[DirectTransposition]     ->setText( String( prep->getTransposition()));
-    directTF[DirectGain]              ->setText( String( prep->getGain()));
-    directTF[DirectOverlay]           ->setText( String( prep->getOverlay()));
+    directTF[DirectId]                  ->setText( String( directId));
+    directTF[DirectTransposition]       ->setText( String( prep->getTransposition()));
+    directTF[DirectGain]                ->setText( String( prep->getGain()));
+    directTF[DirectHammerGain]          ->setText( String( prep->getHammerGain()));
+    directTF[DirectResGain]             ->setText( String( prep->getResonanceGain()));
+    directTF[DirectTuning]              ->setText( String(prep->getTuning()->getId()));
 
 }
 
