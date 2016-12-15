@@ -282,6 +282,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                const int midiNoteNumber,
                                const float transp,
                                const float velocity,
+                               const float gain,
                                PianoSamplerNoteDirection direction,
                                PianoSamplerNoteType type,
                                BKNoteType bktype,
@@ -323,7 +324,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                             midiChannel,
                             midiNoteNumber,
                             transp,
-                            velocity,
+                            velocity * gain,
                             direction,
                             type,
                             bktype,
@@ -341,7 +342,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                     const int midiChannel,
                                     const int midiNoteNumber,
                                     const float midiNoteNumberOffset,
-                                    const float velocity,
+                                    const float volume,
                                     PianoSamplerNoteDirection direction,
                                     PianoSamplerNoteType type,
                                     BKNoteType bktype,
@@ -371,7 +372,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             voice->sostenutoPedalDown = false;
             voice->sustainPedalDown = sustainPedalsDown[midiChannel];
             
-            float gain = velocity;
+            float gain = volume;
             
             if (bktype == Main)
             {

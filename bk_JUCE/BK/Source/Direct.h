@@ -63,8 +63,8 @@ public:
     
     inline const float getTransposition() const noexcept                   {return dTransposition; }
     inline const float getGain() const noexcept                            {return dGain;          }
-    inline const bool getResonanceGain() const noexcept                     {return dResonanceGain;       }
-    inline const bool getHammerGain() const noexcept                     {return dHammerGain;       }
+    inline const float getResonanceGain() const noexcept                     {return dResonanceGain;       }
+    inline const float getHammerGain() const noexcept                     {return dHammerGain;       }
     inline const TuningPreparation::Ptr getTuning() const noexcept      {return tuning; }
     
     inline void setTransposition(float val)                                {dTransposition = val;  }

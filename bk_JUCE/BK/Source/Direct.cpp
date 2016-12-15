@@ -46,11 +46,11 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
     if (keymap->containsNote(noteNumber))
     {
         tuner.keyOn(noteNumber);
-        synth->keyOn(
-                     channel,
+        synth->keyOn(channel,
                      noteNumber,
                      tuner.getOffset(noteNumber) + preparation->getTransposition(),
-                     velocity * preparation->getGain() * aGlobalGain,
+                     velocity,
+                     preparation->getGain() * aGlobalGain,
                      Forward,
                      Normal,
                      Main,
@@ -77,12 +77,13 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
         
         if (hGain > 0.0f)
         {
-            DBG("hammer: " + String(hGain*velocity));
+            DBG("hammer: " + String(hGain));
             hammerSynth->keyOn(
                                      channel,
                                      noteNumber,
                                      0,
-                                     hGain, //will want hammerGain multipler that user can set
+                                     velocity,
+                                     hGain,
                                      Forward,
                                      FixedLength,
                                      Hammer,
@@ -94,12 +95,13 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
         
         if (rGain > 0.0f)
         {
-            DBG("release: " + String(rGain*velocity));
+            DBG("release: " + String(rGain));
             resonanceSynth->keyOn(
                                         channel,
                                         noteNumber,
-                                        0., //do we need to tune this? probably should put in Direct keyOff
-                                        rGain, //will also want multiplier for resonance gain...
+                                        0, 
+                                        velocity,
+                                        rGain,
                                         Forward,
                                         FixedLength,
                                         Resonance,

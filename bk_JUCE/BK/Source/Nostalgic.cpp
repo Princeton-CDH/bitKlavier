@@ -81,7 +81,8 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
                      midiChannel,
                      midiNoteNumber,
                      tuner.getOffset(midiNoteNumber) + preparation->getTransposition(),
-                     velocities.getUnchecked(midiNoteNumber) * preparation->getGain() * aGlobalGain,
+                     velocities.getUnchecked(midiNoteNumber),
+                     preparation->getGain() * aGlobalGain,
                      Reverse,
                      FixedLengthFixedStart,
                      Nostalgic,
@@ -147,11 +148,11 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
  
             if(noteOnPrep->getUndertow() > 0)
             {
-                synth->keyOn(
-                             midiChannel,
+                synth->keyOn(midiChannel,
                              tempnote,
                              tuningsAtKeyOn.getUnchecked(tempnote) + noteOnPrep->getTransposition(),
-                             velocitiesAtKeyOn.getUnchecked(tempnote) * aGlobalGain,
+                             velocitiesAtKeyOn.getUnchecked(tempnote),
+                             aGlobalGain,
                              Forward,
                              FixedLengthFixedStart,
                              Nostalgic,

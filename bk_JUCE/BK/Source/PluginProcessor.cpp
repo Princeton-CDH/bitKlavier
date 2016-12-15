@@ -172,46 +172,6 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
                                            channel);
             }
             
-            /*
-            mainPianoSynth.keyOff(
-                                  channel,
-                                  noteNumber,
-                                  velocity,
-                                  true
-                                  );
-             */
-            
-            //embed these in Direct, have toggle in DirectPreparation to turn these on, have on by default in layer 1 only
-            if (general->getResonanceAndHammer())
-            {
-                hammerReleaseSynth.keyOn(
-                                         channel,
-                                         noteNumber,
-                                         0,
-                                         velocity * 0.0025 * aGlobalGain, //will want hammerGain multipler that user can set
-                                         Forward,
-                                         FixedLength,
-                                         Hammer,
-                                         0,
-                                         2000,
-                                         3,
-                                         3 );
-                
-                resonanceReleaseSynth.keyOn(
-                                            channel,
-                                            noteNumber,
-                                            0., //do we need to tune this? probably should put in Direct keyOff
-                                            velocity * aGlobalGain, //will also want multiplier for resonance gain...
-                                            Forward,
-                                            FixedLength,
-                                            Resonance,
-                                            0,
-                                            2000,
-                                            3,
-                                            3 );
-            }
-            
-            
         }
         else if (m.isAftertouch())
         {
