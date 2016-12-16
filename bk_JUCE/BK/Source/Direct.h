@@ -61,17 +61,17 @@ public:
     }
     
     
-    inline const float getTransposition() const noexcept                   {return dTransposition; }
-    inline const float getGain() const noexcept                            {return dGain;          }
-    inline const float getResonanceGain() const noexcept                     {return dResonanceGain;       }
-    inline const float getHammerGain() const noexcept                     {return dHammerGain;       }
-    inline const TuningPreparation::Ptr getTuning() const noexcept      {return tuning; }
+    inline const float getTransposition() const noexcept                {return dTransposition; }
+    inline const float getGain() const noexcept                         {return dGain;          }
+    inline const float getResonanceGain() const noexcept                {return dResonanceGain; }
+    inline const float getHammerGain() const noexcept                   {return dHammerGain;    }
+    inline const TuningPreparation::Ptr getTuning() const noexcept      {return tuning;         }
     
-    inline void setTransposition(float val)                                {dTransposition = val;  }
-    inline void setGain(float val)                                         {dGain = val;           }
-    inline void setResonanceGain(float val)                                  {dResonanceGain = val;        }
-    inline void setHammerGain(float val)                                  {dHammerGain = val;        }
-    inline void setTuning(TuningPreparation::Ptr t)                       {tuning = t;  }
+    inline void setTransposition(float val)                             {dTransposition = val;  }
+    inline void setGain(float val)                                      {dGain = val;           }
+    inline void setResonanceGain(float val)                             {dResonanceGain = val;  }
+    inline void setHammerGain(float val)                                {dHammerGain = val;     }
+    inline void setTuning(TuningPreparation::Ptr t)                     {tuning = t;            }
     
     inline int getId(void) {   return Id; }
     
@@ -89,7 +89,7 @@ private:
     
     float   dTransposition;       //transposition, in half steps
     float   dGain;                //gain multiplier
-    float dResonanceGain, dHammerGain;
+    float   dResonanceGain, dHammerGain;
     
     TuningPreparation::Ptr tuning;
     
@@ -134,7 +134,6 @@ public:
 private:
     
     int                         Id;
-    
     BKSynthesiser*              synth;
     BKSynthesiser*              resonanceSynth;
     BKSynthesiser*              hammerSynth;
