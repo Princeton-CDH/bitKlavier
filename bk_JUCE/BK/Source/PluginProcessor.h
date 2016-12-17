@@ -46,6 +46,11 @@ public:
     BKSynthesiser mainPianoSynth;
     BKSynthesiser hammerReleaseSynth;
     BKSynthesiser resonanceReleaseSynth;
+    
+    // Pianos
+    /*
+    Piano::CSArr                    pianos; //wraps all the keymaps, processors and preparations inside
+     */
 
     // Processors.
     SynchronicProcessor::CSArr      sProcessor;

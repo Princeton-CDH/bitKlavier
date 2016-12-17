@@ -106,8 +106,16 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     int numSamples = buffer.getNumSamples();
     
+    /*
+     for (int p = 0; p < aMaxNumPianos; p++)
+     {
+        if(pianos[p]->active) pianos[p]->processBlock(numSamples, m.getChannel());
+     }
+     */
+    
     // Process each layer.
     // Could put nostalgic->keyOff/playNote here: (1) have synchronic->processBlock return 1 if pulse happened, otherwise 0. if nostalgic->mode == SynchronicSync and make sure layer corresponds
+    
     for (int layer = 0; layer < numSynchronicLayers; layer++)
     {
         sProcessor[layer]->processBlock(numSamples, m.getChannel());
@@ -134,6 +142,12 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         if (m.isNoteOn())
         {
             
+            /*
+             for (int p = 0; p < aMaxNumPianos; p++)  //or < numCurrentPianos...
+             {
+                if(pianos[p]->active) pianos[p]->keyPressed(noteNumber, velocity, channel);
+             }
+             */
             // Send key on to each layer.
             for (int layer = 0; layer < numSynchronicLayers; layer++)
             {
@@ -153,6 +167,12 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         else if (m.isNoteOff())
         {
             
+            /*
+             for (int p = 0; p < aMaxNumPianos; p++)
+             {
+                if(pianos[p]->active) pianos[p]->keyReleased(noteNumber, velocity, channel);
+             }
+             */
             //need to integrate sProcess layer number here as well, just defaulting for the moment
             for (int i = 0; i < numNostalgicLayers; i++)
             {
