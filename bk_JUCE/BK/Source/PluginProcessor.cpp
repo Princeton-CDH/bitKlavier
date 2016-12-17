@@ -8,7 +8,7 @@
 
 //==============================================================================
 BKAudioProcessor::BKAudioProcessor():
-currentLayer            (new Layer(PreparationTypeDirect, 0 , 0 , 0, 0)),
+currentPiano            (new Piano(PreparationTypeDirect, 0 , 0 , 0, 0)),
 general                 (new GeneralSettings()),
 mainPianoSynth          (general),
 hammerReleaseSynth      (general),
@@ -25,27 +25,27 @@ numSynchronicLayers(12),
 numNostalgicLayers(12),
 numDirectLayers(12)
 {
-    sProcessor.ensureStorageAllocated(aMaxNumLayers);
-    nProcessor.ensureStorageAllocated(aMaxNumLayers);
-    dProcessor.ensureStorageAllocated(aMaxNumLayers);
+    sProcessor.ensureStorageAllocated(aMaxNumPianos);
+    nProcessor.ensureStorageAllocated(aMaxNumPianos);
+    dProcessor.ensureStorageAllocated(aMaxNumPianos);
     
-    tPreparation.ensureStorageAllocated(aMaxNumLayers * 3);
-    bkKeymaps.ensureStorageAllocated(aMaxNumLayers * 3);
+    tPreparation.ensureStorageAllocated(aMaxNumPianos * 3);
+    bkKeymaps.ensureStorageAllocated(aMaxNumPianos * 3);
     
-    for (int i = 0; i < (3 * aMaxNumLayers); i++)
+    for (int i = 0; i < (3 * aMaxNumPianos); i++)
     {
         bkKeymaps.add(new Keymap(i));
         tPreparation.add(new TuningPreparation(i));
     }
     
-    for (int i = 0; i < aMaxNumLayers; i++)
+    for (int i = 0; i < aMaxNumPianos; i++)
     {
         sPreparation.add(new SynchronicPreparation(i, tPreparation[0]));
         nPreparation.add(new NostalgicPreparation(i, tPreparation[0]));
         dPreparation.add(new DirectPreparation(i, tPreparation[0]));
     }
     
-    for (int i = 0; i < aMaxNumLayers; i++)
+    for (int i = 0; i < aMaxNumPianos; i++)
     {
         sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, bkKeymaps[0], sPreparation[0], i));
         nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, bkKeymaps[0], nPreparation[0], sProcessor, i));
@@ -73,7 +73,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     resonanceReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     
-    for (int i = 0; i < aMaxNumLayers; i++)
+    for (int i = 0; i < aMaxNumPianos; i++)
     {
         sProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);
         nProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);

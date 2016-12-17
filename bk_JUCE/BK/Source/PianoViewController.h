@@ -1,15 +1,15 @@
 /*
   ==============================================================================
 
-    LayerViewController.h
+    PianoViewController.h
     Created: 8 Dec 2016 12:54:41am
     Author:  Michael R Mulshine
 
   ==============================================================================
 */
 
-#ifndef LAYERVIEWCONTROLLER_H_INCLUDED
-#define LAYERVIEWCONTROLLER_H_INCLUDED
+#ifndef PIANOVIEWCONTROLLER_H_INCLUDED
+#define PIANOVIEWCONTROLLER_H_INCLUDED
 
 #include "BKUtilities.h"
 
@@ -23,17 +23,17 @@
 
 #include "BKMenu.h"
 
-#include "Layer.h"
+#include "Piano.h"
 
 
 //==============================================================================
 /*
 */
-class LayerViewController    : public BKViewController, public ActionBroadcaster, public ComboBox::Listener
+class PianoViewController    : public BKViewController, public ActionBroadcaster, public ComboBox::Listener
 {
 public:
-    LayerViewController(BKAudioProcessor& , Layer::Ptr);
-    ~LayerViewController();
+    PianoViewController(BKAudioProcessor& , Piano::Ptr);
+    ~PianoViewController();
 
     void paint (Graphics&) override;
     void resized() override;
@@ -42,25 +42,25 @@ private:
     
     BKAudioProcessor& processor;
     
-    Layer::Ptr current;
+    Piano::Ptr current;
     
-    OwnedArray<BKComboBox> layerCB;
+    OwnedArray<BKComboBox> pianoCB;
     
     // BKLabels
-    OwnedArray<BKLabel> layerL;
-    OwnedArray<BKTextField> layerTF;
+    OwnedArray<BKLabel> pianoL;
+    OwnedArray<BKTextField> pianoTF;
     
     
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
     
     void textFieldDidChange(TextEditor&) override;
     
-    void switchToLayer(BKPreparationType type, int layer);
+    void switchToPiano(BKPreparationType type, int piano);
     
     void updateFields(void);
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LayerViewController)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PianoViewController)
 };
 
 
-#endif  // LAYERVIEWCONTROLLER_H_INCLUDED
+#endif  // PIANOVIEWCONTROLLER_H_INCLUDED

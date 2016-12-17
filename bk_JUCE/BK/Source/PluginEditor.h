@@ -21,7 +21,7 @@
 
 #include "GeneralViewController.h"
 
-#include "LayerViewController.h"
+#include "PianoViewController.h"
 #include "KeymapViewController.h"
 
 
@@ -47,7 +47,7 @@ private:
     
     BKAudioProcessor& processor;
     
-    LayerViewController         lvc;
+    PianoViewController         lvc;
     KeymapViewController        kvc;
     GeneralViewController       gvc;
     SynchronicViewController    svc;

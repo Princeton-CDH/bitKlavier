@@ -140,7 +140,7 @@ void DirectViewController::actionListenerCallback (const String& message)
 {
     if (message == "direct/update")
     {
-        currentDirectId = processor.currentLayer->getPreparation();
+        currentDirectId = processor.currentPiano->getPreparation();
         
         updateFields(currentDirectId);
     }

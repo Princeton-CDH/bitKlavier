@@ -60,8 +60,8 @@
                 file="Source/PluginEditor.cpp"/>
           <FILE id="ubAlA4" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
         </GROUP>
-        <GROUP id="{047FD2F8-E8BA-EA56-25D7-A60B1DB51FE3}" name="Layer">
-          <FILE id="jW1Js5" name="Layer.h" compile="0" resource="0" file="Source/Layer.h"/>
+        <GROUP id="{047FD2F8-E8BA-EA56-25D7-A60B1DB51FE3}" name="Piano">
+          <FILE id="jW1Js5" name="Piano.h" compile="0" resource="0" file="Source/Piano.h"/>
         </GROUP>
         <GROUP id="{D95FF283-C159-D64C-6BE8-DFE35BF1BDDA}" name="Keymap">
           <FILE id="hJbk7x" name="Keymap.h" compile="0" resource="0" file="Source/Keymap.h"/>
@@ -85,10 +85,10 @@
               file="Source/KeymapViewController.cpp"/>
         <FILE id="kWVW2o" name="KeymapViewController.h" compile="0" resource="0"
               file="Source/KeymapViewController.h"/>
-        <FILE id="CDxv1I" name="LayerViewController.cpp" compile="1" resource="0"
-              file="Source/LayerViewController.cpp"/>
-        <FILE id="fVTWbs" name="LayerViewController.h" compile="0" resource="0"
-              file="Source/LayerViewController.h"/>
+        <FILE id="CDxv1I" name="PianoViewController.cpp" compile="1" resource="0"
+              file="Source/PianoViewController.cpp"/>
+        <FILE id="fVTWbs" name="PianoViewController.h" compile="0" resource="0"
+              file="Source/PianoViewController.h"/>
         <FILE id="AdZ3vl" name="GeneralViewController.cpp" compile="1" resource="0"
               file="Source/GeneralViewController.cpp"/>
         <FILE id="PRBl6E" name="GeneralViewController.h" compile="0" resource="0"

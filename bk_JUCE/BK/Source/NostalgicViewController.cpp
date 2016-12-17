@@ -164,7 +164,7 @@ void NostalgicViewController::actionListenerCallback (const String& message)
 {
     if (message == "nostalgic/update")
     {
-        currentNostalgicId = processor.currentLayer->getPreparation();
+        currentNostalgicId = processor.currentPiano->getPreparation();
         
         updateFields(currentNostalgicId);
     }

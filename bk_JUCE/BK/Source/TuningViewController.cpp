@@ -167,7 +167,7 @@ void TuningViewController::actionListenerCallback (const String& message)
 {
     if (message == "tuning/update")
     {
-        currentTuningId = processor.currentLayer->getPreparation();
+        currentTuningId = processor.currentPiano->getPreparation();
         
         updateFields(currentTuningId);
     }

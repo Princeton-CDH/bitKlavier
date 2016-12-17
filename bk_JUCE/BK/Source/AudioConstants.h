@@ -79,18 +79,18 @@ static const std::vector<std::string> cPreparationTypes = {
     "Tuning"
 };
 
-typedef enum BKLayerCBType {
-    LayerCBType,
-    LayerCBNumber,
-    BKLayerCBTypeNil,
-} BKLayerCBType;
+typedef enum BKPianoCBType {
+    PianoCBType,
+    PianoCBNumber,
+    BKPianoCBTypeNil,
+} BKPianoCBType;
 
-static const std::vector<std::string> cLayerCBType = {
-    "LayerType",
-    "LayerNumber"
+static const std::vector<std::string> cPianoCBType = {
+    "PianoType",
+    "PianoNumber"
 };
 
-static const std::vector<std::string> cLayerNumberName= {
+static const std::vector<std::string> cPianoNumberName= {
     "One",
     "Two",
     "Three",
@@ -286,20 +286,20 @@ static const std::vector<std::string> cTuningParameterTypes = {
 };
 
 
-#pragma mark - Layer
-typedef enum LayerTFIndex
+#pragma mark - Piano
+typedef enum PianoTFIndex
 {
-    LayerKeymapId = 0,
-    LayerPreparationId,
-    LayerParameterTypeNil
+    PianoKeymapId = 0,
+    PianoPreparationId,
+    PianoParameterTypeNil
     
-} LayerTFIndex;
+} PianoTFIndex;
 
-static const std::vector<std::string> cLayerParameterTypes = {
-    "LayerType",
-    "LayerNumber",
-    "LayerKeymap Id",
-    "LayerPreparation Id"
+static const std::vector<std::string> cPianoParameterTypes = {
+    "PianoType",
+    "PianoNumber",
+    "PianoKeymap Id",
+    "PianoPreparation Id"
 };
 
 #pragma mark - Keymap
@@ -318,7 +318,7 @@ static const std::vector<std::string> cKeymapParameterTypes = {
 
 
 // Globals
-static const int aMaxNumLayers = 12;
+static const int aMaxNumPianos = 12;
 static const float aGlobalGain = 0.5; //make this user settable
 
 static const float aMaxSampleLengthSec = 30.0f;

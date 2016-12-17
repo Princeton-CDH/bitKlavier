@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-    LayerViewController.cpp
+    PianoViewController.cpp
     Created: 8 Dec 2016 12:54:41am
     Author:  Michael R Mulshine
 
@@ -9,76 +9,76 @@
 */
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "LayerViewController.h"
+#include "PianoViewController.h"
 
 //==============================================================================
-LayerViewController::LayerViewController(BKAudioProcessor& p, Layer::Ptr l):
+PianoViewController::PianoViewController(BKAudioProcessor& p, Piano::Ptr l):
 processor(p),
 current(l),
-layerL(OwnedArray<BKLabel>()),
-layerTF(OwnedArray<BKTextField>())
+pianoL(OwnedArray<BKLabel>()),
+pianoTF(OwnedArray<BKTextField>())
 {
     // Labels
-    layerL = OwnedArray<BKLabel>();
-    layerL.ensureStorageAllocated(cLayerParameterTypes.size());
+    pianoL = OwnedArray<BKLabel>();
+    pianoL.ensureStorageAllocated(cPianoParameterTypes.size());
     
-    for (int i = 0; i < cLayerParameterTypes.size(); i++)
+    for (int i = 0; i < cPianoParameterTypes.size(); i++)
     {
-        layerL.set(i, new BKLabel());
-        addAndMakeVisible(layerL[i]);
-        layerL[i]->setName(cLayerParameterTypes[i]);
-        layerL[i]->setText(cLayerParameterTypes[i], NotificationType::dontSendNotification);
+        pianoL.set(i, new BKLabel());
+        addAndMakeVisible(pianoL[i]);
+        pianoL[i]->setName(cPianoParameterTypes[i]);
+        pianoL[i]->setText(cPianoParameterTypes[i], NotificationType::dontSendNotification);
     }
     
     // Text Fields
-    layerTF = OwnedArray<BKTextField>();
-    layerTF.ensureStorageAllocated(cLayerParameterTypes.size());
+    pianoTF = OwnedArray<BKTextField>();
+    pianoTF.ensureStorageAllocated(cPianoParameterTypes.size());
     
-    for (int i = 0; i < cLayerParameterTypes.size()-2; i++)
+    for (int i = 0; i < cPianoParameterTypes.size()-2; i++)
     {
-        layerTF.set(i, new BKTextField());
-        addAndMakeVisible(layerTF[i]);
-        layerTF[i]->addListener(this);
-        layerTF[i]->setName(cLayerParameterTypes[i+2]);
+        pianoTF.set(i, new BKTextField());
+        addAndMakeVisible(pianoTF[i]);
+        pianoTF[i]->addListener(this);
+        pianoTF[i]->setName(cPianoParameterTypes[i+2]);
     }
     
     
-    for (int i = 0; i < cLayerCBType.size(); i++)
+    for (int i = 0; i < cPianoCBType.size(); i++)
     {
-        layerCB.set(i, new BKComboBox());
-        layerCB[i]->setName(cLayerCBType[i]);
-        layerCB[i]->addSeparator();
-        layerCB[i]->addListener(this);
-        addAndMakeVisible(layerCB[i]);
+        pianoCB.set(i, new BKComboBox());
+        pianoCB[i]->setName(cPianoCBType[i]);
+        pianoCB[i]->addSeparator();
+        pianoCB[i]->addListener(this);
+        addAndMakeVisible(pianoCB[i]);
     }
     
     for (int i = 0; i < cPreparationTypes.size(); i++)
     {
-        layerCB[LayerCBType]->addItem(cPreparationTypes[i], i+1);
+        pianoCB[PianoCBType]->addItem(cPreparationTypes[i], i+1);
     }
     
-    for (int i = 0; i < aMaxNumLayers; i++)
+    for (int i = 0; i < aMaxNumPianos; i++)
     {
-        layerCB[LayerCBNumber]->addItem(cLayerNumberName[i], i+1);
+        pianoCB[PianoCBNumber]->addItem(cPianoNumberName[i], i+1);
     }
     
-    layerCB[LayerCBType]->setSelectedItemIndex(0);
-    layerCB[LayerCBNumber]->setSelectedItemIndex(0);
+    pianoCB[PianoCBType]->setSelectedItemIndex(0);
+    pianoCB[PianoCBNumber]->setSelectedItemIndex(0);
     
     updateFields();
 }
 
-LayerViewController::~LayerViewController()
+PianoViewController::~PianoViewController()
 {
 }
 
-void LayerViewController::paint (Graphics& g)
+void PianoViewController::paint (Graphics& g)
 {
     g.setColour(Colours::goldenrod);
     g.drawRect(getLocalBounds(), 1);
 }
 
-void LayerViewController::resized()
+void PianoViewController::resized()
 {
    
     
@@ -87,9 +87,9 @@ void LayerViewController::resized()
     int lX = 0;
     int lY = gComponentLabelHeight + gYSpacing;
     
-    for (int n = 0; n < cLayerParameterTypes.size(); n++)
+    for (int n = 0; n < cPianoParameterTypes.size(); n++)
     {
-        layerL[n]->setTopLeftPosition(lX, gYSpacing + lY * n);
+        pianoL[n]->setTopLeftPosition(lX, gYSpacing + lY * n);
     }
     
     // Text fields
@@ -97,19 +97,19 @@ void LayerViewController::resized()
     int tfX = gComponentLabelWidth + gXSpacing;
     int tfY = gComponentTextFieldHeight + gYSpacing;
     
-    for (int n = 0; n < cLayerCBType.size(); n++)
+    for (int n = 0; n < cPianoCBType.size(); n++)
     {
-        layerCB[n]->setTopLeftPosition(tfX, gYSpacing + tfY * n);
+        pianoCB[n]->setTopLeftPosition(tfX, gYSpacing + tfY * n);
     }
     
-    for (int n = 0; n < cLayerParameterTypes.size()-2; n++)
+    for (int n = 0; n < cPianoParameterTypes.size()-2; n++)
     {
-        layerTF[n]->setTopLeftPosition(tfX, gYSpacing + tfY * (n+2));
+        pianoTF[n]->setTopLeftPosition(tfX, gYSpacing + tfY * (n+2));
     }
     
 }
 
-void LayerViewController::textFieldDidChange(TextEditor& tf)
+void PianoViewController::textFieldDidChange(TextEditor& tf)
 {
     String text = tf.getText();
     String name = tf.getName();
@@ -119,54 +119,54 @@ void LayerViewController::textFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
 
-    if (name == cLayerParameterTypes[LayerKeymapId+2])
+    if (name == cPianoParameterTypes[PianoKeymapId+2])
     {
         current->setKeymap(i);
         
         BKPreparationType type = current->getType();
-        int layerNum = current->getLayerNumber();
+        int pianoNum = current->getPianoNumber();
         
         Keymap::Ptr km = processor.bkKeymaps[i];
         
         if (type == PreparationTypeSynchronic)
         {
-            processor.sProcessor[layerNum]->setKeymap(km);
+            processor.sProcessor[pianoNum]->setKeymap(km);
         }
         else if (type == PreparationTypeNostalgic)
         {
-            processor.nProcessor[layerNum]->setKeymap(km);
+            processor.nProcessor[pianoNum]->setKeymap(km);
         }
         else if (type == PreparationTypeDirect)
         {
-            processor.dProcessor[layerNum]->setKeymap(km);
+            processor.dProcessor[pianoNum]->setKeymap(km);
         }
         
         sendActionMessage("keymap/update");
         
     }
-    else if (name == cLayerParameterTypes[LayerPreparationId+2])
+    else if (name == cPianoParameterTypes[PianoPreparationId+2])
     {
         current->setPreparation(i);
         
         BKPreparationType type = current->getType();
-        int layerNum = current->getLayerNumber();
+        int pianoNum = current->getPianoNumber();
         
         if (type == PreparationTypeSynchronic)
         {
             SynchronicPreparation::Ptr prep = processor.sPreparation[i];
-            processor.sProcessor[layerNum]->setPreparation(prep);
+            processor.sProcessor[pianoNum]->setPreparation(prep);
             sendActionMessage("synchronic/update");
         }
         else if (type == PreparationTypeNostalgic)
         {
             NostalgicPreparation::Ptr prep = processor.nPreparation[i];
-            processor.nProcessor[layerNum]->setPreparation(prep);
+            processor.nProcessor[pianoNum]->setPreparation(prep);
             sendActionMessage("nostalgic/update");
         }
         else if (type == PreparationTypeDirect)
         {
             DirectPreparation::Ptr prep = processor.dPreparation[i];
-            processor.dProcessor[layerNum]->setPreparation(prep);
+            processor.dProcessor[pianoNum]->setPreparation(prep);
             sendActionMessage("direct/update");
         }
     }
@@ -176,13 +176,13 @@ void LayerViewController::textFieldDidChange(TextEditor& tf)
     }
 }
 
-void LayerViewController::switchToLayer(BKPreparationType type, int layer)
+void PianoViewController::switchToPiano(BKPreparationType type, int piano)
 {
     TuningPreparation::Ptr tuning;
     
     if (type == PreparationTypeDirect)
     {
-        DirectProcessor::Ptr proc = processor.dProcessor[layer];
+        DirectProcessor::Ptr proc = processor.dProcessor[piano];
         tuning = proc->getPreparation()->getTuning();
         current->setPreparation(proc->getPreparationId());
         current->setKeymap(proc->getKeymapId());
@@ -190,7 +190,7 @@ void LayerViewController::switchToLayer(BKPreparationType type, int layer)
     }
     else if (type == PreparationTypeSynchronic)
     {
-        SynchronicProcessor::Ptr proc = processor.sProcessor[layer];
+        SynchronicProcessor::Ptr proc = processor.sProcessor[piano];
         tuning = proc->getPreparation()->getTuning();
         current->setPreparation(proc->getPreparationId());
         current->setKeymap(proc->getKeymapId());
@@ -198,7 +198,7 @@ void LayerViewController::switchToLayer(BKPreparationType type, int layer)
     }
     else if (type == PreparationTypeNostalgic)
     {
-        NostalgicProcessor::Ptr proc = processor.nProcessor[layer];
+        NostalgicProcessor::Ptr proc = processor.nProcessor[piano];
         tuning = proc->getPreparation()->getTuning();
         current->setPreparation(proc->getPreparationId());
         current->setKeymap(proc->getKeymapId());
@@ -210,24 +210,24 @@ void LayerViewController::switchToLayer(BKPreparationType type, int layer)
 }
 
 
-void LayerViewController::updateFields(void)
+void PianoViewController::updateFields(void)
 {
     
     // Set text.
-    layerTF[LayerKeymapId]        ->setText( String(current->getKeymap()));
-    layerTF[LayerPreparationId]   ->setText( String(current->getPreparation()));
+    pianoTF[PianoKeymapId]        ->setText( String(current->getKeymap()));
+    pianoTF[PianoPreparationId]   ->setText( String(current->getPreparation()));
 }
 
-void LayerViewController::comboBoxChanged (ComboBox* box)
+void PianoViewController::comboBoxChanged (ComboBox* box)
 {
-    if (box->getName() == "LayerType")
+    if (box->getName() == "PianoType")
     {
         int which = box->getSelectedId() - 1;
         
         DBG(cPreparationTypes[which]);
         
         current->setType((BKPreparationType) which);
-        current->setLayerNumber(0);
+        current->setPianoNumber(0);
         
         if (which == PreparationTypeDirect)
         {
@@ -253,13 +253,13 @@ void LayerViewController::comboBoxChanged (ComboBox* box)
 
         updateFields();
     }
-    else if (box->getName() == "LayerNumber")
+    else if (box->getName() == "PianoNumber")
     {
-        int whichLayer = box->getSelectedId();
+        int whichPiano = box->getSelectedId();
         
-        DBG("which: "+String(whichLayer));
+        DBG("which: "+String(whichPiano));
         
-        current->setLayerNumber(whichLayer);
+        current->setPianoNumber(whichPiano);
         
         BKPreparationType type = current->getType();
         
@@ -267,21 +267,21 @@ void LayerViewController::comboBoxChanged (ComboBox* box)
         
         if (type == PreparationTypeSynchronic)
         {
-            SynchronicProcessor::Ptr proc = processor.sProcessor[whichLayer];
+            SynchronicProcessor::Ptr proc = processor.sProcessor[whichPiano];
             current->setPreparation(proc->getPreparationId());
             current->setKeymap(proc->getKeymapId());
             sendActionMessage("synchronic/update");
         }
         else if (type == PreparationTypeNostalgic)
         {
-            NostalgicProcessor::Ptr proc = processor.nProcessor[whichLayer];
+            NostalgicProcessor::Ptr proc = processor.nProcessor[whichPiano];
             current->setPreparation(proc->getPreparationId());
             current->setKeymap(proc->getKeymapId());
             sendActionMessage("nostalgic/update");
         }
         else if (type == PreparationTypeDirect)
         {
-            DirectProcessor::Ptr proc = processor.dProcessor[whichLayer];
+            DirectProcessor::Ptr proc = processor.dProcessor[whichPiano];
             current->setPreparation(proc->getPreparationId());
             current->setKeymap(proc->getKeymapId());
             sendActionMessage("direct/update");

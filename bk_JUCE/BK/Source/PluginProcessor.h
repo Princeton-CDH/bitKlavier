@@ -20,7 +20,7 @@
 
 #include "General.h"
 
-#include "Layer.h"
+#include "Piano.h"
 
 #define USE_SYNCHRONIC_TWO 0
 
@@ -37,7 +37,7 @@ public:
     BKAudioProcessor();
     ~BKAudioProcessor();
     
-    Layer::Ptr currentLayer;
+    Piano::Ptr currentPiano;
     
     // General settings.
     GeneralSettings::Ptr general;
