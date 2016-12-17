@@ -13,6 +13,18 @@
 
 #include "BKUtilities.h"
 
+#include "BKSynthesiser.h"
+
+#include "Keymap.h"
+
+#include "Tuning.h"
+
+#include "Synchronic.h"
+
+#include "Nostalgic.h"
+
+#include "Direct.h"
+
 class Piano : public ReferenceCountedObject
 {
 public:
@@ -20,48 +32,50 @@ public:
     typedef Array<Piano::Ptr>                   Arr;
     typedef Array<Piano::Ptr, CriticalSection>  CSArr;
     
-    Piano(BKPreparationType type, int pianoNum, int keymapId, int preparationId, int tuningId):
-    type(type),
-    pianoNumber(pianoNum),
-    keymapId(keymapId),
-    preparationId(preparationId),
-    tuningId(tuningId)
-    {
-        
-    }
+    Piano(int pianoNum,
+          BKSynthesiser *s,
+          BKSynthesiser *res,
+          BKSynthesiser *ham);
     
-    ~Piano()
-    {
-    }
+    ~Piano();
     
-    inline void setType(BKPreparationType val)  {   type = val; print();            }
     inline void setPianoNumber(int val)         {   pianoNumber = val; print();     }
-    inline void setKeymap(int val)              {   keymapId = val;  print();       }
-    inline void setPreparation(int val)         {   preparationId = val; print();   }
-    inline void setTuning(int val)              {   tuningId = val; print();        }
     
-    inline BKPreparationType getType(void)      {   return type;            }
     inline int getPianoNumber(void)             {   return pianoNumber;     }
-    inline int getKeymap(void)                  {   return keymapId;        }
-    inline int getPreparation(void)             {   return preparationId;   }
-    inline int getTuning(void)                  {   return tuningId;        }
+    
+    void processBlock(int numSamples, int midiChannel);
+    void setCurrentPlaybackSampleRate(double sr);
+    void keyPressed(int noteNumber, float velocity, int channel);
+    void keyReleased(int noteNumber, float velocity, int channel);
     
     
     void print(void)
     {
-        DBG("type: " + String(type));
         DBG("pianoNum: " + String(pianoNumber));
-        DBG("keymapId: " + String(keymapId));
-        DBG("preparationId: " + String(preparationId));
-        DBG("tuningId:" + String(tuningId));
     }
     
 private:
-    BKPreparationType type;
     int pianoNumber;
-    int keymapId;
-    int preparationId;
-    int tuningId;
+    
+    BKSynthesiser*              synth;
+    BKSynthesiser*              resonanceSynth;
+    BKSynthesiser*              hammerSynth;
+    
+    // Keymap for this Piano (one per piano)
+    Keymap::Ptr                     pKeymap;
+    
+    // Processors.
+    SynchronicProcessor::CSArr      sProcessor;
+    NostalgicProcessor::Arr         nProcessor;
+    DirectProcessor::Arr            dProcessor;
+        
+    // Preparations.
+    SynchronicPreparation::CSArr    sPreparation;
+    NostalgicPreparation::CSArr     nPreparation;
+    DirectPreparation::CSArr        dPreparation;
+    TuningPreparation::CSArr        tPreparation;
+    
+    double sampleRate;
     
     JUCE_LEAK_DETECTOR(Piano)
 };

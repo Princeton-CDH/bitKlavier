@@ -36,9 +36,7 @@ public:
     //==============================================================================
     BKAudioProcessor();
     ~BKAudioProcessor();
-    
-    Piano::Ptr currentPiano;
-    
+  
     // General settings.
     GeneralSettings::Ptr general;
     
@@ -48,15 +46,14 @@ public:
     BKSynthesiser resonanceReleaseSynth;
     
     // Pianos
-    /*
     Piano::CSArr                    pianos; //wraps all the keymaps, processors and preparations inside
-     */
-
+    Piano::Ptr                      currentPiano;
+    
+    //remove these eventually...
     // Processors.
     SynchronicProcessor::CSArr      sProcessor;
     NostalgicProcessor::Arr         nProcessor;
     DirectProcessor::Arr            dProcessor;
-    
     
     // Preparations.
     SynchronicPreparation::CSArr    sPreparation;
@@ -66,11 +63,13 @@ public:
     
     // Keymaps.
     Keymap::CSArr                   bkKeymaps;
+
     
     int numSynchronicLayers, numNostalgicLayers, numDirectLayers;
     
-    int channel;
     
+    int channel;
+
     // Change listener callback implementation
     void changeListenerCallback(ChangeBroadcaster *source) override;
     

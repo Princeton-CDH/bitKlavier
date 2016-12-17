@@ -33,6 +33,7 @@ class PianoViewController    : public BKViewController, public ActionBroadcaster
 {
 public:
     PianoViewController(BKAudioProcessor& , Piano::Ptr);
+    //PianoViewController(BKAudioProcessor&);
     ~PianoViewController();
 
     void paint (Graphics&) override;

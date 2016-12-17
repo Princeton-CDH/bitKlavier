@@ -214,7 +214,7 @@ void SynchronicViewController::actionListenerCallback (const String& message)
 {
     if (message == "synchronic/update")
     {
-        currentSynchronicId = processor.currentPiano->getPreparation();
+        //currentSynchronicId = processor.currentPiano->getPreparation();
         
         updateFields(currentSynchronicId);
     }

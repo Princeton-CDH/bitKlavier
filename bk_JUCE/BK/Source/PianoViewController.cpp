@@ -13,6 +13,7 @@
 
 //==============================================================================
 PianoViewController::PianoViewController(BKAudioProcessor& p, Piano::Ptr l):
+//PianoViewController::PianoViewController(BKAudioProcessor& p):
 processor(p),
 current(l),
 pianoL(OwnedArray<BKLabel>()),
@@ -121,8 +122,9 @@ void PianoViewController::textFieldDidChange(TextEditor& tf)
 
     if (name == cPianoParameterTypes[PianoKeymapId+2])
     {
-        current->setKeymap(i);
+        //current->setKeymap(i);
         
+        /*
         BKPreparationType type = current->getType();
         int pianoNum = current->getPianoNumber();
         
@@ -140,12 +142,14 @@ void PianoViewController::textFieldDidChange(TextEditor& tf)
         {
             processor.dProcessor[pianoNum]->setKeymap(km);
         }
+         */
         
         sendActionMessage("keymap/update");
         
     }
     else if (name == cPianoParameterTypes[PianoPreparationId+2])
     {
+        /*
         current->setPreparation(i);
         
         BKPreparationType type = current->getType();
@@ -169,6 +173,7 @@ void PianoViewController::textFieldDidChange(TextEditor& tf)
             processor.dProcessor[pianoNum]->setPreparation(prep);
             sendActionMessage("direct/update");
         }
+         */
     }
     else
     {
@@ -180,6 +185,7 @@ void PianoViewController::switchToPiano(BKPreparationType type, int piano)
 {
     TuningPreparation::Ptr tuning;
     
+    /*
     if (type == PreparationTypeDirect)
     {
         DirectProcessor::Ptr proc = processor.dProcessor[piano];
@@ -206,20 +212,23 @@ void PianoViewController::switchToPiano(BKPreparationType type, int piano)
     }
     
     current->setTuning(tuning->getId());
+     */
     sendActionMessage("tuning/update");
 }
 
 
 void PianoViewController::updateFields(void)
 {
-    
+    /*
     // Set text.
     pianoTF[PianoKeymapId]        ->setText( String(current->getKeymap()));
     pianoTF[PianoPreparationId]   ->setText( String(current->getPreparation()));
+     */
 }
 
 void PianoViewController::comboBoxChanged (ComboBox* box)
 {
+    /*
     if (box->getName() == "PianoType")
     {
         int which = box->getSelectedId() - 1;
@@ -289,7 +298,7 @@ void PianoViewController::comboBoxChanged (ComboBox* box)
         
         sendActionMessage("keymap/update");
         updateFields();
-    }
+    }*/
 }
 
 
