@@ -48,6 +48,23 @@ public:
     void keyPressed(int noteNumber, float velocity, int channel);
     void keyReleased(int noteNumber, float velocity, int channel);
     
+    // Keymap for this Piano (one per piano)
+    Keymap::Ptr                     pKeymap;
+    
+    // Processors.
+    SynchronicProcessor::CSArr      sProcessor;
+    NostalgicProcessor::Arr         nProcessor;
+    DirectProcessor::Arr            dProcessor;
+    
+    Array<SynchronicProcessor::Ptr> sProcessors;
+    Array<NostalgicProcessor::Ptr>  nProcessors;
+    Array<DirectProcessor::Ptr>     dProcessors;
+    
+    // Preparations.
+    SynchronicPreparation::CSArr    sPreparation;
+    NostalgicPreparation::CSArr     nPreparation;
+    DirectPreparation::CSArr        dPreparation;
+    TuningPreparation::CSArr        tPreparation;
     
     void print(void)
     {
@@ -60,20 +77,6 @@ private:
     BKSynthesiser*              synth;
     BKSynthesiser*              resonanceSynth;
     BKSynthesiser*              hammerSynth;
-    
-    // Keymap for this Piano (one per piano)
-    Keymap::Ptr                     pKeymap;
-    
-    // Processors.
-    SynchronicProcessor::CSArr      sProcessor;
-    NostalgicProcessor::Arr         nProcessor;
-    DirectProcessor::Arr            dProcessor;
-        
-    // Preparations.
-    SynchronicPreparation::CSArr    sPreparation;
-    NostalgicPreparation::CSArr     nPreparation;
-    DirectPreparation::CSArr        dPreparation;
-    TuningPreparation::CSArr        tPreparation;
     
     double sampleRate;
     

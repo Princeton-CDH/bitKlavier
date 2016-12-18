@@ -13,7 +13,6 @@
 
 //==============================================================================
 PianoViewController::PianoViewController(BKAudioProcessor& p, Piano::Ptr l):
-//PianoViewController::PianoViewController(BKAudioProcessor& p):
 processor(p),
 current(l),
 pianoL(OwnedArray<BKLabel>()),
