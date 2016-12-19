@@ -15,8 +15,6 @@
 
 #include "BKSynthesiser.h"
 
-#include "Keymap.h"
-
 #include "Tuning.h"
 
 class SynchronicPreparation : public ReferenceCountedObject
@@ -196,7 +194,6 @@ public:
     typedef Array<SynchronicProcessor::Ptr, CriticalSection> CSArr;
     
     SynchronicProcessor(BKSynthesiser *synth,
-                        Keymap::Ptr km,
                         SynchronicPreparation::Ptr prep,
                         int Id);
     
@@ -211,10 +208,6 @@ public:
     void keyReleased(int noteNumber, int channel);
     float getTimeToBeatMS(float beatsToSkip);
     
-    inline void                     setKeymap(Keymap::Ptr km)   { keymap = km;                  }
-    inline Keymap::Ptr              getKeymap(void)             { return keymap;                }
-    inline int                      getKeymapId(void)           { return keymap->getId();       }
-    
     inline void                             setPreparation(SynchronicPreparation::Ptr prep) { preparation = prep;           }
     inline SynchronicPreparation::Ptr       getPreparation(void)                            { return preparation;           }
     inline int                              getPreparationId(void)                          { return preparation->getId();  }
@@ -222,7 +215,6 @@ public:
 private:
     int Id;
     BKSynthesiser*              synth;
-    Keymap::Ptr                 keymap;
     SynchronicPreparation::Ptr  preparation;
     
     TuningProcessor             tuner;

@@ -49,7 +49,6 @@ public:
     Piano::CSArr                    pianos; //wraps all the keymaps, processors and preparations inside
     Piano::Ptr                      currentPiano;
     
-    //remove these eventually...
     // Processors.
     SynchronicProcessor::CSArr      sProcessor;
     NostalgicProcessor::Arr         nProcessor;
@@ -64,10 +63,6 @@ public:
     // Keymaps.
     Keymap::CSArr                   bkKeymaps;
 
-    
-    int numSynchronicLayers, numNostalgicLayers, numDirectLayers;
-    
-    
     int channel;
 
     // Change listener callback implementation
@@ -83,6 +78,9 @@ public:
    #endif
 
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
+    
+    void setCurrentPiano(int which);
+    inline Piano::Ptr getCurrentPiano() const { return currentPiano;}
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override;

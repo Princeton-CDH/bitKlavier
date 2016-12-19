@@ -11,13 +11,11 @@
 #include "Synchronic.h"
 
 SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s,
-                                         Keymap::Ptr km,
                                          SynchronicPreparation::Ptr p,
                                          int id)
 :
 Id(id),
 synth(s),
-keymap(km),
 preparation(p),
 tuner(preparation->getTuning(), Id)
 {
@@ -82,7 +80,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
     tuner.setPreparation(preparation->getTuning());
     
-    if (keymap->containsNote(noteNumber))
+    //if (keymap->containsNote(noteNumber))
     {
         if (inCluster)
         {
@@ -139,7 +137,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 
 void SynchronicProcessor::keyReleased(int noteNumber, int channel)
 {
-    if (keymap->containsNote(noteNumber))
+    //if (keymap->containsNote(noteNumber))
     {
         ;
     }

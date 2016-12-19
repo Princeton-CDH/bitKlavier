@@ -10,51 +10,9 @@
 
 #include "Piano.h"
 
-Piano::Piano(int pianoNum,
-             BKSynthesiser *s,
-             BKSynthesiser *res,
-             BKSynthesiser *ham):
-pKeymap(new Keymap(pianoNum)),
-pianoNumber(pianoNum),
-synth(s),
-resonanceSynth(res),
-hammerSynth(ham),
-sProcessor(SynchronicProcessor::CSArr()),
-nProcessor(NostalgicProcessor::Arr()),
-dProcessor(DirectProcessor::Arr()),
-sPreparation(SynchronicPreparation::CSArr()),
-nPreparation(NostalgicPreparation::CSArr()),
-dPreparation(DirectPreparation::CSArr())
+Piano::Piano(int pianoNum):
+pianoNumber(pianoNum)
 {
-    sProcessor.ensureStorageAllocated(aMaxNumPreparationsPerPianos);
-    nProcessor.ensureStorageAllocated(aMaxNumPreparationsPerPianos);
-    dProcessor.ensureStorageAllocated(aMaxNumPreparationsPerPianos);
-    
-    tPreparation.ensureStorageAllocated(aMaxNumPreparationsPerPianos * 3);
-    
-    for (int i = 0; i < (3 * aMaxNumPreparationsPerPianos); i++)
-    {
-        tPreparation.add(new TuningPreparation(i));
-    }
-    
-    for (int i = 0; i < aMaxNumPreparationsPerPianos; i++)
-    {
-        sPreparation.add(new SynchronicPreparation(i, tPreparation[0]));
-        nPreparation.add(new NostalgicPreparation(i, tPreparation[0]));
-        dPreparation.add(new DirectPreparation(i, tPreparation[0]));
-    }
-    
-    for (int i = 0; i < aMaxNumPreparationsPerPianos; i++)
-    {
-        sProcessor.insert(i, new SynchronicProcessor(synth, pKeymap, sPreparation[0], i));
-        nProcessor.insert(i, new NostalgicProcessor(synth, pKeymap, nPreparation[0], sProcessor, i));
-        dProcessor.insert(i, new DirectProcessor(synth, resonanceSynth, hammerSynth, pKeymap, dPreparation[0], i));
-    }
-    
-    for (int i = 0; i < 128; i++)
-    {
-        pKeymap->addNote(i);
-    }
     
 }
 
@@ -63,46 +21,70 @@ Piano::~Piano()
     
 }
 
-void Piano::setCurrentPlaybackSampleRate(double sr)
+void Piano::setKeymap(Keymap::Ptr km)
 {
-    sampleRate = sr;
-    
-    for (int i = 0; i < aMaxNumPreparationsPerPianos; i++)
-    {
-        sProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);
-        nProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);
-        dProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);
-    }
+    pKeymap = km;
     
 }
 
+void Piano::removeAllPreparations()
+{
+    sProcessors.clearQuick();
+    nProcessors.clearQuick();
+    dProcessors.clearQuick();
+}
+
+
 void Piano::processBlock(int numSamples, int midiChannel)
 {
-    for (int layer = 0; layer < aMaxNumPreparationsPerPianos; layer++)
+    for (int layer = 0; layer < sProcessors.size(); layer++)
     {
-        sProcessor[layer]->processBlock(numSamples, midiChannel); //precede with if sProcessor[layer]->isActive check
-        nProcessor[layer]->processBlock(numSamples, midiChannel);
-        dProcessor[layer]->processBlock(numSamples, midiChannel);
+        sProcessors[layer]->processBlock(numSamples, midiChannel);
     }
-
+    
+    for (int layer = 0; layer < nProcessors.size(); layer++)
+    {
+        nProcessors[layer]->processBlock(numSamples, midiChannel);
+    }
+    
+    for (int layer = 0; layer < dProcessors.size(); layer++)
+    {
+        dProcessors[layer]->processBlock(numSamples, midiChannel);
+    }
 }
 
 void Piano::keyPressed(int noteNumber, float velocity, int channel)
 {
-    for (int layer = 0; layer < aMaxNumPreparationsPerPianos; layer++)
+    for (int layer = 0; layer < sProcessors.size(); layer++)
     {
-        sProcessor[layer]->keyPressed(noteNumber, velocity); //precede with if sProcessor[layer]->isActive check
-        nProcessor[layer]->keyPressed(noteNumber, velocity);
-        dProcessor[layer]->keyPressed(noteNumber, velocity, channel);
+        if (pKeymap->containsNote(noteNumber)) sProcessors[layer]->keyPressed(noteNumber, velocity);
+    }
+    
+    for (int layer = 0; layer < nProcessors.size(); layer++)
+    {
+        if (pKeymap->containsNote(noteNumber)) nProcessors[layer]->keyPressed(noteNumber, velocity);
+    }
+    
+    for (int layer = 0; layer < dProcessors.size(); layer++)
+    {
+        if (pKeymap->containsNote(noteNumber)) dProcessors[layer]->keyPressed(noteNumber, velocity, channel);
     }
 }
 
 void Piano::keyReleased(int noteNumber, float velocity, int channel)
 {
-    for (int i = 0; i < aMaxNumPreparationsPerPianos; i++)
+    for (int layer = 0; layer < sProcessors.size(); layer++)
     {
-        sProcessor[i]->keyReleased(noteNumber, channel); //precede with if sProcessor[layer]->isActive check
-        nProcessor[i]->keyReleased(noteNumber, channel);
-        dProcessor[i]->keyReleased(noteNumber, velocity, channel);
+        if (pKeymap->containsNote(noteNumber)) sProcessors[layer]->keyReleased(noteNumber, velocity);
+    }
+    
+    for (int layer = 0; layer < nProcessors.size(); layer++)
+    {
+        if (pKeymap->containsNote(noteNumber)) nProcessors[layer]->keyReleased(noteNumber, velocity);
+    }
+    
+    for (int layer = 0; layer < dProcessors.size(); layer++)
+    {
+        if (pKeymap->containsNote(noteNumber)) dProcessors[layer]->keyReleased(noteNumber, velocity, channel);
     }
 }

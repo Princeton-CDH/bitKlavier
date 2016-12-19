@@ -320,6 +320,7 @@ static const std::vector<std::string> cKeymapParameterTypes = {
 // Globals
 static const int aMaxNumPianos = 12;
 static const int aMaxNumPreparationsPerPianos = 12;
+static const int aMaxTotalPreparations = aMaxNumPianos * aMaxNumPreparationsPerPianos;
 static const float aGlobalGain = 0.5; //make this user settable
 
 static const float aMaxSampleLengthSec = 30.0f;

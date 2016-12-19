@@ -17,8 +17,6 @@
 
 #include "BKSynthesiser.h"
 
-#include "Keymap.h"
-
 #include "Tuning.h"
 
 
@@ -148,7 +146,6 @@ public:
     
     NostalgicProcessor(
                        BKSynthesiser *s,
-                       Keymap::Ptr km,
                        NostalgicPreparation::Ptr prep,
                        SynchronicProcessor::CSArr& proc,
                        int Id);
@@ -165,21 +162,17 @@ public:
     
     //begin playing reverse note, called with noteOff
     void keyReleased(int midiNoteNumber, int midiChannel);
-    
-    inline void setKeymap(Keymap::Ptr km)   { keymap = km;  }
+
     inline void setPreparation(NostalgicPreparation::Ptr prep)  { preparation = prep;   }
     
-    int                         getId(void)             { return Id;            }    
-    Keymap::Ptr                 getKeymap(void)         { return keymap;        }
+    int                         getId(void)             { return Id;            }
     NostalgicPreparation::Ptr   getPreparation(void)    { return preparation;   }
     
-    int getKeymapId(void)       { return keymap->getId();       }
     int getPreparationId(void)  { return preparation->getId();  }
     
 private:
     int Id;
     BKSynthesiser*              synth;
-    Keymap::Ptr                 keymap;
     NostalgicPreparation::Ptr   preparation;
 
     TuningProcessor             tuner;

@@ -15,7 +15,7 @@ DirectViewController::DirectViewController(BKAudioProcessor& p):
 processor(p),
 currentDirectId(0)
 {
-    //DirectPreparation::Ptr layer = processor.pianos[0]->dPreparation[currentDirectId];
+    //DirectPreparation::Ptr layer = processor.currentPiano->dPreparation[currentDirectId];
     DirectPreparation::Ptr layer = processor.dPreparation[currentDirectId];
     
     // Labels

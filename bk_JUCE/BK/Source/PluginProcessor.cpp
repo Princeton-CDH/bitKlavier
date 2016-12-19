@@ -13,56 +13,58 @@ mainPianoSynth          (general),
 hammerReleaseSynth      (general),
 resonanceReleaseSynth   (general),
 pianos                  (Piano::CSArr()),
-sProcessor(SynchronicProcessor::CSArr()),
-nProcessor(NostalgicProcessor::Arr()),
-dProcessor(DirectProcessor::Arr()),
-sPreparation(SynchronicPreparation::CSArr()),
-nPreparation(NostalgicPreparation::CSArr()),
-dPreparation(DirectPreparation::CSArr()),
-tPreparation(TuningPreparation::CSArr()),
-bkKeymaps(Keymap::CSArr()),
-numSynchronicLayers(12),
-numNostalgicLayers(12),
-numDirectLayers(12)
+sProcessor              (SynchronicProcessor::CSArr()),
+nProcessor              (NostalgicProcessor::Arr()),
+dProcessor              (DirectProcessor::Arr()),
+sPreparation            (SynchronicPreparation::CSArr()),
+nPreparation            (NostalgicPreparation::CSArr()),
+dPreparation            (DirectPreparation::CSArr()),
+tPreparation            (TuningPreparation::CSArr()),
+bkKeymaps               (Keymap::CSArr())
 {
+    
+    //allocate storage
     pianos.ensureStorageAllocated(aMaxNumPianos);
+    bkKeymaps.ensureStorageAllocated(aMaxNumPianos);
     
+    sProcessor.ensureStorageAllocated(aMaxTotalPreparations);
+    nProcessor.ensureStorageAllocated(aMaxTotalPreparations);
+    dProcessor.ensureStorageAllocated(aMaxTotalPreparations);
     
-    sProcessor.ensureStorageAllocated(aMaxNumPianos);
-    nProcessor.ensureStorageAllocated(aMaxNumPianos);
-    dProcessor.ensureStorageAllocated(aMaxNumPianos);
+    tPreparation.ensureStorageAllocated(aMaxTotalPreparations * 3); //one tuning for each preparation type
+
     
-    tPreparation.ensureStorageAllocated(aMaxNumPianos * 3);
-    bkKeymaps.ensureStorageAllocated(aMaxNumPianos * 3);
-    
-    
-    
-    for (int i = 0; i < (3 * aMaxNumPianos); i++)
+    //initialize pianos, keymaps, preparations, and processors
+    for (int i = 0; i < aMaxNumPianos; i++)
     {
+        pianos.add(new Piano(i));
         bkKeymaps.add(new Keymap(i));
+    }
+  
+    for (int i = 0; i < (aMaxTotalPreparations * 3); i++)
+    {
         tPreparation.add(new TuningPreparation(i));
     }
     
-    for (int i = 0; i < aMaxNumPianos; i++)
+    for (int i = 0; i < aMaxTotalPreparations; i++)
     {
         sPreparation.add(new SynchronicPreparation(i, tPreparation[0]));
         nPreparation.add(new NostalgicPreparation(i, tPreparation[0]));
         dPreparation.add(new DirectPreparation(i, tPreparation[0]));
+        
+        sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, sPreparation[0], i));
+        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth,  nPreparation[0], sProcessor, i));
+        dProcessor.insert(i, new DirectProcessor(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, dPreparation[0], i));
     }
     
     
-    for (int i = 0; i < aMaxNumPianos; i++)
-    {
-        pianos.insert(i, new Piano(i, &mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth));
-        
-        
-        sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, bkKeymaps[0], sPreparation[0], i));
-        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth, bkKeymaps[0], nPreparation[0], sProcessor, i));
-        dProcessor.insert(i, new DirectProcessor(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, bkKeymaps[0], dPreparation[0], i));
-         
-    }
-    
+    //init basic piano
     currentPiano = pianos[0];
+    pianos[0]->addDirect(dProcessor[0]);
+    pianos[0]->addNostalgic(nProcessor[0]);
+    //pianos[0]->addSynchronic(sProcessor[0]);
+    pianos[0]->setKeymap(bkKeymaps[0]);
+    for(int i = 0; i<128; i++) bkKeymaps[0]->addNote(i); //turn on keys for basic piano
     
     // For testing and developing, let's keep directory of samples in home folder on disk.
     BKSampleLoader::loadMainPianoSamples(&mainPianoSynth, aNumSampleLayers);
@@ -85,13 +87,9 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     for (int i = 0; i < aMaxNumPianos; i++)
     {
-        pianos[i]->setCurrentPlaybackSampleRate(sampleRate);
-        
-        /*
         sProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);
         nProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);
         dProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);
-         */
     }
 }
 
@@ -119,31 +117,13 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     MidiMessage m;
     
     int numSamples = buffer.getNumSamples();
-    
+
+    // Process each piano
      for (int p = 0; p < aMaxNumPianos; p++)
      {
-        pianos[p]->processBlock(numSamples, m.getChannel()); //precede with if(pianos[p]->active)
+        pianos[p]->processBlock(numSamples, m.getChannel()); //precede with if(pianos[p]->active), or rework with resizable arrays
      }
     
-    // Process each layer.
-    // Could put nostalgic->keyOff/playNote here: (1) have synchronic->processBlock return 1 if pulse happened, otherwise 0. if nostalgic->mode == SynchronicSync and make sure layer corresponds
-    
-    /*
-    for (int layer = 0; layer < numSynchronicLayers; layer++)
-    {
-        sProcessor[layer]->processBlock(numSamples, m.getChannel());
-    }
-    
-    for (int layer = 0; layer < numNostalgicLayers; layer++)
-    {
-        nProcessor[layer]->processBlock(numSamples, m.getChannel());
-    }
-    
-    for (int layer = 0; layer < numDirectLayers; layer++)
-    {
-        dProcessor[layer]->processBlock(numSamples, m.getChannel());
-    }
-    */
     
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
@@ -154,60 +134,19 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         
         if (m.isNoteOn())
         {
-            
-            
+            // Send key on to each piano
             for (int p = 0; p < aMaxNumPianos; p++)  //or < numCurrentPianos...
             {
                 pianos[p]->keyPressed(noteNumber, velocity, channel); //precede with if(pianos[p]->active)
             }
-            
-            /*
-            // Send key on to each layer.
-            for (int layer = 0; layer < numSynchronicLayers; layer++)
-            {
-                sProcessor[layer]->keyPressed(noteNumber, velocity);
-            }
-            
-            for (int layer = 0; layer < numNostalgicLayers; layer++)
-            {
-                nProcessor[layer]->keyPressed(noteNumber, velocity);
-            }
-            
-            for (int layer = 0; layer < numDirectLayers; layer++)
-            {
-                dProcessor[layer]->keyPressed(noteNumber, velocity, channel);
-            }
-             */
         }
         else if (m.isNoteOff())
         {
-            
+            // Send key off to each piano
             for (int p = 0; p < aMaxNumPianos; p++)
             {
                 pianos[p]->keyReleased(noteNumber, velocity, channel); //precede with if(pianos[p]->active)
             }
-            
-            /*
-            //need to integrate sProcess layer number here as well, just defaulting for the moment
-            for (int i = 0; i < numNostalgicLayers; i++)
-            {
-                nProcessor[i]->keyReleased(noteNumber, channel); // should be in preparation/processor
-                
-            }
-            
-            for (int i = 0; i < numSynchronicLayers; i++)
-            {
-                sProcessor[i]->keyReleased(noteNumber, channel);
-            }
-            
-            for (int i = 0; i < numDirectLayers; i++)
-            {
-                dProcessor[i]->keyReleased(noteNumber,
-                                           velocity,
-                                           channel);
-            }
-             */
-            
         }
         else if (m.isAftertouch())
         {
@@ -233,6 +172,11 @@ void BKAudioProcessor::releaseResources() {
     // spare memory, etc.
     //fileBuffer.setSize (0, 0);
     
+}
+
+void BKAudioProcessor::setCurrentPiano(int which)
+{
+    currentPiano = pianos[which];
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations

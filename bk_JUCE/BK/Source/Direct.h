@@ -108,7 +108,6 @@ public:
     DirectProcessor(BKSynthesiser *s,
                     BKSynthesiser *res,
                     BKSynthesiser *ham,
-                    Keymap::Ptr km,
                     DirectPreparation::Ptr prep,
                     int Id);
     
@@ -118,14 +117,11 @@ public:
     
     void setCurrentPlaybackSampleRate(double sr);
     
-    inline void             setKeymap(Keymap::Ptr km)                   { keymap = km;                      }
     inline void             setPreparation(DirectPreparation::Ptr prep) { preparation = prep;               }
     
-    int                     getId(void)                                 { return Id;                        } 
-    Keymap::Ptr             getKeymap(void) const                       { return keymap;                    }
+    int                     getId(void)                                 { return Id;                        }
     DirectPreparation::Ptr  getPreparation(void) const                  { return preparation;               }
     
-    int                     getKeymapId(void) const                     { return keymap->getId();           }
     int                     getPreparationId(void) const                { return preparation->getId();      }
     
     void    keyPressed(int noteNumber, float velocity, int channel);
@@ -137,7 +133,6 @@ private:
     BKSynthesiser*              synth;
     BKSynthesiser*              resonanceSynth;
     BKSynthesiser*              hammerSynth;
-    Keymap::Ptr                 keymap;
     DirectPreparation::Ptr      preparation;
     TuningProcessor             tuner;
     

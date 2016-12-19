@@ -13,8 +13,8 @@
 
 //==============================================================================
 KeymapViewController::KeymapViewController(BKAudioProcessor& p):
-processor(p),
-currentKeymapId(0)
+currentKeymapId(0),
+processor(p)
 {
     // Labels
     keymapL = OwnedArray<BKLabel>();
@@ -82,7 +82,7 @@ void KeymapViewController::textFieldDidChange(TextEditor& tf)
     String text = tf.getText();
     String name = tf.getName();
     
-    float f = text.getFloatValue();
+    //float f = text.getFloatValue();
     int i = text.getIntValue();
     
     DBG(name + ": |" + text + "|");
@@ -120,7 +120,7 @@ void KeymapViewController::actionListenerCallback (const String& message)
 {
     if (message == "keymap/update")
     {
-        //currentKeymapId = processor.currentPiano->getKeymap();
+        //currentKeymapId = processor.currentPiano->getKeymapId();
         
         updateFields(currentKeymapId);
     }

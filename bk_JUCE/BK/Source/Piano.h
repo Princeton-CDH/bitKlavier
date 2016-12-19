@@ -13,8 +13,6 @@
 
 #include "BKUtilities.h"
 
-#include "BKSynthesiser.h"
-
 #include "Keymap.h"
 
 #include "Tuning.h"
@@ -32,39 +30,32 @@ public:
     typedef Array<Piano::Ptr>                   Arr;
     typedef Array<Piano::Ptr, CriticalSection>  CSArr;
     
-    Piano(int pianoNum,
-          BKSynthesiser *s,
-          BKSynthesiser *res,
-          BKSynthesiser *ham);
-    
+    Piano(int val);
     ~Piano();
     
-    inline void setPianoNumber(int val)         {   pianoNumber = val; print();     }
-    
-    inline int getPianoNumber(void)             {   return pianoNumber;     }
+    inline void setPianoNumber(int val)         { pianoNumber = val; print();   }
+    inline int getPianoNumber(void)             { return pianoNumber;           }
     
     void processBlock(int numSamples, int midiChannel);
-    void setCurrentPlaybackSampleRate(double sr);
     void keyPressed(int noteNumber, float velocity, int channel);
     void keyReleased(int noteNumber, float velocity, int channel);
     
-    // Keymap for this Piano (one per piano)
-    Keymap::Ptr                     pKeymap;
+    void setKeymap(Keymap::Ptr km);
+    inline Keymap::Ptr getKeymap()              { return pKeymap; }
+    inline int getKeymapId()                    { return pKeymap->getId(); }
     
-    // Processors.
-    SynchronicProcessor::CSArr      sProcessor;
-    NostalgicProcessor::Arr         nProcessor;
-    DirectProcessor::Arr            dProcessor;
+    inline void setType(BKPreparationType p)    { prepType = p; }
+    inline BKPreparationType getType()          { return prepType; }
     
-    Array<SynchronicProcessor::Ptr> sProcessors;
-    Array<NostalgicProcessor::Ptr>  nProcessors;
-    Array<DirectProcessor::Ptr>     dProcessors;
+    void addSynchronic(SynchronicProcessor::Ptr sp)         { sProcessors.addIfNotAlreadyThere(sp); }
+    void addNostalgic(NostalgicProcessor::Ptr np)           { nProcessors.addIfNotAlreadyThere(np); }
+    void addDirect(DirectProcessor::Ptr dp)                 { dProcessors.addIfNotAlreadyThere(dp); }
     
-    // Preparations.
-    SynchronicPreparation::CSArr    sPreparation;
-    NostalgicPreparation::CSArr     nPreparation;
-    DirectPreparation::CSArr        dPreparation;
-    TuningPreparation::CSArr        tPreparation;
+    void removeSynchronic(SynchronicProcessor::Ptr sp)      { sProcessors.removeFirstMatchingValue(sp); }
+    void removeNostalgic(NostalgicProcessor::Ptr np)        { nProcessors.removeFirstMatchingValue(np); }
+    void removeDirect(DirectProcessor::Ptr dp)              { dProcessors.removeFirstMatchingValue(dp); }
+
+    void removeAllPreparations();
     
     void print(void)
     {
@@ -72,13 +63,18 @@ public:
     }
     
 private:
+    
     int pianoNumber;
+    BKPreparationType prepType; //temporary, until we allow multiple types of prep per piano
     
-    BKSynthesiser*              synth;
-    BKSynthesiser*              resonanceSynth;
-    BKSynthesiser*              hammerSynth;
+    // Keymap for this Piano (one per piano)
+    Keymap::Ptr                     pKeymap;
     
-    double sampleRate;
+    // Processors (with Preparations previously attached)
+    Array<SynchronicProcessor::Ptr> sProcessors;
+    Array<NostalgicProcessor::Ptr>  nProcessors;
+    Array<DirectProcessor::Ptr>     dProcessors;
+
     
     JUCE_LEAK_DETECTOR(Piano)
 };
