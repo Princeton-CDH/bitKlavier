@@ -11,6 +11,7 @@
 #include "Piano.h"
 
 Piano::Piano(int pianoNum):
+isActive(false),
 pianoNumber(pianoNum)
 {
     
@@ -32,6 +33,8 @@ void Piano::removeAllPreparations()
     sProcessors.clearQuick();
     nProcessors.clearQuick();
     dProcessors.clearQuick();
+    
+    isActive = false;
 }
 
 

@@ -47,15 +47,17 @@ public:
     inline void setType(BKPreparationType p)    { prepType = p; }
     inline BKPreparationType getType()          { return prepType; }
     
-    void addSynchronic(SynchronicProcessor::Ptr sp)         { sProcessors.addIfNotAlreadyThere(sp); }
-    void addNostalgic(NostalgicProcessor::Ptr np)           { nProcessors.addIfNotAlreadyThere(np); }
-    void addDirect(DirectProcessor::Ptr dp)                 { dProcessors.addIfNotAlreadyThere(dp); }
+    void addSynchronic(SynchronicProcessor::Ptr sp)         { sProcessors.addIfNotAlreadyThere(sp); isActive = true;}
+    void addNostalgic(NostalgicProcessor::Ptr np)           { nProcessors.addIfNotAlreadyThere(np); isActive = true;}
+    void addDirect(DirectProcessor::Ptr dp)                 { dProcessors.addIfNotAlreadyThere(dp); isActive = true;}
     
     void removeSynchronic(SynchronicProcessor::Ptr sp)      { sProcessors.removeFirstMatchingValue(sp); }
     void removeNostalgic(NostalgicProcessor::Ptr np)        { nProcessors.removeFirstMatchingValue(np); }
     void removeDirect(DirectProcessor::Ptr dp)              { dProcessors.removeFirstMatchingValue(dp); }
 
     void removeAllPreparations();
+    
+    bool isActive;
     
     void print(void)
     {

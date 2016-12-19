@@ -60,7 +60,7 @@ bkKeymaps               (Keymap::CSArr())
     
     //init basic piano
     currentPiano = pianos[0];
-    pianos[0]->addDirect(dProcessor[0]);
+    //pianos[0]->addDirect(dProcessor[0]);
     pianos[0]->addNostalgic(nProcessor[0]);
     //pianos[0]->addSynchronic(sProcessor[0]);
     pianos[0]->setKeymap(bkKeymaps[0]);
@@ -118,10 +118,11 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     int numSamples = buffer.getNumSamples();
 
-    // Process each piano
+    // Process each active piano
      for (int p = 0; p < aMaxNumPianos; p++)
      {
-        pianos[p]->processBlock(numSamples, m.getChannel()); //precede with if(pianos[p]->active), or rework with resizable arrays
+        if(pianos[p]->isActive)
+            pianos[p]->processBlock(numSamples, m.getChannel());
      }
     
     
@@ -135,9 +136,10 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         if (m.isNoteOn())
         {
             // Send key on to each piano
-            for (int p = 0; p < aMaxNumPianos; p++)  //or < numCurrentPianos...
+            for (int p = 0; p < aMaxNumPianos; p++)
             {
-                pianos[p]->keyPressed(noteNumber, velocity, channel); //precede with if(pianos[p]->active)
+                if(pianos[p]->isActive)
+                    pianos[p]->keyPressed(noteNumber, velocity, channel);
             }
         }
         else if (m.isNoteOff())
@@ -145,7 +147,8 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             // Send key off to each piano
             for (int p = 0; p < aMaxNumPianos; p++)
             {
-                pianos[p]->keyReleased(noteNumber, velocity, channel); //precede with if(pianos[p]->active)
+                if(pianos[p]->isActive)
+                    pianos[p]->keyReleased(noteNumber, velocity, channel); 
             }
         }
         else if (m.isAftertouch())
