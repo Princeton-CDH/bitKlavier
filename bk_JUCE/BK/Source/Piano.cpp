@@ -31,10 +31,12 @@ hammerSynth(ham)
         sProcessor.insert(i, new SynchronicProcessor(synth,
                                                      new SynchronicPreparation(0, new TuningPreparation(0)),
                                                      i));
+        
         nProcessor.insert(i, new NostalgicProcessor(synth,
                                                     new NostalgicPreparation(0, new TuningPreparation(0)),
                                                     sProcessor,
                                                     i));
+        
         dProcessor.insert(i, new DirectProcessor(synth,
                                                  resonanceSynth,
                                                  hammerSynth,
@@ -64,12 +66,13 @@ void Piano::prepareToPlay (double sr)
 void Piano::setKeymap(Keymap::Ptr km)
 {
     pKeymap = km;
-    
 }
 
 void Piano::removeAllPreparations()
 {
-    
+    sPreparations.clearQuick();
+    nPreparations.clearQuick();
+    dPreparations.clearQuick();
     isActive = false;
 }
 
@@ -157,16 +160,17 @@ void Piano::processBlock(int numSamples, int midiChannel)
     }
 }
 
+
 void Piano::keyPressed(int noteNumber, float velocity, int channel)
 {
     for (int layer = 0; layer < sPreparations.size(); layer++)
     {
-        if (pKeymap->containsNote(noteNumber)) sProcessor[layer]->keyPressed(noteNumber, velocity);
+        if (pKeymap->containsNote(noteNumber)) sProcessor[layer]->keyPressed(noteNumber, channel);
     }
     
     for (int layer = 0; layer < nPreparations.size(); layer++)
     {
-        if (pKeymap->containsNote(noteNumber)) nProcessor[layer]->keyPressed(noteNumber, velocity);
+        if (pKeymap->containsNote(noteNumber)) nProcessor[layer]->keyPressed(noteNumber, channel);
     }
     
     for (int layer = 0; layer < dPreparations.size(); layer++)
@@ -175,16 +179,17 @@ void Piano::keyPressed(int noteNumber, float velocity, int channel)
     }
 }
 
+
 void Piano::keyReleased(int noteNumber, float velocity, int channel)
 {
     for (int layer = 0; layer < sPreparations.size(); layer++)
     {
-        if (pKeymap->containsNote(noteNumber)) sProcessor[layer]->keyReleased(noteNumber, velocity);
+        if (pKeymap->containsNote(noteNumber)) sProcessor[layer]->keyReleased(noteNumber, channel);
     }
     
     for (int layer = 0; layer < nPreparations.size(); layer++)
     {
-        if (pKeymap->containsNote(noteNumber)) nProcessor[layer]->keyReleased(noteNumber, velocity);
+        if (pKeymap->containsNote(noteNumber)) nProcessor[layer]->keyReleased(noteNumber, channel);
     }
     
     for (int layer = 0; layer < dPreparations.size(); layer++)
