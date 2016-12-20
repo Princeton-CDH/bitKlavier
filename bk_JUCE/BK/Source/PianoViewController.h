@@ -59,7 +59,7 @@ private:
     
     void updateFields(void);
     
-    void addProcessor(BKPreparationType type, int which);
+    void addPreparation(BKPreparationType type, int which);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PianoViewController)
 };

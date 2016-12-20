@@ -49,11 +49,6 @@ public:
     Piano::CSArr                    pianos; //wraps all the keymaps, processors and preparations inside
     Piano::Ptr                      currentPiano;
     
-    // Processors.
-    SynchronicProcessor::CSArr      sProcessor;
-    NostalgicProcessor::Arr         nProcessor;
-    DirectProcessor::Arr            dProcessor;
-    
     // Preparations.
     SynchronicPreparation::CSArr    sPreparation;
     NostalgicPreparation::CSArr     nPreparation;

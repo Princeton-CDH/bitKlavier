@@ -133,7 +133,7 @@ void PianoViewController::textFieldDidChange(TextEditor& tf)
         BKPreparationType type = current->getType();
         
         current->removeAllPreparations();
-        addProcessor(type, i);
+        addPreparation(type, i);
     }
     else
     {
@@ -142,24 +142,24 @@ void PianoViewController::textFieldDidChange(TextEditor& tf)
 }
 
 
-void PianoViewController::addProcessor(BKPreparationType type, int which)
+void PianoViewController::addPreparation(BKPreparationType type, int which)
 {
     if (type == PreparationTypeSynchronic)
     {
-        SynchronicProcessor::Ptr proc = processor.sProcessor[which];
-        current->addSynchronic(proc);
+        SynchronicPreparation::Ptr prep = processor.sPreparation[which];
+        current->addSynchronic(prep);
         sendActionMessage("synchronic/update");
     }
     else if (type == PreparationTypeNostalgic)
     {
-        NostalgicProcessor::Ptr proc = processor.nProcessor[which];
-        current->addNostalgic(proc);
+        NostalgicPreparation::Ptr prep = processor.nPreparation[which];
+        current->addNostalgic(prep);
         sendActionMessage("nostalgic/update");
     }
     else if (type == PreparationTypeDirect)
     {
-        DirectProcessor::Ptr proc = processor.dProcessor[which];
-        current->addDirect(proc);
+        DirectPreparation::Ptr prep = processor.dPreparation[which];
+        current->addDirect(prep);
         sendActionMessage("direct/update");
     }
 }
@@ -221,7 +221,7 @@ void PianoViewController::comboBoxChanged (ComboBox* box)
         current->setType(BKPreparationType(which));
         //current->setPianoNumber(0);
         
-        addProcessor(BKPreparationType(which), 0);
+        addPreparation(BKPreparationType(which), 0);
 
         updateFields();
     }

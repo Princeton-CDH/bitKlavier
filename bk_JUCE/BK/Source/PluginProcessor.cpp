@@ -13,9 +13,6 @@ mainPianoSynth          (general),
 hammerReleaseSynth      (general),
 resonanceReleaseSynth   (general),
 pianos                  (Piano::CSArr()),
-sProcessor              (SynchronicProcessor::CSArr()),
-nProcessor              (NostalgicProcessor::Arr()),
-dProcessor              (DirectProcessor::Arr()),
 sPreparation            (SynchronicPreparation::CSArr()),
 nPreparation            (NostalgicPreparation::CSArr()),
 dPreparation            (DirectPreparation::CSArr()),
@@ -26,18 +23,12 @@ bkKeymaps               (Keymap::CSArr())
     //allocate storage
     pianos.ensureStorageAllocated(aMaxNumPianos);
     bkKeymaps.ensureStorageAllocated(aMaxNumPianos);
-    
-    sProcessor.ensureStorageAllocated(aMaxTotalPreparations);
-    nProcessor.ensureStorageAllocated(aMaxTotalPreparations);
-    dProcessor.ensureStorageAllocated(aMaxTotalPreparations);
-    
     tPreparation.ensureStorageAllocated(aMaxTotalPreparations * 3); //one tuning for each preparation type
 
-    
     //initialize pianos, keymaps, preparations, and processors
     for (int i = 0; i < aMaxNumPianos; i++)
     {
-        pianos.add(new Piano(i));
+        pianos.add(new Piano(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, i));
         bkKeymaps.add(new Keymap(i));
     }
   
@@ -51,18 +42,14 @@ bkKeymaps               (Keymap::CSArr())
         sPreparation.add(new SynchronicPreparation(i, tPreparation[0]));
         nPreparation.add(new NostalgicPreparation(i, tPreparation[0]));
         dPreparation.add(new DirectPreparation(i, tPreparation[0]));
-        
-        sProcessor.insert(i, new SynchronicProcessor(&mainPianoSynth, sPreparation[0], i));
-        nProcessor.insert(i, new NostalgicProcessor(&mainPianoSynth,  nPreparation[0], sProcessor, i));
-        dProcessor.insert(i, new DirectProcessor(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, dPreparation[0], i));
+
     }
-    
     
     //init basic piano
     currentPiano = pianos[0];
-    //pianos[0]->addDirect(dProcessor[0]);
-    pianos[0]->addNostalgic(nProcessor[0]);
-    //pianos[0]->addSynchronic(sProcessor[0]);
+    pianos[0]->addDirect(dPreparation[0]);
+    //pianos[0]->addNostalgic(nPreparation[0]);
+    //pianos[0]->addSynchronic(sPreparation[0]);
     pianos[0]->setKeymap(bkKeymaps[0]);
     for(int i = 0; i<128; i++) bkKeymaps[0]->addNote(i); //turn on keys for basic piano
     
@@ -70,6 +57,7 @@ bkKeymaps               (Keymap::CSArr())
     BKSampleLoader::loadMainPianoSamples(&mainPianoSynth, aNumSampleLayers);
     BKSampleLoader::loadHammerReleaseSamples(&hammerReleaseSynth);
     BKSampleLoader::loadResonanceReleaseSamples(&resonanceReleaseSynth);
+    
 }
 
 BKAudioProcessor::~BKAudioProcessor()
@@ -84,13 +72,12 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
     hammerReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     resonanceReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
-    
+       
     for (int i = 0; i < aMaxNumPianos; i++)
     {
-        sProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);
-        nProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);
-        dProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);
+        pianos[i]->prepareToPlay(sampleRate);
     }
+    
 }
 
 void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages) {
