@@ -298,6 +298,14 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
         int noteNumber = midiNoteNumber;
         float transposition = transp;
         
+        //adjust noteNumber to take into account transposition values > 1
+        if(fabs(transposition) >= 1.) {
+            noteNumber = noteNumber + round(transp);
+            transposition = fmod(transposition, 1.);
+        }
+        
+        DBG("noteNumber and transp = " + std::to_string(noteNumber) + " " + std::to_string(transposition));
+        
         for (int i = sounds.size(); --i >= 0;)
         {
             BKSynthesiserSound* const sound = sounds.getUnchecked(i);

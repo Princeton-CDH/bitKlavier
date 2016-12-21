@@ -25,10 +25,7 @@ synth(s),
 resonanceSynth(res),
 hammerSynth(ham)
 {
-    //allocate some memory for Processors
-    //sProcessor.ensureStorageAllocated(aMaxNumPreparationsPerPiano);
-    //nProcessor.ensureStorageAllocated(aMaxNumPreparationsPerPiano);
-    //dProcessor.ensureStorageAllocated(aMaxNumPreparationsPerPiano);
+
 }
 
 Piano::~Piano()
