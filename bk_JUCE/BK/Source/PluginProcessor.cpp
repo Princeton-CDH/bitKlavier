@@ -51,6 +51,7 @@ bkKeymaps               (Keymap::PtrArr())
     
     //init basic piano
     currentPiano = pianos[0];
+    activePianos.add(currentPiano);
     
     // For testing and developing, let's keep directory of samples in home folder on disk.
     BKSampleLoader::loadMainPianoSamples(&mainPianoSynth, aNumSampleLayers);
@@ -105,11 +106,9 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     int numSamples = buffer.getNumSamples();
 
     // Process each active piano
-    // <FIX> Let's make an array that only has the currently active pianos and iterate through that? Would save several checks.
-     for (int p = 0; p < aMaxNumPianos; p++)
+     for (int p = 0; p < activePianos.size(); p++)
      {
-        if(pianos[p]->isActive)
-            pianos[p]->processBlock(numSamples, m.getChannel());
+        activePianos[p]->processBlock(numSamples, m.getChannel());
      }
     
     
@@ -123,21 +122,17 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         if (m.isNoteOn())
         {
             // Send key on to each piano
-            // <FIX> Again, array with only the currently active pianos will be better.
-            for (int p = 0; p < aMaxNumPianos; p++)
+            for (int p = 0; p < activePianos.size(); p++)
             {
-                if(pianos[p]->isActive)
-                    pianos[p]->keyPressed(noteNumber, velocity, channel);
+                activePianos[p]->keyPressed(noteNumber, velocity, channel);
             }
         }
         else if (m.isNoteOff())
         {
             // Send key off to each piano
-            // <FIX> Again, array of currently active pianos.
-            for (int p = 0; p < aMaxNumPianos; p++)
+            for (int p = 0; p < activePianos.size(); p++)
             {
-                if(pianos[p]->isActive)
-                    pianos[p]->keyReleased(noteNumber, velocity, channel); 
+                activePianos[p]->keyReleased(noteNumber, velocity, channel); 
             }
         }
         else if (m.isAftertouch())
@@ -168,9 +163,20 @@ void BKAudioProcessor::releaseResources() {
 
 Piano::Ptr  BKAudioProcessor::setCurrentPiano(int which)
 {
+    
     currentPiano = pianos[which];
     
+    //remove inactive pianos
+    for(int i=0; i<activePianos.size(); i++) {
+        if(!activePianos[i]->isActive)
+            activePianos.remove(i);
+    }
+    
+    //add current piano to activePianos
+    activePianos.addIfNotAlreadyThere(currentPiano);
+    
     return currentPiano;
+    
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
