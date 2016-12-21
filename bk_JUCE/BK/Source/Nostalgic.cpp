@@ -62,6 +62,8 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
 
     float duration = 0.0;
     
+    
+    
     if (preparation->getMode() == NoteLengthSync)
     {
         //get length of played notes, subtract wave distance to set nostalgic reverse note length
@@ -73,11 +75,18 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
         duration = syncProcessor[preparation->getSyncTarget()]->getTimeToBeatMS(preparation->getBeatsToSkip()); // sum
     }
     
+    float offset = (preparation->getTransposition() + tuner.getOffset(midiNoteNumber));
+    int synthNoteNumber = midiNoteNumber + (int)offset;
+    offset -= (int)offset;
+    
+    DBG("offset: " + String(offset));
+    DBG("noteNumber: " + String(synthNoteNumber));
+    
     //play nostalgic note
     synth->keyOn(
                  midiChannel,
-                 midiNoteNumber,
-                 tuner.getOffset(midiNoteNumber) + preparation->getTransposition(),
+                 synthNoteNumber,
+                 offset,
                  velocities.getUnchecked(midiNoteNumber),
                  preparation->getGain() * aGlobalGain,
                  Reverse,
@@ -145,9 +154,13 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
  
             if(noteOnPrep->getUndertow() > 0)
             {
+                float offset = (noteOnPrep->getTransposition() + tuningsAtKeyOn.getUnchecked(tempnote));
+                int synthNoteNumber = tempnote +  (int)offset;
+                offset -= (int)offset;
+                
                 synth->keyOn(midiChannel,
-                             tempnote,
-                             tuningsAtKeyOn.getUnchecked(tempnote) + noteOnPrep->getTransposition(),
+                             synthNoteNumber,
+                             offset,
                              velocitiesAtKeyOn.getUnchecked(tempnote),
                              aGlobalGain,
                              Forward,

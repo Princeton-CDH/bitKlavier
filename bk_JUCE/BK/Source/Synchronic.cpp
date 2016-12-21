@@ -59,10 +59,14 @@ void SynchronicProcessor::playNote(int channel, int note)
         noteStartPos = noteLength;
     }
     
+    float offset = (tuner.getOffset(note));
+    int synthNoteNumber = note + (int)offset;
+    offset -= (int)offset;
+    
     synth->keyOn(
                  channel,
-                 note,
-                 tuner.getOffset(note) + preparation->getTranspOffsets()[transp],
+                 synthNoteNumber,
+                 offset + preparation->getTranspOffsets()[transp],
                  preparation->getAccentMultipliers()[accent],
                  aGlobalGain,
                  noteDirection,
