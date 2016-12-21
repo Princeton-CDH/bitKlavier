@@ -19,25 +19,27 @@ class Library : public ReferenceCountedObject
 {
 public:
     typedef ReferenceCountedObjectPtr<Library>   Ptr;
-    typedef Array<Library::Ptr>                  Arr;
-    typedef Array<Library::Ptr, CriticalSection> CSArr;
+    typedef Array<Library::Ptr>                  PtrArr;
+    typedef Array<Library::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<Library>                  Arr;
+    typedef OwnedArray<Library, CriticalSection> CSArr;
  
     Library();
-    Library(Preset::Arr presets);
+    Library(Preset::PtrArr presets);
     ~Library();
     
-    inline void setPresets(Preset::Arr p)           {   presets = p;      }
+    inline void setPresets(Preset::PtrArr p)           {   presets = p;      }
     
-    inline Preset::Arr getPresets(void)             {   return presets;   }
+    inline Preset::PtrArr getPresets(void)             {   return presets;   }
     
     // something like this
     void writeToFile(String filepath);
-    Preset::Arr readFromFile(String filepath);
+    Preset::PtrArr readFromFile(String filepath);
     
     
 private:
     
-    Preset::Arr presets;
+    Preset::PtrArr presets;
     
     ValueTree vt;
     

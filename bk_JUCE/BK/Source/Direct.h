@@ -24,8 +24,10 @@ class DirectPreparation : public ReferenceCountedObject
 public:
     
     typedef ReferenceCountedObjectPtr<DirectPreparation>   Ptr;
-    typedef Array<DirectPreparation::Ptr>                  Arr;
-    typedef Array<DirectPreparation::Ptr, CriticalSection> CSArr;
+    typedef Array<DirectPreparation::Ptr>                  PtrArr;
+    typedef Array<DirectPreparation::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<DirectPreparation>                  Arr;
+    typedef OwnedArray<DirectPreparation, CriticalSection> CSArr;
     
     DirectPreparation(int Id,
                       float transp,
@@ -102,8 +104,10 @@ class DirectProcessor : public ReferenceCountedObject
     
 public:
     typedef ReferenceCountedObjectPtr<DirectProcessor>   Ptr;
-    typedef Array<DirectProcessor::Ptr>                  Arr;
-    typedef Array<DirectProcessor::Ptr, CriticalSection> CSArr;
+    typedef Array<DirectProcessor::Ptr>                  PtrArr;
+    typedef Array<DirectProcessor::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<DirectProcessor>                  Arr;
+    typedef OwnedArray<DirectProcessor, CriticalSection> CSArr;
     
     DirectProcessor(BKSynthesiser *s,
                     BKSynthesiser *res,
@@ -119,17 +123,16 @@ public:
     
     inline void             setPreparation(DirectPreparation::Ptr prep) { preparation = prep;               }
     
-    int                     getId(void)                                 { return Id;                        }
-    DirectPreparation::Ptr  getPreparation(void) const                  { return preparation;               }
-    
     int                     getPreparationId(void) const                { return preparation->getId();      }
+    DirectPreparation::Ptr  getPreparation(void) const                  { return preparation;      }
     
     void    keyPressed(int noteNumber, float velocity, int channel);
     void    keyReleased(int noteNumber, float velocity, int channel);
     
-private:
+    inline int getId(void){return Id;}
     
-    int                         Id;
+private:
+    int Id;
     BKSynthesiser*              synth;
     BKSynthesiser*              resonanceSynth;
     BKSynthesiser*              hammerSynth;

@@ -286,6 +286,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                PianoSamplerNoteDirection direction,
                                PianoSamplerNoteType type,
                                BKNoteType bktype,
+                               int layer,
                                const float startingPositionMS,
                                const float lengthMS,
                                const float rampOnMS, //included in lengthMS
@@ -294,40 +295,28 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     {
         const ScopedLock sl (lock);
         
+        int noteNumber = midiNoteNumber;
+        float transposition = transp;
+        
         for (int i = sounds.size(); --i >= 0;)
         {
             BKSynthesiserSound* const sound = sounds.getUnchecked(i);
             
             // Check if sound applies to note, velocity, and channel.
-            if (sound->appliesToNote (midiNoteNumber)
+            if (sound->appliesToNote (noteNumber)
                 && sound->appliesToVelocity((int)(velocity * 127.0))
                 && sound->appliesToChannel (midiChannel))
             {
-                // If a Normal or NormalFixedStart note is struck while it is still playing, turn old one off.
-                if (type == Normal || type == NormalFixedStart) {
-                    for (int j = voices.size(); --j >= 0;)
-                    {
-                        BKSynthesiserVoice* const voice = voices.getUnchecked (j);
-                        
-                        if (voice->getCurrentlyPlayingNote() == midiNoteNumber
-                            && voice->isPlayingChannel (midiChannel)
-                            && voice->bktype != Nostalgic
-                            && voice->bktype != Synchronic)
-                        {
-                            stopVoice (voice, 1.0f, true);
-                        }
-                    }
-                }
-                
-                startVoice (findFreeVoice (sound, midiChannel, midiNoteNumber, shouldStealNotes),
+                startVoice (findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes),
                             sound,
                             midiChannel,
-                            midiNoteNumber,
-                            transp,
+                            noteNumber,
+                            transposition,
                             velocity * gain,
                             direction,
                             type,
                             bktype,
+                            layer,
                             (uint64)((startingPositionMS * 0.001f) * getSampleRate()),
                             (uint64)(lengthMS*0.001f* getSampleRate()),
                             rampOnMS*0.001f* getSampleRate(),
@@ -346,6 +335,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                     PianoSamplerNoteDirection direction,
                                     PianoSamplerNoteType type,
                                     BKNoteType bktype,
+                                    int layer,
                                     const uint64 startingPosition,
                                     const uint64 length,
                                     int voiceRampOn,
@@ -361,7 +351,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             voice->currentlyPlayingNote = (float)midiNoteNumber + midiNoteNumberOffset;
 #else
             voice->currentlyPlayingNote = midiNoteNumber;
-#endif
+#endif      
+            voice->layerId = layerToLayerId(bktype, layer);
             voice->length = length;
             voice->type = type;
             voice->bktype = bktype;
@@ -427,6 +418,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     }
     
     void BKSynthesiser::keyOff (const int midiChannel,
+                                const BKNoteType type,
+                                const int layerId,
                                 const int midiNoteNumber,
                                 const float velocity,
                                 bool allowTailOff)
@@ -438,8 +431,10 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             BKSynthesiserVoice* const voice = voices.getUnchecked (i);
             
             if (voice->getCurrentlyPlayingNote() == midiNoteNumber
-                && voice->isPlayingChannel (midiChannel))
+                && voice->isPlayingChannel (midiChannel)
+                && (voice->layerId == layerToLayerId(type, layerId)))
             {
+                
                 if (BKSynthesiserSound* const sound = voice->getCurrentlyPlayingSound())
                 {
                     if (sound->appliesToNote (midiNoteNumber)

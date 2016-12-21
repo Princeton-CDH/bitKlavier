@@ -15,7 +15,7 @@ Library::Library()
     
 }
 
-Library::Library(Preset::Arr p):
+Library::Library(Preset::PtrArr p):
 presets(p)
 {
     
@@ -31,7 +31,7 @@ void Library::writeToFile(String filepath)
     
 }
 
-Preset::Arr Library::readFromFile(String filepath)
+Preset::PtrArr Library::readFromFile(String filepath)
 {
     
     return presets;

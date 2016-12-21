@@ -25,8 +25,10 @@ class Keymap : public ReferenceCountedObject
 {
 public:
     typedef ReferenceCountedObjectPtr<Keymap>   Ptr;
-    typedef Array<Keymap::Ptr>                  Arr;
-    typedef Array<Keymap::Ptr, CriticalSection> CSArr;
+    typedef Array<Keymap::Ptr>                  PtrArr;
+    typedef Array<Keymap::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<Keymap>                  Arr;
+    typedef OwnedArray<Keymap, CriticalSection> CSArr;
     
     Keymap(int Id):
     Id(Id),

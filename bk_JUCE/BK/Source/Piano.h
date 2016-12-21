@@ -27,30 +27,61 @@ class Piano : public ReferenceCountedObject
 {
 public:
     typedef ReferenceCountedObjectPtr<Piano>    Ptr;
-    typedef Array<Piano::Ptr>                   Arr;
-    typedef Array<Piano::Ptr, CriticalSection>  CSArr;
+    typedef Array<Piano::Ptr>                   PtrArr;
+    typedef Array<Piano::Ptr, CriticalSection>  CSPtrArr;
+    typedef OwnedArray<Piano>                        Arr;
+    typedef OwnedArray<Piano, CriticalSection>       CSArr;
     
     Piano(BKSynthesiser *s,
           BKSynthesiser *res,
           BKSynthesiser *ham,
+          Keymap::Ptr keymap,
           int pianoNum);
     ~Piano();
     
     void prepareToPlay (double sampleRate);
     
-    inline void setPianoNumber(int val)         { pianoNumber = val; print();   }
-    inline int getPianoNumber(void)             { return pianoNumber;           }
+    inline void setPianoId(int val)         { pianoId = val; print();   }
+    inline int getPianoId(void)             { return pianoId;           }
     
     void processBlock(int numSamples, int midiChannel);
+    
     void keyPressed(int noteNumber, float velocity, int channel);
     void keyReleased(int noteNumber, float velocity, int channel);
     
     void setKeymap(Keymap::Ptr km);
     inline Keymap::Ptr getKeymap()              { return pKeymap; }
-    inline int getKeymapId()                    { return pKeymap->getId(); }
+    inline int getKeymapId()                    { if (pKeymap) return pKeymap->getId(); else return 0; }
     
-    inline void setType(BKPreparationType p)    { prepType = p; }
-    inline BKPreparationType getType()          { return prepType; }
+    inline String getPreparationIds()
+    {
+        String prep = "";
+        for (auto p : sPreparations)
+        {
+            prep.append("S",1);
+            prep.append(String(p->getId()), 3);
+            prep.append(" ",1);
+        }
+        
+        for (auto p : nPreparations)
+        {
+            prep.append("N",1);
+            prep.append(String(p->getId()), 3);
+            prep.append(" ",1);
+        }
+        
+        for (auto p : dPreparations)
+        {
+            prep.append("D",1);
+            prep.append(String(p->getId()), 3);
+            prep.append(" ",1);
+        }
+        return prep;
+    }
+    
+    void setSynchronicPreparations(SynchronicPreparation::PtrArr sPrep);
+    void setNostalgicPreparations(NostalgicPreparation::PtrArr nPrep);
+    void setDirectPreparations(DirectPreparation::PtrArr dPrep);
     
     void addSynchronic(SynchronicPreparation::Ptr sp);
     void addNostalgic(NostalgicPreparation::Ptr np);
@@ -64,15 +95,16 @@ public:
     
     void removeAllPreparations();
     
-    int pianoNumber;
+    
     bool isActive;
     
     void print(void)
     {
-        DBG("pianoNum: " + String(pianoNumber));
+        DBG("pianoNum: " + String(pianoId));
     }
     
 private:
+    int pianoId;
     
     BKPreparationType prepType; //temporary, until we allow multiple types of prep per piano
     
@@ -80,20 +112,20 @@ private:
     Keymap::Ptr                     pKeymap;
     
     // Preparations (flown in from BKAudioProcessor)
-    Array<SynchronicPreparation::Ptr> sPreparations;
-    Array<NostalgicPreparation::Ptr>  nPreparations;
-    Array<DirectPreparation::Ptr>     dPreparations;
+    SynchronicPreparation::PtrArr      sPreparations;
+    NostalgicPreparation::PtrArr       nPreparations;
+    DirectPreparation::PtrArr          dPreparations;
     
     // Processors
-    SynchronicProcessor::CSArr      sProcessor;
-    NostalgicProcessor::Arr         nProcessor;
-    DirectProcessor::Arr            dProcessor;
+    SynchronicProcessor::CSPtrArr        sProcessor;
+    NostalgicProcessor::CSPtrArr         nProcessor;
+    DirectProcessor::CSPtrArr            dProcessor;
     
     // Pointers to synths
-    BKSynthesiser*              synth;
-    BKSynthesiser*              resonanceSynth;
-    BKSynthesiser*              hammerSynth;
-    double                      sampleRate;
+    BKSynthesiser*                  synth;
+    BKSynthesiser*                  resonanceSynth;
+    BKSynthesiser*                  hammerSynth;
+    double                          sampleRate;
     
     
     JUCE_LEAK_DETECTOR(Piano)

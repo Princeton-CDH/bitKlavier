@@ -132,6 +132,7 @@ public:
 private:
     //==============================================================================
     int noteNumber;
+    int layer;
     float noteVelocity;
     uint64 noteStartingPosition, noteEndPosition;
     double pitchRatio;

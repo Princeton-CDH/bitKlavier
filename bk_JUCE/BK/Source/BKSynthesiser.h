@@ -264,6 +264,7 @@ private:
     PianoSamplerNoteType direction;
     PianoSamplerNoteType type;
     BKNoteType bktype;
+    int layerId;
     uint32 noteOnTime;
     BKSynthesiserSound::Ptr currentlyPlayingSound;
     bool keyIsDown, sustainPedalDown, sostenutoPedalDown;
@@ -394,6 +395,7 @@ public:
                         PianoSamplerNoteDirection direction,
                         PianoSamplerNoteType type,
                         BKNoteType bktype,
+                        int layer,
                         float startingPositionMS,
                         float lengthMS,
                         float rampOnMS,
@@ -412,6 +414,8 @@ public:
      The midiChannel parameter is the channel, between 1 and 16 inclusive.
      */
     virtual void keyOff (int midiChannel,
+                         BKNoteType type,
+                         int layerId,
                          int midiNoteNumber,
                          float velocity,
                          bool allowTailOff);
@@ -625,6 +629,7 @@ protected:
                      PianoSamplerNoteDirection direction,
                      PianoSamplerNoteType type,
                      BKNoteType bktype,
+                     int layer,
                      uint64 startingPosition,
                      uint64 length,
                      int voiceRampOn,

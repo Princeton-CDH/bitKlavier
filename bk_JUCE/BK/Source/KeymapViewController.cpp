@@ -109,6 +109,7 @@ void KeymapViewController::textFieldDidChange(TextEditor& tf)
 
 void KeymapViewController::updateFields(int keymapId)
 {
+    DBG("keymap Id: " + String(keymapId));
     Keymap::Ptr km = processor.bkKeymaps[keymapId];
     
     keymapTF[KeymapId]        ->setText( String( keymapId));
@@ -120,7 +121,7 @@ void KeymapViewController::actionListenerCallback (const String& message)
 {
     if (message == "keymap/update")
     {
-        //currentKeymapId = processor.currentPiano->getKeymapId();
+        currentKeymapId = processor.currentPiano->getKeymapId();
         
         updateFields(currentKeymapId);
     }

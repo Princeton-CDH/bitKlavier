@@ -25,8 +25,10 @@ class Preset : public ReferenceCountedObject
 {
 public:
     typedef ReferenceCountedObjectPtr<Preset>   Ptr;
-    typedef Array<Preset::Ptr>                  Arr;
-    typedef Array<Preset::Ptr, CriticalSection> CSArr;
+    typedef Array<Preset::Ptr>                  PtrArr;
+    typedef Array<Preset::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<Preset>                  Arr;
+    typedef OwnedArray<Preset, CriticalSection> CSArr;
     
     Preset();
     Preset(BKAudioProcessor&);
@@ -34,15 +36,15 @@ public:
     
     inline GeneralSettings::Ptr             getGeneralSettings(void)            {   return general;         }
     
-    inline SynchronicPreparation::Arr       getSynchronicPreparations(void)     {   return synchronic;      }
-    inline NostalgicPreparation::Arr        getNostalgicPreparations(void)      {   return nostalgic;       }
-    inline DirectPreparation::Arr           getDirectPreparations(void)         {   return direct;          }
+    inline SynchronicPreparation::PtrArr       getSynchronicPreparations(void)     {   return synchronic;      }
+    inline NostalgicPreparation::PtrArr        getNostalgicPreparations(void)      {   return nostalgic;       }
+    inline DirectPreparation::PtrArr           getDirectPreparations(void)         {   return direct;          }
     
     inline void setGeneralSettings(GeneralSettings::Ptr g)                  {   general = g;            }
     
-    inline void setSynchronicPreparations(SynchronicPreparation::Arr s)     {   synchronic = s;         }
-    inline void setNostalgicPreparations(NostalgicPreparation::Arr n)       {   nostalgic=  n;          }
-    inline void setDirectPreparations(DirectPreparation::Arr d)             {   direct = d;             }
+    inline void setSynchronicPreparations(SynchronicPreparation::PtrArr s)     {   synchronic = s;         }
+    inline void setNostalgicPreparations(NostalgicPreparation::PtrArr n)       {   nostalgic=  n;          }
+    inline void setDirectPreparations(DirectPreparation::PtrArr d)             {   direct = d;             }
     
     
     inline SynchronicPreparation::Ptr       getSynchronicPreparationForLayer(int layer)     {   return synchronic[layer];      }
@@ -61,11 +63,9 @@ private:
     
     GeneralSettings::Ptr        general;
     
-    SynchronicPreparation::Arr  synchronic;
-    NostalgicPreparation::Arr   nostalgic;
-    DirectPreparation::Arr      direct;
-    // TuningPreparation::Ptr      tuning;
-    // TempoPreparation::Ptr       tempo;
+    SynchronicPreparation::PtrArr  synchronic;
+    NostalgicPreparation::PtrArr   nostalgic;
+    DirectPreparation::PtrArr      direct;
     
     ValueTree vt;
     

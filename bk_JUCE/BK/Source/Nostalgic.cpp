@@ -12,12 +12,12 @@
 
 NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s,
                                        NostalgicPreparation::Ptr prep,
-                                       SynchronicProcessor::CSArr& proc,
-                                       int id):
-Id(id),
+                                       SynchronicProcessor::CSPtrArr& proc,
+                                       int Id):
+Id(Id),
 synth(s),
 preparation(prep),
-tuner(preparation->getTuning(), id),
+tuner(preparation->getTuning()),
 syncProcessor(proc)
 {
     noteLengthTimers.ensureStorageAllocated(128);
@@ -83,6 +83,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
                  Reverse,
                  FixedLengthFixedStart,
                  Nostalgic,
+                 Id,
                  duration + preparation->getWavedistance(),
                  duration,                                      // length
                  3,
@@ -152,6 +153,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
                              Forward,
                              FixedLengthFixedStart,
                              Nostalgic,
+                             Id,
                              noteOnPrep->getWavedistance(),                        //start position
                              noteOnPrep->getUndertow(),                            //play length
                              aRampUndertowCrossMS,                                 //ramp up length

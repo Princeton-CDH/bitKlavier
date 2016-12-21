@@ -80,13 +80,11 @@ static const std::vector<std::string> cPreparationTypes = {
 };
 
 typedef enum BKPianoCBType {
-    PianoCBType,
     PianoCBNumber,
     BKPianoCBTypeNil,
 } BKPianoCBType;
 
 static const std::vector<std::string> cPianoCBType = {
-    "PianoType",
     "PianoNumber"
 };
 
@@ -296,7 +294,6 @@ typedef enum PianoTFIndex
 } PianoTFIndex;
 
 static const std::vector<std::string> cPianoParameterTypes = {
-    "PianoType",
     "PianoNumber",
     "PianoKeymap Id",
     "PianoPreparation Id"
@@ -319,8 +316,8 @@ static const std::vector<std::string> cKeymapParameterTypes = {
 
 // Globals
 static const int aMaxNumPianos = 12;
-static const int aMaxNumPreparationsPerPianos = 12;
-static const int aMaxTotalPreparations = aMaxNumPianos * aMaxNumPreparationsPerPianos;
+static const int aMaxNumPreparationsPerPiano = 12;
+static const int aMaxTotalPreparations = aMaxNumPianos * aMaxNumPreparationsPerPiano;
 static const float aGlobalGain = 0.5; //make this user settable
 
 static const float aMaxSampleLengthSec = 30.0f;

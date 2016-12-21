@@ -21,8 +21,10 @@ class SynchronicPreparation : public ReferenceCountedObject
 {
 public:
     typedef ReferenceCountedObjectPtr<SynchronicPreparation>   Ptr;
-    typedef Array<SynchronicPreparation::Ptr>                  Arr;
-    typedef Array<SynchronicPreparation::Ptr, CriticalSection> CSArr;
+    typedef Array<SynchronicPreparation::Ptr>                  PtrArr;
+    typedef Array<SynchronicPreparation::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<SynchronicPreparation>                  Arr;
+    typedef OwnedArray<SynchronicPreparation, CriticalSection> CSArr;
     
     SynchronicPreparation(int Id,
                           float tempo,
@@ -190,8 +192,11 @@ class SynchronicProcessor  : public ReferenceCountedObject
     
 public:
     typedef ReferenceCountedObjectPtr<SynchronicProcessor>   Ptr;
-    typedef Array<SynchronicProcessor::Ptr>                  Arr;
-    typedef Array<SynchronicProcessor::Ptr, CriticalSection> CSArr;
+    typedef Array<SynchronicProcessor::Ptr>                  PtrArr;
+    typedef Array<SynchronicProcessor::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<SynchronicProcessor>                       Arr;
+    typedef OwnedArray<SynchronicProcessor,CriticalSection>       CSArr;
+    
     
     SynchronicProcessor(BKSynthesiser *synth,
                         SynchronicPreparation::Ptr prep,
@@ -211,6 +216,8 @@ public:
     inline void                             setPreparation(SynchronicPreparation::Ptr prep) { preparation = prep;           }
     inline SynchronicPreparation::Ptr       getPreparation(void)                            { return preparation;           }
     inline int                              getPreparationId(void)                          { return preparation->getId();  }
+    
+    inline int getId(void){return Id;}
     
 private:
     int Id;

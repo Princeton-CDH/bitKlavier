@@ -50,6 +50,7 @@ private:
     OwnedArray<BKLabel> pianoL;
     OwnedArray<BKTextField> pianoTF;
     
+    String processPreparationString(String s);
     
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
     

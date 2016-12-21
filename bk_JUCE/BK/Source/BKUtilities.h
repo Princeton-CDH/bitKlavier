@@ -33,5 +33,7 @@ double          mtof(double f);
 
 double          ftom(double f);
 
+inline int layerToLayerId(BKNoteType type, int layer) { return (50*type)+layer;}
+
 
 #endif  // BKUTILITIES_H_INCLUDED

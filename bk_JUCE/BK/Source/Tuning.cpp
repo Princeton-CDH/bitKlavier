@@ -11,9 +11,8 @@
 #include "Tuning.h"
 
 
-TuningProcessor::TuningProcessor(TuningPreparation::Ptr prep, int Id)
+TuningProcessor::TuningProcessor(TuningPreparation::Ptr prep)
 :
-Id(Id),
 preparation(prep)
 {
     
@@ -93,7 +92,6 @@ void TuningProcessor::keyOn(int midiNoteNumber)
         else adaptiveHistoryCounter++;
     }
     
-    DBG("adaptive fundamental = " + std::to_string(ftom(adaptiveFundamentalFreq)));
     clusterTime = 0;
     
 }

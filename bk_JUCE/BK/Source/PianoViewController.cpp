@@ -34,12 +34,12 @@ pianoTF(OwnedArray<BKTextField>())
     pianoTF = OwnedArray<BKTextField>();
     pianoTF.ensureStorageAllocated(cPianoParameterTypes.size());
     
-    for (int i = 0; i < cPianoParameterTypes.size()-2; i++)
+    for (int i = 0; i < cPianoParameterTypes.size()-cPianoCBType.size(); i++)
     {
         pianoTF.set(i, new BKTextField());
         addAndMakeVisible(pianoTF[i]);
         pianoTF[i]->addListener(this);
-        pianoTF[i]->setName(cPianoParameterTypes[i+2]);
+        pianoTF[i]->setName(cPianoParameterTypes[i+cPianoCBType.size()]);
     }
     
     
@@ -52,17 +52,11 @@ pianoTF(OwnedArray<BKTextField>())
         addAndMakeVisible(pianoCB[i]);
     }
     
-    for (int i = 0; i < cPreparationTypes.size(); i++)
-    {
-        pianoCB[PianoCBType]->addItem(cPreparationTypes[i], i+1);
-    }
-    
     for (int i = 0; i < aMaxNumPianos; i++)
     {
         pianoCB[PianoCBNumber]->addItem(cPianoNumberName[i], i+1);
     }
     
-    pianoCB[PianoCBType]->setSelectedItemIndex(0);
     pianoCB[PianoCBNumber]->setSelectedItemIndex(0);
     
     updateFields();
@@ -102,38 +96,128 @@ void PianoViewController::resized()
         pianoCB[n]->setTopLeftPosition(tfX, gYSpacing + tfY * n);
     }
     
-    for (int n = 0; n < cPianoParameterTypes.size()-2; n++)
+    for (int n = 0; n < cPianoParameterTypes.size()-cPianoCBType.size(); n++)
     {
-        pianoTF[n]->setTopLeftPosition(tfX, gYSpacing + tfY * (n+2));
+        pianoTF[n]->setTopLeftPosition(tfX, gYSpacing + tfY * (n+cPianoCBType.size()));
     }
     
+}
+
+String PianoViewController::processPreparationString(String s)
+{
+    SynchronicPreparation::PtrArr sPrep = SynchronicPreparation::PtrArr();
+    NostalgicPreparation::PtrArr nPrep = NostalgicPreparation::PtrArr();
+    DirectPreparation::PtrArr dPrep = DirectPreparation::PtrArr();
+    
+    String temp = "";
+    String out = "";
+    
+    bool inNumber = false;
+    
+    String::CharPointerType c = s.getCharPointer();
+    
+    juce_wchar synchronicLC = 's';
+    juce_wchar synchronicUC = 'S';
+    juce_wchar nostalgicLC = 'n';
+    juce_wchar nostalgicUC = 'N';
+    juce_wchar directLC = 'd';
+    juce_wchar directUC = 'D';
+    
+    BKPreparationType type = BKPreparationTypeNil;
+    
+    for (int i = 0; i < (s.length()+1); i++)
+    {
+        juce_wchar c1 = c.getAndAdvance();
+        
+        bool isSynchronic   = !CharacterFunctions::compare(c1, synchronicLC) || !CharacterFunctions::compare(c1, synchronicUC);
+        bool isNostalgic    = !CharacterFunctions::compare(c1, nostalgicLC) || !CharacterFunctions::compare(c1, nostalgicUC);
+        bool isDirect       = !CharacterFunctions::compare(c1, directLC) || !CharacterFunctions::compare(c1, directUC);
+        
+        bool isNumChar = CharacterFunctions::isDigit(c1);
+        
+        if (!isNumChar)
+        {
+            if (isSynchronic)
+            {
+                type = PreparationTypeSynchronic;
+            }
+            else if (isNostalgic)
+            {
+                type = PreparationTypeNostalgic;
+            }
+            else if (isDirect)
+            {
+                type = PreparationTypeDirect;
+            }
+            else if (inNumber)
+            {
+                if (type == PreparationTypeSynchronic)
+                {
+                    int prep = temp.getIntValue();
+                    sPrep.add(processor.sPreparation[prep]);
+                    out.append("S", 1);
+                    out.append(String(prep), 3);
+                }
+                else if (type == PreparationTypeNostalgic)
+                {
+                    int prep = temp.getIntValue();
+                    nPrep.add(processor.nPreparation[prep]);
+                    out.append("N", 1);
+                    out.append(String(prep), 3);
+                }
+                else if (type == PreparationTypeDirect)
+                {
+                    int prep = temp.getIntValue();
+                    dPrep.add(processor.dPreparation[prep]);
+                    out.append("D", 1);
+                    out.append(String(prep), 3);
+                }
+                
+                out.append(" ", 1);
+                temp = "";
+                type = BKPreparationTypeNil;
+                
+                inNumber = false;
+            }
+            
+            continue;
+        }
+        else
+        {
+            inNumber = true;
+            
+            temp += c1;
+        }
+        
+    }
+    
+    // pass arrays to piano
+    current->setSynchronicPreparations(sPrep);
+    current->setNostalgicPreparations(nPrep);
+    current->setDirectPreparations(dPrep);
+    
+    return out;
 }
 
 void PianoViewController::textFieldDidChange(TextEditor& tf)
 {
     String text = tf.getText();
     String name = tf.getName();
-    
-    //float f = text.getFloatValue();
+
     int i = text.getIntValue();
     
     DBG(name + ": |" + text + "|");
 
-    if (name == cPianoParameterTypes[PianoKeymapId+2])
+    if (name == cPianoParameterTypes[PianoKeymapId+1])
     {
-        
         Keymap::Ptr km = processor.bkKeymaps[i];
         current->setKeymap(km);
         
         sendActionMessage("keymap/update");
-        
     }
-    else if (name == cPianoParameterTypes[PianoPreparationId+2])
+    else if (name == cPianoParameterTypes[PianoPreparationId+1])
     {
-        BKPreparationType type = current->getType();
-        
-        current->removeAllPreparations();
-        addPreparation(type, i);
+        DBG("PREPARATIONS: " + processPreparationString(text));
     }
     else
     {
@@ -142,99 +226,27 @@ void PianoViewController::textFieldDidChange(TextEditor& tf)
 }
 
 
-void PianoViewController::addPreparation(BKPreparationType type, int which)
-{
-    if (type == PreparationTypeSynchronic)
-    {
-        SynchronicPreparation::Ptr prep = processor.sPreparation[which];
-        current->addSynchronic(prep);
-        sendActionMessage("synchronic/update");
-    }
-    else if (type == PreparationTypeNostalgic)
-    {
-        NostalgicPreparation::Ptr prep = processor.nPreparation[which];
-        current->addNostalgic(prep);
-        sendActionMessage("nostalgic/update");
-    }
-    else if (type == PreparationTypeDirect)
-    {
-        DirectPreparation::Ptr prep = processor.dPreparation[which];
-        current->addDirect(prep);
-        sendActionMessage("direct/update");
-    }
-}
-
-void PianoViewController::switchToPiano(BKPreparationType type, int piano)
-{
-    TuningPreparation::Ptr tuning;
-    
-    /*
-    if (type == PreparationTypeDirect)
-    {
-        DirectProcessor::Ptr proc = processor.dProcessor[piano];
-        tuning = proc->getPreparation()->getTuning();
-        current->setPreparation(proc->getPreparationId());
-        current->setKeymap(proc->getKeymapId());
-        sendActionMessage("direct/update");
-    }
-    else if (type == PreparationTypeSynchronic)
-    {
-        SynchronicProcessor::Ptr proc = processor.sProcessor[piano];
-        tuning = proc->getPreparation()->getTuning();
-        current->setPreparation(proc->getPreparationId());
-        current->setKeymap(proc->getKeymapId());
-        sendActionMessage("synchronic/update");
-    }
-    else if (type == PreparationTypeNostalgic)
-    {
-        NostalgicProcessor::Ptr proc = processor.nProcessor[piano];
-        tuning = proc->getPreparation()->getTuning();
-        current->setPreparation(proc->getPreparationId());
-        current->setKeymap(proc->getKeymapId());
-        sendActionMessage("nostalgic/update");
-    }
-    
-    current->setTuning(tuning->getId());
-     */
-    sendActionMessage("tuning/update");
-}
-
 
 void PianoViewController::updateFields(void)
 {
-    /*
+    
     // Set text.
-    pianoTF[PianoKeymapId]        ->setText( String(current->getKeymap()));
-    pianoTF[PianoPreparationId]   ->setText( String(current->getPreparation()));
-     */
+    pianoTF[PianoKeymapId]        ->setText( String(current->getKeymapId()));
+    pianoTF[PianoPreparationId]   ->setText( String(current->getPreparationIds()));
+    
 }
 
 void PianoViewController::comboBoxChanged (ComboBox* box)
 {
     
-    if (box->getName() == "PianoType")
-    {
-        int which = box->getSelectedId() - 1;
-        
-        DBG(cPreparationTypes[which]);
-        
-        current->setType(BKPreparationType(which));
-        //current->setPianoNumber(0);
-        
-        addPreparation(BKPreparationType(which), 0);
-
-        updateFields();
-    }
-    else if (box->getName() == "PianoNumber")
+    if (box->getName() == cPianoCBType[0])
     {
         int whichPiano = box->getSelectedId();
         
-        DBG("which: "+String(whichPiano));
+        DBG("Current Piano: " + String(whichPiano));
         
-        processor.setCurrentPiano(whichPiano);
-        current = processor.getCurrentPiano();
-
-        sendActionMessage("keymap/update");
+        current = processor.setCurrentPiano(whichPiano);
+        
         updateFields();
     }
 }

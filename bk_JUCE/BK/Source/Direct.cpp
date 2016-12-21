@@ -10,18 +10,17 @@
 
 #include "Direct.h"
 
-
 DirectProcessor::DirectProcessor(BKSynthesiser *s,
                                  BKSynthesiser *res,
                                  BKSynthesiser *ham,
                                  DirectPreparation::Ptr prep,
-                                 int id):
-Id(id),
+                                 int Id):
+Id(Id),
 synth(s),
 resonanceSynth(res),
 hammerSynth(ham),
 preparation(prep),
-tuner(preparation->getTuning(), id)
+tuner(preparation->getTuning())
 {
     
 }
@@ -42,14 +41,19 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
     tuner.setPreparation(preparation->getTuning());
     
     tuner.keyOn(noteNumber);
+    
+    float offset = (preparation->getTransposition() + tuner.getOffset(noteNumber));
+    noteNumber += (int)offset;
+    
     synth->keyOn(channel,
                  noteNumber,
-                 tuner.getOffset(noteNumber) + preparation->getTransposition(),
+                 offset,
                  velocity,
                  preparation->getGain() * aGlobalGain,
                  Forward,
                  Normal,
                  Main,
+                 Id,
                  0, // start
                  0, // length
                  3,
@@ -59,9 +63,12 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 
 void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
 {
-
-    synth->keyOff(
-                  channel,
+    float offset = (preparation->getTransposition() + tuner.getOffset(noteNumber));
+    noteNumber += (int)offset;
+    
+    synth->keyOff(channel,
+                  Main,
+                  Id,
                   noteNumber,
                   velocity,
                   true);
@@ -71,7 +78,6 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
     
     if (hGain > 0.0f)
     {
-        DBG("hammer: " + String(hGain));
         hammerSynth->keyOn(
                                  channel,
                                  noteNumber,
@@ -81,6 +87,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
                                  Forward,
                                  Normal, //FixedLength,
                                  Hammer,
+                                 Id,
                                  0,
                                  2000,
                                  3,
@@ -89,7 +96,6 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
     
     if (rGain > 0.0f)
     {
-        DBG("release: " + String(rGain));
         resonanceSynth->keyOn(
                                     channel,
                                     noteNumber,
@@ -99,6 +105,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
                                     Forward,
                                     Normal, //FixedLength,
                                     Resonance,
+                                    Id,
                                     0,
                                     2000,
                                     3,

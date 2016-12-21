@@ -12,12 +12,12 @@
 
 SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s,
                                          SynchronicPreparation::Ptr p,
-                                         int id)
+                                         int Id)
 :
-Id(id),
+Id(Id),
 synth(s),
 preparation(p),
-tuner(preparation->getTuning(), Id)
+tuner(preparation->getTuning())
 {
     clusterTimer = 0;
     phasor = 0;
@@ -68,6 +68,7 @@ void SynchronicProcessor::playNote(int channel, int note)
                  noteDirection,
                  FixedLengthFixedStart,
                  Synchronic,
+                 Id,
                  noteStartPos, // start
                  noteLength,
                  3,

@@ -18,9 +18,11 @@
 class TuningPreparation : public ReferenceCountedObject
 {
 public:
-    typedef ReferenceCountedObjectPtr<TuningPreparation>   Ptr;
-    typedef Array<TuningPreparation::Ptr>                  Arr;
-    typedef Array<TuningPreparation::Ptr, CriticalSection> CSArr;
+    typedef ReferenceCountedObjectPtr<TuningPreparation>    Ptr;
+    typedef Array<TuningPreparation::Ptr>                   PtrArr;
+    typedef Array<TuningPreparation::Ptr, CriticalSection>  CSPtrArr;
+    typedef OwnedArray<TuningPreparation>                        Arr;
+    typedef OwnedArray<TuningPreparation, CriticalSection>       CSArr;
     
     TuningPreparation(int Id,
                       TuningSystem whichTuning,
@@ -136,11 +138,13 @@ private:
 class TuningProcessor : public ReferenceCountedObject
 {
 public:
-    typedef ReferenceCountedObjectPtr<TuningProcessor>   Ptr;
-    typedef Array<TuningProcessor::Ptr>                  Arr;
-    typedef Array<TuningProcessor::Ptr, CriticalSection> CSArr;
+    typedef ReferenceCountedObjectPtr<TuningProcessor>      Ptr;
+    typedef Array<TuningProcessor::Ptr>                     Arr;
+    typedef Array<TuningProcessor::Ptr, CriticalSection>    CSArr;
+    typedef OwnedArray<TuningProcessor>                          PtrArr;
+    typedef OwnedArray<TuningProcessor, CriticalSection>         CSPtrArr;
     
-    TuningProcessor(TuningPreparation::Ptr prep, int Id);;
+    TuningProcessor(TuningPreparation::Ptr prep);;
     ~TuningProcessor();
     
     void setPreparation(TuningPreparation::Ptr prep) {preparation = prep;}
@@ -161,8 +165,6 @@ public:
     const float getGlobalTuningReference(void) const noexcept {return globalTuningReference;}
     
 private:
-    
-    int Id;
     
     Array<Array<float>> tuningLibrary;
     TuningPreparation::Ptr preparation;

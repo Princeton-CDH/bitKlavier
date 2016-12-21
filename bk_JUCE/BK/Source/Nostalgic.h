@@ -24,8 +24,10 @@ class NostalgicPreparation : public ReferenceCountedObject
 {
 public:
     typedef ReferenceCountedObjectPtr<NostalgicPreparation>   Ptr;
-    typedef Array<NostalgicPreparation::Ptr>                  Arr;
-    typedef Array<NostalgicPreparation::Ptr, CriticalSection> CSArr;
+    typedef Array<NostalgicPreparation::Ptr>                  PtrArr;
+    typedef Array<NostalgicPreparation::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<NostalgicPreparation>                  Arr;
+    typedef OwnedArray<NostalgicPreparation, CriticalSection> CSArr;
     
     NostalgicPreparation(int Id,
                          int waveDistance,
@@ -141,13 +143,15 @@ class NostalgicProcessor : public ReferenceCountedObject
     
 public:
     typedef ReferenceCountedObjectPtr<NostalgicProcessor>   Ptr;
-    typedef Array<NostalgicProcessor::Ptr>                  Arr;
-    typedef Array<NostalgicProcessor::Ptr, CriticalSection> CSArr;
+    typedef Array<NostalgicProcessor::Ptr>                  PtrArr;
+    typedef Array<NostalgicProcessor::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<NostalgicProcessor>                  Arr;
+    typedef OwnedArray<NostalgicProcessor, CriticalSection> CSArr;
     
     NostalgicProcessor(
                        BKSynthesiser *s,
                        NostalgicPreparation::Ptr prep,
-                       SynchronicProcessor::CSArr& proc,
+                       SynchronicProcessor::CSPtrArr& proc,
                        int Id);
     
     virtual ~NostalgicProcessor();
@@ -164,11 +168,12 @@ public:
     void keyReleased(int midiNoteNumber, int midiChannel);
 
     inline void setPreparation(NostalgicPreparation::Ptr prep)  { preparation = prep;   }
-    
-    int                         getId(void)             { return Id;            }
+
     NostalgicPreparation::Ptr   getPreparation(void)    { return preparation;   }
     
     int getPreparationId(void)  { return preparation->getId();  }
+    
+    inline int getId(void){return Id;}
     
 private:
     int Id;
@@ -178,10 +183,10 @@ private:
     TuningProcessor             tuner;
     
     //target Synchronic layer
-    SynchronicProcessor::CSArr& syncProcessor;
+    SynchronicProcessor::CSPtrArr& syncProcessor;
     
     //store values so that undertow note retains preparation from reverse note
-    NostalgicPreparation::Arr preparationAtKeyOn;
+    NostalgicPreparation::PtrArr preparationAtKeyOn;
     Array<float> tuningsAtKeyOn;
     Array<float> velocitiesAtKeyOn;
     

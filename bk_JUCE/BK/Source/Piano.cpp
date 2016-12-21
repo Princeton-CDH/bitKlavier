@@ -13,36 +13,22 @@
 Piano::Piano(BKSynthesiser *s,
              BKSynthesiser *res,
              BKSynthesiser *ham,
-             int pianoNum):
-pianoNumber(pianoNum),
+             Keymap::Ptr km,
+             int Id):
 isActive(false),
+pianoId(Id),
+pKeymap(km),
+sProcessor(SynchronicProcessor::CSPtrArr()),
+nProcessor(NostalgicProcessor::CSPtrArr()),
+dProcessor(DirectProcessor::CSPtrArr()),
 synth(s),
 resonanceSynth(res),
 hammerSynth(ham)
 {
-    //allocate memory for Processors
-    sProcessor.ensureStorageAllocated(aMaxNumPreparationsPerPianos);
-    nProcessor.ensureStorageAllocated(aMaxNumPreparationsPerPianos);
-    dProcessor.ensureStorageAllocated(aMaxNumPreparationsPerPianos);
-    
-    //initialize Processors
-    for (int i = 0; i < aMaxNumPreparationsPerPianos; i++)
-    {
-        sProcessor.insert(i, new SynchronicProcessor(synth,
-                                                     new SynchronicPreparation(0, new TuningPreparation(0)),
-                                                     i));
-        
-        nProcessor.insert(i, new NostalgicProcessor(synth,
-                                                    new NostalgicPreparation(0, new TuningPreparation(0)),
-                                                    sProcessor,
-                                                    i));
-        
-        dProcessor.insert(i, new DirectProcessor(synth,
-                                                 resonanceSynth,
-                                                 hammerSynth,
-                                                 new DirectPreparation(0, new TuningPreparation(0)),
-                                                 i));
-    }
+    //allocate some memory for Processors
+    sProcessor.ensureStorageAllocated(aMaxNumPreparationsPerPiano);
+    nProcessor.ensureStorageAllocated(aMaxNumPreparationsPerPiano);
+    dProcessor.ensureStorageAllocated(aMaxNumPreparationsPerPiano);
     
 }
 
@@ -54,18 +40,94 @@ Piano::~Piano()
 void Piano::prepareToPlay (double sr)
 {
     sampleRate = sr;
-    
-    for (int i = 0; i < aMaxNumPreparationsPerPianos; i++)
-    {
-        sProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);
-        nProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);
-        dProcessor[i]->setCurrentPlaybackSampleRate(sampleRate);
-    }
 }
 
 void Piano::setKeymap(Keymap::Ptr km)
 {
     pKeymap = km;
+}
+
+void Piano::setSynchronicPreparations(SynchronicPreparation::PtrArr newPreps)
+{
+    SynchronicPreparation::PtrArr oldPreps = sPreparations;
+    sPreparations = newPreps;
+    
+    // If a preparation was not previously part of the Piano, add it to a new XProcesssor and add that processor to xProcessor.
+    for (int i = sPreparations.size(); --i >= 0;)
+    {
+        if (!oldPreps.contains(sPreparations[i]))
+        {
+            SynchronicProcessor::Ptr proc = new SynchronicProcessor(synth, sPreparations[i], i);
+            sProcessor.add(proc);
+            proc->setCurrentPlaybackSampleRate(sampleRate);
+        }
+    }
+    
+    // If a processor contains a pointer to a preparation that is no longer one of the current preparations, remove that processor from xProcessor.
+    for (int i = sProcessor.size(); --i >= 0;)
+    {
+        if (!sPreparations.contains(sProcessor[i]->getPreparation()))
+            sProcessor.remove(i);
+    }
+    
+    for (auto proc : sProcessor)
+    {
+        DBG("Processor: "+String(proc->getPreparationId()));
+    }
+    
+    deactivateIfNecessary();
+}
+
+void Piano::setNostalgicPreparations(NostalgicPreparation::PtrArr newPreps)
+{
+    NostalgicPreparation::PtrArr oldPreps = nPreparations;
+    nPreparations = newPreps;
+    
+    // If a preparation was not previously part of the Piano, add it to a new XProcesssor and add that processor to xProcessor.
+    for (int i = nPreparations.size(); --i >= 0;)
+    {
+        if (!oldPreps.contains(nPreparations[i]))
+        {
+            NostalgicProcessor::Ptr proc = new NostalgicProcessor(synth, nPreparations[i], sProcessor, i);
+            nProcessor.add(proc);
+            proc->setCurrentPlaybackSampleRate(sampleRate);
+        }
+    }
+    
+    // If a processor contains a pointer to a preparation that is no longer one of the current preparations, remove that processor from xProcessor.
+    for (int i = nProcessor.size(); --i >= 0;)
+    {
+        if (!nPreparations.contains(nProcessor[i]->getPreparation()))
+            nProcessor.remove(i);
+    }
+    
+    deactivateIfNecessary();
+}
+
+void Piano::setDirectPreparations(DirectPreparation::PtrArr newPreps)
+{
+    DirectPreparation::PtrArr oldPreps = dPreparations;
+    dPreparations = newPreps;
+    
+    // If a preparation was not previously part of the Piano, add it to a new XProcesssor and add that processor to xProcessor.
+    for (int i = dPreparations.size(); --i >= 0;)
+    {
+        if (!oldPreps.contains(dPreparations[i]))
+        {
+            DirectProcessor::Ptr proc = new DirectProcessor(synth, resonanceSynth, hammerSynth, dPreparations[i], i);
+            dProcessor.add(proc);
+            proc->setCurrentPlaybackSampleRate(sampleRate);
+        }
+    }
+    
+    // If a processor contains a pointer to a preparation that is no longer one of the current preparations, remove that processor from xProcessor.
+    for (int i = dProcessor.size(); --i >= 0;)
+    {
+        if (!dPreparations.contains(dProcessor[i]->getPreparation()))
+            dProcessor.remove(i);
+    }
+    
+    deactivateIfNecessary();
 }
 
 void Piano::removeAllPreparations()
@@ -76,124 +138,75 @@ void Piano::removeAllPreparations()
     isActive = false;
 }
 
-//perhaps we can refactor these by Processor/Preparation type?
-void Piano::addSynchronic(SynchronicPreparation::Ptr sp)
-{
-    //add Preparation and make sure this Piano is active
-    sPreparations.addIfNotAlreadyThere(sp);
-    isActive = true;
-    
-    //add a new Processor if necessary
-    if(sProcessor.size() < sPreparations.size())
-    {
-        sProcessor.add(new SynchronicProcessor(synth, sp, sPreparations.size()));
-        sProcessor[sProcessor.size() - 1]->setCurrentPlaybackSampleRate(sampleRate);
-    }
-    //or assign preparation to existing processor
-    else sProcessor[sPreparations.indexOf(sp)]->setPreparation(sp);
 
-}
-void Piano::addNostalgic(NostalgicPreparation::Ptr np)
-{
-    nPreparations.addIfNotAlreadyThere(np);
-    isActive = true;
-    if(nProcessor.size() < nPreparations.size()) {
-        nProcessor.add(new NostalgicProcessor(synth, np, sProcessor, nPreparations.size()));
-        nProcessor[nProcessor.size() - 1]->setCurrentPlaybackSampleRate(sampleRate);
-    }
-    else nProcessor[nPreparations.indexOf(np)]->setPreparation(np);
-}
-
-void Piano::addDirect(DirectPreparation::Ptr dp)
-{
-    dPreparations.addIfNotAlreadyThere(dp);
-    isActive = true;
-    if(dProcessor.size() < dPreparations.size()) {
-        dProcessor.add(new DirectProcessor(synth, resonanceSynth, hammerSynth, dp, dPreparations.size()));
-        dProcessor[dProcessor.size() - 1]->setCurrentPlaybackSampleRate(sampleRate);
-    }
-    else dProcessor[dPreparations.indexOf(dp)]->setPreparation(dp);
-}
-
-void Piano::removeSynchronic(SynchronicPreparation::Ptr sp)
-{
-    sPreparations.removeFirstMatchingValue(sp);
-    deactivateIfNecessary();
-}
-
-void Piano::removeNostalgic(NostalgicPreparation::Ptr np)
-{
-    nPreparations.removeFirstMatchingValue(np);
-    deactivateIfNecessary();
-}
-
-void Piano::removeDirect(DirectPreparation::Ptr dp)
-{
-    dPreparations.removeFirstMatchingValue(dp);
-    deactivateIfNecessary();
-}
 
 void Piano::deactivateIfNecessary()
 {
     if(sPreparations.size() == 0 &&
        nPreparations.size() == 0 &&
        dPreparations.size() == 0)
+    {
         isActive = false;
+    }
+    else
+    {
+        isActive = true;
+    }
 }
 
 
 void Piano::processBlock(int numSamples, int midiChannel)
 {
-    for (int layer = 0; layer < sPreparations.size(); layer++)
+    for (int i = sProcessor.size(); --i >= 0; )
     {
-        sProcessor[layer]->processBlock(numSamples, midiChannel);
+        sProcessor[i]->processBlock(numSamples, midiChannel);
     }
     
-    for (int layer = 0; layer < nPreparations.size(); layer++)
+    for (int i = nProcessor.size(); --i >= 0; )
     {
-        nProcessor[layer]->processBlock(numSamples, midiChannel);
+        nProcessor[i]->processBlock(numSamples, midiChannel);
     }
     
-    for (int layer = 0; layer < dPreparations.size(); layer++)
+    for (int i = dProcessor.size(); --i >= 0; )
     {
-        dProcessor[layer]->processBlock(numSamples, midiChannel);
+        dProcessor[i]->processBlock(numSamples, midiChannel);
     }
 }
 
 
 void Piano::keyPressed(int noteNumber, float velocity, int channel)
 {
-    for (int layer = 0; layer < sPreparations.size(); layer++)
+    for (int i = sProcessor.size(); --i >= 0; )
     {
-        if (pKeymap->containsNote(noteNumber)) sProcessor[layer]->keyPressed(noteNumber, channel);
+        if (pKeymap->containsNote(noteNumber)) sProcessor[i]->keyPressed(noteNumber, channel);
     }
     
-    for (int layer = 0; layer < nPreparations.size(); layer++)
+    for (int i = nProcessor.size(); --i >= 0; )
     {
-        if (pKeymap->containsNote(noteNumber)) nProcessor[layer]->keyPressed(noteNumber, channel);
+        if (pKeymap->containsNote(noteNumber)) nProcessor[i]->keyPressed(noteNumber, channel);
     }
     
-    for (int layer = 0; layer < dPreparations.size(); layer++)
+    for (int i = dProcessor.size(); --i >= 0; )
     {
-        if (pKeymap->containsNote(noteNumber)) dProcessor[layer]->keyPressed(noteNumber, velocity, channel);
+        if (pKeymap->containsNote(noteNumber)) dProcessor[i]->keyPressed(noteNumber, velocity, channel);
     }
 }
 
 
 void Piano::keyReleased(int noteNumber, float velocity, int channel)
 {
-    for (int layer = 0; layer < sPreparations.size(); layer++)
+    for (int i = sProcessor.size(); --i >= 0; )
     {
-        if (pKeymap->containsNote(noteNumber)) sProcessor[layer]->keyReleased(noteNumber, channel);
+        if (pKeymap->containsNote(noteNumber)) sProcessor[i]->keyReleased(noteNumber, channel);
     }
     
-    for (int layer = 0; layer < nPreparations.size(); layer++)
+    for (int i = nProcessor.size(); --i >= 0; )
     {
-        if (pKeymap->containsNote(noteNumber)) nProcessor[layer]->keyReleased(noteNumber, channel);
+        if (pKeymap->containsNote(noteNumber)) nProcessor[i]->keyReleased(noteNumber, channel);
     }
     
-    for (int layer = 0; layer < dPreparations.size(); layer++)
+    for (int i = dProcessor.size(); --i >= 0; )
     {
-        if (pKeymap->containsNote(noteNumber)) dProcessor[layer]->keyReleased(noteNumber, velocity, channel);
+        if (pKeymap->containsNote(noteNumber)) dProcessor[i]->keyReleased(noteNumber, velocity, channel);
     }
 }

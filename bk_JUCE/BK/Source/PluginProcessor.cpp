@@ -12,12 +12,12 @@ general                 (new GeneralSettings()),
 mainPianoSynth          (general),
 hammerReleaseSynth      (general),
 resonanceReleaseSynth   (general),
-pianos                  (Piano::CSArr()),
-sPreparation            (SynchronicPreparation::CSArr()),
-nPreparation            (NostalgicPreparation::CSArr()),
-dPreparation            (DirectPreparation::CSArr()),
-tPreparation            (TuningPreparation::CSArr()),
-bkKeymaps               (Keymap::CSArr())
+pianos                  (Piano::CSPtrArr()),
+sPreparation            (SynchronicPreparation::CSPtrArr()),
+nPreparation            (NostalgicPreparation::CSPtrArr()),
+dPreparation            (DirectPreparation::CSPtrArr()),
+tPreparation            (TuningPreparation::CSPtrArr()),
+bkKeymaps               (Keymap::PtrArr())
 {
     
     //allocate storage
@@ -28,8 +28,12 @@ bkKeymaps               (Keymap::CSArr())
     //initialize pianos, keymaps, preparations, and processors
     for (int i = 0; i < aMaxNumPianos; i++)
     {
-        pianos.add(new Piano(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, i));
         bkKeymaps.add(new Keymap(i));
+        pianos.add(new Piano(&mainPianoSynth,
+                             &resonanceReleaseSynth,
+                             &hammerReleaseSynth,
+                             bkKeymaps[0],
+                             i));
     }
   
     for (int i = 0; i < (aMaxTotalPreparations * 3); i++)
@@ -47,11 +51,6 @@ bkKeymaps               (Keymap::CSArr())
     
     //init basic piano
     currentPiano = pianos[0];
-    pianos[0]->addDirect(dPreparation[0]);
-    //pianos[0]->addNostalgic(nPreparation[0]);
-    //pianos[0]->addSynchronic(sPreparation[0]);
-    pianos[0]->setKeymap(bkKeymaps[0]);
-    for(int i = 0; i<128; i++) bkKeymaps[0]->addNote(i); //turn on keys for basic piano
     
     // For testing and developing, let's keep directory of samples in home folder on disk.
     BKSampleLoader::loadMainPianoSamples(&mainPianoSynth, aNumSampleLayers);
@@ -106,6 +105,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     int numSamples = buffer.getNumSamples();
 
     // Process each active piano
+    // <FIX> Let's make an array that only has the currently active pianos and iterate through that? Would save several checks.
      for (int p = 0; p < aMaxNumPianos; p++)
      {
         if(pianos[p]->isActive)
@@ -123,6 +123,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         if (m.isNoteOn())
         {
             // Send key on to each piano
+            // <FIX> Again, array with only the currently active pianos will be better.
             for (int p = 0; p < aMaxNumPianos; p++)
             {
                 if(pianos[p]->isActive)
@@ -132,6 +133,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         else if (m.isNoteOff())
         {
             // Send key off to each piano
+            // <FIX> Again, array of currently active pianos.
             for (int p = 0; p < aMaxNumPianos; p++)
             {
                 if(pianos[p]->isActive)
@@ -164,9 +166,11 @@ void BKAudioProcessor::releaseResources() {
     
 }
 
-void BKAudioProcessor::setCurrentPiano(int which)
+Piano::Ptr  BKAudioProcessor::setCurrentPiano(int which)
 {
     currentPiano = pianos[which];
+    
+    return currentPiano;
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations

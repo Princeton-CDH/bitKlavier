@@ -46,17 +46,17 @@ public:
     BKSynthesiser resonanceReleaseSynth;
     
     // Pianos
-    Piano::CSArr                    pianos; //wraps all the keymaps, processors and preparations inside
-    Piano::Ptr                      currentPiano;
+    Piano::CSPtrArr                    pianos; //wraps all the keymaps, processors and preparations inside
+    Piano::Ptr                         currentPiano;
     
     // Preparations.
-    SynchronicPreparation::CSArr    sPreparation;
-    NostalgicPreparation::CSArr     nPreparation;
-    DirectPreparation::CSArr        dPreparation;
-    TuningPreparation::CSArr        tPreparation;
+    SynchronicPreparation::CSPtrArr    sPreparation;
+    NostalgicPreparation::CSPtrArr     nPreparation;
+    DirectPreparation::CSPtrArr        dPreparation;
+    TuningPreparation::CSPtrArr        tPreparation;
     
     // Keymaps.
-    Keymap::CSArr                   bkKeymaps;
+    Keymap::PtrArr                        bkKeymaps;
 
     int channel;
 
@@ -74,7 +74,8 @@ public:
 
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
     
-    void setCurrentPiano(int which);
+    Piano::Ptr setCurrentPiano(int which);
+    
     inline Piano::Ptr getCurrentPiano() const { return currentPiano;}
 
     //==============================================================================
