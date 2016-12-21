@@ -299,7 +299,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
         float transposition = transp;
         
         //adjust noteNumber to take into account transposition values > 1
-        if(fabs(transposition) >= 1.) {
+        if(fabs(transposition) >= 1.0f) {
             noteNumber = noteNumber + round(transp);
             transposition = fmod(transposition, 1.);
         }

@@ -51,7 +51,7 @@ void SynchronicProcessor::playNote(int channel, int note)
     float noteStartPos = 0.0;
     
     //float noteLength = (fabs(preparation->getLengthMultipliers()[length]) * tempoPeriod);
-    float noteLength = (fabs(preparation->getLengthMultipliers()[length]) * 50.0); //we can change to tempoPeriod multiplier, but need to think about consistency with older behavior
+    float noteLength = (fabs(preparation->getLengthMultipliers()[length]) * 50.0);
     
     if (preparation->getLengthMultipliers()[length] < 0)
     {
@@ -59,14 +59,13 @@ void SynchronicProcessor::playNote(int channel, int note)
         noteStartPos = noteLength;
     }
     
-    float offset = (tuner.getOffset(note));
-    int synthNoteNumber = note + (int)offset;
+    float offset = tuner.getOffset(note) + preparation->getTranspOffsets()[transp];
+    int synthNoteNumber = ((float)note + (int)offset);
     offset -= (int)offset;
     
-    synth->keyOn(
-                 channel,
+    synth->keyOn(channel,
                  synthNoteNumber,
-                 offset + preparation->getTranspOffsets()[transp],
+                 offset,
                  preparation->getAccentMultipliers()[accent],
                  aGlobalGain,
                  noteDirection,
@@ -76,76 +75,70 @@ void SynchronicProcessor::playNote(int channel, int note)
                  noteStartPos, // start
                  noteLength,
                  3,
-                 3
-                 );
+                 3);
 }
 
 
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
     tuner.setPreparation(preparation->getTuning());
-    
-    //if (keymap->containsNote(noteNumber))
+
+    if (inCluster)
     {
-        if (inCluster)
+        // If LastNoteSync mode, reset phasor and multiplier indices.
+        if (preparation->getMode() == LastNoteSync)
         {
-            // If LastNoteSync mode, reset phasor and multiplier indices.
-            if (preparation->getMode() == LastNoteSync)
+            phasor = pulseThresholdSamples;
+            
+            if (clusterThresholdSamples > pulseThresholdSamples)
             {
-                phasor = pulseThresholdSamples;
-                
-                if (clusterThresholdSamples > pulseThresholdSamples)
-                {
-                    pulse = 0;
-                }
-                else
-                {
-                    pulse = 1;
-                }
-                beat = 0;
-                length = 0;
-                accent = 0;
-                transp = 0;
-                
-                inPrePulses = true;
-                pulseThresholdTimer = 0;
+                pulse = 0;
             }
-            
-            
-        }
-        else
-        {
-            cluster.clearQuick();
-            inPulses = false;
-            
-            // Start first note timer, since this is beginning of new cluster.
-            if (preparation->getMode() == FirstNoteSync)
+            else
             {
-                firstNoteTimer = 0;
+                pulse = 1;
             }
+            beat = 0;
+            length = 0;
+            accent = 0;
+            transp = 0;
             
             inPrePulses = true;
             pulseThresholdTimer = 0;
-            
-            inCluster = true;
         }
         
-        if (inCluster)
-        {
-            
-            cluster.add(noteNumber);
-            clusterThresholdTimer = 0;
-        }
+        
     }
+    else
+    {
+        cluster.clearQuick();
+        inPulses = false;
+        
+        // Start first note timer, since this is beginning of new cluster.
+        if (preparation->getMode() == FirstNoteSync)
+        {
+            firstNoteTimer = 0;
+        }
+        
+        inPrePulses = true;
+        pulseThresholdTimer = 0;
+        
+        inCluster = true;
+    }
+    
+    if (inCluster)
+    {
+        
+        cluster.add(noteNumber);
+        clusterThresholdTimer = 0;
+    }
+    
     
 }
 
 void SynchronicProcessor::keyReleased(int noteNumber, int channel)
 {
-    //if (keymap->containsNote(noteNumber))
-    {
-        ;
-    }
+
     
 }
 

@@ -44,7 +44,6 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
     
     float offset = (preparation->getTransposition() + tuner.getOffset(noteNumber));
     int synthNoteNumber = noteNumber + (int)offset;
-    
     offset -= (int)offset;
     
     synth->keyOn(channel,
