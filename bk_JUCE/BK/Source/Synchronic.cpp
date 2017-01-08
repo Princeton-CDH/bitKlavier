@@ -78,15 +78,14 @@ void SynchronicProcessor::playNote(int channel, int note)
                  3);
 }
 
-
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
     tuner.setPreparation(preparation->getTuning());
-
+    
     if (inCluster)
     {
-        // If LastNoteSync mode, reset phasor and multiplier indices.
-        if (preparation->getMode() == LastNoteSync)
+        // If LastNoteOnSync mode, reset phasor and multiplier indices.
+        if (preparation->getMode() == LastNoteOnSync)
         {
             phasor = pulseThresholdSamples;
             
@@ -98,6 +97,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
             {
                 pulse = 1;
             }
+            
             beat = 0;
             length = 0;
             accent = 0;
@@ -115,7 +115,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
         inPulses = false;
         
         // Start first note timer, since this is beginning of new cluster.
-        if (preparation->getMode() == FirstNoteSync)
+        if (preparation->getMode() == FirstNoteOnSync)
         {
             firstNoteTimer = 0;
         }
@@ -132,14 +132,29 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
         cluster.add(noteNumber);
         clusterThresholdTimer = 0;
     }
-    
-    
 }
 
 void SynchronicProcessor::keyReleased(int noteNumber, int channel)
 {
-
-    
+    // If LastNoteOnSync mode, reset phasor and multiplier indices.
+    if (!inPulses && preparation->getMode() == LastNoteOffSync)
+    {
+        phasor = pulseThresholdSamples;
+        beat = 0;
+        length = 0;
+        accent = 0;
+        transp = 0;
+        pulse = 1;
+        
+        /*
+        for (int n = 0; n < cluster.size(); n++)
+        {
+            playNote(channel, cluster[n]);
+        }
+         */
+        
+        inPulses = true;
+    }
 }
 
 void SynchronicProcessor::processBlock(int numSamples, int channel)
@@ -172,7 +187,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
         {
             inPrePulses = false;
             
-            if (preparation->getMode() == FirstNoteSync)
+            if (preparation->getMode() == FirstNoteOnSync)
             {
                 phasor = pulseThresholdSamples;
                 
@@ -183,7 +198,10 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 accent = 0;
             }
             
-            inPulses = true;
+            if (preparation->getMode() != LastNoteOffSync)
+            {
+                inPulses = true;
+            }
             
         }
         else

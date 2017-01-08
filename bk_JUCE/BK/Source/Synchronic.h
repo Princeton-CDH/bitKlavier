@@ -65,7 +65,7 @@ public:
     sClusterMin(1),
     sClusterMax(100),
     sClusterThresh(1.0),
-    sMode(FirstNoteSync),
+    sMode(FirstNoteOnSync),
     sBeatsToSkip(0),
     sBeatMultipliers(Array<float>({1.0})),
     sAccentMultipliers(Array<float>({1.0})),
@@ -87,11 +87,11 @@ public:
     inline const int getClusterMin() const noexcept                    {return sClusterMin;            }
     inline const int getClusterMax() const noexcept                    {return sClusterMax;            }
     inline const float getClusterThresh() const noexcept               {return sClusterThreshSec;      }
-    inline const float getPulseThresh() const noexcept              {return sPulseThreshSec;        }
+    inline const float getPulseThresh() const noexcept                 {return sPulseThreshSec;        }
     inline const float getClusterThreshold() const noexcept            {return sClusterThresh;         }
     inline const SynchronicSyncMode getMode() const noexcept           {return sMode;                  }
-    inline const int getBeatsToSkip() const noexcept                   {return sBeatsToSkip;           }
     inline const Array<float> getBeatMultipliers() const noexcept      {return sBeatMultipliers;       }
+    inline const int getBeatsToSkip()                                  {return sBeatsToSkip;           }
     inline const Array<float> getAccentMultipliers() const noexcept    {return sAccentMultipliers;     }
     inline const Array<float> getLengthMultipliers() const noexcept    {return sLengthMultipliers;     }
     inline const Array<float> getTranspOffsets() const noexcept        {return sTranspOffsets;         }
@@ -246,9 +246,8 @@ private:
     uint64 pulseThresholdSamples;
     uint64 pulseThresholdTimer;
     
-    uint64 firstNoteTimer;
+    uint64 firstNoteTimer, lastNoteTimer;
     uint64 tempoPeriodTimer;
-    uint64 lastNoteTimer;
     
     Array<float> tuningOffsets;
     PitchClass tuningBasePitch;

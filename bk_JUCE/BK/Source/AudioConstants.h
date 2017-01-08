@@ -146,8 +146,9 @@ typedef enum AdaptiveTempo1Mode {
 }AdaptiveTempo1Mode;
 
 typedef enum SynchronicSyncMode {
-    FirstNoteSync = 0,
-    LastNoteSync,
+    FirstNoteOnSync = 0,
+    LastNoteOnSync,
+    LastNoteOffSync,
     SynchronicSyncModeNil
 } SynchronicSyncMode;
 
