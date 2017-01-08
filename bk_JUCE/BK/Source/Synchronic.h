@@ -256,6 +256,8 @@ private:
     uint64 pulseTimer;
     uint64 phasor;
     uint64 numSamplesBeat;
+    int skipBeats;
+    bool shouldPlay;
     
     Array<int> cluster;
     Array<int> toAdd;

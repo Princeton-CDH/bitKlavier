@@ -29,6 +29,9 @@ tuner(preparation->getTuning())
     
     cluster = Array<int>();
     on = Array<int>();
+    
+    skipBeats = 0;
+    shouldPlay = false;
 }
 
 
@@ -214,35 +217,67 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
     {
         numSamplesBeat = (preparation->getBeatMultipliers()[beat] * pulseThresholdSamples);
         
-        
         if (phasor >= numSamplesBeat)
         {
             phasor -= numSamplesBeat;
             
-            if (clusterSize >= preparation->getClusterMin() && clusterSize <= preparation->getClusterMax())
+            
+            DBG("shouldPlay: "      + String((int)shouldPlay) +
+                " skipBeats: "      + String(skipBeats) +
+                " beatsToSkip: "    + String(preparation->getBeatsToSkip()));
+            if (!shouldPlay)
             {
-                for (int n = 0; n < clusterSize; n++)
+                if (++skipBeats >= preparation->getBeatsToSkip())
                 {
-                    playNote(channel, cluster[n]);
+                    skipBeats = 0;
+                    
+                    beat = 0;
+                    
+                    if (preparation->getBeatsToSkip() > 0)
+                    {
+                        pulse = 0;
+                    }
+                    else
+                    {
+                        pulse = 1;
+                    }
+                    
+                    shouldPlay = true;
+                    
+                }
+                else
+                {
+                    if (++beat >= preparation->getBeatMultipliers().size())         beat = 0;
                 }
             }
             
-            if (++beat >= preparation->getBeatMultipliers().size())         beat = 0;
-            
-            if (++length >= preparation->getLengthMultipliers().size())     length = 0;
-            
-            if (++accent >= preparation->getAccentMultipliers().size())     accent = 0;
-            
-            if (++transp >= preparation->getTranspOffsets().size())         transp = 0;
-            
-            if (++pulse >= preparation->getNumPulses())
+            if (shouldPlay)
             {
-                cluster.clearQuick();
-                toAdd.clearQuick();
-                inPulses = false;
+                if (clusterSize >= preparation->getClusterMin() && clusterSize <= preparation->getClusterMax())
+                {
+                    for (int n = 0; n < clusterSize; n++)
+                    {
+                        playNote(channel, cluster[n]);
+                    }
+                
+                }
+                
+                if (++beat >= preparation->getBeatMultipliers().size())         beat = 0;
+                
+                if (++length >= preparation->getLengthMultipliers().size())     length = 0;
+                
+                if (++accent >= preparation->getAccentMultipliers().size())     accent = 0;
+                
+                if (++transp >= preparation->getTranspOffsets().size())         transp = 0;
+                
+                if (++pulse >= preparation->getNumPulses())
+                {
+                    cluster.clearQuick();
+                    toAdd.clearQuick();
+                    inPulses = false;
+                    shouldPlay = false;
+                }
             }
-            
-            
         }
         
         phasor += numSamples;
@@ -256,7 +291,8 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip) //return time in m
     uint64 timeToReturn = numSamplesBeat - phasor; //next beat
     int myBeat = beat;
     
-    while(beatsToSkip-- > 0) {
+    while(beatsToSkip-- > 0)
+    {
         if (++myBeat >= preparation->getBeatMultipliers().size()) myBeat = 0;
         timeToReturn += (preparation->getBeatMultipliers()[myBeat] * pulseThresholdSamples);
     }
