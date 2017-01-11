@@ -174,12 +174,12 @@ void Piano::keyPressed(int noteNumber, float velocity, int channel)
 {
     for (int i = sProcessor.size(); --i >= 0; )
     {
-        if (pKeymap->containsNote(noteNumber)) sProcessor[i]->keyPressed(noteNumber, channel);
+        if (pKeymap->containsNote(noteNumber)) sProcessor[i]->keyPressed(noteNumber, velocity);
     }
     
     for (int i = nProcessor.size(); --i >= 0; )
     {
-        if (pKeymap->containsNote(noteNumber)) nProcessor[i]->keyPressed(noteNumber, channel);
+        if (pKeymap->containsNote(noteNumber)) nProcessor[i]->keyPressed(noteNumber, velocity);
     }
     
     for (int i = dProcessor.size(); --i >= 0; )
