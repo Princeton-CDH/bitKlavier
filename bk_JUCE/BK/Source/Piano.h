@@ -125,6 +125,7 @@ private:
     BKSynthesiser*                  synth;
     BKSynthesiser*                  resonanceSynth;
     BKSynthesiser*                  hammerSynth;
+    
     double                          sampleRate;
     
     
