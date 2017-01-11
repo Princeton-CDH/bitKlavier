@@ -40,11 +40,18 @@ processor(p)
         keymapTF[i]->setName(cKeymapParameterTypes[i]);
     }
     
+    // Keyboard
+    addAndMakeVisible (keyboardComponent = new MidiKeyboardComponent (keyboardState,
+                                                                 MidiKeyboardComponent::horizontalKeyboard));
+    
+    keyboardState.addListener(this);
+    
     updateFields(currentKeymapId);
 }
 
 KeymapViewController::~KeymapViewController()
 {
+    
 }
 
 void KeymapViewController::paint (Graphics& g)
@@ -75,6 +82,10 @@ void KeymapViewController::resized()
         keymapTF[n]->setTopLeftPosition(tfX, gYSpacing + tfY * n);
     }
     
+    int kbX = gXSpacing;
+    int kbY = lY * cKeymapParameterTypes.size() +  gYSpacing;
+    keyboardComponent->setBounds(kbX, kbY,
+                                 getWidth() - 2*gXSpacing, getHeight() - kbY - gYSpacing);
 }
 
 void KeymapViewController::textFieldDidChange(TextEditor& tf)
@@ -126,3 +137,23 @@ void KeymapViewController::actionListenerCallback (const String& message)
         updateFields(currentKeymapId);
     }
 }
+
+/** Called when one of the MidiKeyboardState's keys is pressed. */
+void KeymapViewController::handleNoteOn (MidiKeyboardState* source,
+                   int midiChannel, int midiNoteNumber, float velocity)
+{
+    DBG("NOTE ON: " + String(midiNoteNumber) + " " + String(velocity));
+    
+    processor.bkKeymaps[currentKeymapId]->toggleNote(midiNoteNumber);
+    
+    updateFields(currentKeymapId);
+    
+}
+
+/** Called when one of the MidiKeyboardState's keys is released. */
+void KeymapViewController::handleNoteOff (MidiKeyboardState* source,
+                    int midiChannel, int midiNoteNumber, float velocity)
+{
+    DBG("NOTE OFF: " + String(midiNoteNumber) + " " + String(velocity));
+}
+

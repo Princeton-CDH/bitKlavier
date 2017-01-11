@@ -217,7 +217,7 @@ void PianoViewController::textFieldDidChange(TextEditor& tf)
     }
     else if (name == cPianoParameterTypes[PianoPreparationId+1])
     {
-        DBG("PREPARATIONS: " + processPreparationString(text));
+        DBG("Preparations: " + processPreparationString(text));
     }
     else
     {
@@ -229,7 +229,6 @@ void PianoViewController::textFieldDidChange(TextEditor& tf)
 
 void PianoViewController::updateFields(void)
 {
-    
     // Set text.
     pianoTF[PianoKeymapId]        ->setText( String(current->getKeymapId()));
     pianoTF[PianoPreparationId]   ->setText( String(current->getPreparationIds()));

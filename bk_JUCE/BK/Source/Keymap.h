@@ -90,6 +90,7 @@ public:
         return ret;
     }
     
+    
     bool containsNote(int noteNumber)
     {
         return keymap[noteNumber];
