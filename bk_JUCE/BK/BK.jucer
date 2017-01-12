@@ -60,9 +60,11 @@
                 file="Source/PluginEditor.cpp"/>
           <FILE id="ubAlA4" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
         </GROUP>
-        <GROUP id="{047FD2F8-E8BA-EA56-25D7-A60B1DB51FE3}" name="Piano">
-          <FILE id="nEvMEi" name="Piano.cpp" compile="1" resource="0" file="Source/Piano.cpp"/>
-          <FILE id="jW1Js5" name="Piano.h" compile="0" resource="0" file="Source/Piano.h"/>
+        <GROUP id="{047FD2F8-E8BA-EA56-25D7-A60B1DB51FE3}" name="PreparationsKeymap">
+          <FILE id="nEvMEi" name="PreparationsKeymap.cpp" compile="1" resource="0"
+                file="Source/PreparationsKeymap.cpp"/>
+          <FILE id="jW1Js5" name="PreparationsKeymap.h" compile="0" resource="0"
+                file="Source/PreparationsKeymap.h"/>
         </GROUP>
         <GROUP id="{D95FF283-C159-D64C-6BE8-DFE35BF1BDDA}" name="Keymap">
           <FILE id="hJbk7x" name="Keymap.h" compile="0" resource="0" file="Source/Keymap.h"/>

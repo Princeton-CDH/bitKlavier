@@ -1,15 +1,15 @@
 /*
   ==============================================================================
 
-    Piano.h
+    PreparationsMap.h
     Created: 8 Dec 2016 12:59:46am
     Author:  Michael R Mulshine
 
   ==============================================================================
 */
 
-#ifndef PIANO_H_INCLUDED
-#define PIANO_H_INCLUDED
+#ifndef PreparationsMap_H_INCLUDED
+#define PreparationsMap_H_INCLUDED
 
 #include "BKUtilities.h"
 
@@ -23,26 +23,26 @@
 
 #include "Direct.h"
 
-class Piano : public ReferenceCountedObject
+class PreparationsMap : public ReferenceCountedObject
 {
 public:
-    typedef ReferenceCountedObjectPtr<Piano>    Ptr;
-    typedef Array<Piano::Ptr>                   PtrArr;
-    typedef Array<Piano::Ptr, CriticalSection>  CSPtrArr;
-    typedef OwnedArray<Piano>                        Arr;
-    typedef OwnedArray<Piano, CriticalSection>       CSArr;
+    typedef ReferenceCountedObjectPtr<PreparationsMap>    Ptr;
+    typedef Array<PreparationsMap::Ptr>                   PtrArr;
+    typedef Array<PreparationsMap::Ptr, CriticalSection>  CSPtrArr;
+    typedef OwnedArray<PreparationsMap>                   Arr;
+    typedef OwnedArray<PreparationsMap, CriticalSection>  CSArr;
     
-    Piano(BKSynthesiser *s,
+    PreparationsMap(BKSynthesiser *s,
           BKSynthesiser *res,
           BKSynthesiser *ham,
           Keymap::Ptr keymap,
-          int pianoNum);
-    ~Piano();
+          int PreparationsMapNum);
+    ~PreparationsMap();
     
     void prepareToPlay (double sampleRate);
     
-    inline void setPianoId(int val)         { pianoId = val; print();   }
-    inline int getPianoId(void)             { return pianoId;           }
+    inline void setPreparationsMapId(int val)         { PreparationsMapId = val; print();   }
+    inline int getPreparationsMapId(void)             { return PreparationsMapId;           }
     
     void processBlock(int numSamples, int midiChannel);
     
@@ -100,15 +100,15 @@ public:
     
     void print(void)
     {
-        DBG("pianoNum: " + String(pianoId));
+        DBG("PreparationsMapNum: " + String(PreparationsMapId));
     }
     
 private:
-    int pianoId;
+    int PreparationsMapId;
     
-    BKPreparationType prepType; //temporary, until we allow multiple types of prep per piano
+    BKPreparationType prepType; //temporary, until we allow multiple types of prep per PreparationsMap
     
-    // Keymap for this Piano (one per piano)
+    // Keymap for this PreparationsMap (one per PreparationsMap)
     Keymap::Ptr                     pKeymap;
     
     // Preparations (flown in from BKAudioProcessor)
@@ -129,8 +129,8 @@ private:
     double                          sampleRate;
     
     
-    JUCE_LEAK_DETECTOR(Piano)
+    JUCE_LEAK_DETECTOR(PreparationsMap)
 };
 
 
-#endif  // PIANO_H_INCLUDED
+#endif  // PreparationsMap_H_INCLUDED

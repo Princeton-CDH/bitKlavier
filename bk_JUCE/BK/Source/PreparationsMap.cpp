@@ -1,22 +1,22 @@
 /*
   ==============================================================================
 
-    Piano.cpp
+    PreparationsMap.cpp
     Created: 17 Dec 2016 12:35:30pm
     Author:  Daniel Trueman
 
   ==============================================================================
 */
 
-#include "Piano.h"
+#include "PreparationsMap.h"
 
-Piano::Piano(BKSynthesiser *s,
+PreparationsMap::PreparationsMap(BKSynthesiser *s,
              BKSynthesiser *res,
              BKSynthesiser *ham,
              Keymap::Ptr km,
              int Id):
 isActive(false),
-pianoId(Id),
+PreparationsMapId(Id),
 pKeymap(km),
 sProcessor(SynchronicProcessor::CSPtrArr()),
 nProcessor(NostalgicProcessor::CSPtrArr()),
@@ -28,27 +28,27 @@ hammerSynth(ham)
 
 }
 
-Piano::~Piano()
+PreparationsMap::~PreparationsMap()
 {
     
 }
 
-void Piano::prepareToPlay (double sr)
+void PreparationsMap::prepareToPlay (double sr)
 {
     sampleRate = sr;
 }
 
-void Piano::setKeymap(Keymap::Ptr km)
+void PreparationsMap::setKeymap(Keymap::Ptr km)
 {
     pKeymap = km;
 }
 
-void Piano::setSynchronicPreparations(SynchronicPreparation::PtrArr newPreps)
+void PreparationsMap::setSynchronicPreparations(SynchronicPreparation::PtrArr newPreps)
 {
     SynchronicPreparation::PtrArr oldPreps = sPreparations;
     sPreparations = newPreps;
     
-    // If a preparation was not previously part of the Piano, add it to a new XProcesssor and add that processor to xProcessor.
+    // If a preparation was not previously part of the PreparationsMap, add it to a new XProcesssor and add that processor to xProcessor.
     for (int i = sPreparations.size(); --i >= 0;)
     {
         if (!oldPreps.contains(sPreparations[i]))
@@ -74,12 +74,12 @@ void Piano::setSynchronicPreparations(SynchronicPreparation::PtrArr newPreps)
     deactivateIfNecessary();
 }
 
-void Piano::setNostalgicPreparations(NostalgicPreparation::PtrArr newPreps)
+void PreparationsMap::setNostalgicPreparations(NostalgicPreparation::PtrArr newPreps)
 {
     NostalgicPreparation::PtrArr oldPreps = nPreparations;
     nPreparations = newPreps;
     
-    // If a preparation was not previously part of the Piano, add it to a new XProcesssor and add that processor to xProcessor.
+    // If a preparation was not previously part of the PreparationsMap, add it to a new XProcesssor and add that processor to xProcessor.
     for (int i = nPreparations.size(); --i >= 0;)
     {
         if (!oldPreps.contains(nPreparations[i]))
@@ -100,12 +100,12 @@ void Piano::setNostalgicPreparations(NostalgicPreparation::PtrArr newPreps)
     deactivateIfNecessary();
 }
 
-void Piano::setDirectPreparations(DirectPreparation::PtrArr newPreps)
+void PreparationsMap::setDirectPreparations(DirectPreparation::PtrArr newPreps)
 {
     DirectPreparation::PtrArr oldPreps = dPreparations;
     dPreparations = newPreps;
     
-    // If a preparation was not previously part of the Piano, add it to a new XProcesssor and add that processor to xProcessor.
+    // If a preparation was not previously part of the PreparationsMap, add it to a new XProcesssor and add that processor to xProcessor.
     for (int i = dPreparations.size(); --i >= 0;)
     {
         if (!oldPreps.contains(dPreparations[i]))
@@ -126,7 +126,7 @@ void Piano::setDirectPreparations(DirectPreparation::PtrArr newPreps)
     deactivateIfNecessary();
 }
 
-void Piano::removeAllPreparations()
+void PreparationsMap::removeAllPreparations()
 {
     sPreparations.clearQuick();
     nPreparations.clearQuick();
@@ -136,7 +136,7 @@ void Piano::removeAllPreparations()
 
 
 
-void Piano::deactivateIfNecessary()
+void PreparationsMap::deactivateIfNecessary()
 {
     if(sPreparations.size() == 0 &&
        nPreparations.size() == 0 &&
@@ -151,7 +151,7 @@ void Piano::deactivateIfNecessary()
 }
 
 
-void Piano::processBlock(int numSamples, int midiChannel)
+void PreparationsMap::processBlock(int numSamples, int midiChannel)
 {
     for (int i = sProcessor.size(); --i >= 0; )
     {
@@ -170,7 +170,7 @@ void Piano::processBlock(int numSamples, int midiChannel)
 }
 
 
-void Piano::keyPressed(int noteNumber, float velocity, int channel)
+void PreparationsMap::keyPressed(int noteNumber, float velocity, int channel)
 {
     for (int i = sProcessor.size(); --i >= 0; )
     {
@@ -189,7 +189,7 @@ void Piano::keyPressed(int noteNumber, float velocity, int channel)
 }
 
 
-void Piano::keyReleased(int noteNumber, float velocity, int channel)
+void PreparationsMap::keyReleased(int noteNumber, float velocity, int channel)
 {
     for (int i = sProcessor.size(); --i >= 0; )
     {

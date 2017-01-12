@@ -17,7 +17,7 @@
 BKAudioProcessorEditor::BKAudioProcessorEditor (BKAudioProcessor& p):
 AudioProcessorEditor (&p),
 processor (p),
-lvc(p, p.currentPiano),
+lvc(p, p.currentPrepKeymap),
 kvc(p),
 gvc(p),
 svc(p),
@@ -59,7 +59,7 @@ void BKAudioProcessorEditor::paint (Graphics& g)
 
 void BKAudioProcessorEditor::resized()
 {
-    float lvcH = cPianoParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
+    float lvcH = cPrepMapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
     float kvcH = cKeymapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + gYSpacing + 100 + gYSpacing;
     float gvcH = cGeneralParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
     float svcH = cSynchronicParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;

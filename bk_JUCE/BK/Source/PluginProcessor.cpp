@@ -12,7 +12,7 @@ general                 (new GeneralSettings()),
 mainPianoSynth          (general),
 hammerReleaseSynth      (general),
 resonanceReleaseSynth   (general),
-pianos                  (Piano::CSPtrArr()),
+prepKeymaps             (PreparationsMap::CSPtrArr()),
 sPreparation            (SynchronicPreparation::CSPtrArr()),
 nPreparation            (NostalgicPreparation::CSPtrArr()),
 dPreparation            (DirectPreparation::CSPtrArr()),
@@ -21,22 +21,22 @@ bkKeymaps               (Keymap::PtrArr())
 {
     
     //allocate storage
-    pianos.ensureStorageAllocated(aMaxNumPianos);
-    bkKeymaps.ensureStorageAllocated(aMaxNumPianos);
-    tPreparation.ensureStorageAllocated(aMaxTotalPreparations * 3); //one tuning for each preparation type
+    prepKeymaps.ensureStorageAllocated(aMaxNumPreparationKeymaps);
+    bkKeymaps.ensureStorageAllocated(aMaxNumPreparationKeymaps);
+    tPreparation.ensureStorageAllocated(aMaxTuningPreparations);
 
     //initialize pianos, keymaps, preparations, and processors
-    for (int i = 0; i < aMaxNumPianos; i++)
+    for (int i = 0; i < aMaxNumPreparationKeymaps; i++)
     {
         bkKeymaps.add(new Keymap(i));
-        pianos.add(new Piano(&mainPianoSynth,
+        prepKeymaps.add(new PreparationsMap(&mainPianoSynth,
                              &resonanceReleaseSynth,
                              &hammerReleaseSynth,
                              bkKeymaps[0],
                              i));
     }
   
-    for (int i = 0; i < (aMaxTotalPreparations * 3); i++)
+    for (int i = 0; i < (aMaxTuningPreparations); i++)
     {
         tPreparation.add(new TuningPreparation(i));
     }
@@ -50,8 +50,8 @@ bkKeymaps               (Keymap::PtrArr())
     }
     
     //init basic piano
-    currentPiano = pianos[0];
-    activePianos.add(currentPiano);
+    currentPrepKeymap = prepKeymaps[0];
+    activePrepKeymaps.add(currentPrepKeymap);
     
     // For testing and developing, let's keep directory of samples in home folder on disk.
     BKSampleLoader::loadMainPianoSamples(&mainPianoSynth, aNumSampleLayers);
@@ -73,9 +73,9 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     hammerReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     resonanceReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
        
-    for (int i = 0; i < aMaxNumPianos; i++)
+    for (int i = 0; i < aMaxNumPreparationKeymaps; i++)
     {
-        pianos[i]->prepareToPlay(sampleRate);
+        prepKeymaps[i]->prepareToPlay(sampleRate);
     }
     
 }
@@ -106,9 +106,9 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     int numSamples = buffer.getNumSamples();
 
     // Process each active piano
-     for (int p = 0; p < activePianos.size(); p++)
+     for (int p = 0; p < activePrepKeymaps.size(); p++)
      {
-        activePianos[p]->processBlock(numSamples, m.getChannel());
+        activePrepKeymaps[p]->processBlock(numSamples, m.getChannel());
      }
     
     
@@ -122,17 +122,17 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         if (m.isNoteOn())
         {
             // Send key on to each piano
-            for (int p = 0; p < activePianos.size(); p++)
+            for (int p = 0; p < activePrepKeymaps.size(); p++)
             {
-                activePianos[p]->keyPressed(noteNumber, velocity, channel);
+                activePrepKeymaps[p]->keyPressed(noteNumber, velocity, channel);
             }
         }
         else if (m.isNoteOff())
         {
             // Send key off to each piano
-            for (int p = 0; p < activePianos.size(); p++)
+            for (int p = 0; p < activePrepKeymaps.size(); p++)
             {
-                activePianos[p]->keyReleased(noteNumber, velocity, channel); 
+                activePrepKeymaps[p]->keyReleased(noteNumber, velocity, channel);
             }
         }
         else if (m.isAftertouch())
@@ -161,21 +161,21 @@ void BKAudioProcessor::releaseResources() {
     
 }
 
-Piano::Ptr  BKAudioProcessor::setCurrentPiano(int which)
+PreparationsMap::Ptr  BKAudioProcessor::setCurrentPrepKeymap(int which)
 {
     
-    currentPiano = pianos[which];
+    currentPrepKeymap = prepKeymaps[which];
     
     //remove inactive pianos
-    for(int i=0; i<activePianos.size(); i++) {
-        if(!activePianos[i]->isActive)
-            activePianos.remove(i);
+    for(int i=0; i<activePrepKeymaps.size(); i++) {
+        if(!activePrepKeymaps[i]->isActive)
+            activePrepKeymaps.remove(i);
     }
     
     //add current piano to activePianos
-    activePianos.addIfNotAlreadyThere(currentPiano);
+    activePrepKeymaps.addIfNotAlreadyThere(currentPrepKeymap);
     
-    return currentPiano;
+    return currentPrepKeymap;
     
 }
 

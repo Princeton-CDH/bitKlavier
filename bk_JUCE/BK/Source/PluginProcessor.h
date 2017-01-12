@@ -20,7 +20,7 @@
 
 #include "General.h"
 
-#include "Piano.h"
+#include "PreparationsMap.h"
 
 #define USE_SYNCHRONIC_TWO 0
 
@@ -45,9 +45,9 @@ public:
     BKSynthesiser hammerReleaseSynth;
     BKSynthesiser resonanceReleaseSynth;
     
-    // Pianos
-    Piano::CSPtrArr                    pianos; //wraps all the keymaps, processors and preparations inside
-    Piano::Ptr                         currentPiano;
+    // PreparationsMap
+    PreparationsMap::CSPtrArr       prepKeymaps; 
+    PreparationsMap::Ptr            currentPrepKeymap;
     
     // Preparations.
     SynchronicPreparation::CSPtrArr    sPreparation;
@@ -74,9 +74,9 @@ public:
 
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
     
-    Piano::Ptr setCurrentPiano(int which);
+    PreparationsMap::Ptr setCurrentPrepKeymap(int which);
     
-    inline Piano::Ptr getCurrentPiano() const { return currentPiano;}
+    inline PreparationsMap::Ptr getCurrentPrepKeymap() const { return currentPrepKeymap;}
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override;
@@ -107,7 +107,7 @@ private:
     void loadResonanceRelaseSamples(BKSynthesiser *synth);
     void loadHammerReleaseSamples(BKSynthesiser *synth);
     
-    Piano::CSPtrArr activePianos;
+    PreparationsMap::CSPtrArr activePrepKeymaps;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)
