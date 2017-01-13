@@ -16,6 +16,7 @@
 #include "BKSynthesiser.h"
 #include "BKReferenceCountedBuffer.h"
 #include "AudioConstants.h"
+#include "General.h"
 
 class   BKPianoSamplerSound    : public BKSynthesiserSound
 {
@@ -98,12 +99,15 @@ class  BKPianoSamplerVoice    : public BKSynthesiserVoice
 public:
     //==============================================================================
     /** Creates a BKPianoSamplerVoice. */
-    BKPianoSamplerVoice();
+    BKPianoSamplerVoice(GeneralSettings::Ptr);
     
     /** Destructor. */
     ~BKPianoSamplerVoice();
     
     //==============================================================================
+    
+    GeneralSettings::Ptr generalSettings;
+    
     bool canPlaySound (BKSynthesiserSound*) override;
     
     void startNote (

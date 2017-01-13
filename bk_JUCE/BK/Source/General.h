@@ -22,6 +22,7 @@ public:
     
     GeneralSettings():
         tuningFundamental(440.0),
+        tuningRatio(1.),
         tempoMultiplier(1.0),
         synchronicGain(1.0),
         nostalgicGain(1.0),
@@ -40,6 +41,7 @@ public:
     
     
     const float getTuningFundamental(void)  const noexcept  { return tuningFundamental;     };
+    const float getTuningRatio(void)        const noexcept  { return tuningRatio;           };
     const float getTempoMultiplier(void)    const noexcept  { return tempoMultiplier;       };
     const float getSynchronicGain(void)     const noexcept  { return synchronicGain;        };
     const float getNostalgicGain(void)      const noexcept  { return nostalgicGain;         };
@@ -50,7 +52,10 @@ public:
     const bool getResonanceAndHammer(void)  const noexcept  { return resonanceAndHammer;    };
     const bool getInvertSustain(void)       const noexcept  { return invertSustain;         };
     
-    void setTuningFundamental(float val)    { tuningFundamental = val;      };
+    void setTuningFundamental(float val)    {
+        tuningFundamental = val;
+        tuningRatio = tuningFundamental / 440.;
+    };
     void setTempoMultiplier(float val)      { tempoMultiplier = val;       };
     void setSynchronicGain(float val)       { synchronicGain = val;        };
     void setNostalgicGain(float val)        { nostalgicGain = val;         };
@@ -63,7 +68,8 @@ public:
     
 private:
     
-    float tuningFundamental;
+    float tuningFundamental; //Hz
+    float tuningRatio;
     
     float tempoMultiplier;
     

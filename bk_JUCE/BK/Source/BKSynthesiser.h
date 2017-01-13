@@ -572,6 +572,8 @@ public:
      */
     void setMinimumRenderingSubdivisionSize (int numSamples, bool shouldBeStrict = false) noexcept;
     
+    GeneralSettings::Ptr generalSettings;
+    
 protected:
     //==============================================================================
     /** This is used to control access to the rendering callback and the note trigger methods. */
@@ -579,8 +581,6 @@ protected:
     
     OwnedArray<BKSynthesiserVoice> voices;
     ReferenceCountedArray<BKSynthesiserSound> sounds;
-    
-    GeneralSettings::Ptr generalSettings;
     
     /** The last pitch-wheel values for each midi channel. */
     int lastPitchWheelValues [16];

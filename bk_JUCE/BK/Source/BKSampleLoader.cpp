@@ -24,7 +24,7 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth, int numLayers)
     // 88 or more seems to work well
     for (int i = 0; i < 150; i++)
     {
-        synth->addVoice(new BKPianoSamplerVoice());
+        synth->addVoice(new BKPianoSamplerVoice(synth->generalSettings));
     }
     
     synth->clearSounds();
@@ -158,7 +158,7 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
     
     for (int i = 0; i < 88; i++)
     {
-        synth->addVoice(new BKPianoSamplerVoice() );
+        synth->addVoice(new BKPianoSamplerVoice(synth->generalSettings));
     }
     
     synth->clearSounds();
@@ -261,7 +261,7 @@ void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
     
     for (int i = 0; i < 88; i++)
     {
-        synth->addVoice(new BKPianoSamplerVoice() );
+        synth->addVoice(new BKPianoSamplerVoice(synth->generalSettings));
     }
     
     synth->clearSounds();
