@@ -88,10 +88,10 @@
               file="Source/KeymapViewController.cpp"/>
         <FILE id="kWVW2o" name="KeymapViewController.h" compile="0" resource="0"
               file="Source/KeymapViewController.h"/>
-        <FILE id="CDxv1I" name="PianoViewController.cpp" compile="1" resource="0"
-              file="Source/PianoViewController.cpp"/>
-        <FILE id="fVTWbs" name="PianoViewController.h" compile="0" resource="0"
-              file="Source/PianoViewController.h"/>
+        <FILE id="F0ImEz" name="PreparationsMapViewController.cpp" compile="1"
+              resource="0" file="Source/PreparationsMapViewController.cpp"/>
+        <FILE id="W6ucAm" name="PreparationsMapViewController.h" compile="0"
+              resource="0" file="Source/PreparationsMapViewController.h"/>
         <FILE id="AdZ3vl" name="GeneralViewController.cpp" compile="1" resource="0"
               file="Source/GeneralViewController.cpp"/>
         <FILE id="PRBl6E" name="GeneralViewController.h" compile="0" resource="0"
