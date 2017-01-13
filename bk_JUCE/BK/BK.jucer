@@ -32,10 +32,12 @@
               file="Source/BKReferenceCountedBuffer.h"/>
       </GROUP>
       <GROUP id="{E01F59AF-FEAD-7AEA-32C2-F665B05A05F1}" name="Model">
-        <FILE id="VHt2m9" name="Gallery.cpp" compile="1" resource="0" file="Source/Gallery.cpp"/>
-        <FILE id="x0g8Ul" name="Gallery.h" compile="0" resource="0" file="Source/Gallery.h"/>
-        <FILE id="SPsY4L" name="Piano.cpp" compile="1" resource="0" file="Source/Piano.cpp"/>
-        <FILE id="eStbij" name="Piano.h" compile="0" resource="0" file="Source/Piano.h"/>
+        <GROUP id="{17E83435-F237-FFFA-F781-F5E5B1D86535}" name="Presets">
+          <FILE id="VHt2m9" name="Gallery.cpp" compile="1" resource="0" file="Source/Gallery.cpp"/>
+          <FILE id="x0g8Ul" name="Gallery.h" compile="0" resource="0" file="Source/Gallery.h"/>
+          <FILE id="SPsY4L" name="Piano.cpp" compile="1" resource="0" file="Source/Piano.cpp"/>
+          <FILE id="eStbij" name="Piano.h" compile="0" resource="0" file="Source/Piano.h"/>
+        </GROUP>
         <GROUP id="{D6A5380E-86D4-5EEB-83A3-296DC1BDB7DF}" name="Synthesiser (Sound/Voice)">
           <FILE id="HVbOmG" name="BKPianoSampler.cpp" compile="1" resource="0"
                 file="Source/BKPianoSampler.cpp"/>
