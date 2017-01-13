@@ -32,11 +32,42 @@
               file="Source/BKReferenceCountedBuffer.h"/>
       </GROUP>
       <GROUP id="{E01F59AF-FEAD-7AEA-32C2-F665B05A05F1}" name="Model">
+        <GROUP id="{1CB08EFA-DEC3-73DF-DE6C-B6E7D430054C}" name="Main">
+          <FILE id="GHmNVp" name="PluginProcessor.cpp" compile="1" resource="0"
+                file="Source/PluginProcessor.cpp"/>
+          <FILE id="oVHIQ3" name="PluginProcessor.h" compile="0" resource="0"
+                file="Source/PluginProcessor.h"/>
+          <FILE id="dgzM9u" name="PluginEditor.cpp" compile="1" resource="0"
+                file="Source/PluginEditor.cpp"/>
+          <FILE id="ubAlA4" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+        </GROUP>
+        <GROUP id="{A4AD4139-F8E0-AB44-88B6-84FFC2F2D4D5}" name="General">
+          <FILE id="gu3W3U" name="General.h" compile="0" resource="0" file="Source/General.h"/>
+        </GROUP>
         <GROUP id="{17E83435-F237-FFFA-F781-F5E5B1D86535}" name="Presets">
           <FILE id="VHt2m9" name="Gallery.cpp" compile="1" resource="0" file="Source/Gallery.cpp"/>
           <FILE id="x0g8Ul" name="Gallery.h" compile="0" resource="0" file="Source/Gallery.h"/>
           <FILE id="SPsY4L" name="Piano.cpp" compile="1" resource="0" file="Source/Piano.cpp"/>
           <FILE id="eStbij" name="Piano.h" compile="0" resource="0" file="Source/Piano.h"/>
+        </GROUP>
+        <GROUP id="{047FD2F8-E8BA-EA56-25D7-A60B1DB51FE3}" name="PreparationsMap">
+          <FILE id="nEvMEi" name="PreparationsMap.cpp" compile="1" resource="0"
+                file="Source/PreparationsMap.cpp"/>
+          <FILE id="jW1Js5" name="PreparationsMap.h" compile="0" resource="0"
+                file="Source/PreparationsMap.h"/>
+        </GROUP>
+        <GROUP id="{D95FF283-C159-D64C-6BE8-DFE35BF1BDDA}" name="Keymap">
+          <FILE id="hJbk7x" name="Keymap.h" compile="0" resource="0" file="Source/Keymap.h"/>
+        </GROUP>
+        <GROUP id="{BE0ACC3D-1AC5-1BB6-2D3E-F52EFBCC8E45}" name="Preparations">
+          <FILE id="JhmXbp" name="Direct.cpp" compile="1" resource="0" file="Source/Direct.cpp"/>
+          <FILE id="QYzU0z" name="Direct.h" compile="0" resource="0" file="Source/Direct.h"/>
+          <FILE id="hzuh1H" name="Nostalgic.cpp" compile="1" resource="0" file="Source/Nostalgic.cpp"/>
+          <FILE id="QU7LbV" name="Nostalgic.h" compile="0" resource="0" file="Source/Nostalgic.h"/>
+          <FILE id="O8HjWt" name="Synchronic.cpp" compile="1" resource="0" file="Source/Synchronic.cpp"/>
+          <FILE id="FXpKMX" name="Synchronic.h" compile="0" resource="0" file="Source/Synchronic.h"/>
+          <FILE id="ac8QzA" name="Tuning.cpp" compile="1" resource="0" file="Source/Tuning.cpp"/>
+          <FILE id="OrPhKl" name="Tuning.h" compile="0" resource="0" file="Source/Tuning.h"/>
         </GROUP>
         <GROUP id="{D6A5380E-86D4-5EEB-83A3-296DC1BDB7DF}" name="Synthesiser (Sound/Voice)">
           <FILE id="HVbOmG" name="BKPianoSampler.cpp" compile="1" resource="0"
@@ -52,37 +83,6 @@
                 file="Source/BKSampleLoader.cpp"/>
           <FILE id="wwKFGe" name="BKSampleLoader.h" compile="0" resource="0"
                 file="Source/BKSampleLoader.h"/>
-        </GROUP>
-        <GROUP id="{1CB08EFA-DEC3-73DF-DE6C-B6E7D430054C}" name="Main">
-          <FILE id="GHmNVp" name="PluginProcessor.cpp" compile="1" resource="0"
-                file="Source/PluginProcessor.cpp"/>
-          <FILE id="oVHIQ3" name="PluginProcessor.h" compile="0" resource="0"
-                file="Source/PluginProcessor.h"/>
-          <FILE id="dgzM9u" name="PluginEditor.cpp" compile="1" resource="0"
-                file="Source/PluginEditor.cpp"/>
-          <FILE id="ubAlA4" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
-        </GROUP>
-        <GROUP id="{047FD2F8-E8BA-EA56-25D7-A60B1DB51FE3}" name="PreparationsMap">
-          <FILE id="nEvMEi" name="PreparationsMap.cpp" compile="1" resource="0"
-                file="Source/PreparationsMap.cpp"/>
-          <FILE id="jW1Js5" name="PreparationsMap.h" compile="0" resource="0"
-                file="Source/PreparationsMap.h"/>
-        </GROUP>
-        <GROUP id="{D95FF283-C159-D64C-6BE8-DFE35BF1BDDA}" name="Keymap">
-          <FILE id="hJbk7x" name="Keymap.h" compile="0" resource="0" file="Source/Keymap.h"/>
-        </GROUP>
-        <GROUP id="{A4AD4139-F8E0-AB44-88B6-84FFC2F2D4D5}" name="General">
-          <FILE id="gu3W3U" name="General.h" compile="0" resource="0" file="Source/General.h"/>
-        </GROUP>
-        <GROUP id="{BE0ACC3D-1AC5-1BB6-2D3E-F52EFBCC8E45}" name="Preparations">
-          <FILE id="JhmXbp" name="Direct.cpp" compile="1" resource="0" file="Source/Direct.cpp"/>
-          <FILE id="QYzU0z" name="Direct.h" compile="0" resource="0" file="Source/Direct.h"/>
-          <FILE id="hzuh1H" name="Nostalgic.cpp" compile="1" resource="0" file="Source/Nostalgic.cpp"/>
-          <FILE id="QU7LbV" name="Nostalgic.h" compile="0" resource="0" file="Source/Nostalgic.h"/>
-          <FILE id="O8HjWt" name="Synchronic.cpp" compile="1" resource="0" file="Source/Synchronic.cpp"/>
-          <FILE id="FXpKMX" name="Synchronic.h" compile="0" resource="0" file="Source/Synchronic.h"/>
-          <FILE id="ac8QzA" name="Tuning.cpp" compile="1" resource="0" file="Source/Tuning.cpp"/>
-          <FILE id="OrPhKl" name="Tuning.h" compile="0" resource="0" file="Source/Tuning.h"/>
         </GROUP>
       </GROUP>
       <GROUP id="{07677963-38EF-2F51-36FA-17646727446F}" name="Controller">
