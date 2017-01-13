@@ -32,10 +32,10 @@
               file="Source/BKReferenceCountedBuffer.h"/>
       </GROUP>
       <GROUP id="{E01F59AF-FEAD-7AEA-32C2-F665B05A05F1}" name="Model">
-        <FILE id="VHt2m9" name="Library.cpp" compile="1" resource="0" file="Source/Library.cpp"/>
-        <FILE id="x0g8Ul" name="Library.h" compile="0" resource="0" file="Source/Library.h"/>
-        <FILE id="SPsY4L" name="Preset.cpp" compile="1" resource="0" file="Source/Preset.cpp"/>
-        <FILE id="eStbij" name="Preset.h" compile="0" resource="0" file="Source/Preset.h"/>
+        <FILE id="VHt2m9" name="Gallery.cpp" compile="1" resource="0" file="Source/Gallery.cpp"/>
+        <FILE id="x0g8Ul" name="Gallery.h" compile="0" resource="0" file="Source/Gallery.h"/>
+        <FILE id="SPsY4L" name="Piano.cpp" compile="1" resource="0" file="Source/Piano.cpp"/>
+        <FILE id="eStbij" name="Piano.h" compile="0" resource="0" file="Source/Piano.h"/>
         <GROUP id="{D6A5380E-86D4-5EEB-83A3-296DC1BDB7DF}" name="Synthesiser (Sound/Voice)">
           <FILE id="HVbOmG" name="BKPianoSampler.cpp" compile="1" resource="0"
                 file="Source/BKPianoSampler.cpp"/>
@@ -60,11 +60,11 @@
                 file="Source/PluginEditor.cpp"/>
           <FILE id="ubAlA4" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
         </GROUP>
-        <GROUP id="{047FD2F8-E8BA-EA56-25D7-A60B1DB51FE3}" name="PreparationsKeymap">
-          <FILE id="nEvMEi" name="PreparationsKeymap.cpp" compile="1" resource="0"
-                file="Source/PreparationsKeymap.cpp"/>
-          <FILE id="jW1Js5" name="PreparationsKeymap.h" compile="0" resource="0"
-                file="Source/PreparationsKeymap.h"/>
+        <GROUP id="{047FD2F8-E8BA-EA56-25D7-A60B1DB51FE3}" name="PreparationsMap">
+          <FILE id="nEvMEi" name="PreparationsMap.cpp" compile="1" resource="0"
+                file="Source/PreparationsMap.cpp"/>
+          <FILE id="jW1Js5" name="PreparationsMap.h" compile="0" resource="0"
+                file="Source/PreparationsMap.h"/>
         </GROUP>
         <GROUP id="{D95FF283-C159-D64C-6BE8-DFE35BF1BDDA}" name="Keymap">
           <FILE id="hJbk7x" name="Keymap.h" compile="0" resource="0" file="Source/Keymap.h"/>

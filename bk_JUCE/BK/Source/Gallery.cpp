@@ -1,38 +1,38 @@
 /*
   ==============================================================================
 
-    Library.cpp
+    Gallery.cpp
     Created: 7 Dec 2016 11:03:57am
     Author:  Michael R Mulshine
 
   ==============================================================================
 */
 
-#include "Library.h"
+#include "Gallery.h"
 
-Library::Library()
+Gallery::Gallery()
 {
     
 }
 
-Library::Library(Preset::PtrArr p):
-presets(p)
+Gallery::Gallery(Piano::PtrArr p):
+pianos(p)
 {
     
 }
 
-Library::~Library()
+Gallery::~Gallery()
 {
     
 }
 
-void Library::writeToFile(String filepath)
+void Gallery::writeToFile(String filepath)
 {
     
 }
 
-Preset::PtrArr Library::readFromFile(String filepath)
+Piano::PtrArr Gallery::readFromFile(String filepath)
 {
     
-    return presets;
+    return pianos;
 }

@@ -1,15 +1,15 @@
 /*
   ==============================================================================
 
-    Preset.h
+    Piano.h
     Created: 7 Dec 2016 10:25:40am
     Author:  Michael R Mulshine
 
   ==============================================================================
 */
 
-#ifndef PRESET_H_INCLUDED
-#define PRESET_H_INCLUDED
+#ifndef Piano_H_INCLUDED
+#define Piano_H_INCLUDED
 
 #include "BKUtilities.h"
 
@@ -21,20 +21,20 @@
 #include "Tuning.h"
 #include "General.h"
 
-class Preset : public ReferenceCountedObject
+class Piano : public ReferenceCountedObject
 {
 public:
-    typedef ReferenceCountedObjectPtr<Preset>   Ptr;
-    typedef Array<Preset::Ptr>                  PtrArr;
-    typedef Array<Preset::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<Preset>                  Arr;
-    typedef OwnedArray<Preset, CriticalSection> CSArr;
+    typedef ReferenceCountedObjectPtr<Piano>   Ptr;
+    typedef Array<Piano::Ptr>                  PtrArr;
+    typedef Array<Piano::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<Piano>                  Arr;
+    typedef OwnedArray<Piano, CriticalSection> CSArr;
     
-    Preset();
-    Preset(BKAudioProcessor&);
-    ~Preset();
+    Piano();
+    Piano(BKAudioProcessor&);
+    ~Piano();
     
-    inline GeneralSettings::Ptr             getGeneralSettings(void)            {   return general;         }
+    inline GeneralSettings::Ptr                getGeneralSettings(void)            {   return general;         }
     
     inline SynchronicPreparation::PtrArr       getSynchronicPreparations(void)     {   return synchronic;      }
     inline NostalgicPreparation::PtrArr        getNostalgicPreparations(void)      {   return nostalgic;       }
@@ -55,23 +55,23 @@ public:
     inline void setNostalgicPreparationForLayer(NostalgicPreparation::Ptr n, int layer)     {   nostalgic[layer]    = n;    }
     inline void setDirectPreparationForLayer(DirectPreparation::Ptr d, int layer)           {   direct[layer]       = d;    }
     
-    ValueTree*  getPresetValueTree(void);
+    ValueTree*  getPianoValueTree(void);
     
 private:
     
     BKAudioProcessor& processor;
     
-    GeneralSettings::Ptr        general;
+    GeneralSettings::Ptr            general;
     
-    SynchronicPreparation::PtrArr  synchronic;
-    NostalgicPreparation::PtrArr   nostalgic;
-    DirectPreparation::PtrArr      direct;
+    SynchronicPreparation::PtrArr   synchronic;
+    NostalgicPreparation::PtrArr    nostalgic;
+    DirectPreparation::PtrArr       direct;
     
     ValueTree vt;
     
     
-    JUCE_LEAK_DETECTOR(Preset)
+    JUCE_LEAK_DETECTOR(Piano)
 };
 
 
-#endif  // PRESET_H_INCLUDED
+#endif  // Piano_H_INCLUDED
