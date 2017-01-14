@@ -46,8 +46,8 @@ public:
     BKSynthesiser                       resonanceReleaseSynth;
     
     // PreparationsMap
-    PreparationsMap::CSPtrArr           prepKeymaps;
-    PreparationsMap::Ptr                currentPrepKeymap;
+    PreparationsMap::CSPtrArr           prepMaps;
+    PreparationsMap::Ptr                currentPrepMap;
     
     // Preparations.
     SynchronicPreparation::CSPtrArr     sPreparation;
@@ -74,9 +74,9 @@ public:
 
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
     
-    PreparationsMap::Ptr setCurrentPrepKeymap(int which);
+    PreparationsMap::Ptr setCurrentPrepMap(int which);
     
-    inline PreparationsMap::Ptr getCurrentPrepKeymap() const { return currentPrepKeymap;}
+    inline PreparationsMap::Ptr getCurrentPrepMap() const { return currentPrepMap;}
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override;
@@ -107,7 +107,7 @@ private:
     void loadResonanceRelaseSamples(BKSynthesiser *synth);
     void loadHammerReleaseSamples(BKSynthesiser *synth);
     
-    PreparationsMap::CSPtrArr activePrepKeymaps;
+    PreparationsMap::CSPtrArr activePrepMaps;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)

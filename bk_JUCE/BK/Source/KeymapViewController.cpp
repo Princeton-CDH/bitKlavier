@@ -132,7 +132,7 @@ void KeymapViewController::actionListenerCallback (const String& message)
 {
     if (message == "keymap/update")
     {
-        currentKeymapId = processor.currentPrepKeymap->getKeymapId();
+        currentKeymapId = processor.currentPrepMap->getKeymapId();
         
         updateFields(currentKeymapId);
     }

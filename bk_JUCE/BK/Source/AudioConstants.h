@@ -317,8 +317,8 @@ static const std::vector<std::string> cKeymapParameterTypes = {
 
 // Globals
 static const int aMaxNumPreparationKeymaps = 12;
-static const int aMaxNumPreparationsPerPrepKeymap = 12;
-static const int aMaxTotalPreparations = aMaxNumPreparationKeymaps * aMaxNumPreparationsPerPrepKeymap;
+static const int aMaxNumPreparationsPerPrepMap = 12;
+static const int aMaxTotalPreparations = aMaxNumPreparationKeymaps * aMaxNumPreparationsPerPrepMap;
 static const int aMaxTuningPreparations = aMaxTotalPreparations * 3;
 
 static const float aGlobalGain = 0.5; //make this user settable

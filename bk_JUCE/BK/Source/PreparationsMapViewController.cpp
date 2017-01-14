@@ -244,7 +244,7 @@ void PreparationsMapViewController::comboBoxChanged (ComboBox* box)
         
         DBG("Current Prep Map: " + String(whichPrepMap));
         
-        current = processor.setCurrentPrepKeymap(whichPrepMap);
+        current = processor.setCurrentPrepMap(whichPrepMap);
         
         updateFields();
     }
