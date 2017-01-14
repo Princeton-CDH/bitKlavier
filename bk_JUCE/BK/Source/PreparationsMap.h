@@ -106,22 +106,20 @@ public:
 private:
     int PreparationsMapId;
     
-    BKPreparationType prepType; //temporary, until we allow multiple types of prep per PreparationsMap
-    
     // Keymap for this PreparationsMap (one per PreparationsMap)
     Keymap::Ptr                     pKeymap;
     
     // Preparations (flown in from BKAudioProcessor)
-    SynchronicPreparation::PtrArr      sPreparations;
-    NostalgicPreparation::PtrArr       nPreparations;
-    DirectPreparation::PtrArr          dPreparations;
+    SynchronicPreparation::PtrArr   sPreparations;
+    NostalgicPreparation::PtrArr    nPreparations;
+    DirectPreparation::PtrArr       dPreparations;
     
-    // Processors
-    SynchronicProcessor::CSPtrArr        sProcessor;
-    NostalgicProcessor::CSPtrArr         nProcessor;
-    DirectProcessor::CSPtrArr            dProcessor;
+    // Processors (internal)
+    SynchronicProcessor::CSPtrArr   sProcessor;
+    NostalgicProcessor::CSPtrArr    nProcessor;
+    DirectProcessor::CSPtrArr       dProcessor;
     
-    // Pointers to synths
+    // Pointers to synths (flown in from BKAudioProcessor)
     BKSynthesiser*                  synth;
     BKSynthesiser*                  resonanceSynth;
     BKSynthesiser*                  hammerSynth;

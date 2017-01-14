@@ -38,25 +38,25 @@ public:
     ~BKAudioProcessor();
   
     // General settings.
-    GeneralSettings::Ptr general;
+    GeneralSettings::Ptr                general;
     
     // Synthesisers.
-    BKSynthesiser mainPianoSynth;
-    BKSynthesiser hammerReleaseSynth;
-    BKSynthesiser resonanceReleaseSynth;
+    BKSynthesiser                       mainPianoSynth;
+    BKSynthesiser                       hammerReleaseSynth;
+    BKSynthesiser                       resonanceReleaseSynth;
     
     // PreparationsMap
-    PreparationsMap::CSPtrArr       prepKeymaps; 
-    PreparationsMap::Ptr            currentPrepKeymap;
+    PreparationsMap::CSPtrArr           prepKeymaps;
+    PreparationsMap::Ptr                currentPrepKeymap;
     
     // Preparations.
-    SynchronicPreparation::CSPtrArr    sPreparation;
-    NostalgicPreparation::CSPtrArr     nPreparation;
-    DirectPreparation::CSPtrArr        dPreparation;
-    TuningPreparation::CSPtrArr        tPreparation;
+    SynchronicPreparation::CSPtrArr     sPreparation;
+    NostalgicPreparation::CSPtrArr      nPreparation;
+    DirectPreparation::CSPtrArr         dPreparation;
+    TuningPreparation::CSPtrArr         tPreparation;
     
     // Keymaps.
-    Keymap::PtrArr                        bkKeymaps;
+    Keymap::PtrArr                      bkKeymaps;
 
     int channel;
 
