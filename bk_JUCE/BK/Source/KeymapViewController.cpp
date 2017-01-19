@@ -144,7 +144,7 @@ void KeymapViewController::handleNoteOn (MidiKeyboardState* source,
 {
     DBG("NOTE ON: " + String(midiNoteNumber) + " " + String(velocity));
     
-    processor.bkKeymaps[currentKeymapId]->toggleNote(midiNoteNumber);
+    processor.bkKeymaps[currentKeymapId]->toggleNote(midiNoteNumber - 12);
     
     updateFields(currentKeymapId);
     
