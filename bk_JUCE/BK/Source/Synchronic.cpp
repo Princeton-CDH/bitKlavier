@@ -19,6 +19,11 @@ synth(s),
 preparation(p),
 tuner(preparation->getTuning())
 {
+    velocities.ensureStorageAllocated(128);
+    for (int i = 0; i < 128; i++) {
+        velocities.insert(i, 0.);
+    }
+    
     clusterTimer = 0;
     phasor = 0;
     
@@ -48,7 +53,7 @@ void SynchronicProcessor::setCurrentPlaybackSampleRate(double sr)
 
 
 
-void SynchronicProcessor::playNote(int channel, int note)
+void SynchronicProcessor::playNote(int channel, int note, float velocity)
 {
     PianoSamplerNoteDirection noteDirection = Forward;
     float noteStartPos = 0.0;
@@ -69,7 +74,7 @@ void SynchronicProcessor::playNote(int channel, int note)
     synth->keyOn(channel,
                  synthNoteNumber,
                  offset,
-                 preparation->getAccentMultipliers()[accent],
+                 velocity * preparation->getAccentMultipliers()[accent],
                  aGlobalGain,
                  noteDirection,
                  FixedLengthFixedStart,
@@ -84,6 +89,8 @@ void SynchronicProcessor::playNote(int channel, int note)
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
     tuner.setPreparation(preparation->getTuning());
+    
+    velocities.set(noteNumber, velocity);
     
     if (inCluster)
     {
@@ -131,7 +138,6 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     
     if (inCluster)
     {
-        
         cluster.add(noteNumber);
         clusterThresholdTimer = 0;
     }
@@ -257,7 +263,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 {
                     for (int n = 0; n < clusterSize; n++)
                     {
-                        playNote(channel, cluster[n]);
+                        playNote(channel, cluster[n], velocities.getUnchecked(cluster[n]));
                     }
                 
                 }

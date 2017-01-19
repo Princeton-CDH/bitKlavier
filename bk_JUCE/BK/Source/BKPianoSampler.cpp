@@ -53,7 +53,9 @@ bool BKPianoSamplerSound::appliesToChannel (int /*midiChannel*/)
 
 
 //==============================================================================
-BKPianoSamplerVoice::BKPianoSamplerVoice() : pitchRatio (0.0),
+BKPianoSamplerVoice::BKPianoSamplerVoice(GeneralSettings::Ptr gen) :
+generalSettings(gen),
+pitchRatio (0.0),
 sourceSamplePosition (0.0),
 lgain (0.0f), rgain (0.0f),
 rampOnOffLevel (0),
@@ -90,7 +92,10 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         
         numPulses = 0;
         maxPulses = 16;
-        pitchRatio = powf(2.0f, (midiNoteNumber - (float)sound->midiRootNote) / 12.0f) * sound->sourceSampleRate / getSampleRate();
+        pitchRatio = powf(2.0f, (midiNoteNumber - (float)sound->midiRootNote) / 12.0f)
+                        * sound->sourceSampleRate
+                        * generalSettings->getTuningRatio()
+                        / getSampleRate();
         
         bkType = bktype;
         playType = type;

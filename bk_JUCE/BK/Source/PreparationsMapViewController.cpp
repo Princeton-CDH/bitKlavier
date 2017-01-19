@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-    PianoViewController.cpp
+    PreparationsMapViewController.cpp
     Created: 8 Dec 2016 12:54:41am
     Author:  Michael R Mulshine
 
@@ -9,70 +9,70 @@
 */
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "PianoViewController.h"
+#include "PreparationsMapViewController.h"
 
 //==============================================================================
-PianoViewController::PianoViewController(BKAudioProcessor& p, Piano::Ptr l):
+PreparationsMapViewController::PreparationsMapViewController(BKAudioProcessor& p, PreparationsMap::Ptr l):
 processor(p),
 current(l),
-pianoL(OwnedArray<BKLabel>()),
-pianoTF(OwnedArray<BKTextField>())
+prepMapL(OwnedArray<BKLabel>()),
+prepMapTF(OwnedArray<BKTextField>())
 {
     // Labels
-    pianoL = OwnedArray<BKLabel>();
-    pianoL.ensureStorageAllocated(cPianoParameterTypes.size());
+    prepMapL = OwnedArray<BKLabel>();
+    prepMapL.ensureStorageAllocated(cPrepMapParameterTypes.size());
     
-    for (int i = 0; i < cPianoParameterTypes.size(); i++)
+    for (int i = 0; i < cPrepMapParameterTypes.size(); i++)
     {
-        pianoL.set(i, new BKLabel());
-        addAndMakeVisible(pianoL[i]);
-        pianoL[i]->setName(cPianoParameterTypes[i]);
-        pianoL[i]->setText(cPianoParameterTypes[i], NotificationType::dontSendNotification);
+        prepMapL.set(i, new BKLabel());
+        addAndMakeVisible(prepMapL[i]);
+        prepMapL[i]->setName(cPrepMapParameterTypes[i]);
+        prepMapL[i]->setText(cPrepMapParameterTypes[i], NotificationType::dontSendNotification);
     }
     
     // Text Fields
-    pianoTF = OwnedArray<BKTextField>();
-    pianoTF.ensureStorageAllocated(cPianoParameterTypes.size());
+    prepMapTF = OwnedArray<BKTextField>();
+    prepMapTF.ensureStorageAllocated(cPrepMapParameterTypes.size());
     
-    for (int i = 0; i < cPianoParameterTypes.size()-cPianoCBType.size(); i++)
+    for (int i = 0; i < cPrepMapParameterTypes.size()-cPrepMapCBType.size(); i++)
     {
-        pianoTF.set(i, new BKTextField());
-        addAndMakeVisible(pianoTF[i]);
-        pianoTF[i]->addListener(this);
-        pianoTF[i]->setName(cPianoParameterTypes[i+cPianoCBType.size()]);
+        prepMapTF.set(i, new BKTextField());
+        addAndMakeVisible(prepMapTF[i]);
+        prepMapTF[i]->addListener(this);
+        prepMapTF[i]->setName(cPrepMapParameterTypes[i+cPrepMapCBType.size()]);
     }
     
     
-    for (int i = 0; i < cPianoCBType.size(); i++)
+    for (int i = 0; i < cPrepMapCBType.size(); i++)
     {
-        pianoCB.set(i, new BKComboBox());
-        pianoCB[i]->setName(cPianoCBType[i]);
-        pianoCB[i]->addSeparator();
-        pianoCB[i]->addListener(this);
-        addAndMakeVisible(pianoCB[i]);
+        prepMapCB.set(i, new BKComboBox());
+        prepMapCB[i]->setName(cPrepMapCBType[i]);
+        prepMapCB[i]->addSeparator();
+        prepMapCB[i]->addListener(this);
+        addAndMakeVisible(prepMapCB[i]);
     }
     
-    for (int i = 0; i < aMaxNumPianos; i++)
+    for (int i = 0; i < aMaxNumPreparationKeymaps; i++)
     {
-        pianoCB[PianoCBNumber]->addItem(cPianoNumberName[i], i+1);
+        prepMapCB[PrepMapCBNumber]->addItem(cPreMapNumberName[i], i+1);
     }
     
-    pianoCB[PianoCBNumber]->setSelectedItemIndex(0);
+    prepMapCB[PrepMapCBNumber]->setSelectedItemIndex(0);
     
     updateFields();
 }
 
-PianoViewController::~PianoViewController()
+PreparationsMapViewController::~PreparationsMapViewController()
 {
 }
 
-void PianoViewController::paint (Graphics& g)
+void PreparationsMapViewController::paint (Graphics& g)
 {
     g.setColour(Colours::goldenrod);
     g.drawRect(getLocalBounds(), 1);
 }
 
-void PianoViewController::resized()
+void PreparationsMapViewController::resized()
 {
    
     
@@ -81,9 +81,9 @@ void PianoViewController::resized()
     int lX = 0;
     int lY = gComponentLabelHeight + gYSpacing;
     
-    for (int n = 0; n < cPianoParameterTypes.size(); n++)
+    for (int n = 0; n < cPrepMapParameterTypes.size(); n++)
     {
-        pianoL[n]->setTopLeftPosition(lX, gYSpacing + lY * n);
+        prepMapL[n]->setTopLeftPosition(lX, gYSpacing + lY * n);
     }
     
     // Text fields
@@ -91,19 +91,19 @@ void PianoViewController::resized()
     int tfX = gComponentLabelWidth + gXSpacing;
     int tfY = gComponentTextFieldHeight + gYSpacing;
     
-    for (int n = 0; n < cPianoCBType.size(); n++)
+    for (int n = 0; n < cPrepMapCBType.size(); n++)
     {
-        pianoCB[n]->setTopLeftPosition(tfX, gYSpacing + tfY * n);
+        prepMapCB[n]->setTopLeftPosition(tfX, gYSpacing + tfY * n);
     }
     
-    for (int n = 0; n < cPianoParameterTypes.size()-cPianoCBType.size(); n++)
+    for (int n = 0; n < cPrepMapParameterTypes.size()-cPrepMapCBType.size(); n++)
     {
-        pianoTF[n]->setTopLeftPosition(tfX, gYSpacing + tfY * (n+cPianoCBType.size()));
+        prepMapTF[n]->setTopLeftPosition(tfX, gYSpacing + tfY * (n+cPrepMapCBType.size()));
     }
     
 }
 
-String PianoViewController::processPreparationString(String s)
+String PreparationsMapViewController::processPreparationString(String s)
 {
     SynchronicPreparation::PtrArr sPrep = SynchronicPreparation::PtrArr();
     NostalgicPreparation::PtrArr nPrep = NostalgicPreparation::PtrArr();
@@ -191,7 +191,7 @@ String PianoViewController::processPreparationString(String s)
         
     }
     
-    // pass arrays to piano
+    // pass arrays to prepMap
     current->setSynchronicPreparations(sPrep);
     current->setNostalgicPreparations(nPrep);
     current->setDirectPreparations(dPrep);
@@ -199,7 +199,7 @@ String PianoViewController::processPreparationString(String s)
     return out;
 }
 
-void PianoViewController::textFieldDidChange(TextEditor& tf)
+void PreparationsMapViewController::textFieldDidChange(TextEditor& tf)
 {
     String text = tf.getText();
     String name = tf.getName();
@@ -208,14 +208,14 @@ void PianoViewController::textFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
 
-    if (name == cPianoParameterTypes[PianoKeymapId+1])
+    if (name == cPrepMapParameterTypes[PrepMapKeymapId+1])
     {
         Keymap::Ptr km = processor.bkKeymaps[i];
         current->setKeymap(km);
         
         sendActionMessage("keymap/update");
     }
-    else if (name == cPianoParameterTypes[PianoPreparationId+1])
+    else if (name == cPrepMapParameterTypes[PrepMapPreparationId+1])
     {
         DBG("Preparations: " + processPreparationString(text));
     }
@@ -227,24 +227,24 @@ void PianoViewController::textFieldDidChange(TextEditor& tf)
 
 
 
-void PianoViewController::updateFields(void)
+void PreparationsMapViewController::updateFields(void)
 {
     // Set text.
-    pianoTF[PianoKeymapId]        ->setText( String(current->getKeymapId()));
-    pianoTF[PianoPreparationId]   ->setText( String(current->getPreparationIds()));
+    prepMapTF[PrepMapKeymapId]        ->setText( String(current->getKeymapId()));
+    prepMapTF[PrepMapPreparationId]   ->setText( String(current->getPreparationIds()));
     
 }
 
-void PianoViewController::comboBoxChanged (ComboBox* box)
+void PreparationsMapViewController::comboBoxChanged (ComboBox* box)
 {
     
-    if (box->getName() == cPianoCBType[0])
+    if (box->getName() == cPrepMapCBType[0])
     {
-        int whichPiano = box->getSelectedId();
+        int whichPrepMap = box->getSelectedId();
         
-        DBG("Current Piano: " + String(whichPiano));
+        DBG("Current Prep Map: " + String(whichPrepMap));
         
-        current = processor.setCurrentPiano(whichPiano);
+        current = processor.setCurrentPrepMap(whichPrepMap);
         
         updateFields();
     }

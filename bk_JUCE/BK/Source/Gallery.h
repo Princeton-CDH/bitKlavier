@@ -1,0 +1,51 @@
+/*
+  ==============================================================================
+
+    Gallery.h
+    Created: 7 Dec 2016 11:03:57am
+    Author:  Michael R Mulshine
+
+  ==============================================================================
+*/
+
+#ifndef Gallery_H_INCLUDED
+#define Gallery_H_INCLUDED
+
+#include "BKUtilities.h"
+
+#include "Piano.h"
+
+class Gallery : public ReferenceCountedObject
+{
+public:
+    typedef ReferenceCountedObjectPtr<Gallery>   Ptr;
+    typedef Array<Gallery::Ptr>                  PtrArr;
+    typedef Array<Gallery::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<Gallery>                  Arr;
+    typedef OwnedArray<Gallery, CriticalSection> CSArr;
+ 
+    Gallery();
+    Gallery(Piano::PtrArr pianos);
+    ~Gallery();
+    
+    inline void setPianos(Piano::PtrArr p)           {   pianos = p;      }
+    
+    inline Piano::PtrArr getPianos(void)             {   return pianos;   }
+    
+    // something like this
+    void writeToFile(String filepath);
+    Piano::PtrArr readFromFile(String filepath);
+    
+    
+private:
+    
+    Piano::PtrArr pianos;
+    
+    ValueTree vt;
+    
+    JUCE_LEAK_DETECTOR(Gallery);
+};
+
+
+
+#endif  // Gallery_H_INCLUDED

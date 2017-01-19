@@ -232,7 +232,8 @@ private:
     int length;
     int transp;
     
-    void playNote(int channel, int note);
+    void playNote(int channel, int note, float velocity);
+    Array<float> velocities;           
     
     uint64 tempoPeriodSamples;
     

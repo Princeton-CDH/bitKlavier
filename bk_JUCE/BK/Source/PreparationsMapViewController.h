@@ -1,15 +1,15 @@
 /*
   ==============================================================================
 
-    PianoViewController.h
+    PreparationsMapViewController.h
     Created: 8 Dec 2016 12:54:41am
     Author:  Michael R Mulshine
 
   ==============================================================================
 */
 
-#ifndef PIANOVIEWCONTROLLER_H_INCLUDED
-#define PIANOVIEWCONTROLLER_H_INCLUDED
+#ifndef PreparationsMapViewController_H_INCLUDED
+#define PreparationsMapViewController_H_INCLUDED
 
 #include "BKUtilities.h"
 
@@ -23,17 +23,17 @@
 
 #include "BKMenu.h"
 
-#include "Piano.h"
+#include "PreparationsMap.h"
 
 
 //==============================================================================
 /*
 */
-class PianoViewController    : public BKViewController, public ActionBroadcaster, public ComboBox::Listener
+class PreparationsMapViewController    : public BKViewController, public ActionBroadcaster, public ComboBox::Listener
 {
 public:
-    PianoViewController(BKAudioProcessor& , Piano::Ptr);
-    ~PianoViewController();
+    PreparationsMapViewController(BKAudioProcessor& , PreparationsMap::Ptr);
+    ~PreparationsMapViewController();
 
     void paint (Graphics&) override;
     void resized() override;
@@ -42,13 +42,13 @@ private:
     
     BKAudioProcessor& processor;
     
-    Piano::Ptr current;
+    PreparationsMap::Ptr current;
     
-    OwnedArray<BKComboBox> pianoCB;
+    OwnedArray<BKComboBox> prepMapCB;
     
     // BKLabels
-    OwnedArray<BKLabel> pianoL;
-    OwnedArray<BKTextField> pianoTF;
+    OwnedArray<BKLabel> prepMapL;
+    OwnedArray<BKTextField> prepMapTF;
     
     String processPreparationString(String s);
     
@@ -56,14 +56,14 @@ private:
     
     void textFieldDidChange(TextEditor&) override;
     
-    void switchToPiano(BKPreparationType type, int piano);
+    void switchToPrepMap(BKPreparationType type, int prepMap);
     
     void updateFields(void);
     
     void addPreparation(BKPreparationType type, int which);
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PianoViewController)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreparationsMapViewController)
 };
 
 
-#endif  // PIANOVIEWCONTROLLER_H_INCLUDED
+#endif  // PreparationsMapViewController_H_INCLUDED

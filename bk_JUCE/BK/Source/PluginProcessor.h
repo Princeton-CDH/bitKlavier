@@ -20,7 +20,7 @@
 
 #include "General.h"
 
-#include "Piano.h"
+#include "PreparationsMap.h"
 
 #define USE_SYNCHRONIC_TWO 0
 
@@ -38,25 +38,25 @@ public:
     ~BKAudioProcessor();
   
     // General settings.
-    GeneralSettings::Ptr general;
+    GeneralSettings::Ptr                general;
     
     // Synthesisers.
-    BKSynthesiser mainPianoSynth;
-    BKSynthesiser hammerReleaseSynth;
-    BKSynthesiser resonanceReleaseSynth;
+    BKSynthesiser                       mainPianoSynth;
+    BKSynthesiser                       hammerReleaseSynth;
+    BKSynthesiser                       resonanceReleaseSynth;
     
-    // Pianos
-    Piano::CSPtrArr                    pianos; //wraps all the keymaps, processors and preparations inside
-    Piano::Ptr                         currentPiano;
+    // PreparationsMap
+    PreparationsMap::CSPtrArr           prepMaps;
+    PreparationsMap::Ptr                currentPrepMap;
     
     // Preparations.
-    SynchronicPreparation::CSPtrArr    sPreparation;
-    NostalgicPreparation::CSPtrArr     nPreparation;
-    DirectPreparation::CSPtrArr        dPreparation;
-    TuningPreparation::CSPtrArr        tPreparation;
+    SynchronicPreparation::CSPtrArr     sPreparation;
+    NostalgicPreparation::CSPtrArr      nPreparation;
+    DirectPreparation::CSPtrArr         dPreparation;
+    TuningPreparation::CSPtrArr         tPreparation;
     
     // Keymaps.
-    Keymap::PtrArr                        bkKeymaps;
+    Keymap::PtrArr                      bkKeymaps;
 
     int channel;
 
@@ -74,9 +74,9 @@ public:
 
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
     
-    Piano::Ptr setCurrentPiano(int which);
+    PreparationsMap::Ptr setCurrentPrepMap(int which);
     
-    inline Piano::Ptr getCurrentPiano() const { return currentPiano;}
+    inline PreparationsMap::Ptr getCurrentPrepMap() const { return currentPrepMap;}
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override;
@@ -107,7 +107,7 @@ private:
     void loadResonanceRelaseSamples(BKSynthesiser *synth);
     void loadHammerReleaseSamples(BKSynthesiser *synth);
     
-    Piano::CSPtrArr activePianos;
+    PreparationsMap::CSPtrArr activePrepMaps;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)

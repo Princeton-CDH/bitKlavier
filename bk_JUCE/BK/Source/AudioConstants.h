@@ -79,16 +79,16 @@ static const std::vector<std::string> cPreparationTypes = {
     "Tuning"
 };
 
-typedef enum BKPianoCBType {
-    PianoCBNumber,
-    BKPianoCBTypeNil,
-} BKPianoCBType;
+typedef enum BKPrepMapCBType {
+    PrepMapCBNumber,
+    BKPrepMapCBTypeNil,
+} BKPrepMapCBType;
 
-static const std::vector<std::string> cPianoCBType = {
-    "PianoNumber"
+static const std::vector<std::string> cPrepMapCBType = {
+    "PrepMapNumber"
 };
 
-static const std::vector<std::string> cPianoNumberName= {
+static const std::vector<std::string> cPreMapNumberName= {
     "One",
     "Two",
     "Three",
@@ -285,19 +285,19 @@ static const std::vector<std::string> cTuningParameterTypes = {
 };
 
 
-#pragma mark - Piano
-typedef enum PianoTFIndex
+#pragma mark - PrepMap
+typedef enum PrepMapTFIndex
 {
-    PianoKeymapId = 0,
-    PianoPreparationId,
-    PianoParameterTypeNil
+    PrepMapKeymapId = 0,
+    PrepMapPreparationId,
+    PrepMapParameterTypeNil
     
-} PianoTFIndex;
+} PrepMapTFIndex;
 
-static const std::vector<std::string> cPianoParameterTypes = {
-    "PianoNumber",
-    "PianoKeymap Id",
-    "PianoPreparation Id"
+static const std::vector<std::string> cPrepMapParameterTypes = {
+    "PrepMapNumber",
+    "PrepMapKeymap Id",
+    "PrepMapPreparation Id"
 };
 
 #pragma mark - Keymap
@@ -316,9 +316,11 @@ static const std::vector<std::string> cKeymapParameterTypes = {
 
 
 // Globals
-static const int aMaxNumPianos = 12;
-static const int aMaxNumPreparationsPerPiano = 12;
-static const int aMaxTotalPreparations = aMaxNumPianos * aMaxNumPreparationsPerPiano;
+static const int aMaxNumPreparationKeymaps = 12;
+static const int aMaxNumPreparationsPerPrepMap = 12;
+static const int aMaxTotalPreparations = aMaxNumPreparationKeymaps * aMaxNumPreparationsPerPrepMap;
+static const int aMaxTuningPreparations = aMaxTotalPreparations * 3;
+
 static const float aGlobalGain = 0.5; //make this user settable
 
 static const float aMaxSampleLengthSec = 30.0f;
