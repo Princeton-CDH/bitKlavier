@@ -166,6 +166,8 @@ public:
     
     //begin playing reverse note, called with noteOff
     void keyReleased(int midiNoteNumber, int midiChannel);
+    
+    void postRelease(int midiNoteNumber, int midiChannel);
 
     inline void setPreparation(NostalgicPreparation::Ptr prep)  { preparation = prep;   }
 
@@ -192,6 +194,7 @@ private:
     
     Array<uint64> noteLengthTimers;     //store current length of played notes here
     Array<int> activeNotes;             //table of notes currently being played by player
+    Array<bool> noteOn;                 // table of booleans representing state of each note
     Array<float> velocities;            //table of velocities played
     
     Array<uint64> reverseLengthTimers;  //keep track of how long reverse notes have been playing

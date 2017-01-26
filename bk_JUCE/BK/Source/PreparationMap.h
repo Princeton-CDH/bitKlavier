@@ -52,6 +52,7 @@ public:
     
     void keyPressed(int noteNumber, float velocity, int channel);
     void keyReleased(int noteNumber, float velocity, int channel);
+    void postRelease(int noteNumber, float velocity, int channel);
     
     void setKeymap(Keymap::Ptr km);
     inline Keymap::Ptr getKeymap()              { return pKeymap; }

@@ -62,7 +62,7 @@ prepMapTF(OwnedArray<BKTextField>())
     
     for (int i = 0; i < aMaxNumPreparationKeymaps; i++)
     {
-        prepMapCB[PrepMapCBNumber]->addItem(cPreMapNumberName[i], i+1);
+        prepMapCB[PrepMapCBNumber]->addItem(cPrepMapName[i], i+1);
     }
     
     prepMapCB[PrepMapCBNumber]->setSelectedItemIndex(0);
@@ -274,11 +274,7 @@ void PreparationMapViewController::comboBoxChanged (ComboBox* box)
         
         DBG("Current piano: " + String(whichPiano-1));
         
-        processor.currentPiano = processor.bkPianos[whichPiano-1];
-        
-        processor.currentPiano->currentPMap = processor.currentPiano->getPreparationMaps()[0];
-        
-        processor.currentPiano->activePMaps.addIfNotAlreadyThere(processor.currentPiano->currentPMap);
+        processor.setCurrentPiano(whichPiano-1);
         
         prepMapCB[PrepMapCBNumber]->setSelectedItemIndex(0);
         

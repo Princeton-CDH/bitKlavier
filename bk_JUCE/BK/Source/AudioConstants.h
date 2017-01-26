@@ -90,28 +90,43 @@ static const std::vector<std::string> cPrepMapCBType = {
     "PrepMapNumber"
 };
 
+
+
+
 static const std::vector<std::string> cPianoName = {
-    "MyFirstPiano",
-    "MySecondPiano"
+    "Piano1",
+    "Piano2",
+    "Piano3",
+    "Piano4",
+    "Piano5",
+    "Piano6",
+    "Piano7",
+    "Piano8",
+    "Piano9",
+    "Piano10",
+    "Piano11",
+    "Piano12"
 };
 
-static const std::vector<std::string> cPreMapNumberName= {
-    "One",
-    "Two",
-    "Three",
-    "Four",
-    "Five",
-    "Six",
-    "Seven",
-    "Eigth",
-    "Nine",
-    "Ten",
-    "Eleven",
-    "Twelve"
+static const int aMaxNumPianos = cPianoName.size();
+
+
+static const std::vector<std::string> cPrepMapName= {
+    "PrepMap1",
+    "PrepMap2",
+    "PrepMap3",
+    "PrepMap4",
+    "PrepMap5",
+    "PrepMap6",
+    "PrepMap7",
+    "PrepMap8",
+    "PrepMap9",
+    "PrepMap10",
+    "PrepMap11",
+    "PrepMap12"
 };
 
-
-
+static const int aMaxNumPreparationKeymaps = cPrepMapName.size();
 
 
 #pragma mark - General
@@ -324,9 +339,7 @@ static const std::vector<std::string> cKeymapParameterTypes = {
 
 
 // Globals
-static const int aMaxNumPianos = 2;
 static const int aMaxNumKeymaps = 30;
-static const int aMaxNumPreparationKeymaps = 12;
 static const int aMaxNumPreparationsPerPrepMap = 12;
 static const int aMaxTotalPreparations = aMaxNumPreparationKeymaps * aMaxNumPreparationsPerPrepMap;
 static const int aMaxTuningPreparations = aMaxTotalPreparations * 3;

@@ -49,8 +49,6 @@ public:
     BKSynthesiser                       hammerReleaseSynth;
     BKSynthesiser                       resonanceReleaseSynth;
     
-
-    
     // Preparations.
     SynchronicPreparation::CSPtrArr     sPreparation;
     NostalgicPreparation::CSPtrArr      nPreparation;
@@ -61,7 +59,12 @@ public:
     Keymap::PtrArr                      bkKeymaps;
     
     Piano::Ptr                          currentPiano;
+    Piano::PtrArr                       prevPianos;
     Piano::PtrArr                       bkPianos;
+    
+    Array<int>                         noteOn;
+    
+    int                                 noteOnCount, noteOffCount;
 
 
     int channel;
@@ -80,7 +83,7 @@ public:
 
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
     
-    Piano::Ptr  setCurrentPiano(int which);
+    void  setCurrentPiano(int which);
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override;

@@ -225,3 +225,18 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
         if (pKeymap->containsNote(noteNumber)) dProcessor[i]->keyReleased(noteNumber, velocity, channel);
     }
 }
+
+void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
+{
+    for (int i = dProcessor.size(); --i >= 0; )
+    {
+        if (pKeymap->containsNote(noteNumber)) dProcessor[i]->keyReleased(noteNumber, velocity, channel);
+    }
+    
+    
+    for (int i = nProcessor.size(); --i >= 0; )
+    {
+        if (pKeymap->containsNote(noteNumber)) nProcessor[i]->keyReleased(noteNumber, channel);
+    }
+     
+}

@@ -16,13 +16,19 @@ nPreparation            (NostalgicPreparation::CSPtrArr()),
 dPreparation            (DirectPreparation::CSPtrArr()),
 tPreparation            (TuningPreparation::CSPtrArr()),
 bkKeymaps               (Keymap::PtrArr()),
-bkPianos                (Piano::PtrArr())
+currentPiano            (Piano::Ptr()),
+prevPianos              (Piano::PtrArr()),
+bkPianos                (Piano::PtrArr()),
+noteOn                  (Array<int>())
 {
     
     //allocate storage
     bkKeymaps.ensureStorageAllocated(aMaxNumPreparationKeymaps);
     bkPianos.ensureStorageAllocated(aMaxNumPianos);
+    prevPianos.ensureStorageAllocated(aMaxNumPianos);
     tPreparation.ensureStorageAllocated(aMaxTuningPreparations);
+    
+    //noteOn.ensureStorageAllocated(128);
 
     // Make a bunch of keymaps.
     for (int i = 0; i < aMaxNumKeymaps; i++)
@@ -96,15 +102,10 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     buffer.clear();
     
-    MidiBuffer processedMidi;
     int time;
     MidiMessage m;
     
     int numSamples = buffer.getNumSamples();
-
-    // Process all active prep maps in current piano
-    for (int p = 0; p < currentPiano->activePMaps.size(); p++)
-        currentPiano->activePMaps[p]->processBlock(numSamples, m.getChannel());
     
     
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
@@ -116,32 +117,68 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         
         if (m.isNoteOn())
         {
-            // Send key on to each piano
+            ++noteOnCount;
+            
+            // Send key on to each pmap in current piano
             for (int p = 0; p < currentPiano->activePMaps.size(); p++)
                 currentPiano->activePMaps[p]->keyPressed(noteNumber, velocity, channel);
         }
         else if (m.isNoteOff())
         {
-            // Send key off to each piano
+            
+            // Send key off to each pmap in current piano
             for (int p = 0; p < currentPiano->activePMaps.size(); p++)
                 currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel);
+            
+            // This is to make sure note offs are sent to Direct processors that received note ons before the piano switched.
+            // Also, must send note offs to Nostalgic processors but prevent them from sounding.
+            for (int p = 0; p < prevPianos.size(); p++) {
+                for (int pm = prevPianos[p]->activePMaps.size(); --pm >= 0;) {
+                    //DBG("prev piano release: "+String(prevPianos[p]->getId()));
+                    prevPianos[p]->activePMaps[pm]->postRelease(noteNumber, velocity, channel);
+                }
+            }
+            
+            --noteOnCount;
+            
+            if (!noteOnCount)
+            {
+                DBG("clearing");
+                prevPianos.clearQuick();
+            }
         }
         else if (m.isAftertouch())
         {
         }
         else if (m.isPitchWheel())
         {
+            
         }
-        
-        processedMidi.addEvent (m, time);
+
     }
     
-    midiMessages.swapWith (processedMidi);
+    // Process all active prep maps in current piano
+    for (int p = 0; p < currentPiano->activePMaps.size(); p++)
+        currentPiano->activePMaps[p]->processBlock(numSamples, m.getChannel());
 
     mainPianoSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     
+    
+    
+}
+
+
+void  BKAudioProcessor::setCurrentPiano(int which)
+{
+    if (noteOnCount > noteOffCount)  prevPianos.add(currentPiano);
+    
+    currentPiano = bkPianos[which];
+
+    currentPiano->currentPMap = currentPiano->getPreparationMaps()[0];
+
+    currentPiano->activePMaps.addIfNotAlreadyThere(currentPiano->currentPMap);
 }
 
 void BKAudioProcessor::releaseResources() {
