@@ -22,6 +22,8 @@
 
 #include "PreparationsMap.h"
 
+#include "Piano.h"
+
 #define USE_SYNCHRONIC_TWO 0
 
 //==============================================================================
@@ -45,7 +47,7 @@ public:
     BKSynthesiser                       hammerReleaseSynth;
     BKSynthesiser                       resonanceReleaseSynth;
     
-    // PreparationsMap
+    // PreparationsMaps
     PreparationsMap::CSPtrArr           prepMaps;
     PreparationsMap::Ptr                currentPrepMap;
     
@@ -57,6 +59,10 @@ public:
     
     // Keymaps.
     Keymap::PtrArr                      bkKeymaps;
+    
+    // Active Maps and Pianos
+    PreparationsMap::CSPtrArr activePrepMaps;   //this array is what a Piano stores
+    Piano::Ptr currentPiano;
 
     int channel;
 
@@ -106,8 +112,6 @@ private:
     void loadMainPianoSamples(BKSynthesiser *synth, int numLayers);
     void loadResonanceRelaseSamples(BKSynthesiser *synth);
     void loadHammerReleaseSamples(BKSynthesiser *synth);
-    
-    PreparationsMap::CSPtrArr activePrepMaps;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)

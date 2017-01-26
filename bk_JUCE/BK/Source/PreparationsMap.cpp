@@ -33,6 +33,8 @@ PreparationsMap::~PreparationsMap()
     
 }
 
+//need copy constructor
+
 void PreparationsMap::prepareToPlay (double sr)
 {
     sampleRate = sr;

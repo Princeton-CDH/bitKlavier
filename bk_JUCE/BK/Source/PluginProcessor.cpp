@@ -1,7 +1,6 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-
 #include "BKPianoSampler.h"
 
 #define NOST_KEY_OFF 1
@@ -12,12 +11,13 @@ general                 (new GeneralSettings()),
 mainPianoSynth          (general),
 hammerReleaseSynth      (general),
 resonanceReleaseSynth   (general),
-prepMaps             (PreparationsMap::CSPtrArr()),
+prepMaps                (PreparationsMap::CSPtrArr()),
 sPreparation            (SynchronicPreparation::CSPtrArr()),
 nPreparation            (NostalgicPreparation::CSPtrArr()),
 dPreparation            (DirectPreparation::CSPtrArr()),
 tPreparation            (TuningPreparation::CSPtrArr()),
-bkKeymaps               (Keymap::PtrArr())
+bkKeymaps               (Keymap::PtrArr()),
+currentPiano            (new Piano(activePrepMaps))
 {
     
     //allocate storage

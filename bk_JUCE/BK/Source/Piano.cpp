@@ -10,10 +10,10 @@
 
 #include "Piano.h"
 
-Piano::Piano(BKAudioProcessor& p):
-processor(p)
+Piano::Piano(PreparationsMap::CSPtrArr activePrepMaps):
+currentPrepMaps(activePrepMaps)
 {
-    // Set pointers to Preparations and Keymaps here, based on Processor state. 
+    storedPrepMaps.ensureStorageAllocated(aMaxNumPreparationKeymaps);
 }
 
 Piano::~Piano()
@@ -21,6 +21,17 @@ Piano::~Piano()
     
 }
 
+void Piano::storeCurrentPiano()
+{
+    //copy currentPrepMaps to storedPrepMaps
+}
+
+void Piano::recallCurrentPiano()
+{
+    //copy storedPrepMaps to currentPrepMaps
+}
+
+/*
  // Create and return value tree representing current Piano state, for use in writing Pianos.
 ValueTree* Piano::getPianoValueTree(void)
 {
@@ -28,3 +39,4 @@ ValueTree* Piano::getPianoValueTree(void)
     return &vt;
 }
 
+*/

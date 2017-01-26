@@ -4,6 +4,9 @@
     Keymap.h
     Created: 2 Dec 2016 12:23:33pm
     Author:  Michael R Mulshine
+ 
+    A "Keymap" is simply an array of booleans corresponding to the notes on a keyboard
+        true => that key/note is prepared in some way
 
   ==============================================================================
 */

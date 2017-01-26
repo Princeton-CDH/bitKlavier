@@ -4,6 +4,9 @@
     Piano.h
     Created: 7 Dec 2016 10:25:40am
     Author:  Michael R Mulshine
+ 
+    A "Piano" is an array of PreparationsMaps
+    (equivalent to a "Preset" in the original bitKlavier)
 
   ==============================================================================
 */
@@ -12,14 +15,7 @@
 #define Piano_H_INCLUDED
 
 #include "BKUtilities.h"
-
-#include "PluginProcessor.h"
-
-#include "Synchronic.h"
-#include "Nostalgic.h"
-#include "Direct.h"
-#include "Tuning.h"
-#include "General.h"
+#include "PreparationsMap.h"
 
 class Piano : public ReferenceCountedObject
 {
@@ -29,18 +25,21 @@ public:
     typedef Array<Piano::Ptr, CriticalSection> CSPtrArr;
     typedef OwnedArray<Piano>                  Arr;
     typedef OwnedArray<Piano, CriticalSection> CSArr;
-    
-    Piano();
-    Piano(BKAudioProcessor&);
+
+    Piano(PreparationsMap::CSPtrArr activePrepMaps);
     ~Piano();
     
+    void storeCurrentPiano();
+    void recallCurrentPiano();
+    
+    /*
     inline GeneralSettings::Ptr                getGeneralSettings(void)            {   return general;         }
     
     inline SynchronicPreparation::PtrArr       getSynchronicPreparations(void)     {   return synchronic;      }
     inline NostalgicPreparation::PtrArr        getNostalgicPreparations(void)      {   return nostalgic;       }
     inline DirectPreparation::PtrArr           getDirectPreparations(void)         {   return direct;          }
     
-    inline void setGeneralSettings(GeneralSettings::Ptr g)                  {   general = g;            }
+    inline void setGeneralSettings(GeneralSettings::Ptr g)                      {   general = g;            }
     
     inline void setSynchronicPreparations(SynchronicPreparation::PtrArr s)     {   synchronic = s;         }
     inline void setNostalgicPreparations(NostalgicPreparation::PtrArr n)       {   nostalgic=  n;          }
@@ -56,11 +55,14 @@ public:
     inline void setDirectPreparationForLayer(DirectPreparation::Ptr d, int layer)           {   direct[layer]       = d;    }
     
     ValueTree*  getPianoValueTree(void);
+     */
     
 private:
+
+    PreparationsMap::CSPtrArr   currentPrepMaps;    //from BKProcessor, activePrepMaps
+    PreparationsMap::CSPtrArr   storedPrepMaps;     //internal: store current here, or recall from here to current
     
-    BKAudioProcessor& processor;
-    
+    /*
     GeneralSettings::Ptr            general;
     
     SynchronicPreparation::PtrArr   synchronic;
@@ -68,7 +70,7 @@ private:
     DirectPreparation::PtrArr       direct;
     
     ValueTree vt;
-    
+    */
     
     JUCE_LEAK_DETECTOR(Piano)
 };
