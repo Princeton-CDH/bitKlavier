@@ -24,6 +24,8 @@
 
 #include "Piano.h"
 
+#include "Piano.h"
+
 #define USE_SYNCHRONIC_TWO 0
 
 //==============================================================================
@@ -47,7 +49,7 @@ public:
     BKSynthesiser                       hammerReleaseSynth;
     BKSynthesiser                       resonanceReleaseSynth;
     
-    Piano::Ptr                         currentPiano;
+
     
     // Preparations.
     SynchronicPreparation::CSPtrArr     sPreparation;
@@ -58,7 +60,9 @@ public:
     // Keymaps.
     Keymap::PtrArr                      bkKeymaps;
     
+    Piano::Ptr                          currentPiano;
     Piano::PtrArr                       bkPianos;
+
 
     int channel;
 

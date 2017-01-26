@@ -4,6 +4,9 @@
     Gallery.h
     Created: 7 Dec 2016 11:03:57am
     Author:  Michael R Mulshine
+ 
+    A "Gallery" is an array of Pianos, along with one General Settings
+    (equivalent to a "Library" in the original bitKlavier)
 
   ==============================================================================
 */
@@ -28,6 +31,7 @@ public:
     Gallery(Piano::PtrArr pianos);
     ~Gallery();
     
+    /*
     inline void setPianos(Piano::PtrArr p)           {   pianos = p;      }
     
     inline Piano::PtrArr getPianos(void)             {   return pianos;   }
@@ -35,6 +39,7 @@ public:
     // something like this
     void writeToFile(String filepath);
     Piano::PtrArr readFromFile(String filepath);
+     */
     
     
 private:

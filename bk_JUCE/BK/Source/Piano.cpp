@@ -34,16 +34,21 @@ Piano::~Piano()
     
 }
 
+
 void Piano::prepareToPlay(double sampleRate)
 {
     for (int i = 0; i < aMaxNumPreparationKeymaps; i++)
         prepMaps[i]->prepareToPlay(sampleRate);
 }
 
- // Create and return value tree representing current Piano state, for use in writing Pianos.
-ValueTree* Piano::getPianoValueTree(void)
+
+void Piano::storeCurrentPiano()
 {
-   
-    return &vt;
+    //copy currentPrepMaps to storedPrepMaps
+}
+
+void Piano::recallCurrentPiano()
+{
+    //copy storedPrepMaps to currentPrepMaps
 }
 

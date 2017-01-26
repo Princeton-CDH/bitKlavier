@@ -26,6 +26,7 @@ Gallery::~Gallery()
     
 }
 
+/*
 void Gallery::writeToFile(String filepath)
 {
     
@@ -36,3 +37,4 @@ Piano::PtrArr Gallery::readFromFile(String filepath)
     
     return pianos;
 }
+ */

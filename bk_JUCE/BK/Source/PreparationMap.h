@@ -4,6 +4,8 @@
     PreparationMap.h
     Created: 8 Dec 2016 12:59:46am
     Author:  Michael R Mulshine
+ 
+    A "PreparationsMap" is a Keymap connected to one or more Preparations of any type
 
   ==============================================================================
 */

@@ -4,6 +4,9 @@
     Piano.h
     Created: 7 Dec 2016 10:25:40am
     Author:  Michael R Mulshine
+ 
+    A "Piano" is an array of PreparationsMaps
+    (equivalent to a "Preset" in the original bitKlavier)
 
   ==============================================================================
 */
@@ -13,6 +16,7 @@
 
 #include "BKUtilities.h"
 
+
 #include "PreparationMap.h"
 
 #include "Keymap.h"
@@ -21,6 +25,7 @@
 #include "Direct.h"
 #include "Tuning.h"
 #include "General.h"
+
 
 class Piano : public ReferenceCountedObject
 {
@@ -38,10 +43,14 @@ public:
           int Id);
     ~Piano();
     
+    void storeCurrentPiano();
+    void recallCurrentPiano();
+    
     inline GeneralSettings::Ptr                getGeneralSettings(void)            {   return general;         }
     
     inline void setGeneralSettings(GeneralSettings::Ptr g)                          {   general = g;            }
     
+
     ValueTree*  getPianoValueTree(void);
     
     inline void setId(int Id) { Id = Id; }
@@ -50,10 +59,10 @@ public:
     
     inline PreparationMap::CSPtrArr getPreparationMaps(void) { return prepMaps; }
     
-    PreparationMap::Ptr currentPMap;
-    PreparationMap::CSPtrArr activePMaps;
     
-    PreparationMap::CSPtrArr           prepMaps;
+    PreparationMap::Ptr         currentPMap;
+    PreparationMap::CSPtrArr    activePMaps;
+    PreparationMap::CSPtrArr    prepMaps;
     
     void prepareToPlay(double sampleRate);
     
@@ -63,12 +72,8 @@ private:
     GeneralSettings::Ptr general;
     
     
-    
-    
-    
-    
     ValueTree vt;
-    
+
     
     JUCE_LEAK_DETECTOR(Piano)
 };

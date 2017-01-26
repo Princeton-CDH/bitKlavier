@@ -1,7 +1,6 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-
 #include "BKPianoSampler.h"
 
 #define NOST_KEY_OFF 1
