@@ -80,12 +80,19 @@ static const std::vector<std::string> cPreparationTypes = {
 };
 
 typedef enum BKPrepMapCBType {
+    PrepMapCBPiano,
     PrepMapCBNumber,
     BKPrepMapCBTypeNil,
 } BKPrepMapCBType;
 
 static const std::vector<std::string> cPrepMapCBType = {
+    "Piano",
     "PrepMapNumber"
+};
+
+static const std::vector<std::string> cPianoName = {
+    "MyFirstPiano",
+    "MySecondPiano"
 };
 
 static const std::vector<std::string> cPreMapNumberName= {
@@ -295,7 +302,8 @@ typedef enum PrepMapTFIndex
 } PrepMapTFIndex;
 
 static const std::vector<std::string> cPrepMapParameterTypes = {
-    "PrepMapNumber",
+    "Piano",
+    "PrepMap Id",
     "PrepMapKeymap Id",
     "PrepMapPreparation Id"
 };
@@ -316,6 +324,8 @@ static const std::vector<std::string> cKeymapParameterTypes = {
 
 
 // Globals
+static const int aMaxNumPianos = 2;
+static const int aMaxNumKeymaps = 30;
 static const int aMaxNumPreparationKeymaps = 12;
 static const int aMaxNumPreparationsPerPrepMap = 12;
 static const int aMaxTotalPreparations = aMaxNumPreparationKeymaps * aMaxNumPreparationsPerPrepMap;

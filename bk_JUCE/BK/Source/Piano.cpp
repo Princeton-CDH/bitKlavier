@@ -10,15 +10,34 @@
 
 #include "Piano.h"
 
-Piano::Piano(BKAudioProcessor& p):
-processor(p)
+Piano::Piano(BKSynthesiser *ms,
+             BKSynthesiser *res,
+             BKSynthesiser *ham,
+             Keymap::Ptr keymap,
+             int Id):
+currentPMap(PreparationMap::Ptr()),
+activePMaps(PreparationMap::CSPtrArr()),
+prepMaps(PreparationMap::CSPtrArr()),
+Id(Id)
 {
-    // Set pointers to Preparations and Keymaps here, based on Processor state. 
+    //initialize pianomaps, keymaps, preparations, and processors
+    for (int i = 0; i < aMaxNumPreparationKeymaps; i++)
+    {
+        prepMaps.add(new PreparationMap(ms, res, ham,
+                                        keymap,
+                                        i));
+    }
 }
 
 Piano::~Piano()
 {
     
+}
+
+void Piano::prepareToPlay(double sampleRate)
+{
+    for (int i = 0; i < aMaxNumPreparationKeymaps; i++)
+        prepMaps[i]->prepareToPlay(sampleRate);
 }
 
  // Create and return value tree representing current Piano state, for use in writing Pianos.

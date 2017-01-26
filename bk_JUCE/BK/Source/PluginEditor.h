@@ -21,7 +21,7 @@
 
 #include "GeneralViewController.h"
 
-#include "PreparationsMapViewController.h"
+#include "PreparationMapViewController.h"
 #include "KeymapViewController.h"
 
 
@@ -47,7 +47,7 @@ private:
     
     BKAudioProcessor& processor;
     
-    PreparationsMapViewController         lvc;
+    PreparationMapViewController         lvc;
     KeymapViewController        kvc;
     GeneralViewController       gvc;
     SynchronicViewController    svc;

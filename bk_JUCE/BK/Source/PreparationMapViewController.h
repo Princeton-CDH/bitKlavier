@@ -1,15 +1,15 @@
 /*
   ==============================================================================
 
-    PreparationsMapViewController.h
+    PreparationMapViewController.h
     Created: 8 Dec 2016 12:54:41am
     Author:  Michael R Mulshine
 
   ==============================================================================
 */
 
-#ifndef PreparationsMapViewController_H_INCLUDED
-#define PreparationsMapViewController_H_INCLUDED
+#ifndef PreparationMapViewController_H_INCLUDED
+#define PreparationMapViewController_H_INCLUDED
 
 #include "BKUtilities.h"
 
@@ -23,17 +23,17 @@
 
 #include "BKMenu.h"
 
-#include "PreparationsMap.h"
+#include "PreparationMap.h"
 
 
 //==============================================================================
 /*
 */
-class PreparationsMapViewController    : public BKViewController, public ActionBroadcaster, public ComboBox::Listener
+class PreparationMapViewController    : public BKViewController, public ActionBroadcaster, public ComboBox::Listener
 {
 public:
-    PreparationsMapViewController(BKAudioProcessor& , PreparationsMap::Ptr);
-    ~PreparationsMapViewController();
+    PreparationMapViewController(BKAudioProcessor&);
+    ~PreparationMapViewController();
 
     void paint (Graphics&) override;
     void resized() override;
@@ -41,8 +41,6 @@ public:
 private:
     
     BKAudioProcessor& processor;
-    
-    PreparationsMap::Ptr current;
     
     OwnedArray<BKComboBox> prepMapCB;
     
@@ -62,8 +60,8 @@ private:
     
     void addPreparation(BKPreparationType type, int which);
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreparationsMapViewController)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreparationMapViewController)
 };
 
 
-#endif  // PreparationsMapViewController_H_INCLUDED
+#endif  // PreparationMapViewController_H_INCLUDED

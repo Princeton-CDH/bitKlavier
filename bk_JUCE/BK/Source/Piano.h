@@ -13,8 +13,9 @@
 
 #include "BKUtilities.h"
 
-#include "PluginProcessor.h"
+#include "PreparationMap.h"
 
+#include "Keymap.h"
 #include "Synchronic.h"
 #include "Nostalgic.h"
 #include "Direct.h"
@@ -30,42 +31,41 @@ public:
     typedef OwnedArray<Piano>                  Arr;
     typedef OwnedArray<Piano, CriticalSection> CSArr;
     
-    Piano();
-    Piano(BKAudioProcessor&);
+    Piano(BKSynthesiser *s,
+          BKSynthesiser *res,
+          BKSynthesiser *ham,
+          Keymap::Ptr keymap,
+          int Id);
     ~Piano();
     
     inline GeneralSettings::Ptr                getGeneralSettings(void)            {   return general;         }
     
-    inline SynchronicPreparation::PtrArr       getSynchronicPreparations(void)     {   return synchronic;      }
-    inline NostalgicPreparation::PtrArr        getNostalgicPreparations(void)      {   return nostalgic;       }
-    inline DirectPreparation::PtrArr           getDirectPreparations(void)         {   return direct;          }
-    
-    inline void setGeneralSettings(GeneralSettings::Ptr g)                  {   general = g;            }
-    
-    inline void setSynchronicPreparations(SynchronicPreparation::PtrArr s)     {   synchronic = s;         }
-    inline void setNostalgicPreparations(NostalgicPreparation::PtrArr n)       {   nostalgic=  n;          }
-    inline void setDirectPreparations(DirectPreparation::PtrArr d)             {   direct = d;             }
-    
-    
-    inline SynchronicPreparation::Ptr       getSynchronicPreparationForLayer(int layer)     {   return synchronic[layer];      }
-    inline NostalgicPreparation::Ptr        getNostalgicPreparationForLayer(int layer)      {   return nostalgic[layer];       }
-    inline DirectPreparation::Ptr           getDirectPreparationForLayer(int layer)         {   return direct[layer];          }
-    
-    inline void setSynchronicPreparationForLayer(SynchronicPreparation::Ptr s, int layer)   {   synchronic[layer]   = s;    }
-    inline void setNostalgicPreparationForLayer(NostalgicPreparation::Ptr n, int layer)     {   nostalgic[layer]    = n;    }
-    inline void setDirectPreparationForLayer(DirectPreparation::Ptr d, int layer)           {   direct[layer]       = d;    }
+    inline void setGeneralSettings(GeneralSettings::Ptr g)                          {   general = g;            }
     
     ValueTree*  getPianoValueTree(void);
     
+    inline void setId(int Id) { Id = Id; }
+    
+    inline int getId(void) { return Id; }
+    
+    inline PreparationMap::CSPtrArr getPreparationMaps(void) { return prepMaps; }
+    
+    PreparationMap::Ptr currentPMap;
+    PreparationMap::CSPtrArr activePMaps;
+    
+    PreparationMap::CSPtrArr           prepMaps;
+    
+    void prepareToPlay(double sampleRate);
+    
 private:
+    int Id;
+
+    GeneralSettings::Ptr general;
     
-    BKAudioProcessor& processor;
     
-    GeneralSettings::Ptr            general;
     
-    SynchronicPreparation::PtrArr   synchronic;
-    NostalgicPreparation::PtrArr    nostalgic;
-    DirectPreparation::PtrArr       direct;
+    
+    
     
     ValueTree vt;
     

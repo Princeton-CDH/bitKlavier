@@ -1,15 +1,15 @@
 /*
   ==============================================================================
 
-    PreparationsMap.h
+    PreparationMap.h
     Created: 8 Dec 2016 12:59:46am
     Author:  Michael R Mulshine
 
   ==============================================================================
 */
 
-#ifndef PreparationsMap_H_INCLUDED
-#define PreparationsMap_H_INCLUDED
+#ifndef PreparationMap_H_INCLUDED
+#define PreparationMap_H_INCLUDED
 
 #include "BKUtilities.h"
 
@@ -23,26 +23,28 @@
 
 #include "Direct.h"
 
-class PreparationsMap : public ReferenceCountedObject
+
+
+class PreparationMap : public ReferenceCountedObject
 {
 public:
-    typedef ReferenceCountedObjectPtr<PreparationsMap>    Ptr;
-    typedef Array<PreparationsMap::Ptr>                   PtrArr;
-    typedef Array<PreparationsMap::Ptr, CriticalSection>  CSPtrArr;
-    typedef OwnedArray<PreparationsMap>                   Arr;
-    typedef OwnedArray<PreparationsMap, CriticalSection>  CSArr;
+    typedef ReferenceCountedObjectPtr<PreparationMap>    Ptr;
+    typedef Array<PreparationMap::Ptr>                   PtrArr;
+    typedef Array<PreparationMap::Ptr, CriticalSection>  CSPtrArr;
+    typedef OwnedArray<PreparationMap>                   Arr;
+    typedef OwnedArray<PreparationMap, CriticalSection>  CSArr;
     
-    PreparationsMap(BKSynthesiser *s,
-          BKSynthesiser *res,
-          BKSynthesiser *ham,
-          Keymap::Ptr keymap,
-          int PreparationsMapNum);
-    ~PreparationsMap();
+    PreparationMap(BKSynthesiser *s,
+                   BKSynthesiser *res,
+                   BKSynthesiser *ham,
+                   Keymap::Ptr keymap,
+                   int Id);
+    ~PreparationMap();
     
     void prepareToPlay (double sampleRate);
     
-    inline void setPreparationsMapId(int val)         { PreparationsMapId = val; print();   }
-    inline int getPreparationsMapId(void)             { return PreparationsMapId;           }
+    inline void setId(int val)         { Id = val; print();   }
+    inline int getId(void)             { return Id;           }
     
     void processBlock(int numSamples, int midiChannel);
     
@@ -76,13 +78,23 @@ public:
             prep.append(String(p->getId()), 3);
             prep.append(" ",1);
         }
+        
+        if (prep == "")
+            return " ";
+        
         return prep;
+        
     }
     
     void setSynchronicPreparations(SynchronicPreparation::PtrArr sPrep);
     void setNostalgicPreparations(NostalgicPreparation::PtrArr nPrep);
     void setDirectPreparations(DirectPreparation::PtrArr dPrep);
     
+    SynchronicPreparation::PtrArr getSynchronicPreparations(void);
+    NostalgicPreparation::PtrArr getNostalgicPreparations(void);
+    DirectPreparation::PtrArr getDirectPreparations(void);
+    
+
     void addSynchronic(SynchronicPreparation::Ptr sp);
     void addNostalgic(NostalgicPreparation::Ptr np);
     void addDirect(DirectPreparation::Ptr dp);
@@ -100,13 +112,13 @@ public:
     
     void print(void)
     {
-        DBG("PreparationsMapNum: " + String(PreparationsMapId));
+        DBG("PrepMapId: " + String(Id));
     }
     
 private:
-    int PreparationsMapId;
+    int Id;
     
-    // Keymap for this PreparationsMap (one per PreparationsMap)
+    // Keymap for this PreparationMap (one per PreparationMap)
     Keymap::Ptr                     pKeymap;
     
     // Preparations (flown in from BKAudioProcessor)
@@ -127,8 +139,8 @@ private:
     double                          sampleRate;
     
     
-    JUCE_LEAK_DETECTOR(PreparationsMap)
+    JUCE_LEAK_DETECTOR(PreparationMap)
 };
 
 
-#endif  // PreparationsMap_H_INCLUDED
+#endif  // PreparationMap_H_INCLUDED

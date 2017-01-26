@@ -17,7 +17,7 @@
 BKAudioProcessorEditor::BKAudioProcessorEditor (BKAudioProcessor& p):
 AudioProcessorEditor (&p),
 processor (p),
-lvc(p, p.currentPrepMap),
+lvc(p),
 kvc(p),
 gvc(p),
 svc(p),

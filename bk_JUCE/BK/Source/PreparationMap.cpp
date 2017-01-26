@@ -1,23 +1,26 @@
 /*
   ==============================================================================
 
-    PreparationsMap.cpp
+    PreparationMap.cpp
     Created: 17 Dec 2016 12:35:30pm
     Author:  Daniel Trueman
 
   ==============================================================================
 */
 
-#include "PreparationsMap.h"
+#include "PreparationMap.h"
 
-PreparationsMap::PreparationsMap(BKSynthesiser *s,
+PreparationMap::PreparationMap(BKSynthesiser *s,
              BKSynthesiser *res,
              BKSynthesiser *ham,
              Keymap::Ptr km,
              int Id):
 isActive(false),
-PreparationsMapId(Id),
+Id(Id),
 pKeymap(km),
+sPreparations(SynchronicPreparation::PtrArr()),
+nPreparations(NostalgicPreparation::PtrArr()),
+dPreparations(DirectPreparation::PtrArr()),
 sProcessor(SynchronicProcessor::CSPtrArr()),
 nProcessor(NostalgicProcessor::CSPtrArr()),
 dProcessor(DirectProcessor::CSPtrArr()),
@@ -28,27 +31,27 @@ hammerSynth(ham)
 
 }
 
-PreparationsMap::~PreparationsMap()
+PreparationMap::~PreparationMap()
 {
     
 }
 
-void PreparationsMap::prepareToPlay (double sr)
+void PreparationMap::prepareToPlay (double sr)
 {
     sampleRate = sr;
 }
 
-void PreparationsMap::setKeymap(Keymap::Ptr km)
+void PreparationMap::setKeymap(Keymap::Ptr km)
 {
     pKeymap = km;
 }
 
-void PreparationsMap::setSynchronicPreparations(SynchronicPreparation::PtrArr newPreps)
+void PreparationMap::setSynchronicPreparations(SynchronicPreparation::PtrArr newPreps)
 {
     SynchronicPreparation::PtrArr oldPreps = sPreparations;
     sPreparations = newPreps;
     
-    // If a preparation was not previously part of the PreparationsMap, add it to a new XProcesssor and add that processor to xProcessor.
+    // If a preparation was not previously part of the PreparationMap, add it to a new XProcesssor and add that processor to xProcessor.
     for (int i = sPreparations.size(); --i >= 0;)
     {
         if (!oldPreps.contains(sPreparations[i]))
@@ -74,12 +77,12 @@ void PreparationsMap::setSynchronicPreparations(SynchronicPreparation::PtrArr ne
     deactivateIfNecessary();
 }
 
-void PreparationsMap::setNostalgicPreparations(NostalgicPreparation::PtrArr newPreps)
+void PreparationMap::setNostalgicPreparations(NostalgicPreparation::PtrArr newPreps)
 {
     NostalgicPreparation::PtrArr oldPreps = nPreparations;
     nPreparations = newPreps;
     
-    // If a preparation was not previously part of the PreparationsMap, add it to a new XProcesssor and add that processor to xProcessor.
+    // If a preparation was not previously part of the PreparationMap, add it to a new XProcesssor and add that processor to xProcessor.
     for (int i = nPreparations.size(); --i >= 0;)
     {
         if (!oldPreps.contains(nPreparations[i]))
@@ -100,12 +103,12 @@ void PreparationsMap::setNostalgicPreparations(NostalgicPreparation::PtrArr newP
     deactivateIfNecessary();
 }
 
-void PreparationsMap::setDirectPreparations(DirectPreparation::PtrArr newPreps)
+void PreparationMap::setDirectPreparations(DirectPreparation::PtrArr newPreps)
 {
     DirectPreparation::PtrArr oldPreps = dPreparations;
     dPreparations = newPreps;
     
-    // If a preparation was not previously part of the PreparationsMap, add it to a new XProcesssor and add that processor to xProcessor.
+    // If a preparation was not previously part of the PreparationMap, add it to a new XProcesssor and add that processor to xProcessor.
     for (int i = dPreparations.size(); --i >= 0;)
     {
         if (!oldPreps.contains(dPreparations[i]))
@@ -126,7 +129,23 @@ void PreparationsMap::setDirectPreparations(DirectPreparation::PtrArr newPreps)
     deactivateIfNecessary();
 }
 
-void PreparationsMap::removeAllPreparations()
+SynchronicPreparation::PtrArr PreparationMap::getSynchronicPreparations(void)
+{
+    return sPreparations;
+}
+
+NostalgicPreparation::PtrArr PreparationMap::getNostalgicPreparations(void)
+{
+    return nPreparations;
+}
+
+DirectPreparation::PtrArr PreparationMap::getDirectPreparations(void)
+{
+    return dPreparations;
+}
+
+
+void PreparationMap::removeAllPreparations()
 {
     sPreparations.clearQuick();
     nPreparations.clearQuick();
@@ -136,7 +155,7 @@ void PreparationsMap::removeAllPreparations()
 
 
 
-void PreparationsMap::deactivateIfNecessary()
+void PreparationMap::deactivateIfNecessary()
 {
     if(sPreparations.size() == 0 &&
        nPreparations.size() == 0 &&
@@ -151,7 +170,7 @@ void PreparationsMap::deactivateIfNecessary()
 }
 
 
-void PreparationsMap::processBlock(int numSamples, int midiChannel)
+void PreparationMap::processBlock(int numSamples, int midiChannel)
 {
     for (int i = sProcessor.size(); --i >= 0; )
     {
@@ -170,7 +189,7 @@ void PreparationsMap::processBlock(int numSamples, int midiChannel)
 }
 
 
-void PreparationsMap::keyPressed(int noteNumber, float velocity, int channel)
+void PreparationMap::keyPressed(int noteNumber, float velocity, int channel)
 {
     for (int i = sProcessor.size(); --i >= 0; )
     {
@@ -189,7 +208,7 @@ void PreparationsMap::keyPressed(int noteNumber, float velocity, int channel)
 }
 
 
-void PreparationsMap::keyReleased(int noteNumber, float velocity, int channel)
+void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
 {
     for (int i = sProcessor.size(); --i >= 0; )
     {
