@@ -238,5 +238,5 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
     {
         if (pKeymap->containsNote(noteNumber)) nProcessor[i]->keyReleased(noteNumber, channel);
     }
-     
+    
 }
