@@ -16,15 +16,11 @@
 
 #include "BKUtilities.h"
 
-
 #include "PreparationMap.h"
 
 #include "Keymap.h"
-#include "Synchronic.h"
-#include "Nostalgic.h"
-#include "Direct.h"
-#include "Tuning.h"
-#include "General.h"
+
+
 
 
 class Piano : public ReferenceCountedObject
@@ -64,13 +60,25 @@ public:
     PreparationMap::CSPtrArr    activePMaps;
     PreparationMap::CSPtrArr    prepMaps;
     
+    int numPMaps;
+    
     void prepareToPlay(double sampleRate);
+    
+    int addPreparationMap(void);
+    int removeLastPreparationMap(void);
     
 private:
     int Id;
+    
+    double sampleRate;
 
     GeneralSettings::Ptr general;
     
+    // Pointers to synths (flown in from BKAudioProcessor)
+    BKSynthesiser*                  synth;
+    BKSynthesiser*                  resonanceSynth;
+    BKSynthesiser*                  hammerSynth;
+    Keymap::Ptr                     initialKeymap;
     
     ValueTree vt;
 

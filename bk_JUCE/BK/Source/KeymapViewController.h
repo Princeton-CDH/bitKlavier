@@ -24,7 +24,7 @@
 //==============================================================================
 /*
 */
-class KeymapViewController    : public BKViewController, public ActionListener, public MidiKeyboardStateListener
+class KeymapViewController    : public BKViewController, public ActionListener//, public MidiKeyboardStateListener
 {
 public:
     KeymapViewController(BKAudioProcessor&);
@@ -41,6 +41,8 @@ private:
     OwnedArray<BKLabel> keymapL;
     OwnedArray<BKTextField> keymapTF;
     
+    
+#if 0
     MidiKeyboardState keyboardState;
     
     Component *keyboardComponent;
@@ -68,11 +70,15 @@ private:
      */
     void handleNoteOff (MidiKeyboardState* source,
                                 int midiChannel, int midiNoteNumber, float velocity) override;
+#endif
+    
+    
     
     
     void updateFields(int keymapId);
     
     void textFieldDidChange(TextEditor&) override;
+    void comboBoxDidChange (ComboBox* box) override;
     
     void actionListenerCallback (const String& message) override;
     

@@ -40,11 +40,13 @@ processor(p)
         keymapTF[i]->setName(cKeymapParameterTypes[i]);
     }
     
+#if 0
     // Keyboard
     addAndMakeVisible (keyboardComponent = new MidiKeyboardComponent (keyboardState,
                                                                  MidiKeyboardComponent::horizontalKeyboard));
     
     keyboardState.addListener(this);
+#endif
     
     updateFields(currentKeymapId);
 }
@@ -82,10 +84,12 @@ void KeymapViewController::resized()
         keymapTF[n]->setTopLeftPosition(tfX, gYSpacing + tfY * n);
     }
     
+#if 0
     int kbX = gXSpacing;
     int kbY = lY * cKeymapParameterTypes.size() +  gYSpacing;
     keyboardComponent->setBounds(kbX, kbY,
                                  getWidth() - 2*gXSpacing, getHeight() - kbY - gYSpacing);
+#endif
 }
 
 void KeymapViewController::textFieldDidChange(TextEditor& tf)
@@ -120,7 +124,6 @@ void KeymapViewController::textFieldDidChange(TextEditor& tf)
 
 void KeymapViewController::updateFields(int keymapId)
 {
-    DBG("keymap Id: " + String(keymapId));
     Keymap::Ptr km = processor.bkKeymaps[keymapId];
     
     keymapTF[KeymapId]        ->setText( String( keymapId));
@@ -132,12 +135,13 @@ void KeymapViewController::actionListenerCallback (const String& message)
 {
     if (message == "keymap/update")
     {
-        currentKeymapId = processor.currentPiano->currentPMap->getKeymapId();
+        //currentKeymapId = processor.currentPiano->currentPMap->getKeymapId();
         
-        updateFields(currentKeymapId);
+        //updateFields(currentKeymapId);
     }
 }
 
+#if 0
 /** Called when one of the MidiKeyboardState's keys is pressed. */
 void KeymapViewController::handleNoteOn (MidiKeyboardState* source,
                    int midiChannel, int midiNoteNumber, float velocity)
@@ -155,5 +159,10 @@ void KeymapViewController::handleNoteOff (MidiKeyboardState* source,
                     int midiChannel, int midiNoteNumber, float velocity)
 {
     DBG("NOTE OFF: " + String(midiNoteNumber) + " " + String(velocity));
+}
+#endif
+void KeymapViewController::comboBoxDidChange (ComboBox* box)
+{
+    
 }
 

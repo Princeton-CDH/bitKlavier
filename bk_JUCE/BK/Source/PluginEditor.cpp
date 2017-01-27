@@ -17,7 +17,8 @@
 BKAudioProcessorEditor::BKAudioProcessorEditor (BKAudioProcessor& p):
 AudioProcessorEditor (&p),
 processor (p),
-lvc(p),
+pvc(p),
+pmvc(PreparationMapViewController::PtrArr()),
 kvc(p),
 gvc(p),
 svc(p),
@@ -25,28 +26,151 @@ nvc(p),
 dvc(p),
 tvc(p)
 {
+    float pvcH = cPianoParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
+    
+    upperLeft = Rectangle<int>(gComponentLeftOffset, gComponentTopOffset, gVCWidth, pvcH);
+    
+    pmapH = cPrepMapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
+    
+    pmvc.ensureStorageAllocated(12);
+    
+    addAndMakeVisible(pvc);
     addAndMakeVisible(gvc);
     addAndMakeVisible(svc);
     addAndMakeVisible(nvc);
     addAndMakeVisible(dvc);
-    addAndMakeVisible(lvc);
     addAndMakeVisible(kvc);
     addAndMakeVisible(tvc);
     
-    lvc.addActionListener(&gvc);
-    lvc.addActionListener(&svc);
-    lvc.addActionListener(&nvc);
-    lvc.addActionListener(&dvc);
-    lvc.addActionListener(&kvc);
-    lvc.addActionListener(&tvc);
+    addPMapButton.setName("Add");
+    addPMapButton.changeWidthToFitText();
+    addPMapButton.setButtonText("Add");
+    addPMapButton.addListener(this);
+    addAndMakeVisible(addPMapButton);
+    
+    removePMapButton.setName("Remove");
+    removePMapButton.changeWidthToFitText();
+    removePMapButton.setButtonText("Remove");
+    removePMapButton.addListener(this);
+    addAndMakeVisible(removePMapButton);
+    
+    addPMapButton.setBounds(upperLeft.getX(),
+                            upperLeft.getBottom() + gYSpacing,
+                            50,
+                            20);
     
     setSize(gMainComponentWidth,
             gMainComponentHeight);
     
 }
 
+void BKAudioProcessorEditor::buttonClicked (Button* b)
+{
+    if (b->getName() == "Add")
+    {
+        drawNewPreparationMap(processor.currentPiano->addPreparationMap());
+    }
+    else if (b->getName() == "Remove")
+    {
+        removeLastPreparationMap(processor.currentPiano->removeLastPreparationMap());
+    }
+}
+
+
 BKAudioProcessorEditor::~BKAudioProcessorEditor()
 {
+    
+}
+
+void BKAudioProcessorEditor::removeLastPreparationMap(int Id)
+{
+    
+    if (Id < 0) return;
+    
+    DBG("ID: " + String(Id));
+    
+    pmvc[Id]->setVisible(false);
+    
+    pvc.removeActionListener(pmvc[Id]);
+    
+    removeChildComponent(pmvc[Id]);
+    
+    pmvc.remove(Id);
+    
+    int newLastId = Id - 1;
+    
+    if (newLastId > 0)
+    {
+        addPMapButton.setBounds(pmvc[newLastId]->getX(),
+                                pmvc[newLastId]->getBottom() + gYSpacing,
+                                50,
+                                20);
+        
+        removePMapButton.setBounds(addPMapButton.getRight() + gXSpacing,
+                                   addPMapButton.getY(),
+                                   50,
+                                   20);
+    }
+    else
+    {
+        addPMapButton.setBounds(upperLeft.getX(),
+                                upperLeft.getBottom() + gYSpacing,
+                                50,
+                                20);
+        
+        
+        removePMapButton.setVisible(false);
+    }
+}
+
+void BKAudioProcessorEditor::drawNewPreparationMap(int Id)
+{
+    
+    if (Id < 0) return;
+    
+    pmvc.insert(Id, new PreparationMapViewController(processor, Id));
+    
+    addAndMakeVisible(pmvc[Id]);
+    
+    pvc.addActionListener(pmvc[Id]);
+    
+    pmvc[Id]->addActionListener(&gvc);
+    pmvc[Id]->addActionListener(&svc);
+    pmvc[Id]->addActionListener(&nvc);
+    pmvc[Id]->addActionListener(&dvc);
+    pmvc[Id]->addActionListener(&kvc);
+    pmvc[Id]->addActionListener(&tvc);
+    
+    if (Id > 0) {
+        pmvc[Id]->setBounds(gComponentLeftOffset,
+                            pmvc[Id-1]->getBottom() + gYSpacing,
+                            gVCWidth,
+                            pmapH);
+    } else {
+        pmvc[Id]->setBounds(gComponentLeftOffset,
+                            upperLeft.getBottom() + gYSpacing,
+                            gVCWidth,
+                            pmapH);
+    }
+    
+    addPMapButton.setBounds(pmvc[Id]->getX(),
+                            pmvc[Id]->getBottom() + gYSpacing,
+                            50,
+                            20);
+    
+    if (processor.currentPiano->numPMaps)
+    {
+        removePMapButton.setBounds(addPMapButton.getRight() + gXSpacing,
+                                pmvc[Id]->getBottom() + gYSpacing,
+                                50,
+                                20);
+        
+        removePMapButton.setVisible(true);
+    }
+    else
+    {
+        removePMapButton.setVisible(false);
+    }
     
 }
 
@@ -59,47 +183,49 @@ void BKAudioProcessorEditor::paint (Graphics& g)
 
 void BKAudioProcessorEditor::resized()
 {
-    float lvcH = cPrepMapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
-    float kvcH = cKeymapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + gYSpacing + 100 + gYSpacing;
-    float gvcH = cGeneralParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
-    float svcH = cSynchronicParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
-    float nvcH = cNostalgicParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) +  gYSpacing;
-    float dvcH = cDirectParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) +  gYSpacing;
-    float tvcH = cTuningParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) +  gYSpacing;
+    float kvcH = cKeymapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
+    float gvcH = cGeneralParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
+    float svcH = cSynchronicParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
+    float nvcH = cNostalgicParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + 1.5 *  gYSpacing;
+    float dvcH = cDirectParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
+    float tvcH = cTuningParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
     
-    Rectangle<int> upperLeft = Rectangle<int>(gComponentLeftOffset, gComponentTopOffset, gGeneralVCWidth, lvcH);
+    // Col 1
+    pvc.setBounds(upperLeft);
     
-    lvc.setBounds(upperLeft);
-    
-    kvc.setBounds(upperLeft.getX(),
-                  upperLeft.getBottom() + gYSpacing,
-                  gKeymapVCWidth,
+    // Col 2
+    kvc.setBounds(upperLeft.getRight() + gXSpacing,
+                  upperLeft.getY(),
+                  gVCWidth,
                   kvcH);
     
-    gvc.setBounds(upperLeft.getX(),
+    gvc.setBounds(kvc.getX(),
                   kvc.getBottom() + gYSpacing,
-                  gGeneralVCWidth,
+                  gVCWidth,
                   gvcH);
  
-    svc.setBounds(upperLeft.getRight() + gXSpacing,
+    tvc.setBounds(kvc.getX(),
+                  gvc.getBottom() + gYSpacing,
+                  gVCWidth,
+                  tvcH);
+    
+    dvc.setBounds(kvc.getX(),
+                  tvc.getBottom() + gYSpacing,
+                  gVCWidth,
+                  dvcH);
+    
+    
+    // Col 3
+    
+    svc.setBounds(kvc.getRight() + gXSpacing,
                   upperLeft.getY(),
-                  gSynchronicVCWidth,
+                  gVCWidth,
                   svcH);
     
     nvc.setBounds(svc.getX(),
                   svc.getBottom() + gYSpacing,
-                  gNostalgicVCWidth,
+                  gVCWidth,
                   nvcH);
-    
-    dvc.setBounds(svc.getRight() + gXSpacing,
-                  upperLeft.getY(),
-                  gDirectVCWidth,
-                  dvcH);
-    
-    tvc.setBounds(dvc.getX(),
-                  dvc.getBottom() + gYSpacing,
-                  gTuningVCWidth,
-                  tvcH);
     
     
     

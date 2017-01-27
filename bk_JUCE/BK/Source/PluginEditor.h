@@ -24,18 +24,23 @@
 #include "PreparationMapViewController.h"
 #include "KeymapViewController.h"
 
+#include "PianoViewController.h"
 
 //==============================================================================
 /**
 */
-class BKAudioProcessorEditor : public AudioProcessorEditor,
-                                private TextEditor::Listener
+class BKAudioProcessorEditor :  public AudioProcessorEditor,
+                                private TextEditor::Listener,
+                                private TextButton::Listener
 
 {
     
 public:
     BKAudioProcessorEditor (BKAudioProcessor&);
     ~BKAudioProcessorEditor();
+    
+    void drawNewPreparationMap(int Id);
+    void removeLastPreparationMap(int Id);
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -44,20 +49,30 @@ public:
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it
+    Rectangle<int> upperLeft;
+    float pmapH;
     
     BKAudioProcessor& processor;
     
-    PreparationMapViewController         lvc;
-    KeymapViewController        kvc;
-    GeneralViewController       gvc;
-    SynchronicViewController    svc;
-    NostalgicViewController     nvc;
-    DirectViewController        dvc;
-    TuningViewController        tvc;
+    PianoViewController                 pvc;
+    PreparationMapViewController::PtrArr pmvc;
+    KeymapViewController                kvc;
+    GeneralViewController               gvc;
+    SynchronicViewController            svc;
+    NostalgicViewController             nvc;
+    DirectViewController                dvc;
+    TuningViewController                tvc;
+
+    void buttonClicked (Button* b) override;
+    
+    TextButton                          addPMapButton;
+    TextButton                          removePMapButton;
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessorEditor)
 };
+
+
 
 
 #endif  // PLUGINEDITOR_H_INCLUDED

@@ -44,6 +44,7 @@ private:
     void updateFields(int tuningId);
     
     void textFieldDidChange(TextEditor&) override;
+    void comboBoxDidChange (ComboBox* box) override;
     
     void actionListenerCallback (const String& message) override;
   

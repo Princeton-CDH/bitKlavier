@@ -21,9 +21,13 @@
 /*
 */
 class BKViewController    : public BKView,
-                            public TextEditor::Listener
+                            public TextEditor::Listener,
+                            public ComboBox::Listener
 {
 public:
+    
+    
+  
     BKViewController();
     ~BKViewController();
     
@@ -33,6 +37,7 @@ public:
 private:
     // TextEditor input parsing
     virtual void textFieldDidChange(TextEditor&) = 0;
+    virtual void comboBoxDidChange(ComboBox*) = 0;
     
     void textEditorTextChanged(TextEditor&) override;
     void textEditorFocusLost(TextEditor&) override;
@@ -40,6 +45,10 @@ private:
     void textEditorEscapeKeyPressed(TextEditor&) override;
     
     bool shouldChange;
+    
+    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
+    
+    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKViewController)
 };

@@ -220,4 +220,9 @@ void SynchronicViewController::actionListenerCallback (const String& message)
     }
 }
 
+void SynchronicViewController::comboBoxDidChange (ComboBox* box)
+{
+    
+}
+
 

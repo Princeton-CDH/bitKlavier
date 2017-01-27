@@ -172,3 +172,8 @@ void TuningViewController::actionListenerCallback (const String& message)
         updateFields(currentTuningId);
     }
 }
+
+void TuningViewController::comboBoxDidChange (ComboBox* box)
+{
+    
+}

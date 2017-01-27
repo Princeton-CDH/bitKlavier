@@ -43,6 +43,7 @@ private:
     OwnedArray<BKTextField> nostalgicTF;
     
     void textFieldDidChange(TextEditor&) override;
+    void comboBoxDidChange (ComboBox* box) override;
     
     void updateFields(int nostalgicId);
     

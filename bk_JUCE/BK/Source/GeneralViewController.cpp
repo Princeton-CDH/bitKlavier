@@ -156,3 +156,8 @@ void GeneralViewController::actionListenerCallback (const String& message)
 {
     
 }
+
+void GeneralViewController::comboBoxDidChange (ComboBox* box)
+{
+    
+}

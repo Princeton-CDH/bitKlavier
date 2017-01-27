@@ -27,8 +27,6 @@ noteOn                  (Array<int>())
     bkPianos.ensureStorageAllocated(aMaxNumPianos);
     prevPianos.ensureStorageAllocated(aMaxNumPianos);
     tPreparation.ensureStorageAllocated(aMaxTuningPreparations);
-    
-    //noteOn.ensureStorageAllocated(128);
 
     // Make a bunch of keymaps.
     for (int i = 0; i < aMaxNumKeymaps; i++)
@@ -50,12 +48,8 @@ noteOn                  (Array<int>())
     for (int i = 0 ; i < aMaxNumPianos; i++)
         bkPianos.set(i, new Piano(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, bkKeymaps[0], i)); // initializing piano 0
   
-    //init prep map
+    // Initialize first piano.
     currentPiano = bkPianos[0];
-    
-    currentPiano->currentPMap = currentPiano->getPreparationMaps()[0];
-    
-    currentPiano->activePMaps.add(currentPiano->currentPMap);
     
     
     // For testing and developing, let's keep directory of samples in home folder on disk.
@@ -78,28 +72,13 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     hammerReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     resonanceReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
        
-    for (int i = 0; i < aMaxNumPianos; i++)
+    for (int i = aMaxNumPianos; --i >= 0;)
         bkPianos[i]->prepareToPlay(sampleRate);
     
 }
 
-void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages) {
-    
-    //const int totalNumInputChannels  = getTotalNumInputChannels();
-    //const int totalNumOutputChannels = getTotalNumOutputChannels();
-    
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming fee`dback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    /*
-    for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i) {
-        buffer.clear (i, 0, buffer.getNumSamples());
-    }
-     */
-    
+void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
+{
     buffer.clear();
     
     int time;
@@ -107,11 +86,15 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     int numSamples = buffer.getNumSamples();
     
+    // Process all active prep maps in current piano
+    for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+        currentPiano->activePMaps[p]->processBlock(numSamples, m.getChannel());
     
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
         int noteNumber = m.getNoteNumber();
         float velocity = m.getFloatVelocity();
+        int p, pm; // piano, prepmap
         
         channel = m.getChannel();
         
@@ -119,32 +102,31 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         {
             ++noteOnCount;
             
+            if (allNotesOff)   allNotesOff = false;
+            
             // Send key on to each pmap in current piano
-            for (int p = 0; p < currentPiano->activePMaps.size(); p++)
+            for (p = currentPiano->activePMaps.size(); --p >= 0;)
                 currentPiano->activePMaps[p]->keyPressed(noteNumber, velocity, channel);
         }
         else if (m.isNoteOff())
         {
             
             // Send key off to each pmap in current piano
-            for (int p = 0; p < currentPiano->activePMaps.size(); p++)
+            for (p = currentPiano->activePMaps.size(); --p >= 0;)
                 currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel);
             
-            // This is to make sure note offs are sent to Direct processors that received note ons before the piano switched.
-            // Also, must send note offs to Nostalgic processors but prevent them from sounding.
-            for (int p = 0; p < prevPianos.size(); p++) {
-                for (int pm = prevPianos[p]->activePMaps.size(); --pm >= 0;) {
-                    //DBG("prev piano release: "+String(prevPianos[p]->getId()));
+            // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
+            for (p = prevPianos.size(); --p >= 0;) {
+                for (pm = prevPianos[p]->activePMaps.size(); --pm >= 0;) {
                     prevPianos[p]->activePMaps[pm]->postRelease(noteNumber, velocity, channel);
                 }
             }
             
             --noteOnCount;
             
-            if (!noteOnCount)
-            {
-                DBG("clearing");
+            if (!allNotesOff && !noteOnCount) {
                 prevPianos.clearQuick();
+                allNotesOff = true;
             }
         }
         else if (m.isAftertouch())
@@ -156,10 +138,6 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         }
 
     }
-    
-    // Process all active prep maps in current piano
-    for (int p = 0; p < currentPiano->activePMaps.size(); p++)
-        currentPiano->activePMaps[p]->processBlock(numSamples, m.getChannel());
 
     mainPianoSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
@@ -169,16 +147,13 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
 }
 
-
 void  BKAudioProcessor::setCurrentPiano(int which)
 {
-    if (noteOnCount > noteOffCount)  prevPianos.add(currentPiano);
+    if (noteOnCount)  prevPianos.add(currentPiano);
     
     currentPiano = bkPianos[which];
 
-    currentPiano->currentPMap = currentPiano->getPreparationMaps()[0];
-
-    currentPiano->activePMaps.addIfNotAlreadyThere(currentPiano->currentPMap);
+    //currentPiano->activePMaps.addIfNotAlreadyThere(currentPiano->prepMaps[0]);
 }
 
 void BKAudioProcessor::releaseResources() {
@@ -232,7 +207,6 @@ bool BKAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* BKAudioProcessor::createEditor()
 {
-    
     return new BKAudioProcessorEditor (*this);
 }
 

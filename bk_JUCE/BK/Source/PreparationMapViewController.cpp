@@ -12,7 +12,8 @@
 #include "PreparationMapViewController.h"
 
 //==============================================================================
-PreparationMapViewController::PreparationMapViewController(BKAudioProcessor& p):
+PreparationMapViewController::PreparationMapViewController(BKAudioProcessor& p, int Id):
+Id(Id),
 processor(p),
 prepMapL(OwnedArray<BKLabel>()),
 prepMapTF(OwnedArray<BKTextField>())
@@ -33,41 +34,14 @@ prepMapTF(OwnedArray<BKTextField>())
     prepMapTF = OwnedArray<BKTextField>();
     prepMapTF.ensureStorageAllocated(cPrepMapParameterTypes.size());
     
-    for (int i = 0; i < cPrepMapParameterTypes.size()-cPrepMapCBType.size(); i++)
+    for (int i = 0; i < cPrepMapParameterTypes.size(); i++)
     {
         prepMapTF.set(i, new BKTextField());
         addAndMakeVisible(prepMapTF[i]);
         prepMapTF[i]->addListener(this);
-        prepMapTF[i]->setName(cPrepMapParameterTypes[i+cPrepMapCBType.size()]);
+        prepMapTF[i]->setName(cPrepMapParameterTypes[i]);
     }
     
-    
-    for (int i = 0; i < cPrepMapCBType.size(); i++)
-    {
-        prepMapCB.set(i, new BKComboBox());
-        prepMapCB[i]->setName(cPrepMapCBType[i]);
-        prepMapCB[i]->addSeparator();
-        prepMapCB[i]->addListener(this);
-        addAndMakeVisible(prepMapCB[i]);
-    }
-    
-    
-    for (int i = 0; i < aMaxNumPianos; i++)
-    {
-        prepMapCB[PrepMapCBPiano]->addItem(cPianoName[i], i+1);
-    }
-    
-    prepMapCB[PrepMapCBPiano]->setSelectedItemIndex(0);
-    
-    
-    for (int i = 0; i < aMaxNumPreparationKeymaps; i++)
-    {
-        prepMapCB[PrepMapCBNumber]->addItem(cPrepMapName[i], i+1);
-    }
-    
-    prepMapCB[PrepMapCBNumber]->setSelectedItemIndex(0);
-    
-
     updateFields();
 }
 
@@ -100,15 +74,13 @@ void PreparationMapViewController::resized()
     int tfX = gComponentLabelWidth + gXSpacing;
     int tfY = gComponentTextFieldHeight + gYSpacing;
     
-    for (int n = 0; n < cPrepMapCBType.size(); n++)
+    for (int n = 0; n < cPrepMapParameterTypes.size(); n++)
     {
-        prepMapCB[n]->setTopLeftPosition(tfX, gYSpacing + tfY * n);
+        prepMapTF[n]->setTopLeftPosition(tfX,
+                                         gYSpacing + tfY * n);
     }
     
-    for (int n = 0; n < cPrepMapParameterTypes.size()-cPrepMapCBType.size(); n++)
-    {
-        prepMapTF[n]->setTopLeftPosition(tfX, gYSpacing + tfY * (n+cPrepMapCBType.size()));
-    }
+    
     
 }
 
@@ -201,9 +173,9 @@ String PreparationMapViewController::processPreparationString(String s)
     }
     
     // pass arrays to prepMap
-    processor.currentPiano->currentPMap->setSynchronicPreparations(sPrep);
-    processor.currentPiano->currentPMap->setNostalgicPreparations(nPrep);
-    processor.currentPiano->currentPMap->setDirectPreparations(dPrep);
+    processor.currentPiano->prepMaps[Id]->setSynchronicPreparations(sPrep);
+    processor.currentPiano->prepMaps[Id]->setNostalgicPreparations(nPrep);
+    processor.currentPiano->prepMaps[Id]->setDirectPreparations(dPrep);
     
     return out;
 }
@@ -217,14 +189,15 @@ void PreparationMapViewController::textFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
 
-    if (name == cPrepMapParameterTypes[PrepMapKeymapId+cPrepMapCBType.size()])
+    if (name == cPrepMapParameterTypes[PrepMapKeymapId])
     {
         Keymap::Ptr km = processor.bkKeymaps[i];
-        processor.currentPiano->currentPMap->setKeymap(km);
+
+        processor.currentPiano->prepMaps[Id]->setKeymap(km);
         
         sendActionMessage("keymap/update");
     }
-    else if (name == cPrepMapParameterTypes[PrepMapPreparationId+cPrepMapCBType.size()])
+    else if (name == cPrepMapParameterTypes[PrepMapPreparationId])
     {
         DBG("Preparations: " + processPreparationString(text));
     }
@@ -239,47 +212,24 @@ void PreparationMapViewController::textFieldDidChange(TextEditor& tf)
 void PreparationMapViewController::updateFields(void)
 {
     // Set text.
-    prepMapTF[PrepMapKeymapId]        ->setText( String(processor.currentPiano->currentPMap->getKeymapId()));
-    prepMapTF[PrepMapPreparationId]   ->setText( processor.currentPiano->currentPMap->getPreparationIds());
+    prepMapTF[PrepMapKeymapId]        ->setText( String(processor.currentPiano->prepMaps[Id]->getKeymapId()));
+    prepMapTF[PrepMapPreparationId]   ->setText( processor.currentPiano->prepMaps[Id]->getPreparationIds());
     
 }
 
-void PreparationMapViewController::comboBoxChanged (ComboBox* box)
+void PreparationMapViewController::actionListenerCallback (const String& message)
 {
-    // Change layer
-    if (box->getName() == cPrepMapCBType[PrepMapCBNumber])
-    {
-        int whichPrepMap = box->getSelectedId();
-        
-        DBG("Current Prep Map: " + String(whichPrepMap));
-        
-        processor.currentPiano->currentPMap = processor.currentPiano->getPreparationMaps()[whichPrepMap-1];
-        
-        //remove inactive prepmaps
-        for(int i=0; i<processor.currentPiano->activePMaps.size(); i++) {
-            if(!processor.currentPiano->activePMaps[i]->isActive)
-                processor.currentPiano->activePMaps.remove(i);
-        }
-        
-        //add current prepmap to activePrepMaps
-        processor.currentPiano->activePMaps.addIfNotAlreadyThere(processor.currentPiano->currentPMap);
-        
-        updateFields();
-    }
     
-    // Change piano
-    if (box->getName() == cPrepMapCBType[PrepMapCBPiano])
-    {
-        int whichPiano = box->getSelectedId();
-        
-        DBG("Current piano: " + String(whichPiano-1));
-        
-        processor.setCurrentPiano(whichPiano-1);
-        
-        prepMapCB[PrepMapCBNumber]->setSelectedItemIndex(0);
-        
-        updateFields();
-    }
+}
+
+void PreparationMapViewController::comboBoxDidChange (ComboBox* box)
+{
+    
+}
+
+void PreparationMapViewController::buttonClicked (Button* b)
+{
+    
 }
 
 

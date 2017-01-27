@@ -184,7 +184,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                 {
                     playEndPosition = (double)(sourceSamplePosition - playLength);
                 }
-                //DBG(String(playEndPosition));
             }
             else if (playType == FixedLengthFixedStart)
             {
@@ -256,7 +255,6 @@ void BKPianoSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
     {
         isInRampOn = false;
         isInRampOff = true;
-        //DBG("ramping off");
     }
     else
     {

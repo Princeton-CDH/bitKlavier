@@ -21,7 +21,7 @@ public:
     BKTextField()
     {
         setLookAndFeel(&laf);
-        setSize(200,20);
+        setSize(200,18);
     
         lookAndFeelChanged();
     }

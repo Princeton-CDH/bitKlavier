@@ -79,16 +79,7 @@ static const std::vector<std::string> cPreparationTypes = {
     "Tuning"
 };
 
-typedef enum BKPrepMapCBType {
-    PrepMapCBPiano,
-    PrepMapCBNumber,
-    BKPrepMapCBTypeNil,
-} BKPrepMapCBType;
 
-static const std::vector<std::string> cPrepMapCBType = {
-    "Piano",
-    "PrepMapNumber"
-};
 
 
 
@@ -308,8 +299,7 @@ static const std::vector<std::string> cTuningParameterTypes = {
 
 
 #pragma mark - PrepMap
-typedef enum PrepMapTFIndex
-{
+typedef enum PrepMapTFIndex {
     PrepMapKeymapId = 0,
     PrepMapPreparationId,
     PrepMapParameterTypeNil
@@ -317,11 +307,19 @@ typedef enum PrepMapTFIndex
 } PrepMapTFIndex;
 
 static const std::vector<std::string> cPrepMapParameterTypes = {
-    "Piano",
-    "PrepMap Id",
     "PrepMapKeymap Id",
     "PrepMapPreparation Id"
 };
+
+#pragma mark - Piano
+static const std::vector<std::string> cPianoParameterTypes = {
+    "Piano"
+};
+
+typedef enum PianoCBIndex {
+    PianoCBPiano = 0,
+    PianoCBIndexNil
+} PianoCBIndex;
 
 #pragma mark - Keymap
 typedef enum KeymapParameterType

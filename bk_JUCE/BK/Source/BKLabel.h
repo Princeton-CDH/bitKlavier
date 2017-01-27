@@ -21,7 +21,7 @@ class BKLabel    : public Label
 public:
     BKLabel()
     {
-        setSize(150,20);
+        setSize(150,18);
         setColour(Label::backgroundColourId, Colours::transparentWhite);
         setColour(Label::textColourId, Colours::black);
         

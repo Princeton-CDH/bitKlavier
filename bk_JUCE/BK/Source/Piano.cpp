@@ -18,15 +18,14 @@ Piano::Piano(BKSynthesiser *ms,
 currentPMap(PreparationMap::Ptr()),
 activePMaps(PreparationMap::CSPtrArr()),
 prepMaps(PreparationMap::CSPtrArr()),
-Id(Id)
+numPMaps(0),
+Id(Id),
+synth(ms),
+resonanceSynth(res),
+hammerSynth(ham),
+initialKeymap(keymap)
 {
-    //initialize pianomaps, keymaps, preparations, and processors
-    for (int i = 0; i < aMaxNumPreparationKeymaps; i++)
-    {
-        prepMaps.add(new PreparationMap(ms, res, ham,
-                                        keymap,
-                                        i));
-    }
+    prepMaps.ensureStorageAllocated(12);
 }
 
 Piano::~Piano()
@@ -34,11 +33,46 @@ Piano::~Piano()
     
 }
 
-
-void Piano::prepareToPlay(double sampleRate)
+// Add preparation map, return its Id.
+int Piano::addPreparationMap(void)
 {
-    for (int i = 0; i < aMaxNumPreparationKeymaps; i++)
-        prepMaps[i]->prepareToPlay(sampleRate);
+    prepMaps.add(new PreparationMap(synth, resonanceSynth, hammerSynth,
+                                    initialKeymap,
+                                    numPMaps));
+    
+    prepMaps[numPMaps]->prepareToPlay(sampleRate);
+    
+    activePMaps.addIfNotAlreadyThere(prepMaps[numPMaps]);
+    
+    ++numPMaps;
+    
+    
+    return numPMaps-1;
+}
+
+// Add preparation map, return its Id.
+int Piano::removeLastPreparationMap(void)
+{
+    for (int i = activePMaps.size(); --i >= 0;)
+    {
+        if (activePMaps[i]->getId() == (numPMaps-1))
+        {
+            activePMaps.remove(i);
+        }
+    }
+    
+    prepMaps.remove((numPMaps-1));
+    
+    --numPMaps;
+
+    return numPMaps;
+}
+
+
+void Piano::prepareToPlay(double sr)
+{
+    sampleRate = sr;
+
 }
 
 

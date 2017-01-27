@@ -80,14 +80,18 @@
         </GROUP>
       </GROUP>
       <GROUP id="{07677963-38EF-2F51-36FA-17646727446F}" name="Controller">
-        <FILE id="FY0jbU" name="KeymapViewController.cpp" compile="1" resource="0"
-              file="Source/KeymapViewController.cpp"/>
-        <FILE id="kWVW2o" name="KeymapViewController.h" compile="0" resource="0"
-              file="Source/KeymapViewController.h"/>
+        <FILE id="dMVsSd" name="PianoViewController.cpp" compile="1" resource="0"
+              file="Source/PianoViewController.cpp"/>
+        <FILE id="tIek8E" name="PianoViewController.h" compile="0" resource="0"
+              file="Source/PianoViewController.h"/>
         <FILE id="F0ImEz" name="PreparationMapViewController.cpp" compile="1"
               resource="0" file="Source/PreparationMapViewController.cpp"/>
         <FILE id="W6ucAm" name="PreparationMapViewController.h" compile="0"
               resource="0" file="Source/PreparationMapViewController.h"/>
+        <FILE id="FY0jbU" name="KeymapViewController.cpp" compile="1" resource="0"
+              file="Source/KeymapViewController.cpp"/>
+        <FILE id="kWVW2o" name="KeymapViewController.h" compile="0" resource="0"
+              file="Source/KeymapViewController.h"/>
         <FILE id="AdZ3vl" name="GeneralViewController.cpp" compile="1" resource="0"
               file="Source/GeneralViewController.cpp"/>
         <FILE id="PRBl6E" name="GeneralViewController.h" compile="0" resource="0"

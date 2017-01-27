@@ -59,6 +59,7 @@ void PreparationMap::setSynchronicPreparations(SynchronicPreparation::PtrArr new
             SynchronicProcessor::Ptr proc = new SynchronicProcessor(synth, sPreparations[i], i);
             sProcessor.add(proc);
             proc->setCurrentPlaybackSampleRate(sampleRate);
+            DBG("samplerate: " + String(sampleRate) );
         }
     }
     
@@ -67,11 +68,6 @@ void PreparationMap::setSynchronicPreparations(SynchronicPreparation::PtrArr new
     {
         if (!sPreparations.contains(sProcessor[i]->getPreparation()))
             sProcessor.remove(i);
-    }
-    
-    for (auto proc : sProcessor)
-    {
-        DBG("Processor: "+String(proc->getPreparationId()));
     }
     
     deactivateIfNecessary();
@@ -217,6 +213,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
     
     for (int i = nProcessor.size(); --i >= 0; )
     {
+        DBG("nostalgic processor: " + String(i));
         if (pKeymap->containsNote(noteNumber)) nProcessor[i]->keyReleased(noteNumber, channel);
     }
     

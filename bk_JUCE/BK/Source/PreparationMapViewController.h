@@ -29,16 +29,25 @@
 //==============================================================================
 /*
 */
-class PreparationMapViewController    : public BKViewController, public ActionBroadcaster, public ComboBox::Listener
+class PreparationMapViewController    : public BKViewController, public ActionBroadcaster, public ActionListener, public ReferenceCountedObject, public TextButton::Listener
+
 {
 public:
-    PreparationMapViewController(BKAudioProcessor&);
+    typedef ReferenceCountedObjectPtr<PreparationMapViewController>   Ptr;
+    typedef Array<PreparationMapViewController::Ptr>                  PtrArr;
+    typedef Array<PreparationMapViewController::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<PreparationMapViewController>                  Arr;
+    typedef OwnedArray<PreparationMapViewController, CriticalSection> CSArr;
+    
+    PreparationMapViewController(BKAudioProcessor&, int Id);
     ~PreparationMapViewController();
 
     void paint (Graphics&) override;
     void resized() override;
 
 private:
+    
+    int Id;
     
     BKAudioProcessor& processor;
     
@@ -50,15 +59,18 @@ private:
     
     String processPreparationString(String s);
     
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
-    
     void textFieldDidChange(TextEditor&) override;
+    void comboBoxDidChange (ComboBox* box) override;
     
     void switchToPrepMap(BKPreparationType type, int prepMap);
     
     void updateFields(void);
     
     void addPreparation(BKPreparationType type, int which);
+    
+    void actionListenerCallback (const String& message) override;
+    
+    void buttonClicked (Button* b) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreparationMapViewController)
 };

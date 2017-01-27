@@ -35,6 +35,11 @@ void BKViewController::resized()
 
 }
 
+void BKViewController::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
+{
+    comboBoxDidChange(comboBoxThatHasChanged);
+}
+
 void BKViewController::textEditorFocusLost(TextEditor& tf)
 {
     if (shouldChange)

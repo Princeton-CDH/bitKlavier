@@ -24,8 +24,6 @@
 
 #include "Piano.h"
 
-#include "Piano.h"
-
 #define USE_SYNCHRONIC_TWO 0
 
 //==============================================================================
@@ -62,9 +60,10 @@ public:
     Piano::PtrArr                       prevPianos;
     Piano::PtrArr                       bkPianos;
     
-    Array<int>                         noteOn;
+    Array<int>                          noteOn;
     
-    int                                 noteOnCount, noteOffCount;
+    int                                 noteOnCount;
+    bool                                allNotesOff;
 
 
     int channel;

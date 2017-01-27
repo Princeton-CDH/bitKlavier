@@ -113,7 +113,6 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth, int numLayers)
                         
                     }
                     
-                    
                     double sourceSampleRate = sampleReader->sampleRate;
                     const int numChannels = sampleReader->numChannels;
                     uint64 maxLength;

@@ -45,6 +45,7 @@ private:
     OwnedArray<BKTextField> generalTF;
     
     void textFieldDidChange(TextEditor&) override;
+    void comboBoxDidChange (ComboBox* box) override;
     
     void updateFields(void);
     

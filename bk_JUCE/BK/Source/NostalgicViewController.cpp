@@ -169,3 +169,8 @@ void NostalgicViewController::actionListenerCallback (const String& message)
         updateFields(currentNostalgicId);
     }
 }
+
+void NostalgicViewController::comboBoxDidChange (ComboBox* box)
+{
+    
+}
