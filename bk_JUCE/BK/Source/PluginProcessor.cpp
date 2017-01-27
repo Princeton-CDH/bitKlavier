@@ -51,7 +51,6 @@ noteOn                  (Array<int>())
     // Initialize first piano.
     currentPiano = bkPianos[0];
     
-    
     // For testing and developing, let's keep directory of samples in home folder on disk.
     BKSampleLoader::loadMainPianoSamples(&mainPianoSynth, aNumSampleLayers);
     BKSampleLoader::loadHammerReleaseSamples(&hammerReleaseSynth);

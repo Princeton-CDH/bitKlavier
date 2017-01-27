@@ -99,7 +99,16 @@ void BKAudioProcessorEditor::removeLastPreparationMap(int Id)
     
     int newLastId = Id - 1;
     
-    if (newLastId > 0)
+    if (newLastId < 0)
+    {
+        addPMapButton.setBounds(upperLeft.getX(),
+                                upperLeft.getBottom() + gYSpacing,
+                                50,
+                                20);
+        
+        removePMapButton.setVisible(false);
+    }
+    else
     {
         addPMapButton.setBounds(pmvc[newLastId]->getX(),
                                 pmvc[newLastId]->getBottom() + gYSpacing,
@@ -110,16 +119,9 @@ void BKAudioProcessorEditor::removeLastPreparationMap(int Id)
                                    addPMapButton.getY(),
                                    50,
                                    20);
-    }
-    else
-    {
-        addPMapButton.setBounds(upperLeft.getX(),
-                                upperLeft.getBottom() + gYSpacing,
-                                50,
-                                20);
         
+        removePMapButton.setVisible(true);
         
-        removePMapButton.setVisible(false);
     }
 }
 
@@ -179,6 +181,11 @@ void BKAudioProcessorEditor::paint (Graphics& g)
 {
     g.fillAll(Colours::dimgrey);
     
+}
+
+void BKAudioProcessorEditor::switchPianos(void)
+{
+
 }
 
 void BKAudioProcessorEditor::resized()

@@ -9,6 +9,7 @@
 */
 
 #include "PianoViewController.h"
+#include "PluginEditor.h"
 
 
 //==============================================================================
