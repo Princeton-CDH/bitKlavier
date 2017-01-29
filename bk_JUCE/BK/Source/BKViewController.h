@@ -22,7 +22,10 @@
 */
 class BKViewController    : public BKView,
                             public TextEditor::Listener,
-                            public ComboBox::Listener
+                            public ComboBox::Listener,
+                            public ActionListener,
+                            public ActionBroadcaster,
+                            public TextButton::Listener
 {
 public:
     
@@ -36,17 +39,25 @@ public:
     
 private:
     // TextEditor input parsing
-    virtual void textFieldDidChange(TextEditor&) = 0;
-    virtual void comboBoxDidChange(ComboBox*) = 0;
+    virtual void bkTextFieldDidChange   (TextEditor&)           = 0;
+    virtual void bkComboBoxDidChange    (ComboBox*)             = 0;
+    virtual void bkButtonClicked        (Button* b)             = 0;
+    virtual void bkMessageReceived      (const String& message) = 0;
     
-    void textEditorTextChanged(TextEditor&) override;
-    void textEditorFocusLost(TextEditor&) override;
-    void textEditorReturnKeyPressed(TextEditor&) override;
-    void textEditorEscapeKeyPressed(TextEditor&) override;
+    void textEditorTextChanged      (TextEditor&) override;
+    void textEditorFocusLost        (TextEditor&) override;
+    void textEditorReturnKeyPressed (TextEditor&) override;
+    void textEditorEscapeKeyPressed (TextEditor&) override;
+    
+    void comboBoxChanged            (ComboBox* comboBoxThatHasChanged) override;
+    
+    void buttonClicked              (Button* b) override;
+    
+    void actionListenerCallback     (const String& message) override;
     
     bool shouldChange;
     
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
+    
     
     
     

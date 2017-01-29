@@ -56,6 +56,7 @@ public:
     // Keymaps.
     Keymap::PtrArr                      bkKeymaps;
     
+    Piano::Ptr                          prevPiano;
     Piano::Ptr                          currentPiano;
     Piano::PtrArr                       prevPianos;
     Piano::PtrArr                       bkPianos;

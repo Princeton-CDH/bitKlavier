@@ -24,7 +24,7 @@
 //==============================================================================
 /*
 */
-class KeymapViewController    : public BKViewController, public ActionListener//, public MidiKeyboardStateListener
+class KeymapViewController    : public BKViewController
 {
 public:
     KeymapViewController(BKAudioProcessor&);
@@ -72,15 +72,13 @@ private:
                                 int midiChannel, int midiNoteNumber, float velocity) override;
 #endif
     
+    void bkTextFieldDidChange       (TextEditor&)           override;
+    void bkMessageReceived          (const String& message) override;
     
-    
+    void bkComboBoxDidChange        (ComboBox* box)         override { };
+    void bkButtonClicked            (Button* b)             override { };
     
     void updateFields(int keymapId);
-    
-    void textFieldDidChange(TextEditor&) override;
-    void comboBoxDidChange (ComboBox* box) override;
-    
-    void actionListenerCallback (const String& message) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KeymapViewController)
 };

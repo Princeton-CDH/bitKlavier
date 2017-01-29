@@ -180,7 +180,7 @@ String PreparationMapViewController::processPreparationString(String s)
     return out;
 }
 
-void PreparationMapViewController::textFieldDidChange(TextEditor& tf)
+void PreparationMapViewController::bkTextFieldDidChange(TextEditor& tf)
 {
     String text = tf.getText();
     String name = tf.getName();
@@ -214,21 +214,6 @@ void PreparationMapViewController::updateFields(void)
     // Set text.
     prepMapTF[PrepMapKeymapId]        ->setText( String(processor.currentPiano->prepMaps[Id]->getKeymapId()));
     prepMapTF[PrepMapPreparationId]   ->setText( processor.currentPiano->prepMaps[Id]->getPreparationIds());
-    
-}
-
-void PreparationMapViewController::actionListenerCallback (const String& message)
-{
-    
-}
-
-void PreparationMapViewController::comboBoxDidChange (ComboBox* box)
-{
-    
-}
-
-void PreparationMapViewController::buttonClicked (Button* b)
-{
     
 }
 

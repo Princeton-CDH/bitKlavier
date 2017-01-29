@@ -24,14 +24,15 @@
 #include "PreparationMapViewController.h"
 #include "KeymapViewController.h"
 
-#include "PianoViewController.h"
+#include "BKViewController.h"
 
 //==============================================================================
 /**
 */
 class BKAudioProcessorEditor :  public AudioProcessorEditor,
                                 private TextEditor::Listener,
-                                private TextButton::Listener
+                                private TextButton::Listener,
+                                private ComboBox::Listener
 
 {
     
@@ -51,12 +52,14 @@ public:
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it
-    Rectangle<int> upperLeft;
     float pmapH;
+    Rectangle<int> upperLeft;
     
     BKAudioProcessor& processor;
     
-    PianoViewController                 pvc;
+    
+    
+    Component*                          pvc;
     PreparationMapViewController::PtrArr pmvc;
     KeymapViewController                kvc;
     GeneralViewController               gvc;
@@ -67,8 +70,15 @@ private:
 
     void buttonClicked (Button* b) override;
     
+    void comboBoxChanged            (ComboBox* comboBoxThatHasChanged) override;
+    
+    OwnedArray<BKLabel>                 pianoL;
+    OwnedArray<BKComboBox>              pianoCB;
+    
     TextButton                          addPMapButton;
     TextButton                          removePMapButton;
+    
+    
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessorEditor)

@@ -24,7 +24,7 @@
 //==============================================================================
 /*
 */
-class TuningViewController    : public BKViewController, public ActionListener
+class TuningViewController    : public BKViewController
 {
 public:
     TuningViewController(BKAudioProcessor&);
@@ -43,10 +43,11 @@ private:
     
     void updateFields(int tuningId);
     
-    void textFieldDidChange(TextEditor&) override;
-    void comboBoxDidChange (ComboBox* box) override;
+    void bkTextFieldDidChange       (TextEditor&)           override;
+    void bkMessageReceived          (const String& message) override;
     
-    void actionListenerCallback (const String& message) override;
+    void bkComboBoxDidChange        (ComboBox* box)         override { };
+    void bkButtonClicked            (Button* b)             override { };
   
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningViewController)
 };

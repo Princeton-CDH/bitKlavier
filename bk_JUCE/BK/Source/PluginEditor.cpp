@@ -12,12 +12,15 @@
 #include "PluginEditor.h"
 #include "GraphicsConstants.h"
 
+#include "PianoViewController.h"
+
+
 
 //==============================================================================
 BKAudioProcessorEditor::BKAudioProcessorEditor (BKAudioProcessor& p):
 AudioProcessorEditor (&p),
 processor (p),
-pvc(p),
+pvc(new PianoViewController (p)),
 pmvc(PreparationMapViewController::PtrArr()),
 kvc(p),
 gvc(p),
@@ -26,14 +29,42 @@ nvc(p),
 dvc(p),
 tvc(p)
 {
-    float pvcH = cPianoParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
-    
-    upperLeft = Rectangle<int>(gComponentLeftOffset, gComponentTopOffset, gVCWidth, pvcH);
-    
     pmapH = cPrepMapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     
     pmvc.ensureStorageAllocated(12);
     
+    // Initialize piano stuff here.
+    // Labels
+    pianoL.ensureStorageAllocated(cPianoParameterTypes.size());
+    
+    for (int i = 0; i < cPianoParameterTypes.size(); i++)
+    {
+        pianoL.set(i, new BKLabel());
+        pianoL[i]->setName(cPianoParameterTypes[i]);
+        pianoL[i]->setText(cPianoParameterTypes[i], NotificationType::dontSendNotification);
+        pvc->addAndMakeVisible(pianoL[i]);
+    }
+    
+    //Combo Boxes
+    pianoCB.ensureStorageAllocated(cPianoParameterTypes.size());
+    
+    for (int i = 0; i < cPianoParameterTypes.size(); i++)
+    {
+        pianoCB.set(i, new BKComboBox());
+        pianoCB[i]->setName(cPianoParameterTypes[i]);
+        pianoCB[i]->addSeparator();
+        pianoCB[i]->addListener(this);
+        pvc->addAndMakeVisible(pianoCB[i]);
+    }
+    
+    for (int i = 0; i < aMaxNumPianos; i++)
+    {
+        pianoCB[PianoCBPiano]->addItem(cPianoName[i], i+1);
+    }
+    
+    pianoCB[PianoCBPiano]->setSelectedItemIndex(0);
+    
+    // Make PianoViewController component within plugin editor class.
     addAndMakeVisible(pvc);
     addAndMakeVisible(gvc);
     addAndMakeVisible(svc);
@@ -82,6 +113,83 @@ BKAudioProcessorEditor::~BKAudioProcessorEditor()
     
 }
 
+void BKAudioProcessorEditor::comboBoxChanged            (ComboBox* box)
+{
+    // Change piano
+    if (box->getName() == cPianoParameterTypes[PianoCBPiano])
+    {
+        int whichPiano = box->getSelectedId();
+        
+        DBG("Current piano: " + String(whichPiano-1));
+        
+        processor.setCurrentPiano(whichPiano-1);
+        
+        switchPianos();
+    }
+}
+
+void BKAudioProcessorEditor::switchPianos(void)
+{
+    // Remove all pmaps from old piano.
+    for (int i = processor.prevPiano->numPMaps; --i >= 0; )
+    {
+        pmvc[i]->setVisible(false);
+        
+        removeChildComponent(pmvc[i]);
+        
+        pmvc.remove(i);
+    }
+    
+    pmvc.clearQuick();
+    
+    for (int i = 0; i < processor.currentPiano->numPMaps; i++ )
+    {
+        pmvc.insert(i, new PreparationMapViewController(processor, i));
+        
+        addAndMakeVisible(pmvc[i]);
+        
+        pmvc[i]->addActionListener(&gvc);
+        pmvc[i]->addActionListener(&svc);
+        pmvc[i]->addActionListener(&nvc);
+        pmvc[i]->addActionListener(&dvc);
+        pmvc[i]->addActionListener(&kvc);
+        pmvc[i]->addActionListener(&tvc);
+        
+        if (i > 0) {
+            pmvc[i]->setBounds(gComponentLeftOffset,
+                                pmvc[i-1]->getBottom() + gYSpacing,
+                                gVCWidth,
+                                pmapH);
+        } else {
+            pmvc[i]->setBounds(gComponentLeftOffset,
+                                upperLeft.getBottom() + gYSpacing,
+                                gVCWidth,
+                                pmapH);
+        }
+        
+        
+    }
+    
+    int lastId = processor.currentPiano->numPMaps - 1;
+    
+    if (lastId >= 0)
+    {
+        addPMapButton.setBounds(pmvc[lastId]->getX(),
+                                pmvc[lastId]->getBottom() + gYSpacing,
+                                50,
+                                20);
+        
+        removePMapButton.setBounds(addPMapButton.getRight() + gXSpacing,
+                                   pmvc[lastId]->getBottom() + gYSpacing,
+                                   50,
+                                   20);
+    }
+    
+    if (lastId > 0)     removePMapButton.setVisible(true);
+    else                removePMapButton.setVisible(false);
+}
+
+
 void BKAudioProcessorEditor::removeLastPreparationMap(int Id)
 {
     
@@ -90,8 +198,6 @@ void BKAudioProcessorEditor::removeLastPreparationMap(int Id)
     DBG("ID: " + String(Id));
     
     pmvc[Id]->setVisible(false);
-    
-    pvc.removeActionListener(pmvc[Id]);
     
     removeChildComponent(pmvc[Id]);
     
@@ -133,8 +239,6 @@ void BKAudioProcessorEditor::drawNewPreparationMap(int Id)
     pmvc.insert(Id, new PreparationMapViewController(processor, Id));
     
     addAndMakeVisible(pmvc[Id]);
-    
-    pvc.addActionListener(pmvc[Id]);
     
     pmvc[Id]->addActionListener(&gvc);
     pmvc[Id]->addActionListener(&svc);
@@ -183,13 +287,11 @@ void BKAudioProcessorEditor::paint (Graphics& g)
     
 }
 
-void BKAudioProcessorEditor::switchPianos(void)
-{
 
-}
 
 void BKAudioProcessorEditor::resized()
 {
+    float pvcH = cPianoParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float kvcH = cKeymapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float gvcH = cGeneralParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float svcH = cSynchronicParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
@@ -198,7 +300,32 @@ void BKAudioProcessorEditor::resized()
     float tvcH = cTuningParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
     
     // Col 1
-    pvc.setBounds(upperLeft);
+    // Labels
+    int i = 0;
+    int lX = 0;
+    int lY = gComponentLabelHeight + gYSpacing;
+    
+    for (int n = 0; n < cPianoParameterTypes.size(); n++)
+        pianoL[n]->setTopLeftPosition(lX, gYSpacing + lY * n);
+    
+    // CB
+    i = 0;
+    int tfX = gComponentLabelWidth + gXSpacing;
+    int tfY = gComponentTextFieldHeight + gYSpacing;
+    
+    for (int n = 0; n < cPianoParameterTypes.size(); n++)
+        pianoCB[n]->setTopLeftPosition(tfX, gYSpacing + tfY * n);
+    
+    pvc->setBounds(gComponentLeftOffset,
+                   gComponentTopOffset,
+                   gVCWidth,
+                   pvcH);
+    
+    upperLeft = pvc->getBounds();
+    
+    addAndMakeVisible(pvc);
+    
+    addPMapButton.setBounds(upperLeft.getX(), upperLeft.getBottom() + gYSpacing, 50, 20);
     
     // Col 2
     kvc.setBounds(upperLeft.getRight() + gXSpacing,

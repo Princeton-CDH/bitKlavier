@@ -79,7 +79,7 @@ void TuningViewController::resized()
     
 }
 
-void TuningViewController::textFieldDidChange(TextEditor& tf)
+void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
 {
     String text = tf.getText();
     String name = tf.getName();
@@ -163,7 +163,7 @@ void TuningViewController::updateFields(int tuningId)
     
 }
 
-void TuningViewController::actionListenerCallback (const String& message)
+void TuningViewController::bkMessageReceived(const String& message)
 {
     if (message == "tuning/update")
     {
@@ -171,9 +171,4 @@ void TuningViewController::actionListenerCallback (const String& message)
         
         updateFields(currentTuningId);
     }
-}
-
-void TuningViewController::comboBoxDidChange (ComboBox* box)
-{
-    
 }

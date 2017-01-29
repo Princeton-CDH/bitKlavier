@@ -25,7 +25,7 @@
 //==============================================================================
 /*
 */
-class NostalgicViewController    : public BKViewController, public ActionListener
+class NostalgicViewController    : public BKViewController
 {
 public:
     NostalgicViewController(BKAudioProcessor&);
@@ -42,12 +42,13 @@ private:
     OwnedArray<BKLabel> nostalgicL;
     OwnedArray<BKTextField> nostalgicTF;
     
-    void textFieldDidChange(TextEditor&) override;
-    void comboBoxDidChange (ComboBox* box) override;
+    void bkTextFieldDidChange       (TextEditor&)           override;
+    void bkMessageReceived          (const String& message) override;
+    
+    void bkComboBoxDidChange        (ComboBox* box)         override { };
+    void bkButtonClicked            (Button* b)             override { };
     
     void updateFields(int nostalgicId);
-    
-    void actionListenerCallback (const String& message) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NostalgicViewController)
 };

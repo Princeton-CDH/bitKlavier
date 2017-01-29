@@ -79,7 +79,7 @@ void DirectViewController::resized()
     
 }
 
-void DirectViewController::textFieldDidChange(TextEditor& tf)
+void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
 {
     String text = tf.getText();
     String name = tf.getName();
@@ -137,7 +137,7 @@ void DirectViewController::updateFields(int directId)
 
 }
 
-void DirectViewController::actionListenerCallback (const String& message)
+void DirectViewController::bkMessageReceived (const String& message)
 {
     if (message == "direct/update")
     {
@@ -145,11 +145,6 @@ void DirectViewController::actionListenerCallback (const String& message)
         
         updateFields(currentDirectId);
     }
-}
-
-void DirectViewController::comboBoxDidChange (ComboBox* box)
-{
-    
 }
 
 

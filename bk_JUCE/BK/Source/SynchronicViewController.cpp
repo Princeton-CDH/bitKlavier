@@ -86,7 +86,7 @@ void SynchronicViewController::resized()
 
 }
 
-void SynchronicViewController::textFieldDidChange(TextEditor& tf)
+void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
 {
     String text = tf.getText();
     String name = tf.getName();
@@ -210,7 +210,7 @@ void SynchronicViewController::updateFields(int synchronicId)
 }
 
 
-void SynchronicViewController::actionListenerCallback (const String& message)
+void SynchronicViewController::bkMessageReceived (const String& message)
 {
     if (message == "synchronic/update")
     {
@@ -218,11 +218,6 @@ void SynchronicViewController::actionListenerCallback (const String& message)
         
         updateFields(currentSynchronicId);
     }
-}
-
-void SynchronicViewController::comboBoxDidChange (ComboBox* box)
-{
-    
 }
 
 

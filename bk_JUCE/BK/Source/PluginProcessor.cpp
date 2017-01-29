@@ -49,7 +49,9 @@ noteOn                  (Array<int>())
         bkPianos.set(i, new Piano(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, bkKeymaps[0], i)); // initializing piano 0
   
     // Initialize first piano.
+    prevPiano = bkPianos[0];
     currentPiano = bkPianos[0];
+    
     
     // For testing and developing, let's keep directory of samples in home folder on disk.
     BKSampleLoader::loadMainPianoSamples(&mainPianoSynth, aNumSampleLayers);
@@ -112,11 +114,15 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             
             // Send key off to each pmap in current piano
             for (p = currentPiano->activePMaps.size(); --p >= 0;)
+            {
+                DBG("piano: " + String(p));
                 currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel);
+            }
             
             // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
             for (p = prevPianos.size(); --p >= 0;) {
                 for (pm = prevPianos[p]->activePMaps.size(); --pm >= 0;) {
+                    DBG("piano: " + String(p));
                     prevPianos[p]->activePMaps[pm]->postRelease(noteNumber, velocity, channel);
                 }
             }
@@ -149,6 +155,8 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
 void  BKAudioProcessor::setCurrentPiano(int which)
 {
     if (noteOnCount)  prevPianos.add(currentPiano);
+    
+    prevPiano = currentPiano;
     
     currentPiano = bkPianos[which];
 

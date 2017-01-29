@@ -26,7 +26,7 @@
 //==============================================================================
 /*
 */
-class GeneralViewController    : public BKViewController, public ActionListener
+class GeneralViewController    : public BKViewController
 {
 public:
     GeneralViewController(BKAudioProcessor&);
@@ -44,12 +44,12 @@ private:
 
     OwnedArray<BKTextField> generalTF;
     
-    void textFieldDidChange(TextEditor&) override;
-    void comboBoxDidChange (ComboBox* box) override;
+    void bkTextFieldDidChange       (TextEditor&)           override;
+    void bkComboBoxDidChange        (ComboBox* box)         override { };
+    void bkButtonClicked            (Button* b)             override { };
+    void bkMessageReceived          (const String& message) override { };
     
     void updateFields(void);
-    
-    void actionListenerCallback (const String& message) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GeneralViewController)
 };

@@ -86,7 +86,7 @@ void PianoViewController::updateFields(void)
     
 }
 
-void PianoViewController::comboBoxDidChange (ComboBox* box)
+void PianoViewController::bkComboBoxDidChange (ComboBox* box)
 {
     // Change piano
     if (box->getName() == cPianoParameterTypes[PianoCBPiano])
@@ -98,10 +98,8 @@ void PianoViewController::comboBoxDidChange (ComboBox* box)
         processor.setCurrentPiano(whichPiano-1);
         
         updateFields();
+        
+        sendActionMessage("switchPiano");
     }
 }
 
-void PianoViewController::textFieldDidChange(TextEditor&)
-{
-    
-}

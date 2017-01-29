@@ -77,7 +77,7 @@ void GeneralViewController::resized()
     
 }
 
-void GeneralViewController::textFieldDidChange(TextEditor& tf)
+void GeneralViewController::bkTextFieldDidChange(TextEditor& tf)
 {
     String text = tf.getText();
     String name = tf.getName();
@@ -149,15 +149,5 @@ void GeneralViewController::updateFields(void)
     generalTF[GeneralTempoMultiplier]   ->setText(   String( gen->getTempoMultiplier()));
     generalTF[GeneralResAndHammer]      ->setText(   String( gen->getResonanceAndHammer()));
     generalTF[GeneralInvertSustain]     ->setText(   String( gen->getInvertSustain()));
-    
-}
-
-void GeneralViewController::actionListenerCallback (const String& message)
-{
-    
-}
-
-void GeneralViewController::comboBoxDidChange (ComboBox* box)
-{
     
 }

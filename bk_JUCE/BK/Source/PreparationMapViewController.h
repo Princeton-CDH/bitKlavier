@@ -29,7 +29,7 @@
 //==============================================================================
 /*
 */
-class PreparationMapViewController    : public BKViewController, public ActionBroadcaster, public ActionListener, public ReferenceCountedObject, public TextButton::Listener
+class PreparationMapViewController    : public BKViewController, public ReferenceCountedObject
 
 {
 public:
@@ -59,18 +59,18 @@ private:
     
     String processPreparationString(String s);
     
-    void textFieldDidChange(TextEditor&) override;
-    void comboBoxDidChange (ComboBox* box) override;
-    
     void switchToPrepMap(BKPreparationType type, int prepMap);
-    
-    void updateFields(void);
     
     void addPreparation(BKPreparationType type, int which);
     
-    void actionListenerCallback (const String& message) override;
     
-    void buttonClicked (Button* b) override;
+    void bkTextFieldDidChange       (TextEditor&)           override;
+    
+    void bkComboBoxDidChange        (ComboBox* box)         override { };
+    void bkButtonClicked            (Button* b)             override { };
+    void bkMessageReceived          (const String& message) override { };
+    
+    void updateFields(void);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreparationMapViewController)
 };

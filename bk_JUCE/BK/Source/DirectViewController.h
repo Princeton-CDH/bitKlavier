@@ -26,7 +26,7 @@
 //==============================================================================
 /*
 */
-class DirectViewController    : public BKViewController, public ActionListener
+class DirectViewController    : public BKViewController
 {
 public:
     DirectViewController(BKAudioProcessor&);
@@ -42,12 +42,15 @@ private:
     OwnedArray<BKLabel> directL;
     OwnedArray<BKTextField> directTF;
     
-    void textFieldDidChange(TextEditor&) override;
-    void comboBoxDidChange (ComboBox* box) override;
-    
     void updateFields(int directId);
     
-    void actionListenerCallback (const String& message) override;
+    void bkTextFieldDidChange       (TextEditor&)           override;
+    void bkMessageReceived          (const String& message) override;
+    
+    void bkComboBoxDidChange        (ComboBox* box)         override { };
+    void bkButtonClicked            (Button* b)             override { };
+    
+    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DirectViewController)
 };

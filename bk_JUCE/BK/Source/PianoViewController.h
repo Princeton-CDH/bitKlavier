@@ -27,7 +27,7 @@
 //==============================================================================
 /*
  */
-class PianoViewController       : public BKViewController, public ActionBroadcaster
+class PianoViewController       : public BKViewController
 {
 public:
     PianoViewController(BKAudioProcessor&);
@@ -38,22 +38,21 @@ public:
     
 private:
     
+    
+    
     BKAudioProcessor& processor;
     
     // BKLabels
     OwnedArray<BKLabel> pianoL;
     OwnedArray<BKComboBox> pianoCB;
     
-    String processPreparationString(String s);
+    void bkComboBoxDidChange        (ComboBox* box)         override;
     
-    void textFieldDidChange(TextEditor&) override;
-    void comboBoxDidChange (ComboBox* box) override;
-    
-    void switchToPrepMap(BKPreparationType type, int prepMap);
+    void bkTextFieldDidChange       (TextEditor&)           override { };
+    void bkButtonClicked            (Button* b)             override { };
+    void bkMessageReceived          (const String& message) override { };
     
     void updateFields(void);
-    
-    void addPreparation(BKPreparationType type, int which);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PianoViewController)
 };

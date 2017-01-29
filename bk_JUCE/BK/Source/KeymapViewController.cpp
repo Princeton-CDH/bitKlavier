@@ -92,7 +92,7 @@ void KeymapViewController::resized()
 #endif
 }
 
-void KeymapViewController::textFieldDidChange(TextEditor& tf)
+void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
 {
     String text = tf.getText();
     String name = tf.getName();
@@ -131,7 +131,7 @@ void KeymapViewController::updateFields(int keymapId)
     
 }
 
-void KeymapViewController::actionListenerCallback (const String& message)
+void KeymapViewController::bkMessageReceived (const String& message)
 {
     if (message == "keymap/update")
     {
@@ -161,8 +161,5 @@ void KeymapViewController::handleNoteOff (MidiKeyboardState* source,
     DBG("NOTE OFF: " + String(midiNoteNumber) + " " + String(velocity));
 }
 #endif
-void KeymapViewController::comboBoxDidChange (ComboBox* box)
-{
-    
-}
+
 

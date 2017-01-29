@@ -37,14 +37,14 @@ void BKViewController::resized()
 
 void BKViewController::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 {
-    comboBoxDidChange(comboBoxThatHasChanged);
+    bkComboBoxDidChange(comboBoxThatHasChanged);
 }
 
 void BKViewController::textEditorFocusLost(TextEditor& tf)
 {
     if (shouldChange)
     {
-        textFieldDidChange(tf);
+        bkTextFieldDidChange(tf);
         shouldChange = false;
     }
 }
@@ -53,7 +53,7 @@ void BKViewController::textEditorReturnKeyPressed(TextEditor& tf)
 {
     if (shouldChange)
     {
-        textFieldDidChange(tf);
+        bkTextFieldDidChange(tf);
         shouldChange = false;
     }
 }
@@ -62,13 +62,22 @@ void BKViewController::textEditorEscapeKeyPressed(TextEditor& tf)
 {
     if (shouldChange)
     {
-        textFieldDidChange(tf);
+        bkTextFieldDidChange(tf);
         shouldChange = false;
     }
 }
 
-
 void BKViewController::textEditorTextChanged(TextEditor& tf)
 {
     shouldChange = true;
+}
+
+void BKViewController::buttonClicked (Button* b)
+{
+    bkButtonClicked(b);
+}
+
+void BKViewController::actionListenerCallback (const String& message)
+{
+    bkMessageReceived(message);
 }

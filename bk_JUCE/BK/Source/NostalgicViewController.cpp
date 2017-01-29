@@ -83,7 +83,7 @@ void NostalgicViewController::resized()
     
 }
 
-void NostalgicViewController::textFieldDidChange(TextEditor& tf)
+void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
 {
     String text = tf.getText();
     String name = tf.getName();
@@ -160,7 +160,7 @@ void NostalgicViewController::updateFields(int nostalgicId)
     nostalgicTF[NostalgicTuning]            ->setText( String(prep->getTuning()->getId()));
 }
 
-void NostalgicViewController::actionListenerCallback (const String& message)
+void NostalgicViewController::bkMessageReceived (const String& message)
 {
     if (message == "nostalgic/update")
     {
@@ -170,7 +170,3 @@ void NostalgicViewController::actionListenerCallback (const String& message)
     }
 }
 
-void NostalgicViewController::comboBoxDidChange (ComboBox* box)
-{
-    
-}
