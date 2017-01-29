@@ -184,6 +184,13 @@ void BKAudioProcessorEditor::switchPianos(void)
                                    50,
                                    20);
     }
+    else
+    {
+        addPMapButton.setBounds(upperLeft.getX(),
+                                upperLeft.getBottom() + gYSpacing,
+                                50,
+                                20);
+    }
     
     if (lastId > 0)     removePMapButton.setVisible(true);
     else                removePMapButton.setVisible(false);
