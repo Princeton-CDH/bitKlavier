@@ -52,7 +52,8 @@ public:
     sLengthMultipliers(lengthMultipliers),
     sTranspOffsets(transpOffsets),
     sPulseThreshSec(60.0/sTempo),
-    sClusterThreshSec(sPulseThreshSec * sClusterThresh),
+    //sClusterThreshSec(sPulseThreshSec * sClusterThresh),
+    sClusterThreshSec(.001 * sClusterThresh),
     tuning(t)
     {
     }
@@ -72,7 +73,8 @@ public:
     sLengthMultipliers(Array<float>({1.0})),
     sTranspOffsets(Array<float>({0.0})),
     sPulseThreshSec(60.0/sTempo),
-    sClusterThreshSec(sPulseThreshSec * sClusterThresh),
+    //sClusterThreshSec(sPulseThreshSec * sClusterThresh),
+    sClusterThreshSec(.001 * sClusterThresh),
     at1History(1),
     at1Min(100),
     at1Max(2000),
@@ -86,9 +88,9 @@ public:
     inline const int getNumPulses() const noexcept                     {return sNumPulses;             }
     inline const int getClusterMin() const noexcept                    {return sClusterMin;            }
     inline const int getClusterMax() const noexcept                    {return sClusterMax;            }
-    inline const float getClusterThresh() const noexcept               {return sClusterThreshSec;      }
+    inline const float getClusterThreshSEC() const noexcept            {return sClusterThreshSec;      }
     inline const float getPulseThresh() const noexcept                 {return sPulseThreshSec;        }
-    inline const float getClusterThreshold() const noexcept            {return sClusterThresh;         }
+    inline const float getClusterThreshMS() const noexcept             {return sClusterThresh;         }
     inline const SynchronicSyncMode getMode() const noexcept           {return sMode;                  }
     inline const Array<float> getBeatMultipliers() const noexcept      {return sBeatMultipliers;       }
     inline const int getBeatsToSkip()                                  {return sBeatsToSkip;           }
@@ -111,7 +113,7 @@ public:
         
         float tempoPeriodS = (60.0/sTempo);
         
-        sClusterThreshSec = tempoPeriodS * sClusterThresh;
+        //sClusterThreshSec = tempoPeriodS * sClusterThresh;
         
         sPulseThreshSec = tempoPeriodS;
     }
@@ -119,7 +121,8 @@ public:
     inline void setClusterThresh(float clusterThresh)
     {
         sClusterThresh = clusterThresh;
-        sClusterThreshSec = (60.0/sTempo) * clusterThresh;
+        //sClusterThreshSec = (60.0/sTempo) * clusterThresh;
+        sClusterThreshSec = sClusterThresh * .001;
     }
     
     inline void setNumPulses(int numPulses)                            {sNumPulses = numPulses;                            }
@@ -165,7 +168,6 @@ private:
     int Id;
     float sTempo;
     int sNumPulses,sClusterMin,sClusterMax;
-    float sClusterThresh; // beats
     SynchronicSyncMode sMode;
     int sBeatsToSkip; // float?
     Array<float> sBeatMultipliers;
@@ -173,7 +175,8 @@ private:
     Array<float> sLengthMultipliers;
     Array<float> sTranspOffsets;
 
-    float sPulseThreshSec;
+    float sPulseThreshSec;      //length of time between pulses, as set by temp
+    float sClusterThresh;       //max time between played notes before new cluster is started, in MS
     float sClusterThreshSec;
     
     // Adaptive Tempo 1
@@ -260,9 +263,10 @@ private:
     int skipBeats;
     bool shouldPlay;
     
-    Array<int> cluster;
+    Array<int> cluster;     //cluster of notes played, with repetitions, limited to totalClusters (8?)
+    Array<int> slimCluster; //cluster without repetitions
     Array<int> toAdd;
-    Array<int> on;
+    Array<int> keysDepressed;
     
     JUCE_LEAK_DETECTOR(SynchronicProcessor);
 };

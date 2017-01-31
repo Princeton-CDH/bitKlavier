@@ -33,7 +33,7 @@ tuner(preparation->getTuning())
     firstNoteTimer = 0;
     
     cluster = Array<int>();
-    on = Array<int>();
+    keysDepressed = Array<int>();
     
     skipBeats = 0;
     shouldPlay = false;
@@ -74,7 +74,8 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
     synth->keyOn(channel,
                  synthNoteNumber,
                  offset,
-                 velocity * preparation->getAccentMultipliers()[accent],
+                 //velocity * preparation->getAccentMultipliers()[accent],
+                 velocity,
                  aGlobalGain,
                  noteDirection,
                  FixedLengthFixedStart,
@@ -83,14 +84,22 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
                  noteStartPos, // start
                  noteLength,
                  3,
-                 3);
+                 30);
 }
 
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
     tuner.setPreparation(preparation->getTuning());
     
+    //store velocity
     velocities.set(noteNumber, velocity);
+    DBG("adding note " + String(noteNumber) + " " + String(velocity));
+    
+    //add note to array of depressed notes
+    keysDepressed.addIfNotAlreadyThere(noteNumber);
+    
+    //make sure we aren't playing in NoteOffSync
+    if(LastNoteOffSync) shouldPlay = false;
     
     if (inCluster)
     {
@@ -138,15 +147,26 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     
     if (inCluster)
     {
-        cluster.add(noteNumber);
+        //save note in the cluster, even if it's already there. then cap the cluster to clusterMax
+        //this is different than avoiding dupes at this stage (with "addIfNotAlreadyThere") because it allows
+        //repeated notes to push other notes out the back.
+        //later, we remove dupes so we don't inadvertently play the same note twice in a pulse
+        cluster.insert(0, noteNumber);
+        if(cluster.size() > preparation->getClusterMax()) cluster.resize(preparation->getClusterMax());
+        
         clusterThresholdTimer = 0;
     }
 }
 
 void SynchronicProcessor::keyReleased(int noteNumber, int channel)
 {
+    
+    //remove key from array of pressed keys
+    keysDepressed.removeAllInstancesOf(noteNumber);
+    
     // If LastNoteOnSync mode, reset phasor and multiplier indices.
-    if (!inPulses && preparation->getMode() == LastNoteOffSync)
+    //only initiate pulses if ALL keys are released
+    if (preparation->getMode() == LastNoteOffSync && keysDepressed.size() == 0)
     {
         phasor = pulseThresholdSamples;
         beat = 0;
@@ -154,13 +174,6 @@ void SynchronicProcessor::keyReleased(int noteNumber, int channel)
         accent = 0;
         transp = 0;
         pulse = 1;
-        
-        /*
-        for (int n = 0; n < cluster.size(); n++)
-        {
-            playNote(channel, cluster[n]);
-        }
-         */
         
         inPulses = true;
     }
@@ -171,10 +184,12 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
     
     tuner.incrementAdaptiveClusterTime(numSamples);
     
-    int clusterSize = cluster.size();
+    //remove duplicates from cluster, so we don't play the same note twice in a single pulse
+    slimCluster.clearQuick();
+    for(int i = 0; i< cluster.size(); i++) slimCluster.addIfNotAlreadyThere(cluster.getUnchecked(i));
+    int clusterSize = slimCluster.size();
     
-    clusterThresholdSamples = (preparation->getClusterThresh() * sampleRate);
-    
+    clusterThresholdSamples = (preparation->getClusterThreshSEC() * sampleRate);
     pulseThresholdSamples = (preparation->getPulseThresh() * sampleRate);
     
     if (inCluster)
@@ -225,12 +240,13 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
         
         if (phasor >= numSamplesBeat)
         {
-            phasor -= numSamplesBeat;
             
+            phasor -= numSamplesBeat;
             
             DBG("shouldPlay: "      + String((int)shouldPlay) +
                 " skipBeats: "      + String(skipBeats) +
                 " beatsToSkip: "    + String(preparation->getBeatsToSkip()));
+            
             if (!shouldPlay)
             {
                 if (++skipBeats >= preparation->getBeatsToSkip())
@@ -248,7 +264,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                         pulse = 1;
                     }
                     
-                    shouldPlay = true;
+                    if(keysDepressed.size() == 0) shouldPlay = true;
                     
                 }
                 else
@@ -263,7 +279,9 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 {
                     for (int n = 0; n < clusterSize; n++)
                     {
-                        playNote(channel, cluster[n], velocities.getUnchecked(cluster[n]));
+                        playNote(channel,
+                                 cluster[n],
+                                 velocities.getUnchecked(cluster[n]) * preparation->getAccentMultipliers()[accent]);
                     }
                 
                 }
@@ -276,7 +294,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 
                 if (++transp >= preparation->getTranspOffsets().size())         transp = 0;
                 
-                if (++pulse >= preparation->getNumPulses())
+                if (pulse++ >= preparation->getNumPulses())
                 {
                     cluster.clearQuick();
                     toAdd.clearQuick();

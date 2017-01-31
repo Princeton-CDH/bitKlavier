@@ -346,7 +346,7 @@ static const float aGlobalGain = 0.5; //make this user settable
 
 static const float aMaxSampleLengthSec = 30.0f;
 static const float aRampOnTimeSec = 0.004f;
-static const float aRampOffTimeSec = 0.004f;
+static const float aRampOffTimeSec = 0.03f; //was .004. don't actually use these anymore...
 static const int aNumScaleDegrees = 12;
 static const int aRampUndertowCrossMS = 50;
 

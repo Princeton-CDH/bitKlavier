@@ -192,7 +192,7 @@ void SynchronicViewController::updateFields(int synchronicId)
     synchronicTF[SynchronicNumPulses]           ->setText(  String(                 prep->getNumPulses()));
     synchronicTF[SynchronicClusterMin]          ->setText(  String(                 prep->getClusterMin()));
     synchronicTF[SynchronicClusterMax]          ->setText(  String(                 prep->getClusterMax()));
-    synchronicTF[SynchronicClusterThresh]       ->setText(  String(                 prep->getClusterThresh()));
+    synchronicTF[SynchronicClusterThresh]       ->setText(  String(                 prep->getClusterThreshMS()));
     synchronicTF[SynchronicMode]                ->setText(  String(                 prep->getMode()));
     synchronicTF[SynchronicBeatsToSkip]         ->setText(  String(                 prep->getBeatsToSkip()));
     synchronicTF[SynchronicBeatMultipliers]     ->setText(  floatArrayToString(     prep->getBeatMultipliers()));

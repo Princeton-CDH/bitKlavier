@@ -100,7 +100,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
         resonanceSynth->keyOn(
                                     channel,
                                     noteNumber,
-                                    0, 
+                                    offset,
                                     velocity,
                                     rGain,
                                     Forward,
