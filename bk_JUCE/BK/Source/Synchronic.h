@@ -44,7 +44,6 @@ public:
     sNumPulses(numPulses),
     sClusterMin(clusterMin),
     sClusterMax(clusterMax),
-    sClusterThresh(clusterThresh),
     sMode(mode),
     sBeatsToSkip(beatsToSkip),
     sBeatMultipliers(beatMultipliers),
@@ -52,6 +51,7 @@ public:
     sLengthMultipliers(lengthMultipliers),
     sTranspOffsets(transpOffsets),
     sPulseThreshSec(60.0/sTempo),
+    sClusterThresh(clusterThresh),
     //sClusterThreshSec(sPulseThreshSec * sClusterThresh),
     sClusterThreshSec(.001 * sClusterThresh),
     tuning(t)
@@ -66,7 +66,6 @@ public:
     sClusterMin(1),
     sClusterMax(100),
     sClusterCap(8),
-    sClusterThresh(1.0),
     sMode(FirstNoteOnSync),
     sBeatsToSkip(0),
     sBeatMultipliers(Array<float>({1.0})),
@@ -74,6 +73,7 @@ public:
     sLengthMultipliers(Array<float>({1.0})),
     sTranspOffsets(Array<float>({0.0})),
     sPulseThreshSec(60.0/sTempo),
+    sClusterThresh(500),
     //sClusterThreshSec(sPulseThreshSec * sClusterThresh),
     sClusterThreshSec(.001 * sClusterThresh),
     at1History(1),
@@ -233,12 +233,13 @@ private:
     SynchronicPreparation::Ptr  preparation;
     
     TuningProcessor             tuner;
-    
+
     int pulse;
     int beat;
     int accent;
     int length;
     int transp;
+    void resetPhase(int skipBeats);
     
     void playNote(int channel, int note, float velocity);
     Array<float> velocities;           
