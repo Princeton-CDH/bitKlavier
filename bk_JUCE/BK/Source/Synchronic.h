@@ -65,6 +65,7 @@ public:
     sNumPulses(0),
     sClusterMin(1),
     sClusterMax(100),
+    sClusterCap(8),
     sClusterThresh(1.0),
     sMode(FirstNoteOnSync),
     sBeatsToSkip(0),
@@ -88,6 +89,7 @@ public:
     inline const int getNumPulses() const noexcept                     {return sNumPulses;             }
     inline const int getClusterMin() const noexcept                    {return sClusterMin;            }
     inline const int getClusterMax() const noexcept                    {return sClusterMax;            }
+    inline const int getClusterCap() const noexcept                    {return sClusterCap;            }
     inline const float getClusterThreshSEC() const noexcept            {return sClusterThreshSec;      }
     inline const float getPulseThresh() const noexcept                 {return sPulseThreshSec;        }
     inline const float getClusterThreshMS() const noexcept             {return sClusterThresh;         }
@@ -128,6 +130,7 @@ public:
     inline void setNumPulses(int numPulses)                            {sNumPulses = numPulses;                            }
     inline void setClusterMin(int clusterMin)                          {sClusterMin = clusterMin;                          }
     inline void setClusterMax(int clusterMax)                          {sClusterMax = clusterMax;                          }
+    inline void setClusterCap(int clusterCap)                          {sClusterCap = clusterCap;                          }
     inline void setMode(SynchronicSyncMode mode)                       {sMode = mode;                                      }
     inline void setBeatsToSkip(int beatsToSkip)                        {sBeatsToSkip = beatsToSkip;                        }
     inline void setBeatMultipliers(Array<float> beatMultipliers)       {sBeatMultipliers.swapWith(beatMultipliers);        }
@@ -152,6 +155,7 @@ public:
         DBG("sNumPulses: " + String(sNumPulses));
         DBG("sClusterMin: " + String(sClusterMin));
         DBG("sClusterMax: " + String(sClusterMax));
+        DBG("sClusterCap: " + String(sClusterCap));
         DBG("sClusterThresh: " + String(sClusterThresh));
         DBG("sMode: " + String(sMode));
         DBG("sBeatsToSkip: " + String(sBeatsToSkip));
@@ -168,6 +172,7 @@ private:
     int Id;
     float sTempo;
     int sNumPulses,sClusterMin,sClusterMax;
+    int sClusterCap = 8; //max in cluster; 8 in original bK
     SynchronicSyncMode sMode;
     int sBeatsToSkip; // float?
     Array<float> sBeatMultipliers;

@@ -147,12 +147,21 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     
     if (inCluster)
     {
-        //save note in the cluster, even if it's already there. then cap the cluster to clusterMax
+        //save note in the cluster, even if it's already there. then cap the cluster to a hard cap (8 for now)
         //this is different than avoiding dupes at this stage (with "addIfNotAlreadyThere") because it allows
         //repeated notes to push older notes out the back.
         //later, we remove dupes so we don't inadvertently play the same note twice in a pulse
         cluster.insert(0, noteNumber);
-        if(cluster.size() > 8) cluster.resize(8); //need this cap to be user settable; set to 8 for now to reproduce original bK behavior
+        if(cluster.size() > preparation->getClusterCap()) cluster.resize(preparation->getClusterCap());
+        //why not use clusterMax for this? the intent is different:
+            //clusterMax: max number of notes played otherwise shut of pulses
+            //clusterCap: the most number of notes allowed in a cluster when playing pulses
+        //so, let's say we are playing a rapid passage where successive notes are within the clusterThresh
+            //and we want the pulse to emerge when we stop; clusterMax wouldn't allow this to happen
+            //if we had exceeded clusterMax in that passage, which is bad, but we still want clusterCap
+            //to limit the number of notes included in the cluster.
+        //for now, we'll leave clusterCap unexposed, just to avoid confusion for the user. after all,
+        //I used it this way for all of the etudes to date! but might want to expose eventually...
         
         clusterThresholdTimer = 0;
     }
