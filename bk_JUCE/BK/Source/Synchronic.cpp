@@ -149,10 +149,10 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     {
         //save note in the cluster, even if it's already there. then cap the cluster to clusterMax
         //this is different than avoiding dupes at this stage (with "addIfNotAlreadyThere") because it allows
-        //repeated notes to push other notes out the back.
+        //repeated notes to push older notes out the back.
         //later, we remove dupes so we don't inadvertently play the same note twice in a pulse
         cluster.insert(0, noteNumber);
-        if(cluster.size() > preparation->getClusterMax()) cluster.resize(preparation->getClusterMax());
+        if(cluster.size() > 8) cluster.resize(8); //need this cap to be user settable; set to 8 for now to reproduce original bK behavior
         
         clusterThresholdTimer = 0;
     }
