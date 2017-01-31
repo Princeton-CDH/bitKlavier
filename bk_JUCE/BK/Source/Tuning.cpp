@@ -11,8 +11,7 @@
 #include "Tuning.h"
 
 
-TuningProcessor::TuningProcessor(TuningPreparation::Ptr prep)
-:
+TuningProcessor::TuningProcessor(TuningPreparation::Ptr prep):
 preparation(prep)
 {
     
@@ -30,7 +29,6 @@ preparation(prep)
 TuningProcessor::~TuningProcessor()
 {
 }
-
 
 //returns offsets; main callback
 float TuningProcessor::getOffset(int midiNoteNumber) const

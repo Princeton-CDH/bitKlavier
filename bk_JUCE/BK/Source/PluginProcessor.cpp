@@ -36,12 +36,18 @@ noteOn                  (Array<int>())
     for (int i = 0; i < (aMaxTuningPreparations); i++)
         tPreparation.add(new TuningPreparation(i));
     
+    
     // Make a bunch of preparations. Default to zeroth tuning.
-    for (int i = 0; i < aMaxTotalPreparations; i++) {
+    for (int i = 0; i < aMaxTotalPreparations; i++)
+    {
         sPreparation.add(new SynchronicPreparation(i, tPreparation[0]));
-        nPreparation.add(new NostalgicPreparation(i, tPreparation[0]));
-        dPreparation.add(new DirectPreparation(i, tPreparation[0]));
+        activeSPreparation.add(new SynchronicPreparation(sPreparation[i]));
         
+        nPreparation.add(new NostalgicPreparation(i, tPreparation[0]));
+        activeNPreparation.add(new NostalgicPreparation(nPreparation[i]));
+        
+        dPreparation.add(new DirectPreparation(i, tPreparation[0]));
+        activeDPreparation.add(new DirectPreparation(dPreparation[i]));
     }
     
     // Make a bunch of pianos. Default to zeroth keymap.
@@ -114,15 +120,11 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             
             // Send key off to each pmap in current piano
             for (p = currentPiano->activePMaps.size(); --p >= 0;)
-            {
-                DBG("piano: " + String(p));
                 currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel);
-            }
             
             // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
             for (p = prevPianos.size(); --p >= 0;) {
                 for (pm = prevPianos[p]->activePMaps.size(); --pm >= 0;) {
-                    DBG("piano: " + String(p));
                     prevPianos[p]->activePMaps[pm]->postRelease(noteNumber, velocity, channel);
                 }
             }

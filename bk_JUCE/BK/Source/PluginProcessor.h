@@ -53,6 +53,10 @@ public:
     DirectPreparation::CSPtrArr         dPreparation;
     TuningPreparation::CSPtrArr         tPreparation;
     
+    SynchronicPreparation::CSPtrArr     activeSPreparation;
+    NostalgicPreparation::CSPtrArr      activeNPreparation;
+    DirectPreparation::CSPtrArr         activeDPreparation;
+    
     // Keymaps.
     Keymap::PtrArr                      bkKeymaps;
     

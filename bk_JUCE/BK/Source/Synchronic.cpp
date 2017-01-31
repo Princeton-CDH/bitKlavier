@@ -12,12 +12,14 @@
 
 SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s,
                                          SynchronicPreparation::Ptr p,
+                                         SynchronicPreparation::Ptr ap,
                                          int Id)
 :
 Id(Id),
 synth(s),
 preparation(p),
-tuner(preparation->getTuning())
+active(ap),
+tuner(active->getTuning())
 {
     velocities.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++) {
@@ -58,23 +60,23 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
     PianoSamplerNoteDirection noteDirection = Forward;
     float noteStartPos = 0.0;
     
-    //float noteLength = (fabs(preparation->getLengthMultipliers()[length]) * tempoPeriod);
-    float noteLength = (fabs(preparation->getLengthMultipliers()[length]) * 50.0);
+    //float noteLength = (fabs(active->getLengthMultipliers()[length]) * tempoPeriod);
+    float noteLength = (fabs(active->getLengthMultipliers()[length]) * 50.0);
     
-    if (preparation->getLengthMultipliers()[length] < 0)
+    if (active->getLengthMultipliers()[length] < 0)
     {
         noteDirection = Reverse;
         noteStartPos = noteLength;
     }
     
-    float offset = tuner.getOffset(note) + preparation->getTranspOffsets()[transp];
+    float offset = tuner.getOffset(note) + active->getTranspOffsets()[transp];
     int synthNoteNumber = ((float)note + (int)offset);
     offset -= (int)offset;
     
     synth->keyOn(channel,
                  synthNoteNumber,
                  offset,
-                 velocity * preparation->getAccentMultipliers()[accent],
+                 velocity * active->getAccentMultipliers()[accent],
                  aGlobalGain,
                  noteDirection,
                  FixedLengthFixedStart,
@@ -88,14 +90,14 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
 
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
-    tuner.setPreparation(preparation->getTuning());
+    tuner.setPreparation(active->getTuning());
     
     velocities.set(noteNumber, velocity);
     
     if (inCluster)
     {
         // If LastNoteOnSync mode, reset phasor and multiplier indices.
-        if (preparation->getMode() == LastNoteOnSync)
+        if (active->getMode() == LastNoteOnSync)
         {
             phasor = pulseThresholdSamples;
             
@@ -125,7 +127,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
         inPulses = false;
         
         // Start first note timer, since this is beginning of new cluster.
-        if (preparation->getMode() == FirstNoteOnSync)
+        if (active->getMode() == FirstNoteOnSync)
         {
             firstNoteTimer = 0;
         }
@@ -146,7 +148,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 void SynchronicProcessor::keyReleased(int noteNumber, int channel)
 {
     // If LastNoteOnSync mode, reset phasor and multiplier indices.
-    if (!inPulses && preparation->getMode() == LastNoteOffSync)
+    if (!inPulses && active->getMode() == LastNoteOffSync)
     {
         phasor = pulseThresholdSamples;
         beat = 0;
@@ -173,9 +175,9 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
     
     int clusterSize = cluster.size();
     
-    clusterThresholdSamples = (preparation->getClusterThresh() * sampleRate);
+    clusterThresholdSamples = (active->getClusterThresh() * sampleRate);
     
-    pulseThresholdSamples = (preparation->getPulseThresh() * sampleRate);
+    pulseThresholdSamples = (active->getPulseThresh() * sampleRate);
     
     if (inCluster)
     {
@@ -196,7 +198,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
         {
             inPrePulses = false;
             
-            if (preparation->getMode() == FirstNoteOnSync)
+            if (active->getMode() == FirstNoteOnSync)
             {
                 phasor = pulseThresholdSamples;
                 
@@ -207,7 +209,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 accent = 0;
             }
             
-            if (preparation->getMode() != LastNoteOffSync)
+            if (active->getMode() != LastNoteOffSync)
             {
                 inPulses = true;
             }
@@ -221,25 +223,21 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
     
     if (inPulses)
     {
-        numSamplesBeat = (preparation->getBeatMultipliers()[beat] * pulseThresholdSamples);
+        numSamplesBeat = (active->getBeatMultipliers()[beat] * pulseThresholdSamples);
         
         if (phasor >= numSamplesBeat)
         {
             phasor -= numSamplesBeat;
             
-            
-            DBG("shouldPlay: "      + String((int)shouldPlay) +
-                " skipBeats: "      + String(skipBeats) +
-                " beatsToSkip: "    + String(preparation->getBeatsToSkip()));
             if (!shouldPlay)
             {
-                if (++skipBeats >= preparation->getBeatsToSkip())
+                if (++skipBeats >= active->getBeatsToSkip())
                 {
                     skipBeats = 0;
                     
                     beat = 0;
                     
-                    if (preparation->getBeatsToSkip() > 0)
+                    if (active->getBeatsToSkip() > 0)
                     {
                         pulse = 0;
                     }
@@ -253,13 +251,13 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 }
                 else
                 {
-                    if (++beat >= preparation->getBeatMultipliers().size())         beat = 0;
+                    if (++beat >= active->getBeatMultipliers().size())         beat = 0;
                 }
             }
             
             if (shouldPlay)
             {
-                if (clusterSize >= preparation->getClusterMin() && clusterSize <= preparation->getClusterMax())
+                if (clusterSize >= active->getClusterMin() && clusterSize <= active->getClusterMax())
                 {
                     for (int n = 0; n < clusterSize; n++)
                     {
@@ -268,15 +266,15 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 
                 }
                 
-                if (++beat >= preparation->getBeatMultipliers().size())         beat = 0;
+                if (++beat >= active->getBeatMultipliers().size())         beat = 0;
                 
-                if (++length >= preparation->getLengthMultipliers().size())     length = 0;
+                if (++length >= active->getLengthMultipliers().size())     length = 0;
                 
-                if (++accent >= preparation->getAccentMultipliers().size())     accent = 0;
+                if (++accent >= active->getAccentMultipliers().size())     accent = 0;
                 
-                if (++transp >= preparation->getTranspOffsets().size())         transp = 0;
+                if (++transp >= active->getTranspOffsets().size())         transp = 0;
                 
-                if (++pulse >= preparation->getNumPulses())
+                if (++pulse >= active->getNumPulses())
                 {
                     cluster.clearQuick();
                     toAdd.clearQuick();
@@ -299,8 +297,8 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip) //return time in m
     
     while(beatsToSkip-- > 0)
     {
-        if (++myBeat >= preparation->getBeatMultipliers().size()) myBeat = 0;
-        timeToReturn += (preparation->getBeatMultipliers()[myBeat] * pulseThresholdSamples);
+        if (++myBeat >= active->getBeatMultipliers().size()) myBeat = 0;
+        timeToReturn += (active->getBeatMultipliers()[myBeat] * pulseThresholdSamples);
     }
     
     //DBG("time in ms to skipped beat = " + std::to_string(timeToReturn * 1000./sampleRate));

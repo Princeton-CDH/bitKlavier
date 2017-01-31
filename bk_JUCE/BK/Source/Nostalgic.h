@@ -29,6 +29,22 @@ public:
     typedef OwnedArray<NostalgicPreparation>                  Arr;
     typedef OwnedArray<NostalgicPreparation, CriticalSection> CSArr;
     
+    
+    NostalgicPreparation(NostalgicPreparation::Ptr p):
+    Id(p->getId()),
+    nWaveDistance(p->getWavedistance()),
+    nUndertow(p->getUndertow()),
+    nTransposition(p->getTransposition()),
+    nGain(p->getGain()),
+    nLengthMultiplier(p->getLengthMultiplier()),
+    nBeatsToSkip(p->getBeatsToSkip()),
+    nMode(p->getMode()),
+    nSyncTarget(p->getSyncTarget()),
+    tuning(p->getTuning())
+    {
+        
+    }
+    
     NostalgicPreparation(int Id,
                          int waveDistance,
                          int undertow,
@@ -151,6 +167,7 @@ public:
     NostalgicProcessor(
                        BKSynthesiser *s,
                        NostalgicPreparation::Ptr prep,
+                       NostalgicPreparation::Ptr active,
                        SynchronicProcessor::CSPtrArr& proc,
                        int Id);
     
@@ -180,7 +197,7 @@ public:
 private:
     int Id;
     BKSynthesiser*              synth;
-    NostalgicPreparation::Ptr   preparation;
+    NostalgicPreparation::Ptr   preparation, active;
 
     TuningProcessor             tuner;
     

@@ -89,9 +89,9 @@ public:
         
     }
     
-    void setSynchronicPreparations(SynchronicPreparation::PtrArr sPrep);
-    void setNostalgicPreparations(NostalgicPreparation::PtrArr nPrep);
-    void setDirectPreparations(DirectPreparation::PtrArr dPrep);
+    void setSynchronicPreparations(SynchronicPreparation::PtrArr sPrep, SynchronicPreparation::PtrArr activeSPrep);
+    void setNostalgicPreparations(NostalgicPreparation::PtrArr nPrep, NostalgicPreparation::PtrArr activeNPrep);
+    void setDirectPreparations(DirectPreparation::PtrArr dPrep, DirectPreparation::PtrArr activeDPrep);
     
     SynchronicPreparation::PtrArr getSynchronicPreparations(void);
     NostalgicPreparation::PtrArr getNostalgicPreparations(void);
@@ -128,6 +128,10 @@ private:
     SynchronicPreparation::PtrArr   sPreparations;
     NostalgicPreparation::PtrArr    nPreparations;
     DirectPreparation::PtrArr       dPreparations;
+    
+    SynchronicPreparation::PtrArr   activeSPreparations;
+    NostalgicPreparation::PtrArr    activeNPreparations;
+    DirectPreparation::PtrArr       activeDPreparations;
     
     // Processors (internal)
     SynchronicProcessor::CSPtrArr   sProcessor;

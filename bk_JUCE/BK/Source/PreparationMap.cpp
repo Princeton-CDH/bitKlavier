@@ -46,7 +46,7 @@ void PreparationMap::setKeymap(Keymap::Ptr km)
     pKeymap = km;
 }
 
-void PreparationMap::setSynchronicPreparations(SynchronicPreparation::PtrArr newPreps)
+void PreparationMap::setSynchronicPreparations(SynchronicPreparation::PtrArr newPreps, SynchronicPreparation::PtrArr newActivePreps)
 {
     SynchronicPreparation::PtrArr oldPreps = sPreparations;
     sPreparations = newPreps;
@@ -56,10 +56,9 @@ void PreparationMap::setSynchronicPreparations(SynchronicPreparation::PtrArr new
     {
         if (!oldPreps.contains(sPreparations[i]))
         {
-            SynchronicProcessor::Ptr proc = new SynchronicProcessor(synth, sPreparations[i], i);
+            SynchronicProcessor::Ptr proc = new SynchronicProcessor(synth, sPreparations[i], newActivePreps[i], i);
             sProcessor.add(proc);
             proc->setCurrentPlaybackSampleRate(sampleRate);
-            DBG("samplerate: " + String(sampleRate) );
         }
     }
     
@@ -73,7 +72,7 @@ void PreparationMap::setSynchronicPreparations(SynchronicPreparation::PtrArr new
     deactivateIfNecessary();
 }
 
-void PreparationMap::setNostalgicPreparations(NostalgicPreparation::PtrArr newPreps)
+void PreparationMap::setNostalgicPreparations(NostalgicPreparation::PtrArr newPreps, NostalgicPreparation::PtrArr newActivePreps)
 {
     NostalgicPreparation::PtrArr oldPreps = nPreparations;
     nPreparations = newPreps;
@@ -83,7 +82,7 @@ void PreparationMap::setNostalgicPreparations(NostalgicPreparation::PtrArr newPr
     {
         if (!oldPreps.contains(nPreparations[i]))
         {
-            NostalgicProcessor::Ptr proc = new NostalgicProcessor(synth, nPreparations[i], sProcessor, i);
+            NostalgicProcessor::Ptr proc = new NostalgicProcessor(synth, nPreparations[i], newActivePreps[i], sProcessor, i);
             nProcessor.add(proc);
             proc->setCurrentPlaybackSampleRate(sampleRate);
         }
@@ -99,7 +98,7 @@ void PreparationMap::setNostalgicPreparations(NostalgicPreparation::PtrArr newPr
     deactivateIfNecessary();
 }
 
-void PreparationMap::setDirectPreparations(DirectPreparation::PtrArr newPreps)
+void PreparationMap::setDirectPreparations(DirectPreparation::PtrArr newPreps, DirectPreparation::PtrArr newActivePreps)
 {
     DirectPreparation::PtrArr oldPreps = dPreparations;
     dPreparations = newPreps;
@@ -109,7 +108,7 @@ void PreparationMap::setDirectPreparations(DirectPreparation::PtrArr newPreps)
     {
         if (!oldPreps.contains(dPreparations[i]))
         {
-            DirectProcessor::Ptr proc = new DirectProcessor(synth, resonanceSynth, hammerSynth, dPreparations[i], i);
+            DirectProcessor::Ptr proc = new DirectProcessor(synth, resonanceSynth, hammerSynth, dPreparations[i], newActivePreps[i], i);
             dProcessor.add(proc);
             proc->setCurrentPlaybackSampleRate(sampleRate);
         }
@@ -213,7 +212,6 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
     
     for (int i = nProcessor.size(); --i >= 0; )
     {
-        DBG("nostalgic processor: " + String(i));
         if (pKeymap->containsNote(noteNumber)) nProcessor[i]->keyReleased(noteNumber, channel);
     }
     

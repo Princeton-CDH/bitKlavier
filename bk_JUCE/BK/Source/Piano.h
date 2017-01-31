@@ -21,8 +21,6 @@
 #include "Keymap.h"
 
 
-
-
 class Piano : public ReferenceCountedObject
 {
 public:
@@ -40,6 +38,7 @@ public:
     ~Piano();
     
     void storeCurrentPiano();
+    
     void recallCurrentPiano();
     
     inline GeneralSettings::Ptr                getGeneralSettings(void)            {   return general;         }

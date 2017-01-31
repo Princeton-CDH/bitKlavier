@@ -24,6 +24,22 @@ public:
     typedef OwnedArray<TuningPreparation>                        Arr;
     typedef OwnedArray<TuningPreparation, CriticalSection>       CSArr;
     
+    TuningPreparation(TuningPreparation::Ptr p):
+    Id(p->getId()),
+    tWhichTuning(p->getTuning()),
+    tFundamental(p->getFundamental()),
+    tFundamentalOffset(p->getFundamentalOffset()),
+    tAdaptiveIntervalScale(p->getAdaptiveIntervalScale()),
+    tAdaptiveInversional(p->getAdaptiveInversional()),
+    tAdaptiveAnchorScale(p->getAdaptiveAnchorScale()),
+    tAdaptiveAnchorFundamental(p->getAdaptiveAnchorFundamental()),
+    tAdaptiveClusterThresh(p->getAdaptiveClusterThresh()),
+    tAdaptiveHistory(p->getAdaptiveHistory()),
+    tCustom(p->getCustomScale())
+    {
+        
+    }
+    
     TuningPreparation(int Id,
                       TuningSystem whichTuning,
                       PitchClass fundamental,
@@ -95,7 +111,6 @@ public:
     inline void setAdaptiveHistory(int adaptiveHistory)                             {tAdaptiveHistory = adaptiveHistory;                    }
     inline void setCustomScale(Array<float> tuning)                                 {tCustom = tuning;                                      }
     
-    
     void print(void)
     {
         DBG("tWhichTuning: " +                  String(tWhichTuning));
@@ -144,7 +159,7 @@ public:
     typedef OwnedArray<TuningProcessor>                          PtrArr;
     typedef OwnedArray<TuningProcessor, CriticalSection>         CSPtrArr;
     
-    TuningProcessor(TuningPreparation::Ptr prep);;
+    TuningProcessor(TuningPreparation::Ptr prep);
     ~TuningProcessor();
     
     void setPreparation(TuningPreparation::Ptr prep) {preparation = prep;}
@@ -167,7 +182,7 @@ public:
 private:
     
     Array<Array<float>> tuningLibrary;
-    TuningPreparation::Ptr preparation;
+    TuningPreparation::Ptr preparation, active;
     
     float   intervalToRatio(float interval) const noexcept { return mtof(interval + 60.) / mtof(60.); }
     float   lastNote[128];

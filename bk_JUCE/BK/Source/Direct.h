@@ -29,6 +29,17 @@ public:
     typedef OwnedArray<DirectPreparation>                  Arr;
     typedef OwnedArray<DirectPreparation, CriticalSection> CSArr;
     
+    DirectPreparation(DirectPreparation::Ptr p):
+    Id(p->getId()),
+    dTransposition(p->getTransposition()),
+    dGain(p->getGain()),
+    dResonanceGain(p->getResonanceGain()),
+    dHammerGain(p->getHammerGain()),
+    tuning(p->getTuning())
+    {
+        
+    }
+    
     DirectPreparation(int Id,
                       float transp,
                       float gain,
@@ -113,6 +124,7 @@ public:
                     BKSynthesiser *res,
                     BKSynthesiser *ham,
                     DirectPreparation::Ptr prep,
+                    DirectPreparation::Ptr active,
                     int Id);
     
     ~DirectProcessor();
@@ -136,7 +148,7 @@ private:
     BKSynthesiser*              synth;
     BKSynthesiser*              resonanceSynth;
     BKSynthesiser*              hammerSynth;
-    DirectPreparation::Ptr      preparation;
+    DirectPreparation::Ptr      preparation, active;
     TuningProcessor             tuner;
     
     double sampleRate;
