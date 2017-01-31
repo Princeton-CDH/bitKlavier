@@ -335,6 +335,20 @@ static const std::vector<std::string> cKeymapParameterTypes = {
     "Keymap"
 };
 
+typedef enum BKSampleLoadType
+{
+    BKLoadLite,
+    BKLoadMedium,
+    BKLoadHeavy,
+    BKLoadNil
+}BKSampleLoadType;
+
+static const std::vector<std::string> cBKSampleLoadTypes = {
+    "Load Lite",
+    "Load Medium",
+    "Load Heavy"
+};
+
 
 // Globals
 static const int aMaxNumKeymaps = 30;

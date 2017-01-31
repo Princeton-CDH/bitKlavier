@@ -237,14 +237,8 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                     
                     beat = 0;
                     
-                    if (active->getBeatsToSkip() > 0)
-                    {
-                        pulse = 0;
-                    }
-                    else
-                    {
-                        pulse = 1;
-                    }
+                    if (active->getBeatsToSkip() > 0)   pulse = 0;
+                    else                                pulse = 1;
                     
                     shouldPlay = true;
                     
@@ -260,9 +254,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 if (clusterSize >= active->getClusterMin() && clusterSize <= active->getClusterMax())
                 {
                     for (int n = 0; n < clusterSize; n++)
-                    {
                         playNote(channel, cluster[n], velocities.getUnchecked(cluster[n]));
-                    }
                 
                 }
                 

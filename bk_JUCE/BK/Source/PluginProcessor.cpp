@@ -21,7 +21,7 @@ prevPianos              (Piano::PtrArr()),
 bkPianos                (Piano::PtrArr()),
 noteOn                  (Array<int>())
 {
-    
+    didLoadHammersAndRes = false;
     //allocate storage
     bkKeymaps.ensureStorageAllocated(aMaxNumPreparationKeymaps);
     bkPianos.ensureStorageAllocated(aMaxNumPianos);
@@ -58,11 +58,24 @@ noteOn                  (Array<int>())
     prevPiano = bkPianos[0];
     currentPiano = bkPianos[0];
     
+}
+
+void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
+{
+    // TO IMPLEMENT: Should turn off all notes in the processors/synths before loading new samples.
     
-    // For testing and developing, let's keep directory of samples in home folder on disk.
-    BKSampleLoader::loadMainPianoSamples(&mainPianoSynth, aNumSampleLayers);
-    BKSampleLoader::loadHammerReleaseSamples(&hammerReleaseSynth);
-    BKSampleLoader::loadResonanceReleaseSamples(&resonanceReleaseSynth);
+    didLoadMainPianoSamples = false;
+    
+    BKSampleLoader::loadMainPianoSamples(&mainPianoSynth, type);
+    
+    didLoadMainPianoSamples = true;
+    
+    if (!didLoadHammersAndRes)
+    {
+        didLoadHammersAndRes = true;
+        BKSampleLoader::loadHammerReleaseSamples(&hammerReleaseSynth);
+        BKSampleLoader::loadResonanceReleaseSamples(&resonanceReleaseSynth);
+    }
     
 }
 
@@ -87,6 +100,8 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
     buffer.clear();
+    
+    if (!didLoadMainPianoSamples) return;
     
     int time;
     MidiMessage m;

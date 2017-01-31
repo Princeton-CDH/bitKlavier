@@ -15,19 +15,24 @@
 
 String notes[4] = {"A","C","D#","F#"};
 
-void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth, int numLayers)
+void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadType type)
 {
     WavAudioFormat wavFormat;
     
     String path = "~/samples/";
     
-    // 88 or more seems to work well
-    for (int i = 0; i < 150; i++)
-    {
-        synth->addVoice(new BKPianoSamplerVoice(synth->generalSettings));
-    }
+    int numLayers = 0;
     
+    if      (type == BKLoadLite)    numLayers = 2;
+    else if (type == BKLoadMedium)  numLayers = 4;
+    else if (type == BKLoadHeavy)   numLayers = 8;
+    
+    synth->clearVoices();
     synth->clearSounds();
+    
+    // 88 or more seems to work well
+    for (int i = 0; i < 150; i++)   synth->addVoice(new BKPianoSamplerVoice(synth->generalSettings));
+    
     
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 4; j++) {
@@ -155,13 +160,11 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
     
     String path = "~/samples/";
     
-    for (int i = 0; i < 88; i++)
-    {
-        synth->addVoice(new BKPianoSamplerVoice(synth->generalSettings));
-    }
-    
+    synth->clearVoices();
     synth->clearSounds();
     
+    for (int i = 0; i < 88; i++)    synth->addVoice(new BKPianoSamplerVoice(synth->generalSettings));
+
     //load release resonance samples
     for (int i = 0; i < 7; i++) {       //i => octave
         for (int j = 0; j < 4; j++) {   //j => note name
@@ -258,12 +261,10 @@ void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
     
     String path = "~/samples/";
     
-    for (int i = 0; i < 88; i++)
-    {
-        synth->addVoice(new BKPianoSamplerVoice(synth->generalSettings));
-    }
-    
+    synth->clearVoices();
     synth->clearSounds();
+    
+    for (int i = 0; i < 88; i++)    synth->addVoice(new BKPianoSamplerVoice(synth->generalSettings));
     
     //load hammer release samples
     for (int i = 1; i <= 88; i++) {

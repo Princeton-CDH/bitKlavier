@@ -113,6 +113,8 @@
         <FILE id="Z11OMY" name="DirectViewController.h" compile="0" resource="0"
               file="Source/DirectViewController.h"/>
         <GROUP id="{27822276-6128-D767-C30D-119C8E335EE5}" name="Abstract">
+          <FILE id="P8ybUk" name="BKComponent.cpp" compile="1" resource="0" file="Source/BKComponent.cpp"/>
+          <FILE id="QaEXPb" name="BKComponent.h" compile="0" resource="0" file="Source/BKComponent.h"/>
           <FILE id="DblE68" name="BKViewController.cpp" compile="1" resource="0"
                 file="Source/BKViewController.cpp"/>
           <FILE id="Kze7uZ" name="BKViewController.h" compile="0" resource="0"
