@@ -98,6 +98,8 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
     
     SynchronicPreparation::Ptr prep = processor.sPreparation[currentSynchronicId];
     
+    SynchronicPreparation::Ptr active = processor.activeSPreparation[currentSynchronicId];
+    
     if (name == cSynchronicParameterTypes[SynchronicId])
     {
         currentSynchronicId = i;
@@ -105,75 +107,92 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
     }
     else if (name == cSynchronicParameterTypes[SynchronicTempo])
     {
-        prep->setTempo(f);
+        prep    ->setTempo(f);
+        active  ->setTempo(f);
     }
     else if (name == cSynchronicParameterTypes[SynchronicNumPulses])
     {
-        prep->setNumPulses(i);
+        prep    ->setNumPulses(i);
+        active  ->setNumPulses(i);
     }
     else if (name == cSynchronicParameterTypes[SynchronicClusterMin])
     {
-        prep->setClusterMin(i);
+        prep    ->setClusterMin(i);
+        active  ->setClusterMin(i);
     }
     else if (name == cSynchronicParameterTypes[SynchronicClusterMax])
     {
-        prep->setClusterMax(i);
+        prep    ->setClusterMax(i);
+        active  ->setClusterMax(i);
     }
     else if (name == cSynchronicParameterTypes[SynchronicClusterThresh])
     {
-        prep->setClusterThresh(f);
+        prep    ->setClusterThresh(f);
+        active  ->setClusterThresh(f);
     }
     else if (name == cSynchronicParameterTypes[SynchronicMode])
     {
-        prep->setMode((SynchronicSyncMode) i);
+        prep    ->setMode((SynchronicSyncMode) i);
+        active  ->setMode((SynchronicSyncMode) i);
     }
     else if (name == cSynchronicParameterTypes[SynchronicBeatsToSkip])
     {
-        prep->setBeatsToSkip(i);
+        prep    ->setBeatsToSkip(i);
+        active  ->setBeatsToSkip(i);
     }
     else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
     {
         Array<float> beatMults = stringToFloatArray(text);
-        prep->setBeatMultipliers(beatMults);
+        prep    ->setBeatMultipliers(beatMults);
+        active  ->setBeatMultipliers(beatMults);
     }
     else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
     {
         Array<float> lenMults = stringToFloatArray(text);
-        prep->setLengthMultipliers(lenMults);
+        prep    ->setLengthMultipliers(lenMults);
+        active  ->setLengthMultipliers(lenMults);
     }
     else if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
     {
         Array<float> accentMults = stringToFloatArray(text);
-        prep->setAccentMultipliers(accentMults);
+        prep    ->setAccentMultipliers(accentMults);
+        active  ->setAccentMultipliers(accentMults);
     }
     else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
     {
         Array<float> transpOffsets = stringToFloatArray(text);
-        prep->setTranspOffsets(transpOffsets);
+        prep    ->setTranspOffsets(transpOffsets);
+        active  ->setTranspOffsets(transpOffsets);
     }
     else if (name == cSynchronicParameterTypes[SynchronicTuning])
     {
-        prep->setTuning(processor.tPreparation[i]);
+        prep    ->setTuning(processor.tPreparation[i]);
+        active  ->setTuning(processor.tPreparation[i]);
     }
     else if (name == cSynchronicParameterTypes[AT1Mode])
     {
-        prep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode)i);
+        prep    ->setAdaptiveTempo1Mode((AdaptiveTempo1Mode)i);
+        active  ->setAdaptiveTempo1Mode((AdaptiveTempo1Mode)i);
     }
     else if (name == cSynchronicParameterTypes[AT1History])
     {
-        prep->setAdaptiveTempo1History(i);
+        prep    ->setAdaptiveTempo1History(i);
+        active  ->setAdaptiveTempo1History(i);
     }
     else if (name == cSynchronicParameterTypes[AT1Subdivisions])
     {
-        prep->setAdaptiveTempo1Subdivisions(f);
+        prep    ->setAdaptiveTempo1Subdivisions(f);
+        active  ->setAdaptiveTempo1Subdivisions(f);
     }
     else if (name == cSynchronicParameterTypes[AT1Min])
     {
-        prep->setAdaptiveTempo1Min(f);
+        prep    ->setAdaptiveTempo1Min(f);
+        active  ->setAdaptiveTempo1Min(f);
     }
     else if (name == cSynchronicParameterTypes[AT1Max])
     {
-        prep->setAdaptiveTempo1Max(f);
+        prep    ->setAdaptiveTempo1Max(f);
+        active  ->setAdaptiveTempo1Max(f);
     }
     else
     {
@@ -184,7 +203,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
 
 void SynchronicViewController::updateFields(int synchronicId)
 {
-    SynchronicPreparation::Ptr prep   = processor.sPreparation[synchronicId];
+    SynchronicPreparation::Ptr prep   = processor.activeSPreparation[synchronicId];
     
     // Set text.
     synchronicTF[SynchronicId]                  ->setText(  String(                 prep->getId()));

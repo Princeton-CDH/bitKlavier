@@ -53,6 +53,10 @@ public:
     DirectPreparation::CSPtrArr         dPreparation;
     TuningPreparation::CSPtrArr         tPreparation;
     
+    SynchronicPreparation::CSPtrArr     activeSPreparation;
+    NostalgicPreparation::CSPtrArr      activeNPreparation;
+    DirectPreparation::CSPtrArr         activeDPreparation;
+    
     // Keymaps.
     Keymap::PtrArr                      bkKeymaps;
     
@@ -74,6 +78,7 @@ public:
     
     
     //==============================================================================
+    void loadPianoSamples(BKSampleLoadType type);
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
@@ -111,6 +116,8 @@ public:
 
 private:
     int currentPianoId;
+    
+    bool didLoadHammersAndRes, didLoadMainPianoSamples;
     
     void loadMainPianoSamples(BKSynthesiser *synth, int numLayers);
     void loadResonanceRelaseSamples(BKSynthesiser *synth);

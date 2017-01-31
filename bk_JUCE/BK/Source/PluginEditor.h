@@ -25,6 +25,7 @@
 #include "KeymapViewController.h"
 
 #include "BKViewController.h"
+#include "BKComponent.h"
 
 //==============================================================================
 /**
@@ -58,8 +59,8 @@ private:
     BKAudioProcessor& processor;
     
     
-    
-    Component*                          pvc;
+    BKComponent*                          loadvc;
+    BKComponent*                          pvc;
     PreparationMapViewController::PtrArr pmvc;
     KeymapViewController                kvc;
     GeneralViewController               gvc;
@@ -77,6 +78,8 @@ private:
     
     TextButton                          addPMapButton;
     TextButton                          removePMapButton;
+    
+    OwnedArray<TextButton>              loadButtons;
     
     
     

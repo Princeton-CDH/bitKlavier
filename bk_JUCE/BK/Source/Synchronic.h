@@ -26,6 +26,31 @@ public:
     typedef OwnedArray<SynchronicPreparation>                  Arr;
     typedef OwnedArray<SynchronicPreparation, CriticalSection> CSArr;
     
+    // Copy Constructor
+    SynchronicPreparation(SynchronicPreparation::Ptr p):
+    Id(p->getId()),
+    sTempo(p->getTempo()),
+    sNumPulses(p->getNumPulses()),
+    sClusterMin(p->getClusterMin()),
+    sClusterMax(p->getClusterMax()),
+    sMode(p->getMode()),
+    sBeatsToSkip(p->getBeatsToSkip()),
+    sBeatMultipliers(p->getBeatMultipliers()),
+    sAccentMultipliers(p->getAccentMultipliers()),
+    sLengthMultipliers(p->getLengthMultipliers()),
+    sTranspOffsets(p->getTranspOffsets()),
+    sPulseThreshSec(60.0/sTempo),
+    sClusterThresh(p->getClusterThreshMS()),
+    sClusterThreshSec(sPulseThreshSec * sClusterThresh),
+    at1History(p->getAdaptiveTempo1History()),
+    at1Min(p->getAdaptiveTempo1Min()),
+    at1Max(p->getAdaptiveTempo1Max()),
+    at1Subdivisions(p->getAdaptiveTempo1Subdivisions()),
+    at1Mode(p->getAdaptiveTempo1Mode()),
+    tuning(p->getTuning())
+    {
+    }
+    
     SynchronicPreparation(int Id,
                           float tempo,
                           int numPulses,
@@ -208,6 +233,7 @@ public:
     
     SynchronicProcessor(BKSynthesiser *synth,
                         SynchronicPreparation::Ptr prep,
+                        SynchronicPreparation::Ptr active,
                         int Id);
     
     ~SynchronicProcessor();
@@ -230,7 +256,7 @@ public:
 private:
     int Id;
     BKSynthesiser*              synth;
-    SynchronicPreparation::Ptr  preparation;
+    SynchronicPreparation::Ptr  preparation, active;
     
     TuningProcessor             tuner;
 

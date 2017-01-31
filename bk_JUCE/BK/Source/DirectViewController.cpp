@@ -90,6 +90,7 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
     DBG(name + ": |" + text + "|");
     
     DirectPreparation::Ptr prep = processor.dPreparation[currentDirectId];
+    DirectPreparation::Ptr active = processor.activeDPreparation[currentDirectId];
     
     if (name == cDirectParameterTypes[DirectId])
     {
@@ -98,23 +99,28 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
     }
     else if (name == cDirectParameterTypes[DirectTransposition])
     {
-        prep->setTransposition(f);
+        prep    ->setTransposition(f);
+        active  ->setTransposition(f);
     }
     else if (name == cDirectParameterTypes[DirectGain])
     {
-        prep->setGain(f);
+        prep    ->setGain(f);
+        active  ->setGain(f);
     }
     else if (name == cDirectParameterTypes[DirectHammerGain])
     {
-        prep->setHammerGain(f);
+        prep    ->setHammerGain(f);
+        active  ->setHammerGain(f);
     }
     else if (name == cDirectParameterTypes[DirectResGain])
     {
-        prep->setResonanceGain(f);
+        prep    ->setResonanceGain(f);
+        active  ->setResonanceGain(f);
     }
     else if (name == cDirectParameterTypes[DirectTuning])
     {
-        prep->setTuning(processor.tPreparation[i]);
+        prep    ->setTuning(processor.tPreparation[i]);
+        active  ->setTuning(processor.tPreparation[i]);
     }
     else
     {
@@ -126,7 +132,7 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
 void DirectViewController::updateFields(int directId)
 {
     
-    DirectPreparation::Ptr prep = processor.dPreparation[directId];
+    DirectPreparation::Ptr prep = processor.activeDPreparation[directId];
     
     directTF[DirectId]                  ->setText( String( directId));
     directTF[DirectTransposition]       ->setText( String( prep->getTransposition()));

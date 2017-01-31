@@ -20,7 +20,8 @@
 BKAudioProcessorEditor::BKAudioProcessorEditor (BKAudioProcessor& p):
 AudioProcessorEditor (&p),
 processor (p),
-pvc(new PianoViewController (p)),
+loadvc(new BKComponent()),
+pvc(new BKComponent()),
 pmvc(PreparationMapViewController::PtrArr()),
 kvc(p),
 gvc(p),
@@ -64,6 +65,20 @@ tvc(p)
     
     pianoCB[PianoCBPiano]->setSelectedItemIndex(0);
     
+    // Load buttons
+    loadButtons.ensureStorageAllocated(cBKSampleLoadTypes.size());
+    
+    for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
+    {
+        loadButtons.set(i, new TextButton());
+        
+        loadButtons[i]->setName(cBKSampleLoadTypes[i]);
+        loadButtons[i]->changeWidthToFitText();
+        loadButtons[i]->setButtonText(cBKSampleLoadTypes[i]);
+        loadButtons[i]->addListener(this);
+        loadvc->addAndMakeVisible(loadButtons[i]);
+    }
+    
     // Make PianoViewController component within plugin editor class.
     addAndMakeVisible(pvc);
     addAndMakeVisible(gvc);
@@ -85,8 +100,8 @@ tvc(p)
     removePMapButton.addListener(this);
     addAndMakeVisible(removePMapButton);
     
-    addPMapButton.setBounds(upperLeft.getX(),
-                            upperLeft.getBottom() + gYSpacing,
+    addPMapButton.setBounds(pvc->getX(),
+                            pvc->getBottom() + gYSpacing,
                             50,
                             20);
     
@@ -104,6 +119,18 @@ void BKAudioProcessorEditor::buttonClicked (Button* b)
     else if (b->getName() == "Remove")
     {
         removeLastPreparationMap(processor.currentPiano->removeLastPreparationMap());
+    }
+    else if (b->getName() == "Load Lite")
+    {
+        processor.loadPianoSamples(BKLoadLite);
+    }
+    else if (b->getName() == "Load Medium")
+    {
+        processor.loadPianoSamples(BKLoadMedium);
+    }
+    else if (b->getName() == "Load Heavy")
+    {
+        processor.loadPianoSamples(BKLoadHeavy);
     }
 }
 
@@ -162,7 +189,7 @@ void BKAudioProcessorEditor::switchPianos(void)
                                 pmapH);
         } else {
             pmvc[i]->setBounds(gComponentLeftOffset,
-                                upperLeft.getBottom() + gYSpacing,
+                                pvc->getBottom() + gYSpacing,
                                 gVCWidth,
                                 pmapH);
         }
@@ -186,8 +213,8 @@ void BKAudioProcessorEditor::switchPianos(void)
     }
     else
     {
-        addPMapButton.setBounds(upperLeft.getX(),
-                                upperLeft.getBottom() + gYSpacing,
+        addPMapButton.setBounds(pvc->getX(),
+                                pvc->getBottom() + gYSpacing,
                                 50,
                                 20);
     }
@@ -214,8 +241,8 @@ void BKAudioProcessorEditor::removeLastPreparationMap(int Id)
     
     if (newLastId < 0)
     {
-        addPMapButton.setBounds(upperLeft.getX(),
-                                upperLeft.getBottom() + gYSpacing,
+        addPMapButton.setBounds(pvc->getX(),
+                                pvc->getBottom() + gYSpacing,
                                 50,
                                 20);
         
@@ -261,7 +288,7 @@ void BKAudioProcessorEditor::drawNewPreparationMap(int Id)
                             pmapH);
     } else {
         pmvc[Id]->setBounds(gComponentLeftOffset,
-                            upperLeft.getBottom() + gYSpacing,
+                            pvc->getBottom() + gYSpacing,
                             gVCWidth,
                             pmapH);
     }
@@ -298,6 +325,7 @@ void BKAudioProcessorEditor::paint (Graphics& g)
 
 void BKAudioProcessorEditor::resized()
 {
+    float loadvcH = (20 + gYSpacing) + 1.5 * gYSpacing;
     float pvcH = cPianoParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float kvcH = cKeymapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float gvcH = cGeneralParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
@@ -306,9 +334,32 @@ void BKAudioProcessorEditor::resized()
     float dvcH = cDirectParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float tvcH = cTuningParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
     
+    loadvc->setBounds(gComponentLeftOffset,
+                      gComponentTopOffset,
+                      gVCWidth,
+                      loadvcH);
+    
+    pvc->setBounds(gComponentLeftOffset,
+                   loadvc->getBottom()+gYSpacing,
+                   gVCWidth,
+                   pvcH);
+    
     // Col 1
-    // Labels
+    // Buttons
     int i = 0;
+    int bX = gVCWidth / 3.0 - gXSpacing;
+    int bY = 20;
+    
+    for (int n = 0; n < cBKSampleLoadTypes.size(); n++) {
+        loadButtons[n]->setBounds((bX + gXSpacing) * n + gXSpacing / 2.0,
+                                  gYSpacing,
+                                  bX,
+                                  bY);
+    }
+    
+    // CB labels
+  
+    i = 0;
     int lX = 0;
     int lY = gComponentLabelHeight + gYSpacing;
     
@@ -322,17 +373,14 @@ void BKAudioProcessorEditor::resized()
     
     for (int n = 0; n < cPianoParameterTypes.size(); n++)
         pianoCB[n]->setTopLeftPosition(tfX, gYSpacing + tfY * n);
+
     
-    pvc->setBounds(gComponentLeftOffset,
-                   gComponentTopOffset,
-                   gVCWidth,
-                   pvcH);
+    upperLeft = loadvc->getBounds();
     
-    upperLeft = pvc->getBounds();
-    
+    addAndMakeVisible(loadvc);
     addAndMakeVisible(pvc);
     
-    addPMapButton.setBounds(upperLeft.getX(), upperLeft.getBottom() + gYSpacing, 50, 20);
+    addPMapButton.setBounds(pvc->getX(), pvc->getBottom() + gYSpacing, 50, 20);
     
     // Col 2
     kvc.setBounds(upperLeft.getRight() + gXSpacing,

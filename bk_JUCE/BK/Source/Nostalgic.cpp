@@ -12,12 +12,14 @@
 
 NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s,
                                        NostalgicPreparation::Ptr prep,
+                                       NostalgicPreparation::Ptr activePrep,
                                        SynchronicProcessor::CSPtrArr& proc,
                                        int Id):
 Id(Id),
 synth(s),
 preparation(prep),
-tuner(preparation->getTuning()),
+active(activePrep),
+tuner(active->getTuning()),
 syncProcessor(proc)
 {
     noteLengthTimers.ensureStorageAllocated(128);
@@ -74,18 +76,18 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
 
     if (noteOn[midiNoteNumber])
     {
-        if (preparation->getMode() == NoteLengthSync)
+        if (active->getMode() == NoteLengthSync)
         {
             //get length of played notes, subtract wave distance to set nostalgic reverse note length
-            duration = noteLengthTimers.getUnchecked(midiNoteNumber) * preparation->getLengthMultiplier() * (1000.0 / sampleRate);
+            duration = noteLengthTimers.getUnchecked(midiNoteNumber) * active->getLengthMultiplier() * (1000.0 / sampleRate);
         }
         else //SynchronicSync
         {
             //get time in ms to target beat, summing over skipped beat lengths
-            duration = syncProcessor[preparation->getSyncTarget()]->getTimeToBeatMS(preparation->getBeatsToSkip()); // sum
+            duration = syncProcessor[active->getSyncTarget()]->getTimeToBeatMS(active->getBeatsToSkip()); // sum
         }
         
-        float offset = (preparation->getTransposition() + tuner.getOffset(midiNoteNumber));
+        float offset = (active->getTransposition() + tuner.getOffset(midiNoteNumber));
         int synthNoteNumber = midiNoteNumber + (int)offset;
         offset -= (int)offset;
         
@@ -95,12 +97,12 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
                      synthNoteNumber,
                      offset,
                      velocities.getUnchecked(midiNoteNumber),
-                     preparation->getGain() * aGlobalGain,
+                     active->getGain() * aGlobalGain,
                      Reverse,
                      FixedLengthFixedStart,
                      Nostalgic,
                      Id,
-                     duration + preparation->getWavedistance(),
+                     duration + active->getWavedistance(),
                      duration,                                      // length
                      3,
                      aRampUndertowCrossMS );                        //ramp off
@@ -120,7 +122,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
         
         //store values for when undertow note is played (in the event the preparation changes in the meantime)
         tuningsAtKeyOn.set(midiNoteNumber, tuner.getOffset(midiNoteNumber));
-        velocitiesAtKeyOn.set(midiNoteNumber, velocities.getUnchecked(midiNoteNumber) * preparation->getGain());
+        velocitiesAtKeyOn.set(midiNoteNumber, velocities.getUnchecked(midiNoteNumber) * active->getGain());
         preparationAtKeyOn.set(midiNoteNumber, preparation);
         
         //it might be better to do this by copy, instead of by pointer, in the off chance that the preparation disappears because of a library switch or something...
@@ -133,7 +135,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
 //start timer for length of a particular note; called when key is pressed
 void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity)
 {
-    tuner.setPreparation(preparation->getTuning());
+    tuner.setPreparation(active->getTuning());
     
     //if (keymap->containsNote(midiNoteNumber))
     {

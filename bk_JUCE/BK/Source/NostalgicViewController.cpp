@@ -95,6 +95,8 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
     
     NostalgicPreparation::Ptr prep = processor.nPreparation[currentNostalgicId];
     
+    NostalgicPreparation::Ptr active = processor.activeNPreparation[currentNostalgicId];
+    
     if (name == cNostalgicParameterTypes[NostalgicId])
     {
         currentNostalgicId = i;
@@ -102,39 +104,48 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
     }
     else if (name == cNostalgicParameterTypes[NostalgicWaveDistance])
     {
-        prep->setWaveDistance(i);
+        prep    ->setWaveDistance(i);
+        active  ->setWaveDistance(i);
     }
     else if (name == cNostalgicParameterTypes[NostalgicUndertow])
     {
-        prep->setUndertow(i);
+        prep    ->setUndertow(i);
+        active  ->setUndertow(i);
     }
     else if (name == cNostalgicParameterTypes[NostalgicTransposition])
     {
-        prep->setTransposition(f);
+        prep    ->setTransposition(f);
+        active  ->setTransposition(f);
     }
     else if (name == cNostalgicParameterTypes[NostalgicGain])
     {
-        prep->setGain(f);
+        prep    ->setGain(f);
+        active  ->setGain(f);
     }
     else if (name == cNostalgicParameterTypes[NostalgicLengthMultiplier])
     {
-        prep->setLengthMultiplier(f);
+        prep    ->setLengthMultiplier(f);
+        active  ->setLengthMultiplier(f);
     }
     else if (name == cNostalgicParameterTypes[NostalgicBeatsToSkip])
     {
-        prep->setBeatsToSkip(i);
+        prep    ->setBeatsToSkip(i);
+        active  ->setBeatsToSkip(i);
     }
     else if (name == cNostalgicParameterTypes[NostalgicMode])
     {
-        prep->setMode((NostalgicSyncMode) i);
+        prep    ->setMode((NostalgicSyncMode) i);
+        active  ->setMode((NostalgicSyncMode) i);
     }
     else if (name == cNostalgicParameterTypes[NostalgicSyncTarget])
     {
-        prep->setSyncTarget(i);
+        prep    ->setSyncTarget(i);
+        active  ->setSyncTarget(i);
     }
     else if (name == cNostalgicParameterTypes[NostalgicTuning])
     {
-        prep->setTuning(processor.tPreparation[i]);
+        prep    ->setTuning(processor.tPreparation[i]);
+        active  ->setTuning(processor.tPreparation[i]);
     }
     else
     {
@@ -146,7 +157,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
 void NostalgicViewController::updateFields(int nostalgicId)
 {
     
-    NostalgicPreparation::Ptr prep = processor.nPreparation[nostalgicId];
+    NostalgicPreparation::Ptr prep = processor.activeNPreparation[nostalgicId];
 
     nostalgicTF[NostalgicId]                ->setText( String( nostalgicId));
     nostalgicTF[NostalgicWaveDistance]      ->setText( String( prep->getWavedistance()));

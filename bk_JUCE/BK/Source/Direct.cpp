@@ -14,13 +14,15 @@ DirectProcessor::DirectProcessor(BKSynthesiser *s,
                                  BKSynthesiser *res,
                                  BKSynthesiser *ham,
                                  DirectPreparation::Ptr prep,
+                                 DirectPreparation::Ptr activePrep,
                                  int Id):
 Id(Id),
 synth(s),
 resonanceSynth(res),
 hammerSynth(ham),
 preparation(prep),
-tuner(preparation->getTuning())
+active(activePrep),
+tuner(active->getTuning())
 {
     
 }
@@ -38,11 +40,11 @@ void DirectProcessor::setCurrentPlaybackSampleRate(double sr)
 
 void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 {
-    tuner.setPreparation(preparation->getTuning());
+    tuner.setPreparation(active->getTuning());
     
     tuner.keyOn(noteNumber);
     
-    float offset = (preparation->getTransposition() + tuner.getOffset(noteNumber));
+    float offset = (active->getTransposition() + tuner.getOffset(noteNumber));
     int synthNoteNumber = noteNumber + (int)offset;
     offset -= (int)offset;
     
@@ -50,7 +52,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                  synthNoteNumber,
                  offset,
                  velocity,
-                 preparation->getGain() * aGlobalGain,
+                 active->getGain() * aGlobalGain,
                  Forward,
                  Normal,
                  Main,
@@ -64,7 +66,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 
 void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
 {
-    float offset = (preparation->getTransposition() + tuner.getOffset(noteNumber));
+    float offset = (active->getTransposition() + tuner.getOffset(noteNumber));
     noteNumber += (int)offset;
     
     synth->keyOff(channel,
@@ -74,8 +76,8 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
                   velocity,
                   true);
     
-    float hGain = preparation->getHammerGain();
-    float rGain = preparation->getResonanceGain();
+    float hGain = active->getHammerGain();
+    float rGain = active->getResonanceGain();
     
     if (hGain > 0.0f)
     {
