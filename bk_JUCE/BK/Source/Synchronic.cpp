@@ -153,7 +153,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     if(cluster.size() > preparation->getClusterCap()) cluster.resize(preparation->getClusterCap());
     
     //why not use clusterMax for this? the intent is different:
-    //clusterMax: max number of notes played otherwise shut of pulses
+    //clusterMax: max number of notes played otherwise shut off pulses
     //clusterCap: the most number of notes allowed in a cluster when playing pulses
     //so, let's say we are playing a rapid passage where successive notes are within the clusterThresh
     //and we want the pulse to emerge when we stop; clusterMax wouldn't allow this to happen
