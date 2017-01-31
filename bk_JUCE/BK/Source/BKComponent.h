@@ -12,10 +12,18 @@
 #define BKCOMPONENT_H_INCLUDED
 
 #include "BKUtilities.h"
-#include "BKView.h"
+
+#include "BKTextField.h"
+
+#include "BKLabel.h"
+
+#include "BKMenu.h"
+
+#include "BKLookAndFeel.h"
+
 //==============================================================================
 
-class BKComponent    : public BKView
+class BKComponent    : public Component
 {
 public:
 

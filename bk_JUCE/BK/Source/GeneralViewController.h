@@ -17,16 +17,13 @@
 
 #include "General.h"
 
-#include "BKViewController.h"
-
-#include "BKTextField.h"
-
-#include "BKLabel.h"
+#include "BKListener.h"
+#include "BKComponent.h"
 
 //==============================================================================
 /*
 */
-class GeneralViewController    : public BKViewController
+class GeneralViewController    : public BKComponent, public BKListener
 {
 public:
     GeneralViewController(BKAudioProcessor&);

@@ -15,16 +15,13 @@
 
 #include "PluginProcessor.h"
 
-#include "BKViewController.h"
-
-#include "BKTextField.h"
-
-#include "BKLabel.h"
+#include "BKListener.h"
+#include "BKComponent.h"
 
 //==============================================================================
 /*
 */
-class SynchronicViewController    : public BKViewController
+class SynchronicViewController    : public BKComponent, public BKListener
 {
 public:
     SynchronicViewController(BKAudioProcessor&);

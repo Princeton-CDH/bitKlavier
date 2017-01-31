@@ -25,6 +25,9 @@ resonanceSynth(res),
 hammerSynth(ham),
 initialKeymap(keymap)
 {
+    pianoMap.ensureStorageAllocated(128);
+    for (int i = 0; i < 128; i++)   pianoMap.set(i, 0);
+    
     prepMaps.ensureStorageAllocated(12);
 }
 

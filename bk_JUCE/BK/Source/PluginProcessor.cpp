@@ -10,19 +10,13 @@ BKAudioProcessor::BKAudioProcessor():
 general                 (new GeneralSettings()),
 mainPianoSynth          (general),
 hammerReleaseSynth      (general),
-resonanceReleaseSynth   (general),
-sPreparation            (SynchronicPreparation::CSPtrArr()),
-nPreparation            (NostalgicPreparation::CSPtrArr()),
-dPreparation            (DirectPreparation::CSPtrArr()),
-tPreparation            (TuningPreparation::CSPtrArr()),
-bkKeymaps               (Keymap::PtrArr()),
-currentPiano            (Piano::Ptr()),
-prevPianos              (Piano::PtrArr()),
-bkPianos                (Piano::PtrArr()),
-noteOn                  (Array<int>())
+resonanceReleaseSynth   (general)
 {
-    didLoadHammersAndRes = false;
-    //allocate storage
+    didLoadHammersAndRes    = false;
+    didLoadMainPianoSamples = false;
+    pianoDidChange          = false;
+    
+    
     bkKeymaps.ensureStorageAllocated(aMaxNumPreparationKeymaps);
     bkPianos.ensureStorageAllocated(aMaxNumPianos);
     prevPianos.ensureStorageAllocated(aMaxNumPianos);
@@ -126,6 +120,10 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             
             if (allNotesOff)   allNotesOff = false;
             
+            // Check PianoMap for whether piano should change due to key strike.
+            int whichPiano = currentPiano->pianoMap[noteNumber] - 1;
+            if (whichPiano >= 0 && whichPiano != currentPiano->getId()) setCurrentPiano(whichPiano);
+            
             // Send key on to each pmap in current piano
             for (p = currentPiano->activePMaps.size(); --p >= 0;)
                 currentPiano->activePMaps[p]->keyPressed(noteNumber, velocity, channel);
@@ -146,6 +144,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             
             --noteOnCount;
             
+            // Sets some flags to determine whether to send noteoffs to previous pianos.
             if (!allNotesOff && !noteOnCount) {
                 prevPianos.clearQuick();
                 allNotesOff = true;
@@ -158,8 +157,9 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         {
             
         }
-
     }
+    
+    
 
     mainPianoSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
@@ -176,8 +176,10 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     prevPiano = currentPiano;
     
     currentPiano = bkPianos[which];
-
-    //currentPiano->activePMaps.addIfNotAlreadyThere(currentPiano->prepMaps[0]);
+    
+    DBG("Current piano: " + String(which));
+    
+    pianoDidChange = true;
 }
 
 void BKAudioProcessor::releaseResources() {

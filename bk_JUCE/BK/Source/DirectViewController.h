@@ -15,18 +15,15 @@
 
 #include "PluginProcessor.h"
 
-#include "BKViewController.h"
-
-#include "BKTextField.h"
-
-#include "BKLabel.h"
+#include "BKListener.h"
+#include "BKComponent.h"
 
 #include "Direct.h"
 
 //==============================================================================
 /*
 */
-class DirectViewController    : public BKViewController
+class DirectViewController    : public BKComponent, public BKListener
 {
 public:
     DirectViewController(BKAudioProcessor&);
