@@ -111,6 +111,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     
     //silence pulses if in NoteOffSync
     if(active->getMode() == LastNoteOffSync) shouldPlay = false;
+    else shouldPlay = true;
     
     //cluster management
     if(!inCluster) //we have a new cluster
@@ -126,7 +127,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
         resetPhase(active->getBeatsToSkip());
         
         //start pulses, unless waiting in noteOff mode
-        if(active->getMode() != LastNoteOffSync) shouldPlay = true;
+        //if(active->getMode() != LastNoteOffSync) shouldPlay = true;
         
         //now we are in a cluster!
         inCluster = true;
@@ -150,6 +151,8 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     
     cluster.insert(0, noteNumber);
     if(cluster.size() > active->getClusterCap()) cluster.resize(active->getClusterCap());
+    
+    DBG("cluster size: " + String(cluster.size()) + " " + String(clusterThresholdSamples/sampleRate));
     
     //why not use clusterMax for this? the intent is different:
     //clusterMax: max number of notes played otherwise shut off pulses
@@ -215,7 +218,6 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
         //remove duplicates from cluster, so we don't play the same note twice in a single pulse
         slimCluster.clearQuick();
         for(int i = 0; i< cluster.size(); i++) slimCluster.addIfNotAlreadyThere(cluster.getUnchecked(i));
-        int clusterSize = slimCluster.size();
         
         numSamplesBeat = (active->getBeatMultipliers()[beat] * pulseThresholdSamples);
         
@@ -229,9 +231,9 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 " accent counter: " + String(accent)
                 );
             
-            if (clusterSize >= active->getClusterMin() && clusterSize <= active->getClusterMax())
+            if (cluster.size() >= active->getClusterMin() && cluster.size() <= active->getClusterMax())
             {
-                for (int n = 0; n < clusterSize; n++)
+                for (int n = 0; n < slimCluster.size(); n++)
                 {
                     playNote(channel,
                              cluster[n],
@@ -244,12 +246,8 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             if (++length    >= active->getLengthMultipliers().size())     length = 0;
             if (++accent    >= active->getAccentMultipliers().size())     accent = 0;
             if (++transp    >= active->getTranspOffsets().size())         transp = 0;
-            
-            if (++pulse     >= active->getNumPulses())
-            {
-                cluster.clearQuick();
-                shouldPlay = false;
-            }
+            if (++pulse     >= active->getNumPulses())                shouldPlay = false;
+
         }
         
         phasor += numSamples;

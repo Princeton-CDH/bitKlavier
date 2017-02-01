@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="R4yQHh" name="BK" projectType="audioplug" version="0.0.1"
               bundleIdentifier="com.BK.BK0" includeBinaryInAppConfig="1" buildVST="1"
-              buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0" buildAAX="0"
+              buildVST3="1" buildAU="1" buildAUv3="1" buildRTAS="0" buildAAX="0"
               pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
               pluginManufacturer="manyarrowsmusic" pluginManufacturerCode="Manu"
               pluginCode="R4yq" pluginChannelConfigs="{1,1},{2,2}" pluginIsSynth="1"
