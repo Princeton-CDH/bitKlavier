@@ -128,7 +128,6 @@
       <GROUP id="{E98AFB64-DE96-83A1-81DC-1FA2D8D37DB8}" name="View">
         <FILE id="iHLTYB" name="BKMenu.h" compile="0" resource="0" file="Source/BKMenu.h"/>
         <FILE id="kHSUpx" name="BKLookAndFeel.h" compile="0" resource="0" file="Source/BKLookAndFeel.h"/>
-        <FILE id="k5jeGC" name="BKView.h" compile="0" resource="0" file="Source/BKView.h"/>
         <FILE id="p6ebdl" name="BKLabel.h" compile="0" resource="0" file="Source/BKLabel.h"/>
         <FILE id="Yc4pLT" name="BKTextField.h" compile="0" resource="0" file="Source/BKTextField.h"/>
       </GROUP>
