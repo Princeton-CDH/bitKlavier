@@ -29,7 +29,6 @@ tuner(active->getTuning())
     clusterTimer = 0;
     phasor = 0;
     
-    inPulses = false;
     inCluster = false;
     
     cluster = Array<int>();

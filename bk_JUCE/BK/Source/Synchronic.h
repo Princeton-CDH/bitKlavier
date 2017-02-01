@@ -273,7 +273,7 @@ private:
     
     uint64 tempoPeriodSamples;
     
-    bool inPulses, inCluster, inPrePulses;
+    bool inCluster;
     
     double sampleRate;
     
