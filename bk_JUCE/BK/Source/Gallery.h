@@ -31,6 +31,10 @@ public:
     Gallery(Piano::PtrArr pianos);
     ~Gallery();
     
+    inline GeneralSettings::Ptr                getGeneralSettings(void)            {   return general;         }
+    
+    inline void setGeneralSettings(GeneralSettings::Ptr g)                          {   general = g;            }
+
     /*
     inline void setPianos(Piano::PtrArr p)           {   pianos = p;      }
     
@@ -45,7 +49,7 @@ public:
 private:
     
     Piano::PtrArr pianos;
-    
+    GeneralSettings::Ptr general;
     ValueTree vt;
     
     JUCE_LEAK_DETECTOR(Gallery);

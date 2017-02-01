@@ -15,17 +15,15 @@
 
 #include "PluginProcessor.h"
 
-#include "BKViewController.h"
+#include "BKListener.h"
+#include "BKComponent.h"
 
-#include "BKTextField.h"
-
-#include "BKLabel.h"
 
 
 //==============================================================================
 /*
 */
-class NostalgicViewController    : public BKViewController
+class NostalgicViewController    : public BKComponent, public BKListener
 {
 public:
     NostalgicViewController(BKAudioProcessor&);

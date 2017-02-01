@@ -24,17 +24,13 @@
 #include "PreparationMapViewController.h"
 #include "KeymapViewController.h"
 
-#include "BKViewController.h"
 #include "BKComponent.h"
+#include "BKListener.h"
 
 //==============================================================================
 /**
 */
-class BKAudioProcessorEditor :  public AudioProcessorEditor,
-                                private TextEditor::Listener,
-                                private TextButton::Listener,
-                                private ComboBox::Listener
-
+class BKAudioProcessorEditor :  public AudioProcessorEditor, public BKListener, private Timer
 {
     
 public:
@@ -56,30 +52,39 @@ private:
     float pmapH;
     Rectangle<int> upperLeft;
     
+    void timerCallback() override;
+    
     BKAudioProcessor& processor;
     
     
     BKComponent*                          loadvc;
     BKComponent*                          pvc;
-    PreparationMapViewController::PtrArr pmvc;
-    KeymapViewController                kvc;
-    GeneralViewController               gvc;
-    SynchronicViewController            svc;
-    NostalgicViewController             nvc;
-    DirectViewController                dvc;
-    TuningViewController                tvc;
+    PreparationMapViewController::PtrArr  pmvc;
+    KeymapViewController                  kvc;
+    GeneralViewController                 gvc;
+    SynchronicViewController              svc;
+    NostalgicViewController               nvc;
+    DirectViewController                  dvc;
+    TuningViewController                  tvc;
 
-    void buttonClicked (Button* b) override;
+    void bkTextFieldDidChange       (TextEditor&)           override;
+    void bkMessageReceived          (const String& message) override{};
+    void bkComboBoxDidChange        (ComboBox* box)         override;
+    void bkButtonClicked            (Button* b)             override;
     
-    void comboBoxChanged            (ComboBox* comboBoxThatHasChanged) override;
     
-    OwnedArray<BKLabel>                 pianoL;
-    OwnedArray<BKComboBox>              pianoCB;
+    String                              processPianoMapString(const String& message);
     
     TextButton                          addPMapButton;
     TextButton                          removePMapButton;
     
     OwnedArray<TextButton>              loadButtons;
+    
+    BKLabel                             pianoL;
+    BKComboBox                          pianoCB;
+
+    BKLabel                             pianoMapL;
+    BKTextField                         pianoMapTF;
     
     
     

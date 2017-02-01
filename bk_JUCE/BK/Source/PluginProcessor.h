@@ -65,6 +65,8 @@ public:
     Piano::PtrArr                       prevPianos;
     Piano::PtrArr                       bkPianos;
     
+    bool                                pianoDidChange;
+    
     Array<int>                          noteOn;
     
     int                                 noteOnCount;
@@ -115,7 +117,7 @@ public:
     
 
 private:
-    int currentPianoId;
+    int  currentPianoId;
     
     bool didLoadHammersAndRes, didLoadMainPianoSamples;
     

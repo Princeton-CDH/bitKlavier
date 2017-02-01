@@ -15,16 +15,13 @@
 
 #include "PluginProcessor.h"
 
-#include "BKViewController.h"
-
-#include "BKTextField.h"
-
-#include "BKLabel.h"
+#include "BKListener.h"
+#include "BKComponent.h"
 
 //==============================================================================
 /*
 */
-class TuningViewController    : public BKViewController
+class TuningViewController    : public BKComponent, public BKListener
 {
 public:
     TuningViewController(BKAudioProcessor&);

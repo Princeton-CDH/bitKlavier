@@ -40,11 +40,7 @@ public:
     void storeCurrentPiano();
     
     void recallCurrentPiano();
-    
-    inline GeneralSettings::Ptr                getGeneralSettings(void)            {   return general;         }
-    
-    inline void setGeneralSettings(GeneralSettings::Ptr g)                          {   general = g;            }
-    
+
 
     ValueTree*  getPianoValueTree(void);
     
@@ -59,19 +55,21 @@ public:
     PreparationMap::CSPtrArr    activePMaps;
     PreparationMap::CSPtrArr    prepMaps;
     
-    int numPMaps;
+    Array<int>                  pianoMap;
+    int                         numPMaps;
     
-    void prepareToPlay(double sampleRate);
+    void                        prepareToPlay(double sampleRate);
     
-    int addPreparationMap(void);
-    int removeLastPreparationMap(void);
+    int                         addPreparationMap(void);
+    int                         removeLastPreparationMap(void);
     
 private:
     int Id;
     
     double sampleRate;
 
-    GeneralSettings::Ptr general;
+    
+    
     
     // Pointers to synths (flown in from BKAudioProcessor)
     BKSynthesiser*                  synth;

@@ -341,6 +341,7 @@ typedef enum BKSampleLoadType
     BKLoadMedium,
     BKLoadHeavy,
     BKLoadNil
+    
 }BKSampleLoadType;
 
 static const std::vector<std::string> cBKSampleLoadTypes = {

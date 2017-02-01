@@ -15,16 +15,13 @@
 
 #include "PluginProcessor.h"
 
-#include "BKViewController.h"
-
-#include "BKLabel.h"
-
-#include "BKTextField.h"
+#include "BKListener.h"
+#include "BKComponent.h"
 
 //==============================================================================
 /*
 */
-class KeymapViewController    : public BKViewController
+class KeymapViewController    : public BKComponent, public BKListener
 {
 public:
     KeymapViewController(BKAudioProcessor&);

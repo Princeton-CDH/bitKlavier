@@ -1,41 +1,27 @@
 /*
   ==============================================================================
 
-    BKViewController.h
-    Created: 20 Nov 2016 11:06:14am
+    BKListener.h
+    Created: 31 Jan 2017 3:46:11pm
     Author:  Michael R Mulshine
 
   ==============================================================================
 */
 
-#ifndef BKVIEWCONTROLLER_H_INCLUDED
-#define BKVIEWCONTROLLER_H_INCLUDED
+#ifndef BKLISTENER_H_INCLUDED
+#define BKLISTENER_H_INCLUDED
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "BKUtilities.h"
 
-#include "PluginProcessor.h"
-
-#include "BKView.h"
-
-//==============================================================================
-/*
-*/
-class BKViewController    : public BKView,
-                            public TextEditor::Listener,
-                            public ComboBox::Listener,
-                            public ActionListener,
-                            public ActionBroadcaster,
-                            public TextButton::Listener
+class BKListener    :  public TextEditor::Listener,
+public ComboBox::Listener,
+public ActionListener,
+public ActionBroadcaster,
+public TextButton::Listener
 {
 public:
-    
-    
-  
-    BKViewController();
-    ~BKViewController();
-    
-    void paint (Graphics&) override;
-    void resized() override;
+    BKListener();
+    ~BKListener();
     
 private:
     // TextEditor input parsing
@@ -57,12 +43,8 @@ private:
     
     bool shouldChange;
     
-    
-    
-    
-    
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKViewController)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKListener)
 };
 
-
-#endif  // BKCONTROLLER_H_INCLUDED
+    
+#endif  // BKLISTENER_H_INCLUDED

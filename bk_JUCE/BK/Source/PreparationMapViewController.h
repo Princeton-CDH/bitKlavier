@@ -15,13 +15,8 @@
 
 #include "PluginProcessor.h"
 
-#include "BKViewController.h"
-
-#include "BKLabel.h"
-
-#include "BKTextField.h"
-
-#include "BKMenu.h"
+#include "BKListener.h"
+#include "BKComponent.h"
 
 #include "PreparationMap.h"
 
@@ -29,7 +24,7 @@
 //==============================================================================
 /*
 */
-class PreparationMapViewController    : public BKViewController, public ReferenceCountedObject
+class PreparationMapViewController    : public BKComponent, public BKListener, public ReferenceCountedObject
 
 {
 public:

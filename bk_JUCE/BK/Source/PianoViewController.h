@@ -16,19 +16,14 @@
 
 #include "PluginProcessor.h"
 
-#include "BKViewController.h"
-
-#include "BKLabel.h"
-
-#include "BKTextField.h"
-
-#include "BKMenu.h"
+#include "BKListener.h"
+#include "BKComponent.h"
 
 //==============================================================================
 /*
  */
 
-class PianoViewController       : public BKViewController
+class PianoViewController       : public BKComponent, public BKListener
 {
 public:
     PianoViewController(BKAudioProcessor&);
