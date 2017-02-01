@@ -92,10 +92,10 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
 void SynchronicProcessor::resetPhase(int skipBeats)
 {
     
-    beat    = skipBeats % preparation->getBeatMultipliers().size();
-    length  = skipBeats % preparation->getLengthMultipliers().size();
-    accent  = skipBeats % preparation->getAccentMultipliers().size();
-    transp  = skipBeats % preparation->getTranspOffsets().size();
+    beat    = skipBeats % active->getBeatMultipliers().size();
+    length  = skipBeats % active->getLengthMultipliers().size();
+    accent  = skipBeats % active->getAccentMultipliers().size();
+    transp  = skipBeats % active->getTranspOffsets().size();
     
     pulse   = 0;
 
@@ -114,7 +114,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     keysDepressed.addIfNotAlreadyThere(noteNumber);
     
     //silence pulses if in NoteOffSync
-    if(preparation->getMode() == LastNoteOffSync) shouldPlay = false;
+    if(active->getMode() == LastNoteOffSync) shouldPlay = false;
     
     //cluster management
     if(!inCluster) //we have a new cluster
@@ -130,18 +130,18 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
         resetPhase(active->getBeatsToSkip());
         
         //start pulses, unless waiting in noteOff mode
-        if(preparation->getMode() != LastNoteOffSync) shouldPlay = true;
+        if(active->getMode() != LastNoteOffSync) shouldPlay = true;
         
         //now we are in a cluster!
         inCluster = true;
         
     }
-    else if (preparation->getMode() == LastNoteOnSync)
+    else if (active->getMode() == LastNoteOnSync)
     {
         
         //reset phasor if in LastNoteOnSync
         phasor = 0;
-        resetPhase(preparation->getBeatsToSkip());
+        resetPhase(active->getBeatsToSkip());
 
     }
     
@@ -153,7 +153,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     //later, we remove dupes so we don't inadvertently play the same note twice in a pulse
     
     cluster.insert(0, noteNumber);
-    if(cluster.size() > preparation->getClusterCap()) cluster.resize(preparation->getClusterCap());
+    if(cluster.size() > active->getClusterCap()) cluster.resize(active->getClusterCap());
     
     //why not use clusterMax for this? the intent is different:
     //clusterMax: max number of notes played otherwise shut off pulses
@@ -183,7 +183,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, int channel)
     if (active->getMode() == LastNoteOffSync && keysDepressed.size() == 0)
     {
         phasor = pulseThresholdSamples; //start right away
-        resetPhase(preparation->getBeatsToSkip());
+        resetPhase(active->getBeatsToSkip());
 
         shouldPlay = true;
 
@@ -245,12 +245,12 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 
             }
             
-            if (++beat      >= preparation->getBeatMultipliers().size())         beat = 0;
-            if (++length    >= preparation->getLengthMultipliers().size())     length = 0;
-            if (++accent    >= preparation->getAccentMultipliers().size())     accent = 0;
-            if (++transp    >= preparation->getTranspOffsets().size())         transp = 0;
+            if (++beat      >= active->getBeatMultipliers().size())         beat = 0;
+            if (++length    >= active->getLengthMultipliers().size())     length = 0;
+            if (++accent    >= active->getAccentMultipliers().size())     accent = 0;
+            if (++transp    >= active->getTranspOffsets().size())         transp = 0;
             
-            if (++pulse     >= preparation->getNumPulses())
+            if (++pulse     >= active->getNumPulses())
             {
                 cluster.clearQuick();
                 toAdd.clearQuick();
