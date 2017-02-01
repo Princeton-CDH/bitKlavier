@@ -151,8 +151,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     
     cluster.insert(0, noteNumber);
     if(cluster.size() > active->getClusterCap()) cluster.resize(active->getClusterCap());
-    
-    DBG("cluster size: " + String(cluster.size()) + " " + String(clusterThresholdSamples/sampleRate));
+    //DBG("cluster size: " + String(cluster.size()) + " " + String(clusterThresholdSamples/sampleRate));
     
     //why not use clusterMax for this? the intent is different:
     //clusterMax: max number of notes played otherwise shut off pulses
@@ -226,9 +225,16 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             
             phasor -= numSamplesBeat;
             
-            DBG("shouldPlay: "      + String((int)shouldPlay) +
+            if (++length    >= active->getLengthMultipliers().size())     length = 0;
+            if (++accent    >= active->getAccentMultipliers().size())     accent = 0;
+            if (++transp    >= active->getTranspOffsets().size())         transp = 0;
+            
+            DBG(" length: "         + String(active->getLengthMultipliers()[length]) +
+                " length counter:"  + String(length) +
                 " accent: "         + String(active->getAccentMultipliers()[accent]) +
-                " accent counter: " + String(accent)
+                " accent counter: " + String(accent) +
+                " transp: "         + String(active->getTranspOffsets()[transp]) +
+                " transp counter: " + String(transp)
                 );
             
             if (cluster.size() >= active->getClusterMin() && cluster.size() <= active->getClusterMax())
@@ -243,10 +249,12 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             }
             
             if (++beat      >= active->getBeatMultipliers().size())         beat = 0;
-            if (++length    >= active->getLengthMultipliers().size())     length = 0;
-            if (++accent    >= active->getAccentMultipliers().size())     accent = 0;
-            if (++transp    >= active->getTranspOffsets().size())         transp = 0;
             if (++pulse     >= active->getNumPulses())                shouldPlay = false;
+            
+            DBG(" beat length: "    + String(active->getBeatMultipliers()[beat]) +
+                " beat counter: "   + String(beat)
+                );
+            DBG(" ");
 
         }
         
