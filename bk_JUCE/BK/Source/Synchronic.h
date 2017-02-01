@@ -194,7 +194,7 @@ private:
     int sClusterCap = 8; //max in cluster; 8 in original bK
     
     SynchronicSyncMode sMode;
-    int sBeatsToSkip; // float?
+    int sBeatsToSkip;
     
     Array<float> sBeatMultipliers;
     Array<float> sAccentMultipliers;
@@ -251,39 +251,43 @@ public:
     
 private:
     int Id;
-    BKSynthesiser*              synth;
-    SynchronicPreparation::Ptr  preparation, active;
+    BKSynthesiser* synth;
+    SynchronicPreparation::Ptr preparation, active;
     
     double sampleRate;
     
-    TuningProcessor             tuner;
+    TuningProcessor tuner;
     Array<float> tuningOffsets;
     PitchClass tuningBasePitch;
 
-    int pulse;
-    int beat;
-    int accent;
-    int length;
-    int transp;
+    int pulse;  //pulse counter
+    
+    //parameter fields
+    int beat;   //beat length multipliers
+    int accent; //accent multipliers
+    int length; //note length multipliers (multiples of 50ms, at least for now)
+    int transp; //transposition offsets
+    
+    //reset the phase, including of all the parameter fields
     void resetPhase(int skipBeats);
     
     void playNote(int channel, int note, float velocity);
-    Array<float> velocities;
+    Array<float> velocities;    //record of velocities
     Array<int> keysDepressed;   //current keys that are depressed
     
     bool inCluster;
     uint64 clusterThresholdSamples;
     uint64 clusterThresholdTimer;
-    
     uint64 clusterTimer;
+    Array<int> cluster;         //cluster of notes played, with repetitions, limited to totalClusters (8?)
+    Array<int> slimCluster;     //cluster without repetitions
+    
     uint64 phasor;
     uint64 numSamplesBeat;
     uint64 pulseThresholdSamples;
 
     bool shouldPlay;
-    
-    Array<int> cluster;         //cluster of notes played, with repetitions, limited to totalClusters (8?)
-    Array<int> slimCluster;     //cluster without repetitions
+
     
     JUCE_LEAK_DETECTOR(SynchronicProcessor);
 };
