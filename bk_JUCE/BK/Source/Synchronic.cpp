@@ -32,8 +32,6 @@ tuner(active->getTuning())
     inPulses = false;
     inCluster = false;
     
-    firstNoteTimer = 0;
-    
     cluster = Array<int>();
     keysDepressed = Array<int>();
     
@@ -209,7 +207,6 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
         else
         {
             clusterThresholdTimer += numSamples;
-            firstNoteTimer += numSamples;
         }
     }
     

@@ -283,14 +283,10 @@ private:
     uint64 pulseThresholdSamples;
     uint64 pulseThresholdTimer;
     
-    uint64 firstNoteTimer, lastNoteTimer;
-    uint64 tempoPeriodTimer;
-    
     Array<float> tuningOffsets;
     PitchClass tuningBasePitch;
     
     uint64 clusterTimer;
-    uint64 pulseTimer;
     uint64 phasor;
     uint64 numSamplesBeat;
 
