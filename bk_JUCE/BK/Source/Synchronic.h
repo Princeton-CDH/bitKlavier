@@ -78,7 +78,6 @@ public:
     sTranspOffsets(transpOffsets),
     sPulseThreshSec(60.0/sTempo),
     sClusterThresh(clusterThresh),
-    //sClusterThreshSec(sPulseThreshSec * sClusterThresh),
     sClusterThreshSec(.001 * sClusterThresh),
     tuning(t)
     {
@@ -100,7 +99,6 @@ public:
     sTranspOffsets(Array<float>({0.0})),
     sPulseThreshSec(60.0/sTempo),
     sClusterThresh(500),
-    //sClusterThreshSec(sPulseThreshSec * sClusterThresh),
     sClusterThreshSec(.001 * sClusterThresh),
     at1History(1),
     at1Min(100),
@@ -138,18 +136,13 @@ public:
     inline void setTempo(float tempo)
     {
         sTempo = tempo;
-        
         float tempoPeriodS = (60.0/sTempo);
-        
-        //sClusterThreshSec = tempoPeriodS * sClusterThresh;
-        
         sPulseThreshSec = tempoPeriodS;
     }
     
     inline void setClusterThresh(float clusterThresh)
     {
         sClusterThresh = clusterThresh;
-        //sClusterThreshSec = (60.0/sTempo) * clusterThresh;
         sClusterThreshSec = sClusterThresh * .001;
     }
     
@@ -199,8 +192,10 @@ private:
     float sTempo;
     int sNumPulses,sClusterMin,sClusterMax;
     int sClusterCap = 8; //max in cluster; 8 in original bK
+    
     SynchronicSyncMode sMode;
     int sBeatsToSkip; // float?
+    
     Array<float> sBeatMultipliers;
     Array<float> sAccentMultipliers;
     Array<float> sLengthMultipliers;
@@ -228,8 +223,8 @@ public:
     typedef ReferenceCountedObjectPtr<SynchronicProcessor>   Ptr;
     typedef Array<SynchronicProcessor::Ptr>                  PtrArr;
     typedef Array<SynchronicProcessor::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<SynchronicProcessor>                       Arr;
-    typedef OwnedArray<SynchronicProcessor,CriticalSection>       CSArr;
+    typedef OwnedArray<SynchronicProcessor>                  Arr;
+    typedef OwnedArray<SynchronicProcessor,CriticalSection>  CSArr;
     
     
     SynchronicProcessor(BKSynthesiser *synth,
@@ -259,7 +254,11 @@ private:
     BKSynthesiser*              synth;
     SynchronicPreparation::Ptr  preparation, active;
     
+    double sampleRate;
+    
     TuningProcessor             tuner;
+    Array<float> tuningOffsets;
+    PitchClass tuningBasePitch;
 
     int pulse;
     int beat;
@@ -269,32 +268,22 @@ private:
     void resetPhase(int skipBeats);
     
     void playNote(int channel, int note, float velocity);
-    Array<float> velocities;           
-    
-    uint64 tempoPeriodSamples;
+    Array<float> velocities;
+    Array<int> keysDepressed;   //current keys that are depressed
     
     bool inCluster;
-    
-    double sampleRate;
-    
     uint64 clusterThresholdSamples;
     uint64 clusterThresholdTimer;
-    
-    uint64 pulseThresholdSamples;
-    uint64 pulseThresholdTimer;
-    
-    Array<float> tuningOffsets;
-    PitchClass tuningBasePitch;
     
     uint64 clusterTimer;
     uint64 phasor;
     uint64 numSamplesBeat;
+    uint64 pulseThresholdSamples;
 
     bool shouldPlay;
     
     Array<int> cluster;         //cluster of notes played, with repetitions, limited to totalClusters (8?)
     Array<int> slimCluster;     //cluster without repetitions
-    Array<int> keysDepressed;   //current keys that are depressed
     
     JUCE_LEAK_DETECTOR(SynchronicProcessor);
 };
