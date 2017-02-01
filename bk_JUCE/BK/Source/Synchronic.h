@@ -33,15 +33,16 @@ public:
     sNumPulses(p->getNumPulses()),
     sClusterMin(p->getClusterMin()),
     sClusterMax(p->getClusterMax()),
-    sClusterThresh(p->getClusterThresh()),
+    sClusterCap(p->getClusterCap()),
     sMode(p->getMode()),
     sBeatsToSkip(p->getBeatsToSkip()),
     sBeatMultipliers(p->getBeatMultipliers()),
     sAccentMultipliers(p->getAccentMultipliers()),
     sLengthMultipliers(p->getLengthMultipliers()),
     sTranspOffsets(p->getTranspOffsets()),
-    sPulseThreshSec(60.0/sTempo),
-    sClusterThreshSec(sPulseThreshSec * sClusterThresh),
+    sPulseThreshSec(p->getPulseThresh()),
+    sClusterThresh(p->getClusterThreshMS()),
+    sClusterThreshSec(p->getClusterThreshSEC()),
     at1History(p->getAdaptiveTempo1History()),
     at1Min(p->getAdaptiveTempo1Min()),
     at1Max(p->getAdaptiveTempo1Max()),
@@ -69,7 +70,6 @@ public:
     sNumPulses(numPulses),
     sClusterMin(clusterMin),
     sClusterMax(clusterMax),
-    sClusterThresh(clusterThresh),
     sMode(mode),
     sBeatsToSkip(beatsToSkip),
     sBeatMultipliers(beatMultipliers),
@@ -77,7 +77,8 @@ public:
     sLengthMultipliers(lengthMultipliers),
     sTranspOffsets(transpOffsets),
     sPulseThreshSec(60.0/sTempo),
-    sClusterThreshSec(sPulseThreshSec * sClusterThresh),
+    sClusterThresh(clusterThresh),
+    sClusterThreshSec(.001 * sClusterThresh),
     tuning(t)
     {
     }
@@ -89,7 +90,7 @@ public:
     sNumPulses(0),
     sClusterMin(1),
     sClusterMax(100),
-    sClusterThresh(1.0),
+    sClusterCap(8),
     sMode(FirstNoteOnSync),
     sBeatsToSkip(0),
     sBeatMultipliers(Array<float>({1.0})),
@@ -97,7 +98,8 @@ public:
     sLengthMultipliers(Array<float>({1.0})),
     sTranspOffsets(Array<float>({0.0})),
     sPulseThreshSec(60.0/sTempo),
-    sClusterThreshSec(sPulseThreshSec * sClusterThresh),
+    sClusterThresh(500),
+    sClusterThreshSec(.001 * sClusterThresh),
     at1History(1),
     at1Min(100),
     at1Max(2000),
@@ -111,9 +113,10 @@ public:
     inline const int getNumPulses() const noexcept                     {return sNumPulses;             }
     inline const int getClusterMin() const noexcept                    {return sClusterMin;            }
     inline const int getClusterMax() const noexcept                    {return sClusterMax;            }
-    inline const float getClusterThresh() const noexcept               {return sClusterThreshSec;      }
+    inline const int getClusterCap() const noexcept                    {return sClusterCap;            }
+    inline const float getClusterThreshSEC() const noexcept            {return sClusterThreshSec;      }
     inline const float getPulseThresh() const noexcept                 {return sPulseThreshSec;        }
-    inline const float getClusterThreshold() const noexcept            {return sClusterThresh;         }
+    inline const float getClusterThreshMS() const noexcept             {return sClusterThresh;         }
     inline const SynchronicSyncMode getMode() const noexcept           {return sMode;                  }
     inline const Array<float> getBeatMultipliers() const noexcept      {return sBeatMultipliers;       }
     inline const int getBeatsToSkip()                                  {return sBeatsToSkip;           }
@@ -133,23 +136,20 @@ public:
     inline void setTempo(float tempo)
     {
         sTempo = tempo;
-        
         float tempoPeriodS = (60.0/sTempo);
-        
-        sClusterThreshSec = tempoPeriodS * sClusterThresh;
-        
         sPulseThreshSec = tempoPeriodS;
     }
     
     inline void setClusterThresh(float clusterThresh)
     {
         sClusterThresh = clusterThresh;
-        sClusterThreshSec = (60.0/sTempo) * clusterThresh;
+        sClusterThreshSec = sClusterThresh * .001;
     }
     
     inline void setNumPulses(int numPulses)                            {sNumPulses = numPulses;                            }
     inline void setClusterMin(int clusterMin)                          {sClusterMin = clusterMin;                          }
     inline void setClusterMax(int clusterMax)                          {sClusterMax = clusterMax;                          }
+    inline void setClusterCap(int clusterCap)                          {sClusterCap = clusterCap;                          }
     inline void setMode(SynchronicSyncMode mode)                       {sMode = mode;                                      }
     inline void setBeatsToSkip(int beatsToSkip)                        {sBeatsToSkip = beatsToSkip;                        }
     inline void setBeatMultipliers(Array<float> beatMultipliers)       {sBeatMultipliers.swapWith(beatMultipliers);        }
@@ -174,6 +174,7 @@ public:
         DBG("sNumPulses: " + String(sNumPulses));
         DBG("sClusterMin: " + String(sClusterMin));
         DBG("sClusterMax: " + String(sClusterMax));
+        DBG("sClusterCap: " + String(sClusterCap));
         DBG("sClusterThresh: " + String(sClusterThresh));
         DBG("sMode: " + String(sMode));
         DBG("sBeatsToSkip: " + String(sBeatsToSkip));
@@ -190,15 +191,18 @@ private:
     int Id;
     float sTempo;
     int sNumPulses,sClusterMin,sClusterMax;
-    float sClusterThresh; // beats
+    int sClusterCap = 8; //max in cluster; 8 in original bK
+    
     SynchronicSyncMode sMode;
-    int sBeatsToSkip; // float?
+    int sBeatsToSkip;
+    
     Array<float> sBeatMultipliers;
     Array<float> sAccentMultipliers;
     Array<float> sLengthMultipliers;
     Array<float> sTranspOffsets;
 
-    float sPulseThreshSec;
+    float sPulseThreshSec;      //length of time between pulses, as set by temp
+    float sClusterThresh;       //max time between played notes before new cluster is started, in MS
     float sClusterThreshSec;
     
     // Adaptive Tempo 1
@@ -219,8 +223,8 @@ public:
     typedef ReferenceCountedObjectPtr<SynchronicProcessor>   Ptr;
     typedef Array<SynchronicProcessor::Ptr>                  PtrArr;
     typedef Array<SynchronicProcessor::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<SynchronicProcessor>                       Arr;
-    typedef OwnedArray<SynchronicProcessor,CriticalSection>       CSArr;
+    typedef OwnedArray<SynchronicProcessor>                  Arr;
+    typedef OwnedArray<SynchronicProcessor,CriticalSection>  CSArr;
     
     
     SynchronicProcessor(BKSynthesiser *synth,
@@ -247,48 +251,43 @@ public:
     
 private:
     int Id;
-    BKSynthesiser*              synth;
-    SynchronicPreparation::Ptr  preparation, active;
-    
-    TuningProcessor             tuner;
-    
-    int pulse;
-    int beat;
-    int accent;
-    int length;
-    int transp;
-    
-    void playNote(int channel, int note, float velocity);
-    Array<float> velocities;           
-    
-    uint64 tempoPeriodSamples;
-    
-    bool inPulses, inCluster, inPrePulses;
+    BKSynthesiser* synth;
+    SynchronicPreparation::Ptr preparation, active;
     
     double sampleRate;
     
-    uint64 clusterThresholdSamples;
-    uint64 clusterThresholdTimer;
-    
-    uint64 pulseThresholdSamples;
-    uint64 pulseThresholdTimer;
-    
-    uint64 firstNoteTimer, lastNoteTimer;
-    uint64 tempoPeriodTimer;
-    
+    TuningProcessor tuner;
     Array<float> tuningOffsets;
     PitchClass tuningBasePitch;
+
+    int pulse;  //pulse counter
     
+    //parameter fields
+    int beat;   //beat length multipliers
+    int accent; //accent multipliers
+    int length; //note length multipliers (multiples of 50ms, at least for now)
+    int transp; //transposition offsets
+    
+    //reset the phase, including of all the parameter fields
+    void resetPhase(int skipBeats);
+    
+    void playNote(int channel, int note, float velocity);
+    Array<float> velocities;    //record of velocities
+    Array<int> keysDepressed;   //current keys that are depressed
+    
+    bool inCluster;
+    uint64 clusterThresholdSamples;
+    uint64 clusterThresholdTimer;
     uint64 clusterTimer;
-    uint64 pulseTimer;
+    Array<int> cluster;         //cluster of notes played, with repetitions, limited to totalClusters (8?)
+    Array<int> slimCluster;     //cluster without repetitions
+    
     uint64 phasor;
     uint64 numSamplesBeat;
-    int skipBeats;
+    uint64 pulseThresholdSamples;
+
     bool shouldPlay;
-    
-    Array<int> cluster;
-    Array<int> toAdd;
-    Array<int> on;
+
     
     JUCE_LEAK_DETECTOR(SynchronicProcessor);
 };
