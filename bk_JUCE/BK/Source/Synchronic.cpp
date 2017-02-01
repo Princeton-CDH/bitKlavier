@@ -37,7 +37,6 @@ tuner(active->getTuning())
     cluster = Array<int>();
     keysDepressed = Array<int>();
     
-    skipBeats = 0;
     shouldPlay = false;
 }
 
@@ -253,7 +252,6 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             if (++pulse     >= active->getNumPulses())
             {
                 cluster.clearQuick();
-                toAdd.clearQuick();
                 shouldPlay = false;
             }
         }

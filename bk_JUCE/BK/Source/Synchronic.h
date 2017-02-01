@@ -33,6 +33,7 @@ public:
     sNumPulses(p->getNumPulses()),
     sClusterMin(p->getClusterMin()),
     sClusterMax(p->getClusterMax()),
+    sClusterCap(p->getClusterCap()),
     sMode(p->getMode()),
     sBeatsToSkip(p->getBeatsToSkip()),
     sBeatMultipliers(p->getBeatMultipliers()),
@@ -292,13 +293,12 @@ private:
     uint64 pulseTimer;
     uint64 phasor;
     uint64 numSamplesBeat;
-    int skipBeats;
+
     bool shouldPlay;
     
-    Array<int> cluster;     //cluster of notes played, with repetitions, limited to totalClusters (8?)
-    Array<int> slimCluster; //cluster without repetitions
-    Array<int> toAdd;
-    Array<int> keysDepressed;
+    Array<int> cluster;         //cluster of notes played, with repetitions, limited to totalClusters (8?)
+    Array<int> slimCluster;     //cluster without repetitions
+    Array<int> keysDepressed;   //current keys that are depressed
     
     JUCE_LEAK_DETECTOR(SynchronicProcessor);
 };
