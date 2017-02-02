@@ -162,6 +162,7 @@ typedef enum SynchronicSyncMode {
     FirstNoteOnSync = 0,
     LastNoteOnSync,
     LastNoteOffSync,
+    AnyNoteOffSync,
     SynchronicSyncModeNil
 } SynchronicSyncMode;
 

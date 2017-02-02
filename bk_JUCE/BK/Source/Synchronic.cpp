@@ -110,7 +110,10 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     keysDepressed.addIfNotAlreadyThere(noteNumber);
     
     //silence pulses if in NoteOffSync
-    if(active->getMode() == LastNoteOffSync) shouldPlay = false;
+    if(    (active->getMode() == LastNoteOffSync)
+        || (active->getMode() == AnyNoteOffSync))
+            shouldPlay = false;
+    
     else shouldPlay = true;
     
     //cluster management
@@ -178,7 +181,8 @@ void SynchronicProcessor::keyReleased(int noteNumber, int channel)
     
     // If LastNoteOnSync mode, reset phasor and multiplier indices.
     //only initiate pulses if ALL keys are released
-    if (active->getMode() == LastNoteOffSync && keysDepressed.size() == 0)
+    if (    (active->getMode() == LastNoteOffSync && keysDepressed.size() == 0)
+         || (active->getMode() == AnyNoteOffSync))
     {
         phasor = pulseThresholdSamples; //start right away
         resetPhase(active->getBeatsToSkip());
