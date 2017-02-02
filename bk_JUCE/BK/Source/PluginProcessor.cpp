@@ -46,11 +46,20 @@ resonanceReleaseSynth   (general)
     
     // Make a bunch of pianos. Default to zeroth keymap.
     for (int i = 0 ; i < aMaxNumPianos; i++)
-        bkPianos.set(i, new Piano(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, bkKeymaps[0], i)); // initializing piano 0
+    {
+        bkPianos.set(i, new Piano(activeSPreparation, activeNPreparation, activeDPreparation,
+                                  &mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth,
+                                  bkKeymaps[0], i)); // initializing piano 0
+    }
   
     // Initialize first piano.
     prevPiano = bkPianos[0];
     currentPiano = bkPianos[0];
+    
+    // Modification testing ground
+    // have to explicitly cast to float,int,Array<int>,Array<float>,bool
+    currentPiano->modMap.add(new Modification(ModDirectTransposition, 1, (float)2));
+    currentPiano->modMap.add(new Modification(ModDirectTransposition, 2, (float)-2));
     
 }
 
@@ -123,6 +132,20 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             // Check PianoMap for whether piano should change due to key strike.
             int whichPiano = currentPiano->pianoMap[noteNumber] - 1;
             if (whichPiano >= 0 && whichPiano != currentPiano->getId()) setCurrentPiano(whichPiano);
+            
+            DBG("notenum: "+String(noteNumber));
+            if (noteNumber == 60 && currentPiano->modMap.size())
+            {
+                for (int i = currentPiano->modMap.size(); --i >= 0;)
+                {
+                    if (currentPiano->modMap[i]->type == ModDirectTransposition)
+                    {
+                        preparationDidChange = true;
+                        DBG("modfloat: " + String(currentPiano->modMap[i]->modFloat) );
+                        activeDPreparation[currentPiano->modMap[i]->prepId]->setTransposition(currentPiano->modMap[i]->modFloat);
+                    }
+                }
+            }
             
             // Send key on to each pmap in current piano
             for (p = currentPiano->activePMaps.size(); --p >= 0;)

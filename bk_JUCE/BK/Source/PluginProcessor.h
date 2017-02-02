@@ -66,6 +66,7 @@ public:
     Piano::PtrArr                       bkPianos;
     
     bool                                pianoDidChange;
+    bool                                preparationDidChange;
     
     Array<int>                          noteOn;
     

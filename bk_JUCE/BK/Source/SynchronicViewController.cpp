@@ -45,7 +45,7 @@ SynchronicViewController::SynchronicViewController(BKAudioProcessor& p)
         synchronicTF[i]->setName(cSynchronicParameterTypes[i]);
     }
     
-    updateFields(currentSynchronicId);
+    updateFields();
 }
 
 
@@ -103,7 +103,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
     if (name == cSynchronicParameterTypes[SynchronicId])
     {
         currentSynchronicId = i;
-        updateFields(currentSynchronicId);
+        updateFields();
     }
     else if (name == cSynchronicParameterTypes[SynchronicTempo])
     {
@@ -201,12 +201,10 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
 }
 
 
-void SynchronicViewController::updateFields(int synchronicId)
+void SynchronicViewController::updateFields(void)
 {
-    SynchronicPreparation::Ptr prep   = processor.activeSPreparation[synchronicId];
+    SynchronicPreparation::Ptr prep   = processor.activeSPreparation[currentSynchronicId];
     
-    // Set text.
-    synchronicTF[SynchronicId]                  ->setText(  String(                 prep->getId()));
     synchronicTF[SynchronicTempo]               ->setText(  String(                 prep->getTempo()));
     synchronicTF[SynchronicNumPulses]           ->setText(  String(                 prep->getNumPulses()));
     synchronicTF[SynchronicClusterMin]          ->setText(  String(                 prep->getClusterMin()));
@@ -235,7 +233,7 @@ void SynchronicViewController::bkMessageReceived (const String& message)
     {
         //currentSynchronicId = processor.currentPiano->getPreparation();
         
-        updateFields(currentSynchronicId);
+        updateFields();
     }
 }
 

@@ -118,6 +118,15 @@ void BKAudioProcessorEditor::timerCallback()
         processor.pianoDidChange = false;
         switchPianos();
     }
+    
+    if (processor.preparationDidChange)
+    {
+        processor.preparationDidChange = false;
+        dvc.updateFields();
+        nvc.updateFields();
+        svc.updateFields();
+    }
+    
 }
 
 void BKAudioProcessorEditor::paint (Graphics& g)

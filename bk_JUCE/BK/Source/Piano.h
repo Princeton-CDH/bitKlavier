@@ -17,6 +17,7 @@
 #include "BKUtilities.h"
 
 #include "PreparationMap.h"
+#include "ModificationMap.h"
 
 #include "Keymap.h"
 
@@ -30,7 +31,10 @@ public:
     typedef OwnedArray<Piano>                  Arr;
     typedef OwnedArray<Piano, CriticalSection> CSArr;
     
-    Piano(BKSynthesiser *s,
+    Piano(SynchronicPreparation::CSPtrArr activeSPrep,
+          NostalgicPreparation::CSPtrArr activeNPrep,
+          DirectPreparation::CSPtrArr activeDPrep,
+          BKSynthesiser *s,
           BKSynthesiser *res,
           BKSynthesiser *ham,
           Keymap::Ptr keymap,
@@ -55,8 +59,17 @@ public:
     PreparationMap::CSPtrArr    activePMaps;
     PreparationMap::CSPtrArr    prepMaps;
     
+    SynchronicPreparation::CSPtrArr activeSPrep;
+    NostalgicPreparation::CSPtrArr  activeNPrep;
+    DirectPreparation::CSPtrArr     activeDPrep;
+
     Array<int>                  pianoMap;
     int                         numPMaps;
+    
+    OwnedArray<Modification>    modMap;
+    int                         numMMaps;
+    
+    int                         numModSMaps, numModNMaps, numModDMaps;
     
     void                        prepareToPlay(double sampleRate);
     

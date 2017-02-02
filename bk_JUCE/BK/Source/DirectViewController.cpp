@@ -42,7 +42,7 @@ currentDirectId(0)
         directTF[i]->setName(cDirectParameterTypes[i]);
     }
     
-    updateFields(currentDirectId);
+    updateFields();
 }
 
 DirectViewController::~DirectViewController()
@@ -95,7 +95,7 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
     if (name == cDirectParameterTypes[DirectId])
     {
         currentDirectId = i;
-        updateFields(currentDirectId);
+        updateFields();
     }
     else if (name == cDirectParameterTypes[DirectTransposition])
     {
@@ -129,17 +129,16 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
 }
 
 
-void DirectViewController::updateFields(int directId)
+void DirectViewController::updateFields(void)
 {
     
-    DirectPreparation::Ptr prep = processor.activeDPreparation[directId];
+    DirectPreparation::Ptr prep = processor.activeDPreparation[currentDirectId];
     
-    directTF[DirectId]                  ->setText( String( directId));
     directTF[DirectTransposition]       ->setText( String( prep->getTransposition()));
     directTF[DirectGain]                ->setText( String( prep->getGain()));
     directTF[DirectHammerGain]          ->setText( String( prep->getHammerGain()));
     directTF[DirectResGain]             ->setText( String( prep->getResonanceGain()));
-    directTF[DirectTuning]              ->setText( String(prep->getTuning()->getId()));
+    directTF[DirectTuning]              ->setText( String( prep->getTuning()->getId()));
 
 }
 
@@ -149,7 +148,7 @@ void DirectViewController::bkMessageReceived (const String& message)
     {
         //currentDirectId = processor.currentPiano->getPreparation();
         
-        updateFields(currentDirectId);
+        updateFields();
     }
 }
 

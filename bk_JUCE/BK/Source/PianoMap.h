@@ -12,6 +12,25 @@
 #define PIANOMAP_H_INCLUDED
 
 
+#include "BKUtilities.h"
+
+#include"Keymap.h"
+
+class PianoMap
+{
+public:
+    PianoMap(void);
+    ~PianoMap(void);
+    
+    Array<int>          keyPianoMap;
+    
+    
+    Keymap::PtrArr      keymapPianoMap;
+    
+private:
+    
+    JUCE_LEAK_DETECTOR(PianoMap)
+};
 
 
 

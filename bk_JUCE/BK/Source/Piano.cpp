@@ -10,7 +10,10 @@
 
 #include "Piano.h"
 
-Piano::Piano(BKSynthesiser *ms,
+Piano::Piano(SynchronicPreparation::CSPtrArr sPrep,
+             NostalgicPreparation::CSPtrArr nPrep,
+             DirectPreparation::CSPtrArr dPrep,
+             BKSynthesiser *ms,
              BKSynthesiser *res,
              BKSynthesiser *ham,
              Keymap::Ptr keymap,
@@ -18,6 +21,9 @@ Piano::Piano(BKSynthesiser *ms,
 currentPMap(PreparationMap::Ptr()),
 activePMaps(PreparationMap::CSPtrArr()),
 prepMaps(PreparationMap::CSPtrArr()),
+activeSPrep(sPrep),
+activeNPrep(nPrep),
+activeDPrep(dPrep),
 numPMaps(0),
 Id(Id),
 synth(ms),
@@ -27,6 +33,8 @@ initialKeymap(keymap)
 {
     pianoMap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)   pianoMap.set(i, 0);
+    
+    modMap.ensureStorageAllocated(1);
     
     prepMaps.ensureStorageAllocated(12);
 }

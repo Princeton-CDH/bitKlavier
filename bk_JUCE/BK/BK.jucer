@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="R4yQHh" name="BK" projectType="audioplug" version="0.0.1"
               bundleIdentifier="com.BK.BK0" includeBinaryInAppConfig="1" buildVST="1"
-              buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0" buildAAX="0"
+              buildVST3="1" buildAU="1" buildAUv3="1" buildRTAS="0" buildAAX="0"
               pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
               pluginManufacturer="manyarrowsmusic" pluginManufacturerCode="Manu"
               pluginCode="R4yq" pluginChannelConfigs="{1,1},{2,2}" pluginIsSynth="1"
@@ -49,6 +49,9 @@
           <FILE id="hJbk7x" name="Keymap.h" compile="0" resource="0" file="Source/Keymap.h"/>
           <FILE id="djaSBK" name="PianoMap.cpp" compile="1" resource="0" file="Source/PianoMap.cpp"/>
           <FILE id="U3irmU" name="PianoMap.h" compile="0" resource="0" file="Source/PianoMap.h"/>
+          <FILE id="ZJUiWR" name="Modification.cpp" compile="1" resource="0"
+                file="Source/Modification.cpp"/>
+          <FILE id="xHx6az" name="Modification.h" compile="0" resource="0" file="Source/Modification.h"/>
           <FILE id="sbtYa6" name="ModificationMap.cpp" compile="1" resource="0"
                 file="Source/ModificationMap.cpp"/>
           <FILE id="jsTxEL" name="ModificationMap.h" compile="0" resource="0"
@@ -134,9 +137,10 @@
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX" vst3Folder="">
+    <XCODE_MAC targetFolder="Builds/MacOSX" vst3Folder="" aaxFolder="">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="MRM"/>
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="MRM" osxArchitecture="default"
+                       cppLibType="" osxCompatibility="default" osxSDK="default"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="MRM"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
@@ -157,9 +161,10 @@
         <MODULEPATH id="juce_audio_utils" path="../../../../JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
-    <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="portraitlandscape">
+    <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="portraitlandscape"
+                  aaxFolder="" iosBackgroundAudio="1" UIFileSharingEnabled="1">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="MRM"/>
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="MRM" iosCompatibility="9.2"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="MRM"/>
       </CONFIGURATIONS>
       <MODULEPATHS>

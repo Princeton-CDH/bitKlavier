@@ -31,15 +31,15 @@ public:
 
     void paint (Graphics&) override;
     void resized() override;
-
+    
+    void updateFields(void);
+    
 private:
     BKAudioProcessor& processor;
     int currentDirectId;
     
     OwnedArray<BKLabel> directL;
     OwnedArray<BKTextField> directTF;
-    
-    void updateFields(int directId);
     
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;

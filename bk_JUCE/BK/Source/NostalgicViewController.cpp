@@ -46,7 +46,7 @@ NostalgicViewController::NostalgicViewController(BKAudioProcessor& p)
         nostalgicTF[i]->setName(cNostalgicParameterTypes[i]);
     }
     
-    updateFields(currentNostalgicId);
+    updateFields();
 }
 
 NostalgicViewController::~NostalgicViewController()
@@ -100,7 +100,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
     if (name == cNostalgicParameterTypes[NostalgicId])
     {
         currentNostalgicId = i;
-        updateFields(currentNostalgicId);
+        updateFields();
     }
     else if (name == cNostalgicParameterTypes[NostalgicWaveDistance])
     {
@@ -154,12 +154,11 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
 }
 
 
-void NostalgicViewController::updateFields(int nostalgicId)
+void NostalgicViewController::updateFields(void)
 {
     
-    NostalgicPreparation::Ptr prep = processor.activeNPreparation[nostalgicId];
+    NostalgicPreparation::Ptr prep = processor.activeNPreparation[currentNostalgicId];
 
-    nostalgicTF[NostalgicId]                ->setText( String( nostalgicId));
     nostalgicTF[NostalgicWaveDistance]      ->setText( String( prep->getWavedistance()));
     nostalgicTF[NostalgicUndertow]          ->setText( String( prep->getUndertow()));
     nostalgicTF[NostalgicTransposition]     ->setText( String( prep->getTransposition()));
@@ -177,7 +176,7 @@ void NostalgicViewController::bkMessageReceived (const String& message)
     {
         //currentNostalgicId = processor.currentPiano->getPreparation();
         
-        updateFields(currentNostalgicId);
+        updateFields();
     }
 }
 

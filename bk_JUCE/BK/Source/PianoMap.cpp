@@ -9,3 +9,16 @@
 */
 
 #include "PianoMap.h"
+
+
+PianoMap::PianoMap()
+{
+    keymapPianoMap.ensureStorageAllocated(aMaxNumKeymaps);
+    keyPianoMap.ensureStorageAllocated(128);
+    
+}
+
+PianoMap::~PianoMap()
+{
+    
+}

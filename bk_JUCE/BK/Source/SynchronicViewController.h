@@ -30,7 +30,7 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     
-    
+    void updateFields(void);
     
 private:
     BKAudioProcessor& processor;
@@ -45,8 +45,7 @@ private:
     void bkComboBoxDidChange        (ComboBox* box)         override { };
     void bkButtonClicked            (Button* b)             override { };
     
-    void updateFields(int synchronicId);
-    
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicViewController)
 };
 
