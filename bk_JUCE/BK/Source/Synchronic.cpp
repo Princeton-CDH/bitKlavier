@@ -136,10 +136,10 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
         inCluster = true;
         
     }
-    else if (active->getMode() == LastNoteOnSync)
+    else if (active->getMode() == AnyNoteOnSync)
     {
         
-        //reset phasor if in LastNoteOnSync
+        //reset phasor if in AnyNoteOnSync
         phasor = 0;
         resetPhase(active->getBeatsToSkip());
 
@@ -179,16 +179,15 @@ void SynchronicProcessor::keyReleased(int noteNumber, int channel)
     //remove key from array of pressed keys
     keysDepressed.removeAllInstancesOf(noteNumber);
     
-    // If LastNoteOnSync mode, reset phasor and multiplier indices.
+    // If AnyNoteOffSync mode, reset phasor and multiplier indices.
     //only initiate pulses if ALL keys are released
     if (    (active->getMode() == LastNoteOffSync && keysDepressed.size() == 0)
          || (active->getMode() == AnyNoteOffSync))
     {
-        phasor = pulseThresholdSamples; //start right away
-        resetPhase(active->getBeatsToSkip());
+            phasor = pulseThresholdSamples; //start right away
+            resetPhase(active->getBeatsToSkip());
 
-        shouldPlay = true;
-
+            shouldPlay = true;
     }
 }
 
