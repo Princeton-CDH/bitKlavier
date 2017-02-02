@@ -30,7 +30,7 @@ public:
     SynchronicPreparation(SynchronicPreparation::Ptr p):
     Id(p->getId()),
     sTempo(p->getTempo()),
-    sNumPulses(p->getNumPulses()),
+    sNumBeats(p->getNumBeats()),
     sClusterMin(p->getClusterMin()),
     sClusterMax(p->getClusterMax()),
     sClusterCap(p->getClusterCap()),
@@ -40,7 +40,7 @@ public:
     sAccentMultipliers(p->getAccentMultipliers()),
     sLengthMultipliers(p->getLengthMultipliers()),
     sTranspOffsets(p->getTranspOffsets()),
-    sPulseThreshSec(p->getPulseThresh()),
+    sBeatThreshSec(p->betBeatThresh()),
     sClusterThresh(p->getClusterThreshMS()),
     sClusterThreshSec(p->getClusterThreshSEC()),
     at1History(p->getAdaptiveTempo1History()),
@@ -54,7 +54,7 @@ public:
     
     SynchronicPreparation(int Id,
                           float tempo,
-                          int numPulses,
+                          int numBeats,
                           int clusterMin,
                           int clusterMax,
                           float clusterThresh,
@@ -67,7 +67,7 @@ public:
                           TuningPreparation::Ptr t):
     Id(Id),
     sTempo(tempo),
-    sNumPulses(numPulses),
+    sNumBeats(numBeats),
     sClusterMin(clusterMin),
     sClusterMax(clusterMax),
     sMode(mode),
@@ -76,7 +76,7 @@ public:
     sAccentMultipliers(accentMultipliers),
     sLengthMultipliers(lengthMultipliers),
     sTranspOffsets(transpOffsets),
-    sPulseThreshSec(60.0/sTempo),
+    sBeatThreshSec(60.0/sTempo),
     sClusterThresh(clusterThresh),
     sClusterThreshSec(.001 * sClusterThresh),
     tuning(t)
@@ -87,7 +87,7 @@ public:
     SynchronicPreparation(int Id, TuningPreparation::Ptr t):
     Id(Id),
     sTempo(120),
-    sNumPulses(0),
+    sNumBeats(0),
     sClusterMin(1),
     sClusterMax(100),
     sClusterCap(8),
@@ -97,7 +97,7 @@ public:
     sAccentMultipliers(Array<float>({1.0})),
     sLengthMultipliers(Array<float>({1.0})),
     sTranspOffsets(Array<float>({0.0})),
-    sPulseThreshSec(60.0/sTempo),
+    sBeatThreshSec(60.0/sTempo),
     sClusterThresh(500),
     sClusterThreshSec(.001 * sClusterThresh),
     at1History(1),
@@ -110,12 +110,12 @@ public:
     }
     
     inline const float getTempo() const noexcept                       {return sTempo;                 }
-    inline const int getNumPulses() const noexcept                     {return sNumPulses;             }
+    inline const int getNumBeats() const noexcept                     {return sNumBeats;             }
     inline const int getClusterMin() const noexcept                    {return sClusterMin;            }
     inline const int getClusterMax() const noexcept                    {return sClusterMax;            }
     inline const int getClusterCap() const noexcept                    {return sClusterCap;            }
     inline const float getClusterThreshSEC() const noexcept            {return sClusterThreshSec;      }
-    inline const float getPulseThresh() const noexcept                 {return sPulseThreshSec;        }
+    inline const float betBeatThresh() const noexcept                 {return sBeatThreshSec;        }
     inline const float getClusterThreshMS() const noexcept             {return sClusterThresh;         }
     inline const SynchronicSyncMode getMode() const noexcept           {return sMode;                  }
     inline const Array<float> getBeatMultipliers() const noexcept      {return sBeatMultipliers;       }
@@ -137,7 +137,7 @@ public:
     {
         sTempo = tempo;
         float tempoPeriodS = (60.0/sTempo);
-        sPulseThreshSec = tempoPeriodS;
+        sBeatThreshSec = tempoPeriodS;
     }
     
     inline void setClusterThresh(float clusterThresh)
@@ -146,7 +146,7 @@ public:
         sClusterThreshSec = sClusterThresh * .001;
     }
     
-    inline void setNumPulses(int numPulses)                            {sNumPulses = numPulses;                            }
+    inline void setNumBeats(int numBeats)                              {sNumBeats = numBeats;                            }
     inline void setClusterMin(int clusterMin)                          {sClusterMin = clusterMin;                          }
     inline void setClusterMax(int clusterMax)                          {sClusterMax = clusterMax;                          }
     inline void setClusterCap(int clusterCap)                          {sClusterCap = clusterCap;                          }
@@ -171,7 +171,7 @@ public:
     {
         DBG("| - - - Synchronic Preparation - - - |");
         DBG("sTempo: " + String(sTempo));
-        DBG("sNumPulses: " + String(sNumPulses));
+        DBG("sNumBeats: " + String(sNumBeats));
         DBG("sClusterMin: " + String(sClusterMin));
         DBG("sClusterMax: " + String(sClusterMax));
         DBG("sClusterCap: " + String(sClusterCap));
@@ -182,7 +182,7 @@ public:
         DBG("sLengthMultipliers: " + floatArrayToString(sLengthMultipliers));
         DBG("sAccentMultipliers: " + floatArrayToString(sAccentMultipliers));
         DBG("sTranspOffsets: " + floatArrayToString(sTranspOffsets));
-        DBG("sPulseThreshSec: " + String(sPulseThreshSec));
+        DBG("sBeatThreshSec: " + String(sBeatThreshSec));
         DBG("sClusterThreshSec: " + String(sClusterThreshSec));
         DBG("| - - - - - - - - -- - - - - - - - - |");
     }
@@ -190,7 +190,7 @@ public:
 private:
     int Id;
     float sTempo;
-    int sNumPulses,sClusterMin,sClusterMax;
+    int sNumBeats,sClusterMin,sClusterMax;
     int sClusterCap = 8; //max in cluster; 8 in original bK
     
     SynchronicSyncMode sMode;
@@ -201,7 +201,7 @@ private:
     Array<float> sLengthMultipliers;    //multiply note duration by these
     Array<float> sTranspOffsets;        //transpose by these
 
-    float sPulseThreshSec;      //length of time between pulses, as set by temp
+    float sBeatThreshSec;      //length of time between pulses, as set by temp
     float sClusterThresh;       //max time between played notes before new cluster is started, in MS
     float sClusterThreshSec;
     
@@ -260,13 +260,13 @@ private:
     Array<float> tuningOffsets;
     PitchClass tuningBasePitch;
 
-    int pulse;  //pulse counter; max set by users -- sNumPulses
+    int beatCounter;  //beat (or pulse) counter; max set by users -- sNumBeats
     
     //parameter field counters
-    int beat;   //beat length multipliers
-    int accent; //accent multipliers
-    int length; //note length multipliers (multiples of 50ms, at least for now)
-    int transp; //transposition offsets
+    int beatMultiplierCounter;   //beat length (time between beats) multipliers
+    int accentMultiplierCounter; //accent multipliers
+    int lengthMultiplierCounter; //note length (sounding length) multipliers (multiples of 50ms, at least for now)
+    int transpOffsetCounter;    //transposition offsets
     
     //reset the phase, including of all the parameter fields
     void resetPhase(int skipBeats);
@@ -283,8 +283,8 @@ private:
     Array<int> slimCluster;     //cluster without repetitions
     
     uint64 phasor;
-    uint64 numSamplesBeat;
-    uint64 pulseThresholdSamples;
+    uint64 numSamplesBeat;          // = beatThresholdSamples * beatMultiplier
+    uint64 beatThresholdSamples;    // # samples in a beat, as set by tempo
 
     bool shouldPlay;
 

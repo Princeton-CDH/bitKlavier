@@ -112,8 +112,8 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
     }
     else if (name == cSynchronicParameterTypes[SynchronicNumPulses])
     {
-        prep    ->setNumPulses(i);
-        active  ->setNumPulses(i);
+        prep    ->setNumBeats(i);
+        active  ->setNumBeats(i);
     }
     else if (name == cSynchronicParameterTypes[SynchronicClusterMin])
     {
@@ -208,7 +208,7 @@ void SynchronicViewController::updateFields(int synchronicId)
     // Set text.
     synchronicTF[SynchronicId]                  ->setText(  String(                 prep->getId()));
     synchronicTF[SynchronicTempo]               ->setText(  String(                 prep->getTempo()));
-    synchronicTF[SynchronicNumPulses]           ->setText(  String(                 prep->getNumPulses()));
+    synchronicTF[SynchronicNumPulses]           ->setText(  String(                 prep->getNumBeats()));
     synchronicTF[SynchronicClusterMin]          ->setText(  String(                 prep->getClusterMin()));
     synchronicTF[SynchronicClusterMax]          ->setText(  String(                 prep->getClusterMax()));
     synchronicTF[SynchronicClusterThresh]       ->setText(  String(                 prep->getClusterThreshMS()));
