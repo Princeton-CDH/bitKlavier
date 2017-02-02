@@ -184,7 +184,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, int channel)
          || (active->getMode() == AnyNoteOffSync))
     {
             phasor = pulseThresholdSamples; //start right away
-            resetPhase(active->getBeatsToSkip());
+            resetPhase(active->getBeatsToSkip() - 1);
 
             shouldPlay = true;
     }
