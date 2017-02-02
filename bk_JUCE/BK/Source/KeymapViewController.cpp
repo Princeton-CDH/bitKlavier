@@ -13,7 +13,7 @@
 
 //==============================================================================
 KeymapViewController::KeymapViewController(BKAudioProcessor& p):
-currentKeymapId(0),
+currentKeymapId(1),
 processor(p)
 {
     // Labels

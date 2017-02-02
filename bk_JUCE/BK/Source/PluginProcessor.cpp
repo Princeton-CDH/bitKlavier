@@ -58,8 +58,12 @@ resonanceReleaseSynth   (general)
     
     // Modification testing ground
     // have to explicitly cast to float,int,Array<int>,Array<float>,bool
-    currentPiano->modMap.add(new Modification(ModDirectTransposition, 1, (float)2));
-    currentPiano->modMap.add(new Modification(ModDirectTransposition, 2, (float)-2));
+    bkPianos[0]->modMap.add(new Modification(ModSynchronicTempo, 1, (float)1200));
+    bkPianos[0]->modMap.add(new Modification(ModSynchronicTempo, 2, (float)1500));
+    
+    
+    // Default all on for 
+    for (int i = 0; i < 128; i++)   bkKeymaps[1]->addNote(i);
     
 }
 
@@ -132,18 +136,20 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             // Check PianoMap for whether piano should change due to key strike.
             int whichPiano = currentPiano->pianoMap[noteNumber] - 1;
             if (whichPiano >= 0 && whichPiano != currentPiano->getId()) setCurrentPiano(whichPiano);
-            
-            DBG("notenum: "+String(noteNumber));
-            if (noteNumber == 60 && currentPiano->modMap.size())
+
+            Modification* mod;
+            if (noteNumber == 60)
             {
                 for (int i = currentPiano->modMap.size(); --i >= 0;)
                 {
-                    if (currentPiano->modMap[i]->type == ModDirectTransposition)
-                    {
-                        preparationDidChange = true;
-                        DBG("modfloat: " + String(currentPiano->modMap[i]->modFloat) );
-                        activeDPreparation[currentPiano->modMap[i]->prepId]->setTransposition(currentPiano->modMap[i]->modFloat);
-                    }
+                    mod = currentPiano->modMap[i];
+                    
+                    if (mod->type == ModDirectTransposition)
+                        activeDPreparation[mod->prepId]->setTransposition(mod->modFloat);
+                    else if (mod->type == ModSynchronicTempo)
+                        activeSPreparation[mod->prepId]->setTempo(mod->modFloat);
+
+                    preparationDidChange = true;
                 }
             }
             
@@ -167,11 +173,6 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             
             --noteOnCount;
             
-            // Sets some flags to determine whether to send noteoffs to previous pianos.
-            if (!allNotesOff && !noteOnCount) {
-                prevPianos.clearQuick();
-                allNotesOff = true;
-            }
         }
         else if (m.isAftertouch())
         {
@@ -182,7 +183,11 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         }
     }
     
-    
+    // Sets some flags to determine whether to send noteoffs to previous pianos.
+    if (!allNotesOff && !noteOnCount) {
+        prevPianos.clearQuick();
+        allNotesOff = true;
+    }
 
     mainPianoSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
@@ -194,15 +199,30 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
 
 void  BKAudioProcessor::setCurrentPiano(int which)
 {
-    if (noteOnCount)  prevPianos.add(currentPiano);
+    
+    // Optimizations can be made here. Don't need to iterate through EVERY preparation. 
+    for (int i = activeDPreparation.size(); --i >= 0; ) {
+        
+        // Need to deal with previous transposition value to make sure notes turn off.
+        activeDPreparation[i]->copy(dPreparation[i]);
+    }
+    
+    for (int i = activeNPreparation.size(); --i >= 0; ) {
+        activeNPreparation[i]->copy(nPreparation[i]);
+    }
+    
+    for (int i = activeSPreparation.size(); --i >= 0; ) {
+        activeSPreparation[i]->copy(sPreparation[i]);
+    }
+    
+    if (noteOnCount)  prevPianos.addIfNotAlreadyThere(currentPiano);
     
     prevPiano = currentPiano;
     
     currentPiano = bkPianos[which];
-    
-    DBG("Current piano: " + String(which));
-    
+
     pianoDidChange = true;
+    preparationDidChange = true;
 }
 
 void BKAudioProcessor::releaseResources() {

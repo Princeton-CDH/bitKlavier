@@ -204,25 +204,25 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
 void SynchronicViewController::updateFields(void)
 {
     SynchronicPreparation::Ptr prep   = processor.activeSPreparation[currentSynchronicId];
+
+    synchronicTF[SynchronicTempo]               ->setText(  String(                 prep->getTempo()), false);
+    synchronicTF[SynchronicNumPulses]           ->setText(  String(                 prep->getNumPulses()), false);
+    synchronicTF[SynchronicClusterMin]          ->setText(  String(                 prep->getClusterMin()), false);
+    synchronicTF[SynchronicClusterMax]          ->setText(  String(                 prep->getClusterMax()), false);
+    synchronicTF[SynchronicClusterThresh]       ->setText(  String(                 prep->getClusterThreshMS()), false);
+    synchronicTF[SynchronicMode]                ->setText(  String(                 prep->getMode()), false);
+    synchronicTF[SynchronicBeatsToSkip]         ->setText(  String(                 prep->getBeatsToSkip()), false);
+    synchronicTF[SynchronicBeatMultipliers]     ->setText(  floatArrayToString(     prep->getBeatMultipliers()), false);
+    synchronicTF[SynchronicLengthMultipliers]   ->setText(  floatArrayToString(     prep->getLengthMultipliers()), false);
+    synchronicTF[SynchronicAccentMultipliers]   ->setText(  floatArrayToString(     prep->getAccentMultipliers()), false);
+    synchronicTF[SynchronicTranspOffsets]       ->setText(  floatArrayToString(     prep->getTranspOffsets()), false);
+    synchronicTF[SynchronicTuning]              ->setText(  String(                 prep->getTuning()->getId()), false);
     
-    synchronicTF[SynchronicTempo]               ->setText(  String(                 prep->getTempo()));
-    synchronicTF[SynchronicNumPulses]           ->setText(  String(                 prep->getNumPulses()));
-    synchronicTF[SynchronicClusterMin]          ->setText(  String(                 prep->getClusterMin()));
-    synchronicTF[SynchronicClusterMax]          ->setText(  String(                 prep->getClusterMax()));
-    synchronicTF[SynchronicClusterThresh]       ->setText(  String(                 prep->getClusterThreshMS()));
-    synchronicTF[SynchronicMode]                ->setText(  String(                 prep->getMode()));
-    synchronicTF[SynchronicBeatsToSkip]         ->setText(  String(                 prep->getBeatsToSkip()));
-    synchronicTF[SynchronicBeatMultipliers]     ->setText(  floatArrayToString(     prep->getBeatMultipliers()));
-    synchronicTF[SynchronicLengthMultipliers]   ->setText(  floatArrayToString(     prep->getLengthMultipliers()));
-    synchronicTF[SynchronicAccentMultipliers]   ->setText(  floatArrayToString(     prep->getAccentMultipliers()));
-    synchronicTF[SynchronicTranspOffsets]       ->setText(  floatArrayToString(     prep->getTranspOffsets()));
-    synchronicTF[SynchronicTuning]              ->setText(  String(                 prep->getTuning()->getId()));
-    
-    synchronicTF[AT1Mode]            ->setText(  String(                 prep->getAdaptiveTempo1Mode()));
-    synchronicTF[AT1History]         ->setText(  String(                 prep->getAdaptiveTempo1History()));
-    synchronicTF[AT1Subdivisions]    ->setText(  String(                 prep->getAdaptiveTempo1Subdivisions()));
-    synchronicTF[AT1Min]             ->setText(  String(                 prep->getAdaptiveTempo1Min()));
-    synchronicTF[AT1Max]             ->setText(  String(                 prep->getAdaptiveTempo1Max()));
+    synchronicTF[AT1Mode]            ->setText(  String(                 prep->getAdaptiveTempo1Mode()), false);
+    synchronicTF[AT1History]         ->setText(  String(                 prep->getAdaptiveTempo1History()), false);
+    synchronicTF[AT1Subdivisions]    ->setText(  String(                 prep->getAdaptiveTempo1Subdivisions()), false);
+    synchronicTF[AT1Min]             ->setText(  String(                 prep->getAdaptiveTempo1Min()), false);
+    synchronicTF[AT1Max]             ->setText(  String(                 prep->getAdaptiveTempo1Max()), false);
     
 }
 

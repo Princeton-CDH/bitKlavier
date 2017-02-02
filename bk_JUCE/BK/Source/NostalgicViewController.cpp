@@ -159,15 +159,15 @@ void NostalgicViewController::updateFields(void)
     
     NostalgicPreparation::Ptr prep = processor.activeNPreparation[currentNostalgicId];
 
-    nostalgicTF[NostalgicWaveDistance]      ->setText( String( prep->getWavedistance()));
-    nostalgicTF[NostalgicUndertow]          ->setText( String( prep->getUndertow()));
-    nostalgicTF[NostalgicTransposition]     ->setText( String( prep->getTransposition()));
-    nostalgicTF[NostalgicGain]              ->setText( String( prep->getGain()));
-    nostalgicTF[NostalgicLengthMultiplier]  ->setText( String( prep->getLengthMultiplier()));
-    nostalgicTF[NostalgicBeatsToSkip]       ->setText( String( prep->getBeatsToSkip()));
-    nostalgicTF[NostalgicMode]              ->setText( String( prep->getMode()));
-    nostalgicTF[NostalgicSyncTarget]        ->setText( String( prep->getSyncTarget()));
-    nostalgicTF[NostalgicTuning]            ->setText( String(prep->getTuning()->getId()));
+    nostalgicTF[NostalgicWaveDistance]      ->setText( String( prep->getWavedistance()), false);
+    nostalgicTF[NostalgicUndertow]          ->setText( String( prep->getUndertow()), false);
+    nostalgicTF[NostalgicTransposition]     ->setText( String( prep->getTransposition()), false);
+    nostalgicTF[NostalgicGain]              ->setText( String( prep->getGain()), false);
+    nostalgicTF[NostalgicLengthMultiplier]  ->setText( String( prep->getLengthMultiplier()), false);
+    nostalgicTF[NostalgicBeatsToSkip]       ->setText( String( prep->getBeatsToSkip()), false);
+    nostalgicTF[NostalgicMode]              ->setText( String( prep->getMode()), false);
+    nostalgicTF[NostalgicSyncTarget]        ->setText( String( prep->getSyncTarget()), false);
+    nostalgicTF[NostalgicTuning]            ->setText( String(prep->getTuning()->getId()), false);
 }
 
 void NostalgicViewController::bkMessageReceived (const String& message)

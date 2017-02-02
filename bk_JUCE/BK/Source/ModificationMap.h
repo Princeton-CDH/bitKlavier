@@ -15,11 +15,19 @@
 
 #include "Modification.h"
 
-class ModificationMap
+class ModificationMap : public ReferenceCountedObject
 {
 public:
+    ModificationMap(void);
+    ~ModificationMap(void);
+    typedef ReferenceCountedObjectPtr<ModificationMap>   Ptr;
+    typedef Array<ModificationMap::Ptr>                  PtrArr;
+    typedef Array<ModificationMap::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<ModificationMap>                  Arr;
+    typedef OwnedArray<ModificationMap, CriticalSection> CSArr;
     
 private:
+    Modification::PtrArr    modifications;
     
     JUCE_LEAK_DETECTOR(ModificationMap)
 };

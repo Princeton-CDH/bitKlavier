@@ -109,6 +109,30 @@ public:
     {
     }
     
+    inline void copy(SynchronicPreparation::Ptr s)
+    {
+        sTempo = s->getTempo();
+        sNumPulses = s->getNumPulses();
+        sClusterMin = s->getClusterMin();
+        sClusterMax = s->getClusterMax();
+        sClusterCap = s->getClusterCap();
+        sMode = s->getMode();
+        sBeatsToSkip = s->getBeatsToSkip();
+        sBeatMultipliers = s->getBeatMultipliers();
+        sAccentMultipliers = s->getAccentMultipliers();
+        sLengthMultipliers = s->getLengthMultipliers();
+        sTranspOffsets = s->getTranspOffsets();
+        sPulseThreshSec = 60.0 / sTempo;
+        sClusterThresh = s->getClusterThreshMS();
+        sClusterThreshSec = .001 * sClusterThresh;
+        at1History = s->getAdaptiveTempo1History();
+        at1Min = s->getAdaptiveTempo1Min();
+        at1Max = s->getAdaptiveTempo1Max();
+        at1Subdivisions = s->getAdaptiveTempo1Subdivisions();
+        at1Mode = s->getAdaptiveTempo1Mode();
+        tuning = s->getTuning();
+    }
+    
     inline const float getTempo() const noexcept                       {return sTempo;                 }
     inline const int getNumPulses() const noexcept                     {return sNumPulses;             }
     inline const int getClusterMin() const noexcept                    {return sClusterMin;            }

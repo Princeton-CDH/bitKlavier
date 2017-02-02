@@ -73,6 +73,15 @@ public:
         
     }
     
+    inline void copy(DirectPreparation::Ptr d)
+    {
+        dTransposition = d->getTransposition();
+        dGain = d->getGain();
+        dResonanceGain = d->getResonanceGain();
+        dHammerGain = d->getHammerGain();
+        tuning = d->getTuning();
+    }
+    
     
     inline const float getTransposition() const noexcept                {return dTransposition; }
     inline const float getGain() const noexcept                         {return dGain;          }

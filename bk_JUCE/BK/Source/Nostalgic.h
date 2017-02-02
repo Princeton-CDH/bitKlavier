@@ -91,6 +91,18 @@ public:
         
     }
     
+    inline void copy(NostalgicPreparation::Ptr n)
+    {
+        nWaveDistance = n->getWavedistance();
+        nUndertow = n->getUndertow();
+        nTransposition = n->getTransposition();
+        nGain = n->getGain();
+        nLengthMultiplier = n->getLengthMultiplier();
+        nBeatsToSkip = n->getBeatsToSkip();
+        nMode = n->getMode();
+        nSyncTarget = n->getSyncTarget();
+        tuning = n->getTuning();
+    }
     
     inline const int getWavedistance() const noexcept                      {return nWaveDistance;      }
     inline const int getUndertow() const noexcept                          {return nUndertow;          }

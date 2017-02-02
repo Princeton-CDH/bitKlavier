@@ -99,6 +99,7 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
     }
     else if (name == cDirectParameterTypes[DirectTransposition])
     {
+        DBG("transp: " + String(f));
         prep    ->setTransposition(f);
         active  ->setTransposition(f);
     }
@@ -134,11 +135,11 @@ void DirectViewController::updateFields(void)
     
     DirectPreparation::Ptr prep = processor.activeDPreparation[currentDirectId];
     
-    directTF[DirectTransposition]       ->setText( String( prep->getTransposition()));
-    directTF[DirectGain]                ->setText( String( prep->getGain()));
-    directTF[DirectHammerGain]          ->setText( String( prep->getHammerGain()));
-    directTF[DirectResGain]             ->setText( String( prep->getResonanceGain()));
-    directTF[DirectTuning]              ->setText( String( prep->getTuning()->getId()));
+    directTF[DirectTransposition]       ->setText( String( prep->getTransposition()), false);
+    directTF[DirectGain]                ->setText( String( prep->getGain()), false);
+    directTF[DirectHammerGain]          ->setText( String( prep->getHammerGain()), false);
+    directTF[DirectResGain]             ->setText( String( prep->getResonanceGain()), false);
+    directTF[DirectTuning]              ->setText( String( prep->getTuning()->getId()), false);
 
 }
 

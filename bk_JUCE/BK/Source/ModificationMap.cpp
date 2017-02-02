@@ -9,3 +9,15 @@
 */
 
 #include "ModificationMap.h"
+
+ModificationMap::ModificationMap()
+{
+    modifications.ensureStorageAllocated(1);
+    
+    
+}
+
+ModificationMap::~ModificationMap()
+{
+    
+}

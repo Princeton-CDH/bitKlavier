@@ -224,10 +224,12 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             
             phasor -= numSamplesBeat;
             
+            /*
             DBG("shouldPlay: "      + String((int)shouldPlay) +
                 " accent: "         + String(active->getAccentMultipliers()[accent]) +
                 " accent counter: " + String(accent)
                 );
+            */
             
             if (clusterSize >= active->getClusterMin() && clusterSize <= active->getClusterMax())
             {

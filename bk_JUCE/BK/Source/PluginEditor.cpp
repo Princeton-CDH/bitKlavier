@@ -117,6 +117,7 @@ void BKAudioProcessorEditor::timerCallback()
     {
         processor.pianoDidChange = false;
         switchPianos();
+
     }
     
     if (processor.preparationDidChange)

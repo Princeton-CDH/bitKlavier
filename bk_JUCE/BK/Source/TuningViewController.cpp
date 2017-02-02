@@ -147,18 +147,17 @@ void TuningViewController::updateFields(int tuningId)
 {
     
     TuningPreparation::Ptr prep = processor.tPreparation[tuningId];
-    
-    tuningTF[TuningId]                  ->setText( String( tuningId));
-    tuningTF[TuningScale]               ->setText( String( prep->getTuning()));
-    tuningTF[TuningFundamental]         ->setText( String( prep->getFundamental()));
-    tuningTF[TuningOffset]              ->setText( String( prep->getFundamentalOffset()));
-    tuningTF[TuningA1IntervalScale]     ->setText( String( prep->getAdaptiveIntervalScale()));
-    tuningTF[TuningA1Inversional]       ->setText( String( prep->getAdaptiveInversional()));
-    tuningTF[TuningA1AnchorScale]       ->setText( String( prep->getAdaptiveAnchorScale()));
-    tuningTF[TuningA1AnchorFundamental] ->setText( String( prep->getAdaptiveAnchorFundamental()));
-    tuningTF[TuningA1ClusterThresh]     ->setText( String( prep->getAdaptiveClusterThresh()));
-    tuningTF[TuningA1History]           ->setText( String( prep->getAdaptiveHistory()));
-    tuningTF[TuningCustomScale]         ->setText( floatArrayToString( prep->getCustomScale()));
+
+    tuningTF[TuningScale]               ->setText( String( prep->getTuning()), false);
+    tuningTF[TuningFundamental]         ->setText( String( prep->getFundamental()), false);
+    tuningTF[TuningOffset]              ->setText( String( prep->getFundamentalOffset()), false);
+    tuningTF[TuningA1IntervalScale]     ->setText( String( prep->getAdaptiveIntervalScale()), false);
+    tuningTF[TuningA1Inversional]       ->setText( String( prep->getAdaptiveInversional()), false);
+    tuningTF[TuningA1AnchorScale]       ->setText( String( prep->getAdaptiveAnchorScale()), false);
+    tuningTF[TuningA1AnchorFundamental] ->setText( String( prep->getAdaptiveAnchorFundamental()), false);
+    tuningTF[TuningA1ClusterThresh]     ->setText( String( prep->getAdaptiveClusterThresh()), false);
+    tuningTF[TuningA1History]           ->setText( String( prep->getAdaptiveHistory()), false);
+    tuningTF[TuningCustomScale]         ->setText( floatArrayToString( prep->getCustomScale()), false);
 
     
 }
