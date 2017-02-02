@@ -191,7 +191,7 @@ private:
     int Id;
     float sTempo;
     int sNumBeats,sClusterMin,sClusterMax;
-    int sClusterCap = 8; //max in cluster; 8 in original bK
+    int sClusterCap = 8; //max in cluster; 8 in original bK. pulseDepth?
     
     SynchronicSyncMode sMode;
     int sBeatsToSkip;
@@ -266,7 +266,7 @@ private:
     int beatMultiplierCounter;   //beat length (time between beats) multipliers
     int accentMultiplierCounter; //accent multipliers
     int lengthMultiplierCounter; //note length (sounding length) multipliers (multiples of 50ms, at least for now)
-    int transpOffsetCounter;    //transposition offsets
+    int transpOffsetCounter;     //transposition offsets
     
     //reset the phase, including of all the parameter fields
     void resetPhase(int skipBeats);
@@ -287,7 +287,6 @@ private:
     uint64 beatThresholdSamples;    // # samples in a beat, as set by tempo
 
     bool shouldPlay;
-
     
     JUCE_LEAK_DETECTOR(SynchronicProcessor);
 };
