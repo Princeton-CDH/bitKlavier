@@ -56,23 +56,22 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
     PianoSamplerNoteDirection noteDirection = Forward;
     float noteStartPos = 0.0;
     
-    //float noteLength = (fabs(active->getLengthMultipliers()[length]) * tempoPeriod);
-    float noteLength = (fabs(active->getLengthMultipliers()[length]) * 50.0);
+    //float noteLength = (fabs(active->getLengthMultipliers()[length]) * tempoPeriod); //option for later
+    float noteLength = (fabs(active->getLengthMultipliers()[lengthMultiplierCounter]) * 50.0);
     
-    if (active->getLengthMultipliers()[length] < 0)
+    if (active->getLengthMultipliers()[lengthMultiplierCounter] < 0)
     {
         noteDirection = Reverse;
         noteStartPos = noteLength;
     }
     
-    float offset = tuner.getOffset(note) + active->getTranspOffsets()[transp];
+    float offset = tuner.getOffset(note) + active->getTranspOffsets()[transpOffsetCounter];
     int synthNoteNumber = ((float)note + (int)offset);
     offset -= (int)offset;
     
     synth->keyOn(channel,
                  synthNoteNumber,
                  offset,
-                 //velocity * preparation->getAccentMultipliers()[accent],
                  velocity,
                  aGlobalGain,
                  noteDirection,
@@ -88,12 +87,12 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
 void SynchronicProcessor::resetPhase(int skipBeats)
 {
     
-    beat    = skipBeats % active->getBeatMultipliers().size();
-    length  = skipBeats % active->getLengthMultipliers().size();
-    accent  = skipBeats % active->getAccentMultipliers().size();
-    transp  = skipBeats % active->getTranspOffsets().size();
+    beatMultiplierCounter   = skipBeats % active->getBeatMultipliers().size();
+    lengthMultiplierCounter = skipBeats % active->getLengthMultipliers().size();
+    accentMultiplierCounter = skipBeats % active->getAccentMultipliers().size();
+    transpOffsetCounter     = skipBeats % active->getTranspOffsets().size();
     
-    pulse   = 0;
+    beatCounter   = 0;
 
 }
 
@@ -110,7 +109,11 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     keysDepressed.addIfNotAlreadyThere(noteNumber);
     
     //silence pulses if in NoteOffSync
-    if(active->getMode() == LastNoteOffSync) shouldPlay = false;
+    if(    (active->getMode() == LastNoteOffSync)
+        || (active->getMode() == AnyNoteOffSync))
+            shouldPlay = false;
+    
+    else shouldPlay = true;
     
     //cluster management
     if(!inCluster) //we have a new cluster
@@ -124,18 +127,15 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
         
         //reset parameter counters; need to account for skipBeats
         resetPhase(active->getBeatsToSkip());
-        
-        //start pulses, unless waiting in noteOff mode
-        if(active->getMode() != LastNoteOffSync) shouldPlay = true;
-        
+
         //now we are in a cluster!
         inCluster = true;
         
     }
-    else if (active->getMode() == LastNoteOnSync)
+    else if (active->getMode() == AnyNoteOnSync)
     {
         
-        //reset phasor if in LastNoteOnSync
+        //reset phasor if in AnyNoteOnSync
         phasor = 0;
         resetPhase(active->getBeatsToSkip());
 
@@ -150,9 +150,10 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     
     cluster.insert(0, noteNumber);
     if(cluster.size() > active->getClusterCap()) cluster.resize(active->getClusterCap());
+    //DBG("cluster size: " + String(cluster.size()) + " " + String(clusterThresholdSamples/sampleRate));
     
     //why not use clusterMax for this? the intent is different:
-    //clusterMax: max number of notes played otherwise shut off pulses
+    //clusterMax: max number of keys pressed within clusterThresh, otherwise shut off pulses
     //clusterCap: the most number of notes allowed in a cluster when playing pulses
     //so, let's say we are playing a rapid passage where successive notes are within the clusterThresh
     //and we want the pulse to emerge when we stop; clusterMax wouldn't allow this to happen
@@ -160,7 +161,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     //to limit the number of notes included in the cluster.
     //for now, we'll leave clusterCap unexposed, just to avoid confusion for the user. after all,
     //I used it this way for all of the etudes to date! but might want to expose eventually...
-    //perhaps call pulseVoices? since it's essentially the number of "voices" in the pulse chord?
+    //perhaps call beatVoices? since it's essentially the number of "voices" in the pulse chord?
     
     //reset the timer for time between notes
     clusterThresholdTimer = 0;
@@ -174,15 +175,16 @@ void SynchronicProcessor::keyReleased(int noteNumber, int channel)
     //remove key from array of pressed keys
     keysDepressed.removeAllInstancesOf(noteNumber);
     
-    // If LastNoteOnSync mode, reset phasor and multiplier indices.
+    // If AnyNoteOffSync mode, reset phasor and multiplier indices.
     //only initiate pulses if ALL keys are released
-    if (active->getMode() == LastNoteOffSync && keysDepressed.size() == 0)
+    if (    (active->getMode() == LastNoteOffSync && keysDepressed.size() == 0)
+         || (active->getMode() == AnyNoteOffSync))
     {
-        phasor = pulseThresholdSamples; //start right away
-        resetPhase(active->getBeatsToSkip());
-
+        phasor = beatThresholdSamples; //start right away
+        resetPhase(active->getBeatsToSkip() - 1);
+        
+        inCluster = true;
         shouldPlay = true;
-
     }
 }
 
@@ -195,14 +197,17 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
     
     //need to do this every block?
     clusterThresholdSamples = (active->getClusterThreshSEC() * sampleRate);
-    pulseThresholdSamples = (active->getPulseThresh() * sampleRate);
+    beatThresholdSamples = (active->getBeatThresh() * sampleRate);
     
+    //cluster management
     if (inCluster)
     {
+        //moved beyond clusterThreshold time, done with cluster
         if (clusterThresholdTimer >= clusterThresholdSamples)
         {
             inCluster = false;
         }
+        //otherwise incrument cluster timer
         else
         {
             clusterThresholdTimer += numSamples;
@@ -215,64 +220,76 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
         //remove duplicates from cluster, so we don't play the same note twice in a single pulse
         slimCluster.clearQuick();
         for(int i = 0; i< cluster.size(); i++) slimCluster.addIfNotAlreadyThere(cluster.getUnchecked(i));
-        int clusterSize = slimCluster.size();
         
-        numSamplesBeat = (active->getBeatMultipliers()[beat] * pulseThresholdSamples);
+        //get time until next beat => beat length scaled by beatMultiplier parameter
+        numSamplesBeat = (active->getBeatMultipliers()[beatMultiplierCounter] * beatThresholdSamples);
         
+        //check to see if enough time has passed for next beat
         if (phasor >= numSamplesBeat)
         {
             
+            //reset phasor for next beat
             phasor -= numSamplesBeat;
             
-            /*
-            DBG("shouldPlay: "      + String((int)shouldPlay) +
-                " accent: "         + String(active->getAccentMultipliers()[accent]) +
-                " accent counter: " + String(accent)
-                );
-            */
+            //increment parameter counters
+            if (++lengthMultiplierCounter   >= active->getLengthMultipliers().size())     lengthMultiplierCounter = 0;
+            if (++accentMultiplierCounter   >= active->getAccentMultipliers().size())     accentMultiplierCounter = 0;
+            if (++transpOffsetCounter       >= active->getTranspOffsets().size())         transpOffsetCounter = 0;
             
-            if (clusterSize >= active->getClusterMin() && clusterSize <= active->getClusterMax())
+            //update display of counters in UI
+            DBG(" length: "         + String(active->getLengthMultipliers()[lengthMultiplierCounter]) +
+                " length counter:"  + String(lengthMultiplierCounter) +
+                " accent: "         + String(active->getAccentMultipliers()[accentMultiplierCounter]) +
+                " accent counter: " + String(accentMultiplierCounter) +
+                " transp: "         + String(active->getTranspOffsets()[transpOffsetCounter]) +
+                " transp counter: " + String(transpOffsetCounter)
+                );
+            
+            //play all the notes in the cluster, with current parameter vals
+            if (cluster.size() >= active->getClusterMin() && cluster.size() <= active->getClusterMax())
             {
-                for (int n = 0; n < clusterSize; n++)
+                for (int n = 0; n < slimCluster.size(); n++)
                 {
                     playNote(channel,
                              cluster[n],
-                             velocities.getUnchecked(cluster[n]) * active->getAccentMultipliers()[accent]);
+                             velocities.getUnchecked(cluster[n]) * active->getAccentMultipliers()[accentMultiplierCounter]);
                 }
                 
             }
             
-            if (++beat      >= active->getBeatMultipliers().size())         beat = 0;
-            if (++length    >= active->getLengthMultipliers().size())     length = 0;
-            if (++accent    >= active->getAccentMultipliers().size())     accent = 0;
-            if (++transp    >= active->getTranspOffsets().size())         transp = 0;
+            //increment beat and beatMultiplier counters, for next beat; check maxes and adjust
+            if (++beatMultiplierCounter >= active->getBeatMultipliers().size()) beatMultiplierCounter = 0;
+            if (++beatCounter >= active->getNumBeats()) shouldPlay = false; //done with pulses
             
-            if (++pulse     >= active->getNumPulses())
-            {
-                cluster.clearQuick();
-                shouldPlay = false;
-            }
+            //update display of beat counter in UI
+            DBG(" beat length: "    + String(active->getBeatMultipliers()[beatMultiplierCounter]) +
+                " beatMultiplier counter: "   + String(beatMultiplierCounter)
+                );
+            DBG(" ");
+
         }
         
+        //pass time until next beat
         phasor += numSamples;
     }
     
 }
 
 
-float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip) //return time in ms to future beat, given beatsToSkip
+//return time in ms to future beat, given beatsToSkip
+float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
 {
     uint64 timeToReturn = numSamplesBeat - phasor; //next beat
-    int myBeat = beat;
+    int myBeat = beatMultiplierCounter;
     
     while(beatsToSkip-- > 0)
     {
         if (++myBeat >= active->getBeatMultipliers().size()) myBeat = 0;
-        timeToReturn += (active->getBeatMultipliers()[myBeat] * pulseThresholdSamples);
+        timeToReturn += (active->getBeatMultipliers()[myBeat] * beatThresholdSamples);
     }
     
     //DBG("time in ms to skipped beat = " + std::to_string(timeToReturn * 1000./sampleRate));
-    return timeToReturn * 1000./sampleRate;
+    return timeToReturn * 1000./sampleRate; //optimize later....
 }
 
 
