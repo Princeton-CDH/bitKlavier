@@ -196,10 +196,10 @@ private:
     SynchronicSyncMode sMode;
     int sBeatsToSkip;
     
-    Array<float> sBeatMultipliers;
-    Array<float> sAccentMultipliers;
-    Array<float> sLengthMultipliers;
-    Array<float> sTranspOffsets;
+    Array<float> sBeatMultipliers;      //multiply pulse lengths by these
+    Array<float> sAccentMultipliers;    //multiply velocities by these
+    Array<float> sLengthMultipliers;    //multiply note duration by these
+    Array<float> sTranspOffsets;        //transpose by these
 
     float sPulseThreshSec;      //length of time between pulses, as set by temp
     float sClusterThresh;       //max time between played notes before new cluster is started, in MS
@@ -260,9 +260,9 @@ private:
     Array<float> tuningOffsets;
     PitchClass tuningBasePitch;
 
-    int pulse;  //pulse counter
+    int pulse;  //pulse counter; max set by users -- sNumPulses
     
-    //parameter fields
+    //parameter field counters
     int beat;   //beat length multipliers
     int accent; //accent multipliers
     int length; //note length multipliers (multiples of 50ms, at least for now)

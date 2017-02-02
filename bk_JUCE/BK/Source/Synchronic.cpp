@@ -56,7 +56,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
     PianoSamplerNoteDirection noteDirection = Forward;
     float noteStartPos = 0.0;
     
-    //float noteLength = (fabs(active->getLengthMultipliers()[length]) * tempoPeriod);
+    //float noteLength = (fabs(active->getLengthMultipliers()[length]) * tempoPeriod); //option for later
     float noteLength = (fabs(active->getLengthMultipliers()[length]) * 50.0);
     
     if (active->getLengthMultipliers()[length] < 0)
@@ -72,7 +72,6 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
     synth->keyOn(channel,
                  synthNoteNumber,
                  offset,
-                 //velocity * preparation->getAccentMultipliers()[accent],
                  velocity,
                  aGlobalGain,
                  noteDirection,
@@ -202,12 +201,15 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
     clusterThresholdSamples = (active->getClusterThreshSEC() * sampleRate);
     pulseThresholdSamples = (active->getPulseThresh() * sampleRate);
     
+    //cluster management
     if (inCluster)
     {
+        //moved beyond clusterThreshold time, done with cluster
         if (clusterThresholdTimer >= clusterThresholdSamples)
         {
             inCluster = false;
         }
+        //otherwise incrument cluster timer
         else
         {
             clusterThresholdTimer += numSamples;
@@ -221,17 +223,22 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
         slimCluster.clearQuick();
         for(int i = 0; i< cluster.size(); i++) slimCluster.addIfNotAlreadyThere(cluster.getUnchecked(i));
         
+        //get time until next beat => pulse length scaled by beatMultiplier parameter
         numSamplesBeat = (active->getBeatMultipliers()[beat] * pulseThresholdSamples);
         
+        //check to see if enough time has passed for next beat
         if (phasor >= numSamplesBeat)
         {
             
+            //reset phasor for next beat
             phasor -= numSamplesBeat;
             
+            //increment parameter counters
             if (++length    >= active->getLengthMultipliers().size())     length = 0;
             if (++accent    >= active->getAccentMultipliers().size())     accent = 0;
             if (++transp    >= active->getTranspOffsets().size())         transp = 0;
             
+            //update display of counters in UI
             DBG(" length: "         + String(active->getLengthMultipliers()[length]) +
                 " length counter:"  + String(length) +
                 " accent: "         + String(active->getAccentMultipliers()[accent]) +
@@ -240,6 +247,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 " transp counter: " + String(transp)
                 );
             
+            //play all the notes in the cluster, with current parameter vals
             if (cluster.size() >= active->getClusterMin() && cluster.size() <= active->getClusterMax())
             {
                 for (int n = 0; n < slimCluster.size(); n++)
@@ -251,9 +259,11 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 
             }
             
-            if (++beat      >= active->getBeatMultipliers().size())         beat = 0;
-            if (++pulse     >= active->getNumPulses())                shouldPlay = false;
+            //increment beat and pulse counters, for next beat; check maxes and adjust
+            if (++beat      >= active->getBeatMultipliers().size())         beat = 0;     //go back to beginning of parameter cycle
+            if (++pulse     >= active->getNumPulses())                shouldPlay = false; //done with pulses
             
+            //update display of beat counter in UI
             DBG(" beat length: "    + String(active->getBeatMultipliers()[beat]) +
                 " beat counter: "   + String(beat)
                 );
@@ -261,13 +271,15 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
 
         }
         
+        //pass time until next beat
         phasor += numSamples;
     }
     
 }
 
 
-float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip) //return time in ms to future beat, given beatsToSkip
+//return time in ms to future beat, given beatsToSkip
+float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
 {
     uint64 timeToReturn = numSamplesBeat - phasor; //next beat
     int myBeat = beat;
