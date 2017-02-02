@@ -39,7 +39,7 @@ syncProcessor(proc)
         reverseTargetLength.insert(i, 0);
         tuningsAtKeyOn.insert(i, 0);
         velocitiesAtKeyOn.insert(i, 0);
-        preparationAtKeyOn.insert(i, preparation);
+        preparationAtKeyOn.insert(i, active);
         noteOn.set(i, false);
     }
 
@@ -123,7 +123,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
         //store values for when undertow note is played (in the event the preparation changes in the meantime)
         tuningsAtKeyOn.set(midiNoteNumber, tuner.getOffset(midiNoteNumber));
         velocitiesAtKeyOn.set(midiNoteNumber, velocities.getUnchecked(midiNoteNumber) * active->getGain());
-        preparationAtKeyOn.set(midiNoteNumber, preparation);
+        preparationAtKeyOn.set(midiNoteNumber, active);
         
         //it might be better to do this by copy, instead of by pointer, in the off chance that the preparation disappears because of a library switch or something...
     

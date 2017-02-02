@@ -59,7 +59,7 @@ resonanceReleaseSynth   (general)
     // Modification testing ground
     // have to explicitly cast to float,int,Array<int>,Array<float>,bool
     bkPianos[0]->modMap.add(new Modification(ModSynchronicTempo, 1, (float)1200));
-    bkPianos[0]->modMap.add(new Modification(ModSynchronicTempo, 2, (float)1500));
+    bkPianos[1]->modMap.add(new Modification(ModSynchronicTempo, 2, (float)1500));
     
     
     // Default all on for 
