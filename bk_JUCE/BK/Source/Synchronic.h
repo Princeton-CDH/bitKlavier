@@ -40,7 +40,7 @@ public:
     sAccentMultipliers(p->getAccentMultipliers()),
     sLengthMultipliers(p->getLengthMultipliers()),
     sTranspOffsets(p->getTranspOffsets()),
-    sBeatThreshSec(p->betBeatThresh()),
+    sBeatThreshSec(p->getBeatThresh()),
     sClusterThresh(p->getClusterThreshMS()),
     sClusterThreshSec(p->getClusterThreshSEC()),
     at1History(p->getAdaptiveTempo1History()),
@@ -110,12 +110,12 @@ public:
     }
     
     inline const float getTempo() const noexcept                       {return sTempo;                 }
-    inline const int getNumBeats() const noexcept                     {return sNumBeats;             }
+    inline const int getNumBeats() const noexcept                      {return sNumBeats;             }
     inline const int getClusterMin() const noexcept                    {return sClusterMin;            }
     inline const int getClusterMax() const noexcept                    {return sClusterMax;            }
     inline const int getClusterCap() const noexcept                    {return sClusterCap;            }
     inline const float getClusterThreshSEC() const noexcept            {return sClusterThreshSec;      }
-    inline const float betBeatThresh() const noexcept                 {return sBeatThreshSec;        }
+    inline const float getBeatThresh() const noexcept                  {return sBeatThreshSec;        }
     inline const float getClusterThreshMS() const noexcept             {return sClusterThresh;         }
     inline const SynchronicSyncMode getMode() const noexcept           {return sMode;                  }
     inline const Array<float> getBeatMultipliers() const noexcept      {return sBeatMultipliers;       }

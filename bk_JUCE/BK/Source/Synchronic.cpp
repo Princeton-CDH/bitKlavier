@@ -197,7 +197,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
     
     //need to do this every block?
     clusterThresholdSamples = (active->getClusterThreshSEC() * sampleRate);
-    beatThresholdSamples = (active->betBeatThresh() * sampleRate);
+    beatThresholdSamples = (active->getBeatThresh() * sampleRate);
     
     //cluster management
     if (inCluster)
@@ -289,7 +289,7 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
     }
     
     //DBG("time in ms to skipped beat = " + std::to_string(timeToReturn * 1000./sampleRate));
-    return timeToReturn * 1000./sampleRate;
+    return timeToReturn * 1000./sampleRate; //optimize later....
 }
 
 
