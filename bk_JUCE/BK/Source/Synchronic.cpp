@@ -22,7 +22,8 @@ active(ap),
 tuner(active->getTuning())
 {
     velocities.ensureStorageAllocated(128);
-    for (int i = 0; i < 128; i++) {
+    for (int i = 0; i < 128; i++)
+    {
         velocities.insert(i, 0.);
     }
     

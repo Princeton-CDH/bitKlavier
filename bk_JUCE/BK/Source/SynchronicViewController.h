@@ -30,14 +30,17 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     
+    void updateModFields(void);
     void updateFields(void);
     
 private:
     BKAudioProcessor& processor;
     int currentSynchronicId;
+    int currentModSynchronicId;
     
     OwnedArray<BKLabel> synchronicL;
     OwnedArray<BKTextField> synchronicTF;
+    OwnedArray<BKTextField> modSynchronicTF;
     
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;

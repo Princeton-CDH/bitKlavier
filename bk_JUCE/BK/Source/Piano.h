@@ -61,12 +61,13 @@ public:
     Synchronic::PtrArr  synchronic;
     Nostalgic::PtrArr   nostalgic;
     Direct::PtrArr      direct;
+    
+    SynchronicPreparation::PtrArr   modificationPreps;
 
     Array<int>                  pianoMap;
     int                         numPMaps;
     
-    OwnedArray<Modification>    modMap;
-    int                         numMMaps;
+    OwnedArray<ModificationMap> modMap;
     
     int                         numModSMaps, numModNMaps, numModDMaps;
     

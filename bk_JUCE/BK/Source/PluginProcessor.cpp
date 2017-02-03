@@ -46,6 +46,7 @@ resonanceReleaseSynth   (general)
     {
         bkPianos.set(i, new Piano(synchronic, nostalgic, direct,
                                   bkKeymaps[0], i)); // initializing piano 0
+
     }
   
     // Initialize first piano.
@@ -53,7 +54,11 @@ resonanceReleaseSynth   (general)
     currentPiano = bkPianos[0];
     
     // Default all on for 
-    for (int i = 0; i < 128; i++)   bkKeymaps[1]->addNote(i);
+    for (int i = 0; i < 128; i++) bkKeymaps[1]->addNote(i);
+    
+    
+    DirectModification::Ptr myMod = new DirectModification(DirectTransposition, 1, (float)12.0);
+    currentPiano->modMap[60]->addDirectModification(myMod);
     
 }
 
@@ -134,24 +139,15 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             int whichPiano = currentPiano->pianoMap[noteNumber] - 1;
             if (whichPiano >= 0 && whichPiano != currentPiano->getId()) setCurrentPiano(whichPiano);
 
-            /*
-            Modification* mod;
-            
-            if (noteNumber == 60)
+            DirectModification::PtrArr dMod = currentPiano->modMap[noteNumber]->getDirectModifications();
+            for (int i = dMod.size(); --i >= 0;)
             {
-                for (int i = currentPiano->modMap.size(); --i >= 0;)
-                {
-                    mod = currentPiano->modMap[i];
-                    
-                    if (mod->type == ModDirectTransposition)
-                        direct[mod->prepId]->aPrep->setTransposition(mod->modFloat);
-                    else if (mod->type == ModSynchronicTempo)
-                        synchronic[mod->prepId]->aPrep->setTempo(mod->modFloat);
-
-                    preparationDidChange = true;
-                }
+                if (dMod[i]->getParameterType() == DirectTransposition)
+                    direct[dMod[i]->getPrepId()]->aPrep->setTransposition(dMod[i]->getModFloat());
+                
+                preparationDidChange = true;
             }
-             */
+
             
             // Send key on to each pmap in current piano
             for (p = currentPiano->activePMaps.size(); --p >= 0;)

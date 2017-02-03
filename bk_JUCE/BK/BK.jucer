@@ -49,8 +49,6 @@
           <FILE id="hJbk7x" name="Keymap.h" compile="0" resource="0" file="Source/Keymap.h"/>
           <FILE id="djaSBK" name="PianoMap.cpp" compile="1" resource="0" file="Source/PianoMap.cpp"/>
           <FILE id="U3irmU" name="PianoMap.h" compile="0" resource="0" file="Source/PianoMap.h"/>
-          <FILE id="ZJUiWR" name="Modification.cpp" compile="1" resource="0"
-                file="Source/Modification.cpp"/>
           <FILE id="xHx6az" name="Modification.h" compile="0" resource="0" file="Source/Modification.h"/>
           <FILE id="sbtYa6" name="ModificationMap.cpp" compile="1" resource="0"
                 file="Source/ModificationMap.cpp"/>
@@ -61,15 +59,16 @@
           <FILE id="jW1Js5" name="PreparationMap.h" compile="0" resource="0"
                 file="Source/PreparationMap.h"/>
         </GROUP>
-        <GROUP id="{BE0ACC3D-1AC5-1BB6-2D3E-F52EFBCC8E45}" name="Preparations">
-          <FILE id="TbhF6f" name="Preparation.cpp" compile="1" resource="0" file="Source/Preparation.cpp"/>
+        <GROUP id="{BE0ACC3D-1AC5-1BB6-2D3E-F52EFBCC8E45}" name="Preparation">
           <FILE id="JmN1jz" name="Preparation.h" compile="0" resource="0" file="Source/Preparation.h"/>
-          <FILE id="JhmXbp" name="Direct.cpp" compile="1" resource="0" file="Source/Direct.cpp"/>
-          <FILE id="QYzU0z" name="Direct.h" compile="0" resource="0" file="Source/Direct.h"/>
-          <FILE id="hzuh1H" name="Nostalgic.cpp" compile="1" resource="0" file="Source/Nostalgic.cpp"/>
-          <FILE id="QU7LbV" name="Nostalgic.h" compile="0" resource="0" file="Source/Nostalgic.h"/>
-          <FILE id="O8HjWt" name="Synchronic.cpp" compile="1" resource="0" file="Source/Synchronic.cpp"/>
-          <FILE id="FXpKMX" name="Synchronic.h" compile="0" resource="0" file="Source/Synchronic.h"/>
+          <GROUP id="{27D6A86B-9A4E-E13A-49DF-00E35E3972B7}" name="PreparationTypes">
+            <FILE id="JhmXbp" name="Direct.cpp" compile="1" resource="0" file="Source/Direct.cpp"/>
+            <FILE id="QYzU0z" name="Direct.h" compile="0" resource="0" file="Source/Direct.h"/>
+            <FILE id="hzuh1H" name="Nostalgic.cpp" compile="1" resource="0" file="Source/Nostalgic.cpp"/>
+            <FILE id="QU7LbV" name="Nostalgic.h" compile="0" resource="0" file="Source/Nostalgic.h"/>
+            <FILE id="O8HjWt" name="Synchronic.cpp" compile="1" resource="0" file="Source/Synchronic.cpp"/>
+            <FILE id="FXpKMX" name="Synchronic.h" compile="0" resource="0" file="Source/Synchronic.h"/>
+          </GROUP>
           <FILE id="ac8QzA" name="Tuning.cpp" compile="1" resource="0" file="Source/Tuning.cpp"/>
           <FILE id="OrPhKl" name="Tuning.h" compile="0" resource="0" file="Source/Tuning.h"/>
           <FILE id="gu3W3U" name="General.h" compile="0" resource="0" file="Source/General.h"/>

@@ -190,23 +190,23 @@ typedef enum SynchronicParameterType {
 
 static const std::vector<std::string> cSynchronicParameterTypes = {
     "Synchronic Id",
-    "SynchronicTuning Id",
-    "SynchronicTempo",
-    "SynchronicNumPulses",
-    "SynchronicClusterMin",
-    "SynchronicClusterMax",
-    "SynchronicClusterThresh",
-    "SynchronicMode",
-    "SynchronicBeatsToSkip",
-    "SynchronicBeatMultipliers",
-    "SynchronicLengthMultipliers",
-    "SynchronicAccentMultipliers",
-    "SynchronicTranspOffsets",
-    "AdaptiveTempo1Mode",
-    "AdaptiveTempo1History",
-    "AdaptiveTempo1Subdivisions",
-    "AdaptiveTempo1Min",
-    "AdaptiveTempo1Max"
+    "Tuning Id",
+    "Tempo",
+    "NumPulses",
+    "ClusterMin",
+    "ClusterMax",
+    "ClusterThresh",
+    "Mode",
+    "BeatsToSkip",
+    "BeatMults",
+    "LengthMults",
+    "AccentMults",
+    "TranspOffsets",
+    "AT1Mode",
+    "AT1History",
+    "AT1Subdivs",
+    "AT1Min",
+    "AT1Max"
 };
 
 #pragma mark - Nostalgic
@@ -233,15 +233,15 @@ typedef enum NostalgicParameterType {
 
 static const std::vector<std::string> cNostalgicParameterTypes = {
     "Nostalgic Id",
-    "NostalgicTuning Id",
-    "NostalgicWaveDistance",
-    "NostalgicUndertow",
-    "NostalgicTransposition",
-    "NostalgicGain",
-    "NostalgicLengthMultiplier",
-    "NostalgicBeatsToSkip",
-    "NostalgicMode",
-    "NostalgicSyncTarget"
+    "Tuning Id",
+    "WaveDistance",
+    "Undertow",
+    "Transposition",
+    "Gain",
+    "LengthMult",
+    "BeatsToSkip",
+    "Mode",
+    "SyncTarget"
 };
 
 #pragma mark - Direct
@@ -259,11 +259,11 @@ typedef enum DirectParameterType
 
 static const std::vector<std::string> cDirectParameterTypes = {
     "Direct Id",
-    "DirectTuning Id",
-    "DirectTransposition",
-    "DirectGain",
-    "DirectResGain",
-    "DirectHammerGain"
+    "Tuning Id",
+    "Transposition",
+    "Gain",
+    "ResGain",
+    "HammerGain"
 };
 
 #pragma mark - Tuning
@@ -286,16 +286,16 @@ typedef enum TuningParameterType
 
 static const std::vector<std::string> cTuningParameterTypes = {
     "Tuning Id",
-    "TuningScale",
-    "TuningFundamental",
-    "TuningOffset",
-    "TuningA1IntervalScale",
-    "TuningA1Inversional",
-    "TuningA1AnchorScale",
-    "TuningA1AnchorFundamental",
-    "TuningA1ClusterThresh",
-    "TuningA1History",
-    "TuningCustomScale"
+    "Scale",
+    "Fundamental",
+    "Offset",
+    "A1IntervalScale",
+    "A1Inversional",
+    "A1AnchorScale",
+    "A1AnchorFund",
+    "A1ClusterThresh",
+    "A1History",
+    "CustomScale"
 };
 
 
@@ -346,7 +346,7 @@ typedef enum BKSampleLoadType
 }BKSampleLoadType;
 
 static const std::vector<std::string> cBKSampleLoadTypes = {
-    "Load Lite",
+    "Load Light",
     "Load Medium",
     "Load Heavy"
 };

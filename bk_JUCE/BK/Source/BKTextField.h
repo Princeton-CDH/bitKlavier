@@ -11,6 +11,7 @@
 #ifndef BKTEXTFIELD_H_INCLUDED
 #define BKTEXTFIELD_H_INCLUDED
 
+#include "BKUtilities.h"
 #include "BKLookAndFeel.h"
 
 //==============================================================================
@@ -30,6 +31,7 @@ public:
     {
         
     }
+    
     
     
 private:
