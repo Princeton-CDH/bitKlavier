@@ -10,13 +10,15 @@
 
 #include "DirectViewController.h"
 
+#include "DirectLayer.h"
+
 //==============================================================================
 DirectViewController::DirectViewController(BKAudioProcessor& p):
 processor(p),
 currentDirectId(0)
 {
     //DirectPreparation::Ptr layer = processor.currentPiano->dPreparation[currentDirectId];
-    DirectPreparation::Ptr layer = processor.dPreparation[currentDirectId];
+    DirectPreparation::Ptr layer = processor.direct[currentDirectId]->sPrep;
     
     // Labels
     directL = OwnedArray<BKLabel>();
@@ -89,8 +91,8 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
     
-    DirectPreparation::Ptr prep = processor.dPreparation[currentDirectId];
-    DirectPreparation::Ptr active = processor.activeDPreparation[currentDirectId];
+    DirectPreparation::Ptr prep = processor.direct[currentDirectId]->sPrep;
+    DirectPreparation::Ptr active = processor.direct[currentDirectId]->aPrep;
     
     if (name == cDirectParameterTypes[DirectId])
     {
@@ -133,7 +135,7 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
 void DirectViewController::updateFields(void)
 {
     
-    DirectPreparation::Ptr prep = processor.activeDPreparation[currentDirectId];
+    DirectPreparation::Ptr prep = processor.direct[currentDirectId]->aPrep;
     
     directTF[DirectTransposition]       ->setText( String( prep->getTransposition()), false);
     directTF[DirectGain]                ->setText( String( prep->getGain()), false);

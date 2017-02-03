@@ -176,11 +176,9 @@ public:
     typedef OwnedArray<NostalgicProcessor>                  Arr;
     typedef OwnedArray<NostalgicProcessor, CriticalSection> CSArr;
     
-    NostalgicProcessor(
-                       BKSynthesiser *s,
+    NostalgicProcessor(BKSynthesiser *s,
                        NostalgicPreparation::Ptr prep,
                        NostalgicPreparation::Ptr active,
-                       SynchronicProcessor::CSPtrArr& proc,
                        int Id);
     
     virtual ~NostalgicProcessor();
@@ -214,7 +212,7 @@ private:
     TuningProcessor             tuner;
     
     //target Synchronic layer
-    SynchronicProcessor::CSPtrArr& syncProcessor;
+    SynchronicProcessor::Ptr syncProcessor;
     
     //store values so that undertow note retains preparation from reverse note
     NostalgicPreparation::PtrArr preparationAtKeyOn;

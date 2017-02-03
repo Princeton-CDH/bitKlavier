@@ -13,13 +13,15 @@
 
 #include "Keymap.h"
 
+#include "DirectLayer.h"
+
 //==============================================================================
 SynchronicViewController::SynchronicViewController(BKAudioProcessor& p)
 :
     processor(p),
     currentSynchronicId(0)
 {
-    SynchronicPreparation::Ptr prep = processor.sPreparation[currentSynchronicId];
+    SynchronicPreparation::Ptr prep = processor.synchronic[currentSynchronicId]->sPrep;
     
      // Labels
     synchronicL = OwnedArray<BKLabel>();
@@ -96,9 +98,9 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
     
-    SynchronicPreparation::Ptr prep = processor.sPreparation[currentSynchronicId];
+    SynchronicPreparation::Ptr prep = processor.synchronic[currentSynchronicId]->sPrep;
     
-    SynchronicPreparation::Ptr active = processor.activeSPreparation[currentSynchronicId];
+    SynchronicPreparation::Ptr active = processor.synchronic[currentSynchronicId]->aPrep;
     
     if (name == cSynchronicParameterTypes[SynchronicId])
     {
@@ -203,7 +205,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
 
 void SynchronicViewController::updateFields(void)
 {
-    SynchronicPreparation::Ptr prep   = processor.activeSPreparation[currentSynchronicId];
+    SynchronicPreparation::Ptr prep   = processor.synchronic[currentSynchronicId]->aPrep;
 
     synchronicTF[SynchronicTempo]               ->setText(  String(                 prep->getTempo()), false);
     synchronicTF[SynchronicNumPulses]           ->setText(  String(                 prep->getNumBeats()), false);

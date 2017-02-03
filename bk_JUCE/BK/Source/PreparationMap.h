@@ -17,15 +17,7 @@
 
 #include "Keymap.h"
 
-#include "Tuning.h"
-
-#include "Synchronic.h"
-
-#include "Nostalgic.h"
-
-#include "Direct.h"
-
-
+#include "DirectLayer.h"
 
 class PreparationMap : public ReferenceCountedObject
 {
@@ -36,10 +28,7 @@ public:
     typedef OwnedArray<PreparationMap>                   Arr;
     typedef OwnedArray<PreparationMap, CriticalSection>  CSArr;
     
-    PreparationMap(BKSynthesiser *s,
-                   BKSynthesiser *res,
-                   BKSynthesiser *ham,
-                   Keymap::Ptr keymap,
+    PreparationMap(Keymap::Ptr keymap,
                    int Id);
     ~PreparationMap();
     
@@ -61,21 +50,21 @@ public:
     inline String getPreparationIds()
     {
         String prep = "";
-        for (auto p : sPreparations)
+        for (auto p : synchronic)
         {
             prep.append("S",1);
             prep.append(String(p->getId()), 3);
             prep.append(" ",1);
         }
         
-        for (auto p : nPreparations)
+        for (auto p : nostalgic)
         {
             prep.append("N",1);
             prep.append(String(p->getId()), 3);
             prep.append(" ",1);
         }
         
-        for (auto p : dPreparations)
+        for (auto p : direct)
         {
             prep.append("D",1);
             prep.append(String(p->getId()), 3);
@@ -89,27 +78,17 @@ public:
         
     }
     
-    void setSynchronicPreparations(SynchronicPreparation::PtrArr sPrep, SynchronicPreparation::PtrArr activeSPrep);
-    void setNostalgicPreparations(NostalgicPreparation::PtrArr nPrep, NostalgicPreparation::PtrArr activeNPrep);
-    void setDirectPreparations(DirectPreparation::PtrArr dPrep, DirectPreparation::PtrArr activeDPrep);
+    void setSynchronicPreparations(Synchronic::PtrArr);
+    void setNostalgicPreparations(Nostalgic::PtrArr);
+    void setDirectPreparations(Direct::PtrArr);
     
-    SynchronicPreparation::PtrArr getSynchronicPreparations(void);
-    NostalgicPreparation::PtrArr getNostalgicPreparations(void);
-    DirectPreparation::PtrArr getDirectPreparations(void);
-    
-
-    void addSynchronic(SynchronicPreparation::Ptr sp);
-    void addNostalgic(NostalgicPreparation::Ptr np);
-    void addDirect(DirectPreparation::Ptr dp);
-    
-    void removeSynchronic(SynchronicPreparation::Ptr sp);
-    void removeNostalgic(NostalgicPreparation::Ptr np);
-    void removeDirect(DirectPreparation::Ptr dp);
+    Synchronic::PtrArr getSynchronicPreparations(void);
+    Nostalgic::PtrArr getNostalgicPreparations(void);
+    Direct::PtrArr getDirectPreparations(void);
 
     void deactivateIfNecessary();
     
     void removeAllPreparations();
-    
     
     bool isActive;
     
@@ -124,19 +103,9 @@ private:
     // Keymap for this PreparationMap (one per PreparationMap)
     Keymap::Ptr                     pKeymap;
     
-    // Preparations (flown in from BKAudioProcessor)
-    SynchronicPreparation::PtrArr   sPreparations;
-    NostalgicPreparation::PtrArr    nPreparations;
-    DirectPreparation::PtrArr       dPreparations;
-    
-    SynchronicPreparation::PtrArr   activeSPreparations;
-    NostalgicPreparation::PtrArr    activeNPreparations;
-    DirectPreparation::PtrArr       activeDPreparations;
-    
-    // Processors (internal)
-    SynchronicProcessor::CSPtrArr   sProcessor;
-    NostalgicProcessor::CSPtrArr    nProcessor;
-    DirectProcessor::CSPtrArr       dProcessor;
+    Synchronic::PtrArr                 synchronic;
+    Nostalgic::PtrArr                  nostalgic;
+    Direct::PtrArr                     direct;
     
     // Pointers to synths (flown in from BKAudioProcessor)
     BKSynthesiser*                  synth;

@@ -12,13 +12,15 @@
 
 #include "BKUtilities.h"
 
+#include "DirectLayer.h"
+
 //==============================================================================
 NostalgicViewController::NostalgicViewController(BKAudioProcessor& p)
 :
     processor(p),
     currentNostalgicId(0)
 {
-    NostalgicPreparation::Ptr layer = processor.nPreparation[currentNostalgicId];
+    NostalgicPreparation::Ptr layer = processor.nostalgic[currentNostalgicId]->sPrep;
     
     // Labels
     nostalgicL = OwnedArray<BKLabel>();
@@ -93,9 +95,9 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
     
-    NostalgicPreparation::Ptr prep = processor.nPreparation[currentNostalgicId];
+    NostalgicPreparation::Ptr prep = processor.nostalgic[currentNostalgicId]->sPrep;
     
-    NostalgicPreparation::Ptr active = processor.activeNPreparation[currentNostalgicId];
+    NostalgicPreparation::Ptr active = processor.nostalgic[currentNostalgicId]->aPrep;
     
     if (name == cNostalgicParameterTypes[NostalgicId])
     {
@@ -157,7 +159,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
 void NostalgicViewController::updateFields(void)
 {
     
-    NostalgicPreparation::Ptr prep = processor.activeNPreparation[currentNostalgicId];
+    NostalgicPreparation::Ptr prep = processor.nostalgic[currentNostalgicId]->aPrep;
 
     nostalgicTF[NostalgicWaveDistance]      ->setText( String( prep->getWavedistance()), false);
     nostalgicTF[NostalgicUndertow]          ->setText( String( prep->getUndertow()), false);

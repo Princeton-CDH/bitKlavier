@@ -365,27 +365,27 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             
             float gain = volume;
             
-            if (bktype == Main)
+            if (bktype == MainNote)
             {
                 gain *= 1.0f;
             }
-            else if (bktype == Synchronic)
+            else if (bktype == SynchronicNote)
             {
                 gain *= generalSettings->getSynchronicGain();
             }
-            else if (bktype == Nostalgic)
+            else if (bktype == NostalgicNote)
             {
                 gain *= generalSettings->getNostalgicGain();
             }
-            else if (bktype == Direct)
+            else if (bktype == DirectNote)
             {
                 gain *= generalSettings->getDirectGain();
             }
-            else if (bktype == Hammer)
+            else if (bktype == HammerNote)
             {
                 gain *= generalSettings->getHammerGain();
             }
-            else if (bktype == Resonance)
+            else if (bktype == ResonanceNote)
             {
                 gain *= generalSettings->getResonanceGain();
             }

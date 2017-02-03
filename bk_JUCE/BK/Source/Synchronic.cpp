@@ -76,7 +76,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
                  aGlobalGain,
                  noteDirection,
                  FixedLengthFixedStart,
-                 Synchronic,
+                 SynchronicNote,
                  Id,
                  noteStartPos, // start
                  noteLength,
@@ -274,7 +274,6 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
     }
     
 }
-
 
 //return time in ms to future beat, given beatsToSkip
 float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)

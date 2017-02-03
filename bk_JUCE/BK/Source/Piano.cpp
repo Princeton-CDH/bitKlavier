@@ -10,25 +10,19 @@
 
 #include "Piano.h"
 
-Piano::Piano(SynchronicPreparation::CSPtrArr sPrep,
-             NostalgicPreparation::CSPtrArr nPrep,
-             DirectPreparation::CSPtrArr dPrep,
-             BKSynthesiser *ms,
-             BKSynthesiser *res,
-             BKSynthesiser *ham,
+Piano::Piano(Synchronic::PtrArr synchronic,
+             Nostalgic::PtrArr nostalgic,
+             Direct::PtrArr direct,
              Keymap::Ptr keymap,
              int Id):
 currentPMap(PreparationMap::Ptr()),
 activePMaps(PreparationMap::CSPtrArr()),
 prepMaps(PreparationMap::CSPtrArr()),
-activeSPrep(sPrep),
-activeNPrep(nPrep),
-activeDPrep(dPrep),
+synchronic(synchronic),
+nostalgic(nostalgic),
+direct(direct),
 numPMaps(0),
 Id(Id),
-synth(ms),
-resonanceSynth(res),
-hammerSynth(ham),
 initialKeymap(keymap)
 {
     pianoMap.ensureStorageAllocated(128);
@@ -47,8 +41,7 @@ Piano::~Piano()
 // Add preparation map, return its Id.
 int Piano::addPreparationMap(void)
 {
-    prepMaps.add(new PreparationMap(synth, resonanceSynth, hammerSynth,
-                                    initialKeymap,
+    prepMaps.add(new PreparationMap(initialKeymap,
                                     numPMaps));
     
     prepMaps[numPMaps]->prepareToPlay(sampleRate);

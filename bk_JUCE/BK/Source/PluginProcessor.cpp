@@ -21,6 +21,9 @@ resonanceReleaseSynth   (general)
     bkPianos.ensureStorageAllocated(aMaxNumPianos);
     prevPianos.ensureStorageAllocated(aMaxNumPianos);
     tPreparation.ensureStorageAllocated(aMaxTuningPreparations);
+    synchronic.ensureStorageAllocated(aMaxTotalPreparations);
+    nostalgic.ensureStorageAllocated(aMaxTotalPreparations);
+    direct.ensureStorageAllocated(aMaxTotalPreparations);
 
     // Make a bunch of keymaps.
     for (int i = 0; i < aMaxNumKeymaps; i++)
@@ -31,36 +34,23 @@ resonanceReleaseSynth   (general)
         tPreparation.add(new TuningPreparation(i));
     
     
-    // Make a bunch of preparations. Default to zeroth tuning.
     for (int i = 0; i < aMaxTotalPreparations; i++)
     {
-        sPreparation.add(new SynchronicPreparation(i, tPreparation[0]));
-        activeSPreparation.add(new SynchronicPreparation(sPreparation[i]));
-        
-        nPreparation.add(new NostalgicPreparation(i, tPreparation[0]));
-        activeNPreparation.add(new NostalgicPreparation(nPreparation[i]));
-        
-        dPreparation.add(new DirectPreparation(i, tPreparation[0]));
-        activeDPreparation.add(new DirectPreparation(dPreparation[i]));
+        synchronic.add(new Synchronic(&mainPianoSynth, tPreparation[0], i));
+        nostalgic.add(new Nostalgic(&mainPianoSynth, tPreparation[0], i));
+        direct.add(new Direct(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, tPreparation[0], i));
     }
-    
+
     // Make a bunch of pianos. Default to zeroth keymap.
     for (int i = 0 ; i < aMaxNumPianos; i++)
     {
-        bkPianos.set(i, new Piano(activeSPreparation, activeNPreparation, activeDPreparation,
-                                  &mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth,
+        bkPianos.set(i, new Piano(synchronic, nostalgic, direct,
                                   bkKeymaps[0], i)); // initializing piano 0
     }
   
     // Initialize first piano.
     prevPiano = bkPianos[0];
     currentPiano = bkPianos[0];
-    
-    // Modification testing ground
-    // have to explicitly cast to float,int,Array<int>,Array<float>,bool
-    bkPianos[0]->modMap.add(new Modification(ModSynchronicTempo, 1, (float)1200));
-    bkPianos[1]->modMap.add(new Modification(ModSynchronicTempo, 2, (float)1500));
-    
     
     // Default all on for 
     for (int i = 0; i < 128; i++)   bkKeymaps[1]->addNote(i);
@@ -102,6 +92,13 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     for (int i = aMaxNumPianos; --i >= 0;)
         bkPianos[i]->prepareToPlay(sampleRate);
     
+    for (int i = aMaxTotalPreparations; --i >= 0;)
+    {
+        synchronic[i]->processor->setCurrentPlaybackSampleRate(sampleRate);
+        nostalgic[i]->processor->setCurrentPlaybackSampleRate(sampleRate);
+        direct[i]->processor->setCurrentPlaybackSampleRate(sampleRate);
+    }
+    
 }
 
 void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
@@ -137,7 +134,9 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             int whichPiano = currentPiano->pianoMap[noteNumber] - 1;
             if (whichPiano >= 0 && whichPiano != currentPiano->getId()) setCurrentPiano(whichPiano);
 
+            /*
             Modification* mod;
+            
             if (noteNumber == 60)
             {
                 for (int i = currentPiano->modMap.size(); --i >= 0;)
@@ -145,13 +144,14 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
                     mod = currentPiano->modMap[i];
                     
                     if (mod->type == ModDirectTransposition)
-                        activeDPreparation[mod->prepId]->setTransposition(mod->modFloat);
+                        direct[mod->prepId]->aPrep->setTransposition(mod->modFloat);
                     else if (mod->type == ModSynchronicTempo)
-                        activeSPreparation[mod->prepId]->setTempo(mod->modFloat);
+                        synchronic[mod->prepId]->aPrep->setTempo(mod->modFloat);
 
                     preparationDidChange = true;
                 }
             }
+             */
             
             // Send key on to each pmap in current piano
             for (p = currentPiano->activePMaps.size(); --p >= 0;)
@@ -201,18 +201,18 @@ void  BKAudioProcessor::setCurrentPiano(int which)
 {
     
     // Optimizations can be made here. Don't need to iterate through EVERY preparation. 
-    for (int i = activeDPreparation.size(); --i >= 0; ) {
+    for (int i = direct.size(); --i >= 0; ) {
         
         // Need to deal with previous transposition value to make sure notes turn off.
-        activeDPreparation[i]->copy(dPreparation[i]);
+        direct[i]->aPrep->copy(direct[i]->sPrep);
     }
     
-    for (int i = activeNPreparation.size(); --i >= 0; ) {
-        activeNPreparation[i]->copy(nPreparation[i]);
+    for (int i = nostalgic.size(); --i >= 0; ) {
+        nostalgic[i]->aPrep->copy(nostalgic[i]->sPrep);
     }
     
-    for (int i = activeSPreparation.size(); --i >= 0; ) {
-        activeSPreparation[i]->copy(sPreparation[i]);
+    for (int i = synchronic.size(); --i >= 0; ) {
+        synchronic[i]->aPrep->copy(synchronic[i]->sPrep);
     }
     
     if (noteOnCount)  prevPianos.addIfNotAlreadyThere(currentPiano);

@@ -104,7 +104,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         double playLength = 0.0;
         double maxLength = sound->soundLength - voiceRampOff;
         
-        if (bkType != Main)
+        if (bkType != MainNote)
         {
             if(voiceRampOn  > (0.5 * length))   voiceRampOn     = 0.5 * length;
             if(voiceRampOff > (0.5 * length))   voiceRampOff    = 0.5 * length;

@@ -8,11 +8,7 @@
 
 #include "BKSynthesiser.h"
 
-#include "Synchronic.h"
-
-#include "Nostalgic.h"
-
-#include "Direct.h"
+#include "DirectLayer.h"
 
 #include "Keymap.h"
 
@@ -48,17 +44,16 @@ public:
     BKSynthesiser                       resonanceReleaseSynth;
     
     // Preparations.
-    SynchronicPreparation::CSPtrArr     sPreparation;
-    NostalgicPreparation::CSPtrArr      nPreparation;
-    DirectPreparation::CSPtrArr         dPreparation;
     TuningPreparation::CSPtrArr         tPreparation;
-    
-    SynchronicPreparation::CSPtrArr     activeSPreparation;
-    NostalgicPreparation::CSPtrArr      activeNPreparation;
-    DirectPreparation::CSPtrArr         activeDPreparation;
     
     // Keymaps.
     Keymap::PtrArr                      bkKeymaps;
+    
+    // Nostalgic, Synchronic, Direct classes
+    Synchronic::PtrArr                  synchronic;
+    Nostalgic::PtrArr                   nostalgic;
+    Direct::PtrArr                      direct;
+    
     
     Piano::Ptr                          prevPiano;
     Piano::Ptr                          currentPiano;

@@ -55,12 +55,12 @@ typedef enum PianoSamplerNoteDirection {
 } PianoSamplerNoteDirection;
 
 typedef enum BKNoteType {
-    Synchronic = 0,
-    Nostalgic,
-    Direct,
-    Main,
-    Hammer,
-    Resonance,
+    SynchronicNote = 0,
+    NostalgicNote,
+    DirectNote,
+    MainNote,
+    HammerNote,
+    ResonanceNote,
     BKNoteTypeNil,
 } BKNoteType;
 

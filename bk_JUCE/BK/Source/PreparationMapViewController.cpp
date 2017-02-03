@@ -86,14 +86,11 @@ void PreparationMapViewController::resized()
 
 String PreparationMapViewController::processPreparationString(String s)
 {
-    SynchronicPreparation::PtrArr sPrep = SynchronicPreparation::PtrArr();
-    SynchronicPreparation::PtrArr activeSPrep = SynchronicPreparation::PtrArr();
+    Synchronic::PtrArr sync = Synchronic::PtrArr();
+    Nostalgic::PtrArr nost = Nostalgic::PtrArr();
+    Direct::PtrArr dire = Direct::PtrArr();
     
-    NostalgicPreparation::PtrArr nPrep = NostalgicPreparation::PtrArr();
-    NostalgicPreparation::PtrArr activeNPrep = NostalgicPreparation::PtrArr();
-    
-    DirectPreparation::PtrArr dPrep = DirectPreparation::PtrArr();
-    DirectPreparation::PtrArr activeDPrep = DirectPreparation::PtrArr();
+    sync.ensureStorageAllocated(12);
     
     String temp = "";
     String out = "";
@@ -141,8 +138,7 @@ String PreparationMapViewController::processPreparationString(String s)
                 {
                     int prep = temp.getIntValue();
                     
-                    sPrep.add(processor.sPreparation[prep]);
-                    activeSPrep.add(processor.activeSPreparation[prep]);
+                    sync.add(processor.synchronic[prep]);
                     
                     out.append("S", 1);
                     out.append(String(prep), 3);
@@ -151,8 +147,7 @@ String PreparationMapViewController::processPreparationString(String s)
                 {
                     int prep = temp.getIntValue();
                     
-                    nPrep.add(processor.nPreparation[prep]);
-                    activeNPrep.add(processor.activeNPreparation[prep]);
+                    nost.add(processor.nostalgic[prep]);
                     
                     out.append("N", 1);
                     out.append(String(prep), 3);
@@ -161,8 +156,7 @@ String PreparationMapViewController::processPreparationString(String s)
                 {
                     int prep = temp.getIntValue();
                     
-                    dPrep.add(processor.dPreparation[prep]);
-                    activeDPrep.add(processor.activeDPreparation[prep]);
+                    dire.add(processor.direct[prep]);
                     
                     out.append("D", 1);
                     out.append(String(prep), 3);
@@ -187,9 +181,9 @@ String PreparationMapViewController::processPreparationString(String s)
     }
     
     // pass arrays to prepMap
-    processor.currentPiano->prepMaps[Id]->setSynchronicPreparations(sPrep, activeSPrep);
-    processor.currentPiano->prepMaps[Id]->setNostalgicPreparations(nPrep, activeNPrep);
-    processor.currentPiano->prepMaps[Id]->setDirectPreparations(dPrep, activeDPrep);
+    processor.currentPiano->prepMaps[Id]->setSynchronicPreparations(sync);
+    processor.currentPiano->prepMaps[Id]->setNostalgicPreparations(nost);
+    processor.currentPiano->prepMaps[Id]->setDirectPreparations(dire);
     
     return out;
 }

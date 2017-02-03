@@ -13,14 +13,13 @@
 NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s,
                                        NostalgicPreparation::Ptr prep,
                                        NostalgicPreparation::Ptr activePrep,
-                                       SynchronicProcessor::CSPtrArr& proc,
                                        int Id):
 Id(Id),
 synth(s),
 preparation(prep),
 active(activePrep),
 tuner(active->getTuning()),
-syncProcessor(proc)
+syncProcessor(SynchronicProcessor::Ptr())
 {
     noteLengthTimers.ensureStorageAllocated(128);
     velocities.ensureStorageAllocated(128);
@@ -84,7 +83,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
         else //SynchronicSync
         {
             //get time in ms to target beat, summing over skipped beat lengths
-            duration = syncProcessor[active->getSyncTarget()]->getTimeToBeatMS(active->getBeatsToSkip()); // sum
+            duration = syncProcessor->getTimeToBeatMS(active->getBeatsToSkip()); // sum
         }
         
         float offset = (active->getTransposition() + tuner.getOffset(midiNoteNumber));
@@ -100,7 +99,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
                      active->getGain() * aGlobalGain,
                      Reverse,
                      FixedLengthFixedStart,
-                     Nostalgic,
+                     NostalgicNote,
                      Id,
                      duration + active->getWavedistance(),
                      duration,                                      // length
@@ -178,7 +177,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
                              aGlobalGain,
                              Forward,
                              FixedLengthFixedStart,
-                             Nostalgic,
+                             NostalgicNote,
                              Id,
                              noteOnPrep->getWavedistance(),                        //start position
                              noteOnPrep->getUndertow(),                            //play length

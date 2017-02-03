@@ -21,6 +21,8 @@
 
 #include "Keymap.h"
 
+#include "DirectLayer.h"
+
 
 class Piano : public ReferenceCountedObject
 {
@@ -31,12 +33,9 @@ public:
     typedef OwnedArray<Piano>                  Arr;
     typedef OwnedArray<Piano, CriticalSection> CSArr;
     
-    Piano(SynchronicPreparation::CSPtrArr activeSPrep,
-          NostalgicPreparation::CSPtrArr activeNPrep,
-          DirectPreparation::CSPtrArr activeDPrep,
-          BKSynthesiser *s,
-          BKSynthesiser *res,
-          BKSynthesiser *ham,
+    Piano(Synchronic::PtrArr synchronic,
+          Nostalgic::PtrArr nostalgic,
+          Direct::PtrArr direct,
           Keymap::Ptr keymap,
           int Id);
     ~Piano();
@@ -59,9 +58,9 @@ public:
     PreparationMap::CSPtrArr    activePMaps;
     PreparationMap::CSPtrArr    prepMaps;
     
-    SynchronicPreparation::CSPtrArr activeSPrep;
-    NostalgicPreparation::CSPtrArr  activeNPrep;
-    DirectPreparation::CSPtrArr     activeDPrep;
+    Synchronic::PtrArr  synchronic;
+    Nostalgic::PtrArr   nostalgic;
+    Direct::PtrArr      direct;
 
     Array<int>                  pianoMap;
     int                         numPMaps;

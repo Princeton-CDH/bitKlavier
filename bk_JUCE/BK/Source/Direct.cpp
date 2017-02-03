@@ -55,7 +55,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                  active->getGain() * aGlobalGain,
                  Forward,
                  Normal,
-                 Main,
+                 MainNote,
                  Id,
                  0, // start
                  0, // length
@@ -70,7 +70,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
     noteNumber += (int)offset;
     
     synth->keyOff(channel,
-                  Main,
+                  MainNote,
                   Id,
                   noteNumber,
                   velocity,
@@ -89,7 +89,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
                                  hGain,
                                  Forward,
                                  Normal, //FixedLength,
-                                 Hammer,
+                                 HammerNote,
                                  Id,
                                  0,
                                  2000,
@@ -107,7 +107,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
                                     rGain,
                                     Forward,
                                     Normal, //FixedLength,
-                                    Resonance,
+                                    ResonanceNote,
                                     Id,
                                     0,
                                     2000,
