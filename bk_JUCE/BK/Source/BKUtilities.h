@@ -51,7 +51,7 @@ typedef enum BKTextFieldType
     BKParameter = 0,
     BKModification,
     BKTFNil,
-};
+}BKTextFieldType;
 
 
 

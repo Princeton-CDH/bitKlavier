@@ -20,25 +20,39 @@ resonanceReleaseSynth   (general)
     bkKeymaps.ensureStorageAllocated(aMaxNumPreparationKeymaps);
     bkPianos.ensureStorageAllocated(aMaxNumPianos);
     prevPianos.ensureStorageAllocated(aMaxNumPianos);
+    
     tPreparation.ensureStorageAllocated(aMaxTuningPreparations);
+    modTuning.ensureStorageAllocated(aMaxTuningPreparations);
+    
     synchronic.ensureStorageAllocated(aMaxTotalPreparations);
+    modSynchronic.ensureStorageAllocated(aMaxTotalPreparations);
+    
     nostalgic.ensureStorageAllocated(aMaxTotalPreparations);
+    modNostalgic.ensureStorageAllocated(aMaxTotalPreparations);
+    
     direct.ensureStorageAllocated(aMaxTotalPreparations);
+    modDirect.ensureStorageAllocated(aMaxTotalPreparations);
 
     // Make a bunch of keymaps.
     for (int i = 0; i < aMaxNumKeymaps; i++)
         bkKeymaps.add(new Keymap(i));
     
     // Make a bunch of tunings.
-    for (int i = 0; i < (aMaxTuningPreparations); i++)
+    for (int i = 0; i < (aMaxTuningPreparations); i++) {
         tPreparation.add(new TuningPreparation(i));
+        modTuning.add(new TuningPreparation(i));
+    }
     
     
     for (int i = 0; i < aMaxTotalPreparations; i++)
     {
-        synchronic.add(new Synchronic(&mainPianoSynth, tPreparation[0], i));
-        nostalgic.add(new Nostalgic(&mainPianoSynth, tPreparation[0], i));
-        direct.add(new Direct(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, tPreparation[0], i));
+        synchronic.add  (new Synchronic(&mainPianoSynth, tPreparation[0], i));
+        nostalgic.add   (new Nostalgic(&mainPianoSynth, tPreparation[0], i));
+        direct.add      (new Direct(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, tPreparation[0], i));
+        
+        modSynchronic.add   (new SynchronicPreparation(i, tPreparation[0]));
+        modNostalgic.add    (new NostalgicPreparation(i, tPreparation[0]));
+        modDirect.add       (new DirectModPreparation(i));
     }
 
     // Make a bunch of pianos. Default to zeroth keymap.
@@ -55,10 +69,6 @@ resonanceReleaseSynth   (general)
     
     // Default all on for 
     for (int i = 0; i < 128; i++) bkKeymaps[1]->addNote(i);
-    
-    
-    DirectModification::Ptr myMod = new DirectModification(DirectTransposition, 1, (float)12.0);
-    currentPiano->modMap[60]->addDirectModification(myMod);
     
 }
 

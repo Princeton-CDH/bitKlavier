@@ -33,14 +33,16 @@ public:
     void resized() override;
     
     void updateFields(void);
+    void updateModFields(void);
 
 private:
     BKAudioProcessor& processor;
-    int currentNostalgicId;
+    int currentNostalgicId, currentModNostalgicId;
     
     // BKLabels
     OwnedArray<BKLabel> nostalgicL;
     OwnedArray<BKTextField> nostalgicTF;
+    OwnedArray<BKTextField> modNostalgicTF;
     
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;

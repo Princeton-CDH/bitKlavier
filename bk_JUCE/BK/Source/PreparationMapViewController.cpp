@@ -181,9 +181,9 @@ String PreparationMapViewController::processPreparationString(String s)
     }
     
     // pass arrays to prepMap
-    processor.currentPiano->prepMaps[Id]->setSynchronicPreparations(sync);
-    processor.currentPiano->prepMaps[Id]->setNostalgicPreparations(nost);
-    processor.currentPiano->prepMaps[Id]->setDirectPreparations(dire);
+    processor.currentPiano->prepMaps[Id]->setSynchronic (sync);
+    processor.currentPiano->prepMaps[Id]->setNostalgic  (nost);
+    processor.currentPiano->prepMaps[Id]->setDirect     (dire);
     
     return out;
 }

@@ -34,102 +34,35 @@ void PreparationMap::setKeymap(Keymap::Ptr km)
     pKeymap = km;
 }
 
-void PreparationMap::setSynchronicPreparations(Synchronic::PtrArr s)
+void PreparationMap::setSynchronic(Synchronic::PtrArr s)
 {
-    Synchronic::PtrArr oldSynchronic = synchronic;
     synchronic = s;
-    
-    /*
-    // If a preparation was not previously part of the PreparationMap, add it to a new XProcesssor and add that processor to xProcessor.
-    for (int i = synchronic.size(); --i >= 0;)
-    {
-        if (!oldSynchronic.contains(synchronic[i]))
-        {
-            synchronic.add(synchronic[i]);
-            //synchronic[i]->processor->setCurrentPlaybackSampleRate(sampleRate);
-        }
-    }
-    
-    // If a processor contains a pointer to a preparation that is no longer one of the current preparations, remove that processor from xProcessor.
-    for (int i = synchronic.size(); --i >= 0;)
-    {
-        if (!synchronic.contains(synchronic[i]))
-            synchronic.remove(i);
-    }
-    */
     deactivateIfNecessary();
-     
-     
 }
 
-void PreparationMap::setNostalgicPreparations(Nostalgic::PtrArr n)
+void PreparationMap::setNostalgic(Nostalgic::PtrArr n)
 {
-    Nostalgic::PtrArr oldNostalgic = nostalgic;
     nostalgic = n;
-    
-    /*
-    // If a preparation was not previously part of the PreparationMap, add it to a new XProcesssor and add that processor to xProcessor.
-    for (int i = nostalgic.size(); --i >= 0;)
-    {
-        if (!oldNostalgic.contains(nostalgic[i]))
-        {
-            nostalgic.add(nostalgic[i]);
-            //nostalgic[i]->setCurrentPlaybackSampleRate(sampleRate);
-        }
-    }
-    
-    // If a processor contains a pointer to a preparation that is no longer one of the current preparations, remove that processor from xProcessor.
-    for (int i = nostalgic.size(); --i >= 0;)
-    {
-        if (!nostalgic.contains(nostalgic[i]))
-            nostalgic.remove(i);
-    }
-    
-     */
-    
     deactivateIfNecessary();
-    
 }
 
-void PreparationMap::setDirectPreparations(Direct::PtrArr d)
+void PreparationMap::setDirect(Direct::PtrArr d)
 {
-    Direct::PtrArr oldDirect = direct;
     direct = d;
-    
-    /*
-    // If a preparation was not previously part of the PreparationMap, add it to a new XProcesssor and add that processor to xProcessor.
-    for (int i = direct.size(); --i >= 0;)
-    {
-        if (!oldDirect.contains(direct[i]))
-        {
-            direct.add(direct[i]);
-            //direct[i]->setCurrentPlaybackSampleRate(sampleRate);
-        }
-    }
-    
-    // If a processor contains a pointer to a preparation that is no longer one of the current preparations, remove that processor from xProcessor.
-    for (int i = direct.size(); --i >= 0;)
-    {
-        if (!direct.contains(direct[i]))
-            direct.remove(i);
-    }
-    
-     */
-    
     deactivateIfNecessary();
 }
 
-Synchronic::PtrArr PreparationMap::getSynchronicPreparations(void)
+Synchronic::PtrArr PreparationMap::getSynchronic(void)
 {
     return synchronic;
 }
 
-Nostalgic::PtrArr PreparationMap::getNostalgicPreparations(void)
+Nostalgic::PtrArr PreparationMap::getNostalgic(void)
 {
     return nostalgic;
 }
 
-Direct::PtrArr PreparationMap::getDirectPreparations(void)
+Direct::PtrArr PreparationMap::getDirect(void)
 {
     return direct;
 }

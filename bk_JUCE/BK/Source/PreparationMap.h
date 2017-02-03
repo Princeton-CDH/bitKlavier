@@ -78,13 +78,13 @@ public:
         
     }
     
-    void setSynchronicPreparations(Synchronic::PtrArr);
-    void setNostalgicPreparations(Nostalgic::PtrArr);
-    void setDirectPreparations(Direct::PtrArr);
+    void setSynchronic  (Synchronic::PtrArr);
+    void setNostalgic   (Nostalgic::PtrArr);
+    void setDirect      (Direct::PtrArr);
     
-    Synchronic::PtrArr getSynchronicPreparations(void);
-    Nostalgic::PtrArr getNostalgicPreparations(void);
-    Direct::PtrArr getDirectPreparations(void);
+    Synchronic::PtrArr  getSynchronic(void);
+    Nostalgic::PtrArr   getNostalgic(void);
+    Direct::PtrArr      getDirect(void);
 
     void deactivateIfNecessary();
     

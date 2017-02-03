@@ -83,13 +83,6 @@ void KeymapViewController::resized()
     {
         keymapTF[n]->setTopLeftPosition(tfX, gYSpacing + tfY * n);
     }
-    
-#if 0
-    int kbX = gXSpacing;
-    int kbY = lY * cKeymapParameterTypes.size() +  gYSpacing;
-    keyboardComponent->setBounds(kbX, kbY,
-                                 getWidth() - 2*gXSpacing, getHeight() - kbY - gYSpacing);
-#endif
 }
 
 void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)

@@ -60,10 +60,17 @@ tvc(p)
     pianoMapL.setText("PianoMap", NotificationType::dontSendNotification);
     pvc->addAndMakeVisible(pianoMapL);
     
-    
     pianoMapTF.addListener(this);
     pianoMapTF.setName("PianoMap");
     pvc->addAndMakeVisible(pianoMapTF);
+    
+    modMapL.setName("ModMap");
+    modMapL.setText("ModMap", NotificationType::dontSendNotification);
+    pvc->addAndMakeVisible(modMapL);
+    
+    modMapTF.addListener(this);
+    modMapTF.setName("ModMap");
+    pvc->addAndMakeVisible(modMapTF);
     
     // Load buttons
     loadButtons.ensureStorageAllocated(cBKSampleLoadTypes.size());
@@ -140,7 +147,7 @@ void BKAudioProcessorEditor::paint (Graphics& g)
 void BKAudioProcessorEditor::resized()
 {
     float loadvcH = (20 + gYSpacing) + 1.5 * gYSpacing;
-    float pvcH = 2 * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
+    float pvcH = 3 * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float kvcH = cKeymapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float gvcH = cGeneralParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float svcH = cSynchronicParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
@@ -176,6 +183,8 @@ void BKAudioProcessorEditor::resized()
     pianoCB     .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   pianoL.getY());
     pianoMapL   .setTopLeftPosition(0,                                  pianoL.getBottom() + gYSpacing);
     pianoMapTF  .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   pianoMapL.getY());
+    modMapL     .setTopLeftPosition(0,                                  pianoMapL.getBottom() + gYSpacing);
+    modMapTF    .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   modMapL.getY());
     
     
     upperLeft = loadvc->getBounds();
@@ -316,6 +325,198 @@ String BKAudioProcessorEditor::processPianoMapString(const String& s)
     return out;
 }
 
+String BKAudioProcessorEditor::processModMapString(const String& s)
+{
+    String temp = "";
+    String out = "";
+    
+    bool isNumber = false;
+    bool isMod = false;
+    bool isKeymap = false;
+    bool isColon  = false;
+    bool isSpace = false;
+    bool isEndOfString = false;
+    
+    bool isSynchronic = false;
+    bool isNostalgic = false;
+    bool isDirect= false;
+    
+    bool isBracket;
+    
+    bool itsAMod = false;
+    bool itsAKeymap = false;
+    bool lastColon = false;
+    bool lastBracket = false;
+    bool itsASpace = false;
+    bool itsADirect = false;
+    bool itsASynchronic = false;
+    bool itsANostalgic = false;
+    
+    String::CharPointerType c = s.getCharPointer();
+    
+    juce_wchar keymap = 'k';
+    juce_wchar colon = ':';
+    juce_wchar modLC = 'm';
+    juce_wchar modUC = 'M';
+    
+    
+    juce_wchar synchronicLC = 's';
+    juce_wchar synchronicUC = 'S';
+    juce_wchar nostalgicLC = 'n';
+    juce_wchar nostalgicUC = 'N';
+    juce_wchar directLC = 'd';
+    juce_wchar directUC = 'D';
+    juce_wchar lBracket = '{';
+    juce_wchar rBracket = '}';
+    juce_wchar lBracket2 = '[';
+    juce_wchar rBracket2 = ']';
+    juce_wchar lBracket3 = '(';
+    juce_wchar rBracket3 = ')';
+    
+    Array<int> keys;
+    
+    
+    
+    for (auto map : processor.currentPiano->pianoMap)    map = 0;
+    
+    int numColons, numBrackets;
+    numColons = 0; numBrackets = 0;
+    int whichMod = -1;
+    
+    Array<int> whichPreps;
+    
+    for (int i = 0; i < (s.length()+1); i++)
+    {
+        juce_wchar c1 = c.getAndAdvance();
+        
+        
+        isSynchronic   = !CharacterFunctions::compare(c1, synchronicLC) || !CharacterFunctions::compare(c1, synchronicUC);
+        isNostalgic    = !CharacterFunctions::compare(c1, nostalgicLC) || !CharacterFunctions::compare(c1, nostalgicUC);
+        isDirect       = !CharacterFunctions::compare(c1, directLC) || !CharacterFunctions::compare(c1, directUC);
+ 
+        isBracket   = !CharacterFunctions::compare(c1, lBracket) || !CharacterFunctions::compare(c1, rBracket) ||
+                !CharacterFunctions::compare(c1, lBracket2) || !CharacterFunctions::compare(c1, rBracket2) ||
+                !CharacterFunctions::compare(c1, lBracket3) || !CharacterFunctions::compare(c1, rBracket3);
+        isKeymap    = !CharacterFunctions::compare(c1, keymap);
+        isColon     = !CharacterFunctions::compare(c1, colon);
+        isMod       = !CharacterFunctions::compare(c1, modLC) || !CharacterFunctions::compare(c1, modUC);
+        isNumber    = CharacterFunctions::isDigit(c1);
+        isSpace     = CharacterFunctions::isWhitespace(c1);
+        
+        if (i==s.length()) isEndOfString = true;
+        
+        DBG("char: " + s.charToString(c1));
+        
+        if (!isNumber)
+        {
+            if (isColon)
+            {
+                if (numColons == 0)
+                {
+                    if (itsAKeymap)
+                        keys = processor.bkKeymaps[temp.getIntValue()]->keys();
+                    else
+                        keys.add(temp.getIntValue());
+                }
+                else if (numColons == 1)
+                {
+                    whichMod = temp.getIntValue();
+                }
+                
+                temp = "";
+                
+                if (++numColons == 2) lastColon = true;
+            }
+            else if ((numBrackets == 1) && isSpace)
+            {
+                whichPreps.add(temp.getIntValue());
+                temp = "";
+            }
+            else if (isBracket)
+            {
+                if (numBrackets == 1 && temp != "") whichPreps.add(temp.getIntValue());
+                
+                if (++numBrackets == 2) lastBracket = true;
+            }
+            else if (isSpace || isEndOfString)
+            {
+                itsASpace = true;
+                
+                // Set piano map parameters.
+                // keys | mod id | prepIds
+                for (auto key : keys)
+                {
+                    
+                        if (itsADirect)
+                        {
+                            out += (String(key) + ":dm" +String(whichMod) + ":" + "{" + intArrayToString(whichPreps) + "} ");
+                            
+                            DirectModPreparation::Ptr dmod = processor.modDirect[whichMod];
+                            
+                            for (int n = cDirectParameterTypes.size(); --n >= 0; )
+                            {
+                                String param = dmod->getParam((DirectParameterType)n);
+                                
+                                if (param != "")
+                                {
+                                    for (auto prep : whichPreps)
+                                    {
+                                        processor.currentPiano->modMap[key]->addDirectModification(new DirectModification(prep, (DirectParameterType)n, param));
+                                        DBG("whichprep: " + String(prep) + " whochtype: " + cDirectParameterTypes[n] + " val: " +param);
+                                    }
+                                }
+                            }
+                        }
+                    
+                }
+                
+                itsAKeymap = false;
+                itsADirect = false;
+                itsASynchronic = false;
+                itsANostalgic = false;
+                
+                numColons = 0;
+                numBrackets = 0;
+                whichMod = -1;
+                whichPreps.clearQuick();
+                
+                temp = "";
+                
+                keys.clearQuick();
+            }
+            else if (!itsAKeymap && isKeymap)
+            {
+                itsAKeymap = true;
+            }
+            else if (isDirect)
+            {
+                itsADirect = true;
+            }
+            else if (isSynchronic)
+            {
+                itsASynchronic = true;
+            }
+            else if (isNostalgic)
+            {
+                itsANostalgic = true;
+            }
+            else
+            {
+                itsASpace = false;
+                continue;
+            }
+        }
+        else
+        {
+            itsASpace = false;
+            temp += c1;
+        }
+        
+    }
+    
+    return out;
+}
+
 void BKAudioProcessorEditor::bkTextFieldDidChange(TextEditor& tf)
 {
     String text = tf.getText();
@@ -330,6 +531,10 @@ void BKAudioProcessorEditor::bkTextFieldDidChange(TextEditor& tf)
     {
         tf.setText(processPianoMapString(text));
     }
+    else if (name == "ModMap")
+    {
+        tf.setText(processModMapString(text));
+    }
     
 }
 
@@ -343,7 +548,7 @@ void BKAudioProcessorEditor::bkButtonClicked (Button* b)
     {
         removeLastPreparationMap(processor.currentPiano->removeLastPreparationMap());
     }
-    else if (b->getName() == "Load Lite")
+    else if (b->getName() == "Load Light")
     {
         processor.loadPianoSamples(BKLoadLite);
     }

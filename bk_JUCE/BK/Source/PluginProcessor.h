@@ -54,6 +54,11 @@ public:
     Nostalgic::PtrArr                   nostalgic;
     Direct::PtrArr                      direct;
     
+    SynchronicPreparation::PtrArr       modSynchronic;
+    DirectModPreparation::PtrArr        modDirect;
+    NostalgicPreparation::PtrArr        modNostalgic;
+    TuningPreparation::PtrArr           modTuning;
+    
     
     Piano::Ptr                          prevPiano;
     Piano::Ptr                          currentPiano;

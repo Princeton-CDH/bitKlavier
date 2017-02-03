@@ -16,10 +16,10 @@
 #include "Preparation.h"
 
 //==============================================================================
-SynchronicViewController::SynchronicViewController(BKAudioProcessor& p)
-:
-    processor(p),
-    currentSynchronicId(0)
+SynchronicViewController::SynchronicViewController(BKAudioProcessor& p):
+processor(p),
+currentSynchronicId(0),
+currentModSynchronicId(0)
 {
     SynchronicPreparation::Ptr prep = processor.synchronic[currentSynchronicId]->sPrep;
     
@@ -53,12 +53,14 @@ SynchronicViewController::SynchronicViewController(BKAudioProcessor& p)
     for (int i = 0; i < cSynchronicParameterTypes.size(); i++)
     {
         modSynchronicTF.set(i, new BKTextField());
-        addAndMakeVisible(synchronicTF[i]);
+        addAndMakeVisible(modSynchronicTF[i]);
         modSynchronicTF[i]->addListener(this);
         modSynchronicTF[i]->setName("M"+cSynchronicParameterTypes[i]);
     }
     
+    updateModFields();
     updateFields();
+    
 }
 
 
@@ -77,24 +79,25 @@ void SynchronicViewController::paint (Graphics& g)
 void SynchronicViewController::resized()
 {
     // Labels
-    int i = 0;
-    int lX = 0;
     int lY = gComponentLabelHeight + gYSpacing;
+    
+    float width = getWidth() * 0.25 - gXSpacing;
     
     for (int n = 0; n < cSynchronicParameterTypes.size(); n++)
     {
-        synchronicL[n]->setTopLeftPosition(lX, gYSpacing + lY * n);
+        synchronicL[n]->setBounds(0, gYSpacing + lY * n, width, synchronicL[0]->getHeight());
     }
     
     // Text fields
-    i = 0;
-    int tfX = gComponentLabelWidth + gXSpacing;
     int tfY = gComponentTextFieldHeight + gYSpacing;
 
+    float height = synchronicTF[0]->getHeight();
+    width *= 1.5;
     
     for (int n = 0; n < cSynchronicParameterTypes.size(); n++)
     {
-        synchronicTF[n]->setTopLeftPosition(tfX, gYSpacing + tfY * n);
+        synchronicTF[n]->setBounds(synchronicL[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
+        modSynchronicTF[n]->setBounds(synchronicTF[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
     }
 
 }
@@ -107,9 +110,11 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
 
     BKTextFieldType type = BKParameter;
     
-    if (name.startsWithChar('M')) type = BKModification;
-    
-    name = name.substring(1);
+    if (name.startsWithChar('M'))
+    {
+        type = BKModification;
+        name = name.substring(1);
+    }
     
     float f = text.getFloatValue();
     int i = text.getIntValue();
@@ -120,7 +125,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
     
     SynchronicPreparation::Ptr active = processor.synchronic[currentSynchronicId]->aPrep;
     
-    
+    SynchronicPreparation::Ptr mod = processor.modSynchronic[currentModSynchronicId];
     
     if (name == cSynchronicParameterTypes[SynchronicId])
     {
@@ -144,7 +149,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            
+            mod->setTempo(f);
         }
     }
     else if (name == cSynchronicParameterTypes[SynchronicNumPulses])
@@ -156,7 +161,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            
+            mod->setNumBeats(i);
         }
     }
     else if (name == cSynchronicParameterTypes[SynchronicClusterMin])
@@ -168,7 +173,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            
+            mod->setClusterMin(i);
         }
     }
     else if (name == cSynchronicParameterTypes[SynchronicClusterMax])
@@ -180,7 +185,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            
+            mod->setClusterMax(i);
         }
     }
     else if (name == cSynchronicParameterTypes[SynchronicClusterThresh])
@@ -192,7 +197,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            
+            mod->setClusterThresh(f);
         }
     }
     else if (name == cSynchronicParameterTypes[SynchronicMode])
@@ -204,7 +209,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            
+            mod->setMode((SynchronicSyncMode) i);
         }
     }
     else if (name == cSynchronicParameterTypes[SynchronicBeatsToSkip])
@@ -216,7 +221,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            
+            mod->setBeatsToSkip(i);
         }
     }
     else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
@@ -229,7 +234,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            
+            mod->setBeatMultipliers(beatMults);
         }
     }
     else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
@@ -242,7 +247,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            
+           mod->setLengthMultipliers(lenMults);
         }
     }
     else if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
@@ -255,7 +260,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            
+            mod->setAccentMultipliers(accentMults);
         }
     }
     else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
@@ -268,7 +273,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            
+            mod->setTranspOffsets(transpOffsets);
         }
     }
     else if (name == cSynchronicParameterTypes[SynchronicTuning])
@@ -280,7 +285,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            
+            mod->setTuning(processor.tPreparation[i]);
         }
     }
     else if (name == cSynchronicParameterTypes[AT1Mode])
@@ -292,7 +297,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            
+            mod->setAdaptiveTempo1Mode((AdaptiveTempo1Mode)i);
         }
     }
     else if (name == cSynchronicParameterTypes[AT1History])
@@ -304,7 +309,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            
+            mod->setAdaptiveTempo1History(i);
         }
     }
     else if (name == cSynchronicParameterTypes[AT1Subdivisions])
@@ -316,7 +321,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            
+            mod->setAdaptiveTempo1Subdivisions(f);
         }
     }
     else if (name == cSynchronicParameterTypes[AT1Min])
@@ -328,7 +333,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            
+            mod->setAdaptiveTempo1Min(f);
         }
     }
     else if (name == cSynchronicParameterTypes[AT1Max])
@@ -340,7 +345,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-        
+            mod->setAdaptiveTempo1Max(f);
         }
     }
     else

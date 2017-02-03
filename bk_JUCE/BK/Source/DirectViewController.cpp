@@ -15,7 +15,8 @@
 //==============================================================================
 DirectViewController::DirectViewController(BKAudioProcessor& p):
 processor(p),
-currentDirectId(0)
+currentDirectId(0),
+currentModDirectId(0)
 {
     //DirectPreparation::Ptr layer = processor.currentPiano->dPreparation[currentDirectId];
     DirectPreparation::Ptr layer = processor.direct[currentDirectId]->sPrep;
@@ -44,6 +45,18 @@ currentDirectId(0)
         directTF[i]->setName(cDirectParameterTypes[i]);
     }
     
+    modDirectTF = OwnedArray<BKTextField>();
+    modDirectTF.ensureStorageAllocated(cDirectParameterTypes.size());
+    
+    for (int i = 0; i < cDirectParameterTypes.size(); i++)
+    {
+        modDirectTF.set(i, new BKTextField());
+        addAndMakeVisible(modDirectTF[i]);
+        modDirectTF[i]->addListener(this);
+        modDirectTF[i]->setName("M"+cDirectParameterTypes[i]);
+    }
+    
+    updateModFields();
     updateFields();
 }
 
@@ -60,31 +73,41 @@ void DirectViewController::paint (Graphics& g)
 void DirectViewController::resized()
 {
     // Labels
-    int i = 0;
-    int lX = 0;
     int lY = gComponentLabelHeight + gYSpacing;
+    
+    float width = getWidth() * 0.25 - gXSpacing;
     
     for (int n = 0; n < cDirectParameterTypes.size(); n++)
     {
-        directL[n]->setTopLeftPosition(lX, gYSpacing + lY * n);
+        directL[n]->setBounds(0, gYSpacing + lY * n, width, directL[0]->getHeight());
     }
     
     // Text fields
-    i = 0;
-    int tfX = gComponentLabelWidth + gXSpacing;
     int tfY = gComponentTextFieldHeight + gYSpacing;
+    
+    float height = directTF[0]->getHeight();
+    width *= 1.5;
     
     for (int n = 0; n < cDirectParameterTypes.size(); n++)
     {
-        directTF[n]->setTopLeftPosition(tfX, gYSpacing + tfY * n);
+        directTF[n]->setBounds(directL[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
+        modDirectTF[n]->setBounds(directTF[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
     }
-    
 }
 
 void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
 {
     String text = tf.getText();
     String name = tf.getName();
+    
+    BKTextFieldType type = BKParameter;
+    
+    if (name.startsWithChar('M'))
+    {
+        type = BKModification;
+        name = name.substring(1);
+    }
+    
     
     float f = text.getFloatValue();
     int i = text.getIntValue();
@@ -93,37 +116,80 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
     
     DirectPreparation::Ptr prep = processor.direct[currentDirectId]->sPrep;
     DirectPreparation::Ptr active = processor.direct[currentDirectId]->aPrep;
+    DirectModPreparation::Ptr mod = processor.modDirect[currentModDirectId];
     
     if (name == cDirectParameterTypes[DirectId])
     {
-        currentDirectId = i;
-        updateFields();
+        if (type == BKParameter)
+        {
+            currentDirectId = i;
+            updateFields();
+        }
+        else    //BKModification
+        {
+            currentModDirectId = i;
+            updateModFields();
+        }
     }
     else if (name == cDirectParameterTypes[DirectTransposition])
     {
-        DBG("transp: " + String(f));
-        prep    ->setTransposition(f);
-        active  ->setTransposition(f);
+        if (type == BKParameter)
+        {
+            prep    ->setTransposition(f);
+            active  ->setTransposition(f);
+        }
+        else    //BKModification
+        {
+            mod     ->setParam(DirectTransposition, text);
+        }
     }
     else if (name == cDirectParameterTypes[DirectGain])
     {
-        prep    ->setGain(f);
-        active  ->setGain(f);
+        if (type == BKParameter)
+        {
+            prep    ->setGain(f);
+            active  ->setGain(f);
+        }
+        else    //BKModification
+        {
+            mod     ->setParam(DirectGain, text);
+        }
     }
     else if (name == cDirectParameterTypes[DirectHammerGain])
     {
-        prep    ->setHammerGain(f);
-        active  ->setHammerGain(f);
+        if (type == BKParameter)
+        {
+            prep    ->setHammerGain(f);
+            active  ->setHammerGain(f);
+        }
+        else    //BKModification
+        {
+            mod     ->setParam(DirectHammerGain, text);
+        }
     }
     else if (name == cDirectParameterTypes[DirectResGain])
     {
-        prep    ->setResonanceGain(f);
-        active  ->setResonanceGain(f);
+        if (type == BKParameter)
+        {
+            prep    ->setResonanceGain(f);
+            active  ->setResonanceGain(f);
+        }
+        else    //BKModification
+        {
+            mod     ->setParam(DirectResGain, text);
+        }
     }
     else if (name == cDirectParameterTypes[DirectTuning])
     {
-        prep    ->setTuning(processor.tPreparation[i]);
-        active  ->setTuning(processor.tPreparation[i]);
+        if (type == BKParameter)
+        {
+            prep    ->setTuning(processor.tPreparation[i]);
+            active  ->setTuning(processor.tPreparation[i]);
+        }
+        else    //BKModification
+        {
+            mod     ->setParam(DirectTuning, text);
+        }
     }
     else
     {
@@ -143,6 +209,19 @@ void DirectViewController::updateFields(void)
     directTF[DirectResGain]             ->setText( String( prep->getResonanceGain()), false);
     directTF[DirectTuning]              ->setText( String( prep->getTuning()->getId()), false);
 
+}
+
+void DirectViewController::updateModFields(void)
+{
+    
+    DirectModPreparation::Ptr prep = processor.modDirect[currentModDirectId];
+    
+    modDirectTF[DirectTransposition]       ->setText( prep->getParam(DirectTransposition), false);
+    modDirectTF[DirectGain]                ->setText( prep->getParam(DirectGain), false);
+    modDirectTF[DirectHammerGain]          ->setText( prep->getParam(DirectHammerGain), false);
+    modDirectTF[DirectResGain]             ->setText( prep->getParam(DirectResGain), false);
+    modDirectTF[DirectTuning]              ->setText( prep->getParam(DirectTuning), false);
+    
 }
 
 void DirectViewController::bkMessageReceived (const String& message)

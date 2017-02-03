@@ -138,16 +138,16 @@ typedef enum GeneralParameterType
 } GeneralParameterType;
 
 static const std::vector<std::string> cGeneralParameterTypes = {
-    "GeneralTuningFundamental",
+    "GeneralTuningFund",
     "GeneralGlobalGain",
-    "GeneralSynchronicGain",
-    "GeneralNostalgicGain",
-    "GeneralDirectGain",
-    "GeneralResonanceGain",
-    "GeneralHammerGain",
-    "GeneralTempoMultiplier",
-    "GeneralResAndHammer",
-    "GeneralInvertSustain"
+    "GeneralSyncGain",
+    "GeneralNostGain",
+    "GeneralDrctGain",
+    "GeneralResGain",
+    "GeneralHamGain",
+    "GeneralTempoMult",
+    "GeneralResAndHam",
+    "GeneralInvertSus"
     
 };
 

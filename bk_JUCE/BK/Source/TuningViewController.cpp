@@ -14,7 +14,8 @@
 //==============================================================================
 TuningViewController::TuningViewController(BKAudioProcessor& p):
 processor(p),
-currentTuningId(0)
+currentTuningId(0),
+currentModTuningId(0)
 {
     TuningPreparation::Ptr layer = processor.tPreparation[currentTuningId];
     
@@ -42,7 +43,19 @@ currentTuningId(0)
         tuningTF[i]->setName(cTuningParameterTypes[i]);
     }
     
-    updateFields(currentTuningId);
+    modTuningTF = OwnedArray<BKTextField>();
+    modTuningTF.ensureStorageAllocated(cTuningParameterTypes.size());
+    
+    for (int i = 0; i < cTuningParameterTypes.size(); i++)
+    {
+        modTuningTF.set(i, new BKTextField());
+        addAndMakeVisible(modTuningTF[i]);
+        modTuningTF[i]->addListener(this);
+        modTuningTF[i]->setName("M"+cTuningParameterTypes[i]);
+    }
+    
+    updateModFields();
+    updateFields();
 }
 
 TuningViewController::~TuningViewController()
@@ -58,23 +71,25 @@ void TuningViewController::paint (Graphics& g)
 void TuningViewController::resized()
 {
     // Labels
-    int i = 0;
-    int lX = 0;
     int lY = gComponentLabelHeight + gYSpacing;
+    
+    float width = getWidth() * 0.25 - gXSpacing;
     
     for (int n = 0; n < cTuningParameterTypes.size(); n++)
     {
-        tuningL[n]->setTopLeftPosition(lX, gYSpacing + lY * n);
+        tuningL[n]->setBounds(0, gYSpacing + lY * n, width, tuningL[0]->getHeight());
     }
     
     // Text fields
-    i = 0;
-    int tfX = gComponentLabelWidth + gXSpacing;
     int tfY = gComponentTextFieldHeight + gYSpacing;
+    
+    float height = tuningTF[0]->getHeight();
+    width *= 1.5;
     
     for (int n = 0; n < cTuningParameterTypes.size(); n++)
     {
-        tuningTF[n]->setTopLeftPosition(tfX, gYSpacing + tfY * n);
+        tuningTF[n]->setBounds(tuningL[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
+        modTuningTF[n]->setBounds(tuningTF[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
     }
     
 }
@@ -84,6 +99,15 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
     String text = tf.getText();
     String name = tf.getName();
     
+    BKTextFieldType type = BKParameter;
+    
+    if (name.startsWithChar('M'))
+    {
+        type = BKModification;
+        name = name.substring(1);
+    }
+    
+    
     float f = text.getFloatValue();
     int i = text.getIntValue();
     
@@ -91,50 +115,130 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
     
     TuningPreparation::Ptr prep = processor.tPreparation[currentTuningId];
     
+    TuningPreparation::Ptr mod = processor.modTuning[currentModTuningId];
+    
     if (name == cTuningParameterTypes[TuningId])
     {
-        currentTuningId = i;
-        updateFields(currentTuningId);
+        if (type == BKParameter)
+        {
+            currentTuningId = i;
+            updateFields();
+        }
+        else //BKModification
+        {
+            currentModTuningId = i;
+            updateModFields();
+        }
     }
     else if (name == cTuningParameterTypes[TuningScale])
     {
-        prep->setTuning((TuningSystem)i);
+        if (type == BKParameter)
+        {
+            prep->setTuning((TuningSystem)i);
+        }
+        else    //BKModification
+        {
+            mod->setTuning((TuningSystem)i);
+        }
     }
     else if (name == cTuningParameterTypes[TuningFundamental])
     {
-        prep->setFundamental((PitchClass)i);
+        if (type == BKParameter)
+        {
+            prep->setFundamental((PitchClass)i);
+        }
+        else    //BKModification
+        {
+            mod->setFundamental((PitchClass)i);
+        }
     }
     else if (name == cTuningParameterTypes[TuningOffset])
     {
-        prep->setFundamentalOffset(f);
+        if (type == BKParameter)
+        {
+            prep->setFundamentalOffset(f);
+        }
+        else    //BKModification
+        {
+            mod->setFundamentalOffset(f);
+        }
     }
     else if (name == cTuningParameterTypes[TuningA1IntervalScale])
     {
-        prep->setAdaptiveIntervalScale((TuningSystem)i);
+        if (type == BKParameter)
+        {
+            prep->setAdaptiveIntervalScale((TuningSystem)i);
+        }
+        else    //BKModification
+        {
+            mod->setAdaptiveIntervalScale((TuningSystem)i);
+        }
     }
     else if (name == cTuningParameterTypes[TuningA1Inversional])
     {
-        prep->setAdaptiveInversional((bool) i);
+        if (type == BKParameter)
+        {
+            prep->setAdaptiveInversional((bool) i);
+        }
+        else    //BKModification
+        {
+            mod->setAdaptiveInversional((bool) i);
+        }
     }
     else if (name == cTuningParameterTypes[TuningA1AnchorScale])
     {
-        prep->setAdaptiveAnchorScale((TuningSystem) i);
+        if (type == BKParameter)
+        {
+            prep->setAdaptiveAnchorScale((TuningSystem) i);
+        }
+        else    //BKModification
+        {
+            mod->setAdaptiveAnchorScale((TuningSystem) i);
+        }
     }
     else if (name == cTuningParameterTypes[TuningA1AnchorFundamental])
     {
-        prep->setAdaptiveAnchorFundamental((PitchClass) i);
+        if (type == BKParameter)
+        {
+            prep->setAdaptiveAnchorFundamental((PitchClass) i);
+        }
+        else    //BKModification
+        {
+            mod->setAdaptiveAnchorFundamental((PitchClass) i);
+        }
     }
     else if (name == cTuningParameterTypes[TuningA1ClusterThresh])
     {
-        prep->setAdaptiveClusterThresh(i);
+        if (type == BKParameter)
+        {
+            prep->setAdaptiveClusterThresh(i);
+        }
+        else    //BKModification
+        {
+            mod->setAdaptiveClusterThresh(i);
+        }
     }
     else if (name == cTuningParameterTypes[TuningA1History])
     {
-        prep->setAdaptiveHistory(i);
+        if (type == BKParameter)
+        {
+            prep->setAdaptiveHistory(i);
+        }
+        else    //BKModification
+        {
+            mod->setAdaptiveHistory(i);
+        }
     }
     else if (name == cTuningParameterTypes[TuningCustomScale])
     {
-        prep->setCustomScale( stringToFloatArray(text));
+        if (type == BKParameter)
+        {
+            prep->setCustomScale( stringToFloatArray(text));
+        }
+        else    //BKModification
+        {
+            mod->setCustomScale( stringToFloatArray(text));
+        }
     }
     else
     {
@@ -143,10 +247,10 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
 }
 
 
-void TuningViewController::updateFields(int tuningId)
+void TuningViewController::updateFields()
 {
     
-    TuningPreparation::Ptr prep = processor.tPreparation[tuningId];
+    TuningPreparation::Ptr prep = processor.tPreparation[currentTuningId];
 
     tuningTF[TuningScale]               ->setText( String( prep->getTuning()), false);
     tuningTF[TuningFundamental]         ->setText( String( prep->getFundamental()), false);
@@ -162,12 +266,31 @@ void TuningViewController::updateFields(int tuningId)
     
 }
 
+void TuningViewController::updateModFields()
+{
+    
+    TuningPreparation::Ptr prep = processor.tPreparation[currentTuningId];
+    
+    modTuningTF[TuningScale]               ->setText( String( prep->getTuning()), false);
+    modTuningTF[TuningFundamental]         ->setText( String( prep->getFundamental()), false);
+    modTuningTF[TuningOffset]              ->setText( String( prep->getFundamentalOffset()), false);
+    modTuningTF[TuningA1IntervalScale]     ->setText( String( prep->getAdaptiveIntervalScale()), false);
+    modTuningTF[TuningA1Inversional]       ->setText( String( prep->getAdaptiveInversional()), false);
+    modTuningTF[TuningA1AnchorScale]       ->setText( String( prep->getAdaptiveAnchorScale()), false);
+    modTuningTF[TuningA1AnchorFundamental] ->setText( String( prep->getAdaptiveAnchorFundamental()), false);
+    modTuningTF[TuningA1ClusterThresh]     ->setText( String( prep->getAdaptiveClusterThresh()), false);
+    modTuningTF[TuningA1History]           ->setText( String( prep->getAdaptiveHistory()), false);
+    modTuningTF[TuningCustomScale]         ->setText( floatArrayToString( prep->getCustomScale()), false);
+    
+    
+}
+
 void TuningViewController::bkMessageReceived(const String& message)
 {
     if (message == "tuning/update")
     {
         //currentTuningId = processor.currentPiano->getPreparation();
         
-        updateFields(currentTuningId);
+        updateFields();
     }
 }

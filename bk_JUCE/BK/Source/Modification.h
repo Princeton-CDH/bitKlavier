@@ -65,18 +65,20 @@ public:
     typedef OwnedArray<DirectModification>                  Arr;
     typedef OwnedArray<DirectModification, CriticalSection> CSArr;
     
-    DirectModification(DirectParameterType type, int whichPrep, int            val):
-    type(type)
-    {
-        prepId = whichPrep;
-        modInt = val;
-    }
     
-    DirectModification(DirectParameterType type, int whichPrep, float          val):
+    DirectModification(int whichPrep, DirectParameterType type, String val):
     type(type)
     {
         prepId = whichPrep;
-        modFloat = val;
+        
+        if (type == DirectTuning)
+        {
+            modInt = val.getIntValue();
+        }
+        else // Gains
+        {
+            modFloat = val.getFloatValue();
+        }
     }
     
     ~DirectModification(void)
@@ -89,7 +91,7 @@ public:
     inline DirectParameterType getParameterType(void) {return type; }
     
 private:
-    
+    int Id;
     DirectParameterType type;
     
     JUCE_LEAK_DETECTOR(DirectModification)

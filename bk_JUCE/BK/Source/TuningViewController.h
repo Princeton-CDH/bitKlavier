@@ -30,15 +30,19 @@ public:
     void paint (Graphics&) override;
     void resized() override;
 
+    void updateModFields(void);
+    void updateFields(void);
+    
 private:
     
     BKAudioProcessor& processor;
-    int currentTuningId;
+    int currentTuningId, currentModTuningId;
     
     OwnedArray<BKLabel> tuningL;
     OwnedArray<BKTextField> tuningTF;
+    OwnedArray<BKTextField> modTuningTF;
     
-    void updateFields(int tuningId);
+    
     
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;

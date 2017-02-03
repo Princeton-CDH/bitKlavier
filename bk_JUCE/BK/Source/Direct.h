@@ -118,6 +118,86 @@ private:
     JUCE_LEAK_DETECTOR(DirectPreparation);
 };
 
+class DirectModPreparation : public ReferenceCountedObject
+{
+public:
+    
+    typedef ReferenceCountedObjectPtr<DirectModPreparation>   Ptr;
+    typedef Array<DirectModPreparation::Ptr>                  PtrArr;
+    typedef Array<DirectModPreparation::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<DirectModPreparation>                  Arr;
+    typedef OwnedArray<DirectModPreparation, CriticalSection> CSArr;
+    
+    /*
+    DirectId = 0,
+    DirectTuning,
+    DirectTransposition,
+    DirectGain,
+    DirectResGain,
+    DirectHammerGain,
+    DirectParameterTypeNil,
+     */
+    
+    DirectModPreparation(DirectPreparation::Ptr p):
+    Id(p->getId())
+    {
+        param.ensureStorageAllocated(cDirectParameterTypes.size() - 1);
+        
+        param.set(DirectTuning-1, String(p->getTuning()->getId()));
+        param.set(DirectTransposition-1, String(p->getTransposition()));
+        param.set(DirectGain-1, String(p->getGain()));
+        param.set(DirectResGain-1, String(p->getResonanceGain()));
+        param.set(DirectHammerGain-1, String(p->getHammerGain()));
+        
+    }
+    
+    
+    DirectModPreparation(int Id):
+    Id(Id)
+    {
+        param.set(DirectTuning-1, "");
+        param.set(DirectTransposition-1, "");
+        param.set(DirectGain-1, "");
+        param.set(DirectResGain-1, "");
+        param.set(DirectHammerGain-1, "");
+    }
+           
+    
+    ~DirectModPreparation(void)
+    {
+        
+    }
+    
+    inline void copy(DirectPreparation::Ptr d)
+    {
+        Id = d->getId();
+        param.set(DirectTuning-1, String(d->getTuning()->getId()));
+        param.set(DirectTransposition-1, String(d->getTransposition()));
+        param.set(DirectGain-1, String(d->getGain()));
+        param.set(DirectResGain-1, String(d->getResonanceGain()));
+        param.set(DirectHammerGain-1, String(d->getHammerGain()));
+    }
+    
+    
+    inline const String getParam(DirectParameterType type) { return param[type-1]; }
+    
+    inline void setParam(DirectParameterType type, String val) { param.set(type-1, val);}
+    
+    inline const int getId(void) {   return Id; }
+    
+    void print(void)
+    {
+
+    }
+    
+private:
+    int Id;
+    
+    StringArray          param;
+    
+    JUCE_LEAK_DETECTOR(DirectModPreparation);
+};
+
 
 class DirectProcessor : public ReferenceCountedObject
 {
