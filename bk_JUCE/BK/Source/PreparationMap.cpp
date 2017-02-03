@@ -39,7 +39,7 @@ void PreparationMap::setSynchronicPreparations(Synchronic::PtrArr s)
     Synchronic::PtrArr oldSynchronic = synchronic;
     synchronic = s;
     
-    
+    /*
     // If a preparation was not previously part of the PreparationMap, add it to a new XProcesssor and add that processor to xProcessor.
     for (int i = synchronic.size(); --i >= 0;)
     {
@@ -56,7 +56,7 @@ void PreparationMap::setSynchronicPreparations(Synchronic::PtrArr s)
         if (!synchronic.contains(synchronic[i]))
             synchronic.remove(i);
     }
-    
+    */
     deactivateIfNecessary();
      
      
@@ -67,6 +67,7 @@ void PreparationMap::setNostalgicPreparations(Nostalgic::PtrArr n)
     Nostalgic::PtrArr oldNostalgic = nostalgic;
     nostalgic = n;
     
+    /*
     // If a preparation was not previously part of the PreparationMap, add it to a new XProcesssor and add that processor to xProcessor.
     for (int i = nostalgic.size(); --i >= 0;)
     {
@@ -84,6 +85,8 @@ void PreparationMap::setNostalgicPreparations(Nostalgic::PtrArr n)
             nostalgic.remove(i);
     }
     
+     */
+    
     deactivateIfNecessary();
     
 }
@@ -93,6 +96,7 @@ void PreparationMap::setDirectPreparations(Direct::PtrArr d)
     Direct::PtrArr oldDirect = direct;
     direct = d;
     
+    /*
     // If a preparation was not previously part of the PreparationMap, add it to a new XProcesssor and add that processor to xProcessor.
     for (int i = direct.size(); --i >= 0;)
     {
@@ -109,6 +113,8 @@ void PreparationMap::setDirectPreparations(Direct::PtrArr d)
         if (!direct.contains(direct[i]))
             direct.remove(i);
     }
+    
+     */
     
     deactivateIfNecessary();
 }
