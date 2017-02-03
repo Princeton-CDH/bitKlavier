@@ -62,8 +62,8 @@
                 file="Source/PreparationMap.h"/>
         </GROUP>
         <GROUP id="{BE0ACC3D-1AC5-1BB6-2D3E-F52EFBCC8E45}" name="Preparations">
-          <FILE id="TbhF6f" name="DirectLayer.cpp" compile="1" resource="0" file="Source/DirectLayer.cpp"/>
-          <FILE id="JmN1jz" name="DirectLayer.h" compile="0" resource="0" file="Source/DirectLayer.h"/>
+          <FILE id="TbhF6f" name="Preparation.cpp" compile="1" resource="0" file="Source/Preparation.cpp"/>
+          <FILE id="JmN1jz" name="Preparation.h" compile="0" resource="0" file="Source/Preparation.h"/>
           <FILE id="JhmXbp" name="Direct.cpp" compile="1" resource="0" file="Source/Direct.cpp"/>
           <FILE id="QYzU0z" name="Direct.h" compile="0" resource="0" file="Source/Direct.h"/>
           <FILE id="hzuh1H" name="Nostalgic.cpp" compile="1" resource="0" file="Source/Nostalgic.cpp"/>

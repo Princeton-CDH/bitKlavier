@@ -1,15 +1,15 @@
 /*
   ==============================================================================
 
-    DirectLayer.h
+    Preparation.h
     Created: 2 Feb 2017 5:00:19pm
     Author:  Michael R Mulshine
 
   ==============================================================================
 */
 
-#ifndef DIRECTLAYER_H_INCLUDED
-#define DIRECTLAYER_H_INCLUDED
+#ifndef PREPARATION_H_INCLUDED
+#define PREPARATION_H_INCLUDED
 
 #include "Direct.h"
 #include "Nostalgic.h"
@@ -136,4 +136,4 @@ private:
 
 
 
-#endif  // DIRECTLAYER_H_INCLUDED
+#endif  // PREPARATION_H_INCLUDED
