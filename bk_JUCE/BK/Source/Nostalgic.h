@@ -166,6 +166,113 @@ private:
     JUCE_LEAK_DETECTOR(NostalgicPreparation);
 };
 
+class NostalgicModPreparation : public ReferenceCountedObject
+{
+public:
+    
+    typedef ReferenceCountedObjectPtr<NostalgicModPreparation>   Ptr;
+    typedef Array<NostalgicModPreparation::Ptr>                  PtrArr;
+    typedef Array<NostalgicModPreparation::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<NostalgicModPreparation>                  Arr;
+    typedef OwnedArray<NostalgicModPreparation, CriticalSection> CSArr;
+    
+    /*
+     NostalgicId = 0,
+     NostalgicTuning,
+     NostalgicWaveDistance,
+     NostalgicUndertow,
+     NostalgicTransposition,
+     NostalgicGain,
+     NostalgicLengthMultiplier,
+     NostalgicBeatsToSkip,
+     NostalgicMode,
+     NostalgicSyncTarget,
+     NostalgicParameterTypeNil
+     
+     */
+    
+    NostalgicModPreparation(NostalgicPreparation::Ptr p):
+    Id(p->getId())
+    {
+        param.ensureStorageAllocated(cNostalgicParameterTypes.size());
+        
+        param.set(NostalgicId, String(Id));
+        param.set(NostalgicTuning, String(p->getTuning()->getId()));
+        param.set(NostalgicWaveDistance, String(p->getWavedistance()));
+        param.set(NostalgicUndertow, String(p->getUndertow()));
+        param.set(NostalgicTransposition, String(p->getTransposition()));
+        param.set(NostalgicGain, String(p->getGain()));
+        param.set(NostalgicLengthMultiplier, String(p->getLengthMultiplier()));
+        param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
+        param.set(NostalgicMode, String(p->getMode()));
+        param.set(NostalgicSyncTarget, String(p->getSyncTarget()));
+        
+    }
+    
+    
+    NostalgicModPreparation(int Id):
+    Id(Id)
+    {
+        param.set(NostalgicId, String(Id));
+        param.set(NostalgicTuning, "");
+        param.set(NostalgicWaveDistance, "");
+        param.set(NostalgicUndertow, "");
+        param.set(NostalgicTransposition, "");
+        param.set(NostalgicGain, "");
+        param.set(NostalgicLengthMultiplier, "");
+        param.set(NostalgicBeatsToSkip, "");
+        param.set(NostalgicMode, "");
+        param.set(NostalgicSyncTarget, "");
+    }
+    
+    
+    ~NostalgicModPreparation(void)
+    {
+        
+    }
+    
+    inline void copy(NostalgicPreparation::Ptr p)
+    {
+        Id = p->getId();
+        
+        param.set(NostalgicId, String(Id));
+        param.set(NostalgicTuning, String(p->getTuning()->getId()));
+        param.set(NostalgicWaveDistance, String(p->getWavedistance()));
+        param.set(NostalgicUndertow, String(p->getUndertow()));
+        param.set(NostalgicTransposition, String(p->getTransposition()));
+        param.set(NostalgicGain, String(p->getGain()));
+        param.set(NostalgicLengthMultiplier, String(p->getLengthMultiplier()));
+        param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
+        param.set(NostalgicMode, String(p->getMode()));
+        param.set(NostalgicSyncTarget, String(p->getSyncTarget()));
+    }
+    
+    
+    inline const String getParam(NostalgicParameterType type)
+    {
+        if (type != NostalgicId)
+            return param[type];
+        else
+            return "";
+    }
+    
+    inline void setParam(NostalgicParameterType type, String val) { param.set(type, val);}
+    
+    inline const int getId(void) {   return Id; }
+    
+    void print(void)
+    {
+        
+    }
+    
+private:
+    int Id;
+    
+    StringArray          param;
+    
+    JUCE_LEAK_DETECTOR(NostalgicModPreparation);
+};
+
 class NostalgicProcessor : public ReferenceCountedObject
 {
     

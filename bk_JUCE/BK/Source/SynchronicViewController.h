@@ -35,8 +35,7 @@ public:
     
 private:
     BKAudioProcessor& processor;
-    int currentSynchronicId;
-    int currentModSynchronicId;
+    int currentSynchronicId,currentModSynchronicId;
     
     OwnedArray<BKLabel> synchronicL;
     OwnedArray<BKTextField> synchronicTF;

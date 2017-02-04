@@ -95,6 +95,7 @@ public:
     inline void setHammerGain(float val)                                {dHammerGain = val;     }
     inline void setTuning(TuningPreparation::Ptr t)                     {tuning = t;            }
     
+
     inline int getId(void) {   return Id; }
     
     void print(void)
@@ -141,13 +142,14 @@ public:
     DirectModPreparation(DirectPreparation::Ptr p):
     Id(p->getId())
     {
-        param.ensureStorageAllocated(cDirectParameterTypes.size() - 1);
+        param.ensureStorageAllocated(cDirectParameterTypes.size());
         
-        param.set(DirectTuning-1, String(p->getTuning()->getId()));
-        param.set(DirectTransposition-1, String(p->getTransposition()));
-        param.set(DirectGain-1, String(p->getGain()));
-        param.set(DirectResGain-1, String(p->getResonanceGain()));
-        param.set(DirectHammerGain-1, String(p->getHammerGain()));
+        param.set(DirectId, String(Id));
+        param.set(DirectTuning, String(p->getTuning()->getId()));
+        param.set(DirectTransposition, String(p->getTransposition()));
+        param.set(DirectGain, String(p->getGain()));
+        param.set(DirectResGain, String(p->getResonanceGain()));
+        param.set(DirectHammerGain, String(p->getHammerGain()));
         
     }
     
@@ -155,11 +157,12 @@ public:
     DirectModPreparation(int Id):
     Id(Id)
     {
-        param.set(DirectTuning-1, "");
-        param.set(DirectTransposition-1, "");
-        param.set(DirectGain-1, "");
-        param.set(DirectResGain-1, "");
-        param.set(DirectHammerGain-1, "");
+        param.set(DirectId, String(Id));
+        param.set(DirectTuning, "");
+        param.set(DirectTransposition, "");
+        param.set(DirectGain, "");
+        param.set(DirectResGain, "");
+        param.set(DirectHammerGain, "");
     }
            
     
@@ -171,17 +174,22 @@ public:
     inline void copy(DirectPreparation::Ptr d)
     {
         Id = d->getId();
-        param.set(DirectTuning-1, String(d->getTuning()->getId()));
-        param.set(DirectTransposition-1, String(d->getTransposition()));
-        param.set(DirectGain-1, String(d->getGain()));
-        param.set(DirectResGain-1, String(d->getResonanceGain()));
-        param.set(DirectHammerGain-1, String(d->getHammerGain()));
+        param.set(DirectId, String(Id));
+        param.set(DirectTuning, String(d->getTuning()->getId()));
+        param.set(DirectTransposition, String(d->getTransposition()));
+        param.set(DirectGain, String(d->getGain()));
+        param.set(DirectResGain, String(d->getResonanceGain()));
+        param.set(DirectHammerGain, String(d->getHammerGain()));
     }
     
     
-    inline const String getParam(DirectParameterType type) { return param[type-1]; }
+    inline const String getParam(DirectParameterType type)
+    {
+        if (type != DirectId)   return param[type];
+        else                    return "";
+    }
     
-    inline void setParam(DirectParameterType type, String val) { param.set(type-1, val);}
+    inline void setParam(DirectParameterType type, String val) { param.set(type, val);}
     
     inline const int getId(void) {   return Id; }
     

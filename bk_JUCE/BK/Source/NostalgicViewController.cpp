@@ -122,7 +122,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
     
     NostalgicPreparation::Ptr active = processor.nostalgic[currentNostalgicId]->aPrep;
     
-    NostalgicPreparation::Ptr mod = processor.modNostalgic[currentModNostalgicId];
+    NostalgicModPreparation::Ptr mod = processor.modNostalgic[currentModNostalgicId];
     
     if (name == cNostalgicParameterTypes[NostalgicId])
     {
@@ -146,7 +146,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setWaveDistance(i);
+            mod->setParam(NostalgicWaveDistance, text);
         }
     }
     else if (name == cNostalgicParameterTypes[NostalgicUndertow])
@@ -158,7 +158,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setUndertow(i);
+             mod->setParam(NostalgicUndertow, text);
         }
     }
     else if (name == cNostalgicParameterTypes[NostalgicTransposition])
@@ -170,7 +170,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setTransposition(f); 
+             mod->setParam(NostalgicTransposition, text);
         }
     }
     else if (name == cNostalgicParameterTypes[NostalgicGain])
@@ -182,7 +182,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setGain(f);
+             mod->setParam(NostalgicGain, text);
         }
     }
     else if (name == cNostalgicParameterTypes[NostalgicLengthMultiplier])
@@ -194,7 +194,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setLengthMultiplier(f);
+             mod->setParam(NostalgicLengthMultiplier, text);
         }
     }
     else if (name == cNostalgicParameterTypes[NostalgicBeatsToSkip])
@@ -206,7 +206,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setBeatsToSkip(i);
+             mod->setParam(NostalgicBeatsToSkip, text);
         }
     }
     else if (name == cNostalgicParameterTypes[NostalgicMode])
@@ -218,7 +218,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setMode((NostalgicSyncMode) i);
+             mod->setParam(NostalgicMode, text);
         }
     }
     else if (name == cNostalgicParameterTypes[NostalgicSyncTarget])
@@ -230,7 +230,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setSyncTarget(i);
+             mod->setParam(NostalgicSyncTarget, text);
         }
     }
     else if (name == cNostalgicParameterTypes[NostalgicTuning])
@@ -242,7 +242,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setTuning(processor.tPreparation[i]);
+            mod->setParam(NostalgicTuning, text);
         }
     }
     else
@@ -271,17 +271,17 @@ void NostalgicViewController::updateFields(void)
 void NostalgicViewController::updateModFields(void)
 {
     
-    NostalgicPreparation::Ptr prep = processor.nostalgic[currentModNostalgicId]->aPrep;
+    NostalgicModPreparation::Ptr prep = processor.modNostalgic[currentModNostalgicId];
     
-    modNostalgicTF[NostalgicWaveDistance]      ->setText( String( prep->getWavedistance()), false);
-    modNostalgicTF[NostalgicUndertow]          ->setText( String( prep->getUndertow()), false);
-    modNostalgicTF[NostalgicTransposition]     ->setText( String( prep->getTransposition()), false);
-    modNostalgicTF[NostalgicGain]              ->setText( String( prep->getGain()), false);
-    modNostalgicTF[NostalgicLengthMultiplier]  ->setText( String( prep->getLengthMultiplier()), false);
-    modNostalgicTF[NostalgicBeatsToSkip]       ->setText( String( prep->getBeatsToSkip()), false);
-    modNostalgicTF[NostalgicMode]              ->setText( String( prep->getMode()), false);
-    modNostalgicTF[NostalgicSyncTarget]        ->setText( String( prep->getSyncTarget()), false);
-    modNostalgicTF[NostalgicTuning]            ->setText( String(prep->getTuning()->getId()), false);
+    modNostalgicTF[NostalgicWaveDistance]      ->setText( prep->getParam(NostalgicWaveDistance), false);
+    modNostalgicTF[NostalgicUndertow]          ->setText( prep->getParam(NostalgicUndertow), false);
+    modNostalgicTF[NostalgicTransposition]     ->setText( prep->getParam(NostalgicTransposition), false);
+    modNostalgicTF[NostalgicGain]              ->setText( prep->getParam(NostalgicGain), false);
+    modNostalgicTF[NostalgicLengthMultiplier]  ->setText( prep->getParam(NostalgicLengthMultiplier), false);
+    modNostalgicTF[NostalgicBeatsToSkip]       ->setText( prep->getParam(NostalgicBeatsToSkip), false);
+    modNostalgicTF[NostalgicMode]              ->setText( prep->getParam(NostalgicMode), false);
+    modNostalgicTF[NostalgicSyncTarget]        ->setText( prep->getParam(NostalgicSyncTarget), false);
+    modNostalgicTF[NostalgicTuning]            ->setText( prep->getParam(NostalgicTuning), false);
 }
 
 void NostalgicViewController::bkMessageReceived (const String& message)

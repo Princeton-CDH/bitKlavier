@@ -240,6 +240,143 @@ private:
     JUCE_LEAK_DETECTOR(SynchronicPreparation);
 };
 
+class SynchronicModPreparation : public ReferenceCountedObject
+{
+public:
+    
+    typedef ReferenceCountedObjectPtr<SynchronicModPreparation>   Ptr;
+    typedef Array<SynchronicModPreparation::Ptr>                  PtrArr;
+    typedef Array<SynchronicModPreparation::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<SynchronicModPreparation>                  Arr;
+    typedef OwnedArray<SynchronicModPreparation, CriticalSection> CSArr;
+    
+    /*
+     SynchronicId = 0,
+     SynchronicTuning,
+     SynchronicTempo,
+     SynchronicNumPulses,
+     SynchronicClusterMin,
+     SynchronicClusterMax,
+     SynchronicClusterThresh,
+     SynchronicMode,
+     SynchronicBeatsToSkip,
+     SynchronicBeatMultipliers,
+     SynchronicLengthMultipliers,
+     SynchronicAccentMultipliers,
+     SynchronicTranspOffsets,
+     AT1Mode,
+     AT1History,
+     AT1Subdivisions,
+     AT1Min,
+     AT1Max,
+     */
+    
+    SynchronicModPreparation(SynchronicPreparation::Ptr p):
+    Id(p->getId())
+    {
+        param.ensureStorageAllocated(cSynchronicParameterTypes.size());
+        
+        param.set(SynchronicId, String(Id));
+        param.set(SynchronicTuning, String(p->getTuning()->getId()));
+        param.set(SynchronicTempo, String(p->getTempo()));
+        param.set(SynchronicNumPulses, String(p->getNumBeats()));
+        param.set(SynchronicClusterMin, String(p->getClusterMin()));
+        param.set(SynchronicClusterMax, String(p->getClusterMax()));
+        param.set(SynchronicClusterThresh, String(p->getClusterThreshMS()));
+        param.set(SynchronicMode, String(p->getMode()));
+        param.set(SynchronicBeatsToSkip, String(p->getBeatsToSkip()));
+        param.set(SynchronicBeatMultipliers, floatArrayToString(p->getBeatMultipliers()));
+        param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
+        param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
+        param.set(SynchronicTranspOffsets, floatArrayToString(p->getTranspOffsets()));
+        param.set(AT1Mode, String(p->getAdaptiveTempo1Mode()));
+        param.set(AT1History, String(p->getAdaptiveTempo1History()));
+        param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
+        param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
+        param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
+        
+    }
+    
+    
+    SynchronicModPreparation(int Id):
+    Id(Id)
+    {
+        param.set(SynchronicId, String(Id));
+        param.set(SynchronicTuning, "");
+        param.set(SynchronicTempo, "");
+        param.set(SynchronicNumPulses, "");
+        param.set(SynchronicClusterMin, "");
+        param.set(SynchronicClusterMax, "");
+        param.set(SynchronicClusterThresh, "");
+        param.set(SynchronicMode, "");
+        param.set(SynchronicBeatsToSkip, "");
+        param.set(SynchronicBeatMultipliers, "");
+        param.set(SynchronicLengthMultipliers, "");
+        param.set(SynchronicAccentMultipliers, "");
+        param.set(SynchronicTranspOffsets, "");
+        param.set(AT1Mode, "");
+        param.set(AT1History, "");
+        param.set(AT1Subdivisions, "");
+        param.set(AT1Min, "");
+        param.set(AT1Max, "");
+    }
+    
+    
+    ~SynchronicModPreparation(void)
+    {
+        
+    }
+    
+    inline void copy(SynchronicPreparation::Ptr p)
+    {
+        Id = p->getId();
+        
+        param.set(SynchronicId, String(Id));
+        param.set(SynchronicTuning, String(p->getTuning()->getId()));
+        param.set(SynchronicTempo, String(p->getTempo()));
+        param.set(SynchronicNumPulses, String(p->getNumBeats()));
+        param.set(SynchronicClusterMin, String(p->getClusterMin()));
+        param.set(SynchronicClusterMax, String(p->getClusterMax()));
+        param.set(SynchronicClusterThresh, String(p->getClusterThreshMS()));
+        param.set(SynchronicMode, String(p->getMode()));
+        param.set(SynchronicBeatsToSkip, String(p->getBeatsToSkip()));
+        param.set(SynchronicBeatMultipliers, floatArrayToString(p->getBeatMultipliers()));
+        param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
+        param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
+        param.set(SynchronicTranspOffsets, floatArrayToString(p->getTranspOffsets()));
+        param.set(AT1Mode, String(p->getAdaptiveTempo1Mode()));
+        param.set(AT1History, String(p->getAdaptiveTempo1History()));
+        param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
+        param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
+        param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
+    }
+    
+    
+    inline const String getParam(SynchronicParameterType type)
+    {
+        if (type != SynchronicId)
+            return param[type];
+        else
+            return "";
+    }
+    
+    inline void setParam(SynchronicParameterType type, String val) { param.set(type, val);}
+    
+    inline const int getId(void) {   return Id; }
+    
+    void print(void)
+    {
+        
+    }
+    
+private:
+    int Id;
+    
+    StringArray          param;
+    
+    JUCE_LEAK_DETECTOR(SynchronicModPreparation);
+};
+
 class SynchronicProcessor  : public ReferenceCountedObject
 {
     

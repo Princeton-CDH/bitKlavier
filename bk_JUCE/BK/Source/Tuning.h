@@ -149,6 +149,111 @@ private:
     JUCE_LEAK_DETECTOR(TuningPreparation);
 };
 
+class TuningModPreparation : public ReferenceCountedObject
+{
+public:
+    
+    typedef ReferenceCountedObjectPtr<TuningModPreparation>   Ptr;
+    typedef Array<TuningModPreparation::Ptr>                  PtrArr;
+    typedef Array<TuningModPreparation::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<TuningModPreparation>                  Arr;
+    typedef OwnedArray<TuningModPreparation, CriticalSection> CSArr;
+    
+    /*
+     TuningId = 0,
+     TuningScale,
+     TuningFundamental,
+     TuningOffset,
+     TuningA1IntervalScale,
+     TuningA1Inversional,
+     TuningA1AnchorScale,
+     TuningA1AnchorFundamental,
+     TuningA1ClusterThresh,
+     TuningA1History,
+     TuningCustomScale,
+     */
+    
+    TuningModPreparation(TuningPreparation::Ptr p):
+    Id(p->getId())
+    {
+        param.ensureStorageAllocated(cTuningParameterTypes.size());
+        
+        param.set(TuningId, String(Id));
+        param.set(TuningScale, String(p->getTuning()));
+        param.set(TuningFundamental, String(p->getFundamental()));
+        param.set(TuningOffset, String(p->getFundamentalOffset()));
+        param.set(TuningA1IntervalScale, String(p->getAdaptiveIntervalScale()));
+        param.set(TuningA1Inversional, String(p->getAdaptiveInversional()));
+        param.set(TuningA1AnchorScale, String(p->getAdaptiveAnchorScale()));
+        param.set(TuningA1AnchorFundamental, String(p->getAdaptiveAnchorFundamental()));
+        param.set(TuningA1ClusterThresh, String(p->getAdaptiveClusterThresh()));
+        param.set(TuningA1History, String(p->getAdaptiveHistory()));
+        param.set(TuningCustomScale, floatArrayToString(p->getCustomScale()));
+        
+    }
+    
+    
+    TuningModPreparation(int Id):
+    Id(Id)
+    {
+        param.set(TuningId, String(Id));
+        param.set(TuningScale, "");
+        param.set(TuningFundamental, "");
+        param.set(TuningOffset, "");
+        param.set(TuningA1IntervalScale, "");
+        param.set(TuningA1Inversional, "");
+        param.set(TuningA1AnchorScale, "");
+        param.set(TuningA1AnchorFundamental, "");
+        param.set(TuningA1ClusterThresh, "");
+        param.set(TuningA1History, "");
+        param.set(TuningCustomScale, "");
+    }
+    
+    
+    ~TuningModPreparation(void)
+    {
+        
+    }
+    
+    inline void copy(TuningPreparation::Ptr p)
+    {
+        Id = p->getId();
+        param.set(TuningId, String(Id));
+        param.set(TuningScale, String(p->getTuning()));
+        param.set(TuningFundamental, String(p->getFundamental()));
+        param.set(TuningOffset, String(p->getFundamentalOffset()));
+        param.set(TuningA1IntervalScale, String(p->getAdaptiveIntervalScale()));
+        param.set(TuningA1Inversional, String(p->getAdaptiveInversional()));
+        param.set(TuningA1AnchorScale, String(p->getAdaptiveAnchorScale()));
+        param.set(TuningA1AnchorFundamental, String(p->getAdaptiveAnchorFundamental()));
+        param.set(TuningA1ClusterThresh, String(p->getAdaptiveClusterThresh()));
+        param.set(TuningA1History, String(p->getAdaptiveHistory()));
+        param.set(TuningCustomScale, floatArrayToString(p->getCustomScale()));
+    }
+    
+    
+    inline const String getParam(TuningParameterType type)
+    {
+        if (type != TuningId)   return param[type];
+        else                    return "";
+    }
+    
+    inline void setParam(TuningParameterType type, String val) { param.set(type, val);}
+    
+    inline const int getId(void) {   return Id; }
+    
+    void print(void)
+    {
+        
+    }
+    
+private:
+    int Id;
+    
+    StringArray          param;
+    
+    JUCE_LEAK_DETECTOR(TuningModPreparation);
+};
 
 class TuningProcessor : public ReferenceCountedObject
 {

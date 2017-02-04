@@ -119,6 +119,16 @@ static const std::vector<std::string> cPrepMapName= {
 
 static const int aMaxNumPreparationKeymaps = cPrepMapName.size();
 
+typedef enum BKParameterDataType
+{
+    BKVoid = 0,
+    BKBool,
+    BKInt,
+    BKFloat,
+    BKIntArr,
+    BKFloatArr,
+    BKParameterTypeNil
+} BKParameterDataType;
 
 #pragma mark - General
 typedef enum GeneralParameterType
@@ -188,6 +198,27 @@ typedef enum SynchronicParameterType {
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
+static const std::vector<BKParameterDataType> cSynchronicDataTypes = {
+    BKInt,
+    BKInt,
+    BKFloat,
+    BKInt,
+    BKInt,
+    BKInt,
+    BKFloat,
+    BKInt,
+    BKInt,
+    BKFloatArr,
+    BKFloatArr,
+    BKFloatArr,
+    BKFloatArr,
+    BKFloat,
+    BKInt,
+    BKFloat,
+    BKFloat,
+    BKFloat
+};
+
 static const std::vector<std::string> cSynchronicParameterTypes = {
     "Synchronic Id",
     "Tuning Id",
@@ -231,6 +262,19 @@ typedef enum NostalgicParameterType {
     
 } NostalgicParameterType;
 
+static const std::vector<BKParameterDataType> cNostalgicDataTypes =
+{
+    BKInt,
+    BKInt,
+    BKInt,
+    BKInt,
+    BKFloat,
+    BKFloat,
+    BKFloat,
+    BKInt,
+    BKInt
+};
+
 static const std::vector<std::string> cNostalgicParameterTypes = {
     "Nostalgic Id",
     "Tuning Id",
@@ -256,6 +300,16 @@ typedef enum DirectParameterType
     DirectParameterTypeNil,
     
 } DirectParameterType;
+
+
+static const std::vector<BKParameterDataType> cDirectDataTypes = {
+    BKInt,
+    BKInt,
+    BKFloat,
+    BKFloat,
+    BKFloat,
+    BKFloat
+};
 
 static const std::vector<std::string> cDirectParameterTypes = {
     "Direct Id",
@@ -283,6 +337,20 @@ typedef enum TuningParameterType
     TuningParameterTypeNil
     
 } TuningParameterType;
+
+static const std::vector<BKParameterDataType> cTuningDataTypes = {
+    BKInt,
+    BKInt,
+    BKInt,
+    BKFloat,
+    BKInt,
+    BKBool,
+    BKInt,
+    BKInt,
+    BKInt,
+    BKInt,
+    BKFloatArr
+};
 
 static const std::vector<std::string> cTuningParameterTypes = {
     "Tuning Id",

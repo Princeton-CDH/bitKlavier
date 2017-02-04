@@ -115,7 +115,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
     
     TuningPreparation::Ptr prep = processor.tPreparation[currentTuningId];
     
-    TuningPreparation::Ptr mod = processor.modTuning[currentModTuningId];
+    TuningModPreparation::Ptr mod = processor.modTuning[currentModTuningId];
     
     if (name == cTuningParameterTypes[TuningId])
     {
@@ -138,7 +138,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setTuning((TuningSystem)i);
+            mod->setParam(TuningScale, text);
         }
     }
     else if (name == cTuningParameterTypes[TuningFundamental])
@@ -149,7 +149,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setFundamental((PitchClass)i);
+            mod->setParam(TuningFundamental, text);
         }
     }
     else if (name == cTuningParameterTypes[TuningOffset])
@@ -160,7 +160,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setFundamentalOffset(f);
+            mod->setParam(TuningOffset, text);
         }
     }
     else if (name == cTuningParameterTypes[TuningA1IntervalScale])
@@ -171,7 +171,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setAdaptiveIntervalScale((TuningSystem)i);
+            mod->setParam(TuningA1IntervalScale, text);
         }
     }
     else if (name == cTuningParameterTypes[TuningA1Inversional])
@@ -182,7 +182,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setAdaptiveInversional((bool) i);
+            mod->setParam(TuningA1Inversional, text);
         }
     }
     else if (name == cTuningParameterTypes[TuningA1AnchorScale])
@@ -193,7 +193,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setAdaptiveAnchorScale((TuningSystem) i);
+            mod->setParam(TuningA1AnchorScale, text);
         }
     }
     else if (name == cTuningParameterTypes[TuningA1AnchorFundamental])
@@ -204,7 +204,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setAdaptiveAnchorFundamental((PitchClass) i);
+            mod->setParam(TuningA1AnchorFundamental, text);
         }
     }
     else if (name == cTuningParameterTypes[TuningA1ClusterThresh])
@@ -215,7 +215,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setAdaptiveClusterThresh(i);
+            mod->setParam(TuningA1ClusterThresh, text);
         }
     }
     else if (name == cTuningParameterTypes[TuningA1History])
@@ -226,7 +226,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setAdaptiveHistory(i);
+            mod->setParam(TuningA1History, text);
         }
     }
     else if (name == cTuningParameterTypes[TuningCustomScale])
@@ -237,7 +237,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setCustomScale( stringToFloatArray(text));
+            mod->setParam(TuningCustomScale, text);
         }
     }
     else
@@ -269,18 +269,18 @@ void TuningViewController::updateFields()
 void TuningViewController::updateModFields()
 {
     
-    TuningPreparation::Ptr prep = processor.tPreparation[currentTuningId];
+    TuningModPreparation::Ptr prep = processor.modTuning[currentModTuningId];
     
-    modTuningTF[TuningScale]               ->setText( String( prep->getTuning()), false);
-    modTuningTF[TuningFundamental]         ->setText( String( prep->getFundamental()), false);
-    modTuningTF[TuningOffset]              ->setText( String( prep->getFundamentalOffset()), false);
-    modTuningTF[TuningA1IntervalScale]     ->setText( String( prep->getAdaptiveIntervalScale()), false);
-    modTuningTF[TuningA1Inversional]       ->setText( String( prep->getAdaptiveInversional()), false);
-    modTuningTF[TuningA1AnchorScale]       ->setText( String( prep->getAdaptiveAnchorScale()), false);
-    modTuningTF[TuningA1AnchorFundamental] ->setText( String( prep->getAdaptiveAnchorFundamental()), false);
-    modTuningTF[TuningA1ClusterThresh]     ->setText( String( prep->getAdaptiveClusterThresh()), false);
-    modTuningTF[TuningA1History]           ->setText( String( prep->getAdaptiveHistory()), false);
-    modTuningTF[TuningCustomScale]         ->setText( floatArrayToString( prep->getCustomScale()), false);
+    modTuningTF[TuningScale]               ->setText( prep->getParam(TuningScale), false);
+    modTuningTF[TuningFundamental]         ->setText( prep->getParam(TuningFundamental), false);
+    modTuningTF[TuningOffset]              ->setText( prep->getParam(TuningOffset), false);
+    modTuningTF[TuningA1IntervalScale]     ->setText( prep->getParam(TuningA1IntervalScale), false);
+    modTuningTF[TuningA1Inversional]       ->setText( prep->getParam(TuningA1Inversional), false);
+    modTuningTF[TuningA1AnchorScale]       ->setText( prep->getParam(TuningA1AnchorScale), false);
+    modTuningTF[TuningA1AnchorFundamental] ->setText( prep->getParam(TuningA1AnchorFundamental), false);
+    modTuningTF[TuningA1ClusterThresh]     ->setText( prep->getParam(TuningA1ClusterThresh), false);
+    modTuningTF[TuningA1History]           ->setText( prep->getParam(TuningA1History), false);
+    modTuningTF[TuningCustomScale]         ->setText( prep->getParam(TuningCustomScale), false);
     
     
 }

@@ -127,12 +127,28 @@ void BKAudioProcessorEditor::timerCallback()
 
     }
     
-    if (processor.preparationDidChange)
+    if (processor.directPreparationDidChange)
     {
-        processor.preparationDidChange = false;
+        processor.directPreparationDidChange = false;
         dvc.updateFields();
+    }
+    
+    if (processor.nostalgicPreparationDidChange)
+    {
+        processor.nostalgicPreparationDidChange = false;
         nvc.updateFields();
+    }
+    
+    if (processor.synchronicPreparationDidChange)
+    {
+        processor.synchronicPreparationDidChange = false;
         svc.updateFields();
+    }
+    
+    if (processor.tuningPreparationDidChange)
+    {
+        processor.tuningPreparationDidChange = false;
+        tvc.updateFields();
     }
     
 }
@@ -447,26 +463,70 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                 for (auto key : keys)
                 {
                     
-                        if (itsADirect)
+                    if (itsADirect)
+                    {
+                        out += (String(key) + ":dm" +String(whichMod) + ":" + "{" + intArrayToString(whichPreps) + "} ");
+                        
+                        DirectModPreparation::Ptr dmod = processor.modDirect[whichMod];
+                        
+                        for (int n = cDirectParameterTypes.size(); --n >= 0; )
                         {
-                            out += (String(key) + ":dm" +String(whichMod) + ":" + "{" + intArrayToString(whichPreps) + "} ");
+                            String param = dmod->getParam((DirectParameterType)n);
                             
-                            DirectModPreparation::Ptr dmod = processor.modDirect[whichMod];
-                            
-                            for (int n = cDirectParameterTypes.size(); --n >= 0; )
+                            if (param != "")
                             {
-                                String param = dmod->getParam((DirectParameterType)n);
-                                
-                                if (param != "")
+                                for (auto prep : whichPreps)
                                 {
-                                    for (auto prep : whichPreps)
-                                    {
-                                        processor.currentPiano->modMap[key]->addDirectModification(new DirectModification(prep, (DirectParameterType)n, param));
-                                        DBG("whichprep: " + String(prep) + " whochtype: " + cDirectParameterTypes[n] + " val: " +param);
-                                    }
+                                    processor.currentPiano->modMap[key]->addDirectModification(new DirectModification(prep, (DirectParameterType)n, param));
+                                    DBG("whichprep: " + String(prep) + " whichtype: " + cDirectParameterTypes[n] + " val: " +param);
                                 }
                             }
                         }
+                    }
+                    else if (itsANostalgic)
+                    {
+                        out += (String(key) + ":nm" +String(whichMod) + ":" + "{" + intArrayToString(whichPreps) + "} ");
+                        
+                        NostalgicModPreparation::Ptr nmod = processor.modNostalgic[whichMod];
+                        
+                        for (int n = cNostalgicParameterTypes.size(); --n >= 0; )
+                        {
+                            String param = nmod->getParam((NostalgicParameterType)n);
+                            
+                            DBG("nostparam: " + param);
+                            if (param != "")
+                            {
+                                for (auto prep : whichPreps)
+                                {
+                                    processor.currentPiano->modMap[key]->addNostalgicModification(new NostalgicModification(prep, (NostalgicParameterType)n, param));
+                                    DBG("nostprep: " + String(prep) + " whichtype: " + cNostalgicParameterTypes[n] + " val: " +param);
+                                }
+                            }
+                        }
+                    }
+                    else if (itsASynchronic)
+                    {
+                        out += (String(key) + ":nm" +String(whichMod) + ":" + "{" + intArrayToString(whichPreps) + "} ");
+                        
+                        SynchronicModPreparation::Ptr smod = processor.modSynchronic[whichMod];
+                        
+                        for (int n = cSynchronicParameterTypes.size(); --n >= 0; )
+                        {
+                            String param = smod->getParam((SynchronicParameterType)n);
+                            
+                            DBG("syncparam: " + param);
+                            if (param != "")
+                            {
+                                for (auto prep : whichPreps)
+                                {
+                                    processor.currentPiano->modMap[key]->addSynchronicModification(new SynchronicModification(prep, (SynchronicParameterType)n, param));
+                                    DBG("syncprep: " + String(prep) + " whichtype: " + cSynchronicParameterTypes[n] + " val: " +param);
+                                }
+                            }
+                        }
+                    }
+                    
+                    
                     
                 }
                 

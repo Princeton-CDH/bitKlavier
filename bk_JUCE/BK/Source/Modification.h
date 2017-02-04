@@ -71,11 +71,11 @@ public:
     {
         prepId = whichPrep;
         
-        if (type == DirectTuning)
+        if (cDirectDataTypes[type] == BKInt)
         {
             modInt = val.getIntValue();
         }
-        else // Gains
+        else // BKFloat
         {
             modFloat = val.getFloatValue();
         }
@@ -106,25 +106,23 @@ public:
     typedef OwnedArray<SynchronicModification>                  Arr;
     typedef OwnedArray<SynchronicModification, CriticalSection> CSArr;
     
-    SynchronicModification(SynchronicParameterType type, int whichPrep, int            val):
+    SynchronicModification(int whichPrep, SynchronicParameterType type, String val):
     type(type)
     {
         prepId = whichPrep;
-        modInt = val;
-    }
-    
-    SynchronicModification(SynchronicParameterType type, int whichPrep, float          val):
-    type(type)
-    {
-        prepId = whichPrep;
-        modFloat = val;
-    }
-    
-    SynchronicModification(SynchronicParameterType type, int whichPrep, Array<float> val):
-    type(type)
-    {
-        prepId = whichPrep;
-        modFloatArr = val;
+        
+        if (cSynchronicDataTypes[type] == BKInt)
+        {
+            modInt = val.getIntValue();
+        }
+        else if (cSynchronicDataTypes[type] == BKFloat) // BKFloat
+        {
+            modFloat = val.getFloatValue();
+        }
+        else if (cSynchronicDataTypes[type] == BKFloatArr)
+        {
+            modFloatArr = stringToFloatArray(val);
+        }
     }
     
     ~SynchronicModification(void)
@@ -153,18 +151,19 @@ public:
     typedef OwnedArray<NostalgicModification>                  Arr;
     typedef OwnedArray<NostalgicModification, CriticalSection> CSArr;
     
-    NostalgicModification(NostalgicParameterType type, int whichPrep, int            val):
+    NostalgicModification(int whichPrep, NostalgicParameterType type, String val):
     type(type)
     {
         prepId = whichPrep;
-        modInt = val;
-    }
-    
-    NostalgicModification(NostalgicParameterType type, int whichPrep, float          val):
-    type(type)
-    {
-        prepId = whichPrep;
-        modFloat = val;
+        
+        if (cNostalgicDataTypes[type] == BKInt)
+        {
+            modInt = val.getIntValue();
+        }
+        else if (cNostalgicDataTypes[type] == BKFloat) // BKFloat
+        {
+            modFloat = val.getFloatValue();
+        }
     }
     
     ~NostalgicModification(void)
@@ -192,32 +191,27 @@ public:
     typedef OwnedArray<TuningModification>                  Arr;
     typedef OwnedArray<TuningModification, CriticalSection> CSArr;
     
-    TuningModification(TuningParameterType type, int whichPrep, int            val):
+    TuningModification(int whichPrep, TuningParameterType type, String val):
     type(type)
     {
         prepId = whichPrep;
-        modInt = val;
-    }
-    
-    TuningModification(TuningParameterType type, int whichPrep, float          val):
-    type(type)
-    {
-        prepId = whichPrep;
-        modFloat = val;
-    }
-    
-    TuningModification(TuningParameterType type, int whichPrep, Array<float> val):
-    type(type)
-    {
-        prepId = whichPrep;
-        modFloatArr = val;
-    }
-    
-    TuningModification(TuningParameterType type, int whichPrep, bool val):
-    type(type)
-    {
-        prepId = whichPrep;
-        modBool = val;
+        
+        if (cTuningDataTypes[type] == BKInt)
+        {
+            modInt = val.getIntValue();
+        }
+        else if (cTuningDataTypes[type] == BKFloat)
+        {
+            modFloat = val.getFloatValue();
+        }
+        else if (cTuningDataTypes[type] == BKFloatArr)
+        {
+            modFloatArr = stringToFloatArray(val);
+        }
+        else if (cTuningDataTypes[type] == BKBool)
+        {
+            modBool = (bool)val.getIntValue();
+        }
     }
     
     

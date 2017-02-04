@@ -54,10 +54,10 @@ public:
     Nostalgic::PtrArr                   nostalgic;
     Direct::PtrArr                      direct;
     
-    SynchronicPreparation::PtrArr       modSynchronic;
+    SynchronicModPreparation::PtrArr    modSynchronic;
     DirectModPreparation::PtrArr        modDirect;
-    NostalgicPreparation::PtrArr        modNostalgic;
-    TuningPreparation::PtrArr           modTuning;
+    NostalgicModPreparation::PtrArr     modNostalgic;
+    TuningModPreparation::PtrArr        modTuning;
     
     
     Piano::Ptr                          prevPiano;
@@ -66,7 +66,10 @@ public:
     Piano::PtrArr                       bkPianos;
     
     bool                                pianoDidChange;
-    bool                                preparationDidChange;
+    bool                                directPreparationDidChange;
+    bool                                nostalgicPreparationDidChange;
+    bool                                synchronicPreparationDidChange;
+    bool                                tuningPreparationDidChange;
     
     Array<int>                          noteOn;
     
@@ -92,6 +95,7 @@ public:
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
     
     void  setCurrentPiano(int which);
+    void  performModifications(int noteNumber);
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override;

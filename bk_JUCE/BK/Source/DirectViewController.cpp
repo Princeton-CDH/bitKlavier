@@ -213,7 +213,6 @@ void DirectViewController::updateFields(void)
 
 void DirectViewController::updateModFields(void)
 {
-    
     DirectModPreparation::Ptr prep = processor.modDirect[currentModDirectId];
     
     modDirectTF[DirectTransposition]       ->setText( prep->getParam(DirectTransposition), false);

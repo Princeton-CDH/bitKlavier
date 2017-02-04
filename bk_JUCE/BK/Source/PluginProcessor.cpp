@@ -40,7 +40,7 @@ resonanceReleaseSynth   (general)
     // Make a bunch of tunings.
     for (int i = 0; i < (aMaxTuningPreparations); i++) {
         tPreparation.add(new TuningPreparation(i));
-        modTuning.add(new TuningPreparation(i));
+        modTuning.add(new TuningModPreparation(i));
     }
     
     
@@ -50,8 +50,8 @@ resonanceReleaseSynth   (general)
         nostalgic.add   (new Nostalgic(&mainPianoSynth, tPreparation[0], i));
         direct.add      (new Direct(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, tPreparation[0], i));
         
-        modSynchronic.add   (new SynchronicPreparation(i, tPreparation[0]));
-        modNostalgic.add    (new NostalgicPreparation(i, tPreparation[0]));
+        modSynchronic.add   (new SynchronicModPreparation(i));
+        modNostalgic.add    (new NostalgicModPreparation(i));
         modDirect.add       (new DirectModPreparation(i));
     }
 
@@ -116,6 +116,81 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
 }
 
+void BKAudioProcessor::performModifications(int noteNumber)
+{
+    Array<float> modfa;
+    float modf;
+    int   modi;
+    bool  modb;
+    
+    DirectModification::PtrArr dMod = currentPiano->modMap[noteNumber]->getDirectModifications();
+    for (int i = dMod.size(); --i >= 0;)
+    {
+        DirectPreparation::Ptr active = direct[dMod[i]->getPrepId()]->aPrep;
+        DirectParameterType type = dMod[i]->getParameterType();
+        modf = dMod[i]->getModFloat();
+        modi = dMod[i]->getModInt();
+        
+        if (type == DirectTransposition)    active->setTransposition(modf);
+        else if (type == DirectGain)        active->setGain(modf);
+        else if (type == DirectHammerGain)  active->setHammerGain(modf);
+        else if (type == DirectResGain)     active->setResonanceGain(modf);
+        else if (type == DirectTuning)      active->setTuning(tPreparation[modi]);
+        
+        directPreparationDidChange = true;
+    }
+    
+    NostalgicModification::PtrArr nMod = currentPiano->modMap[noteNumber]->getNostalgicModifications();
+    for (int i = nMod.size(); --i >= 0;)
+    {
+        NostalgicPreparation::Ptr active = nostalgic[nMod[i]->getPrepId()]->aPrep;
+        NostalgicParameterType type = nMod[i]->getParameterType();
+        modf = nMod[i]->getModFloat();
+        modi = nMod[i]->getModInt();
+        
+        if (type == NostalgicTransposition)         active->setTransposition(modf);
+        else if (type == NostalgicGain)             active->setGain(modf);
+        else if (type == NostalgicMode)             active->setMode((NostalgicSyncMode)modi);
+        else if (type == NostalgicUndertow)         active->setUndertow(modi);
+        else if (type == NostalgicSyncTarget)       active->setSyncTarget(modi);
+        else if (type == NostalgicBeatsToSkip)      active->setBeatsToSkip(modf);
+        else if (type == NostalgicWaveDistance)     active->setWaveDistance(modi);
+        else if (type == NostalgicLengthMultiplier) active->setLengthMultiplier(modf);
+        else if (type == NostalgicTuning)           active->setTuning(tPreparation[modi]);
+        
+        nostalgicPreparationDidChange = true;
+    }
+    
+    SynchronicModification::PtrArr sMod = currentPiano->modMap[noteNumber]->getSynchronicModifications();
+    for (int i = sMod.size(); --i >= 0;)
+    {
+        SynchronicPreparation::Ptr active = synchronic[sMod[i]->getPrepId()]->aPrep;
+        SynchronicParameterType type = sMod[i]->getParameterType();
+        modf = sMod[i]->getModFloat();
+        modi = sMod[i]->getModInt();
+        modfa = sMod[i]->getModFloatArr();
+        
+        if (type == SynchronicTranspOffsets)            active->setTranspOffsets(modfa);
+        else if (type == SynchronicTempo)               active->setTempo(modf);
+        else if (type == SynchronicMode)                active->setMode((SynchronicSyncMode)modi);
+        else if (type == SynchronicClusterMin)          active->setClusterMin(modi);
+        else if (type == SynchronicClusterMax)          active->setClusterMax(modi);
+        else if (type == SynchronicClusterThresh)       active->setClusterThresh(modi);
+        else if (type == SynchronicNumPulses )          active->setNumBeats(modi);
+        else if (type == SynchronicBeatsToSkip)         active->setBeatsToSkip(modi);
+        else if (type == SynchronicBeatMultipliers)     active->setBeatMultipliers(modfa);
+        else if (type == SynchronicLengthMultipliers)   active->setLengthMultipliers(modfa);
+        else if (type == SynchronicAccentMultipliers)   active->setAccentMultipliers(modfa);
+        else if (type == AT1Mode)                       active->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) modi);
+        else if (type == AT1Min)                        active->setAdaptiveTempo1Min(modf);
+        else if (type == AT1Max)                        active->setAdaptiveTempo1Max(modf);
+        else if (type == AT1History)                    active->setAdaptiveTempo1History(modi);
+        else if (type == AT1Subdivisions)               active->setAdaptiveTempo1Subdivisions(modf);
+        
+        synchronicPreparationDidChange = true;
+    }
+}
+
 void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
     buffer.clear();
@@ -149,15 +224,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             int whichPiano = currentPiano->pianoMap[noteNumber] - 1;
             if (whichPiano >= 0 && whichPiano != currentPiano->getId()) setCurrentPiano(whichPiano);
 
-            DirectModification::PtrArr dMod = currentPiano->modMap[noteNumber]->getDirectModifications();
-            for (int i = dMod.size(); --i >= 0;)
-            {
-                if (dMod[i]->getParameterType() == DirectTransposition)
-                    direct[dMod[i]->getPrepId()]->aPrep->setTransposition(dMod[i]->getModFloat());
-                
-                preparationDidChange = true;
-            }
-
+            performModifications(noteNumber);
             
             // Send key on to each pmap in current piano
             for (p = currentPiano->activePMaps.size(); --p >= 0;)
@@ -228,7 +295,9 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     currentPiano = bkPianos[which];
 
     pianoDidChange = true;
-    preparationDidChange = true;
+    synchronicPreparationDidChange = true;
+    nostalgicPreparationDidChange = true;
+    directPreparationDidChange = true;
 }
 
 void BKAudioProcessor::releaseResources() {
