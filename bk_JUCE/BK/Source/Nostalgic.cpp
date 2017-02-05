@@ -72,7 +72,7 @@ void NostalgicProcessor::postRelease(int midiNoteNumber, int midiChannel)
 void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
 {
     float duration = 0.0;
-
+    
     if (noteOn[midiNoteNumber])
     {
         if (active->getMode() == NoteLengthSync)
@@ -83,7 +83,9 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
         else //SynchronicSync
         {
             //get time in ms to target beat, summing over skipped beat lengths
-            duration = syncProcessor->getTimeToBeatMS(active->getBeatsToSkip()); // sum
+            //duration = syncProcessor->getTimeToBeatMS(active->getBeatsToSkip()); // sum
+            SynchronicProcessor::Ptr syncTarget = preparation->getSyncTargetProcessor();
+            duration = syncTarget->getTimeToBeatMS(active->getBeatsToSkip()); // sum
         }
         
         float offset = (active->getTransposition() + tuner.getOffset(midiNoteNumber));

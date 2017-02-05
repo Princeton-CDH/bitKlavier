@@ -284,7 +284,7 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
     "Gain",
     "LengthMult",
     "BeatsToSkip",
-    "Mode",
+    "Length Mode",
     "SyncTarget"
 };
 

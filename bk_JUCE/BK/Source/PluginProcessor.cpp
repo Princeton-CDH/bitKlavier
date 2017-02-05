@@ -49,10 +49,13 @@ resonanceReleaseSynth   (general)
         synchronic.add  (new Synchronic(&mainPianoSynth, tPreparation[0], i));
         nostalgic.add   (new Nostalgic(&mainPianoSynth, tPreparation[0], i));
         direct.add      (new Direct(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, tPreparation[0], i));
-        
+                
         modSynchronic.add   (new SynchronicModPreparation(i));
         modNostalgic.add    (new NostalgicModPreparation(i));
         modDirect.add       (new DirectModPreparation(i));
+        
+        nostalgic[i]->sPrep->setSyncTargetProcessor(synchronic[0]->processor);
+        nostalgic[i]->aPrep->setSyncTargetProcessor(synchronic[0]->processor);
     }
 
     // Make a bunch of pianos. Default to zeroth keymap.
@@ -334,6 +337,20 @@ bool BKAudioProcessor::setPreferredBusArrangement (bool isInput, int bus, const 
 }
 #endif
 
+SynchronicProcessor::Ptr BKAudioProcessor::getSynchronicProcessor(int id)
+{
+    for (int i = 0; i < aMaxTotalPreparations; i++)
+    {
+        if(synchronic[i]->getId() == id) {
+            DBG("got synchronic processor id " + String(id));
+            return synchronic[i]->processor;
+        }
+    }
+    
+    //else
+    DBG("synchronic processor not found, returning first processor");
+    return synchronic[0]->processor;
+}
 
 
 //==============================================================================
