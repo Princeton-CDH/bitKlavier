@@ -372,7 +372,6 @@ public:
     
     
     SynchronicProcessor(BKSynthesiser *synth,
-                        SynchronicPreparation::Ptr prep,
                         SynchronicPreparation::Ptr active,
                         int Id);
     
@@ -387,13 +386,10 @@ public:
     void keyReleased(int noteNumber, int channel);
     float getTimeToBeatMS(float beatsToSkip);
     
-    inline void                             setPreparation(SynchronicPreparation::Ptr prep) { preparation = prep;           }
-    inline SynchronicPreparation::Ptr       getPreparation(void)                            { return preparation;           }
-    
 private:
     int Id;
     BKSynthesiser* synth;
-    SynchronicPreparation::Ptr preparation, active;
+    SynchronicPreparation::Ptr active;
     
     double sampleRate;
     

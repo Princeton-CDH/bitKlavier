@@ -409,7 +409,6 @@ void SynchronicViewController::bkMessageReceived (const String& message)
 {
     if (message == "synchronic/update")
     {
-        //currentSynchronicId = processor.currentPiano->getPreparation();
         
         updateFields();
     }

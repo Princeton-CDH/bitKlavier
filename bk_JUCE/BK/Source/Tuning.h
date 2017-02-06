@@ -260,10 +260,8 @@ public:
     typedef OwnedArray<TuningProcessor>                          PtrArr;
     typedef OwnedArray<TuningProcessor, CriticalSection>         CSPtrArr;
     
-    TuningProcessor(TuningPreparation::Ptr prep, TuningPreparation::Ptr active);
+    TuningProcessor(TuningPreparation::Ptr active);
     ~TuningProcessor();
-    
-    void setPreparation(TuningPreparation::Ptr prep) {preparation = prep;}
     
     inline void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr;}
     
@@ -283,7 +281,7 @@ public:
 private:
     
     Array<Array<float>> tuningLibrary;
-    TuningPreparation::Ptr preparation, active;
+    TuningPreparation::Ptr active;
     
     float   intervalToRatio(float interval) const noexcept { return mtof(interval + 60.) / mtof(60.); }
     float   lastNote[128];
@@ -335,7 +333,7 @@ public:
     {
         sPrep = new TuningPreparation();
         aPrep = new TuningPreparation(sPrep);
-        processor = new TuningProcessor(sPrep, aPrep);
+        processor = new TuningProcessor(aPrep);
     };
     
     ~Tuning() {};

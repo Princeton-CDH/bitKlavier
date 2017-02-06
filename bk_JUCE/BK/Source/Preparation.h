@@ -39,7 +39,7 @@ public:
     {
         sPrep = new DirectPreparation(tuning);
         aPrep = new DirectPreparation(sPrep);
-        processor = new DirectProcessor(s, res, ham, sPrep, aPrep, Id);
+        processor = new DirectProcessor(s, res, ham, aPrep, Id);
     };
     
     ~Direct() {};
@@ -78,7 +78,7 @@ public:
     {
         sPrep = new SynchronicPreparation(tuning);
         aPrep = new SynchronicPreparation(sPrep);
-        processor = new SynchronicProcessor(s, sPrep, aPrep, Id);
+        processor = new SynchronicProcessor(s, aPrep, Id);
     };
     
     ~Synchronic() {};
@@ -115,7 +115,7 @@ public:
     {
         sPrep = new NostalgicPreparation(tuning);
         aPrep = new NostalgicPreparation(sPrep);
-        processor = new NostalgicProcessor(s, sPrep, aPrep, Id);
+        processor = new NostalgicProcessor(s, aPrep, Id);
     };
     
     ~Nostalgic() {};

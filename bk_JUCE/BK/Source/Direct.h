@@ -202,7 +202,6 @@ public:
     DirectProcessor(BKSynthesiser *s,
                     BKSynthesiser *res,
                     BKSynthesiser *ham,
-                    DirectPreparation::Ptr prep,
                     DirectPreparation::Ptr active,
                     int Id);
     
@@ -212,10 +211,6 @@ public:
     
     void setCurrentPlaybackSampleRate(double sr);
     
-    inline void             setPreparation(DirectPreparation::Ptr prep) { preparation = prep;               }
-    
-    DirectPreparation::Ptr  getPreparation(void) const                  { return preparation;      }
-    
     void    keyPressed(int noteNumber, float velocity, int channel);
     void    keyReleased(int noteNumber, float velocity, int channel);
     
@@ -224,7 +219,7 @@ private:
     BKSynthesiser*              synth;
     BKSynthesiser*              resonanceSynth;
     BKSynthesiser*              hammerSynth;
-    DirectPreparation::Ptr      preparation, active;
+    DirectPreparation::Ptr      active;
     TuningProcessor::Ptr        tuner;
     
     double sampleRate;

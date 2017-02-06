@@ -272,7 +272,6 @@ public:
     typedef OwnedArray<NostalgicProcessor, CriticalSection> CSArr;
     
     NostalgicProcessor(BKSynthesiser *s,
-                       NostalgicPreparation::Ptr prep,
                        NostalgicPreparation::Ptr active,
                        int Id);
     
@@ -290,15 +289,11 @@ public:
     void keyReleased(int midiNoteNumber, int midiChannel);
     
     void postRelease(int midiNoteNumber, int midiChannel);
-
-    inline void setPreparation(NostalgicPreparation::Ptr prep)  { preparation = prep;   }
-
-    NostalgicPreparation::Ptr   getPreparation(void)    { return preparation;   }
     
 private:
     int Id;
     BKSynthesiser*              synth;
-    NostalgicPreparation::Ptr   preparation, active;
+    NostalgicPreparation::Ptr   active;
 
     TuningProcessor::Ptr             tuner;
     

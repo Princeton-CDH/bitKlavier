@@ -299,7 +299,6 @@ void TuningViewController::bkMessageReceived(const String& message)
 {
     if (message == "tuning/update")
     {
-        //currentTuningId = processor.currentPiano->getPreparation();
         
         updateFields();
     }

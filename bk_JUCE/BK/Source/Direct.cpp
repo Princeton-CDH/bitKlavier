@@ -13,14 +13,12 @@
 DirectProcessor::DirectProcessor(BKSynthesiser *s,
                                  BKSynthesiser *res,
                                  BKSynthesiser *ham,
-                                 DirectPreparation::Ptr prep,
                                  DirectPreparation::Ptr activePrep,
                                  int Id):
 Id(Id),
 synth(s),
 resonanceSynth(res),
 hammerSynth(ham),
-preparation(prep),
 active(activePrep),
 tuner(active->getTuning()->processor)
 {

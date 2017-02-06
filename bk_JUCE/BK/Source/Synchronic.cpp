@@ -11,12 +11,10 @@
 #include "Synchronic.h"
 
 SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s,
-                                         SynchronicPreparation::Ptr p,
                                          SynchronicPreparation::Ptr ap,
                                          int Id):
 Id(Id),
 synth(s),
-preparation(p),
 active(ap),
 tuner(active->getTuning()->processor)
 {

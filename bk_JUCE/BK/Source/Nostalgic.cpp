@@ -11,12 +11,10 @@
 #include "Nostalgic.h"
 
 NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s,
-                                       NostalgicPreparation::Ptr prep,
                                        NostalgicPreparation::Ptr activePrep,
                                        int Id):
 Id(Id),
 synth(s),
-preparation(prep),
 active(activePrep),
 tuner(active->getTuning()->processor),
 syncProcessor(SynchronicProcessor::Ptr())
@@ -84,7 +82,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
         {
             //get time in ms to target beat, summing over skipped beat lengths
             //duration = syncProcessor->getTimeToBeatMS(active->getBeatsToSkip()); // sum
-            SynchronicProcessor::Ptr syncTarget = preparation->getSyncTargetProcessor();
+            SynchronicProcessor::Ptr syncTarget = active->getSyncTargetProcessor();
             duration = syncTarget->getTimeToBeatMS(active->getBeatsToSkip()); // sum
         }
         

@@ -11,9 +11,7 @@
 #include "Tuning.h"
 
 
-TuningProcessor::TuningProcessor(TuningPreparation::Ptr prep,
-                                 TuningPreparation::Ptr active):
-preparation(prep),
+TuningProcessor::TuningProcessor(TuningPreparation::Ptr active):
 active(active)
 {
     

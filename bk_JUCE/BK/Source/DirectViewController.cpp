@@ -227,7 +227,6 @@ void DirectViewController::bkMessageReceived (const String& message)
 {
     if (message == "direct/update")
     {
-        //currentDirectId = processor.currentPiano->getPreparation();
         
         updateFields();
     }
