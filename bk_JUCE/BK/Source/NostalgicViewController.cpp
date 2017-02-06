@@ -237,8 +237,8 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         if (type == BKParameter)
         {
-            prep    ->setTuning(processor.tPreparation[i]);
-            active  ->setTuning(processor.tPreparation[i]);
+            prep    ->setTuning(processor.tuning[i]);
+            active  ->setTuning(processor.tuning[i]);
         }
         else    //BKModification
         {

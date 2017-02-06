@@ -33,11 +33,15 @@ public:
 
     void addDirectModification(DirectModification::Ptr m);
     
+    void addTuningModification(TuningModification::Ptr m);
+    
     SynchronicModification::PtrArr getSynchronicModifications(void);
     
     NostalgicModification::PtrArr getNostalgicModifications(void);
     
     DirectModification::PtrArr getDirectModifications(void);
+    
+    TuningModification::PtrArr getTuningModifications(void);
     
     void clearModifications(void);
     
@@ -46,6 +50,7 @@ private:
     DirectModification::PtrArr      directMods;
     SynchronicModification::PtrArr  synchronicMods;
     NostalgicModification::PtrArr   nostalgicMods;
+    TuningModification::PtrArr      tuningMods;
     
     JUCE_LEAK_DETECTOR(ModificationMap)
 };

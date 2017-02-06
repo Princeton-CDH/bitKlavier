@@ -25,7 +25,6 @@ public:
     typedef OwnedArray<TuningPreparation, CriticalSection>       CSArr;
     
     TuningPreparation(TuningPreparation::Ptr p):
-    Id(p->getId()),
     tWhichTuning(p->getTuning()),
     tFundamental(p->getFundamental()),
     tFundamentalOffset(p->getFundamentalOffset()),
@@ -40,8 +39,21 @@ public:
         
     }
     
-    TuningPreparation(int Id,
-                      TuningSystem whichTuning,
+    inline void copy(TuningPreparation::Ptr p)
+    {
+        tWhichTuning = p->getTuning();
+        tFundamental = p->getFundamental();
+        tFundamentalOffset = p->getFundamentalOffset();
+        tAdaptiveIntervalScale = p->getAdaptiveIntervalScale();
+        tAdaptiveInversional = p->getAdaptiveInversional();
+        tAdaptiveAnchorScale = p->getAdaptiveAnchorScale();
+        tAdaptiveAnchorFundamental = p->getAdaptiveAnchorFundamental();
+        tAdaptiveClusterThresh = p->getAdaptiveClusterThresh();
+        tAdaptiveHistory = p->getAdaptiveHistory();
+        tCustom = p->getCustomScale();
+    }
+    
+    TuningPreparation(TuningSystem whichTuning,
                       PitchClass fundamental,
                       float fundamentalOffset,
                       TuningSystem adaptiveIntervalScale,
@@ -51,7 +63,6 @@ public:
                       uint64 adaptiveClusterThresh,
                       int adaptiveHistory,
                       Array<float> customScale):
-    Id(Id),
     tWhichTuning(whichTuning),
     tFundamental(fundamental),
     tFundamentalOffset(fundamentalOffset),
@@ -66,8 +77,7 @@ public:
         
     }
     
-    TuningPreparation(int Id):
-    Id(Id),
+    TuningPreparation(void):
     tWhichTuning(EqualTemperament),
     tFundamental(C),
     tFundamentalOffset(0.),
@@ -87,7 +97,6 @@ public:
         
     }
     
-    inline const int getId() const noexcept                                 {return Id;                         }
     inline const TuningSystem getTuning() const noexcept                    {return tWhichTuning;               }
     inline const PitchClass getFundamental() const noexcept                 {return tFundamental;               }
     inline const float getFundamentalOffset() const noexcept                {return tFundamentalOffset;         }
@@ -125,9 +134,6 @@ public:
         DBG("tCustom: " +                       floatArrayToString(tCustom));
     }
 private:
-    
-    int Id;
-    
     // basic tuning settings, for static tuning
     TuningSystem    tWhichTuning;               //which tuning system to use
     PitchClass      tFundamental;               //fundamental for tuning system
@@ -173,12 +179,10 @@ public:
      TuningCustomScale,
      */
     
-    TuningModPreparation(TuningPreparation::Ptr p):
-    Id(p->getId())
+    TuningModPreparation(TuningPreparation::Ptr p)
     {
         param.ensureStorageAllocated(cTuningParameterTypes.size());
         
-        param.set(TuningId, String(Id));
         param.set(TuningScale, String(p->getTuning()));
         param.set(TuningFundamental, String(p->getFundamental()));
         param.set(TuningOffset, String(p->getFundamentalOffset()));
@@ -193,10 +197,8 @@ public:
     }
     
     
-    TuningModPreparation(int Id):
-    Id(Id)
+    TuningModPreparation(void)
     {
-        param.set(TuningId, String(Id));
         param.set(TuningScale, "");
         param.set(TuningFundamental, "");
         param.set(TuningOffset, "");
@@ -217,8 +219,6 @@ public:
     
     inline void copy(TuningPreparation::Ptr p)
     {
-        Id = p->getId();
-        param.set(TuningId, String(Id));
         param.set(TuningScale, String(p->getTuning()));
         param.set(TuningFundamental, String(p->getFundamental()));
         param.set(TuningOffset, String(p->getFundamentalOffset()));
@@ -240,16 +240,12 @@ public:
     
     inline void setParam(TuningParameterType type, String val) { param.set(type, val);}
     
-    inline const int getId(void) {   return Id; }
-    
     void print(void)
     {
         
     }
     
 private:
-    int Id;
-    
     StringArray          param;
     
     JUCE_LEAK_DETECTOR(TuningModPreparation);
@@ -264,7 +260,7 @@ public:
     typedef OwnedArray<TuningProcessor>                          PtrArr;
     typedef OwnedArray<TuningProcessor, CriticalSection>         CSPtrArr;
     
-    TuningProcessor(TuningPreparation::Ptr prep);
+    TuningProcessor(TuningPreparation::Ptr prep, TuningPreparation::Ptr active);
     ~TuningProcessor();
     
     void setPreparation(TuningPreparation::Ptr prep) {preparation = prep;}
@@ -322,6 +318,39 @@ private:
     const Array<float> tUtonalTuning      = {0., .117313, .311745, .156414, -.405273, -.019547, .486824, .292191, .136864, .024847, -.039101,  -.049553};
     
     JUCE_LEAK_DETECTOR(TuningProcessor);
+};
+
+class Tuning : public ReferenceCountedObject
+{
+    
+public:
+    typedef ReferenceCountedObjectPtr<Tuning>   Ptr;
+    typedef Array<Tuning::Ptr>                  PtrArr;
+    typedef Array<Tuning::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<Tuning>                  Arr;
+    typedef OwnedArray<Tuning, CriticalSection> CSArr;
+    
+    Tuning(int Id):
+    Id(Id)
+    {
+        sPrep = new TuningPreparation();
+        aPrep = new TuningPreparation(sPrep);
+        processor = new TuningProcessor(sPrep, aPrep);
+    };
+    
+    ~Tuning() {};
+    
+    inline int getId() {return Id;};
+    
+    TuningProcessor::Ptr        processor;
+    TuningPreparation::Ptr      sPrep;
+    TuningPreparation::Ptr      aPrep;
+    
+    
+private:
+    int Id;
+    
+    JUCE_LEAK_DETECTOR(Tuning)
 };
 
 #endif  // TUNING_H_INCLUDED

@@ -22,7 +22,7 @@ resonanceSynth(res),
 hammerSynth(ham),
 preparation(prep),
 active(activePrep),
-tuner(active->getTuning())
+tuner(active->getTuning()->processor)
 {
     
 }
@@ -35,16 +35,15 @@ DirectProcessor::~DirectProcessor(void)
 void DirectProcessor::setCurrentPlaybackSampleRate(double sr)
 {
     sampleRate = sr;
-    tuner.setCurrentPlaybackSampleRate(sr);
+    tuner->setCurrentPlaybackSampleRate(sr);
 }
 
 void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 {
-    tuner.setPreparation(active->getTuning());
+    tuner = active->getTuning()->processor;
+    tuner->keyOn(noteNumber);
     
-    tuner.keyOn(noteNumber);
-    
-    float offset = (active->getTransposition() + tuner.getOffset(noteNumber));
+    float offset = (active->getTransposition() + tuner->getOffset(noteNumber));
     int synthNoteNumber = noteNumber + (int)offset;
     offset -= (int)offset;
     
@@ -66,7 +65,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 
 void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
 {
-    float offset = (active->getTransposition() + tuner.getOffset(noteNumber));
+    float offset = (active->getTransposition() + tuner->getOffset(noteNumber));
     noteNumber += (int)offset;
     
     synth->keyOff(channel,
@@ -119,6 +118,6 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
 
 void DirectProcessor::processBlock(int numSamples, int midiChannel)
 {
-    tuner.incrementAdaptiveClusterTime(numSamples);
+    tuner->incrementAdaptiveClusterTime(numSamples);
 }
 

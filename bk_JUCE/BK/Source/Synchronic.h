@@ -28,7 +28,6 @@ public:
     
     // Copy Constructor
     SynchronicPreparation(SynchronicPreparation::Ptr p):
-    Id(p->getId()),
     sTempo(p->getTempo()),
     sNumBeats(p->getNumBeats()),
     sClusterMin(p->getClusterMin()),
@@ -52,8 +51,7 @@ public:
     {
     }
     
-    SynchronicPreparation(int Id,
-                          float tempo,
+    SynchronicPreparation(float tempo,
                           int numBeats,
                           int clusterMin,
                           int clusterMax,
@@ -64,8 +62,7 @@ public:
                           Array<float> accentMultipliers,
                           Array<float> lengthMultipliers,
                           Array<float> transpOffsets,
-                          TuningPreparation::Ptr t):
-    Id(Id),
+                          Tuning::Ptr t):
     sTempo(tempo),
     sNumBeats(numBeats),
     sClusterMin(clusterMin),
@@ -84,8 +81,7 @@ public:
     }
 
     
-    SynchronicPreparation(int Id, TuningPreparation::Ptr t):
-    Id(Id),
+    SynchronicPreparation(Tuning::Ptr t):
     sTempo(120),
     sNumBeats(0),
     sClusterMin(1),
@@ -155,7 +151,6 @@ public:
     inline float getAdaptiveTempo1Min(void)                 {return at1Min;}
     inline float getAdaptiveTempo1Max(void)                 {return at1Max;}
     
-    inline int getId(void) {   return Id; }
     
     inline void setTempo(float tempo)
     {
@@ -188,8 +183,8 @@ public:
     inline void setAdaptiveTempo1Min(float min)      {at1Min = min;}
     inline void setAdaptiveTempo1Max(float max)      {at1Max = max;}
     
-    inline const TuningPreparation::Ptr getTuning() const noexcept      {return tuning; }
-    inline void setTuning(TuningPreparation::Ptr t)                       {tuning = t;  }
+    inline const Tuning::Ptr getTuning() const noexcept      {return tuning; }
+    inline void setTuning(Tuning::Ptr t)                       {tuning = t;  }
     
     void print(void)
     {
@@ -212,7 +207,6 @@ public:
     }
     
 private:
-    int Id;
     float sTempo;
     int sNumBeats,sClusterMin,sClusterMax;
     int sClusterCap = 8; //max in cluster; 8 in original bK. pulseDepth?
@@ -235,7 +229,7 @@ private:
     float at1Subdivisions;
     AdaptiveTempo1Mode at1Mode;
     
-    TuningPreparation::Ptr tuning;
+    Tuning::Ptr tuning;
     
     JUCE_LEAK_DETECTOR(SynchronicPreparation);
 };
@@ -271,12 +265,10 @@ public:
      AT1Max,
      */
     
-    SynchronicModPreparation(SynchronicPreparation::Ptr p):
-    Id(p->getId())
+    SynchronicModPreparation(SynchronicPreparation::Ptr p)
     {
         param.ensureStorageAllocated(cSynchronicParameterTypes.size());
         
-        param.set(SynchronicId, String(Id));
         param.set(SynchronicTuning, String(p->getTuning()->getId()));
         param.set(SynchronicTempo, String(p->getTempo()));
         param.set(SynchronicNumPulses, String(p->getNumBeats()));
@@ -298,10 +290,8 @@ public:
     }
     
     
-    SynchronicModPreparation(int Id):
-    Id(Id)
+    SynchronicModPreparation(void)
     {
-        param.set(SynchronicId, String(Id));
         param.set(SynchronicTuning, "");
         param.set(SynchronicTempo, "");
         param.set(SynchronicNumPulses, "");
@@ -329,9 +319,6 @@ public:
     
     inline void copy(SynchronicPreparation::Ptr p)
     {
-        Id = p->getId();
-        
-        param.set(SynchronicId, String(Id));
         param.set(SynchronicTuning, String(p->getTuning()->getId()));
         param.set(SynchronicTempo, String(p->getTempo()));
         param.set(SynchronicNumPulses, String(p->getNumBeats()));
@@ -362,16 +349,12 @@ public:
     
     inline void setParam(SynchronicParameterType type, String val) { param.set(type, val);}
     
-    inline const int getId(void) {   return Id; }
-    
     void print(void)
     {
         
     }
     
 private:
-    int Id;
-    
     StringArray          param;
     
     JUCE_LEAK_DETECTOR(SynchronicModPreparation);
@@ -406,9 +389,6 @@ public:
     
     inline void                             setPreparation(SynchronicPreparation::Ptr prep) { preparation = prep;           }
     inline SynchronicPreparation::Ptr       getPreparation(void)                            { return preparation;           }
-    inline int                              getPreparationId(void)                          { return preparation->getId();  }
-    
-    inline int getId(void){return Id;}
     
 private:
     int Id;
@@ -417,7 +397,7 @@ private:
     
     double sampleRate;
     
-    TuningProcessor tuner;
+    TuningProcessor::Ptr tuner;
     Array<float> tuningOffsets;
     PitchClass tuningBasePitch;
 

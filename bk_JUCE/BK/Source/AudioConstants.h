@@ -481,6 +481,6 @@ typedef enum TuningSystem {
     AdaptiveTuning,
     AdaptiveAnchoredTuning,
     CustomTuning
-} Tuning;
+} TuningSystem;
 
 #endif  // AUDIOCONSTANTS_H_INCLUDED

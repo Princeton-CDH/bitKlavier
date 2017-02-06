@@ -44,7 +44,7 @@ public:
     BKSynthesiser                       resonanceReleaseSynth;
     
     // Preparations.
-    TuningPreparation::CSPtrArr         tPreparation;
+    Tuning::PtrArr                      tuning;
     
     // Keymaps.
     Keymap::PtrArr                      bkKeymaps;

@@ -355,6 +355,7 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
     
     bool isSynchronic = false;
     bool isNostalgic = false;
+    bool isTuning = false;
     bool isDirect= false;
     
     bool isBracket;
@@ -366,6 +367,7 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
     bool itsASpace = false;
     bool itsADirect = false;
     bool itsASynchronic = false;
+    bool itsATuning = false;
     bool itsANostalgic = false;
     
     String::CharPointerType c = s.getCharPointer();
@@ -380,6 +382,8 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
     juce_wchar synchronicUC = 'S';
     juce_wchar nostalgicLC = 'n';
     juce_wchar nostalgicUC = 'N';
+    juce_wchar tuningLC = 't';
+    juce_wchar tuningUC = 'T';
     juce_wchar directLC = 'd';
     juce_wchar directUC = 'D';
     juce_wchar lBracket = '{';
@@ -409,6 +413,7 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
         isSynchronic   = !CharacterFunctions::compare(c1, synchronicLC) || !CharacterFunctions::compare(c1, synchronicUC);
         isNostalgic    = !CharacterFunctions::compare(c1, nostalgicLC) || !CharacterFunctions::compare(c1, nostalgicUC);
         isDirect       = !CharacterFunctions::compare(c1, directLC) || !CharacterFunctions::compare(c1, directUC);
+        isTuning       = !CharacterFunctions::compare(c1, tuningLC) || !CharacterFunctions::compare(c1, tuningUC);
  
         isBracket   = !CharacterFunctions::compare(c1, lBracket) || !CharacterFunctions::compare(c1, rBracket) ||
                 !CharacterFunctions::compare(c1, lBracket2) || !CharacterFunctions::compare(c1, rBracket2) ||
@@ -420,8 +425,6 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
         isSpace     = CharacterFunctions::isWhitespace(c1);
         
         if (i==s.length()) isEndOfString = true;
-        
-        DBG("char: " + s.charToString(c1));
         
         if (!isNumber)
         {
@@ -506,7 +509,7 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                     }
                     else if (itsASynchronic)
                     {
-                        out += (String(key) + ":nm" +String(whichMod) + ":" + "{" + intArrayToString(whichPreps) + "} ");
+                        out += (String(key) + ":sm" +String(whichMod) + ":" + "{" + intArrayToString(whichPreps) + "} ");
                         
                         SynchronicModPreparation::Ptr smod = processor.modSynchronic[whichMod];
                         
@@ -525,6 +528,26 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                             }
                         }
                     }
+                    else if (itsATuning)
+                    {
+                        out += (String(key) + ":tm" +String(whichMod) + ":" + "{" + intArrayToString(whichPreps) + "} ");
+                        
+                        TuningModPreparation::Ptr tmod = processor.modTuning[whichMod];
+                        
+                        for (int n = cTuningParameterTypes.size(); --n >= 0; )
+                        {
+                            String param = tmod->getParam((TuningParameterType)n);
+                            
+                            if (param != "")
+                            {
+                                for (auto prep : whichPreps)
+                                {
+                                    processor.currentPiano->modMap[key]->addTuningModification(new TuningModification(prep, (TuningParameterType)n, param));
+                                    DBG("tuneprep: " + String(prep) + " whichtype: " + cTuningParameterTypes[n] + " val: " +param);
+                                }
+                            }
+                        }
+                    }
                     
                     
                     
@@ -533,6 +556,7 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                 itsAKeymap = false;
                 itsADirect = false;
                 itsASynchronic = false;
+                itsATuning = false;
                 itsANostalgic = false;
                 
                 numColons = 0;
@@ -555,6 +579,10 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
             else if (isSynchronic)
             {
                 itsASynchronic = true;
+            }
+            else if (isTuning)
+            {
+                itsATuning = true;
             }
             else if (isNostalgic)
             {

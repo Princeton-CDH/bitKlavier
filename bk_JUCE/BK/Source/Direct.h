@@ -30,7 +30,6 @@ public:
     typedef OwnedArray<DirectPreparation, CriticalSection> CSArr;
     
     DirectPreparation(DirectPreparation::Ptr p):
-    Id(p->getId()),
     dTransposition(p->getTransposition()),
     dGain(p->getGain()),
     dResonanceGain(p->getResonanceGain()),
@@ -40,14 +39,12 @@ public:
         
     }
     
-    DirectPreparation(int Id,
-                      float transp,
+    DirectPreparation(float transp,
                       float gain,
                       bool resAndHammer,
                       float resGain,
                       float hamGain,
-                      TuningPreparation::Ptr t):
-    Id(Id),
+                      Tuning::Ptr t):
     dTransposition(transp),
     dGain(gain),
     dResonanceGain(resGain),
@@ -57,8 +54,7 @@ public:
         
     }
     
-    DirectPreparation(int Id, TuningPreparation::Ptr t):
-    Id(Id),
+    DirectPreparation(Tuning::Ptr t):
     dTransposition(0.0),
     dGain(1.0),
     dResonanceGain(1.0),
@@ -87,16 +83,14 @@ public:
     inline const float getGain() const noexcept                         {return dGain;          }
     inline const float getResonanceGain() const noexcept                {return dResonanceGain; }
     inline const float getHammerGain() const noexcept                   {return dHammerGain;    }
-    inline const TuningPreparation::Ptr getTuning() const noexcept      {return tuning;         }
+    inline const Tuning::Ptr getTuning() const noexcept      {return tuning;         }
     
     inline void setTransposition(float val)                             {dTransposition = val;  }
     inline void setGain(float val)                                      {dGain = val;           }
     inline void setResonanceGain(float val)                             {dResonanceGain = val;  }
     inline void setHammerGain(float val)                                {dHammerGain = val;     }
-    inline void setTuning(TuningPreparation::Ptr t)                     {tuning = t;            }
+    inline void setTuning(Tuning::Ptr t)                                {tuning = t;            }
     
-
-    inline int getId(void) {   return Id; }
     
     void print(void)
     {
@@ -108,13 +102,11 @@ public:
 
 private:
     
-    int Id;
-    
     float   dTransposition;       //transposition, in half steps
     float   dGain;                //gain multiplier
     float   dResonanceGain, dHammerGain;
     
-    TuningPreparation::Ptr tuning;
+    Tuning::Ptr tuning;
     
     JUCE_LEAK_DETECTOR(DirectPreparation);
 };
@@ -139,12 +131,10 @@ public:
     DirectParameterTypeNil,
      */
     
-    DirectModPreparation(DirectPreparation::Ptr p):
-    Id(p->getId())
+    DirectModPreparation(DirectPreparation::Ptr p)
     {
         param.ensureStorageAllocated(cDirectParameterTypes.size());
         
-        param.set(DirectId, String(Id));
         param.set(DirectTuning, String(p->getTuning()->getId()));
         param.set(DirectTransposition, String(p->getTransposition()));
         param.set(DirectGain, String(p->getGain()));
@@ -154,10 +144,8 @@ public:
     }
     
     
-    DirectModPreparation(int Id):
-    Id(Id)
+    DirectModPreparation(void)
     {
-        param.set(DirectId, String(Id));
         param.set(DirectTuning, "");
         param.set(DirectTransposition, "");
         param.set(DirectGain, "");
@@ -173,8 +161,6 @@ public:
     
     inline void copy(DirectPreparation::Ptr d)
     {
-        Id = d->getId();
-        param.set(DirectId, String(Id));
         param.set(DirectTuning, String(d->getTuning()->getId()));
         param.set(DirectTransposition, String(d->getTransposition()));
         param.set(DirectGain, String(d->getGain()));
@@ -191,16 +177,12 @@ public:
     
     inline void setParam(DirectParameterType type, String val) { param.set(type, val);}
     
-    inline const int getId(void) {   return Id; }
-    
     void print(void)
     {
 
     }
     
 private:
-    int Id;
-    
     StringArray          param;
     
     JUCE_LEAK_DETECTOR(DirectModPreparation);
@@ -232,13 +214,10 @@ public:
     
     inline void             setPreparation(DirectPreparation::Ptr prep) { preparation = prep;               }
     
-    int                     getPreparationId(void) const                { return preparation->getId();      }
     DirectPreparation::Ptr  getPreparation(void) const                  { return preparation;      }
     
     void    keyPressed(int noteNumber, float velocity, int channel);
     void    keyReleased(int noteNumber, float velocity, int channel);
-    
-    inline int getId(void){return Id;}
     
 private:
     int Id;
@@ -246,7 +225,7 @@ private:
     BKSynthesiser*              resonanceSynth;
     BKSynthesiser*              hammerSynth;
     DirectPreparation::Ptr      preparation, active;
-    TuningProcessor             tuner;
+    TuningProcessor::Ptr        tuner;
     
     double sampleRate;
     

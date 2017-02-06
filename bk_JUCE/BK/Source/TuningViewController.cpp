@@ -17,8 +17,6 @@ processor(p),
 currentTuningId(0),
 currentModTuningId(0)
 {
-    TuningPreparation::Ptr layer = processor.tPreparation[currentTuningId];
-    
     // Labels
     tuningL = OwnedArray<BKLabel>();
     tuningL.ensureStorageAllocated(cTuningParameterTypes.size());
@@ -113,7 +111,9 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
     
-    TuningPreparation::Ptr prep = processor.tPreparation[currentTuningId];
+    TuningPreparation::Ptr prep = processor.tuning[currentTuningId]->sPrep;
+    
+    TuningPreparation::Ptr active = processor.tuning[currentTuningId]->aPrep;
     
     TuningModPreparation::Ptr mod = processor.modTuning[currentModTuningId];
     
@@ -135,6 +135,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         if (type == BKParameter)
         {
             prep->setTuning((TuningSystem)i);
+            active->setTuning((TuningSystem)i);
         }
         else    //BKModification
         {
@@ -146,6 +147,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         if (type == BKParameter)
         {
             prep->setFundamental((PitchClass)i);
+            active->setFundamental((PitchClass)i);
         }
         else    //BKModification
         {
@@ -157,6 +159,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         if (type == BKParameter)
         {
             prep->setFundamentalOffset(f);
+            active->setFundamentalOffset(f);
         }
         else    //BKModification
         {
@@ -168,6 +171,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         if (type == BKParameter)
         {
             prep->setAdaptiveIntervalScale((TuningSystem)i);
+            active->setAdaptiveIntervalScale((TuningSystem)i);
         }
         else    //BKModification
         {
@@ -179,6 +183,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         if (type == BKParameter)
         {
             prep->setAdaptiveInversional((bool) i);
+            active->setAdaptiveInversional((bool) i);
         }
         else    //BKModification
         {
@@ -190,6 +195,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         if (type == BKParameter)
         {
             prep->setAdaptiveAnchorScale((TuningSystem) i);
+            active->setAdaptiveAnchorScale((TuningSystem) i);
         }
         else    //BKModification
         {
@@ -201,6 +207,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         if (type == BKParameter)
         {
             prep->setAdaptiveAnchorFundamental((PitchClass) i);
+            active->setAdaptiveAnchorFundamental((PitchClass) i);
         }
         else    //BKModification
         {
@@ -212,6 +219,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         if (type == BKParameter)
         {
             prep->setAdaptiveClusterThresh(i);
+            active->setAdaptiveClusterThresh(i);
         }
         else    //BKModification
         {
@@ -223,6 +231,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         if (type == BKParameter)
         {
             prep->setAdaptiveHistory(i);
+            active->setAdaptiveHistory(i);
         }
         else    //BKModification
         {
@@ -234,6 +243,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         if (type == BKParameter)
         {
             prep->setCustomScale( stringToFloatArray(text));
+            active->setCustomScale( stringToFloatArray(text));
         }
         else    //BKModification
         {
@@ -250,7 +260,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
 void TuningViewController::updateFields()
 {
     
-    TuningPreparation::Ptr prep = processor.tPreparation[currentTuningId];
+    TuningPreparation::Ptr prep = processor.tuning[currentTuningId]->aPrep;
 
     tuningTF[TuningScale]               ->setText( String( prep->getTuning()), false);
     tuningTF[TuningFundamental]         ->setText( String( prep->getFundamental()), false);

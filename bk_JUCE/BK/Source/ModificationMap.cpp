@@ -13,11 +13,13 @@
 ModificationMap::ModificationMap():
 directMods(DirectModification::PtrArr()),
 synchronicMods(SynchronicModification::PtrArr()),
-nostalgicMods(NostalgicModification::PtrArr())
+nostalgicMods(NostalgicModification::PtrArr()),
+tuningMods(TuningModification::PtrArr())
 {
     directMods.ensureStorageAllocated(1);
     synchronicMods.ensureStorageAllocated(1);
     nostalgicMods.ensureStorageAllocated(1);
+    tuningMods.ensureStorageAllocated((1));
 }
 
 ModificationMap::~ModificationMap()
@@ -40,6 +42,11 @@ void ModificationMap::addDirectModification(DirectModification::Ptr m)
     directMods.add(m);
 }
 
+void ModificationMap::addTuningModification(TuningModification::Ptr m)
+{
+    tuningMods.add(m);
+}
+
 SynchronicModification::PtrArr ModificationMap::getSynchronicModifications(void)
 {
     return synchronicMods;
@@ -55,10 +62,16 @@ DirectModification::PtrArr ModificationMap::getDirectModifications(void)
     return directMods;
 }
 
+TuningModification::PtrArr ModificationMap::getTuningModifications(void)
+{
+    return tuningMods;
+}
+
 void ModificationMap::clearModifications(void)
 {
     synchronicMods.clear();
     nostalgicMods.clear();
     directMods.clear();
+    tuningMods.clear();
     
 }

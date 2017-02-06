@@ -21,7 +21,7 @@ resonanceReleaseSynth   (general)
     bkPianos.ensureStorageAllocated(aMaxNumPianos);
     prevPianos.ensureStorageAllocated(aMaxNumPianos);
     
-    tPreparation.ensureStorageAllocated(aMaxTuningPreparations);
+    tuning.ensureStorageAllocated(aMaxTuningPreparations);
     modTuning.ensureStorageAllocated(aMaxTuningPreparations);
     
     synchronic.ensureStorageAllocated(aMaxTotalPreparations);
@@ -39,20 +39,20 @@ resonanceReleaseSynth   (general)
     
     // Make a bunch of tunings.
     for (int i = 0; i < (aMaxTuningPreparations); i++) {
-        tPreparation.add(new TuningPreparation(i));
-        modTuning.add(new TuningModPreparation(i));
+        tuning.add(new Tuning(i));
+        modTuning.add(new TuningModPreparation());
     }
     
     
     for (int i = 0; i < aMaxTotalPreparations; i++)
     {
-        synchronic.add  (new Synchronic(&mainPianoSynth, tPreparation[0], i));
-        nostalgic.add   (new Nostalgic(&mainPianoSynth, tPreparation[0], i));
-        direct.add      (new Direct(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, tPreparation[0], i));
+        synchronic.add  (new Synchronic(&mainPianoSynth, tuning[0], i));
+        nostalgic.add   (new Nostalgic(&mainPianoSynth, tuning[0], i));
+        direct.add      (new Direct(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, tuning[0], i));
         
-        modSynchronic.add   (new SynchronicModPreparation(i));
-        modNostalgic.add    (new NostalgicModPreparation(i));
-        modDirect.add       (new DirectModPreparation(i));
+        modSynchronic.add   (new SynchronicModPreparation());
+        modNostalgic.add    (new NostalgicModPreparation());
+        modDirect.add       (new DirectModPreparation());
     }
 
     // Make a bunch of pianos. Default to zeroth keymap.
@@ -123,6 +123,45 @@ void BKAudioProcessor::performModifications(int noteNumber)
     int   modi;
     bool  modb;
     
+    /*
+     TuningId = 0,
+     TuningScale,
+     TuningFundamental,
+     TuningOffset,
+     TuningA1IntervalScale,
+     TuningA1Inversional,
+     TuningA1AnchorScale,
+     TuningA1AnchorFundamental,
+     TuningA1ClusterThresh,
+     TuningA1History,
+     TuningCustomScale,
+     TuningParameterTypeNil
+     */
+    
+    TuningModification::PtrArr tMod = currentPiano->modMap[noteNumber]->getTuningModifications();
+    for (int i = tMod.size(); --i >= 0;)
+    {
+        TuningPreparation::Ptr active = tuning[tMod[i]->getPrepId()]->aPrep;
+        TuningParameterType type = tMod[i]->getParameterType();
+        modf = tMod[i]->getModFloat();
+        modi = tMod[i]->getModInt();
+        modb = tMod[i]->getModBool();
+        modfa = tMod[i]->getModFloatArr();
+        
+        if (type == TuningScale)                    active->setTuning((TuningSystem)modi);
+        else if (type == TuningFundamental)         active->setFundamental((PitchClass)modi);
+        else if (type == TuningOffset)              active->setFundamentalOffset(modf);
+        else if (type == TuningA1IntervalScale)     active->setAdaptiveIntervalScale((TuningSystem)modi);
+        else if (type == TuningA1Inversional)       active->setAdaptiveInversional(modb);
+        else if (type == TuningA1AnchorScale)       active->setAdaptiveAnchorScale((TuningSystem)modi);
+        else if (type == TuningA1ClusterThresh)     active->setAdaptiveClusterThresh(modi);
+        else if (type == TuningA1AnchorFundamental) active->setAdaptiveAnchorFundamental((PitchClass) modi);
+        else if (type == TuningA1History)           active->setAdaptiveHistory(modi);
+        else if (type == TuningCustomScale)         active->setCustomScale(modfa);
+        
+        tuningPreparationDidChange = true;
+    }
+    
     DirectModification::PtrArr dMod = currentPiano->modMap[noteNumber]->getDirectModifications();
     for (int i = dMod.size(); --i >= 0;)
     {
@@ -135,7 +174,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == DirectGain)        active->setGain(modf);
         else if (type == DirectHammerGain)  active->setHammerGain(modf);
         else if (type == DirectResGain)     active->setResonanceGain(modf);
-        else if (type == DirectTuning)      active->setTuning(tPreparation[modi]);
+        else if (type == DirectTuning)      active->setTuning(tuning[modi]);
         
         directPreparationDidChange = true;
     }
@@ -156,7 +195,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == NostalgicBeatsToSkip)      active->setBeatsToSkip(modf);
         else if (type == NostalgicWaveDistance)     active->setWaveDistance(modi);
         else if (type == NostalgicLengthMultiplier) active->setLengthMultiplier(modf);
-        else if (type == NostalgicTuning)           active->setTuning(tPreparation[modi]);
+        else if (type == NostalgicTuning)           active->setTuning(tuning[modi]);
         
         nostalgicPreparationDidChange = true;
     }
@@ -280,13 +319,16 @@ void  BKAudioProcessor::setCurrentPiano(int which)
         direct[i]->aPrep->copy(direct[i]->sPrep);
     }
     
-    for (int i = nostalgic.size(); --i >= 0; ) {
+    for (int i = nostalgic.size(); --i >= 0; )
         nostalgic[i]->aPrep->copy(nostalgic[i]->sPrep);
-    }
+
     
-    for (int i = synchronic.size(); --i >= 0; ) {
+    for (int i = synchronic.size(); --i >= 0; )
         synchronic[i]->aPrep->copy(synchronic[i]->sPrep);
-    }
+    
+    for (int i = tuning.size(); --i >= 0; )
+        tuning[i]->aPrep->copy(tuning[i]->sPrep);
+    
     
     if (noteOnCount)  prevPianos.addIfNotAlreadyThere(currentPiano);
     

@@ -13,13 +13,12 @@
 SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s,
                                          SynchronicPreparation::Ptr p,
                                          SynchronicPreparation::Ptr ap,
-                                         int Id)
-:
+                                         int Id):
 Id(Id),
 synth(s),
 preparation(p),
 active(ap),
-tuner(active->getTuning())
+tuner(active->getTuning()->processor)
 {
     velocities.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -47,7 +46,7 @@ SynchronicProcessor::~SynchronicProcessor()
 void SynchronicProcessor::setCurrentPlaybackSampleRate(double sr)
 {
     sampleRate = sr;
-    tuner.setCurrentPlaybackSampleRate(sr);
+    tuner->setCurrentPlaybackSampleRate(sr);
 }
 
 
@@ -66,7 +65,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
         noteStartPos = noteLength;
     }
     
-    float offset = tuner.getOffset(note) + active->getTranspOffsets()[transpOffsetCounter];
+    float offset = tuner->getOffset(note) + active->getTranspOffsets()[transpOffsetCounter];
     int synthNoteNumber = ((float)note + (int)offset);
     offset -= (int)offset;
     
@@ -99,9 +98,9 @@ void SynchronicProcessor::resetPhase(int skipBeats)
 
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
-
+    
     //set tuning
-    tuner.setPreparation(active->getTuning());
+    tuner = active->getTuning()->processor;
     
     //store velocity
     velocities.set(noteNumber, velocity);
@@ -194,7 +193,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
 {
     
     //adaptive tuning timer update
-    tuner.incrementAdaptiveClusterTime(numSamples);
+    tuner->incrementAdaptiveClusterTime(numSamples);
     
     //need to do this every block?
     clusterThresholdSamples = (active->getClusterThreshSEC() * sampleRate);

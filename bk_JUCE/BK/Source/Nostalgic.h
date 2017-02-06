@@ -31,7 +31,6 @@ public:
     
     
     NostalgicPreparation(NostalgicPreparation::Ptr p):
-    Id(p->getId()),
     nWaveDistance(p->getWavedistance()),
     nUndertow(p->getUndertow()),
     nTransposition(p->getTransposition()),
@@ -45,8 +44,7 @@ public:
         
     }
     
-    NostalgicPreparation(int Id,
-                         int waveDistance,
+    NostalgicPreparation(int waveDistance,
                          int undertow,
                          float transposition,
                          float gain,
@@ -56,8 +54,7 @@ public:
                          int syncTarget,
                          TuningSystem tuning,
                          PitchClass basePitch,
-                         TuningPreparation::Ptr t):
-    Id(Id),
+                         Tuning::Ptr t):
     nWaveDistance(waveDistance),
     nUndertow(undertow),
     nTransposition(transposition),
@@ -71,8 +68,7 @@ public:
         
     }
     
-    NostalgicPreparation(int Id, TuningPreparation::Ptr t):
-    Id(Id),
+    NostalgicPreparation(Tuning::Ptr t):
     nWaveDistance(0),
     nUndertow(0),
     nTransposition(0.0),
@@ -113,8 +109,6 @@ public:
     inline const NostalgicSyncMode getMode() const noexcept                {return nMode;              }
     inline const int getSyncTarget() const noexcept                        {return nSyncTarget;        }
     
-    inline int getId(void) {   return Id; }
-    
     inline void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
     inline void setUndertow(int undertow)                                  {nUndertow = undertow;                  }
     inline void setTransposition(float transposition)                      {nTransposition = transposition;        }
@@ -124,8 +118,8 @@ public:
     inline void setMode(NostalgicSyncMode mode)                            {nMode = mode;                          }
     inline void setSyncTarget(int syncTarget)                              {nSyncTarget = syncTarget;              }
     
-    inline const TuningPreparation::Ptr getTuning() const noexcept      {return tuning; }
-    inline void setTuning(TuningPreparation::Ptr t)                       {tuning = t;  }
+    inline const Tuning::Ptr getTuning() const noexcept      {return tuning; }
+    inline void setTuning(Tuning::Ptr t)                       {tuning = t;  }
     
     
 
@@ -142,7 +136,6 @@ public:
     }
     
 private:
-    int Id;
     int nWaveDistance;  //ms; distance from beginning of sample to stop reverse playback and begin undertow
     int nUndertow;      //ms; length of time to play forward after directional change
     /*
@@ -161,7 +154,7 @@ private:
     NostalgicSyncMode nMode;    //which sync mode to use
     int nSyncTarget;            //which synchronic layer to sync to, when nMode = NostalgicSyncSynchronic
     
-    TuningPreparation::Ptr tuning;
+    Tuning::Ptr tuning;
     
     JUCE_LEAK_DETECTOR(NostalgicPreparation);
 };
@@ -191,12 +184,10 @@ public:
      
      */
     
-    NostalgicModPreparation(NostalgicPreparation::Ptr p):
-    Id(p->getId())
+    NostalgicModPreparation(NostalgicPreparation::Ptr p)
     {
         param.ensureStorageAllocated(cNostalgicParameterTypes.size());
         
-        param.set(NostalgicId, String(Id));
         param.set(NostalgicTuning, String(p->getTuning()->getId()));
         param.set(NostalgicWaveDistance, String(p->getWavedistance()));
         param.set(NostalgicUndertow, String(p->getUndertow()));
@@ -210,10 +201,8 @@ public:
     }
     
     
-    NostalgicModPreparation(int Id):
-    Id(Id)
+    NostalgicModPreparation(void)
     {
-        param.set(NostalgicId, String(Id));
         param.set(NostalgicTuning, "");
         param.set(NostalgicWaveDistance, "");
         param.set(NostalgicUndertow, "");
@@ -233,9 +222,6 @@ public:
     
     inline void copy(NostalgicPreparation::Ptr p)
     {
-        Id = p->getId();
-        
-        param.set(NostalgicId, String(Id));
         param.set(NostalgicTuning, String(p->getTuning()->getId()));
         param.set(NostalgicWaveDistance, String(p->getWavedistance()));
         param.set(NostalgicUndertow, String(p->getUndertow()));
@@ -258,15 +244,12 @@ public:
     
     inline void setParam(NostalgicParameterType type, String val) { param.set(type, val);}
     
-    inline const int getId(void) {   return Id; }
-    
     void print(void)
     {
         
     }
     
 private:
-    int Id;
     
     StringArray          param;
     
@@ -307,16 +290,12 @@ public:
 
     NostalgicPreparation::Ptr   getPreparation(void)    { return preparation;   }
     
-    int getPreparationId(void)  { return preparation->getId();  }
-    
-    inline int getId(void){return Id;}
-    
 private:
     int Id;
     BKSynthesiser*              synth;
     NostalgicPreparation::Ptr   preparation, active;
 
-    TuningProcessor             tuner;
+    TuningProcessor::Ptr             tuner;
     
     //target Synchronic layer
     SynchronicProcessor::Ptr syncProcessor;

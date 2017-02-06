@@ -16,6 +16,7 @@
 #include "Synchronic.h"
 #include "Tuning.h"
 
+
 class Direct : public ReferenceCountedObject
 {
     
@@ -29,14 +30,14 @@ public:
     Direct(BKSynthesiser *s,
            BKSynthesiser *res,
            BKSynthesiser *ham,
-           TuningPreparation::Ptr tuning,
+           Tuning::Ptr tuning,
            int Id):
     Id(Id),
     synth(s),
     resonanceSynth(res),
     hammerSynth(ham)
     {
-        sPrep = new DirectPreparation(Id, tuning);
+        sPrep = new DirectPreparation(tuning);
         aPrep = new DirectPreparation(sPrep);
         processor = new DirectProcessor(s, res, ham, sPrep, aPrep, Id);
     };
@@ -71,11 +72,11 @@ public:
     typedef OwnedArray<Synchronic, CriticalSection> CSArr;
    
     Synchronic(BKSynthesiser *s,
-           TuningPreparation::Ptr tuning,
+               Tuning::Ptr tuning,
            int Id):
     Id(Id)
     {
-        sPrep = new SynchronicPreparation(Id, tuning);
+        sPrep = new SynchronicPreparation(tuning);
         aPrep = new SynchronicPreparation(sPrep);
         processor = new SynchronicProcessor(s, sPrep, aPrep, Id);
     };
@@ -108,11 +109,11 @@ public:
     typedef OwnedArray<Nostalgic, CriticalSection> CSArr;
    
     Nostalgic(BKSynthesiser *s,
-           TuningPreparation::Ptr tuning,
+              Tuning::Ptr tuning,
            int Id):
     Id(Id)
     {
-        sPrep = new NostalgicPreparation(Id, tuning);
+        sPrep = new NostalgicPreparation(tuning);
         aPrep = new NostalgicPreparation(sPrep);
         processor = new NostalgicProcessor(s, sPrep, aPrep, Id);
     };
@@ -133,7 +134,6 @@ private:
     
     JUCE_LEAK_DETECTOR(Nostalgic)
 };
-
 
 
 #endif  // PREPARATION_H_INCLUDED
