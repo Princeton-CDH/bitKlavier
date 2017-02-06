@@ -76,6 +76,7 @@ public:
     int                                 noteOnCount;
     bool                                allNotesOff;
 
+    SynchronicProcessor::Ptr getSynchronicProcessor(int id);
 
     int channel;
 

@@ -108,6 +108,8 @@ public:
     inline const float getBeatsToSkip() const noexcept                     {return nBeatsToSkip;       }
     inline const NostalgicSyncMode getMode() const noexcept                {return nMode;              }
     inline const int getSyncTarget() const noexcept                        {return nSyncTarget;        }
+    inline const SynchronicProcessor::Ptr getSyncTargetProcessor() const noexcept
+                                                                           {return nSyncProcessor;     }
     
     inline void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
     inline void setUndertow(int undertow)                                  {nUndertow = undertow;                  }
@@ -117,6 +119,8 @@ public:
     inline void setBeatsToSkip(float beatsToSkip)                          {nBeatsToSkip = beatsToSkip;            }
     inline void setMode(NostalgicSyncMode mode)                            {nMode = mode;                          }
     inline void setSyncTarget(int syncTarget)                              {nSyncTarget = syncTarget;              }
+    inline void setSyncTargetProcessor(SynchronicProcessor::Ptr syncTargetProcessor)
+                                                                           {nSyncProcessor = syncTargetProcessor; }
     
     inline const Tuning::Ptr getTuning() const noexcept      {return tuning; }
     inline void setTuning(Tuning::Ptr t)                       {tuning = t;  }
@@ -153,6 +157,7 @@ private:
     float nBeatsToSkip;         //synchronic mode: beats to skip before reverse peak
     NostalgicSyncMode nMode;    //which sync mode to use
     int nSyncTarget;            //which synchronic layer to sync to, when nMode = NostalgicSyncSynchronic
+    SynchronicProcessor::Ptr nSyncProcessor;
     
     Tuning::Ptr tuning;
     
