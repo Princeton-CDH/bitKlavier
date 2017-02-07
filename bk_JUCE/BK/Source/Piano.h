@@ -62,8 +62,7 @@ public:
     Nostalgic::PtrArr   nostalgic;
     Direct::PtrArr      direct;
     
-    SynchronicPreparation::PtrArr   modificationPreps;
-
+    
     Array<int>                  pianoMap;
     int                         numPMaps;
     

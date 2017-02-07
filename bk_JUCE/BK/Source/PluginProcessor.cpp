@@ -15,6 +15,10 @@ resonanceReleaseSynth   (general)
     didLoadHammersAndRes    = false;
     didLoadMainPianoSamples = false;
     pianoDidChange          = false;
+    directPreparationDidChange = false;
+    nostalgicPreparationDidChange = false;
+    tuningPreparationDidChange = false;
+    synchronicPreparationDidChange = false;
     
     bkKeymaps.ensureStorageAllocated(aMaxNumPreparationKeymaps);
     bkPianos.ensureStorageAllocated(aMaxNumPianos);
@@ -117,6 +121,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     }
     
 }
+
 
 void BKAudioProcessor::performModifications(int noteNumber)
 {

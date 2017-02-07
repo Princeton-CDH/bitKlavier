@@ -480,8 +480,8 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                             {
                                 for (auto prep : whichPreps)
                                 {
-                                    processor.currentPiano->modMap[key]->addDirectModification(new DirectModification(prep, (DirectParameterType)n, param));
-                                    DBG("whichprep: " + String(prep) + " whichtype: " + cDirectParameterTypes[n] + " val: " +param);
+                                    processor.currentPiano->modMap[key]->addDirectModification(new DirectModification(key, prep, (DirectParameterType)n, param, whichMod));
+                                    DBG("whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cDirectParameterTypes[n] + " val: " +param);
                                 }
                             }
                         }
@@ -501,7 +501,7 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                             {
                                 for (auto prep : whichPreps)
                                 {
-                                    processor.currentPiano->modMap[key]->addNostalgicModification(new NostalgicModification(prep, (NostalgicParameterType)n, param));
+                                    processor.currentPiano->modMap[key]->addNostalgicModification(new NostalgicModification(key, prep, (NostalgicParameterType)n, param, whichMod));
                                     DBG("nostprep: " + String(prep) + " whichtype: " + cNostalgicParameterTypes[n] + " val: " +param);
                                 }
                             }
@@ -522,7 +522,7 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                             {
                                 for (auto prep : whichPreps)
                                 {
-                                    processor.currentPiano->modMap[key]->addSynchronicModification(new SynchronicModification(prep, (SynchronicParameterType)n, param));
+                                    processor.currentPiano->modMap[key]->addSynchronicModification(new SynchronicModification(key, prep, (SynchronicParameterType)n, param, whichMod));
                                     DBG("syncprep: " + String(prep) + " whichtype: " + cSynchronicParameterTypes[n] + " val: " +param);
                                 }
                             }
@@ -542,7 +542,7 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                             {
                                 for (auto prep : whichPreps)
                                 {
-                                    processor.currentPiano->modMap[key]->addTuningModification(new TuningModification(prep, (TuningParameterType)n, param));
+                                    processor.currentPiano->modMap[key]->addTuningModification(new TuningModification(key, prep, (TuningParameterType)n, param, whichMod));
                                     DBG("tuneprep: " + String(prep) + " whichtype: " + cTuningParameterTypes[n] + " val: " +param);
                                 }
                             }
@@ -617,11 +617,11 @@ void BKAudioProcessorEditor::bkTextFieldDidChange(TextEditor& tf)
     
     if (name == "PianoMap")
     {
-        tf.setText(processPianoMapString(text));
+        tf.setText(processPianoMapString(text), false);
     }
     else if (name == "ModMap")
     {
-        tf.setText(processModMapString(text));
+        tf.setText(processModMapString(text), false);
     }
     
 }
@@ -740,6 +740,16 @@ void BKAudioProcessorEditor::switchPianos(void)
     }
         
     pianoMapTF.setText(temp);
+    
+    String modMap = "";
+    for (int i = 0; i < 128; i++)
+    {
+        
+        String mod = processor.currentPiano->modMap[i]->stringRepresentation();
+        if (mod != "") modMap += mod;
+    }
+    
+    modMapTF.setText(modMap);
 }
 
 
