@@ -291,7 +291,10 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
     while(beatsToSkip-- > 0)
     {
         if (++myBeat >= active->getBeatMultipliers().size()) myBeat = 0;
-        timeToReturn += (active->getBeatMultipliers()[myBeat] * beatThresholdSamples);
+        timeToReturn += active->getBeatMultipliers()[myBeat] *
+                        beatThresholdSamples *
+                        general->getTempoDivider();
+                        //*adaptiveTempoDivider;
     }
     
     //DBG("time in ms to skipped beat = " + std::to_string(timeToReturn * 1000./sampleRate));
