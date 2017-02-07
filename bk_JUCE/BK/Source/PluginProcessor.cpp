@@ -16,7 +16,6 @@ resonanceReleaseSynth   (general)
     didLoadMainPianoSamples = false;
     pianoDidChange          = false;
     
-    
     bkKeymaps.ensureStorageAllocated(aMaxNumPreparationKeymaps);
     bkPianos.ensureStorageAllocated(aMaxNumPianos);
     prevPianos.ensureStorageAllocated(aMaxNumPianos);
