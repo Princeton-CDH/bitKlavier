@@ -75,6 +75,11 @@ public:
     DirectModification(int key, int whichPrep, DirectParameterType type, String val, int ident):
     type(type)
     {
+        modFloatArr = Array<float>();
+        modBool = var::null;
+        modInt = var::null;
+        modFloat = var::null;
+        
         Id = ident;
         note = key;
         prepId = whichPrep;
@@ -87,6 +92,7 @@ public:
         {
             modFloat = val.getFloatValue();
         }
+
     }
     
     ~DirectModification(void)
@@ -99,6 +105,7 @@ public:
     inline DirectParameterType getParameterType(void) {return type; }
     
 private:
+    
     DirectParameterType type;
     
     JUCE_LEAK_DETECTOR(DirectModification)
@@ -116,6 +123,11 @@ public:
     SynchronicModification(int key, int whichPrep, SynchronicParameterType type, String val, int ident):
     type(type)
     {
+        modFloatArr = Array<float>();
+        modBool = var::null;
+        modInt = var::null;
+        modFloat = var::null;
+        
         Id = ident;
         note = key;
         prepId = whichPrep;
@@ -163,6 +175,11 @@ public:
     NostalgicModification(int key, int whichPrep, NostalgicParameterType type, String val, int ident):
     type(type)
     {
+        modFloatArr = Array<float>();
+        modBool = var::null;
+        modInt = var::null;
+        modFloat = var::null;
+        
         Id = ident;
         note = key;
         prepId = whichPrep;
@@ -175,6 +192,8 @@ public:
         {
             modFloat = val.getFloatValue();
         }
+        
+       
     }
     
     ~NostalgicModification(void)
@@ -205,6 +224,11 @@ public:
     TuningModification(int key, int whichPrep, TuningParameterType type, String val, int ident):
     type(type)
     {
+        modFloatArr = Array<float>();
+        modBool = var::null;
+        modInt = var::null;
+        modFloat = var::null;
+        
         Id = ident;
         note = key;
         prepId = whichPrep;

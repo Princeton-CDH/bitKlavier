@@ -10,6 +10,119 @@
 
 #include "BKUtilities.h"
 
+BKParameterDataType getBKDataType ( SynchronicParameterType type)
+{
+    if ((type == SynchronicTuning) ||
+        (type == SynchronicNumPulses) ||
+        (type == SynchronicClusterMin) ||
+        (type == SynchronicClusterMax) ||
+        (type == SynchronicClusterThresh) ||
+        (type == SynchronicMode) ||
+        (type == SynchronicBeatsToSkip) ||
+        (type == AT1Mode) ||
+        (type == AT1History))
+        return BKInt;
+        
+    
+    if ((type == SynchronicTempo) ||
+        (type == AT1Subdivisions) ||
+        (type == AT1Min) ||
+        (type == AT1Max))
+        return BKFloat;
+    
+    if((type == SynchronicBeatMultipliers) ||
+       (type == SynchronicLengthMultipliers) ||
+       (type == SynchronicAccentMultipliers) ||
+       (type == SynchronicTranspOffsets))
+        return BKFloatArr;
+}
+/*
+TuningId = 0,
+TuningScale,
+TuningFundamental,
+TuningOffset,
+TuningA1IntervalScale,
+TuningA1Inversional,
+TuningA1AnchorScale,
+TuningA1AnchorFundamental,
+TuningA1ClusterThresh,
+TuningA1History,
+TuningCustomScale
+*/
+BKParameterDataType getBKDataType ( TuningParameterType type)
+{
+    if ((type == TuningId) ||
+        (type == TuningScale) ||
+        (type == TuningFundamental) ||
+        (type == TuningA1IntervalScale) ||
+        (type == TuningA1AnchorScale) ||
+        (type == TuningA1AnchorFundamental) ||
+        (type == TuningA1ClusterThresh) ||
+        (type == TuningA1History))
+        return BKInt;
+    
+    
+    if (type == TuningOffset)
+        return BKFloat;
+    
+    if (type == TuningCustomScale)
+        return BKFloatArr;
+    
+    if (type == TuningA1Inversional)
+        return BKBool;
+}
+
+/*
+BKParameterDataType getBKDataType ( DirectParameterType param)
+{
+    if ((type == SynchronicTuning) ||
+        (type == SynchronicNumPulses) ||
+        (type == SynchronicClusterMin) ||
+        (type == SynchronicClusterMax) ||
+        (type == SynchronicClusterThresh) ||
+        (type == SynchronicMode) ||
+        (type == SynchronicBeatsToSkip) ||
+        (type == AT1Mode) ||
+        (type == AT1History))
+        return BKInt;
+    
+    
+    if ((type == SynchronicTempo) ||
+        (type == AT1Subdivisions) ||
+        (type == AT1Min) ||
+        (type == AT1Max))
+        return BKFloat;
+    
+    if((type == SynchronicBeatMultipliers) ||
+       (type == SynchronicLengthMultipliers) ||
+       (type == SynchronicAccentMultipliers) ||
+       (type == SynchronicTranspOffsets))
+        return BKFloatArr;
+}
+ */
+
+/*
+BKParameterDataType getBKDataType ( NostalgicParameterType param)
+{
+    if ((type == SynchronicTuning) ||
+        (type == SynchronicNumPulses) ||
+        (type == SynchronicClusterMin) ||
+        (type == SynchronicClusterMax) ||
+        (type == SynchronicClusterThresh) ||
+        (type == SynchronicMode) ||
+        (type == SynchronicBeatsToSkip) ||
+        (type == AT1Mode) ||
+        (type == AT1History))
+        return BKInt;
+    
+    
+    if ((type == SynchronicTempo) ||
+        (type == AT1Subdivisions) ||
+        (type == AT1Min) ||
+        (type == AT1Max))
+        return BKFloat;
+}
+*/
 
 String boolArrayToString(Array<bool> arr)
 {

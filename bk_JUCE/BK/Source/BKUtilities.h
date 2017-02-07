@@ -33,6 +33,11 @@ double          mtof(double f);
 
 double          ftom(double f);
 
+BKParameterDataType getBKDataType ( SynchronicParameterType param);
+BKParameterDataType getBKDataType ( TuningParameterType param);
+BKParameterDataType getBKDataType ( DirectParameterType param);
+BKParameterDataType getBKDataType ( NostalgicParameterType param);
+
 inline int layerToLayerId(BKNoteType type, int layer) { return (50*type)+layer;}
 
 typedef enum BKTextFieldType

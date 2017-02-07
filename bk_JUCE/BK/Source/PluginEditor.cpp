@@ -87,6 +87,18 @@ tvc(p)
     }
     
     
+    saveButton.setName("Save");
+    saveButton.changeWidthToFitText();
+    saveButton.setButtonText("Save");
+    saveButton.addListener(this);
+    addAndMakeVisible(saveButton);
+    
+    loadButton.setName("Load");
+    loadButton.changeWidthToFitText();
+    loadButton.setButtonText("Load");
+    loadButton.addListener(this);
+    addAndMakeVisible(loadButton);
+    
     addPMapButton.setName("Add");
     addPMapButton.changeWidthToFitText();
     addPMapButton.setButtonText("Add");
@@ -243,6 +255,10 @@ void BKAudioProcessorEditor::resized()
                   svc.getBottom() + gYSpacing,
                   gVCWidth,
                   nvcH);
+    
+    saveButton.setBounds(getX() + gXSpacing, getBottom() - 25, 50, 20);
+    
+    loadButton.setBounds(saveButton.getRight() + gXSpacing, getBottom() - 25, 50, 20);
     
     
     
@@ -628,7 +644,15 @@ void BKAudioProcessorEditor::bkTextFieldDidChange(TextEditor& tf)
 
 void BKAudioProcessorEditor::bkButtonClicked (Button* b)
 {
-    if (b->getName() == "Add")
+    if (b->getName() == "Save")
+    {
+        processor.saveGallery();
+    }
+    else if (b->getName() == "Load")
+    {
+        processor.loadGallery();
+    }
+    else if (b->getName() == "Add")
     {
         drawNewPreparationMap(processor.currentPiano->addPreparationMap());
     }
@@ -739,7 +763,7 @@ void BKAudioProcessorEditor::switchPianos(void)
         if (pianoMap[i] > 0) temp += (String(i) + ":" + String(pianoMap[i]) + " ");
     }
         
-    pianoMapTF.setText(temp);
+    pianoMapTF.setText(temp, false);
     
     String modMap = "";
     for (int i = 0; i < 128; i++)
@@ -749,7 +773,7 @@ void BKAudioProcessorEditor::switchPianos(void)
         if (mod != "") modMap += mod;
     }
     
-    modMapTF.setText(modMap);
+    modMapTF.setText(modMap, false);
 }
 
 

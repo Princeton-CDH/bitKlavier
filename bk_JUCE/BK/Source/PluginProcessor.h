@@ -35,6 +35,10 @@ public:
     BKAudioProcessor();
     ~BKAudioProcessor();
   
+    void saveGallery(void);
+    void loadGallery(void);
+    ValueTree                           bkState;
+    
     // General settings.
     GeneralSettings::Ptr                general;
     

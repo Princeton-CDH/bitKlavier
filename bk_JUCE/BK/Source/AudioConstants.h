@@ -421,10 +421,10 @@ static const std::vector<std::string> cBKSampleLoadTypes = {
 
 
 // Globals
-static const int aMaxNumKeymaps = 30;
+static const int aMaxNumKeymaps = 10;
 static const int aMaxNumPreparationsPerPrepMap = 12;
-static const int aMaxTotalPreparations = aMaxNumPreparationKeymaps * aMaxNumPreparationsPerPrepMap;
-static const int aMaxTuningPreparations = aMaxTotalPreparations * 3;
+static const int aMaxTotalPreparations = 5; // arbitrary, should be dynamic
+static const int aMaxTuningPreparations = 5; // arbitrary, should be dynamic
 
 static const float aGlobalGain = 0.5; //make this user settable
 

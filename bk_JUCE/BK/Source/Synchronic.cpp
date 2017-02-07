@@ -234,6 +234,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             if (++accentMultiplierCounter   >= active->getAccentMultipliers().size())     accentMultiplierCounter = 0;
             if (++transpOffsetCounter       >= active->getTranspOffsets().size())         transpOffsetCounter = 0;
             
+            /*
             //update display of counters in UI
             DBG(" length: "         + String(active->getLengthMultipliers()[lengthMultiplierCounter]) +
                 " length counter:"  + String(lengthMultiplierCounter) +
@@ -242,6 +243,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 " transp: "         + String(active->getTranspOffsets()[transpOffsetCounter]) +
                 " transp counter: " + String(transpOffsetCounter)
                 );
+            */
             
             //play all the notes in the cluster, with current parameter vals
             if (cluster.size() >= active->getClusterMin() && cluster.size() <= active->getClusterMax())
@@ -260,10 +262,12 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             if (++beatCounter >= active->getNumBeats()) shouldPlay = false; //done with pulses
             
             //update display of beat counter in UI
+            /*
             DBG(" beat length: "    + String(active->getBeatMultipliers()[beatMultiplierCounter]) +
                 " beatMultiplier counter: "   + String(beatMultiplierCounter)
                 );
             DBG(" ");
+              */
 
         }
         
