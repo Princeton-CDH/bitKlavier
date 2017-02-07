@@ -15,6 +15,7 @@
 #include "Nostalgic.h"
 #include "Synchronic.h"
 #include "Tuning.h"
+#include "General.h"
 
 
 class Direct : public ReferenceCountedObject
@@ -73,12 +74,13 @@ public:
    
     Synchronic(BKSynthesiser *s,
                Tuning::Ptr tuning,
-           int Id):
+               GeneralSettings::Ptr general,
+               int Id):
     Id(Id)
     {
         sPrep = new SynchronicPreparation(tuning);
         aPrep = new SynchronicPreparation(sPrep);
-        processor = new SynchronicProcessor(s, aPrep, Id);
+        processor = new SynchronicProcessor(s, aPrep, general, Id);
     };
     
     ~Synchronic() {};

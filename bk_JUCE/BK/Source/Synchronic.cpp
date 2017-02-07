@@ -12,9 +12,11 @@
 
 SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s,
                                          SynchronicPreparation::Ptr ap,
+                                         GeneralSettings::Ptr general,
                                          int Id):
 Id(Id),
 synth(s),
+general(general),
 active(ap),
 tuner(active->getTuning()->processor)
 {
@@ -220,7 +222,10 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
         for(int i = 0; i< cluster.size(); i++) slimCluster.addIfNotAlreadyThere(cluster.getUnchecked(i));
         
         //get time until next beat => beat length scaled by beatMultiplier parameter
-        numSamplesBeat = (active->getBeatMultipliers()[beatMultiplierCounter] * beatThresholdSamples);
+        numSamplesBeat =    beatThresholdSamples *
+                            active->getBeatMultipliers()[beatMultiplierCounter] *
+                            general->getTempoDivider();
+                            // * adaptiveTempoMultiplier or adaptiveTempoDivider
         
         //check to see if enough time has passed for next beat
         if (phasor >= numSamplesBeat)

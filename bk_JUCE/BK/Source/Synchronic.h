@@ -12,10 +12,9 @@
 #define SYNCHRONIC_H_INCLUDED
 
 #include "BKUtilities.h"
-
 #include "BKSynthesiser.h"
-
 #include "Tuning.h"
+#include "General.h"
 
 class SynchronicPreparation : public ReferenceCountedObject
 {
@@ -373,6 +372,7 @@ public:
     
     SynchronicProcessor(BKSynthesiser *synth,
                         SynchronicPreparation::Ptr active,
+                        GeneralSettings::Ptr general,
                         int Id);
     
     ~SynchronicProcessor();
@@ -389,6 +389,7 @@ public:
 private:
     int Id;
     BKSynthesiser* synth;
+    GeneralSettings::Ptr general;
     SynchronicPreparation::Ptr active;
     
     double sampleRate;

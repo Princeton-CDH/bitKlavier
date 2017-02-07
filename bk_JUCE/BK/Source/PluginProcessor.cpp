@@ -46,7 +46,7 @@ resonanceReleaseSynth   (general)
     
     for (int i = 0; i < aMaxTotalPreparations; i++)
     {
-        synchronic.add  (new Synchronic(&mainPianoSynth, tuning[0], i));
+        synchronic.add  (new Synchronic(&mainPianoSynth, tuning[0], general, i));
         nostalgic.add   (new Nostalgic(&mainPianoSynth, tuning[0], i));
         direct.add      (new Direct(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, tuning[0], i));
         
