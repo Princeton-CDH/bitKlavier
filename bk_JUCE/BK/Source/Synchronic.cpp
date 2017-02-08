@@ -285,7 +285,7 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
     uint64 timeToReturn = numSamplesBeat - phasor; //next beat
     int myBeat = beatMultiplierCounter;
     
-    //if key release happens just before beat (10ms) then add a beatToSkip
+    //tolerance: if key release happens just before beat (10ms) then add a beatToSkip
     if (timeToReturn < .01 * sampleRate) beatsToSkip++;
     
     while(beatsToSkip-- > 0)
@@ -297,7 +297,7 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
                         //*adaptiveTempoDivider;
     }
     
-    //DBG("time in ms to skipped beat = " + std::to_string(timeToReturn * 1000./sampleRate));
+    DBG("time in ms to next beat = " + std::to_string(timeToReturn * 1000./sampleRate));
     return timeToReturn * 1000./sampleRate; //optimize later....
 }
 
