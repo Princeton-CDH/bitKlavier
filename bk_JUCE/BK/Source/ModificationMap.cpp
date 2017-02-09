@@ -27,6 +27,25 @@ ModificationMap::~ModificationMap()
     
 }
 
+String  ModificationMap::stringRepresentation(void)
+{
+    String out = "";
+    
+    for (auto mod : directMods)
+        out += (String(mod->getNote())+ ":Dm" + String(mod->getId()) + ":{" + String( mod->getPrepId()) + "} ");
+    
+    for (auto mod : synchronicMods)
+        out += (String(mod->getNote())+ ":Sm" + String(mod->getId()) + ":{" + String( mod->getPrepId()) + "} ");
+    
+    for (auto mod : nostalgicMods)
+        out += (String(mod->getNote())+ ":Nm" + String(mod->getId()) + ":{" + String( mod->getPrepId()) + "} ");
+    
+    for (auto mod : tuningMods)
+        out += (String(mod->getNote())+ ":Tm" + String(mod->getId()) + ":{" + String( mod->getPrepId()) + "} ");
+    
+    return out;
+}
+
 void ModificationMap::addSynchronicModification(SynchronicModification::Ptr m)
 {
     synchronicMods.add(m);

@@ -12,33 +12,37 @@ mainPianoSynth          (general),
 hammerReleaseSynth      (general),
 resonanceReleaseSynth   (general)
 {
-    didLoadHammersAndRes    = false;
-    didLoadMainPianoSamples = false;
-    pianoDidChange          = false;
+    didLoadHammersAndRes            = false;
+    didLoadMainPianoSamples         = false;
+    pianoDidChange                  = false;
+    directPreparationDidChange      = false;
+    nostalgicPreparationDidChange   = false;
+    tuningPreparationDidChange      = false;
+    synchronicPreparationDidChange  = false;
     
+    bkKeymaps       .ensureStorageAllocated(aMaxNumPreparationKeymaps);
+    bkPianos        .ensureStorageAllocated(aMaxNumPianos);
+    prevPianos      .ensureStorageAllocated(aMaxNumPianos);
     
-    bkKeymaps.ensureStorageAllocated(aMaxNumPreparationKeymaps);
-    bkPianos.ensureStorageAllocated(aMaxNumPianos);
-    prevPianos.ensureStorageAllocated(aMaxNumPianos);
+    tuning          .ensureStorageAllocated(aMaxTuningPreparations);
+    modTuning       .ensureStorageAllocated(aMaxTuningPreparations);
     
-    tuning.ensureStorageAllocated(aMaxTuningPreparations);
-    modTuning.ensureStorageAllocated(aMaxTuningPreparations);
+    synchronic      .ensureStorageAllocated(aMaxTotalPreparations);
+    modSynchronic   .ensureStorageAllocated(aMaxTotalPreparations);
     
-    synchronic.ensureStorageAllocated(aMaxTotalPreparations);
-    modSynchronic.ensureStorageAllocated(aMaxTotalPreparations);
+    nostalgic       .ensureStorageAllocated(aMaxTotalPreparations);
+    modNostalgic    .ensureStorageAllocated(aMaxTotalPreparations);
     
-    nostalgic.ensureStorageAllocated(aMaxTotalPreparations);
-    modNostalgic.ensureStorageAllocated(aMaxTotalPreparations);
-    
-    direct.ensureStorageAllocated(aMaxTotalPreparations);
-    modDirect.ensureStorageAllocated(aMaxTotalPreparations);
+    direct          .ensureStorageAllocated(aMaxTotalPreparations);
+    modDirect       .ensureStorageAllocated(aMaxTotalPreparations);
 
     // Make a bunch of keymaps.
     for (int i = 0; i < aMaxNumKeymaps; i++)
         bkKeymaps.add(new Keymap(i));
     
     // Make a bunch of tunings.
-    for (int i = 0; i < (aMaxTuningPreparations); i++) {
+    for (int i = 0; i < (aMaxTuningPreparations); i++)
+    {
         tuning.add(new Tuning(i));
         modTuning.add(new TuningModPreparation());
     }
@@ -72,6 +76,195 @@ resonanceReleaseSynth   (general)
     
     // Default all on for 
     for (int i = 0; i < 128; i++) bkKeymaps[1]->addNote(i);
+    
+}
+
+void BKAudioProcessor::loadGallery(void)
+{
+    FileChooser myChooser ("Load gallery from file...",
+                           File::getSpecialLocation (File::userHomeDirectory),
+                           "*.xml");
+    
+    if (myChooser.browseForFileToOpen())
+    {
+        File myFile (myChooser.getResult());
+        
+        ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
+        
+        if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
+        {
+
+        }
+        
+    }
+}
+
+void BKAudioProcessor::saveGallery(void)
+{
+    ValueTree galleryVT("gallery");
+
+    ValueTree generalVT("general");
+    
+    generalVT.setProperty("globalGain", general->getGlobalGain(), 0);
+    generalVT.setProperty("synchronicGain", general->getSynchronicGain(), 0);
+    generalVT.setProperty("nostalgicGain", general->getNostalgicGain(), 0);
+    generalVT.setProperty("directGain", general->getDirectGain(), 0);
+    generalVT.setProperty("resonanceGain", general->getResonanceGain(), 0);
+    generalVT.setProperty("hammerGain", general->getHammerGain(), 0);
+    generalVT.setProperty("tempoMultiplier", general->getTempoMultiplier(), 0);
+    generalVT.setProperty("resAndHammer", general->getResonanceAndHammer(), 0);
+    generalVT.setProperty("invertSustain", general->getInvertSustain(), 0);
+    generalVT.setProperty("tuningFund", general->getTuningFundamental(), 0);
+    
+    galleryVT.addChild(generalVT, -1, 0);
+    
+    for (int piano = 0; piano < bkPianos.size(); piano++)
+    {
+        
+        ValueTree pianoVT("piano"+String(bkPianos[piano]->getId()));
+        
+        ValueTree prepMapsVT("preparationMaps");
+        
+        int pmapCount = 0;
+        for (auto pmap : bkPianos[piano]->getPreparationMaps())
+        {
+            ValueTree pmapVT("prepMap"+String(pmapCount++));
+            pmapVT.setProperty("keymap", pmap->getKeymapId(), 0);
+            
+            int pcount = 0;
+            ValueTree dPreps("directPreps");
+            for (auto prep : pmap->getDirect()) dPreps.setProperty("d"+String(pcount++), prep->getId(), 0);
+            pmapVT.addChild(dPreps, -1, 0);
+            
+            pcount = 0;
+            ValueTree nPreps("nostalgicPreps");
+            for (auto prep : pmap->getNostalgic()) nPreps.setProperty("n"+String(pcount++), prep->getId(), 0);
+            pmapVT.addChild(nPreps, -1, 0);
+            
+            pcount = 0;
+            ValueTree sPreps("synchronicPreps");
+            for (auto prep : pmap->getSynchronic()) sPreps.setProperty("s"+String(pcount++), prep->getId(), 0);
+            pmapVT.addChild(sPreps, -1, 0);
+            
+            prepMapsVT.addChild(pmapVT, -1, 0);
+        }
+        
+        pianoVT.addChild(prepMapsVT, -1, 0);
+        
+        pmapCount = 0;
+        
+        // Iterate through all keys and write data from PianoMap and ModMap to ValueTree
+        for (int key = 0; key < 128; key++)
+        {
+            if (bkPianos[piano]->pianoMap[key] != 0)
+            {
+                ValueTree pmapVT("pianoMap" + String(pmapCount++));
+                
+                pmapVT.setProperty("key", key, 0);
+                pmapVT.setProperty("piano", bkPianos[piano]->pianoMap[key], 0);
+                
+                pianoVT.addChild(pmapVT, -1, 0);
+            }
+            
+            int modCount = 0;
+            
+            for (auto mod : bkPianos[piano]->modMap[key]->getDirectModifications())
+            {
+                ValueTree modVT("directMod" + String(modCount++));
+                
+                DirectParameterType type = mod->getParameterType();
+                
+                modVT.setProperty("key", key, 0);
+                modVT.setProperty("type", type, 0);
+                modVT.setProperty("prep", mod->getPrepId(), 0);
+                
+                if (type == DirectTuning)   modVT.setProperty("vali", mod->getModInt(), 0);
+                else    /* Rest float */    modVT.setProperty("valf", mod->getModFloat(), 0);
+                
+                pianoVT.addChild(modVT, -1, 0);
+            }
+            
+
+            modCount = 0;
+            
+            for (auto mod : bkPianos[piano]->modMap[key]->getSynchronicModifications())
+            {
+                ValueTree modVT("synchronicMod" + String(modCount++));
+                
+                SynchronicParameterType type = mod->getParameterType();
+                
+                modVT.setProperty("key", key, 0);
+                modVT.setProperty("type", type, 0);
+                modVT.setProperty("prep", mod->getPrepId(), 0);
+                
+                BKParameterDataType bktype = getBKDataType(type);
+                if (bktype == BKInt)            modVT.setProperty("vali", mod->getModInt(), 0);
+                else if (bktype == BKFloat)     modVT.setProperty("valf", mod->getModFloat(), 0);
+                else if (bktype == BKFloatArr)
+                {
+                    ValueTree faVT("valfa");
+                    int count = 0;
+                    for (auto f : mod->getModFloatArr())   faVT.setProperty("f"+String(count++), f, 0);
+                    modVT.addChild(faVT, -1, 0);
+                }
+                
+                pianoVT.addChild(modVT, -1, 0);
+            }
+
+
+        }
+        
+        galleryVT.addChild(pianoVT, -1, 0);
+    }
+    
+    ValueTree directPreps("directPreps");
+    for (int i = 0; i < direct.size(); i++) directPreps.addChild(direct[i]->getState(), -1, 0);
+    galleryVT.addChild(directPreps, -1, 0);
+    
+    ValueTree synchronicPreps("synchronicPreps");
+    for (int i = 0; i < synchronic.size(); i++) synchronicPreps.addChild(synchronic[i]->getState(), -1, 0);
+    galleryVT.addChild(synchronicPreps, -1, 0);
+    
+    ValueTree nostalgicPreps("nostalgicPreps");
+    for (int i = 0; i < nostalgic.size(); i++) nostalgicPreps.addChild(nostalgic[i]->getState(), -1, 0);
+    galleryVT.addChild(nostalgicPreps, -1, 0);
+    
+    ValueTree tuningPreps("tuningPreps");
+    for (int i = 0; i < tuning.size(); i++) tuningPreps.addChild(tuning[i]->getState(), -1, 0);
+    galleryVT.addChild(tuningPreps, -1, 0);
+    
+    ValueTree keymaps("keymaps");
+    
+    for (int i = 0; i < bkKeymaps.size(); i++)
+    {
+        ValueTree keys("keymap"+String(i));
+        int count = 0;
+        for (auto key : bkKeymaps[i]->keys()) keys.setProperty("k"+String(count++), key, 0);
+        
+        keymaps.addChild(keys, -1, 0);
+    }
+    
+    galleryVT.addChild(keymaps, -1, 0);
+    
+    String xml = galleryVT.toXmlString();
+    DBG(xml);
+    
+    FileChooser myChooser ("Save gallery to file...",
+                           File::getSpecialLocation (File::userHomeDirectory),
+                           "*.xml");
+    
+    
+    XmlElement* myXML = galleryVT.createXml();
+    
+    if (myChooser.browseForFileToSave(true))
+    {
+        File myFile (myChooser.getResult());
+        myXML->writeToFile(myFile, String::empty);
+    }
+    
+    
+    delete myXML;
+    
     
 }
 
@@ -118,6 +311,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     }
     
 }
+
 
 void BKAudioProcessor::performModifications(int noteNumber)
 {

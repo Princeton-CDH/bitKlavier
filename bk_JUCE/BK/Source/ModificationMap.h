@@ -43,6 +43,8 @@ public:
     
     TuningModification::PtrArr getTuningModifications(void);
     
+    String  stringRepresentation(void);
+    
     void clearModifications(void);
     
 private:

@@ -54,6 +54,7 @@ public:
     inline PreparationMap::CSPtrArr getPreparationMaps(void) { return prepMaps; }
     
     
+    
     PreparationMap::Ptr         currentPMap;
     PreparationMap::CSPtrArr    activePMaps;
     PreparationMap::CSPtrArr    prepMaps;
@@ -62,8 +63,7 @@ public:
     Nostalgic::PtrArr   nostalgic;
     Direct::PtrArr      direct;
     
-    SynchronicPreparation::PtrArr   modificationPreps;
-
+    
     Array<int>                  pianoMap;
     int                         numPMaps;
     

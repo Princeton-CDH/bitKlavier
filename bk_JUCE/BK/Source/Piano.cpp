@@ -26,15 +26,19 @@ Id(Id),
 initialKeymap(keymap)
 {
     pianoMap.ensureStorageAllocated(128);
-    for (int i = 0; i < 128; i++)   pianoMap.set(i, 0);
     
     modMap = OwnedArray<ModificationMap>();
     modMap.ensureStorageAllocated(128);
     
-    for (int i = 0; i < 128; i++) modMap.add(new ModificationMap());
+    for (int i = 0; i < 128; i++)
+    {
+        pianoMap.set(i, 0);
+        modMap.add(new ModificationMap());
+    }
     
     prepMaps.ensureStorageAllocated(12);
 }
+
 
 Piano::~Piano()
 {

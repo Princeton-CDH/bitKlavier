@@ -27,6 +27,8 @@ public:
         
     }
     
+    inline void setId(int I){ Id = I; }
+    inline void setNote(int n){note=n;}
     inline void setPrepId(int Id) { prepId = Id; }
     inline void setModBool(bool val) { modBool = val; }
     inline void setModInt(int val){modInt = val;}
@@ -34,6 +36,8 @@ public:
     inline void setModIntArr(Array<int> arr){modIntArr = arr;}
     inline void setModFloatArr(Array<float> arr){modFloatArr = arr;}
     
+    inline const int getId(void){return Id;}
+    inline const int getNote(void){return note;}
     inline const int getPrepId(void) { return prepId; }
     inline const bool getModBool(void){return modBool;}
     inline const int getModInt(void){return modInt;}
@@ -43,6 +47,8 @@ public:
     
     
 protected:
+    int             Id;
+    int             note;
     int             prepId;
     bool            modBool;
     int             modInt;
@@ -66,9 +72,16 @@ public:
     typedef OwnedArray<DirectModification, CriticalSection> CSArr;
     
     
-    DirectModification(int whichPrep, DirectParameterType type, String val):
+    DirectModification(int key, int whichPrep, DirectParameterType type, String val, int ident):
     type(type)
     {
+        modFloatArr = Array<float>();
+        modBool = var::null;
+        modInt = var::null;
+        modFloat = var::null;
+        
+        Id = ident;
+        note = key;
         prepId = whichPrep;
         
         if (cDirectDataTypes[type] == BKInt)
@@ -79,6 +92,7 @@ public:
         {
             modFloat = val.getFloatValue();
         }
+
     }
     
     ~DirectModification(void)
@@ -91,7 +105,7 @@ public:
     inline DirectParameterType getParameterType(void) {return type; }
     
 private:
-    int Id;
+    
     DirectParameterType type;
     
     JUCE_LEAK_DETECTOR(DirectModification)
@@ -106,9 +120,16 @@ public:
     typedef OwnedArray<SynchronicModification>                  Arr;
     typedef OwnedArray<SynchronicModification, CriticalSection> CSArr;
     
-    SynchronicModification(int whichPrep, SynchronicParameterType type, String val):
+    SynchronicModification(int key, int whichPrep, SynchronicParameterType type, String val, int ident):
     type(type)
     {
+        modFloatArr = Array<float>();
+        modBool = var::null;
+        modInt = var::null;
+        modFloat = var::null;
+        
+        Id = ident;
+        note = key;
         prepId = whichPrep;
         
         if (cSynchronicDataTypes[type] == BKInt)
@@ -151,9 +172,16 @@ public:
     typedef OwnedArray<NostalgicModification>                  Arr;
     typedef OwnedArray<NostalgicModification, CriticalSection> CSArr;
     
-    NostalgicModification(int whichPrep, NostalgicParameterType type, String val):
+    NostalgicModification(int key, int whichPrep, NostalgicParameterType type, String val, int ident):
     type(type)
     {
+        modFloatArr = Array<float>();
+        modBool = var::null;
+        modInt = var::null;
+        modFloat = var::null;
+        
+        Id = ident;
+        note = key;
         prepId = whichPrep;
         
         if (cNostalgicDataTypes[type] == BKInt)
@@ -164,6 +192,8 @@ public:
         {
             modFloat = val.getFloatValue();
         }
+        
+       
     }
     
     ~NostalgicModification(void)
@@ -191,9 +221,16 @@ public:
     typedef OwnedArray<TuningModification>                  Arr;
     typedef OwnedArray<TuningModification, CriticalSection> CSArr;
     
-    TuningModification(int whichPrep, TuningParameterType type, String val):
+    TuningModification(int key, int whichPrep, TuningParameterType type, String val, int ident):
     type(type)
     {
+        modFloatArr = Array<float>();
+        modBool = var::null;
+        modInt = var::null;
+        modFloat = var::null;
+        
+        Id = ident;
+        note = key;
         prepId = whichPrep;
         
         if (cTuningDataTypes[type] == BKInt)

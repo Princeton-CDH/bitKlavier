@@ -78,6 +78,7 @@ private:
     
     TextButton                          addPMapButton;
     TextButton                          removePMapButton;
+    TextButton                          saveButton, loadButton;
     
     OwnedArray<TextButton>              loadButtons;
     
