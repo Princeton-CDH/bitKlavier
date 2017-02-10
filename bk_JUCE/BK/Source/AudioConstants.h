@@ -19,6 +19,111 @@
 #define CRAY_COOL_MUSIC_MAKER 0
 #define CRAY_COOL_MUSIC_MAKER_2 0
 
+const String vtagGallery = "gallery";
+const String vtagGeneral = "general";
+const String ptagGeneral_globalGain = "globalGain";
+const String ptagGeneral_directGain = "directGain";
+const String ptagGeneral_synchronicGain = "synchronicGain";
+const String ptagGeneral_nostalgicGain = "nostalgicGain";
+const String ptagGeneral_resonanceGain = "resonanceGain";
+const String ptagGeneral_hammerGain = "hammerGain";
+const String ptagGeneral_tempoMultiplier = "tempoMultiplier";
+const String ptagGeneral_resAndHammer = "resAndHammer";
+const String ptagGeneral_invertSustain = "invertSustain";
+const String ptagGeneral_tuningFund = "tuningFund";
+
+const String vtagPiano = "piano";
+const String vtagPrepMap = "prepMap";
+const String ptagPrepMap_keymapId = "keymapId";
+
+const String vtagPrepMap_directPreps = "directPrepIds";
+const String vtagPrepMap_synchronicPreps = "synchronicPrepIds";
+const String vtagPrepMap_nostalgicPreps = "nostalgicPrepIds";
+const String ptagPrepMap_directPrepId = "d";
+const String ptagPrepMap_synchronicPrepId = "s";
+const String ptagPrepMap_nostalgicPrepId = "n";
+
+const String vtagPianoMap = "pianoMap";
+const String ptagPianoMap_key = "key";
+const String ptagPianoMap_piano = "piano";
+
+const String vtagModDirect = "directMod";
+const String vtagModSynchronic = "synchronicMod";
+const String vtagModNostalgic = "nostalgicMod";
+const String vtagModTuning = "tuningMod";
+const String ptagModX_key = "key";
+const String ptagModX_type = "type";
+const String ptagModX_prep = "prep";
+
+const String ptagFloat = "f";
+const String ptagInt = "i";
+const String ptagBool = "b";
+const String ptagFloatArr = "fa";
+const String ptagIntArr = "ia";
+
+
+const String vtagSynchronicPrep = "synchronicPrep";
+const String ptagSynchronic_Id = "Id";
+const String ptagSynchronic_tuning = "tuning";
+const String ptagSynchronic_tempo = "tempo";
+const String ptagSynchronic_numBeats = "numBeats";
+const String ptagSynchronic_clusterMin = "clusterMin";
+const String ptagSynchronic_clusterMax = "clusterMax";
+const String ptagSynchronic_clusterThresh = "clusterThresh";
+const String ptagSynchronic_mode = "mode";
+const String ptagSynchronic_beatsToSkip = "beatsToSkip";
+const String ptagSynchronic_at1Mode = "AT1Mode";
+const String ptagSynchronic_at1History = "AT1History";
+const String ptagSynchronic_at1Subdivisions = "AT1Subdivisions";
+const String ptagSynchronic_AT1Min = "AT1Min";
+const String ptagSynchronic_AT1Max = "AT1Max";
+const String vtagSynchronic_beatMults = "beatMultipliers";
+const String vtagSynchronic_lengthMults = "lengthMultipliers";
+const String vtagSynchronic_accentMults = "accentMultipliers";
+const String vtagSynchronic_transpOffsets = "transpOffsets";
+
+const String vtagNostalgicPrep = "nostalgicPrep";
+const String ptagNostalgic_Id = "Id";
+const String ptagNostalgic_tuning = "tuning";
+const String ptagNostalgic_waveDistance = "waveDistance";
+const String ptagNostalgic_undertow = "undertow";
+const String ptagNostalgic_transposition = "transposition";
+const String ptagNostalgic_gain = "gain";
+const String ptagNostalgic_lengthMultiplier = "lengthMultiplier";
+const String ptagNostalgic_mode = "mode";
+const String ptagNostalgic_beatsToSkip = "beatsToSkip";
+const String ptagNostalgic_syncTarget = "syncTarget";
+
+
+
+const String vtagDirectPrep = "directPrep";
+const String ptagDirect_id ="Id";
+const String ptagDirect_tuning = "tuning";
+const String ptagDirect_transposition = "transposition";
+const String ptagDirect_gain = "gain";
+const String ptagDirect_resGain = "resGain";
+const String ptagDirect_hammerGain = "hammerGain";
+
+
+const String vtagTuningPrep = "tuningPrep";
+const String ptagTuning_Id = "Id";
+const String ptagTuning_scale = "scale";
+const String ptagTuning_fundamental = "fundamental";
+const String ptagTuning_offset = "offset";
+const String ptagTuning_adaptiveIntervalScale = "adaptiveIntervalScale";
+const String ptagTuning_adaptiveInversional = "adaptiveInversional";
+const String ptagTuning_adaptiveAnchorScale = "adaptiveAnchorScale";
+const String ptagTuning_adaptiveAnchorFund = "adaptiveAnchorFund";
+const String ptagTuning_adaptiveClusterThresh = "adaptiveClusterThresh";
+const String ptagTuning_adaptiveHistory = "adaptiveHistory";
+
+const String vtagTuning_customScale = "customScale";
+const String ptagTuning_scaleDeg = "f";
+
+const String vtagKeymaps = "keymaps";
+const String vtagKeymap =  "keymap";
+const String ptagKeymap_key = "k";
+
 typedef enum PitchClass {
     C = 0,
     CSharp,

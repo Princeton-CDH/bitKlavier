@@ -139,6 +139,12 @@ void BKAudioProcessorEditor::timerCallback()
 
     }
     
+    if (processor.generalSettingsDidChange)
+    {
+        processor.generalSettingsDidChange = false;
+        gvc.updateFields();
+    }
+    
     if (processor.directPreparationDidChange)
     {
         processor.directPreparationDidChange = false;

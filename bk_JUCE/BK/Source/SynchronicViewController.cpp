@@ -129,9 +129,24 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
     
     if (name == cSynchronicParameterTypes[SynchronicId])
     {
+        
         if (type == BKParameter)
         {
-            currentSynchronicId = i;
+            int numSynchronic = processor.synchronic.size();
+        
+            if ((i+1) > numSynchronic)
+            {
+                processor.addSynchronic();
+                currentSynchronicId = numSynchronic;
+            
+            }
+            else if (i >= 0)
+            {
+                currentSynchronicId = i;
+            }
+            
+            synchronicTF[SynchronicId]->setText(String(currentSynchronicId), false);
+            
             updateFields();
         }
         else // BKModification

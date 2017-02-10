@@ -31,6 +31,8 @@ public:
 
     void paint (Graphics&) override;
     void resized() override;
+    
+    void updateFields(void);
 
 private:
     BKAudioProcessor& processor;
@@ -46,7 +48,7 @@ private:
     void bkButtonClicked            (Button* b)             override { };
     void bkMessageReceived          (const String& message) override { };
     
-    void updateFields(void);
+    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GeneralViewController)
 };

@@ -97,8 +97,21 @@ void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
     
     if (name == cKeymapParameterTypes[KeymapId])
     {
-        currentKeymapId = i;
+        int numKeymaps = processor.bkKeymaps.size();
+
+        if ((i+1) > numKeymaps)
+        {
+            // :D
+            processor.addKeymap();
+            currentKeymapId = numKeymaps; // last index
+        }
+        else if (i >= 0)
+        {
+            currentKeymapId = i;
+        }
+        
         updateFields(currentKeymapId);
+        
     }
     else if (name == cKeymapParameterTypes[KeymapField])
     {

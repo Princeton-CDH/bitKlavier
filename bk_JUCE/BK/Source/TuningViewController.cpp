@@ -121,10 +121,24 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         if (type == BKParameter)
         {
-            currentTuningId = i;
+            int numTuning = processor.tuning.size();
+            
+            if ((i+1) > numTuning)
+            {
+                processor.addTuning();
+                currentTuningId = numTuning;
+                
+            }
+            else if (i >= 0)
+            {
+                currentTuningId = i;
+            }
+            
+            tuningTF[TuningId]->setText(String(currentTuningId), false);
+            
             updateFields();
         }
-        else //BKModification
+        else // BKModification
         {
             currentModTuningId = i;
             updateModFields();

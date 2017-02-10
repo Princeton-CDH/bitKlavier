@@ -37,7 +37,6 @@ public:
   
     void saveGallery(void);
     void loadGallery(void);
-    ValueTree                           bkState;
     
     // General settings.
     GeneralSettings::Ptr                general;
@@ -69,11 +68,19 @@ public:
     Piano::PtrArr                       prevPianos;
     Piano::PtrArr                       bkPianos;
     
+    void addSynchronic(void);
+    void addNostalgic(void);
+    void addTuning(void);
+    void addDirect(void);
+    void addKeymap(void);
+    
+    void updateUI(void);
     bool                                pianoDidChange;
     bool                                directPreparationDidChange;
     bool                                nostalgicPreparationDidChange;
     bool                                synchronicPreparationDidChange;
     bool                                tuningPreparationDidChange;
+    bool                                generalSettingsDidChange;
     
     Array<int>                          noteOn;
     

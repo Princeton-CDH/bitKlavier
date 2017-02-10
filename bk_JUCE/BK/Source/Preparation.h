@@ -45,14 +45,14 @@ public:
     
     inline ValueTree getState(void)
     {
-        ValueTree prep("direct"+String(Id));
+        ValueTree prep( vtagDirectPrep+String(Id));
         
-        prep.setProperty("Id", Id, 0);
-        prep.setProperty("tuning", sPrep->getTuning()->getId(), 0);
-        prep.setProperty("transposition", sPrep->getTransposition(), 0);
-        prep.setProperty("gain", sPrep->getGain(), 0);
-        prep.setProperty("resGain", sPrep->getResonanceGain(), 0);
-        prep.setProperty("hammerGain", sPrep->getHammerGain(), 0);
+        prep.setProperty( ptagDirect_id,                Id, 0);
+        prep.setProperty( ptagDirect_tuning,            sPrep->getTuning()->getId(), 0);
+        prep.setProperty( ptagDirect_transposition,     sPrep->getTransposition(), 0);
+        prep.setProperty( ptagDirect_gain,              sPrep->getGain(), 0);
+        prep.setProperty( ptagDirect_resGain,           sPrep->getResonanceGain(), 0);
+        prep.setProperty( ptagDirect_hammerGain,        sPrep->getHammerGain(), 0);
         
         return prep;
     }
@@ -99,7 +99,7 @@ public:
     
     inline ValueTree getState(void)
     {
-        ValueTree prep("synchronic"+String(Id));
+        ValueTree prep( vtagSynchronicPrep + String(Id));
         
         /*
         "Synchronic Id",
@@ -122,42 +122,58 @@ public:
         "AT1Max"
         */
         
-        prep.setProperty("Id",                  Id, 0);
-        prep.setProperty("tuning",              sPrep->getTuning()->getId(), 0);
-        prep.setProperty("tempo",               sPrep->getTempo(), 0);
-        prep.setProperty("numPulses",           sPrep->getNumBeats(), 0);
-        prep.setProperty("clusterMin",          sPrep->getClusterMin(), 0);
-        prep.setProperty("clusterMax",          sPrep->getClusterMax(), 0);
-        prep.setProperty("clusterThresh",       sPrep->getClusterThreshMS(), 0);
-        prep.setProperty("mode",                sPrep->getMode(), 0);
-        prep.setProperty("beatsToSkip",         sPrep->getBeatsToSkip(), 0);
+        prep.setProperty( ptagSynchronic_Id,                  Id, 0);
+        prep.setProperty( ptagSynchronic_tuning,              sPrep->getTuning()->getId(), 0);
+        prep.setProperty( ptagSynchronic_tempo,               sPrep->getTempo(), 0);
+        prep.setProperty( ptagSynchronic_numBeats,            sPrep->getNumBeats(), 0);
+        prep.setProperty( ptagSynchronic_clusterMin,          sPrep->getClusterMin(), 0);
+        prep.setProperty( ptagSynchronic_clusterMax,          sPrep->getClusterMax(), 0);
+        prep.setProperty( ptagSynchronic_clusterThresh,       sPrep->getClusterThreshMS(), 0);
+        prep.setProperty( ptagSynchronic_mode,                sPrep->getMode(), 0);
+        prep.setProperty( ptagSynchronic_beatsToSkip,         sPrep->getBeatsToSkip(), 0);
         
         
-        ValueTree beatMults("beatMults");
+        ValueTree beatMults( vtagSynchronic_beatMults);
         int count = 0;
-        for (auto f : sPrep->getBeatMultipliers())      beatMults.setProperty("f"+String(count++), f, 0);
+        for (auto f : sPrep->getBeatMultipliers())
+        {
+            beatMults.      setProperty( ptagFloat + String(count++), f, 0);
+        }
         prep.addChild(beatMults, -1, 0);
         
-        ValueTree lenMults("lengthMults");
+        
+        ValueTree lenMults( vtagSynchronic_lengthMults);
         count = 0;
-        for (auto f : sPrep->getLengthMultipliers())    lenMults.setProperty("f"+String(count++), f, 0);
+        for (auto f : sPrep->getLengthMultipliers())
+        {
+            lenMults.       setProperty( ptagFloat + String(count++), f, 0);
+        }
         prep.addChild(lenMults, -1, 0);
         
-        ValueTree accentMults("accentMults");
+        
+        ValueTree accentMults( vtagSynchronic_accentMults);
         count = 0;
-        for (auto f : sPrep->getAccentMultipliers())    accentMults.setProperty("f"+String(count++), f, 0);
+        for (auto f : sPrep->getAccentMultipliers())
+        {
+            accentMults.    setProperty( ptagFloat + String(count++), f, 0);
+        }
         prep.addChild(accentMults, -1, 0);
         
-        ValueTree transpOffsets("transpOffsets");
+        
+        ValueTree transpOffsets( vtagSynchronic_transpOffsets);
         count = 0;
-        for (auto f : sPrep->getTranspOffsets())        transpOffsets.setProperty("f"+String(count++), f, 0);
+        for (auto f : sPrep->getTranspOffsets())
+        {
+            transpOffsets.  setProperty( ptagFloat + String(count++), f, 0);
+        }
         prep.addChild(transpOffsets, -1, 0);
 
-        prep.setProperty("AT1Mode",             sPrep->getAdaptiveTempo1Mode(), 0);
-        prep.setProperty("AT1History",          sPrep->getAdaptiveTempo1History(), 0);
-        prep.setProperty("AT1Subdiv",           sPrep->getAdaptiveTempo1Subdivisions(), 0);
-        prep.setProperty("AT1Min",              sPrep->getAdaptiveTempo1Min(), 0);
-        prep.setProperty("AT1Max",              sPrep->getAdaptiveTempo1Max(), 0);
+        
+        prep.setProperty( ptagSynchronic_at1Mode,             sPrep->getAdaptiveTempo1Mode(), 0);
+        prep.setProperty( ptagSynchronic_at1History,          sPrep->getAdaptiveTempo1History(), 0);
+        prep.setProperty( ptagSynchronic_at1Subdivisions,     sPrep->getAdaptiveTempo1Subdivisions(), 0);
+        prep.setProperty( ptagSynchronic_AT1Min,              sPrep->getAdaptiveTempo1Min(), 0);
+        prep.setProperty( ptagSynchronic_AT1Max,              sPrep->getAdaptiveTempo1Max(), 0);
         
         return prep;
         
@@ -218,18 +234,18 @@ public:
     
     inline ValueTree getState(void)
     {
-        ValueTree prep("nostalgic"+String(Id));
+        ValueTree prep( vtagNostalgicPrep + String(Id));
         
-        prep.setProperty("Id",                 Id, 0);
-        prep.setProperty("tuning",             sPrep->getTuning()->getId(), 0);
-        prep.setProperty("waveDistance",       sPrep->getWavedistance(), 0);
-        prep.setProperty("undertow",           sPrep->getUndertow(), 0);
-        prep.setProperty("transposition",      sPrep->getTransposition(), 0);
-        prep.setProperty("gain",               sPrep->getGain(), 0);
-        prep.setProperty("lengthMultiplier",   sPrep->getLengthMultiplier(), 0);
-        prep.setProperty("neatsToSkip",        sPrep->getBeatsToSkip(), 0);
-        prep.setProperty("mode",               sPrep->getMode(), 0);
-        prep.setProperty("syncTarget",         sPrep->getSyncTarget(), 0);
+        prep.setProperty( ptagNostalgic_Id,                 Id, 0);
+        prep.setProperty( ptagNostalgic_tuning,             sPrep->getTuning()->getId(), 0);
+        prep.setProperty( ptagNostalgic_waveDistance,       sPrep->getWavedistance(), 0);
+        prep.setProperty( ptagNostalgic_undertow,           sPrep->getUndertow(), 0);
+        prep.setProperty( ptagNostalgic_transposition,      sPrep->getTransposition(), 0);
+        prep.setProperty( ptagNostalgic_gain,               sPrep->getGain(), 0);
+        prep.setProperty( ptagNostalgic_lengthMultiplier,   sPrep->getLengthMultiplier(), 0);
+        prep.setProperty( ptagNostalgic_beatsToSkip,        sPrep->getBeatsToSkip(), 0);
+        prep.setProperty( ptagNostalgic_mode,               sPrep->getMode(), 0);
+        prep.setProperty( ptagNostalgic_syncTarget,         sPrep->getSyncTarget(), 0);
 
         return prep;
     }

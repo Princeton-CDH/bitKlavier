@@ -351,22 +351,22 @@ public:
    */
     inline ValueTree getState(void)
     {
-        ValueTree prep("tuning"+String(Id));
+        ValueTree prep(vtagTuningPrep + String(Id));
         
-        prep.setProperty("Id", Id, 0);
-        prep.setProperty("scale", sPrep->getTuning(), 0);
-        prep.setProperty("fundamental", sPrep->getFundamental(), 0);
-        prep.setProperty("offset", sPrep->getFundamentalOffset(), 0 );
-        prep.setProperty("aIntrvScale", sPrep->getAdaptiveIntervalScale(), 0 );
-        prep.setProperty("aInversion", sPrep->getAdaptiveInversional(), 0 );
-        prep.setProperty("aAnchScale", sPrep->getAdaptiveAnchorScale(), 0 );
-        prep.setProperty("aAnchFund", sPrep->getAdaptiveAnchorFundamental(), 0 );
-        prep.setProperty("aClustThresh", (int)sPrep->getAdaptiveClusterThresh(), 0 );
-        prep.setProperty("aHistory", sPrep->getAdaptiveHistory(), 0 );
+        prep.setProperty( ptagTuning_Id,                    Id, 0);
+        prep.setProperty( ptagTuning_scale,                 sPrep->getTuning(), 0);
+        prep.setProperty( ptagTuning_fundamental,           sPrep->getFundamental(), 0);
+        prep.setProperty( ptagTuning_offset,                sPrep->getFundamentalOffset(), 0 );
+        prep.setProperty( ptagTuning_adaptiveIntervalScale, sPrep->getAdaptiveIntervalScale(), 0 );
+        prep.setProperty( ptagTuning_adaptiveInversional,   sPrep->getAdaptiveInversional(), 0 );
+        prep.setProperty( ptagTuning_adaptiveAnchorScale,   sPrep->getAdaptiveAnchorScale(), 0 );
+        prep.setProperty( ptagTuning_adaptiveAnchorFund,    sPrep->getAdaptiveAnchorFundamental(), 0 );
+        prep.setProperty( ptagTuning_adaptiveClusterThresh, (int)sPrep->getAdaptiveClusterThresh(), 0 );
+        prep.setProperty( ptagTuning_adaptiveHistory,       sPrep->getAdaptiveHistory(), 0 );
         
-        ValueTree scale("customScale");
+        ValueTree scale( vtagTuning_customScale);
         int count = 0;
-        for (auto note : sPrep->getCustomScale()) scale.setProperty("f"+String(count++), note, 0 );
+        for (auto note : sPrep->getCustomScale()) scale.setProperty( ptagTuning_scaleDeg + String(count++), note, 0 );
         prep.addChild(scale, -1, 0);
         
         return prep;
