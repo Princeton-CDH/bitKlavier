@@ -242,7 +242,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
         //get time until next beat => beat length scaled by beatMultiplier parameter
         numSamplesBeat =    beatThresholdSamples *
                             active->getBeatMultipliers()[beatMultiplierCounter] *
-                            general->getTempoDivider() *
+                            general->getPeriodMultiplier() *
                             adaptiveTempoPeriodMultiplier;
         
         //check to see if enough time has passed for next beat
@@ -316,7 +316,7 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
         if (++myBeat >= active->getBeatMultipliers().size()) myBeat = 0;
         timeToReturn += active->getBeatMultipliers()[myBeat] *
                         beatThresholdSamples *
-                        general->getTempoDivider() *
+                        general->getPeriodMultiplier() *
                         adaptiveTempoPeriodMultiplier;
     }
     
