@@ -324,16 +324,7 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
 }
 
 
-/*
- //Adaptive Tempo 1
- inline AdaptiveTempo1Mode getAdaptiveTempo1Mode(void)   {return at1Mode;   }
- inline int getAdaptiveTempo1History(void)               {return at1History;}
- inline float getAdaptiveTempo1Subdivisions(void)        {return at1Subdivisions;}
- inline float getAdaptiveTempo1Min(void)                 {return at1Min;}
- inline float getAdaptiveTempo1Max(void)                 {return at1Max;}
- 
- */
-
+//adaptive tempo functions
 void SynchronicProcessor::atNewNote()
 {
     if(active->getAdaptiveTempo1Mode() == TimeBetweenNotes) atCalculatePeriodMultiplier();
@@ -345,6 +336,7 @@ void SynchronicProcessor::atNewNoteOff()
     if(active->getAdaptiveTempo1Mode() == NoteLength) atCalculatePeriodMultiplier();
 }
 
+//really basic, using constrained moving average of time-between-notes (or note-length)
 void SynchronicProcessor::atCalculatePeriodMultiplier()
 {
     //only do if history val is > 0
