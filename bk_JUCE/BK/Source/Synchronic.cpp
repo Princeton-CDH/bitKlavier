@@ -29,6 +29,15 @@ tuner(active->getTuning()->processor)
     clusterTimer = 0;
     phasor = 0;
     
+    atTimer = 0;
+    atLastTime = 0;
+    atDeltaHistory.ensureStorageAllocated(10);
+    for (int i = 0; i < 10; i++)
+    {
+        atDeltaHistory.insert(0, (60000.0/active->getTempo()));
+    }
+    adaptiveTempoPeriodMultiplier = 1.;
+    
     inCluster = false;
     
     cluster = Array<int>();
@@ -108,6 +117,9 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     //add note to array of depressed notes
     keysDepressed.addIfNotAlreadyThere(noteNumber);
     
+    //add to adaptive tempo history, update adaptive tempo
+    atNewNote();
+    
     //silence pulses if in NoteOffSync
     if(    (active->getMode() == LastNoteOffSync)
         || (active->getMode() == AnyNoteOffSync))
@@ -175,6 +187,9 @@ void SynchronicProcessor::keyReleased(int noteNumber, int channel)
     //remove key from array of pressed keys
     keysDepressed.removeAllInstancesOf(noteNumber);
     
+    //adaptive tempo
+    atNewNoteOff();
+    
     // If AnyNoteOffSync mode, reset phasor and multiplier indices.
     //only initiate pulses if ALL keys are released
     if (    (active->getMode() == LastNoteOffSync && keysDepressed.size() == 0)
@@ -194,6 +209,9 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
     
     //adaptive tuning timer update
     tuner->incrementAdaptiveClusterTime(numSamples);
+    
+    //adaptive tempo timer update
+    atTimer += numSamples;
     
     //need to do this every block?
     clusterThresholdSamples = (active->getClusterThreshSEC() * sampleRate);
@@ -224,8 +242,8 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
         //get time until next beat => beat length scaled by beatMultiplier parameter
         numSamplesBeat =    beatThresholdSamples *
                             active->getBeatMultipliers()[beatMultiplierCounter] *
-                            general->getTempoDivider();
-                            // * adaptiveTempoMultiplier or adaptiveTempoDivider
+                            general->getTempoDivider() *
+                            adaptiveTempoPeriodMultiplier;
         
         //check to see if enough time has passed for next beat
         if (phasor >= numSamplesBeat)
@@ -289,16 +307,16 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
     uint64 timeToReturn = numSamplesBeat - phasor; //next beat
     int myBeat = beatMultiplierCounter;
     
-    //tolerance: if key release happens just before beat (10ms) then add a beatToSkip
-    if (timeToReturn < .01 * sampleRate) beatsToSkip++;
+    //tolerance: if key release happens just before beat (<30ms) then add a beatToSkip
+    if (timeToReturn < .03 * sampleRate) beatsToSkip++;
     
     while(beatsToSkip-- > 0)
     {
         if (++myBeat >= active->getBeatMultipliers().size()) myBeat = 0;
         timeToReturn += active->getBeatMultipliers()[myBeat] *
                         beatThresholdSamples *
-                        general->getTempoDivider();
-                        //*adaptiveTempoDivider;
+                        general->getTempoDivider() *
+                        adaptiveTempoPeriodMultiplier;
     }
     
     DBG("time in ms to next beat = " + std::to_string(timeToReturn * 1000./sampleRate));
@@ -306,7 +324,48 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
 }
 
 
+//adaptive tempo functions
+void SynchronicProcessor::atNewNote()
+{
+    if(active->getAdaptiveTempo1Mode() == TimeBetweenNotes) atCalculatePeriodMultiplier();
+    atLastTime = atTimer;
+}
 
-    
+void SynchronicProcessor::atNewNoteOff()
+{
+    if(active->getAdaptiveTempo1Mode() == NoteLength) atCalculatePeriodMultiplier();
+}
+
+//really basic, using constrained moving average of time-between-notes (or note-length)
+void SynchronicProcessor::atCalculatePeriodMultiplier()
+{
+    //only do if history val is > 0
+    if(active->getAdaptiveTempo1History()) {
+        
+        atDelta = (atTimer - atLastTime) / (0.001 * sampleRate);
+        //DBG("atDelta = " + String(atDelta));
+        
+        //constrain be min and max times between notes
+        if(atDelta > active->getAdaptiveTempo1Min() && atDelta < active->getAdaptiveTempo1Max()) {
+            
+            //insert delta at beginning of history
+            atDeltaHistory.insert(0, atDelta);
+            
+            //eliminate oldest time difference
+            atDeltaHistory.resize(active->getAdaptiveTempo1History());
+            
+            //calculate moving average and then tempo period multiplier
+            int totalDeltas = 0;
+            for(int i = 0; i < atDeltaHistory.size(); i++) totalDeltas += atDeltaHistory.getUnchecked(i);
+            float movingAverage = totalDeltas / active->getAdaptiveTempo1History();
+            
+            adaptiveTempoPeriodMultiplier = movingAverage /
+                                            (beatThresholdSamples / (0.001 * sampleRate)) /
+                                            active->getAdaptiveTempo1Subdivisions();
+            
+            DBG("adaptiveTempoPeriodMultiplier = " + String(adaptiveTempoPeriodMultiplier));
+        }
+    }
+}
 
 

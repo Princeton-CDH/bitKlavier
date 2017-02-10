@@ -105,6 +105,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
                      duration,                                      // length
                      3,
                      aRampUndertowCrossMS );                        //ramp off
+                    //actually, should check to see if undertow is > 0, otherwise use shorter rampOff
         
         
         // turn note length timers off
