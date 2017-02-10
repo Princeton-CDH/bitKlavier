@@ -257,7 +257,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             if (++accentMultiplierCounter   >= active->getAccentMultipliers().size())     accentMultiplierCounter = 0;
             if (++transpOffsetCounter       >= active->getTranspOffsets().size())         transpOffsetCounter = 0;
             
-            /*
+            
             //update display of counters in UI
             DBG(" length: "         + String(active->getLengthMultipliers()[lengthMultiplierCounter]) +
                 " length counter:"  + String(lengthMultiplierCounter) +
@@ -266,13 +266,14 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 " transp: "         + String(active->getTranspOffsets()[transpOffsetCounter]) +
                 " transp counter: " + String(transpOffsetCounter)
                 );
-            */
+            
             
             //play all the notes in the cluster, with current parameter vals
             if (cluster.size() >= active->getClusterMin() && cluster.size() <= active->getClusterMax())
             {
                 for (int n = 0; n < slimCluster.size(); n++)
                 {
+                    DBG("clustervel: "+String(velocities.getUnchecked(cluster[n])));
                     playNote(channel,
                              cluster[n],
                              velocities.getUnchecked(cluster[n]) * active->getAccentMultipliers()[accentMultiplierCounter]);

@@ -136,6 +136,8 @@ public:
 private:
     int  currentPianoId;
     
+    double bkSampleRate;
+    
     bool didLoadHammersAndRes, didLoadMainPianoSamples;
     
     void loadMainPianoSamples(BKSynthesiser *synth, int numLayers);

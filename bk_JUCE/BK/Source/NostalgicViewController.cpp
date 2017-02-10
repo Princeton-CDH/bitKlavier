@@ -239,10 +239,17 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         if (type == BKParameter)
         {
-            prep    ->setSyncTarget(i);
-            prep    ->setSyncTargetProcessor(processor.getSynchronicProcessor(i));
-            active  ->setSyncTarget(i);
-            active  ->setSyncTargetProcessor(processor.getSynchronicProcessor(i));
+            if (i <= processor.synchronic.size()-1)
+            {
+                prep    ->setSyncTarget(i);
+                prep    ->setSyncTargetProcessor(processor.getSynchronicProcessor(i));
+                active  ->setSyncTarget(i);
+                active  ->setSyncTargetProcessor(processor.getSynchronicProcessor(i));
+            }
+            else
+            {
+                nostalgicTF[NostalgicSyncTarget]->undo();
+            }
         }
         else    //BKModification
         {

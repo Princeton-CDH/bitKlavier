@@ -138,28 +138,38 @@ String PreparationMapViewController::processPreparationString(String s)
                 {
                     int prep = temp.getIntValue();
                     
-                    sync.add(processor.synchronic[prep]);
+                    if (prep <= processor.synchronic.size()-1)
+                    {
+                        sync.add(processor.synchronic[prep]);
+                        
+                        out.append("S", 1);
+                        out.append(String(prep), 3);
+                    }
                     
-                    out.append("S", 1);
-                    out.append(String(prep), 3);
                 }
                 else if (type == PreparationTypeNostalgic)
                 {
                     int prep = temp.getIntValue();
                     
-                    nost.add(processor.nostalgic[prep]);
+                    if (prep <= processor.nostalgic.size()-1)
+                    {
+                        nost.add(processor.nostalgic[prep]);
                     
-                    out.append("N", 1);
-                    out.append(String(prep), 3);
+                        out.append("N", 1);
+                        out.append(String(prep), 3);
+                    }
                 }
                 else if (type == PreparationTypeDirect)
                 {
                     int prep = temp.getIntValue();
                     
-                    dire.add(processor.direct[prep]);
+                    if (prep <= processor.direct.size()-1)
+                    {
+                        dire.add(processor.direct[prep]);
                     
-                    out.append("D", 1);
-                    out.append(String(prep), 3);
+                        out.append("D", 1);
+                        out.append(String(prep), 3);
+                    }
                 }
                 
                 out.append(" ", 1);
@@ -207,7 +217,7 @@ void PreparationMapViewController::bkTextFieldDidChange(TextEditor& tf)
     }
     else if (name == cPrepMapParameterTypes[PrepMapPreparationId])
     {
-        DBG("Preparations: " + processPreparationString(text));
+        tf.setText(processPreparationString(text));
     }
     else
     {

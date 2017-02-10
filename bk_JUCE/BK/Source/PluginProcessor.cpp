@@ -47,13 +47,18 @@ resonanceReleaseSynth   (general)
     }
     
     // Start with one of each kind of preparation.
-    addTuning(); // always create first tuning first
-    addSynchronic();
-    addNostalgic();
-    addDirect();
+    for (int i = 0; i < 2; i++)
+    {
+        addTuning(); // always create first tuning first
+        addSynchronic();
+        addNostalgic();
+        addDirect();
+        
+        nostalgic[i]->sPrep->setSyncTargetProcessor(synchronic[0]->processor);
+        nostalgic[i]->aPrep->setSyncTargetProcessor(synchronic[0]->processor);
+    }
     
-    nostalgic[0]->sPrep->setSyncTargetProcessor(synchronic[0]->processor);
-    nostalgic[0]->aPrep->setSyncTargetProcessor(synchronic[0]->processor);
+    
     
     for (int i = 0; i < aMaxTotalPreparations; i++)
     {
@@ -89,12 +94,14 @@ void BKAudioProcessor::addSynchronic(void)
 {
     int numSynchronic = synchronic.size();
     synchronic.add(new Synchronic(&mainPianoSynth, tuning[0], general, numSynchronic));
+    synchronic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 void BKAudioProcessor::addNostalgic(void)
 {
     int numNostalgic = nostalgic.size();
     nostalgic.add(new Nostalgic(&mainPianoSynth, tuning[0], numNostalgic));
+    nostalgic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 void BKAudioProcessor::addTuning(void)
@@ -107,6 +114,7 @@ void BKAudioProcessor::addDirect(void)
 {
     int numDirect = direct.size();
     direct.add(new Direct(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, tuning[0], numDirect));
+    direct.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 
@@ -219,9 +227,9 @@ void BKAudioProcessor::loadGallery(void)
                 }
                 else if (e->hasTagName( vtagTuningPrep + String(tPrepCount)))
                 {
-                    int id = tPrepCount++;
+                    addTuning();
                     
-                    tuning.set(id, new Tuning(id));
+                    int id = tuning.size() - 1;
                     
                     i = e->getStringAttribute( ptagTuning_scale).getIntValue();
                     tuning[id]->sPrep->setTuning((TuningSystem)i);
@@ -275,13 +283,13 @@ void BKAudioProcessor::loadGallery(void)
                     // copy static to active
                     tuning[id]->aPrep->copy( tuning[id]->sPrep);
                     
+                    ++tPrepCount;
                 }
                 else if (e->hasTagName( vtagDirectPrep + String(dPrepCount)))
                 {
-                    int id = dPrepCount++;
+                    addDirect();
                     
-                    direct.set(id, new Direct(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth,
-                                           tuning[0], id));
+                    int id = direct.size()-1;
                     
                     i = e->getStringAttribute(ptagDirect_tuning).getIntValue();
                     direct[id]->sPrep->setTuning(tuning[i]);
@@ -301,12 +309,13 @@ void BKAudioProcessor::loadGallery(void)
                     // copy static to active
                     direct[id]->aPrep->copy(direct[id]->sPrep);
                     
+                    ++dPrepCount;
                 }
                 else if (e->hasTagName( vtagSynchronicPrep + String(sPrepCount)))
                 {
-                    int id = sPrepCount++;
+                    addSynchronic();
                     
-                    synchronic.set(id, new Synchronic(&mainPianoSynth, tuning[0], general, id)); // why general?
+                    int id = synchronic.size() - 1;
                     
                     i = e->getStringAttribute(ptagSynchronic_tuning).getIntValue();
                     synchronic[id]->sPrep->setTuning(tuning[i]);
@@ -407,9 +416,9 @@ void BKAudioProcessor::loadGallery(void)
                         else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
                         {
                             Array<float> transp;
-                            for (int k = 0; k < 128; k++)
+                            for (int k = 0; k < 128; i++)
                             {
-                                String attr = sub->getStringAttribute(ptagFloat + String(k));
+                                String attr = sub->getStringAttribute(ptagFloat + String(i));
                                 
                                 if (attr == String::empty) break;
                                 else
@@ -425,13 +434,14 @@ void BKAudioProcessor::loadGallery(void)
                     
                     synchronic[id]->aPrep->copy(synchronic[id]->sPrep);
                     
+                    ++sPrepCount;
+                    
                 }
                 else if (e->hasTagName( vtagNostalgicPrep + String(nPrepCount)))
                 {
-
-                    int id = nPrepCount++;
+                    addNostalgic();
                     
-                    nostalgic.set   (id, new Nostalgic(&mainPianoSynth, tuning[0], id));
+                    int id = nostalgic.size() - 1;
                     
                     i = e->getStringAttribute(ptagNostalgic_tuning).getIntValue();
                     nostalgic[id]->sPrep->setTuning(tuning[i]);
@@ -464,7 +474,8 @@ void BKAudioProcessor::loadGallery(void)
                     nostalgic[id]->aPrep->setSyncTargetProcessor(synchronic[i]->processor);
                     
                     nostalgic[id]->aPrep->copy(nostalgic[id]->sPrep);
-
+                    
+                    ++nPrepCount;
                 }
 #if 0
                 else if (e->hasTagName( vtagPiano + String(pianoCount)))
@@ -546,9 +557,16 @@ void BKAudioProcessor::loadGallery(void)
             }
         }
         
+        
+        for (int k = synchronic.size(); --k >= 0;)  synchronic[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
+        for (int k = nostalgic.size(); --k >= 0;)   nostalgic[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
+        for (int k = direct.size(); --k >= 0;)      direct[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
+        
+        updateUI();
+        
     }
     
-    updateUI();
+    
 }
 
 void BKAudioProcessor::updateUI(void)
@@ -824,6 +842,7 @@ BKAudioProcessor::~BKAudioProcessor()
 //==============================================================================
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    bkSampleRate = sampleRate;
     
     mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
     hammerReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
@@ -832,9 +851,9 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     for (int i = aMaxNumPianos; --i >= 0;)
         bkPianos[i]->prepareToPlay(sampleRate);
 
-    synchronic[0]->processor->setCurrentPlaybackSampleRate(sampleRate);
-    nostalgic[0]->processor->setCurrentPlaybackSampleRate(sampleRate);
-    direct[0]->processor->setCurrentPlaybackSampleRate(sampleRate);
+    for (int i = synchronic.size(); --i >= 0;)  synchronic[i]->processor->setCurrentPlaybackSampleRate(sampleRate);
+    for (int i = nostalgic.size(); --i >= 0;)   nostalgic[i]->processor->setCurrentPlaybackSampleRate(sampleRate);
+    for (int i = direct.size(); --i >= 0;)      direct[i]->processor->setCurrentPlaybackSampleRate(sampleRate);
     
 }
 
