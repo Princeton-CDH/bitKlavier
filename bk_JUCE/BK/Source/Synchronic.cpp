@@ -34,7 +34,7 @@ tuner(active->getTuning()->processor)
     atDeltaHistory.ensureStorageAllocated(10);
     for (int i = 0; i < 10; i++)
     {
-        atDeltaHistory.insert(0, 0.5 * (active->getAdaptiveTempo1Min() + active->getAdaptiveTempo1Max()));
+        atDeltaHistory.insert(0, (60000.0/active->getTempo()));
     }
     adaptiveTempoPeriodMultiplier = 1.;
     
