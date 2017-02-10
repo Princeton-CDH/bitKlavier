@@ -95,10 +95,10 @@ public:
     sBeatThreshSec(60.0/sTempo),
     sClusterThresh(500),
     sClusterThreshSec(.001 * sClusterThresh),
-    at1History(1),
+    at1History(0),
     at1Min(100),
     at1Max(2000),
-    at1Subdivisions(4.0f),
+    at1Subdivisions(1.0f),
     at1Mode(TimeBetweenNotes),
     tuning(t)
     {
@@ -149,7 +149,7 @@ public:
     inline float getAdaptiveTempo1Subdivisions(void)        {return at1Subdivisions;}
     inline float getAdaptiveTempo1Min(void)                 {return at1Min;}
     inline float getAdaptiveTempo1Max(void)                 {return at1Max;}
-    
+
     
     inline void setTempo(float tempo)
     {
@@ -177,10 +177,10 @@ public:
     
     //Adaptive Tempo 1
     inline void setAdaptiveTempo1Mode(AdaptiveTempo1Mode mode)          {at1Mode = mode;    }
-    inline void setAdaptiveTempo1History(int hist)      {at1History = hist;}
-    inline void setAdaptiveTempo1Subdivisions(float sub)      {at1Subdivisions = sub;}
-    inline void setAdaptiveTempo1Min(float min)      {at1Min = min;}
-    inline void setAdaptiveTempo1Max(float max)      {at1Max = max;}
+    inline void setAdaptiveTempo1History(int hist)                      {at1History = hist;}
+    inline void setAdaptiveTempo1Subdivisions(float sub)                {at1Subdivisions = sub;}
+    inline void setAdaptiveTempo1Min(float min)                         {at1Min = min;}
+    inline void setAdaptiveTempo1Max(float max)                         {at1Max = max;}
     
     inline const Tuning::Ptr getTuning() const noexcept      {return tuning; }
     inline void setTuning(Tuning::Ptr t)                       {tuning = t;  }
@@ -219,7 +219,7 @@ private:
     Array<float> sTranspOffsets;        //transpose by these
 
     float sBeatThreshSec;      //length of time between pulses, as set by temp
-    float sClusterThresh;       //max time between played notes before new cluster is started, in MS
+    float sClusterThresh;      //max time between played notes before new cluster is started, in MS
     float sClusterThreshSec;
     
     // Adaptive Tempo 1
@@ -423,6 +423,16 @@ private:
     uint64 phasor;
     uint64 numSamplesBeat;          // = beatThresholdSamples * beatMultiplier
     uint64 beatThresholdSamples;    // # samples in a beat, as set by tempo
+
+    //adaptive tempo stuff
+    uint64 atTimer, atLastTime; //in samples
+    int atDelta;                //in ms
+    Array<int> atDeltaHistory;  //in ms
+    void atNewNote();
+    void atNewNoteOff();
+    void atCalculatePeriodMultiplier();
+    float adaptiveTempoPeriodMultiplier;
+
 
     bool shouldPlay;
     
