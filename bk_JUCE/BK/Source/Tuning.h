@@ -120,6 +120,11 @@ public:
     inline void setAdaptiveHistory(int adaptiveHistory)                             {tAdaptiveHistory = adaptiveHistory;                    }
     inline void setCustomScale(Array<float> tuning)                                 {tCustom = tuning;                                      }
     
+    inline void setCustomScaleCents(Array<float> tuning)                            {
+        tCustom = tuning;
+        for(int i=0; i<tCustom.size(); i++) tCustom.setUnchecked(i, tCustom.getUnchecked(i) * 0.01);
+    }
+    
     void print(void)
     {
         DBG("tWhichTuning: " +                  String(tWhichTuning));

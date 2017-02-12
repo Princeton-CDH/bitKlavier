@@ -43,7 +43,8 @@ float TuningProcessor::getOffset(int midiNoteNumber) const
     if(active->getTuning() == CustomTuning) currentTuning = active->getCustomScale();
     else currentTuning = tuningLibrary.getUnchecked(active->getTuning());
     
-    return (currentTuning[(midiNoteNumber - active->getFundamental()) % 12] + active->getFundamentalOffset());
+    //return (currentTuning[(midiNoteNumber - active->getFundamental()) % 12] + active->getFundamentalOffset());
+    return (currentTuning[(midiNoteNumber - active->getFundamental()) % currentTuning.size()] + active->getFundamentalOffset());
     
 }
 
@@ -83,7 +84,7 @@ void TuningProcessor::keyOn(int midiNoteNumber)
             
             const Array<float> anchorTuning = tuningLibrary.getUnchecked(active->getAdaptiveAnchorScale());
             adaptiveFundamentalFreq = mtof(midiNoteNumber +
-                                           anchorTuning[(midiNoteNumber + active->getAdaptiveAnchorFundamental()) % 12]
+                                           anchorTuning[(midiNoteNumber + active->getAdaptiveAnchorFundamental()) % anchorTuning.size()]
                                            );
             adaptiveFundamentalNote = midiNoteNumber;
         }
@@ -107,14 +108,14 @@ float TuningProcessor::adaptiveCalculateRatio(const int midiNoteNumber) const
         
         while((tempnote - adaptiveFundamentalNote) < 0) tempnote += 12;
     
-        newnote = midiNoteNumber + intervalScale[(tempnote - adaptiveFundamentalNote) % 12];
+        newnote = midiNoteNumber + intervalScale[(tempnote - adaptiveFundamentalNote) % intervalScale.size()];
         newratio = intervalToRatio(newnote - adaptiveFundamentalNote);
         
         return newratio;
         
     }
     //else
-    newnote = midiNoteNumber - intervalScale[(adaptiveFundamentalNote - tempnote) % 12];
+    newnote = midiNoteNumber - intervalScale[(adaptiveFundamentalNote - tempnote) % intervalScale.size()];
     newratio = intervalToRatio(newnote - adaptiveFundamentalNote);
     
     return newratio;

@@ -256,8 +256,9 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         if (type == BKParameter)
         {
-            prep->setCustomScale( stringToFloatArray(text));
-            active->setCustomScale( stringToFloatArray(text));
+            //UI is in cents, internally represented as fractions of MIDI note value
+            prep->setCustomScaleCents( stringToFloatArray(text));
+            active->setCustomScaleCents( stringToFloatArray(text));
         }
         else    //BKModification
         {
