@@ -38,6 +38,13 @@ float TuningProcessor::getOffset(int midiNoteNumber) const
     if(active->getTuning() == AdaptiveTuning || active->getTuning() == AdaptiveAnchoredTuning)
         return adaptiveCalculate(midiNoteNumber);
     
+    //do absolute tuning if using
+    if(active->getTuning() == AbsoluteTuning)
+    {
+        Array<float> offsets = active->getAbsoluteOffsets();
+        return offsets.getUnchecked(midiNoteNumber);
+    }
+
     //else do regular tunings
     Array<float> currentTuning;
     if(active->getTuning() == CustomTuning) currentTuning = active->getCustomScale();

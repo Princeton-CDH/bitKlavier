@@ -20,17 +20,13 @@
 #include "AudioConstants.h"
 
 String          intArrayToString(Array<int> arr);
-
 String          floatArrayToString(Array<float> arr);
-
 Array<int>      stringToIntArray(String s);
-
 Array<int>      keymapStringToIntArray(String s);
-
 Array<float>    stringToFloatArray(String s);
+Array<float>    stringOrderedPairsToFloatArray(String s, int size);
 
 double          mtof(double f);
-
 double          ftom(double f);
 
 BKParameterDataType getBKDataType ( SynchronicParameterType param);

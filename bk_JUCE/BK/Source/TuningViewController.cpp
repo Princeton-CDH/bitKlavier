@@ -265,6 +265,19 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
             mod->setParam(TuningCustomScale, text);
         }
     }
+    else if (name == cTuningParameterTypes[TuningAbsoluteOffsets])
+    {
+        if (type == BKParameter)
+        {
+            //UI is in cents, internally represented as fractions of MIDI note value
+            prep->setAbsoluteOffsetCents(stringOrderedPairsToFloatArray(text, 128));
+            active->setAbsoluteOffsetCents(stringOrderedPairsToFloatArray(text, 128));
+        }
+        else    //BKModification
+        {
+            mod->setParam(TuningCustomScale, text);
+        }
+    }
     else
     {
         DBG("Unregistered text field.");

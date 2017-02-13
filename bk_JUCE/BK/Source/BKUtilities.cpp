@@ -327,6 +327,105 @@ Array<float> stringToFloatArray(String s)
     return arr;
 }
 
+
+//takes string of ordered pairs in the form x1:y1 x2:y2
+//and converts into Array of floats of y, with indices x
+Array<float> stringOrderedPairsToFloatArray(String s, int size)
+{
+    
+    String tempInt = "";
+    String tempFloat = "";
+    
+    String::CharPointerType c = s.getCharPointer();
+    
+    juce_wchar colon = ':';
+    juce_wchar dash = '-';
+    juce_wchar prd = '.';
+
+    bool isNumber = false;
+    bool isColon  = false;
+    bool isSpace = false;
+    bool isDash = false;
+    bool isPeriod = false;
+
+    bool inInt = false;
+    bool inFloat = false;
+    
+    bool previousColon = false;
+    bool previousSpace = true;
+    
+    bool isEndOfString = false;
+    
+    int newindex = 0;
+    float newval = 0.;
+    
+    Array<float> newarray;
+    newarray.ensureStorageAllocated(size);
+    for(int i=0;i<size;i++) newarray.set(i, 0.);
+    
+    for (int i = 0; i < (s.length()+1); i++)
+    {
+        juce_wchar c1 = c.getAndAdvance();
+        
+        isColon     = !CharacterFunctions::compare(c1, colon);
+        isNumber    = CharacterFunctions::isDigit(c1);
+        isSpace     = CharacterFunctions::isWhitespace(c1);
+        isDash      = !CharacterFunctions::compare(c1, dash);
+        isPeriod    = !CharacterFunctions::compare(c1, prd);
+        if (i==s.length()) isEndOfString = true;
+        
+        //numbers
+        if(isNumber && previousSpace) //beginning index read
+        {
+            inInt = true;
+            tempInt += c1;
+        }
+        else if(isNumber && inInt) //still reading index
+        {
+            tempInt += c1;
+        }
+        else if( (isNumber && previousColon) || isDash || isPeriod ) //beginning val read
+        {
+            inFloat = true;
+            tempFloat += c1;
+        }
+        else if(isNumber && inFloat) //still reading float val
+        {
+            tempFloat += c1;
+        }
+        
+        //colons and spaces
+        if(isColon)
+        {
+            previousColon = true;
+            inInt = false;
+            inFloat = false;
+            
+            newindex = tempInt.getIntValue();
+            tempInt = "";
+        }
+        else previousColon = false;
+        
+        if(isSpace || isEndOfString)
+        {
+            previousSpace = true;
+            inInt = false;
+            inFloat = false;
+            
+            newval = tempFloat.getFloatValue();
+            tempFloat = "";
+            
+            //DBG("new array index and value " + String(newindex) + " " + String(newval));
+            
+            newarray.insert(newindex, newval);
+        }
+        else previousSpace = false;
+        
+    }
+    
+    return newarray;
+}
+
 // the following 2 functions are
 // lifted from  PD source
 // specifically x_acoustics.c
