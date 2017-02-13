@@ -34,9 +34,10 @@ public:
     tAdaptiveAnchorFundamental(p->getAdaptiveAnchorFundamental()),
     tAdaptiveClusterThresh(p->getAdaptiveClusterThresh()),
     tAdaptiveHistory(p->getAdaptiveHistory()),
-    tCustom(p->getCustomScale())
+    tCustom(p->getCustomScale()),
+    tAbsolute(p->getAbsoluteOffsets())
     {
-        
+
     }
     
     inline void copy(TuningPreparation::Ptr p)
@@ -51,6 +52,7 @@ public:
         tAdaptiveClusterThresh = p->getAdaptiveClusterThresh();
         tAdaptiveHistory = p->getAdaptiveHistory();
         tCustom = p->getCustomScale();
+        tAbsolute = p->getAbsoluteOffsets();
     }
     
     TuningPreparation(TuningSystem whichTuning,
@@ -74,7 +76,8 @@ public:
     tAdaptiveHistory(adaptiveHistory),
     tCustom(customScale)
     {
-        
+        tAbsolute.ensureStorageAllocated(128);
+        for(int i=0; i<128; i++) tAbsolute.set(i, 0.);
     }
     
     TuningPreparation(void):
@@ -89,7 +92,8 @@ public:
     tAdaptiveHistory(4),
     tCustom({0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.})
     {
-        
+        tAbsolute.ensureStorageAllocated(128);
+        for(int i=0; i<128; i++) tAbsolute.set(i, 0.);
     }
     
     ~TuningPreparation()
@@ -107,11 +111,13 @@ public:
     inline const uint64 getAdaptiveClusterThresh() const noexcept           {return tAdaptiveClusterThresh;     }
     inline const int getAdaptiveHistory() const noexcept                    {return tAdaptiveHistory;           }
     inline const Array<float> getCustomScale() const noexcept               {return tCustom;                    }
+    inline const Array<float> getAbsoluteOffsets() const noexcept           {return tAbsolute;                  }
+    float getAbsoluteOffset(int midiNoteNumber) const noexcept {return tAbsolute.getUnchecked(midiNoteNumber);}
     
     
     inline void setTuning(TuningSystem tuning)                                      {tWhichTuning = tuning;                                 }
     inline void setFundamental(PitchClass fundamental)                              {tFundamental = fundamental;                            }
-    inline void setFundamentalOffset(float offset)                                  {tFundamentalOffset = offset;                            }
+    inline void setFundamentalOffset(float offset)                                  {tFundamentalOffset = offset;                           }
     inline void setAdaptiveIntervalScale(TuningSystem adaptiveIntervalScale)        {tAdaptiveIntervalScale = adaptiveIntervalScale;        }
     inline void setAdaptiveInversional(bool adaptiveInversional)                    {tAdaptiveInversional = adaptiveInversional;            }
     inline void setAdaptiveAnchorScale(TuningSystem adaptiveAnchorScale)            {tAdaptiveAnchorScale = adaptiveAnchorScale;            }
@@ -119,6 +125,18 @@ public:
     inline void setAdaptiveClusterThresh(uint64 adaptiveClusterThresh)              {tAdaptiveClusterThresh = adaptiveClusterThresh;        }
     inline void setAdaptiveHistory(int adaptiveHistory)                             {tAdaptiveHistory = adaptiveHistory;                    }
     inline void setCustomScale(Array<float> tuning)                                 {tCustom = tuning;                                      }
+    inline void setAbsoluteOffsets(Array<float> abs)                                {tAbsolute = abs;                                       }
+    
+    inline void setCustomScaleCents(Array<float> tuning) {
+        tCustom = tuning;
+        for(int i=0; i<tCustom.size(); i++) tCustom.setUnchecked(i, tCustom.getUnchecked(i) * 0.01f);
+    }
+    
+    inline void setAbsoluteOffsetCents(Array<float> abs) {
+        tAbsolute = abs;
+        for(int i=tAbsolute.size(); --i >= 0;)
+            tAbsolute.setUnchecked(i, tAbsolute.getUnchecked(i) * 0.01f);
+    }
     
     void print(void)
     {
@@ -132,6 +150,7 @@ public:
         DBG("tAdaptiveClusterThresh: " +        String(tAdaptiveClusterThresh));
         DBG("tAdaptiveHistory: " +              String(tAdaptiveHistory));
         DBG("tCustom: " +                       floatArrayToString(tCustom));
+        DBG("tAbsolute: " +                     floatArrayToString(tAbsolute));
     }
 private:
     // basic tuning settings, for static tuning
@@ -149,9 +168,10 @@ private:
     uint64          tAdaptiveClusterThresh;     //ms; max time before fundamental is reset
     int             tAdaptiveHistory;           //cluster max; max number of notes before fundamental is reset
     
-    // custom scale
+    // custom scale and absolute offsets
     Array<float>    tCustom = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}; //custom scale
-    
+    Array<float>    tAbsolute;  //offset (in MIDI fractional offsets, like other tunings) for specific notes; size = 128
+        
     JUCE_LEAK_DETECTOR(TuningPreparation);
 };
 
@@ -177,6 +197,7 @@ public:
      TuningA1ClusterThresh,
      TuningA1History,
      TuningCustomScale,
+     TuningAbsoluteOffsets
      */
     
     TuningModPreparation(TuningPreparation::Ptr p)
@@ -193,6 +214,7 @@ public:
         param.set(TuningA1ClusterThresh, String(p->getAdaptiveClusterThresh()));
         param.set(TuningA1History, String(p->getAdaptiveHistory()));
         param.set(TuningCustomScale, floatArrayToString(p->getCustomScale()));
+        param.set(TuningAbsoluteOffsets, floatArrayToString(p->getAbsoluteOffsets()));
         
     }
     
@@ -209,6 +231,7 @@ public:
         param.set(TuningA1ClusterThresh, "");
         param.set(TuningA1History, "");
         param.set(TuningCustomScale, "");
+        param.set(TuningAbsoluteOffsets, "");
     }
     
     
@@ -229,6 +252,7 @@ public:
         param.set(TuningA1ClusterThresh, String(p->getAdaptiveClusterThresh()));
         param.set(TuningA1History, String(p->getAdaptiveHistory()));
         param.set(TuningCustomScale, floatArrayToString(p->getCustomScale()));
+        param.set(TuningAbsoluteOffsets, offsetArrayToString(p->getAbsoluteOffsets()));
     }
     
     
@@ -366,8 +390,15 @@ public:
         
         ValueTree scale( vtagTuning_customScale);
         int count = 0;
-        for (auto note : sPrep->getCustomScale()) scale.setProperty( ptagTuning_scaleDeg + String(count++), note, 0 );
+        for (auto note : sPrep->getCustomScale())
+            scale.setProperty( ptagFloat + String(count++), note, 0 );
         prep.addChild(scale, -1, 0);
+        
+        ValueTree absolute( vTagTuning_absoluteOffsets);
+        count = 0;
+        for (auto note : sPrep->getAbsoluteOffsets())
+            absolute.setProperty( ptagFloat + String(count++), note, 0 );
+        prep.addChild(absolute, -1, 0);
         
         return prep;
     }

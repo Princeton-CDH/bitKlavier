@@ -131,7 +131,7 @@ void BKAudioProcessor::loadGallery(void)
     Array<float> fa;
     Array<int> fi;
 
-    int pianoCount = 0, sPrepCount = 1, nPrepCount = 1, dPrepCount = 1, tPrepCount = 1, keymapCount = 2;
+    int pianoCount = 0, sPrepCount = 1, nPrepCount = 1, dPrepCount = 1, tPrepCount = 1, keymapCount = 1;
     
     if (myChooser.browseForFileToOpen())
     {
@@ -160,15 +160,12 @@ void BKAudioProcessor::loadGallery(void)
             //modTuning.clearQuick();
             
             bkKeymaps.clearQuick();
-            //bkPianos.clearQuick();
+            bkPianos.clearQuick();
+            
+           
             /* * * * * * * * * * * * * * */
             
             bkKeymaps.set(0, new Keymap(0));
-            bkKeymaps.set(1, new Keymap(1));
-            
-           
-            
-            for (int k = 0; k < 128; k++) bkKeymaps[1]->addNote(k); //init first keymap
             
             // iterate through its sub-elements
             forEachXmlChildElement (*xml, e)
@@ -266,7 +263,7 @@ void BKAudioProcessor::loadGallery(void)
                             Array<float> scale;
                             for (int k = 0; k < 128; k++)
                             {
-                                String attr = sub->getStringAttribute(ptagTuning_scaleDeg + String(k));
+                                String attr = sub->getStringAttribute(ptagFloat + String(k));
                                 
                                 if (attr == String::empty) break;
                                 else
@@ -277,6 +274,23 @@ void BKAudioProcessor::loadGallery(void)
                             }
                             
                             tuning[id]->sPrep->setCustomScale(scale);
+                        }
+                        else if (sub->hasTagName(vTagTuning_absoluteOffsets))
+                        {
+                            Array<float> absolute;
+                            for (int k = 0; k < 128; k++)
+                            {
+                                String attr = sub->getStringAttribute(ptagFloat + String(k));
+                                
+                                if (attr == String::empty) break;
+                                else
+                                {
+                                    f = attr.getFloatValue();
+                                    absolute.add(f);
+                                }
+                            }
+                            
+                            tuning[id]->sPrep->setAbsoluteOffsets(absolute);
                         }
                     }
                     
@@ -416,9 +430,9 @@ void BKAudioProcessor::loadGallery(void)
                         else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
                         {
                             Array<float> transp;
-                            for (int k = 0; k < 128; i++)
+                            for (int k = 0; k < 128; k++)
                             {
-                                String attr = sub->getStringAttribute(ptagFloat + String(i));
+                                String attr = sub->getStringAttribute(ptagFloat + String(k));
                                 
                                 if (attr == String::empty) break;
                                 else
@@ -477,22 +491,16 @@ void BKAudioProcessor::loadGallery(void)
                     
                     ++nPrepCount;
                 }
-#if 0
                 else if (e->hasTagName( vtagPiano + String(pianoCount)))
                 {
                     int whichPiano = pianoCount++;
                     
+                    DBG("piano: " + String(whichPiano));
+                    
                     bkPianos.set(whichPiano, new Piano(synchronic, nostalgic, direct,
-                                              bkKeymaps[0], i)); // initializing piano 0
-                    /*
-                     <piano0>
-                     <prepMap0 keymapId="1" d0="1" d1="2" d2="3"/>
-                     <prepMap1 keymapId="1" n0="1" n1="2" s0="3"/>
-                     <prepMap2 keymapId="2" d0="4"/>
-                     <pianoMap0 key="60" piano="2"/>
-                     <directMod0 key="62" type="2" prep="1" f="12"/>
-                     </piano0>
-                    */
+                                              bkKeymaps[0], whichPiano)); // initializing piano 0
+                    
+                    Piano::Ptr thisPiano = bkPianos[whichPiano];
                     
                     int pianoMapCount = 0, prepMapCount = 0, modDirectCount = 0, modSynchronicCount = 0, modNostalgicCount = 0, modTuningCount = 0;
                     
@@ -508,19 +516,55 @@ void BKAudioProcessor::loadGallery(void)
                             i = pc->getStringAttribute(ptagPianoMap_piano).getIntValue();
                             int piano = i;
                             
-                            bkPianos[whichPiano]->pianoMap.set(key, piano);
+                            thisPiano->pianoMap.set(key, piano);
                             
                             ++pianoMapCount;
                         }
                         else if (pc->hasTagName( vtagPrepMap + String(prepMapCount)))
                         {
                             // PrepMap
-                            
-                            // start here. (make things dynamic all around, like when type prep index higher than num allocated, allocate new preparation, maybe make dropdown menu for preps, keymaps, etc. now
-                            
+                            DBG("prepMap: " + String(prepMapCount));
                             i = pc->getStringAttribute(ptagPrepMap_keymapId).getIntValue();
+                            Keymap::Ptr keymap = bkKeymaps[i];
+                            
+                            thisPiano->addPreparationMap(); // should clean up this functionality . pretty bad
+                            
+                            thisPiano->prepMaps[prepMapCount]->setKeymap(keymap);
+                            
+                            Synchronic::PtrArr sync;
+                            for (int k = 0; k < 128; k++)
+                            {
+                                String attr = pc->getStringAttribute(ptagPrepMap_synchronicPrepId + String(k));
+                                
+                                if (attr == String::empty)  break;
+                                else                        sync.add(synchronic[attr.getIntValue()]);
+                                
+                            }
+                            thisPiano->prepMaps[prepMapCount]->setSynchronic(sync);
+                            
+                            Nostalgic::PtrArr nost;
+                            for (int k = 0; k < 128; k++)
+                            {
+                                String attr = pc->getStringAttribute(ptagPrepMap_nostalgicPrepId + String(k));
+                                
+                                if (attr == String::empty)  break;
+                                else                        nost.add(nostalgic[attr.getIntValue()]);
+                                
+                            }
+                            bkPianos[whichPiano]->prepMaps[prepMapCount]->setNostalgic(nost);
                             
                             
+                            Direct::PtrArr drct;
+                            for (int k = 0; k < 128; k++)
+                            {
+                                String attr = pc->getStringAttribute(ptagPrepMap_directPrepId + String(k));
+                                
+                                if (attr == String::empty)  break;
+                                else                        drct.add(direct[attr.getIntValue()]);
+                                
+                            }
+                            bkPianos[whichPiano]->prepMaps[prepMapCount]->setDirect(drct);
+                        
                             ++prepMapCount;
                         }
                         else if (pc->hasTagName( vtagModDirect + String(modDirectCount)))
@@ -549,11 +593,9 @@ void BKAudioProcessor::loadGallery(void)
                             ++modTuningCount;
                         }
                         
-                        
                     }
 
                 }
-#endif
             }
         }
         
@@ -562,6 +604,7 @@ void BKAudioProcessor::loadGallery(void)
         for (int k = nostalgic.size(); --k >= 0;)   nostalgic[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
         for (int k = direct.size(); --k >= 0;)      direct[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
         
+        currentPiano = bkPianos[0];
         updateUI();
         
     }

@@ -24,7 +24,7 @@ public:
         tuningFundamental(440.0),
         tuningRatio(1.),
         tempoMultiplier(1.0),
-        tempoDivider(1.0),
+        periodMultiplier(1.0),
         synchronicGain(1.0),
         nostalgicGain(1.0),
         directGain(1.0),
@@ -44,7 +44,7 @@ public:
     const float getTuningFundamental(void)  const noexcept  { return tuningFundamental;     };
     const float getTuningRatio(void)        const noexcept  { return tuningRatio;           };
     const float getTempoMultiplier(void)    const noexcept  { return tempoMultiplier;       };
-    const float getTempoDivider(void)       const noexcept  { return tempoDivider;          };
+    const float getPeriodMultiplier(void)       const noexcept  { return periodMultiplier;          };
     const float getSynchronicGain(void)     const noexcept  { return synchronicGain;        };
     const float getNostalgicGain(void)      const noexcept  { return nostalgicGain;         };
     const float getDirectGain(void)         const noexcept  { return directGain;            };
@@ -59,7 +59,7 @@ public:
         tuningRatio = tuningFundamental / 440.;
     };
     void setTempoMultiplier(float val)      { tempoMultiplier = val;
-                                              tempoDivider = 1./tempoMultiplier;};
+                                              periodMultiplier = 1./tempoMultiplier;};
     void setSynchronicGain(float val)       { synchronicGain = val;        };
     void setNostalgicGain(float val)        { nostalgicGain = val;         };
     void setDirectGain(float val)           { directGain = val;            };
@@ -75,7 +75,7 @@ private:
     float tuningRatio;
     
     float tempoMultiplier;
-    float tempoDivider;
+    float periodMultiplier;
     
     float synchronicGain, nostalgicGain, directGain;
     float resonanceGain, hammerGain;

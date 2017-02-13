@@ -70,7 +70,6 @@ public:
         {
             keymap.set(note, true);
         }
-        print();
     }
     
     // Returns true if added. Returns false if not added (because it's already there).

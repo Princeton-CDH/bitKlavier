@@ -256,12 +256,26 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         if (type == BKParameter)
         {
-            prep->setCustomScale( stringToFloatArray(text));
-            active->setCustomScale( stringToFloatArray(text));
+            //UI is in cents, internally represented as fractions of MIDI note value
+            prep->setCustomScaleCents( stringToFloatArray(text));
+            active->setCustomScaleCents( stringToFloatArray(text));
         }
         else    //BKModification
         {
             mod->setParam(TuningCustomScale, text);
+        }
+    }
+    else if (name == cTuningParameterTypes[TuningAbsoluteOffsets])
+    {
+        if (type == BKParameter)
+        {
+            //UI is in cents, internally represented as fractions of MIDI note value
+            prep->setAbsoluteOffsetCents(stringOrderedPairsToFloatArray(text, 128));
+            active->setAbsoluteOffsetCents(stringOrderedPairsToFloatArray(text, 128));
+        }
+        else    //BKModification
+        {
+            mod->setParam(TuningAbsoluteOffsets, text);
         }
     }
     else
@@ -286,6 +300,7 @@ void TuningViewController::updateFields()
     tuningTF[TuningA1ClusterThresh]     ->setText( String( prep->getAdaptiveClusterThresh()), false);
     tuningTF[TuningA1History]           ->setText( String( prep->getAdaptiveHistory()), false);
     tuningTF[TuningCustomScale]         ->setText( floatArrayToString( prep->getCustomScale()), false);
+    tuningTF[TuningAbsoluteOffsets]     ->setText( offsetArrayToString( prep->getAbsoluteOffsets()), false);
 
     
 }
@@ -305,6 +320,7 @@ void TuningViewController::updateModFields()
     modTuningTF[TuningA1ClusterThresh]     ->setText( prep->getParam(TuningA1ClusterThresh), false);
     modTuningTF[TuningA1History]           ->setText( prep->getParam(TuningA1History), false);
     modTuningTF[TuningCustomScale]         ->setText( prep->getParam(TuningCustomScale), false);
+    modTuningTF[TuningAbsoluteOffsets]     ->setText( prep->getParam(TuningAbsoluteOffsets), false);
     
     
 }
