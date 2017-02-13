@@ -277,7 +277,6 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
 
 void NostalgicViewController::updateFields(void)
 {
-    DBG("nostalgicID: "+String(currentNostalgicId));
     NostalgicPreparation::Ptr prep = processor.nostalgic[currentNostalgicId]->aPrep;
 
     nostalgicTF[NostalgicWaveDistance]      ->setText( String( prep->getWavedistance()), false);

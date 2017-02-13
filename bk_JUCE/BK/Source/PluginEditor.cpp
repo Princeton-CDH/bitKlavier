@@ -293,7 +293,8 @@ String BKAudioProcessorEditor::processPianoMapString(const String& s)
     
     Array<int> keys;
     
-    for (auto map : processor.currentPiano->pianoMap)    map = 0;
+    for (int i = processor.currentPiano->pianoMap.size(); --i >= 0;)
+        processor.currentPiano->pianoMap.setUnchecked(i, 0);
     
     for (int i = 0; i < (s.length()+1); i++)
     {

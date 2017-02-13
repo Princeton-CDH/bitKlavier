@@ -154,6 +154,20 @@ String intArrayToString(Array<int> arr)
     return s;
 }
 
+String offsetArrayToString(Array<float> arr)
+{
+    String s = "";
+    int key = 0;
+    for (auto offset : arr)
+    {
+        if (offset != 0.0)  s += String(key) + ":" + String((int)(offset*100.0f)) + " ";
+        
+        ++key;
+    }
+    
+    return s;
+}
+
 String floatArrayToString(Array<float> arr)
 {
     String s = "";

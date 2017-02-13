@@ -129,12 +129,13 @@ public:
     
     inline void setCustomScaleCents(Array<float> tuning) {
         tCustom = tuning;
-        for(int i=0; i<tCustom.size(); i++) tCustom.setUnchecked(i, tCustom.getUnchecked(i) * 0.01);
+        for(int i=0; i<tCustom.size(); i++) tCustom.setUnchecked(i, tCustom.getUnchecked(i) * 0.01f);
     }
     
     inline void setAbsoluteOffsetCents(Array<float> abs) {
         tAbsolute = abs;
-        for(int i=0; i<tAbsolute.size(); i++) tAbsolute.setUnchecked(i, tAbsolute.getUnchecked(i) * 0.01);
+        for(int i=tAbsolute.size(); --i >= 0;)
+            tAbsolute.setUnchecked(i, tAbsolute.getUnchecked(i) * 0.01f);
     }
     
     void print(void)
@@ -251,7 +252,7 @@ public:
         param.set(TuningA1ClusterThresh, String(p->getAdaptiveClusterThresh()));
         param.set(TuningA1History, String(p->getAdaptiveHistory()));
         param.set(TuningCustomScale, floatArrayToString(p->getCustomScale()));
-        param.set(TuningAbsoluteOffsets, floatArrayToString(p->getAbsoluteOffsets()));
+        param.set(TuningAbsoluteOffsets, offsetArrayToString(p->getAbsoluteOffsets()));
     }
     
     
@@ -389,13 +390,15 @@ public:
         
         ValueTree scale( vtagTuning_customScale);
         int count = 0;
-        for (auto note : sPrep->getCustomScale()) scale.setProperty( ptagTuning_scaleDeg + String(count++), note, 0 );
+        for (auto note : sPrep->getCustomScale())
+            scale.setProperty( ptagFloat + String(count++), note, 0 );
         prep.addChild(scale, -1, 0);
         
         ValueTree absolute( vTagTuning_absoluteOffsets);
         count = 0;
-        for (auto note : sPrep->getAbsoluteOffsets()) scale.setProperty( ptagTuning_absoluteScaleDeg + String(count++), note, 0 );
-        prep.addChild(scale, -1, 0);
+        for (auto note : sPrep->getAbsoluteOffsets())
+            absolute.setProperty( ptagFloat + String(count++), note, 0 );
+        prep.addChild(absolute, -1, 0);
         
         return prep;
     }

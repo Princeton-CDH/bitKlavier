@@ -118,10 +118,10 @@ const String ptagTuning_adaptiveClusterThresh = "adaptiveClusterThresh";
 const String ptagTuning_adaptiveHistory = "adaptiveHistory";
 
 const String vtagTuning_customScale = "customScale";
-const String ptagTuning_scaleDeg = "f";
-
+const String ptagTuning_customScaleLength = "customScaleLength";
+const String ptagTuning_customScaleDegree = "scaleDegree";
 const String vTagTuning_absoluteOffsets = "absoluteOffsets";
-const String ptagTuning_absoluteScaleDeg = "af";
+
 
 const String vtagKeymaps = "keymaps";
 const String vtagKeymap =  "keymap";

@@ -275,7 +275,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            mod->setParam(TuningCustomScale, text);
+            mod->setParam(TuningAbsoluteOffsets, text);
         }
     }
     else
@@ -300,6 +300,7 @@ void TuningViewController::updateFields()
     tuningTF[TuningA1ClusterThresh]     ->setText( String( prep->getAdaptiveClusterThresh()), false);
     tuningTF[TuningA1History]           ->setText( String( prep->getAdaptiveHistory()), false);
     tuningTF[TuningCustomScale]         ->setText( floatArrayToString( prep->getCustomScale()), false);
+    tuningTF[TuningAbsoluteOffsets]     ->setText( offsetArrayToString( prep->getAbsoluteOffsets()), false);
 
     
 }
@@ -319,6 +320,7 @@ void TuningViewController::updateModFields()
     modTuningTF[TuningA1ClusterThresh]     ->setText( prep->getParam(TuningA1ClusterThresh), false);
     modTuningTF[TuningA1History]           ->setText( prep->getParam(TuningA1History), false);
     modTuningTF[TuningCustomScale]         ->setText( prep->getParam(TuningCustomScale), false);
+    modTuningTF[TuningAbsoluteOffsets]     ->setText( prep->getParam(TuningAbsoluteOffsets), false);
     
     
 }
