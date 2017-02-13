@@ -101,18 +101,18 @@ private:
     int Id;
     
     // Keymap for this PreparationMap (one per PreparationMap)
-    Keymap::Ptr                     pKeymap;
+    Keymap::Ptr                 pKeymap;
     
-    Synchronic::PtrArr                 synchronic;
-    Nostalgic::PtrArr                  nostalgic;
-    Direct::PtrArr                     direct;
+    Synchronic::PtrArr          synchronic;
+    Nostalgic::PtrArr           nostalgic;
+    Direct::PtrArr              direct;
     
     // Pointers to synths (flown in from BKAudioProcessor)
-    BKSynthesiser*                  synth;
-    BKSynthesiser*                  resonanceSynth;
-    BKSynthesiser*                  hammerSynth;
+    BKSynthesiser*              synth;
+    BKSynthesiser*              resonanceSynth;
+    BKSynthesiser*              hammerSynth;
     
-    double                          sampleRate;
+    double                      sampleRate;
     
     
     JUCE_LEAK_DETECTOR(PreparationMap)
