@@ -60,7 +60,7 @@ void SynchronicProcessor::setCurrentPlaybackSampleRate(double sr)
 
 
 
-void SynchronicProcessor::playNote(int channel, int note, float velocity, float accentMult)
+void SynchronicProcessor::playNote(int channel, int note, float velocity)
 {
     PianoSamplerNoteDirection noteDirection = Forward;
     float noteStartPos = 0.0;
@@ -82,7 +82,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, float 
                  synthNoteNumber,
                  offset,
                  velocity,
-                 aGlobalGain * accentMult,
+                 aGlobalGain * active->getAccentMultipliers()[accentMultiplierCounter],
                  noteDirection,
                  FixedLengthFixedStart,
                  SynchronicNote,
@@ -259,8 +259,8 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             
             
             //update display of counters in UI
-            DBG(" length: "         + String(active->getLengthMultipliers()[lengthMultiplierCounter]) +
-                " length counter:"  + String(lengthMultiplierCounter) +
+            DBG("length: "         + String(active->getLengthMultipliers()[lengthMultiplierCounter]) +
+                " length counter: "  + String(lengthMultiplierCounter) +
                 " accent: "         + String(active->getAccentMultipliers()[accentMultiplierCounter]) +
                 " accent counter: " + String(accentMultiplierCounter) +
                 " transp: "         + String(active->getTranspOffsets()[transpOffsetCounter]) +
@@ -271,13 +271,11 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             //play all the notes in the cluster, with current parameter vals
             if (cluster.size() >= active->getClusterMin() && cluster.size() <= active->getClusterMax())
             {
-                for (int n = 0; n < slimCluster.size(); n++)
+                for (int n = slimCluster.size(); --n >= 0;)
                 {
-                    DBG("clustervel: "+String(velocities.getUnchecked(cluster[n])));
                     playNote(channel,
                              cluster[n],
-                             velocities.getUnchecked(cluster[n]),
-                             active->getAccentMultipliers()[accentMultiplierCounter]);
+                             velocities.getUnchecked(cluster[n]));
                 }
                 
             }

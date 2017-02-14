@@ -409,7 +409,7 @@ private:
     //reset the phase, including of all the parameter fields
     void resetPhase(int skipBeats);
     
-    void playNote(int channel, int note, float velocity, float accentMult);
+    void playNote(int channel, int note, float velocity);
     Array<float> velocities;    //record of velocities
     Array<int> keysDepressed;   //current keys that are depressed
     
