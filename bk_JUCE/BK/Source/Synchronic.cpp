@@ -60,7 +60,7 @@ void SynchronicProcessor::setCurrentPlaybackSampleRate(double sr)
 
 
 
-void SynchronicProcessor::playNote(int channel, int note, float velocity)
+void SynchronicProcessor::playNote(int channel, int note, float velocity, float accentMult)
 {
     PianoSamplerNoteDirection noteDirection = Forward;
     float noteStartPos = 0.0;
@@ -82,7 +82,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
                  synthNoteNumber,
                  offset,
                  velocity,
-                 aGlobalGain,
+                 aGlobalGain * accentMult,
                  noteDirection,
                  FixedLengthFixedStart,
                  SynchronicNote,
@@ -276,7 +276,8 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                     DBG("clustervel: "+String(velocities.getUnchecked(cluster[n])));
                     playNote(channel,
                              cluster[n],
-                             velocities.getUnchecked(cluster[n]) * active->getAccentMultipliers()[accentMultiplierCounter]);
+                             velocities.getUnchecked(cluster[n]),
+                             active->getAccentMultipliers()[accentMultiplierCounter]);
                 }
                 
             }
