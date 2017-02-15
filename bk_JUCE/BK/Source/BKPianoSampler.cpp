@@ -90,6 +90,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
     if (const BKPianoSamplerSound* const sound = dynamic_cast<const BKPianoSamplerSound*> (s))
     {
         
+        DBG(sound->getName());
+        
         numPulses = 0;
         maxPulses = 16;
         pitchRatio = powf(2.0f, (midiNoteNumber - (float)sound->midiRootNote) / 12.0f)
