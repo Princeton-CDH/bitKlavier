@@ -260,12 +260,20 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         if (type == BKParameter)
         {
-            prep    ->setTuning(processor.tuning[i]);
-            active  ->setTuning(processor.tuning[i]);
+            if (i < processor.tuning.size())
+            {
+                prep    ->setTuning(processor.tuning[i]);
+                active  ->setTuning(processor.tuning[i]);
+            }
+            else
+                nostalgicTF[NostalgicTuning]->undo();
         }
         else    //BKModification
         {
-            mod->setParam(NostalgicTuning, text);
+            if (i < processor.tuning.size())
+                mod->setParam(NostalgicTuning, text);
+            else
+                modNostalgicTF[NostalgicTuning]->undo();
         }
     }
     else

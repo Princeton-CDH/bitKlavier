@@ -196,12 +196,22 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         if (type == BKParameter)
         {
-            prep    ->setTuning(processor.tuning[i]);
-            active  ->setTuning(processor.tuning[i]);
+            if (i < processor.tuning.size())
+            {
+                prep    ->setTuning(processor.tuning[i]);
+                active  ->setTuning(processor.tuning[i]);
+            }
+            else
+                directTF[DirectTuning]->undo();
+            
+            
         }
         else    //BKModification
         {
-            mod     ->setParam(DirectTuning, text);
+            if (i < processor.tuning.size())
+                mod     ->setParam(DirectTuning, text);
+            else
+                modDirectTF[DirectTuning]->undo();
         }
     }
     else

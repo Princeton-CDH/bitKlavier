@@ -295,12 +295,21 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         if (type == BKParameter)
         {
-            prep    ->setTuning(processor.tuning[i]);
-            active  ->setTuning(processor.tuning[i]);
+            if (i < processor.tuning.size())
+            {
+                prep    ->setTuning(processor.tuning[i]);
+                active  ->setTuning(processor.tuning[i]);
+            }
+            else
+                synchronicTF[SynchronicTuning]->undo();
+
         }
         else // BKModification
         {
-            mod->setParam( SynchronicTuning, text);
+            if (i < processor.tuning.size())
+                mod->setParam( SynchronicTuning, text);
+            else
+                modSynchronicTF[SynchronicTuning]->undo();
         }
     }
     else if (name == cSynchronicParameterTypes[AT1Mode])
