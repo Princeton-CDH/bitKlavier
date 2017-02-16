@@ -63,8 +63,7 @@ rampOnDelta (0),
 rampOffDelta (0),
 isInRampOn (false), isInRampOff (false)
 {
-    numPulses = 0;
-    maxPulses = 16;
+
 }
 
 BKPianoSamplerVoice::~BKPianoSamplerVoice()
@@ -92,8 +91,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         
         DBG(sound->getName());
         
-        numPulses = 0;
-        maxPulses = 16;
         pitchRatio = powf(2.0f, (midiNoteNumber - (float)sound->midiRootNote) / 12.0f)
                         * sound->sourceSampleRate
                         * generalSettings->getTuningRatio()
@@ -111,7 +108,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             if(voiceRampOn  > (0.5 * length))   voiceRampOn     = 0.5 * length;
             if(voiceRampOff > (0.5 * length))   voiceRampOff    = 0.5 * length;
             
-            playLength = (length - voiceRampOff) * pitchRatio;
+            //playLength = (length - voiceRampOff) * pitchRatio;
+            playLength = (length - (voiceRampOff + voiceRampOn)) * pitchRatio; 
         }
         
         if (playDirection == Forward)
