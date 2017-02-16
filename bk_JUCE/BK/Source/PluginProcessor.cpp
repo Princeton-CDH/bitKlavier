@@ -848,18 +848,57 @@ void BKAudioProcessor::loadGallery(void)
                         else if (pc->hasTagName( vtagModDirect + String(modDirectCount)))
                         {
                             // ModDirect
+                            int k = pc->getStringAttribute(ptagModX_key).getIntValue();
+                            int prep = pc->getStringAttribute(ptagModX_prep).getIntValue();
+                            DirectParameterType type = (DirectParameterType)pc->getStringAttribute(ptagModX_type).getIntValue();
+                            
+                            String val = "";
+                            if (cDirectDataTypes[type] == BKFloat) val = pc->getStringAttribute(ptagFloat);
+                            else if (cDirectDataTypes[type] == BKInt) val = pc->getStringAttribute(ptagInt);
+                            else if (cDirectDataTypes[type] == BKFloatArr) val = pc->getStringAttribute(ptagFloatArr);
+                            else if (cDirectDataTypes[type] == BKBool)   val = pc->getStringAttribute(ptagBool);
+                            else if (cDirectDataTypes[type] == BKIntArr)   val = pc->getStringAttribute(ptagIntArr);
+                            
+                            //DirectModification(int key, int whichPrep, DirectParameterType type, String val, int ident)
+                            bkPianos[whichPiano]->modMap[k]->addDirectModification(new DirectModification(k, prep, type, val, modDirectCount));
                             
                             ++modDirectCount;
                         }
                         else if (pc->hasTagName( vtagModSynchronic + String(modSynchronicCount)))
                         {
                             // ModSynchronic
+                            int k = pc->getStringAttribute(ptagModX_key).getIntValue();
+                            int prep = pc->getStringAttribute(ptagModX_prep).getIntValue();
+                            SynchronicParameterType type = (SynchronicParameterType)pc->getStringAttribute(ptagModX_type).getIntValue();
+                            
+                            String val = "";
+                            if (cSynchronicDataTypes[type] == BKFloat) val = pc->getStringAttribute(ptagFloat);
+                            else if (cSynchronicDataTypes[type] == BKInt) val = pc->getStringAttribute(ptagInt);
+                            else if (cSynchronicDataTypes[type] == BKFloatArr) val = pc->getStringAttribute(ptagFloatArr);
+                            else if (cSynchronicDataTypes[type] == BKBool)   val = pc->getStringAttribute(ptagBool);
+                            else if (cSynchronicDataTypes[type] == BKIntArr)   val = pc->getStringAttribute(ptagIntArr);
+                            
+                            //DirectModification(int key, int whichPrep, DirectParameterType type, String val, int ident)
+                            bkPianos[whichPiano]->modMap[k]->addSynchronicModification(new SynchronicModification(k, prep, type, val, modSynchronicCount));
                             
                             ++modSynchronicCount;
                         }
                         else if (pc->hasTagName( vtagModNostalgic + String(modNostalgicCount)))
                         {
                             // ModNostalgic
+                            int k = pc->getStringAttribute(ptagModX_key).getIntValue();
+                            int prep = pc->getStringAttribute(ptagModX_prep).getIntValue();
+                            NostalgicParameterType type = (NostalgicParameterType)pc->getStringAttribute(ptagModX_type).getIntValue();
+                            
+                            String val = "";
+                            if (cNostalgicDataTypes[type] == BKFloat) val = pc->getStringAttribute(ptagFloat);
+                            else if (cNostalgicDataTypes[type] == BKInt) val = pc->getStringAttribute(ptagInt);
+                            else if (cNostalgicDataTypes[type] == BKFloatArr) val = pc->getStringAttribute(ptagFloatArr);
+                            else if (cNostalgicDataTypes[type] == BKBool)   val = pc->getStringAttribute(ptagBool);
+                            else if (cNostalgicDataTypes[type] == BKIntArr)   val = pc->getStringAttribute(ptagIntArr);
+                            
+                            //DirectModification(int key, int whichPrep, DirectParameterType type, String val, int ident)
+                            bkPianos[whichPiano]->modMap[k]->addNostalgicModification(new NostalgicModification(k, prep, type, val, modNostalgicCount));
                             
                             ++modNostalgicCount;
                             
@@ -867,6 +906,19 @@ void BKAudioProcessor::loadGallery(void)
                         else if (pc->hasTagName( vtagModTuning + String(modTuningCount)))
                         {
                             // ModTuning
+                            int k = pc->getStringAttribute(ptagModX_key).getIntValue();
+                            int prep = pc->getStringAttribute(ptagModX_prep).getIntValue();
+                            TuningParameterType type = (TuningParameterType)pc->getStringAttribute(ptagModX_type).getIntValue();
+                            
+                            String val = "";
+                            if (cTuningDataTypes[type] == BKFloat) val = pc->getStringAttribute(ptagFloat);
+                            else if (cTuningDataTypes[type] == BKInt) val = pc->getStringAttribute(ptagInt);
+                            else if (cTuningDataTypes[type] == BKFloatArr) val = pc->getStringAttribute(ptagFloatArr);
+                            else if (cTuningDataTypes[type] == BKBool)   val = pc->getStringAttribute(ptagBool);
+                            else if (cTuningDataTypes[type] == BKIntArr)   val = pc->getStringAttribute(ptagIntArr);
+                            
+                            //DirectModification(int key, int whichPrep, DirectParameterType type, String val, int ident)
+                            bkPianos[whichPiano]->modMap[k]->addTuningModification(new TuningModification(k, prep, type, val, modTuningCount));
                             
                             ++modTuningCount;
                         }

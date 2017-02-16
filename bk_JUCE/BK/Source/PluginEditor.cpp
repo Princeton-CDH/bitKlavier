@@ -383,7 +383,6 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
     
     bool isBracket;
     
-    bool itsAMod = false;
     bool itsAKeymap = false;
     bool lastColon = false;
     bool lastBracket = false;
@@ -486,7 +485,6 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                 
                 // Set piano map parameters.
                 // keys | mod id | prepIds
-                if (numColons != 2 || numBrackets != 2)
                 for (auto key : keys)
                 {
                     
