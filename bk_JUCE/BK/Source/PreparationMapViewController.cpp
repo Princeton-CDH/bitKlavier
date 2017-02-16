@@ -213,7 +213,7 @@ void PreparationMapViewController::bkTextFieldDidChange(TextEditor& tf)
         if (i < processor.bkKeymaps.size())
             processor.currentPiano->prepMaps[Id]->setKeymap(processor.bkKeymaps[i]);
         else
-            tf.undo();
+            tf.setText("0", false);
         
         sendActionMessage("keymap/update");
     }

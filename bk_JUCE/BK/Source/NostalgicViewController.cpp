@@ -279,14 +279,14 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
                 active  ->setTuning(processor.tuning[i]);
             }
             else
-                nostalgicTF[NostalgicTuning]->undo();
+                tf.setText("0", false);
         }
         else    //BKModification
         {
             if (i < processor.tuning.size())
                 mod->setParam(NostalgicTuning, text);
             else
-                modNostalgicTF[NostalgicTuning]->undo();
+                tf.setText("0", false);
         }
     }
     else

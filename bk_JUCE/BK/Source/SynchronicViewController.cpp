@@ -314,7 +314,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
                 active  ->setTuning(processor.tuning[i]);
             }
             else
-                synchronicTF[SynchronicTuning]->undo();
+                tf.setText("0", false);
 
         }
         else // BKModification
@@ -322,7 +322,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
             if (i < processor.tuning.size())
                 mod->setParam( SynchronicTuning, text);
             else
-                modSynchronicTF[SynchronicTuning]->undo();
+                tf.setText("0", false);
         }
     }
     else if (name == cSynchronicParameterTypes[AT1Mode])

@@ -141,7 +141,7 @@ void BKAudioProcessor::loadGallery(void)
     Array<float> fa;
     Array<int> fi;
 
-    int pianoCount = 0, sPrepCount = 1, nPrepCount = 1, dPrepCount = 1, tPrepCount = 1, keymapCount = 1;
+    int pianoCount = 0, sPrepCount = 1, sModPrepCount = 1, nPrepCount = 1, nModPrepCount = 1, dPrepCount = 1, dModPrepCount = 1, tPrepCount = 1, tModPrepCount = 1, keymapCount = 1;
     
     if (myChooser.browseForFileToOpen())
     {
@@ -164,10 +164,15 @@ void BKAudioProcessor::loadGallery(void)
             addNostalgic();
             addDirect();
             
-            //modSynchronic.clearQuick();
-            //modNostalgic.clearQuick();
-            //modDirect.clearQuick();
-            //modTuning.clearQuick();
+            modSynchronic.clearQuick();
+            modNostalgic.clearQuick();
+            modDirect.clearQuick();
+            modTuning.clearQuick();
+            
+            addTuningMod();
+            addSynchronicMod();
+            addNostalgicMod();
+            addDirectMod();
             
             bkKeymaps.clearQuick();
             bkPianos.clearQuick();
@@ -308,6 +313,83 @@ void BKAudioProcessor::loadGallery(void)
                     tuning[id]->aPrep->copy( tuning[id]->sPrep);
                     
                     ++tPrepCount;
+                }else if (e->hasTagName( vtagTuningModPrep + String(tModPrepCount)))
+                {
+                    addTuningMod();
+                    
+                    int id = modTuning.size() - 1;
+                    
+                    String p = "";
+                    
+                    p = e->getStringAttribute( ptagTuning_scale);
+                    modTuning[id]->setParam(TuningScale, p);
+                    
+                    p = e->getStringAttribute( ptagTuning_fundamental);
+                    modTuning[id]->setParam(TuningFundamental, p);
+                    
+                    p = e->getStringAttribute( ptagTuning_offset);
+                    modTuning[id]->setParam(TuningOffset, p);
+                    
+                    p = e->getStringAttribute( ptagTuning_adaptiveIntervalScale);
+                    modTuning[id]->setParam(TuningA1IntervalScale, p);
+                    
+                    p = e->getStringAttribute( ptagTuning_adaptiveAnchorScale);
+                    modTuning[id]->setParam(TuningA1AnchorScale, p);
+                    
+                    p = e->getStringAttribute( ptagTuning_adaptiveHistory);
+                    modTuning[id]->setParam(TuningA1History, p);
+                    
+                    p = e->getStringAttribute( ptagTuning_adaptiveInversional);
+                    modTuning[id]->setParam(TuningA1Inversional, p);
+                    
+                    p = e->getStringAttribute( ptagTuning_adaptiveClusterThresh);
+                    modTuning[id]->setParam(TuningA1ClusterThresh, p);
+                    
+                    p = e->getStringAttribute( ptagTuning_adaptiveAnchorFund);
+                    modTuning[id]->setParam(TuningA1AnchorFundamental, p);
+                    
+                    // custom scale
+                    forEachXmlChildElement (*e, sub)
+                    {
+                        if (sub->hasTagName(vtagTuning_customScale))
+                        {
+                            Array<float> scale;
+                            for (int k = 0; k < 128; k++)
+                            {
+                                String attr = sub->getStringAttribute(ptagFloat + String(k));
+                                
+                                if (attr == String::empty) break;
+                                else
+                                {
+                                    f = attr.getFloatValue();
+                                    scale.add(f);
+                                }
+                            }
+                            
+                            modTuning[id]->setParam(TuningCustomScale, floatArrayToString(scale));
+                        }
+                        else if (sub->hasTagName(vTagTuning_absoluteOffsets))
+                        {
+                            Array<float> absolute;
+                            String abs = "";
+                            for (int k = 0; k < 128; k++)
+                            {
+                                String attr = sub->getStringAttribute(ptagFloat + String(k));
+                                
+                                if (attr == String::empty) break;
+                                else
+                                {
+                                    f = attr.getFloatValue();
+                                    absolute.add(f);
+                                    if (f != 0.0) abs += (String(k) + ":" + String(f) + " ");
+                                }
+                            }
+                            
+                            modTuning[id]->setParam(TuningAbsoluteOffsets, abs);
+                        }
+                    }
+                    
+                    ++tModPrepCount;
                 }
                 else if (e->hasTagName( vtagDirectPrep + String(dPrepCount)))
                 {
@@ -334,6 +416,31 @@ void BKAudioProcessor::loadGallery(void)
                     direct[id]->aPrep->copy(direct[id]->sPrep);
                     
                     ++dPrepCount;
+                }
+                else if (e->hasTagName( vtagDirectModPrep + String(dModPrepCount)))
+                {
+                    addDirectMod();
+                    
+                    String p = "";
+                    
+                    int id = modDirect.size()-1;
+                    
+                    p = e->getStringAttribute(ptagDirect_tuning);
+                    modDirect[id]->setParam(DirectTuning, p);
+                    
+                    p = e->getStringAttribute(ptagDirect_gain);
+                    modDirect[id]->setParam(DirectGain, p);
+                    
+                    p = e->getStringAttribute(ptagDirect_hammerGain);
+                    modDirect[id]->setParam(DirectHammerGain, p);
+                    
+                    p = e->getStringAttribute(ptagDirect_resGain);
+                    modDirect[id]->setParam(DirectResGain, p);
+                    
+                    p = e->getStringAttribute(ptagDirect_transposition);
+                    modDirect[id]->setParam(DirectTransposition, p);
+                    
+                    ++dModPrepCount;
                 }
                 else if (e->hasTagName( vtagSynchronicPrep + String(sPrepCount)))
                 {
@@ -461,6 +568,133 @@ void BKAudioProcessor::loadGallery(void)
                     ++sPrepCount;
                     
                 }
+                else if (e->hasTagName( vtagSynchronicModPrep + String(sModPrepCount)))
+                {
+                    addSynchronicMod();
+                    
+                    String p = "";
+                    
+                    int id = modSynchronic.size() - 1;
+                    
+                    p = e->getStringAttribute(ptagSynchronic_tuning);
+                    modSynchronic[id]->setParam(SynchronicTuning, p);
+                    
+                    p = e->getStringAttribute(ptagSynchronic_tempo);
+                    modSynchronic[id]->setParam(SynchronicTempo, p);
+                    
+                    p = e->getStringAttribute(ptagSynchronic_numBeats);
+                    modSynchronic[id]->setParam(SynchronicNumPulses, p);
+                    
+                    p = e->getStringAttribute(ptagSynchronic_clusterMin);
+                    modSynchronic[id]->setParam(SynchronicClusterMin, p);
+                    
+                    p = e->getStringAttribute(ptagSynchronic_clusterMax);
+                    modSynchronic[id]->setParam(SynchronicClusterMax, p);
+                    
+                    p = e->getStringAttribute(ptagSynchronic_clusterThresh);
+                    modSynchronic[id]->setParam(SynchronicClusterThresh, p);
+                    
+                    p = e->getStringAttribute(ptagSynchronic_mode);
+                    modSynchronic[id]->setParam(SynchronicMode, p);
+                    
+                    p = e->getStringAttribute(ptagSynchronic_beatsToSkip);
+                    modSynchronic[id]->setParam(SynchronicBeatsToSkip, p);
+                    
+                    p = e->getStringAttribute(ptagSynchronic_at1Mode);
+                    modSynchronic[id]->setParam(AT1Mode, p);
+                    
+                    p = e->getStringAttribute(ptagSynchronic_at1History);
+                    modSynchronic[id]->setParam(AT1History, p);
+                    
+                    p = e->getStringAttribute(ptagSynchronic_at1Subdivisions);
+                    modSynchronic[id]->setParam(AT1Subdivisions, p);
+                    
+                    p = e->getStringAttribute(ptagSynchronic_AT1Min);
+                    modSynchronic[id]->setParam(AT1Min, p);
+                    
+                    p = e->getStringAttribute(ptagSynchronic_AT1Max);
+                    modSynchronic[id]->setParam(AT1Max, p);
+                    
+                    
+                    forEachXmlChildElement (*e, sub)
+                    {
+                        if (sub->hasTagName(vtagSynchronic_beatMults))
+                        {
+                            Array<float> beats;
+                            
+                            for (int k = 0; k < 128; k++)
+                            {
+                                String attr = sub->getStringAttribute(ptagFloat + String(k));
+                                
+                                if (attr == String::empty) break;
+                                else
+                                {
+                                    f = attr.getFloatValue();
+                                    beats.add(f);
+                                }
+                            }
+                            
+                            modSynchronic[id]->setParam(SynchronicBeatMultipliers, floatArrayToString(beats));
+                            
+                        }
+                        else  if (sub->hasTagName(vtagSynchronic_accentMults))
+                        {
+                            Array<float> accents;
+                            for (int k = 0; k < 128; k++)
+                            {
+                                String attr = sub->getStringAttribute(ptagFloat + String(k));
+                                
+                                if (attr == String::empty) break;
+                                else
+                                {
+                                    f = attr.getFloatValue();
+                                    accents.add(f);
+                                }
+                            }
+                            
+                            modSynchronic[id]->setParam(SynchronicAccentMultipliers, floatArrayToString(accents));
+                            
+                        }
+                        else  if (sub->hasTagName(vtagSynchronic_lengthMults))
+                        {
+                            Array<float> lens;
+                            for (int k = 0; k < 128; k++)
+                            {
+                                String attr = sub->getStringAttribute(ptagFloat + String(k));
+                                
+                                if (attr == String::empty) break;
+                                else
+                                {
+                                    f = attr.getFloatValue();
+                                    lens.add(f);
+                                }
+                            }
+                            
+                            modSynchronic[id]->setParam(SynchronicLengthMultipliers, floatArrayToString(lens));
+                            
+                        }
+                        else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
+                        {
+                            Array<float> transp;
+                            for (int k = 0; k < 128; k++)
+                            {
+                                String attr = sub->getStringAttribute(ptagFloat + String(k));
+                                
+                                if (attr == String::empty) break;
+                                else
+                                {
+                                    f = attr.getFloatValue();
+                                    transp.add(f);
+                                }
+                            }
+                            
+                            modSynchronic[id]->setParam(SynchronicTranspOffsets, floatArrayToString(transp));
+                        }
+                    }
+                    
+                    ++sModPrepCount;
+                    
+                }
                 else if (e->hasTagName( vtagNostalgicPrep + String(nPrepCount)))
                 {
                     addNostalgic();
@@ -501,11 +735,46 @@ void BKAudioProcessor::loadGallery(void)
                     
                     ++nPrepCount;
                 }
+                else if (e->hasTagName( vtagNostalgicModPrep + String(nModPrepCount)))
+                {
+                    addNostalgicMod();
+                    
+                    String p = "";
+                    
+                    int id = modNostalgic.size() - 1;
+                    
+                    p = e->getStringAttribute(ptagNostalgic_tuning);
+                    modNostalgic[id]->setParam(NostalgicTuning, p);
+                    
+                    p = e->getStringAttribute(ptagNostalgic_waveDistance);
+                    modNostalgic[id]->setParam(NostalgicWaveDistance, p);
+                    
+                    p = e->getStringAttribute(ptagNostalgic_undertow);
+                    modNostalgic[id]->setParam(NostalgicUndertow, p);
+                    
+                    p = e->getStringAttribute(ptagNostalgic_transposition);
+                    modNostalgic[id]->setParam(NostalgicTransposition, p);
+                    
+                    p = e->getStringAttribute(ptagNostalgic_lengthMultiplier);
+                    modNostalgic[id]->setParam(NostalgicLengthMultiplier, p);
+                    
+                    p = e->getStringAttribute(ptagNostalgic_beatsToSkip);
+                    modNostalgic[id]->setParam(NostalgicBeatsToSkip, p);
+                    
+                    p = e->getStringAttribute(ptagNostalgic_gain);
+                    modNostalgic[id]->setParam(NostalgicGain, p);
+                    
+                    p = e->getStringAttribute(ptagNostalgic_mode);
+                    modNostalgic[id]->setParam(NostalgicMode, p);
+                    
+                    p = e->getStringAttribute(ptagNostalgic_syncTarget);
+                    modNostalgic[id]->setParam(NostalgicSyncTarget, p);
+                    
+                    ++nModPrepCount;
+                }
                 else if (e->hasTagName( vtagPiano + String(pianoCount)))
                 {
                     int whichPiano = pianoCount++;
-                    
-                    DBG("piano: " + String(whichPiano));
                     
                     bkPianos.set(whichPiano, new Piano(synchronic, nostalgic, direct,
                                               bkKeymaps[0], whichPiano)); // initializing piano 0

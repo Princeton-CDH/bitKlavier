@@ -215,7 +215,7 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
                 active  ->setTuning(processor.tuning[i]);
             }
             else
-                directTF[DirectTuning]->undo();
+                tf.setText("0", false);
             
             
         }
@@ -224,7 +224,7 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
             if (i < processor.tuning.size())
                 mod     ->setParam(DirectTuning, text);
             else
-                modDirectTF[DirectTuning]->undo();
+                tf.setText("0", false);
         }
     }
     else
