@@ -219,6 +219,42 @@ public:
         param.set(NostalgicSyncTarget, "");
     }
     
+    inline ValueTree getState(int Id)
+    {
+        ValueTree prep( vtagNostalgicModPrep + String(Id));
+        
+        String p = "";
+        
+        p = getParam(NostalgicTuning);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_tuning,             p.getIntValue(), 0);
+        
+        p = getParam(NostalgicWaveDistance);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_waveDistance,       p.getIntValue(), 0);
+        
+        p = getParam(NostalgicUndertow);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_undertow,           p.getIntValue(), 0);
+        
+        p = getParam(NostalgicTransposition);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_transposition,      p.getFloatValue(), 0);
+        
+        p = getParam(NostalgicGain);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_gain,               p.getFloatValue(), 0);
+        
+        p = getParam(NostalgicLengthMultiplier);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_lengthMultiplier,   p.getFloatValue(), 0);
+        
+        p = getParam(NostalgicBeatsToSkip);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_beatsToSkip,        p.getFloatValue(), 0);
+        
+        p = getParam(NostalgicMode);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_mode,               p.getIntValue(), 0);
+        
+        p = getParam(NostalgicSyncTarget);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_syncTarget,         p.getIntValue(), 0);
+        
+        return prep;
+    }
+    
     
     ~NostalgicModPreparation(void)
     {
@@ -238,6 +274,7 @@ public:
         param.set(NostalgicSyncTarget, String(p->getSyncTarget()));
     }
     
+    inline const StringArray getStringArray(void) { return param; }
     
     inline const String getParam(NostalgicParameterType type)
     {

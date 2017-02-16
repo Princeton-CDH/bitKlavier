@@ -62,7 +62,6 @@ public:
     NostalgicModPreparation::PtrArr     modNostalgic;
     TuningModPreparation::PtrArr        modTuning;
     
-    
     Piano::Ptr                          prevPiano;
     Piano::Ptr                          currentPiano;
     Piano::PtrArr                       prevPianos;

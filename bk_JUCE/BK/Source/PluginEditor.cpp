@@ -486,6 +486,7 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                 
                 // Set piano map parameters.
                 // keys | mod id | prepIds
+                if (numColons != 2 || numBrackets != 2)
                 for (auto key : keys)
                 {
                     

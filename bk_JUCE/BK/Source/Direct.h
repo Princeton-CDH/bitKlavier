@@ -152,7 +152,30 @@ public:
         param.set(DirectResGain, "");
         param.set(DirectHammerGain, "");
     }
-           
+    
+    inline ValueTree getState(int Id)
+    {
+        ValueTree prep( vtagDirectModPrep+String(Id));
+        
+        String p = "";
+        
+        p = getParam(DirectTuning);
+        if (p != String::empty) prep.setProperty( ptagDirect_tuning,            p.getIntValue(), 0);
+        
+        p = getParam(DirectTransposition);
+        if (p != String::empty) prep.setProperty( ptagDirect_transposition,     p.getFloatValue(), 0);
+        
+        p = getParam(DirectGain);
+        if (p != String::empty) prep.setProperty( ptagDirect_gain,              p.getFloatValue(), 0);
+        
+        p = getParam(DirectResGain);
+        if (p != String::empty) prep.setProperty( ptagDirect_resGain,           p.getFloatValue(), 0);
+        
+        p = getParam(DirectHammerGain);
+        if (p != String::empty) prep.setProperty( ptagDirect_hammerGain,        p.getFloatValue(), 0);
+        
+        return prep;
+    }
     
     ~DirectModPreparation(void)
     {
@@ -176,6 +199,8 @@ public:
     }
     
     inline void setParam(DirectParameterType type, String val) { param.set(type, val);}
+    
+    inline const StringArray getStringArray(void) { return param; }
     
     void print(void)
     {

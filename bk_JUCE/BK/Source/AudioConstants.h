@@ -63,6 +63,7 @@ const String ptagIntArr = "ia";
 
 
 const String vtagSynchronicPrep = "synchronicPrep";
+const String vtagSynchronicModPrep = "synchronicModPrep";
 const String ptagSynchronic_Id = "Id";
 const String ptagSynchronic_tuning = "tuning";
 const String ptagSynchronic_tempo = "tempo";
@@ -83,6 +84,7 @@ const String vtagSynchronic_accentMults = "accentMultipliers";
 const String vtagSynchronic_transpOffsets = "transpOffsets";
 
 const String vtagNostalgicPrep = "nostalgicPrep";
+const String vtagNostalgicModPrep = "nostalgicModPrep";
 const String ptagNostalgic_Id = "Id";
 const String ptagNostalgic_tuning = "tuning";
 const String ptagNostalgic_waveDistance = "waveDistance";
@@ -97,6 +99,7 @@ const String ptagNostalgic_syncTarget = "syncTarget";
 
 
 const String vtagDirectPrep = "directPrep";
+const String vtagDirectModPrep = "directModPrep";
 const String ptagDirect_id ="Id";
 const String ptagDirect_tuning = "tuning";
 const String ptagDirect_transposition = "transposition";
@@ -105,6 +108,7 @@ const String ptagDirect_resGain = "resGain";
 const String ptagDirect_hammerGain = "hammerGain";
 
 
+const String vtagTuningModPrep = "tuningModPrep";
 const String vtagTuningPrep = "tuningPrep";
 const String ptagTuning_Id = "Id";
 const String ptagTuning_scale = "scale";

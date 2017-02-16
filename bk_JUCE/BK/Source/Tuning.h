@@ -255,12 +255,71 @@ public:
         param.set(TuningAbsoluteOffsets, offsetArrayToString(p->getAbsoluteOffsets()));
     }
     
+    inline ValueTree getState(int Id)
+    {
+        ValueTree prep(vtagTuningModPrep + String(Id));
+        
+        String p = getParam(TuningScale);
+        if (p != String::empty) prep.setProperty( ptagTuning_scale, p.getIntValue(), 0);
+        
+        p = getParam(TuningFundamental);
+        if (p != String::empty) prep.setProperty( ptagTuning_fundamental,           p.getIntValue(), 0);
+        
+        p = getParam(TuningOffset);
+        if (p != String::empty) prep.setProperty( ptagTuning_offset,                p.getFloatValue(), 0 );
+        
+        p = getParam(TuningA1IntervalScale);
+        if (p != String::empty) prep.setProperty( ptagTuning_adaptiveIntervalScale, p.getIntValue(), 0 );
+        
+        p = getParam(TuningA1Inversional);
+        if (p != String::empty) prep.setProperty( ptagTuning_adaptiveInversional,   (bool)p.getIntValue(), 0 );
+        
+        p = getParam(TuningA1AnchorScale);
+        if (p != String::empty) prep.setProperty( ptagTuning_adaptiveAnchorScale,   p.getIntValue(), 0 );
+        
+        p = getParam(TuningA1AnchorFundamental);
+        if (p != String::empty) prep.setProperty( ptagTuning_adaptiveAnchorFund,    p.getIntValue(), 0 );
+        
+        p = getParam(TuningA1ClusterThresh);
+        if (p != String::empty) prep.setProperty( ptagTuning_adaptiveClusterThresh, p.getIntValue(), 0 );
+        
+        p = getParam(TuningA1History);
+        if (p != String::empty) prep.setProperty( ptagTuning_adaptiveHistory,       p.getIntValue(), 0 );
+        
+        ValueTree scale( vtagTuning_customScale);
+        int count = 0;
+        p = getParam(TuningCustomScale);
+        if (p != String::empty)
+        {
+            Array<float> scl = stringToFloatArray(p);
+            for (auto note : scl)
+                scale.setProperty( ptagFloat + String(count++), note, 0 );
+        }
+        prep.addChild(scale, -1, 0);
+        
+        ValueTree absolute( vTagTuning_absoluteOffsets);
+        count = 0;
+        p = getParam(TuningAbsoluteOffsets);
+        
+        if (p != String::empty)
+        {
+            Array<float> offsets = stringOrderedPairsToFloatArray(p, 128);
+            for (auto note : offsets)
+                absolute.setProperty( ptagFloat + String(count++), note, 0 );
+        }
+        prep.addChild(absolute, -1, 0);
+        
+        return prep;
+    }
+    
     
     inline const String getParam(TuningParameterType type)
     {
         if (type != TuningId)   return param[type];
         else                    return "";
     }
+    
+    inline const StringArray getStringArray(void) { return param; }
     
     inline void setParam(TuningParameterType type, String val) { param.set(type, val);}
     

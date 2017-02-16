@@ -533,7 +533,6 @@ void BKAudioProcessor::loadGallery(void)
                         else if (pc->hasTagName( vtagPrepMap + String(prepMapCount)))
                         {
                             // PrepMap
-                            DBG("prepMap: " + String(prepMapCount));
                             i = pc->getStringAttribute(ptagPrepMap_keymapId).getIntValue();
                             Keymap::Ptr keymap = bkKeymaps[i];
                             
@@ -656,11 +655,20 @@ void BKAudioProcessor::saveGallery(void)
     // Tuning must be first of the preparations.
     for (int i = 0; i < tuning.size(); i++) galleryVT.addChild(tuning[i]->getState(), -1, 0);
     
-    for (int i = 0; i < direct.size(); i++) galleryVT.addChild(direct[i]->getState(), -1, 0);;
+    for (int i = 0; i < direct.size(); i++) galleryVT.addChild(direct[i]->getState(), -1, 0);
     
     for (int i = 0; i < synchronic.size(); i++) galleryVT.addChild(synchronic[i]->getState(), -1, 0);
     
     for (int i = 0; i < nostalgic.size(); i++) galleryVT.addChild(nostalgic[i]->getState(), -1, 0);
+    
+    for (int i = 0; i < modTuning.size(); i++) galleryVT.addChild(modTuning[i]->getState(i), -1, 0);
+    
+    for (int i = 0; i < modDirect.size(); i++) galleryVT.addChild(modDirect[i]->getState(i), -1, 0);
+    
+    for (int i = 0; i < modSynchronic.size(); i++) galleryVT.addChild(modSynchronic[i]->getState(i), -1, 0);
+    
+    for (int i = 0; i < modNostalgic.size(); i++) galleryVT.addChild(modNostalgic[i]->getState(i), -1, 0);
+    
     
     for (int i = 0; i < bkKeymaps.size(); i++)
     {

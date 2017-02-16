@@ -310,6 +310,147 @@ public:
         param.set(AT1Max, "");
     }
     
+    inline ValueTree getState(int Id)
+    {
+        ValueTree prep( vtagSynchronicModPrep + String(Id));
+        
+        /*
+         "Synchronic Id",
+         "Tuning Id",
+         "Tempo",
+         "NumPulses",
+         "ClusterMin",
+         "ClusterMax",
+         "ClusterThresh",
+         "Mode",
+         "BeatsToSkip",
+         "BeatMults",
+         "LengthMults",
+         "AccentMults",
+         "TranspOffsets",
+         "AT1Mode",
+         "AT1History",
+         "AT1Subdivs",
+         "AT1Min",
+         "AT1Max"
+         */
+        String p = "";
+        
+        p = getParam(SynchronicTuning);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_tuning,              p.getIntValue(), 0);
+        
+        p = getParam(SynchronicTempo);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_tempo,               p.getFloatValue(), 0);
+        
+        p = getParam(SynchronicNumPulses);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_numBeats,            p.getIntValue(), 0);
+        
+        p = getParam(SynchronicClusterMin);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_clusterMin,          p.getIntValue(), 0);
+        
+        p = getParam(SynchronicClusterMax);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_clusterMax,          p.getIntValue(), 0);
+        
+        p = getParam(SynchronicClusterThresh);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_clusterThresh,       p.getIntValue(), 0);
+        
+        p = getParam(SynchronicMode);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_mode,                p.getIntValue(), 0);
+        
+        p = getParam(SynchronicBeatsToSkip);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_beatsToSkip,         p.getIntValue(), 0);
+        
+        
+        
+        /*
+         ValueTree scale( vtagTuning_customScale);
+         int count = 0;
+         p = getParam(TuningCustomScale);
+         if (p != String::empty)
+         {
+         Array<float> scl = stringToFloatArray(p);
+         for (auto note : scl)
+         scale.setProperty( ptagFloat + String(count++), note, 0 );
+         }
+         prep.addChild(scale, -1, 0);
+         */
+        ValueTree beatMults( vtagSynchronic_beatMults);
+        int count = 0;
+        p = getParam(SynchronicBeatMultipliers);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                beatMults.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(beatMults, -1, 0);
+        
+        
+        
+        ValueTree lengthMults( vtagSynchronic_lengthMults);
+        count = 0;
+        p = getParam(SynchronicLengthMultipliers);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                lengthMults.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(lengthMults, -1, 0);
+        
+        
+        ValueTree accentMults( vtagSynchronic_accentMults);
+        count = 0;
+        p = getParam(SynchronicAccentMultipliers);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                accentMults.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(accentMults, -1, 0);
+        
+        
+        ValueTree transpOffsets( vtagSynchronic_transpOffsets);
+        count = 0;
+        p = getParam(SynchronicTranspOffsets);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                transpOffsets.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(transpOffsets, -1, 0);
+        
+        
+        p = getParam(AT1Mode);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_at1Mode,          p.getIntValue(), 0);
+        
+        p = getParam(AT1History);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_at1History,          p.getIntValue(), 0);
+        
+        p = getParam(AT1Subdivisions);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_at1Subdivisions,  p.getFloatValue(), 0);
+        
+        p = getParam(AT1Min);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_AT1Min,          p.getFloatValue(), 0);
+        
+        p = getParam(AT1Max);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_AT1Max,          p.getFloatValue(), 0);
+
+        
+        return prep;
+        
+    }
+    
     
     ~SynchronicModPreparation(void)
     {
@@ -336,6 +477,8 @@ public:
         param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
         param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
     }
+    
+    inline const StringArray getStringArray(void) { return param; }
     
     
     inline const String getParam(SynchronicParameterType type)
