@@ -147,7 +147,20 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            currentModNostalgicId = i;
+            int numMod = processor.modNostalgic.size();
+            
+            if ((i+1) > numMod)
+            {
+                processor.addNostalgicMod();
+                currentModNostalgicId = numMod;
+            }
+            else if (i >= 0)
+            {
+                currentModNostalgicId = i;
+            }
+            
+            modNostalgicTF[NostalgicId]->setText(String(currentModNostalgicId), false);
+            
             updateModFields();
         }
     }

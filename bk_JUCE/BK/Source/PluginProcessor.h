@@ -73,6 +73,10 @@ public:
     void addTuning(void);
     void addDirect(void);
     void addKeymap(void);
+    void addDirectMod(void);
+    void addNostalgicMod(void);
+    void addSynchronicMod(void);
+    void addTuningMod(void);
     
     void updateUI(void);
     bool                                pianoDidChange;

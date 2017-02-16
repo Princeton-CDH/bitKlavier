@@ -140,7 +140,20 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            currentModDirectId = i;
+            int numDMod = processor.modDirect.size();
+            
+            if ((i+1) > numDMod)
+            {
+                processor.addDirectMod();
+                currentModDirectId = numDMod;
+            }
+            else if (i >= 0)
+            {
+                currentModDirectId = i;
+            }
+            
+            modDirectTF[DirectId]->setText(String(currentModDirectId), false);
+            
             updateModFields();
         }
     }

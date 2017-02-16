@@ -40,12 +40,6 @@ resonanceReleaseSynth   (general)
     bkKeymaps.add(new Keymap(0));
     bkKeymaps.add(new Keymap(1));
     
-    // Make a bunch of tunings.
-    for (int i = 0; i < (aMaxTuningPreparations); i++)
-    {
-        modTuning.add(new TuningModPreparation());
-    }
-    
     // Start with one of each kind of preparation.
     for (int i = 0; i < 2; i++)
     {
@@ -54,17 +48,13 @@ resonanceReleaseSynth   (general)
         addNostalgic();
         addDirect();
         
+        addDirectMod();
+        addSynchronicMod();
+        addNostalgicMod();
+        addTuningMod();
+        
         nostalgic[i]->sPrep->setSyncTargetProcessor(synchronic[0]->processor);
         nostalgic[i]->aPrep->setSyncTargetProcessor(synchronic[0]->processor);
-    }
-    
-    
-    
-    for (int i = 0; i < aMaxTotalPreparations; i++)
-    {
-        modSynchronic.add   (new SynchronicModPreparation());
-        modNostalgic.add    (new NostalgicModPreparation());
-        modDirect.add       (new DirectModPreparation());
     }
 
     // Make a bunch of pianos. Default to zeroth keymap.
@@ -82,6 +72,26 @@ resonanceReleaseSynth   (general)
     // Default all on for 
     for (int i = 0; i < 128; i++) bkKeymaps[1]->addNote(i);
     
+}
+
+void BKAudioProcessor::addDirectMod()
+{
+    modDirect.add       (new DirectModPreparation());
+}
+
+void BKAudioProcessor::addSynchronicMod()
+{
+    modSynchronic.add       (new SynchronicModPreparation());
+}
+
+void BKAudioProcessor::addNostalgicMod()
+{
+    modNostalgic.add       (new NostalgicModPreparation());
+}
+
+void BKAudioProcessor::addTuningMod()
+{
+    modTuning.add       (new TuningModPreparation());
 }
 
 void BKAudioProcessor::addKeymap(void)
@@ -1071,11 +1081,32 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             --noteOnCount;
             
         }
-        else if (m.isAftertouch())
+        else if (m.isController())
         {
-        }
-        else if (m.isPitchWheel())
-        {
+            int controller = m.getControllerNumber();
+            float value = m.getControllerValue() / 128.0f;
+            
+            if (controller == 1)
+            {
+                for (int n = synchronic.size(); --n >= 0;)
+                    synchronic[n]->aPrep->setTempo((int)(15.0f + value * 3000.0f));
+                
+                synchronicPreparationDidChange = true;
+            }
+            else if (controller == 2)
+            {
+                for (int n = direct.size(); --n >= 0;)
+                    direct[n]->aPrep->setTransposition(((value * 2.0)-1.0) * 24.0f);
+                
+                directPreparationDidChange = true;
+            }
+            else if (controller == 3)
+            {
+                for (int n = nostalgic.size(); --n >= 0;)
+                    nostalgic[n]->aPrep->setTransposition(((value * 2.0)-1.0) * 24.0f);
+                
+                nostalgicPreparationDidChange = true;
+            }
             
         }
     }

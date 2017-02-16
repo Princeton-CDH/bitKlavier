@@ -151,7 +151,20 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            currentModSynchronicId = i;
+            int numMod = processor.modSynchronic.size();
+            
+            if ((i+1) > numMod)
+            {
+                processor.addSynchronicMod();
+                currentModSynchronicId = numMod;
+            }
+            else if (i >= 0)
+            {
+                currentModSynchronicId = i;
+            }
+            
+            modSynchronicTF[SynchronicId]->setText(String(currentModSynchronicId), false);
+            
             updateModFields();
         }
     }

@@ -262,9 +262,9 @@ void BKAudioProcessorEditor::resized()
                   gVCWidth,
                   nvcH);
     
-    saveButton.setBounds(getX() + gXSpacing, getBottom() - 25, 50, 20);
+    saveButton.setBounds(getX() + gXSpacing, getBottom() - 75, 50, 20);
     
-    loadButton.setBounds(saveButton.getRight() + gXSpacing, getBottom() - 25, 50, 20);
+    loadButton.setBounds(saveButton.getRight() + gXSpacing, getBottom() - 75, 50, 20);
     
     
     
