@@ -544,9 +544,9 @@ static const float aRampOnTimeSec = 0.004f;
 static const float aRampOffTimeSec = 0.03f; //was .004. don't actually use these anymore...
 static const int aNumScaleDegrees = 12;
 static const int aRampUndertowCrossMS = 50;
+static const int aRampNostalgicOffMS = 20;
 
 // Sample layers
-static const int aNumSampleLayers = 2;
 
 static const int aVelocityThresh_Eight[9] = {
     0,

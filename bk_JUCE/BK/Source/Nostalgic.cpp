@@ -73,10 +73,24 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
     
     if (noteOn[midiNoteNumber])
     {
+        
+        int offRamp;
+        if (active->getUndertow() > 0) offRamp = aRampUndertowCrossMS;
+        else offRamp = aRampNostalgicOffMS;
+        
         if (active->getMode() == NoteLengthSync)
         {
             //get length of played notes, subtract wave distance to set nostalgic reverse note length
-            duration = noteLengthTimers.getUnchecked(midiNoteNumber) * active->getLengthMultiplier() * (1000.0 / sampleRate);
+            
+            duration =  (noteLengthTimers.getUnchecked(midiNoteNumber) *
+                        active->getLengthMultiplier() +
+                        (offRamp + 3)) *
+                        (1000.0 / sampleRate);
+             /*
+            duration =  (noteLengthTimers.getUnchecked(midiNoteNumber) *
+                         active->getLengthMultiplier() ) *
+                        (1000.0 / sampleRate);
+              */
         }
         else //SynchronicSync
         {
@@ -102,10 +116,9 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
                      NostalgicNote,
                      Id,
                      duration + active->getWavedistance(),
-                     duration,                                      // length
+                     duration,  // length
                      3,
-                     aRampUndertowCrossMS );                        //ramp off
-                    //actually, should check to see if undertow is > 0, otherwise use shorter rampOff
+                     offRamp ); //ramp off
         
         
         // turn note length timers off

@@ -144,7 +144,6 @@ private:
     double playEndPosition;
     uint32 playLength;
     uint64 timer;
-    int maxPulses, numPulses;
     BKNoteType bkType;
     PianoSamplerNoteType playType;
     PianoSamplerNoteDirection playDirection;
