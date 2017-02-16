@@ -84,7 +84,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
             
             duration =  (noteLengthTimers.getUnchecked(midiNoteNumber) *
                         active->getLengthMultiplier() +
-                        (offRamp + 3)) *
+                        (offRamp + 3)) *          //offRamp + onRamp
                         (1000.0 / sampleRate);
              /*
             duration =  (noteLengthTimers.getUnchecked(midiNoteNumber) *
@@ -97,7 +97,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
             //get time in ms to target beat, summing over skipped beat lengths
             //duration = syncProcessor->getTimeToBeatMS(active->getBeatsToSkip()); // sum
             SynchronicProcessor::Ptr syncTarget = active->getSyncTargetProcessor();
-            duration = syncTarget->getTimeToBeatMS(active->getBeatsToSkip()); // sum
+            duration = syncTarget->getTimeToBeatMS(active->getBeatsToSkip()) + offRamp + 3; // sum
         }
         
         float offset = (active->getTransposition() + tuner->getOffset(midiNoteNumber));
@@ -115,7 +115,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
                      FixedLengthFixedStart,
                      NostalgicNote,
                      Id,
-                     duration + active->getWavedistance(),
+                     duration + active->getWavedistance(), //tweak to make sync sound better?
                      duration,  // length
                      3,
                      offRamp ); //ramp off
