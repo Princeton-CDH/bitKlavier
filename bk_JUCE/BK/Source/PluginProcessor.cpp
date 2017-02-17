@@ -1282,6 +1282,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == TuningA1AnchorFundamental) active->setAdaptiveAnchorFundamental((PitchClass) modi);
         else if (type == TuningA1History)           active->setAdaptiveHistory(modi);
         else if (type == TuningCustomScale)         active->setCustomScale(modfa);
+        else if (type == TuningAbsoluteOffsets)     active->setAbsoluteOffsets(modfa);
         
         tuningPreparationDidChange = true;
     }
