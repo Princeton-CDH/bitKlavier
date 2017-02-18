@@ -68,6 +68,13 @@ public:
     int                         numPMaps;
     
     OwnedArray<ModificationMap> modMap;
+    void clearModMap(void)
+    {
+        for (int i = 0; i<modMap.size(); i++)
+        {
+            modMap[i]->clearModifications();
+        }
+    }
     
     int                         numModSMaps, numModNMaps, numModDMaps;
     
