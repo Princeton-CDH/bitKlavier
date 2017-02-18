@@ -429,9 +429,9 @@ Array<float> stringOrderedPairsToFloatArray(String s, int size)
             newval = tempFloat.getFloatValue();
             tempFloat = "";
             
-            //DBG("new array index and value " + String(newindex) + " " + String(newval));
+            DBG("new array index and value " + String(newindex) + " " + String(newval));
             
-            newarray.insert(newindex, newval);
+            newarray.set(newindex, newval);
         }
         else previousSpace = false;
         
