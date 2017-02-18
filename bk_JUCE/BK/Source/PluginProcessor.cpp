@@ -1282,7 +1282,13 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == TuningA1AnchorFundamental) active->setAdaptiveAnchorFundamental((PitchClass) modi);
         else if (type == TuningA1History)           active->setAdaptiveHistory(modi);
         else if (type == TuningCustomScale)         active->setCustomScale(modfa);
-        else if (type == TuningAbsoluteOffsets)     active->setAbsoluteOffsets(modfa);
+        else if (type == TuningAbsoluteOffsets)
+        {
+            for(int i = 0; i< modfa.size(); i+=2) {
+                //DBG("modfa AbsoluteOffsets val = " + String(modfa[i]) + " " + String(modfa[i+1]));
+                active->setAbsoluteOffset(modfa[i], modfa[i+1] * .01);
+            }
+        }
         
         tuningPreparationDidChange = true;
     }

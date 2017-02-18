@@ -126,6 +126,10 @@ public:
     inline void setAdaptiveHistory(int adaptiveHistory)                             {tAdaptiveHistory = adaptiveHistory;                    }
     inline void setCustomScale(Array<float> tuning)                                 {tCustom = tuning;                                      }
     inline void setAbsoluteOffsets(Array<float> abs)                                {tAbsolute = abs;                                       }
+    void setAbsoluteOffset(int which, float val)
+    {
+        tAbsolute.set(which, val);
+    }
     
     inline void setCustomScaleCents(Array<float> tuning) {
         tCustom = tuning;
