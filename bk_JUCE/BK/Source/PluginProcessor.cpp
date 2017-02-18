@@ -301,6 +301,7 @@ void BKAudioProcessor::loadGallery(void)
                                 else
                                 {
                                     f = attr.getFloatValue();
+                                    //DBG("reading new absolute val: " + String(f));
                                     absolute.add(f);
                                 }
                             }

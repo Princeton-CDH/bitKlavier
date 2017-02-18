@@ -160,7 +160,8 @@ String offsetArrayToString(Array<float> arr)
     int key = 0;
     for (auto offset : arr)
     {
-        if (offset != 0.0)  s += String(key) + ":" + String((int)(offset*100.0f)) + " ";
+        //if (offset != 0.0)  s += String(key) + ":" + String((int)(offset*100.0f)) + " ";
+        if (offset != 0.0)  s += String(key) + ":" + String((offset*100.0f)) + " ";
         
         ++key;
     }
