@@ -1304,12 +1304,14 @@ void BKAudioProcessor::performModifications(int noteNumber)
         DirectParameterType type = dMod[i]->getParameterType();
         modf = dMod[i]->getModFloat();
         modi = dMod[i]->getModInt();
+        modia = dMod[i]->getModIntArr();
         
         if (type == DirectTransposition)    active->setTransposition(modf);
         else if (type == DirectGain)        active->setGain(modf);
         else if (type == DirectHammerGain)  active->setHammerGain(modf);
         else if (type == DirectResGain)     active->setResonanceGain(modf);
         else if (type == DirectTuning)      active->setTuning(tuning[modi]);
+        else if (type == DirectResetKeymap) active->resetMap->setKeymap(modia);
         
         directPreparationDidChange = true;
     }

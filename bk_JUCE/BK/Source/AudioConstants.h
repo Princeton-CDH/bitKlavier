@@ -106,6 +106,7 @@ const String ptagDirect_transposition = "transposition";
 const String ptagDirect_gain = "gain";
 const String ptagDirect_resGain = "resGain";
 const String ptagDirect_hammerGain = "hammerGain";
+const String vtagDirect_resetMap = "directResetMap";
 
 
 const String vtagTuningModPrep = "tuningModPrep";
@@ -125,7 +126,7 @@ const String vtagTuning_customScale = "customScale";
 const String ptagTuning_customScaleLength = "customScaleLength";
 const String ptagTuning_customScaleDegree = "scaleDegree";
 const String vTagTuning_absoluteOffsets = "absoluteOffsets";
-const String vtagTuning_resetMap = "resetMap";
+const String vtagTuning_resetMap = "tuningResetMap";
 
 
 const String vtagKeymaps = "keymaps";
@@ -410,6 +411,7 @@ typedef enum DirectParameterType
     DirectGain,
     DirectResGain,
     DirectHammerGain,
+    DirectResetKeymap,
     DirectParameterTypeNil,
     
 } DirectParameterType;
@@ -421,7 +423,8 @@ static const std::vector<BKParameterDataType> cDirectDataTypes = {
     BKFloat,
     BKFloat,
     BKFloat,
-    BKFloat
+    BKFloat,
+    BKIntArr
 };
 
 static const std::vector<std::string> cDirectParameterTypes = {
@@ -430,7 +433,8 @@ static const std::vector<std::string> cDirectParameterTypes = {
     "Transposition",
     "Gain",
     "ResGain",
-    "HammerGain"
+    "HammerGain",
+    "ResetKeymap"
 };
 
 #pragma mark - Tuning

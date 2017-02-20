@@ -132,6 +132,40 @@ BKAudioProcessorEditor::~BKAudioProcessorEditor()
 
 void BKAudioProcessorEditor::timerCallback()
 {
+    
+    //need these to account for reset calls
+    //i can't see how to set the processor.***didChange bools from within preparationMap or the preparation classes
+    for(int i = 0; i<processor.synchronic.size(); i++)
+    {
+        if(processor.synchronic[i]->didChange)
+        {
+            processor.synchronic[i]->didChange = false;
+            svc.updateFields();
+        }
+        
+    }
+    
+    for(int i = 0; i<processor.nostalgic.size(); i++)
+    {
+        if(processor.nostalgic[i]->didChange)
+        {
+            processor.nostalgic[i]->didChange = false;
+            nvc.updateFields();
+        }
+        
+    }
+    
+    for(int i = 0; i<processor.direct.size(); i++)
+    {
+        if(processor.direct[i]->didChange)
+        {
+            processor.direct[i]->didChange = false;
+            dvc.updateFields();
+        }
+        
+    }
+    
+    
     if (processor.pianoDidChange)
     {
         processor.pianoDidChange = false;

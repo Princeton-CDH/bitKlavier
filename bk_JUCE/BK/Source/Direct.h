@@ -85,12 +85,14 @@ public:
     inline const float getResonanceGain() const noexcept                {return dResonanceGain; }
     inline const float getHammerGain() const noexcept                   {return dHammerGain;    }
     inline const Tuning::Ptr getTuning() const noexcept                 {return tuning;         }
+    inline const Keymap::Ptr getResetMap() const noexcept               {return resetMap;       }
     
     inline void setTransposition(float val)                             {dTransposition = val;  }
     inline void setGain(float val)                                      {dGain = val;           }
     inline void setResonanceGain(float val)                             {dResonanceGain = val;  }
     inline void setHammerGain(float val)                                {dHammerGain = val;     }
     inline void setTuning(Tuning::Ptr t)                                {tuning = t;            }
+    inline void setResetMap(Keymap::Ptr k)                              {resetMap = k;            }
     
     
     void print(void)
@@ -99,10 +101,11 @@ public:
         DBG("dGain: "           + String(dGain));
         DBG("dResGain: "        + String(dResonanceGain));
         DBG("dHammerGain: "     + String(dHammerGain));
+        //DBG("resetKeymap: "     + intArrayToString(p->getResetMap()->keys()));
     }
     
     //internal keymap for resetting internal values to static
-    Keymap* resetMap = new Keymap(0); //need to add to copy and mod
+    Keymap::Ptr resetMap = new Keymap(0);
 
 private:
     
@@ -132,6 +135,7 @@ public:
     DirectGain,
     DirectResGain,
     DirectHammerGain,
+    DirectResetKeymap,
     DirectParameterTypeNil,
      */
     
@@ -144,6 +148,7 @@ public:
         param.set(DirectGain, String(p->getGain()));
         param.set(DirectResGain, String(p->getResonanceGain()));
         param.set(DirectHammerGain, String(p->getHammerGain()));
+        param.set(DirectResetKeymap, intArrayToString(p->getResetMap()->keys()));
         
     }
     
@@ -155,6 +160,7 @@ public:
         param.set(DirectGain, "");
         param.set(DirectResGain, "");
         param.set(DirectHammerGain, "");
+        param.set(DirectResetKeymap, "");
     }
     
     inline ValueTree getState(int Id)
@@ -178,6 +184,17 @@ public:
         p = getParam(DirectHammerGain);
         if (p != String::empty) prep.setProperty( ptagDirect_hammerGain,        p.getFloatValue(), 0);
         
+        ValueTree resetMap(vtagDirect_resetMap);
+        int count = 0;
+        p = getParam(DirectResetKeymap);
+        if (p != String::empty)
+        {
+            Array<int> rmap = stringToIntArray(p);
+            for (auto note : rmap)
+                resetMap.setProperty( ptagInt + String(count++), note, 0 );
+        }
+        prep.addChild(resetMap, -1, 0);
+        
         return prep;
     }
     
@@ -193,6 +210,7 @@ public:
         param.set(DirectGain, String(d->getGain()));
         param.set(DirectResGain, String(d->getResonanceGain()));
         param.set(DirectHammerGain, String(d->getHammerGain()));
+        param.set(DirectResetKeymap, intArrayToString(d->getResetMap()->keys()));
     }
     
     

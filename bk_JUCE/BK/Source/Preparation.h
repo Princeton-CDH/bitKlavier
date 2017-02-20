@@ -65,8 +65,14 @@ public:
     DirectPreparation::Ptr      sPrep;
     DirectPreparation::Ptr      aPrep;
     
-    void reset()                { aPrep->copy(sPrep); }
+    void reset()
+    {
+        aPrep->copy(sPrep);
+        didChange = true;
+        DBG("direct reset");
+    }
     
+    bool didChange = false;
     
 private:
     int Id;
@@ -193,12 +199,13 @@ public:
     {
         aPrep->copy(sPrep);
         processor->atReset();
+        didChange = true;
     }
     
+    bool didChange = false;
     
 private:
     int Id;
-    
     
     
     JUCE_LEAK_DETECTOR(Synchronic)
@@ -264,8 +271,13 @@ public:
     NostalgicPreparation::Ptr       sPrep;
     NostalgicPreparation::Ptr       aPrep;
     
-    void reset()                    { aPrep->copy(sPrep); }
+    void reset()
+    {
+        aPrep->copy(sPrep);
+        didChange = true;
+    }
     
+    bool didChange = false;
     
 private:
     int Id;
