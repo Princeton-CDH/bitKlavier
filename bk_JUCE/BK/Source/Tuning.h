@@ -12,7 +12,7 @@
 #define TUNING_H_INCLUDED
 
 #include "BKUtilities.h"
-
+#include "Keymap.h"
 #include "AudioConstants.h"
 
 class TuningPreparation : public ReferenceCountedObject
@@ -35,7 +35,8 @@ public:
     tAdaptiveClusterThresh(p->getAdaptiveClusterThresh()),
     tAdaptiveHistory(p->getAdaptiveHistory()),
     tCustom(p->getCustomScale()),
-    tAbsolute(p->getAbsoluteOffsets())
+    tAbsolute(p->getAbsoluteOffsets()),
+    resetMap(p->getResetMap())
     {
 
     }
@@ -53,6 +54,8 @@ public:
         tAdaptiveHistory = p->getAdaptiveHistory();
         tCustom = p->getCustomScale();
         tAbsolute = p->getAbsoluteOffsets();
+        resetMap = p->getResetMap();
+        
     }
     
     TuningPreparation(TuningSystem whichTuning,
@@ -78,6 +81,9 @@ public:
     {
         tAbsolute.ensureStorageAllocated(128);
         for(int i=0; i<128; i++) tAbsolute.set(i, 0.);
+        
+        resetMap.ensureStorageAllocated(128);
+        for (int i = 0; i < 128; i++) resetMap.set(i,false);
     }
     
     TuningPreparation(void):
@@ -94,6 +100,9 @@ public:
     {
         tAbsolute.ensureStorageAllocated(128);
         for(int i=0; i<128; i++) tAbsolute.set(i, 0.);
+        
+        resetMap.ensureStorageAllocated(128);
+        for (int i = 0; i < 128; i++) resetMap.set(i,false);
     }
     
     ~TuningPreparation()
@@ -112,7 +121,20 @@ public:
     inline const int getAdaptiveHistory() const noexcept                    {return tAdaptiveHistory;           }
     inline const Array<float> getCustomScale() const noexcept               {return tCustom;                    }
     inline const Array<float> getAbsoluteOffsets() const noexcept           {return tAbsolute;                  }
-    float getAbsoluteOffset(int midiNoteNumber) const noexcept {return tAbsolute.getUnchecked(midiNoteNumber);}
+    float getAbsoluteOffset(int midiNoteNumber) const noexcept              {return tAbsolute.getUnchecked(midiNoteNumber);}
+    inline const Array<bool> getResetMap() const noexcept                   {return resetMap;                  }
+    inline const Array<int> getResetMapActiveKeys() const noexcept
+    {
+        Array<int> k = Array<int>();
+        k.ensureStorageAllocated(128);
+        
+        for (int note = 0; note < 128; note++)
+        {
+            if (resetMap[note]) k.add(note);
+        }
+        
+        return k;
+    }
     
     
     inline void setTuning(TuningSystem tuning)                                      {tWhichTuning = tuning;                                 }
@@ -126,11 +148,8 @@ public:
     inline void setAdaptiveHistory(int adaptiveHistory)                             {tAdaptiveHistory = adaptiveHistory;                    }
     inline void setCustomScale(Array<float> tuning)                                 {tCustom = tuning;                                      }
     inline void setAbsoluteOffsets(Array<float> abs)                                {tAbsolute = abs;                                       }
-    void setAbsoluteOffset(int which, float val)
-    {
-        tAbsolute.set(which, val);
-    }
-    
+    void setAbsoluteOffset(int which, float val)                                    {tAbsolute.set(which, val);                             }
+    inline void setResetMap(Array<bool> newmap)                                     {resetMap = newmap;                                     }
     inline void setCustomScaleCents(Array<float> tuning) {
         tCustom = tuning;
         for(int i=0; i<tCustom.size(); i++) tCustom.setUnchecked(i, tCustom.getUnchecked(i) * 0.01f);
@@ -141,6 +160,20 @@ public:
         for(int i=tAbsolute.size(); --i >= 0;)
             tAbsolute.setUnchecked(i, tAbsolute.getUnchecked(i) * 0.01f);
     }
+    
+    void createResetMap(Array<int> km)
+    {
+        //clear it
+        for (int note = 0; note < 128; note++) resetMap.set(note, false);
+        
+        //set all vals from km array to true
+        for (auto note : km) resetMap.set(note, true);
+        
+        DBG("just created resetMap");
+    }
+    
+    bool resetMapContains(int noteNumber) { return resetMap[noteNumber];}
+    
     
     void print(void)
     {
@@ -155,7 +188,9 @@ public:
         DBG("tAdaptiveHistory: " +              String(tAdaptiveHistory));
         DBG("tCustom: " +                       floatArrayToString(tCustom));
         DBG("tAbsolute: " +                     floatArrayToString(tAbsolute));
+        //DBG("tResetMap: " +                     intArrayToString(getResetMapActiveKeys());
     }
+    
 private:
     // basic tuning settings, for static tuning
     TuningSystem    tWhichTuning;               //which tuning system to use
@@ -175,7 +210,10 @@ private:
     // custom scale and absolute offsets
     Array<float>    tCustom = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}; //custom scale
     Array<float>    tAbsolute;  //offset (in MIDI fractional offsets, like other tunings) for specific notes; size = 128
-        
+    
+    Array<bool> resetMap;
+
+    
     JUCE_LEAK_DETECTOR(TuningPreparation);
 };
 
@@ -219,6 +257,7 @@ public:
         param.set(TuningA1History, String(p->getAdaptiveHistory()));
         param.set(TuningCustomScale, floatArrayToString(p->getCustomScale()));
         param.set(TuningAbsoluteOffsets, floatArrayToString(p->getAbsoluteOffsets()));
+        param.set(TuningResetKeymap, intArrayToString(p->getResetMapActiveKeys()));
         
     }
     
@@ -236,6 +275,7 @@ public:
         param.set(TuningA1History, "");
         param.set(TuningCustomScale, "");
         param.set(TuningAbsoluteOffsets, "");
+        param.set(TuningResetKeymap, "");
     }
     
     
@@ -257,6 +297,7 @@ public:
         param.set(TuningA1History, String(p->getAdaptiveHistory()));
         param.set(TuningCustomScale, floatArrayToString(p->getCustomScale()));
         param.set(TuningAbsoluteOffsets, offsetArrayToString(p->getAbsoluteOffsets()));
+        param.set(TuningResetKeymap, intArrayToString(p->getResetMapActiveKeys()));
     }
     
     inline ValueTree getState(int Id)
@@ -304,7 +345,6 @@ public:
         ValueTree absolute( vTagTuning_absoluteOffsets);
         count = 0;
         p = getParam(TuningAbsoluteOffsets);
-        
         if (p != String::empty)
         {
             Array<float> offsets = stringOrderedPairsToFloatArray(p, 128);
@@ -312,6 +352,17 @@ public:
                 absolute.setProperty( ptagFloat + String(count++), note, 0 );
         }
         prep.addChild(absolute, -1, 0);
+        
+        ValueTree resetMap( vtagTuning_resetMap);
+        count = 0;
+        p = getParam(TuningResetKeymap);
+        if (p != String::empty)
+        {
+            Array<int> rmap = stringToIntArray(p);
+            for (auto note : rmap)
+                resetMap.setProperty( ptagInt + String(count++), note, 0 );
+        }
+        prep.addChild(resetMap, -1, 0);
         
         return prep;
     }
@@ -336,6 +387,7 @@ public:
     {
         
     }
+    
     
 private:
     StringArray          param;
@@ -369,6 +421,9 @@ public:
     //for global tuning adjustment, A442, etc...
     void setGlobalTuningReference(float tuningRef) { globalTuningReference = tuningRef;}
     const float getGlobalTuningReference(void) const noexcept {return globalTuningReference;}
+    
+    //reset adaptive tuning
+    void adaptiveReset();
     
 private:
     
@@ -478,6 +533,13 @@ public:
     TuningProcessor::Ptr        processor;
     TuningPreparation::Ptr      sPrep;
     TuningPreparation::Ptr      aPrep;
+    
+    void reset()
+    {
+        aPrep->copy(sPrep);
+        processor->adaptiveReset();
+        DBG("resetting tuning");
+    }
     
     
 private:

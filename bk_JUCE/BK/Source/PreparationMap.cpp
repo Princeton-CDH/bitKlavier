@@ -110,18 +110,21 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel)
 {
     for (int i = synchronic.size(); --i >= 0; )
     {
+        if (synchronic[i]->aPrep->resetMap->containsNote(noteNumber)) synchronic[i]->reset();
         if (pKeymap->containsNote(noteNumber))
             synchronic[i]->processor->keyPressed(noteNumber, velocity);
     }
     
     for (int i = nostalgic.size(); --i >= 0; )
     {
+        if (nostalgic[i]->aPrep->resetMap->containsNote(noteNumber)) nostalgic[i]->reset();
         if (pKeymap->containsNote(noteNumber))
             nostalgic[i]->processor->keyPressed(noteNumber, velocity);
     }
     
     for (int i = direct.size(); --i >= 0; )
     {
+        if (direct[i]->aPrep->resetMap->containsNote(noteNumber)) direct[i]->reset();
         if (pKeymap->containsNote(noteNumber))
             direct[i]->processor->keyPressed(noteNumber, velocity, channel);
     }

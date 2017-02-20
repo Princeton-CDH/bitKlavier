@@ -1244,6 +1244,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 void BKAudioProcessor::performModifications(int noteNumber)
 {
     Array<float> modfa;
+    Array<int> modia;
     float modf;
     int   modi;
     bool  modb;
@@ -1272,6 +1273,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modi = tMod[i]->getModInt();
         modb = tMod[i]->getModBool();
         modfa = tMod[i]->getModFloatArr();
+        modia = tMod[i]->getModIntArr();
         
         if (type == TuningScale)                    active->setTuning((TuningSystem)modi);
         else if (type == TuningFundamental)         active->setFundamental((PitchClass)modi);
@@ -1290,6 +1292,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
                 active->setAbsoluteOffset(modfa[i], modfa[i+1] * .01);
             }
         }
+        else if (type == TuningResetKeymap)         active->createResetMap(modia);
         
         tuningPreparationDidChange = true;
     }
@@ -1394,7 +1397,15 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             // Check PianoMap for whether piano should change due to key strike.
             int whichPiano = currentPiano->pianoMap[noteNumber] - 1;
             if (whichPiano >= 0 && whichPiano != currentPiano->getId()) setCurrentPiano(whichPiano);
-
+            
+            // check for tuning resets
+            for (int i = tuning.size(); --i >= 0; )
+            {
+                if (tuning[i]->aPrep->resetMapContains(noteNumber)) tuning[i]->reset();
+                tuningPreparationDidChange = true;
+            }
+            
+            // modifications
             performModifications(noteNumber);
             
             // Send key on to each pmap in current piano

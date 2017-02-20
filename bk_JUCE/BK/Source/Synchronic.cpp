@@ -107,7 +107,7 @@ void SynchronicProcessor::resetPhase(int skipBeats)
 
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
-    
+
     //set tuning
     tuner = active->getTuning()->processor;
     
@@ -368,4 +368,12 @@ void SynchronicProcessor::atCalculatePeriodMultiplier()
     }
 }
 
+void SynchronicProcessor::atReset()
+{
+    for (int i = 0; i < active->getAdaptiveTempo1History(); i++)
+    {
+        atDeltaHistory.insert(0, (60000.0/active->getTempo()));
+    }
+    adaptiveTempoPeriodMultiplier = 1.;
+}
 

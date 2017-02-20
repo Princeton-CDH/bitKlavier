@@ -225,6 +225,7 @@ public:
     type(type)
     {
         modFloatArr = Array<float>();
+        modIntArr = Array<int>();
         modBool = var::null;
         modInt = var::null;
         modFloat = var::null;
@@ -248,6 +249,10 @@ public:
         else if (cTuningDataTypes[type] == BKBool)
         {
             modBool = (bool)val.getIntValue();
+        }
+        else if (cTuningDataTypes[type] == BKIntArr)
+        {
+            modIntArr = stringToIntArray(val);
         }
     }
     

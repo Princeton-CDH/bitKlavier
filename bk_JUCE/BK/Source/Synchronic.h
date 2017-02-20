@@ -15,6 +15,7 @@
 #include "BKSynthesiser.h"
 #include "Tuning.h"
 #include "General.h"
+#include "Keymap.h"
 
 class SynchronicPreparation : public ReferenceCountedObject
 {
@@ -126,6 +127,7 @@ public:
         at1Subdivisions = s->getAdaptiveTempo1Subdivisions();
         at1Mode = s->getAdaptiveTempo1Mode();
         tuning = s->getTuning();
+        resetMap->copy(s->resetMap);
     }
     
     inline const float getTempo() const noexcept                       {return sTempo;                 }
@@ -204,6 +206,8 @@ public:
         DBG("sClusterThreshSec: " + String(sClusterThreshSec));
         DBG("| - - - - - - - - -- - - - - - - - - |");
     }
+    
+    Keymap* resetMap = new Keymap(0); //need to add to copy and mod
     
 private:
     float sTempo;
@@ -528,6 +532,7 @@ public:
     void keyPressed(int noteNumber, float velocity);
     void keyReleased(int noteNumber, int channel);
     float getTimeToBeatMS(float beatsToSkip);
+    void  atReset();
     
 private:
     int Id;
@@ -575,8 +580,7 @@ private:
     void atNewNoteOff();
     void atCalculatePeriodMultiplier();
     float adaptiveTempoPeriodMultiplier;
-
-
+    
     bool shouldPlay;
     
     JUCE_LEAK_DETECTOR(SynchronicProcessor);

@@ -38,9 +38,9 @@ public:
     resonanceSynth(res),
     hammerSynth(ham)
     {
-        sPrep = new DirectPreparation(tuning);
-        aPrep = new DirectPreparation(sPrep);
-        processor = new DirectProcessor(s, res, ham, aPrep, Id);
+        sPrep       = new DirectPreparation(tuning);
+        aPrep       = new DirectPreparation(sPrep);
+        processor   = new DirectProcessor(s, res, ham, aPrep, Id);
     };
     
     inline ValueTree getState(void)
@@ -64,6 +64,8 @@ public:
     DirectProcessor::Ptr        processor;
     DirectPreparation::Ptr      sPrep;
     DirectPreparation::Ptr      aPrep;
+    
+    void reset()                { aPrep->copy(sPrep); }
     
     
 private:
@@ -92,9 +94,9 @@ public:
                int Id):
     Id(Id)
     {
-        sPrep = new SynchronicPreparation(tuning);
-        aPrep = new SynchronicPreparation(sPrep);
-        processor = new SynchronicProcessor(s, aPrep, general, Id);
+        sPrep       = new SynchronicPreparation(tuning);
+        aPrep       = new SynchronicPreparation(sPrep);
+        processor   = new SynchronicProcessor(s, aPrep, general, Id);
     };
     
     inline ValueTree getState(void)
@@ -186,6 +188,12 @@ public:
     SynchronicProcessor::Ptr        processor;
     SynchronicPreparation::Ptr      sPrep;
     SynchronicPreparation::Ptr      aPrep;
+
+    void reset()
+    {
+        aPrep->copy(sPrep);
+        processor->atReset();
+    }
     
     
 private:
@@ -211,9 +219,9 @@ public:
            int Id):
     Id(Id)
     {
-        sPrep = new NostalgicPreparation(tuning);
-        aPrep = new NostalgicPreparation(sPrep);
-        processor = new NostalgicProcessor(s, aPrep, Id);
+        sPrep       = new NostalgicPreparation(tuning);
+        aPrep       = new NostalgicPreparation(sPrep);
+        processor   = new NostalgicProcessor(s, aPrep, Id);
     };
     
     ~Nostalgic() {};
@@ -230,7 +238,7 @@ public:
      NostalgicMode,
      NostalgicSyncTarget,
         */
-     inline int getId() {return Id;};
+    inline int getId() {return Id;}
     
     inline ValueTree getState(void)
     {
@@ -252,9 +260,11 @@ public:
     
     
     
-    NostalgicProcessor::Ptr        processor;
-    NostalgicPreparation::Ptr      sPrep;
-    NostalgicPreparation::Ptr      aPrep;
+    NostalgicProcessor::Ptr         processor;
+    NostalgicPreparation::Ptr       sPrep;
+    NostalgicPreparation::Ptr       aPrep;
+    
+    void reset()                    { aPrep->copy(sPrep); }
     
     
 private:

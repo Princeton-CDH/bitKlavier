@@ -50,6 +50,11 @@ public:
         
     }
     
+    inline void copy(Keymap::Ptr k)
+    {
+        keymap = k->keymap;
+    }
+    
     inline int getId(void) {   return Id; }
     
     // Returns true if added, false if removed.

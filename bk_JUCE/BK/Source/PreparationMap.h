@@ -14,9 +14,7 @@
 #define PreparationMap_H_INCLUDED
 
 #include "BKUtilities.h"
-
 #include "Keymap.h"
-
 #include "Preparation.h"
 
 class PreparationMap : public ReferenceCountedObject

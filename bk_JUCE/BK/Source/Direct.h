@@ -76,6 +76,7 @@ public:
         dResonanceGain = d->getResonanceGain();
         dHammerGain = d->getHammerGain();
         tuning = d->getTuning();
+        resetMap->copy(d->resetMap);
     }
     
     
@@ -83,7 +84,7 @@ public:
     inline const float getGain() const noexcept                         {return dGain;          }
     inline const float getResonanceGain() const noexcept                {return dResonanceGain; }
     inline const float getHammerGain() const noexcept                   {return dHammerGain;    }
-    inline const Tuning::Ptr getTuning() const noexcept      {return tuning;         }
+    inline const Tuning::Ptr getTuning() const noexcept                 {return tuning;         }
     
     inline void setTransposition(float val)                             {dTransposition = val;  }
     inline void setGain(float val)                                      {dGain = val;           }
@@ -99,6 +100,9 @@ public:
         DBG("dResGain: "        + String(dResonanceGain));
         DBG("dHammerGain: "     + String(dHammerGain));
     }
+    
+    //internal keymap for resetting internal values to static
+    Keymap* resetMap = new Keymap(0); //need to add to copy and mod
 
 private:
     

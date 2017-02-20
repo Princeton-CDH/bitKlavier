@@ -98,6 +98,7 @@ public:
         nMode = n->getMode();
         nSyncTarget = n->getSyncTarget();
         tuning = n->getTuning();
+        resetMap->copy(n->resetMap);
     }
     
     inline const int getWavedistance() const noexcept                      {return nWaveDistance;      }
@@ -138,6 +139,8 @@ public:
         DBG("nMode: " + String(nMode));
         DBG("nSyncTarget: " + String(nSyncTarget));
     }
+    
+    Keymap* resetMap = new Keymap(0); //need to add to copy and mod
     
 private:
     int nWaveDistance;  //ms; distance from beginning of sample to stop reverse playback and begin undertow

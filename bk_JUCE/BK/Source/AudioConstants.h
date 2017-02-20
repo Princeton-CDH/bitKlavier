@@ -125,6 +125,7 @@ const String vtagTuning_customScale = "customScale";
 const String ptagTuning_customScaleLength = "customScaleLength";
 const String ptagTuning_customScaleDegree = "scaleDegree";
 const String vTagTuning_absoluteOffsets = "absoluteOffsets";
+const String vtagTuning_resetMap = "resetMap";
 
 
 const String vtagKeymaps = "keymaps";
@@ -447,6 +448,7 @@ typedef enum TuningParameterType
     TuningA1History,
     TuningCustomScale,
     TuningAbsoluteOffsets,
+    TuningResetKeymap,
     TuningParameterTypeNil
     
 } TuningParameterType;
@@ -463,7 +465,8 @@ static const std::vector<BKParameterDataType> cTuningDataTypes = {
     BKInt,
     BKInt,
     BKFloatArr,
-    BKFloatArr
+    BKFloatArr,
+    BKIntArr
 };
 
 static const std::vector<std::string> cTuningParameterTypes = {
@@ -478,7 +481,8 @@ static const std::vector<std::string> cTuningParameterTypes = {
     "A1ClusterThresh",
     "A1History",
     "CustomScale",
-    "AbsoluteOffsets"
+    "AbsoluteOffsets",
+    "ResetKeymap"
 };
 
 
@@ -595,8 +599,8 @@ typedef enum TuningSystem {
     UtonalTuning,
     AdaptiveTuning,
     AdaptiveAnchoredTuning,
-    CustomTuning,
-    AbsoluteTuning
+    CustomTuning
+
 } TuningSystem;
 
 #endif  // AUDIOCONSTANTS_H_INCLUDED
