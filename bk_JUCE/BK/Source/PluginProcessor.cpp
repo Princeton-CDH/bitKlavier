@@ -293,17 +293,14 @@ void BKAudioProcessor::loadGallery(void)
                         else if (sub->hasTagName(vTagTuning_absoluteOffsets))
                         {
                             Array<float> absolute;
+                            absolute.ensureStorageAllocated(128);
                             for (int k = 0; k < 128; k++)
                             {
                                 String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                
-                                if (attr == String::empty) break;
-                                else
-                                {
-                                    f = attr.getFloatValue();
-                                    //DBG("reading new absolute val: " + String(f));
-                                    absolute.add(f);
-                                }
+                                f = attr.getFloatValue();
+                                //DBG("reading new absolute val: " + String(f));
+                                absolute.set(k, f);
+    
                             }
                             
                             tuning[id]->sPrep->setAbsoluteOffsets(absolute);
@@ -314,7 +311,8 @@ void BKAudioProcessor::loadGallery(void)
                     tuning[id]->aPrep->copy( tuning[id]->sPrep);
                     
                     ++tPrepCount;
-                }else if (e->hasTagName( vtagTuningModPrep + String(tModPrepCount)))
+                }
+                else if (e->hasTagName( vtagTuningModPrep + String(tModPrepCount)))
                 {
                     addTuningMod();
                     
@@ -372,7 +370,20 @@ void BKAudioProcessor::loadGallery(void)
                         else if (sub->hasTagName(vTagTuning_absoluteOffsets))
                         {
                             Array<float> absolute;
+                            absolute.ensureStorageAllocated(128);
                             String abs = "";
+                
+                            for (int k = 0; k < 128; k++)
+                            {
+                                String attr = sub->getStringAttribute(ptagFloat + String(k));
+                                f = attr.getFloatValue();
+                                DBG("reading new absolute mod val: " + String(f));
+                                absolute.set(k, f);
+                                if (f != 0.0) abs += (String(k) + ":" + String(f) + " ");
+                                
+                            }
+                            
+                            /*
                             for (int k = 0; k < 128; k++)
                             {
                                 String attr = sub->getStringAttribute(ptagFloat + String(k));
@@ -385,6 +396,7 @@ void BKAudioProcessor::loadGallery(void)
                                     if (f != 0.0) abs += (String(k) + ":" + String(f) + " ");
                                 }
                             }
+                             */
                             
                             modTuning[id]->setParam(TuningAbsoluteOffsets, abs);
                         }

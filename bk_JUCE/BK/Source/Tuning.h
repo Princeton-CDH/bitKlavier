@@ -320,7 +320,10 @@ public:
         {
             Array<float> offsets = stringOrderedPairsToFloatArray(p, 128);
             for (auto note : offsets)
-                absolute.setProperty( ptagFloat + String(count++), note, 0 );
+            {
+                if(note != 0.) absolute.setProperty( ptagFloat + String(count), note * .01, 0 );
+                count++;
+            }
         }
         prep.addChild(absolute, -1, 0);
         
@@ -491,7 +494,10 @@ public:
         ValueTree absolute( vTagTuning_absoluteOffsets);
         count = 0;
         for (auto note : sPrep->getAbsoluteOffsets())
-            absolute.setProperty( ptagFloat + String(count++), note, 0 );
+        {
+            if(note != 0.) absolute.setProperty( ptagFloat + String(count), note, 0 );
+            count++;
+        }
         prep.addChild(absolute, -1, 0);
         
         return prep;
