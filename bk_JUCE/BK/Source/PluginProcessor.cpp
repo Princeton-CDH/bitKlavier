@@ -376,7 +376,7 @@ void BKAudioProcessor::loadGallery(void)
                             for (int k = 0; k < 128; k++)
                             {
                                 String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                f = attr.getFloatValue();
+                                f = attr.getFloatValue() * 100.;
                                 DBG("reading new absolute mod val: " + String(f));
                                 absolute.set(k, f);
                                 if (f != 0.0) abs += (String(k) + ":" + String(f) + " ");
