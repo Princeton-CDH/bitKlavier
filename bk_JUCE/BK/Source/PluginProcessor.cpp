@@ -1292,7 +1292,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
                 active->setAbsoluteOffset(modfa[i], modfa[i+1] * .01);
             }
         }
-        else if (type == TuningResetKeymap)         active->createResetMap(modia);
+        else if (type == TuningResetKeymap)         active->getResetMap()->setKeymap(modia);
         
         tuningPreparationDidChange = true;
     }
@@ -1407,7 +1407,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             // check for tuning resets
             for (int i = tuning.size(); --i >= 0; )
             {
-                if (tuning[i]->aPrep->resetMapContains(noteNumber)) tuning[i]->reset();
+                if (tuning[i]->aPrep->getResetMap()->containsNote(noteNumber)) tuning[i]->reset();
                 tuningPreparationDidChange = true;
             }
             

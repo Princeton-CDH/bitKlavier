@@ -298,9 +298,9 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
 
             //Array<int> keys = keymapStringToIntArray(text);
             Array<int> keys = stringToIntArray(text);
-            prep->createResetMap(keys);
-            active->createResetMap(keys);
-            tuningTF[TuningResetKeymap]->setText( intArrayToString(prep->getResetMapActiveKeys()));
+            prep->getResetMap()->setKeymap(keys);
+            active->getResetMap()->setKeymap(keys);
+            tuningTF[TuningResetKeymap]->setText( intArrayToString(prep->getResetMap()->keys()));
 
         }
         else    //BKModification
@@ -331,7 +331,7 @@ void TuningViewController::updateFields()
     tuningTF[TuningA1History]           ->setText( String( prep->getAdaptiveHistory()), false);
     tuningTF[TuningCustomScale]         ->setText( floatArrayToString( prep->getCustomScale()), false);
     tuningTF[TuningAbsoluteOffsets]     ->setText( offsetArrayToString( prep->getAbsoluteOffsets()), false);
-    tuningTF[TuningResetKeymap]         ->setText( intArrayToString( prep->getResetMapActiveKeys()), false);
+    tuningTF[TuningResetKeymap]         ->setText( intArrayToString( prep->getResetMap()->keys()), false);
 
     
 }
