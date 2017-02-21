@@ -140,6 +140,8 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel)
     
     for (int i = direct.size(); --i >= 0; )
     {
+        DBG("directgotnote: " + String(noteNumber));
+        DBG(intArrayToString(pKeymap->keys()));
         if (pKeymap->containsNote(noteNumber))
             direct[i]->processor->keyPressed(noteNumber, velocity, channel);
     }

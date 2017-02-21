@@ -38,6 +38,7 @@ void DirectProcessor::setCurrentPlaybackSampleRate(double sr)
 
 void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 {
+    DBG("directprocgotnote: " +String(noteNumber));
     tuner = active->getTuning()->processor;
     tuner->keyOn(noteNumber);
     

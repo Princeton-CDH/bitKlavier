@@ -57,6 +57,29 @@ public:
     
     inline bool compare (TuningPreparation::Ptr p)
     {
+        bool custom = true;
+        bool absolute = true;
+        
+        for (int i = p->getCustomScale().size(); --i>=0;)
+        {
+            if (p->getCustomScale()[i] != tCustom[i])
+            {
+                custom = false;
+                break;
+ 
+            }
+        }
+        
+        for (int i = p->getAbsoluteOffsets().size(); --i>=0;)
+        {
+            if (p->getAbsoluteOffsets()[i] != tAbsolute[i])
+            {
+                absolute = false;
+                break;
+                
+            }
+        }
+        
         return (tWhichTuning == p->getTuning() &&
                 tFundamental == p->getFundamental() &&
                 tFundamentalOffset == p->getFundamentalOffset() &&
@@ -65,9 +88,7 @@ public:
                 tAdaptiveAnchorScale == p->getAdaptiveAnchorScale() &&
                 tAdaptiveAnchorFundamental == p->getAdaptiveAnchorFundamental() &&
                 tAdaptiveClusterThresh == p->getAdaptiveClusterThresh() &&
-                tAdaptiveHistory == p->getAdaptiveHistory() &&
-                tCustom == p->getCustomScale() &&
-                tAbsolute == p->getAbsoluteOffsets());
+                (tAdaptiveHistory == p->getAdaptiveHistory()) && custom && absolute);
     }
     
     TuningPreparation(TuningSystem whichTuning,

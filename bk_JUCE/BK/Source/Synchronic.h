@@ -130,17 +130,59 @@ public:
     
     bool compare(SynchronicPreparation::Ptr s)
     {
+        bool lens = true;
+        bool accents = true;
+        bool beats = true;
+        bool transp = true;
+        
+        for (int i = s->getLengthMultipliers().size(); --i>=0;)
+        {
+            if (s->getLengthMultipliers()[i] != sLengthMultipliers[i])
+            {
+                lens = false;
+                break;
+                
+            }
+        }
+        
+        for (int i = s->getAccentMultipliers().size(); --i>=0;)
+        {
+            if (s->getAccentMultipliers()[i] != sAccentMultipliers[i])
+            {
+                accents = false;
+                break;
+                
+            }
+        }
+        
+        for (int i = s->getBeatMultipliers().size(); --i>=0;)
+        {
+            if (s->getBeatMultipliers()[i] != sBeatMultipliers[i])
+            {
+                beats = false;
+                break;
+                
+            }
+        }
+        
+        for (int i = s->getTranspOffsets().size(); --i>=0;)
+        {
+            if (s->getTranspOffsets()[i] != sTranspOffsets[i])
+            {
+                transp = false;
+                break;
+                
+            }
+        }
+        
         return (sTempo == s->getTempo() &&
                 sNumBeats == s->getNumBeats() &&
                 sClusterMin == s->getClusterMin() &&
                 sClusterMax == s->getClusterMax() &&
                 sClusterCap == s->getClusterCap() &&
-                sMode == s->getMode() &&
-                sBeatsToSkip == s->getBeatsToSkip() &&
-                sBeatMultipliers == s->getBeatMultipliers() &&
-                sAccentMultipliers == s->getAccentMultipliers() &&
-                sLengthMultipliers == s->getLengthMultipliers() &&
-                sTranspOffsets == s->getTranspOffsets() &&
+                (sMode == s->getMode()) &&
+                transp && lens && accents && beats &&
+                (sTranspOffsets == s->getTranspOffsets()) &&
                 sBeatThreshSec == s->getBeatThresh() &&
                 sClusterThresh == s->getClusterThreshMS() &&
                 sClusterThreshSec == s->getClusterThreshSEC() &&

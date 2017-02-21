@@ -259,6 +259,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             
             
             //update display of counters in UI
+            
             DBG("length: "         + String(active->getLengthMultipliers()[lengthMultiplierCounter]) +
                 " length counter: "  + String(lengthMultiplierCounter) +
                 " accent: "         + String(active->getAccentMultipliers()[accentMultiplierCounter]) +

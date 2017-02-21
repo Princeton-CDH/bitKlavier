@@ -45,6 +45,13 @@ public:
         }
     }
     
+    Keymap(Keymap::Ptr k):
+    Id(k->getId())
+    {
+        setKeymap(k->keys());
+    }
+    
+    
     ~Keymap()
     {
         
@@ -58,6 +65,7 @@ public:
         return true;
     }
     
+    inline void setId(int ident) {   Id = ident; }
     inline int getId(void) {   return Id; }
     
     // Returns true if added, false if removed.

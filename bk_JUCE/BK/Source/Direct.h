@@ -22,7 +22,6 @@
 class DirectPreparation : public ReferenceCountedObject
 {
 public:
-    
     typedef ReferenceCountedObjectPtr<DirectPreparation>   Ptr;
     typedef Array<DirectPreparation::Ptr>                  PtrArr;
     typedef Array<DirectPreparation::Ptr, CriticalSection> CSPtrArr;

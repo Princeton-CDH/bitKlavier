@@ -216,7 +216,31 @@ static const std::vector<std::string> cPianoName = {
     "Piano9",
     "Piano10",
     "Piano11",
-    "Piano12"
+    "Piano12",
+    "Piano13",
+    "Piano14",
+    "Piano15",
+    "Piano16",
+    "Piano17",
+    "Piano18",
+    "Piano19",
+    "Piano20",
+    "Piano21",
+    "Piano22",
+    "Piano23",
+    "Piano24",
+    "Piano25",
+    "Piano26",
+    "Piano27",
+    "Piano28",
+    "Piano29",
+    "Piano30",
+    "Piano31",
+    "Piano32",
+    "Piano33",
+    "Piano34",
+    "Piano35"
+    
 };
 
 static const int aMaxNumPianos = cPianoName.size();
