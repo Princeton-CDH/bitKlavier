@@ -100,6 +100,22 @@ public:
         tuning = n->getTuning();
     }
     
+    inline bool compare (NostalgicPreparation::Ptr n)
+    {
+        return (nWaveDistance == n->getWavedistance() &&
+                nUndertow == n->getUndertow() &&
+                nTransposition == n->getTransposition() &&
+                nGain == n->getGain() &&
+                nLengthMultiplier == n->getLengthMultiplier() &&
+                nBeatsToSkip == n->getBeatsToSkip() &&
+                nMode == n->getMode() &&
+                nSyncTarget == n->getSyncTarget()&&
+                tuning == n->getTuning());
+    }
+    
+    inline const String getName() const noexcept {return name;}
+    inline void setName(String n){name = n;}
+    
     inline const int getWavedistance() const noexcept                      {return nWaveDistance;      }
     inline const int getUndertow() const noexcept                          {return nUndertow;          }
     inline const float getTransposition() const noexcept                   {return nTransposition;     }
@@ -140,6 +156,7 @@ public:
     }
     
 private:
+    String name;
     int nWaveDistance;  //ms; distance from beginning of sample to stop reverse playback and begin undertow
     int nUndertow;      //ms; length of time to play forward after directional change
     /*

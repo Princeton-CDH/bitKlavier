@@ -37,6 +37,7 @@ public:
   
     void saveGallery(void);
     void loadGallery(void);
+    void loadJsonGallery(void);
     
     // General settings.
     GeneralSettings::Ptr                general;
@@ -68,10 +69,24 @@ public:
     Piano::PtrArr                       bkPianos;
     
     void addSynchronic(void);
+    void addSynchronic(SynchronicPreparation::Ptr);
+    int addSynchronicIfNotAlreadyThere(SynchronicPreparation::Ptr);
+    
     void addNostalgic(void);
+    void addNostalgic(NostalgicPreparation::Ptr);
+    int addNostalgicIfNotAlreadyThere(NostalgicPreparation::Ptr);
+    
     void addTuning(void);
+    void addTuning(TuningPreparation::Ptr);
+    int addTuningIfNotAlreadyThere(TuningPreparation::Ptr);
+    
     void addDirect(void);
+    void addDirect(DirectPreparation::Ptr);
+    int addDirectIfNotAlreadyThere(DirectPreparation::Ptr);
+    
+    
     void addKeymap(void);
+    void addKeymap(Keymap::Ptr);
     void addDirectMod(void);
     void addNostalgicMod(void);
     void addSynchronicMod(void);

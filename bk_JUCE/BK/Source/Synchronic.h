@@ -128,6 +128,30 @@ public:
         tuning = s->getTuning();
     }
     
+    bool compare(SynchronicPreparation::Ptr s)
+    {
+        return (sTempo == s->getTempo() &&
+                sNumBeats == s->getNumBeats() &&
+                sClusterMin == s->getClusterMin() &&
+                sClusterMax == s->getClusterMax() &&
+                sClusterCap == s->getClusterCap() &&
+                sMode == s->getMode() &&
+                sBeatsToSkip == s->getBeatsToSkip() &&
+                sBeatMultipliers == s->getBeatMultipliers() &&
+                sAccentMultipliers == s->getAccentMultipliers() &&
+                sLengthMultipliers == s->getLengthMultipliers() &&
+                sTranspOffsets == s->getTranspOffsets() &&
+                sBeatThreshSec == s->getBeatThresh() &&
+                sClusterThresh == s->getClusterThreshMS() &&
+                sClusterThreshSec == s->getClusterThreshSEC() &&
+                at1History == s->getAdaptiveTempo1History() &&
+                at1Min == s->getAdaptiveTempo1Min() &&
+                at1Max == s->getAdaptiveTempo1Max() &&
+                at1Subdivisions == s->getAdaptiveTempo1Subdivisions() &&
+                at1Mode == s->getAdaptiveTempo1Mode() &&
+                tuning == s->getTuning());
+    }
+    
     inline const float getTempo() const noexcept                       {return sTempo;                 }
     inline const int getNumBeats() const noexcept                      {return sNumBeats;             }
     inline const int getClusterMin() const noexcept                    {return sClusterMin;            }
@@ -163,6 +187,10 @@ public:
         sClusterThresh = clusterThresh;
         sClusterThreshSec = sClusterThresh * .001;
     }
+    
+    
+    inline const String getName() const noexcept {return name;}
+    inline void setName(String n){name = n;}
     
     inline void setNumBeats(int numBeats)                              {sNumBeats = numBeats;                            }
     inline void setClusterMin(int clusterMin)                          {sClusterMin = clusterMin;                          }
@@ -206,6 +234,7 @@ public:
     }
     
 private:
+    String name;
     float sTempo;
     int sNumBeats,sClusterMin,sClusterMax;
     int sClusterCap = 8; //max in cluster; 8 in original bK. pulseDepth?

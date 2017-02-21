@@ -50,6 +50,14 @@ public:
         
     }
     
+    inline bool compare(Keymap::Ptr k)
+    {
+        for (int i = 0; i < 128; i++)
+            if (k->keymap[i] != k->keymap[i]) return false; 
+                                  
+        return true;
+    }
+    
     inline int getId(void) {   return Id; }
     
     // Returns true if added, false if removed.

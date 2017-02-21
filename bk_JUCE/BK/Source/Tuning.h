@@ -55,6 +55,21 @@ public:
         tAbsolute = p->getAbsoluteOffsets();
     }
     
+    inline bool compare (TuningPreparation::Ptr p)
+    {
+        return (tWhichTuning == p->getTuning() &&
+                tFundamental == p->getFundamental() &&
+                tFundamentalOffset == p->getFundamentalOffset() &&
+                tAdaptiveIntervalScale == p->getAdaptiveIntervalScale() &&
+                tAdaptiveInversional == p->getAdaptiveInversional() &&
+                tAdaptiveAnchorScale == p->getAdaptiveAnchorScale() &&
+                tAdaptiveAnchorFundamental == p->getAdaptiveAnchorFundamental() &&
+                tAdaptiveClusterThresh == p->getAdaptiveClusterThresh() &&
+                tAdaptiveHistory == p->getAdaptiveHistory() &&
+                tCustom == p->getCustomScale() &&
+                tAbsolute == p->getAbsoluteOffsets());
+    }
+    
     TuningPreparation(TuningSystem whichTuning,
                       PitchClass fundamental,
                       float fundamentalOffset,
@@ -101,6 +116,7 @@ public:
         
     }
     
+    inline const String getName() const noexcept {return name;}
     inline const TuningSystem getTuning() const noexcept                    {return tWhichTuning;               }
     inline const PitchClass getFundamental() const noexcept                 {return tFundamental;               }
     inline const float getFundamentalOffset() const noexcept                {return tFundamentalOffset;         }
@@ -115,6 +131,7 @@ public:
     float getAbsoluteOffset(int midiNoteNumber) const noexcept {return tAbsolute.getUnchecked(midiNoteNumber);}
     
     
+    inline void setName(String n){name = n;}
     inline void setTuning(TuningSystem tuning)                                      {tWhichTuning = tuning;                                 }
     inline void setFundamental(PitchClass fundamental)                              {tFundamental = fundamental;                            }
     inline void setFundamentalOffset(float offset)                                  {tFundamentalOffset = offset;                           }
@@ -153,6 +170,7 @@ public:
         DBG("tAbsolute: " +                     floatArrayToString(tAbsolute));
     }
 private:
+    String name;
     // basic tuning settings, for static tuning
     TuningSystem    tWhichTuning;               //which tuning system to use
     PitchClass      tFundamental;               //fundamental for tuning system
@@ -411,6 +429,17 @@ public:
     typedef OwnedArray<Tuning>                  Arr;
     typedef OwnedArray<Tuning, CriticalSection> CSArr;
     
+    
+    Tuning(TuningPreparation::Ptr prep,
+              int Id):
+    sPrep(new TuningPreparation(prep)),
+    aPrep(new TuningPreparation(sPrep)),
+    processor(new TuningProcessor(aPrep)),
+    Id(Id)
+    {
+        
+    }
+    
     Tuning(int Id):
     Id(Id)
     {
@@ -466,9 +495,11 @@ public:
     
     inline int getId() {return Id;};
     
-    TuningProcessor::Ptr        processor;
+    
     TuningPreparation::Ptr      sPrep;
     TuningPreparation::Ptr      aPrep;
+    TuningProcessor::Ptr        processor;
+    
     
     
 private:

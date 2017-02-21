@@ -28,15 +28,26 @@ public:
     typedef OwnedArray<Direct>                  Arr;
     typedef OwnedArray<Direct, CriticalSection> CSArr;
    
+    
+    Direct(BKSynthesiser *s,
+           BKSynthesiser *res,
+           BKSynthesiser *ham,
+           DirectPreparation::Ptr d,
+           int Id):
+    sPrep(new DirectPreparation(d)),
+    aPrep(new DirectPreparation(sPrep)),
+    processor(new DirectProcessor(s, res, ham, aPrep, Id)),
+    Id(Id)
+    {
+        
+    }
+    
     Direct(BKSynthesiser *s,
            BKSynthesiser *res,
            BKSynthesiser *ham,
            Tuning::Ptr tuning,
            int Id):
-    Id(Id),
-    synth(s),
-    resonanceSynth(res),
-    hammerSynth(ham)
+    Id(Id)
     {
         sPrep = new DirectPreparation(tuning);
         aPrep = new DirectPreparation(sPrep);
@@ -61,17 +72,15 @@ public:
     
     inline int getId() {return Id;};
     
-    DirectProcessor::Ptr        processor;
+    
     DirectPreparation::Ptr      sPrep;
     DirectPreparation::Ptr      aPrep;
+    DirectProcessor::Ptr        processor;
+    
     
     
 private:
     int Id;
-    
-    BKSynthesiser*              synth;
-    BKSynthesiser*              resonanceSynth;
-    BKSynthesiser*              hammerSynth;
     
     JUCE_LEAK_DETECTOR(Direct)
 };
@@ -86,6 +95,18 @@ public:
     typedef OwnedArray<Synchronic>                  Arr;
     typedef OwnedArray<Synchronic, CriticalSection> CSArr;
    
+    Synchronic(BKSynthesiser *s,
+           SynchronicPreparation::Ptr prep,
+           GeneralSettings::Ptr general,
+           int Id):
+    sPrep(new SynchronicPreparation(prep)),
+    aPrep(new SynchronicPreparation(sPrep)),
+    processor(new SynchronicProcessor(s, aPrep, general, Id)),
+    Id(Id)
+    {
+        
+    }
+    
     Synchronic(BKSynthesiser *s,
                Tuning::Ptr tuning,
                GeneralSettings::Ptr general,
@@ -183,15 +204,12 @@ public:
     
     inline int getId() {return Id;};
     
-    SynchronicProcessor::Ptr        processor;
     SynchronicPreparation::Ptr      sPrep;
     SynchronicPreparation::Ptr      aPrep;
-    
+    SynchronicProcessor::Ptr        processor;
     
 private:
     int Id;
-    
-    
     
     JUCE_LEAK_DETECTOR(Synchronic)
 };
@@ -206,6 +224,19 @@ public:
     typedef OwnedArray<Nostalgic>                  Arr;
     typedef OwnedArray<Nostalgic, CriticalSection> CSArr;
    
+    
+    Nostalgic(BKSynthesiser *s,
+               NostalgicPreparation::Ptr prep,
+               int Id):
+    sPrep(new NostalgicPreparation(prep)),
+    aPrep(new NostalgicPreparation(sPrep)),
+    processor(new NostalgicProcessor(s, aPrep, Id)),
+    Id(Id)
+    {
+        
+    }
+    
+    
     Nostalgic(BKSynthesiser *s,
               Tuning::Ptr tuning,
            int Id):
@@ -251,11 +282,9 @@ public:
     }
     
     
-    
-    NostalgicProcessor::Ptr        processor;
     NostalgicPreparation::Ptr      sPrep;
     NostalgicPreparation::Ptr      aPrep;
-    
+    NostalgicProcessor::Ptr        processor;
     
 private:
     int Id;

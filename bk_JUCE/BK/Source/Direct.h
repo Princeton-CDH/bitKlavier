@@ -78,6 +78,17 @@ public:
         tuning = d->getTuning();
     }
     
+    inline bool compare(DirectPreparation::Ptr d)
+    {
+        return (dTransposition == d->getTransposition() &&
+                dGain == d->getGain() &&
+                dResonanceGain == d->getResonanceGain() &&
+                dHammerGain == d->getHammerGain() &&
+                tuning == d->getTuning());
+    }
+    
+    inline const String getName() const noexcept {return name;}
+    inline void setName(String n){name = n;}
     
     inline const float getTransposition() const noexcept                {return dTransposition; }
     inline const float getGain() const noexcept                         {return dGain;          }
@@ -101,7 +112,7 @@ public:
     }
 
 private:
-    
+    String  name;
     float   dTransposition;       //transposition, in half steps
     float   dGain;                //gain multiplier
     float   dResonanceGain, dHammerGain;
@@ -152,6 +163,8 @@ public:
         param.set(DirectResGain, "");
         param.set(DirectHammerGain, "");
     }
+    
+    
     
     inline ValueTree getState(int Id)
     {

@@ -99,6 +99,12 @@ tvc(p)
     loadButton.addListener(this);
     addAndMakeVisible(loadButton);
     
+    loadJsonButton.setName("LoadJson");
+    loadJsonButton.changeWidthToFitText();
+    loadJsonButton.setButtonText("LoadJson");
+    loadJsonButton.addListener(this);
+    addAndMakeVisible(loadJsonButton);
+    
     addPMapButton.setName("Add");
     addPMapButton.changeWidthToFitText();
     addPMapButton.setButtonText("Add");
@@ -266,6 +272,7 @@ void BKAudioProcessorEditor::resized()
     
     loadButton.setBounds(saveButton.getRight() + gXSpacing, getBottom() - 75, 50, 20);
     
+    loadJsonButton.setBounds(loadButton.getRight() + gXSpacing, getBottom() - 75, 50, 20);
     
     
 }
@@ -657,6 +664,10 @@ void BKAudioProcessorEditor::bkButtonClicked (Button* b)
     else if (b->getName() == "Load")
     {
         processor.loadGallery();
+    }
+    else if (b->getName() == "LoadJson")
+    {
+        processor.loadJsonGallery();
     }
     else if (b->getName() == "Add")
     {

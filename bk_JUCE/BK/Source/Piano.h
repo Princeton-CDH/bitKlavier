@@ -53,6 +53,9 @@ public:
     
     inline PreparationMap::CSPtrArr getPreparationMaps(void) { return prepMaps; }
     
+    inline const String getName() const noexcept {return name;}
+    inline void setName(String n){name = n;}
+    
     
     
     PreparationMap::Ptr         currentPMap;
@@ -78,6 +81,7 @@ public:
     
 private:
     int Id;
+    String name;
     
     double sampleRate;
 

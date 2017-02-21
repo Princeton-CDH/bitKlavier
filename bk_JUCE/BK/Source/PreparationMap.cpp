@@ -34,15 +34,33 @@ void PreparationMap::setKeymap(Keymap::Ptr km)
     pKeymap = km;
 }
 
+void PreparationMap::addSynchronic(Synchronic::Ptr s)
+{
+    synchronic.add(s);
+    deactivateIfNecessary();
+}
+
 void PreparationMap::setSynchronic(Synchronic::PtrArr s)
 {
     synchronic = s;
     deactivateIfNecessary();
 }
 
+void PreparationMap::addNostalgic(Nostalgic::Ptr n)
+{
+    nostalgic.add(n);
+    deactivateIfNecessary();
+}
+
 void PreparationMap::setNostalgic(Nostalgic::PtrArr n)
 {
     nostalgic = n;
+    deactivateIfNecessary();
+}
+
+void PreparationMap::addDirect(Direct::Ptr d)
+{
+    direct.add(d);
     deactivateIfNecessary();
 }
 

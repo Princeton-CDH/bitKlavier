@@ -19,6 +19,14 @@
 #define CRAY_COOL_MUSIC_MAKER 0
 #define CRAY_COOL_MUSIC_MAKER_2 0
 
+const String jsonSynchronicX = "synchronic::";
+const String jsonDirectX = "direct::";
+const String jsonNostalgicX = "nostalgic::";
+
+const String jsonSynchronicLayerX = "synchronic::synchronicSub.";
+const String jsonDirectLayerX = "direct::directSub.";
+const String jsonNostalgicLayerX = "nostalgic::nostalgicSub.";
+
 const String vtagGallery = "gallery";
 const String vtagGeneral = "general";
 const String ptagGeneral_globalGain = "globalGain";

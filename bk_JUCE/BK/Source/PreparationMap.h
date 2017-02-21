@@ -85,6 +85,10 @@ public:
     Synchronic::PtrArr  getSynchronic(void);
     Nostalgic::PtrArr   getNostalgic(void);
     Direct::PtrArr      getDirect(void);
+    
+    void    addSynchronic(Synchronic::Ptr s);
+    void    addNostalgic(Nostalgic::Ptr n);
+    void    addDirect(Direct::Ptr d);
 
     void deactivateIfNecessary();
     
