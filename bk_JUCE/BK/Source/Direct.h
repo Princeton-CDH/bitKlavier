@@ -12,11 +12,8 @@
 #define DIRECT_H_INCLUDED
 
 #include "BKUtilities.h"
-
 #include "BKSynthesiser.h"
-
 #include "Keymap.h"
-
 #include "Tuning.h"
 
 class DirectPreparation : public ReferenceCountedObject
@@ -92,7 +89,7 @@ public:
     inline void setResonanceGain(float val)                             {dResonanceGain = val;  }
     inline void setHammerGain(float val)                                {dHammerGain = val;     }
     inline void setTuning(Tuning::Ptr t)                                {tuning = t;            }
-    inline void setResetMap(Keymap::Ptr k)                              {resetMap = k;            }
+    inline void setResetMap(Keymap::Ptr k)                              {resetMap = k;          }
     
     
     void print(void)
@@ -101,11 +98,10 @@ public:
         DBG("dGain: "           + String(dGain));
         DBG("dResGain: "        + String(dResonanceGain));
         DBG("dHammerGain: "     + String(dHammerGain));
-        //DBG("resetKeymap: "     + intArrayToString(p->getResetMap()->keys()));
+        DBG("resetKeymap: "     + intArrayToString(getResetMap()->keys()));
     }
     
-    //internal keymap for resetting internal values to static
-    Keymap::Ptr resetMap = new Keymap(0);
+    
 
 private:
     
@@ -114,6 +110,9 @@ private:
     float   dResonanceGain, dHammerGain;
     
     Tuning::Ptr tuning;
+    
+    //internal keymap for resetting internal values to static
+    Keymap::Ptr resetMap = new Keymap(0);
     
     JUCE_LEAK_DETECTOR(DirectPreparation);
 };

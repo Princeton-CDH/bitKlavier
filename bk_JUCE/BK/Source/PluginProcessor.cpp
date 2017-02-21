@@ -76,7 +76,7 @@ resonanceReleaseSynth   (general)
 
 void BKAudioProcessor::addDirectMod()
 {
-    modDirect.add       (new DirectModPreparation());
+    modDirect.add           (new DirectModPreparation());
 }
 
 void BKAudioProcessor::addSynchronicMod()
@@ -86,12 +86,12 @@ void BKAudioProcessor::addSynchronicMod()
 
 void BKAudioProcessor::addNostalgicMod()
 {
-    modNostalgic.add       (new NostalgicModPreparation());
+    modNostalgic.add        (new NostalgicModPreparation());
 }
 
 void BKAudioProcessor::addTuningMod()
 {
-    modTuning.add       (new TuningModPreparation());
+    modTuning.add           (new TuningModPreparation());
 }
 
 void BKAudioProcessor::addKeymap(void)
@@ -1311,7 +1311,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == DirectHammerGain)  active->setHammerGain(modf);
         else if (type == DirectResGain)     active->setResonanceGain(modf);
         else if (type == DirectTuning)      active->setTuning(tuning[modi]);
-        else if (type == DirectResetKeymap) active->resetMap->setKeymap(modia);
+        else if (type == DirectResetKeymap) active->getResetMap()->setKeymap(modia);
         
         directPreparationDidChange = true;
     }
@@ -1323,6 +1323,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         NostalgicParameterType type = nMod[i]->getParameterType();
         modf = nMod[i]->getModFloat();
         modi = nMod[i]->getModInt();
+        modia = nMod[i]->getModIntArr();
         
         if (type == NostalgicTransposition)         active->setTransposition(modf);
         else if (type == NostalgicGain)             active->setGain(modf);
@@ -1333,6 +1334,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == NostalgicWaveDistance)     active->setWaveDistance(modi);
         else if (type == NostalgicLengthMultiplier) active->setLengthMultiplier(modf);
         else if (type == NostalgicTuning)           active->setTuning(tuning[modi]);
+        else if (type == NostalgicResetKeymap)      active->getResetMap()->setKeymap(modia);
         
         nostalgicPreparationDidChange = true;
     }
@@ -1345,6 +1347,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modf = sMod[i]->getModFloat();
         modi = sMod[i]->getModInt();
         modfa = sMod[i]->getModFloatArr();
+        modia = sMod[i]->getModIntArr();
         
         if (type == SynchronicTranspOffsets)            active->setTranspOffsets(modfa);
         else if (type == SynchronicTempo)               active->setTempo(modf);
@@ -1362,6 +1365,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == AT1Max)                        active->setAdaptiveTempo1Max(modf);
         else if (type == AT1History)                    active->setAdaptiveTempo1History(modi);
         else if (type == AT1Subdivisions)               active->setAdaptiveTempo1Subdivisions(modf);
+        else if (type == SynchronicResetKeymap)         active->getResetMap()->setKeymap(modia);
         
         synchronicPreparationDidChange = true;
     }

@@ -82,6 +82,8 @@ const String vtagSynchronic_beatMults = "beatMultipliers";
 const String vtagSynchronic_lengthMults = "lengthMultipliers";
 const String vtagSynchronic_accentMults = "accentMultipliers";
 const String vtagSynchronic_transpOffsets = "transpOffsets";
+const String vtagSynchronic_resetMap = "synchronicResetMap";
+
 
 const String vtagNostalgicPrep = "nostalgicPrep";
 const String vtagNostalgicModPrep = "nostalgicModPrep";
@@ -95,6 +97,7 @@ const String ptagNostalgic_lengthMultiplier = "lengthMultiplier";
 const String ptagNostalgic_mode = "mode";
 const String ptagNostalgic_beatsToSkip = "beatsToSkip";
 const String ptagNostalgic_syncTarget = "syncTarget";
+const String vtagNostalgic_resetMap = "nostalgicResetMap";
 
 
 
@@ -309,6 +312,7 @@ typedef enum SynchronicParameterType {
     AT1Subdivisions,
     AT1Min,
     AT1Max,
+    SynchronicResetKeymap,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
@@ -330,7 +334,8 @@ static const std::vector<BKParameterDataType> cSynchronicDataTypes = {
     BKInt,
     BKFloat,
     BKFloat,
-    BKFloat
+    BKFloat,
+    BKIntArr
 };
 
 static const std::vector<std::string> cSynchronicParameterTypes = {
@@ -351,7 +356,8 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "AT1History",
     "AT1Subdivs",
     "AT1Min",
-    "AT1Max"
+    "AT1Max",
+    "ResetKeymap"
 };
 
 #pragma mark - Nostalgic
@@ -372,6 +378,7 @@ typedef enum NostalgicParameterType {
     NostalgicBeatsToSkip,
     NostalgicMode,
     NostalgicSyncTarget,
+    NostalgicResetKeymap,
     NostalgicParameterTypeNil
     
 } NostalgicParameterType;
@@ -386,7 +393,9 @@ static const std::vector<BKParameterDataType> cNostalgicDataTypes =
     BKFloat,
     BKFloat,
     BKInt,
-    BKInt
+    BKInt,
+    BKInt,
+    BKIntArr
 };
 
 static const std::vector<std::string> cNostalgicParameterTypes = {
@@ -399,7 +408,8 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
     "LengthMult",
     "BeatsToSkip",
     "Length Mode",
-    "SyncTarget"
+    "SyncTarget",
+    "ResetKeymap"
 };
 
 #pragma mark - Direct

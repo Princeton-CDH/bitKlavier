@@ -69,7 +69,6 @@ public:
     {
         aPrep->copy(sPrep);
         didChange = true;
-        DBG("direct reset");
     }
     
     bool didChange = false;
@@ -275,6 +274,7 @@ public:
     {
         aPrep->copy(sPrep);
         didChange = true;
+        DBG("resetting nostalgic");
     }
     
     bool didChange = false;

@@ -144,6 +144,7 @@ public:
     inline const Array<float> getAccentMultipliers() const noexcept    {return sAccentMultipliers;     }
     inline const Array<float> getLengthMultipliers() const noexcept    {return sLengthMultipliers;     }
     inline const Array<float> getTranspOffsets() const noexcept        {return sTranspOffsets;         }
+    inline const Keymap::Ptr getResetMap() const noexcept              {return resetMap;       }
     
     //Adaptive Tempo 1
     inline AdaptiveTempo1Mode getAdaptiveTempo1Mode(void)   {return at1Mode;   }
@@ -184,8 +185,9 @@ public:
     inline void setAdaptiveTempo1Min(float min)                         {at1Min = min;}
     inline void setAdaptiveTempo1Max(float max)                         {at1Max = max;}
     
-    inline const Tuning::Ptr getTuning() const noexcept      {return tuning; }
-    inline void setTuning(Tuning::Ptr t)                       {tuning = t;  }
+    inline const Tuning::Ptr getTuning() const noexcept                 {return tuning; }
+    inline void setTuning(Tuning::Ptr t)                                {tuning = t;  }
+    inline void setResetMap(Keymap::Ptr k)                              {resetMap = k;          }
     
     void print(void)
     {
@@ -204,10 +206,10 @@ public:
         DBG("sTranspOffsets: " + floatArrayToString(sTranspOffsets));
         DBG("sBeatThreshSec: " + String(sBeatThreshSec));
         DBG("sClusterThreshSec: " + String(sClusterThreshSec));
+        DBG("resetKeymap: " + intArrayToString(getResetMap()->keys()));
         DBG("| - - - - - - - - -- - - - - - - - - |");
     }
-    
-    Keymap* resetMap = new Keymap(0); //need to add to copy and mod
+
     
 private:
     float sTempo;
@@ -233,6 +235,8 @@ private:
     AdaptiveTempo1Mode at1Mode;
     
     Tuning::Ptr tuning;
+    
+    Keymap::Ptr resetMap = new Keymap(0); //need to add to copy and mod
     
     JUCE_LEAK_DETECTOR(SynchronicPreparation);
 };
@@ -289,6 +293,7 @@ public:
         param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
         param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
         param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
+        param.set(SynchronicResetKeymap, intArrayToString(p->getResetMap()->keys()));
         
     }
     
@@ -312,6 +317,7 @@ public:
         param.set(AT1Subdivisions, "");
         param.set(AT1Min, "");
         param.set(AT1Max, "");
+        param.set(SynchronicResetKeymap, "");
     }
     
     inline ValueTree getState(int Id)
@@ -450,6 +456,16 @@ public:
         p = getParam(AT1Max);
         if (p != String::empty) prep.setProperty( ptagSynchronic_AT1Max,          p.getFloatValue(), 0);
 
+        ValueTree resetMap(vtagSynchronic_resetMap);
+        count = 0;
+        p = getParam(SynchronicResetKeymap);
+        if (p != String::empty)
+        {
+            Array<int> rmap = stringToIntArray(p);
+            for (auto note : rmap)
+                resetMap.setProperty( ptagInt + String(count++), note, 0 );
+        }
+        prep.addChild(resetMap, -1, 0);
         
         return prep;
         
@@ -480,6 +496,7 @@ public:
         param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
         param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
         param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
+        param.set(SynchronicResetKeymap, intArrayToString(p->getResetMap()->keys()));
     }
     
     inline const StringArray getStringArray(void) { return param; }
