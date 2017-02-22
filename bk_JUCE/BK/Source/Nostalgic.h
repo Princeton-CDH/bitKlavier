@@ -12,12 +12,10 @@
 #define NOSTALGIC_H_INCLUDED
 
 #include "BKUtilities.h"
-
 #include "Synchronic.h"
-
 #include "BKSynthesiser.h"
-
 #include "Tuning.h"
+#include "Keymap.h"
 
 
 class NostalgicPreparation : public ReferenceCountedObject
@@ -98,6 +96,7 @@ public:
         nMode = n->getMode();
         nSyncTarget = n->getSyncTarget();
         tuning = n->getTuning();
+        resetMap->copy(n->resetMap);
     }
     
     inline bool compare (NostalgicPreparation::Ptr n)
@@ -126,6 +125,7 @@ public:
     inline const int getSyncTarget() const noexcept                        {return nSyncTarget;        }
     inline const SynchronicProcessor::Ptr getSyncTargetProcessor() const noexcept
                                                                            {return nSyncProcessor;     }
+    inline const Keymap::Ptr getResetMap() const noexcept                  {return resetMap;           }
     
     inline void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
     inline void setUndertow(int undertow)                                  {nUndertow = undertow;                  }
@@ -137,9 +137,11 @@ public:
     inline void setSyncTarget(int syncTarget)                              {nSyncTarget = syncTarget;              }
     inline void setSyncTargetProcessor(SynchronicProcessor::Ptr syncTargetProcessor)
                                                                            {nSyncProcessor = syncTargetProcessor; }
+    inline void setResetMap(Keymap::Ptr k)                                 {resetMap = k;          }
     
-    inline const Tuning::Ptr getTuning() const noexcept      {return tuning; }
-    inline void setTuning(Tuning::Ptr t)                       {tuning = t;  }
+    inline const Tuning::Ptr getTuning() const noexcept                    {return tuning; }
+    inline void setTuning(Tuning::Ptr t)                                   {tuning = t;  }
+    
     
     
 
@@ -153,7 +155,9 @@ public:
         DBG("nBeatsToSkip: " + String(nBeatsToSkip));
         DBG("nMode: " + String(nMode));
         DBG("nSyncTarget: " + String(nSyncTarget));
+        DBG("resetKeymap: " + intArrayToString(getResetMap()->keys()));
     }
+    
     
 private:
     String name;
@@ -177,6 +181,9 @@ private:
     SynchronicProcessor::Ptr nSyncProcessor;
     
     Tuning::Ptr tuning;
+    
+    //internal keymap for resetting internal values to static
+    Keymap::Ptr resetMap = new Keymap(0);
     
     JUCE_LEAK_DETECTOR(NostalgicPreparation);
 };
@@ -202,6 +209,7 @@ public:
      NostalgicBeatsToSkip,
      NostalgicMode,
      NostalgicSyncTarget,
+     NostalgicResetKeymap,
      NostalgicParameterTypeNil
      
      */
@@ -219,6 +227,7 @@ public:
         param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
         param.set(NostalgicMode, String(p->getMode()));
         param.set(NostalgicSyncTarget, String(p->getSyncTarget()));
+        param.set(NostalgicResetKeymap, intArrayToString(p->getResetMap()->keys()));
         
     }
     
@@ -234,6 +243,7 @@ public:
         param.set(NostalgicBeatsToSkip, "");
         param.set(NostalgicMode, "");
         param.set(NostalgicSyncTarget, "");
+        param.set(NostalgicResetKeymap, "");
     }
     
     inline ValueTree getState(int Id)
@@ -269,6 +279,17 @@ public:
         p = getParam(NostalgicSyncTarget);
         if (p != String::empty) prep.setProperty( ptagNostalgic_syncTarget,         p.getIntValue(), 0);
         
+        ValueTree resetMap(vtagNostalgic_resetMap);
+        int count = 0;
+        p = getParam(NostalgicResetKeymap);
+        if (p != String::empty)
+        {
+            Array<int> rmap = stringToIntArray(p);
+            for (auto note : rmap)
+                resetMap.setProperty( ptagInt + String(count++), note, 0 );
+        }
+        prep.addChild(resetMap, -1, 0);
+        
         return prep;
     }
     
@@ -289,6 +310,7 @@ public:
         param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
         param.set(NostalgicMode, String(p->getMode()));
         param.set(NostalgicSyncTarget, String(p->getSyncTarget()));
+        param.set(NostalgicResetKeymap, intArrayToString(p->getResetMap()->keys()));
     }
     
     inline const StringArray getStringArray(void) { return param; }

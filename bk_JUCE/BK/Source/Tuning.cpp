@@ -66,6 +66,8 @@ void TuningProcessor::incrementAdaptiveClusterTime(int numSamples)
 void TuningProcessor::keyOn(int midiNoteNumber)
 {
 
+    //if(active->resetMap->containsNote(noteNumber)) tuning->reset();
+    
     if(active->getTuning() == AdaptiveTuning)
     {
         if(clusterTime * (1000.0 / sampleRate) > active->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= active->getAdaptiveHistory() - 1)
@@ -127,6 +129,14 @@ float TuningProcessor::adaptiveCalculate(int midiNoteNumber) const
 {
     float newnote = adaptiveFundamentalFreq * adaptiveCalculateRatio(midiNoteNumber);
     return ftom(newnote) - midiNoteNumber;
+}
+
+void TuningProcessor::adaptiveReset()
+{
+    adaptiveFundamentalNote = active->getFundamental();
+    adaptiveFundamentalFreq = mtof(adaptiveFundamentalNote);
+    adaptiveHistoryCounter = 0;
+    
 }
 
 

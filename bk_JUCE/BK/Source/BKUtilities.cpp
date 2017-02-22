@@ -219,7 +219,8 @@ String offsetArrayToString(Array<float> arr)
     int key = 0;
     for (auto offset : arr)
     {
-        if (offset != 0.0)  s += String(key) + ":" + String((int)(offset*100.0f)) + " ";
+        //if (offset != 0.0)  s += String(key) + ":" + String((int)(offset*100.0f)) + " ";
+        if (offset != 0.0)  s += String(key) + ":" + String((offset*100.0f)) + " ";
         
         ++key;
     }
@@ -488,9 +489,9 @@ Array<float> stringOrderedPairsToFloatArray(String s, int size)
             newval = tempFloat.getFloatValue();
             tempFloat = "";
             
-            //DBG("new array index and value " + String(newindex) + " " + String(newval));
+            DBG("new array index and value " + String(newindex) + " " + String(newval));
             
-            newarray.insert(newindex, newval);
+            newarray.set(newindex, newval);
         }
         else previousSpace = false;
         

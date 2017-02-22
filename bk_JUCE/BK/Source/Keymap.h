@@ -57,6 +57,7 @@ public:
         
     }
     
+
     inline bool compare(Keymap::Ptr k)
     {
         for (int i = 0; i < 128; i++)
@@ -66,6 +67,12 @@ public:
     }
     
     inline void setId(int ident) {   Id = ident; }
+
+    inline void copy(Keymap::Ptr k)
+    {
+        setKeymap(k->keys());
+    }
+
     inline int getId(void) {   return Id; }
     
     // Returns true if added, false if removed.
@@ -86,6 +93,7 @@ public:
         {
             keymap.set(note, true);
         }
+        DBG("set keymap: " + intArrayToString(km));
     }
     
     // Returns true if added. Returns false if not added (because it's already there).

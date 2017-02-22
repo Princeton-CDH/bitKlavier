@@ -16,6 +16,7 @@
 #include "Synchronic.h"
 #include "Tuning.h"
 #include "General.h"
+#include "BKUpdateState.h"
 
 
 class Direct : public ReferenceCountedObject
@@ -46,12 +47,14 @@ public:
            BKSynthesiser *res,
            BKSynthesiser *ham,
            Tuning::Ptr tuning,
+           BKUpdateState::Ptr us,
            int Id):
-    Id(Id)
+    Id(Id),
+    updateState(us)
     {
-        sPrep = new DirectPreparation(tuning);
-        aPrep = new DirectPreparation(sPrep);
-        processor = new DirectProcessor(s, res, ham, aPrep, Id);
+        sPrep       = new DirectPreparation(tuning);
+        aPrep       = new DirectPreparation(sPrep);
+        processor   = new DirectProcessor(s, res, ham, aPrep, Id);
     };
     
     inline ValueTree getState(void)
@@ -78,9 +81,19 @@ public:
     DirectProcessor::Ptr        processor;
     
     
+    void reset()
+    {
+        aPrep->copy(sPrep);
+        updateState->directPreparationDidChange = true;
+        DBG("direct reset");
+    }
+    
+    //void didChange(bool which) { updateState->directPreparationDidChange = which; }
     
 private:
     int Id;
+
+    BKUpdateState::Ptr          updateState;
     
     JUCE_LEAK_DETECTOR(Direct)
 };
@@ -110,12 +123,14 @@ public:
     Synchronic(BKSynthesiser *s,
                Tuning::Ptr tuning,
                GeneralSettings::Ptr general,
+               BKUpdateState::Ptr us,
                int Id):
-    Id(Id)
+    Id(Id),
+    updateState(us)
     {
-        sPrep = new SynchronicPreparation(tuning);
-        aPrep = new SynchronicPreparation(sPrep);
-        processor = new SynchronicProcessor(s, aPrep, general, Id);
+        sPrep       = new SynchronicPreparation(tuning);
+        aPrep       = new SynchronicPreparation(sPrep);
+        processor   = new SynchronicProcessor(s, aPrep, general, Id);
     };
     
     inline ValueTree getState(void)
@@ -207,9 +222,20 @@ public:
     SynchronicPreparation::Ptr      sPrep;
     SynchronicPreparation::Ptr      aPrep;
     SynchronicProcessor::Ptr        processor;
+
+    void reset()
+    {
+        aPrep->copy(sPrep);
+        processor->atReset();
+        updateState->synchronicPreparationDidChange = true;
+        DBG("synchronic reset");
+    }
+    
+    //void didChange(bool which) { updateState->synchronicPreparationDidChange = which; }
     
 private:
     int Id;
+    BKUpdateState::Ptr updateState;
     
     JUCE_LEAK_DETECTOR(Synchronic)
 };
@@ -239,12 +265,14 @@ public:
     
     Nostalgic(BKSynthesiser *s,
               Tuning::Ptr tuning,
-           int Id):
-    Id(Id)
+              BKUpdateState::Ptr us,
+              int Id):
+    Id(Id), 
+    updateState(us)
     {
-        sPrep = new NostalgicPreparation(tuning);
-        aPrep = new NostalgicPreparation(sPrep);
-        processor = new NostalgicProcessor(s, aPrep, Id);
+        sPrep       = new NostalgicPreparation(tuning);
+        aPrep       = new NostalgicPreparation(sPrep);
+        processor   = new NostalgicProcessor(s, aPrep, Id);
     };
     
     ~Nostalgic() {};
@@ -261,7 +289,7 @@ public:
      NostalgicMode,
      NostalgicSyncTarget,
         */
-     inline int getId() {return Id;};
+    inline int getId() {return Id;}
     
     inline ValueTree getState(void)
     {
@@ -281,15 +309,22 @@ public:
         return prep;
     }
     
-    
     NostalgicPreparation::Ptr      sPrep;
     NostalgicPreparation::Ptr      aPrep;
     NostalgicProcessor::Ptr        processor;
     
+    void reset()
+    {
+        aPrep->copy(sPrep);
+        updateState->nostalgicPreparationDidChange = true;
+        DBG("nostalgic reset");
+    }
+    
+    //void didChange(bool which) { updateState->nostalgicPreparationDidChange = which; }
+    
 private:
     int Id;
-    
-    
+    BKUpdateState::Ptr updateState;
     
     JUCE_LEAK_DETECTOR(Nostalgic)
 };

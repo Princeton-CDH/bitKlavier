@@ -138,40 +138,40 @@ BKAudioProcessorEditor::~BKAudioProcessorEditor()
 
 void BKAudioProcessorEditor::timerCallback()
 {
-    if (processor.pianoDidChange)
+  
+    if (processor.updateState->pianoDidChange)
     {
-        processor.pianoDidChange = false;
+        processor.updateState->pianoDidChange = false;
         switchPianos();
-
     }
     
-    if (processor.generalSettingsDidChange)
+    if (processor.updateState->generalSettingsDidChange)
     {
-        processor.generalSettingsDidChange = false;
+        processor.updateState->generalSettingsDidChange = false;
         gvc.updateFields();
     }
     
-    if (processor.directPreparationDidChange)
+    if (processor.updateState->directPreparationDidChange)
     {
-        processor.directPreparationDidChange = false;
+        processor.updateState->directPreparationDidChange = false;
         dvc.updateFields();
     }
     
-    if (processor.nostalgicPreparationDidChange)
+    if (processor.updateState->nostalgicPreparationDidChange)
     {
-        processor.nostalgicPreparationDidChange = false;
+        processor.updateState->nostalgicPreparationDidChange = false;
         nvc.updateFields();
     }
     
-    if (processor.synchronicPreparationDidChange)
+    if (processor.updateState->synchronicPreparationDidChange)
     {
-        processor.synchronicPreparationDidChange = false;
+        processor.updateState->synchronicPreparationDidChange = false;
         svc.updateFields();
     }
     
-    if (processor.tuningPreparationDidChange)
+    if (processor.updateState->tuningPreparationDidChange)
     {
-        processor.tuningPreparationDidChange = false;
+        processor.updateState->tuningPreparationDidChange = false;
         tvc.updateFields();
     }
     
@@ -424,7 +424,12 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
     
     Array<int> keys;
     
-    
+    if(s.length() == 0)
+    {
+        DBG("clearing mod map");
+        processor.currentPiano->clearModMap();
+        return out;
+    }
     
     for (auto map : processor.currentPiano->pianoMap)    map = 0;
     

@@ -16,8 +16,8 @@ static const float gMainComponentFontSize = 12.0f;
 static const int gMainComponentHeight = 750;
 static const int gMainComponentWidth = 1200;
 
-static const int gComponentLeftOffset = 10;
-static const int gComponentTopOffset = 10;
+static const int gComponentLeftOffset = 5;
+static const int gComponentTopOffset = 5;
 static const int gComponentYSpacing = 5;
 static const int gComponentXSpacing = 5;
 
@@ -29,8 +29,8 @@ static const int gComponentLabelHeight = 17;
 
 static const int gVCWidth = 375;
 
-static const int gXSpacing = 5;
-static const int gYSpacing = 5;
+static const int gXSpacing = 4;
+static const int gYSpacing = 4;
 
 
 

@@ -291,6 +291,23 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
             mod->setParam(TuningAbsoluteOffsets, text);
         }
     }
+    else if (name == cTuningParameterTypes[TuningResetKeymap])
+    {
+        if (type == BKParameter)
+        {
+
+            //Array<int> keys = keymapStringToIntArray(text);
+            Array<int> keys = stringToIntArray(text);
+            prep->getResetMap()->setKeymap(keys);
+            active->getResetMap()->setKeymap(keys);
+            tuningTF[TuningResetKeymap]->setText( intArrayToString(prep->getResetMap()->keys()));
+
+        }
+        else    //BKModification
+        {
+            mod->setParam(TuningResetKeymap, text);
+        }
+    }
     else
     {
         DBG("Unregistered text field.");
@@ -314,6 +331,7 @@ void TuningViewController::updateFields()
     tuningTF[TuningA1History]           ->setText( String( prep->getAdaptiveHistory()), false);
     tuningTF[TuningCustomScale]         ->setText( floatArrayToString( prep->getCustomScale()), false);
     tuningTF[TuningAbsoluteOffsets]     ->setText( offsetArrayToString( prep->getAbsoluteOffsets()), false);
+    tuningTF[TuningResetKeymap]         ->setText( intArrayToString( prep->getResetMap()->keys()), false);
 
     
 }
@@ -334,6 +352,7 @@ void TuningViewController::updateModFields()
     modTuningTF[TuningA1History]           ->setText( prep->getParam(TuningA1History), false);
     modTuningTF[TuningCustomScale]         ->setText( prep->getParam(TuningCustomScale), false);
     modTuningTF[TuningAbsoluteOffsets]     ->setText( prep->getParam(TuningAbsoluteOffsets), false);
+    modTuningTF[TuningResetKeymap]         ->setText( prep->getParam(TuningResetKeymap), false);
     
     
 }

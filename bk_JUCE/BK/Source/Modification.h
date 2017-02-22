@@ -76,6 +76,7 @@ public:
     type(type)
     {
         modFloatArr = Array<float>();
+        modIntArr   = Array<int>();
         modBool = var::null;
         modInt = var::null;
         modFloat = var::null;
@@ -88,10 +89,15 @@ public:
         {
             modInt = val.getIntValue();
         }
+        else if (cDirectDataTypes[type] == BKIntArr)
+        {
+            modIntArr = stringToIntArray(val);
+        }
         else // BKFloat
         {
             modFloat = val.getFloatValue();
         }
+        
 
     }
     
@@ -124,6 +130,7 @@ public:
     type(type)
     {
         modFloatArr = Array<float>();
+        modIntArr   = Array<int>();
         modBool = var::null;
         modInt = var::null;
         modFloat = var::null;
@@ -144,6 +151,11 @@ public:
         {
             modFloatArr = stringToFloatArray(val);
         }
+        else if (cSynchronicDataTypes[type] == BKIntArr)
+        {
+            modIntArr = stringToIntArray(val);
+        }
+        
     }
     
     ~SynchronicModification(void)
@@ -176,6 +188,7 @@ public:
     type(type)
     {
         modFloatArr = Array<float>();
+        modIntArr   = Array<int>();
         modBool = var::null;
         modInt = var::null;
         modFloat = var::null;
@@ -192,7 +205,10 @@ public:
         {
             modFloat = val.getFloatValue();
         }
-        
+        else if (cNostalgicDataTypes[type] == BKIntArr)
+        {
+            modIntArr = stringToIntArray(val);
+        }
        
     }
     
@@ -225,6 +241,7 @@ public:
     type(type)
     {
         modFloatArr = Array<float>();
+        modIntArr = Array<int>();
         modBool = var::null;
         modInt = var::null;
         modFloat = var::null;
@@ -248,6 +265,10 @@ public:
         else if (cTuningDataTypes[type] == BKBool)
         {
             modBool = (bool)val.getIntValue();
+        }
+        else if (cTuningDataTypes[type] == BKIntArr)
+        {
+            modIntArr = stringToIntArray(val);
         }
     }
     

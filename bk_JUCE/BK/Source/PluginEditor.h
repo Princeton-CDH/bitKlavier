@@ -88,6 +88,10 @@ private:
     BKLabel                             pianoMapL;
     BKTextField                         pianoMapTF;
     
+    // Dynamify piano stuff/
+    BKLabel                             pianoNameL;
+    BKTextField                         pianoNameTF;
+    
     BKLabel                             modMapL;
     BKTextField                         modMapTF;
     

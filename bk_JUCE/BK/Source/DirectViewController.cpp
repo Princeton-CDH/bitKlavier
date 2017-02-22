@@ -227,6 +227,21 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
                 tf.setText("0", false);
         }
     }
+    else if (name == cDirectParameterTypes[DirectResetKeymap])
+    {
+        if (type == BKParameter)
+        {
+            Array<int> keys = stringToIntArray(text);
+            prep->getResetMap()->setKeymap(keys);
+            active->getResetMap()->setKeymap(keys);
+            directTF[DirectResetKeymap]->setText(intArrayToString(prep->getResetMap()->keys()));
+        }
+        else    //BKModification
+        {
+            mod->setParam(DirectResetKeymap, text);
+            DBG("set direct resetkeymap mod to: " + text);
+        }
+    }
     else
     {
         DBG("Unregistered text field entered input.");
@@ -244,6 +259,7 @@ void DirectViewController::updateFields(void)
     directTF[DirectHammerGain]          ->setText( String( prep->getHammerGain()), false);
     directTF[DirectResGain]             ->setText( String( prep->getResonanceGain()), false);
     directTF[DirectTuning]              ->setText( String( prep->getTuning()->getId()), false);
+    directTF[DirectResetKeymap]         ->setText( intArrayToString(prep->getResetMap()->keys()), false);
 
 }
 
@@ -256,6 +272,7 @@ void DirectViewController::updateModFields(void)
     modDirectTF[DirectHammerGain]          ->setText( prep->getParam(DirectHammerGain), false);
     modDirectTF[DirectResGain]             ->setText( prep->getParam(DirectResGain), false);
     modDirectTF[DirectTuning]              ->setText( prep->getParam(DirectTuning), false);
+    modDirectTF[DirectResetKeymap]         ->setText( prep->getParam(DirectResetKeymap), false);
     
 }
 

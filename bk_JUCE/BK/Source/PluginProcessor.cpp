@@ -8,18 +8,20 @@
 //==============================================================================
 BKAudioProcessor::BKAudioProcessor():
 general                 (new GeneralSettings()),
+updateState             (new BKUpdateState()),
 mainPianoSynth          (general),
 hammerReleaseSynth      (general),
 resonanceReleaseSynth   (general)
 {
     didLoadHammersAndRes            = false;
     didLoadMainPianoSamples         = false;
+/*
     pianoDidChange                  = false;
     directPreparationDidChange      = false;
     nostalgicPreparationDidChange   = false;
     tuningPreparationDidChange      = false;
     synchronicPreparationDidChange  = false;
-    
+ */
     bkKeymaps       .ensureStorageAllocated(aMaxNumPreparationKeymaps);
     bkPianos        .ensureStorageAllocated(aMaxNumPianos);
     prevPianos      .ensureStorageAllocated(aMaxNumPianos);
@@ -76,7 +78,7 @@ resonanceReleaseSynth   (general)
 
 void BKAudioProcessor::addDirectMod()
 {
-    modDirect.add       (new DirectModPreparation());
+    modDirect.add           (new DirectModPreparation());
 }
 
 void BKAudioProcessor::addSynchronicMod()
@@ -86,12 +88,12 @@ void BKAudioProcessor::addSynchronicMod()
 
 void BKAudioProcessor::addNostalgicMod()
 {
-    modNostalgic.add       (new NostalgicModPreparation());
+    modNostalgic.add        (new NostalgicModPreparation());
 }
 
 void BKAudioProcessor::addTuningMod()
 {
-    modTuning.add       (new TuningModPreparation());
+    modTuning.add           (new TuningModPreparation());
 }
 
 void BKAudioProcessor::addTuningMod(TuningModPreparation::Ptr tmod)
@@ -114,7 +116,7 @@ void BKAudioProcessor::addKeymap(Keymap::Ptr k)
 void BKAudioProcessor::addSynchronic(void)
 {
     int numSynchronic = synchronic.size();
-    synchronic.add(new Synchronic(&mainPianoSynth, tuning[0], general, numSynchronic));
+    synchronic.add(new Synchronic(&mainPianoSynth, tuning[0], general, updateState, numSynchronic));
     synchronic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
@@ -151,7 +153,7 @@ int  BKAudioProcessor::addSynchronicIfNotAlreadyThere(SynchronicPreparation::Ptr
 void BKAudioProcessor::addNostalgic(void)
 {
     int numNostalgic = nostalgic.size();
-    nostalgic.add(new Nostalgic(&mainPianoSynth, tuning[0], numNostalgic));
+    nostalgic.add(new Nostalgic(&mainPianoSynth, tuning[0], updateState, numNostalgic));
     nostalgic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
@@ -226,7 +228,7 @@ int  BKAudioProcessor::addTuningIfNotAlreadyThere(TuningPreparation::Ptr tune)
 void BKAudioProcessor::addDirect(void)
 {
     int numDirect = direct.size();
-    direct.add(new Direct(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, tuning[0], numDirect));
+    direct.add(new Direct(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, tuning[0], updateState, numDirect));
     direct.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
@@ -1084,16 +1086,14 @@ void BKAudioProcessor::loadGallery(void)
                         else if (sub->hasTagName(vTagTuning_absoluteOffsets))
                         {
                             Array<float> absolute;
+                            absolute.ensureStorageAllocated(128);
                             for (int k = 0; k < 128; k++)
                             {
                                 String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                
-                                if (attr == String::empty) break;
-                                else
-                                {
-                                    f = attr.getFloatValue();
-                                    absolute.add(f);
-                                }
+                                f = attr.getFloatValue();
+                                //DBG("reading new absolute val: " + String(f));
+                                absolute.set(k, f);
+    
                             }
                             
                             tuning[id]->sPrep->setAbsoluteOffsets(absolute);
@@ -1104,7 +1104,8 @@ void BKAudioProcessor::loadGallery(void)
                     tuning[id]->aPrep->copy( tuning[id]->sPrep);
                     
                     ++tPrepCount;
-                }else if (e->hasTagName( vtagTuningModPrep + String(tModPrepCount)))
+                }
+                else if (e->hasTagName( vtagTuningModPrep + String(tModPrepCount)))
                 {
                     addTuningMod();
                     
@@ -1162,7 +1163,20 @@ void BKAudioProcessor::loadGallery(void)
                         else if (sub->hasTagName(vTagTuning_absoluteOffsets))
                         {
                             Array<float> absolute;
+                            absolute.ensureStorageAllocated(128);
                             String abs = "";
+                
+                            for (int k = 0; k < 128; k++)
+                            {
+                                String attr = sub->getStringAttribute(ptagFloat + String(k));
+                                f = attr.getFloatValue() * 100.;
+                                DBG("reading new absolute mod val: " + String(f));
+                                absolute.set(k, f);
+                                if (f != 0.0) abs += (String(k) + ":" + String(f) + " ");
+                                
+                            }
+                            
+                            /*
                             for (int k = 0; k < 128; k++)
                             {
                                 String attr = sub->getStringAttribute(ptagFloat + String(k));
@@ -1175,6 +1189,7 @@ void BKAudioProcessor::loadGallery(void)
                                     if (f != 0.0) abs += (String(k) + ":" + String(f) + " ");
                                 }
                             }
+                             */
                             
                             modTuning[id]->setParam(TuningAbsoluteOffsets, abs);
                         }
@@ -1735,12 +1750,12 @@ void BKAudioProcessor::loadGallery(void)
 
 void BKAudioProcessor::updateUI(void)
 {
-    pianoDidChange = true;
-    directPreparationDidChange = true;
-    nostalgicPreparationDidChange = true;
-    synchronicPreparationDidChange = true;
-    tuningPreparationDidChange = true;
-    generalSettingsDidChange = true;
+    updateState->pianoDidChange = true;
+    updateState->directPreparationDidChange = true;
+    updateState->nostalgicPreparationDidChange = true;
+    updateState->synchronicPreparationDidChange = true;
+    updateState->tuningPreparationDidChange = true;
+    updateState->generalSettingsDidChange = true;
 }
 
 void BKAudioProcessor::saveGallery(void)
@@ -1782,6 +1797,7 @@ void BKAudioProcessor::saveGallery(void)
     for (int i = 0; i < modNostalgic.size(); i++) galleryVT.addChild(modNostalgic[i]->getState(i), -1, 0);
     
     
+    //move this into Keymap
     for (int i = 0; i < bkKeymaps.size(); i++)
     {
         ValueTree keys( vtagKeymap + String(i));
@@ -2034,6 +2050,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 void BKAudioProcessor::performModifications(int noteNumber)
 {
     Array<float> modfa;
+    Array<int> modia;
     float modf;
     int   modi;
     bool  modb;
@@ -2062,6 +2079,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modi = tMod[i]->getModInt();
         modb = tMod[i]->getModBool();
         modfa = tMod[i]->getModFloatArr();
+        modia = tMod[i]->getModIntArr();
         
         if (type == TuningScale)                    active->setTuning((TuningSystem)modi);
         else if (type == TuningFundamental)         active->setFundamental((PitchClass)modi);
@@ -2073,8 +2091,16 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == TuningA1AnchorFundamental) active->setAdaptiveAnchorFundamental((PitchClass) modi);
         else if (type == TuningA1History)           active->setAdaptiveHistory(modi);
         else if (type == TuningCustomScale)         active->setCustomScale(modfa);
+        else if (type == TuningAbsoluteOffsets)
+        {
+            for(int i = 0; i< modfa.size(); i+=2) {
+                //DBG("modfa AbsoluteOffsets val = " + String(modfa[i]) + " " + String(modfa[i+1]));
+                active->setAbsoluteOffset(modfa[i], modfa[i+1] * .01);
+            }
+        }
+        else if (type == TuningResetKeymap)         active->getResetMap()->setKeymap(modia);
         
-        tuningPreparationDidChange = true;
+        updateState->tuningPreparationDidChange = true;
     }
     
     DirectModification::PtrArr dMod = currentPiano->modMap[noteNumber]->getDirectModifications();
@@ -2084,14 +2110,16 @@ void BKAudioProcessor::performModifications(int noteNumber)
         DirectParameterType type = dMod[i]->getParameterType();
         modf = dMod[i]->getModFloat();
         modi = dMod[i]->getModInt();
+        modia = dMod[i]->getModIntArr();
         
         if (type == DirectTransposition)    active->setTransposition(modf);
         else if (type == DirectGain)        active->setGain(modf);
         else if (type == DirectHammerGain)  active->setHammerGain(modf);
         else if (type == DirectResGain)     active->setResonanceGain(modf);
         else if (type == DirectTuning)      active->setTuning(tuning[modi]);
+        else if (type == DirectResetKeymap) active->getResetMap()->setKeymap(modia);
         
-        directPreparationDidChange = true;
+        updateState->directPreparationDidChange = true;
     }
     
     NostalgicModification::PtrArr nMod = currentPiano->modMap[noteNumber]->getNostalgicModifications();
@@ -2101,6 +2129,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         NostalgicParameterType type = nMod[i]->getParameterType();
         modf = nMod[i]->getModFloat();
         modi = nMod[i]->getModInt();
+        modia = nMod[i]->getModIntArr();
         
         if (type == NostalgicTransposition)         active->setTransposition(modf);
         else if (type == NostalgicGain)             active->setGain(modf);
@@ -2111,8 +2140,9 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == NostalgicWaveDistance)     active->setWaveDistance(modi);
         else if (type == NostalgicLengthMultiplier) active->setLengthMultiplier(modf);
         else if (type == NostalgicTuning)           active->setTuning(tuning[modi]);
+        else if (type == NostalgicResetKeymap)      active->getResetMap()->setKeymap(modia);
         
-        nostalgicPreparationDidChange = true;
+        updateState->nostalgicPreparationDidChange = true;
     }
     
     SynchronicModification::PtrArr sMod = currentPiano->modMap[noteNumber]->getSynchronicModifications();
@@ -2123,6 +2153,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modf = sMod[i]->getModFloat();
         modi = sMod[i]->getModInt();
         modfa = sMod[i]->getModFloatArr();
+        modia = sMod[i]->getModIntArr();
         
         if (type == SynchronicTranspOffsets)            active->setTranspOffsets(modfa);
         else if (type == SynchronicTempo)               active->setTempo(modf);
@@ -2140,8 +2171,9 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == AT1Max)                        active->setAdaptiveTempo1Max(modf);
         else if (type == AT1History)                    active->setAdaptiveTempo1History(modi);
         else if (type == AT1Subdivisions)               active->setAdaptiveTempo1Subdivisions(modf);
+        else if (type == SynchronicResetKeymap)         active->getResetMap()->setKeymap(modia);
         
-        synchronicPreparationDidChange = true;
+        updateState->synchronicPreparationDidChange = true;
     }
 }
 
@@ -2177,7 +2209,15 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             // Check PianoMap for whether piano should change due to key strike.
             int whichPiano = currentPiano->pianoMap[noteNumber] - 1;
             if (whichPiano >= 0 && whichPiano != currentPiano->getId()) setCurrentPiano(whichPiano);
-
+            
+            // check for tuning resets
+            for (int i = tuning.size(); --i >= 0; )
+            {
+                if (tuning[i]->aPrep->getResetMap()->containsNote(noteNumber)) tuning[i]->reset();
+                updateState->tuningPreparationDidChange = true;
+            }
+            
+            // modifications
             performModifications(noteNumber);
             
             // Send key on to each pmap in current piano
@@ -2211,6 +2251,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             int piano = controller-51;
             
             if ((m.getControllerValue() != 0) && piano >= 0 && piano < 5)   setCurrentPiano(piano);
+
             
         }
     }
@@ -2256,10 +2297,10 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     
     currentPiano = bkPianos[which];
 
-    pianoDidChange = true;
-    synchronicPreparationDidChange = true;
-    nostalgicPreparationDidChange = true;
-    directPreparationDidChange = true;
+    updateState->pianoDidChange = true;
+    updateState->synchronicPreparationDidChange = true;
+    updateState->nostalgicPreparationDidChange = true;
+    updateState->directPreparationDidChange = true;
 }
 
 void BKAudioProcessor::releaseResources() {

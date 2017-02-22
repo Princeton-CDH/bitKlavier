@@ -385,6 +385,21 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
             mod->setParam( AT1Max, text);
         }
     }
+    else if (name == cSynchronicParameterTypes[SynchronicResetKeymap])
+    {
+        if (type == BKParameter)
+        {
+            Array<int> keys = stringToIntArray(text);
+            prep->getResetMap()->setKeymap(keys);
+            active->getResetMap()->setKeymap(keys);
+            synchronicTF[SynchronicResetKeymap]->setText(intArrayToString(prep->getResetMap()->keys()));
+        }
+        else    //BKModification
+        {
+            mod->setParam(SynchronicResetKeymap, text);
+            DBG("set synchronic resetkeymap mod to: " + text);
+        }
+    }
     else
     {
         DBG("Unregistered text field entered input.");
@@ -408,11 +423,12 @@ void SynchronicViewController::updateFields(void)
     synchronicTF[SynchronicTranspOffsets]       ->setText(  floatArrayToString(     prep->getTranspOffsets()), false);
     synchronicTF[SynchronicTuning]              ->setText(  String(                 prep->getTuning()->getId()), false);
     
-    synchronicTF[AT1Mode]            ->setText(  String(                 prep->getAdaptiveTempo1Mode()), false);
-    synchronicTF[AT1History]         ->setText(  String(                 prep->getAdaptiveTempo1History()), false);
-    synchronicTF[AT1Subdivisions]    ->setText(  String(                 prep->getAdaptiveTempo1Subdivisions()), false);
-    synchronicTF[AT1Min]             ->setText(  String(                 prep->getAdaptiveTempo1Min()), false);
-    synchronicTF[AT1Max]             ->setText(  String(                 prep->getAdaptiveTempo1Max()), false);
+    synchronicTF[AT1Mode]                       ->setText(  String(                 prep->getAdaptiveTempo1Mode()), false);
+    synchronicTF[AT1History]                    ->setText(  String(                 prep->getAdaptiveTempo1History()), false);
+    synchronicTF[AT1Subdivisions]               ->setText(  String(                 prep->getAdaptiveTempo1Subdivisions()), false);
+    synchronicTF[AT1Min]                        ->setText(  String(                 prep->getAdaptiveTempo1Min()), false);
+    synchronicTF[AT1Max]                        ->setText(  String(                 prep->getAdaptiveTempo1Max()), false);
+    synchronicTF[SynchronicResetKeymap]         ->setText(  intArrayToString(prep->getResetMap()->keys()), false);
 }
 
 void SynchronicViewController::updateModFields(void)
@@ -433,11 +449,12 @@ void SynchronicViewController::updateModFields(void)
     modSynchronicTF[SynchronicTranspOffsets]       ->setText(  prep->getParam(SynchronicTranspOffsets), false);
     modSynchronicTF[SynchronicTuning]              ->setText(  prep->getParam(SynchronicTuning), false);
     
-    modSynchronicTF[AT1Mode]            ->setText(  prep->getParam(AT1Mode), false);
-    modSynchronicTF[AT1History]         ->setText(  prep->getParam(AT1History), false);
-    modSynchronicTF[AT1Subdivisions]    ->setText(  prep->getParam(AT1Subdivisions), false);
-    modSynchronicTF[AT1Min]             ->setText(  prep->getParam(AT1Min), false);
-    modSynchronicTF[AT1Max]             ->setText(  prep->getParam(AT1Max), false);
+    modSynchronicTF[AT1Mode]                       ->setText(  prep->getParam(AT1Mode), false);
+    modSynchronicTF[AT1History]                    ->setText(  prep->getParam(AT1History), false);
+    modSynchronicTF[AT1Subdivisions]               ->setText(  prep->getParam(AT1Subdivisions), false);
+    modSynchronicTF[AT1Min]                        ->setText(  prep->getParam(AT1Min), false);
+    modSynchronicTF[AT1Max]                        ->setText(  prep->getParam(AT1Max), false);
+    modSynchronicTF[SynchronicResetKeymap]         ->setText(  prep->getParam(SynchronicResetKeymap), false);
 }
 
 

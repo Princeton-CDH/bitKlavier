@@ -24,6 +24,7 @@
         <FILE id="dmllNf" name="BKList.h" compile="0" resource="0" file="Source/BKList.h"/>
         <FILE id="N85SXV" name="BKUtilities.cpp" compile="1" resource="0" file="Source/BKUtilities.cpp"/>
         <FILE id="WL9668" name="BKUtilities.h" compile="0" resource="0" file="Source/BKUtilities.h"/>
+        <FILE id="coQuvm" name="BKUpdateState.h" compile="0" resource="0" file="Source/BKUpdateState.h"/>
         <FILE id="Yd8HYd" name="BKReferenceCountedObject.h" compile="0" resource="0"
               file="Source/BKReferenceCountedObject.h"/>
         <FILE id="VaGwGg" name="BKReferenceCountedBuffer.cpp" compile="1" resource="0"
