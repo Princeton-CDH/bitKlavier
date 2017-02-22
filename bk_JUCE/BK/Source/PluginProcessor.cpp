@@ -816,6 +816,7 @@ void BKAudioProcessor::loadJsonGallery(void)
                     }
                 }
                 
+#if 0
                 tm = jsonGetProperty("tuning::nostalgicTuningSub::nostalgicTuningMap");
                 if (!(tm.size() % 3))
                 {
@@ -896,7 +897,7 @@ void BKAudioProcessor::loadJsonGallery(void)
                         
                     }
                 }
-                
+#endif
        
             }
             
