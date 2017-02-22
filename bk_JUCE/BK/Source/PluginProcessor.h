@@ -91,6 +91,7 @@ public:
     void addNostalgicMod(void);
     void addSynchronicMod(void);
     void addTuningMod(void);
+    void addTuningMod(TuningModPreparation::Ptr tmod);
     
     void updateUI(void);
     bool                                pianoDidChange;

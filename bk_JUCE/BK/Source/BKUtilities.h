@@ -19,6 +19,9 @@
 
 #include "AudioConstants.h"
 
+PitchClass      letterNoteToPitchClass(String note);
+TuningSystem tuningStringToTuningSystem(String tuning);
+
 String          intArrayToString(Array<int> arr);
 String          floatArrayToString(Array<float> arr);
 String          offsetArrayToString(Array<float> arr);

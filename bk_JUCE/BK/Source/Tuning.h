@@ -294,6 +294,22 @@ public:
         param.set(TuningAbsoluteOffsets, offsetArrayToString(p->getAbsoluteOffsets()));
     }
     
+    inline bool compare(TuningModPreparation::Ptr t)
+    {
+        return (getParam(TuningScale) == t->getParam(TuningScale) &&
+                getParam(TuningFundamental) == t->getParam(TuningFundamental) &&
+                getParam(TuningOffset) == t->getParam(TuningOffset) &&
+                getParam(TuningA1IntervalScale) == t->getParam(TuningA1IntervalScale) &&
+                getParam(TuningA1Inversional) == t->getParam(TuningA1Inversional) &&
+                getParam(TuningA1AnchorScale) == t->getParam(TuningA1AnchorScale) &&
+                getParam(TuningA1AnchorFundamental) == t->getParam(TuningA1AnchorFundamental) &&
+                getParam(TuningA1ClusterThresh) == t->getParam(TuningA1ClusterThresh) &&
+                getParam(TuningA1History) == t->getParam(TuningA1History) &&
+                getParam(TuningCustomScale) == t->getParam(TuningCustomScale) &&
+                getParam(TuningAbsoluteOffsets) == t->getParam(TuningAbsoluteOffsets));
+            
+    }
+    
     inline ValueTree getState(int Id)
     {
         ValueTree prep(vtagTuningModPrep + String(Id));

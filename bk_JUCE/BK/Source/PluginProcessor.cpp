@@ -94,6 +94,11 @@ void BKAudioProcessor::addTuningMod()
     modTuning.add       (new TuningModPreparation());
 }
 
+void BKAudioProcessor::addTuningMod(TuningModPreparation::Ptr tmod)
+{
+    modTuning.add       (tmod);
+}
+
 void BKAudioProcessor::addKeymap(void)
 {
     int numKeymaps = bkKeymaps.size();
@@ -316,7 +321,7 @@ void BKAudioProcessor::loadJsonGallery(void)
         var pianos = pattr.getProperty("slots", "");
     
         int sId,nId,dId,tId;
-        Array<int> keys; var kvar;  bool isLayer; bool isOld = true;
+        Array<int> keys; var kvar;  bool isLayer; bool isOld = true; int modTuningCount = 0;
         
         
         bkKeymaps.add(new Keymap(0));
@@ -770,41 +775,129 @@ void BKAudioProcessor::loadJsonGallery(void)
                     }
                 }
                 
-                /*
-                 "tuning::tuningMap" : [ "just", "G", 55, "partial", "C", 60 ],
-                 "tuning::synchronicTuningSub::synchronicTuningMap" : [ "just", "G", 55, "partial", "C", 60 ],
-                 "tuning::nostalgicTuningSub::nostalgicTuningMap" : [ "just", "G", 55, "partial", "C", 60 ],
-                 */
+
+                String tun,note,notenum;
                 
-#if 0
                 var tm = jsonGetProperty("tuning::tuningMap");
-                String tun,note,num;
-                
                 if (!(tm.size() % 3))
                 {
                     for (int j = 0; j < tm.size(); j += 3)
                     {
-                        tun = tm[j]; note = tm[j+1]; num = tm[j+2];
-                        // convert letter note to PitchClass
-                        // convert tuning string to TuningSystem
-                        // create TuningModPreparation and TuningModification attached to key
-                        DBG("tuning: " + tun + " note: " + note + " num: " + num);
-                        if (tun == "just")
+                        tun = tm[j]; note = tm[j+1]; notenum = tm[j+2];
+                        
+                        PitchClass fund = letterNoteToPitchClass(note);
+                        TuningSystem tscale = tuningStringToTuningSystem(tun);
+                        int noteNumber = notenum.getIntValue();
+                        
+                        TuningModPreparation::Ptr myMod = new TuningModPreparation();
+                        
+                        myMod->setParam(TuningFundamental, String(fund));
+                        myMod->setParam(TuningScale, String(tscale));
+                        
+                        bool dontAdd = false; int whichTMod = 0;
+                        for (int c = modTuning.size(); --c>=0;)
                         {
-                            
+                            if (myMod->compare(modTuning[c]))
+                            {
+                                dontAdd = true;
+                                break;
+                            }
                         }
-                        else if (tun == "partial")
-                        {
-                            
-                        }
-                        else if (tun == "duodene")
-                        {
-                            
-                        }
-                        // etc.
+                        
+                        if (!dontAdd) addTuningMod(myMod);
+                        
+                        int whichPrep = direct[dId]->aPrep->getTuning()->getId();
+                        thisPiano->modMap[noteNumber]->addTuningModification(new TuningModification(noteNumber, whichPrep, TuningFundamental, String(fund), modTuningCount));
+                        
+                        ++modTuningCount;
+                        
+                        
+                        
                     }
                 }
-#endif
+                
+                tm = jsonGetProperty("tuning::nostalgicTuningSub::nostalgicTuningMap");
+                if (!(tm.size() % 3))
+                {
+                    for (int j = 0; j < tm.size(); j += 3)
+                    {
+                        tun = tm[j]; note = tm[j+1]; notenum = tm[j+2];
+                        
+                        PitchClass fund = letterNoteToPitchClass(note);
+                        TuningSystem tscale = tuningStringToTuningSystem(tun);
+                        int noteNumber = notenum.getIntValue();
+                        
+                        TuningModPreparation::Ptr myMod = new TuningModPreparation();
+                        
+                        myMod->setParam(TuningFundamental, String(fund));
+                        myMod->setParam(TuningScale, String(tscale));
+                        
+                        bool dontAdd = false; int whichTMod = 0;
+                        for (int c = modTuning.size(); --c>=0;)
+                        {
+                            if (myMod->compare(modTuning[c]))
+                            {
+                                dontAdd = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!dontAdd) addTuningMod(myMod);
+
+                        int whichPrep = nostalgic[nId]->aPrep->getTuning()->getId();
+                        thisPiano->modMap[noteNumber]->addTuningModification(new TuningModification(noteNumber, whichPrep, TuningFundamental, String(fund), modTuningCount));
+                        
+                        ++modTuningCount;
+
+                        
+                        
+                        
+                    }
+                }
+                
+                tm = jsonGetProperty("tuning::synchronicTuningSub::synchronicTuningMap");
+                if (!(tm.size() % 3))
+                {
+                    for (int j = 0; j < tm.size(); j += 3)
+                    {
+                        tun = tm[j]; note = tm[j+1]; notenum = tm[j+2];
+                        
+                        PitchClass fund = letterNoteToPitchClass(note);
+                        TuningSystem tscale = tuningStringToTuningSystem(tun);
+                        int noteNumber = notenum.getIntValue();
+                        
+                        // create TuningModPreparation and TuningModification attached to key
+                        
+                        TuningModPreparation::Ptr myMod = new TuningModPreparation();
+                        
+                        myMod->setParam(TuningFundamental, String(fund));
+                        myMod->setParam(TuningScale, String(tscale));
+                        
+                        bool dontAdd = false; int whichTMod = 0;
+                        for (int c = modTuning.size(); --c>=0;)
+                        {
+                            if (myMod->compare(modTuning[c]))
+                            {
+                                dontAdd = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!dontAdd) addTuningMod(myMod);
+                        
+                        int whichPrep = synchronic[sId]->aPrep->getTuning()->getId();
+                        
+                        thisPiano->modMap[noteNumber]->addTuningModification(new TuningModification(noteNumber, whichPrep, TuningFundamental, String(fund), modTuningCount));
+                        
+                        ++modTuningCount;
+
+                        
+                        
+                        
+                    }
+                }
+                
+       
             }
             
             
@@ -2114,27 +2207,9 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             int controller = m.getControllerNumber();
             float value = m.getControllerValue() / 128.0f;
             
-            if (controller == 1)
-            {
-                for (int n = synchronic.size(); --n >= 0;)
-                    synchronic[n]->aPrep->setTempo((int)(15.0f + value * 3000.0f));
-                
-                synchronicPreparationDidChange = true;
-            }
-            else if (controller == 2)
-            {
-                for (int n = direct.size(); --n >= 0;)
-                    direct[n]->aPrep->setTransposition(((value * 2.0)-1.0) * 24.0f);
-                
-                directPreparationDidChange = true;
-            }
-            else if (controller == 3)
-            {
-                for (int n = nostalgic.size(); --n >= 0;)
-                    nostalgic[n]->aPrep->setTransposition(((value * 2.0)-1.0) * 24.0f);
-                
-                nostalgicPreparationDidChange = true;
-            }
+            int piano = controller-51;
+            
+            if ((m.getControllerValue() != 0) && piano >= 0 && piano < 5)   setCurrentPiano(piano);
             
         }
     }

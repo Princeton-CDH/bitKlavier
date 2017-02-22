@@ -73,6 +73,65 @@ BKParameterDataType getBKDataType ( TuningParameterType type)
 }
 
 /*
+typedef enum TuningSystem {
+    PartialTuning = 0,
+    JustTuning,
+    EqualTemperament,
+    DuodeneTuning,
+    OtonalTuning,
+    UtonalTuning,
+    AdaptiveTuning,
+    AdaptiveAnchoredTuning,
+    CustomTuning
+} TuningSystem;
+*/
+
+TuningSystem tuningStringToTuningSystem(String tuning)
+{
+    if (tuning == "partial")                return PartialTuning;
+    else if (tuning == "just")              return JustTuning;
+    else if (tuning == "equal")             return EqualTemperament;
+    else if (tuning == "duodene")           return DuodeneTuning;
+    else if (tuning == "otonal")            return OtonalTuning;
+    else if (tuning == "utonal")            return UtonalTuning;
+    else if(tuning == "adaptive")           return AdaptiveTuning;
+    else if (tuning == "adaptiveanchor")    return AdaptiveAnchoredTuning;
+    else if (tuning == "custom")            return CustomTuning;
+    else                                    return TuningSystemNil;
+
+}
+
+PitchClass      letterNoteToPitchClass(String note)
+{
+    if (note == "C" || note == "c") return C;
+    
+    else if (note == "C#" || note == "c#" || note == "Db" || note == "db")   return CSharp;
+    
+    else if (note == "D" || note == "d") return D;
+    
+    else if (note == "D#" || note == "d#" || note == "Eb" || note == "eb")   return DSharp;
+    
+    else if (note == "E" || note == "e") return E;
+    
+    else if (note == "F" || note == "f") return F;
+    
+    else if (note == "F#" || note == "f#" || note == "Gb" || note == "gb")   return FSharp;
+    
+    else if (note == "G" || note == "g") return G;
+    
+    else if (note == "G#" || note == "g#" || note == "Ab" || note == "ab")   return GSharp;
+    
+    else if (note == "A" || note == "a" )    return A;
+    
+    else if (note == "A#" || note == "a#" || note == "Bb" || note == "bb")   return ASharp;
+    
+    else if (note == "B" || note == "b")     return B;
+    
+    
+        
+}
+
+/*
 BKParameterDataType getBKDataType ( DirectParameterType param)
 {
     if ((type == SynchronicTuning) ||
