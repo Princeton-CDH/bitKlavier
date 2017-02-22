@@ -132,74 +132,40 @@ BKAudioProcessorEditor::~BKAudioProcessorEditor()
 
 void BKAudioProcessorEditor::timerCallback()
 {
-    
-    //need these to account for reset calls
-    //i can't see how to set the processor.***didChange bools from within preparationMap or the preparation classes
-    for(int i = 0; i<processor.synchronic.size(); i++)
+  
+    if (processor.updateState->pianoDidChange)
     {
-        if(processor.synchronic[i]->didChange)
-        {
-            processor.synchronic[i]->didChange = false;
-            svc.updateFields();
-        }
-        
-    }
-    
-    for(int i = 0; i<processor.nostalgic.size(); i++)
-    {
-        if(processor.nostalgic[i]->didChange)
-        {
-            processor.nostalgic[i]->didChange = false;
-            nvc.updateFields();
-        }
-        
-    }
-    
-    for(int i = 0; i<processor.direct.size(); i++)
-    {
-        if(processor.direct[i]->didChange)
-        {
-            processor.direct[i]->didChange = false;
-            dvc.updateFields();
-        }
-        
-    }
-    
-    
-    if (processor.pianoDidChange)
-    {
-        processor.pianoDidChange = false;
+        processor.updateState->pianoDidChange = false;
         switchPianos();
-
     }
     
-    if (processor.generalSettingsDidChange)
+    if (processor.updateState->generalSettingsDidChange)
     {
-        processor.generalSettingsDidChange = false;
+        processor.updateState->generalSettingsDidChange = false;
         gvc.updateFields();
     }
     
-    if (processor.directPreparationDidChange)
+    if (processor.updateState->directPreparationDidChange)
     {
-        processor.directPreparationDidChange = false;
+        processor.updateState->directPreparationDidChange = false;
         dvc.updateFields();
     }
     
-    if (processor.nostalgicPreparationDidChange)
+    if (processor.updateState->nostalgicPreparationDidChange)
     {
-        processor.nostalgicPreparationDidChange = false;
+        processor.updateState->nostalgicPreparationDidChange = false;
         nvc.updateFields();
     }
     
-    if (processor.synchronicPreparationDidChange)
+    if (processor.updateState->synchronicPreparationDidChange)
     {
-        processor.synchronicPreparationDidChange = false;
+        processor.updateState->synchronicPreparationDidChange = false;
         svc.updateFields();
     }
     
-    if (processor.tuningPreparationDidChange)
+    if (processor.updateState->tuningPreparationDidChange)
     {
-        processor.tuningPreparationDidChange = false;
+        processor.updateState->tuningPreparationDidChange = false;
         tvc.updateFields();
     }
     

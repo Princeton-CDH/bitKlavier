@@ -8,18 +8,20 @@
 //==============================================================================
 BKAudioProcessor::BKAudioProcessor():
 general                 (new GeneralSettings()),
+updateState             (new BKUpdateState()),
 mainPianoSynth          (general),
 hammerReleaseSynth      (general),
 resonanceReleaseSynth   (general)
 {
     didLoadHammersAndRes            = false;
     didLoadMainPianoSamples         = false;
+/*
     pianoDidChange                  = false;
     directPreparationDidChange      = false;
     nostalgicPreparationDidChange   = false;
     tuningPreparationDidChange      = false;
     synchronicPreparationDidChange  = false;
-    
+ */
     bkKeymaps       .ensureStorageAllocated(aMaxNumPreparationKeymaps);
     bkPianos        .ensureStorageAllocated(aMaxNumPianos);
     prevPianos      .ensureStorageAllocated(aMaxNumPianos);
@@ -103,14 +105,14 @@ void BKAudioProcessor::addKeymap(void)
 void BKAudioProcessor::addSynchronic(void)
 {
     int numSynchronic = synchronic.size();
-    synchronic.add(new Synchronic(&mainPianoSynth, tuning[0], general, numSynchronic));
+    synchronic.add(new Synchronic(&mainPianoSynth, tuning[0], general, updateState, numSynchronic));
     synchronic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 void BKAudioProcessor::addNostalgic(void)
 {
     int numNostalgic = nostalgic.size();
-    nostalgic.add(new Nostalgic(&mainPianoSynth, tuning[0], numNostalgic));
+    nostalgic.add(new Nostalgic(&mainPianoSynth, tuning[0], updateState, numNostalgic));
     nostalgic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
@@ -123,7 +125,7 @@ void BKAudioProcessor::addTuning(void)
 void BKAudioProcessor::addDirect(void)
 {
     int numDirect = direct.size();
-    direct.add(new Direct(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, tuning[0], numDirect));
+    direct.add(new Direct(&mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, tuning[0], updateState, numDirect));
     direct.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
@@ -957,12 +959,12 @@ void BKAudioProcessor::loadGallery(void)
 
 void BKAudioProcessor::updateUI(void)
 {
-    pianoDidChange = true;
-    directPreparationDidChange = true;
-    nostalgicPreparationDidChange = true;
-    synchronicPreparationDidChange = true;
-    tuningPreparationDidChange = true;
-    generalSettingsDidChange = true;
+    updateState->pianoDidChange = true;
+    updateState->directPreparationDidChange = true;
+    updateState->nostalgicPreparationDidChange = true;
+    updateState->synchronicPreparationDidChange = true;
+    updateState->tuningPreparationDidChange = true;
+    updateState->generalSettingsDidChange = true;
 }
 
 void BKAudioProcessor::saveGallery(void)
@@ -1004,6 +1006,7 @@ void BKAudioProcessor::saveGallery(void)
     for (int i = 0; i < modNostalgic.size(); i++) galleryVT.addChild(modNostalgic[i]->getState(i), -1, 0);
     
     
+    //move this into Keymap
     for (int i = 0; i < bkKeymaps.size(); i++)
     {
         ValueTree keys( vtagKeymap + String(i));
@@ -1306,7 +1309,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         }
         else if (type == TuningResetKeymap)         active->getResetMap()->setKeymap(modia);
         
-        tuningPreparationDidChange = true;
+        updateState->tuningPreparationDidChange = true;
     }
     
     DirectModification::PtrArr dMod = currentPiano->modMap[noteNumber]->getDirectModifications();
@@ -1325,7 +1328,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == DirectTuning)      active->setTuning(tuning[modi]);
         else if (type == DirectResetKeymap) active->getResetMap()->setKeymap(modia);
         
-        directPreparationDidChange = true;
+        updateState->directPreparationDidChange = true;
     }
     
     NostalgicModification::PtrArr nMod = currentPiano->modMap[noteNumber]->getNostalgicModifications();
@@ -1348,7 +1351,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == NostalgicTuning)           active->setTuning(tuning[modi]);
         else if (type == NostalgicResetKeymap)      active->getResetMap()->setKeymap(modia);
         
-        nostalgicPreparationDidChange = true;
+        updateState->nostalgicPreparationDidChange = true;
     }
     
     SynchronicModification::PtrArr sMod = currentPiano->modMap[noteNumber]->getSynchronicModifications();
@@ -1379,7 +1382,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == AT1Subdivisions)               active->setAdaptiveTempo1Subdivisions(modf);
         else if (type == SynchronicResetKeymap)         active->getResetMap()->setKeymap(modia);
         
-        synchronicPreparationDidChange = true;
+        updateState->synchronicPreparationDidChange = true;
     }
 }
 
@@ -1420,7 +1423,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             for (int i = tuning.size(); --i >= 0; )
             {
                 if (tuning[i]->aPrep->getResetMap()->containsNote(noteNumber)) tuning[i]->reset();
-                tuningPreparationDidChange = true;
+                updateState->tuningPreparationDidChange = true;
             }
             
             // modifications
@@ -1457,21 +1460,21 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
                 for (int n = synchronic.size(); --n >= 0;)
                     synchronic[n]->aPrep->setTempo((int)(15.0f + value * 3000.0f));
                 
-                synchronicPreparationDidChange = true;
+                updateState->synchronicPreparationDidChange = true;
             }
             else if (controller == 2)
             {
                 for (int n = direct.size(); --n >= 0;)
                     direct[n]->aPrep->setTransposition(((value * 2.0)-1.0) * 24.0f);
                 
-                directPreparationDidChange = true;
+                updateState->directPreparationDidChange = true;
             }
             else if (controller == 3)
             {
                 for (int n = nostalgic.size(); --n >= 0;)
                     nostalgic[n]->aPrep->setTransposition(((value * 2.0)-1.0) * 24.0f);
                 
-                nostalgicPreparationDidChange = true;
+                updateState->nostalgicPreparationDidChange = true;
             }
             
         }
@@ -1518,10 +1521,10 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     
     currentPiano = bkPianos[which];
 
-    pianoDidChange = true;
-    synchronicPreparationDidChange = true;
-    nostalgicPreparationDidChange = true;
-    directPreparationDidChange = true;
+    updateState->pianoDidChange = true;
+    updateState->synchronicPreparationDidChange = true;
+    updateState->nostalgicPreparationDidChange = true;
+    updateState->directPreparationDidChange = true;
 }
 
 void BKAudioProcessor::releaseResources() {

@@ -16,6 +16,7 @@
 #include "Synchronic.h"
 #include "Tuning.h"
 #include "General.h"
+#include "BKUpdateState.h"
 
 
 class Direct : public ReferenceCountedObject
@@ -32,11 +33,13 @@ public:
            BKSynthesiser *res,
            BKSynthesiser *ham,
            Tuning::Ptr tuning,
+           BKUpdateState::Ptr us,
            int Id):
     Id(Id),
     synth(s),
     resonanceSynth(res),
-    hammerSynth(ham)
+    hammerSynth(ham),
+    updateState(us)
     {
         sPrep       = new DirectPreparation(tuning);
         aPrep       = new DirectPreparation(sPrep);
@@ -68,10 +71,11 @@ public:
     void reset()
     {
         aPrep->copy(sPrep);
-        didChange = true;
+        updateState->directPreparationDidChange = true;
+        DBG("direct reset");
     }
     
-    bool didChange = false;
+    //void didChange(bool which) { updateState->directPreparationDidChange = which; }
     
 private:
     int Id;
@@ -79,6 +83,8 @@ private:
     BKSynthesiser*              synth;
     BKSynthesiser*              resonanceSynth;
     BKSynthesiser*              hammerSynth;
+    
+    BKUpdateState::Ptr          updateState;
     
     JUCE_LEAK_DETECTOR(Direct)
 };
@@ -96,8 +102,10 @@ public:
     Synchronic(BKSynthesiser *s,
                Tuning::Ptr tuning,
                GeneralSettings::Ptr general,
+               BKUpdateState::Ptr us,
                int Id):
-    Id(Id)
+    Id(Id),
+    updateState(us)
     {
         sPrep       = new SynchronicPreparation(tuning);
         aPrep       = new SynchronicPreparation(sPrep);
@@ -198,14 +206,15 @@ public:
     {
         aPrep->copy(sPrep);
         processor->atReset();
-        didChange = true;
+        updateState->synchronicPreparationDidChange = true;
+        DBG("synchronic reset");
     }
     
-    bool didChange = false;
+    //void didChange(bool which) { updateState->synchronicPreparationDidChange = which; }
     
 private:
     int Id;
-    
+    BKUpdateState::Ptr updateState;
     
     JUCE_LEAK_DETECTOR(Synchronic)
 };
@@ -222,8 +231,10 @@ public:
    
     Nostalgic(BKSynthesiser *s,
               Tuning::Ptr tuning,
-           int Id):
-    Id(Id)
+              BKUpdateState::Ptr us,
+              int Id):
+    Id(Id), 
+    updateState(us)
     {
         sPrep       = new NostalgicPreparation(tuning);
         aPrep       = new NostalgicPreparation(sPrep);
@@ -273,16 +284,15 @@ public:
     void reset()
     {
         aPrep->copy(sPrep);
-        didChange = true;
-        DBG("resetting nostalgic");
+        updateState->nostalgicPreparationDidChange = true;
+        DBG("nostalgic reset");
     }
     
-    bool didChange = false;
+    //void didChange(bool which) { updateState->nostalgicPreparationDidChange = which; }
     
 private:
     int Id;
-    
-    
+    BKUpdateState::Ptr updateState;
     
     JUCE_LEAK_DETECTOR(Nostalgic)
 };

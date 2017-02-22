@@ -8,6 +8,8 @@
 
 #include "BKSynthesiser.h"
 
+#include "BKUpdateState.h"
+
 #include "Preparation.h"
 
 #include "Keymap.h"
@@ -40,6 +42,7 @@ public:
     
     // General settings.
     GeneralSettings::Ptr                general;
+    BKUpdateState::Ptr                  updateState;
     
     // Synthesisers.
     BKSynthesiser                       mainPianoSynth;
@@ -78,12 +81,16 @@ public:
     void addTuningMod(void);
     
     void updateUI(void);
+    
+    /*
+    //change these to pointers, pass these to Preparations, remove extra layer of checks in PreparationMap
     bool                                pianoDidChange;
     bool                                directPreparationDidChange;
     bool                                nostalgicPreparationDidChange;
     bool                                synchronicPreparationDidChange;
     bool                                tuningPreparationDidChange;
     bool                                generalSettingsDidChange;
+    */
     
     Array<int>                          noteOn;
     
