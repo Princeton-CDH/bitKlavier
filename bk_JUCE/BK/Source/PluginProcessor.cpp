@@ -442,8 +442,8 @@ void BKAudioProcessor::loadJsonGallery(void)
                     if (isLayer)
                     {
                         // Make tuning for this Synchronic layer.
-                        PitchClass metroFundamental = (PitchClass)int(jsonGetValue(sx+"metroFundamentalMenu"));
-                        TuningSystem metroTuning = (TuningSystem)int(jsonGetValue(sx+"metroTuningMenu"));
+                        PitchClass metroFundamental = (PitchClass)int(jsonGetValue("synchronic::metroFundamentalMenu"));
+                        TuningSystem metroTuning = (TuningSystem)int(jsonGetValue("synchronic::metroTuningMenu"));
                         
                         TuningPreparation::Ptr tunePrep = new TuningPreparation(defaultTuning);
                         
@@ -592,8 +592,8 @@ void BKAudioProcessor::loadJsonGallery(void)
                     {
                         
                         // NOSTALGIC TUNING
-                        PitchClass revFundamental = (PitchClass)int(jsonGetValue(nx+"reverseFundamentalMenu"));
-                        TuningSystem revTuning = (TuningSystem)int(jsonGetValue(nx+"reverseTuningMenu"));
+                        PitchClass revFundamental = (PitchClass)int(jsonGetValue("nostalgic::reverseFundamentalMenu"));
+                        TuningSystem revTuning = (TuningSystem)int(jsonGetValue("nostalgic::reverseTuningMenu"));
                         
                         TuningPreparation::Ptr tunePrep = new TuningPreparation(defaultTuning);
                         
