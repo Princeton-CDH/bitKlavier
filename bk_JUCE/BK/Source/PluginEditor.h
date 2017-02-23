@@ -41,6 +41,7 @@ public:
     void removeLastPreparationMap(int Id);
     
     void switchPianos(void);
+    void switchGallery(void);
 
     //==============================================================================
     void paint (Graphics&) override;

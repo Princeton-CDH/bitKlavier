@@ -59,13 +59,10 @@ resonanceReleaseSynth   (general)
         nostalgic[i]->aPrep->setSyncTargetProcessor(synchronic[0]->processor);
     }
 
-    // Make a bunch of pianos. Default to zeroth keymap.
-    for (int i = 0 ; i < aMaxNumPianos; i++)
-    {
-        bkPianos.set(i, new Piano(synchronic, nostalgic, direct,
-                                  bkKeymaps[0], i)); // initializing piano 0
+    // Make a piano.
+    bkPianos.add(new Piano(synchronic, nostalgic, direct,
+                              bkKeymaps[0], 0)); // initializing piano 0
 
-    }
   
     // Initialize first piano.
     prevPiano = bkPianos[0];
@@ -74,6 +71,13 @@ resonanceReleaseSynth   (general)
     // Default all on for 
     for (int i = 0; i < 128; i++) bkKeymaps[1]->addNote(i);
     
+}
+
+void BKAudioProcessor::addPiano()
+{
+    int numPianos = bkPianos.size();
+    bkPianos.add(new Piano(synchronic, nostalgic, direct,
+                           bkKeymaps[0], numPianos));
 }
 
 void BKAudioProcessor::addDirectMod()
@@ -331,12 +335,6 @@ void BKAudioProcessor::loadJsonGallery(void)
         // Default all on for
         for (int i = 0; i < 128; i++) bkKeymaps[1]->addNote(i);
         
-        
-        // DO THIS DYNAMICALLY
-        for (int i = 0; i < aMaxNumPianos; i++)
-            bkPianos.add(new Piano(synchronic, nostalgic, direct, bkKeymaps[0], i));
-        
-        
         for (int i = 1; i <= 500; i++) //arbs
         {
             var piano = pianos.getProperty(String(i), 0);
@@ -345,9 +343,12 @@ void BKAudioProcessor::loadJsonGallery(void)
             if (piano.equals(0)) break;
             else
             {
-                Piano::Ptr thisPiano = bkPianos[i-1];
+                addPiano();
+                Piano::Ptr thisPiano = bkPianos.getLast();
+                thisPiano->setId(i);
                 
                 String name = piano.getProperty("name", "").toString();
+                thisPiano->setName(name);
                 int pianoId = piano.getProperty("id", "");
                 var data = piano.getProperty("data", "");
             
@@ -912,6 +913,8 @@ void BKAudioProcessor::loadJsonGallery(void)
         for (int k = direct.size(); --k >= 0;)      direct[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
         
         currentPiano = bkPianos[0];
+        
+        updateState->galleryDidChange = true;
         updateUI();
         
     }
@@ -1589,6 +1592,8 @@ void BKAudioProcessor::loadGallery(void)
                     
                     int pianoMapCount = 0, prepMapCount = 0, modDirectCount = 0, modSynchronicCount = 0, modNostalgicCount = 0, modTuningCount = 0;
                     
+                    thisPiano->setName(e->getStringAttribute("bkPianoName"));
+                    
                     forEachXmlChildElement (*e, pc)
                     {
                         
@@ -1741,6 +1746,7 @@ void BKAudioProcessor::loadGallery(void)
         for (int k = direct.size(); --k >= 0;)      direct[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
         
         currentPiano = bkPianos[0];
+        updateState->galleryDidChange = true; 
         updateUI();
         
     }
@@ -1750,6 +1756,7 @@ void BKAudioProcessor::loadGallery(void)
 
 void BKAudioProcessor::updateUI(void)
 {
+   
     updateState->pianoDidChange = true;
     updateState->directPreparationDidChange = true;
     updateState->nostalgicPreparationDidChange = true;
@@ -1816,7 +1823,7 @@ void BKAudioProcessor::saveGallery(void)
         
         ValueTree pianoVT( vtagPiano + String(bkPianos[piano]->getId()));
         
-        
+        pianoVT.setProperty("bkPianoName", bkPianos[piano]->getName(), 0);
         
         int pmapCount = 0;
         for (auto pmap : bkPianos[piano]->getPreparationMaps())
@@ -2037,8 +2044,8 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     hammerReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     resonanceReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
        
-    for (int i = aMaxNumPianos; --i >= 0;)
-        bkPianos[i]->prepareToPlay(sampleRate);
+    
+    for (int i = bkPianos.size(); --i >= 0;) bkPianos[i]->prepareToPlay(sampleRate);
 
     for (int i = synchronic.size(); --i >= 0;)  synchronic[i]->processor->setCurrentPlaybackSampleRate(sampleRate);
     for (int i = nostalgic.size(); --i >= 0;)   nostalgic[i]->processor->setCurrentPlaybackSampleRate(sampleRate);

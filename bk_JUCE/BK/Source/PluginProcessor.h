@@ -87,6 +87,8 @@ public:
     void addDirect(DirectPreparation::Ptr);
     int addDirectIfNotAlreadyThere(DirectPreparation::Ptr);
     
+    void addPiano(void);
+    
     
     void addKeymap(void);
     void addKeymap(Keymap::Ptr);

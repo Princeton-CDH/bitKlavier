@@ -25,6 +25,7 @@ public:
     BKUpdateState(){};
     ~BKUpdateState(){};
     
+    bool galleryDidChange = false;
     bool pianoDidChange = false;
     bool directPreparationDidChange = false;
     bool nostalgicPreparationDidChange = false;

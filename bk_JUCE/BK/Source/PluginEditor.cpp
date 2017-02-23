@@ -53,7 +53,9 @@ tvc(p)
     pianoCB.addSeparator();
     pianoCB.addListener(this);
     pvc->addAndMakeVisible(pianoCB);
-    for (int i = 0; i < aMaxNumPianos; i++) pianoCB.addItem(cPianoName[i], i+1);
+    pianoCB.addItem("MyFirstPiano", 1);
+    processor.bkPianos[0]->setName("MyFirstPiano");
+    pianoCB.addItem("New piano...",2);
     pianoCB.setSelectedItemIndex(0);
     
     pianoMapL.setName("PianoMap");
@@ -63,6 +65,14 @@ tvc(p)
     pianoMapTF.addListener(this);
     pianoMapTF.setName("PianoMap");
     pvc->addAndMakeVisible(pianoMapTF);
+    
+    pianoNameL.setName("PianoName");
+    pianoNameL.setText("PianoName", NotificationType::dontSendNotification);
+    pvc->addAndMakeVisible(pianoNameL);
+    
+    pianoNameTF.addListener(this);
+    pianoNameTF.setName("PianoName");
+    pvc->addAndMakeVisible(pianoNameTF);
     
     modMapL.setName("ModMap");
     modMapL.setText("ModMap", NotificationType::dontSendNotification);
@@ -136,9 +146,24 @@ BKAudioProcessorEditor::~BKAudioProcessorEditor()
     
 }
 
+void BKAudioProcessorEditor::switchGallery()
+{
+    pianoCB.clear();
+    for (int i = 0; i < processor.bkPianos.size(); i++)     pianoCB.addItem(processor.bkPianos[i]->getName(), i+1);
+    pianoCB.addItem("New piano...", processor.bkPianos.size()+1);
+    pianoCB.setSelectedId(1);
+    
+    
+}
+
 void BKAudioProcessorEditor::timerCallback()
 {
-  
+    if (processor.updateState->galleryDidChange)
+    {
+        processor.updateState->galleryDidChange = false;
+        switchGallery();
+    }
+    
     if (processor.updateState->pianoDidChange)
     {
         processor.updateState->pianoDidChange = false;
@@ -187,7 +212,7 @@ void BKAudioProcessorEditor::paint (Graphics& g)
 void BKAudioProcessorEditor::resized()
 {
     float loadvcH = (20 + gYSpacing) + 1.5 * gYSpacing;
-    float pvcH = 3 * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
+    float pvcH = 4 * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float kvcH = cKeymapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float gvcH = cGeneralParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float svcH = cSynchronicParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
@@ -221,8 +246,13 @@ void BKAudioProcessorEditor::resized()
     // Piano
     pianoL      .setTopLeftPosition(0,                                  gYSpacing);
     pianoCB     .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   pianoL.getY());
-    pianoMapL   .setTopLeftPosition(0,                                  pianoL.getBottom() + gYSpacing);
+    
+    pianoNameL  .setTopLeftPosition(0,                                  pianoL.getBottom() + gYSpacing);
+    pianoNameTF .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   pianoNameL.getY());
+    
+    pianoMapL   .setTopLeftPosition(0,                                  pianoNameL.getBottom() + gYSpacing);
     pianoMapTF  .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   pianoMapL.getY());
+    
     modMapL     .setTopLeftPosition(0,                                  pianoMapL.getBottom() + gYSpacing);
     modMapTF    .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   modMapL.getY());
     
@@ -657,6 +687,16 @@ void BKAudioProcessorEditor::bkTextFieldDidChange(TextEditor& tf)
     {
         tf.setText(processModMapString(text), false);
     }
+    else if (name == "PianoName")
+    {
+        processor.currentPiano->setName(text);
+        
+        int selected = pianoCB.getSelectedId();
+        if (selected != pianoCB.getNumItems()) pianoCB.changeItemText(selected, text);
+        pianoCB.setSelectedId(selected, dontSendNotification );
+        
+        
+    }
     
 }
 
@@ -701,9 +741,22 @@ void BKAudioProcessorEditor::bkComboBoxDidChange            (ComboBox* box)
     // Change piano
     if (box->getName() == cPianoParameterTypes[PianoCBPiano])
     {
-        int whichPiano = box->getSelectedId();
+        int which = box->getSelectedId();
         
-        processor.setCurrentPiano(whichPiano-1);
+        // Add piano if New piano... pressed.
+        if (which == pianoCB.getNumItems())
+        {
+            processor.addPiano();
+            
+            String newName = "Piano"+String(processor.bkPianos.size());
+            
+            pianoCB.changeItemText(which, newName);
+            processor.bkPianos.getLast()->setName(newName);
+            
+            pianoCB.addItem("New piano...", which+1);
+        }
+        
+        processor.setCurrentPiano(which-1);
     }
 
 }
@@ -796,6 +849,8 @@ void BKAudioProcessorEditor::switchPianos(void)
     }
     
     modMapTF.setText(modMap, false);
+    
+    pianoNameTF.setText(processor.currentPiano->getName(), false);
 }
 
 
