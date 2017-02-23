@@ -695,9 +695,9 @@ void BKAudioProcessor::loadJsonGallery(void)
                         
                         if (!isOld)
                         {
-                            float dGain     = jsonGetProperty(dx+"directGain");
-                            float dOverlay  = jsonGetProperty(dx+"directOverlay");
-                            float dTransp   = jsonGetProperty(dx+"directTransp");
+                            float dGain     = jsonGetValue(dx+"directGain");
+                            float dOverlay  = jsonGetValue(dx+"directOverlay");
+                            float dTransp   = jsonGetValue(dx+"directTransp");
                             
                             dPrep->setGain(dGain);
                             
@@ -742,6 +742,11 @@ void BKAudioProcessor::loadJsonGallery(void)
                             thisPiano->prepMaps.getLast()->setKeymap(bkKeymaps.getLast());
                             
                             thisPiano->prepMaps.getLast()->addDirect(direct[dId]);
+                            
+                            if (thisPiano->getName() == "DirectLayer")
+                            {
+                                DBG(String("NEW PREP MAP    dlkeymap: " + intArrayToString(keymap->keys())));
+                            }
                             
                         }
                         else

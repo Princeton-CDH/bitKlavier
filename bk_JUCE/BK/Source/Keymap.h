@@ -61,7 +61,7 @@ public:
     inline bool compare(Keymap::Ptr k)
     {
         for (int i = 0; i < 128; i++)
-            if (k->keymap[i] != k->keymap[i]) return false; 
+            if (keymap[i] != k->keymap[i]) return false;
                                   
         return true;
     }
