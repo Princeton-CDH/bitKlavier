@@ -80,6 +80,7 @@ private:
     TextButton                          addPMapButton;
     TextButton                          removePMapButton;
     TextButton                          saveButton, loadButton, loadJsonButton;
+    TextButton                          removePianoButton;
     
     OwnedArray<TextButton>              loadButtons;
     

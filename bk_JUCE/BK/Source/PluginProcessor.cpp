@@ -1592,7 +1592,14 @@ void BKAudioProcessor::loadGallery(void)
                     
                     int pianoMapCount = 0, prepMapCount = 0, modDirectCount = 0, modSynchronicCount = 0, modNostalgicCount = 0, modTuningCount = 0;
                     
-                    thisPiano->setName(e->getStringAttribute("bkPianoName"));
+                    String pianoName = e->getStringAttribute("bkPianoName");
+                    
+                    if (pianoName != String::empty)
+                        thisPiano->setName(e->getStringAttribute("bkPianoName"));
+                    else
+                    {
+                        thisPiano->setName("Piano"+String(whichPiano+1));
+                    }
                     
                     forEachXmlChildElement (*e, pc)
                     {

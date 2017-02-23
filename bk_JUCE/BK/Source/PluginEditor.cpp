@@ -120,12 +120,18 @@ tvc(p)
     addPMapButton.setButtonText("Add");
     addPMapButton.addListener(this);
     addAndMakeVisible(addPMapButton);
-    
+
     removePMapButton.setName("Remove");
     removePMapButton.changeWidthToFitText();
     removePMapButton.setButtonText("Remove");
     removePMapButton.addListener(this);
     addAndMakeVisible(removePMapButton);
+    
+    removePianoButton.setName("RemovePiano");
+    removePianoButton.changeWidthToFitText();
+    removePianoButton.setButtonText("Remove");
+    removePianoButton.addListener(this);
+    pvc->addAndMakeVisible(removePianoButton);
     
     addPMapButton.setBounds(pvc->getX(),
                             pvc->getBottom() + gYSpacing,
@@ -246,6 +252,8 @@ void BKAudioProcessorEditor::resized()
     // Piano
     pianoL      .setTopLeftPosition(0,                                  gYSpacing);
     pianoCB     .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   pianoL.getY());
+    
+    removePianoButton.setBounds(pianoCB.getX()-55, pianoCB.getY(), 50, 20);
     
     pianoNameL  .setTopLeftPosition(0,                                  pianoL.getBottom() + gYSpacing);
     pianoNameTF .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   pianoNameL.getY());
@@ -721,6 +729,14 @@ void BKAudioProcessorEditor::bkButtonClicked (Button* b)
     else if (b->getName() == "Remove")
     {
         removeLastPreparationMap(processor.currentPiano->removeLastPreparationMap());
+    }
+    else if (b->getName() == "RemovePiano")
+    {
+        int selected = pianoCB.getSelectedId();
+        
+        processor.bkPianos.remove(selected-1);
+        
+        switchGallery();
     }
     else if (b->getName() == "Load Light")
     {
