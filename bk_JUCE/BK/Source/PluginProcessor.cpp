@@ -547,29 +547,21 @@ void BKAudioProcessor::loadJsonGallery(void)
                             }
                         }
                         
+                        Keymap::Ptr pmapkeymap = bkKeymaps[which];
                         if (!alreadyExists)
                         {
                             addKeymap(keymap);
+                            pmapkeymap = bkKeymaps.getLast();
                             
-                            thisPiano->addPreparationMap();
-                            
-                            thisPiano->prepMaps.getLast()->setKeymap(bkKeymaps.getLast());
-                            
-                            thisPiano->prepMaps.getLast()->addSynchronic(synchronic[sId]);
-                            
-                        }
-                        else
-                        {
-                            // Look for prep map with this keymap.
-                            for (int pm = thisPiano->prepMaps.size(); --pm >= 0;)
-                            {
-                                // If prep map has this keymap, add this preparation to prepmap
-                                if (keymap->compare(    thisPiano->prepMaps[pm]->getKeymap()))
-                                    thisPiano->prepMaps[pm]->addSynchronic(synchronic[sId]);
-                            }
+                            DBG("adding keymap and prepmap");
                         }
                         
-                        
+                        DBG("adding prep map");
+                    
+                        thisPiano->addPreparationMap();
+                        thisPiano->prepMaps.getLast()->setKeymap(pmapkeymap);
+                        thisPiano->prepMaps.getLast()->addSynchronic(synchronic[sId]);
+
                         DBG("\nsynchronicPrep: " + String(sId) +
                             "\nlengths: " + floatArrayToString(lens) +
                             "\naccents: " + floatArrayToString(accents) +
@@ -659,27 +651,21 @@ void BKAudioProcessor::loadJsonGallery(void)
                             }
                         }
                         
+                        Keymap::Ptr pmapkeymap = bkKeymaps[which];
                         if (!alreadyExists)
                         {
                             addKeymap(keymap);
+                            pmapkeymap = bkKeymaps.getLast();
                             
-                            thisPiano->addPreparationMap();
-                            
-                            thisPiano->prepMaps.getLast()->setKeymap(bkKeymaps.getLast());
-                            
-                            thisPiano->prepMaps.getLast()->addNostalgic(nostalgic[nId]);
-    
+                            DBG("adding keymap and prepmap");
                         }
-                        else
-                        {
-                            // Look for prep map with this keymap.
-                            for (int pm = thisPiano->prepMaps.size(); --pm >= 0;)
-                            {
-                                // If prep map has this keymap, add this preparation to prepmap
-                                if (keymap->compare(    thisPiano->prepMaps[pm]->getKeymap()))
-                                    thisPiano->prepMaps[pm]->addNostalgic(nostalgic[nId]);
-                            }
-                        }
+                        
+                        DBG("adding prep map");
+                        
+                        thisPiano->addPreparationMap();
+                        thisPiano->prepMaps.getLast()->setKeymap(pmapkeymap);
+                        thisPiano->prepMaps.getLast()->addNostalgic(nostalgic[nId]);
+     
                         
                         DBG("nostalgicPrep: " + String(nId));
                     }
@@ -733,32 +719,20 @@ void BKAudioProcessor::loadJsonGallery(void)
                             }
                         }
                         
+                        Keymap::Ptr pmapkeymap = bkKeymaps[which];
                         if (!alreadyExists)
                         {
                             addKeymap(keymap);
+                            pmapkeymap = bkKeymaps.getLast();
                             
-                            thisPiano->addPreparationMap();
-                            
-                            thisPiano->prepMaps.getLast()->setKeymap(bkKeymaps.getLast());
-                            
-                            thisPiano->prepMaps.getLast()->addDirect(direct[dId]);
-                            
-                            if (thisPiano->getName() == "DirectLayer")
-                            {
-                                DBG(String("NEW PREP MAP    dlkeymap: " + intArrayToString(keymap->keys())));
-                            }
-                            
+                            DBG("adding keymap and prepmap");
                         }
-                        else
-                        {
-                            // Look for prep map with this keymap.
-                            for (int pm = thisPiano->prepMaps.size(); --pm >= 0;)
-                            {
-                                // If prep map has this keymap, add this preparation to prepmap
-                                if (keymap->compare(    thisPiano->prepMaps[pm]->getKeymap()))
-                                    thisPiano->prepMaps[pm]->addDirect(direct[dId]);
-                            }
-                        }
+                        
+                        DBG("adding prep map");
+                        
+                        thisPiano->addPreparationMap();
+                        thisPiano->prepMaps.getLast()->setKeymap(pmapkeymap);
+                        thisPiano->prepMaps.getLast()->addDirect(direct[dId]);
                         
                         DBG("directPrep: " + String(dId));
                     }
