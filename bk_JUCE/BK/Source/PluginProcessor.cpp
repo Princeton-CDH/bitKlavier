@@ -1106,6 +1106,25 @@ void BKAudioProcessor::loadGallery(void)
                             
                             tuning[id]->sPrep->setAbsoluteOffsets(absolute);
                         }
+                        else if (sub->hasTagName(vtagKeymap + "1"))
+                        {
+                            Array<int> keys;
+                            for (int k = 0; k < 128; k++)
+                            {
+                                String attr = sub->getStringAttribute(ptagKeymap_key + String(k));
+
+                                if (attr == String::empty) break;
+                                else
+                                {
+                                    i = attr.getIntValue();
+                                    keys.add(i);
+                                }
+                            }
+                            
+                            Keymap::Ptr km = new Keymap(0);
+                            km->setKeymap(keys);
+                            tuning[id]->sPrep->setResetMap(km);
+                        }
                     }
                     
                     // copy static to active
@@ -1225,6 +1244,29 @@ void BKAudioProcessor::loadGallery(void)
                     
                     f = e->getStringAttribute(ptagDirect_transposition).getFloatValue();
                     direct[id]->sPrep->setTransposition(f);
+                    
+                    forEachXmlChildElement (*e, sub)
+                    {
+                        if (sub->hasTagName(vtagKeymap + "1"))
+                        {
+                            Array<int> keys;
+                            for (int k = 0; k < 128; k++)
+                            {
+                                String attr = sub->getStringAttribute(ptagKeymap_key + String(k));
+                                
+                                if (attr == String::empty) break;
+                                else
+                                {
+                                    i = attr.getIntValue();
+                                    keys.add(i);
+                                }
+                            }
+                            
+                            Keymap::Ptr km = new Keymap(0);
+                            km->setKeymap(keys);
+                            direct[id]->sPrep->setResetMap(km);
+                        }
+                    }
                     
                     // copy static to active
                     direct[id]->aPrep->copy(direct[id]->sPrep);
@@ -1375,6 +1417,26 @@ void BKAudioProcessor::loadGallery(void)
                             
                             synchronic[id]->sPrep->setTranspOffsets(transp);
                         }
+                        else if (sub->hasTagName(vtagKeymap + "1"))
+                        {
+                            Array<int> keys;
+                            for (int k = 0; k < 128; k++)
+                            {
+                                String attr = sub->getStringAttribute(ptagKeymap_key + String(k));
+                                
+                                if (attr == String::empty) break;
+                                else
+                                {
+                                    i = attr.getIntValue();
+                                    keys.add(i);
+                                }
+                            }
+                            
+                            Keymap::Ptr km = new Keymap(0);
+                            km->setKeymap(keys);
+                            synchronic[id]->sPrep->setResetMap(km);
+                        }
+
                     }
                     
                     synchronic[id]->aPrep->copy(synchronic[id]->sPrep);
@@ -1544,6 +1606,29 @@ void BKAudioProcessor::loadGallery(void)
                     
                     nostalgic[id]->sPrep->setSyncTargetProcessor(synchronic[i]->processor);
                     nostalgic[id]->aPrep->setSyncTargetProcessor(synchronic[i]->processor);
+                    
+                    forEachXmlChildElement (*e, sub)
+                    {
+                        if (sub->hasTagName(vtagKeymap + "1"))
+                        {
+                            Array<int> keys;
+                            for (int k = 0; k < 128; k++)
+                            {
+                                String attr = sub->getStringAttribute(ptagKeymap_key + String(k));
+                                
+                                if (attr == String::empty) break;
+                                else
+                                {
+                                    i = attr.getIntValue();
+                                    keys.add(i);
+                                }
+                            }
+                            
+                            Keymap::Ptr km = new Keymap(0);
+                            km->setKeymap(keys);
+                            nostalgic[id]->sPrep->setResetMap(km);
+                        }
+                    }
                     
                     nostalgic[id]->aPrep->copy(nostalgic[id]->sPrep);
                     
@@ -1815,19 +1900,7 @@ void BKAudioProcessor::saveGallery(void)
     
     for (int i = 0; i < modNostalgic.size(); i++) galleryVT.addChild(modNostalgic[i]->getState(i), -1, 0);
     
-    
-    //move this into Keymap
-    for (int i = 0; i < bkKeymaps.size(); i++)
-    {
-        ValueTree keys( vtagKeymap + String(i));
-        int count = 0;
-        for (auto key : bkKeymaps[i]->keys())
-        {
-            keys.setProperty(ptagKeymap_key + String(count++), key, 0);
-        }
-        
-        galleryVT.addChild(keys, -1, 0);
-    }
+    for (int i = 0; i < bkKeymaps.size(); i++) galleryVT.addChild(bkKeymaps[i]->getState(i), -1, 0);
     
     // Pianos
     for (int piano = 0; piano < bkPianos.size(); piano++)

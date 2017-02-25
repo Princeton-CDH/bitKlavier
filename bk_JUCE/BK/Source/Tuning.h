@@ -566,6 +566,8 @@ public:
         }
         prep.addChild(absolute, -1, 0);
         
+        prep.addChild(sPrep->getResetMap()->getState(Id), -1, 0);
+        
         return prep;
     }
     

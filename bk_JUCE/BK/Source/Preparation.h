@@ -68,6 +68,8 @@ public:
         prep.setProperty( ptagDirect_resGain,           sPrep->getResonanceGain(), 0);
         prep.setProperty( ptagDirect_hammerGain,        sPrep->getHammerGain(), 0);
         
+        prep.addChild(sPrep->getResetMap()->getState(Id), -1, 0);
+        
         return prep;
     }
     
@@ -211,6 +213,8 @@ public:
         prep.setProperty( ptagSynchronic_AT1Min,              sPrep->getAdaptiveTempo1Min(), 0);
         prep.setProperty( ptagSynchronic_AT1Max,              sPrep->getAdaptiveTempo1Max(), 0);
         
+        prep.addChild(sPrep->getResetMap()->getState(Id), -1, 0);
+        
         return prep;
         
     }
@@ -305,6 +309,8 @@ public:
         prep.setProperty( ptagNostalgic_beatsToSkip,        sPrep->getBeatsToSkip(), 0);
         prep.setProperty( ptagNostalgic_mode,               sPrep->getMode(), 0);
         prep.setProperty( ptagNostalgic_syncTarget,         sPrep->getSyncTarget(), 0);
+        
+        prep.addChild(sPrep->getResetMap()->getState(Id), -1, 0);
 
         return prep;
     }
