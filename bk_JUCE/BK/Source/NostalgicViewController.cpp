@@ -293,10 +293,11 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         if (type == BKParameter)
         {
-            Array<int> keys = stringToIntArray(text);
-            prep->getResetMap()->setKeymap(keys);
-            active->getResetMap()->setKeymap(keys);
-            nostalgicTF[NostalgicReset]->setText(intArrayToString(prep->getResetMap()->keys()));
+            // ** nothing here, Mod only
+            //Array<int> keys = stringToIntArray(text);
+            //prep->getResetMap()->setKeymap(keys);
+            //active->getResetMap()->setKeymap(keys);
+            //nostalgicTF[NostalgicReset]->setText(intArrayToString(prep->getResetMap()->keys()));
         }
         else    //BKModification
         {
@@ -324,7 +325,7 @@ void NostalgicViewController::updateFields(void)
     nostalgicTF[NostalgicMode]              ->setText( String( prep->getMode()), false);
     nostalgicTF[NostalgicSyncTarget]        ->setText( String( prep->getSyncTarget()), false);
     nostalgicTF[NostalgicTuning]            ->setText( String(prep->getTuning()->getId()), false);
-    nostalgicTF[NostalgicReset]       ->setText( intArrayToString(prep->getResetMap()->keys()), false);
+    //nostalgicTF[NostalgicReset]       ->setText( intArrayToString(prep->getResetMap()->keys()), false);
 }
 
 void NostalgicViewController::updateModFields(void)

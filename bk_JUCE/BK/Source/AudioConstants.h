@@ -90,7 +90,7 @@ const String vtagSynchronic_beatMults = "beatMultipliers";
 const String vtagSynchronic_lengthMults = "lengthMultipliers";
 const String vtagSynchronic_accentMults = "accentMultipliers";
 const String vtagSynchronic_transpOffsets = "transpOffsets";
-const String vtagSynchronic_resetMap = "synchronicResetMap";
+const String ptagSynchronic_reset = "synchronicReset";
 
 
 const String vtagNostalgicPrep = "nostalgicPrep";
@@ -105,7 +105,7 @@ const String ptagNostalgic_lengthMultiplier = "lengthMultiplier";
 const String ptagNostalgic_mode = "mode";
 const String ptagNostalgic_beatsToSkip = "beatsToSkip";
 const String ptagNostalgic_syncTarget = "syncTarget";
-const String vtagNostalgic_resetMap = "nostalgicResetMap";
+const String ptagNostalgic_reset = "nostalgicReset";
 
 
 
@@ -117,7 +117,7 @@ const String ptagDirect_transposition = "transposition";
 const String ptagDirect_gain = "gain";
 const String ptagDirect_resGain = "resGain";
 const String ptagDirect_hammerGain = "hammerGain";
-const String vtagDirect_resetMap = "directResetMap";
+const String ptagDirect_reset = "directReset";
 
 
 const String vtagTuningModPrep = "tuningModPrep";
@@ -137,7 +137,7 @@ const String vtagTuning_customScale = "customScale";
 const String ptagTuning_customScaleLength = "customScaleLength";
 const String ptagTuning_customScaleDegree = "scaleDegree";
 const String vTagTuning_absoluteOffsets = "absoluteOffsets";
-const String vtagTuning_resetMap = "tuningResetMap";
+const String ptagTuning_resetPrep = "tuningReset";
 
 
 const String vtagKeymaps = "keymaps";

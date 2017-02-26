@@ -231,10 +231,11 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         if (type == BKParameter)
         {
-            Array<int> keys = stringToIntArray(text);
-            prep->getResetMap()->setKeymap(keys);
-            active->getResetMap()->setKeymap(keys);
-            directTF[DirectReset]->setText(intArrayToString(prep->getResetMap()->keys()));
+            // ** do nothing here, Mod only
+            //Array<int> keys = stringToIntArray(text);
+            //prep->getResetMap()->setKeymap(keys);
+            //active->getResetMap()->setKeymap(keys);
+            //directTF[DirectReset]->setText(intArrayToString(prep->getResetMap()->keys()));
         }
         else    //BKModification
         {
@@ -259,7 +260,7 @@ void DirectViewController::updateFields(void)
     directTF[DirectHammerGain]          ->setText( String( prep->getHammerGain()), false);
     directTF[DirectResGain]             ->setText( String( prep->getResonanceGain()), false);
     directTF[DirectTuning]              ->setText( String( prep->getTuning()->getId()), false);
-    directTF[DirectReset]         ->setText( intArrayToString(prep->getResetMap()->keys()), false);
+    //directTF[DirectReset]         ->setText( intArrayToString(prep->getResetMap()->keys()), false);
 
 }
 

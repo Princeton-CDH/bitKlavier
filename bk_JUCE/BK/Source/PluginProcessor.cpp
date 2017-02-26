@@ -1106,6 +1106,7 @@ void BKAudioProcessor::loadGallery(void)
                             
                             tuning[id]->sPrep->setAbsoluteOffsets(absolute);
                         }
+                        /*
                         else if (sub->hasTagName(vtagKeymap + "1"))
                         {
                             Array<int> keys;
@@ -1125,6 +1126,7 @@ void BKAudioProcessor::loadGallery(void)
                             km->setKeymap(keys);
                             tuning[id]->sPrep->setResetMap(km);
                         }
+                         */
                     }
                     
                     // copy static to active
@@ -1166,6 +1168,9 @@ void BKAudioProcessor::loadGallery(void)
                     
                     p = e->getStringAttribute( ptagTuning_adaptiveAnchorFund);
                     modTuning[id]->setParam(TuningA1AnchorFundamental, p);
+                    
+                    p = e->getStringAttribute( ptagTuning_resetPrep);
+                    modTuning[id]->setParam(TuningReset, p);
                     
                     // custom scale
                     forEachXmlChildElement (*e, sub)
@@ -1245,6 +1250,7 @@ void BKAudioProcessor::loadGallery(void)
                     f = e->getStringAttribute(ptagDirect_transposition).getFloatValue();
                     direct[id]->sPrep->setTransposition(f);
                     
+                    /*
                     forEachXmlChildElement (*e, sub)
                     {
                         if (sub->hasTagName(vtagKeymap + "1"))
@@ -1267,6 +1273,7 @@ void BKAudioProcessor::loadGallery(void)
                             direct[id]->sPrep->setResetMap(km);
                         }
                     }
+                     */
                     
                     // copy static to active
                     direct[id]->aPrep->copy(direct[id]->sPrep);
@@ -1295,6 +1302,9 @@ void BKAudioProcessor::loadGallery(void)
                     
                     p = e->getStringAttribute(ptagDirect_transposition);
                     modDirect[id]->setParam(DirectTransposition, p);
+                    
+                    p = e->getStringAttribute(ptagDirect_reset);
+                    modDirect[id]->setParam(DirectReset, p);
                     
                     ++dModPrepCount;
                 }
@@ -1417,6 +1427,7 @@ void BKAudioProcessor::loadGallery(void)
                             
                             synchronic[id]->sPrep->setTranspOffsets(transp);
                         }
+                        /*
                         else if (sub->hasTagName(vtagKeymap + "1"))
                         {
                             Array<int> keys;
@@ -1436,6 +1447,7 @@ void BKAudioProcessor::loadGallery(void)
                             km->setKeymap(keys);
                             synchronic[id]->sPrep->setResetMap(km);
                         }
+                         */
 
                     }
                     
@@ -1490,6 +1502,9 @@ void BKAudioProcessor::loadGallery(void)
                     
                     p = e->getStringAttribute(ptagSynchronic_AT1Max);
                     modSynchronic[id]->setParam(AT1Max, p);
+                    
+                    p = e->getStringAttribute(ptagSynchronic_reset);
+                    modSynchronic[id]->setParam(SynchronicReset, p);
                     
                     
                     forEachXmlChildElement (*e, sub)
@@ -1607,6 +1622,7 @@ void BKAudioProcessor::loadGallery(void)
                     nostalgic[id]->sPrep->setSyncTargetProcessor(synchronic[i]->processor);
                     nostalgic[id]->aPrep->setSyncTargetProcessor(synchronic[i]->processor);
                     
+                    /*
                     forEachXmlChildElement (*e, sub)
                     {
                         if (sub->hasTagName(vtagKeymap + "1"))
@@ -1629,6 +1645,7 @@ void BKAudioProcessor::loadGallery(void)
                             nostalgic[id]->sPrep->setResetMap(km);
                         }
                     }
+                     */
                     
                     nostalgic[id]->aPrep->copy(nostalgic[id]->sPrep);
                     
@@ -1668,6 +1685,9 @@ void BKAudioProcessor::loadGallery(void)
                     
                     p = e->getStringAttribute(ptagNostalgic_syncTarget);
                     modNostalgic[id]->setParam(NostalgicSyncTarget, p);
+                    
+                    p = e->getStringAttribute(ptagNostalgic_reset);
+                    modNostalgic[id]->setParam(NostalgicReset, p);
                     
                     ++nModPrepCount;
                 }
@@ -2173,6 +2193,10 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modfa = tMod[i]->getModFloatArr();
         modia = tMod[i]->getModIntArr();
         
+        //first do reset, if active, then the rest; enables clearing then modifying from orig
+        // ** actually, this doesn't work yet; need to establish order of modifications and try to put reset first
+        if (type == TuningReset)                    tuning[tMod[i]->getPrepId()]->reset();
+        
         if (type == TuningScale)                    active->setTuning((TuningSystem)modi);
         else if (type == TuningFundamental)         active->setFundamental((PitchClass)modi);
         else if (type == TuningOffset)              active->setFundamentalOffset(modf);
@@ -2190,7 +2214,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
                 active->setAbsoluteOffset(modfa[i], modfa[i+1] * .01);
             }
         }
-        else if (type == TuningReset)         tuning[tMod[i]->getPrepId()]->reset(); //active->getResetMap()->setKeymap(modia);
+        
         
         updateState->tuningPreparationDidChange = true;
     }
@@ -2204,12 +2228,15 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modi = dMod[i]->getModInt();
         modia = dMod[i]->getModIntArr();
         
+        //first do reset, if active, then the rest; enables clearing then modifying from orig
+        if (type == DirectReset) direct[dMod[i]->getPrepId()]->reset();
+        
         if (type == DirectTransposition)    active->setTransposition(modf);
         else if (type == DirectGain)        active->setGain(modf);
         else if (type == DirectHammerGain)  active->setHammerGain(modf);
         else if (type == DirectResGain)     active->setResonanceGain(modf);
         else if (type == DirectTuning)      active->setTuning(tuning[modi]);
-        else if (type == DirectReset) direct[dMod[i]->getPrepId()]->reset(); //active->getResetMap()->setKeymap(modia);
+        
         
         updateState->directPreparationDidChange = true;
     }
@@ -2223,6 +2250,9 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modi = nMod[i]->getModInt();
         modia = nMod[i]->getModIntArr();
         
+        //first do reset, if active, then the rest; enables clearing then modifying from orig
+        if (type == NostalgicReset)      nostalgic[nMod[i]->getPrepId()]->reset();
+        
         if (type == NostalgicTransposition)         active->setTransposition(modf);
         else if (type == NostalgicGain)             active->setGain(modf);
         else if (type == NostalgicMode)             active->setMode((NostalgicSyncMode)modi);
@@ -2232,7 +2262,6 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == NostalgicWaveDistance)     active->setWaveDistance(modi);
         else if (type == NostalgicLengthMultiplier) active->setLengthMultiplier(modf);
         else if (type == NostalgicTuning)           active->setTuning(tuning[modi]);
-        else if (type == NostalgicReset)      nostalgic[nMod[i]->getPrepId()]->reset(); //active->getResetMap()->setKeymap(modia);
         
         updateState->nostalgicPreparationDidChange = true;
     }
@@ -2246,6 +2275,8 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modi = sMod[i]->getModInt();
         modfa = sMod[i]->getModFloatArr();
         modia = sMod[i]->getModIntArr();
+        
+        if (type == SynchronicReset)         synchronic[sMod[i]->getPrepId()]->reset();
         
         if (type == SynchronicTranspOffsets)            active->setTranspOffsets(modfa);
         else if (type == SynchronicTempo)               active->setTempo(modf);
@@ -2263,7 +2294,6 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == AT1Max)                        active->setAdaptiveTempo1Max(modf);
         else if (type == AT1History)                    active->setAdaptiveTempo1History(modi);
         else if (type == AT1Subdivisions)               active->setAdaptiveTempo1Subdivisions(modf);
-        else if (type == SynchronicReset)         synchronic[sMod[i]->getPrepId()]->reset(); //active->getResetMap()->setKeymap(modia);
         
         updateState->synchronicPreparationDidChange = true;
     }
@@ -2302,12 +2332,14 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             int whichPiano = currentPiano->pianoMap[noteNumber] - 1;
             if (whichPiano >= 0 && whichPiano != currentPiano->getId()) setCurrentPiano(whichPiano);
             
+            /*
             // check for tuning resets
             for (int i = tuning.size(); --i >= 0; )
             {
                 if (tuning[i]->aPrep->getResetMap()->containsNote(noteNumber)) tuning[i]->reset();
                 updateState->tuningPreparationDidChange = true;
             }
+             */
             
             // modifications
             performModifications(noteNumber);

@@ -53,7 +53,7 @@ public:
         tAdaptiveHistory = p->getAdaptiveHistory();
         tCustom = p->getCustomScale();
         tAbsolute = p->getAbsoluteOffsets();
-        resetMap->copy(p->resetMap);
+        //resetMap->copy(p->resetMap);
         
     }
     
@@ -154,7 +154,7 @@ public:
     inline const Array<float> getCustomScale() const noexcept               {return tCustom;                    }
     inline const Array<float> getAbsoluteOffsets() const noexcept           {return tAbsolute;                  }
     float getAbsoluteOffset(int midiNoteNumber) const noexcept              {return tAbsolute.getUnchecked(midiNoteNumber);}
-    inline const Keymap::Ptr getResetMap() const noexcept                   {return resetMap;       }
+    //inline const Keymap::Ptr getResetMap() const noexcept                   {return resetMap;       }
 
     
     
@@ -171,7 +171,7 @@ public:
     inline void setCustomScale(Array<float> tuning)                                 {tCustom = tuning;                                      }
     inline void setAbsoluteOffsets(Array<float> abs)                                {tAbsolute = abs;                                       }
     void setAbsoluteOffset(int which, float val)                                    {tAbsolute.set(which, val);                             }
-    inline void setResetMap(Keymap::Ptr k)                                          {resetMap = k;          }
+    //inline void setResetMap(Keymap::Ptr k)                                          {resetMap = k;          }
     inline void setCustomScaleCents(Array<float> tuning) {
         tCustom = tuning;
         for(int i=0; i<tCustom.size(); i++) tCustom.setUnchecked(i, tCustom.getUnchecked(i) * 0.01f);
@@ -197,7 +197,7 @@ public:
         DBG("tAdaptiveHistory: " +              String(tAdaptiveHistory));
         DBG("tCustom: " +                       floatArrayToString(tCustom));
         DBG("tAbsolute: " +                     floatArrayToString(tAbsolute));
-        DBG("resetKeymap: " + intArrayToString(getResetMap()->keys()));
+        //DBG("resetKeymap: " + intArrayToString(getResetMap()->keys()));
     }
     
 private:
@@ -221,7 +221,7 @@ private:
     Array<float>    tCustom = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}; //custom scale
     Array<float>    tAbsolute;  //offset (in MIDI fractional offsets, like other tunings) for specific notes; size = 128
     
-    Keymap::Ptr     resetMap = new Keymap(0);;
+    //Keymap::Ptr     resetMap = new Keymap(0);;
 
     
     JUCE_LEAK_DETECTOR(TuningPreparation);
@@ -267,7 +267,7 @@ public:
         param.set(TuningA1History, String(p->getAdaptiveHistory()));
         param.set(TuningCustomScale, floatArrayToString(p->getCustomScale()));
         param.set(TuningAbsoluteOffsets, floatArrayToString(p->getAbsoluteOffsets()));
-        param.set(TuningReset, intArrayToString(p->getResetMap()->keys()));
+        //param.set(TuningReset, intArrayToString(p->getResetMap()->keys()));
         
     }
     
@@ -307,7 +307,7 @@ public:
         param.set(TuningA1History, String(p->getAdaptiveHistory()));
         param.set(TuningCustomScale, floatArrayToString(p->getCustomScale()));
         param.set(TuningAbsoluteOffsets, offsetArrayToString(p->getAbsoluteOffsets()));
-        param.set(TuningReset, intArrayToString(p->getResetMap()->keys()));
+        //param.set(TuningReset, intArrayToString(p->getResetMap()->keys()));
     }
     
     inline bool compare(TuningModPreparation::Ptr t)
@@ -357,6 +357,9 @@ public:
         p = getParam(TuningA1History);
         if (p != String::empty) prep.setProperty( ptagTuning_adaptiveHistory,       p.getIntValue(), 0 );
         
+        p = getParam(TuningReset);
+        if (p != String::empty) prep.setProperty( ptagTuning_resetPrep,       p.getIntValue(), 0 );
+        
         ValueTree scale( vtagTuning_customScale);
         int count = 0;
         p = getParam(TuningCustomScale);
@@ -382,7 +385,8 @@ public:
         }
         prep.addChild(absolute, -1, 0);
         
-        ValueTree resetMap( vtagTuning_resetMap);
+        /*
+        ValueTree resetMap( vtagTuning_resetPrep);
         count = 0;
         p = getParam(TuningReset);
         if (p != String::empty)
@@ -392,6 +396,7 @@ public:
                 resetMap.setProperty( ptagInt + String(count++), note, 0 );
         }
         prep.addChild(resetMap, -1, 0);
+         */
         
         return prep;
     }
@@ -566,7 +571,7 @@ public:
         }
         prep.addChild(absolute, -1, 0);
         
-        prep.addChild(sPrep->getResetMap()->getState(Id), -1, 0);
+        //prep.addChild(sPrep->getResetMap()->getState(Id), -1, 0);
         
         return prep;
     }

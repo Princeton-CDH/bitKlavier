@@ -389,10 +389,11 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         if (type == BKParameter)
         {
-            Array<int> keys = stringToIntArray(text);
-            prep->getResetMap()->setKeymap(keys);
-            active->getResetMap()->setKeymap(keys);
-            synchronicTF[SynchronicReset]->setText(intArrayToString(prep->getResetMap()->keys()));
+            // ** do nothing here, Mod only
+            //Array<int> keys = stringToIntArray(text);
+            //prep->getResetMap()->setKeymap(keys);
+            //active->getResetMap()->setKeymap(keys);
+            //synchronicTF[SynchronicReset]->setText(intArrayToString(prep->getResetMap()->keys()));
         }
         else    //BKModification
         {
@@ -428,7 +429,7 @@ void SynchronicViewController::updateFields(void)
     synchronicTF[AT1Subdivisions]               ->setText(  String(                 prep->getAdaptiveTempo1Subdivisions()), false);
     synchronicTF[AT1Min]                        ->setText(  String(                 prep->getAdaptiveTempo1Min()), false);
     synchronicTF[AT1Max]                        ->setText(  String(                 prep->getAdaptiveTempo1Max()), false);
-    synchronicTF[SynchronicReset]         ->setText(  intArrayToString(prep->getResetMap()->keys()), false);
+    //synchronicTF[SynchronicReset]         ->setText(  intArrayToString(prep->getResetMap()->keys()), false);
 }
 
 void SynchronicViewController::updateModFields(void)
