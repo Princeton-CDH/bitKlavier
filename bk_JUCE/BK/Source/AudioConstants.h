@@ -344,7 +344,7 @@ typedef enum SynchronicParameterType {
     AT1Subdivisions,
     AT1Min,
     AT1Max,
-    SynchronicResetKeymap,
+    SynchronicReset,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
@@ -389,7 +389,7 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "AT1Subdivs",
     "AT1Min",
     "AT1Max",
-    "ResetKeymap"
+    "ResetPrep"
 };
 
 #pragma mark - Nostalgic
@@ -410,7 +410,7 @@ typedef enum NostalgicParameterType {
     NostalgicBeatsToSkip,
     NostalgicMode,
     NostalgicSyncTarget,
-    NostalgicResetKeymap,
+    NostalgicReset,
     NostalgicParameterTypeNil
     
 } NostalgicParameterType;
@@ -441,7 +441,7 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
     "BeatsToSkip",
     "Length Mode",
     "SyncTarget",
-    "ResetKeymap"
+    "ResetPrep"
 };
 
 #pragma mark - Direct
@@ -453,7 +453,7 @@ typedef enum DirectParameterType
     DirectGain,
     DirectResGain,
     DirectHammerGain,
-    DirectResetKeymap,
+    DirectReset,
     DirectParameterTypeNil,
     
 } DirectParameterType;
@@ -476,7 +476,7 @@ static const std::vector<std::string> cDirectParameterTypes = {
     "Gain",
     "ResGain",
     "HammerGain",
-    "ResetKeymap"
+    "ResetPrep"
 };
 
 #pragma mark - Tuning
@@ -494,7 +494,7 @@ typedef enum TuningParameterType
     TuningA1History,
     TuningCustomScale,
     TuningAbsoluteOffsets,
-    TuningResetKeymap,
+    TuningReset,
     TuningParameterTypeNil
     
 } TuningParameterType;
@@ -528,7 +528,7 @@ static const std::vector<std::string> cTuningParameterTypes = {
     "A1History",
     "CustomScale",
     "AbsoluteOffsets",
-    "ResetKeymap"
+    "ResetPrep"
 };
 
 

@@ -364,7 +364,7 @@ public:
         param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
         param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
         param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
-        param.set(SynchronicResetKeymap, intArrayToString(p->getResetMap()->keys()));
+        param.set(SynchronicReset, intArrayToString(p->getResetMap()->keys()));
         
     }
     
@@ -388,7 +388,7 @@ public:
         param.set(AT1Subdivisions, "");
         param.set(AT1Min, "");
         param.set(AT1Max, "");
-        param.set(SynchronicResetKeymap, "");
+        param.set(SynchronicReset, "");
     }
     
     inline ValueTree getState(int Id)
@@ -529,7 +529,7 @@ public:
 
         ValueTree resetMap(vtagSynchronic_resetMap);
         count = 0;
-        p = getParam(SynchronicResetKeymap);
+        p = getParam(SynchronicReset);
         if (p != String::empty)
         {
             Array<int> rmap = stringToIntArray(p);
@@ -567,7 +567,7 @@ public:
         param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
         param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
         param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
-        param.set(SynchronicResetKeymap, intArrayToString(p->getResetMap()->keys()));
+        param.set(SynchronicReset, intArrayToString(p->getResetMap()->keys()));
     }
     
     inline const StringArray getStringArray(void) { return param; }

@@ -144,7 +144,7 @@ public:
     DirectGain,
     DirectResGain,
     DirectHammerGain,
-    DirectResetKeymap,
+    DirectReset,
     DirectParameterTypeNil,
      */
     
@@ -157,7 +157,7 @@ public:
         param.set(DirectGain, String(p->getGain()));
         param.set(DirectResGain, String(p->getResonanceGain()));
         param.set(DirectHammerGain, String(p->getHammerGain()));
-        param.set(DirectResetKeymap, intArrayToString(p->getResetMap()->keys()));
+        param.set(DirectReset, intArrayToString(p->getResetMap()->keys()));
         
     }
     
@@ -169,7 +169,7 @@ public:
         param.set(DirectGain, "");
         param.set(DirectResGain, "");
         param.set(DirectHammerGain, "");
-        param.set(DirectResetKeymap, "");
+        param.set(DirectReset, "");
     }
     
     
@@ -197,7 +197,7 @@ public:
         
         ValueTree resetMap(vtagDirect_resetMap);
         int count = 0;
-        p = getParam(DirectResetKeymap);
+        p = getParam(DirectReset);
         if (p != String::empty)
         {
             Array<int> rmap = stringToIntArray(p);
@@ -221,7 +221,7 @@ public:
         param.set(DirectGain, String(d->getGain()));
         param.set(DirectResGain, String(d->getResonanceGain()));
         param.set(DirectHammerGain, String(d->getHammerGain()));
-        param.set(DirectResetKeymap, intArrayToString(d->getResetMap()->keys()));
+        param.set(DirectReset, intArrayToString(d->getResetMap()->keys()));
     }
     
     

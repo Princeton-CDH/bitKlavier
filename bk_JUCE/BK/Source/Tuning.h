@@ -267,7 +267,7 @@ public:
         param.set(TuningA1History, String(p->getAdaptiveHistory()));
         param.set(TuningCustomScale, floatArrayToString(p->getCustomScale()));
         param.set(TuningAbsoluteOffsets, floatArrayToString(p->getAbsoluteOffsets()));
-        param.set(TuningResetKeymap, intArrayToString(p->getResetMap()->keys()));
+        param.set(TuningReset, intArrayToString(p->getResetMap()->keys()));
         
     }
     
@@ -285,7 +285,7 @@ public:
         param.set(TuningA1History, "");
         param.set(TuningCustomScale, "");
         param.set(TuningAbsoluteOffsets, "");
-        param.set(TuningResetKeymap, "");
+        param.set(TuningReset, "");
     }
     
     
@@ -307,7 +307,7 @@ public:
         param.set(TuningA1History, String(p->getAdaptiveHistory()));
         param.set(TuningCustomScale, floatArrayToString(p->getCustomScale()));
         param.set(TuningAbsoluteOffsets, offsetArrayToString(p->getAbsoluteOffsets()));
-        param.set(TuningResetKeymap, intArrayToString(p->getResetMap()->keys()));
+        param.set(TuningReset, intArrayToString(p->getResetMap()->keys()));
     }
     
     inline bool compare(TuningModPreparation::Ptr t)
@@ -384,7 +384,7 @@ public:
         
         ValueTree resetMap( vtagTuning_resetMap);
         count = 0;
-        p = getParam(TuningResetKeymap);
+        p = getParam(TuningReset);
         if (p != String::empty)
         {
             Array<int> rmap = stringToIntArray(p);

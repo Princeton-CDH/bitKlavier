@@ -209,7 +209,7 @@ public:
      NostalgicBeatsToSkip,
      NostalgicMode,
      NostalgicSyncTarget,
-     NostalgicResetKeymap,
+     NostalgicReset,
      NostalgicParameterTypeNil
      
      */
@@ -227,7 +227,7 @@ public:
         param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
         param.set(NostalgicMode, String(p->getMode()));
         param.set(NostalgicSyncTarget, String(p->getSyncTarget()));
-        param.set(NostalgicResetKeymap, intArrayToString(p->getResetMap()->keys()));
+        param.set(NostalgicReset, intArrayToString(p->getResetMap()->keys()));
         
     }
     
@@ -243,7 +243,7 @@ public:
         param.set(NostalgicBeatsToSkip, "");
         param.set(NostalgicMode, "");
         param.set(NostalgicSyncTarget, "");
-        param.set(NostalgicResetKeymap, "");
+        param.set(NostalgicReset, "");
     }
     
     inline ValueTree getState(int Id)
@@ -281,7 +281,7 @@ public:
         
         ValueTree resetMap(vtagNostalgic_resetMap);
         int count = 0;
-        p = getParam(NostalgicResetKeymap);
+        p = getParam(NostalgicReset);
         if (p != String::empty)
         {
             Array<int> rmap = stringToIntArray(p);
@@ -310,7 +310,7 @@ public:
         param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
         param.set(NostalgicMode, String(p->getMode()));
         param.set(NostalgicSyncTarget, String(p->getSyncTarget()));
-        param.set(NostalgicResetKeymap, intArrayToString(p->getResetMap()->keys()));
+        param.set(NostalgicReset, intArrayToString(p->getResetMap()->keys()));
     }
     
     inline const StringArray getStringArray(void) { return param; }
