@@ -367,7 +367,7 @@ static const std::vector<BKParameterDataType> cSynchronicDataTypes = {
     BKFloat,
     BKFloat,
     BKFloat,
-    BKIntArr
+    BKInt
 };
 
 static const std::vector<std::string> cSynchronicParameterTypes = {
@@ -427,7 +427,7 @@ static const std::vector<BKParameterDataType> cNostalgicDataTypes =
     BKInt,
     BKInt,
     BKInt,
-    BKIntArr
+    BKInt
 };
 
 static const std::vector<std::string> cNostalgicParameterTypes = {
@@ -466,7 +466,7 @@ static const std::vector<BKParameterDataType> cDirectDataTypes = {
     BKFloat,
     BKFloat,
     BKFloat,
-    BKIntArr
+    BKInt
 };
 
 static const std::vector<std::string> cDirectParameterTypes = {
@@ -512,7 +512,7 @@ static const std::vector<BKParameterDataType> cTuningDataTypes = {
     BKInt,
     BKFloatArr,
     BKFloatArr,
-    BKIntArr
+    BKInt
 };
 
 static const std::vector<std::string> cTuningParameterTypes = {
