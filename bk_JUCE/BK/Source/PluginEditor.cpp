@@ -716,7 +716,7 @@ void BKAudioProcessorEditor::bkButtonClicked (Button* b)
     }
     else if (b->getName() == "Load")
     {
-        processor.loadGallery();
+        processor.loadGalleryDialog();
     }
     else if (b->getName() == "LoadJson")
     {

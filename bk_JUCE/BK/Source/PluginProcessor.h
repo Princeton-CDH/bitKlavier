@@ -37,8 +37,9 @@ public:
     BKAudioProcessor();
     ~BKAudioProcessor();
   
-    void saveGallery(void);
-    void loadGallery(void);
+    ScopedPointer<XmlElement>  saveGallery(void);
+    void loadGallery(ScopedPointer<XmlElement> xml);
+    void loadGalleryDialog(void);
     void loadJsonGallery(void);
     
     // General settings.

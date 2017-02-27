@@ -928,13 +928,28 @@ void BKAudioProcessor::loadJsonGallery(void)
     
 }
 
-
-void BKAudioProcessor::loadGallery(void)
+void BKAudioProcessor::loadGalleryDialog(void)
 {
-     
     FileChooser myChooser ("Load gallery from xml file...",
                            File::getSpecialLocation (File::userHomeDirectory),
                            "*.xml");
+    
+    if (myChooser.browseForFileToOpen())
+    {
+        File myFile (myChooser.getResult());
+        
+        ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
+        
+        if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
+        {
+            loadGallery(xml);
+        }
+    }
+    
+}
+
+void BKAudioProcessor::loadGallery(ScopedPointer<XmlElement> xml)
+{
     
     float f;
     int i;
@@ -944,11 +959,7 @@ void BKAudioProcessor::loadGallery(void)
 
     int pianoCount = 0, sPrepCount = 1, sModPrepCount = 1, nPrepCount = 1, nModPrepCount = 1, dPrepCount = 1, dModPrepCount = 1, tPrepCount = 1, tModPrepCount = 1, keymapCount = 1;
     
-    if (myChooser.browseForFileToOpen())
     {
-        File myFile (myChooser.getResult());
-        
-        ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
         
         if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
         {
@@ -1882,7 +1893,7 @@ void BKAudioProcessor::updateUI(void)
     updateState->generalSettingsDidChange = true;
 }
 
-void BKAudioProcessor::saveGallery(void)
+ScopedPointer<XmlElement>  BKAudioProcessor::saveGallery(void)
 {
     ValueTree galleryVT( vtagGallery);
 
@@ -2102,7 +2113,8 @@ void BKAudioProcessor::saveGallery(void)
                            "*.xml");
     
     
-    XmlElement* myXML = galleryVT.createXml();
+    //XmlElement* myXML = galleryVT.createXml();
+    ScopedPointer<XmlElement> myXML = galleryVT.createXml();
     
     if (myChooser.browseForFileToSave(true))
     {
@@ -2111,10 +2123,11 @@ void BKAudioProcessor::saveGallery(void)
     }
     
     
-    delete myXML;
+    return myXML;
     
     
 }
+
 
 void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
 {
@@ -2502,6 +2515,9 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+    
+    ScopedPointer<XmlElement> xml = saveGallery();
+    copyXmlToBinary (*xml, destData);
 }
 
 void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
@@ -2509,6 +2525,10 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
     
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+    
+    //loadGallery
+    ScopedPointer<XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
+    if (xmlState != nullptr) loadGallery(xmlState);
 }
 
 //==============================================================================
