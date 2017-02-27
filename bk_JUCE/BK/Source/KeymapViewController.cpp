@@ -20,6 +20,7 @@ processor(p)
     keymapL = OwnedArray<BKLabel>();
     keymapL.ensureStorageAllocated(cKeymapParameterTypes.size());
     
+    
     for (int i = 0; i < cKeymapParameterTypes.size(); i++)
     {
         keymapL.set(i, new BKLabel());
