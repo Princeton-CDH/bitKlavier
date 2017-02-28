@@ -374,7 +374,7 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
     var pianos = pattr.getProperty("slots", "");
 
     int sId,nId,dId,tId;
-    Array<int> keys; var kvar;  bool isLayer; bool isOld = true; int modTuningCount = 0;
+    Array<int> keys; var kvar;  bool isLayer; bool isOld = true; int modTuningCount = 1;
     
     
     bkKeymaps.add(new Keymap(0));
@@ -426,7 +426,7 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
             
             defaultTuning->setTuning((TuningSystem)scale);
             
-            defaultTuning->setFundamental((PitchClass)fund);
+            defaultTuning->setFundamental((PitchClass)((12-fund)%12));
             
             defaultTuning->setCustomScale(custom);
             
@@ -496,7 +496,7 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
                     
                     tunePrep->setTuning(metroTuning);
                     
-                    tunePrep->setFundamental(metroFundamental);
+                    tunePrep->setFundamental((PitchClass)((12-metroFundamental)%12));
                     
                     tId = addTuningIfNotAlreadyThere(tunePrep);
                     
@@ -638,7 +638,7 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
                     
                     tunePrep->setTuning(revTuning);
                     
-                    tunePrep->setFundamental(revFundamental);
+                    tunePrep->setFundamental((PitchClass)((12-revFundamental)%12));
                     
                     tId = addTuningIfNotAlreadyThere(tunePrep);
                     
@@ -1825,7 +1825,7 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                             DirectParameterType type = (DirectParameterType)pc->getStringAttribute(ptagModX_type).getIntValue();
                             
                             String val = "";
-                            if (cDirectDataTypes[type] == BKFloat) val = pc->getStringAttribute(ptagFloat);
+                            if      (cDirectDataTypes[type] == BKFloat) val = pc->getStringAttribute(ptagFloat);
                             else if (cDirectDataTypes[type] == BKInt) val = pc->getStringAttribute(ptagInt);
                             else if (cDirectDataTypes[type] == BKFloatArr) val = pc->getStringAttribute(ptagFloatArr);
                             else if (cDirectDataTypes[type] == BKBool)   val = pc->getStringAttribute(ptagBool);
@@ -1844,7 +1844,7 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                             SynchronicParameterType type = (SynchronicParameterType)pc->getStringAttribute(ptagModX_type).getIntValue();
                             
                             String val = "";
-                            if (cSynchronicDataTypes[type] == BKFloat) val = pc->getStringAttribute(ptagFloat);
+                            if      (cSynchronicDataTypes[type] == BKFloat) val = pc->getStringAttribute(ptagFloat);
                             else if (cSynchronicDataTypes[type] == BKInt) val = pc->getStringAttribute(ptagInt);
                             else if (cSynchronicDataTypes[type] == BKFloatArr) val = pc->getStringAttribute(ptagFloatArr);
                             else if (cSynchronicDataTypes[type] == BKBool)   val = pc->getStringAttribute(ptagBool);
@@ -1863,7 +1863,7 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                             NostalgicParameterType type = (NostalgicParameterType)pc->getStringAttribute(ptagModX_type).getIntValue();
                             
                             String val = "";
-                            if (cNostalgicDataTypes[type] == BKFloat) val = pc->getStringAttribute(ptagFloat);
+                            if      (cNostalgicDataTypes[type] == BKFloat) val = pc->getStringAttribute(ptagFloat);
                             else if (cNostalgicDataTypes[type] == BKInt) val = pc->getStringAttribute(ptagInt);
                             else if (cNostalgicDataTypes[type] == BKFloatArr) val = pc->getStringAttribute(ptagFloatArr);
                             else if (cNostalgicDataTypes[type] == BKBool)   val = pc->getStringAttribute(ptagBool);
