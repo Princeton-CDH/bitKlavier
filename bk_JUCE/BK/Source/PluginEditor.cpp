@@ -151,19 +151,8 @@ timerCallbackCount(0)
     pmapH = cPrepMapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     pmvc.ensureStorageAllocated(12);
     
+    
     fillGalleryCB();
-    
-    // Load first gallery in folder ?
-#if 0
-    galleryCB.setSelectedId(1);
-    
-    File fileToLoad(processor.galleryNames[0]);
-    
-    ScopedPointer<XmlElement> xml (XmlDocument::parse (fileToLoad));
-    
-    if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)   processor.loadGallery(xml);
-    
-#endif
     
     startTimerHz (50);
 
