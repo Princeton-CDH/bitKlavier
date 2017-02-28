@@ -157,6 +157,19 @@ public:
         DBG("Keymap: "+ intArrayToString(keys()));
     }
     
+    inline ValueTree getState(int ki)
+    {
+ 
+        ValueTree keysave( vtagKeymap + String(ki));
+        int count = 0;
+        for (auto key : keys())
+        {
+            keysave.setProperty(ptagKeymap_key + String(count++), key, 0);
+        }
+        
+        return keysave;
+    }
+    
     
 private:
     int Id;

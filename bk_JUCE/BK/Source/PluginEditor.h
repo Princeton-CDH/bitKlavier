@@ -40,8 +40,7 @@ public:
     void drawNewPreparationMap(int Id);
     void removeLastPreparationMap(int Id);
     
-    void switchPianos(void);
-    void switchGallery(void);
+    
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -54,6 +53,10 @@ private:
     Rectangle<int> upperLeft;
     
     void timerCallback() override;
+    
+    void fillGalleryCB(void);
+    void switchPianos(void);
+    void switchGallery(void);
     
     BKAudioProcessor& processor;
     
@@ -84,6 +87,9 @@ private:
     
     OwnedArray<TextButton>              loadButtons;
     
+    BKLabel                             galleryL;
+    BKComboBox                          galleryCB;
+    
     BKLabel                             pianoL;
     BKComboBox                          pianoCB;
 
@@ -96,6 +102,8 @@ private:
     
     BKLabel                             modMapL;
     BKTextField                         modMapTF;
+    
+    int timerCallbackCount;
     
     
     

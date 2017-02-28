@@ -90,7 +90,7 @@ const String vtagSynchronic_beatMults = "beatMultipliers";
 const String vtagSynchronic_lengthMults = "lengthMultipliers";
 const String vtagSynchronic_accentMults = "accentMultipliers";
 const String vtagSynchronic_transpOffsets = "transpOffsets";
-const String vtagSynchronic_resetMap = "synchronicResetMap";
+const String ptagSynchronic_reset = "synchronicReset";
 
 
 const String vtagNostalgicPrep = "nostalgicPrep";
@@ -105,7 +105,7 @@ const String ptagNostalgic_lengthMultiplier = "lengthMultiplier";
 const String ptagNostalgic_mode = "mode";
 const String ptagNostalgic_beatsToSkip = "beatsToSkip";
 const String ptagNostalgic_syncTarget = "syncTarget";
-const String vtagNostalgic_resetMap = "nostalgicResetMap";
+const String ptagNostalgic_reset = "nostalgicReset";
 
 
 
@@ -117,7 +117,7 @@ const String ptagDirect_transposition = "transposition";
 const String ptagDirect_gain = "gain";
 const String ptagDirect_resGain = "resGain";
 const String ptagDirect_hammerGain = "hammerGain";
-const String vtagDirect_resetMap = "directResetMap";
+const String ptagDirect_reset = "directReset";
 
 
 const String vtagTuningModPrep = "tuningModPrep";
@@ -137,7 +137,7 @@ const String vtagTuning_customScale = "customScale";
 const String ptagTuning_customScaleLength = "customScaleLength";
 const String ptagTuning_customScaleDegree = "scaleDegree";
 const String vTagTuning_absoluteOffsets = "absoluteOffsets";
-const String vtagTuning_resetMap = "tuningResetMap";
+const String ptagTuning_resetPrep = "tuningReset";
 
 
 const String vtagKeymaps = "keymaps";
@@ -344,7 +344,7 @@ typedef enum SynchronicParameterType {
     AT1Subdivisions,
     AT1Min,
     AT1Max,
-    SynchronicResetKeymap,
+    SynchronicReset,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
@@ -367,7 +367,7 @@ static const std::vector<BKParameterDataType> cSynchronicDataTypes = {
     BKFloat,
     BKFloat,
     BKFloat,
-    BKIntArr
+    BKInt
 };
 
 static const std::vector<std::string> cSynchronicParameterTypes = {
@@ -389,7 +389,7 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "AT1Subdivs",
     "AT1Min",
     "AT1Max",
-    "ResetKeymap"
+    "ResetPrep"
 };
 
 #pragma mark - Nostalgic
@@ -410,7 +410,7 @@ typedef enum NostalgicParameterType {
     NostalgicBeatsToSkip,
     NostalgicMode,
     NostalgicSyncTarget,
-    NostalgicResetKeymap,
+    NostalgicReset,
     NostalgicParameterTypeNil
     
 } NostalgicParameterType;
@@ -427,7 +427,7 @@ static const std::vector<BKParameterDataType> cNostalgicDataTypes =
     BKInt,
     BKInt,
     BKInt,
-    BKIntArr
+    BKInt
 };
 
 static const std::vector<std::string> cNostalgicParameterTypes = {
@@ -441,7 +441,7 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
     "BeatsToSkip",
     "Length Mode",
     "SyncTarget",
-    "ResetKeymap"
+    "ResetPrep"
 };
 
 #pragma mark - Direct
@@ -453,7 +453,7 @@ typedef enum DirectParameterType
     DirectGain,
     DirectResGain,
     DirectHammerGain,
-    DirectResetKeymap,
+    DirectReset,
     DirectParameterTypeNil,
     
 } DirectParameterType;
@@ -466,7 +466,7 @@ static const std::vector<BKParameterDataType> cDirectDataTypes = {
     BKFloat,
     BKFloat,
     BKFloat,
-    BKIntArr
+    BKInt
 };
 
 static const std::vector<std::string> cDirectParameterTypes = {
@@ -476,7 +476,7 @@ static const std::vector<std::string> cDirectParameterTypes = {
     "Gain",
     "ResGain",
     "HammerGain",
-    "ResetKeymap"
+    "ResetPrep"
 };
 
 #pragma mark - Tuning
@@ -494,7 +494,7 @@ typedef enum TuningParameterType
     TuningA1History,
     TuningCustomScale,
     TuningAbsoluteOffsets,
-    TuningResetKeymap,
+    TuningReset,
     TuningParameterTypeNil
     
 } TuningParameterType;
@@ -512,7 +512,7 @@ static const std::vector<BKParameterDataType> cTuningDataTypes = {
     BKInt,
     BKFloatArr,
     BKFloatArr,
-    BKIntArr
+    BKInt
 };
 
 static const std::vector<std::string> cTuningParameterTypes = {
@@ -528,7 +528,7 @@ static const std::vector<std::string> cTuningParameterTypes = {
     "A1History",
     "CustomScale",
     "AbsoluteOffsets",
-    "ResetKeymap"
+    "ResetPrep"
 };
 
 

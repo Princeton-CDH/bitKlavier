@@ -28,11 +28,9 @@ gvc(p),
 svc(p),
 nvc(p),
 dvc(p),
-tvc(p)
+tvc(p),
+timerCallbackCount(0)
 {
-    
-    startTimerHz (50);
-    
     // Make PianoViewController component within plugin editor class.
     addAndMakeVisible(pvc);
     addAndMakeVisible(gvc);
@@ -44,7 +42,15 @@ tvc(p)
     
     
     // Piano + PianoMap initialization
+    galleryL.setName("Galleries");
+    galleryL.setText("Galleries", NotificationType::dontSendNotification);
+    pvc->addAndMakeVisible(galleryL);
     
+    galleryCB.setName("Galleries");
+    galleryCB.addSeparator();
+    galleryCB.addListener(this);
+    pvc->addAndMakeVisible(galleryCB);
+
     pianoL.setName(cPianoParameterTypes[0]);
     pianoL.setText(cPianoParameterTypes[0], NotificationType::dontSendNotification);
     pvc->addAndMakeVisible(pianoL);
@@ -144,6 +150,40 @@ tvc(p)
     // Preparation Map initialization
     pmapH = cPrepMapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     pmvc.ensureStorageAllocated(12);
+    
+    fillGalleryCB();
+    
+    // Load first gallery in folder ?
+#if 0
+    galleryCB.setSelectedId(1);
+    
+    File fileToLoad(processor.galleryNames[0]);
+    
+    ScopedPointer<XmlElement> xml (XmlDocument::parse (fileToLoad));
+    
+    if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)   processor.loadGallery(xml);
+    
+#endif
+    
+    startTimerHz (50);
+
+}
+
+void BKAudioProcessorEditor::fillGalleryCB(void)
+{
+    galleryCB.clear(dontSendNotification);
+    
+    int index = 0;
+    
+    for (int i = 0; i < processor.galleryNames.size(); i++)
+    {
+        File thisFile(processor.galleryNames[i]);
+        galleryCB.addItem(thisFile.getFileName(), i+1);
+        
+        if (thisFile.getFileName() == processor.currentGallery) index = i;
+    }
+    
+    galleryCB.setSelectedId(index+1, dontSendNotification);
 
 }
 
@@ -154,16 +194,26 @@ BKAudioProcessorEditor::~BKAudioProcessorEditor()
 
 void BKAudioProcessorEditor::switchGallery()
 {
-    pianoCB.clear();
+    pianoCB.clear(dontSendNotification);
     for (int i = 0; i < processor.bkPianos.size(); i++)     pianoCB.addItem(processor.bkPianos[i]->getName(), i+1);
     pianoCB.addItem("New piano...", processor.bkPianos.size()+1);
     pianoCB.setSelectedId(1);
+    
+    fillGalleryCB();
     
     
 }
 
 void BKAudioProcessorEditor::timerCallback()
 {
+    
+    if (++timerCallbackCount >= 100)
+    {
+        timerCallbackCount = 0;
+        processor.collectGalleries();
+        fillGalleryCB();
+    }
+        
     if (processor.updateState->galleryDidChange)
     {
         processor.updateState->galleryDidChange = false;
@@ -218,7 +268,7 @@ void BKAudioProcessorEditor::paint (Graphics& g)
 void BKAudioProcessorEditor::resized()
 {
     float loadvcH = (20 + gYSpacing) + 1.5 * gYSpacing;
-    float pvcH = 4 * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
+    float pvcH = 5 * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float kvcH = cKeymapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float gvcH = cGeneralParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float svcH = cSynchronicParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
@@ -250,7 +300,10 @@ void BKAudioProcessorEditor::resized()
     
     
     // Piano
-    pianoL      .setTopLeftPosition(0,                                  gYSpacing);
+    galleryL      .setTopLeftPosition(0,                                  gYSpacing);
+    galleryCB     .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   galleryL.getY());
+    
+    pianoL      .setTopLeftPosition(0,                                  galleryL.getBottom() + gYSpacing);
     pianoCB     .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   pianoL.getY());
     
     removePianoButton.setBounds(pianoCB.getX()-55, pianoCB.getY(), 50, 20);
@@ -716,11 +769,11 @@ void BKAudioProcessorEditor::bkButtonClicked (Button* b)
     }
     else if (b->getName() == "Load")
     {
-        processor.loadGallery();
+        processor.loadGalleryDialog();
     }
     else if (b->getName() == "LoadJson")
     {
-        processor.loadJsonGallery();
+        processor.loadJsonGalleryDialog();
     }
     else if (b->getName() == "Add")
     {
@@ -755,10 +808,10 @@ void BKAudioProcessorEditor::bkButtonClicked (Button* b)
 void BKAudioProcessorEditor::bkComboBoxDidChange            (ComboBox* box)
 {
     // Change piano
+    int which = box->getSelectedId();
+    
     if (box->getName() == cPianoParameterTypes[PianoCBPiano])
     {
-        int which = box->getSelectedId();
-        
         // Add piano if New piano... pressed.
         if (which == pianoCB.getNumItems())
         {
@@ -773,6 +826,12 @@ void BKAudioProcessorEditor::bkComboBoxDidChange            (ComboBox* box)
         }
         
         processor.setCurrentPiano(which-1);
+    }
+    else if (box->getName() == "Galleries")
+    {
+        String path = processor.galleryNames[which-1];
+        if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
+        else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
     }
 
 }

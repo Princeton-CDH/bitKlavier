@@ -385,18 +385,19 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
             mod->setParam( AT1Max, text);
         }
     }
-    else if (name == cSynchronicParameterTypes[SynchronicResetKeymap])
+    else if (name == cSynchronicParameterTypes[SynchronicReset])
     {
         if (type == BKParameter)
         {
-            Array<int> keys = stringToIntArray(text);
-            prep->getResetMap()->setKeymap(keys);
-            active->getResetMap()->setKeymap(keys);
-            synchronicTF[SynchronicResetKeymap]->setText(intArrayToString(prep->getResetMap()->keys()));
+            // ** do nothing here, Mod only
+            //Array<int> keys = stringToIntArray(text);
+            //prep->getResetMap()->setKeymap(keys);
+            //active->getResetMap()->setKeymap(keys);
+            //synchronicTF[SynchronicReset]->setText(intArrayToString(prep->getResetMap()->keys()));
         }
         else    //BKModification
         {
-            mod->setParam(SynchronicResetKeymap, text);
+            mod->setParam(SynchronicReset, text);
             DBG("set synchronic resetkeymap mod to: " + text);
         }
     }
@@ -428,7 +429,7 @@ void SynchronicViewController::updateFields(void)
     synchronicTF[AT1Subdivisions]               ->setText(  String(                 prep->getAdaptiveTempo1Subdivisions()), false);
     synchronicTF[AT1Min]                        ->setText(  String(                 prep->getAdaptiveTempo1Min()), false);
     synchronicTF[AT1Max]                        ->setText(  String(                 prep->getAdaptiveTempo1Max()), false);
-    synchronicTF[SynchronicResetKeymap]         ->setText(  intArrayToString(prep->getResetMap()->keys()), false);
+    //synchronicTF[SynchronicReset]         ->setText(  intArrayToString(prep->getResetMap()->keys()), false);
 }
 
 void SynchronicViewController::updateModFields(void)
@@ -454,7 +455,7 @@ void SynchronicViewController::updateModFields(void)
     modSynchronicTF[AT1Subdivisions]               ->setText(  prep->getParam(AT1Subdivisions), false);
     modSynchronicTF[AT1Min]                        ->setText(  prep->getParam(AT1Min), false);
     modSynchronicTF[AT1Max]                        ->setText(  prep->getParam(AT1Max), false);
-    modSynchronicTF[SynchronicResetKeymap]         ->setText(  prep->getParam(SynchronicResetKeymap), false);
+    modSynchronicTF[SynchronicReset]         ->setText(  prep->getParam(SynchronicReset), false);
 }
 
 

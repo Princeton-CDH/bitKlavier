@@ -289,18 +289,19 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
                 tf.setText("0", false);
         }
     }
-    else if (name == cNostalgicParameterTypes[NostalgicResetKeymap])
+    else if (name == cNostalgicParameterTypes[NostalgicReset])
     {
         if (type == BKParameter)
         {
-            Array<int> keys = stringToIntArray(text);
-            prep->getResetMap()->setKeymap(keys);
-            active->getResetMap()->setKeymap(keys);
-            nostalgicTF[NostalgicResetKeymap]->setText(intArrayToString(prep->getResetMap()->keys()));
+            // ** nothing here, Mod only
+            //Array<int> keys = stringToIntArray(text);
+            //prep->getResetMap()->setKeymap(keys);
+            //active->getResetMap()->setKeymap(keys);
+            //nostalgicTF[NostalgicReset]->setText(intArrayToString(prep->getResetMap()->keys()));
         }
         else    //BKModification
         {
-            mod->setParam(NostalgicResetKeymap, text);
+            mod->setParam(NostalgicReset, text);
             DBG("set nostalgic resetkeymap mod to: " + text);
         }
     }
@@ -324,7 +325,7 @@ void NostalgicViewController::updateFields(void)
     nostalgicTF[NostalgicMode]              ->setText( String( prep->getMode()), false);
     nostalgicTF[NostalgicSyncTarget]        ->setText( String( prep->getSyncTarget()), false);
     nostalgicTF[NostalgicTuning]            ->setText( String(prep->getTuning()->getId()), false);
-    nostalgicTF[NostalgicResetKeymap]       ->setText( intArrayToString(prep->getResetMap()->keys()), false);
+    //nostalgicTF[NostalgicReset]       ->setText( intArrayToString(prep->getResetMap()->keys()), false);
 }
 
 void NostalgicViewController::updateModFields(void)
@@ -341,7 +342,7 @@ void NostalgicViewController::updateModFields(void)
     modNostalgicTF[NostalgicMode]              ->setText( prep->getParam(NostalgicMode), false);
     modNostalgicTF[NostalgicSyncTarget]        ->setText( prep->getParam(NostalgicSyncTarget), false);
     modNostalgicTF[NostalgicTuning]            ->setText( prep->getParam(NostalgicTuning), false);
-    modNostalgicTF[NostalgicResetKeymap]       ->setText( prep->getParam(NostalgicResetKeymap), false);
+    modNostalgicTF[NostalgicReset]       ->setText( prep->getParam(NostalgicReset), false);
 }
 
 void NostalgicViewController::bkMessageReceived (const String& message)

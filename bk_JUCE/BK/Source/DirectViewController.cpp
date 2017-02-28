@@ -227,18 +227,19 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
                 tf.setText("0", false);
         }
     }
-    else if (name == cDirectParameterTypes[DirectResetKeymap])
+    else if (name == cDirectParameterTypes[DirectReset])
     {
         if (type == BKParameter)
         {
-            Array<int> keys = stringToIntArray(text);
-            prep->getResetMap()->setKeymap(keys);
-            active->getResetMap()->setKeymap(keys);
-            directTF[DirectResetKeymap]->setText(intArrayToString(prep->getResetMap()->keys()));
+            // ** do nothing here, Mod only
+            //Array<int> keys = stringToIntArray(text);
+            //prep->getResetMap()->setKeymap(keys);
+            //active->getResetMap()->setKeymap(keys);
+            //directTF[DirectReset]->setText(intArrayToString(prep->getResetMap()->keys()));
         }
         else    //BKModification
         {
-            mod->setParam(DirectResetKeymap, text);
+            mod->setParam(DirectReset, text);
             DBG("set direct resetkeymap mod to: " + text);
         }
     }
@@ -259,7 +260,7 @@ void DirectViewController::updateFields(void)
     directTF[DirectHammerGain]          ->setText( String( prep->getHammerGain()), false);
     directTF[DirectResGain]             ->setText( String( prep->getResonanceGain()), false);
     directTF[DirectTuning]              ->setText( String( prep->getTuning()->getId()), false);
-    directTF[DirectResetKeymap]         ->setText( intArrayToString(prep->getResetMap()->keys()), false);
+    //directTF[DirectReset]         ->setText( intArrayToString(prep->getResetMap()->keys()), false);
 
 }
 
@@ -272,7 +273,7 @@ void DirectViewController::updateModFields(void)
     modDirectTF[DirectHammerGain]          ->setText( prep->getParam(DirectHammerGain), false);
     modDirectTF[DirectResGain]             ->setText( prep->getParam(DirectResGain), false);
     modDirectTF[DirectTuning]              ->setText( prep->getParam(DirectTuning), false);
-    modDirectTF[DirectResetKeymap]         ->setText( prep->getParam(DirectResetKeymap), false);
+    modDirectTF[DirectReset]         ->setText( prep->getParam(DirectReset), false);
     
 }
 
