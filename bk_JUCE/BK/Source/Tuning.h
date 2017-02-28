@@ -404,7 +404,6 @@ public:
     
     inline const String getParam(TuningParameterType type)
     {
-        DBG("Get Tuning Param :" + param[type]);
         if (type != TuningId)   return param[type];
         else                    return "";
     }
@@ -414,7 +413,6 @@ public:
     inline void setParam(TuningParameterType type, String val)
     {
         param.set(type, val);
-        DBG("Set Tuning Param :" + param[type]);
     }
     
     void print(void)

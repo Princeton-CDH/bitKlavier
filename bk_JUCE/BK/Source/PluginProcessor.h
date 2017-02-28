@@ -38,9 +38,12 @@ public:
     ~BKAudioProcessor();
   
     ScopedPointer<XmlElement>  saveGallery(void);
-    void loadGallery(ScopedPointer<XmlElement> xml);
+    void loadGalleryFromXml(ScopedPointer<XmlElement> xml);
+    void loadGalleryFromPath(String path);
     void loadGalleryDialog(void);
-    void loadJsonGallery(void);
+    void loadJsonGalleryDialog(void);
+    void loadJsonGalleryFromPath(String path);
+    void loadJsonGalleryFromVar(var myJson);
     
     // General settings.
     GeneralSettings::Ptr                general;
@@ -71,6 +74,13 @@ public:
     Piano::Ptr                          currentPiano;
     Piano::PtrArr                       prevPianos;
     Piano::PtrArr                       bkPianos;
+    
+    StringArray                         galleryNames;
+    String                              currentGallery;
+    
+    void updateGalleries(void);
+    
+    void collectGalleries(void);
     
     void addSynchronic(void);
     void addSynchronic(SynchronicPreparation::Ptr);

@@ -15,13 +15,9 @@ resonanceReleaseSynth   (general)
 {
     didLoadHammersAndRes            = false;
     didLoadMainPianoSamples         = false;
-/*
-    pianoDidChange                  = false;
-    directPreparationDidChange      = false;
-    nostalgicPreparationDidChange   = false;
-    tuningPreparationDidChange      = false;
-    synchronicPreparationDidChange  = false;
- */
+
+    
+    
     bkKeymaps       .ensureStorageAllocated(aMaxNumPreparationKeymaps);
     bkPianos        .ensureStorageAllocated(aMaxNumPianos);
     prevPianos      .ensureStorageAllocated(aMaxNumPianos);
@@ -71,6 +67,38 @@ resonanceReleaseSynth   (general)
     // Default all on for 
     for (int i = 0; i < 128; i++) bkKeymaps[1]->addNote(i);
     
+    updateGalleries();
+    
+}
+
+void BKAudioProcessor::collectGalleries(void)
+{
+    galleryNames.clear();
+    
+    DirectoryIterator xmlIter (File ("~/bk/"), true, "*.xml");
+    while (xmlIter.next())
+    {
+        File galleryFile (xmlIter.getFile());
+        
+        galleryNames.add(galleryFile.getFullPathName());
+    }
+    
+    
+    DirectoryIterator jsonIter (File ("~/bk/"), true, "*.json");
+    while (jsonIter.next())
+    {
+        File galleryFile (jsonIter.getFile());
+        
+        galleryNames.add(galleryFile.getFullPathName());
+    }
+}
+
+void BKAudioProcessor::updateGalleries()
+{
+    
+    collectGalleries();
+    
+    updateState->galleryDidChange = true;
 }
 
 void BKAudioProcessor::addPiano()
@@ -280,7 +308,7 @@ if (isLayer) \
 }; \
 if (!keys.size() || keys[0] == -1) isLayer = false;
 
-void BKAudioProcessor::loadJsonGallery(void)
+void BKAudioProcessor::loadJsonGalleryDialog(void)
 {
     FileChooser myChooser ("Load gallery from json file...",
                            File::getSpecialLocation (File::userHomeDirectory),
@@ -289,643 +317,659 @@ void BKAudioProcessor::loadJsonGallery(void)
     
     if (myChooser.browseForFileToOpen())
     {
-        
-        /* * * * Clear gallery * * * */
-        // Should thread this or prevent audio from happening
-        synchronic.clearQuick();
-        nostalgic.clearQuick();
-        direct.clearQuick();
-        tuning.clearQuick();
-        
-        addTuning();
-        addSynchronic();
-        addNostalgic();
-        addDirect(); 
-        
-        modSynchronic.clearQuick();
-        modNostalgic.clearQuick();
-        modDirect.clearQuick();
-        modTuning.clearQuick();
-        
-        addTuningMod();
-        addSynchronicMod();
-        addNostalgicMod();
-        addDirectMod();
-        
-        bkKeymaps.clearQuick();
-        bkPianos.clearQuick();
-        /* * * * * * * * * * * * * * */
-        
         File myFile (myChooser.getResult());
+        
+        currentGallery = myFile.getFileName();
         
         var myJson = JSON::parse(myFile);
         
-        var pattr = myJson.getProperty("pattrstorage", "");
-        
-        String name = pattr.getProperty("name", "").toString();
-        
-        var pianos = pattr.getProperty("slots", "");
-    
-        int sId,nId,dId,tId;
-        Array<int> keys; var kvar;  bool isLayer; bool isOld = true; int modTuningCount = 0;
-        
-        
-        bkKeymaps.add(new Keymap(0));
-        bkKeymaps.add(new Keymap(1));
-        // Default all on for
-        for (int i = 0; i < 128; i++) bkKeymaps[1]->addNote(i);
-        
-        for (int i = 1; i <= 500; i++) //arbs
-        {
-            var piano = pianos.getProperty(String(i), 0);
-            
-            
-            if (piano.equals(0)) break;
-            else
-            {
-                addPiano();
-                Piano::Ptr thisPiano = bkPianos.getLast();
-                thisPiano->setId(i);
-                
-                String name = piano.getProperty("name", "").toString();
-                thisPiano->setName(name);
-                int pianoId = piano.getProperty("id", "");
-                var data = piano.getProperty("data", "");
-            
-                // V2 test
-                if(jsonPropertyDoesExist(jsonSynchronicLayerX+"1::"+"tempo"))   isOld = false;
-                
-                bool alreadyExists; int which;
-                
-                // TUNING
-                String tx = "tuning::";
-                int scale = jsonGetValue("tuningMenu");
-                int fund = jsonGetValue("fundamentalMenu");
-                int ais = jsonGetValue(tx+"adaptiveIntervalScale");
-                int aas = jsonGetValue(tx+"adaptiveAnchorScale");
-                int inv = jsonGetValue(tx+"adaptiveIntervalScale_verticalInversion");
-                int clustThresh = jsonGetValue(tx+"clusterThresh");
-                float offset = jsonGetValue(tx+"globalFundamentalOffset");
-                int howMany = jsonGetValue(tx+"howMany");
-                
-                Array<float> custom;
-                var cvar =  jsonGetProperty(tx+"customScale");
-                for (int c = 0; c < cvar.size(); c++) custom.add(cvar[c]);
+        loadJsonGalleryFromVar(myJson);
+    }
 
-                
-                // tuningMap, setTuning::fundOffset, etc. should be modifications
-                
-                TuningPreparation::Ptr defaultTuning = new TuningPreparation();
-                
-                defaultTuning->setTuning((TuningSystem)scale);
-                
-                defaultTuning->setFundamental((PitchClass)fund);
-                
-                defaultTuning->setCustomScale(custom);
-                
-                defaultTuning->setAdaptiveHistory(howMany);
-                
-                defaultTuning->setAdaptiveAnchorScale((TuningSystem)aas);
-                
-                defaultTuning->setAdaptiveIntervalScale((TuningSystem)ais);
-                
-                defaultTuning->setAdaptiveInversional((bool)inv);
-                
-                defaultTuning->setAdaptiveClusterThresh(clustThresh);
-                
-                defaultTuning->setFundamentalOffset(offset);
-                
-                tId = addTuningIfNotAlreadyThere(defaultTuning);
-                
-                DirectPreparation::Ptr mainPianoPrep = new DirectPreparation(tuning[tId]);
-                dId = addDirectIfNotAlreadyThere(mainPianoPrep);
-                
-                thisPiano->addPreparationMap();
-                
-                thisPiano->prepMaps[0]->setKeymap(bkKeymaps[1]);
-                thisPiano->prepMaps[0]->addDirect(direct[dId]);
-                
-                // Direct, Synchronic, Nostalgic preparations
-                String dx = jsonDirectX;
-                String nx = jsonNostalgicX;
-                String sx = jsonSynchronicX;
-                String ax = "adaptiveTempo::";
+}
+
+void BKAudioProcessor::loadJsonGalleryFromPath(String path)
+{
+    File myFile (path);
+    
+    currentGallery = myFile.getFileName();
+    
+    var myJson = JSON::parse(myFile);
+    
+    loadJsonGalleryFromVar(myJson);
+}
+
+void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
+{
+    /* * * * Clear gallery * * * */
+    // Should thread this or prevent audio from happening
+    synchronic.clearQuick();
+    nostalgic.clearQuick();
+    direct.clearQuick();
+    tuning.clearQuick();
+    
+    addTuning();
+    addSynchronic();
+    addNostalgic();
+    addDirect(); 
+    
+    modSynchronic.clearQuick();
+    modNostalgic.clearQuick();
+    modDirect.clearQuick();
+    modTuning.clearQuick();
+    
+    addTuningMod();
+    addSynchronicMod();
+    addNostalgicMod();
+    addDirectMod();
+    
+    bkKeymaps.clearQuick();
+    bkPianos.clearQuick();
+    /* * * * * * * * * * * * * * */
+    
+    var pattr = myJson.getProperty("pattrstorage", "");
+    
+    String name = pattr.getProperty("name", "").toString();
+    
+    var pianos = pattr.getProperty("slots", "");
+
+    int sId,nId,dId,tId;
+    Array<int> keys; var kvar;  bool isLayer; bool isOld = true; int modTuningCount = 0;
+    
+    
+    bkKeymaps.add(new Keymap(0));
+    bkKeymaps.add(new Keymap(1));
+    // Default all on for
+    for (int i = 0; i < 128; i++) bkKeymaps[1]->addNote(i);
+    
+    for (int i = 1; i <= 500; i++) //arbs
+    {
+        var piano = pianos.getProperty(String(i), 0);
         
-                for (int L = 1; L <= (isOld ? 1 : 12); L++)
+        
+        if (piano.equals(0)) break;
+        else
+        {
+            addPiano();
+            Piano::Ptr thisPiano = bkPianos.getLast();
+            thisPiano->setId(i);
+            
+            String name = piano.getProperty("name", "").toString();
+            thisPiano->setName(name);
+            int pianoId = piano.getProperty("id", "");
+            var data = piano.getProperty("data", "");
+        
+            // V2 test
+            if(jsonPropertyDoesExist(jsonSynchronicLayerX+"1::"+"tempo"))   isOld = false;
+            
+            bool alreadyExists; int which;
+            
+            // TUNING
+            String tx = "tuning::";
+            int scale = jsonGetValue("tuningMenu");
+            int fund = jsonGetValue("fundamentalMenu");
+            int ais = jsonGetValue(tx+"adaptiveIntervalScale");
+            int aas = jsonGetValue(tx+"adaptiveAnchorScale");
+            int inv = jsonGetValue(tx+"adaptiveIntervalScale_verticalInversion");
+            int clustThresh = jsonGetValue(tx+"clusterThresh");
+            float offset = jsonGetValue(tx+"globalFundamentalOffset");
+            int howMany = jsonGetValue(tx+"howMany");
+            
+            Array<float> custom;
+            var cvar =  jsonGetProperty(tx+"customScale");
+            for (int c = 0; c < cvar.size(); c++) custom.add(cvar[c]);
+
+            
+            // tuningMap, setTuning::fundOffset, etc. should be modifications
+            
+            TuningPreparation::Ptr defaultTuning = new TuningPreparation();
+            
+            defaultTuning->setTuning((TuningSystem)scale);
+            
+            defaultTuning->setFundamental((PitchClass)fund);
+            
+            defaultTuning->setCustomScale(custom);
+            
+            defaultTuning->setAdaptiveHistory(howMany);
+            
+            defaultTuning->setAdaptiveAnchorScale((TuningSystem)aas);
+            
+            defaultTuning->setAdaptiveIntervalScale((TuningSystem)ais);
+            
+            defaultTuning->setAdaptiveInversional((bool)inv);
+            
+            defaultTuning->setAdaptiveClusterThresh(clustThresh);
+            
+            defaultTuning->setFundamentalOffset(offset);
+            
+            tId = addTuningIfNotAlreadyThere(defaultTuning);
+            
+            DirectPreparation::Ptr mainPianoPrep = new DirectPreparation(tuning[tId]);
+            dId = addDirectIfNotAlreadyThere(mainPianoPrep);
+            
+            thisPiano->addPreparationMap();
+            
+            thisPiano->prepMaps[0]->setKeymap(bkKeymaps[1]);
+            thisPiano->prepMaps[0]->addDirect(direct[dId]);
+            
+            // Direct, Synchronic, Nostalgic preparations
+            String dx = jsonDirectX;
+            String nx = jsonNostalgicX;
+            String sx = jsonSynchronicX;
+            String ax = "adaptiveTempo::";
+    
+            for (int L = 1; L <= (isOld ? 1 : 12); L++)
+            {
+                if (!isOld)
                 {
+                    dx = jsonDirectLayerX + String(L) + "::";
+                    nx = jsonNostalgicLayerX + String(L) + "::";
+                    sx = jsonSynchronicLayerX + String(L) + "::";
+                }
+                
+                // FIGURE OUT ADAPTIVE STUFF
+                int atHistory = jsonGetValue(ax+"AT_history");
+                float atMin = jsonGetValue(ax+"AT_mintime");
+                float atMax = jsonGetValue(ax+"AT_maxtime");
+                int atMode = jsonGetValue(ax+"AT_mode");
+                float atSub = jsonGetValue(ax+"AT_subdivisions");
+                
+                // AT
+                jsonGetKeys(sx+"ATkeys");
+                
+                // Link adaptive
+                if (isLayer)
+                {
+                    
+                }
+               
+                // SYNCHRONIC
+                jsonGetKeys(sx+"SynchronicKeys");
+            
+                if (isLayer)
+                {
+                    // Make tuning for this Synchronic layer.
+                    PitchClass metroFundamental = (PitchClass)int(jsonGetValue("synchronic::metroFundamentalMenu"));
+                    TuningSystem metroTuning = (TuningSystem)int(jsonGetValue("synchronic::metroTuningMenu"));
+                    
+                    TuningPreparation::Ptr tunePrep = new TuningPreparation(defaultTuning);
+                    
+                    tunePrep->setTuning(metroTuning);
+                    
+                    tunePrep->setFundamental(metroFundamental);
+                    
+                    tId = addTuningIfNotAlreadyThere(tunePrep);
+                    
+                    SynchronicPreparation::Ptr syncPrep = new SynchronicPreparation(tuning[tId]);
+                    
+                    Array<float> lens;
+                    var lm = jsonGetProperty(sx+"NoteLengthMultList");
+                    for (int c = 0; c < lm.size(); c++) lens.add(lm[c]);
+                    
+                    syncPrep->setLengthMultipliers(lens);
+                    
+                    Array<float> accents;
+                    var am =  jsonGetProperty(sx+"accentsList");
+                    for (int c = 0; c < am.size(); c++) accents.add(am[c]);
+                    
+                    syncPrep->setAccentMultipliers(accents);
+                    
+                    Array<float> transp;
+                    var tm =  jsonGetProperty(sx+"NoteTranspList");
+                    for (int c = 0; c < tm.size(); c++) transp.add(tm[c]);
+                    
+                    syncPrep->setTranspOffsets(transp);
+                    
+                    Array<float> beats;
+                    var bm =  jsonGetProperty(sx+"lengthMultList");
+                    for (int c = 0; c < bm.size(); c++) beats.add(bm[c]);
+                    
+                    syncPrep->setBeatMultipliers(beats);
+                    
+                    int clusterMin = jsonGetValue(sx+"clusterMin");
+                    
+                    syncPrep->setClusterMin(clusterMin);
+                    
+                    int clusterMax = jsonGetValue(sx+"clusterMax");
+                    
+                    syncPrep->setClusterMax(clusterMax);
+                    
+                    int clusterThresh = jsonGetValue(sx+"clusterThresh");
+                    
+                    syncPrep->setClusterThresh(clusterThresh);
+                    
+                    int howMany = jsonGetValue(sx+"howMany");
+                    
+                    syncPrep->setNumBeats(howMany);
+                    
+                    float tempo = jsonGetValue(sx+"tempo");
+                    
+                    syncPrep->setTempo(tempo);
+                    
+                    int syncMode = jsonGetValue(sx+"syncMode");
+                    
+                    if (syncMode < 0 || syncMode > 4) syncMode = 0;
+                    
+                    if (syncMode == 0) //last note sync / start
+                    {
+                        syncPrep->setMode(AnyNoteOnSync);
+                        syncPrep->setBeatsToSkip(0);
+                    }
+                    else if (syncMode == 1) // first-note-sync
+                    {
+                        syncPrep->setMode(FirstNoteOnSync);
+                        syncPrep->setBeatsToSkip(1);
+                    }
+                    else if (syncMode == 2) // note-off-sync
+                    {
+                        syncPrep->setMode(AnyNoteOffSync);
+                        syncPrep->setBeatsToSkip(1);
+                    }
+                    else if (syncMode == 3) // note-off-start
+                    {
+                        syncPrep->setMode(AnyNoteOffSync);
+                        syncPrep->setBeatsToSkip(0);
+                    }
+                    else if (syncMode == 4) // first-note-start
+                    {
+                        syncPrep->setMode(FirstNoteOnSync);
+                        syncPrep->setBeatsToSkip(0);
+                    }
+                    
+                    sId = addSynchronicIfNotAlreadyThere(syncPrep);
+                    
+                    
+                    // Make new keymap
+                    Keymap::Ptr keymap = new Keymap(bkKeymaps.size());
+                    for (int k = 0; k < keys.size(); k += 2 )   keymap->addNote(keys[k]);
+                    
+                    // Compare against current keymaps.
+                    alreadyExists = false; which = 0;
+                    for (int t = 0; t < bkKeymaps.size()-1; t++)
+                    {
+                        if (keymap->compare(bkKeymaps[t]))
+                        {
+                            alreadyExists = true;
+                            which = t;
+                        }
+                    }
+                    
+                    if (!alreadyExists)
+                    {
+                        addKeymap(keymap);
+                        
+                        thisPiano->addPreparationMap();
+                        
+                        thisPiano->prepMaps.getLast()->setKeymap(bkKeymaps.getLast());
+                        
+                        thisPiano->prepMaps.getLast()->addSynchronic(synchronic[sId]);
+                        
+                    }
+                    else
+                    {
+                        // Look for prep map with this keymap.
+                        for (int pm = thisPiano->prepMaps.size(); --pm >= 0;)
+                        {
+                            // If prep map has this keymap, add this preparation to prepmap
+                            if (keymap->compare(    thisPiano->prepMaps[pm]->getKeymap()))
+                                thisPiano->prepMaps[pm]->addSynchronic(synchronic[sId]);
+                        }
+                    }
+                    
+                    
+                    DBG("\nsynchronicPrep: " + String(sId) +
+                        "\nlengths: " + floatArrayToString(lens) +
+                        "\naccents: " + floatArrayToString(accents) +
+                        "\ntransp: " + floatArrayToString(transp) +
+                        "\nbeats: " + floatArrayToString(beats) +
+                        "\nclusterMin: " + String(clusterMin) +
+                        "\nclusterMax: " + String(clusterMax) +
+                        "\nclusterThresh: " + String(clusterThresh) +
+                        "\nhowMany: " + String(howMany) +
+                        "\nfund: " + String(metroFundamental) +
+                        "\ntuning: " + String(metroTuning) +
+                        "\nsyncMode: " + String(syncMode) +
+                        "\ntempo: " + String(tempo) + "\n");
+                }
+                
+                // NOSTALGIC
+                jsonGetKeys(nx+"NostalgicKeys");
+                
+                if (isLayer)
+                {
+                    
+                    // NOSTALGIC TUNING
+                    PitchClass revFundamental = (PitchClass)int(jsonGetValue("nostalgic::reverseFundamentalMenu"));
+                    TuningSystem revTuning = (TuningSystem)int(jsonGetValue("nostalgic::reverseTuningMenu"));
+                    
+                    TuningPreparation::Ptr tunePrep = new TuningPreparation(defaultTuning);
+                    
+                    tunePrep->setTuning(revTuning);
+                    
+                    tunePrep->setFundamental(revFundamental);
+                    
+                    tId = addTuningIfNotAlreadyThere(tunePrep);
+                    
+                    NostalgicPreparation::Ptr nostPrep = new NostalgicPreparation(tuning[tId]);
+                    
+                    float gain = jsonGetValue(nx+"gain");
+                    
+                    nostPrep->setGain(gain);
+                    
+                    float memoryMult = jsonGetValue(nx+"memoryMult");
+                    
+                    nostPrep->setLengthMultiplier(memoryMult);
+                    
+                    float beatsToSkip = jsonGetValue(nx+"revBeatsToSkip");
+                    
+                    nostPrep->setBeatsToSkip(beatsToSkip);
+                    
+                    int reverseSyncMode = jsonGetValue(nx+"reverseSyncMode");
+                    
+                    int reverseSyncTarget = sId;
+                    
+                    if (!isOld) reverseSyncTarget = jsonGetValue(nx+"reverseSyncTarget");
+                    
+                    if (reverseSyncMode)
+                    {
+                        nostPrep->setSyncTarget(reverseSyncTarget);
+                        nostPrep->setSyncTargetProcessor(synchronic[reverseSyncTarget]->processor);
+                    }
+                    
+                    float transposition = jsonGetValue(nx+"transposition");
+                    
+                    nostPrep->setTransposition(transposition);
+                    
+                    float undertow = jsonGetValue(nx+"undertow");
+                    
+                    nostPrep->setUndertow(undertow);
+                    
+                    float wavedistance = jsonGetValue(nx+"wavedistance");
+                    
+                    nostPrep->setWaveDistance(wavedistance);
+                    
+                    // Check if nostalgic[Id] already exists as another nostalgic.
+                    nId = addNostalgicIfNotAlreadyThere(nostPrep);
+                    
+                    // Make new keymap
+                    Keymap::Ptr keymap = new Keymap(bkKeymaps.size());
+                    for (int k = 0; k < keys.size(); k += 2 )   keymap->addNote(keys[k]);
+                    
+                    // Compare against current keymaps.
+                    alreadyExists = false; which = 0;
+                    for (int t = 0; t < bkKeymaps.size()-1; t++)
+                    {
+                        if (keymap->compare(bkKeymaps[t]))
+                        {
+                            alreadyExists = true;
+                            which = t;
+                        }
+                    }
+                    
+                    if (!alreadyExists)
+                    {
+                        addKeymap(keymap);
+                        
+                        thisPiano->addPreparationMap();
+                        
+                        thisPiano->prepMaps.getLast()->setKeymap(bkKeymaps.getLast());
+                        
+                        thisPiano->prepMaps.getLast()->addNostalgic(nostalgic[nId]);
+
+                    }
+                    else
+                    {
+                        // Look for prep map with this keymap.
+                        for (int pm = thisPiano->prepMaps.size(); --pm >= 0;)
+                        {
+                            // If prep map has this keymap, add this preparation to prepmap
+                            if (keymap->compare(    thisPiano->prepMaps[pm]->getKeymap()))
+                                thisPiano->prepMaps[pm]->addNostalgic(nostalgic[nId]);
+                        }
+                    }
+                    
+                    DBG("nostalgicPrep: " + String(nId));
+                }
+                
+                // DIRECT
+                jsonGetKeys(dx+"DirectKeys");
+                
+                if (isLayer)
+                {
+                    
+                    DirectPreparation::Ptr dPrep = new DirectPreparation(tuning[0]);
+                    
+                    
                     if (!isOld)
                     {
-                        dx = jsonDirectLayerX + String(L) + "::";
-                        nx = jsonNostalgicLayerX + String(L) + "::";
-                        sx = jsonSynchronicLayerX + String(L) + "::";
+                        float dGain     = jsonGetValue(dx+"directGain");
+                        float dOverlay  = jsonGetValue(dx+"directOverlay");
+                        float dTransp   = jsonGetValue(dx+"directTransp");
+                        
+                        dPrep->setGain(dGain);
+                        
+                        dPrep->setTransposition(dTransp);
+                        
+                        DBG("keys: " + intArrayToString(keys) +
+                            " dgain: " + String(dGain) +
+                            " dOverlay: " + String(dOverlay) +
+                            " dTransp: " + String(dTransp));
                     }
-                    
-                    // FIGURE OUT ADAPTIVE STUFF
-                    int atHistory = jsonGetValue(ax+"AT_history");
-                    float atMin = jsonGetValue(ax+"AT_mintime");
-                    float atMax = jsonGetValue(ax+"AT_maxtime");
-                    int atMode = jsonGetValue(ax+"AT_mode");
-                    float atSub = jsonGetValue(ax+"AT_subdivisions");
-                    
-                    // AT
-                    jsonGetKeys(sx+"ATkeys");
-                    
-                    // Link adaptive
-                    if (isLayer)
+                    else
                     {
+                        dPrep->setGain(0.0f);
                         
+                        DBG("keys: " + intArrayToString(keys) +
+                            " OFF");
                     }
-                   
-                    // SYNCHRONIC
-                    jsonGetKeys(sx+"SynchronicKeys");
-                
-                    if (isLayer)
+                    
+                    int dId = addDirectIfNotAlreadyThere(dPrep);
+                    
+                    // Make new keymap
+                    Keymap::Ptr keymap = new Keymap(bkKeymaps.size());
+                    for (int k = 0; k < keys.size(); k += 2 )   keymap->addNote(keys[k]);
+                    
+                    // Compare against current keymaps.
+                    alreadyExists = false; which = 0;
+                    for (int t = 0; t < bkKeymaps.size()-1; t++)
                     {
-                        // Make tuning for this Synchronic layer.
-                        PitchClass metroFundamental = (PitchClass)int(jsonGetValue("synchronic::metroFundamentalMenu"));
-                        TuningSystem metroTuning = (TuningSystem)int(jsonGetValue("synchronic::metroTuningMenu"));
-                        
-                        TuningPreparation::Ptr tunePrep = new TuningPreparation(defaultTuning);
-                        
-                        tunePrep->setTuning(metroTuning);
-                        
-                        tunePrep->setFundamental(metroFundamental);
-                        
-                        tId = addTuningIfNotAlreadyThere(tunePrep);
-                        
-                        SynchronicPreparation::Ptr syncPrep = new SynchronicPreparation(tuning[tId]);
-                        
-                        Array<float> lens;
-                        var lm = jsonGetProperty(sx+"NoteLengthMultList");
-                        for (int c = 0; c < lm.size(); c++) lens.add(lm[c]);
-                        
-                        syncPrep->setLengthMultipliers(lens);
-                        
-                        Array<float> accents;
-                        var am =  jsonGetProperty(sx+"accentsList");
-                        for (int c = 0; c < am.size(); c++) accents.add(am[c]);
-                        
-                        syncPrep->setAccentMultipliers(accents);
-                        
-                        Array<float> transp;
-                        var tm =  jsonGetProperty(sx+"NoteTranspList");
-                        for (int c = 0; c < tm.size(); c++) transp.add(tm[c]);
-                        
-                        syncPrep->setTranspOffsets(transp);
-                        
-                        Array<float> beats;
-                        var bm =  jsonGetProperty(sx+"lengthMultList");
-                        for (int c = 0; c < bm.size(); c++) beats.add(bm[c]);
-                        
-                        syncPrep->setBeatMultipliers(beats);
-                        
-                        int clusterMin = jsonGetValue(sx+"clusterMin");
-                        
-                        syncPrep->setClusterMin(clusterMin);
-                        
-                        int clusterMax = jsonGetValue(sx+"clusterMax");
-                        
-                        syncPrep->setClusterMax(clusterMax);
-                        
-                        int clusterThresh = jsonGetValue(sx+"clusterThresh");
-                        
-                        syncPrep->setClusterThresh(clusterThresh);
-                        
-                        int howMany = jsonGetValue(sx+"howMany");
-                        
-                        syncPrep->setNumBeats(howMany);
-                        
-                        float tempo = jsonGetValue(sx+"tempo");
-                        
-                        syncPrep->setTempo(tempo);
-                        
-                        int syncMode = jsonGetValue(sx+"syncMode");
-                        
-                        if (syncMode < 0 || syncMode > 4) syncMode = 0;
-                        
-                        if (syncMode == 0) //last note sync / start
+                        if (keymap->compare(bkKeymaps[t]))
                         {
-                            syncPrep->setMode(AnyNoteOnSync);
-                            syncPrep->setBeatsToSkip(0);
+                            alreadyExists = true;
+                            which = t;
                         }
-                        else if (syncMode == 1) // first-note-sync
-                        {
-                            syncPrep->setMode(FirstNoteOnSync);
-                            syncPrep->setBeatsToSkip(1);
-                        }
-                        else if (syncMode == 2) // note-off-sync
-                        {
-                            syncPrep->setMode(AnyNoteOffSync);
-                            syncPrep->setBeatsToSkip(1);
-                        }
-                        else if (syncMode == 3) // note-off-start
-                        {
-                            syncPrep->setMode(AnyNoteOffSync);
-                            syncPrep->setBeatsToSkip(0);
-                        }
-                        else if (syncMode == 4) // first-note-start
-                        {
-                            syncPrep->setMode(FirstNoteOnSync);
-                            syncPrep->setBeatsToSkip(0);
-                        }
-                        
-                        sId = addSynchronicIfNotAlreadyThere(syncPrep);
-                        
-                        
-                        // Make new keymap
-                        Keymap::Ptr keymap = new Keymap(bkKeymaps.size());
-                        for (int k = 0; k < keys.size(); k += 2 )   keymap->addNote(keys[k]);
-                        
-                        // Compare against current keymaps.
-                        alreadyExists = false; which = 0;
-                        for (int t = 0; t < bkKeymaps.size()-1; t++)
-                        {
-                            if (keymap->compare(bkKeymaps[t]))
-                            {
-                                alreadyExists = true;
-                                which = t;
-                            }
-                        }
-                        
-                        if (!alreadyExists)
-                        {
-                            addKeymap(keymap);
-                            
-                            thisPiano->addPreparationMap();
-                            
-                            thisPiano->prepMaps.getLast()->setKeymap(bkKeymaps.getLast());
-                            
-                            thisPiano->prepMaps.getLast()->addSynchronic(synchronic[sId]);
-                            
-                        }
-                        else
-                        {
-                            // Look for prep map with this keymap.
-                            for (int pm = thisPiano->prepMaps.size(); --pm >= 0;)
-                            {
-                                // If prep map has this keymap, add this preparation to prepmap
-                                if (keymap->compare(    thisPiano->prepMaps[pm]->getKeymap()))
-                                    thisPiano->prepMaps[pm]->addSynchronic(synchronic[sId]);
-                            }
-                        }
-                        
-                        
-                        DBG("\nsynchronicPrep: " + String(sId) +
-                            "\nlengths: " + floatArrayToString(lens) +
-                            "\naccents: " + floatArrayToString(accents) +
-                            "\ntransp: " + floatArrayToString(transp) +
-                            "\nbeats: " + floatArrayToString(beats) +
-                            "\nclusterMin: " + String(clusterMin) +
-                            "\nclusterMax: " + String(clusterMax) +
-                            "\nclusterThresh: " + String(clusterThresh) +
-                            "\nhowMany: " + String(howMany) +
-                            "\nfund: " + String(metroFundamental) +
-                            "\ntuning: " + String(metroTuning) +
-                            "\nsyncMode: " + String(syncMode) +
-                            "\ntempo: " + String(tempo) + "\n");
                     }
                     
-                    // NOSTALGIC
-                    jsonGetKeys(nx+"NostalgicKeys");
-                    
-                    if (isLayer)
+                    if (!alreadyExists)
                     {
+                        addKeymap(keymap);
                         
-                        // NOSTALGIC TUNING
-                        PitchClass revFundamental = (PitchClass)int(jsonGetValue("nostalgic::reverseFundamentalMenu"));
-                        TuningSystem revTuning = (TuningSystem)int(jsonGetValue("nostalgic::reverseTuningMenu"));
+                        thisPiano->addPreparationMap();
                         
-                        TuningPreparation::Ptr tunePrep = new TuningPreparation(defaultTuning);
+                        thisPiano->prepMaps.getLast()->setKeymap(bkKeymaps.getLast());
                         
-                        tunePrep->setTuning(revTuning);
+                        thisPiano->prepMaps.getLast()->addDirect(direct[dId]);
                         
-                        tunePrep->setFundamental(revFundamental);
-                        
-                        tId = addTuningIfNotAlreadyThere(tunePrep);
-                        
-                        NostalgicPreparation::Ptr nostPrep = new NostalgicPreparation(tuning[tId]);
-                        
-                        float gain = jsonGetValue(nx+"gain");
-                        
-                        nostPrep->setGain(gain);
-                        
-                        float memoryMult = jsonGetValue(nx+"memoryMult");
-                        
-                        nostPrep->setLengthMultiplier(memoryMult);
-                        
-                        float beatsToSkip = jsonGetValue(nx+"revBeatsToSkip");
-                        
-                        nostPrep->setBeatsToSkip(beatsToSkip);
-                        
-                        int reverseSyncMode = jsonGetValue(nx+"reverseSyncMode");
-                        
-                        int reverseSyncTarget = sId;
-                        
-                        if (!isOld) reverseSyncTarget = jsonGetValue(nx+"reverseSyncTarget");
-                        
-                        if (reverseSyncMode)
+                        if (thisPiano->getName() == "DirectLayer")
                         {
-                            nostPrep->setSyncTarget(reverseSyncTarget);
-                            nostPrep->setSyncTargetProcessor(synchronic[reverseSyncTarget]->processor);
+                            DBG(String("NEW PREP MAP    dlkeymap: " + intArrayToString(keymap->keys())));
                         }
                         
-                        float transposition = jsonGetValue(nx+"transposition");
-                        
-                        nostPrep->setTransposition(transposition);
-                        
-                        float undertow = jsonGetValue(nx+"undertow");
-                        
-                        nostPrep->setUndertow(undertow);
-                        
-                        float wavedistance = jsonGetValue(nx+"wavedistance");
-                        
-                        nostPrep->setWaveDistance(wavedistance);
-                        
-                        // Check if nostalgic[Id] already exists as another nostalgic.
-                        nId = addNostalgicIfNotAlreadyThere(nostPrep);
-                        
-                        // Make new keymap
-                        Keymap::Ptr keymap = new Keymap(bkKeymaps.size());
-                        for (int k = 0; k < keys.size(); k += 2 )   keymap->addNote(keys[k]);
-                        
-                        // Compare against current keymaps.
-                        alreadyExists = false; which = 0;
-                        for (int t = 0; t < bkKeymaps.size()-1; t++)
-                        {
-                            if (keymap->compare(bkKeymaps[t]))
-                            {
-                                alreadyExists = true;
-                                which = t;
-                            }
-                        }
-                        
-                        if (!alreadyExists)
-                        {
-                            addKeymap(keymap);
-                            
-                            thisPiano->addPreparationMap();
-                            
-                            thisPiano->prepMaps.getLast()->setKeymap(bkKeymaps.getLast());
-                            
-                            thisPiano->prepMaps.getLast()->addNostalgic(nostalgic[nId]);
-    
-                        }
-                        else
-                        {
-                            // Look for prep map with this keymap.
-                            for (int pm = thisPiano->prepMaps.size(); --pm >= 0;)
-                            {
-                                // If prep map has this keymap, add this preparation to prepmap
-                                if (keymap->compare(    thisPiano->prepMaps[pm]->getKeymap()))
-                                    thisPiano->prepMaps[pm]->addNostalgic(nostalgic[nId]);
-                            }
-                        }
-                        
-                        DBG("nostalgicPrep: " + String(nId));
                     }
-                    
-                    // DIRECT
-                    jsonGetKeys(dx+"DirectKeys");
-                    
-                    if (isLayer)
+                    else
                     {
-                        
-                        DirectPreparation::Ptr dPrep = new DirectPreparation(tuning[0]);
-                        
-                        
-                        if (!isOld)
+                        // Look for prep map with this keymap.
+                        for (int pm = thisPiano->prepMaps.size(); --pm >= 0;)
                         {
-                            float dGain     = jsonGetValue(dx+"directGain");
-                            float dOverlay  = jsonGetValue(dx+"directOverlay");
-                            float dTransp   = jsonGetValue(dx+"directTransp");
-                            
-                            dPrep->setGain(dGain);
-                            
-                            dPrep->setTransposition(dTransp);
-                            
-                            DBG("keys: " + intArrayToString(keys) +
-                                " dgain: " + String(dGain) +
-                                " dOverlay: " + String(dOverlay) +
-                                " dTransp: " + String(dTransp));
+                            // If prep map has this keymap, add this preparation to prepmap
+                            if (keymap->compare(    thisPiano->prepMaps[pm]->getKeymap()))
+                                thisPiano->prepMaps[pm]->addDirect(direct[dId]);
                         }
-                        else
-                        {
-                            dPrep->setGain(0.0f);
-                            
-                            DBG("keys: " + intArrayToString(keys) +
-                                " OFF");
-                        }
-                        
-                        int dId = addDirectIfNotAlreadyThere(dPrep);
-                        
-                        // Make new keymap
-                        Keymap::Ptr keymap = new Keymap(bkKeymaps.size());
-                        for (int k = 0; k < keys.size(); k += 2 )   keymap->addNote(keys[k]);
-                        
-                        // Compare against current keymaps.
-                        alreadyExists = false; which = 0;
-                        for (int t = 0; t < bkKeymaps.size()-1; t++)
-                        {
-                            if (keymap->compare(bkKeymaps[t]))
-                            {
-                                alreadyExists = true;
-                                which = t;
-                            }
-                        }
-                        
-                        if (!alreadyExists)
-                        {
-                            addKeymap(keymap);
-                            
-                            thisPiano->addPreparationMap();
-                            
-                            thisPiano->prepMaps.getLast()->setKeymap(bkKeymaps.getLast());
-                            
-                            thisPiano->prepMaps.getLast()->addDirect(direct[dId]);
-                            
-                            if (thisPiano->getName() == "DirectLayer")
-                            {
-                                DBG(String("NEW PREP MAP    dlkeymap: " + intArrayToString(keymap->keys())));
-                            }
-                            
-                        }
-                        else
-                        {
-                            // Look for prep map with this keymap.
-                            for (int pm = thisPiano->prepMaps.size(); --pm >= 0;)
-                            {
-                                // If prep map has this keymap, add this preparation to prepmap
-                                if (keymap->compare(    thisPiano->prepMaps[pm]->getKeymap()))
-                                    thisPiano->prepMaps[pm]->addDirect(direct[dId]);
-                            }
-                        }
-                        
-                        DBG("directPrep: " + String(dId));
                     }
                     
-                    
+                    DBG("directPrep: " + String(dId));
                 }
                 
-                int key, pId;
-                var lm = jsonGetProperty("presetmaps::presetMap");
                 
-                if (!(lm.size() % 3))
-                {
-                    for (int j = 0; j < lm.size(); j += 3)
-                    {
-                        pId = lm[j];
-                        key = lm[j+2];
-                        
-                        if (key >= 0 && key < 128 && pId >= 1)
-                        {
-                            thisPiano->pianoMap.set(key, pId);
-                        }
-                    }
-                }
-                
-
-                String tun,note,notenum;
-                
-                var tm = jsonGetProperty("tuning::tuningMap");
-                if (!(tm.size() % 3))
-                {
-                    for (int j = 0; j < tm.size(); j += 3)
-                    {
-                        tun = tm[j]; note = tm[j+1]; notenum = tm[j+2];
-                        
-                        PitchClass fund = letterNoteToPitchClass(note);
-                        TuningSystem tscale = tuningStringToTuningSystem(tun);
-                        int noteNumber = notenum.getIntValue();
-                        
-                        TuningModPreparation::Ptr myMod = new TuningModPreparation();
-                        
-                        myMod->setParam(TuningFundamental, String(fund));
-                        myMod->setParam(TuningScale, String(tscale));
-                        
-                        bool dontAdd = false; int whichTMod = 0;
-                        for (int c = modTuning.size(); --c>=0;)
-                        {
-                            if (myMod->compare(modTuning[c]))
-                            {
-                                dontAdd = true;
-                                break;
-                            }
-                        }
-                        
-                        if (!dontAdd) addTuningMod(myMod);
-                        
-                        int whichPrep = direct[dId]->aPrep->getTuning()->getId();
-                        thisPiano->modMap[noteNumber]->addTuningModification(new TuningModification(noteNumber, whichPrep, TuningFundamental, String(fund), modTuningCount));
-                        
-                        ++modTuningCount;
-                        
-                        
-                        
-                    }
-                }
-                
-#if 0
-                tm = jsonGetProperty("tuning::nostalgicTuningSub::nostalgicTuningMap");
-                if (!(tm.size() % 3))
-                {
-                    for (int j = 0; j < tm.size(); j += 3)
-                    {
-                        tun = tm[j]; note = tm[j+1]; notenum = tm[j+2];
-                        
-                        PitchClass fund = letterNoteToPitchClass(note);
-                        TuningSystem tscale = tuningStringToTuningSystem(tun);
-                        int noteNumber = notenum.getIntValue();
-                        
-                        TuningModPreparation::Ptr myMod = new TuningModPreparation();
-                        
-                        myMod->setParam(TuningFundamental, String(fund));
-                        myMod->setParam(TuningScale, String(tscale));
-                        
-                        bool dontAdd = false; int whichTMod = 0;
-                        for (int c = modTuning.size(); --c>=0;)
-                        {
-                            if (myMod->compare(modTuning[c]))
-                            {
-                                dontAdd = true;
-                                break;
-                            }
-                        }
-                        
-                        if (!dontAdd) addTuningMod(myMod);
-
-                        int whichPrep = nostalgic[nId]->aPrep->getTuning()->getId();
-                        thisPiano->modMap[noteNumber]->addTuningModification(new TuningModification(noteNumber, whichPrep, TuningFundamental, String(fund), modTuningCount));
-                        
-                        ++modTuningCount;
-
-                        
-                        
-                        
-                    }
-                }
-                
-                tm = jsonGetProperty("tuning::synchronicTuningSub::synchronicTuningMap");
-                if (!(tm.size() % 3))
-                {
-                    for (int j = 0; j < tm.size(); j += 3)
-                    {
-                        tun = tm[j]; note = tm[j+1]; notenum = tm[j+2];
-                        
-                        PitchClass fund = letterNoteToPitchClass(note);
-                        TuningSystem tscale = tuningStringToTuningSystem(tun);
-                        int noteNumber = notenum.getIntValue();
-                        
-                        // create TuningModPreparation and TuningModification attached to key
-                        
-                        TuningModPreparation::Ptr myMod = new TuningModPreparation();
-                        
-                        myMod->setParam(TuningFundamental, String(fund));
-                        myMod->setParam(TuningScale, String(tscale));
-                        
-                        bool dontAdd = false; int whichTMod = 0;
-                        for (int c = modTuning.size(); --c>=0;)
-                        {
-                            if (myMod->compare(modTuning[c]))
-                            {
-                                dontAdd = true;
-                                break;
-                            }
-                        }
-                        
-                        if (!dontAdd) addTuningMod(myMod);
-                        
-                        int whichPrep = synchronic[sId]->aPrep->getTuning()->getId();
-                        
-                        thisPiano->modMap[noteNumber]->addTuningModification(new TuningModification(noteNumber, whichPrep, TuningFundamental, String(fund), modTuningCount));
-                        
-                        ++modTuningCount;
-
-                        
-                        
-                        
-                    }
-                }
-#endif
-       
             }
             
+            int key, pId;
+            var lm = jsonGetProperty("presetmaps::presetMap");
+            
+            if (!(lm.size() % 3))
+            {
+                for (int j = 0; j < lm.size(); j += 3)
+                {
+                    pId = lm[j];
+                    key = lm[j+2];
+                    
+                    if (key >= 0 && key < 128 && pId >= 1)
+                    {
+                        thisPiano->pianoMap.set(key, pId);
+                    }
+                }
+            }
             
 
+            String tun,note,notenum;
+            
+            var tm = jsonGetProperty("tuning::tuningMap");
+            if (!(tm.size() % 3))
+            {
+                for (int j = 0; j < tm.size(); j += 3)
+                {
+                    tun = tm[j]; note = tm[j+1]; notenum = tm[j+2];
+                    
+                    PitchClass fund = letterNoteToPitchClass(note);
+                    TuningSystem tscale = tuningStringToTuningSystem(tun);
+                    int noteNumber = notenum.getIntValue();
+                    
+                    TuningModPreparation::Ptr myMod = new TuningModPreparation();
+                    
+                    myMod->setParam(TuningFundamental, String(fund));
+                    myMod->setParam(TuningScale, String(tscale));
+                    
+                    bool dontAdd = false; int whichTMod = 0;
+                    for (int c = modTuning.size(); --c>=0;)
+                    {
+                        if (myMod->compare(modTuning[c]))
+                        {
+                            dontAdd = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!dontAdd) addTuningMod(myMod);
+                    
+                    int whichPrep = direct[dId]->aPrep->getTuning()->getId();
+                    thisPiano->modMap[noteNumber]->addTuningModification(new TuningModification(noteNumber, whichPrep, TuningFundamental, String(fund), modTuningCount));
+                    
+                    ++modTuningCount;
+                    
+                    
+                    
+                }
+            }
+            
+#if 0
+            tm = jsonGetProperty("tuning::nostalgicTuningSub::nostalgicTuningMap");
+            if (!(tm.size() % 3))
+            {
+                for (int j = 0; j < tm.size(); j += 3)
+                {
+                    tun = tm[j]; note = tm[j+1]; notenum = tm[j+2];
+                    
+                    PitchClass fund = letterNoteToPitchClass(note);
+                    TuningSystem tscale = tuningStringToTuningSystem(tun);
+                    int noteNumber = notenum.getIntValue();
+                    
+                    TuningModPreparation::Ptr myMod = new TuningModPreparation();
+                    
+                    myMod->setParam(TuningFundamental, String(fund));
+                    myMod->setParam(TuningScale, String(tscale));
+                    
+                    bool dontAdd = false; int whichTMod = 0;
+                    for (int c = modTuning.size(); --c>=0;)
+                    {
+                        if (myMod->compare(modTuning[c]))
+                        {
+                            dontAdd = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!dontAdd) addTuningMod(myMod);
+
+                    int whichPrep = nostalgic[nId]->aPrep->getTuning()->getId();
+                    thisPiano->modMap[noteNumber]->addTuningModification(new TuningModification(noteNumber, whichPrep, TuningFundamental, String(fund), modTuningCount));
+                    
+                    ++modTuningCount;
+
+                    
+                    
+                    
+                }
+            }
+            
+            tm = jsonGetProperty("tuning::synchronicTuningSub::synchronicTuningMap");
+            if (!(tm.size() % 3))
+            {
+                for (int j = 0; j < tm.size(); j += 3)
+                {
+                    tun = tm[j]; note = tm[j+1]; notenum = tm[j+2];
+                    
+                    PitchClass fund = letterNoteToPitchClass(note);
+                    TuningSystem tscale = tuningStringToTuningSystem(tun);
+                    int noteNumber = notenum.getIntValue();
+                    
+                    // create TuningModPreparation and TuningModification attached to key
+                    
+                    TuningModPreparation::Ptr myMod = new TuningModPreparation();
+                    
+                    myMod->setParam(TuningFundamental, String(fund));
+                    myMod->setParam(TuningScale, String(tscale));
+                    
+                    bool dontAdd = false; int whichTMod = 0;
+                    for (int c = modTuning.size(); --c>=0;)
+                    {
+                        if (myMod->compare(modTuning[c]))
+                        {
+                            dontAdd = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!dontAdd) addTuningMod(myMod);
+                    
+                    int whichPrep = synchronic[sId]->aPrep->getTuning()->getId();
+                    
+                    thisPiano->modMap[noteNumber]->addTuningModification(new TuningModification(noteNumber, whichPrep, TuningFundamental, String(fund), modTuningCount));
+                    
+                    ++modTuningCount;
+
+                    
+                    
+                    
+                }
+            }
+#endif
+   
         }
         
-        for (int k = synchronic.size(); --k >= 0;)  synchronic[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
-        for (int k = nostalgic.size(); --k >= 0;)   nostalgic[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
-        for (int k = direct.size(); --k >= 0;)      direct[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
         
-        currentPiano = bkPianos[0];
-        
-        updateState->galleryDidChange = true;
-        updateUI();
-        
+
     }
     
+    for (int k = synchronic.size(); --k >= 0;)  synchronic[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
+    for (int k = nostalgic.size(); --k >= 0;)   nostalgic[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
+    for (int k = direct.size(); --k >= 0;)      direct[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
     
+    currentPiano = bkPianos[0];
     
+    updateUI();
+    
+    updateGalleries();
+
 }
 
 void BKAudioProcessor::loadGalleryDialog(void)
@@ -942,13 +986,27 @@ void BKAudioProcessor::loadGalleryDialog(void)
         
         if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
         {
-            loadGallery(xml);
+            currentGallery = myFile.getFileName();
+            loadGalleryFromXml(xml);
         }
     }
     
 }
 
-void BKAudioProcessor::loadGallery(ScopedPointer<XmlElement> xml)
+void BKAudioProcessor::loadGalleryFromPath(String path)
+{
+    File myFile (path);
+    
+    ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
+    
+    if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
+    {
+        currentGallery = myFile.getFileName();
+        loadGalleryFromXml(xml);
+    }
+}
+
+void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
 {
     
     float f;
@@ -1110,7 +1168,6 @@ void BKAudioProcessor::loadGallery(ScopedPointer<XmlElement> xml)
                             {
                                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                                 f = attr.getFloatValue();
-                                //DBG("reading new absolute val: " + String(f));
                                 absolute.set(k, f);
     
                             }
@@ -1213,7 +1270,6 @@ void BKAudioProcessor::loadGallery(ScopedPointer<XmlElement> xml)
                             {
                                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                                 f = attr.getFloatValue() * 100.;
-                                DBG("reading new absolute mod val: " + String(f));
                                 absolute.set(k, f);
                                 if (f != 0.0) abs += (String(k) + ":" + String(f) + " ");
                                 
@@ -1874,8 +1930,10 @@ void BKAudioProcessor::loadGallery(ScopedPointer<XmlElement> xml)
         for (int k = direct.size(); --k >= 0;)      direct[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
         
         currentPiano = bkPianos[0];
-        updateState->galleryDidChange = true; 
+        
         updateUI();
+        
+        updateGalleries();
         
     }
     
@@ -1884,7 +1942,6 @@ void BKAudioProcessor::loadGallery(ScopedPointer<XmlElement> xml)
 
 void BKAudioProcessor::updateUI(void)
 {
-   
     updateState->pianoDidChange = true;
     updateState->directPreparationDidChange = true;
     updateState->nostalgicPreparationDidChange = true;
@@ -2119,8 +2176,12 @@ ScopedPointer<XmlElement>  BKAudioProcessor::saveGallery(void)
     if (myChooser.browseForFileToSave(true))
     {
         File myFile (myChooser.getResult());
+        currentGallery = myFile.getFileName();
         myXML->writeToFile(myFile, String::empty);
     }
+    
+    
+    updateGalleries();
     
     
     return myXML;
@@ -2528,7 +2589,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
     
     //loadGallery
     ScopedPointer<XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
-    if (xmlState != nullptr) loadGallery(xmlState);
+    if (xmlState != nullptr) loadGalleryFromXml(xmlState);
 }
 
 //==============================================================================
