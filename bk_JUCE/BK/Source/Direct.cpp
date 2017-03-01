@@ -45,11 +45,11 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
     {
         float offset = t + tuner->getOffset(noteNumber);
         int synthNoteNumber = noteNumber + (int)offset;
-        offset -= (int)offset;
+        float synthOffset = offset - (int)offset;
         
         synth->keyOn(channel,
                      synthNoteNumber,
-                     offset,
+                     synthOffset,
                      velocity,
                      active->getGain() * aGlobalGain,
                      Forward,
@@ -67,15 +67,17 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 
 void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
 {
+
     for (auto t : active->getTransposition())
     {
         float offset = t + tuner->getOffset(noteNumber);
-        noteNumber += (int)offset;
+        int synthNoteNumber = noteNumber + (int)offset;
+        float synthOffset = offset - (int)offset;
         
         synth->keyOff(channel,
                       MainNote,
                       Id,
-                      noteNumber,
+                      synthNoteNumber,
                       velocity,
                       true);
         
@@ -86,7 +88,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
         {
             hammerSynth->keyOn(
                                      channel,
-                                     noteNumber,
+                                     synthNoteNumber,
                                      0,
                                      velocity,
                                      hGain,
@@ -104,8 +106,8 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
         {
             resonanceSynth->keyOn(
                                         channel,
-                                        noteNumber,
-                                        offset,
+                                        synthNoteNumber,
+                                        synthOffset,
                                         velocity,
                                         rGain,
                                         Forward,
