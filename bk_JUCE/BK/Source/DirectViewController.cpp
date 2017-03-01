@@ -161,8 +161,9 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         if (type == BKParameter)
         {
-            prep    ->setTransposition(f);
-            active  ->setTransposition(f);
+            Array<float> transp = stringToFloatArray(text);
+            prep    ->setTransposition(transp);
+            active  ->setTransposition(transp);
         }
         else    //BKModification
         {
@@ -255,7 +256,7 @@ void DirectViewController::updateFields(void)
     
     DirectPreparation::Ptr prep = processor.direct[currentDirectId]->aPrep;
     
-    directTF[DirectTransposition]       ->setText( String( prep->getTransposition()), false);
+    directTF[DirectTransposition]       ->setText( floatArrayToString( prep->getTransposition()), false);
     directTF[DirectGain]                ->setText( String( prep->getGain()), false);
     directTF[DirectHammerGain]          ->setText( String( prep->getHammerGain()), false);
     directTF[DirectResGain]             ->setText( String( prep->getResonanceGain()), false);

@@ -60,6 +60,7 @@ const String vtagModSynchronic = "synchronicMod";
 const String vtagModNostalgic = "nostalgicMod";
 const String vtagModTuning = "tuningMod";
 const String ptagModX_key = "key";
+const String ptagModX_modPrep = "modPrep";
 const String ptagModX_type = "type";
 const String ptagModX_prep = "prep";
 
@@ -113,7 +114,7 @@ const String vtagDirectPrep = "directPrep";
 const String vtagDirectModPrep = "directModPrep";
 const String ptagDirect_id ="Id";
 const String ptagDirect_tuning = "tuning";
-const String ptagDirect_transposition = "transposition";
+const String vtagDirect_transposition = "transposition";
 const String ptagDirect_gain = "gain";
 const String ptagDirect_resGain = "resGain";
 const String ptagDirect_hammerGain = "hammerGain";

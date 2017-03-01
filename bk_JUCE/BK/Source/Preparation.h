@@ -63,7 +63,13 @@ public:
         
         prep.setProperty( ptagDirect_id,                Id, 0);
         prep.setProperty( ptagDirect_tuning,            sPrep->getTuning()->getId(), 0);
-        prep.setProperty( ptagDirect_transposition,     sPrep->getTransposition(), 0);
+        
+        ValueTree transp( vtagDirect_transposition);
+        Array<float> m = sPrep->getTransposition();
+        int count = 0;
+        for (auto f : m)    transp.setProperty( ptagFloat + String(count++), f, 0);
+        prep.addChild(transp, -1, 0);
+        
         prep.setProperty( ptagDirect_gain,              sPrep->getGain(), 0);
         prep.setProperty( ptagDirect_resGain,           sPrep->getResonanceGain(), 0);
         prep.setProperty( ptagDirect_hammerGain,        sPrep->getHammerGain(), 0);

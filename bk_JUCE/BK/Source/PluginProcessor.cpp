@@ -17,7 +17,6 @@ resonanceReleaseSynth   (general)
     didLoadMainPianoSamples         = false;
 
     
-    
     bkKeymaps       .ensureStorageAllocated(aMaxNumPreparationKeymaps);
     bkPianos        .ensureStorageAllocated(aMaxNumPianos);
     prevPianos      .ensureStorageAllocated(aMaxNumPianos);
@@ -737,7 +736,10 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
                         
                         dPrep->setGain(dGain);
                         
-                        dPrep->setTransposition(dTransp);
+                        Array<float> transp;
+                        transp.add(dTransp);
+                        
+                        dPrep->setTransposition(transp);
                         
                         DBG("keys: " + intArrayToString(keys) +
                             " dgain: " + String(dGain) +
@@ -1291,8 +1293,27 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     f = e->getStringAttribute(ptagDirect_resGain).getFloatValue();
                     direct[id]->sPrep->setResonanceGain(f);
                     
-                    f = e->getStringAttribute(ptagDirect_transposition).getFloatValue();
-                    direct[id]->sPrep->setTransposition(f);
+                    forEachXmlChildElement (*e, sub)
+                    {
+                        if (sub->hasTagName(vtagDirect_transposition))
+                        {
+                            Array<float> transp;
+                            for (int k = 0; k < 128; k++)
+                            {
+                                String attr = sub->getStringAttribute(ptagFloat + String(k));
+                                
+                                if (attr == String::empty) break;
+                                else
+                                {
+                                    f = attr.getFloatValue();
+                                    transp.add(f);
+                                }
+                            }
+                            
+                            direct[id]->sPrep->setTransposition(transp);
+                            
+                        }
+                    }
                     
                     /*
                     forEachXmlChildElement (*e, sub)
@@ -1344,8 +1365,27 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     p = e->getStringAttribute(ptagDirect_resGain);
                     modDirect[id]->setParam(DirectResGain, p);
                     
-                    p = e->getStringAttribute(ptagDirect_transposition);
-                    modDirect[id]->setParam(DirectTransposition, p);
+                    forEachXmlChildElement (*e, sub)
+                    {
+                        if (sub->hasTagName(vtagDirect_transposition))
+                        {
+                            Array<float> transp;
+                            for (int k = 0; k < 128; k++)
+                            {
+                                String attr = sub->getStringAttribute(ptagFloat + String(k));
+                                
+                                if (attr == String::empty) break;
+                                else
+                                {
+                                    f = attr.getFloatValue();
+                                    transp.add(f);
+                                }
+                            }
+                            
+                            modDirect[id]->setParam(DirectTransposition, floatArrayToString(transp));
+                            
+                        }
+                    }
                     
                     p = e->getStringAttribute(ptagDirect_reset);
                     modDirect[id]->setParam(DirectReset, p);
@@ -1821,18 +1861,20 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                         {
                             // ModDirect
                             int k = pc->getStringAttribute(ptagModX_key).getIntValue();
+                            int modPrep = pc->getStringAttribute(ptagModX_modPrep).getIntValue();
                             int prep = pc->getStringAttribute(ptagModX_prep).getIntValue();
-                            DirectParameterType type = (DirectParameterType)pc->getStringAttribute(ptagModX_type).getIntValue();
                             
-                            String val = "";
-                            if      (cDirectDataTypes[type] == BKFloat) val = pc->getStringAttribute(ptagFloat);
-                            else if (cDirectDataTypes[type] == BKInt) val = pc->getStringAttribute(ptagInt);
-                            else if (cDirectDataTypes[type] == BKFloatArr) val = pc->getStringAttribute(ptagFloatArr);
-                            else if (cDirectDataTypes[type] == BKBool)   val = pc->getStringAttribute(ptagBool);
-                            else if (cDirectDataTypes[type] == BKIntArr)   val = pc->getStringAttribute(ptagIntArr);
+                            DirectModPreparation::Ptr thisMod = modDirect[modPrep];
                             
-                            //DirectModification(int key, int whichPrep, DirectParameterType type, String val, int ident)
-                            thisPiano->modMap[k]->addDirectModification(new DirectModification(k, prep, type, val, modDirectCount));
+                            for (int z = 1; z < thisMod->getStringArray().size() ;z++)
+                            {
+                                DirectParameterType type = (DirectParameterType)z;
+                                
+                                String val = thisMod->getParam(type);
+                                
+                                if (val != "")  thisPiano->modMap[k]->addDirectModification(new DirectModification(k, prep, type, val, modPrep));
+                                
+                            }
                             
                             ++modDirectCount;
                         }
@@ -1840,18 +1882,20 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                         {
                             // ModSynchronic
                             int k = pc->getStringAttribute(ptagModX_key).getIntValue();
+                            int modPrep = pc->getStringAttribute(ptagModX_modPrep).getIntValue();
                             int prep = pc->getStringAttribute(ptagModX_prep).getIntValue();
-                            SynchronicParameterType type = (SynchronicParameterType)pc->getStringAttribute(ptagModX_type).getIntValue();
                             
-                            String val = "";
-                            if      (cSynchronicDataTypes[type] == BKFloat) val = pc->getStringAttribute(ptagFloat);
-                            else if (cSynchronicDataTypes[type] == BKInt) val = pc->getStringAttribute(ptagInt);
-                            else if (cSynchronicDataTypes[type] == BKFloatArr) val = pc->getStringAttribute(ptagFloatArr);
-                            else if (cSynchronicDataTypes[type] == BKBool)   val = pc->getStringAttribute(ptagBool);
-                            else if (cSynchronicDataTypes[type] == BKIntArr)   val = pc->getStringAttribute(ptagIntArr);
+                            SynchronicModPreparation::Ptr thisMod = modSynchronic[modPrep];
                             
-                            //DirectModification(int key, int whichPrep, DirectParameterType type, String val, int ident)
-                            thisPiano->modMap[k]->addSynchronicModification(new SynchronicModification(k, prep, type, val, modSynchronicCount));
+                            for (int z = 1; z < thisMod->getStringArray().size() ;z++)
+                            {
+                                SynchronicParameterType type = (SynchronicParameterType)z;
+                                
+                                String val = thisMod->getParam(type);
+                                
+                                if (val != "")  thisPiano->modMap[k]->addSynchronicModification(new SynchronicModification(k, prep, type, val, modPrep));
+                                
+                            }
                             
                             ++modSynchronicCount;
                         }
@@ -1859,18 +1903,20 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                         {
                             // ModNostalgic
                             int k = pc->getStringAttribute(ptagModX_key).getIntValue();
+                            int modPrep = pc->getStringAttribute(ptagModX_modPrep).getIntValue();
                             int prep = pc->getStringAttribute(ptagModX_prep).getIntValue();
-                            NostalgicParameterType type = (NostalgicParameterType)pc->getStringAttribute(ptagModX_type).getIntValue();
                             
-                            String val = "";
-                            if      (cNostalgicDataTypes[type] == BKFloat) val = pc->getStringAttribute(ptagFloat);
-                            else if (cNostalgicDataTypes[type] == BKInt) val = pc->getStringAttribute(ptagInt);
-                            else if (cNostalgicDataTypes[type] == BKFloatArr) val = pc->getStringAttribute(ptagFloatArr);
-                            else if (cNostalgicDataTypes[type] == BKBool)   val = pc->getStringAttribute(ptagBool);
-                            else if (cNostalgicDataTypes[type] == BKIntArr)   val = pc->getStringAttribute(ptagIntArr);
+                            NostalgicModPreparation::Ptr thisMod = modNostalgic[modPrep];
                             
-                            //DirectModification(int key, int whichPrep, DirectParameterType type, String val, int ident)
-                            thisPiano->modMap[k]->addNostalgicModification(new NostalgicModification(k, prep, type, val, modNostalgicCount));
+                            for (int z = 1; z < thisMod->getStringArray().size() ;z++)
+                            {
+                                NostalgicParameterType type = (NostalgicParameterType)z;
+                                
+                                String val = thisMod->getParam(type);
+                                
+                                if (val != "")  thisPiano->modMap[k]->addNostalgicModification(new NostalgicModification(k, prep, type, val, modPrep));
+                                
+                            }
                             
                             ++modNostalgicCount;
                             
@@ -1879,18 +1925,20 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                         {
                             // ModTuning
                             int k = pc->getStringAttribute(ptagModX_key).getIntValue();
+                            int modPrep = pc->getStringAttribute(ptagModX_modPrep).getIntValue();
                             int prep = pc->getStringAttribute(ptagModX_prep).getIntValue();
-                            TuningParameterType type = (TuningParameterType)pc->getStringAttribute(ptagModX_type).getIntValue();
                             
-                            String val = "";
-                            if (cTuningDataTypes[type] == BKFloat) val = pc->getStringAttribute(ptagFloat);
-                            else if (cTuningDataTypes[type] == BKInt) val = pc->getStringAttribute(ptagInt);
-                            else if (cTuningDataTypes[type] == BKFloatArr) val = pc->getStringAttribute(ptagFloatArr);
-                            else if (cTuningDataTypes[type] == BKBool)   val = pc->getStringAttribute(ptagBool);
-                            else if (cTuningDataTypes[type] == BKIntArr)   val = pc->getStringAttribute(ptagIntArr);
+                            TuningModPreparation::Ptr thisMod = modTuning[modPrep];
                             
-                            //DirectModification(int key, int whichPrep, DirectParameterType type, String val, int ident)
-                            thisPiano->modMap[k]->addTuningModification(new TuningModification(k, prep, type, val, modTuningCount));
+                            for (int z = 1; z < thisMod->getStringArray().size() ;z++)
+                            {
+                                TuningParameterType type = (TuningParameterType)z;
+                                
+                                String val = thisMod->getParam(type);
+                                
+                                if (val != "")  thisPiano->modMap[k]->addTuningModification(new TuningModification(k, prep, type, val, modPrep));
+                                
+                            }
                             
                             ++modTuningCount;
                         }
@@ -2000,6 +2048,8 @@ ScopedPointer<XmlElement>  BKAudioProcessor::saveGallery(void)
 
         pmapCount = 0;
         
+        int dmodCount = 0, nmodCount = 0, smodCount = 0, tmodCount = 0;
+        
         // Iterate through all keys and write data from PianoMap and ModMap to ValueTree
         for (int key = 0; key < 128; key++)
         {
@@ -2013,123 +2063,46 @@ ScopedPointer<XmlElement>  BKAudioProcessor::saveGallery(void)
                 pianoVT.addChild(pmapVT, -1, 0);
             }
             
-            int modCount = 0;
-            
             for (auto mod : bkPianos[piano]->modMap[key]->getDirectModifications())
             {
-                ValueTree modVT( vtagModDirect + String(modCount++));
-                
-                DirectParameterType type = mod->getParameterType();
+                ValueTree modVT( vtagModDirect + String(dmodCount++));
                 
                 modVT.setProperty( ptagModX_key, key, 0);
-                modVT.setProperty( ptagModX_type, type, 0);
+                modVT.setProperty( ptagModX_modPrep, mod->getId(), 0);
                 modVT.setProperty( ptagModX_prep, mod->getPrepId(), 0);
-                
-                
-                BKParameterDataType bktype = cDirectDataTypes[type];
-                
-                if (bktype == BKInt)
-                {
-                    modVT.setProperty( ptagInt, mod->getModInt(), 0);
-                }
-                else if (bktype == BKFloat)
-                {
-                    modVT.setProperty( ptagFloat, mod->getModFloat(), 0);
-                }
                 
                 pianoVT.addChild(modVT, -1, 0);
             }
-            
-
-            modCount = 0;
             
             for (auto mod : bkPianos[piano]->modMap[key]->getSynchronicModifications())
             {
-                ValueTree modVT( vtagModSynchronic + String(modCount++));
-                
-                SynchronicParameterType type = mod->getParameterType();
+                ValueTree modVT( vtagModSynchronic + String(smodCount++));
                 
                 modVT.setProperty( ptagModX_key, key, 0);
-                modVT.setProperty( ptagModX_type, type, 0);
+                modVT.setProperty( ptagModX_modPrep, mod->getId(), 0);
                 modVT.setProperty( ptagModX_prep, mod->getPrepId(), 0);
-                
-                BKParameterDataType bktype = cSynchronicDataTypes[type];
-                if (bktype == BKInt)
-                {
-                    modVT.setProperty( ptagInt, mod->getModInt(), 0);
-                }
-                else if (bktype == BKFloat)
-                {
-                    modVT.setProperty( ptagFloat, mod->getModFloat(), 0);
-                }
-                else if (bktype == BKFloatArr)
-                {
-                    ValueTree faVT( ptagFloatArr);
-                    int count = 0;
-                    for (auto f : mod->getModFloatArr())   faVT.setProperty( ptagFloat+String(count++), f, 0);
-                    modVT.addChild(faVT, -1, 0);
-                }
                 
                 pianoVT.addChild(modVT, -1, 0);
             }
-            
-            modCount = 0;
             
             for (auto mod : bkPianos[piano]->modMap[key]->getNostalgicModifications())
             {
-                ValueTree modVT( vtagModNostalgic + String(modCount++));
-                
-                NostalgicParameterType type = mod->getParameterType();
+                ValueTree modVT( vtagModNostalgic + String(nmodCount++));
                 
                 modVT.setProperty( ptagModX_key, key, 0);
-                modVT.setProperty( ptagModX_type, type, 0);
+                modVT.setProperty( ptagModX_modPrep, mod->getId(), 0);
                 modVT.setProperty( ptagModX_prep, mod->getPrepId(), 0);
-                
-                BKParameterDataType bktype = cNostalgicDataTypes[type];
-                if (bktype == BKInt)
-                {
-                    modVT.setProperty( ptagInt, mod->getModInt(), 0);
-                }
-                else if (bktype == BKFloat)
-                {
-                    modVT.setProperty( ptagFloat, mod->getModFloat(), 0);
-                }
                 
                 pianoVT.addChild(modVT, -1, 0);
             }
             
-            modCount = 0;
-            
             for (auto mod : bkPianos[piano]->modMap[key]->getTuningModifications())
             {
-                ValueTree modVT( vtagModTuning + String(modCount++));
-                
-                TuningParameterType type = mod->getParameterType();
+                ValueTree modVT( vtagModTuning + String(tmodCount++));
                 
                 modVT.setProperty( ptagModX_key, key, 0);
-                modVT.setProperty( ptagModX_type, type, 0);
+                modVT.setProperty( ptagModX_modPrep, mod->getId(), 0);
                 modVT.setProperty( ptagModX_prep, mod->getPrepId(), 0);
-                
-                BKParameterDataType bktype = cTuningDataTypes[type];
-                if (bktype == BKInt)
-                {
-                    modVT.setProperty( ptagInt, mod->getModInt(), 0);
-                }
-                else if (bktype == BKFloat)
-                {
-                    modVT.setProperty( ptagFloat, mod->getModFloat(), 0);
-                }
-                else if (bktype == BKBool)
-                {
-                    modVT.setProperty( ptagBool, mod->getModBool(), 0);
-                }
-                else if (bktype == BKFloatArr)
-                {
-                    ValueTree faVT( ptagFloatArr);
-                    int count = 0;
-                    for (auto f : mod->getModFloatArr())   faVT.setProperty( ptagFloat+String(count++), f, 0);
-                    modVT.addChild(faVT, -1, 0);
-                }
                 
                 pianoVT.addChild(modVT, -1, 0);
             }
@@ -2247,8 +2220,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         //first do reset, if active, then the rest; enables clearing then modifying from orig
         // ** actually, this doesn't work yet; need to establish order of modifications and try to put reset first
         if (type == TuningReset)                    tuning[tMod[i]->getPrepId()]->reset();
-        
-        if (type == TuningScale)                    active->setTuning((TuningSystem)modi);
+        else if (type == TuningScale)               active->setTuning((TuningSystem)modi);
         else if (type == TuningFundamental)         active->setFundamental((PitchClass)modi);
         else if (type == TuningOffset)              active->setFundamentalOffset(modf);
         else if (type == TuningA1IntervalScale)     active->setAdaptiveIntervalScale((TuningSystem)modi);
@@ -2275,6 +2247,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
     {
         DirectPreparation::Ptr active = direct[dMod[i]->getPrepId()]->aPrep;
         DirectParameterType type = dMod[i]->getParameterType();
+        modfa = dMod[i]->getModFloatArr();
         modf = dMod[i]->getModFloat();
         modi = dMod[i]->getModInt();
         modia = dMod[i]->getModIntArr();
@@ -2282,7 +2255,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         //first do reset, if active, then the rest; enables clearing then modifying from orig
         if (type == DirectReset) direct[dMod[i]->getPrepId()]->reset();
         
-        if (type == DirectTransposition)    active->setTransposition(modf);
+        if (type == DirectTransposition)    active->setTransposition(modfa);
         else if (type == DirectGain)        active->setGain(modf);
         else if (type == DirectHammerGain)  active->setHammerGain(modf);
         else if (type == DirectResGain)     active->setResonanceGain(modf);

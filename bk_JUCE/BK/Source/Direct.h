@@ -35,7 +35,7 @@ public:
         
     }
     
-    DirectPreparation(float transp,
+    DirectPreparation(Array<float> transp,
                       float gain,
                       bool resAndHammer,
                       float resGain,
@@ -51,7 +51,7 @@ public:
     }
     
     DirectPreparation(Tuning::Ptr t):
-    dTransposition(0.0),
+    dTransposition(Array<float>()),
     dGain(1.0),
     dResonanceGain(1.0),
     dHammerGain(1.0),
@@ -87,14 +87,14 @@ public:
     inline const String getName() const noexcept {return name;}
     inline void setName(String n){name = n;}
     
-    inline const float getTransposition() const noexcept                {return dTransposition; }
+    inline Array<float> getTransposition() const noexcept         {return dTransposition; }
     inline const float getGain() const noexcept                         {return dGain;          }
     inline const float getResonanceGain() const noexcept                {return dResonanceGain; }
     inline const float getHammerGain() const noexcept                   {return dHammerGain;    }
     inline const Tuning::Ptr getTuning() const noexcept                 {return tuning;         }
     //inline const Keymap::Ptr getResetMap() const noexcept               {return resetMap;       }
     
-    inline void setTransposition(float val)                             {dTransposition = val;  }
+    inline void setTransposition(Array<float> val)                      {dTransposition = val;  }
     inline void setGain(float val)                                      {dGain = val;           }
     inline void setResonanceGain(float val)                             {dResonanceGain = val;  }
     inline void setHammerGain(float val)                                {dHammerGain = val;     }
@@ -104,7 +104,7 @@ public:
     
     void print(void)
     {
-        DBG("dTransposition: "  + String(dTransposition));
+        DBG("dTransposition: "  + floatArrayToString(dTransposition));
         DBG("dGain: "           + String(dGain));
         DBG("dResGain: "        + String(dResonanceGain));
         DBG("dHammerGain: "     + String(dHammerGain));
@@ -115,7 +115,7 @@ public:
 
 private:
     String  name;
-    float   dTransposition;       //transposition, in half steps
+    Array<float>   dTransposition;       //transposition, in half steps
     float   dGain;                //gain multiplier
     float   dResonanceGain, dHammerGain;
     
@@ -153,7 +153,7 @@ public:
         param.ensureStorageAllocated(cDirectParameterTypes.size());
         
         param.set(DirectTuning, String(p->getTuning()->getId()));
-        param.set(DirectTransposition, String(p->getTransposition()));
+        param.set(DirectTransposition, floatArrayToString(p->getTransposition()));
         param.set(DirectGain, String(p->getGain()));
         param.set(DirectResGain, String(p->getResonanceGain()));
         param.set(DirectHammerGain, String(p->getHammerGain()));
@@ -164,15 +164,13 @@ public:
     
     DirectModPreparation(void)
     {
-        param.set(DirectTuning, "");
-        param.set(DirectTransposition, "");
-        param.set(DirectGain, "");
-        param.set(DirectResGain, "");
-        param.set(DirectHammerGain, "");
-        param.set(DirectReset, "");
+        param.add("");
+        param.add("");
+        param.add("");
+        param.add("");
+        param.add("");
+        param.add("");
     }
-    
-    
     
     inline ValueTree getState(int Id)
     {
@@ -183,8 +181,18 @@ public:
         p = getParam(DirectTuning);
         if (p != String::empty) prep.setProperty( ptagDirect_tuning,            p.getIntValue(), 0);
         
+        ValueTree transp( vtagDirect_transposition);
+        int count = 0;
         p = getParam(DirectTransposition);
-        if (p != String::empty) prep.setProperty( ptagDirect_transposition,     p.getFloatValue(), 0);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                transp.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(transp, -1, 0);
         
         p = getParam(DirectGain);
         if (p != String::empty) prep.setProperty( ptagDirect_gain,              p.getFloatValue(), 0);
@@ -196,7 +204,7 @@ public:
         if (p != String::empty) prep.setProperty( ptagDirect_hammerGain,        p.getFloatValue(), 0);
         
         p = getParam(DirectReset);
-        if (p != String::empty) prep.setProperty( ptagDirect_reset,        p.getIntValue(), 0);
+        if (p != String::empty) prep.setProperty( ptagDirect_reset,             p.getIntValue(), 0);
         
         /*
         ValueTree resetMap(ptagDirect_reset);
@@ -222,7 +230,7 @@ public:
     inline void copy(DirectPreparation::Ptr d)
     {
         param.set(DirectTuning, String(d->getTuning()->getId()));
-        param.set(DirectTransposition, String(d->getTransposition()));
+        param.set(DirectTransposition, floatArrayToString(d->getTransposition()));
         param.set(DirectGain, String(d->getGain()));
         param.set(DirectResGain, String(d->getResonanceGain()));
         param.set(DirectHammerGain, String(d->getHammerGain()));
