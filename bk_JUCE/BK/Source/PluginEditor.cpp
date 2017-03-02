@@ -505,10 +505,11 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
     
     Array<int> keys;
     
+    DBG("clearing mod map");
     processor.currentPiano->clearModMap();
     
     if (s.length() == 0) return out;
-
+    
     for (auto map : processor.currentPiano->pianoMap)    map = 0;
     
     int numColons, numBrackets;
