@@ -40,30 +40,6 @@ timerCallbackCount(0)
     addAndMakeVisible(kvc);
     addAndMakeVisible(tvc);
     
-    
-    // Piano + PianoMap initialization
-    galleryL.setName("Galleries");
-    galleryL.setText("Galleries", NotificationType::dontSendNotification);
-    pvc->addAndMakeVisible(galleryL);
-    
-    galleryCB.setName("Galleries");
-    galleryCB.addSeparator();
-    galleryCB.addListener(this);
-    pvc->addAndMakeVisible(galleryCB);
-
-    pianoL.setName(cPianoParameterTypes[0]);
-    pianoL.setText(cPianoParameterTypes[0], NotificationType::dontSendNotification);
-    pvc->addAndMakeVisible(pianoL);
-    
-    pianoCB.setName(cPianoParameterTypes[0]);
-    pianoCB.addSeparator();
-    pianoCB.addListener(this);
-    pvc->addAndMakeVisible(pianoCB);
-    pianoCB.addItem("MyFirstPiano", 1);
-    processor.bkPianos[0]->setName("MyFirstPiano");
-    pianoCB.addItem("New piano...",2);
-    pianoCB.setSelectedItemIndex(0);
-    
     pianoMapL.setName("PianoMap");
     pianoMapL.setText("PianoMap", NotificationType::dontSendNotification);
     pvc->addAndMakeVisible(pianoMapL);
@@ -87,6 +63,31 @@ timerCallbackCount(0)
     modMapTF.addListener(this);
     modMapTF.setName("ModMap");
     pvc->addAndMakeVisible(modMapTF);
+    
+    pianoL.setName(cPianoParameterTypes[0]);
+    pianoL.setText(cPianoParameterTypes[0], NotificationType::dontSendNotification);
+    pvc->addAndMakeVisible(pianoL);
+    
+    pianoCB.setName(cPianoParameterTypes[0]);
+    pianoCB.addSeparator();
+    pianoCB.addListener(this);
+    pvc->addAndMakeVisible(pianoCB);
+    pianoCB.addItem("MyFirstPiano", 1);
+    processor.bkPianos[0]->setName("MyFirstPiano");
+    pianoCB.addItem("New piano...",2);
+    pianoCB.setSelectedId(0, NotificationType::dontSendNotification);
+    
+    // Piano + PianoMap initialization
+    galleryL.setName("Galleries");
+    galleryL.setText("Galleries", NotificationType::dontSendNotification);
+    pvc->addAndMakeVisible(galleryL);
+    
+    galleryCB.setName("Galleries");
+    galleryCB.addSeparator();
+    galleryCB.addListener(this);
+    galleryCB.setSelectedId(1);
+    pvc->addAndMakeVisible(galleryCB);
+    
     
     // Load buttons
     loadButtons.ensureStorageAllocated(cBKSampleLoadTypes.size());
@@ -151,7 +152,6 @@ timerCallbackCount(0)
     pmapH = cPrepMapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     pmvc.ensureStorageAllocated(12);
     
-    
     fillGalleryCB();
     
     startTimerHz (50);
@@ -214,6 +214,7 @@ void BKAudioProcessorEditor::timerCallback()
         processor.updateState->pianoDidChange = false;
         switchPianos();
     }
+
     
     if (processor.updateState->generalSettingsDidChange)
     {
@@ -505,6 +506,8 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
     Array<int> keys;
     
     processor.currentPiano->clearModMap();
+    
+    if (s.length() == 0) return out;
 
     for (auto map : processor.currentPiano->pianoMap)    map = 0;
     

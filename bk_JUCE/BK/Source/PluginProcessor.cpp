@@ -53,20 +53,21 @@ resonanceReleaseSynth   (general)
         nostalgic[i]->sPrep->setSyncTargetProcessor(synchronic[0]->processor);
         nostalgic[i]->aPrep->setSyncTargetProcessor(synchronic[0]->processor);
     }
+    
+    // Default all on for
+    for (int i = 0; i < 128; i++) bkKeymaps[1]->addNote(i);
 
     // Make a piano.
     bkPianos.add(new Piano(synchronic, nostalgic, direct,
                               bkKeymaps[0], 0)); // initializing piano 0
-
-  
+    
     // Initialize first piano.
     prevPiano = bkPianos[0];
     currentPiano = bkPianos[0];
     
-    // Default all on for 
-    for (int i = 0; i < 128; i++) bkKeymaps[1]->addNote(i);
+    collectGalleries();
     
-    updateGalleries();
+    loadGalleryFromPath(galleryNames[0]);
     
 }
 
@@ -94,7 +95,6 @@ void BKAudioProcessor::collectGalleries(void)
 
 void BKAudioProcessor::updateGalleries()
 {
-    
     collectGalleries();
     
     updateState->galleryDidChange = true;
