@@ -74,23 +74,26 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
         noteStartPos = noteLength;
     }
     
-    float offset = tuner->getOffset(note) + active->getTranspOffsets()[transpOffsetCounter];
-    int synthNoteNumber = ((float)note + (int)offset);
-    offset -= (int)offset;
-    
-    synth->keyOn(channel,
-                 synthNoteNumber,
-                 offset,
-                 velocity,
-                 aGlobalGain * active->getAccentMultipliers()[accentMultiplierCounter],
-                 noteDirection,
-                 FixedLengthFixedStart,
-                 SynchronicNote,
-                 Id,
-                 noteStartPos, // start
-                 noteLength,
-                 3,
-                 30);
+    for (auto t : active->getTransposition()[transpCounter])
+    {
+        float offset = tuner->getOffset(note) + t;
+        int synthNoteNumber = ((float)note + (int)offset);
+        float synthOffset = offset - (int)offset;
+        
+        synth->keyOn(channel,
+                     synthNoteNumber,
+                     synthOffset,
+                     velocity,
+                     aGlobalGain * active->getAccentMultipliers()[accentMultiplierCounter],
+                     noteDirection,
+                     FixedLengthFixedStart,
+                     SynchronicNote,
+                     Id,
+                     noteStartPos, // start
+                     noteLength,
+                     3,
+                     30);
+    }
 }
 
 void SynchronicProcessor::resetPhase(int skipBeats)
@@ -99,7 +102,7 @@ void SynchronicProcessor::resetPhase(int skipBeats)
     beatMultiplierCounter   = skipBeats % active->getBeatMultipliers().size();
     lengthMultiplierCounter = skipBeats % active->getLengthMultipliers().size();
     accentMultiplierCounter = skipBeats % active->getAccentMultipliers().size();
-    transpOffsetCounter     = skipBeats % active->getTranspOffsets().size();
+    transpCounter     = skipBeats % active->getTransposition().size();
     
     beatCounter   = 0;
 
@@ -255,7 +258,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             //increment parameter counters
             if (++lengthMultiplierCounter   >= active->getLengthMultipliers().size())     lengthMultiplierCounter = 0;
             if (++accentMultiplierCounter   >= active->getAccentMultipliers().size())     accentMultiplierCounter = 0;
-            if (++transpOffsetCounter       >= active->getTranspOffsets().size())         transpOffsetCounter = 0;
+            if (++transpCounter       >= active->getTransposition().size())         transpCounter = 0;
             
             
             //update display of counters in UI
@@ -264,8 +267,8 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 " length counter: "  + String(lengthMultiplierCounter) +
                 " accent: "         + String(active->getAccentMultipliers()[accentMultiplierCounter]) +
                 " accent counter: " + String(accentMultiplierCounter) +
-                " transp: "         + String(active->getTranspOffsets()[transpOffsetCounter]) +
-                " transp counter: " + String(transpOffsetCounter)
+                " transp: "         + "{ "+floatArrayToString(active->getTransposition()[transpCounter]) + " }" +
+                " transp counter: " + String(transpCounter)
                 );
             
             

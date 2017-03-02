@@ -204,13 +204,17 @@ public:
         prep.addChild(accentMults, -1, 0);
         
         
-        ValueTree transpOffsets( vtagSynchronic_transpOffsets);
-        count = 0;
-        for (auto f : sPrep->getTranspOffsets())
+        ValueTree transposition( vtagSynchronic_transpOffsets);
+        
+        int tcount = 0;
+        for (auto arr : sPrep->getTransposition())
         {
-            transpOffsets.  setProperty( ptagFloat + String(count++), f, 0);
+            ValueTree t("t"+String(tcount++));
+            count = 0;
+            for (auto f : arr)  t.setProperty( ptagFloat + String(count++), f, 0);
+            transposition.addChild(t,-1,0);
         }
-        prep.addChild(transpOffsets, -1, 0);
+        prep.addChild(transposition, -1, 0);
 
         
         prep.setProperty( ptagSynchronic_at1Mode,             sPrep->getAdaptiveTempo1Mode(), 0);
@@ -309,7 +313,15 @@ public:
         prep.setProperty( ptagNostalgic_tuning,             sPrep->getTuning()->getId(), 0);
         prep.setProperty( ptagNostalgic_waveDistance,       sPrep->getWavedistance(), 0);
         prep.setProperty( ptagNostalgic_undertow,           sPrep->getUndertow(), 0);
-        prep.setProperty( ptagNostalgic_transposition,      sPrep->getTransposition(), 0);
+        
+        ValueTree transp( vtagNostalgic_transposition);
+        int count = 0;
+        for (auto f : sPrep->getTransposition())
+        {
+            transp.      setProperty( ptagFloat + String(count++), f, 0);
+        }
+        prep.addChild(transp, -1, 0);
+        
         prep.setProperty( ptagNostalgic_gain,               sPrep->getGain(), 0);
         prep.setProperty( ptagNostalgic_lengthMultiplier,   sPrep->getLengthMultiplier(), 0);
         prep.setProperty( ptagNostalgic_beatsToSkip,        sPrep->getBeatsToSkip(), 0);

@@ -36,6 +36,15 @@ public:
     inline void setModIntArr(Array<int> arr){modIntArr = arr;}
     inline void setModFloatArr(Array<float> arr){modFloatArr = arr;}
     
+    inline void setModArrFloatArr(Array<Array<float>> afarr)
+    {
+        modArrFloatArr.clear();
+        for (auto arr : afarr)
+        {
+            modArrFloatArr.add(arr);
+        }
+    }
+
     inline const int getId(void){return Id;}
     inline const int getNote(void){return note;}
     inline const int getPrepId(void) { return prepId; }
@@ -43,6 +52,8 @@ public:
     inline const int getModInt(void){return modInt;}
     inline const float getModFloat(void){return modFloat;}
     inline const Array<float> getModFloatArr(void){return modFloatArr;}
+    
+    inline const Array<Array<float>> getModArrFloatArr(void){return modArrFloatArr;}
     inline const Array<int> getModIntArr(void){return modIntArr;}
     
     
@@ -55,6 +66,7 @@ protected:
     float           modFloat;
     Array<int>      modIntArr;
     Array<float>    modFloatArr;
+    Array<Array<float>> modArrFloatArr;
     
 private:
     

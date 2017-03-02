@@ -228,6 +228,28 @@ String offsetArrayToString(Array<float> arr)
     return s;
 }
 
+String arrayFloatArrayToString(Array<Array<float>> afarr)
+{
+    String s = "";
+    for (auto arr : afarr)
+    {
+        if (arr.size()>1)
+        {
+            s += "[";
+            for (auto f : arr)
+            {
+                s += String(f)+" ";
+            }
+            s += "] ";
+        }
+        else
+        {
+            s +=String(arr[0])+" ";
+        }
+    }
+    return s;
+}
+
 String floatArrayToString(Array<float> arr)
 {
     String s = "";
@@ -352,6 +374,45 @@ Array<int> stringToIntArray(String s)
     
     return arr;
 }
+
+Array<Array<float>> stringToArrayFloatArray(String s)
+{
+    Array<Array<float>> afarr;
+
+    String rest = s;
+    
+    // "4"
+    while (rest.length())
+    {
+        String sub = rest.upToFirstOccurrenceOf("[", false, true);
+        
+        Array<float> ind = stringToFloatArray(sub);
+        
+        for (auto f : ind)
+        {
+            Array<float> arr; arr.add(f);
+            afarr.add(arr);
+        }
+        
+        if (sub == rest) break;
+        
+        rest = rest.substring(sub.length()+1);
+        
+        sub = rest.upToFirstOccurrenceOf("]", false, true);
+        
+        if (sub != rest)
+        {
+            Array<float> group = stringToFloatArray(sub);
+            
+            afarr.add(group);
+        }
+        
+        rest = rest.substring(sub.length()+1);
+    }
+ 
+    return afarr;
+}
+
 
 Array<float> stringToFloatArray(String s)
 {

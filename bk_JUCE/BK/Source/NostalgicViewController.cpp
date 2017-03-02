@@ -192,8 +192,8 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         if (type == BKParameter)
         {
-            prep    ->setTransposition(f);
-            active  ->setTransposition(f);
+            prep    ->setTransposition(stringToFloatArray(text));
+            active  ->setTransposition(stringToFloatArray(text));
         }
         else    //BKModification
         {
@@ -318,7 +318,7 @@ void NostalgicViewController::updateFields(void)
 
     nostalgicTF[NostalgicWaveDistance]      ->setText( String( prep->getWavedistance()), false);
     nostalgicTF[NostalgicUndertow]          ->setText( String( prep->getUndertow()), false);
-    nostalgicTF[NostalgicTransposition]     ->setText( String( prep->getTransposition()), false);
+    nostalgicTF[NostalgicTransposition]     ->setText( floatArrayToString( prep->getTransposition()), false);
     nostalgicTF[NostalgicGain]              ->setText( String( prep->getGain()), false);
     nostalgicTF[NostalgicLengthMultiplier]  ->setText( String( prep->getLengthMultiplier()), false);
     nostalgicTF[NostalgicBeatsToSkip]       ->setText( String( prep->getBeatsToSkip()), false);

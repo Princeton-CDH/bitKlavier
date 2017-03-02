@@ -23,12 +23,17 @@ PitchClass      letterNoteToPitchClass(String note);
 TuningSystem tuningStringToTuningSystem(String tuning);
 
 String          intArrayToString(Array<int> arr);
+
 String          floatArrayToString(Array<float> arr);
+String          arrayFloatArrayToString(Array<Array<float>> arr);
+Array<float>    stringToFloatArray(String s);
+Array<Array<float>> stringToArrayFloatArray(String s);
+
 String          offsetArrayToString(Array<float> arr);
 String          boolArrayToString(Array<bool> arr);
 Array<int>      stringToIntArray(String s);
 Array<int>      keymapStringToIntArray(String s);
-Array<float>    stringToFloatArray(String s);
+
 Array<float>    stringOrderedPairsToFloatArray(String s, int size);
 
 double          mtof(double f);

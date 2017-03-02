@@ -38,7 +38,7 @@ public:
     sBeatMultipliers(p->getBeatMultipliers()),
     sAccentMultipliers(p->getAccentMultipliers()),
     sLengthMultipliers(p->getLengthMultipliers()),
-    sTranspOffsets(p->getTranspOffsets()),
+    sTransposition(p->getTransposition()),
     sBeatThreshSec(p->getBeatThresh()),
     sClusterThresh(p->getClusterThreshMS()),
     sClusterThreshSec(p->getClusterThreshSEC()),
@@ -61,7 +61,7 @@ public:
                           Array<float> beatMultipliers,
                           Array<float> accentMultipliers,
                           Array<float> lengthMultipliers,
-                          Array<float> transpOffsets,
+                          Array<Array<float>> transp,
                           Tuning::Ptr t):
     sTempo(tempo),
     sNumBeats(numBeats),
@@ -72,7 +72,7 @@ public:
     sBeatMultipliers(beatMultipliers),
     sAccentMultipliers(accentMultipliers),
     sLengthMultipliers(lengthMultipliers),
-    sTranspOffsets(transpOffsets),
+    sTransposition(transp),
     sBeatThreshSec(60.0/sTempo),
     sClusterThresh(clusterThresh),
     sClusterThreshSec(.001 * sClusterThresh),
@@ -92,7 +92,6 @@ public:
     sBeatMultipliers(Array<float>({1.0})),
     sAccentMultipliers(Array<float>({1.0})),
     sLengthMultipliers(Array<float>({1.0})),
-    sTranspOffsets(Array<float>({0.0})),
     sBeatThreshSec(60.0/sTempo),
     sClusterThresh(500),
     sClusterThreshSec(.001 * sClusterThresh),
@@ -103,6 +102,8 @@ public:
     at1Mode(TimeBetweenNotes),
     tuning(t)
     {
+        sTransposition.ensureStorageAllocated(1);
+        sTransposition.add(Array<float>({0.0}));
     }
     
     inline void copy(SynchronicPreparation::Ptr s)
@@ -117,7 +118,7 @@ public:
         sBeatMultipliers = s->getBeatMultipliers();
         sAccentMultipliers = s->getAccentMultipliers();
         sLengthMultipliers = s->getLengthMultipliers();
-        sTranspOffsets = s->getTranspOffsets();
+        sTransposition = s->getTransposition();
         sBeatThreshSec = s->getBeatThresh();
         sClusterThresh = s->getClusterThreshMS();
         sClusterThreshSec = s->getClusterThreshSEC();
@@ -167,13 +168,17 @@ public:
             }
         }
         
-        for (int i = s->getTranspOffsets().size(); --i>=0;)
+        for (int i  = s->getTransposition().size(); --i >= 0;)
         {
-            if (s->getTranspOffsets()[i] != sTranspOffsets[i])
+            Array<float> transposition = s->getTransposition()[i];
+            for (int j = transposition.size(); --j >= 0;)
             {
-                transp = false;
-                break;
-                
+                if (transposition[j] != sTransposition[i][j])
+                {
+                    transp = false;
+                    break;
+                    
+                }
             }
         }
         
@@ -184,7 +189,6 @@ public:
                 sClusterCap == s->getClusterCap() &&
                 (sMode == s->getMode()) &&
                 transp && lens && accents && beats &&
-                (sTranspOffsets == s->getTranspOffsets()) &&
                 sBeatThreshSec == s->getBeatThresh() &&
                 sClusterThresh == s->getClusterThreshMS() &&
                 sClusterThreshSec == s->getClusterThreshSEC() &&
@@ -209,7 +213,7 @@ public:
     inline const int getBeatsToSkip()                                  {return sBeatsToSkip;           }
     inline const Array<float> getAccentMultipliers() const noexcept    {return sAccentMultipliers;     }
     inline const Array<float> getLengthMultipliers() const noexcept    {return sLengthMultipliers;     }
-    inline const Array<float> getTranspOffsets() const noexcept        {return sTranspOffsets;         }
+    inline const Array<Array<float>> getTransposition() const noexcept        {return sTransposition;         }
     //inline const Keymap::Ptr getResetMap() const noexcept              {return resetMap;       }
     
     //Adaptive Tempo 1
@@ -245,7 +249,7 @@ public:
     inline void setBeatsToSkip(int beatsToSkip)                        {sBeatsToSkip = beatsToSkip;                        }
     inline void setBeatMultipliers(Array<float> beatMultipliers)       {sBeatMultipliers.swapWith(beatMultipliers);        }
     inline void setAccentMultipliers(Array<float> accentMultipliers)   {sAccentMultipliers.swapWith(accentMultipliers);    }
-    inline void setTranspOffsets(Array<float> transpOffsets)           {sTranspOffsets.swapWith(transpOffsets);            }
+    inline void setTransposition(Array<Array<float>> transp)           {sTransposition.swapWith(transp);                   }
     inline void setLengthMultipliers(Array<float> lengthMultipliers)   {sLengthMultipliers.swapWith(lengthMultipliers);    }
     
     //Adaptive Tempo 1
@@ -273,7 +277,11 @@ public:
         DBG("sBeatMultipliers: " + floatArrayToString(sBeatMultipliers));
         DBG("sLengthMultipliers: " + floatArrayToString(sLengthMultipliers));
         DBG("sAccentMultipliers: " + floatArrayToString(sAccentMultipliers));
-        DBG("sTranspOffsets: " + floatArrayToString(sTranspOffsets));
+        
+        String s = "";
+        for (auto arr : sTransposition) s += "{ " + floatArrayToString(arr) + " },\n";
+        DBG("sTransposition: " + s);
+        
         DBG("sBeatThreshSec: " + String(sBeatThreshSec));
         DBG("sClusterThreshSec: " + String(sClusterThreshSec));
         //DBG("resetKeymap: " + intArrayToString(getResetMap()->keys()));
@@ -293,7 +301,7 @@ private:
     Array<float> sBeatMultipliers;      //multiply pulse lengths by these
     Array<float> sAccentMultipliers;    //multiply velocities by these
     Array<float> sLengthMultipliers;    //multiply note duration by these
-    Array<float> sTranspOffsets;        //transpose by these
+    Array<Array<float>> sTransposition;        //transpose by these
 
     float sBeatThreshSec;      //length of time between pulses, as set by temp
     float sClusterThresh;      //max time between played notes before new cluster is started, in MS
@@ -358,7 +366,7 @@ public:
         param.set(SynchronicBeatMultipliers, floatArrayToString(p->getBeatMultipliers()));
         param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
         param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
-        param.set(SynchronicTranspOffsets, floatArrayToString(p->getTranspOffsets()));
+        param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p->getTransposition()));
         param.set(AT1Mode, String(p->getAdaptiveTempo1Mode()));
         param.set(AT1History, String(p->getAdaptiveTempo1History()));
         param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
@@ -565,7 +573,7 @@ public:
         param.set(SynchronicBeatMultipliers, floatArrayToString(p->getBeatMultipliers()));
         param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
         param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
-        param.set(SynchronicTranspOffsets, floatArrayToString(p->getTranspOffsets()));
+        param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p->getTransposition()));
         param.set(AT1Mode, String(p->getAdaptiveTempo1Mode()));
         param.set(AT1History, String(p->getAdaptiveTempo1History()));
         param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
@@ -644,7 +652,7 @@ private:
     int beatMultiplierCounter;   //beat length (time between beats) multipliers
     int accentMultiplierCounter; //accent multipliers
     int lengthMultiplierCounter; //note length (sounding length) multipliers (multiples of 50ms, at least for now)
-    int transpOffsetCounter;     //transposition offsets
+    int transpCounter;     //transposition offsets
     
     //reset the phase, including of all the parameter fields
     void resetPhase(int skipBeats);

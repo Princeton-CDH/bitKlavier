@@ -902,7 +902,6 @@ void BKAudioProcessorEditor::switchPianos(void)
     String modMap = "";
     for (int i = 0; i < 128; i++)
     {
-        
         String mod = processor.currentPiano->modMap[i]->stringRepresentation();
         if (mod != "") modMap += mod;
     }

@@ -32,16 +32,24 @@ String  ModificationMap::stringRepresentation(void)
     String out = "";
     
     for (auto mod : directMods)
-        out += (String(mod->getNote())+ ":Dm" + String(mod->getId()) + ":{" + String( mod->getPrepId()) + "} ");
+    {
+        out += (String(mod->getNote())+ ":dm" + String(mod->getId()) + ":{" + String( mod->getPrepId()) + "} ");
+    }
     
     for (auto mod : synchronicMods)
-        out += (String(mod->getNote())+ ":Sm" + String(mod->getId()) + ":{" + String( mod->getPrepId()) + "} ");
+    {
+        out += (String(mod->getNote())+ ":sm" + String(mod->getId()) + ":{" + String( mod->getPrepId()) + "} ");
+    }
     
     for (auto mod : nostalgicMods)
-        out += (String(mod->getNote())+ ":Nm" + String(mod->getId()) + ":{" + String( mod->getPrepId()) + "} ");
-    
+    {
+        out += (String(mod->getNote())+ ":nm" + String(mod->getId()) + ":{" + String( mod->getPrepId()) + "} ");
+    }
+
     for (auto mod : tuningMods)
-        out += (String(mod->getNote())+ ":Tm" + String(mod->getId()) + ":{" + String( mod->getPrepId()) + "} ");
+    {
+        out += (String(mod->getNote())+ ":tm" + String(mod->getId()) + ":{" + String( mod->getPrepId()) + "} ");
+    }
     
     return out;
 }

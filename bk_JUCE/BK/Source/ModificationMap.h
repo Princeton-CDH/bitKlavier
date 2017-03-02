@@ -15,6 +15,7 @@
 
 #include "Modification.h"
 
+
 class ModificationMap : public ReferenceCountedObject
 {
 public:

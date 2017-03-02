@@ -293,11 +293,14 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
     }
     else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
     {
-        Array<float> transpOffsets = stringToFloatArray(text);
+        Array<Array<float>> transposition = stringToArrayFloatArray(text);
+        
+        tf.setText(arrayFloatArrayToString(transposition));
+        
         if (type == BKParameter)
         {
-            prep    ->setTranspOffsets(transpOffsets);
-            active  ->setTranspOffsets(transpOffsets);
+            prep    ->setTransposition(transposition);
+            active  ->setTransposition(transposition);
         }
         else // BKModification
         {
@@ -421,7 +424,7 @@ void SynchronicViewController::updateFields(void)
     synchronicTF[SynchronicBeatMultipliers]     ->setText(  floatArrayToString(     prep->getBeatMultipliers()), false);
     synchronicTF[SynchronicLengthMultipliers]   ->setText(  floatArrayToString(     prep->getLengthMultipliers()), false);
     synchronicTF[SynchronicAccentMultipliers]   ->setText(  floatArrayToString(     prep->getAccentMultipliers()), false);
-    synchronicTF[SynchronicTranspOffsets]       ->setText(  floatArrayToString(     prep->getTranspOffsets()), false);
+    synchronicTF[SynchronicTranspOffsets]       ->setText(  arrayFloatArrayToString(prep->getTransposition()), false);
     synchronicTF[SynchronicTuning]              ->setText(  String(                 prep->getTuning()->getId()), false);
     
     synchronicTF[AT1Mode]                       ->setText(  String(                 prep->getAdaptiveTempo1Mode()), false);

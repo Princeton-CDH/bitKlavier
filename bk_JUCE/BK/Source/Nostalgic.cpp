@@ -71,6 +71,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
 {
     float duration = 0.0;
     
+    
     if (noteOn[midiNoteNumber])
     {
         
@@ -100,25 +101,28 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
             duration = syncTarget->getTimeToBeatMS(active->getBeatsToSkip()) + offRamp + 3; // sum
         }
         
-        float offset = (active->getTransposition() + tuner->getOffset(midiNoteNumber));
-        int synthNoteNumber = midiNoteNumber + (int)offset;
-        offset -= (int)offset;
-        
-        //play nostalgic note
-        synth->keyOn(
-                     midiChannel,
-                     synthNoteNumber,
-                     offset,
-                     velocities.getUnchecked(midiNoteNumber),
-                     active->getGain() * aGlobalGain,
-                     Reverse,
-                     FixedLengthFixedStart,
-                     NostalgicNote,
-                     Id,
-                     duration + active->getWavedistance(), //tweak to make sync sound better?
-                     duration,  // length
-                     3,
-                     offRamp ); //ramp off
+        for (auto t : active->getTransposition())
+        {
+            float offset = t + tuner->getOffset(midiNoteNumber);
+            int synthNoteNumber = midiNoteNumber + (int)offset;
+            float synthOffset = offset - (int)offset;
+            
+            //play nostalgic note
+            synth->keyOn(
+                         midiChannel,
+                         synthNoteNumber,
+                         synthOffset,
+                         velocities.getUnchecked(midiNoteNumber),
+                         active->getGain() * aGlobalGain,
+                         Reverse,
+                         FixedLengthFixedStart,
+                         NostalgicNote,
+                         Id,
+                         duration + active->getWavedistance(), //tweak to make sync sound better?
+                         duration,  // length
+                         3,
+                         offRamp ); //ramp off
+        }
         
         
         // turn note length timers off
@@ -148,15 +152,12 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
 void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity)
 {
     tuner = active->getTuning()->processor;
+
+    activeNotes.addIfNotAlreadyThere(midiNoteNumber);
+    noteOn.set(midiNoteNumber, true);
+    noteLengthTimers.set(midiNoteNumber, 0);
+    velocities.set(midiNoteNumber, midiNoteVelocity);
     
-    //if (keymap->containsNote(midiNoteNumber))
-    {
-        activeNotes.addIfNotAlreadyThere(midiNoteNumber);
-        noteOn.set(midiNoteNumber, true);
-        noteLengthTimers.set(midiNoteNumber, 0);
-        velocities.set(midiNoteNumber, midiNoteVelocity);
-        //DBG("nostalgic added active note " + std::to_string(midiNoteNumber) + " " + std::to_string(midiNoteVelocity));
-    }
 }
 
 //main scheduling function
@@ -179,23 +180,27 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
  
             if(noteOnPrep->getUndertow() > 0)
             {
-                float offset = (noteOnPrep->getTransposition() + tuningsAtKeyOn.getUnchecked(tempnote));
-                int synthNoteNumber = tempnote +  (int)offset;
-                offset -= (int)offset;
-                
-                synth->keyOn(midiChannel,
-                             synthNoteNumber,
-                             offset,
-                             velocitiesAtKeyOn.getUnchecked(tempnote),
-                             aGlobalGain,
-                             Forward,
-                             FixedLengthFixedStart,
-                             NostalgicNote,
-                             Id,
-                             noteOnPrep->getWavedistance(),                        //start position
-                             noteOnPrep->getUndertow(),                            //play length
-                             aRampUndertowCrossMS,                                 //ramp up length
-                             noteOnPrep->getUndertow() - aRampUndertowCrossMS);    //ramp down length
+                for (auto t : noteOnPrep->getTransposition())
+                    {
+                    float offset = t + tuningsAtKeyOn.getUnchecked(tempnote);
+                    int synthNoteNumber = tempnote +  (int)offset;
+                    float synthOffset = offset - (int)offset;
+                    
+                    
+                    synth->keyOn(midiChannel,
+                                 synthNoteNumber,
+                                 synthOffset,
+                                 velocitiesAtKeyOn.getUnchecked(tempnote),
+                                 aGlobalGain,
+                                 Forward,
+                                 FixedLengthFixedStart,
+                                 NostalgicNote,
+                                 Id,
+                                 noteOnPrep->getWavedistance(),                        //start position
+                                 noteOnPrep->getUndertow(),                            //play length
+                                 aRampUndertowCrossMS,                                 //ramp up length
+                                 noteOnPrep->getUndertow() - aRampUndertowCrossMS);    //ramp down length
+                }
             }
             
             //remove from active notes list

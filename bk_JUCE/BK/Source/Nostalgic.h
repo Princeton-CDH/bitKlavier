@@ -44,7 +44,7 @@ public:
     
     NostalgicPreparation(int waveDistance,
                          int undertow,
-                         float transposition,
+                         Array<float> transposition,
                          float gain,
                          float lengthMultiplier,
                          float beatsToSkip,
@@ -69,7 +69,7 @@ public:
     NostalgicPreparation(Tuning::Ptr t):
     nWaveDistance(0),
     nUndertow(0),
-    nTransposition(0.0),
+    nTransposition(Array<float>({0.0})),
     nGain(1.0),
     nLengthMultiplier(1.0),
     nBeatsToSkip(0.0),
@@ -117,7 +117,7 @@ public:
     
     inline const int getWavedistance() const noexcept                      {return nWaveDistance;      }
     inline const int getUndertow() const noexcept                          {return nUndertow;          }
-    inline const float getTransposition() const noexcept                   {return nTransposition;     }
+    inline const Array<float> getTransposition() const noexcept            {return nTransposition;     }
     inline const float getGain() const noexcept                            {return nGain;              }
     inline const float getLengthMultiplier() const noexcept                {return nLengthMultiplier;  }
     inline const float getBeatsToSkip() const noexcept                     {return nBeatsToSkip;       }
@@ -129,7 +129,7 @@ public:
     
     inline void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
     inline void setUndertow(int undertow)                                  {nUndertow = undertow;                  }
-    inline void setTransposition(float transposition)                      {nTransposition = transposition;        }
+    inline void setTransposition(Array<float> transposition)                      {nTransposition = transposition;        }
     inline void setGain(float gain)                                        {nGain = gain;                          }
     inline void setLengthMultiplier(float lengthMultiplier)                {nLengthMultiplier = lengthMultiplier;  }
     inline void setBeatsToSkip(float beatsToSkip)                          {nBeatsToSkip = beatsToSkip;            }
@@ -149,7 +149,7 @@ public:
     {
         DBG("nWaveDistance: " + String(nWaveDistance));
         DBG("nUndertow: " + String(nUndertow));
-        DBG("nTransposition: " + String(nTransposition));
+        DBG("nTransposition: " + floatArrayToString(nTransposition));
         DBG("nGain: " + String(nGain));
         DBG("nLengthMultiplier: " + String(nLengthMultiplier));
         DBG("nBeatsToSkip: " + String(nBeatsToSkip));
@@ -172,7 +172,7 @@ private:
      --dt
      */
     
-    float nTransposition;       //transposition, in half steps
+    Array<float> nTransposition;       //transposition, in half steps
     float nGain;                //gain multiplier
     float nLengthMultiplier;    //note-length mode: toscale reverse playback time
     float nBeatsToSkip;         //synchronic mode: beats to skip before reverse peak
@@ -221,7 +221,7 @@ public:
         param.set(NostalgicTuning, String(p->getTuning()->getId()));
         param.set(NostalgicWaveDistance, String(p->getWavedistance()));
         param.set(NostalgicUndertow, String(p->getUndertow()));
-        param.set(NostalgicTransposition, String(p->getTransposition()));
+        param.set(NostalgicTransposition, floatArrayToString(p->getTransposition()));
         param.set(NostalgicGain, String(p->getGain()));
         param.set(NostalgicLengthMultiplier, String(p->getLengthMultiplier()));
         param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
@@ -261,8 +261,18 @@ public:
         p = getParam(NostalgicUndertow);
         if (p != String::empty) prep.setProperty( ptagNostalgic_undertow,           p.getIntValue(), 0);
         
+        ValueTree transp( vtagNostalgic_transposition);
+        int count = 0;
         p = getParam(NostalgicTransposition);
-        if (p != String::empty) prep.setProperty( ptagNostalgic_transposition,      p.getFloatValue(), 0);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                transp.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(transp, -1, 0);
         
         p = getParam(NostalgicGain);
         if (p != String::empty) prep.setProperty( ptagNostalgic_gain,               p.getFloatValue(), 0);
@@ -309,7 +319,7 @@ public:
         param.set(NostalgicTuning, String(p->getTuning()->getId()));
         param.set(NostalgicWaveDistance, String(p->getWavedistance()));
         param.set(NostalgicUndertow, String(p->getUndertow()));
-        param.set(NostalgicTransposition, String(p->getTransposition()));
+        param.set(NostalgicTransposition, floatArrayToString(p->getTransposition()));
         param.set(NostalgicGain, String(p->getGain()));
         param.set(NostalgicLengthMultiplier, String(p->getLengthMultiplier()));
         param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
