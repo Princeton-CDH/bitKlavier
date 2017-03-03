@@ -277,6 +277,7 @@ typedef enum BKParameterDataType
     BKFloat,
     BKIntArr,
     BKFloatArr,
+    BKArrFloatArr,
     BKParameterTypeNil
 } BKParameterDataType;
 
@@ -362,7 +363,7 @@ static const std::vector<BKParameterDataType> cSynchronicDataTypes = {
     BKFloatArr,
     BKFloatArr,
     BKFloatArr,
-    BKFloatArr,
+    BKArrFloatArr,
     BKFloat,
     BKInt,
     BKFloat,
@@ -422,7 +423,7 @@ static const std::vector<BKParameterDataType> cNostalgicDataTypes =
     BKInt,
     BKInt,
     BKInt,
-    BKFloat,
+    BKFloatArr,
     BKFloat,
     BKFloat,
     BKInt,
@@ -463,7 +464,7 @@ typedef enum DirectParameterType
 static const std::vector<BKParameterDataType> cDirectDataTypes = {
     BKInt,
     BKInt,
-    BKFloat,
+    BKFloatArr,
     BKFloat,
     BKFloat,
     BKFloat,

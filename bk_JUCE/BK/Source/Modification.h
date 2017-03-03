@@ -105,6 +105,10 @@ public:
         {
             modIntArr = stringToIntArray(val);
         }
+        else if (cDirectDataTypes[type] == BKFloatArr)
+        {
+            modFloatArr = stringToFloatArray(val);
+        }
         else // BKFloat
         {
             modFloat = val.getFloatValue();
@@ -141,6 +145,7 @@ public:
     SynchronicModification(int key, int whichPrep, SynchronicParameterType type, String val, int ident):
     type(type)
     {
+        modArrFloatArr = Array<Array<float>>();
         modFloatArr = Array<float>();
         modIntArr   = Array<int>();
         modBool = var::null;
@@ -167,6 +172,11 @@ public:
         {
             modIntArr = stringToIntArray(val);
         }
+        else if (cSynchronicDataTypes[type] == BKArrFloatArr)
+        {
+            modArrFloatArr = stringToArrayFloatArray(val);
+        }
+            
         
     }
     
@@ -216,6 +226,10 @@ public:
         else if (cNostalgicDataTypes[type] == BKFloat) // BKFloat
         {
             modFloat = val.getFloatValue();
+        }
+        else if (cNostalgicDataTypes[type] == BKFloatArr)
+        {
+            modFloatArr = stringToFloatArray(val);
         }
         else if (cNostalgicDataTypes[type] == BKIntArr)
         {
