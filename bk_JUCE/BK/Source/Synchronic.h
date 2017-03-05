@@ -373,7 +373,7 @@ public:
         param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
         param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
         //param.set(SynchronicReset, intArrayToString(p->getResetMap()->keys()));
-        param.set(SynchronicReset, "");
+        //param.set(SynchronicReset, "");
         
     }
     
@@ -397,7 +397,7 @@ public:
         param.set(AT1Subdivisions, "");
         param.set(AT1Min, "");
         param.set(AT1Max, "");
-        param.set(SynchronicReset, "");
+        //param.set(SynchronicReset, "");
     }
     
     inline ValueTree getState(int Id)
@@ -449,9 +449,6 @@ public:
         
         p = getParam(SynchronicBeatsToSkip);
         if (p != String::empty) prep.setProperty( ptagSynchronic_beatsToSkip,         p.getIntValue(), 0);
-        
-        p = getParam(SynchronicReset);
-        if (p != String::empty) prep.setProperty( ptagSynchronic_reset,         p.getIntValue(), 0);
         
         /*
          ValueTree scale( vtagTuning_customScale);
@@ -521,7 +518,7 @@ public:
         }
         prep.addChild(transpOffsets, -1, 0);
         
-        
+        /*
         p = getParam(AT1Mode);
         if (p != String::empty) prep.setProperty( ptagSynchronic_at1Mode,          p.getIntValue(), 0);
         
@@ -536,6 +533,7 @@ public:
         
         p = getParam(AT1Max);
         if (p != String::empty) prep.setProperty( ptagSynchronic_AT1Max,          p.getFloatValue(), 0);
+         */
 
         /*
         ValueTree resetMap(ptagSynchronic_reset);

@@ -243,7 +243,7 @@ public:
         param.set(NostalgicBeatsToSkip, "");
         param.set(NostalgicMode, "");
         param.set(NostalgicSyncTarget, "");
-        param.set(NostalgicReset, "");
+        //param.set(NostalgicReset, "");
     }
     
     inline ValueTree getState(int Id)
@@ -289,8 +289,10 @@ public:
         p = getParam(NostalgicSyncTarget);
         if (p != String::empty) prep.setProperty( ptagNostalgic_syncTarget,         p.getIntValue(), 0);
         
+        /*
         p = getParam(NostalgicReset);
         if (p != String::empty) prep.setProperty( ptagNostalgic_reset,         p.getIntValue(), 0);
+         */
         
         /*
         ValueTree resetMap(ptagNostalgic_reset);

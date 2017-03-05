@@ -291,6 +291,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
             mod->setParam(TuningAbsoluteOffsets, text);
         }
     }
+    /*
     else if (name == cTuningParameterTypes[TuningReset])
     {
         if (type == BKParameter)
@@ -309,6 +310,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
             mod->setParam(TuningReset, text);
         }
     }
+     */
     else
     {
         DBG("Unregistered text field.");
@@ -353,7 +355,7 @@ void TuningViewController::updateModFields()
     modTuningTF[TuningA1History]           ->setText( prep->getParam(TuningA1History), false);
     modTuningTF[TuningCustomScale]         ->setText( prep->getParam(TuningCustomScale), false);
     modTuningTF[TuningAbsoluteOffsets]     ->setText( prep->getParam(TuningAbsoluteOffsets), false);
-    modTuningTF[TuningReset]         ->setText( prep->getParam(TuningReset), false);
+    //modTuningTF[TuningReset]         ->setText( prep->getParam(TuningReset), false);
     
     
 }

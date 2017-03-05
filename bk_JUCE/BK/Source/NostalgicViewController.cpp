@@ -289,6 +289,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
                 tf.setText("0", false);
         }
     }
+    /*
     else if (name == cNostalgicParameterTypes[NostalgicReset])
     {
         if (type == BKParameter)
@@ -305,6 +306,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
             DBG("set nostalgic resetkeymap mod to: " + text);
         }
     }
+     */
     else
     {
         DBG("Unregistered text field entered input.");
@@ -342,7 +344,7 @@ void NostalgicViewController::updateModFields(void)
     modNostalgicTF[NostalgicMode]              ->setText( prep->getParam(NostalgicMode), false);
     modNostalgicTF[NostalgicSyncTarget]        ->setText( prep->getParam(NostalgicSyncTarget), false);
     modNostalgicTF[NostalgicTuning]            ->setText( prep->getParam(NostalgicTuning), false);
-    modNostalgicTF[NostalgicReset]       ->setText( prep->getParam(NostalgicReset), false);
+    //modNostalgicTF[NostalgicReset]       ->setText( prep->getParam(NostalgicReset), false);
 }
 
 void NostalgicViewController::bkMessageReceived (const String& message)

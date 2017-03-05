@@ -12,10 +12,7 @@
 #define TEMPO_H_INCLUDED
 
 #include "BKUtilities.h"
-#include "BKSynthesiser.h"
-#include "Tuning.h"
 #include "General.h"
-#include "Keymap.h"
 
 class TempoPreparation : public ReferenceCountedObject
 {
@@ -79,7 +76,6 @@ public:
     inline float getAdaptiveTempo1Min(void)                 {return at1Min;}
     inline float getAdaptiveTempo1Max(void)                 {return at1Max;}
     
-    
     inline const String getName() const noexcept {return name;}
     inline void setName(String n){name = n;}
     
@@ -132,10 +128,9 @@ public:
     typedef OwnedArray<TempoProcessor,CriticalSection>  CSArr;
     
     
-    TempoProcessor(BKSynthesiser *synth,
-                        TempoProcessor::Ptr active,
-                        GeneralSettings::Ptr general,
-                        int Id);
+    TempoProcessor(TempoProcessor::Ptr active,
+                   GeneralSettings::Ptr general,
+                   int Id);
     
     ~TempoProcessor();
     
@@ -144,7 +139,8 @@ public:
     void processBlock(int numSamples, int channel);
     void keyPressed(int noteNumber, float velocity);
     void keyReleased(int noteNumber, int channel);
-    inline float getPeriodMultiplier(void)     {return adaptiveTempoPeriodMultiplier;}
+    inline float getPeriodMultiplier(void)      {return adaptiveTempoPeriodMultiplier;}
+    inline float getAdaptedTempo(void)          {return adaptiveTempoPeriodMultiplier * active->getTempo();}
     
     void  reset();
     

@@ -341,12 +341,6 @@ typedef enum SynchronicParameterType {
     SynchronicLengthMultipliers,
     SynchronicAccentMultipliers,
     SynchronicTranspOffsets,
-    AT1Mode,
-    AT1History,
-    AT1Subdivisions,
-    AT1Min,
-    AT1Max,
-    SynchronicReset,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
@@ -363,13 +357,7 @@ static const std::vector<BKParameterDataType> cSynchronicDataTypes = {
     BKFloatArr,
     BKFloatArr,
     BKFloatArr,
-    BKArrFloatArr,
-    BKFloat,
-    BKInt,
-    BKFloat,
-    BKFloat,
-    BKFloat,
-    BKInt
+    BKArrFloatArr
 };
 
 static const std::vector<std::string> cSynchronicParameterTypes = {
@@ -386,12 +374,6 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "LengthMults",
     "AccentMults",
     "TranspOffsets",
-    "AT1Mode",
-    "AT1History",
-    "AT1Subdivs",
-    "AT1Min",
-    "AT1Max",
-    "ResetPrep"
 };
 
 #pragma mark - Nostalgic
@@ -412,7 +394,6 @@ typedef enum NostalgicParameterType {
     NostalgicBeatsToSkip,
     NostalgicMode,
     NostalgicSyncTarget,
-    NostalgicReset,
     NostalgicParameterTypeNil
     
 } NostalgicParameterType;
@@ -428,7 +409,6 @@ static const std::vector<BKParameterDataType> cNostalgicDataTypes =
     BKFloat,
     BKInt,
     BKInt,
-    BKInt,
     BKInt
 };
 
@@ -442,8 +422,7 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
     "LengthMult",
     "BeatsToSkip",
     "Length Mode",
-    "SyncTarget",
-    "ResetPrep"
+    "SyncTarget"
 };
 
 #pragma mark - Direct
@@ -455,7 +434,6 @@ typedef enum DirectParameterType
     DirectGain,
     DirectResGain,
     DirectHammerGain,
-    DirectReset,
     DirectParameterTypeNil,
     
 } DirectParameterType;
@@ -467,8 +445,7 @@ static const std::vector<BKParameterDataType> cDirectDataTypes = {
     BKFloatArr,
     BKFloat,
     BKFloat,
-    BKFloat,
-    BKInt
+    BKFloat
 };
 
 static const std::vector<std::string> cDirectParameterTypes = {
@@ -477,8 +454,7 @@ static const std::vector<std::string> cDirectParameterTypes = {
     "Transposition",
     "Gain",
     "ResGain",
-    "HammerGain",
-    "ResetPrep"
+    "HammerGain"
 };
 
 #pragma mark - Tuning
@@ -496,7 +472,6 @@ typedef enum TuningParameterType
     TuningA1History,
     TuningCustomScale,
     TuningAbsoluteOffsets,
-    TuningReset,
     TuningParameterTypeNil
     
 } TuningParameterType;
@@ -513,8 +488,7 @@ static const std::vector<BKParameterDataType> cTuningDataTypes = {
     BKInt,
     BKInt,
     BKFloatArr,
-    BKFloatArr,
-    BKInt
+    BKFloatArr
 };
 
 static const std::vector<std::string> cTuningParameterTypes = {
@@ -529,10 +503,42 @@ static const std::vector<std::string> cTuningParameterTypes = {
     "A1ClusterThresh",
     "A1History",
     "CustomScale",
-    "AbsoluteOffsets",
-    "ResetPrep"
+    "AbsoluteOffsets"
 };
 
+#pragma mark - Tempo
+typedef enum TempoParameterType
+{
+    TempoId = 0,
+    Tempo,
+    AT1Mode,
+    AT1History,
+    AT1Subdivisions,
+    AT1Min,
+    AT1Max,
+    TempoParameterTypeNil
+    
+} TempoParameterType;
+
+static const std::vector<BKParameterDataType> cTempoDataTypes = {
+    BKInt,
+    BKFloat,
+    BKInt,
+    BKInt,
+    BKFloat,
+    BKFloat,
+    BKFloat
+};
+
+static const std::vector<std::string> cTempoParameterTypes = {
+    "Tempo Id",
+    "Tempo",
+    "AT1Mode",
+    "AT1History",
+    "AT1Subdivs",
+    "AT1Min",
+    "AT1Max"
+};
 
 #pragma mark - PrepMap
 typedef enum PrepMapTFIndex {

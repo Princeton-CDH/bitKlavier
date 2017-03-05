@@ -157,7 +157,7 @@ public:
         param.set(DirectGain, String(p->getGain()));
         param.set(DirectResGain, String(p->getResonanceGain()));
         param.set(DirectHammerGain, String(p->getHammerGain()));
-        param.set(DirectReset, "");
+        //param.set(DirectReset, "");
         
     }
     
@@ -169,7 +169,7 @@ public:
         param.add("");
         param.add("");
         param.add("");
-        param.add("");
+        //param.add("");
     }
     
     inline ValueTree getState(int Id)
@@ -203,8 +203,6 @@ public:
         p = getParam(DirectHammerGain);
         if (p != String::empty) prep.setProperty( ptagDirect_hammerGain,        p.getFloatValue(), 0);
         
-        p = getParam(DirectReset);
-        if (p != String::empty) prep.setProperty( ptagDirect_reset,             p.getIntValue(), 0);
         
         /*
         ValueTree resetMap(ptagDirect_reset);

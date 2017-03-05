@@ -228,6 +228,7 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
                 tf.setText("0", false);
         }
     }
+    /*
     else if (name == cDirectParameterTypes[DirectReset])
     {
         if (type == BKParameter)
@@ -244,6 +245,7 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
             DBG("set direct resetkeymap mod to: " + text);
         }
     }
+     */
     else
     {
         DBG("Unregistered text field entered input.");
@@ -274,7 +276,7 @@ void DirectViewController::updateModFields(void)
     modDirectTF[DirectHammerGain]          ->setText( prep->getParam(DirectHammerGain), false);
     modDirectTF[DirectResGain]             ->setText( prep->getParam(DirectResGain), false);
     modDirectTF[DirectTuning]              ->setText( prep->getParam(DirectTuning), false);
-    modDirectTF[DirectReset]         ->setText( prep->getParam(DirectReset), false);
+    //modDirectTF[DirectReset]         ->setText( prep->getParam(DirectReset), false);
     
 }
 

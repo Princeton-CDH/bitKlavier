@@ -12,7 +12,6 @@
 #define TUNING_H_INCLUDED
 
 #include "BKUtilities.h"
-#include "Keymap.h"
 #include "AudioConstants.h"
 
 class TuningPreparation : public ReferenceCountedObject
@@ -154,8 +153,6 @@ public:
     inline const Array<float> getCustomScale() const noexcept               {return tCustom;                    }
     inline const Array<float> getAbsoluteOffsets() const noexcept           {return tAbsolute;                  }
     float getAbsoluteOffset(int midiNoteNumber) const noexcept              {return tAbsolute.getUnchecked(midiNoteNumber);}
-    //inline const Keymap::Ptr getResetMap() const noexcept                   {return resetMap;       }
-
     
     
     inline void setName(String n){name = n;}
@@ -171,7 +168,7 @@ public:
     inline void setCustomScale(Array<float> tuning)                                 {tCustom = tuning;                                      }
     inline void setAbsoluteOffsets(Array<float> abs)                                {tAbsolute = abs;                                       }
     void setAbsoluteOffset(int which, float val)                                    {tAbsolute.set(which, val);                             }
-    //inline void setResetMap(Keymap::Ptr k)                                          {resetMap = k;          }
+
     inline void setCustomScaleCents(Array<float> tuning) {
         tCustom = tuning;
         for(int i=0; i<tCustom.size(); i++) tCustom.setUnchecked(i, tCustom.getUnchecked(i) * 0.01f);
@@ -197,7 +194,6 @@ public:
         DBG("tAdaptiveHistory: " +              String(tAdaptiveHistory));
         DBG("tCustom: " +                       floatArrayToString(tCustom));
         DBG("tAbsolute: " +                     floatArrayToString(tAbsolute));
-        //DBG("resetKeymap: " + intArrayToString(getResetMap()->keys()));
     }
     
 private:
@@ -220,9 +216,6 @@ private:
     // custom scale and absolute offsets
     Array<float>    tCustom = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}; //custom scale
     Array<float>    tAbsolute;  //offset (in MIDI fractional offsets, like other tunings) for specific notes; size = 128
-    
-    //Keymap::Ptr     resetMap = new Keymap(0);;
-
     
     JUCE_LEAK_DETECTOR(TuningPreparation);
 };
@@ -285,7 +278,7 @@ public:
         param.set(TuningA1History, "");
         param.set(TuningCustomScale, "");
         param.set(TuningAbsoluteOffsets, "");
-        param.set(TuningReset, "");
+        //param.set(TuningReset, "");
     }
     
     
@@ -357,8 +350,6 @@ public:
         p = getParam(TuningA1History);
         if (p != String::empty) prep.setProperty( ptagTuning_adaptiveHistory,       p.getIntValue(), 0 );
         
-        p = getParam(TuningReset);
-        if (p != String::empty) prep.setProperty( ptagTuning_resetPrep,       p.getIntValue(), 0 );
         
         ValueTree scale( vtagTuning_customScale);
         int count = 0;

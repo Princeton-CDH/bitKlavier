@@ -1237,8 +1237,10 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     p = e->getStringAttribute( ptagTuning_adaptiveAnchorFund);
                     modTuning[id]->setParam(TuningA1AnchorFundamental, p);
                     
+                    /*
                     p = e->getStringAttribute( ptagTuning_resetPrep);
                     modTuning[id]->setParam(TuningReset, p);
+                     */
                     
                     // custom scale
                     forEachXmlChildElement (*e, sub)
@@ -1408,8 +1410,10 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                         }
                     }
                     
+                    /*
                     p = e->getStringAttribute(ptagDirect_reset);
                     modDirect[id]->setParam(DirectReset, p);
+                     */
                     
                     ++dModPrepCount;
                 }
@@ -1599,6 +1603,7 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     p = e->getStringAttribute(ptagSynchronic_mode);
                     modSynchronic[id]->setParam(SynchronicMode, p);
                     
+                    /*
                     p = e->getStringAttribute(ptagSynchronic_beatsToSkip);
                     modSynchronic[id]->setParam(SynchronicBeatsToSkip, p);
                     
@@ -1616,9 +1621,12 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     
                     p = e->getStringAttribute(ptagSynchronic_AT1Max);
                     modSynchronic[id]->setParam(AT1Max, p);
+                    */
                     
+                    /*
                     p = e->getStringAttribute(ptagSynchronic_reset);
                     modSynchronic[id]->setParam(SynchronicReset, p);
+                     */
                     
                     
                     forEachXmlChildElement (*e, sub)
@@ -1839,8 +1847,10 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     p = e->getStringAttribute(ptagNostalgic_syncTarget);
                     modNostalgic[id]->setParam(NostalgicSyncTarget, p);
                     
+                    /*
                     p = e->getStringAttribute(ptagNostalgic_reset);
                     modNostalgic[id]->setParam(NostalgicReset, p);
+                    */
                     
                     ++nModPrepCount;
                 }
@@ -2289,8 +2299,8 @@ void BKAudioProcessor::performModifications(int noteNumber)
         
         //first do reset, if active, then the rest; enables clearing then modifying from orig
         // ** actually, this doesn't work yet; need to establish order of modifications and try to put reset first
-        if (type == TuningReset)                    tuning[tMod[i]->getPrepId()]->reset();
-        else if (type == TuningScale)               active->setTuning((TuningSystem)modi);
+        //if (type == TuningReset)                    tuning[tMod[i]->getPrepId()]->reset();
+        if (type == TuningScale)               active->setTuning((TuningSystem)modi);
         else if (type == TuningFundamental)         active->setFundamental((PitchClass)modi);
         else if (type == TuningOffset)              active->setFundamentalOffset(modf);
         else if (type == TuningA1IntervalScale)     active->setAdaptiveIntervalScale((TuningSystem)modi);
@@ -2323,7 +2333,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modia = dMod[i]->getModIntArr();
         
         //first do reset, if active, then the rest; enables clearing then modifying from orig
-        if (type == DirectReset) direct[dMod[i]->getPrepId()]->reset();
+        //if (type == DirectReset) direct[dMod[i]->getPrepId()]->reset();
         
         if (type == DirectTransposition)    active->setTransposition(modfa);
         else if (type == DirectGain)        active->setGain(modf);
@@ -2346,7 +2356,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modia = nMod[i]->getModIntArr();
         
         //first do reset, if active, then the rest; enables clearing then modifying from orig
-        if (type == NostalgicReset)      nostalgic[nMod[i]->getPrepId()]->reset();
+        //if (type == NostalgicReset)      nostalgic[nMod[i]->getPrepId()]->reset();
         
         if (type == NostalgicTransposition)         active->setTransposition(modfa);
         else if (type == NostalgicGain)             active->setGain(modf);
@@ -2372,7 +2382,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modafa = sMod[i]->getModArrFloatArr();
         modia = sMod[i]->getModIntArr();
         
-        if (type == SynchronicReset)         synchronic[sMod[i]->getPrepId()]->reset();
+        //if (type == SynchronicReset)         synchronic[sMod[i]->getPrepId()]->reset();
         
         if (type == SynchronicTranspOffsets)            active->setTransposition(modafa);
         else if (type == SynchronicTempo)               active->setTempo(modf);

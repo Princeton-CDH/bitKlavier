@@ -328,6 +328,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
                 tf.setText("0", false);
         }
     }
+    /*
     else if (name == cSynchronicParameterTypes[AT1Mode])
     {
         if (type == BKParameter)
@@ -404,6 +405,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
             DBG("set synchronic resetkeymap mod to: " + text);
         }
     }
+    */
     else
     {
         DBG("Unregistered text field entered input.");
@@ -453,12 +455,14 @@ void SynchronicViewController::updateModFields(void)
     modSynchronicTF[SynchronicTranspOffsets]       ->setText(  prep->getParam(SynchronicTranspOffsets), false);
     modSynchronicTF[SynchronicTuning]              ->setText(  prep->getParam(SynchronicTuning), false);
     
+    /*
     modSynchronicTF[AT1Mode]                       ->setText(  prep->getParam(AT1Mode), false);
     modSynchronicTF[AT1History]                    ->setText(  prep->getParam(AT1History), false);
     modSynchronicTF[AT1Subdivisions]               ->setText(  prep->getParam(AT1Subdivisions), false);
     modSynchronicTF[AT1Min]                        ->setText(  prep->getParam(AT1Min), false);
     modSynchronicTF[AT1Max]                        ->setText(  prep->getParam(AT1Max), false);
     modSynchronicTF[SynchronicReset]         ->setText(  prep->getParam(SynchronicReset), false);
+     */
 }
 
 
