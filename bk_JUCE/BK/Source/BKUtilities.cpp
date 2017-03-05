@@ -18,18 +18,18 @@ BKParameterDataType getBKDataType ( SynchronicParameterType type)
         (type == SynchronicClusterMax) ||
         (type == SynchronicClusterThresh) ||
         (type == SynchronicMode) ||
-        (type == SynchronicBeatsToSkip) ||
+        (type == SynchronicBeatsToSkip)) /*||
         (type == AT1Mode) ||
-        (type == AT1History))
+        (type == AT1History)) */
         return BKInt;
         
-    
+/*
     if ((type == SynchronicTempo) ||
         (type == AT1Subdivisions) ||
         (type == AT1Min) ||
         (type == AT1Max))
         return BKFloat;
-    
+*/
     if((type == SynchronicBeatMultipliers) ||
        (type == SynchronicLengthMultipliers) ||
        (type == SynchronicAccentMultipliers) ||
@@ -94,7 +94,7 @@ TuningSystem tuningStringToTuningSystem(String tuning)
     else if (tuning == "duodene")           return DuodeneTuning;
     else if (tuning == "otonal")            return OtonalTuning;
     else if (tuning == "utonal")            return UtonalTuning;
-    else if(tuning == "adaptive")           return AdaptiveTuning;
+    else if (tuning == "adaptive")          return AdaptiveTuning;
     else if (tuning == "adaptiveanchor")    return AdaptiveAnchoredTuning;
     else if (tuning == "custom")            return CustomTuning;
     else                                    return TuningSystemNil;

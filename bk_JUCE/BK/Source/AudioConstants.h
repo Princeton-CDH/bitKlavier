@@ -59,6 +59,7 @@ const String vtagModDirect = "directMod";
 const String vtagModSynchronic = "synchronicMod";
 const String vtagModNostalgic = "nostalgicMod";
 const String vtagModTuning = "tuningMod";
+const String vtagModTempo = "tempoMod";
 const String ptagModX_key = "key";
 const String ptagModX_modPrep = "modPrep";
 const String ptagModX_type = "type";
@@ -74,19 +75,21 @@ const String ptagIntArr = "ia";
 const String vtagSynchronicPrep = "synchronicPrep";
 const String vtagSynchronicModPrep = "synchronicModPrep";
 const String ptagSynchronic_Id = "Id";
-const String ptagSynchronic_tuning = "tuning";
-const String ptagSynchronic_tempo = "tempo";
+const String ptagSynchronic_tuning = "tuning Id";
+const String ptagSynchronic_tempo = "tempo Id";
 const String ptagSynchronic_numBeats = "numBeats";
 const String ptagSynchronic_clusterMin = "clusterMin";
 const String ptagSynchronic_clusterMax = "clusterMax";
 const String ptagSynchronic_clusterThresh = "clusterThresh";
 const String ptagSynchronic_mode = "mode";
 const String ptagSynchronic_beatsToSkip = "beatsToSkip";
+/*
 const String ptagSynchronic_at1Mode = "AT1Mode";
 const String ptagSynchronic_at1History = "AT1History";
 const String ptagSynchronic_at1Subdivisions = "AT1Subdivisions";
 const String ptagSynchronic_AT1Min = "AT1Min";
 const String ptagSynchronic_AT1Max = "AT1Max";
+ */
 const String vtagSynchronic_beatMults = "beatMultipliers";
 const String vtagSynchronic_lengthMults = "lengthMultipliers";
 const String vtagSynchronic_accentMults = "accentMultipliers";
@@ -107,7 +110,6 @@ const String ptagNostalgic_mode = "mode";
 const String ptagNostalgic_beatsToSkip = "beatsToSkip";
 const String ptagNostalgic_syncTarget = "syncTarget";
 const String ptagNostalgic_reset = "nostalgicReset";
-
 
 
 const String vtagDirectPrep = "directPrep";
@@ -139,6 +141,16 @@ const String ptagTuning_customScaleLength = "customScaleLength";
 const String ptagTuning_customScaleDegree = "scaleDegree";
 const String vTagTuning_absoluteOffsets = "absoluteOffsets";
 const String ptagTuning_resetPrep = "tuningReset";
+
+const String vtagTempoModPrep = "tempoModPrep";
+const String vtagTempoPrep = "tempoPrep";
+const String ptagTempo_Id = "Id";
+const String ptagTempo_tempo = "tempo";
+const String ptagTempo_adaptiveSystem = "AdaptiveTempoSystem";
+const String ptagTempo_AT1History = "AT1History";
+const String ptagTempo_AT1Subdivisions = "AT1Subdivisions";
+const String ptagTempo_AT1Min = "AT1Min";
+const String ptagTempo_AT1Max = "AT1Max";
 
 
 const String vtagKeymaps = "keymaps";
@@ -195,6 +207,7 @@ typedef enum BKPreparationType {
     PreparationTypeSynchronic,
     PreparationTypeNostalgic,
     PreparationTypeTuning,
+    PreparationTypeTempo,
     BKPreparationTypeNil,
 } BKPreparationType;
 
@@ -202,7 +215,8 @@ static const std::vector<std::string> cPreparationTypes = {
     "Main/Direct",
     "Synchronic",
     "Nostalgic",
-    "Tuning"
+    "Tuning",
+    "Tempo"
 };
 
 
@@ -347,7 +361,7 @@ typedef enum SynchronicParameterType {
 static const std::vector<BKParameterDataType> cSynchronicDataTypes = {
     BKInt,
     BKInt,
-    BKFloat,
+    BKInt,
     BKInt,
     BKInt,
     BKInt,
@@ -363,7 +377,7 @@ static const std::vector<BKParameterDataType> cSynchronicDataTypes = {
 static const std::vector<std::string> cSynchronicParameterTypes = {
     "Synchronic Id",
     "Tuning Id",
-    "Tempo",
+    "Tempo Id",
     "NumPulses",
     "ClusterMin",
     "ClusterMax",
@@ -511,7 +525,7 @@ typedef enum TempoParameterType
 {
     TempoId = 0,
     Tempo,
-    AT1Mode,
+    TempoMode,
     AT1History,
     AT1Subdivisions,
     AT1Min,
@@ -533,7 +547,7 @@ static const std::vector<BKParameterDataType> cTempoDataTypes = {
 static const std::vector<std::string> cTempoParameterTypes = {
     "Tempo Id",
     "Tempo",
-    "AT1Mode",
+    "TempoMode",
     "AT1History",
     "AT1Subdivs",
     "AT1Min",
@@ -598,6 +612,7 @@ static const int aMaxNumKeymaps = 10;
 static const int aMaxNumPreparationsPerPrepMap = 12;
 static const int aMaxTotalPreparations = 5; // arbitrary, should be dynamic
 static const int aMaxTuningPreparations = 5; // arbitrary, should be dynamic
+static const int aMaxTempoPreparations = 5; // arbitrary, should be dynamic
 
 static const float aGlobalGain = 0.5; //make this user settable
 
@@ -657,5 +672,12 @@ typedef enum TuningSystem {
     TuningSystemNil
 
 } TuningSystem;
+
+typedef enum TempoSystem {
+    ConstantTempo = 0,
+    AdaptiveTempo1,
+    TempoSystemNil
+    
+} TempoSystem;
 
 #endif  // AUDIOCONSTANTS_H_INCLUDED

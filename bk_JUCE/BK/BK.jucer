@@ -59,8 +59,6 @@
                 file="Source/PreparationMap.h"/>
         </GROUP>
         <GROUP id="{BE0ACC3D-1AC5-1BB6-2D3E-F52EFBCC8E45}" name="Preparation">
-          <FILE id="jeqsaH" name="Tempo.cpp" compile="1" resource="0" file="Source/Tempo.cpp"/>
-          <FILE id="o69LuQ" name="Tempo.h" compile="0" resource="0" file="Source/Tempo.h"/>
           <FILE id="JmN1jz" name="Preparation.h" compile="0" resource="0" file="Source/Preparation.h"/>
           <GROUP id="{27D6A86B-9A4E-E13A-49DF-00E35E3972B7}" name="PreparationTypes">
             <FILE id="JhmXbp" name="Direct.cpp" compile="1" resource="0" file="Source/Direct.cpp"/>
@@ -72,6 +70,8 @@
           </GROUP>
           <FILE id="ac8QzA" name="Tuning.cpp" compile="1" resource="0" file="Source/Tuning.cpp"/>
           <FILE id="OrPhKl" name="Tuning.h" compile="0" resource="0" file="Source/Tuning.h"/>
+          <FILE id="o69LuQ" name="Tempo.h" compile="0" resource="0" file="Source/Tempo.h"/>
+          <FILE id="jeqsaH" name="Tempo.cpp" compile="1" resource="0" file="Source/Tempo.cpp"/>
           <FILE id="gu3W3U" name="General.h" compile="0" resource="0" file="Source/General.h"/>
         </GROUP>
         <GROUP id="{D6A5380E-86D4-5EEB-83A3-296DC1BDB7DF}" name="Synthesiser (Sound/Voice)">

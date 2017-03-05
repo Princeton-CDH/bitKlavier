@@ -10,6 +10,16 @@
 
 #include "Tempo.h"
 
+TempoProcessor::TempoProcessor(TempoPreparation::Ptr active):
+active(active)
+{
+    
+    
+}
+
+TempoProcessor::~TempoProcessor()
+{
+}
 
 //adaptive tempo functions
 void TempoProcessor::atNewNote()

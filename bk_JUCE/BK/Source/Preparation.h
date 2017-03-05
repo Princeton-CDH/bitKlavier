@@ -15,6 +15,7 @@
 #include "Nostalgic.h"
 #include "Synchronic.h"
 #include "Tuning.h"
+#include "Tempo.h"
 #include "General.h"
 #include "BKUpdateState.h"
 
@@ -216,13 +217,13 @@ public:
         }
         prep.addChild(transposition, -1, 0);
 
-        
+ /*
         prep.setProperty( ptagSynchronic_at1Mode,             sPrep->getAdaptiveTempo1Mode(), 0);
         prep.setProperty( ptagSynchronic_at1History,          sPrep->getAdaptiveTempo1History(), 0);
         prep.setProperty( ptagSynchronic_at1Subdivisions,     sPrep->getAdaptiveTempo1Subdivisions(), 0);
         prep.setProperty( ptagSynchronic_AT1Min,              sPrep->getAdaptiveTempo1Min(), 0);
         prep.setProperty( ptagSynchronic_AT1Max,              sPrep->getAdaptiveTempo1Max(), 0);
-        
+ */
         //prep.addChild(sPrep->getResetMap()->getState(Id), -1, 0);
         
         return prep;

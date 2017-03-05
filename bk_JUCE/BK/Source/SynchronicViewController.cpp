@@ -429,12 +429,14 @@ void SynchronicViewController::updateFields(void)
     synchronicTF[SynchronicTranspOffsets]       ->setText(  arrayFloatArrayToString(prep->getTransposition()), false);
     synchronicTF[SynchronicTuning]              ->setText(  String(                 prep->getTuning()->getId()), false);
     
+    /*
     synchronicTF[AT1Mode]                       ->setText(  String(                 prep->getAdaptiveTempo1Mode()), false);
     synchronicTF[AT1History]                    ->setText(  String(                 prep->getAdaptiveTempo1History()), false);
     synchronicTF[AT1Subdivisions]               ->setText(  String(                 prep->getAdaptiveTempo1Subdivisions()), false);
     synchronicTF[AT1Min]                        ->setText(  String(                 prep->getAdaptiveTempo1Min()), false);
     synchronicTF[AT1Max]                        ->setText(  String(                 prep->getAdaptiveTempo1Max()), false);
     //synchronicTF[SynchronicReset]         ->setText(  intArrayToString(prep->getResetMap()->keys()), false);
+     */
 }
 
 void SynchronicViewController::updateModFields(void)

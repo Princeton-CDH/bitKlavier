@@ -367,11 +367,11 @@ public:
         param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
         param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
         param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p->getTransposition()));
-        param.set(AT1Mode, String(p->getAdaptiveTempo1Mode()));
-        param.set(AT1History, String(p->getAdaptiveTempo1History()));
-        param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
-        param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
-        param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
+        //param.set(AT1Mode, String(p->getAdaptiveTempo1Mode()));
+        //param.set(AT1History, String(p->getAdaptiveTempo1History()));
+        //param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
+        //param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
+        //param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
         //param.set(SynchronicReset, intArrayToString(p->getResetMap()->keys()));
         //param.set(SynchronicReset, "");
         
@@ -392,11 +392,11 @@ public:
         param.set(SynchronicLengthMultipliers, "");
         param.set(SynchronicAccentMultipliers, "");
         param.set(SynchronicTranspOffsets, "");
-        param.set(AT1Mode, "");
-        param.set(AT1History, "");
-        param.set(AT1Subdivisions, "");
-        param.set(AT1Min, "");
-        param.set(AT1Max, "");
+        //param.set(AT1Mode, "");
+        //param.set(AT1History, "");
+        //param.set(AT1Subdivisions, "");
+        //param.set(AT1Min, "");
+        //param.set(AT1Max, "");
         //param.set(SynchronicReset, "");
     }
     
@@ -572,11 +572,11 @@ public:
         param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
         param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
         param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p->getTransposition()));
-        param.set(AT1Mode, String(p->getAdaptiveTempo1Mode()));
-        param.set(AT1History, String(p->getAdaptiveTempo1History()));
-        param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
-        param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
-        param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
+        //param.set(AT1Mode, String(p->getAdaptiveTempo1Mode()));
+        //param.set(AT1History, String(p->getAdaptiveTempo1History()));
+        //param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
+        //param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
+        //param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
         //param.set(SynchronicReset, intArrayToString(p->getResetMap()->keys()));
     }
     

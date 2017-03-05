@@ -12,9 +12,7 @@
 #define TUNINGVIEWCONTROLLER_H_INCLUDED
 
 #include "BKUtilities.h"
-
 #include "PluginProcessor.h"
-
 #include "BKListener.h"
 #include "BKComponent.h"
 

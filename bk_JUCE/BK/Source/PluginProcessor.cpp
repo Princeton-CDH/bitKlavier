@@ -22,7 +22,9 @@ resonanceReleaseSynth   (general)
     prevPianos      .ensureStorageAllocated(aMaxNumPianos);
     
     tuning          .ensureStorageAllocated(aMaxTuningPreparations);
+    tempo           .ensureStorageAllocated(aMaxTempoPreparations);
     modTuning       .ensureStorageAllocated(aMaxTuningPreparations);
+    modTempo        .ensureStorageAllocated(aMaxTempoPreparations);
     
     synchronic      .ensureStorageAllocated(aMaxTotalPreparations);
     modSynchronic   .ensureStorageAllocated(aMaxTotalPreparations);
@@ -41,6 +43,7 @@ resonanceReleaseSynth   (general)
     for (int i = 0; i < 2; i++)
     {
         addTuning(); // always create first tuning first
+        addTempo();
         addSynchronic();
         addNostalgic();
         addDirect();
@@ -49,6 +52,7 @@ resonanceReleaseSynth   (general)
         addSynchronicMod();
         addNostalgicMod();
         addTuningMod();
+        addTempoMod();
         
         nostalgic[i]->sPrep->setSyncTargetProcessor(synchronic[0]->processor);
         nostalgic[i]->aPrep->setSyncTargetProcessor(synchronic[0]->processor);
@@ -129,7 +133,17 @@ void BKAudioProcessor::addTuningMod()
 
 void BKAudioProcessor::addTuningMod(TuningModPreparation::Ptr tmod)
 {
-    modTuning.add       (tmod);
+    modTuning.add           (tmod);
+}
+
+void BKAudioProcessor::addTempoMod()
+{
+    modTempo.add           (new TempoModPreparation());
+}
+
+void BKAudioProcessor::addTempoMod(TempoModPreparation::Ptr tmod)
+{
+    modTempo.add           (tmod);
 }
 
 void BKAudioProcessor::addKeymap(void)
@@ -255,6 +269,47 @@ int  BKAudioProcessor::addTuningIfNotAlreadyThere(TuningPreparation::Ptr tune)
     }
     
 }
+
+void BKAudioProcessor::addTempo(void)
+{   
+    int numTempo = tempo.size();
+    tempo.add(new class Tempo(numTempo));
+    tempo.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
+}
+
+void BKAudioProcessor::addTempo(TempoPreparation::Ptr tmp)
+{
+    int numTempo = tempo.size();
+    tempo.add(new class Tempo(tmp, numTempo));
+    tempo.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
+}
+
+// Returns index of Tempo to be added/configured.
+int  BKAudioProcessor::addTempoIfNotAlreadyThere(TempoPreparation::Ptr tmp)
+{
+    bool alreadyThere = false; int which = 0;
+    for (int i = 0; i < tempo.size() - 1; i++)
+    {
+        if (tmp->compare(tempo[i]->sPrep))
+        {
+            alreadyThere = true;
+            which = i;
+            break;
+        }
+    }
+    
+    if (alreadyThere)
+    {
+        return which;
+    }
+    else
+    {
+        addTempo(tmp);
+        return tempo.size()-1;
+    }
+    
+}
+
 
 void BKAudioProcessor::addDirect(void)
 {
@@ -1447,6 +1502,7 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     i = e->getStringAttribute(ptagSynchronic_beatsToSkip).getIntValue();
                     synchronic[id]->sPrep->setBeatsToSkip(i);
                     
+                    /*
                     i = e->getStringAttribute(ptagSynchronic_at1Mode).getIntValue();
                     synchronic[id]->sPrep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode)i);
                     
@@ -1461,7 +1517,7 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     
                     f = e->getStringAttribute(ptagSynchronic_AT1Max).getFloatValue();
                     synchronic[id]->sPrep->setAdaptiveTempo1Max(f);
-                    
+                    */
                     
                     forEachXmlChildElement (*e, sub)
                     {
@@ -2395,11 +2451,13 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == SynchronicBeatMultipliers)     active->setBeatMultipliers(modfa);
         else if (type == SynchronicLengthMultipliers)   active->setLengthMultipliers(modfa);
         else if (type == SynchronicAccentMultipliers)   active->setAccentMultipliers(modfa);
+        /*
         else if (type == AT1Mode)                       active->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) modi);
         else if (type == AT1Min)                        active->setAdaptiveTempo1Min(modf);
         else if (type == AT1Max)                        active->setAdaptiveTempo1Max(modf);
         else if (type == AT1History)                    active->setAdaptiveTempo1History(modi);
         else if (type == AT1Subdivisions)               active->setAdaptiveTempo1Subdivisions(modf);
+         */
         
         updateState->synchronicPreparationDidChange = true;
     }
