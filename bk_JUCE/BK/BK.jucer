@@ -111,6 +111,10 @@
               file="Source/TuningViewController.cpp"/>
         <FILE id="DZ40Vl" name="TuningViewController.h" compile="0" resource="0"
               file="Source/TuningViewController.h"/>
+        <FILE id="vi1g4K" name="TempoViewController.cpp" compile="1" resource="0"
+              file="Source/TempoViewController.cpp"/>
+        <FILE id="QZEXdj" name="TempoViewController.h" compile="0" resource="0"
+              file="Source/TempoViewController.h"/>
         <FILE id="Bo4JI6" name="SynchronicViewController.cpp" compile="1" resource="0"
               file="Source/SynchronicViewController.cpp"/>
         <FILE id="OJ2tuE" name="SynchronicViewController.h" compile="0" resource="0"
