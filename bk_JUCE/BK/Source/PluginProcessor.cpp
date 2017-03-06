@@ -273,7 +273,7 @@ int  BKAudioProcessor::addTuningIfNotAlreadyThere(TuningPreparation::Ptr tune)
 void BKAudioProcessor::addTempo(void)
 {   
     int numTempo = tempo.size();
-    tempo.add(new class Tempo(numTempo));
+    tempo.add(new class Tempo(numTempo)); //why do we have to add "class" to this but not to the addTuning function?
     tempo.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 

@@ -18,6 +18,7 @@
 #include "NostalgicViewController.h"
 #include "DirectViewController.h"
 #include "TuningViewController.h"
+#include "TempoViewController.h"
 
 #include "GeneralViewController.h"
 
@@ -70,6 +71,7 @@ private:
     NostalgicViewController               nvc;
     DirectViewController                  dvc;
     TuningViewController                  tvc;
+    TempoViewController                   ovc;
 
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override{};

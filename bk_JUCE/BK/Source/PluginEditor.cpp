@@ -29,6 +29,7 @@ svc(p),
 nvc(p),
 dvc(p),
 tvc(p),
+ovc(p),
 timerCallbackCount(0)
 {
     // Make PianoViewController component within plugin editor class.
@@ -39,6 +40,7 @@ timerCallbackCount(0)
     addAndMakeVisible(dvc);
     addAndMakeVisible(kvc);
     addAndMakeVisible(tvc);
+    addAndMakeVisible(ovc);
     
     pianoMapL.setName("PianoMap");
     pianoMapL.setText("PianoMap", NotificationType::dontSendNotification);
@@ -246,6 +248,12 @@ void BKAudioProcessorEditor::timerCallback()
         tvc.updateFields();
     }
     
+    if (processor.updateState->tempoPreparationDidChange)
+    {
+        processor.updateState->tempoPreparationDidChange = false;
+        ovc.updateFields();
+    }
+    
 }
 
 void BKAudioProcessorEditor::paint (Graphics& g)
@@ -265,6 +273,7 @@ void BKAudioProcessorEditor::resized()
     float nvcH = cNostalgicParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + 1.5 *  gYSpacing;
     float dvcH = cDirectParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float tvcH = cTuningParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
+    float ovcH = cTempoParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
     
     loadvc->setBounds(gComponentLeftOffset,
                       gComponentTopOffset,
@@ -348,6 +357,11 @@ void BKAudioProcessorEditor::resized()
                   svc.getBottom() + gYSpacing,
                   gVCWidth,
                   nvcH);
+    
+    ovc.setBounds(nvc.getX(),
+                  nvc.getBottom() + gYSpacing,
+                  gVCWidth,
+                  ovcH);
     
     saveButton.setBounds(getX() + gXSpacing, getBottom() - 75, 50, 20);
     
@@ -850,6 +864,7 @@ void BKAudioProcessorEditor::switchPianos(void)
         pmvc[i]->addActionListener(&dvc);
         pmvc[i]->addActionListener(&kvc);
         pmvc[i]->addActionListener(&tvc);
+        pmvc[i]->addActionListener(&ovc);
         
         if (i > 0) {
             pmvc[i]->setBounds(gComponentLeftOffset,
@@ -972,6 +987,7 @@ void BKAudioProcessorEditor::drawNewPreparationMap(int Id)
     pmvc[Id]->addActionListener(&dvc);
     pmvc[Id]->addActionListener(&kvc);
     pmvc[Id]->addActionListener(&tvc);
+    pmvc[Id]->addActionListener(&ovc);
     
     if (Id > 0) {
         pmvc[Id]->setBounds(gComponentLeftOffset,
