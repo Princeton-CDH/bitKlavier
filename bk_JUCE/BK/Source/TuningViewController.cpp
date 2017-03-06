@@ -115,7 +115,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
     
     TuningPreparation::Ptr active = processor.tuning[currentTuningId]->aPrep;
     
-    TuningModPreparation::Ptr mod = processor.modTuning[currentModTuningId];
+    TuningModPreparation::Ptr mod = processor.tuningModPrep[currentModTuningId];
     
     if (name == cTuningParameterTypes[TuningId])
     {
@@ -140,7 +140,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            int numMod = processor.modTuning.size();
+            int numMod = processor.tuningModPrep.size();
             
             if ((i+1) > numMod)
             {
@@ -291,24 +291,6 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
             mod->setParam(TuningAbsoluteOffsets, text);
         }
     }
-    else if (name == cTuningParameterTypes[TuningReset])
-    {
-        if (type == BKParameter)
-        {
-
-            // ** actually do nothing here; TuningReset is Mod only
-            //Array<int> keys = keymapStringToIntArray(text);
-            //Array<int> keys = stringToIntArray(text);
-            //prep->getResetMap()->setKeymap(keys);
-            //active->getResetMap()->setKeymap(keys);
-            //tuningTF[TuningReset]->setText( intArrayToString(prep->getResetMap()->keys()));
-
-        }
-        else    //BKModification
-        {
-            mod->setParam(TuningReset, text);
-        }
-    }
     else
     {
         DBG("Unregistered text field.");
@@ -332,7 +314,6 @@ void TuningViewController::updateFields()
     tuningTF[TuningA1History]           ->setText( String( prep->getAdaptiveHistory()), false);
     tuningTF[TuningCustomScale]         ->setText( floatArrayToString( prep->getCustomScale()), false);
     tuningTF[TuningAbsoluteOffsets]     ->setText( offsetArrayToString( prep->getAbsoluteOffsets()), false);
-    //tuningTF[TuningReset]         ->setText( intArrayToString( prep->getResetMap()->keys()), false);
 
     
 }
@@ -340,7 +321,7 @@ void TuningViewController::updateFields()
 void TuningViewController::updateModFields()
 {
     
-    TuningModPreparation::Ptr prep = processor.modTuning[currentModTuningId];
+    TuningModPreparation::Ptr prep = processor.tuningModPrep[currentModTuningId];
     
     modTuningTF[TuningScale]               ->setText( prep->getParam(TuningScale), false);
     modTuningTF[TuningFundamental]         ->setText( prep->getParam(TuningFundamental), false);
@@ -353,8 +334,6 @@ void TuningViewController::updateModFields()
     modTuningTF[TuningA1History]           ->setText( prep->getParam(TuningA1History), false);
     modTuningTF[TuningCustomScale]         ->setText( prep->getParam(TuningCustomScale), false);
     modTuningTF[TuningAbsoluteOffsets]     ->setText( prep->getParam(TuningAbsoluteOffsets), false);
-    modTuningTF[TuningReset]         ->setText( prep->getParam(TuningReset), false);
-    
     
 }
 

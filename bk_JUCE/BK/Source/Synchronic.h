@@ -372,8 +372,6 @@ public:
         param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
         param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
         param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
-        //param.set(SynchronicReset, intArrayToString(p->getResetMap()->keys()));
-        param.set(SynchronicReset, "");
         
     }
     
@@ -397,7 +395,6 @@ public:
         param.set(AT1Subdivisions, "");
         param.set(AT1Min, "");
         param.set(AT1Max, "");
-        param.set(SynchronicReset, "");
     }
     
     inline ValueTree getState(int Id)
@@ -450,21 +447,7 @@ public:
         p = getParam(SynchronicBeatsToSkip);
         if (p != String::empty) prep.setProperty( ptagSynchronic_beatsToSkip,         p.getIntValue(), 0);
         
-        p = getParam(SynchronicReset);
-        if (p != String::empty) prep.setProperty( ptagSynchronic_reset,         p.getIntValue(), 0);
-        
-        /*
-         ValueTree scale( vtagTuning_customScale);
-         int count = 0;
-         p = getParam(TuningCustomScale);
-         if (p != String::empty)
-         {
-         Array<float> scl = stringToFloatArray(p);
-         for (auto note : scl)
-         scale.setProperty( ptagFloat + String(count++), note, 0 );
-         }
-         prep.addChild(scale, -1, 0);
-         */
+
         ValueTree beatMults( vtagSynchronic_beatMults);
         int count = 0;
         p = getParam(SynchronicBeatMultipliers);
@@ -536,19 +519,6 @@ public:
         
         p = getParam(AT1Max);
         if (p != String::empty) prep.setProperty( ptagSynchronic_AT1Max,          p.getFloatValue(), 0);
-
-        /*
-        ValueTree resetMap(ptagSynchronic_reset);
-        count = 0;
-        p = getParam(SynchronicReset);
-        if (p != String::empty)
-        {
-            Array<int> rmap = stringToIntArray(p);
-            for (auto note : rmap)
-                resetMap.setProperty( ptagInt + String(count++), note, 0 );
-        }
-        prep.addChild(resetMap, -1, 0);
-         */
         
         return prep;
         
@@ -579,7 +549,6 @@ public:
         param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
         param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
         param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
-        //param.set(SynchronicReset, intArrayToString(p->getResetMap()->keys()));
     }
     
     inline const StringArray getStringArray(void) { return param; }

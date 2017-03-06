@@ -125,7 +125,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
     
     SynchronicPreparation::Ptr active = processor.synchronic[currentSynchronicId]->aPrep;
     
-    SynchronicModPreparation::Ptr mod = processor.modSynchronic[currentModSynchronicId];
+    SynchronicModPreparation::Ptr mod = processor.synchronicModPrep[currentModSynchronicId];
     
     if (name == cSynchronicParameterTypes[SynchronicId])
     {
@@ -151,7 +151,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            int numMod = processor.modSynchronic.size();
+            int numMod = processor.synchronicModPrep.size();
             
             if ((i+1) > numMod)
             {
@@ -388,22 +388,6 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
             mod->setParam( AT1Max, text);
         }
     }
-    else if (name == cSynchronicParameterTypes[SynchronicReset])
-    {
-        if (type == BKParameter)
-        {
-            // ** do nothing here, Mod only
-            //Array<int> keys = stringToIntArray(text);
-            //prep->getResetMap()->setKeymap(keys);
-            //active->getResetMap()->setKeymap(keys);
-            //synchronicTF[SynchronicReset]->setText(intArrayToString(prep->getResetMap()->keys()));
-        }
-        else    //BKModification
-        {
-            mod->setParam(SynchronicReset, text);
-            DBG("set synchronic resetkeymap mod to: " + text);
-        }
-    }
     else
     {
         DBG("Unregistered text field entered input.");
@@ -432,13 +416,12 @@ void SynchronicViewController::updateFields(void)
     synchronicTF[AT1Subdivisions]               ->setText(  String(                 prep->getAdaptiveTempo1Subdivisions()), false);
     synchronicTF[AT1Min]                        ->setText(  String(                 prep->getAdaptiveTempo1Min()), false);
     synchronicTF[AT1Max]                        ->setText(  String(                 prep->getAdaptiveTempo1Max()), false);
-    //synchronicTF[SynchronicReset]         ->setText(  intArrayToString(prep->getResetMap()->keys()), false);
 }
 
 void SynchronicViewController::updateModFields(void)
 {
     // a Modification copy of Preparation to pull values from when updating
-    SynchronicModPreparation::Ptr prep   = processor.modSynchronic[currentModSynchronicId];
+    SynchronicModPreparation::Ptr prep   = processor.synchronicModPrep[currentModSynchronicId];
     
     modSynchronicTF[SynchronicTempo]               ->setText(  prep->getParam(SynchronicTempo), false);
     modSynchronicTF[SynchronicNumPulses]           ->setText(  prep->getParam(SynchronicNumPulses), false);
@@ -458,7 +441,6 @@ void SynchronicViewController::updateModFields(void)
     modSynchronicTF[AT1Subdivisions]               ->setText(  prep->getParam(AT1Subdivisions), false);
     modSynchronicTF[AT1Min]                        ->setText(  prep->getParam(AT1Min), false);
     modSynchronicTF[AT1Max]                        ->setText(  prep->getParam(AT1Max), false);
-    modSynchronicTF[SynchronicReset]         ->setText(  prep->getParam(SynchronicReset), false);
 }
 
 

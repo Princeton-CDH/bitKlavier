@@ -22,16 +22,16 @@ resonanceReleaseSynth   (general)
     prevPianos      .ensureStorageAllocated(aMaxNumPianos);
     
     tuning          .ensureStorageAllocated(aMaxTuningPreparations);
-    modTuning       .ensureStorageAllocated(aMaxTuningPreparations);
+    tuningModPrep       .ensureStorageAllocated(aMaxTuningPreparations);
     
     synchronic      .ensureStorageAllocated(aMaxTotalPreparations);
-    modSynchronic   .ensureStorageAllocated(aMaxTotalPreparations);
+    synchronicModPrep   .ensureStorageAllocated(aMaxTotalPreparations);
     
     nostalgic       .ensureStorageAllocated(aMaxTotalPreparations);
-    modNostalgic    .ensureStorageAllocated(aMaxTotalPreparations);
+    nostalgicModPrep    .ensureStorageAllocated(aMaxTotalPreparations);
     
     direct          .ensureStorageAllocated(aMaxTotalPreparations);
-    modDirect       .ensureStorageAllocated(aMaxTotalPreparations);
+    directModPrep       .ensureStorageAllocated(aMaxTotalPreparations);
 
 
     bkKeymaps.add(new Keymap(0));
@@ -109,27 +109,27 @@ void BKAudioProcessor::addPiano()
 
 void BKAudioProcessor::addDirectMod()
 {
-    modDirect.add           (new DirectModPreparation());
+    directModPrep.add           (new DirectModPreparation());
 }
 
 void BKAudioProcessor::addSynchronicMod()
 {
-    modSynchronic.add       (new SynchronicModPreparation());
+    synchronicModPrep.add       (new SynchronicModPreparation());
 }
 
 void BKAudioProcessor::addNostalgicMod()
 {
-    modNostalgic.add        (new NostalgicModPreparation());
+    nostalgicModPrep.add        (new NostalgicModPreparation());
 }
 
 void BKAudioProcessor::addTuningMod()
 {
-    modTuning.add           (new TuningModPreparation());
+    tuningModPrep.add           (new TuningModPreparation());
 }
 
 void BKAudioProcessor::addTuningMod(TuningModPreparation::Ptr tmod)
 {
-    modTuning.add       (tmod);
+    tuningModPrep.add       (tmod);
 }
 
 void BKAudioProcessor::addKeymap(void)
@@ -352,10 +352,10 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
     addNostalgic();
     addDirect(); 
     
-    modSynchronic.clearQuick();
-    modNostalgic.clearQuick();
-    modDirect.clearQuick();
-    modTuning.clearQuick();
+    synchronicModPrep.clearQuick();
+    nostalgicModPrep.clearQuick();
+    directModPrep.clearQuick();
+    tuningModPrep.clearQuick();
     
     addTuningMod();
     addSynchronicMod();
@@ -835,9 +835,9 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
                     myMod->setParam(TuningScale, String(tscale));
                     
                     bool dontAdd = false; int whichTMod = 0;
-                    for (int c = modTuning.size(); --c>=0;)
+                    for (int c = tuningModPrep.size(); --c>=0;)
                     {
-                        if (myMod->compare(modTuning[c]))
+                        if (myMod->compare(tuningModPrep[c]))
                         {
                             whichTMod = c;
                             dontAdd = true;
@@ -848,7 +848,7 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
                     if (!dontAdd)
                     {
                         addTuningMod(myMod);
-                        whichTMod = modTuning.size()-1;
+                        whichTMod = tuningModPrep.size()-1;
                     }
                     
                     int whichPrep = direct[dId]->aPrep->getTuning()->getId();
@@ -897,9 +897,9 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
             myMod->setParam(TuningScale, String(tscale));
             
             bool dontAdd = false; int whichTMod = 0;
-            for (int c = modTuning.size(); --c>=0;)
+            for (int c = tuningModPrep.size(); --c>=0;)
             {
-                if (myMod->compare(modTuning[c]))
+                if (myMod->compare(tuningModPrep[c]))
                 {
                     whichTMod = c;
                     dontAdd = true;
@@ -910,7 +910,7 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
             if (!dontAdd)
             {
                 addTuningMod(myMod);
-                whichTMod = modTuning.size()-1;
+                whichTMod = tuningModPrep.size()-1;
             }
             
             int whichPrep = nostalgic[nId]->aPrep->getTuning()->getId();
@@ -943,9 +943,9 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
             myMod->setParam(TuningScale, String(tscale));
             
             bool dontAdd = false; int whichTMod = 0;
-            for (int c = modTuning.size(); --c>=0;)
+            for (int c = tuningModPrep.size(); --c>=0;)
             {
-                if (myMod->compare(modTuning[c]))
+                if (myMod->compare(tuningModPrep[c]))
                 {
                     whichTMod = c;
                     dontAdd = true;
@@ -956,7 +956,7 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
             if (!dontAdd)
             {
                 addTuningMod(myMod);
-                whichTMod = modTuning.size()-1;
+                whichTMod = tuningModPrep.size()-1;
             }
             
             int whichPrep = synchronic[sId]->aPrep->getTuning()->getId();
@@ -1029,10 +1029,10 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
             direct.clearQuick();
             tuning.clearQuick();
             
-            modSynchronic.clearQuick();
-            modNostalgic.clearQuick();
-            modDirect.clearQuick();
-            modTuning.clearQuick();
+            synchronicModPrep.clearQuick();
+            nostalgicModPrep.clearQuick();
+            directModPrep.clearQuick();
+            tuningModPrep.clearQuick();
             
             addTuning();
             addSynchronic();
@@ -1206,39 +1206,36 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                 {
                     addTuningMod();
                     
-                    int id = modTuning.size() - 1;
+                    int id = tuningModPrep.size() - 1;
                     
                     String p = "";
                     
                     p = e->getStringAttribute( ptagTuning_scale);
-                    modTuning[id]->setParam(TuningScale, p);
+                    tuningModPrep[id]->setParam(TuningScale, p);
                     
                     p = e->getStringAttribute( ptagTuning_fundamental);
-                    modTuning[id]->setParam(TuningFundamental, p);
+                    tuningModPrep[id]->setParam(TuningFundamental, p);
                     
                     p = e->getStringAttribute( ptagTuning_offset);
-                    modTuning[id]->setParam(TuningOffset, p);
+                    tuningModPrep[id]->setParam(TuningOffset, p);
                     
                     p = e->getStringAttribute( ptagTuning_adaptiveIntervalScale);
-                    modTuning[id]->setParam(TuningA1IntervalScale, p);
+                    tuningModPrep[id]->setParam(TuningA1IntervalScale, p);
                     
                     p = e->getStringAttribute( ptagTuning_adaptiveAnchorScale);
-                    modTuning[id]->setParam(TuningA1AnchorScale, p);
+                    tuningModPrep[id]->setParam(TuningA1AnchorScale, p);
                     
                     p = e->getStringAttribute( ptagTuning_adaptiveHistory);
-                    modTuning[id]->setParam(TuningA1History, p);
+                    tuningModPrep[id]->setParam(TuningA1History, p);
                     
                     p = e->getStringAttribute( ptagTuning_adaptiveInversional);
-                    modTuning[id]->setParam(TuningA1Inversional, p);
+                    tuningModPrep[id]->setParam(TuningA1Inversional, p);
                     
                     p = e->getStringAttribute( ptagTuning_adaptiveClusterThresh);
-                    modTuning[id]->setParam(TuningA1ClusterThresh, p);
+                    tuningModPrep[id]->setParam(TuningA1ClusterThresh, p);
                     
                     p = e->getStringAttribute( ptagTuning_adaptiveAnchorFund);
-                    modTuning[id]->setParam(TuningA1AnchorFundamental, p);
-                    
-                    p = e->getStringAttribute( ptagTuning_resetPrep);
-                    modTuning[id]->setParam(TuningReset, p);
+                    tuningModPrep[id]->setParam(TuningA1AnchorFundamental, p);
                     
                     // custom scale
                     forEachXmlChildElement (*e, sub)
@@ -1258,7 +1255,7 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                                 }
                             }
                             
-                            modTuning[id]->setParam(TuningCustomScale, floatArrayToString(scale));
+                            tuningModPrep[id]->setParam(TuningCustomScale, floatArrayToString(scale));
                         }
                         else if (sub->hasTagName(vTagTuning_absoluteOffsets))
                         {
@@ -1290,7 +1287,7 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                             }
                              */
                             
-                            modTuning[id]->setParam(TuningAbsoluteOffsets, abs);
+                            tuningModPrep[id]->setParam(TuningAbsoluteOffsets, abs);
                         }
                     }
                     
@@ -1372,19 +1369,19 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     
                     String p = "";
                     
-                    int id = modDirect.size()-1;
+                    int id = directModPrep.size()-1;
                     
                     p = e->getStringAttribute(ptagDirect_tuning);
-                    modDirect[id]->setParam(DirectTuning, p);
+                    directModPrep[id]->setParam(DirectTuning, p);
                     
                     p = e->getStringAttribute(ptagDirect_gain);
-                    modDirect[id]->setParam(DirectGain, p);
+                    directModPrep[id]->setParam(DirectGain, p);
                     
                     p = e->getStringAttribute(ptagDirect_hammerGain);
-                    modDirect[id]->setParam(DirectHammerGain, p);
+                    directModPrep[id]->setParam(DirectHammerGain, p);
                     
                     p = e->getStringAttribute(ptagDirect_resGain);
-                    modDirect[id]->setParam(DirectResGain, p);
+                    directModPrep[id]->setParam(DirectResGain, p);
                     
                     forEachXmlChildElement (*e, sub)
                     {
@@ -1403,13 +1400,10 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                                 }
                             }
                             
-                            modDirect[id]->setParam(DirectTransposition, floatArrayToString(transp));
+                            directModPrep[id]->setParam(DirectTransposition, floatArrayToString(transp));
                             
                         }
                     }
-                    
-                    p = e->getStringAttribute(ptagDirect_reset);
-                    modDirect[id]->setParam(DirectReset, p);
                     
                     ++dModPrepCount;
                 }
@@ -1576,49 +1570,46 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     
                     String p = "";
                     
-                    int id = modSynchronic.size() - 1;
+                    int id = synchronicModPrep.size() - 1;
                     
                     p = e->getStringAttribute(ptagSynchronic_tuning);
-                    modSynchronic[id]->setParam(SynchronicTuning, p);
+                    synchronicModPrep[id]->setParam(SynchronicTuning, p);
                     
                     p = e->getStringAttribute(ptagSynchronic_tempo);
-                    modSynchronic[id]->setParam(SynchronicTempo, p);
+                    synchronicModPrep[id]->setParam(SynchronicTempo, p);
                     
                     p = e->getStringAttribute(ptagSynchronic_numBeats);
-                    modSynchronic[id]->setParam(SynchronicNumPulses, p);
+                    synchronicModPrep[id]->setParam(SynchronicNumPulses, p);
                     
                     p = e->getStringAttribute(ptagSynchronic_clusterMin);
-                    modSynchronic[id]->setParam(SynchronicClusterMin, p);
+                    synchronicModPrep[id]->setParam(SynchronicClusterMin, p);
                     
                     p = e->getStringAttribute(ptagSynchronic_clusterMax);
-                    modSynchronic[id]->setParam(SynchronicClusterMax, p);
+                    synchronicModPrep[id]->setParam(SynchronicClusterMax, p);
                     
                     p = e->getStringAttribute(ptagSynchronic_clusterThresh);
-                    modSynchronic[id]->setParam(SynchronicClusterThresh, p);
+                    synchronicModPrep[id]->setParam(SynchronicClusterThresh, p);
                     
                     p = e->getStringAttribute(ptagSynchronic_mode);
-                    modSynchronic[id]->setParam(SynchronicMode, p);
+                    synchronicModPrep[id]->setParam(SynchronicMode, p);
                     
                     p = e->getStringAttribute(ptagSynchronic_beatsToSkip);
-                    modSynchronic[id]->setParam(SynchronicBeatsToSkip, p);
+                    synchronicModPrep[id]->setParam(SynchronicBeatsToSkip, p);
                     
                     p = e->getStringAttribute(ptagSynchronic_at1Mode);
-                    modSynchronic[id]->setParam(AT1Mode, p);
+                    synchronicModPrep[id]->setParam(AT1Mode, p);
                     
                     p = e->getStringAttribute(ptagSynchronic_at1History);
-                    modSynchronic[id]->setParam(AT1History, p);
+                    synchronicModPrep[id]->setParam(AT1History, p);
                     
                     p = e->getStringAttribute(ptagSynchronic_at1Subdivisions);
-                    modSynchronic[id]->setParam(AT1Subdivisions, p);
+                    synchronicModPrep[id]->setParam(AT1Subdivisions, p);
                     
                     p = e->getStringAttribute(ptagSynchronic_AT1Min);
-                    modSynchronic[id]->setParam(AT1Min, p);
+                    synchronicModPrep[id]->setParam(AT1Min, p);
                     
                     p = e->getStringAttribute(ptagSynchronic_AT1Max);
-                    modSynchronic[id]->setParam(AT1Max, p);
-                    
-                    p = e->getStringAttribute(ptagSynchronic_reset);
-                    modSynchronic[id]->setParam(SynchronicReset, p);
+                    synchronicModPrep[id]->setParam(AT1Max, p);
                     
                     
                     forEachXmlChildElement (*e, sub)
@@ -1639,7 +1630,7 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                                 }
                             }
                             
-                            modSynchronic[id]->setParam(SynchronicBeatMultipliers, floatArrayToString(beats));
+                            synchronicModPrep[id]->setParam(SynchronicBeatMultipliers, floatArrayToString(beats));
                             
                         }
                         else  if (sub->hasTagName(vtagSynchronic_accentMults))
@@ -1657,7 +1648,7 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                                 }
                             }
                             
-                            modSynchronic[id]->setParam(SynchronicAccentMultipliers, floatArrayToString(accents));
+                            synchronicModPrep[id]->setParam(SynchronicAccentMultipliers, floatArrayToString(accents));
                             
                         }
                         else  if (sub->hasTagName(vtagSynchronic_lengthMults))
@@ -1675,7 +1666,7 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                                 }
                             }
                             
-                            modSynchronic[id]->setParam(SynchronicLengthMultipliers, floatArrayToString(lens));
+                            synchronicModPrep[id]->setParam(SynchronicLengthMultipliers, floatArrayToString(lens));
                             
                         }
                         else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
@@ -1693,7 +1684,7 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                                 }
                             }
                             
-                            modSynchronic[id]->setParam(SynchronicTranspOffsets, floatArrayToString(transp));
+                            synchronicModPrep[id]->setParam(SynchronicTranspOffsets, floatArrayToString(transp));
                         }
                     }
                     
@@ -1791,16 +1782,16 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     
                     String p = "";
                     
-                    int id = modNostalgic.size() - 1;
+                    int id = nostalgicModPrep.size() - 1;
                     
                     p = e->getStringAttribute(ptagNostalgic_tuning);
-                    modNostalgic[id]->setParam(NostalgicTuning, p);
+                    nostalgicModPrep[id]->setParam(NostalgicTuning, p);
                     
                     p = e->getStringAttribute(ptagNostalgic_waveDistance);
-                    modNostalgic[id]->setParam(NostalgicWaveDistance, p);
+                    nostalgicModPrep[id]->setParam(NostalgicWaveDistance, p);
                     
                     p = e->getStringAttribute(ptagNostalgic_undertow);
-                    modNostalgic[id]->setParam(NostalgicUndertow, p);
+                    nostalgicModPrep[id]->setParam(NostalgicUndertow, p);
                     
                     forEachXmlChildElement (*e, sub)
                     {
@@ -1819,28 +1810,25 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                                 }
                             }
                             
-                            modNostalgic[id]->setParam(NostalgicTransposition, floatArrayToString(transp));
+                            nostalgicModPrep[id]->setParam(NostalgicTransposition, floatArrayToString(transp));
                             
                         }
                     }
                     
                     p = e->getStringAttribute(ptagNostalgic_lengthMultiplier);
-                    modNostalgic[id]->setParam(NostalgicLengthMultiplier, p);
+                    nostalgicModPrep[id]->setParam(NostalgicLengthMultiplier, p);
                     
                     p = e->getStringAttribute(ptagNostalgic_beatsToSkip);
-                    modNostalgic[id]->setParam(NostalgicBeatsToSkip, p);
+                    nostalgicModPrep[id]->setParam(NostalgicBeatsToSkip, p);
                     
                     p = e->getStringAttribute(ptagNostalgic_gain);
-                    modNostalgic[id]->setParam(NostalgicGain, p);
+                    nostalgicModPrep[id]->setParam(NostalgicGain, p);
                     
                     p = e->getStringAttribute(ptagNostalgic_mode);
-                    modNostalgic[id]->setParam(NostalgicMode, p);
+                    nostalgicModPrep[id]->setParam(NostalgicMode, p);
                     
                     p = e->getStringAttribute(ptagNostalgic_syncTarget);
-                    modNostalgic[id]->setParam(NostalgicSyncTarget, p);
-                    
-                    p = e->getStringAttribute(ptagNostalgic_reset);
-                    modNostalgic[id]->setParam(NostalgicReset, p);
+                    nostalgicModPrep[id]->setParam(NostalgicSyncTarget, p);
                     
                     ++nModPrepCount;
                 }
@@ -1928,12 +1916,12 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                         }
                         else if (pc->hasTagName( vtagModDirect + String(modDirectCount)))
                         {
-                            // ModDirect
+                            // directModPrep
                             int k = pc->getStringAttribute(ptagModX_key).getIntValue();
                             int modPrep = pc->getStringAttribute(ptagModX_modPrep).getIntValue();
                             int prep = pc->getStringAttribute(ptagModX_prep).getIntValue();
                             
-                            DirectModPreparation::Ptr thisMod = modDirect[modPrep];
+                            DirectModPreparation::Ptr thisMod = directModPrep[modPrep];
                             
                             for (int z = 1; z < thisMod->getStringArray().size() ;z++)
                             {
@@ -1949,12 +1937,12 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                         }
                         else if (pc->hasTagName( vtagModSynchronic + String(modSynchronicCount)))
                         {
-                            // ModSynchronic
+                            // synchronicModPrep
                             int k = pc->getStringAttribute(ptagModX_key).getIntValue();
                             int modPrep = pc->getStringAttribute(ptagModX_modPrep).getIntValue();
                             int prep = pc->getStringAttribute(ptagModX_prep).getIntValue();
                             
-                            SynchronicModPreparation::Ptr thisMod = modSynchronic[modPrep];
+                            SynchronicModPreparation::Ptr thisMod = synchronicModPrep[modPrep];
                             
                             for (int z = 1; z < thisMod->getStringArray().size() ;z++)
                             {
@@ -1970,12 +1958,12 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                         }
                         else if (pc->hasTagName( vtagModNostalgic + String(modNostalgicCount)))
                         {
-                            // ModNostalgic
+                            // nostalgicModPrep
                             int k = pc->getStringAttribute(ptagModX_key).getIntValue();
                             int modPrep = pc->getStringAttribute(ptagModX_modPrep).getIntValue();
                             int prep = pc->getStringAttribute(ptagModX_prep).getIntValue();
                             
-                            NostalgicModPreparation::Ptr thisMod = modNostalgic[modPrep];
+                            NostalgicModPreparation::Ptr thisMod = nostalgicModPrep[modPrep];
                             
                             for (int z = 1; z < thisMod->getStringArray().size() ;z++)
                             {
@@ -1992,12 +1980,12 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                         }
                         else if (pc->hasTagName( vtagModTuning + String(modTuningCount)))
                         {
-                            // ModTuning
+                            // tuningModPrep
                             int k = pc->getStringAttribute(ptagModX_key).getIntValue();
                             int modPrep = pc->getStringAttribute(ptagModX_modPrep).getIntValue();
                             int prep = pc->getStringAttribute(ptagModX_prep).getIntValue();
                             
-                            TuningModPreparation::Ptr thisMod = modTuning[modPrep];
+                            TuningModPreparation::Ptr thisMod = tuningModPrep[modPrep];
                             
                             for (int z = 1; z < thisMod->getStringArray().size();z++)
                             {
@@ -2074,13 +2062,13 @@ ScopedPointer<XmlElement>  BKAudioProcessor::saveGallery(void)
     
     for (int i = 0; i < nostalgic.size(); i++) galleryVT.addChild(nostalgic[i]->getState(), -1, 0);
     
-    for (int i = 0; i < modTuning.size(); i++) galleryVT.addChild(modTuning[i]->getState(i), -1, 0);
+    for (int i = 0; i < tuningModPrep.size(); i++) galleryVT.addChild(tuningModPrep[i]->getState(i), -1, 0);
     
-    for (int i = 0; i < modDirect.size(); i++) galleryVT.addChild(modDirect[i]->getState(i), -1, 0);
+    for (int i = 0; i < directModPrep.size(); i++) galleryVT.addChild(directModPrep[i]->getState(i), -1, 0);
     
-    for (int i = 0; i < modSynchronic.size(); i++) galleryVT.addChild(modSynchronic[i]->getState(i), -1, 0);
+    for (int i = 0; i < synchronicModPrep.size(); i++) galleryVT.addChild(synchronicModPrep[i]->getState(i), -1, 0);
     
-    for (int i = 0; i < modNostalgic.size(); i++) galleryVT.addChild(modNostalgic[i]->getState(i), -1, 0);
+    for (int i = 0; i < nostalgicModPrep.size(); i++) galleryVT.addChild(nostalgicModPrep[i]->getState(i), -1, 0);
     
     for (int i = 0; i < bkKeymaps.size(); i++) galleryVT.addChild(bkKeymaps[i]->getState(i), -1, 0);
     
@@ -2251,6 +2239,14 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
 }
 
+void BKAudioProcessor::performResets(int noteNumber)
+{
+    
+    for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->directReset)      direct[prep]->reset();
+    for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->synchronicReset)  synchronic[prep]->reset();
+    for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->nostalgicReset)   nostalgic[prep]->reset();
+    for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->tuningReset)      tuning[prep]->reset();
+}
 
 void BKAudioProcessor::performModifications(int noteNumber)
 {
@@ -2289,8 +2285,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         
         //first do reset, if active, then the rest; enables clearing then modifying from orig
         // ** actually, this doesn't work yet; need to establish order of modifications and try to put reset first
-        if (type == TuningReset)                    tuning[tMod[i]->getPrepId()]->reset();
-        else if (type == TuningScale)               active->setTuning((TuningSystem)modi);
+        if (type == TuningScale)               active->setTuning((TuningSystem)modi);
         else if (type == TuningFundamental)         active->setFundamental((PitchClass)modi);
         else if (type == TuningOffset)              active->setFundamentalOffset(modf);
         else if (type == TuningA1IntervalScale)     active->setAdaptiveIntervalScale((TuningSystem)modi);
@@ -2322,9 +2317,6 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modi = dMod[i]->getModInt();
         modia = dMod[i]->getModIntArr();
         
-        //first do reset, if active, then the rest; enables clearing then modifying from orig
-        if (type == DirectReset) direct[dMod[i]->getPrepId()]->reset();
-        
         if (type == DirectTransposition)    active->setTransposition(modfa);
         else if (type == DirectGain)        active->setGain(modf);
         else if (type == DirectHammerGain)  active->setHammerGain(modf);
@@ -2344,9 +2336,6 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modf = nMod[i]->getModFloat();
         modi = nMod[i]->getModInt();
         modia = nMod[i]->getModIntArr();
-        
-        //first do reset, if active, then the rest; enables clearing then modifying from orig
-        if (type == NostalgicReset)      nostalgic[nMod[i]->getPrepId()]->reset();
         
         if (type == NostalgicTransposition)         active->setTransposition(modfa);
         else if (type == NostalgicGain)             active->setGain(modf);
@@ -2371,8 +2360,6 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modfa = sMod[i]->getModFloatArr();
         modafa = sMod[i]->getModArrFloatArr();
         modia = sMod[i]->getModIntArr();
-        
-        if (type == SynchronicReset)         synchronic[sMod[i]->getPrepId()]->reset();
         
         if (type == SynchronicTranspOffsets)            active->setTransposition(modafa);
         else if (type == SynchronicTempo)               active->setTempo(modf);
@@ -2438,6 +2425,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
              */
             
             // modifications
+            performResets(noteNumber);
             performModifications(noteNumber);
             
             // Send key on to each pmap in current piano

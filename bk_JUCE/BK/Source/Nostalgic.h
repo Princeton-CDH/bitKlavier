@@ -209,7 +209,6 @@ public:
      NostalgicBeatsToSkip,
      NostalgicMode,
      NostalgicSyncTarget,
-     NostalgicReset,
      NostalgicParameterTypeNil
      
      */
@@ -227,7 +226,6 @@ public:
         param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
         param.set(NostalgicMode, String(p->getMode()));
         param.set(NostalgicSyncTarget, String(p->getSyncTarget()));
-        //param.set(NostalgicReset, intArrayToString(p->getResetMap()->keys()));
         
     }
     
@@ -243,7 +241,6 @@ public:
         param.set(NostalgicBeatsToSkip, "");
         param.set(NostalgicMode, "");
         param.set(NostalgicSyncTarget, "");
-        param.set(NostalgicReset, "");
     }
     
     inline ValueTree getState(int Id)
@@ -289,22 +286,6 @@ public:
         p = getParam(NostalgicSyncTarget);
         if (p != String::empty) prep.setProperty( ptagNostalgic_syncTarget,         p.getIntValue(), 0);
         
-        p = getParam(NostalgicReset);
-        if (p != String::empty) prep.setProperty( ptagNostalgic_reset,         p.getIntValue(), 0);
-        
-        /*
-        ValueTree resetMap(ptagNostalgic_reset);
-        int count = 0;
-        p = getParam(NostalgicReset);
-        if (p != String::empty)
-        {
-            Array<int> rmap = stringToIntArray(p);
-            for (auto note : rmap)
-                resetMap.setProperty( ptagInt + String(count++), note, 0 );
-        }
-        prep.addChild(resetMap, -1, 0);
-        */
-        
         return prep;
     }
     
@@ -325,7 +306,6 @@ public:
         param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
         param.set(NostalgicMode, String(p->getMode()));
         param.set(NostalgicSyncTarget, String(p->getSyncTarget()));
-        //param.set(NostalgicReset, intArrayToString(p->getResetMap()->keys()));
     }
     
     inline const StringArray getStringArray(void) { return param; }

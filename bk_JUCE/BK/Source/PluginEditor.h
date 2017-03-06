@@ -79,6 +79,7 @@ private:
     
     String                              processPianoMapString(const String& message);
     String                              processModMapString(const String& message);
+    String                              processResetMapString(const String& message);
     
     TextButton                          addPMapButton;
     TextButton                          removePMapButton;
@@ -102,6 +103,9 @@ private:
     
     BKLabel                             modMapL;
     BKTextField                         modMapTF;
+    
+    BKLabel                             resetMapL;
+    BKTextField                         resetMapTF;
     
     int timerCallbackCount;
     

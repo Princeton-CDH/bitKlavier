@@ -116,7 +116,7 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
     
     DirectPreparation::Ptr prep = processor.direct[currentDirectId]->sPrep;
     DirectPreparation::Ptr active = processor.direct[currentDirectId]->aPrep;
-    DirectModPreparation::Ptr mod = processor.modDirect[currentModDirectId];
+    DirectModPreparation::Ptr mod = processor.directModPrep[currentModDirectId];
     
     if (name == cDirectParameterTypes[DirectId])
     {
@@ -140,7 +140,7 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            int numDMod = processor.modDirect.size();
+            int numDMod = processor.directModPrep.size();
             
             if ((i+1) > numDMod)
             {
@@ -228,22 +228,6 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
                 tf.setText("0", false);
         }
     }
-    else if (name == cDirectParameterTypes[DirectReset])
-    {
-        if (type == BKParameter)
-        {
-            // ** do nothing here, Mod only
-            //Array<int> keys = stringToIntArray(text);
-            //prep->getResetMap()->setKeymap(keys);
-            //active->getResetMap()->setKeymap(keys);
-            //directTF[DirectReset]->setText(intArrayToString(prep->getResetMap()->keys()));
-        }
-        else    //BKModification
-        {
-            mod->setParam(DirectReset, text);
-            DBG("set direct resetkeymap mod to: " + text);
-        }
-    }
     else
     {
         DBG("Unregistered text field entered input.");
@@ -261,20 +245,18 @@ void DirectViewController::updateFields(void)
     directTF[DirectHammerGain]          ->setText( String( prep->getHammerGain()), false);
     directTF[DirectResGain]             ->setText( String( prep->getResonanceGain()), false);
     directTF[DirectTuning]              ->setText( String( prep->getTuning()->getId()), false);
-    //directTF[DirectReset]         ->setText( intArrayToString(prep->getResetMap()->keys()), false);
 
 }
 
 void DirectViewController::updateModFields(void)
 {
-    DirectModPreparation::Ptr prep = processor.modDirect[currentModDirectId];
+    DirectModPreparation::Ptr prep = processor.directModPrep[currentModDirectId];
     
     modDirectTF[DirectTransposition]       ->setText( prep->getParam(DirectTransposition), false);
     modDirectTF[DirectGain]                ->setText( prep->getParam(DirectGain), false);
     modDirectTF[DirectHammerGain]          ->setText( prep->getParam(DirectHammerGain), false);
     modDirectTF[DirectResGain]             ->setText( prep->getParam(DirectResGain), false);
     modDirectTF[DirectTuning]              ->setText( prep->getParam(DirectTuning), false);
-    modDirectTF[DirectReset]         ->setText( prep->getParam(DirectReset), false);
     
 }
 

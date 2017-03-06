@@ -65,10 +65,11 @@ public:
     Nostalgic::PtrArr                   nostalgic;
     Direct::PtrArr                      direct;
     
-    SynchronicModPreparation::PtrArr    modSynchronic;
-    DirectModPreparation::PtrArr        modDirect;
-    NostalgicModPreparation::PtrArr     modNostalgic;
-    TuningModPreparation::PtrArr        modTuning;
+    SynchronicModPreparation::PtrArr    synchronicModPrep;
+    DirectModPreparation::PtrArr        directModPrep;
+    NostalgicModPreparation::PtrArr     nostalgicModPrep;
+    TuningModPreparation::PtrArr        tuningModPrep;
+    
     
     Piano::Ptr                          prevPiano;
     Piano::Ptr                          currentPiano;
@@ -147,6 +148,7 @@ public:
     
     void  setCurrentPiano(int which);
     void  performModifications(int noteNumber);
+    void  performResets(int noteNumber);
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override;

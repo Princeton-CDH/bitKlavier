@@ -17,7 +17,7 @@
 #include "BKUtilities.h"
 
 #include "PreparationMap.h"
-#include "ModificationMap.h"
+#include "Modifications.h"
 
 #include "Keymap.h"
 
@@ -70,12 +70,20 @@ public:
     Array<int>                  pianoMap;
     int                         numPMaps;
     
-    OwnedArray<ModificationMap> modMap;
+    OwnedArray<Modifications> modMap;
     void clearModMap(void)
     {
         for (int i = 0; i<modMap.size(); i++)
         {
             modMap[i]->clearModifications();
+        }
+    }
+    
+    void clearResetMap(void)
+    {
+        for (int i = 0; i<modMap.size(); i++)
+        {
+            modMap[i]->clearResets();
         }
     }
     

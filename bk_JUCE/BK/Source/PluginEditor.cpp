@@ -64,6 +64,14 @@ timerCallbackCount(0)
     modMapTF.setName("ModMap");
     pvc->addAndMakeVisible(modMapTF);
     
+    resetMapL.setName("ResetMap");
+    resetMapL.setText("ResetMap", NotificationType::dontSendNotification);
+    pvc->addAndMakeVisible(resetMapL);
+    
+    resetMapTF.addListener(this);
+    resetMapTF.setName("ResetMap");
+    pvc->addAndMakeVisible(resetMapTF);
+    
     pianoL.setName(cPianoParameterTypes[0]);
     pianoL.setText(cPianoParameterTypes[0], NotificationType::dontSendNotification);
     pvc->addAndMakeVisible(pianoL);
@@ -258,7 +266,7 @@ void BKAudioProcessorEditor::paint (Graphics& g)
 void BKAudioProcessorEditor::resized()
 {
     float loadvcH = (20 + gYSpacing) + 1.5 * gYSpacing;
-    float pvcH = 5 * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
+    float pvcH = 6 * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float kvcH = cKeymapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float gvcH = cGeneralParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float svcH = cSynchronicParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
@@ -307,6 +315,8 @@ void BKAudioProcessorEditor::resized()
     modMapL     .setTopLeftPosition(0,                                  pianoMapL.getBottom() + gYSpacing);
     modMapTF    .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   modMapL.getY());
     
+    resetMapL     .setTopLeftPosition(0,                                  modMapL.getBottom() + gYSpacing);
+    resetMapTF    .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   resetMapL.getY());
     
     upperLeft = loadvc->getBounds();
     
@@ -452,6 +462,150 @@ String BKAudioProcessorEditor::processPianoMapString(const String& s)
     return out;
 }
 
+String BKAudioProcessorEditor::processResetMapString(const String& s)
+{
+    String out = "";
+    String rest = s;
+    
+    Array<int> keys;
+    
+    while (rest != "")
+    {
+        keys.clearQuick();
+        
+        String rmap = rest.upToFirstOccurrenceOf(" ", false, true);
+        if (rmap.contains("{"))
+        {
+            rmap =  rest.upToFirstOccurrenceOf("}", true, false);
+        }
+        
+        DBG("rmap: " + rmap);
+        
+        String keyPart = rmap.upToFirstOccurrenceOf(":", false, true);
+        DBG("keyPart: " + keyPart);
+        
+        if (keyPart.contains("k"))
+        {
+            int whichKeymap = keyPart.fromLastOccurrenceOf("k", false, true).getIntValue();
+            keys = processor.bkKeymaps[whichKeymap]->keys();
+            
+        }
+        else
+        {
+            keys.add( keyPart.getIntValue());
+        }
+        
+        String temp = rmap.substring(keyPart.length()+1);
+        
+        String prepPart = temp.fromFirstOccurrenceOf("{", false, true).upToLastOccurrenceOf("}", false, true);
+        
+        if (prepPart == "") prepPart = temp;
+        
+        DBG("prepPart: " + prepPart);
+        
+        
+        
+        juce_wchar synchronicLC = 's';
+        juce_wchar synchronicUC = 'S';
+        juce_wchar nostalgicLC = 'n';
+        juce_wchar nostalgicUC = 'N';
+        juce_wchar tuningLC = 't';
+        juce_wchar tuningUC = 'T';
+        juce_wchar directLC = 'd';
+        juce_wchar directUC = 'D';
+        
+        bool isSynchronic = false, inSynchronic = false;
+        bool isNostalgic = false, inNostalgic = false;
+        bool isDirect = false, inDirect = false;
+        bool isTuning = false, inTuning = false;
+        
+        bool isNumber = false;
+        
+        
+        String num = "";
+        
+        String::CharPointerType c = prepPart.getCharPointer();
+        
+        for (int i = 0; i < (prepPart.length()+1); i++)
+        {
+            juce_wchar c1 = c.getAndAdvance();
+            
+            isSynchronic   = !CharacterFunctions::compare(c1, synchronicLC) ||  !CharacterFunctions::compare(c1, synchronicUC);
+            isNostalgic    = !CharacterFunctions::compare(c1, nostalgicLC)  ||  !CharacterFunctions::compare(c1, nostalgicUC);
+            isDirect       = !CharacterFunctions::compare(c1, directLC)     ||  !CharacterFunctions::compare(c1, directUC);
+            isTuning       = !CharacterFunctions::compare(c1, tuningLC)     ||  !CharacterFunctions::compare(c1, tuningUC);
+            isNumber       = CharacterFunctions::isDigit(c1);
+            
+            if (isNumber) num += c1;
+            else
+            {
+                if (isSynchronic)        inSynchronic    = true;
+                else if (isNostalgic)    inNostalgic     = true;
+                else if (isDirect)       inDirect        = true;
+                else if (isTuning)       inTuning        = true;
+                else if (inSynchronic)
+                {
+                    int whichPrep = num.getIntValue();
+                    for (auto k : keys)
+                    {
+                        out += String(k) + ":" + "s" + String(whichPrep) + " ";
+                        processor.currentPiano->modMap[k]->synchronicReset.add(whichPrep);
+                    }
+                    
+                    num = "";
+                    inSynchronic = false;
+                    
+                }
+                else if (inNostalgic)
+                {
+                    int whichPrep = num.getIntValue();
+                    for (auto k : keys)
+                    {
+                        out += String(k) + ":" + "n" + String(whichPrep) + " ";
+                        processor.currentPiano->modMap[k]->nostalgicReset.add(whichPrep);
+                    }
+                    
+                    num = "";
+                    inNostalgic = false;
+                }
+                else if (inDirect)
+                {
+                    int whichPrep = num.getIntValue();
+                    for (auto k : keys)
+                    {
+                        out += String(k) + ":" + "d" + String(whichPrep) + " ";
+                        processor.currentPiano->modMap[k]->directReset.add(whichPrep);
+                    }
+                    
+                    num = "";
+                    inDirect = false;
+                }
+                else if (inTuning)
+                {
+                    int whichPrep = num.getIntValue();
+                    for (auto k : keys)
+                    {
+                        out += String(k) + ":" + "t" + String(whichPrep) + " ";
+                        processor.currentPiano->modMap[k]->tuningReset.add(whichPrep);
+                    }
+                    
+                    num = "";
+                    inTuning = false;
+                }
+                
+                num = "";
+            }
+            
+        }
+        
+        rest = rest.substring(rmap.length()+1);
+
+    }
+    
+    
+    return out;
+}
+
 String BKAudioProcessorEditor::processModMapString(const String& s)
 {
     String temp = "";
@@ -583,7 +737,7 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                     {
                         out += (String(key) + ":dm" +String(whichMod) + ":" + "{" + intArrayToString(whichPreps) + "} ");
                         
-                        DirectModPreparation::Ptr dmod = processor.modDirect[whichMod];
+                        DirectModPreparation::Ptr dmod = processor.directModPrep[whichMod];
                         
                         for (int n = cDirectParameterTypes.size(); --n >= 0; )
                         {
@@ -603,7 +757,7 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                     {
                         out += (String(key) + ":nm" +String(whichMod) + ":" + "{" + intArrayToString(whichPreps) + "} ");
                         
-                        NostalgicModPreparation::Ptr nmod = processor.modNostalgic[whichMod];
+                        NostalgicModPreparation::Ptr nmod = processor.nostalgicModPrep[whichMod];
                         
                         for (int n = cNostalgicParameterTypes.size(); --n >= 0; )
                         {
@@ -624,7 +778,7 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                     {
                         out += (String(key) + ":sm" +String(whichMod) + ":" + "{" + intArrayToString(whichPreps) + "} ");
                         
-                        SynchronicModPreparation::Ptr smod = processor.modSynchronic[whichMod];
+                        SynchronicModPreparation::Ptr smod = processor.synchronicModPrep[whichMod];
                         
                         for (int n = cSynchronicParameterTypes.size(); --n >= 0; )
                         {
@@ -645,7 +799,7 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                     {
                         out += (String(key) + ":tm" +String(whichMod) + ":" + "{" + intArrayToString(whichPreps) + "} ");
                         
-                        TuningModPreparation::Ptr tmod = processor.modTuning[whichMod];
+                        TuningModPreparation::Ptr tmod = processor.tuningModPrep[whichMod];
                         
                         for (int n = cTuningParameterTypes.size(); --n >= 0; )
                         {
@@ -735,6 +889,10 @@ void BKAudioProcessorEditor::bkTextFieldDidChange(TextEditor& tf)
     else if (name == "ModMap")
     {
         tf.setText(processModMapString(text), false);
+    }
+    else if (name == "ResetMap")
+    {
+        tf.setText(processResetMapString(text), false);
     }
     else if (name == "PianoName")
     {

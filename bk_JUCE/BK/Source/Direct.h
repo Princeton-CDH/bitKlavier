@@ -144,7 +144,6 @@ public:
     DirectGain,
     DirectResGain,
     DirectHammerGain,
-    DirectReset,
     DirectParameterTypeNil,
      */
     
@@ -157,7 +156,6 @@ public:
         param.set(DirectGain, String(p->getGain()));
         param.set(DirectResGain, String(p->getResonanceGain()));
         param.set(DirectHammerGain, String(p->getHammerGain()));
-        param.set(DirectReset, "");
         
     }
     
@@ -203,22 +201,6 @@ public:
         p = getParam(DirectHammerGain);
         if (p != String::empty) prep.setProperty( ptagDirect_hammerGain,        p.getFloatValue(), 0);
         
-        p = getParam(DirectReset);
-        if (p != String::empty) prep.setProperty( ptagDirect_reset,             p.getIntValue(), 0);
-        
-        /*
-        ValueTree resetMap(ptagDirect_reset);
-        int count = 0;
-        p = getParam(DirectReset);
-        if (p != String::empty)
-        {
-            Array<int> rmap = stringToIntArray(p);
-            for (auto note : rmap)
-                resetMap.setProperty( ptagInt + String(count++), note, 0 );
-        }
-        prep.addChild(resetMap, -1, 0);
-         */
-        
         return prep;
     }
     
@@ -234,7 +216,6 @@ public:
         param.set(DirectGain, String(d->getGain()));
         param.set(DirectResGain, String(d->getResonanceGain()));
         param.set(DirectHammerGain, String(d->getHammerGain()));
-        //param.set(DirectReset, intArrayToString(d->getResetMap()->keys()));
     }
     
     

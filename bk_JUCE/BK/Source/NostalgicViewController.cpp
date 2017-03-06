@@ -122,7 +122,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
     
     NostalgicPreparation::Ptr active = processor.nostalgic[currentNostalgicId]->aPrep;
     
-    NostalgicModPreparation::Ptr mod = processor.modNostalgic[currentModNostalgicId];
+    NostalgicModPreparation::Ptr mod = processor.nostalgicModPrep[currentModNostalgicId];
     
     if (name == cNostalgicParameterTypes[NostalgicId])
     {
@@ -147,7 +147,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            int numMod = processor.modNostalgic.size();
+            int numMod = processor.nostalgicModPrep.size();
             
             if ((i+1) > numMod)
             {
@@ -289,22 +289,6 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
                 tf.setText("0", false);
         }
     }
-    else if (name == cNostalgicParameterTypes[NostalgicReset])
-    {
-        if (type == BKParameter)
-        {
-            // ** nothing here, Mod only
-            //Array<int> keys = stringToIntArray(text);
-            //prep->getResetMap()->setKeymap(keys);
-            //active->getResetMap()->setKeymap(keys);
-            //nostalgicTF[NostalgicReset]->setText(intArrayToString(prep->getResetMap()->keys()));
-        }
-        else    //BKModification
-        {
-            mod->setParam(NostalgicReset, text);
-            DBG("set nostalgic resetkeymap mod to: " + text);
-        }
-    }
     else
     {
         DBG("Unregistered text field entered input.");
@@ -325,13 +309,12 @@ void NostalgicViewController::updateFields(void)
     nostalgicTF[NostalgicMode]              ->setText( String( prep->getMode()), false);
     nostalgicTF[NostalgicSyncTarget]        ->setText( String( prep->getSyncTarget()), false);
     nostalgicTF[NostalgicTuning]            ->setText( String(prep->getTuning()->getId()), false);
-    //nostalgicTF[NostalgicReset]       ->setText( intArrayToString(prep->getResetMap()->keys()), false);
 }
 
 void NostalgicViewController::updateModFields(void)
 {
     
-    NostalgicModPreparation::Ptr prep = processor.modNostalgic[currentModNostalgicId];
+    NostalgicModPreparation::Ptr prep = processor.nostalgicModPrep[currentModNostalgicId];
     
     modNostalgicTF[NostalgicWaveDistance]      ->setText( prep->getParam(NostalgicWaveDistance), false);
     modNostalgicTF[NostalgicUndertow]          ->setText( prep->getParam(NostalgicUndertow), false);
@@ -342,7 +325,6 @@ void NostalgicViewController::updateModFields(void)
     modNostalgicTF[NostalgicMode]              ->setText( prep->getParam(NostalgicMode), false);
     modNostalgicTF[NostalgicSyncTarget]        ->setText( prep->getParam(NostalgicSyncTarget), false);
     modNostalgicTF[NostalgicTuning]            ->setText( prep->getParam(NostalgicTuning), false);
-    modNostalgicTF[NostalgicReset]       ->setText( prep->getParam(NostalgicReset), false);
 }
 
 void NostalgicViewController::bkMessageReceived (const String& message)

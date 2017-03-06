@@ -267,7 +267,6 @@ public:
         param.set(TuningA1History, String(p->getAdaptiveHistory()));
         param.set(TuningCustomScale, floatArrayToString(p->getCustomScale()));
         param.set(TuningAbsoluteOffsets, floatArrayToString(p->getAbsoluteOffsets()));
-        //param.set(TuningReset, intArrayToString(p->getResetMap()->keys()));
         
     }
     
@@ -285,7 +284,6 @@ public:
         param.set(TuningA1History, "");
         param.set(TuningCustomScale, "");
         param.set(TuningAbsoluteOffsets, "");
-        param.set(TuningReset, "");
     }
     
     
@@ -307,7 +305,6 @@ public:
         param.set(TuningA1History, String(p->getAdaptiveHistory()));
         param.set(TuningCustomScale, floatArrayToString(p->getCustomScale()));
         param.set(TuningAbsoluteOffsets, offsetArrayToString(p->getAbsoluteOffsets()));
-        //param.set(TuningReset, intArrayToString(p->getResetMap()->keys()));
     }
     
     inline bool compare(TuningModPreparation::Ptr t)
@@ -357,9 +354,6 @@ public:
         p = getParam(TuningA1History);
         if (p != String::empty) prep.setProperty( ptagTuning_adaptiveHistory,       p.getIntValue(), 0 );
         
-        p = getParam(TuningReset);
-        if (p != String::empty) prep.setProperty( ptagTuning_resetPrep,       p.getIntValue(), 0 );
-        
         ValueTree scale( vtagTuning_customScale);
         int count = 0;
         p = getParam(TuningCustomScale);
@@ -384,20 +378,7 @@ public:
             }
         }
         prep.addChild(absolute, -1, 0);
-        
-        /*
-        ValueTree resetMap( vtagTuning_resetPrep);
-        count = 0;
-        p = getParam(TuningReset);
-        if (p != String::empty)
-        {
-            Array<int> rmap = stringToIntArray(p);
-            for (auto note : rmap)
-                resetMap.setProperty( ptagInt + String(count++), note, 0 );
-        }
-        prep.addChild(resetMap, -1, 0);
-         */
-        
+
         return prep;
     }
     
