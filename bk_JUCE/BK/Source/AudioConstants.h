@@ -151,6 +151,7 @@ const String ptagTempo_AT1History = "AT1History";
 const String ptagTempo_AT1Subdivisions = "AT1Subdivisions";
 const String ptagTempo_AT1Min = "AT1Min";
 const String ptagTempo_AT1Max = "AT1Max";
+const String ptagTempo_AT1Mode = "AT1Mode";
 
 
 const String vtagKeymaps = "keymaps";
@@ -327,11 +328,6 @@ static const std::vector<std::string> cGeneralParameterTypes = {
 };
 
 #pragma mark - Synchronic
-typedef enum AdaptiveTempo1Mode {
-    TimeBetweenNotes,
-    NoteLength,
-    AdaptiveTempo1ModeNil
-}AdaptiveTempo1Mode;
 
 typedef enum SynchronicSyncMode {
     FirstNoteOnSync = 0,
@@ -520,16 +516,24 @@ static const std::vector<std::string> cTuningParameterTypes = {
     "AbsoluteOffsets"
 };
 
+
 #pragma mark - Tempo
+typedef enum AdaptiveTempo1Mode {
+    TimeBetweenNotes,
+    NoteLength,
+    AdaptiveTempo1ModeNil
+} AdaptiveTempo1Mode;
+
 typedef enum TempoParameterType
 {
     TempoId = 0,
-    Tempo,
-    TempoMode,
+    TempoBPM,
+    TempoSystem,
     AT1History,
     AT1Subdivisions,
     AT1Min,
     AT1Max,
+    AT1Mode,
     TempoParameterTypeNil
     
 } TempoParameterType;
@@ -541,7 +545,8 @@ static const std::vector<BKParameterDataType> cTempoDataTypes = {
     BKInt,
     BKFloat,
     BKFloat,
-    BKFloat
+    BKFloat,
+    BKInt
 };
 
 static const std::vector<std::string> cTempoParameterTypes = {
@@ -551,7 +556,8 @@ static const std::vector<std::string> cTempoParameterTypes = {
     "AT1History",
     "AT1Subdivs",
     "AT1Min",
-    "AT1Max"
+    "AT1Max",
+    "AT1Mode"
 };
 
 #pragma mark - PrepMap
@@ -673,11 +679,11 @@ typedef enum TuningSystem {
 
 } TuningSystem;
 
-typedef enum TempoSystem {
+typedef enum TempoType {
     ConstantTempo = 0,
     AdaptiveTempo1,
     TempoSystemNil
     
-} TempoSystem;
+} TempoType;
 
 #endif  // AUDIOCONSTANTS_H_INCLUDED

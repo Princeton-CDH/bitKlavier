@@ -161,7 +161,7 @@ void BKAudioProcessor::addKeymap(Keymap::Ptr k)
 void BKAudioProcessor::addSynchronic(void)
 {
     int numSynchronic = synchronic.size();
-    synchronic.add(new Synchronic(&mainPianoSynth, tuning[0], general, updateState, numSynchronic));
+    synchronic.add(new Synchronic(&mainPianoSynth, tuning[0], tempo[0], general, updateState, numSynchronic));
     synchronic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
@@ -273,14 +273,14 @@ int  BKAudioProcessor::addTuningIfNotAlreadyThere(TuningPreparation::Ptr tune)
 void BKAudioProcessor::addTempo(void)
 {   
     int numTempo = tempo.size();
-    tempo.add(new class Tempo(numTempo)); //why do we have to add "class" to this but not to the addTuning function?
+    tempo.add(new Tempo(numTempo));
     tempo.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 void BKAudioProcessor::addTempo(TempoPreparation::Ptr tmp)
 {
     int numTempo = tempo.size();
-    tempo.add(new class Tempo(tmp, numTempo));
+    tempo.add(new Tempo(tmp, numTempo));
     tempo.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
@@ -427,7 +427,7 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
     
     var pianos = pattr.getProperty("slots", "");
 
-    int sId,nId,dId,tId;
+    int sId,nId,dId,tId,oId;
     Array<int> keys; var kvar;  bool isLayer; bool isOld = true; int modTuningCount = 1;
     
     
@@ -547,14 +547,15 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
                     TuningSystem metroTuning = (TuningSystem)int(jsonGetValue("synchronic::metroTuningMenu"));
                     
                     TuningPreparation::Ptr tunePrep = new TuningPreparation(defaultTuning);
-                    
                     tunePrep->setTuning(metroTuning);
-                    
                     tunePrep->setFundamental((PitchClass)((12-metroFundamental)%12));
-                    
                     tId = addTuningIfNotAlreadyThere(tunePrep);
                     
-                    SynchronicPreparation::Ptr syncPrep = new SynchronicPreparation(tuning[tId]);
+                    TempoPreparation::Ptr tempoPrep = new TempoPreparation();
+                    tempoPrep->setTempo(120);
+                    oId = addTempoIfNotAlreadyThere(tempoPrep);
+                    
+                    SynchronicPreparation::Ptr syncPrep = new SynchronicPreparation(tuning[tId], tempo[oId]);
                     
                     Array<float> lens;
                     var lm = jsonGetProperty(sx+"NoteLengthMultList");

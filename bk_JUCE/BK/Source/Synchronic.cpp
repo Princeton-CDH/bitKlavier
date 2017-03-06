@@ -29,6 +29,7 @@ tuner(active->getTuning()->processor)
     clusterTimer = 0;
     phasor = 0;
     
+    /*
     atTimer = 0;
     atLastTime = 0;
     atDeltaHistory.ensureStorageAllocated(10);
@@ -37,7 +38,8 @@ tuner(active->getTuning()->processor)
         atDeltaHistory.insert(0, (60000.0/active->getTempo()));
     }
     adaptiveTempoPeriodMultiplier = 1.;
-    
+    */
+     
     inCluster = false;
     
     cluster = Array<int>();
@@ -246,7 +248,8 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
         numSamplesBeat =    beatThresholdSamples *
                             active->getBeatMultipliers()[beatMultiplierCounter] *
                             general->getPeriodMultiplier() *
-                            adaptiveTempoPeriodMultiplier;
+                            active->getTempoControl()->processor->getPeriodMultiplier();
+                            //adaptiveTempoPeriodMultiplier;
         
         //check to see if enough time has passed for next beat
         if (phasor >= numSamplesBeat)
@@ -320,7 +323,8 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
         timeToReturn += active->getBeatMultipliers()[myBeat] *
                         beatThresholdSamples *
                         general->getPeriodMultiplier() *
-                        adaptiveTempoPeriodMultiplier;
+                        active->getTempoControl()->processor->getPeriodMultiplier();
+                        //adaptiveTempoPeriodMultiplier;
     }
     
     DBG("time in ms to next beat = " + std::to_string(timeToReturn * 1000./sampleRate));
@@ -376,7 +380,7 @@ void SynchronicProcessor::atReset()
 {
     for (int i = 0; i < active->getAdaptiveTempo1History(); i++)
     {
-        atDeltaHistory.insert(0, (60000.0/active->getTempo()));
+        //atDeltaHistory.insert(0, (60000.0/active->getTempo()));
     }
     adaptiveTempoPeriodMultiplier = 1.;
 }

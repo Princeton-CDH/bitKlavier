@@ -26,6 +26,7 @@ public:
     
     // Copy Constructor
     TempoPreparation(TempoPreparation::Ptr p):
+    sWhichTempoSystem(p->getTempoSystem()),
     sTempo(p->getTempo()),
     at1History(p->getAdaptiveTempo1History()),
     at1Min(p->getAdaptiveTempo1Min()),
@@ -37,6 +38,7 @@ public:
     
     
     TempoPreparation():
+    sWhichTempoSystem(ConstantTempo),
     sTempo(120),
     at1History(0),
     at1Min(100),
@@ -49,6 +51,7 @@ public:
     inline void copy(TempoPreparation::Ptr s)
     {
         sTempo = s->getTempo();
+        sWhichTempoSystem = s->getTempoSystem();
         at1History = s->getAdaptiveTempo1History();
         at1Min = s->getAdaptiveTempo1Min();
         at1Max = s->getAdaptiveTempo1Max();
@@ -60,6 +63,7 @@ public:
     {
         
         return (sTempo == s->getTempo() &&
+                sWhichTempoSystem == s->getTempoSystem() &&
                 at1History == s->getAdaptiveTempo1History() &&
                 at1Min == s->getAdaptiveTempo1Min() &&
                 at1Max == s->getAdaptiveTempo1Max() &&
@@ -67,20 +71,20 @@ public:
                 at1Mode == s->getAdaptiveTempo1Mode());
     }
     
-    inline const TempoSystem getTempoSystem() const noexcept { return sWhichTempoSystem; }
-    inline const float getTempo() const noexcept            {return sTempo; }
-    inline const float getBeatThresh() const noexcept       {return sBeatThreshSec; }
+    inline const TempoType getTempoSystem() const noexcept    {return sWhichTempoSystem; }
+    inline const float getTempo() const noexcept                {return sTempo; }
+    inline const float getBeatThresh() const noexcept           {return sBeatThreshSec; }
   
     //Adaptive Tempo 1
-    inline AdaptiveTempo1Mode getAdaptiveTempo1Mode(void)   {return at1Mode;   }
-    inline int getAdaptiveTempo1History(void)               {return at1History;}
-    inline float getAdaptiveTempo1Subdivisions(void)        {return at1Subdivisions;}
-    inline float getAdaptiveTempo1Min(void)                 {return at1Min;}
-    inline float getAdaptiveTempo1Max(void)                 {return at1Max;}
+    inline AdaptiveTempo1Mode getAdaptiveTempo1Mode(void)       {return at1Mode;   }
+    inline int getAdaptiveTempo1History(void)                   {return at1History;}
+    inline float getAdaptiveTempo1Subdivisions(void)            {return at1Subdivisions;}
+    inline float getAdaptiveTempo1Min(void)                     {return at1Min;}
+    inline float getAdaptiveTempo1Max(void)                     {return at1Max;}
     
-    inline const String getName() const noexcept {return name;}
-    inline void setName(String n){name = n;}
-    
+    inline const String getName() const noexcept                {return name;}
+    inline void setName(String n)                               {name = n;}
+    inline void setTempoSystem(TempoType ts)                  {sWhichTempoSystem = ts;}
     inline void setTempo(float tempo)
     {
         sTempo = tempo;
@@ -105,7 +109,7 @@ public:
     
 private:
     String name;
-    TempoSystem sWhichTempoSystem;
+    TempoType sWhichTempoSystem;
     
     float sTempo;
     float sBeatThreshSec;      //length of time between pulses, as set by tempo
@@ -176,57 +180,39 @@ public:
     
     /*
      TempoId = 0,
-     TempoScale,
-     TempoFundamental,
-     TempoOffset,
-     TempoA1IntervalScale,
-     TempoA1Inversional,
-     TempoA1AnchorScale,
-     TempoA1AnchorFundamental,
-     TempoA1ClusterThresh,
-     TempoA1History,
-     TempoCustomScale,
-     TempoAbsoluteOffsets
+     Tempo,
+     TempoMode,
+     AT1History,
+     AT1Subdivisions,
+     AT1Min,
+     AT1Max,
+     AT1Mode,
      */
     
     TempoModPreparation(TempoPreparation::Ptr p)
     {
         param.ensureStorageAllocated(cTempoParameterTypes.size());
         
-        /*
-        param.set(TempoScale, String(p->getTempo()));
-        param.set(TempoFundamental, String(p->getFundamental()));
-        param.set(TempoOffset, String(p->getFundamentalOffset()));
-        param.set(TempoA1IntervalScale, String(p->getAdaptiveIntervalScale()));
-        param.set(TempoA1Inversional, String(p->getAdaptiveInversional()));
-        param.set(TempoA1AnchorScale, String(p->getAdaptiveAnchorScale()));
-        param.set(TempoA1AnchorFundamental, String(p->getAdaptiveAnchorFundamental()));
-        param.set(TempoA1ClusterThresh, String(p->getAdaptiveClusterThresh()));
-        param.set(TempoA1History, String(p->getAdaptiveHistory()));
-        param.set(TempoCustomScale, floatArrayToString(p->getCustomScale()));
-        param.set(TempoAbsoluteOffsets, floatArrayToString(p->getAbsoluteOffsets()));
-        //param.set(TempoReset, intArrayToString(p->getResetMap()->keys()));
-         */
+        param.set(TempoBPM, String(p->getTempo()));
+        param.set(TempoSystem, String(p->getTempoSystem()));
+        param.set(AT1History, String(p->getAdaptiveTempo1History()));
+        param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
+        param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
+        param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
+        param.set(AT1Mode, String(p->getAdaptiveTempo1Mode()));
         
     }
     
     
     TempoModPreparation(void)
     {
-        /*
-        param.set(TempoScale, "");
-        param.set(TempoFundamental, "");
-        param.set(TempoOffset, "");
-        param.set(TempoA1IntervalScale, "");
-        param.set(TempoA1Inversional, "");
-        param.set(TempoA1AnchorScale, "");
-        param.set(TempoA1AnchorFundamental, "");
-        param.set(TempoA1ClusterThresh, "");
-        param.set(TempoA1History, "");
-        param.set(TempoCustomScale, "");
-        param.set(TempoAbsoluteOffsets, "");
-        //param.set(TempoReset, "");
-         */
+        param.set(TempoBPM, "");
+        param.set(TempoSystem, "");
+        param.set(AT1History, "");
+        param.set(AT1Subdivisions, "");
+        param.set(AT1Min, "");
+        param.set(AT1Max, "");
+        param.set(AT1Mode, "");
     }
     
     
@@ -237,100 +223,54 @@ public:
     
     inline void copy(TempoPreparation::Ptr p)
     {
-        /*
-        param.set(TempoScale, String(p->getTempo()));
-        param.set(TempoFundamental, String(p->getFundamental()));
-        param.set(TempoOffset, String(p->getFundamentalOffset()));
-        param.set(TempoA1IntervalScale, String(p->getAdaptiveIntervalScale()));
-        param.set(TempoA1Inversional, String(p->getAdaptiveInversional()));
-        param.set(TempoA1AnchorScale, String(p->getAdaptiveAnchorScale()));
-        param.set(TempoA1AnchorFundamental, String(p->getAdaptiveAnchorFundamental()));
-        param.set(TempoA1ClusterThresh, String(p->getAdaptiveClusterThresh()));
-        param.set(TempoA1History, String(p->getAdaptiveHistory()));
-        param.set(TempoCustomScale, floatArrayToString(p->getCustomScale()));
-        param.set(TempoAbsoluteOffsets, offsetArrayToString(p->getAbsoluteOffsets()));
-        //param.set(TempoReset, intArrayToString(p->getResetMap()->keys()));
-         */
+        param.set(TempoBPM, String(p->getTempo()));
+        param.set(TempoSystem, String(p->getTempoSystem()));
+        param.set(AT1History, String(p->getAdaptiveTempo1History()));
+        param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
+        param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
+        param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
+        param.set(AT1Mode, String(p->getAdaptiveTempo1Mode()));
     }
     
     inline bool compare(TempoModPreparation::Ptr t)
     {
-        /*
-        return (getParam(TempoScale) == t->getParam(TempoScale) &&
-                getParam(TempoFundamental) == t->getParam(TempoFundamental) &&
-                getParam(TempoOffset) == t->getParam(TempoOffset) &&
-                getParam(TempoA1IntervalScale) == t->getParam(TempoA1IntervalScale) &&
-                getParam(TempoA1Inversional) == t->getParam(TempoA1Inversional) &&
-                getParam(TempoA1AnchorScale) == t->getParam(TempoA1AnchorScale) &&
-                getParam(TempoA1AnchorFundamental) == t->getParam(TempoA1AnchorFundamental) &&
-                getParam(TempoA1ClusterThresh) == t->getParam(TempoA1ClusterThresh) &&
-                getParam(TempoA1History) == t->getParam(TempoA1History) &&
-                getParam(TempoCustomScale) == t->getParam(TempoCustomScale) &&
-                getParam(TempoAbsoluteOffsets) == t->getParam(TempoAbsoluteOffsets));
-         */
-        
+        return (getParam(TempoBPM)          == t->getParam(TempoBPM) &&
+                getParam(TempoSystem)       == t->getParam(TempoSystem) &&
+                getParam(AT1History)        == t->getParam(AT1History) &&
+                getParam(AT1Subdivisions)   == t->getParam(AT1Subdivisions) &&
+                getParam(AT1Min)            == t->getParam(AT1Min) &&
+                getParam(AT1Max)            == t->getParam(AT1Max) &&
+                getParam(AT1Mode)           == t->getParam(AT1Mode));
     }
     
     inline ValueTree getState(int Id)
     {
-        /*
+        
         ValueTree prep(vtagTempoModPrep + String(Id));
         
-        String p = getParam(TempoScale);
-        if (p != String::empty) prep.setProperty( ptagTempo_scale, p.getIntValue(), 0);
+        String p = getParam(TempoBPM);
+        if (p != String::empty) prep.setProperty( ptagTempo_tempo, p.getFloatValue(), 0);
         
-        p = getParam(TempoFundamental);
-        if (p != String::empty) prep.setProperty( ptagTempo_fundamental,           p.getIntValue(), 0);
+        p = getParam(TempoSystem);
+        if (p != String::empty) prep.setProperty( ptagTempo_adaptiveSystem, p.getIntValue(), 0);
         
-        p = getParam(TempoOffset);
-        if (p != String::empty) prep.setProperty( ptagTempo_offset,                p.getFloatValue(), 0 );
+        p = getParam(AT1History);
+        if (p != String::empty) prep.setProperty( ptagTempo_AT1History, p.getIntValue(), 0 );
         
-        p = getParam(TempoA1IntervalScale);
-        if (p != String::empty) prep.setProperty( ptagTempo_adaptiveIntervalScale, p.getIntValue(), 0 );
+        p = getParam(AT1Subdivisions);
+        if (p != String::empty) prep.setProperty( ptagTempo_AT1Subdivisions, p.getIntValue(), 0 );
         
-        p = getParam(TempoA1Inversional);
-        if (p != String::empty) prep.setProperty( ptagTempo_adaptiveInversional,   (bool)p.getIntValue(), 0 );
+        p = getParam(AT1Min);
+        if (p != String::empty) prep.setProperty( ptagTempo_AT1Min, p.getIntValue(), 0 );
         
-        p = getParam(TempoA1AnchorScale);
-        if (p != String::empty) prep.setProperty( ptagTempo_adaptiveAnchorScale,   p.getIntValue(), 0 );
+        p = getParam(AT1Max);
+        if (p != String::empty) prep.setProperty( ptagTempo_AT1Max, p.getIntValue(), 0 );
         
-        p = getParam(TempoA1AnchorFundamental);
-        if (p != String::empty) prep.setProperty( ptagTempo_adaptiveAnchorFund,    p.getIntValue(), 0 );
-        
-        p = getParam(TempoA1ClusterThresh);
-        if (p != String::empty) prep.setProperty( ptagTempo_adaptiveClusterThresh, p.getIntValue(), 0 );
-        
-        p = getParam(TempoA1History);
-        if (p != String::empty) prep.setProperty( ptagTempo_adaptiveHistory,       p.getIntValue(), 0 );
-        
-        
-        ValueTree scale( vtagTempo_customScale);
-        int count = 0;
-        p = getParam(TempoCustomScale);
-        if (p != String::empty)
-        {
-            Array<float> scl = stringToFloatArray(p);
-            for (auto note : scl)
-                scale.setProperty( ptagFloat + String(count++), note, 0 );
-        }
-        prep.addChild(scale, -1, 0);
-        
-        ValueTree absolute( vTagTempo_absoluteOffsets);
-        count = 0;
-        p = getParam(TempoAbsoluteOffsets);
-        if (p != String::empty)
-        {
-            Array<float> offsets = stringOrderedPairsToFloatArray(p, 128);
-            for (auto note : offsets)
-            {
-                if(note != 0.) absolute.setProperty( ptagFloat + String(count), note * .01, 0 );
-                count++;
-            }
-        }
-        prep.addChild(absolute, -1, 0);
+        p = getParam(AT1Mode);
+        if (p != String::empty) prep.setProperty( ptagTempo_AT1Mode, p.getIntValue(), 0 );
     
         return prep;
-        */
+        
     }
     
     
@@ -386,20 +326,11 @@ public:
         sPrep = new TempoPreparation();
         aPrep = new TempoPreparation(sPrep);
         processor = new TempoProcessor(aPrep);
-    };
+    }
     
-    /*
-     TempoId = 0,
-     Tempo,
-     adaptiveTempoSystem,
-     AT1History,
-     AT1Subdivisions,
-     AT1Min,
-     AT1Max,
-     */
+
     inline ValueTree getState(void)
     {
-        
         ValueTree prep(vtagTempoPrep + String(Id));
         
         prep.setProperty( ptagTempo_Id,                    Id, 0);

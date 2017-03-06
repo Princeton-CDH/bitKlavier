@@ -131,13 +131,14 @@ public:
     
     Synchronic(BKSynthesiser *s,
                Tuning::Ptr tuning,
+               Tempo::Ptr tempo,
                GeneralSettings::Ptr general,
                BKUpdateState::Ptr us,
                int Id):
     Id(Id),
     updateState(us)
     {
-        sPrep       = new SynchronicPreparation(tuning);
+        sPrep       = new SynchronicPreparation(tuning, tempo);
         aPrep       = new SynchronicPreparation(sPrep);
         processor   = new SynchronicProcessor(s, aPrep, general, Id);
     };
@@ -169,7 +170,7 @@ public:
         
         prep.setProperty( ptagSynchronic_Id,                  Id, 0);
         prep.setProperty( ptagSynchronic_tuning,              sPrep->getTuning()->getId(), 0);
-        prep.setProperty( ptagSynchronic_tempo,               sPrep->getTempo(), 0);
+        prep.setProperty( ptagSynchronic_tempo,               sPrep->getTempoControl()->getId(), 0);
         prep.setProperty( ptagSynchronic_numBeats,            sPrep->getNumBeats(), 0);
         prep.setProperty( ptagSynchronic_clusterMin,          sPrep->getClusterMin(), 0);
         prep.setProperty( ptagSynchronic_clusterMax,          sPrep->getClusterMax(), 0);
