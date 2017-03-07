@@ -67,8 +67,8 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
     PianoSamplerNoteDirection noteDirection = Forward;
     float noteStartPos = 0.0;
     
-    //float noteLength = (fabs(active->getLengthMultipliers()[length]) * tempoPeriod); //option for later
-    float noteLength = (fabs(active->getLengthMultipliers()[lengthMultiplierCounter]) * 50.0);
+    float noteLength = (fabs(active->getLengthMultipliers()[lengthMultiplierCounter]) * active->getTempoControl()->aPrep->getBeatThreshMS());
+    //float noteLength = (fabs(active->getLengthMultipliers()[lengthMultiplierCounter]) * 50.0); //original way,  multiples of 50ms
     
     if (active->getLengthMultipliers()[lengthMultiplierCounter] < 0)
     {
@@ -104,9 +104,9 @@ void SynchronicProcessor::resetPhase(int skipBeats)
     beatMultiplierCounter   = skipBeats % active->getBeatMultipliers().size();
     lengthMultiplierCounter = skipBeats % active->getLengthMultipliers().size();
     accentMultiplierCounter = skipBeats % active->getAccentMultipliers().size();
-    transpCounter     = skipBeats % active->getTransposition().size();
+    transpCounter           = skipBeats % active->getTransposition().size();
     
-    beatCounter   = 0;
+    beatCounter = 0;
 
 }
 
@@ -123,7 +123,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     keysDepressed.addIfNotAlreadyThere(noteNumber);
     
     //add to adaptive tempo history, update adaptive tempo
-    atNewNote();
+    //atNewNote();
     
     //silence pulses if in NoteOffSync
     if(    (active->getMode() == LastNoteOffSync)
@@ -193,7 +193,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, int channel)
     keysDepressed.removeAllInstancesOf(noteNumber);
     
     //adaptive tempo
-    atNewNoteOff();
+    //atNewNoteOff();
     
     // If AnyNoteOffSync mode, reset phasor and multiplier indices.
     //only initiate pulses if ALL keys are released
@@ -216,11 +216,12 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
     tuner->incrementAdaptiveClusterTime(numSamples);
     
     //adaptive tempo timer update
-    atTimer += numSamples;
+    //atTimer += numSamples;
     
     //need to do this every block?
     clusterThresholdSamples = (active->getClusterThreshSEC() * sampleRate);
-    beatThresholdSamples = (active->getBeatThresh() * sampleRate);
+    //beatThresholdSamples = (active->getBeatThresh() * sampleRate);
+    beatThresholdSamples = (active->getTempoControl()->aPrep->getBeatThresh() * sampleRate);
     
     //cluster management
     if (inCluster)
@@ -261,7 +262,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             //increment parameter counters
             if (++lengthMultiplierCounter   >= active->getLengthMultipliers().size())     lengthMultiplierCounter = 0;
             if (++accentMultiplierCounter   >= active->getAccentMultipliers().size())     accentMultiplierCounter = 0;
-            if (++transpCounter       >= active->getTransposition().size())         transpCounter = 0;
+            if (++transpCounter             >= active->getTransposition().size())         transpCounter = 0;
             
             
             //update display of counters in UI
@@ -331,7 +332,7 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
     return timeToReturn * 1000./sampleRate; //optimize later....
 }
 
-
+/*
 //adaptive tempo functions
 void SynchronicProcessor::atNewNote()
 {
@@ -384,4 +385,5 @@ void SynchronicProcessor::atReset()
     }
     adaptiveTempoPeriodMultiplier = 1.;
 }
+ */
 

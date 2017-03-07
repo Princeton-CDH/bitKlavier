@@ -242,7 +242,7 @@ public:
     void reset()
     {
         aPrep->copy(sPrep);
-        processor->atReset();
+        //processor->atReset();
         updateState->synchronicPreparationDidChange = true;
         DBG("synchronic reset");
     }

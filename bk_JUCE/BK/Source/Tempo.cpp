@@ -13,12 +13,33 @@
 TempoProcessor::TempoProcessor(TempoPreparation::Ptr active):
 active(active)
 {
-    
-    
+    atTimer = 0;
+    atLastTime = 0;
+    atDeltaHistory.ensureStorageAllocated(10);
+    for (int i = 0; i < 10; i++)
+    {
+        atDeltaHistory.insert(0, (60000.0/active->getTempo()));
+    }
+    adaptiveTempoPeriodMultiplier = 1.;
 }
 
 TempoProcessor::~TempoProcessor()
 {
+}
+
+void TempoProcessor::processBlock(int numSamples, int channel)
+{
+    atTimer += numSamples;
+}
+
+void TempoProcessor::keyPressed(int noteNumber, float velocity)
+{
+    atNewNote();
+}
+
+void TempoProcessor::keyReleased(int noteNumber, int channel)
+{
+    atNewNoteOff();
 }
 
 //adaptive tempo functions

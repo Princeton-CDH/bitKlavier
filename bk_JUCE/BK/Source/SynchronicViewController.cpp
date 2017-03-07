@@ -168,16 +168,26 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
             updateModFields();
         }
     }
+
     else if (name == cSynchronicParameterTypes[SynchronicTempo])
     {
         if (type == BKParameter)
         {
-            prep    ->setTempo(f);
-            active  ->setTempo(f);
+            if (i < processor.tempo.size())
+            {
+                prep    ->setTempoControl(processor.tempo[i]);
+                active  ->setTempoControl(processor.tempo[i]);
+            }
+            else
+                tf.setText("0", false);
+            
         }
         else // BKModification
         {
-            mod->setParam( SynchronicTempo, text);
+            if (i < processor.tempo.size())
+                mod->setParam( SynchronicTempo, text);
+            else
+                tf.setText("0", false);
         }
     }
     else if (name == cSynchronicParameterTypes[SynchronicNumPulses])
@@ -416,7 +426,7 @@ void SynchronicViewController::updateFields(void)
 {
     SynchronicPreparation::Ptr prep   = processor.synchronic[currentSynchronicId]->aPrep;
 
-    synchronicTF[SynchronicTempo]               ->setText(  String(                 prep->getTempo()), false);
+    synchronicTF[SynchronicTempo]               ->setText(  String(                 prep->getTempoControl()->getId()), false);
     synchronicTF[SynchronicNumPulses]           ->setText(  String(                 prep->getNumBeats()), false);
     synchronicTF[SynchronicClusterMin]          ->setText(  String(                 prep->getClusterMin()), false);
     synchronicTF[SynchronicClusterMax]          ->setText(  String(                 prep->getClusterMax()), false);

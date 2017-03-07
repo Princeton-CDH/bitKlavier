@@ -62,7 +62,7 @@ public:
                           Array<float> accentMultipliers,
                           Array<float> lengthMultipliers,
                           Array<Array<float>> transp,
-                          Tuning::Ptr t,
+                          Tuning::Ptr tun,
                           Tempo::Ptr tmp):
     sNumBeats(numBeats),
     sClusterMin(clusterMin),
@@ -76,13 +76,13 @@ public:
     sBeatThreshSec(60.0/sTempo),
     sClusterThresh(clusterThresh),
     sClusterThreshSec(.001 * sClusterThresh),
-    tuning(t),
+    tuning(tun),
     tempo(tmp)
     {
     }
 
     
-    SynchronicPreparation(Tuning::Ptr t, Tempo::Ptr tmp):
+    SynchronicPreparation(Tuning::Ptr tun, Tempo::Ptr tmp):
     sNumBeats(0),
     sClusterMin(1),
     sClusterMax(100),
@@ -95,7 +95,7 @@ public:
     sBeatThreshSec(60.0/sTempo),
     sClusterThresh(500),
     sClusterThreshSec(.001 * sClusterThresh),
-    tuning(t),
+    tuning(tun),
     tempo(tmp)
     {
         sTransposition.ensureStorageAllocated(1);
@@ -231,7 +231,7 @@ public:
     inline const String getName() const noexcept {return name;}
     inline void setName(String n){name = n;}
     
-    inline void setNumBeats(int numBeats)                              {sNumBeats = numBeats;                            }
+    inline void setNumBeats(int numBeats)                              {sNumBeats = numBeats;                              }
     inline void setClusterMin(int clusterMin)                          {sClusterMin = clusterMin;                          }
     inline void setClusterMax(int clusterMax)                          {sClusterMax = clusterMax;                          }
     inline void setClusterCap(int clusterCap)                          {sClusterCap = clusterCap;                          }
@@ -622,7 +622,7 @@ public:
     void keyPressed(int noteNumber, float velocity);
     void keyReleased(int noteNumber, int channel);
     float getTimeToBeatMS(float beatsToSkip);
-    void  atReset();
+    //void  atReset();
     
 private:
     int Id;
@@ -663,6 +663,7 @@ private:
     uint64 beatThresholdSamples;    // # samples in a beat, as set by tempo
 
     //adaptive tempo stuff
+    /*
     uint64 atTimer, atLastTime; //in samples
     int atDelta;                //in ms
     Array<int> atDeltaHistory;  //in ms
@@ -670,6 +671,7 @@ private:
     void atNewNoteOff();
     void atCalculatePeriodMultiplier();
     float adaptiveTempoPeriodMultiplier;
+     */
     
     bool shouldPlay;
     

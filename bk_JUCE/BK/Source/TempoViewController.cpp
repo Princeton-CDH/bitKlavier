@@ -117,7 +117,7 @@ void TempoViewController::bkTextFieldDidChange(TextEditor& tf)
     
     /*
      TempoId = 0,
-     Tempo,
+     TempoBPM,
      AT1Mode,
      AT1History,
      AT1Subdivisions,
@@ -166,26 +166,100 @@ void TempoViewController::bkTextFieldDidChange(TextEditor& tf)
             updateModFields();
         }
     }
-    /*
-     else if (name == cTempoParameterTypes[TempoReset])
-     {
-     if (type == BKParameter)
-     {
-     
-     // ** actually do nothing here; TempoReset is Mod only
-     //Array<int> keys = keymapStringToIntArray(text);
-     //Array<int> keys = stringToIntArray(text);
-     //prep->getResetMap()->setKeymap(keys);
-     //active->getResetMap()->setKeymap(keys);
-     //TempoTF[TempoReset]->setText( intArrayToString(prep->getResetMap()->keys()));
-     
-     }
-     else    //BKModification
-     {
-     mod->setParam(TempoReset, text);
-     }
-     }
-     */
+    else if (name == cTempoParameterTypes[TempoBPM])
+    {
+         if (type == BKParameter)
+         {
+             prep->setTempo(f);
+             active->setTempo(f);
+             
+         }
+         else    //BKModification
+         {
+             mod->setParam(TempoBPM, text);
+         }
+    }
+    else if (name == cTempoParameterTypes[AT1Mode])
+    {
+        if (type == BKParameter)
+        {
+            prep->setAdaptiveTempo1Mode(AdaptiveTempo1Mode(i));
+            active->setAdaptiveTempo1Mode(AdaptiveTempo1Mode(i));
+            
+        }
+        else    //BKModification
+        {
+            mod->setParam(AT1Mode, text);
+        }
+    }
+    else if (name == cTempoParameterTypes[AT1History])
+    {
+        if (type == BKParameter)
+        {
+            prep->setAdaptiveTempo1History(i);
+            active->setAdaptiveTempo1History(i);
+            
+        }
+        else    //BKModification
+        {
+            mod->setParam(AT1History, text);
+        }
+    }
+    else if (name == cTempoParameterTypes[AT1Subdivisions])
+    {
+        if (type == BKParameter)
+        {
+            prep->setAdaptiveTempo1Subdivisions(f);
+            active->setAdaptiveTempo1Subdivisions(f);
+            
+        }
+        else    //BKModification
+        {
+            mod->setParam(AT1Subdivisions, text);
+        }
+    }
+    else if (name == cTempoParameterTypes[AT1Min])
+    {
+        if (type == BKParameter)
+        {
+            prep->setAdaptiveTempo1Min(f);
+            active->setAdaptiveTempo1Min(f);
+            
+        }
+        else    //BKModification
+        {
+            mod->setParam(AT1Min, text);
+        }
+    }
+    else if (name == cTempoParameterTypes[AT1Max])
+    {
+        if (type == BKParameter)
+        {
+            prep->setAdaptiveTempo1Max(f);
+            active->setAdaptiveTempo1Max(f);
+            
+        }
+        else    //BKModification
+        {
+            mod->setParam(AT1Max, text);
+        }
+    }
+    else if (name == cTempoParameterTypes[TempoSystem])
+    {
+        if (type == BKParameter)
+        {
+            prep->setTempoSystem(TempoType(i));
+            active->setTempoSystem(TempoType(i));
+            
+        }
+        else    //BKModification
+        {
+            mod->setParam(TempoSystem, text);
+        }
+    }
+
+    
+    
     else
     {
         DBG("Unregistered text field.");
@@ -195,11 +269,16 @@ void TempoViewController::bkTextFieldDidChange(TextEditor& tf)
 
 void TempoViewController::updateFields()
 {
-    
+
     TempoPreparation::Ptr prep = processor.tempo[currentTempoId]->aPrep;
     
-    //tempoTF[TempoScale]               ->setText( String( prep->getTempo()), false);
-    //TempoTF[TempoReset]         ->setText( intArrayToString( prep->getResetMap()->keys()), false);
+    tempoTF[TempoBPM]           ->setText( String( prep->getTempo()), false);
+    tempoTF[AT1Mode]            ->setText( String( prep->getAdaptiveTempo1Mode()), false);
+    tempoTF[AT1History]         ->setText( String( prep->getAdaptiveTempo1History()), false);
+    tempoTF[AT1Subdivisions]    ->setText( String( prep->getAdaptiveTempo1Subdivisions()), false);
+    tempoTF[AT1Min]             ->setText( String( prep->getAdaptiveTempo1Min()), false);
+    tempoTF[AT1Max]             ->setText( String( prep->getAdaptiveTempo1Max()), false);
+    tempoTF[TempoSystem]        ->setText( String( prep->getTempoSystem()), false);
     
     
 }
@@ -208,23 +287,15 @@ void TempoViewController::updateModFields()
 {
     
     TempoModPreparation::Ptr prep = processor.modTempo[currentModTempoId];
-    
-    /*
-    modTempoTF[TempoScale]               ->setText( prep->getParam(TempoScale), false);
-    modTempoTF[TempoFundamental]         ->setText( prep->getParam(TempoFundamental), false);
-    modTempoTF[TempoOffset]              ->setText( prep->getParam(TempoOffset), false);
-    modTempoTF[TempoA1IntervalScale]     ->setText( prep->getParam(TempoA1IntervalScale), false);
-    modTempoTF[TempoA1Inversional]       ->setText( prep->getParam(TempoA1Inversional), false);
-    modTempoTF[TempoA1AnchorScale]       ->setText( prep->getParam(TempoA1AnchorScale), false);
-    modTempoTF[TempoA1AnchorFundamental] ->setText( prep->getParam(TempoA1AnchorFundamental), false);
-    modTempoTF[TempoA1ClusterThresh]     ->setText( prep->getParam(TempoA1ClusterThresh), false);
-    modTempoTF[TempoA1History]           ->setText( prep->getParam(TempoA1History), false);
-    modTempoTF[TempoCustomScale]         ->setText( prep->getParam(TempoCustomScale), false);
-    modTempoTF[TempoAbsoluteOffsets]     ->setText( prep->getParam(TempoAbsoluteOffsets), false);
-    //modTempoTF[TempoReset]         ->setText( prep->getParam(TempoReset), false);
-     */
-    
-    
+
+    modTempoTF[TempoBPM]            ->setText( prep->getParam(TempoBPM), false);
+    modTempoTF[AT1Mode]             ->setText( prep->getParam(AT1Mode), false);
+    modTempoTF[AT1History]          ->setText( prep->getParam(AT1History), false);
+    modTempoTF[AT1Subdivisions]     ->setText( prep->getParam(AT1Subdivisions), false);
+    modTempoTF[AT1Min]              ->setText( prep->getParam(AT1Min), false);
+    modTempoTF[AT1Max]              ->setText( prep->getParam(AT1Max), false);
+    modTempoTF[TempoSystem]         ->setText( prep->getParam(TempoSystem), false);
+ 
 }
 
 void TempoViewController::bkMessageReceived(const String& message)

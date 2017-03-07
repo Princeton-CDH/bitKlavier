@@ -74,6 +74,7 @@ public:
     inline const TempoType getTempoSystem() const noexcept    {return sWhichTempoSystem; }
     inline const float getTempo() const noexcept                {return sTempo; }
     inline const float getBeatThresh() const noexcept           {return sBeatThreshSec; }
+    inline const float getBeatThreshMS() const noexcept         {return sBeatThreshMS; }
   
     //Adaptive Tempo 1
     inline AdaptiveTempo1Mode getAdaptiveTempo1Mode(void)       {return at1Mode;   }
@@ -84,19 +85,21 @@ public:
     
     inline const String getName() const noexcept                {return name;}
     inline void setName(String n)                               {name = n;}
-    inline void setTempoSystem(TempoType ts)                  {sWhichTempoSystem = ts;}
+    inline void setTempoSystem(TempoType ts)                    {sWhichTempoSystem = ts; DBG("Tempo System = " + String(ts));}
     inline void setTempo(float tempo)
     {
         sTempo = tempo;
         sBeatThreshSec = (60.0/sTempo);
+        sBeatThreshMS = sBeatThreshSec * 1000.;
+        DBG("tempo = " + String(sTempo));
     }
     
     //Adaptive Tempo 1
-    inline void setAdaptiveTempo1Mode(AdaptiveTempo1Mode mode)          {at1Mode = mode;    }
-    inline void setAdaptiveTempo1History(int hist)                      {at1History = hist;}
-    inline void setAdaptiveTempo1Subdivisions(float sub)                {at1Subdivisions = sub;}
-    inline void setAdaptiveTempo1Min(float min)                         {at1Min = min;}
-    inline void setAdaptiveTempo1Max(float max)                         {at1Max = max;}
+    inline void setAdaptiveTempo1Mode(AdaptiveTempo1Mode mode)          {at1Mode = mode; DBG("AT1mode = " + String(mode));}
+    inline void setAdaptiveTempo1History(int hist)                      {at1History = hist; DBG("AT1history = " + String(hist));}
+    inline void setAdaptiveTempo1Subdivisions(float sub)                {at1Subdivisions = sub; DBG("at1Subdivisions = " + String(sub));}
+    inline void setAdaptiveTempo1Min(float min)                         {at1Min = min; DBG("at1Min = " + String(min));}
+    inline void setAdaptiveTempo1Max(float max)                         {at1Max = max; DBG("at1Man = " + String(max));}
 
     
     void print(void)
@@ -113,6 +116,7 @@ private:
     
     float sTempo;
     float sBeatThreshSec;      //length of time between pulses, as set by tempo
+    float sBeatThreshMS;
     
     // Adaptive Tempo 1
     int at1History;
