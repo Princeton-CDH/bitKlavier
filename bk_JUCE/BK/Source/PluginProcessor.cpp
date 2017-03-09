@@ -62,7 +62,7 @@ resonanceReleaseSynth   (general)
     for (int i = 0; i < 128; i++) bkKeymaps[1]->addNote(i);
 
     // Make a piano.
-    bkPianos.add(new Piano(synchronic, nostalgic, direct,
+    bkPianos.add(new Piano(synchronic, nostalgic, direct, tuning, tempo,
                               bkKeymaps[0], 0)); // initializing piano 0
     
     // Initialize first piano.
@@ -108,6 +108,7 @@ void BKAudioProcessor::addPiano()
 {
     int numPianos = bkPianos.size();
     bkPianos.add(new Piano(synchronic, nostalgic, direct,
+                           tuning, tempo,
                            bkKeymaps[0], numPianos));
 }
 
@@ -1918,7 +1919,8 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     int whichPiano = pianoCount++;
                     
                     bkPianos.set(whichPiano, new Piano(synchronic, nostalgic, direct,
-                                              bkKeymaps[0], whichPiano)); // initializing piano 0
+                                                       tuning, tempo,
+                                                       bkKeymaps[0], whichPiano)); // initializing piano 0
                     
                     Piano::Ptr thisPiano = bkPianos[whichPiano];
                     

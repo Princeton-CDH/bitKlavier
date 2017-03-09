@@ -20,8 +20,6 @@
 
 #include "General.h"
 
-#include "PreparationMap.h"
-
 #include "Piano.h"
 
 #define USE_SYNCHRONIC_TWO 0

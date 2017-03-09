@@ -52,7 +52,7 @@ float TuningProcessor::getOffset(int midiNoteNumber) const
 
 
 //for keeping track of current cluster size
-void TuningProcessor::incrementAdaptiveClusterTime(int numSamples)
+void TuningProcessor::processBlock(int numSamples)
 {
     if(active->getTuning() == AdaptiveTuning || active->getTuning() == AdaptiveAnchoredTuning) {
         
@@ -63,7 +63,7 @@ void TuningProcessor::incrementAdaptiveClusterTime(int numSamples)
 
 
 //add note to the adaptive tuning history, update adaptive fundamental
-void TuningProcessor::keyOn(int midiNoteNumber)
+void TuningProcessor::keyPressed(int midiNoteNumber)
 {
 
     //if(active->resetMap->containsNote(noteNumber)) tuning->reset();

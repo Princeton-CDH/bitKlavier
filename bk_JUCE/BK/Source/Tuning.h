@@ -436,10 +436,10 @@ public:
     float getOffset(int midiNoteNumber) const;
     
     //for calculating adaptive tuning
-    void keyOn(int midiNoteNumber);
+    void keyPressed(int midiNoteNumber);
     
     //for cluster timing
-    void incrementAdaptiveClusterTime(int numSamples);
+    void processBlock(int numSamples);
     
     //for global tuning adjustment, A442, etc...
     void setGlobalTuningReference(float tuningRef) { globalTuningReference = tuningRef;}

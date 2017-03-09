@@ -36,6 +36,8 @@ public:
     Piano(Synchronic::PtrArr synchronic,
           Nostalgic::PtrArr nostalgic,
           Direct::PtrArr direct,
+          Tuning::PtrArr tuning,
+          Tempo::PtrArr tempo,
           Keymap::Ptr keymap,
           int Id);
     ~Piano();
@@ -56,8 +58,6 @@ public:
     inline const String getName() const noexcept {return pianoName;}
     inline void setName(String n){pianoName = n;}
     
-    
-    
     PreparationMap::Ptr         currentPMap;
     PreparationMap::CSPtrArr    activePMaps;
     PreparationMap::CSPtrArr    prepMaps;
@@ -65,7 +65,8 @@ public:
     Synchronic::PtrArr  synchronic;
     Nostalgic::PtrArr   nostalgic;
     Direct::PtrArr      direct;
-    
+    Tuning::PtrArr      tuning;
+    Tempo::PtrArr       tempo;
     
     Array<int>                  pianoMap;
     int                         numPMaps;
@@ -92,9 +93,6 @@ private:
     
     double sampleRate;
 
-    
-    
-    
     // Pointers to synths (flown in from BKAudioProcessor)
     BKSynthesiser*                  synth;
     BKSynthesiser*                  resonanceSynth;

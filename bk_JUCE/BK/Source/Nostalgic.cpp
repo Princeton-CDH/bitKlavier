@@ -165,7 +165,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
 {
     
     incrementTimers(numSamples);
-    tuner->incrementAdaptiveClusterTime(numSamples);
+    //tuner->incrementAdaptiveClusterTime(numSamples);
     
     //check timers to see if any are at an undertow turnaround point, then call keyOn(forward) and keyOff, with 50ms ramps
     for(int i = (activeReverseNotes.size() - 1); i >= 0; --i)

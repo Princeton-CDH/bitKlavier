@@ -76,6 +76,12 @@ void PreparationMap::setTempo(Tempo::PtrArr d)
     deactivateIfNecessary();
 }
 
+void PreparationMap::setTuning(Tuning::PtrArr d)
+{
+    tuning = d;
+    deactivateIfNecessary();
+}
+
 Synchronic::PtrArr PreparationMap::getSynchronic(void)
 {
     return synchronic;
@@ -91,6 +97,11 @@ Direct::PtrArr PreparationMap::getDirect(void)
     return direct;
 }
 
+Tempo::PtrArr PreparationMap::getTempo(void)
+{
+    return tempo;
+}
+
 
 void PreparationMap::removeAllPreparations()
 {
@@ -98,6 +109,7 @@ void PreparationMap::removeAllPreparations()
     nostalgic.clearQuick();
     direct.clearQuick();
     tempo.clearQuick();
+    tuning.clearQuick();
     isActive = false;
 }
 
@@ -108,6 +120,7 @@ void PreparationMap::deactivateIfNecessary()
     if(synchronic.size() == 0 &&
        nostalgic.size() == 0 &&
        direct.size() == 0 &&
+       tuning.size() == 0 &&
        tempo.size() == 0)
     {
         isActive = false;
@@ -121,6 +134,12 @@ void PreparationMap::deactivateIfNecessary()
 
 void PreparationMap::processBlock(int numSamples, int midiChannel)
 {
+    for (int i = tempo.size(); --i >= 0; )
+        tempo[i]->processor->processBlock(numSamples, midiChannel);
+    
+    for (int i = tuning.size(); --i >= 0; )
+        tuning[i]->processor->processBlock(numSamples);
+  
     for (int i = synchronic.size(); --i >= 0; )
         synchronic[i]->processor->processBlock(numSamples, midiChannel);
     
@@ -129,17 +148,24 @@ void PreparationMap::processBlock(int numSamples, int midiChannel)
     
     for (int i = direct.size(); --i >= 0; )
         direct[i]->processor->processBlock(numSamples, midiChannel);
-    
-    for (int i = tempo.size(); --i >= 0; )
-        tempo[i]->processor->processBlock(numSamples, midiChannel);
-    
-    //for (int i = tuning.size(); --i >= 0; )
-        //tuning[i]->processor->processBlock(numSamples, midiChannel);
+
 }
 
 //not sure why some of these have Channel and some don't; should rectify?
 void PreparationMap::keyPressed(int noteNumber, float velocity, int channel)
 {
+    for (int i = tempo.size(); --i >= 0; )
+    {
+        if (pKeymap->containsNote(noteNumber))
+            tempo[i]->processor->keyPressed(noteNumber, velocity);
+    }
+    
+    for (int i = tuning.size(); --i >= 0; )
+    {
+        if (pKeymap->containsNote(noteNumber))
+            tuning[i]->processor->keyPressed(noteNumber);
+    }
+  
     for (int i = synchronic.size(); --i >= 0; )
     {
         if (pKeymap->containsNote(noteNumber))
@@ -158,11 +184,6 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel)
             direct[i]->processor->keyPressed(noteNumber, velocity, channel);
     }
     
-    for (int i = tempo.size(); --i >= 0; )
-    {
-        if (pKeymap->containsNote(noteNumber))
-            tempo[i]->processor->keyPressed(noteNumber, velocity);
-    }
 }
 
 

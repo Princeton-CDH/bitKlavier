@@ -71,7 +71,7 @@ public:
         
         for (auto p : tempo)
         {
-            prep.append("O",1);
+            prep.append("M",1);
             prep.append(String(p->getId()), 3);
             prep.append(" ",1);
         }

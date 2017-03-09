@@ -39,7 +39,7 @@ void DirectProcessor::setCurrentPlaybackSampleRate(double sr)
 void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 {
     tuner = active->getTuning()->processor;
-    tuner->keyOn(noteNumber);
+    //tuner->keyOn(noteNumber);
     
     for (auto t : active->getTransposition())
     {
@@ -125,6 +125,6 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
 
 void DirectProcessor::processBlock(int numSamples, int midiChannel)
 {
-    tuner->incrementAdaptiveClusterTime(numSamples);
+    //tuner->incrementAdaptiveClusterTime(numSamples);
 }
 
