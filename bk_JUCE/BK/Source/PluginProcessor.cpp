@@ -236,12 +236,14 @@ void BKAudioProcessor::addTuning(void)
 {
     int numTuning = tuning.size();
     tuning.add(new Tuning(numTuning));
+    tuning.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 void BKAudioProcessor::addTuning(TuningPreparation::Ptr tune)
 {
     int numTuning = tuning.size();
     tuning.add(new Tuning(tune, numTuning));
+    tuning.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 // Returns index of Tuning to be added/configured.
@@ -2315,6 +2317,8 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     for (int i = synchronic.size(); --i >= 0;)  synchronic[i]->processor->setCurrentPlaybackSampleRate(sampleRate);
     for (int i = nostalgic.size(); --i >= 0;)   nostalgic[i]->processor->setCurrentPlaybackSampleRate(sampleRate);
     for (int i = direct.size(); --i >= 0;)      direct[i]->processor->setCurrentPlaybackSampleRate(sampleRate);
+    for (int i = tuning.size(); --i >= 0;)      tuning[i]->processor->setCurrentPlaybackSampleRate(sampleRate);
+    for (int i = tempo.size(); --i >= 0;)       tempo[i]->processor->setCurrentPlaybackSampleRate(sampleRate);
     
 }
 
@@ -2497,17 +2501,10 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             int whichPiano = currentPiano->pianoMap[noteNumber] - 1;
             if (whichPiano >= 0 && whichPiano != currentPiano->getId()) setCurrentPiano(whichPiano);
             
-            /*
-            // check for tuning resets
-            for (int i = tuning.size(); --i >= 0; )
-            {
-                if (tuning[i]->aPrep->getResetMap()->containsNote(noteNumber)) tuning[i]->reset();
-                updateState->tuningPreparationDidChange = true;
-            }
-             */
-            
             // modifications
             performModifications(noteNumber);
+            
+            //tempo
             
             // Send key on to each pmap in current piano
             for (p = currentPiano->activePMaps.size(); --p >= 0;) {

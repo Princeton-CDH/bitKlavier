@@ -213,7 +213,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
 {
     
     //adaptive tuning timer update
-    tuner->incrementAdaptiveClusterTime(numSamples);
+    tuner->incrementAdaptiveClusterTime(numSamples); //why are we doing this here? in all the preparations?
     
     //adaptive tempo timer update
     //atTimer += numSamples;

@@ -34,6 +34,7 @@ void TempoProcessor::processBlock(int numSamples, int channel)
 
 void TempoProcessor::keyPressed(int noteNumber, float velocity)
 {
+    DBG("adding adaptive tempo note" + String(noteNumber));
     atNewNote();
 }
 
@@ -60,8 +61,10 @@ void TempoProcessor::atCalculatePeriodMultiplier()
     //only do if history val is > 0
     if(active->getAdaptiveTempo1History()) {
         
-        atDelta = (atTimer - atLastTime) / (sampleRate);
+        atDelta = (atTimer - atLastTime) / (0.001 * sampleRate); //fix this? make sampleRateMS
+        //DBG("atTimer = " + String(atTimer) + " atLastTime = " + String(atLastTime));
         //DBG("atDelta = " + String(atDelta));
+        //DBG("sampleRate = " + String(sampleRate));
         
         //constrain be min and max times between notes
         if(atDelta > active->getAdaptiveTempo1Min() && atDelta < active->getAdaptiveTempo1Max()) {
@@ -78,7 +81,7 @@ void TempoProcessor::atCalculatePeriodMultiplier()
             float movingAverage = totalDeltas / active->getAdaptiveTempo1History();
             
             adaptiveTempoPeriodMultiplier = movingAverage /
-                                            (active->getBeatThresh()) /
+                                            active->getBeatThreshMS() /
                                             active->getAdaptiveTempo1Subdivisions();
             
             DBG("adaptiveTempoPeriodMultiplier = " + String(adaptiveTempoPeriodMultiplier));

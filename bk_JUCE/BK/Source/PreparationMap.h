@@ -69,6 +69,20 @@ public:
             prep.append(" ",1);
         }
         
+        for (auto p : tempo)
+        {
+            prep.append("O",1);
+            prep.append(String(p->getId()), 3);
+            prep.append(" ",1);
+        }
+        
+        for (auto p : tuning)
+        {
+            prep.append("T",1);
+            prep.append(String(p->getId()), 3);
+            prep.append(" ",1);
+        }
+        
         if (prep == "")
             return " ";
         
@@ -79,14 +93,20 @@ public:
     void setSynchronic  (Synchronic::PtrArr);
     void setNostalgic   (Nostalgic::PtrArr);
     void setDirect      (Direct::PtrArr);
+    void setTempo       (Tempo::PtrArr);
+    void setTuning      (Tuning::PtrArr);
     
     Synchronic::PtrArr  getSynchronic(void);
     Nostalgic::PtrArr   getNostalgic(void);
     Direct::PtrArr      getDirect(void);
+    Tempo::PtrArr       getTempo(void);
+    Tuning::PtrArr      getTuning(void);
     
     void    addSynchronic(Synchronic::Ptr s);
     void    addNostalgic(Nostalgic::Ptr n);
     void    addDirect(Direct::Ptr d);
+    void    addTempo(Tempo::Ptr o);
+    void    addTuning(Tuning::Ptr t);
 
     void deactivateIfNecessary();
     
@@ -108,6 +128,8 @@ private:
     Synchronic::PtrArr          synchronic;
     Nostalgic::PtrArr           nostalgic;
     Direct::PtrArr              direct;
+    Tempo::PtrArr               tempo;
+    Tuning::PtrArr              tuning;
     
     // Pointers to synths (flown in from BKAudioProcessor)
     BKSynthesiser*              synth;

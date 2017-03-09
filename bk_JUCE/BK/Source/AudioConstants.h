@@ -519,7 +519,7 @@ static const std::vector<std::string> cTuningParameterTypes = {
 
 #pragma mark - Tempo
 typedef enum AdaptiveTempo1Mode {
-    TimeBetweenNotes,
+    TimeBetweenNotes = 0,
     NoteLength,
     AdaptiveTempo1ModeNil
 } AdaptiveTempo1Mode;

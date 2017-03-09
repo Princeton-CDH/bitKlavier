@@ -42,11 +42,11 @@ public:
     sBeatThreshSec(p->getBeatThresh()),
     sClusterThresh(p->getClusterThreshMS()),
     sClusterThreshSec(p->getClusterThreshSEC()),
-    at1History(p->getAdaptiveTempo1History()),
-    at1Min(p->getAdaptiveTempo1Min()),
-    at1Max(p->getAdaptiveTempo1Max()),
-    at1Subdivisions(p->getAdaptiveTempo1Subdivisions()),
-    at1Mode(p->getAdaptiveTempo1Mode()),
+    //at1History(p->getAdaptiveTempo1History()),
+    //at1Min(p->getAdaptiveTempo1Min()),
+    //at1Max(p->getAdaptiveTempo1Max()),
+    //at1Subdivisions(p->getAdaptiveTempo1Subdivisions()),
+    //at1Mode(p->getAdaptiveTempo1Mode()),
     tuning(p->getTuning()),
     tempo(p->getTempoControl())
     {
@@ -181,11 +181,6 @@ public:
                 sBeatThreshSec == s->getBeatThresh() &&
                 sClusterThresh == s->getClusterThreshMS() &&
                 sClusterThreshSec == s->getClusterThreshSEC() &&
-                at1History == s->getAdaptiveTempo1History() &&
-                at1Min == s->getAdaptiveTempo1Min() &&
-                at1Max == s->getAdaptiveTempo1Max() &&
-                at1Subdivisions == s->getAdaptiveTempo1Subdivisions() &&
-                at1Mode == s->getAdaptiveTempo1Mode() &&
                 tuning == s->getTuning() &&
                 tempo == s->getTempoControl());
     }
@@ -206,13 +201,14 @@ public:
     inline const Array<Array<float>> getTransposition() const noexcept {return sTransposition;         }
     //inline const Keymap::Ptr getResetMap() const noexcept              {return resetMap;       }
     
+    /*
     //Adaptive Tempo 1
     inline AdaptiveTempo1Mode getAdaptiveTempo1Mode(void)   {return at1Mode;   }
     inline int getAdaptiveTempo1History(void)               {return at1History;}
     inline float getAdaptiveTempo1Subdivisions(void)        {return at1Subdivisions;}
     inline float getAdaptiveTempo1Min(void)                 {return at1Min;}
     inline float getAdaptiveTempo1Max(void)                 {return at1Max;}
-
+*/
     
     inline void setTempo(float tempo)
     {
@@ -243,11 +239,13 @@ public:
     inline void setLengthMultipliers(Array<float> lengthMultipliers)   {sLengthMultipliers.swapWith(lengthMultipliers);    }
     
     //Adaptive Tempo 1
+    /*
     inline void setAdaptiveTempo1Mode(AdaptiveTempo1Mode mode)          {at1Mode = mode;    }
     inline void setAdaptiveTempo1History(int hist)                      {at1History = hist;}
     inline void setAdaptiveTempo1Subdivisions(float sub)                {at1Subdivisions = sub;}
     inline void setAdaptiveTempo1Min(float min)                         {at1Min = min;}
     inline void setAdaptiveTempo1Max(float max)                         {at1Max = max;}
+     */
     
     inline const Tuning::Ptr getTuning() const noexcept                 {return tuning; }
     inline void setTuning(Tuning::Ptr t)                                {tuning = t;  }
@@ -298,11 +296,13 @@ private:
     float sClusterThresh;      //max time between played notes before new cluster is started, in MS
     float sClusterThreshSec;
     
+    /*
     // Adaptive Tempo 1
     int at1History;
     float at1Min, at1Max;
     float at1Subdivisions;
     AdaptiveTempo1Mode at1Mode;
+     */
     
     Tuning::Ptr tuning;
     Tempo::Ptr tempo;

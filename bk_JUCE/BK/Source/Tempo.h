@@ -40,7 +40,7 @@ public:
     TempoPreparation():
     sWhichTempoSystem(ConstantTempo),
     sTempo(120),
-    at1History(0),
+    at1History(4),
     at1Min(100),
     at1Max(2000),
     at1Subdivisions(1.0f),
@@ -142,13 +142,13 @@ public:
     
     ~TempoProcessor();
     
-    void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr;}
+    void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr; DBG("setting tempo sample rate " + String(sampleRate));}
     
     void processBlock(int numSamples, int channel);
     void keyPressed(int noteNumber, float velocity);
     void keyReleased(int noteNumber, int channel);
-    inline float getPeriodMultiplier(void)      {return adaptiveTempoPeriodMultiplier;}
-    inline float getAdaptedTempo(void)          {return adaptiveTempoPeriodMultiplier * active->getTempo();}
+    inline float getPeriodMultiplier(void)              {return adaptiveTempoPeriodMultiplier;}
+    inline float getAdaptedTempo(void)                  {return adaptiveTempoPeriodMultiplier * active->getTempo();}
     
     void  reset();
     
@@ -161,8 +161,8 @@ private:
     
     //adaptive tempo stuff
     uint64 atTimer, atLastTime; //in samples
-    int atDelta;                //in sec
-    Array<int> atDeltaHistory;  //in sec
+    int atDelta;                //in ms
+    Array<int> atDeltaHistory;  //in ms
     void atNewNote();
     void atNewNoteOff();
     void atCalculatePeriodMultiplier();
