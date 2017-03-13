@@ -109,46 +109,50 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
         //int synthNoteNumber = noteNumber + (int)offset;
         //float synthOffset = offset - (int)offset;
         
-        float hGain = active->getHammerGain();
-        float rGain = active->getResonanceGain();
-        
-        if (hGain > 0.0f)
+        //only play hammers/resonance for first note in layers of transpositions
+        if(i==0)
         {
-            hammerSynth->keyOn(
-                                     channel,
-                                     //synthNoteNumber,
-                                     t,
-                                     0,
-                                     velocity,
-                                     hGain,
-                                     Forward,
-                                     Normal, //FixedLength,
-                                     HammerNote,
-                                     Id,
-                                     0,
-                                     2000,
-                                     3,
-                                     3 );
-        }
-        
-        if (rGain > 0.0f)
-        {
-            resonanceSynth->keyOn(
-                                        channel,
-                                        //synthNoteNumber,
-                                        t,
-                                        //synthOffset,
-                                        t_offset,
-                                        velocity,
-                                        rGain,
-                                        Forward,
-                                        Normal, //FixedLength,
-                                        ResonanceNote,
-                                        Id,
-                                        0,
-                                        2000,
-                                        3,
-                                        3 );
+            float hGain = active->getHammerGain();
+            float rGain = active->getResonanceGain();
+            
+            if (hGain > 0.0f)
+            {
+                hammerSynth->keyOn(
+                                 channel,
+                                 //synthNoteNumber,
+                                 t,
+                                 0,
+                                 velocity,
+                                 hGain,
+                                 Forward,
+                                 Normal, //FixedLength,
+                                 HammerNote,
+                                 Id,
+                                 0,
+                                 2000,
+                                 3,
+                                 3 );
+            }
+            
+            if (rGain > 0.0f)
+            {
+                resonanceSynth->keyOn(
+                                    channel,
+                                    //synthNoteNumber,
+                                    t,
+                                    //synthOffset,
+                                    t_offset,
+                                    velocity,
+                                    rGain,
+                                    Forward,
+                                    Normal, //FixedLength,
+                                    ResonanceNote,
+                                    Id,
+                                    0,
+                                    2000,
+                                    3,
+                                    3 );
+            }
         }
     }
 
