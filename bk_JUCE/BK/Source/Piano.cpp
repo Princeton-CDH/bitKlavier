@@ -30,10 +30,14 @@ initialKeymap(keymap)
     modMap = OwnedArray<Modifications>();
     modMap.ensureStorageAllocated(128);
     
+    modificationMaps = OwnedArray<ModificationMap>();
+    modificationMaps.ensureStorageAllocated(128);
+    
     for (int i = 0; i < 128; i++)
     {
         pianoMap.set(i, 0);
         modMap.add(new Modifications());
+        modificationMaps.add(new ModificationMap());
     }
     
     prepMaps.ensureStorageAllocated(12);

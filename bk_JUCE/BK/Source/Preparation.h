@@ -93,7 +93,6 @@ public:
     {
         aPrep->copy(sPrep);
         updateState->directPreparationDidChange = true;
-        DBG("direct reset");
     }
     
     //void didChange(bool which) { updateState->directPreparationDidChange = which; }

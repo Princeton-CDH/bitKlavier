@@ -31,7 +31,7 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
     synth->clearSounds();
     
     // 88 or more seems to work well
-    for (int i = 0; i < 150; i++)   synth->addVoice(new BKPianoSamplerVoice(synth->generalSettings));
+    for (int i = 0; i < 300; i++)   synth->addVoice(new BKPianoSamplerVoice(synth->generalSettings));
     
     
     for (int i = 0; i < 8; i++) {

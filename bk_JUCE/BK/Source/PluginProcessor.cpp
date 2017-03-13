@@ -1841,7 +1841,7 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     
                     Piano::Ptr thisPiano = bkPianos[whichPiano];
                     
-                    int pianoMapCount = 0, prepMapCount = 0, modDirectCount = 0, modSynchronicCount = 0, modNostalgicCount = 0, modTuningCount = 0;
+                    int pianoMapCount = 0, prepMapCount = 0, modCount = 0, resetCount = 0;
                     
                     String pianoName = e->getStringAttribute("bkPianoName");
                     
@@ -1914,91 +1914,174 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                         
                             ++prepMapCount;
                         }
-                        else if (pc->hasTagName( vtagModDirect + String(modDirectCount)))
+                        else if (pc->hasTagName( "mod" + String(modCount)))
                         {
-                            // directModPrep
-                            int k = pc->getStringAttribute(ptagModX_key).getIntValue();
-                            int modPrep = pc->getStringAttribute(ptagModX_modPrep).getIntValue();
-                            int prep = pc->getStringAttribute(ptagModX_prep).getIntValue();
+                            int key = pc->getStringAttribute(ptagModX_key).getIntValue();
                             
-                            DirectModPreparation::Ptr thisMod = directModPrep[modPrep];
-                            
-                            for (int z = 1; z < thisMod->getStringArray().size() ;z++)
+                            int subModCount = 0;
+                            forEachXmlChildElement (*pc, mod)
                             {
-                                DirectParameterType type = (DirectParameterType)z;
+                                if (mod->hasTagName("m"+String(subModCount)))
+                                {
+                                    // TOO MANY OF THESE???
+                                    BKPreparationType type = (BKPreparationType)mod->getStringAttribute("type").getIntValue();
+                                    int whichMod = mod->getStringAttribute("id").getIntValue();
+                                    
+                                    Array<int> whichPreps;
+                                    for (int p = 0; p < 200; p++) //arbitrary 200
+                                    {
+                                        String attr = mod->getStringAttribute("p" + String(p));
+                                        
+                                        if (attr == String::empty)  break;
+                                        else                        whichPreps.add(attr.getIntValue());
+                                    }
+                                    
+                                    if (whichPreps.size())
+                                        thisPiano->modificationMaps[key]->addModPrepMap(new ModPrepMap(type, whichMod, whichPreps));
+                                    
+                                    // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ PUT IN OWN FUNCTION IN PIANOOOOO ~ ~ ~ ~ ~ ~ ~ ~ ~
+                                    if (type == PreparationTypeDirect)
+                                    {
+                                        DirectModPreparation::Ptr dmod = directModPrep[whichMod];
+                                        
+                                        for (int n = cDirectParameterTypes.size(); --n >= 0; )
+                                        {
+                                            String param = dmod->getParam((DirectParameterType)n);
+                                            
+                                            if (param != "")
+                                            {
+                                                for (auto prep : whichPreps)
+                                                {
+                                                    thisPiano->modMap[key]->addDirectModification(new DirectModification(key, prep, (DirectParameterType)n, param, whichMod));
+                                                    
+                                                    DBG("[ADDINGMOD] whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cDirectParameterTypes[n] + " val: " +param);
+                                                    
+                                                }
+                                                
+                                                
+                                            }
+                                        }
+                                    }
+                                    else if (type == PreparationTypeSynchronic)
+                                    {
+                                        SynchronicModPreparation::Ptr smod = synchronicModPrep[whichMod];
+                                        
+                                        for (int n = cSynchronicParameterTypes.size(); --n >= 0; )
+                                        {
+                                            String param = smod->getParam((SynchronicParameterType)n);
+                                            
+                                            if (param != "")
+                                            {
+                                                for (auto prep : whichPreps)
+                                                {
+                                                    thisPiano->modMap[key]->addSynchronicModification(new SynchronicModification(key, prep, (SynchronicParameterType)n, param, whichMod));
+                                                    
+                                                    DBG("[ADDINGMOD] whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cSynchronicParameterTypes[n] + " val: " +param);
+                                                    
+                                                }
+                                                
+                                                
+                                            }
+                                        }
+                                    }
+                                    else if (type == PreparationTypeNostalgic)
+                                    {
+                                        NostalgicModPreparation::Ptr nmod = nostalgicModPrep[whichMod];
+                                        
+                                        for (int n = cNostalgicParameterTypes.size(); --n >= 0; )
+                                        {
+                                            String param = nmod->getParam((NostalgicParameterType)n);
+                                            
+                                            if (param != "")
+                                            {
+                                                for (auto prep : whichPreps)
+                                                {
+                                                    thisPiano->modMap[key]->addNostalgicModification(new NostalgicModification(key, prep, (NostalgicParameterType)n, param, whichMod));
+                                                    
+                                                    DBG("[ADDINGMOD] whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cNostalgicParameterTypes[n] + " val: " +param);
+                                                    
+                                                }
+                                                
+                                                
+                                            }
+                                        }
+                                    }
+                                    else if (type == PreparationTypeTuning)
+                                    {
+                                        TuningModPreparation::Ptr tmod = tuningModPrep[whichMod];
+                                        
+                                        for (int n = cTuningParameterTypes.size(); --n >= 0; )
+                                        {
+                                            String param = tmod->getParam((TuningParameterType)n);
+                                            
+                                            if (param != "")
+                                            {
+                                                for (auto prep : whichPreps)
+                                                {
+                                                    thisPiano->modMap[key]->addTuningModification(new TuningModification(key, prep, (TuningParameterType)n, param, whichMod));
+                                                    
+                                                    DBG("[ADDINGMOD] whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cTuningParameterTypes[n] + " val: " +param);
+                                                    
+                                                }
+                                                
+                                                
+                                            }
+                                        }
+                                    }
+                                    // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                                    
+                                    ++subModCount;
+                                }
                                 
-                                String val = thisMod->getParam(type);
-                                
-                                if (val != "")  thisPiano->modMap[k]->addDirectModification(new DirectModification(k, prep, type, val, modPrep));
                                 
                             }
                             
-                            ++modDirectCount;
+                            
+                            
                         }
-                        else if (pc->hasTagName( vtagModSynchronic + String(modSynchronicCount)))
+                        else if (pc->hasTagName( vtagReset + String(resetCount))) // RESET LOADING
                         {
-                            // synchronicModPrep
                             int k = pc->getStringAttribute(ptagModX_key).getIntValue();
-                            int modPrep = pc->getStringAttribute(ptagModX_modPrep).getIntValue();
-                            int prep = pc->getStringAttribute(ptagModX_prep).getIntValue();
                             
-                            SynchronicModPreparation::Ptr thisMod = synchronicModPrep[modPrep];
                             
-                            for (int z = 1; z < thisMod->getStringArray().size() ;z++)
+                            // Direct resets
+                            for (int n = 0; n < 128; n++)
                             {
-                                SynchronicParameterType type = (SynchronicParameterType)z;
+                                String attr = pc->getStringAttribute("d" + String(n));
                                 
-                                String val = thisMod->getParam(type);
-                                
-                                if (val != "")  thisPiano->modMap[k]->addSynchronicModification(new SynchronicModification(k, prep, type, val, modPrep));
-                                
+                                if (attr == String::empty)  break;
+                                else                        thisPiano->modMap[k]->directReset.add(attr.getIntValue());
                             }
                             
-                            ++modSynchronicCount;
-                        }
-                        else if (pc->hasTagName( vtagModNostalgic + String(modNostalgicCount)))
-                        {
-                            // nostalgicModPrep
-                            int k = pc->getStringAttribute(ptagModX_key).getIntValue();
-                            int modPrep = pc->getStringAttribute(ptagModX_modPrep).getIntValue();
-                            int prep = pc->getStringAttribute(ptagModX_prep).getIntValue();
-                            
-                            NostalgicModPreparation::Ptr thisMod = nostalgicModPrep[modPrep];
-                            
-                            for (int z = 1; z < thisMod->getStringArray().size() ;z++)
+                            // Synchronic resets
+                            for (int n = 0; n < 128; n++)
                             {
-                                NostalgicParameterType type = (NostalgicParameterType)z;
+                                String attr = pc->getStringAttribute("s" + String(n));
                                 
-                                String val = thisMod->getParam(type);
-                                
-                                if (val != "")  thisPiano->modMap[k]->addNostalgicModification(new NostalgicModification(k, prep, type, val, modPrep));
-                                
+                                if (attr == String::empty)  break;
+                                else                        thisPiano->modMap[k]->synchronicReset.add(attr.getIntValue());
                             }
                             
-                            ++modNostalgicCount;
-                            
-                        }
-                        else if (pc->hasTagName( vtagModTuning + String(modTuningCount)))
-                        {
-                            // tuningModPrep
-                            int k = pc->getStringAttribute(ptagModX_key).getIntValue();
-                            int modPrep = pc->getStringAttribute(ptagModX_modPrep).getIntValue();
-                            int prep = pc->getStringAttribute(ptagModX_prep).getIntValue();
-                            
-                            TuningModPreparation::Ptr thisMod = tuningModPrep[modPrep];
-                            
-                            for (int z = 1; z < thisMod->getStringArray().size();z++)
+                            // Nostalgic resets
+                            for (int n = 0; n < 128; n++)
                             {
-                                TuningParameterType type = (TuningParameterType)z;
+                                String attr = pc->getStringAttribute("n" + String(n));
                                 
-                                String val = thisMod->getParam(type);
-                                
-                                if (val != "")  thisPiano->modMap[k]->addTuningModification(new TuningModification(k, prep, type, val, modPrep));
-                                
+                                if (attr == String::empty)  break;
+                                else                        thisPiano->modMap[k]->nostalgicReset.add(attr.getIntValue());
                             }
                             
-                            ++modTuningCount;
+                            // Tuning resets
+                            for (int n = 0; n < 128; n++)
+                            {
+                                String attr = pc->getStringAttribute("t" + String(n));
+                                
+                                if (attr == String::empty)  break;
+                                else                        thisPiano->modMap[k]->tuningReset.add(attr.getIntValue());
+                            }
+                            ++resetCount;
                         }
+                        
                         
                     }
 
@@ -2105,7 +2188,7 @@ ScopedPointer<XmlElement>  BKAudioProcessor::saveGallery(void)
 
         pmapCount = 0;
         
-        int dmodCount = 0, nmodCount = 0, smodCount = 0, tmodCount = 0;
+        int dmodCount = 0, nmodCount = 0, smodCount = 0, tmodCount = 0, resetCount = 0, modCount = 0;
         
         // Iterate through all keys and write data from PianoMap and ModMap to ValueTree
         for (int key = 0; key < 128; key++)
@@ -2119,7 +2202,7 @@ ScopedPointer<XmlElement>  BKAudioProcessor::saveGallery(void)
                 
                 pianoVT.addChild(pmapVT, -1, 0);
             }
-            
+            /*
             for (auto mod : bkPianos[piano]->modMap[key]->getDirectModifications())
             {
                 ValueTree modVT( vtagModDirect + String(dmodCount++));
@@ -2130,7 +2213,7 @@ ScopedPointer<XmlElement>  BKAudioProcessor::saveGallery(void)
                 
                 pianoVT.addChild(modVT, -1, 0);
             }
-            
+
             for (auto mod : bkPianos[piano]->modMap[key]->getSynchronicModifications())
             {
                 ValueTree modVT( vtagModSynchronic + String(smodCount++));
@@ -2141,7 +2224,7 @@ ScopedPointer<XmlElement>  BKAudioProcessor::saveGallery(void)
                 
                 pianoVT.addChild(modVT, -1, 0);
             }
-            
+
             for (auto mod : bkPianos[piano]->modMap[key]->getNostalgicModifications())
             {
                 ValueTree modVT( vtagModNostalgic + String(nmodCount++));
@@ -2152,7 +2235,7 @@ ScopedPointer<XmlElement>  BKAudioProcessor::saveGallery(void)
                 
                 pianoVT.addChild(modVT, -1, 0);
             }
-            
+
             for (auto mod : bkPianos[piano]->modMap[key]->getTuningModifications())
             {
                 ValueTree modVT( vtagModTuning + String(tmodCount++));
@@ -2162,6 +2245,61 @@ ScopedPointer<XmlElement>  BKAudioProcessor::saveGallery(void)
                 modVT.setProperty( ptagModX_prep, mod->getPrepId(), 0);
                 
                 pianoVT.addChild(modVT, -1, 0);
+            }
+            */
+            
+            
+            ModPrepMap::PtrArr theMods = bkPianos[piano]->modificationMaps[key]->getModPrepMaps();
+            
+            if (theMods.size())
+            {
+                ValueTree modVT ("mod"+String(modCount++));
+                modVT.setProperty( ptagModX_key, key, 0);
+                
+                for (int thisOne = 0; thisOne < theMods.size(); thisOne++)
+                {
+                    ModPrepMap::Ptr thisMod = theMods[thisOne];
+                    
+                    ValueTree thisModVT("m"+String(thisOne));
+                    thisModVT.setProperty("type", (int)thisMod->getType(), 0);
+                    thisModVT.setProperty("id", thisMod->getId(), 0);
+                    
+                    int pcount = 0;
+                    for (auto prep : thisMod->getPreparations())
+                        thisModVT.setProperty("p"+String(pcount++), prep, 0);
+                    
+                    modVT.addChild(thisModVT, -1, 0);
+                }
+                
+                pianoVT.addChild(modVT, -1, 0);
+            }
+            
+            // RESET SAVING
+            if (bkPianos[piano]->modMap[key]->directReset.size() ||
+                bkPianos[piano]->modMap[key]->nostalgicReset.size() ||
+                bkPianos[piano]->modMap[key]->synchronicReset.size() ||
+                bkPianos[piano]->modMap[key]->tuningReset.size())
+            {
+                ValueTree resetVT( vtagReset + String(resetCount++));
+                resetVT.setProperty( ptagModX_key, key, 0);
+                
+                int rcount = 0;
+                for (auto reset : bkPianos[piano]->modMap[key]->directReset)
+                    resetVT.setProperty( "d" + String(rcount++), reset, 0);
+                
+                rcount = 0;
+                for (auto reset : bkPianos[piano]->modMap[key]->synchronicReset)
+                    resetVT.setProperty( "s" + String(rcount++), reset, 0);
+                
+                rcount = 0;
+                for (auto reset : bkPianos[piano]->modMap[key]->nostalgicReset)
+                    resetVT.setProperty( "n" + String(rcount++), reset, 0);
+                
+                rcount = 0;
+                for (auto reset : bkPianos[piano]->modMap[key]->tuningReset)
+                    resetVT.setProperty( "t" + String(rcount++), reset, 0);
+                
+                pianoVT.addChild(resetVT, -1, 0);
             }
             
         }
@@ -2241,7 +2379,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 
 void BKAudioProcessor::performResets(int noteNumber)
 {
-    
+    // NEEDS OPTIMIZATION
     for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->directReset)      direct[prep]->reset();
     for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->synchronicReset)  synchronic[prep]->reset();
     for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->nostalgicReset)   nostalgic[prep]->reset();
@@ -2250,6 +2388,7 @@ void BKAudioProcessor::performResets(int noteNumber)
 
 void BKAudioProcessor::performModifications(int noteNumber)
 {
+    // NEEDS OPTIMIZATION 
     Array<float> modfa;
     Array<Array<float>> modafa;
     Array<int> modia;
@@ -2430,7 +2569,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             
             // Send key on to each pmap in current piano
             for (p = currentPiano->activePMaps.size(); --p >= 0;) {
-                DBG("noteon: " +String(noteNumber) + " pmap: " + String(p));
+                //DBG("noteon: " +String(noteNumber) + " pmap: " + String(p));
                 currentPiano->activePMaps[p]->keyPressed(noteNumber, velocity, channel);
             }
         }

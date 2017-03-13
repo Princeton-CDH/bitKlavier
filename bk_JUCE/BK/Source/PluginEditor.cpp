@@ -662,6 +662,8 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
     DBG("clearing mod map");
     processor.currentPiano->clearModMap();
     
+    for (int i = 0; i < 128; i++) processor.currentPiano->modificationMaps[i]->clear();
+    
     if (s.length() == 0) return out;
     
     for (auto map : processor.currentPiano->pianoMap)    map = 0;
@@ -671,6 +673,8 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
     int whichMod = -1;
     
     Array<int> whichPreps;
+    
+    Array<Array<int>> theModMap;
     
     for (int i = 0; i < (s.length()+1); i++)
     {
@@ -735,10 +739,11 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                     
                     if (itsADirect)
                     {
-                        out += (String(key) + ":dm" +String(whichMod) + ":" + "{" + intArrayToString(whichPreps) + "} ");
-                        
                         DirectModPreparation::Ptr dmod = processor.directModPrep[whichMod];
                         
+                        processor.currentPiano->modificationMaps[key]->addModPrepMap(new ModPrepMap(PreparationTypeDirect, whichMod, whichPreps));
+                        
+                        // NOW THIS IS JUST CREATING THE INDIVIDUAL MODS FOR PROCESSING
                         for (int n = cDirectParameterTypes.size(); --n >= 0; )
                         {
                             String param = dmod->getParam((DirectParameterType)n);
@@ -748,59 +753,72 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                                 for (auto prep : whichPreps)
                                 {
                                     processor.currentPiano->modMap[key]->addDirectModification(new DirectModification(key, prep, (DirectParameterType)n, param, whichMod));
+                                    
                                     DBG("whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cDirectParameterTypes[n] + " val: " +param);
+                                    
                                 }
+                    
+                                
                             }
                         }
                     }
                     else if (itsANostalgic)
                     {
-                        out += (String(key) + ":nm" +String(whichMod) + ":" + "{" + intArrayToString(whichPreps) + "} ");
-                        
                         NostalgicModPreparation::Ptr nmod = processor.nostalgicModPrep[whichMod];
                         
+                        processor.currentPiano->modificationMaps[key]->addModPrepMap(new ModPrepMap(PreparationTypeNostalgic, whichMod, whichPreps));
+                        
+                        // NOW THIS IS JUST CREATING THE INDIVIDUAL MODS FOR PROCESSING
                         for (int n = cNostalgicParameterTypes.size(); --n >= 0; )
                         {
                             String param = nmod->getParam((NostalgicParameterType)n);
                             
-                            DBG("nostparam: " + param);
                             if (param != "")
                             {
                                 for (auto prep : whichPreps)
                                 {
                                     processor.currentPiano->modMap[key]->addNostalgicModification(new NostalgicModification(key, prep, (NostalgicParameterType)n, param, whichMod));
-                                    DBG("nostprep: " + String(prep) + " whichtype: " + cNostalgicParameterTypes[n] + " val: " +param);
+                                    
+                                    DBG("whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cNostalgicParameterTypes[n] + " val: " +param);
+                                    
                                 }
+                                
+                                
                             }
                         }
                     }
                     else if (itsASynchronic)
                     {
-                        out += (String(key) + ":sm" +String(whichMod) + ":" + "{" + intArrayToString(whichPreps) + "} ");
-                        
                         SynchronicModPreparation::Ptr smod = processor.synchronicModPrep[whichMod];
                         
+                        processor.currentPiano->modificationMaps[key]->addModPrepMap(new ModPrepMap(PreparationTypeSynchronic, whichMod, whichPreps));
+                        
+                        // NOW THIS IS JUST CREATING THE INDIVIDUAL MODS FOR PROCESSING
                         for (int n = cSynchronicParameterTypes.size(); --n >= 0; )
                         {
                             String param = smod->getParam((SynchronicParameterType)n);
                             
-                            DBG("syncparam: " + param);
                             if (param != "")
                             {
                                 for (auto prep : whichPreps)
                                 {
                                     processor.currentPiano->modMap[key]->addSynchronicModification(new SynchronicModification(key, prep, (SynchronicParameterType)n, param, whichMod));
-                                    DBG("syncprep: " + String(prep) + " whichtype: " + cSynchronicParameterTypes[n] + " val: " +param);
+                                    
+                                    DBG("whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cSynchronicParameterTypes[n] + " val: " +param);
+                                    
                                 }
+                                
+                                
                             }
                         }
                     }
                     else if (itsATuning)
                     {
-                        out += (String(key) + ":tm" +String(whichMod) + ":" + "{" + intArrayToString(whichPreps) + "} ");
-                        
                         TuningModPreparation::Ptr tmod = processor.tuningModPrep[whichMod];
                         
+                        processor.currentPiano->modificationMaps[key]->addModPrepMap(new ModPrepMap(PreparationTypeTuning, whichMod, whichPreps));
+                        
+                        // NOW THIS IS JUST CREATING THE INDIVIDUAL MODS FOR PROCESSING
                         for (int n = cTuningParameterTypes.size(); --n >= 0; )
                         {
                             String param = tmod->getParam((TuningParameterType)n);
@@ -810,13 +828,15 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                                 for (auto prep : whichPreps)
                                 {
                                     processor.currentPiano->modMap[key]->addTuningModification(new TuningModification(key, prep, (TuningParameterType)n, param, whichMod));
-                                    DBG("tuneprep: " + String(prep) + " whichtype: " + cTuningParameterTypes[n] + " val: " +param);
+                                    
+                                    DBG("whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cTuningParameterTypes[n] + " val: " +param);
+                                    
                                 }
+                                
+                                
                             }
                         }
                     }
-                    
-                    
                     
                 }
                 
@@ -869,7 +889,7 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
         
     }
     
-    return out;
+    return processor.currentPiano->modificationMapsToString();
 }
 
 void BKAudioProcessorEditor::bkTextFieldDidChange(TextEditor& tf)
@@ -1064,7 +1084,7 @@ void BKAudioProcessorEditor::switchPianos(void)
     String modMap = "";
     for (int i = 0; i < 128; i++)
     {
-        String mod = processor.currentPiano->modMap[i]->stringRepresentation();
+        String mod = processor.currentPiano->modificationMapsToString();
         if (mod != "") modMap += mod;
     }
     

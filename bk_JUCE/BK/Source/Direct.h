@@ -72,7 +72,6 @@ public:
         dResonanceGain = d->getResonanceGain();
         dHammerGain = d->getHammerGain();
         tuning = d->getTuning();
-        //resetMap->copy(d->resetMap);
     }
     
     inline bool compare(DirectPreparation::Ptr d)

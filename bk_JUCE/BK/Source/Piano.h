@@ -71,6 +71,28 @@ public:
     int                         numPMaps;
     
     OwnedArray<Modifications> modMap;
+    OwnedArray<ModificationMap> modificationMaps;
+    
+    String modificationMapsToString(void)
+    {
+        String out = "";
+        for (int i = 0; i < 128; i++)
+        {
+            String ptype = "";
+            for (auto mpm : modificationMaps[i]->getModPrepMaps())
+            {
+                if (mpm->getType() == PreparationTypeDirect) ptype = "dm";
+                else if (mpm->getType() == PreparationTypeNostalgic) ptype = "nm";
+                else if (mpm->getType() == PreparationTypeSynchronic) ptype = "sm";
+                else if (mpm->getType() == PreparationTypeTuning) ptype = "tm";
+                
+                out += String(i) + ":" + ptype + String(mpm->getId()) + ":" + "{" + intArrayToString(mpm->getPreparations()) +"} ";
+                
+            }
+        }
+        return out;
+    }
+    
     void clearModMap(void)
     {
         for (int i = 0; i<modMap.size(); i++)
