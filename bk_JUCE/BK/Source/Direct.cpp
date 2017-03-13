@@ -61,25 +61,53 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                      3,
                      3);
         
+        //store synthNoteNumbers by noteNumber
+        keyPlayed[noteNumber].add(synthNoteNumber);
+        keyPlayedOffset[noteNumber].add(synthOffset);
+        
     }
+    
+    
     
 }
 
 void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
 {
 
-    for (auto t : active->getTransposition())
-    {
-        float offset = t + tuner->getOffset(noteNumber);
-        int synthNoteNumber = noteNumber + (int)offset;
-        float synthOffset = offset - (int)offset;
-        
-        synth->keyOff(channel,
+    /*
+     for (auto t : active->getTransposition())
+     {
+         float offset = t + tuner->getOffset(noteNumber);
+         int synthNoteNumber = noteNumber + (int)offset;
+         float synthOffset = offset - (int)offset;
+         
+         //lookup synthNoteNumber by noteNumber, stored at keyPressed time,
+         //to make sure we keyOff the right "note" in the event of a preparation change mid-note.
+         
+         synth->keyOff(channel,
                       MainNote,
                       Id,
                       synthNoteNumber,
                       velocity,
                       true);
+     
+     */
+    
+    for (int i = 0; i<keyPlayed[noteNumber].size(); i++)
+    {
+        int t = keyPlayed[noteNumber].getUnchecked(i);
+        float t_offset = keyPlayedOffset[noteNumber].getUnchecked(i);
+        
+        synth->keyOff(channel,
+                     MainNote,
+                     Id,
+                     t,
+                     velocity,
+                     true);
+        
+        //float offset = tuner->getOffset(noteNumber);
+        //int synthNoteNumber = noteNumber + (int)offset;
+        //float synthOffset = offset - (int)offset;
         
         float hGain = active->getHammerGain();
         float rGain = active->getResonanceGain();
@@ -88,7 +116,8 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
         {
             hammerSynth->keyOn(
                                      channel,
-                                     synthNoteNumber,
+                                     //synthNoteNumber,
+                                     t,
                                      0,
                                      velocity,
                                      hGain,
@@ -106,8 +135,10 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
         {
             resonanceSynth->keyOn(
                                         channel,
-                                        synthNoteNumber,
-                                        synthOffset,
+                                        //synthNoteNumber,
+                                        t,
+                                        //synthOffset,
+                                        t_offset,
                                         velocity,
                                         rGain,
                                         Forward,
@@ -121,6 +152,9 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
         }
     }
 
+    keyPlayed[noteNumber].clearQuick();
+    keyPlayedOffset[noteNumber].clearQuick();
+    
 }
 
 void DirectProcessor::processBlock(int numSamples, int midiChannel)

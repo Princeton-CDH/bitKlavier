@@ -291,6 +291,12 @@ private:
     DirectPreparation::Ptr      active;
     TuningProcessor::Ptr        tuner;
     
+    //need to keep track of the actual notes played and their offsets when a particular key is pressed
+    //so that they can all be turned off properly, even in the event of a preparation change
+    //while the key is held
+    Array<int>      keyPlayed[128];         //keep track of pitches played associated with particular key on keyboard
+    Array<float>    keyPlayedOffset[128];   //and also the offsets
+    
     double sampleRate;
     
     JUCE_LEAK_DETECTOR(DirectProcessor);
