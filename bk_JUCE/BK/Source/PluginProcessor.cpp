@@ -72,7 +72,7 @@ resonanceReleaseSynth   (general)
     
     collectGalleries();
     
-    //loadGalleryFromPath(galleryNames[0]);
+    loadGalleryFromPath(galleryNames[0]);
 }
 
 void BKAudioProcessor::collectGalleries(void)
@@ -2414,6 +2414,8 @@ ScopedPointer<XmlElement>  BKAudioProcessor::saveGallery(void)
     updateGalleries();
     
     
+    galleryDidLoad = true;
+    
     return myXML;
     
     
@@ -2805,8 +2807,11 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
     
-    ScopedPointer<XmlElement> xml = saveGallery();
-    copyXmlToBinary (*xml, destData);
+    if (galleryDidLoad)
+    {
+        ScopedPointer<XmlElement> xml = saveGallery();
+        copyXmlToBinary (*xml, destData);
+    }
 }
 
 void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
@@ -2816,8 +2821,11 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
     // whose contents will have been created by the getStateInformation() call.
     
     //loadGallery
-    ScopedPointer<XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
-    if (xmlState != nullptr) ;//loadGalleryFromXml(xmlState);
+    if (galleryDidLoad)
+        {
+        ScopedPointer<XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
+        if (xmlState != nullptr) loadGalleryFromXml(xmlState);
+    }
 }
 
 //==============================================================================

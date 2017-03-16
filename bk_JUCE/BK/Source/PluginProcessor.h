@@ -192,7 +192,7 @@ private:
     void loadResonanceRelaseSamples(BKSynthesiser *synth);
     void loadHammerReleaseSamples(BKSynthesiser *synth);
     
-    Array<float> tempoAlreadyLoaded;
+    Array<float> tempoAlreadyLoaded;bool galleryDidLoad;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)

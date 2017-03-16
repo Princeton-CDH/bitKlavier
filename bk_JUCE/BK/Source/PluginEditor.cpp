@@ -95,7 +95,7 @@ timerCallbackCount(0)
     galleryCB.setName("Galleries");
     galleryCB.addSeparator();
     galleryCB.addListener(this);
-    galleryCB.setSelectedId(1, dontSendNotification);
+    galleryCB.setSelectedId(0, dontSendNotification);
     pvc->addAndMakeVisible(galleryCB);
     
     
