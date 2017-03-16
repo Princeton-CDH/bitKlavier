@@ -1081,14 +1081,9 @@ void BKAudioProcessorEditor::switchPianos(void)
         
     pianoMapTF.setText(temp, false);
     
-    String modMap = "";
-    for (int i = 0; i < 128; i++)
-    {
-        String mod = processor.currentPiano->modificationMapsToString();
-        if (mod != "") modMap += mod;
-    }
-    
-    modMapTF.setText(modMap, false);
+
+    String mm = processor.currentPiano->modificationMapsToString();
+    modMapTF.setText(mm, false);
     
     pianoNameTF.setText(processor.currentPiano->getName(), false);
 }

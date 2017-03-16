@@ -2034,10 +2034,11 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                                 }
                                 
                                 
+                                
                             }
                             
                             
-                            
+                            ++modCount;
                         }
                         else if (pc->hasTagName( vtagReset + String(resetCount))) // RESET LOADING
                         {
