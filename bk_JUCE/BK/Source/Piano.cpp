@@ -13,6 +13,8 @@
 Piano::Piano(Synchronic::PtrArr synchronic,
              Nostalgic::PtrArr nostalgic,
              Direct::PtrArr direct,
+             Tuning::PtrArr tuning,
+             Tempo::PtrArr tempo,
              Keymap::Ptr keymap,
              int Id):
 currentPMap(PreparationMap::Ptr()),
@@ -21,6 +23,8 @@ prepMaps(PreparationMap::CSPtrArr()),
 synchronic(synchronic),
 nostalgic(nostalgic),
 direct(direct),
+tuning(tuning),
+tempo(tempo),
 numPMaps(0),
 Id(Id),
 initialKeymap(keymap)

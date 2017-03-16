@@ -118,6 +118,8 @@ public:
     void addDirectModification(DirectModification::Ptr m);
     
     void addTuningModification(TuningModification::Ptr m);
+    
+    void addTempoModification(TempoModification::Ptr m);
 
     SynchronicModification::PtrArr getSynchronicModifications(void);
     
@@ -126,6 +128,8 @@ public:
     DirectModification::PtrArr getDirectModifications(void);
     
     TuningModification::PtrArr getTuningModifications(void);
+    
+    TempoModification::PtrArr getTempoModifications(void);
     
     String  stringRepresentation(void);
     
@@ -136,12 +140,14 @@ public:
     Array<int> nostalgicReset;
     Array<int> synchronicReset;
     Array<int> tuningReset;
+    Array<int> tempoReset;
     
 private:
     DirectModification::PtrArr      directMods;
     SynchronicModification::PtrArr  synchronicMods;
     NostalgicModification::PtrArr   nostalgicMods;
     TuningModification::PtrArr      tuningMods;
+    TempoModification::PtrArr       tempoMods;
     
     
     JUCE_LEAK_DETECTOR(Modifications)

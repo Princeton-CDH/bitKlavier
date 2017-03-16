@@ -122,7 +122,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
     
     NostalgicPreparation::Ptr active = processor.nostalgic[currentNostalgicId]->aPrep;
     
-    NostalgicModPreparation::Ptr mod = processor.nostalgicModPrep[currentModNostalgicId];
+    NostalgicModPreparation::Ptr mod = processor.modNostalgic[currentModNostalgicId];
     
     if (name == cNostalgicParameterTypes[NostalgicId])
     {
@@ -147,7 +147,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            int numMod = processor.nostalgicModPrep.size();
+            int numMod = processor.modNostalgic.size();
             
             if ((i+1) > numMod)
             {
@@ -314,7 +314,7 @@ void NostalgicViewController::updateFields(void)
 void NostalgicViewController::updateModFields(void)
 {
     
-    NostalgicModPreparation::Ptr prep = processor.nostalgicModPrep[currentModNostalgicId];
+    NostalgicModPreparation::Ptr prep = processor.modNostalgic[currentModNostalgicId];
     
     modNostalgicTF[NostalgicWaveDistance]      ->setText( prep->getParam(NostalgicWaveDistance), false);
     modNostalgicTF[NostalgicUndertow]          ->setText( prep->getParam(NostalgicUndertow), false);

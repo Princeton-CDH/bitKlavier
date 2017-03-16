@@ -14,6 +14,7 @@
 #include "BKUtilities.h"
 #include "BKSynthesiser.h"
 #include "Tuning.h"
+#include "Tempo.h"
 #include "General.h"
 #include "Keymap.h"
 
@@ -28,7 +29,6 @@ public:
     
     // Copy Constructor
     SynchronicPreparation(SynchronicPreparation::Ptr p):
-    sTempo(p->getTempo()),
     sNumBeats(p->getNumBeats()),
     sClusterMin(p->getClusterMin()),
     sClusterMax(p->getClusterMax()),
@@ -39,20 +39,14 @@ public:
     sAccentMultipliers(p->getAccentMultipliers()),
     sLengthMultipliers(p->getLengthMultipliers()),
     sTransposition(p->getTransposition()),
-    sBeatThreshSec(p->getBeatThresh()),
     sClusterThresh(p->getClusterThreshMS()),
     sClusterThreshSec(p->getClusterThreshSEC()),
-    at1History(p->getAdaptiveTempo1History()),
-    at1Min(p->getAdaptiveTempo1Min()),
-    at1Max(p->getAdaptiveTempo1Max()),
-    at1Subdivisions(p->getAdaptiveTempo1Subdivisions()),
-    at1Mode(p->getAdaptiveTempo1Mode()),
-    tuning(p->getTuning())
+    tuning(p->getTuning()),
+    tempo(p->getTempoControl())
     {
     }
     
-    SynchronicPreparation(float tempo,
-                          int numBeats,
+    SynchronicPreparation(int numBeats,
                           int clusterMin,
                           int clusterMax,
                           float clusterThresh,
@@ -62,8 +56,8 @@ public:
                           Array<float> accentMultipliers,
                           Array<float> lengthMultipliers,
                           Array<Array<float>> transp,
-                          Tuning::Ptr t):
-    sTempo(tempo),
+                          Tuning::Ptr tun,
+                          Tempo::Ptr tmp):
     sNumBeats(numBeats),
     sClusterMin(clusterMin),
     sClusterMax(clusterMax),
@@ -73,16 +67,15 @@ public:
     sAccentMultipliers(accentMultipliers),
     sLengthMultipliers(lengthMultipliers),
     sTransposition(transp),
-    sBeatThreshSec(60.0/sTempo),
     sClusterThresh(clusterThresh),
     sClusterThreshSec(.001 * sClusterThresh),
-    tuning(t)
+    tuning(tun),
+    tempo(tmp)
     {
     }
 
     
-    SynchronicPreparation(Tuning::Ptr t):
-    sTempo(120),
+    SynchronicPreparation(Tuning::Ptr tun, Tempo::Ptr tmp):
     sNumBeats(0),
     sClusterMin(1),
     sClusterMax(100),
@@ -92,15 +85,10 @@ public:
     sBeatMultipliers(Array<float>({1.0})),
     sAccentMultipliers(Array<float>({1.0})),
     sLengthMultipliers(Array<float>({1.0})),
-    sBeatThreshSec(60.0/sTempo),
     sClusterThresh(500),
     sClusterThreshSec(.001 * sClusterThresh),
-    at1History(0),
-    at1Min(100),
-    at1Max(2000),
-    at1Subdivisions(1.0f),
-    at1Mode(TimeBetweenNotes),
-    tuning(t)
+    tuning(tun),
+    tempo(tmp)
     {
         sTransposition.ensureStorageAllocated(1);
         sTransposition.add(Array<float>({0.0}));
@@ -108,7 +96,6 @@ public:
     
     inline void copy(SynchronicPreparation::Ptr s)
     {
-        sTempo = s->getTempo();
         sNumBeats = s->getNumBeats();
         sClusterMin = s->getClusterMin();
         sClusterMax = s->getClusterMax();
@@ -119,16 +106,10 @@ public:
         sAccentMultipliers = s->getAccentMultipliers();
         sLengthMultipliers = s->getLengthMultipliers();
         sTransposition = s->getTransposition();
-        sBeatThreshSec = s->getBeatThresh();
         sClusterThresh = s->getClusterThreshMS();
         sClusterThreshSec = s->getClusterThreshSEC();
-        at1History = s->getAdaptiveTempo1History();
-        at1Min = s->getAdaptiveTempo1Min();
-        at1Max = s->getAdaptiveTempo1Max();
-        at1Subdivisions = s->getAdaptiveTempo1Subdivisions();
-        at1Mode = s->getAdaptiveTempo1Mode();
         tuning = s->getTuning();
-        //resetMap->copy(s->resetMap);
+        tempo = s->getTempoControl();
     }
     
     bool compare(SynchronicPreparation::Ptr s)
@@ -182,54 +163,41 @@ public:
             }
         }
         
-        return (sTempo == s->getTempo() &&
-                sNumBeats == s->getNumBeats() &&
+        return (sNumBeats == s->getNumBeats() &&
                 sClusterMin == s->getClusterMin() &&
                 sClusterMax == s->getClusterMax() &&
                 sClusterCap == s->getClusterCap() &&
                 (sMode == s->getMode()) &&
                 transp && lens && accents && beats &&
-                sBeatThreshSec == s->getBeatThresh() &&
                 sClusterThresh == s->getClusterThreshMS() &&
                 sClusterThreshSec == s->getClusterThreshSEC() &&
-                at1History == s->getAdaptiveTempo1History() &&
-                at1Min == s->getAdaptiveTempo1Min() &&
-                at1Max == s->getAdaptiveTempo1Max() &&
-                at1Subdivisions == s->getAdaptiveTempo1Subdivisions() &&
-                at1Mode == s->getAdaptiveTempo1Mode() &&
-                tuning == s->getTuning());
+                tuning == s->getTuning() &&
+                tempo == s->getTempoControl());
     }
     
-    inline const float getTempo() const noexcept                       {return sTempo;                 }
+    //inline const float getTempo() const noexcept                       {return sTempo;                 }
     inline const int getNumBeats() const noexcept                      {return sNumBeats;             }
     inline const int getClusterMin() const noexcept                    {return sClusterMin;            }
     inline const int getClusterMax() const noexcept                    {return sClusterMax;            }
     inline const int getClusterCap() const noexcept                    {return sClusterCap;            }
     inline const float getClusterThreshSEC() const noexcept            {return sClusterThreshSec;      }
-    inline const float getBeatThresh() const noexcept                  {return sBeatThreshSec;        }
     inline const float getClusterThreshMS() const noexcept             {return sClusterThresh;         }
     inline const SynchronicSyncMode getMode() const noexcept           {return sMode;                  }
     inline const Array<float> getBeatMultipliers() const noexcept      {return sBeatMultipliers;       }
     inline const int getBeatsToSkip()                                  {return sBeatsToSkip;           }
     inline const Array<float> getAccentMultipliers() const noexcept    {return sAccentMultipliers;     }
     inline const Array<float> getLengthMultipliers() const noexcept    {return sLengthMultipliers;     }
-    inline const Array<Array<float>> getTransposition() const noexcept        {return sTransposition;         }
+    inline const Array<Array<float>> getTransposition() const noexcept {return sTransposition;         }
     //inline const Keymap::Ptr getResetMap() const noexcept              {return resetMap;       }
     
+    /*
     //Adaptive Tempo 1
     inline AdaptiveTempo1Mode getAdaptiveTempo1Mode(void)   {return at1Mode;   }
     inline int getAdaptiveTempo1History(void)               {return at1History;}
     inline float getAdaptiveTempo1Subdivisions(void)        {return at1Subdivisions;}
     inline float getAdaptiveTempo1Min(void)                 {return at1Min;}
     inline float getAdaptiveTempo1Max(void)                 {return at1Max;}
-
-    
-    inline void setTempo(float tempo)
-    {
-        sTempo = tempo;
-        float tempoPeriodS = (60.0/sTempo);
-        sBeatThreshSec = tempoPeriodS;
-    }
+*/
     
     inline void setClusterThresh(float clusterThresh)
     {
@@ -241,7 +209,7 @@ public:
     inline const String getName() const noexcept {return name;}
     inline void setName(String n){name = n;}
     
-    inline void setNumBeats(int numBeats)                              {sNumBeats = numBeats;                            }
+    inline void setNumBeats(int numBeats)                              {sNumBeats = numBeats;                              }
     inline void setClusterMin(int clusterMin)                          {sClusterMin = clusterMin;                          }
     inline void setClusterMax(int clusterMax)                          {sClusterMax = clusterMax;                          }
     inline void setClusterCap(int clusterCap)                          {sClusterCap = clusterCap;                          }
@@ -253,15 +221,19 @@ public:
     inline void setLengthMultipliers(Array<float> lengthMultipliers)   {sLengthMultipliers.swapWith(lengthMultipliers);    }
     
     //Adaptive Tempo 1
+    /*
     inline void setAdaptiveTempo1Mode(AdaptiveTempo1Mode mode)          {at1Mode = mode;    }
     inline void setAdaptiveTempo1History(int hist)                      {at1History = hist;}
     inline void setAdaptiveTempo1Subdivisions(float sub)                {at1Subdivisions = sub;}
     inline void setAdaptiveTempo1Min(float min)                         {at1Min = min;}
     inline void setAdaptiveTempo1Max(float max)                         {at1Max = max;}
+     */
     
     inline const Tuning::Ptr getTuning() const noexcept                 {return tuning; }
     inline void setTuning(Tuning::Ptr t)                                {tuning = t;  }
-    //inline void setResetMap(Keymap::Ptr k)                              {resetMap = k;          }
+    
+    inline const Tempo::Ptr getTempoControl() const noexcept            {return tempo; }
+    inline void setTempoControl(Tempo::Ptr t)                           {tempo = t;  }
     
     void print(void)
     {
@@ -282,7 +254,6 @@ public:
         for (auto arr : sTransposition) s += "{ " + floatArrayToString(arr) + " },\n";
         DBG("sTransposition: " + s);
         
-        DBG("sBeatThreshSec: " + String(sBeatThreshSec));
         DBG("sClusterThreshSec: " + String(sClusterThreshSec));
         //DBG("resetKeymap: " + intArrayToString(getResetMap()->keys()));
         DBG("| - - - - - - - - -- - - - - - - - - |");
@@ -303,17 +274,19 @@ private:
     Array<float> sLengthMultipliers;    //multiply note duration by these
     Array<Array<float>> sTransposition;        //transpose by these
 
-    float sBeatThreshSec;      //length of time between pulses, as set by temp
     float sClusterThresh;      //max time between played notes before new cluster is started, in MS
     float sClusterThreshSec;
     
+    /*
     // Adaptive Tempo 1
     int at1History;
     float at1Min, at1Max;
     float at1Subdivisions;
     AdaptiveTempo1Mode at1Mode;
+     */
     
     Tuning::Ptr tuning;
+    Tempo::Ptr tempo;
     
     //Keymap::Ptr resetMap = new Keymap(0); //need to add to copy and mod
     
@@ -356,7 +329,7 @@ public:
         param.ensureStorageAllocated(cSynchronicParameterTypes.size());
         
         param.set(SynchronicTuning, String(p->getTuning()->getId()));
-        param.set(SynchronicTempo, String(p->getTempo()));
+        param.set(SynchronicTempo, String(p->getTempoControl()->getId()));
         param.set(SynchronicNumPulses, String(p->getNumBeats()));
         param.set(SynchronicClusterMin, String(p->getClusterMin()));
         param.set(SynchronicClusterMax, String(p->getClusterMax()));
@@ -367,11 +340,6 @@ public:
         param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
         param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
         param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p->getTransposition()));
-        param.set(AT1Mode, String(p->getAdaptiveTempo1Mode()));
-        param.set(AT1History, String(p->getAdaptiveTempo1History()));
-        param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
-        param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
-        param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
         
     }
     
@@ -390,16 +358,11 @@ public:
         param.set(SynchronicLengthMultipliers, "");
         param.set(SynchronicAccentMultipliers, "");
         param.set(SynchronicTranspOffsets, "");
-        param.set(AT1Mode, "");
-        param.set(AT1History, "");
-        param.set(AT1Subdivisions, "");
-        param.set(AT1Min, "");
-        param.set(AT1Max, "");
     }
     
     inline ValueTree getState(int Id)
     {
-        ValueTree prep( vtagSynchronicModPrep + String(Id));
+        ValueTree prep( vtagModSynchronic + String(Id));
         
         /*
          "Synchronic Id",
@@ -427,7 +390,7 @@ public:
         if (p != String::empty) prep.setProperty( ptagSynchronic_tuning,              p.getIntValue(), 0);
         
         p = getParam(SynchronicTempo);
-        if (p != String::empty) prep.setProperty( ptagSynchronic_tempo,               p.getFloatValue(), 0);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_tempo,               p.getIntValue(), 0);
         
         p = getParam(SynchronicNumPulses);
         if (p != String::empty) prep.setProperty( ptagSynchronic_numBeats,            p.getIntValue(), 0);
@@ -446,7 +409,6 @@ public:
         
         p = getParam(SynchronicBeatsToSkip);
         if (p != String::empty) prep.setProperty( ptagSynchronic_beatsToSkip,         p.getIntValue(), 0);
-        
 
         ValueTree beatMults( vtagSynchronic_beatMults);
         int count = 0;
@@ -503,22 +465,7 @@ public:
             }
         }
         prep.addChild(transpOffsets, -1, 0);
-        
-        
-        p = getParam(AT1Mode);
-        if (p != String::empty) prep.setProperty( ptagSynchronic_at1Mode,          p.getIntValue(), 0);
-        
-        p = getParam(AT1History);
-        if (p != String::empty) prep.setProperty( ptagSynchronic_at1History,          p.getIntValue(), 0);
-        
-        p = getParam(AT1Subdivisions);
-        if (p != String::empty) prep.setProperty( ptagSynchronic_at1Subdivisions,  p.getFloatValue(), 0);
-        
-        p = getParam(AT1Min);
-        if (p != String::empty) prep.setProperty( ptagSynchronic_AT1Min,          p.getFloatValue(), 0);
-        
-        p = getParam(AT1Max);
-        if (p != String::empty) prep.setProperty( ptagSynchronic_AT1Max,          p.getFloatValue(), 0);
+
         
         return prep;
         
@@ -533,7 +480,7 @@ public:
     inline void copy(SynchronicPreparation::Ptr p)
     {
         param.set(SynchronicTuning, String(p->getTuning()->getId()));
-        param.set(SynchronicTempo, String(p->getTempo()));
+        param.set(SynchronicTempo, String(p->getTempoControl()->getId()));
         param.set(SynchronicNumPulses, String(p->getNumBeats()));
         param.set(SynchronicClusterMin, String(p->getClusterMin()));
         param.set(SynchronicClusterMax, String(p->getClusterMax()));
@@ -544,11 +491,6 @@ public:
         param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
         param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
         param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p->getTransposition()));
-        param.set(AT1Mode, String(p->getAdaptiveTempo1Mode()));
-        param.set(AT1History, String(p->getAdaptiveTempo1History()));
-        param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
-        param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
-        param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
     }
     
     inline const StringArray getStringArray(void) { return param; }
@@ -601,7 +543,7 @@ public:
     void keyPressed(int noteNumber, float velocity);
     void keyReleased(int noteNumber, int channel);
     float getTimeToBeatMS(float beatsToSkip);
-    void  atReset();
+    //void  atReset();
     
 private:
     int Id;
@@ -642,6 +584,7 @@ private:
     uint64 beatThresholdSamples;    // # samples in a beat, as set by tempo
 
     //adaptive tempo stuff
+    /*
     uint64 atTimer, atLastTime; //in samples
     int atDelta;                //in ms
     Array<int> atDeltaHistory;  //in ms
@@ -649,6 +592,7 @@ private:
     void atNewNoteOff();
     void atCalculatePeriodMultiplier();
     float adaptiveTempoPeriodMultiplier;
+     */
     
     bool shouldPlay;
     

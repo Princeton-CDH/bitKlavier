@@ -16,9 +16,9 @@
 
 #include "Tuning.h"
 
-#include "General.h"
+#include "Tempo.h"
 
-#include "PreparationMap.h"
+#include "General.h"
 
 #include "Piano.h"
 
@@ -56,6 +56,7 @@ public:
     
     // Preparations.
     Tuning::PtrArr                      tuning;
+    Tempo::PtrArr                       tempo;
     
     // Keymaps.
     Keymap::PtrArr                      bkKeymaps;
@@ -65,11 +66,11 @@ public:
     Nostalgic::PtrArr                   nostalgic;
     Direct::PtrArr                      direct;
     
-    SynchronicModPreparation::PtrArr    synchronicModPrep;
-    DirectModPreparation::PtrArr        directModPrep;
-    NostalgicModPreparation::PtrArr     nostalgicModPrep;
-    TuningModPreparation::PtrArr        tuningModPrep;
-    
+    SynchronicModPreparation::PtrArr    modSynchronic;
+    DirectModPreparation::PtrArr        modDirect;
+    NostalgicModPreparation::PtrArr     modNostalgic;
+    TuningModPreparation::PtrArr        modTuning;
+    TempoModPreparation::PtrArr         modTempo;
     
     Piano::Ptr                          prevPiano;
     Piano::Ptr                          currentPiano;
@@ -95,6 +96,10 @@ public:
     void addTuning(TuningPreparation::Ptr);
     int addTuningIfNotAlreadyThere(TuningPreparation::Ptr);
     
+    void addTempo(void);
+    void addTempo(TempoPreparation::Ptr);
+    int addTempoIfNotAlreadyThere(TempoPreparation::Ptr);
+    
     void addDirect(void);
     void addDirect(DirectPreparation::Ptr);
     int addDirectIfNotAlreadyThere(DirectPreparation::Ptr);
@@ -109,6 +114,8 @@ public:
     void addSynchronicMod(void);
     void addTuningMod(void);
     void addTuningMod(TuningModPreparation::Ptr tmod);
+    void addTempoMod(void);
+    void addTempoMod(TempoModPreparation::Ptr tmod);
     
     void updateUI(void);
     
@@ -184,6 +191,8 @@ private:
     void loadMainPianoSamples(BKSynthesiser *synth, int numLayers);
     void loadResonanceRelaseSamples(BKSynthesiser *synth);
     void loadHammerReleaseSamples(BKSynthesiser *synth);
+    
+    Array<float> tempoAlreadyLoaded;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)

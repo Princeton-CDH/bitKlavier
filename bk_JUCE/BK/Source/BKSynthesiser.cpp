@@ -350,7 +350,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
 #if CRAY_COOL_MUSIC_MAKER
             voice->currentlyPlayingNote = (float)midiNoteNumber + midiNoteNumberOffset;
 #else
-            voice->currentlyPlayingNote = midiNoteNumber;
+            voice->currentlyPlayingNote = midiNoteNumber; //midiNoteNumber + (int)midiNoteNumberOffset)
 #endif      
             voice->layerId = layerToLayerId(bktype, layer);
             voice->length = length;
@@ -437,7 +437,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                 
                 if (BKSynthesiserSound* const sound = voice->getCurrentlyPlayingSound())
                 {
-                    if (sound->appliesToNote (midiNoteNumber)
+                    if (sound->appliesToNote (midiNoteNumber) 
                         && sound->appliesToChannel (midiChannel))
                     {
                         jassert (! voice->keyIsDown || voice->sustainPedalDown == sustainPedalsDown [midiChannel]);

@@ -29,6 +29,7 @@ svc(p),
 nvc(p),
 dvc(p),
 tvc(p),
+ovc(p),
 timerCallbackCount(0)
 {
     // Make PianoViewController component within plugin editor class.
@@ -39,6 +40,7 @@ timerCallbackCount(0)
     addAndMakeVisible(dvc);
     addAndMakeVisible(kvc);
     addAndMakeVisible(tvc);
+    addAndMakeVisible(ovc);
     
     pianoMapL.setName("PianoMap");
     pianoMapL.setText("PianoMap", NotificationType::dontSendNotification);
@@ -93,7 +95,7 @@ timerCallbackCount(0)
     galleryCB.setName("Galleries");
     galleryCB.addSeparator();
     galleryCB.addListener(this);
-    galleryCB.setSelectedId(1);
+    galleryCB.setSelectedId(1, dontSendNotification);
     pvc->addAndMakeVisible(galleryCB);
     
     
@@ -180,7 +182,7 @@ void BKAudioProcessorEditor::fillGalleryCB(void)
         if (thisFile.getFileName() == processor.currentGallery) index = i;
     }
     
-    galleryCB.setSelectedId(index+1, dontSendNotification);
+    galleryCB.setSelectedId(index+1, NotificationType::dontSendNotification);
 
 }
 
@@ -254,6 +256,12 @@ void BKAudioProcessorEditor::timerCallback()
         tvc.updateFields();
     }
     
+    if (processor.updateState->tempoPreparationDidChange)
+    {
+        processor.updateState->tempoPreparationDidChange = false;
+        ovc.updateFields();
+    }
+    
 }
 
 void BKAudioProcessorEditor::paint (Graphics& g)
@@ -273,6 +281,7 @@ void BKAudioProcessorEditor::resized()
     float nvcH = cNostalgicParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + 1.5 *  gYSpacing;
     float dvcH = cDirectParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float tvcH = cTuningParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
+    float ovcH = cTempoParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
     
     loadvc->setBounds(gComponentLeftOffset,
                       gComponentTopOffset,
@@ -358,6 +367,11 @@ void BKAudioProcessorEditor::resized()
                   svc.getBottom() + gYSpacing,
                   gVCWidth,
                   nvcH);
+    
+    ovc.setBounds(nvc.getX(),
+                  nvc.getBottom() + gYSpacing,
+                  gVCWidth,
+                  ovcH);
     
     saveButton.setBounds(getX() + gXSpacing, getBottom() - 75, 50, 20);
     
@@ -612,7 +626,6 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
     String out = "";
     
     bool isNumber = false;
-    bool isMod = false;
     bool isKeymap = false;
     bool isColon  = false;
     bool isSpace = false;
@@ -622,6 +635,7 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
     bool isNostalgic = false;
     bool isTuning = false;
     bool isDirect= false;
+    bool isTempo = false;
     
     bool isBracket;
     
@@ -633,13 +647,12 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
     bool itsASynchronic = false;
     bool itsATuning = false;
     bool itsANostalgic = false;
+    bool itsATempo = false;
     
     String::CharPointerType c = s.getCharPointer();
     
     juce_wchar keymap = 'k';
     juce_wchar colon = ':';
-    juce_wchar modLC = 'm';
-    juce_wchar modUC = 'M';
     
     
     juce_wchar synchronicLC = 's';
@@ -648,6 +661,8 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
     juce_wchar nostalgicUC = 'N';
     juce_wchar tuningLC = 't';
     juce_wchar tuningUC = 'T';
+    juce_wchar tempoLC = 'm';
+    juce_wchar tempoUC = 'M';
     juce_wchar directLC = 'd';
     juce_wchar directUC = 'D';
     juce_wchar lBracket = '{';
@@ -685,13 +700,13 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
         isNostalgic    = !CharacterFunctions::compare(c1, nostalgicLC) || !CharacterFunctions::compare(c1, nostalgicUC);
         isDirect       = !CharacterFunctions::compare(c1, directLC) || !CharacterFunctions::compare(c1, directUC);
         isTuning       = !CharacterFunctions::compare(c1, tuningLC) || !CharacterFunctions::compare(c1, tuningUC);
+        isTempo      = !CharacterFunctions::compare(c1, tempoLC) || !CharacterFunctions::compare(c1, tempoUC);
  
         isBracket   = !CharacterFunctions::compare(c1, lBracket) || !CharacterFunctions::compare(c1, rBracket) ||
                 !CharacterFunctions::compare(c1, lBracket2) || !CharacterFunctions::compare(c1, rBracket2) ||
                 !CharacterFunctions::compare(c1, lBracket3) || !CharacterFunctions::compare(c1, rBracket3);
         isKeymap    = !CharacterFunctions::compare(c1, keymap);
         isColon     = !CharacterFunctions::compare(c1, colon);
-        isMod       = !CharacterFunctions::compare(c1, modLC) || !CharacterFunctions::compare(c1, modUC);
         isNumber    = CharacterFunctions::isDigit(c1);
         isSpace     = CharacterFunctions::isWhitespace(c1);
         
@@ -739,11 +754,10 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                     
                     if (itsADirect)
                     {
-                        DirectModPreparation::Ptr dmod = processor.directModPrep[whichMod];
+                        DirectModPreparation::Ptr dmod = processor.modDirect[whichMod];
                         
                         processor.currentPiano->modificationMaps[key]->addModPrepMap(new ModPrepMap(PreparationTypeDirect, whichMod, whichPreps));
                         
-                        // NOW THIS IS JUST CREATING THE INDIVIDUAL MODS FOR PROCESSING
                         for (int n = cDirectParameterTypes.size(); --n >= 0; )
                         {
                             String param = dmod->getParam((DirectParameterType)n);
@@ -764,11 +778,10 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                     }
                     else if (itsANostalgic)
                     {
-                        NostalgicModPreparation::Ptr nmod = processor.nostalgicModPrep[whichMod];
+                        NostalgicModPreparation::Ptr nmod = processor.modNostalgic[whichMod];
                         
                         processor.currentPiano->modificationMaps[key]->addModPrepMap(new ModPrepMap(PreparationTypeNostalgic, whichMod, whichPreps));
                         
-                        // NOW THIS IS JUST CREATING THE INDIVIDUAL MODS FOR PROCESSING
                         for (int n = cNostalgicParameterTypes.size(); --n >= 0; )
                         {
                             String param = nmod->getParam((NostalgicParameterType)n);
@@ -789,11 +802,10 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                     }
                     else if (itsASynchronic)
                     {
-                        SynchronicModPreparation::Ptr smod = processor.synchronicModPrep[whichMod];
+                        SynchronicModPreparation::Ptr smod = processor.modSynchronic[whichMod];
                         
                         processor.currentPiano->modificationMaps[key]->addModPrepMap(new ModPrepMap(PreparationTypeSynchronic, whichMod, whichPreps));
                         
-                        // NOW THIS IS JUST CREATING THE INDIVIDUAL MODS FOR PROCESSING
                         for (int n = cSynchronicParameterTypes.size(); --n >= 0; )
                         {
                             String param = smod->getParam((SynchronicParameterType)n);
@@ -814,11 +826,10 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                     }
                     else if (itsATuning)
                     {
-                        TuningModPreparation::Ptr tmod = processor.tuningModPrep[whichMod];
+                        TuningModPreparation::Ptr tmod = processor.modTuning[whichMod];
                         
                         processor.currentPiano->modificationMaps[key]->addModPrepMap(new ModPrepMap(PreparationTypeTuning, whichMod, whichPreps));
                         
-                        // NOW THIS IS JUST CREATING THE INDIVIDUAL MODS FOR PROCESSING
                         for (int n = cTuningParameterTypes.size(); --n >= 0; )
                         {
                             String param = tmod->getParam((TuningParameterType)n);
@@ -837,6 +848,30 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                             }
                         }
                     }
+                    else if (itsATempo)
+                    {
+                        TempoModPreparation::Ptr mmod = processor.modTempo[whichMod];
+                        
+                        processor.currentPiano->modificationMaps[key]->addModPrepMap(new ModPrepMap(PreparationTypeTempo, whichMod, whichPreps));
+                        
+                        for (int n = cTempoParameterTypes.size(); --n >= 0; )
+                        {
+                            String param = mmod->getParam((TempoParameterType)n);
+                            
+                            if (param != "")
+                            {
+                                for (auto prep : whichPreps)
+                                {
+                                    processor.currentPiano->modMap[key]->addTempoModification(new TempoModification(key, prep, (TempoParameterType)n, param, whichMod));
+                                    
+                                    DBG("whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cTempoParameterTypes[n] + " val: " +param);
+                                    
+                                }
+                                
+                                
+                            }
+                        }
+                    }
                     
                 }
                 
@@ -845,6 +880,7 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                 itsASynchronic = false;
                 itsATuning = false;
                 itsANostalgic = false;
+                itsATempo = false;
                 
                 numColons = 0;
                 numBrackets = 0;
@@ -862,6 +898,10 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
             else if (isDirect)
             {
                 itsADirect = true;
+            }
+            else if (isTempo)
+            {
+                itsATempo = true;
             }
             else if (isSynchronic)
             {
@@ -1004,6 +1044,7 @@ void BKAudioProcessorEditor::bkComboBoxDidChange            (ComboBox* box)
 
 void BKAudioProcessorEditor::switchPianos(void)
 {
+    /*
     // Remove all pmaps from old piano.
     for (int i = processor.prevPiano->numPMaps; --i >= 0; )
     {
@@ -1013,7 +1054,7 @@ void BKAudioProcessorEditor::switchPianos(void)
         
         pmvc.remove(i);
     }
-    
+    */
     pmvc.clearQuick();
     
     for (int i = 0; i < processor.currentPiano->numPMaps; i++ )
@@ -1028,6 +1069,7 @@ void BKAudioProcessorEditor::switchPianos(void)
         pmvc[i]->addActionListener(&dvc);
         pmvc[i]->addActionListener(&kvc);
         pmvc[i]->addActionListener(&tvc);
+        pmvc[i]->addActionListener(&ovc);
         
         if (i > 0) {
             pmvc[i]->setBounds(gComponentLeftOffset,
@@ -1145,6 +1187,7 @@ void BKAudioProcessorEditor::drawNewPreparationMap(int Id)
     pmvc[Id]->addActionListener(&dvc);
     pmvc[Id]->addActionListener(&kvc);
     pmvc[Id]->addActionListener(&tvc);
+    pmvc[Id]->addActionListener(&ovc);
     
     if (Id > 0) {
         pmvc[Id]->setBounds(gComponentLeftOffset,

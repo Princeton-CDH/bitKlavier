@@ -125,7 +125,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
     
     SynchronicPreparation::Ptr active = processor.synchronic[currentSynchronicId]->aPrep;
     
-    SynchronicModPreparation::Ptr mod = processor.synchronicModPrep[currentModSynchronicId];
+    SynchronicModPreparation::Ptr mod = processor.modSynchronic[currentModSynchronicId];
     
     if (name == cSynchronicParameterTypes[SynchronicId])
     {
@@ -151,7 +151,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            int numMod = processor.synchronicModPrep.size();
+            int numMod = processor.modSynchronic.size();
             
             if ((i+1) > numMod)
             {
@@ -168,16 +168,26 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
             updateModFields();
         }
     }
+
     else if (name == cSynchronicParameterTypes[SynchronicTempo])
     {
         if (type == BKParameter)
         {
-            prep    ->setTempo(f);
-            active  ->setTempo(f);
+            if (i < processor.tempo.size())
+            {
+                prep    ->setTempoControl(processor.tempo[i]);
+                active  ->setTempoControl(processor.tempo[i]);
+            }
+            else
+                tf.setText("0", false);
+            
         }
         else // BKModification
         {
-            mod->setParam( SynchronicTempo, text);
+            if (i < processor.tempo.size())
+                mod->setParam( SynchronicTempo, text);
+            else
+                tf.setText("0", false);
         }
     }
     else if (name == cSynchronicParameterTypes[SynchronicNumPulses])
@@ -328,66 +338,6 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
                 tf.setText("0", false);
         }
     }
-    else if (name == cSynchronicParameterTypes[AT1Mode])
-    {
-        if (type == BKParameter)
-        {
-            prep    ->setAdaptiveTempo1Mode((AdaptiveTempo1Mode)i);
-            active  ->setAdaptiveTempo1Mode((AdaptiveTempo1Mode)i);
-        }
-        else // BKModification
-        {
-            mod->setParam( AT1Mode, text);
-        }
-    }
-    else if (name == cSynchronicParameterTypes[AT1History])
-    {
-        if (type == BKParameter)
-        {
-            prep    ->setAdaptiveTempo1History(i);
-            active  ->setAdaptiveTempo1History(i);
-        }
-        else // BKModification
-        {
-            mod->setParam( AT1History, text);
-        }
-    }
-    else if (name == cSynchronicParameterTypes[AT1Subdivisions])
-    {
-        if (type == BKParameter)
-        {
-            prep    ->setAdaptiveTempo1Subdivisions(f);
-            active  ->setAdaptiveTempo1Subdivisions(f);
-        }
-        else // BKModification
-        {
-            mod->setParam( AT1Subdivisions, text);
-        }
-    }
-    else if (name == cSynchronicParameterTypes[AT1Min])
-    {
-        if (type == BKParameter)
-        {
-            prep    ->setAdaptiveTempo1Min(f);
-            active  ->setAdaptiveTempo1Min(f);
-        }
-        else // BKModification
-        {
-            mod->setParam( AT1Min, text);
-        }
-    }
-    else if (name == cSynchronicParameterTypes[AT1Max])
-    {
-        if (type == BKParameter)
-        {
-            prep    ->setAdaptiveTempo1Max(f);
-            active  ->setAdaptiveTempo1Max(f);
-        }
-        else // BKModification
-        {
-            mod->setParam( AT1Max, text);
-        }
-    }
     else
     {
         DBG("Unregistered text field entered input.");
@@ -398,7 +348,7 @@ void SynchronicViewController::updateFields(void)
 {
     SynchronicPreparation::Ptr prep   = processor.synchronic[currentSynchronicId]->aPrep;
 
-    synchronicTF[SynchronicTempo]               ->setText(  String(                 prep->getTempo()), false);
+    synchronicTF[SynchronicTempo]               ->setText(  String(                 prep->getTempoControl()->getId()), false);
     synchronicTF[SynchronicNumPulses]           ->setText(  String(                 prep->getNumBeats()), false);
     synchronicTF[SynchronicClusterMin]          ->setText(  String(                 prep->getClusterMin()), false);
     synchronicTF[SynchronicClusterMax]          ->setText(  String(                 prep->getClusterMax()), false);
@@ -411,17 +361,12 @@ void SynchronicViewController::updateFields(void)
     synchronicTF[SynchronicTranspOffsets]       ->setText(  arrayFloatArrayToString(prep->getTransposition()), false);
     synchronicTF[SynchronicTuning]              ->setText(  String(                 prep->getTuning()->getId()), false);
     
-    synchronicTF[AT1Mode]                       ->setText(  String(                 prep->getAdaptiveTempo1Mode()), false);
-    synchronicTF[AT1History]                    ->setText(  String(                 prep->getAdaptiveTempo1History()), false);
-    synchronicTF[AT1Subdivisions]               ->setText(  String(                 prep->getAdaptiveTempo1Subdivisions()), false);
-    synchronicTF[AT1Min]                        ->setText(  String(                 prep->getAdaptiveTempo1Min()), false);
-    synchronicTF[AT1Max]                        ->setText(  String(                 prep->getAdaptiveTempo1Max()), false);
 }
 
 void SynchronicViewController::updateModFields(void)
 {
     // a Modification copy of Preparation to pull values from when updating
-    SynchronicModPreparation::Ptr prep   = processor.synchronicModPrep[currentModSynchronicId];
+    SynchronicModPreparation::Ptr prep   = processor.modSynchronic[currentModSynchronicId];
     
     modSynchronicTF[SynchronicTempo]               ->setText(  prep->getParam(SynchronicTempo), false);
     modSynchronicTF[SynchronicNumPulses]           ->setText(  prep->getParam(SynchronicNumPulses), false);
@@ -435,12 +380,6 @@ void SynchronicViewController::updateModFields(void)
     modSynchronicTF[SynchronicAccentMultipliers]   ->setText(  prep->getParam(SynchronicAccentMultipliers), false);
     modSynchronicTF[SynchronicTranspOffsets]       ->setText(  prep->getParam(SynchronicTranspOffsets), false);
     modSynchronicTF[SynchronicTuning]              ->setText(  prep->getParam(SynchronicTuning), false);
-    
-    modSynchronicTF[AT1Mode]                       ->setText(  prep->getParam(AT1Mode), false);
-    modSynchronicTF[AT1History]                    ->setText(  prep->getParam(AT1History), false);
-    modSynchronicTF[AT1Subdivisions]               ->setText(  prep->getParam(AT1Subdivisions), false);
-    modSynchronicTF[AT1Min]                        ->setText(  prep->getParam(AT1Min), false);
-    modSynchronicTF[AT1Max]                        ->setText(  prep->getParam(AT1Max), false);
 }
 
 

@@ -115,7 +115,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
     
     TuningPreparation::Ptr active = processor.tuning[currentTuningId]->aPrep;
     
-    TuningModPreparation::Ptr mod = processor.tuningModPrep[currentModTuningId];
+    TuningModPreparation::Ptr mod = processor.modTuning[currentModTuningId];
     
     if (name == cTuningParameterTypes[TuningId])
     {
@@ -140,7 +140,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            int numMod = processor.tuningModPrep.size();
+            int numMod = processor.modTuning.size();
             
             if ((i+1) > numMod)
             {
@@ -321,7 +321,7 @@ void TuningViewController::updateFields()
 void TuningViewController::updateModFields()
 {
     
-    TuningModPreparation::Ptr prep = processor.tuningModPrep[currentModTuningId];
+    TuningModPreparation::Ptr prep = processor.modTuning[currentModTuningId];
     
     modTuningTF[TuningScale]               ->setText( prep->getParam(TuningScale), false);
     modTuningTF[TuningFundamental]         ->setText( prep->getParam(TuningFundamental), false);

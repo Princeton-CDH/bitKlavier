@@ -89,6 +89,8 @@ String PreparationMapViewController::processPreparationString(String s)
     Synchronic::PtrArr sync = Synchronic::PtrArr();
     Nostalgic::PtrArr nost = Nostalgic::PtrArr();
     Direct::PtrArr dire = Direct::PtrArr();
+    Tempo::PtrArr tempo = Tempo::PtrArr();
+    Tuning::PtrArr tuning = Tuning::PtrArr();
     
     sync.ensureStorageAllocated(12);
     
@@ -105,6 +107,10 @@ String PreparationMapViewController::processPreparationString(String s)
     juce_wchar nostalgicUC = 'N';
     juce_wchar directLC = 'd';
     juce_wchar directUC = 'D';
+    juce_wchar tempoLC = 'm'; //M for metronome
+    juce_wchar tempoUC = 'M';
+    juce_wchar tuningLC = 't';
+    juce_wchar tuningUC = 'T';
     
     BKPreparationType type = BKPreparationTypeNil;
     
@@ -115,6 +121,8 @@ String PreparationMapViewController::processPreparationString(String s)
         bool isSynchronic   = !CharacterFunctions::compare(c1, synchronicLC) || !CharacterFunctions::compare(c1, synchronicUC);
         bool isNostalgic    = !CharacterFunctions::compare(c1, nostalgicLC) || !CharacterFunctions::compare(c1, nostalgicUC);
         bool isDirect       = !CharacterFunctions::compare(c1, directLC) || !CharacterFunctions::compare(c1, directUC);
+        bool isTempo        = !CharacterFunctions::compare(c1, tempoLC) || !CharacterFunctions::compare(c1, tempoUC);
+        bool isTuning       = !CharacterFunctions::compare(c1, tuningLC) || !CharacterFunctions::compare(c1, tuningUC);
         
         bool isNumChar = CharacterFunctions::isDigit(c1);
         
@@ -131,6 +139,14 @@ String PreparationMapViewController::processPreparationString(String s)
             else if (isDirect)
             {
                 type = PreparationTypeDirect;
+            }
+            else if (isTempo)
+            {
+                type = PreparationTypeTempo;
+            }
+            else if (isTuning)
+            {
+                type = PreparationTypeTuning;
             }
             else if (inNumber)
             {
@@ -171,6 +187,30 @@ String PreparationMapViewController::processPreparationString(String s)
                         out.append(String(prep), 3);
                     }
                 }
+                else if (type == PreparationTypeTempo)
+                {
+                    int prep = temp.getIntValue();
+                    
+                    if (prep <= processor.tempo.size()-1)
+                    {
+                        tempo.add(processor.tempo[prep]);
+                        
+                        out.append("M", 1);
+                        out.append(String(prep), 3);
+                    }
+                }
+                else if (type == PreparationTypeTuning)
+                {
+                    int prep = temp.getIntValue();
+                    
+                    if (prep <= processor.tuning.size()-1)
+                    {
+                        tuning.add(processor.tuning[prep]);
+                        
+                        out.append("T", 1);
+                        out.append(String(prep), 3);
+                    }
+                }
                 
                 out.append(" ", 1);
                 temp = "";
@@ -194,6 +234,8 @@ String PreparationMapViewController::processPreparationString(String s)
     processor.currentPiano->prepMaps[Id]->setSynchronic (sync);
     processor.currentPiano->prepMaps[Id]->setNostalgic  (nost);
     processor.currentPiano->prepMaps[Id]->setDirect     (dire);
+    processor.currentPiano->prepMaps[Id]->setTempo      (tempo);
+    processor.currentPiano->prepMaps[Id]->setTuning     (tuning);
     
     return out;
 }

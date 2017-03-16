@@ -155,7 +155,6 @@ public:
         param.set(DirectGain, String(p->getGain()));
         param.set(DirectResGain, String(p->getResonanceGain()));
         param.set(DirectHammerGain, String(p->getHammerGain()));
-        
     }
     
     
@@ -166,12 +165,12 @@ public:
         param.add("");
         param.add("");
         param.add("");
-        param.add("");
+        //param.add("");
     }
     
     inline ValueTree getState(int Id)
     {
-        ValueTree prep( vtagDirectModPrep+String(Id));
+        ValueTree prep( vtagModDirect+String(Id));
         
         String p = "";
         
@@ -199,7 +198,7 @@ public:
         
         p = getParam(DirectHammerGain);
         if (p != String::empty) prep.setProperty( ptagDirect_hammerGain,        p.getFloatValue(), 0);
-        
+    
         return prep;
     }
     
@@ -272,6 +271,12 @@ private:
     BKSynthesiser*              hammerSynth;
     DirectPreparation::Ptr      active;
     TuningProcessor::Ptr        tuner;
+    
+    //need to keep track of the actual notes played and their offsets when a particular key is pressed
+    //so that they can all be turned off properly, even in the event of a preparation change
+    //while the key is held
+    Array<int>      keyPlayed[128];         //keep track of pitches played associated with particular key on keyboard
+    Array<float>    keyPlayedOffset[128];   //and also the offsets
     
     double sampleRate;
     

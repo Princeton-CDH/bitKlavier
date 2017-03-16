@@ -39,7 +39,7 @@ void DirectProcessor::setCurrentPlaybackSampleRate(double sr)
 void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 {
     tuner = active->getTuning()->processor;
-    tuner->keyOn(noteNumber);
+    //tuner->keyOn(noteNumber);
     
     for (auto t : active->getTransposition())
     {
@@ -61,70 +61,108 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                      3,
                      3);
         
+        //store synthNoteNumbers by noteNumber
+        keyPlayed[noteNumber].add(synthNoteNumber);
+        keyPlayedOffset[noteNumber].add(synthOffset);
+        
     }
+    
+    
     
 }
 
 void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
 {
 
-    for (auto t : active->getTransposition())
-    {
-        float offset = t + tuner->getOffset(noteNumber);
-        int synthNoteNumber = noteNumber + (int)offset;
-        float synthOffset = offset - (int)offset;
-        
-        synth->keyOff(channel,
+    /*
+     for (auto t : active->getTransposition())
+     {
+         float offset = t + tuner->getOffset(noteNumber);
+         int synthNoteNumber = noteNumber + (int)offset;
+         float synthOffset = offset - (int)offset;
+         
+         //lookup synthNoteNumber by noteNumber, stored at keyPressed time,
+         //to make sure we keyOff the right "note" in the event of a preparation change mid-note.
+         
+         synth->keyOff(channel,
                       MainNote,
                       Id,
                       synthNoteNumber,
                       velocity,
                       true);
+     
+     */
+    
+    for (int i = 0; i<keyPlayed[noteNumber].size(); i++)
+    {
+        int t = keyPlayed[noteNumber].getUnchecked(i);
+        float t_offset = keyPlayedOffset[noteNumber].getUnchecked(i);
         
-        float hGain = active->getHammerGain();
-        float rGain = active->getResonanceGain();
+        synth->keyOff(channel,
+                     MainNote,
+                     Id,
+                     t,
+                     velocity,
+                     true);
         
-        if (hGain > 0.0f)
+        //float offset = tuner->getOffset(noteNumber);
+        //int synthNoteNumber = noteNumber + (int)offset;
+        //float synthOffset = offset - (int)offset;
+        
+        //only play hammers/resonance for first note in layers of transpositions
+        if(i==0)
         {
-            hammerSynth->keyOn(
-                                     channel,
-                                     synthNoteNumber,
-                                     0,
-                                     velocity,
-                                     hGain,
-                                     Forward,
-                                     Normal, //FixedLength,
-                                     HammerNote,
-                                     Id,
-                                     0,
-                                     2000,
-                                     3,
-                                     3 );
-        }
-        
-        if (rGain > 0.0f)
-        {
-            resonanceSynth->keyOn(
-                                        channel,
-                                        synthNoteNumber,
-                                        synthOffset,
-                                        velocity,
-                                        rGain,
-                                        Forward,
-                                        Normal, //FixedLength,
-                                        ResonanceNote,
-                                        Id,
-                                        0,
-                                        2000,
-                                        3,
-                                        3 );
+            float hGain = active->getHammerGain();
+            float rGain = active->getResonanceGain();
+            
+            if (hGain > 0.0f)
+            {
+                hammerSynth->keyOn(
+                                 channel,
+                                 //synthNoteNumber,
+                                 t,
+                                 0,
+                                 velocity,
+                                 hGain,
+                                 Forward,
+                                 Normal, //FixedLength,
+                                 HammerNote,
+                                 Id,
+                                 0,
+                                 2000,
+                                 3,
+                                 3 );
+            }
+            
+            if (rGain > 0.0f)
+            {
+                resonanceSynth->keyOn(
+                                    channel,
+                                    //synthNoteNumber,
+                                    t,
+                                    //synthOffset,
+                                    t_offset,
+                                    velocity,
+                                    rGain,
+                                    Forward,
+                                    Normal, //FixedLength,
+                                    ResonanceNote,
+                                    Id,
+                                    0,
+                                    2000,
+                                    3,
+                                    3 );
+            }
         }
     }
 
+    keyPlayed[noteNumber].clearQuick();
+    keyPlayedOffset[noteNumber].clearQuick();
+    
 }
 
 void DirectProcessor::processBlock(int numSamples, int midiChannel)
 {
-    tuner->incrementAdaptiveClusterTime(numSamples);
+    //tuner->incrementAdaptiveClusterTime(numSamples);
 }
 

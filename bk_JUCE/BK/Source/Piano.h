@@ -36,6 +36,8 @@ public:
     Piano(Synchronic::PtrArr synchronic,
           Nostalgic::PtrArr nostalgic,
           Direct::PtrArr direct,
+          Tuning::PtrArr tuning,
+          Tempo::PtrArr tempo,
           Keymap::Ptr keymap,
           int Id);
     ~Piano();
@@ -56,8 +58,6 @@ public:
     inline const String getName() const noexcept {return pianoName;}
     inline void setName(String n){pianoName = n;}
     
-    
-    
     PreparationMap::Ptr         currentPMap;
     PreparationMap::CSPtrArr    activePMaps;
     PreparationMap::CSPtrArr    prepMaps;
@@ -65,7 +65,8 @@ public:
     Synchronic::PtrArr  synchronic;
     Nostalgic::PtrArr   nostalgic;
     Direct::PtrArr      direct;
-    
+    Tuning::PtrArr      tuning;
+    Tempo::PtrArr       tempo;
     
     Array<int>                  pianoMap;
     int                         numPMaps;
@@ -81,10 +82,11 @@ public:
             String ptype = "";
             for (auto mpm : modificationMaps[i]->getModPrepMaps())
             {
-                if (mpm->getType() == PreparationTypeDirect) ptype = "dm";
-                else if (mpm->getType() == PreparationTypeNostalgic) ptype = "nm";
-                else if (mpm->getType() == PreparationTypeSynchronic) ptype = "sm";
-                else if (mpm->getType() == PreparationTypeTuning) ptype = "tm";
+                if (mpm->getType() == PreparationTypeDirect) ptype = "d";
+                else if (mpm->getType() == PreparationTypeNostalgic) ptype = "n";
+                else if (mpm->getType() == PreparationTypeSynchronic) ptype = "s";
+                else if (mpm->getType() == PreparationTypeTuning) ptype = "t";
+                else if (mpm->getType() == PreparationTypeTempo) ptype = "m";
                 
                 out += String(i) + ":" + ptype + String(mpm->getId()) + ":" + "{" + intArrayToString(mpm->getPreparations()) +"} ";
                 
@@ -122,9 +124,6 @@ private:
     
     double sampleRate;
 
-    
-    
-    
     // Pointers to synths (flown in from BKAudioProcessor)
     BKSynthesiser*                  synth;
     BKSynthesiser*                  resonanceSynth;

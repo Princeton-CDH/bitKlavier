@@ -71,6 +71,11 @@ void Modifications::addTuningModification(TuningModification::Ptr m)
     tuningMods.add(m);
 }
 
+void Modifications::addTempoModification(TempoModification::Ptr m)
+{
+    tempoMods.add(m);
+}
+
 SynchronicModification::PtrArr Modifications::getSynchronicModifications(void)
 {
     return synchronicMods;
@@ -91,12 +96,18 @@ TuningModification::PtrArr Modifications::getTuningModifications(void)
     return tuningMods;
 }
 
+TempoModification::PtrArr Modifications::getTempoModifications(void)
+{
+    return tempoMods;
+}
+
 void Modifications::clearModifications(void)
 {
     synchronicMods.clear();
     nostalgicMods.clear();
     directMods.clear();
     tuningMods.clear();
+    tempoMods.clear();
     
 }
 
@@ -106,5 +117,6 @@ void Modifications::clearResets(void)
     nostalgicReset.clear();
     directReset.clear();
     tuningReset.clear();
+    tempoReset.clear();
     
 }

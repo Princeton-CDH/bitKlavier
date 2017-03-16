@@ -31,6 +31,7 @@ public:
     bool nostalgicPreparationDidChange = false;
     bool synchronicPreparationDidChange = false;
     bool tuningPreparationDidChange = false;
+    bool tempoPreparationDidChange = false;
     bool generalSettingsDidChange = false;
     
 private:

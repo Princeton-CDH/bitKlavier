@@ -1,44 +1,41 @@
 /*
   ==============================================================================
 
-    TuningViewController.h
-    Created: 14 Dec 2016 12:25:56pm
-    Author:  Michael R Mulshine
+    TempoViewController.h
+    Created: 5 Mar 2017 9:28:27am
+    Author:  Daniel Trueman
 
   ==============================================================================
 */
 
-#ifndef TUNINGVIEWCONTROLLER_H_INCLUDED
-#define TUNINGVIEWCONTROLLER_H_INCLUDED
+#ifndef TEMPOVIEWCONTROLLER_H_INCLUDED
+#define TEMPOVIEWCONTROLLER_H_INCLUDED
 
 #include "BKUtilities.h"
 #include "PluginProcessor.h"
 #include "BKListener.h"
 #include "BKComponent.h"
 
-//==============================================================================
-/*
-*/
-class TuningViewController    : public BKComponent, public BKListener
+class TempoViewController    : public BKComponent, public BKListener
 {
 public:
-    TuningViewController(BKAudioProcessor&);
-    ~TuningViewController();
-
+    TempoViewController(BKAudioProcessor&);
+    ~TempoViewController();
+    
     void paint (Graphics&) override;
     void resized() override;
-
+    
     void updateModFields(void);
     void updateFields(void);
     
 private:
     
     BKAudioProcessor& processor;
-    int currentTuningId, currentModTuningId;
+    int currentTempoId, currentModTempoId;
     
-    OwnedArray<BKLabel> tuningL;
-    OwnedArray<BKTextField> tuningTF;
-    OwnedArray<BKTextField> modTuningTF;
+    OwnedArray<BKLabel> tempoL;
+    OwnedArray<BKTextField> tempoTF;
+    OwnedArray<BKTextField> modTempoTF;
     
     
     
@@ -47,9 +44,9 @@ private:
     
     void bkComboBoxDidChange        (ComboBox* box)         override { };
     void bkButtonClicked            (Button* b)             override { };
-  
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningViewController)
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TempoViewController)
 };
 
 
-#endif  // TUNINGVIEWCONTROLLER_H_INCLUDED
+#endif  // TEMPOVIEWCONTROLLER_H_INCLUDED

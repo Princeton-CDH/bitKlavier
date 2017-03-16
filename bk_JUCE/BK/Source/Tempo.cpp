@@ -10,6 +10,38 @@
 
 #include "Tempo.h"
 
+TempoProcessor::TempoProcessor(TempoPreparation::Ptr active):
+active(active)
+{
+    atTimer = 0;
+    atLastTime = 0;
+    atDeltaHistory.ensureStorageAllocated(10);
+    for (int i = 0; i < 10; i++)
+    {
+        atDeltaHistory.insert(0, (60000.0/active->getTempo()));
+    }
+    adaptiveTempoPeriodMultiplier = 1.;
+}
+
+TempoProcessor::~TempoProcessor()
+{
+}
+
+void TempoProcessor::processBlock(int numSamples, int channel)
+{
+    atTimer += numSamples;
+}
+
+void TempoProcessor::keyPressed(int noteNumber, float velocity)
+{
+    DBG("adding adaptive tempo note" + String(noteNumber));
+    atNewNote();
+}
+
+void TempoProcessor::keyReleased(int noteNumber, int channel)
+{
+    atNewNoteOff();
+}
 
 //adaptive tempo functions
 void TempoProcessor::atNewNote()
@@ -29,8 +61,10 @@ void TempoProcessor::atCalculatePeriodMultiplier()
     //only do if history val is > 0
     if(active->getAdaptiveTempo1History()) {
         
-        atDelta = (atTimer - atLastTime) / (sampleRate);
+        atDelta = (atTimer - atLastTime) / (0.001 * sampleRate); //fix this? make sampleRateMS
+        //DBG("atTimer = " + String(atTimer) + " atLastTime = " + String(atLastTime));
         //DBG("atDelta = " + String(atDelta));
+        //DBG("sampleRate = " + String(sampleRate));
         
         //constrain be min and max times between notes
         if(atDelta > active->getAdaptiveTempo1Min() && atDelta < active->getAdaptiveTempo1Max()) {
@@ -47,7 +81,7 @@ void TempoProcessor::atCalculatePeriodMultiplier()
             float movingAverage = totalDeltas / active->getAdaptiveTempo1History();
             
             adaptiveTempoPeriodMultiplier = movingAverage /
-                                            (active->getBeatThresh()) /
+                                            active->getBeatThreshMS() /
                                             active->getAdaptiveTempo1Subdivisions();
             
             DBG("adaptiveTempoPeriodMultiplier = " + String(adaptiveTempoPeriodMultiplier));

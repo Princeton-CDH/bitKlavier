@@ -15,6 +15,7 @@
 #include "Nostalgic.h"
 #include "Synchronic.h"
 #include "Tuning.h"
+#include "Tempo.h"
 #include "General.h"
 #include "BKUpdateState.h"
 
@@ -59,7 +60,7 @@ public:
     
     inline ValueTree getState(void)
     {
-        ValueTree prep( vtagDirectPrep+String(Id));
+        ValueTree prep( vtagDirect+String(Id));
         
         prep.setProperty( ptagDirect_id,                Id, 0);
         prep.setProperty( ptagDirect_tuning,            sPrep->getTuning()->getId(), 0);
@@ -73,8 +74,6 @@ public:
         prep.setProperty( ptagDirect_gain,              sPrep->getGain(), 0);
         prep.setProperty( ptagDirect_resGain,           sPrep->getResonanceGain(), 0);
         prep.setProperty( ptagDirect_hammerGain,        sPrep->getHammerGain(), 0);
-        
-        //prep.addChild(sPrep->getResetMap()->getState(Id), -1, 0);
         
         return prep;
     }
@@ -129,20 +128,21 @@ public:
     
     Synchronic(BKSynthesiser *s,
                Tuning::Ptr tuning,
+               Tempo::Ptr tempo,
                GeneralSettings::Ptr general,
                BKUpdateState::Ptr us,
                int Id):
     Id(Id),
     updateState(us)
     {
-        sPrep       = new SynchronicPreparation(tuning);
+        sPrep       = new SynchronicPreparation(tuning, tempo);
         aPrep       = new SynchronicPreparation(sPrep);
         processor   = new SynchronicProcessor(s, aPrep, general, Id);
     };
     
     inline ValueTree getState(void)
     {
-        ValueTree prep( vtagSynchronicPrep + String(Id));
+        ValueTree prep( vtagSynchronic + String(Id));
         
         /*
         "Synchronic Id",
@@ -167,7 +167,7 @@ public:
         
         prep.setProperty( ptagSynchronic_Id,                  Id, 0);
         prep.setProperty( ptagSynchronic_tuning,              sPrep->getTuning()->getId(), 0);
-        prep.setProperty( ptagSynchronic_tempo,               sPrep->getTempo(), 0);
+        prep.setProperty( ptagSynchronic_tempo,               sPrep->getTempoControl()->getId(), 0);
         prep.setProperty( ptagSynchronic_numBeats,            sPrep->getNumBeats(), 0);
         prep.setProperty( ptagSynchronic_clusterMin,          sPrep->getClusterMin(), 0);
         prep.setProperty( ptagSynchronic_clusterMax,          sPrep->getClusterMax(), 0);
@@ -214,15 +214,6 @@ public:
             transposition.addChild(t,-1,0);
         }
         prep.addChild(transposition, -1, 0);
-
-        
-        prep.setProperty( ptagSynchronic_at1Mode,             sPrep->getAdaptiveTempo1Mode(), 0);
-        prep.setProperty( ptagSynchronic_at1History,          sPrep->getAdaptiveTempo1History(), 0);
-        prep.setProperty( ptagSynchronic_at1Subdivisions,     sPrep->getAdaptiveTempo1Subdivisions(), 0);
-        prep.setProperty( ptagSynchronic_AT1Min,              sPrep->getAdaptiveTempo1Min(), 0);
-        prep.setProperty( ptagSynchronic_AT1Max,              sPrep->getAdaptiveTempo1Max(), 0);
-        
-        //prep.addChild(sPrep->getResetMap()->getState(Id), -1, 0);
         
         return prep;
         
@@ -239,7 +230,7 @@ public:
     void reset()
     {
         aPrep->copy(sPrep);
-        processor->atReset();
+        //processor->atReset();
         updateState->synchronicPreparationDidChange = true;
         DBG("synchronic reset");
     }
@@ -306,7 +297,7 @@ public:
     
     inline ValueTree getState(void)
     {
-        ValueTree prep( vtagNostalgicPrep + String(Id));
+        ValueTree prep( vtagNostalgic + String(Id));
         
         prep.setProperty( ptagNostalgic_Id,                 Id, 0);
         prep.setProperty( ptagNostalgic_tuning,             sPrep->getTuning()->getId(), 0);
@@ -326,8 +317,6 @@ public:
         prep.setProperty( ptagNostalgic_beatsToSkip,        sPrep->getBeatsToSkip(), 0);
         prep.setProperty( ptagNostalgic_mode,               sPrep->getMode(), 0);
         prep.setProperty( ptagNostalgic_syncTarget,         sPrep->getSyncTarget(), 0);
-        
-        //prep.addChild(sPrep->getResetMap()->getState(Id), -1, 0);
 
         return prep;
     }
