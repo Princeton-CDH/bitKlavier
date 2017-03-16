@@ -472,7 +472,6 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
     String out = "";
     
     bool isNumber = false;
-    bool isMod = false;
     bool isKeymap = false;
     bool isColon  = false;
     bool isSpace = false;
@@ -482,6 +481,7 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
     bool isNostalgic = false;
     bool isTuning = false;
     bool isDirect= false;
+    bool isTempo = false;
     
     bool isBracket;
     
@@ -493,6 +493,7 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
     bool itsASynchronic = false;
     bool itsATuning = false;
     bool itsANostalgic = false;
+    bool itsATempo = false;
     
     String::CharPointerType c = s.getCharPointer();
     
@@ -508,6 +509,8 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
     juce_wchar nostalgicUC = 'N';
     juce_wchar tuningLC = 't';
     juce_wchar tuningUC = 'T';
+    juce_wchar tempoLC = 'm';
+    juce_wchar tempoUC = 'M';
     juce_wchar directLC = 'd';
     juce_wchar directUC = 'D';
     juce_wchar lBracket = '{';
@@ -541,13 +544,13 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
         isNostalgic    = !CharacterFunctions::compare(c1, nostalgicLC) || !CharacterFunctions::compare(c1, nostalgicUC);
         isDirect       = !CharacterFunctions::compare(c1, directLC) || !CharacterFunctions::compare(c1, directUC);
         isTuning       = !CharacterFunctions::compare(c1, tuningLC) || !CharacterFunctions::compare(c1, tuningUC);
+        isTempo      = !CharacterFunctions::compare(c1, tempoLC) || !CharacterFunctions::compare(c1, tempoUC);
  
         isBracket   = !CharacterFunctions::compare(c1, lBracket) || !CharacterFunctions::compare(c1, rBracket) ||
                 !CharacterFunctions::compare(c1, lBracket2) || !CharacterFunctions::compare(c1, rBracket2) ||
                 !CharacterFunctions::compare(c1, lBracket3) || !CharacterFunctions::compare(c1, rBracket3);
         isKeymap    = !CharacterFunctions::compare(c1, keymap);
         isColon     = !CharacterFunctions::compare(c1, colon);
-        isMod       = !CharacterFunctions::compare(c1, modLC) || !CharacterFunctions::compare(c1, modUC);
         isNumber    = CharacterFunctions::isDigit(c1);
         isSpace     = CharacterFunctions::isWhitespace(c1);
         
@@ -671,6 +674,26 @@ String BKAudioProcessorEditor::processModMapString(const String& s)
                                 {
                                     processor.currentPiano->modMap[key]->addTuningModification(new TuningModification(key, prep, (TuningParameterType)n, param, whichMod));
                                     DBG("tuneprep: " + String(prep) + " whichtype: " + cTuningParameterTypes[n] + " val: " +param);
+                                }
+                            }
+                        }
+                    }
+                    else if (itsATempo)
+                    {
+                        out += (String(key) + ":mm" +String(whichMod) + ":" + "{" + intArrayToString(whichPreps) + "} ");
+                        
+                        TempoModPreparation::Ptr mmod = processor.modTempo[whichMod];
+                        
+                        for (int n = cTuningParameterTypes.size(); --n >= 0; )
+                        {
+                            String param = mmod->getParam((TempoParameterType)n);
+                            
+                            if (param != "")
+                            {
+                                for (auto prep : whichPreps)
+                                {
+                                    processor.currentPiano->modMap[key]->addTempoModification(new TempoModification(key, prep, (TempoParameterType)n, param, whichMod));
+                                    DBG("tempoprep: " + String(prep) + " whichtype: " + cTempoParameterTypes[n] + " val: " +param);
                                 }
                             }
                         }

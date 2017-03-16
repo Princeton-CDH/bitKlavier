@@ -36,6 +36,8 @@ public:
     
     void addTuningModification(TuningModification::Ptr m);
     
+    void addTempoModification(TempoModification::Ptr m);
+    
     SynchronicModification::PtrArr getSynchronicModifications(void);
     
     NostalgicModification::PtrArr getNostalgicModifications(void);
@@ -43,6 +45,8 @@ public:
     DirectModification::PtrArr getDirectModifications(void);
     
     TuningModification::PtrArr getTuningModifications(void);
+    
+    TempoModification::PtrArr getTempoModifications(void);
     
     String  stringRepresentation(void);
     
@@ -54,6 +58,7 @@ private:
     SynchronicModification::PtrArr  synchronicMods;
     NostalgicModification::PtrArr   nostalgicMods;
     TuningModification::PtrArr      tuningMods;
+    TempoModification::PtrArr       tempoMods;
     
     JUCE_LEAK_DETECTOR(ModificationMap)
 };

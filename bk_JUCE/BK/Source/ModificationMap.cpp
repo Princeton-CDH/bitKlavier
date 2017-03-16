@@ -74,6 +74,11 @@ void ModificationMap::addTuningModification(TuningModification::Ptr m)
     tuningMods.add(m);
 }
 
+void ModificationMap::addTempoModification(TempoModification::Ptr m)
+{
+    tempoMods.add(m);
+}
+
 SynchronicModification::PtrArr ModificationMap::getSynchronicModifications(void)
 {
     return synchronicMods;
@@ -92,6 +97,11 @@ DirectModification::PtrArr ModificationMap::getDirectModifications(void)
 TuningModification::PtrArr ModificationMap::getTuningModifications(void)
 {
     return tuningMods;
+}
+
+TempoModification::PtrArr ModificationMap::getTempoModifications(void)
+{
+    return tempoMods;
 }
 
 void ModificationMap::clearModifications(void)

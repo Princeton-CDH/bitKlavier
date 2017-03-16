@@ -97,6 +97,12 @@ Direct::PtrArr PreparationMap::getDirect(void)
     return direct;
 }
 
+Tuning::PtrArr PreparationMap::getTuning(void)
+{
+    return tuning;
+}
+
+
 Tempo::PtrArr PreparationMap::getTempo(void)
 {
     return tempo;

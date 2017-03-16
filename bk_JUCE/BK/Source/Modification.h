@@ -315,5 +315,66 @@ private:
     JUCE_LEAK_DETECTOR(TuningModification)
 };
 
+class TempoModification : public Modification
+{
+public:
+    typedef ReferenceCountedObjectPtr<TempoModification>   Ptr;
+    typedef Array<TempoModification::Ptr>                  PtrArr;
+    typedef Array<TempoModification::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<TempoModification>                  Arr;
+    typedef OwnedArray<TempoModification, CriticalSection> CSArr;
+    
+    TempoModification(int key, int whichPrep, TempoParameterType type, String val, int ident):
+    type(type)
+    {
+        modFloatArr = Array<float>();
+        modIntArr = Array<int>();
+        modBool = var::null;
+        modInt = var::null;
+        modFloat = var::null;
+        
+        Id = ident;
+        note = key;
+        prepId = whichPrep;
+        
+        if (cTempoDataTypes[type] == BKInt)
+        {
+            modInt = val.getIntValue();
+        }
+        else if (cTempoDataTypes[type] == BKFloat)
+        {
+            modFloat = val.getFloatValue();
+        }
+        else if (cTempoDataTypes[type] == BKFloatArr)
+        {
+            modFloatArr = stringToFloatArray(val);
+        }
+        else if (cTempoDataTypes[type] == BKBool)
+        {
+            modBool = (bool)val.getIntValue();
+        }
+        else if (cTempoDataTypes[type] == BKIntArr)
+        {
+            modIntArr = stringToIntArray(val);
+        }
+    }
+    
+    
+    ~TempoModification(void)
+    {
+        
+    }
+    
+    inline void setParameterType(TempoParameterType t) { type = t; }
+    
+    inline TempoParameterType getParameterType(void) {return type; }
+    
+private:
+    
+    TempoParameterType type;
+    
+    JUCE_LEAK_DETECTOR(TempoModification)
+};
+
 
 #endif  // MODIFICATION_H_INCLUDED

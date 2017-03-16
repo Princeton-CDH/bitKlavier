@@ -50,6 +50,8 @@ const String vtagPrepMap_nostalgicPreps = "nostalgicPrepIds";
 const String ptagPrepMap_directPrepId = "d";
 const String ptagPrepMap_synchronicPrepId = "s";
 const String ptagPrepMap_nostalgicPrepId = "n";
+const String ptagPrepMap_tempoPrepId = "m";
+const String ptagPrepMap_tuningPrepId = "t";
 
 const String vtagPianoMap = "pianoMap";
 const String ptagPianoMap_key = "key";
@@ -71,7 +73,6 @@ const String ptagBool = "b";
 const String ptagFloatArr = "fa";
 const String ptagIntArr = "ia";
 
-
 const String vtagSynchronicPrep = "synchronicPrep";
 const String vtagSynchronicModPrep = "synchronicModPrep";
 const String ptagSynchronic_Id = "Id";
@@ -83,13 +84,18 @@ const String ptagSynchronic_clusterMax = "clusterMax";
 const String ptagSynchronic_clusterThresh = "clusterThresh";
 const String ptagSynchronic_mode = "mode";
 const String ptagSynchronic_beatsToSkip = "beatsToSkip";
-/*
-const String ptagSynchronic_at1Mode = "AT1Mode";
-const String ptagSynchronic_at1History = "AT1History";
-const String ptagSynchronic_at1Subdivisions = "AT1Subdivisions";
-const String ptagSynchronic_AT1Min = "AT1Min";
-const String ptagSynchronic_AT1Max = "AT1Max";
- */
+
+const String vtagTempoPrep = "tempoPrep";
+const String vtagTempoModPrep = "tempoModPrep";
+const String ptagTempo_Id = "Id";
+const String ptagTempo_system = "system";
+const String ptagTempo_tempo = "tempo";
+const String ptagTempo_at1Mode = "at1Mode";
+const String ptagTempo_at1History = "at1History";
+const String ptagTempo_at1Subdivisions = "at1Subdivisions";
+const String ptagTempo_at1Min = "at1Min";
+const String ptagTempo_at1Max = "at1Max";
+
 const String vtagSynchronic_beatMults = "beatMultipliers";
 const String vtagSynchronic_lengthMults = "lengthMultipliers";
 const String vtagSynchronic_accentMults = "accentMultipliers";
@@ -141,18 +147,6 @@ const String ptagTuning_customScaleLength = "customScaleLength";
 const String ptagTuning_customScaleDegree = "scaleDegree";
 const String vTagTuning_absoluteOffsets = "absoluteOffsets";
 const String ptagTuning_resetPrep = "tuningReset";
-
-const String vtagTempoModPrep = "tempoModPrep";
-const String vtagTempoPrep = "tempoPrep";
-const String ptagTempo_Id = "Id";
-const String ptagTempo_tempo = "tempo";
-const String ptagTempo_adaptiveSystem = "AdaptiveTempoSystem";
-const String ptagTempo_AT1History = "AT1History";
-const String ptagTempo_AT1Subdivisions = "AT1Subdivisions";
-const String ptagTempo_AT1Min = "AT1Min";
-const String ptagTempo_AT1Max = "AT1Max";
-const String ptagTempo_AT1Mode = "AT1Mode";
-
 
 const String vtagKeymaps = "keymaps";
 const String vtagKeymap =  "keymap";

@@ -256,22 +256,22 @@ public:
         if (p != String::empty) prep.setProperty( ptagTempo_tempo, p.getFloatValue(), 0);
         
         p = getParam(TempoSystem);
-        if (p != String::empty) prep.setProperty( ptagTempo_adaptiveSystem, p.getIntValue(), 0);
+        if (p != String::empty) prep.setProperty( ptagTempo_system, p.getIntValue(), 0);
         
         p = getParam(AT1History);
-        if (p != String::empty) prep.setProperty( ptagTempo_AT1History, p.getIntValue(), 0 );
+        if (p != String::empty) prep.setProperty( ptagTempo_at1History, p.getIntValue(), 0 );
         
         p = getParam(AT1Subdivisions);
-        if (p != String::empty) prep.setProperty( ptagTempo_AT1Subdivisions, p.getIntValue(), 0 );
+        if (p != String::empty) prep.setProperty( ptagTempo_at1Subdivisions, p.getIntValue(), 0 );
         
         p = getParam(AT1Min);
-        if (p != String::empty) prep.setProperty( ptagTempo_AT1Min, p.getIntValue(), 0 );
+        if (p != String::empty) prep.setProperty( ptagTempo_at1Min, p.getIntValue(), 0 );
         
         p = getParam(AT1Max);
-        if (p != String::empty) prep.setProperty( ptagTempo_AT1Max, p.getIntValue(), 0 );
+        if (p != String::empty) prep.setProperty( ptagTempo_at1Max, p.getIntValue(), 0 );
         
         p = getParam(AT1Mode);
-        if (p != String::empty) prep.setProperty( ptagTempo_AT1Mode, p.getIntValue(), 0 );
+        if (p != String::empty) prep.setProperty( ptagTempo_at1Mode, p.getIntValue(), 0 );
     
         return prep;
         
@@ -339,11 +339,12 @@ public:
         
         prep.setProperty( ptagTempo_Id,                    Id, 0);
         prep.setProperty( ptagTempo_tempo,                 sPrep->getTempo(), 0);
-        prep.setProperty( ptagTempo_adaptiveSystem,        sPrep->getTempoSystem(), 0);
-        prep.setProperty( ptagTempo_AT1History,            sPrep->getAdaptiveTempo1History(), 0 );
-        prep.setProperty( ptagTempo_AT1Subdivisions,       sPrep->getAdaptiveTempo1Subdivisions(), 0 );
-        prep.setProperty( ptagTempo_AT1Min,                sPrep->getAdaptiveTempo1Min(), 0 );
-        prep.setProperty( ptagTempo_AT1Max,                sPrep->getAdaptiveTempo1Max(), 0 );
+        prep.setProperty( ptagTempo_system,                sPrep->getTempoSystem(), 0);
+        prep.setProperty( ptagTempo_at1Mode,               sPrep->getAdaptiveTempo1Mode(), 0 );
+        prep.setProperty( ptagTempo_at1History,            sPrep->getAdaptiveTempo1History(), 0 );
+        prep.setProperty( ptagTempo_at1Subdivisions,       sPrep->getAdaptiveTempo1Subdivisions(), 0 );
+        prep.setProperty( ptagTempo_at1Min,                sPrep->getAdaptiveTempo1Min(), 0 );
+        prep.setProperty( ptagTempo_at1Max,                sPrep->getAdaptiveTempo1Max(), 0 );
 
         return prep;
         
