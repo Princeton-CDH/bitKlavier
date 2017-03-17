@@ -64,7 +64,8 @@ resonanceReleaseSynth   (general)
     
     // Make a piano.
     bkPianos.add(new Piano(synchronic, nostalgic, direct, tuning, tempo,
-                           bkKeymaps[0], 0)); // initializing piano 0
+                           modSynchronic, modNostalgic, modDirect, modTuning, modTempo,
+                           bkKeymaps, 0)); // initializing piano 0
     
     // Initialize first piano.
     prevPiano = bkPianos[0];
@@ -107,9 +108,9 @@ void BKAudioProcessor::updateGalleries()
 void BKAudioProcessor::addPiano()
 {
     int numPianos = bkPianos.size();
-    bkPianos.add(new Piano(synchronic, nostalgic, direct,
-                           tuning, tempo,
-                           bkKeymaps[0], numPianos));
+    bkPianos.add(new Piano(synchronic, nostalgic, direct, tuning, tempo,
+                           modSynchronic, modNostalgic, modDirect, modTuning, modTempo,
+                           bkKeymaps, numPianos));
 }
 
 void BKAudioProcessor::addDirectMod()
@@ -1177,33 +1178,7 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                 }
                 else if (e->hasTagName ( vtagGeneral))
                 {
-                    f = e->getStringAttribute( ptagGeneral_globalGain ).getFloatValue();
-                    general->setGlobalGain(f);
-                    
-                    f = e->getStringAttribute( ptagGeneral_hammerGain ).getFloatValue();
-                    general->setHammerGain(f);
-                    
-                    f = e->getStringAttribute( ptagGeneral_resonanceGain ).getFloatValue();
-                    general->setResonanceGain(f);
-                    
-                    f = e->getStringAttribute( ptagGeneral_directGain ).getFloatValue();
-                    general->setDirectGain(f);
-                    
-                    f = e->getStringAttribute( ptagGeneral_nostalgicGain ).getFloatValue();
-                    general->setNostalgicGain(f);
-                    
-                    f = e->getStringAttribute( ptagGeneral_tempoMultiplier ).getFloatValue();
-                    general->setTempoMultiplier(f);
-                    
-                    f = e->getStringAttribute( ptagGeneral_tuningFund ).getFloatValue();
-                    general->setTuningFundamental(f);
-                    
-                    b = (bool) e->getStringAttribute( ptagGeneral_resAndHammer ).getIntValue();
-                    general->setResonanceAndHammer(b);
-                    
-                    b = (bool) e->getStringAttribute( ptagGeneral_invertSustain ).getIntValue();
-                    general->setInvertSustain(b);
-                    
+                    general->setState(e);
                 }
                 else if (e->hasTagName( vtagTuning + String(tPrepCount)))
                 {
@@ -1211,92 +1186,9 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     
                     int id = tuning.size() - 1;
                     
-                    i = e->getStringAttribute( ptagTuning_scale).getIntValue();
-                    tuning[id]->sPrep->setTuning((TuningSystem)i);
+                    Tuning::Ptr thisTuning = tuning[id];
                     
-                    i = e->getStringAttribute( ptagTuning_fundamental).getIntValue();
-                    tuning[id]->sPrep->setFundamental((PitchClass)i);
-                    
-                    f = e->getStringAttribute( ptagTuning_offset).getFloatValue();
-                    tuning[id]->sPrep->setFundamentalOffset(f);
-                    
-                    i = e->getStringAttribute( ptagTuning_adaptiveIntervalScale).getIntValue();
-                    tuning[id]->sPrep->setAdaptiveIntervalScale((TuningSystem)i);
-                    
-                    i = e->getStringAttribute( ptagTuning_adaptiveAnchorScale).getIntValue();
-                    tuning[id]->sPrep->setAdaptiveAnchorScale((TuningSystem)i);
-                    
-                    i = e->getStringAttribute( ptagTuning_adaptiveHistory).getIntValue();
-                    tuning[id]->sPrep->setAdaptiveHistory(i);
-                    
-                    b = (bool) e->getStringAttribute( ptagTuning_adaptiveInversional).getIntValue();
-                    tuning[id]->sPrep->setAdaptiveInversional(b);
-                    
-                    i = e->getStringAttribute( ptagTuning_adaptiveClusterThresh).getIntValue();
-                    tuning[id]->sPrep->setAdaptiveClusterThresh(i);
-                    
-                    i = e->getStringAttribute( ptagTuning_adaptiveAnchorFund).getIntValue();
-                    tuning[id]->sPrep->setAdaptiveAnchorFundamental((PitchClass)i);
-                    
-                    // custom scale
-                    forEachXmlChildElement (*e, sub)
-                    {
-                        if (sub->hasTagName(vtagTuning_customScale))
-                        {
-                            Array<float> scale;
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                
-                                if (attr == String::empty) break;
-                                else
-                                {
-                                    f = attr.getFloatValue();
-                                    scale.add(f);
-                                }
-                            }
-                            
-                            tuning[id]->sPrep->setCustomScale(scale);
-                        }
-                        else if (sub->hasTagName(vTagTuning_absoluteOffsets))
-                        {
-                            Array<float> absolute;
-                            absolute.ensureStorageAllocated(128);
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                f = attr.getFloatValue();
-                                absolute.set(k, f);
-    
-                            }
-                            
-                            tuning[id]->sPrep->setAbsoluteOffsets(absolute);
-                        }
-                        /*
-                        else if (sub->hasTagName(vtagKeymap + "1"))
-                        {
-                            Array<int> keys;
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = sub->getStringAttribute(ptagKeymap_key + String(k));
-
-                                if (attr == String::empty) break;
-                                else
-                                {
-                                    i = attr.getIntValue();
-                                    keys.add(i);
-                                }
-                            }
-                            
-                            Keymap::Ptr km = new Keymap(0);
-                            km->setKeymap(keys);
-                            tuning[id]->sPrep->setResetMap(km);
-                        }
-                         */
-                    }
-                    
-                    // copy static to active
-                    tuning[id]->aPrep->copy( tuning[id]->sPrep);
+                    thisTuning->setState(e);
                     
                     ++tPrepCount;
                 }
@@ -1306,89 +1198,9 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     
                     int id = modTuning.size() - 1;
                     
-                    String p = "";
+                    TuningModPreparation::Ptr thisModTuning = modTuning[id];
                     
-                    p = e->getStringAttribute( ptagTuning_scale);
-                    modTuning[id]->setParam(TuningScale, p);
-                    
-                    p = e->getStringAttribute( ptagTuning_fundamental);
-                    modTuning[id]->setParam(TuningFundamental, p);
-                    
-                    p = e->getStringAttribute( ptagTuning_offset);
-                    modTuning[id]->setParam(TuningOffset, p);
-                    
-                    p = e->getStringAttribute( ptagTuning_adaptiveIntervalScale);
-                    modTuning[id]->setParam(TuningA1IntervalScale, p);
-                    
-                    p = e->getStringAttribute( ptagTuning_adaptiveAnchorScale);
-                    modTuning[id]->setParam(TuningA1AnchorScale, p);
-                    
-                    p = e->getStringAttribute( ptagTuning_adaptiveHistory);
-                    modTuning[id]->setParam(TuningA1History, p);
-                    
-                    p = e->getStringAttribute( ptagTuning_adaptiveInversional);
-                    modTuning[id]->setParam(TuningA1Inversional, p);
-                    
-                    p = e->getStringAttribute( ptagTuning_adaptiveClusterThresh);
-                    modTuning[id]->setParam(TuningA1ClusterThresh, p);
-                    
-                    p = e->getStringAttribute( ptagTuning_adaptiveAnchorFund);
-                    modTuning[id]->setParam(TuningA1AnchorFundamental, p);
-                    
-                    
-                    // custom scale
-                    forEachXmlChildElement (*e, sub)
-                    {
-                        if (sub->hasTagName(vtagTuning_customScale))
-                        {
-                            Array<float> scale;
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                
-                                if (attr == String::empty) break;
-                                else
-                                {
-                                    f = attr.getFloatValue();
-                                    scale.add(f);
-                                }
-                            }
-                            
-                            modTuning[id]->setParam(TuningCustomScale, floatArrayToString(scale));
-                        }
-                        else if (sub->hasTagName(vTagTuning_absoluteOffsets))
-                        {
-                            Array<float> absolute;
-                            absolute.ensureStorageAllocated(128);
-                            String abs = "";
-                
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                f = attr.getFloatValue() * 100.;
-                                absolute.set(k, f);
-                                if (f != 0.0) abs += (String(k) + ":" + String(f) + " ");
-                                
-                            }
-                            
-                            /*
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                
-                                if (attr == String::empty) break;
-                                else
-                                {
-                                    f = attr.getFloatValue();
-                                    absolute.add(f);
-                                    if (f != 0.0) abs += (String(k) + ":" + String(f) + " ");
-                                }
-                            }
-                             */
-                            
-                            modTuning[id]->setParam(TuningAbsoluteOffsets, abs);
-                        }
-                    }
+                    thisModTuning->setState(e);
                     
                     ++tModPrepCount;
                 }
@@ -1398,41 +1210,9 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     
                     int id = direct.size()-1;
                     
-                    i = e->getStringAttribute(ptagDirect_tuning).getIntValue();
-                    direct[id]->sPrep->setTuning(tuning[i]);
+                    Direct::Ptr thisDirect = direct[id];
                     
-                    f = e->getStringAttribute(ptagDirect_gain).getFloatValue();
-                    direct[id]->sPrep->setGain(f);
-                    
-                    f = e->getStringAttribute(ptagDirect_hammerGain).getFloatValue();
-                    direct[id]->sPrep->setHammerGain(f);
-                    
-                    f = e->getStringAttribute(ptagDirect_resGain).getFloatValue();
-                    direct[id]->sPrep->setResonanceGain(f);
-                    
-                    forEachXmlChildElement (*e, sub)
-                    {
-                        if (sub->hasTagName(vtagDirect_transposition))
-                        {
-                            Array<float> transp;
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                
-                                if (attr == String::empty) break;
-                                else
-                                {
-                                    f = attr.getFloatValue();
-                                    transp.add(f);
-                                }
-                            }
-                            
-                            direct[id]->sPrep->setTransposition(transp);
-                            
-                        }
-                    }
-                    // copy static to active
-                    direct[id]->aPrep->copy(direct[id]->sPrep);
+                    thisDirect->setState(e, tuning);
                     
                     ++dPrepCount;
                 }
@@ -1440,43 +1220,11 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                 {
                     addDirectMod();
                     
-                    String p = "";
-                    
                     int id = modDirect.size()-1;
                     
-                    p = e->getStringAttribute(ptagDirect_tuning);
-                    modDirect[id]->setParam(DirectTuning, p);
+                    DirectModPreparation::Ptr thisModDirect = modDirect[id];
                     
-                    p = e->getStringAttribute(ptagDirect_gain);
-                    modDirect[id]->setParam(DirectGain, p);
-                    
-                    p = e->getStringAttribute(ptagDirect_hammerGain);
-                    modDirect[id]->setParam(DirectHammerGain, p);
-                    
-                    p = e->getStringAttribute(ptagDirect_resGain);
-                    modDirect[id]->setParam(DirectResGain, p);
-                    
-                    forEachXmlChildElement (*e, sub)
-                    {
-                        if (sub->hasTagName(vtagDirect_transposition))
-                        {
-                            Array<float> transp;
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                
-                                if (attr == String::empty) break;
-                                else
-                                {
-                                    f = attr.getFloatValue();
-                                    transp.add(f);
-                                }
-                            }
-                            
-                            modDirect[id]->setParam(DirectTransposition, floatArrayToString(transp));
-                            
-                        }
-                    }
+                    thisModDirect->setState(e);
                     
                     ++dModPrepCount;
                 }
@@ -1486,122 +1234,9 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     
                     int id = synchronic.size() - 1;
                     
-                    i = e->getStringAttribute(ptagSynchronic_tuning).getIntValue();
-                    synchronic[id]->sPrep->setTuning(tuning[i]);
+                    Synchronic::Ptr thisSynchronic = synchronic[id];
                     
-                    if (e->getStringAttribute(ptagSynchronic_tempo) != String::empty)
-                    {
-                        i = e->getStringAttribute(ptagSynchronic_tempo).getIntValue();
-                        synchronic[id]->sPrep->setTempoControl(tempo[i]);
-                    }
-                    else
-                    {
-                        synchronic[id]->sPrep->setTempoControl(tempo[0]);
-                    }
-                    
-                    i = e->getStringAttribute(ptagSynchronic_numBeats).getIntValue();
-                    synchronic[id]->sPrep->setNumBeats(i);
-                    
-                    i = e->getStringAttribute(ptagSynchronic_clusterMin).getIntValue();
-                    synchronic[id]->sPrep->setClusterMin(i);
-                    
-                    i = e->getStringAttribute(ptagSynchronic_clusterMax).getIntValue();
-                    synchronic[id]->sPrep->setClusterMax(i);
-                    
-                    i = e->getStringAttribute(ptagSynchronic_clusterThresh).getIntValue();
-                    synchronic[id]->sPrep->setClusterThresh(i);
-                    
-                    i = e->getStringAttribute(ptagSynchronic_mode).getIntValue();
-                    synchronic[id]->sPrep->setMode((SynchronicSyncMode) i);
-                    
-                    i = e->getStringAttribute(ptagSynchronic_beatsToSkip).getIntValue();
-                    synchronic[id]->sPrep->setBeatsToSkip(i);
-                    
-                    forEachXmlChildElement (*e, sub)
-                    {
-                        if (sub->hasTagName(vtagSynchronic_beatMults))
-                        {
-                            Array<float> beats;
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                
-                                if (attr == String::empty) break;
-                                else
-                                {
-                                    f = attr.getFloatValue();
-                                    beats.add(f);
-                                }
-                            }
-                            
-                            synchronic[id]->sPrep->setBeatMultipliers(beats);
-                            
-                        }
-                        else  if (sub->hasTagName(vtagSynchronic_accentMults))
-                        {
-                            Array<float> accents;
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                
-                                if (attr == String::empty) break;
-                                else
-                                {
-                                    f = attr.getFloatValue();
-                                    accents.add(f);
-                                }
-                            }
-                            
-                            synchronic[id]->sPrep->setAccentMultipliers(accents);
-                            
-                        }
-                        else  if (sub->hasTagName(vtagSynchronic_lengthMults))
-                        {
-                            Array<float> lens;
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                
-                                if (attr == String::empty) break;
-                                else
-                                {
-                                    f = attr.getFloatValue();
-                                    lens.add(f);
-                                }
-                            }
-                            
-                            synchronic[id]->sPrep->setLengthMultipliers(lens);
-                            
-                        }
-                        else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
-                        {
-                            Array<Array<float>> atransp;
-                            int tcount = 0;
-                            forEachXmlChildElement (*sub, asub)
-                            {
-                                if (asub->hasTagName("t"+String(tcount++)))
-                                {
-                                    Array<float> transp;
-                                    for (int k = 0; k < 128; k++)
-                                    {
-                                        String attr = asub->getStringAttribute(ptagFloat + String(k));
-                                        
-                                        if (attr == String::empty) break;
-                                        else
-                                        {
-                                            f = attr.getFloatValue();
-                                            transp.add(f);
-                                        }
-                                    }
-                                    atransp.set(tcount-1, transp);
-                                }
-                            }
-                            
-                            synchronic[id]->sPrep->setTransposition(atransp);
-                        }
-                    }
-                    
-                    synchronic[id]->aPrep->copy(synchronic[id]->sPrep);
+                    thisSynchronic->setState(e, tuning, tempo);
                     
                     ++sPrepCount;
                     
@@ -1610,106 +1245,11 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                 {
                     addSynchronicMod();
                     
-                    String p = "";
-                    
                     int id = modSynchronic.size() - 1;
                     
-                    p = e->getStringAttribute(ptagSynchronic_tuning);
-                    modSynchronic[id]->setParam(SynchronicTuning, p);
+                    SynchronicModPreparation::Ptr thisModSynchronic = modSynchronic[id];
                     
-                    p = e->getStringAttribute(ptagSynchronic_tempo);
-                    modSynchronic[id]->setParam(SynchronicTempo, p);
-                    
-                    p = e->getStringAttribute(ptagSynchronic_numBeats);
-                    modSynchronic[id]->setParam(SynchronicNumPulses, p);
-                    
-                    p = e->getStringAttribute(ptagSynchronic_clusterMin);
-                    modSynchronic[id]->setParam(SynchronicClusterMin, p);
-                    
-                    p = e->getStringAttribute(ptagSynchronic_clusterMax);
-                    modSynchronic[id]->setParam(SynchronicClusterMax, p);
-                    
-                    p = e->getStringAttribute(ptagSynchronic_clusterThresh);
-                    modSynchronic[id]->setParam(SynchronicClusterThresh, p);
-                    
-                    p = e->getStringAttribute(ptagSynchronic_mode);
-                    modSynchronic[id]->setParam(SynchronicMode, p);
-                    
-                    forEachXmlChildElement (*e, sub)
-                    {
-                        if (sub->hasTagName(vtagSynchronic_beatMults))
-                        {
-                            Array<float> beats;
-                            
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                
-                                if (attr == String::empty) break;
-                                else
-                                {
-                                    f = attr.getFloatValue();
-                                    beats.add(f);
-                                }
-                            }
-                            
-                            modSynchronic[id]->setParam(SynchronicBeatMultipliers, floatArrayToString(beats));
-                            
-                        }
-                        else  if (sub->hasTagName(vtagSynchronic_accentMults))
-                        {
-                            Array<float> accents;
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                
-                                if (attr == String::empty) break;
-                                else
-                                {
-                                    f = attr.getFloatValue();
-                                    accents.add(f);
-                                }
-                            }
-                            
-                            modSynchronic[id]->setParam(SynchronicAccentMultipliers, floatArrayToString(accents));
-                            
-                        }
-                        else  if (sub->hasTagName(vtagSynchronic_lengthMults))
-                        {
-                            Array<float> lens;
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                
-                                if (attr == String::empty) break;
-                                else
-                                {
-                                    f = attr.getFloatValue();
-                                    lens.add(f);
-                                }
-                            }
-                            
-                            modSynchronic[id]->setParam(SynchronicLengthMultipliers, floatArrayToString(lens));
-                            
-                        }
-                        else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
-                        {
-                            Array<float> transp;
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                
-                                if (attr == String::empty) break;
-                                else
-                                {
-                                    f = attr.getFloatValue();
-                                    transp.add(f);
-                                }
-                            }
-                            
-                            modSynchronic[id]->setParam(SynchronicTranspOffsets, floatArrayToString(transp));
-                        }
-                    }
+                    thisModSynchronic->setState(e);
                     
                     ++sModPrepCount;
                     
@@ -1720,29 +1260,9 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     
                     int id = tempo.size() - 1;
                     
-                    f = e->getStringAttribute(ptagTempo_tempo).getFloatValue();
-                    DBG("going to set tempo for tempo[" + String(id)+"]");
-                    tempo[id]->sPrep->setTempo(f);
+                    Tempo::Ptr thisTempo = tempo[id];
                     
-                    i = e->getStringAttribute(ptagTempo_system).getIntValue();
-                    tempo[id]->sPrep->setTempoSystem((TempoType)i);
-
-                    i = e->getStringAttribute(ptagTempo_at1Mode).getIntValue();
-                    tempo[id]->sPrep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode)i);
-                    
-                    i = e->getStringAttribute(ptagTempo_at1History).getIntValue();
-                    tempo[id]->sPrep->setAdaptiveTempo1History(i);
-
-                    f = e->getStringAttribute(ptagTempo_at1Subdivisions).getFloatValue();
-                    tempo[id]->sPrep->setAdaptiveTempo1Subdivisions(f);
-
-                    f = e->getStringAttribute(ptagTempo_at1Min).getFloatValue();
-                    tempo[id]->sPrep->setAdaptiveTempo1Min(f);
-
-                    f = e->getStringAttribute(ptagTempo_at1Max).getFloatValue();
-                    tempo[id]->sPrep->setAdaptiveTempo1Max(f);
-                    
-                    tempo[id]->aPrep->copy(tempo[id]->sPrep);
+                    thisTempo->setState(e);
                     
                     ++tempoPrepCount;
                     
@@ -1751,30 +1271,11 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                 {
                     addTempoMod();
                     
-                    String p = "";
-                    
                     int id = modTempo.size() - 1;
                     
-                    p = e->getStringAttribute(ptagTempo_tempo);
-                    modTempo[id]->setParam(TempoBPM, p);
+                    TempoModPreparation::Ptr thisModTempo = modTempo[id];
                     
-                    p = e->getStringAttribute(ptagTempo_system);
-                    modTempo[id]->setParam(TempoSystem, p);
-
-                    p = e->getStringAttribute(ptagTempo_at1Mode);
-                    modTempo[id]->setParam(AT1Mode, p);
-
-                    p = e->getStringAttribute(ptagTempo_at1History);
-                    modTempo[id]->setParam(AT1History, p);
-
-                    p = e->getStringAttribute(ptagTempo_at1Subdivisions);
-                    modTempo[id]->setParam(AT1Subdivisions, p);
-
-                    p = e->getStringAttribute(ptagTempo_at1Min);
-                    modTempo[id]->setParam(AT1Min, p);
-
-                    p = e->getStringAttribute(ptagTempo_at1Max);
-                    modTempo[id]->setParam(AT1Max, p);
+                    thisModTempo->setState(e);
                     
                     ++tempoModPrepCount;
                     
@@ -1785,57 +1286,9 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                     
                     int id = nostalgic.size() - 1;
                     
-                    i = e->getStringAttribute(ptagNostalgic_tuning).getIntValue();
-                    nostalgic[id]->sPrep->setTuning(tuning[i]);
+                    Nostalgic::Ptr thisNostalgic = nostalgic[id];
                     
-                    i = e->getStringAttribute(ptagNostalgic_waveDistance).getIntValue();
-                    nostalgic[id]->sPrep->setWaveDistance(i);
-                    
-                    i = e->getStringAttribute(ptagNostalgic_undertow).getIntValue();
-                    nostalgic[id]->sPrep->setUndertow(i);
-                    
-                    forEachXmlChildElement (*e, sub)
-                    {
-                        if (sub->hasTagName(vtagNostalgic_transposition))
-                        {
-                            Array<float> transp;
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                
-                                if (attr == String::empty) break;
-                                else
-                                {
-                                    f = attr.getFloatValue();
-                                    transp.add(f);
-                                }
-                            }
-                            
-                            nostalgic[id]->sPrep->setTransposition(transp);
-                            
-                        }
-                    }
-                    
-                    
-                    f = e->getStringAttribute(ptagNostalgic_lengthMultiplier).getFloatValue();
-                    nostalgic[id]->sPrep->setLengthMultiplier(f);
-                    
-                    f = e->getStringAttribute(ptagNostalgic_beatsToSkip).getFloatValue();
-                    nostalgic[id]->sPrep->setBeatsToSkip(f);
-                    
-                    f = e->getStringAttribute(ptagNostalgic_gain).getFloatValue();
-                    nostalgic[id]->sPrep->setGain(f);
-                    
-                    i = e->getStringAttribute(ptagNostalgic_mode).getIntValue();
-                    nostalgic[id]->sPrep->setMode((NostalgicSyncMode)i);
-                    
-                    i = e->getStringAttribute(ptagNostalgic_syncTarget).getIntValue();
-                    nostalgic[id]->sPrep->setSyncTarget(i);
-                    
-                    nostalgic[id]->sPrep->setSyncTargetProcessor(synchronic[i]->processor);
-                    nostalgic[id]->aPrep->setSyncTargetProcessor(synchronic[i]->processor);
-                    
-                    nostalgic[id]->aPrep->copy(nostalgic[id]->sPrep);
+                    thisNostalgic->setState(e, tuning, synchronic);
                     
                     ++nPrepCount;
                 }
@@ -1843,55 +1296,11 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                 {
                     addNostalgicMod();
                     
-                    String p = "";
-                    
                     int id = modNostalgic.size() - 1;
                     
-                    p = e->getStringAttribute(ptagNostalgic_tuning);
-                    modNostalgic[id]->setParam(NostalgicTuning, p);
+                    NostalgicModPreparation::Ptr thisModNostalgic = modNostalgic[id];
                     
-                    p = e->getStringAttribute(ptagNostalgic_waveDistance);
-                    modNostalgic[id]->setParam(NostalgicWaveDistance, p);
-                    
-                    p = e->getStringAttribute(ptagNostalgic_undertow);
-                    modNostalgic[id]->setParam(NostalgicUndertow, p);
-                    
-                    forEachXmlChildElement (*e, sub)
-                    {
-                        if (sub->hasTagName(vtagNostalgic_transposition))
-                        {
-                            Array<float> transp;
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = sub->getStringAttribute(ptagFloat + String(k));
-                                
-                                if (attr == String::empty) break;
-                                else
-                                {
-                                    f = attr.getFloatValue();
-                                    transp.add(f);
-                                }
-                            }
-                            
-                            modNostalgic[id]->setParam(NostalgicTransposition, floatArrayToString(transp));
-                            
-                        }
-                    }
-                    
-                    p = e->getStringAttribute(ptagNostalgic_lengthMultiplier);
-                    modNostalgic[id]->setParam(NostalgicLengthMultiplier, p);
-                    
-                    p = e->getStringAttribute(ptagNostalgic_beatsToSkip);
-                    modNostalgic[id]->setParam(NostalgicBeatsToSkip, p);
-                    
-                    p = e->getStringAttribute(ptagNostalgic_gain);
-                    modNostalgic[id]->setParam(NostalgicGain, p);
-                    
-                    p = e->getStringAttribute(ptagNostalgic_mode);
-                    modNostalgic[id]->setParam(NostalgicMode, p);
-                    
-                    p = e->getStringAttribute(ptagNostalgic_syncTarget);
-                    modNostalgic[id]->setParam(NostalgicSyncTarget, p);
+                    thisModNostalgic->setState(e);
                     
                     ++nModPrepCount;
                 }
@@ -1899,308 +1308,13 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
                 {
                     int whichPiano = pianoCount++;
                     
-                    bkPianos.set(whichPiano, new Piano(synchronic, nostalgic, direct,
-                                                       tuning, tempo,
-                                                       bkKeymaps[0], whichPiano)); // initializing piano 0
+                    bkPianos.set(whichPiano, new Piano(synchronic, nostalgic, direct, tuning, tempo,
+                                                       modSynchronic, modNostalgic, modDirect, modTuning, modTempo,
+                                                       bkKeymaps, whichPiano)); // initializing piano 0
                     
                     Piano::Ptr thisPiano = bkPianos[whichPiano];
                     
-                    int pianoMapCount = 0, prepMapCount = 0, modCount = 0, resetCount = 0;
-                    
-                    String pianoName = e->getStringAttribute("bkPianoName");
-                    
-                    if (pianoName != String::empty)
-                        thisPiano->setName(e->getStringAttribute("bkPianoName"));
-                    else
-                    {
-                        thisPiano->setName("Piano"+String(whichPiano+1));
-                    }
-                    
-                    forEachXmlChildElement (*e, pc)
-                    {
-                        
-                        if (pc->hasTagName( vtagPianoMap + String(pianoMapCount)))
-                        {
-                            // PianoMap
-                            i = pc->getStringAttribute(ptagPianoMap_key).getIntValue();
-                            int key = i;
-                            
-                            i = pc->getStringAttribute(ptagPianoMap_piano).getIntValue();
-                            int piano = i;
-                            
-                            thisPiano->pianoMap.set(key, piano);
-                            
-                            ++pianoMapCount;
-                        }
-                        else if (pc->hasTagName( vtagPrepMap + String(prepMapCount)))
-                        {
-                            // PrepMap
-                            i = pc->getStringAttribute(ptagPrepMap_keymapId).getIntValue();
-                            Keymap::Ptr keymap = bkKeymaps[i];
-                            
-                            thisPiano->addPreparationMap(); // should clean up this functionality . pretty bad
-                            
-                            thisPiano->prepMaps[prepMapCount]->setKeymap(keymap);
-                            
-                            Synchronic::PtrArr sync;
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = pc->getStringAttribute(ptagPrepMap_synchronicPrepId + String(k));
-                                
-                                if (attr == String::empty)  break;
-                                else                        sync.add(synchronic[attr.getIntValue()]);
-                                
-                            }
-                            thisPiano->prepMaps[prepMapCount]->setSynchronic(sync);
-                            
-                            Nostalgic::PtrArr nost;
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = pc->getStringAttribute(ptagPrepMap_nostalgicPrepId + String(k));
-                                
-                                if (attr == String::empty)  break;
-                                else                        nost.add(nostalgic[attr.getIntValue()]);
-                                
-                            }
-                            thisPiano->prepMaps[prepMapCount]->setNostalgic(nost);
-                            
-                            
-                            Direct::PtrArr drct;
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = pc->getStringAttribute(ptagPrepMap_directPrepId + String(k));
-                                
-                                if (attr == String::empty)  break;
-                                else                        drct.add(direct[attr.getIntValue()]);
-                                
-                            }
-                            thisPiano->prepMaps[prepMapCount]->setDirect(drct);
-                            
-                            Tuning::PtrArr tune;
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = pc->getStringAttribute(ptagPrepMap_tuningPrepId + String(k));
-                                
-                                if (attr == String::empty)  break;
-                                else                        tune.add(tuning[attr.getIntValue()]);
-                                
-                            }
-                            thisPiano->prepMaps[prepMapCount]->setTuning(tune);
-                            
-                            Tempo::PtrArr tmp;
-                            for (int k = 0; k < 128; k++)
-                            {
-                                String attr = pc->getStringAttribute(ptagPrepMap_tempoPrepId + String(k));
-                                
-                                if (attr == String::empty)  break;
-                                else                        tmp.add(tempo[attr.getIntValue()]);
-                                
-                            }
-                            thisPiano->prepMaps[prepMapCount]->setTempo(tmp);
-                            
-                            ++prepMapCount;
-                        }
-                        else if (pc->hasTagName( "mod" + String(modCount)))
-                        {
-                            int key = pc->getStringAttribute(ptagModX_key).getIntValue();
-                            
-                            int subModCount = 0;
-                            forEachXmlChildElement (*pc, mod)
-                            {
-                                if (mod->hasTagName("m"+String(subModCount)))
-                                {
-                                    BKPreparationType type = (BKPreparationType)mod->getStringAttribute("type").getIntValue();
-                                    int whichMod = mod->getStringAttribute("id").getIntValue();
-                                    
-                                    Array<int> whichPreps;
-                                    for (int p = 0; p < 200; p++) //arbitrary 200
-                                    {
-                                        String attr = mod->getStringAttribute("p" + String(p));
-                                        
-                                        if (attr == String::empty)  break;
-                                        else                        whichPreps.add(attr.getIntValue());
-                                    }
-                                    
-                                    if (whichPreps.size())
-                                        thisPiano->modificationMaps[key]->addModPrepMap(new ModPrepMap(type, whichMod, whichPreps));
-                                    
-                                    // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ PUT IN OWN FUNCTION IN PIANOOOOO ~ ~ ~ ~ ~ ~ ~ ~ ~
-                                    if (type == PreparationTypeDirect)
-                                    {
-                                        DirectModPreparation::Ptr dmod = modDirect[whichMod];
-                                        
-                                        for (int n = cDirectParameterTypes.size(); --n >= 0; )
-                                        {
-                                            String param = dmod->getParam((DirectParameterType)n);
-                                            
-                                            if (param != "")
-                                            {
-                                                for (auto prep : whichPreps)
-                                                {
-                                                    thisPiano->modMap[key]->addDirectModification(new DirectModification(key, prep, (DirectParameterType)n, param, whichMod));
-                                                    
-                                                    DBG("[ADDINGMOD] whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cDirectParameterTypes[n] + " val: " +param);
-                                                    
-                                                }
-                                                
-                                                
-                                            }
-                                        }
-                                    }
-                                    else if (type == PreparationTypeSynchronic)
-                                    {
-                                        SynchronicModPreparation::Ptr smod = modSynchronic[whichMod];
-                                        
-                                        for (int n = cSynchronicParameterTypes.size(); --n >= 0; )
-                                        {
-                                            String param = smod->getParam((SynchronicParameterType)n);
-                                            
-                                            if (param != "")
-                                            {
-                                                for (auto prep : whichPreps)
-                                                {
-                                                    thisPiano->modMap[key]->addSynchronicModification(new SynchronicModification(key, prep, (SynchronicParameterType)n, param, whichMod));
-                                                    
-                                                    DBG("[ADDINGMOD] whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cSynchronicParameterTypes[n] + " val: " +param);
-                                                    
-                                                }
-                                                
-                                                
-                                            }
-                                        }
-                                    }
-                                    else if (type == PreparationTypeNostalgic)
-                                    {
-                                        NostalgicModPreparation::Ptr nmod = modNostalgic[whichMod];
-                                        
-                                        for (int n = cNostalgicParameterTypes.size(); --n >= 0; )
-                                        {
-                                            String param = nmod->getParam((NostalgicParameterType)n);
-                                            
-                                            if (param != "")
-                                            {
-                                                for (auto prep : whichPreps)
-                                                {
-                                                    thisPiano->modMap[key]->addNostalgicModification(new NostalgicModification(key, prep, (NostalgicParameterType)n, param, whichMod));
-                                                    
-                                                    DBG("[ADDINGMOD] whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cNostalgicParameterTypes[n] + " val: " +param);
-                                                    
-                                                }
-                                                
-                                                
-                                            }
-                                        }
-                                    }
-                                    else if (type == PreparationTypeTuning)
-                                    {
-                                        TuningModPreparation::Ptr tmod = modTuning[whichMod];
-                                        
-                                        for (int n = cTuningParameterTypes.size(); --n >= 0; )
-                                        {
-                                            String param = tmod->getParam((TuningParameterType)n);
-                                            
-                                            if (param != "")
-                                            {
-                                                for (auto prep : whichPreps)
-                                                {
-                                                    thisPiano->modMap[key]->addTuningModification(new TuningModification(key, prep, (TuningParameterType)n, param, whichMod));
-                                                    
-                                                    DBG("[ADDINGMOD] whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cTuningParameterTypes[n] + " val: " +param);
-                                                    
-                                                }
-                                                
-                                                
-                                            }
-                                        }
-                                    }
-                                    else if (type == PreparationTypeTempo)
-                                    {
-                                        TempoModPreparation::Ptr mmod = modTempo[whichMod];
-                                        
-                                        for (int n = cTempoParameterTypes.size(); --n >= 0; )
-                                        {
-                                            String param = mmod->getParam((TempoParameterType)n);
-                                            
-                                            if (param != "")
-                                            {
-                                                for (auto prep : whichPreps)
-                                                {
-                                                    thisPiano->modMap[key]->addTempoModification(new TempoModification(key, prep, (TempoParameterType)n, param, whichMod));
-                                                    
-                                                    DBG("[ADDINGMOD] whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cTempoParameterTypes[n] + " val: " +param);
-                                                    
-                                                }
-                                                
-                                                
-                                            }
-                                        }
-                                    }
-                                    // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-                                    
-                                    ++subModCount;
-                                }
-                                
-                                
-                                
-                            }
-                            
-                            
-                            ++modCount;
-                        }
-                        else if (pc->hasTagName( vtagReset + String(resetCount))) // RESET LOADING
-                        {
-                            int k = pc->getStringAttribute(ptagModX_key).getIntValue();
-                            
-                            
-                            // Direct resets
-                            for (int n = 0; n < 128; n++)
-                            {
-                                String attr = pc->getStringAttribute("d" + String(n));
-                                
-                                if (attr == String::empty)  break;
-                                else                        thisPiano->modMap[k]->directReset.add(attr.getIntValue());
-                            }
-                            
-                            // Synchronic resets
-                            for (int n = 0; n < 128; n++)
-                            {
-                                String attr = pc->getStringAttribute("s" + String(n));
-                                
-                                if (attr == String::empty)  break;
-                                else                        thisPiano->modMap[k]->synchronicReset.add(attr.getIntValue());
-                            }
-                            
-                            // Nostalgic resets
-                            for (int n = 0; n < 128; n++)
-                            {
-                                String attr = pc->getStringAttribute("n" + String(n));
-                                
-                                if (attr == String::empty)  break;
-                                else                        thisPiano->modMap[k]->nostalgicReset.add(attr.getIntValue());
-                            }
-                            
-                            // Tuning resets
-                            for (int n = 0; n < 128; n++)
-                            {
-                                String attr = pc->getStringAttribute("t" + String(n));
-                                
-                                if (attr == String::empty)  break;
-                                else                        thisPiano->modMap[k]->tuningReset.add(attr.getIntValue());
-                            }
-                            
-                            // Tuning resets
-                            for (int n = 0; n < 128; n++)
-                            {
-                                String attr = pc->getStringAttribute("m" + String(n));
-                                
-                                if (attr == String::empty)  break;
-                                else                        thisPiano->modMap[k]->tempoReset.add(attr.getIntValue());
-                            }
-     
-                            ++resetCount;
-                        }
-                        
-                    }
+                    thisPiano->setState(e);
 
                 }
             }
@@ -2238,169 +1352,42 @@ void BKAudioProcessor::updateUI(void)
 ScopedPointer<XmlElement>  BKAudioProcessor::saveGallery(void)
 {
     ValueTree galleryVT( vtagGallery);
-
-    ValueTree generalVT( vtagGeneral);
     
-    generalVT.setProperty( ptagGeneral_globalGain,       general->getGlobalGain(), 0);
-    generalVT.setProperty( ptagGeneral_directGain,       general->getDirectGain(), 0);
-    generalVT.setProperty( ptagGeneral_synchronicGain,   general->getSynchronicGain(), 0);
-    generalVT.setProperty( ptagGeneral_nostalgicGain,    general->getNostalgicGain(), 0);
-    generalVT.setProperty( ptagGeneral_resonanceGain,    general->getDirectGain(), 0);
-    generalVT.setProperty( ptagGeneral_resonanceGain,    general->getResonanceGain(), 0);
-    generalVT.setProperty( ptagGeneral_hammerGain,       general->getHammerGain(), 0);
-    generalVT.setProperty( ptagGeneral_tempoMultiplier,  general->getTempoMultiplier(), 0);
-    generalVT.setProperty( ptagGeneral_resAndHammer,     general->getResonanceAndHammer(), 0);
-    generalVT.setProperty( ptagGeneral_invertSustain,    general->getInvertSustain(), 0);
-    generalVT.setProperty( ptagGeneral_tuningFund,       general->getTuningFundamental(), 0);
-    
-    galleryVT.addChild(generalVT, -1, 0);
+    galleryVT.addChild(general->getState(), -1, 0);
     
     // Preparations and keymaps must be first.
-    // Tuning must be first of the preparations.
-    for (int i = 0; i < tempo.size(); i++) galleryVT.addChild(tempo[i]->getState(), -1, 0);
+    // Tempo and Tuning must be first of the preparations.
+    for (int i = 0; i < tempo.size(); i++)                  galleryVT.addChild( tempo[i]->getState(), -1, 0);
     
-    for (int i = 0; i < tuning.size(); i++) galleryVT.addChild(tuning[i]->getState(), -1, 0);
+    for (int i = 0; i < tuning.size(); i++)                 galleryVT.addChild( tuning[i]->getState(), -1, 0);
     
-    for (int i = 0; i < direct.size(); i++) galleryVT.addChild(direct[i]->getState(), -1, 0);
+    for (int i = 0; i < direct.size(); i++)                 galleryVT.addChild( direct[i]->getState(), -1, 0);
     
-    for (int i = 0; i < synchronic.size(); i++) galleryVT.addChild(synchronic[i]->getState(), -1, 0);
+    for (int i = 0; i < synchronic.size(); i++)             galleryVT.addChild( synchronic[i]->getState(), -1, 0);
     
-    for (int i = 0; i < nostalgic.size(); i++) galleryVT.addChild(nostalgic[i]->getState(), -1, 0);
+    for (int i = 0; i < nostalgic.size(); i++)              galleryVT.addChild( nostalgic[i]->getState(), -1, 0);
 
-    for (int i = 0; i < modTempo.size(); i++) galleryVT.addChild(modTempo[i]->getState(i), -1, 0);
+    for (int i = 0; i < modTempo.size(); i++)               galleryVT.addChild( modTempo[i]->getState(i), -1, 0);
     
-    for (int i = 0; i < modTuning.size(); i++) galleryVT.addChild(modTuning[i]->getState(i), -1, 0);
+    for (int i = 0; i < modTuning.size(); i++)              galleryVT.addChild( modTuning[i]->getState(i), -1, 0);
     
-    for (int i = 0; i < modDirect.size(); i++) galleryVT.addChild(modDirect[i]->getState(i), -1, 0);
+    for (int i = 0; i < modDirect.size(); i++)              galleryVT.addChild( modDirect[i]->getState(i), -1, 0);
     
-    for (int i = 0; i < modSynchronic.size(); i++) galleryVT.addChild(modSynchronic[i]->getState(i), -1, 0);
+    for (int i = 0; i < modSynchronic.size(); i++)          galleryVT.addChild( modSynchronic[i]->getState(i), -1, 0);
     
-    for (int i = 0; i < modNostalgic.size(); i++) galleryVT.addChild(modNostalgic[i]->getState(i), -1, 0);
+    for (int i = 0; i < modNostalgic.size(); i++)           galleryVT.addChild( modNostalgic[i]->getState(i), -1, 0);
     
-    for (int i = 0; i < bkKeymaps.size(); i++) galleryVT.addChild(bkKeymaps[i]->getState(i), -1, 0);
+    for (int i = 0; i < bkKeymaps.size(); i++)              galleryVT.addChild( bkKeymaps[i]->getState(i), -1, 0);
     
     // Pianos
-    for (int piano = 0; piano < bkPianos.size(); piano++)
-    {
-        
-        ValueTree pianoVT( vtagPiano + String(bkPianos[piano]->getId()));
-        
-        pianoVT.setProperty("bkPianoName", bkPianos[piano]->getName(), 0);
-        
-        int pmapCount = 0;
-        for (auto pmap : bkPianos[piano]->getPreparationMaps())
-        {
-            ValueTree pmapVT( vtagPrepMap+String(pmapCount++));
-            pmapVT.setProperty( ptagPrepMap_keymapId, pmap->getKeymapId(), 0);
-            
-            int pcount = 0;
-            for (auto prep : pmap->getDirect())
-                pmapVT.setProperty(ptagPrepMap_directPrepId+String(pcount++), prep->getId(), 0);
-            
-            pcount = 0;
-            for (auto prep : pmap->getNostalgic())
-                pmapVT.setProperty(ptagPrepMap_nostalgicPrepId+String(pcount++), prep->getId(), 0);
-            
-            pcount = 0;
-            for (auto prep : pmap->getSynchronic())
-                pmapVT.setProperty(ptagPrepMap_synchronicPrepId+String(pcount++), prep->getId(), 0);
-            
-            pcount = 0;
-            for (auto prep : pmap->getTuning())
-                pmapVT.setProperty(ptagPrepMap_tuningPrepId +String(pcount++), prep->getId(), 0);
-            
-            pcount = 0;
-            for (auto prep : pmap->getTempo())
-                pmapVT.setProperty(ptagPrepMap_tempoPrepId +String(pcount++), prep->getId(), 0);
-            
-            
-            pianoVT.addChild(pmapVT, -1, 0);
-        }
-
-        pmapCount = 0;
-        
-        int dmodCount = 0, nmodCount = 0, smodCount = 0, tmodCount = 0, mmodCount = 0, resetCount = 0, modCount = 0;
-        
-        // Iterate through all keys and write data from PianoMap and ModMap to ValueTree
-        for (int key = 0; key < 128; key++)
-        {
-            if (bkPianos[piano]->pianoMap[key] != 0)
-            {
-                ValueTree pmapVT( vtagPianoMap + String(pmapCount++));
-                
-                pmapVT.setProperty( ptagPianoMap_key, key, 0);
-                pmapVT.setProperty( ptagPianoMap_piano, bkPianos[piano]->pianoMap[key], 0);
-                
-                pianoVT.addChild(pmapVT, -1, 0);
-            }
-            
-            ModPrepMap::PtrArr theMods = bkPianos[piano]->modificationMaps[key]->getModPrepMaps();
-            
-            if (theMods.size())
-            {
-                ValueTree modVT ("mod"+String(modCount++));
-                modVT.setProperty( ptagModX_key, key, 0);
-                
-                for (int thisOne = 0; thisOne < theMods.size(); thisOne++)
-                {
-                    ModPrepMap::Ptr thisMod = theMods[thisOne];
-                    
-                    ValueTree thisModVT("m"+String(thisOne));
-                    thisModVT.setProperty("type", (int)thisMod->getType(), 0);
-                    thisModVT.setProperty("id", thisMod->getId(), 0);
-                    
-                    int pcount = 0;
-                    for (auto prep : thisMod->getPreparations())
-                        thisModVT.setProperty("p"+String(pcount++), prep, 0);
-                    
-                    modVT.addChild(thisModVT, -1, 0);
-                }
-                
-                pianoVT.addChild(modVT, -1, 0);
-            }
-            
-            // RESET SAVING
-            if (bkPianos[piano]->modMap[key]->directReset.size() ||
-                bkPianos[piano]->modMap[key]->nostalgicReset.size() ||
-                bkPianos[piano]->modMap[key]->synchronicReset.size() ||
-                bkPianos[piano]->modMap[key]->tuningReset.size())
-            {
-                ValueTree resetVT( vtagReset + String(resetCount++));
-                resetVT.setProperty( ptagModX_key, key, 0);
-                
-                int rcount = 0;
-                for (auto reset : bkPianos[piano]->modMap[key]->directReset)
-                    resetVT.setProperty( "d" + String(rcount++), reset, 0);
-                
-                rcount = 0;
-                for (auto reset : bkPianos[piano]->modMap[key]->synchronicReset)
-                    resetVT.setProperty( "s" + String(rcount++), reset, 0);
-                
-                rcount = 0;
-                for (auto reset : bkPianos[piano]->modMap[key]->nostalgicReset)
-                    resetVT.setProperty( "n" + String(rcount++), reset, 0);
-                
-                rcount = 0;
-                for (auto reset : bkPianos[piano]->modMap[key]->tuningReset)
-                    resetVT.setProperty( "t" + String(rcount++), reset, 0);
-                
-                pianoVT.addChild(resetVT, -1, 0);
-            }
-            
-        }
-        
-        galleryVT.addChild(pianoVT, -1, 0);
-    }
+    for (int piano = 0; piano < bkPianos.size(); piano++)   galleryVT.addChild( bkPianos[piano]->getState(), -1, 0);
     
     String xml = galleryVT.toXmlString();
-    DBG(xml);
     
     FileChooser myChooser ("Save gallery to file...",
                            File::getSpecialLocation (File::userHomeDirectory),
                            "*.xml");
     
-    
-    //XmlElement* myXML = galleryVT.createXml();
     ScopedPointer<XmlElement> myXML = galleryVT.createXml();
     
     if (myChooser.browseForFileToSave(true))
@@ -2412,7 +1399,6 @@ ScopedPointer<XmlElement>  BKAudioProcessor::saveGallery(void)
     
     
     updateGalleries();
-    
     
     galleryDidLoad = true;
     

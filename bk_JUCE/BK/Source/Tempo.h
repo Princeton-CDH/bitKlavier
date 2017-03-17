@@ -284,6 +284,30 @@ public:
         
     }
     
+    inline void setState(XmlElement* e)
+    {
+        String p = e->getStringAttribute(ptagTempo_tempo);
+        setParam(TempoBPM, p);
+        
+        p = e->getStringAttribute(ptagTempo_system);
+        setParam(TempoSystem, p);
+        
+        p = e->getStringAttribute(ptagTempo_at1Mode);
+        setParam(AT1Mode, p);
+        
+        p = e->getStringAttribute(ptagTempo_at1History);
+        setParam(AT1History, p);
+        
+        p = e->getStringAttribute(ptagTempo_at1Subdivisions);
+        setParam(AT1Subdivisions, p);
+        
+        p = e->getStringAttribute(ptagTempo_at1Min);
+        setParam(AT1Min, p);
+        
+        p = e->getStringAttribute(ptagTempo_at1Max);
+        setParam(AT1Max, p);
+    }
+    
     
     inline const String getParam(TempoParameterType type)
     {
@@ -354,7 +378,34 @@ public:
         prep.setProperty( ptagTempo_at1Max,                sPrep->getAdaptiveTempo1Max(), 0 );
 
         return prep;
+    }
+    
+    inline void setState(XmlElement* e)
+    {
+        float f; int i;
         
+        f = e->getStringAttribute(ptagTempo_tempo).getFloatValue();
+        sPrep->setTempo(f);
+        
+        i = e->getStringAttribute(ptagTempo_system).getIntValue();
+        sPrep->setTempoSystem((TempoType)i);
+        
+        i = e->getStringAttribute(ptagTempo_at1Mode).getIntValue();
+        sPrep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode)i);
+        
+        i = e->getStringAttribute(ptagTempo_at1History).getIntValue();
+        sPrep->setAdaptiveTempo1History(i);
+        
+        f = e->getStringAttribute(ptagTempo_at1Subdivisions).getFloatValue();
+        sPrep->setAdaptiveTempo1Subdivisions(f);
+        
+        f = e->getStringAttribute(ptagTempo_at1Min).getFloatValue();
+        sPrep->setAdaptiveTempo1Min(f);
+        
+        f = e->getStringAttribute(ptagTempo_at1Max).getFloatValue();
+        sPrep->setAdaptiveTempo1Max(f);
+        
+        aPrep->copy(sPrep);
     }
     
     ~Tempo() {};

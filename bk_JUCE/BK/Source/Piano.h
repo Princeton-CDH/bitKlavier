@@ -38,7 +38,12 @@ public:
           Direct::PtrArr direct,
           Tuning::PtrArr tuning,
           Tempo::PtrArr tempo,
-          Keymap::Ptr keymap,
+          SynchronicModPreparation::PtrArr mSynchronic,
+          NostalgicModPreparation::PtrArr mNostalgic,
+          DirectModPreparation::PtrArr mDirect,
+          TuningModPreparation::PtrArr mTuning,
+          TempoModPreparation::PtrArr mTempo,
+          Keymap::PtrArr keymap,
           int Id);
     ~Piano();
     
@@ -62,11 +67,6 @@ public:
     PreparationMap::CSPtrArr    activePMaps;
     PreparationMap::CSPtrArr    prepMaps;
     
-    Synchronic::PtrArr  synchronic;
-    Nostalgic::PtrArr   nostalgic;
-    Direct::PtrArr      direct;
-    Tuning::PtrArr      tuning;
-    Tempo::PtrArr       tempo;
     
     Array<int>                  pianoMap;
     int                         numPMaps;
@@ -74,6 +74,11 @@ public:
     OwnedArray<Modifications> modMap;
     OwnedArray<ModificationMap> modificationMaps;
     
+    ValueTree getState(void);
+    
+    void setState(XmlElement* e);
+    
+
     String modificationMapsToString(void)
     {
         String out = "";
@@ -92,9 +97,10 @@ public:
                 
             }
         }
+        
         return out;
     }
-    
+
     void clearModMap(void)
     {
         for (int i = 0; i<modMap.size(); i++)
@@ -102,7 +108,7 @@ public:
             modMap[i]->clearModifications();
         }
     }
-    
+
     void clearResetMap(void)
     {
         for (int i = 0; i<modMap.size(); i++)
@@ -110,29 +116,41 @@ public:
             modMap[i]->clearResets();
         }
     }
-    
+
     int                         numModSMaps, numModNMaps, numModDMaps;
-    
+
     void                        prepareToPlay(double sampleRate);
-    
+
     int                         addPreparationMap(void);
     int                         removeLastPreparationMap(void);
-    
+
 private:
     int Id;
     String pianoName;
-    
+
     double sampleRate;
 
     // Pointers to synths (flown in from BKAudioProcessor)
-    BKSynthesiser*                  synth;
-    BKSynthesiser*                  resonanceSynth;
-    BKSynthesiser*                  hammerSynth;
-    Keymap::Ptr                     initialKeymap;
+    BKSynthesiser*                      synth;
+    BKSynthesiser*                      resonanceSynth;
+    BKSynthesiser*                      hammerSynth;
     
-    ValueTree vt;
+    Synchronic::PtrArr  synchronic;
+    Nostalgic::PtrArr   nostalgic;
+    Direct::PtrArr      direct;
+    Tuning::PtrArr      tuning;
+    Tempo::PtrArr       tempo;
+    
+    SynchronicModPreparation::PtrArr    modSynchronic;
+    NostalgicModPreparation::PtrArr     modNostalgic;
+    DirectModPreparation::PtrArr        modDirect;
+    TuningModPreparation::PtrArr        modTuning;
+    TempoModPreparation::PtrArr         modTempo;
+    
+    
+    Keymap::PtrArr                      bkKeymaps;
 
-    
+
     JUCE_LEAK_DETECTOR(Piano)
 };
 

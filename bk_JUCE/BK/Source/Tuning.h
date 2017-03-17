@@ -316,65 +316,9 @@ public:
             
     }
     
-    inline ValueTree getState(int Id)
-    {
-        ValueTree prep(vtagModTuning + String(Id));
-        
-        String p = getParam(TuningScale);
-        if (p != String::empty) prep.setProperty( ptagTuning_scale, p.getIntValue(), 0);
-        
-        p = getParam(TuningFundamental);
-        if (p != String::empty) prep.setProperty( ptagTuning_fundamental,           p.getIntValue(), 0);
-        
-        p = getParam(TuningOffset);
-        if (p != String::empty) prep.setProperty( ptagTuning_offset,                p.getFloatValue(), 0 );
-        
-        p = getParam(TuningA1IntervalScale);
-        if (p != String::empty) prep.setProperty( ptagTuning_adaptiveIntervalScale, p.getIntValue(), 0 );
-        
-        p = getParam(TuningA1Inversional);
-        if (p != String::empty) prep.setProperty( ptagTuning_adaptiveInversional,   (bool)p.getIntValue(), 0 );
-        
-        p = getParam(TuningA1AnchorScale);
-        if (p != String::empty) prep.setProperty( ptagTuning_adaptiveAnchorScale,   p.getIntValue(), 0 );
-        
-        p = getParam(TuningA1AnchorFundamental);
-        if (p != String::empty) prep.setProperty( ptagTuning_adaptiveAnchorFund,    p.getIntValue(), 0 );
-        
-        p = getParam(TuningA1ClusterThresh);
-        if (p != String::empty) prep.setProperty( ptagTuning_adaptiveClusterThresh, p.getIntValue(), 0 );
-        
-        p = getParam(TuningA1History);
-        if (p != String::empty) prep.setProperty( ptagTuning_adaptiveHistory,       p.getIntValue(), 0 );
-
-        ValueTree scale( vtagTuning_customScale);
-        int count = 0;
-        p = getParam(TuningCustomScale);
-        if (p != String::empty)
-        {
-            Array<float> scl = stringToFloatArray(p);
-            for (auto note : scl)
-                scale.setProperty( ptagFloat + String(count++), note, 0 );
-        }
-        prep.addChild(scale, -1, 0);
-        
-        ValueTree absolute( vTagTuning_absoluteOffsets);
-        count = 0;
-        p = getParam(TuningAbsoluteOffsets);
-        if (p != String::empty)
-        {
-            Array<float> offsets = stringOrderedPairsToFloatArray(p, 128);
-            for (auto note : offsets)
-            {
-                if(note != 0.) absolute.setProperty( ptagFloat + String(count), note * .01, 0 );
-                count++;
-            }
-        }
-        prep.addChild(absolute, -1, 0);
-
-        return prep;
-    }
+    ValueTree getState(int Id);
     
+    void setState(XmlElement*);
     
     inline const String getParam(TuningParameterType type)
     {
@@ -500,53 +444,9 @@ public:
         processor = new TuningProcessor(aPrep);
     };
     
-    /*
-     TuningId = 0,
-     TuningScale,
-     TuningFundamental,
-     TuningOffset,
-     TuningA1IntervalScale,
-     TuningA1Inversional,
-     TuningA1AnchorScale,
-     TuningA1AnchorFundamental,
-     TuningA1ClusterThresh,
-     TuningA1History,
-     TuningCustomScale,
-   */
-    inline ValueTree getState(void)
-    {
-        ValueTree prep(vtagTuning + String(Id));
-        
-        prep.setProperty( ptagTuning_Id,                    Id, 0);
-        prep.setProperty( ptagTuning_scale,                 sPrep->getTuning(), 0);
-        prep.setProperty( ptagTuning_fundamental,           sPrep->getFundamental(), 0);
-        prep.setProperty( ptagTuning_offset,                sPrep->getFundamentalOffset(), 0 );
-        prep.setProperty( ptagTuning_adaptiveIntervalScale, sPrep->getAdaptiveIntervalScale(), 0 );
-        prep.setProperty( ptagTuning_adaptiveInversional,   sPrep->getAdaptiveInversional(), 0 );
-        prep.setProperty( ptagTuning_adaptiveAnchorScale,   sPrep->getAdaptiveAnchorScale(), 0 );
-        prep.setProperty( ptagTuning_adaptiveAnchorFund,    sPrep->getAdaptiveAnchorFundamental(), 0 );
-        prep.setProperty( ptagTuning_adaptiveClusterThresh, (int)sPrep->getAdaptiveClusterThresh(), 0 );
-        prep.setProperty( ptagTuning_adaptiveHistory,       sPrep->getAdaptiveHistory(), 0 );
-        
-        ValueTree scale( vtagTuning_customScale);
-        int count = 0;
-        for (auto note : sPrep->getCustomScale())
-            scale.setProperty( ptagFloat + String(count++), note, 0 );
-        prep.addChild(scale, -1, 0);
-        
-        ValueTree absolute( vTagTuning_absoluteOffsets);
-        count = 0;
-        for (auto note : sPrep->getAbsoluteOffsets())
-        {
-            if(note != 0.) absolute.setProperty( ptagFloat + String(count), note, 0 );
-            count++;
-        }
-        prep.addChild(absolute, -1, 0);
-        
-        //prep.addChild(sPrep->getResetMap()->getState(Id), -1, 0);
-        
-        return prep;
-    }
+
+    ValueTree getState(void);
+    void setState(XmlElement*);
     
     ~Tuning() {};
     

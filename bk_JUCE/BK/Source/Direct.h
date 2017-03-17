@@ -83,6 +83,8 @@ public:
                 tuning == d->getTuning());
     }
     
+    
+    
     inline const String getName() const noexcept {return name;}
     inline void setName(String n){name = n;}
     
@@ -200,6 +202,45 @@ public:
         if (p != String::empty) prep.setProperty( ptagDirect_hammerGain,        p.getFloatValue(), 0);
     
         return prep;
+    }
+    
+    inline void setState(XmlElement* e)
+    {
+        float f;
+        
+        String p = e->getStringAttribute(ptagDirect_tuning);
+        setParam(DirectTuning, p);
+        
+        p = e->getStringAttribute(ptagDirect_gain);
+        setParam(DirectGain, p);
+        
+        p = e->getStringAttribute(ptagDirect_hammerGain);
+        setParam(DirectHammerGain, p);
+        
+        p = e->getStringAttribute(ptagDirect_resGain);
+        setParam(DirectResGain, p);
+        
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName(vtagDirect_transposition))
+            {
+                Array<float> transp;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        transp.add(f);
+                    }
+                }
+                
+                setParam(DirectTransposition, floatArrayToString(transp));
+                
+            }
+        }
     }
     
     ~DirectModPreparation(void)

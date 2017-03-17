@@ -364,26 +364,6 @@ public:
     {
         ValueTree prep( vtagModSynchronic + String(Id));
         
-        /*
-         "Synchronic Id",
-         "Tuning Id",
-         "Tempo",
-         "NumPulses",
-         "ClusterMin",
-         "ClusterMax",
-         "ClusterThresh",
-         "Mode",
-         "BeatsToSkip",
-         "BeatMults",
-         "LengthMults",
-         "AccentMults",
-         "TranspOffsets",
-         "AT1Mode",
-         "AT1History",
-         "AT1Subdivs",
-         "AT1Min",
-         "AT1Max"
-         */
         String p = "";
         
         p = getParam(SynchronicTuning);
@@ -468,6 +448,109 @@ public:
 
         
         return prep;
+        
+    }
+    
+    inline void setState(XmlElement* e)
+    {
+        float f;
+        
+        String p = e->getStringAttribute(ptagSynchronic_tuning);
+        setParam(SynchronicTuning, p);
+        
+        p = e->getStringAttribute(ptagSynchronic_tempo);
+        setParam(SynchronicTempo, p);
+        
+        p = e->getStringAttribute(ptagSynchronic_numBeats);
+        setParam(SynchronicNumPulses, p);
+        
+        p = e->getStringAttribute(ptagSynchronic_clusterMin);
+        setParam(SynchronicClusterMin, p);
+        
+        p = e->getStringAttribute(ptagSynchronic_clusterMax);
+        setParam(SynchronicClusterMax, p);
+        
+        p = e->getStringAttribute(ptagSynchronic_clusterThresh);
+        setParam(SynchronicClusterThresh, p);
+        
+        p = e->getStringAttribute(ptagSynchronic_mode);
+        setParam(SynchronicMode, p);
+        
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName(vtagSynchronic_beatMults))
+            {
+                Array<float> beats;
+                
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        beats.add(f);
+                    }
+                }
+                
+                setParam(SynchronicBeatMultipliers, floatArrayToString(beats));
+                
+            }
+            else  if (sub->hasTagName(vtagSynchronic_accentMults))
+            {
+                Array<float> accents;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        accents.add(f);
+                    }
+                }
+                
+                setParam(SynchronicAccentMultipliers, floatArrayToString(accents));
+                
+            }
+            else  if (sub->hasTagName(vtagSynchronic_lengthMults))
+            {
+                Array<float> lens;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        lens.add(f);
+                    }
+                }
+                
+                setParam(SynchronicLengthMultipliers, floatArrayToString(lens));
+                
+            }
+            else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
+            {
+                Array<float> transp;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        transp.add(f);
+                    }
+                }
+                
+                setParam(SynchronicTranspOffsets, floatArrayToString(transp));
+            }
+        }
         
     }
     

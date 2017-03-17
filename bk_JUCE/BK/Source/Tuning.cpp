@@ -139,4 +139,245 @@ void TuningProcessor::adaptiveReset()
     
 }
 
+ValueTree Tuning::getState(void)
+{
+    
+    ValueTree prep(vtagTuning + String(Id));
+    
+    prep.setProperty( ptagTuning_Id,                    Id, 0);
+    prep.setProperty( ptagTuning_scale,                 sPrep->getTuning(), 0);
+    prep.setProperty( ptagTuning_fundamental,           sPrep->getFundamental(), 0);
+    prep.setProperty( ptagTuning_offset,                sPrep->getFundamentalOffset(), 0 );
+    prep.setProperty( ptagTuning_adaptiveIntervalScale, sPrep->getAdaptiveIntervalScale(), 0 );
+    prep.setProperty( ptagTuning_adaptiveInversional,   sPrep->getAdaptiveInversional(), 0 );
+    prep.setProperty( ptagTuning_adaptiveAnchorScale,   sPrep->getAdaptiveAnchorScale(), 0 );
+    prep.setProperty( ptagTuning_adaptiveAnchorFund,    sPrep->getAdaptiveAnchorFundamental(), 0 );
+    prep.setProperty( ptagTuning_adaptiveClusterThresh, (int)sPrep->getAdaptiveClusterThresh(), 0 );
+    prep.setProperty( ptagTuning_adaptiveHistory,       sPrep->getAdaptiveHistory(), 0 );
+    
+    ValueTree scale( vtagTuning_customScale);
+    int count = 0;
+    for (auto note : sPrep->getCustomScale())
+        scale.setProperty( ptagFloat + String(count++), note, 0 );
+    prep.addChild(scale, -1, 0);
+    
+    ValueTree absolute( vTagTuning_absoluteOffsets);
+    count = 0;
+    for (auto note : sPrep->getAbsoluteOffsets())
+    {
+        if(note != 0.) absolute.setProperty( ptagFloat + String(count), note, 0 );
+        count++;
+    }
+    prep.addChild(absolute, -1, 0);
+    
+    //prep.addChild(sPrep->getResetMap()->getState(Id), -1, 0);
+    
+    return prep;
+    
+}
+
+ValueTree TuningModPreparation::getState(int Id)
+{
+    ValueTree prep(vtagModTuning + String(Id));
+    
+    String p = getParam(TuningScale);
+    if (p != String::empty) prep.setProperty( ptagTuning_scale, p.getIntValue(), 0);
+    
+    p = getParam(TuningFundamental);
+    if (p != String::empty) prep.setProperty( ptagTuning_fundamental,           p.getIntValue(), 0);
+    
+    p = getParam(TuningOffset);
+    if (p != String::empty) prep.setProperty( ptagTuning_offset,                p.getFloatValue(), 0 );
+    
+    p = getParam(TuningA1IntervalScale);
+    if (p != String::empty) prep.setProperty( ptagTuning_adaptiveIntervalScale, p.getIntValue(), 0 );
+    
+    p = getParam(TuningA1Inversional);
+    if (p != String::empty) prep.setProperty( ptagTuning_adaptiveInversional,   (bool)p.getIntValue(), 0 );
+    
+    p = getParam(TuningA1AnchorScale);
+    if (p != String::empty) prep.setProperty( ptagTuning_adaptiveAnchorScale,   p.getIntValue(), 0 );
+    
+    p = getParam(TuningA1AnchorFundamental);
+    if (p != String::empty) prep.setProperty( ptagTuning_adaptiveAnchorFund,    p.getIntValue(), 0 );
+    
+    p = getParam(TuningA1ClusterThresh);
+    if (p != String::empty) prep.setProperty( ptagTuning_adaptiveClusterThresh, p.getIntValue(), 0 );
+    
+    p = getParam(TuningA1History);
+    if (p != String::empty) prep.setProperty( ptagTuning_adaptiveHistory,       p.getIntValue(), 0 );
+    
+    ValueTree scale( vtagTuning_customScale);
+    int count = 0;
+    p = getParam(TuningCustomScale);
+    if (p != String::empty)
+    {
+        Array<float> scl = stringToFloatArray(p);
+        for (auto note : scl)
+            scale.setProperty( ptagFloat + String(count++), note, 0 );
+    }
+    prep.addChild(scale, -1, 0);
+    
+    ValueTree absolute( vTagTuning_absoluteOffsets);
+    count = 0;
+    p = getParam(TuningAbsoluteOffsets);
+    if (p != String::empty)
+    {
+        Array<float> offsets = stringOrderedPairsToFloatArray(p, 128);
+        for (auto note : offsets)
+        {
+            if(note != 0.) absolute.setProperty( ptagFloat + String(count), note * .01, 0 );
+            count++;
+        }
+    }
+    prep.addChild(absolute, -1, 0);
+    
+    return prep;
+}
+
+void TuningModPreparation::setState(XmlElement* e)
+{
+    String p = "";
+    
+    float f;
+    
+    p = e->getStringAttribute( ptagTuning_scale);
+    setParam(TuningScale, p);
+    
+    p = e->getStringAttribute( ptagTuning_fundamental);
+    setParam(TuningFundamental, p);
+    
+    p = e->getStringAttribute( ptagTuning_offset);
+    setParam(TuningOffset, p);
+    
+    p = e->getStringAttribute( ptagTuning_adaptiveIntervalScale);
+    setParam(TuningA1IntervalScale, p);
+    
+    p = e->getStringAttribute( ptagTuning_adaptiveAnchorScale);
+    setParam(TuningA1AnchorScale, p);
+    
+    p = e->getStringAttribute( ptagTuning_adaptiveHistory);
+    setParam(TuningA1History, p);
+    
+    p = e->getStringAttribute( ptagTuning_adaptiveInversional);
+    setParam(TuningA1Inversional, p);
+    
+    p = e->getStringAttribute( ptagTuning_adaptiveClusterThresh);
+    setParam(TuningA1ClusterThresh, p);
+    
+    p = e->getStringAttribute( ptagTuning_adaptiveAnchorFund);
+    setParam(TuningA1AnchorFundamental, p);
+    
+    
+    // custom scale
+    forEachXmlChildElement (*e, sub)
+    {
+        if (sub->hasTagName(vtagTuning_customScale))
+        {
+            Array<float> scale;
+            for (int k = 0; k < 128; k++)
+            {
+                String attr = sub->getStringAttribute(ptagFloat + String(k));
+                
+                if (attr == String::empty) break;
+                else
+                {
+                    f = attr.getFloatValue();
+                    scale.add(f);
+                }
+            }
+            
+            setParam(TuningCustomScale, floatArrayToString(scale));
+        }
+        else if (sub->hasTagName(vTagTuning_absoluteOffsets))
+        {
+            Array<float> absolute;
+            absolute.ensureStorageAllocated(128);
+            String abs = "";
+            
+            for (int k = 0; k < 128; k++)
+            {
+                String attr = sub->getStringAttribute(ptagFloat + String(k));
+                f = attr.getFloatValue() * 100.;
+                absolute.set(k, f);
+                if (f != 0.0) abs += (String(k) + ":" + String(f) + " ");
+                
+            }
+            
+            setParam(TuningAbsoluteOffsets, abs);
+        }
+    }
+}
+
+void Tuning::setState(XmlElement* e)
+{
+    int i; float f; bool b;
+    
+    i = e->getStringAttribute( ptagTuning_scale).getIntValue();
+    sPrep->setTuning((TuningSystem)i);
+    
+    i = e->getStringAttribute( ptagTuning_fundamental).getIntValue();
+    sPrep->setFundamental((PitchClass)i);
+    
+    f = e->getStringAttribute( ptagTuning_offset).getFloatValue();
+    sPrep->setFundamentalOffset(f);
+    
+    i = e->getStringAttribute( ptagTuning_adaptiveIntervalScale).getIntValue();
+    sPrep->setAdaptiveIntervalScale((TuningSystem)i);
+    
+    i = e->getStringAttribute( ptagTuning_adaptiveAnchorScale).getIntValue();
+    sPrep->setAdaptiveAnchorScale((TuningSystem)i);
+    
+    i = e->getStringAttribute( ptagTuning_adaptiveHistory).getIntValue();
+    sPrep->setAdaptiveHistory(i);
+    
+    b = (bool) e->getStringAttribute( ptagTuning_adaptiveInversional).getIntValue();
+    sPrep->setAdaptiveInversional(b);
+    
+    i = e->getStringAttribute( ptagTuning_adaptiveClusterThresh).getIntValue();
+    sPrep->setAdaptiveClusterThresh(i);
+    
+    i = e->getStringAttribute( ptagTuning_adaptiveAnchorFund).getIntValue();
+    sPrep->setAdaptiveAnchorFundamental((PitchClass)i);
+    
+    // custom scale
+    forEachXmlChildElement (*e, sub)
+    {
+        if (sub->hasTagName(vtagTuning_customScale))
+        {
+            Array<float> scale;
+            for (int k = 0; k < 128; k++)
+            {
+                String attr = sub->getStringAttribute(ptagFloat + String(k));
+                
+                if (attr == String::empty) break;
+                else
+                {
+                    f = attr.getFloatValue();
+                    scale.add(f);
+                }
+            }
+            
+            sPrep->setCustomScale(scale);
+        }
+        else if (sub->hasTagName(vTagTuning_absoluteOffsets))
+        {
+            Array<float> absolute;
+            absolute.ensureStorageAllocated(128);
+            for (int k = 0; k < 128; k++)
+            {
+                String attr = sub->getStringAttribute(ptagFloat + String(k));
+                f = attr.getFloatValue();
+                absolute.set(k, f);
+                
+            }
+            
+            sPrep->setAbsoluteOffsets(absolute);
+        }
+    }
+    
+    // copy static to active
+    aPrep->copy( sPrep);
+}
+
 

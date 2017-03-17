@@ -40,6 +40,59 @@ public:
     {
     }
     
+    inline void setState(XmlElement* e)
+    {
+        float f; bool b;
+        
+        f = e->getStringAttribute( ptagGeneral_globalGain ).getFloatValue();
+        setGlobalGain(f);
+        
+        f = e->getStringAttribute( ptagGeneral_hammerGain ).getFloatValue();
+        setHammerGain(f);
+        
+        f = e->getStringAttribute( ptagGeneral_resonanceGain ).getFloatValue();
+        setResonanceGain(f);
+        
+        f = e->getStringAttribute( ptagGeneral_directGain ).getFloatValue();
+        setDirectGain(f);
+        
+        f = e->getStringAttribute( ptagGeneral_nostalgicGain ).getFloatValue();
+        setNostalgicGain(f);
+        
+        f = e->getStringAttribute( ptagGeneral_tempoMultiplier ).getFloatValue();
+        setTempoMultiplier(f);
+        
+        f = e->getStringAttribute( ptagGeneral_tuningFund ).getFloatValue();
+        setTuningFundamental(f);
+        
+        b = (bool) e->getStringAttribute( ptagGeneral_resAndHammer ).getIntValue();
+        setResonanceAndHammer(b);
+        
+        b = (bool) e->getStringAttribute( ptagGeneral_invertSustain ).getIntValue();
+        setInvertSustain(b);
+    }
+    
+    inline ValueTree getState(void)
+    {
+        ValueTree generalVT( vtagGeneral);
+        
+        generalVT.setProperty( ptagGeneral_globalGain,       getGlobalGain(), 0);
+        generalVT.setProperty( ptagGeneral_directGain,       getDirectGain(), 0);
+        generalVT.setProperty( ptagGeneral_synchronicGain,   getSynchronicGain(), 0);
+        generalVT.setProperty( ptagGeneral_nostalgicGain,    getNostalgicGain(), 0);
+        generalVT.setProperty( ptagGeneral_resonanceGain,    getDirectGain(), 0);
+        generalVT.setProperty( ptagGeneral_resonanceGain,    getResonanceGain(), 0);
+        generalVT.setProperty( ptagGeneral_hammerGain,       getHammerGain(), 0);
+        generalVT.setProperty( ptagGeneral_tempoMultiplier,  getTempoMultiplier(), 0);
+        generalVT.setProperty( ptagGeneral_resAndHammer,     getResonanceAndHammer(), 0);
+        generalVT.setProperty( ptagGeneral_invertSustain,    getInvertSustain(), 0);
+        generalVT.setProperty( ptagGeneral_tuningFund,       getTuningFundamental(), 0);
+        
+        return generalVT;
+        
+    }
+    
+    
     
     const float getTuningFundamental(void)  const noexcept  { return tuningFundamental;     };
     const float getTuningRatio(void)        const noexcept  { return tuningRatio;           };

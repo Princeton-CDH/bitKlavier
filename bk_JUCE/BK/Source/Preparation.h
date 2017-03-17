@@ -78,6 +78,47 @@ public:
         return prep;
     }
     
+    inline void setState(XmlElement* e, Tuning::PtrArr tuning)
+    {
+        float f; int i;
+        
+        i = e->getStringAttribute(ptagDirect_tuning).getIntValue();
+        sPrep->setTuning(tuning[i]);
+        
+        f = e->getStringAttribute(ptagDirect_gain).getFloatValue();
+        sPrep->setGain(f);
+        
+        f = e->getStringAttribute(ptagDirect_hammerGain).getFloatValue();
+        sPrep->setHammerGain(f);
+        
+        f = e->getStringAttribute(ptagDirect_resGain).getFloatValue();
+        sPrep->setResonanceGain(f);
+        
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName(vtagDirect_transposition))
+            {
+                Array<float> transp;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        transp.add(f);
+                    }
+                }
+                
+                sPrep->setTransposition(transp);
+                
+            }
+        }
+        // copy static to active
+        aPrep->copy(sPrep);
+    }
+    
     ~Direct() {};
     
     inline int getId() {return Id;};
@@ -144,27 +185,6 @@ public:
     {
         ValueTree prep( vtagSynchronic + String(Id));
         
-        /*
-        "Synchronic Id",
-        "Tuning Id",
-        "Tempo",
-        "NumPulses",
-        "ClusterMin",
-        "ClusterMax",
-        "ClusterThresh",
-        "Mode",
-        "BeatsToSkip",
-        "BeatMults",
-        "LengthMults",
-        "AccentMults",
-        "TranspOffsets",
-        "AT1Mode",
-        "AT1History",
-        "AT1Subdivs",
-        "AT1Min",
-        "AT1Max"
-        */
-        
         prep.setProperty( ptagSynchronic_Id,                  Id, 0);
         prep.setProperty( ptagSynchronic_tuning,              sPrep->getTuning()->getId(), 0);
         prep.setProperty( ptagSynchronic_tempo,               sPrep->getTempoControl()->getId(), 0);
@@ -219,6 +239,127 @@ public:
         
     }
     
+    inline void setState(XmlElement* e, Tuning::PtrArr tuning, Tempo::PtrArr tempo)
+    {
+        int i; float f;
+        i = e->getStringAttribute(ptagSynchronic_tuning).getIntValue();
+        sPrep->setTuning(tuning[i]);
+        
+        if (e->getStringAttribute(ptagSynchronic_tempo) != String::empty)
+        {
+            i = e->getStringAttribute(ptagSynchronic_tempo).getIntValue();
+            sPrep->setTempoControl(tempo[i]);
+        }
+        else
+        {
+            sPrep->setTempoControl(tempo[0]);
+        }
+        
+        i = e->getStringAttribute(ptagSynchronic_numBeats).getIntValue();
+        sPrep->setNumBeats(i);
+        
+        i = e->getStringAttribute(ptagSynchronic_clusterMin).getIntValue();
+        sPrep->setClusterMin(i);
+        
+        i = e->getStringAttribute(ptagSynchronic_clusterMax).getIntValue();
+        sPrep->setClusterMax(i);
+        
+        i = e->getStringAttribute(ptagSynchronic_clusterThresh).getIntValue();
+        sPrep->setClusterThresh(i);
+        
+        i = e->getStringAttribute(ptagSynchronic_mode).getIntValue();
+        sPrep->setMode((SynchronicSyncMode) i);
+        
+        i = e->getStringAttribute(ptagSynchronic_beatsToSkip).getIntValue();
+        sPrep->setBeatsToSkip(i);
+        
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName(vtagSynchronic_beatMults))
+            {
+                Array<float> beats;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        beats.add(f);
+                    }
+                }
+                
+                sPrep->setBeatMultipliers(beats);
+                
+            }
+            else  if (sub->hasTagName(vtagSynchronic_accentMults))
+            {
+                Array<float> accents;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        accents.add(f);
+                    }
+                }
+                
+                sPrep->setAccentMultipliers(accents);
+                
+            }
+            else  if (sub->hasTagName(vtagSynchronic_lengthMults))
+            {
+                Array<float> lens;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        lens.add(f);
+                    }
+                }
+                
+                sPrep->setLengthMultipliers(lens);
+                
+            }
+            else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
+            {
+                Array<Array<float>> atransp;
+                int tcount = 0;
+                forEachXmlChildElement (*sub, asub)
+                {
+                    if (asub->hasTagName("t"+String(tcount++)))
+                    {
+                        Array<float> transp;
+                        for (int k = 0; k < 128; k++)
+                        {
+                            String attr = asub->getStringAttribute(ptagFloat + String(k));
+                            
+                            if (attr == String::empty) break;
+                            else
+                            {
+                                f = attr.getFloatValue();
+                                transp.add(f);
+                            }
+                        }
+                        atransp.set(tcount-1, transp);
+                    }
+                }
+                
+                sPrep->setTransposition(atransp);
+            }
+        }
+        
+        aPrep->copy(sPrep);
+    }
+    
     ~Synchronic() {};
     
     inline int getId() {return Id;};
@@ -271,7 +412,7 @@ public:
               Tuning::Ptr tuning,
               BKUpdateState::Ptr us,
               int Id):
-    Id(Id), 
+    Id(Id),
     updateState(us)
     {
         sPrep       = new NostalgicPreparation(tuning);
@@ -281,18 +422,6 @@ public:
     
     ~Nostalgic() {};
     
-    /*
-     NostalgicId = 0,
-     NostalgicTuning,
-     NostalgicWaveDistance,
-     NostalgicUndertow,
-     NostalgicTransposition,
-     NostalgicGain,
-     NostalgicLengthMultiplier,
-     NostalgicBeatsToSkip,
-     NostalgicMode,
-     NostalgicSyncTarget,
-        */
     inline int getId() {return Id;}
     
     inline ValueTree getState(void)
@@ -320,6 +449,64 @@ public:
 
         return prep;
     }
+    
+    inline void setState(XmlElement* e, Tuning::PtrArr tuning, Synchronic::PtrArr synchronic)
+    {
+        int i; float f;
+        
+        i = e->getStringAttribute(ptagNostalgic_tuning).getIntValue();
+        sPrep->setTuning(tuning[i]);
+        
+        i = e->getStringAttribute(ptagNostalgic_waveDistance).getIntValue();
+        sPrep->setWaveDistance(i);
+        
+        i = e->getStringAttribute(ptagNostalgic_undertow).getIntValue();
+        sPrep->setUndertow(i);
+        
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName(vtagNostalgic_transposition))
+            {
+                Array<float> transp;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        transp.add(f);
+                    }
+                }
+                
+                sPrep->setTransposition(transp);
+                
+            }
+        }
+        
+        
+        f = e->getStringAttribute(ptagNostalgic_lengthMultiplier).getFloatValue();
+        sPrep->setLengthMultiplier(f);
+        
+        f = e->getStringAttribute(ptagNostalgic_beatsToSkip).getFloatValue();
+        sPrep->setBeatsToSkip(f);
+        
+        f = e->getStringAttribute(ptagNostalgic_gain).getFloatValue();
+        sPrep->setGain(f);
+        
+        i = e->getStringAttribute(ptagNostalgic_mode).getIntValue();
+        sPrep->setMode((NostalgicSyncMode)i);
+        
+        i = e->getStringAttribute(ptagNostalgic_syncTarget).getIntValue();
+        sPrep->setSyncTarget(i);
+        
+        sPrep->setSyncTargetProcessor(synchronic[i]->processor);
+        aPrep->setSyncTargetProcessor(synchronic[i]->processor);
+        
+        aPrep->copy(sPrep);
+    }
+    
     
     NostalgicPreparation::Ptr      sPrep;
     NostalgicPreparation::Ptr      aPrep;

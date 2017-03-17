@@ -289,6 +289,57 @@ public:
         return prep;
     }
     
+    inline void setState(XmlElement* e)
+    {
+        float f;
+        
+        String p = e->getStringAttribute(ptagNostalgic_tuning);
+        setParam(NostalgicTuning, p);
+        
+        p = e->getStringAttribute(ptagNostalgic_waveDistance);
+        setParam(NostalgicWaveDistance, p);
+        
+        p = e->getStringAttribute(ptagNostalgic_undertow);
+        setParam(NostalgicUndertow, p);
+        
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName(vtagNostalgic_transposition))
+            {
+                Array<float> transp;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        transp.add(f);
+                    }
+                }
+                
+                setParam(NostalgicTransposition, floatArrayToString(transp));
+                
+            }
+        }
+        
+        p = e->getStringAttribute(ptagNostalgic_lengthMultiplier);
+        setParam(NostalgicLengthMultiplier, p);
+        
+        p = e->getStringAttribute(ptagNostalgic_beatsToSkip);
+        setParam(NostalgicBeatsToSkip, p);
+        
+        p = e->getStringAttribute(ptagNostalgic_gain);
+        setParam(NostalgicGain, p);
+        
+        p = e->getStringAttribute(ptagNostalgic_mode);
+        setParam(NostalgicMode, p);
+        
+        p = e->getStringAttribute(ptagNostalgic_syncTarget);
+        setParam(NostalgicSyncTarget, p);
+    }
+    
     
     ~NostalgicModPreparation(void)
     {
