@@ -189,7 +189,8 @@ ValueTree Piano::getState(void)
         if (modMap[key]->directReset.size() ||
             modMap[key]->nostalgicReset.size() ||
             modMap[key]->synchronicReset.size() ||
-            modMap[key]->tuningReset.size())
+            modMap[key]->tuningReset.size()||
+            modMap[key]->tempoReset.size())
         {
             ValueTree resetVT( vtagReset + String(resetCount++));
             resetVT.setProperty( ptagModX_key, key, 0);
@@ -209,6 +210,10 @@ ValueTree Piano::getState(void)
             rcount = 0;
             for (auto reset : modMap[key]->tuningReset)
                 resetVT.setProperty( "t" + String(rcount++), reset, 0);
+            
+            rcount = 0;
+            for (auto reset : modMap[key]->tempoReset)
+                resetVT.setProperty( "m" + String(rcount++), reset, 0);
             
             pianoVT.addChild(resetVT, -1, 0);
         }
@@ -499,7 +504,7 @@ void Piano::setState(XmlElement* e)
                 else                        modMap[k]->tuningReset.add(attr.getIntValue());
             }
             
-            // Tuning resets
+            // Tempo resets
             for (int n = 0; n < 128; n++)
             {
                 String attr = pc->getStringAttribute("m" + String(n));

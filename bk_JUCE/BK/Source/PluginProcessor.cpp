@@ -1458,6 +1458,7 @@ void BKAudioProcessor::performResets(int noteNumber)
     for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->synchronicReset)  synchronic[prep]->reset();
     for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->nostalgicReset)   nostalgic[prep]->reset();
     for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->tuningReset)      tuning[prep]->reset();
+    for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->tempoReset)      tempo[prep]->reset();
 }
 
 void BKAudioProcessor::performModifications(int noteNumber)

@@ -483,6 +483,15 @@ String BKAudioProcessorEditor::processResetMapString(const String& s)
     
     Array<int> keys;
     
+    for (int i = 0; i < 128; i++)
+    {
+        processor.currentPiano->modMap[i]->synchronicReset.clearQuick();
+        processor.currentPiano->modMap[i]->tuningReset.clearQuick();
+        processor.currentPiano->modMap[i]->tempoReset.clearQuick();
+        processor.currentPiano->modMap[i]->nostalgicReset.clearQuick();
+        processor.currentPiano->modMap[i]->directReset.clearQuick();
+    }
+    
     while (rest != "")
     {
         keys.clearQuick();
@@ -527,12 +536,14 @@ String BKAudioProcessorEditor::processResetMapString(const String& s)
         juce_wchar tuningUC = 'T';
         juce_wchar directLC = 'd';
         juce_wchar directUC = 'D';
+        juce_wchar tempoLC = 'm';
+        juce_wchar tempoUC = 'M';
         
         bool isSynchronic = false, inSynchronic = false;
         bool isNostalgic = false, inNostalgic = false;
         bool isDirect = false, inDirect = false;
         bool isTuning = false, inTuning = false;
-        
+        bool isTempo = false, inTempo = false;
         bool isNumber = false;
         
         
@@ -548,6 +559,7 @@ String BKAudioProcessorEditor::processResetMapString(const String& s)
             isNostalgic    = !CharacterFunctions::compare(c1, nostalgicLC)  ||  !CharacterFunctions::compare(c1, nostalgicUC);
             isDirect       = !CharacterFunctions::compare(c1, directLC)     ||  !CharacterFunctions::compare(c1, directUC);
             isTuning       = !CharacterFunctions::compare(c1, tuningLC)     ||  !CharacterFunctions::compare(c1, tuningUC);
+            isTempo        = !CharacterFunctions::compare(c1, tempoLC)     ||  !CharacterFunctions::compare(c1, tempoUC);
             isNumber       = CharacterFunctions::isDigit(c1);
             
             if (isNumber) num += c1;
@@ -557,6 +569,7 @@ String BKAudioProcessorEditor::processResetMapString(const String& s)
                 else if (isNostalgic)    inNostalgic     = true;
                 else if (isDirect)       inDirect        = true;
                 else if (isTuning)       inTuning        = true;
+                else if (isTempo)        inTempo        = true;
                 else if (inSynchronic)
                 {
                     int whichPrep = num.getIntValue();
@@ -605,6 +618,18 @@ String BKAudioProcessorEditor::processResetMapString(const String& s)
                     
                     num = "";
                     inTuning = false;
+                }
+                else if (inTempo)
+                {
+                    int whichPrep = num.getIntValue();
+                    for (auto k : keys)
+                    {
+                        out += String(k) + ":" + "t" + String(whichPrep) + " ";
+                        processor.currentPiano->modMap[k]->tempoReset.add(whichPrep);
+                    }
+                    
+                    num = "";
+                    inTempo = false;
                 }
                 
                 num = "";
