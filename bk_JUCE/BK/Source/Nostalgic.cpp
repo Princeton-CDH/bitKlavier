@@ -125,27 +125,23 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
                              3,
                              offRamp ); //ramp off
             }
+            
+            // turn note length timers off
+            activeNotes.removeFirstMatchingValue(midiNoteNumber);
+            noteOn.set(midiNoteNumber, false);
+            noteLengthTimers.set(midiNoteNumber, 0);
+            DBG("nostalgic removed active note " + std::to_string(midiNoteNumber));
+            
+            //time how long the reverse note has played, to trigger undertow note
+            activeReverseNotes.addIfNotAlreadyThere(midiNoteNumber);
+            reverseLengthTimers.set(midiNoteNumber, 0);
+            reverseTargetLength.set(midiNoteNumber, (duration - aRampUndertowCrossMS) * sampleRate/1000.); //to schedule undertow note
+            
+            //store values for when undertow note is played (in the event the preparation changes in the meantime)
+            tuningsAtKeyOn.set(midiNoteNumber, tuner->getOffset(midiNoteNumber));
+            velocitiesAtKeyOn.set(midiNoteNumber, velocities.getUnchecked(midiNoteNumber) * active->getGain());
+            preparationAtKeyOn.set(midiNoteNumber, active);
         }
-        
-        
-        // turn note length timers off
-        activeNotes.removeFirstMatchingValue(midiNoteNumber);
-        noteOn.set(midiNoteNumber, false);
-        noteLengthTimers.set(midiNoteNumber, 0);
-        DBG("nostalgic removed active note " + std::to_string(midiNoteNumber));
-        
-        //time how long the reverse note has played, to trigger undertow note
-        activeReverseNotes.addIfNotAlreadyThere(midiNoteNumber);
-        reverseLengthTimers.set(midiNoteNumber, 0);
-        reverseTargetLength.set(midiNoteNumber, (duration - aRampUndertowCrossMS) * sampleRate/1000.); //to schedule undertow note
-        
-        //store values for when undertow note is played (in the event the preparation changes in the meantime)
-        tuningsAtKeyOn.set(midiNoteNumber, tuner->getOffset(midiNoteNumber));
-        velocitiesAtKeyOn.set(midiNoteNumber, velocities.getUnchecked(midiNoteNumber) * active->getGain());
-        preparationAtKeyOn.set(midiNoteNumber, active);
-        
-        //it might be better to do this by copy, instead of by pointer, in the off chance that the preparation disappears because of a library switch or something...
-    
     }
 
 }
@@ -232,7 +228,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
             if(noteOnPrep->getUndertow() > 0)
             {
                 for (auto t : noteOnPrep->getTransposition())
-                    {
+                {
                     float offset = t + tuningsAtKeyOn.getUnchecked(tempnote);
                     int synthNoteNumber = tempnote +  (int)offset;
                     float synthOffset = offset - (int)offset;
