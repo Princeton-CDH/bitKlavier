@@ -533,11 +533,13 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
                 }
                 
                 // FIGURE OUT ADAPTIVE STUFF
+                /*
                 int atHistory = jsonGetValue(ax+"AT_history");
                 float atMin = jsonGetValue(ax+"AT_mintime");
                 float atMax = jsonGetValue(ax+"AT_maxtime");
                 int atMode = jsonGetValue(ax+"AT_mode");
                 float atSub = jsonGetValue(ax+"AT_subdivisions");
+                 */
                 
                 // AT
                 jsonGetKeys(sx+"ATkeys");
@@ -568,11 +570,14 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
                     
                     SynchronicPreparation::Ptr syncPrep = new SynchronicPreparation(tuning[tId], tempo[oId]);
                     
+                    /*
                     Array<float> lens;
                     var lm = jsonGetProperty(sx+"NoteLengthMultList");
-                    for (int c = 0; c < lm.size(); c++) lens.add(lm[c]);
+                    //for (int c = 0; c < lm.size(); c++) lens.add(lm[c]);
+                    for (int c = 0; c < lm.size(); c++) lens.add((float)lm[c] * 50. * 120./60000.);
                     
                     syncPrep->setLengthMultipliers(lens);
+                     */
                     
                     Array<float> accents;
                     var am =  jsonGetProperty(sx+"accentsList");
@@ -652,7 +657,7 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
                     else if (syncMode == 1) // first-note-sync
                     {
                         syncPrep->setMode(FirstNoteOnSync);
-                        syncPrep->setBeatsToSkip(1);
+                        syncPrep->setBeatsToSkip(-1);
                     }
                     else if (syncMode == 2) // note-off-sync
                     {
@@ -669,6 +674,13 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
                         syncPrep->setMode(FirstNoteOnSync);
                         syncPrep->setBeatsToSkip(0);
                     }
+                    
+                    Array<float> lens;
+                    var lm = jsonGetProperty(sx+"NoteLengthMultList");
+                    //for (int c = 0; c < lm.size(); c++) lens.add(lm[c]);
+                    for (int c = 0; c < lm.size(); c++) lens.add((float)lm[c] * 50. * tmp/60000.);
+                    
+                    syncPrep->setLengthMultipliers(lens);
                     
                     sId = addSynchronicIfNotAlreadyThere(syncPrep);
                     

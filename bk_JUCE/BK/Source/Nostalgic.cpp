@@ -71,7 +71,6 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
 {
     float duration = 0.0;
     
-    
     if (noteOn[midiNoteNumber])
     {
         
@@ -92,7 +91,9 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
                          active->getLengthMultiplier() ) *
                         (1000.0 / sampleRate);
               */
+        /*
         }
+        
         else //SynchronicSync
         {
             //get time in ms to target beat, summing over skipped beat lengths
@@ -100,6 +101,73 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
             SynchronicProcessor::Ptr syncTarget = active->getSyncTargetProcessor();
             duration = syncTarget->getTimeToBeatMS(active->getBeatsToSkip()) + offRamp + 3; // sum
         }
+         */
+        
+            for (auto t : active->getTransposition())
+            {
+                float offset = t + tuner->getOffset(midiNoteNumber);
+                int synthNoteNumber = midiNoteNumber + (int)offset;
+                float synthOffset = offset - (int)offset;
+                
+                //play nostalgic note
+                synth->keyOn(
+                             midiChannel,
+                             synthNoteNumber,
+                             synthOffset,
+                             velocities.getUnchecked(midiNoteNumber),
+                             active->getGain() * aGlobalGain,
+                             Reverse,
+                             FixedLengthFixedStart,
+                             NostalgicNote,
+                             Id,
+                             duration + active->getWavedistance(), //tweak to make sync sound better?
+                             duration,  // length
+                             3,
+                             offRamp ); //ramp off
+            }
+        }
+        
+        
+        // turn note length timers off
+        activeNotes.removeFirstMatchingValue(midiNoteNumber);
+        noteOn.set(midiNoteNumber, false);
+        noteLengthTimers.set(midiNoteNumber, 0);
+        DBG("nostalgic removed active note " + std::to_string(midiNoteNumber));
+        
+        //time how long the reverse note has played, to trigger undertow note
+        activeReverseNotes.addIfNotAlreadyThere(midiNoteNumber);
+        reverseLengthTimers.set(midiNoteNumber, 0);
+        reverseTargetLength.set(midiNoteNumber, (duration - aRampUndertowCrossMS) * sampleRate/1000.); //to schedule undertow note
+        
+        //store values for when undertow note is played (in the event the preparation changes in the meantime)
+        tuningsAtKeyOn.set(midiNoteNumber, tuner->getOffset(midiNoteNumber));
+        velocitiesAtKeyOn.set(midiNoteNumber, velocities.getUnchecked(midiNoteNumber) * active->getGain());
+        preparationAtKeyOn.set(midiNoteNumber, active);
+        
+        //it might be better to do this by copy, instead of by pointer, in the off chance that the preparation disappears because of a library switch or something...
+    
+    }
+
+}
+
+//start timer for length of a particular note; called when key is pressed
+void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, int midiChannel)
+{
+    
+    if (active->getMode() == SynchronicSync)
+    {
+        
+        tuner = active->getTuning()->processor;
+        float duration = 0.0;
+        
+        int offRamp;
+        if (active->getUndertow() > 0) offRamp = aRampUndertowCrossMS;
+        else offRamp = aRampNostalgicOffMS;
+        
+        //get time in ms to target beat, summing over skipped beat lengths
+        //duration = syncProcessor->getTimeToBeatMS(active->getBeatsToSkip()); // sum
+        SynchronicProcessor::Ptr syncTarget = active->getSyncTargetProcessor();
+        duration = syncTarget->getTimeToBeatMS(active->getBeatsToSkip()) + offRamp + 3; // sum
         
         for (auto t : active->getTransposition())
         {
@@ -124,14 +192,6 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
                          offRamp ); //ramp off
         }
         
-        
-        // turn note length timers off
-        activeNotes.removeFirstMatchingValue(midiNoteNumber);
-        noteOn.set(midiNoteNumber, false);
-        noteLengthTimers.set(midiNoteNumber, 0);
-        //DBG("nostalgic removed active note " + std::to_string(midiNoteNumber));
-        
-        
         //time how long the reverse note has played, to trigger undertow note
         activeReverseNotes.addIfNotAlreadyThere(midiNoteNumber);
         reverseLengthTimers.set(midiNoteNumber, 0);
@@ -141,18 +201,9 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
         tuningsAtKeyOn.set(midiNoteNumber, tuner->getOffset(midiNoteNumber));
         velocitiesAtKeyOn.set(midiNoteNumber, velocities.getUnchecked(midiNoteNumber) * active->getGain());
         preparationAtKeyOn.set(midiNoteNumber, active);
-        
-        //it might be better to do this by copy, instead of by pointer, in the off chance that the preparation disappears because of a library switch or something...
-    
     }
-
-}
-
-//start timer for length of a particular note; called when key is pressed
-void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity)
-{
-    tuner = active->getTuning()->processor;
-
+    
+    //else?
     activeNotes.addIfNotAlreadyThere(midiNoteNumber);
     noteOn.set(midiNoteNumber, true);
     noteLengthTimers.set(midiNoteNumber, 0);

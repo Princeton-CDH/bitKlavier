@@ -200,8 +200,15 @@ void SynchronicProcessor::keyReleased(int noteNumber, int channel)
     if (    (active->getMode() == LastNoteOffSync && keysDepressed.size() == 0)
          || (active->getMode() == AnyNoteOffSync))
     {
-        phasor = beatThresholdSamples; //start right away
+        
         resetPhase(active->getBeatsToSkip() - 1);
+        
+        //start right away
+        phasor =    beatThresholdSamples *
+                    active->getBeatMultipliers()[beatMultiplierCounter] *
+                    general->getPeriodMultiplier() *
+                    active->getTempoControl()->processor->getPeriodMultiplier();
+        
         
         inCluster = true;
         shouldPlay = true;
@@ -316,7 +323,7 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
     int myBeat = beatMultiplierCounter;
     
     //tolerance: if key release happens just before beat (<30ms) then add a beatToSkip
-    if (timeToReturn < .03 * sampleRate) beatsToSkip++;
+    if (timeToReturn < .1 * sampleRate) beatsToSkip++;
     
     while(beatsToSkip-- > 0)
     {
