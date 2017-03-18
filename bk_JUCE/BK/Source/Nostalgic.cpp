@@ -122,7 +122,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
                              Id,
                              duration + active->getWavedistance(), //tweak to make sync sound better?
                              duration,  // length
-                             3,
+                             30,
                              offRamp ); //ramp off
             }
             
