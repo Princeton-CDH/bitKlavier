@@ -338,7 +338,7 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
     uint64 timeToReturn = numSamplesBeat - phasor; //next beat
     int myBeat = beatMultiplierCounter;
     
-    //tolerance: if key release happens just before beat (<30ms) then add a beatToSkip
+    //tolerance: if key release happens just before beat (<100ms) then add a beatToSkip
     if (timeToReturn < .1 * sampleRate) beatsToSkip++;
     
     while(beatsToSkip-- > 0)

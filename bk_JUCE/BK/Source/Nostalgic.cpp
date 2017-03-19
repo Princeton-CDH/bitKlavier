@@ -78,13 +78,15 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
         if (active->getUndertow() > 0) offRamp = aRampUndertowCrossMS;
         else offRamp = aRampNostalgicOffMS;
         
+        //DBG("nostalgic OFFRAMP = " + String(offRamp));
+        
         if (active->getMode() == NoteLengthSync)
         {
             //get length of played notes, subtract wave distance to set nostalgic reverse note length
             
             duration =  (noteLengthTimers.getUnchecked(midiNoteNumber) *
                         active->getLengthMultiplier() +
-                        (offRamp + 3)) *          //offRamp + onRamp
+                        (offRamp + 30)) *          //offRamp + onRamp
                         (1000.0 / sampleRate);
              /*
             duration =  (noteLengthTimers.getUnchecked(midiNoteNumber) *
@@ -120,7 +122,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
                              FixedLengthFixedStart,
                              NostalgicNote,
                              Id,
-                             duration + active->getWavedistance(), //tweak to make sync sound better?
+                             duration + active->getWavedistance(),
                              duration,  // length
                              30,
                              offRamp ); //ramp off
@@ -135,7 +137,8 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
             //time how long the reverse note has played, to trigger undertow note
             activeReverseNotes.addIfNotAlreadyThere(midiNoteNumber);
             reverseLengthTimers.set(midiNoteNumber, 0);
-            reverseTargetLength.set(midiNoteNumber, (duration - aRampUndertowCrossMS) * sampleRate/1000.); //to schedule undertow note
+            reverseTargetLength.set(midiNoteNumber, (duration - (aRampUndertowCrossMS + 30)) * sampleRate/1000.); //to schedule undertow note
+            //reverseTargetLength.set(midiNoteNumber, duration * sampleRate/1000.); //to schedule undertow note
             
             //store values for when undertow note is played (in the event the preparation changes in the meantime)
             tuningsAtKeyOn.set(midiNoteNumber, tuner->getOffset(midiNoteNumber));
@@ -163,7 +166,7 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
         //get time in ms to target beat, summing over skipped beat lengths
         //duration = syncProcessor->getTimeToBeatMS(active->getBeatsToSkip()); // sum
         SynchronicProcessor::Ptr syncTarget = active->getSyncTargetProcessor();
-        duration = syncTarget->getTimeToBeatMS(active->getBeatsToSkip()) + offRamp + 3; // sum
+        duration = syncTarget->getTimeToBeatMS(active->getBeatsToSkip()) + offRamp + 30; // sum
         
         for (auto t : active->getTransposition())
         {
@@ -184,7 +187,7 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
                          Id,
                          duration + active->getWavedistance(), //tweak to make sync sound better?
                          duration,  // length
-                         3,
+                         30,
                          offRamp ); //ramp off
         }
         
@@ -192,6 +195,7 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
         activeReverseNotes.addIfNotAlreadyThere(midiNoteNumber);
         reverseLengthTimers.set(midiNoteNumber, 0);
         reverseTargetLength.set(midiNoteNumber, (duration - aRampUndertowCrossMS) * sampleRate/1000.); //to schedule undertow note
+        //reverseTargetLength.set(midiNoteNumber, duration * sampleRate/1000.); //to schedule undertow note
         
         //store values for when undertow note is played (in the event the preparation changes in the meantime)
         tuningsAtKeyOn.set(midiNoteNumber, tuner->getOffset(midiNoteNumber));
@@ -223,6 +227,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
         NostalgicPreparation::Ptr noteOnPrep = preparationAtKeyOn.getUnchecked(tempnote);
         
         if (reverseLengthTimers.getUnchecked(tempnote) > reverseTargetLength.getUnchecked(tempnote))
+        //if (reverseLengthTimers.getUnchecked(tempnote) > (reverseTargetLength.getUnchecked(tempnote) - aRampUndertowCrossMS * sampleRate/1000))
         {
  
             if(noteOnPrep->getUndertow() > 0)
