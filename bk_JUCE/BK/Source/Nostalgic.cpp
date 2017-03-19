@@ -174,12 +174,20 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
             int synthNoteNumber = midiNoteNumber + (int)offset;
             float synthOffset = offset - (int)offset;
             
+            /*
+            DBG("playing nostalgic note in sync mode "
+                + String(synthNoteNumber) + " "
+                + String(duration) + " "
+                + String(midiNoteVelocity)
+                );
+             */
+            
             //play nostalgic note
             synth->keyOn(
                          midiChannel,
                          synthNoteNumber,
                          synthOffset,
-                         velocities.getUnchecked(midiNoteNumber),
+                         midiNoteVelocity,
                          active->getGain() * aGlobalGain,
                          Reverse,
                          FixedLengthFixedStart,
@@ -215,7 +223,7 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
 void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
 {
     
-    incrementTimers(numSamples);
+    incrementTimers(numSamples); //at end or beginning?
     //tuner->incrementAdaptiveClusterTime(numSamples);
     
     //check timers to see if any are at an undertow turnaround point, then call keyOn(forward) and keyOff, with 50ms ramps
@@ -259,6 +267,8 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
             activeReverseNotes.removeFirstMatchingValue(tempnote);
         }
     }
+    
+    //incrementTimers(numSamples);
 }
 
 //increment timers for all active notes, and all currently reversing notes
