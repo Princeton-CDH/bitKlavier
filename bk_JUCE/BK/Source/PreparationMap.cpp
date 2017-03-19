@@ -82,6 +82,12 @@ void PreparationMap::setTuning(Tuning::PtrArr d)
     deactivateIfNecessary();
 }
 
+void PreparationMap::addTuning(Tuning::Ptr d)
+{
+    tuning.add(d);
+    deactivateIfNecessary();
+}
+
 Synchronic::PtrArr PreparationMap::getSynchronic(void)
 {
     return synchronic;

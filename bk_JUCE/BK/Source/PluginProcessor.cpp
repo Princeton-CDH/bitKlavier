@@ -516,6 +516,8 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
             
             thisPiano->prepMaps[0]->setKeymap(bkKeymaps[1]);
             thisPiano->prepMaps[0]->addDirect(direct[dId]);
+
+            if (scale == AdaptiveTuning || scale == AdaptiveAnchoredTuning) thisPiano->prepMaps[0]->addTuning(tuning[tId]);
             
             // Direct, Synchronic, Nostalgic preparations
             String dx = jsonDirectX;
@@ -964,11 +966,7 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
                     
                 }
             }
-   
         }
-        
-        
-
     }
     
     for (int k = tempo.size(); --k >= 0;)       tempo[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
