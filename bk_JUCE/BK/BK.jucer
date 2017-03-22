@@ -55,8 +55,8 @@
           <FILE id="VHt2m9" name="Gallery.cpp" compile="1" resource="0" file="Source/Gallery.cpp"/>
           <FILE id="Vv2y63" name="GalleryUtilities.cpp" compile="1" resource="0"
                 file="Source/GalleryUtilities.cpp"/>
-          <FILE id="nh14tG" name="XMLGallery.cpp" compile="1" resource="0" file="Source/XMLGallery.cpp"/>
-          <FILE id="fIg23Y" name="JSONGallery.cpp" compile="1" resource="0" file="Source/JSONGallery.cpp"/>
+          <FILE id="nh14tG" name="GalleryXML.cpp" compile="1" resource="0" file="Source/GalleryXML.cpp"/>
+          <FILE id="fIg23Y" name="GalleryJSON.cpp" compile="1" resource="0" file="Source/GalleryJSON.cpp"/>
         </GROUP>
         <GROUP id="{1CB08EFA-DEC3-73DF-DE6C-B6E7D430054C}" name="Piano">
           <FILE id="eStbij" name="Piano.h" compile="0" resource="0" file="Source/Piano.h"/>

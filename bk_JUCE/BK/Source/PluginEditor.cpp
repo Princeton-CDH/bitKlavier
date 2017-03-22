@@ -495,17 +495,6 @@ void BKAudioProcessorEditor::bkComboBoxDidChange            (ComboBox* box)
 
 void BKAudioProcessorEditor::switchPianos(void)
 {
-    /*
-    // Remove all pmaps from old piano.
-    for (int i = processor.prevPiano->numPMaps; --i >= 0; )
-    {
-        pmvc[i]->setVisible(false);
-        
-        removeChildComponent(pmvc[i]);
-        
-        pmvc.remove(i);
-    }
-    */
     pmvc.clearQuick();
     
     for (int i = 0; i < processor.currentPiano->numPMaps; i++ )
