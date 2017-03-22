@@ -200,8 +200,15 @@ void SynchronicProcessor::keyReleased(int noteNumber, int channel)
     if (    (active->getMode() == LastNoteOffSync && keysDepressed.size() == 0)
          || (active->getMode() == AnyNoteOffSync))
     {
-        phasor = beatThresholdSamples; //start right away
+        
         resetPhase(active->getBeatsToSkip() - 1);
+        
+        //start right away
+        phasor =    beatThresholdSamples *
+                    active->getBeatMultipliers()[beatMultiplierCounter] *
+                    general->getPeriodMultiplier() *
+                    active->getTempoControl()->processor->getPeriodMultiplier();
+        
         
         inCluster = true;
         shouldPlay = true;
@@ -276,8 +283,24 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 );
             */
             
-            //play all the notes in the cluster, with current parameter vals
-            if (cluster.size() >= active->getClusterMin() && cluster.size() <= active->getClusterMax())
+            //figure out whether to play the cluster
+            bool playCluster = false;
+            
+            //in the normal case, where cluster is within a range defined by clusterMin and Max
+            if(active->getClusterMin() <= active->getClusterMax())
+            {
+                if (cluster.size() >= active->getClusterMin() && cluster.size() <= active->getClusterMax())
+                    playCluster = true;
+            }
+            //the inverse case, where we only play cluster that are *outside* the range set by clusterMin and Max
+            else
+            {
+                if (cluster.size() >= active->getClusterMin() || cluster.size() <= active->getClusterMax())
+                    playCluster = true;
+            }
+     
+            //if (cluster.size() >= active->getClusterMin() && cluster.size() <= active->getClusterMax())
+            if(playCluster)
             {
                 for (int n = slimCluster.size(); --n >= 0;)
                 {
@@ -315,8 +338,8 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
     uint64 timeToReturn = numSamplesBeat - phasor; //next beat
     int myBeat = beatMultiplierCounter;
     
-    //tolerance: if key release happens just before beat (<30ms) then add a beatToSkip
-    if (timeToReturn < .03 * sampleRate) beatsToSkip++;
+    //tolerance: if key release happens just before beat (<100ms) then add a beatToSkip
+    if (timeToReturn < .1 * sampleRate) beatsToSkip++;
     
     while(beatsToSkip-- > 0)
     {

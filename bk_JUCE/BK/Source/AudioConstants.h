@@ -663,11 +663,11 @@ typedef enum TuningSystem {
     PartialTuning = 0,
     JustTuning,
     EqualTemperament,
+    AdaptiveTuning,
+    AdaptiveAnchoredTuning,
     DuodeneTuning,
     OtonalTuning,
     UtonalTuning,
-    AdaptiveTuning,
-    AdaptiveAnchoredTuning,
     CustomTuning,
     TuningSystemNil
 

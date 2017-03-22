@@ -516,6 +516,7 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
             
             thisPiano->prepMaps[0]->setKeymap(bkKeymaps[1]);
             thisPiano->prepMaps[0]->addDirect(direct[dId]);
+            if (scale == AdaptiveTuning || scale == AdaptiveAnchoredTuning) thisPiano->prepMaps[0]->addTuning(tuning[tId]);
             
             // Direct, Synchronic, Nostalgic preparations
             String dx = jsonDirectX;
@@ -533,11 +534,13 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
                 }
                 
                 // FIGURE OUT ADAPTIVE STUFF
+                /*
                 int atHistory = jsonGetValue(ax+"AT_history");
                 float atMin = jsonGetValue(ax+"AT_mintime");
                 float atMax = jsonGetValue(ax+"AT_maxtime");
                 int atMode = jsonGetValue(ax+"AT_mode");
                 float atSub = jsonGetValue(ax+"AT_subdivisions");
+                 */
                 
                 // AT
                 jsonGetKeys(sx+"ATkeys");
@@ -566,13 +569,17 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
                     tempoPrep->setTempo(120);
                     oId = addTempoIfNotAlreadyThere(tempoPrep);
                     
+                    
                     SynchronicPreparation::Ptr syncPrep = new SynchronicPreparation(tuning[tId], tempo[oId]);
                     
+                    /*
                     Array<float> lens;
                     var lm = jsonGetProperty(sx+"NoteLengthMultList");
-                    for (int c = 0; c < lm.size(); c++) lens.add(lm[c]);
+                    //for (int c = 0; c < lm.size(); c++) lens.add(lm[c]);
+                    for (int c = 0; c < lm.size(); c++) lens.add((float)lm[c] * 50. * 120./60000.);
                     
                     syncPrep->setLengthMultipliers(lens);
+                     */
                     
                     Array<float> accents;
                     var am =  jsonGetProperty(sx+"accentsList");
@@ -636,6 +643,8 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
                         tempo[tmpId]->sPrep->setTempo(tmp);
                         tempo[tmpId]->aPrep->setTempo(tmp);
                     }
+                    //need to set System first?
+                    //if(tempo[tmpId]->sPrep->getTempoSystem() == AdaptiveTempo1) thisPiano->prepMaps[0]->addTempo(tempo[tmpId]);
                     
                     DBG("tmpId: "+String(tmpId));
                     syncPrep->setTempoControl(tempo[tmpId]);
@@ -652,7 +661,7 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
                     else if (syncMode == 1) // first-note-sync
                     {
                         syncPrep->setMode(FirstNoteOnSync);
-                        syncPrep->setBeatsToSkip(1);
+                        syncPrep->setBeatsToSkip(-1);
                     }
                     else if (syncMode == 2) // note-off-sync
                     {
@@ -669,6 +678,13 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
                         syncPrep->setMode(FirstNoteOnSync);
                         syncPrep->setBeatsToSkip(0);
                     }
+                    
+                    Array<float> lens;
+                    var lm = jsonGetProperty(sx+"NoteLengthMultList");
+                    //for (int c = 0; c < lm.size(); c++) lens.add(lm[c]);
+                    for (int c = 0; c < lm.size(); c++) lens.add((float)lm[c] * 50. * tmp/60000.);
+                    
+                    syncPrep->setLengthMultipliers(lens);
                     
                     sId = addSynchronicIfNotAlreadyThere(syncPrep);
                     
@@ -923,8 +939,9 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
                     
                     TuningModPreparation::Ptr myMod = new TuningModPreparation();
                     
+                    //DBG("JSON import: setting tuning mod fund and scale " + note + " " + String(fund) + " " + tun + " " + String(tscale));
                     myMod->setParam(TuningFundamental, String(fund));
-                    myMod->setParam(TuningScale, String(tscale));
+                    //myMod->setParam(TuningScale, String(tscale));
                     
                     bool dontAdd = false; int whichTMod = 0;
                     for (int c = modTuning.size(); --c>=0;)
@@ -948,15 +965,35 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
                     
                     ++modTuningCount;
                     
+                    // duh; probably shouldn't do such a coarse repeat, but OTOH this is really just a backwards compatability hack...
+                    TuningModPreparation::Ptr myMod2 = new TuningModPreparation();
+                    myMod2->setParam(TuningScale, String(tscale));
                     
+                    dontAdd = false; whichTMod = 0;
+                    for (int c = modTuning.size(); --c>=0;)
+                    {
+                        if (myMod2->compare(modTuning[c]))
+                        {
+                            whichTMod = c;
+                            dontAdd = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!dontAdd)
+                    {
+                        addTuningMod(myMod2);
+                        whichTMod = modTuning.size()-1;
+                    }
+                    
+                    whichPrep = direct[dId]->aPrep->getTuning()->getId();
+                    thisPiano->modMap[noteNumber]->addTuningModification(new TuningModification(noteNumber, whichPrep, TuningScale, String(tscale), whichTMod));
+                    
+                    ++modTuningCount;
                     
                 }
             }
-   
         }
-        
-        
-
     }
     
     for (int k = tempo.size(); --k >= 0;)       tempo[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
@@ -964,7 +1001,8 @@ void BKAudioProcessor::loadJsonGalleryFromVar(var myJson)
     for (int k = synchronic.size(); --k >= 0;)  synchronic[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
     for (int k = nostalgic.size(); --k >= 0;)   nostalgic[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
     for (int k = direct.size(); --k >= 0;)      direct[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
-    
+ 
+    prevPiano = bkPianos[0];
     currentPiano = bkPianos[0];
     
     updateUI();

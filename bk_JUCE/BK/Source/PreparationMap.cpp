@@ -82,6 +82,12 @@ void PreparationMap::setTuning(Tuning::PtrArr d)
     deactivateIfNecessary();
 }
 
+void PreparationMap::addTuning(Tuning::Ptr d)
+{
+    tuning.add(d);
+    deactivateIfNecessary();
+}
+
 Synchronic::PtrArr PreparationMap::getSynchronic(void)
 {
     return synchronic;
@@ -181,7 +187,7 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel)
     for (int i = nostalgic.size(); --i >= 0; )
     {
         if (pKeymap->containsNote(noteNumber))
-            nostalgic[i]->processor->keyPressed(noteNumber, velocity);
+            nostalgic[i]->processor->keyPressed(noteNumber, velocity, channel);
     }
     
     for (int i = direct.size(); --i >= 0; )
