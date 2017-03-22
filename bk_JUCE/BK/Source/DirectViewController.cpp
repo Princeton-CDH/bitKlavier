@@ -18,8 +18,7 @@ processor(p),
 currentDirectId(0),
 currentModDirectId(0)
 {
-    //DirectPreparation::Ptr layer = processor.currentPiano->dPreparation[currentDirectId];
-    DirectPreparation::Ptr layer = processor.direct[currentDirectId]->sPrep;
+    DirectPreparation::Ptr layer = processor.gallery->getStaticDirectPreparation(currentDirectId);
     
     // Labels
     directL = OwnedArray<BKLabel>();
@@ -114,19 +113,19 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
     
-    DirectPreparation::Ptr prep = processor.direct[currentDirectId]->sPrep;
-    DirectPreparation::Ptr active = processor.direct[currentDirectId]->aPrep;
-    DirectModPreparation::Ptr mod = processor.modDirect[currentModDirectId];
+    DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(currentDirectId);
+    DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(currentDirectId);
+    DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(currentModDirectId);
     
     if (name == cDirectParameterTypes[DirectId])
     {
         if (type == BKParameter)
         {
-            int numDirect = processor.direct.size();
+            int numDirect = processor.gallery->getNumDirect();
             
             if ((i+1) > numDirect)
             {
-                processor.addDirect();
+                processor.gallery->addDirect();
                 currentDirectId = numDirect;
             }
             else if (i >= 0)
@@ -140,11 +139,11 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            int numDMod = processor.modDirect.size();
+            int numDMod = processor.gallery->getNumDirectMod();
             
             if ((i+1) > numDMod)
             {
-                processor.addDirectMod();
+                processor.gallery->addDirectMod();
                 currentModDirectId = numDMod;
             }
             else if (i >= 0)
@@ -210,10 +209,10 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         if (type == BKParameter)
         {
-            if (i < processor.tuning.size())
+            if (i < processor.gallery->getNumTuning())
             {
-                prep    ->setTuning(processor.tuning[i]);
-                active  ->setTuning(processor.tuning[i]);
+                prep    ->setTuning(processor.gallery->getTuning(i));
+                active  ->setTuning(processor.gallery->getTuning(i));
             }
             else
                 tf.setText("0", false);
@@ -222,7 +221,7 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else    //BKModification
         {
-            if (i < processor.tuning.size())
+            if (i < processor.gallery->getNumTuning())
                 mod     ->setParam(DirectTuning, text);
             else
                 tf.setText("0", false);
@@ -238,7 +237,7 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
 void DirectViewController::updateFields(void)
 {
     
-    DirectPreparation::Ptr prep = processor.direct[currentDirectId]->aPrep;
+    DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(currentDirectId);
     
     directTF[DirectTransposition]       ->setText( floatArrayToString( prep->getTransposition()), false);
     directTF[DirectGain]                ->setText( String( prep->getGain()), false);
@@ -250,7 +249,7 @@ void DirectViewController::updateFields(void)
 
 void DirectViewController::updateModFields(void)
 {
-    DirectModPreparation::Ptr prep = processor.modDirect[currentModDirectId];
+    DirectModPreparation::Ptr prep = processor.gallery->getDirectModPreparation(currentModDirectId);
     
     modDirectTF[DirectTransposition]       ->setText( prep->getParam(DirectTransposition), false);
     modDirectTF[DirectGain]                ->setText( prep->getParam(DirectGain), false);

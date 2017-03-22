@@ -98,12 +98,12 @@ void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
     
     if (name == cKeymapParameterTypes[KeymapId])
     {
-        int numKeymaps = processor.bkKeymaps.size();
+        int numKeymaps = processor.gallery->getNumKeymaps();
 
         if ((i+1) > numKeymaps)
         {
             // :D
-            processor.addKeymap();
+            processor.gallery->addKeymap();
             currentKeymapId = numKeymaps; // last index
         }
         else if (i >= 0)
@@ -120,7 +120,7 @@ void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
         
         keymapTF[KeymapField]->setText(intArrayToString(keys));
         
-        processor.bkKeymaps[currentKeymapId]->setKeymap(keys);
+        processor.gallery->setKeymap(currentKeymapId, keys);
     }
     else
     {
@@ -131,7 +131,7 @@ void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
 
 void KeymapViewController::updateFields(int keymapId)
 {
-    Keymap::Ptr km = processor.bkKeymaps[keymapId];
+    Keymap::Ptr km = processor.gallery->getKeymap(keymapId);
     
     keymapTF[KeymapId]        ->setText( String( keymapId));
     keymapTF[KeymapField]     ->setText( intArrayToString(km->keys()));

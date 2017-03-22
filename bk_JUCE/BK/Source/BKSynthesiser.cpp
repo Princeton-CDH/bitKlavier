@@ -86,6 +86,23 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
         
     }
     
+    BKSynthesiser::BKSynthesiser(void):
+    sampleRate (0),
+    lastNoteOnCounter (0),
+    minimumSubBlockSize (32),
+    subBlockSubdivisionIsStrict (false),
+    shouldStealNotes (true)
+    {
+        for (int i = 0; i < numElementsInArray (lastPitchWheelValues); ++i)
+            lastPitchWheelValues[i] = 0x2000;
+        
+    }
+    
+    void BKSynthesiser::setGeneralSettings(GeneralSettings::Ptr gen)
+    {
+        generalSettings = gen;
+    }
+    
     BKSynthesiser::~BKSynthesiser()
     {
     }

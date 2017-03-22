@@ -363,6 +363,11 @@ public:
         processor = new TempoProcessor(aPrep);
     }
     
+    void prepareToPlay(double sampleRate)
+    {
+        processor->setCurrentPlaybackSampleRate(sampleRate);
+    }
+    
 
     inline ValueTree getState(void)
     {

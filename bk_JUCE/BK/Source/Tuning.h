@@ -450,6 +450,11 @@ public:
     
     ~Tuning() {};
     
+    void prepareToPlay(double sampleRate)
+    {
+        processor->setCurrentPlaybackSampleRate(sampleRate);
+    }
+    
     inline int getId() {return Id;};
     
     

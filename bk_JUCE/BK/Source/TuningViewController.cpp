@@ -111,21 +111,21 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
     
-    TuningPreparation::Ptr prep = processor.tuning[currentTuningId]->sPrep;
+    TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(currentTuningId);
     
-    TuningPreparation::Ptr active = processor.tuning[currentTuningId]->aPrep;
+    TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(currentTuningId);
     
-    TuningModPreparation::Ptr mod = processor.modTuning[currentModTuningId];
+    TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(currentModTuningId);
     
     if (name == cTuningParameterTypes[TuningId])
     {
         if (type == BKParameter)
         {
-            int numTuning = processor.tuning.size();
+            int numTuning = processor.gallery->getNumTuning();
             
             if ((i+1) > numTuning)
             {
-                processor.addTuning();
+                processor.gallery->addTuning();
                 currentTuningId = numTuning;
                 
             }
@@ -140,11 +140,11 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            int numMod = processor.modTuning.size();
+            int numMod = processor.gallery->getNumTuningMod();
             
             if ((i+1) > numMod)
             {
-                processor.addTuningMod();
+                processor.gallery->addTuningMod();
                 currentModTuningId = numMod;
             }
             else if (i >= 0)
@@ -301,7 +301,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
 void TuningViewController::updateFields()
 {
     
-    TuningPreparation::Ptr prep = processor.tuning[currentTuningId]->aPrep;
+    TuningPreparation::Ptr prep = processor.gallery->getActiveTuningPreparation(currentTuningId);
 
     tuningTF[TuningScale]               ->setText( String( prep->getTuning()), false);
     tuningTF[TuningFundamental]         ->setText( String( prep->getFundamental()), false);
@@ -321,7 +321,7 @@ void TuningViewController::updateFields()
 void TuningViewController::updateModFields()
 {
     
-    TuningModPreparation::Ptr prep = processor.modTuning[currentModTuningId];
+    TuningModPreparation::Ptr prep = processor.gallery->getTuningModPreparation(currentModTuningId);
     
     modTuningTF[TuningScale]               ->setText( prep->getParam(TuningScale), false);
     modTuningTF[TuningFundamental]         ->setText( prep->getParam(TuningFundamental), false);

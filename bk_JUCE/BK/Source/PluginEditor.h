@@ -59,6 +59,8 @@ private:
     void switchPianos(void);
     void switchGallery(void);
     
+    Gallery::Ptr currentGallery;
+    
     BKAudioProcessor& processor;
     
     

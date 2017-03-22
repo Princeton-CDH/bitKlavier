@@ -22,6 +22,8 @@
 
 #include "Piano.h"
 
+#include "Gallery.h"
+
 #define USE_SYNCHRONIC_TWO 0
 
 //==============================================================================
@@ -36,17 +38,18 @@ public:
     //==============================================================================
     BKAudioProcessor();
     ~BKAudioProcessor();
-  
-    ScopedPointer<XmlElement>  saveGallery(void);
-    void loadGalleryFromXml(ScopedPointer<XmlElement> xml);
-    void loadGalleryFromPath(String path);
+    
     void loadGalleryDialog(void);
     void loadJsonGalleryDialog(void);
+    void loadGalleryFromPath(String path);
     void loadJsonGalleryFromPath(String path);
-    void loadJsonGalleryFromVar(var myJson);
+    void saveGallery(void);
     
-    // General settings.
-    GeneralSettings::Ptr                general;
+    String firstGallery(void);
+    void initializeGallery(void);
+  
+    Gallery::Ptr                        gallery;
+    
     BKUpdateState::Ptr                  updateState;
     
     // Synthesisers.
@@ -54,87 +57,24 @@ public:
     BKSynthesiser                       hammerReleaseSynth;
     BKSynthesiser                       resonanceReleaseSynth;
     
-    // Preparations.
-    Tuning::PtrArr                      tuning;
-    Tempo::PtrArr                       tempo;
-    
-    // Keymaps.
-    Keymap::PtrArr                      bkKeymaps;
-    
-    // Nostalgic, Synchronic, Direct classes
-    Synchronic::PtrArr                  synchronic;
-    Nostalgic::PtrArr                   nostalgic;
-    Direct::PtrArr                      direct;
-    
-    SynchronicModPreparation::PtrArr    modSynchronic;
-    DirectModPreparation::PtrArr        modDirect;
-    NostalgicModPreparation::PtrArr     modNostalgic;
-    TuningModPreparation::PtrArr        modTuning;
-    TempoModPreparation::PtrArr         modTempo;
-    
     Piano::Ptr                          prevPiano;
     Piano::Ptr                          currentPiano;
     Piano::PtrArr                       prevPianos;
-    Piano::PtrArr                       bkPianos;
     
     StringArray                         galleryNames;
     String                              currentGallery;
+    
     
     void updateGalleries(void);
     
     void collectGalleries(void);
     
-    void addSynchronic(void);
-    void addSynchronic(SynchronicPreparation::Ptr);
-    int addSynchronicIfNotAlreadyThere(SynchronicPreparation::Ptr);
-    
-    void addNostalgic(void);
-    void addNostalgic(NostalgicPreparation::Ptr);
-    int addNostalgicIfNotAlreadyThere(NostalgicPreparation::Ptr);
-    
-    void addTuning(void);
-    void addTuning(TuningPreparation::Ptr);
-    int addTuningIfNotAlreadyThere(TuningPreparation::Ptr);
-    
-    void addTempo(void);
-    void addTempo(TempoPreparation::Ptr);
-    int addTempoIfNotAlreadyThere(TempoPreparation::Ptr);
-    
-    void addDirect(void);
-    void addDirect(DirectPreparation::Ptr);
-    int addDirectIfNotAlreadyThere(DirectPreparation::Ptr);
-    
-    void addPiano(void);
-    
-    
-    void addKeymap(void);
-    void addKeymap(Keymap::Ptr);
-    void addDirectMod(void);
-    void addNostalgicMod(void);
-    void addSynchronicMod(void);
-    void addTuningMod(void);
-    void addTuningMod(TuningModPreparation::Ptr tmod);
-    void addTempoMod(void);
-    void addTempoMod(TempoModPreparation::Ptr tmod);
-    
     void updateUI(void);
-    
-    /*
-    //change these to pointers, pass these to Preparations, remove extra layer of checks in PreparationMap
-    bool                                pianoDidChange;
-    bool                                directPreparationDidChange;
-    bool                                nostalgicPreparationDidChange;
-    bool                                synchronicPreparationDidChange;
-    bool                                tuningPreparationDidChange;
-    bool                                generalSettingsDidChange;
-    */
     
     Array<int>                          noteOn;
     
     int                                 noteOnCount;
     bool                                allNotesOff;
-
-    SynchronicProcessor::Ptr getSynchronicProcessor(int id);
 
     int channel;
 

@@ -312,6 +312,9 @@ public:
      You'll need to add some sounds and voices before it'll make any sound.
      */
     BKSynthesiser(GeneralSettings::Ptr);
+    BKSynthesiser(void);
+    
+    void setGeneralSettings(GeneralSettings::Ptr gen);
     
     /** Destructor. */
     virtual ~BKSynthesiser();

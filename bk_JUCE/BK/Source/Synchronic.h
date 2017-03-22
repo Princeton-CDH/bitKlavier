@@ -611,7 +611,7 @@ public:
     typedef OwnedArray<SynchronicProcessor,CriticalSection>  CSArr;
     
     
-    SynchronicProcessor(BKSynthesiser *synth,
+    SynchronicProcessor(BKSynthesiser* main,
                         SynchronicPreparation::Ptr active,
                         GeneralSettings::Ptr general,
                         int Id);
@@ -626,6 +626,11 @@ public:
     void keyPressed(int noteNumber, float velocity);
     void keyReleased(int noteNumber, int channel);
     float getTimeToBeatMS(float beatsToSkip);
+    
+    inline void attachToSynthesiser(BKSynthesiser* main)
+    {
+        synth = main;
+    }
     //void  atReset();
     
 private:

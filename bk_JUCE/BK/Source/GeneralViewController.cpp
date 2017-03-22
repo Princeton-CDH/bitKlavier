@@ -87,7 +87,7 @@ void GeneralViewController::bkTextFieldDidChange(TextEditor& tf)
     float f = text.getFloatValue();
     int i = text.getIntValue();
     
-    GeneralSettings::Ptr gen = processor.general;
+    GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
     
     if (name == cGeneralParameterTypes[GeneralTuningFundamental])
     {
@@ -137,7 +137,7 @@ void GeneralViewController::bkTextFieldDidChange(TextEditor& tf)
 
 void GeneralViewController::updateFields(void)
 {
-    GeneralSettings::Ptr gen = processor.general;
+    GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
     
     generalTF[GeneralTuningFundamental] ->setText(   String( gen->getTuningFundamental()));
     generalTF[GeneralGlobalGain]        ->setText(   String( gen->getGlobalGain()));

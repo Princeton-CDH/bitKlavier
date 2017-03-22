@@ -60,8 +60,6 @@ void SynchronicProcessor::setCurrentPlaybackSampleRate(double sr)
     tuner->setCurrentPlaybackSampleRate(sr);
 }
 
-
-
 void SynchronicProcessor::playNote(int channel, int note, float velocity)
 {
     PianoSamplerNoteDirection noteDirection = Forward;

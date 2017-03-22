@@ -33,17 +33,35 @@
               file="Source/BKReferenceCountedBuffer.h"/>
       </GROUP>
       <GROUP id="{E01F59AF-FEAD-7AEA-32C2-F665B05A05F1}" name="Model">
-        <FILE id="GHmNVp" name="PluginProcessor.cpp" compile="1" resource="0"
-              file="Source/PluginProcessor.cpp"/>
-        <FILE id="oVHIQ3" name="PluginProcessor.h" compile="0" resource="0"
-              file="Source/PluginProcessor.h"/>
-        <FILE id="dgzM9u" name="PluginEditor.cpp" compile="1" resource="0"
-              file="Source/PluginEditor.cpp"/>
-        <FILE id="ubAlA4" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
-        <FILE id="SPsY4L" name="Piano.cpp" compile="1" resource="0" file="Source/Piano.cpp"/>
-        <FILE id="eStbij" name="Piano.h" compile="0" resource="0" file="Source/Piano.h"/>
-        <FILE id="VHt2m9" name="Gallery.cpp" compile="1" resource="0" file="Source/Gallery.cpp"/>
-        <FILE id="x0g8Ul" name="Gallery.h" compile="0" resource="0" file="Source/Gallery.h"/>
+        <GROUP id="{A4AD4139-F8E0-AB44-88B6-84FFC2F2D4D5}" name="Editor">
+          <FILE id="ubAlA4" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+          <FILE id="dgzM9u" name="PluginEditor.cpp" compile="1" resource="0"
+                file="Source/PluginEditor.cpp"/>
+          <FILE id="g1Y4SP" name="PluginEditorUtilities.cpp" compile="1" resource="0"
+                file="Source/PluginEditorUtilities.cpp"/>
+        </GROUP>
+        <GROUP id="{A7EA3278-0185-F32B-52C4-0F88EA1C92D3}" name="Processor">
+          <FILE id="oVHIQ3" name="PluginProcessor.h" compile="0" resource="0"
+                file="Source/PluginProcessor.h"/>
+          <FILE id="GHmNVp" name="PluginProcessor.cpp" compile="1" resource="0"
+                file="Source/PluginProcessor.cpp"/>
+          <FILE id="CRo57S" name="PluginConfig.cpp" compile="1" resource="0"
+                file="Source/PluginConfig.cpp"/>
+          <FILE id="lSxCMJ" name="PluginProcessorUtilities.cpp" compile="1" resource="0"
+                file="Source/PluginProcessorUtilities.cpp"/>
+        </GROUP>
+        <GROUP id="{7F5799FB-8D6D-37BC-8D31-68CC0DC2EF98}" name="Gallery">
+          <FILE id="x0g8Ul" name="Gallery.h" compile="0" resource="0" file="Source/Gallery.h"/>
+          <FILE id="VHt2m9" name="Gallery.cpp" compile="1" resource="0" file="Source/Gallery.cpp"/>
+          <FILE id="Vv2y63" name="GalleryUtilities.cpp" compile="1" resource="0"
+                file="Source/GalleryUtilities.cpp"/>
+          <FILE id="nh14tG" name="XMLGallery.cpp" compile="1" resource="0" file="Source/XMLGallery.cpp"/>
+          <FILE id="fIg23Y" name="JSONGallery.cpp" compile="1" resource="0" file="Source/JSONGallery.cpp"/>
+        </GROUP>
+        <GROUP id="{1CB08EFA-DEC3-73DF-DE6C-B6E7D430054C}" name="Piano">
+          <FILE id="eStbij" name="Piano.h" compile="0" resource="0" file="Source/Piano.h"/>
+          <FILE id="SPsY4L" name="Piano.cpp" compile="1" resource="0" file="Source/Piano.cpp"/>
+        </GROUP>
         <GROUP id="{047FD2F8-E8BA-EA56-25D7-A60B1DB51FE3}" name="Maps">
           <FILE id="hJbk7x" name="Keymap.h" compile="0" resource="0" file="Source/Keymap.h"/>
           <FILE id="djaSBK" name="PianoMap.cpp" compile="1" resource="0" file="Source/PianoMap.cpp"/>

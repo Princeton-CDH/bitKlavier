@@ -21,7 +21,7 @@ processor(p),
 currentSynchronicId(0),
 currentModSynchronicId(0)
 {
-    SynchronicPreparation::Ptr prep = processor.synchronic[currentSynchronicId]->sPrep;
+    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(currentSynchronicId);
     
      // Labels
     synchronicL = OwnedArray<BKLabel>();
@@ -121,22 +121,22 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
     
-    SynchronicPreparation::Ptr prep = processor.synchronic[currentSynchronicId]->sPrep;
+    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(currentSynchronicId);
     
-    SynchronicPreparation::Ptr active = processor.synchronic[currentSynchronicId]->aPrep;
+    SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(currentSynchronicId);
     
-    SynchronicModPreparation::Ptr mod = processor.modSynchronic[currentModSynchronicId];
+    SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(currentModSynchronicId);
     
     if (name == cSynchronicParameterTypes[SynchronicId])
     {
         
         if (type == BKParameter)
         {
-            int numSynchronic = processor.synchronic.size();
+            int numSynchronic = processor.gallery->getNumSynchronic();
         
             if ((i+1) > numSynchronic)
             {
-                processor.addSynchronic();
+                processor.gallery->addSynchronic();
                 currentSynchronicId = numSynchronic;
             
             }
@@ -151,11 +151,11 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            int numMod = processor.modSynchronic.size();
+            int numMod = processor.gallery->getNumSynchronicMod();
             
             if ((i+1) > numMod)
             {
-                processor.addSynchronicMod();
+                processor.gallery->addSynchronicMod();
                 currentModSynchronicId = numMod;
             }
             else if (i >= 0)
@@ -173,10 +173,10 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         if (type == BKParameter)
         {
-            if (i < processor.tempo.size())
+            if (i < processor.gallery->getNumTempo())
             {
-                prep    ->setTempoControl(processor.tempo[i]);
-                active  ->setTempoControl(processor.tempo[i]);
+                prep    ->setTempoControl(processor.gallery->getTempo(i));
+                active  ->setTempoControl(processor.gallery->getTempo(i));
             }
             else
                 tf.setText("0", false);
@@ -184,7 +184,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            if (i < processor.tempo.size())
+            if (i < processor.gallery->getNumTempo())
                 mod->setParam( SynchronicTempo, text);
             else
                 tf.setText("0", false);
@@ -321,10 +321,10 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         if (type == BKParameter)
         {
-            if (i < processor.tuning.size())
+            if (i < processor.gallery->getNumTuning())
             {
-                prep    ->setTuning(processor.tuning[i]);
-                active  ->setTuning(processor.tuning[i]);
+                prep    ->setTuning(processor.gallery->getTuning(i));
+                active  ->setTuning(processor.gallery->getTuning(i));
             }
             else
                 tf.setText("0", false);
@@ -332,7 +332,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            if (i < processor.tuning.size())
+            if (i < processor.gallery->getNumTuning())
                 mod->setParam( SynchronicTuning, text);
             else
                 tf.setText("0", false);
@@ -346,7 +346,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
 
 void SynchronicViewController::updateFields(void)
 {
-    SynchronicPreparation::Ptr prep   = processor.synchronic[currentSynchronicId]->aPrep;
+    SynchronicPreparation::Ptr prep   = processor.gallery->getActiveSynchronicPreparation(currentSynchronicId);
 
     synchronicTF[SynchronicTempo]               ->setText(  String(                 prep->getTempoControl()->getId()), false);
     synchronicTF[SynchronicNumPulses]           ->setText(  String(                 prep->getNumBeats()), false);
@@ -366,7 +366,7 @@ void SynchronicViewController::updateFields(void)
 void SynchronicViewController::updateModFields(void)
 {
     // a Modification copy of Preparation to pull values from when updating
-    SynchronicModPreparation::Ptr prep   = processor.modSynchronic[currentModSynchronicId];
+    SynchronicModPreparation::Ptr prep   = processor.gallery->getSynchronicModPreparation(currentModSynchronicId);
     
     modSynchronicTF[SynchronicTempo]               ->setText(  prep->getParam(SynchronicTempo), false);
     modSynchronicTF[SynchronicNumPulses]           ->setText(  prep->getParam(SynchronicNumPulses), false);

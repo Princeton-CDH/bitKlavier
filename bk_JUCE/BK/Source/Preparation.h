@@ -58,6 +58,17 @@ public:
         processor   = new DirectProcessor(s, res, ham, aPrep, Id);
     };
     
+    inline void prepareToPlay(double sampleRate, BKSynthesiser* main, BKSynthesiser* res, BKSynthesiser* hammer)
+    {
+        processor->attachToSynthesiser(main, res, hammer);
+        processor->setCurrentPlaybackSampleRate(sampleRate);
+    }
+    
+    inline void prepareToPlay(double sampleRate)
+    {
+        processor->setCurrentPlaybackSampleRate(sampleRate);
+    }
+    
     inline ValueTree getState(void)
     {
         ValueTree prep( vtagDirect+String(Id));
@@ -180,6 +191,17 @@ public:
         aPrep       = new SynchronicPreparation(sPrep);
         processor   = new SynchronicProcessor(s, aPrep, general, Id);
     };
+    
+    void prepareToPlay(double sampleRate, BKSynthesiser* main)
+    {
+        processor->attachToSynthesiser(main);
+        processor->setCurrentPlaybackSampleRate(sampleRate);
+    }
+    
+    void prepareToPlay(double sampleRate)
+    {
+        processor->setCurrentPlaybackSampleRate(sampleRate);
+    }
     
     inline ValueTree getState(void)
     {
@@ -421,6 +443,17 @@ public:
     };
     
     ~Nostalgic() {};
+    
+    void prepareToPlay(double sampleRate, BKSynthesiser* main)
+    {
+        processor->attachToSynthesiser(main);
+        processor->setCurrentPlaybackSampleRate(sampleRate);
+    }
+    
+    void prepareToPlay(double sampleRate)
+    {
+        processor->setCurrentPlaybackSampleRate(sampleRate);
+    }
     
     inline int getId() {return Id;}
     

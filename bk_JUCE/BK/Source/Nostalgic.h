@@ -393,7 +393,7 @@ public:
     typedef OwnedArray<NostalgicProcessor>                  Arr;
     typedef OwnedArray<NostalgicProcessor, CriticalSection> CSArr;
     
-    NostalgicProcessor(BKSynthesiser *s,
+    NostalgicProcessor(BKSynthesiser* main,
                        NostalgicPreparation::Ptr active,
                        int Id);
     
@@ -411,6 +411,11 @@ public:
     void keyReleased(int midiNoteNumber, int midiChannel);
     
     void postRelease(int midiNoteNumber, int midiChannel);
+    
+    inline void attachToSynthesiser(BKSynthesiser* main)
+    {
+        synth = main;
+    }
     
 private:
     int Id;

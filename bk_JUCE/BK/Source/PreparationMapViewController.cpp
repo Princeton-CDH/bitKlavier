@@ -154,9 +154,9 @@ String PreparationMapViewController::processPreparationString(String s)
                 {
                     int prep = temp.getIntValue();
                     
-                    if (prep <= processor.synchronic.size()-1)
+                    if (prep <= processor.gallery->getNumSynchronic()-1)
                     {
-                        sync.add(processor.synchronic[prep]);
+                        sync.add(processor.gallery->getSynchronic(prep));
                         
                         out.append("S", 1);
                         out.append(String(prep), 3);
@@ -167,9 +167,9 @@ String PreparationMapViewController::processPreparationString(String s)
                 {
                     int prep = temp.getIntValue();
                     
-                    if (prep <= processor.nostalgic.size()-1)
+                    if (prep <= processor.gallery->getNumNostalgic()-1)
                     {
-                        nost.add(processor.nostalgic[prep]);
+                        nost.add(processor.gallery->getNostalgic(prep));
                     
                         out.append("N", 1);
                         out.append(String(prep), 3);
@@ -179,9 +179,9 @@ String PreparationMapViewController::processPreparationString(String s)
                 {
                     int prep = temp.getIntValue();
                     
-                    if (prep <= processor.direct.size()-1)
+                    if (prep <= processor.gallery->getNumDirect()-1)
                     {
-                        dire.add(processor.direct[prep]);
+                        dire.add(processor.gallery->getDirect(prep));
                     
                         out.append("D", 1);
                         out.append(String(prep), 3);
@@ -191,9 +191,9 @@ String PreparationMapViewController::processPreparationString(String s)
                 {
                     int prep = temp.getIntValue();
                     
-                    if (prep <= processor.tempo.size()-1)
+                    if (prep <= processor.gallery->getNumTempo()-1)
                     {
-                        tempo.add(processor.tempo[prep]);
+                        tempo.add(processor.gallery->getTempo(prep));
                         
                         out.append("M", 1);
                         out.append(String(prep), 3);
@@ -203,9 +203,9 @@ String PreparationMapViewController::processPreparationString(String s)
                 {
                     int prep = temp.getIntValue();
                     
-                    if (prep <= processor.tuning.size()-1)
+                    if (prep <= processor.gallery->getNumTuning()-1)
                     {
-                        tuning.add(processor.tuning[prep]);
+                        tuning.add(processor.gallery->getTuning(prep));
                         
                         out.append("T", 1);
                         out.append(String(prep), 3);
@@ -252,8 +252,8 @@ void PreparationMapViewController::bkTextFieldDidChange(TextEditor& tf)
     if (name == cPrepMapParameterTypes[PrepMapKeymapId])
     {
         
-        if (i < processor.bkKeymaps.size())
-            processor.currentPiano->prepMaps[Id]->setKeymap(processor.bkKeymaps[i]);
+        if (i < processor.gallery->getNumKeymaps())
+            processor.currentPiano->prepMaps[Id]->setKeymap(processor.gallery->getKeymap(i));
         else
             tf.setText("0", false);
         

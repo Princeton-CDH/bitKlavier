@@ -111,9 +111,9 @@ void TempoViewController::bkTextFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|"); 
     
-    TempoPreparation::Ptr       prep    = processor.tempo[currentTempoId]->sPrep;
-    TempoPreparation::Ptr       active  = processor.tempo[currentTempoId]->aPrep;
-    TempoModPreparation::Ptr    mod     = processor.modTempo[currentModTempoId];
+    TempoPreparation::Ptr       prep    = processor.gallery->getStaticTempoPreparation(currentTempoId);
+    TempoPreparation::Ptr       active  = processor.gallery->getActiveTempoPreparation(currentTempoId);
+    TempoModPreparation::Ptr    mod     = processor.gallery->getTempoModPreparation(currentModTempoId);
     
     /*
      TempoId = 0,
@@ -130,11 +130,11 @@ void TempoViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         if (type == BKParameter)
         {
-            int numTempo = processor.tempo.size();
+            int numTempo = processor.gallery->getNumTempo();
             
             if ((i+1) > numTempo)
             {
-                processor.addTempo();
+                processor.gallery->addTempo();
                 currentTempoId = numTempo;
                 
             }
@@ -149,11 +149,11 @@ void TempoViewController::bkTextFieldDidChange(TextEditor& tf)
         }
         else // BKModification
         {
-            int numMod = processor.modTempo.size();
+            int numMod = processor.gallery->getNumTempoMod();
             
             if ((i+1) > numMod)
             {
-                processor.addTempoMod();
+                processor.gallery->addTempoMod();
                 currentModTempoId = numMod;
             }
             else if (i >= 0)
@@ -270,7 +270,7 @@ void TempoViewController::bkTextFieldDidChange(TextEditor& tf)
 void TempoViewController::updateFields()
 {
 
-    TempoPreparation::Ptr prep = processor.tempo[currentTempoId]->aPrep;
+    TempoPreparation::Ptr prep = processor.gallery->getActiveTempoPreparation(currentTempoId);
     
     tempoTF[TempoBPM]           ->setText( String( prep->getTempo()), false);
     tempoTF[AT1Mode]            ->setText( String( prep->getAdaptiveTempo1Mode()), false);
@@ -286,7 +286,7 @@ void TempoViewController::updateFields()
 void TempoViewController::updateModFields()
 {
     
-    TempoModPreparation::Ptr prep = processor.modTempo[currentModTempoId];
+    TempoModPreparation::Ptr prep = processor.gallery->getTempoModPreparation(currentModTempoId);
 
     modTempoTF[TempoBPM]            ->setText( prep->getParam(TempoBPM), false);
     modTempoTF[AT1Mode]             ->setText( prep->getParam(AT1Mode), false);

@@ -290,10 +290,7 @@ public:
     typedef OwnedArray<DirectProcessor>                  Arr;
     typedef OwnedArray<DirectProcessor, CriticalSection> CSArr;
     
-    DirectProcessor(BKSynthesiser *s,
-                    BKSynthesiser *res,
-                    BKSynthesiser *ham,
-                    DirectPreparation::Ptr active,
+    DirectProcessor(BKSynthesiser* main, BKSynthesiser* res,  BKSynthesiser* ham, DirectPreparation::Ptr active,
                     int Id);
     
     ~DirectProcessor();
@@ -304,6 +301,13 @@ public:
     
     void    keyPressed(int noteNumber, float velocity, int channel);
     void    keyReleased(int noteNumber, float velocity, int channel);
+    
+    inline void attachToSynthesiser(BKSynthesiser* main,BKSynthesiser* res, BKSynthesiser* ham)
+    {
+        synth = main;
+        resonanceSynth = res;
+        hammerSynth = ham;
+    }
     
 private:
     int Id;
