@@ -624,7 +624,7 @@ String BKAudioProcessorEditor::processResetMapString(const String& s)
                     int whichPrep = num.getIntValue();
                     for (auto k : keys)
                     {
-                        out += String(k) + ":" + "t" + String(whichPrep) + " ";
+                        out += String(k) + ":" + "m" + String(whichPrep) + " ";
                         processor.currentPiano->modMap[k]->tempoReset.add(whichPrep);
                     }
                     
