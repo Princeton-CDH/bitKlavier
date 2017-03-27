@@ -25,7 +25,7 @@
 
 #include "KeymapViewController.h"
 
-class MainViewController :  public Component, private Timer
+class MainViewController :  public Component, private Timer, public BKListener
 {
     
 public:
@@ -56,11 +56,20 @@ private:
     DirectViewController dvc;
     TempoViewController ovc;
     
-    
+    OwnedArray<TextButton> buttons;
     
     void timerCallback() override;
 
     int timerCallbackCount;
+    
+    BKPreparationDisplay currentDisplay;
+    
+    void bkTextFieldDidChange       (TextEditor&)           override{};
+    void bkMessageReceived          (const String& message) override{};
+    void bkComboBoxDidChange        (ComboBox* box)         override{};
+    void bkButtonClicked            (Button* b)             override;
+    
+    void setCurrentDisplay(BKPreparationDisplay type);
     
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainViewController)

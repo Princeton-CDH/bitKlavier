@@ -23,6 +23,19 @@ dvc(p),
 ovc(p),
 timerCallbackCount(0)
 {
+    for (int i = 0; i < cDisplayNames.size(); i++)
+    {
+        buttons.add(new TextButton());
+        
+        buttons[i]->setName(cDisplayNames[i]);
+        buttons[i]->setButtonText(cDisplayNames[i]);
+        
+        buttons[i]->changeWidthToFitText();
+        buttons[i]->addListener(this);
+        addAndMakeVisible(buttons[i]);
+        
+    }
+
     addAndMakeVisible(galvc);
     
     addAndMakeVisible(gvc);
@@ -34,6 +47,9 @@ timerCallbackCount(0)
     addAndMakeVisible(ovc);
     
     
+    setCurrentDisplay(DisplayDirect);
+    
+    
     startTimerHz (50);
     
 }
@@ -41,6 +57,39 @@ timerCallbackCount(0)
 MainViewController::~MainViewController()
 {
     
+}
+
+void MainViewController::bkButtonClicked            (Button* b)
+{
+    String name = b->getName();
+    if (name == cDisplayNames[DisplayKeymap])
+    {
+        setCurrentDisplay(DisplayKeymap);
+    }
+    else if (name == cDisplayNames[DisplayDirect])
+    {
+        setCurrentDisplay(DisplayDirect);
+    }
+    else if (name == cDisplayNames[DisplaySynchronic])
+    {
+        setCurrentDisplay(DisplaySynchronic);
+    }
+    else if (name == cDisplayNames[DisplayNostalgic])
+    {
+        setCurrentDisplay(DisplayNostalgic);
+    }
+    else if (name == cDisplayNames[DisplayTempo])
+    {
+        setCurrentDisplay(DisplayTempo);
+    }
+    else if (name == cDisplayNames[DisplayTuning])
+    {
+        setCurrentDisplay(DisplayTuning);
+    }
+    else if (name == cDisplayNames[DisplayGeneral])
+    {
+        setCurrentDisplay(DisplayGeneral);
+    }
 }
 
 void MainViewController::timerCallback()
@@ -98,11 +147,63 @@ void MainViewController::paint (Graphics& g)
     g.fillAll(Colours::dimgrey);
 }
 
-
+void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
+{
+    currentDisplay = type;
+    
+    kvc.setVisible(false);
+    gvc.setVisible(false);
+    tvc.setVisible(false);
+    dvc.setVisible(false);
+    svc.setVisible(false);
+    nvc.setVisible(false);
+    ovc.setVisible(false);
+    
+    if (type == DisplayKeymap)
+    {
+        kvc.setVisible(true);
+    }
+    else if (type == DisplayTuning)
+    {
+        tvc.setVisible(true);
+    }
+    else if (type == DisplayTempo)
+    {
+        ovc.setVisible(true);
+    }
+    else if (type == DisplaySynchronic)
+    {
+        svc.setVisible(true);
+    }
+    else if (type == DisplayNostalgic)
+    {
+        nvc.setVisible(true);
+    }
+    else if (type == DisplayDirect)
+    {
+        dvc.setVisible(true);
+    }
+    else if (type == DisplayGeneral)
+    {
+        gvc.setVisible(true);
+    }
+        
+}
 
 void MainViewController::resized()
 {
+    galvc.setBounds(0, 0, gVCWidth+2*gXSpacing, getHeight());
     
+    // Place buttons.
+    float buttonWidth = ((getRight()-galvc.getRight() - 7 * gXSpacing)/7.0f);
+    float buttonHeight = 30;
+    buttons[0]->setBounds(galvc.getRight()+gXSpacing, gYSpacing, buttonWidth, buttonHeight);
+    for (int i = 1; i < cDisplayNames.size(); i++)
+    {
+        buttons[i]->setBounds(buttons[i-1]->getRight()+gXSpacing, gYSpacing, buttonWidth, buttonHeight);
+    }
+    
+    /*
     float kvcH = cKeymapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float gvcH = cGeneralParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float svcH = cSynchronicParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
@@ -110,46 +211,18 @@ void MainViewController::resized()
     float dvcH = cDirectParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
     float tvcH = cTuningParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
     float ovcH = cTempoParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
+    */
     
-    galvc.setBounds(0, 0, gVCWidth+2*gXSpacing, getHeight());
-    
-    // Col 2
     kvc.setBounds(galvc.getRight() + gXSpacing,
-                  gYSpacing,
-                  gVCWidth,
-                  kvcH);
+                  buttons[0]->getBottom() + gYSpacing,
+                  getRight() - galvc.getRight() - 2*gXSpacing,
+                  getHeight() - 200);
     
-    gvc.setBounds(kvc.getX(),
-                  kvc.getBottom() + gYSpacing,
-                  gVCWidth,
-                  gvcH);
-    
-    tvc.setBounds(kvc.getX(),
-                  gvc.getBottom() + gYSpacing,
-                  gVCWidth,
-                  tvcH);
-    
-    dvc.setBounds(kvc.getX(),
-                  tvc.getBottom() + gYSpacing,
-                  gVCWidth,
-                  dvcH);
-    
-    
-    // Col 3
-    
-    svc.setBounds(kvc.getRight() + gXSpacing,
-                  gYSpacing,
-                  gVCWidth,
-                  svcH);
-    
-    nvc.setBounds(svc.getX(),
-                  svc.getBottom() + gYSpacing,
-                  gVCWidth,
-                  nvcH);
-    
-    ovc.setBounds(nvc.getX(),
-                  nvc.getBottom() + gYSpacing,
-                  gVCWidth,
-                  ovcH);
+    gvc.setBounds(kvc.getBounds());
+    tvc.setBounds(kvc.getBounds());
+    dvc.setBounds(kvc.getBounds());
+    svc.setBounds(kvc.getBounds());
+    nvc.setBounds(kvc.getBounds());
+    ovc.setBounds(kvc.getBounds());
     
 }

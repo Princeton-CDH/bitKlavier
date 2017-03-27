@@ -214,6 +214,28 @@ static const std::vector<std::string> cPreparationTypes = {
     "Tempo"
 };
 
+typedef enum BKPreparationDisplay {
+    DisplayDirect = 0,
+    DisplaySynchronic,
+    DisplayNostalgic,
+    DisplayTuning,
+    DisplayTempo,
+    DisplayKeymap,
+    DisplayGeneral,
+    DisplayNil,
+} BKPreparationDisplay;
+
+static const std::vector<std::string> cDisplayNames = {
+    "Direct",
+    "Synchronic",
+    "Nostalgic",
+    "Tuning",
+    "Tempo",
+    "Keymap",
+    "General"
+};
+
+
 
 
 

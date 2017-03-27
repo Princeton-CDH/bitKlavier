@@ -106,14 +106,40 @@
         </GROUP>
       </GROUP>
       <GROUP id="{07677963-38EF-2F51-36FA-17646727446F}" name="Controller">
+        <FILE id="Ivngl4" name="MainViewController.cpp" compile="1" resource="0"
+              file="Source/MainViewController.cpp"/>
+        <FILE id="EyR2nF" name="MainViewController.h" compile="0" resource="0"
+              file="Source/MainViewController.h"/>
+        <FILE id="u0eGKF" name="GalleryViewController.cpp" compile="1" resource="0"
+              file="Source/GalleryViewController.cpp"/>
+        <FILE id="yAwIte" name="GalleryViewController.h" compile="0" resource="0"
+              file="Source/GalleryViewController.h"/>
         <FILE id="dMVsSd" name="PianoViewController.cpp" compile="1" resource="0"
               file="Source/PianoViewController.cpp"/>
         <FILE id="tIek8E" name="PianoViewController.h" compile="0" resource="0"
               file="Source/PianoViewController.h"/>
-        <FILE id="F0ImEz" name="PreparationMapViewController.cpp" compile="1"
-              resource="0" file="Source/PreparationMapViewController.cpp"/>
-        <FILE id="W6ucAm" name="PreparationMapViewController.h" compile="0"
-              resource="0" file="Source/PreparationMapViewController.h"/>
+        <GROUP id="{444BC2CA-5FF1-6AEB-00B9-DF5D039DBFFE}" name="PreparationVC">
+          <FILE id="lBHfg4" name="TuningViewController.cpp" compile="1" resource="0"
+                file="Source/TuningViewController.cpp"/>
+          <FILE id="DZ40Vl" name="TuningViewController.h" compile="0" resource="0"
+                file="Source/TuningViewController.h"/>
+          <FILE id="vi1g4K" name="TempoViewController.cpp" compile="1" resource="0"
+                file="Source/TempoViewController.cpp"/>
+          <FILE id="QZEXdj" name="TempoViewController.h" compile="0" resource="0"
+                file="Source/TempoViewController.h"/>
+          <FILE id="Bo4JI6" name="SynchronicViewController.cpp" compile="1" resource="0"
+                file="Source/SynchronicViewController.cpp"/>
+          <FILE id="OJ2tuE" name="SynchronicViewController.h" compile="0" resource="0"
+                file="Source/SynchronicViewController.h"/>
+          <FILE id="nbTvaG" name="NostalgicViewController.cpp" compile="1" resource="0"
+                file="Source/NostalgicViewController.cpp"/>
+          <FILE id="rY4uUs" name="NostalgicViewController.h" compile="0" resource="0"
+                file="Source/NostalgicViewController.h"/>
+          <FILE id="kl67Ve" name="DirectViewController.cpp" compile="1" resource="0"
+                file="Source/DirectViewController.cpp"/>
+          <FILE id="Z11OMY" name="DirectViewController.h" compile="0" resource="0"
+                file="Source/DirectViewController.h"/>
+        </GROUP>
         <FILE id="FY0jbU" name="KeymapViewController.cpp" compile="1" resource="0"
               file="Source/KeymapViewController.cpp"/>
         <FILE id="kWVW2o" name="KeymapViewController.h" compile="0" resource="0"
@@ -122,26 +148,12 @@
               file="Source/GeneralViewController.cpp"/>
         <FILE id="PRBl6E" name="GeneralViewController.h" compile="0" resource="0"
               file="Source/GeneralViewController.h"/>
-        <FILE id="lBHfg4" name="TuningViewController.cpp" compile="1" resource="0"
-              file="Source/TuningViewController.cpp"/>
-        <FILE id="DZ40Vl" name="TuningViewController.h" compile="0" resource="0"
-              file="Source/TuningViewController.h"/>
-        <FILE id="vi1g4K" name="TempoViewController.cpp" compile="1" resource="0"
-              file="Source/TempoViewController.cpp"/>
-        <FILE id="QZEXdj" name="TempoViewController.h" compile="0" resource="0"
-              file="Source/TempoViewController.h"/>
-        <FILE id="Bo4JI6" name="SynchronicViewController.cpp" compile="1" resource="0"
-              file="Source/SynchronicViewController.cpp"/>
-        <FILE id="OJ2tuE" name="SynchronicViewController.h" compile="0" resource="0"
-              file="Source/SynchronicViewController.h"/>
-        <FILE id="nbTvaG" name="NostalgicViewController.cpp" compile="1" resource="0"
-              file="Source/NostalgicViewController.cpp"/>
-        <FILE id="rY4uUs" name="NostalgicViewController.h" compile="0" resource="0"
-              file="Source/NostalgicViewController.h"/>
-        <FILE id="kl67Ve" name="DirectViewController.cpp" compile="1" resource="0"
-              file="Source/DirectViewController.cpp"/>
-        <FILE id="Z11OMY" name="DirectViewController.h" compile="0" resource="0"
-              file="Source/DirectViewController.h"/>
+        <FILE id="g1Y4SP" name="GalleryVCUtilities.cpp" compile="1" resource="0"
+              file="Source/GalleryVCUtilities.cpp"/>
+        <FILE id="F0ImEz" name="PreparationMapViewController.cpp" compile="1"
+              resource="0" file="Source/PreparationMapViewController.cpp"/>
+        <FILE id="W6ucAm" name="PreparationMapViewController.h" compile="0"
+              resource="0" file="Source/PreparationMapViewController.h"/>
         <GROUP id="{27822276-6128-D767-C30D-119C8E335EE5}" name="Abstract">
           <FILE id="kD9p8t" name="BKListener.cpp" compile="1" resource="0" file="Source/BKListener.cpp"/>
           <FILE id="OOopX5" name="BKListener.h" compile="0" resource="0" file="Source/BKListener.h"/>
@@ -150,18 +162,6 @@
         </GROUP>
       </GROUP>
       <GROUP id="{E98AFB64-DE96-83A1-81DC-1FA2D8D37DB8}" name="View">
-        <FILE id="Ivngl4" name="MainViewController.cpp" compile="1" resource="0"
-              file="Source/MainViewController.cpp"/>
-        <FILE id="EyR2nF" name="MainViewController.h" compile="0" resource="0"
-              file="Source/MainViewController.h"/>
-        <FILE id="g1Y4SP" name="TextProcessingUtilities.cpp" compile="1" resource="0"
-              file="Source/TextProcessingUtilities.cpp"/>
-        <FILE id="u0eGKF" name="GalleryViewController.cpp" compile="1" resource="0"
-              file="Source/GalleryViewController.cpp"/>
-        <FILE id="yAwIte" name="GalleryViewController.h" compile="0" resource="0"
-              file="Source/GalleryViewController.h"/>
-        <FILE id="O02WmN" name="BKTopView.cpp" compile="1" resource="0" file="Source/BKTopView.cpp"/>
-        <FILE id="eQImmS" name="BKTopView.h" compile="0" resource="0" file="Source/BKTopView.h"/>
         <GROUP id="{CAAFD165-DFE7-A7F9-44CA-A33CEFE40708}" name="BKKeyboard">
           <FILE id="oxVQCp" name="BKKeyboard.cpp" compile="1" resource="0" file="Source/BKKeyboard.cpp"/>
           <FILE id="IrRGH7" name="BKKeyboard.h" compile="0" resource="0" file="Source/BKKeyboard.h"/>
