@@ -50,7 +50,7 @@ processor(p)
     
     keyboard->setScrollButtonsVisible(true);
     
-    keyboard->setAvailableRange(21, 109);
+    keyboard->setAvailableRange(21, 108);
     
     keyboard->setOctaveForMiddleC(4);
     
@@ -94,15 +94,15 @@ void KeymapViewController::resized()
     
     BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
     
-    float keyboardHeight = 200;
-    float keyWidth = (getWidth()-2*gXSpacing) / 15.0;
+    float keyboardHeight = 100;
+    float keyWidth = (getWidth()-2*gXSpacing) / 29.0;
     
     keyboard->setKeyWidth(keyWidth);
     
     keyboard->setBlackNoteLengthProportion(0.65);
     
     
-    keyboardComponent->setBounds(gXSpacing, 250, getWidth()-2*gXSpacing, keyboardHeight);
+    keyboardComponent->setBounds(gXSpacing, getBottom()-1.5*keyboardHeight, getWidth()-2*gXSpacing, keyboardHeight);
 }
 
 void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
