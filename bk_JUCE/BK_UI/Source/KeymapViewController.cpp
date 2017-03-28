@@ -41,13 +41,20 @@ processor(p)
         keymapTF[i]->setName(cKeymapParameterTypes[i]);
     }
     
-#if 0
     // Keyboard
-    addAndMakeVisible (keyboardComponent = new BKKeyboardComponent (keyboardState,
-                                                                 BKKeyboardComponent::horizontalKeyboard));
+    addAndMakeVisible (keyboardComponent = new BKKeymapKeyboardComponent (keyboardState,
+                                                                 BKKeymapKeyboardComponent::horizontalKeyboard));
+    
+    
+    BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
+    
+    keyboard->setScrollButtonsVisible(true);
+    
+    keyboard->setAvailableRange(21, 109);
+    
+    keyboard->setOctaveForMiddleC(4);
     
     keyboardState.addListener(this);
-#endif
     
     updateFields(currentKeymapId);
 }
@@ -84,6 +91,18 @@ void KeymapViewController::resized()
     {
         keymapTF[n]->setTopLeftPosition(tfX, gYSpacing + tfY * n);
     }
+    
+    BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
+    
+    float keyboardHeight = 200;
+    float keyWidth = (getWidth()-2*gXSpacing) / 15.0;
+    
+    keyboard->setKeyWidth(keyWidth);
+    
+    keyboard->setBlackNoteLengthProportion(0.65);
+    
+    
+    keyboardComponent->setBounds(gXSpacing, 250, getWidth()-2*gXSpacing, keyboardHeight);
 }
 
 void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
@@ -121,6 +140,11 @@ void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
         keymapTF[KeymapField]->setText(intArrayToString(keys));
         
         processor.gallery->setKeymap(currentKeymapId, keys);
+        
+        BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
+        
+        keyboard->setKeysInKeymap(keys);
+        
     }
     else
     {
@@ -136,6 +160,10 @@ void KeymapViewController::updateFields(int keymapId)
     keymapTF[KeymapId]        ->setText( String( keymapId));
     keymapTF[KeymapField]     ->setText( intArrayToString(km->keys()));
     
+    BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
+    
+    keyboard->setKeysInKeymap(km->keys());
+    
 }
 
 void KeymapViewController::bkMessageReceived (const String& message)
@@ -148,25 +176,30 @@ void KeymapViewController::bkMessageReceived (const String& message)
     }
 }
 
-#if 0
-/** Called when one of the BKKeyboardState's keys is pressed. */
-void KeymapViewController::handleNoteOn (BKKeyboardState* source,
-                   int midiChannel, int midiNoteNumber, float velocity)
+
+void KeymapViewController::handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber)
 {
-    DBG("NOTE ON: " + String(midiNoteNumber) + " " + String(velocity));
-    
-    processor.bkKeymaps[currentKeymapId]->toggleNote(midiNoteNumber - 12);
-    
-    updateFields(currentKeymapId);
     
 }
 
-/** Called when one of the BKKeyboardState's keys is released. */
-void KeymapViewController::handleNoteOff (BKKeyboardState* source,
-                    int midiChannel, int midiNoteNumber, float velocity)
+void KeymapViewController::handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber)
 {
-    DBG("NOTE OFF: " + String(midiNoteNumber) + " " + String(velocity));
+    
 }
-#endif
+
+void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber)
+{
+    DBG("toggled? +" + String(midiNoteNumber));
+    
+    processor.gallery->getKeymap(currentKeymapId)->toggleNote(midiNoteNumber);
+    
+    updateFields(currentKeymapId);
+    
+    BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
+    
+    keyboard->setKeysInKeymap(processor.gallery->getKeymap(currentKeymapId)->keys());
+    
+}
+
 
 

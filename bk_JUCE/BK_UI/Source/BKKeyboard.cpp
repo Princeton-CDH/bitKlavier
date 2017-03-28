@@ -1,19 +1,19 @@
 /*
  ==============================================================================
  
- BKKeyboard.cpp
+ BKKeymapKeyboard.cpp
  Created: 27 Mar 2017 12:06:24pm
- Author:  Michael R Mulshine (modified from JUCE BKKeyboardComponent)
+ Author:  Michael R Mulshine (modified from JUCE BKKeymapKeyboardComponent)
  
  ==============================================================================
  */
 
 #include "BKKeyboard.h"
 
-class BKKeyboardUpDownButton  : public Button
+class BKKeymapKeyboardUpDownButton  : public Button
 {
 public:
-    BKKeyboardUpDownButton (BKKeyboardComponent& comp, const int d)
+    BKKeymapKeyboardUpDownButton (BKKeymapKeyboardComponent& comp, const int d)
     : Button (String()), owner (comp), delta (d)
     {
     }
@@ -38,14 +38,14 @@ public:
     }
     
 private:
-    BKKeyboardComponent& owner;
+    BKKeymapKeyboardComponent& owner;
     const int delta;
     
-    JUCE_DECLARE_NON_COPYABLE (BKKeyboardUpDownButton)
+    JUCE_DECLARE_NON_COPYABLE (BKKeymapKeyboardUpDownButton)
 };
 
 //==============================================================================
-BKKeyboardComponent::BKKeyboardComponent (BKKeyboardState& s, Orientation o)
+BKKeymapKeyboardComponent::BKKeymapKeyboardComponent (BKKeymapKeyboardState& s, Orientation o)
 : state (s),
 blackNoteLengthRatio (0.7f),
 xOffset (0),
@@ -64,8 +64,8 @@ shouldCheckMousePos (false),
 keyMappingOctave (6),
 octaveNumForMiddleC (3)
 {
-    addChildComponent (scrollDown = new BKKeyboardUpDownButton (*this, -1));
-    addChildComponent (scrollUp   = new BKKeyboardUpDownButton (*this, 1));
+    addChildComponent (scrollDown = new BKKeymapKeyboardUpDownButton (*this, -1));
+    addChildComponent (scrollUp   = new BKKeymapKeyboardUpDownButton (*this, 1));
     
     // initialise with a default set of qwerty key-mappings..
     const char* const keymap = "awsedftgyhujkolp;";
@@ -84,13 +84,13 @@ octaveNumForMiddleC (3)
     startTimerHz (20);
 }
 
-BKKeyboardComponent::~BKKeyboardComponent()
+BKKeymapKeyboardComponent::~BKKeymapKeyboardComponent()
 {
     state.removeListener (this);
 }
 
 //==============================================================================
-void BKKeyboardComponent::setKeyWidth (const float widthInPixels)
+void BKKeymapKeyboardComponent::setKeyWidth (const float widthInPixels)
 {
     jassert (widthInPixels > 0);
     
@@ -101,7 +101,7 @@ void BKKeyboardComponent::setKeyWidth (const float widthInPixels)
     }
 }
 
-void BKKeyboardComponent::setOrientation (const Orientation newOrientation)
+void BKKeymapKeyboardComponent::setOrientation (const Orientation newOrientation)
 {
     if (orientation != newOrientation)
     {
@@ -110,7 +110,7 @@ void BKKeyboardComponent::setOrientation (const Orientation newOrientation)
     }
 }
 
-void BKKeyboardComponent::setAvailableRange (const int lowestNote,
+void BKKeymapKeyboardComponent::setAvailableRange (const int lowestNote,
                                                const int highestNote)
 {
     jassert (lowestNote >= 0 && lowestNote <= 127);
@@ -126,12 +126,12 @@ void BKKeyboardComponent::setAvailableRange (const int lowestNote,
     }
 }
 
-void BKKeyboardComponent::setLowestVisibleKey (int noteNumber)
+void BKKeymapKeyboardComponent::setLowestVisibleKey (int noteNumber)
 {
     setLowestVisibleKeyFloat ((float) noteNumber);
 }
 
-void BKKeyboardComponent::setLowestVisibleKeyFloat (float noteNumber)
+void BKKeymapKeyboardComponent::setLowestVisibleKeyFloat (float noteNumber)
 {
     noteNumber = jlimit ((float) rangeStart, (float) rangeEnd, noteNumber);
     
@@ -147,7 +147,7 @@ void BKKeyboardComponent::setLowestVisibleKeyFloat (float noteNumber)
     }
 }
 
-void BKKeyboardComponent::setScrollButtonsVisible (const bool newCanScroll)
+void BKKeymapKeyboardComponent::setScrollButtonsVisible (const bool newCanScroll)
 {
     if (canScroll != newCanScroll)
     {
@@ -156,14 +156,14 @@ void BKKeyboardComponent::setScrollButtonsVisible (const bool newCanScroll)
     }
 }
 
-void BKKeyboardComponent::colourChanged()
+void BKKeymapKeyboardComponent::colourChanged()
 {
     setOpaque (findColour (whiteNoteColourId).isOpaque());
     repaint();
 }
 
 //==============================================================================
-void BKKeyboardComponent::setMidiChannel (const int midiChannelNumber)
+void BKKeymapKeyboardComponent::setMidiChannel (const int midiChannelNumber)
 {
     jassert (midiChannelNumber > 0 && midiChannelNumber <= 16);
     
@@ -174,20 +174,20 @@ void BKKeyboardComponent::setMidiChannel (const int midiChannelNumber)
     }
 }
 
-void BKKeyboardComponent::setMidiChannelsToDisplay (const int midiChannelMask)
+void BKKeymapKeyboardComponent::setMidiChannelsToDisplay (const int midiChannelMask)
 {
     midiInChannelMask = midiChannelMask;
     shouldCheckState = true;
 }
 
-void BKKeyboardComponent::setVelocity (const float v, const bool useMousePosition)
+void BKKeymapKeyboardComponent::setVelocity (const float v, const bool useMousePosition)
 {
     velocity = jlimit (0.0f, 1.0f, v);
     useMousePositionForVelocity = useMousePosition;
 }
 
 //==============================================================================
-void BKKeyboardComponent::getKeyPosition (int midiNoteNumber, const float keyWidth_, int& x, int& w) const
+void BKKeymapKeyboardComponent::getKeyPosition (int midiNoteNumber, const float keyWidth_, int& x, int& w) const
 {
     jassert (midiNoteNumber >= 0 && midiNoteNumber < 128);
     
@@ -208,7 +208,7 @@ void BKKeyboardComponent::getKeyPosition (int midiNoteNumber, const float keyWid
     w = roundToInt (MidiMessage::isMidiNoteBlack (note) ? blackNoteWidth * keyWidth_ : keyWidth_);
 }
 
-void BKKeyboardComponent::getKeyPos (int midiNoteNumber, int& x, int& w) const
+void BKKeymapKeyboardComponent::getKeyPos (int midiNoteNumber, int& x, int& w) const
 {
     getKeyPosition (midiNoteNumber, keyWidth, x, w);
     
@@ -218,7 +218,7 @@ void BKKeyboardComponent::getKeyPos (int midiNoteNumber, int& x, int& w) const
     x -= xOffset + rx;
 }
 
-Rectangle<int> BKKeyboardComponent::getRectangleForKey (const int note) const
+Rectangle<int> BKKeymapKeyboardComponent::getRectangleForKey (const int note) const
 {
     jassert (note >= rangeStart && note <= rangeEnd);
     
@@ -251,30 +251,30 @@ Rectangle<int> BKKeyboardComponent::getRectangleForKey (const int note) const
     return Rectangle<int>();
 }
 
-int BKKeyboardComponent::getKeyStartPosition (const int midiNoteNumber) const
+int BKKeymapKeyboardComponent::getKeyStartPosition (const int midiNoteNumber) const
 {
     int x, w;
     getKeyPos (midiNoteNumber, x, w);
     return x;
 }
 
-int BKKeyboardComponent::getTotalKeyboardWidth() const noexcept
+int BKKeymapKeyboardComponent::getTotalKeyboardWidth() const noexcept
 {
     int x, w;
     getKeyPos (rangeEnd, x, w);
     return x + w;
 }
 
-int BKKeyboardComponent::getNoteAtPosition (Point<int> p)
+int BKKeymapKeyboardComponent::getNoteAtPosition (Point<int> p)
 {
     float v;
     return xyToNote (p, v);
 }
 
-const uint8 BKKeyboardComponent::whiteNotes[] = { 0, 2, 4, 5, 7, 9, 11 };
-const uint8 BKKeyboardComponent::blackNotes[] = { 1, 3, 6, 8, 10 };
+const uint8 BKKeymapKeyboardComponent::whiteNotes[] = { 0, 2, 4, 5, 7, 9, 11 };
+const uint8 BKKeymapKeyboardComponent::blackNotes[] = { 1, 3, 6, 8, 10 };
 
-int BKKeyboardComponent::xyToNote (Point<int> pos, float& mousePositionVelocity)
+int BKKeymapKeyboardComponent::xyToNote (Point<int> pos, float& mousePositionVelocity)
 {
     if (! reallyContains (pos, false))
         return -1;
@@ -294,7 +294,7 @@ int BKKeyboardComponent::xyToNote (Point<int> pos, float& mousePositionVelocity)
     return remappedXYToNote (p + Point<int> (xOffset, 0), mousePositionVelocity);
 }
 
-int BKKeyboardComponent::remappedXYToNote (Point<int> pos, float& mousePositionVelocity) const
+int BKKeymapKeyboardComponent::remappedXYToNote (Point<int> pos, float& mousePositionVelocity) const
 {
     const int blackNoteLength = getBlackNoteLength();
     
@@ -349,16 +349,17 @@ int BKKeyboardComponent::remappedXYToNote (Point<int> pos, float& mousePositionV
 }
 
 //==============================================================================
-void BKKeyboardComponent::repaintNote (const int noteNum)
+void BKKeymapKeyboardComponent::repaintNote (const int noteNum)
 {
     if (noteNum >= rangeStart && noteNum <= rangeEnd)
         repaint (getRectangleForKey (noteNum));
 }
 
-void BKKeyboardComponent::paint (Graphics& g)
+void BKKeymapKeyboardComponent::paint (Graphics& g)
 {
     g.fillAll (findColour (whiteNoteColourId));
     
+    Colour keyColour;
     const Colour lineColour (findColour (keySeparatorLineColourId));
     const Colour textColour (findColour (textLabelColourId));
     
@@ -366,7 +367,14 @@ void BKKeyboardComponent::paint (Graphics& g)
     {
         for (int white = 0; white < 7; ++white)
         {
+            
+                             
             const int noteNum = octave + whiteNotes [white];
+            
+            if (state.isInKeymap(noteNum))
+                keyColour = findColour(keyDownOverlayColourId);
+            else
+                keyColour = Colour(Colours::transparentWhite);
             
             if (noteNum >= rangeStart && noteNum <= rangeEnd)
             {
@@ -374,7 +382,7 @@ void BKKeyboardComponent::paint (Graphics& g)
                 
                 drawWhiteNote (noteNum, g, pos.getX(), pos.getY(), pos.getWidth(), pos.getHeight(),
                                state.isNoteOnForChannels (midiInChannelMask, noteNum),
-                               mouseOverNotes.contains (noteNum), lineColour, textColour);
+                               mouseOverNotes.contains (noteNum), keyColour, lineColour, textColour);
             }
         }
     }
@@ -433,25 +441,31 @@ void BKKeyboardComponent::paint (Graphics& g)
         {
             const int noteNum = octave + blackNotes [black];
             
+            if (state.isInKeymap(noteNum))
+                keyColour = findColour(keyDownOverlayColourId);
+            else
+                keyColour = blackNoteColour;
+            
             if (noteNum >= rangeStart && noteNum <= rangeEnd)
             {
                 Rectangle<int> pos = getRectangleForKey (noteNum);
                 
                 drawBlackNote (noteNum, g, pos.getX(), pos.getY(), pos.getWidth(), pos.getHeight(),
                                state.isNoteOnForChannels (midiInChannelMask, noteNum),
-                               mouseOverNotes.contains (noteNum), blackNoteColour);
+                               mouseOverNotes.contains (noteNum), keyColour);
             }
         }
     }
 }
 
-void BKKeyboardComponent::drawWhiteNote (int midiNoteNumber,
+void BKKeymapKeyboardComponent::drawWhiteNote (int midiNoteNumber,
                                            Graphics& g, int x, int y, int w, int h,
                                            bool isDown, bool isOver,
+                                           const Colour& keyColour,
                                            const Colour& lineColour,
                                            const Colour& textColour)
 {
-    Colour c (Colours::transparentWhite);
+    Colour c (keyColour);
     
     if (isDown)  c = findColour (keyDownOverlayColourId);
     if (isOver)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
@@ -502,7 +516,7 @@ void BKKeyboardComponent::drawWhiteNote (int midiNoteNumber,
     }
 }
 
-void BKKeyboardComponent::drawBlackNote (int /*midiNoteNumber*/,
+void BKKeymapKeyboardComponent::drawBlackNote (int /*midiNoteNumber*/,
                                            Graphics& g, int x, int y, int w, int h,
                                            bool isDown, bool isOver,
                                            const Colour& noteFillColour)
@@ -535,13 +549,13 @@ void BKKeyboardComponent::drawBlackNote (int /*midiNoteNumber*/,
     }
 }
 
-void BKKeyboardComponent::setOctaveForMiddleC (const int octaveNum)
+void BKKeymapKeyboardComponent::setOctaveForMiddleC (const int octaveNum)
 {
     octaveNumForMiddleC = octaveNum;
     repaint();
 }
 
-String BKKeyboardComponent::getWhiteNoteText (const int midiNoteNumber)
+String BKKeymapKeyboardComponent::getWhiteNoteText (const int midiNoteNumber)
 {
     if (midiNoteNumber % 12 == 0)
         return MidiMessage::getMidiNoteName (midiNoteNumber, true, true, octaveNumForMiddleC);
@@ -549,7 +563,7 @@ String BKKeyboardComponent::getWhiteNoteText (const int midiNoteNumber)
     return String();
 }
 
-void BKKeyboardComponent::drawUpDownButton (Graphics& g, int w, int h,
+void BKKeymapKeyboardComponent::drawUpDownButton (Graphics& g, int w, int h,
                                               const bool mouseOver,
                                               const bool buttonDown,
                                               const bool movesOctavesUp)
@@ -576,7 +590,7 @@ void BKKeyboardComponent::drawUpDownButton (Graphics& g, int w, int h,
     g.fillPath (path, path.getTransformToScaleToFit (1.0f, 1.0f, w - 2.0f, h - 2.0f, true));
 }
 
-void BKKeyboardComponent::setBlackNoteLengthProportion (float ratio) noexcept
+void BKKeymapKeyboardComponent::setBlackNoteLengthProportion (float ratio) noexcept
 {
     jassert (ratio >= 0.0f && ratio <= 1.0f);
     if (blackNoteLengthRatio != ratio)
@@ -586,14 +600,14 @@ void BKKeyboardComponent::setBlackNoteLengthProportion (float ratio) noexcept
     }
 }
 
-int BKKeyboardComponent::getBlackNoteLength() const noexcept
+int BKKeymapKeyboardComponent::getBlackNoteLength() const noexcept
 {
     const int whiteNoteLength = orientation == horizontalKeyboard ? getHeight() : getWidth();
     
     return roundToInt (whiteNoteLength * blackNoteLengthRatio);
 }
 
-void BKKeyboardComponent::resized()
+void BKKeymapKeyboardComponent::resized()
 {
     int w = getWidth();
     int h = getHeight();
@@ -675,19 +689,25 @@ void BKKeyboardComponent::resized()
     }
 }
 
-//==============================================================================
-void BKKeyboardComponent::handleNoteOn (BKKeyboardState*, int /*midiChannel*/, int /*midiNoteNumber*/, float /*velocity*/)
+void BKKeymapKeyboardComponent::handleKeymapNoteOn (BKKeymapKeyboardState*, int /*midiNoteNumber*/)
 {
     shouldCheckState = true; // (probably being called from the audio thread, so avoid blocking in here)
 }
 
-void BKKeyboardComponent::handleNoteOff (BKKeyboardState*, int /*midiChannel*/, int /*midiNoteNumber*/, float /*velocity*/)
+void BKKeymapKeyboardComponent::handleKeymapNoteOff (BKKeymapKeyboardState*, int /*midiNoteNumber*/)
 {
     shouldCheckState = true; // (probably being called from the audio thread, so avoid blocking in here)
 }
 
+void BKKeymapKeyboardComponent::handleKeymapNoteToggled (BKKeymapKeyboardState*, int /*midiNoteNumber*/)
+{
+    shouldCheckState = true; // (probably being called from the audio thread, so avoid blocking in here)
+}
+
+
+
 //==============================================================================
-void BKKeyboardComponent::resetAnyKeysInUse()
+void BKKeymapKeyboardComponent::resetAnyKeysInUse()
 {
     if (! keysPressed.isZero())
     {
@@ -712,12 +732,12 @@ void BKKeyboardComponent::resetAnyKeysInUse()
     }
 }
 
-void BKKeyboardComponent::updateNoteUnderMouse (const MouseEvent& e, bool isDown)
+void BKKeymapKeyboardComponent::updateNoteUnderMouse (const MouseEvent& e, bool isDown)
 {
     updateNoteUnderMouse (e.getEventRelativeTo (this).getPosition(), isDown, e.source.getIndex());
 }
 
-void BKKeyboardComponent::updateNoteUnderMouse (Point<int> pos, bool isDown, int fingerNum)
+void BKKeymapKeyboardComponent::updateNoteUnderMouse (Point<int> pos, bool isDown, int fingerNum)
 {
     float mousePositionVelocity = 0.0f;
     const int newNote = xyToNote (pos, mousePositionVelocity);
@@ -760,13 +780,13 @@ void BKKeyboardComponent::updateNoteUnderMouse (Point<int> pos, bool isDown, int
     }
 }
 
-void BKKeyboardComponent::mouseMove (const MouseEvent& e)
+void BKKeymapKeyboardComponent::mouseMove (const MouseEvent& e)
 {
     updateNoteUnderMouse (e, false);
     shouldCheckMousePos = false;
 }
 
-void BKKeyboardComponent::mouseDrag (const MouseEvent& e)
+void BKKeymapKeyboardComponent::mouseDrag (const MouseEvent& e)
 {
     float mousePositionVelocity;
     const int newNote = xyToNote (e.getPosition(), mousePositionVelocity);
@@ -777,11 +797,37 @@ void BKKeyboardComponent::mouseDrag (const MouseEvent& e)
     updateNoteUnderMouse (e, true);
 }
 
-bool BKKeyboardComponent::mouseDownOnKey    (int, const MouseEvent&)  { return true; }
-void BKKeyboardComponent::mouseDraggedToKey (int, const MouseEvent&)  {}
-void BKKeyboardComponent::mouseUpOnKey      (int, const MouseEvent&)  {}
+void BKKeymapKeyboardComponent::setKeysInKeymap(Array<int> keys)
+{
+    Array<bool> keymap;
 
-void BKKeyboardComponent::mouseDown (const MouseEvent& e)
+    for (int i = 0; i < 128; i++) keymap.add(false);
+    
+    for (auto key : keys) keymap.set(key, true);
+    
+    state.setKeymap(keymap);
+    
+    repaint();
+}
+
+// FLESH THESE OUT TO ALLOW FOR DRAGGING
+bool BKKeymapKeyboardComponent::mouseDownOnKey    (int, const MouseEvent&)
+{
+    return true;
+}
+
+void BKKeymapKeyboardComponent::mouseDraggedToKey (int, const MouseEvent&)
+{
+
+}
+
+void BKKeymapKeyboardComponent::mouseUpOnKey      (int midiNoteNumber, const MouseEvent&)
+{
+    state.toggle(midiNoteNumber);
+    repaint();
+}
+
+void BKKeymapKeyboardComponent::mouseDown (const MouseEvent& e)
 {
     float mousePositionVelocity;
     const int newNote = xyToNote (e.getPosition(), mousePositionVelocity);
@@ -793,7 +839,7 @@ void BKKeyboardComponent::mouseDown (const MouseEvent& e)
     }
 }
 
-void BKKeyboardComponent::mouseUp (const MouseEvent& e)
+void BKKeymapKeyboardComponent::mouseUp (const MouseEvent& e)
 {
     updateNoteUnderMouse (e, false);
     shouldCheckMousePos = false;
@@ -801,20 +847,22 @@ void BKKeyboardComponent::mouseUp (const MouseEvent& e)
     float mousePositionVelocity;
     const int note = xyToNote (e.getPosition(), mousePositionVelocity);
     if (note >= 0)
+    {
         mouseUpOnKey (note, e);
+    }
 }
 
-void BKKeyboardComponent::mouseEnter (const MouseEvent& e)
+void BKKeymapKeyboardComponent::mouseEnter (const MouseEvent& e)
 {
     updateNoteUnderMouse (e, false);
 }
 
-void BKKeyboardComponent::mouseExit (const MouseEvent& e)
+void BKKeymapKeyboardComponent::mouseExit (const MouseEvent& e)
 {
     updateNoteUnderMouse (e, false);
 }
 
-void BKKeyboardComponent::mouseWheelMove (const MouseEvent&, const MouseWheelDetails& wheel)
+void BKKeymapKeyboardComponent::mouseWheelMove (const MouseEvent&, const MouseWheelDetails& wheel)
 {
     const float amount = (orientation == horizontalKeyboard && wheel.deltaX != 0)
     ? wheel.deltaX : (orientation == verticalKeyboardFacingLeft ? wheel.deltaY
@@ -823,7 +871,7 @@ void BKKeyboardComponent::mouseWheelMove (const MouseEvent&, const MouseWheelDet
     setLowestVisibleKeyFloat (firstKey - amount * keyWidth);
 }
 
-void BKKeyboardComponent::timerCallback()
+void BKKeymapKeyboardComponent::timerCallback()
 {
     if (shouldCheckState)
     {
@@ -850,14 +898,14 @@ void BKKeyboardComponent::timerCallback()
 }
 
 //==============================================================================
-void BKKeyboardComponent::clearKeyMappings()
+void BKKeymapKeyboardComponent::clearKeyMappings()
 {
     resetAnyKeysInUse();
     keyPressNotes.clear();
     keyPresses.clear();
 }
 
-void BKKeyboardComponent::setKeyPressForNote (const KeyPress& key, int midiNoteOffsetFromC)
+void BKKeymapKeyboardComponent::setKeyPressForNote (const KeyPress& key, int midiNoteOffsetFromC)
 {
     removeKeyPressForNote (midiNoteOffsetFromC);
     
@@ -865,7 +913,7 @@ void BKKeyboardComponent::setKeyPressForNote (const KeyPress& key, int midiNoteO
     keyPresses.add (key);
 }
 
-void BKKeyboardComponent::removeKeyPressForNote (const int midiNoteOffsetFromC)
+void BKKeymapKeyboardComponent::removeKeyPressForNote (const int midiNoteOffsetFromC)
 {
     for (int i = keyPressNotes.size(); --i >= 0;)
     {
@@ -877,14 +925,14 @@ void BKKeyboardComponent::removeKeyPressForNote (const int midiNoteOffsetFromC)
     }
 }
 
-void BKKeyboardComponent::setKeyPressBaseOctave (const int newOctaveNumber)
+void BKKeymapKeyboardComponent::setKeyPressBaseOctave (const int newOctaveNumber)
 {
     jassert (newOctaveNumber >= 0 && newOctaveNumber <= 10);
     
     keyMappingOctave = newOctaveNumber;
 }
 
-bool BKKeyboardComponent::keyStateChanged (const bool /*isKeyDown*/)
+bool BKKeymapKeyboardComponent::keyStateChanged (const bool /*isKeyDown*/)
 {
     bool keyPressUsed = false;
     
@@ -915,12 +963,12 @@ bool BKKeyboardComponent::keyStateChanged (const bool /*isKeyDown*/)
     return keyPressUsed;
 }
 
-bool BKKeyboardComponent::keyPressed (const KeyPress& key)
+bool BKKeymapKeyboardComponent::keyPressed (const KeyPress& key)
 {
     return keyPresses.contains (key);
 }
 
-void BKKeyboardComponent::focusLost (FocusChangeType)
+void BKKeymapKeyboardComponent::focusLost (FocusChangeType)
 {
     resetAnyKeysInUse();
 }

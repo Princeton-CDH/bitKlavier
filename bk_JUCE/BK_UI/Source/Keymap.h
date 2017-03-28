@@ -93,7 +93,6 @@ public:
         {
             keymap.set(note, true);
         }
-        DBG("set keymap: " + intArrayToString(km));
     }
     
     // Returns true if added. Returns false if not added (because it's already there).

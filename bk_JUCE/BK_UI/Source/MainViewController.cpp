@@ -189,13 +189,13 @@ void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
     }
         
 }
-
+#define SOME_PADDING 100
 void MainViewController::resized()
 {
     galvc.setBounds(0, 0, gVCWidth+2*gXSpacing, getHeight());
     
     // Place buttons.
-    float buttonWidth = ((getRight()-galvc.getRight() - 7 * gXSpacing)/7.0f);
+    float buttonWidth = ((getRight()-galvc.getRight() - 7 * gXSpacing - SOME_PADDING)/7.0f);
     float buttonHeight = 30;
     buttons[0]->setBounds(galvc.getRight()+gXSpacing, gYSpacing, buttonWidth, buttonHeight);
     for (int i = 1; i < cDisplayNames.size(); i++)
@@ -215,7 +215,7 @@ void MainViewController::resized()
     
     kvc.setBounds(galvc.getRight() + gXSpacing,
                   buttons[0]->getBottom() + gYSpacing,
-                  getRight() - galvc.getRight() - 2*gXSpacing,
+                  getRight() - galvc.getRight() - 2*gXSpacing - SOME_PADDING,
                   getHeight() - 200);
     
     gvc.setBounds(kvc.getBounds());

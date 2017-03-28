@@ -18,10 +18,14 @@
 #include "BKListener.h"
 #include "BKComponent.h"
 
+
+#include "BKKeyboard.h"
+#include "BKKeyboardState.h"
+
 //==============================================================================
 /*
 */
-class KeymapViewController    : public BKComponent, public BKListener
+class KeymapViewController    : public BKComponent, public BKListener, public BKKeymapKeyboardStateListener
 {
 public:
     KeymapViewController(BKAudioProcessor&);
@@ -39,35 +43,17 @@ private:
     OwnedArray<BKTextField> keymapTF;
     
     
-#if 0
-    BKKeyboardState keyboardState;
+
+    BKKeymapKeyboardState keyboardState;
     
     Component *keyboardComponent;
     
-    /** Called when one of the BKKeyboardState's keys is pressed.
-     
-     This will be called synchronously when the state is either processing a
-     buffer in its BKKeyboardState::processNextMidiBuffer() method, or
-     when a note is being played with its BKKeyboardState::noteOn() method.
-     
-     Note that this callback could happen from an audio callback thread, so be
-     careful not to block, and avoid any UI activity in the callback.
-     */
-    void handleNoteOn (BKKeyboardState* source,
-                               int midiChannel, int midiNoteNumber, float velocity) override;
+    void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     
-    /** Called when one of the BKKeyboardState's keys is released.
-     
-     This will be called synchronously when the state is either processing a
-     buffer in its BKKeyboardState::processNextMidiBuffer() method, or
-     when a note is being played with its BKKeyboardState::noteOff() method.
-     
-     Note that this callback could happen from an audio callback thread, so be
-     careful not to block, and avoid any UI activity in the callback.
-     */
-    void handleNoteOff (BKKeyboardState* source,
-                                int midiChannel, int midiNoteNumber, float velocity) override;
-#endif
+    void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override;
+    
+    void handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber) override;
+    
     
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;

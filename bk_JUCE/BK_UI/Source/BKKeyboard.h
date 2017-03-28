@@ -1,16 +1,16 @@
 /*
  ==============================================================================
  
- BKKeyboard.cpp
+ BKKeymapKeyboard.cpp
  Created: 27 Mar 2017 12:06:24pm
- Author:  Michael R Mulshine (modified from JUCE BKKeyboardComponent)
+ Author:  Michael R Mulshine (modified from JUCE BKKeymapKeyboardComponent)
  
  ==============================================================================
  */
 
 
-#ifndef JUCE_BKKeyboardComponent_H_INCLUDED
-#define JUCE_BKKeyboardComponent_H_INCLUDED
+#ifndef JUCE_BKKeymapKeyboardComponent_H_INCLUDED
+#define JUCE_BKKeymapKeyboardComponent_H_INCLUDED
 
 #include "BKUtilities.h"
 #include "BKKeyboardState.h"
@@ -19,8 +19,8 @@
     A component that displays a piano keyboard, whose notes can be clicked on.
 
     This component will mimic a physical midi keyboard, showing the current state of
-    a BKKeyboardState object. When the on-screen keys are clicked on, it will play these
-    notes by calling the noteOn() and noteOff() methods of its BKKeyboardState object.
+    a BKKeymapKeyboardState object. When the on-screen keys are clicked on, it will play these
+    notes by calling the noteOn() and noteOff() methods of its BKKeymapKeyboardState object.
 
     Another feature is that the computer keyboard can also be used to play notes. By
     default it maps the top two rows of a standard qwerty keyboard to the notes, but
@@ -30,10 +30,10 @@
     The component is also a ChangeBroadcaster, so if you want to be informed when the
     keyboard is scrolled, you can register a ChangeListener for callbacks.
 
-    @see BKKeyboardState
+    @see BKKeymapKeyboardState
 */
-class JUCE_API  BKKeyboardComponent  : public Component,
-                                         public BKKeyboardStateListener,
+class JUCE_API  BKKeymapKeyboardComponent  : public Component,
+                                         public BKKeymapKeyboardStateListener,
                                          public ChangeBroadcaster,
                                          private Timer
 {
@@ -49,16 +49,16 @@ public:
         verticalKeyboardFacingRight,
     };
 
-    /** Creates a BKKeyboardComponent.
+    /** Creates a BKKeymapKeyboardComponent.
 
         @param state        the midi keyboard model that this component will represent
         @param orientation  whether the keyboard is horizonal or vertical
     */
-    BKKeyboardComponent (BKKeyboardState& state,
+    BKKeymapKeyboardComponent (BKKeymapKeyboardState& state,
                            Orientation orientation);
 
     /** Destructor. */
-    ~BKKeyboardComponent();
+    ~BKKeymapKeyboardComponent();
 
     //==============================================================================
     /** Changes the velocity used in midi note-on messages that are triggered by clicking
@@ -74,7 +74,7 @@ public:
         on the component.
 
         The channel must be between 1 and 16 (inclusive). This is the channel that will be
-        passed on to the BKKeyboardState::noteOn() method when the user clicks the component.
+        passed on to the BKKeymapKeyboardState::noteOn() method when the user clicks the component.
 
         Although this is the channel used for outgoing events, the component can display
         incoming events from more than one channel - see setMidiChannelsToDisplay()
@@ -93,7 +93,7 @@ public:
 
         The mask is a set of bits, where bit 0 = midi channel 1, bit 1 = midi channel 2, etc.
 
-        If the BKKeyboardState has a key down for any of the channels whose bits are set
+        If the BKKeymapKeyboardState has a key down for any of the channels whose bits are set
         in this mask, the on-screen keys will also go down.
 
         By default, this mask is set to 0xffff (all channels displayed).
@@ -168,6 +168,8 @@ public:
         if there are too many notes to fit them all in the component at once.
     */
     void setScrollButtonsVisible (bool canScroll);
+    
+    void setKeysInKeymap(Array<int> keys);
 
     //==============================================================================
     /** A set of colour IDs to use to change the colour of various aspects of the keyboard.
@@ -282,11 +284,13 @@ public:
     /** @internal */
     void focusLost (FocusChangeType) override;
     /** @internal */
-    void handleNoteOn (BKKeyboardState*, int midiChannel, int midiNoteNumber, float velocity) override;
-    /** @internal */
-    void handleNoteOff (BKKeyboardState*, int midiChannel, int midiNoteNumber, float velocity) override;
-    /** @internal */
     void colourChanged() override;
+    
+    void handleKeymapNoteOn (BKKeymapKeyboardState*, int midiNoteNumber) override;
+    
+    void handleKeymapNoteOff (BKKeymapKeyboardState*, int midiNoteNumber) override;
+    
+    void handleKeymapNoteToggled (BKKeymapKeyboardState*, int midiNoteNumber) override;
 
 protected:
     //==============================================================================
@@ -301,6 +305,7 @@ protected:
                                 Graphics& g,
                                 int x, int y, int w, int h,
                                 bool isDown, bool isOver,
+                                const Colour& keyColour,
                                 const Colour& lineColour,
                                 const Colour& textColour);
 
@@ -369,9 +374,9 @@ protected:
 
 private:
     //==============================================================================
-    friend class BKKeyboardUpDownButton;
+    friend class BKKeymapKeyboardUpDownButton;
 
-    BKKeyboardState& state;
+    BKKeymapKeyboardState& state;
     float blackNoteLengthRatio;
     int xOffset;
     float keyWidth;
@@ -405,8 +410,8 @@ private:
     void repaintNote (int midiNoteNumber);
     void setLowestVisibleKeyFloat (float noteNumber);
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKKeyboardComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKKeymapKeyboardComponent)
 };
 
 
-#endif   // JUCE_BKKeyboardComponent_H_INCLUDED
+#endif   // JUCE_BKKeymapKeyboardComponent_H_INCLUDED

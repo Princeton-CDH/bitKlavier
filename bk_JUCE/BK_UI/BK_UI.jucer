@@ -33,11 +33,6 @@
               file="Source/BKReferenceCountedBuffer.h"/>
       </GROUP>
       <GROUP id="{E01F59AF-FEAD-7AEA-32C2-F665B05A05F1}" name="Model">
-        <GROUP id="{A4AD4139-F8E0-AB44-88B6-84FFC2F2D4D5}" name="Editor">
-          <FILE id="ubAlA4" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
-          <FILE id="dgzM9u" name="PluginEditor.cpp" compile="1" resource="0"
-                file="Source/PluginEditor.cpp"/>
-        </GROUP>
         <GROUP id="{A7EA3278-0185-F32B-52C4-0F88EA1C92D3}" name="Processor">
           <FILE id="oVHIQ3" name="PluginProcessor.h" compile="0" resource="0"
                 file="Source/PluginProcessor.h"/>
@@ -106,6 +101,11 @@
         </GROUP>
       </GROUP>
       <GROUP id="{07677963-38EF-2F51-36FA-17646727446F}" name="Controller">
+        <GROUP id="{A4AD4139-F8E0-AB44-88B6-84FFC2F2D4D5}" name="Editor">
+          <FILE id="ubAlA4" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+          <FILE id="dgzM9u" name="PluginEditor.cpp" compile="1" resource="0"
+                file="Source/PluginEditor.cpp"/>
+        </GROUP>
         <FILE id="Ivngl4" name="MainViewController.cpp" compile="1" resource="0"
               file="Source/MainViewController.cpp"/>
         <FILE id="EyR2nF" name="MainViewController.h" compile="0" resource="0"

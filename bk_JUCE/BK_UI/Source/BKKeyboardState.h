@@ -1,58 +1,40 @@
 /*
   ==============================================================================
 
-    BKKeyboardState.h
+    BKKeymapKeyboardState.h
     Created: 27 Mar 2017 12:06:24pm
     Author:  Michael R Mulshine (modified from JUCE source)
 
   ==============================================================================
 */
 
-#ifndef JUCE_BKKeyboardState_H_INCLUDED
-#define JUCE_BKKeyboardState_H_INCLUDED
+#ifndef JUCE_BKKeymapKeyboardState_H_INCLUDED
+#define JUCE_BKKeymapKeyboardState_H_INCLUDED
 
 
 #include "BKUtilities.h"
 
-class BKKeyboardState;
+class BKKeymapKeyboardState;
 
 //==============================================================================
 /**
- Receives events from a BKKeyboardState object.
+ Receives events from a BKKeymapKeyboardState object.
  
- @see BKKeyboardState
+ @see BKKeymapKeyboardState
  */
-class JUCE_API  BKKeyboardStateListener
+class JUCE_API  BKKeymapKeyboardStateListener
 {
 public:
     //==============================================================================
-    BKKeyboardStateListener() noexcept        {}
-    virtual ~BKKeyboardStateListener()        {}
+    BKKeymapKeyboardStateListener() noexcept        {}
+    virtual ~BKKeymapKeyboardStateListener()        {}
     
-    //==============================================================================
-    /** Called when one of the BKKeyboardState's keys is pressed.
-     
-     This will be called synchronously when the state is either processing a
-     buffer in its BKKeyboardState::processNextMidiBuffer() method, or
-     when a note is being played with its BKKeyboardState::noteOn() method.
-     
-     Note that this callback could happen from an audio callback thread, so be
-     careful not to block, and avoid any UI activity in the callback.
-     */
-    virtual void handleNoteOn (BKKeyboardState* source,
-                               int midiChannel, int midiNoteNumber, float velocity) = 0;
+    virtual void handleKeymapNoteOn(BKKeymapKeyboardState* source, int midiNoteNumber) = 0;
     
-    /** Called when one of the BKKeyboardState's keys is released.
-     
-     This will be called synchronously when the state is either processing a
-     buffer in its BKKeyboardState::processNextMidiBuffer() method, or
-     when a note is being played with its BKKeyboardState::noteOff() method.
-     
-     Note that this callback could happen from an audio callback thread, so be
-     careful not to block, and avoid any UI activity in the callback.
-     */
-    virtual void handleNoteOff (BKKeyboardState* source,
-                                int midiChannel, int midiNoteNumber, float velocity) = 0;
+    virtual void handleKeymapNoteOff(BKKeymapKeyboardState* source, int midiNoteNumber) = 0;
+    
+    virtual void handleKeymapNoteToggled(BKKeymapKeyboardState* source, int midiNoteNumber) = 0;
+    
 };
 
 
@@ -69,12 +51,12 @@ public:
  methods, and midi messages for these events will be merged into the
  midi stream that gets processed by processNextMidiBuffer().
  */
-class JUCE_API  BKKeyboardState
+class JUCE_API  BKKeymapKeyboardState
 {
 public:
     //==============================================================================
-    BKKeyboardState();
-    ~BKKeyboardState();
+    BKKeymapKeyboardState();
+    ~BKKeymapKeyboardState();
     
     //==============================================================================
     /** Resets the state of the object.
@@ -125,6 +107,16 @@ public:
      */
     void noteOff (int midiChannel, int midiNoteNumber, float velocity);
     
+    void addToKeymap(int midiNoteNumber);
+    
+    void removeFromKeymap(int midiNoteNumber);
+    
+    void toggle(int midiNoteNumber);
+    
+    bool isInKeymap(int midiNoteNumber);
+    
+    void setKeymap(Array<bool> midiNoteNumber);
+    
     /** This will turn off any currently-down notes for the given midi channel.
      
      If you pass 0 for the midi channel, it will in fact turn off all notes on all channels.
@@ -169,25 +161,26 @@ public:
     /** Registers a listener for callbacks when keys go up or down.
      @see removeListener
      */
-    void addListener (BKKeyboardStateListener* listener);
+    void addListener (BKKeymapKeyboardStateListener* listener);
     
     /** Deregisters a listener.
      @see addListener
      */
-    void removeListener (BKKeyboardStateListener* listener);
+    void removeListener (BKKeymapKeyboardStateListener* listener);
     
 private:
     //==============================================================================
     CriticalSection lock;
     uint16 noteStates [128];
+    bool inKeymap[128];
     MidiBuffer eventsToAdd;
-    Array <BKKeyboardStateListener*> listeners;
+    Array <BKKeymapKeyboardStateListener*> listeners;
     
     void noteOnInternal (int midiChannel, int midiNoteNumber, float velocity);
     void noteOffInternal (int midiChannel, int midiNoteNumber, float velocity);
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKKeyboardState)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKKeymapKeyboardState)
 };
 
 
-#endif   // JUCE_BKKeyboardState_H_INCLUDED
+#endif   // JUCE_BKKeymapKeyboardState_H_INCLUDED

@@ -149,7 +149,7 @@ public:
     
     ~TempoProcessor();
     
-    void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr; DBG("setting tempo sample rate " + String(sampleRate));}
+    void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr; /*DBG("setting tempo sample rate " + String(sampleRate));*/}
     
     void processBlock(int numSamples, int channel);
     void keyPressed(int noteNumber, float velocity);
