@@ -111,6 +111,7 @@ void KeymapViewController::resized()
     
     keyboardComponent->setBounds(gXSpacing, getBottom()-1.5*keyboardHeight, getWidth()-2*gXSpacing, keyboardHeight);
 }
+
 void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
 {
     String name = box->getName();

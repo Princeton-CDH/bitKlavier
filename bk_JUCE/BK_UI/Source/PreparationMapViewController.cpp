@@ -14,39 +14,65 @@
 //==============================================================================
 PreparationMapViewController::PreparationMapViewController(BKAudioProcessor& p, int Id):
 Id(Id),
-processor(p),
-prepMapL(OwnedArray<BKLabel>()),
-prepMapTF(OwnedArray<BKTextField>())
+processor(p)
 {
-    // Labels
-    prepMapL = OwnedArray<BKLabel>();
-    prepMapL.ensureStorageAllocated(cPrepMapParameterTypes.size());
+    // Row 1: Keymaps
+    // First row
+    addAndMakeVisible(keymapSelectL);
+    keymapSelectL.setName("Keymap");
+    keymapSelectL.setText("Keymap", NotificationType::dontSendNotification);
     
-    for (int i = 0; i < cPrepMapParameterTypes.size(); i++)
-    {
-        prepMapL.set(i, new BKLabel());
-        addAndMakeVisible(prepMapL[i]);
-        prepMapL[i]->setName(cPrepMapParameterTypes[i]);
-        prepMapL[i]->setText(cPrepMapParameterTypes[i], NotificationType::dontSendNotification);
-    }
+    addAndMakeVisible(keymapSelectCB);
+    keymapSelectCB.setName("Keymap");
+    keymapSelectCB.addSeparator();
+    keymapSelectCB.addListener(this);
+    keymapSelectCB.setSelectedItemIndex(0);
     
-    // Text Fields
-    prepMapTF = OwnedArray<BKTextField>();
-    prepMapTF.ensureStorageAllocated(cPrepMapParameterTypes.size());
+    // Row 2: Preparations
+    addAndMakeVisible(prepMapL);
+    prepMapL.setName("Preparations");
+    prepMapL.setText("Preparations", NotificationType::dontSendNotification);
     
-    for (int i = 0; i < cPrepMapParameterTypes.size(); i++)
-    {
-        prepMapTF.set(i, new BKTextField());
-        addAndMakeVisible(prepMapTF[i]);
-        prepMapTF[i]->addListener(this);
-        prepMapTF[i]->setName(cPrepMapParameterTypes[i]);
-    }
+    addAndMakeVisible(prepMapTF);
+    prepMapTF.addListener(this);
+    prepMapTF.setName("Preparations");
     
+    fillKeymapSelectCB();
     updateFields();
 }
 
 PreparationMapViewController::~PreparationMapViewController()
 {
+}
+
+void PreparationMapViewController::fillKeymapSelectCB(void)
+{
+    keymapSelectCB.clear(dontSendNotification);
+    
+    Keymap::PtrArr keymaps = processor.gallery->getKeymaps();
+    
+    for (int i = 0; i < keymaps.size(); i++)
+    {
+        String name = keymaps[i]->getName();
+        if (name != String::empty)  keymapSelectCB.addItem(name, i+1);
+        else                        keymapSelectCB.addItem(String(i+1), i+1);
+    }
+    
+    keymapId = processor.currentPiano->prepMaps[Id]->getKeymap()->getId();
+    keymapSelectCB.setSelectedItemIndex(keymapId, NotificationType::dontSendNotification);
+    
+}
+
+void PreparationMapViewController::bkComboBoxDidChange        (ComboBox* box)
+{
+    String name = box->getName();
+    
+    if (name == "Keymap")
+    {
+        keymapId = box->getSelectedItemIndex();
+        processor.currentPiano->prepMaps[Id]->setKeymap(processor.gallery->getKeymap(keymapId));
+        updateFields();
+    }
 }
 
 void PreparationMapViewController::paint (Graphics& g)
@@ -59,28 +85,12 @@ void PreparationMapViewController::resized()
 {
    
     
-    // Labels
-    int i = 0;
-    int lX = 0;
-    int lY = gComponentLabelHeight + gYSpacing;
+    // Row1
+    keymapSelectL.setTopLeftPosition(0, gYSpacing);
+    keymapSelectCB.setTopLeftPosition(keymapSelectL.getRight()+gXSpacing, keymapSelectL.getY());
     
-    for (int n = 0; n < cPrepMapParameterTypes.size(); n++)
-    {
-        prepMapL[n]->setTopLeftPosition(lX, gYSpacing + lY * n);
-    }
-    
-    // Text fields
-    i = 0;
-    int tfX = gComponentLabelWidth + gXSpacing;
-    int tfY = gComponentTextFieldHeight + gYSpacing;
-    
-    for (int n = 0; n < cPrepMapParameterTypes.size(); n++)
-    {
-        prepMapTF[n]->setTopLeftPosition(tfX,
-                                         gYSpacing + tfY * n);
-    }
-    
-    
+    prepMapL.setTopLeftPosition(0, keymapSelectL.getBottom() + gYSpacing);
+    prepMapTF.setTopLeftPosition(prepMapL.getRight()+gXSpacing, prepMapL.getY());
     
 }
 
@@ -249,17 +259,7 @@ void PreparationMapViewController::bkTextFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
 
-    if (name == cPrepMapParameterTypes[PrepMapKeymapId])
-    {
-        
-        if (i < processor.gallery->getNumKeymaps())
-            processor.currentPiano->prepMaps[Id]->setKeymap(processor.gallery->getKeymap(i));
-        else
-            tf.setText("0", false);
-        
-        sendActionMessage("keymap/update");
-    }
-    else if (name == cPrepMapParameterTypes[PrepMapPreparationId])
+    if (name == "Preparations")
     {
         tf.setText(processPreparationString(text));
     }
@@ -274,8 +274,7 @@ void PreparationMapViewController::bkTextFieldDidChange(TextEditor& tf)
 void PreparationMapViewController::updateFields(void)
 {
     // Set text.
-    prepMapTF[PrepMapKeymapId]        ->setText( String(processor.currentPiano->prepMaps[Id]->getKeymapId()));
-    prepMapTF[PrepMapPreparationId]   ->setText( processor.currentPiano->prepMaps[Id]->getPreparationIds());
+    prepMapTF.setText( processor.currentPiano->prepMaps[Id]->getPreparationIds());
     
 }
 

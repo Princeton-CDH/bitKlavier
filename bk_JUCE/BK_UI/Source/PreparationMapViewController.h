@@ -41,18 +41,22 @@ public:
 
     void paint (Graphics&) override;
     void resized() override;
+    
+    void reset(void);
 
 private:
     
     int Id;
+    int keymapId;
     
     BKAudioProcessor& processor;
     
-    OwnedArray<BKComboBox> prepMapCB;
-    
     // BKLabels
-    OwnedArray<BKLabel> prepMapL;
-    OwnedArray<BKTextField> prepMapTF;
+    BKLabel             keymapSelectL;
+    BKComboBox          keymapSelectCB;
+    
+    BKLabel             prepMapL;
+    BKTextField         prepMapTF;
     
     String processPreparationString(String s);
     
@@ -60,14 +64,14 @@ private:
     
     void addPreparation(BKPreparationType type, int which);
     
-    
     void bkTextFieldDidChange       (TextEditor&)           override;
     
-    void bkComboBoxDidChange        (ComboBox* box)         override { };
+    void bkComboBoxDidChange        (ComboBox* box)         override;
     void bkButtonClicked            (Button* b)             override { };
     void bkMessageReceived          (const String& message) override { };
     
     void updateFields(void);
+    void fillKeymapSelectCB(void);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreparationMapViewController)
 };
