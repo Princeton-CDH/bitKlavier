@@ -11,6 +11,16 @@
 #include "BKKeyboardState.h"
 
 
+
+BKKeymapKeyboardState::BKKeymapKeyboardState(Keymap::Ptr keymap)
+{
+    zerostruct (noteStates);
+    
+    for (int i = 0; i < 128; i++)   inKeymap[i]=false;
+    
+    for (auto key : keymap->keys()) inKeymap[key] = true;
+}
+
 BKKeymapKeyboardState::BKKeymapKeyboardState()
 {
     zerostruct (noteStates);
@@ -35,7 +45,6 @@ void BKKeymapKeyboardState::setKeymap(Array<bool> keymap)
     for (int i = 0; i < 128; i++)
     {
         inKeymap[i] = keymap[i];
-        
     }
 }
 

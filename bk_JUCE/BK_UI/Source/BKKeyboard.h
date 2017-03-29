@@ -375,6 +375,10 @@ protected:
 private:
     //==============================================================================
     friend class BKKeymapKeyboardUpDownButton;
+    
+    int firstKeyDown, lastKeyDown;
+    int lastKeySelected;
+    Array<int> keysSelected;
 
     BKKeymapKeyboardState& state;
     float blackNoteLengthRatio;

@@ -14,6 +14,8 @@
 
 #include "BKUtilities.h"
 
+#include "Keymap.h"
+
 class BKKeymapKeyboardState;
 
 //==============================================================================
@@ -56,6 +58,7 @@ class JUCE_API  BKKeymapKeyboardState
 public:
     //==============================================================================
     BKKeymapKeyboardState();
+    BKKeymapKeyboardState(Keymap::Ptr);
     ~BKKeymapKeyboardState();
     
     //==============================================================================

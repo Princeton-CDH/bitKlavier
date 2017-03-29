@@ -64,6 +64,8 @@ shouldCheckMousePos (false),
 keyMappingOctave (6),
 octaveNumForMiddleC (3)
 {
+    firstKeyDown = -1; lastKeyDown = -1; lastKeySelected = -1;
+    
     addChildComponent (scrollDown = new BKKeymapKeyboardUpDownButton (*this, -1));
     addChildComponent (scrollUp   = new BKKeymapKeyboardUpDownButton (*this, 1));
     
@@ -81,7 +83,7 @@ octaveNumForMiddleC (3)
     
     state.addListener (this);
     
-    startTimerHz (20);
+    startTimerHz (50);
 }
 
 BKKeymapKeyboardComponent::~BKKeymapKeyboardComponent()
@@ -811,20 +813,41 @@ void BKKeymapKeyboardComponent::setKeysInKeymap(Array<int> keys)
 }
 
 // FLESH THESE OUT TO ALLOW FOR DRAGGING
-bool BKKeymapKeyboardComponent::mouseDownOnKey    (int, const MouseEvent&)
+bool BKKeymapKeyboardComponent::mouseDownOnKey    (int midiNoteNumber, const MouseEvent&)
 {
+    if (lastKeySelected == -1)
+    {
+        DBG("mouseDownOnKey: " + String(midiNoteNumber));
+        
+        lastKeySelected = midiNoteNumber;
+    }
+    
     return true;
 }
 
-void BKKeymapKeyboardComponent::mouseDraggedToKey (int, const MouseEvent&)
+void BKKeymapKeyboardComponent::mouseDraggedToKey (int midiNoteNumber, const MouseEvent&)
 {
-
+    if (midiNoteNumber != lastKeySelected)
+    {
+        DBG("mouseDraggedToKey: " + String(midiNoteNumber));
+        
+        state.toggle(lastKeySelected);
+        repaint(getRectangleForKey(lastKeySelected));
+        
+        lastKeySelected = midiNoteNumber;
+    }
 }
 
 void BKKeymapKeyboardComponent::mouseUpOnKey      (int midiNoteNumber, const MouseEvent&)
 {
+
+    DBG("mouseUpOnKey: " + String(midiNoteNumber));
+    
     state.toggle(midiNoteNumber);
-    repaint();
+    repaint(getRectangleForKey(midiNoteNumber));
+    
+    lastKeySelected = -1;
+    
 }
 
 void BKKeymapKeyboardComponent::mouseDown (const MouseEvent& e)
