@@ -324,7 +324,8 @@ public:
      AT1Max,
      */
     
-    SynchronicModPreparation(SynchronicPreparation::Ptr p)
+    SynchronicModPreparation(SynchronicPreparation::Ptr p, int Id):
+    Id(Id)
     {
         param.ensureStorageAllocated(cSynchronicParameterTypes.size());
         
@@ -344,7 +345,8 @@ public:
     }
     
     
-    SynchronicModPreparation(void)
+    SynchronicModPreparation(int Id):
+    Id(Id)
     {
         param.set(SynchronicTuning, "");
         param.set(SynchronicTempo, "");
@@ -594,7 +596,12 @@ public:
         
     }
     
+    inline String getName(void) const noexcept {return name;}
+    inline void setName(String newName) {name = newName;}
+    
 private:
+    int Id;
+    String name;
     StringArray          param;
     
     JUCE_LEAK_DETECTOR(SynchronicModPreparation);

@@ -115,13 +115,13 @@ void KeymapViewController::resized()
 void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
 {
     String name = box->getName();
-    currentKeymapId = box->getSelectedItemIndex();
     
     if (name == "Keymap")
     {
+        currentKeymapId = box->getSelectedItemIndex();
+        
         if (currentKeymapId == keymapSelectCB.getNumItems()-1) // New Keymap
         {
-            DBG("Should add new keymap.");
             processor.gallery->addKeymap();
             
             fillKeymapSelectCB();

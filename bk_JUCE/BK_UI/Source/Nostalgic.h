@@ -213,7 +213,8 @@ public:
      
      */
     
-    NostalgicModPreparation(NostalgicPreparation::Ptr p)
+    NostalgicModPreparation(NostalgicPreparation::Ptr p, int Id):
+    Id(Id)
     {
         param.ensureStorageAllocated(cNostalgicParameterTypes.size());
         
@@ -230,7 +231,8 @@ public:
     }
     
     
-    NostalgicModPreparation(void)
+    NostalgicModPreparation(int Id):
+    Id(Id)
     {
         param.set(NostalgicTuning, "");
         param.set(NostalgicWaveDistance, "");
@@ -376,8 +378,12 @@ public:
         
     }
     
-private:
+    inline String getName(void) const noexcept {return name;}
+    inline void setName(String newName) {name = newName;}
     
+private:
+    int Id;
+    String name;
     StringArray          param;
     
     JUCE_LEAK_DETECTOR(NostalgicModPreparation);

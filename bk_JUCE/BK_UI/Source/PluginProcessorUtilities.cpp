@@ -18,6 +18,9 @@ void BKAudioProcessor::updateUI(void)
     updateState->synchronicPreparationDidChange = true;
     updateState->tuningPreparationDidChange = true;
     updateState->generalSettingsDidChange = true;
+    
+    
+    updateState->directDidChange = true;
     updateState->keymapDidChange = true;
 }
 

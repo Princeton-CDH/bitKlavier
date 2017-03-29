@@ -91,32 +91,37 @@ void Gallery::removeTempo(int Id)
 
 void Gallery::addDirectMod()
 {
-    modDirect.add           (new DirectModPreparation());
+    int numMod = modDirect.size();
+    modDirect.add           (new DirectModPreparation(numMod));
 }
 
 void Gallery::addSynchronicMod()
 {
-    modSynchronic.add       (new SynchronicModPreparation());
+    int numMod = modSynchronic.size();
+    modSynchronic.add       (new SynchronicModPreparation(numMod));
 }
 
 void Gallery::addNostalgicMod()
 {
-    modNostalgic.add        (new NostalgicModPreparation());
+    int numMod = modNostalgic.size();
+    modNostalgic.add        (new NostalgicModPreparation(numMod));
 }
 
 void Gallery::addTuningMod()
 {
-    modTuning.add           (new TuningModPreparation());
+    int numMod = modTuning.size();
+    modTuning.add           (new TuningModPreparation(numMod));
+}
+
+void Gallery::addTempoMod()
+{
+    int numMod = modTempo.size();
+    modTempo.add           (new TempoModPreparation(numMod));
 }
 
 void Gallery::addTuningMod(TuningModPreparation::Ptr tmod)
 {
     modTuning.add           (tmod);
-}
-
-void Gallery::addTempoMod()
-{
-    modTempo.add           (new TempoModPreparation());
 }
 
 void Gallery::addTempoMod(TempoModPreparation::Ptr tmod)

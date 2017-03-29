@@ -245,7 +245,8 @@ public:
      TuningAbsoluteOffsets
      */
     
-    TuningModPreparation(TuningPreparation::Ptr p)
+    TuningModPreparation(TuningPreparation::Ptr p, int Id):
+    Id(Id)
     {
         param.ensureStorageAllocated(cTuningParameterTypes.size());
         
@@ -264,7 +265,8 @@ public:
     }
     
     
-    TuningModPreparation(void)
+    TuningModPreparation(int Id):
+    Id(Id)
     {
         param.set(TuningScale, "");
         param.set(TuningFundamental, "");
@@ -338,8 +340,12 @@ public:
         
     }
     
+    inline String getName(void) const noexcept {return name;}
+    inline void setName(String newName) {name = newName;}
     
 private:
+    int Id; 
+    String name;
     StringArray          param;
     
     JUCE_LEAK_DETECTOR(TuningModPreparation);
@@ -431,13 +437,15 @@ public:
     sPrep(new TuningPreparation(prep)),
     aPrep(new TuningPreparation(sPrep)),
     processor(new TuningProcessor(aPrep)),
-    Id(Id)
+    Id(Id),
+    name(String(Id))
     {
         
     }
     
     Tuning(int Id):
-    Id(Id)
+    Id(Id),
+    name(String(Id))
     {
         sPrep = new TuningPreparation();
         aPrep = new TuningPreparation(sPrep);
@@ -471,8 +479,13 @@ public:
     }
     
     
+    inline String getName(void) const noexcept {return name;}
+    inline void setName(String newName) {name = newName;}
+    
+    
 private:
     int Id;
+    String name;
     
     JUCE_LEAK_DETECTOR(Tuning)
 };

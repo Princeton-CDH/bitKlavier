@@ -32,12 +32,23 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     
+    void reset(void);
     void updateFields(void);
     void updateModFields(void);
+    
+    
     
 private:
     BKAudioProcessor& processor;
     int currentDirectId, currentModDirectId;
+    
+    BKLabel selectL;
+    BKComboBox selectCB;
+    BKComboBox modSelectCB;
+    
+    BKLabel nameL;
+    BKTextField nameTF;
+    BKTextField modNameTF;
     
     OwnedArray<BKLabel> directL;
     OwnedArray<BKTextField> directTF;
@@ -46,8 +57,11 @@ private:
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;
     
-    void bkComboBoxDidChange        (ComboBox* box)         override { };
+    void bkComboBoxDidChange        (ComboBox* box)         override;
     void bkButtonClicked            (Button* b)             override { };
+    
+    void fillSelectCB(void);
+    void fillModSelectCB(void);
     
     
     

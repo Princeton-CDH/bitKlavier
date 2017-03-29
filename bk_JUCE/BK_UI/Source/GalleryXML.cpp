@@ -95,9 +95,9 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                     bkKeymaps.set(id, new Keymap(id));
                     
                     
-                    String name = e->getStringAttribute("name");
+                    String n = e->getStringAttribute("name");
                     
-                    if (name != String::empty)  bkKeymaps[id]->setName(name);
+                    if (n != String::empty)     bkKeymaps[id]->setName(n);
                     else                        bkKeymaps[id]->setName(String(id+1));
                     
                     Array<int> keys;

@@ -148,7 +148,8 @@ public:
     DirectParameterTypeNil,
      */
     
-    DirectModPreparation(DirectPreparation::Ptr p)
+    DirectModPreparation(DirectPreparation::Ptr p, int Id):
+    Id(Id)
     {
         param.ensureStorageAllocated(cDirectParameterTypes.size());
         
@@ -160,7 +161,8 @@ public:
     }
     
     
-    DirectModPreparation(void)
+    DirectModPreparation(int Id):
+    Id(Id)
     {
         param.add("");
         param.add("");
@@ -273,7 +275,12 @@ public:
 
     }
     
+    inline String getName(void) const noexcept {return name;}
+    inline void setName(String newName) {name = newName;}
+    
 private:
+    int Id;
+    String name;
     StringArray          param;
     
     JUCE_LEAK_DETECTOR(DirectModPreparation);

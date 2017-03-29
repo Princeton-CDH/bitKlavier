@@ -188,6 +188,31 @@ public:
         return direct[Id];
     }
     
+    inline const Direct::PtrArr getAllDirect(void) const noexcept
+    {
+        return direct;
+    }
+    
+    inline const Tuning::PtrArr getAllTuning(void) const noexcept
+    {
+        return tuning;
+    }
+    
+    inline const Synchronic::PtrArr getAllSynchronic(void) const noexcept
+    {
+        return synchronic;
+    }
+    
+    inline const Nostalgic::PtrArr getAllNostalgic(void) const noexcept
+    {
+        return nostalgic;
+    }
+    
+    inline const Tempo::PtrArr getAllTempo(void) const noexcept
+    {
+        return tempo;
+    }
+    
     inline const Tuning::Ptr getTuning(int Id) const noexcept
     {
         return tuning[Id];

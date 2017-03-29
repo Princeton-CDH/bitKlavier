@@ -41,6 +41,8 @@ void Gallery::setStateFromJson(var myJson)
     addNostalgicMod();
     addDirectMod();
     
+    general = new GeneralSettings();
+    
     var pattr = myJson.getProperty("pattrstorage", "");
     
     String name = pattr.getProperty("name", "").toString();
@@ -527,7 +529,7 @@ void Gallery::setStateFromJson(var myJson)
                     TuningSystem tscale = tuningStringToTuningSystem(tun);
                     int noteNumber = notenum.getIntValue();
                     
-                    TuningModPreparation::Ptr myMod = new TuningModPreparation();
+                    TuningModPreparation::Ptr myMod = new TuningModPreparation(modTuning.size());
                     
                     //DBG("JSON import: setting tuning mod fund and scale " + note + " " + String(fund) + " " + tun + " " + String(tscale));
                     myMod->setParam(TuningFundamental, String(fund));
@@ -556,7 +558,7 @@ void Gallery::setStateFromJson(var myJson)
                     ++modTuningCount;
                     
                     // duh; probably shouldn't do such a coarse repeat, but OTOH this is really just a backwards compatability hack...
-                    TuningModPreparation::Ptr myMod2 = new TuningModPreparation();
+                    TuningModPreparation::Ptr myMod2 = new TuningModPreparation(modTuning.size());
                     myMod2->setParam(TuningScale, String(tscale));
                     
                     dontAdd = false; whichTMod = 0;

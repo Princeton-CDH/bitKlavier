@@ -39,7 +39,8 @@ public:
     sPrep(new DirectPreparation(d)),
     aPrep(new DirectPreparation(sPrep)),
     processor(new DirectProcessor(s, res, ham, aPrep, Id)),
-    Id(Id)
+    Id(Id),
+    name(String(Id))
     {
         
     }
@@ -51,6 +52,7 @@ public:
            BKUpdateState::Ptr us,
            int Id):
     Id(Id),
+    name(String(Id)),
     updateState(us)
     {
         sPrep       = new DirectPreparation(tuning);
@@ -74,6 +76,7 @@ public:
         ValueTree prep( vtagDirect+String(Id));
         
         prep.setProperty( ptagDirect_id,                Id, 0);
+        prep.setProperty( "name", name, 0);
         prep.setProperty( ptagDirect_tuning,            sPrep->getTuning()->getId(), 0);
         
         ValueTree transp( vtagDirect_transposition);
@@ -92,6 +95,11 @@ public:
     inline void setState(XmlElement* e, Tuning::PtrArr tuning)
     {
         float f; int i;
+        
+        String n = e->getStringAttribute("name");
+        
+        if (n != String::empty)     name = n;
+        else                        name = String(Id);
         
         i = e->getStringAttribute(ptagDirect_tuning).getIntValue();
         sPrep->setTuning(tuning[i]);
@@ -148,8 +156,14 @@ public:
     
     //void didChange(bool which) { updateState->directPreparationDidChange = which; }
     
+    inline String getName(void) const noexcept {return name;}
+    inline void setName(String newName) {name = newName;}
+   
+    
 private:
     int Id;
+    String name;
+    
 
     BKUpdateState::Ptr          updateState;
     
@@ -173,7 +187,8 @@ public:
     sPrep(new SynchronicPreparation(prep)),
     aPrep(new SynchronicPreparation(sPrep)),
     processor(new SynchronicProcessor(s, aPrep, general, Id)),
-    Id(Id)
+    Id(Id),
+    name(String(Id))
     {
         
     }
@@ -185,6 +200,7 @@ public:
                BKUpdateState::Ptr us,
                int Id):
     Id(Id),
+    name(String(Id)),
     updateState(us)
     {
         sPrep       = new SynchronicPreparation(tuning, tempo);
@@ -208,6 +224,7 @@ public:
         ValueTree prep( vtagSynchronic + String(Id));
         
         prep.setProperty( ptagSynchronic_Id,                  Id, 0);
+        prep.setProperty( "name", name, 0);
         prep.setProperty( ptagSynchronic_tuning,              sPrep->getTuning()->getId(), 0);
         prep.setProperty( ptagSynchronic_tempo,               sPrep->getTempoControl()->getId(), 0);
         prep.setProperty( ptagSynchronic_numBeats,            sPrep->getNumBeats(), 0);
@@ -264,6 +281,12 @@ public:
     inline void setState(XmlElement* e, Tuning::PtrArr tuning, Tempo::PtrArr tempo)
     {
         int i; float f;
+        
+        String n = e->getStringAttribute("name");
+        
+        if (n != String::empty)     name = n;
+        else                        name = String(Id);
+        
         i = e->getStringAttribute(ptagSynchronic_tuning).getIntValue();
         sPrep->setTuning(tuning[i]);
         
@@ -400,8 +423,12 @@ public:
     
     //void didChange(bool which) { updateState->synchronicPreparationDidChange = which; }
     
+    inline String getName(void) const noexcept {return name;}
+    inline void setName(String newName) {name = newName;}
+    
 private:
     int Id;
+    String name;
     BKUpdateState::Ptr updateState;
     
     JUCE_LEAK_DETECTOR(Synchronic)
@@ -424,7 +451,8 @@ public:
     sPrep(new NostalgicPreparation(prep)),
     aPrep(new NostalgicPreparation(sPrep)),
     processor(new NostalgicProcessor(s, aPrep, Id)),
-    Id(Id)
+    Id(Id),
+    name(String(Id))
     {
         
     }
@@ -435,6 +463,7 @@ public:
               BKUpdateState::Ptr us,
               int Id):
     Id(Id),
+    name(String(Id)),
     updateState(us)
     {
         sPrep       = new NostalgicPreparation(tuning);
@@ -462,6 +491,7 @@ public:
         ValueTree prep( vtagNostalgic + String(Id));
         
         prep.setProperty( ptagNostalgic_Id,                 Id, 0);
+        prep.setProperty( "name", name, 0);
         prep.setProperty( ptagNostalgic_tuning,             sPrep->getTuning()->getId(), 0);
         prep.setProperty( ptagNostalgic_waveDistance,       sPrep->getWavedistance(), 0);
         prep.setProperty( ptagNostalgic_undertow,           sPrep->getUndertow(), 0);
@@ -486,6 +516,11 @@ public:
     inline void setState(XmlElement* e, Tuning::PtrArr tuning, Synchronic::PtrArr synchronic)
     {
         int i; float f;
+        
+        String n = e->getStringAttribute("name");
+        
+        if (n != String::empty)     name = n;
+        else                        name = String(Id);
         
         i = e->getStringAttribute(ptagNostalgic_tuning).getIntValue();
         sPrep->setTuning(tuning[i]);
@@ -554,8 +589,12 @@ public:
     
     //void didChange(bool which) { updateState->nostalgicPreparationDidChange = which; }
     
+    inline String getName(void) const noexcept {return name;}
+    inline void setName(String newName) {name = newName;}
+    
 private:
     int Id;
+    String name;
     BKUpdateState::Ptr updateState;
     
     JUCE_LEAK_DETECTOR(Nostalgic)

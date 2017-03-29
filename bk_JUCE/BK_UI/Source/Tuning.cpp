@@ -241,6 +241,11 @@ void TuningModPreparation::setState(XmlElement* e)
     
     float f;
     
+    String n = e->getStringAttribute("name");
+    
+    if (n != String::empty)     name = n;
+    else                        name = "tm"+String(Id);
+    
     p = e->getStringAttribute( ptagTuning_scale);
     setParam(TuningScale, p);
     

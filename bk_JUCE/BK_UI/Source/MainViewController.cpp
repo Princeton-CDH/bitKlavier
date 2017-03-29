@@ -146,6 +146,12 @@ void MainViewController::timerCallback()
         kvc.reset();
     }
     
+    if (processor.updateState->directDidChange)
+    {
+        processor.updateState->directDidChange = false;
+        dvc.reset();
+    }
+    
 }
 
 void MainViewController::paint (Graphics& g)

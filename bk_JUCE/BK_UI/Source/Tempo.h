@@ -200,7 +200,8 @@ public:
      AT1Mode,
      */
     
-    TempoModPreparation(TempoPreparation::Ptr p)
+    TempoModPreparation(TempoPreparation::Ptr p, int Id):
+    Id(Id)
     {
         param.ensureStorageAllocated(cTempoParameterTypes.size());
         
@@ -215,7 +216,8 @@ public:
     }
     
     
-    TempoModPreparation(void)
+    TempoModPreparation(int Id):
+    Id(Id)
     {
         param.set(TempoBPM, "");
         param.set(TempoSystem, "");
@@ -259,6 +261,8 @@ public:
         
         ValueTree prep(vtagModTempo + String(Id));
         
+        prep.setProperty("name",name,0);
+        
         String p = getParam(TempoBPM);
         if (p != String::empty) prep.setProperty( ptagTempo_tempo, p.getFloatValue(), 0);
         
@@ -286,6 +290,11 @@ public:
     
     inline void setState(XmlElement* e)
     {
+        String n = e->getStringAttribute("name");
+        
+        if (n != String::empty)     name = n;
+        else                        name = "mm"+String(Id);
+ 
         String p = e->getStringAttribute(ptagTempo_tempo);
         setParam(TempoBPM, p);
         
@@ -327,8 +336,12 @@ public:
         
     }
     
+    inline String getName(void) const noexcept {return name;}
+    inline void setName(String newName) {name = newName;}
     
 private:
+    int Id;
+    String name;
     StringArray          param;
     
     JUCE_LEAK_DETECTOR(TempoModPreparation);
@@ -350,13 +363,15 @@ public:
     sPrep(new TempoPreparation(prep)),
     aPrep(new TempoPreparation(sPrep)),
     processor(new TempoProcessor(aPrep)),
-    Id(Id)
+    Id(Id),
+    name(String(Id))
     {
         
     }
     
     Tempo(int Id):
-    Id(Id)
+    Id(Id),
+    name(String(Id))
     {
         sPrep = new TempoPreparation();
         aPrep = new TempoPreparation(sPrep);
@@ -374,6 +389,7 @@ public:
         ValueTree prep(vtagTempo + String(Id));
         
         prep.setProperty( ptagTempo_Id,                    Id, 0);
+        prep.setProperty( "name",                          name, 0);
         prep.setProperty( ptagTempo_tempo,                 sPrep->getTempo(), 0);
         prep.setProperty( ptagTempo_system,                sPrep->getTempoSystem(), 0);
         prep.setProperty( ptagTempo_at1Mode,               sPrep->getAdaptiveTempo1Mode(), 0 );
@@ -388,6 +404,11 @@ public:
     inline void setState(XmlElement* e)
     {
         float f; int i;
+        
+        String n = e->getStringAttribute("name");
+        
+        if (n != String::empty)     name = n;
+        else                        name = String(Id);
         
         f = e->getStringAttribute(ptagTempo_tempo).getFloatValue();
         sPrep->setTempo(f);
@@ -430,9 +451,12 @@ public:
         DBG("resetting tempo");
     }
     
+    inline String getName(void) const noexcept {return name;}
+    inline void setName(String newName) {name = newName;}
     
 private:
     int Id;
+    String name;
     
     JUCE_LEAK_DETECTOR(Tempo)
 };

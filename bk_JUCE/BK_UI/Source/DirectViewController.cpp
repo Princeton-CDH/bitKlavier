@@ -18,6 +18,39 @@ processor(p),
 currentDirectId(0),
 currentModDirectId(0)
 {
+    
+    // First row
+    addAndMakeVisible(selectL);
+    selectL.setName("Direct");
+    selectL.setText("Direct", NotificationType::dontSendNotification);
+    
+    addAndMakeVisible(selectCB);
+    selectCB.setName("Direct");
+    selectCB.addSeparator();
+    selectCB.addListener(this);
+    //selectCB.setEditableText(true);
+    selectCB.setSelectedItemIndex(0);
+    
+    addAndMakeVisible(modSelectCB);
+    modSelectCB.setName("DirectMod");
+    modSelectCB.addSeparator();
+    modSelectCB.addListener(this);
+    //selectCB.setEditableText(true);
+    modSelectCB.setSelectedItemIndex(0);
+    
+
+    addAndMakeVisible(nameL);
+    nameL.setName("Name");
+    nameL.setText("Name", NotificationType::dontSendNotification);
+    
+    addAndMakeVisible(nameTF);
+    nameTF.addListener(this);
+    nameTF.setName("Name");
+    
+    addAndMakeVisible(modNameTF);
+    modNameTF.addListener(this);
+    modNameTF.setName("Name");
+
     DirectPreparation::Ptr layer = processor.gallery->getStaticDirectPreparation(currentDirectId);
     
     // Labels
@@ -26,7 +59,7 @@ currentModDirectId(0)
     
     for (int i = 0; i < cDirectParameterTypes.size(); i++)
     {
-        directL.set(i, new BKLabel());
+        directL.add(new BKLabel());
         addAndMakeVisible(directL[i]);
         directL[i]->setName(cDirectParameterTypes[i]);
         directL[i]->setText(cDirectParameterTypes[i], NotificationType::dontSendNotification);
@@ -38,7 +71,7 @@ currentModDirectId(0)
     
     for (int i = 0; i < cDirectParameterTypes.size(); i++)
     {
-        directTF.set(i, new BKTextField());
+        directTF.add(new BKTextField());
         addAndMakeVisible(directTF[i]);
         directTF[i]->addListener(this);
         directTF[i]->setName(cDirectParameterTypes[i]);
@@ -55,12 +88,96 @@ currentModDirectId(0)
         modDirectTF[i]->setName("M"+cDirectParameterTypes[i]);
     }
     
-    updateModFields();
-    updateFields();
+    
+    directTF[0]->setVisible(false);directL[0]->setVisible(false);modDirectTF[0]->setVisible(0);
+    
+    fillSelectCB();     fillModSelectCB();
+    
+    updateModFields();  updateFields();
+}
+
+void DirectViewController::reset(void)
+{
+    currentDirectId = 0;
+    fillSelectCB(); updateFields();
+    
+    currentModDirectId = 0;
+    fillModSelectCB(); updateModFields();
 }
 
 DirectViewController::~DirectViewController()
 {
+}
+
+void DirectViewController::fillSelectCB(void)
+{
+    // Direct menu
+    Direct::PtrArr direct = processor.gallery->getAllDirect();
+    
+    selectCB.clear(dontSendNotification);
+    for (int i = 0; i < direct.size(); i++)
+    {
+        String name = direct[i]->getName();
+        if (name != String::empty)  selectCB.addItem(name, i+1);
+        else                        selectCB.addItem(String(i+1), i+1);
+    }
+    
+    selectCB.addItem("New direct...", direct.size()+1);
+    
+    selectCB.setSelectedItemIndex(currentDirectId, NotificationType::dontSendNotification);
+    
+}
+
+void DirectViewController::fillModSelectCB(void)
+{
+    // ModDirect menu
+    DirectModPreparation::PtrArr modDirect = processor.gallery->getDirectModPreparations();
+    
+    modSelectCB.clear(dontSendNotification);
+    for (int i = 0; i < modDirect.size(); i++)
+    {
+        String name = modDirect[i]->getName();
+        if (name != String::empty)  modSelectCB.addItem(name, i+1);
+        else                        modSelectCB.addItem(String(i+1), i+1);
+    }
+    
+    modSelectCB.addItem("New modification...", modDirect.size()+1);
+    
+    modSelectCB.setSelectedItemIndex(currentModDirectId, NotificationType::dontSendNotification);
+}
+
+
+
+void DirectViewController::bkComboBoxDidChange        (ComboBox* box)
+{
+    String name = box->getName();
+    
+    if (name == "Direct")
+    {
+        currentDirectId = box->getSelectedItemIndex();
+        
+        if (currentDirectId == selectCB.getNumItems()-1) // New Direct
+        {
+            processor.gallery->addDirect();
+            
+            fillSelectCB();
+        }
+        
+        updateFields();
+    }
+    else if (name == "DirectMod")
+    {
+        currentModDirectId = box->getSelectedItemIndex();
+        
+        if (currentModDirectId == modSelectCB.getNumItems()-1) // New Mod
+        {
+            processor.gallery->addDirectMod();
+            
+            fillModSelectCB();
+        }
+        
+        updateModFields();
+    }
 }
 
 void DirectViewController::paint (Graphics& g)
@@ -71,26 +188,38 @@ void DirectViewController::paint (Graphics& g)
 
 void DirectViewController::resized()
 {
+    
+    float widthL = getWidth() * 0.25 - gXSpacing;
+    float heightL = directL[0]->getHeight();
+    float widthTF = widthL * 1.5;
+    float heightTF = directTF[0]->getHeight();
+
+    // Menus
+    selectL.setBounds(0, gYSpacing, widthL, heightL);
+    selectCB.setBounds(selectL.getRight()+gXSpacing, selectL.getY(), widthTF, heightTF);
+    modSelectCB.setBounds(selectCB.getRight()+gXSpacing, selectL.getY(), widthTF, heightTF);
+    
+    // Names
+    nameL.setBounds(0, selectL.getBottom()+gYSpacing, widthL, heightL);
+    nameTF.setBounds(nameL.getRight()+gXSpacing, nameL.getY(), widthTF, heightTF);
+    modNameTF.setBounds(nameTF.getRight()+gXSpacing, nameTF.getY(), widthTF, heightTF);
+    
     // Labels
-    int lY = gComponentLabelHeight + gYSpacing;
+    directL[1]->setBounds(0, nameL.getBottom()+gYSpacing, widthL, heightL);
     
-    float width = getWidth() * 0.25 - gXSpacing;
-    
-    for (int n = 0; n < cDirectParameterTypes.size(); n++)
+    for (int n = 2; n < cDirectParameterTypes.size(); n++)
     {
-        directL[n]->setBounds(0, gYSpacing + lY * n, width, directL[0]->getHeight());
+        directL[n]->setBounds(0, directL[n-1]->getBottom()+gYSpacing, widthL, heightL);
     }
     
     // Text fields
-    int tfY = gComponentTextFieldHeight + gYSpacing;
+    directTF[1]->setBounds(directL[1]->getRight()+gXSpacing, directL[1]->getY(), widthTF, heightTF);
+    modDirectTF[1]->setBounds(directTF[1]->getRight()+gXSpacing, directL[1]->getY(), widthTF, heightTF);
     
-    float height = directTF[0]->getHeight();
-    width *= 1.5;
-    
-    for (int n = 0; n < cDirectParameterTypes.size(); n++)
+    for (int n = 2; n < cDirectParameterTypes.size(); n++)
     {
-        directTF[n]->setBounds(directL[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
-        modDirectTF[n]->setBounds(directTF[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
+        directTF[n]->setBounds(directTF[1]->getX(), directTF[n-1]->getBottom()+gYSpacing, widthTF, heightTF);
+        modDirectTF[n]->setBounds(modDirectTF[1]->getX(), modDirectTF[n-1]->getBottom()+gYSpacing, widthTF, heightTF);
     }
 }
 
@@ -117,6 +246,7 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
     DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(currentDirectId);
     DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(currentModDirectId);
     
+    /*
     if (name == cDirectParameterTypes[DirectId])
     {
         if (type == BKParameter)
@@ -155,6 +285,23 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
             
             updateModFields();
         }
+    }
+    else */
+    if (name == "Name")
+    {
+        processor.gallery->getDirect(currentDirectId)->setName(text);
+        
+        int selected = selectCB.getSelectedId();
+        if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, text);
+        selectCB.setSelectedId(selected, dontSendNotification );
+    }
+    else if (name == "ModName")
+    {
+        processor.gallery->getDirectModPreparation(currentModDirectId)->setName(text);
+        
+        int selected = modSelectCB.getSelectedId();
+        if (selected != modSelectCB.getNumItems()) modSelectCB.changeItemText(selected, text);
+        modSelectCB.setSelectedId(selected, dontSendNotification );
     }
     else if (name == cDirectParameterTypes[DirectTransposition])
     {

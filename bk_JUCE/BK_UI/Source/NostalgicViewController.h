@@ -50,6 +50,8 @@ private:
     void bkComboBoxDidChange        (ComboBox* box)         override { };
     void bkButtonClicked            (Button* b)             override { };
     
+     void fillSelectCB(void);
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NostalgicViewController)
 };
 
