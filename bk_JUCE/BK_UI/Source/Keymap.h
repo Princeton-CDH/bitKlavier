@@ -160,6 +160,9 @@ public:
     {
  
         ValueTree keysave( vtagKeymap + String(ki));
+        
+        keysave.setProperty("name",name,0);
+        
         int count = 0;
         for (auto key : keys())
         {
@@ -169,9 +172,13 @@ public:
         return keysave;
     }
     
+    inline String getName(void) const noexcept {return name;}
+    inline void setName(String newName) {name = newName;}
+    
     
 private:
     int Id;
+    String name;
     Array<bool> keymap;
     
     JUCE_LEAK_DETECTOR (Keymap)

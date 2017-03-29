@@ -140,7 +140,6 @@ pmvc(PreparationMapViewController::PtrArr())
     
     fillGalleryCB();
     
-    
 }
 
 void GalleryViewController::update(void)

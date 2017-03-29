@@ -83,6 +83,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
             /* * * * * * * * * * * * * * */
             
             bkKeymaps.set(0, new Keymap(0));
+            bkKeymaps[0]->setName("Empty");
             
             // iterate through its sub-elements
             forEachXmlChildElement (*xml, e)
@@ -92,6 +93,12 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                     int id = keymapCount++;
                     
                     bkKeymaps.set(id, new Keymap(id));
+                    
+                    
+                    String name = e->getStringAttribute("name");
+                    
+                    if (name != String::empty)  bkKeymaps[id]->setName(name);
+                    else                        bkKeymaps[id]->setName(String(id+1));
                     
                     Array<int> keys;
                     for (int k = 0; k < 128; k++)

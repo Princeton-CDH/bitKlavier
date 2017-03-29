@@ -33,16 +33,22 @@ public:
 
     void paint (Graphics&) override;
     void resized() override;
+    
+    void reset(void);
 
 private:
     int currentKeymapId;
     
     BKAudioProcessor& processor;
     
-    OwnedArray<BKLabel> keymapL;
-    OwnedArray<BKTextField> keymapTF;
+    BKLabel     keymapSelectL;
+    BKComboBox  keymapSelectCB;
     
+    BKLabel     keymapNameL;
+    BKTextField keymapNameTF;
     
+    BKLabel     keymapL;
+    BKTextField keymapTF;
 
     BKKeymapKeyboardState keyboardState;
     
@@ -58,10 +64,13 @@ private:
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;
     
-    void bkComboBoxDidChange        (ComboBox* box)         override { };
+    void bkComboBoxDidChange        (ComboBox* box)         override;
     void bkButtonClicked            (Button* b)             override { };
     
-    void updateFields(int keymapId);
+    
+    void updateFields(void);
+    void fillKeymapSelectCB(void);
+    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KeymapViewController)
 };

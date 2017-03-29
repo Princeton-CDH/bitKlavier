@@ -18,6 +18,7 @@ void BKAudioProcessor::updateUI(void)
     updateState->synchronicPreparationDidChange = true;
     updateState->tuningPreparationDidChange = true;
     updateState->generalSettingsDidChange = true;
+    updateState->keymapDidChange = true;
 }
 
 void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)

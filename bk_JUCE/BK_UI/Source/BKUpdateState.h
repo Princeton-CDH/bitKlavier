@@ -33,6 +33,7 @@ public:
     bool tuningPreparationDidChange = false;
     bool tempoPreparationDidChange = false;
     bool generalSettingsDidChange = false;
+    bool keymapDidChange = false;
     
 private:
 

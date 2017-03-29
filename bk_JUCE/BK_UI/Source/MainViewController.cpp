@@ -140,6 +140,12 @@ void MainViewController::timerCallback()
         ovc.updateFields();
     }
     
+    if (processor.updateState->keymapDidChange)
+    {
+        processor.updateState->keymapDidChange = false;
+        kvc.reset();
+    }
+    
 }
 
 void MainViewController::paint (Graphics& g)

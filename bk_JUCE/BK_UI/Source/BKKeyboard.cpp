@@ -370,11 +370,10 @@ void BKKeymapKeyboardComponent::paint (Graphics& g)
         for (int white = 0; white < 7; ++white)
         {
             
-                             
             const int noteNum = octave + whiteNotes [white];
             
             if (state.isInKeymap(noteNum))
-                keyColour = Colour((uint8)210, (uint8)210, (uint8)64, 0.62f);
+                keyColour = Colour((uint8)210, (uint8)210, (uint8)64, 0.62f); // KEYMAP COLOUR
             else
                 keyColour = Colour(Colours::transparentWhite);
             
