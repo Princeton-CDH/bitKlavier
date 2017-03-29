@@ -374,7 +374,7 @@ void BKKeymapKeyboardComponent::paint (Graphics& g)
             const int noteNum = octave + whiteNotes [white];
             
             if (state.isInKeymap(noteNum))
-                keyColour = findColour(keyDownOverlayColourId);
+                keyColour = Colour((uint8)210, (uint8)210, (uint8)64, 0.62f);
             else
                 keyColour = Colour(Colours::transparentWhite);
             
