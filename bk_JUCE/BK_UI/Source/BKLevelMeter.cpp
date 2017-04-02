@@ -51,7 +51,12 @@ void BKLevelMeterComponent::drawLevelMeter (Graphics& g, int width, int height, 
     
     for (int i = 0; i < totalBlocks; ++i)
     {
-        if (i >= numBlocks) g.setColour (Colours::transparentBlack.withAlpha (0.6f));
+        if (i >= numBlocks)
+        {
+            g.setColour (Colours::green.withAlpha (0.2f));
+            if(i >= totalBlocks - 2) g.setColour(Colours::red.withAlpha (0.2f));
+            else if(i >= totalBlocks - 4) g.setColour(Colours::yellow.withAlpha (0.2f));
+        }
         else if(i < totalBlocks - 4) g.setColour(Colours::green.withAlpha (0.9f));
         else if(i < totalBlocks - 2) g.setColour(Colours::yellow.withAlpha (0.9f));
         else g.setColour(Colours::red.withAlpha (1.0f));
