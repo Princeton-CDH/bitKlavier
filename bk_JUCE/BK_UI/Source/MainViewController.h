@@ -28,7 +28,7 @@
 
 #include "KeymapViewController.h"
 
-class MainViewController :  public Component, private Timer, public BKListener
+class MainViewController :  public Component, private Timer, public BKListener, public Slider::Listener
 {
     
 public:
@@ -60,6 +60,7 @@ private:
     TempoViewController ovc;
     
     OwnedArray<TextButton> buttons;
+    Slider* mainSlider;
     
     BKLevelMeterComponent *levelMeterComponentL;
     BKLevelMeterComponent *levelMeterComponentR;
@@ -74,6 +75,7 @@ private:
     void bkMessageReceived          (const String& message) override{};
     void bkComboBoxDidChange        (ComboBox* box)         override{};
     void bkButtonClicked            (Button* b)             override;
+    void sliderValueChanged         (Slider* slider)        override; 
     
     void setCurrentDisplay(BKPreparationDisplay type);
     

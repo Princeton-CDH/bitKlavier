@@ -10,6 +10,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainViewController.h"
+#include "juce_Decibels.h"
 
 //==============================================================================
 MainViewController::MainViewController (BKAudioProcessor& p):
@@ -36,7 +37,7 @@ timerCallbackCount(0)
         addAndMakeVisible(buttons[i]);
         
     }
-
+    
     addAndMakeVisible(galvc);
     
     addAndMakeVisible(gvc);
@@ -49,7 +50,17 @@ timerCallbackCount(0)
     
     addAndMakeVisible (levelMeterComponentL = new BKLevelMeterComponent());
     addAndMakeVisible (levelMeterComponentR = new BKLevelMeterComponent());
-    
+
+    mainSlider = new Slider();
+    addAndMakeVisible (mainSlider);
+    mainSlider->setRange (-90, 12.0, 0.1);
+    mainSlider->setSkewFactor (2.5, false);
+    mainSlider->setPopupMenuEnabled (true);
+    mainSlider->setValue (0);
+    mainSlider->setSliderStyle (Slider::LinearVertical);
+    mainSlider->setDoubleClickReturnValue (true, 0.0); // double-clicking this slider will set it to 50.0
+    mainSlider->setTextValueSuffix (" dB");
+    mainSlider->addListener(this);
     
     setCurrentDisplay(DisplayDirect);
     
@@ -95,6 +106,25 @@ void MainViewController::bkButtonClicked            (Button* b)
         setCurrentDisplay(DisplayGeneral);
     }
 }
+
+void MainViewController::sliderValueChanged (Slider* slider)
+{
+    /*
+    if (slider == &frequencySlider)
+        durationSlider.setValue (1.0 / frequencySlider.getValue(), dontSendNotification);
+    else if (slider == &durationSlider)
+        frequencySlider.setValue (1.0 / durationSlider.getValue(), dontSendNotification);
+     */
+    
+    if(slider == mainSlider)
+    {
+        GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
+        gen->setGlobalGain(Decibels::decibelsToGain(mainSlider->getValue()));
+        gvc.updateFields();
+        
+    }
+}
+
 
 void MainViewController::timerCallback()
 {
@@ -244,17 +274,31 @@ void MainViewController::resized()
     nvc.setBounds(kvc.getBounds());
     ovc.setBounds(kvc.getBounds());
     
-    float levelMeterHeight = 200;
+    float mainSliderHeight = 320;
+    float mainSliderWidth = 70;
+    float mainSliderTextBoxWidth = 50;
+    float mainSliderTextBoxHeight = 20;
+    mainSlider->setTextBoxStyle (Slider::TextBoxBelow, false, mainSliderTextBoxWidth, mainSliderTextBoxHeight);
+    
+    float levelMeterHeight = mainSliderHeight - mainSliderTextBoxHeight;
     float levelMeterWidth = 20;
+    
     //levelMeterComponent->setBounds(galvc.getRight() + gXSpacing, getBottom()-1.5*levelMeterHeight, levelMeterWidth, levelMeterHeight);
     levelMeterComponentL->setBounds(kvc.getRight() + gXSpacing,
-                                    kvc.getBottom() - levelMeterHeight,
+                                    kvc.getBottom() - levelMeterHeight - mainSliderTextBoxHeight,
                                     levelMeterWidth,
                                     levelMeterHeight);
     
-    levelMeterComponentR->setBounds(kvc.getRight() + gXSpacing + levelMeterWidth,
-                                    kvc.getBottom() - levelMeterHeight,
+    mainSlider->setBounds (levelMeterComponentL->getRight() - mainSliderWidth * 0.5 + gXSpacing,
+                           levelMeterComponentL->getBottom() - mainSliderHeight + mainSliderTextBoxHeight,
+                           mainSliderWidth,
+                           mainSliderHeight);
+    
+    levelMeterComponentR->setBounds(mainSlider->getRight() - mainSliderWidth * 0.5 + gXSpacing,
+                                    kvc.getBottom() - levelMeterHeight - mainSliderTextBoxHeight,
                                     levelMeterWidth,
                                     levelMeterHeight);
+    
+    
     
 }
