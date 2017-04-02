@@ -144,6 +144,11 @@ void MainViewController::timerCallback()
         gvc.updateFields();
     }
     
+    GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
+    float genGain = Decibels::gainToDecibels(gen->getGlobalGain());
+    if(genGain != mainSlider->getValue())
+        mainSlider->setValue(Decibels::gainToDecibels(gen->getGlobalGain()));
+    
     if (processor.updateState->directPreparationDidChange)
     {
         processor.updateState->directPreparationDidChange = false;

@@ -97,7 +97,7 @@ public:
     const float getTuningFundamental(void)  const noexcept  { return tuningFundamental;     };
     const float getTuningRatio(void)        const noexcept  { return tuningRatio;           };
     const float getTempoMultiplier(void)    const noexcept  { return tempoMultiplier;       };
-    const float getPeriodMultiplier(void)       const noexcept  { return periodMultiplier;          };
+    const float getPeriodMultiplier(void)   const noexcept  { return periodMultiplier;      };
     const float getSynchronicGain(void)     const noexcept  { return synchronicGain;        };
     const float getNostalgicGain(void)      const noexcept  { return nostalgicGain;         };
     const float getDirectGain(void)         const noexcept  { return directGain;            };
