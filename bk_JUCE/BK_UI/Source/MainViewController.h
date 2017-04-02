@@ -61,7 +61,8 @@ private:
     
     OwnedArray<TextButton> buttons;
     
-    BKLevelMeterComponent *levelMeterComponent;
+    BKLevelMeterComponent *levelMeterComponentL;
+    BKLevelMeterComponent *levelMeterComponentR;
     
     void timerCallback() override;
 

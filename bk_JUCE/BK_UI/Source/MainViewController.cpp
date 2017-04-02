@@ -47,7 +47,8 @@ timerCallbackCount(0)
     addAndMakeVisible(tvc);
     addAndMakeVisible(ovc);
     
-    addAndMakeVisible (levelMeterComponent = new BKLevelMeterComponent());  
+    addAndMakeVisible (levelMeterComponentL = new BKLevelMeterComponent());
+    addAndMakeVisible (levelMeterComponentR = new BKLevelMeterComponent());
     
     
     setCurrentDisplay(DisplayDirect);
@@ -155,7 +156,8 @@ void MainViewController::timerCallback()
         dvc.reset();
     }
     
-    levelMeterComponent->updateLevel(processor.getLevel());
+    levelMeterComponentL->updateLevel(processor.getLevelL());
+    levelMeterComponentR->updateLevel(processor.getLevelL());
     
 }
 
@@ -242,8 +244,17 @@ void MainViewController::resized()
     nvc.setBounds(kvc.getBounds());
     ovc.setBounds(kvc.getBounds());
     
-    float levelMeterHeight = 20;
-    float levelMeterWidth = 200;
-    levelMeterComponent->setBounds(galvc.getRight() + gXSpacing, getBottom()-1.5*levelMeterHeight, levelMeterWidth, levelMeterHeight);
+    float levelMeterHeight = 200;
+    float levelMeterWidth = 20;
+    //levelMeterComponent->setBounds(galvc.getRight() + gXSpacing, getBottom()-1.5*levelMeterHeight, levelMeterWidth, levelMeterHeight);
+    levelMeterComponentL->setBounds(kvc.getRight() + gXSpacing,
+                                    kvc.getBottom() - levelMeterHeight,
+                                    levelMeterWidth,
+                                    levelMeterHeight);
+    
+    levelMeterComponentR->setBounds(kvc.getRight() + gXSpacing + levelMeterWidth,
+                                    kvc.getBottom() - levelMeterHeight,
+                                    levelMeterWidth,
+                                    levelMeterHeight);
     
 }

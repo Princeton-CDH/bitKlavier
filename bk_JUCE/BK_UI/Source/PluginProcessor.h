@@ -119,7 +119,8 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     
-    double getLevel() {return lastRMSLevel;}
+    double getLevelL() {return lastRMSLevelL;}
+    double getLevelR() {return lastRMSLevelR;}
 
 private:
     int  currentPianoId;
@@ -131,7 +132,7 @@ private:
     void loadMainPianoSamples(BKSynthesiser *synth, int numLayers);
     void loadResonanceRelaseSamples(BKSynthesiser *synth);
     void loadHammerReleaseSamples(BKSynthesiser *synth);
-    float lastRMSLevel;
+    double lastRMSLevelL, lastRMSLevelR;
     
     Array<float> tempoAlreadyLoaded;bool galleryDidLoad;
 

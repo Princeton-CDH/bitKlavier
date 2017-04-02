@@ -132,7 +132,17 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     
     // calculate level here
-    lastRMSLevel = buffer.getRMSLevel(0, 0, numSamples);
+    if(buffer.getNumChannels() == 2)
+    {
+        lastRMSLevelL = buffer.getRMSLevel(0, 0, numSamples > 32 ? 32:numSamples);
+        lastRMSLevelR = buffer.getRMSLevel(1, 0, numSamples > 32 ? 32:numSamples);
+    }
+    else
+    {
+        lastRMSLevelL = buffer.getRMSLevel(0, 0, numSamples > 32 ? 32:numSamples);
+        lastRMSLevelR = lastRMSLevelL;
+    }
+    
     
 }
 
