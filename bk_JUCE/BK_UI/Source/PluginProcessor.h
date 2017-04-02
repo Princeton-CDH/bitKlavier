@@ -119,19 +119,8 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     
-    double getLevelL()
-    {
-        if(didLoadMainPianoSamples) return levelBuf.getRMSLevel(0, 0, levelBuf.getNumSamples());
-        else return 0.;
-    }
-    double getLevelR()
-    {
-        if(levelBuf.getNumChannels() == 2) {
-            if(didLoadMainPianoSamples) return levelBuf.getRMSLevel(1, 0, levelBuf.getNumSamples());
-            else return 0.;
-        }
-        else return getLevelL();
-    }
+    double getLevelL();
+    double getLevelR();
 
 private:
     int  currentPianoId;

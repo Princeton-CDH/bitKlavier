@@ -140,6 +140,21 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
 }
 
+double BKAudioProcessor::getLevelL()
+{
+    if(didLoadMainPianoSamples) return levelBuf.getRMSLevel(0, 0, levelBuf.getNumSamples());
+    else return 0.;
+}
+
+double BKAudioProcessor::getLevelR()
+{
+    if(levelBuf.getNumChannels() == 2) {
+        if(didLoadMainPianoSamples) return levelBuf.getRMSLevel(1, 0, levelBuf.getNumSamples());
+        else return 0.;
+    }
+    else return getLevelL();
+}
+
 // Piano
 void  BKAudioProcessor::setCurrentPiano(int which)
 {
