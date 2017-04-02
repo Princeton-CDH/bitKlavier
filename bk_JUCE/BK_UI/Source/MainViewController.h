@@ -59,6 +59,8 @@ private:
     DirectViewController dvc;
     TempoViewController ovc;
     
+    GeneralSettings::Ptr gen;
+    
     OwnedArray<TextButton> buttons;
     Slider* mainSlider;
     
@@ -75,7 +77,7 @@ private:
     void bkMessageReceived          (const String& message) override{};
     void bkComboBoxDidChange        (ComboBox* box)         override{};
     void bkButtonClicked            (Button* b)             override;
-    void sliderValueChanged         (Slider* slider)        override; 
+    void sliderValueChanged         (Slider* slider)        override;
     
     void setCurrentDisplay(BKPreparationDisplay type);
     

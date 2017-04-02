@@ -25,6 +25,8 @@ dvc(p),
 ovc(p),
 timerCallbackCount(0)
 {
+    gen = processor.gallery->getGeneralSettings();
+    
     for (int i = 0; i < cDisplayNames.size(); i++)
     {
         buttons.add(new TextButton());
@@ -118,7 +120,6 @@ void MainViewController::sliderValueChanged (Slider* slider)
     
     if(slider == mainSlider)
     {
-        GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
         gen->setGlobalGain(Decibels::decibelsToGain(mainSlider->getValue()));
         gvc.updateFields();
         
@@ -144,7 +145,7 @@ void MainViewController::timerCallback()
         gvc.updateFields();
     }
     
-    GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
+    //check to see if General Settings globalGain has changed, update slider accordingly
     float genGain = Decibels::gainToDecibels(gen->getGlobalGain());
     if(genGain != mainSlider->getValue())
         mainSlider->setValue(Decibels::gainToDecibels(gen->getGlobalGain()));
