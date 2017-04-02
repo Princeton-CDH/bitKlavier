@@ -119,8 +119,19 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     
-    double getLevelL() {return lastRMSLevelL;}
-    double getLevelR() {return lastRMSLevelR;}
+    double getLevelL()
+    {
+        if(didLoadMainPianoSamples) return levelBuf.getRMSLevel(0, 0, levelBuf.getNumSamples());
+        else return 0.;
+    }
+    double getLevelR()
+    {
+        if(levelBuf.getNumChannels() == 2) {
+            if(didLoadMainPianoSamples) return levelBuf.getRMSLevel(1, 0, levelBuf.getNumSamples());
+            else return 0.;
+        }
+        else return getLevelL();
+    }
 
 private:
     int  currentPianoId;
@@ -132,9 +143,11 @@ private:
     void loadMainPianoSamples(BKSynthesiser *synth, int numLayers);
     void loadResonanceRelaseSamples(BKSynthesiser *synth);
     void loadHammerReleaseSamples(BKSynthesiser *synth);
-    double lastRMSLevelL, lastRMSLevelR;
     
-    Array<float> tempoAlreadyLoaded;bool galleryDidLoad;
+    AudioSampleBuffer levelBuf; //for storing samples for metering/RMS calculation
+    
+    Array<float> tempoAlreadyLoaded;
+    bool galleryDidLoad;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)

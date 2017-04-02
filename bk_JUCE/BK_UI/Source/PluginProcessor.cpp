@@ -36,6 +36,8 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     resonanceReleaseSynth.setGeneralSettings(gallery->getGeneralSettings());
     hammerReleaseSynth.setGeneralSettings(gallery->getGeneralSettings());
     
+    levelBuf.setSize(2, 25);
+    
     gallery->prepareToPlay(sampleRate);
     
     
@@ -56,6 +58,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     MidiMessage m;
     
     int numSamples = buffer.getNumSamples();
+    if(numSamples != levelBuf.getNumSamples()) levelBuf.setSize(buffer.getNumChannels(), numSamples);
     
     // Process all active prep maps in current piano
     for (int p = currentPiano->activePMaps.size(); --p >= 0;)
@@ -131,18 +134,9 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     
-    // calculate level here
-    if(buffer.getNumChannels() == 2)
-    {
-        lastRMSLevelL = buffer.getRMSLevel(0, 0, numSamples > 32 ? 32:numSamples);
-        lastRMSLevelR = buffer.getRMSLevel(1, 0, numSamples > 32 ? 32:numSamples);
-    }
-    else
-    {
-        lastRMSLevelL = buffer.getRMSLevel(0, 0, numSamples > 32 ? 32:numSamples);
-        lastRMSLevelR = lastRMSLevelL;
-    }
-    
+    // store buffer for level calculation when needed
+    levelBuf.copyFrom(0, 0, buffer, 0, 0, numSamples);
+    if(levelBuf.getNumChannels() == 2) levelBuf.copyFrom(1, 0, buffer, 1, 0, numSamples);
     
 }
 
