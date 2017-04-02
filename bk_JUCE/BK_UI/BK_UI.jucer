@@ -162,6 +162,11 @@
         </GROUP>
       </GROUP>
       <GROUP id="{E98AFB64-DE96-83A1-81DC-1FA2D8D37DB8}" name="View">
+        <GROUP id="{610E162A-E853-BA5C-1FC8-181124B56AFB}" name="BKLevelMeter">
+          <FILE id="dgg7xV" name="BKLevelMeter.cpp" compile="1" resource="0"
+                file="Source/BKLevelMeter.cpp"/>
+          <FILE id="SZIe4m" name="BKLevelMeter.h" compile="0" resource="0" file="Source/BKLevelMeter.h"/>
+        </GROUP>
         <GROUP id="{CAAFD165-DFE7-A7F9-44CA-A33CEFE40708}" name="BKKeyboard">
           <FILE id="oxVQCp" name="BKKeyboard.cpp" compile="1" resource="0" file="Source/BKKeyboard.cpp"/>
           <FILE id="IrRGH7" name="BKKeyboard.h" compile="0" resource="0" file="Source/BKKeyboard.h"/>

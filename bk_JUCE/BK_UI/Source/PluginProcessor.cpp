@@ -131,6 +131,9 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     
+    // calculate level here
+    lastRMSLevel = buffer.getRMSLevel(0, 0, numSamples);
+    
 }
 
 // Piano

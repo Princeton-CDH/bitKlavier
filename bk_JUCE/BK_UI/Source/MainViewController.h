@@ -12,6 +12,9 @@
 #define MAINVIEWCONTROLLER_H_INCLUDED
 
 #include "PluginProcessor.h"
+#include "BKListener.h"
+#include "BKComponent.h"
+#include "BKLevelMeter.h"
 
 #include "SynchronicViewController.h"
 #include "NostalgicViewController.h"
@@ -57,6 +60,8 @@ private:
     TempoViewController ovc;
     
     OwnedArray<TextButton> buttons;
+    
+    BKLevelMeterComponent *levelMeterComponent;
     
     void timerCallback() override;
 

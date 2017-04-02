@@ -8,6 +8,7 @@
   ==============================================================================
 */
 
+#include "../JuceLibraryCode/JuceHeader.h"
 #include "MainViewController.h"
 
 //==============================================================================
@@ -45,6 +46,8 @@ timerCallbackCount(0)
     addAndMakeVisible(kvc);
     addAndMakeVisible(tvc);
     addAndMakeVisible(ovc);
+    
+    addAndMakeVisible (levelMeterComponent = new BKLevelMeterComponent());  
     
     
     setCurrentDisplay(DisplayDirect);
@@ -152,6 +155,10 @@ void MainViewController::timerCallback()
         dvc.reset();
     }
     
+    //levelMeterComponent->meter.updateLevel(processor.getLevel());
+    levelMeterComponent->updateLevel(processor.getLevel());
+    //DBG("just called updateLevel " + String(processor.getLevel()));
+    
 }
 
 void MainViewController::paint (Graphics& g)
@@ -236,5 +243,9 @@ void MainViewController::resized()
     svc.setBounds(kvc.getBounds());
     nvc.setBounds(kvc.getBounds());
     ovc.setBounds(kvc.getBounds());
+    
+    float levelMeterHeight = 20;
+    float levelMeterWidth = 200;
+    levelMeterComponent->setBounds(galvc.getRight() + gXSpacing, getBottom()-1.5*levelMeterHeight, levelMeterWidth, levelMeterHeight);
     
 }

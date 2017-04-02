@@ -14,6 +14,7 @@ updateState             (new BKUpdateState())
 {
     didLoadHammersAndRes            = false;
     didLoadMainPianoSamples         = false;
+    noteOnCount                     = 0;
     
     updateUI();
     
@@ -111,10 +112,10 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         else if (m.isController())
         {
             int controller = m.getControllerNumber();
-            float value = m.getControllerValue() / 128.0f;
+            //float value = m.getControllerValue() / 128.0f;
             
+            // Q: what is this for?
             int piano = controller-51;
-            
             if ((m.getControllerValue() != 0) && piano >= 0 && piano < 5)   setCurrentPiano(piano);
 
             
@@ -279,6 +280,7 @@ void BKAudioProcessor::saveGallery(void)
 {
     ValueTree galleryVT = gallery->getState();
     
+    //Q: don't need this line, right?
     String xml = galleryVT.toXmlString();
     
     FileChooser myChooser ("Save gallery to file...",
