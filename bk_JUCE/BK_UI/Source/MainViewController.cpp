@@ -111,12 +111,6 @@ void MainViewController::bkButtonClicked            (Button* b)
 
 void MainViewController::sliderValueChanged (Slider* slider)
 {
-    /*
-    if (slider == &frequencySlider)
-        durationSlider.setValue (1.0 / frequencySlider.getValue(), dontSendNotification);
-    else if (slider == &durationSlider)
-        frequencySlider.setValue (1.0 / durationSlider.getValue(), dontSendNotification);
-     */
     
     if(slider == mainSlider)
     {
@@ -148,7 +142,7 @@ void MainViewController::timerCallback()
     //check to see if General Settings globalGain has changed, update slider accordingly
     float genGain = Decibels::gainToDecibels(gen->getGlobalGain());
     if(genGain != mainSlider->getValue())
-        mainSlider->setValue(Decibels::gainToDecibels(gen->getGlobalGain()));
+        mainSlider->setValue(Decibels::gainToDecibels(gen->getGlobalGain()), dontSendNotification);
     
     if (processor.updateState->directPreparationDidChange)
     {
