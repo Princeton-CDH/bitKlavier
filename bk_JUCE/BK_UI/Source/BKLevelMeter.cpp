@@ -34,22 +34,7 @@ void BKLevelMeterComponent::resized()
 
 void BKLevelMeterComponent::timerCallback()
 {
-    
-    if (isShowing())
-    {
-        //const float newLevel = (float) manager.getCurrentInputLevel();
-        //DBG("level meter callback " + String(level));
-        repaint();
-        /*
-        const float newLevel = 0.25;
-        if (std::abs (level - newLevel) > 0.005f)
-        {
-            level = newLevel;
-            repaint();
-        }
-         */
-    }
-    
+    if (isShowing()) repaint();
 }
 
 void BKLevelMeterComponent::drawLevelMeter (Graphics& g, int width, int height, float level)
@@ -70,51 +55,18 @@ void BKLevelMeterComponent::drawLevelMeter (Graphics& g, int width, int height, 
         else if(i < totalBlocks - 2) g.setColour(Colours::yellow.withAlpha (0.9f));
         else g.setColour(Colours::red.withAlpha (1.0f));
 
-        
         //g.fillRoundedRectangle (3.0f + i * w + w * 0.1f, 3.0f, w * 0.8f, height - 6.0f, w * 0.4f);
         g.fillRect (3.0f + i * w + w * 0.1f, 3.0f, w * 0.8f, height - 6.0f);
     }
 }
 
-//void BKLevelMeterComponent::LevelMeter::updateLevel (const float* const* channelData, int numChannels, int numSamples) noexcept
-void BKLevelMeterComponent::updateLevel (const float* const* channelData, int numChannels, int numSamples) noexcept
-{
-    if (enabled.get() != 0 && numChannels > 0)
-    {
-        for (int j = 0; j < numSamples; ++j)
-        {
-            float s = 0;
-            
-            for (int i = 0; i < numChannels; ++i)
-                s += std::abs (channelData[i][j]);
-            
-            s /= numChannels;
-                
-            const double decayFactor = 0.9;
-                
-            if (s > level)
-                level = s;
-            else if (level > 0.001f)
-                level *= decayFactor;
-            else
-                level = 0;
-        }
-    }
-    else
-    {
-        level = 0;
-    }
-}
-
-//void BKLevelMeterComponent::LevelMeter::updateLevel (float newlevel)
 void BKLevelMeterComponent::updateLevel (double newlevel)
 {
     const double decayFactor = 0.8;
     
     if (enabled.get())
     {
-        //DBG("updatelevel " + String(level));
-        
+    
         if (newlevel > level)
             level = newlevel;
         else if (level > 0.001f)
@@ -125,14 +77,12 @@ void BKLevelMeterComponent::updateLevel (double newlevel)
     }
 }
 
-//void BKLevelMeterComponent::LevelMeter::setEnabled (bool shouldBeEnabled) noexcept
 void BKLevelMeterComponent::setEnabled (bool shouldBeEnabled) noexcept
 {
     enabled.set (shouldBeEnabled ? 1 : 0);
     level = 0;
 }
 
-//double BKLevelMeterComponent::LevelMeter::getCurrentLevel() const noexcept
 double BKLevelMeterComponent::getCurrentLevel() const noexcept
 {
     jassert (enabled.get() != 0); // you need to call setEnabled (true) before using this!

@@ -155,9 +155,7 @@ void MainViewController::timerCallback()
         dvc.reset();
     }
     
-    //levelMeterComponent->meter.updateLevel(processor.getLevel());
     levelMeterComponent->updateLevel(processor.getLevel());
-    //DBG("just called updateLevel " + String(processor.getLevel()));
     
 }
 

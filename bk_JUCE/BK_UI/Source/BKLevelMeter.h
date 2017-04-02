@@ -25,25 +25,18 @@ public:
     ~BKLevelMeterComponent();
     
     void drawLevelMeter (Graphics& g, int width, int height, float level);
-    //float level;
     
     void paint (Graphics&) override;
     void resized() override;
     void timerCallback() override;
     
-    //struct LevelMeter
-    //{
-        //LevelMeter() noexcept;
-    void updateLevel (const float* const*, int numChannels, int numSamples) noexcept;
     void updateLevel (double newlevel);
     void setEnabled (bool) noexcept;
     double getCurrentLevel() const noexcept;
     
     Atomic<int> enabled;
     double level;
-    //};
-    
-    //LevelMeter meter;
+
     
 private:
     
