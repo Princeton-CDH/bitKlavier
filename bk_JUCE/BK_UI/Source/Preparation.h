@@ -157,7 +157,11 @@ public:
     //void didChange(bool which) { updateState->directPreparationDidChange = which; }
     
     inline String getName(void) const noexcept {return name;}
-    inline void setName(String newName) {name = newName;}
+    inline void setName(String newName)
+    {
+        name = newName;
+        updateState->directPreparationDidChange = true;
+    }
    
     
 private:
@@ -424,7 +428,12 @@ public:
     //void didChange(bool which) { updateState->synchronicPreparationDidChange = which; }
     
     inline String getName(void) const noexcept {return name;}
-    inline void setName(String newName) {name = newName;}
+    
+    inline void setName(String newName)
+    {
+        name = newName;
+        updateState->synchronicPreparationDidChange = true;
+    }
     
 private:
     int Id;
@@ -589,8 +598,11 @@ public:
     
     //void didChange(bool which) { updateState->nostalgicPreparationDidChange = which; }
     
-    inline String getName(void) const noexcept {return name;}
-    inline void setName(String newName) {name = newName;}
+    inline String getName(void) const noexcept {return name;}inline void setName(String newName)
+    {
+        name = newName;
+        updateState->nostalgicPreparationDidChange = true;
+    }
     
 private:
     int Id;

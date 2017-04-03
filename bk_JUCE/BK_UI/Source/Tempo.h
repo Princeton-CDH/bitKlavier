@@ -15,6 +15,8 @@
 #include "AudioConstants.h"
 #include "General.h"
 
+#include "BKUpdateState.h"
+
 class TempoPreparation : public ReferenceCountedObject
 {
 public:
@@ -359,19 +361,23 @@ public:
     
     
     Tempo(TempoPreparation::Ptr prep,
-           int Id):
+          int Id,
+          BKUpdateState::Ptr us):
     sPrep(new TempoPreparation(prep)),
     aPrep(new TempoPreparation(sPrep)),
     processor(new TempoProcessor(aPrep)),
     Id(Id),
-    name(String(Id))
+    name(String(Id)),
+    updateState(us)
     {
         
     }
     
-    Tempo(int Id):
+    Tempo(int Id,
+          BKUpdateState::Ptr us):
     Id(Id),
-    name(String(Id))
+    name(String(Id)),
+    updateState(us)
     {
         sPrep = new TempoPreparation();
         aPrep = new TempoPreparation(sPrep);
@@ -452,11 +458,18 @@ public:
     }
     
     inline String getName(void) const noexcept {return name;}
-    inline void setName(String newName) {name = newName;}
+    
+    inline void setName(String newName)
+    {
+        name = newName;
+        updateState->tempoPreparationDidChange = true;
+    }
     
 private:
     int Id;
     String name;
+    
+    BKUpdateState::Ptr updateState;
     
     JUCE_LEAK_DETECTOR(Tempo)
 };

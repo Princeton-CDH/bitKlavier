@@ -246,47 +246,6 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
     DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(currentDirectId);
     DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(currentModDirectId);
     
-    /*
-    if (name == cDirectParameterTypes[DirectId])
-    {
-        if (type == BKParameter)
-        {
-            int numDirect = processor.gallery->getNumDirect();
-            
-            if ((i+1) > numDirect)
-            {
-                processor.gallery->addDirect();
-                currentDirectId = numDirect;
-            }
-            else if (i >= 0)
-            {
-                currentDirectId = i;
-            }
-            
-            directTF[DirectId]->setText(String(currentDirectId), false);
-            
-            updateFields();
-        }
-        else // BKModification
-        {
-            int numDMod = processor.gallery->getNumDirectMod();
-            
-            if ((i+1) > numDMod)
-            {
-                processor.gallery->addDirectMod();
-                currentModDirectId = numDMod;
-            }
-            else if (i >= 0)
-            {
-                currentModDirectId = i;
-            }
-            
-            modDirectTF[DirectId]->setText(String(currentModDirectId), false);
-            
-            updateModFields();
-        }
-    }
-    else */
     if (name == "Name")
     {
         processor.gallery->getDirect(currentDirectId)->setName(text);

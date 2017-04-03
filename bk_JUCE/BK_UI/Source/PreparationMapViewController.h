@@ -26,7 +26,7 @@
 //==============================================================================
 /*
 */
-class PreparationMapViewController    : public BKComponent, public BKListener, public ReferenceCountedObject
+class PreparationMapViewController    : public BKComponent, public BKListener, public ReferenceCountedObject, public DragAndDropTarget
 
 {
 public:
@@ -51,6 +51,8 @@ private:
     
     BKAudioProcessor& processor;
     
+    bool somethingIsBeingDraggedOver;
+    
     // BKLabels
     BKLabel             keymapSelectL;
     BKComboBox          keymapSelectCB;
@@ -64,11 +66,24 @@ private:
     
     void addPreparation(BKPreparationType type, int which);
     
-    void bkTextFieldDidChange       (TextEditor&)           override;
+    String addDirectPreparation(int prep);
+    String addNostalgicPreparation(int prep);
+    String addSynchronicPreparation(int prep);
+    String addTempoPreparation(int prep);
+    String addTuningPreparation(int prep);
     
+    // BKListener interface
+    void bkTextFieldDidChange       (TextEditor&)           override;
     void bkComboBoxDidChange        (ComboBox* box)         override;
     void bkButtonClicked            (Button* b)             override { };
     void bkMessageReceived          (const String& message) override { };
+    
+    // Drag interface
+    bool isInterestedInDragSource (const SourceDetails& /*dragSourceDetails*/) override;
+    void itemDragEnter (const SourceDetails& /*dragSourceDetails*/) override;
+    void itemDragMove (const SourceDetails& /*dragSourceDetails*/) override;
+    void itemDragExit (const SourceDetails& /*dragSourceDetails*/) override;
+    void itemDropped (const SourceDetails& dragSourceDetails) override;
     
     void updateFields(void);
     void fillKeymapSelectCB(void);

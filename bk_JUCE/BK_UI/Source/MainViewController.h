@@ -28,6 +28,8 @@
 
 #include "KeymapViewController.h"
 
+#include "PreparationPanel.h"
+
 class MainViewController :  public Component, private Timer, public BKListener, public Slider::Listener
 {
     
@@ -67,7 +69,11 @@ private:
     BKLevelMeterComponent *levelMeterComponentL;
     BKLevelMeterComponent *levelMeterComponentR;
     
+    PreparationPanel* preparationPanel;
+    
     void timerCallback() override;
+    
+    void drawPreparationPanel(void);
 
     int timerCallbackCount;
     

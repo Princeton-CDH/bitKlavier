@@ -213,6 +213,66 @@ public:
         return tempo;
     }
     
+    inline const StringArray getAllDirectNames(void) const noexcept
+    {
+        StringArray names;
+        
+        for (auto prep : direct)
+        {
+            names.add(prep->getName());
+        }
+        
+        return names;
+    }
+    
+    inline const StringArray getAllTuningNames(void) const noexcept
+    {
+        StringArray names;
+        
+        for (auto prep : tuning)
+        {
+            names.add(prep->getName());
+        }
+        
+        return names;
+    }
+    
+    inline const StringArray getAllSynchronicNames(void) const noexcept
+    {
+        StringArray names;
+        
+        for (auto prep : synchronic)
+        {
+            names.add(prep->getName());
+        }
+        
+        return names;
+    }
+    
+    inline const StringArray getAllNostalgicNames(void) const noexcept
+    {
+        StringArray names;
+        
+        for (auto prep : nostalgic)
+        {
+            names.add(prep->getName());
+        }
+        
+        return names;
+    }
+    
+    inline const StringArray getAllTempoNames(void) const noexcept
+    {
+        StringArray names;
+        
+        for (auto prep : tempo)
+        {
+            names.add(prep->getName());
+        }
+        
+        return names;
+    }
+    
     inline const Tuning::Ptr getTuning(int Id) const noexcept
     {
         return tuning[Id];

@@ -34,21 +34,15 @@ void PreparationMap::setKeymap(Keymap::Ptr km)
     pKeymap = km;
 }
 
-void PreparationMap::addSynchronic(Synchronic::Ptr s)
-{
-    synchronic.add(s);
-    deactivateIfNecessary();
-}
-
 void PreparationMap::setSynchronic(Synchronic::PtrArr s)
 {
     synchronic = s;
     deactivateIfNecessary();
 }
 
-void PreparationMap::addNostalgic(Nostalgic::Ptr n)
+void PreparationMap::addSynchronic(Synchronic::Ptr p)
 {
-    nostalgic.add(n);
+    synchronic.add(p);
     deactivateIfNecessary();
 }
 
@@ -58,9 +52,9 @@ void PreparationMap::setNostalgic(Nostalgic::PtrArr n)
     deactivateIfNecessary();
 }
 
-void PreparationMap::addDirect(Direct::Ptr d)
+void PreparationMap::addNostalgic(Nostalgic::Ptr p)
 {
-    direct.add(d);
+    nostalgic.add(p);
     deactivateIfNecessary();
 }
 
@@ -70,9 +64,21 @@ void PreparationMap::setDirect(Direct::PtrArr d)
     deactivateIfNecessary();
 }
 
+void PreparationMap::addDirect(Direct::Ptr p)
+{
+    direct.add(p);
+    deactivateIfNecessary();
+}
+
 void PreparationMap::setTempo(Tempo::PtrArr d)
 {
     tempo = d;
+    deactivateIfNecessary();
+}
+
+void PreparationMap::addTempo(Tempo::Ptr p)
+{
+    tempo.add(p);
     deactivateIfNecessary();
 }
 
@@ -82,11 +88,12 @@ void PreparationMap::setTuning(Tuning::PtrArr d)
     deactivateIfNecessary();
 }
 
-void PreparationMap::addTuning(Tuning::Ptr d)
+void PreparationMap::addTuning(Tuning::Ptr p)
 {
-    tuning.add(d);
+    tuning.add(p);
     deactivateIfNecessary();
 }
+
 
 Synchronic::PtrArr PreparationMap::getSynchronic(void)
 {

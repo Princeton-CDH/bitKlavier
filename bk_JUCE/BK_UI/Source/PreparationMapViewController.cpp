@@ -14,7 +14,8 @@
 //==============================================================================
 PreparationMapViewController::PreparationMapViewController(BKAudioProcessor& p, int Id):
 Id(Id),
-processor(p)
+processor(p),
+somethingIsBeingDraggedOver(false)
 {
     // Row 1: Keymaps
     // First row
@@ -75,10 +76,66 @@ void PreparationMapViewController::bkComboBoxDidChange        (ComboBox* box)
     }
 }
 
+//==============================================================================
+// These methods implement the DragAndDropTarget interface, and allow our component
+// to accept drag-and-drop of objects from other Juce components..
+
+bool PreparationMapViewController::isInterestedInDragSource (const SourceDetails& /*dragSourceDetails*/)
+{
+    // should check drag source to see if its what we want...
+    return true;
+}
+
+void PreparationMapViewController::itemDragEnter (const SourceDetails& /*dragSourceDetails*/) 
+{
+    somethingIsBeingDraggedOver = true;
+    repaint();
+}
+
+void PreparationMapViewController::itemDragMove (const SourceDetails& /*dragSourceDetails*/)
+{
+}
+
+void PreparationMapViewController::itemDragExit (const SourceDetails& /*dragSourceDetails*/)
+{
+    somethingIsBeingDraggedOver = false;
+    repaint();
+}
+
+void PreparationMapViewController::itemDropped (const SourceDetails& dragSourceDetails)
+{
+    String received = dragSourceDetails.description.toString();
+    DBG("Items dropped: " + received);
+    
+    Array<int> data = stringToIntArray(received);
+    
+    if (data[0] == PreparationTypeDirect)
+    {
+        for (int i = 1; i < data.size(); i++)
+        {
+            prepMapTF.setText( prepMapTF.getText() + " " + addDirectPreparation(data[i]) , dontSendNotification);
+            
+            
+        }
+    }
+    
+    
+    
+    somethingIsBeingDraggedOver = false;
+    repaint();
+}
+
 void PreparationMapViewController::paint (Graphics& g)
 {
     g.setColour(Colours::goldenrod);
     g.drawRect(getLocalBounds(), 1);
+    
+    // draw a red line around the comp if the user's currently dragging something over it..
+    if (somethingIsBeingDraggedOver)
+    {
+        g.setColour (Colours::red);
+        g.drawRect (getLocalBounds(), 3);
+    }
 }
 
 void PreparationMapViewController::resized()
@@ -94,6 +151,22 @@ void PreparationMapViewController::resized()
     
 }
 
+String PreparationMapViewController::addDirectPreparation(int prep)
+{
+    String out = "";
+    
+    if (prep <= processor.gallery->getNumDirect()-1)
+    {
+        Direct::Ptr thePrep = processor.gallery->getDirect(prep);
+        
+        processor.currentPiano->prepMaps[Id]->addDirect(thePrep);
+        
+        out += "D" + String(prep);
+    }
+    
+    return out;
+}
+
 String PreparationMapViewController::processPreparationString(String s)
 {
     Synchronic::PtrArr sync = Synchronic::PtrArr();
@@ -101,6 +174,7 @@ String PreparationMapViewController::processPreparationString(String s)
     Direct::PtrArr dire = Direct::PtrArr();
     Tempo::PtrArr tempo = Tempo::PtrArr();
     Tuning::PtrArr tuning = Tuning::PtrArr();
+    
     
     sync.ensureStorageAllocated(12);
     
@@ -192,7 +266,7 @@ String PreparationMapViewController::processPreparationString(String s)
                     if (prep <= processor.gallery->getNumDirect()-1)
                     {
                         dire.add(processor.gallery->getDirect(prep));
-                    
+                        
                         out.append("D", 1);
                         out.append(String(prep), 3);
                     }
@@ -243,7 +317,7 @@ String PreparationMapViewController::processPreparationString(String s)
     // pass arrays to prepMap
     processor.currentPiano->prepMaps[Id]->setSynchronic (sync);
     processor.currentPiano->prepMaps[Id]->setNostalgic  (nost);
-    processor.currentPiano->prepMaps[Id]->setDirect     (dire);
+    processor.currentPiano->prepMaps[Id]->setDirect  (dire);
     processor.currentPiano->prepMaps[Id]->setTempo      (tempo);
     processor.currentPiano->prepMaps[Id]->setTuning     (tuning);
     

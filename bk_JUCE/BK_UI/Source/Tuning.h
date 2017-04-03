@@ -14,6 +14,8 @@
 #include "BKUtilities.h"
 #include "AudioConstants.h"
 
+#include "BKUpdateState.h"
+
 class TuningPreparation : public ReferenceCountedObject
 {
 public:
@@ -433,19 +435,23 @@ public:
     
     
     Tuning(TuningPreparation::Ptr prep,
-              int Id):
+           int Id,
+           BKUpdateState::Ptr us):
     sPrep(new TuningPreparation(prep)),
     aPrep(new TuningPreparation(sPrep)),
     processor(new TuningProcessor(aPrep)),
     Id(Id),
-    name(String(Id))
+    name(String(Id)),
+    updateState(us)
     {
         
     }
     
-    Tuning(int Id):
+    Tuning(int Id,
+           BKUpdateState::Ptr us):
     Id(Id),
-    name(String(Id))
+    name(String(Id)),
+    updateState(us)
     {
         sPrep = new TuningPreparation();
         aPrep = new TuningPreparation(sPrep);
@@ -480,12 +486,19 @@ public:
     
     
     inline String getName(void) const noexcept {return name;}
-    inline void setName(String newName) {name = newName;}
+    
+    inline void setName(String newName)
+    {
+        name = newName;
+        updateState->tuningPreparationDidChange = true;
+    }
     
     
 private:
     int Id;
     String name;
+    
+    BKUpdateState::Ptr updateState;
     
     JUCE_LEAK_DETECTOR(Tuning)
 };

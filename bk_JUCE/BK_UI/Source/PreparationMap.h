@@ -96,17 +96,17 @@ public:
     void setTempo       (Tempo::PtrArr);
     void setTuning      (Tuning::PtrArr);
     
+    void addDirect(Direct::Ptr p);
+    void addNostalgic(Nostalgic::Ptr p);
+    void addSynchronic(Synchronic::Ptr p);
+    void addTempo(Tempo::Ptr p);
+    void addTuning(Tuning::Ptr p);
+    
     Synchronic::PtrArr  getSynchronic(void);
     Nostalgic::PtrArr   getNostalgic(void);
     Direct::PtrArr      getDirect(void);
     Tempo::PtrArr       getTempo(void);
     Tuning::PtrArr      getTuning(void);
-    
-    void    addSynchronic(Synchronic::Ptr s);
-    void    addNostalgic(Nostalgic::Ptr n);
-    void    addDirect(Direct::Ptr d);
-    void    addTempo(Tempo::Ptr o);
-    void    addTuning(Tuning::Ptr t);
 
     void deactivateIfNecessary();
     

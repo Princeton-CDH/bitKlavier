@@ -162,6 +162,16 @@
         </GROUP>
       </GROUP>
       <GROUP id="{E98AFB64-DE96-83A1-81DC-1FA2D8D37DB8}" name="View">
+        <GROUP id="{B171AA30-1033-F14F-9FB7-D270B9262DF0}" name="PreparationPanel">
+          <FILE id="YGbUxA" name="PreparationPropertyComponent.cpp" compile="1"
+                resource="0" file="Source/PreparationPropertyComponent.cpp"/>
+          <FILE id="y7CI0S" name="PreparationPropertyComponent.h" compile="0"
+                resource="0" file="Source/PreparationPropertyComponent.h"/>
+          <FILE id="dkyu8M" name="PreparationPanel.cpp" compile="1" resource="0"
+                file="Source/PreparationPanel.cpp"/>
+          <FILE id="N0jhhR" name="PreparationPanel.h" compile="0" resource="0"
+                file="Source/PreparationPanel.h"/>
+        </GROUP>
         <GROUP id="{610E162A-E853-BA5C-1FC8-181124B56AFB}" name="BKLevelMeter">
           <FILE id="dgg7xV" name="BKLevelMeter.cpp" compile="1" resource="0"
                 file="Source/BKLevelMeter.cpp"/>

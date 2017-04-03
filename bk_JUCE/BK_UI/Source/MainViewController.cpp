@@ -40,6 +40,10 @@ timerCallbackCount(0)
         
     }
     
+    
+    preparationPanel = new PreparationPanel(PreparationTypeDirect, processor.gallery->getAllDirectNames());
+    addAndMakeVisible(preparationPanel);
+    
     addAndMakeVisible(galvc);
     
     addAndMakeVisible(gvc);
@@ -68,6 +72,12 @@ timerCallbackCount(0)
     
     
     startTimerHz (50);
+    
+}
+
+
+void MainViewController::drawPreparationPanel(void)
+{
     
 }
 
@@ -147,6 +157,9 @@ void MainViewController::timerCallback()
     if (processor.updateState->directPreparationDidChange)
     {
         processor.updateState->directPreparationDidChange = false;
+        
+        preparationPanel->setPreparations(PreparationTypeDirect, processor.gallery->getAllDirectNames());
+        
         dvc.updateFields();
     }
     
@@ -183,6 +196,9 @@ void MainViewController::timerCallback()
     if (processor.updateState->directDidChange)
     {
         processor.updateState->directDidChange = false;
+        
+        preparationPanel->setPreparations(PreparationTypeDirect, processor.gallery->getAllDirectNames());
+        
         dvc.reset();
     }
     
@@ -265,7 +281,7 @@ void MainViewController::resized()
     kvc.setBounds(galvc.getRight() + gXSpacing,
                   buttons[0]->getBottom() + gYSpacing,
                   getRight() - galvc.getRight() - 2*gXSpacing - SOME_PADDING,
-                  getHeight() - 200);
+                  getHeight()/2.0f);
     
     gvc.setBounds(kvc.getBounds());
     tvc.setBounds(kvc.getBounds());
@@ -298,6 +314,10 @@ void MainViewController::resized()
                                     kvc.getBottom() - levelMeterHeight - mainSliderTextBoxHeight,
                                     levelMeterWidth,
                                     levelMeterHeight);
+    
+    preparationPanel->setBounds(kvc.getX(), kvc.getBottom()+gXSpacing, kvc.getWidth(), 300);
+    
+    
     
     
     

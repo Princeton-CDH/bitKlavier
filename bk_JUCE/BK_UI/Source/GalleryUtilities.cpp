@@ -218,14 +218,14 @@ int  Gallery::addNostalgicIfNotAlreadyThere(NostalgicPreparation::Ptr nost)
 void Gallery::addTuning(void)
 {
     int numTuning = tuning.size();
-    tuning.add(new Tuning(numTuning));
+    tuning.add(new Tuning(numTuning, updateState));
     tuning.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 void Gallery::addTuning(TuningPreparation::Ptr tune)
 {
     int numTuning = tuning.size();
-    tuning.add(new Tuning(tune, numTuning));
+    tuning.add(new Tuning(tune, numTuning, updateState));
     tuning.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
@@ -258,14 +258,14 @@ int  Gallery::addTuningIfNotAlreadyThere(TuningPreparation::Ptr tune)
 void Gallery::addTempo(void)
 {
     int numTempo = tempo.size();
-    tempo.add(new Tempo(numTempo));
+    tempo.add(new Tempo(numTempo, updateState));
     tempo.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 void Gallery::addTempo(TempoPreparation::Ptr tmp)
 {
     int numTempo = tempo.size();
-    tempo.add(new Tempo(tmp, numTempo));
+    tempo.add(new Tempo(tmp, numTempo, updateState));
     tempo.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
