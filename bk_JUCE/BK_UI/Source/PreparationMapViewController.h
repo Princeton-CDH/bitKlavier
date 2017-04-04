@@ -26,7 +26,7 @@
 //==============================================================================
 /*
 */
-class PreparationMapViewController    : public BKComponent,/*public BKDraggableComponent,*/ public BKListener, public ReferenceCountedObject, public DragAndDropTarget
+class PreparationMapViewController    : public BKDraggableComponent, public BKListener, public ReferenceCountedObject
 
 {
 public:
@@ -52,8 +52,6 @@ private:
     BKAudioProcessor& processor;
     
     Component fullChild;
-    
-    bool somethingIsBeingDraggedOver;
     
     // BKLabels
     BKLabel             keymapSelectL;
@@ -81,12 +79,7 @@ private:
     void bkMessageReceived          (const String& message) override { };
     
     // Drag interface
-    bool isInterestedInDragSource (const SourceDetails& /*dragSourceDetails*/) override;
-    void itemDragEnter (const SourceDetails& /*dragSourceDetails*/) override;
-    void itemDragMove (const SourceDetails& /*dragSourceDetails*/) override;
-    void itemDragExit (const SourceDetails& /*dragSourceDetails*/) override;
-    void itemDropped (const SourceDetails& dragSourceDetails) override;
-    
+    void itemWasDropped (Array<int> data) override;
     
     
     void updateFields(void);

@@ -13,10 +13,9 @@
 
 //==============================================================================
 PreparationMapViewController::PreparationMapViewController(BKAudioProcessor& p, int Id):
-/*BKDraggableComponent(50, 50, 50, 50),*/
+BKDraggableComponent(true,true),
 Id(Id),
-processor(p),
-somethingIsBeingDraggedOver(false)
+processor(p)
 {
     
     addAndMakeVisible(fullChild);
@@ -57,12 +56,12 @@ void PreparationMapViewController::paint (Graphics& g)
     g.setColour(Colours::goldenrod);
     g.drawRect(getLocalBounds(), 1);
     
-    // draw a red line around the comp if the user's currently dragging something over it..
-    if (somethingIsBeingDraggedOver)
+    if (itemIsHovering)
     {
-        g.setColour (Colours::red);
-        g.drawRect (getLocalBounds(), 3);
+        g.setColour(Colours::white);
+        g.drawRect(getLocalBounds(), 2);
     }
+    
 }
 
 void PreparationMapViewController::resized()
@@ -107,38 +106,10 @@ void PreparationMapViewController::bkComboBoxDidChange        (ComboBox* box)
     }
 }
 
-//==============================================================================
-// These methods implement the DragAndDropTarget interface, and allow our component
-// to accept drag-and-drop of objects from other Juce components..
 
-bool PreparationMapViewController::isInterestedInDragSource (const SourceDetails& /*dragSourceDetails*/)
+void PreparationMapViewController::itemWasDropped (Array<int> data)
 {
-    // should check drag source to see if its what we want...
-    return true;
-}
-
-void PreparationMapViewController::itemDragEnter (const SourceDetails& /*dragSourceDetails*/) 
-{
-    somethingIsBeingDraggedOver = true;
-    repaint();
-}
-
-void PreparationMapViewController::itemDragMove (const SourceDetails& /*dragSourceDetails*/)
-{
-}
-
-void PreparationMapViewController::itemDragExit (const SourceDetails& /*dragSourceDetails*/)
-{
-    somethingIsBeingDraggedOver = false;
-    repaint();
-}
-
-void PreparationMapViewController::itemDropped (const SourceDetails& dragSourceDetails)
-{
-    String received = dragSourceDetails.description.toString();
-    DBG("Items dropped: " + received);
-    
-    Array<int> data = stringToIntArray(received);
+    DBG("HEY");
     BKPreparationType type = (BKPreparationType)data[0];
     String added = "";
     
@@ -170,11 +141,8 @@ void PreparationMapViewController::itemDropped (const SourceDetails& dragSourceD
         updateFields();
     }
     
-    
     prepMapTF.setText( prepMapTF.getText() + " " + added, dontSendNotification);
     
-    somethingIsBeingDraggedOver = false;
-    repaint();
 }
 
 

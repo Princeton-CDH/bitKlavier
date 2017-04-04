@@ -106,6 +106,10 @@
           <FILE id="dgzM9u" name="PluginEditor.cpp" compile="1" resource="0"
                 file="Source/PluginEditor.cpp"/>
         </GROUP>
+        <FILE id="XoM1Au" name="BKConstructionSite.cpp" compile="1" resource="0"
+              file="Source/BKConstructionSite.cpp"/>
+        <FILE id="DD5nMw" name="BKConstructionSite.h" compile="0" resource="0"
+              file="Source/BKConstructionSite.h"/>
         <FILE id="Ivngl4" name="MainViewController.cpp" compile="1" resource="0"
               file="Source/MainViewController.cpp"/>
         <FILE id="EyR2nF" name="MainViewController.h" compile="0" resource="0"
