@@ -107,10 +107,9 @@ void PreparationMapViewController::bkComboBoxDidChange        (ComboBox* box)
 }
 
 
-void PreparationMapViewController::itemWasDropped (Array<int> data)
+void PreparationMapViewController::itemWasDropped (BKPreparationType type, Array<int> data, int x, int y)
 {
     DBG("HEY");
-    BKPreparationType type = (BKPreparationType)data[0];
     String added = "";
     
     if (type == PreparationTypeDirect)

@@ -30,6 +30,8 @@
 
 #include "PreparationPanel.h"
 
+#include "BKConstructionSite.h"
+
 class MainViewController :  public Component, private Timer, public BKListener, public Slider::Listener
 {
     
@@ -50,6 +52,8 @@ private:
     // access the processor object that created it
     
     BKAudioProcessor& processor;
+    
+    BKConstructionSite  construction;
     
     GalleryViewController galvc;
     

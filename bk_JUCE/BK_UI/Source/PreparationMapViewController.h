@@ -79,7 +79,7 @@ private:
     void bkMessageReceived          (const String& message) override { };
     
     // Drag interface
-    void itemWasDropped (Array<int> data) override;
+    void itemWasDropped (BKPreparationType type, Array<int> data, int x, int y) override;
     
     
     void updateFields(void);

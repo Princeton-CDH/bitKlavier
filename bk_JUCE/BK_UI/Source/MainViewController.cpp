@@ -15,6 +15,7 @@
 //==============================================================================
 MainViewController::MainViewController (BKAudioProcessor& p):
 processor (p),
+construction(p),
 galvc(p),
 kvc(p),
 tvc(p),
@@ -43,6 +44,8 @@ timerCallbackCount(0)
     
     preparationPanel = new PreparationPanel(processor);
     addAndMakeVisible(preparationPanel);
+    
+    addAndMakeVisible(construction);
     
     addAndMakeVisible(galvc);
     
@@ -91,7 +94,7 @@ void MainViewController::paint (Graphics& g)
 #define SOME_PADDING 125
 void MainViewController::resized()
 {
-    galvc.setBounds(0, 0, gVCWidth+2*gXSpacing, getHeight());
+    galvc.setBounds(0, 0, gVCWidth+2*gXSpacing, getHeight()*.38);
     
     // Place buttons.
     float buttonWidth = ((getRight()-galvc.getRight() - 7 * gXSpacing - SOME_PADDING)/7.0f);
@@ -124,10 +127,10 @@ void MainViewController::resized()
     nvc.setBounds(kvc.getBounds());
     ovc.setBounds(kvc.getBounds());
     
-    int width = 125;
-    preparationPanel->setBounds(getScreenBounds().getRight() - width, getScreenBounds().getY(), width, getScreenBounds().getHeight());
+    int panelWidth = 125;
+    preparationPanel->setBounds(getScreenBounds().getRight() - panelWidth, getScreenBounds().getY(), panelWidth, getScreenBounds().getHeight());
     
-    
+    construction.setBounds(gXSpacing, kvc.getBottom() + gYSpacing, getScreenBounds().getWidth() - panelWidth - 2*gXSpacing, getScreenBounds().getBottom() - kvc.getBottom()-2*gYSpacing);
     
     /*
     float mainSliderHeight = 320;

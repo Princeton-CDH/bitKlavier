@@ -96,7 +96,7 @@ public:
         dragger.dragComponent (this, e, &constrainer);
     }
     
-    virtual void itemWasDropped(Array<int>){};
+    virtual void itemWasDropped(BKPreparationType type, Array<int>, int x, int y){};
     
 protected:
     bool itemIsHovering, isSelected;
@@ -132,10 +132,14 @@ private:
         DBG("Items dropped: " + received);
         
         Array<int> data = stringToIntArray(received);
+        BKPreparationType type = (BKPreparationType)data[0];
+        data.remove(0);
+        
+        Point<int> where = dragSourceDetails.localPosition;
         
         if (isDroppable)
         {
-            itemWasDropped(data);
+            itemWasDropped(type, data, where.getX(), where.getY());
            
             itemIsHovering = false;
             
