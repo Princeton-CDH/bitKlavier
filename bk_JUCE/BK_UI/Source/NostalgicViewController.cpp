@@ -16,11 +16,9 @@
 
 //==============================================================================
 NostalgicViewController::NostalgicViewController(BKAudioProcessor& p):
-processor(p),
-currentNostalgicId(0),
-currentModNostalgicId(0)
+processor(p)
 {
-    NostalgicPreparation::Ptr layer = processor.gallery->getStaticNostalgicPreparation(currentNostalgicId);
+    NostalgicPreparation::Ptr layer = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
     
     // Labels
     nostalgicL = OwnedArray<BKLabel>();
@@ -118,11 +116,11 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
     
-    NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(currentNostalgicId);
+    NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
     
-    NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(currentNostalgicId);
+    NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
     
-    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(currentModNostalgicId);
+    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
     
     if (name == cNostalgicParameterTypes[NostalgicId])
     {
@@ -133,15 +131,15 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
             if ((i+1) > numNostalgic)
             {
                 processor.gallery->addNostalgic();
-                currentNostalgicId = numNostalgic;
+                processor.updateState->currentNostalgicId = numNostalgic;
                 
             }
             else if (i >= 0)
             {
-                currentNostalgicId = i;
+                processor.updateState->currentNostalgicId = i;
             }
             
-            nostalgicTF[NostalgicId]->setText(String(currentNostalgicId), false);
+            nostalgicTF[NostalgicId]->setText(String(processor.updateState->currentNostalgicId), false);
             
             updateFields();
         }
@@ -152,14 +150,14 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
             if ((i+1) > numMod)
             {
                 processor.gallery->addNostalgicMod();
-                currentModNostalgicId = numMod;
+                processor.updateState->currentModNostalgicId = numMod;
             }
             else if (i >= 0)
             {
-                currentModNostalgicId = i;
+                processor.updateState->currentModNostalgicId = i;
             }
             
-            modNostalgicTF[NostalgicId]->setText(String(currentModNostalgicId), false);
+            modNostalgicTF[NostalgicId]->setText(String(processor.updateState->currentModNostalgicId), false);
             
             updateModFields();
         }
@@ -298,7 +296,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
 
 void NostalgicViewController::updateFields(void)
 {
-    NostalgicPreparation::Ptr prep = processor.gallery->getActiveNostalgicPreparation(currentNostalgicId);
+    NostalgicPreparation::Ptr prep = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
 
     nostalgicTF[NostalgicWaveDistance]      ->setText( String( prep->getWavedistance()), false);
     nostalgicTF[NostalgicUndertow]          ->setText( String( prep->getUndertow()), false);
@@ -314,7 +312,7 @@ void NostalgicViewController::updateFields(void)
 void NostalgicViewController::updateModFields(void)
 {
     
-    NostalgicModPreparation::Ptr prep = processor.gallery->getNostalgicModPreparation(currentModNostalgicId);
+    NostalgicModPreparation::Ptr prep = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
     
     modNostalgicTF[NostalgicWaveDistance]      ->setText( prep->getParam(NostalgicWaveDistance), false);
     modNostalgicTF[NostalgicUndertow]          ->setText( prep->getParam(NostalgicUndertow), false);

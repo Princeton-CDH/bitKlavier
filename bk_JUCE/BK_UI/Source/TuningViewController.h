@@ -34,7 +34,6 @@ public:
 private:
     
     BKAudioProcessor& processor;
-    int currentTuningId, currentModTuningId;
     
     OwnedArray<BKLabel> tuningL;
     OwnedArray<BKTextField> tuningTF;

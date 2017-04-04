@@ -25,6 +25,21 @@ public:
     BKUpdateState(){};
     ~BKUpdateState(){};
     
+    
+    int  currentDirectId = 0;
+    int  currentSynchronicId = 0;
+    int  currentNostalgicId = 0;
+    int  currentTempoId = 0;
+    int  currentTuningId = 0;
+    
+    int  currentModDirectId = 0;
+    int  currentModSynchronicId = 0;
+    int  currentModNostalgicId = 0;
+    int  currentModTempoId = 0;
+    int  currentModTuningId = 0;
+    
+    int  currentKeymapId = 0;
+    
     bool galleryDidChange = false;
     bool directDidChange = false;
     bool pianoDidChange = false;
@@ -35,6 +50,9 @@ public:
     bool tempoPreparationDidChange = false;
     bool generalSettingsDidChange = false;
     bool keymapDidChange = false;
+    
+    BKPreparationDisplay currentPreparationDisplay = DisplayDirect;
+    bool displayDidChange;
     
 private:
 

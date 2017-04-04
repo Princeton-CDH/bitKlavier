@@ -13,9 +13,7 @@
 
 //==============================================================================
 TempoViewController::TempoViewController(BKAudioProcessor& p):
-processor(p),
-currentTempoId(0),
-currentModTempoId(0)
+processor(p)
 {
     // Labels
     tempoL = OwnedArray<BKLabel>();
@@ -111,9 +109,9 @@ void TempoViewController::bkTextFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|"); 
     
-    TempoPreparation::Ptr       prep    = processor.gallery->getStaticTempoPreparation(currentTempoId);
-    TempoPreparation::Ptr       active  = processor.gallery->getActiveTempoPreparation(currentTempoId);
-    TempoModPreparation::Ptr    mod     = processor.gallery->getTempoModPreparation(currentModTempoId);
+    TempoPreparation::Ptr       prep    = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
+    TempoPreparation::Ptr       active  = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
+    TempoModPreparation::Ptr    mod     = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
     
     /*
      TempoId = 0,
@@ -135,15 +133,15 @@ void TempoViewController::bkTextFieldDidChange(TextEditor& tf)
             if ((i+1) > numTempo)
             {
                 processor.gallery->addTempo();
-                currentTempoId = numTempo;
+                processor.updateState->currentTempoId = numTempo;
                 
             }
             else if (i >= 0)
             {
-                currentTempoId = i;
+                processor.updateState->currentTempoId = i;
             }
             
-            tempoTF[TempoId]->setText(String(currentTempoId), false);
+            tempoTF[TempoId]->setText(String(processor.updateState->currentTempoId), false);
             
             updateFields();
         }
@@ -154,14 +152,14 @@ void TempoViewController::bkTextFieldDidChange(TextEditor& tf)
             if ((i+1) > numMod)
             {
                 processor.gallery->addTempoMod();
-                currentModTempoId = numMod;
+                processor.updateState->currentModTempoId = numMod;
             }
             else if (i >= 0)
             {
-                currentModTempoId = i;
+                processor.updateState->currentModTempoId = i;
             }
             
-            modTempoTF[TempoId]->setText(String(currentModTempoId), false);
+            modTempoTF[TempoId]->setText(String(processor.updateState->currentModTempoId), false);
             
             updateModFields();
         }
@@ -270,7 +268,7 @@ void TempoViewController::bkTextFieldDidChange(TextEditor& tf)
 void TempoViewController::updateFields()
 {
 
-    TempoPreparation::Ptr prep = processor.gallery->getActiveTempoPreparation(currentTempoId);
+    TempoPreparation::Ptr prep = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
     
     tempoTF[TempoBPM]           ->setText( String( prep->getTempo()), false);
     tempoTF[AT1Mode]            ->setText( String( prep->getAdaptiveTempo1Mode()), false);
@@ -286,7 +284,7 @@ void TempoViewController::updateFields()
 void TempoViewController::updateModFields()
 {
     
-    TempoModPreparation::Ptr prep = processor.gallery->getTempoModPreparation(currentModTempoId);
+    TempoModPreparation::Ptr prep = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
 
     modTempoTF[TempoBPM]            ->setText( prep->getParam(TempoBPM), false);
     modTempoTF[AT1Mode]             ->setText( prep->getParam(AT1Mode), false);

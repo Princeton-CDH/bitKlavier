@@ -36,11 +36,8 @@ public:
     void updateFields(void);
     void updateModFields(void);
     
-    
-    
 private:
     BKAudioProcessor& processor;
-    int currentDirectId, currentModDirectId;
     
     BKLabel selectL;
     BKComboBox selectCB;

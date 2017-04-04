@@ -37,7 +37,6 @@ public:
     void reset(void);
 
 private:
-    int currentKeymapId;
     
     BKAudioProcessor& processor;
     

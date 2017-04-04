@@ -37,7 +37,6 @@ public:
 
 private:
     BKAudioProcessor& processor;
-    int currentNostalgicId, currentModNostalgicId;
     
     // BKLabels
     OwnedArray<BKLabel> nostalgicL;

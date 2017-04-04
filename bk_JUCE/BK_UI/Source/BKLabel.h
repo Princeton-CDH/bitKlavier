@@ -12,6 +12,7 @@
 #define BKLABEL_H_INCLUDED
 
 #include "BKLookAndFeel.h"
+#include "BKComponent.h"
 
 //==============================================================================
 /*
@@ -32,10 +33,13 @@ public:
 
     ~BKLabel()
     {
+        
     }
 
 
 private:
+    
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKLabel)
 };
 

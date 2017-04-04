@@ -41,7 +41,7 @@ timerCallbackCount(0)
     }
     
     
-    preparationPanel = new PreparationPanel(PreparationTypeDirect, processor.gallery->getAllDirectNames());
+    preparationPanel = new PreparationPanel(processor);
     addAndMakeVisible(preparationPanel);
     
     addAndMakeVisible(galvc);
@@ -54,8 +54,10 @@ timerCallbackCount(0)
     addAndMakeVisible(tvc);
     addAndMakeVisible(ovc);
     
+    /*
     addAndMakeVisible (levelMeterComponentL = new BKLevelMeterComponent());
     addAndMakeVisible (levelMeterComponentR = new BKLevelMeterComponent());
+     */
 
     mainSlider = new Slider();
     addAndMakeVisible (mainSlider);
@@ -75,16 +77,95 @@ timerCallbackCount(0)
     
 }
 
-
-void MainViewController::drawPreparationPanel(void)
-{
-    
-}
-
 MainViewController::~MainViewController()
 {
     
 }
+
+
+void MainViewController::paint (Graphics& g)
+{
+    g.fillAll(Colours::dimgrey);
+}
+
+#define SOME_PADDING 125
+void MainViewController::resized()
+{
+    galvc.setBounds(0, 0, gVCWidth+2*gXSpacing, getHeight());
+    
+    // Place buttons.
+    float buttonWidth = ((getRight()-galvc.getRight() - 7 * gXSpacing - SOME_PADDING)/7.0f);
+    float buttonHeight = 30;
+    buttons[0]->setBounds(galvc.getRight()+gXSpacing, gYSpacing, buttonWidth, buttonHeight);
+    for (int i = 1; i < cDisplayNames.size(); i++)
+    {
+        buttons[i]->setBounds(buttons[i-1]->getRight()+gXSpacing, gYSpacing, buttonWidth, buttonHeight);
+    }
+    
+    /*
+     float kvcH = cKeymapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
+     float gvcH = cGeneralParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
+     float svcH = cSynchronicParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
+     float nvcH = cNostalgicParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + 1.5 *  gYSpacing;
+     float dvcH = cDirectParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
+     float tvcH = cTuningParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
+     float ovcH = cTempoParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
+     */
+    
+    kvc.setBounds(galvc.getRight() + gXSpacing,
+                  buttons[0]->getBottom() + gYSpacing,
+                  getRight() - galvc.getRight() - 2*gXSpacing - SOME_PADDING,
+                  getHeight()*.38);
+    
+    gvc.setBounds(kvc.getBounds());
+    tvc.setBounds(kvc.getBounds());
+    dvc.setBounds(kvc.getBounds());
+    svc.setBounds(kvc.getBounds());
+    nvc.setBounds(kvc.getBounds());
+    ovc.setBounds(kvc.getBounds());
+    
+    int width = 125;
+    preparationPanel->setBounds(getScreenBounds().getRight() - width, getScreenBounds().getY(), width, getScreenBounds().getHeight());
+    
+    
+    
+    /*
+    float mainSliderHeight = 320;
+    float mainSliderWidth = 70;
+    float mainSliderTextBoxWidth = 50;
+    float mainSliderTextBoxHeight = 20;
+    mainSlider->setTextBoxStyle (Slider::TextBoxBelow, false, mainSliderTextBoxWidth, mainSliderTextBoxHeight);
+    
+    float levelMeterHeight = mainSliderHeight - mainSliderTextBoxHeight;
+    float levelMeterWidth = 20;
+    
+    
+    //levelMeterComponent->setBounds(galvc.getRight() + gXSpacing, getBottom()-1.5*levelMeterHeight, levelMeterWidth, levelMeterHeight);
+    levelMeterComponentL->setBounds(kvc.getRight() + gXSpacing,
+                                    kvc.getBottom() - levelMeterHeight - mainSliderTextBoxHeight,
+                                    levelMeterWidth,
+                                    levelMeterHeight);
+    
+    mainSlider->setBounds (levelMeterComponentL->getRight() - mainSliderWidth * 0.5 + gXSpacing,
+                           levelMeterComponentL->getBottom() - mainSliderHeight + mainSliderTextBoxHeight,
+                           mainSliderWidth,
+                           mainSliderHeight);
+    
+    
+    levelMeterComponentR->setBounds(mainSlider->getRight() - mainSliderWidth * 0.5 + gXSpacing,
+                                    kvc.getBottom() - levelMeterHeight - mainSliderTextBoxHeight,
+                                    levelMeterWidth,
+                                    levelMeterHeight);
+     */
+    
+    
+    
+    
+    
+    
+    
+}
+
 
 void MainViewController::bkButtonClicked            (Button* b)
 {
@@ -158,7 +239,7 @@ void MainViewController::timerCallback()
     {
         processor.updateState->directPreparationDidChange = false;
         
-        preparationPanel->setPreparations(PreparationTypeDirect, processor.gallery->getAllDirectNames());
+        preparationPanel->refill(PreparationTypeDirect);
         
         dvc.updateFields();
     }
@@ -166,24 +247,36 @@ void MainViewController::timerCallback()
     if (processor.updateState->nostalgicPreparationDidChange)
     {
         processor.updateState->nostalgicPreparationDidChange = false;
+        
+        preparationPanel->refill(PreparationTypeNostalgic);
+        
         nvc.updateFields();
     }
     
     if (processor.updateState->synchronicPreparationDidChange)
     {
         processor.updateState->synchronicPreparationDidChange = false;
+        
+        preparationPanel->refill(PreparationTypeSynchronic);
+        
         svc.updateFields();
     }
     
     if (processor.updateState->tuningPreparationDidChange)
     {
         processor.updateState->tuningPreparationDidChange = false;
+        
+        preparationPanel->refill(PreparationTypeTuning);
+        
         tvc.updateFields();
     }
     
     if (processor.updateState->tempoPreparationDidChange)
     {
         processor.updateState->tempoPreparationDidChange = false;
+        
+        preparationPanel->refill(PreparationTypeTempo);
+        
         ovc.updateFields();
     }
     
@@ -197,25 +290,28 @@ void MainViewController::timerCallback()
     {
         processor.updateState->directDidChange = false;
         
-        preparationPanel->setPreparations(PreparationTypeDirect, processor.gallery->getAllDirectNames());
+        preparationPanel->refill(PreparationTypeDirect);
         
         dvc.reset();
     }
     
+    if (processor.updateState->displayDidChange)
+    {
+        processor.updateState->displayDidChange = false;
+        
+        setCurrentDisplay(processor.updateState->currentPreparationDisplay);
+    }
+    
+    /*
     levelMeterComponentL->updateLevel(processor.getLevelL());
     levelMeterComponentR->updateLevel(processor.getLevelL());
+     */
     
 }
 
-void MainViewController::paint (Graphics& g)
-{
-    g.fillAll(Colours::dimgrey);
-}
 
 void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
 {
-    currentDisplay = type;
-    
     kvc.setVisible(false);
     gvc.setVisible(false);
     tvc.setVisible(false);
@@ -253,72 +349,4 @@ void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
         gvc.setVisible(true);
     }
         
-}
-#define SOME_PADDING 100
-void MainViewController::resized()
-{
-    galvc.setBounds(0, 0, gVCWidth+2*gXSpacing, getHeight());
-    
-    // Place buttons.
-    float buttonWidth = ((getRight()-galvc.getRight() - 7 * gXSpacing - SOME_PADDING)/7.0f);
-    float buttonHeight = 30;
-    buttons[0]->setBounds(galvc.getRight()+gXSpacing, gYSpacing, buttonWidth, buttonHeight);
-    for (int i = 1; i < cDisplayNames.size(); i++)
-    {
-        buttons[i]->setBounds(buttons[i-1]->getRight()+gXSpacing, gYSpacing, buttonWidth, buttonHeight);
-    }
-    
-    /*
-    float kvcH = cKeymapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
-    float gvcH = cGeneralParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
-    float svcH = cSynchronicParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
-    float nvcH = cNostalgicParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + 1.5 *  gYSpacing;
-    float dvcH = cDirectParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
-    float tvcH = cTuningParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
-    float ovcH = cTempoParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
-    */
-    
-    kvc.setBounds(galvc.getRight() + gXSpacing,
-                  buttons[0]->getBottom() + gYSpacing,
-                  getRight() - galvc.getRight() - 2*gXSpacing - SOME_PADDING,
-                  getHeight()/2.0f);
-    
-    gvc.setBounds(kvc.getBounds());
-    tvc.setBounds(kvc.getBounds());
-    dvc.setBounds(kvc.getBounds());
-    svc.setBounds(kvc.getBounds());
-    nvc.setBounds(kvc.getBounds());
-    ovc.setBounds(kvc.getBounds());
-    
-    float mainSliderHeight = 320;
-    float mainSliderWidth = 70;
-    float mainSliderTextBoxWidth = 50;
-    float mainSliderTextBoxHeight = 20;
-    mainSlider->setTextBoxStyle (Slider::TextBoxBelow, false, mainSliderTextBoxWidth, mainSliderTextBoxHeight);
-    
-    float levelMeterHeight = mainSliderHeight - mainSliderTextBoxHeight;
-    float levelMeterWidth = 20;
-    
-    //levelMeterComponent->setBounds(galvc.getRight() + gXSpacing, getBottom()-1.5*levelMeterHeight, levelMeterWidth, levelMeterHeight);
-    levelMeterComponentL->setBounds(kvc.getRight() + gXSpacing,
-                                    kvc.getBottom() - levelMeterHeight - mainSliderTextBoxHeight,
-                                    levelMeterWidth,
-                                    levelMeterHeight);
-    
-    mainSlider->setBounds (levelMeterComponentL->getRight() - mainSliderWidth * 0.5 + gXSpacing,
-                           levelMeterComponentL->getBottom() - mainSliderHeight + mainSliderTextBoxHeight,
-                           mainSliderWidth,
-                           mainSliderHeight);
-    
-    levelMeterComponentR->setBounds(mainSlider->getRight() - mainSliderWidth * 0.5 + gXSpacing,
-                                    kvc.getBottom() - levelMeterHeight - mainSliderTextBoxHeight,
-                                    levelMeterWidth,
-                                    levelMeterHeight);
-    
-    preparationPanel->setBounds(kvc.getX(), kvc.getBottom()+gXSpacing, kvc.getWidth(), 300);
-    
-    
-    
-    
-    
 }

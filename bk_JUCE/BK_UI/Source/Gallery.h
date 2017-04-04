@@ -213,6 +213,18 @@ public:
         return tempo;
     }
     
+    inline const StringArray getAllKeymapNames(void) const noexcept
+    {
+        StringArray names;
+        
+        for (auto keymap : bkKeymaps)
+        {
+            names.add(keymap->getName());
+        }
+        
+        return names;
+    }
+    
     inline const StringArray getAllDirectNames(void) const noexcept
     {
         StringArray names;

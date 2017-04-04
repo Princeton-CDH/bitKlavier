@@ -11,25 +11,4 @@
 #include "BKComponent.h"
 
 //==============================================================================
-BKComponent::BKComponent()
-{
-    
-}
 
-BKComponent::~BKComponent()
-{
-    
-}
-
-
-
-void BKComponent::paint (Graphics& g)
-{
-    g.setColour(Colours::goldenrod);
-    g.drawRect(getLocalBounds(), 1);
-}
-
-void BKComponent::resized()
-{
-    
-}

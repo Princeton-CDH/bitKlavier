@@ -816,8 +816,6 @@ bool BKKeymapKeyboardComponent::mouseDownOnKey    (int midiNoteNumber, const Mou
 {
     if (lastKeySelected == -1)
     {
-        DBG("mouseDownOnKey: " + String(midiNoteNumber));
-        
         lastKeySelected = midiNoteNumber;
     }
     
@@ -828,8 +826,6 @@ void BKKeymapKeyboardComponent::mouseDraggedToKey (int midiNoteNumber, const Mou
 {
     if (midiNoteNumber != lastKeySelected)
     {
-        DBG("mouseDraggedToKey: " + String(midiNoteNumber));
-        
         state.toggle(lastKeySelected);
         repaint(getRectangleForKey(lastKeySelected));
         
@@ -839,9 +835,6 @@ void BKKeymapKeyboardComponent::mouseDraggedToKey (int midiNoteNumber, const Mou
 
 void BKKeymapKeyboardComponent::mouseUpOnKey      (int midiNoteNumber, const MouseEvent&)
 {
-
-    DBG("mouseUpOnKey: " + String(midiNoteNumber));
-    
     state.toggle(midiNoteNumber);
     repaint(getRectangleForKey(midiNoteNumber));
     

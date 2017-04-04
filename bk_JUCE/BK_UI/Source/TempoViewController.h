@@ -31,7 +31,6 @@ public:
 private:
     
     BKAudioProcessor& processor;
-    int currentTempoId, currentModTempoId;
     
     OwnedArray<BKLabel> tempoL;
     OwnedArray<BKTextField> tempoTF;

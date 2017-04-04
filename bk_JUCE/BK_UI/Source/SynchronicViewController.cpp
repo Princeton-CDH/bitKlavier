@@ -17,11 +17,9 @@
 
 //==============================================================================
 SynchronicViewController::SynchronicViewController(BKAudioProcessor& p):
-processor(p),
-currentSynchronicId(0),
-currentModSynchronicId(0)
+processor(p)
 {
-    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(currentSynchronicId);
+    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     
      // Labels
     synchronicL = OwnedArray<BKLabel>();
@@ -121,11 +119,11 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
     
-    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(currentSynchronicId);
+    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     
-    SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(currentSynchronicId);
+    SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
-    SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(currentModSynchronicId);
+    SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
     
     if (name == cSynchronicParameterTypes[SynchronicId])
     {
@@ -137,15 +135,15 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
             if ((i+1) > numSynchronic)
             {
                 processor.gallery->addSynchronic();
-                currentSynchronicId = numSynchronic;
+                processor.updateState->currentSynchronicId = numSynchronic;
             
             }
             else if (i >= 0)
             {
-                currentSynchronicId = i;
+                processor.updateState->currentSynchronicId = i;
             }
             
-            synchronicTF[SynchronicId]->setText(String(currentSynchronicId), false);
+            synchronicTF[SynchronicId]->setText(String(processor.updateState->currentSynchronicId), false);
             
             updateFields();
         }
@@ -156,14 +154,14 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
             if ((i+1) > numMod)
             {
                 processor.gallery->addSynchronicMod();
-                currentModSynchronicId = numMod;
+                processor.updateState->currentModSynchronicId = numMod;
             }
             else if (i >= 0)
             {
-                currentModSynchronicId = i;
+                processor.updateState->currentModSynchronicId = i;
             }
             
-            modSynchronicTF[SynchronicId]->setText(String(currentModSynchronicId), false);
+            modSynchronicTF[SynchronicId]->setText(String(processor.updateState->currentModSynchronicId), false);
             
             updateModFields();
         }
@@ -346,7 +344,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
 
 void SynchronicViewController::updateFields(void)
 {
-    SynchronicPreparation::Ptr prep   = processor.gallery->getActiveSynchronicPreparation(currentSynchronicId);
+    SynchronicPreparation::Ptr prep   = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
 
     synchronicTF[SynchronicTempo]               ->setText(  String(                 prep->getTempoControl()->getId()), false);
     synchronicTF[SynchronicNumPulses]           ->setText(  String(                 prep->getNumBeats()), false);
@@ -366,7 +364,7 @@ void SynchronicViewController::updateFields(void)
 void SynchronicViewController::updateModFields(void)
 {
     // a Modification copy of Preparation to pull values from when updating
-    SynchronicModPreparation::Ptr prep   = processor.gallery->getSynchronicModPreparation(currentModSynchronicId);
+    SynchronicModPreparation::Ptr prep   = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
     
     modSynchronicTF[SynchronicTempo]               ->setText(  prep->getParam(SynchronicTempo), false);
     modSynchronicTF[SynchronicNumPulses]           ->setText(  prep->getParam(SynchronicNumPulses), false);

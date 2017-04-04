@@ -14,9 +14,7 @@
 
 //==============================================================================
 DirectViewController::DirectViewController(BKAudioProcessor& p):
-processor(p),
-currentDirectId(0),
-currentModDirectId(0)
+processor(p)
 {
     
     // First row
@@ -51,7 +49,7 @@ currentModDirectId(0)
     modNameTF.addListener(this);
     modNameTF.setName("Name");
 
-    DirectPreparation::Ptr layer = processor.gallery->getStaticDirectPreparation(currentDirectId);
+    DirectPreparation::Ptr layer = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
     
     // Labels
     directL = OwnedArray<BKLabel>();
@@ -98,10 +96,10 @@ currentModDirectId(0)
 
 void DirectViewController::reset(void)
 {
-    currentDirectId = 0;
+    processor.updateState->currentDirectId = 0;
     fillSelectCB(); updateFields();
     
-    currentModDirectId = 0;
+    processor.updateState->currentModDirectId = 0;
     fillModSelectCB(); updateModFields();
 }
 
@@ -124,7 +122,7 @@ void DirectViewController::fillSelectCB(void)
     
     selectCB.addItem("New direct...", direct.size()+1);
     
-    selectCB.setSelectedItemIndex(currentDirectId, NotificationType::dontSendNotification);
+    selectCB.setSelectedItemIndex(processor.updateState->currentDirectId, NotificationType::dontSendNotification);
     
 }
 
@@ -143,7 +141,7 @@ void DirectViewController::fillModSelectCB(void)
     
     modSelectCB.addItem("New modification...", modDirect.size()+1);
     
-    modSelectCB.setSelectedItemIndex(currentModDirectId, NotificationType::dontSendNotification);
+    modSelectCB.setSelectedItemIndex(processor.updateState->currentModDirectId, NotificationType::dontSendNotification);
 }
 
 
@@ -154,9 +152,9 @@ void DirectViewController::bkComboBoxDidChange        (ComboBox* box)
     
     if (name == "Direct")
     {
-        currentDirectId = box->getSelectedItemIndex();
+        processor.updateState->currentDirectId = box->getSelectedItemIndex();
         
-        if (currentDirectId == selectCB.getNumItems()-1) // New Direct
+        if (processor.updateState->currentDirectId == selectCB.getNumItems()-1) // New Direct
         {
             processor.gallery->addDirect();
             
@@ -167,9 +165,9 @@ void DirectViewController::bkComboBoxDidChange        (ComboBox* box)
     }
     else if (name == "DirectMod")
     {
-        currentModDirectId = box->getSelectedItemIndex();
+        processor.updateState->currentModDirectId = box->getSelectedItemIndex();
         
-        if (currentModDirectId == modSelectCB.getNumItems()-1) // New Mod
+        if (processor.updateState->currentModDirectId == modSelectCB.getNumItems()-1) // New Mod
         {
             processor.gallery->addDirectMod();
             
@@ -242,13 +240,13 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
     
-    DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(currentDirectId);
-    DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(currentDirectId);
-    DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(currentModDirectId);
+    DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
+    DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
+    DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
     
     if (name == "Name")
     {
-        processor.gallery->getDirect(currentDirectId)->setName(text);
+        processor.gallery->getDirect(processor.updateState->currentDirectId)->setName(text);
         
         int selected = selectCB.getSelectedId();
         if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, text);
@@ -256,7 +254,7 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
     }
     else if (name == "ModName")
     {
-        processor.gallery->getDirectModPreparation(currentModDirectId)->setName(text);
+        processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId)->setName(text);
         
         int selected = modSelectCB.getSelectedId();
         if (selected != modSelectCB.getNumItems()) modSelectCB.changeItemText(selected, text);
@@ -342,8 +340,12 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
 
 void DirectViewController::updateFields(void)
 {
+    Direct::Ptr dir = processor.gallery->getDirect(processor.updateState->currentDirectId);
+    DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
     
-    DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(currentDirectId);
+    selectCB.setSelectedItemIndex(processor.updateState->currentDirectId, dontSendNotification);
+    
+    nameTF.setText(dir->getName(), dontSendNotification);
     
     directTF[DirectTransposition]       ->setText( floatArrayToString( prep->getTransposition()), false);
     directTF[DirectGain]                ->setText( String( prep->getGain()), false);
@@ -355,7 +357,7 @@ void DirectViewController::updateFields(void)
 
 void DirectViewController::updateModFields(void)
 {
-    DirectModPreparation::Ptr prep = processor.gallery->getDirectModPreparation(currentModDirectId);
+    DirectModPreparation::Ptr prep = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
     
     modDirectTF[DirectTransposition]       ->setText( prep->getParam(DirectTransposition), false);
     modDirectTF[DirectGain]                ->setText( prep->getParam(DirectGain), false);

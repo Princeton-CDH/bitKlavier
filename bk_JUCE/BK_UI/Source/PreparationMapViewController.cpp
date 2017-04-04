@@ -13,10 +13,15 @@
 
 //==============================================================================
 PreparationMapViewController::PreparationMapViewController(BKAudioProcessor& p, int Id):
+/*BKDraggableComponent(50, 50, 50, 50),*/
 Id(Id),
 processor(p),
 somethingIsBeingDraggedOver(false)
 {
+    
+    addAndMakeVisible(fullChild);
+    
+    
     // Row 1: Keymaps
     // First row
     addAndMakeVisible(keymapSelectL);
@@ -44,6 +49,32 @@ somethingIsBeingDraggedOver(false)
 
 PreparationMapViewController::~PreparationMapViewController()
 {
+}
+
+
+void PreparationMapViewController::paint (Graphics& g)
+{
+    g.setColour(Colours::goldenrod);
+    g.drawRect(getLocalBounds(), 1);
+    
+    // draw a red line around the comp if the user's currently dragging something over it..
+    if (somethingIsBeingDraggedOver)
+    {
+        g.setColour (Colours::red);
+        g.drawRect (getLocalBounds(), 3);
+    }
+}
+
+void PreparationMapViewController::resized()
+{
+    // Row1
+    keymapSelectL.setTopLeftPosition(0, gYSpacing);
+    keymapSelectCB.setTopLeftPosition(keymapSelectL.getRight()+gXSpacing, keymapSelectL.getY());
+    
+    prepMapL.setTopLeftPosition(0, keymapSelectL.getBottom() + gYSpacing);
+    prepMapTF.setTopLeftPosition(prepMapL.getRight()+gXSpacing, prepMapL.getY());
+    
+    fullChild.setBounds(0,0,getWidth(),getHeight());
 }
 
 void PreparationMapViewController::fillKeymapSelectCB(void)
@@ -108,48 +139,45 @@ void PreparationMapViewController::itemDropped (const SourceDetails& dragSourceD
     DBG("Items dropped: " + received);
     
     Array<int> data = stringToIntArray(received);
+    BKPreparationType type = (BKPreparationType)data[0];
+    String added = "";
     
-    if (data[0] == PreparationTypeDirect)
+    if (type == PreparationTypeDirect)
     {
-        for (int i = 1; i < data.size(); i++)
-        {
-            prepMapTF.setText( prepMapTF.getText() + " " + addDirectPreparation(data[i]) , dontSendNotification);
-            
-            
-        }
+        for (int i = 1; i < data.size(); i++)   added += " " + addDirectPreparation(data[i]);
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        for (int i = 1; i < data.size(); i++)   added += " " + addSynchronicPreparation(data[i]);
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        for (int i = 1; i < data.size(); i++)   added += " " + addNostalgicPreparation(data[i]);
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        for (int i = 1; i < data.size(); i++)   added += " " + addTempoPreparation(data[i]);
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        for (int i = 1; i < data.size(); i++)   added += " " + addTuningPreparation(data[i]);
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+        keymapId = data[1];
+        keymapSelectCB.setSelectedItemIndex(data[1],dontSendNotification);
+        processor.currentPiano->prepMaps[Id]->setKeymap(processor.gallery->getKeymap(keymapId));
+        updateFields();
     }
     
     
+    prepMapTF.setText( prepMapTF.getText() + " " + added, dontSendNotification);
     
     somethingIsBeingDraggedOver = false;
     repaint();
 }
 
-void PreparationMapViewController::paint (Graphics& g)
-{
-    g.setColour(Colours::goldenrod);
-    g.drawRect(getLocalBounds(), 1);
-    
-    // draw a red line around the comp if the user's currently dragging something over it..
-    if (somethingIsBeingDraggedOver)
-    {
-        g.setColour (Colours::red);
-        g.drawRect (getLocalBounds(), 3);
-    }
-}
 
-void PreparationMapViewController::resized()
-{
-   
-    
-    // Row1
-    keymapSelectL.setTopLeftPosition(0, gYSpacing);
-    keymapSelectCB.setTopLeftPosition(keymapSelectL.getRight()+gXSpacing, keymapSelectL.getY());
-    
-    prepMapL.setTopLeftPosition(0, keymapSelectL.getBottom() + gYSpacing);
-    prepMapTF.setTopLeftPosition(prepMapL.getRight()+gXSpacing, prepMapL.getY());
-    
-}
 
 String PreparationMapViewController::addDirectPreparation(int prep)
 {
@@ -162,6 +190,70 @@ String PreparationMapViewController::addDirectPreparation(int prep)
         processor.currentPiano->prepMaps[Id]->addDirect(thePrep);
         
         out += "D" + String(prep);
+    }
+    
+    return out;
+}
+
+String PreparationMapViewController::addSynchronicPreparation(int prep)
+{
+    String out = "";
+    
+    if (prep <= processor.gallery->getNumSynchronic()-1)
+    {
+        Synchronic::Ptr thePrep = processor.gallery->getSynchronic(prep);
+        
+        processor.currentPiano->prepMaps[Id]->addSynchronic(thePrep);
+        
+        out += "S" + String(prep);
+    }
+    
+    return out;
+}
+
+String PreparationMapViewController::addNostalgicPreparation(int prep)
+{
+    String out = "";
+    
+    if (prep <= processor.gallery->getNumNostalgic()-1)
+    {
+        Nostalgic::Ptr thePrep = processor.gallery->getNostalgic(prep);
+        
+        processor.currentPiano->prepMaps[Id]->addNostalgic(thePrep);
+        
+        out += "N" + String(prep);
+    }
+    
+    return out;
+}
+
+String PreparationMapViewController::addTempoPreparation(int prep)
+{
+    String out = "";
+    
+    if (prep <= processor.gallery->getNumTempo()-1)
+    {
+        Tempo::Ptr thePrep = processor.gallery->getTempo(prep);
+        
+        processor.currentPiano->prepMaps[Id]->addTempo(thePrep);
+        
+        out += "M" + String(prep);
+    }
+    
+    return out;
+}
+
+String PreparationMapViewController::addTuningPreparation(int prep)
+{
+    String out = "";
+    
+    if (prep <= processor.gallery->getNumTuning()-1)
+    {
+        Tuning::Ptr thePrep = processor.gallery->getTuning(prep);
+        
+        processor.currentPiano->prepMaps[Id]->addTuning(thePrep);
+        
+        out += "T" + String(prep);
     }
     
     return out;

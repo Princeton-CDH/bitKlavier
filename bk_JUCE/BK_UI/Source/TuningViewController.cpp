@@ -13,9 +13,7 @@
 
 //==============================================================================
 TuningViewController::TuningViewController(BKAudioProcessor& p):
-processor(p),
-currentTuningId(0),
-currentModTuningId(0)
+processor(p)
 {
     // Labels
     tuningL = OwnedArray<BKLabel>();
@@ -111,11 +109,11 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
     
     DBG(name + ": |" + text + "|");
     
-    TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(currentTuningId);
+    TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
     
-    TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(currentTuningId);
+    TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
     
-    TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(currentModTuningId);
+    TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
     
     if (name == cTuningParameterTypes[TuningId])
     {
@@ -126,15 +124,15 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
             if ((i+1) > numTuning)
             {
                 processor.gallery->addTuning();
-                currentTuningId = numTuning;
+                processor.updateState->currentTuningId = numTuning;
                 
             }
             else if (i >= 0)
             {
-                currentTuningId = i;
+                processor.updateState->currentTuningId = i;
             }
             
-            tuningTF[TuningId]->setText(String(currentTuningId), false);
+            tuningTF[TuningId]->setText(String(processor.updateState->currentTuningId), false);
             
             updateFields();
         }
@@ -145,14 +143,14 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
             if ((i+1) > numMod)
             {
                 processor.gallery->addTuningMod();
-                currentModTuningId = numMod;
+                processor.updateState->currentModTuningId = numMod;
             }
             else if (i >= 0)
             {
-                currentModTuningId = i;
+                processor.updateState->currentModTuningId = i;
             }
             
-            modTuningTF[TuningId]->setText(String(currentModTuningId), false);
+            modTuningTF[TuningId]->setText(String(processor.updateState->currentModTuningId), false);
             
             updateModFields();
         }
@@ -301,7 +299,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
 void TuningViewController::updateFields()
 {
     
-    TuningPreparation::Ptr prep = processor.gallery->getActiveTuningPreparation(currentTuningId);
+    TuningPreparation::Ptr prep = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
 
     tuningTF[TuningScale]               ->setText( String( prep->getTuning()), false);
     tuningTF[TuningFundamental]         ->setText( String( prep->getFundamental()), false);
@@ -321,7 +319,7 @@ void TuningViewController::updateFields()
 void TuningViewController::updateModFields()
 {
     
-    TuningModPreparation::Ptr prep = processor.gallery->getTuningModPreparation(currentModTuningId);
+    TuningModPreparation::Ptr prep = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
     
     modTuningTF[TuningScale]               ->setText( prep->getParam(TuningScale), false);
     modTuningTF[TuningFundamental]         ->setText( prep->getParam(TuningFundamental), false);

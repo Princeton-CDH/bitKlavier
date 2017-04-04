@@ -13,7 +13,6 @@
 
 //==============================================================================
 KeymapViewController::KeymapViewController(BKAudioProcessor& p):
-currentKeymapId(1),
 processor(p)
 {
     // First row
@@ -73,7 +72,6 @@ KeymapViewController::~KeymapViewController()
 
 void KeymapViewController::reset(void)
 {
-    currentKeymapId = 0;
     fillKeymapSelectCB();
     updateFields();
 }
@@ -118,9 +116,9 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
     
     if (name == "Keymap")
     {
-        currentKeymapId = box->getSelectedItemIndex();
+        processor.updateState->currentKeymapId = box->getSelectedItemIndex();
         
-        if (currentKeymapId == keymapSelectCB.getNumItems()-1) // New Keymap
+        if (processor.updateState->currentKeymapId == keymapSelectCB.getNumItems()-1) // New Keymap
         {
             processor.gallery->addKeymap();
             
@@ -143,7 +141,7 @@ void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
     
     if (name == "KeymapName")
     {
-        processor.gallery->getKeymap(currentKeymapId)->setName(text);
+        processor.gallery->getKeymap(processor.updateState->currentKeymapId)->setName(text);
 
         int selected = keymapSelectCB.getSelectedId();
         if (selected != keymapSelectCB.getNumItems()) keymapSelectCB.changeItemText(selected, text);
@@ -155,7 +153,7 @@ void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
         
         keymapTF.setText(intArrayToString(keys));
         
-        processor.gallery->setKeymap(currentKeymapId, keys);
+        processor.gallery->setKeymap(processor.updateState->currentKeymapId, keys);
         
         BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
         
@@ -183,14 +181,14 @@ void KeymapViewController::fillKeymapSelectCB(void)
     
     keymapSelectCB.addItem("New keymap...", keymaps.size()+1);
     
-    keymapSelectCB.setSelectedItemIndex(currentKeymapId, NotificationType::dontSendNotification);
+    keymapSelectCB.setSelectedItemIndex(processor.updateState->currentKeymapId, NotificationType::dontSendNotification);
     
 }
 
 
 void KeymapViewController::updateFields(void)
 {
-    Keymap::Ptr km = processor.gallery->getKeymap(currentKeymapId);
+    Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
     
     keymapTF.setText( intArrayToString(km->keys()));
     
@@ -206,7 +204,7 @@ void KeymapViewController::bkMessageReceived (const String& message)
 {
     if (message == "keymap/update")
     {
-        //currentKeymapId = processor.currentPiano->currentPMap->getKeymapId();
+        //processor.updateState->currentKeymapId = processor.currentPiano->currentPMap->getKeymapId();
         
         //updateFields();
     }
@@ -225,15 +223,14 @@ void KeymapViewController::handleKeymapNoteOff (BKKeymapKeyboardState* source, i
 
 void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber)
 {
-    DBG("toggled? +" + String(midiNoteNumber));
     
-    processor.gallery->getKeymap(currentKeymapId)->toggleNote(midiNoteNumber);
+    processor.gallery->getKeymap(processor.updateState->currentKeymapId)->toggleNote(midiNoteNumber);
     
     updateFields();
     
     BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
     
-    keyboard->setKeysInKeymap(processor.gallery->getKeymap(currentKeymapId)->keys());
+    keyboard->setKeysInKeymap(processor.gallery->getKeymap(processor.updateState->currentKeymapId)->keys());
     
 }
 
