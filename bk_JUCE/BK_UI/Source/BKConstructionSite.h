@@ -18,6 +18,8 @@
 
 #include "PluginProcessor.h"
 
+#include "BKItem.h"
+
 class BKConstructionSite : public BKDraggableComponent
 {
 public:
@@ -51,7 +53,7 @@ public:
     
     void resized(void) override
     {
-        for (int i = 0; i < poppers.size(); i++)
+        for (int i = 0; i < items.size(); i++)
         {
             
         }
@@ -60,7 +62,7 @@ public:
 private:
     BKAudioProcessor& processor;
     
-    OwnedArray<Label> poppers;
+    OwnedArray<BKItem> items;
     
     // Drag interface
     void itemWasDropped(BKPreparationType type, Array<int> data, int x, int y) override
@@ -70,17 +72,15 @@ private:
         {
             String name = cPreparationTypes[type]+String(data[i]);
             
-            int index = poppers.size();
+            int index = items.size();
             
-            poppers.add(new Label(String(index), name));
+            items.add(new BKItem(type, data[i], name));
+
             
-            poppers[index]->setJustificationType(Justification::centred);
-            poppers[index]->setBorderSize(BorderSize<int>(2));
+            items[index]->setCentrePosition(x, (i-1)*25 + y);
+            items[index]->setSize(150,20);
             
-            poppers[index]->setCentrePosition(x, (i-1)*25 + y);
-            poppers[index]->setSize(150,20);
-            
-            addAndMakeVisible(poppers[index]);
+            addAndMakeVisible(items[index]);
             
             DBG("added: " + name);
             
