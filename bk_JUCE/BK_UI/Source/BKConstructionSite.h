@@ -70,19 +70,14 @@ private:
         // Now need to make custom objects for preparations/keymaps (draggable, connectable, selectable, deletable)
         for (int i = 0; i < data.size(); i++)
         {
-            String name = cPreparationTypes[type]+String(data[i]);
-            
             int index = items.size();
             
-            items.add(new BKItem(type, data[i], name));
+            items.add(new BKItem(type, data[i], processor));
 
-            
             items[index]->setCentrePosition(x, (i-1)*25 + y);
             items[index]->setSize(150,20);
             
             addAndMakeVisible(items[index]);
-            
-            DBG("added: " + name);
             
         }
         

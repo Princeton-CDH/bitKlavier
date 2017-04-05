@@ -14,14 +14,16 @@
 #include "BKUtilities.h"
 #include "BKComponent.h"
 
+#include "PluginProcessor.h"
+
 class BKItem : public BKDraggableComponent
 {
 public:
-    BKItem(BKPreparationType type, int which, String name):
+    BKItem(BKPreparationType type, int Id, BKAudioProcessor& p):
     BKDraggableComponent(true,false),
+    processor(p),
     type(type),
-    which(which),
-    name(name)
+    Id(Id)
     {
         addAndMakeVisible(fullChild);
         
@@ -30,13 +32,60 @@ public:
         label.setJustificationType(Justification::centred);
         label.setBorderSize(BorderSize<int>(2));
         
+        String name = cPreparationTypes[type]+String(Id);
+        
         label.setText(name, dontSendNotification);
+        
+        DBG("constructed: " + name);
         
     }
     
     ~BKItem()
     {
         
+    }
+    
+    void mouseDown(const MouseEvent& e) override
+    {
+        if (type == PreparationTypeDirect)
+        {
+            processor.updateState->currentDirectId = Id;
+            processor.updateState->directPreparationDidChange = true;
+            processor.updateState->currentPreparationDisplay = DisplayDirect;
+        }
+        else if (type == PreparationTypeSynchronic)
+        {
+            processor.updateState->currentSynchronicId = Id;
+            processor.updateState->synchronicPreparationDidChange = true;
+            processor.updateState->currentPreparationDisplay = DisplaySynchronic;
+        }
+        else if (type == PreparationTypeNostalgic)
+        {
+            processor.updateState->currentNostalgicId = Id;
+            processor.updateState->nostalgicPreparationDidChange = true;
+            processor.updateState->currentPreparationDisplay = DisplayNostalgic;
+        }
+        else if (type == PreparationTypeTuning)
+        {
+            processor.updateState->currentTuningId = Id;
+            processor.updateState->tuningPreparationDidChange = true;
+            processor.updateState->currentPreparationDisplay = DisplayTuning;
+        }
+        else if (type == PreparationTypeTempo)
+        {
+            processor.updateState->currentTempoId = Id;
+            processor.updateState->tempoPreparationDidChange = true;
+            processor.updateState->currentPreparationDisplay = DisplayTempo;
+        }
+        else if (type == PreparationTypeKeymap)
+        {
+            processor.updateState->currentKeymapId = Id;
+            processor.updateState->keymapDidChange = true;
+            processor.updateState->currentPreparationDisplay = DisplayKeymap;
+        }
+        
+        
+        processor.updateState->displayDidChange = true;
     }
     
     void paint(Graphics& g) override
@@ -56,11 +105,12 @@ public:
 
 
 private:
+    BKAudioProcessor& processor;
     Label label;
     Component fullChild;
     
     BKPreparationType type;
-    int which;
+    int Id;
     String name;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKItem)
