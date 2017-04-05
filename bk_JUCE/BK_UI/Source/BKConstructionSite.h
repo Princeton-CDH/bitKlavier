@@ -65,19 +65,32 @@ private:
     // Drag interface
     void itemWasDropped(BKPreparationType type, Array<int> data, int x, int y) override
     {
-        int popperIndex = poppers.size();
+        // Now need to make custom objects for preparations/keymaps (draggable, connectable, selectable, deletable)
+        for (int i = 0; i < data.size(); i++)
+        {
+            String name = cPreparationTypes[type]+String(data[i]);
+            
+            int index = poppers.size();
+            
+            poppers.add(new Label(String(index), name));
+            
+            poppers[index]->setJustificationType(Justification::centred);
+            poppers[index]->setBorderSize(BorderSize<int>(2));
+            
+            poppers[index]->setCentrePosition(x, (i-1)*25 + y);
+            poppers[index]->setSize(150,20);
+            
+            addAndMakeVisible(poppers[index]);
+            
+            DBG("added: " + name);
+            
+        }
         
-        poppers.add(new Label(String(popperIndex), intArrayToString(data)));
         
-        poppers[popperIndex]->setJustificationType(Justification::centred);
-        poppers[popperIndex]->setBorderSize(BorderSize<int>(2));
+        
 
-        poppers[popperIndex]->setCentrePosition(x, y);
-        poppers[popperIndex]->setSize(50,30);
         
-        addAndMakeVisible(poppers[popperIndex]);
-                    
-        DBG("type: " + cPreparationTypes[type] + " drop data: " + intArrayToString(data));
+        
     }
     
     JUCE_LEAK_DETECTOR(BKConstructionSite)
