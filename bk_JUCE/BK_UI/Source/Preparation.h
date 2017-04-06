@@ -66,6 +66,12 @@ public:
         processor->setCurrentPlaybackSampleRate(sampleRate);
     }
     
+    inline void setTuning(Tuning::Ptr tuning)
+    {
+        sPrep->setTuning(tuning);
+        aPrep->setTuning(tuning);
+    }
+    
     inline void prepareToPlay(double sampleRate)
     {
         processor->setCurrentPlaybackSampleRate(sampleRate);
@@ -221,6 +227,18 @@ public:
     void prepareToPlay(double sampleRate)
     {
         processor->setCurrentPlaybackSampleRate(sampleRate);
+    }
+    
+    inline void setTuning(Tuning::Ptr tuning)
+    {
+        sPrep->setTuning(tuning);
+        aPrep->setTuning(tuning);
+    }
+    
+    inline void setTempo(Tempo::Ptr tempo)
+    {
+        sPrep->setTempoControl(tempo);
+        aPrep->setTempoControl(tempo);
     }
     
     inline ValueTree getState(void)
@@ -482,6 +500,15 @@ public:
     
     ~Nostalgic() {};
     
+    inline void setSynchronic(Synchronic::Ptr synchronic)
+    {
+        sPrep->setSyncTarget(synchronic->getId());
+        sPrep->setSyncTargetProcessor(synchronic->processor);
+        
+        aPrep->setSyncTarget(synchronic->getId());
+        aPrep->setSyncTargetProcessor(synchronic->processor);
+    }
+    
     void prepareToPlay(double sampleRate, BKSynthesiser* main)
     {
         processor->attachToSynthesiser(main);
@@ -588,6 +615,12 @@ public:
     NostalgicPreparation::Ptr      sPrep;
     NostalgicPreparation::Ptr      aPrep;
     NostalgicProcessor::Ptr        processor;
+    
+    inline void setTuning(Tuning::Ptr tuning)
+    {
+        sPrep->setTuning(tuning);
+        aPrep->setTuning(tuning);
+    }
     
     void reset()
     {
