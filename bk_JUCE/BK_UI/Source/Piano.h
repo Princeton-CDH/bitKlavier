@@ -122,6 +122,8 @@ public:
     void                        prepareToPlay(double sampleRate);
 
     int                         addPreparationMap(void);
+    int                         addPreparationMap(Keymap::Ptr keymap);
+    PreparationMap::Ptr         getPreparationMapWithKeymap(Keymap::Ptr);
     int                         removeLastPreparationMap(void);
 
 private:

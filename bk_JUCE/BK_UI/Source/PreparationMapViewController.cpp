@@ -13,7 +13,7 @@
 
 //==============================================================================
 PreparationMapViewController::PreparationMapViewController(BKAudioProcessor& p, int Id):
-BKDraggableComponent(true,true),
+BKDraggableComponent(false,true,false),
 Id(Id),
 processor(p)
 {

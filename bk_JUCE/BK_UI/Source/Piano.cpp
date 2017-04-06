@@ -83,6 +83,38 @@ int Piano::addPreparationMap(void)
 }
 
 // Add preparation map, return its Id.
+int Piano::addPreparationMap(Keymap::Ptr keymap)
+{
+    prepMaps.add(new PreparationMap(bkKeymaps[0],
+                                    numPMaps));
+    
+    prepMaps[numPMaps]->prepareToPlay(sampleRate);
+    
+    prepMaps[numPMaps]->setKeymap(keymap);
+    
+    activePMaps.addIfNotAlreadyThere(prepMaps[numPMaps]);
+    
+    ++numPMaps;
+    
+    
+    return numPMaps-1;
+}
+
+PreparationMap::Ptr        Piano::getPreparationMapWithKeymap(Keymap::Ptr thisKeymap)
+{
+    PreparationMap::Ptr thisPMap = nullptr;
+    for (auto pmap : prepMaps)
+    {
+        if (pmap->getKeymap()->compare(thisKeymap))
+        {
+            return thisPMap;
+            break;
+        }
+    }
+    return thisPMap;
+}
+
+// Add preparation map, return its Id.
 int Piano::removeLastPreparationMap(void)
 {
     for (int i = activePMaps.size(); --i >= 0;)
