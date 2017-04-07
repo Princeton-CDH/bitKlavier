@@ -12,6 +12,7 @@
 #define BKSLIDER_H_INCLUDED
 
 #include "BKUtilities.h"
+#include "BKComponent.h"
 
 //class BKMultiSlider
 //class BKSingleSlider
@@ -21,23 +22,85 @@ class BKSingleSlider : public Slider
 public:
     BKSingleSlider ();
     ~BKSingleSlider();
-    
-    void setDefault(double d) {sliderDefault = d;}
-    void setRange(double min, double max);
-    void setValue(double v, NotificationType n);
-    void setSnapping(bool snap, double range);
+
+    void valueChanged() override;
+    double getValueFromText	(const String & text ) override;
+    /*
+    void mouseDown(const MouseEvent &e) override
+    {
+        DBG("mouse pos " + String(e.x) + " " + String(e.y));
+    }
+     */
     
 private:
-    
-    Slider* s;
-    
+
     double sliderMin, sliderMax;
     double sliderDefault;
-    double sliderValue;
-    bool sliderSnap;
-    double sliderSnapRange;
+    double sliderIncrement;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSingleSlider)
+};
+
+
+
+class BKMultiSlider : public BKComponent, public Slider::Listener
+{
+    
+public:
+    
+    BKMultiSlider()
+    {
+        
+        
+        for(int i=0; i<numSliders; i++) {
+            BKSingleSlider* newslider = new BKSingleSlider();
+            newslider->addListener(this);
+            sliders.add(newslider);
+            addAndMakeVisible(newslider);
+        }
+        
+        setSize(numSliders*sliders[0]->getWidth(), sliders[0]->getHeight());
+        setInterceptsMouseClicks(true, true);
+    }
+    
+    ~BKMultiSlider()
+    {
+        
+    }
+
+    
+    /*
+    void paint(Graphics &g) override
+    {
+        
+    }
+     */
+    
+    void mouseDown(const MouseEvent &e) override
+    {
+        DBG("mouse pos " + String(e.x) + " " + String(e.y));
+    }
+    
+    
+    void resized() override
+    {
+        for (int i=0; i<sliders.size(); i++)
+        {
+            sliders[i]->setTopLeftPosition(50*i, 0);
+        }
+        
+    }
+    
+private:
+    OwnedArray<BKSingleSlider> sliders;
+    int numSliders = 10;
+    
+    void sliderValueChanged (Slider *slider) override
+    {
+        DBG("slider val changed " + String(slider->getValue()));
+    }
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKMultiSlider)
 };
 
 

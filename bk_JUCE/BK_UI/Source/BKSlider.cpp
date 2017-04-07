@@ -12,20 +12,19 @@
 
 BKSingleSlider::BKSingleSlider ()
 {
-    s = new Slider();
-    s->setSliderStyle (Slider::LinearBarVertical);
-    DBG("set slider style");
+    setSliderStyle (Slider::LinearBarVertical);
+    DBG("set slider style " + String(getSliderStyle()));
     
     sliderMin = -1.;
     sliderMax = 1.;
     sliderDefault = 0.;
-    sliderSnap = false;
-    sliderSnapRange = 0.1;
+    sliderIncrement = 0.01;
     
-    s->setRange(sliderMin, sliderMax);
-    s->setValue(sliderDefault);
-    
-    
+    setRange(sliderMin, sliderMax, sliderIncrement);
+    setValue(sliderDefault);
+    setSize(50, 200);
+    setInterceptsMouseClicks(true, true);
+ 
 }
 
 
@@ -34,26 +33,20 @@ BKSingleSlider::~BKSingleSlider()
     
 }
 
-void BKSingleSlider::setRange(double min, double max)
+
+void BKSingleSlider::valueChanged()
 {
-    sliderMin = min;
-    sliderMax = max;
-    s->setRange(min, max);
+    //DBG("slider val changed: " + String(getValue()));
 }
 
-void BKSingleSlider::setValue(double v, NotificationType n)
+double BKSingleSlider::getValueFromText	(const String & text )
 {
-    sliderValue = v;
+    //DBG("slider string: " + text);
+    double newval = text.getDoubleValue();
     
-    if(sliderSnap) {
-        if((std::abs(v - sliderDefault)) < sliderSnapRange) sliderValue = sliderDefault;
-    }
+    if(newval > getMaximum()) setRange(getMinimum(), newval, sliderIncrement);
+    if(newval < getMinimum()) setRange(newval, getMaximum(), sliderIncrement);
     
-    s->setValue(sliderValue, n);
+    return newval;
 }
 
-void BKSingleSlider::setSnapping(bool snap, double range)
-{
-    sliderSnap = snap;
-    sliderSnapRange = range;
-}

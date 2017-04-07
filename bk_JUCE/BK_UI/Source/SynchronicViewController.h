@@ -42,7 +42,7 @@ private:
     OwnedArray<BKTextField> synchronicTF;
     OwnedArray<BKTextField> modSynchronicTF;
     
-    BKSingleSlider* sliderTest;
+    BKMultiSlider* sliderTest;
     
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;
