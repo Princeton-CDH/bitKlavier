@@ -168,6 +168,10 @@
         </GROUP>
       </GROUP>
       <GROUP id="{E98AFB64-DE96-83A1-81DC-1FA2D8D37DB8}" name="View">
+        <GROUP id="{312ACC06-200C-E792-F54F-FC9ABB97A738}" name="BKSlider">
+          <FILE id="mqhm7K" name="BKSlider.cpp" compile="1" resource="0" file="Source/BKSlider.cpp"/>
+          <FILE id="NyvzY3" name="BKSlider.h" compile="0" resource="0" file="Source/BKSlider.h"/>
+        </GROUP>
         <GROUP id="{B171AA30-1033-F14F-9FB7-D270B9262DF0}" name="PreparationPanel">
           <FILE id="YGbUxA" name="PreparationPropertyComponent.cpp" compile="1"
                 resource="0" file="Source/PreparationPropertyComponent.cpp"/>
