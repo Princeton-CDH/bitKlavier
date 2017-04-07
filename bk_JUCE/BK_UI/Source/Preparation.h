@@ -620,6 +620,8 @@ public:
     {
         sPrep->setTuning(tuning);
         aPrep->setTuning(tuning);
+        
+        processor->setTuner(tuning->processor);
     }
     
     void reset()
