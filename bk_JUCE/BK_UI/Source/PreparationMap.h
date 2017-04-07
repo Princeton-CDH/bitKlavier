@@ -102,6 +102,13 @@ public:
     void addTempo(Tempo::Ptr p);
     void addTuning(Tuning::Ptr p);
     
+    void removeDirect(Direct::Ptr p);
+    void removeNostalgic(Nostalgic::Ptr p);
+    void removeSynchronic(Synchronic::Ptr p);
+    void removeTempo(Tempo::Ptr p);
+    void removeTuning(Tuning::Ptr p);
+    
+    
     Synchronic::PtrArr  getSynchronic(void);
     Nostalgic::PtrArr   getNostalgic(void);
     Direct::PtrArr      getDirect(void);

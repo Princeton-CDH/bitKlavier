@@ -140,7 +140,7 @@ public:
     //inline void setResetMap(Keymap::Ptr k)                                 {resetMap = k;          }
     
     inline const Tuning::Ptr getTuning() const noexcept                    {return tuning; }
-    inline void setTuning(Tuning::Ptr t)                                   {tuning = t;  }
+    inline void setTuning(Tuning::Ptr t)                                   {tuning = t; }
     
     
     
@@ -421,6 +421,16 @@ public:
     inline void attachToSynthesiser(BKSynthesiser* main)
     {
         synth = main;
+    }
+    
+    inline void setTuner(TuningProcessor::Ptr p)
+    {
+        tuner = p;
+    }
+    
+    inline TuningProcessor::Ptr getTuner(void)
+    {
+        return tuner;
     }
     
 private:

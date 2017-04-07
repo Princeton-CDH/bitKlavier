@@ -90,22 +90,34 @@ public:
     
     virtual void itemWasDropped(BKPreparationType type, Array<int>, int x, int y){};
     virtual void itemIsBeingDragged(const MouseEvent& e){};
+    virtual void keyPressedWhileSelected(const KeyPress& e) {};
     
     
 protected:
     bool itemIsHovering, isSelected;
     
+    
+    
     void prepareDrag(const MouseEvent& e)
     {
+        
         dragger.startDraggingComponent (this, e);
     }
     
     void performDrag(const MouseEvent& e)
     {
-        dragger.dragComponent (this, e, &constrainer);
+        Point<float> newPosition;
         
-        itemIsBeingDragged(e);
+        newPosition.setX(e.x - getWidth()/2.0f);
+        newPosition.setY(e.y - getHeight()/2.0f);
+        
+        MouseEvent newEvent = e.withNewPosition(newPosition);
+        
+        dragger.dragComponent (this, newEvent, &constrainer);
+        
+        itemIsBeingDragged(newEvent);
     }
+    
     
 private:
     // Drag interface
@@ -153,23 +165,37 @@ private:
         }
     }
     
+    bool keyPressed(const KeyPress& e) override
+    {
+        if (isSelected)
+        {
+            keyPressedWhileSelected(e);
+        }
+    }
+    
     void mouseDown (const MouseEvent& e) override
     {
-        if (isConnectable && e.mods.isShiftDown())
+        if (e.mods.isShiftDown())
         {
             // start drawing line
+        }
+        else if (e.mods.isCommandDown())
+        {
+            
         }
         else if (isDraggable)
         {
             prepareDrag(e);
         }
-
-        isSelected = true;
     }
     
     void mouseDrag (const MouseEvent& e) override
     {
         if (e.mods.isShiftDown())
+        {
+            
+        }
+        else if (e.mods.isCommandDown())
         {
             
         }

@@ -46,6 +46,19 @@ void PreparationMap::addSynchronic(Synchronic::Ptr p)
     deactivateIfNecessary();
 }
 
+void PreparationMap::removeSynchronic(Synchronic::Ptr p)
+{
+    for (int i = synchronic.size(); --i >= 0;)
+    {
+        if (synchronic[i] == p)
+        {
+            synchronic.remove(i);
+            break;
+        }
+    }
+    deactivateIfNecessary();
+}
+
 void PreparationMap::setNostalgic(Nostalgic::PtrArr n)
 {
     nostalgic = n;
@@ -55,6 +68,19 @@ void PreparationMap::setNostalgic(Nostalgic::PtrArr n)
 void PreparationMap::addNostalgic(Nostalgic::Ptr p)
 {
     nostalgic.add(p);
+    deactivateIfNecessary();
+}
+
+void PreparationMap::removeNostalgic(Nostalgic::Ptr p)
+{
+    for (int i = nostalgic.size(); --i >= 0;)
+    {
+        if (nostalgic[i] == p)
+        {
+            nostalgic.remove(i);
+            break;
+        }
+    }
     deactivateIfNecessary();
 }
 
@@ -70,6 +96,19 @@ void PreparationMap::addDirect(Direct::Ptr p)
     deactivateIfNecessary();
 }
 
+void PreparationMap::removeDirect(Direct::Ptr p)
+{
+    for (int i = direct.size(); --i >= 0;)
+    {
+        if (direct[i] == p)
+        {
+            direct.remove(i);
+            break;
+        }
+    }
+    deactivateIfNecessary();
+}
+
 void PreparationMap::setTempo(Tempo::PtrArr d)
 {
     tempo = d;
@@ -82,6 +121,19 @@ void PreparationMap::addTempo(Tempo::Ptr p)
     deactivateIfNecessary();
 }
 
+void PreparationMap::removeTempo(Tempo::Ptr p)
+{
+    for (int i = tempo.size(); --i >= 0;)
+    {
+        if (tempo[i] == p)
+        {
+            tempo.remove(i);
+            break;
+        }
+    }
+    deactivateIfNecessary();
+}
+
 void PreparationMap::setTuning(Tuning::PtrArr d)
 {
     tuning = d;
@@ -91,6 +143,19 @@ void PreparationMap::setTuning(Tuning::PtrArr d)
 void PreparationMap::addTuning(Tuning::Ptr p)
 {
     tuning.add(p);
+    deactivateIfNecessary();
+}
+
+void PreparationMap::removeTuning(Tuning::Ptr p)
+{
+    for (int i = tuning.size(); --i >= 0;)
+    {
+        if (tuning[i] == p)
+        {
+            tuning.remove(i);
+            break;
+        }
+    }
     deactivateIfNecessary();
 }
 
@@ -136,6 +201,15 @@ void PreparationMap::removeAllPreparations()
 
 void PreparationMap::deactivateIfNecessary()
 {
+
+    DBG(String(synchronic.size()) + " " +
+       String(nostalgic.size()) + " " +
+       String(direct.size()) + " " +
+       String(tuning.size()) + " " +
+       String(tempo.size()) + " "
+        );
+    
+   
     if(synchronic.size() == 0 &&
        nostalgic.size() == 0 &&
        direct.size() == 0 &&

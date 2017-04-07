@@ -212,6 +212,8 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
     }
     
     //else?
+    tuner = active->getTuning()->processor;
+    
     activeNotes.addIfNotAlreadyThere(midiNoteNumber);
     noteOn.set(midiNoteNumber, true);
     noteLengthTimers.set(midiNoteNumber, 0);
