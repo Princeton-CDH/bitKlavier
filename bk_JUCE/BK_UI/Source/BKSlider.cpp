@@ -15,6 +15,8 @@ BKSingleSlider::BKSingleSlider ()
     setSliderStyle (Slider::LinearBarVertical);
     DBG("set slider style " + String(getSliderStyle()));
     
+    setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, false, 50, 20);
+    
     sliderMin = -1.;
     sliderMax = 1.;
     sliderDefault = 0.;
@@ -23,7 +25,6 @@ BKSingleSlider::BKSingleSlider ()
     setRange(sliderMin, sliderMax, sliderIncrement);
     setValue(sliderDefault);
     setSize(50, 200);
-    setInterceptsMouseClicks(true, true);
  
 }
 
