@@ -315,8 +315,7 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
         {
             if (i < processor.gallery->getNumTuning())
             {
-                prep    ->setTuning(processor.gallery->getTuning(i));
-                active  ->setTuning(processor.gallery->getTuning(i));
+                processor.gallery->getDirect(processor.updateState->currentDirectId)->setTuning(processor.gallery->getTuning(i));
             }
             else
                 tf.setText("0", false);

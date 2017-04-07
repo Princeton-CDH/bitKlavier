@@ -423,6 +423,16 @@ public:
         synth = main;
     }
     
+    inline void setTuner(TuningProcessor::Ptr p)
+    {
+        tuner = p;
+    }
+    
+    inline TuningProcessor::Ptr getTuner(void)
+    {
+        return tuner;
+    }
+    
 private:
     int Id;
     BKSynthesiser*              synth;

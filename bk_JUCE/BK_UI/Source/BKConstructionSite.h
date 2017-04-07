@@ -30,6 +30,8 @@ public:
     {
         addKeyListener(this);
         setWantsKeyboardFocus(true);
+        
+        
     }
     
     ~BKConstructionSite(void)
@@ -67,11 +69,11 @@ public:
             g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY());
         }
     }
-
     
 private:
     BKAudioProcessor& processor;
     
+
     bool connect; int lineOX, lineOY, lineEX, lineEY;
     
     BKItem* itemSource;
