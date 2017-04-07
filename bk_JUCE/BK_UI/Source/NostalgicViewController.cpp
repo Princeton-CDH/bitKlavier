@@ -314,6 +314,7 @@ void NostalgicViewController::updateModFields(void)
     
     NostalgicModPreparation::Ptr prep = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
     
+    modNostalgicTF[NostalgicId] -> setText(String(processor.updateState->currentModNostalgicId), false);
     modNostalgicTF[NostalgicWaveDistance]      ->setText( prep->getParam(NostalgicWaveDistance), false);
     modNostalgicTF[NostalgicUndertow]          ->setText( prep->getParam(NostalgicUndertow), false);
     modNostalgicTF[NostalgicTransposition]     ->setText( prep->getParam(NostalgicTransposition), false);

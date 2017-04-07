@@ -91,7 +91,7 @@ void MainViewController::paint (Graphics& g)
     g.fillAll(Colours::dimgrey);
 }
 
-#define SOME_PADDING 125
+#define SOME_PADDING 350
 void MainViewController::resized()
 {
     galvc.setBounds(0, 0, gVCWidth+2*gXSpacing, getHeight()*.38);
@@ -127,10 +127,10 @@ void MainViewController::resized()
     nvc.setBounds(kvc.getBounds());
     ovc.setBounds(kvc.getBounds());
     
-    int panelWidth = 125;
-    preparationPanel->setBounds(getScreenBounds().getRight() - panelWidth, getScreenBounds().getY(), panelWidth, getScreenBounds().getHeight());
+    int panelWidth = 250;
+    preparationPanel->setBounds(getScreenBounds().getRight() - SOME_PADDING, getScreenBounds().getY(), panelWidth, getScreenBounds().getHeight());
     
-    construction.setBounds(gXSpacing, kvc.getBottom() + gYSpacing, getScreenBounds().getWidth() - panelWidth - 2*gXSpacing, getScreenBounds().getBottom() - kvc.getBottom()-2*gYSpacing);
+    construction.setBounds(gXSpacing, kvc.getBottom() + gYSpacing, getScreenBounds().getWidth() - SOME_PADDING - 2*gXSpacing, getScreenBounds().getBottom() - kvc.getBottom()-2*gYSpacing);
     
     /*
     float mainSliderHeight = 320;
@@ -210,7 +210,6 @@ void MainViewController::sliderValueChanged (Slider* slider)
     {
         gen->setGlobalGain(Decibels::decibelsToGain(mainSlider->getValue()));
         gvc.updateFields();
-        
     }
 }
 
@@ -243,8 +242,10 @@ void MainViewController::timerCallback()
         processor.updateState->directPreparationDidChange = false;
         
         preparationPanel->refill(PreparationTypeDirect);
+        preparationPanel->refill(PreparationTypeDirectMod);
         
         dvc.updateFields();
+        dvc.updateModFields();
     }
     
     if (processor.updateState->nostalgicPreparationDidChange)
@@ -252,8 +253,10 @@ void MainViewController::timerCallback()
         processor.updateState->nostalgicPreparationDidChange = false;
         
         preparationPanel->refill(PreparationTypeNostalgic);
+        preparationPanel->refill(PreparationTypeNostalgicMod);
         
         nvc.updateFields();
+        nvc.updateModFields();
     }
     
     if (processor.updateState->synchronicPreparationDidChange)
@@ -261,8 +264,10 @@ void MainViewController::timerCallback()
         processor.updateState->synchronicPreparationDidChange = false;
         
         preparationPanel->refill(PreparationTypeSynchronic);
+        preparationPanel->refill(PreparationTypeSynchronicMod);
         
         svc.updateFields();
+        svc.updateModFields();
     }
     
     if (processor.updateState->tuningPreparationDidChange)
@@ -270,8 +275,10 @@ void MainViewController::timerCallback()
         processor.updateState->tuningPreparationDidChange = false;
         
         preparationPanel->refill(PreparationTypeTuning);
+        preparationPanel->refill(PreparationTypeTuningMod);
         
         tvc.updateFields();
+        tvc.updateModFields();
     }
     
     if (processor.updateState->tempoPreparationDidChange)
@@ -279,9 +286,12 @@ void MainViewController::timerCallback()
         processor.updateState->tempoPreparationDidChange = false;
         
         preparationPanel->refill(PreparationTypeTempo);
+        preparationPanel->refill(PreparationTypeTempoMod);
         
         ovc.updateFields();
+        ovc.updateModFields();
     }
+    
     
     if (processor.updateState->keymapDidChange)
     {
@@ -294,6 +304,7 @@ void MainViewController::timerCallback()
         processor.updateState->directDidChange = false;
         
         preparationPanel->refill(PreparationTypeDirect);
+        preparationPanel->refill(PreparationTypeDirectMod);
         
         dvc.reset();
     }

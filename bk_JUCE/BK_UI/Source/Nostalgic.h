@@ -245,6 +245,8 @@ public:
         param.set(NostalgicSyncTarget, "");
     }
     
+    inline int getId(void) const noexcept { return Id; }
+    
     inline ValueTree getState(int Id)
     {
         ValueTree prep( vtagModNostalgic + String(Id));

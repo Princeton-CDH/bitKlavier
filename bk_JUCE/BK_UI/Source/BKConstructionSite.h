@@ -29,9 +29,8 @@ public:
     graph(processor)
     {
         addKeyListener(this);
+        
         setWantsKeyboardFocus(true);
-        
-        
     }
     
     ~BKConstructionSite(void)

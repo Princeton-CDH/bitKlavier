@@ -286,6 +286,7 @@ void TempoViewController::updateModFields()
     
     TempoModPreparation::Ptr prep = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
 
+    modTempoTF[TempoId]             ->setText(String(processor.updateState->currentModTempoId));
     modTempoTF[TempoBPM]            ->setText( prep->getParam(TempoBPM), false);
     modTempoTF[AT1Mode]             ->setText( prep->getParam(AT1Mode), false);
     modTempoTF[AT1History]          ->setText( prep->getParam(AT1History), false);

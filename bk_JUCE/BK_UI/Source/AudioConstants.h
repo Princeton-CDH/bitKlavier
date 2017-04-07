@@ -204,6 +204,11 @@ typedef enum BKPreparationType {
     PreparationTypeTuning,
     PreparationTypeTempo,
     PreparationTypeKeymap,
+    PreparationTypeDirectMod,
+    PreparationTypeSynchronicMod,
+    PreparationTypeNostalgicMod,
+    PreparationTypeTuningMod,
+    PreparationTypeTempoMod,
     BKPreparationTypeNil,
 } BKPreparationType;
 
@@ -213,7 +218,12 @@ static const std::vector<std::string> cPreparationTypes = {
     "Nostalgic",
     "Tuning",
     "Tempo",
-    "Keymap"
+    "Keymap",
+    "DirectMod",
+    "SynchronicMod",
+    "NostalgicMod",
+    "TuningMod",
+    "TempoMod"
 };
 
 typedef enum BKPreparationDisplay {

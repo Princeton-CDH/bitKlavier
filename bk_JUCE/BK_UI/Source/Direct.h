@@ -275,6 +275,8 @@ public:
 
     }
     
+    inline int getId(void)const noexcept {return Id;}
+    
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
     

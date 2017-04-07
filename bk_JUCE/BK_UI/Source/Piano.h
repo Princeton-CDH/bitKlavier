@@ -121,6 +121,21 @@ public:
 
     void                        prepareToPlay(double sampleRate);
 
+    void configureDirectModification(int key, DirectModPreparation::Ptr, Array<int> whichPreps);
+    void configureDirectModification(Keymap::Ptr keymap, DirectModPreparation::Ptr, Array<int> whichPreps);
+    
+    void configureSynchronicModification(int key, SynchronicModPreparation::Ptr, Array<int> whichPreps);
+    void configureSynchronicModification(Keymap::Ptr keymap, SynchronicModPreparation::Ptr, Array<int> whichPreps);
+    
+    void configureNostalgicModification(int key, NostalgicModPreparation::Ptr, Array<int> whichPreps);
+    void configureNostalgicModification(Keymap::Ptr keymap, NostalgicModPreparation::Ptr dmod, Array<int> whichPreps);
+    
+    void configureTempoModification(int key, TempoModPreparation::Ptr, Array<int> whichPreps);
+    void configureTempoModification(Keymap::Ptr keymap, TempoModPreparation::Ptr, Array<int> whichPreps);
+    
+    void configureTuningModification(int key, TuningModPreparation::Ptr, Array<int> whichPreps);
+    void configureTuningModification(Keymap::Ptr keymap, TuningModPreparation::Ptr dmod, Array<int> whichPreps);
+    
     int                         addPreparationMap(void);
     int                         addPreparationMap(Keymap::Ptr keymap);
     PreparationMap::Ptr         getPreparationMapWithKeymap(Keymap::Ptr);

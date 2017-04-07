@@ -366,6 +366,7 @@ void SynchronicViewController::updateModFields(void)
     // a Modification copy of Preparation to pull values from when updating
     SynchronicModPreparation::Ptr prep   = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
     
+     modSynchronicTF[SynchronicId] -> setText(String(processor.updateState->currentModSynchronicId), false);
     modSynchronicTF[SynchronicTempo]               ->setText(  prep->getParam(SynchronicTempo), false);
     modSynchronicTF[SynchronicNumPulses]           ->setText(  prep->getParam(SynchronicNumPulses), false);
     modSynchronicTF[SynchronicClusterMin]          ->setText(  prep->getParam(SynchronicClusterMin), false);

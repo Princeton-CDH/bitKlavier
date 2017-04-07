@@ -285,6 +285,66 @@ public:
         return names;
     }
     
+    inline const StringArray getAllDirectModNames(void) const noexcept
+    {
+        StringArray names;
+        
+        for (auto prep : modDirect)
+        {
+            names.add(prep->getName());
+        }
+        
+        return names;
+    }
+    
+    inline const StringArray getAllNostalgicModNames(void) const noexcept
+    {
+        StringArray names;
+        
+        for (auto prep : modNostalgic)
+        {
+            names.add(prep->getName());
+        }
+        
+        return names;
+    }
+    
+    inline const StringArray getAllSynchronicModNames(void) const noexcept
+    {
+        StringArray names;
+        
+        for (auto prep : modSynchronic)
+        {
+            names.add(prep->getName());
+        }
+        
+        return names;
+    }
+    
+    inline const StringArray getAllTempoModNames(void) const noexcept
+    {
+        StringArray names;
+        
+        for (auto prep : modTempo)
+        {
+            names.add(prep->getName());
+        }
+        
+        return names;
+    }
+    
+    inline const StringArray getAllTuningModNames(void) const noexcept
+    {
+        StringArray names;
+        
+        for (auto prep : modTuning)
+        {
+            names.add(prep->getName());
+        }
+        
+        return names;
+    }
+    
     inline const Tuning::Ptr getTuning(int Id) const noexcept
     {
         return tuning[Id];

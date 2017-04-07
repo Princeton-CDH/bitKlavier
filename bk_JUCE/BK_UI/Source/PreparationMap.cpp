@@ -201,15 +201,6 @@ void PreparationMap::removeAllPreparations()
 
 void PreparationMap::deactivateIfNecessary()
 {
-
-    DBG(String(synchronic.size()) + " " +
-       String(nostalgic.size()) + " " +
-       String(direct.size()) + " " +
-       String(tuning.size()) + " " +
-       String(tempo.size()) + " "
-        );
-    
-   
     if(synchronic.size() == 0 &&
        nostalgic.size() == 0 &&
        direct.size() == 0 &&

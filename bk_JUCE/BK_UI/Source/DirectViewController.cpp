@@ -47,7 +47,7 @@ processor(p)
     
     addAndMakeVisible(modNameTF);
     modNameTF.addListener(this);
-    modNameTF.setName("Name");
+    modNameTF.setName("ModName");
 
     DirectPreparation::Ptr layer = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
     
@@ -357,6 +357,8 @@ void DirectViewController::updateFields(void)
 void DirectViewController::updateModFields(void)
 {
     DirectModPreparation::Ptr prep = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
+    
+    modDirectTF[DirectId] -> setText(String(processor.updateState->currentModDirectId), false);
     
     modDirectTF[DirectTransposition]       ->setText( prep->getParam(DirectTransposition), false);
     modDirectTF[DirectGain]                ->setText( prep->getParam(DirectGain), false);

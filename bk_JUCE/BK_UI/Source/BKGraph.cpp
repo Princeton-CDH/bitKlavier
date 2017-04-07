@@ -203,11 +203,11 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
     }
     
 
-    if (item1Type == PreparationTypeKeymap && item2Type != PreparationTypeKeymap)
+    if (item1Type == PreparationTypeKeymap && item2Type <= PreparationTypeKeymap)
     {
         linkPreparationWithKeymap(connect, item2Type, item2Id, processor.gallery->getKeymap(item1Id));
     }
-    else if (item1Type != PreparationTypeKeymap && item2Type == PreparationTypeKeymap)
+    else if (item1Type <= PreparationTypeKeymap && item2Type == PreparationTypeKeymap)
     {
         linkPreparationWithKeymap(connect, item1Type, item1Id, processor.gallery->getKeymap(item2Id));
     }
@@ -247,9 +247,50 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         linkNostalgicWithSynchronic(thisNostalgic, thisSynchronic);
     }
-    else
+    // SynchronicMod
+    else if ((item1Type == PreparationTypeSynchronic && item2Type == PreparationTypeSynchronicMod) ||
+             (item2Type == PreparationTypeSynchronic && item1Type == PreparationTypeSynchronicMod))
     {
+        item2->addModification(item1);
+        item1->addModification(item2);
+    }
+    else if ((item1Type == PreparationTypeKeymap && item2Type == PreparationTypeSynchronicMod) ||
+        (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeSynchronicMod))
+    {
+        Keymap::Ptr thisKeymap = processor.gallery->getKeymap( (item1Type == PreparationTypeKeymap) ?
+                                                              item1Id : item2Id );
+        SynchronicModPreparation::Ptr thisMod = processor.gallery->getSynchronicModPreparation((item1Type == PreparationTypeSynchronicMod) ?
+                                                                                               item1Id : item2Id);
+
+        processor.currentPiano->configureSynchronicModification(thisKeymap, thisMod,
+                                                                getPreparationIds((item1Type == PreparationTypeSynchronicMod) ?
+                                                                                  item1->getModifications() : item2->getModifications()));
+    }
+    // DirectMod
+    else if ((item1Type == PreparationTypeDirect && item2Type == PreparationTypeDirectMod) ||
+             (item2Type == PreparationTypeDirect && item1Type == PreparationTypeDirectMod))
+    {
+        DBG("SHOULD CONFIGURE MOD AND DIRECT");
+        item2->addModification(item1);
+        item1->addModification(item2);
+    }
+    else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeDirectMod)
+    {
+        DBG("SHOULD CONFIGURE MOD WITH KEYMAP");
+        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item1Id);
         
+        DirectModPreparation::Ptr thisMod = processor.gallery->getDirectModPreparation(item2Id);
+        
+        processor.currentPiano->configureDirectModification(thisKeymap, thisMod, getPreparationIds(item2->getModifications()));
+    }
+    else if (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeDirectMod)
+    {
+        DBG("SHOULD CONFIGURE MOD WITH KEYMAP");
+        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item2Id);
+        
+        DirectModPreparation::Ptr thisMod = processor.gallery->getDirectModPreparation(item1Id);
+        
+        processor.currentPiano->configureDirectModification(thisKeymap, thisMod, getPreparationIds(item1->getModifications()));
     }
     
 }
@@ -461,6 +502,36 @@ void BKItem::mouseDown(const MouseEvent& e)
         processor.updateState->keymapDidChange = true;
         processor.updateState->currentPreparationDisplay = DisplayKeymap;
     }
+    else if (type == PreparationTypeDirectMod)
+    {
+        processor.updateState->currentModDirectId = Id;
+        processor.updateState->directDidChange = true;
+        processor.updateState->currentPreparationDisplay = DisplayDirect;
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        processor.updateState->currentModNostalgicId = Id;
+        processor.updateState->nostalgicPreparationDidChange = true;
+        processor.updateState->currentPreparationDisplay = DisplayNostalgic;
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        processor.updateState->currentModSynchronicId = Id;
+        processor.updateState->synchronicPreparationDidChange = true;
+        processor.updateState->currentPreparationDisplay = DisplaySynchronic;
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        processor.updateState->currentModTuningId = Id;
+        processor.updateState->tuningPreparationDidChange = true;
+        processor.updateState->currentPreparationDisplay = DisplayTuning;
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        processor.updateState->currentModTempoId = Id;
+        processor.updateState->tempoPreparationDidChange = true;
+        processor.updateState->currentPreparationDisplay = DisplayTempo;
+    }
     
     processor.updateState->displayDidChange = true;
 }
@@ -479,7 +550,7 @@ void BKItem::paint(Graphics& g)
 {
     if (type == PreparationTypeTuning)
     {
-        g.setColour(Colours::palevioletred);
+        g.setColour(Colours::lightcoral);
     }
     else if (type == PreparationTypeTempo)
     {
@@ -489,6 +560,10 @@ void BKItem::paint(Graphics& g)
     {
         g.setColour(Colours::lightyellow);
         
+    }
+    else if (type >= PreparationTypeKeymap) //mod
+    {
+        g.setColour(Colours::palevioletred);
     }
     else
     {
@@ -519,6 +594,24 @@ void BKItem::resized(void)
 }
 
 
+void BKItem::addModification(BKItem* modification)
+{
+    modifications.add(modification);
+}
+
+void BKItem::removeModification(BKItem* modification)
+{
+    int index = 0;
+    for (auto item : modifications)
+    {
+        if (modification == item)
+        {
+            connections.remove(index);
+            break;
+        }
+        index++;
+    }
+}
 
 inline void BKItem::connectWith(BKItem* item)
 {

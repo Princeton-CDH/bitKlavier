@@ -193,7 +193,6 @@
         </GROUP>
         <FILE id="iHLTYB" name="BKMenu.h" compile="0" resource="0" file="Source/BKMenu.h"/>
         <FILE id="kHSUpx" name="BKLookAndFeel.h" compile="0" resource="0" file="Source/BKLookAndFeel.h"/>
-        <FILE id="bbmV0h" name="BKItem.h" compile="0" resource="0" file="Source/BKItem.h"/>
         <FILE id="p6ebdl" name="BKLabel.h" compile="0" resource="0" file="Source/BKLabel.h"/>
         <FILE id="Yc4pLT" name="BKTextField.h" compile="0" resource="0" file="Source/BKTextField.h"/>
       </GROUP>

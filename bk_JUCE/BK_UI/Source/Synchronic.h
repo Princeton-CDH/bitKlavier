@@ -362,6 +362,8 @@ public:
         param.set(SynchronicTranspOffsets, "");
     }
     
+    inline int getId(void) const noexcept { return Id; }
+    
     inline ValueTree getState(int Id)
     {
         ValueTree prep( vtagModSynchronic + String(Id));

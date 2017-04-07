@@ -283,6 +283,7 @@ public:
         param.set(TuningAbsoluteOffsets, "");
     }
     
+    inline int getId(void) const noexcept { return Id; }
     
     ~TuningModPreparation(void)
     {

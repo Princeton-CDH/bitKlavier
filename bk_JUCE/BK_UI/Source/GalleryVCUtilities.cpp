@@ -408,121 +408,32 @@ String GalleryViewController::processModMapString(const String& s)
                     {
                         DirectModPreparation::Ptr dmod = processor.gallery->getDirectModPreparation(whichMod);
                         
-                        processor.currentPiano->modificationMaps[key]->addModPrepMap(new ModPrepMap(PreparationTypeDirect, whichMod, whichPreps));
-                        
-                        for (int n = cDirectParameterTypes.size(); --n >= 0; )
-                        {
-                            String param = dmod->getParam((DirectParameterType)n);
-                            
-                            if (param != "")
-                            {
-                                for (auto prep : whichPreps)
-                                {
-                                    processor.currentPiano->modMap[key]->addDirectModification(new DirectModification(key, prep, (DirectParameterType)n, param, whichMod));
-                                    
-                                    DBG("whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cDirectParameterTypes[n] + " val: " +param);
-                                    
-                                }
-                                
-                                
-                            }
-                        }
+                        processor.currentPiano->configureDirectModification(key, dmod, whichPreps);
                     }
                     else if (itsANostalgic)
                     {
                         NostalgicModPreparation::Ptr nmod = processor.gallery->getNostalgicModPreparation(whichMod);
                         
-                        processor.currentPiano->modificationMaps[key]->addModPrepMap(new ModPrepMap(PreparationTypeNostalgic, whichMod, whichPreps));
-                        
-                        for (int n = cNostalgicParameterTypes.size(); --n >= 0; )
-                        {
-                            String param = nmod->getParam((NostalgicParameterType)n);
-                            
-                            if (param != "")
-                            {
-                                for (auto prep : whichPreps)
-                                {
-                                    processor.currentPiano->modMap[key]->addNostalgicModification(new NostalgicModification(key, prep, (NostalgicParameterType)n, param, whichMod));
-                                    
-                                    DBG("whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cNostalgicParameterTypes[n] + " val: " +param);
-                                    
-                                }
-                                
-                                
-                            }
-                        }
+                        processor.currentPiano->configureNostalgicModification(key, nmod, whichPreps);
                     }
                     else if (itsASynchronic)
                     {
                         SynchronicModPreparation::Ptr smod = processor.gallery->getSynchronicModPreparation(whichMod);
                         
-                        processor.currentPiano->modificationMaps[key]->addModPrepMap(new ModPrepMap(PreparationTypeSynchronic, whichMod, whichPreps));
-                        
-                        for (int n = cSynchronicParameterTypes.size(); --n >= 0; )
-                        {
-                            String param = smod->getParam((SynchronicParameterType)n);
-                            
-                            if (param != "")
-                            {
-                                for (auto prep : whichPreps)
-                                {
-                                    processor.currentPiano->modMap[key]->addSynchronicModification(new SynchronicModification(key, prep, (SynchronicParameterType)n, param, whichMod));
-                                    
-                                    DBG("whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cSynchronicParameterTypes[n] + " val: " +param);
-                                    
-                                }
-                                
-                                
-                            }
-                        }
+                        processor.currentPiano->configureSynchronicModification(key, smod, whichPreps);
                     }
                     else if (itsATuning)
                     {
                         TuningModPreparation::Ptr tmod = processor.gallery->getTuningModPreparation(whichMod);
                         
-                        processor.currentPiano->modificationMaps[key]->addModPrepMap(new ModPrepMap(PreparationTypeTuning, whichMod, whichPreps));
+                        processor.currentPiano->configureTuningModification(key, tmod, whichPreps);
                         
-                        for (int n = cTuningParameterTypes.size(); --n >= 0; )
-                        {
-                            String param = tmod->getParam((TuningParameterType)n);
-                            
-                            if (param != "")
-                            {
-                                for (auto prep : whichPreps)
-                                {
-                                    processor.currentPiano->modMap[key]->addTuningModification(new TuningModification(key, prep, (TuningParameterType)n, param, whichMod));
-                                    
-                                    DBG("whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cTuningParameterTypes[n] + " val: " +param);
-                                    
-                                }
-                                
-                                
-                            }
-                        }
                     }
                     else if (itsATempo)
                     {
                         TempoModPreparation::Ptr mmod = processor.gallery->getTempoModPreparation(whichMod);
                         
-                        processor.currentPiano->modificationMaps[key]->addModPrepMap(new ModPrepMap(PreparationTypeTempo, whichMod, whichPreps));
-                        
-                        for (int n = cTempoParameterTypes.size(); --n >= 0; )
-                        {
-                            String param = mmod->getParam((TempoParameterType)n);
-                            
-                            if (param != "")
-                            {
-                                for (auto prep : whichPreps)
-                                {
-                                    processor.currentPiano->modMap[key]->addTempoModification(new TempoModification(key, prep, (TempoParameterType)n, param, whichMod));
-                                    
-                                    DBG("whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cTempoParameterTypes[n] + " val: " +param);
-                                    
-                                }
-                                
-                                
-                            }
-                        }
+                        processor.currentPiano->configureTempoModification(key, mmod, whichPreps);
                     }
                     
                 }

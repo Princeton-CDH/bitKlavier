@@ -38,6 +38,10 @@ public:
 
     void connectWith(BKItem* item);
     
+    void addModification(BKItem* item);
+    
+    void removeModification(BKItem* item);
+    
     bool isConnectedWith(BKItem* item);
     
     void disconnectFrom(BKItem* toDisconnect);
@@ -54,6 +58,11 @@ public:
     inline BKItem::PtrArr getConnections(void) const noexcept
     {
         return connections;
+    }
+    
+    inline BKItem::PtrArr getModifications(void) const noexcept
+    {
+        return modifications;
     }
     
     inline void print(void)
@@ -74,6 +83,7 @@ private:
     
     
     BKItem::PtrArr connections;
+    BKItem::PtrArr modifications;
     
     BKPreparationType type;
     int Id;
@@ -144,6 +154,14 @@ public:
         
     }
     
+    inline Array<int> getPreparationIds(BKItem::PtrArr theseItems)
+    {
+        Array<int> whichPreps;
+        for (auto item : theseItems) whichPreps.add(item->getId());
+        
+        return whichPreps;
+    }
+    
     Array<Line<float>> getLines(void);
     
     inline void drawLine(float ox, float oy, float ex, float ey)
@@ -174,6 +192,9 @@ private:
     void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
     void linkSynchronicWithTempo(Synchronic::Ptr synchronic, Tempo::Ptr thisTempo);
     void linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic);
+    
+    
+    
     
     void route(bool connect, BKItem* item1, BKItem* item2);
     

@@ -321,6 +321,7 @@ void TuningViewController::updateModFields()
     
     TuningModPreparation::Ptr prep = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
     
+    modTuningTF[TuningId]             ->setText(String(processor.updateState->currentModTuningId));
     modTuningTF[TuningScale]               ->setText( prep->getParam(TuningScale), false);
     modTuningTF[TuningFundamental]         ->setText( prep->getParam(TuningFundamental), false);
     modTuningTF[TuningOffset]              ->setText( prep->getParam(TuningOffset), false);
