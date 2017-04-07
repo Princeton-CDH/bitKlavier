@@ -140,7 +140,7 @@ public:
     //inline void setResetMap(Keymap::Ptr k)                                 {resetMap = k;          }
     
     inline const Tuning::Ptr getTuning() const noexcept                    {return tuning; }
-    inline void setTuning(Tuning::Ptr t)                                   {tuning = t;  }
+    inline void setTuning(Tuning::Ptr t)                                   {tuning = t; }
     
     
     
