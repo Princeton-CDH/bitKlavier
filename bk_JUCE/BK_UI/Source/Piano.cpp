@@ -107,7 +107,7 @@ PreparationMap::Ptr        Piano::getPreparationMapWithKeymap(Keymap::Ptr thisKe
     {
         if (pmap->getKeymap()->compare(thisKeymap))
         {
-            return thisPMap;
+            thisPMap = pmap;
             break;
         }
     }

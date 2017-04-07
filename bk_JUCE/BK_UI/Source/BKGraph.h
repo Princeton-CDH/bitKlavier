@@ -42,10 +42,14 @@ public:
     
     void disconnectFrom(BKItem* toDisconnect);
     
-    void itemIsBeingDragged(const MouseEvent& e) override;
+    void itemIsBeingDragged(const MouseEvent&) override;
+    void keyPressedWhileSelected(const KeyPress&) override;
     
     inline BKPreparationType getType() const noexcept { return type; }
     inline int getId() const noexcept { return Id; }
+    
+    inline void setSelected(bool select) {isSelected = select; repaint();}
+    inline bool getSelected(void) { return isSelected;}
     
     inline BKItem::PtrArr getConnections(void) const noexcept
     {
@@ -98,6 +102,38 @@ public:
     void connect(BKItem* item1, BKItem* item2);
     void disconnect(BKItem* item1, BKItem* item2);
     
+    inline void select(BKItem* item)
+    {
+        item->setSelected(true);
+    }
+    
+    inline void deselect(BKItem* item)
+    {
+        item->setSelected(false);
+    }
+    
+    inline void deselectAll(void)
+    {
+        for (auto item : items) item->setSelected(false);
+    }
+    
+    inline void selectAll(void)
+    {
+        for (auto item : items) item->setSelected(true);
+    }
+    
+    inline BKItem::PtrArr getSelectedItems(void) const noexcept
+    {
+        BKItem::PtrArr selectedItems;
+        
+        for (auto item : items)
+        {
+            if (item->getSelected()) selectedItems.add(item);
+        }
+        
+        return selectedItems;
+    }
+    
     inline BKItem::RCArr getAllItems(void) const noexcept
     {
         return items;
@@ -134,10 +170,18 @@ private:
     BKAudioProcessor& processor;
     BKItem::RCArr items;
     
-    void linkPreparationWithKeymap(BKPreparationType thisType, int thisId, Keymap::Ptr thisKeymap);
+    void linkPreparationWithKeymap(bool link, BKPreparationType thisType, int thisId, Keymap::Ptr thisKeymap);
     void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
     void linkSynchronicWithTempo(Synchronic::Ptr synchronic, Tempo::Ptr thisTempo);
     void linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic);
+    
+    void route(bool connect, BKItem* item1, BKItem* item2);
+    
+    void disconnectTuningFromSynchronic(BKItem* item);
+    void disconnectTuningFromNostalgic(BKItem* item);
+    void disconnectTuningFromDirect(BKItem* item);
+    void disconnectTempoFromSynchronic(BKItem* synchronicItem);
+    void disconnectSynchronicFromNostalgic(BKItem* thisItem);
     
     JUCE_LEAK_DETECTOR(BKItemGraph)
 };

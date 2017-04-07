@@ -20,7 +20,7 @@
 
 #include "BKGraph.h"
 
-class BKConstructionSite : public BKDraggableComponent
+class BKConstructionSite : public BKDraggableComponent, public KeyListener
 {
 public:
     BKConstructionSite(BKAudioProcessor& p):
@@ -28,7 +28,8 @@ public:
     processor(p),
     graph(processor)
     {
-        
+        addKeyListener(this);
+        setWantsKeyboardFocus(true);
     }
     
     ~BKConstructionSite(void)
@@ -75,6 +76,7 @@ private:
     
     BKItem* itemSource;
     BKItem* itemTarget;
+    BKItem* itemToSelect;
     
     BKItemGraph graph;
     
@@ -96,8 +98,10 @@ private:
 
     void mouseDown (const MouseEvent& eo) override
     {
-        MouseEvent e= eo.getEventRelativeTo(this);
-        if (e.mods.isShiftDown())
+        itemToSelect = nullptr;
+        
+        MouseEvent e = eo.getEventRelativeTo(this);
+        if (e.mods.isCommandDown())
         {
             // begin connector drag
             
@@ -113,6 +117,55 @@ private:
                 lineOY = e.y;
             }
         }
+        else if (e.mods.isShiftDown())
+        {
+            // also select this item
+            itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
+            
+            if (itemToSelect != nullptr && !itemToSelect->getSelected())
+                graph.select(dynamic_cast<BKItem*> (e.originalComponent->getParentComponent()));
+        }
+        else
+        {
+            // deselect all other items
+            graph.deselectAll();
+            
+            itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
+            
+            if (itemToSelect != nullptr && !itemToSelect->getSelected())
+            {
+                graph.select(itemToSelect);
+            }
+            
+        }
+        
+    }
+    
+    void mouseUp (const MouseEvent& eo) override
+    {
+        MouseEvent e = eo.getEventRelativeTo(this);
+        
+        connect = false;
+        
+        if (e.mods.isCommandDown())
+        {
+            
+            int X = e.x;
+            int Y = e.y;
+            
+            itemTarget = getItemAtPoint(X, Y);
+            
+            if (itemTarget != nullptr)
+            {
+                DBG("target type: " + cPreparationTypes[itemTarget->getType()]  + " ID: " + String(itemTarget->getId()) );
+                
+                graph.connect(itemSource, itemTarget);
+                graph.drawLine(lineOX, lineOY, X, Y);
+                
+                repaint();
+            }
+        }
+        
         
     }
     
@@ -122,6 +175,30 @@ private:
         lineEY = e.getEventRelativeTo(this).y;
         
         if (connect) repaint();
+    }
+    
+    inline void deleteItem (BKItem* item)
+    {
+        graph.remove(item);
+        
+        removeChildComponent(item);
+    }
+    
+    bool keyPressed (const KeyPress& e, Component*) override
+    {
+        DBG(String(e.getKeyCode()));
+        
+        if (e.isKeyCode(127))
+        {
+            BKItem::PtrArr selectedItems = graph.getSelectedItems();
+            
+            for (int i = selectedItems.size(); --i >= 0;)
+            {
+                deleteItem(selectedItems[i]);
+            }
+            
+            repaint();
+        }
     }
     
     inline BKItem* getItemAtPoint(const int X, const int Y)
@@ -152,31 +229,6 @@ private:
         return theItem;
     }
     
-    void mouseUp (const MouseEvent& eo) override
-    {
-        MouseEvent e = eo.getEventRelativeTo(this);
-        if (e.mods.isShiftDown())
-        {
-            connect = false;
-            
-            int X = e.x;
-            int Y = e.y;
-            
-            itemTarget = getItemAtPoint(X, Y);
-            
-            if (itemTarget != nullptr)
-            {
-                DBG("target type: " + cPreparationTypes[itemTarget->getType()]  + " ID: " + String(itemTarget->getId()) );
-                
-                graph.connect(itemSource, itemTarget);
-                graph.drawLine(lineOX, lineOY, X, Y);
-                
-                repaint();
-            }
-        }
-        
-        
-    }
     
     JUCE_LEAK_DETECTOR(BKConstructionSite)
 };
