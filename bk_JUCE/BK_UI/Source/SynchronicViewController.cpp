@@ -56,6 +56,9 @@ processor(p)
         modSynchronicTF[i]->setName("M"+cSynchronicParameterTypes[i]);
     }
     
+    sliderTest = new BKSingleSlider();
+    addAndMakeVisible(sliderTest);
+    
     updateModFields();
     updateFields();
     
@@ -97,6 +100,8 @@ void SynchronicViewController::resized()
         synchronicTF[n]->setBounds(synchronicL[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
         modSynchronicTF[n]->setBounds(synchronicTF[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
     }
+    
+    sliderTest->setBounds (40, 35, 20, 230);
 
 }
 

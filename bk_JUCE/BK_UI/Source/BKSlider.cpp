@@ -14,6 +14,18 @@ BKSingleSlider::BKSingleSlider ()
 {
     s = new Slider();
     s->setSliderStyle (Slider::LinearBarVertical);
+    DBG("set slider style");
+    
+    sliderMin = -1.;
+    sliderMax = 1.;
+    sliderDefault = 0.;
+    sliderSnap = false;
+    sliderSnapRange = 0.1;
+    
+    s->setRange(sliderMin, sliderMax);
+    s->setValue(sliderDefault);
+    
+    
 }
 
 
