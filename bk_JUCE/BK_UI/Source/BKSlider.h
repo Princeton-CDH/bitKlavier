@@ -17,10 +17,17 @@
 //class BKMultiSlider
 //class BKSingleSlider
 
+typedef enum BKMultiSliderType {
+    HorizontalMultiSlider = 0,
+    VerticalMultiSlider,
+    BKMultiSliderTypeNil
+} BKMultiSliderType;
+
+
 class BKSingleSlider : public Slider
 {
 public:
-    BKSingleSlider ();
+    BKSingleSlider (SliderStyle sstyle);
     ~BKSingleSlider();
 
     void valueChanged() override;
@@ -82,6 +89,8 @@ private:
     double sliderDefault;
     double sliderIncrement;
     
+    bool sliderIsVertical;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSingleSlider)
 };
 
@@ -92,12 +101,19 @@ class BKMultiSlider : public BKComponent, public Slider::Listener /*, public BKS
     
 public:
     
-    BKMultiSlider()
+    BKMultiSlider(BKMultiSliderType which)
     {
         
         
+        if(which == HorizontalMultiSlider) arrangedHorizontally = true;
+        else arrangedHorizontally = false;
+        
         for(int i=0; i<numSliders; i++) {
-            BKSingleSlider* newslider = new BKSingleSlider();
+            
+            BKSingleSlider* newslider;
+            if(arrangedHorizontally) newslider = new BKSingleSlider(Slider::LinearVertical);
+            else  newslider = new BKSingleSlider(Slider::LinearHorizontal);
+            
             newslider->addListener(this);
             //newslider->addMyListener(this);
             //newslider->addMouseListener(this, true);
@@ -105,15 +121,18 @@ public:
             addAndMakeVisible(newslider);
         }
         
-        bigInvisibleSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, true, 0,0);
-        bigInvisibleSlider.setAlpha(0.0);
-        bigInvisibleSlider.addMouseListener(this, true);
-        bigInvisibleSlider.setName("BIG");
-        bigInvisibleSlider.addListener(this);
+        if(arrangedHorizontally) bigInvisibleSlider = new BKSingleSlider(Slider::LinearVertical);
+        else bigInvisibleSlider = new BKSingleSlider(Slider::LinearHorizontal);
+        bigInvisibleSlider->setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, true, 0,0);
+        bigInvisibleSlider->setAlpha(0.0);
+        bigInvisibleSlider->addMouseListener(this, true);
+        bigInvisibleSlider->setName("BIG");
+        bigInvisibleSlider->addListener(this);
         
         addAndMakeVisible(bigInvisibleSlider);
         
-        setSize(numSliders*sliders[0]->getWidth(), sliders[0]->getHeight());
+        if(arrangedHorizontally) setSize(numSliders*sliders[0]->getWidth(), sliders[0]->getHeight() - sliders[0]->getTextBoxHeight());
+        else setSize(sliders[0]->getWidth() + sliders[0]->getTextBoxWidth(), numSliders * sliders[0]->getHeight());
     }
     
     ~BKMultiSlider()
@@ -144,8 +163,12 @@ public:
     void mouseDrag(const MouseEvent& e) override
     {
         int x = e.x;
+        int y = e.y;
         
-        int which = (e.x / sliders[0]->getWidth());
+        int which;
+        if(arrangedHorizontally) which = (x / sliders[0]->getWidth());
+        else which = (y / sliders[0]->getHeight());
+        
         DBG("DRAGGING " + String(which) + String(e.x) + " " + String(e.y));
         
         if (which >= 0 && which < sliders.size())
@@ -192,23 +215,36 @@ public:
     
     void resized() override
     {
-        for (int i=0; i<sliders.size(); i++)
+        if(arrangedHorizontally)
         {
-            sliders[i]->setTopLeftPosition(50*i, 0);
+            for (int i=0; i<sliders.size(); i++)
+            {
+                sliders[i]->setTopLeftPosition(50*i, 0);
+            }
+            
+            bigInvisibleSlider->setBounds(0, 0, sliders.getLast()->getRight(), sliders.getLast()->getBottom() - sliders.getLast()->getTextBoxHeight());
         }
-        
-        bigInvisibleSlider.setBounds(0, 0, sliders.getLast()->getRight(), sliders.getLast()->getBottom());
+        else
+        {
+            for (int i=0; i<sliders.size(); i++)
+            {
+                sliders[i]->setTopLeftPosition(0, 20 * i);
+            }
+            
+            bigInvisibleSlider->setBounds(sliders.getLast()->getTextBoxWidth(), 0, sliders.getLast()->getRight() - sliders.getLast()->getTextBoxWidth(), sliders.getLast()->getBottom());
+        }
         
     }
     
 private:
     bool dragging;
+    bool arrangedHorizontally;
     
     double currentInvisibleSliderValue;
     
     OwnedArray<BKSingleSlider> sliders;
     
-    BKSingleSlider bigInvisibleSlider;
+    BKSingleSlider* bigInvisibleSlider;
     
     
     BKSingleSlider* currentSlider;

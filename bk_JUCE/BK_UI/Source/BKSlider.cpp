@@ -10,13 +10,17 @@
 
 #include "BKSlider.h"
 
-BKSingleSlider::BKSingleSlider ()
+BKSingleSlider::BKSingleSlider (SliderStyle sstyle)
 {
-    setSliderStyle (Slider::LinearBarVertical);
-    DBG("set slider style " + String(getSliderStyle()));
+    //setSliderStyle (Slider::LinearVertical);
+    setSliderStyle (sstyle);
     
-    setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, false, 50, 20);
-    
+    if(sstyle == LinearVertical || sstyle == LinearBarVertical) sliderIsVertical = true;
+    else sliderIsVertical = false;
+        
+    if(sliderIsVertical) setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, false, 50, 20);
+    else setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxLeft, false, 50, 20);
+
     sliderMin = -1.;
     sliderMax = 1.;
     sliderDefault = 0.;
@@ -24,7 +28,8 @@ BKSingleSlider::BKSingleSlider ()
     
     setRange(sliderMin, sliderMax, sliderIncrement);
     setValue(sliderDefault);
-    setSize(50, 200);
+    if(sliderIsVertical) setSize(50, 200);
+    else setSize(200, 20);
  
 }
 
