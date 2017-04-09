@@ -56,7 +56,7 @@ processor(p)
         modSynchronicTF[i]->setName("M"+cSynchronicParameterTypes[i]);
     }
     
-    sliderTest = new BKMultiSlider(VerticalMultiSlider); //or HorizontalMultiSlider
+    sliderTest = new BKMultiSlider(VerticalMultiBarSlider); //or HorizontalMultiSlider, VerticalMultiSlider, HorizontalMultiBarSlider, VerticalMultiBarSlider
     addAndMakeVisible(sliderTest);
     
     updateModFields();
@@ -101,8 +101,8 @@ void SynchronicViewController::resized()
         modSynchronicTF[n]->setBounds(synchronicTF[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
     }
     
-    //sliderTest->setTopLeftPosition(40, 35);
-    sliderTest->setBounds(40, 35, sliderTest->getWidth(), sliderTest->getHeight() + 20);
+    sliderTest->setTopLeftPosition(40, 35);
+    //sliderTest->setBounds(40, 35, sliderTest->getWidth(), sliderTest->getHeight() + 20);
 
 }
 
