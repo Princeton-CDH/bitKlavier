@@ -18,6 +18,8 @@
 #include "BKListener.h"
 #include "BKComponent.h"
 
+#include "BKSlider.h"
+
 //==============================================================================
 /*
 */
@@ -39,6 +41,8 @@ private:
     OwnedArray<BKLabel> synchronicL;
     OwnedArray<BKTextField> synchronicTF;
     OwnedArray<BKTextField> modSynchronicTF;
+    
+    BKMultiSlider* sliderTest;
     
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;
