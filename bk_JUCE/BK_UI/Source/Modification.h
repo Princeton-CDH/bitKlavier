@@ -188,6 +188,8 @@ public:
     inline void setParameterType(SynchronicParameterType t) { type = t; }
     
     inline SynchronicParameterType getParameterType(void) {return type; }
+
+    
     
 private:
     
@@ -247,9 +249,11 @@ public:
     
     inline NostalgicParameterType getParameterType(void) {return type; }
     
+
 private:
     
     NostalgicParameterType type;
+    
     
     JUCE_LEAK_DETECTOR(NostalgicModification)
 };
@@ -307,6 +311,7 @@ public:
     inline void setParameterType(TuningParameterType t) { type = t; }
     
     inline TuningParameterType getParameterType(void) {return type; }
+
     
 private:
     

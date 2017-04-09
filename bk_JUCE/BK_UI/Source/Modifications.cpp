@@ -24,6 +24,8 @@ Modifications::~Modifications()
     
 }
 
+
+
 String  Modifications::stringRepresentation(void)
 {
     String out = "";
@@ -64,6 +66,30 @@ void Modifications::addNostalgicModification(NostalgicModification::Ptr m)
 void Modifications::addDirectModification(DirectModification::Ptr m)
 {
     directMods.add(m);
+}
+
+void Modifications::removeDirectModification(DirectModification::Ptr m)
+{
+    for (int i = directMods.size(); --i >= 0;)
+    {
+        if (directMods[i] == m)
+        {
+            directMods.remove(i);
+            break;
+        }
+    }
+}
+
+void Modifications::removeDirectModification(int which)
+{
+    for (int i = directMods.size(); --i >= 0;)
+    {
+        if (directMods[i]->getId() == which)
+        {
+            directMods.remove(i);
+            break;
+        }
+    }
 }
 
 void Modifications::addTuningModification(TuningModification::Ptr m)

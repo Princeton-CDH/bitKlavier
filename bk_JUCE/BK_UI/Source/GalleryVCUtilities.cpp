@@ -408,32 +408,32 @@ String GalleryViewController::processModMapString(const String& s)
                     {
                         DirectModPreparation::Ptr dmod = processor.gallery->getDirectModPreparation(whichMod);
                         
-                        processor.currentPiano->configureDirectModification(key, dmod, whichPreps);
+                        //processor.currentPiano->configureDirectModification(key, dmod, whichPreps);
                     }
                     else if (itsANostalgic)
                     {
                         NostalgicModPreparation::Ptr nmod = processor.gallery->getNostalgicModPreparation(whichMod);
                         
-                        processor.currentPiano->configureNostalgicModification(key, nmod, whichPreps);
+                        //processor.currentPiano->configureNostalgicModification(key, nmod, whichPreps);
                     }
                     else if (itsASynchronic)
                     {
                         SynchronicModPreparation::Ptr smod = processor.gallery->getSynchronicModPreparation(whichMod);
                         
-                        processor.currentPiano->configureSynchronicModification(key, smod, whichPreps);
+                        //processor.currentPiano->configureSynchronicModification(key, smod, whichPreps);
                     }
                     else if (itsATuning)
                     {
                         TuningModPreparation::Ptr tmod = processor.gallery->getTuningModPreparation(whichMod);
                         
-                        processor.currentPiano->configureTuningModification(key, tmod, whichPreps);
+                        //processor.currentPiano->configureTuningModification(key, tmod, whichPreps);
                         
                     }
                     else if (itsATempo)
                     {
                         TempoModPreparation::Ptr mmod = processor.gallery->getTempoModPreparation(whichMod);
                         
-                        processor.currentPiano->configureTempoModification(key, mmod, whichPreps);
+                        //processor.currentPiano->configureTempoModification(key, mmod, whichPreps);
                     }
                     
                 }

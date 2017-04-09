@@ -193,6 +193,7 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         item1->connectWith(item2);
         item2->connectWith(item1);
+        
     }
     else // !connect
     {
@@ -247,32 +248,42 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         linkNostalgicWithSynchronic(thisNostalgic, thisSynchronic);
     }
-    // SynchronicMod
-    else if ((item1Type == PreparationTypeSynchronic && item2Type == PreparationTypeSynchronicMod) ||
-             (item2Type == PreparationTypeSynchronic && item1Type == PreparationTypeSynchronicMod))
-    {
-        item2->addModification(item1);
-        item1->addModification(item2);
-    }
-    else if ((item1Type == PreparationTypeKeymap && item2Type == PreparationTypeSynchronicMod) ||
-        (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeSynchronicMod))
-    {
-        Keymap::Ptr thisKeymap = processor.gallery->getKeymap( (item1Type == PreparationTypeKeymap) ?
-                                                              item1Id : item2Id );
-        SynchronicModPreparation::Ptr thisMod = processor.gallery->getSynchronicModPreparation((item1Type == PreparationTypeSynchronicMod) ?
-                                                                                               item1Id : item2Id);
-
-        processor.currentPiano->configureSynchronicModification(thisKeymap, thisMod,
-                                                                getPreparationIds((item1Type == PreparationTypeSynchronicMod) ?
-                                                                                  item1->getModifications() : item2->getModifications()));
-    }
-    // DirectMod
-    else if ((item1Type == PreparationTypeDirect && item2Type == PreparationTypeDirectMod) ||
-             (item2Type == PreparationTypeDirect && item1Type == PreparationTypeDirectMod))
+    // Direct Modifications
+    else if (item1Type == PreparationTypeDirect && item2Type == PreparationTypeDirectMod)
     {
         DBG("SHOULD CONFIGURE MOD AND DIRECT");
-        item2->addModification(item1);
-        item1->addModification(item2);
+        
+        DirectModPreparation::Ptr thisMod = processor.gallery->getDirectModPreparation(item2Id);
+        Direct::Ptr thisDirect = processor.gallery->getDirect(item1Id);
+        
+        thisMod->addTarget(thisDirect);
+        
+        if (connect)
+        {
+            processor.currentPiano->configureDirectModification(thisMod);
+        }
+        else
+        {
+            processor.currentPiano->deconfigureDirectModification(thisMod);
+            thisMod->clearTargets();
+        }
+    }
+    else if (item2Type == PreparationTypeDirect && item1Type == PreparationTypeDirectMod)
+    {
+        DirectModPreparation::Ptr thisMod = processor.gallery->getDirectModPreparation(item1Id);
+        Direct::Ptr thisDirect = processor.gallery->getDirect(item2Id);
+        
+        thisMod->addTarget(thisDirect);
+        
+        if (connect)
+        {
+            processor.currentPiano->configureDirectModification(thisMod);
+        }
+        else
+        {
+            processor.currentPiano->deconfigureDirectModification(thisMod);
+            thisMod->clearTargets();
+        }
     }
     else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeDirectMod)
     {
@@ -281,7 +292,17 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         DirectModPreparation::Ptr thisMod = processor.gallery->getDirectModPreparation(item2Id);
         
-        processor.currentPiano->configureDirectModification(thisKeymap, thisMod, getPreparationIds(item2->getModifications()));
+        thisMod->addKeymap(thisKeymap);
+        
+        if (connect)
+        {
+            processor.currentPiano->configureDirectModification(thisMod);
+        }
+        else
+        {
+            processor.currentPiano->deconfigureDirectModification(thisMod);
+            thisMod->clearKeymaps();
+        }
     }
     else if (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeDirectMod)
     {
@@ -290,7 +311,22 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         DirectModPreparation::Ptr thisMod = processor.gallery->getDirectModPreparation(item1Id);
         
-        processor.currentPiano->configureDirectModification(thisKeymap, thisMod, getPreparationIds(item1->getModifications()));
+        thisMod->addKeymap(thisKeymap);
+        
+        if (connect)
+        {
+            processor.currentPiano->configureDirectModification(thisMod);
+        }
+        else
+        {
+            processor.currentPiano->deconfigureDirectModification(thisMod);
+            thisMod->clearKeymaps();
+        }
+    }
+    else
+    {
+        item1->disconnectFrom(item2);
+        item2->disconnectFrom(item1);
     }
     
 }

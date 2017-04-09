@@ -17,6 +17,8 @@
 
 #include "BKUpdateState.h"
 
+#include "Keymap.h"
+
 class TempoPreparation : public ReferenceCountedObject
 {
 public:
@@ -181,6 +183,131 @@ private:
     JUCE_LEAK_DETECTOR(TempoProcessor);
 };
 
+class Tempo : public ReferenceCountedObject
+{
+    
+public:
+    typedef ReferenceCountedObjectPtr<Tempo>   Ptr;
+    typedef Array<Tempo::Ptr>                  PtrArr;
+    typedef Array<Tempo::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<Tempo>                  Arr;
+    typedef OwnedArray<Tempo, CriticalSection> CSArr;
+    
+    
+    Tempo(TempoPreparation::Ptr prep,
+          int Id,
+          BKUpdateState::Ptr us):
+    sPrep(new TempoPreparation(prep)),
+    aPrep(new TempoPreparation(sPrep)),
+    processor(new TempoProcessor(aPrep)),
+    Id(Id),
+    name(String(Id)),
+    updateState(us)
+    {
+        
+    }
+    
+    Tempo(int Id,
+          BKUpdateState::Ptr us):
+    Id(Id),
+    name(String(Id)),
+    updateState(us)
+    {
+        sPrep = new TempoPreparation();
+        aPrep = new TempoPreparation(sPrep);
+        processor = new TempoProcessor(aPrep);
+    }
+    
+    void prepareToPlay(double sampleRate)
+    {
+        processor->setCurrentPlaybackSampleRate(sampleRate);
+    }
+    
+    
+    inline ValueTree getState(void)
+    {
+        ValueTree prep(vtagTempo + String(Id));
+        
+        prep.setProperty( ptagTempo_Id,                    Id, 0);
+        prep.setProperty( "name",                          name, 0);
+        prep.setProperty( ptagTempo_tempo,                 sPrep->getTempo(), 0);
+        prep.setProperty( ptagTempo_system,                sPrep->getTempoSystem(), 0);
+        prep.setProperty( ptagTempo_at1Mode,               sPrep->getAdaptiveTempo1Mode(), 0 );
+        prep.setProperty( ptagTempo_at1History,            sPrep->getAdaptiveTempo1History(), 0 );
+        prep.setProperty( ptagTempo_at1Subdivisions,       sPrep->getAdaptiveTempo1Subdivisions(), 0 );
+        prep.setProperty( ptagTempo_at1Min,                sPrep->getAdaptiveTempo1Min(), 0 );
+        prep.setProperty( ptagTempo_at1Max,                sPrep->getAdaptiveTempo1Max(), 0 );
+        
+        return prep;
+    }
+    
+    inline void setState(XmlElement* e)
+    {
+        float f; int i;
+        
+        String n = e->getStringAttribute("name");
+        
+        if (n != String::empty)     name = n;
+        else                        name = String(Id);
+        
+        f = e->getStringAttribute(ptagTempo_tempo).getFloatValue();
+        sPrep->setTempo(f);
+        
+        i = e->getStringAttribute(ptagTempo_system).getIntValue();
+        sPrep->setTempoSystem((TempoType)i);
+        
+        i = e->getStringAttribute(ptagTempo_at1Mode).getIntValue();
+        sPrep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode)i);
+        
+        i = e->getStringAttribute(ptagTempo_at1History).getIntValue();
+        sPrep->setAdaptiveTempo1History(i);
+        
+        f = e->getStringAttribute(ptagTempo_at1Subdivisions).getFloatValue();
+        sPrep->setAdaptiveTempo1Subdivisions(f);
+        
+        f = e->getStringAttribute(ptagTempo_at1Min).getFloatValue();
+        sPrep->setAdaptiveTempo1Min(f);
+        
+        f = e->getStringAttribute(ptagTempo_at1Max).getFloatValue();
+        sPrep->setAdaptiveTempo1Max(f);
+        
+        aPrep->copy(sPrep);
+    }
+    
+    ~Tempo() {};
+    
+    inline int getId() {return Id;};
+    
+    
+    TempoPreparation::Ptr      sPrep;
+    TempoPreparation::Ptr      aPrep;
+    TempoProcessor::Ptr        processor;
+    
+    
+    void reset()
+    {
+        aPrep->copy(sPrep);
+        processor->reset();
+        DBG("resetting tempo");
+    }
+    
+    inline String getName(void) const noexcept {return name;}
+    
+    inline void setName(String newName)
+    {
+        name = newName;
+        updateState->tempoPreparationDidChange = true;
+    }
+    
+private:
+    int Id;
+    String name;
+    
+    BKUpdateState::Ptr updateState;
+    
+    JUCE_LEAK_DETECTOR(Tempo)
+};
+
 class TempoModPreparation : public ReferenceCountedObject
 {
 public:
@@ -343,137 +470,23 @@ public:
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
     
+    inline void addTarget(Tempo::Ptr target) { targets.add(target); }
+    inline Tempo::PtrArr getTargets(void) {return targets;}
+    
+    inline void addKeymap(Keymap::Ptr keymap) { keymaps.add(keymap); }
+    inline Keymap::PtrArr getKeymaps(void) {return keymaps;}
+    
 private:
     int Id;
     String name;
     StringArray          param;
     
+    Tempo::PtrArr targets;
+    Keymap::PtrArr keymaps;
+    
+    
     JUCE_LEAK_DETECTOR(TempoModPreparation);
 };
 
-class Tempo : public ReferenceCountedObject
-{
-    
-public:
-    typedef ReferenceCountedObjectPtr<Tempo>   Ptr;
-    typedef Array<Tempo::Ptr>                  PtrArr;
-    typedef Array<Tempo::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<Tempo>                  Arr;
-    typedef OwnedArray<Tempo, CriticalSection> CSArr;
-    
-    
-    Tempo(TempoPreparation::Ptr prep,
-          int Id,
-          BKUpdateState::Ptr us):
-    sPrep(new TempoPreparation(prep)),
-    aPrep(new TempoPreparation(sPrep)),
-    processor(new TempoProcessor(aPrep)),
-    Id(Id),
-    name(String(Id)),
-    updateState(us)
-    {
-        
-    }
-    
-    Tempo(int Id,
-          BKUpdateState::Ptr us):
-    Id(Id),
-    name(String(Id)),
-    updateState(us)
-    {
-        sPrep = new TempoPreparation();
-        aPrep = new TempoPreparation(sPrep);
-        processor = new TempoProcessor(aPrep);
-    }
-    
-    void prepareToPlay(double sampleRate)
-    {
-        processor->setCurrentPlaybackSampleRate(sampleRate);
-    }
-    
-
-    inline ValueTree getState(void)
-    {
-        ValueTree prep(vtagTempo + String(Id));
-        
-        prep.setProperty( ptagTempo_Id,                    Id, 0);
-        prep.setProperty( "name",                          name, 0);
-        prep.setProperty( ptagTempo_tempo,                 sPrep->getTempo(), 0);
-        prep.setProperty( ptagTempo_system,                sPrep->getTempoSystem(), 0);
-        prep.setProperty( ptagTempo_at1Mode,               sPrep->getAdaptiveTempo1Mode(), 0 );
-        prep.setProperty( ptagTempo_at1History,            sPrep->getAdaptiveTempo1History(), 0 );
-        prep.setProperty( ptagTempo_at1Subdivisions,       sPrep->getAdaptiveTempo1Subdivisions(), 0 );
-        prep.setProperty( ptagTempo_at1Min,                sPrep->getAdaptiveTempo1Min(), 0 );
-        prep.setProperty( ptagTempo_at1Max,                sPrep->getAdaptiveTempo1Max(), 0 );
-
-        return prep;
-    }
-    
-    inline void setState(XmlElement* e)
-    {
-        float f; int i;
-        
-        String n = e->getStringAttribute("name");
-        
-        if (n != String::empty)     name = n;
-        else                        name = String(Id);
-        
-        f = e->getStringAttribute(ptagTempo_tempo).getFloatValue();
-        sPrep->setTempo(f);
-        
-        i = e->getStringAttribute(ptagTempo_system).getIntValue();
-        sPrep->setTempoSystem((TempoType)i);
-        
-        i = e->getStringAttribute(ptagTempo_at1Mode).getIntValue();
-        sPrep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode)i);
-        
-        i = e->getStringAttribute(ptagTempo_at1History).getIntValue();
-        sPrep->setAdaptiveTempo1History(i);
-        
-        f = e->getStringAttribute(ptagTempo_at1Subdivisions).getFloatValue();
-        sPrep->setAdaptiveTempo1Subdivisions(f);
-        
-        f = e->getStringAttribute(ptagTempo_at1Min).getFloatValue();
-        sPrep->setAdaptiveTempo1Min(f);
-        
-        f = e->getStringAttribute(ptagTempo_at1Max).getFloatValue();
-        sPrep->setAdaptiveTempo1Max(f);
-        
-        aPrep->copy(sPrep);
-    }
-    
-    ~Tempo() {};
-    
-    inline int getId() {return Id;};
-    
-    
-    TempoPreparation::Ptr      sPrep;
-    TempoPreparation::Ptr      aPrep;
-    TempoProcessor::Ptr        processor;
-    
-    
-    void reset()
-    {
-        aPrep->copy(sPrep);
-        processor->reset();
-        DBG("resetting tempo");
-    }
-    
-    inline String getName(void) const noexcept {return name;}
-    
-    inline void setName(String newName)
-    {
-        name = newName;
-        updateState->tempoPreparationDidChange = true;
-    }
-    
-private:
-    int Id;
-    String name;
-    
-    BKUpdateState::Ptr updateState;
-    
-    JUCE_LEAK_DETECTOR(Tempo)
-};
 
 #endif  // TEMPO_H_INCLUDED

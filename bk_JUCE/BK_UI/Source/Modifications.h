@@ -42,6 +42,7 @@ public:
         
     }
     
+    
     ~ModPrepMap(void)
     {
         
@@ -83,8 +84,55 @@ public:
         
     }
     
-    void addModPrepMap(ModPrepMap::Ptr mpmap) { modPrepMaps.add(mpmap);}
-    ModPrepMap::PtrArr  getModPrepMaps(void) {return modPrepMaps;}
+    inline void addModPrepMap(ModPrepMap::Ptr mpmap)
+    {
+        modPrepMaps.add(mpmap);
+    }
+    
+    inline void removeModPrepMap(ModPrepMap::Ptr mpmap)
+    {
+        for (int i = modPrepMaps.size(); --i >= 0;)
+        {
+            if (modPrepMaps[i] == mpmap)
+            {
+                modPrepMaps.remove(i);
+                break;
+            }
+        }
+    }
+    
+    inline void removeModPrepMap(BKPreparationType type, int Id)
+    {
+        for (int i = modPrepMaps.size(); --i >= 0;)
+        {
+            if ((modPrepMaps[i]->getType() == type) && (modPrepMaps[i]->getId() == Id))
+            {
+                modPrepMaps.remove(i);
+                break;
+            }
+        }
+    }
+    
+    inline ModPrepMap::Ptr getModPrepMap(BKPreparationType type, int Id)
+    {
+        ModPrepMap::Ptr thisModPrepMap;
+        
+        for (int i = modPrepMaps.size(); --i >= 0;)
+        {
+            if ((modPrepMaps[i]->getType() == type) && (modPrepMaps[i]->getId() == Id))
+            {
+                thisModPrepMap == modPrepMaps[i];
+                break;
+            }
+        }
+        
+        return thisModPrepMap;
+    }
+    
+    inline ModPrepMap::PtrArr  getModPrepMaps(void) const noexcept
+    {
+        return modPrepMaps;
+    }
     
     void clear(void) { modPrepMaps.clear();}
     
@@ -114,8 +162,10 @@ public:
     void addSynchronicModification(SynchronicModification::Ptr m);
 
     void addNostalgicModification(NostalgicModification::Ptr m);
-
+    
     void addDirectModification(DirectModification::Ptr m);
+    void removeDirectModification(DirectModification::Ptr m);
+    void removeDirectModification(int which);
     
     void addTuningModification(TuningModification::Ptr m);
     

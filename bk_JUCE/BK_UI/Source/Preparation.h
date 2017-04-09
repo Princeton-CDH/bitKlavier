@@ -20,6 +20,8 @@
 #include "BKUpdateState.h"
 
 
+/* ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ DIRECT ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ */
+
 class Direct : public ReferenceCountedObject
 {
     
@@ -179,6 +181,184 @@ private:
     
     JUCE_LEAK_DETECTOR(Direct)
 };
+
+class DirectModPreparation : public ReferenceCountedObject
+{
+public:
+    
+    typedef ReferenceCountedObjectPtr<DirectModPreparation>   Ptr;
+    typedef Array<DirectModPreparation::Ptr>                  PtrArr;
+    typedef Array<DirectModPreparation::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<DirectModPreparation>                  Arr;
+    typedef OwnedArray<DirectModPreparation, CriticalSection> CSArr;
+    
+    /*
+     DirectId = 0,
+     DirectTuning,
+     DirectTransposition,
+     DirectGain,
+     DirectResGain,
+     DirectHammerGain,
+     DirectParameterTypeNil,
+     */
+    
+    DirectModPreparation(DirectPreparation::Ptr p, int Id):
+    Id(Id)
+    {
+        param.ensureStorageAllocated(cDirectParameterTypes.size());
+        
+        param.set(DirectTuning, String(p->getTuning()->getId()));
+        param.set(DirectTransposition, floatArrayToString(p->getTransposition()));
+        param.set(DirectGain, String(p->getGain()));
+        param.set(DirectResGain, String(p->getResonanceGain()));
+        param.set(DirectHammerGain, String(p->getHammerGain()));
+    }
+    
+    
+    DirectModPreparation(int Id):
+    Id(Id)
+    {
+        param.add("");
+        param.add("");
+        param.add("");
+        param.add("");
+        param.add("");
+        //param.add("");
+    }
+    
+    inline ValueTree getState(int Id)
+    {
+        ValueTree prep( vtagModDirect+String(Id));
+        
+        String p = "";
+        
+        p = getParam(DirectTuning);
+        if (p != String::empty) prep.setProperty( ptagDirect_tuning,            p.getIntValue(), 0);
+        
+        ValueTree transp( vtagDirect_transposition);
+        int count = 0;
+        p = getParam(DirectTransposition);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                transp.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(transp, -1, 0);
+        
+        p = getParam(DirectGain);
+        if (p != String::empty) prep.setProperty( ptagDirect_gain,              p.getFloatValue(), 0);
+        
+        p = getParam(DirectResGain);
+        if (p != String::empty) prep.setProperty( ptagDirect_resGain,           p.getFloatValue(), 0);
+        
+        p = getParam(DirectHammerGain);
+        if (p != String::empty) prep.setProperty( ptagDirect_hammerGain,        p.getFloatValue(), 0);
+        
+        return prep;
+    }
+    
+    inline void setState(XmlElement* e)
+    {
+        float f;
+        
+        String p = e->getStringAttribute(ptagDirect_tuning);
+        setParam(DirectTuning, p);
+        
+        p = e->getStringAttribute(ptagDirect_gain);
+        setParam(DirectGain, p);
+        
+        p = e->getStringAttribute(ptagDirect_hammerGain);
+        setParam(DirectHammerGain, p);
+        
+        p = e->getStringAttribute(ptagDirect_resGain);
+        setParam(DirectResGain, p);
+        
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName(vtagDirect_transposition))
+            {
+                Array<float> transp;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        transp.add(f);
+                    }
+                }
+                
+                setParam(DirectTransposition, floatArrayToString(transp));
+                
+            }
+        }
+    }
+    
+    ~DirectModPreparation(void)
+    {
+        
+    }
+    
+    inline void copy(DirectPreparation::Ptr d)
+    {
+        param.set(DirectTuning, String(d->getTuning()->getId()));
+        param.set(DirectTransposition, floatArrayToString(d->getTransposition()));
+        param.set(DirectGain, String(d->getGain()));
+        param.set(DirectResGain, String(d->getResonanceGain()));
+        param.set(DirectHammerGain, String(d->getHammerGain()));
+    }
+    
+    
+    inline const String getParam(DirectParameterType type)
+    {
+        if (type != DirectId)   return param[type];
+        else                    return "";
+    }
+    
+    inline void setParam(DirectParameterType type, String val) { param.set(type, val);}
+    
+    inline const StringArray getStringArray(void) { return param; }
+    
+    void print(void)
+    {
+        
+    }
+    
+    inline int getId(void)const noexcept {return Id;}
+    
+    inline String getName(void) const noexcept {return name;}
+    inline void setName(String newName) {name = newName;}
+    
+    inline void addTarget(Direct::Ptr target) { targets.add(target); }
+    inline Direct::PtrArr getTargets(void) {return targets;}
+    
+    inline void addKeymap(Keymap::Ptr keymap) { keymaps.add(keymap); }
+    inline Keymap::PtrArr getKeymaps(void) {return keymaps;}
+    
+    inline void clearKeymaps(void) {keymaps.clear();}
+    inline void clearTargets(void) {targets.clear();}
+
+
+    
+private:
+    int Id;
+    String name;
+    StringArray          param;
+
+    Direct::PtrArr targets;
+    
+    Keymap::PtrArr keymaps;
+    
+    JUCE_LEAK_DETECTOR(DirectModPreparation);
+};
+
+
+/* ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ SYNCHRONIC ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ */
 
 class Synchronic : public ReferenceCountedObject
 {
@@ -461,6 +641,335 @@ private:
     JUCE_LEAK_DETECTOR(Synchronic)
 };
 
+class SynchronicModPreparation : public ReferenceCountedObject
+{
+public:
+    
+    typedef ReferenceCountedObjectPtr<SynchronicModPreparation>   Ptr;
+    typedef Array<SynchronicModPreparation::Ptr>                  PtrArr;
+    typedef Array<SynchronicModPreparation::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<SynchronicModPreparation>                  Arr;
+    typedef OwnedArray<SynchronicModPreparation, CriticalSection> CSArr;
+    
+    /*
+     SynchronicId = 0,
+     SynchronicTuning,
+     SynchronicTempo,
+     SynchronicNumPulses,
+     SynchronicClusterMin,
+     SynchronicClusterMax,
+     SynchronicClusterThresh,
+     SynchronicMode,
+     SynchronicBeatsToSkip,
+     SynchronicBeatMultipliers,
+     SynchronicLengthMultipliers,
+     SynchronicAccentMultipliers,
+     SynchronicTranspOffsets,
+     AT1Mode,
+     AT1History,
+     AT1Subdivisions,
+     AT1Min,
+     AT1Max,
+     */
+    
+    SynchronicModPreparation(SynchronicPreparation::Ptr p, int Id):
+    Id(Id)
+    {
+        param.ensureStorageAllocated(cSynchronicParameterTypes.size());
+        
+        param.set(SynchronicTuning, String(p->getTuning()->getId()));
+        param.set(SynchronicTempo, String(p->getTempoControl()->getId()));
+        param.set(SynchronicNumPulses, String(p->getNumBeats()));
+        param.set(SynchronicClusterMin, String(p->getClusterMin()));
+        param.set(SynchronicClusterMax, String(p->getClusterMax()));
+        param.set(SynchronicClusterThresh, String(p->getClusterThreshMS()));
+        param.set(SynchronicMode, String(p->getMode()));
+        param.set(SynchronicBeatsToSkip, String(p->getBeatsToSkip()));
+        param.set(SynchronicBeatMultipliers, floatArrayToString(p->getBeatMultipliers()));
+        param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
+        param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
+        param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p->getTransposition()));
+        
+    }
+    
+    
+    SynchronicModPreparation(int Id):
+    Id(Id)
+    {
+        param.set(SynchronicTuning, "");
+        param.set(SynchronicTempo, "");
+        param.set(SynchronicNumPulses, "");
+        param.set(SynchronicClusterMin, "");
+        param.set(SynchronicClusterMax, "");
+        param.set(SynchronicClusterThresh, "");
+        param.set(SynchronicMode, "");
+        param.set(SynchronicBeatsToSkip, "");
+        param.set(SynchronicBeatMultipliers, "");
+        param.set(SynchronicLengthMultipliers, "");
+        param.set(SynchronicAccentMultipliers, "");
+        param.set(SynchronicTranspOffsets, "");
+    }
+    
+    inline int getId(void) const noexcept { return Id; }
+    
+    inline ValueTree getState(int Id)
+    {
+        ValueTree prep( vtagModSynchronic + String(Id));
+        
+        String p = "";
+        
+        p = getParam(SynchronicTuning);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_tuning,              p.getIntValue(), 0);
+        
+        p = getParam(SynchronicTempo);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_tempo,               p.getIntValue(), 0);
+        
+        p = getParam(SynchronicNumPulses);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_numBeats,            p.getIntValue(), 0);
+        
+        p = getParam(SynchronicClusterMin);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_clusterMin,          p.getIntValue(), 0);
+        
+        p = getParam(SynchronicClusterMax);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_clusterMax,          p.getIntValue(), 0);
+        
+        p = getParam(SynchronicClusterThresh);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_clusterThresh,       p.getIntValue(), 0);
+        
+        p = getParam(SynchronicMode);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_mode,                p.getIntValue(), 0);
+        
+        p = getParam(SynchronicBeatsToSkip);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_beatsToSkip,         p.getIntValue(), 0);
+        
+        ValueTree beatMults( vtagSynchronic_beatMults);
+        int count = 0;
+        p = getParam(SynchronicBeatMultipliers);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                beatMults.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(beatMults, -1, 0);
+        
+        
+        
+        ValueTree lengthMults( vtagSynchronic_lengthMults);
+        count = 0;
+        p = getParam(SynchronicLengthMultipliers);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                lengthMults.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(lengthMults, -1, 0);
+        
+        
+        ValueTree accentMults( vtagSynchronic_accentMults);
+        count = 0;
+        p = getParam(SynchronicAccentMultipliers);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                accentMults.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(accentMults, -1, 0);
+        
+        
+        ValueTree transpOffsets( vtagSynchronic_transpOffsets);
+        count = 0;
+        p = getParam(SynchronicTranspOffsets);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                transpOffsets.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(transpOffsets, -1, 0);
+        
+        
+        return prep;
+        
+    }
+    
+    inline void setState(XmlElement* e)
+    {
+        float f;
+        
+        String p = e->getStringAttribute(ptagSynchronic_tuning);
+        setParam(SynchronicTuning, p);
+        
+        p = e->getStringAttribute(ptagSynchronic_tempo);
+        setParam(SynchronicTempo, p);
+        
+        p = e->getStringAttribute(ptagSynchronic_numBeats);
+        setParam(SynchronicNumPulses, p);
+        
+        p = e->getStringAttribute(ptagSynchronic_clusterMin);
+        setParam(SynchronicClusterMin, p);
+        
+        p = e->getStringAttribute(ptagSynchronic_clusterMax);
+        setParam(SynchronicClusterMax, p);
+        
+        p = e->getStringAttribute(ptagSynchronic_clusterThresh);
+        setParam(SynchronicClusterThresh, p);
+        
+        p = e->getStringAttribute(ptagSynchronic_mode);
+        setParam(SynchronicMode, p);
+        
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName(vtagSynchronic_beatMults))
+            {
+                Array<float> beats;
+                
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        beats.add(f);
+                    }
+                }
+                
+                setParam(SynchronicBeatMultipliers, floatArrayToString(beats));
+                
+            }
+            else  if (sub->hasTagName(vtagSynchronic_accentMults))
+            {
+                Array<float> accents;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        accents.add(f);
+                    }
+                }
+                
+                setParam(SynchronicAccentMultipliers, floatArrayToString(accents));
+                
+            }
+            else  if (sub->hasTagName(vtagSynchronic_lengthMults))
+            {
+                Array<float> lens;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        lens.add(f);
+                    }
+                }
+                
+                setParam(SynchronicLengthMultipliers, floatArrayToString(lens));
+                
+            }
+            else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
+            {
+                Array<float> transp;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        transp.add(f);
+                    }
+                }
+                
+                setParam(SynchronicTranspOffsets, floatArrayToString(transp));
+            }
+        }
+        
+    }
+    
+    
+    ~SynchronicModPreparation(void)
+    {
+        
+    }
+    
+    inline void copy(SynchronicPreparation::Ptr p)
+    {
+        param.set(SynchronicTuning, String(p->getTuning()->getId()));
+        param.set(SynchronicTempo, String(p->getTempoControl()->getId()));
+        param.set(SynchronicNumPulses, String(p->getNumBeats()));
+        param.set(SynchronicClusterMin, String(p->getClusterMin()));
+        param.set(SynchronicClusterMax, String(p->getClusterMax()));
+        param.set(SynchronicClusterThresh, String(p->getClusterThreshMS()));
+        param.set(SynchronicMode, String(p->getMode()));
+        param.set(SynchronicBeatsToSkip, String(p->getBeatsToSkip()));
+        param.set(SynchronicBeatMultipliers, floatArrayToString(p->getBeatMultipliers()));
+        param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
+        param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
+        param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p->getTransposition()));
+    }
+    
+    inline const StringArray getStringArray(void) { return param; }
+    
+    
+    inline const String getParam(SynchronicParameterType type)
+    {
+        if (type != SynchronicId)
+            return param[type];
+        else
+            return "";
+    }
+    
+    inline void setParam(SynchronicParameterType type, String val) { param.set(type, val);}
+    
+    void print(void)
+    {
+        
+    }
+    
+    inline String getName(void) const noexcept {return name;}
+    inline void setName(String newName) {name = newName;}
+    
+    inline void addTarget(Synchronic::Ptr target) { targets.add(target); }
+    inline Synchronic::PtrArr getTargets(void) {return targets;}
+    
+    inline void addKeymap(Keymap::Ptr keymap) { keymaps.add(keymap); }
+    inline Keymap::PtrArr getKeymaps(void) {return keymaps;}
+    
+private:
+    int Id;
+    String name;
+    StringArray          param;
+    
+    Synchronic::PtrArr targets;
+    Keymap::PtrArr     keymaps;
+    
+    JUCE_LEAK_DETECTOR(SynchronicModPreparation);
+};
+
+
+
+/* ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ NOSTALGIC ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ */
+
 class Nostalgic : public ReferenceCountedObject
 {
     
@@ -646,6 +1155,219 @@ private:
     
     JUCE_LEAK_DETECTOR(Nostalgic)
 };
+
+class NostalgicModPreparation : public ReferenceCountedObject
+{
+public:
+    
+    typedef ReferenceCountedObjectPtr<NostalgicModPreparation>   Ptr;
+    typedef Array<NostalgicModPreparation::Ptr>                  PtrArr;
+    typedef Array<NostalgicModPreparation::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<NostalgicModPreparation>                  Arr;
+    typedef OwnedArray<NostalgicModPreparation, CriticalSection> CSArr;
+    
+    /*
+     NostalgicId = 0,
+     NostalgicTuning,
+     NostalgicWaveDistance,
+     NostalgicUndertow,
+     NostalgicTransposition,
+     NostalgicGain,
+     NostalgicLengthMultiplier,
+     NostalgicBeatsToSkip,
+     NostalgicMode,
+     NostalgicSyncTarget,
+     NostalgicParameterTypeNil
+     
+     */
+    
+    NostalgicModPreparation(NostalgicPreparation::Ptr p, int Id):
+    Id(Id)
+    {
+        param.ensureStorageAllocated(cNostalgicParameterTypes.size());
+        
+        param.set(NostalgicTuning, String(p->getTuning()->getId()));
+        param.set(NostalgicWaveDistance, String(p->getWavedistance()));
+        param.set(NostalgicUndertow, String(p->getUndertow()));
+        param.set(NostalgicTransposition, floatArrayToString(p->getTransposition()));
+        param.set(NostalgicGain, String(p->getGain()));
+        param.set(NostalgicLengthMultiplier, String(p->getLengthMultiplier()));
+        param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
+        param.set(NostalgicMode, String(p->getMode()));
+        param.set(NostalgicSyncTarget, String(p->getSyncTarget()));
+        
+    }
+    
+    
+    NostalgicModPreparation(int Id):
+    Id(Id)
+    {
+        param.set(NostalgicTuning, "");
+        param.set(NostalgicWaveDistance, "");
+        param.set(NostalgicUndertow, "");
+        param.set(NostalgicTransposition, "");
+        param.set(NostalgicGain, "");
+        param.set(NostalgicLengthMultiplier, "");
+        param.set(NostalgicBeatsToSkip, "");
+        param.set(NostalgicMode, "");
+        param.set(NostalgicSyncTarget, "");
+    }
+    
+    inline int getId(void) const noexcept { return Id; }
+    
+    inline ValueTree getState(int Id)
+    {
+        ValueTree prep( vtagModNostalgic + String(Id));
+        
+        String p = "";
+        
+        p = getParam(NostalgicTuning);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_tuning,             p.getIntValue(), 0);
+        
+        p = getParam(NostalgicWaveDistance);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_waveDistance,       p.getIntValue(), 0);
+        
+        p = getParam(NostalgicUndertow);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_undertow,           p.getIntValue(), 0);
+        
+        ValueTree transp( vtagNostalgic_transposition);
+        int count = 0;
+        p = getParam(NostalgicTransposition);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                transp.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(transp, -1, 0);
+        
+        p = getParam(NostalgicGain);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_gain,               p.getFloatValue(), 0);
+        
+        p = getParam(NostalgicLengthMultiplier);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_lengthMultiplier,   p.getFloatValue(), 0);
+        
+        p = getParam(NostalgicBeatsToSkip);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_beatsToSkip,        p.getFloatValue(), 0);
+        
+        p = getParam(NostalgicMode);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_mode,               p.getIntValue(), 0);
+        
+        p = getParam(NostalgicSyncTarget);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_syncTarget,         p.getIntValue(), 0);
+        
+        return prep;
+    }
+    
+    inline void setState(XmlElement* e)
+    {
+        float f;
+        
+        String p = e->getStringAttribute(ptagNostalgic_tuning);
+        setParam(NostalgicTuning, p);
+        
+        p = e->getStringAttribute(ptagNostalgic_waveDistance);
+        setParam(NostalgicWaveDistance, p);
+        
+        p = e->getStringAttribute(ptagNostalgic_undertow);
+        setParam(NostalgicUndertow, p);
+        
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName(vtagNostalgic_transposition))
+            {
+                Array<float> transp;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        transp.add(f);
+                    }
+                }
+                
+                setParam(NostalgicTransposition, floatArrayToString(transp));
+                
+            }
+        }
+        
+        p = e->getStringAttribute(ptagNostalgic_lengthMultiplier);
+        setParam(NostalgicLengthMultiplier, p);
+        
+        p = e->getStringAttribute(ptagNostalgic_beatsToSkip);
+        setParam(NostalgicBeatsToSkip, p);
+        
+        p = e->getStringAttribute(ptagNostalgic_gain);
+        setParam(NostalgicGain, p);
+        
+        p = e->getStringAttribute(ptagNostalgic_mode);
+        setParam(NostalgicMode, p);
+        
+        p = e->getStringAttribute(ptagNostalgic_syncTarget);
+        setParam(NostalgicSyncTarget, p);
+    }
+    
+    
+    ~NostalgicModPreparation(void)
+    {
+        
+    }
+    
+    inline void copy(NostalgicPreparation::Ptr p)
+    {
+        param.set(NostalgicTuning, String(p->getTuning()->getId()));
+        param.set(NostalgicWaveDistance, String(p->getWavedistance()));
+        param.set(NostalgicUndertow, String(p->getUndertow()));
+        param.set(NostalgicTransposition, floatArrayToString(p->getTransposition()));
+        param.set(NostalgicGain, String(p->getGain()));
+        param.set(NostalgicLengthMultiplier, String(p->getLengthMultiplier()));
+        param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
+        param.set(NostalgicMode, String(p->getMode()));
+        param.set(NostalgicSyncTarget, String(p->getSyncTarget()));
+    }
+    
+    inline const StringArray getStringArray(void) { return param; }
+    
+    inline const String getParam(NostalgicParameterType type)
+    {
+        if (type != NostalgicId)
+            return param[type];
+        else
+            return "";
+    }
+    
+    inline void setParam(NostalgicParameterType type, String val) { param.set(type, val);}
+    
+    void print(void)
+    {
+        
+    }
+    
+    inline String getName(void) const noexcept {return name;}
+    inline void setName(String newName) {name = newName;}
+    
+    inline void addTarget(Nostalgic::Ptr target) { targets.add(target); }
+    inline Nostalgic::PtrArr getTargets(void) {return targets;}
+    
+    inline void addKeymap(Keymap::Ptr keymap) { keymaps.add(keymap); }
+    inline Keymap::PtrArr getKeymaps(void) {return keymaps;}
+    
+private:
+    int Id;
+    String name;
+    StringArray          param;
+    
+    Nostalgic::PtrArr targets;
+    Keymap::PtrArr keymaps;
+    
+    JUCE_LEAK_DETECTOR(NostalgicModPreparation);
+};
+
 
 
 #endif  // PREPARATION_H_INCLUDED

@@ -77,8 +77,19 @@ public:
     ValueTree getState(void);
     
     void setState(XmlElement* e);
-    
 
+    
+    inline Array<int> getAllIds(Synchronic::PtrArr direct)
+    {
+        Array<int> which;
+        for (auto p : direct)
+        {
+            which.add(p->getId());
+        }
+        
+        return which;
+    }
+    
     String modificationMapsToString(void)
     {
         String out = "";
@@ -121,20 +132,23 @@ public:
 
     void                        prepareToPlay(double sampleRate);
 
-    void configureDirectModification(int key, DirectModPreparation::Ptr, Array<int> whichPreps);
-    void configureDirectModification(Keymap::Ptr keymap, DirectModPreparation::Ptr, Array<int> whichPreps);
+    void deconfigureDirectModification(int key, DirectModPreparation::Ptr, Array<int>);
+    void deconfigureDirectModification(DirectModPreparation::Ptr);
     
-    void configureSynchronicModification(int key, SynchronicModPreparation::Ptr, Array<int> whichPreps);
-    void configureSynchronicModification(Keymap::Ptr keymap, SynchronicModPreparation::Ptr, Array<int> whichPreps);
+    void configureDirectModification(int key, DirectModPreparation::Ptr, Array<int>);
+    void configureDirectModification(DirectModPreparation::Ptr);
     
-    void configureNostalgicModification(int key, NostalgicModPreparation::Ptr, Array<int> whichPreps);
-    void configureNostalgicModification(Keymap::Ptr keymap, NostalgicModPreparation::Ptr dmod, Array<int> whichPreps);
+    void configureSynchronicModification(int key, SynchronicModPreparation::Ptr, Array<int>);
+    void configureSynchronicModification(SynchronicModPreparation::Ptr);
     
-    void configureTempoModification(int key, TempoModPreparation::Ptr, Array<int> whichPreps);
-    void configureTempoModification(Keymap::Ptr keymap, TempoModPreparation::Ptr, Array<int> whichPreps);
+    void configureNostalgicModification(int key, NostalgicModPreparation::Ptr, Array<int>);
+    void configureNostalgicModification(NostalgicModPreparation::Ptr dmod);
     
-    void configureTuningModification(int key, TuningModPreparation::Ptr, Array<int> whichPreps);
-    void configureTuningModification(Keymap::Ptr keymap, TuningModPreparation::Ptr dmod, Array<int> whichPreps);
+    void configureTempoModification(int key, TempoModPreparation::Ptr, Array<int>);
+    void configureTempoModification(TempoModPreparation::Ptr);
+    
+    void configureTuningModification(int key, TuningModPreparation::Ptr, Array<int>);
+    void configureTuningModification(TuningModPreparation::Ptr dmod);
     
     int                         addPreparationMap(void);
     int                         addPreparationMap(Keymap::Ptr keymap);
@@ -166,8 +180,52 @@ private:
     
     
     Keymap::PtrArr                      bkKeymaps;
-
-
+    
+    inline Array<int> getAllIds(Direct::PtrArr direct)
+    {
+        Array<int> which;
+        for (auto p : direct)
+        {
+            which.add(p->getId());
+        }
+        
+        return which;
+    }
+    
+    inline Array<int> getAllIds(Tempo::PtrArr direct)
+    {
+        Array<int> which;
+        for (auto p : direct)
+        {
+            which.add(p->getId());
+        }
+        
+        return which;
+    }
+    
+    inline Array<int> getAllIds(Tuning::PtrArr direct)
+    {
+        Array<int> which;
+        for (auto p : direct)
+        {
+            which.add(p->getId());
+        }
+        
+        return which;
+    }
+    
+    inline Array<int> getAllIds(Nostalgic::PtrArr direct)
+    {
+        Array<int> which;
+        for (auto p : direct)
+        {
+            which.add(p->getId());
+        }
+        
+        return which;
+    }
+    
+    
     JUCE_LEAK_DETECTOR(Piano)
 };
 
