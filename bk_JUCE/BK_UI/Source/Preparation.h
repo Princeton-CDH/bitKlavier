@@ -955,6 +955,10 @@ public:
     inline void addKeymap(Keymap::Ptr keymap) { keymaps.add(keymap); }
     inline Keymap::PtrArr getKeymaps(void) {return keymaps;}
     
+    inline void clearKeymaps(void) {keymaps.clear();}
+    inline void clearTargets(void) {targets.clear();}
+    
+    
 private:
     int Id;
     String name;
@@ -1356,6 +1360,9 @@ public:
     
     inline void addKeymap(Keymap::Ptr keymap) { keymaps.add(keymap); }
     inline Keymap::PtrArr getKeymaps(void) {return keymaps;}
+    
+    inline void clearKeymaps(void) {keymaps.clear();}
+    inline void clearTargets(void) {targets.clear();}
     
 private:
     int Id;

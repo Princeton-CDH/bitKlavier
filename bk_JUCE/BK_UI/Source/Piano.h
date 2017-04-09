@@ -131,22 +131,25 @@ public:
     int                         numModSMaps, numModNMaps, numModDMaps;
 
     void                        prepareToPlay(double sampleRate);
-
-    void deconfigureDirectModification(int key, DirectModPreparation::Ptr, Array<int>);
-    void deconfigureDirectModification(DirectModPreparation::Ptr);
     
+    
+    void deconfigureDirectModification(DirectModPreparation::Ptr);
     void configureDirectModification(int key, DirectModPreparation::Ptr, Array<int>);
     void configureDirectModification(DirectModPreparation::Ptr);
     
+    void deconfigureSynchronicModification(SynchronicModPreparation::Ptr);
     void configureSynchronicModification(int key, SynchronicModPreparation::Ptr, Array<int>);
     void configureSynchronicModification(SynchronicModPreparation::Ptr);
     
+    void deconfigureNostalgicModification(NostalgicModPreparation::Ptr);
     void configureNostalgicModification(int key, NostalgicModPreparation::Ptr, Array<int>);
     void configureNostalgicModification(NostalgicModPreparation::Ptr dmod);
     
+    void deconfigureTempoModification(TempoModPreparation::Ptr);
     void configureTempoModification(int key, TempoModPreparation::Ptr, Array<int>);
     void configureTempoModification(TempoModPreparation::Ptr);
     
+    void deconfigureTuningModification(TuningModPreparation::Ptr);
     void configureTuningModification(int key, TuningModPreparation::Ptr, Array<int>);
     void configureTuningModification(TuningModPreparation::Ptr dmod);
     

@@ -158,18 +158,27 @@ public:
   
     Modifications(void);
     ~Modifications(void);
-    
-    void addSynchronicModification(SynchronicModification::Ptr m);
 
-    void addNostalgicModification(NostalgicModification::Ptr m);
-    
+
     void addDirectModification(DirectModification::Ptr m);
     void removeDirectModification(DirectModification::Ptr m);
     void removeDirectModification(int which);
     
-    void addTuningModification(TuningModification::Ptr m);
+    void addSynchronicModification(SynchronicModification::Ptr m);
+    void removeSynchronicModification(SynchronicModification::Ptr m);
+    void removeSynchronicModification(int which);
+    
+    void addNostalgicModification(NostalgicModification::Ptr m);
+    void removeNostalgicModification(NostalgicModification::Ptr m);
+    void removeNostalgicModification(int which);
     
     void addTempoModification(TempoModification::Ptr m);
+    void removeTempoModification(TempoModification::Ptr m);
+    void removeTempoModification(int which);
+    
+    void addTuningModification(TuningModification::Ptr m);
+    void removeTuningModification(TuningModification::Ptr m);
+    void removeTuningModification(int which);
 
     SynchronicModification::PtrArr getSynchronicModifications(void);
     
