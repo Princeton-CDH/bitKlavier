@@ -16,9 +16,10 @@
 
 /*
  TODO
- -- expose basic parameters to top; max/min, etc... perhaps slider size
+ -- expose basic parameters to top; max/min, etc... perhaps subSlider size
  -- snapping
  -- add text box for creating/copy/pasting directly
+ -- display additional values and main value for clusters (like transposition vals [t1 t2 t3])?
  */
 
 typedef enum BKMultiSliderType {
@@ -55,7 +56,7 @@ private:
 
 
 
-class BKMultiSlider : public BKComponent, public Slider::Listener
+class BKMultiSlider : public BKComponent, public Slider::Listener, public Button::Listener
 {
     
 public:
@@ -66,10 +67,11 @@ public:
     void addSubSlider();
     void mouseDrag(const MouseEvent& e) override;
     void mouseDoubleClick (const MouseEvent &e) override;
-    int whichSubSlider (const MouseEvent &e);
+    int  whichSubSlider (const MouseEvent &e);
     void resetRanges();
     void resized() override;
     void initSizes();
+    Array<float> getAllValues();
     
 private:
     bool dragging;
@@ -87,6 +89,8 @@ private:
     BKSingleSlider* bigInvisibleSlider;
     Slider* incDecSlider;
     
+    TextButton* editTextButton;
+    
     double sliderMin, sliderMax, sliderMinDefault, sliderMaxDefault;
     double sliderDefault;
     double sliderIncrement;
@@ -96,6 +100,8 @@ private:
     int numSliders = 1;
     
     void sliderValueChanged (Slider *slider) override;
+    void buttonClicked (Button* button) override;
+    String textWindowDialog();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKMultiSlider)
 };
