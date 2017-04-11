@@ -102,6 +102,7 @@ private:
     void sliderValueChanged (Slider *slider) override;
     void buttonClicked (Button* button) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+    
     String textWindowDialog();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKMultiSlider)
