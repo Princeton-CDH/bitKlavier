@@ -51,6 +51,11 @@ public:
         setKeymap(k->keys());
     }
     
+    Keymap(void):
+    Id(-1)
+    {
+    }
+    
     
     ~Keymap()
     {
@@ -114,6 +119,15 @@ public:
         
         return ret;
     }
+    
+    void addKeymap(Keymap::Ptr otherKeymap)
+    {
+        for (auto key : otherKeymap->keys())
+        {
+            keymap.set(key, true);
+        }
+    }
+    
     
     
     bool containsNote(int noteNumber)

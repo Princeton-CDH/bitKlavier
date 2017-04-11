@@ -14,6 +14,263 @@
 
 #include "Piano.h"
 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ BKItem ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+BKItem::BKItem(BKPreparationType type, int Id, BKAudioProcessor& p):
+BKDraggableComponent(true,false,true),
+processor(p),
+type(type),
+Id(Id)
+{
+    fullChild.setAlwaysOnTop(true);
+    addAndMakeVisible(fullChild);
+    
+    if (type == PreparationTypePianoMap)
+    {
+        addAndMakeVisible(menu);
+        
+        menu.setName(cPreparationTypes[type]);
+        menu.addListener(this);
+    
+        Piano::PtrArr pianos = processor.gallery->getPianos();
+        for (int i = 0; i < pianos.size(); i++)
+        {
+            menu.addItem(pianos[i]->getName(), i+1);
+            menu.addSeparator();
+        }
+        
+        menu.setSelectedId(0, NotificationType::dontSendNotification);
+    }
+    else
+    {
+        addAndMakeVisible(label);
+        
+        label.setJustificationType(Justification::centred);
+        label.setBorderSize(BorderSize<int>(2));
+        
+        String name = cPreparationTypes[type];
+        
+        if (type != PreparationTypeReset) name += String(Id);
+        
+        label.setText(name, dontSendNotification);
+    }
+    
+    
+    DBG("constructed: " + name);
+    
+}
+
+BKItem::~BKItem()
+{
+    
+}
+
+void BKItem::bkComboBoxDidChange    (ComboBox* cb)
+{
+    if (cb->getName() == "PianoMap")
+    {
+        currentId = cb->getSelectedId();
+        DBG("New piano selected: "+String(currentId));
+    }
+}
+
+void BKItem::itemIsBeingDragged(const MouseEvent& e)
+{
+    getParentComponent()->repaint();
+}
+
+void BKItem::mouseDown(const MouseEvent& e)
+{
+    if (e.getNumberOfClicks() == 2)
+    {
+        if (type == PreparationTypeDirect)
+        {
+            processor.updateState->currentDirectId = Id;
+            processor.updateState->directPreparationDidChange = true;
+            processor.updateState->currentPreparationDisplay = DisplayDirect;
+        }
+        else if (type == PreparationTypeSynchronic)
+        {
+            processor.updateState->currentSynchronicId = Id;
+            processor.updateState->synchronicPreparationDidChange = true;
+            processor.updateState->currentPreparationDisplay = DisplaySynchronic;
+        }
+        else if (type == PreparationTypeNostalgic)
+        {
+            processor.updateState->currentNostalgicId = Id;
+            processor.updateState->nostalgicPreparationDidChange = true;
+            processor.updateState->currentPreparationDisplay = DisplayNostalgic;
+        }
+        else if (type == PreparationTypeTuning)
+        {
+            processor.updateState->currentTuningId = Id;
+            processor.updateState->tuningPreparationDidChange = true;
+            processor.updateState->currentPreparationDisplay = DisplayTuning;
+        }
+        else if (type == PreparationTypeTempo)
+        {
+            processor.updateState->currentTempoId = Id;
+            processor.updateState->tempoPreparationDidChange = true;
+            processor.updateState->currentPreparationDisplay = DisplayTempo;
+        }
+        else if (type == PreparationTypeKeymap)
+        {
+            processor.updateState->currentKeymapId = Id;
+            processor.updateState->keymapDidChange = true;
+            processor.updateState->currentPreparationDisplay = DisplayKeymap;
+        }
+        else if (type == PreparationTypeDirectMod)
+        {
+            processor.updateState->currentModDirectId = Id;
+            processor.updateState->directDidChange = true;
+            processor.updateState->currentPreparationDisplay = DisplayDirect;
+        }
+        else if (type == PreparationTypeNostalgicMod)
+        {
+            processor.updateState->currentModNostalgicId = Id;
+            processor.updateState->nostalgicPreparationDidChange = true;
+            processor.updateState->currentPreparationDisplay = DisplayNostalgic;
+        }
+        else if (type == PreparationTypeSynchronicMod)
+        {
+            processor.updateState->currentModSynchronicId = Id;
+            processor.updateState->synchronicPreparationDidChange = true;
+            processor.updateState->currentPreparationDisplay = DisplaySynchronic;
+        }
+        else if (type == PreparationTypeTuningMod)
+        {
+            processor.updateState->currentModTuningId = Id;
+            processor.updateState->tuningPreparationDidChange = true;
+            processor.updateState->currentPreparationDisplay = DisplayTuning;
+        }
+        else if (type == PreparationTypeTempoMod)
+        {
+            processor.updateState->currentModTempoId = Id;
+            processor.updateState->tempoPreparationDidChange = true;
+            processor.updateState->currentPreparationDisplay = DisplayTempo;
+        }
+        else if (type == PreparationTypePianoMap)
+        {
+            menu.showPopup();
+        }
+    }
+    
+    processor.updateState->displayDidChange = true;
+}
+
+void BKItem::keyPressedWhileSelected(const KeyPress& e)
+{
+    
+}
+
+void BKItem::mouseUp(const MouseEvent& e)
+{
+    mouseExit(e);
+}
+
+void BKItem::paint(Graphics& g)
+{
+    if (type == PreparationTypeTuning)
+    {
+        g.setColour(Colours::lightcoral);
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        g.setColour(Colours::palegreen);
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+        g.setColour(Colours::lightyellow);
+        
+    }
+    else if (type >= PreparationTypeKeymap) //mod
+    {
+        g.setColour(Colours::palevioletred);
+    }
+    else
+    {
+        g.setColour(Colours::lightblue);
+    }
+    
+    
+    g.fillAll();
+    
+    if (isSelected)
+    {
+        g.setColour(Colours::white);
+        g.drawRect(getLocalBounds(),4);
+    }
+    else
+    {
+        g.setColour(Colours::black);
+        g.drawRect(getLocalBounds(),2);
+    }
+    
+    
+}
+
+void BKItem::resized(void)
+{
+    if (type == PreparationTypePianoMap)
+    {
+        menu.setBounds(0, 0, getWidth(), getHeight());
+    }
+    else
+    {
+        label.setBounds(0,0,getWidth(),getHeight());
+    }
+    
+    fullChild.setBounds(0,0,getWidth(),getHeight());
+}
+
+
+void BKItem::addModification(BKItem* modification)
+{
+    modifications.add(modification);
+}
+
+void BKItem::removeModification(BKItem* modification)
+{
+    int index = 0;
+    for (auto item : modifications)
+    {
+        if (modification == item)
+        {
+            connections.remove(index);
+            break;
+        }
+        index++;
+    }
+}
+
+inline void BKItem::connectWith(BKItem* item)
+{
+    connections.add(item);
+    
+}
+
+bool BKItem::isConnectedWith(BKItem* item)
+{
+    return connections.contains(item);
+}
+
+void BKItem::disconnectFrom(BKItem* toDisconnect)
+{
+    int index = 0;
+    for (auto item : connections)
+    {
+        if (toDisconnect == item)
+        {
+            connections.remove(index);
+            break;
+        }
+        
+        index++;
+        
+    }
+    
+}
+
+
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ BKGraph ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 void BKItemGraph::add(BKItem* itemToAdd)
 {
@@ -203,8 +460,43 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         item2->disconnectFrom(item1);
     }
     
-
-    if (item1Type == PreparationTypeKeymap && item2Type <= PreparationTypeKeymap)
+    
+    
+    // CONFIGURATIONS
+    if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypePianoMap)
+    {
+        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item1Id);
+        int pianoId = item2->getSelectedId();
+        
+        if (connect)    processor.currentPiano->configurePianoMap(thisKeymap, pianoId);
+        else            processor.currentPiano->deconfigurePianoMap(thisKeymap);
+        
+    }
+    else if (item1Type == PreparationTypePianoMap && item2Type == PreparationTypeKeymap)
+    {
+        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item2Id);
+        int pianoId = item1->getSelectedId();
+        
+        if (connect)    processor.currentPiano->configurePianoMap(thisKeymap, pianoId);
+        else            processor.currentPiano->deconfigurePianoMap(thisKeymap);
+    }
+    else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeReset)
+    {
+        
+    }
+    else if (item1Type == PreparationTypeReset && item2Type == PreparationTypeKeymap)
+    {
+        
+    }
+    else if (item1Type == PreparationTypeReset && item2Type < PreparationTypeKeymap)
+    {
+        
+    }
+    else if (item1Type < PreparationTypeKeymap && item2Type == PreparationTypeReset)
+    {
+        
+    }
+    else if (item1Type == PreparationTypeKeymap && item2Type <= PreparationTypeKeymap)
     {
         linkPreparationWithKeymap(connect, item2Type, item2Id, processor.gallery->getKeymap(item1Id));
     }
@@ -767,212 +1059,3 @@ Array<Line<float>> BKItemGraph::getLines(void)
 }
 
 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ BKItem ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-BKItem::BKItem(BKPreparationType type, int Id, BKAudioProcessor& p):
-BKDraggableComponent(true,false,true),
-processor(p),
-type(type),
-Id(Id)
-{
-    fullChild.setAlwaysOnTop(true);
-    addAndMakeVisible(fullChild);
-    
-    addAndMakeVisible(label);
-    
-    label.setJustificationType(Justification::centred);
-    label.setBorderSize(BorderSize<int>(2));
-    
-    String name = cPreparationTypes[type]+String(Id);
-    
-    label.setText(name, dontSendNotification);
-    
-    DBG("constructed: " + name);
-    
-}
-
-BKItem::~BKItem()
-{
-    
-}
-
-void BKItem::itemIsBeingDragged(const MouseEvent& e)
-{
-    getParentComponent()->repaint();
-}
-
-void BKItem::mouseDown(const MouseEvent& e)
-{
-    if (type == PreparationTypeDirect)
-    {
-        processor.updateState->currentDirectId = Id;
-        processor.updateState->directPreparationDidChange = true;
-        processor.updateState->currentPreparationDisplay = DisplayDirect;
-    }
-    else if (type == PreparationTypeSynchronic)
-    {
-        processor.updateState->currentSynchronicId = Id;
-        processor.updateState->synchronicPreparationDidChange = true;
-        processor.updateState->currentPreparationDisplay = DisplaySynchronic;
-    }
-    else if (type == PreparationTypeNostalgic)
-    {
-        processor.updateState->currentNostalgicId = Id;
-        processor.updateState->nostalgicPreparationDidChange = true;
-        processor.updateState->currentPreparationDisplay = DisplayNostalgic;
-    }
-    else if (type == PreparationTypeTuning)
-    {
-        processor.updateState->currentTuningId = Id;
-        processor.updateState->tuningPreparationDidChange = true;
-        processor.updateState->currentPreparationDisplay = DisplayTuning;
-    }
-    else if (type == PreparationTypeTempo)
-    {
-        processor.updateState->currentTempoId = Id;
-        processor.updateState->tempoPreparationDidChange = true;
-        processor.updateState->currentPreparationDisplay = DisplayTempo;
-    }
-    else if (type == PreparationTypeKeymap)
-    {
-        processor.updateState->currentKeymapId = Id;
-        processor.updateState->keymapDidChange = true;
-        processor.updateState->currentPreparationDisplay = DisplayKeymap;
-    }
-    else if (type == PreparationTypeDirectMod)
-    {
-        processor.updateState->currentModDirectId = Id;
-        processor.updateState->directDidChange = true;
-        processor.updateState->currentPreparationDisplay = DisplayDirect;
-    }
-    else if (type == PreparationTypeNostalgicMod)
-    {
-        processor.updateState->currentModNostalgicId = Id;
-        processor.updateState->nostalgicPreparationDidChange = true;
-        processor.updateState->currentPreparationDisplay = DisplayNostalgic;
-    }
-    else if (type == PreparationTypeSynchronicMod)
-    {
-        processor.updateState->currentModSynchronicId = Id;
-        processor.updateState->synchronicPreparationDidChange = true;
-        processor.updateState->currentPreparationDisplay = DisplaySynchronic;
-    }
-    else if (type == PreparationTypeTuningMod)
-    {
-        processor.updateState->currentModTuningId = Id;
-        processor.updateState->tuningPreparationDidChange = true;
-        processor.updateState->currentPreparationDisplay = DisplayTuning;
-    }
-    else if (type == PreparationTypeTempoMod)
-    {
-        processor.updateState->currentModTempoId = Id;
-        processor.updateState->tempoPreparationDidChange = true;
-        processor.updateState->currentPreparationDisplay = DisplayTempo;
-    }
-    
-    processor.updateState->displayDidChange = true;
-}
-
-void BKItem::keyPressedWhileSelected(const KeyPress& e)
-{
-    
-}
-
-void BKItem::mouseUp(const MouseEvent& e)
-{
-    mouseExit(e);
-}
-
-void BKItem::paint(Graphics& g)
-{
-    if (type == PreparationTypeTuning)
-    {
-        g.setColour(Colours::lightcoral);
-    }
-    else if (type == PreparationTypeTempo)
-    {
-        g.setColour(Colours::palegreen);
-    }
-    else if (type == PreparationTypeKeymap)
-    {
-        g.setColour(Colours::lightyellow);
-        
-    }
-    else if (type >= PreparationTypeKeymap) //mod
-    {
-        g.setColour(Colours::palevioletred);
-    }
-    else
-    {
-        g.setColour(Colours::lightblue);
-    }
-    
-    
-    g.fillAll();
-    
-    if (isSelected)
-    {
-        g.setColour(Colours::white);
-        g.drawRect(getLocalBounds(),4);
-    }
-    else
-    {
-        g.setColour(Colours::black);
-        g.drawRect(getLocalBounds(),2);
-    }
-    
-    
-}
-
-void BKItem::resized(void)
-{
-    label.setBounds(0,0,getWidth(),getHeight());
-    fullChild.setBounds(0,0,getWidth(),getHeight());
-}
-
-
-void BKItem::addModification(BKItem* modification)
-{
-    modifications.add(modification);
-}
-
-void BKItem::removeModification(BKItem* modification)
-{
-    int index = 0;
-    for (auto item : modifications)
-    {
-        if (modification == item)
-        {
-            connections.remove(index);
-            break;
-        }
-        index++;
-    }
-}
-
-inline void BKItem::connectWith(BKItem* item)
-{
-    connections.add(item);
-    
-}
-
-bool BKItem::isConnectedWith(BKItem* item)
-{
-    return connections.contains(item);
-}
-
-void BKItem::disconnectFrom(BKItem* toDisconnect)
-{
-    int index = 0;
-    for (auto item : connections)
-    {
-        if (toDisconnect == item)
-        {
-            connections.remove(index);
-            break;
-        }
-        
-        index++;
-        
-    }
-    
-}

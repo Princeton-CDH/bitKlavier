@@ -23,6 +23,8 @@
 
 #include "Preparation.h"
 
+#include "Reset.h"
+
 
 class Piano : public ReferenceCountedObject
 {
@@ -77,6 +79,23 @@ public:
     ValueTree getState(void);
     
     void setState(XmlElement* e);
+    
+    inline void configurePianoMap(Keymap::Ptr thisKeymap, int pianoId)
+    {
+        for (auto key : thisKeymap->keys())
+        {
+            pianoMap.set(key, pianoId);
+            
+            DBG("key: " + String(key) + " piano: " + String(pianoId));
+        }
+    
+    }
+    
+    inline void deconfigurePianoMap(Keymap::Ptr thisKeymap)
+    {
+        for (auto key: thisKeymap->keys())
+            pianoMap.set(key, -1);
+    }
 
     
     inline Array<int> getAllIds(Synchronic::PtrArr direct)
@@ -125,6 +144,37 @@ public:
         for (int i = 0; i<modMap.size(); i++)
         {
             modMap[i]->clearResets();
+        }
+    }
+    
+    void addReset(Reset* reset)
+    {
+        BKPreparationType type = reset->getType();
+        Array<int> preps = reset->getPreparations();
+        
+        for (auto key : reset->getKeys())
+        {
+            if (type == PreparationTypeDirect)
+            {
+                for (auto p : preps)    modMap[key]->directReset.add(p);
+            }
+            else if (type == PreparationTypeNostalgic)
+            {
+                for (auto p : preps)    modMap[key]->nostalgicReset.add(p);
+            }
+            else if (type == PreparationTypeSynchronic)
+            {
+                for (auto p : preps)    modMap[key]->synchronicReset.add(p);
+            }
+            else if (type == PreparationTypeTempo)
+            {
+                for (auto p : preps)    modMap[key]->tempoReset.add(p);
+            }
+            else if (type == PreparationTypeTuning)
+            {
+                for (auto p : preps)    modMap[key]->tuningReset.add(p);
+            }
+            
         }
     }
 

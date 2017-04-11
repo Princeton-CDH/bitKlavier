@@ -91,7 +91,7 @@ private:
             
             toAdd->setBounds(x, (i-1)*25 + y, 150, 20);
             
-            if (!graph.contains(toAdd)) graph.add(toAdd);
+            if (type == PreparationTypeReset || type == PreparationTypePianoMap || !graph.contains(toAdd)) graph.add(toAdd);
 
             addAndMakeVisible(toAdd);
         }

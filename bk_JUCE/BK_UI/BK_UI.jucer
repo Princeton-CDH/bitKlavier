@@ -59,6 +59,7 @@
           <FILE id="hJbk7x" name="Keymap.h" compile="0" resource="0" file="Source/Keymap.h"/>
           <FILE id="djaSBK" name="PianoMap.cpp" compile="1" resource="0" file="Source/PianoMap.cpp"/>
           <FILE id="U3irmU" name="PianoMap.h" compile="0" resource="0" file="Source/PianoMap.h"/>
+          <FILE id="zPqDQC" name="Reset.h" compile="0" resource="0" file="Source/Reset.h"/>
           <FILE id="xHx6az" name="Modification.h" compile="0" resource="0" file="Source/Modification.h"/>
           <FILE id="sbtYa6" name="Modifications.cpp" compile="1" resource="0"
                 file="Source/Modifications.cpp"/>
@@ -173,10 +174,6 @@
           <FILE id="NyvzY3" name="BKSlider.h" compile="0" resource="0" file="Source/BKSlider.h"/>
         </GROUP>
         <GROUP id="{B171AA30-1033-F14F-9FB7-D270B9262DF0}" name="PreparationPanel">
-          <FILE id="YGbUxA" name="PreparationPropertyComponent.cpp" compile="1"
-                resource="0" file="Source/PreparationPropertyComponent.cpp"/>
-          <FILE id="y7CI0S" name="PreparationPropertyComponent.h" compile="0"
-                resource="0" file="Source/PreparationPropertyComponent.h"/>
           <FILE id="dkyu8M" name="PreparationPanel.cpp" compile="1" resource="0"
                 file="Source/PreparationPanel.cpp"/>
           <FILE id="N0jhhR" name="PreparationPanel.h" compile="0" resource="0"

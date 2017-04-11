@@ -3,6 +3,8 @@
 #include "PluginEditor.h"
 #include "BKPianoSampler.h"
 
+#include "Reset.h"
+
 #define NOST_KEY_OFF 1
 
 //==============================================================================
@@ -80,7 +82,11 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             
             // Check PianoMap for whether piano should change due to key strike.
             int whichPiano = currentPiano->pianoMap[noteNumber] - 1;
-            if (whichPiano >= 0 && whichPiano != currentPiano->getId()) setCurrentPiano(whichPiano);
+            if (whichPiano >= 0 && whichPiano != currentPiano->getId())
+            {
+                DBG("change piano to " + String(whichPiano));
+                setCurrentPiano(whichPiano);
+            }
             
             // modifications
             performResets(noteNumber);
@@ -170,12 +176,13 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     updateState->synchronicPreparationDidChange = true;
     updateState->nostalgicPreparationDidChange = true;
     updateState->directPreparationDidChange = true;
+    updateState->tempoPreparationDidChange = true;
+    updateState->tuningPreparationDidChange = true;
 }
 
 // Reset
 void BKAudioProcessor::performResets(int noteNumber)
 {
-    // NEEDS OPTIMIZATION
     for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->directReset)      gallery->getDirect(prep)->reset();
     for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->synchronicReset)  gallery->getSynchronic(prep)->reset();
     for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->nostalgicReset)   gallery->getNostalgic(prep)->reset();

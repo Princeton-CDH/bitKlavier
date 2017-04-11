@@ -58,13 +58,13 @@ void PreparationPanel::refillAll(void)
     
 }
 
-
+#define SOME_MORE_PADDING 20
 void PreparationPanel::resized(void)
 {
     
     float rowHeight = preparationListBox[PreparationTypeDirect]->getRowHeight();
     
-    float height = 2*(getHeight()/preparationListBox.size()) - rowHeight;
+    float height = 2*(getHeight()/preparationListBox.size()) - rowHeight - SOME_MORE_PADDING;
     float width = getWidth() / 2.0f;
     
     preparationLabel[PreparationTypeDirect]->setBounds(0, 0, width, rowHeight);

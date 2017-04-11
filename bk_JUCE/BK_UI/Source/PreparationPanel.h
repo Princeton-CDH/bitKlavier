@@ -70,6 +70,10 @@ private:
                 setPreparations(processor.gallery->getAllTempoModNames());
             else if (type == PreparationTypeTuningMod)
                 setPreparations(processor.gallery->getAllTuningModNames());
+            else if (type == PreparationTypePianoMap)
+                setPreparations(StringArray("PianoMap"));
+            else if (type == PreparationTypeReset)
+                setPreparations(StringArray("Reset"));
 
         }
         

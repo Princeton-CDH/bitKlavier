@@ -13,12 +13,13 @@
 
 #include "BKUtilities.h"
 #include "BKComponent.h"
+#include "BKListener.h"
 
 #include "PluginProcessor.h"
 
 #include "Preparation.h"
 
-class BKItem : public BKDraggableComponent, public ReferenceCountedObject
+class BKItem : public BKDraggableComponent, public ReferenceCountedObject, public BKListener
 {
 public:
     typedef ReferenceCountedObjectPtr<BKItem>   Ptr;
@@ -73,12 +74,20 @@ public:
         }
     }
     
+    inline int getSelectedId(void) const noexcept {return currentId;}
+    
     // Public members
     Point<float> origin;
+    
+    void bkTextFieldDidChange   (TextEditor&)           {};
+    void bkComboBoxDidChange    (ComboBox*)             ;
+    void bkButtonClicked        (Button* b)             {};
+    void bkMessageReceived      (const String& message) {};
     
 private:
     BKAudioProcessor& processor;
     Label label;
+    BKComboBox menu; int currentId;
     Component fullChild;
     
     

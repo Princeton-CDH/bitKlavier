@@ -123,6 +123,19 @@ public:
         return bkPianos;
     }
     
+    inline const StringArray getPianoNames(void) const noexcept
+    {
+        StringArray names;
+        
+        for (auto piano : bkPianos)
+        {
+            names.add(piano->getName());
+        }
+        
+        return names;
+    }
+    
+    
     inline const SynchronicPreparation::Ptr getStaticSynchronicPreparation(int Id) const noexcept
     {
         return synchronic[Id]->sPrep;
@@ -344,6 +357,7 @@ public:
         
         return names;
     }
+
     
     inline const Tuning::Ptr getTuning(int Id) const noexcept
     {

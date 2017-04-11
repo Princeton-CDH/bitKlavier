@@ -93,14 +93,12 @@ public:
     inline const float getResonanceGain() const noexcept                {return dResonanceGain; }
     inline const float getHammerGain() const noexcept                   {return dHammerGain;    }
     inline const Tuning::Ptr getTuning() const noexcept                 {return tuning;         }
-    //inline const Keymap::Ptr getResetMap() const noexcept               {return resetMap;       }
     
     inline void setTransposition(Array<float> val)                      {dTransposition = val;  }
     inline void setGain(float val)                                      {dGain = val;           }
     inline void setResonanceGain(float val)                             {dResonanceGain = val;  }
     inline void setHammerGain(float val)                                {dHammerGain = val;     }
     inline void setTuning(Tuning::Ptr t)                                {tuning = t;            }
-    //inline void setResetMap(Keymap::Ptr k)                              {resetMap = k;          }
     
     
     void print(void)
@@ -109,7 +107,6 @@ public:
         DBG("dGain: "           + String(dGain));
         DBG("dResGain: "        + String(dResonanceGain));
         DBG("dHammerGain: "     + String(dHammerGain));
-        //DBG("resetKeymap: "     + intArrayToString(getResetMap()->keys()));
     }
     
     

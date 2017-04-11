@@ -49,7 +49,7 @@ Id(Id)
     
     for (int i = 0; i < 128; i++)
     {
-        pianoMap.set(i, 0);
+        pianoMap.set(i, -1);
         modMap.add(new Modifications());
         modificationMaps.add(new ModificationMap());
     }
