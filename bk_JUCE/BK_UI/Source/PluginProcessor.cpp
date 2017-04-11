@@ -173,6 +173,7 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     currentPiano = gallery->getPiano(which);
     
     updateState->pianoDidChange = true;
+    updateState->pianoDidChangeForGraph = true;
     updateState->synchronicPreparationDidChange = true;
     updateState->nostalgicPreparationDidChange = true;
     updateState->directPreparationDidChange = true;

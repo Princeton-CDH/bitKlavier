@@ -150,6 +150,8 @@ public:
     
     inline int getId() {return Id;};
     
+    inline int getTuningId() {return sPrep->getTuning()->getId();}
+    
     
     DirectPreparation::Ptr      sPrep;
     DirectPreparation::Ptr      aPrep;
@@ -609,7 +611,11 @@ public:
     
     ~Synchronic() {};
     
-    inline int getId() {return Id;};
+    inline int getId() {return Id;}
+    
+    inline int getTuningId() {return sPrep->getTuning()->getId();}
+    
+    inline int getTempoId() {return sPrep->getTempoControl()->getId();}
     
     SynchronicPreparation::Ptr      sPrep;
     SynchronicPreparation::Ptr      aPrep;
@@ -1032,9 +1038,7 @@ public:
     {
         processor->setCurrentPlaybackSampleRate(sampleRate);
     }
-    
-    inline int getId() {return Id;}
-    
+
     inline ValueTree getState(void)
     {
         ValueTree prep( vtagNostalgic + String(Id));
@@ -1123,6 +1127,16 @@ public:
         
         aPrep->copy(sPrep);
     }
+    
+    inline int getTuningId() {return sPrep->getTuning()->getId();}
+    
+    inline int getId() {return Id;}
+    
+    inline int getSynchronicTargetId(void)
+    {
+        return sPrep->getSyncTarget();
+    }
+    
     
     
     NostalgicPreparation::Ptr      sPrep;

@@ -31,11 +31,24 @@ public:
         addKeyListener(this);
         
         setWantsKeyboardFocus(true);
+        
+        graph->reconstruct();
+        
+        draw();
     }
     
     ~BKConstructionSite(void)
     {
         
+    }
+    
+    inline void redraw(void)
+    {
+        removeAllChildren();
+        
+        graph->reconstruct();
+        
+        draw();
     }
 
     void paint(Graphics& g) override
@@ -80,6 +93,39 @@ private:
     BKItem* itemToSelect;
     
     BKItemGraph* graph;
+    
+    
+    void draw(void)
+    {
+        int keymapCount = 0, prepCount = 0;
+        for (auto item : graph->getAllItems())
+        {
+            BKPreparationType type = item->getType();
+            int which = item->getId();
+            
+            if (type == PreparationTypeKeymap)
+            {
+                int row = (int)(keymapCount / 4);
+                int col = keymapCount % 4;
+                
+                item->setBounds(25 + (row * 155), 25 + (col * 25), 150, 20);
+
+                keymapCount++;
+            }
+            else
+            {
+                int row = (int)(prepCount / 4);
+                int col = prepCount % 4;
+                
+                item->setBounds(25 + (row * 155), 250 + (col * 25), 150, 20);
+                
+                prepCount++;
+            }
+            
+            addAndMakeVisible(item);
+        }
+    }
+    
     
     
     // Drag interface

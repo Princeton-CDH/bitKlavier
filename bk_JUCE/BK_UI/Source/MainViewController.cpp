@@ -293,10 +293,20 @@ void MainViewController::timerCallback()
         ovc.updateModFields();
     }
     
+    if (processor.updateState->pianoDidChangeForGraph)
+    {
+        processor.updateState->pianoDidChangeForGraph = false;
+        
+        construction.redraw();
+    }
+    
     
     if (processor.updateState->keymapDidChange)
     {
         processor.updateState->keymapDidChange = false;
+        
+        preparationPanel->refill(PreparationTypeKeymap);
+        
         kvc.reset();
     }
     

@@ -285,6 +285,22 @@ bool BKItemGraph::contains(BKItem* thisItem)
     return alreadyThere;
 }
 
+BKItem* BKItemGraph::itemWithTypeAndId(BKPreparationType type, int Id)
+{
+    BKItem* thisItem = nullptr;
+    
+    for (auto item : items)
+    {
+        if (item->getType() == type && item->getId() == Id)
+        {
+            thisItem = item;
+            break;
+        }
+    }
+    
+    return thisItem;
+}
+
 void BKItemGraph::remove(BKItem* itemToRemove)
 {
     for (auto item : itemToRemove->getConnections())
@@ -939,7 +955,6 @@ void BKItemGraph::update(BKPreparationType type, int which)
 
 }
 
-
 void BKItemGraph::connect(BKItem* item1, BKItem* item2)
 {
     route(true, item1, item2);
@@ -1072,6 +1087,208 @@ Array<Line<float>> BKItemGraph::getLines(void)
     }
     
     return lines;
+}
+
+void BKItemGraph::reconstruct(void)
+{
+    preparations.clear();
+    
+    Piano::Ptr thisPiano = processor.currentPiano;
+    for (auto pmap : thisPiano->getPreparationMaps())
+    {
+        // Keymap
+        int keymapId = pmap->getKeymapId();
+        
+        BKItem* keymap;
+        
+        /// THIS NOT WORKING
+        keymap = itemWithTypeAndId(PreparationTypeKeymap, keymapId);
+        
+        if (keymap == nullptr)
+        {
+            keymap = new BKItem(PreparationTypeKeymap, keymapId, processor);
+        }
+        
+        if (!contains(keymap)) items.add(keymap);
+    
+    
+        for (auto p : pmap->getTuning())
+        {
+            int Id = p->getId();
+            BKItem* newPreparation = new BKItem(PreparationTypeTuning, Id, processor);
+            
+            if (!contains(newPreparation))
+            {
+                items.add(newPreparation);
+                preparations.add(newPreparation);
+            }
+        }
+        
+        for (auto p : pmap->getTempo())
+        {
+            int Id = p->getId();
+            BKItem* newPreparation = new BKItem(PreparationTypeTempo, Id, processor);
+            
+            if (!contains(newPreparation))
+            {
+                items.add(newPreparation);
+                preparations.add(newPreparation);
+            }
+        }
+        
+        for (auto p : pmap->getDirect())
+        {
+            int Id = p->getId();
+            BKItem* newPreparation = new BKItem(PreparationTypeDirect, Id, processor);
+            
+            if (!contains(newPreparation))
+            {
+                items.add(newPreparation);
+                
+                preparations.add(newPreparation);
+                
+                int tuningId = p->getTuningId();
+                
+                bool found = false;
+                for (auto item : items)
+                {
+                    if (item->getType() == PreparationTypeTuning && item->getId() == tuningId)
+                    {
+                        connect(newPreparation, item);
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found)
+                {
+                    BKItem* newTuningPrep = new BKItem(PreparationTypeTuning, tuningId, processor);
+                    items.add(newTuningPrep);
+                    connect(newPreparation, newTuningPrep);
+                }
+            }
+            
+        }
+        
+        for (auto p : pmap->getSynchronic())
+        {
+            int Id = p->getId();
+            BKItem* newPreparation = new BKItem(PreparationTypeSynchronic, Id, processor);
+            
+            if (!contains(newPreparation))
+            {
+                items.add(newPreparation);
+                preparations.add(newPreparation);
+            
+                // TUNING
+                int tuningId = p->getTuningId();
+                
+                bool found = false;
+                for (auto item : items)
+                {
+                    if (item->getType() == PreparationTypeTuning && item->getId() == tuningId)
+                    {
+                        connect(newPreparation, item);
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found)
+                {
+                    BKItem* newTuningPrep = new BKItem(PreparationTypeTuning, tuningId, processor);
+                    items.add(newTuningPrep);
+                    connect(newPreparation, newTuningPrep);
+                }
+                
+                // TEMPO
+                int tempoId = p->getTempoId();
+                
+                found = false;
+                for (auto item : items)
+                {
+                    if (item->getType() == PreparationTypeTempo && item->getId() == tempoId)
+                    {
+                        connect(newPreparation, item);
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found)
+                {
+                    BKItem* newTempoPrep = new BKItem(PreparationTypeTempo, tempoId, processor);
+                    items.add(newTempoPrep);
+                    connect(newPreparation, newTempoPrep);
+                }
+            }
+            
+            
+        }
+        
+        for (auto p : pmap->getNostalgic())
+        {
+            int Id = p->getId();
+            BKItem* newPreparation = new BKItem(PreparationTypeNostalgic, Id, processor);
+            
+            if (!contains(newPreparation))
+            {
+                items.add(newPreparation);
+                preparations.add(newPreparation);
+                
+                // TUNING
+                int tuningId = p->getTuningId();
+                
+                bool found = false;
+                for (auto item : items)
+                {
+                    if (item->getType() == PreparationTypeTuning && item->getId() == tuningId)
+                    {
+                        connect(newPreparation, item);
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found)
+                {
+                    BKItem* newTuningPrep = new BKItem(PreparationTypeTuning, tuningId, processor);
+                    items.add(newTuningPrep);
+                    connect(newPreparation, newTuningPrep);
+                }
+                
+                
+                // SYNC TARGET
+                int syncId = p->getSynchronicTargetId();
+                
+                found = false;
+                for (auto item : items)
+                {
+                    if (item->getType() == PreparationTypeSynchronic && item->getId() == syncId)
+                    {
+                        connect(newPreparation, item);
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found)
+                {
+                    BKItem* newSyncPrep = new BKItem(PreparationTypeSynchronic, syncId, processor);
+                    items.add(newSyncPrep);
+                    connect(newPreparation, newSyncPrep);
+                }
+            }
+            
+            
+        }
+        
+        for (auto p : preparations)
+        {
+            connect(keymap, p);
+        }
+        
+    }
 }
 
 

@@ -119,6 +119,7 @@ public:
         }
     }
     
+    BKItem* itemWithTypeAndId(BKPreparationType type, int Id);
     void add(BKItem* itemToAdd);
     bool contains(BKItem* thisItem);
     void remove(BKItem* itemToRemove);
@@ -128,6 +129,8 @@ public:
     void reconnect(BKItem* item1, BKItem* item2);
     
     void update(BKPreparationType type, int which);
+    
+    void reconstruct(void);
 
     
     inline void select(BKItem* item)
@@ -206,6 +209,8 @@ public:
 private:
     BKAudioProcessor& processor;
     BKItem::RCArr items;
+    
+    BKItem::RCArr preparations;
     
     void linkPreparationWithKeymap(bool link, BKPreparationType thisType, int thisId, Keymap::Ptr thisKeymap);
     void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);

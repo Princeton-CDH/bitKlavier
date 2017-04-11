@@ -43,6 +43,7 @@ public:
     bool galleryDidChange = false;
     bool directDidChange = false;
     bool pianoDidChange = false;
+    bool pianoDidChangeForGraph = false;
     bool directPreparationDidChange = false;
     bool nostalgicPreparationDidChange = false;
     bool synchronicPreparationDidChange = false;
