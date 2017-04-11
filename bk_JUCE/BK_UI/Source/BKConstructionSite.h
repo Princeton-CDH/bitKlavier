@@ -23,10 +23,10 @@
 class BKConstructionSite : public BKDraggableComponent, public KeyListener
 {
 public:
-    BKConstructionSite(BKAudioProcessor& p):
+    BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
     BKDraggableComponent(false,true,false),
     processor(p),
-    graph(processor)
+    graph(theGraph)
     {
         addKeyListener(this);
         
@@ -59,7 +59,7 @@ public:
             g.drawLine(lineOX, lineOY, lineEX, lineEY, 3);
         }
         
-        for (auto line : graph.getLines())
+        for (auto line : graph->getLines())
         {
             DBG("drawStartX: " + String(line.getStartX()) + " drawStartY: " + String(line.getStartY()) +
                 " drawEndX: " + String(line.getEndX()) + " drawEndY: " + String(line.getEndY()));
@@ -79,7 +79,7 @@ private:
     BKItem* itemTarget;
     BKItem* itemToSelect;
     
-    BKItemGraph graph;
+    BKItemGraph* graph;
     
     
     // Drag interface
@@ -91,7 +91,7 @@ private:
             
             toAdd->setBounds(x, (i-1)*25 + y, 150, 20);
             
-            if (type == PreparationTypeReset || type == PreparationTypePianoMap || !graph.contains(toAdd)) graph.add(toAdd);
+            if (type == PreparationTypeReset || type == PreparationTypePianoMap || !graph->contains(toAdd)) graph->add(toAdd);
 
             addAndMakeVisible(toAdd);
         }
@@ -124,18 +124,18 @@ private:
             itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
             
             if (itemToSelect != nullptr && !itemToSelect->getSelected())
-                graph.select(dynamic_cast<BKItem*> (e.originalComponent->getParentComponent()));
+                graph->select(dynamic_cast<BKItem*> (e.originalComponent->getParentComponent()));
         }
         else
         {
             // deselect all other items
-            graph.deselectAll();
+            graph->deselectAll();
             
             itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
             
             if (itemToSelect != nullptr && !itemToSelect->getSelected())
             {
-                graph.select(itemToSelect);
+                graph->select(itemToSelect);
             }
             
         }
@@ -160,8 +160,8 @@ private:
             {
                 DBG("target type: " + cPreparationTypes[itemTarget->getType()]  + " ID: " + String(itemTarget->getId()) );
                 
-                graph.connect(itemSource, itemTarget);
-                graph.drawLine(lineOX, lineOY, X, Y);
+                graph->connect(itemSource, itemTarget);
+                graph->drawLine(lineOX, lineOY, X, Y);
                 
                 repaint();
             }
@@ -180,7 +180,7 @@ private:
     
     inline void deleteItem (BKItem* item)
     {
-        graph.remove(item);
+        graph->remove(item);
         
         removeChildComponent(item);
     }
@@ -191,7 +191,7 @@ private:
         
         if (e.isKeyCode(127))
         {
-            BKItem::PtrArr selectedItems = graph.getSelectedItems();
+            BKItem::PtrArr selectedItems = graph->getSelectedItems();
             
             for (int i = selectedItems.size(); --i >= 0;)
             {
@@ -210,7 +210,7 @@ private:
         {
             int which = 0;
             
-            for (auto item : graph.getAllItems())
+            for (auto item : graph->getAllItems())
             {
                 int left = item->getX(); int right = left + item->getWidth();
                 int top = item->getY(); int bottom = top + item->getHeight();

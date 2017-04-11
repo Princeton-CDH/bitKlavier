@@ -39,10 +39,6 @@ public:
 
     void connectWith(BKItem* item);
     
-    void addModification(BKItem* item);
-    
-    void removeModification(BKItem* item);
-    
     bool isConnectedWith(BKItem* item);
     
     void disconnectFrom(BKItem* toDisconnect);
@@ -74,6 +70,8 @@ public:
         }
     }
     
+    
+    
     inline int getSelectedId(void) const noexcept {return currentId;}
     
     // Public members
@@ -101,7 +99,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKItem)
 };
 
-class BKItemGraph
+class BKItemGraph : public ChangeListener
 {
 public:
     BKItemGraph(BKAudioProcessor& p):
@@ -115,11 +113,21 @@ public:
         
     }
     
+    void changeListenerCallback (ChangeBroadcaster* source) override
+    {
+        
+    }
+    
     void add(BKItem* itemToAdd);
     bool contains(BKItem* thisItem);
     void remove(BKItem* itemToRemove);
     void connect(BKItem* item1, BKItem* item2);
     void disconnect(BKItem* item1, BKItem* item2);
+    
+    void reconnect(BKItem* item1, BKItem* item2);
+    
+    void update(BKPreparationType type, int which);
+
     
     inline void select(BKItem* item)
     {

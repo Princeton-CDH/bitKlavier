@@ -128,6 +128,14 @@ public:
         }
     }
     
+    void removeKeymap(Keymap::Ptr otherKeymap)
+    {
+        for (auto key : otherKeymap->keys())
+        {
+            keymap.set(key, false);
+        }
+    }
+    
     
     
     bool containsNote(int noteNumber)

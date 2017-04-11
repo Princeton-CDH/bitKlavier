@@ -15,15 +15,16 @@
 //==============================================================================
 MainViewController::MainViewController (BKAudioProcessor& p):
 processor (p),
-construction(p),
+theGraph(p),
+construction(p, &theGraph),
 galvc(p),
-kvc(p),
-tvc(p),
+kvc(p, &theGraph),
+tvc(p, &theGraph),
 gvc(p),
-svc(p),
-nvc(p),
-dvc(p),
-ovc(p),
+svc(p, &theGraph),
+nvc(p, &theGraph),
+dvc(p, &theGraph),
+ovc(p, &theGraph),
 timerCallbackCount(0)
 {
     gen = processor.gallery->getGeneralSettings();

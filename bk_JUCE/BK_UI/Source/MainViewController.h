@@ -32,16 +32,14 @@
 
 #include "BKConstructionSite.h"
 
+#include "BKGraph.h"
+
 class MainViewController :  public Component, private Timer, public BKListener, public Slider::Listener
 {
     
 public:
     MainViewController (BKAudioProcessor&);
     ~MainViewController();
-    
-    
-    
-    
     
     //==============================================================================
     void paint (Graphics&) override;
@@ -51,7 +49,11 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it
     
+    
+    
     BKAudioProcessor& processor;
+    
+    BKItemGraph theGraph;
     
     BKConstructionSite  construction;
     

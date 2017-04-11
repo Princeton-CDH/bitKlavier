@@ -12,8 +12,9 @@
 #include "TempoViewController.h"
 
 //==============================================================================
-TempoViewController::TempoViewController(BKAudioProcessor& p):
-processor(p)
+TempoViewController::TempoViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
+processor(p),
+theGraph(theGraph)
 {
     // Labels
     tempoL = OwnedArray<BKLabel>();
@@ -255,13 +256,12 @@ void TempoViewController::bkTextFieldDidChange(TextEditor& tf)
             mod->setParam(TempoSystem, text);
         }
     }
-
-    
-    
     else
     {
         DBG("Unregistered text field.");
     }
+    
+    if (type == BKModification) theGraph->update(PreparationTypeTempoMod, processor.updateState->currentModTempoId);
 }
 
 

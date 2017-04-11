@@ -18,6 +18,7 @@
 #include "BKListener.h"
 #include "BKComponent.h"
 
+#include "BKGraph.h"
 
 
 //==============================================================================
@@ -26,7 +27,7 @@
 class NostalgicViewController    : public BKComponent, public BKListener
 {
 public:
-    NostalgicViewController(BKAudioProcessor&);
+    NostalgicViewController(BKAudioProcessor&, BKItemGraph* theGraph);
     ~NostalgicViewController();
 
     void paint (Graphics&) override;
@@ -37,6 +38,7 @@ public:
 
 private:
     BKAudioProcessor& processor;
+    BKItemGraph* theGraph;
     
     // BKLabels
     OwnedArray<BKLabel> nostalgicL;

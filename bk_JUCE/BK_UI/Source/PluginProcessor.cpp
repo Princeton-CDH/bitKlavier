@@ -180,6 +180,7 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     updateState->tuningPreparationDidChange = true;
 }
 
+
 // Reset
 void BKAudioProcessor::performResets(int noteNumber)
 {

@@ -22,13 +22,15 @@
 #include "BKKeyboard.h"
 #include "BKKeyboardState.h"
 
+#include "BKGraph.h"
+
 //==============================================================================
 /*
 */
 class KeymapViewController    : public BKComponent, public BKListener, public BKKeymapKeyboardStateListener
 {
 public:
-    KeymapViewController(BKAudioProcessor&);
+    KeymapViewController(BKAudioProcessor&, BKItemGraph* theGraph);
     ~KeymapViewController();
 
     void paint (Graphics&) override;
@@ -39,6 +41,7 @@ public:
 private:
     
     BKAudioProcessor& processor;
+    BKItemGraph* theGraph;
     
     BKLabel     keymapSelectL;
     BKComboBox  keymapSelectCB;

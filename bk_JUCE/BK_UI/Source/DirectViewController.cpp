@@ -13,8 +13,9 @@
 #include "Preparation.h"
 
 //==============================================================================
-DirectViewController::DirectViewController(BKAudioProcessor& p):
-processor(p)
+DirectViewController::DirectViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
+processor(p),
+theGraph(theGraph)
 {
     
     // First row
@@ -334,6 +335,8 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         DBG("Unregistered text field entered input.");
     }
+    
+    if (type == BKModification) theGraph->update(PreparationTypeDirectMod, processor.updateState->currentModDirectId);
 }
 
 

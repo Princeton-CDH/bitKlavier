@@ -184,22 +184,27 @@ public:
     
     
     void deconfigureDirectModification(DirectModPreparation::Ptr);
+    void deconfigureDirectModificationForKeys(DirectModPreparation::Ptr, Array<int>);
     void configureDirectModification(int key, DirectModPreparation::Ptr, Array<int>);
     void configureDirectModification(DirectModPreparation::Ptr);
     
     void deconfigureSynchronicModification(SynchronicModPreparation::Ptr);
+    void deconfigureSynchronicModificationForKeys(SynchronicModPreparation::Ptr, Array<int>);
     void configureSynchronicModification(int key, SynchronicModPreparation::Ptr, Array<int>);
     void configureSynchronicModification(SynchronicModPreparation::Ptr);
     
     void deconfigureNostalgicModification(NostalgicModPreparation::Ptr);
+    void deconfigureNostalgicModificationForKeys(NostalgicModPreparation::Ptr, Array<int>);
     void configureNostalgicModification(int key, NostalgicModPreparation::Ptr, Array<int>);
     void configureNostalgicModification(NostalgicModPreparation::Ptr dmod);
     
     void deconfigureTempoModification(TempoModPreparation::Ptr);
+    void deconfigureTempoModificationForKeys(TempoModPreparation::Ptr, Array<int>);
     void configureTempoModification(int key, TempoModPreparation::Ptr, Array<int>);
     void configureTempoModification(TempoModPreparation::Ptr);
     
     void deconfigureTuningModification(TuningModPreparation::Ptr);
+    void deconfigureTuningModificationForKeys(TuningModPreparation::Ptr, Array<int>);
     void configureTuningModification(int key, TuningModPreparation::Ptr, Array<int>);
     void configureTuningModification(TuningModPreparation::Ptr dmod);
     

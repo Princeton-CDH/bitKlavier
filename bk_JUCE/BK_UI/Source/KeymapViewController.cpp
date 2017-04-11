@@ -12,8 +12,9 @@
 #include "KeymapViewController.h"
 
 //==============================================================================
-KeymapViewController::KeymapViewController(BKAudioProcessor& p):
-processor(p)
+KeymapViewController::KeymapViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
+processor(p),
+theGraph(theGraph)
 {
     // First row
     addAndMakeVisible(keymapSelectL);
@@ -152,6 +153,9 @@ void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
         Array<int> keys = keymapStringToIntArray(text);
         
         keymapTF.setText(intArrayToString(keys));
+
+        // get old keys to send to update
+        Array<int> oldKeys = processor.gallery->getKeymap(processor.updateState->currentKeymapId)->keys();
         
         processor.gallery->setKeymap(processor.updateState->currentKeymapId, keys);
         
@@ -159,6 +163,7 @@ void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
         
         keyboard->setKeysInKeymap(keys);
         
+        theGraph->update(PreparationTypeKeymap, processor.updateState->currentKeymapId);
     }
     else
     {
@@ -224,6 +229,8 @@ void KeymapViewController::handleKeymapNoteOff (BKKeymapKeyboardState* source, i
 void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber)
 {
     
+    Array<int> oldKeys = processor.gallery->getKeymap(processor.updateState->currentKeymapId)->keys();
+    
     processor.gallery->getKeymap(processor.updateState->currentKeymapId)->toggleNote(midiNoteNumber);
     
     updateFields();
@@ -231,6 +238,8 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
     BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
     
     keyboard->setKeysInKeymap(processor.gallery->getKeymap(processor.updateState->currentKeymapId)->keys());
+    
+    theGraph->update(PreparationTypeKeymap, processor.updateState->currentKeymapId);
     
 }
 

@@ -16,13 +16,15 @@
 #include "BKListener.h"
 #include "BKComponent.h"
 
+#include "BKGraph.h"
+
 //==============================================================================
 /*
 */
 class TuningViewController    : public BKComponent, public BKListener
 {
 public:
-    TuningViewController(BKAudioProcessor&);
+    TuningViewController(BKAudioProcessor&, BKItemGraph* theGraph);
     ~TuningViewController();
 
     void paint (Graphics&) override;
@@ -34,6 +36,7 @@ public:
 private:
     
     BKAudioProcessor& processor;
+    BKItemGraph* theGraph;
     
     OwnedArray<BKLabel> tuningL;
     OwnedArray<BKTextField> tuningTF;

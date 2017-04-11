@@ -66,10 +66,18 @@ BKItem::~BKItem()
 
 void BKItem::bkComboBoxDidChange    (ComboBox* cb)
 {
-    if (cb->getName() == "PianoMap")
+    String name = cb->getName();
+    int Id = cb->getSelectedId();
+    if (name == "PianoMap")
     {
-        currentId = cb->getSelectedId();
-        DBG("New piano selected: "+String(currentId));
+        if (Id != currentId)
+        {
+            currentId = Id;
+            
+            
+            
+            DBG("New piano selected: "+String(currentId));
+        }
     }
 }
 
@@ -222,30 +230,9 @@ void BKItem::resized(void)
     fullChild.setBounds(0,0,getWidth(),getHeight());
 }
 
-
-void BKItem::addModification(BKItem* modification)
-{
-    modifications.add(modification);
-}
-
-void BKItem::removeModification(BKItem* modification)
-{
-    int index = 0;
-    for (auto item : modifications)
-    {
-        if (modification == item)
-        {
-            connections.remove(index);
-            break;
-        }
-        index++;
-    }
-}
-
 inline void BKItem::connectWith(BKItem* item)
 {
     connections.add(item);
-    
 }
 
 bool BKItem::isConnectedWith(BKItem* item)
@@ -272,6 +259,8 @@ void BKItem::disconnectFrom(BKItem* toDisconnect)
 
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ BKGraph ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+
 void BKItemGraph::add(BKItem* itemToAdd)
 {
     items.add(itemToAdd);
@@ -548,10 +537,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         DirectModPreparation::Ptr thisMod = processor.gallery->getDirectModPreparation(item2Id);
         Direct::Ptr thisDirect = processor.gallery->getDirect(item1Id);
         
-        thisMod->addTarget(thisDirect);
-        
         if (connect)
         {
+            thisMod->addTarget(thisDirect);
             processor.currentPiano->configureDirectModification(thisMod);
         }
         else
@@ -565,10 +553,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         DirectModPreparation::Ptr thisMod = processor.gallery->getDirectModPreparation(item1Id);
         Direct::Ptr thisDirect = processor.gallery->getDirect(item2Id);
         
-        thisMod->addTarget(thisDirect);
-        
         if (connect)
         {
+            thisMod->addTarget(thisDirect);
             processor.currentPiano->configureDirectModification(thisMod);
         }
         else
@@ -584,10 +571,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         DirectModPreparation::Ptr thisMod = processor.gallery->getDirectModPreparation(item2Id);
         
-        thisMod->addKeymap(thisKeymap);
-        
         if (connect)
         {
+            thisMod->addKeymap(thisKeymap);
             processor.currentPiano->configureDirectModification(thisMod);
         }
         else
@@ -607,6 +593,7 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         if (connect)
         {
+            thisMod->addKeymap(thisKeymap);
             processor.currentPiano->configureDirectModification(thisMod);
         }
         else
@@ -623,10 +610,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         NostalgicModPreparation::Ptr thisMod = processor.gallery->getNostalgicModPreparation(item2Id);
         Nostalgic::Ptr thisNostalgic = processor.gallery->getNostalgic(item1Id);
         
-        thisMod->addTarget(thisNostalgic);
-        
         if (connect)
         {
+            thisMod->addTarget(thisNostalgic);
             processor.currentPiano->configureNostalgicModification(thisMod);
         }
         else
@@ -640,10 +626,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         NostalgicModPreparation::Ptr thisMod = processor.gallery->getNostalgicModPreparation(item1Id);
         Nostalgic::Ptr thisNostalgic = processor.gallery->getNostalgic(item2Id);
         
-        thisMod->addTarget(thisNostalgic);
-        
         if (connect)
         {
+            thisMod->addTarget(thisNostalgic);
             processor.currentPiano->configureNostalgicModification(thisMod);
         }
         else
@@ -659,10 +644,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         NostalgicModPreparation::Ptr thisMod = processor.gallery->getNostalgicModPreparation(item2Id);
         
-        thisMod->addKeymap(thisKeymap);
-        
         if (connect)
         {
+            thisMod->addKeymap(thisKeymap);
             processor.currentPiano->configureNostalgicModification(thisMod);
         }
         else
@@ -678,10 +662,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         NostalgicModPreparation::Ptr thisMod = processor.gallery->getNostalgicModPreparation(item1Id);
         
-        thisMod->addKeymap(thisKeymap);
-        
         if (connect)
         {
+            thisMod->addKeymap(thisKeymap);
             processor.currentPiano->configureNostalgicModification(thisMod);
         }
         else
@@ -698,10 +681,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         SynchronicModPreparation::Ptr thisMod = processor.gallery->getSynchronicModPreparation(item2Id);
         Synchronic::Ptr thisSynchronic = processor.gallery->getSynchronic(item1Id);
         
-        thisMod->addTarget(thisSynchronic);
-        
         if (connect)
         {
+            thisMod->addTarget(thisSynchronic);
             processor.currentPiano->configureSynchronicModification(thisMod);
         }
         else
@@ -715,10 +697,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         SynchronicModPreparation::Ptr thisMod = processor.gallery->getSynchronicModPreparation(item1Id);
         Synchronic::Ptr thisSynchronic = processor.gallery->getSynchronic(item2Id);
         
-        thisMod->addTarget(thisSynchronic);
-        
         if (connect)
         {
+            thisMod->addTarget(thisSynchronic);
             processor.currentPiano->configureSynchronicModification(thisMod);
         }
         else
@@ -734,10 +715,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         SynchronicModPreparation::Ptr thisMod = processor.gallery->getSynchronicModPreparation(item2Id);
         
-        thisMod->addKeymap(thisKeymap);
-        
         if (connect)
         {
+            thisMod->addKeymap(thisKeymap);
             processor.currentPiano->configureSynchronicModification(thisMod);
         }
         else
@@ -753,10 +733,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         SynchronicModPreparation::Ptr thisMod = processor.gallery->getSynchronicModPreparation(item1Id);
         
-        thisMod->addKeymap(thisKeymap);
-        
         if (connect)
         {
+            thisMod->addKeymap(thisKeymap);
             processor.currentPiano->configureSynchronicModification(thisMod);
         }
         else
@@ -773,10 +752,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         TuningModPreparation::Ptr thisMod = processor.gallery->getTuningModPreparation(item2Id);
         Tuning::Ptr thisTuning = processor.gallery->getTuning(item1Id);
         
-        thisMod->addTarget(thisTuning);
-        
         if (connect)
         {
+            thisMod->addTarget(thisTuning);
             processor.currentPiano->configureTuningModification(thisMod);
         }
         else
@@ -790,10 +768,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         TuningModPreparation::Ptr thisMod = processor.gallery->getTuningModPreparation(item1Id);
         Tuning::Ptr thisTuning = processor.gallery->getTuning(item2Id);
         
-        thisMod->addTarget(thisTuning);
-        
         if (connect)
         {
+            thisMod->addTarget(thisTuning);
             processor.currentPiano->configureTuningModification(thisMod);
         }
         else
@@ -809,10 +786,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         TuningModPreparation::Ptr thisMod = processor.gallery->getTuningModPreparation(item2Id);
         
-        thisMod->addKeymap(thisKeymap);
-        
         if (connect)
         {
+            thisMod->addKeymap(thisKeymap);
             processor.currentPiano->configureTuningModification(thisMod);
         }
         else
@@ -828,10 +804,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         TuningModPreparation::Ptr thisMod = processor.gallery->getTuningModPreparation(item1Id);
         
-        thisMod->addKeymap(thisKeymap);
-        
         if (connect)
         {
+            thisMod->addKeymap(thisKeymap);
             processor.currentPiano->configureTuningModification(thisMod);
         }
         else
@@ -848,10 +823,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         TempoModPreparation::Ptr thisMod = processor.gallery->getTempoModPreparation(item2Id);
         Tempo::Ptr thisTempo = processor.gallery->getTempo(item1Id);
         
-        thisMod->addTarget(thisTempo);
-        
         if (connect)
         {
+            thisMod->addTarget(thisTempo);
             processor.currentPiano->configureTempoModification(thisMod);
         }
         else
@@ -865,10 +839,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         TempoModPreparation::Ptr thisMod = processor.gallery->getTempoModPreparation(item1Id);
         Tempo::Ptr thisTempo = processor.gallery->getTempo(item2Id);
         
-        thisMod->addTarget(thisTempo);
-        
         if (connect)
         {
+            thisMod->addTarget(thisTempo);
             processor.currentPiano->configureTempoModification(thisMod);
         }
         else
@@ -884,10 +857,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         TempoModPreparation::Ptr thisMod = processor.gallery->getTempoModPreparation(item2Id);
         
-        thisMod->addKeymap(thisKeymap);
-        
         if (connect)
         {
+            thisMod->addKeymap(thisKeymap);
             processor.currentPiano->configureTempoModification(thisMod);
         }
         else
@@ -903,10 +875,9 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         TempoModPreparation::Ptr thisMod = processor.gallery->getTempoModPreparation(item1Id);
         
-        thisMod->addKeymap(thisKeymap);
-        
         if (connect)
         {
+            thisMod->addKeymap(thisKeymap);
             processor.currentPiano->configureTempoModification(thisMod);
         }
         else
@@ -920,7 +891,34 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         item1->disconnectFrom(item2);
         item2->disconnectFrom(item1);
     }
+}
+
+void BKItemGraph::reconnect(BKItem* item1, BKItem* item2)
+{
+    route(false, item1, item2);
+    route(true, item1, item2);
     
+    print();
+}
+
+void BKItemGraph::update(BKPreparationType type, int which)
+{
+    // Only applies to Keymaps and Modification types, so as to make sure that when ModPreparations are changed, so are the Modifications.
+    if (type >= PreparationTypeKeymap && type < PreparationTypePianoMap) // All the mods
+    {
+        for (auto item : items)
+        {
+            if (item->getType() == type && item->getId() == which)
+            {
+                for (auto connection : item->getConnections())
+                {
+                    DBG("should reconnect " +String(type)+String(which) +" and "+ String(connection->getType())+String(connection->getId()));
+                    reconnect(item, connection);
+                }
+            }
+        }
+    }
+
 }
 
 

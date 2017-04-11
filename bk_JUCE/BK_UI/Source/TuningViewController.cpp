@@ -12,8 +12,9 @@
 #include "TuningViewController.h"
 
 //==============================================================================
-TuningViewController::TuningViewController(BKAudioProcessor& p):
-processor(p)
+TuningViewController::TuningViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
+processor(p),
+theGraph(theGraph)
 {
     // Labels
     tuningL = OwnedArray<BKLabel>();
@@ -293,6 +294,8 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         DBG("Unregistered text field.");
     }
+    
+    if (type == BKModification) theGraph->update(PreparationTypeTuningMod, processor.updateState->currentModTuningId);
 }
 
 

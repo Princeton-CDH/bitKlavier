@@ -109,12 +109,51 @@ void Piano::configureDirectModification(int key, DirectModPreparation::Ptr dmod,
 
 void Piano::configureDirectModification(DirectModPreparation::Ptr mod)
 {
+    int whichMod = mod->getId();
     Array<int> whichPreps = getAllIds(mod->getTargets());
     Keymap::PtrArr whichKeymaps = mod->getKeymaps();
+    
+    Array<int> otherKeys;
+    
+    for (int i = 0; i < 128; i++) otherKeys.add(i);
+    
     for (auto keymap : whichKeymaps)
     {
         for (auto key : keymap->keys())
+        {
             configureDirectModification(key, mod, whichPreps);
+            
+            for (int i = otherKeys.size(); --i>=0;)
+            {
+                if (otherKeys[i] == key) otherKeys.remove(i);
+            }
+        }
+    }
+    
+    for (auto key : otherKeys)
+    {
+        // Remove ModPrepMap from Key
+        modificationMaps[key]->removeModPrepMap(PreparationTypeDirect, whichMod);
+        
+        // Remove Modification from Key
+        modMap[key]->removeDirectModification(whichMod);
+    }
+}
+
+void Piano::deconfigureDirectModificationForKeys(DirectModPreparation::Ptr mod, Array<int> keys)
+{
+    int whichMod = mod->getId();
+    
+    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
+    
+    for (auto key : keys)
+    {
+        // Remove ModPrepMap from Key
+        modificationMaps[key]->removeModPrepMap(PreparationTypeDirect, whichMod);
+        
+        // Remove Modification from Key
+        modMap[key]->removeDirectModification(whichMod);
+        
     }
 }
 
@@ -134,14 +173,12 @@ void Piano::deconfigureDirectModification(DirectModPreparation::Ptr mod)
             // Remove Modification from Key
             modMap[key]->removeDirectModification(whichMod);
             
-            DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
         }
     }
 }
 
 void Piano::configureNostalgicModification(int key, NostalgicModPreparation::Ptr dmod, Array<int> whichPreps)
 {
-    DBG("CONFIGURING Nostalgic MODIFICATION");
     
     Nostalgic::PtrArr whichNostalgic = dmod->getTargets();
     
@@ -164,8 +201,6 @@ void Piano::configureNostalgicModification(int key, NostalgicModPreparation::Ptr
     {
         String param = dmod->getParam((NostalgicParameterType)n);
         
-        DBG("param: " + param);
-        
         if (param != "")
         {
             for (auto prep : whichPreps)
@@ -173,8 +208,6 @@ void Piano::configureNostalgicModification(int key, NostalgicModPreparation::Ptr
                 modMap[key]->addNostalgicModification(new NostalgicModification(key, prep, (NostalgicParameterType)n, param, whichMod));
                 
                 thisModPrepMap->addPreparation(prep);
-                
-                DBG("ADD whichmod: " + String(whichMod) + " whichprep: " + String(prep) + " whichtype: " + cNostalgicParameterTypes[n] + " val: " +param + " TO key: " + String(key));
             }
         }
     }
@@ -184,10 +217,36 @@ void Piano::configureNostalgicModification(NostalgicModPreparation::Ptr mod)
 {
     Array<int> whichPreps = getAllIds(mod->getTargets());
     Keymap::PtrArr whichKeymaps = mod->getKeymaps();
+    
+    Array<int> otherKeys;
+    
+    for (int i = 0; i < 128; i++) otherKeys.add(i);
+    
     for (auto keymap : whichKeymaps)
     {
         for (auto key : keymap->keys())
+        {
             configureNostalgicModification(key, mod, whichPreps);
+            otherKeys.remove(key);
+        }
+    }
+    
+    deconfigureNostalgicModificationForKeys(mod, otherKeys);
+}
+
+void Piano::deconfigureNostalgicModificationForKeys(NostalgicModPreparation::Ptr mod, Array<int> keys)
+{
+    int whichMod = mod->getId();
+    
+    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
+    
+    for (auto key : keys)
+    {
+        // Remove ModPrepMap from Key
+        modificationMaps[key]->removeModPrepMap(PreparationTypeNostalgic, whichMod);
+        
+        // Remove Modification from Key
+        modMap[key]->removeNostalgicModification(whichMod);
     }
 }
 
@@ -206,8 +265,6 @@ void Piano::deconfigureNostalgicModification(NostalgicModPreparation::Ptr mod)
             
             // Remove Modification from Key
             modMap[key]->removeNostalgicModification(whichMod);
-            
-            DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
         }
     }
 }
@@ -215,11 +272,8 @@ void Piano::deconfigureNostalgicModification(NostalgicModPreparation::Ptr mod)
 
 void Piano::configureSynchronicModification(int key, SynchronicModPreparation::Ptr dmod, Array<int> whichPreps)
 {
-    DBG("CONFIGURING Synchronic MODIFICATION");
     
     Synchronic::PtrArr whichSynchronic = dmod->getTargets();
-    
-    DBG("key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
     
     int whichMod = dmod->getId();
     
@@ -238,7 +292,6 @@ void Piano::configureSynchronicModification(int key, SynchronicModPreparation::P
     {
         String param = dmod->getParam((SynchronicParameterType)n);
         
-        DBG("param: " + param);
         
         if (param != "")
         {
@@ -247,8 +300,6 @@ void Piano::configureSynchronicModification(int key, SynchronicModPreparation::P
                 modMap[key]->addSynchronicModification(new SynchronicModification(key, prep, (SynchronicParameterType)n, param, whichMod));
                 
                 thisModPrepMap->addPreparation(prep);
-                
-                DBG("ADD whichmod: " + String(whichMod) + " whichprep: " + String(prep) + " whichtype: " + cSynchronicParameterTypes[n] + " val: " +param + " TO key: " + String(key));
             }
         }
     }
@@ -258,10 +309,36 @@ void Piano::configureSynchronicModification(SynchronicModPreparation::Ptr mod)
 {
     Array<int> whichPreps = getAllIds(mod->getTargets());
     Keymap::PtrArr whichKeymaps = mod->getKeymaps();
+    
+    Array<int> otherKeys;
+    
+    for (int i = 0; i < 128; i++) otherKeys.add(i);
+    
     for (auto keymap : whichKeymaps)
     {
         for (auto key : keymap->keys())
+        {
             configureSynchronicModification(key, mod, whichPreps);
+            otherKeys.remove(key);
+        }
+    }
+    
+    deconfigureSynchronicModificationForKeys(mod, otherKeys);
+}
+
+void Piano::deconfigureSynchronicModificationForKeys(SynchronicModPreparation::Ptr mod, Array<int> keys)
+{
+    int whichMod = mod->getId();
+    
+    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
+    
+    for (auto key : keys)
+    {
+        // Remove ModPrepMap from Key
+        modificationMaps[key]->removeModPrepMap(PreparationTypeSynchronic, whichMod);
+        
+        // Remove Modification from Key
+        modMap[key]->removeSynchronicModification(whichMod);
     }
 }
 
@@ -280,15 +357,12 @@ void Piano::deconfigureSynchronicModification(SynchronicModPreparation::Ptr mod)
             
             // Remove Modification from Key
             modMap[key]->removeSynchronicModification(whichMod);
-            
-            DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
         }
     }
 }
 
 void Piano::configureTempoModification(int key, TempoModPreparation::Ptr dmod, Array<int> whichPreps)
 {
-    DBG("CONFIGURING Tempo MODIFICATION");
     
     Tempo::PtrArr whichTempo = dmod->getTargets();
     
@@ -332,10 +406,38 @@ void Piano::configureTempoModification(TempoModPreparation::Ptr mod)
 {
     Array<int> whichPreps = getAllIds(mod->getTargets());
     Keymap::PtrArr whichKeymaps = mod->getKeymaps();
+    
+    Array<int> otherKeys;
+    
+    for (int i = 0; i < 128; i++) otherKeys.add(i);
+    
     for (auto keymap : whichKeymaps)
     {
         for (auto key : keymap->keys())
+        {
             configureTempoModification(key, mod, whichPreps);
+            otherKeys.remove(key);
+        }
+    }
+    
+    deconfigureTempoModificationForKeys(mod, otherKeys);
+}
+
+void Piano::deconfigureTempoModificationForKeys(TempoModPreparation::Ptr mod, Array<int> keys)
+{
+    int whichMod = mod->getId();
+    
+    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
+    
+    for (auto key : keys)
+    {
+        // Remove ModPrepMap from Key
+        modificationMaps[key]->removeModPrepMap(PreparationTypeTempo, whichMod);
+        
+        // Remove Modification from Key
+        modMap[key]->removeTempoModification(whichMod);
+        
+        DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
     }
 }
 
@@ -405,10 +507,38 @@ void Piano::configureTuningModification(TuningModPreparation::Ptr mod)
 {
     Array<int> whichPreps = getAllIds(mod->getTargets());
     Keymap::PtrArr whichKeymaps = mod->getKeymaps();
+    
+    Array<int> otherKeys;
+    
+    for (int i = 0; i < 128; i++) otherKeys.add(i);
+    
     for (auto keymap : whichKeymaps)
     {
         for (auto key : keymap->keys())
+        {
             configureTuningModification(key, mod, whichPreps);
+            otherKeys.remove(key);
+        }
+    }
+    
+    deconfigureTuningModificationForKeys(mod, otherKeys);
+}
+
+void Piano::deconfigureTuningModificationForKeys(TuningModPreparation::Ptr mod, Array<int> keys)
+{
+    int whichMod = mod->getId();
+    
+    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
+    
+    for (auto key : keys)
+    {
+        // Remove ModPrepMap from Key
+        modificationMaps[key]->removeModPrepMap(PreparationTypeTuning, whichMod);
+        
+        // Remove Modification from Key
+        modMap[key]->removeTuningModification(whichMod);
+        
+        DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
     }
 }
 

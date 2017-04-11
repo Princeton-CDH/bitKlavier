@@ -20,13 +20,15 @@
 
 #include "BKSlider.h"
 
+#include "BKGraph.h"
+
 //==============================================================================
 /*
 */
 class SynchronicViewController    : public BKComponent, public BKListener
 {
 public:
-    SynchronicViewController(BKAudioProcessor&);
+    SynchronicViewController(BKAudioProcessor&, BKItemGraph* theGraph);
     ~SynchronicViewController();
 
     void paint (Graphics&) override;
@@ -37,6 +39,7 @@ public:
     
 private:
     BKAudioProcessor& processor;
+    BKItemGraph* theGraph;
     
     OwnedArray<BKLabel> synchronicL;
     OwnedArray<BKTextField> synchronicTF;

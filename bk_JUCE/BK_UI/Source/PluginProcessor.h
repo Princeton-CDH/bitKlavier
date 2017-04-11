@@ -24,6 +24,7 @@
 
 #include "Gallery.h"
 
+
 #define USE_SYNCHRONIC_TWO 0
 
 //==============================================================================
@@ -47,7 +48,7 @@ public:
     
     String firstGallery(void);
     void initializeGallery(void);
-  
+    
     Gallery::Ptr                        gallery;
     
     BKUpdateState::Ptr                  updateState;

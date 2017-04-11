@@ -16,8 +16,9 @@
 #include "Preparation.h"
 
 //==============================================================================
-SynchronicViewController::SynchronicViewController(BKAudioProcessor& p):
-processor(p)
+SynchronicViewController::SynchronicViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
+processor(p),
+theGraph(theGraph)
 {
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     
@@ -346,6 +347,8 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         DBG("Unregistered text field entered input.");
     }
+    
+    if (type == BKModification) theGraph->update(PreparationTypeSynchronicMod, processor.updateState->currentModSynchronicId);
 }
 
 void SynchronicViewController::updateFields(void)

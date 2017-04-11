@@ -16,10 +16,12 @@
 #include "BKListener.h"
 #include "BKComponent.h"
 
+#include "BKGraph.h"
+
 class TempoViewController    : public BKComponent, public BKListener
 {
 public:
-    TempoViewController(BKAudioProcessor&);
+    TempoViewController(BKAudioProcessor&, BKItemGraph* theGraph);
     ~TempoViewController();
     
     void paint (Graphics&) override;
@@ -31,6 +33,7 @@ public:
 private:
     
     BKAudioProcessor& processor;
+    BKItemGraph* theGraph;
     
     OwnedArray<BKLabel> tempoL;
     OwnedArray<BKTextField> tempoTF;

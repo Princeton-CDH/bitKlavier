@@ -15,8 +15,9 @@
 #include "Preparation.h"
 
 //==============================================================================
-NostalgicViewController::NostalgicViewController(BKAudioProcessor& p):
-processor(p)
+NostalgicViewController::NostalgicViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
+processor(p),
+theGraph(theGraph)
 {
     NostalgicPreparation::Ptr layer = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
     
@@ -291,6 +292,8 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         DBG("Unregistered text field entered input.");
     }
+    
+    if (type == BKModification) theGraph->update(PreparationTypeNostalgicMod, processor.updateState->currentModNostalgicId);
 }
 
 

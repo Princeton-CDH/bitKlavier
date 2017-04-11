@@ -20,13 +20,15 @@
 
 #include "Direct.h"
 
+#include "BKGraph.h"
+
 //==============================================================================
 /*
 */
 class DirectViewController    : public BKComponent, public BKListener
 {
 public:
-    DirectViewController(BKAudioProcessor&);
+    DirectViewController(BKAudioProcessor&, BKItemGraph* theGraph);
     ~DirectViewController();
 
     void paint (Graphics&) override;
@@ -38,6 +40,7 @@ public:
     
 private:
     BKAudioProcessor& processor;
+    BKItemGraph* theGraph;
     
     BKLabel selectL;
     BKComboBox selectCB;
