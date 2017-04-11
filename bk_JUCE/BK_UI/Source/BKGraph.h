@@ -70,8 +70,6 @@ public:
         }
     }
     
-    
-    
     inline int getSelectedId(void) const noexcept {return currentId;}
     
     // Public members
@@ -99,7 +97,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKItem)
 };
 
-class BKItemGraph : public ChangeListener
+class BKItemGraph : public ActionListener
 {
 public:
     BKItemGraph(BKAudioProcessor& p):
@@ -113,9 +111,12 @@ public:
         
     }
     
-    void changeListenerCallback (ChangeBroadcaster* source) override
+    void actionListenerCallback (const String& message) override
     {
-        
+        if (message == "/pianomap/update")
+        {
+            update(PreparationTypePianoMap, 0);
+        }
     }
     
     void add(BKItem* itemToAdd);
@@ -178,6 +179,7 @@ public:
         
         return whichPreps;
     }
+    
     
     Array<Line<float>> getLines(void);
     

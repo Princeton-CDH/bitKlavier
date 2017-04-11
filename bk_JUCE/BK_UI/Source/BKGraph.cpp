@@ -74,7 +74,7 @@ void BKItem::bkComboBoxDidChange    (ComboBox* cb)
         {
             currentId = Id;
             
-            
+            sendActionMessage("/pianomap/update");
             
             DBG("New piano selected: "+String(currentId));
         }
@@ -263,7 +263,11 @@ void BKItem::disconnectFrom(BKItem* toDisconnect)
 
 void BKItemGraph::add(BKItem* itemToAdd)
 {
+    
+    itemToAdd->addActionListener(this);
     items.add(itemToAdd);
+    
+    
 }
 
 bool BKItemGraph::contains(BKItem* thisItem)
@@ -913,6 +917,20 @@ void BKItemGraph::update(BKPreparationType type, int which)
                 for (auto connection : item->getConnections())
                 {
                     DBG("should reconnect " +String(type)+String(which) +" and "+ String(connection->getType())+String(connection->getId()));
+                    reconnect(item, connection);
+                }
+            }
+        }
+    }
+    else if (type == PreparationTypePianoMap)
+    {
+        for (auto item : items)
+        {
+            if (item->getType() == type)
+            {
+                for (auto connection : item->getConnections())
+                {
+                    DBG("RECONNECT PIANO MAPS");
                     reconnect(item, connection);
                 }
             }
