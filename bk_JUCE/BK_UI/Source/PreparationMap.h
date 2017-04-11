@@ -102,6 +102,13 @@ public:
     void addTempo(Tempo::Ptr p);
     void addTuning(Tuning::Ptr p);
     
+    bool contains(Direct::Ptr thisOne);
+    bool contains(Synchronic::Ptr thisOne);
+    bool contains(Nostalgic::Ptr thisOne);
+    bool contains(Tempo::Ptr thisOne);
+    bool contains(Tuning::Ptr thisOne);
+    
+    
     void removeDirect(Direct::Ptr p);
     void removeNostalgic(Nostalgic::Ptr p);
     void removeSynchronic(Synchronic::Ptr p);

@@ -96,6 +96,79 @@ void PreparationMap::addDirect(Direct::Ptr p)
     deactivateIfNecessary();
 }
 
+
+bool PreparationMap::contains(Direct::Ptr thisOne)
+{
+    for (auto p : direct)
+    {
+        if (p->getId() == thisOne->getId())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool PreparationMap::contains(Tuning::Ptr thisOne)
+{
+    bool isThere = false;
+    for (auto p : tuning)
+    {
+        if (p->getId() == thisOne->getId())
+        {
+            isThere = true;
+            break;
+        }
+    }
+    
+    return isThere;
+}
+
+bool PreparationMap::contains(Tempo::Ptr thisOne)
+{
+    bool isThere = false;
+    for (auto p : tempo)
+    {
+        if (p->getId() == thisOne->getId())
+        {
+            isThere = true;
+            break;
+        }
+    }
+    
+    return isThere;
+}
+
+bool PreparationMap::contains(Synchronic::Ptr thisOne)
+{
+    bool isThere = false;
+    for (auto p : synchronic)
+    {
+        if (p->getId() == thisOne->getId())
+        {
+            isThere = true;
+            break;
+        }
+    }
+    
+    return isThere;
+}
+
+bool PreparationMap::contains(Nostalgic::Ptr thisOne)
+{
+    bool isThere = false;
+    for (auto p : nostalgic)
+    {
+        if (p->getId() == thisOne->getId())
+        {
+            isThere = true;
+            break;
+        }
+    }
+    
+    return isThere;
+}
+
 void PreparationMap::removeDirect(Direct::Ptr p)
 {
     for (int i = direct.size(); --i >= 0;)

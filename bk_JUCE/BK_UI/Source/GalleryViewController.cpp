@@ -187,7 +187,8 @@ void GalleryViewController::switchGallery()
     pianoCB.clear(dontSendNotification);
     for (int i = 0; i < processor.gallery->getPianos().size(); i++)     pianoCB.addItem(processor.gallery->getPiano(i)->getName(), i+1);
     pianoCB.addItem("New piano...", processor.gallery->getPianos().size()+1);
-    pianoCB.setSelectedId(1);
+    
+    pianoCB.setSelectedId(1, dontSendNotification);
     
     fillGalleryCB();
     
@@ -305,6 +306,7 @@ void GalleryViewController::bkTextFieldDidChange(TextEditor& tf)
         
         int selected = pianoCB.getSelectedId();
         if (selected != pianoCB.getNumItems()) pianoCB.changeItemText(selected, text);
+        
         pianoCB.setSelectedId(selected, dontSendNotification );
         
         
@@ -340,6 +342,7 @@ void GalleryViewController::bkButtonClicked (Button* b)
         
         processor.gallery->removePiano(selected-1);
         
+        DBG("not here right?");
         switchGallery();
     }
     else if (b->getName() == "Load Light")
@@ -438,7 +441,7 @@ void GalleryViewController::switchPianos(void)
         removePMapButton.setVisible(false);
     }
     
-    pianoCB.setSelectedId(processor.currentPiano->getId() + 1);
+    pianoCB.setSelectedId(processor.currentPiano->getId() + 1, dontSendNotification);
     
     String temp = "";
     Array<int> pianoMap = processor.currentPiano->pianoMap;

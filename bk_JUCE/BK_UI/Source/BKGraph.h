@@ -123,6 +123,9 @@ public:
     void add(BKItem* itemToAdd);
     bool contains(BKItem* thisItem);
     void remove(BKItem* itemToRemove);
+    void clear(void);
+    void connectUI(BKItem* item1, BKItem* item2);
+    void disconnectUI(BKItem* item1, BKItem* item2);
     void connect(BKItem* item1, BKItem* item2);
     void disconnect(BKItem* item1, BKItem* item2);
     

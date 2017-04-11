@@ -287,7 +287,7 @@ bool BKItemGraph::contains(BKItem* thisItem)
 
 BKItem* BKItemGraph::itemWithTypeAndId(BKPreparationType type, int Id)
 {
-    BKItem* thisItem = nullptr;
+    BKItem* thisItem = new BKItem(type, Id, processor);
     
     for (auto item : items)
     {
@@ -309,6 +309,22 @@ void BKItemGraph::remove(BKItem* itemToRemove)
     }
     
     items.removeObject(itemToRemove);
+    
+}
+
+
+void BKItemGraph::clear(void)
+{
+    for (auto itemToRemove : items)
+    {
+        for (auto item : itemToRemove->getConnections())
+        {
+            disconnect(itemToRemove, item);
+        }
+        
+        items.removeObject(itemToRemove);
+    }
+    
     
 }
 
@@ -348,11 +364,16 @@ void BKItemGraph::linkPreparationWithKeymap(bool link, BKPreparationType thisTyp
 {
     PreparationMap::Ptr thisPreparationMap = processor.currentPiano->getPreparationMapWithKeymap(thisKeymap);
     
-    if (link && thisPreparationMap == nullptr)
+    if (thisPreparationMap == nullptr)
     {
-        int whichPMap = processor.currentPiano->addPreparationMap(thisKeymap);
-        
-        thisPreparationMap = processor.currentPiano->prepMaps[whichPMap];
+        if (link)
+        {
+            int whichPMap = processor.currentPiano->addPreparationMap(thisKeymap);
+            
+            thisPreparationMap = processor.currentPiano->prepMaps[whichPMap];
+        }
+        else
+            return;
     }
     
     
@@ -391,8 +412,6 @@ void BKItemGraph::linkPreparationWithKeymap(bool link, BKPreparationType thisTyp
         if (link)   thisPreparationMap->addTuning(thisTuning);
         else        thisPreparationMap->removeTuning(thisTuning);
     }
-    
-    processor.updateState->galleryDidChange = true;
 
 }
 
@@ -913,6 +932,8 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
     }
 }
 
+
+
 void BKItemGraph::reconnect(BKItem* item1, BKItem* item2)
 {
     route(false, item1, item2);
@@ -953,6 +974,124 @@ void BKItemGraph::update(BKPreparationType type, int which)
         }
     }
 
+}
+
+void BKItemGraph::disconnectUI(BKItem* item1, BKItem* item2)
+{
+    item1->disconnectFrom(item2);
+    item2->disconnectFrom(item1);
+}
+
+void BKItemGraph::connectUI(BKItem* item1, BKItem* item2)
+{
+    item1->connectWith(item2);
+    item2->connectWith(item1);
+#if 0
+    BKPreparationType item1Type = item1->getType();
+    int item1Id = item1->getId();
+    
+    BKPreparationType item2Type = item2->getType();
+    int item2Id = item2->getId();
+    
+    
+    if (item1->isConnectedWith(item2) && item2->isConnectedWith(item1)) return;
+    
+    if (item1Type == PreparationTypeTuning && item2Type <= PreparationTypeNostalgic)
+    {
+        if (item2Type == PreparationTypeDirect)
+        {
+            disconnectTuningFromDirect(item2);
+        }
+        else if (item2Type == PreparationTypeNostalgic)
+        {
+            disconnectTuningFromNostalgic(item2);
+        }
+        if (item2Type == PreparationTypeSynchronic)
+        {
+            disconnectTuningFromSynchronic(item2);
+        }
+    }
+    else if (item1Type <= PreparationTypeNostalgic && item2Type == PreparationTypeTuning)
+    {
+        if (item1Type == PreparationTypeDirect)
+        {
+            disconnectTuningFromDirect(item1);
+        }
+        else if (item1Type == PreparationTypeNostalgic)
+        {
+            disconnectTuningFromNostalgic(item1);
+        }
+        if (item1Type == PreparationTypeSynchronic)
+        {
+            disconnectTuningFromSynchronic(item1);
+        }
+        
+    }
+    else if (item1Type == PreparationTypeSynchronic && item2Type == PreparationTypeTempo)
+    {
+        disconnectTempoFromSynchronic(item1);
+    }
+    else if (item1Type == PreparationTypeTempo && item2Type == PreparationTypeSynchronic)
+    {
+        disconnectTempoFromSynchronic(item2);
+    }
+    else if (item1Type == PreparationTypeSynchronic && item2Type == PreparationTypeNostalgic)
+    {
+        disconnectSynchronicFromNostalgic(item2);
+    }
+    else if (item1Type == PreparationTypeNostalgic && item2Type == PreparationTypeSynchronic)
+    {
+        disconnectSynchronicFromNostalgic(item1);
+    }
+    
+    item1->connectWith(item2);
+    item2->connectWith(item1);
+
+
+    
+    // CONFIGURATIONS
+    if (!(
+          (item1Type == PreparationTypeKeymap && item2Type == PreparationTypePianoMap) ||
+        (item1Type == PreparationTypePianoMap && item2Type == PreparationTypeKeymap) ||
+        (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeReset) ||
+        (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeReset) ||
+        (item1Type == PreparationTypeReset && item2Type == PreparationTypeKeymap) ||
+          (item1Type == PreparationTypeReset && item2Type < PreparationTypeKeymap) ||
+          (item1Type < PreparationTypeKeymap && item2Type == PreparationTypeReset) ||
+          (item1Type == PreparationTypeKeymap && item2Type <= PreparationTypeKeymap) ||
+          (item1Type <= PreparationTypeKeymap && item2Type == PreparationTypeKeymap) ||
+          (item1Type == PreparationTypeTuning && item2Type <= PreparationTypeNostalgic) ||
+          (item1Type <= PreparationTypeNostalgic && item2Type == PreparationTypeTuning) ||
+          (item1Type == PreparationTypeTempo && item2Type == PreparationTypeSynchronic) ||
+          (item1Type == PreparationTypeSynchronic && item2Type == PreparationTypeTempo) ||
+          (item1Type == PreparationTypeNostalgic && item2Type == PreparationTypeSynchronic) ||
+          (item1Type == PreparationTypeSynchronic && item2Type == PreparationTypeNostalgic) ||
+          (item1Type == PreparationTypeDirect && item2Type == PreparationTypeDirectMod) ||
+          (item2Type == PreparationTypeDirect && item1Type == PreparationTypeDirectMod) ||
+          (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeDirectMod) ||
+          (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeDirectMod) ||
+          (item1Type == PreparationTypeNostalgic && item2Type == PreparationTypeNostalgicMod) ||
+          (item2Type == PreparationTypeNostalgic && item1Type == PreparationTypeNostalgicMod) ||
+          (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeNostalgicMod) ||
+          (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeNostalgicMod) ||
+          (item1Type == PreparationTypeSynchronic && item2Type == PreparationTypeSynchronicMod) ||
+          (item2Type == PreparationTypeSynchronic && item1Type == PreparationTypeSynchronicMod) ||
+          (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeSynchronicMod) ||
+          (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeSynchronicMod) ||
+          (item1Type == PreparationTypeTuning && item2Type == PreparationTypeTuningMod) ||
+          (item2Type == PreparationTypeTuning && item1Type == PreparationTypeTuningMod) ||
+          (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeTuningMod) ||
+          (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeTuningMod) ||
+          (item1Type == PreparationTypeTempo && item2Type == PreparationTypeTempoMod) ||
+          (item2Type == PreparationTypeTempo && item1Type == PreparationTypeTempoMod) ||
+          (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeTempoMod) ||
+          (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeTempoMod)
+          ))
+    {
+        item1->disconnectFrom(item2);
+        item2->disconnectFrom(item1);
+    }
+#endif
 }
 
 void BKItemGraph::connect(BKItem* item1, BKItem* item2)
@@ -1100,22 +1239,18 @@ void BKItemGraph::reconstruct(void)
         int keymapId = pmap->getKeymapId();
         
         BKItem* keymap;
+        BKItem* newPreparation;
         
-        /// THIS NOT WORKING
         keymap = itemWithTypeAndId(PreparationTypeKeymap, keymapId);
-        
-        if (keymap == nullptr)
-        {
-            keymap = new BKItem(PreparationTypeKeymap, keymapId, processor);
-        }
-        
+
         if (!contains(keymap)) items.add(keymap);
     
     
         for (auto p : pmap->getTuning())
         {
             int Id = p->getId();
-            BKItem* newPreparation = new BKItem(PreparationTypeTuning, Id, processor);
+            
+            newPreparation = itemWithTypeAndId(PreparationTypeTuning, Id);
             
             if (!contains(newPreparation))
             {
@@ -1127,7 +1262,8 @@ void BKItemGraph::reconstruct(void)
         for (auto p : pmap->getTempo())
         {
             int Id = p->getId();
-            BKItem* newPreparation = new BKItem(PreparationTypeTempo, Id, processor);
+            
+            newPreparation = itemWithTypeAndId(PreparationTypeTempo, Id);
             
             if (!contains(newPreparation))
             {
@@ -1139,7 +1275,8 @@ void BKItemGraph::reconstruct(void)
         for (auto p : pmap->getDirect())
         {
             int Id = p->getId();
-            BKItem* newPreparation = new BKItem(PreparationTypeDirect, Id, processor);
+            
+            newPreparation = itemWithTypeAndId(PreparationTypeDirect, Id);
             
             if (!contains(newPreparation))
             {
@@ -1149,23 +1286,11 @@ void BKItemGraph::reconstruct(void)
                 
                 int tuningId = p->getTuningId();
                 
-                bool found = false;
-                for (auto item : items)
-                {
-                    if (item->getType() == PreparationTypeTuning && item->getId() == tuningId)
-                    {
-                        connect(newPreparation, item);
-                        found = true;
-                        break;
-                    }
-                }
+                BKItem* thisTuning = itemWithTypeAndId(PreparationTypeTuning, tuningId);
                 
-                if (!found)
-                {
-                    BKItem* newTuningPrep = new BKItem(PreparationTypeTuning, tuningId, processor);
-                    items.add(newTuningPrep);
-                    connect(newPreparation, newTuningPrep);
-                }
+                if (!contains(thisTuning))  items.add(thisTuning);
+                
+                connectUI(newPreparation, thisTuning);
             }
             
         }
@@ -1173,7 +1298,8 @@ void BKItemGraph::reconstruct(void)
         for (auto p : pmap->getSynchronic())
         {
             int Id = p->getId();
-            BKItem* newPreparation = new BKItem(PreparationTypeSynchronic, Id, processor);
+            
+            newPreparation = itemWithTypeAndId(PreparationTypeSynchronic, Id);
             
             if (!contains(newPreparation))
             {
@@ -1183,44 +1309,21 @@ void BKItemGraph::reconstruct(void)
                 // TUNING
                 int tuningId = p->getTuningId();
                 
-                bool found = false;
-                for (auto item : items)
-                {
-                    if (item->getType() == PreparationTypeTuning && item->getId() == tuningId)
-                    {
-                        connect(newPreparation, item);
-                        found = true;
-                        break;
-                    }
-                }
+                BKItem* thisTuning = itemWithTypeAndId(PreparationTypeTuning, tuningId);
                 
-                if (!found)
-                {
-                    BKItem* newTuningPrep = new BKItem(PreparationTypeTuning, tuningId, processor);
-                    items.add(newTuningPrep);
-                    connect(newPreparation, newTuningPrep);
-                }
+                if (!contains(thisTuning))  items.add(thisTuning);
+                
+                connectUI(newPreparation, thisTuning);
+                
                 
                 // TEMPO
                 int tempoId = p->getTempoId();
                 
-                found = false;
-                for (auto item : items)
-                {
-                    if (item->getType() == PreparationTypeTempo && item->getId() == tempoId)
-                    {
-                        connect(newPreparation, item);
-                        found = true;
-                        break;
-                    }
-                }
+                BKItem* thisTempo = itemWithTypeAndId(PreparationTypeTempo, tempoId);
                 
-                if (!found)
-                {
-                    BKItem* newTempoPrep = new BKItem(PreparationTypeTempo, tempoId, processor);
-                    items.add(newTempoPrep);
-                    connect(newPreparation, newTempoPrep);
-                }
+                if (!contains(thisTempo))  items.add(thisTempo);
+                
+                connectUI(newPreparation, thisTempo);
             }
             
             
@@ -1229,8 +1332,9 @@ void BKItemGraph::reconstruct(void)
         for (auto p : pmap->getNostalgic())
         {
             int Id = p->getId();
-            BKItem* newPreparation = new BKItem(PreparationTypeNostalgic, Id, processor);
             
+            newPreparation = itemWithTypeAndId(PreparationTypeNostalgic, Id);
+
             if (!contains(newPreparation))
             {
                 items.add(newPreparation);
@@ -1239,45 +1343,21 @@ void BKItemGraph::reconstruct(void)
                 // TUNING
                 int tuningId = p->getTuningId();
                 
-                bool found = false;
-                for (auto item : items)
-                {
-                    if (item->getType() == PreparationTypeTuning && item->getId() == tuningId)
-                    {
-                        connect(newPreparation, item);
-                        found = true;
-                        break;
-                    }
-                }
+                BKItem* thisTuning = itemWithTypeAndId(PreparationTypeTuning, tuningId);
                 
-                if (!found)
-                {
-                    BKItem* newTuningPrep = new BKItem(PreparationTypeTuning, tuningId, processor);
-                    items.add(newTuningPrep);
-                    connect(newPreparation, newTuningPrep);
-                }
+                if (!contains(thisTuning))  items.add(thisTuning);
+                
+                connectUI(newPreparation, thisTuning);
                 
                 
                 // SYNC TARGET
                 int syncId = p->getSynchronicTargetId();
                 
-                found = false;
-                for (auto item : items)
-                {
-                    if (item->getType() == PreparationTypeSynchronic && item->getId() == syncId)
-                    {
-                        connect(newPreparation, item);
-                        found = true;
-                        break;
-                    }
-                }
+                BKItem* thisSyncTarget = itemWithTypeAndId(PreparationTypeSynchronic, syncId);
                 
-                if (!found)
-                {
-                    BKItem* newSyncPrep = new BKItem(PreparationTypeSynchronic, syncId, processor);
-                    items.add(newSyncPrep);
-                    connect(newPreparation, newSyncPrep);
-                }
+                if (!contains(thisSyncTarget))  items.add(thisSyncTarget);
+                
+                connectUI(newPreparation, thisSyncTarget);
             }
             
             
@@ -1285,7 +1365,7 @@ void BKItemGraph::reconstruct(void)
         
         for (auto p : preparations)
         {
-            connect(keymap, p);
+            connectUI(keymap, p);
         }
         
     }

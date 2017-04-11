@@ -32,9 +32,7 @@ public:
         
         setWantsKeyboardFocus(true);
         
-        graph->reconstruct();
-        
-        draw();
+        redraw();
     }
     
     ~BKConstructionSite(void)
@@ -44,6 +42,14 @@ public:
     
     inline void redraw(void)
     {
+        
+        BKItem::RCArr items = graph->getAllItems();
+       
+        for (auto item : items)
+        {
+            graph->remove(item);
+        }
+        
         removeAllChildren();
         
         graph->reconstruct();
@@ -97,7 +103,7 @@ private:
     
     void draw(void)
     {
-        int keymapCount = 0, prepCount = 0;
+        int keymapCount = 0, prepCount = 0, otherCount = 0;
         for (auto item : graph->getAllItems())
         {
             BKPreparationType type = item->getType();
@@ -105,25 +111,35 @@ private:
             
             if (type == PreparationTypeKeymap)
             {
-                int row = (int)(keymapCount / 4);
-                int col = keymapCount % 4;
+                int col = (int)(keymapCount / 4);
+                int row = keymapCount % 4;
                 
-                item->setBounds(25 + (row * 155), 25 + (col * 25), 150, 20);
+                item->setBounds(25 + (row * 155), 50 + (col * 25), 150, 20);
 
                 keymapCount++;
             }
-            else
+            else if (type <= PreparationTypeNostalgic)
             {
-                int row = (int)(prepCount / 4);
-                int col = prepCount % 4;
+                int col = (int)(prepCount / 4);
+                int row = prepCount % 4;
                 
-                item->setBounds(25 + (row * 155), 250 + (col * 25), 150, 20);
+                item->setBounds(25 + (row * 155), 200 + (col * 25), 150, 20);
                 
                 prepCount++;
+            }
+            else
+            {
+                int col = (int)(otherCount / 4);
+                int row = otherCount % 4;
+                
+                item->setBounds(25 + (row * 155), 350 + (col * 25), 150, 20);
+                otherCount++;
             }
             
             addAndMakeVisible(item);
         }
+        
+        repaint();
     }
     
     
