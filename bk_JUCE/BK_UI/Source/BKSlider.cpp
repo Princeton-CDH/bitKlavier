@@ -92,13 +92,13 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     sliderDefault = 0.;
     
     if(sliderIsVertical) {
-        sliderWidth = 200;
+        sliderWidth = 80;
         sliderHeight = 20;
     }
     else
     {
-        sliderWidth = 50;
-        sliderHeight = 200;
+        sliderWidth = 30;
+        sliderHeight = 60;
     }
     
     
@@ -162,16 +162,20 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     incDecSlider->setRange (1., 1000., 1.0);
     incDecSlider->setIncDecButtonsMode (Slider::incDecButtonsNotDraggable);
     if(arrangedHorizontally) incDecSlider->setSize(sliderWidth, 20);
-    else  incDecSlider->setSize(50, sliderHeight);
+    else  incDecSlider->setSize(sliderWidth/2, sliderHeight);
     incDecSlider->setTextBoxStyle (Slider::NoTextBox, false, 90, 20);
-    
     
     editTextButton = new TextButton();
     addAndMakeVisible (editTextButton);
     editTextButton->setButtonText ("edit");
     editTextButton->addListener (this);
-    editTextButton->setSize(50, 20);
+    if(arrangedHorizontally) editTextButton->setSize(sliderWidth, 20);
+    else editTextButton->setSize(sliderWidth/2, sliderHeight);
     
+    editValsTextField = new TextEditor();
+    addAndMakeVisible(editValsTextField);
+    editValsTextField->setSize(sliderWidth, sliderHeight);
+    editValsTextField->addListener(this);
     
     initSizes();
     
@@ -269,21 +273,23 @@ void BKMultiSlider::resized()
 {
     if(arrangedHorizontally)
     {
+        incDecSlider->setTopLeftPosition(0, 0);
+        editTextButton->setTopLeftPosition(0, getHeight() - editTextButton->getHeight());
+        editValsTextField->setTopLeftPosition(editTextButton->getRight(), getHeight() - editTextButton->getHeight());
+        editValsTextField->setVisible(false);
+        
         for (int i=0; i<sliders.size(); i++)
         {
-            sliders[i]->setTopLeftPosition(sliderWidth * i, incDecSlider->getHeight());
+            sliders[i]->setTopLeftPosition(sliderWidth * i + editTextButton->getWidth(), 0);
         }
         
         if(!sliderIsBar) {
-            bigInvisibleSlider->setBounds(0, incDecSlider->getHeight(), sliders.getLast()->getRight(), sliders.getLast()->getHeight() - sliders.getLast()->getTextBoxHeight());
-            incDecSlider->setTopLeftPosition(0, 0);
+            bigInvisibleSlider->setBounds(editTextButton->getWidth(), 0, sliders.getLast()->getRight(), sliders.getLast()->getHeight() - sliders.getLast()->getTextBoxHeight());
         }
         else
         {
-            bigInvisibleSlider->setBounds(0, incDecSlider->getHeight(), sliders.getLast()->getRight(), sliders.getLast()->getHeight());
-            incDecSlider->setTopLeftPosition(0, 0);
+            bigInvisibleSlider->setBounds(editTextButton->getWidth(), 0, sliders.getLast()->getRight(), sliders.getLast()->getHeight());
         }
-        editTextButton->setTopLeftPosition(0, bigInvisibleSlider->getBottom());
     }
     else
     {
@@ -298,7 +304,8 @@ void BKMultiSlider::resized()
         
         //incDecSlider->setTopLeftPosition((int)(sliderWidth/2. - incDecSlider->getWidth()/2.), 0);
         incDecSlider->setTopLeftPosition(0, 0);
-        editTextButton->setTopRightPosition(bigInvisibleSlider->getRight(), 0);
+        editTextButton->setTopRightPosition(getRight(), 0);
+        
     }
     
     
@@ -308,13 +315,14 @@ void BKMultiSlider::initSizes()
 {
     if(arrangedHorizontally) {
         bigInvisibleSlider->setSize(numSliders * sliders[0]->getWidth(), bigInvisibleSlider->getHeight());
-        setSize(numSliders * sliders[0]->getWidth(), sliders[0]->getHeight() + incDecSlider->getHeight() + editTextButton->getHeight());
+        setSize(numSliders * sliders[0]->getWidth() + editTextButton->getWidth(), sliders[0]->getHeight());
+        //setSize(10 * sliders[0]->getWidth() + editTextButton->getWidth(), sliders[0]->getHeight());
         bigInvisibleSlider->toFront(false);
     }
     else
     {
         bigInvisibleSlider->setSize(bigInvisibleSlider->getWidth(), numSliders * sliders[0]->getWidth());
-        if(!sliderIsBar) setSize(sliders[0]->getWidth() + sliders[0]->getTextBoxWidth(), numSliders * sliders[0]->getHeight() + incDecSlider->getHeight());
+        if(!sliderIsBar) setSize(sliders[0]->getWidth(), numSliders * sliders[0]->getHeight() + incDecSlider->getHeight());
         else setSize(sliders[0]->getWidth(), numSliders * sliders[0]->getHeight() + incDecSlider->getHeight());
         bigInvisibleSlider->toFront(false);
     }
@@ -345,9 +353,39 @@ void BKMultiSlider::sliderValueChanged (Slider *slider)
     }
 }
 
+void BKMultiSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
+{
+    DBG(textEditor.getText());
+    editValsTextField->setVisible(false);
+    editValsTextField->toBack();
+    
+    Array<float> newvals = stringToFloatArray(textEditor.getText());
+    
+    numSliders = newvals.size();
+    if(numSliders < 1) numSliders = 1;
+    
+    for(int i=0; i<numSliders; i++)
+    {
+        if(i >= sliders.size()) addSubSlider();
+        
+        if(sliders[i]->getMaximum() < newvals[i]) sliders[i]->setRange(sliderMin, newvals[i], sliderIncrement);
+        if(sliders[i]->getMinimum() > newvals[i]) sliders[i]->setRange(newvals[i], sliderMax, sliderIncrement);
+        
+        sliders[i]->setValue(newvals[i]);
+        //DBG("new array val " + String(newvals[i]));
+    }
+    
+    if(sliders.size() > numSliders) sliders.removeRange(numSliders, sliders.size());
+    
+    resetRanges();
+    initSizes();
+    incDecSlider->setValue(numSliders, dontSendNotification);
+}
+
 
 String BKMultiSlider::textWindowDialog()
 {
+    //#if JUCE_MODAL_LOOPS_PERMITTED //this is a problem, apparently; need to find a different way to do this.
     AlertWindow w ("Multislider Values",
                    "Enter slider values by hand here...",
                    AlertWindow::QuestionIcon);
@@ -363,11 +401,20 @@ String BKMultiSlider::textWindowDialog()
         return text;
     }
     return("cancelled");
+    //#endif
 }
 
 void BKMultiSlider::buttonClicked (Button* button)
 {
-
+    //setSize(10 * sliders[0]->getWidth() + editTextButton->getWidth(), sliders[0]->getHeight());
+    editValsTextField->setVisible(true);
+    editValsTextField->toFront(true);
+    editValsTextField->setText(floatArrayToString(getAllValues()));
+    
+    //editValsTextField->setSize(getWidth() - editTextButton->getWidth(), editValsTextField->getHeight());
+    editValsTextField->setSize(numSliders * sliders[0]->getWidth(), editValsTextField->getHeight());
+    
+    /*
     String newparams = textWindowDialog();
     if(newparams != "cancelled")
     {
@@ -394,6 +441,7 @@ void BKMultiSlider::buttonClicked (Button* button)
         initSizes();
         incDecSlider->setValue(numSliders, dontSendNotification);
     }
+     */
     
 }
 

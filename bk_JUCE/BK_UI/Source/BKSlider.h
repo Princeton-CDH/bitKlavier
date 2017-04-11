@@ -18,7 +18,6 @@
  TODO
  -- expose basic parameters to top; max/min, etc... perhaps subSlider size
  -- snapping
- -- add text box for creating/copy/pasting directly
  -- display additional values and main value for clusters (like transposition vals [t1 t2 t3])?
  */
 
@@ -56,7 +55,7 @@ private:
 
 
 
-class BKMultiSlider : public BKComponent, public Slider::Listener, public Button::Listener
+class BKMultiSlider : public BKComponent, public Slider::Listener, public Button::Listener, public TextEditor::Listener
 {
     
 public:
@@ -90,6 +89,7 @@ private:
     Slider* incDecSlider;
     
     TextButton* editTextButton;
+    TextEditor* editValsTextField;
     
     double sliderMin, sliderMax, sliderMinDefault, sliderMaxDefault;
     double sliderDefault;
@@ -101,6 +101,7 @@ private:
     
     void sliderValueChanged (Slider *slider) override;
     void buttonClicked (Button* button) override;
+    void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     String textWindowDialog();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKMultiSlider)
