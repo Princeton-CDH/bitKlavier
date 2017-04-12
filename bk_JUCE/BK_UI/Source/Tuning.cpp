@@ -170,8 +170,6 @@ ValueTree Tuning::getState(void)
     }
     prep.addChild(absolute, -1, 0);
     
-    //prep.addChild(sPrep->getResetMap()->getState(Id), -1, 0);
-    
     return prep;
     
 }
@@ -272,7 +270,6 @@ void TuningModPreparation::setState(XmlElement* e)
     
     p = e->getStringAttribute( ptagTuning_adaptiveAnchorFund);
     setParam(TuningA1AnchorFundamental, p);
-    
     
     // custom scale
     forEachXmlChildElement (*e, sub)

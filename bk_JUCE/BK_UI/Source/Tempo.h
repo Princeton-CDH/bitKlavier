@@ -414,6 +414,7 @@ public:
         
         p = getParam(AT1Mode);
         if (p != String::empty) prep.setProperty( ptagTempo_at1Mode, p.getIntValue(), 0 );
+        
     
         return prep;
         
@@ -446,6 +447,7 @@ public:
         
         p = e->getStringAttribute(ptagTempo_at1Max);
         setParam(AT1Max, p);
+        
     }
     
     
@@ -470,11 +472,13 @@ public:
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
     
-    inline void addTarget(Tempo::Ptr target) { targets.add(target); }
-    inline Tempo::PtrArr getTargets(void) {return targets;}
+    inline void addTarget(int target) { targets.add(target); }
+    inline void addTarget(Tempo::Ptr target) { targets.add(target->getId()); }
+    inline Array<int> getTargets(void) {return targets;}
     
-    inline void addKeymap(Keymap::Ptr keymap) { keymaps.add(keymap); }
-    inline Keymap::PtrArr getKeymaps(void) {return keymaps;}
+    inline void addKeymap(int keymap) { keymaps.add(keymap); }
+    inline void addKeymap(Tempo::Ptr keymap) { keymaps.add(keymap->getId()); }
+    inline Array<int> getKeymaps(void) {return keymaps;}
     
     inline void clearKeymaps(void) {keymaps.clear();}
     inline void clearTargets(void) {targets.clear();}
@@ -484,8 +488,8 @@ private:
     String name;
     StringArray          param;
     
-    Tempo::PtrArr targets;
-    Keymap::PtrArr keymaps;
+    Array<int> targets;
+    Array<int> keymaps;
     
     
     JUCE_LEAK_DETECTOR(TempoModPreparation);

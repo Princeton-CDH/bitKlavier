@@ -442,11 +442,11 @@ private:
     
     GeneralSettings::Ptr                general;
     
-    Synchronic::PtrArr                  synchronic;
-    Nostalgic::PtrArr                   nostalgic;
-    Direct::PtrArr                      direct;
-    Tuning::PtrArr                      tuning;
-    Tempo::PtrArr                       tempo;
+    Synchronic::PtrArr synchronic;
+    Nostalgic::PtrArr nostalgic;
+    Direct::PtrArr direct;
+    Tuning::PtrArr tuning;
+    Tempo::PtrArr tempo;
     
     SynchronicModPreparation::PtrArr    modSynchronic;
     DirectModPreparation::PtrArr        modDirect;

@@ -248,9 +248,9 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 {
                     int whichPiano = pianoCount++;
                     
-                    bkPianos.set(whichPiano, new Piano(synchronic, nostalgic, direct, tuning, tempo,
-                                                       modSynchronic, modNostalgic, modDirect, modTuning, modTempo,
-                                                       bkKeymaps, whichPiano)); // initializing piano 0
+                    bkPianos.set(whichPiano, new Piano(&synchronic, &nostalgic, &direct, &tuning, &tempo,
+                                                       &modSynchronic, &modNostalgic, &modDirect, &modTuning, &modTempo,
+                                                       &bkKeymaps, whichPiano)); // initializing piano 0
                     
                     Piano::Ptr thisPiano = bkPianos[whichPiano];
                     

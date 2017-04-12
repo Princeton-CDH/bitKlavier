@@ -258,6 +258,7 @@ public:
         
         p = getParam(DirectHammerGain);
         if (p != String::empty) prep.setProperty( ptagDirect_hammerGain,        p.getFloatValue(), 0);
+
         
         return prep;
     }
@@ -335,15 +336,6 @@ public:
     
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
-    
-    inline void addTarget(Direct::Ptr target) { targets.add(target); }
-    inline Direct::PtrArr getTargets(void) {return targets;}
-    
-    inline void addKeymap(Keymap::Ptr keymap) { keymaps.add(keymap); }
-    inline Keymap::PtrArr getKeymaps(void) {return keymaps;}
-    
-    inline void clearKeymaps(void) {keymaps.clear();}
-    inline void clearTargets(void) {targets.clear();}
 
 
     
@@ -352,10 +344,6 @@ private:
     String name;
     StringArray          param;
 
-    Direct::PtrArr targets;
-    
-    Keymap::PtrArr keymaps;
-    
     JUCE_LEAK_DETECTOR(DirectModPreparation);
 };
 
@@ -803,7 +791,7 @@ public:
             }
         }
         prep.addChild(transpOffsets, -1, 0);
-        
+
         
         return prep;
         
@@ -955,23 +943,12 @@ public:
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
     
-    inline void addTarget(Synchronic::Ptr target) { targets.add(target); }
-    inline Synchronic::PtrArr getTargets(void) {return targets;}
-    
-    inline void addKeymap(Keymap::Ptr keymap) { keymaps.add(keymap); }
-    inline Keymap::PtrArr getKeymaps(void) {return keymaps;}
-    
-    inline void clearKeymaps(void) {keymaps.clear();}
-    inline void clearTargets(void) {targets.clear();}
-    
     
 private:
     int Id;
     String name;
     StringArray          param;
-    
-    Synchronic::PtrArr targets;
-    Keymap::PtrArr     keymaps;
+
     
     JUCE_LEAK_DETECTOR(SynchronicModPreparation);
 };
@@ -1174,6 +1151,61 @@ private:
     JUCE_LEAK_DETECTOR(Nostalgic)
 };
 
+class ModificationMapper : public ReferenceCountedObject
+{
+public:
+    typedef ReferenceCountedObjectPtr<ModificationMapper>   Ptr;
+    typedef Array<ModificationMapper::Ptr>                  PtrArr;
+    typedef Array<ModificationMapper::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<ModificationMapper>                  Arr;
+    typedef OwnedArray<ModificationMapper, CriticalSection> CSArr;
+    
+    
+    typedef ReferenceCountedArray<ModificationMapper>       RCArr;
+    
+    ModificationMapper(BKPreparationType type, int Id):
+    type(type),
+    Id(Id)
+    {
+    }
+    
+    ModificationMapper(BKPreparationType type, int Id, Array<int> keymaps, Array<int> targets):
+    type(type),
+    Id(Id),
+    keymaps(keymaps),
+    targets(targets)
+    {
+        
+    }
+
+    void print(void)
+    {
+        DBG("MAPPER type: " + String(type) + " Id: " + String(Id) + " Keymaps: " + intArrayToString(keymaps) + " Targets: " + intArrayToString(targets));
+    }
+    
+    inline int getId(void) const noexcept { return Id; }
+    
+    inline BKPreparationType getType(void) const noexcept { return type; }
+    
+    inline void addTarget(int target) { targets.add(target); }
+    inline Array<int> getTargets(void) {return targets;}
+    
+    inline void addKeymap(int keymap) { keymaps.add(keymap); }
+    inline Array<int> getKeymaps(void) {return keymaps;}
+    
+    inline void clearKeymaps(void) {keymaps.clear();}
+    inline void clearTargets(void) {targets.clear();}
+    
+private:
+    BKPreparationType type;
+    int Id;
+    
+    Array<int> targets;
+    Array<int> keymaps;
+    
+    JUCE_LEAK_DETECTOR(ModificationMapper);
+};
+
 class NostalgicModPreparation : public ReferenceCountedObject
 {
 public:
@@ -1275,6 +1307,7 @@ public:
         
         p = getParam(NostalgicSyncTarget);
         if (p != String::empty) prep.setProperty( ptagNostalgic_syncTarget,         p.getIntValue(), 0);
+
         
         return prep;
     }
@@ -1368,23 +1401,12 @@ public:
     
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
-    
-    inline void addTarget(Nostalgic::Ptr target) { targets.add(target); }
-    inline Nostalgic::PtrArr getTargets(void) {return targets;}
-    
-    inline void addKeymap(Keymap::Ptr keymap) { keymaps.add(keymap); }
-    inline Keymap::PtrArr getKeymaps(void) {return keymaps;}
-    
-    inline void clearKeymaps(void) {keymaps.clear();}
-    inline void clearTargets(void) {targets.clear();}
+
     
 private:
     int Id;
     String name;
     StringArray          param;
-    
-    Nostalgic::PtrArr targets;
-    Keymap::PtrArr keymaps;
     
     JUCE_LEAK_DETECTOR(NostalgicModPreparation);
 };

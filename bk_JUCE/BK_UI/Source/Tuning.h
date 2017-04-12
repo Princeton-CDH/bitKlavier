@@ -498,24 +498,13 @@ public:
     
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
-    
-    inline void addTarget(Tuning::Ptr target) { targets.add(target); }
-    inline Tuning::PtrArr getTargets(void) {return targets;}
-    
-    inline void addKeymap(Keymap::Ptr keymap) { keymaps.add(keymap); }
-    inline Keymap::PtrArr getKeymaps(void) {return keymaps;}
-    
-    inline void clearKeymaps(void) {keymaps.clear();}
-    inline void clearTargets(void) {targets.clear();}
+
     
     
 private:
     int Id; 
     String name;
     StringArray          param;
-    
-    Tuning::PtrArr targets;
-    Keymap::PtrArr keymaps;
     
     JUCE_LEAK_DETECTOR(TuningModPreparation);
 };

@@ -571,358 +571,336 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
     // Direct Modifications
     else if (item1Type == PreparationTypeDirect && item2Type == PreparationTypeDirectMod)
     {
-        DBG("SHOULD CONFIGURE MOD AND DIRECT");
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeDirectMod, item2Id);
         
-        DirectModPreparation::Ptr thisMod = processor.gallery->getDirectModPreparation(item2Id);
-        Direct::Ptr thisDirect = processor.gallery->getDirect(item1Id);
+        int Id = item1Id;
         
         if (connect)
         {
-            thisMod->addTarget(thisDirect);
-            processor.currentPiano->configureDirectModification(thisMod);
+            thisMapper->addTarget(Id);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureDirectModification(thisMod);
-            thisMod->clearTargets();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearTargets();
         }
     }
-    else if (item2Type == PreparationTypeDirect && item1Type == PreparationTypeDirectMod)
+    else if (item1Type == PreparationTypeDirectMod && item2Type == PreparationTypeDirect)
     {
-        DirectModPreparation::Ptr thisMod = processor.gallery->getDirectModPreparation(item1Id);
-        Direct::Ptr thisDirect = processor.gallery->getDirect(item2Id);
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeDirectMod, item1Id);
+        
+        int Id = item2Id;
         
         if (connect)
         {
-            thisMod->addTarget(thisDirect);
-            processor.currentPiano->configureDirectModification(thisMod);
+            thisMapper->addTarget(Id);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureDirectModification(thisMod);
-            thisMod->clearTargets();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearTargets();
         }
     }
     else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeDirectMod)
     {
-        DBG("SHOULD CONFIGURE MOD WITH KEYMAP");
-        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item1Id);
-        
-        DirectModPreparation::Ptr thisMod = processor.gallery->getDirectModPreparation(item2Id);
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeDirectMod, item2Id);
+        int keymapId = item1Id;
         
         if (connect)
         {
-            thisMod->addKeymap(thisKeymap);
-            processor.currentPiano->configureDirectModification(thisMod);
+            thisMapper->addKeymap(keymapId);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureDirectModification(thisMod);
-            thisMod->clearKeymaps();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearKeymaps();
         }
     }
     else if (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeDirectMod)
     {
-        DBG("SHOULD CONFIGURE MOD WITH KEYMAP");
-        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item2Id);
-        
-        DirectModPreparation::Ptr thisMod = processor.gallery->getDirectModPreparation(item1Id);
-        
-        thisMod->addKeymap(thisKeymap);
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeDirectMod, item1Id);
+        int keymapId = item2Id;
         
         if (connect)
         {
-            thisMod->addKeymap(thisKeymap);
-            processor.currentPiano->configureDirectModification(thisMod);
+            thisMapper->addKeymap(keymapId);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureDirectModification(thisMod);
-            thisMod->clearKeymaps();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearKeymaps();
         }
     }
     // Nostalgic Modifications
     else if (item1Type == PreparationTypeNostalgic && item2Type == PreparationTypeNostalgicMod)
     {
-        DBG("SHOULD CONFIGURE MOD AND Nostalgic");
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeNostalgicMod, item2Id);
         
-        NostalgicModPreparation::Ptr thisMod = processor.gallery->getNostalgicModPreparation(item2Id);
-        Nostalgic::Ptr thisNostalgic = processor.gallery->getNostalgic(item1Id);
+        int Id = item1Id;
         
         if (connect)
         {
-            thisMod->addTarget(thisNostalgic);
-            processor.currentPiano->configureNostalgicModification(thisMod);
+            thisMapper->addTarget(Id);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureNostalgicModification(thisMod);
-            thisMod->clearTargets();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearTargets();
         }
     }
     else if (item2Type == PreparationTypeNostalgic && item1Type == PreparationTypeNostalgicMod)
     {
-        NostalgicModPreparation::Ptr thisMod = processor.gallery->getNostalgicModPreparation(item1Id);
-        Nostalgic::Ptr thisNostalgic = processor.gallery->getNostalgic(item2Id);
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeNostalgicMod, item1Id);
+        
+        int Id = item2Id;
         
         if (connect)
         {
-            thisMod->addTarget(thisNostalgic);
-            processor.currentPiano->configureNostalgicModification(thisMod);
+            thisMapper->addTarget(Id);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureNostalgicModification(thisMod);
-            thisMod->clearTargets();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearTargets();
         }
     }
     else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeNostalgicMod)
     {
-        DBG("SHOULD CONFIGURE MOD WITH KEYMAP");
-        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item1Id);
-        
-        NostalgicModPreparation::Ptr thisMod = processor.gallery->getNostalgicModPreparation(item2Id);
-        
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeNostalgicMod, item2Id);
+        int keymapId = item1Id;
+    
         if (connect)
         {
-            thisMod->addKeymap(thisKeymap);
-            processor.currentPiano->configureNostalgicModification(thisMod);
+            thisMapper->addKeymap(keymapId);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureNostalgicModification(thisMod);
-            thisMod->clearKeymaps();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearKeymaps();
         }
     }
     else if (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeNostalgicMod)
     {
-        DBG("SHOULD CONFIGURE MOD WITH KEYMAP");
-        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item2Id);
-        
-        NostalgicModPreparation::Ptr thisMod = processor.gallery->getNostalgicModPreparation(item1Id);
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeNostalgicMod, item1Id);
+        int keymapId = item2Id;
         
         if (connect)
         {
-            thisMod->addKeymap(thisKeymap);
-            processor.currentPiano->configureNostalgicModification(thisMod);
+            thisMapper->addKeymap(keymapId);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureNostalgicModification(thisMod);
-            thisMod->clearKeymaps();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearKeymaps();
         }
     }
     // Synchronic Modifications
     else if (item1Type == PreparationTypeSynchronic && item2Type == PreparationTypeSynchronicMod)
     {
-        DBG("SHOULD CONFIGURE MOD AND Synchronic");
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeSynchronicMod, item2Id);
         
-        SynchronicModPreparation::Ptr thisMod = processor.gallery->getSynchronicModPreparation(item2Id);
-        Synchronic::Ptr thisSynchronic = processor.gallery->getSynchronic(item1Id);
+        int Id = item1Id;
         
         if (connect)
         {
-            thisMod->addTarget(thisSynchronic);
-            processor.currentPiano->configureSynchronicModification(thisMod);
+            thisMapper->addTarget(Id);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureSynchronicModification(thisMod);
-            thisMod->clearTargets();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearTargets();
         }
     }
     else if (item2Type == PreparationTypeSynchronic && item1Type == PreparationTypeSynchronicMod)
     {
-        SynchronicModPreparation::Ptr thisMod = processor.gallery->getSynchronicModPreparation(item1Id);
-        Synchronic::Ptr thisSynchronic = processor.gallery->getSynchronic(item2Id);
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeSynchronicMod, item1Id);
+        
+        int Id = item2Id;
         
         if (connect)
         {
-            thisMod->addTarget(thisSynchronic);
-            processor.currentPiano->configureSynchronicModification(thisMod);
+            thisMapper->addTarget(Id);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureSynchronicModification(thisMod);
-            thisMod->clearTargets();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearTargets();
         }
     }
     else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeSynchronicMod)
     {
-        DBG("SHOULD CONFIGURE MOD WITH KEYMAP");
-        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item1Id);
-        
-        SynchronicModPreparation::Ptr thisMod = processor.gallery->getSynchronicModPreparation(item2Id);
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeSynchronicMod, item2Id);
+        int keymapId = item1Id;
         
         if (connect)
         {
-            thisMod->addKeymap(thisKeymap);
-            processor.currentPiano->configureSynchronicModification(thisMod);
+            thisMapper->addKeymap(keymapId);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureSynchronicModification(thisMod);
-            thisMod->clearKeymaps();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearKeymaps();
         }
     }
     else if (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeSynchronicMod)
     {
-        DBG("SHOULD CONFIGURE MOD WITH KEYMAP");
-        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item2Id);
-        
-        SynchronicModPreparation::Ptr thisMod = processor.gallery->getSynchronicModPreparation(item1Id);
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeSynchronicMod, item1Id);
+        int keymapId = item2Id;
         
         if (connect)
         {
-            thisMod->addKeymap(thisKeymap);
-            processor.currentPiano->configureSynchronicModification(thisMod);
+            thisMapper->addKeymap(keymapId);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureSynchronicModification(thisMod);
-            thisMod->clearKeymaps();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearKeymaps();
         }
     }
     // Tuning Modifications
     else if (item1Type == PreparationTypeTuning && item2Type == PreparationTypeTuningMod)
     {
-        DBG("SHOULD CONFIGURE MOD AND Tuning");
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeTuningMod, item2Id);
         
-        TuningModPreparation::Ptr thisMod = processor.gallery->getTuningModPreparation(item2Id);
-        Tuning::Ptr thisTuning = processor.gallery->getTuning(item1Id);
+        int Id = item1Id;
         
         if (connect)
         {
-            thisMod->addTarget(thisTuning);
-            processor.currentPiano->configureTuningModification(thisMod);
+            thisMapper->addTarget(Id);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureTuningModification(thisMod);
-            thisMod->clearTargets();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearTargets();
         }
     }
     else if (item2Type == PreparationTypeTuning && item1Type == PreparationTypeTuningMod)
     {
-        TuningModPreparation::Ptr thisMod = processor.gallery->getTuningModPreparation(item1Id);
-        Tuning::Ptr thisTuning = processor.gallery->getTuning(item2Id);
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeTuningMod, item1Id);
+        
+        int Id = item2Id;
         
         if (connect)
         {
-            thisMod->addTarget(thisTuning);
-            processor.currentPiano->configureTuningModification(thisMod);
+            thisMapper->addTarget(Id);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureTuningModification(thisMod);
-            thisMod->clearTargets();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearTargets();
         }
     }
     else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeTuningMod)
     {
-        DBG("SHOULD CONFIGURE MOD WITH KEYMAP");
-        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item1Id);
-        
-        TuningModPreparation::Ptr thisMod = processor.gallery->getTuningModPreparation(item2Id);
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeTuningMod, item2Id);
+        int keymapId = item1Id;
         
         if (connect)
         {
-            thisMod->addKeymap(thisKeymap);
-            processor.currentPiano->configureTuningModification(thisMod);
+            thisMapper->addKeymap(keymapId);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureTuningModification(thisMod);
-            thisMod->clearKeymaps();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearKeymaps();
         }
     }
     else if (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeTuningMod)
     {
-        DBG("SHOULD CONFIGURE MOD WITH KEYMAP");
-        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item2Id);
-        
-        TuningModPreparation::Ptr thisMod = processor.gallery->getTuningModPreparation(item1Id);
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeTuningMod, item1Id);
+        int keymapId = item2Id;
         
         if (connect)
         {
-            thisMod->addKeymap(thisKeymap);
-            processor.currentPiano->configureTuningModification(thisMod);
+            thisMapper->addKeymap(keymapId);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureTuningModification(thisMod);
-            thisMod->clearKeymaps();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearKeymaps();
         }
     }
     // Tempo Modifications
     else if (item1Type == PreparationTypeTempo && item2Type == PreparationTypeTempoMod)
     {
-        DBG("SHOULD CONFIGURE MOD AND Tempo");
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeTempoMod, item2Id);
         
-        TempoModPreparation::Ptr thisMod = processor.gallery->getTempoModPreparation(item2Id);
-        Tempo::Ptr thisTempo = processor.gallery->getTempo(item1Id);
+        int Id = item1Id;
         
         if (connect)
         {
-            thisMod->addTarget(thisTempo);
-            processor.currentPiano->configureTempoModification(thisMod);
+            thisMapper->addTarget(Id);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureTempoModification(thisMod);
-            thisMod->clearTargets();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearTargets();
         }
     }
     else if (item2Type == PreparationTypeTempo && item1Type == PreparationTypeTempoMod)
     {
-        TempoModPreparation::Ptr thisMod = processor.gallery->getTempoModPreparation(item1Id);
-        Tempo::Ptr thisTempo = processor.gallery->getTempo(item2Id);
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeTempoMod, item1Id);
+        
+        int Id = item2Id;
         
         if (connect)
         {
-            thisMod->addTarget(thisTempo);
-            processor.currentPiano->configureTempoModification(thisMod);
+            thisMapper->addTarget(Id);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureTempoModification(thisMod);
-            thisMod->clearTargets();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearTargets();
         }
     }
     else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeTempoMod)
     {
-        DBG("SHOULD CONFIGURE MOD WITH KEYMAP");
-        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item1Id);
-        
-        TempoModPreparation::Ptr thisMod = processor.gallery->getTempoModPreparation(item2Id);
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeTempoMod, item2Id);
+        int keymapId = item1Id;
         
         if (connect)
         {
-            thisMod->addKeymap(thisKeymap);
-            processor.currentPiano->configureTempoModification(thisMod);
+            thisMapper->addKeymap(keymapId);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureTempoModification(thisMod);
-            thisMod->clearKeymaps();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearKeymaps();
         }
     }
     else if (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeTempoMod)
     {
-        DBG("SHOULD CONFIGURE MOD WITH KEYMAP");
-        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item2Id);
-        
-        TempoModPreparation::Ptr thisMod = processor.gallery->getTempoModPreparation(item1Id);
+        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeTempoMod, item1Id);
+        int keymapId = item2Id;
         
         if (connect)
         {
-            thisMod->addKeymap(thisKeymap);
-            processor.currentPiano->configureTempoModification(thisMod);
+            thisMapper->addKeymap(keymapId);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigureTempoModification(thisMod);
-            thisMod->clearKeymaps();
+            processor.currentPiano->deconfigureModification(thisMapper);
+            thisMapper->clearKeymaps();
         }
     }
     else
@@ -1369,6 +1347,58 @@ void BKItemGraph::reconstruct(void)
         }
         
     }
+
+    for (auto map : thisPiano->getMappers())
+    {
+        BKPreparationType type = map->getType();
+        int Id = map->getId();
+        
+        Array<int> keymaps = map->getKeymaps();
+        Array<int> targets = map->getTargets();
+        
+        BKItem* thisMod = itemWithTypeAndId(type, Id);
+        
+        if (!contains(thisMod) && (keymaps.size() || targets.size())) items.add(thisMod);
+        
+        for (auto k : keymaps)
+        {
+            BKItem* thisKeymap = itemWithTypeAndId(PreparationTypeKeymap, k);
+            if (!contains(thisKeymap)) items.add(thisKeymap);
+            
+            connectUI(thisKeymap, thisMod);
+        }
+        
+        for (auto t : targets)
+        {
+            BKItem* thisTarget;
+            
+            if (type == PreparationTypeDirectMod)
+            {
+                thisTarget = itemWithTypeAndId(PreparationTypeDirect, t);
+            }
+            else if (type == PreparationTypeSynchronicMod)
+            {
+                thisTarget = itemWithTypeAndId(PreparationTypeSynchronic, t);
+            }
+            else if (type == PreparationTypeNostalgicMod)
+            {
+                thisTarget = itemWithTypeAndId(PreparationTypeNostalgic, t);
+            }
+            else if (type == PreparationTypeTempoMod)
+            {
+                thisTarget = itemWithTypeAndId(PreparationTypeTempo, t);
+            }
+            else if (type == PreparationTypeTuningMod)
+            {
+                thisTarget = itemWithTypeAndId(PreparationTypeTuning, t);
+            }
+            
+            if (!contains(thisTarget)) items.add(thisTarget);
+            
+            connectUI(thisTarget, thisMod);
+        }
+    }
+    
 }
 
 

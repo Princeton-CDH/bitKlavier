@@ -121,7 +121,7 @@ public:
         {
             if ((modPrepMaps[i]->getType() == type) && (modPrepMaps[i]->getId() == Id))
             {
-                thisModPrepMap == modPrepMaps[i];
+                thisModPrepMap = modPrepMaps[i];
                 break;
             }
         }

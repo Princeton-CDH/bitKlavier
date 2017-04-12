@@ -35,17 +35,17 @@ public:
     typedef OwnedArray<Piano>                  Arr;
     typedef OwnedArray<Piano, CriticalSection> CSArr;
     
-    Piano(Synchronic::PtrArr synchronic,
-          Nostalgic::PtrArr nostalgic,
-          Direct::PtrArr direct,
-          Tuning::PtrArr tuning,
-          Tempo::PtrArr tempo,
-          SynchronicModPreparation::PtrArr mSynchronic,
-          NostalgicModPreparation::PtrArr mNostalgic,
-          DirectModPreparation::PtrArr mDirect,
-          TuningModPreparation::PtrArr mTuning,
-          TempoModPreparation::PtrArr mTempo,
-          Keymap::PtrArr keymap,
+    Piano(Synchronic::PtrArr* synchronic,
+          Nostalgic::PtrArr* nostalgic,
+          Direct::PtrArr* direct,
+          Tuning::PtrArr* tuning,
+          Tempo::PtrArr* tempo,
+          SynchronicModPreparation::PtrArr* mSynchronic,
+          NostalgicModPreparation::PtrArr* mNostalgic,
+          DirectModPreparation::PtrArr* mDirect,
+          TuningModPreparation::PtrArr* mTuning,
+          TempoModPreparation::PtrArr* mTempo,
+          Keymap::PtrArr* keymap,
           int Id);
     ~Piano();
     
@@ -75,6 +75,38 @@ public:
     
     OwnedArray<Modifications> modMap;
     OwnedArray<ModificationMap> modificationMaps;
+    
+    ModificationMapper::PtrArr mappers;
+    
+    inline ModificationMapper::PtrArr getMappers(void) const noexcept { return mappers; }
+    
+    inline ModificationMapper::Ptr getMapper(int which) { return mappers[which]; }
+    
+    inline ModificationMapper::Ptr getMapper(BKPreparationType type, int Id)
+    {
+        ModificationMapper::Ptr thisMapper = new ModificationMapper(type, Id);
+        
+        bool add = true;
+        for (auto map : mappers)
+        {
+            if (map->getType() == type && map->getId() == Id)
+            {
+                thisMapper = map;
+                add = false;
+                break;
+            }
+        }
+        
+        if (add) mappers.add(thisMapper);
+        
+        return thisMapper;
+    }
+    
+    inline void addMapper(ModificationMapper::Ptr thisMapper)
+    {
+        mappers.add(thisMapper);
+    }
+
     
     ValueTree getState(void);
     
@@ -178,41 +210,46 @@ public:
         }
     }
 
+
     int                         numModSMaps, numModNMaps, numModDMaps;
 
     void                        prepareToPlay(double sampleRate);
     
-    
-    void deconfigureDirectModification(DirectModPreparation::Ptr);
-    void deconfigureDirectModificationForKeys(DirectModPreparation::Ptr, Array<int>);
+    void configureModifications(ModificationMapper::PtrArr maps);
+    void configureModification(ModificationMapper::Ptr map);
+    void deconfigureModification(ModificationMapper::Ptr map);
+
+    void configureDirectModification(DirectModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
     void configureDirectModification(int key, DirectModPreparation::Ptr, Array<int>);
-    void configureDirectModification(DirectModPreparation::Ptr);
-    
-    void deconfigureSynchronicModification(SynchronicModPreparation::Ptr);
-    void deconfigureSynchronicModificationForKeys(SynchronicModPreparation::Ptr, Array<int>);
+    void deconfigureDirectModification(DirectModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureDirectModificationForKeys(DirectModPreparation::Ptr, Array<int>);
+
+    void configureSynchronicModification(SynchronicModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
     void configureSynchronicModification(int key, SynchronicModPreparation::Ptr, Array<int>);
-    void configureSynchronicModification(SynchronicModPreparation::Ptr);
+    void deconfigureSynchronicModification(SynchronicModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureSynchronicModificationForKeys(SynchronicModPreparation::Ptr, Array<int>);
     
-    void deconfigureNostalgicModification(NostalgicModPreparation::Ptr);
-    void deconfigureNostalgicModificationForKeys(NostalgicModPreparation::Ptr, Array<int>);
+    void configureNostalgicModification(NostalgicModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps);
     void configureNostalgicModification(int key, NostalgicModPreparation::Ptr, Array<int>);
-    void configureNostalgicModification(NostalgicModPreparation::Ptr dmod);
+    void deconfigureNostalgicModification(NostalgicModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureNostalgicModificationForKeys(NostalgicModPreparation::Ptr, Array<int>);
     
-    void deconfigureTempoModification(TempoModPreparation::Ptr);
-    void deconfigureTempoModificationForKeys(TempoModPreparation::Ptr, Array<int>);
-    void configureTempoModification(int key, TempoModPreparation::Ptr, Array<int>);
-    void configureTempoModification(TempoModPreparation::Ptr);
-    
-    void deconfigureTuningModification(TuningModPreparation::Ptr);
-    void deconfigureTuningModificationForKeys(TuningModPreparation::Ptr, Array<int>);
+    void configureTuningModification(TuningModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
     void configureTuningModification(int key, TuningModPreparation::Ptr, Array<int>);
-    void configureTuningModification(TuningModPreparation::Ptr dmod);
+    void deconfigureTuningModification(TuningModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureTuningModificationForKeys(TuningModPreparation::Ptr, Array<int>);
+
+    void configureTempoModification(TempoModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
+    void configureTempoModification(int key, TempoModPreparation::Ptr, Array<int>);
+    void deconfigureTempoModification(TempoModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureTempoModificationForKeys(TempoModPreparation::Ptr, Array<int>);
     
     int                         addPreparationMap(void);
     int                         addPreparationMap(Keymap::Ptr keymap);
     PreparationMap::Ptr         getPreparationMapWithKeymap(Keymap::Ptr);
     int                         removeLastPreparationMap(void);
 
+    
 private:
     int Id;
     String pianoName;
@@ -224,20 +261,22 @@ private:
     BKSynthesiser*                      resonanceSynth;
     BKSynthesiser*                      hammerSynth;
     
-    Synchronic::PtrArr  synchronic;
-    Nostalgic::PtrArr   nostalgic;
-    Direct::PtrArr      direct;
-    Tuning::PtrArr      tuning;
-    Tempo::PtrArr       tempo;
+    Synchronic::PtrArr*  synchronic;
+    Nostalgic::PtrArr*   nostalgic;
+    Direct::PtrArr*      direct;
+    Tuning::PtrArr*      tuning;
+    Tempo::PtrArr*       tempo;
     
-    SynchronicModPreparation::PtrArr    modSynchronic;
-    NostalgicModPreparation::PtrArr     modNostalgic;
-    DirectModPreparation::PtrArr        modDirect;
-    TuningModPreparation::PtrArr        modTuning;
-    TempoModPreparation::PtrArr         modTempo;
+    SynchronicModPreparation::PtrArr*    modSynchronic;
+    NostalgicModPreparation::PtrArr*     modNostalgic;
+    DirectModPreparation::PtrArr*        modDirect;
+    TempoModPreparation::PtrArr*         modTempo;
+    
+    Keymap::PtrArr*                      bkKeymaps;
+    TuningModPreparation::PtrArr*        modTuning;
     
     
-    Keymap::PtrArr                      bkKeymaps;
+    
     
     inline Array<int> getAllIds(Direct::PtrArr direct)
     {

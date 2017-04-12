@@ -29,9 +29,9 @@ SynchronicProcessor::Ptr Gallery::getSynchronicProcessor(int id)
 void Gallery::addPiano()
 {
     int numPianos = bkPianos.size();
-    bkPianos.add(new Piano(synchronic, nostalgic, direct, tuning, tempo,
-                           modSynchronic, modNostalgic, modDirect, modTuning, modTempo,
-                           bkKeymaps, numPianos));
+    bkPianos.add(new Piano(&synchronic, &nostalgic, &direct, &tuning, &tempo,
+                           &modSynchronic, &modNostalgic, &modDirect, &modTuning, &modTempo,
+                           &bkKeymaps, numPianos));
 }
 
 void Gallery::removePiano(int Id)

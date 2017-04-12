@@ -57,8 +57,9 @@ theGraph(theGraph)
         modSynchronicTF[i]->setName("M"+cSynchronicParameterTypes[i]);
     }
     
-    sliderTest = new BKMultiSlider(VerticalMultiSlider); //or HorizontalMultiSlider
-    addAndMakeVisible(sliderTest);
+    
+    //sliderTest = new BKMultiSlider(VerticalMultiSlider); //or HorizontalMultiSlider
+    //addAndMakeVisible(sliderTest);
     
     updateModFields();
     updateFields();
@@ -103,7 +104,7 @@ void SynchronicViewController::resized()
     }
     
     //sliderTest->setTopLeftPosition(40, 35);
-    sliderTest->setBounds(40, 35, sliderTest->getWidth(), sliderTest->getHeight() + 20);
+    //sliderTest->setBounds(40, 35, sliderTest->getWidth(), sliderTest->getHeight() + 20);
 
 }
 

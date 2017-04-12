@@ -10,17 +10,17 @@
 
 #include "Piano.h"
 
-Piano::Piano(Synchronic::PtrArr synchronic,
-             Nostalgic::PtrArr nostalgic,
-             Direct::PtrArr direct,
-             Tuning::PtrArr tuning,
-             Tempo::PtrArr tempo,
-             SynchronicModPreparation::PtrArr mSynchronic,
-             NostalgicModPreparation::PtrArr mNostalgic,
-             DirectModPreparation::PtrArr mDirect,
-             TuningModPreparation::PtrArr mTuning,
-             TempoModPreparation::PtrArr mTempo,
-             Keymap::PtrArr keymaps,
+Piano::Piano(Synchronic::PtrArr* synchronic,
+             Nostalgic::PtrArr* nostalgic,
+             Direct::PtrArr* direct,
+             Tuning::PtrArr* tuning,
+             Tempo::PtrArr* tempo,
+             SynchronicModPreparation::PtrArr* mSynchronic,
+             NostalgicModPreparation::PtrArr* mNostalgic,
+             DirectModPreparation::PtrArr* mDirect,
+             TuningModPreparation::PtrArr* mTuning,
+             TempoModPreparation::PtrArr* mTempo,
+             Keymap::PtrArr* keymaps,
              int Id):
 currentPMap(PreparationMap::Ptr()),
 activePMaps(PreparationMap::CSPtrArr()),
@@ -54,23 +54,18 @@ Id(Id)
         modificationMaps.add(new ModificationMap());
     }
     
-    prepMaps.ensureStorageAllocated(12);
-    
-    
-    
+
 }
 
 
 Piano::~Piano()
 {
     
-}
-
+}              
+                   
 void Piano::configureDirectModification(int key, DirectModPreparation::Ptr dmod, Array<int> whichPreps)
 {
     DBG("CONFIGURING DIRECT MODIFICATION");
-    
-    Direct::PtrArr whichDirect = dmod->getTargets();
     
     DBG("key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
     
@@ -107,19 +102,15 @@ void Piano::configureDirectModification(int key, DirectModPreparation::Ptr dmod,
     }
 }
 
-void Piano::configureDirectModification(DirectModPreparation::Ptr mod)
+void Piano::configureDirectModification(DirectModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
 {
-    int whichMod = mod->getId();
-    Array<int> whichPreps = getAllIds(mod->getTargets());
-    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
-    
     Array<int> otherKeys;
     
     for (int i = 0; i < 128; i++) otherKeys.add(i);
     
     for (auto keymap : whichKeymaps)
     {
-        for (auto key : keymap->keys())
+        for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
         {
             configureDirectModification(key, mod, whichPreps);
             
@@ -130,22 +121,13 @@ void Piano::configureDirectModification(DirectModPreparation::Ptr mod)
         }
     }
     
-    for (auto key : otherKeys)
-    {
-        // Remove ModPrepMap from Key
-        modificationMaps[key]->removeModPrepMap(PreparationTypeDirect, whichMod);
-        
-        // Remove Modification from Key
-        modMap[key]->removeDirectModification(whichMod);
-    }
+    deconfigureDirectModificationForKeys(mod, otherKeys);
 }
 
 void Piano::deconfigureDirectModificationForKeys(DirectModPreparation::Ptr mod, Array<int> keys)
 {
     int whichMod = mod->getId();
-    
-    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
-    
+
     for (auto key : keys)
     {
         // Remove ModPrepMap from Key
@@ -157,15 +139,13 @@ void Piano::deconfigureDirectModificationForKeys(DirectModPreparation::Ptr mod, 
     }
 }
 
-void Piano::deconfigureDirectModification(DirectModPreparation::Ptr mod)
+void Piano::deconfigureDirectModification(DirectModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
 {
     int whichMod = mod->getId();
     
-    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
-    
     for (auto keymap : whichKeymaps)
     {
-        for (auto key : keymap->keys())
+        for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
         {
             // Remove ModPrepMap from Key
             modificationMaps[key]->removeModPrepMap(PreparationTypeDirect, whichMod);
@@ -179,9 +159,6 @@ void Piano::deconfigureDirectModification(DirectModPreparation::Ptr mod)
 
 void Piano::configureNostalgicModification(int key, NostalgicModPreparation::Ptr dmod, Array<int> whichPreps)
 {
-    
-    Nostalgic::PtrArr whichNostalgic = dmod->getTargets();
-    
     DBG("key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
     
     int whichMod = dmod->getId();
@@ -213,18 +190,87 @@ void Piano::configureNostalgicModification(int key, NostalgicModPreparation::Ptr
     }
 }
 
-void Piano::configureNostalgicModification(NostalgicModPreparation::Ptr mod)
+void Piano::configureModifications(ModificationMapper::PtrArr mods)
 {
-    Array<int> whichPreps = getAllIds(mod->getTargets());
-    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
+    for (auto mod : mods)
+    {
+        configureModification(mod);
+    }
+}
+
+void Piano::deconfigureModification(ModificationMapper::Ptr map)
+{
+    Array<int> whichPreps = map->getTargets();
+    Array<int> whichKeymaps = map->getKeymaps();
     
+    BKPreparationType type = map->getType();
+    int Id = map->getId();
+    
+    if (type == PreparationTypeDirectMod)
+    {
+        deconfigureDirectModification(modDirect->getUnchecked(Id), whichKeymaps, whichPreps);
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        deconfigureSynchronicModification(modSynchronic->getUnchecked(Id), whichKeymaps, whichPreps);
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        deconfigureNostalgicModification(modNostalgic->getUnchecked(Id), whichKeymaps, whichPreps);
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        deconfigureTuningModification(modTuning->getUnchecked(Id), whichKeymaps, whichPreps);
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        deconfigureTempoModification(modTempo->getUnchecked(Id), whichKeymaps, whichPreps);
+    }
+}
+
+void Piano::configureModification(ModificationMapper::Ptr map)
+{
+    map->print();
+    DBG("numKeymaps: " + String(bkKeymaps->size()));
+    
+    Array<int> whichPreps = map->getTargets();
+    Array<int> whichKeymaps = map->getKeymaps();
+
+    BKPreparationType type = map->getType();
+    int Id = map->getId();
+    
+    if (type == PreparationTypeDirectMod)
+    {
+        configureDirectModification(modDirect->getUnchecked(Id), whichKeymaps, whichPreps);
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        configureSynchronicModification(modSynchronic->getUnchecked(Id), whichKeymaps, whichPreps);
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        configureNostalgicModification(modNostalgic->getUnchecked(Id), whichKeymaps, whichPreps);
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        configureTuningModification(modTuning->getUnchecked(Id), whichKeymaps, whichPreps);
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        configureTempoModification(modTempo->getUnchecked(Id), whichKeymaps, whichPreps);
+    }
+}
+
+
+void Piano::configureNostalgicModification(NostalgicModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
+{
     Array<int> otherKeys;
     
     for (int i = 0; i < 128; i++) otherKeys.add(i);
     
     for (auto keymap : whichKeymaps)
     {
-        for (auto key : keymap->keys())
+        for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
         {
             configureNostalgicModification(key, mod, whichPreps);
             otherKeys.remove(key);
@@ -238,8 +284,6 @@ void Piano::deconfigureNostalgicModificationForKeys(NostalgicModPreparation::Ptr
 {
     int whichMod = mod->getId();
     
-    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
-    
     for (auto key : keys)
     {
         // Remove ModPrepMap from Key
@@ -250,15 +294,13 @@ void Piano::deconfigureNostalgicModificationForKeys(NostalgicModPreparation::Ptr
     }
 }
 
-void Piano::deconfigureNostalgicModification(NostalgicModPreparation::Ptr mod)
+void Piano::deconfigureNostalgicModification(NostalgicModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
 {
     int whichMod = mod->getId();
     
-    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
-    
     for (auto keymap : whichKeymaps)
     {
-        for (auto key : keymap->keys())
+        for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
         {
             // Remove ModPrepMap from Key
             modificationMaps[key]->removeModPrepMap(PreparationTypeNostalgic, whichMod);
@@ -272,9 +314,6 @@ void Piano::deconfigureNostalgicModification(NostalgicModPreparation::Ptr mod)
 
 void Piano::configureSynchronicModification(int key, SynchronicModPreparation::Ptr dmod, Array<int> whichPreps)
 {
-    
-    Synchronic::PtrArr whichSynchronic = dmod->getTargets();
-    
     int whichMod = dmod->getId();
     
     // Find or make new ModPrepMap
@@ -305,18 +344,15 @@ void Piano::configureSynchronicModification(int key, SynchronicModPreparation::P
     }
 }
 
-void Piano::configureSynchronicModification(SynchronicModPreparation::Ptr mod)
+void Piano::configureSynchronicModification(SynchronicModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
 {
-    Array<int> whichPreps = getAllIds(mod->getTargets());
-    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
-    
     Array<int> otherKeys;
     
     for (int i = 0; i < 128; i++) otherKeys.add(i);
     
     for (auto keymap : whichKeymaps)
     {
-        for (auto key : keymap->keys())
+        for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
         {
             configureSynchronicModification(key, mod, whichPreps);
             otherKeys.remove(key);
@@ -329,9 +365,7 @@ void Piano::configureSynchronicModification(SynchronicModPreparation::Ptr mod)
 void Piano::deconfigureSynchronicModificationForKeys(SynchronicModPreparation::Ptr mod, Array<int> keys)
 {
     int whichMod = mod->getId();
-    
-    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
-    
+
     for (auto key : keys)
     {
         // Remove ModPrepMap from Key
@@ -342,15 +376,13 @@ void Piano::deconfigureSynchronicModificationForKeys(SynchronicModPreparation::P
     }
 }
 
-void Piano::deconfigureSynchronicModification(SynchronicModPreparation::Ptr mod)
+void Piano::deconfigureSynchronicModification(SynchronicModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
 {
     int whichMod = mod->getId();
     
-    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
-    
     for (auto keymap : whichKeymaps)
     {
-        for (auto key : keymap->keys())
+        for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
         {
             // Remove ModPrepMap from Key
             modificationMaps[key]->removeModPrepMap(PreparationTypeSynchronic, whichMod);
@@ -363,9 +395,6 @@ void Piano::deconfigureSynchronicModification(SynchronicModPreparation::Ptr mod)
 
 void Piano::configureTempoModification(int key, TempoModPreparation::Ptr dmod, Array<int> whichPreps)
 {
-    
-    Tempo::PtrArr whichTempo = dmod->getTargets();
-    
     DBG("key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
     
     int whichMod = dmod->getId();
@@ -402,18 +431,15 @@ void Piano::configureTempoModification(int key, TempoModPreparation::Ptr dmod, A
 }
 
 
-void Piano::configureTempoModification(TempoModPreparation::Ptr mod)
+void Piano::configureTempoModification(TempoModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
 {
-    Array<int> whichPreps = getAllIds(mod->getTargets());
-    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
-    
     Array<int> otherKeys;
     
     for (int i = 0; i < 128; i++) otherKeys.add(i);
     
     for (auto keymap : whichKeymaps)
     {
-        for (auto key : keymap->keys())
+        for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
         {
             configureTempoModification(key, mod, whichPreps);
             otherKeys.remove(key);
@@ -427,8 +453,6 @@ void Piano::deconfigureTempoModificationForKeys(TempoModPreparation::Ptr mod, Ar
 {
     int whichMod = mod->getId();
     
-    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
-    
     for (auto key : keys)
     {
         // Remove ModPrepMap from Key
@@ -441,15 +465,13 @@ void Piano::deconfigureTempoModificationForKeys(TempoModPreparation::Ptr mod, Ar
     }
 }
 
-void Piano::deconfigureTempoModification(TempoModPreparation::Ptr mod)
+void Piano::deconfigureTempoModification(TempoModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
 {
     int whichMod = mod->getId();
     
-    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
-    
     for (auto keymap : whichKeymaps)
     {
-        for (auto key : keymap->keys())
+        for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
         {
             // Remove ModPrepMap from Key
             modificationMaps[key]->removeModPrepMap(PreparationTypeTempo, whichMod);
@@ -464,9 +486,6 @@ void Piano::deconfigureTempoModification(TempoModPreparation::Ptr mod)
 
 void Piano::configureTuningModification(int key, TuningModPreparation::Ptr dmod, Array<int> whichPreps)
 {
-    DBG("CONFIGURING Tuning MODIFICATION");
-    
-    Tuning::PtrArr whichTuning = dmod->getTargets();
     
     DBG("key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
     
@@ -503,18 +522,15 @@ void Piano::configureTuningModification(int key, TuningModPreparation::Ptr dmod,
     }
 }
 
-void Piano::configureTuningModification(TuningModPreparation::Ptr mod)
+void Piano::configureTuningModification(TuningModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
 {
-    Array<int> whichPreps = getAllIds(mod->getTargets());
-    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
-    
     Array<int> otherKeys;
     
     for (int i = 0; i < 128; i++) otherKeys.add(i);
     
     for (auto keymap : whichKeymaps)
     {
-        for (auto key : keymap->keys())
+        for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
         {
             configureTuningModification(key, mod, whichPreps);
             otherKeys.remove(key);
@@ -528,8 +544,6 @@ void Piano::deconfigureTuningModificationForKeys(TuningModPreparation::Ptr mod, 
 {
     int whichMod = mod->getId();
     
-    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
-    
     for (auto key : keys)
     {
         // Remove ModPrepMap from Key
@@ -542,15 +556,13 @@ void Piano::deconfigureTuningModificationForKeys(TuningModPreparation::Ptr mod, 
     }
 }
 
-void Piano::deconfigureTuningModification(TuningModPreparation::Ptr mod)
+void Piano::deconfigureTuningModification(TuningModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
 {
     int whichMod = mod->getId();
     
-    Keymap::PtrArr whichKeymaps = mod->getKeymaps();
-    
     for (auto keymap : whichKeymaps)
     {
-        for (auto key : keymap->keys())
+        for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
         {
             // Remove ModPrepMap from Key
             modificationMaps[key]->removeModPrepMap(PreparationTypeTuning, whichMod);
@@ -567,7 +579,7 @@ void Piano::deconfigureTuningModification(TuningModPreparation::Ptr mod)
 // Add preparation map, return its Id.
 int Piano::addPreparationMap(void)
 {
-    prepMaps.add(new PreparationMap(bkKeymaps[0],
+    prepMaps.add(new PreparationMap(bkKeymaps->getUnchecked(0),
                                     numPMaps));
     
     prepMaps[numPMaps]->prepareToPlay(sampleRate);
@@ -583,7 +595,7 @@ int Piano::addPreparationMap(void)
 // Add preparation map, return its Id.
 int Piano::addPreparationMap(Keymap::Ptr keymap)
 {
-    prepMaps.add(new PreparationMap(bkKeymaps[0],
+    prepMaps.add(new PreparationMap(bkKeymaps->getUnchecked(0),
                                     numPMaps));
     
     prepMaps[numPMaps]->prepareToPlay(sampleRate);
@@ -643,10 +655,10 @@ ValueTree Piano::getState(void)
     
     pianoVT.setProperty("bkPianoName", getName(), 0);
     
-    int pmapCount = 0;
+    int prepMapCount = 0;
     for (auto pmap : getPreparationMaps())
     {
-        ValueTree pmapVT( vtagPrepMap+String(pmapCount++));
+        ValueTree pmapVT( vtagPrepMap+String(prepMapCount++));
         pmapVT.setProperty( ptagPrepMap_keymapId, pmap->getKeymapId(), 0);
         
         int pcount = 0;
@@ -673,48 +685,46 @@ ValueTree Piano::getState(void)
         pianoVT.addChild(pmapVT, -1, 0);
     }
     
-    pmapCount = 0;
-    
-    int resetCount = 0, modCount = 0;
-    
+    // Mapper Saving
+    int mapCount = 0;
+    for (auto map : mappers)
+    {
+        ValueTree mapVT ("mapper"+String(mapCount++));
+        
+        mapVT.setProperty("type", map->getType(), 0);
+        
+        mapVT.setProperty("Id", map->getId(), 0);
+        
+        int pcount = 0;
+        for (auto keymap : map->getKeymaps())
+        {
+            mapVT.setProperty("k"+String(pcount++), keymap, 0);
+        }
+        
+        pcount = 0;
+        for (auto target : map->getTargets())
+        {
+            mapVT.setProperty("t"+String(pcount++), target, 0);
+        }
+        
+        pianoVT.addChild(mapVT, -1, 0);
+    }
+
+    int resetCount = 0;
+    int pianoMapCount = 0;
     // Iterate through all keys and write data from PianoMap and ModMap to ValueTree
     for (int key = 0; key < 128; key++)
     {
-        if (pianoMap[key] != 0)
+        if (pianoMap[key] != -1)
         {
-            ValueTree pmapVT( vtagPianoMap + String(pmapCount++));
+            ValueTree pmapVT( vtagPianoMap + String(pianoMapCount++));
             
             pmapVT.setProperty( ptagPianoMap_key, key, 0);
             pmapVT.setProperty( ptagPianoMap_piano, pianoMap[key], 0);
             
             pianoVT.addChild(pmapVT, -1, 0);
         }
-        
-        ModPrepMap::PtrArr theMods = modificationMaps[key]->getModPrepMaps();
-        
-        if (theMods.size())
-        {
-            ValueTree modVT ("mod"+String(modCount++));
-            modVT.setProperty( ptagModX_key, key, 0);
-            
-            for (int thisOne = 0; thisOne < theMods.size(); thisOne++)
-            {
-                ModPrepMap::Ptr thisMod = theMods[thisOne];
-                
-                ValueTree thisModVT("m"+String(thisOne));
-                thisModVT.setProperty("type", (int)thisMod->getType(), 0);
-                thisModVT.setProperty("id", thisMod->getId(), 0);
-                
-                int pcount = 0;
-                for (auto prep : thisMod->getPreparations())
-                    thisModVT.setProperty("p"+String(pcount++), prep, 0);
-                
-                modVT.addChild(thisModVT, -1, 0);
-            }
-            
-            pianoVT.addChild(modVT, -1, 0);
-        }
-        
+
         // RESET SAVING
         if (modMap[key]->directReset.size() ||
             modMap[key]->nostalgicReset.size() ||
@@ -755,7 +765,7 @@ ValueTree Piano::getState(void)
 void Piano::setState(XmlElement* e)
 {
     int i; float f;
-    int pianoMapCount = 0, prepMapCount = 0, modCount = 0, resetCount = 0;
+    int pianoMapCount = 0, prepMapCount = 0, modCount = 0, resetCount = 0, mapperCount = 0;
     
     String pianoName = e->getStringAttribute("bkPianoName");
     
@@ -764,8 +774,48 @@ void Piano::setState(XmlElement* e)
     
     forEachXmlChildElement (*e, pc)
     {
+        String map =  "mapper" + String(mapperCount);
         
-        if (pc->hasTagName( vtagPianoMap + String(pianoMapCount)))
+        DBG(map);
+                                         
+        if (pc->hasTagName(map))
+        {
+            DBG("made it in mapper");
+            i = pc->getStringAttribute("type").getIntValue();
+            BKPreparationType type = (BKPreparationType) i;
+            
+            i = pc->getStringAttribute("Id").getIntValue();
+            int Id = i;
+            
+            Array<int> keymaps;
+            for (int k = 0; k < 500; k++) // arbitrary
+            {
+                String attr = pc->getStringAttribute("k" + String(k));
+                
+                if (attr == String::empty)  break;
+                else                        keymaps.add(attr.getIntValue());
+            }
+            
+            Array<int> targets;
+            for (int k = 0; k < 500; k++) // arbitrary
+            {
+                String attr = pc->getStringAttribute("t" + String(k));
+                
+                if (attr == String::empty)  break;
+                else                        targets.add(attr.getIntValue());
+            }
+            
+            ModificationMapper::Ptr mapper = new ModificationMapper(type, Id, keymaps, targets);
+            
+            mapper->print();
+            
+            configureModification(mapper);
+            
+            mappers.add(mapper);
+            
+            ++mapperCount;
+        }
+        else if (pc->hasTagName( vtagPianoMap + String(pianoMapCount)))
         {
             // PianoMap
             i = pc->getStringAttribute(ptagPianoMap_key).getIntValue();
@@ -782,7 +832,7 @@ void Piano::setState(XmlElement* e)
         {
             // PrepMap
             i = pc->getStringAttribute(ptagPrepMap_keymapId).getIntValue();
-            Keymap::Ptr keymap = bkKeymaps[i];
+            Keymap::Ptr keymap = bkKeymaps->getUnchecked(i);
             
             addPreparationMap(); // should clean up this functionality . pretty bad
             
@@ -794,7 +844,7 @@ void Piano::setState(XmlElement* e)
                 String attr = pc->getStringAttribute(ptagPrepMap_synchronicPrepId + String(k));
                 
                 if (attr == String::empty)  break;
-                else                        sync.add(synchronic[attr.getIntValue()]);
+                else                        sync.add(synchronic->getUnchecked(attr.getIntValue()));
                 
             }
             prepMaps[prepMapCount]->setSynchronic(sync);
@@ -805,7 +855,7 @@ void Piano::setState(XmlElement* e)
                 String attr = pc->getStringAttribute(ptagPrepMap_nostalgicPrepId + String(k));
                 
                 if (attr == String::empty)  break;
-                else                        nost.add(nostalgic[attr.getIntValue()]);
+                else                        nost.add(nostalgic->getUnchecked(attr.getIntValue()));
                 
             }
             prepMaps[prepMapCount]->setNostalgic(nost);
@@ -817,7 +867,7 @@ void Piano::setState(XmlElement* e)
                 String attr = pc->getStringAttribute(ptagPrepMap_directPrepId + String(k));
                 
                 if (attr == String::empty)  break;
-                else                        drct.add(direct[attr.getIntValue()]);
+                else                        drct.add(direct->getUnchecked(attr.getIntValue()));
                 
             }
             prepMaps[prepMapCount]->setDirect(drct);
@@ -828,7 +878,7 @@ void Piano::setState(XmlElement* e)
                 String attr = pc->getStringAttribute(ptagPrepMap_tuningPrepId + String(k));
                 
                 if (attr == String::empty)  break;
-                else                        tune.add(tuning[attr.getIntValue()]);
+                else                        tune.add(tuning->getUnchecked(attr.getIntValue()));
                 
             }
             prepMaps[prepMapCount]->setTuning(tune);
@@ -839,159 +889,12 @@ void Piano::setState(XmlElement* e)
                 String attr = pc->getStringAttribute(ptagPrepMap_tempoPrepId + String(k));
                 
                 if (attr == String::empty)  break;
-                else                        tmp.add(tempo[attr.getIntValue()]);
+                else                        tmp.add(tempo->getUnchecked(attr.getIntValue()));
                 
             }
             prepMaps[prepMapCount]->setTempo(tmp);
             
             ++prepMapCount;
-        }
-        else if (pc->hasTagName( "mod" + String(modCount)))
-        {
-            int key = pc->getStringAttribute(ptagModX_key).getIntValue();
-            
-            int subModCount = 0;
-            forEachXmlChildElement (*pc, mod)
-            {
-                if (mod->hasTagName("m"+String(subModCount)))
-                {
-                    BKPreparationType type = (BKPreparationType)mod->getStringAttribute("type").getIntValue();
-                    int whichMod = mod->getStringAttribute("id").getIntValue();
-                    
-                    Array<int> whichPreps;
-                    for (int p = 0; p < 200; p++) //arbitrary 200
-                    {
-                        String attr = mod->getStringAttribute("p" + String(p));
-                        
-                        if (attr == String::empty)  break;
-                        else                        whichPreps.add(attr.getIntValue());
-                    }
-                    
-                    if (whichPreps.size())
-                        modificationMaps[key]->addModPrepMap(new ModPrepMap(type, whichMod, whichPreps));
-                    
-                    // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ PUT IN OWN FUNCTION IN PIANOOOOO ~ ~ ~ ~ ~ ~ ~ ~ ~
-                    if (type == PreparationTypeDirect)
-                    {
-                        DirectModPreparation::Ptr dmod = modDirect[whichMod];
-                        
-                        for (int n = cDirectParameterTypes.size(); --n >= 0; )
-                        {
-                            String param = dmod->getParam((DirectParameterType)n);
-                            
-                            if (param != "")
-                            {
-                                for (auto prep : whichPreps)
-                                {
-                                    modMap[key]->addDirectModification(new DirectModification(key, prep, (DirectParameterType)n, param, whichMod));
-                                    
-                                    DBG("[ADDINGMOD] whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cDirectParameterTypes[n] + " val: " +param);
-                                    
-                                }
-                                
-                                
-                            }
-                        }
-                    }
-                    else if (type == PreparationTypeSynchronic)
-                    {
-                        SynchronicModPreparation::Ptr smod = modSynchronic[whichMod];
-                        
-                        for (int n = cSynchronicParameterTypes.size(); --n >= 0; )
-                        {
-                            String param = smod->getParam((SynchronicParameterType)n);
-                            
-                            if (param != "")
-                            {
-                                for (auto prep : whichPreps)
-                                {
-                                    modMap[key]->addSynchronicModification(new SynchronicModification(key, prep, (SynchronicParameterType)n, param, whichMod));
-                                    
-                                    DBG("[ADDINGMOD] whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cSynchronicParameterTypes[n] + " val: " +param);
-                                    
-                                }
-                                
-                                
-                            }
-                        }
-                    }
-                    else if (type == PreparationTypeNostalgic)
-                    {
-                        NostalgicModPreparation::Ptr nmod = modNostalgic[whichMod];
-                        
-                        for (int n = cNostalgicParameterTypes.size(); --n >= 0; )
-                        {
-                            String param = nmod->getParam((NostalgicParameterType)n);
-                            
-                            if (param != "")
-                            {
-                                for (auto prep : whichPreps)
-                                {
-                                    modMap[key]->addNostalgicModification(new NostalgicModification(key, prep, (NostalgicParameterType)n, param, whichMod));
-                                    
-                                    DBG("[ADDINGMOD] whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cNostalgicParameterTypes[n] + " val: " +param);
-                                    
-                                }
-                                
-                                
-                            }
-                        }
-                    }
-                    else if (type == PreparationTypeTuning)
-                    {
-                        TuningModPreparation::Ptr tmod = modTuning[whichMod];
-                        
-                        for (int n = cTuningParameterTypes.size(); --n >= 0; )
-                        {
-                            String param = tmod->getParam((TuningParameterType)n);
-                            
-                            if (param != "")
-                            {
-                                for (auto prep : whichPreps)
-                                {
-                                    modMap[key]->addTuningModification(new TuningModification(key, prep, (TuningParameterType)n, param, whichMod));
-                                    
-                                    DBG("[ADDINGMOD] whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cTuningParameterTypes[n] + " val: " +param);
-                                    
-                                }
-                                
-                                
-                            }
-                        }
-                    }
-                    else if (type == PreparationTypeTempo)
-                    {
-                        TempoModPreparation::Ptr mmod = modTempo[whichMod];
-                        
-                        for (int n = cTempoParameterTypes.size(); --n >= 0; )
-                        {
-                            String param = mmod->getParam((TempoParameterType)n);
-                            
-                            if (param != "")
-                            {
-                                for (auto prep : whichPreps)
-                                {
-                                    modMap[key]->addTempoModification(new TempoModification(key, prep, (TempoParameterType)n, param, whichMod));
-                                    
-                                    DBG("[ADDINGMOD] whichmod: " + String(whichMod) +" whichprep: " + String(prep) + " whichtype: " + cTempoParameterTypes[n] + " val: " +param);
-                                    
-                                }
-                                
-                                
-                            }
-                        }
-                    }
-                    // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-                    
-                    ++subModCount;
-                }
-                
-                
-                
-            }
-            
-            
-            ++modCount;
         }
         else if (pc->hasTagName( vtagReset + String(resetCount))) // RESET LOADING
         {

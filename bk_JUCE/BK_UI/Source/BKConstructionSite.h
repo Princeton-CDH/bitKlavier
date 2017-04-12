@@ -103,7 +103,7 @@ private:
     
     void draw(void)
     {
-        int keymapCount = 0, prepCount = 0, otherCount = 0;
+        int keymapCount = 0, prepCount = 0, otherCount = 0, modCount = 0;
         for (auto item : graph->getAllItems())
         {
             BKPreparationType type = item->getType();
@@ -126,6 +126,15 @@ private:
                 item->setBounds(25 + (row * 155), 200 + (col * 25), 150, 20);
                 
                 prepCount++;
+            }
+            else if (type > PreparationTypeKeymap)
+            {
+                int col = (int)(modCount / 4);
+                int row = modCount % 4;
+                
+                item->setBounds(110 + (row * 155), 125 + (col * 25), 130, 20);
+                
+                modCount++;
             }
             else
             {

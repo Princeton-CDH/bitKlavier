@@ -531,9 +531,8 @@ void Gallery::setStateFromJson(var myJson)
                     
                     TuningModPreparation::Ptr myMod = new TuningModPreparation(modTuning.size());
                     
-                    //DBG("JSON import: setting tuning mod fund and scale " + note + " " + String(fund) + " " + tun + " " + String(tscale));
                     myMod->setParam(TuningFundamental, String(fund));
-                    //myMod->setParam(TuningScale, String(tscale));
+                    myMod->setParam(TuningScale, String(tscale));
                     
                     bool dontAdd = false; int whichTMod = 0;
                     for (int c = modTuning.size(); --c>=0;)
@@ -552,34 +551,45 @@ void Gallery::setStateFromJson(var myJson)
                         whichTMod = modTuning.size()-1;
                     }
                     
-                    int whichPrep = direct[dId]->aPrep->getTuning()->getId();
-                    thisPiano->modMap[noteNumber]->addTuningModification(new TuningModification(noteNumber, whichPrep, TuningFundamental, String(fund), whichTMod));
+                    // Make new keymap
+                    Keymap::Ptr keymap = new Keymap(bkKeymaps.size());
+                    keymap->addNote(noteNumber);
                     
-                    ++modTuningCount;
-                    
-                    // duh; probably shouldn't do such a coarse repeat, but OTOH this is really just a backwards compatability hack...
-                    TuningModPreparation::Ptr myMod2 = new TuningModPreparation(modTuning.size());
-                    myMod2->setParam(TuningScale, String(tscale));
-                    
-                    dontAdd = false; whichTMod = 0;
-                    for (int c = modTuning.size(); --c>=0;)
+                    // Compare against current keymaps.
+                    alreadyExists = false; which = 0;
+                    for (int t = 0; t < bkKeymaps.size()-1; t++)
                     {
-                        if (myMod2->compare(modTuning[c]))
+                        if (keymap->compare(bkKeymaps[t]))
                         {
-                            whichTMod = c;
-                            dontAdd = true;
-                            break;
+                            alreadyExists = true;
+                            which = t;
                         }
                     }
                     
-                    if (!dontAdd)
+                    Keymap::Ptr pmapkeymap = bkKeymaps[which];
+                    if (!alreadyExists)
                     {
-                        addTuningMod(myMod2);
-                        whichTMod = modTuning.size()-1;
+                        addKeymap(keymap);
+                        pmapkeymap = bkKeymaps.getLast();
+                        
+                        DBG("adding keymap");
                     }
                     
-                    whichPrep = direct[dId]->aPrep->getTuning()->getId();
-                    thisPiano->modMap[noteNumber]->addTuningModification(new TuningModification(noteNumber, whichPrep, TuningScale, String(tscale), whichTMod));
+                    Array<int> whichTargets;
+                    
+                    whichTargets.add(dId);
+                    
+                    Array<int> whichKeymaps;
+                    
+                    whichKeymaps.add(pmapkeymap->getId());
+                    
+                    ModificationMapper::Ptr thisMapper = new ModificationMapper(PreparationTypeTuningMod, whichTMod, whichKeymaps, whichTargets);
+                    
+                    thisPiano->addMapper(thisMapper);
+                    
+                    thisMapper->print();
+                    
+                    thisPiano->configureModification(thisMapper);
                     
                     ++modTuningCount;
                     
