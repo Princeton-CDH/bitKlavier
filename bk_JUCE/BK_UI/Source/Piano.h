@@ -74,13 +74,14 @@ public:
     int                         numPMaps;
     
     OwnedArray<Modifications> modMap;
-    OwnedArray<ModificationMap> modificationMaps;
     
     ModificationMapper::PtrArr mappers;
     
     inline ModificationMapper::PtrArr getMappers(void) const noexcept { return mappers; }
     
     inline ModificationMapper::Ptr getMapper(int which) { return mappers[which]; }
+    
+    inline void clearMapper(void) { mappers.clear(); }
     
     inline ModificationMapper::Ptr getMapper(BKPreparationType type, int Id)
     {
@@ -147,15 +148,15 @@ public:
         for (int i = 0; i < 128; i++)
         {
             String ptype = "";
-            for (auto mpm : modificationMaps[i]->getModPrepMaps())
+            for (auto map : mappers)
             {
-                if (mpm->getType() == PreparationTypeDirect) ptype = "d";
-                else if (mpm->getType() == PreparationTypeNostalgic) ptype = "n";
-                else if (mpm->getType() == PreparationTypeSynchronic) ptype = "s";
-                else if (mpm->getType() == PreparationTypeTuning) ptype = "t";
-                else if (mpm->getType() == PreparationTypeTempo) ptype = "m";
+                if (map->getType() == PreparationTypeDirect) ptype = "d";
+                else if (map->getType() == PreparationTypeNostalgic) ptype = "n";
+                else if (map->getType() == PreparationTypeSynchronic) ptype = "s";
+                else if (map->getType() == PreparationTypeTuning) ptype = "t";
+                else if (map->getType() == PreparationTypeTempo) ptype = "m";
                 
-                out += String(i) + ":" + ptype + String(mpm->getId()) + ":" + "{" + intArrayToString(mpm->getPreparations()) +"} ";
+                out += String(i) + ":" + ptype + String(map->getId()) + ":" + "{" + intArrayToString(map->getTargets()) +"} ";
                 
             }
         }

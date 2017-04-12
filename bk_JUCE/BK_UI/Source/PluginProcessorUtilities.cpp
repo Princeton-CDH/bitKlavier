@@ -79,6 +79,8 @@ void BKAudioProcessor::updateGalleries()
 {
     collectGalleries();
     
+    updateState->setAllCurrentIdsTo(0);
+    
     updateState->galleryDidChange = true;
 }
 

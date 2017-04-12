@@ -101,6 +101,7 @@ private:
     BKItemGraph* graph;
     
     
+#define NUM_COL 6
     void draw(void)
     {
         int keymapCount = 0, prepCount = 0, otherCount = 0, modCount = 0;
@@ -111,37 +112,37 @@ private:
             
             if (type == PreparationTypeKeymap)
             {
-                int col = (int)(keymapCount / 4);
-                int row = keymapCount % 4;
+                int col = (int)(keymapCount / NUM_COL);
+                int row = keymapCount % NUM_COL;
                 
-                item->setBounds(25 + (row * 155), 50 + (col * 25), 150, 20);
+                item->setBounds(10 + (row * 155), 50 + (col * 25), 150, 20);
 
                 keymapCount++;
             }
             else if (type <= PreparationTypeNostalgic)
             {
-                int col = (int)(prepCount / 4);
-                int row = prepCount % 4;
+                int col = (int)(prepCount / NUM_COL);
+                int row = prepCount % NUM_COL;
                 
-                item->setBounds(25 + (row * 155), 200 + (col * 25), 150, 20);
+                item->setBounds(10 + (row * 155), 200 + (col * 25), 150, 20);
                 
                 prepCount++;
             }
             else if (type > PreparationTypeKeymap)
             {
-                int col = (int)(modCount / 4);
-                int row = modCount % 4;
+                int col = (int)(modCount / NUM_COL);
+                int row = modCount % NUM_COL;
                 
-                item->setBounds(110 + (row * 155), 125 + (col * 25), 130, 20);
+                item->setBounds(95 + (row * 155), 125 + (col * 25), 130, 20);
                 
                 modCount++;
             }
             else
             {
-                int col = (int)(otherCount / 4);
-                int row = otherCount % 4;
+                int col = (int)(otherCount / NUM_COL);
+                int row = otherCount % NUM_COL;
                 
-                item->setBounds(25 + (row * 155), 350 + (col * 25), 150, 20);
+                item->setBounds(10 + (row * 155), 350 + (col * 25), 150, 20);
                 otherCount++;
             }
             

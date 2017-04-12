@@ -147,6 +147,9 @@ void GalleryViewController::update(void)
     if (processor.updateState->galleryDidChange)
     {
         processor.updateState->galleryDidChange = false;
+        
+        
+        
         switchGallery();
     }
     

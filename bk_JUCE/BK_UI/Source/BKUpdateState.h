@@ -55,6 +55,23 @@ public:
     BKPreparationDisplay currentPreparationDisplay = DisplayDirect;
     bool displayDidChange;
     
+    void setAllCurrentIdsTo(int val)
+    {
+        currentDirectId = val;
+        currentSynchronicId = val;
+        currentNostalgicId = val;
+        currentTempoId = val;
+        currentTuningId = val;
+        
+        currentModDirectId = val;
+        currentModSynchronicId = val;
+        currentModNostalgicId = val;
+        currentModTempoId = val;
+        currentModTuningId = val;
+        
+        currentKeymapId = val;
+    }
+    
 private:
 
 };

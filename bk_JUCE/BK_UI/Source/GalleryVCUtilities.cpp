@@ -329,7 +329,7 @@ String GalleryViewController::processModMapString(const String& s)
     DBG("clearing mod map");
     processor.currentPiano->clearModMap();
     
-    for (int i = 0; i < 128; i++) processor.currentPiano->modificationMaps[i]->clear();
+    processor.currentPiano->clearMapper();
     
     if (s.length() == 0) return out;
     
@@ -340,6 +340,8 @@ String GalleryViewController::processModMapString(const String& s)
     int whichMod = -1;
     
     Array<int> whichPreps;
+    
+    BKPreparationType type;
     
     Array<Array<int>> theModMap;
     
@@ -401,43 +403,11 @@ String GalleryViewController::processModMapString(const String& s)
                 
                 // Set piano map parameters.
                 // keys | mod id | prepIds
-                for (auto key : keys)
-                {
-                    
-                    if (itsADirect)
-                    {
-                        DirectModPreparation::Ptr dmod = processor.gallery->getDirectModPreparation(whichMod);
-                        
-                        //processor.currentPiano->configureDirectModification(key, dmod, whichPreps);
-                    }
-                    else if (itsANostalgic)
-                    {
-                        NostalgicModPreparation::Ptr nmod = processor.gallery->getNostalgicModPreparation(whichMod);
-                        
-                        //processor.currentPiano->configureNostalgicModification(key, nmod, whichPreps);
-                    }
-                    else if (itsASynchronic)
-                    {
-                        SynchronicModPreparation::Ptr smod = processor.gallery->getSynchronicModPreparation(whichMod);
-                        
-                        //processor.currentPiano->configureSynchronicModification(key, smod, whichPreps);
-                    }
-                    else if (itsATuning)
-                    {
-                        TuningModPreparation::Ptr tmod = processor.gallery->getTuningModPreparation(whichMod);
-                        
-                        //processor.currentPiano->configureTuningModification(key, tmod, whichPreps);
-                        
-                    }
-                    else if (itsATempo)
-                    {
-                        TempoModPreparation::Ptr mmod = processor.gallery->getTempoModPreparation(whichMod);
-                        
-                        //processor.currentPiano->configureTempoModification(key, mmod, whichPreps);
-                    }
-                    
-                }
                 
+                ModificationMapper::Ptr thisMapper = new ModificationMapper(type, whichMod, keys, whichPreps);
+                processor.currentPiano->addMapper(thisMapper);
+                processor.currentPiano->configureModification(thisMapper);
+
                 itsAKeymap = false;
                 itsADirect = false;
                 itsASynchronic = false;
@@ -461,22 +431,32 @@ String GalleryViewController::processModMapString(const String& s)
             else if (isDirect)
             {
                 itsADirect = true;
+                
+                type = PreparationTypeDirectMod;
             }
             else if (isTempo)
             {
                 itsATempo = true;
+                
+                type = PreparationTypeTempoMod;
             }
             else if (isSynchronic)
             {
                 itsASynchronic = true;
+                
+                type = PreparationTypeSynchronicMod;
             }
             else if (isTuning)
             {
                 itsATuning = true;
+                
+                type = PreparationTypeTuningMod;
             }
             else if (isNostalgic)
             {
                 itsANostalgic = true;
+                
+                type = PreparationTypeNostalgicMod;
             }
             else
             {
