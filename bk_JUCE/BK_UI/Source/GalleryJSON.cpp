@@ -577,7 +577,7 @@ void Gallery::setStateFromJson(var myJson)
                     
                     Array<int> whichTargets;
                     
-                    whichTargets.add(dId);
+                    whichTargets.add(direct[dId]->getTuningId());
                     
                     Array<int> whichKeymaps;
                     
