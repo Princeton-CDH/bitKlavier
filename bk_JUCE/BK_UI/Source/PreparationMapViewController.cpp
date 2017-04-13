@@ -109,7 +109,6 @@ void PreparationMapViewController::bkComboBoxDidChange        (ComboBox* box)
 
 void PreparationMapViewController::itemWasDropped (BKPreparationType type, Array<int> data, int x, int y)
 {
-    DBG("HEY");
     String added = "";
     
     if (type == PreparationTypeDirect)
@@ -376,7 +375,7 @@ String PreparationMapViewController::processPreparationString(String s)
     // pass arrays to prepMap
     processor.currentPiano->prepMaps[Id]->setSynchronic (sync);
     processor.currentPiano->prepMaps[Id]->setNostalgic  (nost);
-    processor.currentPiano->prepMaps[Id]->setDirect  (dire);
+    processor.currentPiano->prepMaps[Id]->setDirect     (dire);
     processor.currentPiano->prepMaps[Id]->setTempo      (tempo);
     processor.currentPiano->prepMaps[Id]->setTuning     (tuning);
     

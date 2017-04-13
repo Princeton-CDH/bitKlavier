@@ -492,8 +492,8 @@
   </piano15>
   <piano16 bkPianoName="Tuning1">
     <prepMap0 keymapId="1" d0="3"/>
-    <mapper0 type="9" Id="1" k0="4" t0="3"/>
-    <mapper1 type="9" Id="2" k0="5" t0="3"/>
+    <mapper0 type="9" Id="1" k0="4" t0="5"/>
+    <mapper1 type="9" Id="2" k0="5" t0="5"/>
   </piano16>
   <piano17 bkPianoName="Tuning2">
     <prepMap0 keymapId="1" d0="4" t0="6"/>

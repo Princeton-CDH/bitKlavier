@@ -770,6 +770,7 @@ void Piano::setState(XmlElement* e)
                 else                        drct.add(direct->getUnchecked(attr.getIntValue()));
                 
             }
+            DBG(pianoName + " direct: " + intArrayToString(getAllIds(drct)));
             prepMaps[prepMapCount]->setDirect(drct);
             
             Tuning::PtrArr tune;

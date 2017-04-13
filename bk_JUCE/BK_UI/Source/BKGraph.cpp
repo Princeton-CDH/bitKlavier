@@ -49,14 +49,11 @@ Id(Id)
         
         String name = cPreparationTypes[type];
         
+        
         if (type != PreparationTypeReset) name += String(Id);
         
         label.setText(name, dontSendNotification);
     }
-    
-    
-    DBG("constructed: " + name);
-    
 }
 
 BKItem::~BKItem()
@@ -305,7 +302,7 @@ void BKItemGraph::remove(BKItem* itemToRemove)
 {
     for (auto item : itemToRemove->getConnections())
     {
-        disconnect(itemToRemove, item);
+        disconnectUI(itemToRemove, item);
     }
     
     items.removeObject(itemToRemove);
@@ -1206,15 +1203,21 @@ Array<Line<float>> BKItemGraph::getLines(void)
     return lines;
 }
 
+
 void BKItemGraph::reconstruct(void)
 {
     preparations.clear();
     
     Piano::Ptr thisPiano = processor.currentPiano;
+    int pmapcount = 0;
     for (auto pmap : thisPiano->getPreparationMaps())
     {
+        
         // Keymap
         int keymapId = pmap->getKeymapId();
+        
+        DBG("PMAP"+String(pmapcount++));
+        DBG("    keymap"+String(keymapId));
         
         BKItem* keymap;
         BKItem* newPreparation;
@@ -1227,6 +1230,8 @@ void BKItemGraph::reconstruct(void)
         for (auto p : pmap->getTuning())
         {
             int Id = p->getId();
+            
+            DBG("    tuning"+String(Id));
             
             newPreparation = itemWithTypeAndId(PreparationTypeTuning, Id);
             
@@ -1241,6 +1246,8 @@ void BKItemGraph::reconstruct(void)
         {
             int Id = p->getId();
             
+            DBG("    tempo"+String(Id));
+            
             newPreparation = itemWithTypeAndId(PreparationTypeTempo, Id);
             
             if (!contains(newPreparation))
@@ -1253,6 +1260,8 @@ void BKItemGraph::reconstruct(void)
         for (auto p : pmap->getDirect())
         {
             int Id = p->getId();
+            
+            DBG("    direct"+String(Id));
             
             newPreparation = itemWithTypeAndId(PreparationTypeDirect, Id);
             
@@ -1276,6 +1285,8 @@ void BKItemGraph::reconstruct(void)
         for (auto p : pmap->getSynchronic())
         {
             int Id = p->getId();
+            
+            DBG("    synchronic"+String(Id));
             
             newPreparation = itemWithTypeAndId(PreparationTypeSynchronic, Id);
             
@@ -1310,6 +1321,8 @@ void BKItemGraph::reconstruct(void)
         for (auto p : pmap->getNostalgic())
         {
             int Id = p->getId();
+            
+            DBG("    nostalgic"+String(Id));
             
             newPreparation = itemWithTypeAndId(PreparationTypeNostalgic, Id);
 
@@ -1396,6 +1409,45 @@ void BKItemGraph::reconstruct(void)
             if (!contains(thisTarget)) items.add(thisTarget);
             
             connectUI(thisTarget, thisMod);
+        }
+    }
+    
+    Array<int> pianoMap = thisPiano->pianoMap;
+    int count = 0;
+    for (int i = 0; i < 128; i++)
+    {
+        if (pianoMap[i] != -1)
+        {
+            BKItem* thisMap = itemWithTypeAndId(PreparationTypePianoMap, count++);
+            
+            if (!contains(thisMap)) items.add(thisMap);
+            
+            thisMap->setSelectedId(pianoMap[i]);
+            
+            Keymap::PtrArr keymaps = processor.gallery->getKeymaps();
+            
+            Keymap::Ptr newKeymap = new Keymap(keymaps.size());
+            newKeymap->addNote(i);
+            
+            bool found = false;
+            
+            for (auto keymap : keymaps)
+            {
+                if (newKeymap->compare(keymap))
+                {
+                    newKeymap = keymap;
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found) processor.gallery->addKeymap(newKeymap);
+            
+            BKItem* thisKeymap = itemWithTypeAndId(PreparationTypeKeymap, newKeymap->getId());
+            
+            if (!contains(thisKeymap)) items.add(thisKeymap);
+            
+            connectUI(thisMap, thisKeymap);
         }
     }
     

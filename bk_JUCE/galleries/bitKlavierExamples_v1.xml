@@ -235,7 +235,7 @@
   <synchronic12 Id="12" name="12" tuningId="1" tempoId="0" numBeats="10000" clusterMin="2"
                 clusterMax="100" clusterThresh="1200" mode="0" beatsToSkip="-1">
     <beatMultipliers f0="1"/>
-    <lengthMultipliers f0="0.050000000745058059692"/>
+    <lengthMultipliers f0="0.15000000596046447754"/>
     <accentMultipliers f0="1"/>
     <transpOffsets>
       <t0 f0="0"/>
@@ -344,8 +344,8 @@
   <modNostalgic0>
     <transposition/>
   </modNostalgic0>
-  <keymap0 name=""/>
-  <keymap1 name="" k0="0" k1="1" k2="2" k3="3" k4="4" k5="5" k6="6" k7="7"
+  <keymap0 name="Empty"/>
+  <keymap1 name="2" k0="0" k1="1" k2="2" k3="3" k4="4" k5="5" k6="6" k7="7"
            k8="8" k9="9" k10="10" k11="11" k12="12" k13="13" k14="14" k15="15"
            k16="16" k17="17" k18="18" k19="19" k20="20" k21="21" k22="22"
            k23="23" k24="24" k25="25" k26="26" k27="27" k28="28" k29="29"
@@ -364,7 +364,7 @@
            k112="112" k113="113" k114="114" k115="115" k116="116" k117="117"
            k118="118" k119="119" k120="120" k121="121" k122="122" k123="123"
            k124="124" k125="125" k126="126" k127="127"/>
-  <keymap2 name="" k0="21" k1="22" k2="23" k3="24" k4="25" k5="26" k6="27"
+  <keymap2 name="3" k0="21" k1="22" k2="23" k3="24" k4="25" k5="26" k6="27"
            k7="28" k8="29" k9="30" k10="31" k11="32" k12="33" k13="34" k14="35"
            k15="36" k16="37" k17="38" k18="39" k19="40" k20="41" k21="42"
            k22="43" k23="44" k24="45" k25="46" k26="47" k27="48" k28="49"
@@ -377,7 +377,7 @@
            k71="92" k72="93" k73="94" k74="95" k75="96" k76="97" k77="98"
            k78="99" k79="100" k80="101" k81="102" k82="103" k83="104" k84="105"
            k85="106" k86="107" k87="108"/>
-  <keymap3 name="" k0="21" k1="22" k2="23" k3="24" k4="25" k5="26" k6="27"
+  <keymap3 name="4" k0="21" k1="22" k2="23" k3="24" k4="25" k5="26" k6="27"
            k7="28" k8="29" k9="30" k10="31" k11="32" k12="33" k13="34" k14="35"
            k15="36" k16="37" k17="38" k18="39" k19="40" k20="41" k21="42"
            k22="43" k23="44" k24="45" k25="46" k26="47" k27="48" k28="49"
@@ -390,12 +390,13 @@
            k71="92" k72="93" k73="94" k74="95" k75="96" k76="97" k77="98"
            k78="99" k79="100" k80="101" k81="102" k82="103" k83="104" k84="105"
            k85="106" k86="107" k87="108"/>
-  <keymap4 name="" k0="55"/>
-  <keymap5 name="" k0="60"/>
-  <keymap6 name="" k0="60" k1="62" k2="64"/>
-  <keymap7 name="" k0="48"/>
+  <keymap4 name="5" k0="55"/>
+  <keymap5 name="6" k0="60"/>
+  <keymap6 name="7" k0="60" k1="62" k2="64"/>
+  <keymap7 name="8" k0="48"/>
+  <keymap8 name="9" k0="72"/>
   <piano0 bkPianoName="Blank">
-    <prepMap0 keymapId="1" d0="1"/>
+    <prepMap0 keymapId="1"/>
   </piano0>
   <piano1 bkPianoName="Synchronic1">
     <prepMap0 keymapId="1" d0="2"/>
@@ -462,8 +463,8 @@
   </piano15>
   <piano16 bkPianoName="Tuning1">
     <prepMap0 keymapId="1" d0="3"/>
-    <mapper0 type="9" Id="1" k0="4" t0="3"/>
-    <mapper1 type="9" Id="2" k0="5" t0="3"/>
+    <mapper0 type="9" Id="1" k0="4" t0="5"/>
+    <mapper1 type="9" Id="2" k0="5" t0="5"/>
   </piano16>
   <piano17 bkPianoName="Tuning2">
     <prepMap0 keymapId="1" d0="4" t0="6"/>
@@ -503,20 +504,15 @@
     <prepMap1 keymapId="3" s0="15"/>
   </piano26>
   <piano27 bkPianoName="PresetKeymap1">
-    <prepMap0 keymapId="1" d0="1"/>
-    <prepMap1 keymapId="3" s0="16"/>
-    <prepMap2 keymapId="7" d0="8"/>
+    <prepMap0 keymapId="1" d0="1" s0="16"/>
     <pianoMap0 key="60" piano="29"/>
   </piano27>
   <piano28 bkPianoName="PresetKeymap2">
-    <prepMap0 keymapId="1" d0="1"/>
-    <prepMap1 keymapId="3" s0="12"/>
-    <prepMap2 keymapId="3" n0="6"/>
+    <prepMap0 keymapId="1" d0="1" n0="6" s0="12"/>
     <pianoMap0 key="72" piano="30"/>
   </piano28>
   <piano29 bkPianoName="PresetKeymap3">
-    <prepMap0 keymapId="1" d0="1"/>
-    <prepMap1 keymapId="3" s0="17"/>
+    <prepMap0 keymapId="1" d0="1" s0="17"/>
     <pianoMap0 key="48" piano="28"/>
   </piano29>
 </gallery>

@@ -58,6 +58,8 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
     Array<float> fa;
     Array<int> fi;
     
+    bkPianos.clear();
+    
     int pianoCount = 0, sPrepCount = 1, sModPrepCount = 1, nPrepCount = 1, nModPrepCount = 1, dPrepCount = 1, dModPrepCount = 1, tPrepCount = 1, tModPrepCount = 1, keymapCount = 1, tempoPrepCount = 1, tempoModPrepCount = 1;
     
     {
@@ -246,15 +248,15 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 }
                 else if (e->hasTagName( vtagPiano + String(pianoCount)))
                 {
-                    int whichPiano = pianoCount++;
-                    
-                    bkPianos.set(whichPiano, new Piano(&synchronic, &nostalgic, &direct, &tuning, &tempo,
-                                                       &modSynchronic, &modNostalgic, &modDirect, &modTuning, &modTempo,
-                                                       &bkKeymaps, whichPiano)); // initializing piano 0
-                    
-                    Piano::Ptr thisPiano = bkPianos[whichPiano];
+                    Piano::Ptr thisPiano = new Piano(&synchronic, &nostalgic, &direct, &tuning, &tempo,
+                                                     &modSynchronic, &modNostalgic, &modDirect, &modTuning, &modTempo,
+                                                     &bkKeymaps, pianoCount);
                     
                     thisPiano->setState(e);
+                    
+                    bkPianos.add(thisPiano); // initializing piano 0
+                    
+                    ++pianoCount;
                     
                 }
             }

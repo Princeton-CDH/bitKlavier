@@ -115,7 +115,7 @@ private:
                 int col = (int)(keymapCount / NUM_COL);
                 int row = keymapCount % NUM_COL;
                 
-                item->setBounds(10 + (row * 155), 50 + (col * 25), 150, 20);
+                item->setBounds(10 + (row * 155), 50 + (col * 25), 100, 40);
 
                 keymapCount++;
             }

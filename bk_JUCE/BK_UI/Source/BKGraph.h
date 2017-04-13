@@ -71,14 +71,15 @@ public:
     }
     
     inline int getSelectedId(void) const noexcept {return currentId;}
+    inline void setSelectedId(int Id) { menu.setSelectedId(Id, dontSendNotification); }
     
     // Public members
     Point<float> origin;
     
-    void bkTextFieldDidChange   (TextEditor&)           {};
-    void bkComboBoxDidChange    (ComboBox*)             ;
-    void bkButtonClicked        (Button* b)             {};
-    void bkMessageReceived      (const String& message) {};
+    void bkTextFieldDidChange   (TextEditor&)           override {};
+    void bkComboBoxDidChange    (ComboBox*)             override;
+    void bkButtonClicked        (Button* b)             override {};
+    void bkMessageReceived      (const String& message) override {};
     
 private:
     BKAudioProcessor& processor;
