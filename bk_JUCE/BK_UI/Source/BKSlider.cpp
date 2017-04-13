@@ -72,6 +72,7 @@ double BKSingleSlider::getValueFromText	(const String & text )
 }
 
 
+
 // **************************************************  BKMultiSlider ************************************************** //
 
 BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
@@ -174,7 +175,11 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     
     editValsTextField = new TextEditor();
     addAndMakeVisible(editValsTextField);
-    editValsTextField->setSize(sliderWidth, sliderHeight);
+    //editValsTextField->setMultiLine(true);
+    //editValsTextField->setScrollbarsShown(true);
+    //editValsTextField->setSize(sliderWidth, sliderHeight);
+    if(!arrangedHorizontally) editValsTextField->setSize(getWidth(), sliderHeight);
+    else editValsTextField->setSize(sliderWidth, sliderHeight);
     editValsTextField->addListener(this);
     
     initSizes();
@@ -228,6 +233,18 @@ void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
         int which = whichSubSlider(e);
         if(which >= 0) sliders[which]->showTextBox();
         updatingTextBox = true;
+    }
+}
+void BKMultiSlider::mouseUp (const MouseEvent &event)
+{
+    if(event.mouseWasClicked())
+    {
+        if(event.mods.isShiftDown())
+        {
+            //DBG("shift clicked on slider");
+            int which = whichSubSlider(event);
+            if(which >= 0) sliders[which]->setValue(sliderDefault);
+        }
     }
 }
 
@@ -295,7 +312,8 @@ void BKMultiSlider::resized()
     {
         //incDecSlider->setTopLeftPosition((int)(sliderWidth/2. - incDecSlider->getWidth()/2.), 0);
         incDecSlider->setTopLeftPosition(0, 0);
-        editTextButton->setTopRightPosition(getRight(), 0);
+        //editTextButton->setTopRightPosition(getRight(), 0);
+        editTextButton->setTopLeftPosition(incDecSlider->getRight(), 0);
         editValsTextField->setTopLeftPosition(0, 0);
         editValsTextField->setVisible(false);
         
@@ -383,27 +401,6 @@ void BKMultiSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 }
 
 
-String BKMultiSlider::textWindowDialog()
-{
-    //#if JUCE_MODAL_LOOPS_PERMITTED //this is a problem, apparently; need to find a different way to do this.
-    AlertWindow w ("Multislider Values",
-                   "Enter slider values by hand here...",
-                   AlertWindow::QuestionIcon);
-    
-    w.addTextEditor ("text", floatArrayToString(getAllValues()), "text field:");
-    
-    w.addButton ("OK",     1, KeyPress (KeyPress::returnKey, 0, 0));
-    w.addButton ("Cancel", 0, KeyPress (KeyPress::escapeKey, 0, 0));
-    
-    if (w.runModalLoop() != 0) // is they picked 'ok'
-    {
-        String text = w.getTextEditorContents ("text");
-        return text;
-    }
-    return("cancelled");
-    //#endif
-}
-
 void BKMultiSlider::buttonClicked (Button* button)
 {
     //setSize(10 * sliders[0]->getWidth() + editTextButton->getWidth(), sliders[0]->getHeight());
@@ -412,37 +409,8 @@ void BKMultiSlider::buttonClicked (Button* button)
     editValsTextField->setText(floatArrayToString(getAllValues()));
     
     //editValsTextField->setSize(getWidth() - editTextButton->getWidth(), editValsTextField->getHeight());
-    editValsTextField->setSize(numSliders * sliders[0]->getWidth(), editValsTextField->getHeight());
-    
-    /*
-    String newparams = textWindowDialog();
-    if(newparams != "cancelled")
-    {
-        //Array<Array<float>> newvals = stringToArrayFloatArray(newparams); //for transposition lists, with [] vals
-        Array<float> newvals = stringToFloatArray(newparams);
-
-        numSliders = newvals.size();
-        if(numSliders < 1) numSliders = 1;
-
-        for(int i=0; i<numSliders; i++)
-        {
-            if(i >= sliders.size()) addSubSlider();
-            
-            if(sliders[i]->getMaximum() < newvals[i]) sliders[i]->setRange(sliderMin, newvals[i], sliderIncrement);
-            if(sliders[i]->getMinimum() > newvals[i]) sliders[i]->setRange(newvals[i], sliderMax, sliderIncrement);
-            
-            sliders[i]->setValue(newvals[i]);
-            //DBG("new array val " + String(newvals[i]));
-        }
-        
-        if(sliders.size() > numSliders) sliders.removeRange(numSliders, sliders.size());
-        
-        resetRanges();
-        initSizes();
-        incDecSlider->setValue(numSliders, dontSendNotification);
-    }
-     */
-    
+    if(arrangedHorizontally) editValsTextField->setSize(numSliders * sliders[0]->getWidth(), editValsTextField->getHeight());
+    else editValsTextField->setSize(getWidth(), editValsTextField->getHeight());    
 }
 
 Array<float> BKMultiSlider::getAllValues()

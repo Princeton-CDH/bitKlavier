@@ -56,7 +56,7 @@ processor(p)
         modSynchronicTF[i]->setName("M"+cSynchronicParameterTypes[i]);
     }
     
-    sliderTest = new BKMultiSlider(VerticalMultiSlider); //or HorizontalMultiSlider, VerticalMultiSlider, HorizontalMultiBarSlider, VerticalMultiBarSlider
+    sliderTest = new BKMultiSlider(HorizontalMultiBarSlider); //or HorizontalMultiSlider, VerticalMultiSlider, HorizontalMultiBarSlider, VerticalMultiBarSlider
     addAndMakeVisible(sliderTest);
     
     
