@@ -18,13 +18,8 @@
  TODO
  -- expose basic parameters to top; max/min, etc... perhaps subSlider size
  -- display additional values and main value for clusters (like transposition vals [t1 t2 t3])?
- -- add control-click for opening edit window and selecting value where clicked, remove edit and +/- buttons
- -- add keystrokes where you can add/subtract sliders inside the multislider...\
- -- look and feel, with version of bar that is just a band, or multiple bands
     -- be able to click on one of multiple bands to move it
- -- remove number from display
  -- allow narrowing of sliders as numSlider increases
- -- displayVal slider that shows current value and also hovering value (hover over a slider in the multislider)
  -- highlight currentVal slider when synhronic is active
  -- possibly have faded out inactive sliders filling out a default width; dragging over them activates... ? have minimumSlidersToDisplay = 16, grey-out inactive ones
  */
@@ -36,6 +31,23 @@ typedef enum BKMultiSliderType {
     VerticalMultiBarSlider,
     BKMultiSliderTypeNil
 } BKMultiSliderType;
+
+
+class BKSliderLookAndFeel : public LookAndFeel_V3
+{
+
+public:
+    
+    BKSliderLookAndFeel()
+    {
+        //setColour (TextButton::buttonColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.13f));
+    }
+    ~BKSliderLookAndFeel() {}
+    
+    void drawLinearSlider (Graphics& g, int x, int y, int width, int height,
+                           float sliderPos, float minSliderPos, float maxSliderPos,
+                           const Slider::SliderStyle style, Slider& slider) override;     
+};
 
 
 class BKSingleSlider : public Slider
@@ -71,9 +83,12 @@ public:
     BKMultiSlider(BKMultiSliderType which);
     ~BKMultiSlider();
 
-    void addSubSlider();
+    void addSubSlider(int where);
+    void insertSubSlider(int where);
+    void deleteSubSlider(int where);
     void mouseDrag(const MouseEvent &e) override;
     void mouseDoubleClick (const MouseEvent &e) override;
+    void mouseDown (const MouseEvent &event) override;
     void mouseUp (const MouseEvent &event) override;
     int  whichSubSlider (const MouseEvent &e);
     void resetRanges();
@@ -82,6 +97,9 @@ public:
     Array<float> getAllValues();
     
 private:
+    
+    BKSliderLookAndFeel thisLookAndFeel;
+    
     bool dragging;
     bool arrangedHorizontally;
     bool sliderIsVertical;
@@ -93,7 +111,7 @@ private:
     double currentInvisibleSliderValue;
     
     OwnedArray<BKSingleSlider> sliders;
-    
+    BKSingleSlider* displaySlider;
     BKSingleSlider* bigInvisibleSlider;
     Slider* incDecSlider;
     
@@ -111,16 +129,11 @@ private:
     void sliderValueChanged (Slider *slider) override;
     void buttonClicked (Button* button) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+    
+    void showModifyPopupMenu(int which);
+    static void sliderModifyMenuCallback (const int result, BKMultiSlider* slider, int which);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKMultiSlider)
-};
-
-
-class BKSliderLookAndFeel : public LookAndFeel_V3
-{
-    void drawLinearSlider (Graphics& g, int x, int y, int width, int height,
-                      float sliderPos, float minSliderPos, float maxSliderPos,
-                      const Slider::SliderStyle style, Slider& slider) override;
 };
  
 #endif  // BKSLIDER_H_INCLUDED
