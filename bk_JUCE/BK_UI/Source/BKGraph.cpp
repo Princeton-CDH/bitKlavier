@@ -167,8 +167,119 @@ void BKItem::keyPressedWhileSelected(const KeyPress& e)
     
 }
 
+Point<int> BKItem::getPosition(void)
+{
+    Gallery::Ptr thisGallery = processor.gallery;
+    Piano::Ptr thisPiano = processor.currentPiano;
+    
+    if (type == PreparationTypeDirect)
+    {
+        thisGallery->getDirect(Id)->getPosition();
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        thisGallery->getSynchronic(Id)->getPosition();
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        thisGallery->getNostalgic(Id)->getPosition();
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        thisGallery->getTuning(Id)->getPosition();
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        thisGallery->getTempo(Id)->getPosition();
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+        thisGallery->getKeymap(Id)->getPosition();
+    }
+    else if (type == PreparationTypeDirectMod)
+    {
+        thisGallery->getDirectModPreparation(Id)->getPosition();
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        thisGallery->getNostalgicModPreparation(Id)->getPosition();
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        thisGallery->getSynchronicModPreparation(Id)->getPosition();
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        thisGallery->getTuningModPreparation(Id)->getPosition();
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        thisGallery->getTempoModPreparation(Id)->getPosition();
+    }
+    else if (type == PreparationTypePianoMap)
+    {
+        
+    }
+}
+
+void BKItem::setPosition(int X, int Y)
+{
+    Gallery::Ptr thisGallery = processor.gallery;
+    Piano::Ptr thisPiano = processor.currentPiano;
+    
+    if (type == PreparationTypeDirect)
+    {
+        thisGallery->getDirect(Id)->setPosition(X,Y);
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        thisGallery->getSynchronic(Id)->setPosition(X,Y);
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        thisGallery->getNostalgic(Id)->setPosition(X,Y);
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        thisGallery->getTuning(Id)->setPosition(X,Y);
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        thisGallery->getTempo(Id)->setPosition(X,Y);
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+        thisGallery->getKeymap(Id)->setPosition(X,Y);
+    }
+    else if (type == PreparationTypeDirectMod)
+    {
+        thisGallery->getDirectModPreparation(Id)->setPosition(X,Y);
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        thisGallery->getNostalgicModPreparation(Id)->setPosition(X,Y);
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        thisGallery->getSynchronicModPreparation(Id)->setPosition(X,Y);
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        thisGallery->getTuningModPreparation(Id)->setPosition(X,Y);
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        thisGallery->getTempoModPreparation(Id)->setPosition(X,Y);
+    }
+    else if (type == PreparationTypePianoMap)
+    {
+        
+    }
+}
+
 void BKItem::mouseUp(const MouseEvent& e)
 {
+    setPosition(e.x, e.y);
     mouseExit(e);
 }
 

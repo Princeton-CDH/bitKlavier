@@ -44,6 +44,7 @@ public:
     void disconnectFrom(BKItem* toDisconnect);
     
     void itemIsBeingDragged(const MouseEvent&) override;
+    
     void keyPressedWhileSelected(const KeyPress&) override;
     
     inline BKPreparationType getType() const noexcept { return type; }
@@ -73,6 +74,9 @@ public:
     inline int getSelectedId(void) const noexcept {return currentId;}
     inline void setSelectedId(int Id) { menu.setSelectedId(Id, dontSendNotification); }
     
+    Point<int> getPosition(void);
+    void setPosition(int X, int Y);
+    
     // Public members
     Point<float> origin;
     
@@ -94,6 +98,8 @@ private:
     BKPreparationType type;
     int Id;
     String name;
+    
+    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKItem)
 };

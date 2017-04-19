@@ -35,7 +35,8 @@ public:
     
     Keymap(int Id):
     Id(Id),
-    keymap(Array<bool>())
+    keymap(Array<bool>()),
+    X(-1),Y(-1)
     {
         keymap.ensureStorageAllocated(128);
         
@@ -46,13 +47,15 @@ public:
     }
     
     Keymap(Keymap::Ptr k):
-    Id(k->getId())
+    Id(k->getId()),
+    X(-1),Y(-1)
     {
         setKeymap(k->keys());
     }
     
     Keymap(void):
-    Id(-1)
+    Id(-1),
+    X(-1),Y(-1)
     {
     }
     
@@ -197,11 +200,23 @@ public:
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
     
+    inline void setPosition(int x, int y) { X=x;Y=y;}
+    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
+    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
+    
+    inline void setX(int x) { X = x; }
+    inline void setY(int y) { Y = y; }
+    inline int getX(void) const noexcept { return X; }
+    inline int getY(void) const noexcept { return Y; }
+    
     
 private:
     int Id;
     String name;
     Array<bool> keymap;
+    
+    
+    int X,Y;
     
     JUCE_LEAK_DETECTOR (Keymap)
 };

@@ -202,7 +202,8 @@ public:
     processor(new TempoProcessor(aPrep)),
     Id(Id),
     name(String(Id)),
-    updateState(us)
+    updateState(us),
+    X(-1),Y(-1)
     {
         
     }
@@ -211,7 +212,8 @@ public:
           BKUpdateState::Ptr us):
     Id(Id),
     name(String(Id)),
-    updateState(us)
+    updateState(us),
+    X(-1),Y(-1)
     {
         sPrep = new TempoPreparation();
         aPrep = new TempoPreparation(sPrep);
@@ -237,6 +239,9 @@ public:
         prep.setProperty( ptagTempo_at1Subdivisions,       sPrep->getAdaptiveTempo1Subdivisions(), 0 );
         prep.setProperty( ptagTempo_at1Min,                sPrep->getAdaptiveTempo1Min(), 0 );
         prep.setProperty( ptagTempo_at1Max,                sPrep->getAdaptiveTempo1Max(), 0 );
+        
+        prep.setProperty( posX, X, 0);
+        prep.setProperty( posY, Y, 0);
         
         return prep;
     }
@@ -271,6 +276,15 @@ public:
         f = e->getStringAttribute(ptagTempo_at1Max).getFloatValue();
         sPrep->setAdaptiveTempo1Max(f);
         
+        n = e->getStringAttribute(posX);
+        if (n != String::empty) X = n.getIntValue();
+        else                    X = -1;
+        
+        n = e->getStringAttribute(posY);
+        if (n != String::empty) Y = n.getIntValue();
+        else                    Y = -1;
+        
+        
         aPrep->copy(sPrep);
     }
     
@@ -299,11 +313,21 @@ public:
         updateState->tempoPreparationDidChange = true;
     }
     
+    inline void setPosition(int x, int y) { X=x;Y=y;}
+    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
+    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
+    inline void setX(int x) { X = x; }
+    inline void setY(int y) { Y = y; }
+    inline int getX(void) const noexcept { return X; }
+    inline int getY(void) const noexcept { return Y; }
+    
 private:
     int Id;
     String name;
     
     BKUpdateState::Ptr updateState;
+    
+    int X,Y;
     
     JUCE_LEAK_DETECTOR(Tempo)
 };
@@ -330,7 +354,8 @@ public:
      */
     
     TempoModPreparation(TempoPreparation::Ptr p, int Id):
-    Id(Id)
+    Id(Id),
+    X(-1),Y(-1)
     {
         param.ensureStorageAllocated(cTempoParameterTypes.size());
         
@@ -346,7 +371,8 @@ public:
     
     
     TempoModPreparation(int Id):
-    Id(Id)
+    Id(Id),
+    X(-1),Y(-1)
     {
         param.set(TempoBPM, "");
         param.set(TempoSystem, "");
@@ -472,24 +498,22 @@ public:
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
     
-    inline void addTarget(int target) { targets.add(target); }
-    inline void addTarget(Tempo::Ptr target) { targets.add(target->getId()); }
-    inline Array<int> getTargets(void) {return targets;}
-    
-    inline void addKeymap(int keymap) { keymaps.add(keymap); }
-    inline void addKeymap(Tempo::Ptr keymap) { keymaps.add(keymap->getId()); }
-    inline Array<int> getKeymaps(void) {return keymaps;}
-    
-    inline void clearKeymaps(void) {keymaps.clear();}
-    inline void clearTargets(void) {targets.clear();}
+    inline void setPosition(int x, int y) { X=x;Y=y;}
+    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
+    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
+    inline void setX(int x) { X = x; }
+    inline void setY(int y) { Y = y; }
+    inline int getX(void) const noexcept { return X; }
+    inline int getY(void) const noexcept { return Y; }
     
 private:
     int Id;
     String name;
     StringArray          param;
     
-    Array<int> targets;
-    Array<int> keymaps;
+    int X,Y;
+    
+    
     
     
     JUCE_LEAK_DETECTOR(TempoModPreparation);

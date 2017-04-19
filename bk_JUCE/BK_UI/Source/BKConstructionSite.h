@@ -110,12 +110,17 @@ private:
             BKPreparationType type = item->getType();
             int which = item->getId();
             
+            Point<int> pos = item->getPosition();
+            
             if (type == PreparationTypeKeymap)
             {
                 int col = (int)(keymapCount / NUM_COL);
                 int row = keymapCount % NUM_COL;
                 
-                item->setBounds(10 + (row * 155), 50 + (col * 25), 100, 40);
+                int X = 10 + (row * 155);
+                int Y = 50 + (col * 25);
+                
+                item->setBounds(X, Y, 100, 40);
 
                 keymapCount++;
             }
@@ -124,7 +129,10 @@ private:
                 int col = (int)(prepCount / NUM_COL);
                 int row = prepCount % NUM_COL;
                 
-                item->setBounds(10 + (row * 155), 200 + (col * 25), 150, 20);
+                int X = 10 + (row * 155);
+                int Y = 200 + (col * 25);
+                
+                item->setBounds(X, Y, 150, 20);
                 
                 prepCount++;
             }
@@ -133,7 +141,10 @@ private:
                 int col = (int)(modCount / NUM_COL);
                 int row = modCount % NUM_COL;
                 
-                item->setBounds(95 + (row * 155), 125 + (col * 25), 130, 20);
+                int X = 95 + (row * 155);
+                int Y = 125 + (col * 25);
+                
+                item->setBounds(X, Y, 130, 20);
                 
                 modCount++;
             }
@@ -142,7 +153,10 @@ private:
                 int col = (int)(otherCount / NUM_COL);
                 int row = otherCount % NUM_COL;
                 
-                item->setBounds(10 + (row * 155), 350 + (col * 25), 150, 20);
+                int X = 10 + (row * 155);
+                int Y = 350 + (col * 25);
+                
+                item->setBounds(X, Y, 150, 20);
                 otherCount++;
             }
             

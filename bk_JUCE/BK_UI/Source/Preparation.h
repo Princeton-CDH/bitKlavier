@@ -42,7 +42,8 @@ public:
     aPrep(new DirectPreparation(sPrep)),
     processor(new DirectProcessor(s, res, ham, aPrep, Id)),
     Id(Id),
-    name(String(Id))
+    name(String(Id)),
+    X(-1),Y(-1)
     {
         
     }
@@ -55,7 +56,8 @@ public:
            int Id):
     Id(Id),
     name(String(Id)),
-    updateState(us)
+    updateState(us),
+    X(-1),Y(-1)
     {
         sPrep       = new DirectPreparation(tuning);
         aPrep       = new DirectPreparation(sPrep);
@@ -97,6 +99,9 @@ public:
         prep.setProperty( ptagDirect_resGain,           sPrep->getResonanceGain(), 0);
         prep.setProperty( ptagDirect_hammerGain,        sPrep->getHammerGain(), 0);
         
+        prep.setProperty( posX, X, 0);
+        prep.setProperty( posY, Y, 0);
+        
         return prep;
     }
     
@@ -120,6 +125,14 @@ public:
         
         f = e->getStringAttribute(ptagDirect_resGain).getFloatValue();
         sPrep->setResonanceGain(f);
+        
+        n = e->getStringAttribute(posX);
+        if (n != String::empty) X = n.getIntValue();
+        else                    X = -1;
+        
+        n = e->getStringAttribute(posY);
+        if (n != String::empty) Y = n.getIntValue();
+        else                    Y = -1;
         
         forEachXmlChildElement (*e, sub)
         {
@@ -173,13 +186,20 @@ public:
         updateState->directPreparationDidChange = true;
     }
    
+    inline void setPosition(int x, int y) { X=x;Y=y;}
+    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
+    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
+    inline void setX(int x) { X = x; }
+    inline void setY(int y) { Y = y; }
+    inline int getX(void) const noexcept { return X; }
+    inline int getY(void) const noexcept { return Y; }
     
 private:
     int Id;
     String name;
-    
-
     BKUpdateState::Ptr          updateState;
+    
+    int X,Y;
     
     JUCE_LEAK_DETECTOR(Direct)
 };
@@ -205,7 +225,8 @@ public:
      */
     
     DirectModPreparation(DirectPreparation::Ptr p, int Id):
-    Id(Id)
+    Id(Id),
+    X(-1),Y(-1)
     {
         param.ensureStorageAllocated(cDirectParameterTypes.size());
         
@@ -218,7 +239,8 @@ public:
     
     
     DirectModPreparation(int Id):
-    Id(Id)
+    Id(Id),
+    X(-1),Y(-1)
     {
         param.add("");
         param.add("");
@@ -337,12 +359,21 @@ public:
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
 
+    inline void setPosition(int x, int y) { X=x;Y=y;}
+    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
+    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
+    inline void setX(int x) { X = x; }
+    inline void setY(int y) { Y = y; }
+    inline int getX(void) const noexcept { return X; }
+    inline int getY(void) const noexcept { return Y; }
 
     
 private:
     int Id;
     String name;
     StringArray          param;
+    
+    int X,Y;
 
     JUCE_LEAK_DETECTOR(DirectModPreparation);
 };
@@ -368,7 +399,8 @@ public:
     aPrep(new SynchronicPreparation(sPrep)),
     processor(new SynchronicProcessor(s, aPrep, general, Id)),
     Id(Id),
-    name(String(Id))
+    name(String(Id)),
+    X(-1),Y(-1)
     {
         
     }
@@ -381,7 +413,8 @@ public:
                int Id):
     Id(Id),
     name(String(Id)),
-    updateState(us)
+    updateState(us),
+    X(-1),Y(-1)
     {
         sPrep       = new SynchronicPreparation(tuning, tempo);
         aPrep       = new SynchronicPreparation(sPrep);
@@ -425,6 +458,9 @@ public:
         prep.setProperty( ptagSynchronic_clusterThresh,       sPrep->getClusterThreshMS(), 0);
         prep.setProperty( ptagSynchronic_mode,                sPrep->getMode(), 0);
         prep.setProperty( ptagSynchronic_beatsToSkip,         sPrep->getBeatsToSkip(), 0);
+        
+        prep.setProperty( posX, X, 0);
+        prep.setProperty( posY, Y, 0);
         
         
         ValueTree beatMults( vtagSynchronic_beatMults);
@@ -509,6 +545,14 @@ public:
         
         i = e->getStringAttribute(ptagSynchronic_beatsToSkip).getIntValue();
         sPrep->setBeatsToSkip(i);
+        
+        n = e->getStringAttribute(posX);
+        if (n != String::empty) X = n.getIntValue();
+        else                    X = -1;
+        
+        n = e->getStringAttribute(posY);
+        if (n != String::empty) Y = n.getIntValue();
+        else                    Y = -1;
         
         forEachXmlChildElement (*e, sub)
         {
@@ -627,10 +671,23 @@ public:
         updateState->synchronicPreparationDidChange = true;
     }
     
+    inline void setPosition(int x, int y) { X=x;Y=y;}
+    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
+    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
+    inline void setX(int x) { X = x; }
+    inline void setY(int y) { Y = y; }
+    inline int getX(void) const noexcept { return X; }
+    inline int getY(void) const noexcept { return Y; }
+    
+    
+    
 private:
     int Id;
     String name;
     BKUpdateState::Ptr updateState;
+    
+    int X,Y;
+    
     
     JUCE_LEAK_DETECTOR(Synchronic)
 };
@@ -667,7 +724,8 @@ public:
      */
     
     SynchronicModPreparation(SynchronicPreparation::Ptr p, int Id):
-    Id(Id)
+    Id(Id),
+    X(-1),Y(-1)
     {
         param.ensureStorageAllocated(cSynchronicParameterTypes.size());
         
@@ -688,7 +746,8 @@ public:
     
     
     SynchronicModPreparation(int Id):
-    Id(Id)
+    Id(Id),
+    X(-1),Y(-1)
     {
         param.set(SynchronicTuning, "");
         param.set(SynchronicTempo, "");
@@ -943,11 +1002,21 @@ public:
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
     
+    inline void setPosition(int x, int y) { X=x;Y=y;}
+    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
+    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
+    inline void setX(int x) { X = x; }
+    inline void setY(int y) { Y = y; }
+    inline int getX(void) const noexcept { return X; }
+    inline int getY(void) const noexcept { return Y; }
+    
     
 private:
     int Id;
     String name;
     StringArray          param;
+    
+    int X,Y;
 
     
     JUCE_LEAK_DETECTOR(SynchronicModPreparation);
@@ -975,7 +1044,8 @@ public:
     aPrep(new NostalgicPreparation(sPrep)),
     processor(new NostalgicProcessor(s, aPrep, Id)),
     Id(Id),
-    name(String(Id))
+    name(String(Id)),
+    X(-1),Y(-1)
     {
         
     }
@@ -987,7 +1057,8 @@ public:
               int Id):
     Id(Id),
     name(String(Id)),
-    updateState(us)
+    updateState(us),
+    X(-1),Y(-1)
     {
         sPrep       = new NostalgicPreparation(tuning);
         aPrep       = new NostalgicPreparation(sPrep);
@@ -1040,6 +1111,9 @@ public:
         prep.setProperty( ptagNostalgic_mode,               sPrep->getMode(), 0);
         prep.setProperty( ptagNostalgic_syncTarget,         sPrep->getSyncTarget(), 0);
 
+        prep.setProperty( posX, X, 0);
+        prep.setProperty( posY, Y, 0);
+        
         return prep;
     }
     
@@ -1060,6 +1134,14 @@ public:
         
         i = e->getStringAttribute(ptagNostalgic_undertow).getIntValue();
         sPrep->setUndertow(i);
+        
+        n = e->getStringAttribute(posX);
+        if (n != String::empty) X = n.getIntValue();
+        else                    X = -1;
+        
+        n = e->getStringAttribute(posY);
+        if (n != String::empty) Y = n.getIntValue();
+        else                    Y = -1;
         
         forEachXmlChildElement (*e, sub)
         {
@@ -1143,10 +1225,20 @@ public:
         updateState->nostalgicPreparationDidChange = true;
     }
     
+    inline void setPosition(int x, int y) { X=x;Y=y;}
+    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
+    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
+    inline void setX(int x) { X = x; }
+    inline void setY(int y) { Y = y; }
+    inline int getX(void) const noexcept { return X; }
+    inline int getY(void) const noexcept { return Y; }
+    
 private:
     int Id;
     String name;
     BKUpdateState::Ptr updateState;
+    
+    int X,Y;
     
     JUCE_LEAK_DETECTOR(Nostalgic)
 };
@@ -1232,7 +1324,8 @@ public:
      */
     
     NostalgicModPreparation(NostalgicPreparation::Ptr p, int Id):
-    Id(Id)
+    Id(Id),
+    X(-1),Y(-1)
     {
         param.ensureStorageAllocated(cNostalgicParameterTypes.size());
         
@@ -1250,7 +1343,8 @@ public:
     
     
     NostalgicModPreparation(int Id):
-    Id(Id)
+    Id(Id),
+    X(-1),Y(-1)
     {
         param.set(NostalgicTuning, "");
         param.set(NostalgicWaveDistance, "");
@@ -1401,12 +1495,22 @@ public:
     
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
+    
+    inline void setPosition(int x, int y) { X=x;Y=y;}
+    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
+    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
+    inline void setX(int x) { X = x; }
+    inline void setY(int y) { Y = y; }
+    inline int getX(void) const noexcept { return X; }
+    inline int getY(void) const noexcept { return Y; }
 
     
 private:
     int Id;
     String name;
     StringArray          param;
+    
+    int X,Y;
     
     JUCE_LEAK_DETECTOR(NostalgicModPreparation);
 };

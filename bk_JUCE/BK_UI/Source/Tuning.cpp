@@ -170,6 +170,9 @@ ValueTree Tuning::getState(void)
     }
     prep.addChild(absolute, -1, 0);
     
+    prep.setProperty( posX, X, 0);
+    prep.setProperty( posY, Y, 0);
+    
     return prep;
     
 }
@@ -229,6 +232,9 @@ ValueTree TuningModPreparation::getState(int Id)
         }
     }
     prep.addChild(absolute, -1, 0);
+    
+    prep.setProperty( posX, X, 0);
+    prep.setProperty( posY, Y, 0);
     
     return prep;
 }
@@ -309,6 +315,14 @@ void TuningModPreparation::setState(XmlElement* e)
             setParam(TuningAbsoluteOffsets, abs);
         }
     }
+    
+    n = e->getStringAttribute(posX);
+    if (n != String::empty) X = n.getIntValue();
+    else                    X = -1;
+    
+    n = e->getStringAttribute(posY);
+    if (n != String::empty) Y = n.getIntValue();
+    else                    Y = -1;
 }
 
 void Tuning::setState(XmlElement* e)
@@ -377,6 +391,14 @@ void Tuning::setState(XmlElement* e)
             sPrep->setAbsoluteOffsets(absolute);
         }
     }
+    
+    String n = e->getStringAttribute(posX);
+    if (n != String::empty) X = n.getIntValue();
+    else                    X = -1;
+    
+    n = e->getStringAttribute(posY);
+    if (n != String::empty) Y = n.getIntValue();
+    else                    Y = -1;
     
     // copy static to active
     aPrep->copy( sPrep);

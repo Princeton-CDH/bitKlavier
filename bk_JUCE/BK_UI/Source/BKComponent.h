@@ -90,17 +90,18 @@ public:
     
     virtual void itemWasDropped(BKPreparationType type, Array<int>, int x, int y){};
     virtual void itemIsBeingDragged(const MouseEvent& e){};
+    virtual void itemWasDragged(const MouseEvent& e){};
     virtual void keyPressedWhileSelected(const KeyPress& e) {};
     
     
 protected:
-    bool itemIsHovering, isSelected;
+    bool itemIsHovering, isSelected, isDragging;
     
     
     
     void prepareDrag(const MouseEvent& e)
     {
-        
+        isDragging = true;
         dragger.startDraggingComponent (this, e);
     }
     
@@ -207,7 +208,11 @@ private:
     
     void mouseUp(const MouseEvent& e) override
     {
-        
+        if (isDragging)
+        {
+            itemWasDragged(e);
+            isDragging = false;
+        }
     }
     
     ComponentBoundsConstrainer constrainer;

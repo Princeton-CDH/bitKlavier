@@ -19,6 +19,9 @@
 #define CRAY_COOL_MUSIC_MAKER 0
 #define CRAY_COOL_MUSIC_MAKER_2 0
 
+const String posX = "X";
+const String posY = "Y";
+
 const String jsonSynchronicX = "synchronic::";
 const String jsonDirectX = "direct::";
 const String jsonNostalgicX = "nostalgic::";

@@ -314,7 +314,8 @@ public:
     processor(new TuningProcessor(aPrep)),
     Id(Id),
     name(String(Id)),
-    updateState(us)
+    updateState(us),
+    X(-1),Y(-1)
     {
         
     }
@@ -323,7 +324,8 @@ public:
            BKUpdateState::Ptr us):
     Id(Id),
     name(String(Id)),
-    updateState(us)
+    updateState(us),
+    X(-1),Y(-1)
     {
         sPrep = new TuningPreparation();
         aPrep = new TuningPreparation(sPrep);
@@ -365,12 +367,20 @@ public:
         updateState->tuningPreparationDidChange = true;
     }
     
+    inline void setPosition(int x, int y) { X=x;Y=y;}
+    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
+    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
+    inline void setX(int x) { X = x; }
+    inline void setY(int y) { Y = y; }
+    inline int getX(void) const noexcept { return X; }
+    inline int getY(void) const noexcept { return Y; }
     
 private:
     int Id;
     String name;
-    
     BKUpdateState::Ptr updateState;
+    
+    int X,Y;
     
     JUCE_LEAK_DETECTOR(Tuning)
 };
@@ -401,7 +411,8 @@ public:
      */
     
     TuningModPreparation(TuningPreparation::Ptr p, int Id):
-    Id(Id)
+    Id(Id),
+    X(-1),Y(-1)
     {
         param.ensureStorageAllocated(cTuningParameterTypes.size());
         
@@ -421,7 +432,8 @@ public:
     
     
     TuningModPreparation(int Id):
-    Id(Id)
+    Id(Id),
+    X(-1),Y(-1)
     {
         param.set(TuningScale, "");
         param.set(TuningFundamental, "");
@@ -499,12 +511,20 @@ public:
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
 
-    
+    inline void setPosition(int x, int y) { X=x;Y=y;}
+    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
+    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
+    inline void setX(int x) { X = x; }
+    inline void setY(int y) { Y = y; }
+    inline int getX(void) const noexcept { return X; }
+    inline int getY(void) const noexcept { return Y; }
     
 private:
     int Id; 
     String name;
     StringArray          param;
+    
+    int X,Y;
     
     JUCE_LEAK_DETECTOR(TuningModPreparation);
 };
