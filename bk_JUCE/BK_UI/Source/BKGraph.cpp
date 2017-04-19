@@ -298,7 +298,7 @@ BKItem* BKItemGraph::itemWithTypeAndId(BKPreparationType type, int Id)
     return thisItem;
 }
 
-void BKItemGraph::remove(BKItem* itemToRemove)
+void BKItemGraph::removeUI(BKItem* itemToRemove)
 {
     for (auto item : itemToRemove->getConnections())
     {
@@ -306,6 +306,19 @@ void BKItemGraph::remove(BKItem* itemToRemove)
     }
     
     items.removeObject(itemToRemove);
+    
+}
+
+void BKItemGraph::remove(BKItem* itemToRemove)
+{
+    for (auto item : itemToRemove->getConnections())
+    {
+        disconnect(itemToRemove, item);
+    }
+    
+    items.removeObject(itemToRemove);
+    
+    
     
 }
 
@@ -357,57 +370,86 @@ void BKItemGraph::linkPreparationWithTuning(BKPreparationType thisType, int this
     }
 }
 
-void BKItemGraph::linkPreparationWithKeymap(bool link, BKPreparationType thisType, int thisId, Keymap::Ptr thisKeymap)
+
+void BKItemGraph::removePreparationFromKeymap(BKPreparationType thisType, int thisId, Keymap::Ptr thisKeymap)
 {
     PreparationMap::Ptr thisPreparationMap = processor.currentPiano->getPreparationMapWithKeymap(thisKeymap);
     
-    if (thisPreparationMap == nullptr)
-    {
-        if (link)
-        {
-            int whichPMap = processor.currentPiano->addPreparationMap(thisKeymap);
-            
-            thisPreparationMap = processor.currentPiano->prepMaps[whichPMap];
-        }
-        else
-            return;
-    }
-    
+    if (thisPreparationMap == nullptr) return;
     
     if (thisType == PreparationTypeDirect)
     {
         Direct::Ptr thisDirect = processor.gallery->getDirect(thisId);
         
-        if (link)   thisPreparationMap->addDirect(thisDirect);
-        else        thisPreparationMap->removeDirect(thisDirect);
+        thisPreparationMap->removeDirect(thisDirect);
     }
     else if (thisType == PreparationTypeSynchronic)
     {
         Synchronic::Ptr thisSynchronic = processor.gallery->getSynchronic(thisId);
         
-        if (link)   thisPreparationMap->addSynchronic(thisSynchronic);
-        else        thisPreparationMap->removeSynchronic(thisSynchronic);
+        thisPreparationMap->removeSynchronic(thisSynchronic);
     }
     else if (thisType == PreparationTypeNostalgic)
     {
         Nostalgic::Ptr thisNostalgic = processor.gallery->getNostalgic(thisId);
         
-        if (link)   thisPreparationMap->addNostalgic(thisNostalgic);
-        else        thisPreparationMap->removeNostalgic(thisNostalgic);
+        thisPreparationMap->removeNostalgic(thisNostalgic);
     }
     else if (thisType == PreparationTypeTempo)
     {
         Tempo::Ptr thisTempo = processor.gallery->getTempo(thisId);
         
-        if (link)   thisPreparationMap->addTempo(thisTempo);
-        else        thisPreparationMap->removeTempo(thisTempo);
+        thisPreparationMap->removeTempo(thisTempo);
     }
     else if (thisType == PreparationTypeTuning)
     {
         Tuning::Ptr thisTuning = processor.gallery->getTuning(thisId);
         
-        if (link)   thisPreparationMap->addTuning(thisTuning);
-        else        thisPreparationMap->removeTuning(thisTuning);
+        thisPreparationMap->removeTuning(thisTuning);
+    }
+    
+}
+
+void BKItemGraph::addPreparationToKeymap(BKPreparationType thisType, int thisId, Keymap::Ptr thisKeymap)
+{
+    PreparationMap::Ptr thisPreparationMap = processor.currentPiano->getPreparationMapWithKeymap(thisKeymap);
+    
+    if (thisPreparationMap == nullptr)
+    {
+        int whichPMap = processor.currentPiano->addPreparationMap(thisKeymap);
+        
+        thisPreparationMap = processor.currentPiano->prepMaps[whichPMap];
+    }
+    
+    if (thisType == PreparationTypeDirect)
+    {
+        Direct::Ptr thisDirect = processor.gallery->getDirect(thisId);
+        
+        thisPreparationMap->addDirect(thisDirect);
+    }
+    else if (thisType == PreparationTypeSynchronic)
+    {
+        Synchronic::Ptr thisSynchronic = processor.gallery->getSynchronic(thisId);
+        
+        thisPreparationMap->addSynchronic(thisSynchronic);
+    }
+    else if (thisType == PreparationTypeNostalgic)
+    {
+        Nostalgic::Ptr thisNostalgic = processor.gallery->getNostalgic(thisId);
+        
+        thisPreparationMap->addNostalgic(thisNostalgic);
+    }
+    else if (thisType == PreparationTypeTempo)
+    {
+        Tempo::Ptr thisTempo = processor.gallery->getTempo(thisId);
+        
+        thisPreparationMap->addTempo(thisTempo);
+    }
+    else if (thisType == PreparationTypeTuning)
+    {
+        Tuning::Ptr thisTuning = processor.gallery->getTuning(thisId);
+        
+        thisPreparationMap->addTuning(thisTuning);
     }
 
 }
@@ -523,11 +565,18 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
     }
     else if (item1Type == PreparationTypeKeymap && item2Type <= PreparationTypeKeymap)
     {
-        linkPreparationWithKeymap(connect, item2Type, item2Id, processor.gallery->getKeymap(item1Id));
+        if (connect)    addPreparationToKeymap(item2Type, item2Id, processor.gallery->getKeymap(item1Id));
+        else
+        {
+            Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item1Id);
+            
+            processor.currentPiano->removePreparationMapWithKeymap(thisKeymap);
+        }
     }
     else if (item1Type <= PreparationTypeKeymap && item2Type == PreparationTypeKeymap)
     {
-        linkPreparationWithKeymap(connect, item1Type, item1Id, processor.gallery->getKeymap(item2Id));
+        if (connect)    addPreparationToKeymap(item1Type, item1Id, processor.gallery->getKeymap(item2Id));
+        else            removePreparationFromKeymap(item1Type, item1Id, processor.gallery->getKeymap(item2Id));
     }
     else if (item1Type == PreparationTypeTuning && item2Type <= PreparationTypeNostalgic)
     {
@@ -1213,6 +1262,8 @@ void BKItemGraph::reconstruct(void)
     for (auto pmap : thisPiano->getPreparationMaps())
     {
         
+        DBG("--------------------------------");
+        pmap->print();
         // Keymap
         int keymapId = pmap->getKeymapId();
         

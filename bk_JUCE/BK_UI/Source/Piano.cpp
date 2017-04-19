@@ -525,6 +525,32 @@ PreparationMap::Ptr        Piano::getPreparationMapWithKeymap(Keymap::Ptr thisKe
 }
 
 // Add preparation map, return its Id.
+int Piano::removePreparationMapWithKeymap(Keymap::Ptr thisKeymap)
+{
+    for (int i = activePMaps.size(); --i >= 0; )
+    {
+        if (activePMaps[i]->getKeymapId() == thisKeymap->getId())
+        {
+            activePMaps.remove(i);
+            break;
+        }
+    }
+    
+    for (int i = prepMaps.size(); --i >= 0; )
+    {
+        if (prepMaps[i]->getKeymapId() == thisKeymap->getId())
+        {
+            prepMaps.remove(i);
+            break;
+        }
+    }
+    
+    --numPMaps;
+    
+    return numPMaps;
+}
+
+// Add preparation map, return its Id.
 int Piano::removeLastPreparationMap(void)
 {
     for (int i = activePMaps.size(); --i >= 0;)

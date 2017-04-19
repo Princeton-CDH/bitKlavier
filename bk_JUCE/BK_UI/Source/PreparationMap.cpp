@@ -270,11 +270,21 @@ void PreparationMap::removeAllPreparations()
     isActive = false;
 }
 
+void PreparationMap::removeKeymap(void)
+{
+    pKeymap = nullptr;
+    deactivateIfNecessary();
+}
+
 
 
 void PreparationMap::deactivateIfNecessary()
 {
-    if(synchronic.size() == 0 &&
+    if (pKeymap == nullptr)
+    {
+        isActive = false;
+    }
+    else if(synchronic.size() == 0 &&
        nostalgic.size() == 0 &&
        direct.size() == 0 &&
        tuning.size() == 0 &&

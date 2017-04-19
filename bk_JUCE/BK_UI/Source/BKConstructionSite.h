@@ -47,7 +47,7 @@ public:
        
         for (auto item : items)
         {
-            graph->remove(item);
+            graph->removeUI(item);
         }
         
         removeAllChildren();

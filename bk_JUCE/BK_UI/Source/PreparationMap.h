@@ -115,6 +115,7 @@ public:
     void removeTempo(Tempo::Ptr p);
     void removeTuning(Tuning::Ptr p);
     
+    void removeKeymap(void);
     
     Synchronic::PtrArr  getSynchronic(void);
     Nostalgic::PtrArr   getNostalgic(void);
@@ -131,6 +132,27 @@ public:
     void print(void)
     {
         DBG("PrepMapId: " + String(Id));
+        DBG("Keymap: " + String(pKeymap->getId()));
+        
+        Array<int> ps;
+        for (auto p : synchronic) ps.add(p->getId());
+        DBG("Synchronic: " + intArrayToString(ps));
+        
+        ps.clear();
+        for (auto p : nostalgic) ps.add(p->getId());
+        DBG("Nostalgic: " + intArrayToString(ps));
+        
+        ps.clear();
+        for (auto p : direct) ps.add(p->getId());
+        DBG("Direct: " + intArrayToString(ps));
+        
+        ps.clear();
+        for (auto p : tuning) ps.add(p->getId());
+        DBG("Tuning: " + intArrayToString(ps));
+        
+        ps.clear();
+        for (auto p : tempo) ps.add(p->getId());
+        DBG("Tempo: " + intArrayToString(ps));
     }
     
 private:

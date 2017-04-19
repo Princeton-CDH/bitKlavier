@@ -124,6 +124,8 @@ public:
     void add(BKItem* itemToAdd);
     bool contains(BKItem* thisItem);
     void remove(BKItem* itemToRemove);
+    void removeUI(BKItem* itemToRemove);
+    void removeKeymap(BKItem* itemToRemove);
     void clear(void);
     void connectUI(BKItem* item1, BKItem* item2);
     void disconnectUI(BKItem* item1, BKItem* item2);
@@ -200,10 +202,7 @@ public:
         DBG("\n~ ~ ~ ~ ~ ~ ~ GRAPH ~ ~ ~ ~ ~ ~ ~:\n");
         for (auto item : items)
         {
-            DBG(cPreparationTypes[item->getType()]+String(item->getId()));
-            
-            for (auto conn : item->getConnections())
-                DBG("                   ==> " +cPreparationTypes[item->getType()]+String(item->getId()));
+            item->print();
         }
         DBG("\n~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n");
     }
@@ -216,7 +215,8 @@ private:
     
     BKItem::RCArr preparations;
     
-    void linkPreparationWithKeymap(bool link, BKPreparationType thisType, int thisId, Keymap::Ptr thisKeymap);
+    void addPreparationToKeymap(BKPreparationType thisType, int thisId, Keymap::Ptr thisKeymap);
+    void removePreparationFromKeymap(BKPreparationType thisType, int thisId, Keymap::Ptr thisKeymap);
     void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
     void linkSynchronicWithTempo(Synchronic::Ptr synchronic, Tempo::Ptr thisTempo);
     void linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic);

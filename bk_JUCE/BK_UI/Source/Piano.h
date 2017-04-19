@@ -131,16 +131,6 @@ public:
     }
 
     
-    inline Array<int> getAllIds(Synchronic::PtrArr direct)
-    {
-        Array<int> which;
-        for (auto p : direct)
-        {
-            which.add(p->getId());
-        }
-        
-        return which;
-    }
     
     String modificationMapsToString(void)
     {
@@ -249,6 +239,7 @@ public:
     int                         addPreparationMap(Keymap::Ptr keymap);
     PreparationMap::Ptr         getPreparationMapWithKeymap(Keymap::Ptr);
     int                         removeLastPreparationMap(void);
+    int                         removePreparationMapWithKeymap(Keymap::Ptr thisKeymap);
 
     
 private:
@@ -322,6 +313,18 @@ private:
         
         return which;
     }
+    
+    inline Array<int> getAllIds(Synchronic::PtrArr direct)
+    {
+        Array<int> which;
+        for (auto p : direct)
+        {
+            which.add(p->getId());
+        }
+        
+        return which;
+    }
+    
     
     
     JUCE_LEAK_DETECTOR(Piano)
