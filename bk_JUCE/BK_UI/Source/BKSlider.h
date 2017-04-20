@@ -14,256 +14,134 @@
 #include "BKUtilities.h"
 #include "BKComponent.h"
 
-//class BKMultiSlider
-//class BKSingleSlider
+/*
+ TODO
+ -- expose basic parameters to top; max/min, etc... perhaps subSlider size
+ -- display additional values and main value for clusters (like transposition vals [t1 t2 t3])?
+    -- be able to click on one of multiple bands to move it
+ -- allow narrowing of sliders as numSlider increases
+ -- highlight currentVal slider when synhronic is active
+ -- possibly have faded out inactive sliders filling out a default width; dragging over them activates... ? have minimumSlidersToDisplay = 16, grey-out inactive ones
+*/
 
 typedef enum BKMultiSliderType {
     HorizontalMultiSlider = 0,
     VerticalMultiSlider,
+    HorizontalMultiBarSlider,
+    VerticalMultiBarSlider,
     BKMultiSliderTypeNil
 } BKMultiSliderType;
+
+
+class BKSliderLookAndFeel : public LookAndFeel_V3
+{
+
+public:
+    
+    BKSliderLookAndFeel()
+    {
+        //setColour (TextButton::buttonColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.13f));
+    }
+    ~BKSliderLookAndFeel() {}
+    
+    void drawLinearSlider (Graphics& g, int x, int y, int width, int height,
+                           float sliderPos, float minSliderPos, float maxSliderPos,
+                           const Slider::SliderStyle style, Slider& slider) override;
+};
 
 
 class BKSingleSlider : public Slider
 {
 public:
-    BKSingleSlider (SliderStyle sstyle);
+    BKSingleSlider (SliderStyle sstyle, double min, double max, double def, double increment, int width, int height);
     ~BKSingleSlider();
 
     void valueChanged() override;
     double getValueFromText	(const String & text ) override;
     
-    /*
-    void mouseDown(const MouseEvent &e) override
-    {
-        for (auto listener : listeners)
-        {
-            listener->sliderMouseDown(e);
-        }
-    }
-    
-    void mouseDrag(const MouseEvent &e) override
-    {
-        for (auto listener : listeners)
-        {
-            listener->sliderMouseDrag(e);
-        }
-    }
-    
-    class MyListener
-    {
-    public:
-        virtual ~MyListener() {}
-        
-        virtual void sliderMouseDown(const MouseEvent& e){};
-        
-        virtual void sliderMouseDrag(const MouseEvent& e){};
-        
-    private:
-    };
-    
-    void addMyListener(MyListener* listener)
-    {
-        listeners.add(listener);
-    }
-    
-    void removeMyListener(MyListener* listener)
-    {
-        for (int i = listeners.size(); --i >= 0; i++)
-        {
-            if (listeners[i] == listener)
-            {
-                listeners.remove(i);
-                break;
-            }
-        }
-        
-    }
-    */
-    
 private:
     
-    /*OwnedArray<MyListener> listeners;*/
-
     double sliderMin, sliderMax;
     double sliderDefault;
     double sliderIncrement;
     
+    int sliderWidth, sliderHeight;
+    
     bool sliderIsVertical;
+    bool sliderIsBar;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSingleSlider)
 };
 
 
 
-class BKMultiSlider : public BKComponent, public Slider::Listener /*, public BKSingleSlider::MyListener*/
+class BKMultiSlider : public BKComponent, public Slider::Listener, public Button::Listener, public TextEditor::Listener
 {
     
 public:
     
-    BKMultiSlider(BKMultiSliderType which)
-    {
-        
-        
-        if(which == HorizontalMultiSlider) arrangedHorizontally = true;
-        else arrangedHorizontally = false;
-        
-        for(int i=0; i<numSliders; i++) {
-            
-            BKSingleSlider* newslider;
-            if(arrangedHorizontally) newslider = new BKSingleSlider(Slider::LinearVertical);
-            else  newslider = new BKSingleSlider(Slider::LinearHorizontal);
-            
-            newslider->addListener(this);
-            //newslider->addMyListener(this);
-            //newslider->addMouseListener(this, true);
-            sliders.add(newslider);
-            addAndMakeVisible(newslider);
-        }
-        
-        if(arrangedHorizontally) bigInvisibleSlider = new BKSingleSlider(Slider::LinearVertical);
-        else bigInvisibleSlider = new BKSingleSlider(Slider::LinearHorizontal);
-        bigInvisibleSlider->setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, true, 0,0);
-        bigInvisibleSlider->setAlpha(0.0);
-        bigInvisibleSlider->addMouseListener(this, true);
-        bigInvisibleSlider->setName("BIG");
-        bigInvisibleSlider->addListener(this);
-        
-        addAndMakeVisible(bigInvisibleSlider);
-        
-        if(arrangedHorizontally) setSize(numSliders*sliders[0]->getWidth(), sliders[0]->getHeight() - sliders[0]->getTextBoxHeight());
-        else setSize(sliders[0]->getWidth() + sliders[0]->getTextBoxWidth(), numSliders * sliders[0]->getHeight());
-    }
-    
-    ~BKMultiSlider()
-    {
-        
-    }
+    BKMultiSlider(BKMultiSliderType which);
+    ~BKMultiSlider();
 
-    void mouseDown(const MouseEvent& e) override
-    {
-        
-        /*
-        if (!dragging)
-        {
-            int x = e.getEventRelativeTo(this).x;
-            int y = e.getEventRelativeTo(this).y;
-            
-            DBG("START " + String(x) + " " + String(y));
-            
-            
-            currentSlider = dynamic_cast<BKSingleSlider*> (getComponentAt(x, y));
-            prevSlider = currentSlider;
-            
-            dragging = true;
-        }
-         */
-    }
+    void addSlider(int where, int depth);
+    void addSubSlider(int where, int depth);
+    void insertSlider(int where);
+    void deleteSlider(int where);
     
-    void mouseDrag(const MouseEvent& e) override
-    {
-        int x = e.x;
-        int y = e.y;
-        
-        int which;
-        if(arrangedHorizontally) which = (x / sliders[0]->getWidth());
-        else which = (y / sliders[0]->getHeight());
-        
-        DBG("DRAGGING " + String(which) + String(e.x) + " " + String(e.y));
-        
-        if (which >= 0 && which < sliders.size())
-        {
-            sliders[which]->setValue(currentInvisibleSliderValue);
-            
-        }
-        /*
-        if (dragging)
-        {
-            int x = e.getEventRelativeTo(this).x;
-            int y = e.getEventRelativeTo(this).y;
-            
-            DBG("DRAGGING " + String(e.getEventRelativeTo(this).x) + " " + String(e.getEventRelativeTo(this).y));
-            
-            prevSlider = currentSlider;
-            currentSlider = dynamic_cast<BKSingleSlider*> (getComponentAt(x, y)->getComponentAt(x, y));
-            
-            if (currentSlider != prevSlider)
-            {
-                prevSlider->mouseUp(e);
-                currentSlider->mouseDown(e);
-            }
-        }
-         */
-    }
+    int whichSlider (const MouseEvent &e);
+    int whichSubSlider (int which);
     
-    void mouseUp(const MouseEvent& e) override
-    {
-        /*
-        if (dragging)
-        {
-            int x = e.getEventRelativeTo(this).x;
-            int y = e.getEventRelativeTo(this).y;
-            
-            dragging = false;
-            
-            DBG("DONE DRAGGING");
-        }
-         */
-        
-    }
+    void mouseDrag(const MouseEvent &e) override;
+    void mouseDoubleClick (const MouseEvent &e) override;
+    void mouseDown (const MouseEvent &event) override;
+    void mouseUp (const MouseEvent &event) override;
     
+    void resetRanges();
+    void resized() override;
+    void initSizes();
     
-    void resized() override
-    {
-        if(arrangedHorizontally)
-        {
-            for (int i=0; i<sliders.size(); i++)
-            {
-                sliders[i]->setTopLeftPosition(50*i, 0);
-            }
-            
-            bigInvisibleSlider->setBounds(0, 0, sliders.getLast()->getRight(), sliders.getLast()->getBottom() - sliders.getLast()->getTextBoxHeight());
-        }
-        else
-        {
-            for (int i=0; i<sliders.size(); i++)
-            {
-                sliders[i]->setTopLeftPosition(0, 20 * i);
-            }
-            
-            bigInvisibleSlider->setBounds(sliders.getLast()->getTextBoxWidth(), 0, sliders.getLast()->getRight() - sliders.getLast()->getTextBoxWidth(), sliders.getLast()->getBottom());
-        }
-        
-    }
+    Array<Array<float>> getAllValues();
     
 private:
+    
+    BKSliderLookAndFeel thisLookAndFeel;
+    
     bool dragging;
     bool arrangedHorizontally;
+    bool sliderIsVertical;
+    bool sliderIsBar;
+    bool updatingTextBox = false;
+    int currentSubSlider;
+    
+    Slider::SliderStyle subsliderStyle;
     
     double currentInvisibleSliderValue;
     
-    OwnedArray<BKSingleSlider> sliders;
+    OwnedArray<OwnedArray<BKSingleSlider>> sliders;
     
+    BKSingleSlider* displaySlider;
     BKSingleSlider* bigInvisibleSlider;
+    //Slider* incDecSlider;
     
+    //TextButton* editTextButton;
+    TextEditor* editValsTextField;
     
-    BKSingleSlider* currentSlider;
-    BKSingleSlider* prevSlider;
+    double sliderMin, sliderMax, sliderMinDefault, sliderMaxDefault;
+    double sliderDefault;
+    double sliderIncrement;
     
-    int numSliders = 10;
+    int sliderWidth, sliderHeight;
     
-    void sliderValueChanged (Slider *slider) override
-    {
-        if (slider->getName() == "BIG")
-        {
-            currentInvisibleSliderValue = slider->getValue();
-            DBG(currentInvisibleSliderValue);
-        }
-    }
+    int numSliders = 1;
     
+    void sliderValueChanged (Slider *slider) override;
+    void buttonClicked (Button* button) override;
+    void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+    
+    void showModifyPopupMenu(int which);
+    static void sliderModifyMenuCallback (const int result, BKMultiSlider* slider, int which);
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKMultiSlider)
 };
-
-
  
 #endif  // BKSLIDER_H_INCLUDED
