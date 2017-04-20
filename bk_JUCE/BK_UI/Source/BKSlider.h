@@ -22,7 +22,7 @@
  -- allow narrowing of sliders as numSlider increases
  -- highlight currentVal slider when synhronic is active
  -- possibly have faded out inactive sliders filling out a default width; dragging over them activates... ? have minimumSlidersToDisplay = 16, grey-out inactive ones
- */
+*/
 
 typedef enum BKMultiSliderType {
     HorizontalMultiSlider = 0,
@@ -46,7 +46,7 @@ public:
     
     void drawLinearSlider (Graphics& g, int x, int y, int width, int height,
                            float sliderPos, float minSliderPos, float maxSliderPos,
-                           const Slider::SliderStyle style, Slider& slider) override;     
+                           const Slider::SliderStyle style, Slider& slider) override;
 };
 
 
@@ -83,18 +83,24 @@ public:
     BKMultiSlider(BKMultiSliderType which);
     ~BKMultiSlider();
 
-    void addSubSlider(int where);
-    void insertSubSlider(int where);
-    void deleteSubSlider(int where);
+    void addSlider(int where, int depth);
+    void addSubSlider(int where, int depth);
+    void insertSlider(int where);
+    void deleteSlider(int where);
+    
+    int whichSlider (const MouseEvent &e);
+    int whichSubSlider (int which);
+    
     void mouseDrag(const MouseEvent &e) override;
     void mouseDoubleClick (const MouseEvent &e) override;
     void mouseDown (const MouseEvent &event) override;
     void mouseUp (const MouseEvent &event) override;
-    int  whichSubSlider (const MouseEvent &e);
+    
     void resetRanges();
     void resized() override;
     void initSizes();
-    Array<float> getAllValues();
+    
+    Array<Array<float>> getAllValues();
     
 private:
     
@@ -105,17 +111,19 @@ private:
     bool sliderIsVertical;
     bool sliderIsBar;
     bool updatingTextBox = false;
+    int currentSubSlider;
     
     Slider::SliderStyle subsliderStyle;
     
     double currentInvisibleSliderValue;
     
-    OwnedArray<BKSingleSlider> sliders;
+    OwnedArray<OwnedArray<BKSingleSlider>> sliders;
+    
     BKSingleSlider* displaySlider;
     BKSingleSlider* bigInvisibleSlider;
-    Slider* incDecSlider;
+    //Slider* incDecSlider;
     
-    TextButton* editTextButton;
+    //TextButton* editTextButton;
     TextEditor* editValsTextField;
     
     double sliderMin, sliderMax, sliderMinDefault, sliderMaxDefault;
