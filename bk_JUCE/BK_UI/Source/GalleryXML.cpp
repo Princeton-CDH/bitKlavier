@@ -270,6 +270,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
         
     }
     
+    printPianoConfigurations();
     
 }
 

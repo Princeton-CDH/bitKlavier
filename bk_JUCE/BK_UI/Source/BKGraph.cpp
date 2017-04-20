@@ -167,119 +167,12 @@ void BKItem::keyPressedWhileSelected(const KeyPress& e)
     
 }
 
-Point<int> BKItem::getPosition(void)
-{
-    Gallery::Ptr thisGallery = processor.gallery;
-    Piano::Ptr thisPiano = processor.currentPiano;
-    
-    if (type == PreparationTypeDirect)
-    {
-        thisGallery->getDirect(Id)->getPosition();
-    }
-    else if (type == PreparationTypeSynchronic)
-    {
-        thisGallery->getSynchronic(Id)->getPosition();
-    }
-    else if (type == PreparationTypeNostalgic)
-    {
-        thisGallery->getNostalgic(Id)->getPosition();
-    }
-    else if (type == PreparationTypeTuning)
-    {
-        thisGallery->getTuning(Id)->getPosition();
-    }
-    else if (type == PreparationTypeTempo)
-    {
-        thisGallery->getTempo(Id)->getPosition();
-    }
-    else if (type == PreparationTypeKeymap)
-    {
-        thisGallery->getKeymap(Id)->getPosition();
-    }
-    else if (type == PreparationTypeDirectMod)
-    {
-        thisGallery->getDirectModPreparation(Id)->getPosition();
-    }
-    else if (type == PreparationTypeNostalgicMod)
-    {
-        thisGallery->getNostalgicModPreparation(Id)->getPosition();
-    }
-    else if (type == PreparationTypeSynchronicMod)
-    {
-        thisGallery->getSynchronicModPreparation(Id)->getPosition();
-    }
-    else if (type == PreparationTypeTuningMod)
-    {
-        thisGallery->getTuningModPreparation(Id)->getPosition();
-    }
-    else if (type == PreparationTypeTempoMod)
-    {
-        thisGallery->getTempoModPreparation(Id)->getPosition();
-    }
-    else if (type == PreparationTypePianoMap)
-    {
-        
-    }
-}
-
-void BKItem::setPosition(int X, int Y)
-{
-    Gallery::Ptr thisGallery = processor.gallery;
-    Piano::Ptr thisPiano = processor.currentPiano;
-    
-    if (type == PreparationTypeDirect)
-    {
-        thisGallery->getDirect(Id)->setPosition(X,Y);
-    }
-    else if (type == PreparationTypeSynchronic)
-    {
-        thisGallery->getSynchronic(Id)->setPosition(X,Y);
-    }
-    else if (type == PreparationTypeNostalgic)
-    {
-        thisGallery->getNostalgic(Id)->setPosition(X,Y);
-    }
-    else if (type == PreparationTypeTuning)
-    {
-        thisGallery->getTuning(Id)->setPosition(X,Y);
-    }
-    else if (type == PreparationTypeTempo)
-    {
-        thisGallery->getTempo(Id)->setPosition(X,Y);
-    }
-    else if (type == PreparationTypeKeymap)
-    {
-        thisGallery->getKeymap(Id)->setPosition(X,Y);
-    }
-    else if (type == PreparationTypeDirectMod)
-    {
-        thisGallery->getDirectModPreparation(Id)->setPosition(X,Y);
-    }
-    else if (type == PreparationTypeNostalgicMod)
-    {
-        thisGallery->getNostalgicModPreparation(Id)->setPosition(X,Y);
-    }
-    else if (type == PreparationTypeSynchronicMod)
-    {
-        thisGallery->getSynchronicModPreparation(Id)->setPosition(X,Y);
-    }
-    else if (type == PreparationTypeTuningMod)
-    {
-        thisGallery->getTuningModPreparation(Id)->setPosition(X,Y);
-    }
-    else if (type == PreparationTypeTempoMod)
-    {
-        thisGallery->getTempoModPreparation(Id)->setPosition(X,Y);
-    }
-    else if (type == PreparationTypePianoMap)
-    {
-        
-    }
-}
-
 void BKItem::mouseUp(const MouseEvent& e)
 {
-    setPosition(e.x, e.y);
+    int X = e.getEventRelativeTo(getParentComponent()).x;
+    int Y = e.getEventRelativeTo(getParentComponent()).y;
+    
+    processor.currentPiano->configuration->setItemXY(type, Id, X, Y);
     mouseExit(e);
 }
 
@@ -374,6 +267,7 @@ void BKItemGraph::add(BKItem* itemToAdd)
     
     itemToAdd->addActionListener(this);
     items.add(itemToAdd);
+    processor.currentPiano->configuration->addItem(itemToAdd->getType(), itemToAdd->getId());
     
     
 }
@@ -1363,12 +1257,12 @@ Array<Line<float>> BKItemGraph::getLines(void)
     return lines;
 }
 
-
 void BKItemGraph::reconstruct(void)
 {
     preparations.clear();
     
     Piano::Ptr thisPiano = processor.currentPiano;
+    
     int pmapcount = 0;
     for (auto pmap : thisPiano->getPreparationMaps())
     {
@@ -1386,7 +1280,7 @@ void BKItemGraph::reconstruct(void)
         
         keymap = itemWithTypeAndId(PreparationTypeKeymap, keymapId);
 
-        if (!contains(keymap)) items.add(keymap);
+        if (!contains(keymap)) add(keymap);
     
     
         for (auto p : pmap->getTuning())
@@ -1399,7 +1293,7 @@ void BKItemGraph::reconstruct(void)
             
             if (!contains(newPreparation))
             {
-                items.add(newPreparation);
+                add(newPreparation);
                 preparations.add(newPreparation);
             }
         }
@@ -1414,7 +1308,7 @@ void BKItemGraph::reconstruct(void)
             
             if (!contains(newPreparation))
             {
-                items.add(newPreparation);
+                add(newPreparation);
                 preparations.add(newPreparation);
             }
         }
@@ -1429,7 +1323,7 @@ void BKItemGraph::reconstruct(void)
             
             if (!contains(newPreparation))
             {
-                items.add(newPreparation);
+                add(newPreparation);
                 
                 preparations.add(newPreparation);
                 
@@ -1437,7 +1331,7 @@ void BKItemGraph::reconstruct(void)
                 
                 BKItem* thisTuning = itemWithTypeAndId(PreparationTypeTuning, tuningId);
                 
-                if (!contains(thisTuning))  items.add(thisTuning);
+                if (!contains(thisTuning))  add(thisTuning);
                 
                 connectUI(newPreparation, thisTuning);
             }
@@ -1454,7 +1348,7 @@ void BKItemGraph::reconstruct(void)
             
             if (!contains(newPreparation))
             {
-                items.add(newPreparation);
+                add(newPreparation);
                 preparations.add(newPreparation);
             
                 // TUNING
@@ -1462,7 +1356,7 @@ void BKItemGraph::reconstruct(void)
                 
                 BKItem* thisTuning = itemWithTypeAndId(PreparationTypeTuning, tuningId);
                 
-                if (!contains(thisTuning))  items.add(thisTuning);
+                if (!contains(thisTuning))  add(thisTuning);
                 
                 connectUI(newPreparation, thisTuning);
                 
@@ -1472,7 +1366,7 @@ void BKItemGraph::reconstruct(void)
                 
                 BKItem* thisTempo = itemWithTypeAndId(PreparationTypeTempo, tempoId);
                 
-                if (!contains(thisTempo))  items.add(thisTempo);
+                if (!contains(thisTempo))  add(thisTempo);
                 
                 connectUI(newPreparation, thisTempo);
             }
@@ -1490,7 +1384,7 @@ void BKItemGraph::reconstruct(void)
 
             if (!contains(newPreparation))
             {
-                items.add(newPreparation);
+                add(newPreparation);
                 preparations.add(newPreparation);
                 
                 // TUNING
@@ -1498,7 +1392,7 @@ void BKItemGraph::reconstruct(void)
                 
                 BKItem* thisTuning = itemWithTypeAndId(PreparationTypeTuning, tuningId);
                 
-                if (!contains(thisTuning))  items.add(thisTuning);
+                if (!contains(thisTuning))  add(thisTuning);
                 
                 connectUI(newPreparation, thisTuning);
                 
@@ -1508,7 +1402,7 @@ void BKItemGraph::reconstruct(void)
                 
                 BKItem* thisSyncTarget = itemWithTypeAndId(PreparationTypeSynchronic, syncId);
                 
-                if (!contains(thisSyncTarget))  items.add(thisSyncTarget);
+                if (!contains(thisSyncTarget))  add(thisSyncTarget);
                 
                 connectUI(newPreparation, thisSyncTarget);
             }
@@ -1533,12 +1427,12 @@ void BKItemGraph::reconstruct(void)
         
         BKItem* thisMod = itemWithTypeAndId(type, Id);
         
-        if (!contains(thisMod) && (keymaps.size() || targets.size())) items.add(thisMod);
+        if (!contains(thisMod) && (keymaps.size() || targets.size())) add(thisMod);
         
         for (auto k : keymaps)
         {
             BKItem* thisKeymap = itemWithTypeAndId(PreparationTypeKeymap, k);
-            if (!contains(thisKeymap)) items.add(thisKeymap);
+            if (!contains(thisKeymap)) add(thisKeymap);
             
             connectUI(thisKeymap, thisMod);
         }
@@ -1568,7 +1462,7 @@ void BKItemGraph::reconstruct(void)
                 thisTarget = itemWithTypeAndId(PreparationTypeTuning, t);
             }
             
-            if (!contains(thisTarget)) items.add(thisTarget);
+            if (!contains(thisTarget)) add(thisTarget);
             
             connectUI(thisTarget, thisMod);
         }
@@ -1582,7 +1476,7 @@ void BKItemGraph::reconstruct(void)
         {
             BKItem* thisMap = itemWithTypeAndId(PreparationTypePianoMap, count++);
             
-            if (!contains(thisMap)) items.add(thisMap);
+            if (!contains(thisMap)) add(thisMap);
             
             thisMap->setSelectedId(pianoMap[i]);
             
@@ -1607,7 +1501,7 @@ void BKItemGraph::reconstruct(void)
             
             BKItem* thisKeymap = itemWithTypeAndId(PreparationTypeKeymap, newKeymap->getId());
             
-            if (!contains(thisKeymap)) items.add(thisKeymap);
+            if (!contains(thisKeymap)) add(thisKeymap);
             
             connectUI(thisMap, thisKeymap);
         }

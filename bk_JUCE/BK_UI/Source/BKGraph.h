@@ -74,8 +74,17 @@ public:
     inline int getSelectedId(void) const noexcept {return currentId;}
     inline void setSelectedId(int Id) { menu.setSelectedId(Id, dontSendNotification); }
     
-    Point<int> getPosition(void);
-    void setPosition(int X, int Y);
+    inline Point<int> getItemPosition(void)
+    {
+        getPosition();
+    }
+    
+    inline void setItemBounds(int X, int Y, int width, int height)
+    {
+        setBounds(X,Y,width,height);
+        
+        processor.currentPiano->configuration->setItemXY(type, Id, X, Y);
+    }
     
     // Public members
     Point<float> origin;
@@ -90,6 +99,8 @@ private:
     Label label;
     BKComboBox menu; int currentId;
     Component fullChild;
+    
+    Point<int> position;
     
     
     BKItem::PtrArr connections;

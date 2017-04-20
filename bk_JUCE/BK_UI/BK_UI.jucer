@@ -52,6 +52,7 @@
           <FILE id="fIg23Y" name="GalleryJSON.cpp" compile="1" resource="0" file="Source/GalleryJSON.cpp"/>
         </GROUP>
         <GROUP id="{1CB08EFA-DEC3-73DF-DE6C-B6E7D430054C}" name="Piano">
+          <FILE id="ZUXmPM" name="PianoConfig.h" compile="0" resource="0" file="Source/PianoConfig.h"/>
           <FILE id="eStbij" name="Piano.h" compile="0" resource="0" file="Source/Piano.h"/>
           <FILE id="SPsY4L" name="Piano.cpp" compile="1" resource="0" file="Source/Piano.cpp"/>
         </GROUP>

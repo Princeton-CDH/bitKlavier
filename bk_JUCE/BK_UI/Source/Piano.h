@@ -25,6 +25,7 @@
 
 #include "Reset.h"
 
+#include "PianoConfig.h"
 
 class Piano : public ReferenceCountedObject
 {
@@ -48,6 +49,8 @@ public:
           Keymap::PtrArr* keymap,
           int Id);
     ~Piano();
+    
+
     
     void storeCurrentPiano();
     
@@ -112,6 +115,16 @@ public:
     ValueTree getState(void);
     
     void setState(XmlElement* e);
+    
+    inline void setUIState(ValueTree vt)
+    {
+        
+    }
+    
+    inline ValueTree getUIState(void)
+    {
+        
+    }
     
     inline void configurePianoMap(Keymap::Ptr thisKeymap, int pianoId)
     {
@@ -241,6 +254,8 @@ public:
     int                         removeLastPreparationMap(void);
     int                         removePreparationMapWithKeymap(Keymap::Ptr thisKeymap);
 
+    PianoConfiguration::Ptr     configuration;
+    
     
 private:
     int Id;
@@ -266,9 +281,6 @@ private:
     
     Keymap::PtrArr*                      bkKeymaps;
     TuningModPreparation::PtrArr*        modTuning;
-    
-    
-    
     
     inline Array<int> getAllIds(Direct::PtrArr direct)
     {

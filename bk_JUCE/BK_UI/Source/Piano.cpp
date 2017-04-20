@@ -38,6 +38,9 @@ modTempo(mTempo),
 bkKeymaps(keymaps),
 Id(Id)
 {
+    
+    configuration = new PianoConfiguration();
+    
     numPMaps = 0;
     pianoMap.ensureStorageAllocated(128);
     
@@ -61,8 +64,6 @@ Piano::~Piano()
                    
 void Piano::configureDirectModification(int key, DirectModPreparation::Ptr dmod, Array<int> whichPreps)
 {
-    DBG("CONFIGURING DIRECT MODIFICATION");
-    
     DBG("key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
     
     int whichMod = dmod->getId();
@@ -72,15 +73,13 @@ void Piano::configureDirectModification(int key, DirectModPreparation::Ptr dmod,
     {
         String param = dmod->getParam((DirectParameterType)n);
         
-        DBG("param: " + param);
-        
         if (param != "")
         {
             for (auto prep : whichPreps)
             {
                 modMap[key]->addDirectModification(new DirectModification(key, prep, (DirectParameterType)n, param, whichMod));
                 
-                DBG("ADD whichmod: " + String(whichMod) + " whichprep: " + String(prep) + " whichtype: " + cDirectParameterTypes[n] + " val: " +param + " TO key: " + String(key));
+                //DBG("ADD whichmod: " + String(whichMod) + " whichprep: " + String(prep) + " whichtype: " + cDirectParameterTypes[n] + " val: " +param + " TO key: " + String(key));
             }
         }
     }
@@ -344,8 +343,6 @@ void Piano::configureTempoModification(int key, TempoModPreparation::Ptr dmod, A
     {
         String param = dmod->getParam((TempoParameterType)n);
         
-        DBG("param: " + param);
-        
         if (param != "")
         {
             for (auto prep : whichPreps)
@@ -416,8 +413,6 @@ void Piano::configureTuningModification(int key, TuningModPreparation::Ptr dmod,
     {
         String param = dmod->getParam((TuningParameterType)n);
         
-        DBG("param: " + param);
-        
         if (param != "")
         {
             for (auto prep : whichPreps)
@@ -479,35 +474,31 @@ void Piano::deconfigureTuningModification(TuningModPreparation::Ptr mod, Array<i
 // Add preparation map, return its Id.
 int Piano::addPreparationMap(void)
 {
-    prepMaps.add(new PreparationMap(bkKeymaps->getUnchecked(0),
-                                    numPMaps));
+    PreparationMap::Ptr thisPreparationMap = new PreparationMap(bkKeymaps->getUnchecked(0), numPMaps);
     
-    prepMaps[numPMaps]->prepareToPlay(sampleRate);
+    prepMaps.add(thisPreparationMap);
     
-    activePMaps.addIfNotAlreadyThere(prepMaps[numPMaps]);
+    thisPreparationMap->prepareToPlay(sampleRate);
     
-    ++numPMaps;
+    activePMaps.add(thisPreparationMap);
     
-    
-    return numPMaps-1;
+    return prepMaps.size()-1;
 }
 
 // Add preparation map, return its Id.
 int Piano::addPreparationMap(Keymap::Ptr keymap)
 {
-    prepMaps.add(new PreparationMap(bkKeymaps->getUnchecked(0),
-                                    numPMaps));
+    PreparationMap::Ptr thisPreparationMap = new PreparationMap(keymap, numPMaps);
     
-    prepMaps[numPMaps]->prepareToPlay(sampleRate);
+    prepMaps.add(thisPreparationMap);
     
-    prepMaps[numPMaps]->setKeymap(keymap);
+    thisPreparationMap->prepareToPlay(sampleRate);
     
-    activePMaps.addIfNotAlreadyThere(prepMaps[numPMaps]);
+    thisPreparationMap->setKeymap(keymap);
     
-    ++numPMaps;
+    activePMaps.add(thisPreparationMap);
     
-    
-    return numPMaps-1;
+    return prepMaps.size()-1;
 }
 
 PreparationMap::Ptr        Piano::getPreparationMapWithKeymap(Keymap::Ptr thisKeymap)
@@ -685,6 +676,9 @@ ValueTree Piano::getState(void)
         }
     }
     
+    ValueTree configurationVT = configuration->getState();
+    pianoVT.addChild(configurationVT, -1, 0);
+    
     return pianoVT;
 }
 
@@ -698,15 +692,18 @@ void Piano::setState(XmlElement* e)
     if (pianoName != String::empty)
         setName(e->getStringAttribute("bkPianoName"));
     
+    configuration = new PianoConfiguration();
+    
     forEachXmlChildElement (*e, pc)
     {
         String map =  "mapper" + String(mapperCount);
         
-        DBG(map);
-                                         
-        if (pc->hasTagName(map))
+        if (pc->hasTagName("configuration"))
         {
-            DBG("made it in mapper");
+            configuration->setState(pc);
+        }
+        else if (pc->hasTagName(map))
+        {
             i = pc->getStringAttribute("type").getIntValue();
             BKPreparationType type = (BKPreparationType) i;
             

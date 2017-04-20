@@ -1272,7 +1272,7 @@ public:
 
     void print(void)
     {
-        DBG("MAPPER type: " + String(type) + " Id: " + String(Id) + " Keymaps: " + intArrayToString(keymaps) + " Targets: " + intArrayToString(targets));
+        //DBG("MAPPER type: " + String(type) + " Id: " + String(Id) + " Keymaps: " + intArrayToString(keymaps) + " Targets: " + intArrayToString(targets));
     }
     
     inline int getId(void) const noexcept { return Id; }

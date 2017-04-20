@@ -54,7 +54,11 @@ public:
         
         graph->reconstruct();
         
+        processor.currentPiano->configuration->print();
+        
+        
         draw();
+        
     }
 
     void paint(Graphics& g) override
@@ -100,7 +104,7 @@ private:
     
     BKItemGraph* graph;
     
-    
+#define AUTO_DRAW 0
 #define NUM_COL 6
     void draw(void)
     {
@@ -110,58 +114,84 @@ private:
             BKPreparationType type = item->getType();
             int which = item->getId();
             
-            Point<int> pos = item->getPosition();
+            Point<int> xy = processor.currentPiano->configuration->getXY(type, which);
+            
+            int x = xy.x; int y = xy.y;
             
             if (type == PreparationTypeKeymap)
             {
+#if AUTO_DRAW
                 int col = (int)(keymapCount / NUM_COL);
                 int row = keymapCount % NUM_COL;
-                
+
                 int X = 10 + (row * 155);
                 int Y = 50 + (col * 25);
                 
-                item->setBounds(X, Y, 100, 40);
-
+                item->setItemBounds(X, Y, 100, 40);
+                
                 keymapCount++;
+#else
+                item->setBounds(x, y, 100, 40);
+#endif
+                
             }
             else if (type <= PreparationTypeNostalgic)
             {
+#if AUTO_DRAW
                 int col = (int)(prepCount / NUM_COL);
                 int row = prepCount % NUM_COL;
                 
                 int X = 10 + (row * 155);
                 int Y = 200 + (col * 25);
                 
-                item->setBounds(X, Y, 150, 20);
+                item->setItemBounds(X, Y, 150, 20);
                 
                 prepCount++;
+#else
+                item->setBounds(x, y, 150, 20);
+#endif
+                
             }
             else if (type > PreparationTypeKeymap)
             {
+#if AUTO_DRAW
                 int col = (int)(modCount / NUM_COL);
                 int row = modCount % NUM_COL;
                 
                 int X = 95 + (row * 155);
                 int Y = 125 + (col * 25);
                 
-                item->setBounds(X, Y, 130, 20);
+                
+                item->setItemBounds(X, Y, 130, 20);
                 
                 modCount++;
+#else
+                item->setBounds(x, y, 130, 20);
+#endif
             }
             else
             {
+#if AUTO_DRAW
                 int col = (int)(otherCount / NUM_COL);
                 int row = otherCount % NUM_COL;
                 
                 int X = 10 + (row * 155);
                 int Y = 350 + (col * 25);
                 
-                item->setBounds(X, Y, 150, 20);
+                item->setItemBounds(X, Y, 150, 20);
+                
                 otherCount++;
+#else
+                item->setBounds(x, y, 150, 20);
+#endif
+                
             }
             
             addAndMakeVisible(item);
         }
+        
+        DBG("POST DRAW");
+        processor.currentPiano->configuration->print();
         
         repaint();
     }
@@ -175,7 +205,7 @@ private:
         {
             BKItem::Ptr toAdd = new BKItem(type, data[i], processor);
             
-            toAdd->setBounds(x, (i-1)*25 + y, 150, 20);
+            toAdd->setItemBounds(x, (i-1)*25 + y, 150, 20);
             
             if (type == PreparationTypeReset || type == PreparationTypePianoMap || !graph->contains(toAdd)) graph->add(toAdd);
 
