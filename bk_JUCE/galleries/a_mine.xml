@@ -5,131 +5,142 @@
            resonanceGain="1" hammerGain="0.0099999997764825820923" tempoMultiplier="1"
            resAndHammer="1" invertSustain="0" tuningFund="440"/>
   <tempo0 Id="0" name="0" tempo="120" system="0" at1Mode="0" at1History="4"
-          at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+          at1Subdivisions="1" at1Min="100" at1Max="2000" X="-1" Y="-1"/>
   <tempo1 Id="1" name="1" tempo="120" system="0" at1Mode="0" at1History="4"
-          at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+          at1Subdivisions="1" at1Min="100" at1Max="2000" X="-1" Y="-1"/>
   <tempo2 Id="2" name="2" tempo="120" system="0" at1Mode="0" at1History="4"
-          at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+          at1Subdivisions="1" at1Min="100" at1Max="2000" X="-1" Y="-1"/>
   <tempo3 Id="3" name="3" tempo="60" system="0" at1Mode="0" at1History="4"
-          at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+          at1Subdivisions="1" at1Min="100" at1Max="2000" X="-1" Y="-1"/>
   <tempo4 Id="4" name="4" tempo="240" system="0" at1Mode="0" at1History="4"
-          at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+          at1Subdivisions="1" at1Min="100" at1Max="2000" X="-1" Y="-1"/>
   <tuning0 Id="0" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
            adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
-           adaptiveClusterThresh="100" adaptiveHistory="4">
+           adaptiveClusterThresh="100" adaptiveHistory="4" X="-1" Y="-1">
     <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
                  f9="0" f10="0" f11="0"/>
     <absoluteOffsets/>
   </tuning0>
   <tuning1 Id="1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="0"
            adaptiveInversional="0" adaptiveAnchorScale="0" adaptiveAnchorFund="0"
-           adaptiveClusterThresh="300" adaptiveHistory="5">
+           adaptiveClusterThresh="300" adaptiveHistory="5" X="10" Y="350">
     <customScale f0="6" f1="0" f2="2" f3="4" f4="-2" f5="6" f6="-2" f7="4" f8="2"
                  f9="0" f10="6" f11="-2"/>
     <absoluteOffsets/>
   </tuning1>
   <tuning2 Id="2" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="0"
            adaptiveInversional="0" adaptiveAnchorScale="0" adaptiveAnchorFund="0"
-           adaptiveClusterThresh="300" adaptiveHistory="5">
+           adaptiveClusterThresh="300" adaptiveHistory="5" X="-1" Y="-1">
     <customScale f0="6" f1="0" f2="2" f3="4" f4="-2" f5="6" f6="-2" f7="4" f8="2"
                  f9="0" f10="6" f11="-2"/>
     <absoluteOffsets/>
   </tuning2>
   <tuning3 Id="3" scale="0" fundamental="0" offset="0" adaptiveIntervalScale="0"
            adaptiveInversional="0" adaptiveAnchorScale="0" adaptiveAnchorFund="0"
-           adaptiveClusterThresh="300" adaptiveHistory="5">
+           adaptiveClusterThresh="300" adaptiveHistory="5" X="-1" Y="-1">
     <customScale f0="6" f1="0" f2="2" f3="4" f4="-2" f5="6" f6="-2" f7="4" f8="2"
                  f9="0" f10="6" f11="-2"/>
     <absoluteOffsets/>
   </tuning3>
   <tuning4 Id="4" scale="0" fundamental="0" offset="0" adaptiveIntervalScale="0"
            adaptiveInversional="0" adaptiveAnchorScale="0" adaptiveAnchorFund="0"
-           adaptiveClusterThresh="300" adaptiveHistory="5">
+           adaptiveClusterThresh="300" adaptiveHistory="5" X="-1" Y="-1">
     <customScale f0="6" f1="0" f2="2" f3="4" f4="-2" f5="6" f6="-2" f7="4" f8="2"
                  f9="0" f10="6" f11="-2"/>
     <absoluteOffsets/>
   </tuning4>
   <tuning5 Id="5" scale="1" fundamental="7" offset="0" adaptiveIntervalScale="0"
            adaptiveInversional="0" adaptiveAnchorScale="0" adaptiveAnchorFund="0"
-           adaptiveClusterThresh="300" adaptiveHistory="5">
+           adaptiveClusterThresh="300" adaptiveHistory="5" X="-1" Y="-1">
     <customScale f0="6" f1="0" f2="2" f3="4" f4="-2" f5="6" f6="-2" f7="4" f8="2"
                  f9="0" f10="6" f11="-2"/>
     <absoluteOffsets/>
   </tuning5>
   <tuning6 Id="6" scale="3" fundamental="0" offset="0" adaptiveIntervalScale="1"
            adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
-           adaptiveClusterThresh="1" adaptiveHistory="1">
+           adaptiveClusterThresh="1" adaptiveHistory="1" X="-1" Y="-1">
     <customScale f0="6" f1="0" f2="2" f3="4" f4="-2" f5="6" f6="-2" f7="4" f8="2"
                  f9="0" f10="6" f11="-2"/>
     <absoluteOffsets/>
   </tuning6>
   <tuning7 Id="7" scale="3" fundamental="0" offset="0" adaptiveIntervalScale="1"
            adaptiveInversional="0" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
-           adaptiveClusterThresh="1" adaptiveHistory="1">
+           adaptiveClusterThresh="1" adaptiveHistory="1" X="-1" Y="-1">
     <customScale f0="6" f1="0" f2="2" f3="4" f4="-2" f5="6" f6="-2" f7="4" f8="2"
                  f9="0" f10="6" f11="-2"/>
     <absoluteOffsets/>
   </tuning7>
   <tuning8 Id="8" scale="3" fundamental="0" offset="0" adaptiveIntervalScale="1"
            adaptiveInversional="0" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
-           adaptiveClusterThresh="1000" adaptiveHistory="3">
+           adaptiveClusterThresh="1000" adaptiveHistory="3" X="-1" Y="-1">
     <customScale f0="6" f1="0" f2="2" f3="4" f4="-2" f5="6" f6="-2" f7="4" f8="2"
                  f9="0" f10="6" f11="-2"/>
     <absoluteOffsets/>
   </tuning8>
   <tuning9 Id="9" scale="4" fundamental="0" offset="0" adaptiveIntervalScale="1"
            adaptiveInversional="0" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
-           adaptiveClusterThresh="300" adaptiveHistory="5">
+           adaptiveClusterThresh="300" adaptiveHistory="5" X="-1" Y="-1">
     <customScale f0="6" f1="0" f2="2" f3="4" f4="-2" f5="6" f6="-2" f7="4" f8="2"
                  f9="0" f10="6" f11="-2"/>
     <absoluteOffsets/>
   </tuning9>
   <tuning10 Id="10" scale="1" fundamental="0" offset="0" adaptiveIntervalScale="0"
             adaptiveInversional="0" adaptiveAnchorScale="0" adaptiveAnchorFund="0"
-            adaptiveClusterThresh="300" adaptiveHistory="5">
+            adaptiveClusterThresh="300" adaptiveHistory="5" X="-1" Y="-1">
     <customScale f0="6" f1="0" f2="2" f3="4" f4="-2" f5="6" f6="-2" f7="4" f8="2"
                  f9="0" f10="6" f11="-2"/>
     <absoluteOffsets/>
   </tuning10>
   <tuning11 Id="11" scale="0" fundamental="7" offset="0" adaptiveIntervalScale="0"
             adaptiveInversional="0" adaptiveAnchorScale="0" adaptiveAnchorFund="0"
-            adaptiveClusterThresh="300" adaptiveHistory="5">
+            adaptiveClusterThresh="300" adaptiveHistory="5" X="-1" Y="-1">
     <customScale f0="6" f1="0" f2="2" f3="4" f4="-2" f5="6" f6="-2" f7="4" f8="2"
                  f9="0" f10="6" f11="-2"/>
     <absoluteOffsets/>
   </tuning11>
-  <direct0 Id="0" name="0" tuning="0" gain="1" resGain="1" hammerGain="1">
+  <direct0 Id="0" name="0" tuning="0" gain="1" resGain="1" hammerGain="1"
+           X="-1" Y="-1">
     <transposition f0="0"/>
   </direct0>
-  <direct1 Id="1" name="Direct2" tuning="1" gain="1" resGain="1" hammerGain="1">
+  <direct1 Id="1" name="Direct2" tuning="1" gain="1" resGain="1" hammerGain="1"
+           X="10" Y="200">
     <transposition f0="0"/>
   </direct1>
-  <direct2 Id="2" name="Direct3" tuning="2" gain="1" resGain="1" hammerGain="1">
+  <direct2 Id="2" name="Direct3" tuning="2" gain="1" resGain="1" hammerGain="1"
+           X="-1" Y="-1">
     <transposition f0="0"/>
   </direct2>
-  <direct3 Id="3" name="Direct4" tuning="5" gain="1" resGain="1" hammerGain="1">
+  <direct3 Id="3" name="Direct4" tuning="5" gain="1" resGain="1" hammerGain="1"
+           X="-1" Y="-1">
     <transposition f0="0"/>
   </direct3>
-  <direct4 Id="4" name="Direct5" tuning="6" gain="1" resGain="1" hammerGain="1">
+  <direct4 Id="4" name="Direct5" tuning="6" gain="1" resGain="1" hammerGain="1"
+           X="-1" Y="-1">
     <transposition f0="0"/>
   </direct4>
-  <direct5 Id="5" name="Direct6" tuning="7" gain="1" resGain="1" hammerGain="1">
+  <direct5 Id="5" name="Direct6" tuning="7" gain="1" resGain="1" hammerGain="1"
+           X="-1" Y="-1">
     <transposition f0="0"/>
   </direct5>
-  <direct6 Id="6" name="Direct7" tuning="8" gain="1" resGain="1" hammerGain="1">
+  <direct6 Id="6" name="Direct7" tuning="8" gain="1" resGain="1" hammerGain="1"
+           X="-1" Y="-1">
     <transposition f0="0"/>
   </direct6>
-  <direct7 Id="7" name="Direct8" tuning="9" gain="1" resGain="1" hammerGain="1">
+  <direct7 Id="7" name="Direct8" tuning="9" gain="1" resGain="1" hammerGain="1"
+           X="-1" Y="-1">
     <transposition f0="0"/>
   </direct7>
-  <direct8 Id="8" name="Direct10" tuning="0" gain="0" resGain="1" hammerGain="1">
+  <direct8 Id="8" name="Direct10" tuning="0" gain="0" resGain="1" hammerGain="1"
+           X="-1" Y="-1">
     <transposition f0="0"/>
   </direct8>
-  <direct9 Id="9" name="Direct11" tuning="0" gain="0" resGain="1" hammerGain="1">
+  <direct9 Id="9" name="Direct11" tuning="0" gain="0" resGain="1" hammerGain="1"
+           X="-1" Y="-1">
     <transposition f0="0"/>
   </direct9>
   <synchronic0 Id="0" name="0" tuningId="0" tempoId="0" numBeats="0" clusterMin="1"
-               clusterMax="100" clusterThresh="500" mode="0" beatsToSkip="0">
+               clusterMax="100" clusterThresh="500" mode="0" beatsToSkip="0"
+               X="-1" Y="-1">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
     <accentMultipliers f0="1"/>
@@ -138,7 +149,8 @@
     </transpOffsets>
   </synchronic0>
   <synchronic1 Id="1" name="1" tuningId="1" tempoId="2" numBeats="10000" clusterMin="2"
-               clusterMax="100" clusterThresh="500" mode="1" beatsToSkip="0">
+               clusterMax="100" clusterThresh="500" mode="1" beatsToSkip="0"
+               X="-1" Y="-1">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
     <accentMultipliers f0="1"/>
@@ -147,7 +159,8 @@
     </transpOffsets>
   </synchronic1>
   <synchronic2 Id="2" name="2" tuningId="1" tempoId="1" numBeats="10000" clusterMin="2"
-               clusterMax="100" clusterThresh="500" mode="0" beatsToSkip="1">
+               clusterMax="100" clusterThresh="500" mode="0" beatsToSkip="1"
+               X="-1" Y="-1">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
     <accentMultipliers f0="1"/>
@@ -156,7 +169,8 @@
     </transpOffsets>
   </synchronic2>
   <synchronic3 Id="3" name="3" tuningId="1" tempoId="1" numBeats="10000" clusterMin="2"
-               clusterMax="100" clusterThresh="500" mode="0" beatsToSkip="1">
+               clusterMax="100" clusterThresh="500" mode="0" beatsToSkip="1"
+               X="-1" Y="-1">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
     <accentMultipliers f0="1" f1="0.5" f2="0.25"/>
@@ -165,7 +179,8 @@
     </transpOffsets>
   </synchronic3>
   <synchronic4 Id="4" name="4" tuningId="1" tempoId="1" numBeats="10000" clusterMin="2"
-               clusterMax="3" clusterThresh="500" mode="0" beatsToSkip="0">
+               clusterMax="3" clusterThresh="500" mode="0" beatsToSkip="0" X="-1"
+               Y="-1">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
     <accentMultipliers f0="1" f1="0.5" f2="0.25"/>
@@ -174,7 +189,8 @@
     </transpOffsets>
   </synchronic4>
   <synchronic5 Id="5" name="5" tuningId="1" tempoId="1" numBeats="12" clusterMin="2"
-               clusterMax="3" clusterThresh="500" mode="0" beatsToSkip="0">
+               clusterMax="3" clusterThresh="500" mode="0" beatsToSkip="0" X="-1"
+               Y="-1">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="6" f1="4" f2="2"/>
     <accentMultipliers f0="1" f1="0.5" f2="0.25"/>
@@ -183,7 +199,8 @@
     </transpOffsets>
   </synchronic5>
   <synchronic6 Id="6" name="6" tuningId="3" tempoId="1" numBeats="12" clusterMin="2"
-               clusterMax="3" clusterThresh="500" mode="0" beatsToSkip="0">
+               clusterMax="3" clusterThresh="500" mode="0" beatsToSkip="0" X="-1"
+               Y="-1">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="6" f1="4" f2="2"/>
     <accentMultipliers f0="1" f1="0.5" f2="0.25"/>
@@ -192,7 +209,8 @@
     </transpOffsets>
   </synchronic6>
   <synchronic7 Id="7" name="7" tuningId="4" tempoId="1" numBeats="12" clusterMin="2"
-               clusterMax="3" clusterThresh="500" mode="0" beatsToSkip="0">
+               clusterMax="3" clusterThresh="500" mode="0" beatsToSkip="0" X="-1"
+               Y="-1">
     <beatMultipliers f0="1.2000000476837158203" f1="1" f2="0.69999998807907104492"/>
     <lengthMultipliers f0="4" f1="6" f2="2"/>
     <accentMultipliers f0="1" f1="0.5" f2="0.25"/>
@@ -201,7 +219,8 @@
     </transpOffsets>
   </synchronic7>
   <synchronic8 Id="8" name="8" tuningId="3" tempoId="1" numBeats="10000" clusterMin="2"
-               clusterMax="3" clusterThresh="500" mode="0" beatsToSkip="0">
+               clusterMax="3" clusterThresh="500" mode="0" beatsToSkip="0" X="-1"
+               Y="-1">
     <beatMultipliers f0="1.2000000476837158203" f1="1" f2="0.69999998807907104492"/>
     <lengthMultipliers f0="4" f1="6" f2="2" f3="1" f4="1.5"/>
     <accentMultipliers f0="1" f1="0.5" f2="0.25" f3="0.125"/>
@@ -210,7 +229,8 @@
     </transpOffsets>
   </synchronic8>
   <synchronic9 Id="9" name="9" tuningId="3" tempoId="1" numBeats="10000" clusterMin="2"
-               clusterMax="3" clusterThresh="500" mode="3" beatsToSkip="0">
+               clusterMax="3" clusterThresh="500" mode="3" beatsToSkip="0" X="-1"
+               Y="-1">
     <beatMultipliers f0="1.2000000476837158203" f1="1" f2="0.69999998807907104492"/>
     <lengthMultipliers f0="4" f1="6" f2="2" f3="1" f4="1.5"/>
     <accentMultipliers f0="1" f1="0.5" f2="0.25" f3="0.125"/>
@@ -219,7 +239,8 @@
     </transpOffsets>
   </synchronic9>
   <synchronic10 Id="10" name="10" tuningId="1" tempoId="3" numBeats="10000" clusterMin="1"
-                clusterMax="100" clusterThresh="1200" mode="0" beatsToSkip="1">
+                clusterMax="100" clusterThresh="1200" mode="0" beatsToSkip="1"
+                X="-1" Y="-1">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
     <accentMultipliers f0="1"/>
@@ -228,7 +249,8 @@
     </transpOffsets>
   </synchronic10>
   <synchronic11 Id="11" name="11" tuningId="1" tempoId="3" numBeats="10000" clusterMin="1"
-                clusterMax="100" clusterThresh="1200" mode="0" beatsToSkip="1">
+                clusterMax="100" clusterThresh="1200" mode="0" beatsToSkip="1"
+                X="-1" Y="-1">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
     <accentMultipliers f0="1"/>
@@ -237,7 +259,8 @@
     </transpOffsets>
   </synchronic11>
   <synchronic12 Id="12" name="12" tuningId="1" tempoId="3" numBeats="10000" clusterMin="2"
-                clusterMax="100" clusterThresh="1200" mode="0" beatsToSkip="1">
+                clusterMax="100" clusterThresh="1200" mode="0" beatsToSkip="1"
+                X="-1" Y="-1">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
     <accentMultipliers f0="1"/>
@@ -246,7 +269,8 @@
     </transpOffsets>
   </synchronic12>
   <synchronic13 Id="13" name="13" tuningId="1" tempoId="1" numBeats="10000" clusterMin="2"
-                clusterMax="100" clusterThresh="500" mode="1" beatsToSkip="0">
+                clusterMax="100" clusterThresh="500" mode="1" beatsToSkip="0"
+                X="-1" Y="-1">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
     <accentMultipliers f0="1"/>
@@ -255,7 +279,8 @@
     </transpOffsets>
   </synchronic13>
   <synchronic14 Id="14" name="14" tuningId="1" tempoId="4" numBeats="10000" clusterMin="2"
-                clusterMax="100" clusterThresh="500" mode="1" beatsToSkip="0">
+                clusterMax="100" clusterThresh="500" mode="1" beatsToSkip="0"
+                X="-1" Y="-1">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
     <accentMultipliers f0="1"/>
@@ -264,7 +289,8 @@
     </transpOffsets>
   </synchronic14>
   <synchronic15 Id="15" name="15" tuningId="1" tempoId="3" numBeats="10000" clusterMin="2"
-                clusterMax="100" clusterThresh="500" mode="1" beatsToSkip="0">
+                clusterMax="100" clusterThresh="500" mode="1" beatsToSkip="0"
+                X="-1" Y="-1">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
     <accentMultipliers f0="1"/>
@@ -273,7 +299,8 @@
     </transpOffsets>
   </synchronic15>
   <synchronic16 Id="16" name="16" tuningId="1" tempoId="3" numBeats="10000" clusterMin="2"
-                clusterMax="100" clusterThresh="500" mode="3" beatsToSkip="0">
+                clusterMax="100" clusterThresh="500" mode="3" beatsToSkip="0"
+                X="-1" Y="-1">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
     <accentMultipliers f0="1"/>
@@ -283,7 +310,7 @@
   </synchronic16>
   <synchronic17 Id="17" name="17" tuningId="11" tempoId="1" numBeats="10000"
                 clusterMin="2" clusterMax="100" clusterThresh="500" mode="0"
-                beatsToSkip="0">
+                beatsToSkip="0" X="-1" Y="-1">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="2"/>
     <accentMultipliers f0="1"/>
@@ -292,7 +319,8 @@
     </transpOffsets>
   </synchronic17>
   <synchronic18 Id="18" name="18" tuningId="5" tempoId="1" numBeats="12" clusterMin="2"
-                clusterMax="100" clusterThresh="500" mode="0" beatsToSkip="0">
+                clusterMax="100" clusterThresh="500" mode="0" beatsToSkip="0"
+                X="-1" Y="-1">
     <beatMultipliers f0="1.2000000476837158203" f1="1" f2="0.69999998807907104492"/>
     <lengthMultipliers f0="4" f1="6" f2="2"/>
     <accentMultipliers f0="1" f1="0.5" f2="0.25"/>
@@ -301,47 +329,55 @@
     </transpOffsets>
   </synchronic18>
   <nostalgic0 Id="0" name="0" tuning="0" waveDistance="0" undertow="0" gain="1"
-              lengthMultiplier="1" beatsToSkip="0" mode="0" syncTarget="0">
+              lengthMultiplier="1" beatsToSkip="0" mode="0" syncTarget="0"
+              X="-1" Y="-1">
     <transposition f0="0"/>
   </nostalgic0>
   <nostalgic1 Id="1" name="1" tuning="1" waveDistance="0" undertow="0" gain="1"
-              lengthMultiplier="1" beatsToSkip="1" mode="0" syncTarget="0">
+              lengthMultiplier="1" beatsToSkip="1" mode="0" syncTarget="0"
+              X="-1" Y="-1">
     <transposition f0="0"/>
   </nostalgic1>
   <nostalgic2 Id="2" name="2" tuning="1" waveDistance="0" undertow="0" gain="1"
-              lengthMultiplier="2" beatsToSkip="1" mode="0" syncTarget="0">
+              lengthMultiplier="2" beatsToSkip="1" mode="0" syncTarget="0"
+              X="-1" Y="-1">
     <transposition f0="0"/>
   </nostalgic2>
   <nostalgic3 Id="3" name="3" tuning="1" waveDistance="200" undertow="1000"
-              gain="1" lengthMultiplier="1" beatsToSkip="1" mode="0" syncTarget="0">
+              gain="1" lengthMultiplier="1" beatsToSkip="1" mode="0" syncTarget="0"
+              X="-1" Y="-1">
     <transposition f0="0"/>
   </nostalgic3>
   <nostalgic4 Id="4" name="4" tuning="1" waveDistance="0" undertow="0" gain="1"
-              lengthMultiplier="1" beatsToSkip="0" mode="0" syncTarget="10">
+              lengthMultiplier="1" beatsToSkip="0" mode="0" syncTarget="10"
+              X="-1" Y="-1">
     <transposition f0="0"/>
   </nostalgic4>
   <nostalgic5 Id="5" name="5" tuning="1" waveDistance="0" undertow="0" gain="1"
-              lengthMultiplier="1" beatsToSkip="1" mode="0" syncTarget="11">
+              lengthMultiplier="1" beatsToSkip="1" mode="0" syncTarget="11"
+              X="-1" Y="-1">
     <transposition f0="0"/>
   </nostalgic5>
   <nostalgic6 Id="6" name="6" tuning="3" waveDistance="200" undertow="1500"
-              gain="1" lengthMultiplier="1" beatsToSkip="1" mode="0" syncTarget="12">
+              gain="1" lengthMultiplier="1" beatsToSkip="1" mode="0" syncTarget="12"
+              X="-1" Y="-1">
     <transposition f0="0"/>
   </nostalgic6>
   <nostalgic7 Id="7" name="7" tuning="10" waveDistance="200" undertow="500"
-              gain="1" lengthMultiplier="1" beatsToSkip="1" mode="0" syncTarget="0">
+              gain="1" lengthMultiplier="1" beatsToSkip="1" mode="0" syncTarget="0"
+              X="-1" Y="-1">
     <transposition f0="0"/>
   </nostalgic7>
   <modTempo0 name=""/>
-  <modTuning0>
+  <modTuning0 X="-1" Y="-1">
     <customScale/>
     <absoluteOffsets/>
   </modTuning0>
-  <modTuning1 scale="1" fundamental="7">
+  <modTuning1 scale="1" fundamental="7" X="-1" Y="-1">
     <customScale/>
     <absoluteOffsets/>
   </modTuning1>
-  <modTuning2 scale="0" fundamental="0">
+  <modTuning2 scale="0" fundamental="0" X="-1" Y="-1">
     <customScale/>
     <absoluteOffsets/>
   </modTuning2>
@@ -417,14 +453,36 @@
            k21="73" k22="75" k23="78" k24="80" k25="82" k26="85" k27="87"
            k28="90" k29="92" k30="94" k31="97" k32="99" k33="102" k34="104"
            k35="106"/>
-  <piano0 bkPianoName="MyFirstPiano"/>
+  <piano0 bkPianoName="MyFirstPiano">
+    <configuration/>
+  </piano0>
   <piano1 bkPianoName="PianoOne">
-    <prepMap0 keymapId="1"/>
+    <prepMap0 keymapId="4" d0="1"/>
+    <prepMap1 keymapId="3" d0="1"/>
+    <prepMap2 keymapId="5" d0="1"/>
+    <configuration>
+      <item0 type="5" Id="4" X="10" Y="50"/>
+      <item1 type="0" Id="1" X="10" Y="200"/>
+      <item2 type="3" Id="1" X="10" Y="350"/>
+      <item3 type="5" Id="3" X="165" Y="50"/>
+      <item4 type="5" Id="5" X="320" Y="50"/>
+    </configuration>
   </piano1>
   <piano2 bkPianoName="ModDirectTest">
     <prepMap0 keymapId="1" d0="1"/>
     <mapper0 type="6" Id="1" k0="4" t0="1"/>
     <mapper1 type="6" Id="2" k0="5" t0="1"/>
     <mapper2 type="6" Id="3" k0="3" t0="1"/>
+    <configuration>
+      <item0 type="5" Id="1" X="10" Y="50"/>
+      <item1 type="0" Id="1" X="10" Y="200"/>
+      <item2 type="3" Id="1" X="10" Y="350"/>
+      <item3 type="6" Id="1" X="95" Y="125"/>
+      <item4 type="5" Id="4" X="165" Y="50"/>
+      <item5 type="6" Id="2" X="250" Y="125"/>
+      <item6 type="5" Id="5" X="320" Y="50"/>
+      <item7 type="6" Id="3" X="405" Y="125"/>
+      <item8 type="5" Id="3" X="475" Y="50"/>
+    </configuration>
   </piano2>
 </gallery>
