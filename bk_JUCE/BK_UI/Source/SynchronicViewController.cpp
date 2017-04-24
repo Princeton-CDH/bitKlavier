@@ -69,9 +69,9 @@ theGraph(theGraph)
     
 }
 
-void SynchronicViewController::multiSliderValueChanged(String name, int whichSlider, float value)
+void SynchronicViewController::multiSliderValueChanged(String name, int whichSlider, Array<float> value)
 {
-    DBG("received slider value " + String(whichSlider) + " " + String(value));
+    //DBG("received slider value " + String(whichSlider) + " " + String(value));
 }
 
 SynchronicViewController::~SynchronicViewController()

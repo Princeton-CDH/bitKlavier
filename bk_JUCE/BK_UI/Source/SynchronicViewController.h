@@ -54,7 +54,7 @@ private:
     void bkComboBoxDidChange        (ComboBox* box)         override { };
     void bkButtonClicked            (Button* b)             override { };
     
-    void multiSliderValueChanged(String name, int whichSlider, float value) override;
+    void multiSliderValueChanged(String name, int whichSlider, Array<float> values) override;
     void multiSliderAllValuesChanged(String name, Array<Array<float>> values) override { };
     
      void fillSelectCB(void);

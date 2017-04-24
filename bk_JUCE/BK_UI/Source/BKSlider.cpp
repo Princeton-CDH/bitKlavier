@@ -195,6 +195,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     displaySlider->addMouseListener(this, true);
     displaySlider->setName("DISPLAY");
     displaySlider->addListener(this);
+    displaySlider->setInterceptsMouseClicks(false, false);
     displaySlider->setLookAndFeel(&activeSliderLookAndFeel);
     
     addAndMakeVisible(displaySlider);
@@ -286,6 +287,10 @@ void BKMultiSlider::addSlider(int where, int depth, bool active)
     else
         newslider->setLookAndFeel(&passiveSliderLookAndFeel);
     newslider->isActive(active);
+    
+    listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
+                   getName(),
+                   getAllActiveValues());
 }
 
 
@@ -323,6 +328,10 @@ void BKMultiSlider::addSubSlider(int where, int depth, bool active)
     else
         newslider->setLookAndFeel(&passiveSliderLookAndFeel);
     newslider->isActive(active);
+    
+    listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
+                   getName(),
+                   getAllActiveValues());
 }
 
 void BKMultiSlider::insertSlider(int where)
@@ -332,6 +341,10 @@ void BKMultiSlider::insertSlider(int where)
     numSliders++;
     DBG("numSliders = " + String(numSliders));
     resized();
+    
+    listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
+                   getName(),
+                   getAllActiveValues());
     //initSizes();
 }
 
@@ -342,6 +355,10 @@ void BKMultiSlider::deleteSlider(int where)
         sliders.remove(where);
         numSliders = sliders.size();
         resized();
+        
+        listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
+                       getName(),
+                       getAllActiveValues());
         //initSizes();
     }
 }
@@ -349,9 +366,32 @@ void BKMultiSlider::deleteSlider(int where)
 void BKMultiSlider::deactivateSlider(int where)
 {
     if(sliders.size() > 1) {
-        BKSingleSlider *currentSlider = sliders[where]->getUnchecked(currentSubSlider);
-        currentSlider->isActive(false);
-        currentSlider->setLookAndFeel(&passiveSliderLookAndFeel);
+        for(int i=0; i<sliders[where]->size(); i++) {
+            BKSingleSlider *currentSlider = sliders[where]->getUnchecked(i);
+            currentSlider->isActive(false);
+            currentSlider->setLookAndFeel(&passiveSliderLookAndFeel);
+        }
+        
+        listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
+                       getName(),
+                       getAllActiveValues());
+    }
+}
+
+void BKMultiSlider::deactivateAllAfter(int where)
+{
+    for(int i=where+1; i<sliders.size(); i++ )
+    {
+        deactivateSlider(i);
+    }
+}
+
+void BKMultiSlider::deactivateAllBefore(int where)
+{
+    if (where > sliders.size()) where = sliders.size();
+    for(int i=0; i<where; i++ )
+    {
+        deactivateSlider(i);
     }
 }
 
@@ -364,14 +404,23 @@ void BKMultiSlider::mouseDrag(const MouseEvent& e)
         if(which >= 0) {
             BKSingleSlider *currentSlider = sliders[which]->getUnchecked(currentSubSlider);
             currentSlider->setValue(currentInvisibleSliderValue);
-            currentSlider->isActive(true);
-            currentSlider->setLookAndFeel(&activeSliderLookAndFeel);
-            
             displaySlider->setValue(currentInvisibleSliderValue);
-            listeners.call(&BKMultiSliderListener::multiSliderValueChanged,
-                           getName(),
-                           which,
-                           currentInvisibleSliderValue);
+            
+            if(!currentSlider->isActive()){
+                currentSlider->isActive(true);
+                currentSlider->setLookAndFeel(&activeSliderLookAndFeel);
+                listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
+                               getName(),
+                               getAllActiveValues());
+            }
+            else
+            {
+                listeners.call(&BKMultiSliderListener::multiSliderValueChanged,
+                               getName(),
+                               whichActiveSlider(which),
+                               getOneSliderBank(which));
+            }
+            
         }
     }
 }
@@ -433,10 +482,11 @@ void BKMultiSlider::mouseUp (const MouseEvent &event)
             int which = whichSlider(event);
             if(which >= 0) {
                 sliders[which]->getUnchecked(0)->setValue(sliderDefault); //again, need to identify which subslider to get
+                
                 listeners.call(&BKMultiSliderListener::multiSliderValueChanged,
                                getName(),
-                               which,
-                               sliders[which]->getUnchecked(0)->getValue());
+                               whichActiveSlider(which),
+                               getOneSliderBank(which));
             }
         }
     }
@@ -467,14 +517,29 @@ int BKMultiSlider::whichSubSlider (int which)
     if(arrangedHorizontally) {
         for(int i=0; i<sliders.getUnchecked(which)->size(); i++)
         {
-            if(fabs(sliders.getUnchecked(which)->getUnchecked(i)->getValue() - currentInvisibleSliderValue) < currentDistance)
+            float tempDistance = fabs(sliders.getUnchecked(which)->getUnchecked(i)->getValue() - currentInvisibleSliderValue);
+            if(tempDistance < currentDistance)
             {
                 whichSub = i;
+                currentDistance = tempDistance;
             }
         }
     }
     
     return whichSub;
+}
+
+int BKMultiSlider::whichActiveSlider (int which)
+{
+    int counter = 0;
+    if(which > sliders.size()) which = sliders.size();
+    
+    for(int i=0; i<which; i++)
+        if(sliders.getUnchecked(i)->getFirst()->isActive()) counter++;
+    
+    //DBG("active slider = " + String(counter));
+    
+    return counter;
 }
 
 void BKMultiSlider::resetRanges()
@@ -716,7 +781,7 @@ void BKMultiSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
     //sendChangeMessage();
     listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
                    getName(),
-                   getAllValues());
+                   getAllActiveValues());
     resetRanges();
     resized();
     //initSizes();
@@ -754,6 +819,33 @@ Array<Array<float>> BKMultiSlider::getAllValues()
     return currentvals;
 }
 
+Array<Array<float>> BKMultiSlider::getAllActiveValues()
+{
+    Array<Array<float>> currentvals;
+    
+    for(int i=0; i<sliders.size(); i++)
+    {
+        Array<float> toAdd;
+        
+        for(int j=0; j<sliders.getUnchecked(i)->size(); j++)
+        {
+            if(sliders.getUnchecked(i)->getUnchecked(j)->isActive())
+               toAdd.add(sliders.getUnchecked(i)->getUnchecked(j)->getValue());
+        }
+        
+        if(toAdd.size() > 0) currentvals.add(toAdd);
+    }
+    
+    return currentvals;
+}
+
+Array<float> BKMultiSlider::getOneSliderBank(int which)
+{
+    Array<float> newvals;
+    for(int i=0; i<sliders[which]->size(); i++)
+        newvals.add(sliders[which]->getUnchecked(i)->getValue());
+    return newvals;
+}
 
 void BKSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int width, int height,
                                        float sliderPos, float minSliderPos, float maxSliderPos,
@@ -804,6 +896,8 @@ void BKMultiSlider::showModifyPopupMenu(int which)
     m.addItem (2, translate ("insert slider after"), true, false);
     m.addItem (3, translate ("delete slider"), true, false);
     m.addItem (4, translate ("deactivate slider"), true, false);
+    m.addItem (5, translate ("deactivate all after this"), true, false);
+    m.addItem (6, translate ("deactivate all before this"), true, false);
     m.addSeparator();
     
     m.showMenuAsync (PopupMenu::Options(),
@@ -820,6 +914,8 @@ void BKMultiSlider::sliderModifyMenuCallback (const int result, BKMultiSlider* m
             case 2:   ms->insertSlider(which + 1); break;
             case 3:   ms->deleteSlider(which); break;
             case 4:   ms->deactivateSlider(which); break;
+            case 5:   ms->deactivateAllAfter(which); break;
+            case 6:   ms->deactivateAllBefore(which); break;
 
             default:  break;
         }

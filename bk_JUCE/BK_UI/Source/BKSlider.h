@@ -84,7 +84,7 @@ public:
     BKMultiSliderListener() {}
     virtual ~BKMultiSliderListener() {};
     
-    virtual void multiSliderValueChanged(String name, int whichSlider, float value) = 0;
+    virtual void multiSliderValueChanged(String name, int whichSlider, Array<float> values) = 0;
     virtual void multiSliderAllValuesChanged(String name, Array<Array<float>> values) = 0;
 };
 
@@ -106,9 +106,12 @@ public:
     void insertSlider(int where);
     void deleteSlider(int where);
     void deactivateSlider(int where);
+    void deactivateAllAfter(int where);
+    void deactivateAllBefore(int where);
     
     int whichSlider (const MouseEvent &e);
     int whichSubSlider (int which);
+    int whichActiveSlider (int which);
     
     void mouseDrag(const MouseEvent &e) override;
     void mouseDoubleClick (const MouseEvent &e) override;
@@ -126,6 +129,8 @@ public:
     String getName()                                        { return sliderName; }
     
     Array<Array<float>> getAllValues();
+    Array<Array<float>> getAllActiveValues();
+    Array<float> getOneSliderBank(int which);
     
 private:
     

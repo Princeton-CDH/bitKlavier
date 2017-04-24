@@ -89,14 +89,70 @@ SynchronicViewController2::~SynchronicViewController2()
 
 
 //sliderTest->addMyListener(&msliderListener);
-void SynchronicViewController2::multiSliderValueChanged(String name, int whichSlider, float value)
+void SynchronicViewController2::multiSliderValueChanged(String name, int whichSlider, Array<float> values)
 {
-    DBG("received slider value " + name + " " + String(whichSlider) + " " + String(value));
+    //DBG("received slider value " + name + " " + String(whichSlider) + " " + String(value));
+    
+    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+    SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
+    if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+    {
+        prep    ->setAccentMultiplier(whichSlider, values[0]);
+        active  ->setAccentMultiplier(whichSlider, values[0]);
+    }
+    else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+    {
+        prep    ->setBeatMultiplier(whichSlider, values[0]);
+        active  ->setBeatMultiplier(whichSlider, values[0]);
+    }
+    else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+    {
+        prep    ->setLengthMultiplier(whichSlider, values[0]);
+        active  ->setLengthMultiplier(whichSlider, values[0]);
+    }
+    else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
+    {
+        prep    ->setSingleTransposition(whichSlider, values);
+        active  ->setSingleTransposition(whichSlider, values);
+    }
+    
+    processor.updateState->synchronicPreparationDidChange = true;
+
 }
 
 void SynchronicViewController2::multiSliderAllValuesChanged(String name, Array<Array<float>> values)
 {
-    DBG("received all slider vals" + name);
+    DBG("received all slider vals " + name);
+    
+    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+    SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
+    Array<float> newvals;
+    for(int i=0; i<values.size(); i++) newvals.add(values[i][0]);
+    
+    if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+    {
+        prep    ->setAccentMultipliers(newvals);
+        active  ->setAccentMultipliers(newvals);
+    }
+    else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+    {
+        prep    ->setBeatMultipliers(newvals);
+        active  ->setBeatMultipliers(newvals);
+    }
+    else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+    {
+        prep    ->setLengthMultipliers(newvals);
+        active  ->setLengthMultipliers(newvals);
+    }
+    else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
+    {
+        prep    ->setTransposition(values);
+        active  ->setTransposition(values);
+    }
+    
+    processor.updateState->synchronicPreparationDidChange = true;
 }
 
 void SynchronicViewController2::paint (Graphics& g)
