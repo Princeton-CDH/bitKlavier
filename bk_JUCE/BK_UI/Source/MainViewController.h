@@ -17,6 +17,7 @@
 #include "BKLevelMeter.h"
 
 #include "SynchronicViewController.h"
+#include "SynchronicViewController2.h"
 #include "NostalgicViewController.h"
 #include "DirectViewController.h"
 #include "TuningViewController.h"
@@ -68,6 +69,8 @@ private:
     TempoViewController ovc;
     
     GeneralSettings::Ptr gen;
+    
+    SynchronicViewController2 svc2;
     
     OwnedArray<TextButton> buttons;
     Slider* mainSlider;

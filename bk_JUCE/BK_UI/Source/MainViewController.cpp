@@ -25,6 +25,7 @@ svc(p, &theGraph),
 nvc(p, &theGraph),
 dvc(p, &theGraph),
 ovc(p, &theGraph),
+svc2(p, &theGraph),
 timerCallbackCount(0)
 {
     gen = processor.gallery->getGeneralSettings();
@@ -57,6 +58,8 @@ timerCallbackCount(0)
     addAndMakeVisible(kvc);
     addAndMakeVisible(tvc);
     addAndMakeVisible(ovc);
+    
+    addAndMakeVisible(svc2);
     
     /*
     addAndMakeVisible (levelMeterComponentL = new BKLevelMeterComponent());
@@ -98,7 +101,7 @@ void MainViewController::resized()
     galvc.setBounds(0, 0, gVCWidth+2*gXSpacing, getHeight()*.38);
     
     // Place buttons.
-    float buttonWidth = ((getRight()-galvc.getRight() - 7 * gXSpacing - SOME_PADDING)/7.0f);
+    float buttonWidth = ((getRight()-galvc.getRight() - 8 * gXSpacing - SOME_PADDING)/8.0f);
     float buttonHeight = 30;
     buttons[0]->setBounds(galvc.getRight()+gXSpacing, gYSpacing, buttonWidth, buttonHeight);
     for (int i = 1; i < cDisplayNames.size(); i++)
@@ -127,6 +130,8 @@ void MainViewController::resized()
     svc.setBounds(kvc.getBounds());
     nvc.setBounds(kvc.getBounds());
     ovc.setBounds(kvc.getBounds());
+    
+    svc2.setBounds(kvc.getBounds());
     
     int panelWidth = 250;
     preparationPanel->setBounds(getScreenBounds().getRight() - SOME_PADDING, getScreenBounds().getY(), panelWidth, getScreenBounds().getHeight());
@@ -201,6 +206,10 @@ void MainViewController::bkButtonClicked            (Button* b)
     else if (name == cDisplayNames[DisplayGeneral])
     {
         setCurrentDisplay(DisplayGeneral);
+    }
+    else if (name == cDisplayNames[DisplaySynchronic2])
+    {
+        setCurrentDisplay(DisplaySynchronic2);
     }
 }
 
@@ -345,6 +354,8 @@ void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
     nvc.setVisible(false);
     ovc.setVisible(false);
     
+    svc2.setVisible(false);
+    
     if (type == DisplayKeymap)
     {
         kvc.setVisible(true);
@@ -372,6 +383,10 @@ void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
     else if (type == DisplayGeneral)
     {
         gvc.setVisible(true);
+    }
+    else if (type == DisplaySynchronic2)
+    {
+        svc2.setVisible(true);
     }
         
 }

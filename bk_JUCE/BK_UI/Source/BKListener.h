@@ -13,7 +13,8 @@
 
 #include "BKUtilities.h"
 
-class BKListener    :  public TextEditor::Listener,
+class BKListener :
+public TextEditor::Listener,
 public ComboBox::Listener,
 public ActionListener,
 public ActionBroadcaster,

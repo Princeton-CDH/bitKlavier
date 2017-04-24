@@ -1,42 +1,35 @@
 /*
   ==============================================================================
 
-    SynchronicView.h
-    Created: 15 Nov 2016 4:02:15pm
-    Author:  Michael R Mulshine
+    SynchronicViewController2.h
+    Created: 21 Apr 2017 11:17:47pm
+    Author:  Daniel Trueman
 
   ==============================================================================
 */
 
-#ifndef SYNCHRONICVIEWCONTROLLER_H_INCLUDED
-#define SYNCHRONICVIEWCONTROLLER_H_INCLUDED
+#ifndef SYNCHRONICVIEWCONTROLLER2_H_INCLUDED
+#define SYNCHRONICVIEWCONTROLLER2_H_INCLUDED
 
 #include "BKUtilities.h"
-
 #include "PluginProcessor.h"
-
 #include "BKListener.h"
 #include "BKComponent.h"
-
 #include "BKSlider.h"
-
 #include "BKGraph.h"
 
-//==============================================================================
-/*
-*/
 
-class SynchronicViewController    : public BKComponent, public BKListener, public BKMultiSliderListener
+class SynchronicViewController2    : public BKComponent, public BKListener, public BKMultiSliderListener
 {
 public:
-    SynchronicViewController(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~SynchronicViewController();
-
+    SynchronicViewController2(BKAudioProcessor&, BKItemGraph* theGraph);
+    ~SynchronicViewController2();
+    
     void paint (Graphics&) override;
     void resized() override;
     
-    void updateModFields(void);
-    void updateFields(void);
+    //void updateModFields(void);
+    //void updateFields(void);
     
 private:
     BKAudioProcessor& processor;
@@ -46,22 +39,23 @@ private:
     OwnedArray<BKTextField> synchronicTF;
     OwnedArray<BKTextField> modSynchronicTF;
     
-    BKMultiSlider* sliderTest;
-    
-    void bkTextFieldDidChange       (TextEditor&)           override;
+    OwnedArray<BKMultiSlider> paramSliders;
+
+    void bkTextFieldDidChange       (TextEditor&)           override { };
     void bkMessageReceived          (const String& message) override;
     
     void bkComboBoxDidChange        (ComboBox* box)         override { };
     void bkButtonClicked            (Button* b)             override { };
     
     void multiSliderValueChanged(String name, int whichSlider, float value) override;
-    void multiSliderAllValuesChanged(String name, Array<Array<float>> values) override { };
+    void multiSliderAllValuesChanged(String name, Array<Array<float>> values) override;
     
-     void fillSelectCB(void);
+    void fillSelectCB(void);
     
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicViewController)
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicViewController2)
 };
 
 
-#endif  // SYNCHRONICVIEWCONTROLLER_H_INCLUDED
+
+#endif  // SYNCHRONICVIEWCONTROLLER2_H_INCLUDED

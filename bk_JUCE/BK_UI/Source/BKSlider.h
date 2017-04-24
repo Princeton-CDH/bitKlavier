@@ -17,8 +17,6 @@
 /*
  TODO
  -- expose basic parameters to top; max/min, etc... perhaps subSlider size
- -- display additional values and main value for clusters (like transposition vals [t1 t2 t3])?
-    -- be able to click on one of multiple bands to move it
  -- allow narrowing of sliders as numSlider increases
  -- highlight currentVal slider when synhronic is active
  -- possibly have faded out inactive sliders filling out a default width; dragging over them activates... ? have minimumSlidersToDisplay = 16, grey-out inactive ones
@@ -58,6 +56,8 @@ public:
 
     void valueChanged() override;
     double getValueFromText	(const String & text ) override;
+    bool isActive() { return active; }
+    void isActive(bool newactive) {active = newactive; }
     
 private:
     
@@ -70,12 +70,30 @@ private:
     bool sliderIsVertical;
     bool sliderIsBar;
     
+    bool active;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSingleSlider)
 };
 
 
+class BKMultiSliderListener
+{
+    
+public:
+    
+    BKMultiSliderListener() {}
+    virtual ~BKMultiSliderListener() {};
+    
+    virtual void multiSliderValueChanged(String name, int whichSlider, float value) = 0;
+    virtual void multiSliderAllValuesChanged(String name, Array<Array<float>> values) = 0;
+};
 
-class BKMultiSlider : public BKComponent, public Slider::Listener, public Button::Listener, public TextEditor::Listener
+
+class BKMultiSlider :
+public BKComponent,
+public Slider::Listener,
+public Button::Listener,
+public TextEditor::Listener
 {
     
 public:
@@ -83,10 +101,11 @@ public:
     BKMultiSlider(BKMultiSliderType which);
     ~BKMultiSlider();
 
-    void addSlider(int where, int depth);
-    void addSubSlider(int where, int depth);
+    void addSlider(int where, int depth, bool active);
+    void addSubSlider(int where, int depth, bool active);
     void insertSlider(int where);
     void deleteSlider(int where);
+    void deactivateSlider(int where);
     
     int whichSlider (const MouseEvent &e);
     int whichSubSlider (int which);
@@ -100,12 +119,21 @@ public:
     void resized() override;
     void initSizes();
     
+    ListenerList<BKMultiSliderListener> listeners;
+    void addMyListener(BKMultiSliderListener* listener)     { listeners.add(listener);      }
+    void removeMyListener(BKMultiSliderListener* listener)  { listeners.remove(listener);   }
+    void setName(String newName)                            { sliderName = newName; showName.setText(sliderName, dontSendNotification);        }
+    String getName()                                        { return sliderName; }
+    
     Array<Array<float>> getAllValues();
     
 private:
     
-    BKSliderLookAndFeel thisLookAndFeel;
-    
+    BKSliderLookAndFeel activeSliderLookAndFeel;
+    BKSliderLookAndFeel passiveSliderLookAndFeel;
+    String sliderName;
+    BKLabel showName;
+
     bool dragging;
     bool arrangedHorizontally;
     bool sliderIsVertical;
@@ -130,9 +158,10 @@ private:
     double sliderDefault;
     double sliderIncrement;
     
+    int totalWidth;
     int sliderWidth, sliderHeight;
     
-    int numSliders = 1;
+    int numSliders;
     
     void sliderValueChanged (Slider *slider) override;
     void buttonClicked (Button* button) override;

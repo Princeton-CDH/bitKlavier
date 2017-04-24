@@ -60,6 +60,8 @@ theGraph(theGraph)
 
     sliderTest = new BKMultiSlider(HorizontalMultiBarSlider); //or HorizontalMultiSlider, VerticalMultiSlider, HorizontalMultiBarSlider, VerticalMultiBarSlider
     addAndMakeVisible(sliderTest);
+    sliderTest->addMyListener(this);
+    sliderTest->setName("Accents");
     
     
     updateModFields();
@@ -67,7 +69,10 @@ theGraph(theGraph)
     
 }
 
-
+void SynchronicViewController::multiSliderValueChanged(String name, int whichSlider, float value)
+{
+    DBG("received slider value " + String(whichSlider) + " " + String(value));
+}
 
 SynchronicViewController::~SynchronicViewController()
 {

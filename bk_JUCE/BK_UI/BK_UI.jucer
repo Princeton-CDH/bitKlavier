@@ -127,6 +127,10 @@
         <FILE id="tIek8E" name="PianoViewController.h" compile="0" resource="0"
               file="Source/PianoViewController.h"/>
         <GROUP id="{444BC2CA-5FF1-6AEB-00B9-DF5D039DBFFE}" name="PreparationVC">
+          <FILE id="dthKFQ" name="SynchronicViewController2.cpp" compile="1"
+                resource="0" file="Source/SynchronicViewController2.cpp"/>
+          <FILE id="U7d1FI" name="SynchronicViewController2.h" compile="0" resource="0"
+                file="Source/SynchronicViewController2.h"/>
           <FILE id="lBHfg4" name="TuningViewController.cpp" compile="1" resource="0"
                 file="Source/TuningViewController.cpp"/>
           <FILE id="DZ40Vl" name="TuningViewController.h" compile="0" resource="0"

@@ -241,6 +241,7 @@ typedef enum BKPreparationDisplay {
     DisplayTempo,
     DisplayKeymap,
     DisplayGeneral,
+    DisplaySynchronic2,
     DisplayNil,
 } BKPreparationDisplay;
 
@@ -251,7 +252,8 @@ static const std::vector<std::string> cDisplayNames = {
     "Tuning",
     "Tempo",
     "Keymap",
-    "General"
+    "General",
+    "Synchronic2"
 };
 
 
