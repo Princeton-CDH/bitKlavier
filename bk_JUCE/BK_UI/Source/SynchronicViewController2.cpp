@@ -30,6 +30,8 @@ theGraph(theGraph)
             addAndMakeVisible(paramSliders[0]);
             paramSliders[0]->addMyListener(this);
             paramSliders[0]->setName(cSynchronicParameterTypes[i]);
+            //cSynchronicDefaultRangeValuesAndInc
+            //paramSliders[0]->setDefaultRangeValuesAndInc(cSynchronicDefaultRangeValuesAndInc[i]);
         }
     }
     

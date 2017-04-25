@@ -423,6 +423,22 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "TranspOffsets"
 };
 
+static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc = {
+    {0., 0, 0, 0},
+    {0., 0, 0, 0},
+    {0., 0, 0, 0},
+    {1., 100, 1, 1},
+    {1, 4, 1},
+    {2, 8, 1},
+    {20, 2000, 10},
+    {0, 0, 0},
+    {0, 4, 1},
+    {0.1, 10, 0.01},
+    {0.1, 10, 0.01},
+    {0., 2., 0.01},
+    {-12, 12, 0.1}
+};
+
 #pragma mark - Nostalgic
 typedef enum NostalgicSyncMode {
     NoteLengthSync = 0, //reverse note length set by played note length
