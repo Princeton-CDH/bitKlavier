@@ -92,21 +92,6 @@ public:
     
     inline void itemIsBeingDragged(BKItem* thisItem, Point<int> startPosition)
     {
-        /*
-        DBG("start X: " + String(startPosition.x) + " start Y: " + String(startPosition.y));
-        int deltaX = thisItem->getX() - startPosition.x; int deltaY = thisItem->getY() - startPosition.y;
-        DBG("delta X: " + String(deltaX) + " delta Y: " + String(deltaY));
-        for (auto item : graph->getSelectedItems())
-        {
-            DBG("DRAG Type: " + String(item->getType()) + " Id: " + String(item->getId()));
-            if (!(item->getType() == thisItem->getType() && item->getId() == thisItem->getId()))
-            {
-                int X = item->getX() + deltaX; int Y = item->getY() + deltaY;
-                DBG("new X: " + String(X) + " new Y: " + String(Y));
-                item->setTopLeftPosition(X, Y);
-            }
-        }
-        */
         repaint();
     }
     
@@ -211,7 +196,6 @@ private:
             addAndMakeVisible(item);
         }
         
-        DBG("POST DRAW");
         processor.currentPiano->configuration->print();
         
         repaint();
@@ -262,8 +246,6 @@ private:
             
             if (itemSource != nullptr)
             {
-                DBG("source type: " + cPreparationTypes[itemSource->getType()]  + " ID: " + String(itemSource->getId()) );
-                
                 connect = true;
                 
                 lineOX = e.x;
@@ -285,9 +267,6 @@ private:
             {
                 prepareItemDrag(item, e, true);
             }
-            
-            DBG("START SHIFT: "+String(e.x) +" "+String(e.y));
-            
     
         }
         else
@@ -331,8 +310,6 @@ private:
             
             if (itemTarget != nullptr)
             {
-                DBG("target type: " + cPreparationTypes[itemTarget->getType()]  + " ID: " + String(itemTarget->getId()) );
-                
                 graph->connect(itemSource, itemTarget);
                 graph->drawLine(lineOX, lineOY, X, Y);
                 
@@ -344,7 +321,6 @@ private:
         {
             if (item->isDragging)
             {
-                //itemWasDragged(eo);
                 item->isDragging = false;
             }
         }
@@ -353,20 +329,14 @@ private:
     
     void mouseDrag (const MouseEvent& e) override
     {
-        DBG("CLICK SHIFT: "+String(e.x) +" "+String(e.y));
-        
-        //if (!e.mods.isShiftDown())
-        {
-            for (auto item : graph->getSelectedItems())
-                item->performDrag(e);
-            repaint();
-        }
+        for (auto item : graph->getSelectedItems())
+            item->performDrag(e);
+        repaint();
     }
     
     inline void deleteItem (BKItem* item)
     {
         graph->remove(item);
-        
         removeChildComponent(item);
     }
     
@@ -402,9 +372,7 @@ private:
                 
                 if (X >= left && X <= right && Y >= top && Y <= bottom) // is in item
                 {
-                    // start from this item
                     theItem = dynamic_cast<BKItem*> (item);
-                    
                     break;
                 }
                 
