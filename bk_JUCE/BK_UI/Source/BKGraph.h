@@ -43,7 +43,7 @@ public:
     
     void disconnectFrom(BKItem* toDisconnect);
     
-    void itemIsBeingDragged(const MouseEvent&) override;
+    void itemIsBeingDragged(const MouseEvent&, Point<int>) override;
     
     void keyPressedWhileSelected(const KeyPress&) override;
     
@@ -94,6 +94,8 @@ public:
     void bkButtonClicked        (Button* b)             override {};
     void bkMessageReceived      (const String& message) override {};
     
+    Point<int> lastClick;
+    
 private:
     BKAudioProcessor& processor;
     Label label;
@@ -136,6 +138,18 @@ public:
             update(PreparationTypePianoMap, 0);
         }
     }
+    
+    /*
+    class Listener
+    {
+        ~Listener(void)
+        {
+            
+        }
+        
+        virtual void itemsDragged(void){};
+    };
+     */
     
     BKItem* itemWithTypeAndId(BKPreparationType type, int Id);
     void add(BKItem* itemToAdd);

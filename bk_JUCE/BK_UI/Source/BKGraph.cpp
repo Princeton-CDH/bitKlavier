@@ -14,6 +14,8 @@
 
 #include "Piano.h"
 
+#include "BKConstructionSite.h"
+
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ BKItem ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 BKItem::BKItem(BKPreparationType type, int Id, BKAudioProcessor& p):
 BKDraggableComponent(true,false,true),
@@ -78,13 +80,19 @@ void BKItem::bkComboBoxDidChange    (ComboBox* cb)
     }
 }
 
-void BKItem::itemIsBeingDragged(const MouseEvent& e)
+void BKItem::itemIsBeingDragged(const MouseEvent& e, Point<int> startPosition)
 {
-    getParentComponent()->repaint();
+    ((BKConstructionSite*)getParentComponent())->itemIsBeingDragged(this, startPosition);
 }
 
 void BKItem::mouseDown(const MouseEvent& e)
 {
+    
+    if (isDraggable)
+    {
+        prepareDrag(e);
+    }
+    
     if (e.getNumberOfClicks() == 2)
     {
         if (type == PreparationTypeDirect)

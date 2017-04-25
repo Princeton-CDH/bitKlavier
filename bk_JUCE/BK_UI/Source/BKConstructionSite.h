@@ -32,6 +32,8 @@ public:
         
         setWantsKeyboardFocus(true);
         
+        graph->deselectAll();
+        
         redraw();
     }
     
@@ -55,7 +57,6 @@ public:
         graph->reconstruct();
         
         processor.currentPiano->configuration->print();
-        
         
         draw();
         
@@ -81,26 +82,46 @@ public:
             g.setColour(Colours::white);
             g.drawLine(lineOX, lineOY, lineEX, lineEY, 3);
         }
-        
+    
         for (auto line : graph->getLines())
         {
-            DBG("drawStartX: " + String(line.getStartX()) + " drawStartY: " + String(line.getStartY()) +
-                " drawEndX: " + String(line.getEndX()) + " drawEndY: " + String(line.getEndY()));
-            
             g.setColour(Colours::black);
             g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY());
         }
     }
     
+    inline void itemIsBeingDragged(BKItem* thisItem, Point<int> startPosition)
+    {
+        /*
+        DBG("start X: " + String(startPosition.x) + " start Y: " + String(startPosition.y));
+        int deltaX = thisItem->getX() - startPosition.x; int deltaY = thisItem->getY() - startPosition.y;
+        DBG("delta X: " + String(deltaX) + " delta Y: " + String(deltaY));
+        for (auto item : graph->getSelectedItems())
+        {
+            DBG("DRAG Type: " + String(item->getType()) + " Id: " + String(item->getId()));
+            if (!(item->getType() == thisItem->getType() && item->getId() == thisItem->getId()))
+            {
+                int X = item->getX() + deltaX; int Y = item->getY() + deltaY;
+                DBG("new X: " + String(X) + " new Y: " + String(Y));
+                item->setTopLeftPosition(X, Y);
+            }
+        }
+        */
+        repaint();
+    }
+    
 private:
     BKAudioProcessor& processor;
     
+    Point<int> lastPosition;
 
     bool connect; int lineOX, lineOY, lineEX, lineEY;
+    bool multiple;
     
     BKItem* itemSource;
     BKItem* itemTarget;
     BKItem* itemToSelect;
+    BKItem* lastItem;
     
     BKItemGraph* graph;
     
@@ -197,6 +218,22 @@ private:
     }
     
     
+    inline void prepareItemDrag(BKItem* item, const MouseEvent& e, bool center)
+    {
+        if (center)
+        {
+            float X = item->getPosition().getX() + item->getWidth() / 2.0f;
+            float Y = item->getPosition().getY() + item->getHeight() / 2.0f;
+            Point<float>pos(X,Y);
+            MouseEvent newEvent = e.withNewPosition(pos);
+            
+            item->prepareDrag(newEvent);
+        }
+        else
+        {
+            item->prepareDrag(e);
+        }
+    }
     
     // Drag interface
     void itemWasDropped(BKPreparationType type, Array<int> data, int x, int y) override
@@ -215,7 +252,6 @@ private:
 
     void mouseDown (const MouseEvent& eo) override
     {
-        itemToSelect = nullptr;
         
         MouseEvent e = eo.getEventRelativeTo(this);
         if (e.mods.isCommandDown())
@@ -239,21 +275,42 @@ private:
             // also select this item
             itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
             
-            if (itemToSelect != nullptr && !itemToSelect->getSelected())
-                graph->select(dynamic_cast<BKItem*> (e.originalComponent->getParentComponent()));
+            if (itemToSelect != nullptr)
+            {
+                if (!itemToSelect->getSelected())   graph->select(itemToSelect);
+                else                                graph->deselect(itemToSelect);
+            }
+            
+            for (auto item : graph->getSelectedItems())
+            {
+                prepareItemDrag(item, e, true);
+            }
+            
+            DBG("START SHIFT: "+String(e.x) +" "+String(e.y));
+            
+    
         }
         else
         {
-            // deselect all other items
-            graph->deselectAll();
-            
             itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
-            
-            if (itemToSelect != nullptr && !itemToSelect->getSelected())
+        
+            if (itemToSelect != nullptr)
             {
-                graph->select(itemToSelect);
+                if (!itemToSelect->getSelected())
+                {
+                    graph->deselectAll();
+                    graph->select(itemToSelect);
+                }
+            }
+            else
+            {
+                graph->deselectAll();
             }
             
+            for (auto item : graph->getSelectedItems())
+            {
+                prepareItemDrag(item, e, true);
+            }
         }
         
     }
@@ -283,15 +340,27 @@ private:
             }
         }
         
+        for (auto item : graph->getSelectedItems())
+        {
+            if (item->isDragging)
+            {
+                //itemWasDragged(eo);
+                item->isDragging = false;
+            }
+        }
         
     }
     
     void mouseDrag (const MouseEvent& e) override
     {
-        lineEX = e.getEventRelativeTo(this).x;
-        lineEY = e.getEventRelativeTo(this).y;
+        DBG("CLICK SHIFT: "+String(e.x) +" "+String(e.y));
         
-        if (connect) repaint();
+        //if (!e.mods.isShiftDown())
+        {
+            for (auto item : graph->getSelectedItems())
+                item->performDrag(e);
+            repaint();
+        }
     }
     
     inline void deleteItem (BKItem* item)
