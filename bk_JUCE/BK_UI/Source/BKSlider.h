@@ -118,9 +118,11 @@ public:
     void mouseDown (const MouseEvent &event) override;
     void mouseUp (const MouseEvent &event) override;
     
+    void setTo(Array<float> newvals);
+    void setTo(Array<Array<float>> newvals);
+    
     void resetRanges();
     void resized() override;
-    void initSizes();
     
     ListenerList<BKMultiSliderListener> listeners;
     void addMyListener(BKMultiSliderListener* listener)     { listeners.add(listener);      }

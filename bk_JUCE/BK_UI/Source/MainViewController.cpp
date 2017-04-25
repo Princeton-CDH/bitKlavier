@@ -278,6 +278,8 @@ void MainViewController::timerCallback()
         
         svc.updateFields();
         svc.updateModFields();
+        
+        svc2.updateFields();
     }
     
     if (processor.updateState->tuningPreparationDidChange)

@@ -31,6 +31,8 @@ public:
     //void updateModFields(void);
     //void updateFields(void);
     
+    void updateFields();
+    
 private:
     BKAudioProcessor& processor;
     BKItemGraph* theGraph;
@@ -51,7 +53,6 @@ private:
     void multiSliderAllValuesChanged(String name, Array<Array<float>> values) override;
     
     void fillSelectCB(void);
-    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicViewController2)
 };

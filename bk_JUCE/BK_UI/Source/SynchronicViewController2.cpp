@@ -163,44 +163,42 @@ void SynchronicViewController2::paint (Graphics& g)
 
 void SynchronicViewController2::resized()
 {
-    /*
-    // Labels
-    int lY = gComponentLabelHeight + gYSpacing;
-    
-    float width = getWidth() * 0.25 - gXSpacing;
-    
-    for (int n = 0; n < cSynchronicParameterTypes.size(); n++)
-    {
-        synchronicL[n]->setBounds(0, gYSpacing + lY * n, width, synchronicL[0]->getHeight());
-    }
-    
-    // Text fields
-    int tfY = gComponentTextFieldHeight + gYSpacing;
-    
-    float height = synchronicTF[0]->getHeight();
-    width *= 1.5;
-    
-    for (int n = 0; n < cSynchronicParameterTypes.size(); n++)
-    {
-        synchronicTF[n]->setBounds(synchronicL[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
-        modSynchronicTF[n]->setBounds(synchronicTF[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
-    }
-    
-    sliderTest->setTopLeftPosition(40, 35);
-     */
-    
     Rectangle<int> area (getLocalBounds());
     area.removeFromRight(area.getWidth() * 0.5);
     int tempHeight = area.getHeight() / paramSliders.size();
     
     for(int i = 0; i < paramSliders.size(); i++)
     {
-        //paramSliders[i]->setBounds(0, i * 60, 200, 60);
-        //paramSliders[i]->setTopLeftPosition(0, i * 60);
         paramSliders[i]->setBounds(area.removeFromBottom(tempHeight));
     }
+}
+
+void SynchronicViewController2::updateFields()
+{
     
+    DBG("**** updating sliders ****");
     
+    SynchronicPreparation::Ptr prep   = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
+    for(int i = 0; i < paramSliders.size(); i++)
+    {
+        if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+        {
+            paramSliders[i]->setTo(prep->getAccentMultipliers());
+        }
+        else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+        {
+            paramSliders[i]->setTo(prep->getBeatMultipliers());
+        }
+        else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+        {
+            paramSliders[i]->setTo(prep->getLengthMultipliers());
+        }
+        else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicTranspOffsets])
+        {
+            paramSliders[i]->setTo(prep->getTransposition());
+        }
+    }
 }
 
 void SynchronicViewController2::bkMessageReceived (const String& message)
@@ -208,6 +206,7 @@ void SynchronicViewController2::bkMessageReceived (const String& message)
     if (message == "synchronic/update")
     {
         //updateFields();
+        updateFields();
     }
 }
 
