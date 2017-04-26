@@ -56,7 +56,7 @@ private:
     
     
     String                              processPianoMapString(const String& message);
-    String                              processModMapString(const String& message);
+    String                              processmodificationMapString(const String& message);
     String                              processResetMapString(const String& message);
     
     TextButton                          addPMapButton;
@@ -76,11 +76,13 @@ private:
     BKTextField                         pianoMapTF;
     
     // Dynamify piano stuff/
+   
     BKLabel                             pianoNameL;
     BKTextField                         pianoNameTF;
     
-    BKLabel                             modMapL;
-    BKTextField                         modMapTF;
+    
+    BKLabel                             modificationMapL;
+    BKTextField                         modificationMapTF;
     
     BKLabel                             resetMapL;
     BKTextField                         resetMapTF;

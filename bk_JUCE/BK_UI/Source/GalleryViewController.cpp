@@ -19,13 +19,13 @@ pmvc(PreparationMapViewController::PtrArr())
     // Make PianoViewController component within plugin editor class.
     addAndMakeVisible(pvc);
     
-    pianoMapL.setName("PianoMap");
-    pianoMapL.setText("PianoMap", NotificationType::dontSendNotification);
-    pvc->addAndMakeVisible(pianoMapL);
-    
-    pianoMapTF.addListener(this);
-    pianoMapTF.setName("PianoMap");
-    pvc->addAndMakeVisible(pianoMapTF);
+//    pianoMapL.setName("PianoMap");
+//    pianoMapL.setText("PianoMap", NotificationType::dontSendNotification);
+//    pvc->addAndMakeVisible(pianoMapL);
+//    
+//    pianoMapTF.addListener(this);
+//    pianoMapTF.setName("PianoMap");
+//    pvc->addAndMakeVisible(pianoMapTF);
     
     pianoNameL.setName("PianoName");
     pianoNameL.setText("PianoName", NotificationType::dontSendNotification);
@@ -35,13 +35,13 @@ pmvc(PreparationMapViewController::PtrArr())
     pianoNameTF.setName("PianoName");
     pvc->addAndMakeVisible(pianoNameTF);
     
-    modMapL.setName("ModMap");
-    modMapL.setText("ModMap", NotificationType::dontSendNotification);
-    pvc->addAndMakeVisible(modMapL);
-    
-    modMapTF.addListener(this);
-    modMapTF.setName("ModMap");
-    pvc->addAndMakeVisible(modMapTF);
+//    modificationMapL.setName("modificationMap");
+//    modificationMapL.setText("modificationMap", NotificationType::dontSendNotification);
+//    pvc->addAndMakeVisible(modificationMapL);
+//    
+//    modificationMapTF.addListener(this);
+//    modificationMapTF.setName("modificationMap");
+//    pvc->addAndMakeVisible(modificationMapTF);
     
     resetMapL.setName("ResetMap");
     resetMapL.setText("ResetMap", NotificationType::dontSendNotification);
@@ -96,20 +96,6 @@ pmvc(PreparationMapViewController::PtrArr())
     saveButton.setButtonText("Save");
     saveButton.addListener(this);
     pvc->addAndMakeVisible(saveButton);
-    
-    /*
-    loadButton.setName("Load");
-    loadButton.changeWidthToFitText();
-    loadButton.setButtonText("Load");
-    loadButton.addListener(this);
-    addAndMakeVisible(loadButton);
-    
-    loadJsonButton.setName("LoadJson");
-    loadJsonButton.changeWidthToFitText();
-    loadJsonButton.setButtonText("LoadJson");
-    loadJsonButton.addListener(this);
-    addAndMakeVisible(loadJsonButton);
-     */
     
     addPMapButton.setName("Add");
     addPMapButton.changeWidthToFitText();
@@ -248,13 +234,13 @@ void GalleryViewController::resized()
     pianoNameL  .setTopLeftPosition(0,                                  pianoL.getBottom() + gYSpacing);
     pianoNameTF .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   pianoNameL.getY());
     
-    pianoMapL   .setTopLeftPosition(0,                                  pianoNameL.getBottom() + gYSpacing);
-    pianoMapTF  .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   pianoMapL.getY());
+//    pianoMapL   .setTopLeftPosition(0,                                  pianoNameL.getBottom() + gYSpacing);
+//    pianoMapTF  .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   pianoMapL.getY());
     
-    modMapL     .setTopLeftPosition(0,                                  pianoMapL.getBottom() + gYSpacing);
-    modMapTF    .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   modMapL.getY());
+//    modificationMapL     .setTopLeftPosition(0,                                  pianoMapL.getBottom() + gYSpacing);
+//    modificationMapTF    .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   modificationMapL.getY());
     
-    resetMapL     .setTopLeftPosition(0,                                  modMapL.getBottom() + gYSpacing);
+    resetMapL     .setTopLeftPosition(0,                                  pianoNameL.getBottom() + gYSpacing);
     resetMapTF    .setTopLeftPosition(gComponentLabelWidth + gXSpacing,   resetMapL.getY());
     
     upperLeft = loadvc->getBounds();
@@ -295,9 +281,9 @@ void GalleryViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         tf.setText(processPianoMapString(text), false);
     }
-    else if (name == "ModMap")
+    else if (name == "modificationMap")
     {
-        tf.setText(processModMapString(text), false);
+        tf.setText(processmodificationMapString(text), false);
     }
     else if (name == "ResetMap")
     {
@@ -453,12 +439,8 @@ void GalleryViewController::switchPianos(void)
         if (pianoMap[i] > 0) temp += (String(i) + ":" + String(pianoMap[i]) + " ");
     }
     
-    pianoMapTF.setText(temp, false);
-    
-    
-    String mm = processor.currentPiano->modificationMapsToString();
-    modMapTF.setText(mm, false);
-    
+    //pianoMapTF.setText(temp, false);
+
     pianoNameTF.setText(processor.currentPiano->getName(), false);
 }
 

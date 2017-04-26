@@ -76,15 +76,40 @@ public:
     Array<int>                  pianoMap;
     int                         numPMaps;
     
-    OwnedArray<Modifications> modMap;
+    int numResetMappers;
+    
+    OwnedArray<Modifications> modificationMap;
+
     
     ModificationMapper::PtrArr mappers;
+    ModificationMapper::PtrArr resetMappers;
     
     inline ModificationMapper::PtrArr getMappers(void) const noexcept { return mappers; }
     
     inline ModificationMapper::Ptr getMapper(int which) { return mappers[which]; }
     
+    
     inline void clearMapper(void) { mappers.clear(); }
+    
+    inline ModificationMapper::Ptr getResetMapper(BKPreparationType resetType, int which)
+    {
+        ModificationMapper::Ptr thisMapper = new ModificationMapper(resetType, Id);
+        
+        bool add = true;
+        for (auto map : mappers)
+        {
+            if (map->getType() == PreparationTypeReset && map->getId() == Id)
+            {
+                thisMapper = map;
+                add = false;
+                break;
+            }
+        }
+        
+        if (add) mappers.add(thisMapper);
+        
+        return thisMapper;
+    }
     
     inline ModificationMapper::Ptr getMapper(BKPreparationType type, int Id)
     {
@@ -110,7 +135,6 @@ public:
     {
         mappers.add(thisMapper);
     }
-
     
     ValueTree getState(void);
     
@@ -167,50 +191,19 @@ public:
         return out;
     }
 
-    void clearModMap(void)
+    void clearmodificationMap(void)
     {
-        for (int i = 0; i<modMap.size(); i++)
+        for (int i = 0; i<modificationMap.size(); i++)
         {
-            modMap[i]->clearModifications();
+            modificationMap[i]->clearModifications();
         }
     }
 
     void clearResetMap(void)
     {
-        for (int i = 0; i<modMap.size(); i++)
+        for (int i = 0; i<modificationMap.size(); i++)
         {
-            modMap[i]->clearResets();
-        }
-    }
-    
-    void addReset(Reset* reset)
-    {
-        BKPreparationType type = reset->getType();
-        Array<int> preps = reset->getPreparations();
-        
-        for (auto key : reset->getKeys())
-        {
-            if (type == PreparationTypeDirect)
-            {
-                for (auto p : preps)    modMap[key]->directReset.add(p);
-            }
-            else if (type == PreparationTypeNostalgic)
-            {
-                for (auto p : preps)    modMap[key]->nostalgicReset.add(p);
-            }
-            else if (type == PreparationTypeSynchronic)
-            {
-                for (auto p : preps)    modMap[key]->synchronicReset.add(p);
-            }
-            else if (type == PreparationTypeTempo)
-            {
-                for (auto p : preps)    modMap[key]->tempoReset.add(p);
-            }
-            else if (type == PreparationTypeTuning)
-            {
-                for (auto p : preps)    modMap[key]->tuningReset.add(p);
-            }
-            
+            modificationMap[i]->clearResets();
         }
     }
 
@@ -218,6 +211,15 @@ public:
     int                         numModSMaps, numModNMaps, numModDMaps;
 
     void                        prepareToPlay(double sampleRate);
+    
+    void configureReset(BKPreparationType type, Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureReset(BKPreparationType type, Array<int> whichKeymaps, Array<int> whichPreps);
+    
+    void deconfigureSynchronicReset(Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureDirectReset(Array<int> whichKeymaps, Array<int> whichPreps);
+    
+    void configureSynchronicReset(Array<int> whichKeymaps, Array<int> whichPreps);
+    void configureDirectReset(Array<int> whichKeymaps, Array<int> whichPreps);
     
     void configureModifications(ModificationMapper::PtrArr maps);
     void configureModification(ModificationMapper::Ptr map);

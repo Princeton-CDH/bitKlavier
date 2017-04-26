@@ -1261,6 +1261,7 @@ public:
     {
     }
     
+    
     ModificationMapper(BKPreparationType type, int Id, Array<int> keymaps, Array<int> targets):
     type(type),
     Id(Id),
@@ -1270,9 +1271,10 @@ public:
         
     }
 
+    
     void print(void)
     {
-        //DBG("MAPPER type: " + String(type) + " Id: " + String(Id) + " Keymaps: " + intArrayToString(keymaps) + " Targets: " + intArrayToString(targets));
+        DBG("MAPPER type: " + String(type)  + " Id: " + String(Id) + " Keymaps: " + intArrayToString(keymaps) + " Targets: " + intArrayToString(targets));
     }
     
     inline int getId(void) const noexcept { return Id; }
@@ -1287,6 +1289,7 @@ public:
     
     inline void clearKeymaps(void) {keymaps.clear();}
     inline void clearTargets(void) {targets.clear();}
+    
     
 private:
     BKPreparationType type;

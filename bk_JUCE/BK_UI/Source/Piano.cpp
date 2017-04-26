@@ -44,13 +44,13 @@ Id(Id)
     numPMaps = 0;
     pianoMap.ensureStorageAllocated(128);
     
-    modMap = OwnedArray<Modifications>();
-    modMap.ensureStorageAllocated(128);
+    modificationMap = OwnedArray<Modifications>();
+    modificationMap.ensureStorageAllocated(128);
     
     for (int i = 0; i < 128; i++)
     {
         pianoMap.set(i, -1);
-        modMap.add(new Modifications());
+        modificationMap.add(new Modifications());
     }
     
 
@@ -77,7 +77,7 @@ void Piano::configureDirectModification(int key, DirectModPreparation::Ptr dmod,
         {
             for (auto prep : whichPreps)
             {
-                modMap[key]->addDirectModification(new DirectModification(key, prep, (DirectParameterType)n, param, whichMod));
+                modificationMap[key]->addDirectModification(new DirectModification(key, prep, (DirectParameterType)n, param, whichMod));
                 
                 //DBG("ADD whichmod: " + String(whichMod) + " whichprep: " + String(prep) + " whichtype: " + cDirectParameterTypes[n] + " val: " +param + " TO key: " + String(key));
             }
@@ -114,7 +114,7 @@ void Piano::deconfigureDirectModificationForKeys(DirectModPreparation::Ptr mod, 
     for (auto key : keys)
     {
         // Remove Modification from Key
-        modMap[key]->removeDirectModification(whichMod);
+        modificationMap[key]->removeDirectModification(whichMod);
         
     }
 }
@@ -128,7 +128,7 @@ void Piano::deconfigureDirectModification(DirectModPreparation::Ptr mod, Array<i
         for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
         {
             // Remove Modification from Key
-            modMap[key]->removeDirectModification(whichMod);
+            modificationMap[key]->removeDirectModification(whichMod);
         }
     }
 }
@@ -147,7 +147,7 @@ void Piano::configureNostalgicModification(int key, NostalgicModPreparation::Ptr
         {
             for (auto prep : whichPreps)
             {
-                modMap[key]->addNostalgicModification(new NostalgicModification(key, prep, (NostalgicParameterType)n, param, whichMod));
+                modificationMap[key]->addNostalgicModification(new NostalgicModification(key, prep, (NostalgicParameterType)n, param, whichMod));
             }
         }
     }
@@ -224,6 +224,114 @@ void Piano::configureModification(ModificationMapper::Ptr map)
     }
 }
 
+void Piano::configureReset(BKPreparationType type, Array<int> whichKeymaps, Array<int> whichPreps)
+{
+    Array<int> otherKeys;
+    
+    for (int i = 0; i < 128; i++) otherKeys.add(i);
+    
+    for (auto keymap : whichKeymaps)
+    {
+        for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
+        {
+            for (auto prep : whichPreps)
+                modificationMap[key]->synchronicReset.add(prep);
+            otherKeys.remove(key);
+        }
+    }
+    
+    for (auto key: otherKeys)
+    {
+        for (auto prep : whichPreps)
+        {
+            int count = 0;
+            for (auto item : modificationMap[key]->synchronicReset)
+            {
+                if (item == prep)
+                {
+                    modificationMap[key]->synchronicReset.remove(count);
+                    break;
+                }
+                count++;
+            }
+        }
+    }
+}
+
+void Piano::deconfigureSynchronicReset(Array<int> whichKeymaps, Array<int> whichPreps)
+{
+    for (auto keymap : whichKeymaps)
+    {
+        for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
+        {
+            Array<int> resets =  modificationMap[key]->synchronicReset;
+            
+            for (auto prep : whichPreps)
+            {
+                for (int i = resets.size(); --i >= 0;)
+                {
+                    if (resets[i] == prep)
+                    {
+                        resets.remove(i);
+                        break;
+                    }
+                }
+            }
+            
+            modificationMap[key]->synchronicReset = resets;
+        }
+    }
+}
+
+void Piano::deconfigureDirectReset(Array<int> whichKeymaps, Array<int> whichPreps)
+{
+    for (auto keymap : whichKeymaps)
+    {
+        for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
+        {
+            Array<int> resets =  modificationMap[key]->directReset;
+            
+            for (auto prep : whichPreps)
+            {
+                for (int i = resets.size(); --i >= 0;)
+                {
+                    if (resets[i] == prep)
+                    {
+                        resets.remove(i);
+                        break;
+                    }
+                }
+            }
+            
+            modificationMap[key]->directReset = resets;
+        }
+    }
+}
+
+void Piano::deconfigureReset(BKPreparationType type, Array<int> whichKeymaps, Array<int> whichPreps)
+{
+    if (type == PreparationTypeSynchronic)
+    {
+        deconfigureSynchronicReset(whichKeymaps, whichPreps);
+    }
+    else if (type == PreparationTypeDirect)
+    {
+        deconfigureDirectReset(whichKeymaps, whichPreps);
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+       // deconfigureNostalgicReset(whichKeymaps, whichPreps);
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        //deconfigureTuningReset(whichKeymaps, whichPreps);
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        //deconfigureTempoReset(whichKeymaps, whichPreps);
+    }
+}
+
 
 void Piano::configureNostalgicModification(NostalgicModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
 {
@@ -250,7 +358,7 @@ void Piano::deconfigureNostalgicModificationForKeys(NostalgicModPreparation::Ptr
     for (auto key : keys)
     {
         // Remove Modification from Key
-        modMap[key]->removeNostalgicModification(whichMod);
+        modificationMap[key]->removeNostalgicModification(whichMod);
     }
 }
 
@@ -263,7 +371,7 @@ void Piano::deconfigureNostalgicModification(NostalgicModPreparation::Ptr mod, A
         for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
         {
             // Remove Modification from Key
-            modMap[key]->removeNostalgicModification(whichMod);
+            modificationMap[key]->removeNostalgicModification(whichMod);
         }
     }
 }
@@ -283,7 +391,7 @@ void Piano::configureSynchronicModification(int key, SynchronicModPreparation::P
         {
             for (auto prep : whichPreps)
             {
-                modMap[key]->addSynchronicModification(new SynchronicModification(key, prep, (SynchronicParameterType)n, param, whichMod));
+                modificationMap[key]->addSynchronicModification(new SynchronicModification(key, prep, (SynchronicParameterType)n, param, whichMod));
             }
         }
     }
@@ -314,7 +422,7 @@ void Piano::deconfigureSynchronicModificationForKeys(SynchronicModPreparation::P
     for (auto key : keys)
     {
         // Remove Modification from Key
-        modMap[key]->removeSynchronicModification(whichMod);
+        modificationMap[key]->removeSynchronicModification(whichMod);
     }
 }
 
@@ -327,7 +435,7 @@ void Piano::deconfigureSynchronicModification(SynchronicModPreparation::Ptr mod,
         for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
         {
             // Remove Modification from Key
-            modMap[key]->removeSynchronicModification(whichMod);
+            modificationMap[key]->removeSynchronicModification(whichMod);
         }
     }
 }
@@ -347,7 +455,7 @@ void Piano::configureTempoModification(int key, TempoModPreparation::Ptr dmod, A
         {
             for (auto prep : whichPreps)
             {
-                modMap[key]->addTempoModification(new TempoModification(key, prep, (TempoParameterType)n, param, whichMod));
+                modificationMap[key]->addTempoModification(new TempoModification(key, prep, (TempoParameterType)n, param, whichMod));
             }
         }
     }
@@ -379,7 +487,7 @@ void Piano::deconfigureTempoModificationForKeys(TempoModPreparation::Ptr mod, Ar
     for (auto key : keys)
     {
         // Remove Modification from Key
-        modMap[key]->removeTempoModification(whichMod);
+        modificationMap[key]->removeTempoModification(whichMod);
         
         DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
     }
@@ -394,7 +502,7 @@ void Piano::deconfigureTempoModification(TempoModPreparation::Ptr mod, Array<int
         for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
         {
             // Remove Modification from Key
-            modMap[key]->removeTempoModification(whichMod);
+            modificationMap[key]->removeTempoModification(whichMod);
             
             DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
         }
@@ -417,7 +525,7 @@ void Piano::configureTuningModification(int key, TuningModPreparation::Ptr dmod,
         {
             for (auto prep : whichPreps)
             {
-                modMap[key]->addTuningModification(new TuningModification(key, prep, (TuningParameterType)n, param, whichMod));
+                modificationMap[key]->addTuningModification(new TuningModification(key, prep, (TuningParameterType)n, param, whichMod));
             }
         }
     }
@@ -448,7 +556,7 @@ void Piano::deconfigureTuningModificationForKeys(TuningModPreparation::Ptr mod, 
     for (auto key : keys)
     {
         // Remove Modification from Key
-        modMap[key]->removeTuningModification(whichMod);
+        modificationMap[key]->removeTuningModification(whichMod);
         
         DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
     }
@@ -463,7 +571,7 @@ void Piano::deconfigureTuningModification(TuningModPreparation::Ptr mod, Array<i
         for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
         {
             // Remove Modification from Key
-            modMap[key]->removeTuningModification(whichMod);
+            modificationMap[key]->removeTuningModification(whichMod);
             
             DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
         }
@@ -629,7 +737,7 @@ ValueTree Piano::getState(void)
 
     int resetCount = 0;
     int pianoMapCount = 0;
-    // Iterate through all keys and write data from PianoMap and ModMap to ValueTree
+    // Iterate through all keys and write data from PianoMap and modificationMap to ValueTree
     for (int key = 0; key < 128; key++)
     {
         if (pianoMap[key] != -1)
@@ -643,33 +751,33 @@ ValueTree Piano::getState(void)
         }
 
         // RESET SAVING
-        if (modMap[key]->directReset.size() ||
-            modMap[key]->nostalgicReset.size() ||
-            modMap[key]->synchronicReset.size() ||
-            modMap[key]->tuningReset.size()||
-            modMap[key]->tempoReset.size())
+        if (modificationMap[key]->directReset.size() ||
+            modificationMap[key]->nostalgicReset.size() ||
+            modificationMap[key]->synchronicReset.size() ||
+            modificationMap[key]->tuningReset.size()||
+            modificationMap[key]->tempoReset.size())
         {
             ValueTree resetVT( vtagReset + String(resetCount++));
             resetVT.setProperty( ptagModX_key, key, 0);
             
             int rcount = 0;
-            for (auto reset : modMap[key]->directReset)
+            for (auto reset : modificationMap[key]->directReset)
                 resetVT.setProperty( "d" + String(rcount++), reset, 0);
             
             rcount = 0;
-            for (auto reset : modMap[key]->synchronicReset)
+            for (auto reset : modificationMap[key]->synchronicReset)
                 resetVT.setProperty( "s" + String(rcount++), reset, 0);
             
             rcount = 0;
-            for (auto reset : modMap[key]->nostalgicReset)
+            for (auto reset : modificationMap[key]->nostalgicReset)
                 resetVT.setProperty( "n" + String(rcount++), reset, 0);
             
             rcount = 0;
-            for (auto reset : modMap[key]->tuningReset)
+            for (auto reset : modificationMap[key]->tuningReset)
                 resetVT.setProperty( "t" + String(rcount++), reset, 0);
             
             rcount = 0;
-            for (auto reset : modMap[key]->tempoReset)
+            for (auto reset : modificationMap[key]->tempoReset)
                 resetVT.setProperty( "m" + String(rcount++), reset, 0);
             
             pianoVT.addChild(resetVT, -1, 0);
@@ -831,7 +939,7 @@ void Piano::setState(XmlElement* e)
                 String attr = pc->getStringAttribute("d" + String(n));
                 
                 if (attr == String::empty)  break;
-                else                        modMap[k]->directReset.add(attr.getIntValue());
+                else                        modificationMap[k]->directReset.add(attr.getIntValue());
             }
             
             // Synchronic resets
@@ -840,7 +948,7 @@ void Piano::setState(XmlElement* e)
                 String attr = pc->getStringAttribute("s" + String(n));
                 
                 if (attr == String::empty)  break;
-                else                        modMap[k]->synchronicReset.add(attr.getIntValue());
+                else                        modificationMap[k]->synchronicReset.add(attr.getIntValue());
             }
             
             // Nostalgic resets
@@ -849,7 +957,7 @@ void Piano::setState(XmlElement* e)
                 String attr = pc->getStringAttribute("n" + String(n));
                 
                 if (attr == String::empty)  break;
-                else                        modMap[k]->nostalgicReset.add(attr.getIntValue());
+                else                        modificationMap[k]->nostalgicReset.add(attr.getIntValue());
             }
             
             // Tuning resets
@@ -858,7 +966,7 @@ void Piano::setState(XmlElement* e)
                 String attr = pc->getStringAttribute("t" + String(n));
                 
                 if (attr == String::empty)  break;
-                else                        modMap[k]->tuningReset.add(attr.getIntValue());
+                else                        modificationMap[k]->tuningReset.add(attr.getIntValue());
             }
             
             // Tempo resets
@@ -867,7 +975,7 @@ void Piano::setState(XmlElement* e)
                 String attr = pc->getStringAttribute("m" + String(n));
                 
                 if (attr == String::empty)  break;
-                else                        modMap[k]->tempoReset.add(attr.getIntValue());
+                else                        modificationMap[k]->tempoReset.add(attr.getIntValue());
             }
             
             ++resetCount;

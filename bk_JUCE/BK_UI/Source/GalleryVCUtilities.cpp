@@ -112,11 +112,11 @@ String GalleryViewController::processResetMapString(const String& s)
     
     for (int i = 0; i < 128; i++)
     {
-        processor.currentPiano->modMap[i]->synchronicReset.clearQuick();
-        processor.currentPiano->modMap[i]->tuningReset.clearQuick();
-        processor.currentPiano->modMap[i]->tempoReset.clearQuick();
-        processor.currentPiano->modMap[i]->nostalgicReset.clearQuick();
-        processor.currentPiano->modMap[i]->directReset.clearQuick();
+        processor.currentPiano->modificationMap[i]->synchronicReset.clearQuick();
+        processor.currentPiano->modificationMap[i]->tuningReset.clearQuick();
+        processor.currentPiano->modificationMap[i]->tempoReset.clearQuick();
+        processor.currentPiano->modificationMap[i]->nostalgicReset.clearQuick();
+        processor.currentPiano->modificationMap[i]->directReset.clearQuick();
     }
     
     while (rest != "")
@@ -203,7 +203,7 @@ String GalleryViewController::processResetMapString(const String& s)
                     for (auto k : keys)
                     {
                         out += String(k) + ":" + "s" + String(whichPrep) + " ";
-                        processor.currentPiano->modMap[k]->synchronicReset.add(whichPrep);
+                        processor.currentPiano->modificationMap[k]->synchronicReset.add(whichPrep);
                     }
                     
                     num = "";
@@ -216,7 +216,7 @@ String GalleryViewController::processResetMapString(const String& s)
                     for (auto k : keys)
                     {
                         out += String(k) + ":" + "n" + String(whichPrep) + " ";
-                        processor.currentPiano->modMap[k]->nostalgicReset.add(whichPrep);
+                        processor.currentPiano->modificationMap[k]->nostalgicReset.add(whichPrep);
                     }
                     
                     num = "";
@@ -228,7 +228,7 @@ String GalleryViewController::processResetMapString(const String& s)
                     for (auto k : keys)
                     {
                         out += String(k) + ":" + "d" + String(whichPrep) + " ";
-                        processor.currentPiano->modMap[k]->directReset.add(whichPrep);
+                        processor.currentPiano->modificationMap[k]->directReset.add(whichPrep);
                     }
                     
                     num = "";
@@ -240,7 +240,7 @@ String GalleryViewController::processResetMapString(const String& s)
                     for (auto k : keys)
                     {
                         out += String(k) + ":" + "t" + String(whichPrep) + " ";
-                        processor.currentPiano->modMap[k]->tuningReset.add(whichPrep);
+                        processor.currentPiano->modificationMap[k]->tuningReset.add(whichPrep);
                     }
                     
                     num = "";
@@ -252,7 +252,7 @@ String GalleryViewController::processResetMapString(const String& s)
                     for (auto k : keys)
                     {
                         out += String(k) + ":" + "m" + String(whichPrep) + " ";
-                        processor.currentPiano->modMap[k]->tempoReset.add(whichPrep);
+                        processor.currentPiano->modificationMap[k]->tempoReset.add(whichPrep);
                     }
                     
                     num = "";
@@ -272,7 +272,7 @@ String GalleryViewController::processResetMapString(const String& s)
     return out;
 }
 
-String GalleryViewController::processModMapString(const String& s)
+String GalleryViewController::processmodificationMapString(const String& s)
 {
     String temp = "";
     String out = "";
@@ -327,7 +327,7 @@ String GalleryViewController::processModMapString(const String& s)
     Array<int> keys;
     
     DBG("clearing mod map");
-    processor.currentPiano->clearModMap();
+    processor.currentPiano->clearmodificationMap();
     
     processor.currentPiano->clearMapper();
     
@@ -343,7 +343,7 @@ String GalleryViewController::processModMapString(const String& s)
     
     BKPreparationType type;
     
-    Array<Array<int>> theModMap;
+    Array<Array<int>> themodificationMap;
     
     for (int i = 0; i < (s.length()+1); i++)
     {

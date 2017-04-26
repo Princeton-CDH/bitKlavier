@@ -29,8 +29,6 @@ public:
     BKItem(BKPreparationType type, int Id, BKAudioProcessor& p);
     ~BKItem(void);
     
-    
-    void mouseUp(const MouseEvent& e) override;
     void mouseDown(const MouseEvent& e) override;
     
     void paint(Graphics& g) override;

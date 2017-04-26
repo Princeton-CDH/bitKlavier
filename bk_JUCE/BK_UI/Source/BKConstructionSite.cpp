@@ -227,6 +227,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
         {
             connect = true;
             
+            DBG("ORIGIN: " + String(lineOX) + " " + String(lineOY));
             lineOX = e.x;
             lineOY = e.y;
         }
@@ -300,6 +301,9 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
     {
         if (item->isDragging)
         {
+            int X = item->getX(); int Y = item->getY();
+            DBG("SET X: " + String(X) + " Y: " + String(Y));
+            processor.currentPiano->configuration->setItemXY(item->getType(), item->getId(), X, Y);
             item->isDragging = false;
         }
     }
@@ -308,8 +312,17 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
 
 void BKConstructionSite::mouseDrag (const MouseEvent& e)
 {
-    for (auto item : graph->getSelectedItems())
-        item->performDrag(e);
+    if (!e.mods.isCommandDown())
+    {
+        for (auto item : graph->getSelectedItems())
+            item->performDrag(e);
+    }
+    
+    lineEX = e.getEventRelativeTo(this).x;
+    lineEY = e.getEventRelativeTo(this).y;
+    
+    DBG("DRAG: "+String(lineEX) + " " +String(lineEY));
+    
     repaint();
 }
 

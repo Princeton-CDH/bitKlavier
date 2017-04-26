@@ -642,7 +642,7 @@ if (!(tm.size() % 3))
         }
         
         int whichPrep = nostalgic[nId]->aPrep->getTuning()->getId();
-        thisPiano->modMap[noteNumber]->addTuningModification(new TuningModification(noteNumber, whichPrep, TuningFundamental, String(fund), whichTMod));
+        thisPiano->modificationMap[noteNumber]->addTuningModification(new TuningModification(noteNumber, whichPrep, TuningFundamental, String(fund), whichTMod));
         
         ++modTuningCount;
         
@@ -689,7 +689,7 @@ if (!(tm.size() % 3))
         
         int whichPrep = synchronic[sId]->aPrep->getTuning()->getId();
         
-        thisPiano->modMap[noteNumber]->addTuningModification(new TuningModification(noteNumber, whichPrep, TuningFundamental, String(fund), whichTMod));
+        thisPiano->modificationMap[noteNumber]->addTuningModification(new TuningModification(noteNumber, whichPrep, TuningFundamental, String(fund), whichTMod));
         
         ++modTuningCount;
         

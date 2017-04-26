@@ -185,11 +185,11 @@ void  BKAudioProcessor::setCurrentPiano(int which)
 // Reset
 void BKAudioProcessor::performResets(int noteNumber)
 {
-    for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->directReset)      gallery->getDirect(prep)->reset();
-    for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->synchronicReset)  gallery->getSynchronic(prep)->reset();
-    for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->nostalgicReset)   gallery->getNostalgic(prep)->reset();
-    for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->tuningReset)      gallery->getTuning(prep)->reset();
-    for (auto prep : currentPiano->modMap.getUnchecked(noteNumber)->tempoReset)       gallery->getTempo(prep)->reset();
+    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->directReset)      gallery->getDirect(prep)->reset();
+    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->synchronicReset)  gallery->getSynchronic(prep)->reset();
+    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->nostalgicReset)   gallery->getNostalgic(prep)->reset();
+    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->tuningReset)      gallery->getTuning(prep)->reset();
+    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->tempoReset)       gallery->getTempo(prep)->reset();
 }
 
 // Modification
@@ -203,7 +203,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
     int   modi;
     bool  modb;
     
-    TuningModification::PtrArr tMod = currentPiano->modMap[noteNumber]->getTuningModifications();
+    TuningModification::PtrArr tMod = currentPiano->modificationMap[noteNumber]->getTuningModifications();
     for (int i = tMod.size(); --i >= 0;)
     {
         TuningPreparation::Ptr active = gallery->getTuning(tMod[i]->getPrepId())->aPrep;
@@ -236,7 +236,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         updateState->tuningPreparationDidChange = true;
     }
     
-    DirectModification::PtrArr dMod = currentPiano->modMap[noteNumber]->getDirectModifications();
+    DirectModification::PtrArr dMod = currentPiano->modificationMap[noteNumber]->getDirectModifications();
     for (int i = dMod.size(); --i >= 0;)
     {
         DirectPreparation::Ptr active = gallery->getDirect(dMod[i]->getPrepId())->aPrep;
@@ -256,7 +256,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         updateState->directPreparationDidChange = true;
     }
     
-    NostalgicModification::PtrArr nMod = currentPiano->modMap[noteNumber]->getNostalgicModifications();
+    NostalgicModification::PtrArr nMod = currentPiano->modificationMap[noteNumber]->getNostalgicModifications();
     for (int i = nMod.size(); --i >= 0;)
     {
         NostalgicPreparation::Ptr active = gallery->getNostalgic(nMod[i]->getPrepId())->aPrep;
@@ -279,7 +279,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         updateState->nostalgicPreparationDidChange = true;
     }
     
-    SynchronicModification::PtrArr sMod = currentPiano->modMap[noteNumber]->getSynchronicModifications();
+    SynchronicModification::PtrArr sMod = currentPiano->modificationMap[noteNumber]->getSynchronicModifications();
     for (int i = sMod.size(); --i >= 0;)
     {
         SynchronicPreparation::Ptr active = gallery->getSynchronic(sMod[i]->getPrepId())->aPrep;
