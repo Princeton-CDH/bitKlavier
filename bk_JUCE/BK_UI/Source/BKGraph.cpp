@@ -73,7 +73,7 @@ void BKItem::bkComboBoxDidChange    (ComboBox* cb)
         {
             currentId = Id;
             
-            sendActionMessage("/pianomap/update");
+            ((BKConstructionSite*)getParentComponent())->pianoMapDidChange(this);
             
             DBG("New piano selected: "+String(currentId));
         }
@@ -177,8 +177,10 @@ void BKItem::keyPressedWhileSelected(const KeyPress& e)
 
 void BKItem::mouseUp(const MouseEvent& e)
 {
-    int X = e.getEventRelativeTo(getParentComponent()).x;
-    int Y = e.getEventRelativeTo(getParentComponent()).y;
+    int X = getX();
+    int Y = getY();
+    
+    DBG("SET X: " + String(X) + " Y: " + String(Y));
     
     processor.currentPiano->configuration->setItemXY(type, Id, X, Y);
     mouseExit(e);
@@ -982,7 +984,7 @@ void BKItemGraph::reconnect(BKItem* item1, BKItem* item2)
 void BKItemGraph::update(BKPreparationType type, int which)
 {
     // Only applies to Keymaps and Modification types, so as to make sure that when ModPreparations are changed, so are the Modifications.
-    if (type >= PreparationTypeKeymap && type < PreparationTypePianoMap) // All the mods
+    if (type >= PreparationTypeKeymap && type <= PreparationTypePianoMap) // All the mods
     {
         for (auto item : items)
         {
@@ -991,20 +993,6 @@ void BKItemGraph::update(BKPreparationType type, int which)
                 for (auto connection : item->getConnections())
                 {
                     DBG("should reconnect " +String(type)+String(which) +" and "+ String(connection->getType())+String(connection->getId()));
-                    reconnect(item, connection);
-                }
-            }
-        }
-    }
-    else if (type == PreparationTypePianoMap)
-    {
-        for (auto item : items)
-        {
-            if (item->getType() == type)
-            {
-                for (auto connection : item->getConnections())
-                {
-                    DBG("RECONNECT PIANO MAPS");
                     reconnect(item, connection);
                 }
             }

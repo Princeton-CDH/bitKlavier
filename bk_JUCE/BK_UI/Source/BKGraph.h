@@ -83,6 +83,8 @@ public:
     {
         setBounds(X,Y,width,height);
         
+        DBG("SET X: " + String(X) + " Y: " + String(Y));
+        
         processor.currentPiano->configuration->setItemXY(type, Id, X, Y);
     }
     
@@ -133,10 +135,10 @@ public:
     
     void actionListenerCallback (const String& message) override
     {
-        if (message == "/pianomap/update")
-        {
-            update(PreparationTypePianoMap, 0);
-        }
+//        if (message == "/pianomap/update")
+//        {
+//            update(PreparationTypePianoMap, 0);
+//        }
     }
     
     /*
