@@ -255,7 +255,7 @@ void BKMultiSlider::setTo(Array<float> newvals)
     }
     
     //if(sliders.size() > numSliders) sliders.removeRange(numSliders, sliders.size());
-    //if(sliders.size() > numSliders) deactivateAllAfter(numSliders);
+    if(sliders.size() > numSliders) deactivateAllAfter(numSliders - 1);
     
     resetRanges();
     resized();
@@ -287,7 +287,7 @@ void BKMultiSlider::setTo(Array<Array<float>> newvals)
     }
     
     //if(sliders.size() > numSliders) sliders.removeRange(numSliders, sliders.size());
-    //if(sliders.size() > numSliders) deactivateAllAfter(numSliders);
+    if(sliders.size() > numSliders) deactivateAllAfter(numSliders - 1);
     
     resetRanges();
     resized();
@@ -429,6 +429,7 @@ void BKMultiSlider::deactivateSlider(int where)
             BKSingleSlider *currentSlider = sliders[where]->getUnchecked(i);
             currentSlider->isActive(false);
             currentSlider->setLookAndFeel(&passiveSliderLookAndFeel);
+            currentSlider->setValue(sliderDefault);
         }
         
         listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,

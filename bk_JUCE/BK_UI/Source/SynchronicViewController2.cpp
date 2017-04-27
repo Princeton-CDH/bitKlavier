@@ -34,6 +34,14 @@ theGraph(theGraph)
         }
     }
     
+    addAndMakeVisible(selectCB);
+    selectCB.setName("Synchronic");
+    selectCB.addSeparator();
+    selectCB.addListener(this);
+    //selectCB.setEditableText(true);
+    selectCB.setSelectedItemIndex(0);
+    fillSelectCB();
+    
     /*
     // Labels
     synchronicL = OwnedArray<BKLabel>();
@@ -165,13 +173,16 @@ void SynchronicViewController2::paint (Graphics& g)
 void SynchronicViewController2::resized()
 {
     Rectangle<int> area (getLocalBounds());
-    area.removeFromRight(area.getWidth() * 0.5);
+    Rectangle<int> rightColumn = area.removeFromRight(area.getWidth() * 0.5);
+    
     int tempHeight = area.getHeight() / paramSliders.size();
     
     for(int i = 0; i < paramSliders.size(); i++)
     {
         paramSliders[i]->setBounds(area.removeFromBottom(tempHeight));
     }
+    
+    selectCB.setBounds(rightColumn.removeFromTop(20));
 }
 
 void SynchronicViewController2::updateFields()
@@ -201,6 +212,45 @@ void SynchronicViewController2::updateFields()
         }
     }
     
+}
+
+void SynchronicViewController2::fillSelectCB(void)
+{
+    // Direct menu
+    Synchronic::PtrArr newpreps = processor.gallery->getAllSynchronic();
+    
+    selectCB.clear(dontSendNotification);
+    for (int i = 0; i < newpreps.size(); i++)
+    {
+        String name = newpreps[i]->getName();
+        if (name != String::empty)  selectCB.addItem(name, i+1);
+        else                        selectCB.addItem(String(i+1), i+1);
+    }
+    
+    selectCB.addItem("New synchronic...", newpreps.size()+1);
+    
+    selectCB.setSelectedItemIndex(processor.updateState->currentSynchronicId, NotificationType::dontSendNotification);
+    
+}
+
+
+void SynchronicViewController2::bkComboBoxDidChange (ComboBox* box)
+{
+    String name = box->getName();
+    
+    if (name == "Synchronic")
+    {
+        processor.updateState->currentSynchronicId = box->getSelectedItemIndex();
+        
+        if (processor.updateState->currentSynchronicId == selectCB.getNumItems()-1)
+        {
+            processor.gallery->addSynchronic();
+            
+            fillSelectCB();
+        }
+        
+        updateFields();
+    }
 }
 
 void SynchronicViewController2::bkMessageReceived (const String& message)

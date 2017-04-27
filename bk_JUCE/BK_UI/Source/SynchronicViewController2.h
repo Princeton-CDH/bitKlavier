@@ -43,12 +43,12 @@ private:
     
     OwnedArray<BKMultiSlider> paramSliders;
     
-    BKComboBox selectPrep;
+    BKComboBox selectCB;
 
     void bkTextFieldDidChange       (TextEditor&)           override { };
     void bkMessageReceived          (const String& message) override;
     
-    void bkComboBoxDidChange        (ComboBox* box)         override { };
+    void bkComboBoxDidChange        (ComboBox* box)         override;
     void bkButtonClicked            (Button* b)             override { };
     
     void multiSliderValueChanged(String name, int whichSlider, Array<float> values) override;
