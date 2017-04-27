@@ -42,6 +42,8 @@ private:
     OwnedArray<BKTextField> modSynchronicTF;
     
     OwnedArray<BKMultiSlider> paramSliders;
+    
+    BKComboBox selectPrep;
 
     void bkTextFieldDidChange       (TextEditor&)           override { };
     void bkMessageReceived          (const String& message) override;

@@ -59,7 +59,7 @@ theGraph(theGraph)
     
 
     sliderTest = new BKMultiSlider(HorizontalMultiBarSlider); //or HorizontalMultiSlider, VerticalMultiSlider, HorizontalMultiBarSlider, VerticalMultiBarSlider
-    addAndMakeVisible(sliderTest);
+    //addAndMakeVisible(sliderTest);
     sliderTest->addMyListener(this);
     sliderTest->setName("Accents");
     

@@ -30,8 +30,7 @@ theGraph(theGraph)
             addAndMakeVisible(paramSliders[0]);
             paramSliders[0]->addMyListener(this);
             paramSliders[0]->setName(cSynchronicParameterTypes[i]);
-            //cSynchronicDefaultRangeValuesAndInc
-            //paramSliders[0]->setDefaultRangeValuesAndInc(cSynchronicDefaultRangeValuesAndInc[i]);
+            paramSliders[0]->setMinMaxDefaultInc(cSynchronicDefaultRangeValuesAndInc[i]);
         }
     }
     
@@ -119,7 +118,7 @@ void SynchronicViewController2::multiSliderValueChanged(String name, int whichSl
         active  ->setSingleTransposition(whichSlider, values);
     }
     
-    processor.updateState->synchronicPreparationDidChange = true;
+    //processor.updateState->synchronicPreparationDidChange = true;
 
 }
 
@@ -154,7 +153,7 @@ void SynchronicViewController2::multiSliderAllValuesChanged(String name, Array<A
         active  ->setTransposition(values);
     }
     
-    processor.updateState->synchronicPreparationDidChange = true;
+    //processor.updateState->synchronicPreparationDidChange = true;
 }
 
 void SynchronicViewController2::paint (Graphics& g)
@@ -201,6 +200,7 @@ void SynchronicViewController2::updateFields()
             paramSliders[i]->setTo(prep->getTransposition());
         }
     }
+    
 }
 
 void SynchronicViewController2::bkMessageReceived (const String& message)

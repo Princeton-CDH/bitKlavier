@@ -58,6 +58,8 @@ public:
     double getValueFromText	(const String & text ) override;
     bool isActive() { return active; }
     void isActive(bool newactive) {active = newactive; }
+    void setMinMaxDefaultInc(std::vector<float> newvals);
+        
     
 private:
     
@@ -92,7 +94,6 @@ public:
 class BKMultiSlider :
 public BKComponent,
 public Slider::Listener,
-public Button::Listener,
 public TextEditor::Listener
 {
     
@@ -114,13 +115,16 @@ public:
     int whichActiveSlider (int which);
     
     void mouseDrag(const MouseEvent &e) override;
+    void mouseMove(const MouseEvent& e) override;
     void mouseDoubleClick (const MouseEvent &e) override;
     void mouseDown (const MouseEvent &event) override;
     void mouseUp (const MouseEvent &event) override;
     
     void setTo(Array<float> newvals);
     void setTo(Array<Array<float>> newvals);
+    void setMinMaxDefaultInc(std::vector<float> newvals);
     
+    void clearSliders();
     void resetRanges();
     void resized() override;
     
@@ -145,7 +149,6 @@ private:
     bool arrangedHorizontally;
     bool sliderIsVertical;
     bool sliderIsBar;
-    bool updatingTextBox = false;
     int currentSubSlider;
     
     Slider::SliderStyle subsliderStyle;
@@ -167,11 +170,11 @@ private:
     
     int totalWidth;
     int sliderWidth, sliderHeight;
+    int displaySliderWidth;
     
     int numSliders;
     
     void sliderValueChanged (Slider *slider) override;
-    void buttonClicked (Button* button) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     
     void showModifyPopupMenu(int which);

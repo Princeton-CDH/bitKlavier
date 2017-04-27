@@ -60,6 +60,17 @@ void BKSingleSlider::valueChanged()
     //setRange(sliderMin, sliderMax, sliderIncrement);
 }
 
+void BKSingleSlider::setMinMaxDefaultInc(std::vector<float> newvals)
+{
+    sliderMin = newvals[0];
+    sliderMax = newvals[1];
+    sliderDefault = newvals[2];
+    sliderIncrement = newvals[3];
+    setRange(sliderMin, sliderMax, sliderIncrement);
+    setSkewFactorFromMidPoint(sliderDefault);
+    setValue(sliderDefault, dontSendNotification);
+}
+
 
 
 double BKSingleSlider::getValueFromText	(const String & text )
@@ -113,6 +124,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
         sliderHeight = 60;
     }
     
+    displaySliderWidth = 50;
     
     //subslider is oriented perpendicular to multislider orientation
     if(sliderIsVertical) {
@@ -154,7 +166,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
                                            sliderMax,
                                            sliderDefault,
                                            sliderIncrement,
-                                           40,
+                                           displaySliderWidth,
                                            tempheight);
         
         DBG("done with horizontal setup");
@@ -181,7 +193,6 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     bigInvisibleSlider->addListener(this);
     bigInvisibleSlider->setLookAndFeel(&activeSliderLookAndFeel);
     //bigInvisibleSlider->setInterceptsMouseClicks(true, true);
-    
     addAndMakeVisible(bigInvisibleSlider);
     
     displaySlider->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxLeft, true, 0,0);
@@ -190,44 +201,16 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     displaySlider->addListener(this);
     displaySlider->setInterceptsMouseClicks(false, false);
     displaySlider->setLookAndFeel(&activeSliderLookAndFeel);
-    
     addAndMakeVisible(displaySlider);
     
     showName.setInterceptsMouseClicks(false, true);
     addAndMakeVisible(showName);
     
- /*
-    incDecSlider = new Slider();
-    addAndMakeVisible (incDecSlider);
-    incDecSlider->addMouseListener(this, true);
-    incDecSlider->addListener(this);
-    incDecSlider->setName("INCDEC");
-    incDecSlider->setSliderStyle (Slider::IncDecButtons);
-    incDecSlider->setRange (1., 1000., 1.0);
-    incDecSlider->setIncDecButtonsMode (Slider::incDecButtonsNotDraggable);
-    if(arrangedHorizontally) incDecSlider->setSize(sliderWidth, 20);
-    else  incDecSlider->setSize(sliderWidth/2, sliderHeight);
-    incDecSlider->setTextBoxStyle (Slider::NoTextBox, false, 90, 20);
-    
-    editTextButton = new TextButton();
-    addAndMakeVisible (editTextButton);
-    editTextButton->setButtonText ("edit");
-    editTextButton->addListener (this);
-    if(arrangedHorizontally) editTextButton->setSize(sliderWidth, 20);
-    else editTextButton->setSize(sliderWidth/2, sliderHeight);
- */
-  
     editValsTextField = new TextEditor();
-    addAndMakeVisible(editValsTextField);
-    //editValsTextField->setMultiLine(true);
-    //editValsTextField->setScrollbarsShown(true);
-    //editValsTextField->setSize(sliderWidth, sliderHeight);
-    //if(!arrangedHorizontally) editValsTextField->setSize(getWidth(), sliderHeight);
-    //else editValsTextField->setSize(sliderWidth, 20);
     editValsTextField->setMultiLine(true);
+    editValsTextField->setName("PARAMTXTEDIT");
     editValsTextField->addListener(this);
-    
-    //initSizes();
+    addAndMakeVisible(editValsTextField);
     
     DBG("done with constructor");
     
@@ -238,9 +221,23 @@ BKMultiSlider::~BKMultiSlider()
     
 }
 
+void BKMultiSlider::clearSliders()
+{
+    for(int i=0; i<sliders.size(); i++)
+    {
+        for(int j=0; j<sliders[i]->size(); j++)
+        {
+            sliders[i]->getUnchecked(j)->setValue(sliderDefault, dontSendNotification);
+        }
+        deactivateSlider(i);
+    }
+    resetRanges();
+}
 
 void BKMultiSlider::setTo(Array<float> newvals)
 {
+    //clearSliders();
+    
     numSliders = newvals.size();
     DBG("new numsliders = " + String(numSliders));
     if(numSliders < 1) numSliders = 1;
@@ -258,6 +255,7 @@ void BKMultiSlider::setTo(Array<float> newvals)
     }
     
     //if(sliders.size() > numSliders) sliders.removeRange(numSliders, sliders.size());
+    //if(sliders.size() > numSliders) deactivateAllAfter(numSliders);
     
     resetRanges();
     resized();
@@ -266,6 +264,8 @@ void BKMultiSlider::setTo(Array<float> newvals)
 
 void BKMultiSlider::setTo(Array<Array<float>> newvals)
 {
+    //clearSliders();
+    
     numSliders = newvals.size();
     DBG("new numsliders = " + String(numSliders));
     if(numSliders < 1) numSliders = 1;
@@ -287,9 +287,29 @@ void BKMultiSlider::setTo(Array<Array<float>> newvals)
     }
     
     //if(sliders.size() > numSliders) sliders.removeRange(numSliders, sliders.size());
+    //if(sliders.size() > numSliders) deactivateAllAfter(numSliders);
     
     resetRanges();
     resized();
+}
+
+void BKMultiSlider::setMinMaxDefaultInc(std::vector<float> newvals)
+{
+    sliderMin = sliderMinDefault = newvals[0];
+    sliderMax = sliderMaxDefault = newvals[1];
+    sliderDefault = newvals[2];
+    sliderIncrement = newvals[3];
+    
+    for(int i=0; i<sliders.size(); i++)
+    {
+        for(int j = 0; j<sliders[i]->size(); j++)
+        {
+            sliders.getUnchecked(i)->getUnchecked(j)->setMinMaxDefaultInc(newvals);
+        }
+    }
+    
+    displaySlider->setMinMaxDefaultInc(newvals);
+    bigInvisibleSlider->setMinMaxDefaultInc(newvals);
 }
 
 
@@ -313,6 +333,7 @@ void BKMultiSlider::addSlider(int where, int depth, bool active)
                                                                sliderHeight);
     
     newslider->setRange(sliderMin, sliderMax, sliderIncrement);
+    newslider->setValue(sliderDefault);
     newslider->addListener(this);
 
     if(where < 0) {
@@ -324,8 +345,6 @@ void BKMultiSlider::addSlider(int where, int depth, bool active)
         sliders.insert(where, new OwnedArray<BKSingleSlider>);
         sliders.getUnchecked(where)->add(newslider);
     }
-    
-    DBG("sliders.size = " + String(sliders.size()));
 
     addAndMakeVisible(newslider);
     if(active)
@@ -360,11 +379,10 @@ void BKMultiSlider::addSubSlider(int where, int depth, bool active)
                                                                 sliderHeight);
     
     newslider->setRange(sliderMin, sliderMax, sliderIncrement);
+    newslider->setValue(sliderDefault);
     newslider->addListener(this);
     
     sliders.getUnchecked(where)->add(newslider);
-    
-    DBG("slider " + String(where) + " depth = " + String(sliders.getUnchecked(where)->size()));
     
     addAndMakeVisible(newslider);
     if(active)
@@ -383,7 +401,6 @@ void BKMultiSlider::insertSlider(int where)
     if(where < 0) where = 0;
     addSlider(where, 0, false);
     numSliders++;
-    DBG("numSliders = " + String(numSliders));
     resized();
     
     listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
@@ -443,6 +460,8 @@ void BKMultiSlider::mouseDrag(const MouseEvent& e)
     {
         int which = whichSlider(e);
         
+        DBG("dragging slider " + String(which));
+        
         if(which >= 0) {
             BKSingleSlider *currentSlider = sliders[which]->getUnchecked(currentSubSlider);
             currentSlider->setValue(currentInvisibleSliderValue);
@@ -462,8 +481,18 @@ void BKMultiSlider::mouseDrag(const MouseEvent& e)
                                whichActiveSlider(which),
                                getOneSliderBank(which));
             }
-            
         }
+    }
+}
+
+void BKMultiSlider::mouseMove(const MouseEvent& e)
+{
+    if(e.eventComponent == bigInvisibleSlider)
+    {
+        int which = whichSlider(e);
+        int whichSub = whichSubSlider(which);
+        if(which >= 0 && whichSub >= 0)
+            displaySlider->setValue(sliders.getUnchecked(which)->getUnchecked(whichSub)->getValue());
     }
 }
 
@@ -472,8 +501,6 @@ void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
 {
     if(e.eventComponent == bigInvisibleSlider)
     {
-        //DBG("all vals " + arrayFloatArrayToString(getAllValues()));
-        
         int which = whichSlider(e);
         
         //highlight number for current slider
@@ -489,9 +516,6 @@ void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
         editValsTextField->toFront(true);
         editValsTextField->setText(arrayFloatArrayToString(getAllValues())); //arrayFloatArrayToString
         
-        //if(arrangedHorizontally) editValsTextField->setSize(numSliders * sliders.getFirst()->getFirst()->getWidth(), editValsTextField->getHeight());
-        //else editValsTextField->setSize(getWidth(), editValsTextField->getHeight());
-        
         Range<int> highlightRange(startPoint, endPoint);
         editValsTextField->setHighlightedRegion(highlightRange);
     }
@@ -502,12 +526,10 @@ void BKMultiSlider::mouseDown (const MouseEvent &event)
     if(event.mouseWasClicked())
     {
         currentSubSlider = whichSubSlider(whichSlider(event));
-        //DBG("current sub slider = " + String(currentSubSlider));
         
         if(event.mods.isCtrlDown())
         {
-            //DBG("control down for slider " + String(whichSlider(event)));
-            showModifyPopupMenu(whichSlider(event));
+              showModifyPopupMenu(whichSlider(event));
         }
     }
 }
@@ -518,10 +540,10 @@ void BKMultiSlider::mouseUp (const MouseEvent &event)
     {
         if(event.mods.isShiftDown())
         {
-            //DBG("shift clicked on slider");
             int which = whichSlider(event);
             if(which >= 0) {
                 sliders[which]->getUnchecked(0)->setValue(sliderDefault); //again, need to identify which subslider to get
+                displaySlider->setValue(sliderDefault);
                 
                 listeners.call(&BKMultiSliderListener::multiSliderValueChanged,
                                getName(),
@@ -591,7 +613,6 @@ void BKMultiSlider::resetRanges()
         {
             if(sliders[i]->getUnchecked(j)->getValue() > sliderMaxTemp) sliderMaxTemp = sliders[i]->getUnchecked(j)->getValue();
             if(sliders[i]->getUnchecked(j)->getValue() < sliderMinTemp) sliderMinTemp = sliders[i]->getUnchecked(j)->getValue();
-            //DBG("slider val " + String(sliders[i]->getUnchecked(j)->getValue()));
         }
     }
     
@@ -599,7 +620,6 @@ void BKMultiSlider::resetRanges()
     {
         sliderMax = sliderMaxTemp;
         sliderMin = sliderMinTemp;
-        //DBG("new slider max/min " + String(sliderMax) + " " + String(sliderMin));
         
         for(int i = 0; i<sliders.size(); i++)
         {
@@ -618,11 +638,12 @@ void BKMultiSlider::resized()
 {
     
     Rectangle<int> area (getLocalBounds());
-    displaySlider->setBounds(area.removeFromLeft(40));
+    displaySlider->setBounds(area.removeFromLeft(displaySliderWidth));
     editValsTextField->setBounds(area);
     editValsTextField->setVisible(false);
     
     showName.setBounds(area);
+    showName.setJustificationType(Justification::topRight);
     showName.toFront(false);
     
     bigInvisibleSlider->setBounds(area);
@@ -635,7 +656,6 @@ void BKMultiSlider::resized()
         for(int j=0; j<sliders.getUnchecked(i)->size(); j++)
         {
             sliders.getUnchecked(i)->getUnchecked(j)->setBounds(sliderArea);
-            //sliders.getUnchecked(i)->getUnchecked(j)->setSize(sliderArea.getWidth(), sliderArea.getHeight());
         }
     }
     
@@ -648,55 +668,26 @@ void BKMultiSlider::sliderValueChanged (Slider *slider)
     if (slider->getName() == "BIG")
     {
         currentInvisibleSliderValue = slider->getValue();
-        //sendChangeMessage();
-        //DBG(currentInvisibleSliderValue);
-    }
-    /*
-    else if(slider->getName() == "INCDEC")
-    {
-        //DBG(slider->getValue());
-        
-        numSliders = slider->getValue();
-        if(numSliders > sliders.size()) addSlider(-1);
-        else sliders.removeLast();
-        
-        initSizes();
-    }
-     */
-    else { //subsliders
-        if(updatingTextBox) {
-            updatingTextBox = false;
-            resetRanges();
-        }
     }
 }
 
 void BKMultiSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 {
-    editValsTextField->setVisible(false);
-    editValsTextField->toBack();
-
-    setTo(stringToArrayFloatArray(textEditor.getText()));
-
-    listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
-                   getName(),
-                   getAllActiveValues());
-    
-    resetRanges();
-    resized();
-}
-
-
-void BKMultiSlider::buttonClicked (Button* button)
-{
-    //setSize(10 * sliders.getFirst()->getWidth() + editTextButton->getWidth(), sliders.getFirst()->getHeight());
-    editValsTextField->setVisible(true);
-    editValsTextField->toFront(true);
-    editValsTextField->setText(arrayFloatArrayToString(getAllValues())); //arrayFloatArrayToString
-    
-    //editValsTextField->setSize(getWidth() - editTextButton->getWidth(), editValsTextField->getHeight());
-    //if(arrangedHorizontally) editValsTextField->setSize(numSliders * sliders.getFirst()->getFirst()->getWidth(), editValsTextField->getHeight());
-    //else editValsTextField->setSize(getWidth(), editValsTextField->getHeight());
+    if(textEditor.getName() == editValsTextField->getName())
+    {
+        editValsTextField->setVisible(false);
+        editValsTextField->toBack();
+        
+        setTo(stringToArrayFloatArray(textEditor.getText()));
+        
+        listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
+                       getName(),
+                       getAllActiveValues());
+        
+        if(sliders.size() > numSliders) deactivateAllAfter(numSliders - 1);
+        resetRanges();
+        resized();
+    }
 }
 
 
@@ -796,7 +787,6 @@ void BKSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int width
         Path p;
         
         if (style == Slider::LinearBarVertical)
-            //p.addRectangle (fx, sliderPos, fw, 1.0f + fh - sliderPos);
             p.addRectangle (fx, sliderPos - 2, fw, 4); //band instead of bar, width of 4
         else
             p.addRectangle (fx, fy, sliderPos - fx, fh);

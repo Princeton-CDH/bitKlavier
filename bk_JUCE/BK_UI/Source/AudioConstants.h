@@ -424,19 +424,19 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
 };
 
 static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc = {
+    {0., 0, 0, 0}, //min, max, default, increment, skew
     {0., 0, 0, 0},
     {0., 0, 0, 0},
-    {0., 0, 0, 0},
-    {1., 100, 1, 1},
-    {1, 4, 1},
-    {2, 8, 1},
-    {20, 2000, 10},
+    {1., 100, 1, 1.0},
+    {1, 4, 1, 1.0},
+    {2, 8, 8, 1.0},
+    {20, 2000, 500, 10.0},
     {0, 0, 0},
-    {0, 4, 1},
-    {0.1, 10, 0.01},
-    {0.1, 10, 0.01},
-    {0., 2., 0.01},
-    {-12, 12, 0.1}
+    {0, 4, 0, 1.0},
+    {0.1, 2, 1, 0.001},
+    {0.1, 2, 1, 0.001},
+    {0., 2., 1, 0.001},
+    {-12, 12, 0, 0.01}
 };
 
 #pragma mark - Nostalgic
