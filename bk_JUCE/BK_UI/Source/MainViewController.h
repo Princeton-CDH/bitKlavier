@@ -56,6 +56,8 @@ private:
     
     BKItemGraph theGraph;
     
+    Viewport viewPort;
+    
     BKConstructionSite  construction;
     
     GalleryViewController galvc;

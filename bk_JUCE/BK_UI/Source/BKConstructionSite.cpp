@@ -13,10 +13,11 @@
 #define AUTO_DRAW 0
 #define NUM_COL 6
 
-BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
+BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph, Viewport* viewPort):
 BKDraggableComponent(false,true,false),
 processor(p),
-graph(theGraph)
+graph(theGraph),
+viewPort(viewPort)
 {
     addKeyListener(this);
     
@@ -25,6 +26,13 @@ graph(theGraph)
     graph->deselectAll();
     
     redraw();
+    
+    leftMost = 0;
+    rightMost = 1000;
+    topMost = 0;
+    bottomMost = 600;
+    
+    setBounds(leftMost, topMost, rightMost, bottomMost);
 }
 
 BKConstructionSite::~BKConstructionSite(void)
@@ -34,7 +42,6 @@ BKConstructionSite::~BKConstructionSite(void)
 
 void BKConstructionSite::redraw(void)
 {
-    
     BKItem::RCArr items = graph->getAllItems();
     
     for (auto item : items)
@@ -314,8 +321,51 @@ void BKConstructionSite::mouseDrag (const MouseEvent& e)
 {
     if (!e.mods.isCommandDown())
     {
+        bool resizeX = false, resizeY = false;
         for (auto item : graph->getSelectedItems())
+        {
             item->performDrag(e);
+            
+            int X = item->getX(); int Y = item->getY();
+            
+            if (X < viewPort->getViewPositionX() || X > viewPort->getViewWidth())
+            {
+                if (X < leftMost) leftMost = X;
+                else if (X > rightMost) rightMost = X;
+                resizeX = true;
+            }
+            
+            if (Y < viewPort->getViewPositionY() || Y > viewPort->getViewHeight())
+            {
+                if (Y < topMost)    topMost = Y;
+                else if (Y > bottomMost) bottomMost = Y;
+                resizeY = true;
+            }
+        }
+     
+        setBounds(leftMost, topMost, rightMost - leftMost, bottomMost - topMost);
+        
+        /*
+        if (resizeX)
+        {
+            for (auto item : graph->getSelectedItems())
+            {
+                item->setTopLeftPosition(item->getX()+10, item->getY());
+            }
+            resizeX = false;
+        }
+        
+        if (resizeY)
+        {
+            setSize(getWidth(), getHeight()+abs(offsetY));
+            for (auto item : graph->getSelectedItems())
+            {
+                item->setTopLeftPosition(item->getX(), item->getY()+10);
+
+            }
+            resizeY = false;
+        }
+         */
     }
     
     lineEX = e.getEventRelativeTo(this).x;

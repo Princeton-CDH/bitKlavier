@@ -9,8 +9,10 @@
               pluginWantsMidiIn="1" pluginProducesMidiOut="1" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="1" pluginAUExportPrefix="BKAU" pluginRTASCategory=""
               aaxIdentifier="com.manyarrowsmusic.bitKlavier" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
-              jucerVersion="4.3.1" companyName="manyarrowsmusic" companyEmail="dtrueman@princeton.edu"
-              maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/">
+              jucerVersion="5.0.0" companyName="manyarrowsmusic" companyEmail="dtrueman@princeton.edu"
+              maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
+              displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Dark"
+              buildStandalone="0" enableIAA="0">
   <MAINGROUP id="s4R02g" name="BK_UI">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
       <GROUP id="{19157329-C279-4066-03E0-75F988B82181}" name="Constants">
@@ -103,17 +105,6 @@
         </GROUP>
       </GROUP>
       <GROUP id="{07677963-38EF-2F51-36FA-17646727446F}" name="Controller">
-        <GROUP id="{A4AD4139-F8E0-AB44-88B6-84FFC2F2D4D5}" name="Editor">
-          <FILE id="ubAlA4" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
-          <FILE id="dgzM9u" name="PluginEditor.cpp" compile="1" resource="0"
-                file="Source/PluginEditor.cpp"/>
-        </GROUP>
-        <FILE id="XoM1Au" name="BKConstructionSite.cpp" compile="1" resource="0"
-              file="Source/BKConstructionSite.cpp"/>
-        <FILE id="DD5nMw" name="BKConstructionSite.h" compile="0" resource="0"
-              file="Source/BKConstructionSite.h"/>
-        <FILE id="b0CZgV" name="BKGraph.cpp" compile="1" resource="0" file="Source/BKGraph.cpp"/>
-        <FILE id="DNfiAk" name="BKGraph.h" compile="0" resource="0" file="Source/BKGraph.h"/>
         <FILE id="Ivngl4" name="MainViewController.cpp" compile="1" resource="0"
               file="Source/MainViewController.cpp"/>
         <FILE id="EyR2nF" name="MainViewController.h" compile="0" resource="0"
@@ -126,6 +117,19 @@
               file="Source/PianoViewController.cpp"/>
         <FILE id="tIek8E" name="PianoViewController.h" compile="0" resource="0"
               file="Source/PianoViewController.h"/>
+        <GROUP id="{482B7CF5-2C2A-E429-840B-6825AAA6161C}" name="Graph">
+          <FILE id="XoM1Au" name="BKConstructionSite.cpp" compile="1" resource="0"
+                file="Source/BKConstructionSite.cpp"/>
+          <FILE id="DD5nMw" name="BKConstructionSite.h" compile="0" resource="0"
+                file="Source/BKConstructionSite.h"/>
+          <FILE id="b0CZgV" name="BKGraph.cpp" compile="1" resource="0" file="Source/BKGraph.cpp"/>
+          <FILE id="DNfiAk" name="BKGraph.h" compile="0" resource="0" file="Source/BKGraph.h"/>
+        </GROUP>
+        <GROUP id="{A4AD4139-F8E0-AB44-88B6-84FFC2F2D4D5}" name="Editor">
+          <FILE id="ubAlA4" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+          <FILE id="dgzM9u" name="PluginEditor.cpp" compile="1" resource="0"
+                file="Source/PluginEditor.cpp"/>
+        </GROUP>
         <GROUP id="{444BC2CA-5FF1-6AEB-00B9-DF5D039DBFFE}" name="PreparationVC">
           <FILE id="dthKFQ" name="SynchronicViewController2.cpp" compile="1"
                 resource="0" file="Source/SynchronicViewController2.cpp"/>

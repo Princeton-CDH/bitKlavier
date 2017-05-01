@@ -64,7 +64,7 @@ public:
     {
         addMouseListener(this,true);
         
-        constrainer.setMinimumOnscreenAmounts(50,50,50,50);
+        constrainer.setMinimumOnscreenAmounts(80,100,80,100);
     }
     
     BKDraggableComponent(bool isDrag, bool isDrop, bool isConn,
@@ -75,7 +75,7 @@ public:
     {
         addMouseListener(this,true);
         
-        constrainer.setMinimumOnscreenAmounts(top,left,bottom,right);
+        //constrainer.setMinimumOnscreenAmounts(top,left,bottom,right);
     }
     
     ~BKDraggableComponent()
@@ -85,7 +85,7 @@ public:
     
     inline void setConstrainer(int top, int left, int bottom, int right)
     {
-        constrainer.setMinimumOnscreenAmounts(top, left, bottom, right);
+        //constrainer.setMinimumOnscreenAmounts(top, left, bottom, right);
     }
     
     virtual void itemWasDropped(BKPreparationType type, Array<int>, int x, int y){};
@@ -106,7 +106,7 @@ public:
     {
         int X = e.x, Y = e.y;
         
-        dragger.dragComponent (this, e, &constrainer);
+        dragger.dragComponent (this, e, nullptr);
 
     }
     
@@ -168,35 +168,6 @@ private:
             keyPressedWhileSelected(e);
         }
     }
-    
-    /*
-    void mouseDrag (const MouseEvent& e) override
-    {
-        if (e.mods.isShiftDown())
-        {
-            
-        }
-        else if (e.mods.isCommandDown())
-        {
-            
-        }
-        else if (isDraggable)
-        {
-            performDrag(e);
-        }
-    }
-    */
-    
-    /*
-    void mouseUp(const MouseEvent& e) override
-    {
-        if (isDragging)
-        {
-            itemWasDragged(e);
-            isDragging = false;
-        }
-    }
-     */
     
     ComponentBoundsConstrainer constrainer;
     ComponentDragger dragger;

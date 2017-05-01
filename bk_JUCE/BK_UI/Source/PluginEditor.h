@@ -43,12 +43,13 @@ private:
     BKAudioProcessor& processor;
     
     Viewport viewPort;
+    ComponentBoundsConstrainer* const constrain;
+    
     MainViewController mvc;
     
     ResizableCornerComponent* resizer;
-    ScrollBar* scroll;
     
-    ComponentBoundsConstrainer* const constrain;
+    
     
     
     

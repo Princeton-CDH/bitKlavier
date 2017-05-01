@@ -10,13 +10,12 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainViewController.h"
-#include "juce_Decibels.h"
 
 //==============================================================================
 MainViewController::MainViewController (BKAudioProcessor& p):
 processor (p),
 theGraph(p),
-construction(p, &theGraph),
+construction(p, &theGraph, &viewPort),
 galvc(p),
 kvc(p, &theGraph),
 tvc(p, &theGraph),
@@ -47,7 +46,10 @@ timerCallbackCount(0)
     preparationPanel = new PreparationPanel(processor);
     addAndMakeVisible(preparationPanel);
     
-    addAndMakeVisible(construction);
+    
+    viewPort.setViewedComponent(&construction);
+    viewPort.setViewPosition(0, 0);
+    addAndMakeVisible(viewPort);
     
     addAndMakeVisible(galvc);
     
@@ -78,7 +80,6 @@ timerCallbackCount(0)
     mainSlider->addListener(this);
     
     setCurrentDisplay(DisplayDirect);
-    
     
     startTimerHz (50);
     
@@ -136,7 +137,12 @@ void MainViewController::resized()
     int panelWidth = 250;
     preparationPanel->setBounds(getScreenBounds().getRight() - SOME_PADDING, getScreenBounds().getY(), panelWidth, getScreenBounds().getHeight());
     
-    construction.setBounds(gXSpacing, kvc.getBottom() + gYSpacing, getScreenBounds().getWidth() - SOME_PADDING - 2*gXSpacing, getScreenBounds().getBottom() - kvc.getBottom()-2*gYSpacing);
+    viewPort.setBounds(gXSpacing,
+                           kvc.getBottom() + gYSpacing,
+                           getScreenBounds().getWidth() - SOME_PADDING - 2*gXSpacing,
+                           getScreenBounds().getBottom() - kvc.getBottom()-2*gYSpacing);
+    
+    construction.setSize(viewPort.getWidth(), viewPort.getHeight());
     
     /*
     float mainSliderHeight = 320;
