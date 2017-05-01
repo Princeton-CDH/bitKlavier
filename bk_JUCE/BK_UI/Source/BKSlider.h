@@ -14,13 +14,6 @@
 #include "BKUtilities.h"
 #include "BKComponent.h"
 
-/*
- TODO
- -- expose basic parameters to top; max/min, etc... perhaps subSlider size
- -- allow narrowing of sliders as numSlider increases
- -- highlight currentVal slider when synhronic is active
- -- possibly have faded out inactive sliders filling out a default width; dragging over them activates... ? have minimumSlidersToDisplay = 16, grey-out inactive ones
-*/
 
 typedef enum BKMultiSliderType {
     HorizontalMultiSlider = 0,
@@ -48,11 +41,12 @@ public:
 };
 
 
-class BKSingleSlider : public Slider
+class BKSubSlider : public Slider
 {
 public:
-    BKSingleSlider (SliderStyle sstyle, double min, double max, double def, double increment, int width, int height);
-    ~BKSingleSlider();
+    
+    BKSubSlider (SliderStyle sstyle, double min, double max, double def, double increment, int width, int height);
+    ~BKSubSlider();
 
     void valueChanged() override;
     double getValueFromText	(const String & text ) override;
@@ -74,7 +68,7 @@ private:
     
     bool active;
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSingleSlider)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSubSlider)
 };
 
 
@@ -120,8 +114,8 @@ public:
     void mouseDown (const MouseEvent &event) override;
     void mouseUp (const MouseEvent &event) override;
     
-    void setTo(Array<float> newvals);
-    void setTo(Array<Array<float>> newvals);
+    void setTo(Array<float> newvals, NotificationType newnotify);
+    void setTo(Array<Array<float>> newvals, NotificationType newnotify);
     void setMinMaxDefaultInc(std::vector<float> newvals);
     
     void clearSliders();
@@ -155,13 +149,11 @@ private:
     
     double currentInvisibleSliderValue;
     
-    OwnedArray<OwnedArray<BKSingleSlider>> sliders;
+    OwnedArray<OwnedArray<BKSubSlider>> sliders;
     
-    BKSingleSlider* displaySlider;
-    BKSingleSlider* bigInvisibleSlider;
-    //Slider* incDecSlider;
-    
-    //TextButton* editTextButton;
+    BKSubSlider* displaySlider;
+    BKSubSlider* bigInvisibleSlider;
+
     TextEditor* editValsTextField;
     
     double sliderMin, sliderMax, sliderMinDefault, sliderMaxDefault;
@@ -173,6 +165,7 @@ private:
     int displaySliderWidth;
     
     int numSliders;
+    int numSlidersDefault;
     
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;

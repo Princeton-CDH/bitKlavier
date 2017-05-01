@@ -38,9 +38,29 @@ theGraph(theGraph)
     selectCB.setName("Synchronic");
     selectCB.addSeparator();
     selectCB.addListener(this);
-    //selectCB.setEditableText(true);
     selectCB.setSelectedItemIndex(0);
     fillSelectCB();
+    
+    addAndMakeVisible(howManySlider);
+    howManySlider.addListener(this);
+    howManySlider.setSliderStyle (Slider::LinearHorizontal);
+    howManySlider.setTextBoxStyle(Slider::TextBoxLeft, false, 50, 20);
+    howManySlider.setRange(1, 100, 1);
+    howManySlider.setValue(1, dontSendNotification);
+    
+    addAndMakeVisible(clusterThreshSlider);
+    clusterThreshSlider.addListener(this);
+    clusterThreshSlider.setSliderStyle (Slider::LinearHorizontal);
+    clusterThreshSlider.setTextBoxStyle(Slider::TextBoxLeft, false, 50, 20);
+    clusterThreshSlider.setRange(20, 2000, 10);
+    clusterThreshSlider.setValue(200, dontSendNotification);
+    
+    addAndMakeVisible(clusterMinMaxSlider);
+    clusterMinMaxSlider.addListener(this);
+    clusterMinMaxSlider.setSliderStyle (Slider::TwoValueHorizontal);
+    clusterMinMaxSlider.setTextBoxStyle(Slider::TextBoxLeft, false, 50, 20);
+    clusterMinMaxSlider.setRange(1, 10, 1);
+    
     
     /*
     // Labels
@@ -181,8 +201,28 @@ void SynchronicViewController2::resized()
     {
         paramSliders[i]->setBounds(area.removeFromBottom(tempHeight));
     }
-    
+
     selectCB.setBounds(rightColumn.removeFromTop(20));
+    
+    /*
+    int rightColumnSlabWidth= rightColumn.getWidth() / 3.;
+    howManySlider.setBounds(rightColumn.removeFromLeft(rightColumnSlabWidth));
+    clusterThreshSlider.setBounds(rightColumn.removeFromLeft(rightColumnSlabWidth));
+    clusterMinMaxSlider.setBounds(rightColumn.removeFromLeft(rightColumnSlabWidth));
+     */
+    
+    int rightColumnRowHeight = rightColumn.getHeight() / 3.;
+    howManySlider.setBounds(rightColumn.removeFromTop(rightColumnRowHeight));
+    clusterThreshSlider.setBounds(rightColumn.removeFromTop(rightColumnRowHeight));
+    clusterMinMaxSlider.setBounds(rightColumn.removeFromTop(rightColumnRowHeight));
+    
+    /*
+     Slider tempoSlider; //send to Tempo
+     Slider howManySlider;
+     Slider clusterThreshSlider;
+     Slider clusterMinMaxSlider;
+     */
+    
 }
 
 void SynchronicViewController2::updateFields()
@@ -196,19 +236,19 @@ void SynchronicViewController2::updateFields()
     {
         if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicAccentMultipliers])
         {
-            paramSliders[i]->setTo(prep->getAccentMultipliers());
+            paramSliders[i]->setTo(prep->getAccentMultipliers(), dontSendNotification);
         }
         else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicBeatMultipliers])
         {
-            paramSliders[i]->setTo(prep->getBeatMultipliers());
+            paramSliders[i]->setTo(prep->getBeatMultipliers(), dontSendNotification);
         }
         else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicLengthMultipliers])
         {
-            paramSliders[i]->setTo(prep->getLengthMultipliers());
+            paramSliders[i]->setTo(prep->getLengthMultipliers(), dontSendNotification);
         }
         else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicTranspOffsets])
         {
-            paramSliders[i]->setTo(prep->getTransposition());
+            paramSliders[i]->setTo(prep->getTransposition(), dontSendNotification);
         }
     }
     

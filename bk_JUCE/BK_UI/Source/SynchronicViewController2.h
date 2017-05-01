@@ -19,7 +19,11 @@
 #include "BKGraph.h"
 
 
-class SynchronicViewController2    : public BKComponent, public BKListener, public BKMultiSliderListener
+class SynchronicViewController2 :
+public BKComponent,
+public BKListener,
+public BKMultiSliderListener,
+public SliderListener
 {
 public:
     SynchronicViewController2(BKAudioProcessor&, BKItemGraph* theGraph);
@@ -27,10 +31,7 @@ public:
     
     void paint (Graphics&) override;
     void resized() override;
-    
-    //void updateModFields(void);
-    //void updateFields(void);
-    
+
     void updateFields();
     
 private:
@@ -45,6 +46,10 @@ private:
     
     BKComboBox selectCB;
 
+    Slider howManySlider;
+    Slider clusterThreshSlider;
+    Slider clusterMinMaxSlider;
+
     void bkTextFieldDidChange       (TextEditor&)           override { };
     void bkMessageReceived          (const String& message) override;
     
@@ -53,6 +58,8 @@ private:
     
     void multiSliderValueChanged(String name, int whichSlider, Array<float> values) override;
     void multiSliderAllValuesChanged(String name, Array<Array<float>> values) override;
+    
+    void sliderValueChanged(Slider* slider) override{ };
     
     void fillSelectCB(void);
     

@@ -8,11 +8,11 @@
   ==============================================================================
 */
 
-// **************************************************  BKSingleSlider ************************************************** //
+// **************************************************  BKSubSlider ************************************************** //
 
 #include "BKSlider.h"
 
-BKSingleSlider::BKSingleSlider (SliderStyle sstyle, double min, double max, double def, double increment, int width, int height):
+BKSubSlider::BKSubSlider (SliderStyle sstyle, double min, double max, double def, double increment, int width, int height):
 sliderMin(min),
 sliderMax(max),
 sliderDefault(def),
@@ -48,19 +48,19 @@ sliderHeight(height)
 }
 
 
-BKSingleSlider::~BKSingleSlider()
+BKSubSlider::~BKSubSlider()
 {
     
 }
 
 
-void BKSingleSlider::valueChanged()
+void BKSubSlider::valueChanged()
 {
     //DBG("slider val changed: " + String(getValue()));
     //setRange(sliderMin, sliderMax, sliderIncrement);
 }
 
-void BKSingleSlider::setMinMaxDefaultInc(std::vector<float> newvals)
+void BKSubSlider::setMinMaxDefaultInc(std::vector<float> newvals)
 {
     sliderMin = newvals[0];
     sliderMax = newvals[1];
@@ -73,7 +73,7 @@ void BKSingleSlider::setMinMaxDefaultInc(std::vector<float> newvals)
 
 
 
-double BKSingleSlider::getValueFromText	(const String & text )
+double BKSubSlider::getValueFromText	(const String & text )
 {
     double newval = text.getDoubleValue();
     
@@ -112,7 +112,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     sliderIncrement = 0.01;
     sliderDefault = 0.;
     
-    numSliders = 12;
+    numSliders = numSlidersDefault = 12;
     
     if(sliderIsVertical) {
         sliderWidth = 80;
@@ -153,7 +153,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
         DBG("depth of first " + String(sliders.getUnchecked(0)->size()));
         DBG("tempheight = " + String(tempheight));
         
-        bigInvisibleSlider = new BKSingleSlider(Slider::LinearBarVertical,
+        bigInvisibleSlider = new BKSubSlider(Slider::LinearBarVertical,
                                                 sliderMin,
                                                 sliderMax,
                                                 sliderDefault,
@@ -161,7 +161,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
                                                 numSliders * sliders.getFirst()->getFirst()->getWidth(),
                                                 tempheight);
         
-        displaySlider = new BKSingleSlider(Slider::LinearBarVertical,
+        displaySlider = new BKSubSlider(Slider::LinearBarVertical,
                                            sliderMin,
                                            sliderMax,
                                            sliderDefault,
@@ -177,7 +177,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
         if(!sliderIsBar) tempwidth = sliders.getFirst()->getFirst()->getWidth() - sliders.getFirst()->getFirst()->getTextBoxWidth();
         else tempwidth = sliders.getFirst()->getFirst()->getWidth();
         
-        bigInvisibleSlider = new BKSingleSlider(Slider::LinearBar,
+        bigInvisibleSlider = new BKSubSlider(Slider::LinearBar,
                                                 sliderMin,
                                                 sliderMax,
                                                 sliderDefault,
@@ -234,7 +234,7 @@ void BKMultiSlider::clearSliders()
     resetRanges();
 }
 
-void BKMultiSlider::setTo(Array<float> newvals)
+void BKMultiSlider::setTo(Array<float> newvals, NotificationType newnotify)
 {
     //clearSliders();
     
@@ -249,20 +249,28 @@ void BKMultiSlider::setTo(Array<float> newvals)
         if(sliders.getUnchecked(i)->getFirst()->getMaximum() < newvals[i]) sliders.getUnchecked(i)->getFirst()->setRange(sliderMin, newvals[i], sliderIncrement);
         if(sliders.getUnchecked(i)->getFirst()->getMinimum() > newvals[i]) sliders.getUnchecked(i)->getFirst()->setRange(newvals[i], sliderMax, sliderIncrement);
         
-        sliders.getUnchecked(i)->getUnchecked(0)->setValue(newvals[i]);
+        sliders.getUnchecked(i)->getUnchecked(0)->setValue(newvals[i], newnotify);
         sliders.getUnchecked(i)->getUnchecked(0)->isActive(true);
         sliders.getUnchecked(i)->getUnchecked(0)->setLookAndFeel(&activeSliderLookAndFeel);
     }
     
     //if(sliders.size() > numSliders) sliders.removeRange(numSliders, sliders.size());
-    if(sliders.size() > numSliders) deactivateAllAfter(numSliders - 1);
+    if(sliders.size() > numSliders && sliders.size() <= numSlidersDefault) deactivateAllAfter(numSliders - 1);
+    
+    if(sliders.size() < numSlidersDefault)
+    {
+        for(int i=numSliders; i<numSlidersDefault; i++)
+            addSlider(-1, 0, false);
+        
+        numSliders = numSlidersDefault;
+    }
     
     resetRanges();
     resized();
 }
 
 
-void BKMultiSlider::setTo(Array<Array<float>> newvals)
+void BKMultiSlider::setTo(Array<Array<float>> newvals, NotificationType newnotify)
 {
     //clearSliders();
     
@@ -280,14 +288,22 @@ void BKMultiSlider::setTo(Array<Array<float>> newvals)
             if(sliders.getUnchecked(i)->getUnchecked(j)->getMaximum() < newvals[i][j]) sliders.getUnchecked(i)->getUnchecked(j)->setRange(sliderMin, newvals[i][j], sliderIncrement);
             if(sliders.getUnchecked(i)->getUnchecked(j)->getMinimum() > newvals[i][j]) sliders.getUnchecked(i)->getUnchecked(j)->setRange(newvals[i][j], sliderMax, sliderIncrement);
             
-            sliders.getUnchecked(i)->getUnchecked(j)->setValue(newvals[i][j]);
+            sliders.getUnchecked(i)->getUnchecked(j)->setValue(newvals[i][j], newnotify);
             sliders.getUnchecked(i)->getUnchecked(j)->isActive(true);
             sliders.getUnchecked(i)->getUnchecked(j)->setLookAndFeel(&activeSliderLookAndFeel);
         }
     }
     
     //if(sliders.size() > numSliders) sliders.removeRange(numSliders, sliders.size());
-    if(sliders.size() > numSliders) deactivateAllAfter(numSliders - 1);
+    if(sliders.size() > numSliders && sliders.size() <= numSlidersDefault) deactivateAllAfter(numSliders - 1);
+    
+    if(sliders.size() < numSlidersDefault)
+    {
+        for(int i=numSliders; i<numSlidersDefault; i++)
+            addSlider(-1, 0, false);
+        
+        numSliders = numSlidersDefault;
+    }
     
     resetRanges();
     resized();
@@ -315,16 +331,16 @@ void BKMultiSlider::setMinMaxDefaultInc(std::vector<float> newvals)
 
 void BKMultiSlider::addSlider(int where, int depth, bool active)
 {
-    BKSingleSlider* newslider;
+    BKSubSlider* newslider;
 
-    if(arrangedHorizontally) newslider     = new BKSingleSlider(subsliderStyle,
+    if(arrangedHorizontally) newslider     = new BKSubSlider(subsliderStyle,
                                                                sliderMin,
                                                                sliderMax,
                                                                sliderDefault,
                                                                sliderIncrement,
                                                                sliderWidth,
                                                                sliderHeight);
-    else newslider                         = new BKSingleSlider(subsliderStyle,
+    else newslider                         = new BKSubSlider(subsliderStyle,
                                                                sliderMin,
                                                                sliderMax,
                                                                sliderDefault,
@@ -337,12 +353,12 @@ void BKMultiSlider::addSlider(int where, int depth, bool active)
     newslider->addListener(this);
 
     if(where < 0) {
-        sliders.add(new OwnedArray<BKSingleSlider>);
+        sliders.add(new OwnedArray<BKSubSlider>);
         sliders.getLast()->add(newslider);
     }
     else
     {
-        sliders.insert(where, new OwnedArray<BKSingleSlider>);
+        sliders.insert(where, new OwnedArray<BKSubSlider>);
         sliders.getUnchecked(where)->add(newslider);
     }
 
@@ -361,16 +377,16 @@ void BKMultiSlider::addSlider(int where, int depth, bool active)
 
 void BKMultiSlider::addSubSlider(int where, int depth, bool active)
 {
-    BKSingleSlider* newslider;
+    BKSubSlider* newslider;
     
-    if(arrangedHorizontally) newslider     = new BKSingleSlider(subsliderStyle,
+    if(arrangedHorizontally) newslider     = new BKSubSlider(subsliderStyle,
                                                                 sliderMin,
                                                                 sliderMax,
                                                                 sliderDefault,
                                                                 sliderIncrement,
                                                                 sliderWidth,
                                                                 sliderHeight);
-    else newslider                         = new BKSingleSlider(subsliderStyle,
+    else newslider                         = new BKSubSlider(subsliderStyle,
                                                                 sliderMin,
                                                                 sliderMax,
                                                                 sliderDefault,
@@ -426,7 +442,7 @@ void BKMultiSlider::deactivateSlider(int where)
 {
     if(sliders.size() > 1) {
         for(int i=0; i<sliders[where]->size(); i++) {
-            BKSingleSlider *currentSlider = sliders[where]->getUnchecked(i);
+            BKSubSlider *currentSlider = sliders[where]->getUnchecked(i);
             currentSlider->isActive(false);
             currentSlider->setLookAndFeel(&passiveSliderLookAndFeel);
             currentSlider->setValue(sliderDefault);
@@ -464,7 +480,7 @@ void BKMultiSlider::mouseDrag(const MouseEvent& e)
         DBG("dragging slider " + String(which));
         
         if(which >= 0) {
-            BKSingleSlider *currentSlider = sliders[which]->getUnchecked(currentSubSlider);
+            BKSubSlider *currentSlider = sliders[which]->getUnchecked(currentSubSlider);
             currentSlider->setValue(currentInvisibleSliderValue);
             displaySlider->setValue(currentInvisibleSliderValue);
             
@@ -506,7 +522,7 @@ void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
         
         //highlight number for current slider
         StringArray tokens;
-        tokens.addTokens(arrayFloatArrayToString(getAllValues()), false); //arrayFloatArrayToString
+        tokens.addTokens(arrayFloatArrayToString(getAllActiveValues()), false); //arrayFloatArrayToString
         int startPoint = 0;
         int endPoint;
         
@@ -515,7 +531,7 @@ void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
         
         editValsTextField->setVisible(true);
         editValsTextField->toFront(true);
-        editValsTextField->setText(arrayFloatArrayToString(getAllValues())); //arrayFloatArrayToString
+        editValsTextField->setText(arrayFloatArrayToString(getAllActiveValues())); //arrayFloatArrayToString
         
         Range<int> highlightRange(startPoint, endPoint);
         editValsTextField->setHighlightedRegion(highlightRange);
@@ -679,7 +695,7 @@ void BKMultiSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
         editValsTextField->setVisible(false);
         editValsTextField->toBack();
         
-        setTo(stringToArrayFloatArray(textEditor.getText()));
+        setTo(stringToArrayFloatArray(textEditor.getText()), sendNotification);
         
         listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
                        getName(),
