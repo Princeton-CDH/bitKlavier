@@ -43,11 +43,14 @@ private:
     BKAudioProcessor& processor;
     
     Viewport viewPort;
-    ComponentBoundsConstrainer* const constrain;
     
     MainViewController mvc;
     
-    ResizableCornerComponent* resizer;
+    ScopedPointer<ComponentBoundsConstrainer> constrain;
+    
+    
+    
+    ScopedPointer<ResizableCornerComponent> resizer;
     
     
     

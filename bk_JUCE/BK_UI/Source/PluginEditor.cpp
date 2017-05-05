@@ -21,13 +21,14 @@ BKAudioProcessorEditor::BKAudioProcessorEditor (BKAudioProcessor& p):
 AudioProcessorEditor (&p),
 processor (p),
 mvc(p),
-constrain(new ComponentBoundsConstrainer())
+constrain(new ComponentBoundsConstrainer()),
+resizer(new ResizableCornerComponent (this, constrain))
 {
     viewPort.setViewedComponent(&mvc);
     viewPort.setViewPosition(0, 0);
     addAndMakeVisible(viewPort);
     
-    addAndMakeVisible (resizer = new ResizableCornerComponent (this, constrain));
+    addAndMakeVisible (resizer);
     
     resizer->setAlwaysOnTop(true);
     

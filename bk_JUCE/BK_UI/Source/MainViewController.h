@@ -75,12 +75,12 @@ private:
     SynchronicViewController2 svc2;
     
     OwnedArray<TextButton> buttons;
-    Slider* mainSlider;
+    ScopedPointer<Slider> mainSlider;
     
-    BKLevelMeterComponent *levelMeterComponentL;
-    BKLevelMeterComponent *levelMeterComponentR;
+    ScopedPointer<BKLevelMeterComponent> levelMeterComponentL;
+    ScopedPointer<BKLevelMeterComponent> levelMeterComponentR;
     
-    PreparationPanel* preparationPanel;
+    ScopedPointer<PreparationPanel> preparationPanel;
     
     void timerCallback() override;
     

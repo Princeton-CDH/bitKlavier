@@ -42,8 +42,8 @@ private:
     void switchGallery(void);
     
     Gallery::Ptr currentGallery;
-    BKComponent*                          loadvc;
-    BKComponent*                          pvc;
+    ScopedPointer<BKComponent>                          loadvc;
+    ScopedPointer<BKComponent>                          pvc;
     PreparationMapViewController::PtrArr  pmvc;
     
     void drawNewPreparationMap(int Id);
