@@ -23,6 +23,8 @@ class SynchronicViewController2 :
 public BKComponent,
 public BKListener,
 public BKMultiSliderListener,
+public BKSingleSliderListener,
+public BKRangeSliderListener,
 public SliderListener
 {
 public:
@@ -46,9 +48,9 @@ private:
     
     BKComboBox selectCB;
 
-    Slider howManySlider;
-    Slider clusterThreshSlider;
-    Slider clusterMinMaxSlider;
+    BKSingleSlider* howManySlider;
+    BKSingleSlider* clusterThreshSlider;
+    BKRangeSlider* clusterMinMaxSlider;
 
     void bkTextFieldDidChange       (TextEditor&)           override { };
     void bkMessageReceived          (const String& message) override;
@@ -58,6 +60,8 @@ private:
     
     void multiSliderValueChanged(String name, int whichSlider, Array<float> values) override;
     void multiSliderAllValuesChanged(String name, Array<Array<float>> values) override;
+    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
     
     void sliderValueChanged(Slider* slider) override{ };
     

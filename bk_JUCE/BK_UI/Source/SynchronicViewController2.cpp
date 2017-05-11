@@ -41,25 +41,41 @@ theGraph(theGraph)
     selectCB.setSelectedItemIndex(0);
     fillSelectCB();
     
+    howManySlider = new BKSingleSlider("how many", 1, 100, 1, 1);
+    howManySlider->addMyListener(this);
     addAndMakeVisible(howManySlider);
+    
+    /*
     howManySlider.addListener(this);
     howManySlider.setSliderStyle (Slider::LinearHorizontal);
     howManySlider.setTextBoxStyle(Slider::TextBoxLeft, false, 50, 20);
     howManySlider.setRange(1, 100, 1);
     howManySlider.setValue(1, dontSendNotification);
+     */
     
+    clusterThreshSlider = new BKSingleSlider("cluster threshold", 20, 2000, 200, 10);
+    clusterThreshSlider->addMyListener(this);
     addAndMakeVisible(clusterThreshSlider);
+    
+    /*
     clusterThreshSlider.addListener(this);
     clusterThreshSlider.setSliderStyle (Slider::LinearHorizontal);
     clusterThreshSlider.setTextBoxStyle(Slider::TextBoxLeft, false, 50, 20);
     clusterThreshSlider.setRange(20, 2000, 10);
     clusterThreshSlider.setValue(200, dontSendNotification);
+     */
     
+    clusterMinMaxSlider = new BKRangeSlider("cluster min/max", 1, 10, 3, 4, 1);
+    clusterMinMaxSlider->addMyListener(this);
+    addAndMakeVisible(clusterMinMaxSlider);
+    
+    /*
     addAndMakeVisible(clusterMinMaxSlider);
     clusterMinMaxSlider.addListener(this);
     clusterMinMaxSlider.setSliderStyle (Slider::TwoValueHorizontal);
     clusterMinMaxSlider.setTextBoxStyle(Slider::TextBoxLeft, false, 50, 20);
     clusterMinMaxSlider.setRange(1, 10, 1);
+     */
     
     
     /*
@@ -152,7 +168,7 @@ void SynchronicViewController2::multiSliderValueChanged(String name, int whichSl
 
 void SynchronicViewController2::multiSliderAllValuesChanged(String name, Array<Array<float>> values)
 {
-    DBG("received all slider vals " + name);
+    //DBG("received all slider vals " + name);
     
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
@@ -184,6 +200,25 @@ void SynchronicViewController2::multiSliderAllValuesChanged(String name, Array<A
     //processor.updateState->synchronicPreparationDidChange = true;
 }
 
+void SynchronicViewController2::BKSingleSliderValueChanged(String name, double val)
+{
+    if(name == "how many") {
+        DBG("got new how many " + String(val));
+    }
+    else if(name == "cluster threshold")
+    {
+        DBG("got new cluster threshold " + String(val));
+    }
+}
+
+void SynchronicViewController2::BKRangeSliderValueChanged(String name, double minval, double maxval)
+{
+    if(name == "cluster min/max") {
+        DBG("got new cluster min/max " + String(minval) + " " + String(maxval));
+    }
+
+}
+
 void SynchronicViewController2::paint (Graphics& g)
 {
     g.setColour(Colours::goldenrod);
@@ -212,9 +247,9 @@ void SynchronicViewController2::resized()
      */
     
     int rightColumnRowHeight = rightColumn.getHeight() / 3.;
-    howManySlider.setBounds(rightColumn.removeFromTop(rightColumnRowHeight));
-    clusterThreshSlider.setBounds(rightColumn.removeFromTop(rightColumnRowHeight));
-    clusterMinMaxSlider.setBounds(rightColumn.removeFromTop(rightColumnRowHeight));
+    howManySlider->setBounds(rightColumn.removeFromTop(rightColumnRowHeight));
+    clusterThreshSlider->setBounds(rightColumn.removeFromTop(rightColumnRowHeight));
+    clusterMinMaxSlider->setBounds(rightColumn.removeFromTop(rightColumnRowHeight));
     
     /*
      Slider tempoSlider; //send to Tempo
@@ -231,6 +266,7 @@ void SynchronicViewController2::updateFields()
     DBG("**** updating sliders ****");
     
     SynchronicPreparation::Ptr prep   = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
     
     for(int i = 0; i < paramSliders.size(); i++)
     {

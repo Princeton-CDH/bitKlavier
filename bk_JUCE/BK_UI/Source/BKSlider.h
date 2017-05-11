@@ -24,16 +24,16 @@ typedef enum BKMultiSliderType {
 } BKMultiSliderType;
 
 
-class BKSliderLookAndFeel : public LookAndFeel_V3
+class BKMultiSliderLookAndFeel : public LookAndFeel_V3
 {
 
 public:
     
-    BKSliderLookAndFeel()
+    BKMultiSliderLookAndFeel()
     {
         //setColour (TextButton::buttonColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.13f));
     }
-    ~BKSliderLookAndFeel() {}
+    ~BKMultiSliderLookAndFeel() {}
     
     void drawLinearSlider (Graphics& g, int x, int y, int width, int height,
                            float sliderPos, float minSliderPos, float maxSliderPos,
@@ -77,7 +77,7 @@ class BKMultiSliderListener
     
 public:
     
-    BKMultiSliderListener() {}
+    //BKMultiSliderListener() {}
     virtual ~BKMultiSliderListener() {};
     
     virtual void multiSliderValueChanged(String name, int whichSlider, Array<float> values) = 0;
@@ -96,8 +96,8 @@ public:
     BKMultiSlider(BKMultiSliderType which);
     ~BKMultiSlider();
 
-    void addSlider(int where, int depth, bool active);
-    void addSubSlider(int where, int depth, bool active);
+    void addSlider(int where, bool active);
+    void addSubSlider(int where, bool active);
     void insertSlider(int where);
     void deleteSlider(int where);
     void deactivateSlider(int where);
@@ -119,7 +119,10 @@ public:
     void setMinMaxDefaultInc(std::vector<float> newvals);
     
     void clearSliders();
+    void resetnumActiveSliders();
+    void cleanupSliderArray();
     void resetRanges();
+    
     void resized() override;
     
     ListenerList<BKMultiSliderListener> listeners;
@@ -134,8 +137,8 @@ public:
     
 private:
     
-    BKSliderLookAndFeel activeSliderLookAndFeel;
-    BKSliderLookAndFeel passiveSliderLookAndFeel;
+    BKMultiSliderLookAndFeel activeSliderLookAndFeel;
+    BKMultiSliderLookAndFeel passiveSliderLookAndFeel;
     String sliderName;
     BKLabel showName;
 
@@ -149,23 +152,26 @@ private:
     
     double currentInvisibleSliderValue;
     
+    //Array<Array<ScopedPointer<BKSubSlider>>> sliders;
     OwnedArray<OwnedArray<BKSubSlider>> sliders;
     
-    BKSubSlider* displaySlider;
-    BKSubSlider* bigInvisibleSlider;
+    ScopedPointer<BKSubSlider> displaySlider;
+    ScopedPointer<BKSubSlider> bigInvisibleSlider;
 
-    TextEditor* editValsTextField;
+    ScopedPointer<TextEditor> editValsTextField;
     
     double sliderMin, sliderMax, sliderMinDefault, sliderMaxDefault;
     double sliderDefault;
     double sliderIncrement;
     
     int totalWidth;
-    int sliderWidth, sliderHeight;
+    int sliderHeight;
+    float sliderWidth;
     int displaySliderWidth;
     
-    int numSliders;
-    int numSlidersDefault;
+    int numActiveSliders;
+    int numDefaultSliders;
+    int numVisibleSliders;
     
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
@@ -175,5 +181,109 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKMultiSlider)
 };
- 
+
+
+class BKSingleSliderListener
+{
+    
+public:
+    
+    //BKSingleSliderListener() {}
+    virtual ~BKSingleSliderListener() {};
+    
+    virtual void BKSingleSliderValueChanged(String name, double val) = 0;
+};
+
+//basic horizontal slider with its own text box and label
+//entering values in the text box will reset the range as needed
+class BKSingleSlider :
+public BKComponent,
+public Slider::Listener,
+public TextEditor::Listener
+{
+public:
+    BKSingleSlider(String sliderName, double min, double max, double def, double increment);
+    ~BKSingleSlider() {};
+    
+    Slider thisSlider;
+    
+    String sliderName;
+    Label showName;
+    
+    TextEditor valueTF;
+    
+    void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
+    String getName()                { return sliderName; }
+    
+    void sliderValueChanged (Slider *slider) override;
+    void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+    void resized() override;
+    
+    ListenerList<BKSingleSliderListener> listeners;
+    void addMyListener(BKSingleSliderListener* listener)     { listeners.add(listener);      }
+    void removeMyListener(BKSingleSliderListener* listener)  { listeners.remove(listener);   }
+    
+private:
+    
+    double sliderMin, sliderMax;
+    double sliderDefault;
+    double sliderIncrement;
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSingleSlider)
+
+};
+
+
+class BKRangeSliderListener
+{
+    
+public:
+    
+    //BKRangeSliderListener() {}
+    virtual ~BKRangeSliderListener() {};
+    
+    virtual void BKRangeSliderValueChanged(String name, double min, double max) = 0;
+};
+
+
+class BKRangeSlider :
+public BKComponent,
+public Slider::Listener,
+public TextEditor::Listener
+{
+public:
+    BKRangeSlider(String sliderName, double min, double max, double defmin, double defmax, double increment);
+    ~BKRangeSlider() {};
+    
+    Slider thisSlider;
+    
+    String sliderName;
+    Label showName;
+    
+    TextEditor minValueTF;
+    TextEditor maxValueTF;
+    
+    void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
+    String getName()                { return sliderName; }
+    
+    void sliderValueChanged (Slider *slider) override;
+    void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+    void resized() override;
+    
+    ListenerList<BKRangeSliderListener> listeners;
+    void addMyListener(BKRangeSliderListener* listener)     { listeners.add(listener);      }
+    void removeMyListener(BKRangeSliderListener* listener)  { listeners.remove(listener);   }
+    
+private:
+    
+    double sliderMin, sliderMax;
+    double sliderDefaultMin, sliderDefaultMax;
+    double sliderIncrement;
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKRangeSlider)
+    
+};
+
+
+
 #endif  // BKSLIDER_H_INCLUDED
