@@ -98,9 +98,9 @@ public:
 
     void addSlider(int where, bool active);
     void addSubSlider(int where, bool active);
-    void insertSlider(int where);
-    void deleteSlider(int where);
+
     void deactivateSlider(int where);
+    void deactivateAll();
     void deactivateAllAfter(int where);
     void deactivateAllBefore(int where);
     
@@ -118,8 +118,6 @@ public:
     void setTo(Array<Array<float>> newvals, NotificationType newnotify);
     void setMinMaxDefaultInc(std::vector<float> newvals);
     
-    void clearSliders();
-    void resetnumActiveSliders();
     void cleanupSliderArray();
     void resetRanges();
     
@@ -152,12 +150,9 @@ private:
     
     double currentInvisibleSliderValue;
     
-    //Array<Array<ScopedPointer<BKSubSlider>>> sliders;
     OwnedArray<OwnedArray<BKSubSlider>> sliders;
-    
     ScopedPointer<BKSubSlider> displaySlider;
     ScopedPointer<BKSubSlider> bigInvisibleSlider;
-
     ScopedPointer<TextEditor> editValsTextField;
     
     double sliderMin, sliderMax, sliderMinDefault, sliderMaxDefault;
