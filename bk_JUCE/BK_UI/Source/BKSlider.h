@@ -229,6 +229,38 @@ private:
 };
 
 
+class BKRangeMinSliderLookAndFeel : public LookAndFeel_V4
+{
+    
+public:
+    
+    BKRangeMinSliderLookAndFeel()
+    {
+        //setColour (TextButton::buttonColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.13f));
+    }
+    ~BKRangeMinSliderLookAndFeel() {}
+    
+    void drawLinearSlider (Graphics& g, int x, int y, int width, int height,
+                           float sliderPos, float minSliderPos, float maxSliderPos,
+                           const Slider::SliderStyle style, Slider& slider) override;
+};
+
+class BKRangeMaxSliderLookAndFeel : public LookAndFeel_V4
+{
+    
+public:
+    
+    BKRangeMaxSliderLookAndFeel()
+    {
+        //setColour (TextButton::buttonColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.13f));
+    }
+    ~BKRangeMaxSliderLookAndFeel() {}
+    
+    void drawLinearSlider (Graphics& g, int x, int y, int width, int height,
+                           float sliderPos, float minSliderPos, float maxSliderPos,
+                           const Slider::SliderStyle style, Slider& slider) override;
+};
+
 class BKRangeSliderListener
 {
     
@@ -252,6 +284,14 @@ public:
     
     Slider thisSlider;
     
+    Slider minSlider;
+    Slider maxSlider;
+    String minSliderName;
+    String maxSliderName;
+    
+    Slider invisibleSlider;
+    Slider* currentSlider;
+    
     String sliderName;
     Label showName;
     
@@ -264,6 +304,7 @@ public:
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void resized() override;
+    void sliderDragEnded(Slider *slider) override;
     
     ListenerList<BKRangeSliderListener> listeners;
     void addMyListener(BKRangeSliderListener* listener)     { listeners.add(listener);      }
@@ -274,6 +315,11 @@ private:
     double sliderMin, sliderMax;
     double sliderDefaultMin, sliderDefaultMax;
     double sliderIncrement;
+    
+    bool newDrag;
+    
+    BKRangeMinSliderLookAndFeel minSliderLookAndFeel;
+    BKRangeMaxSliderLookAndFeel maxSliderLookAndFeel;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKRangeSlider)
     

@@ -8,6 +8,16 @@
   ==============================================================================
 */
 
+
+/*
+ TODO
+ 1. RangeSlider: overlay two regular sliders, set thumbs to be up/down diamonds; so min can be > max
+ 2. have displaySlider updated while cycling through, displaying current value
+ 3. have multiSlider highlight lookandfeel that shows which slider is currently active
+*/
+
+
+
 // ******************************************************************************************************************** //
 // **************************************************  BKSubSlider ************************************************** //
 // ******************************************************************************************************************** //
@@ -41,7 +51,6 @@ sliderHeight(height)
     }
     else
     {
-        //setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, false, 0, 0);
         if(sliderIsVertical) setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
     }
 
@@ -242,6 +251,7 @@ void BKMultiSlider::setTo(Array<float> newvals, NotificationType newnotify)
             {
                 if(refSlider->getMaximum() < newvals[i]) refSlider->setRange(sliderMin, newvals[i], sliderIncrement);
                 if(refSlider->getMinimum() > newvals[i]) refSlider->setRange(newvals[i], sliderMax, sliderIncrement);
+                
                 refSlider->setValue(newvals[i], newnotify);
                 refSlider->isActive(true);
                 refSlider->setLookAndFeel(&activeSliderLookAndFeel);
@@ -992,7 +1002,31 @@ sliderIncrement(increment)
     thisSlider.setMinValue(sliderDefaultMin, dontSendNotification);
     thisSlider.setMaxValue(sliderDefaultMax, dontSendNotification);
     thisSlider.addListener(this);
-    addAndMakeVisible(thisSlider);
+    //addAndMakeVisible(thisSlider);
+    
+    minSlider.setSliderStyle(Slider::LinearHorizontal);
+    minSlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
+    minSlider.setRange(sliderMin, sliderMax, sliderIncrement);
+    minSlider.setValue(sliderDefaultMin, dontSendNotification);
+    minSlider.addListener(this);
+    minSlider.setLookAndFeel(&minSliderLookAndFeel);
+    addAndMakeVisible(minSlider);
+    
+    maxSlider.setSliderStyle(Slider::LinearHorizontal);
+    maxSlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
+    maxSlider.setRange(sliderMin, sliderMax, sliderIncrement);
+    maxSlider.setValue(sliderDefaultMax, dontSendNotification);
+    maxSlider.addListener(this);
+    maxSlider.setLookAndFeel(&maxSliderLookAndFeel);
+    addAndMakeVisible(maxSlider);
+    
+    invisibleSlider.setSliderStyle(Slider::LinearHorizontal);
+    invisibleSlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
+    invisibleSlider.setRange(sliderMin, sliderMax, sliderIncrement);
+    invisibleSlider.setValue(sliderDefaultMin, dontSendNotification);
+    invisibleSlider.setAlpha(0.0);
+    invisibleSlider.addListener(this);
+    addAndMakeVisible(invisibleSlider);
     
     showName.setText(sliderName, dontSendNotification);
     showName.setJustificationType(Justification::bottomRight);
@@ -1008,19 +1042,45 @@ sliderIncrement(increment)
     maxValueTF.addListener(this);
     addAndMakeVisible(maxValueTF);
     
+    newDrag = true;
 }
 
 void BKRangeSlider::sliderValueChanged (Slider *slider)
 {
-    if(slider == &thisSlider)
+  
+    if(slider == &invisibleSlider)
     {
+        
+        if(newDrag) {
+            newDrag = false;
+            
+            float refDistance = fabs(invisibleSlider.getValue() - minSlider.getValue());
+
+            if (fabs(invisibleSlider.getValue() - maxSlider.getValue()) < refDistance)
+            {
+                currentSlider = &maxSlider;
+            }
+            else
+            {
+                currentSlider = &minSlider;
+            }
+        }
+        
+        if (currentSlider == &maxSlider)
+        {
+            maxSlider.setValue(invisibleSlider.getValue());
+            maxValueTF.setText(String(maxSlider.getValue()), dontSendNotification);
+        }
+        else
+        {
+            minSlider.setValue(invisibleSlider.getValue());
+            minValueTF.setText(String(minSlider.getValue()), dontSendNotification);
+        }
+        
         listeners.call(&BKRangeSliderListener::BKRangeSliderValueChanged,
                        getName(),
-                       thisSlider.getMinValue(),
-                       thisSlider.getMaxValue());
-        
-        minValueTF.setText(String(thisSlider.getMinValue()), dontSendNotification);
-        maxValueTF.setText(String(thisSlider.getMaxValue()), dontSendNotification);
+                       minSlider.getValue(),
+                       maxSlider.getValue());
     }
 }
 
@@ -1029,30 +1089,60 @@ void BKRangeSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 {
     double newval = textEditor.getText().getDoubleValue();
     
-    if(newval > thisSlider.getMaximum()) {
-        sliderMax = newval;
-        thisSlider.setRange(thisSlider.getMinimum(), newval, sliderIncrement);
+    if(newval > maxSlider.getMaximum()) {
+        //sliderMax = newval;
+        maxSlider.setRange(minSlider.getMinimum(), newval, sliderIncrement);
+        minSlider.setRange(minSlider.getMinimum(), newval, sliderIncrement);
+        invisibleSlider.setRange(minSlider.getMinimum(), newval, sliderIncrement);
+    }
+
+    if(newval < minSlider.getMinimum()) {
+        //sliderMin = newval;
+        maxSlider.setRange(newval, maxSlider.getMaximum(), sliderIncrement);
+        minSlider.setRange(newval, maxSlider.getMaximum(), sliderIncrement);
+        invisibleSlider.setRange(newval, maxSlider.getMaximum(), sliderIncrement);
     }
     
-    if(newval < thisSlider.getMinimum()) {
-        sliderMin = newval;
-        thisSlider.setRange(newval, thisSlider.getMaximum(), sliderIncrement);
-    }
-    
-    if(textEditor.getName() == minValueTF.getName())
+    if(textEditor.getName() == "minvalue")
     {
-        thisSlider.setMinValue(newval, sendNotification);
+        minSlider.setValue(newval, sendNotification);
+        
+        if(minSlider.getMinimum() < sliderMin &&
+           minSlider.getValue() > sliderMin &&
+           maxSlider.getValue() > sliderMin)
+        {
+            //sliderMin = sliderDefaultMin;
+            maxSlider.setRange(sliderMin, maxSlider.getMaximum(), sliderIncrement);
+            minSlider.setRange(sliderMin, maxSlider.getMaximum(), sliderIncrement);
+            invisibleSlider.setRange(sliderMin, maxSlider.getMaximum(), sliderIncrement);
+        }
     }
-    else if(textEditor.getName() == maxValueTF.getName())
+    else if(textEditor.getName() == "maxvalue")
     {
-        thisSlider.setMaxValue(newval, sendNotification);
+        maxSlider.setValue(newval, sendNotification);
+        //DBG("maxSlider.getMaximum(), maxSlider.getValue, defaultMax " + String(maxSlider.getMaximum()) + " " + String(maxSlider.getValue()) + " " + String(sliderMax));
+        
+        if(maxSlider.getMaximum() > sliderMax &&
+           maxSlider.getValue() < sliderMax &&
+           minSlider.getValue() < sliderMax
+           )
+        {
+            //sliderMax = sliderDefaultMax;
+            maxSlider.setRange(minSlider.getMinimum(), sliderMax, sliderIncrement);
+            minSlider.setRange(minSlider.getMinimum(), sliderMax, sliderIncrement);
+            invisibleSlider.setRange(minSlider.getMinimum(), sliderMax, sliderIncrement);
+        }
     }
-    
     
     listeners.call(&BKRangeSliderListener::BKRangeSliderValueChanged,
                    getName(),
-                   thisSlider.getMinValue(),
-                   thisSlider.getMaxValue());
+                   minSlider.getValue(),
+                   maxSlider.getValue());
+}
+
+ void BKRangeSlider::sliderDragEnded(Slider *slider)
+{
+    newDrag = true;
 }
 
 void BKRangeSlider::resized()
@@ -1065,7 +1155,11 @@ void BKRangeSlider::resized()
     minValueTF.setBounds(topSlab.removeFromRight(50));
     showName.setBounds(topSlab.removeFromRight(100));
     
-    thisSlider.setBounds(area.removeFromTop(20));
+    //thisSlider.setBounds(area.removeFromTop(20));
+    Rectangle<int> sliderArea (area.removeFromTop(40));
+    minSlider.setBounds(sliderArea);
+    maxSlider.setBounds(sliderArea);
+    invisibleSlider.setBounds(sliderArea);
 }
 
 
@@ -1110,6 +1204,104 @@ void BKMultiSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int 
     {
         drawLinearSliderBackground (g, x, y, width, height, sliderPos, minSliderPos, maxSliderPos, style, slider);
         drawLinearSliderThumb (g, x, y, width, height, sliderPos, minSliderPos, maxSliderPos, style, slider);
+    }
+}
+
+
+void BKRangeMinSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int width, int height,
+                                       float sliderPos,
+                                       float minSliderPos,
+                                       float maxSliderPos,
+                                       const Slider::SliderStyle style, Slider& slider)
+{
+
+    {
+        
+        const auto trackWidth = jmin (6.0f, slider.isHorizontal() ? height * 0.25f : width * 0.25f);
+        
+        const Point<float> startPoint (slider.isHorizontal() ? x : width * 0.5f,
+                                       slider.isHorizontal() ? height * 0.5f : height + y);
+        
+        const Point<float> endPoint (slider.isHorizontal() ? width + x : startPoint.x,
+                                     slider.isHorizontal() ? startPoint.y : y);
+        
+        Path backgroundTrack;
+        backgroundTrack.startNewSubPath (startPoint);
+        backgroundTrack.lineTo (endPoint);
+        g.setColour (slider.findColour (Slider::backgroundColourId));
+        g.strokePath (backgroundTrack, PathStrokeType (trackWidth, PathStrokeType::curved, PathStrokeType::rounded));
+        
+        Path valueTrack;
+        Point<float> minPoint, maxPoint, thumbPoint;
+
+        const auto kx = slider.isHorizontal() ? sliderPos : (x + width * 0.5f);
+        const auto ky = slider.isHorizontal() ? (y + height * 0.5f) : sliderPos;
+        
+        minPoint = startPoint;
+        maxPoint = { kx, ky };
+
+        valueTrack.startNewSubPath (minPoint);
+        valueTrack.lineTo (maxPoint);
+        g.setColour (slider.findColour (Slider::trackColourId));
+        g.strokePath (valueTrack, PathStrokeType (trackWidth, PathStrokeType::curved, PathStrokeType::rounded));
+        
+        g.setColour (slider.findColour (Slider::thumbColourId));
+        const auto pointerColour = slider.findColour (Slider::thumbColourId);
+        drawPointer (g, sliderPos - trackWidth,
+                     //jmin (y + height - trackWidth * 2.0f, y + height * 0.5f),
+                     //jmin (y + height - trackWidth * 1.0f, y + height * 0.5f),
+                     y + height - trackWidth * 3.0f,
+                     trackWidth * 2.0f, pointerColour, 4);
+        
+    }
+}
+
+void BKRangeMaxSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int width, int height,
+                                                    float sliderPos,
+                                                    float minSliderPos,
+                                                    float maxSliderPos,
+                                                    const Slider::SliderStyle style, Slider& slider)
+{
+    
+    {
+        
+        const auto trackWidth = jmin (6.0f, slider.isHorizontal() ? height * 0.25f : width * 0.25f);
+        
+        const Point<float> startPoint (slider.isHorizontal() ? x : width * 0.5f,
+                                       slider.isHorizontal() ? height * 0.5f : height + y);
+        
+        const Point<float> endPoint (slider.isHorizontal() ? width + x : startPoint.x,
+                                     slider.isHorizontal() ? startPoint.y : y);
+        Path valueTrack;
+        Point<float> minPoint, maxPoint, thumbPoint;
+
+        const auto kx = slider.isHorizontal() ? sliderPos : (x + width * 0.5f);
+        const auto ky = slider.isHorizontal() ? (y + height * 0.5f) : sliderPos;
+        
+        maxPoint = endPoint;
+        minPoint = { kx, ky };
+
+        valueTrack.startNewSubPath (minPoint);
+        valueTrack.lineTo (maxPoint);
+        g.setColour (slider.findColour (Slider::trackColourId));
+        g.strokePath (valueTrack, PathStrokeType (trackWidth, PathStrokeType::curved, PathStrokeType::rounded));
+        
+        g.setColour (slider.findColour (Slider::thumbColourId));
+
+        const auto pointerColour = slider.findColour (Slider::thumbColourId);
+        const auto sr = jmin (trackWidth, (slider.isHorizontal() ? height : width) * 0.4f);
+        drawPointer (g, sliderPos - sr,
+                      //jmax (0.0f, y + height * 0.5f - trackWidth * 2.0f),
+                     //jmax (0.0f, y + height * 0.5f - trackWidth * 4.0f),
+                     y + height - trackWidth *6.0f,
+                      trackWidth * 2.0f, pointerColour, 2);
+
+        
+        Path backgroundTrack;
+        backgroundTrack.startNewSubPath (startPoint);
+        backgroundTrack.lineTo (endPoint);
+        //g.setColour (slider.findColour (Slider::backgroundColourId));
+        //g.strokePath (backgroundTrack, PathStrokeType (trackWidth, PathStrokeType::curved, PathStrokeType::rounded));
     }
 }
 
