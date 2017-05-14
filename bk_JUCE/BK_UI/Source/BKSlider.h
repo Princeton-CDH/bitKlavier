@@ -282,8 +282,6 @@ public:
     BKRangeSlider(String sliderName, double min, double max, double defmin, double defmax, double increment);
     ~BKRangeSlider() {};
     
-    Slider thisSlider;
-    
     Slider minSlider;
     Slider maxSlider;
     String minSliderName;
@@ -305,6 +303,8 @@ public:
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void resized() override;
     void sliderDragEnded(Slider *slider) override;
+    void mouseDown (const MouseEvent &event) override;
+    void mouseDrag (const MouseEvent &event) override;
     
     ListenerList<BKRangeSliderListener> listeners;
     void addMyListener(BKRangeSliderListener* listener)     { listeners.add(listener);      }
@@ -317,6 +317,7 @@ private:
     double sliderIncrement;
     
     bool newDrag;
+    bool clickedOnMinSlider;
     
     BKRangeMinSliderLookAndFeel minSliderLookAndFeel;
     BKRangeMaxSliderLookAndFeel maxSliderLookAndFeel;
