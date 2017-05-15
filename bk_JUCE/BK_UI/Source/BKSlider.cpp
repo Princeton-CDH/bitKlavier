@@ -1051,28 +1051,7 @@ void BKRangeSlider::sliderValueChanged (Slider *slider)
         
         if(newDrag)
         {
-            newDrag = false;
-            
-            DBG("about to move slider");
-            
-            float refDistance = fabs(invisibleSlider.getValue() - minSlider.getValue());
-
-            /*
-            if (fabs(invisibleSlider.getValue() - maxSlider.getValue()) < refDistance)
-            {
-                currentSlider = &maxSlider;
-            }
-            else
-               */ 
-            {
-                if(clickedOnMinSlider)
-                    currentSlider = &minSlider;
-                else
-                    currentSlider = &maxSlider;
-            }
-        
-        
-            if (currentSlider == &maxSlider)
+            if(!clickedOnMinSlider)
             {
                 maxSlider.setValue(invisibleSlider.getValue());
                 maxValueTF.setText(String(maxSlider.getValue()), dontSendNotification);
@@ -1100,12 +1079,10 @@ void BKRangeSlider::mouseDown (const MouseEvent &event)
             if(event.y > invisibleSlider.getHeight() / 2.)
             {
                 clickedOnMinSlider = true;
-                DBG("clicked on minslider side");
             }
             else
             {
                 clickedOnMinSlider = false;
-                DBG("clicked on maxslider side");
             }
             
             newDrag = true;
@@ -1113,25 +1090,10 @@ void BKRangeSlider::mouseDown (const MouseEvent &event)
     }
 }
 
-void BKRangeSlider::mouseDrag (const MouseEvent &event)
+
+void BKRangeSlider::sliderDragEnded(Slider *slider)
 {
-    if(event.eventComponent == &invisibleSlider)
-    {
-        {
-            if(event.y > invisibleSlider.getHeight() / 2.)
-            {
-                clickedOnMinSlider = true;
-                DBG("drag on minslider side");
-            }
-            else
-            {
-                clickedOnMinSlider = false;
-                DBG("drag on maxslider side");
-            }
-            
-            newDrag = true;
-        }
-    }
+    newDrag = false;
 }
 
 void BKRangeSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
@@ -1184,12 +1146,6 @@ void BKRangeSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
                    maxSlider.getValue());
 }
 
- void BKRangeSlider::sliderDragEnded(Slider *slider)
-{
-    //newDrag = true;
-    //DBG("slider drag ended");
-    newDrag = false;
-}
 
 void BKRangeSlider::resized()
 {
@@ -1282,9 +1238,12 @@ void BKRangeMinSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, i
         const auto kx = slider.isHorizontal() ? sliderPos : (x + width * 0.5f);
         const auto ky = slider.isHorizontal() ? (y + height * 0.5f) : sliderPos;
         
-        minPoint = startPoint;
-        maxPoint = { kx, ky };
+        //minPoint = startPoint;
+        //maxPoint = { kx, ky };
 
+        minPoint = { kx, ky };
+        maxPoint = endPoint;
+        
         valueTrack.startNewSubPath (minPoint);
         valueTrack.lineTo (maxPoint);
         g.setColour (slider.findColour (Slider::trackColourId));
@@ -1322,9 +1281,11 @@ void BKRangeMaxSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, i
         const auto kx = slider.isHorizontal() ? sliderPos : (x + width * 0.5f);
         const auto ky = slider.isHorizontal() ? (y + height * 0.5f) : sliderPos;
         
-        maxPoint = endPoint;
-        minPoint = { kx, ky };
-
+        //maxPoint = endPoint;
+        //minPoint = { kx, ky };
+        maxPoint = { kx, ky };
+        minPoint = startPoint;
+        
         valueTrack.startNewSubPath (minPoint);
         valueTrack.lineTo (maxPoint);
         g.setColour (slider.findColour (Slider::trackColourId));

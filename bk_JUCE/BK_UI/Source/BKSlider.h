@@ -288,7 +288,7 @@ public:
     String maxSliderName;
     
     Slider invisibleSlider;
-    Slider* currentSlider;
+
     
     String sliderName;
     Label showName;
@@ -304,7 +304,6 @@ public:
     void resized() override;
     void sliderDragEnded(Slider *slider) override;
     void mouseDown (const MouseEvent &event) override;
-    void mouseDrag (const MouseEvent &event) override;
     
     ListenerList<BKRangeSliderListener> listeners;
     void addMyListener(BKRangeSliderListener* listener)     { listeners.add(listener);      }
