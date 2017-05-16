@@ -8,18 +8,8 @@
   ==============================================================================
 */
 
-
-/*
- TODO
- 1. RangeSlider: overlay two regular sliders, set thumbs to be up/down diamonds; so min can be > max
- 2. have displaySlider updated while cycling through, displaying current value
- 3. have multiSlider highlight lookandfeel that shows which slider is currently active
-*/
-
-
-
 // ******************************************************************************************************************** //
-// **************************************************  BKSubSlider ************************************************** //
+// **************************************************  BKSubSlider **************************************************** //
 // ******************************************************************************************************************** //
 
 //used in BKMultSlider
@@ -55,7 +45,7 @@ sliderHeight(height)
     }
 
     setRange(sliderMin, sliderMax, sliderIncrement);
-    setValue(sliderDefault);
+    setValue(sliderDefault, dontSendNotification);
     
 }
 
@@ -66,10 +56,6 @@ BKSubSlider::~BKSubSlider()
 }
 
 
-void BKSubSlider::valueChanged()
-{
-
-}
 
 void BKSubSlider::setMinMaxDefaultInc(std::vector<float> newvals)
 {
@@ -120,6 +106,8 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     else arrangedHorizontally = false;
     
     passiveSliderLookAndFeel.setColour(Slider::thumbColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.13f));
+    highlightedSliderLookAndFeel.setColour(Slider::thumbColourId, Colour::fromRGBA(250, 10, 50, 50));
+    lastHighlightedSlider = 0;
     
     sliderMin = sliderMinDefault = -1.;
     sliderMax = sliderMaxDefault = 1.;
@@ -238,7 +226,7 @@ void BKMultiSlider::setTo(Array<float> newvals, NotificationType newnotify)
     if(numActiveSliders <= numDefaultSliders) numVisibleSliders = numDefaultSliders;
     else numVisibleSliders = numActiveSliders;
     
-    deactivateAll();
+    deactivateAll(newnotify);
     
     for(int i=0; i<numVisibleSliders; i++)
     {
@@ -279,7 +267,7 @@ void BKMultiSlider::setTo(Array<Array<float>> newvals, NotificationType newnotif
     if(numActiveSliders <= numDefaultSliders) numVisibleSliders = numDefaultSliders;
     else numVisibleSliders = numActiveSliders;
     
-    deactivateAll();
+    deactivateAll(newnotify);
 
     for(int i=0; i<numVisibleSliders; i++)
     {
@@ -404,7 +392,7 @@ void BKMultiSlider::addSlider(int where, bool active)
                                                              sliderHeight);
     
     newslider->setRange(sliderMin, sliderMax, sliderIncrement);
-    newslider->setValue(sliderDefault);
+    newslider->setValue(sliderDefault, dontSendNotification);
     newslider->addListener(this);
     
     if(where < 0)
@@ -454,7 +442,7 @@ void BKMultiSlider::addSubSlider(int where, bool active)
                                                              sliderHeight);
     
     newslider->setRange(sliderMin, sliderMax, sliderIncrement);
-    newslider->setValue(sliderDefault);
+    newslider->setValue(sliderDefault, dontSendNotification);
     newslider->addListener(this);
 
     OwnedArray<BKSubSlider> *newsliderArray = sliders[where];
@@ -477,48 +465,58 @@ void BKMultiSlider::addSubSlider(int where, bool active)
 
 
 
-void BKMultiSlider::deactivateSlider(int where)
+void BKMultiSlider::deactivateSlider(int where, NotificationType notify)
 {
     if(sliders.size() > 1) {
-        for(int i=0; i<sliders[where]->size(); i++) {
+        
+        //leave one active slider for first slider
+        int startSlider;
+        if(where == 0) startSlider = 1;
+        else startSlider = 0;
+        
+        for(int i=startSlider; i<sliders[where]->size(); i++) {
             
             BKSubSlider* currentSlider = sliders[where]->operator[](i);
             if(currentSlider != nullptr) {
                 currentSlider->isActive(false);
                 currentSlider->setLookAndFeel(&passiveSliderLookAndFeel);
-                currentSlider->setValue(sliderDefault);
+                currentSlider->setValue(sliderDefault, dontSendNotification);
             }
         }
         
-        listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
-                       getName(),
-                       getAllActiveValues());
+        lastHighlightedSlider = 0;
+        
+        if(notify) {
+            listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
+                           getName(),
+                           getAllActiveValues());
+        }
     }
 }
 
-void BKMultiSlider::deactivateAll()
+void BKMultiSlider::deactivateAll(NotificationType notify)
 {
     for(int i=0; i<sliders.size(); i++ )
     {
-        deactivateSlider(i);
+        deactivateSlider(i, notify);
     }
 }
 
 
-void BKMultiSlider::deactivateAllAfter(int where)
+void BKMultiSlider::deactivateAllAfter(int where, NotificationType notify)
 {
     for(int i=where+1; i<sliders.size(); i++ )
     {
-        deactivateSlider(i);
+        deactivateSlider(i, notify);
     }
 }
 
-void BKMultiSlider::deactivateAllBefore(int where)
+void BKMultiSlider::deactivateAllBefore(int where, NotificationType notify)
 {
     if (where > sliders.size()) where = sliders.size();
     for(int i=0; i<where; i++ )
     {
-        deactivateSlider(i);
+        deactivateSlider(i, notify);
     }
 }
 
@@ -895,14 +893,65 @@ void BKMultiSlider::sliderModifyMenuCallback (const int result, BKMultiSlider* m
     {
         switch (result)
         {
-            case 1:   ms->deactivateSlider(which); break;
-            case 2:   ms->deactivateAllAfter(which); break;
-            case 3:   ms->deactivateAllBefore(which); break;
+            case 1:   ms->deactivateSlider(which, sendNotification); break;
+            case 2:   ms->deactivateAllAfter(which, sendNotification); break;
+            case 3:   ms->deactivateAllBefore(which, sendNotification); break;
 
             default:  break;
         }
     }
 }
+
+void BKMultiSlider::setCurrentSlider(int activeSliderNum)
+{
+    //find activeSliderNum, highlight it as current, dehighlight all the others...
+    //DBG("will highlight slider num " + String(activeSliderNum));
+    
+    int sliderNum = getActiveSlider(activeSliderNum);
+    
+    if(sliderNum != lastHighlightedSlider)
+    {
+        highlight(sliderNum);
+        deHighlight(lastHighlightedSlider);
+        lastHighlightedSlider = sliderNum;
+        displaySlider->setValue(sliders[sliderNum]->operator[](0)->getValue());
+    }
+}
+
+int BKMultiSlider::getActiveSlider(int sliderNum)
+{
+    int sliderCount = 0;
+    
+    for(int i = 0; i<sliders.size(); i++)
+    {
+        if(sliderCount == sliderNum && sliders[i]->operator[](0)->isActive())
+            return i;
+        
+        if(sliders[i]->operator[](0)->isActive())
+            sliderCount++;
+    }
+    
+    return 0;
+}
+
+void BKMultiSlider::highlight(int activeSliderNum)
+{
+    //need to count through depth, but for now just the first one...
+    for(int i=0; i<sliders[activeSliderNum]->size(); i++)
+    {
+        sliders[activeSliderNum]->operator[](i)->setLookAndFeel(&highlightedSliderLookAndFeel);
+    }
+}
+
+void BKMultiSlider::deHighlight(int sliderNum)
+{
+    for(int i=0; i<sliders[sliderNum]->size(); i++)
+    {
+        sliders[sliderNum]->operator[](i)->setLookAndFeel(&activeSliderLookAndFeel);
+    }
+
+}
+
 
 
 // ******************************************************************************************************************** //
@@ -951,21 +1000,34 @@ void BKSingleSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 {
     double newval = textEditor.getText().getDoubleValue();
     
-    if(newval > thisSlider.getMaximum()) {
-        sliderMax = newval;
-        thisSlider.setRange(thisSlider.getMinimum(), newval, sliderIncrement);
-    }
-    
-    if(newval < thisSlider.getMinimum()) {
-        sliderMin = newval;
-        thisSlider.setRange(newval, thisSlider.getMaximum(), sliderIncrement);
-    }
+    checkValue(newval);
     
     thisSlider.setValue(newval, sendNotification);
     
     listeners.call(&BKSingleSliderListener::BKSingleSliderValueChanged,
                    getName(),
                    thisSlider.getValue());
+}
+
+void BKSingleSlider::checkValue(double newval)
+{
+    if(newval > thisSlider.getMaximum()) {
+        thisSlider.setRange(thisSlider.getMinimum(), newval, sliderIncrement);
+    }
+    
+    if(newval < thisSlider.getMinimum()) {
+        thisSlider.setRange(newval, thisSlider.getMaximum(), sliderIncrement);
+    }
+    
+    if(newval <= sliderMax && thisSlider.getMaximum() > sliderMax)
+    {
+        thisSlider.setRange(thisSlider.getMinimum(), sliderMax, sliderIncrement);
+    }
+    
+    if(newval >= sliderMin && thisSlider.getMinimum() < sliderMin)
+    {
+        thisSlider.setRange(sliderMin, thisSlider.getMaximum(), sliderIncrement);
+    }
 }
 
 void BKSingleSlider::resized()
@@ -978,6 +1040,13 @@ void BKSingleSlider::resized()
     showName.setBounds(topSlab.removeFromRight(100));
     
     thisSlider.setBounds(area.removeFromTop(20));
+}
+
+void BKSingleSlider::setValue(double newval, NotificationType notify)
+{
+    checkValue(newval);
+    thisSlider.setValue(newval, notify);
+    valueTF.setText(String(thisSlider.getValue()), notify);
 }
 
 
@@ -1043,6 +1112,22 @@ sliderIncrement(increment)
     newDrag = false;
 }
 
+void BKRangeSlider::setMinValue(double newval, NotificationType notify)
+{
+    checkValue(newval);
+    minSlider.setValue(newval, notify);
+    minValueTF.setText(String(minSlider.getValue()), dontSendNotification);
+    rescaleMinSlider();
+}
+
+void BKRangeSlider::setMaxValue(double newval, NotificationType notify)
+{
+    checkValue(newval);
+    maxSlider.setValue(newval, notify);
+    maxValueTF.setText(String(maxSlider.getValue()), dontSendNotification);
+    rescaleMaxSlider();
+}
+
 void BKRangeSlider::sliderValueChanged (Slider *slider)
 {
   
@@ -1100,44 +1185,18 @@ void BKRangeSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 {
     double newval = textEditor.getText().getDoubleValue();
     
-    if(newval > maxSlider.getMaximum()) {
-        maxSlider.setRange(minSlider.getMinimum(), newval, sliderIncrement);
-        minSlider.setRange(minSlider.getMinimum(), newval, sliderIncrement);
-        invisibleSlider.setRange(minSlider.getMinimum(), newval, sliderIncrement);
-    }
-
-    if(newval < minSlider.getMinimum()) {
-        maxSlider.setRange(newval, maxSlider.getMaximum(), sliderIncrement);
-        minSlider.setRange(newval, maxSlider.getMaximum(), sliderIncrement);
-        invisibleSlider.setRange(newval, maxSlider.getMaximum(), sliderIncrement);
-    }
+    //adjusts min/max of sldiers as needed
+    checkValue(newval);
     
     if(textEditor.getName() == "minvalue")
     {
         minSlider.setValue(newval, sendNotification);
-        
-        if(minSlider.getMinimum() < sliderMin &&
-           minSlider.getValue() > sliderMin &&
-           maxSlider.getValue() > sliderMin)
-        {
-            maxSlider.setRange(sliderMin, maxSlider.getMaximum(), sliderIncrement);
-            minSlider.setRange(sliderMin, maxSlider.getMaximum(), sliderIncrement);
-            invisibleSlider.setRange(sliderMin, maxSlider.getMaximum(), sliderIncrement);
-        }
+        rescaleMinSlider();
     }
     else if(textEditor.getName() == "maxvalue")
     {
         maxSlider.setValue(newval, sendNotification);
-        
-        if(maxSlider.getMaximum() > sliderMax &&
-           maxSlider.getValue() < sliderMax &&
-           minSlider.getValue() < sliderMax
-           )
-        {
-            maxSlider.setRange(minSlider.getMinimum(), sliderMax, sliderIncrement);
-            minSlider.setRange(minSlider.getMinimum(), sliderMax, sliderIncrement);
-            invisibleSlider.setRange(minSlider.getMinimum(), sliderMax, sliderIncrement);
-        }
+        rescaleMaxSlider();
     }
     
     listeners.call(&BKRangeSliderListener::BKRangeSliderValueChanged,
@@ -1146,6 +1205,46 @@ void BKRangeSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
                    maxSlider.getValue());
 }
 
+void BKRangeSlider::checkValue(double newval)
+{
+    if(newval > maxSlider.getMaximum()) {
+        maxSlider.setRange(minSlider.getMinimum(), newval, sliderIncrement);
+        minSlider.setRange(minSlider.getMinimum(), newval, sliderIncrement);
+        invisibleSlider.setRange(minSlider.getMinimum(), newval, sliderIncrement);
+    }
+    
+    if(newval < minSlider.getMinimum()) {
+        maxSlider.setRange(newval, maxSlider.getMaximum(), sliderIncrement);
+        minSlider.setRange(newval, maxSlider.getMaximum(), sliderIncrement);
+        invisibleSlider.setRange(newval, maxSlider.getMaximum(), sliderIncrement);
+    }
+}
+
+void BKRangeSlider::rescaleMinSlider()
+{
+    if(minSlider.getMinimum() < sliderMin &&
+       minSlider.getValue() > sliderMin &&
+       maxSlider.getValue() > sliderMin)
+    {
+        maxSlider.setRange(sliderMin, maxSlider.getMaximum(), sliderIncrement);
+        minSlider.setRange(sliderMin, maxSlider.getMaximum(), sliderIncrement);
+        invisibleSlider.setRange(sliderMin, maxSlider.getMaximum(), sliderIncrement);
+    }
+}
+
+void BKRangeSlider::rescaleMaxSlider()
+{
+    
+    if(maxSlider.getMaximum() > sliderMax &&
+       maxSlider.getValue() < sliderMax &&
+       minSlider.getValue() < sliderMax
+       )
+    {
+        maxSlider.setRange(minSlider.getMinimum(), sliderMax, sliderIncrement);
+        minSlider.setRange(minSlider.getMinimum(), sliderMax, sliderIncrement);
+        invisibleSlider.setRange(minSlider.getMinimum(), sliderMax, sliderIncrement);
+    }
+}
 
 void BKRangeSlider::resized()
 {
@@ -1156,8 +1255,7 @@ void BKRangeSlider::resized()
     maxValueTF.setBounds(topSlab.removeFromRight(50));
     minValueTF.setBounds(topSlab.removeFromRight(50));
     showName.setBounds(topSlab.removeFromRight(100));
-    
-    //thisSlider.setBounds(area.removeFromTop(20));
+
     Rectangle<int> sliderArea (area.removeFromTop(40));
     minSlider.setBounds(sliderArea);
     maxSlider.setBounds(sliderArea);

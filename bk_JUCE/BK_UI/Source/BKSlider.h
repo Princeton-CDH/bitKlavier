@@ -48,7 +48,6 @@ public:
     BKSubSlider (SliderStyle sstyle, double min, double max, double def, double increment, int width, int height);
     ~BKSubSlider();
 
-    void valueChanged() override;
     double getValueFromText	(const String & text ) override;
     bool isActive() { return active; }
     void isActive(bool newactive) {active = newactive; }
@@ -99,10 +98,10 @@ public:
     void addSlider(int where, bool active);
     void addSubSlider(int where, bool active);
 
-    void deactivateSlider(int where);
-    void deactivateAll();
-    void deactivateAllAfter(int where);
-    void deactivateAllBefore(int where);
+    void deactivateSlider(int where, NotificationType notify);
+    void deactivateAll(NotificationType notify);
+    void deactivateAllAfter(int where, NotificationType notify);
+    void deactivateAllBefore(int where, NotificationType notify);
     
     int whichSlider (const MouseEvent &e);
     int whichSubSlider (int which);
@@ -117,6 +116,7 @@ public:
     void setTo(Array<float> newvals, NotificationType newnotify);
     void setTo(Array<Array<float>> newvals, NotificationType newnotify);
     void setMinMaxDefaultInc(std::vector<float> newvals);
+    void setCurrentSlider(int activeSliderNum);
     
     void cleanupSliderArray();
     void resetRanges();
@@ -137,6 +137,8 @@ private:
     
     BKMultiSliderLookAndFeel activeSliderLookAndFeel;
     BKMultiSliderLookAndFeel passiveSliderLookAndFeel;
+    BKMultiSliderLookAndFeel highlightedSliderLookAndFeel;
+    
     String sliderName;
     BKLabel showName;
 
@@ -145,6 +147,7 @@ private:
     bool sliderIsVertical;
     bool sliderIsBar;
     int currentSubSlider;
+    int lastHighlightedSlider;
     
     Slider::SliderStyle subsliderStyle;
     
@@ -173,7 +176,11 @@ private:
     
     void showModifyPopupMenu(int which);
     static void sliderModifyMenuCallback (const int result, BKMultiSlider* slider, int which);
-
+    
+    void highlight(int activeSliderNum);
+    void deHighlight(int sliderNum);
+    int getActiveSlider(int sliderNum);
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKMultiSlider)
 };
 
@@ -209,6 +216,8 @@ public:
     
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName()                { return sliderName; }
+    void setValue(double newval, NotificationType notify);
+    void checkValue(double newval);
     
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
@@ -289,7 +298,6 @@ public:
     
     Slider invisibleSlider;
 
-    
     String sliderName;
     Label showName;
     
@@ -298,6 +306,11 @@ public:
     
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName()                { return sliderName; }
+    void setMinValue(double newval, NotificationType notify);
+    void setMaxValue(double newval, NotificationType notify);
+    void checkValue(double newval);
+    void rescaleMinSlider();
+    void rescaleMaxSlider();
     
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;

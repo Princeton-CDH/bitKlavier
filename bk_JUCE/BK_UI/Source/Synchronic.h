@@ -325,6 +325,11 @@ public:
     void keyReleased(int noteNumber, int channel);
     float getTimeToBeatMS(float beatsToSkip);
     
+    inline const int getBeatMultiplierCounter() const noexcept { return beatMultiplierCounter; }
+    inline const int getAccentMultiplierCounter() const noexcept { return accentMultiplierCounter; }
+    inline const int getLengthMultiplierCounter() const noexcept { return lengthMultiplierCounter; }
+    inline const int getTranspCounter() const noexcept { return transpCounter; }
+    
     inline void attachToSynthesiser(BKSynthesiser* main)
     {
         synth = main;

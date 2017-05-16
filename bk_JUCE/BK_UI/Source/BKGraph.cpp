@@ -97,7 +97,7 @@ void BKItem::mouseDown(const MouseEvent& e)
         {
             processor.updateState->currentSynchronicId = Id;
             processor.updateState->synchronicPreparationDidChange = true;
-            processor.updateState->currentPreparationDisplay = DisplaySynchronic;
+            processor.updateState->currentPreparationDisplay = DisplaySynchronic2;
         }
         else if (type == PreparationTypeNostalgic)
         {

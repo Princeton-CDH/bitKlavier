@@ -25,7 +25,8 @@ public BKListener,
 public BKMultiSliderListener,
 public BKSingleSliderListener,
 public BKRangeSliderListener,
-public SliderListener
+public SliderListener,
+public Timer
 {
 public:
     SynchronicViewController2(BKAudioProcessor&, BKItemGraph* theGraph);
@@ -35,6 +36,8 @@ public:
     void resized() override;
 
     void updateFields();
+    void updateFields(NotificationType notify);
+    void timerCallback() override;
     
 private:
     BKAudioProcessor& processor;
@@ -47,7 +50,9 @@ private:
     OwnedArray<BKMultiSlider> paramSliders;
     
     BKComboBox selectCB;
+    BKComboBox modeSelectCB;
 
+    BKSingleSlider* beatsToSkipSlider;
     BKSingleSlider* howManySlider;
     BKSingleSlider* clusterThreshSlider;
     BKRangeSlider* clusterMinMaxSlider;
@@ -66,6 +71,7 @@ private:
     void sliderValueChanged(Slider* slider) override{ };
     
     void fillSelectCB(void);
+    void fillModeSelectCB(void);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicViewController2)
 };

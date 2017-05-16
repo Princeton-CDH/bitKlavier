@@ -16,7 +16,7 @@ SynchronicProcessor::Ptr Gallery::getSynchronicProcessor(int id)
     for (int i = synchronic.size(); --i >= 0;)
     {
         if(synchronic[i]->getId() == id) {
-            DBG("got synchronic processor id " + String(id));
+            //DBG("got synchronic processor id " + String(id));
             return synchronic[i]->processor;
         }
     }
