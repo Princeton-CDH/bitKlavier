@@ -256,6 +256,7 @@ void BKMultiSlider::setTo(Array<float> newvals, NotificationType newnotify)
     cleanupSliderArray();
     resetRanges();
     resized();
+    displaySlider->setValue(sliders[0]->operator[](0)->getValue());
 }
 
 
@@ -303,6 +304,7 @@ void BKMultiSlider::setTo(Array<Array<float>> newvals, NotificationType newnotif
     cleanupSliderArray();
     resetRanges();
     resized();
+    displaySlider->setValue(sliders[0]->operator[](0)->getValue());
 }
 
 
@@ -564,7 +566,8 @@ void BKMultiSlider::mouseMove(const MouseEvent& e)
             BKSubSlider* currentSlider = sliders[which]->operator[](whichSub);
             if (currentSlider != nullptr)
             {
-                displaySlider->setValue(currentSlider->getValue());
+                if(currentSlider->isActive())
+                    displaySlider->setValue(currentSlider->getValue());
             }
         }
     }

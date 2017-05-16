@@ -102,7 +102,7 @@ void SynchronicViewController2::timerCallback()
 void SynchronicViewController2::multiSliderValueChanged(String name, int whichSlider, Array<float> values)
 {
   
-    DBG("multiSliderValueChanged called");
+    //DBG("multiSliderValueChanged called");
     
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
@@ -135,7 +135,7 @@ void SynchronicViewController2::multiSliderValueChanged(String name, int whichSl
 void SynchronicViewController2::multiSliderAllValuesChanged(String name, Array<Array<float>> values)
 {
 
-    DBG("multiSliderALLValueChanged called");
+    //DBG("multiSliderALLValueChanged called");
     
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
