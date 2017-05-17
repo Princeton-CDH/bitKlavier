@@ -4,7 +4,7 @@
     BKSlider.cpp
     Created: 6 Apr 2017 9:50:44pm
     Author:  Daniel Trueman
-
+ 
   ==============================================================================
 */
 
@@ -535,8 +535,17 @@ void BKMultiSlider::mouseDrag(const MouseEvent& e)
             BKSubSlider* currentSlider = sliders[which]->operator[](currentSubSlider);
             if (currentSlider != nullptr)
             {
-                currentSlider->setValue(currentInvisibleSliderValue);
-                displaySlider->setValue(currentInvisibleSliderValue);
+                if(e.mods.isShiftDown())
+                {
+                    currentSlider->setValue(round(currentInvisibleSliderValue));
+                    displaySlider->setValue(round(currentInvisibleSliderValue));
+                }
+                else
+                {
+                    currentSlider->setValue(currentInvisibleSliderValue);
+                    displaySlider->setValue(currentInvisibleSliderValue);
+                }
+
                 
                 if(!currentSlider->isActive()){
                     currentSlider->isActive(true);
