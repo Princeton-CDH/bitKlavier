@@ -476,18 +476,20 @@ void BKMultiSlider::deactivateSlider(int where, NotificationType notify)
         if(where == 0) startSlider = 1;
         else startSlider = 0;
         
-        for(int i=startSlider; i<sliders[where]->size(); i++) {
+        for(int i = sliders[where]->size() - 1; i >= startSlider; i--) {
             
             BKSubSlider* currentSlider = sliders[where]->operator[](i);
             if(currentSlider != nullptr) {
                 currentSlider->isActive(false);
                 currentSlider->setLookAndFeel(&passiveSliderLookAndFeel);
                 currentSlider->setValue(sliderDefault, dontSendNotification);
+                if(i != 0) sliders[where]->remove(i); //remove all but first slider
             }
         }
         
         lastHighlightedSlider = 0;
-        
+        cleanupSliderArray();
+
         if(notify) {
             listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
                            getName(),
