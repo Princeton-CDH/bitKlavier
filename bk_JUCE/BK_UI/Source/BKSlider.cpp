@@ -560,7 +560,8 @@ void BKMultiSlider::mouseMove(const MouseEvent& e)
     if(e.eventComponent == bigInvisibleSlider)
     {
         int which = whichSlider(e);
-        int whichSub = whichSubSlider(which);
+        int whichSub = whichSubSlider(which, e);
+        
         if(which >= 0 && whichSub >= 0)
         {
             BKSubSlider* currentSlider = sliders[which]->operator[](whichSub);
@@ -576,26 +577,25 @@ void BKMultiSlider::mouseMove(const MouseEvent& e)
 
 void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
 {
-    if(e.eventComponent == bigInvisibleSlider)
-    {
-        int which = whichSlider(e);
-        
-        //highlight number for current slider
-        StringArray tokens;
-        tokens.addTokens(arrayFloatArrayToString(getAllActiveValues()), false); //arrayFloatArrayToString
-        int startPoint = 0;
-        int endPoint;
-        
-        for(int i=0; i < which; i++) startPoint += tokens[i].length() + 1;
-        endPoint = startPoint + tokens[which].length();
-        
-        editValsTextField->setVisible(true);
-        editValsTextField->toFront(true);
-        editValsTextField->setText(arrayFloatArrayToString(getAllActiveValues())); //arrayFloatArrayToString
-        
-        Range<int> highlightRange(startPoint, endPoint);
-        editValsTextField->setHighlightedRegion(highlightRange);
-    }
+    int which = whichSlider(e);
+    
+    //highlight number for current slider
+    StringArray tokens;
+    tokens.addTokens(arrayFloatArrayToString(getAllActiveValues()), false); //arrayFloatArrayToString
+    int startPoint = 0;
+    int endPoint;
+    
+    for(int i=0; i < which; i++) startPoint += tokens[i].length() + 1;
+    endPoint = startPoint + tokens[which].length();
+    
+    //need to account for depth....
+    
+    editValsTextField->setVisible(true);
+    editValsTextField->toFront(true);
+    editValsTextField->setText(arrayFloatArrayToString(getAllActiveValues())); //arrayFloatArrayToString
+    
+    Range<int> highlightRange(startPoint, endPoint);
+    editValsTextField->setHighlightedRegion(highlightRange);
 }
 
 void BKMultiSlider::mouseDown (const MouseEvent &event)
@@ -684,7 +684,37 @@ int BKMultiSlider::whichSubSlider (int which)
                     refDistance = tempDistance;
                 }
             }
+        }
+    }
+    
+    return whichSub;
+}
 
+int BKMultiSlider::whichSubSlider (int which, const MouseEvent &e)
+{
+    if(which < 0) return 0;
+    
+    int whichSub = 0;
+    float refDistance;
+    
+    BKSubSlider* refSlider = sliders[which]->operator[](0);
+    if(refSlider != nullptr)
+    {
+        refDistance = fabs(refSlider->getPositionOfValue(refSlider->getValue()) - e.y);
+    }
+    
+    if(arrangedHorizontally) {
+        for(int i=0; i<sliders[which]->size(); i++)
+        {
+            BKSubSlider* currentSlider = sliders[which]->operator[](i);
+            if(currentSlider != nullptr) {
+                float tempDistance = fabs(currentSlider->getPositionOfValue(currentSlider->getValue()) - e.y);
+                if(tempDistance < refDistance)
+                {
+                    whichSub = i;
+                    refDistance = tempDistance;
+                }
+            }
         }
     }
     
@@ -849,8 +879,11 @@ Array<Array<float>> BKMultiSlider::getAllActiveValues()
             BKSubSlider* currentSlider = sliders[i]->operator[](j);
             if(currentSlider != nullptr)
             {
+                float valToAdd = currentSlider->getValue();
+                if(fabs(valToAdd) < 0.000001) valToAdd = 0.;
+                
                 if(currentSlider->isActive())
-                    toAdd.add(currentSlider->getValue());
+                    toAdd.add(valToAdd);
             }
         }
         

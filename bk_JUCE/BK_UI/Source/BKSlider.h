@@ -105,6 +105,7 @@ public:
     
     int whichSlider (const MouseEvent &e);
     int whichSubSlider (int which);
+    int whichSubSlider (int which, const MouseEvent &e);
     int whichActiveSlider (int which);
     
     void mouseDrag(const MouseEvent &e) override;
