@@ -321,7 +321,7 @@ void BKMultiSlider::cleanupSliderArray()
         //remove sliders above numVisibleSliders
         if(i >= numVisibleSliders)
         {
-            for(int j=0; j<sliders[i]->size(); j++)
+            for(int j=sliders[i]->size() - 1; j>=0; j--)
             {
                 BKSubSlider* refSlider = sliders[i]->operator[](j);
                 if(refSlider != nullptr)
