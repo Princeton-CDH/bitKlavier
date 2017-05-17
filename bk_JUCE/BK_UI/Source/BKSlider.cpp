@@ -311,9 +311,10 @@ void BKMultiSlider::setTo(Array<Array<float>> newvals, NotificationType newnotif
 
 void BKMultiSlider::cleanupSliderArray()
 {
-    sliders.getLock().enter();
+    //sliders.getLock().enter();
     //doc says "...or preferably use an object of ScopedLockType as an RAII lock for it"
     //not sure if we should do that or not.
+    //not sure if we have to do any locking at all, because it looks like OwnedArray does so for remove
     
     for(int i=sliders.size() - 1; i>=0; i--)
     {
@@ -346,7 +347,7 @@ void BKMultiSlider::cleanupSliderArray()
         }
     }
     
-    sliders.getLock().exit();
+    //sliders.getLock().exit();
 }
 
 
