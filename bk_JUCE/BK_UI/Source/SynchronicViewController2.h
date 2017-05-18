@@ -52,7 +52,8 @@ private:
     BKComboBox selectCB;
     BKComboBox modeSelectCB;
 
-    BKSingleSlider* beatsToSkipSlider;
+    //BKSingleSlider* offsetParamStartToggle;
+    ToggleButton offsetParamStartToggle;
     BKSingleSlider* howManySlider;
     BKSingleSlider* clusterThreshSlider;
     BKRangeSlider* clusterMinMaxSlider;
@@ -69,6 +70,7 @@ private:
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
     
     void sliderValueChanged(Slider* slider) override{ };
+    void buttonClicked (Button* b) override;
     
     void fillSelectCB(void);
     void fillModeSelectCB(void);

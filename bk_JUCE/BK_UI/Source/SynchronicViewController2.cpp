@@ -48,9 +48,11 @@ theGraph(theGraph)
     fillModeSelectCB();
     addAndMakeVisible(modeSelectCB);
     
-    beatsToSkipSlider = new BKSingleSlider("beats to skip", -1, 1, 0, 1);
-    beatsToSkipSlider->addMyListener(this);
-    addAndMakeVisible(beatsToSkipSlider);
+    //offsetParamStartToggle = new BKSingleSlider("skip first", 0, 1, 0, 1);
+    offsetParamStartToggle.addListener(this);
+    offsetParamStartToggle.setButtonText ("skip first");
+    offsetParamStartToggle.setToggleState (true, dontSendNotification);
+    addAndMakeVisible(offsetParamStartToggle);
     
     howManySlider = new BKSingleSlider("how many", 1, 100, 1, 1);
     howManySlider->addMyListener(this);
@@ -185,12 +187,6 @@ void SynchronicViewController2::BKSingleSliderValueChanged(String name, double v
         prep->setClusterThresh(val);
         active->setClusterThresh(val);
     }
-    else if(name == "beats to skip")
-    {
-        DBG("got new beats to skip " + String(val));
-        prep->setBeatsToSkip(val);
-        active->setBeatsToSkip(val);
-    }
 }
 
 void SynchronicViewController2::BKRangeSliderValueChanged(String name, double minval, double maxval)
@@ -204,9 +200,7 @@ void SynchronicViewController2::BKRangeSliderValueChanged(String name, double mi
         prep->setClusterMax(maxval);
         active->setClusterMin(minval);
         active->setClusterMax(maxval);
-        
     }
-
 }
 
 void SynchronicViewController2::paint (Graphics& g)
@@ -229,9 +223,9 @@ void SynchronicViewController2::resized()
 
     selectCB.setBounds(rightColumn.removeFromTop(20));
     modeSelectCB.setBounds(rightColumn.removeFromTop(20));
+    offsetParamStartToggle.setBounds(rightColumn.removeFromTop(20));
     
-    int rightColumnRowHeight = rightColumn.getHeight() / 4.;
-    beatsToSkipSlider->setBounds(rightColumn.removeFromTop(rightColumnRowHeight));
+    int rightColumnRowHeight = rightColumn.getHeight() / 3.;
     howManySlider->setBounds(rightColumn.removeFromTop(rightColumnRowHeight));
     clusterThreshSlider->setBounds(rightColumn.removeFromTop(rightColumnRowHeight));
     clusterMinMaxSlider->setBounds(rightColumn.removeFromTop(rightColumnRowHeight));
@@ -247,7 +241,9 @@ void SynchronicViewController2::updateFields(NotificationType notify)
     
     selectCB.setSelectedItemIndex(processor.updateState->currentSynchronicId, notify);
     modeSelectCB.setSelectedItemIndex(prep->getMode(), notify);
-    beatsToSkipSlider->setValue(prep->getBeatsToSkip(), notify);
+    //offsetParamStartToggle->setValue(prep->getBeatsToSkip(), notify);
+    //offsetParamStartToggle->setValue(prep->getOffsetParamToggle(), notify);
+    offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
     howManySlider->setValue(prep->getNumBeats(), notify);
     clusterThreshSlider->setValue(prep->getClusterThreshMS(), notify);
     clusterMinMaxSlider->setMinValue(prep->getClusterMin(), notify);
@@ -334,6 +330,29 @@ void SynchronicViewController2::bkComboBoxDidChange (ComboBox* box)
         //updateFields(sendNotification);
         updateFields();
     }
+    else if (name == "Mode")
+    {
+        SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+        SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+        
+        prep    ->setMode((SynchronicSyncMode) box->getSelectedItemIndex());
+        active  ->setMode((SynchronicSyncMode) box->getSelectedItemIndex());
+        
+        int toggleVal;
+        if(offsetParamStartToggle.getToggleState()) toggleVal = 1;
+        else toggleVal = 0;
+        
+        if(prep->getMode() == FirstNoteOnSync || prep->getMode() == AnyNoteOnSync)
+        {
+            prep->setBeatsToSkip(toggleVal - 1);
+            active->setBeatsToSkip(toggleVal - 1);
+        }
+        else
+        {
+            prep->setBeatsToSkip(toggleVal);
+            active->setBeatsToSkip(toggleVal);
+        }
+    }
 }
 
 void SynchronicViewController2::bkMessageReceived (const String& message)
@@ -341,6 +360,32 @@ void SynchronicViewController2::bkMessageReceived (const String& message)
     if (message == "synchronic/update")
     {
         updateFields();
+    }
+}
+
+void SynchronicViewController2::buttonClicked (Button* b)
+{
+    if (b == &offsetParamStartToggle)
+    {
+        
+        SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+        SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+        
+        int toggleVal;
+        if(offsetParamStartToggle.getToggleState()) toggleVal = 1;
+        else toggleVal = 0;
+        
+        if(prep->getMode() == FirstNoteOnSync || prep->getMode() == AnyNoteOnSync)
+        {
+            prep->setBeatsToSkip(toggleVal - 1);
+            active->setBeatsToSkip(toggleVal - 1);
+        }
+        else
+        {
+            prep->setBeatsToSkip(toggleVal);
+            active->setBeatsToSkip(toggleVal);
+        }
+
     }
 }
 

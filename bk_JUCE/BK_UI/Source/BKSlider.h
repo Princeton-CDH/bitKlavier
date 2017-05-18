@@ -219,6 +219,7 @@ public:
     String getName()                { return sliderName; }
     void setValue(double newval, NotificationType notify);
     void checkValue(double newval);
+    double getValue() {return thisSlider.getValue();}
     
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;

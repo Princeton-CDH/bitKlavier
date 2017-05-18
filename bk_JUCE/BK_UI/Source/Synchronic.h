@@ -175,8 +175,8 @@ public:
                 tempo == s->getTempoControl());
     }
     
-    //inline const float getTempo() const noexcept                       {return sTempo;                 }
-    inline const int getNumBeats() const noexcept                      {return sNumBeats;             }
+    //inline const float getTempo() const noexcept                       {return sTempo;               }
+    inline const int getNumBeats() const noexcept                      {return sNumBeats;              }
     inline const int getClusterMin() const noexcept                    {return sClusterMin;            }
     inline const int getClusterMax() const noexcept                    {return sClusterMax;            }
     inline const int getClusterCap() const noexcept                    {return sClusterCap;            }
@@ -184,7 +184,13 @@ public:
     inline const float getClusterThreshMS() const noexcept             {return sClusterThresh;         }
     inline const SynchronicSyncMode getMode() const noexcept           {return sMode;                  }
     inline const Array<float> getBeatMultipliers() const noexcept      {return sBeatMultipliers;       }
-    inline const int getBeatsToSkip()                                  {return sBeatsToSkip;           }
+    inline const int getBeatsToSkip() const noexcept                   {return sBeatsToSkip;           }
+    inline const int getOffsetParamToggle() const noexcept
+    {
+        if(getMode() == FirstNoteOnSync || getMode() == AnyNoteOnSync) return getBeatsToSkip() + 1;
+        else return getBeatsToSkip();
+    }
+    
     inline const Array<float> getAccentMultipliers() const noexcept    {return sAccentMultipliers;     }
     inline const Array<float> getLengthMultipliers() const noexcept    {return sLengthMultipliers;     }
     inline const Array<Array<float>> getTransposition() const noexcept {return sTransposition;         }
@@ -197,7 +203,7 @@ public:
     inline float getAdaptiveTempo1Subdivisions(void)        {return at1Subdivisions;}
     inline float getAdaptiveTempo1Min(void)                 {return at1Min;}
     inline float getAdaptiveTempo1Max(void)                 {return at1Max;}
-*/
+     */
     
     inline void setClusterThresh(float clusterThresh)
     {
