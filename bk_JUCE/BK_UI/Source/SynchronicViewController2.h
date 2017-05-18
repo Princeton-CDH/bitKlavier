@@ -8,6 +8,13 @@
   ==============================================================================
 */
 
+/*
+ 
+ TODO
+ => gain slider? or do we want to add that in the graph or in a mixer view on a per-preparation basis?
+ => naming textfield
+ */
+
 #ifndef SYNCHRONICVIEWCONTROLLER2_H_INCLUDED
 #define SYNCHRONICVIEWCONTROLLER2_H_INCLUDED
 
@@ -51,6 +58,8 @@ private:
     
     BKComboBox selectCB;
     BKComboBox modeSelectCB;
+    
+    BKTextField nameTF;
 
     //BKSingleSlider* offsetParamStartToggle;
     ToggleButton offsetParamStartToggle;
@@ -58,7 +67,7 @@ private:
     BKSingleSlider* clusterThreshSlider;
     BKRangeSlider* clusterMinMaxSlider;
 
-    void bkTextFieldDidChange       (TextEditor&)           override { };
+    void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;
     
     void bkComboBoxDidChange        (ComboBox* box)         override;

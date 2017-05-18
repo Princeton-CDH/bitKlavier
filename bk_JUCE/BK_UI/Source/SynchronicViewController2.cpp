@@ -66,6 +66,10 @@ theGraph(theGraph)
     clusterMinMaxSlider->addMyListener(this);
     addAndMakeVisible(clusterMinMaxSlider);
     
+    addAndMakeVisible(nameTF);
+    nameTF.addListener(this);
+    nameTF.setName("Name");
+    
     startTimer(20);
 
 }
@@ -222,8 +226,11 @@ void SynchronicViewController2::resized()
     }
 
     selectCB.setBounds(rightColumn.removeFromTop(20));
-    modeSelectCB.setBounds(rightColumn.removeFromTop(20));
-    offsetParamStartToggle.setBounds(rightColumn.removeFromTop(20));
+    nameTF.setBounds(rightColumn.removeFromTop(20));
+    
+    Rectangle<int> modeSlice = rightColumn.removeFromTop(20);
+    modeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2));
+    offsetParamStartToggle.setBounds(modeSlice);
     
     int rightColumnRowHeight = rightColumn.getHeight() / 3.;
     howManySlider->setBounds(rightColumn.removeFromTop(rightColumnRowHeight));
@@ -235,19 +242,18 @@ void SynchronicViewController2::resized()
 void SynchronicViewController2::updateFields(NotificationType notify)
 {
     
-    DBG("**** updating synchronic sliders **** prep # " + String(processor.updateState->currentSynchronicId) + " " + String(notify));
+    //DBG("**** updating synchronic sliders **** prep # " + String(processor.updateState->currentSynchronicId) + " " + String(notify));
     
     SynchronicPreparation::Ptr prep   = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
     selectCB.setSelectedItemIndex(processor.updateState->currentSynchronicId, notify);
     modeSelectCB.setSelectedItemIndex(prep->getMode(), notify);
-    //offsetParamStartToggle->setValue(prep->getBeatsToSkip(), notify);
-    //offsetParamStartToggle->setValue(prep->getOffsetParamToggle(), notify);
     offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
     howManySlider->setValue(prep->getNumBeats(), notify);
     clusterThreshSlider->setValue(prep->getClusterThreshMS(), notify);
     clusterMinMaxSlider->setMinValue(prep->getClusterMin(), notify);
     clusterMinMaxSlider->setMaxValue(prep->getClusterMax(), notify);
+    nameTF.setText(processor.gallery->getSynchronic(processor.updateState->currentSynchronicId)->getName(), notify);
     
     for(int i = 0; i < paramSliders.size(); i++)
     {
@@ -352,6 +358,24 @@ void SynchronicViewController2::bkComboBoxDidChange (ComboBox* box)
             prep->setBeatsToSkip(toggleVal);
             active->setBeatsToSkip(toggleVal);
         }
+    }
+}
+
+void SynchronicViewController2::bkTextFieldDidChange(TextEditor& tf)
+{
+    String text = tf.getText();
+    String name = tf.getName();
+    
+    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+    SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
+    if (name == "Name")
+    {
+        processor.gallery->getSynchronic(processor.updateState->currentSynchronicId)->setName(text);
+        
+        int selected = selectCB.getSelectedId();
+        if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, text);
+        selectCB.setSelectedId(selected, dontSendNotification );
     }
 }
 
