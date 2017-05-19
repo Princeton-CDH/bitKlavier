@@ -1083,7 +1083,9 @@ void BKSingleSlider::resized()
     
     Rectangle<int> area (getLocalBounds());
     
-    Rectangle<int> topSlab (area.removeFromTop(20));
+    Rectangle<int> topSlab (area.removeFromTop(area.getHeight() / 3));
+    topSlab.removeFromTop(topSlab.getHeight() - 20);
+    topSlab.removeFromRight(5);
     valueTF.setBounds(topSlab.removeFromRight(50));
     showName.setBounds(topSlab.removeFromRight(100));
     
@@ -1299,7 +1301,9 @@ void BKRangeSlider::resized()
     
     Rectangle<int> area (getLocalBounds());
     
-    Rectangle<int> topSlab (area.removeFromTop(20));
+    Rectangle<int> topSlab (area.removeFromTop(area.getHeight() / 3));
+    topSlab.removeFromTop(topSlab.getHeight() - 20);
+    topSlab.removeFromRight(5);
     maxValueTF.setBounds(topSlab.removeFromRight(50));
     minValueTF.setBounds(topSlab.removeFromRight(50));
     showName.setBounds(topSlab.removeFromRight(100));
@@ -1308,6 +1312,7 @@ void BKRangeSlider::resized()
     minSlider.setBounds(sliderArea);
     maxSlider.setBounds(sliderArea);
     invisibleSlider.setBounds(sliderArea);
+
 }
 
 

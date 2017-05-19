@@ -214,7 +214,11 @@ void SynchronicViewController2::paint (Graphics& g)
 void SynchronicViewController2::resized()
 {
     Rectangle<int> area (getLocalBounds());
-    Rectangle<int> rightColumn = area.removeFromRight(area.getWidth() * 0.5);
+    Rectangle<int> oneColumn = area.removeFromLeft(area.getWidth() * 0.5);
+    
+    Rectangle<int> modeSlice = area.removeFromTop(20);
+    modeSelectCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2));
+    offsetParamStartToggle.setBounds(modeSlice);
     
     int tempHeight = area.getHeight() / paramSliders.size();
     
@@ -223,16 +227,12 @@ void SynchronicViewController2::resized()
         paramSliders[i]->setBounds(area.removeFromBottom(tempHeight));
     }
 
-    selectCB.setBounds(rightColumn.removeFromTop(20));
+    selectCB.setBounds(oneColumn.removeFromTop(20));
     
-    Rectangle<int> modeSlice = rightColumn.removeFromTop(20);
-    modeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2));
-    offsetParamStartToggle.setBounds(modeSlice);
-    
-    int rightColumnRowHeight = rightColumn.getHeight() / 3.;
-    howManySlider->setBounds(rightColumn.removeFromTop(rightColumnRowHeight));
-    clusterThreshSlider->setBounds(rightColumn.removeFromTop(rightColumnRowHeight));
-    clusterMinMaxSlider->setBounds(rightColumn.removeFromTop(rightColumnRowHeight));
+    int oneColumnRowHeight = oneColumn.getHeight() / 3.;
+    howManySlider->setBounds(oneColumn.removeFromTop(oneColumnRowHeight));
+    clusterThreshSlider->setBounds(oneColumn.removeFromTop(oneColumnRowHeight));
+    clusterMinMaxSlider->setBounds(oneColumn.removeFromTop(oneColumnRowHeight));
 
 }
 
