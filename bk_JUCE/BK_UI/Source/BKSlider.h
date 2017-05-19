@@ -85,7 +85,7 @@ public:
 
 
 class BKMultiSlider :
-public BKComponent,
+public Component,
 public Slider::Listener,
 public TextEditor::Listener
 {
@@ -200,7 +200,7 @@ public:
 //basic horizontal slider with its own text box and label
 //entering values in the text box will reset the range as needed
 class BKSingleSlider :
-public BKComponent,
+public Component,
 public Slider::Listener,
 public TextEditor::Listener
 {
@@ -285,7 +285,7 @@ public:
 
 
 class BKRangeSlider :
-public BKComponent,
+public Component,
 public Slider::Listener,
 public TextEditor::Listener
 {
