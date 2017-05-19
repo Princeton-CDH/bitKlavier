@@ -38,6 +38,8 @@ theGraph(theGraph)
     selectCB.addSeparator();
     selectCB.addListener(this);
     selectCB.setSelectedItemIndex(0);
+    selectCB.addMyListener(this);
+    //selectCB.setEditableText(true);
     fillSelectCB();
     addAndMakeVisible(selectCB);
     
@@ -65,10 +67,6 @@ theGraph(theGraph)
     clusterMinMaxSlider = new BKRangeSlider("cluster min/max", 1, 10, 3, 4, 1);
     clusterMinMaxSlider->addMyListener(this);
     addAndMakeVisible(clusterMinMaxSlider);
-    
-    addAndMakeVisible(nameTF);
-    nameTF.addListener(this);
-    nameTF.setName("Name");
     
     startTimer(20);
 
@@ -226,7 +224,6 @@ void SynchronicViewController2::resized()
     }
 
     selectCB.setBounds(rightColumn.removeFromTop(20));
-    nameTF.setBounds(rightColumn.removeFromTop(20));
     
     Rectangle<int> modeSlice = rightColumn.removeFromTop(20);
     modeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2));
@@ -253,7 +250,6 @@ void SynchronicViewController2::updateFields(NotificationType notify)
     clusterThreshSlider->setValue(prep->getClusterThreshMS(), notify);
     clusterMinMaxSlider->setMinValue(prep->getClusterMin(), notify);
     clusterMinMaxSlider->setMaxValue(prep->getClusterMax(), notify);
-    nameTF.setText(processor.gallery->getSynchronic(processor.updateState->currentSynchronicId)->getName(), notify);
     
     for(int i = 0; i < paramSliders.size(); i++)
     {
@@ -335,6 +331,7 @@ void SynchronicViewController2::bkComboBoxDidChange (ComboBox* box)
         
         //updateFields(sendNotification);
         updateFields();
+        
     }
     else if (name == "Mode")
     {
@@ -366,8 +363,8 @@ void SynchronicViewController2::bkTextFieldDidChange(TextEditor& tf)
     String text = tf.getText();
     String name = tf.getName();
     
-    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
-    SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    //SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+    //SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
     if (name == "Name")
     {
@@ -377,6 +374,17 @@ void SynchronicViewController2::bkTextFieldDidChange(TextEditor& tf)
         if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, text);
         selectCB.setSelectedId(selected, dontSendNotification );
     }
+}
+
+void SynchronicViewController2::BKEditableComboBoxChanged(String name, int index)
+{
+    DBG("Received BKEditableComboBoxChanged " + name + " " + String(index));
+    
+    processor.gallery->getSynchronic(processor.updateState->currentSynchronicId)->setName(name);
+    
+    int selected = selectCB.getSelectedId();
+    if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, name);
+    selectCB.setSelectedId(selected, dontSendNotification );
 }
 
 void SynchronicViewController2::bkMessageReceived (const String& message)

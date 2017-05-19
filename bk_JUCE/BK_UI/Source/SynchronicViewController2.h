@@ -8,13 +8,6 @@
   ==============================================================================
 */
 
-/*
- 
- TODO
- => gain slider? or do we want to add that in the graph or in a mixer view on a per-preparation basis?
- => naming textfield
- */
-
 #ifndef SYNCHRONICVIEWCONTROLLER2_H_INCLUDED
 #define SYNCHRONICVIEWCONTROLLER2_H_INCLUDED
 
@@ -32,6 +25,7 @@ public BKListener,
 public BKMultiSliderListener,
 public BKSingleSliderListener,
 public BKRangeSliderListener,
+public BKEditableComboBoxListener,
 public SliderListener,
 public Timer
 {
@@ -56,12 +50,9 @@ private:
     
     OwnedArray<BKMultiSlider> paramSliders;
     
-    BKComboBox selectCB;
+    BKEditableComboBox selectCB;
     BKComboBox modeSelectCB;
-    
-    BKTextField nameTF;
 
-    //BKSingleSlider* offsetParamStartToggle;
     ToggleButton offsetParamStartToggle;
     BKSingleSlider* howManySlider;
     BKSingleSlider* clusterThreshSlider;
@@ -77,6 +68,7 @@ private:
     void multiSliderAllValuesChanged(String name, Array<Array<float>> values) override;
     void BKSingleSliderValueChanged(String name, double val) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
+    void BKEditableComboBoxChanged(String name, int index) override;
     
     void sliderValueChanged(Slider* slider) override{ };
     void buttonClicked (Button* b) override;
