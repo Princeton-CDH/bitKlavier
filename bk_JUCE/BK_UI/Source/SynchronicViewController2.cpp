@@ -378,8 +378,6 @@ void SynchronicViewController2::bkTextFieldDidChange(TextEditor& tf)
 
 void SynchronicViewController2::BKEditableComboBoxChanged(String name, int index)
 {
-    DBG("Received BKEditableComboBoxChanged " + name + " " + String(index));
-    
     processor.gallery->getSynchronic(processor.updateState->currentSynchronicId)->setName(name);
     
     int selected = selectCB.getSelectedId();

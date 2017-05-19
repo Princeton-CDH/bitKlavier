@@ -71,7 +71,6 @@ public:
     }
     
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
-    //void resized() override;
     void mouseDoubleClick(const MouseEvent& e) override;
     
     ListenerList<BKEditableComboBoxListener> listeners;
@@ -79,18 +78,8 @@ public:
     void removeMyListener(BKEditableComboBoxListener* listener)  { listeners.remove(listener);   }
     
 private:
-    
-    //BKComboBox thisComboBox;
-    //selectCB.setSelectedItemIndex(processor.updateState->currentSynchronicId, notify);
-    //selectCB.clear(dontSendNotification);
-    //selectCB.addItem(name, i+1);
-    //selectCB.getNumItems()-1)
-    //selectCB.changeItemText(selected, text);
-    
+        
     BKTextField nameEditor;
-    
-    void showModifyPopupMenu();
-    static void controlClickCallback (const int result, BKEditableComboBox* cbox);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKEditableComboBox)
 };
