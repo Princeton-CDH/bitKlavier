@@ -424,10 +424,10 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "ClusterThresh",
     "Mode",
     "BeatsToSkip",
-    "BeatMults",
-    "LengthMults",
-    "AccentMults",
-    "TranspOffsets"
+    "beat length multipliers",
+    "sustain length multipliers",
+    "accents",
+    "transpositions"
 };
 
 static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc = {

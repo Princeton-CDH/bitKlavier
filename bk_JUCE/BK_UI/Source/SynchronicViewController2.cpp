@@ -78,25 +78,31 @@ SynchronicViewController2::~SynchronicViewController2()
     
 }
 
+/*
+ "beat length multipliers",
+ "sustain length multipliers",
+ "accents",
+ "transpositions"*/
+
 void SynchronicViewController2::timerCallback()
 {
     SynchronicProcessor::Ptr sProcessor = processor.gallery->getSynchronicProcessor(processor.updateState->currentSynchronicId);
 
     for (int i = 0; i < paramSliders.size(); i++)
     {
-        if(paramSliders[i]->getName() == "BeatMults")
+        if(paramSliders[i]->getName() == "beat length multipliers")
         {
             paramSliders[i]->setCurrentSlider(sProcessor->getBeatMultiplierCounter());
         }
-        else if(paramSliders[i]->getName() == "LengthMults")
+        else if(paramSliders[i]->getName() == "sustain length multipliers")
         {
             paramSliders[i]->setCurrentSlider(sProcessor->getLengthMultiplierCounter());
         }
-        else if(paramSliders[i]->getName() == "AccentMults")
+        else if(paramSliders[i]->getName() == "accents")
         {
             paramSliders[i]->setCurrentSlider(sProcessor->getAccentMultiplierCounter());
         }
-        else if(paramSliders[i]->getName() == "TranspOffsets")
+        else if(paramSliders[i]->getName() == "transpositions")
         {
             paramSliders[i]->setCurrentSlider(sProcessor->getTranspCounter());
         }
