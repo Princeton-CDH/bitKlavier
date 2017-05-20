@@ -16,6 +16,7 @@ void BKEditableComboBox::mouseDoubleClick (const MouseEvent &event)
     addAndMakeVisible(nameEditor);
     nameEditor.setBounds(getLocalBounds());
     nameEditor.grabKeyboardFocus();
+    nameEditor.setText(getItemText(getSelectedItemIndex()));
 }
 
 

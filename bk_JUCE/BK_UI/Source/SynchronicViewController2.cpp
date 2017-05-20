@@ -38,6 +38,7 @@ theGraph(theGraph)
     selectCB.addSeparator();
     selectCB.addListener(this);
     selectCB.setSelectedItemIndex(0);
+    //selectCB.setJustificationType(Justification::centredRight);
     selectCB.addMyListener(this);
     //selectCB.setEditableText(true);
     fillSelectCB();
