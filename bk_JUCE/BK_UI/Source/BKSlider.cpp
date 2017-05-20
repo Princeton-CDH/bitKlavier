@@ -590,17 +590,37 @@ void BKMultiSlider::mouseMove(const MouseEvent& e)
 void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
 {
     int which = whichSlider(e);
+    int whichSave = which;
+    
+    //account for subsliders
+    which += whichSubSlider(which, e);
+    for (int i=0; i<whichSave; i++)
+    {
+        if(sliders[i]->size() > 0)
+        {
+            which += (sliders[i]->size() - 1);
+        }
+    }
     
     //highlight number for current slider
     StringArray tokens;
     tokens.addTokens(arrayFloatArrayToString(getAllActiveValues()), false); //arrayFloatArrayToString
     int startPoint = 0;
     int endPoint;
+
+    //need to skip brackets
+    int numBrackets = 0;
+    for(int i=0; i<=which + numBrackets; i++)
+    {
+        if(tokens[i] == "[" || tokens[i] == "]") numBrackets++;
+    }
     
-    for(int i=0; i < which; i++) startPoint += tokens[i].length() + 1;
-    endPoint = startPoint + tokens[which].length();
-    
-    //need to account for depth....
+    for(int i=0; i < which + numBrackets; i++) {
+        if(tokens[i] == "[") startPoint += 1;
+        else if(tokens[i] == "]") startPoint += 2;
+        else startPoint += tokens[i].length() + 1;
+    }
+    endPoint = startPoint + tokens[which + numBrackets].length();
     
     editValsTextField->setVisible(true);
     editValsTextField->toFront(true);
