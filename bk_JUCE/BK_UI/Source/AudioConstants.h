@@ -375,10 +375,10 @@ typedef enum SynchronicSyncMode {
 } SynchronicSyncMode;
 
 static const std::vector<std::string> cSynchronicSyncModes = {
-    "First Note On",
-    "Any Note On",
-    "Last Note Off",
-    "Any Note Off"
+    "First Note-On",
+    "Any Note-On",
+    "Last Note-Off",
+    "Any Note-Off"
 };
 
 typedef enum SynchronicParameterType {

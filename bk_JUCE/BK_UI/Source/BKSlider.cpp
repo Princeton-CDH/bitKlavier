@@ -483,7 +483,6 @@ void BKMultiSlider::deactivateSlider(int where, NotificationType notify)
             if(currentSlider != nullptr) {
                 currentSlider->isActive(false);
                 currentSlider->setLookAndFeel(&passiveSliderLookAndFeel);
-                //currentSlider->setValue(sliderDefault, dontSendNotification);
                 if(i != 0) sliders[where]->remove(i); //remove all but first slider
             }
         }
@@ -1335,7 +1334,16 @@ void BKRangeSlider::resized()
 
 }
 
+// ******************************************************************************************************************** //
+// *******************************************  BKWaveDistanceUndertowSlider ****************************************** //
+// ******************************************************************************************************************** //
 
+/*
+BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
+{
+    
+}
+*/
 
 // ******************************************************************************************************************** //
 // **************************************************  BKLookAndFeel Stuff ******************************************** //

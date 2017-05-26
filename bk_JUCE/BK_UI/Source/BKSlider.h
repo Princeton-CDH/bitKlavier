@@ -15,6 +15,8 @@
 #include "BKComponent.h"
 
 
+
+
 typedef enum BKMultiSliderType {
     HorizontalMultiSlider = 0,
     VerticalMultiSlider,
@@ -40,6 +42,9 @@ public:
                            const Slider::SliderStyle style, Slider& slider) override;
 };
 
+// ******************************************************************************************************************** //
+// **************************************************  BKSubSlider **************************************************** //
+// ******************************************************************************************************************** //
 
 class BKSubSlider : public Slider
 {
@@ -69,6 +74,13 @@ private:
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSubSlider)
 };
+
+
+
+
+// ******************************************************************************************************************** //
+// **************************************************  BKMultiSlider ************************************************** //
+// ******************************************************************************************************************** //
 
 
 class BKMultiSliderListener
@@ -186,6 +198,12 @@ private:
 };
 
 
+
+// ******************************************************************************************************************** //
+// **************************************************  BKSingleSlider ************************************************* //
+// ******************************************************************************************************************** //
+
+
 class BKSingleSliderListener
 {
     
@@ -239,6 +257,11 @@ private:
 
 };
 
+
+
+// ******************************************************************************************************************** //
+// **************************************************  BKRangeSlider ************************************************** //
+// ******************************************************************************************************************** //
 
 class BKRangeMinSliderLookAndFeel : public LookAndFeel_V4
 {
@@ -341,5 +364,80 @@ private:
 };
 
 
+
+// ******************************************************************************************************************** //
+// *******************************************  BKWaveDistanceUndertowSlider ****************************************** //
+// ******************************************************************************************************************** //
+
+/*
+class BKWaveDistanceUndertowSliderListener
+{
+    
+public:
+    
+    //BKRangeSliderListener() {}
+    virtual ~BKWaveDistanceUndertowSliderListener() {};
+    
+    virtual void BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow) = 0;
+};
+
+
+
+class BKWaveDistanceUndertowSlider :
+public Component,
+public Slider::Listener,
+public TextEditor::Listener
+{
+public:
+    BKWaveDistanceUndertowSlider();
+    ~BKWaveDistanceUndertowSlider() {};
+    
+    Slider wavedistanceSlider;
+    Slider undertowSlider;
+    OwnedArray<Slider> displaySliders;
+    
+    String wavedistanceSliderName;
+    String undertowSliderName;
+    
+    String sliderName;
+    Label showName;
+    
+    TextEditor wavedistanceValueTF;
+    TextEditor undertowValueTF;
+    
+    void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
+    String getName()                { return sliderName; }
+    
+    void setWavedistanceValue(double newval, NotificationType notify);
+    void setUndertowValue(double newval, NotificationType notify);
+    void rescaleWavedistanceSlider();
+    void rescaleUndertowSlider();
+    
+    void sliderValueChanged (Slider *slider) override;
+    void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+    void resized() override;
+    void sliderDragEnded(Slider *slider) override;
+    void mouseDown (const MouseEvent &event) override;
+    
+    ListenerList<BKWaveDistanceUndertowSliderListener> listeners;
+    void addMyListener(BKWaveDistanceUndertowSliderListener* listener)     { listeners.add(listener);      }
+    void removeMyListener(BKWaveDistanceUndertowSliderListener* listener)  { listeners.remove(listener);   }
+    
+private:
+    double sliderMin, sliderMax;
+    double sliderDefaultMin, sliderDefaultMax;
+    double sliderIncrement;
+    
+    bool newDrag;
+    bool clickedOnMinSlider;
+    
+    BKRangeMinSliderLookAndFeel minSliderLookAndFeel; //possibly need to remake for this
+    BKRangeMaxSliderLookAndFeel maxSliderLookAndFeel;
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKWaveDistanceUndertowSlider)
+    
+};
+
+*/
 
 #endif  // BKSLIDER_H_INCLUDED

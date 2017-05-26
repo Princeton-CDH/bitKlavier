@@ -49,6 +49,7 @@ public:
     }
     
     SynchronicProcessor::Ptr getSynchronicProcessor(int Id);
+    NostalgicProcessor::Ptr getNostalgicProcessor(int id);
     
     void addSynchronic(void);
     void addSynchronic(SynchronicPreparation::Ptr);

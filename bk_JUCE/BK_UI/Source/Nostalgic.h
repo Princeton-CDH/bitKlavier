@@ -232,6 +232,9 @@ public:
         return tuner;
     }
     
+    Array<int> getPlayPositions();
+    Array<int> getUndertowPositions();
+    
 private:
     int Id;
     BKSynthesiser*              synth;
@@ -255,6 +258,14 @@ private:
     Array<uint64> reverseLengthTimers;  //keep track of how long reverse notes have been playing
     Array<int> activeReverseNotes;      //table of active reverse notes
     Array<int> reverseTargetLength;     //target reverse length (in samples)
+    
+    Array<uint64> undertowNoteTimers;
+    Array<int> activeUndertowNotes;
+    
+    Array<uint64> startPositions;
+    Array<uint64> playPositions;
+    Array<uint64> undertowPositions;
+    
     
     double sampleRate;
     

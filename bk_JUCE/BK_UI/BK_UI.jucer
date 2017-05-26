@@ -129,10 +129,6 @@
         <FILE id="tIek8E" name="PianoViewController.h" compile="0" resource="0"
               file="Source/PianoViewController.h"/>
         <GROUP id="{444BC2CA-5FF1-6AEB-00B9-DF5D039DBFFE}" name="PreparationVC">
-          <FILE id="dthKFQ" name="SynchronicViewController2.cpp" compile="1"
-                resource="0" file="Source/SynchronicViewController2.cpp"/>
-          <FILE id="U7d1FI" name="SynchronicViewController2.h" compile="0" resource="0"
-                file="Source/SynchronicViewController2.h"/>
           <FILE id="lBHfg4" name="TuningViewController.cpp" compile="1" resource="0"
                 file="Source/TuningViewController.cpp"/>
           <FILE id="DZ40Vl" name="TuningViewController.h" compile="0" resource="0"
@@ -145,10 +141,18 @@
                 file="Source/SynchronicViewController.cpp"/>
           <FILE id="OJ2tuE" name="SynchronicViewController.h" compile="0" resource="0"
                 file="Source/SynchronicViewController.h"/>
+          <FILE id="dthKFQ" name="SynchronicViewController2.cpp" compile="1"
+                resource="0" file="Source/SynchronicViewController2.cpp"/>
+          <FILE id="U7d1FI" name="SynchronicViewController2.h" compile="0" resource="0"
+                file="Source/SynchronicViewController2.h"/>
           <FILE id="nbTvaG" name="NostalgicViewController.cpp" compile="1" resource="0"
                 file="Source/NostalgicViewController.cpp"/>
           <FILE id="rY4uUs" name="NostalgicViewController.h" compile="0" resource="0"
                 file="Source/NostalgicViewController.h"/>
+          <FILE id="Lgqkrt" name="NostalgicViewController2.cpp" compile="1" resource="0"
+                file="Source/NostalgicViewController2.cpp"/>
+          <FILE id="Ek0XSq" name="NostalgicViewController2.h" compile="0" resource="0"
+                file="Source/NostalgicViewController2.h"/>
           <FILE id="kl67Ve" name="DirectViewController.cpp" compile="1" resource="0"
                 file="Source/DirectViewController.cpp"/>
           <FILE id="Z11OMY" name="DirectViewController.h" compile="0" resource="0"

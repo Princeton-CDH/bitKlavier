@@ -26,6 +26,7 @@ nvc(p, &theGraph),
 dvc(p, &theGraph),
 ovc(p, &theGraph),
 svc2(p, &theGraph),
+nvc2(p, &theGraph),
 timerCallbackCount(0)
 {
     gen = processor.gallery->getGeneralSettings();
