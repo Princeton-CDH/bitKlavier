@@ -321,41 +321,16 @@ private:
     //target Synchronic layer
     SynchronicProcessor::Ptr syncProcessor;
     
-    //store values so that undertow note retains preparation from reverse note
-    NostalgicPreparation::PtrArr preparationAtKeyOn;
-    Array<float> tuningsAtKeyOn;
-    Array<float> velocitiesAtKeyOn;
-    
     Array<uint64> noteLengthTimers;     //store current length of played notes here
     Array<int> activeNotes;             //table of notes currently being played by player
     Array<bool> noteOn;                 // table of booleans representing state of each note
     Array<float> velocities;            //table of velocities played
     
-    Array<uint64> reverseLengthTimers;  //keep track of how long reverse notes have been playing
-    Array<int> activeReverseNotes;      //table of active reverse notes
-    Array<int> reverseTargetLength;     //target reverse length (in samples)
-    
-    Array<uint64> undertowNoteTimers;
-    Array<int> activeUndertowNotes;
-    
-    Array<uint64> startPositions;
-    Array<uint64> playPositions;
-    Array<uint64> undertowPositions;
-    
     OwnedArray<NostalgicNoteStuff> reverseNotes;
     OwnedArray<NostalgicNoteStuff> undertowNotes;
     
     double sampleRate;
-    
-    //functions
-    void playNote(int channel, int note);
-    
-    //finish timing played note length, called with noteOff
-    void noteLengthTimerOff(int midiNoteNumber);
-    
-    //begin timing reverse note play time
-    void reverseNoteLengthTimerOn(int midiNoteNumber, float noteLength);
-    
+
     //move timers forward by blocksize
     void incrementTimers(int numSamples);
     
