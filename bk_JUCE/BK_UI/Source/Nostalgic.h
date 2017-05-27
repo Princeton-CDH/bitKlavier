@@ -188,6 +188,82 @@ private:
     JUCE_LEAK_DETECTOR(NostalgicPreparation);
 };
 
+
+class NostalgicNoteStuff : public ReferenceCountedObject
+{
+public:
+    
+    typedef ReferenceCountedObjectPtr<NostalgicNoteStuff>   Ptr;
+    typedef Array<NostalgicNoteStuff::Ptr>                  PtrArr;
+    typedef Array<NostalgicNoteStuff::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<NostalgicNoteStuff>                  Arr;
+    typedef OwnedArray<NostalgicNoteStuff, CriticalSection> CSArr;
+    
+    NostalgicNoteStuff(int noteNumber) : notenumber(noteNumber)
+    {
+        resetReverseTimer();
+        resetUndertowTimer();
+    }
+    
+    ~NostalgicNoteStuff() {}
+    
+    void setNoteNumber(int newnote)                         { notenumber = newnote; }
+    inline const int getNoteNumber() const noexcept         { return notenumber; }
+    
+    void setPrepAtKeyOn(NostalgicPreparation::Ptr nprep)    { prepAtKeyOn = nprep; }
+    NostalgicPreparation::Ptr getPrepAtKeyOn()              { return prepAtKeyOn; }
+    
+    void setTuningAtKeyOn(float t)                          { tuningAtKeyOn = t; }
+    inline const float getTuningAtKeyOn() const noexcept    { return tuningAtKeyOn; }
+    
+    void setVelocityAtKeyOn(float v)                        { velocityAtKeyOn = v; }
+    inline const float getVelocityAtKeyOn() const noexcept  { return velocityAtKeyOn; }
+    
+    void incrementReverseTimer(uint64 numsamples)           { reverseTimer += numsamples; }
+    void incrementUndertowTimer(uint64 numsamples)          { undertowTimer += numsamples; }
+    
+    void resetReverseTimer()                                { reverseTimer = 0; }
+    void resetUndertowTimer()                               { undertowTimer = 0; }
+    
+    void setReverseStartPosition(uint64 rsp)                        { reverseStartPosition = rsp; }
+    inline const uint64 getReverseStartPosition() const noexcept    { return reverseStartPosition; }
+    
+    void setUndertowStartPosition(uint64 usp)                        { undertowStartPosition = usp; }
+    inline const uint64 getUndertowStartPosition() const noexcept    { return undertowStartPosition; }
+    
+    void setReverseTargetLength(uint64 rtl)                         { reverseTargetLength = rtl; }
+    void setUndertowTargetLength(uint64 utl)                        { undertowTargetLength = utl; }
+    inline const uint64 getUndertowTargetLength() const noexcept    { return undertowTargetLength; }
+    
+    bool reverseTimerExceedsTarget()    { if(reverseTimer > reverseTargetLength) return true; else return false; }
+    bool undertowTimerExceedsTarget()   { if(undertowTimer > undertowTargetLength) return true; else return false; }
+    
+    uint64 getReversePlayPosition()     { return (reverseStartPosition - reverseTimer); }
+    uint64 getUndertowPlayPosition()    { return (undertowStartPosition + undertowTimer); }
+    
+private:
+    
+    int notenumber;
+    NostalgicPreparation::Ptr prepAtKeyOn;
+    float tuningAtKeyOn;
+    float velocityAtKeyOn;
+    
+    uint64 reverseTimer;
+    uint64 undertowTimer;
+    
+    uint64 reverseStartPosition;
+    uint64 reversePosition;
+    
+    uint64 undertowStartPosition;
+    uint64 undertowPosition;
+    
+    uint64 reverseTargetLength;
+    uint64 undertowTargetLength;
+    
+    JUCE_LEAK_DETECTOR(NostalgicNoteStuff);
+};
+
+
 class NostalgicProcessor : public ReferenceCountedObject
 {
     
@@ -266,6 +342,8 @@ private:
     Array<uint64> playPositions;
     Array<uint64> undertowPositions;
     
+    OwnedArray<NostalgicNoteStuff> reverseNotes;
+    OwnedArray<NostalgicNoteStuff> undertowNotes;
     
     double sampleRate;
     

@@ -142,6 +142,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
             noteLengthTimers.set(midiNoteNumber, 0);
             //DBG("nostalgic removed active note " + std::to_string(midiNoteNumber));
             
+            /*
             //time how long the reverse note has played, to trigger undertow note
             activeReverseNotes.addIfNotAlreadyThere(midiNoteNumber);
             //activeReverseNotes.add(midiNoteNumber);
@@ -154,6 +155,16 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
             tuningsAtKeyOn.set(midiNoteNumber, tuner->getOffset(midiNoteNumber));
             velocitiesAtKeyOn.set(midiNoteNumber, velocities.getUnchecked(midiNoteNumber) * active->getGain());
             preparationAtKeyOn.set(midiNoteNumber, active);
+             */
+            
+            reverseNotes.insert(0, new NostalgicNoteStuff(midiNoteNumber));
+            NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
+            currentNote->setPrepAtKeyOn(active);
+            currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber));
+            currentNote->setVelocityAtKeyOn(velocities.getUnchecked(midiNoteNumber) * active->getGain());
+            currentNote->setReverseStartPosition((duration + active->getWavedistance()) * sampleRate/1000.);
+            currentNote->setReverseTargetLength((duration - (aRampUndertowCrossMS + 30)) * sampleRate/1000.);
+            currentNote->setUndertowTargetLength(active->getUndertow() * sampleRate/1000.);
         }
     }
 
@@ -209,6 +220,7 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
                          offRamp ); //ramp off
         }
         
+        /*
         //time how long the reverse note has played, to trigger undertow note
         activeReverseNotes.addIfNotAlreadyThere(midiNoteNumber);
         //activeReverseNotes.add(midiNoteNumber);
@@ -220,6 +232,16 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
         tuningsAtKeyOn.set(midiNoteNumber, tuner->getOffset(midiNoteNumber));
         velocitiesAtKeyOn.set(midiNoteNumber, velocities.getUnchecked(midiNoteNumber) * active->getGain());
         preparationAtKeyOn.set(midiNoteNumber, active);
+         */
+        
+        reverseNotes.insert(0, new NostalgicNoteStuff(midiNoteNumber));
+        NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
+        currentNote->setPrepAtKeyOn(active);
+        currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber));
+        currentNote->setVelocityAtKeyOn(midiNoteVelocity);
+        currentNote->setReverseStartPosition((duration + active->getWavedistance()) * sampleRate/1000.);
+        currentNote->setReverseTargetLength((duration - aRampUndertowCrossMS) * sampleRate/1000.);
+        currentNote->setUndertowTargetLength(active->getUndertow() * sampleRate/1000.);
     }
     
     //else?
@@ -239,6 +261,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
     
     incrementTimers(numSamples); //at end or beginning?
     
+    /*
     for(int i = (activeUndertowNotes.size() - 1); i >= 0; --i)
     {
         int tempnote = activeUndertowNotes.getUnchecked(i);
@@ -249,8 +272,58 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
             activeUndertowNotes.removeFirstMatchingValue(tempnote);
         }
     }
-
+     */
     
+    for(int i = undertowNotes.size() - 1; i >= 0; --i)
+    {
+        if(undertowNotes.getUnchecked(i)->undertowTimerExceedsTarget())
+            undertowNotes.remove(i);
+    }
+    
+    for(int i = reverseNotes.size() - 1; i >= 0; --i)
+    {
+        NostalgicNoteStuff* thisNote = reverseNotes.getUnchecked(i);
+        
+        if(thisNote->reverseTimerExceedsTarget())
+        {
+            NostalgicPreparation::Ptr noteOnPrep = thisNote->getPrepAtKeyOn();
+            
+            if(noteOnPrep->getUndertow() > 0)
+            {
+                for (auto t : noteOnPrep->getTransposition())
+                {
+                    float offset = t + thisNote->getTuningAtKeyOn();
+                    int synthNoteNumber = thisNote->getNoteNumber() +  (int)offset;
+                    float synthOffset = offset - (int)offset;
+                    
+                    synth->keyOn(midiChannel,
+                                 synthNoteNumber,
+                                 synthOffset,
+                                 thisNote->getVelocityAtKeyOn(),
+                                 aGlobalGain,
+                                 Forward,
+                                 FixedLengthFixedStart,
+                                 NostalgicNote,
+                                 Id,
+                                 noteOnPrep->getWavedistance(),                        //start position
+                                 noteOnPrep->getUndertow(),                            //play length
+                                 aRampUndertowCrossMS,                                 //ramp up length
+                                 noteOnPrep->getUndertow() - aRampUndertowCrossMS);    //ramp down length
+                }
+
+                undertowNotes.insert(0, new NostalgicNoteStuff(thisNote->getNoteNumber()));
+                NostalgicNoteStuff* newNote = undertowNotes.getUnchecked(0);
+                newNote->setUndertowTargetLength(thisNote->getUndertowTargetLength());
+                newNote->setUndertowStartPosition(noteOnPrep->getWavedistance() * sampleRate/1000.);
+                
+            }
+            
+            //remove from active notes list
+            reverseNotes.remove(i);
+        }
+    }
+
+    /*
     //check timers to see if any are at an undertow turnaround point, then call keyOn(forward) and keyOff, with 50ms ramps
     for(int i = (activeReverseNotes.size() - 1); i >= 0; --i)
     {
@@ -293,8 +366,10 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
             
             //remove from active notes list
             activeReverseNotes.removeFirstMatchingValue(tempnote);
+
         }
     }
+     */
     
     //incrementTimers(numSamples);
 }
@@ -302,12 +377,14 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
 //increment timers for all active notes, and all currently reversing notes
 void NostalgicProcessor::incrementTimers(int numSamples)
 {
+    
     for(int i = (activeNotes.size() - 1); i >= 0; --i)
     {
         noteLengthTimers.set(activeNotes.getUnchecked(i),
                              noteLengthTimers.getUnchecked(activeNotes.getUnchecked(i)) + numSamples);
     }
     
+    /*
     for(int i = (activeReverseNotes.size() - 1); i >= 0; --i)
     {
         reverseLengthTimers.set(activeReverseNotes.getUnchecked(i),
@@ -328,15 +405,32 @@ void NostalgicProcessor::incrementTimers(int numSamples)
                              undertowNoteTimers.getUnchecked(activeUndertowNotes.getUnchecked(i)));
         
     }
+     */
+    
+    for(int i = 0; i<reverseNotes.size(); i++)
+    {
+        reverseNotes.getUnchecked(i)->incrementReverseTimer(numSamples);
+    }
+    for(int i = 0; i<undertowNotes.size(); i++)
+    {
+        undertowNotes.getUnchecked(i)->incrementUndertowTimer(numSamples);
+    }
 }
 
 Array<int> NostalgicProcessor::getPlayPositions() //return playback positions in ms, not samples
 {
     Array<int> newpositions;
     
+    /*
     for(int i=0; i<activeReverseNotes.size(); i++)
     {
         newpositions.set(i, playPositions.getUnchecked(activeReverseNotes.getUnchecked(i)) * 1000./sampleRate);
+    }
+     */
+    
+    for(int i = 0; i<reverseNotes.size(); i++)
+    {
+        newpositions.set(i, reverseNotes.getUnchecked(i)->getReversePlayPosition() * 1000./sampleRate);
     }
     
     return newpositions;
@@ -346,9 +440,16 @@ Array<int> NostalgicProcessor::getUndertowPositions() //return playback position
 {
     Array<int> newpositions;
     
+    /*
     for(int i=0; i<activeUndertowNotes.size(); i++)
     {
         newpositions.set(i, undertowPositions.getUnchecked(activeUndertowNotes.getUnchecked(i)) * 1000./sampleRate);
+    }
+     */
+    
+    for(int i = 0; i<undertowNotes.size(); i++)
+    {
+        newpositions.set(i, undertowNotes.getUnchecked(i)->getUndertowPlayPosition() * 1000./sampleRate);
     }
     
     return newpositions;
