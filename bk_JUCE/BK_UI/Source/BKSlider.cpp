@@ -1423,7 +1423,6 @@ void BKWaveDistanceUndertowSlider::updateSliderPositions(Array<int> newpositions
     for(int i=0; i<newpositions.size(); i++)
     {
         displaySliders.getUnchecked(i)->setValue(newpositions.getUnchecked(i) - wavedistanceSlider->getValue());
-        //displaySliders.getUnchecked(i)->setValue(newpositions.getUnchecked(i));
         displaySliders.getUnchecked(i)->setVisible(true);
     }
     
@@ -1446,14 +1445,9 @@ void BKWaveDistanceUndertowSlider::resized()
     
     sampleImageComponent.setBounds(area);
     
-    //float sliderHeight = area.getHeight() / maxSliders;
-    //float sliderHeight = area.getHeight();
-    
     for(int i=0; i<maxSliders; i++)
     {
         Slider* newSlider = displaySliders.getUnchecked(i);
-        
-        //newSlider->setBounds(area.removeFromTop(sliderHeight));
         newSlider->setBounds(area);
     }
     
@@ -1464,20 +1458,7 @@ void BKWaveDistanceUndertowSlider::sliderDragEnded(Slider *slider)
 {
     if(slider == wavedistanceSlider)
     {
-        int xpos = slider->getPositionOfValue(slider->getValue());
-        //undertowSlider->setTopLeftPosition(xpos, undertowSlider->getY());
-        undertowSlider->setBounds(xpos, undertowSlider->getY(), getWidth() - xpos, undertowSlider->getHeight());
-        undertowSlider->setRange(sliderMin, sliderMax - slider->getValue(), sliderIncrement);
-        //undertowSlider->setRange(sliderMin + slider->getValue(), sliderMax + slider->getValue(), sliderIncrement);
-        
-        for(int i=0; i<maxSliders; i++)
-        {
-            Slider* newSlider = displaySliders.getUnchecked(i);
-            
-            //newSlider->setBounds(area.removeFromTop(sliderHeight));
-            newSlider->setBounds(xpos, newSlider->getY(), getWidth() - xpos, newSlider->getHeight());
-            newSlider->setRange(sliderMin, sliderMax - wavedistanceSlider->getValue(), sliderIncrement);
-        }
+        setWaveDistance(wavedistanceSlider->getValue(), dontSendNotification);
     }
     
     listeners.call(&BKWaveDistanceUndertowSliderListener::BKWaveDistanceUndertowSliderValueChanged,
@@ -1493,13 +1474,11 @@ void BKWaveDistanceUndertowSlider::setWaveDistance(int newwavedist, Notification
     int xpos = wavedistanceSlider->getPositionOfValue(wavedistanceSlider->getValue());
     undertowSlider->setBounds(xpos, undertowSlider->getY(), getWidth() - xpos, undertowSlider->getHeight());
     undertowSlider->setRange(sliderMin, sliderMax - wavedistanceSlider->getValue(), sliderIncrement);
-    //undertowSlider->setRange(sliderMin + wavedistanceSlider->getValue(), sliderMax + wavedistanceSlider->getValue(), sliderIncrement);
-    
+
     for(int i=0; i<maxSliders; i++)
     {
         Slider* newSlider = displaySliders.getUnchecked(i);
-        
-        //newSlider->setBounds(area.removeFromTop(sliderHeight));
+
         newSlider->setBounds(xpos, newSlider->getY(), getWidth() - xpos, newSlider->getHeight());
         newSlider->setRange(sliderMin, sliderMax - wavedistanceSlider->getValue(), sliderIncrement);
     }
