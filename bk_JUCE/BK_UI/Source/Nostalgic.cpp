@@ -230,6 +230,8 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
             //remove from active notes list
             reverseNotes.remove(i);
         }
+        
+        if(!thisNote->isActive()) reverseNotes.remove(i);
     }
 }
 

@@ -61,6 +61,7 @@ timerCallbackCount(0)
     addAndMakeVisible(ovc);
     
     addAndMakeVisible(svc2);
+    addAndMakeVisible(nvc2);
     
     /*
     addAndMakeVisible (levelMeterComponentL = new BKLevelMeterComponent());
@@ -102,7 +103,7 @@ void MainViewController::resized()
     galvc.setBounds(0, 0, gVCWidth+2*gXSpacing, getHeight()*.38);
     
     // Place buttons.
-    float buttonWidth = ((getRight()-galvc.getRight() - 8 * gXSpacing - SOME_PADDING)/8.0f);
+    float buttonWidth = ((getRight()-galvc.getRight() - 9 * gXSpacing - SOME_PADDING)/9.0f);
     float buttonHeight = 30;
     buttons[0]->setBounds(galvc.getRight()+gXSpacing, gYSpacing, buttonWidth, buttonHeight);
     for (int i = 1; i < cDisplayNames.size(); i++)
@@ -133,6 +134,7 @@ void MainViewController::resized()
     ovc.setBounds(kvc.getBounds());
     
     svc2.setBounds(kvc.getBounds());
+    nvc2.setBounds(kvc.getBounds());
     
     int panelWidth = 250;
     preparationPanel->setBounds(getScreenBounds().getRight() - SOME_PADDING, getScreenBounds().getY(), panelWidth, getScreenBounds().getHeight());
@@ -212,6 +214,10 @@ void MainViewController::bkButtonClicked            (Button* b)
     {
         setCurrentDisplay(DisplaySynchronic2);
     }
+    else if (name == cDisplayNames[DisplayNostalgic2])
+    {
+        setCurrentDisplay(DisplayNostalgic2);
+    }
 }
 
 void MainViewController::sliderValueChanged (Slider* slider)
@@ -268,6 +274,8 @@ void MainViewController::timerCallback()
         
         nvc.updateFields();
         nvc.updateModFields();
+        
+        nvc2.updateFields();
     }
     
     if (processor.updateState->synchronicPreparationDidChange)
@@ -358,6 +366,7 @@ void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
     ovc.setVisible(false);
     
     svc2.setVisible(false);
+    nvc2.setVisible(false);
     
     if (type == DisplayKeymap)
     {
@@ -390,6 +399,10 @@ void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
     else if (type == DisplaySynchronic2)
     {
         svc2.setVisible(true);
+    }
+    else if (type == DisplayNostalgic2)
+    {
+        nvc2.setVisible(true);
     }
         
 }

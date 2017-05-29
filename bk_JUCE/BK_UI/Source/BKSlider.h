@@ -230,11 +230,14 @@ public:
     
     String sliderName;
     Label showName;
+    bool textIsAbove;
     
     TextEditor valueTF;
     
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName()                { return sliderName; }
+    void setTextIsAbove(bool nt)    { textIsAbove = nt; }
+    
     void setValue(double newval, NotificationType notify);
     void checkValue(double newval);
     double getValue() {return thisSlider.getValue();}
@@ -369,7 +372,7 @@ private:
 // *******************************************  BKWaveDistanceUndertowSlider ****************************************** //
 // ******************************************************************************************************************** //
 
-/*
+
 class BKWaveDistanceUndertowSliderListener
 {
     
@@ -385,15 +388,18 @@ public:
 
 class BKWaveDistanceUndertowSlider :
 public Component,
-public Slider::Listener,
-public TextEditor::Listener
+public Slider::Listener
+//public BKSingleSliderListener,
+//public TextEditor::Listener
 {
 public:
     BKWaveDistanceUndertowSlider();
     ~BKWaveDistanceUndertowSlider() {};
     
-    Slider wavedistanceSlider;
-    Slider undertowSlider;
+    //ScopedPointer<BKSingleSlider> wavedistanceSlider;
+    //ScopedPointer<BKSingleSlider>  undertowSlider;
+    ScopedPointer<Slider> wavedistanceSlider;
+    ScopedPointer<Slider> undertowSlider;
     OwnedArray<Slider> displaySliders;
     
     String wavedistanceSliderName;
@@ -408,16 +414,22 @@ public:
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName()                { return sliderName; }
     
-    void setWavedistanceValue(double newval, NotificationType notify);
-    void setUndertowValue(double newval, NotificationType notify);
-    void rescaleWavedistanceSlider();
-    void rescaleUndertowSlider();
+    void updateSliderPositions(Array<int> newpositions);
     
-    void sliderValueChanged (Slider *slider) override;
-    void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+    //void setWavedistanceValue(double newval, NotificationType notify);
+    //void setUndertowValue(double newval, NotificationType notify);
+    //void rescaleWavedistanceSlider();
+    //void rescaleUndertowSlider();
+    
+    //void BKSingleSliderValueChanged(String name, double val) override;
+    void sliderValueChanged (Slider *slider) override {};
+    //void textEditorReturnKeyPressed(TextEditor& textEditor) override {};
     void resized() override;
     void sliderDragEnded(Slider *slider) override;
-    void mouseDown (const MouseEvent &event) override;
+    void mouseDown (const MouseEvent &event) override {};
+    
+    void setWaveDistance(int newwavedist, NotificationType notify);
+    void setUndertow(int newundertow, NotificationType notify);
     
     ListenerList<BKWaveDistanceUndertowSliderListener> listeners;
     void addMyListener(BKWaveDistanceUndertowSliderListener* listener)     { listeners.add(listener);      }
@@ -425,19 +437,22 @@ public:
     
 private:
     double sliderMin, sliderMax;
-    double sliderDefaultMin, sliderDefaultMax;
     double sliderIncrement;
+    
+    int maxSliders;
     
     bool newDrag;
     bool clickedOnMinSlider;
+
+    ImageComponent sampleImageComponent;
     
     BKRangeMinSliderLookAndFeel minSliderLookAndFeel; //possibly need to remake for this
     BKRangeMaxSliderLookAndFeel maxSliderLookAndFeel;
+    BKMultiSliderLookAndFeel displaySliderLookAndFeel;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKWaveDistanceUndertowSlider)
     
 };
 
-*/
 
 #endif  // BKSLIDER_H_INCLUDED

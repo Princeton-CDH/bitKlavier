@@ -333,7 +333,6 @@ void NostalgicViewController::bkMessageReceived (const String& message)
 {
     if (message == "nostalgic/update")
     {
-        
         updateFields();
     }
 }

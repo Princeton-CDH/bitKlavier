@@ -19,6 +19,7 @@
 
 class NostalgicViewController2 :
 public BKComponent,
+public BKWaveDistanceUndertowSliderListener,
 //public BKListener,
 //public BKSingleSliderListener,
 //public BKEditableComboBoxListener,
@@ -29,12 +30,16 @@ public:
     NostalgicViewController2(BKAudioProcessor&, BKItemGraph* theGraph);
     ~NostalgicViewController2() {};
     
-    void paint (Graphics&) override {};
-    void resized() override {};
+    BKWaveDistanceUndertowSlider nDisplaySlider;
     
-    //void updateFields();
+    void paint (Graphics&) override;
+    void resized() override;
+    
+    void updateFields();
+    void bkMessageReceived (const String& message);
     //void updateFields(NotificationType notify);
     void timerCallback() override;
+    void BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow) override;
     
 
 private:

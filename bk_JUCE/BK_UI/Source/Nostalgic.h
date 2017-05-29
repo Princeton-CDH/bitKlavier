@@ -238,8 +238,10 @@ public:
     bool reverseTimerExceedsTarget()    { if(reverseTimer > reverseTargetLength) return true; else return false; }
     bool undertowTimerExceedsTarget()   { if(undertowTimer > undertowTargetLength) return true; else return false; }
     
-    uint64 getReversePlayPosition()     { return (reverseStartPosition - reverseTimer); }
-    uint64 getUndertowPlayPosition()    { return (undertowStartPosition + undertowTimer); }
+    inline const uint64 getReversePlayPosition()     { return (reverseStartPosition - reverseTimer); }
+    inline const uint64 getUndertowPlayPosition()    { return (undertowStartPosition + undertowTimer); }
+    
+    bool isActive() { if(reverseStartPosition < reverseTimer) return false; else return true; }
     
 private:
     

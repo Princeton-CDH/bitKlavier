@@ -629,6 +629,7 @@ void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
     editValsTextField->setHighlightedRegion(highlightRange);
 }
 
+
 void BKMultiSlider::mouseDown (const MouseEvent &event)
 {
     if(event.mouseWasClicked())
@@ -1033,6 +1034,8 @@ sliderDefault(def),
 sliderIncrement(increment)
 {
     
+    textIsAbove = true;
+    
     thisSlider.setSliderStyle(Slider::LinearHorizontal);
     thisSlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
     thisSlider.setRange(sliderMin, sliderMax, sliderIncrement);
@@ -1099,16 +1102,32 @@ void BKSingleSlider::checkValue(double newval)
 
 void BKSingleSlider::resized()
 {
-    
-    Rectangle<int> area (getLocalBounds());
-    
-    Rectangle<int> topSlab (area.removeFromTop(area.getHeight() / 3));
-    topSlab.removeFromTop(topSlab.getHeight() - 20);
-    topSlab.removeFromRight(5);
-    valueTF.setBounds(topSlab.removeFromRight(50));
-    showName.setBounds(topSlab.removeFromRight(100));
-    
-    thisSlider.setBounds(area.removeFromTop(20));
+    if(textIsAbove)
+    {
+        Rectangle<int> area (getLocalBounds());
+        
+        //Rectangle<int> textSlab (area.removeFromTop(area.getHeight() / 3));
+        Rectangle<int> textSlab (area.removeFromTop(20));
+        //textSlab.removeFromTop(textSlab.getHeight() - 20);
+        textSlab.removeFromRight(5);
+        valueTF.setBounds(textSlab.removeFromRight(50));
+        showName.setBounds(textSlab.removeFromRight(100));
+        
+        thisSlider.setBounds(area.removeFromTop(15));
+    }
+    else
+    {
+        Rectangle<int> area (getLocalBounds());
+        
+        //Rectangle<int> textSlab (area.removeFromBottom(area.getHeight() / 3));
+        Rectangle<int> textSlab (area.removeFromBottom(20));
+        //textSlab.removeFromBottom(textSlab.getHeight() - 20);
+        textSlab.removeFromRight(5);
+        valueTF.setBounds(textSlab.removeFromRight(50));
+        showName.setBounds(textSlab.removeFromRight(100));
+        
+        thisSlider.setBounds(area.removeFromBottom(15));
+    }
 }
 
 void BKSingleSlider::setValue(double newval, NotificationType notify)
@@ -1338,12 +1357,131 @@ void BKRangeSlider::resized()
 // *******************************************  BKWaveDistanceUndertowSlider ****************************************** //
 // ******************************************************************************************************************** //
 
-/*
+
 BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
 {
     
+    maxSliders = 10;
+    
+    sliderMin = 0;
+    sliderMax = 4000;
+    sliderIncrement = 1;
+    
+    File file("~/bkImages/samplePic.png");
+    FileInputStream inputStream(file);
+    PNGImageFormat sampleImageLoader;
+    sampleImageComponent.setImage(sampleImageLoader.decodeImage(inputStream));
+    sampleImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
+    addAndMakeVisible(sampleImageComponent);
+
+    wavedistanceSlider = new Slider();
+    wavedistanceSlider->setRange(sliderMin, sliderMax, sliderIncrement);
+    wavedistanceSlider->setSliderStyle(Slider::SliderStyle::LinearBar);
+    wavedistanceSlider->addListener(this);
+    addAndMakeVisible(wavedistanceSlider);
+
+    undertowSlider = new Slider();
+    undertowSlider->setRange(sliderMin, sliderMax, sliderIncrement);
+    undertowSlider->setSliderStyle(Slider::SliderStyle::LinearBar);
+    undertowSlider->addListener(this);
+    addAndMakeVisible(undertowSlider);
+    
+    //displaySliderLookAndFeel.setColour(Slider::thumbColourId, Colour::fromRGBA(250, 10, 50, 50));
+    //displaySliderLookAndFeel.setColour(Slider::backgroundColourId, Colour::fromRGBA(250, 10, 50, 50).withAlpha(0.0f));
+    //displaySliderLookAndFeel.setColour(Slider::trackColourId, Colour::fromRGBA(250, 10, 50, 50).withAlpha(0.0f));
+    
+    for(int i=0; i<maxSliders; i++)
+    {
+        displaySliders.insert(0, new Slider());
+        Slider* newSlider = displaySliders.getUnchecked(0);
+        
+        newSlider->setRange(sliderMin, sliderMax, sliderIncrement);
+        newSlider->setLookAndFeel(&displaySliderLookAndFeel);
+        newSlider->setSliderStyle(BKSubSlider::SliderStyle::LinearBar);
+        newSlider->setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
+        newSlider->setInterceptsMouseClicks(false, false);
+        //newSlider->setOpaque(false);
+        //newSlider->setAlpha(0.5);
+        addAndMakeVisible(newSlider);
+    }
+    
 }
-*/
+
+
+void BKWaveDistanceUndertowSlider::updateSliderPositions(Array<int> newpositions)
+{
+    
+    if(newpositions.size() > maxSliders) newpositions.resize(maxSliders);
+    
+    for(int i=0; i<newpositions.size(); i++)
+    {
+        displaySliders.getUnchecked(i)->setValue(newpositions.getUnchecked(i));
+        displaySliders.getUnchecked(i)->setVisible(true);
+        //displaySliders.getUnchecked(i)->toFront(true);
+    }
+    
+    for(int i=newpositions.size(); i<displaySliders.size(); i++)
+    {
+        displaySliders.getUnchecked(i)->setVisible(false);
+    }
+}
+
+
+void BKWaveDistanceUndertowSlider::resized()
+{
+    Rectangle<int> area (getLocalBounds());
+    
+    wavedistanceSlider->setBounds(area.removeFromTop(20));
+    undertowSlider->setBounds(area.removeFromBottom(20));
+    
+    sampleImageComponent.setBounds(area);
+    
+    //float sliderHeight = area.getHeight() / maxSliders;
+    float sliderHeight = area.getHeight();
+    
+    for(int i=0; i<maxSliders; i++)
+    {
+        Slider* newSlider = displaySliders.getUnchecked(i);
+        
+        //newSlider->setBounds(area.removeFromTop(sliderHeight));
+        newSlider->setBounds(area);
+    }
+    
+    
+}
+
+void BKWaveDistanceUndertowSlider::sliderDragEnded(Slider *slider)
+{
+    if(slider == wavedistanceSlider)
+    {
+        int xpos = slider->getPositionOfValue(slider->getValue());
+        //undertowSlider->setTopLeftPosition(xpos, undertowSlider->getY());
+        undertowSlider->setBounds(xpos, undertowSlider->getY(), getWidth() - xpos, undertowSlider->getHeight());
+        undertowSlider->setRange(sliderMin, sliderMax - slider->getValue(), sliderIncrement);
+    }
+    
+    listeners.call(&BKWaveDistanceUndertowSliderListener::BKWaveDistanceUndertowSliderValueChanged,
+                   "nSlider",
+                   wavedistanceSlider->getValue(),
+                   undertowSlider->getValue());
+}
+
+void BKWaveDistanceUndertowSlider::setWaveDistance(int newwavedist, NotificationType notify)
+{
+    wavedistanceSlider->setValue(newwavedist, notify);
+    
+    int xpos = wavedistanceSlider->getPositionOfValue(wavedistanceSlider->getValue());
+    undertowSlider->setBounds(xpos, undertowSlider->getY(), getWidth() - xpos, undertowSlider->getHeight());
+    undertowSlider->setRange(sliderMin, sliderMax - wavedistanceSlider->getValue(), sliderIncrement);
+    
+}
+
+void BKWaveDistanceUndertowSlider::setUndertow(int newundertow, NotificationType notify)
+{
+    undertowSlider->setValue(newundertow, notify);
+}
+
+
 
 // ******************************************************************************************************************** //
 // **************************************************  BKLookAndFeel Stuff ******************************************** //
@@ -1364,7 +1502,8 @@ void BKMultiSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int 
         if (style == Slider::LinearBarVertical)
             p.addRectangle (fx, sliderPos - 2, fw, 4); //band instead of bar, width of 4
         else
-            p.addRectangle (fx, fy, sliderPos - fx, fh);
+            //p.addRectangle (fx, fy, sliderPos - fx, fh);
+            p.addRectangle (sliderPos - 2, fy, 4 , fh);
         
         Colour baseColour (slider.findColour (Slider::thumbColourId)
                            .withMultipliedSaturation (slider.isEnabled() ? 1.0f : 0.5f)
@@ -1376,10 +1515,12 @@ void BKMultiSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int 
         
         g.setColour (baseColour.darker (0.2f));
         
+        
         if (style == Slider::LinearBarVertical)
             g.fillRect (fx, sliderPos, fw, 1.0f);
         else
             g.fillRect (sliderPos, fy, 1.0f, fh);
+         
     }
     else
     {
