@@ -1041,6 +1041,7 @@ sliderIncrement(increment)
     thisSlider.setRange(sliderMin, sliderMax, sliderIncrement);
     thisSlider.setValue(sliderDefault, dontSendNotification);
     thisSlider.addListener(this);
+    thisSlider.addMouseListener(this, true);
     addAndMakeVisible(thisSlider);
     
     showName.setText(name, dontSendNotification);
@@ -1097,6 +1098,25 @@ void BKSingleSlider::checkValue(double newval)
     if(newval >= sliderMin && thisSlider.getMinimum() < sliderMin)
     {
         thisSlider.setRange(sliderMin, thisSlider.getMaximum(), sliderIncrement);
+    }
+}
+
+void BKSingleSlider::mouseUp(const MouseEvent &event)
+{
+    if(event.mouseWasClicked())
+    {
+        if(event.mods.isShiftDown())
+        {
+            thisSlider.setValue(sliderDefault, sendNotification);
+        }
+    }
+}
+
+void BKSingleSlider::mouseDrag(const MouseEvent &e)
+{
+    if(e.mods.isShiftDown())
+    {
+        thisSlider.setValue(round(thisSlider.getValue()), sendNotification);
     }
 }
 
