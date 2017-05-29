@@ -19,7 +19,11 @@
 
 class NostalgicViewController2 :
 public BKComponent,
+//public BKListener,
 public BKWaveDistanceUndertowSliderListener,
+//public BKEditableComboBoxListener,
+//public BKSingleSliderListener,
+//public SliderListener,
 //public BKListener,
 //public BKSingleSliderListener,
 //public BKEditableComboBoxListener,
@@ -31,6 +35,14 @@ public:
     ~NostalgicViewController2() {};
     
     BKWaveDistanceUndertowSlider nDisplaySlider;
+    
+    /*
+    BKEditableComboBox selectCB;
+    BKComboBox lengthModeSelectCB;
+    BKSingleSlider* transpositionSlider;
+    BKSingleSlider* lengthMultiplierSlider;
+    BKSingleSlider* beatsToSkipSlider;
+     */
     
     void paint (Graphics&) override;
     void resized() override;

@@ -406,12 +406,13 @@ public:
     String undertowSliderName;
     
     String sliderName;
-    Label showName;
+    Label wavedistanceName;
+    Label undertowName;
     
     TextEditor wavedistanceValueTF;
     TextEditor undertowValueTF;
     
-    void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
+    void setName(String newName)    { sliderName = newName; }
     String getName()                { return sliderName; }
     
     void updateSliderPositions(Array<int> newpositions);

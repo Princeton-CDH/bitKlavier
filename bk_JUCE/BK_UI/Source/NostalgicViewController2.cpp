@@ -17,6 +17,23 @@ theGraph(theGraph)
     nDisplaySlider.addMyListener(this);
     addAndMakeVisible(nDisplaySlider);
     
+    /*
+    selectCB.setName("Nostalgic");
+    selectCB.addSeparator();
+    selectCB.addListener(this);
+    selectCB.setSelectedItemIndex(0);
+    selectCB.addMyListener(this);
+    //fillSelectCB();
+    addAndMakeVisible(selectCB);
+    
+    lengthModeSelectCB.setName("Length Mode");
+    lengthModeSelectCB.addSeparator();
+    lengthModeSelectCB.addListener(this);
+    lengthModeSelectCB.setSelectedItemIndex(0);
+    //fillModeSelectCB();
+    addAndMakeVisible(lengthModeSelectCB);
+     */
+    
     startTimer(20);
 }
 

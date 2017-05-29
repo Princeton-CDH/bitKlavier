@@ -1113,7 +1113,7 @@ void BKSingleSlider::resized()
         valueTF.setBounds(textSlab.removeFromRight(50));
         showName.setBounds(textSlab.removeFromRight(100));
         
-        thisSlider.setBounds(area.removeFromTop(15));
+        thisSlider.setBounds(area.removeFromTop(20));
     }
     else
     {
@@ -1126,7 +1126,7 @@ void BKSingleSlider::resized()
         valueTF.setBounds(textSlab.removeFromRight(50));
         showName.setBounds(textSlab.removeFromRight(100));
         
-        thisSlider.setBounds(area.removeFromBottom(15));
+        thisSlider.setBounds(area.removeFromBottom(20));
     }
 }
 
@@ -1364,8 +1364,10 @@ BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
     maxSliders = 10;
     
     sliderMin = 0;
-    sliderMax = 4000;
+    sliderMax = 20000;
     sliderIncrement = 1;
+    
+    float skewFactor = 0.7;
     
     File file("~/bkImages/samplePic.png");
     FileInputStream inputStream(file);
@@ -1373,23 +1375,29 @@ BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
     sampleImageComponent.setImage(sampleImageLoader.decodeImage(inputStream));
     sampleImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
     addAndMakeVisible(sampleImageComponent);
+    
+    wavedistanceName.setText("wave distance (ms)", dontSendNotification);
+    wavedistanceName.setJustificationType(Justification::topRight);
+    addAndMakeVisible(wavedistanceName);
+    
+    undertowName.setText("undertow (ms)", dontSendNotification);
+    undertowName.setJustificationType(Justification::bottomRight);
+    addAndMakeVisible(undertowName);
 
     wavedistanceSlider = new Slider();
     wavedistanceSlider->setRange(sliderMin, sliderMax, sliderIncrement);
     wavedistanceSlider->setSliderStyle(Slider::SliderStyle::LinearBar);
     wavedistanceSlider->addListener(this);
+    wavedistanceSlider->setSkewFactor(skewFactor);
     addAndMakeVisible(wavedistanceSlider);
 
     undertowSlider = new Slider();
     undertowSlider->setRange(sliderMin, sliderMax, sliderIncrement);
     undertowSlider->setSliderStyle(Slider::SliderStyle::LinearBar);
     undertowSlider->addListener(this);
+    undertowSlider->setSkewFactor(skewFactor);
     addAndMakeVisible(undertowSlider);
-    
-    //displaySliderLookAndFeel.setColour(Slider::thumbColourId, Colour::fromRGBA(250, 10, 50, 50));
-    //displaySliderLookAndFeel.setColour(Slider::backgroundColourId, Colour::fromRGBA(250, 10, 50, 50).withAlpha(0.0f));
-    //displaySliderLookAndFeel.setColour(Slider::trackColourId, Colour::fromRGBA(250, 10, 50, 50).withAlpha(0.0f));
-    
+
     for(int i=0; i<maxSliders; i++)
     {
         displaySliders.insert(0, new Slider());
@@ -1400,8 +1408,7 @@ BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
         newSlider->setSliderStyle(BKSubSlider::SliderStyle::LinearBar);
         newSlider->setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
         newSlider->setInterceptsMouseClicks(false, false);
-        //newSlider->setOpaque(false);
-        //newSlider->setAlpha(0.5);
+        newSlider->setSkewFactor(skewFactor);
         addAndMakeVisible(newSlider);
     }
     
@@ -1415,9 +1422,9 @@ void BKWaveDistanceUndertowSlider::updateSliderPositions(Array<int> newpositions
     
     for(int i=0; i<newpositions.size(); i++)
     {
-        displaySliders.getUnchecked(i)->setValue(newpositions.getUnchecked(i));
+        displaySliders.getUnchecked(i)->setValue(newpositions.getUnchecked(i) - wavedistanceSlider->getValue());
+        //displaySliders.getUnchecked(i)->setValue(newpositions.getUnchecked(i));
         displaySliders.getUnchecked(i)->setVisible(true);
-        //displaySliders.getUnchecked(i)->toFront(true);
     }
     
     for(int i=newpositions.size(); i<displaySliders.size(); i++)
@@ -1434,10 +1441,13 @@ void BKWaveDistanceUndertowSlider::resized()
     wavedistanceSlider->setBounds(area.removeFromTop(20));
     undertowSlider->setBounds(area.removeFromBottom(20));
     
+    undertowName.setBounds(area);
+    wavedistanceName.setBounds(area);
+    
     sampleImageComponent.setBounds(area);
     
     //float sliderHeight = area.getHeight() / maxSliders;
-    float sliderHeight = area.getHeight();
+    //float sliderHeight = area.getHeight();
     
     for(int i=0; i<maxSliders; i++)
     {
@@ -1458,6 +1468,16 @@ void BKWaveDistanceUndertowSlider::sliderDragEnded(Slider *slider)
         //undertowSlider->setTopLeftPosition(xpos, undertowSlider->getY());
         undertowSlider->setBounds(xpos, undertowSlider->getY(), getWidth() - xpos, undertowSlider->getHeight());
         undertowSlider->setRange(sliderMin, sliderMax - slider->getValue(), sliderIncrement);
+        //undertowSlider->setRange(sliderMin + slider->getValue(), sliderMax + slider->getValue(), sliderIncrement);
+        
+        for(int i=0; i<maxSliders; i++)
+        {
+            Slider* newSlider = displaySliders.getUnchecked(i);
+            
+            //newSlider->setBounds(area.removeFromTop(sliderHeight));
+            newSlider->setBounds(xpos, newSlider->getY(), getWidth() - xpos, newSlider->getHeight());
+            newSlider->setRange(sliderMin, sliderMax - wavedistanceSlider->getValue(), sliderIncrement);
+        }
     }
     
     listeners.call(&BKWaveDistanceUndertowSliderListener::BKWaveDistanceUndertowSliderValueChanged,
@@ -1473,6 +1493,16 @@ void BKWaveDistanceUndertowSlider::setWaveDistance(int newwavedist, Notification
     int xpos = wavedistanceSlider->getPositionOfValue(wavedistanceSlider->getValue());
     undertowSlider->setBounds(xpos, undertowSlider->getY(), getWidth() - xpos, undertowSlider->getHeight());
     undertowSlider->setRange(sliderMin, sliderMax - wavedistanceSlider->getValue(), sliderIncrement);
+    //undertowSlider->setRange(sliderMin + wavedistanceSlider->getValue(), sliderMax + wavedistanceSlider->getValue(), sliderIncrement);
+    
+    for(int i=0; i<maxSliders; i++)
+    {
+        Slider* newSlider = displaySliders.getUnchecked(i);
+        
+        //newSlider->setBounds(area.removeFromTop(sliderHeight));
+        newSlider->setBounds(xpos, newSlider->getY(), getWidth() - xpos, newSlider->getHeight());
+        newSlider->setRange(sliderMin, sliderMax - wavedistanceSlider->getValue(), sliderIncrement);
+    }
     
 }
 
