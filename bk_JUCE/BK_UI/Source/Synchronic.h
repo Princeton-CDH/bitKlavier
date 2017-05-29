@@ -39,6 +39,7 @@ public:
     sAccentMultipliers(p->getAccentMultipliers()),
     sLengthMultipliers(p->getLengthMultipliers()),
     sTransposition(p->getTransposition()),
+    sGain(p->getGain()),
     sClusterThresh(p->getClusterThreshMS()),
     sClusterThreshSec(p->getClusterThreshSEC()),
     tuning(p->getTuning()),
@@ -85,6 +86,7 @@ public:
     sBeatMultipliers(Array<float>({1.0})),
     sAccentMultipliers(Array<float>({1.0})),
     sLengthMultipliers(Array<float>({1.0})),
+    sGain(1.0),
     sClusterThresh(500),
     sClusterThreshSec(.001 * sClusterThresh),
     tuning(tun),
@@ -105,6 +107,7 @@ public:
         sBeatMultipliers = s->getBeatMultipliers();
         sAccentMultipliers = s->getAccentMultipliers();
         sLengthMultipliers = s->getLengthMultipliers();
+        sGain = s->getGain();
         sTransposition = s->getTransposition();
         sClusterThresh = s->getClusterThreshMS();
         sClusterThreshSec = s->getClusterThreshSEC();
@@ -169,6 +172,7 @@ public:
                 sClusterCap == s->getClusterCap() &&
                 (sMode == s->getMode()) &&
                 transp && lens && accents && beats &&
+                sGain == s->getGain() &&
                 sClusterThresh == s->getClusterThreshMS() &&
                 sClusterThreshSec == s->getClusterThreshSEC() &&
                 tuning == s->getTuning() &&
@@ -194,6 +198,8 @@ public:
     inline const Array<float> getAccentMultipliers() const noexcept    {return sAccentMultipliers;     }
     inline const Array<float> getLengthMultipliers() const noexcept    {return sLengthMultipliers;     }
     inline const Array<Array<float>> getTransposition() const noexcept {return sTransposition;         }
+    inline const float getGain() const noexcept                        {return sGain;              }
+    
     //inline const Keymap::Ptr getResetMap() const noexcept              {return resetMap;       }
     
     /*
@@ -230,6 +236,7 @@ public:
     inline void setAccentMultiplier(int whichSlider, float value)      {sAccentMultipliers.set(whichSlider, value);         }
     inline void setLengthMultiplier(int whichSlider, float value)      {sLengthMultipliers.set(whichSlider, value);         }
     inline void setSingleTransposition(int whichSlider, Array<float> values) {sTransposition.set(whichSlider, values); }
+    inline void setGain(float gain)                                    {sGain = gain;                          }
     
     //Adaptive Tempo 1
     /*
@@ -285,6 +292,7 @@ private:
     Array<float> sLengthMultipliers;    //multiply note duration by these
     Array<Array<float>> sTransposition;        //transpose by these
 
+    float sGain;                //gain multiplier
     float sClusterThresh;      //max time between played notes before new cluster is started, in MS
     float sClusterThreshSec;
     

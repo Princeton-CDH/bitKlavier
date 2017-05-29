@@ -8,6 +8,15 @@
   ==============================================================================
 */
 
+/* TODO
+ 
+ need version of SingleSlider that can handle multiple values (for Nostalgic transposition)
+ SingleSlider: 
+    => shift click to return to default
+    => shift drag to move by integer values
+ 
+ */
+
 #ifndef BKSLIDER_H_INCLUDED
 #define BKSLIDER_H_INCLUDED
 
@@ -245,6 +254,9 @@ public:
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void resized() override;
+    
+    void setSkewFactor (double factor, bool symmetricSkew) { thisSlider.setSkewFactor(factor, symmetricSkew); }
+    void setSkewFactorFromMidPoint (double sliderValueToShowAtMidPoint	) { thisSlider.setSkewFactorFromMidPoint(sliderValueToShowAtMidPoint); }
     
     ListenerList<BKSingleSliderListener> listeners;
     void addMyListener(BKSingleSliderListener* listener)     { listeners.add(listener);      }

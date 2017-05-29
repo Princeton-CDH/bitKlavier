@@ -8,6 +8,12 @@
   ==============================================================================
 */
 
+/* TODO
+ 
+ Transposition slider to handle multiple values
+ 
+ */
+
 #pragma once
 
 #include "BKUtilities.h"
@@ -19,14 +25,10 @@
 
 class NostalgicViewController2 :
 public BKComponent,
-//public BKListener,
+public BKListener,
 public BKWaveDistanceUndertowSliderListener,
-//public BKEditableComboBoxListener,
-//public BKSingleSliderListener,
-//public SliderListener,
-//public BKListener,
-//public BKSingleSliderListener,
-//public BKEditableComboBoxListener,
+public BKEditableComboBoxListener,
+public BKSingleSliderListener,
 //public SliderListener,
 public Timer
 {
@@ -36,20 +38,31 @@ public:
     
     BKWaveDistanceUndertowSlider nDisplaySlider;
     
-    /*
+
     BKEditableComboBox selectCB;
     BKComboBox lengthModeSelectCB;
+    
     BKSingleSlider* transpositionSlider;
     BKSingleSlider* lengthMultiplierSlider;
     BKSingleSlider* beatsToSkipSlider;
-     */
+    BKSingleSlider* gainSlider;
+    
     
     void paint (Graphics&) override;
     void resized() override;
     
     void updateFields();
-    void bkMessageReceived (const String& message);
     //void updateFields(NotificationType notify);
+    
+    void bkMessageReceived (const String& message) override;
+    void bkComboBoxDidChange (ComboBox* box) override;
+    void bkTextFieldDidChange (TextEditor&) override {};
+    void bkButtonClicked (Button* b) override { };
+    void BKEditableComboBoxChanged(String name, int index) override;
+    void BKSingleSliderValueChanged(String name, double val) override;
+    void fillSelectCB(void);
+    void fillModeSelectCB(void);
+    
     void timerCallback() override;
     void BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow) override;
     

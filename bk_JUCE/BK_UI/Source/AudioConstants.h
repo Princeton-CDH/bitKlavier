@@ -455,6 +455,11 @@ typedef enum NostalgicSyncMode {
     NostalgicSyncModeNil
 } NostalgicSyncMode;
 
+static const std::vector<std::string> cNostalgicSyncModes = {
+    "Note Length",
+    "Synchronic Sync"
+};
+
 typedef enum NostalgicParameterType {
     NostalgicId = 0,
     NostalgicTuning,

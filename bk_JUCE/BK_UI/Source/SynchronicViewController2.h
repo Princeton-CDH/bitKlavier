@@ -57,6 +57,7 @@ private:
     BKSingleSlider* howManySlider;
     BKSingleSlider* clusterThreshSlider;
     BKRangeSlider* clusterMinMaxSlider;
+    BKSingleSlider* gainSlider;
 
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;

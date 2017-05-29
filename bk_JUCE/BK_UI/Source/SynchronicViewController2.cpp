@@ -67,6 +67,11 @@ theGraph(theGraph)
     clusterMinMaxSlider->addMyListener(this);
     addAndMakeVisible(clusterMinMaxSlider);
     
+    gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
+    gainSlider->setSkewFactorFromMidPoint(1.);
+    gainSlider->addMyListener(this);
+    addAndMakeVisible(gainSlider);
+    
     startTimer(20);
 
 }
@@ -194,6 +199,12 @@ void SynchronicViewController2::BKSingleSliderValueChanged(String name, double v
         prep->setClusterThresh(val);
         active->setClusterThresh(val);
     }
+    else if(name == "gain")
+    {
+        DBG("gain " + String(val));
+        prep->setGain(val);
+        active->setGain(val);
+    }
 }
 
 void SynchronicViewController2::BKRangeSliderValueChanged(String name, double minval, double maxval)
@@ -237,10 +248,11 @@ void SynchronicViewController2::resized()
     comboBoxSlice.reduce(4, 2);
     selectCB.setBounds(comboBoxSlice);
     
-    int oneColumnRowHeight = oneColumn.getHeight() / 3.;
+    int oneColumnRowHeight = oneColumn.getHeight() / 4.;
     howManySlider->setBounds(oneColumn.removeFromTop(oneColumnRowHeight));
     clusterThreshSlider->setBounds(oneColumn.removeFromTop(oneColumnRowHeight));
     clusterMinMaxSlider->setBounds(oneColumn.removeFromTop(oneColumnRowHeight));
+    gainSlider->setBounds(oneColumn.removeFromTop(oneColumnRowHeight));
 
 }
 
@@ -258,6 +270,7 @@ void SynchronicViewController2::updateFields(NotificationType notify)
     clusterThreshSlider->setValue(prep->getClusterThreshMS(), notify);
     clusterMinMaxSlider->setMinValue(prep->getClusterMin(), notify);
     clusterMinMaxSlider->setMaxValue(prep->getClusterMax(), notify);
+    gainSlider->setValue(prep->getGain(), notify);
     
     for(int i = 0; i < paramSliders.size(); i++)
     {

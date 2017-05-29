@@ -1111,7 +1111,7 @@ void BKSingleSlider::resized()
         //textSlab.removeFromTop(textSlab.getHeight() - 20);
         textSlab.removeFromRight(5);
         valueTF.setBounds(textSlab.removeFromRight(50));
-        showName.setBounds(textSlab.removeFromRight(100));
+        showName.setBounds(textSlab.removeFromRight(150));
         
         thisSlider.setBounds(area.removeFromTop(20));
     }
