@@ -10,8 +10,7 @@
 
 */
 
-#ifndef __APPHEADERFILE_R4YQHH__
-#define __APPHEADERFILE_R4YQHH__
+#pragma once
 
 #include "AppConfig.h"
 
@@ -46,5 +45,3 @@ namespace ProjectInfo
     const int          versionNumber  = 0x1;
 }
 #endif
-
-#endif   // __APPHEADERFILE_R4YQHH__
