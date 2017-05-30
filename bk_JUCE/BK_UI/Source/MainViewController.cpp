@@ -10,7 +10,6 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainViewController.h"
-#include "juce_Decibels.h"
 
 //==============================================================================
 MainViewController::MainViewController (BKAudioProcessor& p):
