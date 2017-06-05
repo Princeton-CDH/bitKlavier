@@ -38,6 +38,7 @@ theGraph(theGraph)
     addAndMakeVisible(transpositionSlider);
     
     lengthMultiplierSlider = new BKSingleSlider("note length multiplier", 0, 10, 1, 0.01);
+    lengthMultiplierSlider->setSkewFactorFromMidPoint(1.);
     lengthMultiplierSlider->addMyListener(this);
     addAndMakeVisible(lengthMultiplierSlider);
     
@@ -72,9 +73,10 @@ void NostalgicViewController2::resized()
     lengthModeSelectCB.setBounds(area.removeFromTop(20));
     lengthMultiplierSlider->setBounds(area.removeFromTop(40));
     beatsToSkipSlider->setBounds(lengthMultiplierSlider->getBounds());
+    gainSlider->setBounds(area.removeFromBottom(40));
     
     transpositionSlider->setBounds(leftColumn.removeFromTop(40));
-    gainSlider->setBounds(leftColumn.removeFromBottom(40));
+    
 }
 
 void NostalgicViewController2::BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow)
