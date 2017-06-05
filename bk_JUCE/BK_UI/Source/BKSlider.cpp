@@ -1513,6 +1513,345 @@ void BKWaveDistanceUndertowSlider::setUndertow(int newundertow, NotificationType
 
 
 // ******************************************************************************************************************** //
+// ************************************************** BKStackedSlider ************************************************* //
+// ******************************************************************************************************************** //
+
+
+BKStackedSlider::BKStackedSlider(String sliderName, double min, double max, double defmin, double defmax, double def, double increment):
+sliderName(sliderName),
+sliderMin(min),
+sliderMax(max),
+sliderMinDefault(defmin),
+sliderMaxDefault(defmax),
+sliderDefault(def),
+sliderIncrement(increment)
+{
+
+    showName.setText(sliderName, dontSendNotification);
+    showName.setInterceptsMouseClicks(false, true);
+    addAndMakeVisible(showName);
+    
+    editValsTextField = new TextEditor();
+    editValsTextField->setMultiLine(true);
+    editValsTextField->setName("PARAMTXTEDIT");
+    editValsTextField->addListener(this);
+    addAndMakeVisible(editValsTextField);
+    editValsTextField->setVisible(false);
+    
+    numSliders = 12;
+    numActiveSliders = 1;
+    
+    for(int i=0; i<numSliders; i++)
+    {
+        dataSliders.add(new Slider);
+        Slider* newSlider = dataSliders.getLast();
+        
+        newSlider->setSliderStyle(Slider::LinearBar);
+        newSlider->setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
+        newSlider->setRange(sliderMin, sliderMax, sliderIncrement);
+        newSlider->setValue(sliderDefault, dontSendNotification);
+        newSlider->setLookAndFeel(&stackedSliderLookAndFeel);
+        //newSlider->addListener(this);
+        addAndMakeVisible(newSlider);
+        if(i>0) {
+            newSlider->setVisible(false);
+            activeSliders.insert(i, false);
+        }
+        else activeSliders.insert(0, true);
+    }
+    
+    topSlider = new Slider;
+    topSlider->setSliderStyle(Slider::LinearBar);
+    topSlider->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxLeft, true, 0,0);
+    topSlider->setRange(sliderMin, sliderMax, sliderIncrement);
+    topSlider->setValue(sliderDefault, dontSendNotification);
+    topSlider->addListener(this);
+    topSlider->addMouseListener(this, true);
+    topSlider->setLookAndFeel(&topSliderLookAndFeel);
+    addAndMakeVisible(topSlider);
+    
+    topSliderLookAndFeel.setColour(Slider::thumbColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.0f));
+    
+}
+
+void BKStackedSlider::sliderValueChanged (Slider *slider)
+{
+    //leave unimplelemented; only drag and setTo should actually change values of subSliders
+}
+
+
+void BKStackedSlider::setTo(Array<float> newvals, NotificationType newnotify)
+{
+    
+    int slidersToActivate = newvals.size();
+    if(slidersToActivate > numSliders) slidersToActivate = numSliders;
+    
+    //activate sliders
+    for(int i=0; i<slidersToActivate; i++)
+    {
+        
+        Slider* newSlider = dataSliders.operator[](i);
+        if(newSlider != nullptr)
+        {
+            if(newvals.getUnchecked(i) > sliderMax)
+                newSlider->setRange(sliderMin, newvals.getUnchecked(i), sliderIncrement);
+            
+            if(newvals.getUnchecked(i) < sliderMin)
+                newSlider->setRange(newvals.getUnchecked(i), sliderMax, sliderIncrement);
+            
+            newSlider->setValue(newvals.getUnchecked(i));
+            newSlider->setVisible(true);
+        }
+  
+        activeSliders.set(i, true);
+    }
+    
+    //deactivate unused sliders
+    for(int i=slidersToActivate; i<numSliders; i++)
+    {
+        
+        Slider* newSlider = dataSliders.operator[](i);
+        if(newSlider != nullptr)
+        {
+            newSlider->setValue(sliderDefault);
+            newSlider->setVisible(false);
+        }
+        
+        activeSliders.set(i, false);
+    }
+    
+    //make sure there is one!
+    if(slidersToActivate <= 0)
+    {
+        dataSliders.getFirst()->setValue(sliderDefault);
+        activeSliders.set(0, true);
+    }
+    
+    resetRanges();
+}
+
+
+void BKStackedSlider::mouseDown (const MouseEvent &event)
+{
+    if(event.mouseWasClicked())
+    {
+        clickedSlider = whichSlider();
+        
+        if(event.mods.isCtrlDown())
+        {
+            //showModifyPopupMenu(whichSlider(event));
+            DBG("control-clicked on stacked slider");
+        }
+    }
+}
+
+
+void BKStackedSlider::mouseDrag(const MouseEvent& e)
+{
+    Slider* currentSlider = dataSliders.operator[](clickedSlider);
+    if(currentSlider != nullptr)
+    {
+        if(e.mods.isShiftDown())
+        {
+            currentSlider->setValue(round(topSlider->getValue()));
+            topSlider->setValue(round(topSlider->getValue()));
+        }
+        else currentSlider->setValue(topSlider->getValue(), sendNotification);
+    }
+}
+
+void BKStackedSlider::mouseUp(const MouseEvent& e)
+{
+    listeners.call(&BKStackedSliderListener::BKStackedSliderValueChanged,
+                   getName(),
+                   getAllActiveValues());
+}
+
+void BKStackedSlider::mouseMove(const MouseEvent& e)
+{
+    //topSlider->setValue(topSlider->proportionOfLengthToValue((double)e.x / getWidth()), dontSendNotification);
+    topSlider->setValue(dataSliders.getUnchecked(whichSlider(e))->getValue()); //need to pass e and find closest slider
+}
+
+
+void BKStackedSlider::mouseDoubleClick (const MouseEvent &e)
+{
+
+    //highlight number for current slider
+    
+    StringArray tokens;
+    tokens.addTokens(floatArrayToString(getAllActiveValues()), false); //arrayFloatArrayToString
+    int startPoint = 0;
+    int endPoint;
+    
+    int which = whichSlider();
+    
+    for(int i=0; i < which; i++) {
+        startPoint += tokens[i].length() + 1;
+    }
+    endPoint = startPoint + tokens[which].length();
+
+    editValsTextField->setVisible(true);
+    editValsTextField->toFront(true);
+    editValsTextField->setText(floatArrayToString(getAllActiveValues())); //arrayFloatArrayToString
+    
+    Range<int> highlightRange(startPoint, endPoint);
+    editValsTextField->setHighlightedRegion(highlightRange);
+}
+
+void BKStackedSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
+{
+    if(textEditor.getName() == editValsTextField->getName())
+    {
+        editValsTextField->setVisible(false);
+        editValsTextField->toBack();
+        
+        setTo(stringToFloatArray(textEditor.getText()), sendNotification);
+        clickedSlider = 0;
+        resized();
+        
+        listeners.call(&BKStackedSliderListener::BKStackedSliderValueChanged,
+                       getName(),
+                       getAllActiveValues());
+        
+    }
+}
+
+void BKStackedSlider::resetRanges()
+{
+    
+    double sliderMinTemp = sliderMinDefault;
+    double sliderMaxTemp = sliderMaxDefault;
+    
+    for(int i = 0; i<dataSliders.size(); i++)
+    {
+        Slider* currentSlider = dataSliders.operator[](i);
+        if(currentSlider != nullptr)
+        {
+            if(currentSlider->getValue() > sliderMaxTemp) sliderMaxTemp = currentSlider->getValue();
+            if(currentSlider->getValue() < sliderMinTemp) sliderMinTemp = currentSlider->getValue();
+        }
+    }
+    
+    if( (sliderMax != sliderMaxTemp) || sliderMin != sliderMinTemp)
+    {
+        sliderMax = sliderMaxTemp;
+        sliderMin = sliderMinTemp;
+        
+        for(int i = 0; i<dataSliders.size(); i++)
+        {
+            Slider* currentSlider = dataSliders.operator[](i);
+            if(currentSlider != nullptr)
+            {
+                currentSlider->setRange(sliderMin, sliderMax, sliderIncrement);
+            }
+        }
+        
+        topSlider->setRange(sliderMin, sliderMax, sliderIncrement);
+    }
+}
+
+
+Array<float> BKStackedSlider::getAllActiveValues()
+{
+    Array<float> currentVals;
+    
+    for(int i=0; i<dataSliders.size(); i++)
+    {
+        Slider* currentSlider = dataSliders.operator[](i);
+        if(currentSlider != nullptr)
+        {
+            if(activeSliders.getUnchecked(i))
+               currentVals.add(currentSlider->getValue());
+        }
+
+    }
+    
+    return currentVals;
+}
+
+int BKStackedSlider::whichSlider()
+{
+    float refDistance;
+    int whichSub = 0;
+    
+    Slider* refSlider = dataSliders.getFirst();
+    refDistance = fabs(refSlider->getValue() - topSlider->getValue());
+    
+    for(int i=1; i<dataSliders.size(); i++)
+    {
+        if(activeSliders.getUnchecked(i))
+        {
+            Slider* currentSlider = dataSliders.operator[](i);
+            if(currentSlider != nullptr) {
+                float tempDistance = fabs(currentSlider->getValue() - topSlider->getValue());
+                if(tempDistance < refDistance)
+                {
+                    whichSub = i;
+                    refDistance = tempDistance;
+                }
+            }
+        }
+    }
+    //DBG("whichSlider = " + String(whichSub));
+    
+    return whichSub;
+}
+
+int BKStackedSlider::whichSlider(const MouseEvent& e)
+{
+    float refDistance;
+    float topSliderVal = topSlider->proportionOfLengthToValue((double)e.x / getWidth());
+    
+    int whichSub = 0;
+    
+    Slider* refSlider = dataSliders.getFirst();
+    refDistance = fabs(refSlider->getValue() - topSliderVal);
+    
+    for(int i=1; i<dataSliders.size(); i++)
+    {
+        if(activeSliders.getUnchecked(i))
+        {
+            Slider* currentSlider = dataSliders.operator[](i);
+            if(currentSlider != nullptr) {
+                float tempDistance = fabs(currentSlider->getValue() - topSliderVal);
+                if(tempDistance < refDistance)
+                {
+                    whichSub = i;
+                    refDistance = tempDistance;
+                }
+            }
+        }
+    }
+    //DBG("whichSlider = " + String(whichSub));
+    
+    return whichSub;
+}
+
+
+void BKStackedSlider::resized ()
+{
+    Rectangle<int> area (getLocalBounds());
+    
+    showName.setBounds(area.toNearestInt());
+    showName.setJustificationType(Justification::topRight);
+    //showName.toFront(false);
+    
+    topSlider->setBounds(area);
+    
+    editValsTextField->setBounds(area);
+    editValsTextField->setVisible(false);
+    
+    for(int i=0; i<numSliders; i++)
+    {
+        Slider* newSlider = dataSliders.getUnchecked(i);
+        newSlider->setBounds(area);
+    }
+    
+}
+
+
+// ******************************************************************************************************************** //
 // **************************************************  BKLookAndFeel Stuff ******************************************** //
 // ******************************************************************************************************************** //
 

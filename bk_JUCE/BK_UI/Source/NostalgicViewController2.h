@@ -29,6 +29,7 @@ public BKListener,
 public BKWaveDistanceUndertowSliderListener,
 public BKEditableComboBoxListener,
 public BKSingleSliderListener,
+public BKStackedSliderListener,
 //public SliderListener,
 public Timer
 {
@@ -42,11 +43,11 @@ public:
     BKEditableComboBox selectCB;
     BKComboBox lengthModeSelectCB;
     
-    BKSingleSlider* transpositionSlider;
     BKSingleSlider* lengthMultiplierSlider;
     BKSingleSlider* beatsToSkipSlider;
     BKSingleSlider* gainSlider;
     
+    BKStackedSlider* transpositionSlider;
     
     void paint (Graphics&) override;
     void resized() override;
@@ -65,6 +66,7 @@ public:
     
     void timerCallback() override;
     void BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow) override;
+    void BKStackedSliderValueChanged(String name, Array<float> val) override;
     
 
 private:
