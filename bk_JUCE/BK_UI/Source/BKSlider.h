@@ -497,6 +497,7 @@ public:
     void resetRanges();
     int whichSlider();
     int whichSlider(const MouseEvent& e);
+    void addSlider(NotificationType newnotify);
     
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName()                { return sliderName; }
@@ -531,6 +532,9 @@ private:
     double currentDisplaySliderValue;
     
     Array<float> getAllActiveValues();
+    
+    void showModifyPopupMenu();
+    static void sliderModifyMenuCallback (const int result, BKStackedSlider* ss);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKStackedSlider)
 };

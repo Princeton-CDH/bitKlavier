@@ -1579,6 +1579,13 @@ void BKStackedSlider::sliderValueChanged (Slider *slider)
     //leave unimplelemented; only drag and setTo should actually change values of subSliders
 }
 
+void BKStackedSlider::addSlider(NotificationType newnotify)
+{
+    Array<float> sliderVals = getAllActiveValues();
+    sliderVals.add(sliderDefault);
+    setTo(sliderVals, newnotify);
+}
+
 
 void BKStackedSlider::setTo(Array<float> newvals, NotificationType newnotify)
 {
@@ -1639,8 +1646,7 @@ void BKStackedSlider::mouseDown (const MouseEvent &event)
         
         if(event.mods.isCtrlDown())
         {
-            //showModifyPopupMenu(whichSlider(event));
-            DBG("control-clicked on stacked slider");
+            showModifyPopupMenu();
         }
     }
 }
@@ -1826,6 +1832,30 @@ int BKStackedSlider::whichSlider(const MouseEvent& e)
     //DBG("whichSlider = " + String(whichSub));
     
     return whichSub;
+}
+
+void BKStackedSlider::showModifyPopupMenu()
+{
+    PopupMenu m;
+    m.setLookAndFeel (&getLookAndFeel());
+    m.addItem (1, translate ("add transposition"), true, false);
+    m.addSeparator();
+    
+    m.showMenuAsync (PopupMenu::Options(),
+                     ModalCallbackFunction::forComponent (sliderModifyMenuCallback, this));
+}
+
+void BKStackedSlider::sliderModifyMenuCallback (const int result, BKStackedSlider* ss)
+{
+    if (ss != nullptr)
+    {
+        switch (result)
+        {
+            case 1:   ss->addSlider(sendNotification); break;
+                
+            default:  break;
+        }
+    }
 }
 
 
