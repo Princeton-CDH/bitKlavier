@@ -81,7 +81,6 @@ void NostalgicViewController2::resized()
 
 void NostalgicViewController2::BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow)
 {
-    DBG("got new nostalgic slider vals " + String(wavedist) + " " + String(undertow));
     
     NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
     NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
@@ -188,19 +187,19 @@ void NostalgicViewController2::BKSingleSliderValueChanged(String name, double va
     
     if(name == "note length multiplier")
     {
-        DBG("note length multiplier " + String(val));
+        //DBG("note length multiplier " + String(val));
         prep->setLengthMultiplier(val);
         active->setLengthMultiplier(val);
     }
     else if(name == "beats to skip")
     {
-        DBG("beats to skip " + String(val));
+        //DBG("beats to skip " + String(val));
         prep->setBeatsToSkip(val);
         active->setBeatsToSkip(val);
     }
     else if(name == "gain")
     {
-        DBG("gain " + String(val));
+        //DBG("gain " + String(val));
         prep->setGain(val);
         active->setGain(val);
     }
