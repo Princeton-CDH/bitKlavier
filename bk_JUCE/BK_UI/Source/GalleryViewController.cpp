@@ -37,6 +37,7 @@ processor (p)
     addAndMakeVisible(pianoCB);
     pianoCB.setName("pianoCB");
     pianoCB.addListener(this);
+    pianoCB.addMyListener(this);
     
     pianoCB.addItem("New piano...",1);
     pianoCB.setSelectedId(0, dontSendNotification);
@@ -241,6 +242,11 @@ void GalleryViewController::BKEditableComboBoxChanged(String text, BKEditableCom
     int selectedId = cb->getSelectedId();
     
     processor.currentPiano->setName(text);
+    
+    pianoCB.changeItemText(selectedId, text);
+    
+    pianoCB.setSelectedId(selectedId);
+    
     
     /*
      processor.currentPiano->setName(text);
