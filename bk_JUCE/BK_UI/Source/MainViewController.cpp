@@ -26,6 +26,7 @@ dvc(p, &theGraph),
 ovc(p, &theGraph),
 svc2(p, &theGraph),
 nvc2(p, &theGraph),
+dvc2(p, &theGraph),
 timerCallbackCount(0)
 {
     gen = processor.gallery->getGeneralSettings();
@@ -64,6 +65,7 @@ timerCallbackCount(0)
     
     addAndMakeVisible(svc2);
     addAndMakeVisible(nvc2);
+    addAndMakeVisible(dvc2);
     
     /*
     addAndMakeVisible (levelMeterComponentL = new BKLevelMeterComponent());
@@ -104,7 +106,7 @@ void MainViewController::resized()
     galvc.setBounds(0, 0, gVCWidth+2*gXSpacing, getHeight()*.38);
     
     // Place buttons.
-    float buttonWidth = ((getRight()-galvc.getRight() - 9 * gXSpacing - SOME_PADDING)/9.0f);
+    float buttonWidth = ((getRight()-galvc.getRight() - 10 * gXSpacing - SOME_PADDING)/10.0f);
     float buttonHeight = 30;
     buttons[0]->setBounds(galvc.getRight()+gXSpacing, gYSpacing, buttonWidth, buttonHeight);
     for (int i = 1; i < cDisplayNames.size(); i++)
@@ -136,6 +138,7 @@ void MainViewController::resized()
     
     svc2.setBounds(kvc.getBounds());
     nvc2.setBounds(kvc.getBounds());
+    dvc2.setBounds(kvc.getBounds());
     
     int panelWidth = 250;
     preparationPanel->setBounds(getScreenBounds().getRight() - SOME_PADDING, getScreenBounds().getY(), panelWidth, getScreenBounds().getHeight());
@@ -224,6 +227,10 @@ void MainViewController::bkButtonClicked            (Button* b)
     {
         setCurrentDisplay(DisplayNostalgic2);
     }
+    else if (name == cDisplayNames[DisplayDirect2])
+    {
+        setCurrentDisplay(DisplayDirect2);
+    }
 }
 
 void MainViewController::sliderValueChanged (Slider* slider)
@@ -269,6 +276,8 @@ void MainViewController::timerCallback()
         
         dvc.updateFields();
         dvc.updateModFields();
+        
+        dvc2.updateFields();
     }
     
     if (processor.updateState->nostalgicPreparationDidChange)
@@ -373,6 +382,7 @@ void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
     
     svc2.setVisible(false);
     nvc2.setVisible(false);
+    dvc2.setVisible(false);
     
     if (type == DisplayKeymap)
     {
@@ -401,6 +411,10 @@ void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
     else if (type == DisplayGeneral)
     {
         gvc.setVisible(true);
+    }
+    else if (type == DisplayDirect2)
+    {
+        dvc2.setVisible(true);
     }
     else if (type == DisplaySynchronic2)
     {

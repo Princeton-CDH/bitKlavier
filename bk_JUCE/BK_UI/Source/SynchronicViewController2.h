@@ -54,10 +54,10 @@ private:
     BKComboBox modeSelectCB;
 
     ToggleButton offsetParamStartToggle;
-    BKSingleSlider* howManySlider;
-    BKSingleSlider* clusterThreshSlider;
-    BKRangeSlider* clusterMinMaxSlider;
-    BKSingleSlider* gainSlider;
+    ScopedPointer<BKSingleSlider> howManySlider;
+    ScopedPointer<BKSingleSlider> clusterThreshSlider;
+    ScopedPointer<BKRangeSlider> clusterMinMaxSlider;
+    ScopedPointer<BKSingleSlider> gainSlider;
 
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;
