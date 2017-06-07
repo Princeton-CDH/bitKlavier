@@ -188,6 +188,84 @@ private:
     JUCE_LEAK_DETECTOR(NostalgicPreparation);
 };
 
+
+class NostalgicNoteStuff : public ReferenceCountedObject
+{
+public:
+    
+    typedef ReferenceCountedObjectPtr<NostalgicNoteStuff>   Ptr;
+    typedef Array<NostalgicNoteStuff::Ptr>                  PtrArr;
+    typedef Array<NostalgicNoteStuff::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<NostalgicNoteStuff>                  Arr;
+    typedef OwnedArray<NostalgicNoteStuff, CriticalSection> CSArr;
+    
+    NostalgicNoteStuff(int noteNumber) : notenumber(noteNumber)
+    {
+        resetReverseTimer();
+        resetUndertowTimer();
+    }
+    
+    ~NostalgicNoteStuff() {}
+    
+    void setNoteNumber(int newnote)                         { notenumber = newnote; }
+    inline const int getNoteNumber() const noexcept         { return notenumber; }
+    
+    void setPrepAtKeyOn(NostalgicPreparation::Ptr nprep)    { prepAtKeyOn = nprep; }
+    NostalgicPreparation::Ptr getPrepAtKeyOn()              { return prepAtKeyOn; }
+    
+    void setTuningAtKeyOn(float t)                          { tuningAtKeyOn = t; }
+    inline const float getTuningAtKeyOn() const noexcept    { return tuningAtKeyOn; }
+    
+    void setVelocityAtKeyOn(float v)                        { velocityAtKeyOn = v; }
+    inline const float getVelocityAtKeyOn() const noexcept  { return velocityAtKeyOn; }
+    
+    void incrementReverseTimer(uint64 numsamples)           { reverseTimer += numsamples; }
+    void incrementUndertowTimer(uint64 numsamples)          { undertowTimer += numsamples; }
+    
+    void resetReverseTimer()                                { reverseTimer = 0; }
+    void resetUndertowTimer()                               { undertowTimer = 0; }
+    
+    void setReverseStartPosition(uint64 rsp)                        { reverseStartPosition = rsp; }
+    inline const uint64 getReverseStartPosition() const noexcept    { return reverseStartPosition; }
+    
+    void setUndertowStartPosition(uint64 usp)                        { undertowStartPosition = usp; }
+    inline const uint64 getUndertowStartPosition() const noexcept    { return undertowStartPosition; }
+    
+    void setReverseTargetLength(uint64 rtl)                         { reverseTargetLength = rtl; }
+    void setUndertowTargetLength(uint64 utl)                        { undertowTargetLength = utl; }
+    inline const uint64 getUndertowTargetLength() const noexcept    { return undertowTargetLength; }
+    
+    bool reverseTimerExceedsTarget()    { if(reverseTimer > reverseTargetLength) return true; else return false; }
+    bool undertowTimerExceedsTarget()   { if(undertowTimer > undertowTargetLength) return true; else return false; }
+    
+    inline const uint64 getReversePlayPosition()     { return (reverseStartPosition - reverseTimer); }
+    inline const uint64 getUndertowPlayPosition()    { return (undertowStartPosition + undertowTimer); }
+    
+    bool isActive() { if(reverseStartPosition < reverseTimer) return false; else return true; }
+    
+private:
+    
+    int notenumber;
+    NostalgicPreparation::Ptr prepAtKeyOn;
+    float tuningAtKeyOn;
+    float velocityAtKeyOn;
+    
+    uint64 reverseTimer;
+    uint64 undertowTimer;
+    
+    uint64 reverseStartPosition;
+    uint64 reversePosition;
+    
+    uint64 undertowStartPosition;
+    uint64 undertowPosition;
+    
+    uint64 reverseTargetLength;
+    uint64 undertowTargetLength;
+    
+    JUCE_LEAK_DETECTOR(NostalgicNoteStuff);
+};
+
+
 class NostalgicProcessor : public ReferenceCountedObject
 {
     
@@ -232,6 +310,9 @@ public:
         return tuner;
     }
     
+    Array<int> getPlayPositions();
+    Array<int> getUndertowPositions();
+    
 private:
     int Id;
     BKSynthesiser*              synth;
@@ -242,31 +323,16 @@ private:
     //target Synchronic layer
     SynchronicProcessor::Ptr syncProcessor;
     
-    //store values so that undertow note retains preparation from reverse note
-    NostalgicPreparation::PtrArr preparationAtKeyOn;
-    Array<float> tuningsAtKeyOn;
-    Array<float> velocitiesAtKeyOn;
-    
     Array<uint64> noteLengthTimers;     //store current length of played notes here
     Array<int> activeNotes;             //table of notes currently being played by player
     Array<bool> noteOn;                 // table of booleans representing state of each note
     Array<float> velocities;            //table of velocities played
     
-    Array<uint64> reverseLengthTimers;  //keep track of how long reverse notes have been playing
-    Array<int> activeReverseNotes;      //table of active reverse notes
-    Array<int> reverseTargetLength;     //target reverse length (in samples)
+    OwnedArray<NostalgicNoteStuff> reverseNotes;
+    OwnedArray<NostalgicNoteStuff> undertowNotes;
     
     double sampleRate;
-    
-    //functions
-    void playNote(int channel, int note);
-    
-    //finish timing played note length, called with noteOff
-    void noteLengthTimerOff(int midiNoteNumber);
-    
-    //begin timing reverse note play time
-    void reverseNoteLengthTimerOn(int midiNoteNumber, float noteLength);
-    
+
     //move timers forward by blocksize
     void incrementTimers(int numSamples);
     

@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="R4yQHh" name="BK_UI" projectType="audioplug" version="0.0.1"
               bundleIdentifier="com.BK.BK0" includeBinaryInAppConfig="1" buildVST="1"
-              buildVST3="1" buildAU="1" buildAUv3="1" buildRTAS="0" buildAAX="0"
+              buildVST3="1" buildAU="0" buildAUv3="0" buildRTAS="0" buildAAX="0"
               pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
               pluginManufacturer="manyarrowsmusic" pluginManufacturerCode="Manu"
               pluginCode="R4yq" pluginChannelConfigs="{1,1},{2,2}" pluginIsSynth="1"
@@ -131,10 +131,6 @@
                 file="Source/PluginEditor.cpp"/>
         </GROUP>
         <GROUP id="{444BC2CA-5FF1-6AEB-00B9-DF5D039DBFFE}" name="PreparationVC">
-          <FILE id="dthKFQ" name="SynchronicViewController2.cpp" compile="1"
-                resource="0" file="Source/SynchronicViewController2.cpp"/>
-          <FILE id="U7d1FI" name="SynchronicViewController2.h" compile="0" resource="0"
-                file="Source/SynchronicViewController2.h"/>
           <FILE id="lBHfg4" name="TuningViewController.cpp" compile="1" resource="0"
                 file="Source/TuningViewController.cpp"/>
           <FILE id="DZ40Vl" name="TuningViewController.h" compile="0" resource="0"
@@ -147,10 +143,18 @@
                 file="Source/SynchronicViewController.cpp"/>
           <FILE id="OJ2tuE" name="SynchronicViewController.h" compile="0" resource="0"
                 file="Source/SynchronicViewController.h"/>
+          <FILE id="dthKFQ" name="SynchronicViewController2.cpp" compile="1"
+                resource="0" file="Source/SynchronicViewController2.cpp"/>
+          <FILE id="U7d1FI" name="SynchronicViewController2.h" compile="0" resource="0"
+                file="Source/SynchronicViewController2.h"/>
           <FILE id="nbTvaG" name="NostalgicViewController.cpp" compile="1" resource="0"
                 file="Source/NostalgicViewController.cpp"/>
           <FILE id="rY4uUs" name="NostalgicViewController.h" compile="0" resource="0"
                 file="Source/NostalgicViewController.h"/>
+          <FILE id="Lgqkrt" name="NostalgicViewController2.cpp" compile="1" resource="0"
+                file="Source/NostalgicViewController2.cpp"/>
+          <FILE id="Ek0XSq" name="NostalgicViewController2.h" compile="0" resource="0"
+                file="Source/NostalgicViewController2.h"/>
           <FILE id="kl67Ve" name="DirectViewController.cpp" compile="1" resource="0"
                 file="Source/DirectViewController.cpp"/>
           <FILE id="Z11OMY" name="DirectViewController.h" compile="0" resource="0"
@@ -201,7 +205,10 @@
           <FILE id="whgJO1" name="BKKeyboardState.h" compile="0" resource="0"
                 file="Source/BKKeyboardState.h"/>
         </GROUP>
-        <FILE id="iHLTYB" name="BKMenu.h" compile="0" resource="0" file="Source/BKMenu.h"/>
+        <GROUP id="{4B499D6C-5305-4070-7065-5CC7E1297454}" name="BKMenu">
+          <FILE id="iHLTYB" name="BKMenu.h" compile="0" resource="0" file="Source/BKMenu.h"/>
+          <FILE id="lZxazr" name="BKMenu.cpp" compile="1" resource="0" file="Source/BKMenu.cpp"/>
+        </GROUP>
         <FILE id="kHSUpx" name="BKLookAndFeel.h" compile="0" resource="0" file="Source/BKLookAndFeel.h"/>
         <FILE id="p6ebdl" name="BKLabel.h" compile="0" resource="0" file="Source/BKLabel.h"/>
         <FILE id="Yc4pLT" name="BKTextField.h" compile="0" resource="0" file="Source/BKTextField.h"/>

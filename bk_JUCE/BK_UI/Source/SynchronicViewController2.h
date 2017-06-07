@@ -19,7 +19,15 @@
 #include "BKGraph.h"
 
 
-class SynchronicViewController2    : public BKComponent, public BKListener, public BKMultiSliderListener
+class SynchronicViewController2 :
+public BKComponent,
+public BKListener,
+public BKMultiSliderListener,
+public BKSingleSliderListener,
+public BKRangeSliderListener,
+public BKEditableComboBoxListener,
+public SliderListener,
+public Timer
 {
 public:
     SynchronicViewController2(BKAudioProcessor&, BKItemGraph* theGraph);
@@ -27,11 +35,10 @@ public:
     
     void paint (Graphics&) override;
     void resized() override;
-    
-    //void updateModFields(void);
-    //void updateFields(void);
-    
+
     void updateFields();
+    void updateFields(NotificationType notify);
+    void timerCallback() override;
     
 private:
     BKAudioProcessor& processor;
@@ -42,17 +49,33 @@ private:
     OwnedArray<BKTextField> modSynchronicTF;
     
     OwnedArray<BKMultiSlider> paramSliders;
+    
+    BKEditableComboBox selectCB;
+    BKComboBox modeSelectCB;
 
-    void bkTextFieldDidChange       (TextEditor&)           override { };
+    ToggleButton offsetParamStartToggle;
+    BKSingleSlider* howManySlider;
+    BKSingleSlider* clusterThreshSlider;
+    BKRangeSlider* clusterMinMaxSlider;
+    BKSingleSlider* gainSlider;
+
+    void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;
     
-    void bkComboBoxDidChange        (ComboBox* box)         override { };
+    void bkComboBoxDidChange        (ComboBox* box)         override;
     void bkButtonClicked            (Button* b)             override { };
     
     void multiSliderValueChanged(String name, int whichSlider, Array<float> values) override;
     void multiSliderAllValuesChanged(String name, Array<Array<float>> values) override;
+    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
+    void BKEditableComboBoxChanged(String name, int index) override;
+    
+    void sliderValueChanged(Slider* slider) override{ };
+    void buttonClicked (Button* b) override;
     
     void fillSelectCB(void);
+    void fillModeSelectCB(void);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicViewController2)
 };

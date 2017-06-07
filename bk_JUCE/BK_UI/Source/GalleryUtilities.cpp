@@ -16,7 +16,7 @@ SynchronicProcessor::Ptr Gallery::getSynchronicProcessor(int id)
     for (int i = synchronic.size(); --i >= 0;)
     {
         if(synchronic[i]->getId() == id) {
-            DBG("got synchronic processor id " + String(id));
+            //DBG("got synchronic processor id " + String(id));
             return synchronic[i]->processor;
         }
     }
@@ -24,6 +24,21 @@ SynchronicProcessor::Ptr Gallery::getSynchronicProcessor(int id)
     //else
     DBG("synchronic processor not found, returning first processor");
     return synchronic[0]->processor;
+}
+
+NostalgicProcessor::Ptr Gallery::getNostalgicProcessor(int id)
+{
+    for (int i = nostalgic.size(); --i >= 0;)
+    {
+        if(nostalgic[i]->getId() == id) {
+            //DBG("got nostalgic processor id " + String(id));
+            return nostalgic[i]->processor;
+        }
+    }
+    
+    //else
+    DBG("nostalgic processor not found, returning first processor");
+    return nostalgic[0]->processor;
 }
 
 void Gallery::addPiano()

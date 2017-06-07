@@ -60,6 +60,7 @@ void SynchronicProcessor::setCurrentPlaybackSampleRate(double sr)
     tuner->setCurrentPlaybackSampleRate(sr);
 }
 
+
 void SynchronicProcessor::playNote(int channel, int note, float velocity)
 {
     PianoSamplerNoteDirection noteDirection = Forward;
@@ -349,9 +350,11 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
                         //adaptiveTempoPeriodMultiplier;
     }
     
-    DBG("time in ms to next beat = " + std::to_string(timeToReturn * 1000./sampleRate));
+    //DBG("time in ms to next beat = " + std::to_string(timeToReturn * 1000./sampleRate));
     return timeToReturn * 1000./sampleRate; //optimize later....
 }
+
+
 
 /*
 //adaptive tempo functions

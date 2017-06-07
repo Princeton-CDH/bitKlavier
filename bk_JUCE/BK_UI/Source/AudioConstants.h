@@ -242,6 +242,7 @@ typedef enum BKPreparationDisplay {
     DisplayKeymap,
     DisplayGeneral,
     DisplaySynchronic2,
+    DisplayNostalgic2,
     DisplayNil,
 } BKPreparationDisplay;
 
@@ -253,7 +254,8 @@ static const std::vector<std::string> cDisplayNames = {
     "Tempo",
     "Keymap",
     "General",
-    "Synchronic2"
+    "Synchronic2",
+    "Nostalgic2"
 };
 
 
@@ -374,6 +376,13 @@ typedef enum SynchronicSyncMode {
     SynchronicSyncModeNil
 } SynchronicSyncMode;
 
+static const std::vector<std::string> cSynchronicSyncModes = {
+    "First Note-On",
+    "Any Note-On",
+    "Last Note-Off",
+    "Any Note-Off"
+};
+
 typedef enum SynchronicParameterType {
     SynchronicId = 0,
     SynchronicTuning,
@@ -417,10 +426,26 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "ClusterThresh",
     "Mode",
     "BeatsToSkip",
-    "BeatMults",
-    "LengthMults",
-    "AccentMults",
-    "TranspOffsets"
+    "beat length multipliers",
+    "sustain length multipliers",
+    "accents",
+    "transpositions"
+};
+
+static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc = {
+    {0., 0, 0, 0}, //min, max, default, increment, skew
+    {0., 0, 0, 0},
+    {0., 0, 0, 0},
+    {1., 100, 1, 1.0},
+    {1, 4, 1, 1.0},
+    {2, 8, 8, 1.0},
+    {20, 2000, 500, 10.0},
+    {0, 0, 0},
+    {0, 4, 0, 1.0},
+    {0.1, 2, 1, 0.001},
+    {0.1, 2, 1, 0.001},
+    {0., 2., 1, 0.001},
+    {-12, 12, 0, 0.01}
 };
 
 #pragma mark - Nostalgic
@@ -429,6 +454,11 @@ typedef enum NostalgicSyncMode {
     SynchronicSync,     //reverse note length set by next synchronic pulse
     NostalgicSyncModeNil
 } NostalgicSyncMode;
+
+static const std::vector<std::string> cNostalgicSyncModes = {
+    "Note Length",
+    "Synchronic Sync"
+};
 
 typedef enum NostalgicParameterType {
     NostalgicId = 0,

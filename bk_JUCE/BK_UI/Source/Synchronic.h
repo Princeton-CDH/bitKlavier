@@ -39,6 +39,7 @@ public:
     sAccentMultipliers(p->getAccentMultipliers()),
     sLengthMultipliers(p->getLengthMultipliers()),
     sTransposition(p->getTransposition()),
+    sGain(p->getGain()),
     sClusterThresh(p->getClusterThreshMS()),
     sClusterThreshSec(p->getClusterThreshSEC()),
     tuning(p->getTuning()),
@@ -85,6 +86,7 @@ public:
     sBeatMultipliers(Array<float>({1.0})),
     sAccentMultipliers(Array<float>({1.0})),
     sLengthMultipliers(Array<float>({1.0})),
+    sGain(1.0),
     sClusterThresh(500),
     sClusterThreshSec(.001 * sClusterThresh),
     tuning(tun),
@@ -105,6 +107,7 @@ public:
         sBeatMultipliers = s->getBeatMultipliers();
         sAccentMultipliers = s->getAccentMultipliers();
         sLengthMultipliers = s->getLengthMultipliers();
+        sGain = s->getGain();
         sTransposition = s->getTransposition();
         sClusterThresh = s->getClusterThreshMS();
         sClusterThreshSec = s->getClusterThreshSEC();
@@ -169,14 +172,15 @@ public:
                 sClusterCap == s->getClusterCap() &&
                 (sMode == s->getMode()) &&
                 transp && lens && accents && beats &&
+                sGain == s->getGain() &&
                 sClusterThresh == s->getClusterThreshMS() &&
                 sClusterThreshSec == s->getClusterThreshSEC() &&
                 tuning == s->getTuning() &&
                 tempo == s->getTempoControl());
     }
     
-    //inline const float getTempo() const noexcept                       {return sTempo;                 }
-    inline const int getNumBeats() const noexcept                      {return sNumBeats;             }
+    //inline const float getTempo() const noexcept                       {return sTempo;               }
+    inline const int getNumBeats() const noexcept                      {return sNumBeats;              }
     inline const int getClusterMin() const noexcept                    {return sClusterMin;            }
     inline const int getClusterMax() const noexcept                    {return sClusterMax;            }
     inline const int getClusterCap() const noexcept                    {return sClusterCap;            }
@@ -184,10 +188,18 @@ public:
     inline const float getClusterThreshMS() const noexcept             {return sClusterThresh;         }
     inline const SynchronicSyncMode getMode() const noexcept           {return sMode;                  }
     inline const Array<float> getBeatMultipliers() const noexcept      {return sBeatMultipliers;       }
-    inline const int getBeatsToSkip()                                  {return sBeatsToSkip;           }
+    inline const int getBeatsToSkip() const noexcept                   {return sBeatsToSkip;           }
+    inline const int getOffsetParamToggle() const noexcept
+    {
+        if(getMode() == FirstNoteOnSync || getMode() == AnyNoteOnSync) return getBeatsToSkip() + 1;
+        else return getBeatsToSkip();
+    }
+    
     inline const Array<float> getAccentMultipliers() const noexcept    {return sAccentMultipliers;     }
     inline const Array<float> getLengthMultipliers() const noexcept    {return sLengthMultipliers;     }
     inline const Array<Array<float>> getTransposition() const noexcept {return sTransposition;         }
+    inline const float getGain() const noexcept                        {return sGain;              }
+    
     //inline const Keymap::Ptr getResetMap() const noexcept              {return resetMap;       }
     
     /*
@@ -197,7 +209,7 @@ public:
     inline float getAdaptiveTempo1Subdivisions(void)        {return at1Subdivisions;}
     inline float getAdaptiveTempo1Min(void)                 {return at1Min;}
     inline float getAdaptiveTempo1Max(void)                 {return at1Max;}
-*/
+     */
     
     inline void setClusterThresh(float clusterThresh)
     {
@@ -224,6 +236,7 @@ public:
     inline void setAccentMultiplier(int whichSlider, float value)      {sAccentMultipliers.set(whichSlider, value);         }
     inline void setLengthMultiplier(int whichSlider, float value)      {sLengthMultipliers.set(whichSlider, value);         }
     inline void setSingleTransposition(int whichSlider, Array<float> values) {sTransposition.set(whichSlider, values); }
+    inline void setGain(float gain)                                    {sGain = gain;                          }
     
     //Adaptive Tempo 1
     /*
@@ -279,6 +292,7 @@ private:
     Array<float> sLengthMultipliers;    //multiply note duration by these
     Array<Array<float>> sTransposition;        //transpose by these
 
+    float sGain;                //gain multiplier
     float sClusterThresh;      //max time between played notes before new cluster is started, in MS
     float sClusterThreshSec;
     
@@ -324,6 +338,11 @@ public:
     void keyPressed(int noteNumber, float velocity);
     void keyReleased(int noteNumber, int channel);
     float getTimeToBeatMS(float beatsToSkip);
+    
+    inline const int getBeatMultiplierCounter() const noexcept { return beatMultiplierCounter; }
+    inline const int getAccentMultiplierCounter() const noexcept { return accentMultiplierCounter; }
+    inline const int getLengthMultiplierCounter() const noexcept { return lengthMultiplierCounter; }
+    inline const int getTranspCounter() const noexcept { return transpCounter; }
     
     inline void attachToSynthesiser(BKSynthesiser* main)
     {

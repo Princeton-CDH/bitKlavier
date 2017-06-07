@@ -19,6 +19,7 @@
 #include "SynchronicViewController.h"
 #include "SynchronicViewController2.h"
 #include "NostalgicViewController.h"
+#include "NostalgicViewController2.h"
 #include "DirectViewController.h"
 #include "TuningViewController.h"
 #include "TempoViewController.h"
@@ -73,6 +74,7 @@ private:
     GeneralSettings::Ptr gen;
     
     SynchronicViewController2 svc2;
+    NostalgicViewController2 nvc2;
     
     OwnedArray<TextButton> buttons;
     ScopedPointer<Slider> mainSlider;
