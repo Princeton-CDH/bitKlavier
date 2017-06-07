@@ -28,21 +28,8 @@ svc2(p, &theGraph),
 nvc2(p, &theGraph),
 timerCallbackCount(0)
 {
+    
     gen = processor.gallery->getGeneralSettings();
-    
-    for (int i = 0; i < cDisplayNames.size(); i++)
-    {
-        buttons.add(new TextButton());
-        
-        buttons[i]->setName(cDisplayNames[i]);
-        buttons[i]->setButtonText(cDisplayNames[i]);
-        
-        buttons[i]->changeWidthToFitText();
-        buttons[i]->addListener(this);
-        addAndMakeVisible(buttons[i]);
-        
-    }
-    
     
     preparationPanel = new PreparationPanel(processor);
     addAndMakeVisible(preparationPanel);
@@ -54,16 +41,19 @@ timerCallbackCount(0)
     
     addAndMakeVisible(galvc);
     
-    addAndMakeVisible(gvc);
-    addAndMakeVisible(svc);
-    addAndMakeVisible(nvc);
-    addAndMakeVisible(dvc);
-    addAndMakeVisible(kvc);
-    addAndMakeVisible(tvc);
-    addAndMakeVisible(ovc);
+    overtop.addAndMakeVisible(hideOrShow);
+    hideOrShow.setName("hideOrShow");
+    hideOrShow.addListener(this);
+    hideOrShow.setButtonText(" X ");
     
-    addAndMakeVisible(svc2);
-    addAndMakeVisible(nvc2);
+    addChildComponent(overtop);
+    overtop.addChildComponent(gvc);
+    overtop.addChildComponent(dvc);
+    overtop.addChildComponent(kvc);
+    overtop.addChildComponent(tvc);
+    overtop.addChildComponent(ovc);
+    overtop.addChildComponent(svc2);
+    overtop.addChildComponent(nvc2);
     
     /*
     addAndMakeVisible (levelMeterComponentL = new BKLevelMeterComponent());
@@ -81,7 +71,7 @@ timerCallbackCount(0)
     mainSlider->setTextValueSuffix (" dB");
     mainSlider->addListener(this);
     
-    setCurrentDisplay(DisplayDirect);
+    setCurrentDisplay(DisplayNil);
     
     startTimerHz (50);
     
@@ -98,89 +88,46 @@ void MainViewController::paint (Graphics& g)
     g.fillAll(Colours::dimgrey);
 }
 
-#define SOME_PADDING 350
+#define SOME_PADDING 200
 void MainViewController::resized()
 {
-    galvc.setBounds(0, 0, gVCWidth+2*gXSpacing, getHeight()*.38);
+    galvc.setBounds(0, 0, getScreenBounds().getRight() - SOME_PADDING, 30);
     
-    // Place buttons.
-    float buttonWidth = ((getRight()-galvc.getRight() - 9 * gXSpacing - SOME_PADDING)/9.0f);
-    float buttonHeight = 30;
-    buttons[0]->setBounds(galvc.getRight()+gXSpacing, gYSpacing, buttonWidth, buttonHeight);
-    for (int i = 1; i < cDisplayNames.size(); i++)
-    {
-        buttons[i]->setBounds(buttons[i-1]->getRight()+gXSpacing, gYSpacing, buttonWidth, buttonHeight);
-    }
     
-    /*
-     float kvcH = cKeymapParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
-     float gvcH = cGeneralParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
-     float svcH = cSynchronicParameterTypes.size() * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
-     float nvcH = cNostalgicParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + 1.5 *  gYSpacing;
-     float dvcH = cDirectParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + 1.5 * gYSpacing;
-     float tvcH = cTuningParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
-     float ovcH = cTempoParameterTypes.size()  * (gComponentTextFieldHeight + gYSpacing) + gYSpacing;
-     */
     
-    kvc.setBounds(galvc.getRight() + gXSpacing,
-                  buttons[0]->getBottom() + gYSpacing,
-                  getRight() - galvc.getRight() - 2*gXSpacing - SOME_PADDING,
-                  getHeight()*.38);
-    
-    gvc.setBounds(kvc.getBounds());
-    tvc.setBounds(kvc.getBounds());
-    dvc.setBounds(kvc.getBounds());
-    svc.setBounds(kvc.getBounds());
-    nvc.setBounds(kvc.getBounds());
-    ovc.setBounds(kvc.getBounds());
-    
-    svc2.setBounds(kvc.getBounds());
-    nvc2.setBounds(kvc.getBounds());
-    
-    int panelWidth = 250;
+    int panelWidth = 200;
     preparationPanel->setBounds(getScreenBounds().getRight() - SOME_PADDING, getScreenBounds().getY(), panelWidth, getScreenBounds().getHeight());
     
     viewPort.setBounds(gXSpacing,
-                           kvc.getBottom() + gYSpacing,
+                           galvc.getBottom()+gYSpacing,
                            getScreenBounds().getWidth() - SOME_PADDING - 2*gXSpacing,
-                           getScreenBounds().getBottom() - kvc.getBottom()-2*gYSpacing);
+                           getScreenBounds().getBottom() - galvc.getBottom()-2*gYSpacing);
     
     construction.setSize(viewPort.getWidth(), viewPort.getHeight());
     
-    /*
-    float mainSliderHeight = 320;
-    float mainSliderWidth = 70;
-    float mainSliderTextBoxWidth = 50;
-    float mainSliderTextBoxHeight = 20;
-    mainSlider->setTextBoxStyle (Slider::TextBoxBelow, false, mainSliderTextBoxWidth, mainSliderTextBoxHeight);
+    overtop.setBounds(viewPort.getBounds());
     
-    float levelMeterHeight = mainSliderHeight - mainSliderTextBoxHeight;
-    float levelMeterWidth = 20;
+    hideOrShow.setBounds(gXSpacing,gYSpacing, 20,20);
     
+
+    float X = gXSpacing; float Y = hideOrShow.getBottom()+gYSpacing;
+    float width = overtop.getWidth() - 10;
+    float height = overtop.getHeight() - 25;
     
-    //levelMeterComponent->setBounds(galvc.getRight() + gXSpacing, getBottom()-1.5*levelMeterHeight, levelMeterWidth, levelMeterHeight);
-    levelMeterComponentL->setBounds(kvc.getRight() + gXSpacing,
-                                    kvc.getBottom() - levelMeterHeight - mainSliderTextBoxHeight,
-                                    levelMeterWidth,
-                                    levelMeterHeight);
+    kvc.setBounds(X, Y, width, height);
     
-    mainSlider->setBounds (levelMeterComponentL->getRight() - mainSliderWidth * 0.5 + gXSpacing,
-                           levelMeterComponentL->getBottom() - mainSliderHeight + mainSliderTextBoxHeight,
-                           mainSliderWidth,
-                           mainSliderHeight);
+    gvc.setBounds(X, Y, width, height);
     
+    tvc.setBounds(X, Y, width, height);
     
-    levelMeterComponentR->setBounds(mainSlider->getRight() - mainSliderWidth * 0.5 + gXSpacing,
-                                    kvc.getBottom() - levelMeterHeight - mainSliderTextBoxHeight,
-                                    levelMeterWidth,
-                                    levelMeterHeight);
-     */
+    dvc.setBounds(X, Y, width, height);
     
+    ovc.setBounds(X, Y, width, height);
     
+    svc2.setBounds(X, Y, width, height);
     
-    
-    
-    
+    nvc2.setBounds(X, Y, width, height);
+
     
 }
 
@@ -223,6 +170,10 @@ void MainViewController::bkButtonClicked            (Button* b)
     else if (name == cDisplayNames[DisplayNostalgic2])
     {
         setCurrentDisplay(DisplayNostalgic2);
+    }
+    else if (name == "hideOrShow")
+    {
+        setCurrentDisplay(DisplayNil);
     }
 }
 
@@ -363,16 +314,22 @@ void MainViewController::timerCallback()
 
 void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
 {
+    if (type == DisplayNil) {
+        overtop.setVisible(false);
+        processor.updateState->currentPreparationDisplay = DisplayNil;
+        return;
+    }
+    else
+        overtop.setVisible(true);
+    
     kvc.setVisible(false);
     gvc.setVisible(false);
     tvc.setVisible(false);
     dvc.setVisible(false);
-    svc.setVisible(false);
-    nvc.setVisible(false);
     ovc.setVisible(false);
-    
     svc2.setVisible(false);
     nvc2.setVisible(false);
+    
     
     if (type == DisplayKeymap)
     {
@@ -388,11 +345,11 @@ void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
     }
     else if (type == DisplaySynchronic)
     {
-        svc.setVisible(true);
+        svc2.setVisible(true);
     }
     else if (type == DisplayNostalgic)
     {
-        nvc.setVisible(true);
+        nvc2.setVisible(true);
     }
     else if (type == DisplayDirect)
     {
@@ -401,14 +358,6 @@ void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
     else if (type == DisplayGeneral)
     {
         gvc.setVisible(true);
-    }
-    else if (type == DisplaySynchronic2)
-    {
-        svc2.setVisible(true);
-    }
-    else if (type == DisplayNostalgic2)
-    {
-        nvc2.setVisible(true);
     }
         
 }

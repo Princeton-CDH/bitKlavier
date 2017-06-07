@@ -76,7 +76,6 @@ private:
     SynchronicViewController2 svc2;
     NostalgicViewController2 nvc2;
     
-    OwnedArray<TextButton> buttons;
     ScopedPointer<Slider> mainSlider;
     
     ScopedPointer<BKLevelMeterComponent> levelMeterComponentL;
@@ -99,6 +98,9 @@ private:
     void sliderValueChanged         (Slider* slider)        override;
     
     void setCurrentDisplay(BKPreparationDisplay type);
+    
+    Component overtop;
+    TextButton hideOrShow;;
     
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainViewController)

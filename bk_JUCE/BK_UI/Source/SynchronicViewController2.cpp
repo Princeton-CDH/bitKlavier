@@ -223,8 +223,7 @@ void SynchronicViewController2::BKRangeSliderValueChanged(String name, double mi
 
 void SynchronicViewController2::paint (Graphics& g)
 {
-    g.setColour(Colours::goldenrod);
-    g.drawRect(getLocalBounds(), 1);
+    g.fillAll(Colours::lightgrey);
 }
 
 void SynchronicViewController2::resized()
@@ -397,7 +396,7 @@ void SynchronicViewController2::bkTextFieldDidChange(TextEditor& tf)
     }
 }
 
-void SynchronicViewController2::BKEditableComboBoxChanged(String name, int index)
+void SynchronicViewController2::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
     processor.gallery->getSynchronic(processor.updateState->currentSynchronicId)->setName(name);
     

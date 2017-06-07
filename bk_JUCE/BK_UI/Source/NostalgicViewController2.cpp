@@ -57,8 +57,7 @@ theGraph(theGraph)
 
 void NostalgicViewController2::paint (Graphics& g)
 {
-    g.setColour(Colours::goldenrod);
-    g.drawRect(getLocalBounds(), 1);
+    g.fillAll(Colours::lightgrey);
 }
 
 void NostalgicViewController2::resized()
@@ -92,7 +91,7 @@ void NostalgicViewController2::BKWaveDistanceUndertowSliderValueChanged(String n
     
 }
 
-void NostalgicViewController2::BKEditableComboBoxChanged(String name, int index)
+void NostalgicViewController2::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
     processor.gallery->getNostalgic(processor.updateState->currentNostalgicId)->setName(name);
     

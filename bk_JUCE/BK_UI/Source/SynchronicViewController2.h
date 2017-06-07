@@ -69,7 +69,7 @@ private:
     void multiSliderAllValuesChanged(String name, Array<Array<float>> values) override;
     void BKSingleSliderValueChanged(String name, double val) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
-    void BKEditableComboBoxChanged(String name, int index) override;
+    void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     
     void sliderValueChanged(Slider* slider) override{ };
     void buttonClicked (Button* b) override;

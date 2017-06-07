@@ -49,10 +49,10 @@ private:
     bool connect; int lineOX, lineOY, lineEX, lineEY;
     bool multiple;
     
-    ScopedPointer<BKItem> itemSource;
-    ScopedPointer<BKItem> itemTarget;
-    ScopedPointer<BKItem> itemToSelect;
-    ScopedPointer<BKItem> lastItem;
+    BKItem* itemSource;
+    BKItem* itemTarget;
+    BKItem* itemToSelect;
+    BKItem* lastItem;
     
     
     
