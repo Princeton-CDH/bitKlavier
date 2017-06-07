@@ -33,11 +33,12 @@ theGraph(theGraph)
     fillModeSelectCB();
     addAndMakeVisible(lengthModeSelectCB);
     
-    transpositionSlider = new BKSingleSlider("transposition", -12, 12, 0, 0.01);
+    transpositionSlider = new BKStackedSlider("transpositions", -12, 12, -12, 12, 0, 0.01);
     transpositionSlider->addMyListener(this);
     addAndMakeVisible(transpositionSlider);
     
     lengthMultiplierSlider = new BKSingleSlider("note length multiplier", 0, 10, 1, 0.01);
+    lengthMultiplierSlider->setSkewFactorFromMidPoint(1.);
     lengthMultiplierSlider->addMyListener(this);
     addAndMakeVisible(lengthMultiplierSlider);
     
@@ -67,19 +68,19 @@ void NostalgicViewController2::resized()
     Rectangle<int> displayRow = area.removeFromBottom(area.getHeight() * 0.5);
     nDisplaySlider.setBounds(displayRow);
     
-    selectCB.setBounds(area.removeFromTop(20));
+    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
+    selectCB.setBounds(leftColumn.removeFromTop(20));
     lengthModeSelectCB.setBounds(area.removeFromTop(20));
-    
-    int sliderHeight = area.getHeight() / 3;
-    transpositionSlider->setBounds(area.removeFromTop(sliderHeight));
-    lengthMultiplierSlider->setBounds(area.removeFromTop(sliderHeight));
+    lengthMultiplierSlider->setBounds(area.removeFromTop(40));
     beatsToSkipSlider->setBounds(lengthMultiplierSlider->getBounds());
-    gainSlider->setBounds(area.removeFromTop(sliderHeight));
+    gainSlider->setBounds(area.removeFromBottom(40));
+    
+    transpositionSlider->setBounds(leftColumn.removeFromTop(40));
+    
 }
 
 void NostalgicViewController2::BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow)
 {
-    DBG("got new nostalgic slider vals " + String(wavedist) + " " + String(undertow));
     
     NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
     NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
@@ -111,8 +112,7 @@ void NostalgicViewController2::updateFields(void)
     selectCB.setSelectedItemIndex(processor.updateState->currentNostalgicId, dontSendNotification);
     lengthModeSelectCB.setSelectedItemIndex(prep->getMode(), dontSendNotification);
     
-    Array<float> tempTransp = prep->getTransposition();
-    transpositionSlider->setValue(tempTransp.getFirst(), dontSendNotification);
+    transpositionSlider->setValue(prep->getTransposition(), dontSendNotification);
     lengthMultiplierSlider->setValue(prep->getLengthMultiplier(), dontSendNotification);
     beatsToSkipSlider->setValue(prep->getBeatsToSkip(), dontSendNotification);
     gainSlider->setValue(prep->getGain(), dontSendNotification);
@@ -185,31 +185,33 @@ void NostalgicViewController2::BKSingleSliderValueChanged(String name, double va
     NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
     NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
     
-    if(name == "transposition") {
-        DBG("transposition " + String(val));
-        Array<float> newvals;
-        newvals.add(val);
-        prep->setTransposition(newvals);
-        active->setTransposition(newvals);
-    }
-    else if(name == "note length multiplier")
+    if(name == "note length multiplier")
     {
-        DBG("note length multiplier " + String(val));
+        //DBG("note length multiplier " + String(val));
         prep->setLengthMultiplier(val);
         active->setLengthMultiplier(val);
     }
     else if(name == "beats to skip")
     {
-        DBG("beats to skip " + String(val));
+        //DBG("beats to skip " + String(val));
         prep->setBeatsToSkip(val);
         active->setBeatsToSkip(val);
     }
     else if(name == "gain")
     {
-        DBG("gain " + String(val));
+        //DBG("gain " + String(val));
         prep->setGain(val);
         active->setGain(val);
     }
+}
+
+void NostalgicViewController2::BKStackedSliderValueChanged(String name, Array<float> val)
+{
+    NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
+    NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
+
+    prep->setTransposition(val);
+    active->setTransposition(val);
 }
 
 void NostalgicViewController2::fillSelectCB(void)

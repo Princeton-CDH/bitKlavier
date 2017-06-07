@@ -20,9 +20,6 @@
 #include "BKUtilities.h"
 #include "BKComponent.h"
 
-
-
-
 typedef enum BKMultiSliderType {
     HorizontalMultiSlider = 0,
     VerticalMultiSlider,
@@ -145,6 +142,7 @@ public:
     ListenerList<BKMultiSliderListener> listeners;
     void addMyListener(BKMultiSliderListener* listener)     { listeners.add(listener);      }
     void removeMyListener(BKMultiSliderListener* listener)  { listeners.remove(listener);   }
+    
     void setName(String newName)                            { sliderName = newName; showName.setText(sliderName, dontSendNotification);        }
     String getName()                                        { return sliderName; }
     
@@ -407,8 +405,6 @@ public:
     BKWaveDistanceUndertowSlider();
     ~BKWaveDistanceUndertowSlider() {};
     
-    //ScopedPointer<BKSingleSlider> wavedistanceSlider;
-    //ScopedPointer<BKSingleSlider>  undertowSlider;
     ScopedPointer<Slider> wavedistanceSlider;
     ScopedPointer<Slider> undertowSlider;
     OwnedArray<Slider> displaySliders;
@@ -428,14 +424,7 @@ public:
     
     void updateSliderPositions(Array<int> newpositions);
     
-    //void setWavedistanceValue(double newval, NotificationType notify);
-    //void setUndertowValue(double newval, NotificationType notify);
-    //void rescaleWavedistanceSlider();
-    //void rescaleUndertowSlider();
-    
-    //void BKSingleSliderValueChanged(String name, double val) override;
     void sliderValueChanged (Slider *slider) override {};
-    //void textEditorReturnKeyPressed(TextEditor& textEditor) override {};
     void resized() override;
     void sliderDragEnded(Slider *slider) override;
     void mouseDown (const MouseEvent &event) override {};
@@ -464,6 +453,90 @@ private:
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKWaveDistanceUndertowSlider)
     
+};
+
+
+
+// ******************************************************************************************************************** //
+// ************************************************** BKStackedSlider ************************************************* //
+// ******************************************************************************************************************** //
+
+
+
+class BKStackedSliderListener
+{
+    
+public:
+    
+    //BKStackedSliderListener() {}
+    virtual ~BKStackedSliderListener() {};
+    
+    virtual void BKStackedSliderValueChanged(String name, Array<float> val) = 0; //rewrite all this to pass "this" and check by slider ref instead of name?
+};
+
+class BKStackedSlider :
+public Component,
+public Slider::Listener,
+public TextEditor::Listener
+{
+public:
+    
+    BKStackedSlider(String sliderName, double min, double max, double defmin, double defmax, double def, double increment);
+    ~BKStackedSlider() {};
+    
+    void sliderValueChanged (Slider *slider) override;
+    void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+    void mouseDown (const MouseEvent &event) override;
+    void mouseDrag(const MouseEvent& e) override;
+    void mouseUp(const MouseEvent& e) override;
+    void mouseMove(const MouseEvent& e) override;
+    void mouseDoubleClick (const MouseEvent &e) override;
+    
+    void setTo(Array<float> newvals, NotificationType newnotify);
+    void setValue(Array<float> newvals, NotificationType newnotify) { setTo(newvals, newnotify); }
+    void resetRanges();
+    int whichSlider();
+    int whichSlider(const MouseEvent& e);
+    void addSlider(NotificationType newnotify);
+    
+    void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
+    String getName()                { return sliderName; }
+    
+    void resized() override;
+    
+    ListenerList<BKStackedSliderListener> listeners;
+    void addMyListener(BKStackedSliderListener* listener)     { listeners.add(listener);      }
+    void removeMyListener(BKStackedSliderListener* listener)  { listeners.remove(listener);   }
+    
+private:
+    
+    ScopedPointer<Slider> topSlider; //user interacts with this
+    OwnedArray<Slider> dataSliders;  //displays data, user controls with topSlider
+    Array<bool> activeSliders;
+    
+    ScopedPointer<TextEditor> editValsTextField;
+    
+    int numSliders;
+    int numActiveSliders;
+    int clickedSlider;
+    
+    String sliderName;
+    BKLabel showName;
+    
+    BKMultiSliderLookAndFeel stackedSliderLookAndFeel;
+    BKMultiSliderLookAndFeel topSliderLookAndFeel;
+
+    double sliderMin, sliderMax, sliderMinDefault, sliderMaxDefault;
+    double sliderDefault;
+    double sliderIncrement;
+    double currentDisplaySliderValue;
+    
+    Array<float> getAllActiveValues();
+    
+    void showModifyPopupMenu();
+    static void sliderModifyMenuCallback (const int result, BKStackedSlider* ss);
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKStackedSlider)
 };
 
 
