@@ -20,14 +20,17 @@ galvc(p),
 kvc(p, &theGraph),
 tvc(p, &theGraph),
 gvc(p),
-svc(p, &theGraph),
-nvc(p, &theGraph),
+//svc(p, &theGraph),
+//nvc(p, &theGraph),
 dvc(p, &theGraph),
 ovc(p, &theGraph),
 svc2(p, &theGraph),
 nvc2(p, &theGraph),
 timerCallbackCount(0)
 {
+    
+    addKeyListener(this);
+    
     
     gen = processor.gallery->getGeneralSettings();
     
@@ -99,7 +102,7 @@ void MainViewController::resized()
     preparationPanel->setBounds(getScreenBounds().getRight() - SOME_PADDING, getScreenBounds().getY(), panelWidth, getScreenBounds().getHeight());
     
     viewPort.setBounds(gXSpacing,
-                           galvc.getBottom()+gYSpacing,
+                           galvc.getBottom(),
                            getScreenBounds().getWidth() - SOME_PADDING - 2*gXSpacing,
                            getScreenBounds().getBottom() - galvc.getBottom()-2*gYSpacing);
     
@@ -112,7 +115,7 @@ void MainViewController::resized()
 
     float X = gXSpacing; float Y = hideOrShow.getBottom()+gYSpacing;
     float width = overtop.getWidth() - 10;
-    float height = overtop.getHeight() - 25;
+    float height = overtop.getHeight() - 35;
     
     kvc.setBounds(X, Y, width, height);
     
@@ -132,46 +135,20 @@ void MainViewController::resized()
 }
 
 
+bool MainViewController::keyPressed (const KeyPress& e, Component*)
+{
+    if (e.isKeyCode(27)) // Escape
+    {
+        DBG("trying...");
+        setCurrentDisplay(DisplayNil);
+    }
+}
+
 void MainViewController::bkButtonClicked            (Button* b)
 {
     String name = b->getName();
-    if (name == cDisplayNames[DisplayKeymap])
-    {
-        setCurrentDisplay(DisplayKeymap);
-    }
-    else if (name == cDisplayNames[DisplayDirect])
-    {
-        setCurrentDisplay(DisplayDirect);
-    }
-    else if (name == cDisplayNames[DisplaySynchronic])
-    {
-        setCurrentDisplay(DisplaySynchronic);
-    }
-    else if (name == cDisplayNames[DisplayNostalgic])
-    {
-        setCurrentDisplay(DisplayNostalgic);
-    }
-    else if (name == cDisplayNames[DisplayTempo])
-    {
-        setCurrentDisplay(DisplayTempo);
-    }
-    else if (name == cDisplayNames[DisplayTuning])
-    {
-        setCurrentDisplay(DisplayTuning);
-    }
-    else if (name == cDisplayNames[DisplayGeneral])
-    {
-        setCurrentDisplay(DisplayGeneral);
-    }
-    else if (name == cDisplayNames[DisplaySynchronic2])
-    {
-        setCurrentDisplay(DisplaySynchronic2);
-    }
-    else if (name == cDisplayNames[DisplayNostalgic2])
-    {
-        setCurrentDisplay(DisplayNostalgic2);
-    }
-    else if (name == "hideOrShow")
+    
+    if (name == "hideOrShow")
     {
         setCurrentDisplay(DisplayNil);
     }
@@ -229,8 +206,8 @@ void MainViewController::timerCallback()
         preparationPanel->refill(PreparationTypeNostalgic);
         preparationPanel->refill(PreparationTypeNostalgicMod);
         
-        nvc.updateFields();
-        nvc.updateModFields();
+        //nvc.updateFields();
+        //nvc.updateModFields();
         
         nvc2.updateFields();
     }
@@ -242,8 +219,8 @@ void MainViewController::timerCallback()
         preparationPanel->refill(PreparationTypeSynchronic);
         preparationPanel->refill(PreparationTypeSynchronicMod);
         
-        svc.updateFields();
-        svc.updateModFields();
+        //svc.updateFields();
+        //svc.updateModFields();
         
         svc2.updateFields();
     }
@@ -327,6 +304,10 @@ void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
     tvc.setVisible(false);
     dvc.setVisible(false);
     ovc.setVisible(false);
+    
+    //svc.setVisible(false);
+    //nvc.setVisible(false);
+    
     svc2.setVisible(false);
     nvc2.setVisible(false);
     

@@ -28,9 +28,9 @@ viewPort(viewPort)
     redraw();
     
     leftMost = 0;
-    rightMost = 1500;
+    rightMost = 1000;
     topMost = 0;
-    bottomMost = 1000;
+    bottomMost = 700;
     
     setBounds(leftMost, topMost, rightMost, bottomMost);
 }

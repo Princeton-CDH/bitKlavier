@@ -90,10 +90,17 @@ private:
             return numRows;
         }
         
-        void listBoxItemClicked (int row, const MouseEvent&) override
+        void listBoxItemClicked (int row, const MouseEvent& e) override
         {
             // set selected Preparation
             DBG("clicked..." + String(row));
+
+        }
+        
+        void listBoxItemDoubleClicked (int row, const MouseEvent& e) override
+        {
+            // set selected Preparation
+            DBG("double clicked..." + String(row));
             
             setAndViewPreparation(type, row);
         }
@@ -181,12 +188,6 @@ private:
             
             processor.updateState->displayDidChange = true;
             
-        }
-        
-        void listBoxItemDoubleClicked (int row, const MouseEvent&) override
-        {
-             // set selected Preparation or something
-            DBG("double clicked..." + String(row));
         }
         
         void paintListBoxItem (int rowNumber, Graphics& g,

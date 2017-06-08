@@ -16,13 +16,15 @@
 
 //==============================================================================
 
-class BKTextField    : public TextEditor, public TextEditor::Listener
+class BKTextField    : public TextEditor, public TextEditor::Listener, public KeyListener
 {
 public:
     BKTextField()
     {
         setLookAndFeel(&laf);
         setSize(200,18);
+        
+        setEscapeAndReturnKeysConsumed(false);
     
         lookAndFeelChanged();
     }
@@ -36,6 +38,16 @@ public:
     
 private:
     BKTextFieldLAF laf;
+    
+    inline bool keyPressed (const KeyPress& e, Component*) override
+    {
+        if (e.getKeyCode() == 27)
+        {
+            //exitModa
+        }
+    }
+    
+    
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKTextField)
     

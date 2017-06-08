@@ -36,7 +36,7 @@
 
 #include "BKGraph.h"
 
-class MainViewController :  public Component, private Timer, public BKListener, public Slider::Listener
+class MainViewController :  public Component, private Timer, public BKListener, public Slider::Listener, public KeyListener
 {
     
 public:
@@ -53,6 +53,7 @@ private:
     
     
     
+    
     BKAudioProcessor& processor;
     
     BKItemGraph theGraph;
@@ -66,8 +67,6 @@ private:
     KeymapViewController kvc;
     TuningViewController tvc;
     GeneralViewController gvc;
-    SynchronicViewController svc;
-    NostalgicViewController nvc;
     DirectViewController dvc;
     TempoViewController ovc;
     
@@ -75,6 +74,10 @@ private:
     
     SynchronicViewController2 svc2;
     NostalgicViewController2 nvc2;
+    
+    
+    //SynchronicViewController svc;
+    //NostalgicViewController nvc;
     
     ScopedPointer<Slider> mainSlider;
     
@@ -96,6 +99,7 @@ private:
     void bkComboBoxDidChange        (ComboBox* box)         override{};
     void bkButtonClicked            (Button* b)             override;
     void sliderValueChanged         (Slider* slider)        override;
+    bool keyPressed (const KeyPress& e, Component*) override;
     
     void setCurrentDisplay(BKPreparationDisplay type);
     

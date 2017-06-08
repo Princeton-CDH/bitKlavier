@@ -52,7 +52,7 @@ public:
     bool generalSettingsDidChange = false;
     bool keymapDidChange = false;
     
-    BKPreparationDisplay currentPreparationDisplay = DisplayDirect;
+    BKPreparationDisplay currentPreparationDisplay = DisplayNil;
     bool displayDidChange;
     
     void setAllCurrentIdsTo(int val)
