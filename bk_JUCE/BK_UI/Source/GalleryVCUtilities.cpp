@@ -10,6 +10,9 @@
 
 #include "GalleryViewController.h"
 
+#define TEXT_INTERFACE 0
+
+#if TEXT_INTERFACE
 String GalleryViewController::processPianoMapString(const String& s)
 {
     String temp = "";
@@ -474,3 +477,5 @@ String GalleryViewController::processmodificationMapString(const String& s)
     
     return processor.currentPiano->modificationMapsToString();
 }
+
+#endif

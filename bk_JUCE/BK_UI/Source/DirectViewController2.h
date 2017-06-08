@@ -45,7 +45,7 @@ public:
     void bkComboBoxDidChange (ComboBox* box) override;
     void bkTextFieldDidChange (TextEditor&) override {};
     void bkButtonClicked (Button* b) override { };
-    void BKEditableComboBoxChanged(String name, int index) override;
+    void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override; 
     void BKSingleSliderValueChanged(String name, double val) override;
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
     void fillSelectCB(void);

@@ -108,7 +108,7 @@ void DirectViewController2::bkComboBoxDidChange (ComboBox* box)
     }
 }
 
-void DirectViewController2::BKEditableComboBoxChanged(String name, int index)
+void DirectViewController2::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
     processor.gallery->getDirect(processor.updateState->currentDirectId)->setName(name);
     

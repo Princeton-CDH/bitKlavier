@@ -48,9 +48,7 @@ GeneralViewController::~GeneralViewController()
 
 void GeneralViewController::paint (Graphics& g)
 {
-
-    g.setColour(Colours::goldenrod);
-    g.drawRect(getLocalBounds(), 1);
+    g.fillAll(Colours::lightgrey);
 }
 
 void GeneralViewController::resized()

@@ -25,7 +25,7 @@ void BKEditableComboBox::textEditorReturnKeyPressed(TextEditor& textEditor)
     
     listeners.call(&BKEditableComboBoxListener::BKEditableComboBoxChanged,
                    textEditor.getText(),
-                   getSelectedItemIndex());
+                   this);
     
     removeChildComponent(&nameEditor);
 };

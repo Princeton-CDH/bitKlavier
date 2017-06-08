@@ -79,8 +79,7 @@ void KeymapViewController::reset(void)
 
 void KeymapViewController::paint (Graphics& g)
 {
-    g.setColour(Colours::goldenrod);
-    g.drawRect(getLocalBounds(), 1);
+    g.fillAll(Colours::lightgrey);
 }
 
 void KeymapViewController::resized()

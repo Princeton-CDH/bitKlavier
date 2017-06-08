@@ -38,17 +38,7 @@ private:
 };
 
 
-class BKEditableComboBoxListener
-{
-    
-public:
-    
-    //BKSingleSliderListener() {}
-    virtual ~BKEditableComboBoxListener() {};
-    
-    virtual void BKEditableComboBoxChanged(String name, int index) = 0;
-};
-
+class BKEditableComboBoxListener;
 
 class BKEditableComboBox :
 public ComboBox,
@@ -83,6 +73,18 @@ private:
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKEditableComboBox)
 };
+
+class BKEditableComboBoxListener
+{
+    
+public:
+    
+    //BKSingleSliderListener() {}
+    virtual ~BKEditableComboBoxListener() {};
+    
+    virtual void BKEditableComboBoxChanged(String text, BKEditableComboBox*) = 0;
+};
+
 
 
 #endif  // BKMENU_H_INCLUDED
