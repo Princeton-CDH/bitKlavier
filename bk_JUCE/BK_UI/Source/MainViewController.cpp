@@ -50,7 +50,7 @@ timerCallbackCount(0)
 
     addChildComponent(overtop);
     overtop.addChildComponent(gvc);
-    overtop.addChildComponent(dvc);
+    //overtop.addChildComponent(dvc);
     overtop.addChildComponent(kvc);
     overtop.addChildComponent(tvc);
     overtop.addChildComponent(ovc);
@@ -123,13 +123,13 @@ void MainViewController::resized()
     
     tvc.setBounds(X, Y, width, height);
     
-    dvc2.setBounds(X, Y, width, height);
-    
     ovc.setBounds(X, Y, width, height);
     
     svc2.setBounds(X, Y, width, height);
     
     nvc2.setBounds(X, Y, width, height);
+    
+    dvc2.setBounds(X, Y, width, height);
     
 
     
