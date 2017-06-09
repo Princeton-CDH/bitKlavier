@@ -43,7 +43,6 @@ private:
     OwnedArray<BKTextField> modTuningTF;
     
     
-    
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;
     

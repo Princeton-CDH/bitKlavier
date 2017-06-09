@@ -19,6 +19,8 @@ processor(p),
 graph(theGraph),
 viewPort(viewPort)
 {
+    
+    
     addKeyListener(this);
     
     setWantsKeyboardFocus(true);
@@ -33,6 +35,7 @@ viewPort(viewPort)
     bottomMost = 700;
     
     setBounds(leftMost, topMost, rightMost, bottomMost);
+
 }
 
 BKConstructionSite::~BKConstructionSite(void)
@@ -221,8 +224,12 @@ void BKConstructionSite::itemWasDropped(BKPreparationType type, Array<int> data,
 void BKConstructionSite::mouseDown (const MouseEvent& eo)
 {
     MouseEvent e = eo.getEventRelativeTo(this);
+
+    selected.deselectAll();
     
-    //addAndMakeVisible(lasso = new LassoComponent<BKItem>());
+    addAndMakeVisible(lasso = new LassoComponent<BKItem*>());
+    
+    lasso->beginLasso(eo, this);
     
     if (e.mods.isCommandDown())
     {
@@ -281,9 +288,81 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     
 }
 
+void BKConstructionSite::mouseDrag (const MouseEvent& e)
+{
+    lasso->dragLasso(e);
+    
+    if (!e.mods.isCommandDown())
+    {
+        bool resizeX = false, resizeY = false;
+        for (auto item : graph->getSelectedItems())
+        {
+            item->performDrag(e);
+            
+            int X = item->getX(); int Y = item->getY();
+            
+            if (X < viewPort->getViewPositionX() || X > viewPort->getViewWidth())
+            {
+                if (X < leftMost) leftMost = X;
+                else if (X > rightMost) rightMost = X;
+                resizeX = true;
+            }
+            
+            if (Y < viewPort->getViewPositionY() || Y > viewPort->getViewHeight())
+            {
+                if (Y < topMost)    topMost = Y;
+                else if (Y > bottomMost) bottomMost = Y;
+                resizeY = true;
+            }
+        }
+        
+        setBounds(leftMost, topMost, rightMost - leftMost, bottomMost - topMost);
+        
+        /*
+         if (resizeX)
+         {
+         for (auto item : graph->getSelectedItems())
+         {
+         item->setTopLeftPosition(item->getX()+10, item->getY());
+         }
+         resizeX = false;
+         }
+         
+         if (resizeY)
+         {
+         setSize(getWidth(), getHeight()+abs(offsetY));
+         for (auto item : graph->getSelectedItems())
+         {
+         item->setTopLeftPosition(item->getX(), item->getY()+10);
+         
+         }
+         resizeY = false;
+         }
+         */
+    }
+    
+    lineEX = e.getEventRelativeTo(this).x;
+    lineEY = e.getEventRelativeTo(this).y;
+    
+    DBG("DRAG: "+String(lineEX) + " " +String(lineEY));
+    
+    repaint();
+}
+
 void BKConstructionSite::mouseUp (const MouseEvent& eo)
 {
     MouseEvent e = eo.getEventRelativeTo(this);
+    
+    lasso->endLasso();
+    
+    if (selected.getNumSelected())
+    {
+        graph->deselectAll();
+        
+        for (auto item : selected)  graph->select(item);
+        
+        return;
+    }
     
     connect = false;
     
@@ -315,65 +394,6 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
         }
     }
     
-}
-
-void BKConstructionSite::mouseDrag (const MouseEvent& e)
-{
-    if (!e.mods.isCommandDown())
-    {
-        bool resizeX = false, resizeY = false;
-        for (auto item : graph->getSelectedItems())
-        {
-            item->performDrag(e);
-            
-            int X = item->getX(); int Y = item->getY();
-            
-            if (X < viewPort->getViewPositionX() || X > viewPort->getViewWidth())
-            {
-                if (X < leftMost) leftMost = X;
-                else if (X > rightMost) rightMost = X;
-                resizeX = true;
-            }
-            
-            if (Y < viewPort->getViewPositionY() || Y > viewPort->getViewHeight())
-            {
-                if (Y < topMost)    topMost = Y;
-                else if (Y > bottomMost) bottomMost = Y;
-                resizeY = true;
-            }
-        }
-     
-        setBounds(leftMost, topMost, rightMost - leftMost, bottomMost - topMost);
-        
-        /*
-        if (resizeX)
-        {
-            for (auto item : graph->getSelectedItems())
-            {
-                item->setTopLeftPosition(item->getX()+10, item->getY());
-            }
-            resizeX = false;
-        }
-        
-        if (resizeY)
-        {
-            setSize(getWidth(), getHeight()+abs(offsetY));
-            for (auto item : graph->getSelectedItems())
-            {
-                item->setTopLeftPosition(item->getX(), item->getY()+10);
-
-            }
-            resizeY = false;
-        }
-         */
-    }
-    
-    lineEX = e.getEventRelativeTo(this).x;
-    lineEY = e.getEventRelativeTo(this).y;
-    
-    DBG("DRAG: "+String(lineEX) + " " +String(lineEY));
-    
-    repaint();
 }
 
 void BKConstructionSite::deleteItem (BKItem* item)
@@ -424,3 +444,39 @@ BKItem* BKConstructionSite::getItemAtPoint(const int X, const int Y)
     
     return theItem;
 }
+
+void BKConstructionSite::findLassoItemsInArea (Array <BKItem*>& itemsFound,
+                                  const Rectangle<int>& area)
+{
+    int areaX = area.getX(); int areaY = area.getY(); int areaWidth = area.getWidth(); int areaHeight = area.getHeight();
+    
+    // psuedocode determine if collide: if (x1 + w1) - x2 >= 0 and (x2 + w2) - x1 >= 0
+    
+    for (auto item : graph->getAllItems())
+    {
+        int itemX = item->getX(); int itemWidth = item->getWidth();
+        int itemY = item->getY(); int itemHeight = item->getHeight();
+        
+        if (((itemX + itemWidth - areaX) >= 0) && ((areaX + areaWidth - itemX) >= 0) &&
+            ((itemY + itemHeight - areaY) >= 0) && ((areaY + areaHeight - itemY) >= 0))
+            itemsFound.add(item);
+    }
+    
+    /*
+    for (int x = area.getX(); x < area.getRight(); x++)
+    {
+        for (int y = area.getY(); y < area.getBottom(); y++)
+        {
+            BKItem* item = getItemAtPoint(x,y);
+            
+            if (item != nullptr) itemsFound.add(item);
+        }
+    }
+     */
+}
+
+SelectedItemSet<BKItem*>& BKConstructionSite::getLassoSelection(void)
+{
+    return selected;
+}
+

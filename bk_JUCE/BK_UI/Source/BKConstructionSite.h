@@ -20,7 +20,7 @@
 
 #include "BKGraph.h"
 
-class BKConstructionSite : public BKDraggableComponent, public KeyListener
+class BKConstructionSite : public BKDraggableComponent, public KeyListener, public LassoSource<BKItem*>
 {
 public:
     BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph, Viewport* viewPort);
@@ -54,9 +54,16 @@ private:
     BKItem* itemToSelect;
     BKItem* lastItem;
     
+    LassoComponent<BKItem*>* lasso;
+    
+    SelectedItemSet<BKItem*> selected;
+    
+    void findLassoItemsInArea (Array <BKItem*>& itemsFound,
+                                                   const Rectangle<int>& area) override;
+    
+    SelectedItemSet<BKItem*>& getLassoSelection(void) override;
     
     
-    LassoComponent<BKItem>* lasso;
     
     void draw(void);
     
