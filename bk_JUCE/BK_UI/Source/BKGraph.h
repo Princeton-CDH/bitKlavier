@@ -44,6 +44,8 @@ public:
     void itemIsBeingDragged(const MouseEvent&, Point<int>) override;
     
     void keyPressedWhileSelected(const KeyPress&) override;
+
+    inline String getName(void) { return name; }
     
     inline BKPreparationType getType() const noexcept { return type; }
     inline int getId() const noexcept { return Id; }
@@ -72,9 +74,11 @@ public:
     inline int getSelectedId(void) const noexcept {return currentId;}
     inline void setSelectedId(int Id) { menu.setSelectedId(Id, dontSendNotification); }
     
+    
+    
     inline Point<int> getItemPosition(void)
     {
-        getPosition();
+        return getPosition();
     }
     
     inline void setItemBounds(int X, int Y, int width, int height)
@@ -86,6 +90,7 @@ public:
         processor.currentPiano->configuration->setItemXY(type, Id, X, Y);
     }
     
+    void copy(BKItem::Ptr);
     // Public members
     Point<float> origin;
     
@@ -96,13 +101,15 @@ public:
     
     Point<int> lastClick;
     
+    Point<int> position;
+    
 private:
     BKAudioProcessor& processor;
     Label label;
     BKComboBox menu; int currentId;
     Component fullChild;
     
-    Point<int> position;
+    
     
     
     BKItem::PtrArr connections;
@@ -152,6 +159,7 @@ public:
      */
     
     BKItem* itemWithTypeAndId(BKPreparationType type, int Id);
+    BKItem* get(BKPreparationType type, int Id);
     void add(BKItem* itemToAdd);
     bool contains(BKItem* thisItem);
     void remove(BKItem* itemToRemove);
@@ -238,11 +246,16 @@ public:
         DBG("\n~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n");
     }
     
+    void updateLast(void);
+    
+    inline BKItem::RCArr getLast(void) const noexcept { return last; }
     
     
 private:
     BKAudioProcessor& processor;
     BKItem::RCArr items;
+    
+    BKItem::RCArr last;
     
     BKItem::RCArr preparations;
     

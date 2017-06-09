@@ -1,13 +1,12 @@
 /*
   ==============================================================================
 
-    NostalgicViewController2.h
-    Created: 24 May 2017 7:13:23pm
+    DirectViewController2.h
+    Created: 7 Jun 2017 1:42:55pm
     Author:  Daniel Trueman
 
   ==============================================================================
 */
-
 
 #pragma once
 
@@ -18,52 +17,41 @@
 #include "BKSlider.h"
 #include "BKGraph.h"
 
-class NostalgicViewController2 :
+class DirectViewController2 :
 public BKComponent,
 public BKListener,
-public BKWaveDistanceUndertowSliderListener,
 public BKEditableComboBoxListener,
 public BKSingleSliderListener,
-public BKStackedSliderListener,
-//public SliderListener,
-public Timer
+public BKStackedSliderListener
 {
 public:
-    NostalgicViewController2(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~NostalgicViewController2() {};
     
-    BKWaveDistanceUndertowSlider nDisplaySlider;
-
+    DirectViewController2(BKAudioProcessor&, BKItemGraph* theGraph);
+    ~DirectViewController2() {};
+    
     BKEditableComboBox selectCB;
-    BKComboBox lengthModeSelectCB;
-    
-    ScopedPointer<BKSingleSlider> lengthMultiplierSlider;
-    ScopedPointer<BKSingleSlider> beatsToSkipSlider;
-    ScopedPointer<BKSingleSlider> gainSlider;
     
     ScopedPointer<BKStackedSlider> transpositionSlider;
+    ScopedPointer<BKSingleSlider> gainSlider;
+    ScopedPointer<BKSingleSlider> resonanceGainSlider;
+    ScopedPointer<BKSingleSlider> hammerGainSlider;
     
     void paint (Graphics&) override;
     void resized() override;
     
     void updateFields();
-    //void updateFields(NotificationType notify);
     
     void bkMessageReceived (const String& message) override;
     void bkComboBoxDidChange (ComboBox* box) override;
     void bkTextFieldDidChange (TextEditor&) override {};
     void bkButtonClicked (Button* b) override { };
-    void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
+    void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override; 
     void BKSingleSliderValueChanged(String name, double val) override;
-    void fillSelectCB(void);
-    void fillModeSelectCB(void);
-    
-    void timerCallback() override;
-    void BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow) override;
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
-    
+    void fillSelectCB(void);
 
 private:
+    
     BKAudioProcessor& processor;
     BKItemGraph* theGraph;
 

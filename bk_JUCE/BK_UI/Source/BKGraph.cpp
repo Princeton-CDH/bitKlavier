@@ -63,6 +63,15 @@ BKItem::~BKItem()
     
 }
 
+void BKItem::copy(BKItem::Ptr itemToCopy)
+{
+    name = itemToCopy->getName();
+    position = itemToCopy->getPosition();
+    type = itemToCopy->getType();
+    Id = itemToCopy->getId();
+    currentId = itemToCopy->getSelectedId();
+}
+
 void BKItem::bkComboBoxDidChange    (ComboBox* cb)
 {
     String name = cb->getName();
@@ -260,6 +269,20 @@ void BKItem::disconnectFrom(BKItem* toDisconnect)
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ BKGraph ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
+void BKItemGraph::updateLast(void)
+{
+    last.clear();
+    
+    for (auto item : items)
+    {
+        BKItem* toAdd = new BKItem(item->getType(), item->getId(), processor);
+        
+        toAdd->copy(item);
+        
+        last.add(toAdd);
+    }
+    
+}
 
 void BKItemGraph::add(BKItem* itemToAdd)
 {
@@ -269,6 +292,18 @@ void BKItemGraph::add(BKItem* itemToAdd)
     processor.currentPiano->configuration->addItem(itemToAdd->getType(), itemToAdd->getId());
     
     
+}
+
+BKItem* BKItemGraph::get(BKPreparationType type, int Id)
+{
+    for (auto item : items)
+    {
+        if ((item->getType() == type) && (item->getId() == Id))
+        {
+            return item;
+        }
+    }
+    return nullptr;
 }
 
 bool BKItemGraph::contains(BKItem* thisItem)

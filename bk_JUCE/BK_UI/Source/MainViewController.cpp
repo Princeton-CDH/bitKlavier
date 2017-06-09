@@ -26,6 +26,7 @@ dvc(p, &theGraph),
 ovc(p, &theGraph),
 svc2(p, &theGraph),
 nvc2(p, &theGraph),
+dvc2(p, &theGraph),
 timerCallbackCount(0)
 {
     
@@ -49,14 +50,16 @@ timerCallbackCount(0)
     hideOrShow.addListener(this);
     hideOrShow.setButtonText(" X ");
     
+
     addChildComponent(overtop);
     overtop.addChildComponent(gvc);
-    overtop.addChildComponent(dvc);
+    //overtop.addChildComponent(dvc);
     overtop.addChildComponent(kvc);
     overtop.addChildComponent(tvc);
     overtop.addChildComponent(ovc);
     overtop.addChildComponent(svc2);
     overtop.addChildComponent(nvc2);
+    overtop.addChildComponent(dvc2);
     
     /*
     addAndMakeVisible (levelMeterComponentL = new BKLevelMeterComponent());
@@ -94,11 +97,11 @@ void MainViewController::paint (Graphics& g)
 #define SOME_PADDING 200
 void MainViewController::resized()
 {
+
     galvc.setBounds(0, 0, getScreenBounds().getRight() - SOME_PADDING, 30);
     
-    
-    
     int panelWidth = 200;
+
     preparationPanel->setBounds(getScreenBounds().getRight() - SOME_PADDING, getScreenBounds().getY(), panelWidth, getScreenBounds().getHeight());
     
     viewPort.setBounds(gXSpacing,
@@ -123,13 +126,14 @@ void MainViewController::resized()
     
     tvc.setBounds(X, Y, width, height);
     
-    dvc.setBounds(X, Y, width, height);
-    
     ovc.setBounds(X, Y, width, height);
     
     svc2.setBounds(X, Y, width, height);
     
     nvc2.setBounds(X, Y, width, height);
+    
+    dvc2.setBounds(X, Y, width, height);
+    
 
     
 }
@@ -139,9 +143,9 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
 {
     if (e.isKeyCode(27)) // Escape
     {
-        DBG("trying...");
         setCurrentDisplay(DisplayNil);
     }
+
 }
 
 void MainViewController::bkButtonClicked            (Button* b)
@@ -197,6 +201,8 @@ void MainViewController::timerCallback()
         
         dvc.updateFields();
         dvc.updateModFields();
+        
+        dvc2.updateFields();
     }
     
     if (processor.updateState->nostalgicPreparationDidChange)
@@ -310,6 +316,7 @@ void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
     
     svc2.setVisible(false);
     nvc2.setVisible(false);
+    dvc2.setVisible(false);
     
     
     if (type == DisplayKeymap)
@@ -334,7 +341,7 @@ void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
     }
     else if (type == DisplayDirect)
     {
-        dvc.setVisible(true);
+        dvc2.setVisible(true);
     }
     else if (type == DisplayGeneral)
     {

@@ -252,6 +252,7 @@ static const std::vector<std::string> cDisplayNames = {
     "Tempo",
     "Keymap",
     "General"
+
 };
 
 

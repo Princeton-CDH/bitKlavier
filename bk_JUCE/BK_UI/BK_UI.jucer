@@ -12,7 +12,7 @@
               jucerVersion="5.0.2" companyName="manyarrowsmusic" companyEmail="dtrueman@princeton.edu"
               maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
               displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Dark"
-              buildStandalone="0" enableIAA="0">
+              buildStandalone="1" enableIAA="0">
   <MAINGROUP id="s4R02g" name="BK_UI">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
       <GROUP id="{19157329-C279-4066-03E0-75F988B82181}" name="Constants">
@@ -159,6 +159,10 @@
                 file="Source/DirectViewController.cpp"/>
           <FILE id="Z11OMY" name="DirectViewController.h" compile="0" resource="0"
                 file="Source/DirectViewController.h"/>
+          <FILE id="Bm0yvn" name="DirectViewController2.cpp" compile="1" resource="0"
+                file="Source/DirectViewController2.cpp"/>
+          <FILE id="vmiCDv" name="DirectViewController2.h" compile="0" resource="0"
+                file="Source/DirectViewController2.h"/>
         </GROUP>
         <FILE id="FY0jbU" name="KeymapViewController.cpp" compile="1" resource="0"
               file="Source/KeymapViewController.cpp"/>

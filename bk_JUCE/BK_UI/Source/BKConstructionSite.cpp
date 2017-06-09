@@ -90,6 +90,7 @@ void BKConstructionSite::paint(Graphics& g)
 
 void BKConstructionSite::itemIsBeingDragged(BKItem* thisItem, Point<int> startPosition)
 {
+    graph->updateLast();
     repaint();
 }
 
@@ -219,6 +220,8 @@ void BKConstructionSite::itemWasDropped(BKPreparationType type, Array<int> data,
         
         addAndMakeVisible(toAdd);
     }
+    
+    graph->updateLast();
 }
 
 void BKConstructionSite::mouseDown (const MouseEvent& eo)
@@ -233,7 +236,6 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     
     if (e.mods.isCommandDown())
     {
-        // begin connector drag
         
         itemSource = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
         
@@ -408,6 +410,8 @@ bool BKConstructionSite::keyPressed (const KeyPress& e, Component*)
     
     if (e.isKeyCode(127))
     {
+        graph->updateLast();
+        
         BKItem::PtrArr selectedItems = graph->getSelectedItems();
         
         for (int i = selectedItems.size(); --i >= 0;)
@@ -417,6 +421,31 @@ bool BKConstructionSite::keyPressed (const KeyPress& e, Component*)
         
         repaint();
     }
+    else if ((e.getModifiers().isCommandDown() || e.getModifiers().isCtrlDown()) && e.isKeyCode(90))
+    {
+        // Cmd/Ctrl-Z UNDO
+        DBG("undo");
+        
+        for (auto toAdd : graph->getLast())
+        {
+            
+            if (!graph->contains(toAdd))
+            {
+                graph->add(toAdd);
+            
+                toAdd->setItemBounds(toAdd->position.x, toAdd->position.y, 150, 20);
+                
+                addAndMakeVisible(toAdd);
+            }
+            else
+            {
+                // reposition if already contains
+                graph->get(toAdd->getType(), toAdd->getId())
+                        ->setTopLeftPosition(toAdd->position.x, toAdd->position.y);
+            }
+        }
+    }
+    
 }
 
 BKItem* BKConstructionSite::getItemAtPoint(const int X, const int Y)
