@@ -17,13 +17,14 @@ processor(p),
 theGraph(theGraph)
 {
 
+    
     addAndMakeVisible(selectCB);
     selectCB.setName("Keymap");
     selectCB.addSeparator();
     selectCB.addListener(this);
     //keymapSelectCB.setEditableText(true);
     selectCB.setSelectedItemIndex(0);
-    
+     
     
     // Absolute Keyboard
     addAndMakeVisible (absoluteKeyboardComponent =

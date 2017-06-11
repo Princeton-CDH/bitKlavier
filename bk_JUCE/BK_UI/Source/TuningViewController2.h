@@ -36,11 +36,6 @@ public:
     
     void updateFields();
     
-private:
-    
-    BKAudioProcessor& processor;
-    BKItemGraph* theGraph;
-    
     //basics
     BKEditableComboBox selectCB;
     BKComboBox scaleCB;
@@ -84,6 +79,11 @@ private:
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(String name, double val) override {};
     void fillSelectCB(void);
+    
+private:
+    
+    BKAudioProcessor& processor;
+    BKItemGraph* theGraph;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningViewController2)
     

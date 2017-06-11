@@ -14,12 +14,12 @@
 void BKEditableComboBox::mouseDoubleClick (const MouseEvent &event)
 {
 
-    //addAndMakeVisible(nameEditor);
-    nameEditor.setVisible(true);
-    nameEditor.setOpaque(true);
-    nameEditor.toFront(true);
+    addAndMakeVisible(nameEditor);
+    //nameEditor.setVisible(true);
+    //nameEditor.setOpaque(true);
+    //nameEditor.toFront(true);
     nameEditor.setBounds(getLocalBounds());
-    //nameEditor.grabKeyboardFocus();
+    nameEditor.grabKeyboardFocus();
     nameEditor.setText(getItemText(getSelectedItemIndex()));
 }
 
@@ -29,10 +29,12 @@ void BKEditableComboBox::textEditorReturnKeyPressed(TextEditor& textEditor)
     
     DBG("BKEditableComboBox return key pressed");
     
+    
     listeners.call(&BKEditableComboBoxListener::BKEditableComboBoxChanged,
                    textEditor.getText(),
                    this);
+     
     
-    nameEditor.setVisible(false);
-    //removeChildComponent(&nameEditor);
+    //nameEditor.setVisible(false);
+    removeChildComponent(&nameEditor);
 };
