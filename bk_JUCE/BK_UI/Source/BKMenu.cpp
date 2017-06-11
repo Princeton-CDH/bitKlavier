@@ -10,12 +10,16 @@
 
 #include "BKMenu.h"
 
+
 void BKEditableComboBox::mouseDoubleClick (const MouseEvent &event)
 {
 
-    addAndMakeVisible(nameEditor);
+    //addAndMakeVisible(nameEditor);
+    nameEditor.setVisible(true);
+    nameEditor.setOpaque(true);
+    nameEditor.toFront(true);
     nameEditor.setBounds(getLocalBounds());
-    nameEditor.grabKeyboardFocus();
+    //nameEditor.grabKeyboardFocus();
     nameEditor.setText(getItemText(getSelectedItemIndex()));
 }
 
@@ -23,9 +27,12 @@ void BKEditableComboBox::mouseDoubleClick (const MouseEvent &event)
 void BKEditableComboBox::textEditorReturnKeyPressed(TextEditor& textEditor)
 {
     
+    DBG("BKEditableComboBox return key pressed");
+    
     listeners.call(&BKEditableComboBoxListener::BKEditableComboBoxChanged,
                    textEditor.getText(),
                    this);
     
-    removeChildComponent(&nameEditor);
+    nameEditor.setVisible(false);
+    //removeChildComponent(&nameEditor);
 };

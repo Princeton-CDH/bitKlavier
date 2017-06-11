@@ -51,8 +51,10 @@ public:
         setSize(200,20);
         
         lookAndFeelChanged();
-        
+
         nameEditor.setName("NAMETXTEDIT");
+        addAndMakeVisible(nameEditor);
+        nameEditor.setVisible(false);
         nameEditor.addListener(this);
     }
     
@@ -79,7 +81,6 @@ class BKEditableComboBoxListener
     
 public:
     
-    //BKSingleSliderListener() {}
     virtual ~BKEditableComboBoxListener() {};
     
     virtual void BKEditableComboBoxChanged(String text, BKEditableComboBox*) = 0;

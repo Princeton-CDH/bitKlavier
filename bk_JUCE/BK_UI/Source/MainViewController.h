@@ -23,6 +23,7 @@
 #include "DirectViewController.h"
 #include "DirectViewController2.h"
 #include "TuningViewController.h"
+#include "TuningViewController2.h"
 #include "TempoViewController.h"
 
 #include "GeneralViewController.h"
@@ -75,7 +76,8 @@ private:
     
     SynchronicViewController2 svc2;
     NostalgicViewController2 nvc2;
-    DirectViewController2 dvc2; 
+    DirectViewController2 dvc2;
+    TuningViewController2 tvc2;
     
     
     //SynchronicViewController svc;

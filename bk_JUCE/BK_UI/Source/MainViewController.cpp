@@ -27,6 +27,7 @@ ovc(p, &theGraph),
 svc2(p, &theGraph),
 nvc2(p, &theGraph),
 dvc2(p, &theGraph),
+tvc2(p, &theGraph),
 timerCallbackCount(0)
 {
     
@@ -60,6 +61,7 @@ timerCallbackCount(0)
     overtop.addChildComponent(svc2);
     overtop.addChildComponent(nvc2);
     overtop.addChildComponent(dvc2);
+    overtop.addChildComponent(tvc2);
     
     /*
     addAndMakeVisible (levelMeterComponentL = new BKLevelMeterComponent());
@@ -133,6 +135,8 @@ void MainViewController::resized()
     nvc2.setBounds(X, Y, width, height);
     
     dvc2.setBounds(X, Y, width, height);
+    
+    tvc2.setBounds(X, Y, width, height);
     
 
     
@@ -240,6 +244,8 @@ void MainViewController::timerCallback()
         
         tvc.updateFields();
         tvc.updateModFields();
+        
+        tvc2.updateFields();
     }
     
     if (processor.updateState->tempoPreparationDidChange)
@@ -317,6 +323,7 @@ void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
     svc2.setVisible(false);
     nvc2.setVisible(false);
     dvc2.setVisible(false);
+    tvc2.setVisible(false);
     
     
     if (type == DisplayKeymap)
@@ -325,7 +332,7 @@ void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
     }
     else if (type == DisplayTuning)
     {
-        tvc.setVisible(true);
+        tvc2.setVisible(true);
     }
     else if (type == DisplayTempo)
     {
