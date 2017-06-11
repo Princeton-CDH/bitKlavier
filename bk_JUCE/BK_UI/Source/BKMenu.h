@@ -59,6 +59,9 @@ public:
         //nameEditor.setVisible(false);
         nameEditor.setOpaque(true);
         nameEditor.addListener(this);
+        
+        lastItemId = 0;
+
     }
     
     ~BKEditableComboBox()
@@ -75,6 +78,7 @@ public:
 private:
         
     BKTextField nameEditor;
+    int lastItemId;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKEditableComboBox)
 };

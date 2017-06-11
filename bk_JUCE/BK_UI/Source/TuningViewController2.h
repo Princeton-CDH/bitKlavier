@@ -73,7 +73,7 @@ public:
     
     //other overrides
     void bkMessageReceived (const String& message) override {};
-    void bkComboBoxDidChange (ComboBox* box) override {};
+    void bkComboBoxDidChange (ComboBox* box) override;
     void bkTextFieldDidChange (TextEditor&) override {};
     void bkButtonClicked (Button* b) override { };
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;

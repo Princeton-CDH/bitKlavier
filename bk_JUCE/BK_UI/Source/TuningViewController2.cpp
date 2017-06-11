@@ -18,12 +18,13 @@ theGraph(theGraph)
 {
 
     
-    addAndMakeVisible(selectCB);
-    selectCB.setName("Keymap");
+    selectCB.setName("Tuning");
     selectCB.addSeparator();
     selectCB.addListener(this);
-    //keymapSelectCB.setEditableText(true);
     selectCB.setSelectedItemIndex(0);
+    selectCB.addMyListener(this);
+    fillSelectCB();
+    addAndMakeVisible(selectCB);
      
     
     // Absolute Keyboard
@@ -39,8 +40,7 @@ theGraph(theGraph)
     lastAbsoluteKeyPressed = 0;
     
     lastCustomKeyPressed = 0;
-    
-    fillSelectCB();
+
     
     updateFields();
 }
@@ -92,15 +92,29 @@ void TuningViewController2::fillSelectCB(void)
     
 }
 
+void TuningViewController2::bkComboBoxDidChange (ComboBox* box)
+{
+    String name = box->getName();
+    
+    if (name == "Tuning")
+    {
+        processor.updateState->currentTuningId = box->getSelectedItemIndex();
+        
+        if (processor.updateState->currentTuningId == selectCB.getNumItems()-1)
+        {
+            processor.gallery->addDirect();
+            
+            fillSelectCB();
+        }
+        
+        //updateFields(sendNotification);
+        updateFields();
+    }
+}
+
 void TuningViewController2::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    DBG("editable CB changed " + name);
-    
     processor.gallery->getTuning(processor.updateState->currentTuningId)->setName(name);
-
-    int selected = selectCB.getSelectedId();
-    if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, name);
-    selectCB.setSelectedId(selected, dontSendNotification );
 }
 
 

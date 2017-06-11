@@ -13,13 +13,14 @@
 
 void BKEditableComboBox::mouseDoubleClick (const MouseEvent &event)
 {
-
+    lastItemId = getSelectedId();
     nameEditor.setAlpha(1.);
-    //nameEditor.setVisible(true);
     nameEditor.toFront(true);
     nameEditor.setBounds(getLocalBounds());
     nameEditor.grabKeyboardFocus();
-    nameEditor.setText(getItemText(getSelectedItemIndex()));
+    nameEditor.setText(getItemText(indexOfItemId(lastItemId)));
+    Range<int> highlightRange(0, nameEditor.getText().length());
+    nameEditor.setHighlightedRegion(highlightRange);
 }
 
 
@@ -27,11 +28,14 @@ void BKEditableComboBox::textEditorReturnKeyPressed(TextEditor& textEditor)
 {
     
     nameEditor.toBack();
-    //nameEditor.setVisible(false);
     nameEditor.setAlpha(0.);
+
     hidePopup();
     
     listeners.call(&BKEditableComboBoxListener::BKEditableComboBoxChanged,
                    textEditor.getText(),
                    this);
+    
+    changeItemText(lastItemId, textEditor.getText());
+    setSelectedId(lastItemId, dontSendNotification);
 };

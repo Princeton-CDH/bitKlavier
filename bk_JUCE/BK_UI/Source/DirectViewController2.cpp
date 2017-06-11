@@ -112,9 +112,9 @@ void DirectViewController2::BKEditableComboBoxChanged(String name, BKEditableCom
 {
     processor.gallery->getDirect(processor.updateState->currentDirectId)->setName(name);
     
-    int selected = selectCB.getSelectedId();
-    if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, name);
-    selectCB.setSelectedId(selected, dontSendNotification );
+    //int selected = selectCB.getSelectedId();
+    //if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, name);
+    //selectCB.setSelectedId(selected, dontSendNotification );
 }
 
 

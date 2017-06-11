@@ -238,14 +238,14 @@ void GalleryViewController::bkTextFieldDidChange(TextEditor& tf)
 
 void GalleryViewController::BKEditableComboBoxChanged(String text, BKEditableComboBox* cb)
 {
-    String name = cb->getName();
-    int selectedId = cb->getSelectedId();
+    //String name = cb->getName();
+    //int selectedId = cb->getSelectedId();
     
     processor.currentPiano->setName(text);
     
-    pianoCB.changeItemText(selectedId, text);
+    //pianoCB.changeItemText(selectedId, text);
     
-    pianoCB.setSelectedId(selectedId);
+    //pianoCB.setSelectedId(selectedId);
     
     
     /*
