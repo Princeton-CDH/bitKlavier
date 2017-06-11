@@ -53,8 +53,11 @@ public:
         lookAndFeelChanged();
 
         nameEditor.setName("NAMETXTEDIT");
-        //addAndMakeVisible(nameEditor);
+        addAndMakeVisible(nameEditor);
+        nameEditor.toBack();
+        nameEditor.setAlpha(0.);
         //nameEditor.setVisible(false);
+        nameEditor.setOpaque(true);
         nameEditor.addListener(this);
     }
     
