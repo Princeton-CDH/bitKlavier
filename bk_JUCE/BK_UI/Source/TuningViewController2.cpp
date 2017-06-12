@@ -17,7 +17,6 @@ processor(p),
 theGraph(theGraph)
 {
 
-    
     selectCB.setName("Tuning");
     selectCB.addSeparator();
     selectCB.addListener(this);
@@ -27,21 +26,47 @@ theGraph(theGraph)
     addAndMakeVisible(selectCB);
      
     
-    // Absolute Keyboard
+    // Absolute Tuning Keyboard
     addAndMakeVisible (absoluteKeyboardComponent =
                        new BKKeymapKeyboardComponent (absoluteKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard));
     BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)absoluteKeyboardComponent);
     keyboard->setScrollButtonsVisible(false);
     keyboard->setAvailableRange(21, 108);
     keyboard->setOctaveForMiddleC(4);
+    keyboard->addMouseListener(this, true);
     absoluteKeyboardState.addListener(this);
     absoluteOffsets.ensureStorageAllocated(128);
     for(int i=0; i<128; i++) absoluteOffsets.add(0.);
     lastAbsoluteKeyPressed = 0;
     
-    lastCustomKeyPressed = 0;
-
+    absoluteKeyboardName.setText("key-by-key tuning offsets", dontSendNotification);
+    absoluteKeyboardName.setJustificationType(Justification::bottomRight);
+    addAndMakeVisible(absoluteKeyboardName);
     
+    absoluteKeyboardValueTF.setText(String(0.00f));
+    absoluteKeyboardValueTF.setName("ABSTXT");
+    absoluteKeyboardValueTF.addListener(this);
+    addAndMakeVisible(absoluteKeyboardValueTF);
+    
+    absoluteValsTextField = new TextEditor();
+    absoluteValsTextField->setMultiLine(true);
+    absoluteValsTextField->setName("ABSTXTEDITALL");
+    absoluteValsTextField->addListener(this);
+    addAndMakeVisible(absoluteValsTextField);
+    absoluteValsTextField->setAlpha(0);
+    absoluteValsTextField->toBack();
+    
+    
+    //Custom Tuning Keyboard
+    customOffsets.ensureStorageAllocated(12);
+    for(int i=0; i<12; i++) customOffsets.add(0.);
+    lastCustomKeyPressed = 0;
+    
+    absoluteValsTextFieldOpen.setName("ABSTXTEDITALLBUTTON");
+    absoluteValsTextFieldOpen.addListener(this);
+    absoluteValsTextFieldOpen.setButtonText("edit all offsets");
+    addAndMakeVisible(absoluteValsTextFieldOpen);
+
     updateFields();
 }
 
@@ -49,7 +74,7 @@ void TuningViewController2::resized()
 {
     Rectangle<int> area (getLocalBounds());
     float keyboardHeight = 60;
-    Rectangle<int> absoluteKeymapRow = area.removeFromBottom(keyboardHeight);
+    Rectangle<int> absoluteKeymapRow = area.removeFromBottom(keyboardHeight + 20);
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     
     //prep select combo box
@@ -64,6 +89,23 @@ void TuningViewController2::resized()
     keyboard->setKeyWidth(keyWidth);
     keyboard->setBlackNoteLengthProportion(0.65);
     absoluteKeyboardComponent->setBounds(absoluteKeymapRow.removeFromBottom(keyboardHeight));
+    Rectangle<int> absoluteTextSlab (absoluteKeymapRow.removeFromBottom(20));
+    absoluteKeyboardValueTF.setBounds(absoluteTextSlab.removeFromRight(75));
+    absoluteKeyboardName.setBounds(absoluteTextSlab.removeFromRight(200));
+    absoluteValsTextFieldOpen.setBounds(absoluteTextSlab.removeFromLeft(100));
+    absoluteValsTextField->setBounds(absoluteKeyboardComponent->getBounds());
+}
+
+void TuningViewController2::mouseMove(const MouseEvent& e)
+{
+    if(e.eventComponent == absoluteKeyboardComponent)
+    {
+        BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)absoluteKeyboardComponent);
+        //DBG("last key over " + String(keyboard->getLastNoteOver()));
+        if(keyboard->getLastNoteOver() >= 0 && keyboard->getLastNoteOver() < 128){
+            absoluteKeyboardValueTF.setText(String(absoluteOffsets.getUnchecked(keyboard->getLastNoteOver())), dontSendNotification);
+        }
+    }
 }
 
 
@@ -92,6 +134,35 @@ void TuningViewController2::fillSelectCB(void)
     
 }
 
+void TuningViewController2::bkTextFieldDidChange (TextEditor& textEditor)
+{
+    if(textEditor.getName() == absoluteKeyboardValueTF.getName())
+    {
+        if(absoluteKeyboardState.isInKeymap(lastAbsoluteKeyPressed))
+        {
+            absoluteOffsets.set(lastAbsoluteKeyPressed, absoluteKeyboardValueTF.getText().getDoubleValue());
+            //absoluteValsTextField->setText(offsetArrayToString2(absoluteOffsets), dontSendNotification);
+        }
+    }
+}
+
+void TuningViewController2::textEditorReturnKeyPressed(TextEditor& textEditor)
+{
+    if(textEditor.getName() == absoluteValsTextField->getName())
+    {
+        absoluteOffsets = stringOrderedPairsToFloatArray(absoluteValsTextField->getText(), 128);
+        absoluteValsTextField->setAlpha(0);
+        absoluteValsTextField->toBack();
+        
+        for(int i=0; i<128; i++)
+        {
+            if(absoluteOffsets.getUnchecked(i) != 0)
+                absoluteKeyboardState.addToKeymap(i);
+        }
+
+    }
+}
+
 void TuningViewController2::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
@@ -115,6 +186,16 @@ void TuningViewController2::bkComboBoxDidChange (ComboBox* box)
 void TuningViewController2::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
     processor.gallery->getTuning(processor.updateState->currentTuningId)->setName(name);
+}
+
+void TuningViewController2::bkButtonClicked (Button* b)
+{
+    if(b->getName() == absoluteValsTextFieldOpen.getName())
+    {
+        absoluteValsTextField->setAlpha(1);
+        absoluteValsTextField->toFront(true);
+        absoluteValsTextField->setText(offsetArrayToString2(absoluteOffsets), dontSendNotification);
+    }
 }
 
 
@@ -144,8 +225,17 @@ void TuningViewController2::handleKeymapNoteToggled (BKKeymapKeyboardState* sour
 {
     if(source == &absoluteKeyboardState)
     {
-        DBG("toggled absolute keyboard " + String(midiNoteNumber));
         lastAbsoluteKeyPressed = midiNoteNumber;
+        DBG("lastAbsoluteKeyPressed = " + String(lastAbsoluteKeyPressed));
+        
+        if(absoluteKeyboardState.isInKeymap(lastAbsoluteKeyPressed))
+        {
+            absoluteOffsets.set(lastAbsoluteKeyPressed, absoluteKeyboardValueTF.getText().getDoubleValue());
+        }
+        else
+        {
+            absoluteOffsets.set(lastAbsoluteKeyPressed, 0.);
+        }
     }
     else if(source == &customKeyboardState)
     {
@@ -154,5 +244,6 @@ void TuningViewController2::handleKeymapNoteToggled (BKKeymapKeyboardState* sour
     }
     
 }
+
 
 

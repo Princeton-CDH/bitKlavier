@@ -36,6 +36,11 @@ public:
     
     void updateFields();
     
+private:
+    
+    BKAudioProcessor& processor;
+    BKItemGraph* theGraph;
+    
     //basics
     BKEditableComboBox selectCB;
     BKComboBox scaleCB;
@@ -57,13 +62,15 @@ public:
     Component *absoluteKeyboardComponent;
     Array<float> absoluteOffsets;   //for entire keyboard; up to 88 vals
     int lastAbsoluteKeyPressed;
+    ScopedPointer<TextEditor> absoluteValsTextField;
+    TextButton absoluteValsTextFieldOpen;
     
     //custom tuning keyboard stuff
     Label customKeyboardName;
     TextEditor customKeyboardValueTF;
     BKKeymapKeyboardState customKeyboardState;
     Component *customKeyboardComponent;
-    Array<float> customOffsets;     //for custom tuning; 12 vals
+    Array<double> customOffsets;     //for custom tuning; 12 vals
     int lastCustomKeyPressed;
     
     //keymap overrides
@@ -74,16 +81,14 @@ public:
     //other overrides
     void bkMessageReceived (const String& message) override {};
     void bkComboBoxDidChange (ComboBox* box) override;
-    void bkTextFieldDidChange (TextEditor&) override {};
-    void bkButtonClicked (Button* b) override { };
+    void bkTextFieldDidChange (TextEditor& txt) override;
+    void bkButtonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(String name, double val) override {};
+    void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void fillSelectCB(void);
     
-private:
-    
-    BKAudioProcessor& processor;
-    BKItemGraph* theGraph;
+    void mouseMove(const MouseEvent& e) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningViewController2)
     

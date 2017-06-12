@@ -228,6 +228,21 @@ String offsetArrayToString(Array<float> arr)
     return s;
 }
 
+String offsetArrayToString2(Array<float> arr)
+{
+    String s = "";
+    int key = 0;
+    for (auto offset : arr)
+    {
+        //if (offset != 0.0)  s += String(key) + ":" + String((int)(offset*100.0f)) + " ";
+        if (offset != 0.0)  s += String(key) + ":" + String((offset)) + " ";
+        
+        ++key;
+    }
+    
+    return s;
+}
+
 String arrayFloatArrayToString(Array<Array<float>> afarr)
 {
     String s = "";
@@ -528,6 +543,7 @@ Array<float> stringOrderedPairsToFloatArray(String s, int size)
         {
             tempFloat += c1;
         }
+
         
         //colons and spaces
         if(isColon)
@@ -541,7 +557,17 @@ Array<float> stringOrderedPairsToFloatArray(String s, int size)
         }
         else previousColon = false;
         
-        if(isSpace || isEndOfString)
+        if(isSpace && previousSpace) //skip repeated spaces
+        {
+            previousSpace = true;
+            inInt = false;
+            inFloat = false;
+        }
+        else if(previousSpace && isEndOfString)
+        {
+            //do nothing; previousSpace already finalized array
+        }
+        else if(isSpace || isEndOfString)
         {
             previousSpace = true;
             inInt = false;
