@@ -212,6 +212,10 @@
                 file="Source/BKKeyboardState.cpp"/>
           <FILE id="whgJO1" name="BKKeyboardState.h" compile="0" resource="0"
                 file="Source/BKKeyboardState.h"/>
+          <FILE id="xFL3Cb" name="BKKeyboardSlider.cpp" compile="1" resource="0"
+                file="Source/BKKeyboardSlider.cpp"/>
+          <FILE id="xXx0sS" name="BKKeyboardSlider.h" compile="0" resource="0"
+                file="Source/BKKeyboardSlider.h"/>
         </GROUP>
         <GROUP id="{4B499D6C-5305-4070-7065-5CC7E1297454}" name="BKMenu">
           <FILE id="iHLTYB" name="BKMenu.h" compile="0" resource="0" file="Source/BKMenu.h"/>
