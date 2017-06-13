@@ -68,11 +68,11 @@ theGraph(theGraph)
     A1FundamentalLabel.setText("Adaptive 1 Anchor Fundamental", dontSendNotification);
     addAndMakeVisible(A1FundamentalLabel);
     
-    A1ClusterThresh = new BKSingleSlider("cluster threshold", 1, 1000, 0, 1);
+    A1ClusterThresh = new BKSingleSlider("Cluster Threshold", 1, 1000, 0, 1);
     A1ClusterThresh->addMyListener(this);
     addAndMakeVisible(A1ClusterThresh);
     
-    A1ClusterMax = new BKSingleSlider("cluster maximum", 1, 8, 1, 1);
+    A1ClusterMax = new BKSingleSlider("Cluster Maximum", 1, 8, 1, 1);
     A1ClusterMax->addMyListener(this);
     addAndMakeVisible(A1ClusterMax);
     
@@ -82,20 +82,20 @@ theGraph(theGraph)
     // Absolute Tuning Keyboard
     absoluteOffsets.ensureStorageAllocated(128);
     for(int i=0; i<128; i++) absoluteOffsets.add(0.);
-    absoluteKeyboard.setName("key-by-key offsets");
+    absoluteKeyboard.setName("Key-by-Key Offsets");
     absoluteKeyboard.addMyListener(this);
     addAndMakeVisible(absoluteKeyboard);
     
     //Custom Tuning Keyboard
     customOffsets.ensureStorageAllocated(12);
     for(int i=0; i<12; i++) customOffsets.add(0.);
-    customKeyboard.setName("custom offsets");
+    customKeyboard.setName("Custom Offsets");
     customKeyboard.addMyListener(this);
     customKeyboard.setAvailableRange(60, 71);
     customKeyboard.useOrderedPairs(false);
     addAndMakeVisible(customKeyboard);
     
-    offsetSlider = new BKSingleSlider("offset (cents)", -100, 100, 0, 0.1);
+    offsetSlider = new BKSingleSlider("Global Offset (cents)", -100, 100, 0, 0.1);
     offsetSlider->addMyListener(this);
     addAndMakeVisible(offsetSlider);
 
@@ -359,6 +359,28 @@ void TuningViewController2::keyboardSliderChanged(String name, Array<float> valu
     }
 }
 
+void TuningViewController2::BKSingleSliderValueChanged(String name, double val)
+{
+    TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
+    TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+    
+    if(name == offsetSlider->getName()) {
+        DBG("got offset " + String(val));
+        prep->setFundamentalOffset(val);
+        active->setFundamentalOffset(val);
+    }
+    else if(name == A1ClusterThresh->getName()) {
+        DBG("got A1ClusterThresh " + String(val));
+        prep->setAdaptiveClusterThresh(val);
+        active->setAdaptiveClusterThresh(val);
+    }
+    else if(name == A1ClusterMax->getName()) {
+        DBG("got A1ClusterMax " + String(val));
+        prep->setAdaptiveHistory(val);
+        active->setAdaptiveHistory(val);
+    }
+}
+
 void TuningViewController2::bkTextFieldDidChange (TextEditor& textEditor)
 {
     
@@ -371,7 +393,16 @@ void TuningViewController2::textEditorReturnKeyPressed(TextEditor& textEditor)
 
 void TuningViewController2::bkButtonClicked (Button* b)
 {
-    
+    if (b == &A1Inversional)
+    {
+        DBG("setting A1Inversional " + String(A1Inversional.getToggleState()));
+        
+        TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
+        TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+
+        prep->setAdaptiveInversional(A1Inversional.getToggleState());
+        active->setAdaptiveInversional(A1Inversional.getToggleState());
+    }
 }
 
 

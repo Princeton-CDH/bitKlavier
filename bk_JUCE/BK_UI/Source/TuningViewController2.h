@@ -78,7 +78,7 @@ private:
     void bkTextFieldDidChange (TextEditor& txt) override;
     void bkButtonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
-    void BKSingleSliderValueChanged(String name, double val) override {};
+    void BKSingleSliderValueChanged(String name, double val) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void keyboardSliderChanged(String name, Array<float> values) override;
     void mouseMove(const MouseEvent& e) override {};
