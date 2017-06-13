@@ -426,6 +426,10 @@ bool BKConstructionSite::keyPressed (const KeyPress& e, Component*)
         // Cmd/Ctrl-Z UNDO
         DBG("undo");
         
+        // should have Snapshot based system.
+        
+        /*
+        
         for (auto toAdd : graph->getLast())
         {
             
@@ -444,6 +448,7 @@ bool BKConstructionSite::keyPressed (const KeyPress& e, Component*)
                         ->setTopLeftPosition(toAdd->position.x, toAdd->position.y);
             }
         }
+         */
     }
     
 }

@@ -20,6 +20,7 @@ void BKEditableComboBox::mouseDoubleClick (const MouseEvent &event)
 }
 
 
+
 void BKEditableComboBox::textEditorReturnKeyPressed(TextEditor& textEditor)
 {
     
@@ -27,5 +28,17 @@ void BKEditableComboBox::textEditorReturnKeyPressed(TextEditor& textEditor)
                    textEditor.getText(),
                    this);
     
+    
     removeChildComponent(&nameEditor);
-};
+}
+
+void BKEditableComboBox::textEditorFocusLost(TextEditor& textEditor)
+{
+    
+    listeners.call(&BKEditableComboBoxListener::BKEditableComboBoxChanged,
+                   textEditor.getText(),
+                   this);
+    
+    removeChildComponent(&nameEditor);
+}
+

@@ -2,10 +2,10 @@
 
 <JUCERPROJECT id="R4yQHh" name="BK_UI" projectType="audioplug" version="0.0.1"
               bundleIdentifier="com.BK.BK0" includeBinaryInAppConfig="1" buildVST="1"
-              buildVST3="1" buildAU="0" buildAUv3="0" buildRTAS="0" buildAAX="0"
+              buildVST3="1" buildAU="0" buildAUv3="1" buildRTAS="0" buildAAX="0"
               pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
               pluginManufacturer="manyarrowsmusic" pluginManufacturerCode="Manu"
-              pluginCode="R4yq" pluginChannelConfigs="{1,1},{2,2}" pluginIsSynth="1"
+              pluginCode="R4yq" pluginChannelConfigs="{0,2}" pluginIsSynth="1"
               pluginWantsMidiIn="1" pluginProducesMidiOut="1" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="1" pluginAUExportPrefix="BKAU" pluginRTASCategory=""
               aaxIdentifier="com.manyarrowsmusic.bitKlavier" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"

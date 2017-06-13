@@ -24,6 +24,9 @@ updateState             (new BKUpdateState())
     loadGalleryFromPath(galleryNames[0]);
     
     
+    
+    
+    
 }
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -69,6 +72,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
         int noteNumber = m.getNoteNumber();
+        DBG("note: " + String(noteNumber));
         float velocity = m.getFloatVelocity();
         int p, pm; // piano, prepmap
         

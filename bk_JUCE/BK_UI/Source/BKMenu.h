@@ -61,6 +61,7 @@ public:
     }
     
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+    void textEditorFocusLost (TextEditor& textEditor) override;
     void mouseDoubleClick(const MouseEvent& e) override;
     
     ListenerList<BKEditableComboBoxListener> listeners;
