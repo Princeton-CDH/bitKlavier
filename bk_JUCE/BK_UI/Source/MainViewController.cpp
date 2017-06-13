@@ -97,17 +97,18 @@ void MainViewController::paint (Graphics& g)
 #define SOME_PADDING 200
 void MainViewController::resized()
 {
-
-    galvc.setBounds(0, 0, getScreenBounds().getRight() - SOME_PADDING, 30);
+    setSize(getParentComponent()->getWidth(), getParentComponent()->getHeight());
+    
+    galvc.setBounds(0, 0, getParentComponent()->getRight() - SOME_PADDING, 30);
     
     int panelWidth = 200;
 
-    preparationPanel->setBounds(getScreenBounds().getRight() - SOME_PADDING, getScreenBounds().getY(), panelWidth, getScreenBounds().getHeight());
+    preparationPanel->setBounds(getParentComponent()->getRight() - SOME_PADDING, getParentComponent()->getY(), panelWidth, getParentComponent()->getHeight());
     
     viewPort.setBounds(gXSpacing,
                            galvc.getBottom(),
-                           getScreenBounds().getWidth() - SOME_PADDING - 2*gXSpacing,
-                           getScreenBounds().getBottom() - galvc.getBottom()-2*gYSpacing);
+                           getParentComponent()->getWidth() - SOME_PADDING - 2*gXSpacing,
+                           getParentComponent()->getBottom() - galvc.getBottom()-2*gYSpacing);
     
     construction.setSize(viewPort.getWidth(), viewPort.getHeight());
     

@@ -32,7 +32,7 @@ resizer(new ResizableCornerComponent (this, constrain))
     
     resizer->setAlwaysOnTop(true);
     
-    constrain->setSizeLimits(200, 150, 1500, 1000);
+    constrain->setSizeLimits(400, 150, 2000, 1500);
     
     mvc.setSize(gMainComponentWidth, gMainComponentHeight);
     setSize(gMainComponentWidth, gMainComponentHeight);
@@ -56,6 +56,8 @@ void BKAudioProcessorEditor::resized()
     viewPort.setBoundsRelative(0.0f,0.0f,1.0f,1.0f);
     
     resizer->setBounds(getWidth()-16, getHeight()-16, 16, 16);
+    
+    mvc.resized();
     
     
 }
