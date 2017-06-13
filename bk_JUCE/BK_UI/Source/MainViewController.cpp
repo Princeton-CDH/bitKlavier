@@ -96,9 +96,7 @@ void MainViewController::paint (Graphics& g)
 
 #define SOME_PADDING 200
 void MainViewController::resized()
-{
-    setSize(getParentComponent()->getWidth(), getParentComponent()->getHeight());
-    
+{    
     galvc.setBounds(0, 0, getParentComponent()->getRight() - SOME_PADDING, 30);
     
     int panelWidth = 200;

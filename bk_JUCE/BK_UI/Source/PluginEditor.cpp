@@ -57,6 +57,7 @@ void BKAudioProcessorEditor::resized()
     
     resizer->setBounds(getWidth()-16, getHeight()-16, 16, 16);
     
+    mvc.setSize(getWidth(), getHeight());
     mvc.resized();
     
     
