@@ -217,7 +217,7 @@ void TuningViewController2::bkComboBoxDidChange (ComboBox* box)
     TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
     TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
     
-    if (name == "Tuning")
+    if (name == selectCB.getName())
     {
         processor.updateState->currentTuningId = box->getSelectedItemIndex();
         
@@ -239,6 +239,14 @@ void TuningViewController2::bkComboBoxDidChange (ComboBox* box)
         updateComponentVisibility();
         
     }
+    else if (name == fundamentalCB.getName())
+    {
+        prep->setFundamental((PitchClass)fundamentalCB.getSelectedItemIndex());
+        active->setFundamental((PitchClass)fundamentalCB.getSelectedItemIndex());
+        
+        updateComponentVisibility();
+        
+    }
     else if (name == A1IntervalScaleCB.getName())
     {
         prep->setAdaptiveIntervalScale((TuningSystem)A1IntervalScaleCB.getSelectedItemIndex());
@@ -252,6 +260,14 @@ void TuningViewController2::bkComboBoxDidChange (ComboBox* box)
         active->setAdaptiveAnchorScale((TuningSystem)A1AnchorScaleCB.getSelectedItemIndex());
         
         updateComponentVisibility();
+    }
+    else if (name == A1FundamentalCB.getName())
+    {
+        prep->setAdaptiveAnchorFundamental((PitchClass)A1FundamentalCB.getSelectedItemIndex());
+        active->setAdaptiveAnchorFundamental((PitchClass)A1FundamentalCB.getSelectedItemIndex());
+        
+        updateComponentVisibility();
+        
     }
 }
 
