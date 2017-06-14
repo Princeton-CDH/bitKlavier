@@ -108,11 +108,6 @@ void MainViewController::align(int which)
 {
     construction.align(which);
 }
-    
-void MainViewController::space(int which)
-{
-    construction.space(which);
-}
 
 void MainViewController::tabPressed(void)
 {

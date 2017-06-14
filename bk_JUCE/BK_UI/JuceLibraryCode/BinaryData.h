@@ -18,7 +18,7 @@ namespace BinaryData
     const int            icon_pngSize = 38622;
 
     extern const char*   keymap_icon_png;
-    const int            keymap_icon_pngSize = 3135;
+    const int            keymap_icon_pngSize = 5963;
 
     extern const char*   mod_icon_png;
     const int            mod_icon_pngSize = 2536;

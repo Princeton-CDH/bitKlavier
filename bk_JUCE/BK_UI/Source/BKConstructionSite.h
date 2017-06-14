@@ -38,7 +38,6 @@ public:
     void move(int which, bool fine);
     void remove(void);
     void align(int which);
-    void space(int which);
     
 private:
     

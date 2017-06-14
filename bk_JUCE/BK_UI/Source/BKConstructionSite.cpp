@@ -16,10 +16,9 @@
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
 BKDraggableComponent(false,true,false),
 processor(p),
-graph(theGraph)
+graph(theGraph),
+connect(false)
 {
-    
-    
     addKeyListener(this);
     
     setWantsKeyboardFocus(true);
@@ -27,7 +26,6 @@ graph(theGraph)
     graph->deselectAll();
     
     redraw();
-
 }
 
 BKConstructionSite::~BKConstructionSite(void)
@@ -86,18 +84,6 @@ void BKConstructionSite::remove(void)
     }
     
     repaint();
-}
-
-void BKConstructionSite::space(int which)
-{
-    if (which) // Vertical
-    {
-        
-    }
-    else // Horizontal
-    {
-        
-    }
 }
 
 void BKConstructionSite::align(int which)
