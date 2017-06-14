@@ -80,7 +80,8 @@ Id(Id)
     placement = RectanglePlacement::centred;
     
 
-    int val = ((type > PreparationTypeKeymap && type < PreparationTypePianoMap) || type == PreparationTypeReset) ? 125 : 75;
+    int val = ((type > PreparationTypeKeymap && type < PreparationTypePianoMap) || type == PreparationTypeReset) ? 125 : ((type == PreparationTypeKeymap) ? 85 : 75);
+    
     
     while (!(image.getWidth() < val || image.getHeight() < val))
     {
