@@ -80,14 +80,18 @@ Id(Id)
     placement = RectanglePlacement::centred;
     
 
-    int val = ((type > PreparationTypeKeymap && type < PreparationTypePianoMap) || type == PreparationTypeReset) ? 125 : ((type == PreparationTypeKeymap) ? 85 : 75);
+    int val =
+    ((type > PreparationTypeKeymap && type < PreparationTypePianoMap) || type == PreparationTypeReset) ? 100 :
+    (type == PreparationTypeKeymap) ? 75 :
+    (type == PreparationTypeTempo || type == PreparationTypeTuning) ? 55 :
+    65;
     
     
     while (!(image.getWidth() < val || image.getHeight() < val))
     {
         DBG(String(image.getWidth()) +  " " + String(image.getHeight()));
         
-       image = image.rescaled(image.getWidth() * 0.5, image.getHeight() * 0.5);
+       image = image.rescaled(image.getWidth() * 0.75, image.getHeight() * 0.75);
     }
     
     if (type != PreparationTypePianoMap)    setSize(image.getWidth(), image.getHeight());
