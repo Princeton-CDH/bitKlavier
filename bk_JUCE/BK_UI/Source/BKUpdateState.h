@@ -55,6 +55,12 @@ public:
     BKPreparationDisplay currentPreparationDisplay = DisplayNil;
     bool displayDidChange;
     
+    void setCurrentDisplay(BKPreparationDisplay type)
+    {
+        currentPreparationDisplay = type;
+        displayDidChange = true;
+    }
+    
     void setAllCurrentIdsTo(int val)
     {
         currentDirectId = val;

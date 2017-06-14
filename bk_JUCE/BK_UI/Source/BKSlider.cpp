@@ -873,6 +873,23 @@ void BKMultiSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
     }
 }
 
+void BKMultiSlider::textEditorFocusLost(TextEditor& textEditor)
+{
+    if(textEditor.getName() == editValsTextField->getName())
+    {
+        editValsTextField->setVisible(false);
+        editValsTextField->toBack();
+        
+        setTo(stringToArrayFloatArray(textEditor.getText()), sendNotification);
+        resetRanges();
+        resized();
+        
+        listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
+                       getName(),
+                       getAllActiveValues());
+        
+    }
+}
 
 Array<Array<float>> BKMultiSlider::getAllValues()
 {
@@ -1313,6 +1330,30 @@ void BKRangeSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
                    maxSlider.getValue());
 }
 
+void BKRangeSlider::textEditorFocusLost(TextEditor& textEditor)
+{
+    double newval = textEditor.getText().getDoubleValue();
+    
+    //adjusts min/max of sldiers as needed
+    checkValue(newval);
+    
+    if(textEditor.getName() == "minvalue")
+    {
+        minSlider.setValue(newval, sendNotification);
+        rescaleMinSlider();
+    }
+    else if(textEditor.getName() == "maxvalue")
+    {
+        maxSlider.setValue(newval, sendNotification);
+        rescaleMaxSlider();
+    }
+    
+    listeners.call(&BKRangeSliderListener::BKRangeSliderValueChanged,
+                   getName(),
+                   minSlider.getValue(),
+                   maxSlider.getValue());
+}
+
 void BKRangeSlider::checkValue(double newval)
 {
     if(newval > maxSlider.getMaximum()) {
@@ -1706,6 +1747,24 @@ void BKStackedSlider::mouseDoubleClick (const MouseEvent &e)
 }
 
 void BKStackedSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
+{
+    if(textEditor.getName() == editValsTextField->getName())
+    {
+        editValsTextField->setVisible(false);
+        editValsTextField->toBack();
+        
+        setTo(stringToFloatArray(textEditor.getText()), sendNotification);
+        clickedSlider = 0;
+        resized();
+        
+        listeners.call(&BKStackedSliderListener::BKStackedSliderValueChanged,
+                       getName(),
+                       getAllActiveValues());
+        
+    }
+}
+
+void BKStackedSlider::textEditorFocusLost(TextEditor& textEditor)
 {
     if(textEditor.getName() == editValsTextField->getName())
     {

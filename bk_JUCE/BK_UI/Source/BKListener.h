@@ -26,10 +26,10 @@ public:
     
 private:
     // TextEditor input parsing
-    virtual void bkTextFieldDidChange   (TextEditor&)           = 0;
-    virtual void bkComboBoxDidChange    (ComboBox*)             = 0;
-    virtual void bkButtonClicked        (Button* b)             = 0;
-    virtual void bkMessageReceived      (const String& message) = 0;
+    virtual void bkTextFieldDidChange   (TextEditor&)           {};
+    virtual void bkComboBoxDidChange    (ComboBox*)             {};
+    virtual void bkButtonClicked        (Button* b)             {};
+    virtual void bkMessageReceived      (const String& message) {};
     
     void textEditorTextChanged      (TextEditor&) override;
     void textEditorFocusLost        (TextEditor&) override;

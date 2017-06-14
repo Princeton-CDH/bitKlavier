@@ -15,52 +15,23 @@
 MainViewController::MainViewController (BKAudioProcessor& p):
 processor (p),
 theGraph(p),
-construction(p, &theGraph, &viewPort),
-galvc(p),
-kvc(p, &theGraph),
-tvc(p, &theGraph),
-gvc(p),
-//svc(p, &theGraph),
-//nvc(p, &theGraph),
-dvc(p, &theGraph),
-ovc(p, &theGraph),
-svc2(p, &theGraph),
-nvc2(p, &theGraph),
-dvc2(p, &theGraph),
+overtop(p, &theGraph),
+construction(p, &theGraph),
+header(p),
 timerCallbackCount(0)
 {
-    
-    addKeyListener(this);
-    
     
     gen = processor.gallery->getGeneralSettings();
     
     preparationPanel = new PreparationPanel(processor);
     addAndMakeVisible(preparationPanel);
     
+    addAndMakeVisible(construction);
     
-    viewPort.setViewedComponent(&construction);
-    viewPort.setViewPosition(0, 0);
-    addAndMakeVisible(viewPort);
+    addAndMakeVisible(header);
     
-    addAndMakeVisible(galvc);
-    
-    overtop.addAndMakeVisible(hideOrShow);
-    hideOrShow.setName("hideOrShow");
-    hideOrShow.addListener(this);
-    hideOrShow.setButtonText(" X ");
-    
-
     addChildComponent(overtop);
-    overtop.addChildComponent(gvc);
-    //overtop.addChildComponent(dvc);
-    overtop.addChildComponent(kvc);
-    overtop.addChildComponent(tvc);
-    overtop.addChildComponent(ovc);
-    overtop.addChildComponent(svc2);
-    overtop.addChildComponent(nvc2);
-    overtop.addChildComponent(dvc2);
-    
+
     /*
     addAndMakeVisible (levelMeterComponentL = new BKLevelMeterComponent());
     addAndMakeVisible (levelMeterComponentR = new BKLevelMeterComponent());
@@ -76,8 +47,6 @@ timerCallbackCount(0)
     mainSlider->setDoubleClickReturnValue (true, 0.0); // double-clicking this slider will set it to 50.0
     mainSlider->setTextValueSuffix (" dB");
     mainSlider->addListener(this);
-    
-    setCurrentDisplay(DisplayNil);
     
     startTimerHz (50);
     
@@ -97,64 +66,27 @@ void MainViewController::paint (Graphics& g)
 #define SOME_PADDING 200
 void MainViewController::resized()
 {    
-    galvc.setBounds(0, 0, getParentComponent()->getRight() - SOME_PADDING, 30);
+    header.setBounds(0, 0, getParentComponent()->getRight() - SOME_PADDING, 30);
     
     int panelWidth = 200;
 
     preparationPanel->setBounds(getParentComponent()->getRight() - SOME_PADDING, getParentComponent()->getY(), panelWidth, getParentComponent()->getHeight());
     
-    viewPort.setBounds(gXSpacing,
-                           galvc.getBottom(),
+    construction.setBounds(gXSpacing,
+                           header.getBottom(),
                            getParentComponent()->getWidth() - SOME_PADDING - 2*gXSpacing,
-                           getParentComponent()->getBottom() - galvc.getBottom()-2*gYSpacing);
+                           getParentComponent()->getBottom() - header.getBottom()-2*gYSpacing);
     
-    construction.setSize(viewPort.getWidth(), viewPort.getHeight());
     
-    overtop.setBounds(viewPort.getBounds());
-    
-    hideOrShow.setBounds(gXSpacing,gYSpacing, 20,20);
-    
-
-    float X = gXSpacing; float Y = hideOrShow.getBottom()+gYSpacing;
-    float width = overtop.getWidth() - 10;
-    float height = overtop.getHeight() - 35;
-    
-    kvc.setBounds(X, Y, width, height);
-    
-    gvc.setBounds(X, Y, width, height);
-    
-    tvc.setBounds(X, Y, width, height);
-    
-    ovc.setBounds(X, Y, width, height);
-    
-    svc2.setBounds(X, Y, width, height);
-    
-    nvc2.setBounds(X, Y, width, height);
-    
-    dvc2.setBounds(X, Y, width, height);
-    
-
-    
+    overtop.setBounds(viewPort.getBounds());    
 }
 
 
-bool MainViewController::keyPressed (const KeyPress& e, Component*)
-{
-    if (e.isKeyCode(27)) // Escape
-    {
-        setCurrentDisplay(DisplayNil);
-    }
-
-}
 
 void MainViewController::bkButtonClicked            (Button* b)
 {
     String name = b->getName();
-    
-    if (name == "hideOrShow")
-    {
-        setCurrentDisplay(DisplayNil);
-    }
+
 }
 
 void MainViewController::sliderValueChanged (Slider* slider)
@@ -163,10 +95,39 @@ void MainViewController::sliderValueChanged (Slider* slider)
     if(slider == mainSlider)
     {
         gen->setGlobalGain(Decibels::decibelsToGain(mainSlider->getValue()));
-        gvc.updateFields();
+        overtop.gvc.updateFields();
     }
 }
 
+void MainViewController::deletePressed(void)
+{
+    construction.remove();
+}
+
+void MainViewController::arrowPressed(int which, bool fine)
+{
+    construction.move(which, fine);
+}
+
+void MainViewController::align(int which)
+{
+    construction.align(which);
+}
+    
+void MainViewController::space(int which)
+{
+    construction.space(which);
+}
+
+void MainViewController::tabPressed(void)
+{
+    
+}
+
+void MainViewController::escapePressed(void)
+{
+    processor.updateState->setCurrentDisplay(DisplayNil);
+}
 
 void MainViewController::timerCallback()
 {
@@ -175,15 +136,15 @@ void MainViewController::timerCallback()
     {
         timerCallbackCount = 0;
         processor.collectGalleries();
-        galvc.fillGalleryCB();
+        header.fillGalleryCB();
     }
     
-    galvc.update();
+    header.update();
     
     if (processor.updateState->generalSettingsDidChange)
     {
         processor.updateState->generalSettingsDidChange = false;
-        gvc.updateFields();
+        overtop.gvc.updateFields();
     }
     
     //check to see if General Settings globalGain has changed, update slider accordingly
@@ -198,10 +159,10 @@ void MainViewController::timerCallback()
         preparationPanel->refill(PreparationTypeDirect);
         preparationPanel->refill(PreparationTypeDirectMod);
         
-        dvc.updateFields();
-        dvc.updateModFields();
+        overtop.dvc.updateFields();
+        overtop.dvc.updateModFields();
         
-        dvc2.updateFields();
+        overtop.dvc2.updateFields();
     }
     
     if (processor.updateState->nostalgicPreparationDidChange)
@@ -214,7 +175,7 @@ void MainViewController::timerCallback()
         //nvc.updateFields();
         //nvc.updateModFields();
         
-        nvc2.updateFields();
+        overtop.nvc2.updateFields();
     }
     
     if (processor.updateState->synchronicPreparationDidChange)
@@ -224,10 +185,10 @@ void MainViewController::timerCallback()
         preparationPanel->refill(PreparationTypeSynchronic);
         preparationPanel->refill(PreparationTypeSynchronicMod);
         
-        //svc.updateFields();
-        //svc.updateModFields();
+        //overtop.svc.updateFields();
+        //overtop.svc.updateModFields();
         
-        svc2.updateFields();
+        overtop.svc2.updateFields();
     }
     
     if (processor.updateState->tuningPreparationDidChange)
@@ -237,8 +198,8 @@ void MainViewController::timerCallback()
         preparationPanel->refill(PreparationTypeTuning);
         preparationPanel->refill(PreparationTypeTuningMod);
         
-        tvc.updateFields();
-        tvc.updateModFields();
+        overtop.tvc.updateFields();
+        overtop.tvc.updateModFields();
     }
     
     if (processor.updateState->tempoPreparationDidChange)
@@ -248,8 +209,8 @@ void MainViewController::timerCallback()
         preparationPanel->refill(PreparationTypeTempo);
         preparationPanel->refill(PreparationTypeTempoMod);
         
-        ovc.updateFields();
-        ovc.updateModFields();
+        overtop.ovc.updateFields();
+        overtop.ovc.updateModFields();
     }
     
     if (processor.updateState->pianoDidChangeForGraph)
@@ -266,7 +227,7 @@ void MainViewController::timerCallback()
         
         preparationPanel->refill(PreparationTypeKeymap);
         
-        kvc.reset();
+        overtop.kvc.reset();
     }
     
     if (processor.updateState->directDidChange)
@@ -276,14 +237,14 @@ void MainViewController::timerCallback()
         preparationPanel->refill(PreparationTypeDirect);
         preparationPanel->refill(PreparationTypeDirectMod);
         
-        dvc.reset();
+        overtop.dvc.reset();
     }
     
     if (processor.updateState->displayDidChange)
     {
         processor.updateState->displayDidChange = false;
         
-        setCurrentDisplay(processor.updateState->currentPreparationDisplay);
+        overtop.setCurrentDisplay(processor.updateState->currentPreparationDisplay);
     }
     
     /*
@@ -294,57 +255,4 @@ void MainViewController::timerCallback()
 }
 
 
-void MainViewController::setCurrentDisplay(BKPreparationDisplay type)
-{
-    if (type == DisplayNil) {
-        overtop.setVisible(false);
-        processor.updateState->currentPreparationDisplay = DisplayNil;
-        return;
-    }
-    else
-        overtop.setVisible(true);
-    
-    kvc.setVisible(false);
-    gvc.setVisible(false);
-    tvc.setVisible(false);
-    dvc.setVisible(false);
-    ovc.setVisible(false);
-    
-    //svc.setVisible(false);
-    //nvc.setVisible(false);
-    
-    svc2.setVisible(false);
-    nvc2.setVisible(false);
-    dvc2.setVisible(false);
-    
-    
-    if (type == DisplayKeymap)
-    {
-        kvc.setVisible(true);
-    }
-    else if (type == DisplayTuning)
-    {
-        tvc.setVisible(true);
-    }
-    else if (type == DisplayTempo)
-    {
-        ovc.setVisible(true);
-    }
-    else if (type == DisplaySynchronic)
-    {
-        svc2.setVisible(true);
-    }
-    else if (type == DisplayNostalgic)
-    {
-        nvc2.setVisible(true);
-    }
-    else if (type == DisplayDirect)
-    {
-        dvc2.setVisible(true);
-    }
-    else if (type == DisplayGeneral)
-    {
-        gvc.setVisible(true);
-    }
-        
-}
+

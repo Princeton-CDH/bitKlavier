@@ -68,7 +68,7 @@ NostalgicViewController::~NostalgicViewController()
 
 void NostalgicViewController::paint (Graphics& g)
 {
-    g.fillAll(Colours::lightgrey);
+    g.fillAll(Colours::transparentWhite);
 }
 
 void NostalgicViewController::resized()

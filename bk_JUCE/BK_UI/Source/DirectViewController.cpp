@@ -181,7 +181,7 @@ void DirectViewController::bkComboBoxDidChange        (ComboBox* box)
 
 void DirectViewController::paint (Graphics& g)
 {
-    g.fillAll(Colours::lightgrey);
+    g.fillAll(Colours::transparentWhite);
 }
 
 void DirectViewController::resized()

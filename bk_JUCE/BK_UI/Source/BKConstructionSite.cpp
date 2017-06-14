@@ -13,11 +13,10 @@
 #define AUTO_DRAW 0
 #define NUM_COL 6
 
-BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph, Viewport* viewPort):
+BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
 BKDraggableComponent(false,true,false),
 processor(p),
-graph(theGraph),
-viewPort(viewPort)
+graph(theGraph)
 {
     
     
@@ -28,13 +27,6 @@ viewPort(viewPort)
     graph->deselectAll();
     
     redraw();
-    
-    leftMost = 0;
-    rightMost = 1000;
-    topMost = 0;
-    bottomMost = 700;
-    
-    setBounds(leftMost, topMost, rightMost, bottomMost);
 
 }
 
@@ -58,6 +50,90 @@ void BKConstructionSite::redraw(void)
     
     draw();
     
+}
+
+void BKConstructionSite::move(int which, bool fine)
+{
+    if (processor.updateState->currentPreparationDisplay != DisplayNil) return;
+    
+    float changeX = 0;
+    float changeY = 0;
+    
+    if (which == 0) // Up
+        changeY = fine ? -1 : -10;
+    else if (which == 1) // Right
+        changeX = fine ? 1 : 10;
+    else if (which == 2) // Down
+        changeY = fine ? 1 : 10;
+    else if (which == 3) // Left
+        changeX = fine ? -1 : -10;
+    
+    for (auto item : graph->getSelectedItems())
+        item->setTopLeftPosition(item->getX() + changeX, item->getY() + changeY);
+}
+
+void BKConstructionSite::remove(void)
+{
+    graph->updateLast();
+    
+    BKItem::PtrArr selectedItems = graph->getSelectedItems();
+    
+    for (int i = selectedItems.size(); --i >= 0;)
+    {
+        deleteItem(selectedItems[i]);
+    }
+    
+    repaint();
+}
+
+void BKConstructionSite::space(int which)
+{
+    if (which) // Vertical
+    {
+        
+    }
+    else // Horizontal
+    {
+        
+    }
+}
+
+void BKConstructionSite::align(int which)
+{
+    if (processor.updateState->currentPreparationDisplay != DisplayNil) return;
+    
+    if (graph->getSelectedItems().size() <= 1) return;
+    
+    bool top = false, bottom = false, left = false, right = false;
+    
+    float mostTop = getBottom(), mostBottom = 0.0, mostLeft = getRight(), mostRight = 0.0;
+    
+    for (auto item : graph->getSelectedItems())
+    {
+        float X = item->getX();
+        float Y = item->getY();
+        
+        if (X < mostLeft)   mostLeft = X;
+        
+        if (X > mostRight)  mostRight = X;
+        
+        if (Y < mostTop)    mostTop = Y;
+        
+        if (Y > mostBottom) mostBottom = Y;
+    }
+    
+    if (which == 0)         top = true;
+    else if (which == 1)    right = true;
+    else if (which == 2)    bottom = true;
+    else if (which == 3)    left = true;
+    
+    for (auto item : graph->getSelectedItems())
+    {
+        float X = (left ? mostLeft : (right ? mostRight : item->getX()));
+        float Y = (top ? mostTop : (bottom ? mostBottom : item->getY()));
+        
+        item->setTopLeftPosition(X, Y);
+    }
 }
 
 void BKConstructionSite::paint(Graphics& g)
@@ -300,47 +376,7 @@ void BKConstructionSite::mouseDrag (const MouseEvent& e)
         for (auto item : graph->getSelectedItems())
         {
             item->performDrag(e);
-            
-            int X = item->getX(); int Y = item->getY();
-            
-            if (X < viewPort->getViewPositionX() || X > viewPort->getViewWidth())
-            {
-                if (X < leftMost) leftMost = X;
-                else if (X > rightMost) rightMost = X;
-                resizeX = true;
-            }
-            
-            if (Y < viewPort->getViewPositionY() || Y > viewPort->getViewHeight())
-            {
-                if (Y < topMost)    topMost = Y;
-                else if (Y > bottomMost) bottomMost = Y;
-                resizeY = true;
-            }
         }
-        
-        setBounds(leftMost, topMost, rightMost - leftMost, bottomMost - topMost);
-        
-        /*
-         if (resizeX)
-         {
-         for (auto item : graph->getSelectedItems())
-         {
-         item->setTopLeftPosition(item->getX()+10, item->getY());
-         }
-         resizeX = false;
-         }
-         
-         if (resizeY)
-         {
-         setSize(getWidth(), getHeight()+abs(offsetY));
-         for (auto item : graph->getSelectedItems())
-         {
-         item->setTopLeftPosition(item->getX(), item->getY()+10);
-         
-         }
-         resizeY = false;
-         }
-         */
     }
     
     lineEX = e.getEventRelativeTo(this).x;
@@ -406,50 +442,6 @@ void BKConstructionSite::deleteItem (BKItem* item)
 
 bool BKConstructionSite::keyPressed (const KeyPress& e, Component*)
 {
-    DBG(String(e.getKeyCode()));
-    
-    if (e.isKeyCode(127))
-    {
-        graph->updateLast();
-        
-        BKItem::PtrArr selectedItems = graph->getSelectedItems();
-        
-        for (int i = selectedItems.size(); --i >= 0;)
-        {
-            deleteItem(selectedItems[i]);
-        }
-        
-        repaint();
-    }
-    else if ((e.getModifiers().isCommandDown() || e.getModifiers().isCtrlDown()) && e.isKeyCode(90))
-    {
-        // Cmd/Ctrl-Z UNDO
-        DBG("undo");
-        
-        // should have Snapshot based system.
-        
-        /*
-        
-        for (auto toAdd : graph->getLast())
-        {
-            
-            if (!graph->contains(toAdd))
-            {
-                graph->add(toAdd);
-            
-                toAdd->setItemBounds(toAdd->position.x, toAdd->position.y, 150, 20);
-                
-                addAndMakeVisible(toAdd);
-            }
-            else
-            {
-                // reposition if already contains
-                graph->get(toAdd->getType(), toAdd->getId())
-                        ->setTopLeftPosition(toAdd->position.x, toAdd->position.y);
-            }
-        }
-         */
-    }
     
 }
 

@@ -81,7 +81,7 @@ SynchronicViewController::~SynchronicViewController()
 
 void SynchronicViewController::paint (Graphics& g)
 {
-    g.fillAll(Colours::lightgrey);
+    g.fillAll(Colours::transparentWhite);
 }
 
 void SynchronicViewController::resized()

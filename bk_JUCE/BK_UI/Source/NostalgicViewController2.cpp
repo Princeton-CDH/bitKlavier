@@ -57,7 +57,7 @@ theGraph(theGraph)
 
 void NostalgicViewController2::paint (Graphics& g)
 {
-    g.fillAll(Colours::lightgrey);
+    g.fillAll(Colours::transparentWhite);
 }
 
 void NostalgicViewController2::resized()

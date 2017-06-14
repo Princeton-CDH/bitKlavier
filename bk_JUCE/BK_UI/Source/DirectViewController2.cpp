@@ -45,8 +45,7 @@ theGraph(theGraph)
 
 void DirectViewController2::paint (Graphics& g)
 {
-    g.setColour(Colours::goldenrod);
-    g.drawRect(getLocalBounds(), 1);
+    g.fillAll(Colours::transparentWhite);
 }
 
 void DirectViewController2::resized()

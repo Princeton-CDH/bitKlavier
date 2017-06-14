@@ -48,7 +48,7 @@ GeneralViewController::~GeneralViewController()
 
 void GeneralViewController::paint (Graphics& g)
 {
-    g.fillAll(Colours::lightgrey);
+    g.fillAll(Colours::transparentWhite);
 }
 
 void GeneralViewController::resized()

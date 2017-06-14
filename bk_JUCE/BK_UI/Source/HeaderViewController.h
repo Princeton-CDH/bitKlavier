@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-    GalleryViewController.h
+    HeaderViewController.h
     Created: 27 Mar 2017 12:47:45pm
     Author:  Michael R Mulshine
 
@@ -20,11 +20,11 @@
 #include "BKComponent.h"
 #include "BKListener.h"
 
-class GalleryViewController : public BKComponent, public BKListener, public BKEditableComboBoxListener
+class HeaderViewController : public BKComponent, public BKListener, public BKEditableComboBoxListener
 {
 public:
-    GalleryViewController(BKAudioProcessor& p);
-    ~GalleryViewController();
+    HeaderViewController(BKAudioProcessor& p);
+    ~HeaderViewController();
     
     void update(void);
     void fillGalleryCB(void);
@@ -47,9 +47,9 @@ private:
     void bkButtonClicked            (Button* b)             override;
     void BKEditableComboBoxChanged(String text, BKEditableComboBox* cb) override;
     
-    static void loadMenuCallback(int result, GalleryViewController*);
-    static void pianoMenuCallback(int result, GalleryViewController*);
-    static void galleryMenuCallback(int result, GalleryViewController*);
+    static void loadMenuCallback(int result, HeaderViewController*);
+    static void pianoMenuCallback(int result, HeaderViewController*);
+    static void galleryMenuCallback(int result, HeaderViewController*);
     
     PopupMenu getLoadMenu(void);
     PopupMenu getPianoMenu(void);
@@ -64,7 +64,7 @@ private:
     
     BKEditableComboBox                  pianoCB;
     
-    JUCE_LEAK_DETECTOR(GalleryViewController)
+    JUCE_LEAK_DETECTOR(HeaderViewController)
 };
 
 #endif  // GALLERYVIEWCONTROLLER_H_INCLUDED

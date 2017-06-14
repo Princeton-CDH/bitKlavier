@@ -77,7 +77,7 @@ void KeymapViewController::reset(void)
 
 void KeymapViewController::paint (Graphics& g)
 {
-    g.fillAll(Colours::lightgrey);
+    g.fillAll(Colours::transparentWhite);
 }
 
 void KeymapViewController::resized()
