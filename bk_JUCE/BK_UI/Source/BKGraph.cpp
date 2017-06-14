@@ -81,7 +81,7 @@ Id(Id)
     
 
     int val =
-    ((type > PreparationTypeKeymap && type < PreparationTypePianoMap) || type == PreparationTypeReset) ? 100 :
+    ((type > PreparationTypeKeymap && type <= PreparationTypePianoMap) || type == PreparationTypeReset) ? 90 :
     (type == PreparationTypeKeymap) ? 75 :
     (type == PreparationTypeTempo || type == PreparationTypeTuning) ? 55 :
     65;
