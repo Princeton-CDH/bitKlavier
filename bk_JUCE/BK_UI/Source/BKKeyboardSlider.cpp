@@ -21,6 +21,7 @@ BKKeyboardSlider::BKKeyboardSlider()
     keyboard->setScrollButtonsVisible(false);
     keyboard->setAvailableRange(minKey, maxKey);
     keyboard->setOctaveForMiddleC(4);
+    keyboard->setFundamental(-1);
     keyboard->addMouseListener(this, true);
     keyboardState.addListener(this);
     keyboardVals.ensureStorageAllocated(128);
@@ -75,6 +76,12 @@ void BKKeyboardSlider::resized()
     showName.setBounds(textSlab.removeFromRight(125));
     keyboardValsTextFieldOpen.setBounds(textSlab.removeFromLeft(75));
     keyboardValsTextField->setBounds(keyboardComponent->getBounds());
+}
+
+void BKKeyboardSlider::setFundamental(int fund)
+{
+    BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
+    keyboard->setFundamental(fund);
 }
 
 void BKKeyboardSlider::setAvailableRange(int min, int max)

@@ -55,6 +55,8 @@ public:
     void setAvailableRange(int min, int max);
     void useOrderedPairs(bool op) { orderedPairs = op; };
     
+    void setFundamental(int fund);
+    
     Array<float> getAllValues();
     Array<float> getActiveValues();
     

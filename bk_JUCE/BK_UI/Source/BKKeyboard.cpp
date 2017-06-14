@@ -78,6 +78,8 @@ octaveNumForMiddleC (3)
     mouseOverNotes.insertMultiple (0, -1, 32);
     mouseDownNotes.insertMultiple (0, -1, 32);
     
+    fundamental = -1; //don't display by default
+    
     colourChanged();
     setWantsKeyboardFocus (true);
     
@@ -471,6 +473,8 @@ void BKKeymapKeyboardComponent::drawWhiteNote (int midiNoteNumber,
     if (isDown)  c = findColour (keyDownOverlayColourId);
     if (isOver)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
     
+    if (isFundamental(midiNoteNumber % 12)) c = c.overlaidWith(Colours::red.withMultipliedAlpha(0.5));
+    
     g.setColour (c);
     g.fillRect (x, y, w, h);
     
@@ -517,7 +521,7 @@ void BKKeymapKeyboardComponent::drawWhiteNote (int midiNoteNumber,
     }
 }
 
-void BKKeymapKeyboardComponent::drawBlackNote (int /*midiNoteNumber*/,
+void BKKeymapKeyboardComponent::drawBlackNote (int midiNoteNumber,
                                            Graphics& g, int x, int y, int w, int h,
                                            bool isDown, bool isOver,
                                            const Colour& noteFillColour)
@@ -526,6 +530,8 @@ void BKKeymapKeyboardComponent::drawBlackNote (int /*midiNoteNumber*/,
     
     if (isDown)  c = c.overlaidWith (findColour (keyDownOverlayColourId));
     if (isOver)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
+    
+    if (isFundamental(midiNoteNumber % 12)) c = c.overlaidWith(Colours::red.withMultipliedAlpha(0.5));
     
     g.setColour (c);
     g.fillRect (x, y, w, h);

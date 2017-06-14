@@ -93,6 +93,7 @@ theGraph(theGraph)
     customKeyboard.addMyListener(this);
     customKeyboard.setAvailableRange(60, 71);
     customKeyboard.useOrderedPairs(false);
+    customKeyboard.setFundamental(0);
     addAndMakeVisible(customKeyboard);
     
     offsetSlider = new BKSingleSlider("Global Offset (cents)", -100, 100, 0, 0.1);

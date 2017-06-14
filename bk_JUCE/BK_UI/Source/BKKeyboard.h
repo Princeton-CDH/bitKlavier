@@ -257,6 +257,15 @@ public:
     int getOctaveForMiddleC() const noexcept            { return octaveNumForMiddleC; }
     
     const int getLastNoteOver() const noexcept          { return lastNoteOver; }
+    
+    
+    bool isFundamental(int root)
+    {
+        if(root == fundamental) return true;
+        else return false;
+    }
+    
+    void setFundamental(int fund) { fundamental = fund; }
 
     //==============================================================================
     /** @internal */
@@ -293,6 +302,7 @@ public:
     void handleKeymapNoteOff (BKKeymapKeyboardState*, int midiNoteNumber) override;
     
     void handleKeymapNoteToggled (BKKeymapKeyboardState*, int midiNoteNumber) override;
+
 
 protected:
     //==============================================================================
@@ -403,6 +413,7 @@ private:
     Array<KeyPress> keyPresses;
     Array<int> keyPressNotes;
     int keyMappingOctave, octaveNumForMiddleC;
+    int fundamental;
 
     static const uint8 whiteNotes[];
     static const uint8 blackNotes[];
