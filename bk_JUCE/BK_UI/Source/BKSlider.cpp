@@ -1430,10 +1430,7 @@ BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
     
     float skewFactor = 0.7;
     
-    File file("~/bkImages/samplePic.png");
-    FileInputStream inputStream(file);
-    PNGImageFormat sampleImageLoader;
-    sampleImageComponent.setImage(sampleImageLoader.decodeImage(inputStream));
+    sampleImageComponent.setImage(ImageCache::getFromMemory(BinaryData::samplePic_png, BinaryData::samplePic_pngSize));
     sampleImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
     addAndMakeVisible(sampleImageComponent);
     

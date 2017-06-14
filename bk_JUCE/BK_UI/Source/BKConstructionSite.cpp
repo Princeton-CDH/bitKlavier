@@ -307,66 +307,68 @@ void BKConstructionSite::itemWasDropped(BKPreparationType type, Array<int> data,
 void BKConstructionSite::mouseDown (const MouseEvent& eo)
 {
     MouseEvent e = eo.getEventRelativeTo(this);
-
-    selected.deselectAll();
     
-    if (e.mods.isCommandDown())
+    itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
+    
+    
+    if (itemToSelect != nullptr)
     {
-        
-        itemSource = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
-        
-        if (itemSource != nullptr)
+        if (e.mods.isShiftDown())
         {
-            connect = true;
+            // also select this item
+            if (itemToSelect != nullptr)
+            {
+                if (!itemToSelect->getSelected())   graph->select(itemToSelect);
+                else                                graph->deselect(itemToSelect);
+            }
             
-            DBG("ORIGIN: " + String(lineOX) + " " + String(lineOY));
-            lineOX = e.x;
-            lineOY = e.y;
+            for (auto item : graph->getSelectedItems())
+            {
+                prepareItemDrag(item, e, true);
+            }
+            
         }
-    }
-    else if (e.mods.isShiftDown())
-    {
-        // also select this item
-        itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
-        
-        if (itemToSelect != nullptr)
+        else
         {
-            if (!itemToSelect->getSelected())   graph->select(itemToSelect);
-            else                                graph->deselect(itemToSelect);
-        }
-        
-        for (auto item : graph->getSelectedItems())
-        {
-            prepareItemDrag(item, e, true);
-        }
-        
-    }
-    else
-    {
-        itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
-        
-        if (itemToSelect != nullptr)
-        {
+            itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
+            
             if (!itemToSelect->getSelected())
             {
                 graph->deselectAll();
                 graph->select(itemToSelect);
             }
-        }
-        else
-        {
-            graph->deselectAll();
             
-            addAndMakeVisible(lasso = new LassoComponent<BKItem*>());
-            
-            lasso->beginLasso(eo, this);
+            for (auto item : graph->getSelectedItems())
+            {
+                prepareItemDrag(item, e, true);
+            }
         }
         
-        for (auto item : graph->getSelectedItems())
+        if (e.mods.isCommandDown())
         {
-            prepareItemDrag(item, e, true);
+            itemSource = itemToSelect;
+            
+            if (itemSource != nullptr)
+            {
+                connect = true;
+                
+                DBG("ORIGIN: " + String(lineOX) + " " + String(lineOY));
+                lineOX = e.x;
+                lineOY = e.y;
+            }
         }
     }
+    else
+    {
+        graph->deselectAll();
+        
+        selected.deselectAll();
+        
+        addAndMakeVisible(lasso = new LassoComponent<BKItem*>());
+        
+        lasso->beginLasso(eo, this);
+    }
+    
     
 }
 
