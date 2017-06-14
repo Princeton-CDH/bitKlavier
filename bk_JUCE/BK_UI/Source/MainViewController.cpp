@@ -15,8 +15,8 @@
 MainViewController::MainViewController (BKAudioProcessor& p):
 processor (p),
 theGraph(p),
-overtop(p, &theGraph),
 construction(p, &theGraph),
+overtop(p, &theGraph),
 header(p),
 timerCallbackCount(0)
 {
@@ -31,11 +31,6 @@ timerCallbackCount(0)
     addAndMakeVisible(header);
     
     addChildComponent(overtop);
-
-    /*
-    addAndMakeVisible (levelMeterComponentL = new BKLevelMeterComponent());
-    addAndMakeVisible (levelMeterComponentR = new BKLevelMeterComponent());
-     */
 
     mainSlider = new Slider();
     addAndMakeVisible (mainSlider);
@@ -78,7 +73,7 @@ void MainViewController::resized()
                            getParentComponent()->getBottom() - header.getBottom()-2*gYSpacing);
     
     
-    overtop.setBounds(viewPort.getBounds());    
+    overtop.setBounds(construction.getBounds());
 }
 
 
@@ -253,6 +248,5 @@ void MainViewController::timerCallback()
      */
     
 }
-
 
 

@@ -10,13 +10,17 @@
 
 #include "BKMenu.h"
 
+
 void BKEditableComboBox::mouseDoubleClick (const MouseEvent &event)
 {
-
-    addAndMakeVisible(nameEditor);
+    lastItemId = getSelectedId();
+    nameEditor.setAlpha(1.);
+    nameEditor.toFront(true);
     nameEditor.setBounds(getLocalBounds());
     nameEditor.grabKeyboardFocus();
-    nameEditor.setText(getItemText(getSelectedItemIndex()));
+    nameEditor.setText(getItemText(indexOfItemId(lastItemId)));
+    Range<int> highlightRange(0, nameEditor.getText().length());
+    nameEditor.setHighlightedRegion(highlightRange);
 }
 
 
@@ -24,12 +28,19 @@ void BKEditableComboBox::mouseDoubleClick (const MouseEvent &event)
 void BKEditableComboBox::textEditorReturnKeyPressed(TextEditor& textEditor)
 {
     
+    nameEditor.toBack();
+    nameEditor.setAlpha(0.);
+
+    hidePopup();
+    
     listeners.call(&BKEditableComboBoxListener::BKEditableComboBoxChanged,
                    textEditor.getText(),
                    this);
     
-    
     removeChildComponent(&nameEditor);
+    
+    changeItemText(lastItemId, textEditor.getText());
+    setSelectedId(lastItemId, dontSendNotification);
 }
 
 void BKEditableComboBox::textEditorFocusLost(TextEditor& textEditor)
@@ -40,5 +51,7 @@ void BKEditableComboBox::textEditorFocusLost(TextEditor& textEditor)
                    this);
     
     removeChildComponent(&nameEditor);
-}
 
+    changeItemText(lastItemId, textEditor.getText());
+    setSelectedId(lastItemId, dontSendNotification);
+};

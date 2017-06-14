@@ -746,6 +746,8 @@ void BKKeymapKeyboardComponent::updateNoteUnderMouse (Point<int> pos, bool isDow
     const int oldNoteDown = mouseDownNotes.getUnchecked (fingerNum);
     const float eventVelocity = useMousePositionForVelocity ? mousePositionVelocity * velocity : 1.0f;
     
+    lastNoteOver = newNote;
+    
     if (oldNote != newNote)
     {
         repaintNote (oldNote);

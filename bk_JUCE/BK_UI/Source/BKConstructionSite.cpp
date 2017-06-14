@@ -198,12 +198,12 @@ void BKConstructionSite::draw(void)
             int X = 10 + (row * 155);
             int Y = 50 + (col * 25);
             
-            item->setItemBounds(X, Y, 100, 40);
+            item->setTopLeftPosition(X, Y);
             
             keymapCount++;
 #else
             
-            item->setBounds(x, y, 100, 40);
+            item->setTopLeftPosition(x, y);
 #endif
             
         }
@@ -216,11 +216,11 @@ void BKConstructionSite::draw(void)
             int X = 10 + (row * 155);
             int Y = 200 + (col * 25);
             
-            item->setItemBounds(X, Y, 150, 20);
+            item->setTopLeftPosition(X, Y);
             
             prepCount++;
 #else
-            item->setBounds(x, y, 150, 20);
+            item->setTopLeftPosition(x, y);
 #endif
             
         }
@@ -234,11 +234,11 @@ void BKConstructionSite::draw(void)
             int Y = 125 + (col * 25);
             
             
-            item->setItemBounds(X, Y, 130, 20);
+            item->setTopLeftPosition(X, Y);
             
             modCount++;
 #else
-            item->setBounds(x, y, 130, 20);
+            item->setTopLeftPosition(x, y);
 #endif
         }
         else
@@ -250,11 +250,11 @@ void BKConstructionSite::draw(void)
             int X = 10 + (row * 155);
             int Y = 350 + (col * 25);
             
-            item->setItemBounds(X, Y, 150, 20);
+            item->setTopLeftPosition(X, Y);
             
             otherCount++;
 #else
-            item->setBounds(x, y, 150, 20);
+            item->setTopLeftPosition(x, y);
 #endif
             
         }
@@ -290,7 +290,7 @@ void BKConstructionSite::itemWasDropped(BKPreparationType type, Array<int> data,
     {
         BKItem::Ptr toAdd = new BKItem(type, data[i], processor);
         
-        toAdd->setItemBounds(x, (i-1)*25 + y, 150, 20);
+        toAdd->setTopLeftPosition(x, (i-1) * 125 + y);
         
         if (type == PreparationTypeReset || type == PreparationTypePianoMap || !graph->contains(toAdd)) graph->add(toAdd);
         
@@ -305,10 +305,6 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     MouseEvent e = eo.getEventRelativeTo(this);
 
     selected.deselectAll();
-    
-    addAndMakeVisible(lasso = new LassoComponent<BKItem*>());
-    
-    lasso->beginLasso(eo, this);
     
     if (e.mods.isCommandDown())
     {
@@ -356,6 +352,10 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
         else
         {
             graph->deselectAll();
+            
+            addAndMakeVisible(lasso = new LassoComponent<BKItem*>());
+            
+            lasso->beginLasso(eo, this);
         }
         
         for (auto item : graph->getSelectedItems())
@@ -368,7 +368,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
 
 void BKConstructionSite::mouseDrag (const MouseEvent& e)
 {
-    lasso->dragLasso(e);
+    if (itemToSelect == nullptr) lasso->dragLasso(e);
     
     if (!e.mods.isCommandDown())
     {
@@ -391,7 +391,7 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
 {
     MouseEvent e = eo.getEventRelativeTo(this);
     
-    lasso->endLasso();
+    if (itemToSelect == nullptr) lasso->endLasso();
     
     if (selected.getNumSelected())
     {

@@ -255,6 +255,8 @@ public:
         @see setOctaveForMiddleC
     */
     int getOctaveForMiddleC() const noexcept            { return octaveNumForMiddleC; }
+    
+    const int getLastNoteOver() const noexcept          { return lastNoteOver; }
 
     //==============================================================================
     /** @internal */
@@ -413,6 +415,8 @@ private:
     void updateNoteUnderMouse (const MouseEvent&, bool isDown);
     void repaintNote (int midiNoteNumber);
     void setLowestVisibleKeyFloat (float noteNumber);
+    
+    int lastNoteOver;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKKeymapKeyboardComponent)
 };

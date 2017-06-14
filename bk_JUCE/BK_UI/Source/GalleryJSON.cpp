@@ -104,7 +104,7 @@ void Gallery::setStateFromJson(var myJson)
             
             defaultTuning->setFundamental((PitchClass)((12-fund)%12));
             
-            defaultTuning->setCustomScale(custom);
+            defaultTuning->setCustomScaleCents(custom);
             
             defaultTuning->setAdaptiveHistory(howMany);
             

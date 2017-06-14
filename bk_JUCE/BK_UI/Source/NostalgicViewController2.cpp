@@ -95,9 +95,9 @@ void NostalgicViewController2::BKEditableComboBoxChanged(String name, BKEditable
 {
     processor.gallery->getNostalgic(processor.updateState->currentNostalgicId)->setName(name);
     
-    int selected = selectCB.getSelectedId();
-    if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, name);
-    selectCB.setSelectedId(selected, dontSendNotification );
+    //int selected = selectCB.getSelectedId();
+    //if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, name);
+    //selectCB.setSelectedId(selected, dontSendNotification );
 }
 
 void NostalgicViewController2::updateFields(void)

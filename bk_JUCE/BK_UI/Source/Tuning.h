@@ -158,6 +158,26 @@ public:
     inline const Array<float> getAbsoluteOffsets() const noexcept           {return tAbsolute;                  }
     float getAbsoluteOffset(int midiNoteNumber) const noexcept              {return tAbsolute.getUnchecked(midiNoteNumber);}
     
+    inline const Array<float> getAbsoluteOffsetsCents() const noexcept {
+        Array<float> tAbsoluteCents;
+        tAbsoluteCents.ensureStorageAllocated(128);
+        for(int i=tAbsolute.size(); --i >= 0;)
+        {
+            tAbsoluteCents.set(i, tAbsolute.getUnchecked(i) * 100.);
+        }
+        return tAbsoluteCents;
+    }
+    
+    inline const Array<float> getCustomScaleCents() const noexcept {
+        Array<float> tCustomCents;
+        tCustomCents.ensureStorageAllocated(12);
+        for(int i=0; i<tCustom.size(); i++)
+        {
+            tCustomCents.set(i, tCustom.getUnchecked(i) * 100.);
+        }
+        return tCustomCents;
+    }
+    
     
     inline void setName(String n){name = n;}
     inline void setTuning(TuningSystem tuning)                                      {tWhichTuning = tuning;                                 }

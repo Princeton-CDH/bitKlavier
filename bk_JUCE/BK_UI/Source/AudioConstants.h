@@ -743,6 +743,33 @@ typedef enum TuningSystem {
 
 } TuningSystem;
 
+static const std::vector<std::string> cTuningSystemNames = {
+    "Partial",
+    "Just",
+    "Equal Temperament",
+    "Adaptive Tuning 1",
+    "Adaptive Anchored Tuning 1",
+    "Duodene",
+    "Otonal",
+    "Utonal",
+    "Custom"
+};
+
+static const std::vector<std::string> cFundamentalNames = {
+    "0: C",
+    "1: C#/Db",
+    "2: D",
+    "3: D#/Eb",
+    "4: E",
+    "5: F",
+    "6: F#/Gb",
+    "7: G",
+    "8: G#/Ab",
+    "9: A",
+    "10: A#/Bb",
+    "11: B"
+};
+
 typedef enum TempoType {
     ConstantTempo = 0,
     AdaptiveTempo1,

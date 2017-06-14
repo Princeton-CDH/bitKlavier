@@ -51,9 +51,17 @@ public:
         setSize(200,20);
         
         lookAndFeelChanged();
-        
+
         nameEditor.setName("NAMETXTEDIT");
+        addAndMakeVisible(nameEditor);
+        nameEditor.toBack();
+        nameEditor.setAlpha(0.);
+        //nameEditor.setVisible(false);
+        nameEditor.setOpaque(true);
         nameEditor.addListener(this);
+        
+        lastItemId = 0;
+
     }
     
     ~BKEditableComboBox()
@@ -71,6 +79,7 @@ public:
 private:
         
     BKTextField nameEditor;
+    int lastItemId;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKEditableComboBox)
 };
@@ -80,7 +89,6 @@ class BKEditableComboBoxListener
     
 public:
     
-    //BKSingleSliderListener() {}
     virtual ~BKEditableComboBoxListener() {};
     
     virtual void BKEditableComboBoxChanged(String text, BKEditableComboBox*) = 0;

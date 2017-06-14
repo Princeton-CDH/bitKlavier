@@ -101,6 +101,7 @@ public:
     
     inline void setCurrentDisplay(BKPreparationDisplay type)
     {
+        
         if (type == DisplayNil)
         {
             setVisible(false);

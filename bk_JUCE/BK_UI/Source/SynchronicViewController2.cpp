@@ -400,9 +400,9 @@ void SynchronicViewController2::BKEditableComboBoxChanged(String name, BKEditabl
 {
     processor.gallery->getSynchronic(processor.updateState->currentSynchronicId)->setName(name);
     
-    int selected = selectCB.getSelectedId();
-    if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, name);
-    selectCB.setSelectedId(selected, dontSendNotification );
+    //int selected = selectCB.getSelectedId();
+    //if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, name);
+    //selectCB.setSelectedId(selected, dontSendNotification );
 }
 
 void SynchronicViewController2::bkMessageReceived (const String& message)

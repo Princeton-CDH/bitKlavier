@@ -94,6 +94,9 @@ public:
     // Public members
     Point<float> origin;
     
+    Image image;
+    RectanglePlacement placement;
+    
     void bkTextFieldDidChange   (TextEditor&)           override {};
     void bkComboBoxDidChange    (ComboBox*)             override;
     void bkButtonClicked        (Button* b)             override {};

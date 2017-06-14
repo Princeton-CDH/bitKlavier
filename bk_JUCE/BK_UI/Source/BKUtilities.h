@@ -30,6 +30,7 @@ Array<float>    stringToFloatArray(String s);
 Array<Array<float>> stringToArrayFloatArray(String s);
 
 String          offsetArrayToString(Array<float> arr);
+String          offsetArrayToString2(Array<float> arr);
 String          boolArrayToString(Array<bool> arr);
 Array<int>      stringToIntArray(String s);
 Array<int>      keymapStringToIntArray(String s);

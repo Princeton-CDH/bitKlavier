@@ -234,7 +234,7 @@ public:
     Slider thisSlider;
     
     String sliderName;
-    Label showName;
+    BKLabel showName;
     bool textIsAbove;
     
     TextEditor valueTF;
@@ -337,7 +337,7 @@ public:
     Slider invisibleSlider;
 
     String sliderName;
-    Label showName;
+    BKLabel showName;
     
     TextEditor minValueTF;
     TextEditor maxValueTF;
@@ -415,8 +415,8 @@ public:
     String undertowSliderName;
     
     String sliderName;
-    Label wavedistanceName;
-    Label undertowName;
+    BKLabel wavedistanceName;
+    BKLabel undertowName;
     
     TextEditor wavedistanceValueTF;
     TextEditor undertowValueTF;

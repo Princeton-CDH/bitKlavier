@@ -62,6 +62,7 @@ private:
     
     HeaderViewController header;
     BKConstructionSite  construction;
+
     BKOvertop           overtop;
     
     ScopedPointer<Slider> mainSlider;
