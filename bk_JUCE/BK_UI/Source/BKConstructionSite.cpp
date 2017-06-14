@@ -70,6 +70,8 @@ void BKConstructionSite::move(int which, bool fine)
     
     for (auto item : graph->getSelectedItems())
         item->setTopLeftPosition(item->getX() + changeX, item->getY() + changeY);
+    
+    repaint();
 }
 
 void BKConstructionSite::remove(void)
@@ -134,6 +136,8 @@ void BKConstructionSite::align(int which)
         
         item->setTopLeftPosition(X, Y);
     }
+    
+    repaint();
 }
 
 void BKConstructionSite::paint(Graphics& g)
