@@ -59,6 +59,7 @@ public:
     
     Array<float> getAllValues();
     Array<float> getActiveValues();
+    Array<float> getActiveValuesWithFundamentalOffset();
     
     void setAllValues(Array<float> newvals);
     void setActiveValues(Array<float> newvals);
@@ -70,6 +71,7 @@ private:
     BKLabel showName;
 
     TextEditor keyboardValueTF;
+    BKKeymapKeyboardComponent* keyboard;
     BKKeymapKeyboardState keyboardState;
     Component *keyboardComponent;
     ScopedPointer<TextEditor> keyboardValsTextField;
@@ -78,9 +80,11 @@ private:
     int keyboardSize, minKey, maxKey;
     int lastKeyPressed;
     Array<float> keyboardVals;
+    Array<float> keyboardValsFundamentalOffset;
     bool orderedPairs;
     
     void setActiveValsFromString(String s);
+    void setActiveValsFromStringWithFundamentalOffset(String s);
     
     void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override {};
     void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override {};
@@ -92,6 +96,8 @@ private:
     void bkTextFieldDidChange (TextEditor& txt) override;
     void bkButtonClicked (Button* b) override;
     void mouseMove(const MouseEvent& e) override;
+    void mouseDrag(const MouseEvent& e) override;
+    void mouseUp(const MouseEvent& e) override;
 
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKKeyboardSlider)

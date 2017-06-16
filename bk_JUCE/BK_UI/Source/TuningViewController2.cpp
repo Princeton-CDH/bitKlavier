@@ -91,7 +91,8 @@ theGraph(theGraph)
     for(int i=0; i<12; i++) customOffsets.add(0.);
     customKeyboard.setName("Custom Offsets");
     customKeyboard.addMyListener(this);
-    customKeyboard.setAvailableRange(60, 71);
+    //customKeyboard.setAvailableRange(60, 71);
+    customKeyboard.setAvailableRange(0, 11);
     customKeyboard.useOrderedPairs(false);
     customKeyboard.setFundamental(0);
     addAndMakeVisible(customKeyboard);
@@ -245,6 +246,8 @@ void TuningViewController2::bkComboBoxDidChange (ComboBox* box)
         prep->setFundamental((PitchClass)fundamentalCB.getSelectedItemIndex());
         active->setFundamental((PitchClass)fundamentalCB.getSelectedItemIndex());
         
+        customKeyboard.setFundamental(fundamentalCB.getSelectedItemIndex());
+        
         updateComponentVisibility();
         
     }
@@ -345,7 +348,7 @@ void TuningViewController2::updateFields(void)
     offsetSlider->setValue(prep->getFundamentalOffset(), dontSendNotification);
 
     absoluteKeyboard.setAllValues(prep->getAbsoluteOffsetsCents());
-    customKeyboard.setActiveValues(prep->getCustomScaleCents());
+    customKeyboard.setActiveValues(prep->getCustomScaleCents()); //these two calls should be the same?
     
     A1IntervalScaleCB.setSelectedItemIndex(prep->getAdaptiveIntervalScale(), dontSendNotification);
     A1Inversional.setToggleState(prep->getAdaptiveInversional(), dontSendNotification);
