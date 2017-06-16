@@ -45,6 +45,7 @@ private:
     
     BKLabel scaleLabel;
     BKComboBox scaleCB;
+    int customIndex; //index of Custom tuning in combobox
     
     BKLabel fundamentalLabel;
     BKComboBox fundamentalCB;

@@ -194,14 +194,12 @@ public:
     void setAbsoluteOffset(int which, float val)                                    {tAbsolute.set(which, val);                             }
 
     inline void setCustomScaleCents(Array<float> tuning) {
-        tCustom = tuning;
-        for(int i=0; i<tCustom.size(); i++) tCustom.setUnchecked(i, tCustom.getUnchecked(i) * 0.01f);
+        for(int i=0; i<tCustom.size(); i++) tCustom.setUnchecked(i, tuning.getUnchecked(i) * 0.01f);
     }
     
     inline void setAbsoluteOffsetCents(Array<float> abs) {
-        tAbsolute = abs;
         for(int i=tAbsolute.size(); --i >= 0;)
-            tAbsolute.setUnchecked(i, tAbsolute.getUnchecked(i) * 0.01f);
+            tAbsolute.setUnchecked(i, abs.getUnchecked(i) * 0.01f);
     }
     
     
@@ -261,6 +259,7 @@ public:
     
     //returns tuning offsets; add to integer PitchClass
     float getOffset(int midiNoteNumber) const;
+    Array<float> getTuningOffsets(TuningSystem which) {return tuningLibrary.getUnchecked(which); }
     
     //for calculating adaptive tuning
     void keyPressed(int midiNoteNumber);
@@ -394,6 +393,28 @@ public:
     inline void setY(int y) { Y = y; }
     inline int getX(void) const noexcept { return X; }
     inline int getY(void) const noexcept { return Y; }
+    
+    Array<float> getCurrentScale()
+    {
+        if(aPrep->getTuning() == CustomTuning)
+        {
+            return aPrep->getCustomScale();
+        }
+        DBG("current tuning " + String(aPrep->getTuning()));
+        return processor->getTuningOffsets(aPrep->getTuning());
+    }
+    
+    Array<float> getCurrentScaleCents()
+    {
+        Array<float> mScale = getCurrentScale();
+        Array<float> cScale;
+        for(int i=0; i<12; i++)
+        {
+            cScale.insert(i, mScale.getUnchecked(i) * 100.);
+        }
+        
+        return cScale;
+    }
     
 private:
     int Id;

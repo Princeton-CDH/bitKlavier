@@ -89,7 +89,7 @@ theGraph(theGraph)
     //Custom Tuning Keyboard
     customOffsets.ensureStorageAllocated(12);
     for(int i=0; i<12; i++) customOffsets.add(0.);
-    customKeyboard.setName("Custom Offsets");
+    customKeyboard.setName("Temperament Offsets");
     customKeyboard.addMyListener(this);
     //customKeyboard.setAvailableRange(60, 71);
     customKeyboard.setAvailableRange(0, 11);
@@ -124,6 +124,9 @@ void TuningViewController2::resized()
     
     fundamentalLabel.setBounds(leftColumn.removeFromTop(20));
     fundamentalCB.setBounds(leftColumn.removeFromTop(20));
+    leftColumn.removeFromTop(gYSpacing * 2);
+    
+    customKeyboard.setBounds(leftColumn.removeFromTop(120));
     leftColumn.removeFromTop(gYSpacing * 4);
     
     offsetSlider->setBounds(leftColumn.removeFromTop(50));
@@ -143,9 +146,6 @@ void TuningViewController2::resized()
     rightColumn.removeFromTop(gYSpacing * 2);
     A1FundamentalLabel.setBounds(rightColumn.removeFromTop(20));
     A1FundamentalCB.setBounds(rightColumn.removeFromTop(20));
-    
-    rightColumn.removeFromBottom(gYSpacing * 2);
-    customKeyboard.setBounds(rightColumn.removeFromBottom(80));
     
     absoluteKeyboard.setBounds(absoluteKeymapRow);
 }
@@ -196,6 +196,11 @@ void TuningViewController2::fillTuningCB(void)
             A1IntervalScaleCB.setItemEnabled(i+1, false);
             A1AnchorScaleCB.setItemEnabled(i+1, false);
         }
+                
+        if(name == "Custom") {
+            customIndex = i;
+            DBG("assigned to customIndex " + String(customIndex));
+        }
     }
 }
 
@@ -238,6 +243,9 @@ void TuningViewController2::bkComboBoxDidChange (ComboBox* box)
         prep->setTuning((TuningSystem)scaleCB.getSelectedItemIndex());
         active->setTuning((TuningSystem)scaleCB.getSelectedItemIndex());
         
+        Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+        customKeyboard.setValues(currentTuning->getCurrentScaleCents());
+        
         updateComponentVisibility();
         
     }
@@ -277,11 +285,13 @@ void TuningViewController2::bkComboBoxDidChange (ComboBox* box)
 
 void TuningViewController2::updateComponentVisibility()
 {
+    /*
     if(scaleCB.getText() == "Custom")
     {
         customKeyboard.setVisible(true);
     }
     else customKeyboard.setVisible(false);
+     */
         
     if(scaleCB.getText() == "Adaptive Tuning 1")
     {
@@ -347,8 +357,9 @@ void TuningViewController2::updateFields(void)
     fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
     offsetSlider->setValue(prep->getFundamentalOffset(), dontSendNotification);
 
-    absoluteKeyboard.setAllValues(prep->getAbsoluteOffsetsCents());
-    customKeyboard.setActiveValues(prep->getCustomScaleCents()); //these two calls should be the same?
+    absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
+    Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+    customKeyboard.setValues(currentTuning->getCurrentScaleCents());
     
     A1IntervalScaleCB.setSelectedItemIndex(prep->getAdaptiveIntervalScale(), dontSendNotification);
     A1Inversional.setToggleState(prep->getAdaptiveInversional(), dontSendNotification);
@@ -374,8 +385,13 @@ void TuningViewController2::keyboardSliderChanged(String name, Array<float> valu
     else if(name == customKeyboard.getName())
     {
         DBG("updating custom tuning vals");
+        scaleCB.setSelectedItemIndex(customIndex, dontSendNotification);
+
         prep->setCustomScaleCents(values);
         active->setCustomScaleCents(values);
+        
+        prep->setTuning((TuningSystem)customIndex);
+        active->setTuning((TuningSystem)customIndex);
     }
 }
 

@@ -15,7 +15,8 @@ TuningProcessor::TuningProcessor(TuningPreparation::Ptr active):
 active(active)
 {
     
-    tuningLibrary.ensureStorageAllocated(6);
+    tuningLibrary.ensureStorageAllocated(cTuningSystemNames.size());
+    for(int i=0; i<cTuningSystemNames.size(); i++) tuningLibrary.insert(EqualTemperament, tEqualTuning);
     
     tuningLibrary.set(PartialTuning, tPartialTuning);
     tuningLibrary.set(JustTuning, tJustTuning);

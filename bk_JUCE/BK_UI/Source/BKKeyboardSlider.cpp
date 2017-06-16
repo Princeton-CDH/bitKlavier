@@ -25,6 +25,7 @@ BKKeyboardSlider::BKKeyboardSlider()
     keyboard->setOctaveForMiddleC(4);
     keyboard->setFundamental(-1);
     keyboard->setAllowDrag(false);
+    keyboard->doKeysToggle(false);
     keyboard->addMouseListener(this, true);
     keyboardState.addListener(this);
     keyboardVals.ensureStorageAllocated(128);
@@ -64,7 +65,7 @@ void BKKeyboardSlider::paint (Graphics& g)
 void BKKeyboardSlider::resized()
 {
     Rectangle<int> area (getLocalBounds());
-    float keyboardHeight = 60;
+    float keyboardHeight = area.getHeight() - 20;
     Rectangle<int> keymapRow = area.removeFromBottom(keyboardHeight + 20);
     
     //absolute keymap
@@ -100,7 +101,7 @@ void BKKeyboardSlider::setAvailableRange(int min, int max)
 
 void BKKeyboardSlider::mouseMove(const MouseEvent& e)
 {
-    keyboardValueTF.setText(String(keyboard->getLastNoteOverValue()), 1);
+    keyboardValueTF.setText(String(keyboard->getLastNoteOverValue(), 1), dontSendNotification);
 }
 
 void BKKeyboardSlider::mouseDrag(const MouseEvent& e)
@@ -116,7 +117,7 @@ void BKKeyboardSlider::mouseDrag(const MouseEvent& e)
         else dragPos = -1.* dragPos * dragPos;
         
         //keyboardVals.set(keyboard->getLastKeySelected(),  dragPos * 50.);
-        keyboardVals.set(lastKeyPressed,  dragPos * 50.);
+        //keyboardVals.set(lastKeyPressed,  dragPos * 50.);
         keyboardValueTF.setText(String(dragPos * 50.0, 1), dontSendNotification);
         //keyboard->setKeyValue(keyboard->getLastKeySelected(), dragPos * 50.);
         keyboard->setKeyValue(lastKeyPressed, dragPos * 50.);
@@ -131,13 +132,23 @@ void BKKeyboardSlider::mouseUp(const MouseEvent& e)
     {
         if(e.mods.isShiftDown())
         {
-            keyboardVals.set(lastKeyPressed,  0.);
+            //keyboardVals.set(lastKeyPressed,  0.);
             keyboardValueTF.setText(String(0.), dontSendNotification);
             keyboard->setKeyValue(lastKeyPressed, 0.);
-            
-            keyboard->repaint();
         }
     }
+    
+    listeners.call(&BKKeyboardSliderListener::keyboardSliderChanged,
+                   getName(),
+                   keyboard->getValuesRotatedByFundamental());
+    
+    keyboard->repaint();
+}
+
+void BKKeyboardSlider::mouseDown(const MouseEvent& e)
+{
+    lastKeyPressed = keyboard->getLastNoteOver();
+    DBG("lastKeyPressed = " + String(lastKeyPressed));
 }
 
 void BKKeyboardSlider::bkTextFieldDidChange (TextEditor& textEditor)
@@ -191,8 +202,7 @@ void BKKeyboardSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 
 void BKKeyboardSlider::handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber)
 {
-    lastKeyPressed = midiNoteNumber;
-    DBG("lastKeyPressed = " + String(lastKeyPressed));
+
 }
 
 void BKKeyboardSlider::bkButtonClicked (Button* b)
@@ -314,11 +324,11 @@ void BKKeyboardSlider::setAllValues(Array<float> newvals)
     for(int i=0; i<newvals.size(); i++)
     {
         if(fund <= 0) {
-            keyboardVals.set(i, newvals.getUnchecked(i));
+            //keyboardVals.set(i, newvals.getUnchecked(i));
             keyboard->setKeyValue(i, keyboardVals.getUnchecked(i));
         }
         else {
-            keyboardVals.set((i + fund) % (keyboardSize + 1), newvals.getUnchecked(i));
+            //keyboardVals.set((i + fund) % (keyboardSize + 1), newvals.getUnchecked(i));
             keyboard->setKeyValue((i + fund) % (keyboardSize + 1), keyboardVals.getUnchecked(i)); //blargh...
         }
     }
@@ -334,8 +344,23 @@ void BKKeyboardSlider::setActiveValues(Array<float> newvals)
     for(int i=minKey; i<=maxKey; i++)
     {
         if(valCounter < newvals.size()) {
-            keyboardVals.set(i, newvals.getUnchecked(valCounter++));
+            //keyboardVals.set(i, newvals.getUnchecked(valCounter++));
             keyboard->setKeyValue(i, keyboardVals.getUnchecked(i));
+        }
+    }
+    
+    updateDisplay();
+}
+
+void BKKeyboardSlider::setValues(Array<float> newvals)
+{
+    int valCounter = 0;
+    
+    for(int i=minKey; i<=maxKey; i++)
+    {
+        if(valCounter < newvals.size()) {
+            //keyboardVals.set(i, newvals.getUnchecked(valCounter++));
+            keyboard->setKeyValue(i, newvals.getUnchecked(valCounter++));
         }
     }
     

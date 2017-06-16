@@ -63,6 +63,7 @@ public:
     
     void setAllValues(Array<float> newvals);
     void setActiveValues(Array<float> newvals);
+    void setValues(Array<float> newvals);
     void updateDisplay();
     
 private:
@@ -98,6 +99,7 @@ private:
     void mouseMove(const MouseEvent& e) override;
     void mouseDrag(const MouseEvent& e) override;
     void mouseUp(const MouseEvent& e) override;
+    void mouseDown(const MouseEvent& e) override;
 
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKKeyboardSlider)

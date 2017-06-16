@@ -277,6 +277,8 @@ public:
     void setValuesDirectly(Array<float> vals);
     Array<float> getValuesDirectly();
     float getLastNoteOverValue();
+    
+    void doKeysToggle(bool tog) { keysToggle = tog; }
 
     //==============================================================================
     /** @internal */
@@ -404,6 +406,7 @@ private:
     int lastKeySelected;
     Array<int> keysSelected;
     Array<float> keyValues;
+    bool keysToggle;
 
     BKKeymapKeyboardState& state;
     float blackNoteLengthRatio;

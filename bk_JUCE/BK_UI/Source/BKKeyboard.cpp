@@ -78,7 +78,9 @@ octaveNumForMiddleC (3)
     mouseOverNotes.insertMultiple (0, -1, 32);
     mouseDownNotes.insertMultiple (0, -1, 32);
     
-    fundamental = -1; //don't display by default
+    keysToggle = true;
+    
+    fundamental = -1; //don't display by default; absolute, not rotating.
     rangeAll = (rangeEnd - rangeStart) + 1;
     
     colourChanged();
@@ -488,22 +490,46 @@ void BKKeymapKeyboardComponent::drawWhiteNote (int midiNoteNumber,
     {
         if (isDown)  c = c.overlaidWith (findColour (keyDownOverlayColourId));
         if (isOver)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
-        
-        if (isFundamental(midiNoteNumber % 12)) c = c.overlaidWith(Colours::red.withMultipliedAlpha(0.5));
-        
     }
     
     g.setColour (c);
     g.fillRect (x, y, w, h);
     
-    const String text (getWhiteNoteText (midiNoteNumber));
+    //const String text (getWhiteNoteText (midiNoteNumber));
+    String text (getWhiteNoteText (midiNoteNumber));
+    
+    if(fundamental >= 0) //meaning: rotating keyboard, or temperament
+    {
+        if(isFundamental(midiNoteNumber))
+        {
+            String ftext ("*");
+            text.swapWith(ftext);
+        }
+        else
+        {
+            String btext;
+            text.swapWith(btext);
+        }
+    }
     
     if (text.isNotEmpty())
     {
-        const float fontHeight = jmin (12.0f, keyWidth * 0.9f);
-        
-        g.setColour (textColour);
-        g.setFont (Font (fontHeight).withHorizontalScale (0.8f));
+       if(fundamental >= 0)
+       {
+           const float fontHeight = jmin (18.0f, keyWidth * 0.9f);
+           
+           g.setColour (c.contrasting());
+           g.setFont (Font (fontHeight));
+           
+       }
+       else
+       {
+           const float fontHeight = jmin (12.0f, keyWidth * 0.9f);
+           
+           g.setColour (c.contrasting());
+           g.setFont (Font (fontHeight).withHorizontalScale (0.8f));
+       }
+
         
         switch (orientation)
         {
@@ -546,19 +572,8 @@ void BKKeymapKeyboardComponent::drawBlackNote (int midiNoteNumber,
 {
     Colour c (noteFillColour);
     
-    float keyVal = keyValues.getUnchecked(midiNoteNumber);
-    if(keyVal != 0.)
-    {
-        if(keyVal > 0) c = c.overlaidWith (Colours::red.withSaturation ( sqrt(keyVal / 50.)) );
-        else c = c.overlaidWith (Colours::blue.withSaturation ( sqrt(keyVal * -1. / 50.)));
-    }
-    else
-    {
-        if (isDown)  c = c.overlaidWith (findColour (keyDownOverlayColourId));
-        if (isOver)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
-        
-        if (isFundamental(midiNoteNumber % 12)) c = c.overlaidWith(Colours::red.withMultipliedAlpha(0.5));
-    }
+    if (isDown)  c = c.overlaidWith (findColour (keyDownOverlayColourId));
+    if (isOver)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
     
     g.setColour (c);
     g.fillRect (x, y, w, h);
@@ -570,7 +585,16 @@ void BKKeymapKeyboardComponent::drawBlackNote (int midiNoteNumber,
     }
     else
     {
-        g.setColour (c.brighter());
+        
+        float keyVal = keyValues.getUnchecked(midiNoteNumber);
+        if(keyVal != 0.)
+        {
+            if(keyVal > 0) c = Colours::red.withSaturation ( sqrt(keyVal / 50.)) ;
+            else c = Colours::blue.withSaturation ( sqrt(keyVal * -1. / 50.));
+            g.setColour(c);
+        }
+        else g.setColour (c.brighter());
+        
         const int xIndent = jmax (1, jmin (w, h) / 8);
         
         switch (orientation)
@@ -579,6 +603,28 @@ void BKKeymapKeyboardComponent::drawBlackNote (int midiNoteNumber,
             case verticalKeyboardFacingLeft:    g.fillRect (x + w / 8, y + xIndent, w - w / 8, h - xIndent * 2); break;
             case verticalKeyboardFacingRight:   g.fillRect (x, y + xIndent, 7 * w / 8, h - xIndent * 2); break;
             default: break;
+        }
+    }
+    
+    if(fundamental >= 0) //meaning: rotating keyboard, or temperament
+    {
+        if(isFundamental(midiNoteNumber))
+        {
+            String text ("*");
+            
+            const float fontHeight = jmin (18.0f, keyWidth * 0.9f);
+            
+            g.setColour (c.contrasting());
+            //g.setFont (Font (fontHeight).withHorizontalScale (0.8f));
+            g.setFont (Font (fontHeight));
+            
+            switch (orientation)
+            {
+                case horizontalKeyboard:            g.drawText (text, x + 1, y - 6, w - 1, h - 2, Justification::centredBottom, false); break;
+                case verticalKeyboardFacingLeft:    g.drawText (text, x + 2, y + 2, w - 4, h - 4, Justification::centredLeft,   false); break;
+                case verticalKeyboardFacingRight:   g.drawText (text, x + 2, y + 2, w - 4, h - 4, Justification::centredRight,  false); break;
+                default: break;
+            }
         }
     }
 }
@@ -967,8 +1013,11 @@ void BKKeymapKeyboardComponent::mouseDraggedToKey (int midiNoteNumber, const Mou
 {
     if (midiNoteNumber != lastKeySelected)
     {
-        state.toggle(lastKeySelected);
-        repaint(getRectangleForKey(lastKeySelected));
+        if(keysToggle)
+        {
+            state.toggle(lastKeySelected);
+            repaint(getRectangleForKey(lastKeySelected));
+        }
         
         lastKeySelected = midiNoteNumber;
     }
@@ -976,8 +1025,11 @@ void BKKeymapKeyboardComponent::mouseDraggedToKey (int midiNoteNumber, const Mou
 
 void BKKeymapKeyboardComponent::mouseUpOnKey      (int midiNoteNumber, const MouseEvent&)
 {
-    state.toggle(midiNoteNumber);
-    repaint(getRectangleForKey(midiNoteNumber));
+    if(keysToggle)
+    {
+        state.toggle(midiNoteNumber);
+        repaint(getRectangleForKey(midiNoteNumber));
+    }
     
     lastKeySelected = -1;
     
