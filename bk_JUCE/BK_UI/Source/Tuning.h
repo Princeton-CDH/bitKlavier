@@ -258,7 +258,7 @@ public:
     inline void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr;}
     
     //returns tuning offsets; add to integer PitchClass
-    float getOffset(int midiNoteNumber) const;
+    float getOffset(int midiNoteNumber);
     Array<float> getTuningOffsets(TuningSystem which) {return tuningLibrary.getUnchecked(which); }
     
     //for calculating adaptive tuning
@@ -270,6 +270,9 @@ public:
     //for global tuning adjustment, A442, etc...
     void setGlobalTuningReference(float tuningRef) { globalTuningReference = tuningRef;}
     const float getGlobalTuningReference(void) const noexcept {return globalTuningReference;}
+    
+    float getLastNoteTuning() { return lastNoteTuning; }
+    float getLastIntervalTuning() { return lastIntervalTuning; }
     
     //reset adaptive tuning
     void adaptiveReset();
@@ -283,6 +286,8 @@ private:
     float   lastNote[128];
     float   globalTuningReference = 440.; //A440
     
+    float lastNoteTuning;
+    float lastIntervalTuning;
     
     //adaptive tuning functions
     float   adaptiveCalculate(int midiNoteNumber) const;

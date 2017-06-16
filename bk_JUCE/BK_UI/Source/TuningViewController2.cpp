@@ -10,6 +10,14 @@
 
 #include "TuningViewController2.h"
 
+/*
+ TODO
+ 
+ => add "last note" and "last interval" textfields to display those
+ => cleanup: both this, and the keyboard and keyboardslider classes....
+ 
+ */
+
 
 //==============================================================================
 TuningViewController2::TuningViewController2(BKAudioProcessor& p, BKItemGraph* theGraph):
@@ -100,6 +108,13 @@ theGraph(theGraph)
     offsetSlider = new BKSingleSlider("Global Offset (cents)", -100, 100, 0, 0.1);
     offsetSlider->addMyListener(this);
     addAndMakeVisible(offsetSlider);
+    
+    lastNote.setText("last note: ", dontSendNotification);
+    lastInterval.setText("last interval: ", dontSendNotification);
+    addAndMakeVisible(lastNote);
+    addAndMakeVisible(lastInterval);
+    
+    startTimer(50);
 
     updateFields();
 }
@@ -130,6 +145,14 @@ void TuningViewController2::resized()
     leftColumn.removeFromTop(gYSpacing * 4);
     
     offsetSlider->setBounds(leftColumn.removeFromTop(50));
+    leftColumn.removeFromTop(gYSpacing * 4);
+    
+    lastNote.setBounds(leftColumn.removeFromTop(20));
+    leftColumn.removeFromTop(gYSpacing * 2);
+    
+    lastInterval.setBounds(leftColumn.removeFromTop(20));
+    leftColumn.removeFromTop(gYSpacing * 2);
+    
     
     A1IntervalScaleLabel.setBounds(rightColumn.removeFromTop(20));
     A1IntervalScaleCB.setBounds(rightColumn.removeFromTop(20));
@@ -156,6 +179,13 @@ void TuningViewController2::paint (Graphics& g)
     g.fillAll(Colours::lightgrey);
 }
 
+void TuningViewController2::timerCallback()
+{
+    TuningProcessor::Ptr tProcessor = processor.gallery->getTuningProcessor(processor.updateState->currentTuningId);
+    lastNote.setText("last note: " + String(tProcessor->getLastNoteTuning()), dontSendNotification);
+    lastInterval.setText("last interval: "  + String(tProcessor->getLastIntervalTuning()), dontSendNotification);
+    
+}
 
 void TuningViewController2::fillSelectCB(void)
 {

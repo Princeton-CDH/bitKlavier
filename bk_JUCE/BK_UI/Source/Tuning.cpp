@@ -32,22 +32,35 @@ TuningProcessor::~TuningProcessor()
 }
 
 //returns offsets; main callback
-float TuningProcessor::getOffset(int midiNoteNumber) const
+float TuningProcessor::getOffset(int midiNoteNumber)
 {
+    float lastNoteTuningTemp = lastNoteTuning;
+    float lastNoteOffset;
     
     //do adaptive tunings if using
     if(active->getTuning() == AdaptiveTuning || active->getTuning() == AdaptiveAnchoredTuning)
-        return adaptiveCalculate(midiNoteNumber);
+    {
+        float lastNoteOffset = adaptiveCalculate(midiNoteNumber);
+        lastNoteTuning = midiNoteNumber + lastNoteOffset;
+        lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
+        return lastNoteOffset;
+    }
+    
 
     //else do regular tunings
     Array<float> currentTuning;
     if(active->getTuning() == CustomTuning) currentTuning = active->getCustomScale();
     else currentTuning = tuningLibrary.getUnchecked(active->getTuning());
     
-    //return (currentTuning[(midiNoteNumber - active->getFundamental()) % 12] + active->getFundamentalOffset());
-    return (currentTuning[(midiNoteNumber - active->getFundamental()) % currentTuning.size()] +
-            + active->getAbsoluteOffsets().getUnchecked(midiNoteNumber) +
-            active->getFundamentalOffset());
+    lastNoteOffset = (currentTuning[(midiNoteNumber - active->getFundamental()) % currentTuning.size()] +
+                      + active->getAbsoluteOffsets().getUnchecked(midiNoteNumber) +
+                      active->getFundamentalOffset());
+    
+    
+    lastNoteTuning = midiNoteNumber + lastNoteOffset;
+    lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
+    
+    return lastNoteOffset;
     
 }
 
@@ -67,8 +80,6 @@ void TuningProcessor::processBlock(int numSamples)
 void TuningProcessor::keyPressed(int midiNoteNumber)
 {
 
-    //if(active->resetMap->containsNote(noteNumber)) tuning->reset();
-    
     if(active->getTuning() == AdaptiveTuning)
     {
         if(clusterTime * (1000.0 / sampleRate) > active->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= active->getAdaptiveHistory() - 1)

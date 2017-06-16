@@ -23,7 +23,7 @@ BKKeyboardSlider::BKKeyboardSlider()
     keyboard->setScrollButtonsVisible(false);
     keyboard->setAvailableRange(minKey, maxKey);
     keyboard->setOctaveForMiddleC(4);
-    keyboard->setFundamental(-1);
+    keyboard->setFundamental(-1); //would be good to wrap all of these into keyboard so that keyboard->setMode(slider) sets all these internally and makes it clear
     keyboard->setAllowDrag(false);
     keyboard->doKeysToggle(false);
     keyboard->addMouseListener(this, true);

@@ -23,7 +23,8 @@ public BKComponent,
 public BKListener,
 public BKEditableComboBoxListener,
 public BKSingleSliderListener,
-public BKKeyboardSliderListener
+public BKKeyboardSliderListener,
+public Timer
 {
 public:
     
@@ -32,6 +33,7 @@ public:
     
     void paint (Graphics&) override;
     void resized() override;
+    void timerCallback() override;
     
     void updateFields();
     
@@ -69,6 +71,9 @@ private:
 
     Array<float> absoluteOffsets;   //for entire keyboard; up to 128 vals
     Array<float> customOffsets;     //for custom tuning; 12 vals
+    
+    BKLabel lastNote;
+    BKLabel lastInterval;
     
     BKKeyboardSlider absoluteKeyboard;
     BKKeyboardSlider customKeyboard;

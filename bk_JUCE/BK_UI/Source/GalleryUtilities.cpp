@@ -41,6 +41,21 @@ NostalgicProcessor::Ptr Gallery::getNostalgicProcessor(int id)
     return nostalgic[0]->processor;
 }
 
+TuningProcessor::Ptr Gallery::getTuningProcessor(int id)
+{
+    for (int i = tuning.size(); --i >= 0;)
+    {
+        if(tuning[i]->getId() == id) {
+            //DBG("got tuning processor id " + String(id));
+            return tuning[i]->processor;
+        }
+    }
+    
+    //else
+    DBG("tuning processor not found, returning first processor");
+    return tuning[0]->processor;
+}
+
 void Gallery::addPiano()
 {
     int numPianos = bkPianos.size();
