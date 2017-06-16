@@ -84,6 +84,10 @@ theGraph(theGraph)
     A1ClusterMax->addMyListener(this);
     addAndMakeVisible(A1ClusterMax);
     
+    A1reset.addListener(this);
+    A1reset.setButtonText("reset");
+    addAndMakeVisible(A1reset);
+    
     fillTuningCB();
     fillFundamentalCB();
     
@@ -169,6 +173,9 @@ void TuningViewController2::resized()
     rightColumn.removeFromTop(gYSpacing * 2);
     A1FundamentalLabel.setBounds(rightColumn.removeFromTop(20));
     A1FundamentalCB.setBounds(rightColumn.removeFromTop(20));
+    
+    rightColumn.removeFromTop(gYSpacing * 2);
+    A1reset.setBounds(rightColumn.removeFromTop(20));
     
     absoluteKeyboard.setBounds(absoluteKeymapRow);
 }
@@ -315,13 +322,6 @@ void TuningViewController2::bkComboBoxDidChange (ComboBox* box)
 
 void TuningViewController2::updateComponentVisibility()
 {
-    /*
-    if(scaleCB.getText() == "Custom")
-    {
-        customKeyboard.setVisible(true);
-    }
-    else customKeyboard.setVisible(false);
-     */
         
     if(scaleCB.getText() == "Adaptive Tuning 1")
     {
@@ -334,11 +334,8 @@ void TuningViewController2::updateComponentVisibility()
         A1IntervalScaleLabel.setVisible(true);
         A1AnchorScaleLabel.setVisible(false);
         A1FundamentalLabel.setVisible(false);
-        
-        if(A1IntervalScaleCB.getText() == "Custom")
-        {
-            customKeyboard.setVisible(true);
-        }
+        A1reset.setVisible(true);
+
     }
     else if(scaleCB.getText() == "Adaptive Anchored Tuning 1")
     {
@@ -351,11 +348,8 @@ void TuningViewController2::updateComponentVisibility()
         A1IntervalScaleLabel.setVisible(true);
         A1AnchorScaleLabel.setVisible(true);
         A1FundamentalLabel.setVisible(true);
-        
-        if(A1IntervalScaleCB.getText() == "Custom" || A1AnchorScaleCB.getText() == "Custom")
-        {
-            customKeyboard.setVisible(true);
-        }
+        A1reset.setVisible(true);
+
     }
     else
     {
@@ -368,6 +362,7 @@ void TuningViewController2::updateComponentVisibility()
         A1IntervalScaleLabel.setVisible(false);
         A1AnchorScaleLabel.setVisible(false);
         A1FundamentalLabel.setVisible(false);
+        A1reset.setVisible(false);
     }
 }
 
@@ -385,7 +380,7 @@ void TuningViewController2::updateFields(void)
     selectCB.setSelectedItemIndex(processor.updateState->currentTuningId, dontSendNotification);
     scaleCB.setSelectedItemIndex(prep->getTuning(), dontSendNotification);
     fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
-    offsetSlider->setValue(prep->getFundamentalOffset(), dontSendNotification);
+    offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
 
     absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
     Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
@@ -432,8 +427,8 @@ void TuningViewController2::BKSingleSliderValueChanged(String name, double val)
     
     if(name == offsetSlider->getName()) {
         DBG("got offset " + String(val));
-        prep->setFundamentalOffset(val);
-        active->setFundamentalOffset(val);
+        prep->setFundamentalOffset(val * 0.01);
+        active->setFundamentalOffset(val * 0.01);
     }
     else if(name == A1ClusterThresh->getName()) {
         DBG("got A1ClusterThresh " + String(val));
@@ -468,6 +463,13 @@ void TuningViewController2::bkButtonClicked (Button* b)
 
         prep->setAdaptiveInversional(A1Inversional.getToggleState());
         active->setAdaptiveInversional(A1Inversional.getToggleState());
+    }
+    else if (b == &A1reset)
+    {
+        DBG("resetting A1");
+        
+        TuningProcessor::Ptr tProcessor = processor.gallery->getTuningProcessor(processor.updateState->currentTuningId);
+        tProcessor->adaptiveReset();
     }
 }
 

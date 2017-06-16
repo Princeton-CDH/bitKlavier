@@ -68,6 +68,8 @@ private:
     
     ScopedPointer<BKSingleSlider> A1ClusterThresh;
     ScopedPointer<BKSingleSlider> A1ClusterMax;
+    
+    TextButton A1reset;
 
     Array<float> absoluteOffsets;   //for entire keyboard; up to 128 vals
     Array<float> customOffsets;     //for custom tuning; 12 vals
