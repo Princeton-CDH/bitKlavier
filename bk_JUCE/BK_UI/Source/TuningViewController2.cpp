@@ -13,7 +13,6 @@
 /*
  TODO
  
- => add "last note" and "last interval" textfields to display those
  => cleanup: both this, and the keyboard and keyboardslider classes....
  
  */
@@ -189,9 +188,12 @@ void TuningViewController2::paint (Graphics& g)
 void TuningViewController2::timerCallback()
 {
     TuningProcessor::Ptr tProcessor = processor.gallery->getTuningProcessor(processor.updateState->currentTuningId);
-    lastNote.setText("last note: " + String(tProcessor->getLastNoteTuning()), dontSendNotification);
-    lastInterval.setText("last interval: "  + String(tProcessor->getLastIntervalTuning()), dontSendNotification);
-    
+    if(tProcessor->getLastNoteTuning() != lastNoteTuningSave)
+    {
+        lastNoteTuningSave = tProcessor->getLastNoteTuning();
+        lastNote.setText("last note: " + String(lastNoteTuningSave), dontSendNotification);
+        lastInterval.setText("last interval: "  + String(tProcessor->getLastIntervalTuning()), dontSendNotification);
+    }
 }
 
 void TuningViewController2::fillSelectCB(void)
