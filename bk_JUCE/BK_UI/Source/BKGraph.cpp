@@ -26,42 +26,120 @@ Id(Id)
     fullChild.setAlwaysOnTop(true);
     addAndMakeVisible(fullChild);
     
-    if (type == PreparationTypePianoMap)
+    if (type == PreparationTypeTuning)
     {
+        image = ImageCache::getFromFile(File("~/bK_icons/tuning_icon.png"));
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        image = ImageCache::getFromFile(File("~/bK_icons/tempo_icon.png"));
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        image = ImageCache::getFromFile(File("~/bK_icons/synchronic_icon.png"));
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        image = ImageCache::getFromFile(File("~/bK_icons/nostalgic_icon.png"));
+    }
+    else if (type == PreparationTypeDirect)
+    {
+        image = ImageCache::getFromFile(File("~/bK_icons/direct_icon.png"));
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+        image = ImageCache::getFromFile(File("~/bK_icons/keymap_icon.png"));
+    }
+    else if (type > PreparationTypeKeymap && type < PreparationTypePianoMap) //mod
+    {
+        image = ImageCache::getFromFile(File("~/bK_icons/mod_icon.png"));
+    }
+    else if (type == PreparationTypePianoMap)
+    {
+        image = ImageCache::getFromFile(File("~/bK_icons/piano_icon.png"));
+        
         addAndMakeVisible(menu);
         
         menu.setName(cPreparationTypes[type]);
         menu.addListener(this);
-    
+        
         Piano::PtrArr pianos = processor.gallery->getPianos();
         for (int i = 0; i < pianos.size(); i++)
         {
             menu.addItem(pianos[i]->getName(), i+1);
             menu.addSeparator();
         }
-        
+    
         menu.setSelectedId(0, NotificationType::dontSendNotification);
     }
-    else
+    else if (type == PreparationTypeReset)
     {
-        addAndMakeVisible(label);
-        
-        label.setJustificationType(Justification::centred);
-        label.setBorderSize(BorderSize<int>(2));
-        
-        String name = cPreparationTypes[type];
-        
-        
-        if (type != PreparationTypeReset) name += String(Id);
-        
-        label.setText(name, dontSendNotification);
+        image = ImageCache::getFromFile(File("~/bK_icons/reset_icon.png"));
     }
+    
+    placement = RectanglePlacement::centred;
+    
+
+    int val =
+    ((type > PreparationTypeKeymap && type <= PreparationTypePianoMap) || type == PreparationTypeReset) ? 90 :
+    (type == PreparationTypeKeymap) ? 75 :
+    (type == PreparationTypeTempo || type == PreparationTypeTuning) ? 55 :
+    65;
+    
+    
+    while (!(image.getWidth() < val || image.getHeight() < val))
+    {
+        DBG(String(image.getWidth()) +  " " + String(image.getHeight()));
+        
+       image = image.rescaled(image.getWidth() * 0.75, image.getHeight() * 0.75);
+    }
+    
+    if (type != PreparationTypePianoMap)    setSize(image.getWidth(), image.getHeight());
+    else                                    setSize(image.getWidth(), image.getHeight() + 25);
+    
+    //image.rescaled(image.getWidth() * .25, image.getHeight() * .25);
 }
 
 BKItem::~BKItem()
 {
     
 }
+
+
+void BKItem::paint(Graphics& g)
+{
+    
+    g.setOpacity (1.0f);
+    g.drawImage (image, getLocalBounds().toFloat(), placement);
+    
+    if (isSelected)
+    {
+        g.setColour(Colours::white);
+        g.drawRect(getLocalBounds(),2);
+    }
+    else
+    {
+        g.setColour(Colours::transparentWhite);
+        g.drawRect(getLocalBounds(),0);
+    }
+    
+    
+}
+
+void BKItem::resized(void)
+{
+    if (type == PreparationTypePianoMap)
+    {
+        menu.setBounds(0, image.getHeight(), getWidth(), 25);
+    }
+    else
+    {
+        label.setBounds(0,0,getWidth(),getHeight());
+    }
+    
+    fullChild.setBounds(0,0,getWidth(),getHeight());
+}
+
 
 void BKItem::copy(BKItem::Ptr itemToCopy)
 {
@@ -182,61 +260,6 @@ void BKItem::mouseDown(const MouseEvent& e)
 void BKItem::keyPressedWhileSelected(const KeyPress& e)
 {
     
-}
-
-void BKItem::paint(Graphics& g)
-{
-    if (type == PreparationTypeTuning)
-    {
-        g.setColour(Colours::lightcoral);
-    }
-    else if (type == PreparationTypeTempo)
-    {
-        g.setColour(Colours::palegreen);
-    }
-    else if (type == PreparationTypeKeymap)
-    {
-        g.setColour(Colours::lightyellow);
-        
-    }
-    else if (type >= PreparationTypeKeymap) //mod
-    {
-        g.setColour(Colours::palevioletred);
-    }
-    else
-    {
-        g.setColour(Colours::lightblue);
-    }
-    
-    
-    g.fillAll();
-    
-    if (isSelected)
-    {
-        g.setColour(Colours::white);
-        g.drawRect(getLocalBounds(),4);
-    }
-    else
-    {
-        g.setColour(Colours::black);
-        g.drawRect(getLocalBounds(),2);
-    }
-    
-    
-}
-
-void BKItem::resized(void)
-{
-    if (type == PreparationTypePianoMap)
-    {
-        menu.setBounds(0, 0, getWidth(), getHeight());
-    }
-    else
-    {
-        label.setBounds(0,0,getWidth(),getHeight());
-    }
-    
-    fullChild.setBounds(0,0,getWidth(),getHeight());
 }
 
 inline void BKItem::connectWith(BKItem* item)

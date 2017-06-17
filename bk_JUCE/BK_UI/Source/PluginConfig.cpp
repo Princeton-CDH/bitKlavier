@@ -110,20 +110,12 @@ const String BKAudioProcessor::getName() const {
 
 bool BKAudioProcessor::acceptsMidi() const {
     
-#if JucePlugin_WantsMidiInput
     return true;
-#else
-    return false;
-#endif
 }
 
 bool BKAudioProcessor::producesMidi() const {
     
-#if JucePlugin_ProducesMidiOutput
-    return true;
-#else
     return false;
-#endif
 }
 
 double BKAudioProcessor::getTailLengthSeconds() const {
@@ -159,6 +151,8 @@ void BKAudioProcessor::changeProgramName (int index, const String& newName) {
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
+    AudioProcessor* processor = new BKAudioProcessor();
+
     
-    return new BKAudioProcessor();
+    return  processor;
 }

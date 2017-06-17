@@ -223,7 +223,7 @@ void SynchronicViewController2::BKRangeSliderValueChanged(String name, double mi
 
 void SynchronicViewController2::paint (Graphics& g)
 {
-    g.fillAll(Colours::lightgrey);
+    g.fillAll(Colours::transparentWhite);
 }
 
 void SynchronicViewController2::resized()

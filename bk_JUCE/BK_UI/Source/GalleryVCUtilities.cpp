@@ -8,12 +8,12 @@
   ==============================================================================
 */
 
-#include "GalleryViewController.h"
+#include "HeaderViewController.h"
 
 #define TEXT_INTERFACE 0
 
 #if TEXT_INTERFACE
-String GalleryViewController::processPianoMapString(const String& s)
+String HeaderViewController::processPianoMapString(const String& s)
 {
     String temp = "";
     String out = "";
@@ -106,7 +106,7 @@ String GalleryViewController::processPianoMapString(const String& s)
     return out;
 }
 
-String GalleryViewController::processResetMapString(const String& s)
+String HeaderViewController::processResetMapString(const String& s)
 {
     String out = "";
     String rest = s;
@@ -275,7 +275,7 @@ String GalleryViewController::processResetMapString(const String& s)
     return out;
 }
 
-String GalleryViewController::processmodificationMapString(const String& s)
+String HeaderViewController::processmodificationMapString(const String& s)
 {
     String temp = "";
     String out = "";

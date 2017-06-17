@@ -1,16 +1,16 @@
 /*
   ==============================================================================
 
-    GalleryViewController.cpp
+    HeaderViewController.cpp
     Created: 27 Mar 2017 12:47:45pm
     Author:  Michael R Mulshine
 
   ==============================================================================
 */
 
-#include "GalleryViewController.h"
+#include "HeaderViewController.h"
 
-GalleryViewController::GalleryViewController (BKAudioProcessor& p):
+HeaderViewController::HeaderViewController (BKAudioProcessor& p):
 processor (p)
 {
     
@@ -47,17 +47,17 @@ processor (p)
     
 }
 
-GalleryViewController::~GalleryViewController()
+HeaderViewController::~HeaderViewController()
 {
     
 }
 
-void GalleryViewController::paint (Graphics& g)
+void HeaderViewController::paint (Graphics& g)
 {
     g.fillAll(Colours::dimgrey);
 }
 
-void GalleryViewController::resized()
+void HeaderViewController::resized()
 {
     float width = getWidth() / 7 - gXSpacing;
     float height = getHeight() - 2 * gYSpacing;
@@ -74,7 +74,7 @@ void GalleryViewController::resized()
     
 }
 
-PopupMenu GalleryViewController::getLoadMenu(void)
+PopupMenu HeaderViewController::getLoadMenu(void)
 {
     PopupMenu loadMenu;
     
@@ -85,7 +85,7 @@ PopupMenu GalleryViewController::getLoadMenu(void)
     return loadMenu;
 }
 
-PopupMenu GalleryViewController::getPianoMenu(void)
+PopupMenu HeaderViewController::getPianoMenu(void)
 {
     PopupMenu pianoMenu;
     
@@ -97,7 +97,7 @@ PopupMenu GalleryViewController::getPianoMenu(void)
     return pianoMenu;
 }
 
-PopupMenu GalleryViewController::getGalleryMenu(void)
+PopupMenu HeaderViewController::getGalleryMenu(void)
 {
     PopupMenu galleryMenu;
     
@@ -111,12 +111,12 @@ PopupMenu GalleryViewController::getGalleryMenu(void)
     
 }
 
-void GalleryViewController::loadMenuCallback(int result, GalleryViewController* gvc)
+void HeaderViewController::loadMenuCallback(int result, HeaderViewController* gvc)
 {
     gvc->processor.loadPianoSamples((BKSampleLoadType)(result-1));
 }
 
-void GalleryViewController::pianoMenuCallback(int result, GalleryViewController* gvc)
+void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* gvc)
 {
     if (result == 1) // New piano
     {
@@ -145,12 +145,11 @@ void GalleryViewController::pianoMenuCallback(int result, GalleryViewController*
     }
     else if (result == 3)
     {
-        gvc->processor.updateState->currentPreparationDisplay =  DisplayGeneral;
-        gvc->processor.updateState->displayDidChange = true;
+        gvc->processor.updateState->setCurrentDisplay(DisplayGeneral);
     }
 }
 
-void GalleryViewController::galleryMenuCallback(int result, GalleryViewController* gvc)
+void HeaderViewController::galleryMenuCallback(int result, HeaderViewController* gvc)
 {
     if (result == 1)
     {
@@ -166,7 +165,7 @@ void GalleryViewController::galleryMenuCallback(int result, GalleryViewControlle
     }
 }
 
-void GalleryViewController::bkButtonClicked (Button* b)
+void HeaderViewController::bkButtonClicked (Button* b)
 {
     String name = b->getName();
     
@@ -188,7 +187,7 @@ void GalleryViewController::bkButtonClicked (Button* b)
     
 }
 
-void GalleryViewController::fillGalleryCB(void)
+void HeaderViewController::fillGalleryCB(void)
 {
     galleryCB.clear(dontSendNotification);
     
@@ -206,7 +205,7 @@ void GalleryViewController::fillGalleryCB(void)
     
 }
 
-void GalleryViewController::update(void)
+void HeaderViewController::update(void)
 {
     if (processor.updateState->galleryDidChange)
     {
@@ -216,7 +215,7 @@ void GalleryViewController::update(void)
     }
 }
 
-void GalleryViewController::switchGallery()
+void HeaderViewController::switchGallery()
 {
     pianoCB.clear(dontSendNotification);
     for (int i = 0; i < processor.gallery->getPianos().size(); i++)     pianoCB.addItem(processor.gallery->getPiano(i)->getName(), i+1);
@@ -229,14 +228,14 @@ void GalleryViewController::switchGallery()
     
 }
 
-void GalleryViewController::bkTextFieldDidChange(TextEditor& tf)
+void HeaderViewController::bkTextFieldDidChange(TextEditor& tf)
 {
     String text = tf.getText();
     String name = tf.getName();
     
 }
 
-void GalleryViewController::BKEditableComboBoxChanged(String text, BKEditableComboBox* cb)
+void HeaderViewController::BKEditableComboBoxChanged(String text, BKEditableComboBox* cb)
 {
     //String name = cb->getName();
     //int selectedId = cb->getSelectedId();
@@ -259,7 +258,7 @@ void GalleryViewController::BKEditableComboBoxChanged(String text, BKEditableCom
 }
 
 
-void GalleryViewController::bkComboBoxDidChange            (ComboBox* cb)
+void HeaderViewController::bkComboBoxDidChange            (ComboBox* cb)
 {
     // Change piano
     String name = cb->getName();

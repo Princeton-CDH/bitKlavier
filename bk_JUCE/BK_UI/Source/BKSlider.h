@@ -190,6 +190,7 @@ private:
     
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+    void textEditorFocusLost(TextEditor& textEditor) override;
     
     void showModifyPopupMenu(int which);
     static void sliderModifyMenuCallback (const int result, BKMultiSlider* slider, int which);
@@ -351,6 +352,7 @@ public:
     
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+    void textEditorFocusLost(TextEditor& textEditor) override;
     void resized() override;
     void sliderDragEnded(Slider *slider) override;
     void mouseDown (const MouseEvent &event) override;
@@ -486,6 +488,8 @@ public:
     
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+    
+    void textEditorFocusLost(TextEditor& textEditor) override;
     void mouseDown (const MouseEvent &event) override;
     void mouseDrag(const MouseEvent& e) override;
     void mouseUp(const MouseEvent& e) override;

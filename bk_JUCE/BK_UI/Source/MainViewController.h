@@ -16,21 +16,7 @@
 #include "BKComponent.h"
 #include "BKLevelMeter.h"
 
-#include "SynchronicViewController.h"
-#include "SynchronicViewController2.h"
-#include "NostalgicViewController.h"
-#include "NostalgicViewController2.h"
-#include "DirectViewController.h"
-#include "DirectViewController2.h"
-#include "TuningViewController.h"
-#include "TuningViewController2.h"
-#include "TempoViewController.h"
-
-#include "GeneralViewController.h"
-
-#include "GalleryViewController.h"
-
-#include "KeymapViewController.h"
+#include "HeaderViewController.h"
 
 #include "PreparationPanel.h"
 
@@ -38,7 +24,9 @@
 
 #include "BKGraph.h"
 
-class MainViewController :  public Component, private Timer, public BKListener, public Slider::Listener, public KeyListener
+#include "BKOvertop.h"
+
+class MainViewController :  public Component, private Timer, public BKListener, public Slider::Listener
 {
     
 public:
@@ -49,6 +37,14 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     
+    
+    void deletePressed(void);
+    void arrowPressed(int which, bool fine);
+    void align(int which);
+    void space(int which);
+    void tabPressed(void);
+    void escapePressed(void);
+    
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it
@@ -58,30 +54,16 @@ private:
     
     BKAudioProcessor& processor;
     
+    GeneralSettings::Ptr gen;
+    
     BKItemGraph theGraph;
     
     Viewport viewPort;
     
+    HeaderViewController header;
     BKConstructionSite  construction;
-    
-    GalleryViewController galvc;
-    
-    KeymapViewController kvc;
-    TuningViewController tvc;
-    GeneralViewController gvc;
-    DirectViewController dvc;
-    TempoViewController ovc;
-    
-    GeneralSettings::Ptr gen;
-    
-    SynchronicViewController2 svc2;
-    NostalgicViewController2 nvc2;
-    DirectViewController2 dvc2;
-    TuningViewController2 tvc2;
-    
-    
-    //SynchronicViewController svc;
-    //NostalgicViewController nvc;
+
+    BKOvertop           overtop;
     
     ScopedPointer<Slider> mainSlider;
     
@@ -92,23 +74,14 @@ private:
     
     void timerCallback() override;
     
+    void bkButtonClicked        (Button* b)                     override;
+    void sliderValueChanged     (Slider* slider)                override;
+    
     void drawPreparationPanel(void);
 
     int timerCallbackCount;
+
     
-    BKPreparationDisplay currentDisplay;
-    
-    void bkTextFieldDidChange       (TextEditor&)           override{};
-    void bkMessageReceived          (const String& message) override{};
-    void bkComboBoxDidChange        (ComboBox* box)         override{};
-    void bkButtonClicked            (Button* b)             override;
-    void sliderValueChanged         (Slider* slider)        override;
-    bool keyPressed (const KeyPress& e, Component*) override;
-    
-    void setCurrentDisplay(BKPreparationDisplay type);
-    
-    Component overtop;
-    TextButton hideOrShow;;
     
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainViewController)

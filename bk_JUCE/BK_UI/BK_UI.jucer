@@ -2,10 +2,10 @@
 
 <JUCERPROJECT id="R4yQHh" name="BK_UI" projectType="audioplug" version="0.0.1"
               bundleIdentifier="com.BK.BK0" includeBinaryInAppConfig="1" buildVST="1"
-              buildVST3="1" buildAU="0" buildAUv3="0" buildRTAS="0" buildAAX="0"
+              buildVST3="1" buildAU="0" buildAUv3="1" buildRTAS="0" buildAAX="0"
               pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
               pluginManufacturer="manyarrowsmusic" pluginManufacturerCode="Manu"
-              pluginCode="R4yq" pluginChannelConfigs="{1,1},{2,2}" pluginIsSynth="1"
+              pluginCode="R4yq" pluginChannelConfigs="{0,2}" pluginIsSynth="1"
               pluginWantsMidiIn="1" pluginProducesMidiOut="1" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="1" pluginAUExportPrefix="BKAU" pluginRTASCategory=""
               aaxIdentifier="com.manyarrowsmusic.bitKlavier" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
@@ -15,6 +15,30 @@
               buildStandalone="1" enableIAA="0">
   <MAINGROUP id="s4R02g" name="BK_UI">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
+      <GROUP id="{1E3013D4-6B2A-D996-A5C8-F92AE44A39F2}" name="Resources">
+        <GROUP id="{6F7CFDA8-D246-D5B9-B60B-EDBE0C6F3537}" name="icons">
+          <FILE id="zyjC33" name="direct_icon.png" compile="0" resource="1" file="Source/icons/direct_icon.png"
+                xcodeResource="0"/>
+          <FILE id="XKtIlB" name="icon.png" compile="0" resource="1" file="Source/icons/icon.png"
+                xcodeResource="0"/>
+          <FILE id="o4zUNE" name="keymap_icon.png" compile="0" resource="1" file="Source/icons/keymap_icon.png"
+                xcodeResource="0"/>
+          <FILE id="prJ2HS" name="mod_icon.png" compile="0" resource="1" file="Source/icons/mod_icon.png"
+                xcodeResource="0"/>
+          <FILE id="XAH0zl" name="nostalgic_icon.png" compile="0" resource="1"
+                file="Source/icons/nostalgic_icon.png" xcodeResource="0"/>
+          <FILE id="GvDVbY" name="piano_icon.png" compile="0" resource="1" file="Source/icons/piano_icon.png"
+                xcodeResource="0"/>
+          <FILE id="kbokKK" name="reset_icon.png" compile="0" resource="1" file="Source/icons/reset_icon.png"
+                xcodeResource="0"/>
+          <FILE id="bIP81H" name="synchronic_icon.png" compile="0" resource="1"
+                file="Source/icons/synchronic_icon.png" xcodeResource="0"/>
+          <FILE id="zxFKh5" name="tempo_icon.png" compile="0" resource="1" file="Source/icons/tempo_icon.png"
+                xcodeResource="0"/>
+          <FILE id="ay3naN" name="tuning_icon.png" compile="0" resource="1" file="Source/icons/tuning_icon.png"
+                xcodeResource="0"/>
+        </GROUP>
+      </GROUP>
       <GROUP id="{19157329-C279-4066-03E0-75F988B82181}" name="Constants">
         <FILE id="tVctaQ" name="AudioConstants.h" compile="0" resource="0"
               file="Source/AudioConstants.h"/>
@@ -105,18 +129,15 @@
         </GROUP>
       </GROUP>
       <GROUP id="{07677963-38EF-2F51-36FA-17646727446F}" name="Controller">
+        <FILE id="PVkjL7" name="BKOvertop.h" compile="0" resource="0" file="Source/BKOvertop.h"/>
         <FILE id="Ivngl4" name="MainViewController.cpp" compile="1" resource="0"
               file="Source/MainViewController.cpp"/>
         <FILE id="EyR2nF" name="MainViewController.h" compile="0" resource="0"
               file="Source/MainViewController.h"/>
-        <FILE id="u0eGKF" name="GalleryViewController.cpp" compile="1" resource="0"
-              file="Source/GalleryViewController.cpp"/>
-        <FILE id="yAwIte" name="GalleryViewController.h" compile="0" resource="0"
-              file="Source/GalleryViewController.h"/>
-        <FILE id="dMVsSd" name="PianoViewController.cpp" compile="1" resource="0"
-              file="Source/PianoViewController.cpp"/>
-        <FILE id="tIek8E" name="PianoViewController.h" compile="0" resource="0"
-              file="Source/PianoViewController.h"/>
+        <FILE id="u0eGKF" name="HeaderViewController.cpp" compile="1" resource="0"
+              file="Source/HeaderViewController.cpp"/>
+        <FILE id="yAwIte" name="HeaderViewController.h" compile="0" resource="0"
+              file="Source/HeaderViewController.h"/>
         <GROUP id="{482B7CF5-2C2A-E429-840B-6825AAA6161C}" name="Graph">
           <FILE id="XoM1Au" name="BKConstructionSite.cpp" compile="1" resource="0"
                 file="Source/BKConstructionSite.cpp"/>
@@ -228,7 +249,8 @@
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX" vst3Folder="" aaxFolder="">
+    <XCODE_MAC targetFolder="Builds/MacOSX" vst3Folder="" aaxFolder="" customXcodeResourceFolders=""
+               customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist version=&quot;1.0&quot;&gt;&#10;&lt;dict&gt;&#10;&#9;&lt;key&gt;CFBundleIconFile&lt;/key&gt;&#10;&#9;&lt;string&gt;BK&lt;/string&gt;&#10;&lt;/dict&gt;&#10;&lt;/plist&gt;&#10;">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="BK_UI"
                        osxArchitecture="default" cppLibType="" osxCompatibility="default"

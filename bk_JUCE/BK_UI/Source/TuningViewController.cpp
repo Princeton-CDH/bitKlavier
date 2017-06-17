@@ -61,7 +61,7 @@ TuningViewController::~TuningViewController()
 
 void TuningViewController::paint (Graphics& g)
 {
-    g.fillAll(Colours::lightgrey);
+    g.fillAll(Colours::transparentWhite);
 }
 
 void TuningViewController::resized()

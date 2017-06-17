@@ -50,7 +50,6 @@ theGraph(theGraph)
     addAndMakeVisible (keyboardComponent = new BKKeymapKeyboardComponent (keyboardState,
                                                                  BKKeymapKeyboardComponent::horizontalKeyboard));
     
-    
     BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
     
     keyboard->setScrollButtonsVisible(true);
@@ -68,7 +67,6 @@ theGraph(theGraph)
 
 KeymapViewController::~KeymapViewController()
 {
-    
 }
 
 void KeymapViewController::reset(void)
@@ -79,7 +77,7 @@ void KeymapViewController::reset(void)
 
 void KeymapViewController::paint (Graphics& g)
 {
-    g.fillAll(Colours::lightgrey);
+    g.fillAll(Colours::transparentWhite);
 }
 
 void KeymapViewController::resized()
