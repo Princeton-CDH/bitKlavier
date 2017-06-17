@@ -16,13 +16,17 @@
   <MAINGROUP id="s4R02g" name="BK_UI">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
       <GROUP id="{1E3013D4-6B2A-D996-A5C8-F92AE44A39F2}" name="Resources">
+        <FILE id="U1tlUf" name="bk.icns" compile="0" resource="0" file="Source/icons/bk.icns"
+              xcodeResource="1"/>
+        <GROUP id="{4BE31847-48C8-CA93-0ACB-7EE8777A39B7}" name="images">
+          <FILE id="OX0b8u" name="samplePic.png" compile="0" resource="1" file="../../../../bkImages/samplePic.png"/>
+        </GROUP>
         <GROUP id="{6F7CFDA8-D246-D5B9-B60B-EDBE0C6F3537}" name="icons">
           <FILE id="zyjC33" name="direct_icon.png" compile="0" resource="1" file="Source/icons/direct_icon.png"
                 xcodeResource="0"/>
           <FILE id="XKtIlB" name="icon.png" compile="0" resource="1" file="Source/icons/icon.png"
                 xcodeResource="0"/>
-          <FILE id="o4zUNE" name="keymap_icon.png" compile="0" resource="1" file="Source/icons/keymap_icon.png"
-                xcodeResource="0"/>
+          <FILE id="wEIbpZ" name="keymap_icon.png" compile="0" resource="1" file="Source/icons/keymap_icon.png"/>
           <FILE id="prJ2HS" name="mod_icon.png" compile="0" resource="1" file="Source/icons/mod_icon.png"
                 xcodeResource="0"/>
           <FILE id="XAH0zl" name="nostalgic_icon.png" compile="0" resource="1"
@@ -250,7 +254,7 @@
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" vst3Folder="" aaxFolder="" customXcodeResourceFolders=""
-               customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist version=&quot;1.0&quot;&gt;&#10;&lt;dict&gt;&#10;&#9;&lt;key&gt;CFBundleIconFile&lt;/key&gt;&#10;&#9;&lt;string&gt;BK&lt;/string&gt;&#10;&lt;/dict&gt;&#10;&lt;/plist&gt;&#10;">
+               customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist version=&quot;1.0&quot;&gt;&#10;&lt;dict&gt;&#10;&#9;&lt;key&gt;CFBundleIconFile&lt;/key&gt;&#10;&#9;&lt;string&gt;bk&lt;/string&gt;&#10;&lt;/dict&gt;&#10;&lt;/plist&gt;&#10;">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="BK_UI"
                        osxArchitecture="default" cppLibType="" osxCompatibility="default"

@@ -41,7 +41,6 @@ public:
     void deletePressed(void);
     void arrowPressed(int which, bool fine);
     void align(int which);
-    void space(int which);
     void tabPressed(void);
     void escapePressed(void);
     

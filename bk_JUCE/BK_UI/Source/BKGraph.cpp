@@ -28,35 +28,35 @@ Id(Id)
     
     if (type == PreparationTypeTuning)
     {
-        image = ImageCache::getFromFile(File("~/bK_icons/tuning_icon.png"));
+        image = ImageCache::getFromMemory(BinaryData::tuning_icon_png, BinaryData::tuning_icon_pngSize);
     }
     else if (type == PreparationTypeTempo)
     {
-        image = ImageCache::getFromFile(File("~/bK_icons/tempo_icon.png"));
+        image = ImageCache::getFromMemory(BinaryData::tempo_icon_png, BinaryData::tempo_icon_pngSize);
     }
     else if (type == PreparationTypeSynchronic)
     {
-        image = ImageCache::getFromFile(File("~/bK_icons/synchronic_icon.png"));
+        image = ImageCache::getFromMemory(BinaryData::synchronic_icon_png, BinaryData::synchronic_icon_pngSize);
     }
     else if (type == PreparationTypeNostalgic)
     {
-        image = ImageCache::getFromFile(File("~/bK_icons/nostalgic_icon.png"));
+        image = ImageCache::getFromMemory(BinaryData::nostalgic_icon_png, BinaryData::nostalgic_icon_pngSize);
     }
     else if (type == PreparationTypeDirect)
     {
-        image = ImageCache::getFromFile(File("~/bK_icons/direct_icon.png"));
+        image = ImageCache::getFromMemory(BinaryData::direct_icon_png, BinaryData::direct_icon_pngSize);
     }
     else if (type == PreparationTypeKeymap)
     {
-        image = ImageCache::getFromFile(File("~/bK_icons/keymap_icon.png"));
+        image = ImageCache::getFromMemory(BinaryData::keymap_icon_png, BinaryData::keymap_icon_pngSize);
     }
     else if (type > PreparationTypeKeymap && type < PreparationTypePianoMap) //mod
     {
-        image = ImageCache::getFromFile(File("~/bK_icons/mod_icon.png"));
+        image = ImageCache::getFromMemory(BinaryData::piano_icon_png, BinaryData::piano_icon_pngSize);
     }
     else if (type == PreparationTypePianoMap)
     {
-        image = ImageCache::getFromFile(File("~/bK_icons/piano_icon.png"));
+        image = ImageCache::getFromMemory(BinaryData::piano_icon_png, BinaryData::piano_icon_pngSize);
         
         addAndMakeVisible(menu);
         
@@ -74,7 +74,7 @@ Id(Id)
     }
     else if (type == PreparationTypeReset)
     {
-        image = ImageCache::getFromFile(File("~/bK_icons/reset_icon.png"));
+        image = ImageCache::getFromMemory(BinaryData::reset_icon_png, BinaryData::reset_icon_pngSize);
     }
     
     placement = RectanglePlacement::centred;
