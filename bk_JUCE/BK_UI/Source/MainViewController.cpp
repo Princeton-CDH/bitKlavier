@@ -193,8 +193,10 @@ void MainViewController::timerCallback()
         preparationPanel->refill(PreparationTypeTuning);
         preparationPanel->refill(PreparationTypeTuningMod);
         
-        overtop.tvc.updateFields();
-        overtop.tvc.updateModFields();
+        //overtop.tvc.updateFields();
+        //overtop.tvc.updateModFields();
+        
+        overtop.tvc2.updateFields();
     }
     
     if (processor.updateState->tempoPreparationDidChange)

@@ -25,6 +25,7 @@
 #include "DirectViewController.h"
 #include "DirectViewController2.h"
 #include "TuningViewController.h"
+#include "TuningViewController2.h"
 #include "TempoViewController.h"
 #include "KeymapViewController.h"
 #include "GeneralViewController.h"
@@ -38,13 +39,14 @@ public:
     processor(p),
     gvc(p),
     kvc(p, theGraph),
-    tvc(p, theGraph),
+    //tvc(p, theGraph),
     //svc(p, &theGraph),
     //nvc(p, &theGraph),
     dvc(p, theGraph),
     ovc(p, theGraph),
     svc2(p, theGraph),
     nvc2(p, theGraph),
+    tvc2(p, theGraph),
     dvc2(p, theGraph)
     {
         addKeyListener(this);
@@ -57,7 +59,7 @@ public:
         addChildComponent(gvc);
         //addChildComponent(dvc);
         addChildComponent(kvc);
-        addChildComponent(tvc);
+        addChildComponent(tvc2);
         addChildComponent(ovc);
         addChildComponent(svc2);
         addChildComponent(nvc2);
@@ -88,7 +90,7 @@ public:
         
         gvc.setBounds(X, Y, width, height);
         
-        tvc.setBounds(X, Y, width, height);
+        tvc2.setBounds(X, Y, width, height);
         
         ovc.setBounds(X, Y, width, height);
         
@@ -116,7 +118,7 @@ public:
         
         removeChildComponent(&kvc);
         removeChildComponent(&gvc);
-        removeChildComponent(&tvc);
+        removeChildComponent(&tvc2);
         removeChildComponent(&dvc);
         removeChildComponent(&ovc);
         
@@ -134,7 +136,7 @@ public:
         }
         else if (type == DisplayTuning)
         {
-            addAndMakeVisible(&tvc);
+            addAndMakeVisible(&tvc2);
         }
         else if (type == DisplayTempo)
         {
@@ -162,7 +164,7 @@ public:
     GeneralViewController gvc;
     
     KeymapViewController kvc;
-    TuningViewController tvc;
+    TuningViewController2 tvc2;
     //SynchronicViewController svc;
     //NostalgicViewController nvc;
     DirectViewController dvc;
