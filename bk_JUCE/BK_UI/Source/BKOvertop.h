@@ -27,6 +27,7 @@
 #include "TuningViewController.h"
 #include "TuningViewController2.h"
 #include "TempoViewController.h"
+#include "TempoViewController2.h"
 #include "KeymapViewController.h"
 #include "GeneralViewController.h"
 
@@ -43,7 +44,7 @@ public:
     //svc(p, &theGraph),
     //nvc(p, &theGraph),
     dvc(p, theGraph),
-    ovc(p, theGraph),
+    ovc2(p, theGraph),
     svc2(p, theGraph),
     nvc2(p, theGraph),
     tvc2(p, theGraph),
@@ -60,7 +61,7 @@ public:
         //addChildComponent(dvc);
         addChildComponent(kvc);
         addChildComponent(tvc2);
-        addChildComponent(ovc);
+        addChildComponent(ovc2);
         addChildComponent(svc2);
         addChildComponent(nvc2);
         addChildComponent(dvc2);
@@ -92,7 +93,7 @@ public:
         
         tvc2.setBounds(X, Y, width, height);
         
-        ovc.setBounds(X, Y, width, height);
+        ovc2.setBounds(X, Y, width, height);
         
         svc2.setBounds(X, Y, width, height);
         
@@ -120,7 +121,7 @@ public:
         removeChildComponent(&gvc);
         removeChildComponent(&tvc2);
         removeChildComponent(&dvc);
-        removeChildComponent(&ovc);
+        removeChildComponent(&ovc2);
         
         //svc.setVisible(false);
         //nvc.setVisible(false);
@@ -140,7 +141,7 @@ public:
         }
         else if (type == DisplayTempo)
         {
-            addAndMakeVisible(&ovc);
+            addAndMakeVisible(&ovc2);
         }
         else if (type == DisplaySynchronic)
         {
@@ -168,7 +169,8 @@ public:
     //SynchronicViewController svc;
     //NostalgicViewController nvc;
     DirectViewController dvc;
-    TempoViewController ovc;
+    //TempoViewController ovc;
+    TempoViewController2 ovc2;
     
     SynchronicViewController2 svc2;
     NostalgicViewController2 nvc2;

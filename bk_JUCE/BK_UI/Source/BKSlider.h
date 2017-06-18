@@ -346,6 +346,7 @@ public:
     String getName()                { return sliderName; }
     void setMinValue(double newval, NotificationType notify);
     void setMaxValue(double newval, NotificationType notify);
+    void setIsMinAlwaysLessThanMax(bool im) { isMinAlwaysLessThanMax = im; }
     void checkValue(double newval);
     void rescaleMinSlider();
     void rescaleMaxSlider();
@@ -369,6 +370,7 @@ private:
     
     bool newDrag;
     bool clickedOnMinSlider;
+    bool isMinAlwaysLessThanMax;
     
     BKRangeMinSliderLookAndFeel minSliderLookAndFeel;
     BKRangeMaxSliderLookAndFeel maxSliderLookAndFeel;

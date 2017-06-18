@@ -56,6 +56,21 @@ TuningProcessor::Ptr Gallery::getTuningProcessor(int id)
     return tuning[0]->processor;
 }
 
+TempoProcessor::Ptr Gallery::getTempoProcessor(int id)
+{
+    for (int i = tempo.size(); --i >= 0;)
+    {
+        if(tempo[i]->getId() == id) {
+            //DBG("got tempo processor id " + String(id));
+            return tempo[i]->processor;
+        }
+    }
+    
+    //else
+    DBG("tempo processor not found, returning first processor");
+    return tempo[0]->processor;
+}
+
 void Gallery::addPiano()
 {
     int numPianos = bkPianos.size();

@@ -37,7 +37,7 @@ void BKEditableComboBox::textEditorReturnKeyPressed(TextEditor& textEditor)
                    textEditor.getText(),
                    this);
     
-    removeChildComponent(&nameEditor);
+    //removeChildComponent(&nameEditor);
     
     changeItemText(lastItemId, textEditor.getText());
     setSelectedId(lastItemId, dontSendNotification);
@@ -50,7 +50,7 @@ void BKEditableComboBox::textEditorFocusLost(TextEditor& textEditor)
                    textEditor.getText(),
                    this);
     
-    removeChildComponent(&nameEditor);
+    //removeChildComponent(&nameEditor);
 
     changeItemText(lastItemId, textEditor.getText());
     setSelectedId(lastItemId, dontSendNotification);

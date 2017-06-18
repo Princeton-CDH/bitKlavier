@@ -201,8 +201,8 @@ void MainViewController::timerCallback()
         preparationPanel->refill(PreparationTypeTempo);
         preparationPanel->refill(PreparationTypeTempoMod);
         
-        overtop.ovc.updateFields();
-        overtop.ovc.updateModFields();
+        overtop.ovc2.updateFields();
+        //overtop.ovc2.updateModFields();
     }
     
     if (processor.updateState->pianoDidChangeForGraph)
