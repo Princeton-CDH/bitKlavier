@@ -102,6 +102,7 @@ void NostalgicViewController2::BKEditableComboBoxChanged(String name, BKEditable
 
 void NostalgicViewController2::updateFields(void)
 {
+    fillSelectCB();
     
     NostalgicPreparation::Ptr prep = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
     

@@ -58,8 +58,9 @@ void TempoProcessor::atNewNoteOff()
 //really basic, using constrained moving average of time-between-notes (or note-length)
 void TempoProcessor::atCalculatePeriodMultiplier()
 {
-    //only do if history val is > 0
-    if(active->getAdaptiveTempo1History()) {
+
+    DBG("tempo system = " + String(active->getTempoSystem()));
+    if(active->getAdaptiveTempo1History() && active->getTempoSystem() == AdaptiveTempo1) {
         
         atDelta = (atTimer - atLastTime) / (0.001 * sampleRate); //fix this? make sampleRateMS
         //DBG("atTimer = " + String(atTimer) + " atLastTime = " + String(atLastTime));

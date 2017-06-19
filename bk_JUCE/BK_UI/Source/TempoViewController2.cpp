@@ -269,6 +269,7 @@ void TempoViewController2::updateComponentVisibility()
 
 void TempoViewController2::updateFields(void)
 {
+    fillSelectCB();
     
     TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
     

@@ -376,6 +376,7 @@ void TuningViewController2::BKEditableComboBoxChanged(String name, BKEditableCom
 
 void TuningViewController2::updateFields(void)
 {
+    fillSelectCB();
     
     TuningPreparation::Ptr prep = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
     
