@@ -274,7 +274,7 @@ void TempoViewController2::updateFields(void)
     TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
     
     selectCB.setSelectedItemIndex(processor.updateState->currentTempoId, dontSendNotification);
-    modeCB.setSelectedItemIndex(prep->getTempoSystem(), dontSendNotification);
+    modeCB.setSelectedItemIndex((int)prep->getTempoSystem(), dontSendNotification);
     tempoSlider->setValue(prep->getTempo(), dontSendNotification);
     
     A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempo1Mode(), dontSendNotification);
