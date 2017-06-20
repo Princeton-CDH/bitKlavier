@@ -59,10 +59,10 @@ private:
     TextButton  pianoB;
     TextButton  galleryB;
     
-    
     BKComboBox                          galleryCB;
-    
     BKEditableComboBox                  pianoCB;
+    
+    BKButtonAndMenuLAF buttonsAndMenusLAF;
     
     JUCE_LEAK_DETECTOR(HeaderViewController)
 };

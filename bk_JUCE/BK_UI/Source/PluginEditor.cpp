@@ -43,7 +43,7 @@ BKAudioProcessorEditor::~BKAudioProcessorEditor()
 
 void BKAudioProcessorEditor::paint (Graphics& g)
 {
-    g.fillAll(Colours::dimgrey);
+    g.fillAll(Colours::black);
 }
 
 

@@ -34,6 +34,4 @@ static const int gYSpacing = 4;
 
 
 
-
-
 #endif  // GRAPHICSCONSTANTS_H_INCLUDED

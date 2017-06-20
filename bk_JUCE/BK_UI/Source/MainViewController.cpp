@@ -55,7 +55,7 @@ MainViewController::~MainViewController()
 
 void MainViewController::paint (Graphics& g)
 {
-    g.fillAll(Colours::dimgrey);
+    g.fillAll(Colours::black);
 }
 
 #define SOME_PADDING 200

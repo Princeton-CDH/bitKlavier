@@ -14,6 +14,7 @@
 void BKEditableComboBox::mouseDoubleClick (const MouseEvent &event)
 {
     lastItemId = getSelectedId();
+    focusLostByEscapeKey = false;
     nameEditor.setAlpha(1.);
     nameEditor.toFront(true);
     nameEditor.setBounds(getLocalBounds());
@@ -37,21 +38,34 @@ void BKEditableComboBox::textEditorReturnKeyPressed(TextEditor& textEditor)
                    textEditor.getText(),
                    this);
     
-    //removeChildComponent(&nameEditor);
-    
     changeItemText(lastItemId, textEditor.getText());
     setSelectedId(lastItemId, dontSendNotification);
 }
 
+void BKEditableComboBox::textEditorEscapeKeyPressed (TextEditor &)
+{
+    focusLostByEscapeKey = true;
+    nameEditor.toBack();
+    nameEditor.setAlpha(0.);
+    nameEditor.focusLost(focusChangedDirectly);
+}
+
 void BKEditableComboBox::textEditorFocusLost(TextEditor& textEditor)
 {
+    nameEditor.toBack();
+    nameEditor.setAlpha(0.);
     
-    listeners.call(&BKEditableComboBoxListener::BKEditableComboBoxChanged,
-                   textEditor.getText(),
-                   this);
-    
-    //removeChildComponent(&nameEditor);
+    if(!focusLostByEscapeKey)
+    {
+        focusLostByEscapeKey = false;
+        
+        listeners.call(&BKEditableComboBoxListener::BKEditableComboBoxChanged,
+                       textEditor.getText(),
+                       this);
+        
+        changeItemText(lastItemId, textEditor.getText());
+        setSelectedId(lastItemId, dontSendNotification);
+    }
 
-    changeItemText(lastItemId, textEditor.getText());
-    setSelectedId(lastItemId, dontSendNotification);
+     
 };

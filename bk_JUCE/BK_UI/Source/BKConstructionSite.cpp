@@ -128,7 +128,8 @@ void BKConstructionSite::align(int which)
 
 void BKConstructionSite::paint(Graphics& g)
 {
-    g.setColour(Colours::lightgrey);
+    //g.setColour(Colours::gold);
+    g.setColour(Colours::burlywood.withMultipliedBrightness(0.5));
     g.fillAll();
     
     
