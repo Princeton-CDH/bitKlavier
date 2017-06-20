@@ -23,7 +23,8 @@ public BKComponent,
 public BKListener,
 public BKEditableComboBoxListener,
 public BKSingleSliderListener,
-public BKKeyboardSliderListener
+public BKKeyboardSliderListener,
+public Timer
 {
 public:
     
@@ -32,6 +33,7 @@ public:
     
     void paint (Graphics&) override;
     void resized() override;
+    void timerCallback() override;
     
     void updateFields();
     
@@ -45,6 +47,7 @@ private:
     
     BKLabel scaleLabel;
     BKComboBox scaleCB;
+    int customIndex; //index of Custom tuning in combobox
     
     BKLabel fundamentalLabel;
     BKComboBox fundamentalCB;
@@ -65,9 +68,15 @@ private:
     
     ScopedPointer<BKSingleSlider> A1ClusterThresh;
     ScopedPointer<BKSingleSlider> A1ClusterMax;
+    
+    TextButton A1reset;
 
     Array<float> absoluteOffsets;   //for entire keyboard; up to 128 vals
     Array<float> customOffsets;     //for custom tuning; 12 vals
+    
+    BKLabel lastNote;
+    BKLabel lastInterval;
+    float lastNoteTuningSave = -.1;
     
     BKKeyboardSlider absoluteKeyboard;
     BKKeyboardSlider customKeyboard;

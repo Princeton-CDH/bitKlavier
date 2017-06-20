@@ -78,8 +78,18 @@ octaveNumForMiddleC (3)
     mouseOverNotes.insertMultiple (0, -1, 32);
     mouseDownNotes.insertMultiple (0, -1, 32);
     
+    keysToggle = true;
+    
+    fundamental = -1; //don't display by default; absolute, not rotating.
+    rangeAll = (rangeEnd - rangeStart) + 1;
+    
     colourChanged();
     setWantsKeyboardFocus (true);
+    
+    for(int i=0; i<128; i++)
+    {
+        keyValues.add(0.);
+    }
     
     state.addListener (this);
     
@@ -124,6 +134,8 @@ void BKKeymapKeyboardComponent::setAvailableRange (const int lowestNote,
         rangeStart = jlimit (0, 127, lowestNote);
         rangeEnd = jlimit (0, 127, highestNote);
         firstKey = jlimit ((float) rangeStart, (float) rangeEnd, firstKey);
+        
+        rangeAll = (rangeEnd - rangeStart) + 1;
         resized();
     }
 }
@@ -468,20 +480,56 @@ void BKKeymapKeyboardComponent::drawWhiteNote (int midiNoteNumber,
 {
     Colour c (keyColour);
     
-    if (isDown)  c = findColour (keyDownOverlayColourId);
-    if (isOver)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
+    float keyVal = keyValues.getUnchecked(midiNoteNumber);
+    if(keyVal != 0.)
+    {
+        if(keyVal > 0) c = c.overlaidWith (Colours::red.withSaturation ( sqrt(keyVal / 50.)) );
+        else c = c.overlaidWith (Colours::blue.withSaturation ( sqrt(keyVal * -1. / 50.)));
+    }
+    else
+    {
+        if (isDown)  c = c.overlaidWith (findColour (keyDownOverlayColourId));
+        if (isOver)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
+    }
     
     g.setColour (c);
     g.fillRect (x, y, w, h);
     
-    const String text (getWhiteNoteText (midiNoteNumber));
+    //const String text (getWhiteNoteText (midiNoteNumber));
+    String text (getWhiteNoteText (midiNoteNumber));
+    
+    if(fundamental >= 0) //meaning: rotating keyboard, or temperament
+    {
+        if(isFundamental(midiNoteNumber))
+        {
+            String ftext ("*");
+            text.swapWith(ftext);
+        }
+        else
+        {
+            String btext;
+            text.swapWith(btext);
+        }
+    }
     
     if (text.isNotEmpty())
     {
-        const float fontHeight = jmin (12.0f, keyWidth * 0.9f);
-        
-        g.setColour (textColour);
-        g.setFont (Font (fontHeight).withHorizontalScale (0.8f));
+       if(fundamental >= 0)
+       {
+           const float fontHeight = jmin (18.0f, keyWidth * 0.9f);
+           
+           g.setColour (c.contrasting());
+           g.setFont (Font (fontHeight));
+           
+       }
+       else
+       {
+           const float fontHeight = jmin (12.0f, keyWidth * 0.9f);
+           
+           g.setColour (c.contrasting());
+           g.setFont (Font (fontHeight).withHorizontalScale (0.8f));
+       }
+
         
         switch (orientation)
         {
@@ -517,7 +565,7 @@ void BKKeymapKeyboardComponent::drawWhiteNote (int midiNoteNumber,
     }
 }
 
-void BKKeymapKeyboardComponent::drawBlackNote (int /*midiNoteNumber*/,
+void BKKeymapKeyboardComponent::drawBlackNote (int midiNoteNumber,
                                            Graphics& g, int x, int y, int w, int h,
                                            bool isDown, bool isOver,
                                            const Colour& noteFillColour)
@@ -537,7 +585,16 @@ void BKKeymapKeyboardComponent::drawBlackNote (int /*midiNoteNumber*/,
     }
     else
     {
-        g.setColour (c.brighter());
+        
+        float keyVal = keyValues.getUnchecked(midiNoteNumber);
+        if(keyVal != 0.)
+        {
+            if(keyVal > 0) c = Colours::red.withSaturation ( sqrt(keyVal / 50.)) ;
+            else c = Colours::blue.withSaturation ( sqrt(keyVal * -1. / 50.));
+            g.setColour(c);
+        }
+        else g.setColour (c.brighter());
+        
         const int xIndent = jmax (1, jmin (w, h) / 8);
         
         switch (orientation)
@@ -546,6 +603,28 @@ void BKKeymapKeyboardComponent::drawBlackNote (int /*midiNoteNumber*/,
             case verticalKeyboardFacingLeft:    g.fillRect (x + w / 8, y + xIndent, w - w / 8, h - xIndent * 2); break;
             case verticalKeyboardFacingRight:   g.fillRect (x, y + xIndent, 7 * w / 8, h - xIndent * 2); break;
             default: break;
+        }
+    }
+    
+    if(fundamental >= 0) //meaning: rotating keyboard, or temperament
+    {
+        if(isFundamental(midiNoteNumber))
+        {
+            String text ("*");
+            
+            const float fontHeight = jmin (18.0f, keyWidth * 0.9f);
+            
+            g.setColour (c.contrasting());
+            //g.setFont (Font (fontHeight).withHorizontalScale (0.8f));
+            g.setFont (Font (fontHeight));
+            
+            switch (orientation)
+            {
+                case horizontalKeyboard:            g.drawText (text, x + 1, y - 6, w - 1, h - 2, Justification::centredBottom, false); break;
+                case verticalKeyboardFacingLeft:    g.drawText (text, x + 2, y + 2, w - 4, h - 4, Justification::centredLeft,   false); break;
+                case verticalKeyboardFacingRight:   g.drawText (text, x + 2, y + 2, w - 4, h - 4, Justification::centredRight,  false); break;
+                default: break;
+            }
         }
     }
 }
@@ -791,13 +870,16 @@ void BKKeymapKeyboardComponent::mouseMove (const MouseEvent& e)
 
 void BKKeymapKeyboardComponent::mouseDrag (const MouseEvent& e)
 {
-    float mousePositionVelocity;
-    const int newNote = xyToNote (e.getPosition(), mousePositionVelocity);
-    
-    if (newNote >= 0)
-        mouseDraggedToKey (newNote, e);
-    
-    updateNoteUnderMouse (e, true);
+    if(allowDrag)
+    {
+        float mousePositionVelocity;
+        const int newNote = xyToNote (e.getPosition(), mousePositionVelocity);
+        
+        if (newNote >= 0)
+            mouseDraggedToKey (newNote, e);
+        
+        updateNoteUnderMouse (e, true);
+    }
 }
 
 void BKKeymapKeyboardComponent::setKeysInKeymap(Array<int> keys)
@@ -809,6 +891,109 @@ void BKKeymapKeyboardComponent::setKeysInKeymap(Array<int> keys)
     for (auto key : keys) keymap.set(key, true);
     
     state.setKeymap(keymap);
+    
+    repaint();
+}
+
+void BKKeymapKeyboardComponent::setKeyValue(int midiNoteNumber, float val)
+{
+    DBG("setting keyValue directly " + String(midiNoteNumber) + " " + String(val));
+    keyValues.set(midiNoteNumber, val);
+}
+
+void BKKeymapKeyboardComponent::setValuesRotatedByFundamental(Array<float> vals)
+{
+    int offset;
+    if(fundamental <= 0) offset = 0;
+    else offset = fundamental;
+    
+    for(int i=rangeStart; i<=rangeEnd; i++)
+    {
+        //int index = (((i - rangeStart) - offset) + rangeAll) % rangeAll + rangeStart;
+        //int index = (((i - rangeStart) - offset) + rangeAll) % rangeAll;
+        int index = ((i - offset) + rangeAll) % rangeAll;
+        keyValues.set(i, vals.getUnchecked(index));
+    }
+}
+
+Array<float> BKKeymapKeyboardComponent::getValuesRotatedByFundamental()
+{
+    Array<float> valsToSend;
+    for (int i = 0; i < 128; i++) valsToSend.add(0.);
+    
+    int offset;
+    if(fundamental <= 0) offset = 0;
+    else offset = fundamental;
+    
+    //must create inverse of index from setValues
+    for(int i=rangeStart; i<=rangeEnd; i++)
+    {
+        int index = (i + offset) % (rangeStart + rangeAll);
+        //valsToSend.set(i - rangeStart, keyValues.getUnchecked(index));
+        valsToSend.set(i, keyValues.getUnchecked(index));
+        //DBG("keyValues GET ROTATED " + String(i - rangeStart) + " " + String(keyValues.getUnchecked(index)));
+        DBG("keyValues GET ROTATED " + String(i) + " " + String(keyValues.getUnchecked(index)));
+    }
+    
+    return valsToSend;
+}
+
+void BKKeymapKeyboardComponent::setValuesDirectly(Array<float> vals)
+{
+    for(int i=rangeStart; i<=rangeEnd; i++)
+    {
+        //DBG("keyValues SET DIRECT " + String(i) + " " + String(i - rangeStart) + " " + String(vals.getUnchecked(i - rangeStart)));
+        DBG("keyValues SET DIRECT " + String(i) + " " + String(i) + " " + String(vals.getUnchecked(i)));
+        //keyValues.set(i, vals.getUnchecked(i - rangeStart));
+        keyValues.set(i, vals.getUnchecked(i));
+    }
+}
+
+Array<float> BKKeymapKeyboardComponent::getValuesDirectly()
+{
+    Array<float> valsToSend;
+    for (int i = 0; i < rangeAll; i++) valsToSend.add(0.);
+    
+    for(int i=rangeStart; i<=rangeEnd; i++)
+    {
+        //DBG("keyValues GET DIRECT " + String(i - rangeStart) + " " + String(keyValues.getUnchecked(i)));
+        DBG("keyValues GET DIRECT " + String(i) + " " + String(keyValues.getUnchecked(i)));
+        //valsToSend.set(i - rangeStart, keyValues.getUnchecked(i));
+        valsToSend.set(i, keyValues.getUnchecked(i));
+    }
+    
+    return valsToSend;
+}
+
+float BKKeymapKeyboardComponent::getLastNoteOverValue()
+{
+    if(lastNoteOver >= 0 && lastNoteOver < 128)
+        return (keyValues.getUnchecked(lastNoteOver));
+    
+    return 0.;
+}
+
+void BKKeymapKeyboardComponent::setFundamental(int fund)
+{
+    
+    //need to shift keyValues over by difference in fundamental
+    int oldFund = fundamental;
+    fundamental = fund;
+    int offset = fund - oldFund;
+    
+    Array<float> tempVals;
+    for (int i = 0; i < 128; i++) tempVals.add(0.);
+    
+    for(int i=rangeStart; i<=rangeEnd; i++)
+    {
+        int index = (i + offset + rangeAll) % rangeAll;
+        tempVals.setUnchecked(index, keyValues.getUnchecked(i));
+    }
+    
+    for(int i=rangeStart; i<=rangeEnd; i++)
+    {
+        keyValues.setUnchecked(i, tempVals.getUnchecked(i));
+    }
     
     repaint();
 }
@@ -828,8 +1013,11 @@ void BKKeymapKeyboardComponent::mouseDraggedToKey (int midiNoteNumber, const Mou
 {
     if (midiNoteNumber != lastKeySelected)
     {
-        state.toggle(lastKeySelected);
-        repaint(getRectangleForKey(lastKeySelected));
+        if(keysToggle)
+        {
+            state.toggle(lastKeySelected);
+            repaint(getRectangleForKey(lastKeySelected));
+        }
         
         lastKeySelected = midiNoteNumber;
     }
@@ -837,8 +1025,11 @@ void BKKeymapKeyboardComponent::mouseDraggedToKey (int midiNoteNumber, const Mou
 
 void BKKeymapKeyboardComponent::mouseUpOnKey      (int midiNoteNumber, const MouseEvent&)
 {
-    state.toggle(midiNoteNumber);
-    repaint(getRectangleForKey(midiNoteNumber));
+    if(keysToggle)
+    {
+        state.toggle(midiNoteNumber);
+        repaint(getRectangleForKey(midiNoteNumber));
+    }
     
     lastKeySelected = -1;
     

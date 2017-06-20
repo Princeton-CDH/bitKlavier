@@ -259,6 +259,7 @@ void SynchronicViewController2::updateFields(NotificationType notify)
 {
     
     //DBG("**** updating synchronic sliders **** prep # " + String(processor.updateState->currentSynchronicId) + " " + String(notify));
+    fillSelectCB();
     
     SynchronicPreparation::Ptr prep   = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     

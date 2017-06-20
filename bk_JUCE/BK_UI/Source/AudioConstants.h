@@ -582,11 +582,22 @@ static const std::vector<std::string> cTuningParameterTypes = {
 
 
 #pragma mark - Tempo
+
+static const std::vector<std::string> cTempoModeTypes = {
+    "Constant Tempo",
+    "Adaptive Tempo 1"
+};
+
 typedef enum AdaptiveTempo1Mode {
     TimeBetweenNotes = 0,
     NoteLength,
     AdaptiveTempo1ModeNil
 } AdaptiveTempo1Mode;
+
+static const std::vector<std::string> cAdaptiveTempoModeTypes = {
+    "Time Between Notes",
+    "Note Sustain Length"
+};
 
 typedef enum TempoParameterType
 {

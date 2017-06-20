@@ -183,8 +183,10 @@ void MainViewController::timerCallback()
         preparationPanel->refill(PreparationTypeTuning);
         preparationPanel->refill(PreparationTypeTuningMod);
         
-        overtop.tvc.updateFields();
-        overtop.tvc.updateModFields();
+        //overtop.tvc.updateFields();
+        //overtop.tvc.updateModFields();
+        
+        overtop.tvc2.updateFields();
     }
     
     if (processor.updateState->tempoPreparationDidChange)
@@ -194,8 +196,8 @@ void MainViewController::timerCallback()
         preparationPanel->refill(PreparationTypeTempo);
         preparationPanel->refill(PreparationTypeTempoMod);
         
-        overtop.ovc.updateFields();
-        overtop.ovc.updateModFields();
+        overtop.ovc2.updateFields();
+        //overtop.ovc2.updateModFields();
     }
     
     if (processor.updateState->pianoDidChangeForGraph)

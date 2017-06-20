@@ -66,6 +66,7 @@ void DirectViewController2::resized()
 
 void DirectViewController2::updateFields(void)
 {
+    fillSelectCB();
     
     DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
 

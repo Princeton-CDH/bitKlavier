@@ -1124,7 +1124,9 @@ void BKSingleSlider::mouseUp(const MouseEvent &event)
     {
         if(event.mods.isShiftDown())
         {
+            checkValue(sliderDefault);
             thisSlider.setValue(sliderDefault, sendNotification);
+            
         }
     }
 }
@@ -1235,6 +1237,7 @@ sliderIncrement(increment)
     addAndMakeVisible(invisibleSlider);
 
     newDrag = false;
+    isMinAlwaysLessThanMax = false;
 }
 
 void BKRangeSlider::setMinValue(double newval, NotificationType notify)
@@ -1265,11 +1268,17 @@ void BKRangeSlider::sliderValueChanged (Slider *slider)
             {
                 maxSlider.setValue(invisibleSlider.getValue());
                 maxValueTF.setText(String(maxSlider.getValue()), dontSendNotification);
+                if(isMinAlwaysLessThanMax)
+                    if(maxSlider.getValue() < minSlider.getValue())
+                        setMinValue(maxSlider.getValue(), dontSendNotification);
             }
             else
             {
                 minSlider.setValue(invisibleSlider.getValue());
                 minValueTF.setText(String(minSlider.getValue()), dontSendNotification);
+                if(isMinAlwaysLessThanMax)
+                    if(minSlider.getValue() > maxSlider.getValue())
+                        setMaxValue(minSlider.getValue(), dontSendNotification);
             }
             
             listeners.call(&BKRangeSliderListener::BKRangeSliderValueChanged,
@@ -1316,11 +1325,17 @@ void BKRangeSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
     if(textEditor.getName() == "minvalue")
     {
         minSlider.setValue(newval, sendNotification);
+        if(isMinAlwaysLessThanMax)
+            if(minSlider.getValue() > maxSlider.getValue())
+                setMaxValue(minSlider.getValue(), dontSendNotification);
         rescaleMinSlider();
     }
     else if(textEditor.getName() == "maxvalue")
     {
         maxSlider.setValue(newval, sendNotification);
+        if(isMinAlwaysLessThanMax)
+            if(maxSlider.getValue() < minSlider.getValue())
+                setMinValue(maxSlider.getValue(), dontSendNotification);
         rescaleMaxSlider();
     }
     
@@ -1332,26 +1347,7 @@ void BKRangeSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 
 void BKRangeSlider::textEditorFocusLost(TextEditor& textEditor)
 {
-    double newval = textEditor.getText().getDoubleValue();
-    
-    //adjusts min/max of sldiers as needed
-    checkValue(newval);
-    
-    if(textEditor.getName() == "minvalue")
-    {
-        minSlider.setValue(newval, sendNotification);
-        rescaleMinSlider();
-    }
-    else if(textEditor.getName() == "maxvalue")
-    {
-        maxSlider.setValue(newval, sendNotification);
-        rescaleMaxSlider();
-    }
-    
-    listeners.call(&BKRangeSliderListener::BKRangeSliderValueChanged,
-                   getName(),
-                   minSlider.getValue(),
-                   maxSlider.getValue());
+    textEditorReturnKeyPressed(textEditor);
 }
 
 void BKRangeSlider::checkValue(double newval)

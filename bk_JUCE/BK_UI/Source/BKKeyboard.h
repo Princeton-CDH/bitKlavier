@@ -204,6 +204,8 @@ public:
 
     /** Returns the key at a given coordinate. */
     int getNoteAtPosition (Point<int> position);
+    
+    int getLastKeySelected() const { return lastKeySelected; };
 
     //==============================================================================
     /** Deletes all key-mappings.
@@ -257,6 +259,26 @@ public:
     int getOctaveForMiddleC() const noexcept            { return octaveNumForMiddleC; }
     
     const int getLastNoteOver() const noexcept          { return lastNoteOver; }
+    
+    void setAllowDrag(bool d) { allowDrag = d; }
+    
+    void setFundamental(int fund);
+    int getFundamental() { return fundamental; }
+    
+    bool isFundamental(int note)
+    {
+        if(note == fundamental) return true;
+        else return false;
+    }
+    
+    void setKeyValue(int midiNoteNumber, float val);
+    void setValuesRotatedByFundamental(Array<float> vals);
+    Array<float> getValuesRotatedByFundamental();
+    void setValuesDirectly(Array<float> vals);
+    Array<float> getValuesDirectly();
+    float getLastNoteOverValue();
+    
+    void doKeysToggle(bool tog) { keysToggle = tog; }
 
     //==============================================================================
     /** @internal */
@@ -293,6 +315,7 @@ public:
     void handleKeymapNoteOff (BKKeymapKeyboardState*, int midiNoteNumber) override;
     
     void handleKeymapNoteToggled (BKKeymapKeyboardState*, int midiNoteNumber) override;
+    
 
 protected:
     //==============================================================================
@@ -329,6 +352,9 @@ protected:
         @see setOctaveForMiddleC
     */
     virtual String getWhiteNoteText (const int midiNoteNumber);
+    
+    /** Returns the rectangle for a given key if within the displayable range */
+    Rectangle<int> getRectangleForKey (int midiNoteNumber) const;
 
     /** Draws the up and down buttons that change the base note. */
     virtual void drawUpDownButton (Graphics& g, int w, int h,
@@ -370,8 +396,6 @@ protected:
     virtual void getKeyPosition (int midiNoteNumber, float keyWidth,
                                  int& x, int& w) const;
 
-    /** Returns the rectangle for a given key if within the displayable range */
-    Rectangle<int> getRectangleForKey (int midiNoteNumber) const;
 
 
 private:
@@ -381,6 +405,8 @@ private:
     int firstKeyDown, lastKeyDown;
     int lastKeySelected;
     Array<int> keysSelected;
+    Array<float> keyValues;
+    bool keysToggle;
 
     BKKeymapKeyboardState& state;
     float blackNoteLengthRatio;
@@ -394,8 +420,10 @@ private:
     Array<int> mouseOverNotes, mouseDownNotes;
     BigInteger keysPressed, keysCurrentlyDrawnDown;
     bool shouldCheckState;
+    bool allowDrag;
 
     int rangeStart, rangeEnd;
+    int rangeAll;
     float firstKey;
     bool canScroll, useMousePositionForVelocity, shouldCheckMousePos;
     ScopedPointer<Button> scrollDown, scrollUp;
@@ -403,6 +431,7 @@ private:
     Array<KeyPress> keyPresses;
     Array<int> keyPressNotes;
     int keyMappingOctave, octaveNumForMiddleC;
+    int fundamental;
 
     static const uint8 whiteNotes[];
     static const uint8 blackNotes[];

@@ -159,7 +159,7 @@ public:
     void keyPressed(int noteNumber, float velocity);
     void keyReleased(int noteNumber, int channel);
     inline float getPeriodMultiplier(void)              {return adaptiveTempoPeriodMultiplier;}
-    inline float getAdaptedTempo(void)                  {return adaptiveTempoPeriodMultiplier * active->getTempo();}
+    inline float getAdaptedTempo(void)                  {return active->getTempo() / adaptiveTempoPeriodMultiplier;}
     
     void  reset();
     
