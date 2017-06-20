@@ -53,12 +53,12 @@ public:
     bool generalSettingsDidChange = false;
     bool keymapDidChange = false;
     
-    BKPreparationDisplay currentPreparationDisplay = DisplayNil;
+    BKPreparationDisplay currentDisplay = DisplayNil;
     bool displayDidChange;
     
     void setCurrentDisplay(BKPreparationDisplay type)
     {
-        currentPreparationDisplay = type;
+        currentDisplay = type;
         displayDidChange = true;
     }
     

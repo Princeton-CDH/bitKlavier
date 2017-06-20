@@ -29,7 +29,7 @@ public BKStackedSliderListener,
 public Timer
 {
 public:
-    NostalgicViewController2(BKAudioProcessor&, BKItemGraph* theGraph);
+    NostalgicViewController2(BKEditorType type, BKAudioProcessor&, BKItemGraph* theGraph);
     ~NostalgicViewController2() {};
     
     BKWaveDistanceUndertowSlider nDisplaySlider;
@@ -64,6 +64,8 @@ public:
     
 
 private:
+    BKEditorType type;
+    
     BKAudioProcessor& processor;
     BKItemGraph* theGraph;
 

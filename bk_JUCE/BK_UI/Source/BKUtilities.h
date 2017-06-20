@@ -55,4 +55,11 @@ typedef enum BKTextFieldType
     
 }BKTextFieldType;
 
+typedef enum BKEditorType
+{
+    BKPreparationEditor,
+    BKModificationEditor,
+    BKEditorTypeNil
+}BKEditorType;
+
 #endif  // BKUTILITIES_H_INCLUDED

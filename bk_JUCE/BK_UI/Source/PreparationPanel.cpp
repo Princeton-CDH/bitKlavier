@@ -69,19 +69,13 @@ void PreparationPanel::resized(void)
     
     preparationLabel[PreparationTypeDirect]->setBounds(0, 0, width, rowHeight);
     preparationListBox[PreparationTypeDirect]->setBounds(0, preparationLabel[PreparationTypeDirect]->getBottom(), width, height);
-    
-    preparationLabel[PreparationTypeDirectMod]->setBounds(width, 0, width, rowHeight);
-    preparationListBox[PreparationTypeDirectMod]->setBounds(width, preparationLabel[PreparationTypeDirectMod]->getBottom(), width, height);
-    
+
     for (int i = PreparationTypeDirect+1; i < BKPreparationTypeNil; i++)
     {
-        if (i != PreparationTypeDirectMod)
-        {
             preparationLabel[i]     ->setBounds(preparationListBox[i-1]->getX(),  preparationListBox[i-1]->getBottom(),
                                                 width, rowHeight);
             preparationListBox[i]   ->setBounds(preparationListBox[i-1]->getX(),  preparationLabel[i]->getBottom(),
                                                 width, height);
-        }
     }
 }
 

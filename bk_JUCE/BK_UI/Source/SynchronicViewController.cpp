@@ -353,7 +353,7 @@ void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
         DBG("Unregistered text field entered input.");
     }
     
-    if (type == BKModification) theGraph->update(PreparationTypeSynchronicMod, processor.updateState->currentModSynchronicId);
+    if (type == BKModification) theGraph->updateMod(PreparationTypeSynchronic, processor.updateState->currentModSynchronicId);
 }
 
 void SynchronicViewController::updateFields(void)

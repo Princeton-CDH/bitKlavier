@@ -294,7 +294,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
         DBG("Unregistered text field.");
     }
     
-    if (type == BKModification) theGraph->update(PreparationTypeTuningMod, processor.updateState->currentModTuningId);
+    if (type == BKModification) theGraph->updateMod(PreparationTypeTuning, processor.updateState->currentModTuningId);
 }
 
 

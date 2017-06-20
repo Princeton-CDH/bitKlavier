@@ -260,7 +260,7 @@ void TempoViewController::bkTextFieldDidChange(TextEditor& tf)
         DBG("Unregistered text field.");
     }
     
-    if (type == BKModification) theGraph->update(PreparationTypeTempoMod, processor.updateState->currentModTempoId);
+    if (type == BKModification) theGraph->updateMod(PreparationTypeTempo, processor.updateState->currentModTempoId);
 }
 
 

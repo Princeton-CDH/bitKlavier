@@ -30,7 +30,7 @@ public SliderListener,
 public Timer
 {
 public:
-    SynchronicViewController2(BKAudioProcessor&, BKItemGraph* theGraph);
+    SynchronicViewController2(BKEditorType type, BKAudioProcessor&, BKItemGraph* theGraph);
     ~SynchronicViewController2();
     
     void paint (Graphics&) override;
@@ -41,6 +41,8 @@ public:
     void timerCallback() override;
     
 private:
+    BKEditorType type;
+    
     BKAudioProcessor& processor;
     BKItemGraph* theGraph;
     

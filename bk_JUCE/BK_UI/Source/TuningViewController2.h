@@ -28,7 +28,7 @@ public Timer
 {
 public:
     
-    TuningViewController2(BKAudioProcessor&, BKItemGraph* theGraph);
+    TuningViewController2(BKEditorType type, BKAudioProcessor&, BKItemGraph* theGraph);
     ~TuningViewController2() {};
     
     void paint (Graphics&) override;
@@ -38,6 +38,7 @@ public:
     void updateFields();
     
 private:
+    BKEditorType type;
     
     BKAudioProcessor& processor;
     BKItemGraph* theGraph;

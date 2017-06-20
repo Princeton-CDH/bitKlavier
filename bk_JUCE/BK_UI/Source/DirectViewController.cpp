@@ -335,7 +335,7 @@ void DirectViewController::bkTextFieldDidChange(TextEditor& tf)
         DBG("Unregistered text field entered input.");
     }
     
-    if (type == BKModification) theGraph->update(PreparationTypeDirectMod, processor.updateState->currentModDirectId);
+    if (type == BKModification) theGraph->updateMod(PreparationTypeDirect, processor.updateState->currentModDirectId);
 }
 
 

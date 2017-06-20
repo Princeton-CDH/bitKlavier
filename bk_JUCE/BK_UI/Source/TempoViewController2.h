@@ -27,7 +27,7 @@ public Timer
 {
 public:
     
-    TempoViewController2(BKAudioProcessor&, BKItemGraph* theGraph);
+    TempoViewController2(BKEditorType type, BKAudioProcessor&, BKItemGraph* theGraph);
     ~TempoViewController2() {};
     
     void paint (Graphics&) override;
@@ -38,7 +38,7 @@ public:
     
     
 private:
-
+    BKEditorType type;
     
     BKAudioProcessor& processor;
     BKItemGraph* theGraph;

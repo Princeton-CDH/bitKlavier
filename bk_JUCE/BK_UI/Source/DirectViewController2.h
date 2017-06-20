@@ -26,7 +26,7 @@ public BKStackedSliderListener
 {
 public:
     
-    DirectViewController2(BKAudioProcessor&, BKItemGraph* theGraph);
+    DirectViewController2(BKEditorType type, BKAudioProcessor&, BKItemGraph* theGraph);
     ~DirectViewController2() {};
     
     BKEditableComboBox selectCB;
@@ -51,6 +51,7 @@ public:
     void fillSelectCB(void);
 
 private:
+    BKEditorType type;
     
     BKAudioProcessor& processor;
     BKItemGraph* theGraph;

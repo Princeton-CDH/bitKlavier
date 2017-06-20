@@ -1278,8 +1278,10 @@ public:
     }
     
     inline int getId(void) const noexcept { return Id; }
+    inline void setId(int newId) { Id = newId; }
     
     inline BKPreparationType getType(void) const noexcept { return type; }
+    inline void setType(BKPreparationType newType) { type = newType; }
     
     inline void addTarget(int target) { targets.add(target); }
     inline Array<int> getTargets(void) {return targets;}

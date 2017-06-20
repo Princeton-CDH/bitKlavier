@@ -10,7 +10,8 @@
 
 #include "NostalgicViewController2.h"
 
-NostalgicViewController2::NostalgicViewController2(BKAudioProcessor& p, BKItemGraph* theGraph):
+NostalgicViewController2::NostalgicViewController2(BKEditorType type, BKAudioProcessor& p, BKItemGraph* theGraph):
+type(type),
 processor(p),
 theGraph(theGraph)
 {
@@ -93,15 +94,14 @@ void NostalgicViewController2::BKWaveDistanceUndertowSliderValueChanged(String n
 
 void NostalgicViewController2::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    processor.gallery->getNostalgic(processor.updateState->currentNostalgicId)->setName(name);
-    
-    //int selected = selectCB.getSelectedId();
-    //if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, name);
-    //selectCB.setSelectedId(selected, dontSendNotification );
+    if (type == BKPreparationEditor)    processor.gallery->getNostalgic(processor.updateState->currentNostalgicId)->setName(name);
+    else                                processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId)->setName(name);
 }
 
 void NostalgicViewController2::updateFields(void)
 {
+    if (processor.updateState->currentNostalgicId < 0) return;
+    
     fillSelectCB();
     
     NostalgicPreparation::Ptr prep = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);

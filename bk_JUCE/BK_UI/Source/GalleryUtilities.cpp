@@ -134,6 +134,64 @@ void Gallery::removeTempo(int Id)
     tempo.remove(Id);
 }
 
+void Gallery::addMod(BKPreparationType type)
+{
+    if (type == PreparationTypeDirect)
+    {
+        int numMod = modDirect.size();
+        modDirect.add           (new DirectModPreparation(numMod));
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        int numMod = modNostalgic.size();
+        modNostalgic.add           (new NostalgicModPreparation(numMod));
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        int numMod = modSynchronic.size();
+        modSynchronic.add           (new SynchronicModPreparation(numMod));
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        int numMod = modTuning.size();
+        modTuning.add           (new TuningModPreparation(numMod));
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        int numMod = modTempo.size();
+        modTempo.add           (new TempoModPreparation(numMod));
+    }
+    
+    
+}
+
+int Gallery::getNumMod(BKPreparationType type)
+{
+    if (type == PreparationTypeDirect)
+    {
+        return modDirect.size();
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        return modNostalgic.size();
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        return modSynchronic.size();
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        return modTuning.size();
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        return modTempo.size();
+    }
+    
+    
+}
+
+
 void Gallery::addDirectMod()
 {
     int numMod = modDirect.size();

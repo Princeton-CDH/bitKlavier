@@ -81,6 +81,10 @@ public:
     void addKeymap(Keymap::Ptr);
     inline const int getNumKeymaps(void) const noexcept {return bkKeymaps.size();}
     
+    void addMod(BKPreparationType type);
+    
+    int getNumMod(BKPreparationType type);
+    
     void addDirectMod(void);
     void addNostalgicMod(void);
     void addSynchronicMod(void);

@@ -134,7 +134,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     }
     else if (code == 67) // C modification
     {
-        construction.addItem(PreparationTypeDirectMod, 1);
+        construction.addItem(PreparationTypeMod, 1);
     }
     else if (code == 68) // D direct
     {
@@ -199,61 +199,46 @@ void MainViewController::timerCallback()
         processor.updateState->idDidChange = false;
         
         construction.idDidChange();
-        
     }
     
     if (processor.updateState->directPreparationDidChange)
     {
         processor.updateState->directPreparationDidChange = false;
         
-        preparationPanel->refill(PreparationTypeDirect);
-        preparationPanel->refill(PreparationTypeDirectMod);
-        
-        overtop.dvc2.updateFields();
+        overtop.dvc.updateFields();
+        overtop.dvcm.updateFields();
     }
     
     if (processor.updateState->nostalgicPreparationDidChange)
     {
         processor.updateState->nostalgicPreparationDidChange = false;
         
-        preparationPanel->refill(PreparationTypeNostalgic);
-        preparationPanel->refill(PreparationTypeNostalgicMod);
-        
-        overtop.nvc2.updateFields();
+        overtop.nvc.updateFields();
+        overtop.nvcm.updateFields();
     }
     
     if (processor.updateState->synchronicPreparationDidChange)
     {
         processor.updateState->synchronicPreparationDidChange = false;
         
-        preparationPanel->refill(PreparationTypeSynchronic);
-        preparationPanel->refill(PreparationTypeSynchronicMod);
-        
-        
-        overtop.svc2.updateFields();
+        overtop.svc.updateFields();
+        overtop.svcm.updateFields();
     }
     
     if (processor.updateState->tuningPreparationDidChange)
     {
         processor.updateState->tuningPreparationDidChange = false;
         
-        preparationPanel->refill(PreparationTypeTuning);
-        preparationPanel->refill(PreparationTypeTuningMod);
-        
-        //overtop.tvc.updateFields();
-        //overtop.tvc.updateModFields();
-        
-        overtop.tvc2.updateFields();
+        overtop.tvc.updateFields();
+        overtop.tvcm.updateFields();
     }
     
     if (processor.updateState->tempoPreparationDidChange)
     {
         processor.updateState->tempoPreparationDidChange = false;
         
-        preparationPanel->refill(PreparationTypeTempo);
-        preparationPanel->refill(PreparationTypeTempoMod);
-        
-        overtop.ovc2.updateFields();
+        overtop.ovc.updateFields();
+        overtop.ovcm.updateFields();
     }
     
     if (processor.updateState->pianoDidChangeForGraph)
@@ -267,27 +252,15 @@ void MainViewController::timerCallback()
     if (processor.updateState->keymapDidChange)
     {
         processor.updateState->keymapDidChange = false;
-        
-        preparationPanel->refill(PreparationTypeKeymap);
-        
-        overtop.kvc.reset();
-    }
     
-    if (processor.updateState->directDidChange)
-    {
-        processor.updateState->directDidChange = false;
-        
-        preparationPanel->refill(PreparationTypeDirect);
-        preparationPanel->refill(PreparationTypeDirectMod);
-        
-        overtop.dvc.reset();
+        overtop.kvc.reset();
     }
     
     if (processor.updateState->displayDidChange)
     {
         processor.updateState->displayDidChange = false;
         
-        overtop.setCurrentDisplay(processor.updateState->currentPreparationDisplay);
+        overtop.setCurrentDisplay(processor.updateState->currentDisplay);
     }
     
     /*

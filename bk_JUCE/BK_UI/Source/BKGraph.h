@@ -19,6 +19,8 @@
 
 #include "Preparation.h"
 
+
+
 class BKItem : public BKDraggableComponent, public ReferenceCountedObject, public BKListener
 {
 public:
@@ -27,6 +29,7 @@ public:
     typedef ReferenceCountedArray<BKItem>       RCArr;
     
     BKItem(BKPreparationType type, int Id, BKAudioProcessor& p);
+    
     ~BKItem(void);
     
     void mouseDown(const MouseEvent& e) override;
@@ -47,7 +50,12 @@ public:
 
     inline String getName(void) { return name; }
     
+    inline void setType(BKPreparationType newType) { type = newType; }
+    
     inline BKPreparationType getType() const noexcept { return type; }
+    
+    inline void setId(int newId ) { Id = newId; }
+    
     inline int getId() const noexcept { return Id; }
     
     inline void setSelected(bool select) {isSelected = select; repaint();}
@@ -71,6 +79,8 @@ public:
         }
     }
     
+    inline ModificationMapper::Ptr getMapper() const noexcept { return mapper; }
+    
     inline int getSelectedId(void) const noexcept {return currentId;}
     inline void setSelectedId(int Id) { menu.setSelectedId(Id, dontSendNotification); }
     
@@ -80,8 +90,6 @@ public:
     {
         return getPosition();
     }
-    
-    inline void setId(int newId ) { Id = newId; }
     
     inline void setItemBounds(int X, int Y, int width, int height)
     {
@@ -124,14 +132,16 @@ private:
     
     BKPreparationType type;
     int Id;
+    
+    ModificationMapper::Ptr mapper;
+    
     String name;
-    
-    
+
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKItem)
 };
 
-class BKItemGraph : public ActionListener
+class BKItemGraph
 {
 public:
     BKItemGraph(BKAudioProcessor& p):
@@ -145,25 +155,6 @@ public:
         
     }
     
-    void actionListenerCallback (const String& message) override
-    {
-//        if (message == "/pianomap/update")
-//        {
-//            update(PreparationTypePianoMap, 0);
-//        }
-    }
-    
-    /*
-    class Listener
-    {
-        ~Listener(void)
-        {
-            
-        }
-        
-        virtual void itemsDragged(void){};
-    };
-     */
     
     BKItem* itemWithTypeAndId(BKPreparationType type, int Id);
     BKItem* get(BKPreparationType type, int Id);
@@ -181,6 +172,7 @@ public:
     void reconnect(BKItem* item1, BKItem* item2);
     
     void update(BKPreparationType type, int which);
+    void updateMod(BKPreparationType modType, int modId);
     
     void reconstruct(void);
 
@@ -272,9 +264,6 @@ private:
     void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
     void linkSynchronicWithTempo(Synchronic::Ptr synchronic, Tempo::Ptr thisTempo);
     void linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic);
-    
-    
-    
     
     void route(bool connect, BKItem* item1, BKItem* item2);
     

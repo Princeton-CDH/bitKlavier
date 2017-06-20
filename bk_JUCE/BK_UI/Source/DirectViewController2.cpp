@@ -10,7 +10,8 @@
 
 #include "DirectViewController2.h"
 
-DirectViewController2::DirectViewController2(BKAudioProcessor& p, BKItemGraph* theGraph):
+DirectViewController2::DirectViewController2(BKEditorType type, BKAudioProcessor& p, BKItemGraph* theGraph):
+type(type),
 processor(p),
 theGraph(theGraph)
 {
@@ -66,6 +67,9 @@ void DirectViewController2::resized()
 
 void DirectViewController2::updateFields(void)
 {
+    
+    if (processor.updateState->currentDirectId < 0) return;
+    
     fillSelectCB();
     
     DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
@@ -105,18 +109,14 @@ void DirectViewController2::bkComboBoxDidChange (ComboBox* box)
             fillSelectCB();
         }
         
-        //updateFields(sendNotification);
         updateFields();
     }
 }
 
 void DirectViewController2::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    processor.gallery->getDirect(processor.updateState->currentDirectId)->setName(name);
-    
-    //int selected = selectCB.getSelectedId();
-    //if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, name);
-    //selectCB.setSelectedId(selected, dontSendNotification );
+    if (type == BKPreparationEditor)    processor.gallery->getDirect(processor.updateState->currentDirectId)->setName(name);
+    else                                processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId)->setName(name);
 }
 
 

@@ -169,23 +169,24 @@ void Piano::deconfigureModification(ModificationMapper::Ptr map)
     BKPreparationType type = map->getType();
     int Id = map->getId();
     
-    if (type == PreparationTypeDirectMod)
+    if (type == BKPreparationTypeNil) return;
+    else if (type == PreparationTypeDirect)
     {
         deconfigureDirectModification(modDirect->getUnchecked(Id), whichKeymaps, whichPreps);
     }
-    else if (type == PreparationTypeSynchronicMod)
+    else if (type == PreparationTypeSynchronic)
     {
         deconfigureSynchronicModification(modSynchronic->getUnchecked(Id), whichKeymaps, whichPreps);
     }
-    else if (type == PreparationTypeNostalgicMod)
+    else if (type == PreparationTypeNostalgic)
     {
         deconfigureNostalgicModification(modNostalgic->getUnchecked(Id), whichKeymaps, whichPreps);
     }
-    else if (type == PreparationTypeTuningMod)
+    else if (type == PreparationTypeTuning)
     {
         deconfigureTuningModification(modTuning->getUnchecked(Id), whichKeymaps, whichPreps);
     }
-    else if (type == PreparationTypeTempoMod)
+    else if (type == PreparationTypeTempo)
     {
         deconfigureTempoModification(modTempo->getUnchecked(Id), whichKeymaps, whichPreps);
     }
@@ -202,23 +203,24 @@ void Piano::configureModification(ModificationMapper::Ptr map)
     BKPreparationType type = map->getType();
     int Id = map->getId();
     
-    if (type == PreparationTypeDirectMod)
+    if (type == BKPreparationTypeNil) return;
+    else if (type == PreparationTypeDirect)
     {
         configureDirectModification(modDirect->getUnchecked(Id), whichKeymaps, whichPreps);
     }
-    else if (type == PreparationTypeSynchronicMod)
+    else if (type == PreparationTypeSynchronic)
     {
         configureSynchronicModification(modSynchronic->getUnchecked(Id), whichKeymaps, whichPreps);
     }
-    else if (type == PreparationTypeNostalgicMod)
+    else if (type == PreparationTypeNostalgic)
     {
         configureNostalgicModification(modNostalgic->getUnchecked(Id), whichKeymaps, whichPreps);
     }
-    else if (type == PreparationTypeTuningMod)
+    else if (type == PreparationTypeTuning)
     {
         configureTuningModification(modTuning->getUnchecked(Id), whichKeymaps, whichPreps);
     }
-    else if (type == PreparationTypeTempoMod)
+    else if (type == PreparationTypeTempo)
     {
         configureTempoModification(modTempo->getUnchecked(Id), whichKeymaps, whichPreps);
     }

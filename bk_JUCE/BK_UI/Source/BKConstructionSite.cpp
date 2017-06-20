@@ -54,7 +54,7 @@ void BKConstructionSite::redraw(void)
 
 void BKConstructionSite::move(int which, bool fine)
 {
-    if (processor.updateState->currentPreparationDisplay != DisplayNil) return;
+    if (processor.updateState->currentDisplay != DisplayNil) return;
     
     float changeX = 0;
     float changeY = 0;
@@ -90,7 +90,7 @@ void BKConstructionSite::remove(void)
 
 void BKConstructionSite::align(int which)
 {
-    if (processor.updateState->currentPreparationDisplay != DisplayNil) return;
+    if (processor.updateState->currentDisplay != DisplayNil) return;
     
     if (graph->getSelectedItems().size() <= 1) return;
     
@@ -279,7 +279,6 @@ void BKConstructionSite::addItem(BKPreparationType type, int which)
 {
     BKItem::Ptr toAdd = new BKItem(type, which, processor);
     
-    DBG("lastdownxy: " + String(lastDownX) + " " + String(lastDownY) );
     toAdd->setTopLeftPosition(lastDownX, lastDownY);
     
     lastDownX += 10; lastDownY += 10;
@@ -396,6 +395,8 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
 {
     MouseEvent e = eo.getEventRelativeTo(this);
     
+    connect = false;
+    
     if (itemToSelect == nullptr) lasso->endLasso();
     
     if (selected.getNumSelected())
@@ -406,8 +407,6 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
         
         return;
     }
-    
-    connect = false;
     
     if (e.mods.isCommandDown())
     {
@@ -421,8 +420,6 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
         {
             graph->connect(itemSource, itemTarget);
             graph->drawLine(lineOX, lineOY, X, Y);
-            
-            repaint();
         }
     }
     
@@ -437,6 +434,8 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
         }
     }
     
+    repaint();
+    
 }
 
 void BKConstructionSite::idDidChange(void)
@@ -450,9 +449,36 @@ void BKConstructionSite::idDidChange(void)
     else if (type == PreparationTypeSynchronic) newId = processor.updateState->currentSynchronicId;
     else if (type == PreparationTypeTempo)      newId = processor.updateState->currentTempoId;
     else if (type == PreparationTypeTuning)     newId = processor.updateState->currentTuningId;
-    else                                        return;
+    else if (type == PreparationTypeMod)
+    {
+        ModificationMapper::Ptr thisMapper = currentItem->getMapper();
+        BKPreparationType modType = thisMapper->getType();
+        
+        if (modType == PreparationTypeDirect)
+        {
+            currentItem->getMapper()->setId(processor.updateState->currentModDirectId);
+        }
+        else if (modType == PreparationTypeSynchronic)
+        {
+            currentItem->getMapper()->setId(processor.updateState->currentModSynchronicId);
+        }
+        else if (modType == PreparationTypeNostalgic)
+        {
+            currentItem->getMapper()->setId(processor.updateState->currentModNostalgicId);
+        }
+        else if (modType == PreparationTypeTuning)
+        {
+            currentItem->getMapper()->setId(processor.updateState->currentModTuningId);
+        }
+        else if (modType == PreparationTypeTempo)
+        {
+            currentItem->getMapper()->setId(processor.updateState->currentModTempoId);
+        }
+
+        
+    }
     
-    if (currentItem->getId() == newId) return;
+    if (type <= PreparationTypeTempo && currentItem->getId() == newId) return;
     
     BKItem::PtrArr connections;
     
@@ -463,12 +489,9 @@ void BKConstructionSite::idDidChange(void)
         graph->disconnect(currentItem, item);
     }
     
-    currentItem->setId(newId);
+    if (type <= PreparationTypeTempo) currentItem->setId(newId);
     
-    for (auto item : connections)
-    {
-        graph->connect(currentItem, item);
-    }
+    for (auto item : connections)   graph->connect(currentItem, item);
 }
 
 void BKConstructionSite::deleteItem (BKItem* item)

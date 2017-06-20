@@ -192,6 +192,8 @@ void KeymapViewController::fillKeymapSelectCB(void)
 
 void KeymapViewController::updateFields(void)
 {
+    if (processor.updateState->currentKeymapId < 0) return;
+    
     Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
     
     keymapTF.setText( intArrayToString(km->keys()));

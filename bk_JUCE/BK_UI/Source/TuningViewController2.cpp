@@ -19,7 +19,8 @@
 
 
 //==============================================================================
-TuningViewController2::TuningViewController2(BKAudioProcessor& p, BKItemGraph* theGraph):
+TuningViewController2::TuningViewController2(BKEditorType type, BKAudioProcessor& p, BKItemGraph* theGraph):
+type(type),
 processor(p),
 theGraph(theGraph)
 {
@@ -372,12 +373,15 @@ void TuningViewController2::updateComponentVisibility()
 
 void TuningViewController2::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    processor.gallery->getTuning(processor.updateState->currentTuningId)->setName(name);
+    if (type == BKPreparationEditor)    processor.gallery->getTuning(processor.updateState->currentTuningId)->setName(name);
+    else                                processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId)->setName(name);
 }
 
 
 void TuningViewController2::updateFields(void)
 {
+    if (processor.updateState->currentTuningId < 0) return;
+    
     fillSelectCB();
     
     TuningPreparation::Ptr prep = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);

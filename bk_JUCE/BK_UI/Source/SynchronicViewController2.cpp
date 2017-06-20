@@ -13,7 +13,8 @@
 #include "Keymap.h"
 #include "Preparation.h"
 
-SynchronicViewController2::SynchronicViewController2(BKAudioProcessor& p, BKItemGraph* theGraph):
+SynchronicViewController2::SynchronicViewController2(BKEditorType type, BKAudioProcessor& p, BKItemGraph* theGraph):
+type(type),
 processor(p),
 theGraph(theGraph)
 {
@@ -257,8 +258,9 @@ void SynchronicViewController2::resized()
 
 void SynchronicViewController2::updateFields(NotificationType notify)
 {
+    if (processor.updateState->currentSynchronicId < 0) return;
     
-    //DBG("**** updating synchronic sliders **** prep # " + String(processor.updateState->currentSynchronicId) + " " + String(notify));
+    
     fillSelectCB();
     
     SynchronicPreparation::Ptr prep   = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
@@ -401,11 +403,8 @@ void SynchronicViewController2::bkTextFieldDidChange(TextEditor& tf)
 
 void SynchronicViewController2::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    processor.gallery->getSynchronic(processor.updateState->currentSynchronicId)->setName(name);
-    
-    //int selected = selectCB.getSelectedId();
-    //if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, name);
-    //selectCB.setSelectedId(selected, dontSendNotification );
+    if (type == BKPreparationEditor)    processor.gallery->getSynchronic(processor.updateState->currentSynchronicId)->setName(name);
+    else                                processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId)->setName(name);
 }
 
 void SynchronicViewController2::bkMessageReceived (const String& message)

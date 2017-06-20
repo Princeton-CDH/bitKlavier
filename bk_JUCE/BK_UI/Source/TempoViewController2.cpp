@@ -11,7 +11,8 @@
 #include "TempoViewController2.h"
 
 
-TempoViewController2::TempoViewController2(BKAudioProcessor& p, BKItemGraph* theGraph):
+TempoViewController2::TempoViewController2(BKEditorType type, BKAudioProcessor& p, BKItemGraph* theGraph):
+type(type),
 processor(p),
 theGraph(theGraph)
 {
@@ -271,6 +272,8 @@ void TempoViewController2::updateComponentVisibility()
 
 void TempoViewController2::updateFields(void)
 {
+    if (processor.updateState->currentTempoId < 0) return;
+    
     fillSelectCB();
     
     TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);

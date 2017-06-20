@@ -292,7 +292,7 @@ void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
         DBG("Unregistered text field entered input.");
     }
     
-    if (type == BKModification) theGraph->update(PreparationTypeNostalgicMod, processor.updateState->currentModNostalgicId);
+    if (type == BKModification) theGraph->updateMod(PreparationTypeNostalgic, processor.updateState->currentModNostalgicId);
 }
 
 
