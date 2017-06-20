@@ -20,8 +20,6 @@ mvc(p),
 constrain(new ComponentBoundsConstrainer()),
 resizer(new ResizableCornerComponent (this, constrain))
 {
-    addKeyListener(this);
-    
     viewPort.setViewedComponent(&mvc);
     viewPort.setViewPosition(0, 0);
     addAndMakeVisible(viewPort);
@@ -58,57 +56,6 @@ void BKAudioProcessorEditor::resized()
     mvc.resized();
     
     
-}
-
-bool BKAudioProcessorEditor::keyPressed (const KeyPress& e, Component*)
-{
-    DBG(e.getKeyCode());
-    
-    int code = e.getKeyCode();
-    
-    if (code == KeyPress::escapeKey)
-    {
-        mvc.escapePressed();
-    }
-    else if (code == KeyPress::deleteKey)
-    {
-        mvc.deletePressed();
-    }
-    else if (code == KeyPress::backspaceKey)
-    {
-        mvc.deletePressed();
-    }
-    else if (code == KeyPress::upKey)
-    {
-        if (e.getModifiers().isCommandDown())
-            mvc.align(0);
-        else
-            mvc.arrowPressed(0, e.getModifiers().isShiftDown());
-    }
-    else if (code == KeyPress::rightKey)
-    {   if (e.getModifiers().isCommandDown())
-            mvc.align(1);
-        else
-            mvc.arrowPressed(1, e.getModifiers().isShiftDown());
-    }
-    else if (code == KeyPress::downKey)
-    {
-        if (e.getModifiers().isCommandDown())
-            mvc.align(2);
-        else
-            mvc.arrowPressed(2, e.getModifiers().isShiftDown());
-    }
-    else if (code == KeyPress::leftKey)
-    {
-        if (e.getModifiers().isCommandDown())
-            mvc.align(3);
-        else
-            mvc.arrowPressed(3, e.getModifiers().isShiftDown());
-    }
-    else if (code == KeyPress::tabKey)
-    {
-        mvc.tabPressed();
-    }
 }
 
 

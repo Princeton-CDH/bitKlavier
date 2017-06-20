@@ -38,6 +38,7 @@ public:
     
     
 private:
+
     
     BKAudioProcessor& processor;
     BKItemGraph* theGraph;

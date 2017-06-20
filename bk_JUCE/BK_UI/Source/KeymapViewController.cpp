@@ -116,6 +116,8 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
     {
         processor.updateState->currentKeymapId = box->getSelectedItemIndex();
         
+        processor.updateState->idDidChange = true;
+        
         if (processor.updateState->currentKeymapId == keymapSelectCB.getNumItems()-1) // New Keymap
         {
             processor.gallery->addKeymap();

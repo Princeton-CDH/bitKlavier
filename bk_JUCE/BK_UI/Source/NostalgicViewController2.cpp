@@ -147,6 +147,8 @@ void NostalgicViewController2::bkComboBoxDidChange (ComboBox* box)
     {
         processor.updateState->currentNostalgicId = box->getSelectedItemIndex();
         
+        processor.updateState->idDidChange = true;
+        
         if (processor.updateState->currentNostalgicId == selectCB.getNumItems()-1)
         {
             processor.gallery->addNostalgic();

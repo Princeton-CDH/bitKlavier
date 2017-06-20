@@ -40,6 +40,7 @@ public:
     
     int  currentKeymapId = 0;
     
+    bool idDidChange = false;
     bool galleryDidChange = false;
     bool directDidChange = false;
     bool pianoDidChange = false;

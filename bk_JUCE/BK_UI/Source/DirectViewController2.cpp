@@ -96,6 +96,8 @@ void DirectViewController2::bkComboBoxDidChange (ComboBox* box)
     {
         processor.updateState->currentDirectId = box->getSelectedItemIndex();
         
+        processor.updateState->idDidChange = true;
+        
         if (processor.updateState->currentDirectId == selectCB.getNumItems()-1)
         {
             processor.gallery->addDirect();

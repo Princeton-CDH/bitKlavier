@@ -17,7 +17,9 @@ BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGrap
 BKDraggableComponent(false,true,false),
 processor(p),
 graph(theGraph),
-connect(false)
+connect(false),
+lastDownX(10),
+lastDownY(10)
 {
     addKeyListener(this);
     
@@ -58,13 +60,13 @@ void BKConstructionSite::move(int which, bool fine)
     float changeY = 0;
     
     if (which == 0) // Up
-        changeY = fine ? -1 : -10;
+        changeY = fine ? -2 : -10;
     else if (which == 1) // Right
-        changeX = fine ? 1 : 10;
+        changeX = fine ? 2 : 10;
     else if (which == 2) // Down
-        changeY = fine ? 1 : 10;
+        changeY = fine ? 2 : 10;
     else if (which == 3) // Left
-        changeX = fine ? -1 : -10;
+        changeX = fine ? -2 : -10;
     
     for (auto item : graph->getSelectedItems())
         item->setTopLeftPosition(item->getX() + changeX, item->getY() + changeY);
@@ -273,19 +275,27 @@ void BKConstructionSite::prepareItemDrag(BKItem* item, const MouseEvent& e, bool
     }
 }
 
+void BKConstructionSite::addItem(BKPreparationType type, int which)
+{
+    BKItem::Ptr toAdd = new BKItem(type, which, processor);
+    
+    DBG("lastdownxy: " + String(lastDownX) + " " + String(lastDownY) );
+    toAdd->setTopLeftPosition(lastDownX, lastDownY);
+    
+    lastDownX += 10; lastDownY += 10;
+    
+    graph->add(toAdd);
+    
+    addAndMakeVisible(toAdd);
+}
+
+
 // Drag interface
 void BKConstructionSite::itemWasDropped(BKPreparationType type, Array<int> data, int x, int y)
 {
-    for (int i = 0; i < data.size(); i++)
-    {
-        BKItem::Ptr toAdd = new BKItem(type, data[i], processor);
-        
-        toAdd->setTopLeftPosition(x, (i-1) * 125 + y);
-        
-        if (type == PreparationTypeReset || type == PreparationTypePianoMap || !graph->contains(toAdd)) graph->add(toAdd);
-        
-        addAndMakeVisible(toAdd);
-    }
+    lastDownX = x; lastDownY = y;
+    
+    for (int i = 0; i < data.size(); i++)   addItem(type, data[i]);
     
     graph->updateLast();
 }
@@ -296,6 +306,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     
     itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
     
+    lastDownX = e.x; lastDownY = e.y;
     
     if (itemToSelect != nullptr)
     {
@@ -360,6 +371,8 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
 
 void BKConstructionSite::mouseDrag (const MouseEvent& e)
 {
+    lastDownX = e.x; lastDownY = e.y;
+    
     if (itemToSelect == nullptr) lasso->dragLasso(e);
     
     if (!e.mods.isCommandDown())
@@ -424,6 +437,38 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
         }
     }
     
+}
+
+void BKConstructionSite::idDidChange(void)
+{
+    BKPreparationType type = currentItem->getType();
+    int newId = -1;
+    
+    if (type == PreparationTypeKeymap)          newId = processor.updateState->currentKeymapId;
+    else if (type == PreparationTypeDirect)     newId = processor.updateState->currentDirectId;
+    else if (type == PreparationTypeNostalgic)  newId = processor.updateState->currentNostalgicId;
+    else if (type == PreparationTypeSynchronic) newId = processor.updateState->currentSynchronicId;
+    else if (type == PreparationTypeTempo)      newId = processor.updateState->currentTempoId;
+    else if (type == PreparationTypeTuning)     newId = processor.updateState->currentTuningId;
+    else                                        return;
+    
+    if (currentItem->getId() == newId) return;
+    
+    BKItem::PtrArr connections;
+    
+    for (auto item : currentItem->getConnections())
+    {
+        connections.add(item);
+        
+        graph->disconnect(currentItem, item);
+    }
+    
+    currentItem->setId(newId);
+    
+    for (auto item : connections)
+    {
+        graph->connect(currentItem, item);
+    }
 }
 
 void BKConstructionSite::deleteItem (BKItem* item)

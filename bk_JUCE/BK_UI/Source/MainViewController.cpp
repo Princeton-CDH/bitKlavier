@@ -20,6 +20,7 @@ overtop(p, &theGraph),
 header(p),
 timerCallbackCount(0)
 {
+    addKeyListener(this);
     
     gen = processor.gallery->getGeneralSettings();
     
@@ -89,30 +90,86 @@ void MainViewController::sliderValueChanged (Slider* slider)
     }
 }
 
-void MainViewController::deletePressed(void)
+bool MainViewController::keyPressed (const KeyPress& e, Component*)
 {
-    construction.remove();
-}
-
-void MainViewController::arrowPressed(int which, bool fine)
-{
-    construction.move(which, fine);
-}
-
-void MainViewController::align(int which)
-{
-    construction.align(which);
-}
-
-void MainViewController::tabPressed(void)
-{
+    DBG(e.getKeyCode());
     
+    int code = e.getKeyCode();
+    
+    if (code == KeyPress::escapeKey)
+    {
+        processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+    else if (code == KeyPress::deleteKey)
+    {
+        construction.remove();
+    }
+    else if (code == KeyPress::backspaceKey)
+    {
+        construction.remove();
+    }
+    else if (code == KeyPress::upKey)
+    {
+        if (e.getModifiers().isCommandDown())   construction.align(0);
+        else                                    construction.move(0, e.getModifiers().isShiftDown());
+    }
+    else if (code == KeyPress::rightKey)
+    {
+        if (e.getModifiers().isCommandDown())   construction.align(1);
+        else                                    construction.move(1, e.getModifiers().isShiftDown());
+    }
+    else if (code == KeyPress::downKey)
+    {
+        if (e.getModifiers().isCommandDown())   construction.align(2);
+        else                                    construction.move(2, e.getModifiers().isShiftDown());
+    }
+    else if (code == KeyPress::leftKey)
+    {
+        if (e.getModifiers().isCommandDown())   construction.align(3);
+        else                                    construction.move(3, e.getModifiers().isShiftDown());
+    }
+    else if (code == KeyPress::tabKey)
+    {
+        
+    }
+    else if (code == 67) // C modification
+    {
+        construction.addItem(PreparationTypeDirectMod, 1);
+    }
+    else if (code == 68) // D direct
+    {
+        construction.addItem(PreparationTypeDirect, 1);
+    }
+    else if (code == 75) // K keymap
+    {
+        construction.addItem(PreparationTypeKeymap, 1);
+    }
+    else if (code == 77) // M tempo
+    {
+        construction.addItem(PreparationTypeTempo, 1);
+    }
+    else if (code == 78) // N nostalgic
+    {
+        construction.addItem(PreparationTypeNostalgic, 1);
+    }
+    else if (code == 80) // P piano
+    {
+        construction.addItem(PreparationTypePianoMap, -1);
+    }
+    else if (code == 82) // R reset
+    {
+        construction.addItem(PreparationTypeReset, -1);
+    }
+    else if (code == 83) // S synchronic
+    {
+        construction.addItem(PreparationTypeSynchronic, 1);
+    }
+    else if (code == 84) // T tuning
+    {
+        construction.addItem(PreparationTypeTuning, 1);
+    }
 }
 
-void MainViewController::escapePressed(void)
-{
-    processor.updateState->setCurrentDisplay(DisplayNil);
-}
 
 void MainViewController::timerCallback()
 {
@@ -137,15 +194,20 @@ void MainViewController::timerCallback()
     if(genGain != mainSlider->getValue())
         mainSlider->setValue(Decibels::gainToDecibels(gen->getGlobalGain()), dontSendNotification);
     
+    if (processor.updateState->idDidChange)
+    {
+        processor.updateState->idDidChange = false;
+        
+        construction.idDidChange();
+        
+    }
+    
     if (processor.updateState->directPreparationDidChange)
     {
         processor.updateState->directPreparationDidChange = false;
         
         preparationPanel->refill(PreparationTypeDirect);
         preparationPanel->refill(PreparationTypeDirectMod);
-        
-        overtop.dvc.updateFields();
-        overtop.dvc.updateModFields();
         
         overtop.dvc2.updateFields();
     }
@@ -157,9 +219,6 @@ void MainViewController::timerCallback()
         preparationPanel->refill(PreparationTypeNostalgic);
         preparationPanel->refill(PreparationTypeNostalgicMod);
         
-        //nvc.updateFields();
-        //nvc.updateModFields();
-        
         overtop.nvc2.updateFields();
     }
     
@@ -170,8 +229,6 @@ void MainViewController::timerCallback()
         preparationPanel->refill(PreparationTypeSynchronic);
         preparationPanel->refill(PreparationTypeSynchronicMod);
         
-        //overtop.svc.updateFields();
-        //overtop.svc.updateModFields();
         
         overtop.svc2.updateFields();
     }
@@ -197,7 +254,6 @@ void MainViewController::timerCallback()
         preparationPanel->refill(PreparationTypeTempoMod);
         
         overtop.ovc2.updateFields();
-        //overtop.ovc2.updateModFields();
     }
     
     if (processor.updateState->pianoDidChangeForGraph)

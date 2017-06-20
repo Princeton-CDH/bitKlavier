@@ -39,6 +39,13 @@ public:
     void remove(void);
     void align(int which);
     
+    void addItem(BKPreparationType type, int which);
+    
+    inline void setCurrentItem(BKItem* item) { currentItem = item;}
+    inline BKItem* getCurrentItem(void) { return currentItem;}
+
+    void idDidChange(void);
+    
 private:
     
     int leftMost, rightMost, topMost, bottomMost;
@@ -55,6 +62,7 @@ private:
     BKItem* itemTarget;
     BKItem* itemToSelect;
     BKItem* lastItem;
+    BKItem* currentItem;
     
     LassoComponent<BKItem*>* lasso;
     
@@ -73,6 +81,7 @@ private:
     
     // Drag interface
     void itemWasDropped(BKPreparationType type, Array<int> data, int x, int y) override;
+
     
     void mouseDown (const MouseEvent& eo) override;
     
@@ -86,6 +95,9 @@ private:
     
     BKItem* getItemAtPoint(const int X, const int Y);
 
+    int lastDownX, lastDownY;
+    int lastAddedX, lastAddedY;
+    
     
     
     JUCE_LEAK_DETECTOR(BKConstructionSite)

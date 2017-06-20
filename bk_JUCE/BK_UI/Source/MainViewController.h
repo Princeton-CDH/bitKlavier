@@ -26,7 +26,7 @@
 
 #include "BKOvertop.h"
 
-class MainViewController :  public Component, private Timer, public BKListener, public Slider::Listener
+class MainViewController :  public Component, private Timer, public BKListener, public Slider::Listener, private KeyListener
 {
     
 public:
@@ -36,13 +36,6 @@ public:
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
-    
-    
-    void deletePressed(void);
-    void arrowPressed(int which, bool fine);
-    void align(int which);
-    void tabPressed(void);
-    void escapePressed(void);
     
 private:
     // This reference is provided as a quick way for your editor to
@@ -79,6 +72,9 @@ private:
     void drawPreparationPanel(void);
 
     int timerCallbackCount;
+    
+    
+    bool keyPressed (const KeyPress& e, Component*);
 
     
     

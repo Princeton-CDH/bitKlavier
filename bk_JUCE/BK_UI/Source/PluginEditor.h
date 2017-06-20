@@ -21,7 +21,7 @@
 //==============================================================================
 /**
 */
-class BKAudioProcessorEditor :  public AudioProcessorEditor, private KeyListener
+class BKAudioProcessorEditor :  public AudioProcessorEditor
 {
     
 public:
@@ -48,7 +48,6 @@ private:
     
     ScopedPointer<ComponentBoundsConstrainer> constrain;
     
-    bool keyPressed (const KeyPress& e, Component*) override;
     
     
     

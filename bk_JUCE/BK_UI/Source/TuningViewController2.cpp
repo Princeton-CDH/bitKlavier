@@ -267,6 +267,8 @@ void TuningViewController2::bkComboBoxDidChange (ComboBox* box)
     {
         processor.updateState->currentTuningId = box->getSelectedItemIndex();
         
+        processor.updateState->idDidChange = true;
+        
         if (processor.updateState->currentTuningId == selectCB.getNumItems()-1)
         {
             processor.gallery->addTuning();

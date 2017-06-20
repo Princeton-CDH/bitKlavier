@@ -190,6 +190,8 @@ void TempoViewController2::bkComboBoxDidChange (ComboBox* box)
     {
         processor.updateState->currentTempoId = box->getSelectedItemIndex();
         
+        processor.updateState->idDidChange = true;
+        
         if (processor.updateState->currentTempoId == selectCB.getNumItems()-1)
         {
             processor.gallery->addTempo();

@@ -343,6 +343,8 @@ void SynchronicViewController2::bkComboBoxDidChange (ComboBox* box)
     {
         processor.updateState->currentSynchronicId = box->getSelectedItemIndex();
         
+        processor.updateState->idDidChange = true;
+        
         if (processor.updateState->currentSynchronicId == selectCB.getNumItems()-1)
         {
             processor.gallery->addSynchronic();

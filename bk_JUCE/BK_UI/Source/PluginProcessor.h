@@ -53,6 +53,7 @@ public:
     Gallery::Ptr                        gallery;
     
     BKUpdateState::Ptr                  updateState;
+
     
     // Synthesisers.
     BKSynthesiser                       mainPianoSynth;

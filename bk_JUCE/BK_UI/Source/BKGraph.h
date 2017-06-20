@@ -81,6 +81,8 @@ public:
         return getPosition();
     }
     
+    inline void setId(int newId ) { Id = newId; }
+    
     inline void setItemBounds(int X, int Y, int width, int height)
     {
         setBounds(X,Y,width,height);
@@ -105,6 +107,8 @@ public:
     Point<int> lastClick;
     
     Point<int> position;
+    
+    
     
 private:
     BKAudioProcessor& processor;
@@ -253,6 +257,7 @@ public:
     
     inline BKItem::RCArr getLast(void) const noexcept { return last; }
     
+    int itemIdCount;
     
 private:
     BKAudioProcessor& processor;

@@ -52,7 +52,7 @@ Id(Id)
     }
     else if (type > PreparationTypeKeymap && type < PreparationTypePianoMap) //mod
     {
-        image = ImageCache::getFromMemory(BinaryData::piano_icon_png, BinaryData::piano_icon_pngSize);
+        image = ImageCache::getFromMemory(BinaryData::mod_icon_png, BinaryData::mod_icon_pngSize);
     }
     else if (type == PreparationTypePianoMap)
     {
@@ -88,11 +88,7 @@ Id(Id)
     
     
     while (!(image.getWidth() < val || image.getHeight() < val))
-    {
-        DBG(String(image.getWidth()) +  " " + String(image.getHeight()));
-        
        image = image.rescaled(image.getWidth() * 0.75, image.getHeight() * 0.75);
-    }
     
     if (type != PreparationTypePianoMap)    setSize(image.getWidth(), image.getHeight());
     else                                    setSize(image.getWidth(), image.getHeight() + 25);
@@ -182,6 +178,8 @@ void BKItem::mouseDown(const MouseEvent& e)
     
     if (e.getNumberOfClicks() >= 2)
     {
+        ((BKConstructionSite*)getParentComponent())->setCurrentItem(this);
+        
         if (type == PreparationTypeDirect)
         {
             processor.updateState->currentDirectId = Id;
@@ -1352,6 +1350,8 @@ Array<Line<float>> BKItemGraph::getLines(void)
 
 void BKItemGraph::reconstruct(void)
 {
+    itemIdCount = 0;
+    
     preparations.clear();
     
     Piano::Ptr thisPiano = processor.currentPiano;
