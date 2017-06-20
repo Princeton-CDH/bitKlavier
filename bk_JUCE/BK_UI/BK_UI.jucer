@@ -207,10 +207,6 @@
               file="Source/GeneralViewController.h"/>
         <FILE id="g1Y4SP" name="GalleryVCUtilities.cpp" compile="1" resource="0"
               file="Source/GalleryVCUtilities.cpp"/>
-        <FILE id="F0ImEz" name="PreparationMapViewController.cpp" compile="1"
-              resource="0" file="Source/PreparationMapViewController.cpp"/>
-        <FILE id="W6ucAm" name="PreparationMapViewController.h" compile="0"
-              resource="0" file="Source/PreparationMapViewController.h"/>
         <GROUP id="{27822276-6128-D767-C30D-119C8E335EE5}" name="Abstract">
           <FILE id="kD9p8t" name="BKListener.cpp" compile="1" resource="0" file="Source/BKListener.cpp"/>
           <FILE id="OOopX5" name="BKListener.h" compile="0" resource="0" file="Source/BKListener.h"/>
