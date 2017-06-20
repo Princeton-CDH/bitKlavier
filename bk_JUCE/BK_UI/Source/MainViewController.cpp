@@ -58,18 +58,13 @@ void MainViewController::paint (Graphics& g)
     g.fillAll(Colours::dimgrey);
 }
 
-#define SOME_PADDING 200
 void MainViewController::resized()
 {    
-    header.setBounds(0, 0, getParentComponent()->getRight() - SOME_PADDING, 30);
-    
-    int panelWidth = 200;
+    header.setBounds(0, 0, getParentComponent()->getRight(), 30);
 
-    preparationPanel->setBounds(getParentComponent()->getRight() - SOME_PADDING, getParentComponent()->getY(), panelWidth, getParentComponent()->getHeight());
-    
     construction.setBounds(gXSpacing,
                            header.getBottom(),
-                           getParentComponent()->getWidth() - SOME_PADDING - 2*gXSpacing,
+                           getParentComponent()->getWidth() - 2*gXSpacing,
                            getParentComponent()->getBottom() - header.getBottom()-2*gYSpacing);
     
     
