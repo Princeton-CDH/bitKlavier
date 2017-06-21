@@ -110,7 +110,8 @@ void TempoViewController2::resized()
 
 void TempoViewController2::paint (Graphics& g)
 {
-    g.fillAll(Colours::lightgrey);
+    //g.fillAll(Colours::lightgrey);
+    g.fillAll(Colours::transparentWhite);
 }
 
 

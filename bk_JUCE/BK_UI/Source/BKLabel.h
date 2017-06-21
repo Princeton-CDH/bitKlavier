@@ -24,7 +24,7 @@ public:
     {
         setSize(150,18);
         setColour(Label::backgroundColourId, Colours::transparentWhite);
-        setColour(Label::textColourId, Colours::black);
+        setColour(Label::textColourId, Colours::white);
         
         
         lookAndFeelChanged();

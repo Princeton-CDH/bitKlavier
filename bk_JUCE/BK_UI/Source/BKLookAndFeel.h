@@ -42,11 +42,66 @@ public:
         setColour(TextButton::textColourOffId, Colours::white);
         setColour(TextButton::textColourOnId, Colours::white);
         
-        setColour(juce::LookAndFeel_V4::ColourScheme::outline, Colours::black);
-        getCurrentColourScheme().setUIColour(juce::LookAndFeel_V4::ColourScheme::widgetBackground, Colours::yellow);
+        setColour(TextEditor::backgroundColourId, Colours::black);
+        setColour(TextEditor::textColourId, Colours::white);
+        
+        setColour(Label::textColourId, Colours::white);
+        
+        //setColour(juce::LookAndFeel_V4::ColourScheme::outline, Colours::black);
+        //getCurrentColourScheme().setUIColour(juce::LookAndFeel_V4::ColourScheme::widgetBackground, Colours::yellow);
         
         
     }
+};
+
+class BKMultiSliderLookAndFeel : public BKButtonAndMenuLAF
+{
+    
+public:
+    
+    BKMultiSliderLookAndFeel()
+    {
+        setColour(Slider::backgroundColourId, Colours::darkgrey.withMultipliedAlpha(0.25));
+        setColour(Slider::textBoxOutlineColourId, Colours::darkgrey.withMultipliedAlpha(0.1));
+    }
+    ~BKMultiSliderLookAndFeel() {}
+    
+    
+    void drawLinearSlider (Graphics& g, int x, int y, int width, int height,
+                           float sliderPos, float minSliderPos, float maxSliderPos,
+                           const Slider::SliderStyle style, Slider& slider) override;
+};
+
+class BKRangeMinSliderLookAndFeel : public BKButtonAndMenuLAF
+{
+    
+public:
+    
+    BKRangeMinSliderLookAndFeel()
+    {
+        //setColour (TextButton::buttonColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.13f));
+    }
+    ~BKRangeMinSliderLookAndFeel() {}
+    
+    void drawLinearSlider (Graphics& g, int x, int y, int width, int height,
+                           float sliderPos, float minSliderPos, float maxSliderPos,
+                           const Slider::SliderStyle style, Slider& slider) override;
+};
+
+class BKRangeMaxSliderLookAndFeel : public BKButtonAndMenuLAF
+{
+    
+public:
+    
+    BKRangeMaxSliderLookAndFeel()
+    {
+        //setColour (TextButton::buttonColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.13f));
+    }
+    ~BKRangeMaxSliderLookAndFeel() {}
+    
+    void drawLinearSlider (Graphics& g, int x, int y, int width, int height,
+                           float sliderPos, float minSliderPos, float maxSliderPos,
+                           const Slider::SliderStyle style, Slider& slider) override;
 };
 
 #endif  // BKLOOKANDFEEL_H_INCLUDED

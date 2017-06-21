@@ -14,7 +14,11 @@
 static const float gMainComponentFontSize = 12.0f;
 
 static const int gMainComponentHeight = 750;
-static const int gMainComponentWidth = 1000;
+static const int gMainComponentWidth = gMainComponentHeight * 4./3.;
+
+
+static const int gMainComponentMinWidth = gMainComponentWidth * .5;
+static const int gMainComponentMinHeight = gMainComponentMinWidth *.56;
 
 static const int gComponentLeftOffset = 5;
 static const int gComponentTopOffset = 5;

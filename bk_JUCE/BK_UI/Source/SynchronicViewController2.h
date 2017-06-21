@@ -44,6 +44,8 @@ private:
     BKAudioProcessor& processor;
     BKItemGraph* theGraph;
     
+    ImageComponent iconImageComponent;
+    
     OwnedArray<BKLabel> synchronicL;
     OwnedArray<BKTextField> synchronicTF;
     OwnedArray<BKTextField> modSynchronicTF;
@@ -76,6 +78,8 @@ private:
     
     void fillSelectCB(void);
     void fillModeSelectCB(void);
+    
+    BKButtonAndMenuLAF buttonsAndMenusLAF;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicViewController2)
 };

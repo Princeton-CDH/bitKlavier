@@ -24,6 +24,8 @@ processor(p),
 theGraph(theGraph)
 {
 
+    setLookAndFeel(&buttonsAndMenusLAF);
+    
     selectCB.setName("Tuning");
     selectCB.addSeparator();
     selectCB.addListener(this);
@@ -182,7 +184,9 @@ void TuningViewController2::resized()
 
 void TuningViewController2::paint (Graphics& g)
 {
-    g.fillAll(Colours::lightgrey);
+    //g.fillAll(Colours::lightgrey);
+    //g.fillAll(Colours::transparentWhite);
+    g.fillAll(Colours::black);
 }
 
 void TuningViewController2::timerCallback()

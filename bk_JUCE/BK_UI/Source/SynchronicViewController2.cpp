@@ -19,6 +19,13 @@ theGraph(theGraph)
 {
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     
+    setLookAndFeel(&buttonsAndMenusLAF);
+    
+    iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::synchronic_icon_png, BinaryData::synchronic_icon_pngSize));
+    iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
+    iconImageComponent.setAlpha(0.075);
+    addAndMakeVisible(iconImageComponent);
+    
     // MultSliders
     paramSliders = OwnedArray<BKMultiSlider>();
     
@@ -223,12 +230,14 @@ void SynchronicViewController2::BKRangeSliderValueChanged(String name, double mi
 
 void SynchronicViewController2::paint (Graphics& g)
 {
-    g.fillAll(Colours::transparentWhite);
+    g.fillAll(Colours::black);
 }
 
 void SynchronicViewController2::resized()
 {
     Rectangle<int> area (getLocalBounds());
+    iconImageComponent.setBounds(area);
+    
     Rectangle<int> oneColumn = area.removeFromLeft(area.getWidth() * 0.5);
     
     Rectangle<int> modeSlice = area.removeFromTop(24);
@@ -236,13 +245,14 @@ void SynchronicViewController2::resized()
     modeSelectCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2));
     offsetParamStartToggle.setBounds(modeSlice);
     
-    int tempHeight = area.getHeight() / paramSliders.size();
+    int tempHeight = (area.getHeight() - paramSliders.size() * gYSpacing) / paramSliders.size();
     
     for(int i = 0; i < paramSliders.size(); i++)
     {
         paramSliders[i]->setBounds(area.removeFromBottom(tempHeight));
+        area.removeFromBottom(gYSpacing);
     }
-
+    
     Rectangle<int> comboBoxSlice = oneColumn.removeFromTop(24);
     comboBoxSlice.reduce(4, 2);
     selectCB.setBounds(comboBoxSlice);

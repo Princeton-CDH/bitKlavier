@@ -59,7 +59,7 @@ BKKeyboardSlider::BKKeyboardSlider()
 
 void BKKeyboardSlider::paint (Graphics& g)
 {
-    g.fillAll(Colours::lightgrey);
+    //g.fillAll(Colours::lightgrey);
 }
 
 void BKKeyboardSlider::resized()
@@ -84,7 +84,6 @@ void BKKeyboardSlider::resized()
 void BKKeyboardSlider::setFundamental(int fund)
 {
     keyboard->setFundamental(fund);
-    keyboard->repaint(); //put this inside keyboard
     
     DBG("new fundamental = " + String(fund));
 }
@@ -354,6 +353,9 @@ void BKKeyboardSlider::setActiveValues(Array<float> newvals)
 
 void BKKeyboardSlider::setValues(Array<float> newvals)
 {
+    int fund = keyboard->getFundamental();
+    keyboard->setFundamental(0);
+    
     int valCounter = 0;
     
     for(int i=minKey; i<=maxKey; i++)
@@ -363,6 +365,8 @@ void BKKeyboardSlider::setValues(Array<float> newvals)
             keyboard->setKeyValue(i, newvals.getUnchecked(valCounter++));
         }
     }
+    
+    keyboard->setFundamental(fund);
     
     updateDisplay();
 }

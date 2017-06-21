@@ -98,6 +98,7 @@ private:
     
     void updateComponentVisibility();
     
+    BKButtonAndMenuLAF buttonsAndMenusLAF;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningViewController2)
     

@@ -19,6 +19,7 @@
 
 #include "BKUtilities.h"
 #include "BKComponent.h"
+#include "BKLookAndFeel.h"
 
 typedef enum BKMultiSliderType {
     HorizontalMultiSlider = 0,
@@ -29,21 +30,6 @@ typedef enum BKMultiSliderType {
 } BKMultiSliderType;
 
 
-class BKMultiSliderLookAndFeel : public LookAndFeel_V3
-{
-
-public:
-    
-    BKMultiSliderLookAndFeel()
-    {
-        //setColour (TextButton::buttonColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.13f));
-    }
-    ~BKMultiSliderLookAndFeel() {}
-    
-    void drawLinearSlider (Graphics& g, int x, int y, int width, int height,
-                           float sliderPos, float minSliderPos, float maxSliderPos,
-                           const Slider::SliderStyle style, Slider& slider) override;
-};
 
 // ******************************************************************************************************************** //
 // **************************************************  BKSubSlider **************************************************** //
@@ -276,37 +262,6 @@ private:
 // **************************************************  BKRangeSlider ************************************************** //
 // ******************************************************************************************************************** //
 
-class BKRangeMinSliderLookAndFeel : public LookAndFeel_V4
-{
-    
-public:
-    
-    BKRangeMinSliderLookAndFeel()
-    {
-        //setColour (TextButton::buttonColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.13f));
-    }
-    ~BKRangeMinSliderLookAndFeel() {}
-    
-    void drawLinearSlider (Graphics& g, int x, int y, int width, int height,
-                           float sliderPos, float minSliderPos, float maxSliderPos,
-                           const Slider::SliderStyle style, Slider& slider) override;
-};
-
-class BKRangeMaxSliderLookAndFeel : public LookAndFeel_V4
-{
-    
-public:
-    
-    BKRangeMaxSliderLookAndFeel()
-    {
-        //setColour (TextButton::buttonColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.13f));
-    }
-    ~BKRangeMaxSliderLookAndFeel() {}
-    
-    void drawLinearSlider (Graphics& g, int x, int y, int width, int height,
-                           float sliderPos, float minSliderPos, float maxSliderPos,
-                           const Slider::SliderStyle style, Slider& slider) override;
-};
 
 class BKRangeSliderListener
 {
