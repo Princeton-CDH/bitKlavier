@@ -681,7 +681,7 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
             thisMapper->clearTargets();
         }
     }
-    else if (item1Type == PreparationTypeKeymap && item2Type <= PreparationTypeKeymap)
+    else if (item1Type == PreparationTypeKeymap && item2Type <= PreparationTypeTempo)
     {
         if (connect)    addPreparationToKeymap(item2Type, item2Id, processor.gallery->getKeymap(item1Id));
         else
@@ -691,7 +691,7 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
             processor.currentPiano->removePreparationMapWithKeymap(thisKeymap);
         }
     }
-    else if (item1Type <= PreparationTypeKeymap && item2Type == PreparationTypeKeymap)
+    else if (item1Type <= PreparationTypeTempo && item2Type == PreparationTypeKeymap)
     {
         if (connect)    addPreparationToKeymap(item1Type, item1Id, processor.gallery->getKeymap(item2Id));
         else            removePreparationFromKeymap(item1Type, item1Id, processor.gallery->getKeymap(item2Id));

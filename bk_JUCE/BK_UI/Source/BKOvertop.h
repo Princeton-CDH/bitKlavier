@@ -19,15 +19,11 @@
 
 
 #include "SynchronicViewController.h"
-#include "SynchronicViewController2.h"
 #include "NostalgicViewController.h"
-#include "NostalgicViewController2.h"
 #include "DirectViewController.h"
-#include "DirectViewController2.h"
 #include "TuningViewController.h"
-#include "TuningViewController2.h"
 #include "TempoViewController.h"
-#include "TempoViewController2.h"
+
 #include "KeymapViewController.h"
 #include "GeneralViewController.h"
 
@@ -40,19 +36,16 @@ public:
     processor(p),
     gvc(p),
     kvc(p, theGraph),
-    //tvc(p, theGraph),
-    //svc(p, &theGraph),
-    //nvc(p, &theGraph),
-    dvc(BKPreparationEditor, p, theGraph),
-    ovc(BKPreparationEditor, p, theGraph),
-    svc(BKPreparationEditor, p, theGraph),
-    nvc(BKPreparationEditor, p, theGraph),
-    tvc(BKPreparationEditor, p, theGraph),
-    dvcm(BKModificationEditor, p, theGraph),
-    ovcm(BKModificationEditor, p, theGraph),
-    svcm(BKModificationEditor, p, theGraph),
-    nvcm(BKModificationEditor, p, theGraph),
-    tvcm(BKModificationEditor, p, theGraph)
+    tvc(p, theGraph),
+    ovc(p, theGraph),
+    svc(p, theGraph),
+    nvc(p, theGraph),
+    dvc(p, theGraph),
+    tvcm(p, theGraph),
+    ovcm(p, theGraph),
+    svcm(p, theGraph),
+    nvcm(p, theGraph),
+    dvcm(p, theGraph)
     {
         addKeyListener(this);
         
@@ -201,17 +194,17 @@ public:
     
     KeymapViewController kvc;
     
-    TuningViewController2 tvc;
-    TempoViewController2 ovc;
-    SynchronicViewController2 svc;
-    NostalgicViewController2 nvc;
-    DirectViewController2 dvc;
+    TuningPreparationEditor tvc;
+    TempoPreparationEditor ovc;
+    SynchronicPreparationEditor svc;
+    NostalgicPreparationEditor nvc;
+    DirectPreparationEditor dvc;
     
-    TuningViewController2 tvcm;
-    TempoViewController2 ovcm;
-    SynchronicViewController2 svcm;
-    NostalgicViewController2 nvcm;
-    DirectViewController2 dvcm;
+    TuningModificationEditor tvcm;
+    TempoModificationEditor ovcm;
+    SynchronicModificationEditor svcm;
+    NostalgicModificationEditor nvcm;
+    DirectModificationEditor dvcm;
     
     
 private:

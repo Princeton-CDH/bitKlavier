@@ -2,59 +2,115 @@
   ==============================================================================
 
     NostalgicViewController.h
-    Created: 30 Nov 2016 9:43:47am
-    Author:  Michael R Mulshine
+    Created: 24 May 2017 7:13:23pm
+    Author:  Daniel Trueman
 
   ==============================================================================
 */
 
-#ifndef NOSTALGICVIEWCONTROLLER_H_INCLUDED
-#define NOSTALGICVIEWCONTROLLER_H_INCLUDED
 
-#include "BKUtilities.h"
+#pragma once
 
-#include "PluginProcessor.h"
+#include "BKViewController.h"
 
-#include "BKListener.h"
-#include "BKComponent.h"
-
-#include "BKGraph.h"
-
-
-//==============================================================================
-/*
-*/
-class NostalgicViewController    : public BKComponent, public BKListener
+class NostalgicViewController :
+public BKViewController
 {
 public:
     NostalgicViewController(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~NostalgicViewController();
+    ~NostalgicViewController() {};
+    
+    BKWaveDistanceUndertowSlider nDisplaySlider;
 
+    BKEditableComboBox selectCB;
+    BKComboBox lengthModeSelectCB;
+    
+    ScopedPointer<BKSingleSlider> lengthMultiplierSlider;
+    ScopedPointer<BKSingleSlider> beatsToSkipSlider;
+    ScopedPointer<BKSingleSlider> gainSlider;
+    
+    ScopedPointer<BKStackedSlider> transpositionSlider;
+    
     void paint (Graphics&) override;
     void resized() override;
     
-    void updateFields(void);
-    void updateModFields(void);
-
+    void fillModeSelectCB(void);
+    
 private:
-    BKAudioProcessor& processor;
-    BKItemGraph* theGraph;
-    
-    // BKLabels
-    OwnedArray<BKLabel> nostalgicL;
-    OwnedArray<BKTextField> nostalgicTF;
-    OwnedArray<BKTextField> modNostalgicTF;
-    
-    void bkTextFieldDidChange       (TextEditor&)           override;
-    void bkMessageReceived          (const String& message) override;
-    
-    void bkComboBoxDidChange        (ComboBox* box)         override { };
-    void bkButtonClicked            (Button* b)             override { };
-    
-     void fillSelectCB(void);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NostalgicViewController)
+    
+
 };
 
+class NostalgicPreparationEditor :
+public NostalgicViewController,
+public BKWaveDistanceUndertowSliderListener,
+public BKEditableComboBoxListener,
+public BKSingleSliderListener,
+public BKStackedSliderListener,
+//public SliderListener,
+public Timer
+{
+public:
+    NostalgicPreparationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
+    ~NostalgicPreparationEditor() {};
+    
+    
+    void update(void) ;
+    
+    void bkMessageReceived (const String& message) override;
+    void bkComboBoxDidChange (ComboBox* box) override;
+    void bkTextFieldDidChange (TextEditor&) override {};
+    void bkButtonClicked (Button* b) override { };
+    void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
+    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow) override;
+    void BKStackedSliderValueChanged(String name, Array<float> val) override;
+    
+    void fillSelectCB(void);
+    
+    void timerCallback() override;
+    
+    
+private:
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NostalgicPreparationEditor)
+    
+};
 
-#endif  // NOSTALGICVIEWCONTROLLER_H_INCLUDED
+class NostalgicModificationEditor :
+public NostalgicViewController,
+public BKWaveDistanceUndertowSliderListener,
+public BKEditableComboBoxListener,
+public BKSingleSliderListener,
+public BKStackedSliderListener,
+//public SliderListener,
+public Timer
+{
+public:
+    NostalgicModificationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
+    ~NostalgicModificationEditor() {};
+    
+    
+    void update(void) ;
+    
+    void bkMessageReceived (const String& message) override;
+    void bkComboBoxDidChange (ComboBox* box) override;
+    void bkTextFieldDidChange (TextEditor&) override {};
+    void bkButtonClicked (Button* b) override { };
+    void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
+    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow) override;
+    void BKStackedSliderValueChanged(String name, Array<float> val) override;
+    
+    void fillSelectCB(void);
+    
+    void timerCallback() override;
+    
+    
+private:
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NostalgicModificationEditor)
+    
+};

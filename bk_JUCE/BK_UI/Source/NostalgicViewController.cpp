@@ -2,68 +2,45 @@
   ==============================================================================
 
     NostalgicViewController.cpp
-    Created: 30 Nov 2016 9:43:47am
-    Author:  Michael R Mulshine
+    Created: 24 May 2017 7:13:23pm
+    Author:  Daniel Trueman
 
   ==============================================================================
 */
 
 #include "NostalgicViewController.h"
 
-#include "BKUtilities.h"
-
-#include "Preparation.h"
-
-//==============================================================================
 NostalgicViewController::NostalgicViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-processor(p),
-theGraph(theGraph)
+BKViewController(p, theGraph)
 {
-    NostalgicPreparation::Ptr layer = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
+    addAndMakeVisible(nDisplaySlider);
     
-    // Labels
-    nostalgicL = OwnedArray<BKLabel>();
-    nostalgicL.ensureStorageAllocated(cNostalgicParameterTypes.size());
+    selectCB.setName("Nostalgic");
+    selectCB.addSeparator();
+    selectCB.setSelectedItemIndex(0);
     
-    for (int i = 0; i < cNostalgicParameterTypes.size(); i++)
-    {
-        nostalgicL.set(i, new BKLabel());
-        addAndMakeVisible(nostalgicL[i]);
-        nostalgicL[i]->setName(cNostalgicParameterTypes[i]);
-        nostalgicL[i]->setText(cNostalgicParameterTypes[i], NotificationType::dontSendNotification);
-    }
+    addAndMakeVisible(selectCB);
     
+    lengthModeSelectCB.setName("Length Mode");
+    lengthModeSelectCB.addSeparator();
+    lengthModeSelectCB.setSelectedItemIndex(0);
+    fillModeSelectCB();
+    addAndMakeVisible(lengthModeSelectCB);
     
+    transpositionSlider = new BKStackedSlider("transpositions", -12, 12, -12, 12, 0, 0.01);
+    addAndMakeVisible(transpositionSlider);
     
-    // Text Fields
-    nostalgicTF = OwnedArray<BKTextField>();
-    nostalgicTF.ensureStorageAllocated(cNostalgicParameterTypes.size());
+    lengthMultiplierSlider = new BKSingleSlider("note length multiplier", 0, 10, 1, 0.01);
+    lengthMultiplierSlider->setSkewFactorFromMidPoint(1.);
+    addAndMakeVisible(lengthMultiplierSlider);
     
-    for (int i = 0; i < cNostalgicParameterTypes.size(); i++)
-    {
-        nostalgicTF.set(i, new BKTextField());
-        addAndMakeVisible(nostalgicTF[i]);
-        nostalgicTF[i]->addListener(this);
-        nostalgicTF[i]->setName(cNostalgicParameterTypes[i]);
-    }
+    beatsToSkipSlider = new BKSingleSlider("beats to skip", 0, 10, 0, 1);
+    addAndMakeVisible(beatsToSkipSlider);
+    beatsToSkipSlider->setVisible(false);
     
-    modNostalgicTF = OwnedArray<BKTextField>();
-    modNostalgicTF.ensureStorageAllocated(cNostalgicParameterTypes.size());
-    
-    for (int i = 0; i < cNostalgicParameterTypes.size(); i++)
-    {
-        modNostalgicTF.set(i, new BKTextField());
-        addAndMakeVisible(modNostalgicTF[i]);
-        modNostalgicTF[i]->addListener(this);
-        modNostalgicTF[i]->setName("M"+cNostalgicParameterTypes[i]);
-    }
-    
-    updateModFields();
-    updateFields();
-}
-
-NostalgicViewController::~NostalgicViewController()
-{
+    gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
+    gainSlider->setSkewFactorFromMidPoint(1.);
+    addAndMakeVisible(gainSlider);
 }
 
 void NostalgicViewController::paint (Graphics& g)
@@ -73,266 +50,407 @@ void NostalgicViewController::paint (Graphics& g)
 
 void NostalgicViewController::resized()
 {
-    // Labels
-    int lY = gComponentLabelHeight + gYSpacing;
+    Rectangle<int> area (getLocalBounds());
     
-    float width = getWidth() * 0.25 - gXSpacing;
+    Rectangle<int> displayRow = area.removeFromBottom(area.getHeight() * 0.5);
+    nDisplaySlider.setBounds(displayRow);
     
-    for (int n = 0; n < cNostalgicParameterTypes.size(); n++)
-    {
-        nostalgicL[n]->setBounds(0, gYSpacing + lY * n, width, nostalgicL[0]->getHeight());
-    }
+    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
+    selectCB.setBounds(leftColumn.removeFromTop(20));
+    lengthModeSelectCB.setBounds(area.removeFromTop(20));
+    lengthMultiplierSlider->setBounds(area.removeFromTop(40));
+    beatsToSkipSlider->setBounds(lengthMultiplierSlider->getBounds());
+    gainSlider->setBounds(area.removeFromBottom(40));
     
-    // Text fields
-    int tfY = gComponentTextFieldHeight + gYSpacing;
-    
-    float height = nostalgicTF[0]->getHeight();
-    width *= 1.5;
-    
-    for (int n = 0; n < cNostalgicParameterTypes.size(); n++)
-    {
-        nostalgicTF[n]->setBounds(nostalgicL[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
-        modNostalgicTF[n]->setBounds(nostalgicTF[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
-    }
+    transpositionSlider->setBounds(leftColumn.removeFromTop(40));
     
 }
 
-void NostalgicViewController::bkTextFieldDidChange(TextEditor& tf)
+
+void NostalgicViewController::fillModeSelectCB(void)
 {
-    String text = tf.getText();
-    String name = tf.getName();
     
-    BKTextFieldType type = BKParameter;
-    
-    if (name.startsWithChar('M'))
+    lengthModeSelectCB.clear(dontSendNotification);
+    for (int i = 0; i < cNostalgicSyncModes.size(); i++)
     {
-        type = BKModification;
-        name = name.substring(1);
+        String name = cNostalgicSyncModes[i];
+        if (name != String::empty)  lengthModeSelectCB.addItem(name, i+1);
+        else                        lengthModeSelectCB.addItem(String(i+1), i+1);
     }
     
+    lengthModeSelectCB.setSelectedItemIndex(0, NotificationType::dontSendNotification);
+}
+
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ NostalgicPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
+
+NostalgicPreparationEditor::NostalgicPreparationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
+NostalgicViewController(p, theGraph)
+{
+    fillSelectCB();
     
-    float f = text.getFloatValue();
-    int i = text.getIntValue();
+    nDisplaySlider.addMyListener(this);
+    selectCB.addListener(this);
+    selectCB.addMyListener(this);
+    lengthModeSelectCB.addListener(this);
+    transpositionSlider->addMyListener(this);
+    lengthMultiplierSlider->addMyListener(this);
+    beatsToSkipSlider->addMyListener(this);
     
-    DBG(name + ": |" + text + "|");
+    gainSlider->addMyListener(this);
+    
+    startTimer(20);
+}
+
+void NostalgicPreparationEditor::BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow)
+{
     
     NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
-    
     NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
     
-    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
+    prep    ->setWaveDistance(wavedist);
+    active  ->setWaveDistance(wavedist);
+    prep    ->setUndertow(undertow);
+    active  ->setUndertow(undertow);
     
-    if (name == cNostalgicParameterTypes[NostalgicId])
+}
+
+void NostalgicPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
+{
+    processor.gallery->getNostalgic(processor.updateState->currentNostalgicId)->setName(name);
+}
+
+void NostalgicPreparationEditor::update(void)
+{
+    if (processor.updateState->currentNostalgicId < 0) return;
+    
+    fillSelectCB();
+    
+    NostalgicPreparation::Ptr prep = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
+    
+    nDisplaySlider.setWaveDistance(prep->getWavedistance(), dontSendNotification);
+    nDisplaySlider.setUndertow(prep->getUndertow(), dontSendNotification);
+    
+    selectCB.setSelectedItemIndex(processor.updateState->currentNostalgicId, dontSendNotification);
+    lengthModeSelectCB.setSelectedItemIndex(prep->getMode(), dontSendNotification);
+    
+    transpositionSlider->setValue(prep->getTransposition(), dontSendNotification);
+    lengthMultiplierSlider->setValue(prep->getLengthMultiplier(), dontSendNotification);
+    beatsToSkipSlider->setValue(prep->getBeatsToSkip(), dontSendNotification);
+    gainSlider->setValue(prep->getGain(), dontSendNotification);
+    
+    if(prep->getMode() == NoteLengthSync)
     {
-        if (type == BKParameter)
-        {
-            int numNostalgic = processor.gallery->getNumNostalgic();
-            
-            if ((i+1) > numNostalgic)
-            {
-                processor.gallery->addNostalgic();
-                processor.updateState->currentNostalgicId = numNostalgic;
-                
-            }
-            else if (i >= 0)
-            {
-                processor.updateState->currentNostalgicId = i;
-            }
-            
-            nostalgicTF[NostalgicId]->setText(String(processor.updateState->currentNostalgicId), false);
-            
-            updateFields();
-        }
-        else // BKModification
-        {
-            int numMod = processor.gallery->getNumNostalgicMod();
-            
-            if ((i+1) > numMod)
-            {
-                processor.gallery->addNostalgicMod();
-                processor.updateState->currentModNostalgicId = numMod;
-            }
-            else if (i >= 0)
-            {
-                processor.updateState->currentModNostalgicId = i;
-            }
-            
-            modNostalgicTF[NostalgicId]->setText(String(processor.updateState->currentModNostalgicId), false);
-            
-            updateModFields();
-        }
-    }
-    else if (name == cNostalgicParameterTypes[NostalgicWaveDistance])
-    {
-        if (type == BKParameter)
-        {
-            prep    ->setWaveDistance(i);
-            active  ->setWaveDistance(i);
-        }
-        else    //BKModification
-        {
-            mod->setParam(NostalgicWaveDistance, text);
-        }
-    }
-    else if (name == cNostalgicParameterTypes[NostalgicUndertow])
-    {
-        if (type == BKParameter)
-        {
-            prep    ->setUndertow(i);
-            active  ->setUndertow(i);
-        }
-        else    //BKModification
-        {
-             mod->setParam(NostalgicUndertow, text);
-        }
-    }
-    else if (name == cNostalgicParameterTypes[NostalgicTransposition])
-    {
-        if (type == BKParameter)
-        {
-            prep    ->setTransposition(stringToFloatArray(text));
-            active  ->setTransposition(stringToFloatArray(text));
-        }
-        else    //BKModification
-        {
-             mod->setParam(NostalgicTransposition, text);
-        }
-    }
-    else if (name == cNostalgicParameterTypes[NostalgicGain])
-    {
-        if (type == BKParameter)
-        {
-            prep    ->setGain(f);
-            active  ->setGain(f);
-        }
-        else    //BKModification
-        {
-             mod->setParam(NostalgicGain, text);
-        }
-    }
-    else if (name == cNostalgicParameterTypes[NostalgicLengthMultiplier])
-    {
-        if (type == BKParameter)
-        {
-            prep    ->setLengthMultiplier(f);
-            active  ->setLengthMultiplier(f);
-        }
-        else    //BKModification
-        {
-             mod->setParam(NostalgicLengthMultiplier, text);
-        }
-    }
-    else if (name == cNostalgicParameterTypes[NostalgicBeatsToSkip])
-    {
-        if (type == BKParameter)
-        {
-            prep    ->setBeatsToSkip(i);
-            active  ->setBeatsToSkip(i);
-        }
-        else    //BKModification
-        {
-             mod->setParam(NostalgicBeatsToSkip, text);
-        }
-    }
-    else if (name == cNostalgicParameterTypes[NostalgicMode])
-    {
-        if (type == BKParameter)
-        {
-            prep    ->setMode((NostalgicSyncMode) i);
-            active  ->setMode((NostalgicSyncMode) i);
-        }
-        else    //BKModification
-        {
-             mod->setParam(NostalgicMode, text);
-        }
-    }
-    else if (name == cNostalgicParameterTypes[NostalgicSyncTarget])
-    {
-        if (type == BKParameter)
-        {
-            if (i <= processor.gallery->getNumSynchronic()-1)
-            {
-                prep    ->setSyncTarget(i);
-                prep    ->setSyncTargetProcessor(processor.gallery->getSynchronicProcessor(i));
-                active  ->setSyncTarget(i);
-                active  ->setSyncTargetProcessor(processor.gallery->getSynchronicProcessor(i));
-            }
-            else
-            {
-                nostalgicTF[NostalgicSyncTarget]->undo();
-            }
-        }
-        else    //BKModification
-        {
-             mod->setParam(NostalgicSyncTarget, text);
-        }
-    }
-    else if (name == cNostalgicParameterTypes[NostalgicTuning])
-    {
-        if (type == BKParameter)
-        {
-            if (i < processor.gallery->getNumTuning())
-            {
-                prep    ->setTuning(processor.gallery->getTuning(i));
-                active  ->setTuning(processor.gallery->getTuning(i));
-            }
-            else
-                tf.setText("0", false);
-        }
-        else    //BKModification
-        {
-            if (i < processor.gallery->getNumTuning())
-                mod->setParam(NostalgicTuning, text);
-            else
-                tf.setText("0", false);
-        }
+        lengthMultiplierSlider->setVisible(true);
+        beatsToSkipSlider->setVisible(false);
     }
     else
     {
-        DBG("Unregistered text field entered input.");
+        lengthMultiplierSlider->setVisible(false);
+        beatsToSkipSlider->setVisible(true);
     }
-    
-    if (type == BKModification) theGraph->updateMod(PreparationTypeNostalgic, processor.updateState->currentModNostalgicId);
+
 }
 
-
-void NostalgicViewController::updateFields(void)
-{
-    NostalgicPreparation::Ptr prep = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
-
-    nostalgicTF[NostalgicWaveDistance]      ->setText( String( prep->getWavedistance()), false);
-    nostalgicTF[NostalgicUndertow]          ->setText( String( prep->getUndertow()), false);
-    nostalgicTF[NostalgicTransposition]     ->setText( floatArrayToString( prep->getTransposition()), false);
-    nostalgicTF[NostalgicGain]              ->setText( String( prep->getGain()), false);
-    nostalgicTF[NostalgicLengthMultiplier]  ->setText( String( prep->getLengthMultiplier()), false);
-    nostalgicTF[NostalgicBeatsToSkip]       ->setText( String( prep->getBeatsToSkip()), false);
-    nostalgicTF[NostalgicMode]              ->setText( String( prep->getMode()), false);
-    nostalgicTF[NostalgicSyncTarget]        ->setText( String( prep->getSyncTarget()), false);
-    nostalgicTF[NostalgicTuning]            ->setText( String(prep->getTuning()->getId()), false);
-}
-
-void NostalgicViewController::updateModFields(void)
-{
-    
-    NostalgicModPreparation::Ptr prep = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
-    
-    modNostalgicTF[NostalgicId] -> setText(String(processor.updateState->currentModNostalgicId), false);
-    modNostalgicTF[NostalgicWaveDistance]      ->setText( prep->getParam(NostalgicWaveDistance), false);
-    modNostalgicTF[NostalgicUndertow]          ->setText( prep->getParam(NostalgicUndertow), false);
-    modNostalgicTF[NostalgicTransposition]     ->setText( prep->getParam(NostalgicTransposition), false);
-    modNostalgicTF[NostalgicGain]              ->setText( prep->getParam(NostalgicGain), false);
-    modNostalgicTF[NostalgicLengthMultiplier]  ->setText( prep->getParam(NostalgicLengthMultiplier), false);
-    modNostalgicTF[NostalgicBeatsToSkip]       ->setText( prep->getParam(NostalgicBeatsToSkip), false);
-    modNostalgicTF[NostalgicMode]              ->setText( prep->getParam(NostalgicMode), false);
-    modNostalgicTF[NostalgicSyncTarget]        ->setText( prep->getParam(NostalgicSyncTarget), false);
-    modNostalgicTF[NostalgicTuning]            ->setText( prep->getParam(NostalgicTuning), false);
-}
-
-void NostalgicViewController::bkMessageReceived (const String& message)
+void NostalgicPreparationEditor::bkMessageReceived (const String& message)
 {
     if (message == "nostalgic/update")
     {
-        updateFields();
+        
+        update();
     }
 }
 
+void NostalgicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
+{
+    String name = box->getName();
+    
+    if (name == "Nostalgic")
+    {
+        processor.updateState->currentNostalgicId = box->getSelectedItemIndex();
+        
+        processor.updateState->idDidChange = true;
+        
+        if (processor.updateState->currentNostalgicId == selectCB.getNumItems()-1)
+        {
+            processor.gallery->addNostalgic();
+            
+            fillSelectCB();
+        }
+        
+        //update(sendNotification);
+        update();
+        
+    }
+    else if (name == "Length Mode")
+    {
+        NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
+        NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
+        
+        prep    ->setMode((NostalgicSyncMode) box->getSelectedItemIndex());
+        active  ->setMode((NostalgicSyncMode) box->getSelectedItemIndex());
+        
+        if(prep->getMode() == NoteLengthSync)
+        {
+            lengthMultiplierSlider->setVisible(true);
+            beatsToSkipSlider->setVisible(false);
+        }
+        else
+        {
+            lengthMultiplierSlider->setVisible(false);
+            beatsToSkipSlider->setVisible(true);
+        }
+
+    }
+}
+
+void NostalgicPreparationEditor::BKSingleSliderValueChanged(String name, double val)
+{
+    NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
+    NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
+    
+    if(name == "note length multiplier")
+    {
+        //DBG("note length multiplier " + String(val));
+        prep->setLengthMultiplier(val);
+        active->setLengthMultiplier(val);
+    }
+    else if(name == "beats to skip")
+    {
+        //DBG("beats to skip " + String(val));
+        prep->setBeatsToSkip(val);
+        active->setBeatsToSkip(val);
+    }
+    else if(name == "gain")
+    {
+        //DBG("gain " + String(val));
+        prep->setGain(val);
+        active->setGain(val);
+    }
+}
+
+void NostalgicPreparationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
+{
+    NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
+    NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
+
+    prep->setTransposition(val);
+    active->setTransposition(val);
+}
+
+void NostalgicPreparationEditor::fillSelectCB(void)
+{
+    // Direct menu
+    Nostalgic::PtrArr newpreps = processor.gallery->getAllNostalgic();
+    
+    selectCB.clear(dontSendNotification);
+    for (int i = 0; i < newpreps.size(); i++)
+    {
+        String name = newpreps[i]->getName();
+        if (name != String::empty)  selectCB.addItem(name, i+1);
+        else                        selectCB.addItem(String(i+1), i+1);
+    }
+    
+    selectCB.addItem("New nostalgic...", newpreps.size()+1);
+    
+    selectCB.setSelectedItemIndex(processor.updateState->currentNostalgicId, NotificationType::dontSendNotification);
+    
+}
+
+void NostalgicPreparationEditor::timerCallback()
+{
+    NostalgicProcessor::Ptr nProcessor = processor.gallery->getNostalgicProcessor(processor.updateState->currentNostalgicId);
+    
+    Array<int> currentPlayPositions = nProcessor->getPlayPositions();
+    Array<int> currentUndertowPositions = nProcessor->getUndertowPositions();
+    currentPlayPositions.addArray(currentUndertowPositions);
+    
+    nDisplaySlider.updateSliderPositions(currentPlayPositions);
+    
+}
+
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ NostalgicModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
+
+NostalgicModificationEditor::NostalgicModificationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
+NostalgicViewController(p, theGraph)
+{
+    fillSelectCB();
+    
+    nDisplaySlider.addMyListener(this);
+    selectCB.addListener(this);
+    selectCB.addMyListener(this);
+    lengthModeSelectCB.addListener(this);
+    transpositionSlider->addMyListener(this);
+    lengthMultiplierSlider->addMyListener(this);
+    beatsToSkipSlider->addMyListener(this);
+    
+    gainSlider->addMyListener(this);
+    
+    startTimer(20);
+}
+
+void NostalgicModificationEditor::BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow)
+{
+    
+    NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
+    NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
+    
+    prep    ->setWaveDistance(wavedist);
+    active  ->setWaveDistance(wavedist);
+    prep    ->setUndertow(undertow);
+    active  ->setUndertow(undertow);
+    
+}
+
+void NostalgicModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
+{
+    processor.gallery->getNostalgic(processor.updateState->currentNostalgicId)->setName(name);
+}
+
+void NostalgicModificationEditor::update(void)
+{
+    if (processor.updateState->currentNostalgicId < 0) return;
+    
+    fillSelectCB();
+    
+    NostalgicPreparation::Ptr prep = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
+    
+    nDisplaySlider.setWaveDistance(prep->getWavedistance(), dontSendNotification);
+    nDisplaySlider.setUndertow(prep->getUndertow(), dontSendNotification);
+    
+    selectCB.setSelectedItemIndex(processor.updateState->currentNostalgicId, dontSendNotification);
+    lengthModeSelectCB.setSelectedItemIndex(prep->getMode(), dontSendNotification);
+    
+    transpositionSlider->setValue(prep->getTransposition(), dontSendNotification);
+    lengthMultiplierSlider->setValue(prep->getLengthMultiplier(), dontSendNotification);
+    beatsToSkipSlider->setValue(prep->getBeatsToSkip(), dontSendNotification);
+    gainSlider->setValue(prep->getGain(), dontSendNotification);
+    
+    if(prep->getMode() == NoteLengthSync)
+    {
+        lengthMultiplierSlider->setVisible(true);
+        beatsToSkipSlider->setVisible(false);
+    }
+    else
+    {
+        lengthMultiplierSlider->setVisible(false);
+        beatsToSkipSlider->setVisible(true);
+    }
+    
+}
+
+void NostalgicModificationEditor::bkMessageReceived (const String& message)
+{
+    if (message == "nostalgic/update")
+    {
+        
+        update();
+    }
+}
+
+void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
+{
+    String name = box->getName();
+    
+    if (name == "Nostalgic")
+    {
+        processor.updateState->currentNostalgicId = box->getSelectedItemIndex();
+        
+        processor.updateState->idDidChange = true;
+        
+        if (processor.updateState->currentNostalgicId == selectCB.getNumItems()-1)
+        {
+            processor.gallery->addNostalgic();
+            
+            fillSelectCB();
+        }
+        
+        //update(sendNotification);
+        update();
+        
+    }
+    else if (name == "Length Mode")
+    {
+        NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
+        NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
+        
+        prep    ->setMode((NostalgicSyncMode) box->getSelectedItemIndex());
+        active  ->setMode((NostalgicSyncMode) box->getSelectedItemIndex());
+        
+        if(prep->getMode() == NoteLengthSync)
+        {
+            lengthMultiplierSlider->setVisible(true);
+            beatsToSkipSlider->setVisible(false);
+        }
+        else
+        {
+            lengthMultiplierSlider->setVisible(false);
+            beatsToSkipSlider->setVisible(true);
+        }
+        
+    }
+}
+
+void NostalgicModificationEditor::BKSingleSliderValueChanged(String name, double val)
+{
+    NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
+    NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
+    
+    if(name == "note length multiplier")
+    {
+        //DBG("note length multiplier " + String(val));
+        prep->setLengthMultiplier(val);
+        active->setLengthMultiplier(val);
+    }
+    else if(name == "beats to skip")
+    {
+        //DBG("beats to skip " + String(val));
+        prep->setBeatsToSkip(val);
+        active->setBeatsToSkip(val);
+    }
+    else if(name == "gain")
+    {
+        //DBG("gain " + String(val));
+        prep->setGain(val);
+        active->setGain(val);
+    }
+}
+
+void NostalgicModificationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
+{
+    NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
+    NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
+    
+    prep->setTransposition(val);
+    active->setTransposition(val);
+}
+
+void NostalgicModificationEditor::fillSelectCB(void)
+{
+    // Direct menu
+    Nostalgic::PtrArr newpreps = processor.gallery->getAllNostalgic();
+    
+    selectCB.clear(dontSendNotification);
+    for (int i = 0; i < newpreps.size(); i++)
+    {
+        String name = newpreps[i]->getName();
+        if (name != String::empty)  selectCB.addItem(name, i+1);
+        else                        selectCB.addItem(String(i+1), i+1);
+    }
+    
+    selectCB.addItem("New nostalgic...", newpreps.size()+1);
+    
+    selectCB.setSelectedItemIndex(processor.updateState->currentNostalgicId, NotificationType::dontSendNotification);
+    
+}
+
+void NostalgicModificationEditor::timerCallback()
+{
+    NostalgicProcessor::Ptr nProcessor = processor.gallery->getNostalgicProcessor(processor.updateState->currentNostalgicId);
+    
+    Array<int> currentPlayPositions = nProcessor->getPlayPositions();
+    Array<int> currentUndertowPositions = nProcessor->getUndertowPositions();
+    currentPlayPositions.addArray(currentUndertowPositions);
+    
+    nDisplaySlider.updateSliderPositions(currentPlayPositions);
+    
+}

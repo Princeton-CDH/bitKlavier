@@ -38,7 +38,7 @@ processor(p)
         generalTF[i]->setName(cGeneralParameterTypes[i]);
     }
     
-    updateFields();
+    update();
     
 }
 
@@ -133,7 +133,7 @@ void GeneralViewController::bkTextFieldDidChange(TextEditor& tf)
     }
 }
 
-void GeneralViewController::updateFields(void)
+void GeneralViewController::update(void)
 {
     GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
     

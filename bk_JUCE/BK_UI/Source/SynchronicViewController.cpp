@@ -1,77 +1,67 @@
 /*
   ==============================================================================
 
-    SynchronicView.cpp
-    Created: 15 Nov 2016 4:02:15pm
-    Author:  Michael R Mulshine
+    SynchronicViewController.cpp
+    Created: 21 Apr 2017 11:17:47pm
+    Author:  Daniel Trueman
 
   ==============================================================================
 */
+
 #include "SynchronicViewController.h"
-
 #include "BKUtilities.h"
-
 #include "Keymap.h"
-
 #include "Preparation.h"
 
-//==============================================================================
 SynchronicViewController::SynchronicViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-processor(p),
-theGraph(theGraph)
+BKViewController(p, theGraph)
 {
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     
-     // Labels
-    synchronicL = OwnedArray<BKLabel>();
-    synchronicL.ensureStorageAllocated(cSynchronicParameterTypes.size());
+    // MultSliders
+    paramSliders = OwnedArray<BKMultiSlider>();
     
     for (int i = 0; i < cSynchronicParameterTypes.size(); i++)
     {
-        synchronicL.set(i, new BKLabel());
-        addAndMakeVisible(synchronicL[i]);
-        synchronicL[i]->setName(cSynchronicParameterTypes[i]);
-        synchronicL[i]->setText(cSynchronicParameterTypes[i], NotificationType::dontSendNotification);
+        if (cSynchronicDataTypes[i] == BKFloatArr || cSynchronicDataTypes[i] == BKArrFloatArr)
+        {
+            paramSliders.insert(0, new BKMultiSlider(HorizontalMultiBarSlider));
+            addAndMakeVisible(paramSliders[0]);
+            paramSliders[0]->addMyListener(this);
+            paramSliders[0]->setName(cSynchronicParameterTypes[i]);
+            paramSliders[0]->setMinMaxDefaultInc(cSynchronicDefaultRangeValuesAndInc[i]);
+        }
     }
     
-    // Text Fields
-    synchronicTF = OwnedArray<BKTextField>();
-    synchronicTF.ensureStorageAllocated(cSynchronicParameterTypes.size());
+    selectCB.setName("Synchronic");
+    selectCB.addSeparator();
+    selectCB.setSelectedItemIndex(0);
+    addAndMakeVisible(selectCB);
     
-    for (int i = 0; i < cSynchronicParameterTypes.size(); i++)
-    {
-        synchronicTF.set(i, new BKTextField());
-        addAndMakeVisible(synchronicTF[i]);
-        synchronicTF[i]->addListener(this);
-        synchronicTF[i]->setName(cSynchronicParameterTypes[i]);
-    }
+    modeSelectCB.setName("Mode");
+    modeSelectCB.addSeparator();
+    modeSelectCB.setSelectedItemIndex(0);
+    fillModeSelectCB();
+    addAndMakeVisible(modeSelectCB);
     
-    modSynchronicTF = OwnedArray<BKTextField>();
-    modSynchronicTF.ensureStorageAllocated(cSynchronicParameterTypes.size());
+    //offsetParamStartToggle = new BKSingleSlider("skip first", 0, 1, 0, 1);
+    offsetParamStartToggle.setButtonText ("skip first");
+    offsetParamStartToggle.setToggleState (true, dontSendNotification);
+    addAndMakeVisible(offsetParamStartToggle);
     
-    for (int i = 0; i < cSynchronicParameterTypes.size(); i++)
-    {
-        modSynchronicTF.set(i, new BKTextField());
-        addAndMakeVisible(modSynchronicTF[i]);
-        modSynchronicTF[i]->addListener(this);
-        modSynchronicTF[i]->setName("M"+cSynchronicParameterTypes[i]);
-    }
+    howManySlider = new BKSingleSlider("how many", 1, 100, 1, 1);
+    addAndMakeVisible(howManySlider);
     
+    clusterThreshSlider = new BKSingleSlider("cluster threshold", 20, 2000, 200, 10);
+    addAndMakeVisible(clusterThreshSlider);
 
-    sliderTest = new BKMultiSlider(HorizontalMultiBarSlider); //or HorizontalMultiSlider, VerticalMultiSlider, HorizontalMultiBarSlider, VerticalMultiBarSlider
-    //addAndMakeVisible(sliderTest);
-    sliderTest->addMyListener(this);
-    sliderTest->setName("Accents");
+    clusterMinMaxSlider = new BKRangeSlider("cluster min/max", 1, 10, 3, 4, 1);
+    addAndMakeVisible(clusterMinMaxSlider);
     
-    
-    updateModFields();
-    updateFields();
-    
-}
+    gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
+    gainSlider->setSkewFactorFromMidPoint(1.);
+    addAndMakeVisible(gainSlider);
 
-void SynchronicViewController::multiSliderValueChanged(String name, int whichSlider, Array<float> value)
-{
-    //DBG("received slider value " + String(whichSlider) + " " + String(value));
 }
 
 SynchronicViewController::~SynchronicViewController()
@@ -86,324 +76,696 @@ void SynchronicViewController::paint (Graphics& g)
 
 void SynchronicViewController::resized()
 {
-    // Labels
-    int lY = gComponentLabelHeight + gYSpacing;
+    Rectangle<int> area (getLocalBounds());
+    Rectangle<int> oneColumn = area.removeFromLeft(area.getWidth() * 0.5);
     
-    float width = getWidth() * 0.25 - gXSpacing;
+    Rectangle<int> modeSlice = area.removeFromTop(24);
+    modeSlice.reduce(4, 2);
+    modeSelectCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2));
+    offsetParamStartToggle.setBounds(modeSlice);
     
-    for (int n = 0; n < cSynchronicParameterTypes.size(); n++)
+    int tempHeight = area.getHeight() / paramSliders.size();
+    
+    for(int i = 0; i < paramSliders.size(); i++)
     {
-        synchronicL[n]->setBounds(0, gYSpacing + lY * n, width, synchronicL[0]->getHeight());
+        paramSliders[i]->setBounds(area.removeFromBottom(tempHeight));
     }
     
-    // Text fields
-    int tfY = gComponentTextFieldHeight + gYSpacing;
-
-    float height = synchronicTF[0]->getHeight();
-    width *= 1.5;
+    Rectangle<int> comboBoxSlice = oneColumn.removeFromTop(24);
+    comboBoxSlice.reduce(4, 2);
+    selectCB.setBounds(comboBoxSlice);
     
-    for (int n = 0; n < cSynchronicParameterTypes.size(); n++)
-    {
-        synchronicTF[n]->setBounds(synchronicL[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
-        modSynchronicTF[n]->setBounds(synchronicTF[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
-    }
+    int oneColumnRowHeight = oneColumn.getHeight() / 4.;
+    howManySlider->setBounds(oneColumn.removeFromTop(oneColumnRowHeight));
+    clusterThreshSlider->setBounds(oneColumn.removeFromTop(oneColumnRowHeight));
+    clusterMinMaxSlider->setBounds(oneColumn.removeFromTop(oneColumnRowHeight));
+    gainSlider->setBounds(oneColumn.removeFromTop(oneColumnRowHeight));
     
-    sliderTest->setTopLeftPosition(40, 35);
-
 }
 
-void SynchronicViewController::bkTextFieldDidChange(TextEditor& tf)
+//SynchronicSyncMode
+void SynchronicViewController::fillModeSelectCB(void)
 {
     
-    String text = tf.getText();
-    String name = tf.getName();
-
-    BKTextFieldType type = BKParameter;
-    
-    if (name.startsWithChar('M'))
+    modeSelectCB.clear(dontSendNotification);
+    for (int i = 0; i < cSynchronicSyncModes.size(); i++)
     {
-        type = BKModification;
-        name = name.substring(1);
+        String name = cSynchronicSyncModes[i];
+        if (name != String::empty)  modeSelectCB.addItem(name, i+1);
+        else                        modeSelectCB.addItem(String(i+1), i+1);
     }
     
-    float f = text.getFloatValue();
-    int i = text.getIntValue();
-    
-    DBG(name + ": |" + text + "|");
+    modeSelectCB.setSelectedItemIndex(0, NotificationType::dontSendNotification);
+}
+
+
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ SynchronicPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
+
+SynchronicPreparationEditor::SynchronicPreparationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
+SynchronicViewController(p, theGraph)
+{
+    fillSelectCB();
     
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     
+    selectCB.addListener(this);
+    selectCB.addMyListener(this);
+    modeSelectCB.addListener(this);
+    offsetParamStartToggle.addListener(this);
+    howManySlider->addMyListener(this);
+    clusterThreshSlider->addMyListener(this);
+    clusterMinMaxSlider->addMyListener(this);
+
+    gainSlider->addMyListener(this);
+    
+    startTimer(20);
+    
+}
+
+void SynchronicPreparationEditor::timerCallback()
+{
+    SynchronicProcessor::Ptr sProcessor = processor.gallery->getSynchronicProcessor(processor.updateState->currentSynchronicId);
+
+    for (int i = 0; i < paramSliders.size(); i++)
+    {
+        if(paramSliders[i]->getName() == "beat length multipliers")
+        {
+            paramSliders[i]->setCurrentSlider(sProcessor->getBeatMultiplierCounter());
+        }
+        else if(paramSliders[i]->getName() == "sustain length multipliers")
+        {
+            paramSliders[i]->setCurrentSlider(sProcessor->getLengthMultiplierCounter());
+        }
+        else if(paramSliders[i]->getName() == "accents")
+        {
+            paramSliders[i]->setCurrentSlider(sProcessor->getAccentMultiplierCounter());
+        }
+        else if(paramSliders[i]->getName() == "transpositions")
+        {
+            paramSliders[i]->setCurrentSlider(sProcessor->getTranspCounter());
+        }
+    }
+}
+
+
+void SynchronicPreparationEditor::multiSliderDidChange(String name, int whichSlider, Array<float> values)
+{
+  
+    //DBG("multiSliderValueChanged called");
+    
+    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
-    SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
-    
-    if (name == cSynchronicParameterTypes[SynchronicId])
+    if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
     {
-        
-        if (type == BKParameter)
-        {
-            int numSynchronic = processor.gallery->getNumSynchronic();
-        
-            if ((i+1) > numSynchronic)
-            {
-                processor.gallery->addSynchronic();
-                processor.updateState->currentSynchronicId = numSynchronic;
-            
-            }
-            else if (i >= 0)
-            {
-                processor.updateState->currentSynchronicId = i;
-            }
-            
-            synchronicTF[SynchronicId]->setText(String(processor.updateState->currentSynchronicId), false);
-            
-            updateFields();
-        }
-        else // BKModification
-        {
-            int numMod = processor.gallery->getNumSynchronicMod();
-            
-            if ((i+1) > numMod)
-            {
-                processor.gallery->addSynchronicMod();
-                processor.updateState->currentModSynchronicId = numMod;
-            }
-            else if (i >= 0)
-            {
-                processor.updateState->currentModSynchronicId = i;
-            }
-            
-            modSynchronicTF[SynchronicId]->setText(String(processor.updateState->currentModSynchronicId), false);
-            
-            updateModFields();
-        }
-    }
-
-    else if (name == cSynchronicParameterTypes[SynchronicTempo])
-    {
-        if (type == BKParameter)
-        {
-            if (i < processor.gallery->getNumTempo())
-            {
-                prep    ->setTempoControl(processor.gallery->getTempo(i));
-                active  ->setTempoControl(processor.gallery->getTempo(i));
-            }
-            else
-                tf.setText("0", false);
-            
-        }
-        else // BKModification
-        {
-            if (i < processor.gallery->getNumTempo())
-                mod->setParam( SynchronicTempo, text);
-            else
-                tf.setText("0", false);
-        }
-    }
-    else if (name == cSynchronicParameterTypes[SynchronicNumPulses])
-    {
-        if (type == BKParameter)
-        {
-            prep    ->setNumBeats(i);
-            active  ->setNumBeats(i);
-        }
-        else // BKModification
-        {
-            mod->setParam( SynchronicNumPulses, text);
-        }
-    }
-    else if (name == cSynchronicParameterTypes[SynchronicClusterMin])
-    {
-        if (type == BKParameter)
-        {
-            prep    ->setClusterMin(i);
-            active  ->setClusterMin(i);
-        }
-        else // BKModification
-        {
-            mod->setParam( SynchronicClusterMin, text);
-        }
-    }
-    else if (name == cSynchronicParameterTypes[SynchronicClusterMax])
-    {
-        if (type == BKParameter)
-        {
-            prep    ->setClusterMax(i);
-            active  ->setClusterMax(i);
-        }
-        else // BKModification
-        {
-            mod->setParam( SynchronicClusterMax, text);
-        }
-    }
-    else if (name == cSynchronicParameterTypes[SynchronicClusterThresh])
-    {
-        if (type == BKParameter)
-        {
-            prep    ->setClusterThresh(f);
-            active  ->setClusterThresh(f);
-        }
-        else // BKModification
-        {
-            mod->setParam( SynchronicClusterThresh, text);
-        }
-    }
-    else if (name == cSynchronicParameterTypes[SynchronicMode])
-    {
-        if (type == BKParameter)
-        {
-            prep    ->setMode((SynchronicSyncMode) i);
-            active  ->setMode((SynchronicSyncMode) i);
-        }
-        else // BKModification
-        {
-            mod->setParam( SynchronicMode, text);
-        }
-    }
-    else if (name == cSynchronicParameterTypes[SynchronicBeatsToSkip])
-    {
-        if (type == BKParameter)
-        {
-            prep    ->setBeatsToSkip(i);
-            active  ->setBeatsToSkip(i);
-        }
-        else // BKModification
-        {
-            mod->setParam( SynchronicBeatsToSkip, text);
-        }
+        prep    ->setAccentMultiplier(whichSlider, values[0]);
+        active  ->setAccentMultiplier(whichSlider, values[0]);
     }
     else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
     {
-        Array<float> beatMults = stringToFloatArray(text);
-        if (type == BKParameter)
-        {
-            prep    ->setBeatMultipliers(beatMults);
-            active  ->setBeatMultipliers(beatMults);
-        }
-        else // BKModification
-        {
-            mod->setParam( SynchronicBeatMultipliers, text);
-        }
+        prep    ->setBeatMultiplier(whichSlider, values[0]);
+        active  ->setBeatMultiplier(whichSlider, values[0]);
     }
     else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
     {
-        Array<float> lenMults = stringToFloatArray(text);
-        if (type == BKParameter)
-        {
-            prep    ->setLengthMultipliers(lenMults);
-            active  ->setLengthMultipliers(lenMults);
-        }
-        else // BKModification
-        {
-           mod->setParam( SynchronicLengthMultipliers, text);
-        }
-    }
-    else if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
-    {
-        Array<float> accentMults = stringToFloatArray(text);
-        if (type == BKParameter)
-        {
-            prep    ->setAccentMultipliers(accentMults);
-            active  ->setAccentMultipliers(accentMults);
-        }
-        else // BKModification
-        {
-            mod->setParam( SynchronicAccentMultipliers, text);
-        }
+        prep    ->setLengthMultiplier(whichSlider, values[0]);
+        active  ->setLengthMultiplier(whichSlider, values[0]);
     }
     else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
     {
-        Array<Array<float>> transposition = stringToArrayFloatArray(text);
-        
-        tf.setText(arrayFloatArrayToString(transposition));
-        
-        if (type == BKParameter)
-        {
-            prep    ->setTransposition(transposition);
-            active  ->setTransposition(transposition);
-        }
-        else // BKModification
-        {
-            mod->setParam( SynchronicTranspOffsets, text);
-        }
-    }
-    else if (name == cSynchronicParameterTypes[SynchronicTuning])
-    {
-        if (type == BKParameter)
-        {
-            if (i < processor.gallery->getNumTuning())
-            {
-                prep    ->setTuning(processor.gallery->getTuning(i));
-                active  ->setTuning(processor.gallery->getTuning(i));
-            }
-            else
-                tf.setText("0", false);
-
-        }
-        else // BKModification
-        {
-            if (i < processor.gallery->getNumTuning())
-                mod->setParam( SynchronicTuning, text);
-            else
-                tf.setText("0", false);
-        }
-    }
-    else
-    {
-        DBG("Unregistered text field entered input.");
+        prep    ->setSingleTransposition(whichSlider, values);
+        active  ->setSingleTransposition(whichSlider, values);
     }
     
-    if (type == BKModification) theGraph->updateMod(PreparationTypeSynchronic, processor.updateState->currentModSynchronicId);
+    //processor.updateState->synchronicPreparationDidChange = true;
+
 }
 
-void SynchronicViewController::updateFields(void)
+void SynchronicPreparationEditor::multiSlidersDidChange(String name, Array<Array<float>> values)
 {
+
+    //DBG("multiSliderALLValueChanged called");
+    
+    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+    SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
+    //only transposition allows multiple simultaneous vals, so trim down to 1D array
+    Array<float> newvals = Array<float>();
+    for(int i=0; i<values.size(); i++) newvals.add(values[i][0]);
+    
+    if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+    {
+        prep    ->setAccentMultipliers(newvals);
+        active  ->setAccentMultipliers(newvals);
+    }
+    else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+    {
+        prep    ->setBeatMultipliers(newvals);
+        active  ->setBeatMultipliers(newvals);
+    }
+    else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+    {
+        prep    ->setLengthMultipliers(newvals);
+        active  ->setLengthMultipliers(newvals);
+    }
+    //pass original 2D array for transpositions
+    else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
+    {
+        prep    ->setTransposition(values);
+        active  ->setTransposition(values);
+    }
+    
+    //processor.updateState->synchronicPreparationDidChange = true;
+}
+
+void SynchronicPreparationEditor::BKSingleSliderValueChanged(String name, double val)
+{
+    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+    SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
+    if(name == "how many") {
+        DBG("got new how many " + String(val));
+        prep->setNumBeats(val);
+        active->setNumBeats(val);
+    }
+    else if(name == "cluster threshold")
+    {
+        DBG("got new cluster threshold " + String(val));
+        prep->setClusterThresh(val);
+        active->setClusterThresh(val);
+    }
+    else if(name == "gain")
+    {
+        DBG("gain " + String(val));
+        prep->setGain(val);
+        active->setGain(val);
+    }
+}
+
+void SynchronicPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
+{
+    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+    SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
+    if(name == "cluster min/max") {
+        DBG("got new cluster min/max " + String(minval) + " " + String(maxval));
+        prep->setClusterMin(minval);
+        prep->setClusterMax(maxval);
+        active->setClusterMin(minval);
+        active->setClusterMax(maxval);
+    }
+}
+
+void SynchronicPreparationEditor::update(NotificationType notify)
+{
+    if (processor.updateState->currentSynchronicId < 0) return;
+    
+    
+    fillSelectCB();
+    
     SynchronicPreparation::Ptr prep   = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
-
-    synchronicTF[SynchronicTempo]               ->setText(  String(                 prep->getTempoControl()->getId()), false);
-    synchronicTF[SynchronicNumPulses]           ->setText(  String(                 prep->getNumBeats()), false);
-    synchronicTF[SynchronicClusterMin]          ->setText(  String(                 prep->getClusterMin()), false);
-    synchronicTF[SynchronicClusterMax]          ->setText(  String(                 prep->getClusterMax()), false);
-    synchronicTF[SynchronicClusterThresh]       ->setText(  String(                 prep->getClusterThreshMS()), false);
-    synchronicTF[SynchronicMode]                ->setText(  String(                 prep->getMode()), false);
-    synchronicTF[SynchronicBeatsToSkip]         ->setText(  String(                 prep->getBeatsToSkip()), false);
-    synchronicTF[SynchronicBeatMultipliers]     ->setText(  floatArrayToString(     prep->getBeatMultipliers()), false);
-    synchronicTF[SynchronicLengthMultipliers]   ->setText(  floatArrayToString(     prep->getLengthMultipliers()), false);
-    synchronicTF[SynchronicAccentMultipliers]   ->setText(  floatArrayToString(     prep->getAccentMultipliers()), false);
-    synchronicTF[SynchronicTranspOffsets]       ->setText(  arrayFloatArrayToString(prep->getTransposition()), false);
-    synchronicTF[SynchronicTuning]              ->setText(  String(                 prep->getTuning()->getId()), false);
+    
+    selectCB.setSelectedItemIndex(processor.updateState->currentSynchronicId, notify);
+    modeSelectCB.setSelectedItemIndex(prep->getMode(), notify);
+    offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
+    howManySlider->setValue(prep->getNumBeats(), notify);
+    clusterThreshSlider->setValue(prep->getClusterThreshMS(), notify);
+    clusterMinMaxSlider->setMinValue(prep->getClusterMin(), notify);
+    clusterMinMaxSlider->setMaxValue(prep->getClusterMax(), notify);
+    gainSlider->setValue(prep->getGain(), notify);
+    
+    for(int i = 0; i < paramSliders.size(); i++)
+    {
+        if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+        {
+            paramSliders[i]->setTo(prep->getAccentMultipliers(), notify);
+        }
+        else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+        {
+            paramSliders[i]->setTo(prep->getBeatMultipliers(), notify);
+        }
+        else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+        {
+            paramSliders[i]->setTo(prep->getLengthMultipliers(), notify);
+        }
+        else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicTranspOffsets])
+        {
+            paramSliders[i]->setTo(prep->getTransposition(), notify);
+        }
+    }
     
 }
 
-void SynchronicViewController::updateModFields(void)
+void SynchronicPreparationEditor::update()
 {
-    // a Modification copy of Preparation to pull values from when updating
-    SynchronicModPreparation::Ptr prep   = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
+    update(dontSendNotification);
+}
+
+void SynchronicPreparationEditor::fillSelectCB(void)
+{
+    // Direct menu
+    Synchronic::PtrArr newpreps = processor.gallery->getAllSynchronic();
     
-     modSynchronicTF[SynchronicId] -> setText(String(processor.updateState->currentModSynchronicId), false);
-    modSynchronicTF[SynchronicTempo]               ->setText(  prep->getParam(SynchronicTempo), false);
-    modSynchronicTF[SynchronicNumPulses]           ->setText(  prep->getParam(SynchronicNumPulses), false);
-    modSynchronicTF[SynchronicClusterMin]          ->setText(  prep->getParam(SynchronicClusterMin), false);
-    modSynchronicTF[SynchronicClusterMax]          ->setText(  prep->getParam(SynchronicClusterMax), false);
-    modSynchronicTF[SynchronicClusterThresh]       ->setText(  prep->getParam(SynchronicClusterThresh), false);
-    modSynchronicTF[SynchronicMode]                ->setText(  prep->getParam(SynchronicMode), false);
-    modSynchronicTF[SynchronicBeatsToSkip]         ->setText(  prep->getParam(SynchronicBeatsToSkip), false);
-    modSynchronicTF[SynchronicBeatMultipliers]     ->setText(  prep->getParam(SynchronicBeatMultipliers), false);
-    modSynchronicTF[SynchronicLengthMultipliers]   ->setText(  prep->getParam(SynchronicLengthMultipliers), false);
-    modSynchronicTF[SynchronicAccentMultipliers]   ->setText(  prep->getParam(SynchronicAccentMultipliers), false);
-    modSynchronicTF[SynchronicTranspOffsets]       ->setText(  prep->getParam(SynchronicTranspOffsets), false);
-    modSynchronicTF[SynchronicTuning]              ->setText(  prep->getParam(SynchronicTuning), false);
+    selectCB.clear(dontSendNotification);
+    for (int i = 0; i < newpreps.size(); i++)
+    {
+        String name = newpreps[i]->getName();
+        if (name != String::empty)  selectCB.addItem(name, i+1);
+        else                        selectCB.addItem(String(i+1), i+1);
+    }
+    
+    selectCB.addItem("New synchronic...", newpreps.size()+1);
+    
+    selectCB.setSelectedItemIndex(processor.updateState->currentSynchronicId, NotificationType::dontSendNotification);
+    
 }
 
 
+void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
+{
+    String name = box->getName();
+    
+    if (name == "Synchronic")
+    {
+        processor.updateState->currentSynchronicId = box->getSelectedItemIndex();
+        
+        processor.updateState->idDidChange = true;
+        
+        if (processor.updateState->currentSynchronicId == selectCB.getNumItems()-1)
+        {
+            processor.gallery->addSynchronic();
+            
+            fillSelectCB();
+        }
+        
+        //update(sendNotification);
+        update();
+        
+    }
+    else if (name == "Mode")
+    {
+        SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+        SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+        
+        prep    ->setMode((SynchronicSyncMode) box->getSelectedItemIndex());
+        active  ->setMode((SynchronicSyncMode) box->getSelectedItemIndex());
+        
+        int toggleVal;
+        if(offsetParamStartToggle.getToggleState()) toggleVal = 1;
+        else toggleVal = 0;
+        
+        if(prep->getMode() == FirstNoteOnSync || prep->getMode() == AnyNoteOnSync)
+        {
+            prep->setBeatsToSkip(toggleVal - 1);
+            active->setBeatsToSkip(toggleVal - 1);
+        }
+        else
+        {
+            prep->setBeatsToSkip(toggleVal);
+            active->setBeatsToSkip(toggleVal);
+        }
+    }
+}
 
-void SynchronicViewController::bkMessageReceived (const String& message)
+void SynchronicPreparationEditor::bkTextFieldDidChange(TextEditor& tf)
+{
+    String text = tf.getText();
+    String name = tf.getName();
+    
+    //SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+    //SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
+    if (name == "Name")
+    {
+        processor.gallery->getSynchronic(processor.updateState->currentSynchronicId)->setName(text);
+        
+        int selected = selectCB.getSelectedId();
+        if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, text);
+        selectCB.setSelectedId(selected, dontSendNotification );
+    }
+}
+
+void SynchronicPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
+{
+    processor.gallery->getSynchronic(processor.updateState->currentSynchronicId)->setName(name);
+}
+
+void SynchronicPreparationEditor::bkMessageReceived (const String& message)
 {
     if (message == "synchronic/update")
     {
-        
-        updateFields();
+        update();
     }
 }
+
+void SynchronicPreparationEditor::buttonClicked (Button* b)
+{
+    if (b == &offsetParamStartToggle)
+    {
+        
+        SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+        SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+        
+        int toggleVal;
+        if(offsetParamStartToggle.getToggleState()) toggleVal = 1;
+        else toggleVal = 0;
+        
+        if(prep->getMode() == FirstNoteOnSync || prep->getMode() == AnyNoteOnSync)
+        {
+            prep->setBeatsToSkip(toggleVal - 1);
+            active->setBeatsToSkip(toggleVal - 1);
+        }
+        else
+        {
+            prep->setBeatsToSkip(toggleVal);
+            active->setBeatsToSkip(toggleVal);
+        }
+
+    }
+}
+
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ SynchronicModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
+SynchronicModificationEditor::SynchronicModificationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
+SynchronicViewController(p, theGraph)
+{
+    fillSelectCB();
+    
+    selectCB.addListener(this);
+    selectCB.addMyListener(this);
+    modeSelectCB.addListener(this);
+    offsetParamStartToggle.addListener(this);
+    howManySlider->addMyListener(this);
+    clusterThreshSlider->addMyListener(this);
+    clusterMinMaxSlider->addMyListener(this);
+    
+    gainSlider->addMyListener(this);
+    
+    startTimer(20);
+    
+}
+
+void SynchronicModificationEditor::timerCallback()
+{
+    SynchronicProcessor::Ptr sProcessor = processor.gallery->getSynchronicProcessor(processor.updateState->currentSynchronicId);
+    
+    for (int i = 0; i < paramSliders.size(); i++)
+    {
+        if(paramSliders[i]->getName() == "beat length multipliers")
+        {
+            paramSliders[i]->setCurrentSlider(sProcessor->getBeatMultiplierCounter());
+        }
+        else if(paramSliders[i]->getName() == "sustain length multipliers")
+        {
+            paramSliders[i]->setCurrentSlider(sProcessor->getLengthMultiplierCounter());
+        }
+        else if(paramSliders[i]->getName() == "accents")
+        {
+            paramSliders[i]->setCurrentSlider(sProcessor->getAccentMultiplierCounter());
+        }
+        else if(paramSliders[i]->getName() == "transpositions")
+        {
+            paramSliders[i]->setCurrentSlider(sProcessor->getTranspCounter());
+        }
+    }
+}
+
+
+void SynchronicModificationEditor::multiSliderDidChange(String name, int whichSlider, Array<float> values)
+{
+    
+    //DBG("multiSliderValueChanged called");
+    
+    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+    SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
+    if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+    {
+        prep    ->setAccentMultiplier(whichSlider, values[0]);
+        active  ->setAccentMultiplier(whichSlider, values[0]);
+    }
+    else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+    {
+        prep    ->setBeatMultiplier(whichSlider, values[0]);
+        active  ->setBeatMultiplier(whichSlider, values[0]);
+    }
+    else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+    {
+        prep    ->setLengthMultiplier(whichSlider, values[0]);
+        active  ->setLengthMultiplier(whichSlider, values[0]);
+    }
+    else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
+    {
+        prep    ->setSingleTransposition(whichSlider, values);
+        active  ->setSingleTransposition(whichSlider, values);
+    }
+    
+    //processor.updateState->synchronicPreparationDidChange = true;
+    
+}
+
+void SynchronicModificationEditor::multiSlidersDidChange(String name, Array<Array<float>> values)
+{
+    
+    //DBG("multiSliderALLValueChanged called");
+    
+    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+    SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
+    //only transposition allows multiple simultaneous vals, so trim down to 1D array
+    Array<float> newvals = Array<float>();
+    for(int i=0; i<values.size(); i++) newvals.add(values[i][0]);
+    
+    if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+    {
+        prep    ->setAccentMultipliers(newvals);
+        active  ->setAccentMultipliers(newvals);
+    }
+    else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+    {
+        prep    ->setBeatMultipliers(newvals);
+        active  ->setBeatMultipliers(newvals);
+    }
+    else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+    {
+        prep    ->setLengthMultipliers(newvals);
+        active  ->setLengthMultipliers(newvals);
+    }
+    //pass original 2D array for transpositions
+    else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
+    {
+        prep    ->setTransposition(values);
+        active  ->setTransposition(values);
+    }
+    
+    //processor.updateState->synchronicPreparationDidChange = true;
+}
+
+void SynchronicModificationEditor::BKSingleSliderValueChanged(String name, double val)
+{
+    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+    SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
+    if(name == "how many") {
+        DBG("got new how many " + String(val));
+        prep->setNumBeats(val);
+        active->setNumBeats(val);
+    }
+    else if(name == "cluster threshold")
+    {
+        DBG("got new cluster threshold " + String(val));
+        prep->setClusterThresh(val);
+        active->setClusterThresh(val);
+    }
+    else if(name == "gain")
+    {
+        DBG("gain " + String(val));
+        prep->setGain(val);
+        active->setGain(val);
+    }
+}
+
+void SynchronicModificationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
+{
+    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+    SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
+    if(name == "cluster min/max") {
+        DBG("got new cluster min/max " + String(minval) + " " + String(maxval));
+        prep->setClusterMin(minval);
+        prep->setClusterMax(maxval);
+        active->setClusterMin(minval);
+        active->setClusterMax(maxval);
+    }
+}
+
+void SynchronicModificationEditor::update(NotificationType notify)
+{
+    if (processor.updateState->currentSynchronicId < 0) return;
+    
+    
+    fillSelectCB();
+    
+    SynchronicPreparation::Ptr prep   = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
+    selectCB.setSelectedItemIndex(processor.updateState->currentSynchronicId, notify);
+    modeSelectCB.setSelectedItemIndex(prep->getMode(), notify);
+    offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
+    howManySlider->setValue(prep->getNumBeats(), notify);
+    clusterThreshSlider->setValue(prep->getClusterThreshMS(), notify);
+    clusterMinMaxSlider->setMinValue(prep->getClusterMin(), notify);
+    clusterMinMaxSlider->setMaxValue(prep->getClusterMax(), notify);
+    gainSlider->setValue(prep->getGain(), notify);
+    
+    for(int i = 0; i < paramSliders.size(); i++)
+    {
+        if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+        {
+            paramSliders[i]->setTo(prep->getAccentMultipliers(), notify);
+        }
+        else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+        {
+            paramSliders[i]->setTo(prep->getBeatMultipliers(), notify);
+        }
+        else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+        {
+            paramSliders[i]->setTo(prep->getLengthMultipliers(), notify);
+        }
+        else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicTranspOffsets])
+        {
+            paramSliders[i]->setTo(prep->getTransposition(), notify);
+        }
+    }
+    
+}
+
+void SynchronicModificationEditor::update()
+{
+    update(dontSendNotification);
+}
+
+void SynchronicModificationEditor::fillSelectCB(void)
+{
+    // Direct menu
+    Synchronic::PtrArr newpreps = processor.gallery->getAllSynchronic();
+    
+    selectCB.clear(dontSendNotification);
+    for (int i = 0; i < newpreps.size(); i++)
+    {
+        String name = newpreps[i]->getName();
+        if (name != String::empty)  selectCB.addItem(name, i+1);
+        else                        selectCB.addItem(String(i+1), i+1);
+    }
+    
+    selectCB.addItem("New synchronic...", newpreps.size()+1);
+    
+    selectCB.setSelectedItemIndex(processor.updateState->currentSynchronicId, NotificationType::dontSendNotification);
+    
+}
+
+
+void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
+{
+    String name = box->getName();
+    
+    if (name == "Synchronic")
+    {
+        processor.updateState->currentSynchronicId = box->getSelectedItemIndex();
+        
+        processor.updateState->idDidChange = true;
+        
+        if (processor.updateState->currentSynchronicId == selectCB.getNumItems()-1)
+        {
+            processor.gallery->addSynchronic();
+            
+            fillSelectCB();
+        }
+        
+        //update(sendNotification);
+        update();
+        
+    }
+    else if (name == "Mode")
+    {
+        SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+        SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+        
+        prep    ->setMode((SynchronicSyncMode) box->getSelectedItemIndex());
+        active  ->setMode((SynchronicSyncMode) box->getSelectedItemIndex());
+        
+        int toggleVal;
+        if(offsetParamStartToggle.getToggleState()) toggleVal = 1;
+        else toggleVal = 0;
+        
+        if(prep->getMode() == FirstNoteOnSync || prep->getMode() == AnyNoteOnSync)
+        {
+            prep->setBeatsToSkip(toggleVal - 1);
+            active->setBeatsToSkip(toggleVal - 1);
+        }
+        else
+        {
+            prep->setBeatsToSkip(toggleVal);
+            active->setBeatsToSkip(toggleVal);
+        }
+    }
+}
+
+void SynchronicModificationEditor::bkTextFieldDidChange(TextEditor& tf)
+{
+    String text = tf.getText();
+    String name = tf.getName();
+    
+    //SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+    //SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
+    if (name == "Name")
+    {
+        processor.gallery->getSynchronic(processor.updateState->currentSynchronicId)->setName(text);
+        
+        int selected = selectCB.getSelectedId();
+        if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, text);
+        selectCB.setSelectedId(selected, dontSendNotification );
+    }
+}
+
+void SynchronicModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
+{
+    processor.gallery->getSynchronic(processor.updateState->currentSynchronicId)->setName(name);
+}
+
+void SynchronicModificationEditor::bkMessageReceived (const String& message)
+{
+    if (message == "synchronic/update")
+    {
+        update();
+    }
+}
+
+void SynchronicModificationEditor::buttonClicked (Button* b)
+{
+    if (b == &offsetParamStartToggle)
+    {
+        
+        SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+        SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+        
+        int toggleVal;
+        if(offsetParamStartToggle.getToggleState()) toggleVal = 1;
+        else toggleVal = 0;
+        
+        if(prep->getMode() == FirstNoteOnSync || prep->getMode() == AnyNoteOnSync)
+        {
+            prep->setBeatsToSkip(toggleVal - 1);
+            active->setBeatsToSkip(toggleVal - 1);
+        }
+        else
+        {
+            prep->setBeatsToSkip(toggleVal);
+            active->setBeatsToSkip(toggleVal);
+        }
+        
+    }
+}
+
+
 
 

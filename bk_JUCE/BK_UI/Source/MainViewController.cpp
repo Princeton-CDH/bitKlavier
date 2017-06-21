@@ -86,7 +86,7 @@ void MainViewController::sliderValueChanged (Slider* slider)
     if(slider == mainSlider)
     {
         gen->setGlobalGain(Decibels::decibelsToGain(mainSlider->getValue()));
-        overtop.gvc.updateFields();
+        overtop.gvc.update();
     }
 }
 
@@ -186,7 +186,7 @@ void MainViewController::timerCallback()
     if (processor.updateState->generalSettingsDidChange)
     {
         processor.updateState->generalSettingsDidChange = false;
-        overtop.gvc.updateFields();
+        overtop.gvc.update();
     }
     
     //check to see if General Settings globalGain has changed, update slider accordingly
@@ -205,40 +205,40 @@ void MainViewController::timerCallback()
     {
         processor.updateState->directPreparationDidChange = false;
         
-        overtop.dvc.updateFields();
-        overtop.dvcm.updateFields();
+        overtop.dvc.update();
+        overtop.dvcm.update();
     }
     
     if (processor.updateState->nostalgicPreparationDidChange)
     {
         processor.updateState->nostalgicPreparationDidChange = false;
         
-        overtop.nvc.updateFields();
-        overtop.nvcm.updateFields();
+        overtop.nvc.update();
+        overtop.nvcm.update();
     }
     
     if (processor.updateState->synchronicPreparationDidChange)
     {
         processor.updateState->synchronicPreparationDidChange = false;
         
-        overtop.svc.updateFields();
-        overtop.svcm.updateFields();
+        overtop.svc.update();
+        overtop.svcm.update();
     }
     
     if (processor.updateState->tuningPreparationDidChange)
     {
         processor.updateState->tuningPreparationDidChange = false;
         
-        overtop.tvc.updateFields();
-        overtop.tvcm.updateFields();
+        overtop.tvc.update();
+        overtop.tvcm.update();
     }
     
     if (processor.updateState->tempoPreparationDidChange)
     {
         processor.updateState->tempoPreparationDidChange = false;
         
-        overtop.ovc.updateFields();
-        overtop.ovcm.updateFields();
+        overtop.ovc.update();
+        overtop.ovcm.update();
     }
     
     if (processor.updateState->pianoDidChangeForGraph)
