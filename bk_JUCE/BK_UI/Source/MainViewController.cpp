@@ -56,7 +56,7 @@ MainViewController::~MainViewController()
 
 void MainViewController::paint (Graphics& g)
 {
-    g.fillAll(Colours::dimgrey);
+    g.fillAll(Colours::black);
 }
 
 void MainViewController::resized()

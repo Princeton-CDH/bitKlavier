@@ -14,6 +14,8 @@ HeaderViewController::HeaderViewController (BKAudioProcessor& p):
 processor (p)
 {
     
+    setLookAndFeel(&buttonsAndMenusLAF);
+    
     addAndMakeVisible(loadB);
     loadB.setButtonText("Load Samples");
     loadB.addListener(this);
@@ -54,7 +56,7 @@ HeaderViewController::~HeaderViewController()
 
 void HeaderViewController::paint (Graphics& g)
 {
-    g.fillAll(Colours::dimgrey);
+    g.fillAll(Colours::black);
 }
 
 void HeaderViewController::resized()
@@ -77,6 +79,7 @@ void HeaderViewController::resized()
 PopupMenu HeaderViewController::getLoadMenu(void)
 {
     PopupMenu loadMenu;
+    loadMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
     int count = 0;
     for (auto loadType : cBKSampleLoadTypes)
@@ -88,6 +91,7 @@ PopupMenu HeaderViewController::getLoadMenu(void)
 PopupMenu HeaderViewController::getPianoMenu(void)
 {
     PopupMenu pianoMenu;
+    pianoMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
     pianoMenu.addItem(1, "New");
     pianoMenu.addItem(2, "Delete");
@@ -100,6 +104,7 @@ PopupMenu HeaderViewController::getPianoMenu(void)
 PopupMenu HeaderViewController::getGalleryMenu(void)
 {
     PopupMenu galleryMenu;
+    galleryMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
     galleryMenu.addItem(1, "Save");
     galleryMenu.addItem(2, "Load");
@@ -172,6 +177,7 @@ void HeaderViewController::bkButtonClicked (Button* b)
     if (b == &loadB)
     {
         PopupMenu loadMenu = getLoadMenu();
+        loadMenu.setLookAndFeel(&buttonsAndMenusLAF);
         
         loadMenu.showMenuAsync (PopupMenu::Options().withTargetComponent (&loadB), ModalCallbackFunction::forComponent (loadMenuCallback, this) );
     }
@@ -237,24 +243,7 @@ void HeaderViewController::bkTextFieldDidChange(TextEditor& tf)
 
 void HeaderViewController::BKEditableComboBoxChanged(String text, BKEditableComboBox* cb)
 {
-    //String name = cb->getName();
-    //int selectedId = cb->getSelectedId();
-    
     processor.currentPiano->setName(text);
-    
-    //pianoCB.changeItemText(selectedId, text);
-    
-    //pianoCB.setSelectedId(selectedId);
-    
-    
-    /*
-     processor.currentPiano->setName(text);
-     
-     int selected = pianoCB.getSelectedId();
-     if (selected != pianoCB.getNumItems()) pianoCB.changeItemText(selected, text);
-     
-     pianoCB.setSelectedId(selected, dontSendNotification );
-    */
 }
 
 

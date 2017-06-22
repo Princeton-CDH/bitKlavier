@@ -56,7 +56,6 @@ public:
         addAndMakeVisible(nameEditor);
         nameEditor.toBack();
         nameEditor.setAlpha(0.);
-        //nameEditor.setVisible(false);
         nameEditor.setOpaque(true);
         nameEditor.addListener(this);
         
@@ -71,6 +70,7 @@ public:
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void textEditorFocusLost (TextEditor& textEditor) override;
     void mouseDoubleClick(const MouseEvent& e) override;
+    void textEditorEscapeKeyPressed (TextEditor &) override;
     
     ListenerList<BKEditableComboBoxListener> listeners;
     void addMyListener(BKEditableComboBoxListener* listener)     { listeners.add(listener);      }
@@ -79,6 +79,7 @@ public:
 private:
         
     BKTextField nameEditor;
+    bool focusLostByEscapeKey;
     int lastItemId;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKEditableComboBox)
