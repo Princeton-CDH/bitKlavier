@@ -212,14 +212,9 @@ public:
 
     void                        prepareToPlay(double sampleRate);
     
-    void configureReset(BKPreparationType type, Array<int> whichKeymaps, Array<int> whichPreps);
-    void deconfigureReset(BKPreparationType type, Array<int> whichKeymaps, Array<int> whichPreps);
-    
-    void deconfigureSynchronicReset(Array<int> whichKeymaps, Array<int> whichPreps);
-    void deconfigureDirectReset(Array<int> whichKeymaps, Array<int> whichPreps);
-    
-    void configureSynchronicReset(Array<int> whichKeymaps, Array<int> whichPreps);
-    void configureDirectReset(Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureResets(Array<Array<int>> resets, Array<int> whichKeymaps);
+    void configureResets(Array<Array<int>> resets, Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureResetsForKeys(Array<Array<int>> resets, Array<int> otherKeys);
     
     void configureModifications(ModificationMapper::PtrArr maps);
     void configureModification(ModificationMapper::Ptr map);
@@ -227,27 +222,27 @@ public:
 
     void configureDirectModification(DirectModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
     void configureDirectModification(int key, DirectModPreparation::Ptr, Array<int>);
-    void deconfigureDirectModification(DirectModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureDirectModification(DirectModPreparation::Ptr, Array<int> whichKeymaps);
     void deconfigureDirectModificationForKeys(DirectModPreparation::Ptr, Array<int>);
 
     void configureSynchronicModification(SynchronicModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
     void configureSynchronicModification(int key, SynchronicModPreparation::Ptr, Array<int>);
-    void deconfigureSynchronicModification(SynchronicModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureSynchronicModification(SynchronicModPreparation::Ptr, Array<int> whichKeymaps);
     void deconfigureSynchronicModificationForKeys(SynchronicModPreparation::Ptr, Array<int>);
     
     void configureNostalgicModification(NostalgicModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps);
     void configureNostalgicModification(int key, NostalgicModPreparation::Ptr, Array<int>);
-    void deconfigureNostalgicModification(NostalgicModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureNostalgicModification(NostalgicModPreparation::Ptr, Array<int> whichKeymaps);
     void deconfigureNostalgicModificationForKeys(NostalgicModPreparation::Ptr, Array<int>);
     
     void configureTuningModification(TuningModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
     void configureTuningModification(int key, TuningModPreparation::Ptr, Array<int>);
-    void deconfigureTuningModification(TuningModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureTuningModification(TuningModPreparation::Ptr, Array<int> whichKeymaps);
     void deconfigureTuningModificationForKeys(TuningModPreparation::Ptr, Array<int>);
 
     void configureTempoModification(TempoModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
     void configureTempoModification(int key, TempoModPreparation::Ptr, Array<int>);
-    void deconfigureTempoModification(TempoModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureTempoModification(TempoModPreparation::Ptr, Array<int> whichKeymaps);
     void deconfigureTempoModificationForKeys(TempoModPreparation::Ptr, Array<int>);
     
     int                         addPreparationMap(void);

@@ -1259,6 +1259,7 @@ public:
     type(type),
     Id(Id)
     {
+        for (int i = 0; i < 5; i++) resets.add(Array<int>());
     }
     
     
@@ -1292,6 +1293,7 @@ public:
     inline void clearKeymaps(void) {keymaps.clear();}
     inline void clearTargets(void) {targets.clear();}
     
+    Array<Array<int>> resets;
     
 private:
     BKPreparationType type;
@@ -1299,6 +1301,8 @@ private:
     
     Array<int> targets;
     Array<int> keymaps;
+    
+    
     
     JUCE_LEAK_DETECTOR(ModificationMapper);
 };

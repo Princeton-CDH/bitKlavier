@@ -76,6 +76,7 @@ mapper(new ModificationMapper(BKPreparationTypeNil, -1))
     else if (type == PreparationTypeReset)
     {
         image = ImageCache::getFromMemory(BinaryData::reset_icon_png, BinaryData::reset_icon_pngSize);
+        mapper->setType(PreparationTypeReset);
     }
     
     placement = RectanglePlacement::centred;
@@ -614,72 +615,7 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         if (connect)    processor.currentPiano->configurePianoMap(thisKeymap, pianoId);
         else            processor.currentPiano->deconfigurePianoMap(thisKeymap);
     }
-    else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeReset)
-    {
-        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(PreparationTypeReset, item2Id);
-        int keymapId = item1Id;
-        
-        if (connect)
-        {
-            thisMapper->addKeymap(keymapId);
-            processor.currentPiano->configureModification(thisMapper);
-        }
-        else
-        {
-            processor.currentPiano->deconfigureModification(thisMapper);
-            thisMapper->clearKeymaps();
-        }
-    }
-    else if (item1Type == PreparationTypeReset && item2Type == PreparationTypeKeymap)
-    {
-        ModificationMapper::Ptr thisMapper = processor.currentPiano->getResetMapper(PreparationTypeReset, item1Id);
-        int keymapId = item2Id;
-        
-        if (connect)
-        {
-            thisMapper->addKeymap(keymapId);
-            processor.currentPiano->configureModification(thisMapper);
-        }
-        else
-        {
-            processor.currentPiano->deconfigureModification(thisMapper);
-            thisMapper->clearKeymaps();
-        }
-    }
-    else if (item1Type == PreparationTypeReset && item2Type < PreparationTypeKeymap)
-    {
-        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(item1Type, item1Id);
-        
-        int Id = item2Id;
-        
-        if (connect)
-        {
-            thisMapper->addTarget(Id);
-            processor.currentPiano->configureModification(thisMapper);
-        }
-        else
-        {
-            processor.currentPiano->deconfigureModification(thisMapper);
-            thisMapper->clearTargets();
-        }
-    }
-    else if (item1Type < PreparationTypeKeymap && item2Type == PreparationTypeReset)
-    {
-        ModificationMapper::Ptr thisMapper = processor.currentPiano->getMapper(item2Type, item2Id);
-        
-        int Id = item1Id;
-        
-        if (connect)
-        {
-            thisMapper->addTarget(Id);
-            processor.currentPiano->configureModification(thisMapper);
-        }
-        else
-        {
-            processor.currentPiano->deconfigureModification(thisMapper);
-            thisMapper->clearTargets();
-        }
-    }
+
     else if (item1Type == PreparationTypeKeymap && item2Type <= PreparationTypeTempo)
     {
         if (connect)    addPreparationToKeymap(item2Type, item2Id, processor.gallery->getKeymap(item1Id));
@@ -731,7 +667,7 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         linkNostalgicWithSynchronic(thisNostalgic, thisSynchronic);
     }
-    else if (item1Type == PreparationTypeMod && item2Type <= PreparationTypeTempo)
+    else if ((item1Type == PreparationTypeMod || item1Type == PreparationTypeReset) && item2Type <= PreparationTypeTempo)
     {
         ModificationMapper::Ptr thisMapper = item1->getMapper();
         
@@ -739,15 +675,32 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         if (thisMapper->getType() == BKPreparationTypeNil)
         {
-            //processor.gallery->addMod(modType);
-            
-            ///int modId = processor.gallery->getNumMod(modType)-1;
-            
             thisMapper->setType(modType);
             thisMapper->setId(0);
         }
         
-        if (thisMapper->getType() == item2Type)
+        if (thisMapper->getType() == PreparationTypeReset)
+        {
+            if (connect)
+            {
+                Array<int> reset = thisMapper->resets.getUnchecked(item2Type);
+                reset.addIfNotAlreadyThere(item2Id);
+                thisMapper->resets.set(item2Type, reset);
+                
+                DBG("resets: " + arrayIntArrayToString(thisMapper->resets));
+                processor.currentPiano->configureModification(thisMapper);
+            }
+            else
+            {
+                processor.currentPiano->deconfigureModification(thisMapper);
+                Array<int> resets = thisMapper->resets.getUnchecked(item2Type);
+                for (int i = 0; i < resets.size(); i++)
+                {
+                    if (resets[i] == item2Id) thisMapper->resets.getUnchecked(item2Type).remove(item2Id);
+                }
+            }
+        }
+        else if (thisMapper->getType() == item2Type)
         {
             int Id = item2Id;
             
@@ -764,7 +717,7 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         }
         
     }
-    else if (item1Type <= PreparationTypeTempo && item2Type == PreparationTypeMod)
+    else if (item1Type <= PreparationTypeTempo && (item2Type == PreparationTypeMod || item2Type == PreparationTypeReset))
     {
         ModificationMapper::Ptr thisMapper = item2->getMapper();
         
@@ -772,15 +725,29 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         if (thisMapper->getType() == BKPreparationTypeNil)
         {
-            //processor.gallery->addMod(modType);
-            
-            //int modId = processor.gallery->getNumMod(modType)-1;
-            
             thisMapper->setType(modType);
             thisMapper->setId(0);
         }
         
-        if (thisMapper->getType() == item1Type)
+        if (thisMapper->getType() == PreparationTypeReset)
+        {
+            if (connect)
+            {
+                thisMapper->resets.getUnchecked(item1Type).add(item1Id);
+                processor.currentPiano->configureModification(thisMapper);
+            }
+            else
+            {
+                processor.currentPiano->deconfigureModification(thisMapper);
+                Array<int> resets = thisMapper->resets.getUnchecked(item1Type);
+                for (int i = 0; i < resets.size(); i++)
+                {
+                    if (resets[i] == item1Id) thisMapper->resets.getUnchecked(item1Type).remove(item1Id);
+                }
+            }
+            
+        }
+        else if (thisMapper->getType() == item1Type)
         {
             ModificationMapper::Ptr thisMapper = item2->getMapper();
             
@@ -798,7 +765,7 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
             }
         }
     }
-    else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeMod)
+    else if (item1Type == PreparationTypeKeymap && (item2Type == PreparationTypeMod || item2Type == PreparationTypeReset))
     {
         ModificationMapper::Ptr thisMapper = item2->getMapper();
         
@@ -813,7 +780,7 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
             thisMapper->clearKeymaps();
         }
     }
-    else if (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeMod)
+    else if (item2Type == PreparationTypeKeymap && (item1Type == PreparationTypeMod || item1Type == PreparationTypeReset))
     {
         ModificationMapper::Ptr thisMapper = item1->getMapper();
         

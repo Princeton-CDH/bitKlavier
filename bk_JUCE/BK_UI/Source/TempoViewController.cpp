@@ -379,32 +379,32 @@ void TempoModificationEditor::update(void)
     TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(targetId);
     
     String val = mod->getParam(TempoSystem);
-    if (val != String::empty)   modeCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-    //else                        modeCB.setSelectedItemIndex((int)prep->getTempoSystem(), dontSendNotification);
+    modeCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+    //                       modeCB.setSelectedItemIndex((int)prep->getTempoSystem(), dontSendNotification);
     
     val = mod->getParam(TempoBPM);
-    if (val != String::empty)   tempoSlider->setValue(val.getFloatValue(), dontSendNotification);
-    //else                        tempoSlider->setValue(prep->getTempo(), dontSendNotification);
+    tempoSlider->setValue(val.getFloatValue(), dontSendNotification);
+    //                       tempoSlider->setValue(prep->getTempo(), dontSendNotification);
     
     val = mod->getParam(AT1Mode);
-    if (val != String::empty)   A1ModeCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-    //else                        A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempo1Mode(), dontSendNotification);
+    A1ModeCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+    //                       A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempo1Mode(), dontSendNotification);
     
     val = mod->getParam(AT1History);
-    if (val != String::empty)   AT1HistorySlider->setValue(val.getIntValue(), dontSendNotification);
-    //else                        AT1HistorySlider->setValue(prep->getAdaptiveTempo1History(), dontSendNotification);
+    AT1HistorySlider->setValue(val.getIntValue(), dontSendNotification);
+    //                       AT1HistorySlider->setValue(prep->getAdaptiveTempo1History(), dontSendNotification);
     
     val = mod->getParam(AT1Subdivisions);
-    if (val != String::empty)   AT1SubdivisionsSlider->setValue(val.getFloatValue(), dontSendNotification);
-    //else                        AT1SubdivisionsSlider->setValue(prep->getAdaptiveTempo1Subdivisions(), dontSendNotification);
+    AT1SubdivisionsSlider->setValue(val.getFloatValue(), dontSendNotification);
+    //                       AT1SubdivisionsSlider->setValue(prep->getAdaptiveTempo1Subdivisions(), dontSendNotification);
     
     val = mod->getParam(AT1Min);
-    if (val != String::empty)   AT1MinMaxSlider->setMinValue(val.getDoubleValue(), dontSendNotification);
-    //else                        AT1MinMaxSlider->setMinValue(prep->getAdaptiveTempo1Min(), dontSendNotification);
+    AT1MinMaxSlider->setMinValue(val.getDoubleValue(), dontSendNotification);
+    //                       AT1MinMaxSlider->setMinValue(prep->getAdaptiveTempo1Min(), dontSendNotification);
     
     val = mod->getParam(AT1Max);
-    if (val != String::empty)   AT1MinMaxSlider->setMaxValue(val.getDoubleValue(), dontSendNotification);
-    //else                        AT1MinMaxSlider->setMaxValue(prep->getAdaptiveTempo1Max(), dontSendNotification);
+    AT1MinMaxSlider->setMaxValue(val.getDoubleValue(), dontSendNotification);
+    //                       AT1MinMaxSlider->setMaxValue(prep->getAdaptiveTempo1Max(), dontSendNotification);
     
     updateComponentVisibility();
 }

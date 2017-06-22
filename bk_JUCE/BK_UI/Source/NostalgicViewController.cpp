@@ -301,14 +301,14 @@ void NostalgicModificationEditor::update(void)
     NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
     
     String val = mod->getParam(NostalgicWaveDistance);
-    if (val != String::empty)   nDisplaySlider.setWaveDistance(val.getIntValue(), dontSendNotification);
+    nDisplaySlider.setWaveDistance(val.getIntValue(), dontSendNotification);
     
     val = mod->getParam(NostalgicUndertow);
-    if (val != String::empty)   nDisplaySlider.setUndertow(val.getIntValue(), dontSendNotification);
+    nDisplaySlider.setUndertow(val.getIntValue(), dontSendNotification);
     
     val = mod->getParam(NostalgicMode);
     NostalgicSyncMode mode = (NostalgicSyncMode) val.getIntValue();
-    if (val != String::empty)   lengthModeSelectCB.setSelectedItemIndex(mode, dontSendNotification);
+    lengthModeSelectCB.setSelectedItemIndex(mode, dontSendNotification);
     
     if(mode == NoteLengthSync)
     {
@@ -322,16 +322,16 @@ void NostalgicModificationEditor::update(void)
     }
 
     val = mod->getParam(NostalgicTransposition);
-    if (val != String::empty)   transpositionSlider->setValue(stringToFloatArray(val), dontSendNotification);
+    transpositionSlider->setValue(stringToFloatArray(val), dontSendNotification);
     
     val = mod->getParam(NostalgicLengthMultiplier);
-    if (val != String::empty)   lengthMultiplierSlider->setValue(val.getFloatValue(), dontSendNotification);
+    lengthMultiplierSlider->setValue(val.getFloatValue(), dontSendNotification);
     
     val = mod->getParam(NostalgicBeatsToSkip);
-    if (val != String::empty)   beatsToSkipSlider->setValue(val.getFloatValue(), dontSendNotification);
+    beatsToSkipSlider->setValue(val.getFloatValue(), dontSendNotification);
     
     val = mod->getParam(NostalgicGain);
-    if (val != String::empty)   gainSlider->setValue(val.getFloatValue(), dontSendNotification);
+    gainSlider->setValue(val.getFloatValue(), dontSendNotification);
     
 }
 
@@ -466,7 +466,7 @@ void NostalgicModificationEditor::BKStackedSliderValueChanged(String name, Array
 {
     NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
 
-    mod->setParam(NostalgicGain, floatArrayToString(val));
+    mod->setParam(NostalgicTransposition, floatArrayToString(val));
     
     updateModification();
 }

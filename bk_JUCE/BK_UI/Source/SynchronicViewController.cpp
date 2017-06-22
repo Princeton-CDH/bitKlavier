@@ -506,21 +506,21 @@ void SynchronicModificationEditor::update(NotificationType notify)
     
     
     String val = mod->getParam(SynchronicMode);
-    if (val != String::empty)   modeSelectCB.setSelectedItemIndex(val.getIntValue(), notify);
+    modeSelectCB.setSelectedItemIndex(val.getIntValue(), notify);
     
     //FIXIT offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
     
     val = mod->getParam(SynchronicNumPulses);
-    if (val != String::empty)   howManySlider->setValue(val.getIntValue(), notify);
+    howManySlider->setValue(val.getIntValue(), notify);
     
     val = mod->getParam(SynchronicClusterThresh);
-    if (val != String::empty)   clusterThreshSlider->setValue(val.getFloatValue(), notify);
+    clusterThreshSlider->setValue(val.getFloatValue(), notify);
     
     val = mod->getParam(SynchronicClusterMin);
-    if (val != String::empty)   clusterMinMaxSlider->setMinValue(val.getIntValue(), notify);
+    clusterMinMaxSlider->setMinValue(val.getIntValue(), notify);
     
     val = mod->getParam(SynchronicClusterMax);
-    if (val != String::empty)   clusterMinMaxSlider->setMaxValue(val.getIntValue(), notify);
+    clusterMinMaxSlider->setMaxValue(val.getIntValue(), notify);
     
     
 

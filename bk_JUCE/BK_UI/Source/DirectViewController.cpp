@@ -215,16 +215,16 @@ void DirectModificationEditor::update(void)
     
     
     String val = mod->getParam(DirectTransposition);
-    /*if (val != String::empty)*/   transpositionSlider->setValue(stringToFloatArray(val), dontSendNotification);
+    transpositionSlider->setValue(stringToFloatArray(val), dontSendNotification);
     
     val = mod->getParam(DirectResGain);
-    /*if (val != String::empty) */  resonanceGainSlider->setValue(val.getFloatValue(), dontSendNotification);
+    resonanceGainSlider->setValue(val.getFloatValue(), dontSendNotification);
     
     val = mod->getParam(DirectHammerGain);
-    /*if (val != String::empty)*/   hammerGainSlider->setValue(val.getFloatValue(), dontSendNotification);
+    hammerGainSlider->setValue(val.getFloatValue(), dontSendNotification);
     
     val = mod->getParam(DirectGain);
-    /*if (val != String::empty)*/   gainSlider->setValue(val.getFloatValue(), dontSendNotification);
+    gainSlider->setValue(val.getFloatValue(), dontSendNotification);
 }
 
 void DirectModificationEditor::fillSelectCB(void)
