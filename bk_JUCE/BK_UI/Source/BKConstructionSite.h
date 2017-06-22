@@ -82,6 +82,7 @@ private:
     // Drag interface
     void itemWasDropped(BKPreparationType type, Array<int> data, int x, int y) override;
 
+    void resized() override;
     
     void mouseDown (const MouseEvent& eo) override;
     

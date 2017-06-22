@@ -33,13 +33,13 @@
 
 #include "BKGraph.h"
 
-class BKOvertop :  public Component, public BKListener, public KeyListener
+class BKOvertop :  public Component//, public BKListener, public KeyListener
 {
 public:
     BKOvertop (BKAudioProcessor& p, BKItemGraph* theGraph):
-    processor(p),
     gvc(p),
     kvc(p, theGraph),
+    tvc2(p, theGraph),
     //tvc(p, theGraph),
     //svc(p, &theGraph),
     //nvc(p, &theGraph),
@@ -47,15 +47,17 @@ public:
     ovc2(p, theGraph),
     svc2(p, theGraph),
     nvc2(p, theGraph),
-    tvc2(p, theGraph),
-    dvc2(p, theGraph)
+    dvc2(p, theGraph),
+    processor(p)
     {
-        addKeyListener(this);
+        //addKeyListener(this);
         
+        /*
         addAndMakeVisible(hideOrShow);
         hideOrShow.setName("hideOrShow");
         hideOrShow.addListener(this);
         hideOrShow.setButtonText(" X ");
+         */
         
         addChildComponent(gvc);
         //addChildComponent(dvc);
@@ -65,7 +67,7 @@ public:
         addChildComponent(svc2);
         addChildComponent(nvc2);
         addChildComponent(dvc2);
-    
+        
     }
     
     ~BKOvertop()
@@ -76,16 +78,41 @@ public:
     //==============================================================================
     void paint (Graphics& g) override
     {
-        g.fillAll(Colour((uint8)0, (uint8)0, (uint8)0, 0.75f));
+        //g.fillAll(Colour((uint8)0, (uint8)0, (uint8)0, 0.75f));
+        //g.fillAll(Colours::burlywood);
+        //g.fillAll(Colours::transparentBlack);
     }
     
     void resized() override
     {
-        hideOrShow.setBounds(gXSpacing,gYSpacing, 20, 20);
+        //hideOrShow.setBounds(gXSpacing,gYSpacing * 2, gComponentComboBoxHeight, gComponentComboBoxHeight);
         
-        float X = gXSpacing; float Y = hideOrShow.getBottom()+gYSpacing;
-        float width = getWidth() - 10;
-        float height = getHeight() - 35;
+        //float X = gXSpacing;
+        //float Y = hideOrShow.getBottom()+gYSpacing;
+        //float Y = hideOrShow.getY();
+        //float Y = gYSpacing;
+        //float width = getWidth() - 10;
+        //float height = getHeight() - 10;
+        
+        Rectangle<int> area (getLocalBounds());
+        
+        //float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
+        //float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
+        
+        //area.reduce(50 * paddingScalarX, 70 * paddingScalarY);
+        
+        kvc.setBounds(area);
+        gvc.setBounds(area);
+        tvc2.setBounds(area);
+        ovc2.setBounds(area);
+        svc2.setBounds(area);
+        nvc2.setBounds(area);
+        dvc2.setBounds(area);
+        
+        /*
+        float width = getWidth() * paddingScalarX;
+        float height = getHeight() * paddingScalarY;
+        
         
         kvc.setBounds(X, Y, width, height);
         
@@ -100,6 +127,10 @@ public:
         nvc2.setBounds(X, Y, width, height);
         
         dvc2.setBounds(X, Y, width, height);
+         */
+        
+        
+        //hideOrShow.toFront(false);
     }
     
     inline void setCurrentDisplay(BKPreparationDisplay type)
@@ -160,6 +191,8 @@ public:
             addAndMakeVisible(&gvc);
         }
         
+        //hideOrShow.toFront(false);
+        
     }
     
     GeneralViewController gvc;
@@ -176,15 +209,15 @@ public:
     NostalgicViewController2 nvc2;
     DirectViewController2 dvc2;
     
-    
 private:
     
     BKAudioProcessor& processor;
     
-    TextButton hideOrShow;
+    //TextButton hideOrShow;
     
     BKPreparationDisplay currentDisplay;
     
+    /*
     void bkTextFieldDidChange       (TextEditor&)           override{};
     void bkMessageReceived          (const String& message) override{};
     void bkComboBoxDidChange        (ComboBox* box)         override{};
@@ -206,6 +239,7 @@ private:
             
         }
     }
+     */
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BKOvertop);
     

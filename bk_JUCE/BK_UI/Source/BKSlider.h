@@ -141,6 +141,7 @@ private:
     BKMultiSliderLookAndFeel activeSliderLookAndFeel;
     BKMultiSliderLookAndFeel passiveSliderLookAndFeel;
     BKMultiSliderLookAndFeel highlightedSliderLookAndFeel;
+    BKMultiSliderLookAndFeel displaySliderLookAndFeel;
     
     String sliderName;
     BKLabel showName;

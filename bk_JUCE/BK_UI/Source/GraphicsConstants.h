@@ -31,10 +31,21 @@ static const int gComponentTextFieldHeight = 17;
 static const int gComponentLabelWidth = 160;
 static const int gComponentLabelHeight = 17;
 
+static const int gComponentComboBoxHeight = 24;
+static const int gComponentToggleBoxWidth  = gComponentComboBoxHeight;
+static const int gComponentToggleBoxHeight  = gComponentToggleBoxWidth;
+
+static const int gComponentRangeSliderHeight = 40;
+static const int gComponentSingleSliderHeight = 60;
+
+static const int gComponentStackedSliderHeight = 40;
+
 static const int gVCWidth = 375;
 
 static const int gXSpacing = 4;
 static const int gYSpacing = 4;
+
+static const int gPaddingConst = 10;
 
 
 

@@ -21,19 +21,32 @@
 class BKComboBox : public ComboBox
 {
 public:
-    BKComboBox()
+    BKComboBox() :
+    thisJustification (Justification::centredLeft)
     {
         setSize(200,20);
         
-        lookAndFeelChanged();
+        //lookAndFeelChanged();
+        setLookAndFeel(&thisLAF);
+        
     }
     
     ~BKComboBox()
     {
     }
+    
+    void BKSetJustificationType (Justification justification)
+    {
+        thisJustification = justification;
+        thisLAF.setComboBoxJustificationType(justification);
+    }
 
 
 private:
+    
+    BKButtonAndMenuLAF thisLAF;
+    Justification thisJustification;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKComboBox)
 };
 
@@ -46,11 +59,13 @@ public TextEditor::Listener
 {
 public:
     
-    BKEditableComboBox()
+    BKEditableComboBox() :
+    thisJustification (Justification::centredLeft)
     {
         setSize(200,20);
         
-        lookAndFeelChanged();
+        //lookAndFeelChanged();
+        setLookAndFeel(&thisLAF);
 
         nameEditor.setName("NAMETXTEDIT");
         addAndMakeVisible(nameEditor);
@@ -76,11 +91,20 @@ public:
     void addMyListener(BKEditableComboBoxListener* listener)     { listeners.add(listener);      }
     void removeMyListener(BKEditableComboBoxListener* listener)  { listeners.remove(listener);   }
     
+    void BKSetJustificationType (Justification justification)
+    {
+        thisJustification = justification;
+        thisLAF.setComboBoxJustificationType(justification);
+    }
+    
 private:
         
     BKTextField nameEditor;
     bool focusLostByEscapeKey;
     int lastItemId;
+    
+    BKButtonAndMenuLAF thisLAF;
+    Justification thisJustification;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKEditableComboBox)
 };

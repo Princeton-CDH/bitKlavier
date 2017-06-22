@@ -55,7 +55,9 @@ private:
     HeaderViewController header;
     BKConstructionSite  construction;
 
-    BKOvertop           overtop;
+    BKOvertop overtop;
+    
+    //ImageComponent backgroundImageComponent;
     
     ScopedPointer<Slider> mainSlider;
     

@@ -23,7 +23,7 @@ theGraph(theGraph)
     
     iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::synchronic_icon_png, BinaryData::synchronic_icon_pngSize));
     iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
-    iconImageComponent.setAlpha(0.075);
+    iconImageComponent.setAlpha(0.095);
     addAndMakeVisible(iconImageComponent);
     
     // MultSliders
@@ -45,6 +45,7 @@ theGraph(theGraph)
     selectCB.addSeparator();
     selectCB.addListener(this);
     selectCB.setSelectedItemIndex(0);
+    selectCB.BKSetJustificationType(juce::Justification::centredRight);
     selectCB.addMyListener(this);
     fillSelectCB();
     addAndMakeVisible(selectCB);
@@ -78,6 +79,11 @@ theGraph(theGraph)
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->addMyListener(this);
     addAndMakeVisible(gainSlider);
+    
+    addAndMakeVisible(hideOrShow);
+    hideOrShow.setName("hideOrShow");
+    hideOrShow.addListener(this);
+    hideOrShow.setButtonText(" X ");
     
     startTimer(20);
 
@@ -195,18 +201,18 @@ void SynchronicViewController2::BKSingleSliderValueChanged(String name, double v
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
-    if(name == "how many") {
+    if(name == howManySlider->getName()) {
         DBG("got new how many " + String(val));
         prep->setNumBeats(val);
         active->setNumBeats(val);
     }
-    else if(name == "cluster threshold")
+    else if(name == clusterThreshSlider->getName())
     {
         DBG("got new cluster threshold " + String(val));
         prep->setClusterThresh(val);
         active->setClusterThresh(val);
     }
-    else if(name == "gain")
+    else if(name == gainSlider->getName())
     {
         DBG("gain " + String(val));
         prep->setGain(val);
@@ -236,33 +242,62 @@ void SynchronicViewController2::paint (Graphics& g)
 void SynchronicViewController2::resized()
 {
     Rectangle<int> area (getLocalBounds());
+    
+    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
+    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
+
     iconImageComponent.setBounds(area);
+    area.reduce(10 * paddingScalarX + 4, 10 * paddingScalarY + 4);
     
-    Rectangle<int> oneColumn = area.removeFromLeft(area.getWidth() * 0.5);
+    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
+    Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * paddingScalarX);
+    hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
+    selectCB.setBounds(comboBoxSlice.removeFromRight(comboBoxSlice.getWidth() / 2.));
     
-    Rectangle<int> modeSlice = area.removeFromTop(24);
-    modeSlice.reduce(4, 2);
-    modeSelectCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2));
+    /* *** above here should be generic to all prep layouts *** */
+    /* ***    below here will be specific to each prep      *** */
+    
+    Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
+    modeSlice.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
+    modeSelectCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
     offsetParamStartToggle.setBounds(modeSlice);
-    
-    int tempHeight = (area.getHeight() - paramSliders.size() * gYSpacing) / paramSliders.size();
-    
+
+    int tempHeight = (area.getHeight() - paramSliders.size() * (gYSpacing + gPaddingConst * paddingScalarY)) / paramSliders.size();
+    area.removeFromLeft(4 + 2.*gPaddingConst * paddingScalarX);
     for(int i = 0; i < paramSliders.size(); i++)
     {
-        paramSliders[i]->setBounds(area.removeFromBottom(tempHeight));
-        area.removeFromBottom(gYSpacing);
+        area.removeFromTop(gYSpacing + gPaddingConst * paddingScalarY);
+        paramSliders[i]->setBounds(area.removeFromTop(tempHeight));
     }
     
-    Rectangle<int> comboBoxSlice = oneColumn.removeFromTop(24);
-    comboBoxSlice.reduce(4, 2);
-    selectCB.setBounds(comboBoxSlice);
+    leftColumn.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
     
-    int oneColumnRowHeight = oneColumn.getHeight() / 4.;
-    howManySlider->setBounds(oneColumn.removeFromTop(oneColumnRowHeight));
-    clusterThreshSlider->setBounds(oneColumn.removeFromTop(oneColumnRowHeight));
-    clusterMinMaxSlider->setBounds(oneColumn.removeFromTop(oneColumnRowHeight));
-    gainSlider->setBounds(oneColumn.removeFromTop(oneColumnRowHeight));
+    int nextCenter = paramSliders[0]->getY() + paramSliders[0]->getHeight() / 2 + 2. * gPaddingConst * (1. - paddingScalarY) ;
+    howManySlider->setBounds(leftColumn.getX(),
+                             nextCenter - gComponentSingleSliderHeight/2.,
+                             leftColumn.getWidth(),
+                             gComponentSingleSliderHeight);
+    
+    nextCenter = paramSliders[1]->getY() + paramSliders[1]->getHeight() / 2 + 2. * gPaddingConst * (1. - paddingScalarY);
+    clusterThreshSlider->setBounds(leftColumn.getX(),
+                                   nextCenter - gComponentSingleSliderHeight/2.,
+                                   leftColumn.getWidth(),
+                                   gComponentSingleSliderHeight);
+    
+    nextCenter = paramSliders[2]->getY() + paramSliders[2]->getHeight() / 2 + gPaddingConst * (1. - paddingScalarY);
+    clusterMinMaxSlider->setBounds(leftColumn.getX(),
+                                   nextCenter - gComponentRangeSliderHeight/2.,
+                                   leftColumn.getWidth(),
+                                   gComponentRangeSliderHeight);
+    
+    nextCenter = paramSliders[3]->getY() + paramSliders[3]->getHeight() / 2 + 2. * gPaddingConst * (1. - paddingScalarY);
+    gainSlider->setBounds(leftColumn.getX(),
+                          nextCenter - gComponentSingleSliderHeight/2.,
+                          leftColumn.getWidth(),
+                          gComponentSingleSliderHeight);
 
+    repaint();
 }
 
 void SynchronicViewController2::updateFields(NotificationType notify)
@@ -449,6 +484,10 @@ void SynchronicViewController2::buttonClicked (Button* b)
             active->setBeatsToSkip(toggleVal);
         }
 
+    }
+    else if (b == &hideOrShow)
+    {
+        processor.updateState->setCurrentDisplay(DisplayNil);
     }
 }
 

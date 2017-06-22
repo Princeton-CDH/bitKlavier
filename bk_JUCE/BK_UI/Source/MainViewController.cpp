@@ -15,9 +15,9 @@
 MainViewController::MainViewController (BKAudioProcessor& p):
 processor (p),
 theGraph(p),
+header(p),
 construction(p, &theGraph),
 overtop(p, &theGraph),
-header(p),
 timerCallbackCount(0)
 {
     addKeyListener(this);
@@ -27,12 +27,10 @@ timerCallbackCount(0)
     preparationPanel = new PreparationPanel(processor);
     addAndMakeVisible(preparationPanel);
     
-    addAndMakeVisible(construction);
-    
     addAndMakeVisible(header);
-    
+    addAndMakeVisible(construction);
     addChildComponent(overtop);
-
+    
     mainSlider = new Slider();
     addAndMakeVisible (mainSlider);
     mainSlider->setRange (-90, 12.0, 0.1);
@@ -43,6 +41,17 @@ timerCallbackCount(0)
     mainSlider->setDoubleClickReturnValue (true, 0.0); // double-clicking this slider will set it to 50.0
     mainSlider->setTextValueSuffix (" dB");
     mainSlider->addListener(this);
+    
+    /*
+    File file ("~/bk_icons/icon.png");
+    FileInputStream inputStream(file);
+    PNGImageFormat tempimg;
+    Image bimg = tempimg.decodeImage(inputStream);
+    backgroundImageComponent.setImage(bimg);
+    backgroundImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
+    backgroundImageComponent.setAlpha(0.2);
+    addAndMakeVisible(backgroundImageComponent);
+     */
     
     startTimerHz (50);
     
@@ -56,7 +65,7 @@ MainViewController::~MainViewController()
 
 void MainViewController::paint (Graphics& g)
 {
-    g.fillAll(Colours::black);
+    //g.fillAll(Colours::transparentBlack);
 }
 
 void MainViewController::resized()
@@ -68,13 +77,28 @@ void MainViewController::resized()
                            getParentComponent()->getWidth() - 2*gXSpacing,
                            getParentComponent()->getBottom() - header.getBottom()-2*gYSpacing);
     
+    //construction.repaint();
     
-    overtop.setBounds(construction.getBounds());
+    Rectangle<int> area (getLocalBounds());
+    area.removeFromTop(header.getHeight());
+    
+    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
+    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
+    
+    area.reduce(70 * paddingScalarX, 90 * paddingScalarY);
+    
+    //overtop.setBounds(construction.getBounds());
+    overtop.setBounds(area);
+    
+    /*
+    backgroundImageComponent.setBounds(getBounds());
+    backgroundImageComponent.toBack();
+     */
 }
 
 
 
-void MainViewController::bkButtonClicked            (Button* b)
+void MainViewController::bkButtonClicked (Button* b)
 {
     String name = b->getName();
 

@@ -29,7 +29,8 @@ class BKButtonAndMenuLAF : public LookAndFeel_V4
 {
 public:
     
-    BKButtonAndMenuLAF()
+    BKButtonAndMenuLAF() :
+    comboBoxJustification (Justification::centredLeft)
     {
         setColour(ComboBox::backgroundColourId, Colours::black);
         setColour(ComboBox::textColourId, Colours::white);
@@ -50,8 +51,23 @@ public:
         //setColour(juce::LookAndFeel_V4::ColourScheme::outline, Colours::black);
         //getCurrentColourScheme().setUIColour(juce::LookAndFeel_V4::ColourScheme::widgetBackground, Colours::yellow);
         
-        
     }
+    
+    void positionComboBoxText (ComboBox& box, Label& label) override;
+    void drawComboBox (Graphics& g, int width, int height, bool,
+                                       int, int, int, int, ComboBox& box) override;
+    
+    void drawPopupMenuItem (Graphics& g, const Rectangle<int>& area,
+                                            const bool isSeparator, const bool isActive,
+                                            const bool isHighlighted, const bool isTicked,
+                                            const bool hasSubMenu, const String& text,
+                                            const String& shortcutKeyText,
+                                            const Drawable* icon, const Colour* const textColourToUse) override;
+    
+    void setComboBoxJustificationType (Justification justification)    { comboBoxJustification = justification; }
+    
+private:
+    Justification comboBoxJustification;
 };
 
 class BKMultiSliderLookAndFeel : public BKButtonAndMenuLAF
@@ -80,6 +96,9 @@ public:
     BKRangeMinSliderLookAndFeel()
     {
         //setColour (TextButton::buttonColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.13f));
+        setColour(Slider::thumbColourId, Colours::goldenrod);
+        setColour(Slider::backgroundColourId, Colours::goldenrod.withMultipliedAlpha(0.1));
+        setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.35));
     }
     ~BKRangeMinSliderLookAndFeel() {}
     
@@ -96,6 +115,10 @@ public:
     BKRangeMaxSliderLookAndFeel()
     {
         //setColour (TextButton::buttonColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.13f));
+        setColour(Slider::thumbColourId, Colours::goldenrod);
+        setColour(Slider::backgroundColourId, Colours::goldenrod.withMultipliedAlpha(0.1));
+        setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.35));
+        //trackColourId
     }
     ~BKRangeMaxSliderLookAndFeel() {}
     

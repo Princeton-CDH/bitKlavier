@@ -14,14 +14,19 @@ NostalgicViewController2::NostalgicViewController2(BKAudioProcessor& p, BKItemGr
 processor(p),
 theGraph(theGraph)
 {
-    nDisplaySlider.addMyListener(this);
-    addAndMakeVisible(nDisplaySlider);
     
+    setLookAndFeel(&buttonsAndMenusLAF);
+    
+    iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::nostalgic_icon_png, BinaryData::nostalgic_icon_pngSize));
+    iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
+    iconImageComponent.setAlpha(0.095);
+    addAndMakeVisible(iconImageComponent);
     
     selectCB.setName("Nostalgic");
     selectCB.addSeparator();
     selectCB.addListener(this);
     selectCB.setSelectedItemIndex(0);
+    selectCB.BKSetJustificationType(juce::Justification::centredRight);
     selectCB.addMyListener(this);
     fillSelectCB();
     addAndMakeVisible(selectCB);
@@ -52,30 +57,73 @@ theGraph(theGraph)
     gainSlider->addMyListener(this);
     addAndMakeVisible(gainSlider);
     
+    addAndMakeVisible(hideOrShow);
+    hideOrShow.setName("hideOrShow");
+    hideOrShow.addListener(this);
+    hideOrShow.setButtonText(" X ");
+    
+    nDisplaySlider.addMyListener(this);
+    addAndMakeVisible(nDisplaySlider);
+    
     startTimer(20);
 }
 
 void NostalgicViewController2::paint (Graphics& g)
 {
-    g.fillAll(Colours::transparentWhite);
+    g.fillAll(Colours::black);
 }
 
 void NostalgicViewController2::resized()
 {
     Rectangle<int> area (getLocalBounds());
     
-    Rectangle<int> displayRow = area.removeFromBottom(area.getHeight() * 0.5);
-    nDisplaySlider.setBounds(displayRow);
+    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
+    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
+    
+    iconImageComponent.setBounds(area);
+    area.reduce(10 * paddingScalarX + 4, 10 * paddingScalarY + 4);
+    
+    Rectangle<int> nDisplayRow = area.removeFromBottom(100 + 80 * paddingScalarY);
+    nDisplayRow.reduce(4, 4);
+    nDisplaySlider.setBounds(nDisplayRow);
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
-    selectCB.setBounds(leftColumn.removeFromTop(20));
-    lengthModeSelectCB.setBounds(area.removeFromTop(20));
-    lengthMultiplierSlider->setBounds(area.removeFromTop(40));
+    Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * paddingScalarX);
+    hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
+    selectCB.setBounds(comboBoxSlice.removeFromRight(comboBoxSlice.getWidth() / 2.));
+    
+    /* *** above here should be generic to all prep layouts *** */
+    /* ***    below here will be specific to each prep      *** */
+    
+    Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
+    modeSlice.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
+    lengthModeSelectCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
+    
+    Rectangle<int> sliderSlice = area;
+    sliderSlice.reduce(4 + 2.*gPaddingConst * paddingScalarX,
+                       4 + 2.*gPaddingConst * paddingScalarY);
+    
+    int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 4.;
+    lengthMultiplierSlider->setBounds(sliderSlice.getX(),
+                                      nextCenter - gComponentSingleSliderHeight/2 + 8,
+                                      sliderSlice.getWidth(),
+                                      gComponentSingleSliderHeight);
     beatsToSkipSlider->setBounds(lengthMultiplierSlider->getBounds());
-    gainSlider->setBounds(area.removeFromBottom(40));
     
-    transpositionSlider->setBounds(leftColumn.removeFromTop(40));
+    nextCenter = sliderSlice.getY() + 3. * sliderSlice.getHeight() / 4.;
+    gainSlider->setBounds(sliderSlice.getX(),
+                          nextCenter - gComponentSingleSliderHeight/2 + 4,
+                          sliderSlice.getWidth(),
+                          gComponentSingleSliderHeight);
+
+    nextCenter = leftColumn.getY() + leftColumn.getHeight() / 2.;
+    leftColumn.reduce(4, 0);
     
+    transpositionSlider->setBounds(leftColumn.getX(),
+                                   lengthMultiplierSlider->getY(),
+                                   leftColumn.getWidth(),
+                                   gComponentStackedSliderHeight + paddingScalarY * 30);
 }
 
 void NostalgicViewController2::BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow)
@@ -214,6 +262,14 @@ void NostalgicViewController2::BKStackedSliderValueChanged(String name, Array<fl
 
     prep->setTransposition(val);
     active->setTransposition(val);
+}
+
+void NostalgicViewController2::bkButtonClicked (Button* b)
+{
+    if (b == &hideOrShow)
+    {
+        processor.updateState->setCurrentDisplay(DisplayNil);
+    }
 }
 
 void NostalgicViewController2::fillSelectCB(void)

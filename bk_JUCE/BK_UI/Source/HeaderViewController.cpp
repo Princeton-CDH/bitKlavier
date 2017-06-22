@@ -32,6 +32,7 @@ processor (p)
     addAndMakeVisible(galleryCB);
     galleryCB.setName("galleryCB");
     galleryCB.addListener(this);
+    galleryCB.BKSetJustificationType(juce::Justification::centredRight);
     
     galleryCB.setSelectedId(0, dontSendNotification);
     
@@ -62,18 +63,25 @@ void HeaderViewController::paint (Graphics& g)
 void HeaderViewController::resized()
 {
     float width = getWidth() / 7 - gXSpacing;
-    float height = getHeight() - 2 * gYSpacing;
     
-    loadB          .setBounds(gXSpacing, gYSpacing, width, height);
+    Rectangle<int> area (getLocalBounds());
+    area.reduce(0, gYSpacing);
     
-    galleryCB       .setBounds(loadB.getRight() + gXSpacing, gYSpacing, 2*width, height);
+    area.removeFromLeft(gXSpacing);
+    galleryB.setBounds(area.removeFromLeft(width));
     
-    galleryB .setBounds(galleryCB.getRight() + gXSpacing, gYSpacing, width, height);
+    area.removeFromLeft(gXSpacing);
+    galleryCB.setBounds(area.removeFromLeft(2*width));
     
-    pianoCB         .setBounds(galleryB.getRight() + gXSpacing, gYSpacing, 2*width, height);
+    area.removeFromRight(gXSpacing);
+    pianoB.setBounds(area.removeFromRight(width));
     
-    pianoB   .setBounds(pianoCB.getRight() + gXSpacing, gYSpacing, width, height);
-    
+    area.removeFromRight(gXSpacing);
+    pianoCB.setBounds(area.removeFromRight(2*width));
+    area.removeFromRight(gXSpacing);
+
+    area.removeFromLeft(gXSpacing);
+    loadB.setBounds(area);
 }
 
 PopupMenu HeaderViewController::getLoadMenu(void)

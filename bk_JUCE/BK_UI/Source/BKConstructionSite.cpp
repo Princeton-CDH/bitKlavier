@@ -128,10 +128,15 @@ void BKConstructionSite::align(int which)
     repaint();
 }
 
+void BKConstructionSite::resized()
+{
+    repaint();
+}
+
 void BKConstructionSite::paint(Graphics& g)
 {
     //g.setColour(Colours::gold);
-    g.setColour(Colours::burlywood.withMultipliedBrightness(0.5));
+    g.setColour(Colours::burlywood.withMultipliedBrightness(0.25));
     g.fillAll();
     
     
@@ -146,14 +151,14 @@ void BKConstructionSite::paint(Graphics& g)
     
     if (connect)
     {
-        g.setColour(Colours::white);
+        g.setColour(Colours::goldenrod);
         g.drawLine(lineOX, lineOY, lineEX, lineEY, 3);
     }
     
     for (auto line : graph->getLines())
     {
-        g.setColour(Colours::black);
-        g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY());
+        g.setColour(Colours::goldenrod);
+        g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY(), 3);
     }
 }
 

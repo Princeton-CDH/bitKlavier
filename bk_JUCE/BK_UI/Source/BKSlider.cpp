@@ -106,7 +106,10 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     else arrangedHorizontally = false;
     
     passiveSliderLookAndFeel.setColour(Slider::thumbColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.13f));
-    highlightedSliderLookAndFeel.setColour(Slider::thumbColourId, Colour::fromRGBA(250, 10, 50, 50));
+    //highlightedSliderLookAndFeel.setColour(Slider::thumbColourId, Colour::fromRGBA(250, 10, 50, 50));
+    highlightedSliderLookAndFeel.setColour(Slider::thumbColourId, Colours::red.withSaturation(1.));
+    activeSliderLookAndFeel.setColour(Slider::thumbColourId, Colours::goldenrod.withMultipliedAlpha(0.75));
+    displaySliderLookAndFeel.setColour(Slider::thumbColourId, Colours::red.withMultipliedAlpha(0.5));
     lastHighlightedSlider = 0;
     
     sliderMin = sliderMinDefault = -1.;
@@ -196,7 +199,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     displaySlider->setName("DISPLAY");
     displaySlider->addListener(this);
     displaySlider->setInterceptsMouseClicks(false, false);
-    displaySlider->setLookAndFeel(&activeSliderLookAndFeel);
+    displaySlider->setLookAndFeel(&displaySliderLookAndFeel);
     addAndMakeVisible(displaySlider);
     
     showName.setInterceptsMouseClicks(false, true);
@@ -821,7 +824,9 @@ void BKMultiSlider::resized()
     editValsTextField->setBounds(area.toNearestInt());
     editValsTextField->setVisible(false);
     
-    showName.setBounds(area.toNearestInt());
+    Rectangle<float> nameSlab (area);
+    nameSlab.removeFromTop(gYSpacing / 2.).removeFromRight(gXSpacing);
+    showName.setBounds(nameSlab.toNearestInt());
     showName.setJustificationType(Justification::topRight);
     showName.toFront(false);
     
@@ -1053,6 +1058,9 @@ sliderIncrement(increment)
     
     textIsAbove = true;
     
+    thisSlider.setColour(Slider::thumbColourId, Colours::goldenrod);
+    thisSlider.setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.25));
+    thisSlider.setColour(Slider::backgroundColourId, Colours::goldenrod.withMultipliedAlpha(0.1));
     thisSlider.setSliderStyle(Slider::LinearHorizontal);
     thisSlider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
     thisSlider.setRange(sliderMin, sliderMax, sliderIncrement);
@@ -1146,13 +1154,15 @@ void BKSingleSlider::resized()
         Rectangle<int> area (getLocalBounds());
         
         //Rectangle<int> textSlab (area.removeFromTop(area.getHeight() / 3));
-        Rectangle<int> textSlab (area.removeFromTop(20));
+        //Rectangle<int> textSlab (area.removeFromTop(gComponentSingleSliderHeight * 0.5));
+        Rectangle<int> textSlab (area.removeFromTop(gComponentTextFieldHeight));
+        //gComponentTextFieldHeight
         //textSlab.removeFromTop(textSlab.getHeight() - 20);
-        textSlab.removeFromRight(5);
+        textSlab.removeFromRight(8);
         valueTF.setBounds(textSlab.removeFromRight(50));
         showName.setBounds(textSlab.removeFromRight(150));
         
-        thisSlider.setBounds(area.removeFromTop(20));
+        thisSlider.setBounds(area.removeFromTop(gComponentSingleSliderHeight * 0.5 - 12));
     }
     else
     {
@@ -1212,7 +1222,7 @@ sliderIncrement(increment)
     minSlider.addListener(this);
     minSlider.setLookAndFeel(&minSliderLookAndFeel);
     //minSlider.setInterceptsMouseClicks(false, true);
-    minSliderLookAndFeel.setColour(Slider::trackColourId, Colour::fromRGBA(55, 105, 250, 50));
+    //minSliderLookAndFeel.setColour(Slider::trackColourId, Colour::fromRGBA(55, 105, 250, 50));
     addAndMakeVisible(minSlider);
     
     maxSlider.setSliderStyle(Slider::LinearHorizontal);
@@ -1223,7 +1233,7 @@ sliderIncrement(increment)
     maxSlider.setLookAndFeel(&maxSliderLookAndFeel);
     //maxSlider.setInterceptsMouseClicks(false, true);
     //maxSliderLookAndFeel.setColour(Slider::trackColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.13f));
-    maxSliderLookAndFeel.setColour(Slider::trackColourId, Colour::fromRGBA(55, 105, 250, 50));
+    //maxSliderLookAndFeel.setColour(Slider::trackColourId, Colour::fromRGBA(55, 105, 250, 50));
     addAndMakeVisible(maxSlider);
     
     invisibleSlider.setSliderStyle(Slider::LinearHorizontal);
@@ -1396,8 +1406,11 @@ void BKRangeSlider::resized()
     
     Rectangle<int> area (getLocalBounds());
     
-    Rectangle<int> topSlab (area.removeFromTop(area.getHeight() / 3));
-    topSlab.removeFromTop(topSlab.getHeight() - 20);
+    //Rectangle<int> topSlab (area.removeFromTop((area.getHeight() + 20) / 3));
+    Rectangle<int> topSlab (area.removeFromTop(gComponentTextFieldHeight));
+    //topSlab.removeFromTop(topSlab.getHeight() - 20);
+    //topSlab.removeFromTop(gComponentTextFieldHeight);
+    //gComponentTextFieldHeight
     topSlab.removeFromRight(5);
     maxValueTF.setBounds(topSlab.removeFromRight(50));
     minValueTF.setBounds(topSlab.removeFromRight(50));
@@ -1604,7 +1617,12 @@ sliderIncrement(increment)
     topSlider->setLookAndFeel(&topSliderLookAndFeel);
     addAndMakeVisible(topSlider);
     
+    showName.setText(sliderName, dontSendNotification);
+    showName.setInterceptsMouseClicks(false, true);
+    addAndMakeVisible(showName);
+    
     topSliderLookAndFeel.setColour(Slider::thumbColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.0f));
+    stackedSliderLookAndFeel.setColour(Slider::thumbColourId, Colours::goldenrod.withMultipliedAlpha(0.95));
     
 }
 
@@ -1917,7 +1935,7 @@ void BKStackedSlider::resized ()
     
     showName.setBounds(area.toNearestInt());
     showName.setJustificationType(Justification::topRight);
-    //showName.toFront(false);
+    showName.toFront(false);
     
     topSlider->setBounds(area);
     

@@ -57,8 +57,8 @@ private:
     TextButton  pianoB;
     TextButton  galleryB;
     
-    BKComboBox                          galleryCB;
-    BKEditableComboBox                  pianoCB;
+    BKComboBox galleryCB;
+    BKEditableComboBox pianoCB;
     
     BKButtonAndMenuLAF buttonsAndMenusLAF;
     
