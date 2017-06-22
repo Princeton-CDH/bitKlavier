@@ -58,6 +58,8 @@ BKViewController(p, theGraph)
     addAndMakeVisible(A1reset);
     
     updateComponentVisibility();
+    
+    update();
 }
 
 void TempoViewController::resized()
@@ -364,6 +366,50 @@ void TempoModificationEditor::fillSelectCB(void)
     
 }
 
+void TempoModificationEditor::update(void)
+{
+    fillSelectCB();
+    selectCB.setSelectedItemIndex(processor.updateState->currentModTempoId, dontSendNotification);
+    
+    TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
+    
+    // NEED TO MAKE SURE THIS IS LINKED TO RIGHT ITEM, need better way of doing this
+    int targetId = processor.currentPiano->getMapper(PreparationTypeTempo, processor.updateState->currentModTempoId)->getId();
+    
+    TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(targetId);
+    
+    String val = mod->getParam(TempoSystem);
+    if (val != String::empty)   modeCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+    //else                        modeCB.setSelectedItemIndex((int)prep->getTempoSystem(), dontSendNotification);
+    
+    val = mod->getParam(TempoBPM);
+    if (val != String::empty)   tempoSlider->setValue(val.getFloatValue(), dontSendNotification);
+    //else                        tempoSlider->setValue(prep->getTempo(), dontSendNotification);
+    
+    val = mod->getParam(AT1Mode);
+    if (val != String::empty)   A1ModeCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+    //else                        A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempo1Mode(), dontSendNotification);
+    
+    val = mod->getParam(AT1History);
+    if (val != String::empty)   AT1HistorySlider->setValue(val.getIntValue(), dontSendNotification);
+    //else                        AT1HistorySlider->setValue(prep->getAdaptiveTempo1History(), dontSendNotification);
+    
+    val = mod->getParam(AT1Subdivisions);
+    if (val != String::empty)   AT1SubdivisionsSlider->setValue(val.getFloatValue(), dontSendNotification);
+    //else                        AT1SubdivisionsSlider->setValue(prep->getAdaptiveTempo1Subdivisions(), dontSendNotification);
+    
+    val = mod->getParam(AT1Min);
+    if (val != String::empty)   AT1MinMaxSlider->setMinValue(val.getDoubleValue(), dontSendNotification);
+    //else                        AT1MinMaxSlider->setMinValue(prep->getAdaptiveTempo1Min(), dontSendNotification);
+    
+    val = mod->getParam(AT1Max);
+    if (val != String::empty)   AT1MinMaxSlider->setMaxValue(val.getDoubleValue(), dontSendNotification);
+    //else                        AT1MinMaxSlider->setMaxValue(prep->getAdaptiveTempo1Max(), dontSendNotification);
+    
+    updateComponentVisibility();
+}
+
+
 void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
@@ -385,8 +431,11 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
         
         update();
         updateComponentVisibility();
+        
+        return;
     }
-    else if (name == modeCB.getName())
+    
+    if (name == modeCB.getName())
     {
         mod->setParam(TempoSystem, String(modeCB.getSelectedItemIndex()));
         
@@ -396,12 +445,17 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         mod->setParam(AT1Mode, String(A1ModeCB.getSelectedItemIndex()));
     }
+    
+    updateModification();
+    
 }
 
 
 void TempoModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
     processor.gallery->getTempo(processor.updateState->currentModTempoId)->setName(name);
+    
+    updateModification();
 }
 
 void TempoModificationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
@@ -413,57 +467,10 @@ void TempoModificationEditor::BKRangeSliderValueChanged(String name, double minv
         mod->setParam(AT1Min, String(minval));
         mod->setParam(AT1Max, String(maxval));
     }
+    
+    updateModification();
 }
 
-void TempoModificationEditor::update(void)
-{
-    fillSelectCB();
-    selectCB.setSelectedItemIndex(processor.updateState->currentModTempoId, dontSendNotification);
-    
-    TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
-    
-    // NEED TO MAKE SURE THIS IS LINKED TO RIGHT ITEM, need better way of doing this
-    int targetId = processor.currentPiano->getMapper(PreparationTypeTempo, processor.updateState->currentModTempoId)->getId();
-    
-    TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(targetId);
-    
-    String val = mod->getParam(TempoSystem);
-    
-    if (val != String::empty)   modeCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-    else                        modeCB.setSelectedItemIndex((int)prep->getTempoSystem(), dontSendNotification);
-    
-    val = mod->getParam(TempoBPM);
-    
-    if (val != String::empty)   tempoSlider->setValue(val.getFloatValue(), dontSendNotification);
-    else                        tempoSlider->setValue(prep->getTempo(), dontSendNotification);
-    
-    val = mod->getParam(AT1Mode);
-    
-    if (val != String::empty)   A1ModeCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-    else                        A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempo1Mode(), dontSendNotification);
-    
-    val = mod->getParam(AT1History);
-    
-    if (val != String::empty)   AT1HistorySlider->setValue(val.getIntValue(), dontSendNotification);
-    else                        AT1HistorySlider->setValue(prep->getAdaptiveTempo1History(), dontSendNotification);
-    
-    val = mod->getParam(AT1Subdivisions);
-    
-    if (val != String::empty)   AT1SubdivisionsSlider->setValue(val.getFloatValue(), dontSendNotification);
-    else                        AT1SubdivisionsSlider->setValue(prep->getAdaptiveTempo1Subdivisions(), dontSendNotification);
-    
-    val = mod->getParam(AT1Min);
-    
-    if (val != String::empty)   AT1MinMaxSlider->setMinValue(val.getDoubleValue(), dontSendNotification);
-    else                        AT1MinMaxSlider->setMinValue(prep->getAdaptiveTempo1Min(), dontSendNotification);
-    
-    val = mod->getParam(AT1Max);
-    
-    if (val != String::empty)   AT1MinMaxSlider->setMaxValue(val.getDoubleValue(), dontSendNotification);
-    else                        AT1MinMaxSlider->setMaxValue(prep->getAdaptiveTempo1Max(), dontSendNotification);
-    
-    updateComponentVisibility();
-}
 
 
 void TempoModificationEditor::BKSingleSliderValueChanged(String name, double val)
@@ -483,6 +490,12 @@ void TempoModificationEditor::BKSingleSliderValueChanged(String name, double val
         mod->setParam(AT1Subdivisions, String(val));
     }
     
+    updateModification();
+    
 }
 
+void TempoModificationEditor::updateModification(void)
+{
+    processor.updateState->modificationDidChange = true;
+}
 

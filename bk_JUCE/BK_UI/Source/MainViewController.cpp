@@ -173,6 +173,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
 
 void MainViewController::timerCallback()
 {
+    BKUpdateState::Ptr state = processor.updateState;
     
     if (++timerCallbackCount >= 100)
     {
@@ -183,9 +184,9 @@ void MainViewController::timerCallback()
     
     header.update();
     
-    if (processor.updateState->generalSettingsDidChange)
+    if (state->generalSettingsDidChange)
     {
-        processor.updateState->generalSettingsDidChange = false;
+        state->generalSettingsDidChange = false;
         overtop.gvc.update();
     }
     
@@ -194,69 +195,76 @@ void MainViewController::timerCallback()
     if(genGain != mainSlider->getValue())
         mainSlider->setValue(Decibels::gainToDecibels(gen->getGlobalGain()), dontSendNotification);
     
-    if (processor.updateState->idDidChange)
+    if (state->modificationDidChange)
     {
-        processor.updateState->idDidChange = false;
+        state->modificationDidChange = false;
+        
+        construction.reconfigureCurrentItem();
+    }
+    
+    if (state->idDidChange)
+    {
+        state->idDidChange = false;
         
         construction.idDidChange();
     }
     
-    if (processor.updateState->directPreparationDidChange)
+    if (state->directPreparationDidChange)
     {
-        processor.updateState->directPreparationDidChange = false;
+        state->directPreparationDidChange = false;
         
         overtop.dvc.update();
         overtop.dvcm.update();
     }
     
-    if (processor.updateState->nostalgicPreparationDidChange)
+    if (state->nostalgicPreparationDidChange)
     {
-        processor.updateState->nostalgicPreparationDidChange = false;
+        state->nostalgicPreparationDidChange = false;
         
         overtop.nvc.update();
         overtop.nvcm.update();
     }
     
-    if (processor.updateState->synchronicPreparationDidChange)
+    if (state->synchronicPreparationDidChange)
     {
-        processor.updateState->synchronicPreparationDidChange = false;
+        state->synchronicPreparationDidChange = false;
         
         overtop.svc.update();
         overtop.svcm.update();
     }
     
-    if (processor.updateState->tuningPreparationDidChange)
+    if (state->tuningPreparationDidChange)
     {
-        processor.updateState->tuningPreparationDidChange = false;
+        state->tuningPreparationDidChange = false;
         
         overtop.tvc.update();
         overtop.tvcm.update();
     }
     
-    if (processor.updateState->tempoPreparationDidChange)
+    if (state->tempoPreparationDidChange)
     {
-        processor.updateState->tempoPreparationDidChange = false;
+        state->tempoPreparationDidChange = false;
         
         overtop.ovc.update();
         overtop.ovcm.update();
     }
     
-    if (processor.updateState->pianoDidChangeForGraph)
+    if (state->pianoDidChangeForGraph)
     {
-        processor.updateState->pianoDidChangeForGraph = false;
+        state->pianoDidChangeForGraph = false;
         
         construction.redraw();
     }
     
     
-    if (processor.updateState->keymapDidChange)
+    if (state->keymapDidChange)
     {
         processor.updateState->keymapDidChange = false;
     
         overtop.kvc.reset();
     }
     
-    if (processor.updateState->displayDidChange)
+    if (state->displayDidChange)
     {
         processor.updateState->displayDidChange = false;
         

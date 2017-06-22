@@ -52,6 +52,7 @@ public:
     bool tempoPreparationDidChange = false;
     bool generalSettingsDidChange = false;
     bool keymapDidChange = false;
+    bool modificationDidChange = false;
     
     BKPreparationDisplay currentDisplay = DisplayNil;
     bool displayDidChange;

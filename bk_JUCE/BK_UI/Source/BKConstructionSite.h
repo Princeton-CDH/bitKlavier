@@ -45,6 +45,7 @@ public:
     inline BKItem* getCurrentItem(void) { return currentItem;}
 
     void idDidChange(void);
+    void reconfigureCurrentItem(void);
     
 private:
     

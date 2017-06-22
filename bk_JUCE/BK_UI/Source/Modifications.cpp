@@ -131,13 +131,16 @@ void Modifications::removeDirectModification(DirectModification::Ptr m)
 
 void Modifications::removeDirectModification(int which)
 {
-    for (int i = directMods.size(); --i >= 0;)
+    for (int i = 0; i < directMods.size(); i++)
     {
+        DBG("trying to remove: " + String(which));
+        DBG("dmod ID: " + String(directMods[i]->getId()));
         if (directMods[i]->getId() == which)
         {
             directMods.remove(i);
             break;
         }
+        
     }
 }
 

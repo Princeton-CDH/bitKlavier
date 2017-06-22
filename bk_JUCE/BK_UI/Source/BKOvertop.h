@@ -142,50 +142,62 @@ public:
         if (type == DisplayKeymap)
         {
             addAndMakeVisible(&kvc);
+            //kvc.update();
         }
         else if (type == DisplayGeneral)
         {
             addAndMakeVisible(&gvc);
+            gvc.update();
         }
         else if (type == DisplayTuning)
         {
             addAndMakeVisible(&tvc);
+            tvc.update();
         }
         else if (type == DisplayTempo)
         {
             addAndMakeVisible(&ovc);
+            ovc.update();
         }
         else if (type == DisplaySynchronic)
         {
             addAndMakeVisible(&svc);
+            svc.update();
         }
         else if (type == DisplayNostalgic)
         {
             addAndMakeVisible(&nvc);
+            nvc.update();
         }
         else if (type == DisplayDirect)
         {
             addAndMakeVisible(&dvc);
+            dvc.update();
         }
         else if (type == DisplayTuningMod)
         {
             addAndMakeVisible(&tvcm);
+            tvcm.update();
         }
         else if (type == DisplayTempoMod)
         {
             addAndMakeVisible(&ovcm);
+            ovcm.update();
         }
         else if (type == DisplaySynchronicMod)
         {
             addAndMakeVisible(&svcm);
+            svcm.update();
         }
         else if (type == DisplayNostalgicMod)
         {
             addAndMakeVisible(&nvcm);
+            nvcm.update();
         }
         else if (type == DisplayDirectMod)
         {
             addAndMakeVisible(&dvcm);
+            dvcm.update();
         }
         
     }

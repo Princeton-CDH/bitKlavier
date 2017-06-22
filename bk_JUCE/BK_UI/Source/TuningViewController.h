@@ -23,6 +23,8 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     
+    virtual void update(void) {};
+    
 protected:
     //basics
     BKEditableComboBox selectCB;
@@ -90,7 +92,7 @@ public:
     
     void timerCallback() override;
     
-    void update(void);
+    void update(void) override;
     
 private:
     
@@ -115,7 +117,8 @@ public:
     TuningModificationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
     ~TuningModificationEditor() {};
     
-    void update(void);
+    void update(void) override;
+    void updateModification(void);
     
 private:
     

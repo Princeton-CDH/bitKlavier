@@ -24,6 +24,8 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     
+    virtual void update(void) {};
+    
 protected:
     
     OwnedArray<BKLabel> synchronicL;
@@ -70,7 +72,7 @@ public:
     SynchronicPreparationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
     ~SynchronicPreparationEditor() {};
     
-    void update(void);
+    void update(void) override;
     
     void update(NotificationType notify);
     
@@ -107,9 +109,10 @@ public:
     SynchronicModificationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
     ~SynchronicModificationEditor() {};
     
-    void update(void);
+    void update(void) override;
     
     void update(NotificationType notify);
+    void updateModification(void);
     
     void timerCallback() override;
     

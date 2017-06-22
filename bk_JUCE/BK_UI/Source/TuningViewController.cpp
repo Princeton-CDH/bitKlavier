@@ -100,6 +100,8 @@ BKViewController(p, theGraph)
     lastInterval.setText("last interval: ", dontSendNotification);
     addAndMakeVisible(lastNote);
     addAndMakeVisible(lastInterval);
+    
+    update();
 }
 
 void TuningViewController::resized()
@@ -538,54 +540,44 @@ void TuningModificationEditor::update(void)
     selectCB.setSelectedItemIndex(processor.updateState->currentModTuningId, dontSendNotification);
     
     String val = mod->getParam(TuningScale);
-    
     if (val != String::empty)   scaleCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-    else                        scaleCB.setSelectedItemIndex(prep->getTuning(), dontSendNotification);
+    //else                        scaleCB.setSelectedItemIndex(prep->getTuning(), dontSendNotification);
     
     val = mod->getParam(TuningFundamental);
-    
     if (val != String::empty)   fundamentalCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-    else                        fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
+    //else                        fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
     
     val = mod->getParam(TuningOffset);
-    
     if (val != String::empty)   offsetSlider->setValue(val.getFloatValue() * 100., dontSendNotification);
-    else                        offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
+    //else                        offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
     
     val = mod->getParam(TuningAbsoluteOffsets);
-    
     if (val != String::empty)   absoluteKeyboard.setValues(stringToFloatArray(val));
-    else                        absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
+    //else                        absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
     
     val = mod->getParam(TuningA1IntervalScale);
-    
     if (val != String::empty)   A1IntervalScaleCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-    else                        A1IntervalScaleCB.setSelectedItemIndex(prep->getAdaptiveIntervalScale(), dontSendNotification);
+    //else                        A1IntervalScaleCB.setSelectedItemIndex(prep->getAdaptiveIntervalScale(), dontSendNotification);
     
     val = mod->getParam(TuningA1Inversional);
-    
     if (val != String::empty)   A1Inversional.setToggleState((bool)val.getIntValue(), dontSendNotification);
-    else                        A1Inversional.setToggleState(prep->getAdaptiveInversional(), dontSendNotification);
+    //else                        A1Inversional.setToggleState(prep->getAdaptiveInversional(), dontSendNotification);
     
     val = mod->getParam(TuningA1AnchorScale);
-    
     if (val != String::empty)   A1AnchorScaleCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-    else                        A1AnchorScaleCB.setSelectedItemIndex(prep->getAdaptiveAnchorScale(), dontSendNotification);
+    //else                        A1AnchorScaleCB.setSelectedItemIndex(prep->getAdaptiveAnchorScale(), dontSendNotification);
     
     val = mod->getParam(TuningA1AnchorFundamental);
-    
     if (val != String::empty)   A1FundamentalCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-    else                        A1FundamentalCB.setSelectedItemIndex(prep->getAdaptiveAnchorFundamental(), dontSendNotification);
+    //else                        A1FundamentalCB.setSelectedItemIndex(prep->getAdaptiveAnchorFundamental(), dontSendNotification);
     
     val = mod->getParam(TuningA1ClusterThresh);
-    
     if (val != String::empty)   A1ClusterThresh->setValue(val.getLargeIntValue(), dontSendNotification);
-    else                        A1ClusterThresh->setValue(prep->getAdaptiveClusterThresh(), dontSendNotification);
+    //else                        A1ClusterThresh->setValue(prep->getAdaptiveClusterThresh(), dontSendNotification);
     
     val = mod->getParam(TuningA1ClusterThresh);
-    
     if (val != String::empty)   A1ClusterMax->setValue(val.getIntValue(), dontSendNotification);
-    else                        A1ClusterMax->setValue(prep->getAdaptiveHistory(), dontSendNotification);
+    //else                        A1ClusterMax->setValue(prep->getAdaptiveHistory(), dontSendNotification);
     
     updateComponentVisibility();
 }
@@ -617,21 +609,23 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == selectCB.getName())
     {
-        processor.updateState->currentTuningId = box->getSelectedItemIndex();
+        processor.updateState->currentModTuningId = box->getSelectedItemIndex();
         
         processor.updateState->idDidChange = true;
         
         if (processor.updateState->currentTuningId == selectCB.getNumItems()-1)
         {
-            processor.gallery->addTuning();
+            processor.gallery->addTuningMod();
             
             fillSelectCB();
         }
         
         //update(sendNotification);
         update();
+        return;
     }
-    else if (name == scaleCB.getName())
+    
+    if (name == scaleCB.getName())
     {
         mod->setParam(TuningScale, String(scaleCB.getSelectedItemIndex()));
         
@@ -657,12 +651,16 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
         mod->setParam(TuningA1AnchorFundamental, String(A1FundamentalCB.getSelectedItemIndex()));
     }
     
+    updateModification();
+    
     updateComponentVisibility();
 }
 
 void TuningModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
     processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId)->setName(name);
+    
+    updateModification();
 }
 
 void TuningModificationEditor::keyboardSliderChanged(String name, Array<float> values)
@@ -680,6 +678,8 @@ void TuningModificationEditor::keyboardSliderChanged(String name, Array<float> v
         mod->setParam(TuningCustomScale, floatArrayToString(values));
         mod->setParam(TuningScale, String(customIndex));
     }
+    
+    updateModification();
 }
 
 void TuningModificationEditor::BKSingleSliderValueChanged(String name, double val)
@@ -698,6 +698,13 @@ void TuningModificationEditor::BKSingleSliderValueChanged(String name, double va
     {
         mod->setParam(TuningA1History, String(val));
     }
+    
+    updateModification();
+}
+
+void TuningModificationEditor::updateModification(void)
+{
+    processor.updateState->modificationDidChange = true;
 }
 
 

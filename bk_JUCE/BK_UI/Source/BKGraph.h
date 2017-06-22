@@ -75,7 +75,9 @@ public:
     {
         for (auto item : connections)
         {
-            DBG(cPreparationTypes[type]+String(Id)+" ==> " +cPreparationTypes[item->getType()]+String(item->getId()));
+            DBG(cPreparationTypes[type]+((Id >= 0) ? String(Id) : "") +
+                " ==> " +
+                cPreparationTypes[item->getType()]+((item->getId() >= 0) ? String(item->getId()) : ""));
         }
     }
     

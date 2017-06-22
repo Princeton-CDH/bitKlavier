@@ -438,9 +438,36 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
     
 }
 
-void BKConstructionSite::idDidChange(void)
+void BKConstructionSite::reconfigureCurrentItem(void)
 {
     BKPreparationType type = currentItem->getType();
+    
+    BKItem::PtrArr connections;
+    
+    for (auto item : currentItem->getConnections())
+    {
+        connections.add(item);
+        
+        graph->disconnect(currentItem, item);
+    }
+    
+    for (auto item : connections)   graph->connect(currentItem, item);
+}
+
+void BKConstructionSite::idDidChange(void)
+{
+    BKItem::PtrArr connections;
+    
+    for (auto item : currentItem->getConnections())
+    {
+        connections.add(item);
+        
+        graph->disconnect(currentItem, item);
+    }
+    
+    
+    BKPreparationType type = currentItem->getType();
+    
     int newId = -1;
     
     if (type == PreparationTypeKeymap)          newId = processor.updateState->currentKeymapId;
@@ -453,7 +480,7 @@ void BKConstructionSite::idDidChange(void)
     {
         ModificationMapper::Ptr thisMapper = currentItem->getMapper();
         BKPreparationType modType = thisMapper->getType();
-        
+    
         if (modType == PreparationTypeDirect)
         {
             currentItem->getMapper()->setId(processor.updateState->currentModDirectId);
@@ -474,24 +501,15 @@ void BKConstructionSite::idDidChange(void)
         {
             currentItem->getMapper()->setId(processor.updateState->currentModTempoId);
         }
-
         
     }
     
-    if (type <= PreparationTypeTempo && currentItem->getId() == newId) return;
-    
-    BKItem::PtrArr connections;
-    
-    for (auto item : currentItem->getConnections())
-    {
-        connections.add(item);
-        
-        graph->disconnect(currentItem, item);
-    }
-    
-    if (type <= PreparationTypeTempo) currentItem->setId(newId);
+    currentItem->setId(newId);
     
     for (auto item : connections)   graph->connect(currentItem, item);
+    
+    
+    
 }
 
 void BKConstructionSite::deleteItem (BKItem* item)

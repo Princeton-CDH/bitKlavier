@@ -31,7 +31,7 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     
-    void update(void) ;
+    virtual void update(void) {};
     
 
 private:
@@ -49,7 +49,7 @@ public:
     DirectPreparationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
     ~DirectPreparationEditor() {};
     
-    void update(void);
+    void update(void) override;
     
     void bkMessageReceived (const String& message) override;
     void bkComboBoxDidChange (ComboBox* box) override;
@@ -76,7 +76,8 @@ public:
     DirectModificationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
     ~DirectModificationEditor() {};
     
-    void update(void);
+    void update(void) override;
+    void updateModification(void);
     
     void bkMessageReceived (const String& message) override;
     void bkComboBoxDidChange (ComboBox* box) override;

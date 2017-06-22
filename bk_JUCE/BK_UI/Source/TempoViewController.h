@@ -23,6 +23,8 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     
+    virtual void update(void){};
+    
 protected:
     BKLabel selectLabel;
     BKEditableComboBox selectCB;
@@ -51,6 +53,8 @@ protected:
     
 private:
     
+    
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TempoViewController)
 };
 
@@ -68,7 +72,7 @@ public:
     
     void timerCallback() override;
     
-    void update(void);
+    void update(void) override;
     
     void fillSelectCB(void);
 
@@ -89,17 +93,20 @@ class TempoModificationEditor :
 public TempoViewController,
 public BKEditableComboBoxListener,
 public BKRangeSliderListener,
-public BKSingleSliderListener
+public BKSingleSliderListener,
+private Timer
 {
 public:
     
     TempoModificationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
     ~TempoModificationEditor(){};
     
-    void update(void);
+    void update(void) override;
+    void updateModification(void);
     
     void fillSelectCB(void);
     
+    void timerCallback(void) override {};
 private:
     void bkComboBoxDidChange (ComboBox* box) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;

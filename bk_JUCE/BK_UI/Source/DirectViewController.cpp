@@ -33,11 +33,13 @@ BKViewController(p, theGraph)
     hammerGainSlider->setSkewFactorFromMidPoint(1.);
     addAndMakeVisible(hammerGainSlider);
     
+    update();
+    
 }
 
 void DirectViewController::paint (Graphics& g)
 {
-    g.fillAll(Colours::transparentWhite);
+    g.fillAll(Colours::lightgrey);
 }
 
 void DirectViewController::resized()
@@ -61,6 +63,7 @@ DirectPreparationEditor::DirectPreparationEditor(BKAudioProcessor& p, BKItemGrap
 DirectViewController(p, theGraph)
 {
     selectCB.addMyListener(this);
+    selectCB.addListener(this);
     
     fillSelectCB();
     
@@ -184,8 +187,9 @@ void DirectPreparationEditor::fillSelectCB(void)
 DirectModificationEditor::DirectModificationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
 DirectViewController(p, theGraph)
 {
-    selectCB.addMyListener(this);
+    
     selectCB.addListener(this);
+    selectCB.addMyListener(this);
     
     fillSelectCB();
     
@@ -201,18 +205,45 @@ DirectViewController(p, theGraph)
 void DirectModificationEditor::update(void)
 {
     
-    if (processor.updateState->currentDirectId < 0) return;
+    if (processor.updateState->currentModDirectId < 0) return;
     
     fillSelectCB();
     
-    DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
+    selectCB.setSelectedItemIndex(processor.updateState->currentModDirectId, dontSendNotification);
     
-    selectCB.setSelectedItemIndex(processor.updateState->currentDirectId, dontSendNotification);
+    DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
     
-    transpositionSlider->setValue(prep->getTransposition(), dontSendNotification);
-    resonanceGainSlider->setValue(prep->getResonanceGain(), dontSendNotification);
-    hammerGainSlider->setValue(prep->getHammerGain(), dontSendNotification);
-    gainSlider->setValue(prep->getGain(), dontSendNotification);
+    
+    String val = mod->getParam(DirectTransposition);
+    /*if (val != String::empty)*/   transpositionSlider->setValue(stringToFloatArray(val), dontSendNotification);
+    
+    val = mod->getParam(DirectResGain);
+    /*if (val != String::empty) */  resonanceGainSlider->setValue(val.getFloatValue(), dontSendNotification);
+    
+    val = mod->getParam(DirectHammerGain);
+    /*if (val != String::empty)*/   hammerGainSlider->setValue(val.getFloatValue(), dontSendNotification);
+    
+    val = mod->getParam(DirectGain);
+    /*if (val != String::empty)*/   gainSlider->setValue(val.getFloatValue(), dontSendNotification);
+}
+
+void DirectModificationEditor::fillSelectCB(void)
+{
+    // Direct menu
+    StringArray mods = processor.gallery->getAllDirectModNames();
+    
+    selectCB.clear(dontSendNotification);
+    for (int i = 0; i < mods.size(); i++)
+    {
+        String name = mods[i];
+        if (name != String::empty)  selectCB.addItem(name, i+1);
+        else                        selectCB.addItem(String(i+1), i+1);
+    }
+    
+    selectCB.addItem("New direct modification...", mods.size()+1);
+    
+    selectCB.setSelectedItemIndex(processor.updateState->currentModDirectId, NotificationType::dontSendNotification);
+
     
 }
 
@@ -220,7 +251,6 @@ void DirectModificationEditor::bkMessageReceived (const String& message)
 {
     if (message == "direct/update")
     {
-        
         update();
     }
 }
@@ -231,76 +261,64 @@ void DirectModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == "Direct")
     {
-        processor.updateState->currentDirectId = box->getSelectedItemIndex();
+        processor.updateState->currentModDirectId = box->getSelectedItemIndex();
         
         processor.updateState->idDidChange = true;
         
-        if (processor.updateState->currentDirectId == selectCB.getNumItems()-1)
+        
+        if (processor.updateState->currentModDirectId == selectCB.getNumItems()-1)
         {
-            processor.gallery->addDirect();
+            processor.gallery->addDirectMod();
             
             fillSelectCB();
         }
         
         update();
+        
+        return;
     }
 }
 
 void DirectModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    processor.gallery->getDirect(processor.updateState->currentDirectId)->setName(name);
+    processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId)->setName(name);
+    
+    updateModification();
 }
 
 
 void DirectModificationEditor::BKSingleSliderValueChanged(String name, double val)
 {
-    DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
-    DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
+    DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
     
     if(name == "resonance gain")
     {
-        //DBG("note length multiplier " + String(val));
-        prep->setResonanceGain(val);
-        active->setResonanceGain(val);
+        mod->setParam(DirectResGain, String(val));
     }
     else if(name == "hammer gain")
     {
-        //DBG("beats to skip " + String(val));
-        prep->setHammerGain(val);
-        active->setHammerGain(val);
+        mod->setParam(DirectHammerGain, String(val));
     }
     else if(name == "gain")
     {
-        //DBG("gain " + String(val));
-        prep->setGain(val);
-        active->setGain(val);
+        mod->setParam(DirectGain, String(val));
     }
+    
+    updateModification();
 }
 
 void DirectModificationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {
-    DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
-    DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
+    DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
     
-    prep->setTransposition(val);
-    active->setTransposition(val);
+    mod->setParam(DirectTransposition, floatArrayToString(val));
+    
+    updateModification();
 }
 
-void DirectModificationEditor::fillSelectCB(void)
+void DirectModificationEditor::updateModification(void)
 {
-    // Direct menu
-    Direct::PtrArr newpreps = processor.gallery->getAllDirect();
-    
-    selectCB.clear(dontSendNotification);
-    for (int i = 0; i < newpreps.size(); i++)
-    {
-        String name = newpreps[i]->getName();
-        if (name != String::empty)  selectCB.addItem(name, i+1);
-        else                        selectCB.addItem(String(i+1), i+1);
-    }
-    
-    selectCB.addItem("New direct...", newpreps.size()+1);
-    
-    selectCB.setSelectedItemIndex(processor.updateState->currentDirectId, NotificationType::dontSendNotification);
-    
+    processor.updateState->modificationDidChange = true;
 }
+
+

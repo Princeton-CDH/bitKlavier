@@ -187,37 +187,37 @@ void BKItem::mouseDown(const MouseEvent& e)
         {
             processor.updateState->currentDirectId = Id;
             processor.updateState->directPreparationDidChange = true;
-            processor.updateState->currentDisplay = DisplayDirect;
+            processor.updateState->setCurrentDisplay(DisplayDirect);
         }
         else if (type == PreparationTypeSynchronic)
         {
             processor.updateState->currentSynchronicId = Id;
             processor.updateState->synchronicPreparationDidChange = true;
-            processor.updateState->currentDisplay = DisplaySynchronic;
+            processor.updateState->setCurrentDisplay(DisplaySynchronic);
         }
         else if (type == PreparationTypeNostalgic)
         {
             processor.updateState->currentNostalgicId = Id;
             processor.updateState->nostalgicPreparationDidChange = true;
-            processor.updateState->currentDisplay = DisplayNostalgic;
+            processor.updateState->setCurrentDisplay(DisplayNostalgic);
         }
         else if (type == PreparationTypeTuning)
         {
             processor.updateState->currentTuningId = Id;
             processor.updateState->tuningPreparationDidChange = true;
-            processor.updateState->currentDisplay = DisplayTuning;
+            processor.updateState->setCurrentDisplay(DisplayTuning);
         }
         else if (type == PreparationTypeTempo)
         {
             processor.updateState->currentTempoId = Id;
             processor.updateState->tempoPreparationDidChange = true;
-            processor.updateState->currentDisplay = DisplayTempo;
+            processor.updateState->setCurrentDisplay(DisplayTempo);
         }
         else if (type == PreparationTypeKeymap)
         {
             processor.updateState->currentKeymapId = Id;
             processor.updateState->keymapDidChange = true;
-            processor.updateState->currentDisplay = DisplayKeymap;
+            processor.updateState->setCurrentDisplay(DisplayKeymap);
         }
         else if (type == PreparationTypeMod)
         {
@@ -228,31 +228,31 @@ void BKItem::mouseDown(const MouseEvent& e)
             {
                 processor.updateState->currentModDirectId = modId;
                 processor.updateState->directDidChange = true;
-                processor.updateState->currentDisplay = DisplayDirectMod;
+                processor.updateState->setCurrentDisplay(DisplayDirectMod);
             }
             else if (modType == PreparationTypeNostalgic)
             {
                 processor.updateState->currentModNostalgicId = modId;
                 processor.updateState->nostalgicPreparationDidChange = true;
-                processor.updateState->currentDisplay = DisplayNostalgicMod;
+                processor.updateState->setCurrentDisplay(DisplayNostalgicMod);
             }
             else if (modType == PreparationTypeSynchronic)
             {
                 processor.updateState->currentModSynchronicId = modId;
                 processor.updateState->synchronicPreparationDidChange = true;
-                processor.updateState->currentDisplay = DisplaySynchronicMod;
+                processor.updateState->setCurrentDisplay(DisplaySynchronicMod);
             }
             else if (modType == PreparationTypeTuning)
             {
                 processor.updateState->currentModTuningId = modId;
                 processor.updateState->tuningPreparationDidChange = true;
-                processor.updateState->currentDisplay = DisplayTuningMod;
+                processor.updateState->setCurrentDisplay(DisplayTuningMod);
             }
             else if (modType == PreparationTypeTempo)
             {
                 processor.updateState->currentModTempoId = modId;
                 processor.updateState->tempoPreparationDidChange = true;
-                processor.updateState->currentDisplay = DisplayTempoMod;
+                processor.updateState->setCurrentDisplay(DisplayTuningMod);
             }
         }
         else if (type == PreparationTypePianoMap)
@@ -260,8 +260,7 @@ void BKItem::mouseDown(const MouseEvent& e)
             menu.showPopup();
         }
     }
-    
-    processor.updateState->displayDidChange = true;
+
 }
 
 void BKItem::keyPressedWhileSelected(const KeyPress& e)
@@ -740,12 +739,12 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         if (thisMapper->getType() == BKPreparationTypeNil)
         {
-            processor.gallery->addMod(modType);
+            //processor.gallery->addMod(modType);
             
-            int modId = processor.gallery->getNumMod(modType)-1;
+            ///int modId = processor.gallery->getNumMod(modType)-1;
             
             thisMapper->setType(modType);
-            thisMapper->setId(modId);
+            thisMapper->setId(0);
         }
         
         if (thisMapper->getType() == item2Type)
@@ -773,12 +772,12 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         if (thisMapper->getType() == BKPreparationTypeNil)
         {
-            processor.gallery->addMod(modType);
+            //processor.gallery->addMod(modType);
             
-            int modId = processor.gallery->getNumMod(modType)-1;
+            //int modId = processor.gallery->getNumMod(modType)-1;
             
             thisMapper->setType(modType);
-            thisMapper->setId(modId);
+            thisMapper->setId(0);
         }
         
         if (thisMapper->getType() == item1Type)

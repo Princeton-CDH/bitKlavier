@@ -79,7 +79,7 @@ void Piano::configureDirectModification(int key, DirectModPreparation::Ptr dmod,
             {
                 modificationMap[key]->addDirectModification(new DirectModification(key, prep, (DirectParameterType)n, param, whichMod));
                 
-                //DBG("ADD whichmod: " + String(whichMod) + " whichprep: " + String(prep) + " whichtype: " + cDirectParameterTypes[n] + " val: " +param + " TO key: " + String(key));
+                DBG("ADD whichmod: " + String(whichMod) + " whichprep: " + String(prep) + " whichtype: " + cDirectParameterTypes[n] + " val: " +param + " TO key: " + String(key));
             }
         }
     }
@@ -128,7 +128,7 @@ void Piano::deconfigureDirectModification(DirectModPreparation::Ptr mod, Array<i
         for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
         {
             // Remove Modification from Key
-            modificationMap[key]->removeDirectModification(whichMod);
+            modificationMap.getUnchecked(key)->removeDirectModification(whichMod);
         }
     }
 }

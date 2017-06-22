@@ -34,6 +34,8 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     
+    virtual void update(void) {};
+    
     void fillModeSelectCB(void);
     
 private:
@@ -57,7 +59,7 @@ public:
     ~NostalgicPreparationEditor() {};
     
     
-    void update(void) ;
+    void update(void) override;
     
     void bkMessageReceived (const String& message) override;
     void bkComboBoxDidChange (ComboBox* box) override;
@@ -93,7 +95,9 @@ public:
     ~NostalgicModificationEditor() {};
     
     
-    void update(void) ;
+    void update(void) override;
+    
+    void updateModification(void);
     
     void bkMessageReceived (const String& message) override;
     void bkComboBoxDidChange (ComboBox* box) override;
