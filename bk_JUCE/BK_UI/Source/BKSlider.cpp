@@ -208,6 +208,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     editValsTextField = new TextEditor();
     editValsTextField->setMultiLine(true);
     editValsTextField->setName("PARAMTXTEDIT");
+    editValsTextField->setColour(TextEditor::highlightColourId, Colours::darkgrey);
     editValsTextField->addListener(this);
     addAndMakeVisible(editValsTextField);
     
@@ -630,6 +631,8 @@ void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
     
     Range<int> highlightRange(startPoint, endPoint);
     editValsTextField->setHighlightedRegion(highlightRange);
+    
+    focusLostByEscapeKey = false;
 }
 
 
@@ -878,6 +881,17 @@ void BKMultiSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
     }
 }
 
+void BKMultiSlider::textEditorEscapeKeyPressed (TextEditor& textEditor) 
+{
+    if(textEditor.getName() == editValsTextField->getName())
+    {
+        focusLostByEscapeKey = true;
+        editValsTextField->setVisible(false); 
+        editValsTextField->toBack();
+        unfocusAllComponents();
+    }
+}
+
 void BKMultiSlider::textEditorFocusLost(TextEditor& textEditor)
 {
     if(textEditor.getName() == editValsTextField->getName())
@@ -885,14 +899,16 @@ void BKMultiSlider::textEditorFocusLost(TextEditor& textEditor)
         editValsTextField->setVisible(false);
         editValsTextField->toBack();
         
-        setTo(stringToArrayFloatArray(textEditor.getText()), sendNotification);
-        resetRanges();
-        resized();
-        
-        listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
-                       getName(),
-                       getAllActiveValues());
-        
+        if(!focusLostByEscapeKey)
+        {
+            setTo(stringToArrayFloatArray(textEditor.getText()), sendNotification);
+            resetRanges();
+            resized();
+            
+            listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
+                           getName(),
+                           getAllActiveValues());
+        }
     }
 }
 
@@ -1075,6 +1091,8 @@ sliderIncrement(increment)
     
     valueTF.setText(String(sliderDefault));
     valueTF.addListener(this);
+    valueTF.setSelectAllWhenFocused(true);
+    valueTF.setColour(TextEditor::highlightColourId, Colours::darkgrey);
     addAndMakeVisible(valueTF);
     
 }
@@ -1095,14 +1113,33 @@ void BKSingleSlider::sliderValueChanged (Slider *slider)
 void BKSingleSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 {
     double newval = textEditor.getText().getDoubleValue();
-    
     checkValue(newval);
-    
     thisSlider.setValue(newval, sendNotification);
+    
+    unfocusAllComponents();
     
     listeners.call(&BKSingleSliderListener::BKSingleSliderValueChanged,
                    getName(),
                    thisSlider.getValue());
+}
+
+void BKSingleSlider::textEditorTextChanged(TextEditor& textEditor)
+{
+    focusLostByEscapeKey = false;
+}
+
+void BKSingleSlider::textEditorEscapeKeyPressed (TextEditor& textEditor)
+{
+    focusLostByEscapeKey = true;
+    unfocusAllComponents();
+}
+
+void BKSingleSlider::textEditorFocusLost(TextEditor& textEditor)
+{
+    if(!focusLostByEscapeKey)
+    {
+        textEditorReturnKeyPressed(textEditor);
+    }
 }
 
 void BKSingleSlider::checkValue(double newval)
@@ -1208,11 +1245,15 @@ sliderIncrement(increment)
     minValueTF.setText(String(sliderDefaultMin));
     minValueTF.setName("minvalue");
     minValueTF.addListener(this);
+    minValueTF.setSelectAllWhenFocused(true);
+    minValueTF.setColour(TextEditor::highlightColourId, Colours::darkgrey);
     addAndMakeVisible(minValueTF);
     
     maxValueTF.setText(String(sliderDefaultMax));
     maxValueTF.setName("maxvalue");
     maxValueTF.addListener(this);
+    maxValueTF.setSelectAllWhenFocused(true);
+    maxValueTF.setColour(TextEditor::highlightColourId, Colours::darkgrey);
     addAndMakeVisible(maxValueTF);
     
     minSlider.setSliderStyle(Slider::LinearHorizontal);
@@ -1250,6 +1291,7 @@ sliderIncrement(increment)
     isMinAlwaysLessThanMax = false;
 }
 
+
 void BKRangeSlider::setMinValue(double newval, NotificationType notify)
 {
     checkValue(newval);
@@ -1257,6 +1299,7 @@ void BKRangeSlider::setMinValue(double newval, NotificationType notify)
     minValueTF.setText(String(minSlider.getValue()), dontSendNotification);
     rescaleMinSlider();
 }
+
 
 void BKRangeSlider::setMaxValue(double newval, NotificationType notify)
 {
@@ -1266,17 +1309,17 @@ void BKRangeSlider::setMaxValue(double newval, NotificationType notify)
     rescaleMaxSlider();
 }
 
+
 void BKRangeSlider::sliderValueChanged (Slider *slider)
 {
   
     if(slider == &invisibleSlider)
     {
-        
         if(newDrag)
         {
             if(!clickedOnMinSlider)
             {
-                maxSlider.setValue(invisibleSlider.getValue());
+                maxSlider.setValue(invisibleSlider.getValue(), dontSendNotification);
                 maxValueTF.setText(String(maxSlider.getValue()), dontSendNotification);
                 if(isMinAlwaysLessThanMax)
                     if(maxSlider.getValue() < minSlider.getValue())
@@ -1284,7 +1327,7 @@ void BKRangeSlider::sliderValueChanged (Slider *slider)
             }
             else
             {
-                minSlider.setValue(invisibleSlider.getValue());
+                minSlider.setValue(invisibleSlider.getValue(), dontSendNotification);
                 minValueTF.setText(String(minSlider.getValue()), dontSendNotification);
                 if(isMinAlwaysLessThanMax)
                     if(minSlider.getValue() > maxSlider.getValue())
@@ -1298,6 +1341,7 @@ void BKRangeSlider::sliderValueChanged (Slider *slider)
         }
     }
 }
+
 
 void BKRangeSlider::mouseDown (const MouseEvent &event)
 {
@@ -1316,6 +1360,8 @@ void BKRangeSlider::mouseDown (const MouseEvent &event)
             
             newDrag = true;
         }
+        
+        unfocusAllComponents();
     }
 }
 
@@ -1323,7 +1369,9 @@ void BKRangeSlider::mouseDown (const MouseEvent &event)
 void BKRangeSlider::sliderDragEnded(Slider *slider)
 {
     newDrag = false;
+    unfocusAllComponents();
 }
+
 
 void BKRangeSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 {
@@ -1349,16 +1397,36 @@ void BKRangeSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
         rescaleMaxSlider();
     }
     
+    unfocusAllComponents();
+    
     listeners.call(&BKRangeSliderListener::BKRangeSliderValueChanged,
                    getName(),
                    minSlider.getValue(),
                    maxSlider.getValue());
 }
 
+
+void BKRangeSlider::textEditorTextChanged(TextEditor& textEditor)
+{
+    focusLostByEscapeKey = false;
+}
+
+
+void BKRangeSlider::textEditorEscapeKeyPressed (TextEditor& textEditor)
+{
+    focusLostByEscapeKey = true;
+    unfocusAllComponents();
+}
+
+
 void BKRangeSlider::textEditorFocusLost(TextEditor& textEditor)
 {
-    textEditorReturnKeyPressed(textEditor);
+    if(!focusLostByEscapeKey)
+    {
+        textEditorReturnKeyPressed(textEditor);
+    }
 }
+
 
 void BKRangeSlider::checkValue(double newval)
 {
@@ -1374,6 +1442,7 @@ void BKRangeSlider::checkValue(double newval)
         invisibleSlider.setRange(newval, maxSlider.getMaximum(), sliderIncrement);
     }
 }
+
 
 void BKRangeSlider::rescaleMinSlider()
 {
@@ -1454,6 +1523,7 @@ BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
     wavedistanceSlider = new Slider();
     wavedistanceSlider->setRange(sliderMin, sliderMax, sliderIncrement);
     wavedistanceSlider->setSliderStyle(Slider::SliderStyle::LinearBar);
+    wavedistanceSlider->setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.5));
     wavedistanceSlider->addListener(this);
     wavedistanceSlider->setSkewFactor(skewFactor);
     addAndMakeVisible(wavedistanceSlider);
@@ -1461,6 +1531,7 @@ BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
     undertowSlider = new Slider();
     undertowSlider->setRange(sliderMin, sliderMax, sliderIncrement);
     undertowSlider->setSliderStyle(Slider::SliderStyle::LinearBar);
+    undertowSlider->setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.5));
     undertowSlider->addListener(this);
     undertowSlider->setSkewFactor(skewFactor);
     addAndMakeVisible(undertowSlider);
@@ -1473,6 +1544,7 @@ BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
         newSlider->setRange(sliderMin, sliderMax, sliderIncrement);
         newSlider->setLookAndFeel(&displaySliderLookAndFeel);
         newSlider->setSliderStyle(BKSubSlider::SliderStyle::LinearBar);
+        displaySliderLookAndFeel.setColour(Slider::thumbColourId, Colours::deepskyblue.withMultipliedAlpha(0.75));
         newSlider->setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
         newSlider->setInterceptsMouseClicks(false, false);
         newSlider->setSkewFactor(skewFactor);
@@ -1582,6 +1654,7 @@ sliderIncrement(increment)
     editValsTextField->setMultiLine(true);
     editValsTextField->setName("PARAMTXTEDIT");
     editValsTextField->addListener(this);
+    editValsTextField->setColour(TextEditor::highlightColourId, Colours::darkgrey);
     addAndMakeVisible(editValsTextField);
     editValsTextField->setVisible(false);
     
@@ -1634,8 +1707,10 @@ void BKStackedSlider::sliderValueChanged (Slider *slider)
 void BKStackedSlider::addSlider(NotificationType newnotify)
 {
     Array<float> sliderVals = getAllActiveValues();
-    sliderVals.add(sliderDefault);
+    //sliderVals.add(sliderDefault);
+    sliderVals.add(topSlider->proportionOfLengthToValue((double)clickedPosition / getWidth()));
     setTo(sliderVals, newnotify);
+    topSlider->setValue(topSlider->proportionOfLengthToValue((double)clickedPosition / getWidth()), dontSendNotification);
 }
 
 
@@ -1687,6 +1762,8 @@ void BKStackedSlider::setTo(Array<float> newvals, NotificationType newnotify)
     }
     
     resetRanges();
+    
+    topSlider->setValue(dataSliders.getFirst()->getValue(), dontSendNotification);
 }
 
 
@@ -1695,6 +1772,7 @@ void BKStackedSlider::mouseDown (const MouseEvent &event)
     if(event.mouseWasClicked())
     {
         clickedSlider = whichSlider();
+        clickedPosition = event.x;
         
         if(event.mods.isCtrlDown())
         {
@@ -1728,7 +1806,7 @@ void BKStackedSlider::mouseUp(const MouseEvent& e)
 void BKStackedSlider::mouseMove(const MouseEvent& e)
 {
     //topSlider->setValue(topSlider->proportionOfLengthToValue((double)e.x / getWidth()), dontSendNotification);
-    topSlider->setValue(dataSliders.getUnchecked(whichSlider(e))->getValue()); //need to pass e and find closest slider
+    topSlider->setValue(dataSliders.getUnchecked(whichSlider(e))->getValue());
 }
 
 
@@ -1755,6 +1833,8 @@ void BKStackedSlider::mouseDoubleClick (const MouseEvent &e)
     
     Range<int> highlightRange(startPoint, endPoint);
     editValsTextField->setHighlightedRegion(highlightRange);
+    
+    focusLostByEscapeKey = false;
 }
 
 void BKStackedSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
@@ -1777,19 +1857,19 @@ void BKStackedSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 
 void BKStackedSlider::textEditorFocusLost(TextEditor& textEditor)
 {
+    if(!focusLostByEscapeKey) {
+        textEditorReturnKeyPressed(textEditor);
+    }
+}
+
+void BKStackedSlider::textEditorEscapeKeyPressed (TextEditor& textEditor)
+{
     if(textEditor.getName() == editValsTextField->getName())
     {
+        focusLostByEscapeKey = true;
         editValsTextField->setVisible(false);
         editValsTextField->toBack();
-        
-        setTo(stringToFloatArray(textEditor.getText()), sendNotification);
-        clickedSlider = 0;
-        resized();
-        
-        listeners.call(&BKStackedSliderListener::BKStackedSliderValueChanged,
-                       getName(),
-                       getAllActiveValues());
-        
+        unfocusAllComponents();
     }
 }
 

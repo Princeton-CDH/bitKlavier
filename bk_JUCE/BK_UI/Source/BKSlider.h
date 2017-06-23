@@ -114,6 +114,7 @@ public:
     void mouseDoubleClick (const MouseEvent &e) override;
     void mouseDown (const MouseEvent &event) override;
     void mouseUp (const MouseEvent &event) override;
+    void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
     
     void setTo(Array<float> newvals, NotificationType newnotify);
     void setTo(Array<Array<float>> newvals, NotificationType newnotify);
@@ -152,6 +153,7 @@ private:
     bool sliderIsBar;
     int currentSubSlider;
     int lastHighlightedSlider;
+    bool focusLostByEscapeKey;
     
     Slider::SliderStyle subsliderStyle;
     
@@ -238,6 +240,9 @@ public:
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void mouseUp(const MouseEvent &event) override;
     void mouseDrag(const MouseEvent &e) override;
+    void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
+    void textEditorFocusLost(TextEditor& textEditor) override;
+    void textEditorTextChanged(TextEditor& textEditor) override;
     void resized() override;
     
     void setSkewFactor (double factor, bool symmetricSkew) { thisSlider.setSkewFactor(factor, symmetricSkew); }
@@ -252,6 +257,8 @@ private:
     double sliderMin, sliderMax;
     double sliderDefault;
     double sliderIncrement;
+    
+    bool focusLostByEscapeKey;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSingleSlider)
 
@@ -310,6 +317,8 @@ public:
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void textEditorFocusLost(TextEditor& textEditor) override;
+    void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
+    void textEditorTextChanged(TextEditor& textEditor) override;
     void resized() override;
     void sliderDragEnded(Slider *slider) override;
     void mouseDown (const MouseEvent &event) override;
@@ -327,6 +336,7 @@ private:
     bool newDrag;
     bool clickedOnMinSlider;
     bool isMinAlwaysLessThanMax;
+    bool focusLostByEscapeKey;
     
     BKRangeMinSliderLookAndFeel minSliderLookAndFeel;
     BKRangeMaxSliderLookAndFeel maxSliderLookAndFeel;
@@ -407,8 +417,8 @@ private:
 
     ImageComponent sampleImageComponent;
     
-    BKRangeMinSliderLookAndFeel minSliderLookAndFeel; //possibly need to remake for this
-    BKRangeMaxSliderLookAndFeel maxSliderLookAndFeel;
+    //BKRangeMinSliderLookAndFeel minSliderLookAndFeel; //possibly need to remake for this
+    //BKRangeMaxSliderLookAndFeel maxSliderLookAndFeel;
     BKMultiSliderLookAndFeel displaySliderLookAndFeel;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKWaveDistanceUndertowSlider)
@@ -446,8 +456,8 @@ public:
     
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
-    
     void textEditorFocusLost(TextEditor& textEditor) override;
+    void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
     void mouseDown (const MouseEvent &event) override;
     void mouseDrag(const MouseEvent& e) override;
     void mouseUp(const MouseEvent& e) override;
@@ -481,6 +491,7 @@ private:
     int numSliders;
     int numActiveSliders;
     int clickedSlider;
+    float clickedPosition;
     
     String sliderName;
     BKLabel showName;
@@ -492,6 +503,8 @@ private:
     double sliderDefault;
     double sliderIncrement;
     double currentDisplaySliderValue;
+    
+    bool focusLostByEscapeKey;
     
     Array<float> getAllActiveValues();
     
