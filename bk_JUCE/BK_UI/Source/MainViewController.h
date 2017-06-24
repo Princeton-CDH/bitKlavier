@@ -26,7 +26,13 @@
 
 #include "BKOvertop.h"
 
-class MainViewController :  public Component, private Timer, public BKListener, public Slider::Listener, private KeyListener
+class MainViewController :
+public Component,
+private Timer,
+public BKListener,
+public Slider::Listener,
+private KeyListener,
+private BKKeymapKeyboardStateListener
 {
     
 public:
@@ -60,11 +66,18 @@ private:
     //ImageComponent backgroundImageComponent;
     
     ScopedPointer<Slider> mainSlider;
-    
     ScopedPointer<BKLevelMeterComponent> levelMeterComponentL;
     ScopedPointer<BKLevelMeterComponent> levelMeterComponentR;
     
     ScopedPointer<PreparationPanel> preparationPanel;
+    
+    BKKeymapKeyboardComponent* keyboard;
+    BKKeymapKeyboardState keyboardState;
+    Component *keyboardComponent;
+    
+    void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override;
+    void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override;
+    void handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     
     void timerCallback() override;
     
@@ -75,11 +88,8 @@ private:
 
     int timerCallbackCount;
     
-    
     bool keyPressed (const KeyPress& e, Component*);
-
-    
-    
+    bool isAddingFromMidiInput;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainViewController)
 };

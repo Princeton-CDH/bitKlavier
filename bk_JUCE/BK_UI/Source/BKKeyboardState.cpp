@@ -48,7 +48,6 @@ void BKKeymapKeyboardState::setKeymap(Array<bool> keymap)
     }
 }
 
-
 void BKKeymapKeyboardState::addToKeymap(int midiNoteNumber)
 {
     inKeymap[midiNoteNumber]=true;
@@ -119,7 +118,6 @@ void BKKeymapKeyboardState::noteOnInternal  (const int midiChannel, const int mi
     if (isPositiveAndBelow (midiNoteNumber, (int) 128))
     {
         noteStates [midiNoteNumber] |= (1 << (midiChannel - 1));
-    
     }
 }
 

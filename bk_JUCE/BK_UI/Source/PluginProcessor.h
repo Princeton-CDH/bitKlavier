@@ -74,7 +74,11 @@ public:
     
     void updateUI(void);
     
-    Array<int>                          noteOn;
+    Array<bool>                         noteOn; //which notes are on, for the UI
+    Array<bool>                         getNoteOns() { return noteOn; }
+    
+    void                                noteOnUI (int noteNumber) { if(didLoadMainPianoSamples) notesOnUI.add(noteNumber); }
+    void                                noteOffUI(int noteNumber) { if(didLoadMainPianoSamples) notesOffUI.add(noteNumber); }
     
     int                                 noteOnCount;
     bool                                allNotesOff;
@@ -99,6 +103,9 @@ public:
     void  setCurrentPiano(int which);
     void  performModifications(int noteNumber);
     void  performResets(int noteNumber);
+    
+    void handleNoteOn(int noteNumber, float velocity, int channel);
+    void handleNoteOff(int noteNumber, float velocity, int channel);
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override;
@@ -140,6 +147,9 @@ private:
     
     Array<float> tempoAlreadyLoaded;
     bool galleryDidLoad;
+    
+    Array<int> notesOnUI;
+    Array<int> notesOffUI;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)

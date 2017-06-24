@@ -1010,6 +1010,8 @@ bool BKKeymapKeyboardComponent::mouseDownOnKey    (int midiNoteNumber, const Mou
     {
         lastKeySelected = midiNoteNumber;
     }
+    //DBG("mouseDownOnKey " + String(midiNoteNumber));
+    state.addToKeymap(midiNoteNumber);
     
     return true;
 }
@@ -1034,6 +1036,11 @@ void BKKeymapKeyboardComponent::mouseUpOnKey      (int midiNoteNumber, const Mou
     {
         state.toggle(midiNoteNumber);
         repaint(getRectangleForKey(midiNoteNumber));
+    }
+    else
+    {
+        //DBG("mouseUpOnKey " + String(midiNoteNumber));
+        state.removeFromKeymap(midiNoteNumber);
     }
     
     lastKeySelected = -1;

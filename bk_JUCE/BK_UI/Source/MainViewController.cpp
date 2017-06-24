@@ -24,23 +24,58 @@ timerCallbackCount(0)
     
     gen = processor.gallery->getGeneralSettings();
     
+    levelMeterComponentL = new BKLevelMeterComponent;
+    addAndMakeVisible(levelMeterComponentL);
+    
+    mainSlider = new Slider();
+    addAndMakeVisible (mainSlider);
+    mainSlider->setRange (-90, 12.0, 0.1);
+    mainSlider->getLookAndFeel().setColour(Slider::thumbColourId, Colours::goldenrod);
+    mainSlider->getLookAndFeel().setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.75));
+    mainSlider->getLookAndFeel().setColour(Slider::backgroundColourId, Colours::goldenrod.withMultipliedAlpha(0.25));
+    mainSlider->setSkewFactor (2.5, false);
+    mainSlider->setPopupMenuEnabled (true);
+    mainSlider->setValue (0);
+    mainSlider->setSliderStyle (Slider::LinearBarVertical);
+    //mainSlider->setSliderStyle (Slider::LinearVertical);
+    mainSlider->setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
+    mainSlider->setPopupDisplayEnabled (true, this);
+    mainSlider->setDoubleClickReturnValue (true, 0.0); // double-clicking this slider will set it to 50.0
+    mainSlider->setTextValueSuffix (" dB");
+    mainSlider->addListener(this);
+    
+    addAndMakeVisible (keyboardComponent =
+                       new BKKeymapKeyboardComponent (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard));
+    
+    keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
+    
+    keyboard->setScrollButtonsVisible(false);
+    keyboard->setAvailableRange(21, 108);
+    keyboard->setOctaveForMiddleC(4);
+    keyboard->setFundamental(-1);
+    keyboard->setAllowDrag(false);
+    keyboard->doKeysToggle(false);
+    keyboard->addMouseListener(this, true);
+    keyboardState.addListener(this);
+    
+    //keyboardComponent.setAvailableRange(21, 108);
+    //keyboardComponent.setScrollButtonsVisible(false);
+    //keyboardComponent.setOctaveForMiddleC(4);
+    //keyboardComponent.addMyListener (this);
+    //addAndMakeVisible (keyboardComponent);
+    /*
+     absoluteKeyboard.setName("Key-by-Key Offsets");
+     absoluteKeyboard.addMyListener(this);
+     addAndMakeVisible(absoluteKeyboard);
+    
+     */
+    
     preparationPanel = new PreparationPanel(processor);
     addAndMakeVisible(preparationPanel);
     
     addAndMakeVisible(header);
     addAndMakeVisible(construction);
     addChildComponent(overtop);
-    
-    mainSlider = new Slider();
-    addAndMakeVisible (mainSlider);
-    mainSlider->setRange (-90, 12.0, 0.1);
-    mainSlider->setSkewFactor (2.5, false);
-    mainSlider->setPopupMenuEnabled (true);
-    mainSlider->setValue (0);
-    mainSlider->setSliderStyle (Slider::LinearVertical);
-    mainSlider->setDoubleClickReturnValue (true, 0.0); // double-clicking this slider will set it to 50.0
-    mainSlider->setTextValueSuffix (" dB");
-    mainSlider->addListener(this);
     
     /*
     File file ("~/bk_icons/icon.png");
@@ -65,30 +100,49 @@ MainViewController::~MainViewController()
 
 void MainViewController::paint (Graphics& g)
 {
-    //g.fillAll(Colours::transparentBlack);
+    g.fillAll(Colours::black);
 }
 
 void MainViewController::resized()
-{    
-    header.setBounds(0, 0, getParentComponent()->getRight(), 30);
-
-    construction.setBounds(gXSpacing,
-                           header.getBottom(),
-                           getParentComponent()->getWidth() - 2*gXSpacing,
-                           getParentComponent()->getBottom() - header.getBottom()-2*gYSpacing);
-    
-    //construction.repaint();
-    
-    Rectangle<int> area (getLocalBounds());
-    area.removeFromTop(header.getHeight());
+{
+   
+    int headerHeight = 30;
+    int sidebarWidth = 20;
+    int footerHeight = 40;
     
     float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
     float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
     
-    area.reduce(70 * paddingScalarX, 90 * paddingScalarY);
+    Rectangle<int> area (getLocalBounds());
+    header.setBounds(area.removeFromTop(headerHeight));
     
-    //overtop.setBounds(construction.getBounds());
-    overtop.setBounds(area);
+    Rectangle<int> overtopSlice = area;
+    overtopSlice.reduce(70 * paddingScalarX, 90 * paddingScalarY);
+    overtop.setBounds(overtopSlice);
+    
+    Rectangle<int> footerSlice = area.removeFromBottom(footerHeight + footerHeight * paddingScalarY + gYSpacing);
+    //float keyWidth = footerSlice.getWidth() / round((108 - 21) * 7./12 + 1);
+    footerSlice.reduce(gXSpacing, gYSpacing);
+    //keyboardComponent.setKeyWidth(keyWidth);
+    //keyboardComponent.setBlackNoteLengthProportion(0.65);
+    //keyboardComponent.setBounds(footerSlice);
+    float keyWidth = footerSlice.getWidth() / round((108 - 21) * 7./12 + 1); //num white keys
+    keyboard->setKeyWidth(keyWidth);
+    keyboard->setBlackNoteLengthProportion(0.65);
+    keyboardComponent->setBounds(footerSlice);
+    
+    Rectangle<int> levelMeterSlice = area.removeFromLeft(sidebarWidth + gXSpacing);
+    levelMeterSlice.removeFromLeft(gXSpacing);
+    levelMeterSlice.removeFromTop(2 * gYSpacing * paddingScalarY);
+    levelMeterComponentL->setBounds(levelMeterSlice);
+    
+    Rectangle<int> gainSliderSlice = area.removeFromRight(sidebarWidth + gXSpacing);
+    gainSliderSlice.removeFromRight(gXSpacing);
+    //gainSliderSlice.reduce(0, 1);
+    mainSlider->setBounds(gainSliderSlice);
+    
+    area.reduce(gXSpacing, 0);
+    construction.setBounds(area);
     
     /*
     backgroundImageComponent.setBounds(getBounds());
@@ -112,6 +166,24 @@ void MainViewController::sliderValueChanged (Slider* slider)
         gen->setGlobalGain(Decibels::decibelsToGain(mainSlider->getValue()));
         overtop.gvc.updateFields();
     }
+}
+
+void MainViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber)
+{
+    DBG("MainViewController::handleKeymapNoteToggled " + String(midiNoteNumber));
+}
+
+void MainViewController::handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber)
+{
+    DBG("MainViewController::handleKeymapNoteOn " + String(midiNoteNumber));
+    processor.noteOnUI(midiNoteNumber);
+}
+
+
+void MainViewController::handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber)
+{
+    DBG("MainViewController::handleKeymapNoteOff " + String(midiNoteNumber));
+    processor.noteOffUI(midiNoteNumber);
 }
 
 bool MainViewController::keyPressed (const KeyPress& e, Component*)
@@ -195,6 +267,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
 }
 
 
+
 void MainViewController::timerCallback()
 {
     
@@ -206,6 +279,10 @@ void MainViewController::timerCallback()
     }
     
     header.update();
+    
+    Array<bool> noteOns = processor.getNoteOns();
+    keyboardState.setKeymap(noteOns);
+    keyboard->repaint();
     
     if (processor.updateState->generalSettingsDidChange)
     {
@@ -314,10 +391,9 @@ void MainViewController::timerCallback()
         overtop.setCurrentDisplay(processor.updateState->currentPreparationDisplay);
     }
     
-    /*
     levelMeterComponentL->updateLevel(processor.getLevelL());
-    levelMeterComponentR->updateLevel(processor.getLevelL());
-     */
+    //levelMeterComponentR->updateLevel(processor.getLevelL());
+    
     
 }
 

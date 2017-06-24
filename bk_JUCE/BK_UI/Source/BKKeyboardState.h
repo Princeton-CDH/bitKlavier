@@ -171,6 +171,7 @@ public:
      */
     void removeListener (BKKeymapKeyboardStateListener* listener);
     
+    
 private:
     //==============================================================================
     CriticalSection lock;
@@ -181,6 +182,7 @@ private:
     
     void noteOnInternal (int midiChannel, int midiNoteNumber, float velocity);
     void noteOffInternal (int midiChannel, int midiNoteNumber, float velocity);
+
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKKeymapKeyboardState)
 };
