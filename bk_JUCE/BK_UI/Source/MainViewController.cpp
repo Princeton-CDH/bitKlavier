@@ -117,7 +117,10 @@ void MainViewController::resized()
     header.setBounds(area.removeFromTop(headerHeight));
     
     Rectangle<int> overtopSlice = area;
-    overtopSlice.reduce(70 * paddingScalarX, 90 * paddingScalarY);
+    //overtopSlice.reduce(70 * paddingScalarX, 90 * paddingScalarY);
+    overtopSlice.removeFromTop(60 * paddingScalarY);
+    overtopSlice.removeFromBottom(120 * paddingScalarY);
+    overtopSlice.reduce(70 * paddingScalarX, 0);
     overtop.setBounds(overtopSlice);
     
     Rectangle<int> footerSlice = area.removeFromBottom(footerHeight + footerHeight * paddingScalarY + gYSpacing);
