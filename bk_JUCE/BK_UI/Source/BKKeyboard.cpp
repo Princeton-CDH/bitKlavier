@@ -514,12 +514,17 @@ void BKKeymapKeyboardComponent::drawWhiteNote (int midiNoteNumber,
     
     if (text.isNotEmpty())
     {
-       if(fundamental >= 0)
+        
+        int textOffset = 0;
+        
+        if(fundamental >= 0)
        {
-           const float fontHeight = jmin (18.0f, keyWidth * 0.9f);
+           const float fontHeight = jmin (12.0f, keyWidth * 0.9f);
            
            g.setColour (c.contrasting());
-           g.setFont (Font (fontHeight));
+           g.setFont (Font (fontHeight * 2));
+           textOffset = 8;
+           
            
        }
        else
@@ -533,7 +538,7 @@ void BKKeymapKeyboardComponent::drawWhiteNote (int midiNoteNumber,
         
         switch (orientation)
         {
-            case horizontalKeyboard:            g.drawText (text, x + 1, y,     w - 1, h - 2, Justification::centredBottom, false); break;
+            case horizontalKeyboard:            g.drawText (text, x + 1, y + textOffset, w - 1, h - 2, Justification::centredBottom, false); break;
             case verticalKeyboardFacingLeft:    g.drawText (text, x + 2, y + 2, w - 4, h - 4, Justification::centredLeft,   false); break;
             case verticalKeyboardFacingRight:   g.drawText (text, x + 2, y + 2, w - 4, h - 4, Justification::centredRight,  false); break;
             default: break;
@@ -612,15 +617,15 @@ void BKKeymapKeyboardComponent::drawBlackNote (int midiNoteNumber,
         {
             String text ("*");
             
-            const float fontHeight = jmin (18.0f, keyWidth * 0.9f);
+            const float fontHeight = jmin (12.0f, keyWidth * 0.9f);
             
             g.setColour (c.contrasting());
             //g.setFont (Font (fontHeight).withHorizontalScale (0.8f));
-            g.setFont (Font (fontHeight));
+            g.setFont (Font (fontHeight * 2));
             
             switch (orientation)
             {
-                case horizontalKeyboard:            g.drawText (text, x + 1, y - 6, w - 1, h - 2, Justification::centredBottom, false); break;
+                case horizontalKeyboard:            g.drawText (text, x + 1, y - 0, w - 1, h - 2, Justification::centredBottom, false); break;
                 case verticalKeyboardFacingLeft:    g.drawText (text, x + 2, y + 2, w - 4, h - 4, Justification::centredLeft,   false); break;
                 case verticalKeyboardFacingRight:   g.drawText (text, x + 2, y + 2, w - 4, h - 4, Justification::centredRight,  false); break;
                 default: break;

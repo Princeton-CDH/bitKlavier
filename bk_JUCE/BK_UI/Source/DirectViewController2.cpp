@@ -25,7 +25,6 @@ theGraph(theGraph)
     selectCB.addSeparator();
     selectCB.addListener(this);
     selectCB.setSelectedItemIndex(0);
-    selectCB.BKSetJustificationType(juce::Justification::centredRight);
     selectCB.addMyListener(this);
     fillSelectCB();
     addAndMakeVisible(selectCB);
@@ -36,16 +35,19 @@ theGraph(theGraph)
 
     gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
     gainSlider->setSkewFactorFromMidPoint(1.);
+    gainSlider->setJustifyRight(false);
     gainSlider->addMyListener(this);
     addAndMakeVisible(gainSlider);
     
     resonanceGainSlider = new BKSingleSlider("resonance gain", 0, 10, 1, 0.01);
     resonanceGainSlider->setSkewFactorFromMidPoint(1.);
+    resonanceGainSlider->setJustifyRight(false);
     resonanceGainSlider->addMyListener(this);
     addAndMakeVisible(resonanceGainSlider);
     
     hammerGainSlider = new BKSingleSlider("hammer gain", 0, 10, 1, 0.01);
     hammerGainSlider->setSkewFactorFromMidPoint(1.);
+    hammerGainSlider->setJustifyRight(false);
     hammerGainSlider->addMyListener(this);
     addAndMakeVisible(hammerGainSlider);
     
@@ -74,18 +76,17 @@ void DirectViewController2::resized()
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
     comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * paddingScalarX);
+    comboBoxSlice.removeFromLeft(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
-    selectCB.setBounds(comboBoxSlice.removeFromRight(comboBoxSlice.getWidth() / 2.));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
     
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
     
-    Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
-    modeSlice.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
-    
-    Rectangle<int> sliderSlice = area;
-    sliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);
-    sliderSlice.removeFromRight(gXSpacing);
+    Rectangle<int> sliderSlice = leftColumn;
+    sliderSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    //sliderSlice.removeFromLeft(gXSpacing);
     /*
     sliderSlice.reduce(4 + 2.*gPaddingConst * paddingScalarX,
                        4 + 2.*gPaddingConst * paddingScalarY);
@@ -110,27 +111,14 @@ void DirectViewController2::resized()
                           gComponentSingleSliderHeight);
     
     //leftColumn.reduce(4, 0);
-    leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
-    leftColumn.removeFromLeft(gXSpacing);
-    transpositionSlider->setBounds(leftColumn.getX(),
+    area.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    area.removeFromRight(gXSpacing);
+    
+    transpositionSlider->setBounds(area.getX(),
                                    resonanceGainSlider->getY(),
-                                   leftColumn.getWidth(),
+                                   area.getWidth(),
                                    gComponentStackedSliderHeight + paddingScalarY * 30);
-    
-    /*
-    Rectangle<int> area (getLocalBounds());
-    
-    Rectangle<int> displayRow = area.removeFromBottom(area.getHeight() * 0.5);
-    
-    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
-    selectCB.setBounds(leftColumn.removeFromTop(20));
-    transpositionSlider->setBounds(leftColumn.removeFromTop(40));
-    
-    resonanceGainSlider->setBounds(area.removeFromTop(40));
-    hammerGainSlider->setBounds(area.removeFromTop(40));
-    gainSlider->setBounds(area.removeFromBottom(40));
-     */
-    
+
 }
 
 void DirectViewController2::updateFields(void)

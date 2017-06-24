@@ -45,13 +45,13 @@ theGraph(theGraph)
     selectCB.addSeparator();
     selectCB.addListener(this);
     selectCB.setSelectedItemIndex(0);
-    selectCB.BKSetJustificationType(juce::Justification::centredRight);
     selectCB.addMyListener(this);
     fillSelectCB();
     addAndMakeVisible(selectCB);
     
     modeSelectCB.setName("Mode");
     modeSelectCB.addSeparator();
+    modeSelectCB.BKSetJustificationType(juce::Justification::centredRight);
     modeSelectCB.addListener(this);
     modeSelectCB.setSelectedItemIndex(0);
     fillModeSelectCB();
@@ -60,22 +60,27 @@ theGraph(theGraph)
     //offsetParamStartToggle = new BKSingleSlider("skip first", 0, 1, 0, 1);
     offsetParamStartToggle.addListener(this);
     offsetParamStartToggle.setButtonText ("skip first");
+    buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
     offsetParamStartToggle.setToggleState (true, dontSendNotification);
     addAndMakeVisible(offsetParamStartToggle);
     
     howManySlider = new BKSingleSlider("how many", 1, 100, 1, 1);
+    howManySlider->setJustifyRight(false);
     howManySlider->addMyListener(this);
     addAndMakeVisible(howManySlider);
     
     clusterThreshSlider = new BKSingleSlider("cluster threshold", 20, 2000, 200, 10);
+    clusterThreshSlider->setJustifyRight(false);
     clusterThreshSlider->addMyListener(this);
     addAndMakeVisible(clusterThreshSlider);
 
     clusterMinMaxSlider = new BKRangeSlider("cluster min/max", 1, 10, 3, 4, 1);
+    clusterMinMaxSlider->setJustifyRight(false);
     clusterMinMaxSlider->addMyListener(this);
     addAndMakeVisible(clusterMinMaxSlider);
     
     gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
+    gainSlider->setJustifyRight(false);
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->addMyListener(this);
     addAndMakeVisible(gainSlider);
@@ -252,19 +257,22 @@ void SynchronicViewController2::resized()
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
     comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * paddingScalarX);
+    comboBoxSlice.removeFromLeft(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
-    selectCB.setBounds(comboBoxSlice.removeFromRight(comboBoxSlice.getWidth() / 2.));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
     
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
     
     Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
-    modeSlice.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
-    modeSelectCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
+    modeSlice.removeFromRight(gXSpacing);
+    modeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
     offsetParamStartToggle.setBounds(modeSlice);
 
     int tempHeight = (area.getHeight() - paramSliders.size() * (gYSpacing + gPaddingConst * paddingScalarY)) / paramSliders.size();
     area.removeFromLeft(4 + 2.*gPaddingConst * paddingScalarX);
+    area.removeFromRight(gXSpacing);
     for(int i = 0; i < paramSliders.size(); i++)
     {
         area.removeFromTop(gYSpacing + gPaddingConst * paddingScalarY);
@@ -273,7 +281,7 @@ void SynchronicViewController2::resized()
     
     //leftColumn.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
     leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
-    leftColumn.removeFromLeft(gXSpacing);
+    //leftColumn.removeFromLeft(gXSpacing);
     
     int nextCenter = paramSliders[0]->getY() + paramSliders[0]->getHeight() / 2 + gPaddingConst * (1. - paddingScalarY) ;
     howManySlider->setBounds(leftColumn.getX(),

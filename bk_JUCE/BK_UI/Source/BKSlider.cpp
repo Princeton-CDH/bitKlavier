@@ -1073,6 +1073,7 @@ sliderIncrement(increment)
 {
     
     textIsAbove = true;
+    justifyRight = true;
     
     thisSlider.setColour(Slider::thumbColourId, Colours::goldenrod);
     thisSlider.setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.25));
@@ -1086,7 +1087,8 @@ sliderIncrement(increment)
     addAndMakeVisible(thisSlider);
     
     showName.setText(name, dontSendNotification);
-    showName.setJustificationType(Justification::bottomRight);
+    if (justifyRight) showName.setJustificationType(Justification::bottomRight);
+    else showName.setJustificationType(Justification::bottomLeft);
     addAndMakeVisible(showName);
     
     valueTF.setText(String(sliderDefault));
@@ -1195,9 +1197,18 @@ void BKSingleSlider::resized()
         Rectangle<int> textSlab (area.removeFromTop(gComponentTextFieldHeight));
         //gComponentTextFieldHeight
         //textSlab.removeFromTop(textSlab.getHeight() - 20);
-        textSlab.removeFromRight(gComponentSingleSliderXOffset);
-        valueTF.setBounds(textSlab.removeFromRight(50));
-        showName.setBounds(textSlab.removeFromRight(150));
+        if(justifyRight)
+        {
+            textSlab.removeFromRight(gComponentSingleSliderXOffset);
+            valueTF.setBounds(textSlab.removeFromRight(50));
+            showName.setBounds(textSlab.removeFromRight(150));
+        }
+        else
+        {
+            textSlab.removeFromLeft(gComponentSingleSliderXOffset);
+            valueTF.setBounds(textSlab.removeFromLeft(50));
+            showName.setBounds(textSlab.removeFromLeft(150));
+        }
         
         //thisSlider.setBounds(area.removeFromTop(gComponentSingleSliderHeight * 0.5 - 12));
         thisSlider.setBounds(area.removeFromTop(gComponentSingleSliderHeight - gComponentTextFieldHeight));
@@ -1239,8 +1250,11 @@ sliderDefaultMax(defmax),
 sliderIncrement(increment)
 {
     
+    justifyRight = true;
+    
     showName.setText(sliderName, dontSendNotification);
-    showName.setJustificationType(Justification::bottomRight);
+    if(justifyRight) showName.setJustificationType(Justification::bottomRight);
+    else showName.setJustificationType(Justification::bottomLeft);
     addAndMakeVisible(showName);
     
     minValueTF.setText(String(sliderDefaultMin));
@@ -1475,17 +1489,24 @@ void BKRangeSlider::resized()
 {
     
     Rectangle<int> area (getLocalBounds());
-    
-    //Rectangle<int> topSlab (area.removeFromTop((area.getHeight() + 20) / 3));
     Rectangle<int> topSlab (area.removeFromTop(gComponentTextFieldHeight));
-    //topSlab.removeFromTop(topSlab.getHeight() - 20);
-    //topSlab.removeFromTop(gComponentTextFieldHeight);
-    //gComponentTextFieldHeight
-    topSlab.removeFromRight(5);
-    maxValueTF.setBounds(topSlab.removeFromRight(50));
-    topSlab.removeFromRight(gXSpacing);
-    minValueTF.setBounds(topSlab.removeFromRight(50));
-    showName.setBounds(topSlab.removeFromRight(100));
+
+    if(justifyRight)
+    {
+        topSlab.removeFromRight(5);
+        maxValueTF.setBounds(topSlab.removeFromRight(50));
+        topSlab.removeFromRight(gXSpacing);
+        minValueTF.setBounds(topSlab.removeFromRight(50));
+        showName.setBounds(topSlab.removeFromRight(100));
+    }
+    else
+    {
+        topSlab.removeFromLeft(5);
+        minValueTF.setBounds(topSlab.removeFromLeft(50));
+        topSlab.removeFromLeft(gXSpacing);
+        maxValueTF.setBounds(topSlab.removeFromLeft(50));
+        showName.setBounds(topSlab.removeFromLeft(100));
+    }
 
     Rectangle<int> sliderArea (area.removeFromTop(40));
     minSlider.setBounds(sliderArea);

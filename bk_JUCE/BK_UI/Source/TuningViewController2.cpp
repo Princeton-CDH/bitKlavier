@@ -35,7 +35,6 @@ theGraph(theGraph)
     selectCB.addSeparator();
     selectCB.addListener(this);
     selectCB.setSelectedItemIndex(0);
-    selectCB.BKSetJustificationType(juce::Justification::centredRight);
     selectCB.addMyListener(this);
     fillSelectCB();
     addAndMakeVisible(selectCB);
@@ -59,8 +58,8 @@ theGraph(theGraph)
     A1IntervalScaleCB.addListener(this);
     addAndMakeVisible(A1IntervalScaleCB);
     
-    A1IntervalScaleLabel.setText("Adaptive Scale", dontSendNotification);
-    A1IntervalScaleLabel.setJustificationType(juce::Justification::centredRight);
+    A1IntervalScaleLabel.setText("Adaptive Scale:", dontSendNotification);
+    //A1IntervalScaleLabel.setJustificationType(juce::Justification::centredRight);
     addAndMakeVisible(A1IntervalScaleLabel);
     
     A1Inversional.addListener(this);
@@ -76,8 +75,8 @@ theGraph(theGraph)
     A1AnchorScaleCB.addListener(this);
     addAndMakeVisible(A1AnchorScaleCB);
     
-    A1AnchorScaleLabel.setText("Anchor Scale", dontSendNotification);
-    A1AnchorScaleLabel.setJustificationType(juce::Justification::centredRight);
+    A1AnchorScaleLabel.setText("Anchor Scale:", dontSendNotification);
+    //A1AnchorScaleLabel.setJustificationType(juce::Justification::centredRight);
     addAndMakeVisible(A1AnchorScaleLabel);
     
     A1FundamentalCB.setName("A1Fundamental");
@@ -88,10 +87,12 @@ theGraph(theGraph)
     //addAndMakeVisible(A1FundamentalLabel);
     
     A1ClusterThresh = new BKSingleSlider("Cluster Threshold", 1, 1000, 0, 1);
+    A1ClusterThresh->setJustifyRight(false);
     A1ClusterThresh->addMyListener(this);
     addAndMakeVisible(A1ClusterThresh);
     
     A1ClusterMax = new BKSingleSlider("Cluster Maximum", 1, 8, 1, 1);
+    A1ClusterMax->setJustifyRight(false);
     A1ClusterMax->addMyListener(this);
     addAndMakeVisible(A1ClusterMax);
     
@@ -126,6 +127,7 @@ theGraph(theGraph)
     
     lastNote.setText("last note: ", dontSendNotification);
     lastInterval.setText("last interval: ", dontSendNotification);
+    lastInterval.setJustificationType(juce::Justification::centredRight);
     addAndMakeVisible(lastNote);
     addAndMakeVisible(lastInterval);
     
@@ -157,9 +159,10 @@ void TuningViewController2::resized()
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
     comboBoxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
-    selectCB.setBounds(comboBoxSlice.removeFromRight(comboBoxSlice.getWidth() / 2.));
-    comboBoxSlice.removeFromRight(gXSpacing);
-    A1reset.setBounds(comboBoxSlice.removeFromRight(45));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    A1reset.setBounds(comboBoxSlice.removeFromLeft(45));
     
     /* *** above here should be generic (mostly) to all prep layouts *** */
     /* ***         below here will be specific to each prep          *** */
@@ -197,16 +200,13 @@ void TuningViewController2::resized()
     lastInterval.setBounds(lastNoteSlice);
     
     // ********* left column
-    
-    //leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
-    //leftColumn.removeFromLeft(gXSpacing);
-    
+ 
     extraY = (leftColumn.getHeight() -
               (gComponentComboBoxHeight * 2 +
                gComponentSingleSliderHeight * 2 +
                gYSpacing * 5)) * 0.25;
     
-    DBG("extraY = " + String(extraY));
+    //DBG("extraY = " + String(extraY));
     
     leftColumn.removeFromTop(extraY + gYSpacing);
     Rectangle<int> A1IntervalScaleCBSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
@@ -217,23 +217,16 @@ void TuningViewController2::resized()
     A1IntervalScaleCB.setBounds(A1IntervalScaleCBSlice.removeFromRight(tempwidth));
     A1IntervalScaleLabel.setBounds(A1IntervalScaleCBSlice);
     
-    /*
-    Rectangle<int> A1InversionalSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    A1InversionalSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
-    A1InversionalSlice.removeFromLeft(gXSpacing);
-    A1Inversional.setBounds(A1InversionalSlice);
-     */
-    
     leftColumn.removeFromTop(extraY + gYSpacing);
     Rectangle<int> A1ClusterMaxSlice = leftColumn.removeFromTop(gComponentSingleSliderHeight);
     A1ClusterMaxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
-    A1ClusterMaxSlice.removeFromLeft(gXSpacing);
+    //A1ClusterMaxSlice.removeFromLeft(gXSpacing);
     A1ClusterMax->setBounds(A1ClusterMaxSlice);
     
     leftColumn.removeFromTop(gYSpacing);
     Rectangle<int> A1ClusterThreshSlice = leftColumn.removeFromTop(gComponentSingleSliderHeight);
     A1ClusterThreshSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
-    A1ClusterThreshSlice.removeFromLeft(gXSpacing);
+    //A1ClusterThreshSlice.removeFromLeft(gXSpacing);
     A1ClusterThresh->setBounds(A1ClusterThreshSlice);
     
     leftColumn.removeFromTop(extraY + gYSpacing);
@@ -246,67 +239,6 @@ void TuningViewController2::resized()
     A1AnchorScaleCBSlice.removeFromLeft(gXSpacing);
     A1FundamentalCB.setBounds(A1AnchorScaleCBSlice);
     
-    /*
-    modeSlice = area.removeFromTop(gComponentComboBoxHeight);
-    modeSlice.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
-    fundamentalCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
-     */
-    
-    /*
-    Rectangle<int> area (getLocalBounds());
-    float keyboardHeight = 60;
-    Rectangle<int> absoluteKeymapRow = area.removeFromBottom(keyboardHeight + 20);
-    
-    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.25);
-    Rectangle<int> rightColumn = area.removeFromRight(leftColumn.getWidth());
-    Rectangle<int> centerRightColumn = area.removeFromRight(leftColumn.getWidth());
-    
-    //prep select combo box
-    selectCB.setBounds(leftColumn.removeFromTop(20));
-    leftColumn.removeFromTop(gYSpacing * 2);
-    
-    scaleLabel.setBounds(leftColumn.removeFromTop(20));
-    scaleCB.setBounds(leftColumn.removeFromTop(20));
-    leftColumn.removeFromTop(gYSpacing * 2);
-    
-    fundamentalLabel.setBounds(leftColumn.removeFromTop(20));
-    fundamentalCB.setBounds(leftColumn.removeFromTop(20));
-    leftColumn.removeFromTop(gYSpacing * 2);
-    
-    customKeyboard.setBounds(leftColumn.removeFromTop(120));
-    leftColumn.removeFromTop(gYSpacing * 4);
-    
-    offsetSlider->setBounds(leftColumn.removeFromTop(50));
-    leftColumn.removeFromTop(gYSpacing * 4);
-    
-    lastNote.setBounds(leftColumn.removeFromTop(20));
-    leftColumn.removeFromTop(gYSpacing * 2);
-    
-    lastInterval.setBounds(leftColumn.removeFromTop(20));
-    leftColumn.removeFromTop(gYSpacing * 2);
-    
-    
-    A1IntervalScaleLabel.setBounds(rightColumn.removeFromTop(20));
-    A1IntervalScaleCB.setBounds(rightColumn.removeFromTop(20));
-    A1Inversional.setBounds(rightColumn.removeFromTop(20));
-    
-    rightColumn.removeFromTop(gYSpacing * 4);
-    A1ClusterMax->setBounds(rightColumn.removeFromTop(50));
-    A1ClusterThresh->setBounds(rightColumn.removeFromTop(50));
-    
-    rightColumn.removeFromTop(gYSpacing * 4);
-    A1AnchorScaleLabel.setBounds(rightColumn.removeFromTop(20));
-    A1AnchorScaleCB.setBounds(rightColumn.removeFromTop(20));
-    
-    rightColumn.removeFromTop(gYSpacing * 2);
-    A1FundamentalLabel.setBounds(rightColumn.removeFromTop(20));
-    A1FundamentalCB.setBounds(rightColumn.removeFromTop(20));
-    
-    rightColumn.removeFromTop(gYSpacing * 2);
-    A1reset.setBounds(rightColumn.removeFromTop(20));
-    
-    absoluteKeyboard.setBounds(absoluteKeymapRow);
-     */
 }
 
 
@@ -323,8 +255,8 @@ void TuningViewController2::timerCallback()
     if(tProcessor->getLastNoteTuning() != lastNoteTuningSave)
     {
         lastNoteTuningSave = tProcessor->getLastNoteTuning();
-        lastNote.setText("last note: " + String(lastNoteTuningSave), dontSendNotification);
-        lastInterval.setText("last interval: "  + String(tProcessor->getLastIntervalTuning()), dontSendNotification);
+        lastNote.setText("last note: " + String(lastNoteTuningSave, 3), dontSendNotification);
+        lastInterval.setText("last interval: "  + String(tProcessor->getLastIntervalTuning(), 3), dontSendNotification);
     }
 }
 

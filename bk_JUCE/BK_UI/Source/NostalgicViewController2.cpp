@@ -26,7 +26,6 @@ theGraph(theGraph)
     selectCB.addSeparator();
     selectCB.addListener(this);
     selectCB.setSelectedItemIndex(0);
-    selectCB.BKSetJustificationType(juce::Justification::centredRight);
     selectCB.addMyListener(this);
     fillSelectCB();
     addAndMakeVisible(selectCB);
@@ -34,6 +33,7 @@ theGraph(theGraph)
     lengthModeSelectCB.setName("Length Mode");
     lengthModeSelectCB.addSeparator();
     lengthModeSelectCB.addListener(this);
+    lengthModeSelectCB.BKSetJustificationType(juce::Justification::centredRight);
     lengthModeSelectCB.setSelectedItemIndex(0);
     fillModeSelectCB();
     addAndMakeVisible(lengthModeSelectCB);
@@ -92,15 +92,19 @@ void NostalgicViewController2::resized()
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
     comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * paddingScalarX);
+    comboBoxSlice.removeFromLeft(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
-    selectCB.setBounds(comboBoxSlice.removeFromRight(comboBoxSlice.getWidth() / 2.));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
     
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
     
     Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
-    modeSlice.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
-    lengthModeSelectCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
+    modeSlice.removeFromRight(gXSpacing);
+    //modeSlice.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
+    //lengthModeSelectCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
+    lengthModeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
     
     Rectangle<int> sliderSlice = area;
     sliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);

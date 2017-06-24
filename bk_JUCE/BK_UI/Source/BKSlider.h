@@ -231,6 +231,12 @@ public:
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName()                { return sliderName; }
     void setTextIsAbove(bool nt)    { textIsAbove = nt; }
+    void setJustifyRight(bool jr)
+    {
+        justifyRight = jr;
+        if (justifyRight) showName.setJustificationType(Justification::bottomRight);
+        else showName.setJustificationType(Justification::bottomLeft);
+    }
     
     void setValue(double newval, NotificationType notify);
     void checkValue(double newval);
@@ -259,6 +265,8 @@ private:
     double sliderIncrement;
     
     bool focusLostByEscapeKey;
+    
+    bool justifyRight;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSingleSlider)
 
@@ -310,6 +318,13 @@ public:
     void setMinValue(double newval, NotificationType notify);
     void setMaxValue(double newval, NotificationType notify);
     void setIsMinAlwaysLessThanMax(bool im) { isMinAlwaysLessThanMax = im; }
+    void setJustifyRight(bool jr)
+    {
+        justifyRight = jr;
+        if (justifyRight) showName.setJustificationType(Justification::bottomRight);
+        else showName.setJustificationType(Justification::bottomLeft);
+    }
+    
     void checkValue(double newval);
     void rescaleMinSlider();
     void rescaleMaxSlider();
@@ -337,6 +352,7 @@ private:
     bool clickedOnMinSlider;
     bool isMinAlwaysLessThanMax;
     bool focusLostByEscapeKey;
+    bool justifyRight;
     
     BKRangeMinSliderLookAndFeel minSliderLookAndFeel;
     BKRangeMaxSliderLookAndFeel maxSliderLookAndFeel;
@@ -495,6 +511,7 @@ private:
     
     String sliderName;
     BKLabel showName;
+    bool justifyRight;
     
     BKMultiSliderLookAndFeel stackedSliderLookAndFeel;
     BKMultiSliderLookAndFeel topSliderLookAndFeel;
