@@ -26,10 +26,16 @@ theGraph(theGraph)
 
     setLookAndFeel(&buttonsAndMenusLAF);
     
+    iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::tuning_icon_png, BinaryData::tuning_icon_pngSize));
+    iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
+    iconImageComponent.setAlpha(0.095);
+    addAndMakeVisible(iconImageComponent);
+    
     selectCB.setName("Tuning");
     selectCB.addSeparator();
     selectCB.addListener(this);
     selectCB.setSelectedItemIndex(0);
+    selectCB.BKSetJustificationType(juce::Justification::centredRight);
     selectCB.addMyListener(this);
     fillSelectCB();
     addAndMakeVisible(selectCB);
@@ -39,43 +45,47 @@ theGraph(theGraph)
     addAndMakeVisible(scaleCB);
     
     scaleLabel.setText("Scale", dontSendNotification);
-    addAndMakeVisible(scaleLabel);
+    //addAndMakeVisible(scaleLabel);
     
     fundamentalCB.setName("Fundamental");
     fundamentalCB.addListener(this);
     addAndMakeVisible(fundamentalCB);
     
     fundamentalLabel.setText("Fundamental", dontSendNotification);
-    addAndMakeVisible(fundamentalLabel);
+    //addAndMakeVisible(fundamentalLabel);
     
     A1IntervalScaleCB.setName("A1IntervalScale");
+    //A1IntervalScaleCB.BKSetJustificationType(juce::Justification::centredRight);
     A1IntervalScaleCB.addListener(this);
     addAndMakeVisible(A1IntervalScaleCB);
     
-    A1IntervalScaleLabel.setText("Adaptive 1 Scale", dontSendNotification);
+    A1IntervalScaleLabel.setText("Adaptive Scale", dontSendNotification);
+    A1IntervalScaleLabel.setJustificationType(juce::Justification::centredRight);
     addAndMakeVisible(A1IntervalScaleLabel);
     
     A1Inversional.addListener(this);
-    A1Inversional.setButtonText ("inversional?");
+    A1Inversional.setButtonText ("invert");
     A1Inversional.setToggleState (true, dontSendNotification);
-    A1Inversional.setColour(ToggleButton::textColourId, Colours::black);
-    A1Inversional.setColour(ToggleButton::tickColourId, Colours::black);
-    A1Inversional.setColour(ToggleButton::tickDisabledColourId, Colours::black);
+    //buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
+    A1Inversional.setColour(ToggleButton::textColourId, Colours::white);
+    A1Inversional.setColour(ToggleButton::tickColourId, Colours::white);
+    A1Inversional.setColour(ToggleButton::tickDisabledColourId, Colours::white);
     addAndMakeVisible(A1Inversional);
     
     A1AnchorScaleCB.setName("A1AnchorScale");
     A1AnchorScaleCB.addListener(this);
     addAndMakeVisible(A1AnchorScaleCB);
     
-    A1AnchorScaleLabel.setText("Adaptive 1 Anchor Scale", dontSendNotification);
+    A1AnchorScaleLabel.setText("Anchor Scale", dontSendNotification);
+    A1AnchorScaleLabel.setJustificationType(juce::Justification::centredRight);
     addAndMakeVisible(A1AnchorScaleLabel);
     
     A1FundamentalCB.setName("A1Fundamental");
     A1FundamentalCB.addListener(this);
     addAndMakeVisible(A1FundamentalCB);
     
-    A1FundamentalLabel.setText("Adaptive 1 Anchor Fundamental", dontSendNotification);
-    addAndMakeVisible(A1FundamentalLabel);
+    //A1FundamentalLabel.setText("Adaptive 1 Anchor Fundamental", dontSendNotification);
+    //addAndMakeVisible(A1FundamentalLabel);
     
     A1ClusterThresh = new BKSingleSlider("Cluster Threshold", 1, 1000, 0, 1);
     A1ClusterThresh->addMyListener(this);
@@ -119,6 +129,11 @@ theGraph(theGraph)
     addAndMakeVisible(lastNote);
     addAndMakeVisible(lastInterval);
     
+    addAndMakeVisible(hideOrShow);
+    hideOrShow.setName("hideOrShow");
+    hideOrShow.addListener(this);
+    hideOrShow.setButtonText(" X ");
+    
     startTimer(50);
 
     updateFields();
@@ -126,6 +141,118 @@ theGraph(theGraph)
 
 void TuningViewController2::resized()
 {
+    Rectangle<int> area (getLocalBounds());
+    
+    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
+    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
+    
+    iconImageComponent.setBounds(area);
+    area.reduce(10 * paddingScalarX + 4, 10 * paddingScalarY + 4);
+    
+    float keyboardHeight = 60 + 50 * paddingScalarY;
+    Rectangle<int> absoluteKeymapRow = area.removeFromBottom(keyboardHeight);
+    absoluteKeyboard.setBounds(absoluteKeymapRow);
+    
+    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
+    Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    comboBoxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
+    selectCB.setBounds(comboBoxSlice.removeFromRight(comboBoxSlice.getWidth() / 2.));
+    comboBoxSlice.removeFromRight(gXSpacing);
+    A1reset.setBounds(comboBoxSlice.removeFromRight(45));
+    
+    /* *** above here should be generic (mostly) to all prep layouts *** */
+    /* ***         below here will be specific to each prep          *** */
+    
+    // ********* right column
+    
+    Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
+    modeSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    modeSlice.removeFromRight(gXSpacing);
+    scaleCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
+    
+    modeSlice.removeFromLeft(gXSpacing + gPaddingConst * paddingScalarX);
+    fundamentalCB.setBounds(modeSlice);
+    
+    int customKeyboardHeight = 60 + 70. * paddingScalarY;
+    int extraY = (area.getHeight() - (customKeyboardHeight + gComponentSingleSliderHeight + gComponentTextFieldHeight + gYSpacing * 4)) * 0.25;
+    
+    area.removeFromTop(extraY + gYSpacing);
+    Rectangle<int> customKeyboardSlice = area.removeFromTop(customKeyboardHeight);
+    customKeyboardSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    customKeyboardSlice.removeFromRight(gXSpacing);
+    customKeyboard.setBounds(customKeyboardSlice);
+    
+    area.removeFromTop(extraY + gYSpacing);
+    Rectangle<int> offsetSliderSlice = area.removeFromTop(gComponentSingleSliderHeight);
+    offsetSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
+    offsetSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
+    offsetSlider->setBounds(offsetSliderSlice);
+    
+    area.removeFromTop(extraY + gYSpacing);
+    Rectangle<int> lastNoteSlice = area.removeFromTop(gComponentTextFieldHeight);
+    lastNoteSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    lastNoteSlice.removeFromRight(gXSpacing);
+    lastNote.setBounds(lastNoteSlice.removeFromLeft(lastNoteSlice.getWidth() * 0.5));
+    lastInterval.setBounds(lastNoteSlice);
+    
+    // ********* left column
+    
+    //leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    //leftColumn.removeFromLeft(gXSpacing);
+    
+    extraY = (leftColumn.getHeight() -
+              (gComponentComboBoxHeight * 2 +
+               gComponentSingleSliderHeight * 2 +
+               gYSpacing * 5)) * 0.25;
+    
+    DBG("extraY = " + String(extraY));
+    
+    leftColumn.removeFromTop(extraY + gYSpacing);
+    Rectangle<int> A1IntervalScaleCBSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    A1IntervalScaleCBSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    A1IntervalScaleCBSlice.removeFromLeft(gXSpacing);
+    int tempwidth = A1IntervalScaleCBSlice.getWidth() / 3.;
+    A1Inversional.setBounds(A1IntervalScaleCBSlice.removeFromRight(tempwidth));
+    A1IntervalScaleCB.setBounds(A1IntervalScaleCBSlice.removeFromRight(tempwidth));
+    A1IntervalScaleLabel.setBounds(A1IntervalScaleCBSlice);
+    
+    /*
+    Rectangle<int> A1InversionalSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    A1InversionalSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    A1InversionalSlice.removeFromLeft(gXSpacing);
+    A1Inversional.setBounds(A1InversionalSlice);
+     */
+    
+    leftColumn.removeFromTop(extraY + gYSpacing);
+    Rectangle<int> A1ClusterMaxSlice = leftColumn.removeFromTop(gComponentSingleSliderHeight);
+    A1ClusterMaxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
+    A1ClusterMaxSlice.removeFromLeft(gXSpacing);
+    A1ClusterMax->setBounds(A1ClusterMaxSlice);
+    
+    leftColumn.removeFromTop(gYSpacing);
+    Rectangle<int> A1ClusterThreshSlice = leftColumn.removeFromTop(gComponentSingleSliderHeight);
+    A1ClusterThreshSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
+    A1ClusterThreshSlice.removeFromLeft(gXSpacing);
+    A1ClusterThresh->setBounds(A1ClusterThreshSlice);
+    
+    leftColumn.removeFromTop(extraY + gYSpacing);
+    Rectangle<int> A1AnchorScaleCBSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    A1AnchorScaleCBSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    A1AnchorScaleCBSlice.removeFromLeft(gXSpacing);
+    tempwidth = A1AnchorScaleCBSlice.getWidth() / 3.;
+    A1AnchorScaleLabel.setBounds(A1AnchorScaleCBSlice.removeFromLeft(tempwidth));
+    A1AnchorScaleCB.setBounds(A1AnchorScaleCBSlice.removeFromLeft(tempwidth));
+    A1AnchorScaleCBSlice.removeFromLeft(gXSpacing);
+    A1FundamentalCB.setBounds(A1AnchorScaleCBSlice);
+    
+    /*
+    modeSlice = area.removeFromTop(gComponentComboBoxHeight);
+    modeSlice.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
+    fundamentalCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
+     */
+    
+    /*
     Rectangle<int> area (getLocalBounds());
     float keyboardHeight = 60;
     Rectangle<int> absoluteKeymapRow = area.removeFromBottom(keyboardHeight + 20);
@@ -179,6 +306,7 @@ void TuningViewController2::resized()
     A1reset.setBounds(rightColumn.removeFromTop(20));
     
     absoluteKeyboard.setBounds(absoluteKeymapRow);
+     */
 }
 
 
@@ -479,6 +607,10 @@ void TuningViewController2::bkButtonClicked (Button* b)
         
         TuningProcessor::Ptr tProcessor = processor.gallery->getTuningProcessor(processor.updateState->currentTuningId);
         tProcessor->adaptiveReset();
+    }
+    else if (b == &hideOrShow)
+    {
+        processor.updateState->setCurrentDisplay(DisplayNil);
     }
 }
 

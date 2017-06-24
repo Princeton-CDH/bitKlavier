@@ -48,6 +48,8 @@ public:
         
         setColour(Label::textColourId, Colours::white);
         
+        toggleTextToRight = true;
+        
         //setColour(juce::LookAndFeel_V4::ColourScheme::outline, Colours::black);
         //getCurrentColourScheme().setUIColour(juce::LookAndFeel_V4::ColourScheme::widgetBackground, Colours::yellow);
         
@@ -65,9 +67,14 @@ public:
                                             const Drawable* icon, const Colour* const textColourToUse) override;
     
     void setComboBoxJustificationType (Justification justification)    { comboBoxJustification = justification; }
+    void setToggleBoxTextToRightBool (bool ttr)    { toggleTextToRight = ttr; }
+    
+    void drawToggleButton (Graphics& g, ToggleButton& button,
+                                               bool isMouseOverButton, bool isButtonDown) override;
     
 private:
     Justification comboBoxJustification;
+    bool toggleTextToRight;
 };
 
 class BKMultiSliderLookAndFeel : public BKButtonAndMenuLAF

@@ -1195,11 +1195,12 @@ void BKSingleSlider::resized()
         Rectangle<int> textSlab (area.removeFromTop(gComponentTextFieldHeight));
         //gComponentTextFieldHeight
         //textSlab.removeFromTop(textSlab.getHeight() - 20);
-        textSlab.removeFromRight(8);
+        textSlab.removeFromRight(gComponentSingleSliderXOffset);
         valueTF.setBounds(textSlab.removeFromRight(50));
         showName.setBounds(textSlab.removeFromRight(150));
         
-        thisSlider.setBounds(area.removeFromTop(gComponentSingleSliderHeight * 0.5 - 12));
+        //thisSlider.setBounds(area.removeFromTop(gComponentSingleSliderHeight * 0.5 - 12));
+        thisSlider.setBounds(area.removeFromTop(gComponentSingleSliderHeight - gComponentTextFieldHeight));
     }
     else
     {
@@ -1482,6 +1483,7 @@ void BKRangeSlider::resized()
     //gComponentTextFieldHeight
     topSlab.removeFromRight(5);
     maxValueTF.setBounds(topSlab.removeFromRight(50));
+    topSlab.removeFromRight(gXSpacing);
     minValueTF.setBounds(topSlab.removeFromRight(50));
     showName.setBounds(topSlab.removeFromRight(100));
 
@@ -1577,7 +1579,9 @@ void BKWaveDistanceUndertowSlider::resized()
     Rectangle<int> area (getLocalBounds());
     
     wavedistanceSlider->setBounds(area.removeFromTop(20));
+    int xpos = wavedistanceSlider->getPositionOfValue(wavedistanceSlider->getValue());
     undertowSlider->setBounds(area.removeFromBottom(20));
+    undertowSlider->setBounds(xpos, undertowSlider->getY(), getWidth() - xpos, undertowSlider->getHeight());
     
     undertowName.setBounds(area);
     wavedistanceName.setBounds(area);

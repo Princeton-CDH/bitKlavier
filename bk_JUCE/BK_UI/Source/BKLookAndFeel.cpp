@@ -153,6 +153,67 @@ void BKButtonAndMenuLAF::drawPopupMenuItem (Graphics& g, const Rectangle<int>& a
     }
 }
 
+
+void BKButtonAndMenuLAF::drawToggleButton (Graphics& g, ToggleButton& button,
+                                       bool isMouseOverButton, bool isButtonDown)
+{
+    if(toggleTextToRight)
+    {
+        const auto fontSize = jmin (15.0f, button.getHeight() * 0.75f);
+        const auto tickWidth = fontSize * 1.1f;
+        
+        drawTickBox (g, button, 4.0f, (button.getHeight() - tickWidth) * 0.5f,
+                     tickWidth, tickWidth,
+                     button.getToggleState(),
+                     button.isEnabled(),
+                     isMouseOverButton,
+                     isButtonDown);
+        
+        g.setColour (button.findColour (ToggleButton::textColourId));
+        g.setFont (fontSize);
+        
+        if (! button.isEnabled())
+            g.setOpacity (0.5f);
+        
+        const auto textX = roundToInt (tickWidth) + 10;
+        
+        g.drawFittedText (button.getButtonText(),
+                          textX, 0,
+                          button.getWidth() - textX - 2, button.getHeight(),
+                          Justification::centredLeft, 10);
+    }
+    else
+    {
+        const auto fontSize = jmin (15.0f, button.getHeight() * 0.75f);
+        const auto tickWidth = fontSize * 1.1f;
+        
+        drawTickBox (g, button,
+                     (button.getWidth() - tickWidth - 2),
+                     (button.getHeight() - tickWidth) * 0.5f,
+                     tickWidth, tickWidth,
+                     button.getToggleState(),
+                     button.isEnabled(),
+                     isMouseOverButton,
+                     isButtonDown);
+        
+        g.setColour (button.findColour (ToggleButton::textColourId));
+        g.setFont (fontSize);
+        
+        if (! button.isEnabled())
+            g.setOpacity (0.5f);
+        
+        const auto textX = roundToInt (tickWidth) + 10;
+        
+        g.drawFittedText (button.getButtonText(),
+                          0,
+                          0,
+                          button.getWidth() - textX - 2,
+                          button.getHeight(),
+                          Justification::centredRight, 10);
+        
+    }
+}
+
 void BKMultiSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int width, int height,
                                                  float sliderPos, float minSliderPos, float maxSliderPos,
                                                  const Slider::SliderStyle style, Slider& slider)

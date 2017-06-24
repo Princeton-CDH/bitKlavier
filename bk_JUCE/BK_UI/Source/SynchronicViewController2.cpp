@@ -271,15 +271,17 @@ void SynchronicViewController2::resized()
         paramSliders[i]->setBounds(area.removeFromTop(tempHeight));
     }
     
-    leftColumn.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
+    //leftColumn.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
+    leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
+    leftColumn.removeFromLeft(gXSpacing);
     
-    int nextCenter = paramSliders[0]->getY() + paramSliders[0]->getHeight() / 2 + 2. * gPaddingConst * (1. - paddingScalarY) ;
+    int nextCenter = paramSliders[0]->getY() + paramSliders[0]->getHeight() / 2 + gPaddingConst * (1. - paddingScalarY) ;
     howManySlider->setBounds(leftColumn.getX(),
                              nextCenter - gComponentSingleSliderHeight/2.,
                              leftColumn.getWidth(),
                              gComponentSingleSliderHeight);
     
-    nextCenter = paramSliders[1]->getY() + paramSliders[1]->getHeight() / 2 + 2. * gPaddingConst * (1. - paddingScalarY);
+    nextCenter = paramSliders[1]->getY() + paramSliders[1]->getHeight() / 2 + gPaddingConst * (1. - paddingScalarY);
     clusterThreshSlider->setBounds(leftColumn.getX(),
                                    nextCenter - gComponentSingleSliderHeight/2.,
                                    leftColumn.getWidth(),
@@ -291,7 +293,7 @@ void SynchronicViewController2::resized()
                                    leftColumn.getWidth(),
                                    gComponentRangeSliderHeight);
     
-    nextCenter = paramSliders[3]->getY() + paramSliders[3]->getHeight() / 2 + 2. * gPaddingConst * (1. - paddingScalarY);
+    nextCenter = paramSliders[3]->getY() + paramSliders[3]->getHeight() / 2 + gPaddingConst * (1. - paddingScalarY);
     gainSlider->setBounds(leftColumn.getX(),
                           nextCenter - gComponentSingleSliderHeight/2.,
                           leftColumn.getWidth(),

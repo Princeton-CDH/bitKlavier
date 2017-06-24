@@ -35,9 +35,10 @@ static const int gComponentComboBoxHeight = 24;
 static const int gComponentToggleBoxWidth  = gComponentComboBoxHeight;
 static const int gComponentToggleBoxHeight  = gComponentToggleBoxWidth;
 
-static const int gComponentRangeSliderHeight = 40;
-static const int gComponentSingleSliderHeight = 60;
+static const int gComponentSingleSliderXOffset  = 8;
 
+static const int gComponentRangeSliderHeight = 40;
+static const int gComponentSingleSliderHeight = 40;
 static const int gComponentStackedSliderHeight = 40;
 
 static const int gVCWidth = 375;

@@ -14,10 +14,18 @@ DirectViewController2::DirectViewController2(BKAudioProcessor& p, BKItemGraph* t
 processor(p),
 theGraph(theGraph)
 {
+    setLookAndFeel(&buttonsAndMenusLAF);
+    
+    iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::direct_icon_png, BinaryData::direct_icon_pngSize));
+    iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
+    iconImageComponent.setAlpha(0.095);
+    addAndMakeVisible(iconImageComponent);
+    
     selectCB.setName("Direct");
     selectCB.addSeparator();
     selectCB.addListener(this);
     selectCB.setSelectedItemIndex(0);
+    selectCB.BKSetJustificationType(juce::Justification::centredRight);
     selectCB.addMyListener(this);
     fillSelectCB();
     addAndMakeVisible(selectCB);
@@ -41,15 +49,75 @@ theGraph(theGraph)
     hammerGainSlider->addMyListener(this);
     addAndMakeVisible(hammerGainSlider);
     
+    addAndMakeVisible(hideOrShow);
+    hideOrShow.setName("hideOrShow");
+    hideOrShow.addListener(this);
+    hideOrShow.setButtonText(" X ");
+    
 }
 
 void DirectViewController2::paint (Graphics& g)
 {
-    g.fillAll(Colours::transparentWhite);
+    g.fillAll(Colours::black);
 }
 
 void DirectViewController2::resized()
 {
+    Rectangle<int> area (getLocalBounds());
+    
+    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
+    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
+    
+    iconImageComponent.setBounds(area);
+    area.reduce(10 * paddingScalarX + 4, 10 * paddingScalarY + 4);
+    
+    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
+    Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * paddingScalarX);
+    hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
+    selectCB.setBounds(comboBoxSlice.removeFromRight(comboBoxSlice.getWidth() / 2.));
+    
+    /* *** above here should be generic to all prep layouts *** */
+    /* ***    below here will be specific to each prep      *** */
+    
+    Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
+    modeSlice.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
+    
+    Rectangle<int> sliderSlice = area;
+    sliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    sliderSlice.removeFromRight(gXSpacing);
+    /*
+    sliderSlice.reduce(4 + 2.*gPaddingConst * paddingScalarX,
+                       4 + 2.*gPaddingConst * paddingScalarY);
+     */
+    
+    int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 5.;
+    resonanceGainSlider->setBounds(sliderSlice.getX(),
+                                      nextCenter - gComponentSingleSliderHeight/2 + 8,
+                                      sliderSlice.getWidth(),
+                                      gComponentSingleSliderHeight);
+    
+    nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 2.;
+    hammerGainSlider->setBounds(sliderSlice.getX(),
+                                   nextCenter - gComponentSingleSliderHeight/2 + 8,
+                                   sliderSlice.getWidth(),
+                                   gComponentSingleSliderHeight);
+    
+    nextCenter = sliderSlice.getY() + 4. * sliderSlice.getHeight() / 5.;
+    gainSlider->setBounds(sliderSlice.getX(),
+                          nextCenter - gComponentSingleSliderHeight/2 + 4,
+                          sliderSlice.getWidth(),
+                          gComponentSingleSliderHeight);
+    
+    //leftColumn.reduce(4, 0);
+    leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    leftColumn.removeFromLeft(gXSpacing);
+    transpositionSlider->setBounds(leftColumn.getX(),
+                                   resonanceGainSlider->getY(),
+                                   leftColumn.getWidth(),
+                                   gComponentStackedSliderHeight + paddingScalarY * 30);
+    
+    /*
     Rectangle<int> area (getLocalBounds());
     
     Rectangle<int> displayRow = area.removeFromBottom(area.getHeight() * 0.5);
@@ -61,6 +129,7 @@ void DirectViewController2::resized()
     resonanceGainSlider->setBounds(area.removeFromTop(40));
     hammerGainSlider->setBounds(area.removeFromTop(40));
     gainSlider->setBounds(area.removeFromBottom(40));
+     */
     
 }
 
@@ -152,6 +221,14 @@ void DirectViewController2::BKStackedSliderValueChanged(String name, Array<float
     
     prep->setTransposition(val);
     active->setTransposition(val);
+}
+
+void DirectViewController2::bkButtonClicked (Button* b)
+{
+    if (b == &hideOrShow)
+    {
+        processor.updateState->setCurrentDisplay(DisplayNil);
+    }
 }
 
 void DirectViewController2::fillSelectCB(void)

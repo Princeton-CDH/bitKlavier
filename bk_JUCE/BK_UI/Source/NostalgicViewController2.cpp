@@ -84,7 +84,9 @@ void NostalgicViewController2::resized()
     area.reduce(10 * paddingScalarX + 4, 10 * paddingScalarY + 4);
     
     Rectangle<int> nDisplayRow = area.removeFromBottom(100 + 80 * paddingScalarY);
-    nDisplayRow.reduce(4, 4);
+    nDisplayRow.reduce(0, 4);
+    nDisplayRow.removeFromLeft(gXSpacing + gPaddingConst * paddingScalarX * 0.5);
+    nDisplayRow.removeFromRight(gXSpacing + gPaddingConst * paddingScalarX * 0.5);
     nDisplaySlider.setBounds(nDisplayRow);
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
@@ -101,8 +103,12 @@ void NostalgicViewController2::resized()
     lengthModeSelectCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
     
     Rectangle<int> sliderSlice = area;
+    sliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    //sliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
+    /*
     sliderSlice.reduce(4 + 2.*gPaddingConst * paddingScalarX,
                        4 + 2.*gPaddingConst * paddingScalarY);
+     */
     
     int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 4.;
     lengthMultiplierSlider->setBounds(sliderSlice.getX(),
@@ -117,9 +123,9 @@ void NostalgicViewController2::resized()
                           sliderSlice.getWidth(),
                           gComponentSingleSliderHeight);
 
-    nextCenter = leftColumn.getY() + leftColumn.getHeight() / 2.;
-    leftColumn.reduce(4, 0);
-    
+    //leftColumn.reduce(4, 0);
+    leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    leftColumn.removeFromLeft(gXSpacing);
     transpositionSlider->setBounds(leftColumn.getX(),
                                    lengthMultiplierSlider->getY(),
                                    leftColumn.getWidth(),

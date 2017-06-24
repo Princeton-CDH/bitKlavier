@@ -81,6 +81,9 @@ private:
     BKKeyboardSlider absoluteKeyboard;
     BKKeyboardSlider customKeyboard;
     
+    ImageComponent iconImageComponent;
+    TextButton hideOrShow;
+    
     //other overrides
     void bkMessageReceived (const String& message) override {};
     void bkComboBoxDidChange (ComboBox* box) override;
