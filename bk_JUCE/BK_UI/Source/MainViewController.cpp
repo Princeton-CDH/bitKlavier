@@ -31,8 +31,8 @@ timerCallbackCount(0)
     addAndMakeVisible (mainSlider);
     mainSlider->setRange (-90, 12.0, 0.1);
     mainSlider->getLookAndFeel().setColour(Slider::thumbColourId, Colours::goldenrod);
-    mainSlider->getLookAndFeel().setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.75));
-    mainSlider->getLookAndFeel().setColour(Slider::backgroundColourId, Colours::goldenrod.withMultipliedAlpha(0.25));
+    mainSlider->getLookAndFeel().setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.25));
+    mainSlider->getLookAndFeel().setColour(Slider::backgroundColourId, Colours::goldenrod.withMultipliedAlpha(0.1));
     mainSlider->setSkewFactor (2.5, false);
     mainSlider->setPopupMenuEnabled (true);
     mainSlider->setValue (0);
