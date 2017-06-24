@@ -153,6 +153,7 @@ void TuningViewController2::resized()
     
     float keyboardHeight = 60 + 50 * paddingScalarY;
     Rectangle<int> absoluteKeymapRow = area.removeFromBottom(keyboardHeight);
+    absoluteKeymapRow.reduce(gXSpacing, 0);
     absoluteKeyboard.setBounds(absoluteKeymapRow);
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);

@@ -16,6 +16,13 @@ processor(p),
 theGraph(theGraph)
 {
     
+    setLookAndFeel(&buttonsAndMenusLAF);
+    
+    iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::tempo_icon_png, BinaryData::tempo_icon_pngSize));
+    iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
+    iconImageComponent.setAlpha(0.095);
+    addAndMakeVisible(iconImageComponent);
+    
     selectCB.setName("Tempo");
     selectCB.addSeparator();
     selectCB.addListener(this);
@@ -23,15 +30,12 @@ theGraph(theGraph)
     selectCB.addMyListener(this);
     fillSelectCB();
     addAndMakeVisible(selectCB);
-    selectLabel.setText("Which", dontSendNotification);
-    addAndMakeVisible(selectLabel);
-    
+
     modeCB.setName("Mode");
+    modeCB.BKSetJustificationType(juce::Justification::centredRight);
     modeCB.addListener(this);
     fillModeCB();
     addAndMakeVisible(modeCB);
-    modeLabel.setText("Mode", dontSendNotification);
-    addAndMakeVisible(modeLabel);
     
     tempoSlider = new BKSingleSlider("Tempo", 40, 208, 100, 0.01);
     tempoSlider->addMyListener(this);
@@ -39,30 +43,39 @@ theGraph(theGraph)
     
     AT1HistorySlider = new BKSingleSlider("History", 1, 10, 4, 1);
     AT1HistorySlider->addMyListener(this);
+    AT1HistorySlider->setJustifyRight(false);
     addAndMakeVisible(AT1HistorySlider);
     
-    AT1SubdivisionsSlider = new BKSingleSlider("Subdivisions within Time Difference", 0., 12, 1, 0.01);
+    AT1SubdivisionsSlider = new BKSingleSlider("Subdivisions", 0., 12, 1, 0.01);
     AT1SubdivisionsSlider->addMyListener(this);
+    AT1SubdivisionsSlider->setJustifyRight(false);
     addAndMakeVisible(AT1SubdivisionsSlider);
     
-    AT1MinMaxSlider = new BKRangeSlider("Min/Max Time Difference (ms)", 1, 2000, 100, 500, 10);
+    AT1MinMaxSlider = new BKRangeSlider("Min/Max (ms)", 1, 2000, 100, 500, 10);
     AT1MinMaxSlider->addMyListener(this);
+    AT1MinMaxSlider->setJustifyRight(false);
     AT1MinMaxSlider->setIsMinAlwaysLessThanMax(true);
     addAndMakeVisible(AT1MinMaxSlider);
     
-    A1ModeCB.setName("Adaptive Tempo Mode");
+    A1ModeCB.setName("Adaptive Mode");
     A1ModeCB.addListener(this);
     addAndMakeVisible(A1ModeCB);
     fillA1ModeCB();
-    A1ModeLabel.setText("Adaptive Tempo Mode", dontSendNotification);
+    A1ModeLabel.setText("Adaptive Mode", dontSendNotification);
     addAndMakeVisible(A1ModeLabel);
     
     addAndMakeVisible(A1AdaptedTempo);
     addAndMakeVisible(A1AdaptedPeriodMultiplier);
+    A1AdaptedPeriodMultiplier.setJustificationType(juce::Justification::centredRight);
     
     A1reset.addListener(this);
     A1reset.setButtonText("reset");
     addAndMakeVisible(A1reset);
+    
+    addAndMakeVisible(hideOrShow);
+    hideOrShow.setName("hideOrShow");
+    hideOrShow.addListener(this);
+    hideOrShow.setButtonText(" X ");
     
     startTimer(50);
     
@@ -73,6 +86,74 @@ theGraph(theGraph)
 
 void TempoViewController2::resized()
 {
+    Rectangle<int> area (getLocalBounds());
+    
+    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
+    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
+    
+    iconImageComponent.setBounds(area);
+    area.reduce(10 * paddingScalarX + 4, 10 * paddingScalarY + 4);
+    
+    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
+    Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    comboBoxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    A1reset.setBounds(comboBoxSlice.removeFromLeft(45));
+    
+    /* *** above here should be generic (mostly) to all prep layouts *** */
+    /* ***         below here will be specific to each prep          *** */
+    
+    // ********* left column
+    
+    leftColumn.removeFromBottom(gYSpacing);
+    int extraY = (leftColumn.getHeight() -
+              (gComponentComboBoxHeight +
+               gComponentSingleSliderHeight * 2 +
+               gComponentRangeSliderHeight +
+               gComponentTextFieldHeight +
+               gYSpacing * 6)) / 6.;
+    
+    //DBG("extraY = " + String(extraY));
+    
+    leftColumn.removeFromTop(extraY + gYSpacing);
+    Rectangle<int> A1ModeCBSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    A1ModeCBSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    //A1ModeCBSlice.removeFromLeft(2 * gXSpacing + hideOrShow.getWidth());
+    A1ModeCBSlice.removeFromLeft(gXSpacing);
+    A1ModeCB.setBounds(A1ModeCBSlice.removeFromLeft(selectCB.getWidth() + gXSpacing + hideOrShow.getWidth()));
+    A1ModeLabel.setBounds(A1ModeCBSlice);
+    
+    leftColumn.removeFromTop(extraY + gYSpacing);
+    AT1HistorySlider->setBounds(leftColumn.removeFromTop(gComponentSingleSliderHeight));
+    
+    leftColumn.removeFromTop(extraY + gYSpacing);
+    AT1SubdivisionsSlider->setBounds(leftColumn.removeFromTop(gComponentSingleSliderHeight));
+    
+    leftColumn.removeFromTop(extraY + gYSpacing);
+    AT1MinMaxSlider->setBounds(leftColumn.removeFromTop(gComponentRangeSliderHeight));
+    
+    leftColumn.removeFromTop(extraY + gYSpacing);
+    Rectangle<int> adaptedLabelSlice = leftColumn.removeFromTop(gComponentTextFieldHeight);
+    A1AdaptedTempo.setBounds(adaptedLabelSlice.removeFromLeft(leftColumn.getWidth() / 2.));
+    A1AdaptedPeriodMultiplier.setBounds(adaptedLabelSlice);
+    
+    // ********* right column
+    
+    Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
+    modeSlice.removeFromRight(gXSpacing);
+    modeCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
+    
+    area.removeFromTop(A1ModeCB.getY() - selectCB.getBottom());
+    Rectangle<int> tempoSliderSlice = area.removeFromTop(gComponentSingleSliderHeight);
+    tempoSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
+    tempoSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
+    tempoSlider->setBounds(tempoSliderSlice);
+
+    /*
     Rectangle<int> area (getLocalBounds());
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.25);
     Rectangle<int> rightColumn = area.removeFromRight(leftColumn.getWidth());
@@ -104,14 +185,14 @@ void TempoViewController2::resized()
     
     rightColumn.removeFromTop(gYSpacing * 2);
     A1reset.setBounds(rightColumn.removeFromTop(20));
-    
+    */
 }
 
 
 void TempoViewController2::paint (Graphics& g)
 {
     //g.fillAll(Colours::lightgrey);
-    g.fillAll(Colours::transparentWhite);
+    g.fillAll(Colours::black);
 }
 
 
@@ -124,7 +205,7 @@ void TempoViewController2::timerCallback()
         lastPeriodMultiplier = tProcessor->getPeriodMultiplier();
         
         A1AdaptedTempo.setText("Adapted Tempo = " + String(tProcessor->getAdaptedTempo()), dontSendNotification);
-        A1AdaptedPeriodMultiplier.setText("Adapted Period Multiplier = " + String(tProcessor->getPeriodMultiplier()), dontSendNotification);
+        A1AdaptedPeriodMultiplier.setText("Period Multiplier = " + String(tProcessor->getPeriodMultiplier()), dontSendNotification);
     }
     
 }
@@ -321,5 +402,9 @@ void TempoViewController2::bkButtonClicked (Button* b)
         
         TempoProcessor::Ptr tProcessor = processor.gallery->getTempoProcessor(processor.updateState->currentTempoId);
         tProcessor->reset();
+    }
+    else if (b == &hideOrShow)
+    {
+        processor.updateState->setCurrentDisplay(DisplayNil);
     }
 }

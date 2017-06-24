@@ -63,6 +63,9 @@ private:
     
     TextButton A1reset;
     
+    ImageComponent iconImageComponent;
+    TextButton hideOrShow;
+    
     float lastPeriodMultiplier;
     
     void bkMessageReceived (const String& message) override {};
@@ -80,6 +83,7 @@ private:
     
     void updateComponentVisibility();
     
+    BKButtonAndMenuLAF buttonsAndMenusLAF;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TempoViewController2)
 };
