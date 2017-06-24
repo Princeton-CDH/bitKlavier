@@ -38,11 +38,13 @@ public:
     
     void resized(void) override;
 
-    void connectWith(BKItem* item);
+    void addConnection(BKItem* item);
+    
+    bool compare(BKItem* item);
     
     bool isConnectedWith(BKItem* item);
     
-    void disconnectFrom(BKItem* toDisconnect);
+    void removeConnection(BKItem* toDisconnect);
     
     void itemIsBeingDragged(const MouseEvent&, Point<int>) override;
     
@@ -82,6 +84,7 @@ public:
     }
     
     inline ModificationMapper::Ptr getMapper() const noexcept { return mapper; }
+    inline void setMapper(ModificationMapper::Ptr map) {mapper = map; }
     
     inline int getSelectedId(void) const noexcept {return currentId;}
     inline void setSelectedId(int Id) { menu.setSelectedId(Id, dontSendNotification); }
@@ -118,7 +121,7 @@ public:
     
     Point<int> position;
     
-    
+    void setImage(Image newImage);
     
 private:
     BKAudioProcessor& processor;
@@ -138,6 +141,8 @@ private:
     ModificationMapper::Ptr mapper;
     
     String name;
+    
+    
 
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKItem)
@@ -249,7 +254,17 @@ public:
     
     void updateLast(void);
     
+    void updateClipboard(void);
+    
+    inline void setClipboad(BKItem::PtrArr theseItems)
+    {
+        
+    }
+    
     inline BKItem::RCArr getLast(void) const noexcept { return last; }
+    
+    BKItem::RCArr clipboard;
+    
     
     int itemIdCount;
     

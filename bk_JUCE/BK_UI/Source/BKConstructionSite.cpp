@@ -10,16 +10,17 @@
 
 #include "BKConstructionSite.h"
 
-#define AUTO_DRAW 0
-#define NUM_COL 6
+#define AUTO_DRAW 1
+#define NUM_COL 8
 
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
 BKDraggableComponent(false,true,false),
 processor(p),
 graph(theGraph),
 connect(false),
-lastDownX(10),
-lastDownY(10)
+lastX(10),
+lastY(10),
+altDown(false)
 {
     addKeyListener(this);
     
@@ -48,6 +49,8 @@ void BKConstructionSite::redraw(void)
     
     graph->reconstruct();
     
+    graph->deselectAll();
+    
     draw();
     
 }
@@ -74,7 +77,7 @@ void BKConstructionSite::move(int which, bool fine)
     repaint();
 }
 
-void BKConstructionSite::remove(void)
+void BKConstructionSite::deleteSelected(void)
 {
     graph->updateLast();
     
@@ -84,6 +87,8 @@ void BKConstructionSite::remove(void)
     {
         deleteItem(selectedItems[i]);
     }
+    
+    selected.deselectAll();
     
     repaint();
 }
@@ -200,7 +205,7 @@ void BKConstructionSite::draw(void)
 #endif
             
         }
-        else if (type <= PreparationTypeNostalgic)
+        else if (type <= PreparationTypeNostalgic || type == PreparationTypePianoMap || type == PreparationTypeMod)
         {
 #if AUTO_DRAW
             int col = (int)(prepCount / NUM_COL);
@@ -223,8 +228,8 @@ void BKConstructionSite::draw(void)
             int col = (int)(modCount / NUM_COL);
             int row = modCount % NUM_COL;
             
-            int X = 95 + (row * 155);
-            int Y = 125 + (col * 25);
+            int X = 10 + (row * 155);
+            int Y = 400 + (col * 25);
             
             
             item->setTopLeftPosition(X, Y);
@@ -280,9 +285,9 @@ void BKConstructionSite::addItem(BKPreparationType type, int which)
 {
     BKItem::Ptr toAdd = new BKItem(type, which, processor);
     
-    toAdd->setTopLeftPosition(lastDownX, lastDownY);
+    toAdd->setTopLeftPosition(lastX, lastY);
     
-    lastDownX += 10; lastDownY += 10;
+    lastX += 10; lastY += 10;
     
     graph->add(toAdd);
     
@@ -293,11 +298,69 @@ void BKConstructionSite::addItem(BKPreparationType type, int which)
 // Drag interface
 void BKConstructionSite::itemWasDropped(BKPreparationType type, Array<int> data, int x, int y)
 {
-    lastDownX = x; lastDownY = y;
+    lastX = x; lastY = y;
     
     for (int i = 0; i < data.size(); i++)   addItem(type, data[i]);
     
     graph->updateLast();
+}
+
+void BKConstructionSite::copy(void)
+{
+    graph->updateClipboard();
+}
+
+void BKConstructionSite::addItemsFromClipboard(void)
+{
+    graph->deselectAll();
+    
+    int which = 0;
+    int firstX, firstY;
+    for (auto item : graph->clipboard)
+    {
+        BKItem::Ptr toAdd = new BKItem(item->getType(), item->getId(), processor);
+        
+        if (which == 0)
+        {
+            toAdd->setTopLeftPosition(lastX, lastY);
+            firstX = item->position.x; firstY = item->position.y;
+        }
+        else
+        {
+            toAdd->setTopLeftPosition(lastX+item->position.x-firstX, lastY+item->position.y-firstY);
+        }
+        
+        graph->add(toAdd);
+        
+        for (auto connection : toAdd->getConnections())
+            graph->connect(toAdd, connection);
+        
+        addAndMakeVisible(toAdd);
+        
+        which++;
+        
+        graph->select(toAdd);
+    }
+}
+
+void BKConstructionSite::paste(void)
+{
+    addItemsFromClipboard();
+}
+
+void BKConstructionSite::cut(void)
+{
+    graph->updateClipboard();
+    deleteSelected();
+    
+}
+
+void BKConstructionSite::mouseMove (const MouseEvent& eo)
+{
+    MouseEvent e = eo.getEventRelativeTo(this);
+    
+    lastX = e.x;
+    lastY = e.y;
 }
 
 void BKConstructionSite::mouseDown (const MouseEvent& eo)
@@ -306,7 +369,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     
     itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
     
-    lastDownX = e.x; lastDownY = e.y;
+    lastX = e.x; lastY = e.y;
     
     if (itemToSelect != nullptr)
     {
@@ -323,6 +386,28 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
             {
                 prepareItemDrag(item, e, true);
             }
+            
+        }
+        else if (e.mods.isAltDown())
+        {
+            // Copy and drag
+            
+            itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
+            
+            if (!itemToSelect->getSelected())
+            {
+                graph->deselectAll();
+                graph->select(itemToSelect);
+            }
+            
+            graph->updateClipboard();
+            
+            lastX = e.x; lastY = e.y;
+            
+            addItemsFromClipboard();
+            
+            
+            
             
         }
         else
@@ -371,7 +456,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
 
 void BKConstructionSite::mouseDrag (const MouseEvent& e)
 {
-    lastDownX = e.x; lastDownY = e.y;
+    lastX = e.x; lastY = e.y;
     
     if (itemToSelect == nullptr) lasso->dragLasso(e);
     

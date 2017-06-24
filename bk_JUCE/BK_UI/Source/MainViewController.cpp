@@ -102,11 +102,11 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     }
     else if (code == KeyPress::deleteKey)
     {
-        construction.remove();
+        construction.deleteSelected();
     }
     else if (code == KeyPress::backspaceKey)
     {
-        construction.remove();
+        construction.deleteSelected();
     }
     else if (code == KeyPress::upKey)
     {
@@ -134,7 +134,8 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     }
     else if (code == 67) // C modification
     {
-        construction.addItem(PreparationTypeMod, 1);
+        if (e.getModifiers().isCommandDown())   construction.copy();
+        else                                    construction.addItem(PreparationTypeMod, 1);
     }
     else if (code == 68) // D direct
     {
@@ -167,6 +168,14 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     else if (code == 84) // T tuning
     {
         construction.addItem(PreparationTypeTuning, 1);
+    }
+    else if (code == 86) // V
+    {
+        if (e.getModifiers().isCommandDown())   construction.paste();
+    }
+    else if (code == 88) // X
+    {
+        if (e.getModifiers().isCommandDown())   construction.cut();
     }
 }
 

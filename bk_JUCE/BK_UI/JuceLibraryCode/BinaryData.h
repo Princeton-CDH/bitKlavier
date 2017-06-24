@@ -20,8 +20,23 @@ namespace BinaryData
     extern const char*   keymap_icon_png;
     const int            keymap_icon_pngSize = 5963;
 
-    extern const char*   mod_icon_png;
-    const int            mod_icon_pngSize = 2536;
+    extern const char*   mod_direct_icon_png;
+    const int            mod_direct_icon_pngSize = 11541;
+
+    extern const char*   mod_nostalgic_icon_png;
+    const int            mod_nostalgic_icon_pngSize = 11553;
+
+    extern const char*   mod_synchronic_icon_png;
+    const int            mod_synchronic_icon_pngSize = 11468;
+
+    extern const char*   mod_tempo_icon_png;
+    const int            mod_tempo_icon_pngSize = 11298;
+
+    extern const char*   mod_tuning_icon_png;
+    const int            mod_tuning_icon_pngSize = 11524;
+
+    extern const char*   mod_unassigned_icon_png;
+    const int            mod_unassigned_icon_pngSize = 11339;
 
     extern const char*   nostalgic_icon_png;
     const int            nostalgic_icon_pngSize = 11489;
@@ -45,7 +60,7 @@ namespace BinaryData
     extern const char* namedResourceList[];
 
     // Number of elements in the namedResourceList array.
-    const int namedResourceListSize = 11;
+    const int namedResourceListSize = 16;
 
     // If you provide the name of one of the binary resource variables above, this function will
     // return the corresponding data and its size (or a null pointer if the name isn't found).

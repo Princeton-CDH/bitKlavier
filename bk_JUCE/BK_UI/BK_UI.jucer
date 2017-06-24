@@ -27,8 +27,18 @@
           <FILE id="XKtIlB" name="icon.png" compile="0" resource="1" file="Source/icons/icon.png"
                 xcodeResource="0"/>
           <FILE id="wEIbpZ" name="keymap_icon.png" compile="0" resource="1" file="Source/icons/keymap_icon.png"/>
-          <FILE id="prJ2HS" name="mod_icon.png" compile="0" resource="1" file="Source/icons/mod_icon.png"
-                xcodeResource="0"/>
+          <FILE id="cVywwa" name="mod_direct_icon.png" compile="0" resource="1"
+                file="Source/icons/mod_direct_icon.png"/>
+          <FILE id="EztFRr" name="mod_nostalgic_icon.png" compile="0" resource="1"
+                file="Source/icons/mod_nostalgic_icon.png"/>
+          <FILE id="sf35pm" name="mod_synchronic_icon.png" compile="0" resource="1"
+                file="Source/icons/mod_synchronic_icon.png"/>
+          <FILE id="W48ccm" name="mod_tempo_icon.png" compile="0" resource="1"
+                file="Source/icons/mod_tempo_icon.png"/>
+          <FILE id="oPUWKk" name="mod_tuning_icon.png" compile="0" resource="1"
+                file="Source/icons/mod_tuning_icon.png"/>
+          <FILE id="bQ9nHT" name="mod_unassigned_icon.png" compile="0" resource="1"
+                file="Source/icons/mod_unassigned_icon.png"/>
           <FILE id="XAH0zl" name="nostalgic_icon.png" compile="0" resource="1"
                 file="Source/icons/nostalgic_icon.png" xcodeResource="0"/>
           <FILE id="GvDVbY" name="piano_icon.png" compile="0" resource="1" file="Source/icons/piano_icon.png"

@@ -36,9 +36,14 @@ public:
     void pianoMapDidChange(BKItem* thisItem);
     
     void move(int which, bool fine);
-    void remove(void);
+    void deleteSelected(void);
     void align(int which);
+    void copy(void);
+    bool inPaste, inCopyDrag, inCut;
+    void paste(void);
+    void cut(void);
     
+    void addItemsFromClipboard(void);
     void addItem(BKPreparationType type, int which);
     
     inline void setCurrentItem(BKItem* item) { currentItem = item;}
@@ -46,6 +51,8 @@ public:
 
     void idDidChange(void);
     void reconfigureCurrentItem(void);
+    
+    bool altDown;
     
 private:
     
@@ -90,14 +97,15 @@ private:
     
     void mouseDrag (const MouseEvent& e) override;
     
+    void mouseMove (const MouseEvent& e) override;
+    
     void deleteItem (BKItem* item);
     
     bool keyPressed (const KeyPress& e, Component*) override;
     
     BKItem* getItemAtPoint(const int X, const int Y);
 
-    int lastDownX, lastDownY;
-    int lastAddedX, lastAddedY;
+    int lastX, lastY;
     
     
     

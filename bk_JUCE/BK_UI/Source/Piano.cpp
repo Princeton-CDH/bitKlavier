@@ -50,8 +50,14 @@ Id(Id)
     for (int i = 0; i < 128; i++)
     {
         pianoMap.set(i, -1);
+        
+        pianoMaps.add(Array<int>());
+        pianoMaps.add(Array<int>());
+        
         modificationMap.add(new Modifications());
     }
+    
+    
     
 
 }
@@ -725,23 +731,27 @@ ValueTree Piano::getState(void)
     {
         ValueTree mapVT ("mapper"+String(mapCount++));
         
-        mapVT.setProperty("type", map->getType(), 0);
-        
-        mapVT.setProperty("Id", map->getId(), 0);
-        
-        int pcount = 0;
-        for (auto keymap : map->getKeymaps())
+        if (map->getType() < BKPreparationTypeNil && map->getKeymaps().size() && map->getTargets().size())
         {
-            mapVT.setProperty("k"+String(pcount++), keymap, 0);
+            mapVT.setProperty("type", map->getType(), 0);
+            
+            if (map->getId() >= 0)  mapVT.setProperty("Id", map->getId(), 0);
+            
+            int pcount = 0;
+            for (auto keymap : map->getKeymaps())
+            {
+                mapVT.setProperty("k"+String(pcount++), keymap, 0);
+            }
+            
+            pcount = 0;
+            for (auto target : map->getTargets())
+            {
+                mapVT.setProperty("t"+String(pcount++), target, 0);
+            }
+            
+            pianoVT.addChild(mapVT, -1, 0);
         }
-        
-        pcount = 0;
-        for (auto target : map->getTargets())
-        {
-            mapVT.setProperty("t"+String(pcount++), target, 0);
-        }
-        
-        pianoVT.addChild(mapVT, -1, 0);
+
     }
 
     int resetCount = 0;
@@ -815,6 +825,8 @@ void Piano::setState(XmlElement* e)
     {
         String map =  "mapper" + String(mapperCount);
         
+        
+        
         if (pc->hasTagName("configuration"))
         {
             configuration->setState(pc);
@@ -844,6 +856,7 @@ void Piano::setState(XmlElement* e)
                 if (attr == String::empty)  break;
                 else                        targets.add(attr.getIntValue());
             }
+            
             
             ModificationMapper::Ptr mapper = new ModificationMapper(type, Id, keymaps, targets);
             
