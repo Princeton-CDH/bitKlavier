@@ -42,6 +42,7 @@ public:
     sGain(p->getGain()),
     sClusterThresh(p->getClusterThreshMS()),
     sClusterThreshSec(p->getClusterThreshSEC()),
+    sReleaseVelocitySetsSynchronic(p->getReleaseVelocitySetsSynchronic()),
     tuning(p->getTuning()),
     tempo(p->getTempoControl())
     {
@@ -52,6 +53,7 @@ public:
                           int clusterMax,
                           float clusterThresh,
                           SynchronicSyncMode mode,
+                          bool velocityMode,
                           int beatsToSkip,
                           Array<float> beatMultipliers,
                           Array<float> accentMultipliers,
@@ -63,6 +65,7 @@ public:
     sClusterMin(clusterMin),
     sClusterMax(clusterMax),
     sMode(mode),
+    sReleaseVelocitySetsSynchronic(velocityMode),
     sBeatsToSkip(beatsToSkip),
     sBeatMultipliers(beatMultipliers),
     sAccentMultipliers(accentMultipliers),
@@ -82,6 +85,7 @@ public:
     sClusterMax(100),
     sClusterCap(8),
     sMode(FirstNoteOnSync),
+    sReleaseVelocitySetsSynchronic(false),
     sBeatsToSkip(0),
     sBeatMultipliers(Array<float>({1.0})),
     sAccentMultipliers(Array<float>({1.0})),
@@ -111,6 +115,7 @@ public:
         sTransposition = s->getTransposition();
         sClusterThresh = s->getClusterThreshMS();
         sClusterThreshSec = s->getClusterThreshSEC();
+        sReleaseVelocitySetsSynchronic = s->getReleaseVelocitySetsSynchronic();
         tuning = s->getTuning();
         tempo = s->getTempoControl();
     }
@@ -175,6 +180,7 @@ public:
                 sGain == s->getGain() &&
                 sClusterThresh == s->getClusterThreshMS() &&
                 sClusterThreshSec == s->getClusterThreshSEC() &&
+                sReleaseVelocitySetsSynchronic == s->getReleaseVelocitySetsSynchronic() &&
                 tuning == s->getTuning() &&
                 tempo == s->getTempoControl());
     }
@@ -198,6 +204,7 @@ public:
     inline const Array<float> getAccentMultipliers() const noexcept    {return sAccentMultipliers;     }
     inline const Array<float> getLengthMultipliers() const noexcept    {return sLengthMultipliers;     }
     inline const Array<Array<float>> getTransposition() const noexcept {return sTransposition;         }
+    inline const bool getReleaseVelocitySetsSynchronic() const noexcept{return sReleaseVelocitySetsSynchronic; }
     inline const float getGain() const noexcept                        {return sGain;              }
     
     //inline const Keymap::Ptr getResetMap() const noexcept              {return resetMap;       }
@@ -236,6 +243,7 @@ public:
     inline void setAccentMultiplier(int whichSlider, float value)      {sAccentMultipliers.set(whichSlider, value);         }
     inline void setLengthMultiplier(int whichSlider, float value)      {sLengthMultipliers.set(whichSlider, value);         }
     inline void setSingleTransposition(int whichSlider, Array<float> values) {sTransposition.set(whichSlider, values); }
+    inline void setReleaseVelocitySetsSynchronic(bool rvss)            {sReleaseVelocitySetsSynchronic = rvss;          }
     inline void setGain(float gain)                                    {sGain = gain;                          }
     
     //Adaptive Tempo 1
@@ -262,6 +270,7 @@ public:
         DBG("sClusterMax: " + String(sClusterMax));
         DBG("sClusterCap: " + String(sClusterCap));
         DBG("sClusterThresh: " + String(sClusterThresh));
+        DBG("sReleaseVelocitySetsSynchronic: " + String(sReleaseVelocitySetsSynchronic));
         DBG("sMode: " + String(sMode));
         DBG("sBeatsToSkip: " + String(sBeatsToSkip));
         DBG("sBeatMultipliers: " + floatArrayToString(sBeatMultipliers));
@@ -295,6 +304,8 @@ private:
     float sGain;                //gain multiplier
     float sClusterThresh;      //max time between played notes before new cluster is started, in MS
     float sClusterThreshSec;
+    
+    bool sReleaseVelocitySetsSynchronic;
     
     /*
     // Adaptive Tempo 1
@@ -336,7 +347,7 @@ public:
     
     void processBlock(int numSamples, int channel);
     void keyPressed(int noteNumber, float velocity);
-    void keyReleased(int noteNumber, int channel);
+    void keyReleased(int noteNumber, float velocity, int channel);
     float getTimeToBeatMS(float beatsToSkip);
     
     inline const int getBeatMultiplierCounter() const noexcept { return beatMultiplierCounter; }

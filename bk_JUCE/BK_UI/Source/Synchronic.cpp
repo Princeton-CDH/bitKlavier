@@ -80,7 +80,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
         float offset = tuner->getOffset(note) + t;
         int synthNoteNumber = ((float)note + (int)offset);
         float synthOffset = offset - (int)offset;
-        
+        DBG("playing synchronic note/vel " + String(note) +  " " + String(velocity));
         synth->keyOn(channel,
                      synthNoteNumber,
                      synthOffset,
@@ -116,7 +116,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     tuner = active->getTuning()->processor;
     
     //store velocity
-    velocities.set(noteNumber, velocity);
+    if(!active->getReleaseVelocitySetsSynchronic()) velocities.set(noteNumber, velocity);
  
     //add note to array of depressed notes
     keysDepressed.addIfNotAlreadyThere(noteNumber);
@@ -185,7 +185,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 }
 
 
-void SynchronicProcessor::keyReleased(int noteNumber, int channel)
+void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channel) 
 {
     
     //remove key from array of pressed keys
@@ -199,6 +199,8 @@ void SynchronicProcessor::keyReleased(int noteNumber, int channel)
     if (    (active->getMode() == LastNoteOffSync && keysDepressed.size() == 0)
          || (active->getMode() == AnyNoteOffSync))
     {
+        
+        if(active->getReleaseVelocitySetsSynchronic()) velocities.set(noteNumber, velocity);
         
         resetPhase(active->getBeatsToSkip() - 1);
         

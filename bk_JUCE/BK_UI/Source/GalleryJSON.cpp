@@ -257,12 +257,12 @@ void Gallery::setStateFromJson(var myJson)
                     }
                     else if (syncMode == 2) // note-off-sync
                     {
-                        syncPrep->setMode(AnyNoteOffSync);
+                        syncPrep->setMode(LastNoteOffSync);
                         syncPrep->setBeatsToSkip(1);
                     }
                     else if (syncMode == 3) // note-off-start
                     {
-                        syncPrep->setMode(AnyNoteOffSync);
+                        syncPrep->setMode(LastNoteOffSync);
                         syncPrep->setBeatsToSkip(0);
                     }
                     else if (syncMode == 4) // first-note-start

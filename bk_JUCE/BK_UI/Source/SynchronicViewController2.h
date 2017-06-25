@@ -56,6 +56,7 @@ private:
     BKComboBox modeSelectCB;
 
     ToggleButton offsetParamStartToggle;
+    ToggleButton releaseVelocitySetsSynchronicToggle;
     ScopedPointer<BKSingleSlider> howManySlider;
     ScopedPointer<BKSingleSlider> clusterThreshSlider;
     ScopedPointer<BKRangeSlider> clusterMinMaxSlider;
@@ -82,6 +83,7 @@ private:
     void fillModeSelectCB(void);
     
     BKButtonAndMenuLAF buttonsAndMenusLAF;
+    BKButtonAndMenuLAF buttonsAndMenusLAF2;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicViewController2)
 };

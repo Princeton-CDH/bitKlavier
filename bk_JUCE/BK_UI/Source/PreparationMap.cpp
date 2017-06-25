@@ -359,7 +359,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
     for (int i = synchronic.size(); --i >= 0; )
     {
         if (pKeymap->containsNote(noteNumber))
-            synchronic[i]->processor->keyReleased(noteNumber, channel);
+            synchronic[i]->processor->keyReleased(noteNumber, velocity, channel);
     }
     
     for (int i = nostalgic.size(); --i >= 0; )

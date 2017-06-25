@@ -64,6 +64,13 @@ theGraph(theGraph)
     offsetParamStartToggle.setToggleState (true, dontSendNotification);
     addAndMakeVisible(offsetParamStartToggle);
     
+    releaseVelocitySetsSynchronicToggle.addListener(this);
+    releaseVelocitySetsSynchronicToggle.setLookAndFeel(&buttonsAndMenusLAF2); //need different one so toggle text can be on other side
+    releaseVelocitySetsSynchronicToggle.setButtonText ("release loudness");
+    buttonsAndMenusLAF2.setToggleBoxTextToRightBool(true);
+    releaseVelocitySetsSynchronicToggle.setToggleState (false, dontSendNotification);
+    addAndMakeVisible(releaseVelocitySetsSynchronicToggle);
+    
     howManySlider = new BKSingleSlider("how many", 1, 100, 1, 1);
     howManySlider->setJustifyRight(false);
     howManySlider->addMyListener(this);
@@ -261,6 +268,7 @@ void SynchronicViewController2::resized()
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    releaseVelocitySetsSynchronicToggle.setBounds(comboBoxSlice);
     
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
@@ -321,6 +329,7 @@ void SynchronicViewController2::updateFields(NotificationType notify)
     selectCB.setSelectedItemIndex(processor.updateState->currentSynchronicId, notify);
     modeSelectCB.setSelectedItemIndex(prep->getMode(), notify);
     offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
+    releaseVelocitySetsSynchronicToggle.setToggleState(prep->getReleaseVelocitySetsSynchronic(), notify);
     howManySlider->setValue(prep->getNumBeats(), notify);
     clusterThreshSlider->setValue(prep->getClusterThreshMS(), notify);
     clusterMinMaxSlider->setMinValue(prep->getClusterMin(), notify);
@@ -498,6 +507,14 @@ void SynchronicViewController2::buttonClicked (Button* b)
     else if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+    else if (b == &releaseVelocitySetsSynchronicToggle)
+    {
+        SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+        SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+        
+        prep->setReleaseVelocitySetsSynchronic(releaseVelocitySetsSynchronicToggle.getToggleState());
+        active->setReleaseVelocitySetsSynchronic(releaseVelocitySetsSynchronicToggle.getToggleState());
     }
 }
 

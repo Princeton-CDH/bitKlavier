@@ -92,6 +92,7 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     int p, pm;
     
     noteOn.set(noteNumber, false);
+    DBG("noteoff velocity = " + String(velocity));
     
     // Send key off to each pmap in current piano
     for (p = currentPiano->activePMaps.size(); --p >= 0;)
@@ -139,7 +140,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
         int noteNumber = m.getNoteNumber();
-        DBG("note: " + String(noteNumber));
+        DBG("note: " + String(noteNumber) + " " + String(m.getVelocity()));
         float velocity = m.getFloatVelocity();
         int p, pm; // piano, prepmap
         
