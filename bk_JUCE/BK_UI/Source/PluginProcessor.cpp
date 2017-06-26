@@ -9,10 +9,10 @@
 
 //==============================================================================
 BKAudioProcessor::BKAudioProcessor():
+updateState(new BKUpdateState()),
 mainPianoSynth(),
-resonanceReleaseSynth(),
 hammerReleaseSynth(),
-updateState             (new BKUpdateState())
+resonanceReleaseSynth()
 {
     didLoadHammersAndRes            = false;
     didLoadMainPianoSamples         = false;
@@ -142,8 +142,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         int noteNumber = m.getNoteNumber();
         DBG("note: " + String(noteNumber) + " " + String(m.getVelocity()));
         float velocity = m.getFloatVelocity();
-        int p, pm; // piano, prepmap
-        
+         
         channel = m.getChannel();
         
         if (m.isNoteOn())
@@ -200,13 +199,23 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         else if (m.isController())
         {
             int controller = m.getControllerNumber();
-            float value = m.getControllerValue() / 128.0f;
-            
             int piano = controller-51;
             
             if ((m.getControllerValue() != 0) && piano >= 0 && piano < 5)   setCurrentPiano(piano);
-
+        }
+        
+        if (m.isSustainPedalOn())
+        {
+            DBG("sustain pedal depressed");
+            for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                currentPiano->activePMaps[p]->sustainPedalPressed();
             
+        }
+        else if (m.isSustainPedalOff())
+        {
+            DBG("sustain pedal released");
+            for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                currentPiano->activePMaps[p]->sustainPedalReleased();
         }
     }
     

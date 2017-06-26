@@ -40,6 +40,8 @@ public:
     void keyPressed(int noteNumber, float velocity, int channel);
     void keyReleased(int noteNumber, float velocity, int channel);
     void postRelease(int noteNumber, float velocity, int channel);
+    void sustainPedalPressed()  { sustainPedalIsDepressed = true;  }
+    void sustainPedalReleased();
     
     void setKeymap(Keymap::Ptr km);
     inline Keymap::Ptr getKeymap()              { return pKeymap; }
@@ -173,6 +175,16 @@ private:
     BKSynthesiser*              hammerSynth;
     
     double                      sampleRate;
+    
+    bool sustainPedalIsDepressed;
+
+    struct SustainedNote
+    {
+        int noteNumber;
+        float velocity;
+        int channel;
+    };
+    Array<SustainedNote> sustainedNotes;
     
     
     JUCE_LEAK_DETECTOR(PreparationMap)

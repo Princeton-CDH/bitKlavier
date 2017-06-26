@@ -32,6 +32,7 @@ resizer(new ResizableCornerComponent (this, constrain))
     
     mvc.setSize(gMainComponentWidth, gMainComponentHeight);
     setSize(gMainComponentWidth, gMainComponentHeight);
+
 }
 
 BKAudioProcessorEditor::~BKAudioProcessorEditor()
@@ -54,7 +55,6 @@ void BKAudioProcessorEditor::resized()
     
     mvc.setSize(getWidth(), getHeight());
     mvc.resized();
-    
     
 }
 

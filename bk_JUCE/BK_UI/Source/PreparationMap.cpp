@@ -356,29 +356,61 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel)
 
 void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
 {
-    for (int i = synchronic.size(); --i >= 0; )
+    
+    if(sustainPedalIsDepressed && pKeymap->containsNote(noteNumber))
     {
-        if (pKeymap->containsNote(noteNumber))
-            synchronic[i]->processor->keyReleased(noteNumber, velocity, channel);
+        SustainedNote newNote;
+        newNote.noteNumber = noteNumber;
+        newNote.velocity = velocity;
+        newNote.channel = channel;
+        DBG("storing sustained note " + String(noteNumber));
+        
+        sustainedNotes.add(newNote);
+    }
+    else {
+        for (int i = synchronic.size(); --i >= 0; )
+        {
+            if (pKeymap->containsNote(noteNumber))
+                synchronic[i]->processor->keyReleased(noteNumber, velocity, channel);
+        }
+        
+        for (int i = nostalgic.size(); --i >= 0; )
+        {
+            if (pKeymap->containsNote(noteNumber))
+                nostalgic[i]->processor->keyReleased(noteNumber, channel);
+        }
+        
+        for (int i = direct.size(); --i >= 0; )
+        {
+            if (pKeymap->containsNote(noteNumber))
+                direct[i]->processor->keyReleased(noteNumber, velocity, channel);
+        }
+        
+        for (int i = tempo.size(); --i >= 0; )
+        {
+            if (pKeymap->containsNote(noteNumber))
+                tempo[i]->processor->keyReleased(noteNumber, channel);
+        }
+    }
+}
+
+void PreparationMap::sustainPedalReleased()
+{
+    sustainPedalIsDepressed = false;
+    
+    //do all keyReleased calls now
+    for(int n=0; n<sustainedNotes.size(); n++)
+    {
+        SustainedNote releaseNote = sustainedNotes.getUnchecked(n);
+        
+        for (int i = synchronic.size(); --i >= 0; )
+            synchronic[i]->processor->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel);
+        
+        for (int i = nostalgic.size(); --i >= 0; )
+            nostalgic[i]->processor->keyReleased(releaseNote.noteNumber, releaseNote.channel);
     }
     
-    for (int i = nostalgic.size(); --i >= 0; )
-    {
-        if (pKeymap->containsNote(noteNumber))
-            nostalgic[i]->processor->keyReleased(noteNumber, channel);
-    }
-    
-    for (int i = direct.size(); --i >= 0; )
-    {
-        if (pKeymap->containsNote(noteNumber))
-            direct[i]->processor->keyReleased(noteNumber, velocity, channel);
-    }
-    
-    for (int i = tempo.size(); --i >= 0; )
-    {
-        if (pKeymap->containsNote(noteNumber))
-            tempo[i]->processor->keyReleased(noteNumber, channel);
-    }
+    sustainedNotes.clearQuick();
 }
 
 void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
