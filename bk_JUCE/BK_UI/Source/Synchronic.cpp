@@ -85,7 +85,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
                      synthNoteNumber,
                      synthOffset,
                      velocity,
-                     aGlobalGain * active->getAccentMultipliers()[accentMultiplierCounter],
+                     active->getGain() * aGlobalGain * active->getAccentMultipliers()[accentMultiplierCounter],
                      noteDirection,
                      FixedLengthFixedStart,
                      SynchronicNote,
