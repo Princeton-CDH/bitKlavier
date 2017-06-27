@@ -232,8 +232,10 @@ void NostalgicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         {
             processor.gallery->addNostalgic();
             
-            fillSelectCB();
+            
         }
+        
+        fillSelectCB();
         
         //update(sendNotification);
         update();
@@ -483,10 +485,12 @@ void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
         {
             processor.gallery->addNostalgicMod();
             
-            fillSelectCB();
+            
         }
         
         update();
+        
+        fillSelectCB();
         
         return;
         

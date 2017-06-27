@@ -378,9 +378,10 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         {
             processor.gallery->addTuning();
             
-            fillSelectCB();
+            
         }
         
+        fillSelectCB();
         //update(sendNotification);
         update();
     }
@@ -687,9 +688,10 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
         {
             processor.gallery->addTuningMod();
             
-            fillSelectCB();
+            
         }
         
+        fillSelectCB();
         //update(sendNotification);
         update();
         return;

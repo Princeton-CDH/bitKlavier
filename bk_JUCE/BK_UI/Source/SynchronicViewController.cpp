@@ -423,9 +423,9 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         if (processor.updateState->currentSynchronicId == selectCB.getNumItems()-1)
         {
             processor.gallery->addSynchronic();
-            
-            fillSelectCB();
         }
+        
+        fillSelectCB();
         
         //update(sendNotification);
         update();
@@ -766,9 +766,11 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
         {
             processor.gallery->addSynchronicMod();
             
-            fillSelectCB();
+            
         }
 
+        fillSelectCB();
+        
         update();
         
         return;

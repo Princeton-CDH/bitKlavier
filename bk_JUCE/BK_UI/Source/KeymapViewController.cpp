@@ -141,9 +141,11 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
         {
             processor.gallery->addKeymap();
             
-            fillKeymapSelectCB();
+            
         }
 
+        fillKeymapSelectCB();
+        
         update();
     }
 }

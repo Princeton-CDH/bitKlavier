@@ -174,8 +174,10 @@ void DirectPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         {
             processor.gallery->addDirect();
             
-            fillSelectCB();
+            
         }
+        
+        fillSelectCB();
         
         update();
     }
@@ -344,8 +346,9 @@ void DirectModificationEditor::bkComboBoxDidChange (ComboBox* box)
         {
             processor.gallery->addDirectMod();
             
-            fillSelectCB();
+            
         }
+        fillSelectCB();
         
         update();
         

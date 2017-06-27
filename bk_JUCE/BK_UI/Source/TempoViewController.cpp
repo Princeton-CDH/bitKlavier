@@ -287,8 +287,10 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         {
             processor.gallery->addTempo();
             
-            fillSelectCB();
+            
         }
+        
+        fillSelectCB();
         
         update();
         updateComponentVisibility();
@@ -485,8 +487,10 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
         {
             processor.gallery->addTempoMod();
             
-            fillSelectCB();
+            
         }
+        
+        fillSelectCB();
         
         update();
         updateComponentVisibility();
