@@ -2,347 +2,790 @@
   ==============================================================================
 
     TuningViewController.cpp
-    Created: 14 Dec 2016 12:25:56pm
-    Author:  Michael R Mulshine
+    Created: 10 Jun 2017 11:24:22am
+    Author:  Daniel Trueman
 
   ==============================================================================
 */
 
-#include "../JuceLibraryCode/JuceHeader.h"
 #include "TuningViewController.h"
 
-//==============================================================================
 TuningViewController::TuningViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-processor(p),
-theGraph(theGraph)
+BKViewController(p,theGraph)
 {
-    // Labels
-    tuningL = OwnedArray<BKLabel>();
-    tuningL.ensureStorageAllocated(cTuningParameterTypes.size());
     
-    for (int i = 0; i < cTuningParameterTypes.size(); i++)
-    {
-        tuningL.set(i, new BKLabel());
-        addAndMakeVisible(tuningL[i]);
-        tuningL[i]->setName(cTuningParameterTypes[i]);
-        tuningL[i]->setText(cTuningParameterTypes[i], NotificationType::dontSendNotification);
-    }
+    setLookAndFeel(&buttonsAndMenusLAF);
     
-    // Text Fields
-    tuningTF = OwnedArray<BKTextField>();
-    tuningTF.ensureStorageAllocated(cTuningParameterTypes.size());
+    iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::tuning_icon_png, BinaryData::tuning_icon_pngSize));
+    iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
+    iconImageComponent.setAlpha(0.095);
+    addAndMakeVisible(iconImageComponent);
     
-    for (int i = 0; i < cTuningParameterTypes.size(); i++)
-    {
-        tuningTF.set(i, new BKTextField());
-        addAndMakeVisible(tuningTF[i]);
-        tuningTF[i]->addListener(this);
-        tuningTF[i]->setName(cTuningParameterTypes[i]);
-    }
+    selectCB.setName("Tuning");
+    selectCB.addSeparator();
+    selectCB.addListener(this);
+    selectCB.setSelectedItemIndex(0);
+    addAndMakeVisible(selectCB);
     
-    modTuningTF = OwnedArray<BKTextField>();
-    modTuningTF.ensureStorageAllocated(cTuningParameterTypes.size());
+    scaleCB.setName("Scale");
+    addAndMakeVisible(scaleCB);
     
-    for (int i = 0; i < cTuningParameterTypes.size(); i++)
-    {
-        modTuningTF.set(i, new BKTextField());
-        addAndMakeVisible(modTuningTF[i]);
-        modTuningTF[i]->addListener(this);
-        modTuningTF[i]->setName("M"+cTuningParameterTypes[i]);
-    }
+    scaleLabel.setText("Scale", dontSendNotification);
+    //addAndMakeVisible(scaleLabel);
     
-    updateModFields();
-    updateFields();
-}
-
-TuningViewController::~TuningViewController()
-{
-}
-
-void TuningViewController::paint (Graphics& g)
-{
-    g.fillAll(Colours::transparentWhite);
+    fundamentalCB.setName("Fundamental");
+    addAndMakeVisible(fundamentalCB);
+    
+    fundamentalLabel.setText("Fundamental", dontSendNotification);
+    //addAndMakeVisible(fundamentalLabel);
+    
+    A1IntervalScaleCB.setName("A1IntervalScale");
+    //A1IntervalScaleCB.BKSetJustificationType(juce::Justification::centredRight);
+    A1IntervalScaleCB.addListener(this);
+    addAndMakeVisible(A1IntervalScaleCB);
+    
+    A1IntervalScaleLabel.setText("Adaptive Scale:", dontSendNotification);
+    //A1IntervalScaleLabel.setJustificationType(juce::Justification::centredRight);
+    addAndMakeVisible(A1IntervalScaleLabel);
+    
+    A1Inversional.setButtonText ("invert");
+    A1Inversional.setToggleState (true, dontSendNotification);
+    //buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
+    A1Inversional.setColour(ToggleButton::textColourId, Colours::white);
+    A1Inversional.setColour(ToggleButton::tickColourId, Colours::white);
+    A1Inversional.setColour(ToggleButton::tickDisabledColourId, Colours::white);
+    addAndMakeVisible(A1Inversional);
+    
+    A1AnchorScaleCB.setName("A1AnchorScale");
+    addAndMakeVisible(A1AnchorScaleCB);
+    
+    A1AnchorScaleLabel.setText("Anchor Scale:", dontSendNotification);
+    //A1AnchorScaleLabel.setJustificationType(juce::Justification::centredRight);
+    addAndMakeVisible(A1AnchorScaleLabel);
+    
+    A1FundamentalCB.setName("A1Fundamental");
+    addAndMakeVisible(A1FundamentalCB);
+    
+    //A1FundamentalLabel.setText("Adaptive 1 Anchor Fundamental", dontSendNotification);
+    //addAndMakeVisible(A1FundamentalLabel);
+    
+    A1ClusterThresh = new BKSingleSlider("Cluster Threshold", 1, 1000, 0, 1);
+    A1ClusterThresh->setJustifyRight(false);
+    addAndMakeVisible(A1ClusterThresh);
+    
+    A1ClusterMax = new BKSingleSlider("Cluster Maximum", 1, 8, 1, 1);
+    A1ClusterMax->setJustifyRight(false);
+    addAndMakeVisible(A1ClusterMax);
+    
+    A1reset.setButtonText("reset");
+    addAndMakeVisible(A1reset);
+    
+    fillTuningCB();
+    fillFundamentalCB();
+    
+    // Absolute Tuning Keyboard
+    absoluteOffsets.ensureStorageAllocated(128);
+    for(int i=0; i<128; i++) absoluteOffsets.add(0.);
+    absoluteKeyboard.setName("Key-by-Key Offsets");
+    addAndMakeVisible(absoluteKeyboard);
+    
+    //Custom Tuning Keyboard
+    customOffsets.ensureStorageAllocated(12);
+    for(int i=0; i<12; i++) customOffsets.add(0.);
+    customKeyboard.setName("Temperament Offsets");
+    //customKeyboard.setAvailableRange(60, 71);
+    customKeyboard.setAvailableRange(0, 11);
+    customKeyboard.useOrderedPairs(false);
+    customKeyboard.setFundamental(0);
+    addAndMakeVisible(customKeyboard);
+    
+    offsetSlider = new BKSingleSlider("Global Offset (cents)", -100, 100, 0, 0.1);
+    addAndMakeVisible(offsetSlider);
+    
+    lastNote.setText("last note: ", dontSendNotification);
+    lastInterval.setText("last interval: ", dontSendNotification);
+    lastInterval.setJustificationType(juce::Justification::centredRight);
+    addAndMakeVisible(lastNote);
+    addAndMakeVisible(lastInterval);
+    
+    addAndMakeVisible(hideOrShow);
+    hideOrShow.setName("hideOrShow");
+    hideOrShow.setButtonText(" X ");
 }
 
 void TuningViewController::resized()
 {
-    // Labels
-    int lY = gComponentLabelHeight + gYSpacing;
+    Rectangle<int> area (getLocalBounds());
     
-    float width = getWidth() * 0.25 - gXSpacing;
+    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
+    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
     
-    for (int n = 0; n < cTuningParameterTypes.size(); n++)
-    {
-        tuningL[n]->setBounds(0, gYSpacing + lY * n, width, tuningL[0]->getHeight());
-    }
+    iconImageComponent.setBounds(area);
+    area.reduce(10 * paddingScalarX + 4, 10 * paddingScalarY + 4);
     
-    // Text fields
-    int tfY = gComponentTextFieldHeight + gYSpacing;
+    float keyboardHeight = 60 + 50 * paddingScalarY;
+    Rectangle<int> absoluteKeymapRow = area.removeFromBottom(keyboardHeight);
+    absoluteKeymapRow.reduce(gXSpacing, 0);
+    absoluteKeyboard.setBounds(absoluteKeymapRow);
     
-    float height = tuningTF[0]->getHeight();
-    width *= 1.5;
+    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
+    Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    comboBoxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    A1reset.setBounds(comboBoxSlice.removeFromLeft(45));
     
-    for (int n = 0; n < cTuningParameterTypes.size(); n++)
-    {
-        tuningTF[n]->setBounds(tuningL[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
-        modTuningTF[n]->setBounds(tuningTF[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
-    }
+    /* *** above here should be generic (mostly) to all prep layouts *** */
+    /* ***         below here will be specific to each prep          *** */
+    
+    // ********* right column
+    
+    Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
+    modeSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    modeSlice.removeFromRight(gXSpacing);
+    scaleCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
+    
+    modeSlice.removeFromLeft(gXSpacing + gPaddingConst * paddingScalarX);
+    fundamentalCB.setBounds(modeSlice);
+    
+    int customKeyboardHeight = 60 + 70. * paddingScalarY;
+    int extraY = (area.getHeight() - (customKeyboardHeight + gComponentSingleSliderHeight + gComponentTextFieldHeight + gYSpacing * 4)) * 0.25;
+    
+    area.removeFromTop(extraY + gYSpacing);
+    Rectangle<int> customKeyboardSlice = area.removeFromTop(customKeyboardHeight);
+    customKeyboardSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    customKeyboardSlice.removeFromRight(gXSpacing);
+    customKeyboard.setBounds(customKeyboardSlice);
+    
+    area.removeFromTop(extraY + gYSpacing);
+    Rectangle<int> offsetSliderSlice = area.removeFromTop(gComponentSingleSliderHeight);
+    offsetSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
+    offsetSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
+    offsetSlider->setBounds(offsetSliderSlice);
+    
+    area.removeFromTop(extraY + gYSpacing);
+    Rectangle<int> lastNoteSlice = area.removeFromTop(gComponentTextFieldHeight);
+    lastNoteSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    lastNoteSlice.removeFromRight(gXSpacing);
+    lastNote.setBounds(lastNoteSlice.removeFromLeft(lastNoteSlice.getWidth() * 0.5));
+    lastInterval.setBounds(lastNoteSlice);
+    
+    // ********* left column
+    
+    extraY = (leftColumn.getHeight() -
+              (gComponentComboBoxHeight * 2 +
+               gComponentSingleSliderHeight * 2 +
+               gYSpacing * 5)) * 0.25;
+    
+    //DBG("extraY = " + String(extraY));
+    
+    leftColumn.removeFromTop(extraY + gYSpacing);
+    Rectangle<int> A1IntervalScaleCBSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    A1IntervalScaleCBSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    A1IntervalScaleCBSlice.removeFromLeft(gXSpacing);
+    int tempwidth = A1IntervalScaleCBSlice.getWidth() / 3.;
+    A1Inversional.setBounds(A1IntervalScaleCBSlice.removeFromRight(tempwidth));
+    A1IntervalScaleCB.setBounds(A1IntervalScaleCBSlice.removeFromRight(tempwidth));
+    A1IntervalScaleLabel.setBounds(A1IntervalScaleCBSlice);
+    
+    leftColumn.removeFromTop(extraY + gYSpacing);
+    Rectangle<int> A1ClusterMaxSlice = leftColumn.removeFromTop(gComponentSingleSliderHeight);
+    A1ClusterMaxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
+    //A1ClusterMaxSlice.removeFromLeft(gXSpacing);
+    A1ClusterMax->setBounds(A1ClusterMaxSlice);
+    
+    leftColumn.removeFromTop(gYSpacing);
+    Rectangle<int> A1ClusterThreshSlice = leftColumn.removeFromTop(gComponentSingleSliderHeight);
+    A1ClusterThreshSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
+    //A1ClusterThreshSlice.removeFromLeft(gXSpacing);
+    A1ClusterThresh->setBounds(A1ClusterThreshSlice);
+    
+    leftColumn.removeFromTop(extraY + gYSpacing);
+    Rectangle<int> A1AnchorScaleCBSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    A1AnchorScaleCBSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    A1AnchorScaleCBSlice.removeFromLeft(gXSpacing);
+    tempwidth = A1AnchorScaleCBSlice.getWidth() / 3.;
+    A1AnchorScaleLabel.setBounds(A1AnchorScaleCBSlice.removeFromLeft(tempwidth));
+    A1AnchorScaleCB.setBounds(A1AnchorScaleCBSlice.removeFromLeft(tempwidth));
+    A1AnchorScaleCBSlice.removeFromLeft(gXSpacing);
+    A1FundamentalCB.setBounds(A1AnchorScaleCBSlice);
     
 }
 
-void TuningViewController::bkTextFieldDidChange(TextEditor& tf)
+
+void TuningViewController::paint (Graphics& g)
 {
-    String text = tf.getText();
-    String name = tf.getName();
+    //g.fillAll(Colours::lightgrey);
+    //g.fillAll(Colours::transparentWhite);
+    g.fillAll(Colours::black);
+}
+
+void TuningViewController::fillTuningCB(void)
+{
+    //cTuningSystemNames
     
-    BKTextFieldType type = BKParameter;
+    scaleCB.clear(dontSendNotification);
+    A1IntervalScaleCB.clear(dontSendNotification);
+    A1AnchorScaleCB.clear(dontSendNotification);
     
-    if (name.startsWithChar('M'))
+    for (int i = 0; i < cTuningSystemNames.size(); i++)
     {
-        type = BKModification;
-        name = name.substring(1);
-    }
-    
-    
-    float f = text.getFloatValue();
-    int i = text.getIntValue();
-    
-    DBG(name + ": |" + text + "|");
-    
-    TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
-    
-    TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
-    
-    TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
-    
-    if (name == cTuningParameterTypes[TuningId])
-    {
-        if (type == BKParameter)
+        String name = cTuningSystemNames[i];
+        scaleCB.addItem(name, i+1);
+        A1IntervalScaleCB.addItem(name, i+1);
+        A1AnchorScaleCB.addItem(name, i+1);
+        
+        if(name == "Adaptive Tuning 1" || name == "Adaptive Anchored Tuning 1")
         {
-            int numTuning = processor.gallery->getNumTuning();
-            
-            if ((i+1) > numTuning)
-            {
-                processor.gallery->addTuning();
-                processor.updateState->currentTuningId = numTuning;
+            A1IntervalScaleCB.setItemEnabled(i+1, false);
+            A1AnchorScaleCB.setItemEnabled(i+1, false);
+        }
                 
-            }
-            else if (i >= 0)
-            {
-                processor.updateState->currentTuningId = i;
-            }
-            
-            tuningTF[TuningId]->setText(String(processor.updateState->currentTuningId), false);
-            
-            updateFields();
-        }
-        else // BKModification
-        {
-            int numMod = processor.gallery->getNumTuningMod();
-            
-            if ((i+1) > numMod)
-            {
-                processor.gallery->addTuningMod();
-                processor.updateState->currentModTuningId = numMod;
-            }
-            else if (i >= 0)
-            {
-                processor.updateState->currentModTuningId = i;
-            }
-            
-            modTuningTF[TuningId]->setText(String(processor.updateState->currentModTuningId), false);
-            
-            updateModFields();
+        if(name == "Custom") {
+            customIndex = i;
+            DBG("assigned to customIndex " + String(customIndex));
         }
     }
-    else if (name == cTuningParameterTypes[TuningScale])
+}
+
+void TuningViewController::fillFundamentalCB(void)
+{
+    fundamentalCB.clear(dontSendNotification);
+    A1FundamentalCB.clear(dontSendNotification);
+    
+    for (int i = 0; i < cFundamentalNames.size(); i++)
     {
-        if (type == BKParameter)
-        {
-            prep->setTuning((TuningSystem)i);
-            active->setTuning((TuningSystem)i);
-        }
-        else    //BKModification
-        {
-            mod->setParam(TuningScale, text);
-        }
+        String name = cFundamentalNames[i];
+        fundamentalCB.addItem(name, i+1);
+        A1FundamentalCB.addItem(name, i+1);
     }
-    else if (name == cTuningParameterTypes[TuningFundamental])
+}
+
+void TuningViewController::updateComponentVisibility()
+{
+        
+    if(scaleCB.getText() == "Adaptive Tuning 1")
     {
-        if (type == BKParameter)
-        {
-            prep->setFundamental((PitchClass)i);
-            active->setFundamental((PitchClass)i);
-        }
-        else    //BKModification
-        {
-            mod->setParam(TuningFundamental, text);
-        }
+        A1IntervalScaleCB.setVisible(true);
+        A1Inversional.setVisible(true);
+        A1AnchorScaleCB.setVisible(false);
+        A1FundamentalCB.setVisible(false);
+        A1ClusterThresh->setVisible(true);
+        A1ClusterMax->setVisible(true);
+        A1IntervalScaleLabel.setVisible(true);
+        A1AnchorScaleLabel.setVisible(false);
+        A1FundamentalLabel.setVisible(false);
+        A1reset.setVisible(true);
+
     }
-    else if (name == cTuningParameterTypes[TuningOffset])
+    else if(scaleCB.getText() == "Adaptive Anchored Tuning 1")
     {
-        if (type == BKParameter)
-        {
-            prep->setFundamentalOffset(f);
-            active->setFundamentalOffset(f);
-        }
-        else    //BKModification
-        {
-            mod->setParam(TuningOffset, text);
-        }
-    }
-    else if (name == cTuningParameterTypes[TuningA1IntervalScale])
-    {
-        if (type == BKParameter)
-        {
-            prep->setAdaptiveIntervalScale((TuningSystem)i);
-            active->setAdaptiveIntervalScale((TuningSystem)i);
-        }
-        else    //BKModification
-        {
-            mod->setParam(TuningA1IntervalScale, text);
-        }
-    }
-    else if (name == cTuningParameterTypes[TuningA1Inversional])
-    {
-        if (type == BKParameter)
-        {
-            prep->setAdaptiveInversional((bool) i);
-            active->setAdaptiveInversional((bool) i);
-        }
-        else    //BKModification
-        {
-            mod->setParam(TuningA1Inversional, text);
-        }
-    }
-    else if (name == cTuningParameterTypes[TuningA1AnchorScale])
-    {
-        if (type == BKParameter)
-        {
-            prep->setAdaptiveAnchorScale((TuningSystem) i);
-            active->setAdaptiveAnchorScale((TuningSystem) i);
-        }
-        else    //BKModification
-        {
-            mod->setParam(TuningA1AnchorScale, text);
-        }
-    }
-    else if (name == cTuningParameterTypes[TuningA1AnchorFundamental])
-    {
-        if (type == BKParameter)
-        {
-            prep->setAdaptiveAnchorFundamental((PitchClass) i);
-            active->setAdaptiveAnchorFundamental((PitchClass) i);
-        }
-        else    //BKModification
-        {
-            mod->setParam(TuningA1AnchorFundamental, text);
-        }
-    }
-    else if (name == cTuningParameterTypes[TuningA1ClusterThresh])
-    {
-        if (type == BKParameter)
-        {
-            prep->setAdaptiveClusterThresh(i);
-            active->setAdaptiveClusterThresh(i);
-        }
-        else    //BKModification
-        {
-            mod->setParam(TuningA1ClusterThresh, text);
-        }
-    }
-    else if (name == cTuningParameterTypes[TuningA1History])
-    {
-        if (type == BKParameter)
-        {
-            prep->setAdaptiveHistory(i);
-            active->setAdaptiveHistory(i);
-        }
-        else    //BKModification
-        {
-            mod->setParam(TuningA1History, text);
-        }
-    }
-    else if (name == cTuningParameterTypes[TuningCustomScale])
-    {
-        if (type == BKParameter)
-        {
-            //UI is in cents, internally represented as fractions of MIDI note value
-            prep->setCustomScaleCents( stringToFloatArray(text));
-            active->setCustomScaleCents( stringToFloatArray(text));
-        }
-        else    //BKModification
-        {
-            mod->setParam(TuningCustomScale, text);
-        }
-    }
-    else if (name == cTuningParameterTypes[TuningAbsoluteOffsets])
-    {
-        if (type == BKParameter)
-        {
-            //UI is in cents, internally represented as fractions of MIDI note value
-            prep->setAbsoluteOffsetCents(stringOrderedPairsToFloatArray(text, 128));
-            active->setAbsoluteOffsetCents(stringOrderedPairsToFloatArray(text, 128));
-        }
-        else    //BKModification
-        {
-            mod->setParam(TuningAbsoluteOffsets, text);
-        }
+        A1IntervalScaleCB.setVisible(true);
+        A1Inversional.setVisible(true);
+        A1AnchorScaleCB.setVisible(true);
+        A1FundamentalCB.setVisible(true);
+        A1ClusterThresh->setVisible(true);
+        A1ClusterMax->setVisible(true);
+        A1IntervalScaleLabel.setVisible(true);
+        A1AnchorScaleLabel.setVisible(true);
+        A1FundamentalLabel.setVisible(true);
+        A1reset.setVisible(true);
+
     }
     else
     {
-        DBG("Unregistered text field.");
+        A1IntervalScaleCB.setVisible(false);
+        A1Inversional.setVisible(false);
+        A1AnchorScaleCB.setVisible(false);
+        A1FundamentalCB.setVisible(false);
+        A1ClusterThresh->setVisible(false);
+        A1ClusterMax->setVisible(false);
+        A1IntervalScaleLabel.setVisible(false);
+        A1AnchorScaleLabel.setVisible(false);
+        A1FundamentalLabel.setVisible(false);
+        A1reset.setVisible(false);
     }
+}
+
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ TuningPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
+
+TuningPreparationEditor::TuningPreparationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
+TuningViewController(p, theGraph)
+{
+    fillSelectCB();
     
-    if (type == BKModification) theGraph->update(PreparationTypeTuningMod, processor.updateState->currentModTuningId);
+    selectCB.addMyListener(this);
+    
+    selectCB.addListener(this);
+
+    scaleCB.addListener(this);
+    
+    fundamentalCB.addListener(this);
+
+    A1IntervalScaleCB.addListener(this);
+    
+    A1Inversional.addListener(this);
+    
+    A1AnchorScaleCB.addListener(this);
+    
+    A1FundamentalCB.addListener(this);
+    
+    A1ClusterThresh->addMyListener(this);
+    
+    A1ClusterMax->addMyListener(this);
+    
+    A1reset.addListener(this);
+    
+    absoluteKeyboard.addMyListener(this);
+    
+    offsetSlider->addMyListener(this);
+    
+    startTimer(50);
+    
+    update();
+}
+
+void TuningPreparationEditor::timerCallback()
+{
+    TuningProcessor::Ptr tProcessor = processor.gallery->getTuningProcessor(processor.updateState->currentTuningId);
+    if(tProcessor->getLastNoteTuning() != lastNoteTuningSave)
+    {
+        lastNoteTuningSave = tProcessor->getLastNoteTuning();
+        lastNote.setText("last note: " + String(lastNoteTuningSave), dontSendNotification);
+        lastInterval.setText("last interval: "  + String(tProcessor->getLastIntervalTuning()), dontSendNotification);
+    }
 }
 
 
-void TuningViewController::updateFields()
+void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 {
+    String name = box->getName();
+    
+    TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
+    TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+    
+    if (name == selectCB.getName())
+    {
+        processor.updateState->currentTuningId = box->getSelectedItemIndex();
+        
+        processor.updateState->idDidChange = true;
+        
+        if (processor.updateState->currentTuningId == selectCB.getNumItems()-1)
+        {
+            processor.gallery->addTuning();
+            
+            fillSelectCB();
+        }
+        
+        //update(sendNotification);
+        update();
+    }
+    else if (name == scaleCB.getName())
+    {
+        prep->setTuning((TuningSystem)scaleCB.getSelectedItemIndex());
+        active->setTuning((TuningSystem)scaleCB.getSelectedItemIndex());
+        
+        Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+        customKeyboard.setValues(currentTuning->getCurrentScaleCents());
+        
+        updateComponentVisibility();
+        
+    }
+    else if (name == fundamentalCB.getName())
+    {
+        prep->setFundamental((PitchClass)fundamentalCB.getSelectedItemIndex());
+        active->setFundamental((PitchClass)fundamentalCB.getSelectedItemIndex());
+        
+        customKeyboard.setFundamental(fundamentalCB.getSelectedItemIndex());
+        
+        updateComponentVisibility();
+        
+    }
+    else if (name == A1IntervalScaleCB.getName())
+    {
+        prep->setAdaptiveIntervalScale((TuningSystem)A1IntervalScaleCB.getSelectedItemIndex());
+        active->setAdaptiveIntervalScale((TuningSystem)A1IntervalScaleCB.getSelectedItemIndex());
+        
+        updateComponentVisibility();
+    }
+    else if (name == A1AnchorScaleCB.getName())
+    {
+        prep->setAdaptiveAnchorScale((TuningSystem)A1AnchorScaleCB.getSelectedItemIndex());
+        active->setAdaptiveAnchorScale((TuningSystem)A1AnchorScaleCB.getSelectedItemIndex());
+        
+        updateComponentVisibility();
+    }
+    else if (name == A1FundamentalCB.getName())
+    {
+        prep->setAdaptiveAnchorFundamental((PitchClass)A1FundamentalCB.getSelectedItemIndex());
+        active->setAdaptiveAnchorFundamental((PitchClass)A1FundamentalCB.getSelectedItemIndex());
+        
+        updateComponentVisibility();
+        
+    }
+}
+
+
+void TuningPreparationEditor::fillSelectCB(void)
+{
+    // Direct menu
+    Tuning::PtrArr newpreps = processor.gallery->getAllTuning();
+    
+    selectCB.clear(dontSendNotification);
+    for (int i = 0; i < newpreps.size(); i++)
+    {
+        String name = newpreps[i]->getName();
+        if (name != String::empty)  selectCB.addItem(name, i+1);
+        else                        selectCB.addItem(String(i+1), i+1);
+    }
+    
+    selectCB.addItem("New tuning...", newpreps.size()+1);
+    
+    selectCB.setSelectedItemIndex(processor.updateState->currentTuningId, NotificationType::dontSendNotification);
+    
+}
+
+
+void TuningPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
+{
+    processor.gallery->getTuning(processor.updateState->currentTuningId)->setName(name);
+}
+
+
+void TuningPreparationEditor::update(void)
+{
+    if (processor.updateState->currentTuningId < 0) return;
+    
+    fillSelectCB();
     
     TuningPreparation::Ptr prep = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
-
-    tuningTF[TuningScale]               ->setText( String( prep->getTuning()), false);
-    tuningTF[TuningFundamental]         ->setText( String( prep->getFundamental()), false);
-    tuningTF[TuningOffset]              ->setText( String( prep->getFundamentalOffset()), false);
-    tuningTF[TuningA1IntervalScale]     ->setText( String( prep->getAdaptiveIntervalScale()), false);
-    tuningTF[TuningA1Inversional]       ->setText( String( prep->getAdaptiveInversional()), false);
-    tuningTF[TuningA1AnchorScale]       ->setText( String( prep->getAdaptiveAnchorScale()), false);
-    tuningTF[TuningA1AnchorFundamental] ->setText( String( prep->getAdaptiveAnchorFundamental()), false);
-    tuningTF[TuningA1ClusterThresh]     ->setText( String( prep->getAdaptiveClusterThresh()), false);
-    tuningTF[TuningA1History]           ->setText( String( prep->getAdaptiveHistory()), false);
-    tuningTF[TuningCustomScale]         ->setText( floatArrayToString( prep->getCustomScale()), false);
-    tuningTF[TuningAbsoluteOffsets]     ->setText( offsetArrayToString( prep->getAbsoluteOffsets()), false);
-
     
+    selectCB.setSelectedItemIndex(processor.updateState->currentTuningId, dontSendNotification);
+    scaleCB.setSelectedItemIndex(prep->getTuning(), dontSendNotification);
+    fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
+    offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
+
+    absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
+    Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+    customKeyboard.setValues(currentTuning->getCurrentScaleCents());
+    
+    A1IntervalScaleCB.setSelectedItemIndex(prep->getAdaptiveIntervalScale(), dontSendNotification);
+    A1Inversional.setToggleState(prep->getAdaptiveInversional(), dontSendNotification);
+    A1AnchorScaleCB.setSelectedItemIndex(prep->getAdaptiveAnchorScale(), dontSendNotification);
+    A1FundamentalCB.setSelectedItemIndex(prep->getAdaptiveAnchorFundamental(), dontSendNotification);
+    A1ClusterThresh->setValue(prep->getAdaptiveClusterThresh(), dontSendNotification);
+    A1ClusterMax->setValue(prep->getAdaptiveHistory(), dontSendNotification);
+    
+    updateComponentVisibility();
 }
 
-void TuningViewController::updateModFields()
+void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> values)
 {
-    
-    TuningModPreparation::Ptr prep = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
-    
-    modTuningTF[TuningId]             ->setText(String(processor.updateState->currentModTuningId));
-    modTuningTF[TuningScale]               ->setText( prep->getParam(TuningScale), false);
-    modTuningTF[TuningFundamental]         ->setText( prep->getParam(TuningFundamental), false);
-    modTuningTF[TuningOffset]              ->setText( prep->getParam(TuningOffset), false);
-    modTuningTF[TuningA1IntervalScale]     ->setText( prep->getParam(TuningA1IntervalScale), false);
-    modTuningTF[TuningA1Inversional]       ->setText( prep->getParam(TuningA1Inversional), false);
-    modTuningTF[TuningA1AnchorScale]       ->setText( prep->getParam(TuningA1AnchorScale), false);
-    modTuningTF[TuningA1AnchorFundamental] ->setText( prep->getParam(TuningA1AnchorFundamental), false);
-    modTuningTF[TuningA1ClusterThresh]     ->setText( prep->getParam(TuningA1ClusterThresh), false);
-    modTuningTF[TuningA1History]           ->setText( prep->getParam(TuningA1History), false);
-    modTuningTF[TuningCustomScale]         ->setText( prep->getParam(TuningCustomScale), false);
-    modTuningTF[TuningAbsoluteOffsets]     ->setText( prep->getParam(TuningAbsoluteOffsets), false);
-    
-}
-
-void TuningViewController::bkMessageReceived(const String& message)
-{
-    if (message == "tuning/update")
+    TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
+    TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+ 
+    if(name == absoluteKeyboard.getName())
     {
+        DBG("updating absolute tuning vals");
+        prep->setAbsoluteOffsetCents(values);
+        active->setAbsoluteOffsetCents(values);
+    }
+    else if(name == customKeyboard.getName())
+    {
+        DBG("updating custom tuning vals");
+        scaleCB.setSelectedItemIndex(customIndex, dontSendNotification);
+
+        prep->setCustomScaleCents(values);
+        active->setCustomScaleCents(values);
         
-        updateFields();
+        prep->setTuning((TuningSystem)customIndex);
+        active->setTuning((TuningSystem)customIndex);
     }
 }
+
+void TuningPreparationEditor::BKSingleSliderValueChanged(String name, double val)
+{
+    TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
+    TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+    
+    if(name == offsetSlider->getName()) {
+        DBG("got offset " + String(val));
+        prep->setFundamentalOffset(val * 0.01);
+        active->setFundamentalOffset(val * 0.01);
+    }
+    else if(name == A1ClusterThresh->getName()) {
+        DBG("got A1ClusterThresh " + String(val));
+        prep->setAdaptiveClusterThresh(val);
+        active->setAdaptiveClusterThresh(val);
+    }
+    else if(name == A1ClusterMax->getName()) {
+        DBG("got A1ClusterMax " + String(val));
+        prep->setAdaptiveHistory(val);
+        active->setAdaptiveHistory(val);
+    }
+}
+
+void TuningPreparationEditor::bkButtonClicked (Button* b)
+{
+    if (b == &A1Inversional)
+    {
+        DBG("setting A1Inversional " + String(A1Inversional.getToggleState()));
+        
+        TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
+        TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+
+        prep->setAdaptiveInversional(A1Inversional.getToggleState());
+        active->setAdaptiveInversional(A1Inversional.getToggleState());
+    }
+    else if (b == &A1reset)
+    {
+        DBG("resetting A1");
+        
+        TuningProcessor::Ptr tProcessor = processor.gallery->getTuningProcessor(processor.updateState->currentTuningId);
+        tProcessor->adaptiveReset();
+    }
+    else if (b == &hideOrShow)
+    {
+        processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+}
+
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ TuningModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
+TuningModificationEditor::TuningModificationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
+TuningViewController(p, theGraph)
+{
+    fillSelectCB();
+    
+    selectCB.addMyListener(this);
+    
+    selectCB.addListener(this);
+    
+    scaleCB.addListener(this);
+    
+    fundamentalCB.addListener(this);
+    
+    A1IntervalScaleCB.addListener(this);
+    
+    A1Inversional.addListener(this);
+    
+    A1AnchorScaleCB.addListener(this);
+    
+    A1FundamentalCB.addListener(this);
+    
+    A1ClusterThresh->addMyListener(this);
+    
+    A1ClusterMax->addMyListener(this);
+    
+    A1reset.addListener(this);
+    
+    absoluteKeyboard.addMyListener(this);
+    
+    offsetSlider->addMyListener(this);
+    
+    update();
+}
+
+
+void TuningModificationEditor::update(void)
+{
+    TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
+    
+    TuningPreparation::Ptr prep = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+    
+    fillSelectCB();
+    
+    selectCB.setSelectedItemIndex(processor.updateState->currentModTuningId, dontSendNotification);
+    
+    String val = mod->getParam(TuningScale);
+    scaleCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+    //                       scaleCB.setSelectedItemIndex(prep->getTuning(), dontSendNotification);
+    
+    val = mod->getParam(TuningFundamental);
+    fundamentalCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+    //                       fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
+    
+    val = mod->getParam(TuningOffset);
+    offsetSlider->setValue(val.getFloatValue() * 100., dontSendNotification);
+    //                       offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
+    
+    val = mod->getParam(TuningAbsoluteOffsets);
+    absoluteKeyboard.setValues(stringToFloatArray(val));
+    //                       absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
+    
+    val = mod->getParam(TuningA1IntervalScale);
+    A1IntervalScaleCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+    //                       A1IntervalScaleCB.setSelectedItemIndex(prep->getAdaptiveIntervalScale(), dontSendNotification);
+    
+    val = mod->getParam(TuningA1Inversional);
+    A1Inversional.setToggleState((bool)val.getIntValue(), dontSendNotification);
+    //                       A1Inversional.setToggleState(prep->getAdaptiveInversional(), dontSendNotification);
+    
+    val = mod->getParam(TuningA1AnchorScale);
+    A1AnchorScaleCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+    //                       A1AnchorScaleCB.setSelectedItemIndex(prep->getAdaptiveAnchorScale(), dontSendNotification);
+    
+    val = mod->getParam(TuningA1AnchorFundamental);
+    A1FundamentalCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+    //                       A1FundamentalCB.setSelectedItemIndex(prep->getAdaptiveAnchorFundamental(), dontSendNotification);
+    
+    val = mod->getParam(TuningA1ClusterThresh);
+    A1ClusterThresh->setValue(val.getLargeIntValue(), dontSendNotification);
+    //                       A1ClusterThresh->setValue(prep->getAdaptiveClusterThresh(), dontSendNotification);
+    
+    val = mod->getParam(TuningA1ClusterThresh);
+    A1ClusterMax->setValue(val.getIntValue(), dontSendNotification);
+    //                       A1ClusterMax->setValue(prep->getAdaptiveHistory(), dontSendNotification);
+    
+    updateComponentVisibility();
+}
+
+void TuningModificationEditor::fillSelectCB(void)
+{
+    // Direct menu
+    StringArray mods = processor.gallery->getAllTuningModNames();
+    
+    selectCB.clear(dontSendNotification);
+    for (int i = 0; i < mods.size(); i++)
+    {
+        String name = mods[i];
+        if (name != String::empty)  selectCB.addItem(name, i+1);
+        else                        selectCB.addItem(String(i+1), i+1);
+    }
+    
+    selectCB.addItem("New tuning...", mods.size()+1);
+    
+    selectCB.setSelectedItemIndex(processor.updateState->currentModTuningId, NotificationType::dontSendNotification);
+    
+}
+
+void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
+{
+    String name = box->getName();
+    
+    TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
+    
+    if (name == selectCB.getName())
+    {
+        processor.updateState->currentModTuningId = box->getSelectedItemIndex();
+        
+        processor.updateState->idDidChange = true;
+        
+        if (processor.updateState->currentTuningId == selectCB.getNumItems()-1)
+        {
+            processor.gallery->addTuningMod();
+            
+            fillSelectCB();
+        }
+        
+        //update(sendNotification);
+        update();
+        return;
+    }
+    
+    if (name == scaleCB.getName())
+    {
+        mod->setParam(TuningScale, String(scaleCB.getSelectedItemIndex()));
+        
+        Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+        customKeyboard.setValues(currentTuning->getCurrentScaleCents());
+    }
+    else if (name == fundamentalCB.getName())
+    {
+        mod->setParam(TuningScale, String(fundamentalCB.getSelectedItemIndex()));
+        
+        customKeyboard.setFundamental(fundamentalCB.getSelectedItemIndex());
+    }
+    else if (name == A1IntervalScaleCB.getName())
+    {
+        mod->setParam(TuningA1IntervalScale, String(A1IntervalScaleCB.getSelectedItemIndex()));
+    }
+    else if (name == A1AnchorScaleCB.getName())
+    {
+        mod->setParam(TuningA1AnchorScale, String(A1AnchorScaleCB.getSelectedItemIndex()));
+    }
+    else if (name == A1FundamentalCB.getName())
+    {
+        mod->setParam(TuningA1AnchorFundamental, String(A1FundamentalCB.getSelectedItemIndex()));
+    }
+    
+    updateModification();
+    
+    updateComponentVisibility();
+}
+
+void TuningModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
+{
+    processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId)->setName(name);
+    
+    updateModification();
+}
+
+void TuningModificationEditor::keyboardSliderChanged(String name, Array<float> values)
+{
+    TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
+    
+    if(name == absoluteKeyboard.getName())
+    {
+        mod->setParam(TuningAbsoluteOffsets, floatArrayToString(values));
+    }
+    else if(name == customKeyboard.getName())
+    {
+        scaleCB.setSelectedItemIndex(customIndex, dontSendNotification);
+        
+        mod->setParam(TuningCustomScale, floatArrayToString(values));
+        mod->setParam(TuningScale, String(customIndex));
+    }
+    
+    updateModification();
+}
+
+void TuningModificationEditor::BKSingleSliderValueChanged(String name, double val)
+{
+    TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
+    
+    if(name == offsetSlider->getName())
+    {
+        mod->setParam(TuningOffset, String(val));
+    }
+    else if(name == A1ClusterThresh->getName())
+    {
+        mod->setParam(TuningA1ClusterThresh, String(val));
+    }
+    else if(name == A1ClusterMax->getName())
+    {
+        mod->setParam(TuningA1History, String(val));
+    }
+    
+    updateModification();
+}
+
+void TuningModificationEditor::updateModification(void)
+{
+    processor.updateState->modificationDidChange = true;
+}
+
+void TuningModificationEditor::bkButtonClicked (Button* b)
+{
+    TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
+    
+    if (b == &A1Inversional)
+    {
+        mod->setParam(TuningA1Inversional, String(A1Inversional.getToggleState()));
+    }
+    else if (b == &A1reset)
+    {
+        // reset mod
+    }
+    else if (b == &hideOrShow)
+    {
+        processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+}
+
+
+
+
+
+

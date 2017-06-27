@@ -19,15 +19,11 @@
 
 
 #include "SynchronicViewController.h"
-#include "SynchronicViewController2.h"
 #include "NostalgicViewController.h"
-#include "NostalgicViewController2.h"
 #include "DirectViewController.h"
-#include "DirectViewController2.h"
 #include "TuningViewController.h"
-#include "TuningViewController2.h"
 #include "TempoViewController.h"
-#include "TempoViewController2.h"
+
 #include "KeymapViewController.h"
 #include "GeneralViewController.h"
 
@@ -37,36 +33,35 @@ class BKOvertop :  public Component//, public BKListener, public KeyListener
 {
 public:
     BKOvertop (BKAudioProcessor& p, BKItemGraph* theGraph):
+    processor(p),
     gvc(p),
     kvc(p, theGraph),
-    tvc2(p, theGraph),
-    //tvc(p, theGraph),
-    //svc(p, &theGraph),
-    //nvc(p, &theGraph),
+    tvc(p, theGraph),
+    ovc(p, theGraph),
+    svc(p, theGraph),
+    nvc(p, theGraph),
     dvc(p, theGraph),
-    ovc2(p, theGraph),
-    svc2(p, theGraph),
-    nvc2(p, theGraph),
-    dvc2(p, theGraph),
-    processor(p)
+    tvcm(p, theGraph),
+    ovcm(p, theGraph),
+    svcm(p, theGraph),
+    nvcm(p, theGraph),
+    dvcm(p, theGraph)
     {
-        //addKeyListener(this);
-        
-        /*
-        addAndMakeVisible(hideOrShow);
-        hideOrShow.setName("hideOrShow");
-        hideOrShow.addListener(this);
-        hideOrShow.setButtonText(" X ");
-         */
         
         addChildComponent(gvc);
-        //addChildComponent(dvc);
         addChildComponent(kvc);
-        addChildComponent(tvc2);
-        addChildComponent(ovc2);
-        addChildComponent(svc2);
-        addChildComponent(nvc2);
-        addChildComponent(dvc2);
+
+        addChildComponent(tvc);
+        addChildComponent(ovc);
+        addChildComponent(svc);
+        addChildComponent(nvc);
+        addChildComponent(dvc);
+        
+        addChildComponent(tvcm);
+        addChildComponent(ovcm);
+        addChildComponent(svcm);
+        addChildComponent(nvcm);
+        addChildComponent(dvcm);
         
     }
     
@@ -85,52 +80,33 @@ public:
     
     void resized() override
     {
-        //hideOrShow.setBounds(gXSpacing,gYSpacing * 2, gComponentComboBoxHeight, gComponentComboBoxHeight);
-        
-        //float X = gXSpacing;
-        //float Y = hideOrShow.getBottom()+gYSpacing;
-        //float Y = hideOrShow.getY();
-        //float Y = gYSpacing;
-        //float width = getWidth() - 10;
-        //float height = getHeight() - 10;
-        
+
         Rectangle<int> area (getLocalBounds());
         
-        //float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
-        //float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
-        
-        //area.reduce(50 * paddingScalarX, 70 * paddingScalarY);
-        
         kvc.setBounds(area);
+        
         gvc.setBounds(area);
-        tvc2.setBounds(area);
-        ovc2.setBounds(area);
-        svc2.setBounds(area);
-        nvc2.setBounds(area);
-        dvc2.setBounds(area);
         
-        /*
-        float width = getWidth() * paddingScalarX;
-        float height = getHeight() * paddingScalarY;
+        tvc.setBounds(area);
         
+        ovc.setBounds(area);
         
-        kvc.setBounds(X, Y, width, height);
+        svc.setBounds(area);
         
-        gvc.setBounds(X, Y, width, height);
+        nvc.setBounds(area);
         
-        tvc2.setBounds(X, Y, width, height);
+        dvc.setBounds(area);
         
-        ovc2.setBounds(X, Y, width, height);
+        tvcm.setBounds(area);
         
-        svc2.setBounds(X, Y, width, height);
+        ovcm.setBounds(area);
         
-        nvc2.setBounds(X, Y, width, height);
+        svcm.setBounds(area);
         
-        dvc2.setBounds(X, Y, width, height);
-         */
+        nvcm.setBounds(area);
         
-        
-        //hideOrShow.toFront(false);
+        dvcm.setBounds(area);
+
     }
     
     inline void setCurrentDisplay(BKPreparationDisplay type)
@@ -150,45 +126,79 @@ public:
         
         removeChildComponent(&kvc);
         removeChildComponent(&gvc);
-        removeChildComponent(&tvc2);
+        
+        removeChildComponent(&tvc);
         removeChildComponent(&dvc);
-        removeChildComponent(&ovc2);
+        removeChildComponent(&ovc);
+        removeChildComponent(&svc);
+        removeChildComponent(&nvc);
         
-        //svc.setVisible(false);
-        //nvc.setVisible(false);
-        
-        removeChildComponent(&svc2);
-        removeChildComponent(&nvc2);
-        removeChildComponent(&dvc2);
+        removeChildComponent(&tvcm);
+        removeChildComponent(&dvcm);
+        removeChildComponent(&ovcm);
+        removeChildComponent(&svcm);
+        removeChildComponent(&nvcm);
         
         
         if (type == DisplayKeymap)
         {
             addAndMakeVisible(&kvc);
-        }
-        else if (type == DisplayTuning)
-        {
-            addAndMakeVisible(&tvc2);
-        }
-        else if (type == DisplayTempo)
-        {
-            addAndMakeVisible(&ovc2);
-        }
-        else if (type == DisplaySynchronic)
-        {
-            addAndMakeVisible(&svc2);
-        }
-        else if (type == DisplayNostalgic)
-        {
-            addAndMakeVisible(&nvc2);
-        }
-        else if (type == DisplayDirect)
-        {
-            addAndMakeVisible(&dvc2);
+            //kvc.update();
         }
         else if (type == DisplayGeneral)
         {
             addAndMakeVisible(&gvc);
+            gvc.update();
+        }
+        else if (type == DisplayTuning)
+        {
+            addAndMakeVisible(&tvc);
+            tvc.update();
+        }
+        else if (type == DisplayTempo)
+        {
+            addAndMakeVisible(&ovc);
+            ovc.update();
+        }
+        else if (type == DisplaySynchronic)
+        {
+            addAndMakeVisible(&svc);
+            svc.update();
+        }
+        else if (type == DisplayNostalgic)
+        {
+            addAndMakeVisible(&nvc);
+            nvc.update();
+        }
+        else if (type == DisplayDirect)
+        {
+            addAndMakeVisible(&dvc);
+            dvc.update();
+        }
+        else if (type == DisplayTuningMod)
+        {
+            addAndMakeVisible(&tvcm);
+            tvcm.update();
+        }
+        else if (type == DisplayTempoMod)
+        {
+            addAndMakeVisible(&ovcm);
+            ovcm.update();
+        }
+        else if (type == DisplaySynchronicMod)
+        {
+            addAndMakeVisible(&svcm);
+            svcm.update();
+        }
+        else if (type == DisplayNostalgicMod)
+        {
+            addAndMakeVisible(&nvcm);
+            nvcm.update();
+        }
+        else if (type == DisplayDirectMod)
+        {
+            addAndMakeVisible(&dvcm);
+            dvcm.update();
         }
         
         //hideOrShow.toFront(false);
@@ -198,16 +208,18 @@ public:
     GeneralViewController gvc;
     
     KeymapViewController kvc;
-    TuningViewController2 tvc2;
-    //SynchronicViewController svc;
-    //NostalgicViewController nvc;
-    DirectViewController dvc;
-    //TempoViewController ovc;
-    TempoViewController2 ovc2;
     
-    SynchronicViewController2 svc2;
-    NostalgicViewController2 nvc2;
-    DirectViewController2 dvc2;
+    TuningPreparationEditor tvc;
+    TempoPreparationEditor ovc;
+    SynchronicPreparationEditor svc;
+    NostalgicPreparationEditor nvc;
+    DirectPreparationEditor dvc;
+    
+    TuningModificationEditor tvcm;
+    TempoModificationEditor ovcm;
+    SynchronicModificationEditor svcm;
+    NostalgicModificationEditor nvcm;
+    DirectModificationEditor dvcm;
     
 private:
     

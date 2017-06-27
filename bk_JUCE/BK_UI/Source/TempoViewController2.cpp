@@ -152,40 +152,7 @@ void TempoViewController2::resized()
     tempoSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
     tempoSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
     tempoSlider->setBounds(tempoSliderSlice);
-
-    /*
-    Rectangle<int> area (getLocalBounds());
-    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.25);
-    Rectangle<int> rightColumn = area.removeFromRight(leftColumn.getWidth());
     
-    //left column
-    selectLabel.setBounds(leftColumn.removeFromTop(20));
-    selectCB.setBounds(leftColumn.removeFromTop(20));
-    leftColumn.removeFromTop(gYSpacing * 2);
-    
-    modeLabel.setBounds(leftColumn.removeFromTop(20));
-    modeCB.setBounds(leftColumn.removeFromTop(20));
-    leftColumn.removeFromTop(gYSpacing * 2);
-    
-    tempoSlider->setBounds(leftColumn.removeFromTop(50));
-
-    //right column; adaptive stuff.
-    A1ModeLabel.setBounds(rightColumn.removeFromTop(20));
-    A1ModeCB.setBounds(rightColumn.removeFromTop(20));
-    rightColumn.removeFromTop(gYSpacing * 2);
-    
-    rightColumn.removeFromTop(gYSpacing * 4);
-    AT1HistorySlider->setBounds(rightColumn.removeFromTop(50));
-    AT1SubdivisionsSlider->setBounds(rightColumn.removeFromTop(50));
-    AT1MinMaxSlider->setBounds(rightColumn.removeFromTop(80));
-    
-    rightColumn.removeFromTop(gYSpacing * 4);
-    A1AdaptedTempo.setBounds(rightColumn.removeFromTop(20));
-    A1AdaptedPeriodMultiplier.setBounds(rightColumn.removeFromTop(20));
-    
-    rightColumn.removeFromTop(gYSpacing * 2);
-    A1reset.setBounds(rightColumn.removeFromTop(20));
-    */
 }
 
 

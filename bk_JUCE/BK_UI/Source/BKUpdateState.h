@@ -52,13 +52,14 @@ public:
     bool tempoPreparationDidChange = false;
     bool generalSettingsDidChange = false;
     bool keymapDidChange = false;
+    bool modificationDidChange = false;
     
-    BKPreparationDisplay currentPreparationDisplay = DisplayNil;
+    BKPreparationDisplay currentDisplay = DisplayNil;
     bool displayDidChange;
     
     void setCurrentDisplay(BKPreparationDisplay type)
     {
-        currentPreparationDisplay = type;
+        currentDisplay = type;
         displayDidChange = true;
     }
     

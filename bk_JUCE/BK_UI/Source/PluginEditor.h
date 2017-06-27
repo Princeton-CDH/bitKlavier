@@ -28,10 +28,6 @@ public:
     BKAudioProcessorEditor (BKAudioProcessor&);
     ~BKAudioProcessorEditor();
     
-    
-    
-    
-
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
@@ -47,9 +43,7 @@ private:
     MainViewController mvc;
     
     ScopedPointer<ComponentBoundsConstrainer> constrain;
-    
-    
-    
+
     
     ScopedPointer<ResizableCornerComponent> resizer;
     

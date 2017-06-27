@@ -19,6 +19,8 @@
 
 #include "Preparation.h"
 
+
+
 class BKItem : public BKDraggableComponent, public ReferenceCountedObject, public BKListener
 {
 public:
@@ -27,6 +29,7 @@ public:
     typedef ReferenceCountedArray<BKItem>       RCArr;
     
     BKItem(BKPreparationType type, int Id, BKAudioProcessor& p);
+    
     ~BKItem(void);
     
     void mouseDown(const MouseEvent& e) override;
@@ -35,11 +38,13 @@ public:
     
     void resized(void) override;
 
-    void connectWith(BKItem* item);
+    void addConnection(BKItem* item);
+    
+    bool compare(BKItem* item);
     
     bool isConnectedWith(BKItem* item);
     
-    void disconnectFrom(BKItem* toDisconnect);
+    void removeConnection(BKItem* toDisconnect);
     
     void itemIsBeingDragged(const MouseEvent&, Point<int>) override;
     
@@ -47,7 +52,12 @@ public:
 
     inline String getName(void) { return name; }
     
+    inline void setType(BKPreparationType newType) { type = newType; }
+    
     inline BKPreparationType getType() const noexcept { return type; }
+    
+    inline void setId(int newId ) { Id = newId; }
+    
     inline int getId() const noexcept { return Id; }
     
     inline void setSelected(bool select) {isSelected = select; repaint();}
@@ -67,9 +77,14 @@ public:
     {
         for (auto item : connections)
         {
-            DBG(cPreparationTypes[type]+String(Id)+" ==> " +cPreparationTypes[item->getType()]+String(item->getId()));
+            DBG(cPreparationTypes[type]+((Id >= 0) ? String(Id) : "") +
+                " ==> " +
+                cPreparationTypes[item->getType()]+((item->getId() >= 0) ? String(item->getId()) : ""));
         }
     }
+    
+    inline ModificationMapper::Ptr getMapper() const noexcept { return mapper; }
+    inline void setMapper(ModificationMapper::Ptr map) {mapper = map; }
     
     inline int getSelectedId(void) const noexcept {return currentId;}
     inline void setSelectedId(int Id) { menu.setSelectedId(Id, dontSendNotification); }
@@ -80,8 +95,6 @@ public:
     {
         return getPosition();
     }
-    
-    inline void setId(int newId ) { Id = newId; }
     
     inline void setItemBounds(int X, int Y, int width, int height)
     {
@@ -108,7 +121,7 @@ public:
     
     Point<int> position;
     
-    
+    void setImage(Image newImage);
     
 private:
     BKAudioProcessor& processor;
@@ -124,14 +137,18 @@ private:
     
     BKPreparationType type;
     int Id;
+    
+    ModificationMapper::Ptr mapper;
+    
     String name;
     
     
+
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKItem)
 };
 
-class BKItemGraph : public ActionListener
+class BKItemGraph
 {
 public:
     BKItemGraph(BKAudioProcessor& p):
@@ -145,25 +162,6 @@ public:
         
     }
     
-    void actionListenerCallback (const String& message) override
-    {
-//        if (message == "/pianomap/update")
-//        {
-//            update(PreparationTypePianoMap, 0);
-//        }
-    }
-    
-    /*
-    class Listener
-    {
-        ~Listener(void)
-        {
-            
-        }
-        
-        virtual void itemsDragged(void){};
-    };
-     */
     
     BKItem* itemWithTypeAndId(BKPreparationType type, int Id);
     BKItem* get(BKPreparationType type, int Id);
@@ -181,6 +179,7 @@ public:
     void reconnect(BKItem* item1, BKItem* item2);
     
     void update(BKPreparationType type, int which);
+    void updateMod(BKPreparationType modType, int modId);
     
     void reconstruct(void);
 
@@ -255,7 +254,17 @@ public:
     
     void updateLast(void);
     
+    void updateClipboard(void);
+    
+    inline void setClipboad(BKItem::PtrArr theseItems)
+    {
+        
+    }
+    
     inline BKItem::RCArr getLast(void) const noexcept { return last; }
+    
+    BKItem::RCArr clipboard;
+    
     
     int itemIdCount;
     
@@ -272,9 +281,6 @@ private:
     void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
     void linkSynchronicWithTempo(Synchronic::Ptr synchronic, Tempo::Ptr thisTempo);
     void linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic);
-    
-    
-    
     
     void route(bool connect, BKItem* item1, BKItem* item2);
     

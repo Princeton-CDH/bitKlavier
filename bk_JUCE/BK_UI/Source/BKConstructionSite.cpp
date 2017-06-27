@@ -10,16 +10,17 @@
 
 #include "BKConstructionSite.h"
 
-#define AUTO_DRAW 0
-#define NUM_COL 6
+#define AUTO_DRAW 1
+#define NUM_COL 8
 
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
 BKDraggableComponent(false,true,false),
 processor(p),
 graph(theGraph),
 connect(false),
-lastDownX(10),
-lastDownY(10)
+lastX(10),
+lastY(10),
+altDown(false)
 {
     addKeyListener(this);
     
@@ -48,13 +49,15 @@ void BKConstructionSite::redraw(void)
     
     graph->reconstruct();
     
+    graph->deselectAll();
+    
     draw();
     
 }
 
 void BKConstructionSite::move(int which, bool fine)
 {
-    if (processor.updateState->currentPreparationDisplay != DisplayNil) return;
+    if (processor.updateState->currentDisplay != DisplayNil) return;
     
     float changeX = 0;
     float changeY = 0;
@@ -74,7 +77,7 @@ void BKConstructionSite::move(int which, bool fine)
     repaint();
 }
 
-void BKConstructionSite::remove(void)
+void BKConstructionSite::deleteSelected(void)
 {
     graph->updateLast();
     
@@ -85,12 +88,14 @@ void BKConstructionSite::remove(void)
         deleteItem(selectedItems[i]);
     }
     
+    selected.deselectAll();
+    
     repaint();
 }
 
 void BKConstructionSite::align(int which)
 {
-    if (processor.updateState->currentPreparationDisplay != DisplayNil) return;
+    if (processor.updateState->currentDisplay != DisplayNil) return;
     
     if (graph->getSelectedItems().size() <= 1) return;
     
@@ -205,7 +210,7 @@ void BKConstructionSite::draw(void)
 #endif
             
         }
-        else if (type <= PreparationTypeNostalgic)
+        else if (type <= PreparationTypeNostalgic || type == PreparationTypePianoMap || type == PreparationTypeMod)
         {
 #if AUTO_DRAW
             int col = (int)(prepCount / NUM_COL);
@@ -228,8 +233,8 @@ void BKConstructionSite::draw(void)
             int col = (int)(modCount / NUM_COL);
             int row = modCount % NUM_COL;
             
-            int X = 95 + (row * 155);
-            int Y = 125 + (col * 25);
+            int X = 10 + (row * 155);
+            int Y = 400 + (col * 25);
             
             
             item->setTopLeftPosition(X, Y);
@@ -280,15 +285,20 @@ void BKConstructionSite::prepareItemDrag(BKItem* item, const MouseEvent& e, bool
         item->prepareDrag(e);
     }
 }
+void BKConstructionSite::deleteItem (BKItem* item)
+{
+    graph->remove(item);
+    removeChildComponent(item);
+}
+
 
 void BKConstructionSite::addItem(BKPreparationType type, int which)
 {
     BKItem::Ptr toAdd = new BKItem(type, which, processor);
     
-    DBG("lastdownxy: " + String(lastDownX) + " " + String(lastDownY) );
-    toAdd->setTopLeftPosition(lastDownX, lastDownY);
+    toAdd->setTopLeftPosition(lastX, lastY);
     
-    lastDownX += 10; lastDownY += 10;
+    lastX += 10; lastY += 10;
     
     graph->add(toAdd);
     
@@ -299,11 +309,69 @@ void BKConstructionSite::addItem(BKPreparationType type, int which)
 // Drag interface
 void BKConstructionSite::itemWasDropped(BKPreparationType type, Array<int> data, int x, int y)
 {
-    lastDownX = x; lastDownY = y;
+    lastX = x; lastY = y;
     
     for (int i = 0; i < data.size(); i++)   addItem(type, data[i]);
     
     graph->updateLast();
+}
+
+void BKConstructionSite::copy(void)
+{
+    graph->updateClipboard();
+}
+
+void BKConstructionSite::addItemsFromClipboard(void)
+{
+    graph->deselectAll();
+    
+    int which = 0;
+    int firstX, firstY;
+    for (auto item : graph->clipboard)
+    {
+        BKItem::Ptr toAdd = new BKItem(item->getType(), item->getId(), processor);
+        
+        if (which == 0)
+        {
+            toAdd->setTopLeftPosition(lastX, lastY);
+            firstX = item->position.x; firstY = item->position.y;
+        }
+        else
+        {
+            toAdd->setTopLeftPosition(lastX+item->position.x-firstX, lastY+item->position.y-firstY);
+        }
+        
+        graph->add(toAdd);
+        
+        for (auto connection : toAdd->getConnections())
+            graph->connect(toAdd, connection);
+        
+        addAndMakeVisible(toAdd);
+        
+        which++;
+        
+        graph->select(toAdd);
+    }
+}
+
+void BKConstructionSite::paste(void)
+{
+    addItemsFromClipboard();
+}
+
+void BKConstructionSite::cut(void)
+{
+    graph->updateClipboard();
+    deleteSelected();
+    
+}
+
+void BKConstructionSite::mouseMove (const MouseEvent& eo)
+{
+    MouseEvent e = eo.getEventRelativeTo(this);
+    
+    lastX = e.x;
+    lastY = e.y;
 }
 
 void BKConstructionSite::mouseDown (const MouseEvent& eo)
@@ -312,7 +380,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     
     itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
     
-    lastDownX = e.x; lastDownY = e.y;
+    lastX = e.x; lastY = e.y;
     
     if (itemToSelect != nullptr)
     {
@@ -329,6 +397,28 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
             {
                 prepareItemDrag(item, e, true);
             }
+            
+        }
+        else if (e.mods.isAltDown())
+        {
+            // Copy and drag
+            
+            itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
+            
+            if (!itemToSelect->getSelected())
+            {
+                graph->deselectAll();
+                graph->select(itemToSelect);
+            }
+            
+            graph->updateClipboard();
+            
+            lastX = e.x; lastY = e.y;
+            
+            addItemsFromClipboard();
+            
+            
+            
             
         }
         else
@@ -377,7 +467,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
 
 void BKConstructionSite::mouseDrag (const MouseEvent& e)
 {
-    lastDownX = e.x; lastDownY = e.y;
+    lastX = e.x; lastY = e.y;
     
     if (itemToSelect == nullptr) lasso->dragLasso(e);
     
@@ -402,6 +492,8 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
 {
     MouseEvent e = eo.getEventRelativeTo(this);
     
+    connect = false;
+    
     if (itemToSelect == nullptr) lasso->endLasso();
     
     if (selected.getNumSelected())
@@ -412,8 +504,6 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
         
         return;
     }
-    
-    connect = false;
     
     if (e.mods.isCommandDown())
     {
@@ -427,8 +517,6 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
         {
             graph->connect(itemSource, itemTarget);
             graph->drawLine(lineOX, lineOY, X, Y);
-            
-            repaint();
         }
     }
     
@@ -443,22 +531,13 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
         }
     }
     
+    repaint();
+    
 }
 
-void BKConstructionSite::idDidChange(void)
+void BKConstructionSite::reconfigureCurrentItem(void)
 {
     BKPreparationType type = currentItem->getType();
-    int newId = -1;
-    
-    if (type == PreparationTypeKeymap)          newId = processor.updateState->currentKeymapId;
-    else if (type == PreparationTypeDirect)     newId = processor.updateState->currentDirectId;
-    else if (type == PreparationTypeNostalgic)  newId = processor.updateState->currentNostalgicId;
-    else if (type == PreparationTypeSynchronic) newId = processor.updateState->currentSynchronicId;
-    else if (type == PreparationTypeTempo)      newId = processor.updateState->currentTempoId;
-    else if (type == PreparationTypeTuning)     newId = processor.updateState->currentTuningId;
-    else                                        return;
-    
-    if (currentItem->getId() == newId) return;
     
     BKItem::PtrArr connections;
     
@@ -469,19 +548,67 @@ void BKConstructionSite::idDidChange(void)
         graph->disconnect(currentItem, item);
     }
     
-    currentItem->setId(newId);
-    
-    for (auto item : connections)
-    {
-        graph->connect(currentItem, item);
-    }
+    for (auto item : connections)   graph->connect(currentItem, item);
 }
 
-void BKConstructionSite::deleteItem (BKItem* item)
+void BKConstructionSite::idDidChange(void)
 {
-    graph->remove(item);
-    removeChildComponent(item);
+    BKItem::PtrArr connections;
+    
+    for (auto item : currentItem->getConnections())
+    {
+        connections.add(item);
+        
+        graph->disconnect(currentItem, item);
+    }
+    
+    
+    BKPreparationType type = currentItem->getType();
+    
+    int newId = -1;
+    
+    if (type == PreparationTypeKeymap)          newId = processor.updateState->currentKeymapId;
+    else if (type == PreparationTypeDirect)     newId = processor.updateState->currentDirectId;
+    else if (type == PreparationTypeNostalgic)  newId = processor.updateState->currentNostalgicId;
+    else if (type == PreparationTypeSynchronic) newId = processor.updateState->currentSynchronicId;
+    else if (type == PreparationTypeTempo)      newId = processor.updateState->currentTempoId;
+    else if (type == PreparationTypeTuning)     newId = processor.updateState->currentTuningId;
+    else if (type == PreparationTypeMod)
+    {
+        ModificationMapper::Ptr thisMapper = currentItem->getMapper();
+        BKPreparationType modType = thisMapper->getType();
+    
+        if (modType == PreparationTypeDirect)
+        {
+            currentItem->getMapper()->setId(processor.updateState->currentModDirectId);
+        }
+        else if (modType == PreparationTypeSynchronic)
+        {
+            currentItem->getMapper()->setId(processor.updateState->currentModSynchronicId);
+        }
+        else if (modType == PreparationTypeNostalgic)
+        {
+            currentItem->getMapper()->setId(processor.updateState->currentModNostalgicId);
+        }
+        else if (modType == PreparationTypeTuning)
+        {
+            currentItem->getMapper()->setId(processor.updateState->currentModTuningId);
+        }
+        else if (modType == PreparationTypeTempo)
+        {
+            currentItem->getMapper()->setId(processor.updateState->currentModTempoId);
+        }
+        
+    }
+    
+    currentItem->setId(newId);
+    
+    for (auto item : connections)   graph->connect(currentItem, item);
+    
+    
+    
 }
+
 
 bool BKConstructionSite::keyPressed (const KeyPress& e, Component*)
 {

@@ -32,7 +32,7 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     
-    void updateFields(void);
+    void update(void);
 
 private:
     BKAudioProcessor& processor;

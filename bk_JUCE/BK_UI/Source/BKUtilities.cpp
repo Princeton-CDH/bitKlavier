@@ -243,6 +243,28 @@ String offsetArrayToString2(Array<float> arr)
     return s;
 }
 
+String arrayIntArrayToString(Array<Array<int>> afarr)
+{
+    String s = "";
+    for (auto arr : afarr)
+    {
+        if (arr.size()>1)
+        {
+            s += "[";
+            for (auto i : arr)
+            {
+                s += String(i)+" ";
+            }
+            s += "] ";
+        }
+        else
+        {
+            s +=String(arr[0])+" ";
+        }
+    }
+    return s;
+}
+
 String arrayFloatArrayToString(Array<Array<float>> afarr)
 {
     String s = "";

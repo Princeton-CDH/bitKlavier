@@ -167,7 +167,7 @@ void MainViewController::sliderValueChanged (Slider* slider)
     if(slider == mainSlider)
     {
         gen->setGlobalGain(Decibels::decibelsToGain(mainSlider->getValue()));
-        overtop.gvc.updateFields();
+        overtop.gvc.update();
     }
 }
 
@@ -201,11 +201,11 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     }
     else if (code == KeyPress::deleteKey)
     {
-        construction.remove();
+        construction.deleteSelected();
     }
     else if (code == KeyPress::backspaceKey)
     {
-        construction.remove();
+        construction.deleteSelected();
     }
     else if (code == KeyPress::upKey)
     {
@@ -233,7 +233,8 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     }
     else if (code == 67) // C modification
     {
-        construction.addItem(PreparationTypeDirectMod, 1);
+        if (e.getModifiers().isCommandDown())   construction.copy();
+        else                                    construction.addItem(PreparationTypeMod, 1);
     }
     else if (code == 68) // D direct
     {
@@ -267,12 +268,21 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     {
         construction.addItem(PreparationTypeTuning, 1);
     }
+    else if (code == 86) // V
+    {
+        if (e.getModifiers().isCommandDown())   construction.paste();
+    }
+    else if (code == 88) // X
+    {
+        if (e.getModifiers().isCommandDown())   construction.cut();
+    }
 }
 
 
 
 void MainViewController::timerCallback()
 {
+    BKUpdateState::Ptr state = processor.updateState;
     
     if (++timerCallbackCount >= 100)
     {
@@ -287,10 +297,10 @@ void MainViewController::timerCallback()
     keyboardState.setKeymap(noteOns);
     keyboard->repaint();
     
-    if (processor.updateState->generalSettingsDidChange)
+    if (state->generalSettingsDidChange)
     {
-        processor.updateState->generalSettingsDidChange = false;
-        overtop.gvc.updateFields();
+        state->generalSettingsDidChange = false;
+        overtop.gvc.update();
     }
     
     //check to see if General Settings globalGain has changed, update slider accordingly
@@ -298,100 +308,80 @@ void MainViewController::timerCallback()
     if(genGain != mainSlider->getValue())
         mainSlider->setValue(Decibels::gainToDecibels(gen->getGlobalGain()), dontSendNotification);
     
-    if (processor.updateState->idDidChange)
+    if (state->modificationDidChange)
     {
-        processor.updateState->idDidChange = false;
+        state->modificationDidChange = false;
+        
+        construction.reconfigureCurrentItem();
+    }
+    
+    if (state->idDidChange)
+    {
+        state->idDidChange = false;
         
         construction.idDidChange();
-        
     }
     
-    if (processor.updateState->directPreparationDidChange)
+    if (state->directPreparationDidChange)
     {
-        processor.updateState->directPreparationDidChange = false;
+        state->directPreparationDidChange = false;
         
-        preparationPanel->refill(PreparationTypeDirect);
-        preparationPanel->refill(PreparationTypeDirectMod);
-        
-        overtop.dvc2.updateFields();
+        overtop.dvc.update();
+        overtop.dvcm.update();
     }
     
-    if (processor.updateState->nostalgicPreparationDidChange)
+    if (state->nostalgicPreparationDidChange)
     {
-        processor.updateState->nostalgicPreparationDidChange = false;
+        state->nostalgicPreparationDidChange = false;
         
-        preparationPanel->refill(PreparationTypeNostalgic);
-        preparationPanel->refill(PreparationTypeNostalgicMod);
-        
-        overtop.nvc2.updateFields();
+        overtop.nvc.update();
+        overtop.nvcm.update();
     }
     
-    if (processor.updateState->synchronicPreparationDidChange)
+    if (state->synchronicPreparationDidChange)
     {
-        processor.updateState->synchronicPreparationDidChange = false;
+        state->synchronicPreparationDidChange = false;
         
-        preparationPanel->refill(PreparationTypeSynchronic);
-        preparationPanel->refill(PreparationTypeSynchronicMod);
-        
-        
-        overtop.svc2.updateFields();
+        overtop.svc.update();
+        overtop.svcm.update();
     }
     
-    if (processor.updateState->tuningPreparationDidChange)
+    if (state->tuningPreparationDidChange)
     {
-        processor.updateState->tuningPreparationDidChange = false;
+        state->tuningPreparationDidChange = false;
         
-        preparationPanel->refill(PreparationTypeTuning);
-        preparationPanel->refill(PreparationTypeTuningMod);
-        
-        //overtop.tvc.updateFields();
-        //overtop.tvc.updateModFields();
-        
-        overtop.tvc2.updateFields();
+        overtop.tvc.update();
+        overtop.tvcm.update();
     }
     
-    if (processor.updateState->tempoPreparationDidChange)
+    if (state->tempoPreparationDidChange)
     {
-        processor.updateState->tempoPreparationDidChange = false;
+        state->tempoPreparationDidChange = false;
         
-        preparationPanel->refill(PreparationTypeTempo);
-        preparationPanel->refill(PreparationTypeTempoMod);
-        
-        overtop.ovc2.updateFields();
+        overtop.ovc.update();
+        overtop.ovcm.update();
     }
     
-    if (processor.updateState->pianoDidChangeForGraph)
+    if (state->pianoDidChangeForGraph)
     {
-        processor.updateState->pianoDidChangeForGraph = false;
+        state->pianoDidChangeForGraph = false;
         
         construction.redraw();
     }
     
     
-    if (processor.updateState->keymapDidChange)
+    if (state->keymapDidChange)
     {
         processor.updateState->keymapDidChange = false;
-        
-        preparationPanel->refill(PreparationTypeKeymap);
-        
+    
         overtop.kvc.reset();
     }
     
-    if (processor.updateState->directDidChange)
-    {
-        processor.updateState->directDidChange = false;
-        
-        preparationPanel->refill(PreparationTypeDirect);
-        preparationPanel->refill(PreparationTypeDirectMod);
-        
-        overtop.dvc.reset();
-    }
-    
-    if (processor.updateState->displayDidChange)
+    if (state->displayDidChange)
     {
         processor.updateState->displayDidChange = false;
         
-        overtop.setCurrentDisplay(processor.updateState->currentPreparationDisplay);
+        overtop.setCurrentDisplay(processor.updateState->currentDisplay);
     }
     
     levelMeterComponentL->updateLevel(processor.getLevelL());

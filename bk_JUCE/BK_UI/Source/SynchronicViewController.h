@@ -1,67 +1,151 @@
 /*
   ==============================================================================
 
-    SynchronicView.h
-    Created: 15 Nov 2016 4:02:15pm
-    Author:  Michael R Mulshine
+    SynchronicViewController.h
+    Created: 21 Apr 2017 11:17:47pm
+    Author:  Daniel Trueman
 
   ==============================================================================
 */
 
-#ifndef SYNCHRONICVIEWCONTROLLER_H_INCLUDED
-#define SYNCHRONICVIEWCONTROLLER_H_INCLUDED
+#ifndef SYNCHRONICVIEWCONTROLLER2_H_INCLUDED
+#define SYNCHRONICVIEWCONTROLLER2_H_INCLUDED
 
-#include "BKUtilities.h"
+#include "BKViewController.h"
 
-#include "PluginProcessor.h"
-
-#include "BKListener.h"
-#include "BKComponent.h"
-
-#include "BKSlider.h"
-
-#include "BKGraph.h"
-
-//==============================================================================
-/*
-*/
-
-class SynchronicViewController    : public BKComponent, public BKListener, public BKMultiSliderListener
+class SynchronicViewController :
+public BKMultiSliderListener,
+public BKViewController
 {
 public:
     SynchronicViewController(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~SynchronicViewController();
-
+    ~SynchronicViewController() {};
+    
     void paint (Graphics&) override;
     void resized() override;
     
-    void updateModFields(void);
-    void updateFields(void);
+    virtual void update(void) {};
     
-private:
-    BKAudioProcessor& processor;
-    BKItemGraph* theGraph;
+protected:
     
     OwnedArray<BKLabel> synchronicL;
     OwnedArray<BKTextField> synchronicTF;
     OwnedArray<BKTextField> modSynchronicTF;
     
-    BKMultiSlider* sliderTest;
+    OwnedArray<BKMultiSlider> paramSliders;
     
-    void bkTextFieldDidChange       (TextEditor&)           override;
-    void bkMessageReceived          (const String& message) override;
+    virtual void multiSliderDidChange(String name, int whichSlider, Array<float> values) = 0;
+    virtual void multiSlidersDidChange(String name, Array<Array<float>> values) = 0;
     
-    void bkComboBoxDidChange        (ComboBox* box)         override { };
-    void bkButtonClicked            (Button* b)             override { };
+    inline void multiSliderValueChanged(String name, int whichSlider, Array<float> values) override
+    {
+        multiSliderDidChange(name, whichSlider, values);
+    }
     
-    void multiSliderValueChanged(String name, int whichSlider, Array<float> values) override;
-    void multiSliderAllValuesChanged(String name, Array<Array<float>> values) override { };
+    inline void multiSliderAllValuesChanged(String name, Array<Array<float>> values) override
+    {
+        multiSlidersDidChange(name, values);
+    }
     
-     void fillSelectCB(void);
-    
+    BKEditableComboBox selectCB;
+    BKComboBox modeSelectCB;
 
+    ToggleButton offsetParamStartToggle;
+    ToggleButton releaseVelocitySetsSynchronicToggle;
+    ScopedPointer<BKSingleSlider> howManySlider;
+    ScopedPointer<BKSingleSlider> clusterThreshSlider;
+    ScopedPointer<BKRangeSlider> clusterMinMaxSlider;
+    ScopedPointer<BKSingleSlider> gainSlider;
+    
+    ImageComponent iconImageComponent;
+    TextButton hideOrShow;
+    
+    BKButtonAndMenuLAF buttonsAndMenusLAF;
+    BKButtonAndMenuLAF buttonsAndMenusLAF2;
+    
+    void fillModeSelectCB(void);
+private:
+    
+    
+    
+    
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicViewController)
 };
 
+class SynchronicPreparationEditor :
+public SynchronicViewController,
+public BKSingleSliderListener,
+public BKRangeSliderListener,
+public BKEditableComboBoxListener,
+public Timer
+{
+public:
+    SynchronicPreparationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
+    ~SynchronicPreparationEditor() {};
+    
+    void update(void) override;
+    
+    void update(NotificationType notify);
+    
+    void timerCallback() override;
+    
+private:
 
-#endif  // SYNCHRONICVIEWCONTROLLER_H_INCLUDED
+    void bkTextFieldDidChange       (TextEditor&)           override;
+    void bkMessageReceived          (const String& message) override;
+    void bkComboBoxDidChange        (ComboBox* box)         override;
+    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
+    void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
+    void buttonClicked (Button* b) override;
+    
+    void multiSliderDidChange(String name, int whichSlider, Array<float> values) override;
+    void multiSlidersDidChange(String name, Array<Array<float>> values) override;
+    
+    void fillSelectCB(void);
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicPreparationEditor)
+};
+
+
+
+class SynchronicModificationEditor :
+public SynchronicViewController,
+public BKSingleSliderListener,
+public BKRangeSliderListener,
+public BKEditableComboBoxListener,
+public Timer
+{
+public:
+    SynchronicModificationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
+    ~SynchronicModificationEditor() {};
+    
+    void update(void) override;
+    
+    void update(NotificationType notify);
+    void updateModification(void);
+    
+    void timerCallback() override;
+    
+private:
+    
+    void bkTextFieldDidChange       (TextEditor&)           override;
+    void bkMessageReceived          (const String& message) override;
+    void bkComboBoxDidChange        (ComboBox* box)         override;
+    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
+    void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
+    void buttonClicked (Button* b) override;
+    
+    void multiSliderDidChange(String name, int whichSlider, Array<float> values) override;
+    void multiSlidersDidChange(String name, Array<Array<float>> values) override;
+    
+    void fillSelectCB(void);
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicModificationEditor)
+};
+
+
+
+#endif  // SYNCHRONICVIEWCONTROLLER2_H_INCLUDED

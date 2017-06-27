@@ -78,7 +78,7 @@ theGraph(theGraph)
     
     fillKeymapSelectCB();
     
-    updateFields();
+    update();
 }
 
 KeymapViewController::~KeymapViewController()
@@ -88,7 +88,7 @@ KeymapViewController::~KeymapViewController()
 void KeymapViewController::reset(void)
 {
     fillKeymapSelectCB();
-    updateFields();
+    update();
 }
 
 void KeymapViewController::paint (Graphics& g)
@@ -144,7 +144,7 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
             fillKeymapSelectCB();
         }
 
-        updateFields();
+        update();
     }
 }
 
@@ -242,8 +242,10 @@ void KeymapViewController::fillKeymapSelectCB(void)
 }
 
 
-void KeymapViewController::updateFields(void)
+void KeymapViewController::update(void)
 {
+    if (processor.updateState->currentKeymapId < 0) return;
+    
     Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
     
     keymapTF.setText( intArrayToString(km->keys()));
@@ -262,7 +264,7 @@ void KeymapViewController::bkMessageReceived (const String& message)
     {
         //processor.updateState->currentKeymapId = processor.currentPiano->currentPMap->getKeymapId();
         
-        //updateFields();
+        //update();
     }
 }
 
@@ -284,7 +286,7 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
     
     processor.gallery->getKeymap(processor.updateState->currentKeymapId)->toggleNote(midiNoteNumber);
     
-    updateFields();
+    update();
     
     BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
     

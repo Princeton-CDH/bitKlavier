@@ -1789,6 +1789,8 @@ void BKStackedSlider::setTo(Array<float> newvals, NotificationType newnotify)
     resetRanges();
     
     topSlider->setValue(dataSliders.getFirst()->getValue(), dontSendNotification);
+
+
 }
 
 

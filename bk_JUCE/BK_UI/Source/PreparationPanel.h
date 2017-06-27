@@ -60,16 +60,6 @@ private:
                 setPreparations(processor.gallery->getAllTuningNames());
             else if (type == PreparationTypeKeymap)
                 setPreparations(processor.gallery->getAllKeymapNames());
-            else if (type == PreparationTypeDirectMod)
-                setPreparations(processor.gallery->getAllDirectModNames());
-            else if (type == PreparationTypeSynchronicMod)
-                setPreparations(processor.gallery->getAllSynchronicModNames());
-            else if (type == PreparationTypeNostalgicMod)
-                setPreparations(processor.gallery->getAllNostalgicModNames());
-            else if (type == PreparationTypeTempoMod)
-                setPreparations(processor.gallery->getAllTempoModNames());
-            else if (type == PreparationTypeTuningMod)
-                setPreparations(processor.gallery->getAllTuningModNames());
             else if (type == PreparationTypePianoMap)
                 setPreparations(StringArray("PianoMap"));
             else if (type == PreparationTypeReset)
@@ -112,77 +102,42 @@ private:
                 processor.updateState->currentDirectId = which;
                 processor.updateState->directPreparationDidChange = true;
                 
-                processor.updateState->currentPreparationDisplay = DisplayDirect;
+                processor.updateState->currentDisplay = DisplayDirect;
             }
             else if (type == PreparationTypeSynchronic)
             {
                 processor.updateState->currentSynchronicId = which;
                 processor.updateState->synchronicPreparationDidChange = true;
                 
-                processor.updateState->currentPreparationDisplay = DisplaySynchronic;
+                processor.updateState->currentDisplay = DisplaySynchronic;
             }
             else if (type == PreparationTypeNostalgic)
             {
                 processor.updateState->currentNostalgicId = which;
                 processor.updateState->nostalgicPreparationDidChange = true;
                 
-                processor.updateState->currentPreparationDisplay = DisplayNostalgic;
+                processor.updateState->currentDisplay = DisplayNostalgic;
             }
             else if (type == PreparationTypeTuning)
             {
                 processor.updateState->currentTuningId = which;
                 processor.updateState->tuningPreparationDidChange = true;
                 
-                processor.updateState->currentPreparationDisplay = DisplayTuning;
+                processor.updateState->currentDisplay = DisplayTuning;
             }
             else if (type == PreparationTypeTempo)
             {
                 processor.updateState->currentTempoId = which;
                 processor.updateState->tempoPreparationDidChange = true;
                 
-                processor.updateState->currentPreparationDisplay = DisplayTempo;
+                processor.updateState->currentDisplay = DisplayTempo;
             }
             else if (type == PreparationTypeKeymap)
             {
                 processor.updateState->currentKeymapId = which;
                 processor.updateState->keymapDidChange = true;
                 
-                processor.updateState->currentPreparationDisplay = DisplayKeymap;
-            }
-            else if (type == PreparationTypeSynchronicMod)
-            {
-                processor.updateState->currentModSynchronicId = which;
-                processor.updateState->synchronicPreparationDidChange = true;
-                
-                processor.updateState->currentPreparationDisplay = DisplaySynchronic;
-            }
-            else if (type == PreparationTypeNostalgicMod)
-            {
-                processor.updateState->currentModNostalgicId = which;
-                processor.updateState->nostalgicPreparationDidChange = true;
-                
-                processor.updateState->currentPreparationDisplay = DisplayNostalgic;
-            }
-            else if (type == PreparationTypeDirectMod)
-            {
-                processor.updateState->currentModDirectId = which;
-                processor.updateState->directPreparationDidChange = true;
-                
-                processor.updateState->currentPreparationDisplay = DisplayDirect;
-            }
-            else if (type == PreparationTypeTuningMod)
-            {
-                processor.updateState->currentModTuningId = which;
-                processor.updateState->tuningPreparationDidChange = true;
-                
-                processor.updateState->currentPreparationDisplay = DisplayTuning;
-            }
-            else if (type == PreparationTypeTempoMod)
-            {
-                processor.updateState->currentModTempoId = which;
-                processor.updateState->tempoPreparationDidChange = true;
-                
-                processor.updateState->currentPreparationDisplay = DisplayTempo;
+                processor.updateState->currentDisplay = DisplayKeymap;
             }
             
             

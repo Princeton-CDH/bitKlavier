@@ -2,57 +2,140 @@
   ==============================================================================
 
     TuningViewController.h
-    Created: 14 Dec 2016 12:25:56pm
-    Author:  Michael R Mulshine
+    Created: 10 Jun 2017 11:24:22am
+    Author:  Daniel Trueman
 
   ==============================================================================
 */
 
-#ifndef TUNINGVIEWCONTROLLER_H_INCLUDED
-#define TUNINGVIEWCONTROLLER_H_INCLUDED
+#pragma once
 
-#include "BKUtilities.h"
-#include "PluginProcessor.h"
-#include "BKListener.h"
-#include "BKComponent.h"
+#include "BKViewController.h"
 
-#include "BKGraph.h"
-
-//==============================================================================
-/*
-*/
-class TuningViewController    : public BKComponent, public BKListener
+class TuningViewController :
+public BKViewController
 {
 public:
+    
     TuningViewController(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~TuningViewController();
-
+    ~TuningViewController() {};
+    
     void paint (Graphics&) override;
     void resized() override;
+    
+    virtual void update(void) {};
+    
+protected:
+    //basics
+    BKEditableComboBox selectCB;
+    
+    BKLabel scaleLabel;
+    BKComboBox scaleCB;
+    
+    BKLabel fundamentalLabel;
+    BKComboBox fundamentalCB;
+    
+    ScopedPointer<BKSingleSlider> offsetSlider;
+    
+    //adaptive tuning 1 stuff
+    BKLabel A1IntervalScaleLabel;
+    BKComboBox A1IntervalScaleCB;
+    
+    ToggleButton A1Inversional;
+    
+    BKLabel A1AnchorScaleLabel;
+    BKComboBox A1AnchorScaleCB;
+    
+    BKLabel A1FundamentalLabel;
+    BKComboBox A1FundamentalCB;
+    
+    ScopedPointer<BKSingleSlider> A1ClusterThresh;
+    ScopedPointer<BKSingleSlider> A1ClusterMax;
+    
+    TextButton A1reset;
 
-    void updateModFields(void);
-    void updateFields(void);
+    Array<float> absoluteOffsets;   //for entire keyboard; up to 128 vals
+    Array<float> customOffsets;     //for custom tuning; 12 vals
+    
+    BKLabel lastNote;
+    BKLabel lastInterval;
+    float lastNoteTuningSave = -.1;
+    
+    BKKeyboardSlider absoluteKeyboard;
+    BKKeyboardSlider customKeyboard;
+    
+    ImageComponent iconImageComponent;
+    TextButton hideOrShow;
+    BKButtonAndMenuLAF buttonsAndMenusLAF;
+    
+    //other overrides
+    
+    void fillTuningCB(void);
+    void fillFundamentalCB(void);
+    
+    void updateComponentVisibility();
+    
+    int customIndex; //index of Custom tuning in combobox
+private:
+    
+    
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningViewController)
+    
+};
+
+class TuningPreparationEditor :
+public TuningViewController,
+public BKEditableComboBoxListener,
+public BKSingleSliderListener,
+public BKKeyboardSliderListener,
+public Timer
+{
+public:
+    
+    TuningPreparationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
+    ~TuningPreparationEditor() {};
+    
+    void timerCallback() override;
+    
+    void update(void) override;
     
 private:
     
-    BKAudioProcessor& processor;
-    BKItemGraph* theGraph;
+    void bkComboBoxDidChange (ComboBox* box) override;
+    void bkButtonClicked (Button* b) override;
+    void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
+    void BKSingleSliderValueChanged(String name, double val) override;
+    void keyboardSliderChanged(String name, Array<float> values) override;
     
-    OwnedArray<BKLabel> tuningL;
-    OwnedArray<BKTextField> tuningTF;
-    OwnedArray<BKTextField> modTuningTF;
+    void fillSelectCB(void);    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningPreparationEditor)
     
-    
-    void bkTextFieldDidChange       (TextEditor&)           override;
-    void bkMessageReceived          (const String& message) override;
-    
-    void bkComboBoxDidChange        (ComboBox* box)         override { };
-    void bkButtonClicked            (Button* b)             override { };
-    
-     void fillSelectCB(void);
-  
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningViewController)
 };
 
-
-#endif  // TUNINGVIEWCONTROLLER_H_INCLUDED
+class TuningModificationEditor :
+public TuningViewController,
+public BKEditableComboBoxListener,
+public BKSingleSliderListener,
+public BKKeyboardSliderListener
+{
+public:
+    
+    TuningModificationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
+    ~TuningModificationEditor() {};
+    
+    void update(void) override;
+    void updateModification(void);
+    
+private:
+    
+    void bkComboBoxDidChange (ComboBox* box) override;
+    void bkButtonClicked (Button* b) override;
+    void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
+    void BKSingleSliderValueChanged(String name, double val) override;
+    void keyboardSliderChanged(String name, Array<float> values) override;
+    
+    void fillSelectCB(void);
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningModificationEditor)
+    
+};

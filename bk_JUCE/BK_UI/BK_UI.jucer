@@ -27,8 +27,18 @@
           <FILE id="XKtIlB" name="icon.png" compile="0" resource="1" file="Source/icons/icon.png"
                 xcodeResource="0"/>
           <FILE id="wEIbpZ" name="keymap_icon.png" compile="0" resource="1" file="Source/icons/keymap_icon.png"/>
-          <FILE id="prJ2HS" name="mod_icon.png" compile="0" resource="1" file="Source/icons/mod_icon.png"
-                xcodeResource="0"/>
+          <FILE id="cVywwa" name="mod_direct_icon.png" compile="0" resource="1"
+                file="Source/icons/mod_direct_icon.png"/>
+          <FILE id="EztFRr" name="mod_nostalgic_icon.png" compile="0" resource="1"
+                file="Source/icons/mod_nostalgic_icon.png"/>
+          <FILE id="sf35pm" name="mod_synchronic_icon.png" compile="0" resource="1"
+                file="Source/icons/mod_synchronic_icon.png"/>
+          <FILE id="W48ccm" name="mod_tempo_icon.png" compile="0" resource="1"
+                file="Source/icons/mod_tempo_icon.png"/>
+          <FILE id="oPUWKk" name="mod_tuning_icon.png" compile="0" resource="1"
+                file="Source/icons/mod_tuning_icon.png"/>
+          <FILE id="bQ9nHT" name="mod_unassigned_icon.png" compile="0" resource="1"
+                file="Source/icons/mod_unassigned_icon.png"/>
           <FILE id="XAH0zl" name="nostalgic_icon.png" compile="0" resource="1"
                 file="Source/icons/nostalgic_icon.png" xcodeResource="0"/>
           <FILE id="GvDVbY" name="piano_icon.png" compile="0" resource="1" file="Source/icons/piano_icon.png"
@@ -133,6 +143,8 @@
         </GROUP>
       </GROUP>
       <GROUP id="{07677963-38EF-2F51-36FA-17646727446F}" name="Controller">
+        <FILE id="pXYbqY" name="BKViewController.h" compile="0" resource="0"
+              file="Source/BKViewController.h"/>
         <FILE id="PVkjL7" name="BKOvertop.h" compile="0" resource="0" file="Source/BKOvertop.h"/>
         <FILE id="Ivngl4" name="MainViewController.cpp" compile="1" resource="0"
               file="Source/MainViewController.cpp"/>
@@ -156,46 +168,26 @@
                 file="Source/PluginEditor.cpp"/>
         </GROUP>
         <GROUP id="{444BC2CA-5FF1-6AEB-00B9-DF5D039DBFFE}" name="PreparationVC">
-          <FILE id="Iv0ln2" name="TempoViewController2.cpp" compile="1" resource="0"
-                file="Source/TempoViewController2.cpp"/>
-          <FILE id="ePlqOW" name="TempoViewController2.h" compile="0" resource="0"
-                file="Source/TempoViewController2.h"/>
-          <FILE id="lBHfg4" name="TuningViewController.cpp" compile="1" resource="0"
-                file="Source/TuningViewController.cpp"/>
-          <FILE id="DZ40Vl" name="TuningViewController.h" compile="0" resource="0"
-                file="Source/TuningViewController.h"/>
-          <FILE id="BIrYkq" name="TuningViewController2.cpp" compile="1" resource="0"
-                file="Source/TuningViewController2.cpp"/>
-          <FILE id="kkg7qA" name="TuningViewController2.h" compile="0" resource="0"
-                file="Source/TuningViewController2.h"/>
-          <FILE id="vi1g4K" name="TempoViewController.cpp" compile="1" resource="0"
+          <FILE id="Iv0ln2" name="TempoViewController.cpp" compile="1" resource="0"
                 file="Source/TempoViewController.cpp"/>
-          <FILE id="QZEXdj" name="TempoViewController.h" compile="0" resource="0"
+          <FILE id="ePlqOW" name="TempoViewController.h" compile="0" resource="0"
                 file="Source/TempoViewController.h"/>
-          <FILE id="Bo4JI6" name="SynchronicViewController.cpp" compile="1" resource="0"
+          <FILE id="BIrYkq" name="TuningViewController.cpp" compile="1" resource="0"
+                file="Source/TuningViewController.cpp"/>
+          <FILE id="kkg7qA" name="TuningViewController.h" compile="0" resource="0"
+                file="Source/TuningViewController.h"/>
+          <FILE id="dthKFQ" name="SynchronicViewController.cpp" compile="1" resource="0"
                 file="Source/SynchronicViewController.cpp"/>
-          <FILE id="OJ2tuE" name="SynchronicViewController.h" compile="0" resource="0"
+          <FILE id="U7d1FI" name="SynchronicViewController.h" compile="0" resource="0"
                 file="Source/SynchronicViewController.h"/>
-          <FILE id="dthKFQ" name="SynchronicViewController2.cpp" compile="1"
-                resource="0" file="Source/SynchronicViewController2.cpp"/>
-          <FILE id="U7d1FI" name="SynchronicViewController2.h" compile="0" resource="0"
-                file="Source/SynchronicViewController2.h"/>
-          <FILE id="nbTvaG" name="NostalgicViewController.cpp" compile="1" resource="0"
+          <FILE id="Lgqkrt" name="NostalgicViewController.cpp" compile="1" resource="0"
                 file="Source/NostalgicViewController.cpp"/>
-          <FILE id="rY4uUs" name="NostalgicViewController.h" compile="0" resource="0"
+          <FILE id="Ek0XSq" name="NostalgicViewController.h" compile="0" resource="0"
                 file="Source/NostalgicViewController.h"/>
-          <FILE id="Lgqkrt" name="NostalgicViewController2.cpp" compile="1" resource="0"
-                file="Source/NostalgicViewController2.cpp"/>
-          <FILE id="Ek0XSq" name="NostalgicViewController2.h" compile="0" resource="0"
-                file="Source/NostalgicViewController2.h"/>
-          <FILE id="kl67Ve" name="DirectViewController.cpp" compile="1" resource="0"
+          <FILE id="Bm0yvn" name="DirectViewController.cpp" compile="1" resource="0"
                 file="Source/DirectViewController.cpp"/>
-          <FILE id="Z11OMY" name="DirectViewController.h" compile="0" resource="0"
+          <FILE id="vmiCDv" name="DirectViewController.h" compile="0" resource="0"
                 file="Source/DirectViewController.h"/>
-          <FILE id="Bm0yvn" name="DirectViewController2.cpp" compile="1" resource="0"
-                file="Source/DirectViewController2.cpp"/>
-          <FILE id="vmiCDv" name="DirectViewController2.h" compile="0" resource="0"
-                file="Source/DirectViewController2.h"/>
         </GROUP>
         <FILE id="FY0jbU" name="KeymapViewController.cpp" compile="1" resource="0"
               file="Source/KeymapViewController.cpp"/>

@@ -2,305 +2,561 @@
   ==============================================================================
 
     TempoViewController.cpp
-    Created: 5 Mar 2017 9:28:27am
+    Created: 17 Jun 2017 5:29:25pm
     Author:  Daniel Trueman
 
   ==============================================================================
 */
 
-#include "../JuceLibraryCode/JuceHeader.h"
 #include "TempoViewController.h"
 
-//==============================================================================
+
 TempoViewController::TempoViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-processor(p),
-theGraph(theGraph)
+BKViewController(p, theGraph)
 {
-    // Labels
-    tempoL = OwnedArray<BKLabel>();
-    tempoL.ensureStorageAllocated(cTempoParameterTypes.size());
     
-    for (int i = 0; i < cTempoParameterTypes.size(); i++)
-    {
-        tempoL.set(i, new BKLabel());
-        addAndMakeVisible(tempoL[i]);
-        tempoL[i]->setName(cTempoParameterTypes[i]);
-        tempoL[i]->setText(cTempoParameterTypes[i], NotificationType::dontSendNotification);
-    }
+    setLookAndFeel(&buttonsAndMenusLAF);
     
-    // Text Fields
-    tempoTF = OwnedArray<BKTextField>();
-    tempoTF.ensureStorageAllocated(cTempoParameterTypes.size());
+    iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::tempo_icon_png, BinaryData::tempo_icon_pngSize));
+    iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
+    iconImageComponent.setAlpha(0.095);
+    addAndMakeVisible(iconImageComponent);
     
-    for (int i = 0; i < cTempoParameterTypes.size(); i++)
-    {
-        tempoTF.set(i, new BKTextField());
-        addAndMakeVisible(tempoTF[i]);
-        tempoTF[i]->addListener(this);
-        tempoTF[i]->setName(cTempoParameterTypes[i]);
-    }
+    selectCB.setName("Tempo");
+    selectCB.addSeparator();    selectCB.setSelectedItemIndex(0);
+    addAndMakeVisible(selectCB);
     
-    modTempoTF = OwnedArray<BKTextField>();
-    modTempoTF.ensureStorageAllocated(cTempoParameterTypes.size());
+    modeCB.setName("Mode");
+    modeCB.BKSetJustificationType(juce::Justification::centredRight);
+    fillModeCB();
+    addAndMakeVisible(modeCB);
     
-    for (int i = 0; i < cTempoParameterTypes.size(); i++)
-    {
-        modTempoTF.set(i, new BKTextField());
-        addAndMakeVisible(modTempoTF[i]);
-        modTempoTF[i]->addListener(this);
-        modTempoTF[i]->setName("M"+cTempoParameterTypes[i]);
-    }
+    tempoSlider = new BKSingleSlider("Tempo", 40, 208, 100, 0.01);
+    addAndMakeVisible(tempoSlider);
     
-    updateModFields();
-    updateFields();
+    AT1HistorySlider = new BKSingleSlider("History", 1, 10, 4, 1);
+    AT1HistorySlider->setJustifyRight(false);
+    addAndMakeVisible(AT1HistorySlider);
+    
+    AT1SubdivisionsSlider = new BKSingleSlider("Subdivisions", 0., 12, 1, 0.01);
+    AT1SubdivisionsSlider->setJustifyRight(false);
+    addAndMakeVisible(AT1SubdivisionsSlider);
+    
+    AT1MinMaxSlider = new BKRangeSlider("Min/Max (ms)", 1, 2000, 100, 500, 10);
+    AT1MinMaxSlider->setJustifyRight(false);
+    AT1MinMaxSlider->setIsMinAlwaysLessThanMax(true);
+    addAndMakeVisible(AT1MinMaxSlider);
+    
+    A1ModeCB.setName("Adaptive Mode");
+    addAndMakeVisible(A1ModeCB);
+    fillA1ModeCB();
+    A1ModeLabel.setText("Adaptive Mode", dontSendNotification);
+    addAndMakeVisible(A1ModeLabel);
+    
+    addAndMakeVisible(A1AdaptedTempo);
+    addAndMakeVisible(A1AdaptedPeriodMultiplier);
+    A1AdaptedPeriodMultiplier.setJustificationType(juce::Justification::centredRight);
+    
+    A1reset.setButtonText("reset");
+    addAndMakeVisible(A1reset);
+    
+    addAndMakeVisible(hideOrShow);
+    hideOrShow.setName("hideOrShow");
+    hideOrShow.setButtonText(" X ");
+    
+    
+    updateComponentVisibility();
 }
 
-TempoViewController::~TempoViewController()
-{
-}
-
-void TempoViewController::paint (Graphics& g)
-{
-    g.fillAll(Colours::transparentWhite);
-}
 
 void TempoViewController::resized()
 {
-    // Labels
-    int lY = gComponentLabelHeight + gYSpacing;
+    Rectangle<int> area (getLocalBounds());
     
-    float width = getWidth() * 0.25 - gXSpacing;
+    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
+    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
     
-    for (int n = 0; n < cTempoParameterTypes.size(); n++)
-    {
-        tempoL[n]->setBounds(0, gYSpacing + lY * n, width, tempoL[0]->getHeight());
-    }
+    iconImageComponent.setBounds(area);
+    area.reduce(10 * paddingScalarX + 4, 10 * paddingScalarY + 4);
     
-    // Text fields
-    int tfY = gComponentTextFieldHeight + gYSpacing;
+    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
+    Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    comboBoxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    A1reset.setBounds(comboBoxSlice.removeFromLeft(45));
     
-    float height = tempoTF[0]->getHeight();
-    width *= 1.5;
+    /* *** above here should be generic (mostly) to all prep layouts *** */
+    /* ***         below here will be specific to each prep          *** */
     
-    for (int n = 0; n < cTempoParameterTypes.size(); n++)
-    {
-        tempoTF[n]->setBounds(tempoL[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
-        modTempoTF[n]->setBounds(tempoTF[0]->getRight()+gXSpacing, gYSpacing + tfY * n, width, height);
-    }
+    // ********* left column
+    
+    leftColumn.removeFromBottom(gYSpacing);
+    int extraY = (leftColumn.getHeight() -
+                  (gComponentComboBoxHeight +
+                   gComponentSingleSliderHeight * 2 +
+                   gComponentRangeSliderHeight +
+                   gComponentTextFieldHeight +
+                   gYSpacing * 6)) / 6.;
+    
+    //DBG("extraY = " + String(extraY));
+    
+    leftColumn.removeFromTop(extraY + gYSpacing);
+    Rectangle<int> A1ModeCBSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    A1ModeCBSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    //A1ModeCBSlice.removeFromLeft(2 * gXSpacing + hideOrShow.getWidth());
+    A1ModeCBSlice.removeFromLeft(gXSpacing);
+    A1ModeCB.setBounds(A1ModeCBSlice.removeFromLeft(selectCB.getWidth() + gXSpacing + hideOrShow.getWidth()));
+    A1ModeLabel.setBounds(A1ModeCBSlice);
+    
+    leftColumn.removeFromTop(extraY + gYSpacing);
+    AT1HistorySlider->setBounds(leftColumn.removeFromTop(gComponentSingleSliderHeight));
+    
+    leftColumn.removeFromTop(extraY + gYSpacing);
+    AT1SubdivisionsSlider->setBounds(leftColumn.removeFromTop(gComponentSingleSliderHeight));
+    
+    leftColumn.removeFromTop(extraY + gYSpacing);
+    AT1MinMaxSlider->setBounds(leftColumn.removeFromTop(gComponentRangeSliderHeight));
+    
+    leftColumn.removeFromTop(extraY + gYSpacing);
+    Rectangle<int> adaptedLabelSlice = leftColumn.removeFromTop(gComponentTextFieldHeight);
+    A1AdaptedTempo.setBounds(adaptedLabelSlice.removeFromLeft(leftColumn.getWidth() / 2.));
+    A1AdaptedPeriodMultiplier.setBounds(adaptedLabelSlice);
+    
+    // ********* right column
+    
+    Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
+    modeSlice.removeFromRight(gXSpacing);
+    modeCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
+    
+    area.removeFromTop(A1ModeCB.getY() - selectCB.getBottom());
+    Rectangle<int> tempoSliderSlice = area.removeFromTop(gComponentSingleSliderHeight);
+    tempoSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
+    tempoSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
+    tempoSlider->setBounds(tempoSliderSlice);
     
 }
 
-void TempoViewController::bkTextFieldDidChange(TextEditor& tf)
+
+void TempoViewController::paint (Graphics& g)
 {
-    String text = tf.getText();
-    String name = tf.getName();
+    g.fillAll(Colours::black);
+}
+void TempoViewController::fillModeCB(void)
+{
     
-    BKTextFieldType type = BKParameter;
+    modeCB.clear(dontSendNotification);
     
-    if (name.startsWithChar('M'))
+    for (int i = 0; i < cTempoModeTypes.size(); i++)
     {
-        type = BKModification;
-        name = name.substring(1);
+        String name = cTempoModeTypes[i];
+        modeCB.addItem(name, i+1);
     }
     
+    modeCB.setSelectedItemIndex(0, dontSendNotification);
+}
+
+
+void TempoViewController::fillA1ModeCB(void)
+{
     
-    float f = text.getFloatValue();
-    int i = text.getIntValue();
+    A1ModeCB.clear(dontSendNotification);
     
-    DBG(name + ": |" + text + "|"); 
+    for (int i = 0; i < cAdaptiveTempoModeTypes.size(); i++)
+    {
+        String name = cAdaptiveTempoModeTypes[i];
+        A1ModeCB.addItem(name, i+1);
+    }
     
-    TempoPreparation::Ptr       prep    = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
-    TempoPreparation::Ptr       active  = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
-    TempoModPreparation::Ptr    mod     = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
-    
-    /*
-     TempoId = 0,
-     TempoBPM,
-     AT1Mode,
-     AT1History,
-     AT1Subdivisions,
-     AT1Min,
-     AT1Max,
-     TempoParameterTypeNil
-    */ 
- 
-    if (name == cTempoParameterTypes[TempoId])
+    A1ModeCB.setSelectedItemIndex(0, dontSendNotification);
+}
+
+void TempoViewController::updateComponentVisibility()
+{
+    if(modeCB.getText() == "Adaptive Tempo 1")
     {
-        if (type == BKParameter)
-        {
-            int numTempo = processor.gallery->getNumTempo();
-            
-            if ((i+1) > numTempo)
-            {
-                processor.gallery->addTempo();
-                processor.updateState->currentTempoId = numTempo;
-                
-            }
-            else if (i >= 0)
-            {
-                processor.updateState->currentTempoId = i;
-            }
-            
-            tempoTF[TempoId]->setText(String(processor.updateState->currentTempoId), false);
-            
-            updateFields();
-        }
-        else // BKModification
-        {
-            int numMod = processor.gallery->getNumTempoMod();
-            
-            if ((i+1) > numMod)
-            {
-                processor.gallery->addTempoMod();
-                processor.updateState->currentModTempoId = numMod;
-            }
-            else if (i >= 0)
-            {
-                processor.updateState->currentModTempoId = i;
-            }
-            
-            modTempoTF[TempoId]->setText(String(processor.updateState->currentModTempoId), false);
-            
-            updateModFields();
-        }
-    }
-    else if (name == cTempoParameterTypes[TempoBPM])
-    {
-         if (type == BKParameter)
-         {
-             prep->setTempo(f);
-             active->setTempo(f);
-             
-         }
-         else    //BKModification
-         {
-             mod->setParam(TempoBPM, text);
-         }
-    }
-    else if (name == cTempoParameterTypes[AT1Mode])
-    {
-        if (type == BKParameter)
-        {
-            prep->setAdaptiveTempo1Mode(AdaptiveTempo1Mode(i));
-            active->setAdaptiveTempo1Mode(AdaptiveTempo1Mode(i));
-            
-        }
-        else    //BKModification
-        {
-            mod->setParam(AT1Mode, text);
-        }
-    }
-    else if (name == cTempoParameterTypes[AT1History])
-    {
-        if (type == BKParameter)
-        {
-            prep->setAdaptiveTempo1History(i);
-            active->setAdaptiveTempo1History(i);
-            
-        }
-        else    //BKModification
-        {
-            mod->setParam(AT1History, text);
-        }
-    }
-    else if (name == cTempoParameterTypes[AT1Subdivisions])
-    {
-        if (type == BKParameter)
-        {
-            prep->setAdaptiveTempo1Subdivisions(f);
-            active->setAdaptiveTempo1Subdivisions(f);
-            
-        }
-        else    //BKModification
-        {
-            mod->setParam(AT1Subdivisions, text);
-        }
-    }
-    else if (name == cTempoParameterTypes[AT1Min])
-    {
-        if (type == BKParameter)
-        {
-            prep->setAdaptiveTempo1Min(f);
-            active->setAdaptiveTempo1Min(f);
-            
-        }
-        else    //BKModification
-        {
-            mod->setParam(AT1Min, text);
-        }
-    }
-    else if (name == cTempoParameterTypes[AT1Max])
-    {
-        if (type == BKParameter)
-        {
-            prep->setAdaptiveTempo1Max(f);
-            active->setAdaptiveTempo1Max(f);
-            
-        }
-        else    //BKModification
-        {
-            mod->setParam(AT1Max, text);
-        }
-    }
-    else if (name == cTempoParameterTypes[TempoSystem])
-    {
-        if (type == BKParameter)
-        {
-            prep->setTempoSystem(TempoType(i));
-            active->setTempoSystem(TempoType(i));
-            
-        }
-        else    //BKModification
-        {
-            mod->setParam(TempoSystem, text);
-        }
+        AT1HistorySlider->setVisible(true);
+        AT1SubdivisionsSlider->setVisible(true);;
+        AT1MinMaxSlider->setVisible(true);
+        
+        A1ModeLabel.setVisible(true);
+        A1ModeCB.setVisible(true);
+        
+        A1AdaptedTempo.setVisible(true);
+        A1AdaptedPeriodMultiplier.setVisible(true);
+        
+        A1reset.setVisible(true);
     }
     else
     {
-        DBG("Unregistered text field.");
+        AT1HistorySlider->setVisible(false);
+        AT1SubdivisionsSlider->setVisible(false);;
+        AT1MinMaxSlider->setVisible(false);
+        
+        A1ModeLabel.setVisible(false);
+        A1ModeCB.setVisible(false);
+        
+        A1AdaptedTempo.setVisible(false);
+        A1AdaptedPeriodMultiplier.setVisible(false);
+        
+        A1reset.setVisible(false);
+    }
+}
+
+
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ TempoPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~//
+
+TempoPreparationEditor::TempoPreparationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
+TempoViewController(p, theGraph)
+{
+    selectCB.addMyListener(this);
+    fillSelectCB();
+    
+    tempoSlider->addMyListener(this);
+    AT1HistorySlider->addMyListener(this);
+    AT1SubdivisionsSlider->addMyListener(this);
+    AT1MinMaxSlider->addMyListener(this);
+    
+    startTimer(50);
+    
+    update();
+}
+
+void TempoPreparationEditor::timerCallback()
+{
+    TempoProcessor::Ptr tProcessor = processor.gallery->getTempoProcessor(processor.updateState->currentTempoId);
+
+    if(tProcessor->getPeriodMultiplier() != lastPeriodMultiplier)
+    {
+        lastPeriodMultiplier = tProcessor->getPeriodMultiplier();
+        
+        A1AdaptedTempo.setText("Adapted Tempo = " + String(tProcessor->getAdaptedTempo()), dontSendNotification);
+        A1AdaptedPeriodMultiplier.setText("Adapted Period Multiplier = " + String(tProcessor->getPeriodMultiplier()), dontSendNotification);
     }
     
-    if (type == BKModification) theGraph->update(PreparationTypeTempoMod, processor.updateState->currentModTempoId);
 }
 
 
-void TempoViewController::updateFields()
+void TempoPreparationEditor::fillSelectCB(void)
 {
 
-    TempoPreparation::Ptr prep = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
+    Tempo::PtrArr newpreps = processor.gallery->getAllTempo();
     
-    tempoTF[TempoBPM]           ->setText( String( prep->getTempo()), false);
-    tempoTF[AT1Mode]            ->setText( String( prep->getAdaptiveTempo1Mode()), false);
-    tempoTF[AT1History]         ->setText( String( prep->getAdaptiveTempo1History()), false);
-    tempoTF[AT1Subdivisions]    ->setText( String( prep->getAdaptiveTempo1Subdivisions()), false);
-    tempoTF[AT1Min]             ->setText( String( prep->getAdaptiveTempo1Min()), false);
-    tempoTF[AT1Max]             ->setText( String( prep->getAdaptiveTempo1Max()), false);
-    tempoTF[TempoSystem]        ->setText( String( prep->getTempoSystem()), false);
+    selectCB.clear(dontSendNotification);
+    for (int i = 0; i < newpreps.size(); i++)
+    {
+        String name = newpreps[i]->getName();
+        if (name != String::empty)  selectCB.addItem(name, i+1);
+        else                        selectCB.addItem(String(i+1), i+1);
+    }
+    
+    selectCB.addItem("New tempo...", newpreps.size()+1);
+    
+    selectCB.setSelectedItemIndex(processor.updateState->currentTempoId, NotificationType::dontSendNotification);
+    
+}
+
+void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
+{
+    String name = box->getName();
+    
+    TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
+    TempoPreparation::Ptr active = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
+    
+    if (name == selectCB.getName())
+    {
+        processor.updateState->currentTempoId = box->getSelectedItemIndex();
+        
+        processor.updateState->idDidChange = true;
+        
+        if (processor.updateState->currentTempoId == selectCB.getNumItems()-1)
+        {
+            processor.gallery->addTempo();
+            
+            fillSelectCB();
+        }
+        
+        update();
+        updateComponentVisibility();
+    }
+    else if (name == modeCB.getName())
+    {
+        prep->setTempoSystem(TempoType(modeCB.getSelectedItemIndex()));
+        active->setTempoSystem(TempoType(modeCB.getSelectedItemIndex()));
+        updateComponentVisibility();
+    }
+    else if (name == A1ModeCB.getName())
+    {
+        prep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) A1ModeCB.getSelectedItemIndex());
+        active->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) A1ModeCB.getSelectedItemIndex());
+    }
+}
+
+
+void TempoPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
+{
+    processor.gallery->getTempo(processor.updateState->currentTempoId)->setName(name);
+}
+
+void TempoPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
+{
+    TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
+    TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
+    
+    if(name == AT1MinMaxSlider->getName()) {
+        DBG("got new AdaptiveTempo 1 time diff min/max " + String(minval) + " " + String(maxval));
+        prep->setAdaptiveTempo1Min(minval);
+        prep->setAdaptiveTempo1Max(maxval);
+        active->setAdaptiveTempo1Min(minval);
+        active->setAdaptiveTempo1Max(maxval);
+    }
+}
+
+void TempoPreparationEditor::update(void)
+{
+    if (processor.updateState->currentTempoId < 0) return;
+    
+    fillSelectCB();
+    
+    TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
+    
+    selectCB.setSelectedItemIndex(processor.updateState->currentTempoId, dontSendNotification);
+    modeCB.setSelectedItemIndex((int)prep->getTempoSystem(), dontSendNotification);
+    tempoSlider->setValue(prep->getTempo(), dontSendNotification);
+    
+    A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempo1Mode(), dontSendNotification);
+    AT1HistorySlider->setValue(prep->getAdaptiveTempo1History(), dontSendNotification);
+    AT1SubdivisionsSlider->setValue(prep->getAdaptiveTempo1Subdivisions(), dontSendNotification);
+    AT1MinMaxSlider->setMinValue(prep->getAdaptiveTempo1Min(), dontSendNotification);
+    AT1MinMaxSlider->setMaxValue(prep->getAdaptiveTempo1Max(), dontSendNotification);
+    
+    updateComponentVisibility();
+}
+
+
+void TempoPreparationEditor::BKSingleSliderValueChanged(String name, double val)
+{
+    TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
+    TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);;
+    
+    if(name == tempoSlider->getName()) {
+        DBG("got tempo " + String(val));
+        prep->setTempo(val);
+        active->setTempo(val);
+    }
+    else if(name == AT1HistorySlider->getName()) {
+        DBG("got A1History " + String(val));
+        prep->setAdaptiveTempo1History(val);
+        active->setAdaptiveTempo1History(val);
+    }
+    else if(name == AT1SubdivisionsSlider->getName()) {
+        DBG("got A1Subdivisions " + String(val));
+        prep->setAdaptiveTempo1Subdivisions(val);
+        active->setAdaptiveTempo1Subdivisions(val);
+    }
+    
+}
+
+void TempoPreparationEditor::bkButtonClicked (Button* b)
+{
+    if (b == &A1reset)
+    {
+        DBG("resetting A1 tempo multiplier");
+        
+        TempoProcessor::Ptr tProcessor = processor.gallery->getTempoProcessor(processor.updateState->currentTempoId);
+        tProcessor->reset();
+    }
+    else if (b == &hideOrShow)
+    {
+        processor.updateState->setCurrentDisplay(DisplayNil);
+    }
     
     
 }
 
-void TempoViewController::updateModFields()
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ TempoModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~//
+
+TempoModificationEditor::TempoModificationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
+TempoViewController(p, theGraph)
 {
     
-    TempoModPreparation::Ptr prep = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
-
-    modTempoTF[TempoId]             ->setText(String(processor.updateState->currentModTempoId));
-    modTempoTF[TempoBPM]            ->setText( prep->getParam(TempoBPM), false);
-    modTempoTF[AT1Mode]             ->setText( prep->getParam(AT1Mode), false);
-    modTempoTF[AT1History]          ->setText( prep->getParam(AT1History), false);
-    modTempoTF[AT1Subdivisions]     ->setText( prep->getParam(AT1Subdivisions), false);
-    modTempoTF[AT1Min]              ->setText( prep->getParam(AT1Min), false);
-    modTempoTF[AT1Max]              ->setText( prep->getParam(AT1Max), false);
-    modTempoTF[TempoSystem]         ->setText( prep->getParam(TempoSystem), false);
- 
+    fillSelectCB();
+    
+    selectCB.addMyListener(this);
+    tempoSlider->addMyListener(this);
+    AT1HistorySlider->addMyListener(this);
+    AT1SubdivisionsSlider->addMyListener(this);
+    AT1MinMaxSlider->addMyListener(this);
+    
+    update();
 }
 
-void TempoViewController::bkMessageReceived(const String& message)
+void TempoModificationEditor::fillSelectCB(void)
 {
-    if (message == "Tempo/update")
+    
+    StringArray mods = processor.gallery->getAllTempoModNames();
+    
+    selectCB.clear(dontSendNotification);
+    for (int i = 0; i < mods.size(); i++)
+    {
+        String name = mods[i];
+        if (name != String::empty)  selectCB.addItem(name, i+1);
+        else                        selectCB.addItem(String(i+1), i+1);
+    }
+    
+    selectCB.addItem("New tempo modification...", mods.size()+1);
+    
+    selectCB.setSelectedItemIndex(processor.updateState->currentModTempoId, NotificationType::dontSendNotification);
+    
+}
+
+void TempoModificationEditor::update(void)
+{
+    fillSelectCB();
+    selectCB.setSelectedItemIndex(processor.updateState->currentModTempoId, dontSendNotification);
+    
+    TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
+    
+    // NEED TO MAKE SURE THIS IS LINKED TO RIGHT ITEM, need better way of doing this
+    int targetId = processor.currentPiano->getMapper(PreparationTypeTempo, processor.updateState->currentModTempoId)->getId();
+    
+    TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(targetId);
+    
+    String val = mod->getParam(TempoSystem);
+    modeCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+    //                       modeCB.setSelectedItemIndex((int)prep->getTempoSystem(), dontSendNotification);
+    
+    val = mod->getParam(TempoBPM);
+    tempoSlider->setValue(val.getFloatValue(), dontSendNotification);
+    //                       tempoSlider->setValue(prep->getTempo(), dontSendNotification);
+    
+    val = mod->getParam(AT1Mode);
+    A1ModeCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+    //                       A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempo1Mode(), dontSendNotification);
+    
+    val = mod->getParam(AT1History);
+    AT1HistorySlider->setValue(val.getIntValue(), dontSendNotification);
+    //                       AT1HistorySlider->setValue(prep->getAdaptiveTempo1History(), dontSendNotification);
+    
+    val = mod->getParam(AT1Subdivisions);
+    AT1SubdivisionsSlider->setValue(val.getFloatValue(), dontSendNotification);
+    //                       AT1SubdivisionsSlider->setValue(prep->getAdaptiveTempo1Subdivisions(), dontSendNotification);
+    
+    val = mod->getParam(AT1Min);
+    AT1MinMaxSlider->setMinValue(val.getDoubleValue(), dontSendNotification);
+    //                       AT1MinMaxSlider->setMinValue(prep->getAdaptiveTempo1Min(), dontSendNotification);
+    
+    val = mod->getParam(AT1Max);
+    AT1MinMaxSlider->setMaxValue(val.getDoubleValue(), dontSendNotification);
+    //                       AT1MinMaxSlider->setMaxValue(prep->getAdaptiveTempo1Max(), dontSendNotification);
+    
+    updateComponentVisibility();
+}
+
+
+void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
+{
+    String name = box->getName();
+    
+    TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
+    
+    if (name == selectCB.getName())
+    {
+        processor.updateState->currentModTempoId = box->getSelectedItemIndex();
+        
+        processor.updateState->idDidChange = true;
+        
+        if (processor.updateState->currentModTempoId == selectCB.getNumItems()-1)
+        {
+            processor.gallery->addTempoMod();
+            
+            fillSelectCB();
+        }
+        
+        update();
+        updateComponentVisibility();
+        
+        return;
+    }
+    
+    if (name == modeCB.getName())
+    {
+        mod->setParam(TempoSystem, String(modeCB.getSelectedItemIndex()));
+        
+        updateComponentVisibility();
+    }
+    else if (name == A1ModeCB.getName())
+    {
+        mod->setParam(AT1Mode, String(A1ModeCB.getSelectedItemIndex()));
+    }
+    
+    updateModification();
+    
+}
+
+
+void TempoModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
+{
+    processor.gallery->getTempo(processor.updateState->currentModTempoId)->setName(name);
+    
+    updateModification();
+}
+
+void TempoModificationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
+{
+    TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
+
+    if(name == AT1MinMaxSlider->getName())
+    {
+        mod->setParam(AT1Min, String(minval));
+        mod->setParam(AT1Max, String(maxval));
+    }
+    
+    updateModification();
+}
+
+
+
+void TempoModificationEditor::BKSingleSliderValueChanged(String name, double val)
+{
+    TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
+    
+    if(name == tempoSlider->getName())
+    {
+        mod->setParam(TempoBPM, String(val));
+    }
+    else if(name == AT1HistorySlider->getName())
+    {
+        mod->setParam(AT1History, String(val));
+    }
+    else if(name == AT1SubdivisionsSlider->getName())
+    {
+        mod->setParam(AT1Subdivisions, String(val));
+    }
+    
+    updateModification();
+    
+}
+
+void TempoModificationEditor::updateModification(void)
+{
+    processor.updateState->modificationDidChange = true;
+}
+
+void TempoModificationEditor::bkButtonClicked (Button* b)
+{
+    if (b == &A1reset)
     {
         
-        updateFields();
     }
+    else if (b == &hideOrShow)
+    {
+        processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+    
+    
 }
+

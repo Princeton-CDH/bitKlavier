@@ -26,6 +26,8 @@ String          intArrayToString(Array<int> arr);
 
 String          floatArrayToString(Array<float> arr);
 String          arrayFloatArrayToString(Array<Array<float>> arr);
+
+String          arrayIntArrayToString(Array<Array<int>> arr);
 Array<float>    stringToFloatArray(String s);
 Array<Array<float>> stringToArrayFloatArray(String s);
 
@@ -54,5 +56,12 @@ typedef enum BKTextFieldType
     BKTFNil
     
 }BKTextFieldType;
+
+typedef enum BKEditorType
+{
+    BKPreparationEditor,
+    BKModificationEditor,
+    BKEditorTypeNil
+}BKEditorType;
 
 #endif  // BKUTILITIES_H_INCLUDED

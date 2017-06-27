@@ -1259,6 +1259,7 @@ public:
     type(type),
     Id(Id)
     {
+        for (int i = 0; i < 5; i++) resets.add(Array<int>());
     }
     
     
@@ -1278,8 +1279,10 @@ public:
     }
     
     inline int getId(void) const noexcept { return Id; }
+    inline void setId(int newId) { Id = newId; }
     
     inline BKPreparationType getType(void) const noexcept { return type; }
+    inline void setType(BKPreparationType newType) { type = newType; }
     
     inline void addTarget(int target) { targets.add(target); }
     inline Array<int> getTargets(void) {return targets;}
@@ -1290,6 +1293,7 @@ public:
     inline void clearKeymaps(void) {keymaps.clear();}
     inline void clearTargets(void) {targets.clear();}
     
+    Array<Array<int>> resets;
     
 private:
     BKPreparationType type;
@@ -1297,6 +1301,8 @@ private:
     
     Array<int> targets;
     Array<int> keymaps;
+    
+    
     
     JUCE_LEAK_DETECTOR(ModificationMapper);
 };

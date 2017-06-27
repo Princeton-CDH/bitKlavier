@@ -75,7 +75,7 @@ private:
     void bkButtonClicked            (Button* b)             override;
     
     
-    void updateFields(void);
+    void update(void);
     void fillKeymapSelectCB(void);
     void keymapUpdated(TextEditor& tf);
     
