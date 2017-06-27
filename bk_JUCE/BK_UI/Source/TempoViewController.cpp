@@ -177,6 +177,8 @@ void TempoViewController::fillA1ModeCB(void)
 
 void TempoViewController::updateComponentVisibility()
 {
+    
+    DBG("updating component visibility");
     if(modeCB.getText() == "Adaptive Tempo 1")
     {
         AT1HistorySlider->setVisible(true);
@@ -216,6 +218,8 @@ TempoViewController(p, theGraph)
 {
     selectCB.addMyListener(this);
     fillSelectCB();
+    
+    modeCB.addListener(this);
     
     tempoSlider->addMyListener(this);
     AT1HistorySlider->addMyListener(this);
@@ -399,6 +403,7 @@ TempoViewController(p, theGraph)
     fillSelectCB();
     
     selectCB.addMyListener(this);
+    modeCB.addListener(this);
     tempoSlider->addMyListener(this);
     AT1HistorySlider->addMyListener(this);
     AT1SubdivisionsSlider->addMyListener(this);
