@@ -115,6 +115,14 @@ public:
         mappers.add(thisMapper);
     }
     
+    inline void removeMapper(ModificationMapper::Ptr thisMapper)
+    {
+        for (int i = mappers.size(); --i >= 0; )
+        {
+            if (mappers[i] == thisMapper) mappers.remove(i);
+        }
+    }
+    
     ValueTree getState(void);
     
     void setState(XmlElement* e);

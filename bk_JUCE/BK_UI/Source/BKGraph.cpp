@@ -81,12 +81,11 @@ mapper(new ModificationMapper(BKPreparationTypeNil, -1))
     
     processor.currentPiano->addMapper(mapper);
     
-    //image.rescaled(image.getWidth() * .25, image.getHeight() * .25);
 }
 
 BKItem::~BKItem()
 {
-    
+    processor.currentPiano->removeMapper(mapper);
 }
 
 void BKItem::setImage(Image newImage)

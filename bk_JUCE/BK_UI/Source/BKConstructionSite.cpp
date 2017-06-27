@@ -280,6 +280,12 @@ void BKConstructionSite::prepareItemDrag(BKItem* item, const MouseEvent& e, bool
         item->prepareDrag(e);
     }
 }
+void BKConstructionSite::deleteItem (BKItem* item)
+{
+    graph->remove(item);
+    removeChildComponent(item);
+}
+
 
 void BKConstructionSite::addItem(BKPreparationType type, int which)
 {
@@ -598,11 +604,6 @@ void BKConstructionSite::idDidChange(void)
     
 }
 
-void BKConstructionSite::deleteItem (BKItem* item)
-{
-    graph->remove(item);
-    removeChildComponent(item);
-}
 
 bool BKConstructionSite::keyPressed (const KeyPress& e, Component*)
 {
