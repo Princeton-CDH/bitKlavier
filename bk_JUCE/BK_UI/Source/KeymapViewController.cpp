@@ -233,6 +233,13 @@ void KeymapViewController::fillKeymapSelectCB(void)
         String name = keymaps[i]->getName();
         if (name != String::empty)  selectCB.addItem(name, i+1);
         else                        selectCB.addItem(String(i+1), i+1);
+        
+        selectCB.setItemEnabled(i+1, true);
+        Array<int> active = processor.updateState->active.getUnchecked(PreparationTypeKeymap);
+        if (active.contains(i) && i != processor.updateState->currentKeymapId)
+        {
+            selectCB.setItemEnabled(i+1, false);
+        }
     }
     
     selectCB.addItem("New keymap...", keymaps.size()+1);

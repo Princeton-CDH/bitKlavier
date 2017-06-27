@@ -22,9 +22,19 @@ public:
     typedef OwnedArray<BKUpdateState>                  Arr;
     typedef OwnedArray<BKUpdateState, CriticalSection> CSArr;
    
-    BKUpdateState(){};
-    ~BKUpdateState(){};
+    BKUpdateState()
+    {
+        for (int i = 0; i< 6; i++)
+        {
+            active.add(Array<int>());
+        }
+    };
     
+    ~BKUpdateState()
+    {
+    };
+    
+    Array<Array<int>> active;
     
     int  currentDirectId = 0;
     int  currentSynchronicId = 0;

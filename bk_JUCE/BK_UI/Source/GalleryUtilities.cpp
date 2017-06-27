@@ -165,6 +165,46 @@ void Gallery::addMod(BKPreparationType type)
     
 }
 
+void Gallery::add(BKPreparationType type)
+{
+    if (type == PreparationTypeDirect)
+    {
+        addDirect();
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        addSynchronic();
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        addNostalgic();
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        addTuning();
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        addTempo();
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+        addKeymap();
+    }
+}
+
+int Gallery::getNum(BKPreparationType type)
+{
+    return  (type == PreparationTypeDirect) ? direct.size() :
+    (type == PreparationTypeNostalgic) ? nostalgic.size() :
+    (type == PreparationTypeSynchronic) ? synchronic.size() :
+    (type == PreparationTypeTuning) ? tuning.size() :
+    (type == PreparationTypeTempo) ? tempo.size() :
+    (type == PreparationTypeKeymap) ? bkKeymaps.size() :
+    -1;
+    
+}
+
 int Gallery::getNumMod(BKPreparationType type)
 {
     if (type == PreparationTypeDirect)
@@ -190,7 +230,6 @@ int Gallery::getNumMod(BKPreparationType type)
     
     
 }
-
 
 void Gallery::addDirectMod()
 {

@@ -79,7 +79,6 @@ void BKConstructionSite::move(int which, bool fine)
 
 void BKConstructionSite::deleteSelected(void)
 {
-    graph->updateLast();
     
     BKItem::PtrArr selectedItems = graph->getSelectedItems();
     
@@ -169,7 +168,6 @@ void BKConstructionSite::paint(Graphics& g)
 
 void BKConstructionSite::itemIsBeingDragged(BKItem* thisItem, Point<int> startPosition)
 {
-    graph->updateLast();
     repaint();
 }
 
@@ -291,10 +289,43 @@ void BKConstructionSite::deleteItem (BKItem* item)
     removeChildComponent(item);
 }
 
+int BKConstructionSite::getUnusedId(BKPreparationType type, int which)
+{
+    int thisId = which;
+    
+    if (type <= PreparationTypeKeymap)
+    {
+        int count = processor.gallery->getNum(type);
+        
+        if (count < 0)
+        {
+            thisId = 0;
+        }
+        else
+        {
+            while (thisId < count)
+            {
+                if (!graph->containsItemWithTypeAndId(type, thisId))
+                    break;
+                
+                thisId++;
+            }
+        }
+        
+        if (thisId >= count)
+            processor.gallery->add(type);
+        
+    }
+    
+    return thisId;
+}
+
 
 void BKConstructionSite::addItem(BKPreparationType type, int which)
 {
-    BKItem::Ptr toAdd = new BKItem(type, which, processor);
+    int thisId = getUnusedId(type, which);
+    
+    BKItem::Ptr toAdd = new BKItem(type, thisId, processor);
     
     toAdd->setTopLeftPosition(lastX, lastY);
     
@@ -306,6 +337,7 @@ void BKConstructionSite::addItem(BKPreparationType type, int which)
 }
 
 
+
 // Drag interface
 void BKConstructionSite::itemWasDropped(BKPreparationType type, Array<int> data, int x, int y)
 {
@@ -313,7 +345,6 @@ void BKConstructionSite::itemWasDropped(BKPreparationType type, Array<int> data,
     
     for (int i = 0; i < data.size(); i++)   addItem(type, data[i]);
     
-    graph->updateLast();
 }
 
 void BKConstructionSite::copy(void)
@@ -329,7 +360,9 @@ void BKConstructionSite::addItemsFromClipboard(void)
     int firstX, firstY;
     for (auto item : graph->clipboard)
     {
-        BKItem::Ptr toAdd = new BKItem(item->getType(), item->getId(), processor);
+        int thisId = getUnusedId(item->getType(), item->getId());
+        
+        BKItem::Ptr toAdd = new BKItem(item->getType(), thisId, processor);
         
         if (which == 0)
         {

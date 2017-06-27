@@ -170,6 +170,7 @@ public:
     BKItem* get(BKPreparationType type, int Id);
     void add(BKItem* itemToAdd);
     bool contains(BKItem* thisItem);
+    bool containsItemWithTypeAndId(BKPreparationType type, int Id);
     void remove(BKItem* itemToRemove);
     void removeUI(BKItem* itemToRemove);
     void removeKeymap(BKItem* itemToRemove);

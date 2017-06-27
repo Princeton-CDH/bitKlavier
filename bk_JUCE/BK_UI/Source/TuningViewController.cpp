@@ -441,6 +441,13 @@ void TuningPreparationEditor::fillSelectCB(void)
         String name = newpreps[i]->getName();
         if (name != String::empty)  selectCB.addItem(name, i+1);
         else                        selectCB.addItem(String(i+1), i+1);
+        
+        selectCB.setItemEnabled(i+1, true);
+        Array<int> active = processor.updateState->active.getUnchecked(PreparationTypeTuning);
+        if (active.contains(i) && i != processor.updateState->currentTuningId)
+        {
+            selectCB.setItemEnabled(i+1, false);
+        }
     }
     
     selectCB.addItem("New tuning...", newpreps.size()+1);

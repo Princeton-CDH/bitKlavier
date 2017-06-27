@@ -393,6 +393,13 @@ void SynchronicPreparationEditor::fillSelectCB(void)
         String name = newpreps[i]->getName();
         if (name != String::empty)  selectCB.addItem(name, i+1);
         else                        selectCB.addItem(String(i+1), i+1);
+        
+        selectCB.setItemEnabled(i+1, true);
+        Array<int> active = processor.updateState->active.getUnchecked(PreparationTypeSynchronic);
+        if (active.contains(i) && i != processor.updateState->currentSynchronicId)
+        {
+            selectCB.setItemEnabled(i+1, false);
+        }
     }
     
     selectCB.addItem("New synchronic...", newpreps.size()+1);

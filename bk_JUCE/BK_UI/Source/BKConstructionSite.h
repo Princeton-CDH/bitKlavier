@@ -80,8 +80,8 @@ private:
                                                    const Rectangle<int>& area) override;
     
     SelectedItemSet<BKItem*>& getLassoSelection(void) override;
-    
-    
+
+    int getUnusedId(BKPreparationType type, int which);
     
     void draw(void);
     
