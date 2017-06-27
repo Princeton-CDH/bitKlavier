@@ -254,11 +254,11 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     }
     else if (code == 80) // P piano
     {
-        construction.addItem(PreparationTypePianoMap, -1);
+        construction.addItem(PreparationTypePianoMap, 1);
     }
     else if (code == 82) // R reset
     {
-        construction.addItem(PreparationTypeReset, -1);
+        construction.addItem(PreparationTypeReset, 1);
     }
     else if (code == 83) // S synchronic
     {

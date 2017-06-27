@@ -154,6 +154,7 @@ NostalgicViewController(p, theGraph)
     beatsToSkipSlider->addMyListener(this);
     
     gainSlider->addMyListener(this);
+    hideOrShow.addListener(this);
     
     startTimer(20);
 }
@@ -326,7 +327,7 @@ void NostalgicPreparationEditor::timerCallback()
 }
 
 
-void NostalgicPreparationEditor::bkButtonClicked (Button* b)
+void NostalgicPreparationEditor::buttonClicked (Button* b)
 {
     if (b == &hideOrShow)
     {
@@ -349,6 +350,7 @@ NostalgicViewController(p, theGraph)
     transpositionSlider->addMyListener(this);
     lengthMultiplierSlider->addMyListener(this);
     beatsToSkipSlider->addMyListener(this);
+    hideOrShow.addListener(this);
     
     gainSlider->addMyListener(this);
     
@@ -541,7 +543,7 @@ void NostalgicModificationEditor::updateModification(void)
     processor.updateState->modificationDidChange = true;
 }
 
-void NostalgicModificationEditor::bkButtonClicked (Button* b)
+void NostalgicModificationEditor::buttonClicked (Button* b)
 {
     if (b == &hideOrShow)
     {

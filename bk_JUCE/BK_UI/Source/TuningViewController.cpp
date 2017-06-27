@@ -342,6 +342,8 @@ TuningViewController(p, theGraph)
     
     offsetSlider->addMyListener(this);
     
+    hideOrShow.addListener(this);
+    
     startTimer(50);
     
     update();
@@ -527,7 +529,7 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(String name, double val
     }
 }
 
-void TuningPreparationEditor::bkButtonClicked (Button* b)
+void TuningPreparationEditor::buttonClicked (Button* b)
 {
     if (b == &A1Inversional)
     {
@@ -583,6 +585,8 @@ TuningViewController(p, theGraph)
     absoluteKeyboard.addMyListener(this);
     
     offsetSlider->addMyListener(this);
+    
+    hideOrShow.addListener(this);
     
     update();
 }
@@ -766,7 +770,7 @@ void TuningModificationEditor::updateModification(void)
     processor.updateState->modificationDidChange = true;
 }
 
-void TuningModificationEditor::bkButtonClicked (Button* b)
+void TuningModificationEditor::buttonClicked (Button* b)
 {
     TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
     

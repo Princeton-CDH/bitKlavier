@@ -219,6 +219,7 @@ TempoViewController(p, theGraph)
     AT1HistorySlider->addMyListener(this);
     AT1SubdivisionsSlider->addMyListener(this);
     AT1MinMaxSlider->addMyListener(this);
+    hideOrShow.addListener(this);
     
     startTimer(50);
     
@@ -360,7 +361,7 @@ void TempoPreparationEditor::BKSingleSliderValueChanged(String name, double val)
     
 }
 
-void TempoPreparationEditor::bkButtonClicked (Button* b)
+void TempoPreparationEditor::buttonClicked (Button* b)
 {
     if (b == &A1reset)
     {
@@ -390,6 +391,7 @@ TempoViewController(p, theGraph)
     AT1HistorySlider->addMyListener(this);
     AT1SubdivisionsSlider->addMyListener(this);
     AT1MinMaxSlider->addMyListener(this);
+    hideOrShow.addListener(this);
     
     update();
 }
@@ -546,7 +548,7 @@ void TempoModificationEditor::updateModification(void)
     processor.updateState->modificationDidChange = true;
 }
 
-void TempoModificationEditor::bkButtonClicked (Button* b)
+void TempoModificationEditor::buttonClicked (Button* b)
 {
     if (b == &A1reset)
     {

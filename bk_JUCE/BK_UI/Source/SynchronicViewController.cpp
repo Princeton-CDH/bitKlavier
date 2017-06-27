@@ -84,7 +84,6 @@ BKViewController(p, theGraph)
     
     addAndMakeVisible(hideOrShow);
     hideOrShow.setName("hideOrShow");
-    hideOrShow.addListener(this);
     hideOrShow.setButtonText(" X ");
 
     
@@ -195,6 +194,7 @@ SynchronicViewController(p, theGraph)
     howManySlider->addMyListener(this);
     clusterThreshSlider->addMyListener(this);
     clusterMinMaxSlider->addMyListener(this);
+    hideOrShow.addListener(this);
 
     gainSlider->addMyListener(this);
     
@@ -532,7 +532,7 @@ SynchronicViewController(p, theGraph)
     howManySlider->addMyListener(this);
     clusterThreshSlider->addMyListener(this);
     clusterMinMaxSlider->addMyListener(this);
-    
+    hideOrShow.addListener(this);
     gainSlider->addMyListener(this);
     
     startTimer(20);

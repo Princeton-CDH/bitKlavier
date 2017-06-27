@@ -87,7 +87,10 @@ public:
     inline void setMapper(ModificationMapper::Ptr map) {mapper = map; }
     
     inline int getSelectedId(void) const noexcept {return currentId;}
-    inline void setSelectedId(int Id) { menu.setSelectedId(Id, dontSendNotification); }
+    inline void setSelectedId(int Id)
+    {
+        menu.setSelectedId(Id, dontSendNotification);
+    }
     
     
     

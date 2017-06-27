@@ -1290,6 +1290,15 @@ public:
     inline void addKeymap(int keymap) { keymaps.add(keymap); }
     inline Array<int> getKeymaps(void) {return keymaps;}
     
+    
+    inline void removeKeymap(int keymap)
+    {
+        for (int i = keymaps.size(); --i>=0;)
+        {
+            if (keymaps[i] == keymap) keymaps.remove(i);
+        }
+    }
+    
     inline void clearKeymaps(void) {keymaps.clear();}
     inline void clearTargets(void) {targets.clear();}
     

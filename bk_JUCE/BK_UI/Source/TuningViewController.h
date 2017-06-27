@@ -103,7 +103,7 @@ public:
 private:
     
     void bkComboBoxDidChange (ComboBox* box) override;
-    void bkButtonClicked (Button* b) override;
+    void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(String name, double val) override;
     void keyboardSliderChanged(String name, Array<float> values) override;
@@ -129,7 +129,7 @@ public:
 private:
     
     void bkComboBoxDidChange (ComboBox* box) override;
-    void bkButtonClicked (Button* b) override;
+    void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(String name, double val) override;
     void keyboardSliderChanged(String name, Array<float> values) override;

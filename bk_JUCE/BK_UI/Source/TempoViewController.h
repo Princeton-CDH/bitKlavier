@@ -84,7 +84,7 @@ private:
     float lastPeriodMultiplier;
     
     void bkComboBoxDidChange (ComboBox* box) override;
-    void bkButtonClicked (Button* b) override;
+    void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(String name, double val) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
@@ -113,7 +113,7 @@ public:
     void timerCallback(void) override {};
 private:
     void bkComboBoxDidChange (ComboBox* box) override;
-    void bkButtonClicked (Button* b) override;
+    void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(String name, double val) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;

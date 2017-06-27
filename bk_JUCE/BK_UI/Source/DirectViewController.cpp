@@ -129,6 +129,8 @@ DirectViewController(p, theGraph)
     resonanceGainSlider->addMyListener(this);
     
     hammerGainSlider->addMyListener(this);
+    
+    hideOrShow.addListener(this);
 }
 
 void DirectPreparationEditor::update(void)
@@ -238,7 +240,7 @@ void DirectPreparationEditor::fillSelectCB(void)
     
 }
 
-void DirectPreparationEditor::bkButtonClicked (Button* b)
+void DirectPreparationEditor::buttonClicked (Button* b)
 {
     if (b == &hideOrShow)
     {
@@ -263,6 +265,8 @@ DirectViewController(p, theGraph)
     resonanceGainSlider->addMyListener(this);
     
     hammerGainSlider->addMyListener(this);
+    
+    hideOrShow.addListener(this);
 }
 
 void DirectModificationEditor::update(void)
@@ -384,7 +388,7 @@ void DirectModificationEditor::updateModification(void)
     processor.updateState->modificationDidChange = true;
 }
 
-void DirectModificationEditor::bkButtonClicked (Button* b)
+void DirectModificationEditor::buttonClicked (Button* b)
 {
     if (b == &hideOrShow)
     {

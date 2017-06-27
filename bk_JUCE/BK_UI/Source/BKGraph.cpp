@@ -79,13 +79,15 @@ mapper(new ModificationMapper(BKPreparationTypeNil, -1))
         mapper->setType(PreparationTypeReset);
     }
     
-    processor.currentPiano->addMapper(mapper);
+    if (type == PreparationTypeMod || type == PreparationTypePianoMap || type == PreparationTypeReset)
+        processor.currentPiano->addMapper(mapper);
     
 }
 
 BKItem::~BKItem()
 {
-    processor.currentPiano->removeMapper(mapper);
+    if (type == PreparationTypeMod || type == PreparationTypePianoMap || type == PreparationTypeReset)
+        processor.currentPiano->removeMapper(mapper);
 }
 
 void BKItem::setImage(Image newImage)
@@ -201,6 +203,8 @@ void BKItem::bkComboBoxDidChange    (ComboBox* cb)
             currentId = Id;
             
             ((BKConstructionSite*)getParentComponent())->pianoMapDidChange(this);
+            
+            mapper->addTarget(currentId);
             
             DBG("New piano selected: "+String(currentId));
         }
@@ -657,6 +661,17 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         {
             disconnectSynchronicFromNostalgic(item1);
         }
+        // MODS RESETS AND PMAPS CAN ONLY HAVE ONE KEYMAP!
+        else if (item1Type == PreparationTypePianoMap || item1Type == PreparationTypeMod || item1Type == PreparationTypeReset)
+        {
+            if (item1->getMapper()->getKeymaps().size()) return;
+        }
+        else if (item2Type == PreparationTypePianoMap || item2Type == PreparationTypeMod || item2Type == PreparationTypeReset)
+        {
+            if (item2->getMapper()->getKeymaps().size()) return;
+        }
+        
+        // MODS RESETS AND PMAPS CAN ONLY HAVE ONE KEYMAP!
         
         item1->addConnection(item2);
         item2->addConnection(item1);
@@ -671,24 +686,42 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
     }
     
     
-    
     // CONFIGURATIONS
     if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypePianoMap)
     {
         Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item1Id);
         int pianoId = item2->getSelectedId();
         
-        if (connect)    processor.currentPiano->configurePianoMap(thisKeymap, pianoId);
-        else            processor.currentPiano->deconfigurePianoMap(thisKeymap, pianoId);
+        ModificationMapper::Ptr thisMapper = item2->getMapper();
+        
+        if (connect)
+        {
+            thisMapper->addKeymap(item1Id);
+            processor.currentPiano->configurePianoMap(thisKeymap, pianoId);
+        }
+        else
+        {
+            processor.currentPiano->deconfigurePianoMap(thisKeymap, pianoId);
+            thisMapper->clearKeymaps();
+        }
         
     }
     else if (item1Type == PreparationTypePianoMap && item2Type == PreparationTypeKeymap)
     {
         Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item2Id);
-        int pianoId = item1->getSelectedId();
         
-        if (connect)    processor.currentPiano->configurePianoMap(thisKeymap, pianoId);
-        else            processor.currentPiano->deconfigurePianoMap(thisKeymap, pianoId);
+        ModificationMapper::Ptr thisMapper = item1->getMapper();
+        
+        if (connect)
+        {
+            thisMapper->addKeymap(item2Id);
+            processor.currentPiano->configurePianoMap(thisKeymap, thisMapper->getTargets().getFirst());
+        }
+        else
+        {
+            processor.currentPiano->deconfigurePianoMap(thisKeymap, thisMapper->getTargets().getFirst());
+            thisMapper->clearKeymaps();
+        }
     }
 
     else if (item1Type == PreparationTypeKeymap && item2Type <= PreparationTypeTempo)

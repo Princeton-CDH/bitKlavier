@@ -60,7 +60,7 @@ public:
     void bkMessageReceived (const String& message) override;
     void bkComboBoxDidChange (ComboBox* box) override;
     void bkTextFieldDidChange (TextEditor&) override {};
-    void bkButtonClicked (Button* b) override;
+    void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(String name, double val) override;
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
@@ -88,7 +88,7 @@ public:
     void bkMessageReceived (const String& message) override;
     void bkComboBoxDidChange (ComboBox* box) override;
     void bkTextFieldDidChange (TextEditor&) override {};
-    void bkButtonClicked (Button* b) override;
+    void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(String name, double val) override;
     void BKStackedSliderValueChanged(String name, Array<float> val) override;

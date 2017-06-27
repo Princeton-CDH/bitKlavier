@@ -139,8 +139,6 @@ public:
     
     inline void configurePianoMap(Keymap::Ptr thisKeymap, int pianoId)
     {
-        pianoMaps.getUnchecked(thisKeymap->getId()).add(pianoId);
-        
         for (auto key : thisKeymap->keys())
         {
             pianoMap.set(key, pianoId);

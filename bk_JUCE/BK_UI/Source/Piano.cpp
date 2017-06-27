@@ -731,76 +731,37 @@ ValueTree Piano::getState(void)
     {
         ValueTree mapVT ("mapper"+String(mapCount++));
         
-        if (map->getType() < BKPreparationTypeNil && map->getKeymaps().size() && map->getTargets().size())
+        mapVT.setProperty("type", map->getType(), 0);
+        
+        mapVT.setProperty("Id", map->getId(), 0);
+        
+        int pcount = 0;
+        for (auto keymap : map->getKeymaps())
         {
-            mapVT.setProperty("type", map->getType(), 0);
-            
-            if (map->getId() >= 0)  mapVT.setProperty("Id", map->getId(), 0);
-            
-            int pcount = 0;
-            for (auto keymap : map->getKeymaps())
-            {
-                mapVT.setProperty("k"+String(pcount++), keymap, 0);
-            }
-            
-            pcount = 0;
-            for (auto target : map->getTargets())
-            {
-                mapVT.setProperty("t"+String(pcount++), target, 0);
-            }
-            
-            pianoVT.addChild(mapVT, -1, 0);
+            mapVT.setProperty("k"+String(pcount++), keymap, 0);
         }
-
-    }
-
-    int resetCount = 0;
-    int pianoMapCount = 0;
-    // Iterate through all keys and write data from PianoMap and modificationMap to ValueTree
-    for (int key = 0; key < 128; key++)
-    {
-        if (pianoMap[key] != -1)
+        
+        pcount = 0;
+        for (auto target : map->getTargets())
         {
-            ValueTree pmapVT( vtagPianoMap + String(pianoMapCount++));
-            
-            pmapVT.setProperty( ptagPianoMap_key, key, 0);
-            pmapVT.setProperty( ptagPianoMap_piano, pianoMap[key], 0);
-            
-            pianoVT.addChild(pmapVT, -1, 0);
+            mapVT.setProperty("t"+String(pcount++), target, 0);
         }
-
-        // RESET SAVING
-        if (modificationMap[key]->directReset.size() ||
-            modificationMap[key]->nostalgicReset.size() ||
-            modificationMap[key]->synchronicReset.size() ||
-            modificationMap[key]->tuningReset.size()||
-            modificationMap[key]->tempoReset.size())
+        
+        for (int i = 0; i < 5; i++)
         {
-            ValueTree resetVT( vtagReset + String(resetCount++));
-            resetVT.setProperty( ptagModX_key, key, 0);
+            ValueTree resetVT( vtagReset + String(i));
             
             int rcount = 0;
-            for (auto reset : modificationMap[key]->directReset)
-                resetVT.setProperty( "d" + String(rcount++), reset, 0);
+            for (auto reset : map->resets[i])
+            {
+                resetVT.setProperty( "r" + String(rcount++), reset, 0);
+            }
             
-            rcount = 0;
-            for (auto reset : modificationMap[key]->synchronicReset)
-                resetVT.setProperty( "s" + String(rcount++), reset, 0);
-            
-            rcount = 0;
-            for (auto reset : modificationMap[key]->nostalgicReset)
-                resetVT.setProperty( "n" + String(rcount++), reset, 0);
-            
-            rcount = 0;
-            for (auto reset : modificationMap[key]->tuningReset)
-                resetVT.setProperty( "t" + String(rcount++), reset, 0);
-            
-            rcount = 0;
-            for (auto reset : modificationMap[key]->tempoReset)
-                resetVT.setProperty( "m" + String(rcount++), reset, 0);
-            
-            pianoVT.addChild(resetVT, -1, 0);
+            mapVT.addChild(resetVT, -1, 0);
         }
+        
+        pianoVT.addChild(mapVT, -1, 0);
+
     }
     
     ValueTree configurationVT = configuration->getState();
