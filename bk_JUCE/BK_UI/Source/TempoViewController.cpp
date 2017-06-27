@@ -23,7 +23,8 @@ BKViewController(p, theGraph)
     addAndMakeVisible(iconImageComponent);
     
     selectCB.setName("Tempo");
-    selectCB.addSeparator();    selectCB.setSelectedItemIndex(0);
+    selectCB.addSeparator();
+    selectCB.setSelectedItemIndex(0);
     addAndMakeVisible(selectCB);
     
     modeCB.setName("Mode");
@@ -204,6 +205,7 @@ void TempoViewController::updateComponentVisibility()
         
         A1reset.setVisible(false);
     }
+    
 }
 
 

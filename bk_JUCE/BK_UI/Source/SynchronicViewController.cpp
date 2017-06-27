@@ -53,7 +53,8 @@ BKViewController(p, theGraph)
     fillModeSelectCB();
     addAndMakeVisible(modeSelectCB);
     
-    //offsetParamStartToggle = new BKSingleSlider("skip first", 0, 1, 0, 1);    offsetParamStartToggle.setButtonText ("skip first");
+    //offsetParamStartToggle = new BKSingleSlider("skip first", 0, 1, 0, 1);
+    offsetParamStartToggle.setButtonText ("skip first");
     buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
     offsetParamStartToggle.setToggleState (true, dontSendNotification);
     addAndMakeVisible(offsetParamStartToggle);
