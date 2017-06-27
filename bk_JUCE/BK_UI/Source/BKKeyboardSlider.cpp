@@ -200,6 +200,29 @@ void BKKeyboardSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 
 }
 
+void BKKeyboardSlider::textEditorEscapeKeyPressed (TextEditor& textEditor)
+{
+    focusLostByEscapeKey = true;
+    if(textEditor.getName() == keyboardValsTextField->getName())
+    {
+        keyboardValsTextField->setAlpha(0);
+        keyboardValsTextField->toBack();
+        unfocusAllComponents();
+    }
+    else if(textEditor.getName() == keyboardValueTF.getName())
+    {
+        unfocusAllComponents();
+    }
+}
+
+void BKKeyboardSlider::textEditorFocusLost(TextEditor& textEditor)
+{
+    if(!focusLostByEscapeKey)
+    {
+        textEditorReturnKeyPressed(textEditor);
+    }
+}
+
 void BKKeyboardSlider::handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber)
 {
 
@@ -209,6 +232,7 @@ void BKKeyboardSlider::bkButtonClicked (Button* b)
 {
     if(b->getName() == keyboardValsTextFieldOpen.getName())
     {
+        focusLostByEscapeKey = false;
         keyboardValsTextField->setAlpha(1);
         keyboardValsTextField->toFront(true);
         if(orderedPairs) {

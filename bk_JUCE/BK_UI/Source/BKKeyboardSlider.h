@@ -94,12 +94,16 @@ private:
     void bkMessageReceived (const String& message) override {};
     void bkComboBoxDidChange (ComboBox*) override {};
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+    void textEditorFocusLost(TextEditor& textEditor) override;
+    void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
     void bkTextFieldDidChange (TextEditor& txt) override;
     void bkButtonClicked (Button* b) override;
     void mouseMove(const MouseEvent& e) override;
     void mouseDrag(const MouseEvent& e) override;
     void mouseUp(const MouseEvent& e) override;
     void mouseDown(const MouseEvent& e) override;
+    
+    bool focusLostByEscapeKey;
 
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKKeyboardSlider)
