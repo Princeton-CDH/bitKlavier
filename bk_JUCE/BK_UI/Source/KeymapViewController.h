@@ -27,7 +27,11 @@
 //==============================================================================
 /*
 */
-class KeymapViewController    : public BKComponent, public BKListener, public BKKeymapKeyboardStateListener
+class KeymapViewController :
+public BKComponent,
+public BKListener,
+public BKEditableComboBoxListener,
+public BKKeymapKeyboardStateListener
 {
 public:
     KeymapViewController(BKAudioProcessor&, BKItemGraph* theGraph);
@@ -44,34 +48,43 @@ private:
     BKItemGraph* theGraph;
     
     BKLabel     keymapSelectL;
-    BKComboBox  keymapSelectCB;
+    BKEditableComboBox  selectCB;
     
     BKLabel     keymapNameL;
     BKTextField keymapNameTF;
     
     BKLabel     keymapL;
-    BKTextField keymapTF;
+    TextEditor  keymapTF;
 
     BKKeymapKeyboardState keyboardState;
-    
     Component *keyboardComponent;
+    BKKeymapKeyboardComponent* keyboard;
+    TextButton keyboardValsTextFieldOpen;
     
     void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override;
-    
     void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override;
-    
     void handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber) override;
-    
+    void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
+    void textEditorFocusLost(TextEditor& textEditor) override;
+    void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
     
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;
     
     void bkComboBoxDidChange        (ComboBox* box)         override;
-    void bkButtonClicked            (Button* b)             override { };
+    void bkButtonClicked            (Button* b)             override;
     
     
     void updateFields(void);
     void fillKeymapSelectCB(void);
+    void keymapUpdated(TextEditor& tf);
+    
+    
+    ImageComponent iconImageComponent;
+    TextButton hideOrShow;
+    BKButtonAndMenuLAF buttonsAndMenusLAF;
+    
+    bool focusLostByEscapeKey;
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KeymapViewController)

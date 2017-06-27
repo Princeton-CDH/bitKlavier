@@ -16,49 +16,65 @@ KeymapViewController::KeymapViewController(BKAudioProcessor& p, BKItemGraph* the
 processor(p),
 theGraph(theGraph)
 {
-    // First row
-    addAndMakeVisible(keymapSelectL);
-    keymapSelectL.setName("Keymap");
-    keymapSelectL.setText("Keymap", NotificationType::dontSendNotification);
+    setLookAndFeel(&buttonsAndMenusLAF);
     
-    addAndMakeVisible(keymapSelectCB);
-    keymapSelectCB.setName("Keymap");
-    keymapSelectCB.addSeparator();
-    keymapSelectCB.addListener(this);
+    iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::keymap_icon_png, BinaryData::keymap_icon_pngSize));
+    iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
+    iconImageComponent.setAlpha(0.095);
+    addAndMakeVisible(iconImageComponent);
+    
+    // First row
+    //addAndMakeVisible(keymapSelectL);
+    //keymapSelectL.setName("Keymap");
+    //keymapSelectL.setText("Keymap", NotificationType::dontSendNotification);
+    
+    selectCB.setName("Keymap");
+    selectCB.addSeparator();
+    selectCB.addListener(this);
     //keymapSelectCB.setEditableText(true);
-    keymapSelectCB.setSelectedItemIndex(0);
+    selectCB.setSelectedItemIndex(0);
+    addAndMakeVisible(selectCB);
     
     // Second row
-    addAndMakeVisible(keymapNameL);
-    keymapNameL.setName("KeymapName");
-    keymapNameL.setText("KeymapName", NotificationType::dontSendNotification);
+    //addAndMakeVisible(keymapNameL);
+    //keymapNameL.setName("KeymapName");
+    //keymapNameL.setText("KeymapName", NotificationType::dontSendNotification);
     
-    addAndMakeVisible(keymapNameTF);
-    keymapNameTF.addListener(this);
-    keymapNameTF.setName("KeymapName");
+    //addAndMakeVisible(keymapNameTF);
+    //keymapNameTF.addListener(this);
+    //keymapNameTF.setName("KeymapName");
     
     // Third row
-    addAndMakeVisible(keymapL);
-    keymapL.setName("KeymapMidi");
-    keymapL.setText("KeymapMidi", NotificationType::dontSendNotification);
+    //addAndMakeVisible(keymapL);
+    //keymapL.setName("KeymapMidi");
+    //keymapL.setText("KeymapMidi", NotificationType::dontSendNotification);
     
     addAndMakeVisible(keymapTF);
     keymapTF.addListener(this);
     keymapTF.setName("KeymapMidi");
+    keymapTF.setMultiLine(true);
     
     // Keyboard
     addAndMakeVisible (keyboardComponent = new BKKeymapKeyboardComponent (keyboardState,
                                                                  BKKeymapKeyboardComponent::horizontalKeyboard));
     
-    BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
-    
+    keyboard = (BKKeymapKeyboardComponent*)keyboardComponent;
     keyboard->setScrollButtonsVisible(true);
-    
     keyboard->setAvailableRange(21, 108);
-    
     keyboard->setOctaveForMiddleC(4);
-    
     keyboardState.addListener(this);
+    
+    keyboardValsTextFieldOpen.setName("KSLIDERTXTEDITALLBUTTON");
+    keyboardValsTextFieldOpen.addListener(this);
+    keyboardValsTextFieldOpen.setButtonText("edit all");
+    addAndMakeVisible(keyboardValsTextFieldOpen);
+    keymapTF.setVisible(false);
+    keymapTF.toBack();
+    
+    addAndMakeVisible(hideOrShow);
+    hideOrShow.setName("hideOrShow");
+    hideOrShow.addListener(this);
+    hideOrShow.setButtonText(" X ");
     
     fillKeymapSelectCB();
     
@@ -77,36 +93,39 @@ void KeymapViewController::reset(void)
 
 void KeymapViewController::paint (Graphics& g)
 {
-    g.fillAll(Colours::transparentWhite);
+    g.fillAll(Colours::black);
 }
 
 void KeymapViewController::resized()
 {
-    // First row
-    keymapSelectL.setTopLeftPosition(0, gYSpacing);
-    keymapSelectCB.setTopLeftPosition(keymapSelectL.getRight()+gXSpacing, keymapSelectL.getY());
+    Rectangle<int> area (getLocalBounds());
     
-    // Second row
-    keymapNameL.setTopLeftPosition(0, keymapSelectL.getBottom()+gYSpacing);
-    keymapNameTF.setTopLeftPosition(keymapNameL.getRight()+gXSpacing, keymapNameL.getY());
-
-    // Third row
-    keymapL.setTopLeftPosition(0, keymapNameL.getBottom()+gYSpacing);
-    keymapTF.setTopLeftPosition(keymapL.getRight()+gXSpacing, keymapL.getY());
+    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
+    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
     
-    // Keyboard
-    BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
+    iconImageComponent.setBounds(area);
+    area.reduce(10 * paddingScalarX + 4, 10 * paddingScalarY + 4);
     
-    float keyboardHeight = 100;
-    float keyWidth = (getWidth()-2*gXSpacing) / 29.0;
+    float keyboardHeight = 86; // + 36 * paddingScalarY;
+    Rectangle<int> keyboardRow = area.removeFromBottom(keyboardHeight);
+    keyboardRow.reduce(gXSpacing, 0);
+    keyboard->setBounds(keyboardRow);
+    keymapTF.setBounds(keyboardRow);
     
-    keyboard->setKeyWidth(keyWidth);
+    area.removeFromBottom(gYSpacing);
+    Rectangle<int> textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
+    textButtonSlab.removeFromLeft(gXSpacing);
+    keyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(75));
     
-    keyboard->setBlackNoteLengthProportion(0.65);
+    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
+    Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * paddingScalarX);
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
     
-    
-    keyboardComponent->setBounds(gXSpacing, getBottom()-1.5*keyboardHeight, getWidth()-2*gXSpacing, keyboardHeight);
-}
+  }
 
 void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
 {
@@ -118,7 +137,7 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
         
         processor.updateState->idDidChange = true;
         
-        if (processor.updateState->currentKeymapId == keymapSelectCB.getNumItems()-1) // New Keymap
+        if (processor.updateState->currentKeymapId == selectCB.getNumItems()-1) // New Keymap
         {
             processor.gallery->addKeymap();
             
@@ -129,40 +148,34 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
     }
 }
 
+void KeymapViewController::bkButtonClicked (Button* b)
+{
+    if (b == &hideOrShow)
+    {
+        processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+    else if(b->getName() == keyboardValsTextFieldOpen.getName())
+    {
+        keymapTF.setVisible(true);
+        keymapTF.toFront(true);
+        focusLostByEscapeKey = false;
+    }
+}
+
+
+void KeymapViewController::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
+{
+    processor.gallery->getDirect(processor.updateState->currentDirectId)->setName(name);
+}
+
 void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
 {
-    String text = tf.getText();
+
     String name = tf.getName();
     
-    //float f = text.getFloatValue();
-    int i = text.getIntValue();
-    
-    DBG(name + ": |" + text + "|");
-    
-    if (name == "KeymapName")
+    if (name == "KeymapMidi")
     {
-        processor.gallery->getKeymap(processor.updateState->currentKeymapId)->setName(text);
-
-        int selected = keymapSelectCB.getSelectedId();
-        if (selected != keymapSelectCB.getNumItems()) keymapSelectCB.changeItemText(selected, text);
-        keymapSelectCB.setSelectedId(selected, dontSendNotification );
-    }
-    else if (name == "KeymapMidi")
-    {
-        Array<int> keys = keymapStringToIntArray(text);
-        
-        keymapTF.setText(intArrayToString(keys));
-
-        // get old keys to send to update
-        Array<int> oldKeys = processor.gallery->getKeymap(processor.updateState->currentKeymapId)->keys();
-        
-        processor.gallery->setKeymap(processor.updateState->currentKeymapId, keys);
-        
-        BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
-        
-        keyboard->setKeysInKeymap(keys);
-        
-        theGraph->update(PreparationTypeKeymap, processor.updateState->currentKeymapId);
+        keymapUpdated(tf);
     }
     else
     {
@@ -170,22 +183,61 @@ void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
     }
 }
 
+void KeymapViewController::keymapUpdated(TextEditor& tf)
+{
+    String text = tf.getText();
+    Array<int> keys = keymapStringToIntArray(text);
+    
+    keymapTF.setText(intArrayToString(keys));
+    
+    // get old keys to send to update
+    Array<int> oldKeys = processor.gallery->getKeymap(processor.updateState->currentKeymapId)->keys();
+    
+    processor.gallery->setKeymap(processor.updateState->currentKeymapId, keys);
+    
+    BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
+    
+    keyboard->setKeysInKeymap(keys);
+    
+    theGraph->update(PreparationTypeKeymap, processor.updateState->currentKeymapId);
+    
+    keymapTF.setVisible(false);
+    keymapTF.toBack();
+
+}
+
+void KeymapViewController::textEditorFocusLost(TextEditor& tf)
+{
+    DBG("textEditorFocusLost");
+    if(!focusLostByEscapeKey) {
+        keymapUpdated(tf);
+    }
+}
+
+void KeymapViewController::textEditorEscapeKeyPressed (TextEditor& textEditor)
+{
+    focusLostByEscapeKey = true;
+    keymapTF.setVisible(false);
+    keymapTF.toBack();
+    unfocusAllComponents();
+}
+
 void KeymapViewController::fillKeymapSelectCB(void)
 {
-    keymapSelectCB.clear(dontSendNotification);
+    selectCB.clear(dontSendNotification);
     
     Keymap::PtrArr keymaps = processor.gallery->getKeymaps();
     
     for (int i = 0; i < keymaps.size(); i++)
     {
         String name = keymaps[i]->getName();
-        if (name != String::empty)  keymapSelectCB.addItem(name, i+1);
-        else                        keymapSelectCB.addItem(String(i+1), i+1);
+        if (name != String::empty)  selectCB.addItem(name, i+1);
+        else                        selectCB.addItem(String(i+1), i+1);
     }
     
-    keymapSelectCB.addItem("New keymap...", keymaps.size()+1);
+    selectCB.addItem("New keymap...", keymaps.size()+1);
     
-    keymapSelectCB.setSelectedItemIndex(processor.updateState->currentKeymapId, NotificationType::dontSendNotification);
+    selectCB.setSelectedItemIndex(processor.updateState->currentKeymapId, NotificationType::dontSendNotification);
     
 }
 
