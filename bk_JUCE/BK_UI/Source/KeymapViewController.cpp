@@ -129,8 +129,6 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
         if (processor.updateState->currentKeymapId == selectCB.getNumItems()-1) // New Keymap
         {
             processor.gallery->addKeymap();
-            
-            
         }
 
         fillKeymapSelectCB();
@@ -226,8 +224,8 @@ void KeymapViewController::fillKeymapSelectCB(void)
         else                        selectCB.addItem(String(i+1), i+1);
         
         selectCB.setItemEnabled(i+1, true);
-        Array<int> active = processor.updateState->active.getUnchecked(PreparationTypeKeymap);
-        if (active.contains(i) && i != processor.updateState->currentKeymapId)
+        if (processor.updateState->isActive(PreparationTypeKeymap, i) &&
+            (i != processor.updateState->currentKeymapId))
         {
             selectCB.setItemEnabled(i+1, false);
         }

@@ -262,7 +262,8 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     }
     else if (code == 83) // S synchronic
     {
-        construction.addItem(PreparationTypeSynchronic, 1);
+        if (e.getModifiers().isCommandDown())   ;
+        else                                    construction.addItem(PreparationTypeSynchronic, 1);
     }
     else if (code == 84) // T tuning
     {

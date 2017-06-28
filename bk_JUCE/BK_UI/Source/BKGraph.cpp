@@ -1147,6 +1147,8 @@ void BKItemGraph::reconstruct(void)
 {
     itemIdCount = 0;
     
+    processor.updateState->clearActive();
+    
     preparations.clear();
     
     Piano::Ptr thisPiano = processor.currentPiano;
