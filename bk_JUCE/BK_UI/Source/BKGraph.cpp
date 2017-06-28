@@ -79,13 +79,7 @@ mapper(new ModificationMapper(BKPreparationTypeNil, -1))
         mapper->setType(PreparationTypeReset);
     }
     
-    Array<int> active = processor.updateState->active.getUnchecked(type);
-    
-    if (type <= PreparationTypeKeymap) active.addIfNotAlreadyThere(Id);
-    
-    processor.updateState->active.set(type, active);
-    
-    DBG("active: " + arrayIntArrayToString(processor.updateState->active));
+    processor.updateState->addActive(type, Id);
     
     if (type == PreparationTypeMod || type == PreparationTypePianoMap || type == PreparationTypeReset)
         processor.currentPiano->addMapper(mapper);
@@ -94,22 +88,10 @@ mapper(new ModificationMapper(BKPreparationTypeNil, -1))
 
 BKItem::~BKItem()
 {
-    if (type <= PreparationTypeKeymap)
-    {
-        Array<int> active = processor.updateState->active.getUnchecked(type);
-        
-        for (int i = active.size(); --i>=0;)
-        {
-            if (active[i] == Id) active.remove(i);
-        }
-        
-        processor.updateState->active.set(type, active);
-    }
+    processor.updateState->removeActive(type, Id);
     
     if (type == PreparationTypeMod || type == PreparationTypePianoMap || type == PreparationTypeReset)
         processor.currentPiano->removeMapper(mapper);
-    
-    DBG("active: " + arrayIntArrayToString(processor.updateState->active));
 }
 
 void BKItem::setImage(Image newImage)
@@ -1164,6 +1146,8 @@ Array<Line<float>> BKItemGraph::getLines(void)
 void BKItemGraph::reconstruct(void)
 {
     itemIdCount = 0;
+    
+    processor.updateState->clearActive();
     
     preparations.clear();
     

@@ -586,6 +586,10 @@ void BKConstructionSite::reconfigureCurrentItem(void)
 
 void BKConstructionSite::idDidChange(void)
 {
+    BKPreparationType type = currentItem->getType();
+    
+    processor.updateState->removeActive(type, currentItem->getId());
+    
     BKItem::PtrArr connections;
     
     for (auto item : currentItem->getConnections())
@@ -594,9 +598,6 @@ void BKConstructionSite::idDidChange(void)
         
         graph->disconnect(currentItem, item);
     }
-    
-    
-    BKPreparationType type = currentItem->getType();
     
     int newId = -1;
     
@@ -636,9 +637,9 @@ void BKConstructionSite::idDidChange(void)
     
     currentItem->setId(newId);
     
+    processor.updateState->addActive(type, newId);
+    
     for (auto item : connections)   graph->connect(currentItem, item);
-    
-    
     
 }
 

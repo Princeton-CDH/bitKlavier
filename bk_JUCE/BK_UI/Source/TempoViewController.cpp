@@ -283,16 +283,23 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == selectCB.getName())
     {
+        // Remove current from list of actives
+        processor.updateState->removeActive(PreparationTypeTempo, processor.updateState->currentTempoId);
+        
+        // Set new current
         processor.updateState->currentTempoId = box->getSelectedItemIndex();
+        
+        // Add new current from list of actives
+        processor.updateState->addActive(PreparationTypeTempo, processor.updateState->currentTempoId);
         
         processor.updateState->idDidChange = true;
         
         if (processor.updateState->currentTempoId == selectCB.getNumItems()-1)
         {
             processor.gallery->addTempo();
-            
-            fillSelectCB();
         }
+        
+        fillSelectCB();
         
         update();
         updateComponentVisibility();
@@ -490,8 +497,10 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
         {
             processor.gallery->addTempoMod();
             
-            fillSelectCB();
+            
         }
+        
+        fillSelectCB();
         
         update();
         updateComponentVisibility();

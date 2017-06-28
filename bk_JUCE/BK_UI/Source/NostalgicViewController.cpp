@@ -224,16 +224,23 @@ void NostalgicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == "Nostalgic")
     {
+        // Remove current from list of actives
+        processor.updateState->removeActive(PreparationTypeNostalgic, processor.updateState->currentNostalgicId);
+        
+        // Set new current
         processor.updateState->currentNostalgicId = box->getSelectedItemIndex();
+        
+        // Add new current from list of actives
+        processor.updateState->addActive(PreparationTypeNostalgic, processor.updateState->currentNostalgicId);
         
         processor.updateState->idDidChange = true;
         
         if (processor.updateState->currentNostalgicId == selectCB.getNumItems()-1)
         {
             processor.gallery->addNostalgic();
-            
-            fillSelectCB();
         }
+        
+        fillSelectCB();
         
         //update(sendNotification);
         update();
@@ -482,11 +489,12 @@ void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
         if (processor.updateState->currentModNostalgicId == selectCB.getNumItems()-1)
         {
             processor.gallery->addNostalgicMod();
-            
-            fillSelectCB();
         }
         
+        fillSelectCB();
+        
         update();
+        
         
         return;
         
