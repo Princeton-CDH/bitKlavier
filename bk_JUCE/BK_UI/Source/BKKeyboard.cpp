@@ -1026,6 +1026,8 @@ void BKKeymapKeyboardComponent::mouseDraggedToKey (int midiNoteNumber, const Mou
             repaint(getRectangleForKey(lastKeySelected));
         }
         
+        state.addToKeymap(midiNoteNumber);
+        state.removeFromKeymap(lastKeySelected);
         lastKeySelected = midiNoteNumber;
     }
 }

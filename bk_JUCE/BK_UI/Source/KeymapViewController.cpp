@@ -23,31 +23,12 @@ theGraph(theGraph)
     iconImageComponent.setAlpha(0.095);
     addAndMakeVisible(iconImageComponent);
     
-    // First row
-    //addAndMakeVisible(keymapSelectL);
-    //keymapSelectL.setName("Keymap");
-    //keymapSelectL.setText("Keymap", NotificationType::dontSendNotification);
-    
     selectCB.setName("Keymap");
     selectCB.addSeparator();
     selectCB.addListener(this);
     //keymapSelectCB.setEditableText(true);
     selectCB.setSelectedItemIndex(0);
     addAndMakeVisible(selectCB);
-    
-    // Second row
-    //addAndMakeVisible(keymapNameL);
-    //keymapNameL.setName("KeymapName");
-    //keymapNameL.setText("KeymapName", NotificationType::dontSendNotification);
-    
-    //addAndMakeVisible(keymapNameTF);
-    //keymapNameTF.addListener(this);
-    //keymapNameTF.setName("KeymapName");
-    
-    // Third row
-    //addAndMakeVisible(keymapL);
-    //keymapL.setName("KeymapMidi");
-    //keymapL.setText("KeymapMidi", NotificationType::dontSendNotification);
     
     addAndMakeVisible(keymapTF);
     keymapTF.addListener(this);
@@ -61,6 +42,7 @@ theGraph(theGraph)
     keyboard = (BKKeymapKeyboardComponent*)keyboardComponent;
     keyboard->setScrollButtonsVisible(true);
     keyboard->setAvailableRange(21, 108);
+    keyboard->setAllowDrag(true);
     keyboard->setOctaveForMiddleC(4);
     keyboardState.addListener(this);
     

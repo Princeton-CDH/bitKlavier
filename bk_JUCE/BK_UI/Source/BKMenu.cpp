@@ -52,20 +52,21 @@ void BKEditableComboBox::textEditorEscapeKeyPressed (TextEditor &)
 
 void BKEditableComboBox::textEditorFocusLost(TextEditor& textEditor)
 {
-    nameEditor.toBack();
-    nameEditor.setAlpha(0.);
-    
-    if(!focusLostByEscapeKey)
+    if(lastItemId > 0)
     {
-        focusLostByEscapeKey = false;
+        nameEditor.toBack();
+        nameEditor.setAlpha(0.);
         
-        listeners.call(&BKEditableComboBoxListener::BKEditableComboBoxChanged,
-                       textEditor.getText(),
-                       this);
-        
-        changeItemText(lastItemId, textEditor.getText());
-        setSelectedId(lastItemId, dontSendNotification);
+        if(!focusLostByEscapeKey)
+        {
+            focusLostByEscapeKey = false;
+            
+            listeners.call(&BKEditableComboBoxListener::BKEditableComboBoxChanged,
+                           textEditor.getText(),
+                           this);
+            DBG("textEditorFocusLost lastItemID = " + String(lastItemId));
+            changeItemText(lastItemId, textEditor.getText());
+            setSelectedId(lastItemId, dontSendNotification);
+        }   
     }
-
-     
 };
