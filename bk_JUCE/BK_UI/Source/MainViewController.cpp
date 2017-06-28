@@ -53,7 +53,7 @@ timerCallbackCount(0)
     keyboard->setAvailableRange(21, 108);
     keyboard->setOctaveForMiddleC(4);
     keyboard->setFundamental(-1);
-    keyboard->setAllowDrag(false);
+    keyboard->setAllowDrag(true);
     keyboard->doKeysToggle(false);
     keyboard->addMouseListener(this, true);
     keyboardState.addListener(this);
