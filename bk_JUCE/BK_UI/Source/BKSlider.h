@@ -121,6 +121,9 @@ public:
     void setMinMaxDefaultInc(std::vector<float> newvals);
     void setCurrentSlider(int activeSliderNum);
     
+    void setAllowSubSlider(bool ss) { allowSubSliders = ss; }
+    void setSubSliderName(String ssname) { subSliderName = ssname; }
+    
     void cleanupSliderArray();
     void resetRanges();
     
@@ -172,6 +175,9 @@ private:
     int sliderHeight;
     float sliderWidth;
     int displaySliderWidth;
+    
+    bool allowSubSliders;
+    String subSliderName;
     
     int numActiveSliders;
     int numDefaultSliders;

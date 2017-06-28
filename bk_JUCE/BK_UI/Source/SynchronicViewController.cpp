@@ -37,6 +37,12 @@ BKViewController(p, theGraph)
             paramSliders[0]->addMyListener(this);
             paramSliders[0]->setName(cSynchronicParameterTypes[i]);
             paramSliders[0]->setMinMaxDefaultInc(cSynchronicDefaultRangeValuesAndInc[i]);
+            
+            if(paramSliders[0]->getName() == "transpositions")
+            {
+                paramSliders[0]->setAllowSubSlider(true);
+                paramSliders[0]->setSubSliderName("add transposition");
+            }
         }
     }
     

@@ -121,6 +121,9 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     numDefaultSliders = 12;
     numVisibleSliders = 12;
     
+    allowSubSliders = false;
+    subSliderName = "add transposition";
+    
     if(sliderIsVertical) {
         sliderWidth = 80;
         sliderHeight = 20;
@@ -987,6 +990,7 @@ void BKMultiSlider::showModifyPopupMenu(int which)
     m.addItem (1, translate ("deactivate slider"), true, false);
     m.addItem (2, translate ("deactivate all after this"), true, false);
     m.addItem (3, translate ("deactivate all before this"), true, false);
+    if(allowSubSliders) m.addItem (4, translate (subSliderName), true, false);
     m.addSeparator();
     
     m.showMenuAsync (PopupMenu::Options(),
@@ -1002,6 +1006,7 @@ void BKMultiSlider::sliderModifyMenuCallback (const int result, BKMultiSlider* m
             case 1:   ms->deactivateSlider(which, sendNotification); break;
             case 2:   ms->deactivateAllAfter(which, sendNotification); break;
             case 3:   ms->deactivateAllBefore(which, sendNotification); break;
+            case 4:   ms->addSubSlider(which, true); break;
 
             default:  break;
         }
