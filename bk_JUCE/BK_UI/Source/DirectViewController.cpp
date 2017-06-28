@@ -166,15 +166,21 @@ void DirectPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == "Direct")
     {
+        
+        // Remove current from list of actives
+        processor.updateState->removeActive(PreparationTypeDirect, processor.updateState->currentDirectId);
+        
+        // Set new current
         processor.updateState->currentDirectId = box->getSelectedItemIndex();
+        
+        // Add new current from list of actives
+        processor.updateState->addActive(PreparationTypeDirect, processor.updateState->currentDirectId);
         
         processor.updateState->idDidChange = true;
         
         if (processor.updateState->currentDirectId == selectCB.getNumItems()-1)
         {
             processor.gallery->addDirect();
-            
-            
         }
         
         fillSelectCB();
@@ -345,8 +351,6 @@ void DirectModificationEditor::bkComboBoxDidChange (ComboBox* box)
         if (processor.updateState->currentModDirectId == selectCB.getNumItems()-1)
         {
             processor.gallery->addDirectMod();
-            
-            
         }
         
         fillSelectCB();

@@ -133,7 +133,14 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
     
     if (name == "Keymap")
     {
+        // Remove current from list of actives
+        processor.updateState->removeActive(PreparationTypeKeymap, processor.updateState->currentKeymapId);
+        
+        // Set new current
         processor.updateState->currentKeymapId = box->getSelectedItemIndex();
+        
+        // Add new current from list of actives
+        processor.updateState->addActive(PreparationTypeKeymap, processor.updateState->currentKeymapId);
         
         processor.updateState->idDidChange = true;
         

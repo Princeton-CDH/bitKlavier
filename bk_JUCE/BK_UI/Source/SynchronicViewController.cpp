@@ -416,7 +416,14 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == "Synchronic")
     {
+        // Remove current from list of actives
+        processor.updateState->removeActive(PreparationTypeSynchronic, processor.updateState->currentSynchronicId);
+        
+        // Set new current
         processor.updateState->currentSynchronicId = box->getSelectedItemIndex();
+        
+        // Add new current from list of actives
+        processor.updateState->addActive(PreparationTypeSynchronic, processor.updateState->currentSynchronicId);
         
         processor.updateState->idDidChange = true;
         

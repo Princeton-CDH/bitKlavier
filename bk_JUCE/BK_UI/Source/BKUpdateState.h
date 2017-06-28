@@ -34,6 +34,34 @@ public:
     {
     };
     
+    inline void removeActive(BKPreparationType type, int Id)
+    {
+        Array<int> theseActive = active.getUnchecked(type);
+        
+        if (type <= PreparationTypeKeymap)
+        {
+            for (int i = theseActive.size(); --i>=0;)
+            {
+                if (theseActive[i] == Id) theseActive.remove(i);
+            }
+        }
+        
+        active.set(type, theseActive);
+        
+        DBG("active: " + arrayIntArrayToString(active));
+    }
+    
+    inline void addActive(BKPreparationType type, int Id)
+    {
+        Array<int> theseActive = active.getUnchecked(type);
+        
+        if (type <= PreparationTypeKeymap) theseActive.addIfNotAlreadyThere(Id);
+        
+        active.set(type, theseActive);
+        
+        DBG("active: " + arrayIntArrayToString(active));
+    }
+    
     Array<Array<int>> active;
     
     int  currentDirectId = 0;

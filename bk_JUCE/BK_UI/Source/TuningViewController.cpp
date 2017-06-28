@@ -370,7 +370,14 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == selectCB.getName())
     {
+        // Remove current from list of actives
+        processor.updateState->removeActive(PreparationTypeTuning, processor.updateState->currentTuningId);
+        
+        // Set new current
         processor.updateState->currentTuningId = box->getSelectedItemIndex();
+        
+        // Add new current from list of actives
+        processor.updateState->addActive(PreparationTypeTuning, processor.updateState->currentTuningId);
         
         processor.updateState->idDidChange = true;
         

@@ -588,17 +588,7 @@ void BKConstructionSite::idDidChange(void)
 {
     BKPreparationType type = currentItem->getType();
     
-    if (type <= PreparationTypeKeymap)
-    {
-        Array<int> active = processor.updateState->active.getUnchecked(type);
-        
-        for (int i = active.size(); --i>=0;)
-        {
-            if (active[i] == currentItem->getId()) active.remove(i);
-        }
-        
-        processor.updateState->active.set(type, active);
-    }
+    processor.updateState->removeActive(type, currentItem->getId());
     
     BKItem::PtrArr connections;
     
@@ -647,19 +637,9 @@ void BKConstructionSite::idDidChange(void)
     
     currentItem->setId(newId);
     
-    Array<int> active = processor.updateState->active.getUnchecked(type);
-    
-    if (type <= PreparationTypeKeymap) active.addIfNotAlreadyThere(newId);
-    
-    processor.updateState->active.set(type, active);
-    
-    
-    DBG("active: " + arrayIntArrayToString(processor.updateState->active));
-    
+    processor.updateState->addActive(type, newId);
     
     for (auto item : connections)   graph->connect(currentItem, item);
-    
-    
     
 }
 
