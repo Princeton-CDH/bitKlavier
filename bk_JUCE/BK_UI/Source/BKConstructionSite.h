@@ -72,7 +72,7 @@ private:
     BKItem* lastItem;
     BKItem* currentItem;
     
-    LassoComponent<BKItem*>* lasso;
+    ScopedPointer<LassoComponent<BKItem*>> lasso;
     
     SelectedItemSet<BKItem*> selected;
     

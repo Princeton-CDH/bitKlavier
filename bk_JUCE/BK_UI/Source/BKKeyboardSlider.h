@@ -74,7 +74,7 @@ private:
     TextEditor keyboardValueTF;
     BKKeymapKeyboardComponent* keyboard;
     BKKeymapKeyboardState keyboardState;
-    Component *keyboardComponent;
+    ScopedPointer<Component> keyboardComponent;
     ScopedPointer<TextEditor> keyboardValsTextField;
     TextButton keyboardValsTextFieldOpen;
     

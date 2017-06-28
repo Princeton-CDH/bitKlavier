@@ -39,7 +39,7 @@ theGraph(theGraph)
     addAndMakeVisible (keyboardComponent = new BKKeymapKeyboardComponent (keyboardState,
                                                                  BKKeymapKeyboardComponent::horizontalKeyboard));
     
-    keyboard = (BKKeymapKeyboardComponent*)keyboardComponent;
+    keyboard = (BKKeymapKeyboardComponent*)keyboardComponent.get();
     keyboard->setScrollButtonsVisible(true);
     keyboard->setAvailableRange(21, 108);
     keyboard->setAllowDrag(true);
@@ -184,7 +184,7 @@ void KeymapViewController::keymapUpdated(TextEditor& tf)
     
     processor.gallery->setKeymap(processor.updateState->currentKeymapId, keys);
     
-    BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
+    BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
     
     keyboard->setKeysInKeymap(keys);
     
@@ -248,7 +248,7 @@ void KeymapViewController::update(void)
     
     keymapNameTF.setText(km->getName());
     
-    BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
+    BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
     
     keyboard->setKeysInKeymap(km->keys());
     
@@ -284,7 +284,7 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
     
     update();
     
-    BKKeymapKeyboardComponent* keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
+    BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
     
     keyboard->setKeysInKeymap(processor.gallery->getKeymap(processor.updateState->currentKeymapId)->keys());
     

@@ -57,7 +57,7 @@ private:
     TextEditor  keymapTF;
 
     BKKeymapKeyboardState keyboardState;
-    Component *keyboardComponent;
+    ScopedPointer<Component> keyboardComponent;
     BKKeymapKeyboardComponent* keyboard;
     TextButton keyboardValsTextFieldOpen;
     

@@ -8,9 +8,6 @@
 
 namespace BinaryData
 {
-    extern const char*   samplePic_png;
-    const int            samplePic_pngSize = 171628;
-
     extern const char*   direct_icon_png;
     const int            direct_icon_pngSize = 7648;
 
@@ -46,6 +43,9 @@ namespace BinaryData
 
     extern const char*   reset_icon_png;
     const int            reset_icon_pngSize = 2039;
+
+    extern const char*   samplePic_png;
+    const int            samplePic_pngSize = 171628;
 
     extern const char*   synchronic_icon_png;
     const int            synchronic_icon_pngSize = 22367;

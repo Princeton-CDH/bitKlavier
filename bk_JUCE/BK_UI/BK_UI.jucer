@@ -18,39 +18,31 @@
       <GROUP id="{1E3013D4-6B2A-D996-A5C8-F92AE44A39F2}" name="Resources">
         <FILE id="U1tlUf" name="bk.icns" compile="0" resource="0" file="Source/icons/bk.icns"
               xcodeResource="1"/>
-        <GROUP id="{4BE31847-48C8-CA93-0ACB-7EE8777A39B7}" name="images">
-          <FILE id="OX0b8u" name="samplePic.png" compile="0" resource="1" file="../../../../bkImages/samplePic.png"/>
-        </GROUP>
         <GROUP id="{6F7CFDA8-D246-D5B9-B60B-EDBE0C6F3537}" name="icons">
-          <FILE id="zyjC33" name="direct_icon.png" compile="0" resource="1" file="Source/icons/direct_icon.png"
-                xcodeResource="0"/>
-          <FILE id="XKtIlB" name="icon.png" compile="0" resource="1" file="Source/icons/icon.png"
-                xcodeResource="0"/>
-          <FILE id="wEIbpZ" name="keymap_icon.png" compile="0" resource="1" file="Source/icons/keymap_icon.png"/>
-          <FILE id="cVywwa" name="mod_direct_icon.png" compile="0" resource="1"
+          <FILE id="fiXHO5" name="direct_icon.png" compile="0" resource="1" file="Source/icons/direct_icon.png"/>
+          <FILE id="a9zMwc" name="icon.png" compile="0" resource="1" file="Source/icons/icon.png"/>
+          <FILE id="jAEdvs" name="keymap_icon.png" compile="0" resource="1" file="Source/icons/keymap_icon.png"/>
+          <FILE id="iljBYp" name="mod_direct_icon.png" compile="0" resource="1"
                 file="Source/icons/mod_direct_icon.png"/>
-          <FILE id="EztFRr" name="mod_nostalgic_icon.png" compile="0" resource="1"
+          <FILE id="FliMzy" name="mod_nostalgic_icon.png" compile="0" resource="1"
                 file="Source/icons/mod_nostalgic_icon.png"/>
-          <FILE id="sf35pm" name="mod_synchronic_icon.png" compile="0" resource="1"
+          <FILE id="tO9LfJ" name="mod_synchronic_icon.png" compile="0" resource="1"
                 file="Source/icons/mod_synchronic_icon.png"/>
-          <FILE id="W48ccm" name="mod_tempo_icon.png" compile="0" resource="1"
+          <FILE id="JTngLR" name="mod_tempo_icon.png" compile="0" resource="1"
                 file="Source/icons/mod_tempo_icon.png"/>
-          <FILE id="oPUWKk" name="mod_tuning_icon.png" compile="0" resource="1"
+          <FILE id="jENQvx" name="mod_tuning_icon.png" compile="0" resource="1"
                 file="Source/icons/mod_tuning_icon.png"/>
-          <FILE id="bQ9nHT" name="mod_unassigned_icon.png" compile="0" resource="1"
+          <FILE id="YIRkMI" name="mod_unassigned_icon.png" compile="0" resource="1"
                 file="Source/icons/mod_unassigned_icon.png"/>
-          <FILE id="XAH0zl" name="nostalgic_icon.png" compile="0" resource="1"
-                file="Source/icons/nostalgic_icon.png" xcodeResource="0"/>
-          <FILE id="GvDVbY" name="piano_icon.png" compile="0" resource="1" file="Source/icons/piano_icon.png"
-                xcodeResource="0"/>
-          <FILE id="kbokKK" name="reset_icon.png" compile="0" resource="1" file="Source/icons/reset_icon.png"
-                xcodeResource="0"/>
-          <FILE id="bIP81H" name="synchronic_icon.png" compile="0" resource="1"
-                file="Source/icons/synchronic_icon.png" xcodeResource="0"/>
-          <FILE id="zxFKh5" name="tempo_icon.png" compile="0" resource="1" file="Source/icons/tempo_icon.png"
-                xcodeResource="0"/>
-          <FILE id="ay3naN" name="tuning_icon.png" compile="0" resource="1" file="Source/icons/tuning_icon.png"
-                xcodeResource="0"/>
+          <FILE id="zYafoQ" name="nostalgic_icon.png" compile="0" resource="1"
+                file="Source/icons/nostalgic_icon.png"/>
+          <FILE id="plhpj8" name="piano_icon.png" compile="0" resource="1" file="Source/icons/piano_icon.png"/>
+          <FILE id="qCqL85" name="reset_icon.png" compile="0" resource="1" file="Source/icons/reset_icon.png"/>
+          <FILE id="OygRi2" name="samplePic.png" compile="0" resource="1" file="Source/icons/samplePic.png"/>
+          <FILE id="cRWRNc" name="synchronic_icon.png" compile="0" resource="1"
+                file="Source/icons/synchronic_icon.png"/>
+          <FILE id="QNLZ5x" name="tempo_icon.png" compile="0" resource="1" file="Source/icons/tempo_icon.png"/>
+          <FILE id="uY7VmT" name="tuning_icon.png" compile="0" resource="1" file="Source/icons/tuning_icon.png"/>
         </GROUP>
       </GROUP>
       <GROUP id="{19157329-C279-4066-03E0-75F988B82181}" name="Constants">
@@ -256,21 +248,21 @@
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="BK_UI"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_core" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="juce_video" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="juce_opengl" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_plugin_client" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_video" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="portraitlandscape"
@@ -297,7 +289,7 @@
         <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
   </EXPORTFORMATS>

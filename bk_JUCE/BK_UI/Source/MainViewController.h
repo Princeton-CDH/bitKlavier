@@ -68,7 +68,7 @@ private:
     
     ScopedPointer<PreparationPanel> preparationPanel;
     
-    BKKeymapKeyboardComponent* keyboard;
+    ScopedPointer<BKKeymapKeyboardComponent> keyboard;
     BKKeymapKeyboardState keyboardState;
     Component *keyboardComponent;
     

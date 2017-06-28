@@ -16,7 +16,7 @@ BKKeyboardSlider::BKKeyboardSlider()
     addAndMakeVisible (keyboardComponent =
                        new BKKeymapKeyboardComponent (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard));
 
-    keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
+    keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
     
     minKey = 21;
     maxKey = 108;
@@ -60,6 +60,7 @@ BKKeyboardSlider::BKKeyboardSlider()
 void BKKeyboardSlider::paint (Graphics& g)
 {
     //g.fillAll(Colours::lightgrey);
+    keyboardComponent.release();
 }
 
 void BKKeyboardSlider::resized()
