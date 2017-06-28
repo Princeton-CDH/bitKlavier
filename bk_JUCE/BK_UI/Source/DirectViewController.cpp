@@ -348,6 +348,7 @@ void DirectModificationEditor::bkComboBoxDidChange (ComboBox* box)
             
             
         }
+        
         fillSelectCB();
         
         update();

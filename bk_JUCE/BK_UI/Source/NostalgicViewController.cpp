@@ -488,9 +488,10 @@ void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
             
         }
         
+        fillSelectCB();
+        
         update();
         
-        fillSelectCB();
         
         return;
         

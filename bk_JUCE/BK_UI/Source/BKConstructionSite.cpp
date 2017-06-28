@@ -600,8 +600,6 @@ void BKConstructionSite::idDidChange(void)
         processor.updateState->active.set(type, active);
     }
     
-    DBG("active: " + arrayIntArrayToString(processor.updateState->active));
-    
     BKItem::PtrArr connections;
     
     for (auto item : currentItem->getConnections())
@@ -654,6 +652,9 @@ void BKConstructionSite::idDidChange(void)
     if (type <= PreparationTypeKeymap) active.addIfNotAlreadyThere(newId);
     
     processor.updateState->active.set(type, active);
+    
+    
+    DBG("active: " + arrayIntArrayToString(processor.updateState->active));
     
     
     for (auto item : connections)   graph->connect(currentItem, item);
