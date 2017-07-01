@@ -428,7 +428,7 @@ private:
     bool canScroll, useMousePositionForVelocity, shouldCheckMousePos;
     ScopedPointer<Button> scrollDown, scrollUp;
 
-    Array<KeyPress> keyPresses;
+    Array<KeyPress> keyPresses; //this leaks: change to OwnedArray?
     Array<int> keyPressNotes;
     int keyMappingOctave, octaveNumForMiddleC;
     int fundamental;
