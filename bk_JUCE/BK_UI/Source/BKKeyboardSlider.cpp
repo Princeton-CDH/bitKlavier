@@ -73,13 +73,14 @@ void BKKeyboardSlider::resized()
     float keyWidth = keymapRow.getWidth() / round((maxKey - minKey) * 7./12 + 1); //num white keys
     keyboard->setKeyWidth(keyWidth);
     keyboard->setBlackNoteLengthProportion(0.65);
-    keyboardComponent->setBounds(keymapRow.removeFromBottom(keyboardHeight - gYSpacing));
+    //keyboardComponent->setBounds(keymapRow.removeFromBottom(keyboardHeight - gYSpacing));
+    keyboard->setBounds(keymapRow.removeFromBottom(keyboardHeight - gYSpacing));
     keymapRow.removeFromBottom(gYSpacing);
     Rectangle<int> textSlab (keymapRow.removeFromBottom(20));
     keyboardValueTF.setBounds(textSlab.removeFromRight(50));
     showName.setBounds(textSlab.removeFromRight(125));
     keyboardValsTextFieldOpen.setBounds(textSlab.removeFromLeft(75));
-    keyboardValsTextField->setBounds(keyboardComponent->getBounds());
+    keyboardValsTextField->setBounds(keyboard->getBounds());
 
 }
 
