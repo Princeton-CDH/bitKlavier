@@ -10,10 +10,40 @@
 
 #include "PluginProcessor.h"
 
-
 ValueTree  Gallery::getState(void)
 {
     ValueTree galleryVT( vtagGallery);
+    
+    // NEED THIS
+    ValueTree idCountVT( "idCount");
+    
+    for (int i = 0; i < BKPreparationTypeNil; i++)
+    {
+        idCountVT.setProperty( "idCount"+String(i), idCount[i], 0);
+    }
+    
+    galleryVT.addChild(idCountVT, -1, 0);
+    
+    
+    // Useful if we want to be able to reconfigure/organize menus of preparations.
+    ValueTree idIndexVT ("idIndexList");
+    
+    for (int i = 0; i < BKPreparationTypeNil; i++)
+    {
+        ValueTree vt ("index");
+        
+        Array<int> index = idIndexList.getUnchecked(i);
+        
+        int count = 0;
+        for (auto id : index)
+        {
+            vt.setProperty("i"+String(count++), id, 0);
+        }
+        
+        idIndexVT.addChild(vt, -1, 0);
+    }
+    
+    galleryVT.addChild(idIndexVT, -1, 0);
     
     galleryVT.addChild(general->getState(), -1, 0);
     
@@ -60,47 +90,30 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
     
     bkPianos.clear();
     
-    int pianoCount = 0, sPrepCount = 1, sModPrepCount = 1, nPrepCount = 1, nModPrepCount = 1, dPrepCount = 1, dModPrepCount = 1, tPrepCount = 1, tModPrepCount = 1, keymapCount = 1, tempoPrepCount = 1, tempoModPrepCount = 1;
+    int pianoCount = 0, sPrepCount = 0, sModPrepCount = 0, nPrepCount = 0, nModPrepCount = 0, dPrepCount = 0, dModPrepCount = 0, tPrepCount = 0, tModPrepCount = 0, keymapCount = 0, tempoPrepCount = 0, tempoModPrepCount = 0;
     
     {
         
         if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
         {
-            addTempo(); // should happen first
-            addTuning();// should happen first
-            addSynchronic();
-            addNostalgic();
-            addDirect();
-            
-            
-            addTuningMod();
-            addSynchronicMod();
-            addNostalgicMod();
-            addDirectMod();
-            addTempoMod();
-            
             general = new GeneralSettings();
-            
             
             /* * * * * * * * * * * * * * */
             
-            bkKeymaps.set(0, new Keymap(0));
-            bkKeymaps[0]->setName("Empty");
             
             // iterate through its sub-elements
             forEachXmlChildElement (*xml, e)
             {
                 if (e->hasTagName( vtagKeymap + String(keymapCount)))
                 {
-                    int id = keymapCount++;
-                    
-                    bkKeymaps.set(id, new Keymap(id));
-                    
+                    addKeymap();
                     
                     String n = e->getStringAttribute("name");
                     
-                    if (n != String::empty)     bkKeymaps[id]->setName(n);
-                    else                        bkKeymaps[id]->setName(String(id+1));
+                    Keymap::Ptr newKeymap = bkKeymaps.getLast();
+                    
+                    if (n != String::empty)     newKeymap->setName(n);
+                    else                        newKeymap->setName(String(newKeymap->getId()));
                     
                     Array<int> keys;
                     for (int k = 0; k < 128; k++)
@@ -115,7 +128,9 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                         }
                     }
                     
-                    bkKeymaps[id]->setKeymap(keys);
+                    newKeymap->setKeymap(keys);
+                    
+                    ++keymapCount;
                     
                 }
                 else if (e->hasTagName ( vtagGeneral))
@@ -126,11 +141,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 {
                     addTuning();
                     
-                    int id = tuning.size() - 1;
-                    
-                    Tuning::Ptr thisTuning = tuning[id];
-                    
-                    thisTuning->setState(e);
+                    tuning.getLast()->setState(e);
                     
                     ++tPrepCount;
                 }
@@ -138,11 +149,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 {
                     addTuningMod();
                     
-                    int id = modTuning.size() - 1;
-                    
-                    TuningModPreparation::Ptr thisModTuning = modTuning[id];
-                    
-                    thisModTuning->setState(e);
+                    modTuning.getLast()->setState(e);
                     
                     ++tModPrepCount;
                 }
@@ -150,11 +157,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 {
                     addDirect();
                     
-                    int id = direct.size()-1;
-                    
-                    Direct::Ptr thisDirect = direct[id];
-                    
-                    thisDirect->setState(e, tuning);
+                    direct.getLast()->setState(e, tuning);
                     
                     ++dPrepCount;
                 }
@@ -162,11 +165,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 {
                     addDirectMod();
                     
-                    int id = modDirect.size()-1;
-                    
-                    DirectModPreparation::Ptr thisModDirect = modDirect[id];
-                    
-                    thisModDirect->setState(e);
+                    modDirect.getLast()->setState(e);
                     
                     ++dModPrepCount;
                 }
@@ -174,11 +173,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 {
                     addSynchronic();
                     
-                    int id = synchronic.size() - 1;
-                    
-                    Synchronic::Ptr thisSynchronic = synchronic[id];
-                    
-                    thisSynchronic->setState(e, tuning, tempo);
+                    synchronic.getLast()->setState(e, tuning, tempo);
                     
                     ++sPrepCount;
                     
@@ -186,12 +181,8 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 else if (e->hasTagName( vtagModSynchronic + String(sModPrepCount)))
                 {
                     addSynchronicMod();
-                    
-                    int id = modSynchronic.size() - 1;
-                    
-                    SynchronicModPreparation::Ptr thisModSynchronic = modSynchronic[id];
-                    
-                    thisModSynchronic->setState(e);
+                
+                    modSynchronic.getLast()->setState(e);
                     
                     ++sModPrepCount;
                     
@@ -200,11 +191,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 {
                     addTempo();
                     
-                    int id = tempo.size() - 1;
-                    
-                    Tempo::Ptr thisTempo = tempo[id];
-                    
-                    thisTempo->setState(e);
+                    tempo.getLast()->setState(e);
                     
                     ++tempoPrepCount;
                     
@@ -213,11 +200,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 {
                     addTempoMod();
                     
-                    int id = modTempo.size() - 1;
-                    
-                    TempoModPreparation::Ptr thisModTempo = modTempo[id];
-                    
-                    thisModTempo->setState(e);
+                    tempo.getLast()->setState(e);
                     
                     ++tempoModPrepCount;
                     
@@ -226,11 +209,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 {
                     addNostalgic();
                     
-                    int id = nostalgic.size() - 1;
-                    
-                    Nostalgic::Ptr thisNostalgic = nostalgic[id];
-                    
-                    thisNostalgic->setState(e, tuning, synchronic);
+                    nostalgic.getLast()->setState(e, tuning, synchronic);
                     
                     ++nPrepCount;
                 }
@@ -238,11 +217,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 {
                     addNostalgicMod();
                     
-                    int id = modNostalgic.size() - 1;
-                    
-                    NostalgicModPreparation::Ptr thisModNostalgic = modNostalgic[id];
-                    
-                    thisModNostalgic->setState(e);
+                    modNostalgic.getLast()->setState(e);
                     
                     ++nModPrepCount;
                 }
@@ -250,7 +225,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 {
                     Piano::Ptr thisPiano = new Piano(&synchronic, &nostalgic, &direct, &tuning, &tempo,
                                                      &modSynchronic, &modNostalgic, &modDirect, &modTuning, &modTempo,
-                                                     &bkKeymaps, pianoCount);
+                                                     &bkKeymaps, getNewId(PreparationTypePiano));
                     
                     thisPiano->setState(e);
                     

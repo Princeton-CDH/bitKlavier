@@ -13,8 +13,7 @@
 
 //==============================================================================
 KeymapViewController::KeymapViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-processor(p),
-theGraph(theGraph)
+BKViewController(p, theGraph)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
     
@@ -26,7 +25,6 @@ theGraph(theGraph)
     selectCB.setName("Keymap");
     selectCB.addSeparator();
     selectCB.addListener(this);
-    //keymapSelectCB.setEditableText(true);
     selectCB.setSelectedItemIndex(0);
     addAndMakeVisible(selectCB);
     
@@ -59,7 +57,7 @@ theGraph(theGraph)
     hideOrShow.setButtonText(" X ");
     
     fillKeymapSelectCB();
-    
+
     update();
 }
 
@@ -107,7 +105,7 @@ void KeymapViewController::resized()
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
     
-  }
+}
 
 void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
 {
@@ -119,7 +117,7 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
         processor.updateState->removeActive(PreparationTypeKeymap, processor.updateState->currentKeymapId);
         
         // Set new current
-        processor.updateState->currentKeymapId = box->getSelectedItemIndex();
+        processor.updateState->currentKeymapId = processor.gallery->getIdFromIndex(PreparationTypeKeymap, box->getSelectedItemIndex());
         
         // Add new current from list of actives
         processor.updateState->addActive(PreparationTypeKeymap, processor.updateState->currentKeymapId);
@@ -135,6 +133,35 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
         
         update();
     }
+}
+
+void KeymapViewController::fillKeymapSelectCB(void)
+{
+    selectCB.clear(dontSendNotification);
+    
+    Array<int> index = processor.gallery->getIndexList(PreparationTypeKeymap);
+    
+    for (int i = 0; i < index.size(); i++)
+    {
+        int Id = index[i];
+        String name = processor.gallery->getKeymap(Id)->getName();
+        if (name != String::empty)  selectCB.addItem(name, i+1);
+        else                        selectCB.addItem(String(i+1), i+1);
+        
+        selectCB.setItemEnabled(i+1, true);
+        if (processor.updateState->isActive(PreparationTypeKeymap, Id) &&
+            (Id != processor.updateState->currentKeymapId))
+        {
+            selectCB.setItemEnabled(i+1, false);
+        }
+    }
+    
+    selectCB.addItem("New keymap...", index.size()+1);
+    
+    int currentId = processor.updateState->currentKeymapId;
+    
+    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeKeymap, currentId), NotificationType::dontSendNotification);
+    
 }
 
 void KeymapViewController::bkButtonClicked (Button* b)
@@ -211,46 +238,26 @@ void KeymapViewController::textEditorEscapeKeyPressed (TextEditor& textEditor)
     unfocusAllComponents();
 }
 
-void KeymapViewController::fillKeymapSelectCB(void)
-{
-    selectCB.clear(dontSendNotification);
-    
-    Keymap::PtrArr keymaps = processor.gallery->getKeymaps();
-    
-    for (int i = 0; i < keymaps.size(); i++)
-    {
-        String name = keymaps[i]->getName();
-        if (name != String::empty)  selectCB.addItem(name, i+1);
-        else                        selectCB.addItem(String(i+1), i+1);
-        
-        selectCB.setItemEnabled(i+1, true);
-        if (processor.updateState->isActive(PreparationTypeKeymap, i) &&
-            (i != processor.updateState->currentKeymapId))
-        {
-            selectCB.setItemEnabled(i+1, false);
-        }
-    }
-    
-    selectCB.addItem("New keymap...", keymaps.size()+1);
-    
-    selectCB.setSelectedItemIndex(processor.updateState->currentKeymapId, NotificationType::dontSendNotification);
-    
-}
-
-
 void KeymapViewController::update(void)
 {
     if (processor.updateState->currentKeymapId < 0) return;
     
     Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
     
-    keymapTF.setText( intArrayToString(km->keys()));
-    
-    keymapNameTF.setText(km->getName());
-    
-    BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
-    
-    keyboard->setKeysInKeymap(km->keys());
+    if (km != nullptr)
+    {
+        fillKeymapSelectCB();
+        
+        selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeKeymap, processor.updateState->currentKeymapId), dontSendNotification);
+        
+        keymapTF.setText( intArrayToString(km->keys()));
+        
+        keymapNameTF.setText(km->getName());
+        
+        BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
+        
+        keyboard->setKeysInKeymap(km->keys());
+    }
     
 }
 

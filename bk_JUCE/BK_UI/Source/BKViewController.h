@@ -37,11 +37,29 @@ public:
         
     }
     
+    PopupMenu getOptionMenu(void)
+    {
+        PopupMenu optionMenu;
+        optionMenu.setLookAndFeel(&buttonsAndMenusLAF);
+        
+        optionMenu.addItem(1, "New");
+        optionMenu.addItem(2, "Save");
+        optionMenu.addItem(3, "Delete");
+        
+        return optionMenu;
+    }
+    
     
     
 protected:
     BKAudioProcessor& processor;
     BKItemGraph* theGraph;
+    
+    BKButtonAndMenuLAF buttonsAndMenusLAF;
+    BKButtonAndMenuLAF buttonsAndMenusLAF2;
+    
+    ImageComponent iconImageComponent;
+    TextButton hideOrShow;
     
 private:
     

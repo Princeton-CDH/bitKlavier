@@ -57,12 +57,6 @@ protected:
     ScopedPointer<BKRangeSlider> clusterMinMaxSlider;
     ScopedPointer<BKSingleSlider> gainSlider;
     
-    ImageComponent iconImageComponent;
-    TextButton hideOrShow;
-    
-    BKButtonAndMenuLAF buttonsAndMenusLAF;
-    BKButtonAndMenuLAF buttonsAndMenusLAF2;
-    
     void fillModeSelectCB(void);
 private:
     

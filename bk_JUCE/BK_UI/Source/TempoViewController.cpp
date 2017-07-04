@@ -345,17 +345,20 @@ void TempoPreparationEditor::update(void)
     
     TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
     
-    selectCB.setSelectedItemIndex(processor.updateState->currentTempoId, dontSendNotification);
-    modeCB.setSelectedItemIndex((int)prep->getTempoSystem(), dontSendNotification);
-    tempoSlider->setValue(prep->getTempo(), dontSendNotification);
-    
-    A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempo1Mode(), dontSendNotification);
-    AT1HistorySlider->setValue(prep->getAdaptiveTempo1History(), dontSendNotification);
-    AT1SubdivisionsSlider->setValue(prep->getAdaptiveTempo1Subdivisions(), dontSendNotification);
-    AT1MinMaxSlider->setMinValue(prep->getAdaptiveTempo1Min(), dontSendNotification);
-    AT1MinMaxSlider->setMaxValue(prep->getAdaptiveTempo1Max(), dontSendNotification);
-    
-    updateComponentVisibility();
+    if (prep != nullptr)
+    {
+        selectCB.setSelectedItemIndex(processor.updateState->currentTempoId, dontSendNotification);
+        modeCB.setSelectedItemIndex((int)prep->getTempoSystem(), dontSendNotification);
+        tempoSlider->setValue(prep->getTempo(), dontSendNotification);
+        
+        A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempo1Mode(), dontSendNotification);
+        AT1HistorySlider->setValue(prep->getAdaptiveTempo1History(), dontSendNotification);
+        AT1SubdivisionsSlider->setValue(prep->getAdaptiveTempo1Subdivisions(), dontSendNotification);
+        AT1MinMaxSlider->setMinValue(prep->getAdaptiveTempo1Min(), dontSendNotification);
+        AT1MinMaxSlider->setMaxValue(prep->getAdaptiveTempo1Max(), dontSendNotification);
+        
+        updateComponentVisibility();
+    }
 }
 
 
@@ -444,40 +447,42 @@ void TempoModificationEditor::update(void)
     
     TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
     
-    // NEED TO MAKE SURE THIS IS LINKED TO RIGHT ITEM, need better way of doing this
-    int targetId = processor.currentPiano->getMapper(PreparationTypeTempo, processor.updateState->currentModTempoId)->getId();
+    if (mod != nullptr)
+    {
+        // NEED TO MAKE SURE THIS IS LINKED TO RIGHT ITEM, need better way of doing this
+        int targetId = processor.currentPiano->getMapper(PreparationTypeTempo, processor.updateState->currentModTempoId)->getId();
+        
+        String val = mod->getParam(TempoSystem);
+        modeCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+        //                       modeCB.setSelectedItemIndex((int)prep->getTempoSystem(), dontSendNotification);
+        
+        val = mod->getParam(TempoBPM);
+        tempoSlider->setValue(val.getFloatValue(), dontSendNotification);
+        //                       tempoSlider->setValue(prep->getTempo(), dontSendNotification);
+        
+        val = mod->getParam(AT1Mode);
+        A1ModeCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+        //                       A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempo1Mode(), dontSendNotification);
+        
+        val = mod->getParam(AT1History);
+        AT1HistorySlider->setValue(val.getIntValue(), dontSendNotification);
+        //                       AT1HistorySlider->setValue(prep->getAdaptiveTempo1History(), dontSendNotification);
+        
+        val = mod->getParam(AT1Subdivisions);
+        AT1SubdivisionsSlider->setValue(val.getFloatValue(), dontSendNotification);
+        //                       AT1SubdivisionsSlider->setValue(prep->getAdaptiveTempo1Subdivisions(), dontSendNotification);
+        
+        val = mod->getParam(AT1Min);
+        AT1MinMaxSlider->setMinValue(val.getDoubleValue(), dontSendNotification);
+        //                       AT1MinMaxSlider->setMinValue(prep->getAdaptiveTempo1Min(), dontSendNotification);
+        
+        val = mod->getParam(AT1Max);
+        AT1MinMaxSlider->setMaxValue(val.getDoubleValue(), dontSendNotification);
+        //                       AT1MinMaxSlider->setMaxValue(prep->getAdaptiveTempo1Max(), dontSendNotification);
+        
+        updateComponentVisibility();
+    }
     
-    TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(targetId);
-    
-    String val = mod->getParam(TempoSystem);
-    modeCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-    //                       modeCB.setSelectedItemIndex((int)prep->getTempoSystem(), dontSendNotification);
-    
-    val = mod->getParam(TempoBPM);
-    tempoSlider->setValue(val.getFloatValue(), dontSendNotification);
-    //                       tempoSlider->setValue(prep->getTempo(), dontSendNotification);
-    
-    val = mod->getParam(AT1Mode);
-    A1ModeCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-    //                       A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempo1Mode(), dontSendNotification);
-    
-    val = mod->getParam(AT1History);
-    AT1HistorySlider->setValue(val.getIntValue(), dontSendNotification);
-    //                       AT1HistorySlider->setValue(prep->getAdaptiveTempo1History(), dontSendNotification);
-    
-    val = mod->getParam(AT1Subdivisions);
-    AT1SubdivisionsSlider->setValue(val.getFloatValue(), dontSendNotification);
-    //                       AT1SubdivisionsSlider->setValue(prep->getAdaptiveTempo1Subdivisions(), dontSendNotification);
-    
-    val = mod->getParam(AT1Min);
-    AT1MinMaxSlider->setMinValue(val.getDoubleValue(), dontSendNotification);
-    //                       AT1MinMaxSlider->setMinValue(prep->getAdaptiveTempo1Min(), dontSendNotification);
-    
-    val = mod->getParam(AT1Max);
-    AT1MinMaxSlider->setMaxValue(val.getDoubleValue(), dontSendNotification);
-    //                       AT1MinMaxSlider->setMaxValue(prep->getAdaptiveTempo1Max(), dontSendNotification);
-    
-    updateComponentVisibility();
 }
 
 

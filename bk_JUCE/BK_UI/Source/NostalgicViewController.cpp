@@ -181,32 +181,36 @@ void NostalgicPreparationEditor::update(void)
 {
     if (processor.updateState->currentNostalgicId < 0) return;
     
-    fillSelectCB();
-    
     NostalgicPreparation::Ptr prep = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
     
-    nDisplaySlider.setWaveDistance(prep->getWavedistance(), dontSendNotification);
-    nDisplaySlider.setUndertow(prep->getUndertow(), dontSendNotification);
-    
-    selectCB.setSelectedItemIndex(processor.updateState->currentNostalgicId, dontSendNotification);
-    lengthModeSelectCB.setSelectedItemIndex(prep->getMode(), dontSendNotification);
-    
-    transpositionSlider->setValue(prep->getTransposition(), dontSendNotification);
-    lengthMultiplierSlider->setValue(prep->getLengthMultiplier(), dontSendNotification);
-    beatsToSkipSlider->setValue(prep->getBeatsToSkip(), dontSendNotification);
-    gainSlider->setValue(prep->getGain(), dontSendNotification);
-    
-    if(prep->getMode() == NoteLengthSync)
+    if (prep != nullptr)
     {
-        lengthMultiplierSlider->setVisible(true);
-        beatsToSkipSlider->setVisible(false);
-    }
-    else
-    {
-        lengthMultiplierSlider->setVisible(false);
-        beatsToSkipSlider->setVisible(true);
-    }
+        nDisplaySlider.setWaveDistance(prep->getWavedistance(), dontSendNotification);
+        nDisplaySlider.setUndertow(prep->getUndertow(), dontSendNotification);
+        
+        selectCB.setSelectedItemIndex(processor.updateState->currentNostalgicId, dontSendNotification);
+        lengthModeSelectCB.setSelectedItemIndex(prep->getMode(), dontSendNotification);
+        
+        transpositionSlider->setValue(prep->getTransposition(), dontSendNotification);
+        lengthMultiplierSlider->setValue(prep->getLengthMultiplier(), dontSendNotification);
+        beatsToSkipSlider->setValue(prep->getBeatsToSkip(), dontSendNotification);
+        gainSlider->setValue(prep->getGain(), dontSendNotification);
+        
+        if(prep->getMode() == NoteLengthSync)
+        {
+            lengthMultiplierSlider->setVisible(true);
+            beatsToSkipSlider->setVisible(false);
+        }
+        else
+        {
+            lengthMultiplierSlider->setVisible(false);
+            beatsToSkipSlider->setVisible(true);
+        }
 
+    }
+    
+    fillSelectCB();
+    
 }
 
 void NostalgicPreparationEditor::bkMessageReceived (const String& message)
@@ -375,44 +379,49 @@ void NostalgicModificationEditor::update(void)
 {
     if (processor.updateState->currentModNostalgicId < 0) return;
     
-    fillSelectCB();
-    
-    selectCB.setSelectedItemIndex(processor.updateState->currentModNostalgicId, dontSendNotification);
     
     NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
     
-    String val = mod->getParam(NostalgicWaveDistance);
-    nDisplaySlider.setWaveDistance(val.getIntValue(), dontSendNotification);
-    
-    val = mod->getParam(NostalgicUndertow);
-    nDisplaySlider.setUndertow(val.getIntValue(), dontSendNotification);
-    
-    val = mod->getParam(NostalgicMode);
-    NostalgicSyncMode mode = (NostalgicSyncMode) val.getIntValue();
-    lengthModeSelectCB.setSelectedItemIndex(mode, dontSendNotification);
-    
-    if(mode == NoteLengthSync)
+    if (mod != nullptr)
     {
-        lengthMultiplierSlider->setVisible(true);
-        beatsToSkipSlider->setVisible(false);
+        fillSelectCB();
+        
+        selectCB.setSelectedItemIndex(processor.updateState->currentModNostalgicId, dontSendNotification);
+        
+        String val = mod->getParam(NostalgicWaveDistance);
+        nDisplaySlider.setWaveDistance(val.getIntValue(), dontSendNotification);
+        
+        val = mod->getParam(NostalgicUndertow);
+        nDisplaySlider.setUndertow(val.getIntValue(), dontSendNotification);
+        
+        val = mod->getParam(NostalgicMode);
+        NostalgicSyncMode mode = (NostalgicSyncMode) val.getIntValue();
+        lengthModeSelectCB.setSelectedItemIndex(mode, dontSendNotification);
+        
+        if(mode == NoteLengthSync)
+        {
+            lengthMultiplierSlider->setVisible(true);
+            beatsToSkipSlider->setVisible(false);
+        }
+        else
+        {
+            lengthMultiplierSlider->setVisible(false);
+            beatsToSkipSlider->setVisible(true);
+        }
+        
+        val = mod->getParam(NostalgicTransposition);
+        transpositionSlider->setValue(stringToFloatArray(val), dontSendNotification);
+        
+        val = mod->getParam(NostalgicLengthMultiplier);
+        lengthMultiplierSlider->setValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(NostalgicBeatsToSkip);
+        beatsToSkipSlider->setValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(NostalgicGain);
+        gainSlider->setValue(val.getFloatValue(), dontSendNotification);
     }
-    else
-    {
-        lengthMultiplierSlider->setVisible(false);
-        beatsToSkipSlider->setVisible(true);
-    }
-
-    val = mod->getParam(NostalgicTransposition);
-    transpositionSlider->setValue(stringToFloatArray(val), dontSendNotification);
     
-    val = mod->getParam(NostalgicLengthMultiplier);
-    lengthMultiplierSlider->setValue(val.getFloatValue(), dontSendNotification);
-    
-    val = mod->getParam(NostalgicBeatsToSkip);
-    beatsToSkipSlider->setValue(val.getFloatValue(), dontSendNotification);
-    
-    val = mod->getParam(NostalgicGain);
-    gainSlider->setValue(val.getFloatValue(), dontSendNotification);
     
 }
 

@@ -51,7 +51,7 @@ mapper(new ModificationMapper(BKPreparationTypeNil, -1))
     {
         setImage(ImageCache::getFromMemory(BinaryData::keymap_icon_png, BinaryData::keymap_icon_pngSize));
     }
-    else if (type == PreparationTypeMod)
+    else if (type == PreparationTypeGenericMod)
     {
         setImage(ImageCache::getFromMemory(BinaryData::mod_unassigned_icon_png, BinaryData::mod_unassigned_icon_pngSize));
     }
@@ -81,7 +81,7 @@ mapper(new ModificationMapper(BKPreparationTypeNil, -1))
     
     processor.updateState->addActive(type, Id);
     
-    if (type == PreparationTypeMod || type == PreparationTypePianoMap || type == PreparationTypeReset)
+    if (type == PreparationTypeGenericMod || type == PreparationTypePianoMap || type == PreparationTypeReset)
         processor.currentPiano->addMapper(mapper);
     
 }
@@ -90,7 +90,7 @@ BKItem::~BKItem()
 {
     processor.updateState->removeActive(type, Id);
     
-    if (type == PreparationTypeMod || type == PreparationTypePianoMap || type == PreparationTypeReset)
+    if (type == PreparationTypeGenericMod || type == PreparationTypePianoMap || type == PreparationTypeReset)
         processor.currentPiano->removeMapper(mapper);
 }
 
@@ -101,7 +101,7 @@ void BKItem::setImage(Image newImage)
     placement = RectanglePlacement::centred;
     
     int val =
-    (type == PreparationTypeMod && type == PreparationTypeReset) ?  90 :
+    (type == PreparationTypeGenericMod && type == PreparationTypeReset) ?  90 :
     (type == PreparationTypePianoMap) ? 75 :
     (type == PreparationTypeKeymap) ? 90 :
     (type == PreparationTypeTempo || type == PreparationTypeTuning) ? 55 :
@@ -115,6 +115,59 @@ void BKItem::setImage(Image newImage)
     else                                    setSize(image.getWidth(), image.getHeight() + 25);
 }
 
+void BKItem::setType(BKPreparationType newType)
+{
+    int thisId = -1;
+    
+    type = newType;
+    
+    if (type == PreparationTypeGenericMod)
+    {
+        setImage(ImageCache::getFromMemory(BinaryData::mod_unassigned_icon_png, BinaryData::mod_unassigned_icon_pngSize));
+    }
+    else if (type == PreparationTypeDirectMod)
+    {
+        setImage(ImageCache::getFromMemory(BinaryData::mod_direct_icon_png, BinaryData::mod_direct_icon_pngSize));
+        
+        thisId = processor.gallery->getNewId(PreparationTypeDirectMod);
+        
+        processor.gallery->addTypeWithId(PreparationTypeDirectMod, thisId);
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        setImage(ImageCache::getFromMemory(BinaryData::mod_synchronic_icon_png, BinaryData::mod_synchronic_icon_pngSize));
+        
+        thisId = processor.gallery->getNewId(PreparationTypeSynchronicMod);
+        
+        processor.gallery->addTypeWithId(PreparationTypeSynchronicMod, thisId);
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        setImage(ImageCache::getFromMemory(BinaryData::mod_nostalgic_icon_png, BinaryData::mod_nostalgic_icon_pngSize));
+        
+        thisId = processor.gallery->getNewId(PreparationTypeNostalgicMod);
+        
+        processor.gallery->addTypeWithId(PreparationTypeNostalgicMod, thisId);
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        setImage(ImageCache::getFromMemory(BinaryData::mod_tuning_icon_png, BinaryData::mod_tuning_icon_pngSize));
+        
+        thisId = processor.gallery->getNewId(PreparationTypeTuningMod);
+        
+        processor.gallery->addTypeWithId(PreparationTypeTuningMod, thisId);
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        setImage(ImageCache::getFromMemory(BinaryData::mod_tempo_icon_png, BinaryData::mod_tempo_icon_pngSize));
+        
+        thisId = processor.gallery->getNewId(PreparationTypeTempoMod);
+        
+        processor.gallery->addTypeWithId(PreparationTypeTempoMod, thisId);
+    }
+    
+    setId(thisId);
+}
 
 void BKItem::paint(Graphics& g)
 {
@@ -154,7 +207,7 @@ bool BKItem::compare(BKItem* otherItem)
 {
     if (type == otherItem->getType())
     {
-        if (type == PreparationTypeMod)
+        if (type == PreparationTypeGenericMod)
         {
             if ((mapper->getType() == otherItem->mapper->getType()))
             {
@@ -269,7 +322,7 @@ void BKItem::mouseDown(const MouseEvent& e)
             processor.updateState->keymapDidChange = true;
             processor.updateState->setCurrentDisplay(DisplayKeymap);
         }
-        else if (type == PreparationTypeMod)
+        else if (type == PreparationTypeGenericMod)
         {
             BKPreparationType modType = mapper->getType();
             int modId = mapper->getId();
@@ -682,11 +735,11 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
             disconnectSynchronicFromNostalgic(item1);
         }
         // MODS RESETS AND PMAPS CAN ONLY HAVE ONE KEYMAP!
-        else if (item1Type == PreparationTypePianoMap || item1Type == PreparationTypeMod || item1Type == PreparationTypeReset)
+        else if (item1Type == PreparationTypePianoMap || item1Type == PreparationTypeGenericMod || item1Type == PreparationTypeReset)
         {
             if (item1->getMapper()->getKeymaps().size()) return;
         }
-        else if (item2Type == PreparationTypePianoMap || item2Type == PreparationTypeMod || item2Type == PreparationTypeReset)
+        else if (item2Type == PreparationTypePianoMap || item2Type == PreparationTypeGenericMod || item2Type == PreparationTypeReset)
         {
             if (item2->getMapper()->getKeymaps().size()) return;
         }
@@ -795,7 +848,7 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         
         linkNostalgicWithSynchronic(thisNostalgic, thisSynchronic);
     }
-    else if ((item1Type == PreparationTypeMod || item1Type == PreparationTypeReset) && item2Type <= PreparationTypeTempo)
+    else if ((item1Type == PreparationTypeGenericMod || item1Type == PreparationTypeReset) && item2Type <= PreparationTypeTempo)
     {
         ModificationMapper::Ptr thisMapper = item1->getMapper();
         
@@ -866,7 +919,7 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
         }
         
     }
-    else if (item1Type <= PreparationTypeTempo && (item2Type == PreparationTypeMod || item2Type == PreparationTypeReset))
+    else if (item1Type <= PreparationTypeTempo && (item2Type == PreparationTypeGenericMod || item2Type == PreparationTypeReset))
     {
         ModificationMapper::Ptr thisMapper = item2->getMapper();
         
@@ -914,7 +967,7 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
             }
         }
     }
-    else if (item1Type == PreparationTypeKeymap && (item2Type == PreparationTypeMod || item2Type == PreparationTypeReset))
+    else if (item1Type == PreparationTypeKeymap && (item2Type == PreparationTypeGenericMod || item2Type == PreparationTypeReset))
     {
         ModificationMapper::Ptr thisMapper = item2->getMapper();
         
@@ -929,7 +982,7 @@ void BKItemGraph::route(bool connect, BKItem* item1, BKItem* item2)
             thisMapper->clearKeymaps();
         }
     }
-    else if (item2Type == PreparationTypeKeymap && (item1Type == PreparationTypeMod || item1Type == PreparationTypeReset))
+    else if (item2Type == PreparationTypeKeymap && (item1Type == PreparationTypeGenericMod || item1Type == PreparationTypeReset))
     {
         ModificationMapper::Ptr thisMapper = item1->getMapper();
         
@@ -1317,7 +1370,7 @@ void BKItemGraph::reconstruct(void)
         
         BKItem* thisMod;
         if (map->getType() == PreparationTypeReset)     thisMod = itemWithTypeAndId(PreparationTypeReset, -1);
-        else if (map->getType() == PreparationTypeMod)  thisMod = itemWithTypeAndId(PreparationTypeMod, -1);
+        else if (map->getType() == PreparationTypeGenericMod)  thisMod = itemWithTypeAndId(PreparationTypeGenericMod, -1);
         else continue;
         
         thisMod->setMapper(map);

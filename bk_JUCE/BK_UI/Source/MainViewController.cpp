@@ -234,40 +234,40 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     else if (code == 67) // C modification
     {
         if (e.getModifiers().isCommandDown())   construction.copy();
-        else                                    construction.addItem(PreparationTypeMod, 1);
+        else                                    construction.addItem(PreparationTypeGenericMod);
     }
     else if (code == 68) // D direct
     {
-        construction.addItem(PreparationTypeDirect, 1);
+        construction.addItem(PreparationTypeDirect);
     }
     else if (code == 75) // K keymap
     {
-        construction.addItem(PreparationTypeKeymap, 1);
+        construction.addItem(PreparationTypeKeymap);
     }
     else if (code == 77) // M tempo
     {
-        construction.addItem(PreparationTypeTempo, 1);
+        construction.addItem(PreparationTypeTempo);
     }
     else if (code == 78) // N nostalgic
     {
-        construction.addItem(PreparationTypeNostalgic, 1);
+        construction.addItem(PreparationTypeNostalgic);
     }
     else if (code == 80) // P piano
     {
-        construction.addItem(PreparationTypePianoMap, 1);
+        construction.addItem(PreparationTypePianoMap);
     }
     else if (code == 82) // R reset
     {
-        construction.addItem(PreparationTypeReset, 1);
+        construction.addItem(PreparationTypeReset);
     }
     else if (code == 83) // S synchronic
     {
-        if (e.getModifiers().isCommandDown())   ;
-        else                                    construction.addItem(PreparationTypeSynchronic, 1);
+        if (e.getModifiers().isCommandDown())   ;//save
+        else                                    construction.addItem(PreparationTypeSynchronic);
     }
     else if (code == 84) // T tuning
     {
-        construction.addItem(PreparationTypeTuning, 1);
+        construction.addItem(PreparationTypeTuning);
     }
     else if (code == 86) // V
     {

@@ -494,6 +494,7 @@ public:
         param.set(TuningAbsoluteOffsets, "");
     }
     
+    inline void setId(int newId) { Id = newId; }
     inline int getId(void) const noexcept { return Id; }
     
     ~TuningModPreparation(void)

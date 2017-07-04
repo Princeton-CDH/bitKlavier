@@ -38,12 +38,6 @@ public:
     
     void fillModeSelectCB(void);
     
-protected:
-    ImageComponent iconImageComponent;
-    TextButton hideOrShow;
-    
-    BKButtonAndMenuLAF buttonsAndMenusLAF;
-    
 private:
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NostalgicViewController)

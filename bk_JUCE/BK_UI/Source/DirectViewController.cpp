@@ -142,13 +142,15 @@ void DirectPreparationEditor::update(void)
     
     DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
 
-    selectCB.setSelectedItemIndex(processor.updateState->currentDirectId, dontSendNotification);
-    
-    transpositionSlider->setValue(prep->getTransposition(), dontSendNotification);
-    resonanceGainSlider->setValue(prep->getResonanceGain(), dontSendNotification);
-    hammerGainSlider->setValue(prep->getHammerGain(), dontSendNotification);
-    gainSlider->setValue(prep->getGain(), dontSendNotification);
-    
+    if (prep != nullptr)
+    {
+        selectCB.setSelectedItemIndex(processor.updateState->currentDirectId, dontSendNotification);
+        
+        transpositionSlider->setValue(prep->getTransposition(), dontSendNotification);
+        resonanceGainSlider->setValue(prep->getResonanceGain(), dontSendNotification);
+        hammerGainSlider->setValue(prep->getHammerGain(), dontSendNotification);
+        gainSlider->setValue(prep->getGain(), dontSendNotification);
+    }
 }
 
 void DirectPreparationEditor::bkMessageReceived (const String& message)
@@ -295,22 +297,28 @@ void DirectModificationEditor::update(void)
     
     DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
     
+    if (mod != nullptr)
+    {
+        String val = mod->getParam(DirectTransposition);
+        transpositionSlider->setValue(stringToFloatArray(val), dontSendNotification);
+        
+        val = mod->getParam(DirectResGain);
+        resonanceGainSlider->setValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(DirectHammerGain);
+        hammerGainSlider->setValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(DirectGain);
+        gainSlider->setValue(val.getFloatValue(), dontSendNotification);
+    }
     
-    String val = mod->getParam(DirectTransposition);
-    transpositionSlider->setValue(stringToFloatArray(val), dontSendNotification);
     
-    val = mod->getParam(DirectResGain);
-    resonanceGainSlider->setValue(val.getFloatValue(), dontSendNotification);
-    
-    val = mod->getParam(DirectHammerGain);
-    hammerGainSlider->setValue(val.getFloatValue(), dontSendNotification);
-    
-    val = mod->getParam(DirectGain);
-    gainSlider->setValue(val.getFloatValue(), dontSendNotification);
 }
 
 void DirectModificationEditor::fillSelectCB(void)
 {
+    // FIGURE THIS OUT FOR MODS
+    
     // Direct menu
     StringArray mods = processor.gallery->getAllDirectModNames();
     

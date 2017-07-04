@@ -24,10 +24,11 @@ public:
    
     BKUpdateState()
     {
-        for (int i = 0; i< 6; i++)
+        for (int i = 0; i < BKPreparationTypeNil; i++)
         {
             active.add(Array<int>());
         }
+        
     };
     
     ~BKUpdateState()
@@ -94,19 +95,19 @@ public:
     
     Array<Array<int>> active;
     
-    int  currentDirectId = 0;
-    int  currentSynchronicId = 0;
-    int  currentNostalgicId = 0;
-    int  currentTempoId = 0;
-    int  currentTuningId = 0;
+    int  currentDirectId = 1;
+    int  currentSynchronicId = 1;
+    int  currentNostalgicId = 1;
+    int  currentTempoId = 1;
+    int  currentTuningId = 1;
     
-    int  currentModDirectId = 0;
-    int  currentModSynchronicId = 0;
-    int  currentModNostalgicId = 0;
-    int  currentModTempoId = 0;
-    int  currentModTuningId = 0;
+    int  currentModDirectId = 1;
+    int  currentModSynchronicId = 1;
+    int  currentModNostalgicId = 1;
+    int  currentModTempoId = 1;
+    int  currentModTuningId = 1;
     
-    int  currentKeymapId = 0;
+    int  currentKeymapId = 1;
     
     bool idDidChange = false;
     bool galleryDidChange = false;

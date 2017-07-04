@@ -207,11 +207,18 @@ typedef enum BKPreparationType {
     PreparationTypeTuning,
     PreparationTypeTempo,
     PreparationTypeKeymap,
-    PreparationTypeMod,
+    PreparationTypeDirectMod,
+    PreparationTypeSynchronicMod,
+    PreparationTypeNostalgicMod,
+    PreparationTypeTuningMod,
+    PreparationTypeTempoMod,
+    PreparationTypeGenericMod,
     PreparationTypePianoMap,
     PreparationTypeReset,
-    BKPreparationTypeNil,
+    PreparationTypePiano,
+    BKPreparationTypeNil
 } BKPreparationType;
+
 
 static const std::vector<std::string> cPreparationTypes = {
     "Direct",
@@ -220,9 +227,15 @@ static const std::vector<std::string> cPreparationTypes = {
     "Tuning",
     "Tempo",
     "Keymap",
-    "Mod",
+    "DirectMod",
+    "SynchronicMod",
+    "NostalgicMod",
+    "TuningMod",
+    "TempoMod",
+    "GenericMod",
     "PianoMap",
-    "Reset"
+    "Reset",
+    "Piano"
 };
 
 typedef enum BKPreparationDisplay {
@@ -231,12 +244,12 @@ typedef enum BKPreparationDisplay {
     DisplayNostalgic,
     DisplayTuning,
     DisplayTempo,
+    DisplayKeymap,
     DisplayDirectMod,
     DisplaySynchronicMod,
     DisplayNostalgicMod,
     DisplayTuningMod,
     DisplayTempoMod,
-    DisplayKeymap,
     DisplayGeneral,
     DisplayNil,
 } BKPreparationDisplay;

@@ -52,7 +52,7 @@ public:
 
     inline String getName(void) { return name; }
     
-    inline void setType(BKPreparationType newType) { type = newType; }
+    void setType(BKPreparationType type);
     
     inline BKPreparationType getType() const noexcept { return type; }
     

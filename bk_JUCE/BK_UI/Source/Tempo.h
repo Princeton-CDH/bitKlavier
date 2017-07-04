@@ -411,6 +411,7 @@ public:
                 getParam(AT1Mode)           == t->getParam(AT1Mode));
     }
     
+    inline void setId(int newId) { Id = newId; }
     inline int getId(void) const noexcept { return Id; }
     
     inline ValueTree getState(int Id)

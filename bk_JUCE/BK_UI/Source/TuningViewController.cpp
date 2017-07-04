@@ -479,23 +479,27 @@ void TuningPreparationEditor::update(void)
     
     TuningPreparation::Ptr prep = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
     
-    selectCB.setSelectedItemIndex(processor.updateState->currentTuningId, dontSendNotification);
-    scaleCB.setSelectedItemIndex(prep->getTuning(), dontSendNotification);
-    fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
-    offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
-
-    absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
-    Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-    customKeyboard.setValues(currentTuning->getCurrentScaleCents());
+    if (prep != nullptr)
+    {
+        selectCB.setSelectedItemIndex(processor.updateState->currentTuningId, dontSendNotification);
+        scaleCB.setSelectedItemIndex(prep->getTuning(), dontSendNotification);
+        fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
+        offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
+        
+        absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
+        Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+        customKeyboard.setValues(currentTuning->getCurrentScaleCents());
+        
+        A1IntervalScaleCB.setSelectedItemIndex(prep->getAdaptiveIntervalScale(), dontSendNotification);
+        A1Inversional.setToggleState(prep->getAdaptiveInversional(), dontSendNotification);
+        A1AnchorScaleCB.setSelectedItemIndex(prep->getAdaptiveAnchorScale(), dontSendNotification);
+        A1FundamentalCB.setSelectedItemIndex(prep->getAdaptiveAnchorFundamental(), dontSendNotification);
+        A1ClusterThresh->setValue(prep->getAdaptiveClusterThresh(), dontSendNotification);
+        A1ClusterMax->setValue(prep->getAdaptiveHistory(), dontSendNotification);
+        
+        updateComponentVisibility();
+    }
     
-    A1IntervalScaleCB.setSelectedItemIndex(prep->getAdaptiveIntervalScale(), dontSendNotification);
-    A1Inversional.setToggleState(prep->getAdaptiveInversional(), dontSendNotification);
-    A1AnchorScaleCB.setSelectedItemIndex(prep->getAdaptiveAnchorScale(), dontSendNotification);
-    A1FundamentalCB.setSelectedItemIndex(prep->getAdaptiveAnchorFundamental(), dontSendNotification);
-    A1ClusterThresh->setValue(prep->getAdaptiveClusterThresh(), dontSendNotification);
-    A1ClusterMax->setValue(prep->getAdaptiveHistory(), dontSendNotification);
-    
-    updateComponentVisibility();
 }
 
 void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> values)
@@ -611,53 +615,55 @@ void TuningModificationEditor::update(void)
 {
     TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
     
-    TuningPreparation::Ptr prep = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+    if (mod != nullptr)
+    {
+        fillSelectCB();
+        
+        selectCB.setSelectedItemIndex(processor.updateState->currentModTuningId, dontSendNotification);
+        
+        String val = mod->getParam(TuningScale);
+        scaleCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+        //                       scaleCB.setSelectedItemIndex(prep->getTuning(), dontSendNotification);
+        
+        val = mod->getParam(TuningFundamental);
+        fundamentalCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+        //                       fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
+        
+        val = mod->getParam(TuningOffset);
+        offsetSlider->setValue(val.getFloatValue() * 100., dontSendNotification);
+        //                       offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
+        
+        val = mod->getParam(TuningAbsoluteOffsets);
+        absoluteKeyboard.setValues(stringToFloatArray(val));
+        //                       absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
+        
+        val = mod->getParam(TuningA1IntervalScale);
+        A1IntervalScaleCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+        //                       A1IntervalScaleCB.setSelectedItemIndex(prep->getAdaptiveIntervalScale(), dontSendNotification);
+        
+        val = mod->getParam(TuningA1Inversional);
+        A1Inversional.setToggleState((bool)val.getIntValue(), dontSendNotification);
+        //                       A1Inversional.setToggleState(prep->getAdaptiveInversional(), dontSendNotification);
+        
+        val = mod->getParam(TuningA1AnchorScale);
+        A1AnchorScaleCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+        //                       A1AnchorScaleCB.setSelectedItemIndex(prep->getAdaptiveAnchorScale(), dontSendNotification);
+        
+        val = mod->getParam(TuningA1AnchorFundamental);
+        A1FundamentalCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+        //                       A1FundamentalCB.setSelectedItemIndex(prep->getAdaptiveAnchorFundamental(), dontSendNotification);
+        
+        val = mod->getParam(TuningA1ClusterThresh);
+        A1ClusterThresh->setValue(val.getLargeIntValue(), dontSendNotification);
+        //                       A1ClusterThresh->setValue(prep->getAdaptiveClusterThresh(), dontSendNotification);
+        
+        val = mod->getParam(TuningA1ClusterThresh);
+        A1ClusterMax->setValue(val.getIntValue(), dontSendNotification);
+        //                       A1ClusterMax->setValue(prep->getAdaptiveHistory(), dontSendNotification);
+        
+        updateComponentVisibility();
+    }
     
-    fillSelectCB();
-    
-    selectCB.setSelectedItemIndex(processor.updateState->currentModTuningId, dontSendNotification);
-    
-    String val = mod->getParam(TuningScale);
-    scaleCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-    //                       scaleCB.setSelectedItemIndex(prep->getTuning(), dontSendNotification);
-    
-    val = mod->getParam(TuningFundamental);
-    fundamentalCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-    //                       fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
-    
-    val = mod->getParam(TuningOffset);
-    offsetSlider->setValue(val.getFloatValue() * 100., dontSendNotification);
-    //                       offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
-    
-    val = mod->getParam(TuningAbsoluteOffsets);
-    absoluteKeyboard.setValues(stringToFloatArray(val));
-    //                       absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
-    
-    val = mod->getParam(TuningA1IntervalScale);
-    A1IntervalScaleCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-    //                       A1IntervalScaleCB.setSelectedItemIndex(prep->getAdaptiveIntervalScale(), dontSendNotification);
-    
-    val = mod->getParam(TuningA1Inversional);
-    A1Inversional.setToggleState((bool)val.getIntValue(), dontSendNotification);
-    //                       A1Inversional.setToggleState(prep->getAdaptiveInversional(), dontSendNotification);
-    
-    val = mod->getParam(TuningA1AnchorScale);
-    A1AnchorScaleCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-    //                       A1AnchorScaleCB.setSelectedItemIndex(prep->getAdaptiveAnchorScale(), dontSendNotification);
-    
-    val = mod->getParam(TuningA1AnchorFundamental);
-    A1FundamentalCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-    //                       A1FundamentalCB.setSelectedItemIndex(prep->getAdaptiveAnchorFundamental(), dontSendNotification);
-    
-    val = mod->getParam(TuningA1ClusterThresh);
-    A1ClusterThresh->setValue(val.getLargeIntValue(), dontSendNotification);
-    //                       A1ClusterThresh->setValue(prep->getAdaptiveClusterThresh(), dontSendNotification);
-    
-    val = mod->getParam(TuningA1ClusterThresh);
-    A1ClusterMax->setValue(val.getIntValue(), dontSendNotification);
-    //                       A1ClusterMax->setValue(prep->getAdaptiveHistory(), dontSendNotification);
-    
-    updateComponentVisibility();
 }
 
 void TuningModificationEditor::fillSelectCB(void)

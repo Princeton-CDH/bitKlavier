@@ -50,11 +50,6 @@ protected:
     
     void updateComponentVisibility();
     
-    ImageComponent iconImageComponent;
-    TextButton hideOrShow;
-    
-    BKButtonAndMenuLAF buttonsAndMenusLAF;
-    
 private:
     
     

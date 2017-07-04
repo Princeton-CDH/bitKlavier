@@ -354,6 +354,7 @@ public:
         
     }
     
+    inline void setId(int newId) { Id = newId; }
     inline int getId(void)const noexcept {return Id;}
     
     inline String getName(void) const noexcept {return name;}
@@ -763,6 +764,7 @@ public:
         param.set(SynchronicTranspOffsets, "");
     }
     
+    inline void setId(int newId) { Id = newId; }
     inline int getId(void) const noexcept { return Id; }
     
     inline ValueTree getState(int Id)
@@ -1375,6 +1377,7 @@ public:
         param.set(NostalgicSyncTarget, "");
     }
     
+    inline void setId(int newId) { Id = newId; }
     inline int getId(void) const noexcept { return Id; }
     
     inline ValueTree getState(int Id)

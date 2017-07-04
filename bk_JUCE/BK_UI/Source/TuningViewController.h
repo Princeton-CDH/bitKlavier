@@ -64,10 +64,6 @@ protected:
     BKKeyboardSlider absoluteKeyboard;
     BKKeyboardSlider customKeyboard;
     
-    ImageComponent iconImageComponent;
-    TextButton hideOrShow;
-    BKButtonAndMenuLAF buttonsAndMenusLAF;
-    
     //other overrides
     
     void fillTuningCB(void);
