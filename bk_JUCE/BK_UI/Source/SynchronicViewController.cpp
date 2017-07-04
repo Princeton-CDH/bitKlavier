@@ -396,27 +396,30 @@ void SynchronicPreparationEditor::update()
 
 void SynchronicPreparationEditor::fillSelectCB(void)
 {
-    // Direct menu
-    Synchronic::PtrArr newpreps = processor.gallery->getAllSynchronic();
-    
     selectCB.clear(dontSendNotification);
-    for (int i = 0; i < newpreps.size(); i++)
+    
+    Array<int> index = processor.gallery->getIndexList(PreparationTypeSynchronic);
+    
+    for (int i = 0; i < index.size(); i++)
     {
-        String name = newpreps[i]->getName();
+        int Id = index[i];
+        String name = processor.gallery->getSynchronic(Id)->getName();
         if (name != String::empty)  selectCB.addItem(name, i+1);
         else                        selectCB.addItem(String(i+1), i+1);
         
         selectCB.setItemEnabled(i+1, true);
-        Array<int> active = processor.updateState->active.getUnchecked(PreparationTypeSynchronic);
-        if (active.contains(i) && i != processor.updateState->currentSynchronicId)
+        if (processor.updateState->isActive(PreparationTypeSynchronic, Id) &&
+            (Id != processor.updateState->currentSynchronicId))
         {
             selectCB.setItemEnabled(i+1, false);
         }
     }
     
-    selectCB.addItem("New synchronic...", newpreps.size()+1);
+    selectCB.addItem("New synchronic...", index.size()+1);
     
-    selectCB.setSelectedItemIndex(processor.updateState->currentSynchronicId, NotificationType::dontSendNotification);
+    int currentId = processor.updateState->currentSynchronicId;
+    
+    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeSynchronic, currentId), NotificationType::dontSendNotification);
     
 }
 
@@ -660,20 +663,30 @@ void SynchronicModificationEditor::update()
 
 void SynchronicModificationEditor::fillSelectCB(void)
 {
-    // Direct menu
-    StringArray mods = processor.gallery->getAllSynchronicModNames();
-    
     selectCB.clear(dontSendNotification);
-    for (int i = 0; i < mods.size(); i++)
+    
+    Array<int> index = processor.gallery->getIndexList(PreparationTypeSynchronicMod);
+    
+    for (int i = 0; i < index.size(); i++)
     {
-        String name = mods[i];
+        int Id = index[i];
+        String name = processor.gallery->getSynchronicModPreparation(Id)->getName();
         if (name != String::empty)  selectCB.addItem(name, i+1);
         else                        selectCB.addItem(String(i+1), i+1);
+        
+        selectCB.setItemEnabled(i+1, true);
+        if (processor.updateState->isActive(PreparationTypeSynchronicMod, Id) &&
+            (Id != processor.updateState->currentModSynchronicId))
+        {
+            selectCB.setItemEnabled(i+1, false);
+        }
     }
     
-    selectCB.addItem("New synchronic modification...", mods.size()+1);
+    selectCB.addItem("New synchronic modification...", index.size()+1);
     
-    selectCB.setSelectedItemIndex(processor.updateState->currentModSynchronicId, NotificationType::dontSendNotification);
+    int currentId = processor.updateState->currentModSynchronicId;
+    
+    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeSynchronicMod, currentId), NotificationType::dontSendNotification);
     
 }
 

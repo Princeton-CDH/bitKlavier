@@ -308,27 +308,30 @@ void NostalgicPreparationEditor::BKStackedSliderValueChanged(String name, Array<
 
 void NostalgicPreparationEditor::fillSelectCB(void)
 {
-    // Direct menu
-    Nostalgic::PtrArr newpreps = processor.gallery->getAllNostalgic();
-    
     selectCB.clear(dontSendNotification);
-    for (int i = 0; i < newpreps.size(); i++)
+    
+    Array<int> index = processor.gallery->getIndexList(PreparationTypeNostalgic);
+    
+    for (int i = 0; i < index.size(); i++)
     {
-        String name = newpreps[i]->getName();
+        int Id = index[i];
+        String name = processor.gallery->getNostalgic(Id)->getName();
         if (name != String::empty)  selectCB.addItem(name, i+1);
         else                        selectCB.addItem(String(i+1), i+1);
         
         selectCB.setItemEnabled(i+1, true);
-        Array<int> active = processor.updateState->active.getUnchecked(PreparationTypeNostalgic);
-        if (active.contains(i) && i != processor.updateState->currentNostalgicId)
+        if (processor.updateState->isActive(PreparationTypeNostalgic, Id) &&
+            (Id != processor.updateState->currentNostalgicId))
         {
             selectCB.setItemEnabled(i+1, false);
         }
     }
     
-    selectCB.addItem("New nostalgic...", newpreps.size()+1);
+    selectCB.addItem("New nostalgic...", index.size()+1);
     
-    selectCB.setSelectedItemIndex(processor.updateState->currentNostalgicId, NotificationType::dontSendNotification);
+    int currentId = processor.updateState->currentNostalgicId;
+    
+    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeNostalgic, currentId), NotificationType::dontSendNotification);
     
 }
 
@@ -428,20 +431,30 @@ void NostalgicModificationEditor::update(void)
 
 void NostalgicModificationEditor::fillSelectCB(void)
 {
-    // Direct menu
-    StringArray mods = processor.gallery->getAllNostalgicModNames();
-    
     selectCB.clear(dontSendNotification);
-    for (int i = 0; i < mods.size(); i++)
+    
+    Array<int> index = processor.gallery->getIndexList(PreparationTypeNostalgicMod);
+    
+    for (int i = 0; i < index.size(); i++)
     {
-        String name = mods[i];
+        int Id = index[i];
+        String name = processor.gallery->getNostalgicModPreparation(Id)->getName();
         if (name != String::empty)  selectCB.addItem(name, i+1);
         else                        selectCB.addItem(String(i+1), i+1);
+        
+        selectCB.setItemEnabled(i+1, true);
+        if (processor.updateState->isActive(PreparationTypeNostalgicMod, Id) &&
+            (Id != processor.updateState->currentModNostalgicId))
+        {
+            selectCB.setItemEnabled(i+1, false);
+        }
     }
     
-    selectCB.addItem("New nostalgic...", mods.size()+1);
+    selectCB.addItem("New nostalgic modification...", index.size()+1);
     
-    selectCB.setSelectedItemIndex(processor.updateState->currentModNostalgicId, NotificationType::dontSendNotification);
+    int currentId = processor.updateState->currentModNostalgicId;
+    
+    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeNostalgicMod, currentId), NotificationType::dontSendNotification);
     
 }
 

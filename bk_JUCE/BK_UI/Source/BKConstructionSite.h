@@ -81,8 +81,6 @@ private:
     
     SelectedItemSet<BKItem*>& getLassoSelection(void) override;
 
-    int getUnusedId(BKPreparationType type, int which);
-    
     void draw(void);
     
     void prepareItemDrag(BKItem* item, const MouseEvent& e, bool center);

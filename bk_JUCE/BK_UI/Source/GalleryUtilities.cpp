@@ -254,7 +254,7 @@ int Gallery::getNumMod(BKPreparationType type)
 
 void Gallery::addDirectMod()
 {
-    int newId = getNewId(PreparationTypeGenericMod);
+    int newId = getNewId(PreparationTypeDirectMod);
     modDirect.add           (new DirectModPreparation(newId));
 }
 
@@ -265,7 +265,7 @@ void Gallery::addDirectModWithId(int Id)
 
 void Gallery::addSynchronicMod()
 {
-    int newId = getNewId(PreparationTypeGenericMod);
+    int newId = getNewId(PreparationTypeSynchronicMod);
     modSynchronic.add       (new SynchronicModPreparation(newId));
 }
 
@@ -277,7 +277,7 @@ void Gallery::addSynchronicModWithId(int Id)
 
 void Gallery::addNostalgicMod()
 {
-    int newId = getNewId(PreparationTypeGenericMod);
+    int newId = getNewId(PreparationTypeNostalgicMod);
     modNostalgic.add        (new NostalgicModPreparation(newId));
 }
 
@@ -289,13 +289,13 @@ void Gallery::addNostalgicModWithId(int Id)
 
 void Gallery::addTuningMod()
 {
-    int newId = getNewId(PreparationTypeGenericMod);
+    int newId = getNewId(PreparationTypeTuningMod);
     modTuning.add           (new TuningModPreparation(newId));
 }
 
 void Gallery::addTuningMod(TuningModPreparation::Ptr tmod)
 {
-    int newId = getNewId(PreparationTypeGenericMod);
+    int newId = getNewId(PreparationTypeTuningMod);
     tmod->setId(newId);
     modTuning.add           (tmod);
 }
@@ -307,7 +307,7 @@ void Gallery::addTuningModWithId(int Id)
 
 void Gallery::addTempoMod()
 {
-    int newId = getNewId(PreparationTypeGenericMod);
+    int newId = getNewId(PreparationTypeTempoMod);
     modTempo.add           (new TempoModPreparation(newId));
 }
 
@@ -318,7 +318,7 @@ void Gallery::addTempoModWithId(int Id)
 
 void Gallery::addTempoMod(TempoModPreparation::Ptr tmod)
 {
-    int newId = getNewId(PreparationTypeGenericMod);
+    int newId = getNewId(PreparationTypeTempoMod);
     tmod->setId(newId);
     modTempo.add           (tmod);
 }

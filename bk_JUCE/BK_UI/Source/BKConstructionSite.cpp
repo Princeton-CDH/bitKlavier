@@ -289,38 +289,6 @@ void BKConstructionSite::deleteItem (BKItem* item)
     removeChildComponent(item);
 }
 
-int BKConstructionSite::getUnusedId(BKPreparationType type, int which)
-{
-    int thisId = which;
-    
-    if (type <= PreparationTypeKeymap)
-    {
-        int count = processor.gallery->getNum(type);
-        
-        if (count < 0)
-        {
-            thisId = 0;
-        }
-        else
-        {
-            while (thisId < count)
-            {
-                if (!graph->containsItemWithTypeAndId(type, thisId))
-                    break;
-                
-                thisId++;
-            }
-        }
-        
-        if (thisId >= count)
-            processor.gallery->add(type);
-        
-    }
-    
-    return thisId;
-}
-
-
 void BKConstructionSite::addItem(BKPreparationType type)
 {
     int thisId = -1;
@@ -356,7 +324,7 @@ void BKConstructionSite::addItemsFromClipboard(void)
     int firstX, firstY;
     for (auto item : graph->clipboard)
     {
-        int thisId = getUnusedId(item->getType(), item->getId());
+        int thisId = item->getId();
         
         BKItem::Ptr toAdd = new BKItem(item->getType(), thisId, processor);
         
@@ -572,12 +540,9 @@ void BKConstructionSite::reconfigureCurrentItem(void)
     
     for (auto item : currentItem->getConnections())
     {
-        connections.add(item);
-        
-        graph->disconnect(currentItem, item);
+        graph->reconnect(currentItem, item);
     }
     
-    for (auto item : connections)   graph->connect(currentItem, item);
 }
 
 void BKConstructionSite::idDidChange(void)

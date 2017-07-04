@@ -249,28 +249,30 @@ void TempoPreparationEditor::timerCallback()
 
 void TempoPreparationEditor::fillSelectCB(void)
 {
-
-    Tempo::PtrArr newpreps = processor.gallery->getAllTempo();
-    
     selectCB.clear(dontSendNotification);
-    for (int i = 0; i < newpreps.size(); i++)
+    
+    Array<int> index = processor.gallery->getIndexList(PreparationTypeTempo);
+    
+    for (int i = 0; i < index.size(); i++)
     {
-        
-        String name = newpreps[i]->getName();
+        int Id = index[i];
+        String name = processor.gallery->getTempo(Id)->getName();
         if (name != String::empty)  selectCB.addItem(name, i+1);
         else                        selectCB.addItem(String(i+1), i+1);
         
         selectCB.setItemEnabled(i+1, true);
-        Array<int> active = processor.updateState->active.getUnchecked(PreparationTypeTempo);
-        if (active.contains(i) && i != processor.updateState->currentTempoId)
+        if (processor.updateState->isActive(PreparationTypeTempo, Id) &&
+            (Id != processor.updateState->currentTempoId))
         {
             selectCB.setItemEnabled(i+1, false);
         }
     }
     
-    selectCB.addItem("New tempo...", newpreps.size()+1);
+    selectCB.addItem("New tempo...", index.size()+1);
     
-    selectCB.setSelectedItemIndex(processor.updateState->currentTempoId, NotificationType::dontSendNotification);
+    int currentId = processor.updateState->currentTempoId;
+    
+    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeTempo, currentId), NotificationType::dontSendNotification);
     
 }
 
@@ -424,19 +426,30 @@ TempoViewController(p, theGraph)
 void TempoModificationEditor::fillSelectCB(void)
 {
     
-    StringArray mods = processor.gallery->getAllTempoModNames();
-    
     selectCB.clear(dontSendNotification);
-    for (int i = 0; i < mods.size(); i++)
+    
+    Array<int> index = processor.gallery->getIndexList(PreparationTypeTempoMod);
+    
+    for (int i = 0; i < index.size(); i++)
     {
-        String name = mods[i];
+        int Id = index[i];
+        String name = processor.gallery->getTempoModPreparation(Id)->getName();
         if (name != String::empty)  selectCB.addItem(name, i+1);
         else                        selectCB.addItem(String(i+1), i+1);
+        
+        selectCB.setItemEnabled(i+1, true);
+        if (processor.updateState->isActive(PreparationTypeTempoMod, Id) &&
+            (Id != processor.updateState->currentModTempoId))
+        {
+            selectCB.setItemEnabled(i+1, false);
+        }
     }
     
-    selectCB.addItem("New tempo modification...", mods.size()+1);
+    selectCB.addItem("New tempo modification...", index.size()+1);
     
-    selectCB.setSelectedItemIndex(processor.updateState->currentModTempoId, NotificationType::dontSendNotification);
+    int currentId = processor.updateState->currentModTempoId;
+    
+    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeTempoMod, currentId), NotificationType::dontSendNotification);
     
 }
 

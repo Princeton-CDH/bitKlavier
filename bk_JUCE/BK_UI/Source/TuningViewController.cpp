@@ -440,27 +440,30 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 
 void TuningPreparationEditor::fillSelectCB(void)
 {
-    // Direct menu
-    Tuning::PtrArr newpreps = processor.gallery->getAllTuning();
-    
     selectCB.clear(dontSendNotification);
-    for (int i = 0; i < newpreps.size(); i++)
+    
+    Array<int> index = processor.gallery->getIndexList(PreparationTypeTuning);
+    
+    for (int i = 0; i < index.size(); i++)
     {
-        String name = newpreps[i]->getName();
+        int Id = index[i];
+        String name = processor.gallery->getTuning(Id)->getName();
         if (name != String::empty)  selectCB.addItem(name, i+1);
         else                        selectCB.addItem(String(i+1), i+1);
         
         selectCB.setItemEnabled(i+1, true);
-        Array<int> active = processor.updateState->active.getUnchecked(PreparationTypeTuning);
-        if (active.contains(i) && i != processor.updateState->currentTuningId)
+        if (processor.updateState->isActive(PreparationTypeTuning, Id) &&
+            (Id != processor.updateState->currentTuningId))
         {
             selectCB.setItemEnabled(i+1, false);
         }
     }
     
-    selectCB.addItem("New tuning...", newpreps.size()+1);
+    selectCB.addItem("New tuning...", index.size()+1);
     
-    selectCB.setSelectedItemIndex(processor.updateState->currentTuningId, NotificationType::dontSendNotification);
+    int currentId = processor.updateState->currentTuningId;
+    
+    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeTuning, currentId), NotificationType::dontSendNotification);
     
 }
 
@@ -668,20 +671,30 @@ void TuningModificationEditor::update(void)
 
 void TuningModificationEditor::fillSelectCB(void)
 {
-    // Direct menu
-    StringArray mods = processor.gallery->getAllTuningModNames();
-    
     selectCB.clear(dontSendNotification);
-    for (int i = 0; i < mods.size(); i++)
+    
+    Array<int> index = processor.gallery->getIndexList(PreparationTypeTuningMod);
+    
+    for (int i = 0; i < index.size(); i++)
     {
-        String name = mods[i];
+        int Id = index[i];
+        String name = processor.gallery->getTuningModPreparation(Id)->getName();
         if (name != String::empty)  selectCB.addItem(name, i+1);
         else                        selectCB.addItem(String(i+1), i+1);
+        
+        selectCB.setItemEnabled(i+1, true);
+        if (processor.updateState->isActive(PreparationTypeTuningMod, Id) &&
+            (Id != processor.updateState->currentModTuningId))
+        {
+            selectCB.setItemEnabled(i+1, false);
+        }
     }
     
-    selectCB.addItem("New tuning...", mods.size()+1);
+    selectCB.addItem("New tuning modification...", index.size()+1);
     
-    selectCB.setSelectedItemIndex(processor.updateState->currentModTuningId, NotificationType::dontSendNotification);
+    int currentId = processor.updateState->currentModTuningId;
+    
+    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeTuningMod, currentId), NotificationType::dontSendNotification);
     
 }
 

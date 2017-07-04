@@ -54,6 +54,7 @@ public:
     
     void setType(BKPreparationType type);
     
+
     inline BKPreparationType getType() const noexcept { return type; }
     
     inline void setId(int newId ) { Id = newId; }
@@ -186,6 +187,12 @@ public:
     void updateMod(BKPreparationType modType, int modId);
     
     void reconstruct(void);
+    
+    inline BKPreparationType getModType(BKPreparationType type)
+    {
+        return (BKPreparationType)(type+6);
+    }
+    
 
     
     inline void select(BKItem* item)
@@ -286,7 +293,7 @@ private:
     void linkSynchronicWithTempo(Synchronic::Ptr synchronic, Tempo::Ptr thisTempo);
     void linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic);
     
-    void route(bool connect, BKItem* item1, BKItem* item2);
+    void route(bool connect, bool reconfigure, BKItem* item1, BKItem* item2);
     
     void disconnectTuningFromSynchronic(BKItem* item);
     void disconnectTuningFromNostalgic(BKItem* item);

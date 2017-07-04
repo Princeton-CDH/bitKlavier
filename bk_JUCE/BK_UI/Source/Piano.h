@@ -335,7 +335,126 @@ private:
     void deconfigureTempoModification(TempoModPreparation::Ptr, Array<int> whichKeymaps);
     void deconfigureTempoModificationForKeys(TempoModPreparation::Ptr, Array<int>);
     
+    inline const Synchronic::Ptr getSynchronic(int Id) const noexcept
+    {
+        for (int i = 0; i < synchronic->size(); i++)
+        {
+            Synchronic::Ptr thisOne = synchronic->getUnchecked(i);
+            
+            if (thisOne->getId() == Id)   return thisOne;
+        }
+        return nullptr;
+    }
     
+    inline const Nostalgic::Ptr getNostalgic(int Id) const noexcept
+    {
+        for (int i = 0; i < nostalgic->size(); i++)
+        {
+            Nostalgic::Ptr thisOne = nostalgic->getUnchecked(i);
+            
+            if (thisOne->getId() == Id)   return thisOne;
+        }
+        return nullptr;
+    }
+    
+    inline const Direct::Ptr getDirect(int Id) const noexcept
+    {
+        for (int i = 0; i < direct->size(); i++)
+        {
+            Direct::Ptr thisOne = direct->getUnchecked(i);
+            
+            if (thisOne->getId() == Id)   return thisOne;
+        }
+        return nullptr;
+    }
+    
+    inline const Tuning::Ptr getTuning(int Id) const noexcept
+    {
+        for (int i = 0; i < tuning->size(); i++)
+        {
+            Tuning::Ptr thisOne = tuning->getUnchecked(i);
+            
+            if (thisOne->getId() == Id)   return thisOne;
+        }
+        return nullptr;
+    }
+    
+    inline const Tempo::Ptr getTempo(int Id) const noexcept
+    {
+        for (int i = 0; i < tempo->size(); i++)
+        {
+            Tempo::Ptr thisOne = tempo->getUnchecked(i);
+            
+            if (thisOne->getId() == Id)   return thisOne;
+        }
+        return nullptr;
+    }
+    
+    inline const SynchronicModPreparation::Ptr getSynchronicModPreparation(int Id) const noexcept
+    {
+        for (int i = 0; i < modSynchronic->size(); i++)
+        {
+            SynchronicModPreparation::Ptr thisOne = modSynchronic->getUnchecked(i);
+            
+            if (thisOne->getId() == Id)   return thisOne;
+        }
+        return nullptr;
+    }
+    
+    inline const NostalgicModPreparation::Ptr getNostalgicModPreparation(int Id) const noexcept
+    {
+        for (int i = 0; i < modNostalgic->size(); i++)
+        {
+            NostalgicModPreparation::Ptr thisOne = modNostalgic->getUnchecked(i);
+            
+            if (thisOne->getId() == Id)   return thisOne;
+        }
+        return nullptr;
+    }
+    
+    inline const DirectModPreparation::Ptr getDirectModPreparation(int Id) const noexcept
+    {
+        for (int i = 0; i < modDirect->size(); i++)
+        {
+            DirectModPreparation::Ptr thisOne = modDirect->getUnchecked(i);
+            
+            if (thisOne->getId() == Id)   return thisOne;
+        }
+        return nullptr;
+    }
+    
+    inline const TuningModPreparation::Ptr getTuningModPreparation(int Id) const noexcept
+    {
+        for (int i = 0; i < modTuning->size(); i++)
+        {
+            TuningModPreparation::Ptr thisOne = modTuning->getUnchecked(i);
+            
+            if (thisOne->getId() == Id)   return thisOne;
+        }
+        return nullptr;
+    }
+    
+    inline const TempoModPreparation::Ptr getTempoModPreparation(int Id) const noexcept
+    {
+        for (int i = 0; i < modTempo->size(); i++)
+        {
+            TempoModPreparation::Ptr thisOne = modTempo->getUnchecked(i);
+            
+            if (thisOne->getId() == Id)   return thisOne;
+        }
+        return nullptr;
+    }
+    
+    inline const Keymap::Ptr getKeymap(int Id) const noexcept
+    {
+        for (int i = 0; i < bkKeymaps->size(); i++)
+        {
+            Keymap::Ptr thisOne = bkKeymaps->getUnchecked(i);
+            
+            if (thisOne->getId() == Id)   return thisOne;
+        }
+        return nullptr;
+    }
     
     JUCE_LEAK_DETECTOR(Piano)
 };

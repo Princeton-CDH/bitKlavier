@@ -233,27 +233,30 @@ void DirectPreparationEditor::BKStackedSliderValueChanged(String name, Array<flo
 
 void DirectPreparationEditor::fillSelectCB(void)
 {
-    // Direct menu
-    Direct::PtrArr newpreps = processor.gallery->getAllDirect();
-    
     selectCB.clear(dontSendNotification);
-    for (int i = 0; i < newpreps.size(); i++)
+    
+    Array<int> index = processor.gallery->getIndexList(PreparationTypeDirect);
+    
+    for (int i = 0; i < index.size(); i++)
     {
-        String name = newpreps[i]->getName();
+        int Id = index[i];
+        String name = processor.gallery->getDirect(Id)->getName();
         if (name != String::empty)  selectCB.addItem(name, i+1);
         else                        selectCB.addItem(String(i+1), i+1);
         
         selectCB.setItemEnabled(i+1, true);
-        Array<int> active = processor.updateState->active.getUnchecked(PreparationTypeDirect);
-        if (active.contains(i) && i != processor.updateState->currentDirectId)
+        if (processor.updateState->isActive(PreparationTypeDirect, Id) &&
+            (Id != processor.updateState->currentDirectId))
         {
             selectCB.setItemEnabled(i+1, false);
         }
     }
     
-    selectCB.addItem("New direct...", newpreps.size()+1);
+    selectCB.addItem("New direct...", index.size()+1);
     
-    selectCB.setSelectedItemIndex(processor.updateState->currentDirectId, NotificationType::dontSendNotification);
+    int currentId = processor.updateState->currentDirectId;
+    
+    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeDirect, currentId), NotificationType::dontSendNotification);
     
 }
 
@@ -317,23 +320,31 @@ void DirectModificationEditor::update(void)
 
 void DirectModificationEditor::fillSelectCB(void)
 {
-    // FIGURE THIS OUT FOR MODS
-    
-    // Direct menu
-    StringArray mods = processor.gallery->getAllDirectModNames();
-    
     selectCB.clear(dontSendNotification);
-    for (int i = 0; i < mods.size(); i++)
+    
+    Array<int> index = processor.gallery->getIndexList(PreparationTypeDirectMod);
+    
+    for (int i = 0; i < index.size(); i++)
     {
-        String name = mods[i];
+        int Id = index[i];
+        String name = processor.gallery->getDirectModPreparation(Id)->getName();
         if (name != String::empty)  selectCB.addItem(name, i+1);
         else                        selectCB.addItem(String(i+1), i+1);
+        
+        selectCB.setItemEnabled(i+1, true);
+        if (processor.updateState->isActive(PreparationTypeDirectMod, Id) &&
+            (Id != processor.updateState->currentModDirectId))
+        {
+            selectCB.setItemEnabled(i+1, false);
+        }
     }
     
-    selectCB.addItem("New direct modification...", mods.size()+1);
+    selectCB.addItem("New direct modification...", index.size()+1);
     
-    selectCB.setSelectedItemIndex(processor.updateState->currentModDirectId, NotificationType::dontSendNotification);
-
+    int currentId = processor.updateState->currentModDirectId;
+    
+    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeDirectMod, currentId), NotificationType::dontSendNotification);
+    
     
 }
 
