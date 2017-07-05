@@ -181,7 +181,7 @@ void KeymapViewController::bkButtonClicked (Button* b)
 
 void KeymapViewController::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    processor.gallery->getDirect(processor.updateState->currentDirectId)->setName(name);
+    processor.gallery->getKeymap(processor.updateState->currentKeymapId)->setName(name);
 }
 
 void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)

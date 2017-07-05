@@ -354,6 +354,54 @@ void Gallery::addSynchronicWithId(int Id)
     synchronic.getLast()->prepareToPlay(bkSampleRate);
 }
 
+void Gallery::copy(BKPreparationType type, int from, int to)
+{
+    if (type == PreparationTypeDirect)
+    {
+        direct.getUnchecked(to)->copy(direct.getUnchecked(from));
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        synchronic.getUnchecked(to)->copy(synchronic.getUnchecked(from));
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        nostalgic.getUnchecked(to)->copy(nostalgic.getUnchecked(from));
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        tuning.getUnchecked(to)->copy(tuning.getUnchecked(from));
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        tempo.getUnchecked(to)->copy(tempo.getUnchecked(from));
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+        bkKeymaps.getUnchecked(to)->copy(bkKeymaps.getUnchecked(from));
+    }
+    else if (type == PreparationTypeDirectMod)
+    {
+        (modDirect.getUnchecked(to))->copy(modDirect.getUnchecked(from));
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        modSynchronic.getUnchecked(to)->copy(modSynchronic.getUnchecked(from));
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        modNostalgic.getUnchecked(to)->copy(modNostalgic.getUnchecked(from));
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        modTuning.getUnchecked(to)->copy(modTuning.getUnchecked(from));
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        modTempo.getUnchecked(to)->copy(modTempo.getUnchecked(from));
+    }
+}
+
 void Gallery::addTypeWithId(BKPreparationType type, int Id)
 {
     if (type == PreparationTypeDirect)

@@ -322,9 +322,19 @@ void BKConstructionSite::addItemsFromClipboard(void)
     
     int which = 0;
     int firstX, firstY;
+    
     for (auto item : graph->clipboard)
     {
         int thisId = item->getId();
+        
+        BKPreparationType type = item->getType();
+        
+        if (processor.updateState->isActive(type, thisId))
+        {
+            thisId = processor.gallery->getNewId(type);
+            
+            processor.gallery->addTypeWithId(type, thisId);
+        }
         
         BKItem::Ptr toAdd = new BKItem(item->getType(), thisId, processor);
         

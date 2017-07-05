@@ -431,24 +431,6 @@ void BKItemGraph::updateClipboard(void)
         
         clipboard.add(toAdd);
     }
-    
-    /*
-    for (int i = items.size(); --i >= 0; )
-    {
-        for (auto connection : items[i]->getConnections())
-        {
-            for (auto item : clipboard)
-            {
-                if (item->compare(connection))
-                {
-                    clipboard[i]->addConnection(item);
-                }
-            }
-                
-        }
-
-    }
-     */
 }
 
 
@@ -738,11 +720,13 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
             disconnectSynchronicFromNostalgic(item1);
         }
         // MODS RESETS AND PMAPS CAN ONLY HAVE ONE KEYMAP!
-        else if (item1Type == PreparationTypePianoMap || item1Type == PreparationTypeGenericMod || item1Type == PreparationTypeReset)
+        else if (item2Type == PreparationTypeKeymap  &&
+                (item1Type == PreparationTypePianoMap || item1Type == PreparationTypeGenericMod || item1Type == PreparationTypeReset))
         {
             if (item1->getMapper()->getKeymaps().size()) return;
         }
-        else if (item2Type == PreparationTypePianoMap || item2Type == PreparationTypeGenericMod || item2Type == PreparationTypeReset)
+        else if (item1Type == PreparationTypeKeymap &&
+                (item2Type == PreparationTypePianoMap || item2Type == PreparationTypeGenericMod || item2Type == PreparationTypeReset))
         {
             if (item2->getMapper()->getKeymaps().size()) return;
         }

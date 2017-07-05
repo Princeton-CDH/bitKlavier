@@ -510,6 +510,8 @@ public:
         return nullptr;
     }
     
+    void copy(BKPreparationType type, int from, int to);
+    
     inline const SynchronicModPreparation::PtrArr getSynchronicModPreparations(void) const noexcept
     {
         return modSynchronic;
