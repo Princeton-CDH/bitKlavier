@@ -739,7 +739,7 @@ void SynchronicModificationEditor::multiSlidersDidChange(String name, Array<Arra
     //pass original 2D array for transpositions
     else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
     {
-        mod->setParam(SynchronicLengthMultipliers, arrayFloatArrayToString(values));
+        mod->setParam(SynchronicTranspOffsets, arrayFloatArrayToString(values));
     }
     
     updateModification();

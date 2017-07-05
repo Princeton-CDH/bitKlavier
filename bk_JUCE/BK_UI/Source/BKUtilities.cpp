@@ -22,19 +22,15 @@ BKParameterDataType getBKDataType ( SynchronicParameterType type)
         (type == AT1Mode) ||
         (type == AT1History)) */
         return BKInt;
-        
-/*
-    if ((type == SynchronicTempo) ||
-        (type == AT1Subdivisions) ||
-        (type == AT1Min) ||
-        (type == AT1Max))
-        return BKFloat;
-*/
+    
     if((type == SynchronicBeatMultipliers) ||
        (type == SynchronicLengthMultipliers) ||
-       (type == SynchronicAccentMultipliers) ||
-       (type == SynchronicTranspOffsets))
+       (type == SynchronicAccentMultipliers))
         return BKFloatArr;
+    
+    if (type == SynchronicTranspOffsets)
+        return BKArrFloatArr;
+
 }
 /*
 TuningId = 0,

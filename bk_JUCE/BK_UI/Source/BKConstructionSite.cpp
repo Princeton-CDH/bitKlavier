@@ -377,8 +377,12 @@ void BKConstructionSite::mouseMove (const MouseEvent& eo)
 {
     MouseEvent e = eo.getEventRelativeTo(this);
     
-    lastX = e.x;
-    lastY = e.y;
+    if (e.x != lastEX) lastX = e.x;
+    
+    if (e.y != lastEY) lastY = e.y;
+    
+    lastEX = e.x;
+    lastEY = e.y;
 }
 
 void BKConstructionSite::mouseDown (const MouseEvent& eo)

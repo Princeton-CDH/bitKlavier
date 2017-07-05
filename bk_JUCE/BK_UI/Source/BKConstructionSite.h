@@ -101,6 +101,7 @@ private:
     BKItem* getItemAtPoint(const int X, const int Y);
 
     int lastX, lastY;
+    int lastEX,lastEY;
     
     
     

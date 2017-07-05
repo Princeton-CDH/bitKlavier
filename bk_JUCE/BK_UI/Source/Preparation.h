@@ -1023,7 +1023,10 @@ public:
             return "";
     }
     
-    inline void setParam(SynchronicParameterType type, String val) { param.set(type, val);}
+    inline void setParam(SynchronicParameterType type, String val)
+    {
+        param.set(type, val);
+    }
     
     void print(void)
     {
@@ -1040,7 +1043,6 @@ public:
     inline void setY(int y) { Y = y; }
     inline int getX(void) const noexcept { return X; }
     inline int getY(void) const noexcept { return Y; }
-    
     
 private:
     int Id;
