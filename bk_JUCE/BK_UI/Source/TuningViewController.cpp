@@ -575,6 +575,15 @@ void TuningPreparationEditor::buttonClicked (Button* b)
 TuningModificationEditor::TuningModificationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
 TuningViewController(p, theGraph)
 {
+    unmodifiedButtonsAndMenusLAF.setColour(juce::ComboBox::ColourIds::textColourId, Colours::burlywood.withMultipliedAlpha(0.75));
+    unmodifiedButtonsAndMenusLAF.setColour(juce::ComboBox::ColourIds::arrowColourId, Colours::burlywood.withMultipliedAlpha(0.75));
+    unmodifiedButtonsAndMenusLAF.setColour(juce::ComboBox::ColourIds::outlineColourId, Colours::burlywood.withMultipliedAlpha(0.75));
+    unmodifiedButtonsAndMenusLAF.setColour(juce::ComboBox::ColourIds::buttonColourId, Colours::burlywood.withMultipliedAlpha(0.75));
+    
+    lastNote.setVisible(false);
+    lastInterval.setVisible(false);
+    A1reset.setVisible(false);
+    
     fillSelectCB();
     
     selectCB.addMyListener(this);
@@ -582,29 +591,40 @@ TuningViewController(p, theGraph)
     selectCB.addListener(this);
     
     scaleCB.addListener(this);
+    scaleCB.setLookAndFeel(&unmodifiedButtonsAndMenusLAF);
     
     fundamentalCB.addListener(this);
+    fundamentalCB.setLookAndFeel(&unmodifiedButtonsAndMenusLAF);
     
     A1IntervalScaleCB.addListener(this);
+    A1IntervalScaleCB.setLookAndFeel(&unmodifiedButtonsAndMenusLAF);
     
     A1Inversional.addListener(this);
+    A1Inversional.setLookAndFeel(&unmodifiedButtonsAndMenusLAF);
     
     A1AnchorScaleCB.addListener(this);
+    A1AnchorScaleCB.setLookAndFeel(&unmodifiedButtonsAndMenusLAF);
     
     A1FundamentalCB.addListener(this);
+    A1FundamentalCB.setLookAndFeel(&unmodifiedButtonsAndMenusLAF);
     
     A1ClusterThresh->addMyListener(this);
+    A1ClusterThresh->setLookAndFeel(&unmodifiedButtonsAndMenusLAF);
     
     A1ClusterMax->addMyListener(this);
+    A1ClusterMax->setLookAndFeel(&unmodifiedButtonsAndMenusLAF);
     
     A1reset.addListener(this);
+    A1reset.setLookAndFeel(&unmodifiedButtonsAndMenusLAF);
     
     absoluteKeyboard.addMyListener(this);
+    absoluteKeyboard.setLookAndFeel(&unmodifiedButtonsAndMenusLAF);
     
     offsetSlider->addMyListener(this);
+    offsetSlider->setLookAndFeel(&unmodifiedButtonsAndMenusLAF);
     
     hideOrShow.addListener(this);
-    
+
     update();
 }
 
