@@ -39,7 +39,7 @@ BKViewController(p, theGraph)
                                                                  BKKeymapKeyboardComponent::horizontalKeyboard));
     
     keyboard = (BKKeymapKeyboardComponent*)keyboardComponent.get();
-    keyboard->setScrollButtonsVisible(true);
+    keyboard->setScrollButtonsVisible(false);
     keyboard->setAvailableRange(21, 108);
     keyboard->setAllowDrag(true);
     keyboard->setOctaveForMiddleC(4);
@@ -89,6 +89,9 @@ void KeymapViewController::resized()
     
     float keyboardHeight = 86; // + 36 * paddingScalarY;
     Rectangle<int> keyboardRow = area.removeFromBottom(keyboardHeight);
+    float keyWidth = keyboardRow.getWidth() / round((108 - 21) * 7./12 + 1); //num white keys
+    keyboard->setKeyWidth(keyWidth);
+    keyboard->setBlackNoteLengthProportion(0.65);
     keyboardRow.reduce(gXSpacing, 0);
     keyboard->setBounds(keyboardRow);
     keymapTF.setBounds(keyboardRow);

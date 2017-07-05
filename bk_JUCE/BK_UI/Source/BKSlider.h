@@ -96,8 +96,8 @@ public:
     BKMultiSlider(BKMultiSliderType which);
     ~BKMultiSlider();
 
-    void addSlider(int where, bool active);
-    void addSubSlider(int where, bool active);
+    void addSlider(int where, bool active, NotificationType newnotify);
+    void addSubSlider(int where, bool active, NotificationType newnotify);
 
     void deactivateSlider(int where, NotificationType notify);
     void deactivateAll(NotificationType notify);

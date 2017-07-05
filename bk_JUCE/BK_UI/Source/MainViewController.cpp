@@ -77,6 +77,12 @@ timerCallbackCount(0)
     addAndMakeVisible(construction);
     addChildComponent(overtop);
     
+    Point<int> myshadowOffset(2, 2);
+    DropShadow myshadow(Colours::darkgrey, 5, myshadowOffset);
+    overtopShadow = new DropShadower(myshadow);
+    overtopShadow->setOwner(&overtop);
+
+    
     /*
     File file ("~/bk_icons/icon.png");
     FileInputStream inputStream(file);

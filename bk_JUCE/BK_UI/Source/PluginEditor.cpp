@@ -28,7 +28,7 @@ resizer(new ResizableCornerComponent (this, constrain))
     
     resizer->setAlwaysOnTop(true);
     
-    constrain->setSizeLimits(gMainComponentMinWidth, gMainComponentMinHeight, gMainComponentWidth, gMainComponentHeight);
+    constrain->setSizeLimits(gMainComponentMinWidth, gMainComponentMinHeight, gMainComponentWidth * 2, gMainComponentHeight * 2);
     
     mvc.setSize(gMainComponentWidth, gMainComponentHeight);
     setSize(gMainComponentWidth, gMainComponentHeight);

@@ -59,6 +59,7 @@ private:
     BKConstructionSite  construction;
 
     BKOvertop overtop;
+    ScopedPointer<DropShadower> overtopShadow;
     
     //ImageComponent backgroundImageComponent;
     

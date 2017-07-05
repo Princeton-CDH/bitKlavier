@@ -340,6 +340,8 @@ TuningViewController(p, theGraph)
     
     absoluteKeyboard.addMyListener(this);
     
+    customKeyboard.addMyListener(this);
+    
     offsetSlider->addMyListener(this);
     
     hideOrShow.addListener(this);

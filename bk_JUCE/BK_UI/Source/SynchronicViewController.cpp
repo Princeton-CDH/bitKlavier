@@ -65,13 +65,6 @@ BKViewController(p, theGraph)
     offsetParamStartToggle.setToggleState (true, dontSendNotification);
     addAndMakeVisible(offsetParamStartToggle);
     
-    releaseVelocitySetsSynchronicToggle.addListener(this);
-    releaseVelocitySetsSynchronicToggle.setLookAndFeel(&buttonsAndMenusLAF2); //need different one so toggle text can be on other side
-    releaseVelocitySetsSynchronicToggle.setButtonText ("release loudness");
-    buttonsAndMenusLAF2.setToggleBoxTextToRightBool(true);
-    releaseVelocitySetsSynchronicToggle.setToggleState (false, dontSendNotification);
-    addAndMakeVisible(releaseVelocitySetsSynchronicToggle);
-    
     howManySlider = new BKSingleSlider("how many", 1, 100, 1, 1);
     howManySlider->setJustifyRight(false);
     addAndMakeVisible(howManySlider);
@@ -88,6 +81,13 @@ BKViewController(p, theGraph)
     gainSlider->setJustifyRight(false);
     gainSlider->setSkewFactorFromMidPoint(1.);
     addAndMakeVisible(gainSlider);
+    
+    releaseVelocitySetsSynchronicToggle.addListener(this);
+    releaseVelocitySetsSynchronicToggle.setLookAndFeel(&buttonsAndMenusLAF2); //need different one so toggle text can be on other side
+    releaseVelocitySetsSynchronicToggle.setButtonText ("noteOff loudness");
+    buttonsAndMenusLAF2.setToggleBoxTextToRightBool(false);
+    releaseVelocitySetsSynchronicToggle.setToggleState (false, dontSendNotification);
+    addAndMakeVisible(releaseVelocitySetsSynchronicToggle);
     
     addAndMakeVisible(hideOrShow);
     hideOrShow.setName("hideOrShow");
@@ -118,7 +118,6 @@ void SynchronicViewController::resized()
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
-    releaseVelocitySetsSynchronicToggle.setBounds(comboBoxSlice);
     
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
@@ -164,6 +163,10 @@ void SynchronicViewController::resized()
                           nextCenter - gComponentSingleSliderHeight/2.,
                           leftColumn.getWidth(),
                           gComponentSingleSliderHeight);
+    
+    Rectangle<int> releaseToggleSlice = gainSlider->getBounds().removeFromTop(gComponentTextFieldHeight);
+    releaseToggleSlice.removeFromRight(gYSpacing);
+    releaseVelocitySetsSynchronicToggle.setBounds(releaseToggleSlice.removeFromRight(releaseToggleSlice.getWidth() * 0.5));
     
     repaint();
     

@@ -122,7 +122,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     numVisibleSliders = 12;
     
     allowSubSliders = false;
-    subSliderName = "add transposition";
+    subSliderName = "add subslider";
     
     if(sliderIsVertical) {
         sliderWidth = 80;
@@ -150,8 +150,8 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     //create the default sliders, with one active
     for(int i = 0; i<numDefaultSliders; i++)
     {
-        if(i==0) addSlider(-1, true);
-        else addSlider(-1, false);
+        if(i==0) addSlider(-1, true, dontSendNotification);
+        else addSlider(-1, false, dontSendNotification);
     }
     
     if(arrangedHorizontally)
@@ -237,7 +237,7 @@ void BKMultiSlider::setTo(Array<float> newvals, NotificationType newnotify)
     
     for(int i=0; i<numVisibleSliders; i++)
     {
-        if(i >= sliders.size()) addSlider(-1, true);
+        if(i >= sliders.size()) addSlider(-1, true, newnotify);
 
         BKSubSlider* refSlider = sliders[i]->operator[](0);
         if(refSlider != nullptr)
@@ -276,15 +276,25 @@ void BKMultiSlider::setTo(Array<Array<float>> newvals, NotificationType newnotif
     else numVisibleSliders = numActiveSliders;
     
     deactivateAll(newnotify);
+    
+    /*
+    for(int i=0; i<newvals.size(); i++)
+    {
+        for(int j=0; j<newvals[i].size(); j++)
+        {
+            DBG("new multislider value " + String(i) + " " + String(j) + " " + String(newvals[i].getUnchecked(j)));
+        }
+    }
+     */
 
     for(int i=0; i<numVisibleSliders; i++)
     {
-        if(i >= sliders.size()) addSlider(-1, false);
+        if(i >= sliders.size()) addSlider(-1, false, newnotify);
         
         for(int j=0; j<newvals[i].size(); j++)
         {
             
-            if(j >= sliders[i]->size()) addSubSlider(i, false);
+            if(j >= sliders[i]->size()) addSubSlider(i, false, newnotify);
 
             BKSubSlider* refSlider = sliders[i]->operator[](j);
             if(refSlider != nullptr)
@@ -382,7 +392,7 @@ void BKMultiSlider::setMinMaxDefaultInc(std::vector<float> newvals)
 }
 
 
-void BKMultiSlider::addSlider(int where, bool active)
+void BKMultiSlider::addSlider(int where, bool active, NotificationType newnotify)
 {
     BKSubSlider* newslider;
     
@@ -425,14 +435,17 @@ void BKMultiSlider::addSlider(int where, bool active)
     
     newslider->isActive(active);
     
-    listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
-                   getName(),
-                   getAllActiveValues());
+    if(newnotify == sendNotification)
+    {
+        listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
+                       getName(),
+                       getAllActiveValues());
+    }
     
 }
 
 
-void BKMultiSlider::addSubSlider(int where, bool active)
+void BKMultiSlider::addSubSlider(int where, bool active, NotificationType newnotify)
 {
     BKSubSlider* newslider;
     
@@ -468,9 +481,14 @@ void BKMultiSlider::addSubSlider(int where, bool active)
     
     newslider->isActive(active);
     
-    listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
-                   getName(),
-                   getAllActiveValues());
+    if(newnotify == sendNotification)
+    {
+        listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
+                       getName(),
+                       getAllActiveValues());
+    }
+    
+    //resized();
 }
 
 
@@ -1006,7 +1024,7 @@ void BKMultiSlider::sliderModifyMenuCallback (const int result, BKMultiSlider* m
             case 1:   ms->deactivateSlider(which, sendNotification); break;
             case 2:   ms->deactivateAllAfter(which, sendNotification); break;
             case 3:   ms->deactivateAllBefore(which, sendNotification); break;
-            case 4:   ms->addSubSlider(which, true); break;
+            case 4:   ms->addSubSlider(which, true, sendNotification); ms->resized(); break;
 
             default:  break;
         }
