@@ -47,6 +47,7 @@ static const int gXSpacing = 4;
 static const int gYSpacing = 4;
 
 static const int gPaddingConst = 10;
+static const float gModAlpha = 0.4;
 
 
 
