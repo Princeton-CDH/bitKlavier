@@ -133,9 +133,6 @@ private:
     BKComboBox menu; int currentId;
     Component fullChild;
     
-    
-    
-    
     BKItem::PtrArr connections;
     BKItem::PtrArr modifications;
     

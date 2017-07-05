@@ -25,6 +25,7 @@ BKViewController(p, theGraph)
     selectCB.setName("Keymap");
     selectCB.addSeparator();
     selectCB.addListener(this);
+    selectCB.addMyListener(this);
     selectCB.setSelectedItemIndex(0);
     addAndMakeVisible(selectCB);
     
@@ -145,6 +146,9 @@ void KeymapViewController::fillKeymapSelectCB(void)
     {
         int Id = index[i];
         String name = processor.gallery->getKeymap(Id)->getName();
+        
+        DBG("keymap name: " + name);
+        
         if (name != String::empty)  selectCB.addItem(name, i+1);
         else                        selectCB.addItem(String(i+1), i+1);
         
@@ -158,9 +162,9 @@ void KeymapViewController::fillKeymapSelectCB(void)
     
     selectCB.addItem("New keymap...", index.size()+1);
     
-    int currentId = processor.updateState->currentKeymapId;
-    
-    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeKeymap, currentId), NotificationType::dontSendNotification);
+    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeKeymap,
+                                                                    processor.updateState->currentKeymapId),
+                                  NotificationType::dontSendNotification);
     
 }
 

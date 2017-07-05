@@ -133,20 +133,23 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
 {
     if (result == 1) // New piano
     {
-        hvc->processor.gallery->addPiano();
+        int index = hvc->processor.gallery->getNumPianos();
         
-        int Id = hvc->processor.gallery->getPianos().size();
-        String newName = "Piano"+String(Id);
+        int newId = hvc->processor.gallery->getNewId(PreparationTypePiano);
         
-        hvc->pianoCB.changeItemText(Id, newName);
+        hvc->processor.gallery->addPianoWithId(newId);
+        
+        String newName = "Piano"+String(newId);
         
         hvc->processor.gallery->getPianos().getLast()->setName(newName);
         
-        hvc->pianoCB.addItem("New piano...", Id+1 );
+        hvc->pianoCB.changeItemText(index, newName);
         
-        hvc->pianoCB.setSelectedId(Id);
+        hvc->pianoCB.addItem("New piano...", index );
         
-        hvc->processor.setCurrentPiano(Id-1);
+        hvc->pianoCB.setSelectedId(index);
+        
+        hvc->processor.setCurrentPiano(newId);
     }
     else if (result == 2) // Remove piano
     {
