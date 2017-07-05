@@ -305,6 +305,12 @@ public:
         DBG("resetting tempo");
     }
     
+    inline void copy(Tempo::Ptr from)
+    {
+        sPrep->copy(from->sPrep);
+        aPrep->copy(sPrep);
+    }
+    
     inline String getName(void) const noexcept {return name;}
     
     inline void setName(String newName)
@@ -400,6 +406,14 @@ public:
         param.set(AT1Mode, String(p->getAdaptiveTempo1Mode()));
     }
     
+    inline void copy(TempoModPreparation::Ptr p)
+    {
+        for (int i = TempoId+1; i < TempoParameterTypeNil; i++)
+        {
+            param.set(i, p->getParam((TempoParameterType)i));
+        }
+    }
+    
     inline bool compare(TempoModPreparation::Ptr t)
     {
         return (getParam(TempoBPM)          == t->getParam(TempoBPM) &&
@@ -411,6 +425,7 @@ public:
                 getParam(AT1Mode)           == t->getParam(AT1Mode));
     }
     
+    inline void setId(int newId) { Id = newId; }
     inline int getId(void) const noexcept { return Id; }
     
     inline ValueTree getState(int Id)

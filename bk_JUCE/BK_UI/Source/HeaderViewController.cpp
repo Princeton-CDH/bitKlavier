@@ -129,36 +129,39 @@ void HeaderViewController::loadMenuCallback(int result, HeaderViewController* gv
     gvc->processor.loadPianoSamples((BKSampleLoadType)(result-1));
 }
 
-void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* gvc)
+void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* hvc)
 {
     if (result == 1) // New piano
     {
-        gvc->processor.gallery->addPiano();
+        int index = hvc->processor.gallery->getNumPianos();
         
-        int Id = gvc->processor.gallery->getPianos().size();
-        String newName = "Piano"+String(Id);
+        int newId = hvc->processor.gallery->getNewId(PreparationTypePiano);
         
-        gvc->pianoCB.changeItemText(Id, newName);
+        hvc->processor.gallery->addPianoWithId(newId);
         
-        gvc->processor.gallery->getPianos().getLast()->setName(newName);
+        String newName = "Piano"+String(newId);
         
-        gvc->pianoCB.addItem("New piano...", Id+1 );
+        hvc->processor.gallery->getPianos().getLast()->setName(newName);
         
-        gvc->pianoCB.setSelectedId(Id);
+        hvc->pianoCB.changeItemText(index, newName);
         
-        gvc->processor.setCurrentPiano(Id-1);
+        hvc->pianoCB.addItem("New piano...", index );
+        
+        hvc->pianoCB.setSelectedId(index);
+        
+        hvc->processor.setCurrentPiano(newId);
     }
     else if (result == 2) // Remove piano
     {
-        int pianoId = gvc->pianoCB.getSelectedId()-1;
+        int pianoId = hvc->pianoCB.getSelectedId()-1;
         
-        gvc->processor.gallery->removePiano(pianoId);
+        hvc->processor.gallery->removePiano(pianoId);
         
-        gvc->switchGallery();
+        hvc->switchGallery();
     }
     else if (result == 3)
     {
-        gvc->processor.updateState->setCurrentDisplay(DisplayGeneral);
+        hvc->processor.updateState->setCurrentDisplay(DisplayGeneral);
     }
 }
 

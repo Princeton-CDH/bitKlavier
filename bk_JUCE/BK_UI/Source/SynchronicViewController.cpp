@@ -355,34 +355,39 @@ void SynchronicPreparationEditor::update(NotificationType notify)
     
     SynchronicPreparation::Ptr prep   = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
-    selectCB.setSelectedItemIndex(processor.updateState->currentSynchronicId, notify);
-    modeSelectCB.setSelectedItemIndex(prep->getMode(), notify);
-    offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
-    releaseVelocitySetsSynchronicToggle.setToggleState(prep->getReleaseVelocitySetsSynchronic(), notify);
-    howManySlider->setValue(prep->getNumBeats(), notify);
-    clusterThreshSlider->setValue(prep->getClusterThreshMS(), notify);
-    clusterMinMaxSlider->setMinValue(prep->getClusterMin(), notify);
-    clusterMinMaxSlider->setMaxValue(prep->getClusterMax(), notify);
-    gainSlider->setValue(prep->getGain(), notify);
-    
-    for(int i = 0; i < paramSliders.size(); i++)
+    if (prep != nullptr)
     {
-        if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+        
+        selectCB.setSelectedItemIndex(processor.updateState->currentSynchronicId, notify);
+        modeSelectCB.setSelectedItemIndex(prep->getMode(), notify);
+        offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
+        releaseVelocitySetsSynchronicToggle.setToggleState(prep->getReleaseVelocitySetsSynchronic(), notify);
+        howManySlider->setValue(prep->getNumBeats(), notify);
+        clusterThreshSlider->setValue(prep->getClusterThreshMS(), notify);
+        clusterMinMaxSlider->setMinValue(prep->getClusterMin(), notify);
+        clusterMinMaxSlider->setMaxValue(prep->getClusterMax(), notify);
+        gainSlider->setValue(prep->getGain(), notify);
+        
+        for(int i = 0; i < paramSliders.size(); i++)
         {
-            paramSliders[i]->setTo(prep->getAccentMultipliers(), notify);
+            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+            {
+                paramSliders[i]->setTo(prep->getAccentMultipliers(), notify);
+            }
+            else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+            {
+                paramSliders[i]->setTo(prep->getBeatMultipliers(), notify);
+            }
+            else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+            {
+                paramSliders[i]->setTo(prep->getLengthMultipliers(), notify);
+            }
+            else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicTranspOffsets])
+            {
+                paramSliders[i]->setTo(prep->getTransposition(), notify);
+            }
         }
-        else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicBeatMultipliers])
-        {
-            paramSliders[i]->setTo(prep->getBeatMultipliers(), notify);
-        }
-        else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicLengthMultipliers])
-        {
-            paramSliders[i]->setTo(prep->getLengthMultipliers(), notify);
-        }
-        else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicTranspOffsets])
-        {
-            paramSliders[i]->setTo(prep->getTransposition(), notify);
-        }
+        
     }
     
 }
@@ -394,27 +399,30 @@ void SynchronicPreparationEditor::update()
 
 void SynchronicPreparationEditor::fillSelectCB(void)
 {
-    // Direct menu
-    Synchronic::PtrArr newpreps = processor.gallery->getAllSynchronic();
-    
     selectCB.clear(dontSendNotification);
-    for (int i = 0; i < newpreps.size(); i++)
+    
+    Array<int> index = processor.gallery->getIndexList(PreparationTypeSynchronic);
+    
+    for (int i = 0; i < index.size(); i++)
     {
-        String name = newpreps[i]->getName();
+        int Id = index[i];
+        String name = processor.gallery->getSynchronic(Id)->getName();
         if (name != String::empty)  selectCB.addItem(name, i+1);
         else                        selectCB.addItem(String(i+1), i+1);
         
         selectCB.setItemEnabled(i+1, true);
-        Array<int> active = processor.updateState->active.getUnchecked(PreparationTypeSynchronic);
-        if (active.contains(i) && i != processor.updateState->currentSynchronicId)
+        if (processor.updateState->isActive(PreparationTypeSynchronic, Id) &&
+            (Id != processor.updateState->currentSynchronicId))
         {
             selectCB.setItemEnabled(i+1, false);
         }
     }
     
-    selectCB.addItem("New synchronic...", newpreps.size()+1);
+    selectCB.addItem("New synchronic...", index.size()+1);
     
-    selectCB.setSelectedItemIndex(processor.updateState->currentSynchronicId, NotificationType::dontSendNotification);
+    int currentId = processor.updateState->currentSynchronicId;
+    
+    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeSynchronic, currentId), NotificationType::dontSendNotification);
     
 }
 
@@ -598,56 +606,56 @@ void SynchronicModificationEditor::update(NotificationType notify)
     
     selectCB.setSelectedItemIndex(processor.updateState->currentModSynchronicId, notify);
     
-    SynchronicPreparation::Ptr prep   = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
-    
     SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
     
-    
-    String val = mod->getParam(SynchronicMode);
-    modeSelectCB.setSelectedItemIndex(val.getIntValue(), notify);
-    
-    //FIXIT offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
-    
-    val = mod->getParam(SynchronicNumPulses);
-    howManySlider->setValue(val.getIntValue(), notify);
-    
-    val = mod->getParam(SynchronicClusterThresh);
-    clusterThreshSlider->setValue(val.getFloatValue(), notify);
-    
-    val = mod->getParam(SynchronicClusterMin);
-    clusterMinMaxSlider->setMinValue(val.getIntValue(), notify);
-    
-    val = mod->getParam(SynchronicClusterMax);
-    clusterMinMaxSlider->setMaxValue(val.getIntValue(), notify);
-    
-    
-
-    // FIXIT gainSlider->setValue(prep->getGain(), notify);
-    
-    for (int i = 0; i < paramSliders.size(); i++)
+    if (mod != nullptr)
     {
-        if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+        String val = mod->getParam(SynchronicMode);
+        modeSelectCB.setSelectedItemIndex(val.getIntValue(), notify);
+        
+        //FIXIT offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
+        
+        val = mod->getParam(SynchronicNumPulses);
+        howManySlider->setValue(val.getIntValue(), notify);
+        
+        val = mod->getParam(SynchronicClusterThresh);
+        clusterThreshSlider->setValue(val.getFloatValue(), notify);
+        
+        val = mod->getParam(SynchronicClusterMin);
+        clusterMinMaxSlider->setMinValue(val.getIntValue(), notify);
+        
+        val = mod->getParam(SynchronicClusterMax);
+        clusterMinMaxSlider->setMaxValue(val.getIntValue(), notify);
+        
+        
+        
+        // FIXIT gainSlider->setValue(prep->getGain(), notify);
+        
+        for (int i = 0; i < paramSliders.size(); i++)
         {
-            val = mod->getParam(SynchronicAccentMultipliers);
-            paramSliders[i]->setTo(stringToFloatArray(val), notify);
-        }
-        else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicBeatMultipliers])
-        {
-            val = mod->getParam(SynchronicBeatMultipliers);
-            paramSliders[i]->setTo(stringToFloatArray(val), notify);
-        }
-        else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicLengthMultipliers])
-        {
-            val = mod->getParam(SynchronicLengthMultipliers);
-            paramSliders[i]->setTo(stringToFloatArray(val), notify);
-        }
-        else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicTranspOffsets])
-        {
-            val = mod->getParam(SynchronicTranspOffsets);
-            paramSliders[i]->setTo(stringToArrayFloatArray(val), notify);
+            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+            {
+                val = mod->getParam(SynchronicAccentMultipliers);
+                paramSliders[i]->setTo(stringToFloatArray(val), notify);
+            }
+            else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+            {
+                val = mod->getParam(SynchronicBeatMultipliers);
+                paramSliders[i]->setTo(stringToFloatArray(val), notify);
+            }
+            else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+            {
+                val = mod->getParam(SynchronicLengthMultipliers);
+                paramSliders[i]->setTo(stringToFloatArray(val), notify);
+            }
+            else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicTranspOffsets])
+            {
+                val = mod->getParam(SynchronicTranspOffsets);
+                paramSliders[i]->setTo(stringToArrayFloatArray(val), notify);
+            }
         }
     }
-    
+
 }
 
 void SynchronicModificationEditor::update()
@@ -658,20 +666,30 @@ void SynchronicModificationEditor::update()
 
 void SynchronicModificationEditor::fillSelectCB(void)
 {
-    // Direct menu
-    StringArray mods = processor.gallery->getAllSynchronicModNames();
-    
     selectCB.clear(dontSendNotification);
-    for (int i = 0; i < mods.size(); i++)
+    
+    Array<int> index = processor.gallery->getIndexList(PreparationTypeSynchronicMod);
+    
+    for (int i = 0; i < index.size(); i++)
     {
-        String name = mods[i];
+        int Id = index[i];
+        String name = processor.gallery->getSynchronicModPreparation(Id)->getName();
         if (name != String::empty)  selectCB.addItem(name, i+1);
         else                        selectCB.addItem(String(i+1), i+1);
+        
+        selectCB.setItemEnabled(i+1, true);
+        if (processor.updateState->isActive(PreparationTypeSynchronicMod, Id) &&
+            (Id != processor.updateState->currentModSynchronicId))
+        {
+            selectCB.setItemEnabled(i+1, false);
+        }
     }
     
-    selectCB.addItem("New synchronic modification...", mods.size()+1);
+    selectCB.addItem("New synchronic modification...", index.size()+1);
     
-    selectCB.setSelectedItemIndex(processor.updateState->currentModSynchronicId, NotificationType::dontSendNotification);
+    int currentId = processor.updateState->currentModSynchronicId;
+    
+    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeSynchronicMod, currentId), NotificationType::dontSendNotification);
     
 }
 
@@ -724,7 +742,7 @@ void SynchronicModificationEditor::multiSlidersDidChange(String name, Array<Arra
     //pass original 2D array for transpositions
     else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
     {
-        mod->setParam(SynchronicLengthMultipliers, arrayFloatArrayToString(values));
+        mod->setParam(SynchronicTranspOffsets, arrayFloatArrayToString(values));
     }
     
     updateModification();

@@ -54,7 +54,6 @@ public:
     
     BKUpdateState::Ptr                  updateState;
 
-    
     // Synthesisers.
     BKSynthesiser                       mainPianoSynth;
     BKSynthesiser                       hammerReleaseSynth;

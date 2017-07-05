@@ -29,18 +29,6 @@ if (!keys.size() || keys[0] == -1) isLayer = false;
 
 void Gallery::setStateFromJson(var myJson)
 {
-    addTempo();
-    addTuning();
-    addSynchronic();
-    addNostalgic();
-    addDirect();
-    
-    addTempoMod();
-    addTuningMod();
-    addSynchronicMod();
-    addNostalgicMod();
-    addDirectMod();
-    
     general = new GeneralSettings();
     
     var pattr = myJson.getProperty("pattrstorage", "");
@@ -50,7 +38,7 @@ void Gallery::setStateFromJson(var myJson)
     var pianos = pattr.getProperty("slots", "");
     
     int sId,nId,dId,tId,oId;
-    Array<int> keys; var kvar;  bool isLayer; bool isOld = true; int modTuningCount = 1;
+    Array<int> keys; var kvar;  bool isLayer; bool isOld = true; int modTuningCount = 0;
     
     
     bkKeymaps.add(new Keymap(0));
@@ -58,7 +46,7 @@ void Gallery::setStateFromJson(var myJson)
     // Default all on for
     for (int i = 0; i < 128; i++) bkKeymaps[1]->addNote(i);
     
-    for (int i = 1; i <= 500; i++) //arbs
+    for (int i = 0; i <= 500; i++) //arbs
     {
         var piano = pianos.getProperty(String(i), 0);
         
@@ -135,7 +123,7 @@ void Gallery::setStateFromJson(var myJson)
             String sx = jsonSynchronicX;
             String ax = "adaptiveTempo::";
             
-            for (int L = 1; L <= (isOld ? 1 : 12); L++)
+            for (int L = 0; L <= (isOld ? 1 : 12); L++)
             {
                 if (!isOld)
                 {
@@ -216,7 +204,7 @@ void Gallery::setStateFromJson(var myJson)
                     if (tempoAlreadyLoaded.contains(tmp))
                     {
                         
-                        for (int i = 1; i < tempo.size(); i++)
+                        for (int i = 0; i < tempo.size(); i++)
                         {
                             if (tempo[i]->sPrep->getTempo() == tmp)
                             {

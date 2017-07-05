@@ -61,6 +61,7 @@ bool BKAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* BKAudioProcessor::createEditor()
 {
+
     return new BKAudioProcessorEditor (*this);
 }
 

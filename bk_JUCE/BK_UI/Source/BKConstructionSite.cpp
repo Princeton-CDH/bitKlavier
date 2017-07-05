@@ -14,7 +14,7 @@
 #define NUM_COL 8
 
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKDraggableComponent(false,true,false),
+BKDraggableComponent(false,false,false),
 processor(p),
 graph(theGraph),
 connect(false),
@@ -208,7 +208,7 @@ void BKConstructionSite::draw(void)
 #endif
             
         }
-        else if (type <= PreparationTypeNostalgic || type == PreparationTypePianoMap || type == PreparationTypeMod)
+        else if (type <= PreparationTypeNostalgic || type == PreparationTypePianoMap || type == PreparationTypeGenericMod)
         {
 #if AUTO_DRAW
             int col = (int)(prepCount / NUM_COL);
@@ -289,41 +289,16 @@ void BKConstructionSite::deleteItem (BKItem* item)
     removeChildComponent(item);
 }
 
-int BKConstructionSite::getUnusedId(BKPreparationType type, int which)
+void BKConstructionSite::addItem(BKPreparationType type)
 {
-    int thisId = which;
+    int thisId = -1;
     
-    if (type <= PreparationTypeKeymap)
+    if (type != PreparationTypeGenericMod)
     {
-        int count = processor.gallery->getNum(type);
+        thisId = processor.gallery->getNewId(type);
         
-        if (count < 0)
-        {
-            thisId = 0;
-        }
-        else
-        {
-            while (thisId < count)
-            {
-                if (!graph->containsItemWithTypeAndId(type, thisId))
-                    break;
-                
-                thisId++;
-            }
-        }
-        
-        if (thisId >= count)
-            processor.gallery->add(type);
-        
+        processor.gallery->addTypeWithId(type, thisId);
     }
-    
-    return thisId;
-}
-
-
-void BKConstructionSite::addItem(BKPreparationType type, int which)
-{
-    int thisId = getUnusedId(type, which);
     
     BKItem::Ptr toAdd = new BKItem(type, thisId, processor);
     
@@ -334,17 +309,6 @@ void BKConstructionSite::addItem(BKPreparationType type, int which)
     graph->add(toAdd);
     
     addAndMakeVisible(toAdd);
-}
-
-
-
-// Drag interface
-void BKConstructionSite::itemWasDropped(BKPreparationType type, Array<int> data, int x, int y)
-{
-    lastX = x; lastY = y;
-    
-    for (int i = 0; i < data.size(); i++)   addItem(type, data[i]);
-    
 }
 
 void BKConstructionSite::copy(void)
@@ -358,9 +322,19 @@ void BKConstructionSite::addItemsFromClipboard(void)
     
     int which = 0;
     int firstX, firstY;
+    
     for (auto item : graph->clipboard)
     {
-        int thisId = getUnusedId(item->getType(), item->getId());
+        int thisId = item->getId();
+        
+        BKPreparationType type = item->getType();
+        
+        if (processor.updateState->isActive(type, thisId))
+        {
+            thisId = processor.gallery->getNewId(type);
+            
+            processor.gallery->addTypeWithId(type, thisId);
+        }
         
         BKItem::Ptr toAdd = new BKItem(item->getType(), thisId, processor);
         
@@ -403,8 +377,12 @@ void BKConstructionSite::mouseMove (const MouseEvent& eo)
 {
     MouseEvent e = eo.getEventRelativeTo(this);
     
-    lastX = e.x;
-    lastY = e.y;
+    if (e.x != lastEX) lastX = e.x;
+    
+    if (e.y != lastEY) lastY = e.y;
+    
+    lastEX = e.x;
+    lastEY = e.y;
 }
 
 void BKConstructionSite::mouseDown (const MouseEvent& eo)
@@ -576,12 +554,9 @@ void BKConstructionSite::reconfigureCurrentItem(void)
     
     for (auto item : currentItem->getConnections())
     {
-        connections.add(item);
-        
-        graph->disconnect(currentItem, item);
+        graph->reconnect(currentItem, item);
     }
     
-    for (auto item : connections)   graph->connect(currentItem, item);
 }
 
 void BKConstructionSite::idDidChange(void)
@@ -607,7 +582,7 @@ void BKConstructionSite::idDidChange(void)
     else if (type == PreparationTypeSynchronic) newId = processor.updateState->currentSynchronicId;
     else if (type == PreparationTypeTempo)      newId = processor.updateState->currentTempoId;
     else if (type == PreparationTypeTuning)     newId = processor.updateState->currentTuningId;
-    else if (type == PreparationTypeMod)
+    else if (type == PreparationTypeGenericMod)
     {
         ModificationMapper::Ptr thisMapper = currentItem->getMapper();
         BKPreparationType modType = thisMapper->getType();

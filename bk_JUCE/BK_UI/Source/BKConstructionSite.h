@@ -44,7 +44,7 @@ public:
     void cut(void);
     
     void addItemsFromClipboard(void);
-    void addItem(BKPreparationType type, int which);
+    void addItem(BKPreparationType type);
     
     inline void setCurrentItem(BKItem* item) { currentItem = item;}
     inline BKItem* getCurrentItem(void) { return currentItem;}
@@ -81,17 +81,11 @@ private:
     
     SelectedItemSet<BKItem*>& getLassoSelection(void) override;
 
-    int getUnusedId(BKPreparationType type, int which);
-    
     void draw(void);
     
     void prepareItemDrag(BKItem* item, const MouseEvent& e, bool center);
     
-    // Drag interface
-    void itemWasDropped(BKPreparationType type, Array<int> data, int x, int y) override;
-
     void resized() override;
-    
     void mouseDown (const MouseEvent& eo) override;
     
     void mouseUp (const MouseEvent& eo) override;
@@ -107,6 +101,7 @@ private:
     BKItem* getItemAtPoint(const int X, const int Y);
 
     int lastX, lastY;
+    int lastEX,lastEY;
     
     
     

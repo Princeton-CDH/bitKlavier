@@ -24,10 +24,11 @@ public:
    
     BKUpdateState()
     {
-        for (int i = 0; i< 6; i++)
+        for (int i = 0; i < BKPreparationTypeNil; i++)
         {
             active.add(Array<int>());
         }
+        
     };
     
     ~BKUpdateState()
@@ -36,50 +37,42 @@ public:
     
     inline void removeActive(BKPreparationType type, int Id)
     {
-        if (type <= PreparationTypeKeymap)
+
+        Array<int> theseActive = active.getUnchecked(type);
+
+        for (int i = theseActive.size(); --i>=0;)
         {
-            Array<int> theseActive = active.getUnchecked(type);
-            
-            if (type <= PreparationTypeKeymap)
-            {
-                for (int i = theseActive.size(); --i>=0;)
-                {
-                    if (theseActive[i] == Id) theseActive.remove(i);
-                }
-            }
-            
-            active.set(type, theseActive);
-            
-            DBG("active: " + arrayIntArrayToString(active));
+            if (theseActive[i] == Id) theseActive.remove(i);
         }
+        
+        active.set(type, theseActive);
+        
+        DBG("active: " + arrayIntArrayToString(active));
+
     }
     
     inline void addActive(BKPreparationType type, int Id)
     {
-        if (type <= PreparationTypeKeymap)
-        {
-            Array<int> theseActive = active.getUnchecked(type);
-            
-            theseActive.addIfNotAlreadyThere(Id);
-            
-            active.set(type, theseActive);
-            
-            DBG("active: " + arrayIntArrayToString(active));
-        }
+        Array<int> theseActive = active.getUnchecked(type);
+        
+        theseActive.addIfNotAlreadyThere(Id);
+        
+        active.set(type, theseActive);
+        
+        DBG("active: " + arrayIntArrayToString(active));
+
     }
     
     inline bool isActive(BKPreparationType type, int Id)
     {
         bool isThere = false;
         
-        if (type <= PreparationTypeKeymap)
-        {
-            Array<int> theseActive = active.getUnchecked(type);
-            
-            isThere = theseActive.contains(Id);
-            
-            DBG("active: " + arrayIntArrayToString(active));
-        }
+        Array<int> theseActive = active.getUnchecked(type);
+        
+        isThere = theseActive.contains(Id);
+        
+        DBG("active: " + arrayIntArrayToString(active));
+
         
         return isThere;
     }
@@ -94,19 +87,19 @@ public:
     
     Array<Array<int>> active;
     
-    int  currentDirectId = 0;
-    int  currentSynchronicId = 0;
-    int  currentNostalgicId = 0;
-    int  currentTempoId = 0;
-    int  currentTuningId = 0;
+    int  currentDirectId = 1;
+    int  currentSynchronicId = 1;
+    int  currentNostalgicId = 1;
+    int  currentTempoId = 1;
+    int  currentTuningId = 1;
     
-    int  currentModDirectId = 0;
-    int  currentModSynchronicId = 0;
-    int  currentModNostalgicId = 0;
-    int  currentModTempoId = 0;
-    int  currentModTuningId = 0;
+    int  currentModDirectId = 1;
+    int  currentModSynchronicId = 1;
+    int  currentModNostalgicId = 1;
+    int  currentModTempoId = 1;
+    int  currentModTuningId = 1;
     
-    int  currentKeymapId = 0;
+    int  currentKeymapId = 1;
     
     bool idDidChange = false;
     bool galleryDidChange = false;

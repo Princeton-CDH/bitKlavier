@@ -34,12 +34,16 @@ void BKEditableComboBox::textEditorReturnKeyPressed(TextEditor& textEditor)
 
     hidePopup();
     
-    listeners.call(&BKEditableComboBoxListener::BKEditableComboBoxChanged,
-                   textEditor.getText(),
-                   this);
-    
-    changeItemText(lastItemId, textEditor.getText());
-    setSelectedId(lastItemId, dontSendNotification);
+    if (textEditor.getText() != String::empty)
+    {
+        listeners.call(&BKEditableComboBoxListener::BKEditableComboBoxChanged,
+                       textEditor.getText(),
+                       this);
+        
+        changeItemText(lastItemId, textEditor.getText());
+        setSelectedId(lastItemId, dontSendNotification);
+        
+    }
 }
 
 void BKEditableComboBox::textEditorEscapeKeyPressed (TextEditor &)

@@ -143,6 +143,7 @@ public:
         if (type == DisplayKeymap)
         {
             addAndMakeVisible(&kvc);
+            kvc.update();
             //kvc.update();
         }
         else if (type == DisplayGeneral)

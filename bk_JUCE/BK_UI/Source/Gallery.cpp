@@ -12,6 +12,13 @@
 
 Gallery::Gallery(ScopedPointer<XmlElement> xml)
 {
+    for (int i = 0; i < BKPreparationTypeNil; i++)
+    {
+        idCount.add(0);
+        idIndexList.set(i,Array<int>());
+    }
+    
+
     setStateFromXML(xml);
 }
 
@@ -21,11 +28,23 @@ main(m),
 res(r),
 hammer(h)
 {
+    for (int i = 0; i < BKPreparationTypeNil; i++)
+    {
+        idCount.add(0);
+        idIndexList.set(i,Array<int>());
+    }
+
     setStateFromXML(xml);
 }
 
 Gallery::Gallery(var myJson)
 {
+    for (int i = 0; i < BKPreparationTypeNil; i++)
+    {
+        idCount.add(0);
+        idIndexList.set(i,Array<int>());
+    }
+
     setStateFromJson(myJson);
 }
 
@@ -35,6 +54,12 @@ main(m),
 res(r),
 hammer(h)
 {
+    for (int i = 0; i < BKPreparationTypeNil; i++)
+    {
+        idCount.add(0);
+        idIndexList.set(i,Array<int>());
+    }
+    
     setStateFromJson(myJson);
     
 }

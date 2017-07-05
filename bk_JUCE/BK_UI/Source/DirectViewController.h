@@ -33,13 +33,6 @@ public:
     
     virtual void update(void) {};
     
-protected:
-    ImageComponent iconImageComponent;
-    TextButton hideOrShow;
-    
-    BKButtonAndMenuLAF buttonsAndMenusLAF;
-    
-
 private:
 
 };

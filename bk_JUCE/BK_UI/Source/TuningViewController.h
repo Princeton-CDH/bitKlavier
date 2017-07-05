@@ -68,7 +68,7 @@ protected:
     TextButton hideOrShow;
     BKButtonAndMenuLAF buttonsAndMenusLAF;
     BKButtonAndMenuLAF unmodifiedButtonsAndMenusLAF;
-    
+
     //other overrides
     
     void fillTuningCB(void);

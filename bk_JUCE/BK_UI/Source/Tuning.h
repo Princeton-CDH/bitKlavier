@@ -382,6 +382,12 @@ public:
         DBG("resetting tuning");
     }
     
+    inline void copy(Tuning::Ptr from)
+    {
+        sPrep->copy(from->sPrep);
+        aPrep->copy(sPrep);
+    }
+    
     
     inline String getName(void) const noexcept {return name;}
     
@@ -494,6 +500,7 @@ public:
         param.set(TuningAbsoluteOffsets, "");
     }
     
+    inline void setId(int newId) { Id = newId; }
     inline int getId(void) const noexcept { return Id; }
     
     ~TuningModPreparation(void)
@@ -514,6 +521,14 @@ public:
         param.set(TuningA1History, String(p->getAdaptiveHistory()));
         param.set(TuningCustomScale, floatArrayToString(p->getCustomScale()));
         param.set(TuningAbsoluteOffsets, offsetArrayToString(p->getAbsoluteOffsets()));
+    }
+    
+    inline void copy(TuningModPreparation::Ptr p)
+    {
+        for (int i = TuningId+1; i < TuningParameterTypeNil; i++)
+        {
+            param.set(i, p->getParam((TuningParameterType)i));
+        }
     }
     
     inline bool compare(TuningModPreparation::Ptr t)

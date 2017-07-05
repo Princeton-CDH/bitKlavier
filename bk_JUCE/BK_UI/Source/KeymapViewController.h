@@ -11,27 +11,18 @@
 #ifndef KEYMAPVIEWCONTROLLER_H_INCLUDED
 #define KEYMAPVIEWCONTROLLER_H_INCLUDED
 
-#include "BKUtilities.h"
-
-#include "PluginProcessor.h"
-
-#include "BKListener.h"
-#include "BKComponent.h"
-
+#include "BKViewController.h"
 
 #include "BKKeyboard.h"
 #include "BKKeyboardState.h"
 
-#include "BKGraph.h"
 
 //==============================================================================
 /*
 */
-class KeymapViewController :
-public BKComponent,
-public BKListener,
-public BKEditableComboBoxListener,
-public BKKeymapKeyboardStateListener
+class KeymapViewController : public BKViewController,
+public BKKeymapKeyboardStateListener,
+public BKEditableComboBoxListener
 {
 public:
     KeymapViewController(BKAudioProcessor&, BKItemGraph* theGraph);
@@ -41,11 +32,10 @@ public:
     void resized() override;
     
     void reset(void);
+    
+    void update(void);
 
 private:
-    
-    BKAudioProcessor& processor;
-    BKItemGraph* theGraph;
     
     BKLabel     keymapSelectL;
     BKEditableComboBox  selectCB;
@@ -75,17 +65,11 @@ private:
     void bkButtonClicked            (Button* b)             override;
     
     
-    void update(void);
     void fillKeymapSelectCB(void);
+    
     void keymapUpdated(TextEditor& tf);
     
-    
-    ImageComponent iconImageComponent;
-    TextButton hideOrShow;
-    BKButtonAndMenuLAF buttonsAndMenusLAF;
-    
     bool focusLostByEscapeKey;
-    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KeymapViewController)
 };

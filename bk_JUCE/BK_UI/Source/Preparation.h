@@ -171,11 +171,18 @@ public:
     DirectProcessor::Ptr        processor;
     
     
-    void reset()
+    inline void reset(void)
     {
         aPrep->copy(sPrep);
         updateState->directPreparationDidChange = true;
     }
+    
+    inline void copy(Direct::Ptr from)
+    {
+        sPrep->copy(from->sPrep);
+        aPrep->copy(sPrep);
+    }
+    
     
     //void didChange(bool which) { updateState->directPreparationDidChange = which; }
     
@@ -338,6 +345,13 @@ public:
         param.set(DirectHammerGain, String(d->getHammerGain()));
     }
     
+    inline void copy(DirectModPreparation::Ptr p)
+    {
+        for (int i = DirectId+1; i < DirectParameterTypeNil; i++)
+        {
+            param.set(i, p->getParam((DirectParameterType)i));
+        }
+    }
     
     inline const String getParam(DirectParameterType type)
     {
@@ -354,6 +368,7 @@ public:
         
     }
     
+    inline void setId(int newId) { Id = newId; }
     inline int getId(void)const noexcept {return Id;}
     
     inline String getName(void) const noexcept {return name;}
@@ -442,6 +457,12 @@ public:
     {
         sPrep->setTempoControl(tempo);
         aPrep->setTempoControl(tempo);
+    }
+    
+    inline void copy(Synchronic::Ptr from)
+    {
+        sPrep->copy(from->sPrep);
+        aPrep->copy(sPrep);
     }
     
     inline ValueTree getState(void)
@@ -763,6 +784,7 @@ public:
         param.set(SynchronicTranspOffsets, "");
     }
     
+    inline void setId(int newId) { Id = newId; }
     inline int getId(void) const noexcept { return Id; }
     
     inline ValueTree getState(int Id)
@@ -981,6 +1003,15 @@ public:
         param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p->getTransposition()));
     }
     
+    inline void copy(SynchronicModPreparation::Ptr p)
+    {
+        for (int i = SynchronicId+1; i < SynchronicParameterTypeNil; i++)
+        {
+            param.set(i, p->getParam((SynchronicParameterType)i));
+        }
+    }
+    
+    
     inline const StringArray getStringArray(void) { return param; }
     
     
@@ -992,7 +1023,10 @@ public:
             return "";
     }
     
-    inline void setParam(SynchronicParameterType type, String val) { param.set(type, val);}
+    inline void setParam(SynchronicParameterType type, String val)
+    {
+        param.set(type, val);
+    }
     
     void print(void)
     {
@@ -1009,7 +1043,6 @@ public:
     inline void setY(int y) { Y = y; }
     inline int getX(void) const noexcept { return X; }
     inline int getY(void) const noexcept { return Y; }
-    
     
 private:
     int Id;
@@ -1087,6 +1120,13 @@ public:
         processor->setCurrentPlaybackSampleRate(sampleRate);
     }
 
+    
+    inline void copy(Nostalgic::Ptr from)
+    {
+        sPrep->copy(from->sPrep);
+        aPrep->copy(sPrep);
+    }
+    
     inline ValueTree getState(void)
     {
         ValueTree prep( vtagNostalgic + String(Id));
@@ -1375,6 +1415,7 @@ public:
         param.set(NostalgicSyncTarget, "");
     }
     
+    inline void setId(int newId) { Id = newId; }
     inline int getId(void) const noexcept { return Id; }
     
     inline ValueTree getState(int Id)
@@ -1492,6 +1533,14 @@ public:
         param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
         param.set(NostalgicMode, String(p->getMode()));
         param.set(NostalgicSyncTarget, String(p->getSyncTarget()));
+    }
+    
+    inline void copy(NostalgicModPreparation::Ptr p)
+    {
+        for (int i = NostalgicId+1; i < NostalgicParameterTypeNil; i++)
+        {
+            param.set(i, p->getParam((NostalgicParameterType)i));
+        }
     }
     
     inline const StringArray getStringArray(void) { return param; }

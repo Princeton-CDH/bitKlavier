@@ -17,9 +17,9 @@ resonanceReleaseSynth()
     didLoadHammersAndRes            = false;
     didLoadMainPianoSamples         = false;
     
-    updateUI();
-    
     collectGalleries();
+    
+    updateUI();
     
     loadGalleryFromPath(galleryNames[0]);
     
