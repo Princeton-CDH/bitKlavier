@@ -715,8 +715,6 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
         if (processor.updateState->currentTuningId == selectCB.getNumItems()-1)
         {
             processor.gallery->addTuningMod();
-            
-            
         }
         
         fillSelectCB();

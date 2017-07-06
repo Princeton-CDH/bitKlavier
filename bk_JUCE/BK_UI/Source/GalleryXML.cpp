@@ -30,7 +30,7 @@ ValueTree  Gallery::getState(void)
     
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
-        ValueTree vt ("index");
+        ValueTree vt ("index" + String(i));
         
         Array<int> index = idIndexList.getUnchecked(i);
         
@@ -223,13 +223,9 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 }
                 else if (e->hasTagName( vtagPiano + String(pianoCount)))
                 {
-                    Piano::Ptr thisPiano = new Piano(&synchronic, &nostalgic, &direct, &tuning, &tempo,
-                                                     &modSynchronic, &modNostalgic, &modDirect, &modTuning, &modTempo,
-                                                     &bkKeymaps, getNewId(PreparationTypePiano));
+                    addPiano();
                     
-                    thisPiano->setState(e);
-                    
-                    bkPianos.add(thisPiano); // initializing piano 0
+                    bkPianos.getLast()->setState(e);
                     
                     ++pianoCount;
                     

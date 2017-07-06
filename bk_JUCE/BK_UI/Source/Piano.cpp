@@ -773,7 +773,7 @@ ValueTree Piano::getState(void)
 void Piano::setState(XmlElement* e)
 {
     int i; float f;
-    int pianoMapCount = 0, prepMapCount = 0, modCount = 0, resetCount = 0, mapperCount = 0;
+    int pianoMapCount = 0, prepMapCount = 0, resetCount = 0, mapperCount = 0;
     
     String pianoName = e->getStringAttribute("bkPianoName");
     
@@ -786,8 +786,6 @@ void Piano::setState(XmlElement* e)
     {
         String map =  "mapper" + String(mapperCount);
         
-        
-        
         if (pc->hasTagName("configuration"))
         {
             configuration->setState(pc);
@@ -798,7 +796,7 @@ void Piano::setState(XmlElement* e)
             BKPreparationType type = (BKPreparationType) i;
             
             i = pc->getStringAttribute("Id").getIntValue();
-            int Id = i;
+            int thisId = i;
             
             Array<int> keymaps;
             for (int k = 0; k < 500; k++) // arbitrary
@@ -818,8 +816,31 @@ void Piano::setState(XmlElement* e)
                 else                        targets.add(attr.getIntValue());
             }
             
+            ModificationMapper::Ptr mapper = new ModificationMapper(type, thisId, keymaps, targets);
             
-            ModificationMapper::Ptr mapper = new ModificationMapper(type, Id, keymaps, targets);
+            int resetCount = 0;
+            forEachXmlChildElement (*pc, sub)
+            {
+                if (sub->hasTagName(vtagReset+String(resetCount)))
+                {
+                    Array<int> theseResets = mapper->resets.getUnchecked(resetCount);
+                    
+                    for (int k = 0; k < 100; k++)
+                    {
+                        String attr = sub->getStringAttribute("r" + String(k));
+                        
+                        if (attr == String::empty) break;
+                        else
+                        {
+                            theseResets.add(attr.getIntValue());
+                        }
+                    }
+                    
+                    mapper->resets.set(resetCount, theseResets);
+                    
+                    resetCount++;
+                }
+            }
             
             mapper->print();
             
@@ -910,58 +931,6 @@ void Piano::setState(XmlElement* e)
             prepMaps[prepMapCount]->setTempo(tmp);
             
             ++prepMapCount;
-        }
-        else if (pc->hasTagName( vtagReset + String(resetCount))) // RESET LOADING
-        {
-            int k = pc->getStringAttribute(ptagModX_key).getIntValue();
-            
-            
-            // Direct resets
-            for (int n = 0; n < 128; n++)
-            {
-                String attr = pc->getStringAttribute("d" + String(n));
-                
-                if (attr == String::empty)  break;
-                else                        modificationMap[k]->directReset.add(attr.getIntValue());
-            }
-            
-            // Synchronic resets
-            for (int n = 0; n < 128; n++)
-            {
-                String attr = pc->getStringAttribute("s" + String(n));
-                
-                if (attr == String::empty)  break;
-                else                        modificationMap[k]->synchronicReset.add(attr.getIntValue());
-            }
-            
-            // Nostalgic resets
-            for (int n = 0; n < 128; n++)
-            {
-                String attr = pc->getStringAttribute("n" + String(n));
-                
-                if (attr == String::empty)  break;
-                else                        modificationMap[k]->nostalgicReset.add(attr.getIntValue());
-            }
-            
-            // Tuning resets
-            for (int n = 0; n < 128; n++)
-            {
-                String attr = pc->getStringAttribute("t" + String(n));
-                
-                if (attr == String::empty)  break;
-                else                        modificationMap[k]->tuningReset.add(attr.getIntValue());
-            }
-            
-            // Tempo resets
-            for (int n = 0; n < 128; n++)
-            {
-                String attr = pc->getStringAttribute("m" + String(n));
-                
-                if (attr == String::empty)  break;
-                else                        modificationMap[k]->tempoReset.add(attr.getIntValue());
-            }
-            
-            ++resetCount;
         }
         
     }

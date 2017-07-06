@@ -52,7 +52,7 @@ public:
 
     inline String getName(void) { return name; }
     
-    void setType(BKPreparationType type);
+    void setType(BKPreparationType type, bool create);
     
 
     inline BKPreparationType getType() const noexcept { return type; }
@@ -76,12 +76,15 @@ public:
     
     inline void print(void)
     {
+        DBG("type: " + String(type) + " Id: " + String(Id));
         for (auto item : connections)
         {
             DBG(cPreparationTypes[type]+((Id >= 0) ? String(Id) : "") +
                 " ==> " +
                 cPreparationTypes[item->getType()]+((item->getId() >= 0) ? String(item->getId()) : ""));
         }
+        
+        mapper->print();
     }
     
     inline ModificationMapper::Ptr getMapper() const noexcept { return mapper; }

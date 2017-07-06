@@ -27,7 +27,7 @@ public:
     
     ~BKConstructionSite(void);
     
-    inline void redraw(void);
+    void redraw(void);
 
     void paint(Graphics& g) override;
     

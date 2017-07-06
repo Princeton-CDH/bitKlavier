@@ -27,8 +27,6 @@ altDown(false)
     setWantsKeyboardFocus(true);
     
     graph->deselectAll();
-    
-    redraw();
 }
 
 BKConstructionSite::~BKConstructionSite(void)
@@ -178,7 +176,7 @@ void BKConstructionSite::pianoMapDidChange(BKItem* thisItem)
 
 void BKConstructionSite::draw(void)
 {
-    int keymapCount = 0, prepCount = 0, otherCount = 0, modCount = 0;
+    int keymapCount = 0, prepCount = 0, otherCount = 0, modCount = 0, ttCount = 0;
     for (auto item : graph->getAllItems())
     {
         BKPreparationType type = item->getType();
@@ -208,14 +206,14 @@ void BKConstructionSite::draw(void)
 #endif
             
         }
-        else if (type <= PreparationTypeNostalgic || type == PreparationTypePianoMap || type == PreparationTypeGenericMod)
+        else if (type <= PreparationTypeNostalgic)
         {
 #if AUTO_DRAW
             int col = (int)(prepCount / NUM_COL);
             int row = prepCount % NUM_COL;
             
             int X = 10 + (row * 155);
-            int Y = 200 + (col * 25);
+            int Y = 350 + (col * 25);
             
             item->setTopLeftPosition(X, Y);
             
@@ -225,6 +223,23 @@ void BKConstructionSite::draw(void)
 #endif
             
         }
+        else if (type == PreparationTypeTuning || type == PreparationTypeTempo)
+        {
+#if AUTO_DRAW
+            int col = (int)(ttCount / NUM_COL);
+            int row = ttCount % NUM_COL;
+            
+            int X = 10 + (row * 155);
+            int Y = 500 + (col * 25);
+            
+            
+            item->setTopLeftPosition(X, Y);
+            
+            ttCount++;
+#else
+            item->setTopLeftPosition(x, y);
+#endif
+        }
         else if (type > PreparationTypeKeymap)
         {
 #if AUTO_DRAW
@@ -232,7 +247,7 @@ void BKConstructionSite::draw(void)
             int row = modCount % NUM_COL;
             
             int X = 10 + (row * 155);
-            int Y = 400 + (col * 25);
+            int Y = 200 + (col * 25);
             
             
             item->setTopLeftPosition(X, Y);
@@ -286,6 +301,7 @@ void BKConstructionSite::prepareItemDrag(BKItem* item, const MouseEvent& e, bool
 void BKConstructionSite::deleteItem (BKItem* item)
 {
     graph->remove(item);
+    
     removeChildComponent(item);
 }
 

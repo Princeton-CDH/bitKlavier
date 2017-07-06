@@ -462,9 +462,6 @@ void TempoModificationEditor::update(void)
     
     if (mod != nullptr)
     {
-        // NEED TO MAKE SURE THIS IS LINKED TO RIGHT ITEM, need better way of doing this
-        int targetId = processor.currentPiano->getMapper(PreparationTypeTempo, processor.updateState->currentModTempoId)->getId();
-        
         String val = mod->getParam(TempoSystem);
         modeCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
         //                       modeCB.setSelectedItemIndex((int)prep->getTempoSystem(), dontSendNotification);

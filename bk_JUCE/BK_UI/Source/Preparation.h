@@ -1309,7 +1309,7 @@ public:
     keymaps(keymaps),
     targets(targets)
     {
-        
+        for (int i = 0; i < 5; i++) resets.add(Array<int>());
     }
 
     
@@ -1322,13 +1322,18 @@ public:
     inline void setId(int newId) { Id = newId; }
     
     inline BKPreparationType getType(void) const noexcept { return type; }
-    inline void setType(BKPreparationType newType) { type = newType; }
+    inline void setType(BKPreparationType newType)
+    {
+        type = newType;
+    }
     
     inline void addTarget(int target) { targets.add(target); }
     inline Array<int> getTargets(void) {return targets;}
     
     inline void addKeymap(int keymap) { keymaps.add(keymap); }
     inline Array<int> getKeymaps(void) {return keymaps;}
+    
+    
     
     
     inline void removeKeymap(int keymap)

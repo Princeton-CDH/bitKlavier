@@ -85,7 +85,7 @@ public:
         }
     }
     
-    Array<Array<int>> active;
+    Array< Array<int>> active = Array <Array<int>>();
     
     int  currentDirectId = 1;
     int  currentSynchronicId = 1;
