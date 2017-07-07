@@ -112,7 +112,7 @@ public:
     
     inline void addMapper(ModificationMapper::Ptr thisMapper)
     {
-        mappers.add(thisMapper);
+        mappers.addIfNotAlreadyThere(thisMapper);
     }
     
     inline void removeMapper(ModificationMapper::Ptr thisMapper)

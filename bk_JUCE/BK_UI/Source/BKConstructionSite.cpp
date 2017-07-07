@@ -11,7 +11,7 @@
 #include "BKConstructionSite.h"
 
 #define AUTO_DRAW 1
-#define NUM_COL 8
+#define NUM_COL 6
 
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
 BKDraggableComponent(false,false,false),

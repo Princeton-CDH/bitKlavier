@@ -592,6 +592,10 @@ public:
     }
     
     
+    inline void setURL(String newURL) { url = newURL; }
+    
+    inline String getURL(void) const noexcept {return url;}
+    
     
 private:
     double bkSampleRate;
@@ -599,6 +603,8 @@ private:
     Array< int> idCount;
     
     Array< Array<int>> idIndexList;
+    
+    String url;
     
     BKUpdateState::Ptr updateState;
     BKSynthesiser* main;

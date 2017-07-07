@@ -75,7 +75,7 @@ public:
     {
         addMouseListener(this,true);
         
-        //constrainer.setMinimumOnscreenAmounts(top,left,bottom,right);
+        constrainer.setMinimumOnscreenAmounts(top,left,bottom,right);
     }
     
     ~BKDraggableComponent()
@@ -85,7 +85,7 @@ public:
     
     inline void setConstrainer(int top, int left, int bottom, int right)
     {
-        //constrainer.setMinimumOnscreenAmounts(top, left, bottom, right);
+        constrainer.setMinimumOnscreenAmounts(top, left, bottom, right);
     }
     
     virtual void itemWasDropped(BKPreparationType type, Array<int>, int x, int y){};

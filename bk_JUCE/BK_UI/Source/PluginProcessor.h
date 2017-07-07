@@ -45,6 +45,7 @@ public:
     void loadJsonGalleryDialog(void);
     void loadGalleryFromPath(String path);
     void loadJsonGalleryFromPath(String path);
+    void saveGalleryAs(void);
     void saveGallery(void);
     
     String firstGallery(void);

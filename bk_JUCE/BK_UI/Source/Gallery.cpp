@@ -10,7 +10,8 @@
 
 #include "Gallery.h"
 
-Gallery::Gallery(ScopedPointer<XmlElement> xml)
+Gallery::Gallery(ScopedPointer<XmlElement> xml):
+url(String::empty)
 {
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
@@ -26,7 +27,8 @@ Gallery::Gallery(ScopedPointer<XmlElement> xml, BKSynthesiser* m, BKSynthesiser*
 updateState(state),
 main(m),
 res(r),
-hammer(h)
+hammer(h),
+url(String::empty)
 {
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
@@ -37,7 +39,8 @@ hammer(h)
     setStateFromXML(xml);
 }
 
-Gallery::Gallery(var myJson)
+Gallery::Gallery(var myJson):
+url(String::empty)
 {
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
@@ -52,7 +55,8 @@ Gallery::Gallery(var myJson, BKSynthesiser* m, BKSynthesiser* r, BKSynthesiser* 
 updateState(state),
 main(m),
 res(r),
-hammer(h)
+hammer(h),
+url(String::empty)
 {
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {

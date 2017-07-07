@@ -29,15 +29,10 @@ public:
     typedef OwnedArray<TempoPreparation, CriticalSection> CSArr;
     
     // Copy Constructor
-    TempoPreparation(TempoPreparation::Ptr p):
-    sWhichTempoSystem(p->getTempoSystem()),
-    sTempo(p->getTempo()),
-    at1History(p->getAdaptiveTempo1History()),
-    at1Min(p->getAdaptiveTempo1Min()),
-    at1Max(p->getAdaptiveTempo1Max()),
-    at1Subdivisions(p->getAdaptiveTempo1Subdivisions()),
-    at1Mode(p->getAdaptiveTempo1Mode())
+    TempoPreparation(TempoPreparation::Ptr p)
     {
+        copy(p);
+        
         sBeatThreshSec = (60.0/sTempo);
         sBeatThreshMS = sBeatThreshSec * 1000.;
     }

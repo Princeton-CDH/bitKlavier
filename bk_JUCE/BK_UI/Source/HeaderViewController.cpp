@@ -115,9 +115,10 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
     galleryMenu.addItem(1, "Save");
-    galleryMenu.addItem(2, "Load");
+    galleryMenu.addItem(2, "Save as...");
+    galleryMenu.addItem(3, "Open...");
     galleryMenu.addSeparator();
-    galleryMenu.addItem(3, "Load (Old)");
+    galleryMenu.addItem(4, "Open (legacy)...");
     
     return galleryMenu;
     
@@ -171,11 +172,15 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     {
         gvc->processor.saveGallery();
     }
-    else if (result == 2) // Load
+    if (result == 2)
+    {
+        gvc->processor.saveGalleryAs();
+    }
+    else if (result == 3) // Load
     {
         gvc->processor.loadGalleryDialog();
     }
-    else if (result == 3) // Load (old)
+    else if (result == 4) // Load (old)
     {
         gvc->processor.loadJsonGalleryDialog();
     }

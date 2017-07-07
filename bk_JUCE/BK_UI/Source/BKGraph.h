@@ -19,8 +19,6 @@
 
 #include "Preparation.h"
 
-
-
 class BKItem : public BKDraggableComponent, public ReferenceCountedObject, public BKListener
 {
 public:

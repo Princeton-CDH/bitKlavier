@@ -69,7 +69,7 @@ mapper(new ModificationMapper(BKPreparationTypeNil, -1))
     
         menu.setSelectedId(0, NotificationType::dontSendNotification);
     }
-    else if ((type == PreparationTypeReset) || (type == PreparationTypeGenericMod) || (type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod))
+    else if (type == PreparationTypeGenericMod || (type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod) || type == PreparationTypeReset)
     {
         setType(type, false);
     }
@@ -108,11 +108,18 @@ void BKItem::setType(BKPreparationType newType, bool create)
 {
     if (type != PreparationTypeGenericMod) processor.updateState->removeActive(type, Id);
 
-    int thisId = Id;
-    
-    if (create) thisId = processor.gallery->getNewId(newType);
+    if (create)
+    {
+        Id = processor.gallery->getNewId(newType);
+        processor.gallery->addTypeWithId(newType, Id);
+    }
     
     type = newType;
+    
+    BKPreparationType mapperType = (type == PreparationTypeGenericMod || type == PreparationTypeReset) ? type : (BKPreparationType)(type - 6);
+    
+    mapper->setType(mapperType);
+    mapper->setId(Id);
     
     if (type == PreparationTypeGenericMod)
     {
@@ -127,46 +134,29 @@ void BKItem::setType(BKPreparationType newType, bool create)
     else if (type == PreparationTypeDirectMod)
     {
         setImage(ImageCache::getFromMemory(BinaryData::mod_direct_icon_png, BinaryData::mod_direct_icon_pngSize));
-        
-        processor.gallery->addTypeWithId(PreparationTypeDirectMod, thisId);
     }
     else if (type == PreparationTypeSynchronicMod)
     {
         setImage(ImageCache::getFromMemory(BinaryData::mod_synchronic_icon_png, BinaryData::mod_synchronic_icon_pngSize));
-        
-        processor.gallery->addTypeWithId(PreparationTypeSynchronicMod, thisId);
     }
     else if (type == PreparationTypeNostalgicMod)
     {
         setImage(ImageCache::getFromMemory(BinaryData::mod_nostalgic_icon_png, BinaryData::mod_nostalgic_icon_pngSize));
-        
-        processor.gallery->addTypeWithId(PreparationTypeNostalgicMod, thisId);
     }
     else if (type == PreparationTypeTuningMod)
     {
         setImage(ImageCache::getFromMemory(BinaryData::mod_tuning_icon_png, BinaryData::mod_tuning_icon_pngSize));
-        
-        processor.gallery->addTypeWithId(PreparationTypeTuningMod, thisId);
     }
     else if (type == PreparationTypeTempoMod)
     {
         setImage(ImageCache::getFromMemory(BinaryData::mod_tempo_icon_png, BinaryData::mod_tempo_icon_pngSize));
-        
-        processor.gallery->addTypeWithId(PreparationTypeTempoMod, thisId);
     }
-    
-    BKPreparationType mapperType = (type == PreparationTypeGenericMod || type == PreparationTypeReset) ? type : (BKPreparationType)(type - 6);
-    
-    mapper->setType(mapperType);
-    mapper->setId(thisId);
     
     if (type != PreparationTypeGenericMod)
     {
-        processor.updateState->addActive(type, thisId);
+        processor.updateState->addActive(type, Id);
         processor.currentPiano->addMapper(mapper);
     }
-    
-    setId(thisId);
     
     repaint();
 }
@@ -495,8 +485,6 @@ BKItem* BKItemGraph::itemWithTypeAndId(BKPreparationType type, int Id)
             break;
         }
     }
-    
-    if (thisItem == nullptr) thisItem = new BKItem(type, Id, processor);
 
     return thisItem;
 }
@@ -837,26 +825,28 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
     {
         ModificationMapper::Ptr thisMapper = item1->getMapper();
         
-        BKPreparationType mapperType = item2Type;
+        BKPreparationType mapperType = (item1Type == PreparationTypeReset) ?  PreparationTypeReset : item2Type;
         
-        if (thisMapper->getType() == PreparationTypeReset)
+        if (mapperType == PreparationTypeReset)
         {
             if (connect)
             {
-                Array<int> reset = thisMapper->resets.getUnchecked(mapperType);
+                Array<int> reset = thisMapper->resets.getUnchecked(item2Type);
                 reset.addIfNotAlreadyThere(item2Id);
-                thisMapper->resets.set(mapperType, reset);
+                thisMapper->resets.set(item2Type, reset);
                 
                 DBG("resets: " + arrayIntArrayToString(thisMapper->resets));
                 processor.currentPiano->configureModification(thisMapper);
+                
+                processor.currentPiano->addMapper(thisMapper);
             }
             else
             {
                 processor.currentPiano->deconfigureModification(thisMapper);
-                Array<int> resets = thisMapper->resets.getUnchecked(mapperType);
+                Array<int> resets = thisMapper->resets.getUnchecked(item2Type);
                 for (int i = 0; i < resets.size(); i++)
                 {
-                    if (resets[i] == item2Id) thisMapper->resets.getUnchecked(mapperType).remove(item2Id);
+                    if (resets[i] == item2Id) thisMapper->resets.getUnchecked(item2Type).remove(item2Id);
                 }
                 processor.currentPiano->removeMapper(thisMapper);
             }
@@ -890,27 +880,30 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
     {
         ModificationMapper::Ptr thisMapper = item2->getMapper();
         
-        BKPreparationType mapperType = item1Type;
+        BKPreparationType mapperType = (item2Type == PreparationTypeReset) ? PreparationTypeReset : item1Type;
         
-        if (thisMapper->getType() == PreparationTypeReset)
+        if (mapperType == PreparationTypeReset)
         {
             if (connect)
             {
-                Array<int> reset = thisMapper->resets.getUnchecked(mapperType);
+                Array<int> reset = thisMapper->resets.getUnchecked(item1Type);
                 reset.addIfNotAlreadyThere(item1Id);
-                thisMapper->resets.set(mapperType, reset);
+                thisMapper->resets.set(item1Type, reset);
                 
                 DBG("resets: " + arrayIntArrayToString(thisMapper->resets));
                 processor.currentPiano->configureModification(thisMapper);
+                
+                processor.currentPiano->addMapper(thisMapper);
             }
             else
             {
                 processor.currentPiano->deconfigureModification(thisMapper);
-                Array<int> resets = thisMapper->resets.getUnchecked(mapperType);
+                Array<int> resets = thisMapper->resets.getUnchecked(item1Type);
                 for (int i = 0; i < resets.size(); i++)
                 {
-                    if (resets[i] == item1Id) thisMapper->resets.getUnchecked(mapperType).remove(item1Id);
+                    if (resets[i] == item1Id) thisMapper->resets.getUnchecked(item1Type).remove(item1Id);
                 }
+                processor.currentPiano->removeMapper(thisMapper);
             }
         }
         else
@@ -1194,6 +1187,8 @@ void BKItemGraph::reconstruct(void)
         BKItem* newPreparation;
         
         keymap = itemWithTypeAndId(PreparationTypeKeymap, keymapId);
+        
+        if (keymap == nullptr) keymap = new BKItem(PreparationTypeKeymap, keymapId, processor);
 
         if (!contains(keymap)) add(keymap);
     
@@ -1236,6 +1231,8 @@ void BKItemGraph::reconstruct(void)
             
             newPreparation = itemWithTypeAndId(PreparationTypeDirect, Id);
             
+            if (newPreparation == nullptr) newPreparation = new BKItem(PreparationTypeDirect, Id, processor);
+                                                                       
             if (!contains(newPreparation))
             {
                 add(newPreparation);
@@ -1245,6 +1242,8 @@ void BKItemGraph::reconstruct(void)
                 int tuningId = p->getTuningId();
                 
                 BKItem* thisTuning = itemWithTypeAndId(PreparationTypeTuning, tuningId);
+                
+                if (thisTuning == nullptr) thisTuning = new BKItem(PreparationTypeTuning, tuningId, processor);
                 
                 if (!contains(thisTuning))  add(thisTuning);
                 
@@ -1257,9 +1256,9 @@ void BKItemGraph::reconstruct(void)
         {
             int Id = p->getId();
             
-            DBG("    synchronic"+String(Id));
-            
             newPreparation = itemWithTypeAndId(PreparationTypeSynchronic, Id);
+            
+            if (newPreparation == nullptr) newPreparation = new BKItem(PreparationTypeSynchronic, Id, processor);
             
             if (!contains(newPreparation))
             {
@@ -1271,6 +1270,8 @@ void BKItemGraph::reconstruct(void)
                 
                 BKItem* thisTuning = itemWithTypeAndId(PreparationTypeTuning, tuningId);
                 
+                if (thisTuning == nullptr) thisTuning = new BKItem(PreparationTypeTuning, tuningId, processor);
+                
                 if (!contains(thisTuning))  add(thisTuning);
                 
                 connectUI(newPreparation, thisTuning);
@@ -1280,6 +1281,11 @@ void BKItemGraph::reconstruct(void)
                 int tempoId = p->getTempoId();
                 
                 BKItem* thisTempo = itemWithTypeAndId(PreparationTypeTempo, tempoId);
+                
+                if (thisTempo == nullptr)
+                {
+                    thisTempo = new BKItem(PreparationTypeTempo, tempoId, processor);
+                }
                 
                 if (!contains(thisTempo))  add(thisTempo);
                 
@@ -1296,6 +1302,8 @@ void BKItemGraph::reconstruct(void)
             DBG("    nostalgic"+String(Id));
             
             newPreparation = itemWithTypeAndId(PreparationTypeNostalgic, Id);
+            
+            if (newPreparation == nullptr) newPreparation = new BKItem(PreparationTypeNostalgic, Id, processor);
 
             if (!contains(newPreparation))
             {
@@ -1307,6 +1315,8 @@ void BKItemGraph::reconstruct(void)
                 
                 BKItem* thisTuning = itemWithTypeAndId(PreparationTypeTuning, tuningId);
                 
+                if (thisTuning == nullptr) thisTuning = new BKItem(PreparationTypeTuning, Id, processor);
+                
                 if (!contains(thisTuning))  add(thisTuning);
                 
                 connectUI(newPreparation, thisTuning);
@@ -1316,6 +1326,8 @@ void BKItemGraph::reconstruct(void)
                 int syncId = p->getSynchronicTargetId();
                 
                 BKItem* thisSyncTarget = itemWithTypeAndId(PreparationTypeSynchronic, syncId);
+                
+                if (thisSyncTarget == nullptr) thisSyncTarget = new BKItem(PreparationTypeSynchronic, syncId, processor);
                 
                 if (!contains(thisSyncTarget))  add(thisSyncTarget);
                 
@@ -1347,6 +1359,12 @@ void BKItemGraph::reconstruct(void)
         
         BKItem* thisMod = itemWithTypeAndId(itemType, Id);
         
+        if (thisMod == nullptr)
+        {
+            thisMod = new BKItem(itemType, Id, processor);
+            thisMod->setType(itemType, false);
+        }
+        
         thisMod->setMapper(map);
         
         if (!contains(thisMod)) add(thisMod);
@@ -1355,6 +1373,9 @@ void BKItemGraph::reconstruct(void)
         for (auto k : keymaps)
         {
             BKItem* thisKeymap = itemWithTypeAndId(PreparationTypeKeymap, k);
+            
+            if (thisKeymap == nullptr) thisKeymap = new BKItem(PreparationTypeKeymap, k, processor);
+            
             if (!contains(thisKeymap)) add(thisKeymap);
             
             connectUI(thisKeymap, thisMod);
@@ -1366,26 +1387,9 @@ void BKItemGraph::reconstruct(void)
             {
                 BKItem* thisTarget;
                 
-                if (targetType == PreparationTypeDirect)
-                {
-                    thisTarget = itemWithTypeAndId(PreparationTypeDirect, t);
-                }
-                else if (targetType == PreparationTypeSynchronic)
-                {
-                    thisTarget = itemWithTypeAndId(PreparationTypeSynchronic, t);
-                }
-                else if (targetType == PreparationTypeNostalgic)
-                {
-                    thisTarget = itemWithTypeAndId(PreparationTypeNostalgic, t);
-                }
-                else if (targetType == PreparationTypeTempo)
-                {
-                    thisTarget = itemWithTypeAndId(PreparationTypeTempo, t);
-                }
-                else if (targetType == PreparationTypeTuning)
-                {
-                    thisTarget = itemWithTypeAndId(PreparationTypeTuning, t);
-                }
+                thisTarget = itemWithTypeAndId(targetType, t);
+                
+                if (thisTarget == nullptr) thisTarget = new BKItem(getModType(targetType), t, processor);
                 
                 if (!contains(thisTarget)) add(thisTarget);
                 
@@ -1402,26 +1406,9 @@ void BKItemGraph::reconstruct(void)
                 {
                     BKItem* thisTarget;
                     
-                    if (rtype == PreparationTypeDirect)
-                    {
-                        thisTarget = itemWithTypeAndId(PreparationTypeDirect, t);
-                    }
-                    else if (rtype == PreparationTypeSynchronic)
-                    {
-                        thisTarget = itemWithTypeAndId(PreparationTypeSynchronic, t);
-                    }
-                    else if (rtype == PreparationTypeNostalgic)
-                    {
-                        thisTarget = itemWithTypeAndId(PreparationTypeNostalgic, t);
-                    }
-                    else if (rtype == PreparationTypeTempo)
-                    {
-                        thisTarget = itemWithTypeAndId(PreparationTypeTempo, t);
-                    }
-                    else if (rtype == PreparationTypeTuning)
-                    {
-                        thisTarget = itemWithTypeAndId(PreparationTypeTuning, t);
-                    }
+                    thisTarget = itemWithTypeAndId((BKPreparationType)rtype, t);
+                    
+                    if (thisTarget == nullptr) thisTarget = new BKItem((BKPreparationType)rtype, t, processor);
                     
                     if (!contains(thisTarget)) add(thisTarget);
                     
@@ -1439,6 +1426,8 @@ void BKItemGraph::reconstruct(void)
         if (pianoMap[i] != -1)
         {
             BKItem* thisMap = itemWithTypeAndId(PreparationTypePianoMap, count++);
+            
+            // continue here if (thisMap == nullptr
             
             if (!contains(thisMap)) add(thisMap);
             

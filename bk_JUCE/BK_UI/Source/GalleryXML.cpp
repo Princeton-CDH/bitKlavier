@@ -14,12 +14,13 @@ ValueTree  Gallery::getState(void)
 {
     ValueTree galleryVT( vtagGallery);
     
-    // NEED THIS
+    galleryVT.setProperty("url", url, 0);
+    
     ValueTree idCountVT( "idCount");
     
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
-        idCountVT.setProperty( "idCount"+String(i), idCount[i], 0);
+        idCountVT.setProperty( "i"+String(i), idCount[i], 0);
     }
     
     galleryVT.addChild(idCountVT, -1, 0);
@@ -99,11 +100,33 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
             general = new GeneralSettings();
             
             /* * * * * * * * * * * * * * */
-            
+            url = xml->getStringAttribute("url");
+
+            DBG("loaded url: " + url);
             
             // iterate through its sub-elements
             forEachXmlChildElement (*xml, e)
             {
+                /*
+                if (e->hasTagName("idCount"))
+                {
+                    
+                    for (int idType = 0; idType < (BKPreparationTypeNil-1); idType++)
+                    {
+                        String attr = e->getStringAttribute("i"+String(idType));
+                        
+                        DBG("id" + String(idType) + " " + attr);
+                        
+                        i = attr.getIntValue();
+                        
+                        idCount.set(idType, i);
+                        
+                    }
+                    
+                    DBG("idCountsPOSTLOAD: " + intArrayToString(idCount));
+                }
+                */
+                
                 if (e->hasTagName( vtagKeymap + String(keymapCount)))
                 {
                     addKeymap();

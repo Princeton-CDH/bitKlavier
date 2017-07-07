@@ -268,7 +268,11 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     }
     else if (code == 83) // S synchronic
     {
-        if (e.getModifiers().isCommandDown())   ;//save
+        if (e.getModifiers().isCommandDown())
+        {
+            if (e.getModifiers().isShiftDown()) processor.saveGalleryAs();
+            else                                processor.saveGallery();
+        }
         else                                    construction.addItem(PreparationTypeSynchronic);
     }
     else if (code == 84) // T tuning

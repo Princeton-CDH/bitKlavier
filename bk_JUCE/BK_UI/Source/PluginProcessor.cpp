@@ -397,22 +397,28 @@ void BKAudioProcessor::performModifications(int noteNumber)
     }
 }
 
-void BKAudioProcessor::saveGallery(void)
+void BKAudioProcessor::saveGalleryAs(void)
 {
-    ValueTree galleryVT = gallery->getState();
-    
-    String xml = galleryVT.toXmlString();
-    
     FileChooser myChooser ("Save gallery to file...",
                            File::getSpecialLocation (File::userHomeDirectory),
                            "*.xml");
-    
-    ScopedPointer<XmlElement> myXML = galleryVT.createXml();
     
     if (myChooser.browseForFileToSave(true))
     {
         File myFile (myChooser.getResult());
         currentGallery = myFile.getFileName();
+        
+        String currentURL = gallery->getURL();
+        String newURL = myFile.getFullPathName();
+        
+        DBG("newURL: " + newURL);
+        
+        if (currentURL != newURL)   gallery->setURL(newURL);
+        
+        ValueTree galleryVT = gallery->getState();
+        
+        ScopedPointer<XmlElement> myXML = galleryVT.createXml();
+        
         myXML->writeToFile(myFile, String::empty);
     }
     
@@ -421,6 +427,27 @@ void BKAudioProcessor::saveGallery(void)
     
     galleryDidLoad = true;
     
+}
+
+void BKAudioProcessor::saveGallery(void)
+{
+    String currentURL = gallery->getURL();
+
+    if (currentURL == String::empty)
+    {
+        saveGalleryAs();
+        return;
+    }
+    else
+    {
+        File myFile (currentURL);
+        
+        ValueTree galleryVT = gallery->getState();
+        
+        ScopedPointer<XmlElement> myXML = galleryVT.createXml();
+        
+        myXML->writeToFile(myFile, String::empty);
+    }
 }
 
 

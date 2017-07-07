@@ -729,6 +729,13 @@ ValueTree Piano::getState(void)
     int mapCount = 0;
     for (auto map : mappers)
     {
+        if ((map->getType() != PreparationTypeReset) && !map->getKeymaps().size()) continue;
+        
+        if ((map->getType() != PreparationTypeReset) && (!map->getKeymaps().size() || !map->getTargets().size())) continue;
+        
+        DBG("SAVING THIS MAPPER: ");
+        map->print();
+        
         ValueTree mapVT ("mapper"+String(mapCount++));
         
         mapVT.setProperty("type", map->getType(), 0);
@@ -842,6 +849,7 @@ void Piano::setState(XmlElement* e)
                 }
             }
             
+            DBG("SETTINGUP");
             mapper->print();
             
             configureModification(mapper);
