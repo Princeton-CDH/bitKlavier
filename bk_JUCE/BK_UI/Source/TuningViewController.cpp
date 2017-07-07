@@ -582,39 +582,66 @@ void TuningPreparationEditor::buttonClicked (Button* b)
 TuningModificationEditor::TuningModificationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
 TuningViewController(p, theGraph)
 {
+    
+    lastNote.setVisible(false);
+    lastInterval.setVisible(false);
+    A1reset.setVisible(false);
+    greyOutAllComponents();
+    
     fillSelectCB();
-    
     selectCB.addMyListener(this);
-    
     selectCB.addListener(this);
-    
     scaleCB.addListener(this);
     
     fundamentalCB.addListener(this);
-    
     A1IntervalScaleCB.addListener(this);
-    
     A1Inversional.addListener(this);
-    
     A1AnchorScaleCB.addListener(this);
-    
     A1FundamentalCB.addListener(this);
-    
     A1ClusterThresh->addMyListener(this);
-    
     A1ClusterMax->addMyListener(this);
-    
     A1reset.addListener(this);
-    
     absoluteKeyboard.addMyListener(this);
-    
+    customKeyboard.addMyListener(this);
     offsetSlider->addMyListener(this);
-    
     hideOrShow.addListener(this);
-    
+
     update();
 }
 
+void TuningModificationEditor::greyOutAllComponents()
+{
+    scaleCB.setAlpha(gModAlpha);
+    fundamentalCB.setAlpha(gModAlpha);
+    A1IntervalScaleCB.setAlpha(gModAlpha);
+    A1Inversional.setAlpha(gModAlpha);
+    A1AnchorScaleCB.setAlpha(gModAlpha);
+    A1FundamentalCB.setAlpha(gModAlpha);
+    A1ClusterThresh->setAlpha(gModAlpha);
+    A1ClusterMax->setAlpha(gModAlpha);
+    absoluteKeyboard.setAlpha(gModAlpha);
+    customKeyboard.setAlpha(gModAlpha);
+    offsetSlider->setAlpha(gModAlpha);
+    A1IntervalScaleLabel.setAlpha(gModAlpha);
+    A1AnchorScaleLabel.setAlpha(gModAlpha);
+}
+
+void TuningModificationEditor::highlightModedComponents()
+{
+    TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
+    
+    if(mod->getParam(TuningScale) != "")                scaleCB.setAlpha(1.);
+    if(mod->getParam(TuningFundamental) != "")          fundamentalCB.setAlpha(1);
+    if(mod->getParam(TuningA1IntervalScale) != "")      { A1IntervalScaleCB.setAlpha(1); A1IntervalScaleLabel.setAlpha(1); }
+    if(mod->getParam(TuningA1Inversional) != "")        A1Inversional.setAlpha(1);
+    if(mod->getParam(TuningA1AnchorScale) != "")        { A1AnchorScaleCB.setAlpha(1); A1AnchorScaleLabel.setAlpha(1); }
+    if(mod->getParam(TuningA1AnchorFundamental) != "")  A1FundamentalCB.setAlpha(1);
+    if(mod->getParam(TuningA1ClusterThresh) != "")      A1ClusterThresh->setAlpha(1);
+    //if(mod->getParam(TuningScale) != "")                A1ClusterMax->setAlpha(1);
+    if(mod->getParam(TuningAbsoluteOffsets) != "")      absoluteKeyboard.setAlpha(1);
+    if(mod->getParam(TuningCustomScale) != "")                customKeyboard.setAlpha(1);
+    if(mod->getParam(TuningOffset) != "")               offsetSlider->setAlpha(1);
+}
 
 void TuningModificationEditor::update(void)
 {
@@ -623,6 +650,9 @@ void TuningModificationEditor::update(void)
     if (mod != nullptr)
     {
         fillSelectCB();
+        
+        greyOutAllComponents();
+        highlightModedComponents();
         
         selectCB.setSelectedItemIndex(processor.updateState->currentModTuningId, dontSendNotification);
         
@@ -641,6 +671,9 @@ void TuningModificationEditor::update(void)
         val = mod->getParam(TuningAbsoluteOffsets);
         absoluteKeyboard.setValues(stringToFloatArray(val));
         //                       absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
+        
+        val = mod->getParam(TuningCustomScale);
+        customKeyboard.setValues(stringToFloatArray(val));
         
         val = mod->getParam(TuningA1IntervalScale);
         A1IntervalScaleCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
@@ -662,8 +695,8 @@ void TuningModificationEditor::update(void)
         A1ClusterThresh->setValue(val.getLargeIntValue(), dontSendNotification);
         //                       A1ClusterThresh->setValue(prep->getAdaptiveClusterThresh(), dontSendNotification);
         
-        val = mod->getParam(TuningA1ClusterThresh);
-        A1ClusterMax->setValue(val.getIntValue(), dontSendNotification);
+        //val = mod->getParam(TuningA1ClusterMax);
+        //A1ClusterMax->setValue(val.getIntValue(), dontSendNotification);
         //                       A1ClusterMax->setValue(prep->getAdaptiveHistory(), dontSendNotification);
         
         updateComponentVisibility();
@@ -726,27 +759,34 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
     if (name == scaleCB.getName())
     {
         mod->setParam(TuningScale, String(scaleCB.getSelectedItemIndex()));
+        scaleCB.setAlpha(1.);
         
         Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         customKeyboard.setValues(currentTuning->getCurrentScaleCents());
     }
     else if (name == fundamentalCB.getName())
     {
-        mod->setParam(TuningScale, String(fundamentalCB.getSelectedItemIndex()));
+        mod->setParam(TuningFundamental, String(fundamentalCB.getSelectedItemIndex()));
+        fundamentalCB.setAlpha(1.);
         
         customKeyboard.setFundamental(fundamentalCB.getSelectedItemIndex());
     }
     else if (name == A1IntervalScaleCB.getName())
     {
         mod->setParam(TuningA1IntervalScale, String(A1IntervalScaleCB.getSelectedItemIndex()));
+        A1IntervalScaleCB.setAlpha(1.);
+        A1IntervalScaleLabel.setAlpha(1);
     }
     else if (name == A1AnchorScaleCB.getName())
     {
         mod->setParam(TuningA1AnchorScale, String(A1AnchorScaleCB.getSelectedItemIndex()));
+        A1AnchorScaleCB.setAlpha(1.);
+        A1AnchorScaleLabel.setAlpha(1);
     }
     else if (name == A1FundamentalCB.getName())
     {
         mod->setParam(TuningA1AnchorFundamental, String(A1FundamentalCB.getSelectedItemIndex()));
+        A1FundamentalCB.setAlpha(1.);
     }
     
     updateModification();
@@ -768,6 +808,8 @@ void TuningModificationEditor::keyboardSliderChanged(String name, Array<float> v
     if(name == absoluteKeyboard.getName())
     {
         mod->setParam(TuningAbsoluteOffsets, floatArrayToString(values));
+        absoluteKeyboard.setAlpha(1.);
+        
     }
     else if(name == customKeyboard.getName())
     {
@@ -775,6 +817,7 @@ void TuningModificationEditor::keyboardSliderChanged(String name, Array<float> v
         
         mod->setParam(TuningCustomScale, floatArrayToString(values));
         mod->setParam(TuningScale, String(customIndex));
+        customKeyboard.setAlpha(1.);
     }
     
     updateModification();
@@ -786,15 +829,18 @@ void TuningModificationEditor::BKSingleSliderValueChanged(String name, double va
     
     if(name == offsetSlider->getName())
     {
-        mod->setParam(TuningOffset, String(val));
+        mod->setParam(TuningOffset, String(val * 0.01));
+        offsetSlider->setAlpha(1.);
     }
     else if(name == A1ClusterThresh->getName())
     {
         mod->setParam(TuningA1ClusterThresh, String(val));
+        A1ClusterThresh->setAlpha(1.);
     }
     else if(name == A1ClusterMax->getName())
     {
         mod->setParam(TuningA1History, String(val));
+        A1ClusterMax->setAlpha(1.);
     }
     
     updateModification();
@@ -812,6 +858,7 @@ void TuningModificationEditor::buttonClicked (Button* b)
     if (b == &A1Inversional)
     {
         mod->setParam(TuningA1Inversional, String(A1Inversional.getToggleState()));
+        A1Inversional.setAlpha(1.);
     }
     else if (b == &A1reset)
     {

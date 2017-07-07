@@ -64,6 +64,10 @@ protected:
     BKKeyboardSlider absoluteKeyboard;
     BKKeyboardSlider customKeyboard;
     
+    ImageComponent iconImageComponent;
+    TextButton hideOrShow;
+    BKButtonAndMenuLAF buttonsAndMenusLAF;
+
     //other overrides
     
     void fillTuningCB(void);
@@ -131,6 +135,8 @@ private:
     void keyboardSliderChanged(String name, Array<float> values) override;
     
     void fillSelectCB(void);
+    void greyOutAllComponents();
+    void highlightModedComponents();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningModificationEditor)
     
