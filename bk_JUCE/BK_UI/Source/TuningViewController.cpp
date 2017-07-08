@@ -637,9 +637,9 @@ void TuningModificationEditor::highlightModedComponents()
     if(mod->getParam(TuningA1AnchorScale) != "")        { A1AnchorScaleCB.setAlpha(1); A1AnchorScaleLabel.setAlpha(1); }
     if(mod->getParam(TuningA1AnchorFundamental) != "")  A1FundamentalCB.setAlpha(1);
     if(mod->getParam(TuningA1ClusterThresh) != "")      A1ClusterThresh->setAlpha(1);
-    //if(mod->getParam(TuningScale) != "")                A1ClusterMax->setAlpha(1);
+    if(mod->getParam(TuningA1History) != "")            A1ClusterMax->setAlpha(1);
     if(mod->getParam(TuningAbsoluteOffsets) != "")      absoluteKeyboard.setAlpha(1);
-    if(mod->getParam(TuningCustomScale) != "")                customKeyboard.setAlpha(1);
+    if(mod->getParam(TuningCustomScale) != "")          customKeyboard.setAlpha(1);
     if(mod->getParam(TuningOffset) != "")               offsetSlider->setAlpha(1);
 }
 
@@ -695,8 +695,8 @@ void TuningModificationEditor::update(void)
         A1ClusterThresh->setValue(val.getLargeIntValue(), dontSendNotification);
         //                       A1ClusterThresh->setValue(prep->getAdaptiveClusterThresh(), dontSendNotification);
         
-        //val = mod->getParam(TuningA1ClusterMax);
-        //A1ClusterMax->setValue(val.getIntValue(), dontSendNotification);
+        val = mod->getParam(TuningA1History);
+        A1ClusterMax->setValue(val.getIntValue(), dontSendNotification);
         //                       A1ClusterMax->setValue(prep->getAdaptiveHistory(), dontSendNotification);
         
         updateComponentVisibility();

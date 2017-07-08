@@ -102,6 +102,7 @@ BKKeymapKeyboardComponent::~BKKeymapKeyboardComponent()
 }
 
 //==============================================================================
+
 void BKKeymapKeyboardComponent::setKeyWidth (const float widthInPixels)
 {
     jassert (widthInPixels > 0);
@@ -976,6 +977,11 @@ float BKKeymapKeyboardComponent::getLastNoteOverValue()
         return (keyValues.getUnchecked(lastNoteOver));
     
     return 0.;
+}
+
+void BKKeymapKeyboardComponent::clearKeyValues()
+{
+    for (int i = 0; i < 128; i++) keyValues.set(i, 0.);
 }
 
 void BKKeymapKeyboardComponent::setFundamental(int fund)
