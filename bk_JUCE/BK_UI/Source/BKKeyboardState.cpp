@@ -118,6 +118,9 @@ void BKKeymapKeyboardState::noteOnInternal  (const int midiChannel, const int mi
     if (isPositiveAndBelow (midiNoteNumber, (int) 128))
     {
         noteStates [midiNoteNumber] |= (1 << (midiChannel - 1));
+        
+        for (int i = listeners.size(); --i >= 0;)
+            listeners.getUnchecked(i)->handleNoteOn(this, midiNoteNumber, velocity);
     }
 }
 
@@ -141,6 +144,9 @@ void BKKeymapKeyboardState::noteOffInternal  (const int midiChannel, const int m
     if (isNoteOn (midiChannel, midiNoteNumber))
     {
         noteStates [midiNoteNumber] &= ~(1 << (midiChannel - 1));
+        
+        for (int i = listeners.size(); --i >= 0;)
+            listeners.getUnchecked(i)->handleNoteOff(this, midiNoteNumber, velocity);
     }
 }
 

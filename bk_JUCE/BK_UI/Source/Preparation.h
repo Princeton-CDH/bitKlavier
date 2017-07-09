@@ -1297,7 +1297,8 @@ public:
     
     ModificationMapper(BKPreparationType type, int Id):
     type(type),
-    Id(Id)
+    Id(Id),
+    piano(-1)
     {
         for (int i = 0; i < 5; i++) resets.add(Array<int>());
     }
@@ -1307,7 +1308,8 @@ public:
     type(type),
     Id(Id),
     keymaps(keymaps),
-    targets(targets)
+    targets(targets),
+    piano(-1)
     {
         for (int i = 0; i < 5; i++) resets.add(Array<int>());
     }
@@ -1348,6 +1350,7 @@ public:
     inline void clearTargets(void) {targets.clear();}
     
     Array<Array<int>> resets;
+    int piano;
     
 private:
     BKPreparationType type;

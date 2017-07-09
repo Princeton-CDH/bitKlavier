@@ -176,6 +176,10 @@ void Piano::deconfigureModification(ModificationMapper::Ptr map)
     int Id = map->getId();
     
     if (type == BKPreparationTypeNil) return;
+    else if (type == PreparationTypePianoMap)
+    {
+        deconfigurePianoMap(whichKeymaps, map->piano);
+    }
     else if (type == PreparationTypeReset)
     {
         deconfigureResets(map->resets, whichKeymaps);
@@ -320,6 +324,10 @@ void Piano::configureModification(ModificationMapper::Ptr map)
     int Id = map->getId();
     
     if (type == BKPreparationTypeNil) return;
+    else if (type == PreparationTypePianoMap)
+    {
+        configurePianoMap(whichKeymaps, map->piano);
+    }
     else if (type == PreparationTypeReset)
     {
         configureResets(map->resets, whichKeymaps, whichPreps);
@@ -742,6 +750,8 @@ ValueTree Piano::getState(void)
         
         mapVT.setProperty("Id", map->getId(), 0);
         
+        mapVT.setProperty("piano", map->piano,0);
+        
         int pcount = 0;
         for (auto keymap : map->getKeymaps())
         {
@@ -805,6 +815,9 @@ void Piano::setState(XmlElement* e)
             i = pc->getStringAttribute("Id").getIntValue();
             int thisId = i;
             
+            i = pc->getStringAttribute("piano").getIntValue();
+            int piano = i;
+            
             Array<int> keymaps;
             for (int k = 0; k < 500; k++) // arbitrary
             {
@@ -824,6 +837,7 @@ void Piano::setState(XmlElement* e)
             }
             
             ModificationMapper::Ptr mapper = new ModificationMapper(type, thisId, keymaps, targets);
+            mapper->piano = piano;
             
             int resetCount = 0;
             forEachXmlChildElement (*pc, sub)

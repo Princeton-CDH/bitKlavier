@@ -154,7 +154,7 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
     }
     else if (result == 2) // Remove piano
     {
-        int pianoId = hvc->pianoCB.getSelectedId()-1;
+        int pianoId = hvc->pianoCB.getSelectedItemIndex();
         
         hvc->processor.gallery->removePiano(pianoId);
         
@@ -239,14 +239,21 @@ void HeaderViewController::update(void)
 
 void HeaderViewController::switchGallery()
 {
+    fillPianoCB();
+    fillGalleryCB();
+    
+    
+}
+
+void HeaderViewController::fillPianoCB(void)
+{
     pianoCB.clear(dontSendNotification);
     for (int i = 0; i < processor.gallery->getPianos().size(); i++)     pianoCB.addItem(processor.gallery->getPiano(i)->getName(), i+1);
     pianoCB.addItem("New piano...", processor.gallery->getPianos().size()+1);
     
-    pianoCB.setSelectedId(1, dontSendNotification);
     
-    fillGalleryCB();
-    
+    int itemIndex = processor.gallery->getIndexFromId(PreparationTypePiano, processor.currentPiano->getId());
+    pianoCB.setSelectedItemIndex(itemIndex, dontSendNotification);
     
 }
 
@@ -267,32 +274,32 @@ void HeaderViewController::bkComboBoxDidChange            (ComboBox* cb)
 {
     // Change piano
     String name = cb->getName();
-    int selectedId = cb->getSelectedId();
+    int selected = cb->getSelectedItemIndex();
     
     if (name == "pianoCB")
     {
         // Add piano if New piano... pressed.
-        if (selectedId == pianoCB.getNumItems())
+        if (selected == pianoCB.getNumItems())
         {
             processor.gallery->addPiano();
             
             String newName = "Piano"+String(processor.gallery->getPianos().size());
             
-            pianoCB.changeItemText(selectedId, newName);
+            pianoCB.changeItemText(selected, newName);
             processor.gallery->getPianos().getLast()->setName(newName);
             
-            pianoCB.setSelectedId(selectedId);
+            pianoCB.setSelectedItemIndex(selected);
             
-            pianoCB.addItem("New piano...", selectedId+1);
+            pianoCB.addItem("New piano...", selected+1);
         }
         
-        processor.setCurrentPiano(selectedId-1);
+        processor.setCurrentPiano(selected);
         
         
     }
     else if (name == "galleryCB")
     {
-        String path = processor.galleryNames[selectedId-1];
+        String path = processor.galleryNames[selected];
         if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
         else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
     }

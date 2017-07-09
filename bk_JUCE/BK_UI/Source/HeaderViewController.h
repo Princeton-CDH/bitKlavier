@@ -26,6 +26,7 @@ public:
     
     void update(void);
     void fillGalleryCB(void);
+    void fillPianoCB(void);
     
     //==============================================================================
     void paint (Graphics&) override;

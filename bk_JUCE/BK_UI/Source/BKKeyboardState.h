@@ -31,11 +31,16 @@ public:
     BKKeymapKeyboardStateListener() noexcept        {}
     virtual ~BKKeymapKeyboardStateListener()        {}
     
-    virtual void handleKeymapNoteOn(BKKeymapKeyboardState* source, int midiNoteNumber) = 0;
     
-    virtual void handleKeymapNoteOff(BKKeymapKeyboardState* source, int midiNoteNumber) = 0;
+    virtual void handleNoteOn(BKKeymapKeyboardState* source, int midiNoteNumber, float velocity) {};
     
-    virtual void handleKeymapNoteToggled(BKKeymapKeyboardState* source, int midiNoteNumber) = 0;
+    virtual void handleNoteOff(BKKeymapKeyboardState* source, int midiNoteNumber, float velocity) {};
+    
+    virtual void handleKeymapNoteOn(BKKeymapKeyboardState* source, int midiNoteNumber) {};
+    
+    virtual void handleKeymapNoteOff(BKKeymapKeyboardState* source, int midiNoteNumber) {};
+    
+    virtual void handleKeymapNoteToggled(BKKeymapKeyboardState* source, int midiNoteNumber) {};
     
 };
 

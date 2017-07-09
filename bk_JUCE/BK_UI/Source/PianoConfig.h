@@ -96,6 +96,11 @@ public:
     
     inline void addItem(BKPreparationType type, int Id)
     {
+        for (auto item : items)
+        {
+            if (item->getType() == type && item->getId() == Id) return;
+        }
+        
         items.add(new ItemConfiguration(type, Id));
     }
     

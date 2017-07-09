@@ -1004,15 +1004,17 @@ void BKKeymapKeyboardComponent::setFundamental(int fund)
 }
 
 // FLESH THESE OUT TO ALLOW FOR DRAGGING
-bool BKKeymapKeyboardComponent::mouseDownOnKey    (int midiNoteNumber, const MouseEvent&)
+bool BKKeymapKeyboardComponent::mouseDownOnKey    (int midiNoteNumber, const MouseEvent& e)
 {
+    lastNoteOn = midiNoteNumber;
+    
     if (lastKeySelected == -1)
     {
         lastKeySelected = midiNoteNumber;
     }
     //DBG("mouseDownOnKey " + String(midiNoteNumber));
     state.addToKeymap(midiNoteNumber);
-    
+
     return true;
 }
 
@@ -1030,6 +1032,8 @@ void BKKeymapKeyboardComponent::mouseDraggedToKey (int midiNoteNumber, const Mou
         state.removeFromKeymap(lastKeySelected);
         lastKeySelected = midiNoteNumber;
     }
+    
+    lastNoteOn = midiNoteNumber;
 }
 
 void BKKeymapKeyboardComponent::mouseUpOnKey      (int midiNoteNumber, const MouseEvent&)

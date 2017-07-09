@@ -251,6 +251,7 @@ public:
         else                        name = String(Id);
         
         f = e->getStringAttribute(ptagTempo_tempo).getFloatValue();
+        DBG("new tempo::: " + String(f));
         sPrep->setTempo(f);
         
         i = e->getStringAttribute(ptagTempo_system).getIntValue();

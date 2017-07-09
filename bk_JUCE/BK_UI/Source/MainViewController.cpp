@@ -177,19 +177,14 @@ void MainViewController::sliderValueChanged (Slider* slider)
     }
 }
 
-void MainViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber)
-{
-    DBG("MainViewController::handleKeymapNoteToggled " + String(midiNoteNumber));
-}
 
-void MainViewController::handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber)
+void MainViewController::handleNoteOn(BKKeymapKeyboardState* source, int midiNoteNumber, float velocity) 
 {
     DBG("MainViewController::handleKeymapNoteOn " + String(midiNoteNumber));
     processor.noteOnUI(midiNoteNumber);
 }
 
-
-void MainViewController::handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber)
+void MainViewController::handleNoteOff(BKKeymapKeyboardState* source, int midiNoteNumber, float velocity)
 {
     DBG("MainViewController::handleKeymapNoteOff " + String(midiNoteNumber));
     processor.noteOffUI(midiNoteNumber);
@@ -378,6 +373,8 @@ void MainViewController::timerCallback()
         state->pianoDidChangeForGraph = false;
         
         construction.redraw();
+        
+        header.fillPianoCB();
     }
     
     

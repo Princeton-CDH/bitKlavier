@@ -73,9 +73,14 @@ private:
     BKKeymapKeyboardState keyboardState;
     Component *keyboardComponent;
     
+    /*
     void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber) override;
+    */
+    
+    void handleNoteOn(BKKeymapKeyboardState* source, int midiNoteNumber, float velocity) override;
+    void handleNoteOff(BKKeymapKeyboardState* source, int midiNoteNumber, float velocity) override;
     
     void timerCallback() override;
     

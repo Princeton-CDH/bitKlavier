@@ -402,7 +402,10 @@ private:
     //==============================================================================
     friend class BKKeymapKeyboardUpDownButton;
     
+    bool isKeymapKeyboard;
+    
     int firstKeyDown, lastKeyDown;
+    int lastNoteOn;
     int lastKeySelected;
     Array<int> keysSelected;
     Array<float> keyValues;

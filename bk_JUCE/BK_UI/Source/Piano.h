@@ -137,36 +137,33 @@ public:
         
     }
     
-    inline void configurePianoMap(Keymap::Ptr thisKeymap, int pianoId)
+    inline void configurePianoMap(Array<int> keymaps, int pianoId)
     {
-        for (auto key : thisKeymap->keys())
+        for (auto keymapId : keymaps)
         {
-            pianoMap.set(key, pianoId);
-            
-            DBG("key: " + String(key) + " piano: " + String(pianoId));
+            Keymap::Ptr thisKeymap = getKeymap(keymapId);
+            for (auto key : thisKeymap->keys())
+            {
+                pianoMap.set(key, pianoId);
+                
+                DBG("key: " + String(key) + " piano: " + String(pianoId));
+            }
         }
-    
     }
     
-    inline void deconfigurePianoMap(Keymap::Ptr thisKeymap, int pianoId)
+    inline void deconfigurePianoMap(Array<int> keymaps, int pianoId)
     {
-        Array<int> pianos = pianoMaps.getUnchecked(thisKeymap->getId());
-        
-        int count = 0;
-        for (auto piano : pianos)
+        for (auto keymapId : keymaps)
         {
-            if (piano == pianoId) pianos.remove(count);
-            count++;
-        }
+            Keymap::Ptr thisKeymap = getKeymap(keymapId);
         
-        pianoMaps.set(thisKeymap->getId(), pianos);
-        
+            for (auto key : thisKeymap->keys())
+            {
+                pianoMap.set(key, -1);
+            }
             
-        for (auto key: thisKeymap->keys())
-            pianoMap.set(key, -1);
+        }
     }
-
-    
     
     String modificationMapsToString(void)
     {

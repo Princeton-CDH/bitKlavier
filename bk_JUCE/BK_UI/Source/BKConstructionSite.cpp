@@ -171,7 +171,7 @@ void BKConstructionSite::itemIsBeingDragged(BKItem* thisItem, Point<int> startPo
 
 void BKConstructionSite::pianoMapDidChange(BKItem* thisItem)
 {
-    graph->update(PreparationTypePianoMap,thisItem->getId());
+    graph->update(PreparationTypePianoMap, thisItem->getId());
 }
 
 void BKConstructionSite::draw(void)
@@ -334,6 +334,8 @@ void BKConstructionSite::addItem(BKPreparationType type)
     BKItem::Ptr toAdd = new BKItem(type, thisId, processor);
     
     toAdd->setTopLeftPosition(lastX, lastY);
+    
+    processor.currentPiano->configuration->addItem(type, thisId, lastX, lastY);
     
     lastX += 10; lastY += 10;
     

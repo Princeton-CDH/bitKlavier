@@ -51,25 +51,7 @@ mapper(new ModificationMapper(BKPreparationTypeNil, -1))
     {
         setImage(ImageCache::getFromMemory(BinaryData::keymap_icon_png, BinaryData::keymap_icon_pngSize));
     }
-    else if (type == PreparationTypePianoMap)
-    {
-        setImage(ImageCache::getFromMemory(BinaryData::piano_icon_png, BinaryData::piano_icon_pngSize));
-        
-        addAndMakeVisible(menu);
-        
-        menu.setName(cPreparationTypes[type]);
-        menu.addListener(this);
-        
-        Piano::PtrArr pianos = processor.gallery->getPianos();
-        for (int i = 0; i < pianos.size(); i++)
-        {
-            menu.addItem(pianos[i]->getName(), i+1);
-            menu.addSeparator();
-        }
-    
-        menu.setSelectedId(0, NotificationType::dontSendNotification);
-    }
-    else if (type == PreparationTypeGenericMod || (type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod) || type == PreparationTypeReset)
+    else if (type == PreparationTypePianoMap || type == PreparationTypeGenericMod || (type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod) || type == PreparationTypeReset)
     {
         setType(type, false);
     }
@@ -150,6 +132,28 @@ void BKItem::setType(BKPreparationType newType, bool create)
     else if (type == PreparationTypeTempoMod)
     {
         setImage(ImageCache::getFromMemory(BinaryData::mod_tempo_icon_png, BinaryData::mod_tempo_icon_pngSize));
+    }
+    else if (type == PreparationTypePianoMap)
+    {
+        mapper->setType(PreparationTypePianoMap);
+        mapper->piano = processor.currentPiano->getId();
+        
+        setImage(ImageCache::getFromMemory(BinaryData::piano_icon_png, BinaryData::piano_icon_pngSize));
+        
+        addAndMakeVisible(menu);
+        
+        menu.setName(cPreparationTypes[type]);
+        menu.addListener(this);
+        
+        Piano::PtrArr pianos = processor.gallery->getPianos();
+        for (int i = 0; i < pianos.size(); i++)
+        {
+            menu.addItem(pianos[i]->getName(), i+1);
+            menu.addSeparator();
+        }
+        
+        menu.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypePiano, processor.currentPiano->getId()),
+                                  NotificationType::dontSendNotification);
     }
     
     if (type != PreparationTypeGenericMod)
@@ -237,23 +241,25 @@ void BKItem::copy(BKItem::Ptr itemToCopy)
     position = itemToCopy->getPosition();
     type = itemToCopy->getType();
     Id = itemToCopy->getId();
-    currentId = itemToCopy->getSelectedId();
+    currentId = itemToCopy->getSelectedPianoId();
     mapper = itemToCopy->getMapper();
 }
 
 void BKItem::bkComboBoxDidChange    (ComboBox* cb)
 {
     String name = cb->getName();
-    int Id = cb->getSelectedId();
+    int pianoId = cb->getSelectedItemIndex();
+    
     if (name == "PianoMap")
     {
-        if (Id != currentId)
+        if (pianoId != currentId)
         {
-            currentId = Id;
-            
-            ((BKConstructionSite*)getParentComponent())->pianoMapDidChange(this);
+            currentId = pianoId;
             
             mapper->addTarget(currentId);
+            mapper->piano = currentId;
+            
+            ((BKConstructionSite*)getParentComponent())->pianoMapDidChange(this);
             
             DBG("New piano selected: "+String(currentId));
         }
@@ -424,8 +430,6 @@ void BKItemGraph::add(BKItem* itemToAdd)
     processor.updateState->addActive(itemToAdd->getType(), itemToAdd->getId());
     items.add(itemToAdd);
     processor.currentPiano->configuration->addItem(itemToAdd->getType(), itemToAdd->getId());
-    
-    
 }
 
 BKItem* BKItemGraph::get(BKPreparationType type, int Id)
@@ -738,18 +742,17 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
     if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypePianoMap)
     {
         Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item1Id);
-        int pianoId = item2->getSelectedId();
         
         ModificationMapper::Ptr thisMapper = item2->getMapper();
         
         if (connect)
         {
             thisMapper->addKeymap(item1Id);
-            processor.currentPiano->configurePianoMap(thisKeymap, pianoId);
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigurePianoMap(thisKeymap, pianoId);
+            processor.currentPiano->deconfigureModification(thisMapper);
             thisMapper->clearKeymaps();
         }
         
@@ -763,11 +766,11 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
         if (connect)
         {
             thisMapper->addKeymap(item2Id);
-            processor.currentPiano->configurePianoMap(thisKeymap, thisMapper->getTargets().getFirst());
+            processor.currentPiano->configureModification(thisMapper);
         }
         else
         {
-            processor.currentPiano->deconfigurePianoMap(thisKeymap, thisMapper->getTargets().getFirst());
+            processor.currentPiano->deconfigureModification(thisMapper);
             thisMapper->clearKeymaps();
         }
     }
@@ -984,9 +987,9 @@ void BKItemGraph::reconnect(BKItem* item1, BKItem* item2)
 void BKItemGraph::update(BKPreparationType type, int Id)
 {
     // Only applies to Keymaps and Modification types, so as to make sure that when ModPreparations are changed, so are the Modifications.
-    // Also applies to Resets and PianoMaps.
+    // Also applies to PianoMaps.
 
-    if (type == PreparationTypeKeymap || type == PreparationTypePianoMap) // All the mods
+    if (type == PreparationTypeKeymap || type == PreparationTypePianoMap || (type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod)) // All the mods
     {
         for (auto item : items)
         {
@@ -1352,123 +1355,83 @@ void BKItemGraph::reconstruct(void)
         
     for (auto map : thisPiano->getMappers())
     {
+        
+        BKPreparationType modType = map->getType();
         int Id = map->getId();
-        BKPreparationType targetType = map->getType();
         Array<int> targetIds = map->getTargets();
         Array<int> keymaps = map->getKeymaps();
+        int piano = map->piano;
         
         Array< Array<int>> resets = map->resets;
         
-        BKPreparationType itemType = (targetType == PreparationTypeReset) ? targetType : getModType(targetType);
+        BKPreparationType itemType = (modType == PreparationTypeReset || modType == PreparationTypePianoMap) ? modType : getModType(modType);
         
         BKItem* thisMod = itemWithTypeAndId(itemType, Id);
         
-        if (thisMod == nullptr)
-        {
-            thisMod = new BKItem(itemType, Id, processor);
-            thisMod->setType(itemType, false);
-        }
+        if (thisMod == nullptr) thisMod = new BKItem(itemType, Id, processor);
+        
+        thisMod->setSelectedPianoId(piano);
         
         thisMod->setMapper(map);
         
-        if (!contains(thisMod)) add(thisMod);
-        else    continue;
         
-        for (auto k : keymaps)
-        {
-            BKItem* thisKeymap = itemWithTypeAndId(PreparationTypeKeymap, k);
-            
-            if (thisKeymap == nullptr) thisKeymap = new BKItem(PreparationTypeKeymap, k, processor);
-            
-            if (!contains(thisKeymap)) add(thisKeymap);
-            
-            connectUI(thisKeymap, thisMod);
-        }
         
-        if (map->getType() != PreparationTypeReset)
+        if (!contains(thisMod))
         {
-            for (auto t : targetIds)
+            add(thisMod);
+            
+            if (thisMod->getType() == PreparationTypePianoMap) DBG("HOLY SHIT ADDING PIANO!");
+            
+            for (auto k : keymaps)
             {
-                BKItem* thisTarget;
+                BKItem* thisKeymap = itemWithTypeAndId(PreparationTypeKeymap, k);
                 
-                thisTarget = itemWithTypeAndId(targetType, t);
+                if (thisKeymap == nullptr) thisKeymap = new BKItem(PreparationTypeKeymap, k, processor);
                 
-                if (thisTarget == nullptr) thisTarget = new BKItem(getModType(targetType), t, processor);
+                if (!contains(thisKeymap)) add(thisKeymap);
                 
-                if (!contains(thisTarget)) add(thisTarget);
-                
-                connectUI(thisTarget, thisMod);
+                connectUI(thisKeymap, thisMod);
             }
-        }
-        else
-        {
-            for (int rtype = 0; rtype < 5; rtype++)
+            
+            if (map->getType() >= PreparationTypeDirect && map->getType() <= PreparationTypeTempo)
             {
-                Array<int> theseResets = map->resets.getUnchecked(rtype);
-                
-                for (auto t : theseResets)
+                for (auto t : targetIds)
                 {
                     BKItem* thisTarget;
                     
-                    thisTarget = itemWithTypeAndId((BKPreparationType)rtype, t);
+                    thisTarget = itemWithTypeAndId(modType, t);
                     
-                    if (thisTarget == nullptr) thisTarget = new BKItem((BKPreparationType)rtype, t, processor);
+                    if (thisTarget == nullptr) thisTarget = new BKItem(getModType(modType), t, processor);
                     
                     if (!contains(thisTarget)) add(thisTarget);
                     
                     connectUI(thisTarget, thisMod);
                 }
             }
-        }
-        
-    }
-    
-    Array<int> pianoMap = thisPiano->pianoMap;
-    int count = 0;
-    for (int i = 0; i < 128; i++)
-    {
-        if (pianoMap[i] != -1)
-        {
-            BKItem* thisMap = itemWithTypeAndId(PreparationTypePianoMap, count);
-            
-            // continue here if (thisMap == nullptr
-            if (thisMap == nullptr) thisMap = new BKItem(PreparationTypePianoMap, count, processor);
-            
-            count++;
-            
-            if (!contains(thisMap)) add(thisMap);
-            
-            thisMap->setSelectedId(pianoMap[i]);
-            
-            Keymap::PtrArr keymaps = processor.gallery->getKeymaps();
-            
-            Keymap::Ptr newKeymap = new Keymap(keymaps.size());
-            newKeymap->addNote(i);
-            
-            bool found = false;
-            
-            for (auto keymap : keymaps)
+            else if (map->getType() == PreparationTypeReset)
             {
-                if (newKeymap->compare(keymap))
+                for (int rtype = 0; rtype < 5; rtype++)
                 {
-                    newKeymap = keymap;
-                    found = true;
-                    break;
+                    Array<int> theseResets = map->resets.getUnchecked(rtype);
+                    
+                    for (auto t : theseResets)
+                    {
+                        BKItem* thisTarget;
+                        
+                        thisTarget = itemWithTypeAndId((BKPreparationType)rtype, t);
+                        
+                        if (thisTarget == nullptr) thisTarget = new BKItem((BKPreparationType)rtype, t, processor);
+                        
+                        if (!contains(thisTarget)) add(thisTarget);
+                        
+                        connectUI(thisTarget, thisMod);
+                    }
                 }
             }
-            
-            if (!found) processor.gallery->addKeymap(newKeymap);
-            
-            BKItem* thisKeymap = itemWithTypeAndId(PreparationTypeKeymap, newKeymap->getId());
-            
-            if (thisKeymap == nullptr) thisKeymap = new BKItem(PreparationTypeKeymap, newKeymap->getId(), processor);
-            if (!contains(thisKeymap)) add(thisKeymap);
-            
-            connectUI(thisMap, thisKeymap);
         }
+        
+        
     }
-    
-    DBG("active::: " + arrayIntArrayToString(processor.updateState->active));
     
 }
 

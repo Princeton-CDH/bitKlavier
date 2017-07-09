@@ -14,7 +14,8 @@ PreparationMap::PreparationMap(Keymap::Ptr km,
                                int Id):
 isActive(false),
 Id(Id),
-pKeymap(km)
+pKeymap(km),
+sustainPedalIsDepressed(false)
 {
 
 }
