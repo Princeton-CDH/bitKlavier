@@ -382,6 +382,7 @@ void BKKeyboardSlider::setValues(Array<float> newvals)
 {
     int fund = keyboard->getFundamental();
     keyboard->setFundamental(0);
+    keyboard->clearKeyValues();
     
     int valCounter = 0;
     

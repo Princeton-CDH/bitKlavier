@@ -265,6 +265,8 @@ public:
     void setFundamental(int fund);
     int getFundamental() { return fundamental; }
     
+    void clearKeyValues();
+    
     bool isFundamental(int note)
     {
         if(note == fundamental) return true;
