@@ -445,6 +445,8 @@ bool BKItemGraph::contains(BKItem* thisItem)
     bool alreadyThere = false;
     for (auto item : items)
     {
+        if (item->getType() == BKPreparationTypeNil) continue;
+        
         if ((item->getType() == thisItem->getType()) && (item->getId() == thisItem->getId()))
         {
             alreadyThere = true;
@@ -1201,6 +1203,8 @@ void BKItemGraph::reconstruct(void)
             
             newPreparation = itemWithTypeAndId(PreparationTypeTuning, Id);
             
+            if (newPreparation == nullptr) newPreparation = new BKItem(PreparationTypeTuning, Id, processor);
+            
             if (!contains(newPreparation))
             {
                 add(newPreparation);
@@ -1425,9 +1429,12 @@ void BKItemGraph::reconstruct(void)
     {
         if (pianoMap[i] != -1)
         {
-            BKItem* thisMap = itemWithTypeAndId(PreparationTypePianoMap, count++);
+            BKItem* thisMap = itemWithTypeAndId(PreparationTypePianoMap, count);
             
             // continue here if (thisMap == nullptr
+            if (thisMap == nullptr) thisMap = new BKItem(PreparationTypePianoMap, count, processor);
+            
+            count++;
             
             if (!contains(thisMap)) add(thisMap);
             
@@ -1454,6 +1461,7 @@ void BKItemGraph::reconstruct(void)
             
             BKItem* thisKeymap = itemWithTypeAndId(PreparationTypeKeymap, newKeymap->getId());
             
+            if (thisKeymap == nullptr) thisKeymap = new BKItem(PreparationTypeKeymap, newKeymap->getId(), processor);
             if (!contains(thisKeymap)) add(thisKeymap);
             
             connectUI(thisMap, thisKeymap);

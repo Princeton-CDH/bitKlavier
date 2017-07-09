@@ -214,7 +214,6 @@ SynchronicViewController(p, theGraph)
 
 void SynchronicPreparationEditor::timerCallback()
 {
-    DBG("synchronic processor: " + String(processor.updateState->currentSynchronicId));
     SynchronicProcessor::Ptr sProcessor = processor.gallery->getSynchronicProcessor(processor.updateState->currentSynchronicId);
 
     for (int i = 0; i < paramSliders.size(); i++)

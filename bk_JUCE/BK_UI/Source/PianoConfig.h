@@ -158,6 +158,7 @@ public:
     
     inline void print(void)
     {
+        DBG("PIANO CONFIG: ");
         for (auto item : items)
         {
             DBG(String(item->getType()) + " " + String(item->getId()) + " " + String(item->getX()) + " " + String(item->getY()));

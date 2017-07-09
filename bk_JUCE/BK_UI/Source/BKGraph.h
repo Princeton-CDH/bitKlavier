@@ -53,7 +53,7 @@ public:
     void setType(BKPreparationType type, bool create);
     
 
-    inline BKPreparationType getType() const noexcept { return type; }
+    inline BKPreparationType getType(void) const noexcept { return type; }
     
     inline void setId(int newId ) { Id = newId; }
     

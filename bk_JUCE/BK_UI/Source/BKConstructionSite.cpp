@@ -10,7 +10,7 @@
 
 #include "BKConstructionSite.h"
 
-#define AUTO_DRAW 1
+#define AUTO_DRAW 0
 #define NUM_COL 6
 
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
@@ -177,6 +177,11 @@ void BKConstructionSite::pianoMapDidChange(BKItem* thisItem)
 void BKConstructionSite::draw(void)
 {
     int keymapCount = 0, prepCount = 0, otherCount = 0, modCount = 0, ttCount = 0;
+    
+#if AUTO_DRAW 
+    processor.currentPiano->configuration->clear();
+#endif
+    
     for (auto item : graph->getAllItems())
     {
         BKPreparationType type = item->getType();
@@ -277,6 +282,16 @@ void BKConstructionSite::draw(void)
         
         addAndMakeVisible(item);
     }
+    
+    for (auto item : graph->getAllItems())
+    {
+#if AUTO_DRAW
+        processor.currentPiano->configuration->addItem(item->getType(), item->getId());
+#endif
+        processor.currentPiano->configuration->setItemXY(item->getType(), item->getId(), item->getX(), item->getY());
+    }
+    
+    processor.currentPiano->configuration->print();
     
     repaint();
 }
@@ -557,6 +572,8 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
             item->isDragging = false;
         }
     }
+    
+    processor.currentPiano->configuration->print();
     
     repaint();
     
