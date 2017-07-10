@@ -96,6 +96,8 @@ public:
     
     inline void addItem(BKPreparationType type, int Id)
     {
+        if (type == BKPreparationTypeNil) return;
+        
         for (auto item : items)
         {
             if (item->getType() == type && item->getId() == Id) return;
@@ -106,7 +108,20 @@ public:
     
     inline void addItem(BKPreparationType type, int Id, int X, int Y)
     {
-        items.add(new ItemConfiguration(type, Id, X, Y));
+        if (!contains(type,Id)) items.add(new ItemConfiguration(type, Id, X, Y));
+    }
+    
+    inline bool contains(BKPreparationType type, int Id)
+    {
+        for (auto item : items)
+        {
+            if (item->getType() == type && item->getId() == Id)
+            {
+                return true;
+            }
+        }
+        
+        return false;
     }
     
     inline void removeItem(BKPreparationType type, int Id)

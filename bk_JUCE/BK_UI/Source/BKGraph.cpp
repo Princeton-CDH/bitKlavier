@@ -88,6 +88,7 @@ void BKItem::setImage(Image newImage)
 
 void BKItem::setType(BKPreparationType newType, bool create)
 {
+    
     if (type != PreparationTypeGenericMod) processor.updateState->removeActive(type, Id);
 
     if (create)
@@ -98,7 +99,7 @@ void BKItem::setType(BKPreparationType newType, bool create)
     
     type = newType;
     
-    BKPreparationType mapperType = (type == PreparationTypeGenericMod || type == PreparationTypeReset) ? type : (BKPreparationType)(type - 6);
+    BKPreparationType mapperType = (type == PreparationTypeGenericMod || type == PreparationTypeReset || type == PreparationTypePianoMap) ? type : (BKPreparationType)(type - 6);
     
     mapper->setType(mapperType);
     mapper->setId(Id);
@@ -159,6 +160,7 @@ void BKItem::setType(BKPreparationType newType, bool create)
     if (type != PreparationTypeGenericMod)
     {
         processor.updateState->addActive(type, Id);
+        processor.currentPiano->configuration->addItem(type, Id, getX(), getY());
         processor.currentPiano->addMapper(mapper);
     }
     
@@ -749,11 +751,15 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
         {
             thisMapper->addKeymap(item1Id);
             processor.currentPiano->configureModification(thisMapper);
+            
+            processor.currentPiano->addMapper(thisMapper);
         }
         else
         {
             processor.currentPiano->deconfigureModification(thisMapper);
             thisMapper->clearKeymaps();
+            
+            processor.currentPiano->removeMapper(thisMapper);
         }
         
     }
@@ -767,11 +773,15 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
         {
             thisMapper->addKeymap(item2Id);
             processor.currentPiano->configureModification(thisMapper);
+            
+            processor.currentPiano->addMapper(thisMapper);
         }
         else
         {
             processor.currentPiano->deconfigureModification(thisMapper);
             thisMapper->clearKeymaps();
+            
+            processor.currentPiano->removeMapper(thisMapper);
         }
     }
 

@@ -737,16 +737,17 @@ ValueTree Piano::getState(void)
     int mapCount = 0;
     for (auto map : mappers)
     {
-        if ((map->getType() != PreparationTypeReset) && !map->getKeymaps().size()) continue;
+        BKPreparationType type = map->getType();
+        Array<int> keymaps = map->getKeymaps();
         
-        if ((map->getType() != PreparationTypeReset) && (!map->getKeymaps().size() || !map->getTargets().size())) continue;
+        if ((type == PreparationTypeReset || type == PreparationTypePianoMap || (type >= PreparationTypeDirect && type <= PreparationTypeTempo)) && !keymaps.size()) continue;
         
-        DBG("SAVING THIS MAPPER: ");
+        DBG("SAVING THIS MAPPER: " + String(mapCount));
         map->print();
         
         ValueTree mapVT ("mapper"+String(mapCount++));
         
-        mapVT.setProperty("type", map->getType(), 0);
+        mapVT.setProperty("type", type, 0);
         
         mapVT.setProperty("Id", map->getId(), 0);
         
