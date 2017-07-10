@@ -362,6 +362,9 @@ void DirectModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == "Direct")
     {
+        
+        processor.updateState->removeActive(PreparationTypeDirectMod, processor.updateState->currentModDirectId);
+        
         processor.updateState->currentModDirectId = box->getSelectedItemIndex();
         
         processor.updateState->idDidChange = true;

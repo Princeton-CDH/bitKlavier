@@ -376,7 +376,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         processor.updateState->removeActive(PreparationTypeTuning, processor.updateState->currentTuningId);
         
         // Set new current
-        processor.updateState->currentTuningId = box->getSelectedItemIndex();
+        processor.updateState->currentTuningId = processor.gallery->getIdFromIndex(PreparationTypeTuning, box->getSelectedItemIndex());
         
         // Add new current from list of actives
         processor.updateState->addActive(PreparationTypeTuning, processor.updateState->currentTuningId);
@@ -741,11 +741,13 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == selectCB.getName())
     {
-        processor.updateState->currentModTuningId = box->getSelectedItemIndex();
+        processor.updateState->removeActive(PreparationTypeTuningMod, processor.updateState->currentModTuningId);
+        
+        processor.updateState->currentModTuningId = processor.gallery->getIdFromIndex(PreparationTypeTuningMod, box->getSelectedItemIndex());
         
         processor.updateState->idDidChange = true;
         
-        if (processor.updateState->currentTuningId == selectCB.getNumItems()-1)
+        if (processor.updateState->currentModTuningId == selectCB.getNumItems()-1)
         {
             processor.gallery->addTuningMod();
         }

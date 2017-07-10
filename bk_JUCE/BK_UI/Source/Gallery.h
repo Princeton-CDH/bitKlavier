@@ -93,8 +93,6 @@ public:
     void add(BKPreparationType type);
     int getNum(BKPreparationType type);
     
-    void addMod(BKPreparationType type);
-    int getNumMod(BKPreparationType type);
     
     void addDirectMod(void);
     void addNostalgicMod(void);

@@ -504,6 +504,8 @@ void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == "Nostalgic")
     {
+        processor.updateState->removeActive(PreparationTypeNostalgicMod, processor.updateState->currentModNostalgicId);
+        
         processor.updateState->currentModNostalgicId = box->getSelectedItemIndex();
         
         processor.updateState->idDidChange = true;

@@ -792,6 +792,8 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == "Synchronic")
     {
+        processor.updateState->removeActive(PreparationTypeSynchronicMod, processor.updateState->currentModSynchronicId);
+        
         processor.updateState->currentModSynchronicId = box->getSelectedItemIndex();
         
         processor.updateState->idDidChange = true;

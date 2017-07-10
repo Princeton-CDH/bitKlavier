@@ -510,6 +510,8 @@ void BKItemGraph::removeUI(BKItem* itemToRemove)
 
 void BKItemGraph::remove(BKItem* itemToRemove)
 {
+    processor.updateState->removeActive(itemToRemove->getType(), itemToRemove->getId());
+    
     for (auto item : itemToRemove->getConnections())
     {
         disconnect(itemToRemove, item);
@@ -876,6 +878,7 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
                 processor.currentPiano->configureModification(thisMapper);
                 
                 if (!reconfigure && item1Type == PreparationTypeGenericMod)    item1->setType(getModType(item2Type), true);
+                else                                                           item1->setType(getModType(item2Type), false);
             }
             else
             {
@@ -931,6 +934,7 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
                 processor.currentPiano->configureModification(thisMapper);
                 
                 if (!reconfigure && item2Type == PreparationTypeGenericMod)    item2->setType(getModType(item1Type), true);
+                else                                                           item2->setType(getModType(item1Type), false);
             }
             else
             {
@@ -1048,6 +1052,14 @@ void BKItemGraph::connect(BKItem* item1, BKItem* item2)
     
     print();
 }
+
+void BKItemGraph::connectWithoutCreatingNew(BKItem* item1, BKItem* item2)
+{
+    route(true, true, item1, item2);
+    
+    print();
+}
+
 
 void BKItemGraph::disconnect(BKItem* item1, BKItem* item2)
 {

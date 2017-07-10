@@ -504,6 +504,8 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == selectCB.getName())
     {
+        processor.updateState->removeActive(PreparationTypeTempoMod, processor.updateState->currentModTempoId);
+        
         processor.updateState->currentModTempoId = box->getSelectedItemIndex();
         
         processor.updateState->idDidChange = true;

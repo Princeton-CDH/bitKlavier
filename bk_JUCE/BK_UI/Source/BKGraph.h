@@ -177,6 +177,7 @@ public:
     void connectUI(BKItem* item1, BKItem* item2);
     void disconnectUI(BKItem* item1, BKItem* item2);
     void connect(BKItem* item1, BKItem* item2);
+    void connectWithoutCreatingNew(BKItem* item1, BKItem* item2);
     void disconnect(BKItem* item1, BKItem* item2);
     
     void reconnect(BKItem* item1, BKItem* item2);

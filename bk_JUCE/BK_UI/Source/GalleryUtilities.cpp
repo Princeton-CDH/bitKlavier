@@ -162,32 +162,6 @@ void Gallery::removeTempo(int Id)
     }
 }
 
-void Gallery::addMod(BKPreparationType type)
-{
-    if (type == PreparationTypeDirect)
-    {
-        addDirectMod();
-    }
-    else if (type == PreparationTypeNostalgic)
-    {
-        addNostalgicMod();
-    }
-    else if (type == PreparationTypeSynchronic)
-    {
-        addSynchronicMod();
-    }
-    else if (type == PreparationTypeTuning)
-    {
-        addTuningMod();
-    }
-    else if (type == PreparationTypeTempo)
-    {
-        addTempoMod();
-    }
-    
-    
-}
-
 void Gallery::add(BKPreparationType type)
 {
     if (type == PreparationTypeDirect)
@@ -214,6 +188,27 @@ void Gallery::add(BKPreparationType type)
     {
         addKeymap();
     }
+    if (type == PreparationTypeDirectMod)
+    {
+        addDirectMod();
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        addSynchronicMod();
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        addNostalgicMod();
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        addTuningMod();
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        addTempoMod();
+        
+    }
 }
 
 int Gallery::getNum(BKPreparationType type)
@@ -223,33 +218,14 @@ int Gallery::getNum(BKPreparationType type)
     (type == PreparationTypeSynchronic) ? synchronic.size() :
     (type == PreparationTypeTuning) ? tuning.size() :
     (type == PreparationTypeTempo) ? tempo.size() :
+    (type == PreparationTypeDirectMod) ? modDirect.size() :
+    (type == PreparationTypeNostalgicMod) ? modNostalgic.size() :
+    (type == PreparationTypeSynchronicMod) ? modSynchronic.size() :
+    (type == PreparationTypeTuningMod) ? modTuning.size() :
+    (type == PreparationTypeTempoMod) ? modTempo.size() :
     (type == PreparationTypeKeymap) ? bkKeymaps.size() :
     -1;
     
-}
-
-int Gallery::getNumMod(BKPreparationType type)
-{
-    if (type == PreparationTypeDirect)
-    {
-        return modDirect.size();
-    }
-    else if (type == PreparationTypeNostalgic)
-    {
-        return modNostalgic.size();
-    }
-    else if (type == PreparationTypeSynchronic)
-    {
-        return modSynchronic.size();
-    }
-    else if (type == PreparationTypeTuning)
-    {
-        return modTuning.size();
-    }
-    else if (type == PreparationTypeTempo)
-    {
-        return modTempo.size();
-    }
 }
 
 void Gallery::addDirectMod()

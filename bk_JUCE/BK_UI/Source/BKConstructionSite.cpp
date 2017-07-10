@@ -612,45 +612,23 @@ void BKConstructionSite::idDidChange(void)
     
     int newId = -1;
     
-    if (type == PreparationTypeKeymap)          newId = processor.updateState->currentKeymapId;
-    else if (type == PreparationTypeDirect)     newId = processor.updateState->currentDirectId;
-    else if (type == PreparationTypeNostalgic)  newId = processor.updateState->currentNostalgicId;
-    else if (type == PreparationTypeSynchronic) newId = processor.updateState->currentSynchronicId;
-    else if (type == PreparationTypeTempo)      newId = processor.updateState->currentTempoId;
-    else if (type == PreparationTypeTuning)     newId = processor.updateState->currentTuningId;
-    else if (type == PreparationTypeGenericMod)
-    {
-        ModificationMapper::Ptr thisMapper = currentItem->getMapper();
-        BKPreparationType modType = thisMapper->getType();
-    
-        if (modType == PreparationTypeDirect)
-        {
-            currentItem->getMapper()->setId(processor.updateState->currentModDirectId);
-        }
-        else if (modType == PreparationTypeSynchronic)
-        {
-            currentItem->getMapper()->setId(processor.updateState->currentModSynchronicId);
-        }
-        else if (modType == PreparationTypeNostalgic)
-        {
-            currentItem->getMapper()->setId(processor.updateState->currentModNostalgicId);
-        }
-        else if (modType == PreparationTypeTuning)
-        {
-            currentItem->getMapper()->setId(processor.updateState->currentModTuningId);
-        }
-        else if (modType == PreparationTypeTempo)
-        {
-            currentItem->getMapper()->setId(processor.updateState->currentModTempoId);
-        }
-        
-    }
+    if (type == PreparationTypeKeymap)              newId = processor.updateState->currentKeymapId;
+    else if (type == PreparationTypeDirect)         newId = processor.updateState->currentDirectId;
+    else if (type == PreparationTypeNostalgic)      newId = processor.updateState->currentNostalgicId;
+    else if (type == PreparationTypeSynchronic)     newId = processor.updateState->currentSynchronicId;
+    else if (type == PreparationTypeTempo)          newId = processor.updateState->currentTempoId;
+    else if (type == PreparationTypeTuning)         newId = processor.updateState->currentTuningId;
+    else if (type == PreparationTypeDirectMod)      newId = processor.updateState->currentModDirectId;
+    else if (type == PreparationTypeNostalgicMod)   newId = processor.updateState->currentModNostalgicId;
+    else if (type == PreparationTypeSynchronicMod)  newId = processor.updateState->currentModSynchronicId;
+    else if (type == PreparationTypeTuningMod)      newId = processor.updateState->currentModTuningId;
+    else if (type == PreparationTypeTempoMod)       newId = processor.updateState->currentModTempoId;
     
     currentItem->setId(newId);
     
     processor.updateState->addActive(type, newId);
     
-    for (auto item : connections)   graph->connect(currentItem, item);
+    for (auto item : connections)   graph->connectWithoutCreatingNew(currentItem, item);
     
 }
 
