@@ -515,7 +515,7 @@ void BKConstructionSite::mouseDrag (const MouseEvent& e)
     
     if (itemToSelect == nullptr) lasso->dragLasso(e);
     
-    if (!e.mods.isCommandDown())
+    if (!connect)
     {
         bool resizeX = false, resizeY = false;
         for (auto item : graph->getSelectedItems())
@@ -536,7 +536,7 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
 {
     MouseEvent e = eo.getEventRelativeTo(this);
     
-    connect = false;
+    
     
     if (itemToSelect == nullptr) lasso->endLasso();
     
@@ -549,9 +549,8 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
         return;
     }
     
-    if (e.mods.isCommandDown())
+    if (connect)
     {
-        
         int X = e.x;
         int Y = e.y;
         
@@ -562,6 +561,8 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
             graph->connect(itemSource, itemTarget);
             graph->drawLine(lineOX, lineOY, X, Y);
         }
+        
+        connect = false;
     }
     
     for (auto item : graph->getSelectedItems())
