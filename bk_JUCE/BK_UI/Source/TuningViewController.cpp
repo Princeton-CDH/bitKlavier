@@ -700,6 +700,7 @@ void TuningModificationEditor::update(void)
         //                       A1ClusterMax->setValue(prep->getAdaptiveHistory(), dontSendNotification);
         
         updateComponentVisibility();
+        A1reset.setVisible(false);
     }
     
 }
@@ -794,6 +795,7 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
     updateModification();
     
     updateComponentVisibility();
+    A1reset.setVisible(false);
 }
 
 void TuningModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
