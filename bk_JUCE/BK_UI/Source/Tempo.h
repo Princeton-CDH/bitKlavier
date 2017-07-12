@@ -198,7 +198,8 @@ public:
     Id(Id),
     name(String(Id)),
     updateState(us),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         
     }
@@ -208,7 +209,8 @@ public:
     Id(Id),
     name(String(Id)),
     updateState(us),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         sPrep = new TempoPreparation();
         aPrep = new TempoPreparation(sPrep);
@@ -243,6 +245,8 @@ public:
     
     inline void setState(XmlElement* e)
     {
+        editted = true;
+        
         float f; int i;
         
         String n = e->getStringAttribute("name");
@@ -323,6 +327,7 @@ public:
     inline int getX(void) const noexcept { return X; }
     inline int getY(void) const noexcept { return Y; }
     
+    bool editted;
 private:
     int Id;
     String name;
@@ -357,7 +362,8 @@ public:
     
     TempoModPreparation(TempoPreparation::Ptr p, int Id):
     Id(Id),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         param.ensureStorageAllocated(cTempoParameterTypes.size());
         
@@ -374,7 +380,8 @@ public:
     
     TempoModPreparation(int Id):
     Id(Id),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         param.set(TempoBPM, "");
         param.set(TempoSystem, "");
@@ -516,6 +523,8 @@ public:
     inline void setY(int y) { Y = y; }
     inline int getX(void) const noexcept { return X; }
     inline int getY(void) const noexcept { return Y; }
+    
+    bool editted;
     
 private:
     int Id;

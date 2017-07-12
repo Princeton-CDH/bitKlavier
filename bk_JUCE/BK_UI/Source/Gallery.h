@@ -78,7 +78,9 @@ public:
     void addDirect(DirectPreparation::Ptr);
     int addDirectIfNotAlreadyThere(DirectPreparation::Ptr);
     
-    void addTypeWithId(BKPreparationType type, int Id);
+
+    bool getEditted(BKPreparationType type, int Id);
+    void setEditted(BKPreparationType type, int Id, bool editted);
     
     void addPiano(void);
     void addPianoWithId(int Id);
@@ -91,7 +93,9 @@ public:
     inline const int getNumKeymaps(void) const noexcept {return bkKeymaps.size();}
     
     void add(BKPreparationType type);
-    int getNum(BKPreparationType type);
+    void addTypeWithId(BKPreparationType type, int Id);
+    void remove(BKPreparationType type, int Id);
+    int  getNum(BKPreparationType type);
     
     
     void addDirectMod(void);
@@ -114,6 +118,7 @@ public:
     void removeNostalgic(int Id);
     void removeTuning(int Id);
     void removeTempo(int Id);
+    void removeKeymap(int Id);
     void removeDirectModPreparation(int Id);
     void removeNostalgicModPreparation(int Id);
     void removeSynchronicModPreparation(int Id);
@@ -549,15 +554,21 @@ public:
 
     inline int getNewId(BKPreparationType type)
     {
-        int newId = idCount[type];
+        int oldId = idCount[type];
         
-        idCount.set(type, newId+1);
+        DBG("OLD: " + String(oldId));
+        
+        int newId = oldId + 1;
+        
+        idCount.set(type, newId);
         
         Array<int> thisIndexList = getIndexList(type);
         
         thisIndexList.add(newId);
         
         idIndexList.set(type, thisIndexList);
+        
+        DBG("NEW: " + String(newId));
         
         return newId;
     }
@@ -574,12 +585,14 @@ public:
         Array<int> index = getIndexList(type);
         
         int count = 0;
-        for (auto i : index)
+        for (int i : index)
         {
-            if (i == Id) return i;
+            if (i == Id) return count;
             
             count++;
         }
+        
+        return 0;
     }
     
     inline int getIdFromIndex(BKPreparationType type, int idx)

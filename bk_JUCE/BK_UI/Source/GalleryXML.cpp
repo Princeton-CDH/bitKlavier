@@ -153,6 +153,8 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                     
                     newKeymap->setKeymap(keys);
                     
+                    newKeymap->editted = true;
+                    
                     ++keymapCount;
                     
                 }

@@ -592,14 +592,19 @@ void BKConstructionSite::reconfigureCurrentItem(void)
     {
         graph->reconnect(currentItem, item);
     }
+}
+
+void BKConstructionSite::removeItem(BKPreparationType type, int Id)
+{
     
 }
 
 void BKConstructionSite::idDidChange(void)
 {
     BKPreparationType type = currentItem->getType();
+    int oldId = currentItem->getId();
     
-    processor.updateState->removeActive(type, currentItem->getId());
+    processor.updateState->removeActive(type, oldId);
     
     BKItem::PtrArr connections;
     

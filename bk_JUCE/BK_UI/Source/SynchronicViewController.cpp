@@ -240,8 +240,8 @@ void SynchronicPreparationEditor::timerCallback()
 
 void SynchronicPreparationEditor::multiSliderDidChange(String name, int whichSlider, Array<float> values)
 {
-  
-    //DBG("multiSliderValueChanged called");
+    Synchronic::Ptr synchronic = processor.gallery->getSynchronic(processor.updateState->currentSynchronicId);
+    synchronic->editted = true;
     
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
@@ -273,8 +273,8 @@ void SynchronicPreparationEditor::multiSliderDidChange(String name, int whichSli
 
 void SynchronicPreparationEditor::multiSlidersDidChange(String name, Array<Array<float>> values)
 {
-
-    //DBG("multiSliderALLValueChanged called");
+    Synchronic::Ptr synchronic = processor.gallery->getSynchronic(processor.updateState->currentSynchronicId);
+    synchronic->editted = true;
     
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
@@ -310,6 +310,9 @@ void SynchronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
 
 void SynchronicPreparationEditor::BKSingleSliderValueChanged(String name, double val)
 {
+    Synchronic::Ptr synchronic = processor.gallery->getSynchronic(processor.updateState->currentSynchronicId);
+    synchronic->editted = true;
+    
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
@@ -334,6 +337,9 @@ void SynchronicPreparationEditor::BKSingleSliderValueChanged(String name, double
 
 void SynchronicPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
 {
+    Synchronic::Ptr synchronic = processor.gallery->getSynchronic(processor.updateState->currentSynchronicId);
+    synchronic->editted = true;
+    
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
@@ -422,6 +428,7 @@ void SynchronicPreparationEditor::fillSelectCB(void)
     
     int currentId = processor.updateState->currentSynchronicId;
     
+    selectCB.addSeparator();
     selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeSynchronic, currentId), NotificationType::dontSendNotification);
     
 }
@@ -430,33 +437,45 @@ void SynchronicPreparationEditor::fillSelectCB(void)
 void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
+    int index = box->getSelectedItemIndex();
     
     if (name == "Synchronic")
     {
-        // Remove current from list of actives
-        processor.updateState->removeActive(PreparationTypeSynchronic, processor.updateState->currentSynchronicId);
+        int oldId = processor.updateState->currentSynchronicId;
+        int newId = processor.gallery->getIdFromIndex(PreparationTypeSynchronic, index);
         
-        // Set new current
-        processor.updateState->currentSynchronicId = box->getSelectedItemIndex();
+        if (index == selectCB.getNumItems()-1)
+        {
+            processor.gallery->addSynchronic();
+            
+            processor.gallery->setEditted(PreparationTypeNostalgic, oldId, true);
+            
+            processor.gallery->getAllNostalgic().getLast()->editted = true;
+            
+            newId = processor.gallery->getAllNostalgic().getLast()->getId();
+        }
         
-        // Add new current from list of actives
-        processor.updateState->addActive(PreparationTypeSynchronic, processor.updateState->currentSynchronicId);
+        processor.updateState->currentSynchronicId = newId;
+        
+        processor.updateState->removeActive(PreparationTypeSynchronic, oldId);
+        
+        if (!processor.gallery->getSynchronic(oldId)->editted)
+        {
+            processor.updateState->removePreparation(PreparationTypeSynchronic, oldId);
+            
+            processor.gallery->remove(PreparationTypeSynchronic, oldId);
+        }
+        processor.updateState->addActive(PreparationTypeSynchronic, newId);
         
         processor.updateState->idDidChange = true;
         
-        if (processor.updateState->currentSynchronicId == selectCB.getNumItems()-1)
-        {
-            processor.gallery->addSynchronic();
-        }
-        
         fillSelectCB();
-        
-        //update(sendNotification);
-        update();
-        
     }
     else if (name == "Mode")
     {
+        Synchronic::Ptr synchronic = processor.gallery->getSynchronic(processor.updateState->currentSynchronicId);
+        synchronic->editted = true;
+        
         SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
         SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
         
@@ -490,7 +509,10 @@ void SynchronicPreparationEditor::bkTextFieldDidChange(TextEditor& tf)
     
     if (name == "Name")
     {
-        processor.gallery->getSynchronic(processor.updateState->currentSynchronicId)->setName(text);
+        Synchronic::Ptr synchronic = processor.gallery->getSynchronic(processor.updateState->currentSynchronicId);
+        synchronic->editted = true;
+        
+        synchronic->setName(text);
         
         int selected = selectCB.getSelectedId();
         if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, text);
@@ -500,7 +522,10 @@ void SynchronicPreparationEditor::bkTextFieldDidChange(TextEditor& tf)
 
 void SynchronicPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    processor.gallery->getSynchronic(processor.updateState->currentSynchronicId)->setName(name);
+    Synchronic::Ptr synchronic = processor.gallery->getSynchronic(processor.updateState->currentSynchronicId);
+    synchronic->editted = true;
+    
+    synchronic->setName(name);
 }
 
 void SynchronicPreparationEditor::bkMessageReceived (const String& message)
@@ -513,9 +538,12 @@ void SynchronicPreparationEditor::bkMessageReceived (const String& message)
 
 void SynchronicPreparationEditor::buttonClicked (Button* b)
 {
+    
+    Synchronic::Ptr synchronic = processor.gallery->getSynchronic(processor.updateState->currentSynchronicId);
+    synchronic->editted = true;
+    
     if (b == &offsetParamStartToggle)
     {
-        
         SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
         SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
         
@@ -689,6 +717,7 @@ void SynchronicModificationEditor::fillSelectCB(void)
     
     int currentId = processor.updateState->currentModSynchronicId;
     
+    selectCB.addSeparator();
     selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeSynchronicMod, currentId), NotificationType::dontSendNotification);
     
 }
@@ -792,28 +821,39 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == "Synchronic")
     {
-        processor.updateState->removeActive(PreparationTypeSynchronicMod, processor.updateState->currentModSynchronicId);
+        int index = box->getSelectedItemIndex();
         
-        processor.updateState->currentModSynchronicId = box->getSelectedItemIndex();
+        int oldId = processor.updateState->currentModSynchronicId;
+        int newId = processor.gallery->getIdFromIndex(PreparationTypeSynchronicMod, index);
         
-        processor.updateState->idDidChange = true;
-        
-        if (processor.updateState->currentModSynchronicId == selectCB.getNumItems()-1)
+        if (index == selectCB.getNumItems()-1)
         {
             processor.gallery->addSynchronicMod();
             
+            processor.gallery->setEditted(PreparationTypeSynchronicMod, oldId, true);
             
+            processor.gallery->getSynchronicModPreparations().getLast()->editted = true;
+            
+            newId = processor.gallery->getSynchronicModPreparations().getLast()->getId();
         }
-
+        
+        processor.updateState->currentModSynchronicId = newId;
+        
+        processor.updateState->removeActive(PreparationTypeSynchronicMod, oldId);
+        
+        if (!processor.gallery->getSynchronicModPreparation(oldId)->editted)
+        {
+            processor.updateState->removePreparation(PreparationTypeSynchronicMod, oldId);
+            
+            processor.gallery->remove(PreparationTypeSynchronicMod, oldId);
+        }
+        processor.updateState->addActive(PreparationTypeSynchronicMod, newId);
+        
+        processor.updateState->idDidChange = true;
+        
         fillSelectCB();
-        
-        update();
-        
-        return;
-        
     }
-    
-    if (name == "Mode")
+    else if (name == "Mode")
     {
         SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
         
@@ -832,9 +872,11 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
         {
             mod->setParam(SynchronicBeatsToSkip, String(toggleVal));
         }
+        
+        updateModification();
     }
     
-    updateModification();
+    
 }
 
 void SynchronicModificationEditor::bkTextFieldDidChange(TextEditor& tf)
@@ -856,7 +898,10 @@ void SynchronicModificationEditor::bkTextFieldDidChange(TextEditor& tf)
 
 void SynchronicModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    processor.gallery->getSynchronicModPreparation(processor.updateState->currentSynchronicId)->setName(name);
+    SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
+    
+    mod->setName(name);
+    
     updateModification();
 }
 
@@ -866,16 +911,14 @@ void SynchronicModificationEditor::bkMessageReceived (const String& message)
     {
         update();
     }
-    
-    
 }
 
 void SynchronicModificationEditor::buttonClicked (Button* b)
 {
+    SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
+    
     if (b == &offsetParamStartToggle)
     {
-        SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
-        
         int toggleVal;
         if(offsetParamStartToggle.getToggleState()) toggleVal = 1;
         else toggleVal = 0;
@@ -908,6 +951,9 @@ void SynchronicModificationEditor::buttonClicked (Button* b)
 
 void SynchronicModificationEditor::updateModification(void)
 {
+    SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
+    mod->editted = true;
+    
     processor.updateState->modificationDidChange = true;
 }
 

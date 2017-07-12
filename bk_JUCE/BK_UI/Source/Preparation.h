@@ -43,7 +43,8 @@ public:
     processor(new DirectProcessor(s, res, ham, aPrep, Id)),
     Id(Id),
     name(String(Id)),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         
     }
@@ -57,7 +58,8 @@ public:
     Id(Id),
     name(String(Id)),
     updateState(us),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         sPrep       = new DirectPreparation(tuning);
         aPrep       = new DirectPreparation(sPrep);
@@ -107,6 +109,8 @@ public:
     
     inline void setState(XmlElement* e, Tuning::PtrArr tuning)
     {
+        editted = true;
+        
         float f; int i;
         
         String n = e->getStringAttribute("name");
@@ -201,6 +205,8 @@ public:
     inline int getX(void) const noexcept { return X; }
     inline int getY(void) const noexcept { return Y; }
     
+    bool editted;
+    
 private:
     int Id;
     String name;
@@ -233,7 +239,8 @@ public:
     
     DirectModPreparation(DirectPreparation::Ptr p, int Id):
     Id(Id),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         param.ensureStorageAllocated(cDirectParameterTypes.size());
         
@@ -247,7 +254,8 @@ public:
     
     DirectModPreparation(int Id):
     Id(Id),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         param.add("");
         param.add("");
@@ -294,6 +302,7 @@ public:
     
     inline void setState(XmlElement* e)
     {
+        editted = true;
         float f;
         
         String p = e->getStringAttribute(ptagDirect_tuning);
@@ -382,6 +391,7 @@ public:
     inline int getX(void) const noexcept { return X; }
     inline int getY(void) const noexcept { return Y; }
 
+    bool editted;
     
 private:
     int Id;
@@ -415,7 +425,8 @@ public:
     processor(new SynchronicProcessor(s, aPrep, general, Id)),
     Id(Id),
     name(String(Id)),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         
     }
@@ -429,7 +440,8 @@ public:
     Id(Id),
     name(String(Id)),
     updateState(us),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         sPrep       = new SynchronicPreparation(tuning, tempo);
         aPrep       = new SynchronicPreparation(sPrep);
@@ -529,6 +541,8 @@ public:
     
     inline void setState(XmlElement* e, Tuning::PtrArr tuning, Tempo::PtrArr tempo)
     {
+        editted = true;
+        
         int i; float f;
         
         String n = e->getStringAttribute("name");
@@ -700,7 +714,7 @@ public:
     inline int getX(void) const noexcept { return X; }
     inline int getY(void) const noexcept { return Y; }
     
-    
+    bool editted;
     
 private:
     int Id;
@@ -746,7 +760,8 @@ public:
     
     SynchronicModPreparation(SynchronicPreparation::Ptr p, int Id):
     Id(Id),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         param.ensureStorageAllocated(cSynchronicParameterTypes.size());
         
@@ -768,7 +783,8 @@ public:
     
     SynchronicModPreparation(int Id):
     Id(Id),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         param.set(SynchronicTuning, "");
         param.set(SynchronicTempo, "");
@@ -880,6 +896,8 @@ public:
     
     inline void setState(XmlElement* e)
     {
+        editted = true;
+        
         float f;
         
         String p = e->getStringAttribute(ptagSynchronic_tuning);
@@ -1044,6 +1062,8 @@ public:
     inline int getX(void) const noexcept { return X; }
     inline int getY(void) const noexcept { return Y; }
     
+    bool editted;
+    
 private:
     int Id;
     String name;
@@ -1078,7 +1098,8 @@ public:
     processor(new NostalgicProcessor(s, aPrep, Id)),
     Id(Id),
     name(String(Id)),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         
     }
@@ -1091,7 +1112,8 @@ public:
     Id(Id),
     name(String(Id)),
     updateState(us),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         sPrep       = new NostalgicPreparation(tuning);
         aPrep       = new NostalgicPreparation(sPrep);
@@ -1159,6 +1181,8 @@ public:
     
     inline void setState(XmlElement* e, Tuning::PtrArr tuning, Synchronic::PtrArr synchronic)
     {
+        editted = true;
+        
         int i; float f;
         
         String n = e->getStringAttribute("name");
@@ -1225,9 +1249,13 @@ public:
         aPrep->setSyncTargetProcessor(synchronic[i]->processor);
         
         aPrep->copy(sPrep);
+
     }
     
-    inline int getTuningId() {return sPrep->getTuning()->getId();}
+    inline int getTuningId()
+    {
+        return sPrep->getTuning()->getId();
+    }
     
     inline int getId() {return Id;}
     
@@ -1273,6 +1301,8 @@ public:
     inline int getX(void) const noexcept { return X; }
     inline int getY(void) const noexcept { return Y; }
     
+    bool editted;
+    
 private:
     int Id;
     String name;
@@ -1298,7 +1328,8 @@ public:
     ModificationMapper(BKPreparationType type, int Id):
     type(type),
     Id(Id),
-    piano(-1)
+    piano(-1),
+    editted(false)
     {
         for (int i = 0; i < 5; i++) resets.add(Array<int>());
     }
@@ -1309,7 +1340,8 @@ public:
     Id(Id),
     keymaps(keymaps),
     targets(targets),
-    piano(-1)
+    piano(-1),
+    editted(false)
     {
         for (int i = 0; i < 5; i++) resets.add(Array<int>());
     }
@@ -1352,6 +1384,8 @@ public:
     Array<Array<int>> resets;
     int piano;
     
+    bool editted;
+    
 private:
     BKPreparationType type;
     int Id;
@@ -1391,7 +1425,8 @@ public:
     
     NostalgicModPreparation(NostalgicPreparation::Ptr p, int Id):
     Id(Id),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         param.ensureStorageAllocated(cNostalgicParameterTypes.size());
         
@@ -1410,7 +1445,8 @@ public:
     
     NostalgicModPreparation(int Id):
     Id(Id),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         param.set(NostalgicTuning, "");
         param.set(NostalgicWaveDistance, "");
@@ -1475,6 +1511,8 @@ public:
     
     inline void setState(XmlElement* e)
     {
+        editted = true;
+        
         float f;
         
         String p = e->getStringAttribute(ptagNostalgic_tuning);
@@ -1579,6 +1617,7 @@ public:
     inline int getX(void) const noexcept { return X; }
     inline int getY(void) const noexcept { return Y; }
 
+    bool editted;
     
 private:
     int Id;

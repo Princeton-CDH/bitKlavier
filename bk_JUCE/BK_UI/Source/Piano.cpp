@@ -315,7 +315,6 @@ void Piano::deconfigureResetsForKeys(Array<Array<int>> resets, Array<int> otherK
 void Piano::configureModification(ModificationMapper::Ptr map)
 {
     map->print();
-    DBG("numKeymaps: " + String(bkKeymaps->size()));
     
     Array<int> whichPreps = map->getTargets();
     Array<int> whichKeymaps = map->getKeymaps();

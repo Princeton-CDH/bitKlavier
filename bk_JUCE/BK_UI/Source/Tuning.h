@@ -339,7 +339,8 @@ public:
     Id(Id),
     name(String(Id)),
     updateState(us),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         
     }
@@ -349,7 +350,8 @@ public:
     Id(Id),
     name(String(Id)),
     updateState(us),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         sPrep = new TuningPreparation();
         aPrep = new TuningPreparation(sPrep);
@@ -427,6 +429,8 @@ public:
         return cScale;
     }
     
+    bool editted;
+    
 private:
     int Id;
     String name;
@@ -464,7 +468,8 @@ public:
     
     TuningModPreparation(TuningPreparation::Ptr p, int Id):
     Id(Id),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         param.ensureStorageAllocated(cTuningParameterTypes.size());
         
@@ -485,7 +490,8 @@ public:
     
     TuningModPreparation(int Id):
     Id(Id),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         param.set(TuningScale, "");
         param.set(TuningFundamental, "");
@@ -580,6 +586,7 @@ public:
     inline int getX(void) const noexcept { return X; }
     inline int getY(void) const noexcept { return Y; }
     
+    bool editted;
 private:
     int Id; 
     String name;

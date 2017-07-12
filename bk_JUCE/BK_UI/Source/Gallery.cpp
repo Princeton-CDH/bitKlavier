@@ -15,7 +15,7 @@ url(String::empty)
 {
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
-        idCount.add(0);
+        idCount.add(-1);
         idIndexList.set(i,Array<int>());
     }
     
@@ -32,7 +32,7 @@ url(String::empty)
 {
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
-        idCount.add(0);
+        idCount.add(-1);
         idIndexList.set(i,Array<int>());
     }
 
@@ -44,7 +44,7 @@ url(String::empty)
 {
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
-        idCount.add(0);
+        idCount.add(-1);
         idIndexList.set(i,Array<int>());
     }
 
@@ -60,7 +60,7 @@ url(String::empty)
 {
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
-        idCount.add(0);
+        idCount.add(-1);
         idIndexList.set(i,Array<int>());
     }
     

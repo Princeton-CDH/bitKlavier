@@ -123,10 +123,71 @@ public:
     BKPreparationDisplay currentDisplay = DisplayNil;
     bool displayDidChange;
     
+    bool preparationRemoved = false;
+    BKPreparationType preparationRemovedType = BKPreparationTypeNil;
+    int preparationRemovedId = -1;
+    
+    void removePreparation(BKPreparationType type, int Id)
+    {
+        preparationRemoved = true;
+        
+        preparationRemovedType = type;
+        
+        preparationRemovedId = Id;
+    }
+    
     void setCurrentDisplay(BKPreparationDisplay type)
     {
         currentDisplay = type;
         displayDidChange = true;
+    }
+    
+    int getCurrentId(BKPreparationDisplay type)
+    {
+        if (type == DisplayDirect)
+        {
+            return currentDirectId;
+        }
+        else if (type == DisplaySynchronic)
+        {
+            return currentSynchronicId;
+        }
+        else if (type == DisplayNostalgic)
+        {
+            return currentNostalgicId;
+        }
+        else if (type == DisplayTuning)
+        {
+            return currentTuningId;
+        }
+        else if (type == DisplayTempo)
+        {
+            return currentTempoId;
+        }
+        else if (type == DisplayKeymap)
+        {
+            return currentKeymapId;
+        }
+        else if (type == DisplayDirectMod)
+        {
+            return currentModDirectId;
+        }
+        else if (type == DisplaySynchronicMod)
+        {
+            return currentModSynchronicId;
+        }
+        else if (type == DisplayNostalgicMod)
+        {
+            return currentModNostalgicId;
+        }
+        else if (type == DisplayTuningMod)
+        {
+            return currentModTuningId;
+        }
+        else if (type == DisplayTempoMod)
+        {
+            return currentModTempoId;
+        }
     }
     
     void setAllCurrentIdsTo(int val)

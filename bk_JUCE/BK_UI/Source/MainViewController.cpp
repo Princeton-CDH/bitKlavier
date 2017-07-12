@@ -198,6 +198,9 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     
     if (code == KeyPress::escapeKey)
     {
+        int Id = processor.updateState->getCurrentId(processor.updateState->currentDisplay);
+        processor.gallery->setEditted((BKPreparationType)processor.updateState->currentDisplay, Id, true);
+        
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
     else if (code == KeyPress::deleteKey)
@@ -380,16 +383,24 @@ void MainViewController::timerCallback()
     
     if (state->keymapDidChange)
     {
-        processor.updateState->keymapDidChange = false;
+        state->keymapDidChange = false;
     
         overtop.kvc.reset();
     }
     
     if (state->displayDidChange)
     {
-        processor.updateState->displayDidChange = false;
+        state->displayDidChange = false;
         
         overtop.setCurrentDisplay(processor.updateState->currentDisplay);
+    }
+    
+    if (state->preparationRemoved)
+    {
+        state->preparationRemoved = false;
+        
+        construction.removeItem(state->preparationRemovedType, state->preparationRemovedId);
+        
     }
     
     levelMeterComponentL->updateLevel(processor.getLevelL());

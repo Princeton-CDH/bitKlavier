@@ -44,7 +44,9 @@ public:
     void cut(void);
     
     void addItemsFromClipboard(void);
+    
     void addItem(BKPreparationType type);
+    void removeItem(BKPreparationType type, int Id);
     
     inline void setCurrentItem(BKItem* item) { currentItem = item;}
     inline BKItem* getCurrentItem(void) { return currentItem;}

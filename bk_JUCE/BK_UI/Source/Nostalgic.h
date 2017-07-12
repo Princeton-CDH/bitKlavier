@@ -134,16 +134,13 @@ public:
     inline void setLengthMultiplier(float lengthMultiplier)                {nLengthMultiplier = lengthMultiplier;  }
     inline void setBeatsToSkip(float beatsToSkip)                          {nBeatsToSkip = beatsToSkip;            }
     inline void setMode(NostalgicSyncMode mode)                            {nMode = mode;                          }
-    inline void setSyncTarget(int syncTarget)                              {nSyncTarget = syncTarget;              }
+    inline void setSyncTarget(int syncTarget)                              {nSyncTarget = syncTarget;}
     inline void setSyncTargetProcessor(SynchronicProcessor::Ptr syncTargetProcessor)
-                                                                           {nSyncProcessor = syncTargetProcessor; }
+                                                                           {nSyncProcessor = syncTargetProcessor;}
     //inline void setResetMap(Keymap::Ptr k)                                 {resetMap = k;          }
     
     inline const Tuning::Ptr getTuning() const noexcept                    {return tuning; }
-    inline void setTuning(Tuning::Ptr t)                                   {tuning = t; }
-    
-    
-    
+    inline void setTuning(Tuning::Ptr t)                                   {tuning = t;}
 
     void print(void)
     {

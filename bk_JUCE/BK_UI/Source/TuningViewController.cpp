@@ -372,27 +372,38 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == selectCB.getName())
     {
-        // Remove current from list of actives
-        processor.updateState->removeActive(PreparationTypeTuning, processor.updateState->currentTuningId);
+        int index = box->getSelectedItemIndex();
         
-        // Set new current
-        processor.updateState->currentTuningId = processor.gallery->getIdFromIndex(PreparationTypeTuning, box->getSelectedItemIndex());
+        int oldId = processor.updateState->currentTuningId;
+        int newId = processor.gallery->getIdFromIndex(PreparationTypeTuning, index);
         
-        // Add new current from list of actives
-        processor.updateState->addActive(PreparationTypeTuning, processor.updateState->currentTuningId);
-        
-        processor.updateState->idDidChange = true;
-        
-        if (processor.updateState->currentTuningId == selectCB.getNumItems()-1)
+        if (index == selectCB.getNumItems()-1)
         {
             processor.gallery->addTuning();
             
+            processor.gallery->setEditted(PreparationTypeTuning, oldId, true);
             
+            processor.gallery->getAllTuning().getLast()->editted = true;
+            
+            newId = processor.gallery->getAllTuning().getLast()->getId();
         }
         
+        processor.updateState->currentTuningId = newId;
+        
+        processor.updateState->removeActive(PreparationTypeTuning, oldId);
+        
+        if (!processor.gallery->getTuning(oldId)->editted)
+        {
+            processor.updateState->removePreparation(PreparationTypeTuning, oldId);
+            
+            processor.gallery->remove(PreparationTypeTuning, oldId);
+        }
+        
+        processor.updateState->addActive(PreparationTypeTuning, newId);
+        
+        processor.updateState->idDidChange = true;
+        
         fillSelectCB();
-        //update(sendNotification);
-        update();
     }
     else if (name == scaleCB.getName())
     {
@@ -437,6 +448,12 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         updateComponentVisibility();
         
     }
+    
+    if (name != selectCB.getName())
+    {
+        Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+        tuning->editted = true;
+    }
 }
 
 
@@ -461,6 +478,7 @@ void TuningPreparationEditor::fillSelectCB(void)
         }
     }
     
+    selectCB.addSeparator();
     selectCB.addItem("New tuning...", index.size()+1);
     
     int currentId = processor.updateState->currentTuningId;
@@ -472,7 +490,10 @@ void TuningPreparationEditor::fillSelectCB(void)
 
 void TuningPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    processor.gallery->getTuning(processor.updateState->currentTuningId)->setName(name);
+    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+    tuning->editted = true;
+    
+    tuning->setName(name);
 }
 
 
@@ -509,6 +530,9 @@ void TuningPreparationEditor::update(void)
 
 void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> values)
 {
+    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+    tuning->editted = true;
+    
     TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
     TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
  
@@ -533,6 +557,9 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
 
 void TuningPreparationEditor::BKSingleSliderValueChanged(String name, double val)
 {
+    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+    tuning->editted = true;
+    
     TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
     TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
     
@@ -555,6 +582,9 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(String name, double val
 
 void TuningPreparationEditor::buttonClicked (Button* b)
 {
+    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+    tuning->editted = true;
+    
     if (b == &A1Inversional)
     {
         DBG("setting A1Inversional " + String(A1Inversional.getToggleState()));
@@ -725,6 +755,7 @@ void TuningModificationEditor::fillSelectCB(void)
         }
     }
     
+    selectCB.addSeparator();
     selectCB.addItem("New tuning modification...", index.size()+1);
     
     int currentId = processor.updateState->currentModTuningId;
@@ -741,24 +772,40 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == selectCB.getName())
     {
-        processor.updateState->removeActive(PreparationTypeTuningMod, processor.updateState->currentModTuningId);
+        int index = box->getSelectedItemIndex();
         
-        processor.updateState->currentModTuningId = processor.gallery->getIdFromIndex(PreparationTypeTuningMod, box->getSelectedItemIndex());
+        int oldId = processor.updateState->currentModTuningId;
+        int newId = processor.gallery->getIdFromIndex(PreparationTypeTuningMod, index);
+        
+        if (index == selectCB.getNumItems()-1)
+        {
+            processor.gallery->addTuningMod();
+            
+            processor.gallery->setEditted(PreparationTypeTuningMod, oldId, true);
+            
+            processor.gallery->getTuningModPreparations().getLast()->editted = true;
+            
+            newId = processor.gallery->getTuningModPreparations().getLast()->getId();
+        }
+        
+        processor.updateState->currentModTuningId = newId;
+        
+        processor.updateState->removeActive(PreparationTypeTuningMod, oldId);
+        
+        if (!processor.gallery->getTuningModPreparation(oldId)->editted)
+        {
+            processor.updateState->removePreparation(PreparationTypeTuningMod, oldId);
+            
+            processor.gallery->remove(PreparationTypeTuningMod, oldId);
+        }
+        
+        processor.updateState->addActive(PreparationTypeTuningMod, newId);
         
         processor.updateState->idDidChange = true;
         
-        if (processor.updateState->currentModTuningId == selectCB.getNumItems()-1)
-        {
-            processor.gallery->addTuningMod();
-        }
-        
         fillSelectCB();
-        //update(sendNotification);
-        update();
-        return;
     }
-    
-    if (name == scaleCB.getName())
+    else if (name == scaleCB.getName())
     {
         mod->setParam(TuningScale, String(scaleCB.getSelectedItemIndex()));
         scaleCB.setAlpha(1.);
@@ -791,7 +838,7 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
         A1FundamentalCB.setAlpha(1.);
     }
     
-    updateModification();
+    if (name != selectCB.getName()) updateModification();
     
     updateComponentVisibility();
 }
@@ -850,6 +897,9 @@ void TuningModificationEditor::BKSingleSliderValueChanged(String name, double va
 
 void TuningModificationEditor::updateModification(void)
 {
+    TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
+    mod->editted = true;
+    
     processor.updateState->modificationDidChange = true;
 }
 
@@ -870,6 +920,8 @@ void TuningModificationEditor::buttonClicked (Button* b)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
+    
+    updateModification();
 }
 
 

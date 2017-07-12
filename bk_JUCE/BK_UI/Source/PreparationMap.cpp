@@ -392,6 +392,14 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
             if (pKeymap->containsNote(noteNumber))
                 tempo[i]->processor->keyReleased(noteNumber, channel);
         }
+        
+        /* // need this ???
+        for (int i = tuning.size(); --i >= 0; )
+        {
+            if (pKeymap->containsNote(noteNumber))
+                tuning[i]->processor->keyReleased(noteNumber, channel);
+        }
+         */
     }
 }
 

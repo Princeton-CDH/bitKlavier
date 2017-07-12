@@ -162,53 +162,235 @@ void Gallery::removeTempo(int Id)
     }
 }
 
-void Gallery::add(BKPreparationType type)
+void Gallery::removeKeymap(int Id)
+{
+    for (int i = bkKeymaps.size(); --i >= 0; )
+    {
+        if (bkKeymaps[i]->getId() == Id) bkKeymaps.remove(i);
+    }
+}
+
+void Gallery::setEditted(BKPreparationType type, int Id, bool editted)
 {
     if (type == PreparationTypeDirect)
     {
+        getDirect(Id)->editted = editted;
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        getSynchronic(Id)->editted = editted;
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        getNostalgic(Id)->editted = editted;
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        getTuning(Id)->editted = editted;
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        getTempo(Id)->editted = editted;
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+        getKeymap(Id)->editted = editted;
+    }
+    if (type == PreparationTypeDirectMod)
+    {
+        getDirectModPreparation(Id)->editted = editted;
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        getSynchronicModPreparation(Id)->editted = editted;
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        getNostalgicModPreparation(Id)->editted = editted;
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        getTuningModPreparation(Id)->editted = editted;
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        getTempoModPreparation(Id)->editted = editted;
+        
+    }
+}
+
+bool Gallery::getEditted(BKPreparationType type, int Id)
+{
+    if (type == PreparationTypeDirect)
+    {
+        return direct.getUnchecked(Id)->editted;
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        return synchronic.getUnchecked(Id)->editted;
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        return nostalgic.getUnchecked(Id)->editted;
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        return tuning.getUnchecked(Id)->editted;
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        return tempo.getUnchecked(Id)->editted;
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+        return bkKeymaps.getUnchecked(Id)->editted;
+    }
+    if (type == PreparationTypeDirectMod)
+    {
+        return modDirect.getUnchecked(Id)->editted;
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        return modSynchronic.getUnchecked(Id)->editted;
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        return modNostalgic.getUnchecked(Id)->editted;
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        return modTuning.getUnchecked(Id)->editted;
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        return modTempo.getUnchecked(Id)->editted;
+        
+    }
+}
+
+void Gallery::remove(BKPreparationType type, int Id)
+{
+    if (type == PreparationTypeDirect)
+    {
+        removeDirect(Id);
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        removeSynchronic(Id);
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        removeNostalgic(Id);
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        removeTuning(Id);
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        removeTempo(Id);
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+        removeKeymap(Id);
+    }
+    if (type == PreparationTypeDirectMod)
+    {
+        removeDirectModPreparation(Id);
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        removeSynchronicModPreparation(Id);
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        removeNostalgicModPreparation(Id);
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        removeTuningModPreparation(Id);
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        removeTempoModPreparation(Id);
+    }
+    
+    Array<int> thisIndexList = getIndexList(type);
+    
+    for (auto index : thisIndexList)
+    {
+        if (index == Id) thisIndexList.remove(index);
+    }
+    
+    idIndexList.set(type, thisIndexList);
+}
+
+
+void Gallery::add(BKPreparationType type)
+{
+    int newId = -1;
+    if (type == PreparationTypeDirect)
+    {
         addDirect();
+        newId = direct.getLast()->getId();
     }
     else if (type == PreparationTypeSynchronic)
     {
         addSynchronic();
+        newId = synchronic.getLast()->getId();
     }
     else if (type == PreparationTypeNostalgic)
     {
         addNostalgic();
+        newId = nostalgic.getLast()->getId();
     }
     else if (type == PreparationTypeTuning)
     {
         addTuning();
+        newId = tuning.getLast()->getId();
     }
     else if (type == PreparationTypeTempo)
     {
         addTempo();
+        newId = tempo.getLast()->getId();
     }
     else if (type == PreparationTypeKeymap)
     {
         addKeymap();
+        newId = bkKeymaps.getLast()->getId();
     }
     if (type == PreparationTypeDirectMod)
     {
         addDirectMod();
+        newId = modDirect.getLast()->getId();
     }
     else if (type == PreparationTypeSynchronicMod)
     {
         addSynchronicMod();
+        newId = modSynchronic.getLast()->getId();
     }
     else if (type == PreparationTypeNostalgicMod)
     {
         addNostalgicMod();
+        newId = modNostalgic.getLast()->getId();
     }
     else if (type == PreparationTypeTuningMod)
     {
         addTuningMod();
+        newId = modTuning.getLast()->getId();
     }
     else if (type == PreparationTypeTempoMod)
     {
         addTempoMod();
+        newId = modTempo.getLast()->getId();
         
     }
+    
+    Array<int> thisIndexList = getIndexList(type);
+    
+    thisIndexList.add(newId);
+    
+    idIndexList.set(type, thisIndexList);
 }
 
 int Gallery::getNum(BKPreparationType type)

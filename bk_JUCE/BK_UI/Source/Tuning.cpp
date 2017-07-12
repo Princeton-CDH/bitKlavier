@@ -253,6 +253,8 @@ ValueTree TuningModPreparation::getState(int Id)
 
 void TuningModPreparation::setState(XmlElement* e)
 {
+    editted = true;
+    
     String p = "";
     
     float f;
@@ -339,6 +341,8 @@ void TuningModPreparation::setState(XmlElement* e)
 
 void Tuning::setState(XmlElement* e)
 {
+    editted = true;
+    
     int i; float f; bool b;
     
     i = e->getStringAttribute( ptagTuning_scale).getIntValue();

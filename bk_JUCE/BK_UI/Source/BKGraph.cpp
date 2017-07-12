@@ -518,11 +518,18 @@ void BKItemGraph::remove(BKItem* itemToRemove)
     }
     
     items.removeObject(itemToRemove);
-    
-    
-    
 }
 
+void BKItemGraph::remove(BKPreparationType type, int Id)
+{
+    for (auto item : items)
+    {
+        if (item->getType() == type && item->getId() == Id)
+        {
+            remove(item);
+        }
+    }
+}
 
 void BKItemGraph::clear(void)
 {

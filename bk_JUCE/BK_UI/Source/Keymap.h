@@ -36,7 +36,8 @@ public:
     Keymap(int Id):
     Id(Id),
     keymap(Array<bool>()),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         keymap.ensureStorageAllocated(128);
         
@@ -48,14 +49,16 @@ public:
     
     Keymap(Keymap::Ptr k):
     Id(k->getId()),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
         setKeymap(k->keys());
     }
     
     Keymap(void):
     Id(-1),
-    X(-1),Y(-1)
+    X(-1),Y(-1),
+    editted(false)
     {
     }
     
@@ -208,7 +211,7 @@ public:
     inline void setY(int y) { Y = y; }
     inline int getX(void) const noexcept { return X; }
     inline int getY(void) const noexcept { return Y; }
-    
+    bool editted;
     
 private:
     int Id;

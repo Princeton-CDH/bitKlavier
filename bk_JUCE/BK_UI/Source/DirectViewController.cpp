@@ -165,40 +165,58 @@ void DirectPreparationEditor::bkMessageReceived (const String& message)
 void DirectPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
-    
+
     if (name == "Direct")
     {
+        int index = box->getSelectedItemIndex();
         
-        // Remove current from list of actives
-        processor.updateState->removeActive(PreparationTypeDirect, processor.updateState->currentDirectId);
+        int oldId = processor.updateState->currentDirectId;
+        int newId = processor.gallery->getIdFromIndex(PreparationTypeDirect, index);
         
-        // Set new current
-        processor.updateState->currentDirectId = box->getSelectedItemIndex();
+        if (index == selectCB.getNumItems()-1)
+        {
+            processor.gallery->addDirect();
+            
+            processor.gallery->setEditted(PreparationTypeDirect, oldId, true);
+            
+            processor.gallery->getAllDirect().getLast()->editted = true;
+            
+            newId = processor.gallery->getAllDirect().getLast()->getId();
+        }
         
-        // Add new current from list of actives
-        processor.updateState->addActive(PreparationTypeDirect, processor.updateState->currentDirectId);
+        processor.updateState->currentDirectId = newId;
+        
+        processor.updateState->removeActive(PreparationTypeDirect, oldId);
+        
+        if (!processor.gallery->getDirect(oldId)->editted)
+        {
+            processor.updateState->removePreparation(PreparationTypeDirect, oldId);
+            
+            processor.gallery->remove(PreparationTypeDirect, oldId);
+        }
+        
+        processor.updateState->addActive(PreparationTypeDirect, newId);
         
         processor.updateState->idDidChange = true;
         
-        if (processor.updateState->currentDirectId == selectCB.getNumItems()-1)
-        {
-            processor.gallery->addDirect();
-        }
-        
         fillSelectCB();
-        
-        update();
     }
 }
 
 void DirectPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    processor.gallery->getDirect(processor.updateState->currentDirectId)->setName(name);
+    Direct::Ptr direct = processor.gallery->getDirect(processor.updateState->currentDirectId);
+    direct->editted = true;
+    
+    direct->setName(name);
 }
 
 
 void DirectPreparationEditor::BKSingleSliderValueChanged(String name, double val)
 {
+    Direct::Ptr direct = processor.gallery->getDirect(processor.updateState->currentDirectId);
+    direct->editted = true;
+    
     DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
     DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
     
@@ -224,6 +242,9 @@ void DirectPreparationEditor::BKSingleSliderValueChanged(String name, double val
 
 void DirectPreparationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {
+    Direct::Ptr direct = processor.gallery->getDirect(processor.updateState->currentDirectId);
+    direct->editted = true;
+    
     DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
     DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
     
@@ -256,6 +277,7 @@ void DirectPreparationEditor::fillSelectCB(void)
     
     int currentId = processor.updateState->currentDirectId;
     
+    selectCB.addSeparator();
     selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeDirect, currentId), NotificationType::dontSendNotification);
     
 }
@@ -264,6 +286,9 @@ void DirectPreparationEditor::buttonClicked (Button* b)
 {
     if (b == &hideOrShow)
     {
+        DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
+        mod->editted = true;
+        
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
 }
@@ -343,6 +368,8 @@ void DirectModificationEditor::fillSelectCB(void)
     
     int currentId = processor.updateState->currentModDirectId;
     
+    
+    selectCB.addSeparator();
     selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeDirectMod, currentId), NotificationType::dontSendNotification);
     
     
@@ -362,30 +389,46 @@ void DirectModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == "Direct")
     {
+        int index = box->getSelectedItemIndex();
         
-        processor.updateState->removeActive(PreparationTypeDirectMod, processor.updateState->currentModDirectId);
+        int oldId = processor.updateState->currentModDirectId;
+        int newId = processor.gallery->getIdFromIndex(PreparationTypeDirectMod, index);
         
-        processor.updateState->currentModDirectId = box->getSelectedItemIndex();
+        if (index == selectCB.getNumItems()-1)
+        {
+            processor.gallery->addDirectMod();
+            
+            processor.gallery->setEditted(PreparationTypeDirectMod, oldId, true);
+            
+            processor.gallery->getDirectModPreparations().getLast()->editted = true;
+            
+            newId = processor.gallery->getDirectModPreparations().getLast()->getId();
+        }
+        
+        processor.updateState->currentModDirectId = newId;
+        
+        processor.updateState->removeActive(PreparationTypeDirectMod, oldId);
+        
+        if (!processor.gallery->getDirectModPreparation(oldId)->editted)
+        {
+            processor.updateState->removePreparation(PreparationTypeDirectMod, oldId);
+            
+            processor.gallery->remove(PreparationTypeDirectMod, oldId);
+        }
+        
+        processor.updateState->addActive(PreparationTypeDirectMod, newId);
         
         processor.updateState->idDidChange = true;
         
-        
-        if (processor.updateState->currentModDirectId == selectCB.getNumItems()-1)
-        {
-            processor.gallery->addDirectMod();
-        }
-        
         fillSelectCB();
-        
-        update();
-        
-        return;
     }
 }
 
 void DirectModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId)->setName(name);
+    DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
+    
+    mod->setName(name);
     
     updateModification();
 }
@@ -422,6 +465,9 @@ void DirectModificationEditor::BKStackedSliderValueChanged(String name, Array<fl
 
 void DirectModificationEditor::updateModification(void)
 {
+    DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
+    mod->editted = true;
+    
     processor.updateState->modificationDidChange = true;
 }
 
@@ -429,6 +475,9 @@ void DirectModificationEditor::buttonClicked (Button* b)
 {
     if (b == &hideOrShow)
     {
+        DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
+        mod->editted = true;
+        
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
 }

@@ -268,6 +268,7 @@ void TempoPreparationEditor::fillSelectCB(void)
         }
     }
     
+    selectCB.addSeparator();
     selectCB.addItem("New tempo...", index.size()+1);
     
     int currentId = processor.updateState->currentTempoId;
@@ -279,32 +280,45 @@ void TempoPreparationEditor::fillSelectCB(void)
 void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
+    int index = box->getSelectedItemIndex();
     
     TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
     TempoPreparation::Ptr active = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
     
     if (name == selectCB.getName())
     {
-        // Remove current from list of actives
-        processor.updateState->removeActive(PreparationTypeTempo, processor.updateState->currentTempoId);
+        int index = box->getSelectedItemIndex();
         
-        // Set new current
-        processor.updateState->currentTempoId = box->getSelectedItemIndex();
+        int oldId = processor.updateState->currentTempoId;
+        int newId = processor.gallery->getIdFromIndex(PreparationTypeTempo, index);
         
-        // Add new current from list of actives
-        processor.updateState->addActive(PreparationTypeTempo, processor.updateState->currentTempoId);
+        if (index == selectCB.getNumItems()-1)
+        {
+            processor.gallery->addTempo();
+            
+            processor.gallery->setEditted(PreparationTypeTempo, oldId, true);
+            
+            processor.gallery->getAllTempo().getLast()->editted = true;
+            
+            newId = processor.gallery->getAllTempo().getLast()->getId();
+        }
+        
+        processor.updateState->currentTempoId = newId;
+    
+        processor.updateState->removeActive(PreparationTypeTempo, oldId);
+        
+        if (!processor.gallery->getTempo(oldId)->editted)
+        {
+            processor.updateState->removePreparation(PreparationTypeTempo, oldId);
+            
+            processor.gallery->remove(PreparationTypeTempo, oldId);
+        }
+        
+        processor.updateState->addActive(PreparationTypeTempo, newId);
         
         processor.updateState->idDidChange = true;
         
-        if (processor.updateState->currentTempoId == selectCB.getNumItems()-1)
-        {
-            processor.gallery->addTempo();
-        }
-        
         fillSelectCB();
-        
-        update();
-        updateComponentVisibility();
     }
     else if (name == modeCB.getName())
     {
@@ -317,16 +331,28 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         prep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) A1ModeCB.getSelectedItemIndex());
         active->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) A1ModeCB.getSelectedItemIndex());
     }
+    
+    if (name != selectCB.getName())
+    {
+        Tempo::Ptr tempo = processor.gallery->getTempo(processor.updateState->currentTempoId);
+        tempo->editted = true;
+    }
 }
 
 
 void TempoPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    processor.gallery->getTempo(processor.updateState->currentTempoId)->setName(name);
+    Tempo::Ptr tempo = processor.gallery->getTempo(processor.updateState->currentTempoId);
+    tempo->editted = true;
+    
+    tempo->setName(name);
 }
 
 void TempoPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
 {
+    Tempo::Ptr tempo = processor.gallery->getTempo(processor.updateState->currentTempoId);
+    tempo->editted = true;
+    
     TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
     TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
     
@@ -366,6 +392,9 @@ void TempoPreparationEditor::update(void)
 
 void TempoPreparationEditor::BKSingleSliderValueChanged(String name, double val)
 {
+    Tempo::Ptr tempo = processor.gallery->getTempo(processor.updateState->currentTempoId);
+    tempo->editted = true;
+    
     TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
     TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);;
     
@@ -389,6 +418,9 @@ void TempoPreparationEditor::BKSingleSliderValueChanged(String name, double val)
 
 void TempoPreparationEditor::buttonClicked (Button* b)
 {
+    Tempo::Ptr tempo = processor.gallery->getTempo(processor.updateState->currentTempoId);
+    tempo->editted = true;
+    
     if (b == &A1reset)
     {
         DBG("resetting A1 tempo multiplier");
@@ -400,7 +432,6 @@ void TempoPreparationEditor::buttonClicked (Button* b)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
-    
     
 }
 
@@ -445,6 +476,7 @@ void TempoModificationEditor::fillSelectCB(void)
         }
     }
     
+    selectCB.addSeparator();
     selectCB.addItem("New tempo modification...", index.size()+1);
     
     int currentId = processor.updateState->currentModTempoId;
@@ -499,33 +531,44 @@ void TempoModificationEditor::update(void)
 void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
+    int index = box->getSelectedItemIndex();
     
     TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
     
     if (name == selectCB.getName())
     {
-        processor.updateState->removeActive(PreparationTypeTempoMod, processor.updateState->currentModTempoId);
+        int oldId = processor.updateState->currentModTempoId;
+        int newId = processor.gallery->getIdFromIndex(PreparationTypeTempoMod, index);
         
-        processor.updateState->currentModTempoId = box->getSelectedItemIndex();
-        
-        processor.updateState->idDidChange = true;
-        
-        if (processor.updateState->currentModTempoId == selectCB.getNumItems()-1)
+        if (index == selectCB.getNumItems()-1)
         {
             processor.gallery->addTempoMod();
             
+            processor.gallery->setEditted(PreparationTypeTempoMod, oldId, true);
             
+            processor.gallery->getTempoModPreparations().getLast()->editted = true;
+            
+            newId = processor.gallery->getTempoModPreparations().getLast()->getId();
         }
         
+        processor.updateState->currentModTempoId = newId;
+        
+        processor.updateState->removeActive(PreparationTypeTempoMod, oldId);
+        
+        if (!processor.gallery->getTempoModPreparation(oldId)->editted)
+        {
+            processor.updateState->removePreparation(PreparationTypeTempoMod, oldId);
+            
+            processor.gallery->remove(PreparationTypeTempoMod, oldId);
+        }
+        
+        processor.updateState->addActive(PreparationTypeTempoMod, newId);
+        
+        processor.updateState->idDidChange = true;
+        
         fillSelectCB();
-        
-        update();
-        updateComponentVisibility();
-        
-        return;
     }
-    
-    if (name == modeCB.getName())
+    else if (name == modeCB.getName())
     {
         mod->setParam(TempoSystem, String(modeCB.getSelectedItemIndex()));
         
@@ -536,7 +579,7 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
         mod->setParam(AT1Mode, String(A1ModeCB.getSelectedItemIndex()));
     }
     
-    updateModification();
+    if (name != selectCB.getName()) updateModification();
     
 }
 
@@ -586,6 +629,9 @@ void TempoModificationEditor::BKSingleSliderValueChanged(String name, double val
 
 void TempoModificationEditor::updateModification(void)
 {
+    TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
+    mod->editted = true;
+    
     processor.updateState->modificationDidChange = true;
 }
 
@@ -597,9 +643,12 @@ void TempoModificationEditor::buttonClicked (Button* b)
     }
     else if (b == &hideOrShow)
     {
+        TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
+        mod->editted = true;
+        
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
     }
-    
     
 }
 

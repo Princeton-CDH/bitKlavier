@@ -171,6 +171,7 @@ public:
     bool contains(BKItem* thisItem);
     bool containsItemWithTypeAndId(BKPreparationType type, int Id);
     void remove(BKItem* itemToRemove);
+    void remove(BKPreparationType type, int Id);
     void removeUI(BKItem* itemToRemove);
     void removeKeymap(BKItem* itemToRemove);
     void clear(void);
