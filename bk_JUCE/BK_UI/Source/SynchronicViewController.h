@@ -58,6 +58,9 @@ protected:
     ScopedPointer<BKSingleSlider> gainSlider;
     
     void fillModeSelectCB(void);
+    
+    TextButton clearModsButton;
+    
 private:
     
     

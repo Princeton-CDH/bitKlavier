@@ -88,7 +88,8 @@ void TempoViewController::resized()
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
     comboBoxSlice.removeFromLeft(gXSpacing);
-    A1reset.setBounds(comboBoxSlice.removeFromLeft(45));
+    A1reset.setBounds(comboBoxSlice.removeFromLeft(90));
+    clearModsButton.setBounds(A1reset.getBounds());
     
     /* *** above here should be generic (mostly) to all prep layouts *** */
     /* ***         below here will be specific to each prep          *** */
@@ -410,6 +411,8 @@ TempoModificationEditor::TempoModificationEditor(BKAudioProcessor& p, BKItemGrap
 TempoViewController(p, theGraph)
 {
     
+    A1reset.setVisible(false);
+    
     fillSelectCB();
     
     selectCB.addMyListener(this);
@@ -418,9 +421,41 @@ TempoViewController(p, theGraph)
     AT1HistorySlider->addMyListener(this);
     AT1SubdivisionsSlider->addMyListener(this);
     AT1MinMaxSlider->addMyListener(this);
+    A1ModeCB.addListener(this);
     hideOrShow.addListener(this);
     
+    clearModsButton.setButtonText("clear mods");
+    addAndMakeVisible(clearModsButton);
+    clearModsButton.addListener(this);
+    
     update();
+}
+
+void TempoModificationEditor::greyOutAllComponents()
+{
+    A1reset.setVisible(false);
+    
+    A1ModeLabel.setAlpha(gModAlpha);
+    modeCB.setAlpha(gModAlpha);
+    A1ModeCB.setAlpha(gModAlpha);
+    tempoSlider->setDim(gModAlpha);
+    AT1HistorySlider->setDim(gModAlpha);
+    AT1SubdivisionsSlider->setDim(gModAlpha);
+    AT1MinMaxSlider->setDim(gModAlpha);
+}
+
+void TempoModificationEditor::highlightModedComponents()
+{
+    TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
+    
+    if(mod->getParam(TempoBPM) != "")           tempoSlider->setBright();
+    if(mod->getParam(TempoSystem) != "")        modeCB.setAlpha(1);
+    if(mod->getParam(AT1History) != "")         AT1HistorySlider->setBright();
+    if(mod->getParam(AT1Subdivisions) != "")    AT1SubdivisionsSlider->setBright();
+    if(mod->getParam(AT1Min) != "")             AT1MinMaxSlider->setBright();
+    if(mod->getParam(AT1Max) != "")             AT1MinMaxSlider->setBright();
+    if(mod->getParam(AT1Mode) != "")            { A1ModeCB.setAlpha(1.);  A1ModeLabel.setAlpha(1.); }
+
 }
 
 void TempoModificationEditor::fillSelectCB(void)
@@ -453,6 +488,7 @@ void TempoModificationEditor::fillSelectCB(void)
     
 }
 
+
 void TempoModificationEditor::update(void)
 {
     fillSelectCB();
@@ -462,6 +498,10 @@ void TempoModificationEditor::update(void)
     
     if (mod != nullptr)
     {
+        
+        greyOutAllComponents();
+        highlightModedComponents();
+        
         String val = mod->getParam(TempoSystem);
         modeCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
         //                       modeCB.setSelectedItemIndex((int)prep->getTempoSystem(), dontSendNotification);
@@ -528,12 +568,14 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
     if (name == modeCB.getName())
     {
         mod->setParam(TempoSystem, String(modeCB.getSelectedItemIndex()));
-        
+        modeCB.setAlpha(1.);
         updateComponentVisibility();
     }
     else if (name == A1ModeCB.getName())
     {
         mod->setParam(AT1Mode, String(A1ModeCB.getSelectedItemIndex()));
+        A1ModeCB.setAlpha(1.);
+        A1ModeLabel.setAlpha(1.);
     }
     
     updateModification();
@@ -556,6 +598,7 @@ void TempoModificationEditor::BKRangeSliderValueChanged(String name, double minv
     {
         mod->setParam(AT1Min, String(minval));
         mod->setParam(AT1Max, String(maxval));
+        AT1MinMaxSlider->setBright();
     }
     
     updateModification();
@@ -570,14 +613,17 @@ void TempoModificationEditor::BKSingleSliderValueChanged(String name, double val
     if(name == tempoSlider->getName())
     {
         mod->setParam(TempoBPM, String(val));
+        tempoSlider->setBright();
     }
     else if(name == AT1HistorySlider->getName())
     {
         mod->setParam(AT1History, String(val));
+        AT1HistorySlider->setBright();
     }
     else if(name == AT1SubdivisionsSlider->getName())
     {
         mod->setParam(AT1Subdivisions, String(val));
+        AT1SubdivisionsSlider->setBright();
     }
     
     updateModification();
@@ -598,6 +644,12 @@ void TempoModificationEditor::buttonClicked (Button* b)
     else if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+    else if (b == &clearModsButton)
+    {
+        TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
+        mod->clearAll();
+        update();
     }
     
     

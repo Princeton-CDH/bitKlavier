@@ -71,6 +71,8 @@ void DirectViewController::resized()
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    clearModsButton.setBounds(comboBoxSlice.removeFromLeft(90));
     
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
@@ -287,6 +289,28 @@ DirectViewController(p, theGraph)
     hammerGainSlider->addMyListener(this);
     
     hideOrShow.addListener(this);
+    
+    clearModsButton.setButtonText("clear mods");
+    addAndMakeVisible(clearModsButton);
+    clearModsButton.addListener(this);
+}
+
+void DirectModificationEditor::greyOutAllComponents()
+{
+    hammerGainSlider->setDim(gModAlpha);
+    resonanceGainSlider->setDim(gModAlpha);
+    transpositionSlider->setDim(gModAlpha);
+    gainSlider->setDim(gModAlpha);
+}
+
+void DirectModificationEditor::highlightModedComponents()
+{
+    DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
+
+    if(mod->getParam(DirectTransposition) != "")    transpositionSlider->setBright();
+    if(mod->getParam(DirectGain) != "")             gainSlider->setBright();
+    if(mod->getParam(DirectResGain) != "")          resonanceGainSlider->setBright();
+    if(mod->getParam(DirectHammerGain) != "")       hammerGainSlider->setBright();
 }
 
 void DirectModificationEditor::update(void)
@@ -302,6 +326,9 @@ void DirectModificationEditor::update(void)
     
     if (mod != nullptr)
     {
+        greyOutAllComponents();
+        highlightModedComponents();
+        
         String val = mod->getParam(DirectTransposition);
         transpositionSlider->setValue(stringToFloatArray(val), dontSendNotification);
         
@@ -398,14 +425,17 @@ void DirectModificationEditor::BKSingleSliderValueChanged(String name, double va
     if(name == "resonance gain")
     {
         mod->setParam(DirectResGain, String(val));
+        resonanceGainSlider->setBright();
     }
     else if(name == "hammer gain")
     {
         mod->setParam(DirectHammerGain, String(val));
+        hammerGainSlider->setBright();
     }
     else if(name == "gain")
     {
         mod->setParam(DirectGain, String(val));
+        gainSlider->setBright();
     }
     
     updateModification();
@@ -416,6 +446,7 @@ void DirectModificationEditor::BKStackedSliderValueChanged(String name, Array<fl
     DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
     
     mod->setParam(DirectTransposition, floatArrayToString(val));
+    transpositionSlider->setBright();
     
     updateModification();
 }
@@ -430,6 +461,12 @@ void DirectModificationEditor::buttonClicked (Button* b)
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+    else if (b == &clearModsButton)
+    {
+        DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
+        mod->clearAll();
+        update();
     }
 }
 

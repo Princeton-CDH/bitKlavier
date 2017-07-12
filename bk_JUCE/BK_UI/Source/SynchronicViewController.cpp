@@ -118,6 +118,8 @@ void SynchronicViewController::resized()
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    clearModsButton.setBounds(comboBoxSlice.removeFromLeft(90));
     
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
@@ -573,6 +575,10 @@ SynchronicViewController(p, theGraph)
         paramSliders[i]->addMyListener(this);
     }
     
+    clearModsButton.setButtonText("clear mods");
+    addAndMakeVisible(clearModsButton);
+    clearModsButton.addListener(this);
+    
     //startTimer(20);
     
 }
@@ -581,10 +587,19 @@ void SynchronicModificationEditor::greyOutAllComponents()
 {
     modeSelectCB.setAlpha(gModAlpha);
     offsetParamStartToggle.setAlpha(gModAlpha);
-    howManySlider->setAlpha(gModAlpha);
-    clusterThreshSlider->setAlpha(gModAlpha);
-    clusterMinMaxSlider->setAlpha(gModAlpha);
-    gainSlider->setAlpha(gModAlpha);
+    
+    //howManySlider->setAlpha(gModAlpha);
+    howManySlider->setDim(gModAlpha);
+    //clusterThreshSlider->setAlpha(gModAlpha);
+    clusterThreshSlider->setDim(gModAlpha);
+    //clusterMinMaxSlider->setAlpha(gModAlpha);
+    clusterThreshSlider->setDim(gModAlpha);
+    //gainSlider->setAlpha(gModAlpha);
+    gainSlider->setDim(gModAlpha);
+    
+    //clusterMinMaxSlider->setAlpha(gModAlpha);
+    clusterMinMaxSlider->setDim(gModAlpha);
+    
     for(int i = 0; i < paramSliders.size(); i++)
     {
         paramSliders[i]->setAlpha(gModAlpha);
@@ -596,12 +611,12 @@ void SynchronicModificationEditor::highlightModedComponents()
     SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
     
     if(mod->getParam(SynchronicMode) != "")             modeSelectCB.setAlpha(1.);
-    if(mod->getParam(SynchronicNumPulses) != "")        howManySlider->setAlpha(1);
-    if(mod->getParam(SynchronicClusterThresh) != "")    clusterThreshSlider->setAlpha(1);
-    if(mod->getParam(SynchronicClusterMin) != "")       clusterMinMaxSlider->setAlpha(1);
-    if(mod->getParam(SynchronicClusterMax) != "")       clusterMinMaxSlider->setAlpha(1);
+    if(mod->getParam(SynchronicNumPulses) != "")        howManySlider->setBright(); //howManySlider->setAlpha(1);
+    if(mod->getParam(SynchronicClusterThresh) != "")    clusterThreshSlider->setBright(); //clusterThreshSlider->setAlpha(1);
+    if(mod->getParam(SynchronicClusterMin) != "")       clusterMinMaxSlider->setBright(); //clusterMinMaxSlider->setAlpha(1);
+    if(mod->getParam(SynchronicClusterMax) != "")       clusterMinMaxSlider->setBright(); //clusterMinMaxSlider->setAlpha(1);
     if(mod->getParam(SynchronicBeatsToSkip) != "")      offsetParamStartToggle.setAlpha(1.);
-    //if(mod->getParam(SynchronicGain) != "")           gainSlider->setAlpha(1);
+    if(mod->getParam(SynchronicGain) != "")             gainSlider->setBright(); //gainSlider->setAlpha(1);
 
     if(mod->getParam(SynchronicBeatMultipliers) != "")
     {
@@ -685,7 +700,7 @@ void SynchronicModificationEditor::update(NotificationType notify)
         //FIXIT offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
         //SynchronicBeatsToSkip determines whether to set this toggle
         val = mod->getParam(SynchronicBeatsToSkip);
-        offsetParamStartToggle.setToggleState(val.getIntValue(), notify);
+        offsetParamStartToggle.setToggleState(val.getIntValue() + 1, notify);
         
         val = mod->getParam(SynchronicNumPulses);
         howManySlider->setValue(val.getIntValue(), notify);
@@ -699,9 +714,8 @@ void SynchronicModificationEditor::update(NotificationType notify)
         val = mod->getParam(SynchronicClusterMax);
         clusterMinMaxSlider->setMaxValue(val.getIntValue(), notify);
         
-        
-        
-        // FIXIT gainSlider->setValue(prep->getGain(), notify);
+        val = mod->getParam(SynchronicGain);
+        gainSlider->setValue(val.getFloatValue(), notify);
         
         for (int i = 0; i < paramSliders.size(); i++)
         {
@@ -839,18 +853,20 @@ void SynchronicModificationEditor::BKSingleSliderValueChanged(String name, doubl
     if(name == "how many")
     {
         mod->setParam(SynchronicNumPulses, String(val));
-        howManySlider->setAlpha(1.);
+        //howManySlider->setAlpha(1.);
+        howManySlider->setBright();
     }
     else if(name == "cluster threshold")
     {
         mod->setParam(SynchronicClusterThresh, String(val));
-        clusterThreshSlider->setAlpha(1.);
+        //clusterThreshSlider->setAlpha(1.);
+        clusterThreshSlider->setBright();
     }
     else if(name == "gain")
     {
-        // gain mod
-        //genmod->setSynchronicGain(val);
-        gainSlider->setAlpha(1.);
+        mod->setParam(SynchronicGain, String(val));
+        //gainSlider->setAlpha(1.);
+        gainSlider->setBright();
     }
     
     updateModification();
@@ -864,7 +880,8 @@ void SynchronicModificationEditor::BKRangeSliderValueChanged(String name, double
     {
         mod->setParam(SynchronicClusterMin, String(minval));
         mod->setParam(SynchronicClusterMax, String(maxval));
-        clusterMinMaxSlider->setAlpha(1.);
+        //clusterMinMaxSlider->setAlpha(1.);
+        clusterMinMaxSlider->setBright();
     }
     
     updateModification();
@@ -992,6 +1009,12 @@ void SynchronicModificationEditor::buttonClicked (Button* b)
     else if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+    else if (b == &clearModsButton)
+    {
+        SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
+        mod->clearAll();
+        update();
     }
     
     updateModification();

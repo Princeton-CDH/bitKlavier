@@ -353,6 +353,14 @@ public:
         }
     }
     
+    void clearAll()
+    {
+        for (int i = DirectId+1; i < DirectParameterTypeNil; i++)
+        {
+            param.set(i, "");
+        }
+    }
+    
     inline const String getParam(DirectParameterType type)
     {
         if (type != DirectId)   return param[type];
@@ -1011,6 +1019,14 @@ public:
         }
     }
     
+    void clearAll()
+    {
+        for (int i = SynchronicId+1; i < SynchronicParameterTypeNil; i++)
+        {
+            param.set(i, "");
+        }
+    }
+    
     
     inline const StringArray getStringArray(void) { return param; }
     
@@ -1548,6 +1564,14 @@ public:
         for (int i = NostalgicId+1; i < NostalgicParameterTypeNil; i++)
         {
             param.set(i, p->getParam((NostalgicParameterType)i));
+        }
+    }
+    
+    void clearAll()
+    {
+        for (int i = NostalgicId+1; i < NostalgicParameterTypeNil; i++)
+        {
+            param.set(i, "");
         }
     }
     
