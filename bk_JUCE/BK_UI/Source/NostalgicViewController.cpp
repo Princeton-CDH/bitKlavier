@@ -84,6 +84,8 @@ void NostalgicViewController::resized()
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    clearModsButton.setBounds(comboBoxSlice.removeFromLeft(90));
     
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
@@ -196,7 +198,8 @@ void NostalgicPreparationEditor::update(void)
         selectCB.setSelectedItemIndex(processor.updateState->currentNostalgicId, dontSendNotification);
         lengthModeSelectCB.setSelectedItemIndex(prep->getMode(), dontSendNotification);
         
-        transpositionSlider->setValue(prep->getTransposition(), dontSendNotification);
+        //transpositionSlider->setValue(prep->getTransposition(), dontSendNotification);
+        transpositionSlider->setTo(prep->getTransposition(), dontSendNotification);
         lengthMultiplierSlider->setValue(prep->getLengthMultiplier(), dontSendNotification);
         beatsToSkipSlider->setValue(prep->getBeatsToSkip(), dontSendNotification);
         gainSlider->setValue(prep->getGain(), dontSendNotification);
@@ -391,6 +394,10 @@ NostalgicViewController(p, theGraph)
 {
     fillSelectCB();
     
+    clearModsButton.setButtonText("clear mods");
+    addAndMakeVisible(clearModsButton);
+    clearModsButton.addListener(this);
+    
     nDisplaySlider.addMyListener(this);
     selectCB.addListener(this);
     selectCB.addMyListener(this);
@@ -402,7 +409,30 @@ NostalgicViewController(p, theGraph)
     
     gainSlider->addMyListener(this);
     
-    startTimer(20);
+    //startTimer(20);
+}
+
+void NostalgicModificationEditor::greyOutAllComponents()
+{
+    nDisplaySlider.setDim(gModAlpha);
+    lengthModeSelectCB.setAlpha(gModAlpha);
+    transpositionSlider->setDim(gModAlpha);
+    lengthMultiplierSlider->setDim(gModAlpha);
+    beatsToSkipSlider->setDim(gModAlpha);
+    gainSlider->setDim(gModAlpha);
+}
+
+void NostalgicModificationEditor::highlightModedComponents()
+{
+    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
+
+    if(mod->getParam(NostalgicWaveDistance) != "")      nDisplaySlider.setBright();
+    if(mod->getParam(NostalgicUndertow) != "")          nDisplaySlider.setBright();
+    if(mod->getParam(NostalgicTransposition) != "")     transpositionSlider->setBright();
+    if(mod->getParam(NostalgicLengthMultiplier) != "")  lengthMultiplierSlider->setBright();
+    if(mod->getParam(NostalgicBeatsToSkip) != "")       beatsToSkipSlider->setBright();
+    if(mod->getParam(NostalgicMode) != "")              lengthModeSelectCB.setAlpha(1.);
+    if(mod->getParam(NostalgicGain) != "")              gainSlider->setBright();
 }
 
 void NostalgicModificationEditor::update(void)
@@ -415,6 +445,9 @@ void NostalgicModificationEditor::update(void)
     if (mod != nullptr)
     {
         fillSelectCB();
+        
+        greyOutAllComponents();
+        highlightModedComponents();
         
         selectCB.setSelectedItemIndex(processor.updateState->currentModNostalgicId, dontSendNotification);
         
@@ -440,7 +473,8 @@ void NostalgicModificationEditor::update(void)
         }
         
         val = mod->getParam(NostalgicTransposition);
-        transpositionSlider->setValue(stringToFloatArray(val), dontSendNotification);
+        //transpositionSlider->setValue(stringToFloatArray(val), dontSendNotification);
+        transpositionSlider->setTo(stringToFloatArray(val), dontSendNotification);
         
         val = mod->getParam(NostalgicLengthMultiplier);
         lengthMultiplierSlider->setValue(val.getFloatValue(), dontSendNotification);
@@ -506,6 +540,8 @@ void NostalgicModificationEditor::BKWaveDistanceUndertowSliderValueChanged(Strin
     
     mod     ->setParam(NostalgicWaveDistance, String(wavedist));
     mod     ->setParam(NostalgicUndertow, String(undertow));
+    
+    nDisplaySlider.setBright();
     
     updateModification();
 }
@@ -585,6 +621,7 @@ void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
         }
         
         updateModification();
+        lengthModeSelectCB.setAlpha(1.);
         
     }
     
@@ -598,14 +635,17 @@ void NostalgicModificationEditor::BKSingleSliderValueChanged(String name, double
     if(name == "note length multiplier")
     {
         mod->setParam(NostalgicLengthMultiplier, String(val));
+        lengthMultiplierSlider->setBright();
     }
     else if(name == "beats to skip")
     {
         mod->setParam(NostalgicBeatsToSkip, String(val));
+        beatsToSkipSlider->setBright();
     }
     else if(name == "gain")
     {
         mod->setParam(NostalgicGain, String(val));
+        gainSlider->setBright();
     }
     
     updateModification();
@@ -616,6 +656,7 @@ void NostalgicModificationEditor::BKStackedSliderValueChanged(String name, Array
     NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
     
     mod->setParam(NostalgicTransposition, floatArrayToString(val));
+    transpositionSlider->setBright();
     
     updateModification();
 }
@@ -637,6 +678,10 @@ void NostalgicModificationEditor::buttonClicked (Button* b)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
-    
-    
+    else if (b == &clearModsButton)
+    {
+        NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
+        mod->clearAll();
+        update();
+    }
 }

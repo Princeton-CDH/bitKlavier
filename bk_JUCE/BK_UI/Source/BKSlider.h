@@ -264,6 +264,9 @@ public:
     void addMyListener(BKSingleSliderListener* listener)     { listeners.add(listener);      }
     void removeMyListener(BKSingleSliderListener* listener)  { listeners.remove(listener);   }
     
+    void setDim(float newAlpha);
+    void setBright();
+    
 private:
     
     double sliderMin, sliderMax;
@@ -343,6 +346,9 @@ public:
     void resized() override;
     void sliderDragEnded(Slider *slider) override;
     void mouseDown (const MouseEvent &event) override;
+    
+    void setDim(float newAlpha);
+    void setBright();
     
     ListenerList<BKRangeSliderListener> listeners;
     void addMyListener(BKRangeSliderListener* listener)     { listeners.add(listener);      }
@@ -424,6 +430,9 @@ public:
     void setWaveDistance(int newwavedist, NotificationType notify);
     void setUndertow(int newundertow, NotificationType notify);
     
+    void setDim(float newAlpha);
+    void setBright();
+    
     ListenerList<BKWaveDistanceUndertowSliderListener> listeners;
     void addMyListener(BKWaveDistanceUndertowSliderListener* listener)     { listeners.add(listener);      }
     void removeMyListener(BKWaveDistanceUndertowSliderListener* listener)  { listeners.remove(listener);   }
@@ -497,6 +506,9 @@ public:
     String getName()                { return sliderName; }
     
     void resized() override;
+    
+    void setDim(float newAlpha);
+    void setBright();
     
     ListenerList<BKStackedSliderListener> listeners;
     void addMyListener(BKStackedSliderListener* listener)     { listeners.add(listener);      }

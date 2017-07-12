@@ -135,7 +135,8 @@ void TuningViewController::resized()
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
     comboBoxSlice.removeFromLeft(gXSpacing);
-    A1reset.setBounds(comboBoxSlice.removeFromLeft(45));
+    A1reset.setBounds(comboBoxSlice.removeFromLeft(90));
+    clearModsButton.setBounds(A1reset.getBounds());
     
     /* *** above here should be generic (mostly) to all prep layouts *** */
     /* ***         below here will be specific to each prep          *** */
@@ -635,6 +636,10 @@ TuningViewController(p, theGraph)
     customKeyboard.addMyListener(this);
     offsetSlider->addMyListener(this);
     hideOrShow.addListener(this);
+    
+    clearModsButton.setButtonText("clear mods");
+    addAndMakeVisible(clearModsButton);
+    clearModsButton.addListener(this);
 
     update();
 }
@@ -647,11 +652,11 @@ void TuningModificationEditor::greyOutAllComponents()
     A1Inversional.setAlpha(gModAlpha);
     A1AnchorScaleCB.setAlpha(gModAlpha);
     A1FundamentalCB.setAlpha(gModAlpha);
-    A1ClusterThresh->setAlpha(gModAlpha);
-    A1ClusterMax->setAlpha(gModAlpha);
+    A1ClusterThresh->setDim(gModAlpha);
+    A1ClusterMax->setDim(gModAlpha);
     absoluteKeyboard.setAlpha(gModAlpha);
     customKeyboard.setAlpha(gModAlpha);
-    offsetSlider->setAlpha(gModAlpha);
+    offsetSlider->setDim(gModAlpha);
     A1IntervalScaleLabel.setAlpha(gModAlpha);
     A1AnchorScaleLabel.setAlpha(gModAlpha);
 }
@@ -666,11 +671,11 @@ void TuningModificationEditor::highlightModedComponents()
     if(mod->getParam(TuningA1Inversional) != "")        A1Inversional.setAlpha(1);
     if(mod->getParam(TuningA1AnchorScale) != "")        { A1AnchorScaleCB.setAlpha(1); A1AnchorScaleLabel.setAlpha(1); }
     if(mod->getParam(TuningA1AnchorFundamental) != "")  A1FundamentalCB.setAlpha(1);
-    if(mod->getParam(TuningA1ClusterThresh) != "")      A1ClusterThresh->setAlpha(1);
-    if(mod->getParam(TuningA1History) != "")            A1ClusterMax->setAlpha(1);
+    if(mod->getParam(TuningA1ClusterThresh) != "")      A1ClusterThresh->setBright();;
+    if(mod->getParam(TuningA1History) != "")            A1ClusterMax->setBright();;
     if(mod->getParam(TuningAbsoluteOffsets) != "")      absoluteKeyboard.setAlpha(1);
     if(mod->getParam(TuningCustomScale) != "")          customKeyboard.setAlpha(1);
-    if(mod->getParam(TuningOffset) != "")               offsetSlider->setAlpha(1);
+    if(mod->getParam(TuningOffset) != "")               offsetSlider->setBright();
 }
 
 void TuningModificationEditor::update(void)
@@ -730,6 +735,7 @@ void TuningModificationEditor::update(void)
         //                       A1ClusterMax->setValue(prep->getAdaptiveHistory(), dontSendNotification);
         
         updateComponentVisibility();
+        A1reset.setVisible(false);
     }
     
 }
@@ -841,6 +847,7 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
     if (name != selectCB.getName()) updateModification();
     
     updateComponentVisibility();
+    A1reset.setVisible(false);
 }
 
 void TuningModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
@@ -879,17 +886,17 @@ void TuningModificationEditor::BKSingleSliderValueChanged(String name, double va
     if(name == offsetSlider->getName())
     {
         mod->setParam(TuningOffset, String(val * 0.01));
-        offsetSlider->setAlpha(1.);
+        offsetSlider->setBright();
     }
     else if(name == A1ClusterThresh->getName())
     {
         mod->setParam(TuningA1ClusterThresh, String(val));
-        A1ClusterThresh->setAlpha(1.);
+        A1ClusterThresh->setBright();
     }
     else if(name == A1ClusterMax->getName())
     {
         mod->setParam(TuningA1History, String(val));
-        A1ClusterMax->setAlpha(1.);
+        A1ClusterMax->setBright();
     }
     
     updateModification();
@@ -914,11 +921,17 @@ void TuningModificationEditor::buttonClicked (Button* b)
     }
     else if (b == &A1reset)
     {
-        // reset mod
+        // N/A in mod
     }
     else if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+    else if (b == &clearModsButton)
+    {
+        TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
+        mod->clearAll();
+        update();
     }
     
     updateModification();

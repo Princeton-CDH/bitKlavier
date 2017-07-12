@@ -428,6 +428,14 @@ public:
                 getParam(AT1Mode)           == t->getParam(AT1Mode));
     }
     
+    void clearAll()
+    {
+        for (int i = TempoId+1; i < TempoParameterTypeNil; i++)
+        {
+            param.set(i, "");
+        }
+    }
+    
     inline void setId(int newId) { Id = newId; }
     inline int getId(void) const noexcept { return Id; }
     

@@ -553,6 +553,14 @@ public:
             
     }
     
+    void clearAll()
+    {
+        for (int i = TuningId+1; i < TuningParameterTypeNil; i++)
+        {
+            param.set(i, "");
+        }
+    }
+    
     ValueTree getState(int Id);
     
     void setState(XmlElement*);

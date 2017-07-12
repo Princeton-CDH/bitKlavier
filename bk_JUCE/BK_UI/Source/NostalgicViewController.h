@@ -38,6 +38,8 @@ public:
     
     void fillModeSelectCB(void);
     
+    TextButton clearModsButton;
+    
 private:
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NostalgicViewController)
@@ -109,6 +111,8 @@ public:
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
     
     void fillSelectCB(void);
+    void greyOutAllComponents();
+    void highlightModedComponents();
     
     void timerCallback() override;
     

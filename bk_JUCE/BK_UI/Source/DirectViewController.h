@@ -32,6 +32,8 @@ public:
     void resized() override;
     
     virtual void update(void) {};
+        
+    TextButton clearModsButton;
     
 private:
 
@@ -85,6 +87,9 @@ public:
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(String name, double val) override;
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
+    
+    void greyOutAllComponents();
+    void highlightModedComponents();
     
     void fillSelectCB(void);
     

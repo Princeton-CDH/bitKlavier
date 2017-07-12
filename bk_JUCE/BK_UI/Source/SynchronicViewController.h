@@ -58,6 +58,9 @@ protected:
     ScopedPointer<BKSingleSlider> gainSlider;
     
     void fillModeSelectCB(void);
+    
+    TextButton clearModsButton;
+    
 private:
     
     
@@ -136,6 +139,8 @@ private:
     void multiSlidersDidChange(String name, Array<Array<float>> values) override;
     
     void fillSelectCB(void);
+    void greyOutAllComponents();
+    void highlightModedComponents();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicModificationEditor)
 };

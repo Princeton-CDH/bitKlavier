@@ -1122,6 +1122,20 @@ sliderIncrement(increment)
     
 }
 
+void BKSingleSlider::setDim(float alphaVal)
+{
+    thisSlider.setAlpha(alphaVal);
+    showName.setAlpha(alphaVal);
+    valueTF.setAlpha(alphaVal);
+}
+
+void BKSingleSlider::setBright()
+{
+    thisSlider.setAlpha(1.);
+    showName.setAlpha(1.);
+    valueTF.setAlpha(1.);
+}
+
 void BKSingleSlider::sliderValueChanged (Slider *slider)
 {
     if(slider == &thisSlider)
@@ -1327,6 +1341,24 @@ sliderIncrement(increment)
 
     newDrag = false;
     isMinAlwaysLessThanMax = false;
+}
+
+void BKRangeSlider::setDim(float alphaVal)
+{
+    minSlider.setAlpha(alphaVal);
+    maxSlider.setAlpha(alphaVal);
+    showName.setAlpha(alphaVal);
+    minValueTF.setAlpha(alphaVal);
+    maxValueTF.setAlpha(alphaVal);
+}
+
+void BKRangeSlider::setBright()
+{
+    minSlider.setAlpha(1.);
+    maxSlider.setAlpha(1.);
+    showName.setAlpha(1.);
+    minValueTF.setAlpha(1.);
+    maxValueTF.setAlpha(1.);
 }
 
 
@@ -1599,6 +1631,29 @@ BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
     
 }
 
+void BKWaveDistanceUndertowSlider::setDim(float alphaVal)
+{
+    wavedistanceName.setAlpha(alphaVal);
+    undertowName.setAlpha(alphaVal);
+    wavedistanceSlider->setAlpha(alphaVal);
+    undertowSlider->setAlpha(alphaVal);
+    
+    for(int i=0; i<maxSliders; i++)
+    {
+        Slider* newSlider = displaySliders.getUnchecked(i);
+        newSlider->setAlpha(0.);
+    }
+    
+}
+
+void BKWaveDistanceUndertowSlider::setBright()
+{
+    wavedistanceName.setAlpha(1.);
+    undertowName.setAlpha(1.);
+    wavedistanceSlider->setAlpha(1.);
+    undertowSlider->setAlpha(1.);
+}
+
 
 void BKWaveDistanceUndertowSlider::updateSliderPositions(Array<int> newpositions)
 {
@@ -1747,6 +1802,42 @@ sliderIncrement(increment)
     
 }
 
+void BKStackedSlider::setDim(float alphaVal)
+{
+    showName.setAlpha(alphaVal);
+    topSlider->setAlpha(alphaVal);
+    
+    for(int i=0; i<numSliders; i++)
+    {
+        Slider* newSlider = dataSliders.operator[](i);
+        if(newSlider != nullptr)
+        {
+            if(activeSliders.getUnchecked(i))
+            {
+                newSlider->setAlpha(alphaVal);
+            }
+        }
+    }
+}
+
+void BKStackedSlider::setBright()
+{
+    showName.setAlpha(1.);
+    topSlider->setAlpha(1.);
+    
+    for(int i=0; i<numSliders; i++)
+    {
+        Slider* newSlider = dataSliders.operator[](i);
+        if(newSlider != nullptr)
+        {
+            if(activeSliders.getUnchecked(i))
+            {
+                newSlider->setAlpha(1.);
+            }
+        }
+    }
+}
+
 void BKStackedSlider::sliderValueChanged (Slider *slider)
 {
     //leave unimplelemented; only drag and setTo should actually change values of subSliders
@@ -1767,6 +1858,11 @@ void BKStackedSlider::setTo(Array<float> newvals, NotificationType newnotify)
     
     int slidersToActivate = newvals.size();
     if(slidersToActivate > numSliders) slidersToActivate = numSliders;
+    if(slidersToActivate <= 0)
+    {
+        slidersToActivate = 1;
+        newvals.add(sliderDefault);
+    }
     
     //activate sliders
     for(int i=0; i<slidersToActivate; i++)
