@@ -77,7 +77,7 @@ public:
                 at1Mode == s->getAdaptiveTempo1Mode());
     }
     
-    inline const TempoType getTempoSystem() const noexcept    {return sWhichTempoSystem; }
+    inline const TempoType getTempoSystem() const noexcept      {return sWhichTempoSystem; }
     inline const float getTempo() const noexcept                {return sTempo; }
     inline const float getBeatThresh() const noexcept           {return sBeatThreshSec; }
     inline const float getBeatThreshMS() const noexcept         {return sBeatThreshMS; }

@@ -215,7 +215,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 else if (e->hasTagName( vtagTempo + String(tempoPrepCount)))
                 {
                     addTempo();
-                    
+
                     tempo.getLast()->setState(e);
                     
                     ++tempoPrepCount;
@@ -225,7 +225,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 {
                     addTempoMod();
                     
-                    tempo.getLast()->setState(e);
+                    modTempo.getLast()->setState(e);
                     
                     ++tempoModPrepCount;
                     

@@ -441,7 +441,7 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     String name = box->getName();
     int index = box->getSelectedItemIndex();
     
-    if (name == "Synchronic")
+    if (name == selectCB.getName())
     {
         int oldId = processor.updateState->currentSynchronicId;
         int newId = processor.gallery->getIdFromIndex(PreparationTypeSynchronic, index);
@@ -450,11 +450,11 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         {
             processor.gallery->addSynchronic();
             
-            processor.gallery->setEditted(PreparationTypeNostalgic, oldId, true);
+            processor.gallery->setEditted(PreparationTypeSynchronic, oldId, true);
             
-            processor.gallery->getAllNostalgic().getLast()->editted = true;
+            processor.gallery->getAllSynchronic().getLast()->editted = true;
             
-            newId = processor.gallery->getAllNostalgic().getLast()->getId();
+            newId = processor.gallery->getAllSynchronic().getLast()->getId();
         }
         
         processor.updateState->currentSynchronicId = newId;
@@ -922,7 +922,7 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
     
-    if (name == "Synchronic")
+    if (name == selectCB.getName())
     {
         int index = box->getSelectedItemIndex();
         

@@ -327,6 +327,27 @@ void BKAudioProcessor::performModifications(int noteNumber)
         updateState->tuningPreparationDidChange = true;
     }
     
+    TempoModification::PtrArr mMod = currentPiano->modificationMap[noteNumber]->getTempoModifications();
+    for (int i = mMod.size(); --i >= 0;)
+    {
+        TempoPreparation::Ptr active = gallery->getTempo(mMod[i]->getPrepId())->aPrep;
+        TempoParameterType type = mMod[i]->getParameterType();
+        modfa = mMod[i]->getModFloatArr();
+        modf = mMod[i]->getModFloat();
+        modi = mMod[i]->getModInt();
+        modia = mMod[i]->getModIntArr();
+        
+        if (type == TempoBPM)               active->setTempo(modf);
+        else if (type == TempoSystem)       active->setTempoSystem((TempoType)modi);
+        else if (type == AT1History)        active->setAdaptiveTempo1History(modi);
+        else if (type == AT1Subdivisions)   active->setAdaptiveTempo1Subdivisions(modf);
+        else if (type == AT1Min)            active->setAdaptiveTempo1Min(modf);
+        else if (type == AT1Max)            active->setAdaptiveTempo1Max(modf);
+        else if (type == AT1Mode)           active->setAdaptiveTempo1Mode((AdaptiveTempo1Mode)modi);
+
+        updateState->tempoPreparationDidChange = true;
+    }
+    
     DirectModification::PtrArr dMod = currentPiano->modificationMap[noteNumber]->getDirectModifications();
     for (int i = dMod.size(); --i >= 0;)
     {

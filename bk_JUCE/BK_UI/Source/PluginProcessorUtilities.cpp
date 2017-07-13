@@ -18,6 +18,7 @@ void BKAudioProcessor::updateUI(void)
     updateState->nostalgicPreparationDidChange = true;
     updateState->synchronicPreparationDidChange = true;
     updateState->tuningPreparationDidChange = true;
+    updateState->tempoPreparationDidChange = true;
     updateState->generalSettingsDidChange = true;
     
     

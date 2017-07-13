@@ -218,6 +218,7 @@ TempoPreparationEditor::TempoPreparationEditor(BKAudioProcessor& p, BKItemGraph*
 TempoViewController(p, theGraph)
 {
     selectCB.addMyListener(this);
+    selectCB.addListener(this);
     fillSelectCB();
     
     modeCB.addListener(this);
@@ -288,7 +289,8 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == selectCB.getName())
     {
-        int index = box->getSelectedItemIndex();
+
+        //int index = box->getSelectedItemIndex();
         
         int oldId = processor.updateState->currentTempoId;
         int newId = processor.gallery->getIdFromIndex(PreparationTypeTempo, index);
@@ -314,7 +316,6 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
             
             processor.gallery->remove(PreparationTypeTempo, oldId);
         }
-        
         processor.updateState->addActive(PreparationTypeTempo, newId);
         
         processor.updateState->idDidChange = true;
@@ -345,6 +346,7 @@ void TempoPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableCo
 {
     Tempo::Ptr tempo = processor.gallery->getTempo(processor.updateState->currentTempoId);
     tempo->editted = true;
+        DBG("************** tempo->edited = true");
     
     tempo->setName(name);
 }
@@ -379,6 +381,7 @@ void TempoPreparationEditor::update(void)
         selectCB.setSelectedItemIndex(processor.updateState->currentTempoId, dontSendNotification);
         modeCB.setSelectedItemIndex((int)prep->getTempoSystem(), dontSendNotification);
         tempoSlider->setValue(prep->getTempo(), dontSendNotification);
+        DBG("tempoSlider set to " + String(prep->getTempo()));
         
         A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempo1Mode(), dontSendNotification);
         AT1HistorySlider->setValue(prep->getAdaptiveTempo1History(), dontSendNotification);
