@@ -21,6 +21,7 @@ overtop(p, &theGraph),
 timerCallbackCount(0)
 {
     addKeyListener(this);
+    addMouseListener(this, true);
     
     gen = processor.gallery->getGeneralSettings();
     
@@ -159,7 +160,14 @@ void MainViewController::resized()
      */
 }
 
-
+void MainViewController::mouseDown(const MouseEvent &event)
+{
+    if(event.eventComponent == &construction)
+    {
+        if(overtop.getCurrentDisplay() != DisplayNil)
+            overtop.setCurrentDisplay(DisplayNil);
+    }
+}
 
 void MainViewController::bkButtonClicked (Button* b)
 {
@@ -180,13 +188,13 @@ void MainViewController::sliderValueChanged (Slider* slider)
 
 void MainViewController::handleNoteOn(BKKeymapKeyboardState* source, int midiNoteNumber, float velocity) 
 {
-    DBG("MainViewController::handleKeymapNoteOn " + String(midiNoteNumber));
+    //DBG("MainViewController::handleKeymapNoteOn " + String(midiNoteNumber));
     processor.noteOnUI(midiNoteNumber);
 }
 
 void MainViewController::handleNoteOff(BKKeymapKeyboardState* source, int midiNoteNumber, float velocity)
 {
-    DBG("MainViewController::handleKeymapNoteOff " + String(midiNoteNumber));
+    //DBG("MainViewController::handleKeymapNoteOff " + String(midiNoteNumber));
     processor.noteOffUI(midiNoteNumber);
 }
 

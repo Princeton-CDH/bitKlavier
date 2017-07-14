@@ -86,6 +86,7 @@ private:
     
     void bkButtonClicked        (Button* b)                     override;
     void sliderValueChanged     (Slider* slider)                override;
+    void mouseDown (const MouseEvent &event) override;
     
     void drawPreparationPanel(void);
 

@@ -111,10 +111,13 @@ public:
     
     inline void setCurrentDisplay(BKPreparationDisplay type)
     {
+        currentDisplay = type;
+        
         if (type == DisplayNil)
         {
             setVisible(false);
             setOpaque(false);
+            
             return;
         }
         else
@@ -203,6 +206,11 @@ public:
         
         //hideOrShow.toFront(false);
         
+    }
+    
+    BKPreparationDisplay getCurrentDisplay()
+    {
+        return currentDisplay;
     }
     
     GeneralViewController gvc;
