@@ -50,7 +50,7 @@ void BKAudioProcessor::collectGalleries(void)
 {
     galleryNames.clear();
     
-    DirectoryIterator xmlIter (File ("~/bk"), true, "*.xml");
+    DirectoryIterator xmlIter (File ("~/bkGalleries"), true, "*.xml");
     while (xmlIter.next())
     {
         File galleryFile (xmlIter.getFile());
@@ -59,7 +59,7 @@ void BKAudioProcessor::collectGalleries(void)
     }
     
     
-    DirectoryIterator jsonIter (File ("~/bk"), true, "*.json");
+    DirectoryIterator jsonIter (File ("~/bkGalleries"), true, "*.json");
     while (jsonIter.next())
     {
         File galleryFile (jsonIter.getFile());

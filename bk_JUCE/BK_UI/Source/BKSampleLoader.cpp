@@ -19,7 +19,7 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
 {
     WavAudioFormat wavFormat;
     
-    String path = "~/samples/";
+    String path = "~/bkSamples/";
     
     int numLayers = 0;
     
@@ -158,7 +158,7 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
 {
     WavAudioFormat wavFormat;
     
-    String path = "~/samples/";
+    String path = "~/bkSamples/";
     
     synth->clearVoices();
     synth->clearSounds();
@@ -259,7 +259,7 @@ void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
 {
     WavAudioFormat wavFormat;
     
-    String path = "~/samples/";
+    String path = "~/bkSamples/";
     
     synth->clearVoices();
     synth->clearSounds();
