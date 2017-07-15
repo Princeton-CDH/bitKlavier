@@ -136,6 +136,8 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     
     displaySliderWidth = 50;
     
+    clickedHeight = 0.;
+    
     //subslider is oriented perpendicular to multislider orientation
     if(sliderIsVertical) {
         if(sliderIsBar) subsliderStyle = Slider::LinearBar;
@@ -465,7 +467,7 @@ void BKMultiSlider::addSubSlider(int where, bool active, NotificationType newnot
                                                              sliderHeight);
     
     newslider->setRange(sliderMin, sliderMax, sliderIncrement);
-    newslider->setValue(sliderDefault, dontSendNotification);
+    newslider->setValue(newslider->proportionOfLengthToValue( 1. - (clickedHeight / this->getHeight())), dontSendNotification);
     newslider->addListener(this);
 
     OwnedArray<BKSubSlider> *newsliderArray = sliders[where];
@@ -662,6 +664,7 @@ void BKMultiSlider::mouseDown (const MouseEvent &event)
     if(event.mouseWasClicked())
     {
         currentSubSlider = whichSubSlider(whichSlider(event));
+        clickedHeight = event.y;
         
         if(event.mods.isCtrlDown())
         {
@@ -1010,7 +1013,7 @@ void BKMultiSlider::showModifyPopupMenu(int which)
     m.addItem (3, translate ("deactivate all before this"), true, false);
     if(allowSubSliders) m.addItem (4, translate (subSliderName), true, false);
     m.addSeparator();
-    
+
     m.showMenuAsync (PopupMenu::Options(),
                      ModalCallbackFunction::forComponent (sliderModifyMenuCallback, this, which));
 }

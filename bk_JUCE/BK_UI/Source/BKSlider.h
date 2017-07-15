@@ -183,6 +183,8 @@ private:
     int numDefaultSliders;
     int numVisibleSliders;
     
+    float clickedHeight;
+    
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void textEditorFocusLost(TextEditor& textEditor) override;
