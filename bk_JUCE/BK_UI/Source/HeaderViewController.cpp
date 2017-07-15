@@ -104,8 +104,8 @@ PopupMenu HeaderViewController::getPianoMenu(void)
     
     pianoMenu.addItem(1, "New");
     pianoMenu.addItem(2, "Delete");
-    pianoMenu.addSeparator();
-    pianoMenu.addItem(3, "Settings");
+    //pianoMenu.addSeparator();
+    //pianoMenu.addItem(3, "Settings");
     
     return pianoMenu;
 }
@@ -119,7 +119,9 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addItem(2, "Save as...");
     galleryMenu.addItem(3, "Open...");
     galleryMenu.addSeparator();
-    galleryMenu.addItem(4, "Open (legacy)...");
+    galleryMenu.addItem(4, "Gallery Settings");
+    galleryMenu.addSeparator();
+    galleryMenu.addItem(5, "Open (legacy)...");
     
     return galleryMenu;
     
@@ -161,10 +163,12 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
         
         hvc->switchGallery();
     }
+    /*
     else if (result == 3)
     {
         hvc->processor.updateState->setCurrentDisplay(DisplayGeneral);
     }
+     */
 }
 
 void HeaderViewController::galleryMenuCallback(int result, HeaderViewController* gvc)
@@ -181,7 +185,11 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     {
         gvc->processor.loadGalleryDialog();
     }
-    else if (result == 4) // Load (old)
+    else if (result == 4) // open General settings
+    {
+        gvc->processor.updateState->setCurrentDisplay(DisplayGeneral);
+    }
+    else if (result == 5) // Load (old)
     {
         gvc->processor.loadJsonGalleryDialog();
     }
