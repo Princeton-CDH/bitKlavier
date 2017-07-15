@@ -542,6 +542,7 @@ private:
     double currentDisplaySliderValue;
     
     bool focusLostByEscapeKey;
+    bool mouseJustDown;
     
     Array<float> getAllActiveValues();
     

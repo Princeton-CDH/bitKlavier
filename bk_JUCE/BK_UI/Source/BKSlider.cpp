@@ -1844,6 +1844,7 @@ void BKStackedSlider::setBright()
 void BKStackedSlider::sliderValueChanged (Slider *slider)
 {
     //leave unimplelemented; only drag and setTo should actually change values of subSliders
+    DBG("stacked sliderValueChanged");
 }
 
 void BKStackedSlider::addSlider(NotificationType newnotify)
@@ -1923,6 +1924,8 @@ void BKStackedSlider::mouseDown (const MouseEvent &event)
         clickedSlider = whichSlider();
         clickedPosition = event.x;
         
+        mouseJustDown = true;
+        
         if(event.mods.isCtrlDown())
         {
             showModifyPopupMenu();
@@ -1933,16 +1936,23 @@ void BKStackedSlider::mouseDown (const MouseEvent &event)
 
 void BKStackedSlider::mouseDrag(const MouseEvent& e)
 {
-    Slider* currentSlider = dataSliders.operator[](clickedSlider);
-    if(currentSlider != nullptr)
-    {
-        if(e.mods.isShiftDown())
+    if(!mouseJustDown)
+    {        
+        Slider* currentSlider = dataSliders.operator[](clickedSlider);
+        if(currentSlider != nullptr)
         {
-            currentSlider->setValue(round(topSlider->getValue()));
-            topSlider->setValue(round(topSlider->getValue()));
+            if(e.mods.isShiftDown())
+            {
+                currentSlider->setValue(round(topSlider->getValue()));
+                topSlider->setValue(round(topSlider->getValue()));
+            }
+            else {
+                currentSlider->setValue(topSlider->getValue(), sendNotification);
+            }
         }
-        else currentSlider->setValue(topSlider->getValue(), sendNotification);
     }
+    else mouseJustDown = false;
+
 }
 
 void BKStackedSlider::mouseUp(const MouseEvent& e)
