@@ -34,7 +34,7 @@ class BKOvertop :  public Component//, public BKListener, public KeyListener
 public:
     BKOvertop (BKAudioProcessor& p, BKItemGraph* theGraph):
     processor(p),
-    gvc(p),
+    gvc(p, theGraph),
     kvc(p, theGraph),
     tvc(p, theGraph),
     ovc(p, theGraph),

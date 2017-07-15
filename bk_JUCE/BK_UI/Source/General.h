@@ -110,6 +110,7 @@ public:
     void setTuningFundamental(float val)    {
         tuningFundamental = val;
         tuningRatio = tuningFundamental / 440.;
+        DBG("new tuning ratio " + String(tuningRatio));
     };
     void setTempoMultiplier(float val)      { tempoMultiplier = val;
                                               periodMultiplier = 1./tempoMultiplier;};

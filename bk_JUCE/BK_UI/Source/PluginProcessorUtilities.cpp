@@ -83,6 +83,11 @@ void BKAudioProcessor::updateGalleries()
     
     updateState->setAllCurrentIdsTo(0);
     
+    gallery->getGeneralSettings();
+    mainPianoSynth.updateGeneralSettings(gallery->getGeneralSettings());
+    hammerReleaseSynth.updateGeneralSettings(gallery->getGeneralSettings());
+    resonanceReleaseSynth.updateGeneralSettings(gallery->getGeneralSettings());
+    
     updateState->galleryDidChange = true;
 }
 

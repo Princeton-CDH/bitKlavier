@@ -32,7 +32,7 @@ processor (p)
     addAndMakeVisible(galleryCB);
     galleryCB.setName("galleryCB");
     galleryCB.addListener(this);
-    galleryCB.BKSetJustificationType(juce::Justification::centredRight);
+    //galleryCB.BKSetJustificationType(juce::Justification::centredRight);
     
     galleryCB.setSelectedId(0, dontSendNotification);
     
@@ -41,6 +41,7 @@ processor (p)
     pianoCB.setName("pianoCB");
     pianoCB.addListener(this);
     pianoCB.addMyListener(this);
+    pianoCB.BKSetJustificationType(juce::Justification::centredRight);
     
     pianoCB.addItem("New piano...",1);
     pianoCB.setSelectedId(0, dontSendNotification);

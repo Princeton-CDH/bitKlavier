@@ -106,7 +106,7 @@ public:
     
     //==============================================================================
     
-    GeneralSettings::Ptr generalSettings;
+    //GeneralSettings::Ptr generalSettings;
     
     bool canPlaySound (BKSynthesiserSound*) override;
     

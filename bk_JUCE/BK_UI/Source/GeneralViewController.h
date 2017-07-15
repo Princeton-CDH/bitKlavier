@@ -8,25 +8,19 @@
   ==============================================================================
 */
 
-#ifndef GeneralViewController_H_INCLUDED
-#define GeneralViewController_H_INCLUDED
+#pragma once
 
-#include "BKUtilities.h"
-
-#include "PluginProcessor.h"
-
-#include "General.h"
-
-#include "BKListener.h"
-#include "BKComponent.h"
+#include "BKViewController.h"
 
 //==============================================================================
 /*
 */
-class GeneralViewController    : public BKComponent, public BKListener
+class GeneralViewController :
+public BKViewController,
+public BKSingleSliderListener
 {
 public:
-    GeneralViewController(BKAudioProcessor&);
+    GeneralViewController(BKAudioProcessor&, BKItemGraph* theGraph);
     ~GeneralViewController();
 
     void paint (Graphics&) override;
@@ -35,23 +29,24 @@ public:
     void update(void);
 
 private:
-    BKAudioProcessor& processor;
+    //BKAudioProcessor& processor;
     int currentNostalgicLayer;
     
     // BKLabels
     OwnedArray<BKLabel> generalL;
-
     OwnedArray<BKTextField> generalTF;
     
-    void bkTextFieldDidChange       (TextEditor&)           override;
-    void bkComboBoxDidChange        (ComboBox* box)         override { };
-    void bkButtonClicked            (Button* b)             override { };
-    void bkMessageReceived          (const String& message) override { };
+    ScopedPointer<BKSingleSlider> A4tuningReferenceFrequencySlider; //A440
+    ScopedPointer<BKSingleSlider> tempoMultiplierSlider;
+    
+    void bkTextFieldDidChange       (TextEditor&)               override;
+    void bkComboBoxDidChange        (ComboBox* box)             override { };
+    void bkButtonClicked            (Button* b)                 override;
+    void bkMessageReceived          (const String& message)     override { };
+    void BKSingleSliderValueChanged (String name, double val)   override;
     
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GeneralViewController)
 };
 
-
-#endif  // GeneralViewController_H_INCLUDED

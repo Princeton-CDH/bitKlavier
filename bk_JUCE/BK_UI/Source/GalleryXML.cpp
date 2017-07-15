@@ -97,7 +97,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
         
         if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
         {
-            general = new GeneralSettings();
+            //general = new GeneralSettings();
             
             /* * * * * * * * * * * * * * */
             url = xml->getStringAttribute("url");

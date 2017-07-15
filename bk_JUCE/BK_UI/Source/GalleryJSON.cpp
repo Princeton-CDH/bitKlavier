@@ -29,7 +29,7 @@ if (!keys.size() || keys[0] == -1) isLayer = false;
 
 void Gallery::setStateFromJson(var myJson)
 {
-    general = new GeneralSettings();
+    //general = new GeneralSettings();
     
     var pattr = myJson.getProperty("pattrstorage", "");
     

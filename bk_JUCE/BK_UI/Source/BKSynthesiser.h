@@ -238,6 +238,9 @@ public:
     /** Returns true if this voice started playing its current note before the other voice did. */
     bool wasStartedBefore (const BKSynthesiserVoice& other) const noexcept;
     
+    GeneralSettings::Ptr generalSettings;
+    void setGeneralSettings(GeneralSettings::Ptr gen) {generalSettings = gen;}
+    
 protected:
     /** Resets the state of this voice after a sound has finished playing.
      
@@ -315,6 +318,7 @@ public:
     BKSynthesiser(void);
     
     void setGeneralSettings(GeneralSettings::Ptr gen);
+    void updateGeneralSettings(GeneralSettings::Ptr gen);
     
     /** Destructor. */
     virtual ~BKSynthesiser();

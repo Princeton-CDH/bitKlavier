@@ -103,6 +103,14 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
         generalSettings = gen;
     }
     
+    void BKSynthesiser::updateGeneralSettings(GeneralSettings::Ptr gen)
+    {
+        for (int i = voices.size(); --i >= 0;)
+        {
+            voices.getUnchecked(i)->setGeneralSettings(gen);
+        }
+    }
+    
     BKSynthesiser::~BKSynthesiser()
     {
     }

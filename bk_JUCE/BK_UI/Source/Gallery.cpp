@@ -19,6 +19,7 @@ url(String::empty)
         idIndexList.set(i,Array<int>());
     }
     
+    general = new GeneralSettings();
 
     setStateFromXML(xml);
 }
@@ -35,6 +36,8 @@ url(String::empty)
         idCount.add(-1);
         idIndexList.set(i,Array<int>());
     }
+    
+    general = new GeneralSettings();
 
     setStateFromXML(xml);
 }
@@ -47,6 +50,8 @@ url(String::empty)
         idCount.add(-1);
         idIndexList.set(i,Array<int>());
     }
+    
+    general = new GeneralSettings();
 
     setStateFromJson(myJson);
 }
@@ -63,6 +68,8 @@ url(String::empty)
         idCount.add(-1);
         idIndexList.set(i,Array<int>());
     }
+    
+    general = new GeneralSettings();
     
     setStateFromJson(myJson);
     
