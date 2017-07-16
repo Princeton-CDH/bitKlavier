@@ -94,7 +94,7 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     int p, pm;
     
     noteOn.set(noteNumber, false);
-    DBG("noteoff velocity = " + String(velocity));
+    //DBG("noteoff velocity = " + String(velocity));
     
     // Send key off to each pmap in current piano
     for (p = currentPiano->activePMaps.size(); --p >= 0;)

@@ -80,7 +80,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
         float offset = tuner->getOffset(note) + t;
         int synthNoteNumber = ((float)note + (int)offset);
         float synthOffset = offset - (int)offset;
-        DBG("playing synchronic note/vel " + String(note) +  " " + String(velocity));
+        //DBG("playing synchronic note/vel " + String(note) +  " " + String(velocity));
         synth->keyOn(channel,
                      synthNoteNumber,
                      synthOffset,

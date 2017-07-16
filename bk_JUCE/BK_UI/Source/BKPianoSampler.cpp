@@ -90,7 +90,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
     {
         
         //DBG(sound->getName());
-        DBG("startNote: getting tuning ratio " + String(generalSettings->getTuningRatio()));
+        //DBG("startNote: getting tuning ratio " + String(generalSettings->getTuningRatio()));
         
         pitchRatio = powf(2.0f, (midiNoteNumber - (float)sound->midiRootNote) / 12.0f)
                         * sound->sourceSampleRate

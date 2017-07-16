@@ -285,7 +285,7 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     int index = box->getSelectedItemIndex();
     
     TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
-    TempoPreparation::Ptr active = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
+    TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
     
     if (name == selectCB.getName())
     {
