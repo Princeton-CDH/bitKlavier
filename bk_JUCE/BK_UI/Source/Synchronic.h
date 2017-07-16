@@ -205,7 +205,7 @@ public:
     inline const Array<float> getLengthMultipliers() const noexcept    {return sLengthMultipliers;     }
     inline const Array<Array<float>> getTransposition() const noexcept {return sTransposition;         }
     inline const bool getReleaseVelocitySetsSynchronic() const noexcept{return sReleaseVelocitySetsSynchronic; }
-    inline const float getGain() const noexcept                        {return sGain;              }
+    inline const float getGain() const noexcept                        {return sGain;                   }
     
     //inline const Keymap::Ptr getResetMap() const noexcept              {return resetMap;       }
     
@@ -354,6 +354,7 @@ public:
     inline const int getAccentMultiplierCounter() const noexcept { return accentMultiplierCounter; }
     inline const int getLengthMultiplierCounter() const noexcept { return lengthMultiplierCounter; }
     inline const int getTranspCounter() const noexcept { return transpCounter; }
+    inline const SynchronicSyncMode getMode() const noexcept {return active->getMode(); }
     
     inline void attachToSynthesiser(BKSynthesiser* main)
     {
