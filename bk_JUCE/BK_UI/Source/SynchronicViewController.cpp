@@ -73,7 +73,7 @@ BKViewController(p, theGraph)
     clusterThreshSlider->setJustifyRight(false);
     addAndMakeVisible(clusterThreshSlider);
     
-    clusterMinMaxSlider = new BKRangeSlider("cluster min/max", 1, 10, 3, 4, 1);
+    clusterMinMaxSlider = new BKRangeSlider("cluster min/max", 1, 12, 3, 4, 1);
     clusterMinMaxSlider->setJustifyRight(false);
     addAndMakeVisible(clusterMinMaxSlider);
     
@@ -472,6 +472,8 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         processor.updateState->idDidChange = true;
         
         fillSelectCB();
+        
+        update();
     }
     else if (name == "Mode")
     {

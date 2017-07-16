@@ -202,6 +202,8 @@ void DirectPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         processor.updateState->idDidChange = true;
         
         fillSelectCB();
+        
+        update();
     }
 }
 

@@ -163,12 +163,7 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
         
         hvc->switchGallery();
     }
-    /*
-    else if (result == 3)
-    {
-        hvc->processor.updateState->setCurrentDisplay(DisplayGeneral);
-    }
-     */
+    
 }
 
 void HeaderViewController::galleryMenuCallback(int result, HeaderViewController* gvc)
