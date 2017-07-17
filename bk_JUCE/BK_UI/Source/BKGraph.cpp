@@ -613,6 +613,8 @@ void BKItemGraph::removePreparationFromKeymap(BKPreparationType thisType, int th
         thisPreparationMap->removeTuning(thisTuning);
     }
     
+    if (!thisPreparationMap->isActive) processor.currentPiano->removePreparationMapWithKeymap(keymapId);
+    
 }
 
 void BKItemGraph::addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId)
