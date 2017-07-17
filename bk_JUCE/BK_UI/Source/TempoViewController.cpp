@@ -617,6 +617,8 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
         processor.updateState->idDidChange = true;
         
         fillSelectCB();
+        
+        update();
     }
     else if (name == modeCB.getName())
     {

@@ -10,6 +10,8 @@
 
 #pragma once
 
+#define AUTO_DELETE 0
+
 #include "BKUtilities.h"
 
 #include "PluginProcessor.h"

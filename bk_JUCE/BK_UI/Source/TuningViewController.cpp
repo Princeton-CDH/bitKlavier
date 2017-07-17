@@ -816,6 +816,8 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
         processor.updateState->idDidChange = true;
         
         fillSelectCB();
+        
+        update();
     }
     else if (name == scaleCB.getName())
     {

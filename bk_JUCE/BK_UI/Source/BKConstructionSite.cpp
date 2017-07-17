@@ -633,10 +633,10 @@ void BKConstructionSite::idDidChange(void)
     
     currentItem->setId(newId);
     
-    processor.currentPiano->configuration->removeItem(type, oldId);
-    processor.currentPiano->configuration->addItem(type, newId);
+    processor.currentPiano->configuration->setIdOfItem(type, oldId, newId);
     
     processor.updateState->addActive(type, newId);
+    
     
     for (auto item : connections)   graph->connectWithoutCreatingNew(currentItem, item);
     

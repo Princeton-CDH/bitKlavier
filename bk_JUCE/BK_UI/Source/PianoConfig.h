@@ -47,6 +47,7 @@ public:
     inline int getY(void) { return Y; }
     inline BKPreparationType getType(void) const noexcept { return type; }
     inline int getId(void) const noexcept {return Id; }
+    inline void setId(int Id){Id = Id; }
     
 private:
     BKPreparationType type;
@@ -131,6 +132,18 @@ public:
             if (items[i]->getType() == type && items[i]->getId() == Id)
             {
                 items.remove(i);
+                break;
+            }
+        }
+    }
+    
+    inline void setIdOfItem(BKPreparationType type, int oldId, int newId)
+    {
+        for (int i = items.size(); --i >= 0; )
+        {
+            if (items[i]->getType() == type && items[i]->getId() == oldId)
+            {
+                items[i]->setId(newId);
                 break;
             }
         }

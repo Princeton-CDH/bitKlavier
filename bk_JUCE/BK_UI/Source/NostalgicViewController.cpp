@@ -608,6 +608,8 @@ void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
         processor.updateState->idDidChange = true;
         
         fillSelectCB();
+        
+        update();
     }
     else if (name == "Length Mode")
     {
