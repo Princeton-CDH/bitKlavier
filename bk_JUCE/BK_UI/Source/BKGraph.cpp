@@ -428,10 +428,9 @@ void BKItemGraph::updateClipboard(void)
 
 void BKItemGraph::add(BKItem* itemToAdd)
 {
-    
+    processor.currentPiano->configuration->addItem(itemToAdd->getType(), itemToAdd->getId(), itemToAdd->getX(), itemToAdd->getY());
     processor.updateState->addActive(itemToAdd->getType(), itemToAdd->getId());
     items.add(itemToAdd);
-    processor.currentPiano->configuration->addItem(itemToAdd->getType(), itemToAdd->getId());
 }
 
 BKItem* BKItemGraph::get(BKPreparationType type, int Id)
@@ -1281,6 +1280,8 @@ void BKItemGraph::reconstruct(void)
                 
                 if (thisTuning == nullptr) thisTuning = new BKItem(PreparationTypeTuning, tuningId, processor);
                 
+                thisTuning->setTopLeftPosition(10, 10);
+                
                 if (!contains(thisTuning))  add(thisTuning);
                 
                 connectUI(newPreparation, thisTuning);
@@ -1308,6 +1309,8 @@ void BKItemGraph::reconstruct(void)
                 
                 if (thisTuning == nullptr) thisTuning = new BKItem(PreparationTypeTuning, tuningId, processor);
                 
+                thisTuning->setTopLeftPosition(10, 10);
+                
                 if (!contains(thisTuning))  add(thisTuning);
                 
                 connectUI(newPreparation, thisTuning);
@@ -1322,6 +1325,8 @@ void BKItemGraph::reconstruct(void)
                 {
                     thisTempo = new BKItem(PreparationTypeTempo, tempoId, processor);
                 }
+                
+                thisTempo->setTopLeftPosition(10, 10);
                 
                 if (!contains(thisTempo))  add(thisTempo);
                 
@@ -1353,6 +1358,8 @@ void BKItemGraph::reconstruct(void)
                 
                 if (thisTuning == nullptr) thisTuning = new BKItem(PreparationTypeTuning, Id, processor);
                 
+                thisTuning->setTopLeftPosition(10, 10);
+                
                 if (!contains(thisTuning))  add(thisTuning);
                 
                 connectUI(newPreparation, thisTuning);
@@ -1364,6 +1371,8 @@ void BKItemGraph::reconstruct(void)
                 BKItem* thisSyncTarget = itemWithTypeAndId(PreparationTypeSynchronic, syncId);
                 
                 if (thisSyncTarget == nullptr) thisSyncTarget = new BKItem(PreparationTypeSynchronic, syncId, processor);
+                
+                thisSyncTarget->setTopLeftPosition(10, 10);
                 
                 if (!contains(thisSyncTarget))  add(thisSyncTarget);
                 

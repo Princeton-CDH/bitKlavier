@@ -606,10 +606,9 @@ void BKConstructionSite::idDidChange(void)
     BKPreparationType type = currentItem->getType();
     int oldId = currentItem->getId();
     
-    processor.updateState->removeActive(type, oldId);
-    
     BKItem::PtrArr connections;
     
+    // DISCONNECT
     for (auto item : currentItem->getConnections())
     {
         connections.add(item);
@@ -617,6 +616,7 @@ void BKConstructionSite::idDidChange(void)
         graph->disconnect(currentItem, item);
     }
     
+    // GET NEW ID
     int newId = -1;
     
     if (type == PreparationTypeKeymap)              newId = processor.updateState->currentKeymapId;
@@ -633,12 +633,20 @@ void BKConstructionSite::idDidChange(void)
     
     currentItem->setId(newId);
     
-    processor.currentPiano->configuration->setIdOfItem(type, oldId, newId);
+    // RECONNECT
+    for (auto item : connections)   graph->connectWithoutCreatingNew(currentItem, item);
     
+    // CONFIGURATION
+    Point<int> oldXY = processor.currentPiano->configuration->getXY(type, oldId);
+    processor.currentPiano->configuration->removeItem(type, oldId);
+    processor.currentPiano->configuration->addItem(type, newId, oldXY.x, oldXY.y);
+    
+    // ACTIVE
+    processor.updateState->removeActive(type, oldId);
     processor.updateState->addActive(type, newId);
     
+    processor.currentPiano->configuration->print();
     
-    for (auto item : connections)   graph->connectWithoutCreatingNew(currentItem, item);
     
 }
 

@@ -99,12 +99,7 @@ public:
     {
         if (type == BKPreparationTypeNil) return;
         
-        for (auto item : items)
-        {
-            if (item->getType() == type && item->getId() == Id) return;
-        }
-        
-        items.add(new ItemConfiguration(type, Id));
+        if (!contains(type,Id)) items.add(new ItemConfiguration(type, Id));
     }
     
     inline void addItem(BKPreparationType type, int Id, int X, int Y)
@@ -139,11 +134,11 @@ public:
     
     inline void setIdOfItem(BKPreparationType type, int oldId, int newId)
     {
-        for (int i = items.size(); --i >= 0; )
+        for (auto item : items)
         {
-            if (items[i]->getType() == type && items[i]->getId() == oldId)
+            if (item->getType() == type && item->getId() == oldId)
             {
-                items[i]->setId(newId);
+                item->setId(newId);
                 break;
             }
         }
