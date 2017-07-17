@@ -538,15 +538,15 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
 {
     MouseEvent e = eo.getEventRelativeTo(this);
     
-    
-    
     if (itemToSelect == nullptr) lasso->endLasso();
     
     if (selected.getNumSelected())
     {
-        graph->deselectAll();
+        if (!eo.mods.isShiftDown()) graph->deselectAll();
         
         for (auto item : selected)  graph->select(item);
+        
+        selected.deselectAll();
         
         return;
     }
@@ -577,6 +577,8 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
             item->isDragging = false;
         }
     }
+    
+    
     
     processor.currentPiano->configuration->print();
     
