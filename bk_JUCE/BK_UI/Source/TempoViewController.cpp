@@ -310,12 +310,15 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     
         processor.updateState->removeActive(PreparationTypeTempo, oldId);
         
+#if AUTO_DELETE
         if (!processor.gallery->getTempo(oldId)->editted)
         {
             processor.updateState->removePreparation(PreparationTypeTempo, oldId);
             
             processor.gallery->remove(PreparationTypeTempo, oldId);
         }
+#endif
+        
         processor.updateState->addActive(PreparationTypeTempo, newId);
         
         processor.updateState->idDidChange = true;
@@ -599,13 +602,15 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
         processor.updateState->currentModTempoId = newId;
         
         processor.updateState->removeActive(PreparationTypeTempoMod, oldId);
-        
+
+#if AUTO_DELETE
         if (!processor.gallery->getTempoModPreparation(oldId)->editted)
         {
             processor.updateState->removePreparation(PreparationTypeTempoMod, oldId);
             
             processor.gallery->remove(PreparationTypeTempoMod, oldId);
         }
+#endif
         
         processor.updateState->addActive(PreparationTypeTempoMod, newId);
         

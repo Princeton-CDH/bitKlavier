@@ -315,6 +315,8 @@ void BKConstructionSite::prepareItemDrag(BKItem* item, const MouseEvent& e, bool
 }
 void BKConstructionSite::deleteItem (BKItem* item)
 {
+    processor.currentPiano->configuration->removeItem(item->getType(), item->getId());
+    
     graph->remove(item);
     
     removeChildComponent(item);
@@ -630,6 +632,9 @@ void BKConstructionSite::idDidChange(void)
     else if (type == PreparationTypeTempoMod)       newId = processor.updateState->currentModTempoId;
     
     currentItem->setId(newId);
+    
+    processor.currentPiano->configuration->removeItem(type, oldId);
+    processor.currentPiano->configuration->addItem(type, newId);
     
     processor.updateState->addActive(type, newId);
     

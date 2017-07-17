@@ -393,12 +393,14 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         
         processor.updateState->removeActive(PreparationTypeTuning, oldId);
         
+        #if AUTO_DELETE
         if (!processor.gallery->getTuning(oldId)->editted)
         {
             processor.updateState->removePreparation(PreparationTypeTuning, oldId);
             
             processor.gallery->remove(PreparationTypeTuning, oldId);
         }
+#endif
         
         processor.updateState->addActive(PreparationTypeTuning, newId);
         
@@ -799,13 +801,15 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
         processor.updateState->currentModTuningId = newId;
         
         processor.updateState->removeActive(PreparationTypeTuningMod, oldId);
-        
+
+        #if AUTO_DELETE
         if (!processor.gallery->getTuningModPreparation(oldId)->editted)
         {
             processor.updateState->removePreparation(PreparationTypeTuningMod, oldId);
             
             processor.gallery->remove(PreparationTypeTuningMod, oldId);
         }
+#endif
         
         processor.updateState->addActive(PreparationTypeTuningMod, newId);
         

@@ -190,12 +190,14 @@ void DirectPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         
         processor.updateState->removeActive(PreparationTypeDirect, oldId);
         
+        #if AUTO_DELETE
         if (!processor.gallery->getDirect(oldId)->editted)
         {
             processor.updateState->removePreparation(PreparationTypeDirect, oldId);
             
             processor.gallery->remove(PreparationTypeDirect, oldId);
         }
+#endif
         
         processor.updateState->addActive(PreparationTypeDirect, newId);
         
@@ -438,12 +440,14 @@ void DirectModificationEditor::bkComboBoxDidChange (ComboBox* box)
         
         processor.updateState->removeActive(PreparationTypeDirectMod, oldId);
         
+#if AUTO_DELETE
         if (!processor.gallery->getDirectModPreparation(oldId)->editted)
         {
             processor.updateState->removePreparation(PreparationTypeDirectMod, oldId);
             
             processor.gallery->remove(PreparationTypeDirectMod, oldId);
         }
+#endif
         
         processor.updateState->addActive(PreparationTypeDirectMod, newId);
         

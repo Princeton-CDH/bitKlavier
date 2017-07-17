@@ -461,12 +461,16 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         
         processor.updateState->removeActive(PreparationTypeSynchronic, oldId);
         
+        
+        #if AUTO_DELETE
         if (!processor.gallery->getSynchronic(oldId)->editted)
         {
             processor.updateState->removePreparation(PreparationTypeSynchronic, oldId);
             
             processor.gallery->remove(PreparationTypeSynchronic, oldId);
         }
+#endif
+        
         processor.updateState->addActive(PreparationTypeSynchronic, newId);
         
         processor.updateState->idDidChange = true;
@@ -946,12 +950,14 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
         
         processor.updateState->removeActive(PreparationTypeSynchronicMod, oldId);
         
+        #if AUTO_DELETE
         if (!processor.gallery->getSynchronicModPreparation(oldId)->editted)
         {
             processor.updateState->removePreparation(PreparationTypeSynchronicMod, oldId);
             
             processor.gallery->remove(PreparationTypeSynchronicMod, oldId);
         }
+#endif
         processor.updateState->addActive(PreparationTypeSynchronicMod, newId);
         
         processor.updateState->idDidChange = true;

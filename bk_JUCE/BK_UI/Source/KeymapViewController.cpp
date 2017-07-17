@@ -135,6 +135,7 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
         
         processor.updateState->currentKeymapId = newId;
         
+        #if AUTO_DELETE
         processor.updateState->removeActive(PreparationTypeKeymap, oldId);
 
         if (!processor.gallery->getKeymap(oldId)->editted)
@@ -143,6 +144,7 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
             
             processor.gallery->remove(PreparationTypeKeymap, oldId);
         }
+#endif
         
         processor.updateState->addActive(PreparationTypeKeymap, newId);
         

@@ -255,12 +255,15 @@ void NostalgicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         
         processor.updateState->removeActive(PreparationTypeNostalgic, oldId);
         
+        #if AUTO_DELETE
         if (!processor.gallery->getNostalgic(oldId)->editted)
         {
             processor.updateState->removePreparation(PreparationTypeNostalgic, oldId);
             
             processor.gallery->remove(PreparationTypeNostalgic, oldId);
         }
+#endif
+        
         processor.updateState->addActive(PreparationTypeNostalgic, newId);
         
         processor.updateState->idDidChange = true;
@@ -591,12 +594,15 @@ void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
         
         processor.updateState->removeActive(PreparationTypeNostalgicMod, oldId);
         
+        #if AUTO_DELETE
         if (!processor.gallery->getNostalgicModPreparation(oldId)->editted)
         {
             processor.updateState->removePreparation(PreparationTypeNostalgicMod, oldId);
             
             processor.gallery->remove(PreparationTypeNostalgicMod, oldId);
         }
+#endif
+        
         processor.updateState->addActive(PreparationTypeNostalgicMod, newId);
         
         processor.updateState->idDidChange = true;
