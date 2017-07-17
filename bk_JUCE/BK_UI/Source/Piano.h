@@ -219,6 +219,7 @@ public:
     int                         addPreparationMap(void);
     int                         addPreparationMap(Keymap::Ptr keymap);
     PreparationMap::Ptr         getPreparationMapWithKeymap(Keymap::Ptr);
+    PreparationMap::Ptr         getPreparationMapWithKeymap(int keymapId);
     int                         removeLastPreparationMap(void);
     int                         removePreparationMapWithKeymap(Keymap::Ptr thisKeymap);
 

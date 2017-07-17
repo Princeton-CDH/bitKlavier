@@ -484,8 +484,6 @@ BKItem* BKItemGraph::itemWithTypeAndId(BKPreparationType type, int Id)
 
     for (auto item : items)
     {
-        DBG("ITEMXXX");
-        item->print();
         if (item->getType() == type && item->getId() == Id)
         {
             thisItem = item;
@@ -578,9 +576,9 @@ void BKItemGraph::linkPreparationWithTuning(BKPreparationType thisType, int this
 }
 
 
-void BKItemGraph::removePreparationFromKeymap(BKPreparationType thisType, int thisId, Keymap::Ptr thisKeymap)
+void BKItemGraph::removePreparationFromKeymap(BKPreparationType thisType, int thisId, int keymapId)
 {
-    PreparationMap::Ptr thisPreparationMap = processor.currentPiano->getPreparationMapWithKeymap(thisKeymap);
+    PreparationMap::Ptr thisPreparationMap = processor.currentPiano->getPreparationMapWithKeymap(keymapId);
     
     if (thisPreparationMap == nullptr) return;
     
@@ -617,13 +615,13 @@ void BKItemGraph::removePreparationFromKeymap(BKPreparationType thisType, int th
     
 }
 
-void BKItemGraph::addPreparationToKeymap(BKPreparationType thisType, int thisId, Keymap::Ptr thisKeymap)
+void BKItemGraph::addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId)
 {
-    PreparationMap::Ptr thisPreparationMap = processor.currentPiano->getPreparationMapWithKeymap(thisKeymap);
+    PreparationMap::Ptr thisPreparationMap = processor.currentPiano->getPreparationMapWithKeymap(keymapId);
     
     if (thisPreparationMap == nullptr)
     {
-        int whichPMap = processor.currentPiano->addPreparationMap(thisKeymap);
+        int whichPMap = processor.currentPiano->addPreparationMap(processor.gallery->getKeymap(keymapId));
         
         thisPreparationMap = processor.currentPiano->prepMaps[whichPMap];
     }
@@ -795,18 +793,17 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
 
     else if (item1Type == PreparationTypeKeymap && item2Type <= PreparationTypeTempo)
     {
-        if (connect)    addPreparationToKeymap(item2Type, item2Id, processor.gallery->getKeymap(item1Id));
-        else
-        {
-            Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item1Id);
-            
-            processor.currentPiano->removePreparationMapWithKeymap(thisKeymap);
-        }
+        if (connect)    addPreparationToKeymap(item2Type, item2Id, item1Id);
+        else            removePreparationFromKeymap(item2Type, item2Id, item1Id);
+        
+        processor.currentPiano->getPreparationMapWithKeymap(item1Id)->print();
     }
     else if (item1Type <= PreparationTypeTempo && item2Type == PreparationTypeKeymap)
     {
-        if (connect)    addPreparationToKeymap(item1Type, item1Id, processor.gallery->getKeymap(item2Id));
-        else            removePreparationFromKeymap(item1Type, item1Id, processor.gallery->getKeymap(item2Id));
+        if (connect)    addPreparationToKeymap(item1Type, item1Id, item2Id);
+        else            removePreparationFromKeymap(item1Type, item1Id, item2Id);
+        
+        processor.currentPiano->getPreparationMapWithKeymap(item2Id)->print();
     }
     else if (item1Type == PreparationTypeTuning && item2Type <= PreparationTypeNostalgic)
     {
@@ -1200,13 +1197,12 @@ void BKItemGraph::reconstruct(void)
     
     processor.updateState->clearActive();
     
-    preparations.clear();
-    
     Piano::Ptr thisPiano = processor.currentPiano;
     
     int pmapcount = 0;
     for (auto pmap : thisPiano->getPreparationMaps())
     {
+        preparations.clear();
         
         DBG("--------------------------------");
         pmap->print();
@@ -1223,170 +1219,176 @@ void BKItemGraph::reconstruct(void)
         
         if (keymap == nullptr) keymap = new BKItem(PreparationTypeKeymap, keymapId, processor);
 
-        if (!contains(keymap)) add(keymap);
-    
-    
-        for (auto p : pmap->getTuning())
+        if (!contains(keymap))
         {
-            int Id = p->getId();
+            add(keymap);
             
-            DBG("    tuning"+String(Id));
-            
-            newPreparation = itemWithTypeAndId(PreparationTypeTuning, Id);
-            
-            if (newPreparation == nullptr) newPreparation = new BKItem(PreparationTypeTuning, Id, processor);
-            
-            if (!contains(newPreparation))
+            for (auto p : pmap->getTuning())
             {
-                add(newPreparation);
-                preparations.add(newPreparation);
-            }
-        }
-        
-        for (auto p : pmap->getTempo())
-        {
-            int Id = p->getId();
-            
-            DBG("    tempo"+String(Id));
-            
-            newPreparation = itemWithTypeAndId(PreparationTypeTempo, Id);
-            
-            if (!contains(newPreparation))
-            {
-                add(newPreparation);
-                preparations.add(newPreparation);
-            }
-        }
-        
-        for (auto p : pmap->getDirect())
-        {
-            int Id = p->getId();
-            
-            DBG("    direct"+String(Id));
-            
-            newPreparation = itemWithTypeAndId(PreparationTypeDirect, Id);
-            
-            if (newPreparation == nullptr) newPreparation = new BKItem(PreparationTypeDirect, Id, processor);
-                                                                       
-            if (!contains(newPreparation))
-            {
-                add(newPreparation);
+                int Id = p->getId();
+                
+                DBG("    tuning"+String(Id));
+                
+                newPreparation = itemWithTypeAndId(PreparationTypeTuning, Id);
+                
+                if (newPreparation == nullptr) newPreparation = new BKItem(PreparationTypeTuning, Id, processor);
                 
                 preparations.add(newPreparation);
                 
-                int tuningId = p->getTuningId();
-                
-                BKItem* thisTuning = itemWithTypeAndId(PreparationTypeTuning, tuningId);
-                
-                if (thisTuning == nullptr) thisTuning = new BKItem(PreparationTypeTuning, tuningId, processor);
-                
-                thisTuning->setTopLeftPosition(10, 10);
-                
-                if (!contains(thisTuning))  add(thisTuning);
-                
-                connectUI(newPreparation, thisTuning);
-            }
-            
-        }
-        
-        for (auto p : pmap->getSynchronic())
-        {
-            int Id = p->getId();
-            
-            newPreparation = itemWithTypeAndId(PreparationTypeSynchronic, Id);
-            
-            if (newPreparation == nullptr) newPreparation = new BKItem(PreparationTypeSynchronic, Id, processor);
-            
-            if (!contains(newPreparation))
-            {
-                add(newPreparation);
-                preparations.add(newPreparation);
-            
-                // TUNING
-                int tuningId = p->getTuningId();
-                
-                BKItem* thisTuning = itemWithTypeAndId(PreparationTypeTuning, tuningId);
-                
-                if (thisTuning == nullptr) thisTuning = new BKItem(PreparationTypeTuning, tuningId, processor);
-                
-                thisTuning->setTopLeftPosition(10, 10);
-                
-                if (!contains(thisTuning))  add(thisTuning);
-                
-                connectUI(newPreparation, thisTuning);
-                
-                
-                // TEMPO
-                int tempoId = p->getTempoId();
-                
-                BKItem* thisTempo = itemWithTypeAndId(PreparationTypeTempo, tempoId);
-                
-                if (thisTempo == nullptr)
+                if (!contains(newPreparation))
                 {
-                    thisTempo = new BKItem(PreparationTypeTempo, tempoId, processor);
+                    add(newPreparation);
+                }
+            }
+            
+            for (auto p : pmap->getTempo())
+            {
+                int Id = p->getId();
+                
+                DBG("    tempo"+String(Id));
+                
+                newPreparation = itemWithTypeAndId(PreparationTypeTempo, Id);
+                
+                preparations.add(newPreparation);
+                
+                if (!contains(newPreparation))
+                {
+                    add(newPreparation);
+                }
+            }
+            
+            for (auto p : pmap->getDirect())
+            {
+                int Id = p->getId();
+                
+                DBG("    direct"+String(Id));
+                
+                newPreparation = itemWithTypeAndId(PreparationTypeDirect, Id);
+                
+                if (newPreparation == nullptr) newPreparation = new BKItem(PreparationTypeDirect, Id, processor);
+                
+                preparations.add(newPreparation);
+                
+                if (!contains(newPreparation))
+                {
+                    add(newPreparation);
+                    
+                    int tuningId = p->getTuningId();
+                    
+                    BKItem* thisTuning = itemWithTypeAndId(PreparationTypeTuning, tuningId);
+                    
+                    if (thisTuning == nullptr) thisTuning = new BKItem(PreparationTypeTuning, tuningId, processor);
+                    
+                    thisTuning->setTopLeftPosition(10, 10);
+                    
+                    if (!contains(thisTuning))  add(thisTuning);
+                    
+                    connectUI(newPreparation, thisTuning);
                 }
                 
-                thisTempo->setTopLeftPosition(10, 10);
-                
-                if (!contains(thisTempo))  add(thisTempo);
-                
-                connectUI(newPreparation, thisTempo);
             }
             
-            
-        }
-        
-        for (auto p : pmap->getNostalgic())
-        {
-            int Id = p->getId();
-            
-            DBG("    nostalgic"+String(Id));
-            
-            newPreparation = itemWithTypeAndId(PreparationTypeNostalgic, Id);
-            
-            if (newPreparation == nullptr) newPreparation = new BKItem(PreparationTypeNostalgic, Id, processor);
-
-            if (!contains(newPreparation))
+            for (auto p : pmap->getSynchronic())
             {
-                add(newPreparation);
+                int Id = p->getId();
+                
+                newPreparation = itemWithTypeAndId(PreparationTypeSynchronic, Id);
+                
+                if (newPreparation == nullptr) newPreparation = new BKItem(PreparationTypeSynchronic, Id, processor);
+                
                 preparations.add(newPreparation);
                 
-                // TUNING
-                int tuningId = p->getTuningId();
+                if (!contains(newPreparation))
+                {
+                    add(newPreparation);
+                    
+                    // TUNING
+                    int tuningId = p->getTuningId();
+                    
+                    BKItem* thisTuning = itemWithTypeAndId(PreparationTypeTuning, tuningId);
+                    
+                    if (thisTuning == nullptr) thisTuning = new BKItem(PreparationTypeTuning, tuningId, processor);
+                    
+                    thisTuning->setTopLeftPosition(10, 10);
+                    
+                    if (!contains(thisTuning))  add(thisTuning);
+                    
+                    connectUI(newPreparation, thisTuning);
+                    
+                    
+                    // TEMPO
+                    int tempoId = p->getTempoId();
+                    
+                    BKItem* thisTempo = itemWithTypeAndId(PreparationTypeTempo, tempoId);
+                    
+                    if (thisTempo == nullptr)
+                    {
+                        thisTempo = new BKItem(PreparationTypeTempo, tempoId, processor);
+                    }
+                    
+                    thisTempo->setTopLeftPosition(10, 10);
+                    
+                    if (!contains(thisTempo))  add(thisTempo);
+                    
+                    connectUI(newPreparation, thisTempo);
+                }
                 
-                BKItem* thisTuning = itemWithTypeAndId(PreparationTypeTuning, tuningId);
                 
-                if (thisTuning == nullptr) thisTuning = new BKItem(PreparationTypeTuning, Id, processor);
-                
-                thisTuning->setTopLeftPosition(10, 10);
-                
-                if (!contains(thisTuning))  add(thisTuning);
-                
-                connectUI(newPreparation, thisTuning);
-                
-                
-                // SYNC TARGET
-                int syncId = p->getSynchronicTargetId();
-                
-                BKItem* thisSyncTarget = itemWithTypeAndId(PreparationTypeSynchronic, syncId);
-                
-                if (thisSyncTarget == nullptr) thisSyncTarget = new BKItem(PreparationTypeSynchronic, syncId, processor);
-                
-                thisSyncTarget->setTopLeftPosition(10, 10);
-                
-                if (!contains(thisSyncTarget))  add(thisSyncTarget);
-                
-                connectUI(newPreparation, thisSyncTarget);
             }
             
+            for (auto p : pmap->getNostalgic())
+            {
+                int Id = p->getId();
+                
+                DBG("    nostalgic"+String(Id));
+                
+                newPreparation = itemWithTypeAndId(PreparationTypeNostalgic, Id);
+                
+                if (newPreparation == nullptr) newPreparation = new BKItem(PreparationTypeNostalgic, Id, processor);
+                
+                preparations.add(newPreparation);
+                
+                if (!contains(newPreparation))
+                {
+                    add(newPreparation);
+                    
+                    // TUNING
+                    int tuningId = p->getTuningId();
+                    
+                    BKItem* thisTuning = itemWithTypeAndId(PreparationTypeTuning, tuningId);
+                    
+                    if (thisTuning == nullptr) thisTuning = new BKItem(PreparationTypeTuning, Id, processor);
+                    
+                    thisTuning->setTopLeftPosition(10, 10);
+                    
+                    if (!contains(thisTuning))  add(thisTuning);
+                    
+                    connectUI(newPreparation, thisTuning);
+                    
+                    
+                    // SYNC TARGET
+                    int syncId = p->getSynchronicTargetId();
+                    
+                    BKItem* thisSyncTarget = itemWithTypeAndId(PreparationTypeSynchronic, syncId);
+                    
+                    if (thisSyncTarget == nullptr) thisSyncTarget = new BKItem(PreparationTypeSynchronic, syncId, processor);
+                    
+                    thisSyncTarget->setTopLeftPosition(10, 10);
+                    
+                    if (!contains(thisSyncTarget))  add(thisSyncTarget);
+                    
+                    connectUI(newPreparation, thisSyncTarget);
+                }
+                
+                
+            }
             
+            for (auto p : preparations)
+            {
+                p->print();
+                connectUI(keymap, p);
+            }
         }
-        
-        for (auto p : preparations)
-        {
-            connectUI(keymap, p);
-        }
-        
     }
 
     DBG("MAPPER COUNT: " + String(thisPiano->getMappers().size()));

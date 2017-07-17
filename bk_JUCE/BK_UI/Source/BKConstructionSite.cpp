@@ -499,9 +499,12 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     }
     else
     {
-        graph->deselectAll();
-        
-        selected.deselectAll();
+        if (!e.mods.isShiftDown())
+        {
+            graph->deselectAll();
+            
+            selected.deselectAll();
+        }
         
         addAndMakeVisible(lasso = new LassoComponent<BKItem*>());
         

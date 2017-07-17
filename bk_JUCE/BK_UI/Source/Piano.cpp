@@ -645,6 +645,21 @@ PreparationMap::Ptr        Piano::getPreparationMapWithKeymap(Keymap::Ptr thisKe
     return thisPMap;
 }
 
+PreparationMap::Ptr        Piano::getPreparationMapWithKeymap(int keymapId)
+{
+    PreparationMap::Ptr thisPMap = nullptr;
+    for (auto pmap : prepMaps)
+    {
+        if (pmap->getKeymap()->getId() == keymapId)
+        {
+            thisPMap = pmap;
+            break;
+        }
+    }
+    return thisPMap;
+}
+
+
 // Add preparation map, return its Id.
 int Piano::removePreparationMapWithKeymap(Keymap::Ptr thisKeymap)
 {

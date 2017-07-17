@@ -74,7 +74,7 @@ public:
     
     inline void print(void)
     {
-        DBG("type: " + String(type) + " Id: " + String(Id));
+        DBG("PREPARATIONZ type: " + String(type) + " Id: " + String(Id));
         for (auto item : connections)
         {
             DBG(cPreparationTypes[type]+((Id >= 0) ? String(Id) : "") +
@@ -287,8 +287,8 @@ private:
     
     BKItem::RCArr preparations;
     
-    void addPreparationToKeymap(BKPreparationType thisType, int thisId, Keymap::Ptr thisKeymap);
-    void removePreparationFromKeymap(BKPreparationType thisType, int thisId, Keymap::Ptr thisKeymap);
+    void addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId);
+    void removePreparationFromKeymap(BKPreparationType thisType, int thisId, int keymapId);
     void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
     void linkSynchronicWithTempo(Synchronic::Ptr synchronic, Tempo::Ptr thisTempo);
     void linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic);
