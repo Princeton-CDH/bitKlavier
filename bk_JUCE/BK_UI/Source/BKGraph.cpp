@@ -1247,6 +1247,8 @@ void BKItemGraph::reconstruct(void)
                 
                 newPreparation = itemWithTypeAndId(PreparationTypeTempo, Id);
                 
+                if (newPreparation == nullptr) newPreparation = new BKItem(PreparationTypeTempo, Id, processor);
+                
                 preparations.add(newPreparation);
                 
                 if (!contains(newPreparation))
