@@ -621,9 +621,9 @@ void BKItemGraph::addPreparationToKeymap(BKPreparationType thisType, int thisId,
     
     if (thisPreparationMap == nullptr)
     {
-        int whichPMap = processor.currentPiano->addPreparationMap(processor.gallery->getKeymap(keymapId));
+        processor.currentPiano->addPreparationMap(processor.gallery->getKeymap(keymapId));
         
-        thisPreparationMap = processor.currentPiano->prepMaps[whichPMap];
+        thisPreparationMap = processor.currentPiano->getPreparationMaps().getLast();
     }
     
     if (thisType == PreparationTypeDirect)
@@ -795,15 +795,11 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
     {
         if (connect)    addPreparationToKeymap(item2Type, item2Id, item1Id);
         else            removePreparationFromKeymap(item2Type, item2Id, item1Id);
-        
-        processor.currentPiano->getPreparationMapWithKeymap(item1Id)->print();
     }
     else if (item1Type <= PreparationTypeTempo && item2Type == PreparationTypeKeymap)
     {
         if (connect)    addPreparationToKeymap(item1Type, item1Id, item2Id);
         else            removePreparationFromKeymap(item1Type, item1Id, item2Id);
-        
-        processor.currentPiano->getPreparationMapWithKeymap(item2Id)->print();
     }
     else if (item1Type == PreparationTypeTuning && item2Type <= PreparationTypeNostalgic)
     {
@@ -1200,16 +1196,16 @@ void BKItemGraph::reconstruct(void)
     Piano::Ptr thisPiano = processor.currentPiano;
     
     int pmapcount = 0;
+    DBG("PMAPZ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~~ ");
     for (auto pmap : thisPiano->getPreparationMaps())
     {
         preparations.clear();
         
-        DBG("--------------------------------");
         pmap->print();
         // Keymap
         int keymapId = pmap->getKeymapId();
         
-        DBG("PMAP"+String(pmapcount++));
+        DBG("---PMAP"+String(pmapcount++));
         DBG("    keymap"+String(keymapId));
         
         BKItem* keymap;

@@ -908,7 +908,7 @@ void Piano::setState(XmlElement* e)
             
             addPreparationMap(); // should clean up this functionality . pretty bad
             
-            prepMaps[prepMapCount]->setKeymap(keymap);
+            prepMaps.getLast()->setKeymap(keymap);
             
             Synchronic::PtrArr sync;
             for (int k = 0; k < 128; k++)
