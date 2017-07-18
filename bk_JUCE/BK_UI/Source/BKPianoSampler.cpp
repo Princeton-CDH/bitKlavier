@@ -330,6 +330,7 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
                 {
                     rampOnOffLevel = 1.0f;
                     isInRampOff = false;
+                    isInRampOn = false; //wasn't here before!
                 }
             }
             else if (isInRampOff)

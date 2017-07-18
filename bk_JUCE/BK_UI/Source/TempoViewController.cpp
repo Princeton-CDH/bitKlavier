@@ -224,6 +224,8 @@ TempoViewController(p, theGraph)
     modeCB.addListener(this);
     
     tempoSlider->addMyListener(this);
+    A1ModeCB.addListener(this);
+    A1reset.addListener(this);
     AT1HistorySlider->addMyListener(this);
     AT1SubdivisionsSlider->addMyListener(this);
     AT1MinMaxSlider->addMyListener(this);
