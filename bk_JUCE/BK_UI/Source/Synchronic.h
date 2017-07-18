@@ -83,7 +83,7 @@ public:
     sNumBeats(0),
     sClusterMin(1),
     sClusterMax(100),
-    sClusterCap(8),
+    sClusterCap(8), //8 in original bK, but behavior is different here?
     sMode(FirstNoteOnSync),
     sReleaseVelocitySetsSynchronic(false),
     sBeatsToSkip(0),

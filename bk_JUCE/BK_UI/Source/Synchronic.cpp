@@ -166,7 +166,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     
     cluster.insert(0, noteNumber);
     if(cluster.size() > active->getClusterCap()) cluster.resize(active->getClusterCap());
-    //DBG("cluster size: " + String(cluster.size()) + " " + String(clusterThresholdSamples/sampleRate));
+    DBG("cluster size: " + String(cluster.size()) + " " + String(clusterThresholdSamples/sampleRate));
     
     //why not use clusterMax for this? the intent is different:
     //clusterMax: max number of keys pressed within clusterThresh, otherwise shut off pulses
@@ -181,11 +181,11 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     
     //reset the timer for time between notes
     clusterThresholdTimer = 0;
-    
+
 }
 
 
-void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channel) 
+void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channel)
 {
     
     //remove key from array of pressed keys
@@ -253,6 +253,15 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
         slimCluster.clearQuick();
         for(int i = 0; i< cluster.size(); i++) slimCluster.addIfNotAlreadyThere(cluster.getUnchecked(i));
         
+        /*
+        String clusterNotes = " ";
+        for(int i=0; i<slimCluster.size(); i++)
+        {
+            clusterNotes = clusterNotes + String(slimCluster.getUnchecked(i)) + " ";
+        }
+        DBG("slimCluster = " + clusterNotes);
+        */
+        
         //get time until next beat => beat length scaled by beatMultiplier parameter
         numSamplesBeat =    beatThresholdSamples *
                             active->getBeatMultipliers()[beatMultiplierCounter] *
@@ -303,11 +312,17 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             //if (cluster.size() >= active->getClusterMin() && cluster.size() <= active->getClusterMax())
             if(playCluster)
             {
-                for (int n = slimCluster.size(); --n >= 0;)
+                //for (int n = slimCluster.size(); --n >= 0;)
+                for (int n=0; n<slimCluster.size(); n++)
                 {
+                    /*
                     playNote(channel,
                              cluster[n],
                              velocities.getUnchecked(cluster[n]));
+                     */
+                    playNote(channel,
+                             slimCluster[n],
+                             velocities.getUnchecked(slimCluster[n]));
                 }
                 
             }
