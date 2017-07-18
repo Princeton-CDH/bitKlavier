@@ -77,15 +77,15 @@ void BKItem::setImage(Image newImage)
     placement = RectanglePlacement::centred;
     
     int val =
-    (type == PreparationTypeGenericMod && type == PreparationTypeReset) ?  90 :
-    (type == PreparationTypePianoMap) ? 75 :
-    (type == PreparationTypeKeymap) ? 90 :
-    (type == PreparationTypeTempo || type == PreparationTypeTuning) ? 55 :
+    (type == PreparationTypeGenericMod && type == PreparationTypeReset) ?  80 :
+    (type == PreparationTypePianoMap) ? 120 :
+    (type == PreparationTypeKeymap) ? 80 :
+    (type == PreparationTypeTempo || type == PreparationTypeTuning) ? 60 :
     65;
     
     
     while (!(image.getWidth() < val || image.getHeight() < val))
-        image = image.rescaled(image.getWidth() * 0.75, image.getHeight() * 0.75);
+        image = image.rescaled(image.getWidth() * 0.8, image.getHeight() * 0.8);
     
     if (type != PreparationTypePianoMap)    setSize(image.getWidth(), image.getHeight());
     else                                    setSize(image.getWidth(), image.getHeight() + 25);

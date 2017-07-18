@@ -29,7 +29,7 @@
 
 #include "BKGraph.h"
 
-class BKOvertop :  public Component//, public BKListener, public KeyListener
+class BKOvertop :  public Component
 {
 public:
     BKOvertop (BKAudioProcessor& p, BKItemGraph* theGraph):
@@ -73,14 +73,10 @@ public:
     //==============================================================================
     void paint (Graphics& g) override
     {
-        //g.fillAll(Colour((uint8)0, (uint8)0, (uint8)0, 0.75f));
-        //g.fillAll(Colours::burlywood);
-        //g.fillAll(Colours::transparentBlack);
     }
     
     void resized() override
     {
-
         Rectangle<int> area (getLocalBounds());
         
         kvc.setBounds(area);
@@ -233,33 +229,7 @@ private:
     
     BKAudioProcessor& processor;
     
-    //TextButton hideOrShow;
-    
     BKPreparationDisplay currentDisplay;
-    
-    /*
-    void bkTextFieldDidChange       (TextEditor&)           override{};
-    void bkMessageReceived          (const String& message) override{};
-    void bkComboBoxDidChange        (ComboBox* box)         override{};
-    
-    inline void bkButtonClicked            (Button* b) override
-    {
-        String name = b->getName();
-        
-        if (name == "hideOrShow")
-        {
-            processor.updateState->setCurrentDisplay(DisplayNil);
-        }
-    }
-    
-    bool keyPressed (const KeyPress& e, Component*) override
-    {
-        if (e.isKeyCode(27)) // Escape
-        {
-            
-        }
-    }
-     */
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BKOvertop);
     
