@@ -27,6 +27,8 @@
 
 #include "PianoConfig.h"
 
+#include "ItemMapper.h"
+
 class Piano : public ReferenceCountedObject
 {
 public:

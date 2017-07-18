@@ -39,15 +39,6 @@ public:
     
     void resetPreparations(void);
     
-    inline void printPianoConfigurations(void)
-    {
-        for (auto piano : bkPianos)
-        {
-            DBG("PIANO "+ String(piano->getName()));
-            piano->configuration->print();
-        }
-    }
-    
     SynchronicProcessor::Ptr getSynchronicProcessor(int Id);
     NostalgicProcessor::Ptr getNostalgicProcessor(int id);
     TuningProcessor::Ptr getTuningProcessor(int id);

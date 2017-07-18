@@ -18,14 +18,14 @@
 #include "PluginProcessor.h"
 
 #include "Preparation.h"
+#include "ItemMapper.h"
 
-class BKItem : public ReferenceCountedObject, public BKDraggableComponent, public BKListener
+class BKItem : public ItemMapper, public BKDraggableComponent, public BKListener
 {
 public:
-    
-    typedef ReferenceCountedObjectPtr<BKItem> Ptr;
-    typedef ReferenceCountedArray<BKItem>     RCArr;
-    typedef Array<BKItem::Ptr>                PtrArr;
+    typedef ReferenceCountedArray<BKItem>       RCArr;
+    typedef ReferenceCountedObjectPtr<BKItem>   Ptr;
+    typedef Array<Ptr>                          PtrArr;
     
     BKItem(BKPreparationType type, int Id, BKAudioProcessor& p);
     
@@ -45,11 +45,6 @@ public:
     
     inline void setSelected(bool select) {isSelected = select; repaint();}
     inline bool getSelected(void) { return isSelected;}
-    
-    inline BKItem::PtrArr getConnections(void) const noexcept
-    {
-        return connections;
-    }
 
     inline int getSelectedPianoId(void) const noexcept {return currentId;}
     inline void setSelectedPianoId(int Id)
@@ -66,11 +61,11 @@ public:
     
     inline void setItemBounds(int X, int Y, int width, int height)
     {
-        setBounds(X,Y,width,height);
-        
         DBG("SET X: " + String(X) + " Y: " + String(Y));
         
-        processor.currentPiano->configuration->setItemXY(core->getType(), core->getId(), X, Y);
+        setBounds(X,Y,width,height);
+        
+        setXY(X,Y);
     }
     
     void copy(BKItem::Ptr);
@@ -102,9 +97,8 @@ private:
     
     // UI stuff
     Component fullChild;
-    
-    BKItem::PtrArr connections;
-    ItemMapper::Ptr core;
+
+    Array<BKItem*> connections;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKItem)
 };
@@ -122,7 +116,6 @@ public:
     {
         
     }
-    
     
     BKItem* itemWithTypeAndId(BKPreparationType type, int Id);
     BKItem* get(BKPreparationType type, int Id);
@@ -186,15 +179,11 @@ public:
         return selectedItems;
     }
     
-    inline BKItem::RCArr getAllItems(void) const noexcept
+    inline BKItem::RCArr getItems(void)
     {
         return items;
     }
     
-    inline BKItem* getItemAtXY(int x, int y) const noexcept
-    {
-        
-    }
     
     inline Array<int> getPreparationIds(BKItem::PtrArr theseItems)
     {
@@ -232,7 +221,7 @@ public:
 private:
     BKAudioProcessor& processor;
     
-    BKItem::PtrArr items;
+    BKItem::RCArr items;
 
     void addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId);
     void removePreparationFromKeymap(BKPreparationType thisType, int thisId, int keymapId);

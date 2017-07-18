@@ -38,9 +38,6 @@ modTempo(mTempo),
 bkKeymaps(keymaps),
 Id(Id)
 {
-    
-    configuration = new PianoConfiguration();
-    
     numPMaps = 0;
     pianoMap.ensureStorageAllocated(128);
     
@@ -740,59 +737,43 @@ ValueTree Piano::getState(void)
     int mapCount = 0;
     for (auto map : mappers)
     {
-        BKPreparationType type = map->getType();
-        Array<int> keymaps = map->getKeymaps();
+        ValueTree mapVT ("item"+String(mapCount++));
         
-        if ((type == PreparationTypeReset || type == PreparationTypePianoMap || (type >= PreparationTypeDirect && type <= PreparationTypeTempo)) && !keymaps.size()) continue;
-        
-        DBG("SAVING THIS MAPPER: " + String(mapCount));
-        map->print();
-        
-        ValueTree mapVT ("mapper"+String(mapCount++));
-        
-        mapVT.setProperty("type", type, 0);
+        mapVT.setProperty("type", map->getType(), 0);
         
         mapVT.setProperty("Id", map->getId(), 0);
         
-        mapVT.setProperty("piano", map->piano,0);
-        
-        int pcount = 0;
-        for (auto keymap : map->getKeymaps())
+        for (int i = 0; i < BKPreparationTypeNil; i++)
         {
-            mapVT.setProperty("k"+String(pcount++), keymap, 0);
-        }
-        
-        pcount = 0;
-        for (auto target : map->getTargets())
-        {
-            mapVT.setProperty("t"+String(pcount++), target, 0);
-        }
-        
-        for (int i = 0; i < 5; i++)
-        {
-            ValueTree resetVT( vtagReset + String(i));
+            ValueTree connexVT( "type" + String(i));
             
-            int rcount = 0;
-            for (auto reset : map->resets[i])
+            Array<int> connex = map->getConnections((BKPreparationType)i);
+            
+            int count = 0;
+            for (auto c : connex)
             {
-                resetVT.setProperty( "r" + String(rcount++), reset, 0);
+                connexVT.setProperty("id"+String(count++), c, 0);
             }
             
-            mapVT.addChild(resetVT, -1, 0);
+            mapVT.addChild(connexVT, -1, 0);
         }
+        
+        map->print();
         
         pianoVT.addChild(mapVT, -1, 0);
 
     }
     
-    ValueTree configurationVT = configuration->getState();
-    pianoVT.addChild(configurationVT, -1, 0);
+    
     
     return pianoVT;
 }
+#define LOAD_VERSION 0
 
 void Piano::setState(XmlElement* e)
 {
+    
+#if LOAD_VERSION
     int i; float f;
     int pianoMapCount = 0, prepMapCount = 0, resetCount = 0, mapperCount = 0;
     
@@ -960,6 +941,7 @@ void Piano::setState(XmlElement* e)
         }
         
     }
+#endif 
     
 }
 

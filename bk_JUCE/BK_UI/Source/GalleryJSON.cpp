@@ -10,6 +10,8 @@
 
 #include "PluginProcessor.h"
 
+
+
 Array<float> tempoAlreadyLoaded;
 
 #define jsonGetValue(ID) data.getProperty(ID, "").getArray()->getFirst()
@@ -571,7 +573,10 @@ void Gallery::setStateFromJson(var myJson)
                     
                     whichKeymaps.add(pmapkeymap->getId());
                     
-                    ItemMapper::Ptr thisMapper = new ItemMapper(PreparationTypeTuning, whichTMod, whichKeymaps, whichTargets);
+                    ItemMapper::Ptr thisMapper = new ItemMapper(PreparationTypeTuning, whichTMod);
+                    
+                    thisMapper->setConnections(PreparationTypeKeymap, whichKeymaps);
+                    thisMapper->setConnections(PreparationTypeTuning, whichTargets);
                     
                     thisPiano->addMapper(thisMapper);
                     
