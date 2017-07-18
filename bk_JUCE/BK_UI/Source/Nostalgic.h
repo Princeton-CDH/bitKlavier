@@ -125,11 +125,10 @@ public:
     inline const int getSyncTarget() const noexcept                        {return nSyncTarget;        }
     inline const SynchronicProcessor::Ptr getSyncTargetProcessor() const noexcept
                                                                            {return nSyncProcessor;     }
-    //inline const Keymap::Ptr getResetMap() const noexcept                  {return resetMap;           }
     
     inline void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
     inline void setUndertow(int undertow)                                  {nUndertow = undertow;                  }
-    inline void setTransposition(Array<float> transposition)                      {nTransposition = transposition;        }
+    inline void setTransposition(Array<float> transposition)               {nTransposition = transposition;        }
     inline void setGain(float gain)                                        {nGain = gain;                          }
     inline void setLengthMultiplier(float lengthMultiplier)                {nLengthMultiplier = lengthMultiplier;  }
     inline void setBeatsToSkip(float beatsToSkip)                          {nBeatsToSkip = beatsToSkip;            }

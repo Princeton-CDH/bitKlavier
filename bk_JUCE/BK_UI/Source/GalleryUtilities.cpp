@@ -11,11 +11,11 @@
 #include "Gallery.h"
 
 
-SynchronicProcessor::Ptr Gallery::getSynchronicProcessor(int id)
+SynchronicProcessor::Ptr Gallery::getSynchronicProcessor(int Id)
 {
     for (auto p : synchronic)
     {
-        if(p->getId() == id)    return p->processor;
+        if(p->getId() == Id)    return p->processor;
     }
     
     //else
@@ -23,11 +23,11 @@ SynchronicProcessor::Ptr Gallery::getSynchronicProcessor(int id)
     return synchronic[0]->processor;
 }
 
-NostalgicProcessor::Ptr Gallery::getNostalgicProcessor(int id)
+NostalgicProcessor::Ptr Gallery::getNostalgicProcessor(int Id)
 {
     for (auto p : nostalgic)
     {
-        if(p->getId() == id)    return p->processor;
+        if(p->getId() == Id)    return p->processor;
     }
     
     //else
@@ -35,11 +35,11 @@ NostalgicProcessor::Ptr Gallery::getNostalgicProcessor(int id)
     return nostalgic[0]->processor;
 }
 
-TuningProcessor::Ptr Gallery::getTuningProcessor(int id)
+TuningProcessor::Ptr Gallery::getTuningProcessor(int Id)
 {
     for (auto p : tuning)
     {
-        if(p->getId() == id)    return p->processor;
+        if(p->getId() == Id)    return p->processor;
     }
     
     //else
@@ -47,11 +47,11 @@ TuningProcessor::Ptr Gallery::getTuningProcessor(int id)
     return tuning[0]->processor;
 }
 
-TempoProcessor::Ptr Gallery::getTempoProcessor(int id)
+TempoProcessor::Ptr Gallery::getTempoProcessor(int Id)
 {
     for (auto p : tempo)
     {
-        if(p->getId() == id)    return p->processor;
+        if(p->getId() == Id)    return p->processor;
     }
     
     //else
@@ -643,13 +643,18 @@ void Gallery::addNostalgic(void)
 {
     int newId = getNewId(PreparationTypeNostalgic);
     nostalgic.add(new Nostalgic(main, tuning[0], updateState, newId));
+
     nostalgic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
+    
+    nostalgic.getLast()->setSynchronic(synchronic[0]);
 }
 
 void Gallery::addNostalgicWithId(int Id)
 {
     nostalgic.add(new Nostalgic(main, tuning[0], updateState, Id));
     nostalgic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
+    
+    nostalgic.getLast()->setSynchronic(synchronic[0]);
 }
 
 
@@ -658,6 +663,8 @@ void Gallery::addNostalgic(NostalgicPreparation::Ptr nost)
     int newId = getNewId(PreparationTypeNostalgic);
     nostalgic.add(new Nostalgic(main, nost, newId));
     nostalgic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
+    
+    nostalgic.getLast()->setSynchronic(synchronic[0]);
 }
 
 // Returns index of Nostalgic to be added/configured.

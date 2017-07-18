@@ -77,13 +77,15 @@ url(String::empty)
 
 void Gallery::prepareToPlay (double sampleRate)
 {
-    for (int i = bkPianos.size(); --i >= 0;) bkPianos[i]->prepareToPlay(sampleRate);
+    bkSampleRate = sampleRate;
     
-    for (int i = tuning.size(); --i >= 0;)      tuning[i]->prepareToPlay(sampleRate);
-    for (int i = tempo.size(); --i >= 0;)       tempo[i]->prepareToPlay(sampleRate);
-    for (int i = synchronic.size(); --i >= 0;)  synchronic[i]->prepareToPlay(sampleRate);
-    for (int i = nostalgic.size(); --i >= 0;)   nostalgic[i]->prepareToPlay(sampleRate);
-    for (int i = direct.size(); --i >= 0;)      direct[i]->prepareToPlay(sampleRate);
+    for (int i = bkPianos.size(); --i >= 0;) bkPianos[i]->prepareToPlay(bkSampleRate);
+    
+    for (int i = tuning.size(); --i >= 0;)      tuning[i]->prepareToPlay(bkSampleRate);
+    for (int i = tempo.size(); --i >= 0;)       tempo[i]->prepareToPlay(bkSampleRate);
+    for (int i = synchronic.size(); --i >= 0;)  synchronic[i]->prepareToPlay(bkSampleRate);
+    for (int i = nostalgic.size(); --i >= 0;)   nostalgic[i]->prepareToPlay(bkSampleRate);
+    for (int i = direct.size(); --i >= 0;)      direct[i]->prepareToPlay(bkSampleRate);
     
 }
 

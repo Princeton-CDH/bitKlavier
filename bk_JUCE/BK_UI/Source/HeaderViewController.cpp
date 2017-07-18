@@ -43,6 +43,7 @@ processor (p)
     pianoCB.addMyListener(this);
     pianoCB.BKSetJustificationType(juce::Justification::centredRight);
     
+    pianoCB.addSeparator();
     pianoCB.addItem("New piano...",1);
     pianoCB.setSelectedId(0, dontSendNotification);
     
@@ -137,7 +138,7 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
 {
     if (result == 1) // New piano
     {
-        int index = hvc->processor.gallery->getNumPianos();
+        int newIndex = hvc->processor.gallery->getNumPianos();
         
         int newId = hvc->processor.gallery->getNewId(PreparationTypePiano);
         
@@ -147,11 +148,12 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
         
         hvc->processor.gallery->getPianos().getLast()->setName(newName);
         
-        hvc->pianoCB.changeItemText(index, newName);
+        hvc->pianoCB.changeItemText(newIndex, newName);
         
-        hvc->pianoCB.addItem("New piano...", index );
+        hvc->pianoCB.addSeparator();
+        hvc->pianoCB.addItem("New piano...", newIndex );
         
-        hvc->pianoCB.setSelectedId(index);
+        hvc->pianoCB.setSelectedId(newIndex);
         
         hvc->processor.setCurrentPiano(newId);
     }
@@ -252,8 +254,14 @@ void HeaderViewController::switchGallery()
 void HeaderViewController::fillPianoCB(void)
 {
     pianoCB.clear(dontSendNotification);
-    for (int i = 0; i < processor.gallery->getPianos().size(); i++)     pianoCB.addItem(processor.gallery->getPiano(i)->getName(), i+1);
-    pianoCB.addItem("New piano...", processor.gallery->getPianos().size()+1);
+    
+    int count = 0;
+    for (auto piano : processor.gallery->getPianos())
+    {
+        pianoCB.addItem(piano->getName(), ++count);
+    }
+    pianoCB.addSeparator();
+    pianoCB.addItem("New piano...", ++count);
     
     
     int itemIndex = processor.gallery->getIndexFromId(PreparationTypePiano, processor.currentPiano->getId());
@@ -278,32 +286,41 @@ void HeaderViewController::bkComboBoxDidChange            (ComboBox* cb)
 {
     // Change piano
     String name = cb->getName();
-    int selected = cb->getSelectedItemIndex();
+    int index = cb->getSelectedItemIndex();
     
     if (name == "pianoCB")
     {
         // Add piano if New piano... pressed.
-        if (selected == pianoCB.getNumItems())
+        if (index == (pianoCB.getNumItems()-1))
         {
-            processor.gallery->addPiano();
+            int newIndex = processor.gallery->getNumPianos();
             
-            String newName = "Piano"+String(processor.gallery->getPianos().size());
+            int newId = processor.gallery->getNewId(PreparationTypePiano);
             
-            pianoCB.changeItemText(selected, newName);
+            processor.gallery->addPianoWithId(newId);
+            
+            String newName = "Piano"+String(newId);
+            
             processor.gallery->getPianos().getLast()->setName(newName);
             
-            pianoCB.setSelectedItemIndex(selected);
+            pianoCB.changeItemText(newIndex, newName);
             
-            pianoCB.addItem("New piano...", selected+1);
+            pianoCB.setSelectedId(newIndex+1);
+            
+            pianoCB.addSeparator();
+            pianoCB.addItem("New piano...", newIndex + 2);
+            
         }
         
-        processor.setCurrentPiano(selected);
+        int pianoId = processor.gallery->getIdFromIndex(PreparationTypePiano, index);
+        
+        processor.setCurrentPiano(pianoId);
         
         
     }
     else if (name == "galleryCB")
     {
-        String path = processor.galleryNames[selected];
+        String path = processor.galleryNames[index];
         if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
         else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
     }

@@ -68,12 +68,17 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
         
         if (active->getMode() == NoteLengthSync)
         {
+            DBG("NOSTALGIC note on");
             //get length of played notes, subtract wave distance to set nostalgic reverse note length
             duration =  (noteLengthTimers.getUnchecked(midiNoteNumber) *
                         active->getLengthMultiplier() +
                         (offRamp + 30)) *          //offRamp + onRamp
                         (1000.0 / sampleRate);
-        
+            
+            DBG("sr: " + String(sampleRate));
+            DBG("lenmult: " + String(active->getLengthMultiplier()));
+            DBG("duration: " + String(duration));
+            
             for (auto t : active->getTransposition())
             {
                 float offset = t + tuner->getOffset(midiNoteNumber);
