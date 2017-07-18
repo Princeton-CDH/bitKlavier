@@ -19,10 +19,8 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ BKItem ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 BKItem::BKItem(BKPreparationType type, int Id, BKAudioProcessor& p):
 BKDraggableComponent(true,false,true),
-processor(p),
-type(type),
-Id(Id),
-mapper(new ModificationMapper(BKPreparationTypeNil, -1))
+ItemMapper(type, Id),
+processor(p)
 {
     fullChild.setAlwaysOnTop(true);
     addAndMakeVisible(fullChild);
@@ -206,40 +204,6 @@ void BKItem::resized(void)
     fullChild.setBounds(0,0,getWidth(),getHeight());
 }
 
-bool BKItem::compare(BKItem* otherItem)
-{
-    if (type == otherItem->getType())
-    {
-        if (type == PreparationTypeGenericMod)
-        {
-            if ((mapper->getType() == otherItem->mapper->getType()))
-            {
-                if (mapper->getType() == PreparationTypeReset)
-                {
-                    for (int i = 0; i < 5; i++)
-                    {
-                        if (mapper->resets[i] != otherItem->mapper->resets[i]) return false;
-                    }
-                    
-                    if (mapper->getKeymaps() == otherItem->mapper->getKeymaps()) return true;
-                }
-                else if ((mapper->getTargets() == otherItem->mapper->getTargets()) &&
-                         (mapper->getKeymaps() == otherItem->mapper->getKeymaps()))
-                {
-                    return true;
-                }
-            }
-        }
-        else if (type == PreparationTypePianoMap)
-        {
-        
-        }
-        else
-        {
-            if (Id == otherItem->getId()) return true;
-        }
-    }
-}
 
 
 void BKItem::copy(BKItem::Ptr itemToCopy)
@@ -423,21 +387,6 @@ void BKItem::removeConnection(BKItem* toDisconnect)
 
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ BKGraph ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-void BKItemGraph::updateLast(void)
-{
-    last.clear();
-    
-    for (auto item : items)
-    {
-        BKItem* toAdd = new BKItem(item->getType(), item->getId(), processor);
-        
-        toAdd->copy(item);
-        
-        last.add(toAdd);
-    }
-    
-}
 
 void BKItemGraph::updateClipboard(void)
 {
@@ -782,7 +731,7 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
     {
         Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item1Id);
         
-        ModificationMapper::Ptr thisMapper = item2->getMapper();
+        ItemMapper::Ptr thisMapper = item2->getMapper();
         
         if (connect)
         {
@@ -804,7 +753,7 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
     {
         Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item2Id);
         
-        ModificationMapper::Ptr thisMapper = item1->getMapper();
+        ItemMapper::Ptr thisMapper = item1->getMapper();
         
         if (connect)
         {
@@ -870,7 +819,7 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
     }
     else if ((item1Type == PreparationTypeGenericMod || item1Type == PreparationTypeReset || (item1Type >= PreparationTypeDirectMod && item1Type <= PreparationTypeTempoMod)) && item2Type <= PreparationTypeTempo)
     {
-        ModificationMapper::Ptr thisMapper = item1->getMapper();
+        ItemMapper::Ptr thisMapper = item1->getMapper();
         
         BKPreparationType mapperType = (item1Type == PreparationTypeReset) ?  PreparationTypeReset : item2Type;
         
@@ -926,7 +875,7 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
     }
     else if (item1Type <= PreparationTypeTempo && (item2Type == PreparationTypeGenericMod || item2Type == PreparationTypeReset || (item2Type >= PreparationTypeDirectMod && item2Type <= PreparationTypeTempoMod)))
     {
-        ModificationMapper::Ptr thisMapper = item2->getMapper();
+        ItemMapper::Ptr thisMapper = item2->getMapper();
         
         BKPreparationType mapperType = (item2Type == PreparationTypeReset) ? PreparationTypeReset : item1Type;
         
@@ -982,7 +931,7 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
     else if (item1Type == PreparationTypeKeymap &&
             (item2Type == PreparationTypeGenericMod || item2Type == PreparationTypeReset || (item2Type >= PreparationTypeDirectMod && item2Type <= PreparationTypeTempoMod)))
     {
-        ModificationMapper::Ptr thisMapper = item2->getMapper();
+        ItemMapper::Ptr thisMapper = item2->getMapper();
         
         if (connect)
         {
@@ -998,7 +947,7 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
     else if (item2Type == PreparationTypeKeymap &&
             (item1Type == PreparationTypeGenericMod || item1Type == PreparationTypeReset|| (item1Type >= PreparationTypeDirectMod && item1Type <= PreparationTypeTempoMod)))
     {
-        ModificationMapper::Ptr thisMapper = item1->getMapper();
+        ItemMapper::Ptr thisMapper = item1->getMapper();
         
         if (connect)
         {

@@ -81,18 +81,15 @@ public:
     OwnedArray<Modifications> modificationMap;
 
     
-    ModificationMapper::PtrArr mappers;
-    ModificationMapper::PtrArr resetMappers;
+    ItemMapper::PtrArr     mappers;
     
-    inline ModificationMapper::PtrArr getMappers(void) const noexcept { return mappers; }
+    inline ItemMapper::PtrArr getMappers(void) const noexcept { return mappers; }
     
-    inline ModificationMapper::Ptr getMapper(int which) { return mappers[which]; }
+    inline void clearMappers(void) { mappers.clear(); }
     
-    inline void clearMapper(void) { mappers.clear(); }
-    
-    inline ModificationMapper::Ptr getMapper(BKPreparationType type, int Id)
+    inline ItemMapper::Ptr getMapper(BKPreparationType type, int Id)
     {
-        ModificationMapper::Ptr thisMapper = new ModificationMapper(type, Id);
+        ItemMapper::Ptr thisMapper = new ItemMapper(type, Id);
         
         bool add = true;
         for (auto map : mappers)
@@ -110,12 +107,12 @@ public:
         return thisMapper;
     }
     
-    inline void addMapper(ModificationMapper::Ptr thisMapper)
+    inline void addMapper(ItemMapper::Ptr thisMapper)
     {
         mappers.addIfNotAlreadyThere(thisMapper);
     }
     
-    inline void removeMapper(ModificationMapper::Ptr thisMapper)
+    inline void removeMapper(ItemMapper::Ptr thisMapper)
     {
         for (int i = mappers.size(); --i >= 0; )
         {
@@ -179,7 +176,7 @@ public:
                 else if (map->getType() == PreparationTypeTuning) ptype = "t";
                 else if (map->getType() == PreparationTypeTempo) ptype = "m";
                 
-                out += String(i) + ":" + ptype + String(map->getId()) + ":" + "{" + intArrayToString(map->getTargets()) +"} ";
+                out += String(i) + ":" + ptype + String(map->getId()) + ":" + "{" + arrayIntArrayToString(map->getAllConnections()) +"} ";
                 
             }
         }
@@ -212,17 +209,15 @@ public:
     void configureResets(Array<Array<int>> resets, Array<int> whichKeymaps, Array<int> whichPreps);
     void deconfigureResetsForKeys(Array<Array<int>> resets, Array<int> otherKeys);
     
-    void configureModifications(ModificationMapper::PtrArr maps);
-    void configureModification(ModificationMapper::Ptr map);
-    void deconfigureModification(ModificationMapper::Ptr map);
+    void configureModifications(ItemMapper::PtrArr maps);
+    void configureModification(ItemMapper::Ptr map);
+    void deconfigureModification(ItemMapper::Ptr map);
     
     int                         addPreparationMap(void);
     int                         addPreparationMap(Keymap::Ptr keymap);
     PreparationMap::Ptr         getPreparationMapWithKeymap(int keymapId);
     int                         removeLastPreparationMap(void);
     int                         removePreparationMapWithKeymap(int keymapId);
-
-    PianoConfiguration::Ptr     configuration;
     
     Array<Array<int>> pianoMaps;
 private:

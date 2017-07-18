@@ -159,7 +159,7 @@ void Piano::configureNostalgicModification(int key, NostalgicModPreparation::Ptr
     }
 }
 
-void Piano::configureModifications(ModificationMapper::PtrArr mods)
+void Piano::configureModifications(ItemMapper::PtrArr mods)
 {
     for (auto mod : mods)
     {
@@ -167,22 +167,24 @@ void Piano::configureModifications(ModificationMapper::PtrArr mods)
     }
 }
 
-void Piano::deconfigureModification(ModificationMapper::Ptr map)
+void Piano::deconfigureModification(ItemMapper::Ptr map)
 {
-    Array<int> whichPreps = map->getTargets();
-    Array<int> whichKeymaps = map->getKeymaps();
-    
     BKPreparationType type = map->getType();
+    
+    Array<int> whichPreps = map->getConnections(type);
+    
+    Array<int> whichKeymaps = map->getConnections(PreparationTypeKeymap);
+    
     int Id = map->getId();
     
     if (type == BKPreparationTypeNil) return;
     else if (type == PreparationTypePianoMap)
     {
-        deconfigurePianoMap(whichKeymaps, map->piano);
+        deconfigurePianoMap(whichKeymaps, map->getConnections(PreparationTypePiano).getFirst());
     }
     else if (type == PreparationTypeReset)
     {
-        deconfigureResets(map->resets, whichKeymaps);
+        deconfigureResets(map->getAllConnections(), whichKeymaps);
     }
     else if (type == PreparationTypeDirect)
     {
@@ -312,24 +314,25 @@ void Piano::deconfigureResetsForKeys(Array<Array<int>> resets, Array<int> otherK
     }
 }
 
-void Piano::configureModification(ModificationMapper::Ptr map)
+void Piano::configureModification(ItemMapper::Ptr map)
 {
     map->print();
     
-    Array<int> whichPreps = map->getTargets();
-    Array<int> whichKeymaps = map->getKeymaps();
-
     BKPreparationType type = map->getType();
     int Id = map->getId();
+    
+    Array<int> whichPreps = map->getConnections(type);
+    
+    Array<int> whichKeymaps = map->getConnections(PreparationTypeKeymap);
     
     if (type == BKPreparationTypeNil) return;
     else if (type == PreparationTypePianoMap)
     {
-        configurePianoMap(whichKeymaps, map->piano);
+        configurePianoMap(whichKeymaps, map->getConnections(PreparationTypeKeymap).getFirst());
     }
     else if (type == PreparationTypeReset)
     {
-        configureResets(map->resets, whichKeymaps, whichPreps);
+        configureResets(map->getAllConnections(), whichKeymaps, whichPreps);
     }
     else if (type == PreparationTypeDirect)
     {
@@ -837,7 +840,7 @@ void Piano::setState(XmlElement* e)
                 else                        targets.add(attr.getIntValue());
             }
             
-            ModificationMapper::Ptr mapper = new ModificationMapper(type, thisId, keymaps, targets);
+            ItemMapper::Ptr mapper = new ItemMapper(type, thisId, keymaps, targets);
             mapper->piano = piano;
             
             int resetCount = 0;

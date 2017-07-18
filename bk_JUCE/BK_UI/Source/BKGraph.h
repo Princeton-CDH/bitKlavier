@@ -19,12 +19,13 @@
 
 #include "Preparation.h"
 
-class BKItem : public BKDraggableComponent, public ReferenceCountedObject, public BKListener
+class BKItem : public ReferenceCountedObject, public BKDraggableComponent, public BKListener
 {
 public:
-    typedef ReferenceCountedObjectPtr<BKItem>   Ptr;
-    typedef Array<BKItem::Ptr>                  PtrArr;
-    typedef ReferenceCountedArray<BKItem>       RCArr;
+    
+    typedef ReferenceCountedObjectPtr<BKItem> Ptr;
+    typedef ReferenceCountedArray<BKItem>     RCArr;
+    typedef Array<BKItem::Ptr>                PtrArr;
     
     BKItem(BKPreparationType type, int Id, BKAudioProcessor& p);
     
@@ -35,29 +36,12 @@ public:
     void paint(Graphics& g) override;
     
     void resized(void) override;
-
-    void addConnection(BKItem* item);
-    
-    bool compare(BKItem* item);
-    
-    bool isConnectedWith(BKItem* item);
-    
-    void removeConnection(BKItem* toDisconnect);
     
     void itemIsBeingDragged(const MouseEvent&, Point<int>) override;
     
     void keyPressedWhileSelected(const KeyPress&) override;
 
-    inline String getName(void) { return name; }
-    
     void setType(BKPreparationType type, bool create);
-    
-
-    inline BKPreparationType getType(void) const noexcept { return type; }
-    
-    inline void setId(int newId ) { Id = newId; }
-    
-    inline int getId() const noexcept { return Id; }
     
     inline void setSelected(bool select) {isSelected = select; repaint();}
     inline bool getSelected(void) { return isSelected;}
@@ -66,28 +50,7 @@ public:
     {
         return connections;
     }
-    
-    inline BKItem::PtrArr getModifications(void) const noexcept
-    {
-        return modifications;
-    }
-    
-    inline void print(void)
-    {
-        DBG("PREPARATIONZ type: " + String(type) + " Id: " + String(Id));
-        for (auto item : connections)
-        {
-            DBG(cPreparationTypes[type]+((Id >= 0) ? String(Id) : "") +
-                " ==> " +
-                cPreparationTypes[item->getType()]+((item->getId() >= 0) ? String(item->getId()) : ""));
-        }
-        
-        mapper->print();
-    }
-    
-    inline ModificationMapper::Ptr getMapper() const noexcept { return mapper; }
-    inline void setMapper(ModificationMapper::Ptr map) {mapper = map; }
-    
+
     inline int getSelectedPianoId(void) const noexcept {return currentId;}
     inline void setSelectedPianoId(int Id)
     {
@@ -107,7 +70,7 @@ public:
         
         DBG("SET X: " + String(X) + " Y: " + String(Y));
         
-        processor.currentPiano->configuration->setItemXY(type, Id, X, Y);
+        processor.currentPiano->configuration->setItemXY(core->getType(), core->getId(), X, Y);
     }
     
     void copy(BKItem::Ptr);
@@ -133,21 +96,15 @@ public:
 private:
     BKAudioProcessor& processor;
     Label label;
+    
+    // Piano stuff
     BKComboBox menu; int currentId;
+    
+    // UI stuff
     Component fullChild;
     
     BKItem::PtrArr connections;
-    BKItem::PtrArr modifications;
-    
-    BKPreparationType type;
-    int Id;
-    
-    ModificationMapper::Ptr mapper;
-    
-    String name;
-    
-    
-
+    ItemMapper::Ptr core;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKItem)
 };
@@ -265,17 +222,8 @@ public:
         DBG("\n~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n");
     }
     
-    void updateLast(void);
-    
     void updateClipboard(void);
-    
-    inline void setClipboad(BKItem::PtrArr theseItems)
-    {
-        
-    }
-    
-    inline BKItem::RCArr getLast(void) const noexcept { return last; }
-    
+
     BKItem::RCArr clipboard;
     
     
@@ -283,12 +231,9 @@ public:
     
 private:
     BKAudioProcessor& processor;
-    BKItem::RCArr items;
     
-    BKItem::RCArr last;
-    
-    BKItem::RCArr preparations;
-    
+    BKItem::PtrArr items;
+
     void addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId);
     void removePreparationFromKeymap(BKPreparationType thisType, int thisId, int keymapId);
     void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);

@@ -571,7 +571,7 @@ void Gallery::setStateFromJson(var myJson)
                     
                     whichKeymaps.add(pmapkeymap->getId());
                     
-                    ModificationMapper::Ptr thisMapper = new ModificationMapper(PreparationTypeTuning, whichTMod, whichKeymaps, whichTargets);
+                    ItemMapper::Ptr thisMapper = new ItemMapper(PreparationTypeTuning, whichTMod, whichKeymaps, whichTargets);
                     
                     thisPiano->addMapper(thisMapper);
                     

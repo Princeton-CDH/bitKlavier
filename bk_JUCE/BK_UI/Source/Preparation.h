@@ -1329,89 +1329,146 @@ private:
     JUCE_LEAK_DETECTOR(Nostalgic)
 };
 
-class ModificationMapper : public ReferenceCountedObject
+class ItemMapper : public ReferenceCountedObject
 {
 public:
-    typedef ReferenceCountedObjectPtr<ModificationMapper>   Ptr;
-    typedef Array<ModificationMapper::Ptr>                  PtrArr;
-    typedef Array<ModificationMapper::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<ModificationMapper>                  Arr;
-    typedef OwnedArray<ModificationMapper, CriticalSection> CSArr;
     
+    typedef ReferenceCountedObjectPtr<ItemMapper>   Ptr;
+    typedef ReferenceCountedArray<ItemMapper>       RCArr;
+    typedef Array<ItemMapper::Ptr>                  PtrArr;
     
-    typedef ReferenceCountedArray<ModificationMapper>       RCArr;
-    
-    ModificationMapper(BKPreparationType type, int Id):
+    ItemMapper(BKPreparationType type, int Id):
     type(type),
     Id(Id),
-    piano(-1),
     editted(false)
     {
-        for (int i = 0; i < 5; i++) resets.add(Array<int>());
+        for (int i = 0; i < BKPreparationTypeNil; i++) connections.add(Array<int>());
     }
-    
-    
-    ModificationMapper(BKPreparationType type, int Id, Array<int> keymaps, Array<int> targets):
-    type(type),
-    Id(Id),
-    keymaps(keymaps),
-    targets(targets),
-    piano(-1),
-    editted(false)
-    {
-        for (int i = 0; i < 5; i++) resets.add(Array<int>());
-    }
-
     
     void print(void)
     {
-        DBG("MAPPER type: " + String(type)  + " Id: " + String(Id) + " Keymaps: " + intArrayToString(keymaps) + " Targets: " + intArrayToString(targets));
+        DBG("~ ~ ~ ~ ~ ~ ~ MAPPER ~ ~ ~ ~ ~ ~ ~ ~");
+        DBG("type: " + String(type)  + "\nId: " + "\nConnections: " + arrayIntArrayToString(connections));
+        DBG("~ ~ ~ ~ ~ ~ ~ ~ ~~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
     }
     
     inline int getId(void) const noexcept { return Id; }
     inline void setId(int newId) { Id = newId; }
     
     inline BKPreparationType getType(void) const noexcept { return type; }
-    inline void setType(BKPreparationType newType)
+    inline void setType(BKPreparationType newType) { type = newType; }
+    
+    inline void setConnections(BKPreparationType type, Array<int> connex)
     {
-        type = newType;
+        connections.set(type, connex);
     }
     
-    inline void addTarget(int target) { targets.add(target); }
-    inline Array<int> getTargets(void) {return targets;}
-    
-    inline void addKeymap(int keymap) { keymaps.add(keymap); }
-    inline Array<int> getKeymaps(void) {return keymaps;}
-    
-    
-    
-    
-    inline void removeKeymap(int keymap)
+    inline void setAllConnections(Array<Array<int>> newConnections)
     {
-        for (int i = keymaps.size(); --i>=0;)
+        connections = newConnections;
+    }
+    
+    inline void addConnection(BKPreparationType type, int Id)
+    {
+        Array<int> connex = connections.getUnchecked(type);
+        
+        connex.add(Id);
+        
+        connections.set(type, connex);
+    }
+    
+    inline void removeConnection(BKPreparationType type, int Id)
+    {
+        Array<int> connex = getConnections(type);
+        
+        for (int i = 0; i < connex.size(); i++)
         {
-            if (keymaps[i] == keymap) keymaps.remove(i);
+            if (connex[i] == Id)
+            {
+                connex.remove(i);
+                break;
+            }
+        }
+        
+        connections.set(type, connex);
+    }
+    
+    inline bool isConnectedTo(BKPreparationType type, int Id)
+    {
+        Array<int> connex = getConnections(type);
+        
+        for (int i = 0; i < connex.size(); i++)
+        {
+            if (connex[i] == Id)
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    inline void changeIdOfConnection(BKPreparationType type, int oldId, int newId)
+    {
+        Array<int> connex = getConnections(type);
+        
+        for (int i = 0; i < connex.size(); i++)
+        {
+            if (connex[i] == oldId)
+            {
+                connex.set(i, newId);
+                break;
+            }
         }
     }
     
-    inline void clearKeymaps(void) {keymaps.clear();}
-    inline void clearTargets(void) {targets.clear();}
+    inline Array<int> getConnections(BKPreparationType type)
+    {
+        return connections.getUnchecked(type);
+    }
     
-    Array<Array<int>> resets;
-    int piano;
+    inline Array<Array<int>> getAllConnections(void) const noexcept { return connections; }
+    
+    inline void clearAllConnections(void)
+    {
+        for (int i = 0; i < BKPreparationTypeNil; i++)
+        {
+            connections.getUnchecked(i).clear();
+        }
+    }
+    
+    inline void clearConnections(BKPreparationType type)
+    {
+        connections.getUnchecked(type).clear();
+    }
+    
+    inline void setName(String s) { name = s; }
+    inline String getName(void) const noexcept { return name;}
+    
+    inline void setX(int x) { X = x; };
+    inline void setY(int y) { Y = y; };
+    
+    inline int getX(void) const noexcept { return X; };
+    inline int getY(void) const noexcept { return Y; };
+    
+    inline void setXY(int x, int y) { X=x; Y=y;}
+    
+    inline void setXY(Point<int> xy) { X=xy.x; Y=xy.y;}
     
     bool editted;
     
-private:
+protected:
     BKPreparationType type;
     int Id;
+    String name;
     
-    Array<int> targets;
-    Array<int> keymaps;
+    Array<Array<int>> connections;
     
+    int X,Y;
     
+private:
     
-    JUCE_LEAK_DETECTOR(ModificationMapper);
+    JUCE_LEAK_DETECTOR(ItemMapper);
 };
 
 class NostalgicModPreparation : public ReferenceCountedObject
