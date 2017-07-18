@@ -502,9 +502,9 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
         if (!e.mods.isShiftDown())
         {
             graph->deselectAll();
-            
-            selected.deselectAll();
         }
+        
+        selected.deselectAll();
         
         addAndMakeVisible(lasso = new LassoComponent<BKItem*>());
         
@@ -520,7 +520,7 @@ void BKConstructionSite::mouseDrag (const MouseEvent& e)
     
     if (itemToSelect == nullptr) lasso->dragLasso(e);
     
-    if (!connect)
+    if (!connect && !e.mods.isShiftDown())
     {
         bool resizeX = false, resizeY = false;
         for (auto item : graph->getSelectedItems())

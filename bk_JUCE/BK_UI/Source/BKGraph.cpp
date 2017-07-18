@@ -55,6 +55,11 @@ mapper(new ModificationMapper(BKPreparationTypeNil, -1))
     {
         setType(type, false);
     }
+    
+    for (int i = 0; i < BKPreparationTypeNil; i++)
+    {
+        connex.add(Array<int>());
+    }
 }
 
 BKItem::~BKItem()
@@ -245,6 +250,11 @@ void BKItem::copy(BKItem::Ptr itemToCopy)
     Id = itemToCopy->getId();
     currentId = itemToCopy->getSelectedPianoId();
     mapper = itemToCopy->getMapper();
+    
+    for (int i = 0; i < BKPreparationTypeNil; i++)
+    {
+        connex.set(i, itemToCopy->connex.getUnchecked(i));
+    }
 }
 
 void BKItem::bkComboBoxDidChange    (ComboBox* cb)
@@ -368,6 +378,12 @@ void BKItem::keyPressedWhileSelected(const KeyPress& e)
 inline void BKItem::addConnection(BKItem* item)
 {
     connections.add(item);
+    
+    Array<int> conn = connex.getUnchecked(item->getType());
+    
+    conn.add(item->getId());
+    
+    connex.set(item->getType(), conn);
 }
 
 bool BKItem::isConnectedWith(BKItem* item)
@@ -389,6 +405,19 @@ void BKItem::removeConnection(BKItem* toDisconnect)
         index++;
         
     }
+    
+    Array<int> conn = connex.getUnchecked(toDisconnect->getType());
+    
+    for (int i = conn.size(); --i>=0;)
+    {
+        if (conn[i] == toDisconnect->getId())
+        {
+            conn.remove(i);
+            break;
+        }
+    }
+    
+    connex.set(toDisconnect->getType(), conn);
     
 }
 

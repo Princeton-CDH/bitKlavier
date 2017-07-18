@@ -128,6 +128,8 @@ public:
     
     void setImage(Image newImage);
     
+    Array<Array<int>> connex;
+    
 private:
     BKAudioProcessor& processor;
     Label label;
