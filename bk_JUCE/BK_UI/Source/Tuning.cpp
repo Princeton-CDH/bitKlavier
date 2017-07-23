@@ -157,6 +157,7 @@ ValueTree Tuning::getState(void)
     ValueTree prep(vtagTuning + String(Id));
     
     prep.setProperty( ptagTuning_Id,                    Id, 0);
+    prep.setProperty( "name",                           name, 0);
     prep.setProperty( ptagTuning_scale,                 sPrep->getTuning(), 0);
     prep.setProperty( ptagTuning_fundamental,           sPrep->getFundamental(), 0);
     prep.setProperty( ptagTuning_offset,                sPrep->getFundamentalOffset(), 0 );
@@ -344,6 +345,11 @@ void Tuning::setState(XmlElement* e)
     editted = true;
     
     int i; float f; bool b;
+    
+    String nn = e->getStringAttribute("name");
+    
+    if (nn != String::empty)     name = nn;
+    else                         name = "mm"+String(Id);
     
     i = e->getStringAttribute( ptagTuning_scale).getIntValue();
     sPrep->setTuning((TuningSystem)i);

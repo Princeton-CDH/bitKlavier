@@ -179,7 +179,7 @@ public:
     }
     
     
-    inline void setName(String n){name = n;}
+    inline void setName(String n){name = n; DBG("set tuning name " + name);}
     inline void setTuning(TuningSystem tuning)                                      {tWhichTuning = tuning;                                 }
     inline void setFundamental(PitchClass fundamental)                              {tFundamental = fundamental;                            }
     inline void setFundamentalOffset(float offset)                                  {tFundamentalOffset = offset;                           }
@@ -396,6 +396,7 @@ public:
     inline void setName(String newName)
     {
         name = newName;
+        DBG("tuning name = " + name);
         updateState->tuningPreparationDidChange = true;
     }
     
