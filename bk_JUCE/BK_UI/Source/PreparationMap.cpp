@@ -43,7 +43,7 @@ void PreparationMap::setSynchronic(Synchronic::PtrArr s)
 
 void PreparationMap::addSynchronic(Synchronic::Ptr p)
 {
-    synchronic.add(p);
+    synchronic.addIfNotAlreadyThere(p);
     deactivateIfNecessary();
 }
 
@@ -68,7 +68,7 @@ void PreparationMap::setNostalgic(Nostalgic::PtrArr n)
 
 void PreparationMap::addNostalgic(Nostalgic::Ptr p)
 {
-    nostalgic.add(p);
+    nostalgic.addIfNotAlreadyThere(p);
     deactivateIfNecessary();
 }
 
@@ -93,7 +93,7 @@ void PreparationMap::setDirect(Direct::PtrArr d)
 
 void PreparationMap::addDirect(Direct::Ptr p)
 {
-    direct.add(p);
+    direct.addIfNotAlreadyThere(p);
     deactivateIfNecessary();
 }
 
@@ -191,7 +191,7 @@ void PreparationMap::setTempo(Tempo::PtrArr d)
 
 void PreparationMap::addTempo(Tempo::Ptr p)
 {
-    tempo.add(p);
+    tempo.addIfNotAlreadyThere(p);
     deactivateIfNecessary();
 }
 
@@ -216,7 +216,7 @@ void PreparationMap::setTuning(Tuning::PtrArr d)
 
 void PreparationMap::addTuning(Tuning::Ptr p)
 {
-    tuning.add(p);
+    tuning.addIfNotAlreadyThere(p);
     deactivateIfNecessary();
 }
 

@@ -83,18 +83,18 @@ public:
     OwnedArray<Modifications> modificationMap;
 
     
-    ItemMapper::PtrArr     mappers;
+    ItemMapper::PtrArr     items;
     
-    inline ItemMapper::PtrArr getMappers(void) const noexcept { return mappers; }
+    inline ItemMapper::PtrArr getItems(void) const noexcept { return items; }
     
-    inline void clearMappers(void) { mappers.clear(); }
+    inline void clearItems(void) { items.clear(); }
     
-    inline ItemMapper::Ptr getMapper(BKPreparationType type, int Id)
+    inline ItemMapper::Ptr getItem(BKPreparationType type, int Id)
     {
         ItemMapper::Ptr thisMapper = new ItemMapper(type, Id);
         
         bool add = true;
-        for (auto map : mappers)
+        for (auto map : items)
         {
             if (map->getType() == type && map->getId() == Id)
             {
@@ -104,23 +104,21 @@ public:
             }
         }
         
-        if (add) mappers.add(thisMapper);
+        if (add) items.add(thisMapper);
         
         return thisMapper;
     }
     
-    inline void addMapper(ItemMapper::Ptr thisMapper)
-    {
-        mappers.addIfNotAlreadyThere(thisMapper);
-    }
+    void add(ItemMapper::Ptr item);
+    void remove(ItemMapper::Ptr item);
+    void configure(ItemMapper::Ptr item);
+    void deconfigure(ItemMapper::Ptr item);
+
     
-    inline void removeMapper(ItemMapper::Ptr thisMapper)
-    {
-        for (int i = mappers.size(); --i >= 0; )
-        {
-            if (mappers[i] == thisMapper) mappers.remove(i);
-        }
-    }
+    void removePreparationFromKeymap(BKPreparationType thisType, int thisId, int keymapId);
+    
+    void addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId);
+    
     
     ValueTree getState(void);
     

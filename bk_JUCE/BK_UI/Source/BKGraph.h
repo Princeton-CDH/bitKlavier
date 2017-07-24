@@ -110,14 +110,18 @@ public:
     {
         
     }
+
+    BKItem::Ptr get(BKPreparationType type, int Id);
+    BKItem::PtrArr getConnections(BKItem* item);
     
-    BKItem* itemWithTypeAndId(BKPreparationType type, int Id);
-    BKItem* get(BKPreparationType type, int Id);
     void add(BKItem* itemToAdd);
+    
     bool contains(BKItem* thisItem);
-    bool containsItemWithTypeAndId(BKPreparationType type, int Id);
+    bool contains(BKPreparationType type, int Id);
+    
     void remove(BKItem* itemToRemove);
     void remove(BKPreparationType type, int Id);
+    
     void removeUI(BKItem* itemToRemove);
     void removeKeymap(BKItem* itemToRemove);
     void clear(void);
@@ -138,6 +142,7 @@ public:
     {
         return (BKPreparationType)(type+6);
     }
+    
     
 
     

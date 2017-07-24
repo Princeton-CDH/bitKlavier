@@ -381,7 +381,7 @@ void BKConstructionSite::addItemsFromClipboard(void)
         
         graph->add(toAdd);
         
-        for (auto connection : toAdd->getConnections())
+        for (auto connection : graph->getConnections(toAdd))
             graph->connect(toAdd, connection);
         
         addAndMakeVisible(toAdd);
@@ -570,16 +570,10 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
     {
         if (item->isDragging)
         {
-            int X = item->getX(); int Y = item->getY();
-            DBG("SET X: " + String(X) + " Y: " + String(Y));
-            processor.currentPiano->configuration->setItemXY(item->getType(), item->getId(), X, Y);
+            item->saveXY(item->getX(), item->getY());
             item->isDragging = false;
         }
     }
-    
-    
-    
-    processor.currentPiano->configuration->print();
     
     repaint();
     
@@ -587,11 +581,9 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
 
 void BKConstructionSite::reconfigureCurrentItem(void)
 {
-    BKPreparationType type = currentItem->getType();
-    
     BKItem::PtrArr connections;
     
-    for (auto item : currentItem->getConnections())
+    for (auto item : graph->getConnections(currentItem))
     {
         graph->reconnect(currentItem, item);
     }
@@ -610,7 +602,7 @@ void BKConstructionSite::idDidChange(void)
     BKItem::PtrArr connections;
     
     // DISCONNECT
-    for (auto item : currentItem->getConnections())
+    for (auto item : graph->getConnections(currentItem))
     {
         connections.add(item);
         
@@ -636,18 +628,10 @@ void BKConstructionSite::idDidChange(void)
     
     // RECONNECT
     for (auto item : connections)   graph->connectWithoutCreatingNew(currentItem, item);
-    
-    // CONFIGURATION
-    Point<int> oldXY = processor.currentPiano->configuration->getXY(type, oldId);
-    processor.currentPiano->configuration->removeItem(type, oldId);
-    processor.currentPiano->configuration->addItem(type, newId, oldXY.x, oldXY.y);
-    
+
     // ACTIVE
     processor.updateState->removeActive(type, oldId);
     processor.updateState->addActive(type, newId);
-    
-    processor.currentPiano->configuration->print();
-    
     
 }
 
@@ -665,7 +649,7 @@ BKItem* BKConstructionSite::getItemAtPoint(const int X, const int Y)
     {
         int which = 0;
         
-        for (auto item : graph->getAllItems())
+        for (auto item : graph->getItems())
         {
             int left = item->getX(); int right = left + item->getWidth();
             int top = item->getY(); int bottom = top + item->getHeight();
@@ -690,7 +674,7 @@ void BKConstructionSite::findLassoItemsInArea (Array <BKItem*>& itemsFound,
     
     // psuedocode determine if collide: if (x1 + w1) - x2 >= 0 and (x2 + w2) - x1 >= 0
     
-    for (auto item : graph->getAllItems())
+    for (auto item : graph->getItems())
     {
         int itemX = item->getX(); int itemWidth = item->getWidth();
         int itemY = item->getY(); int itemHeight = item->getHeight();

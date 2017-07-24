@@ -63,8 +63,168 @@ Id(Id)
 Piano::~Piano()
 {
     
-}              
-                   
+}
+
+void Piano::deconfigure(ItemMapper::Ptr item)
+{
+    
+}
+
+void Piano::configure(ItemMapper::Ptr item)
+{
+    BKPreparationType type = item->getType();
+    int Id = item->getId();
+    
+    for (int i = 0; i < BKPreparationTypeNil; i++)
+    {
+        BKPreparationType cType = (BKPreparationType)i;
+        Array<int> connex = item->getConnections(cType);
+        
+        for (auto cId : connex)
+        {
+            if (type == PreparationTypeKeymap)
+            {
+                if (cType >= PreparationTypeDirect && cType <= PreparationTypeTempo)
+                {
+                    addPreparationToKeymap(type, Id, cId);
+                }
+                else if (cType >= PreparationTypeDirectMod && cType <= PreparationTypeTempoMod)
+                {
+                    //configureModification(cType, cId);
+                }
+                
+            }
+            
+            
+            else if (type == PreparationTypeTuning)
+            {
+                // Configure...
+                // Direct, Nostalgic, Synchronic tunings
+            }
+            else if (type == PreparationTypeTempo)
+            {
+                // Configure...
+                // Synchronic tempo
+            }
+            else if (type == PreparationTypeSynchronic)
+            {
+                // Configure...
+                // Nostalgic sync target
+            }
+            else if (type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod)
+            {
+                //
+            }
+        }
+    }
+}
+
+void Piano::add(ItemMapper::Ptr item)
+{
+    bool added = items.addIfNotAlreadyThere(item);
+    
+    if (added) configure(item);
+}
+
+
+void Piano::remove(ItemMapper::Ptr item)
+{
+    for (int i = items.size(); --i >= 0; )
+    {
+        if (items[i] == item)
+        {
+            deconfigure(item);
+            items.remove(i);
+        }
+    }
+}
+
+
+void Piano::addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId)
+{
+    PreparationMap::Ptr thisPreparationMap = getPreparationMapWithKeymap(keymapId);
+    
+    if (thisPreparationMap == nullptr)
+    {
+        addPreparationMap(getKeymap(keymapId));
+        
+        thisPreparationMap = getPreparationMaps().getLast();
+    }
+    
+    if (thisType == PreparationTypeDirect)
+    {
+        Direct::Ptr thisDirect = getDirect(thisId);
+        
+        thisPreparationMap->addDirect(thisDirect);
+    }
+    else if (thisType == PreparationTypeSynchronic)
+    {
+        Synchronic::Ptr thisSynchronic = getSynchronic(thisId);
+        
+        thisPreparationMap->addSynchronic(thisSynchronic);
+    }
+    else if (thisType == PreparationTypeNostalgic)
+    {
+        Nostalgic::Ptr thisNostalgic = getNostalgic(thisId);
+        
+        thisPreparationMap->addNostalgic(thisNostalgic);
+    }
+    else if (thisType == PreparationTypeTempo)
+    {
+        Tempo::Ptr thisTempo = getTempo(thisId);
+        
+        thisPreparationMap->addTempo(thisTempo);
+    }
+    else if (thisType == PreparationTypeTuning)
+    {
+        Tuning::Ptr thisTuning = getTuning(thisId);
+        
+        thisPreparationMap->addTuning(thisTuning);
+    }
+    
+}
+
+void Piano::removePreparationFromKeymap(BKPreparationType thisType, int thisId, int keymapId)
+{
+    PreparationMap::Ptr thisPreparationMap = getPreparationMapWithKeymap(keymapId);
+    
+    if (thisPreparationMap == nullptr) return;
+    
+    if (thisType == PreparationTypeDirect)
+    {
+        Direct::Ptr thisDirect = getDirect(thisId);
+        
+        thisPreparationMap->removeDirect(thisDirect);
+    }
+    else if (thisType == PreparationTypeSynchronic)
+    {
+        Synchronic::Ptr thisSynchronic = getSynchronic(thisId);
+        
+        thisPreparationMap->removeSynchronic(thisSynchronic);
+    }
+    else if (thisType == PreparationTypeNostalgic)
+    {
+        Nostalgic::Ptr thisNostalgic = getNostalgic(thisId);
+        
+        thisPreparationMap->removeNostalgic(thisNostalgic);
+    }
+    else if (thisType == PreparationTypeTempo)
+    {
+        Tempo::Ptr thisTempo = getTempo(thisId);
+        
+        thisPreparationMap->removeTempo(thisTempo);
+    }
+    else if (thisType == PreparationTypeTuning)
+    {
+        Tuning::Ptr thisTuning = getTuning(thisId);
+        
+        thisPreparationMap->removeTuning(thisTuning);
+    }
+    
+    if (!thisPreparationMap->isActive) removePreparationMapWithKeymap(keymapId);
+    
+}
+
 void Piano::configureDirectModification(int key, DirectModPreparation::Ptr dmod, Array<int> whichPreps)
 {
     DBG("key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
@@ -735,7 +895,7 @@ ValueTree Piano::getState(void)
     
     // Mapper Saving
     int mapCount = 0;
-    for (auto map : mappers)
+    for (auto map : items)
     {
         ValueTree mapVT ("item"+String(mapCount++));
         

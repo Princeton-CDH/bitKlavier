@@ -365,18 +365,6 @@ void BKItemGraph::add(BKItem* itemToAdd)
     items.add(itemToAdd);
 }
 
-BKItem* BKItemGraph::get(BKPreparationType type, int Id)
-{
-    for (auto item : items)
-    {
-        if ((item->getType() == type) && (item->getId() == Id))
-        {
-            return item;
-        }
-    }
-    return nullptr;
-}
-
 bool BKItemGraph::contains(BKItem* thisItem)
 {
     bool alreadyThere = false;
@@ -395,7 +383,7 @@ bool BKItemGraph::contains(BKItem* thisItem)
 }
 
 
-bool BKItemGraph::containsItemWithTypeAndId(BKPreparationType type, int Id)
+bool BKItemGraph::contains(BKPreparationType type, int Id)
 {
     bool alreadyThere = false;
     for (auto item : items)
@@ -410,9 +398,9 @@ bool BKItemGraph::containsItemWithTypeAndId(BKPreparationType type, int Id)
     return alreadyThere;
 }
 
-BKItem* BKItemGraph::itemWithTypeAndId(BKPreparationType type, int Id)
+BKItem::Ptr BKItemGraph::get(BKPreparationType type, int Id)
 {
-    BKItem* thisItem = nullptr;
+    BKItem::Ptr thisItem = nullptr;
 
     for (auto item : items)
     {
@@ -428,36 +416,47 @@ BKItem* BKItemGraph::itemWithTypeAndId(BKPreparationType type, int Id)
 
 void BKItemGraph::removeUI(BKItem* itemToRemove)
 {
-    BKPreparationType type = itemToRemove->getType();
-    
-    for (int i = 0; i < BKPreparationTypeNil; i++)
+    for (int type = 0; type < BKPreparationTypeNil; type++)
     {
-        Array<int> connex = itemToRemove->getConnections((BKPreparationType)i);
+        Array<int> connex = itemToRemove->getConnections((BKPreparationType)type);
         
-        for (auto conn : connex)
+        for (auto Id : connex)
         {
-            disconnectUI(itemToRemove, item);
+            disconnectUI(itemToRemove, get((BKPreparationType)type, Id));
         }
-    }
-   
-    
-    {
-        
     }
     
     items.removeObject(itemToRemove);
     
 }
 
+BKItem::PtrArr BKItemGraph::getConnections(BKItem* item)
+{
+    BKItem::PtrArr connections;
+    for (int type = 0; type < BKPreparationTypeNil; type++)
+    {
+        Array<int> connex = item->getConnections((BKPreparationType)type);
+        
+        for (auto Id : connex)
+        {
+            connections.add(get((BKPreparationType)type,Id));
+        }
+    }
+    return connections;
+}
+
 void BKItemGraph::remove(BKItem* itemToRemove)
 {
-    processor.updateState->removeActive(itemToRemove->getType(), itemToRemove->getId());
+    processor.currentPiano->removeMapper(itemToRemove);
     
-    processor.currentPiano->removeMapper(item);
-    
-    for (auto item : itemToRemove->getConnections())
+    for (int type = 0; type < BKPreparationTypeNil; type++)
     {
-        disconnect(itemToRemove, item);
+        Array<int> connex = itemToRemove->getConnections((BKPreparationType)type);
+        
+        for (auto Id : connex)
+        {
+            disconnect(itemToRemove, get((BKPreparationType)type, Id));
+        }
     }
     
     items.removeObject(itemToRemove);
@@ -478,12 +477,7 @@ void BKItemGraph::clear(void)
 {
     for (auto itemToRemove : items)
     {
-        for (auto item : itemToRemove->getConnections())
-        {
-            disconnect(itemToRemove, item);
-        }
-        
-        items.removeObject(itemToRemove);
+        remove(itemToRemove);
     }
     
     
@@ -522,90 +516,7 @@ void BKItemGraph::linkPreparationWithTuning(BKPreparationType thisType, int this
 }
 
 
-void BKItemGraph::removePreparationFromKeymap(BKPreparationType thisType, int thisId, int keymapId)
-{
-    PreparationMap::Ptr thisPreparationMap = processor.currentPiano->getPreparationMapWithKeymap(keymapId);
-    
-    if (thisPreparationMap == nullptr) return;
-    
-    if (thisType == PreparationTypeDirect)
-    {
-        Direct::Ptr thisDirect = processor.gallery->getDirect(thisId);
-        
-        thisPreparationMap->removeDirect(thisDirect);
-    }
-    else if (thisType == PreparationTypeSynchronic)
-    {
-        Synchronic::Ptr thisSynchronic = processor.gallery->getSynchronic(thisId);
-        
-        thisPreparationMap->removeSynchronic(thisSynchronic);
-    }
-    else if (thisType == PreparationTypeNostalgic)
-    {
-        Nostalgic::Ptr thisNostalgic = processor.gallery->getNostalgic(thisId);
-        
-        thisPreparationMap->removeNostalgic(thisNostalgic);
-    }
-    else if (thisType == PreparationTypeTempo)
-    {
-        Tempo::Ptr thisTempo = processor.gallery->getTempo(thisId);
-        
-        thisPreparationMap->removeTempo(thisTempo);
-    }
-    else if (thisType == PreparationTypeTuning)
-    {
-        Tuning::Ptr thisTuning = processor.gallery->getTuning(thisId);
-        
-        thisPreparationMap->removeTuning(thisTuning);
-    }
-    
-    if (!thisPreparationMap->isActive) processor.currentPiano->removePreparationMapWithKeymap(keymapId);
-    
-}
 
-void BKItemGraph::addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId)
-{
-    PreparationMap::Ptr thisPreparationMap = processor.currentPiano->getPreparationMapWithKeymap(keymapId);
-    
-    if (thisPreparationMap == nullptr)
-    {
-        processor.currentPiano->addPreparationMap(processor.gallery->getKeymap(keymapId));
-        
-        thisPreparationMap = processor.currentPiano->getPreparationMaps().getLast();
-    }
-    
-    if (thisType == PreparationTypeDirect)
-    {
-        Direct::Ptr thisDirect = processor.gallery->getDirect(thisId);
-        
-        thisPreparationMap->addDirect(thisDirect);
-    }
-    else if (thisType == PreparationTypeSynchronic)
-    {
-        Synchronic::Ptr thisSynchronic = processor.gallery->getSynchronic(thisId);
-        
-        thisPreparationMap->addSynchronic(thisSynchronic);
-    }
-    else if (thisType == PreparationTypeNostalgic)
-    {
-        Nostalgic::Ptr thisNostalgic = processor.gallery->getNostalgic(thisId);
-        
-        thisPreparationMap->addNostalgic(thisNostalgic);
-    }
-    else if (thisType == PreparationTypeTempo)
-    {
-        Tempo::Ptr thisTempo = processor.gallery->getTempo(thisId);
-        
-        thisPreparationMap->addTempo(thisTempo);
-    }
-    else if (thisType == PreparationTypeTuning)
-    {
-        Tuning::Ptr thisTuning = processor.gallery->getTuning(thisId);
-        
-        thisPreparationMap->addTuning(thisTuning);
-    }
-
-}
 
 void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* item2)
 {
@@ -618,7 +529,7 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
     
     if (connect)
     {
-        if (item1->isConnectedWith(item2) && item2->isConnectedWith(item1)) return;
+        if (item1->isConnectedTo(item2Type, item2Id) && item2->isConnectedTo(item1Type, item1Id)) return;
         
         if (item1Type == PreparationTypeTuning && item2Type <= PreparationTypeNostalgic)
         {
@@ -671,26 +582,26 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
         else if (item2Type == PreparationTypeKeymap  &&
                 (item1Type == PreparationTypePianoMap || item1Type == PreparationTypeGenericMod || item1Type == PreparationTypeReset))
         {
-            if (item1->getMapper()->getKeymaps().size()) return;
+            if (item1->getConnections(PreparationTypeKeymap).size()) return;
         }
         else if (item1Type == PreparationTypeKeymap &&
                 (item2Type == PreparationTypePianoMap || item2Type == PreparationTypeGenericMod || item2Type == PreparationTypeReset))
         {
-            if (item2->getMapper()->getKeymaps().size()) return;
+            if (item2->getConnections(PreparationTypeKeymap).size()) return;
         }
         
         // MODS RESETS AND PMAPS CAN ONLY HAVE ONE KEYMAP!
         
-        item1->addConnection(item2);
-        item2->addConnection(item1);
+        item1->addConnection(item2Type, item2Id);
+        item2->addConnection(item1Type, item1Id);
         
     }
     else // !connect
     {
-        if (!item1->isConnectedWith(item2) && !item2->isConnectedWith(item1)) return;
+        if (!item1->isConnectedTo(item2Type, item1Type) && !item2->isConnectedTo(item1Type, item1Id)) return;
         
-        item1->removeConnection(item2);
-        item2->removeConnection(item1);
+        item1->removeConnection(item2Type, item2Id);
+        item2->removeConnection(item1Type, item1Id);
     }
     
     
@@ -703,7 +614,7 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
         
         if (connect)
         {
-            thisMapper->addKeymap(item1Id);
+            item2->addConnection(PreparationTypeKeymap, item1Id);
             processor.currentPiano->configureModification(thisMapper);
             
             processor.currentPiano->addMapper(thisMapper);
@@ -983,14 +894,14 @@ void BKItemGraph::updateMod(BKPreparationType modType, int modId)
 
 void BKItemGraph::disconnectUI(BKItem* item1, BKItem* item2)
 {
-    item1->removeConnection(item2);
-    item2->removeConnection(item1);
+    item1->removeConnection(item2->getType(), item2->getId());
+    item2->removeConnection(item1->getType(), item1->getId());
 }
 
 void BKItemGraph::connectUI(BKItem* item1, BKItem* item2)
 {
-    item1->addConnection(item2);
-    item2->addConnection(item1);
+    item1->addConnection(item2->getType(), item2->getId());
+    item2->addConnection(item1->getType(), item1->getId());
 }
 
 void BKItemGraph::connect(BKItem* item1, BKItem* item2)
@@ -1007,6 +918,12 @@ void BKItemGraph::connectWithoutCreatingNew(BKItem* item1, BKItem* item2)
     print();
 }
 
+void BKItemGraph::disconnect(BKItem* item1, BKItem* item2)
+{
+    route(false, false, item1, item2);
+    
+    print();
+}
 
 void BKItemGraph::disconnect(BKItem* item1, BKItem* item2)
 {

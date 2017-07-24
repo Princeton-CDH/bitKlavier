@@ -24,13 +24,14 @@ public:
     Id(Id),
     editted(false)
     {
-        for (int i = 0; i < BKPreparationTypeNil; i++) connections.add(Array<int>());
+    
     }
     
     void print(void)
     {
         DBG("~ ~ ~ ~ ~ ~ ~ MAPPER ~ ~ ~ ~ ~ ~ ~ ~");
-        DBG("type: " + String(type)  + "\nId: " + "\nConnections: " + arrayIntArrayToString(connections));
+        DBG("type: " + String(type)  + "\nId: " + String(Id) + "\nConnections: ");
+        for (auto item : connections) item->print();
         DBG("~ ~ ~ ~ ~ ~ ~ ~ ~~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
     }
     
@@ -40,48 +41,59 @@ public:
     inline BKPreparationType getType(void) const noexcept { return type; }
     inline void setType(BKPreparationType newType) { type = newType; }
     
-    inline void setConnections(BKPreparationType type, Array<int> connex)
-    {
-        connections.set(type, connex);
-    }
-    
-    inline void setAllConnections(Array<Array<int>> newConnections)
+    inline void setAllConnections(ItemMapper::PtrArr newConnections)
     {
         connections = newConnections;
     }
     
-    inline void addConnection(BKPreparationType type, int Id)
+    inline bool addConnection(ItemMapper::Ptr thisItem)
     {
-        Array<int> connex = connections.getUnchecked(type);
+        bool added = connections.addIfNotAlreadyThere(thisItem);
         
-        connex.add(Id);
-        
-        connections.set(type, connex);
+        return added;
     }
     
     inline void removeConnection(BKPreparationType type, int Id)
     {
-        Array<int> connex = getConnections(type);
-        
-        for (int i = 0; i < connex.size(); i++)
+        for (int i = connections.size(); --i >= 0;)
         {
-            if (connex[i] == Id)
+            if ((connections.getUnchecked(i)->getType() == type) && (connections.getUnchecked(i)->getId() == Id))
             {
-                connex.remove(i);
+                connections.remove(i);
                 break;
             }
         }
-        
-        connections.set(type, connex);
+    }
+    
+    inline void removeConnection(ItemMapper::Ptr thisItem)
+    {
+        int index = 0;
+        for (auto item : connections)
+        {
+            if (item == thisItem) connections.remove(index);
+            
+            index++;
+        }
     }
     
     inline bool isConnectedTo(BKPreparationType type, int Id)
     {
-        Array<int> connex = getConnections(type);
-        
-        for (int i = 0; i < connex.size(); i++)
+        for (auto item : connections)
         {
-            if (connex[i] == Id)
+            if (item->getType() == type && item->getId() == Id)
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    inline bool isConnectedTo(ItemMapper::Ptr thisItem)
+    {
+        for (auto item : connections)
+        {
+            if ((item->getType() == thisItem->getType()) && (item->getId() == thisItem->getId()))
             {
                 return true;
             }
@@ -92,36 +104,41 @@ public:
     
     inline void changeIdOfConnection(BKPreparationType type, int oldId, int newId)
     {
-        Array<int> connex = getConnections(type);
-        
-        for (int i = 0; i < connex.size(); i++)
+        for (auto item : connections)
         {
-            if (connex[i] == oldId)
+            if (item->getType() == type && item->getId() == oldId)
             {
-                connex.set(i, newId);
+                item->setId(newId);
                 break;
             }
         }
     }
     
-    inline Array<int> getConnections(BKPreparationType type)
+    inline ItemMapper::PtrArr getConnections(BKPreparationType type)
     {
-        return connections.getUnchecked(type);
+        ItemMapper::PtrArr theseItems;
+        
+        for (auto item : connections)
+        {
+            if (item->getType() == type) theseItems.add(item);
+        }
+        
+        return theseItems;
     }
     
-    inline Array<Array<int>> getAllConnections(void) const noexcept { return connections; }
+    inline ItemMapper::PtrArr getAllConnections(void) const noexcept { return connections; }
     
     inline void clearAllConnections(void)
     {
-        for (int i = 0; i < BKPreparationTypeNil; i++)
-        {
-            connections.getUnchecked(i).clear();
-        }
+        connections.clear();
     }
     
     inline void clearConnections(BKPreparationType type)
     {
-        connections.getUnchecked(type).clear();
+        for (int i = connections.size(); --i >= 0;)
+        {
+            if (connections.getUnchecked(i)->getType() == type) connections.remove(i);
+        }
     }
     
     inline void setItemName(String s) { name = s; }
@@ -154,12 +171,14 @@ protected:
     int Id;
     String name;
     
-    Array<Array<int>> connections;
+    ItemMapper::PtrArr connections;
     
     Point<int> XY;
     
     bool active;
     bool editted;
+    
+    
     
 private:
     
