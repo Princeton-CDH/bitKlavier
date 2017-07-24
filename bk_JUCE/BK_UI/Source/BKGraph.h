@@ -41,7 +41,7 @@ public:
     
     void keyPressedWhileSelected(const KeyPress&) override;
 
-    void setType(BKPreparationType type, bool create);
+    void setItemType(BKPreparationType type, bool create);
     
     inline void setSelected(bool select) {isSelected = select; repaint();}
     inline bool getSelected(void) { return isSelected;}
@@ -51,8 +51,6 @@ public:
     {
         menu.setSelectedItemIndex(Id, dontSendNotification);
     }
-    
-    
     
     inline Point<int> getItemPosition(void)
     {
@@ -65,7 +63,7 @@ public:
         
         setBounds(X,Y,width,height);
         
-        setXY(X,Y);
+        saveXY(X,Y);
     }
     
     void copy(BKItem::Ptr);
@@ -86,8 +84,6 @@ public:
     
     void setImage(Image newImage);
     
-    Array<Array<int>> connex;
-    
 private:
     BKAudioProcessor& processor;
     Label label;
@@ -97,8 +93,6 @@ private:
     
     // UI stuff
     Component fullChild;
-
-    Array<BKItem*> connections;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKItem)
 };

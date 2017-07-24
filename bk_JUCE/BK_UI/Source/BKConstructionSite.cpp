@@ -18,9 +18,9 @@ BKDraggableComponent(false,false,false),
 processor(p),
 graph(theGraph),
 connect(false),
+altDown(false),
 lastX(10),
-lastY(10),
-altDown(false)
+lastY(10)
 {
     addKeyListener(this);
     
@@ -36,7 +36,7 @@ BKConstructionSite::~BKConstructionSite(void)
 
 void BKConstructionSite::redraw(void)
 {
-    BKItem::RCArr items = graph->getAllItems();
+    BKItem::RCArr items = graph->getItems();
     
     for (auto item : items)
     {
@@ -182,12 +182,12 @@ void BKConstructionSite::draw(void)
     processor.currentPiano->configuration->clear();
 #endif
     
-    for (auto item : graph->getAllItems())
+    for (auto item : graph->getItems())
     {
         BKPreparationType type = item->getType();
         int which = item->getId();
         
-        Point<int> xy = processor.currentPiano->configuration->getXY(type, which);
+        Point<int> xy = item->retrieveXY();
         
         int x = xy.x; int y = xy.y;
         
@@ -283,15 +283,13 @@ void BKConstructionSite::draw(void)
         addAndMakeVisible(item);
     }
     
-    for (auto item : graph->getAllItems())
+    for (auto item : graph->getItems())
     {
 #if AUTO_DRAW
         processor.currentPiano->configuration->addItem(item->getType(), item->getId());
 #endif
-        processor.currentPiano->configuration->setItemXY(item->getType(), item->getId(), item->getX(), item->getY());
+        item->saveXY(item->getX(), item->getY());
     }
-    
-    processor.currentPiano->configuration->print();
     
     repaint();
 }
@@ -315,8 +313,6 @@ void BKConstructionSite::prepareItemDrag(BKItem* item, const MouseEvent& e, bool
 }
 void BKConstructionSite::deleteItem (BKItem* item)
 {
-    processor.currentPiano->configuration->removeItem(item->getType(), item->getId());
-    
     graph->remove(item);
     
     removeChildComponent(item);
@@ -337,8 +333,8 @@ void BKConstructionSite::addItem(BKPreparationType type)
     
     toAdd->setTopLeftPosition(lastX, lastY);
     
-    processor.currentPiano->configuration->addItem(type, thisId, lastX, lastY);
-    
+    toAdd->saveXY(lastX, lastY);
+
     lastX += 10; lastY += 10;
     
     graph->add(toAdd);

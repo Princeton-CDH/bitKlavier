@@ -18,8 +18,8 @@
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ BKItem ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 BKItem::BKItem(BKPreparationType type, int Id, BKAudioProcessor& p):
-BKDraggableComponent(true,false,true),
 ItemMapper(type, Id),
+BKDraggableComponent(true,false,true),
 processor(p)
 {
     fullChild.setAlwaysOnTop(true);
@@ -51,12 +51,7 @@ processor(p)
     }
     else if (type == PreparationTypePianoMap || type == PreparationTypeGenericMod || (type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod) || type == PreparationTypeReset)
     {
-        setType(type, false);
-    }
-    
-    for (int i = 0; i < BKPreparationTypeNil; i++)
-    {
-        connex.add(Array<int>());
+        setItemType(type, false);
     }
 }
 
@@ -64,8 +59,7 @@ BKItem::~BKItem()
 {
     processor.updateState->removeActive(type, Id);
     
-    if (type == PreparationTypeGenericMod || type == PreparationTypePianoMap || type == PreparationTypeReset)
-        processor.currentPiano->removeMapper(mapper);
+    if (type != BKPreparationTypeNil) processor.currentPiano->removeMapper(this);
 }
 
 void BKItem::setImage(Image newImage)
@@ -89,7 +83,7 @@ void BKItem::setImage(Image newImage)
     else                                    setSize(image.getWidth(), image.getHeight() + 25);
 }
 
-void BKItem::setType(BKPreparationType newType, bool create)
+void BKItem::setItemType(BKPreparationType newType, bool create)
 {
     
     if (type != PreparationTypeGenericMod) processor.updateState->removeActive(type, Id);
@@ -104,14 +98,15 @@ void BKItem::setType(BKPreparationType newType, bool create)
     
     BKPreparationType mapperType = (type == PreparationTypeGenericMod || type == PreparationTypeReset || type == PreparationTypePianoMap) ? type : (BKPreparationType)(type - 6);
     
-    mapper->setType(mapperType);
-    mapper->setId(Id);
+    ItemMapper::setType(mapperType);
+    
+    ItemMapper::setId(Id);
     
     if (type == PreparationTypeGenericMod)
     {
         setImage(ImageCache::getFromMemory(BinaryData::mod_unassigned_icon_png, BinaryData::mod_unassigned_icon_pngSize));
         
-        processor.currentPiano->removeMapper(mapper);
+        processor.currentPiano->removeMapper(this);
     }
     else if (type == PreparationTypeReset)
     {
@@ -139,8 +134,10 @@ void BKItem::setType(BKPreparationType newType, bool create)
     }
     else if (type == PreparationTypePianoMap)
     {
-        mapper->setType(PreparationTypePianoMap);
-        mapper->piano = processor.currentPiano->getId();
+        ItemMapper::setType(PreparationTypePianoMap);
+        
+        clearConnections(PreparationTypePiano);
+        addConnection(PreparationTypePiano, processor.currentPiano->getId());
         
         setImage(ImageCache::getFromMemory(BinaryData::piano_icon_png, BinaryData::piano_icon_pngSize));
         
@@ -163,8 +160,9 @@ void BKItem::setType(BKPreparationType newType, bool create)
     if (type != PreparationTypeGenericMod)
     {
         processor.updateState->addActive(type, Id);
-        processor.currentPiano->configuration->addItem(type, Id, getX(), getY());
-        processor.currentPiano->addMapper(mapper);
+        
+        saveXY(getPosition());
+        processor.currentPiano->addMapper(this);
     }
     
     repaint();
@@ -208,23 +206,23 @@ void BKItem::resized(void)
 
 void BKItem::copy(BKItem::Ptr itemToCopy)
 {
-    name = itemToCopy->getName();
+    name = itemToCopy->getItemName();
     position = itemToCopy->getPosition();
     type = itemToCopy->getType();
     Id = itemToCopy->getId();
     currentId = itemToCopy->getSelectedPianoId();
-    mapper = itemToCopy->getMapper();
     
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
-        connex.set(i, itemToCopy->connex.getUnchecked(i));
+        Array<int> connex = itemToCopy->getConnections((BKPreparationType)i);
+        connections.set(i, connex);
     }
 }
 
 void BKItem::bkComboBoxDidChange    (ComboBox* cb)
 {
     String name = cb->getName();
-    int pianoId = cb->getSelectedItemIndex();
+    int pianoId = processor.gallery->getIdFromIndex(PreparationTypePiano, cb->getSelectedItemIndex());
     
     if (name == "PianoMap")
     {
@@ -232,8 +230,8 @@ void BKItem::bkComboBoxDidChange    (ComboBox* cb)
         {
             currentId = pianoId;
             
-            mapper->addTarget(currentId);
-            mapper->piano = currentId;
+            clearConnections(PreparationTypePiano);
+            addConnection(PreparationTypePiano, currentId);
             
             ((BKConstructionSite*)getParentComponent())->pianoMapDidChange(this);
             
@@ -339,51 +337,6 @@ void BKItem::keyPressedWhileSelected(const KeyPress& e)
     
 }
 
-inline void BKItem::addConnection(BKItem* item)
-{
-    connections.add(item);
-    
-    Array<int> conn = connex.getUnchecked(item->getType());
-    
-    conn.add(item->getId());
-    
-    connex.set(item->getType(), conn);
-}
-
-bool BKItem::isConnectedWith(BKItem* item)
-{
-    return connections.contains(item);
-}
-
-void BKItem::removeConnection(BKItem* toDisconnect)
-{
-    int index = 0;
-    for (auto item : connections)
-    {
-        if (toDisconnect == item)
-        {
-            connections.remove(index);
-            break;
-        }
-        
-        index++;
-        
-    }
-    
-    Array<int> conn = connex.getUnchecked(toDisconnect->getType());
-    
-    for (int i = conn.size(); --i>=0;)
-    {
-        if (conn[i] == toDisconnect->getId())
-        {
-            conn.remove(i);
-            break;
-        }
-    }
-    
-    connex.set(toDisconnect->getType(), conn);
-    
-}
 
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ BKGraph ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -406,7 +359,8 @@ void BKItemGraph::updateClipboard(void)
 
 void BKItemGraph::add(BKItem* itemToAdd)
 {
-    processor.currentPiano->configuration->addItem(itemToAdd->getType(), itemToAdd->getId(), itemToAdd->getX(), itemToAdd->getY());
+    itemToAdd->saveXY(itemToAdd->getPosition());
+    processor.currentPiano->addMapper(itemToAdd);
     processor.updateState->addActive(itemToAdd->getType(), itemToAdd->getId());
     items.add(itemToAdd);
 }
@@ -474,9 +428,21 @@ BKItem* BKItemGraph::itemWithTypeAndId(BKPreparationType type, int Id)
 
 void BKItemGraph::removeUI(BKItem* itemToRemove)
 {
-    for (auto item : itemToRemove->getConnections())
+    BKPreparationType type = itemToRemove->getType();
+    
+    for (int i = 0; i < BKPreparationTypeNil; i++)
     {
-        disconnectUI(itemToRemove, item);
+        Array<int> connex = itemToRemove->getConnections((BKPreparationType)i);
+        
+        for (auto conn : connex)
+        {
+            disconnectUI(itemToRemove, item);
+        }
+    }
+   
+    
+    {
+        
     }
     
     items.removeObject(itemToRemove);
@@ -486,6 +452,8 @@ void BKItemGraph::removeUI(BKItem* itemToRemove)
 void BKItemGraph::remove(BKItem* itemToRemove)
 {
     processor.updateState->removeActive(itemToRemove->getType(), itemToRemove->getId());
+    
+    processor.currentPiano->removeMapper(item);
     
     for (auto item : itemToRemove->getConnections())
     {
