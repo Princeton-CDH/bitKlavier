@@ -219,6 +219,16 @@ typedef enum BKPreparationType {
     BKPreparationTypeNil
 } BKPreparationType;
 
+inline BKPreparationType modToPrepType(BKPreparationType modType)
+{
+    return ((modType >= PreparationTypeDirectMod && modType <= PreparationTypeTempoMod) ? (BKPreparationType)(modType - 6) : BKPreparationTypeNil);
+}
+
+inline BKPreparationType prepToModType(BKPreparationType modType)
+{
+    return ((modType >= PreparationTypeDirect && modType <= PreparationTypeTempo) ? (BKPreparationType)(modType + 6) : BKPreparationTypeNil);
+}
+
 
 static const std::vector<std::string> cPreparationTypes = {
     "Direct",
@@ -394,8 +404,6 @@ static const std::vector<std::string> cSynchronicSyncModes = {
 
 typedef enum SynchronicParameterType {
     SynchronicId = 0,
-    SynchronicTuning,
-    SynchronicTempo,
     SynchronicNumPulses,
     SynchronicClusterMin,
     SynchronicClusterMax,
@@ -407,6 +415,8 @@ typedef enum SynchronicParameterType {
     SynchronicAccentMultipliers,
     SynchronicTranspOffsets,
     SynchronicGain,
+    SynchronicTuning,
+    SynchronicTempo,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
@@ -474,7 +484,6 @@ static const std::vector<std::string> cNostalgicSyncModes = {
 
 typedef enum NostalgicParameterType {
     NostalgicId = 0,
-    NostalgicTuning,
     NostalgicWaveDistance,
     NostalgicUndertow,
     NostalgicTransposition,
@@ -483,6 +492,7 @@ typedef enum NostalgicParameterType {
     NostalgicBeatsToSkip,
     NostalgicMode,
     NostalgicSyncTarget,
+    NostalgicTuning,
     NostalgicParameterTypeNil
     
 } NostalgicParameterType;
@@ -518,11 +528,11 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
 typedef enum DirectParameterType
 {
     DirectId = 0,
-    DirectTuning,
     DirectTransposition,
     DirectGain,
     DirectResGain,
     DirectHammerGain,
+    DirectTuning,
     DirectParameterTypeNil,
     
 } DirectParameterType;

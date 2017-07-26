@@ -111,8 +111,8 @@ public:
     
     void add(ItemMapper::Ptr item);
     void remove(ItemMapper::Ptr item);
-    void configure(ItemMapper::Ptr item);
-    void deconfigure(ItemMapper::Ptr item);
+    void configure(void);
+    void deconfigure(void);
 
     
     void removePreparationFromKeymap(BKPreparationType thisType, int thisId, int keymapId);
@@ -134,33 +134,6 @@ public:
         
     }
     
-    inline void configurePianoMap(Array<int> keymaps, int pianoId)
-    {
-        for (auto keymapId : keymaps)
-        {
-            Keymap::Ptr thisKeymap = getKeymap(keymapId);
-            for (auto key : thisKeymap->keys())
-            {
-                pianoMap.set(key, pianoId);
-                
-                DBG("key: " + String(key) + " piano: " + String(pianoId));
-            }
-        }
-    }
-    
-    inline void deconfigurePianoMap(Array<int> keymaps, int pianoId)
-    {
-        for (auto keymapId : keymaps)
-        {
-            Keymap::Ptr thisKeymap = getKeymap(keymapId);
-        
-            for (auto key : thisKeymap->keys())
-            {
-                pianoMap.set(key, -1);
-            }
-            
-        }
-    }
     
     String modificationMapsToString(void)
     {
@@ -168,15 +141,17 @@ public:
         for (int i = 0; i < 128; i++)
         {
             String ptype = "";
-            for (auto map : mappers)
+            for (auto item : items)
             {
-                if (map->getType() == PreparationTypeDirect) ptype = "d";
-                else if (map->getType() == PreparationTypeNostalgic) ptype = "n";
-                else if (map->getType() == PreparationTypeSynchronic) ptype = "s";
-                else if (map->getType() == PreparationTypeTuning) ptype = "t";
-                else if (map->getType() == PreparationTypeTempo) ptype = "m";
+                BKPreparationType type = item->getType();
                 
-                out += String(i) + ":" + ptype + String(map->getId()) + ":" + "{" + arrayIntArrayToString(map->getAllConnections()) +"} ";
+                if (type == PreparationTypeDirect) ptype = "d";
+                else if (type == PreparationTypeNostalgic) ptype = "n";
+                else if (type == PreparationTypeSynchronic) ptype = "s";
+                else if (type == PreparationTypeTuning) ptype = "t";
+                else if (type == PreparationTypeTempo) ptype = "m";
+                
+                out += String(i) + ":" + ptype + String(item->getId()) + ":" + "{" + item->connectionsToString() +"} ";
                 
             }
         }
@@ -204,6 +179,13 @@ public:
     int                         numModSMaps, numModNMaps, numModDMaps;
 
     void                        prepareToPlay(double sampleRate);
+    
+    void configurePianoMap(ItemMapper::Ptr map);
+    void deconfigurePianoMap(ItemMapper::Ptr map);
+    
+    void configureReset(ItemMapper::Ptr item);
+    void deconfigureReset(ItemMapper::Ptr item);
+    void deconfigureResetForKeys(ItemMapper::Ptr item, Array<int> otherKeys);
     
     void deconfigureResets(Array<Array<int>> resets, Array<int> whichKeymaps);
     void configureResets(Array<Array<int>> resets, Array<int> whichKeymaps, Array<int> whichPreps);

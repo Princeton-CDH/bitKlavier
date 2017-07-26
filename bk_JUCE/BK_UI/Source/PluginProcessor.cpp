@@ -362,7 +362,6 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == DirectGain)        active->setGain(modf);
         else if (type == DirectHammerGain)  active->setHammerGain(modf);
         else if (type == DirectResGain)     active->setResonanceGain(modf);
-        else if (type == DirectTuning)      active->setTuning(gallery->getTuning(modi));
         
         
         updateState->directPreparationDidChange = true;
@@ -386,7 +385,6 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == NostalgicBeatsToSkip)      active->setBeatsToSkip(modf);
         else if (type == NostalgicWaveDistance)     active->setWaveDistance(modi);
         else if (type == NostalgicLengthMultiplier) active->setLengthMultiplier(modf);
-        else if (type == NostalgicTuning)           active->setTuning(gallery->getTuning(modi));
         
         updateState->nostalgicPreparationDidChange = true;
     }
@@ -403,7 +401,6 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modia = sMod[i]->getModIntArr();
         
         if (type == SynchronicTranspOffsets)            active->setTransposition(modafa);
-        else if (type == SynchronicTempo)               active->setTempoControl(gallery->getTempo(modi));
         else if (type == SynchronicMode)                active->setMode((SynchronicSyncMode)modi);
         else if (type == SynchronicClusterMin)          active->setClusterMin(modi);
         else if (type == SynchronicClusterMax)          active->setClusterMax(modi);

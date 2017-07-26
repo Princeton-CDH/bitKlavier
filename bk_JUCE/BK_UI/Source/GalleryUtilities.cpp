@@ -612,7 +612,7 @@ void Gallery::addTypeWithId(BKPreparationType type, int Id)
 void Gallery::addSynchronic(SynchronicPreparation::Ptr sync)
 {
     int newId = getNewId(PreparationTypeSynchronic);
-    synchronic.add(new Synchronic(main, sync, general, newId));
+    synchronic.add(new Synchronic(main, sync, tuning.getFirst(), tempo.getFirst(), general, newId));
     synchronic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
@@ -642,7 +642,7 @@ int  Gallery::addSynchronicIfNotAlreadyThere(SynchronicPreparation::Ptr sync)
 void Gallery::addNostalgic(void)
 {
     int newId = getNewId(PreparationTypeNostalgic);
-    nostalgic.add(new Nostalgic(main, tuning[0], updateState, newId));
+    nostalgic.add(new Nostalgic(main, tuning.getFirst(), synchronic.getFirst(), updateState, newId));
 
     nostalgic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
     
@@ -651,7 +651,7 @@ void Gallery::addNostalgic(void)
 
 void Gallery::addNostalgicWithId(int Id)
 {
-    nostalgic.add(new Nostalgic(main, tuning[0], updateState, Id));
+    nostalgic.add(new Nostalgic(main, tuning.getFirst(), synchronic.getFirst(), updateState, Id));
     nostalgic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
     
     nostalgic.getLast()->setSynchronic(synchronic[0]);
@@ -661,7 +661,7 @@ void Gallery::addNostalgicWithId(int Id)
 void Gallery::addNostalgic(NostalgicPreparation::Ptr nost)
 {
     int newId = getNewId(PreparationTypeNostalgic);
-    nostalgic.add(new Nostalgic(main, nost, newId));
+    nostalgic.add(new Nostalgic(main, nost, tuning.getFirst(), synchronic.getFirst(), newId));
     nostalgic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
     
     nostalgic.getLast()->setSynchronic(synchronic[0]);
@@ -799,7 +799,7 @@ void Gallery::addDirectWithId(int Id)
 void Gallery::addDirect(DirectPreparation::Ptr drct)
 {
     int newId = getNewId(PreparationTypeDirect);
-    direct.add(new Direct(main, res, hammer, drct, newId));
+    direct.add(new Direct(main, res, hammer, drct, tuning.getFirst(), newId));
     direct.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 

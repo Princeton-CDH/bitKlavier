@@ -17,7 +17,6 @@
 #include "Tuning.h"
 #include "Keymap.h"
 
-
 class NostalgicPreparation : public ReferenceCountedObject
 {
 public:
@@ -36,8 +35,7 @@ public:
     nLengthMultiplier(p->getLengthMultiplier()),
     nBeatsToSkip(p->getBeatsToSkip()),
     nMode(p->getMode()),
-    nSyncTarget(p->getSyncTarget()),
-    tuning(p->getTuning())
+    nSyncTarget(p->getSyncTarget())
     {
         
     }
@@ -60,8 +58,7 @@ public:
     nLengthMultiplier(lengthMultiplier),
     nBeatsToSkip(beatsToSkip),
     nMode(mode),
-    nSyncTarget(syncTarget),
-    tuning(t)
+    nSyncTarget(syncTarget)
     {
         
     }
@@ -74,8 +71,7 @@ public:
     nLengthMultiplier(1.0),
     nBeatsToSkip(0.0),
     nMode(NoteLengthSync),
-    nSyncTarget(0),
-    tuning(t)
+    nSyncTarget(0)
     {
 
     }
@@ -95,8 +91,6 @@ public:
         nBeatsToSkip = n->getBeatsToSkip();
         nMode = n->getMode();
         nSyncTarget = n->getSyncTarget();
-        tuning = n->getTuning();
-        //resetMap->copy(n->resetMap);
     }
     
     inline bool compare (NostalgicPreparation::Ptr n)
@@ -108,8 +102,7 @@ public:
                 nLengthMultiplier == n->getLengthMultiplier() &&
                 nBeatsToSkip == n->getBeatsToSkip() &&
                 nMode == n->getMode() &&
-                nSyncTarget == n->getSyncTarget()&&
-                tuning == n->getTuning());
+                nSyncTarget == n->getSyncTarget());
     }
     
     inline const String getName() const noexcept {return name;}
@@ -136,10 +129,6 @@ public:
     inline void setSyncTarget(int syncTarget)                              {nSyncTarget = syncTarget;}
     inline void setSyncTargetProcessor(SynchronicProcessor::Ptr syncTargetProcessor)
                                                                            {nSyncProcessor = syncTargetProcessor;}
-    //inline void setResetMap(Keymap::Ptr k)                                 {resetMap = k;          }
-    
-    inline const Tuning::Ptr getTuning() const noexcept                    {return tuning; }
-    inline void setTuning(Tuning::Ptr t)                                   {tuning = t;}
 
     void print(void)
     {
@@ -151,7 +140,6 @@ public:
         DBG("nBeatsToSkip: " + String(nBeatsToSkip));
         DBG("nMode: " + String(nMode));
         DBG("nSyncTarget: " + String(nSyncTarget));
-        //DBG("resetKeymap: " + intArrayToString(getResetMap()->keys()));
     }
     
     
@@ -175,8 +163,6 @@ private:
     NostalgicSyncMode nMode;    //which sync mode to use
     int nSyncTarget;            //which synchronic layer to sync to, when nMode = NostalgicSyncSynchronic
     SynchronicProcessor::Ptr nSyncProcessor;
-    
-    Tuning::Ptr tuning;
     
     //internal keymap for resetting internal values to static
     //Keymap::Ptr resetMap = new Keymap(0);
@@ -274,6 +260,8 @@ public:
     
     NostalgicProcessor(BKSynthesiser* main,
                        NostalgicPreparation::Ptr active,
+                       Tuning::Ptr tuning,
+                       Synchronic::Ptr synchronic,
                        int Id);
     
     virtual ~NostalgicProcessor();
@@ -296,12 +284,27 @@ public:
         synth = main;
     }
     
-    inline void setTuner(TuningProcessor::Ptr p)
+    inline void setSynchronic(Synchronic::Ptr sync)
+    {
+        synchronic = sync;
+    }
+    
+    inline Synchronic::Ptr getSynchronic(void) const noexcept
+    {
+        return synchronic;
+    }
+    
+    inline int getSynchronicId(void)
+    {
+        return synchronic->getId();
+    }
+    
+    inline void setTuner(Tuning::Ptr p)
     {
         tuner = p;
     }
     
-    inline TuningProcessor::Ptr getTuner(void)
+    inline Tuning::Ptr getTuner(void)
     {
         return tuner;
     }
@@ -314,11 +317,9 @@ private:
     BKSynthesiser*              synth;
     NostalgicPreparation::Ptr   active;
 
-    TuningProcessor::Ptr             tuner;
-    
-    //target Synchronic layer
-    SynchronicProcessor::Ptr syncProcessor;
-    
+    Tuning::Ptr             tuner;
+    Synchronic::Ptr         synchronic;
+
     Array<uint64> noteLengthTimers;     //store current length of played notes here
     Array<int> activeNotes;             //table of notes currently being played by player
     Array<bool> noteOn;                 // table of booleans representing state of each note
@@ -335,6 +336,450 @@ private:
     JUCE_LEAK_DETECTOR (NostalgicProcessor) //is this the right one to use here?
 };
 
+/* ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ NOSTALGIC ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ */
+
+class Nostalgic : public ReferenceCountedObject
+{
+    
+public:
+    typedef ReferenceCountedObjectPtr<Nostalgic>   Ptr;
+    typedef Array<Nostalgic::Ptr>                  PtrArr;
+    typedef Array<Nostalgic::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<Nostalgic>                  Arr;
+    typedef OwnedArray<Nostalgic, CriticalSection> CSArr;
+    
+    
+    Nostalgic(BKSynthesiser *s,
+              NostalgicPreparation::Ptr prep,
+              Tuning::Ptr tuning,
+              Synchronic::Ptr sync,
+              int Id):
+    sPrep(new NostalgicPreparation(prep)),
+    aPrep(new NostalgicPreparation(sPrep)),
+    processor(new NostalgicProcessor(s, aPrep, tuning, sync, Id)),
+    Id(Id),
+    editted(false),
+    name(String(Id)),
+    X(-1),Y(-1)
+    {
+    }
+    
+    
+    Nostalgic(BKSynthesiser *s,
+              Tuning::Ptr tuning,
+              Synchronic::Ptr sync,
+              BKUpdateState::Ptr us,
+              int Id):
+    Id(Id),
+    updateState(us),
+    editted(false),
+    name(String(Id)),
+    X(-1),Y(-1)
+    {
+        sPrep       = new NostalgicPreparation(tuning);
+        aPrep       = new NostalgicPreparation(sPrep);
+        processor   = new NostalgicProcessor(s, aPrep, tuning, sync, Id);
+    };
+    
+    ~Nostalgic() {};
+    
+    inline void setSynchronic(Synchronic::Ptr synchronic)
+    {
+        processor->setSynchronic(synchronic);
+    }
+    
+    void prepareToPlay(double sampleRate, BKSynthesiser* main)
+    {
+        processor->attachToSynthesiser(main);
+        processor->setCurrentPlaybackSampleRate(sampleRate);
+    }
+    
+    void prepareToPlay(double sampleRate)
+    {
+        processor->setCurrentPlaybackSampleRate(sampleRate);
+    }
+    
+    
+    inline void copy(Nostalgic::Ptr from)
+    {
+        sPrep->copy(from->sPrep);
+        aPrep->copy(sPrep);
+    }
+    
+    inline ValueTree getState(void)
+    {
+        ValueTree prep( vtagNostalgic + String(Id));
+        
+        prep.setProperty( ptagNostalgic_Id,                 Id, 0);
+        prep.setProperty( "name", name, 0);
+        prep.setProperty( ptagNostalgic_waveDistance,       sPrep->getWavedistance(), 0);
+        prep.setProperty( ptagNostalgic_undertow,           sPrep->getUndertow(), 0);
+        
+        ValueTree transp( vtagNostalgic_transposition);
+        int count = 0;
+        for (auto f : sPrep->getTransposition())
+        {
+            transp.      setProperty( ptagFloat + String(count++), f, 0);
+        }
+        prep.addChild(transp, -1, 0);
+        
+        prep.setProperty( ptagNostalgic_gain,               sPrep->getGain(), 0);
+        prep.setProperty( ptagNostalgic_lengthMultiplier,   sPrep->getLengthMultiplier(), 0);
+        prep.setProperty( ptagNostalgic_beatsToSkip,        sPrep->getBeatsToSkip(), 0);
+        prep.setProperty( ptagNostalgic_mode,               sPrep->getMode(), 0);
+        prep.setProperty( ptagNostalgic_syncTarget,         sPrep->getSyncTarget(), 0);
+        
+        prep.setProperty( posX, X, 0);
+        prep.setProperty( posY, Y, 0);
+        
+        return prep;
+    }
+    
+    inline void setState(XmlElement* e, Tuning::PtrArr tuning, Synchronic::PtrArr synchronic)
+    {
+        editted = true;
+        
+        int i; float f;
+        
+        String n = e->getStringAttribute("name");
+        
+        if (n != String::empty)     name = n;
+        else                        name = String(Id);
+        
+        i = e->getStringAttribute(ptagNostalgic_waveDistance).getIntValue();
+        sPrep->setWaveDistance(i);
+        
+        i = e->getStringAttribute(ptagNostalgic_undertow).getIntValue();
+        sPrep->setUndertow(i);
+        
+        n = e->getStringAttribute(posX);
+        if (n != String::empty) X = n.getIntValue();
+        else                    X = -1;
+        
+        n = e->getStringAttribute(posY);
+        if (n != String::empty) Y = n.getIntValue();
+        else                    Y = -1;
+        
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName(vtagNostalgic_transposition))
+            {
+                Array<float> transp;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        transp.add(f);
+                    }
+                }
+                
+                sPrep->setTransposition(transp);
+                
+            }
+        }
+        
+        
+        f = e->getStringAttribute(ptagNostalgic_lengthMultiplier).getFloatValue();
+        sPrep->setLengthMultiplier(f);
+        
+        f = e->getStringAttribute(ptagNostalgic_beatsToSkip).getFloatValue();
+        sPrep->setBeatsToSkip(f);
+        
+        f = e->getStringAttribute(ptagNostalgic_gain).getFloatValue();
+        sPrep->setGain(f);
+        
+        i = e->getStringAttribute(ptagNostalgic_mode).getIntValue();
+        sPrep->setMode((NostalgicSyncMode)i);
+        
+        i = e->getStringAttribute(ptagNostalgic_syncTarget).getIntValue();
+        sPrep->setSyncTarget(i);
+        
+        processor->setSynchronic(synchronic[i]);
+        
+        aPrep->copy(sPrep);
+        
+    }
+    
+    inline int getId() {return Id;}
+    
+    NostalgicPreparation::Ptr      sPrep;
+    NostalgicPreparation::Ptr      aPrep;
+    NostalgicProcessor::Ptr        processor;
+    
+    inline void setTuning(Tuning::Ptr tuning)
+    {
+        processor->setTuner(tuning);
+    }
+    
+    void reset()
+    {
+        aPrep->copy(sPrep);
+        updateState->nostalgicPreparationDidChange = true;
+        DBG("nostalgic reset");
+    }
+    
+    //void didChange(bool which) { updateState->nostalgicPreparationDidChange = which; }
+    
+    inline String getName(void) const noexcept {return name;}inline void setName(String newName)
+    {
+        name = newName;
+        updateState->nostalgicPreparationDidChange = true;
+    }
+    
+    inline void setPosition(int x, int y) { X=x;Y=y;}
+    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
+    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
+    inline void setX(int x) { X = x; }
+    inline void setY(int y) { Y = y; }
+    inline int getX(void) const noexcept { return X; }
+    inline int getY(void) const noexcept { return Y; }
+    
+    bool editted;
+    
+private:
+    int Id;
+    String name;
+    BKUpdateState::Ptr updateState;
+    
+    int X,Y;
+    
+    JUCE_LEAK_DETECTOR(Nostalgic)
+};
+
+
+class NostalgicModPreparation : public ReferenceCountedObject
+{
+public:
+    
+    typedef ReferenceCountedObjectPtr<NostalgicModPreparation>   Ptr;
+    typedef Array<NostalgicModPreparation::Ptr>                  PtrArr;
+    typedef Array<NostalgicModPreparation::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<NostalgicModPreparation>                  Arr;
+    typedef OwnedArray<NostalgicModPreparation, CriticalSection> CSArr;
+    
+    /*
+     NostalgicId = 0,
+     NostalgicTuning,
+     NostalgicWaveDistance,
+     NostalgicUndertow,
+     NostalgicTransposition,
+     NostalgicGain,
+     NostalgicLengthMultiplier,
+     NostalgicBeatsToSkip,
+     NostalgicMode,
+     NostalgicSyncTarget,
+     NostalgicParameterTypeNil
+     
+     */
+    
+    NostalgicModPreparation(NostalgicPreparation::Ptr p, int Id):
+    Id(Id),
+    X(-1),Y(-1),
+    editted(false)
+    {
+        param.ensureStorageAllocated(cNostalgicParameterTypes.size());
+        
+        param.set(NostalgicWaveDistance, String(p->getWavedistance()));
+        param.set(NostalgicUndertow, String(p->getUndertow()));
+        param.set(NostalgicTransposition, floatArrayToString(p->getTransposition()));
+        param.set(NostalgicGain, String(p->getGain()));
+        param.set(NostalgicLengthMultiplier, String(p->getLengthMultiplier()));
+        param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
+        param.set(NostalgicMode, String(p->getMode()));
+        param.set(NostalgicSyncTarget, String(p->getSyncTarget()));
+        
+    }
+    
+    
+    NostalgicModPreparation(int Id):
+    Id(Id),
+    X(-1),Y(-1),
+    editted(false)
+    {
+        param.set(NostalgicWaveDistance, "");
+        param.set(NostalgicUndertow, "");
+        param.set(NostalgicTransposition, "");
+        param.set(NostalgicGain, "");
+        param.set(NostalgicLengthMultiplier, "");
+        param.set(NostalgicBeatsToSkip, "");
+        param.set(NostalgicMode, "");
+        param.set(NostalgicSyncTarget, "");
+    }
+    
+    inline void setId(int newId) { Id = newId; }
+    inline int getId(void) const noexcept { return Id; }
+    
+    inline ValueTree getState(int Id)
+    {
+        ValueTree prep( vtagModNostalgic + String(Id));
+        
+        String p = "";
+        
+        p = getParam(NostalgicWaveDistance);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_waveDistance,       p.getIntValue(), 0);
+        
+        p = getParam(NostalgicUndertow);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_undertow,           p.getIntValue(), 0);
+        
+        ValueTree transp( vtagNostalgic_transposition);
+        int count = 0;
+        p = getParam(NostalgicTransposition);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                transp.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(transp, -1, 0);
+        
+        p = getParam(NostalgicGain);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_gain,               p.getFloatValue(), 0);
+        
+        p = getParam(NostalgicLengthMultiplier);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_lengthMultiplier,   p.getFloatValue(), 0);
+        
+        p = getParam(NostalgicBeatsToSkip);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_beatsToSkip,        p.getFloatValue(), 0);
+        
+        p = getParam(NostalgicMode);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_mode,               p.getIntValue(), 0);
+        
+        p = getParam(NostalgicSyncTarget);
+        if (p != String::empty) prep.setProperty( ptagNostalgic_syncTarget,         p.getIntValue(), 0);
+        
+        
+        return prep;
+    }
+    
+    inline void setState(XmlElement* e)
+    {
+        editted = true;
+        
+        float f;
+        
+        String p = e->getStringAttribute(ptagNostalgic_waveDistance);
+        setParam(NostalgicWaveDistance, p);
+        
+        p = e->getStringAttribute(ptagNostalgic_undertow);
+        setParam(NostalgicUndertow, p);
+        
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName(vtagNostalgic_transposition))
+            {
+                Array<float> transp;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        transp.add(f);
+                    }
+                }
+                
+                setParam(NostalgicTransposition, floatArrayToString(transp));
+                
+            }
+        }
+        
+        p = e->getStringAttribute(ptagNostalgic_lengthMultiplier);
+        setParam(NostalgicLengthMultiplier, p);
+        
+        p = e->getStringAttribute(ptagNostalgic_beatsToSkip);
+        setParam(NostalgicBeatsToSkip, p);
+        
+        p = e->getStringAttribute(ptagNostalgic_gain);
+        setParam(NostalgicGain, p);
+        
+        p = e->getStringAttribute(ptagNostalgic_mode);
+        setParam(NostalgicMode, p);
+        
+        p = e->getStringAttribute(ptagNostalgic_syncTarget);
+        setParam(NostalgicSyncTarget, p);
+    }
+    
+    
+    ~NostalgicModPreparation(void)
+    {
+        
+    }
+    
+    inline void copy(NostalgicPreparation::Ptr p)
+    {
+        param.set(NostalgicWaveDistance, String(p->getWavedistance()));
+        param.set(NostalgicUndertow, String(p->getUndertow()));
+        param.set(NostalgicTransposition, floatArrayToString(p->getTransposition()));
+        param.set(NostalgicGain, String(p->getGain()));
+        param.set(NostalgicLengthMultiplier, String(p->getLengthMultiplier()));
+        param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
+        param.set(NostalgicMode, String(p->getMode()));
+        param.set(NostalgicSyncTarget, String(p->getSyncTarget()));
+    }
+    
+    inline void copy(NostalgicModPreparation::Ptr p)
+    {
+        for (int i = NostalgicId+1; i < NostalgicParameterTypeNil; i++)
+        {
+            param.set(i, p->getParam((NostalgicParameterType)i));
+        }
+    }
+    
+    void clearAll()
+    {
+        for (int i = NostalgicId+1; i < NostalgicParameterTypeNil; i++)
+        {
+            param.set(i, "");
+        }
+    }
+    
+    inline const StringArray getStringArray(void) { return param; }
+    
+    inline const String getParam(NostalgicParameterType type)
+    {
+        if (type != NostalgicId)
+            return param[type];
+        else
+            return "";
+    }
+    
+    inline void setParam(NostalgicParameterType type, String val) { param.set(type, val);}
+    
+    void print(void)
+    {
+        
+    }
+    
+    inline String getName(void) const noexcept {return name;}
+    inline void setName(String newName) {name = newName;}
+    
+    inline void setPosition(int x, int y) { X=x;Y=y;}
+    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
+    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
+    inline void setX(int x) { X = x; }
+    inline void setY(int y) { Y = y; }
+    inline int getX(void) const noexcept { return X; }
+    inline int getY(void) const noexcept { return Y; }
+    
+    bool editted;
+    
+private:
+    int Id;
+    String name;
+    StringArray          param;
+    
+    int X,Y;
+    
+    JUCE_LEAK_DETECTOR(NostalgicModPreparation);
+};
 
 
 #endif  // NOSTALGIC_H_INCLUDED

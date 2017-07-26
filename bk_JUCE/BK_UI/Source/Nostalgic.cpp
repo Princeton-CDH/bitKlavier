@@ -12,12 +12,14 @@
 
 NostalgicProcessor::NostalgicProcessor(BKSynthesiser *s,
                                        NostalgicPreparation::Ptr activePrep,
+                                       Tuning::Ptr tuning,
+                                       Synchronic::Ptr synchronic,
                                        int Id):
 Id(Id),
 synth(s),
 active(activePrep),
-tuner(active->getTuning()->processor),
-syncProcessor(SynchronicProcessor::Ptr())
+tuner(tuning),
+synchronic(synchronic)
 {
     noteLengthTimers.ensureStorageAllocated(128);
     velocities.ensureStorageAllocated(128);
@@ -39,7 +41,7 @@ NostalgicProcessor::~NostalgicProcessor()
 void NostalgicProcessor::setCurrentPlaybackSampleRate(double sr)
 {
     sampleRate = sr;
-    tuner->setCurrentPlaybackSampleRate(sr);
+    tuner->processor->setCurrentPlaybackSampleRate(sr);
 }
 
 //begin reverse note; called when key is released
@@ -81,7 +83,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
             
             for (auto t : active->getTransposition())
             {
-                float offset = t + tuner->getOffset(midiNoteNumber);
+                float offset = t + tuner->processor->getOffset(midiNoteNumber);
                 int synthNoteNumber = midiNoteNumber + (int)offset;
                 float synthOffset = offset - (int)offset;
                 
@@ -111,7 +113,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
             reverseNotes.insert(0, new NostalgicNoteStuff(midiNoteNumber));
             NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
             currentNote->setPrepAtKeyOn(active);
-            currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber));
+            currentNote->setTuningAtKeyOn(tuner->processor->getOffset(midiNoteNumber));
             currentNote->setVelocityAtKeyOn(velocities.getUnchecked(midiNoteNumber) * active->getGain());
             currentNote->setReverseStartPosition((duration + active->getWavedistance()) * sampleRate/1000.);
             //currentNote->setReverseTargetLength((duration - (aRampUndertowCrossMS + 30)) * sampleRate/1000.);
@@ -124,7 +126,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
             
             for (auto t : active->getTransposition())
             {
-                float offset = t + tuner->getOffset(midiNoteNumber);
+                float offset = t + tuner->processor->getOffset(midiNoteNumber);
                 int synthNoteNumber = midiNoteNumber + (int)offset;
                 float synthOffset = offset - (int)offset;
                 
@@ -148,7 +150,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
             reverseNotes.insert(0, new NostalgicNoteStuff(midiNoteNumber));
             NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
             currentNote->setPrepAtKeyOn(active);
-            currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber));
+            currentNote->setTuningAtKeyOn(tuner->processor->getOffset(midiNoteNumber));
             currentNote->setVelocityAtKeyOn(velocities.getUnchecked(midiNoteNumber) * active->getGain());
             currentNote->setReverseStartPosition((duration + active->getWavedistance()) * sampleRate/1000.);
             currentNote->setReverseTargetLength((duration - aRampUndertowCrossMS) * sampleRate/1000.);
@@ -164,8 +166,6 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
     
     if (active->getMode() == SynchronicSync)
     {
-        
-        tuner = active->getTuning()->processor;
         float duration = 0.0;
         
         int offRamp;
@@ -182,7 +182,7 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
             
             for (auto t : active->getTransposition())
             {
-                float offset = t + tuner->getOffset(midiNoteNumber);
+                float offset = t + tuner->processor->getOffset(midiNoteNumber);
                 int synthNoteNumber = midiNoteNumber + (int)offset;
                 float synthOffset = offset - (int)offset;
 
@@ -206,16 +206,13 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
             reverseNotes.insert(0, new NostalgicNoteStuff(midiNoteNumber));
             NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
             currentNote->setPrepAtKeyOn(active);
-            currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber));
+            currentNote->setTuningAtKeyOn(tuner->processor->getOffset(midiNoteNumber));
             currentNote->setVelocityAtKeyOn(midiNoteVelocity);
             currentNote->setReverseStartPosition((duration + active->getWavedistance()) * sampleRate/1000.);
             currentNote->setReverseTargetLength((duration - aRampUndertowCrossMS) * sampleRate/1000.);
             currentNote->setUndertowTargetLength(active->getUndertow() * sampleRate/1000.);
         }
     }
-    
-    //else?
-    tuner = active->getTuning()->processor;
     
     activeNotes.addIfNotAlreadyThere(midiNoteNumber);
     //activeNotes.add(midiNoteNumber);

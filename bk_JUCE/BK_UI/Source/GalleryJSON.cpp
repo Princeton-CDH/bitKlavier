@@ -229,7 +229,8 @@ void Gallery::setStateFromJson(var myJson)
                     //if(tempo[tmpId]->sPrep->getTempoSystem() == AdaptiveTempo1) thisPiano->prepMaps[0]->addTempo(tempo[tmpId]);
                     
                     DBG("tmpId: "+String(tmpId));
-                    syncPrep->setTempoControl(tempo[tmpId]);
+                    // FIX THIS
+                    //syncPrep->setTempo(tempo[tmpId]);
                     
                     int syncMode = jsonGetValue(sx+"syncMode");
                     
@@ -564,25 +565,14 @@ void Gallery::setStateFromJson(var myJson)
                         
                         DBG("adding keymap");
                     }
+
+                    ItemMapper::Ptr thisTuning = new ItemMapper(PreparationTypeTuning, direct[dId]->getTuning()->getId());
+                    ItemMapper::Ptr thisKeymap = new ItemMapper(PreparationTypeKeymap, pmapkeymap->getId());
+                    ItemMapper::Ptr thisTuningMod = new ItemMapper(PreparationTypeTuningMod, whichTMod);
                     
-                    Array<int> whichTargets;
-                    
-                    whichTargets.add(direct[dId]->getTuningId());
-                    
-                    Array<int> whichKeymaps;
-                    
-                    whichKeymaps.add(pmapkeymap->getId());
-                    
-                    ItemMapper::Ptr thisMapper = new ItemMapper(PreparationTypeTuning, whichTMod);
-                    
-                    thisMapper->setConnections(PreparationTypeKeymap, whichKeymaps);
-                    thisMapper->setConnections(PreparationTypeTuning, whichTargets);
-                    
-                    thisPiano->addMapper(thisMapper);
-                    
-                    thisMapper->print();
-                    
-                    thisPiano->configureModification(thisMapper);
+                    thisPiano->add(thisTuning);
+                    thisPiano->add(thisKeymap);
+                    thisPiano->add(thisTuningMod);
                     
                     ++modTuningCount;
                     

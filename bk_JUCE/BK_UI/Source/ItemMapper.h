@@ -41,7 +41,7 @@ public:
     inline BKPreparationType getType(void) const noexcept { return type; }
     inline void setType(BKPreparationType newType) { type = newType; }
     
-    inline void setAllConnections(ItemMapper::PtrArr newConnections)
+    inline void setConnections(ItemMapper::PtrArr newConnections)
     {
         connections = newConnections;
     }
@@ -52,6 +52,12 @@ public:
         
         return added;
     }
+    
+    inline void addConnections(ItemMapper::PtrArr theseItems)
+    {
+        for (auto item : theseItems) connections.addIfNotAlreadyThere(item);
+    }
+    
     
     inline void removeConnection(BKPreparationType type, int Id)
     {
@@ -114,7 +120,7 @@ public:
         }
     }
     
-    inline ItemMapper::PtrArr getConnections(BKPreparationType type)
+    inline ItemMapper::PtrArr getConnectionsOfType(BKPreparationType type)
     {
         ItemMapper::PtrArr theseItems;
         
@@ -126,14 +132,57 @@ public:
         return theseItems;
     }
     
-    inline ItemMapper::PtrArr getAllConnections(void) const noexcept { return connections; }
+    inline Array<int> getConnectionIdsOfType(BKPreparationType type)
+    {
+        Array<int> theseItems;
+        
+        for (auto item : connections)
+        {
+            if (item->getType() == type) theseItems.add(item->getId());
+        }
+        
+        return theseItems;
+    }
     
-    inline void clearAllConnections(void)
+    inline ItemMapper::PtrArr getConnections(void) const noexcept { return connections; }
+    
+    inline Array<Array<int>> getConnectionIds(void)
+    {
+        Array<Array<int>> connectionIds;
+        
+        for (int i = 0; i < BKPreparationTypeNil; i++)
+        {
+            Array<int> theseItems = getConnectionIdsOfType((BKPreparationType)i);
+            connectionIds.add(theseItems);
+        }
+        return connectionIds;
+    }
+    
+    
+    inline String connectionsToString(void)
+    {
+        String s = "";
+        for (int type = 0; type < BKPreparationTypeNil; type++)
+        {
+            ItemMapper::PtrArr connex = getConnectionsOfType((BKPreparationType)type);
+            
+            s += cPreparationTypes[type]+":";
+            
+            for (auto item : connex)
+            {
+                s += " " + String(item->getId());
+            }
+        }
+        return s;
+    }
+    
+
+    inline void clearConnections(void)
     {
         connections.clear();
     }
     
-    inline void clearConnections(BKPreparationType type)
+    inline void clearConnectionsOfType(BKPreparationType type)
     {
         for (int i = connections.size(); --i >= 0;)
         {
@@ -158,18 +207,23 @@ public:
     inline void saveXY(Point<int> xy) { XY.x = xy.x; XY.y = xy.y;}
     
     // ACTIVE
-    bool getActive(void) const noexcept {return active;}
-    void setActive(bool a) { active = a; }
+    inline bool getActive(void) const noexcept {return active;}
+    inline void setActive(bool a) { active = a; }
     
     
     // EDITTED
-    bool getEditted(void) const noexcept { return editted;}
-    void setEditted(bool e) { editted = e; }
+    inline bool getEditted(void) const noexcept { return editted;}
+    inline void setEditted(bool e) { editted = e; }
+    
+    inline void setPianoTarget(int target) { pianoTarget = target; }
+    inline int getPianoTarget(void) const noexcept { return pianoTarget; }
     
 protected:
     BKPreparationType type;
     int Id;
     String name;
+    
+    int pianoTarget;
     
     ItemMapper::PtrArr connections;
     
@@ -177,8 +231,6 @@ protected:
     
     bool active;
     bool editted;
-    
-    
     
 private:
     

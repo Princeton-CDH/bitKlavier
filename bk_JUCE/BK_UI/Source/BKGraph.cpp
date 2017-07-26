@@ -59,7 +59,7 @@ BKItem::~BKItem()
 {
     processor.updateState->removeActive(type, Id);
     
-    if (type != BKPreparationTypeNil) processor.currentPiano->removeMapper(this);
+    if (type != BKPreparationTypeNil) processor.currentPiano->remove(this);
 }
 
 void BKItem::setImage(Image newImage)
@@ -106,7 +106,7 @@ void BKItem::setItemType(BKPreparationType newType, bool create)
     {
         setImage(ImageCache::getFromMemory(BinaryData::mod_unassigned_icon_png, BinaryData::mod_unassigned_icon_pngSize));
         
-        processor.currentPiano->removeMapper(this);
+        processor.currentPiano->remove(this);
     }
     else if (type == PreparationTypeReset)
     {
@@ -136,8 +136,7 @@ void BKItem::setItemType(BKPreparationType newType, bool create)
     {
         ItemMapper::setType(PreparationTypePianoMap);
         
-        clearConnections(PreparationTypePiano);
-        addConnection(PreparationTypePiano, processor.currentPiano->getId());
+        setPianoTarget(processor.currentPiano->getId());
         
         setImage(ImageCache::getFromMemory(BinaryData::piano_icon_png, BinaryData::piano_icon_pngSize));
         
@@ -162,7 +161,7 @@ void BKItem::setItemType(BKPreparationType newType, bool create)
         processor.updateState->addActive(type, Id);
         
         saveXY(getPosition());
-        processor.currentPiano->addMapper(this);
+        processor.currentPiano->add(this);
     }
     
     repaint();
@@ -212,11 +211,7 @@ void BKItem::copy(BKItem::Ptr itemToCopy)
     Id = itemToCopy->getId();
     currentId = itemToCopy->getSelectedPianoId();
     
-    for (int i = 0; i < BKPreparationTypeNil; i++)
-    {
-        Array<int> connex = itemToCopy->getConnections((BKPreparationType)i);
-        connections.set(i, connex);
-    }
+    // COPY CONNECTIONS TOO, OR HAVE REDUNDANT 2D ARRAY OF CONNEX
 }
 
 void BKItem::bkComboBoxDidChange    (ComboBox* cb)
@@ -230,8 +225,7 @@ void BKItem::bkComboBoxDidChange    (ComboBox* cb)
         {
             currentId = pianoId;
             
-            clearConnections(PreparationTypePiano);
-            addConnection(PreparationTypePiano, currentId);
+            // FIX THIS
             
             ((BKConstructionSite*)getParentComponent())->pianoMapDidChange(this);
             
@@ -360,7 +354,7 @@ void BKItemGraph::updateClipboard(void)
 void BKItemGraph::add(BKItem* itemToAdd)
 {
     itemToAdd->saveXY(itemToAdd->getPosition());
-    processor.currentPiano->addMapper(itemToAdd);
+    processor.currentPiano->add(itemToAdd);
     processor.updateState->addActive(itemToAdd->getType(), itemToAdd->getId());
     items.add(itemToAdd);
 }
@@ -418,11 +412,11 @@ void BKItemGraph::removeUI(BKItem* itemToRemove)
 {
     for (int type = 0; type < BKPreparationTypeNil; type++)
     {
-        Array<int> connex = itemToRemove->getConnections((BKPreparationType)type);
+        BKItem::PtrArr connex = getConnections(itemToRemove);
         
-        for (auto Id : connex)
+        for (auto item : connex)
         {
-            disconnectUI(itemToRemove, get((BKPreparationType)type, Id));
+            disconnectUI(itemToRemove, item);
         }
     }
     
@@ -430,35 +424,17 @@ void BKItemGraph::removeUI(BKItem* itemToRemove)
     
 }
 
-BKItem::PtrArr BKItemGraph::getConnections(BKItem* item)
-{
-    BKItem::PtrArr connections;
-    for (int type = 0; type < BKPreparationTypeNil; type++)
-    {
-        Array<int> connex = item->getConnections((BKPreparationType)type);
-        
-        for (auto Id : connex)
-        {
-            connections.add(get((BKPreparationType)type,Id));
-        }
-    }
-    return connections;
-}
-
 void BKItemGraph::remove(BKItem* itemToRemove)
 {
-    processor.currentPiano->removeMapper(itemToRemove);
+    processor.currentPiano->remove(itemToRemove);
     
-    for (int type = 0; type < BKPreparationTypeNil; type++)
+    // Remove itemToRemove from connection lists of all connected items
+    for (auto item : itemToRemove->getConnections())
     {
-        Array<int> connex = itemToRemove->getConnections((BKPreparationType)type);
-        
-        for (auto Id : connex)
-        {
-            disconnect(itemToRemove, get((BKPreparationType)type, Id));
-        }
+        item->removeConnection(itemToRemove);
     }
     
+    processor.currentPiano->remove(itemToRemove);
     items.removeObject(itemToRemove);
 }
 
@@ -582,18 +558,18 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
         else if (item2Type == PreparationTypeKeymap  &&
                 (item1Type == PreparationTypePianoMap || item1Type == PreparationTypeGenericMod || item1Type == PreparationTypeReset))
         {
-            if (item1->getConnections(PreparationTypeKeymap).size()) return;
+            if (item1->getConnectionsOfType(PreparationTypeKeymap).size()) return;
         }
         else if (item1Type == PreparationTypeKeymap &&
                 (item2Type == PreparationTypePianoMap || item2Type == PreparationTypeGenericMod || item2Type == PreparationTypeReset))
         {
-            if (item2->getConnections(PreparationTypeKeymap).size()) return;
+            if (item2->getConnectionsOfType(PreparationTypeKeymap).size()) return;
         }
         
         // MODS RESETS AND PMAPS CAN ONLY HAVE ONE KEYMAP!
         
-        item1->addConnection(item2Type, item2Id);
-        item2->addConnection(item1Type, item1Id);
+        item1->addConnection(item2);
+        item2->addConnection(item1);
         
     }
     else // !connect
@@ -610,21 +586,20 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
     {
         Keymap::Ptr thisKeymap = processor.gallery->getKeymap(item1Id);
         
-        ItemMapper::Ptr thisMapper = item2->getMapper();
         
         if (connect)
         {
-            item2->addConnection(PreparationTypeKeymap, item1Id);
+            item2->addConnection(item1);
             processor.currentPiano->configureModification(thisMapper);
             
-            processor.currentPiano->addMapper(thisMapper);
+            processor.currentPiano->add(thisMapper);
         }
         else
         {
             processor.currentPiano->deconfigureModification(thisMapper);
             thisMapper->clearKeymaps();
             
-            processor.currentPiano->removeMapper(thisMapper);
+            processor.currentPiano->remove(thisMapper);
         }
         
     }
@@ -639,14 +614,14 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
             thisMapper->addKeymap(item2Id);
             processor.currentPiano->configureModification(thisMapper);
             
-            processor.currentPiano->addMapper(thisMapper);
+            processor.currentPiano->add(thisMapper);
         }
         else
         {
             processor.currentPiano->deconfigureModification(thisMapper);
             thisMapper->clearKeymaps();
             
-            processor.currentPiano->removeMapper(thisMapper);
+            processor.currentPiano->remove(thisMapper);
         }
     }
 
@@ -713,7 +688,7 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
                 DBG("resets: " + arrayIntArrayToString(thisMapper->resets));
                 processor.currentPiano->configureModification(thisMapper);
                 
-                processor.currentPiano->addMapper(thisMapper);
+                processor.currentPiano->add(thisMapper);
             }
             else
             {
@@ -723,7 +698,7 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
                 {
                     if (resets[i] == item2Id) thisMapper->resets.getUnchecked(item2Type).remove(item2Id);
                 }
-                processor.currentPiano->removeMapper(thisMapper);
+                processor.currentPiano->remove(thisMapper);
             }
         }
         else
@@ -769,7 +744,7 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
                 DBG("resets: " + arrayIntArrayToString(thisMapper->resets));
                 processor.currentPiano->configureModification(thisMapper);
                 
-                processor.currentPiano->addMapper(thisMapper);
+                processor.currentPiano->add(thisMapper);
             }
             else
             {
@@ -779,7 +754,7 @@ void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* i
                 {
                     if (resets[i] == item1Id) thisMapper->resets.getUnchecked(item1Type).remove(item1Id);
                 }
-                processor.currentPiano->removeMapper(thisMapper);
+                processor.currentPiano->remove(thisMapper);
             }
         }
         else

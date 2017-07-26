@@ -12,13 +12,14 @@
 
 SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s,
                                          SynchronicPreparation::Ptr ap,
+                                         Tuning::Ptr tuning,
                                          GeneralSettings::Ptr general,
                                          int Id):
 Id(Id),
 synth(s),
 general(general),
 active(ap),
-tuner(active->getTuning()->processor)
+tuner(tuning)
 {
     velocities.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -57,7 +58,7 @@ SynchronicProcessor::~SynchronicProcessor()
 void SynchronicProcessor::setCurrentPlaybackSampleRate(double sr)
 {
     sampleRate = sr;
-    tuner->setCurrentPlaybackSampleRate(sr);
+    tuner->processor->setCurrentPlaybackSampleRate(sr);
 }
 
 
@@ -66,7 +67,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
     PianoSamplerNoteDirection noteDirection = Forward;
     float noteStartPos = 0.0;
     
-    float noteLength = (fabs(active->getLengthMultipliers()[lengthMultiplierCounter]) * active->getTempoControl()->aPrep->getBeatThreshMS());
+    float noteLength = (fabs(active->getLengthMultipliers()[lengthMultiplierCounter]) * tempo->aPrep->getBeatThreshMS());
     //float noteLength = (fabs(active->getLengthMultipliers()[lengthMultiplierCounter]) * 50.0); //original way,  multiples of 50ms
     
     if (active->getLengthMultipliers()[lengthMultiplierCounter] < 0)
@@ -77,7 +78,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
     
     for (auto t : active->getTransposition()[transpCounter])
     {
-        float offset = tuner->getOffset(note) + t;
+        float offset = tuner->processor->getOffset(note) + t;
         int synthNoteNumber = ((float)note + (int)offset);
         float synthOffset = offset - (int)offset;
         //DBG("playing synchronic note/vel " + String(note) +  " " + String(velocity));
@@ -111,10 +112,6 @@ void SynchronicProcessor::resetPhase(int skipBeats)
 
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
-
-    //set tuning
-    tuner = active->getTuning()->processor;
-    
     //store velocity
     if(!active->getReleaseVelocitySetsSynchronic()) velocities.set(noteNumber, velocity);
  
@@ -208,7 +205,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
         phasor =    beatThresholdSamples *
                     active->getBeatMultipliers()[beatMultiplierCounter] *
                     general->getPeriodMultiplier() *
-                    active->getTempoControl()->processor->getPeriodMultiplier();
+                    tempo->processor->getPeriodMultiplier();
         
         
         inCluster = true;
@@ -219,17 +216,10 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
 
 void SynchronicProcessor::processBlock(int numSamples, int channel)
 {
-    
-    //adaptive tuning timer update
-    //tuner->incrementAdaptiveClusterTime(numSamples); //why are we doing this here? in all the preparations?
-    
-    //adaptive tempo timer update
-    //atTimer += numSamples;
-    
     //need to do this every block?
     clusterThresholdSamples = (active->getClusterThreshSEC() * sampleRate);
     //beatThresholdSamples = (active->getBeatThresh() * sampleRate);
-    beatThresholdSamples = (active->getTempoControl()->aPrep->getBeatThresh() * sampleRate);
+    beatThresholdSamples = (tempo->aPrep->getBeatThresh() * sampleRate);
     
     //cluster management
     if (inCluster)
@@ -266,7 +256,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
         numSamplesBeat =    beatThresholdSamples *
                             active->getBeatMultipliers()[beatMultiplierCounter] *
                             general->getPeriodMultiplier() *
-                            active->getTempoControl()->processor->getPeriodMultiplier();
+                            tempo->processor->getPeriodMultiplier();
         
         //check to see if enough time has passed for next beat
         if (phasor >= numSamplesBeat)
@@ -363,7 +353,7 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
         timeToReturn += active->getBeatMultipliers()[myBeat] *
                         beatThresholdSamples *
                         general->getPeriodMultiplier() *
-                        active->getTempoControl()->processor->getPeriodMultiplier();
+                        tempo->processor->getPeriodMultiplier();
                         //adaptiveTempoPeriodMultiplier;
     }
     
