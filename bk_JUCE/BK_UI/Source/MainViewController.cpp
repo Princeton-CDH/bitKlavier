@@ -165,7 +165,10 @@ void MainViewController::mouseDown(const MouseEvent &event)
     if(event.eventComponent == &construction)
     {
         if (overtop.getCurrentDisplay() != DisplayNil)
-            overtop.setCurrentDisplay(DisplayNil);
+        {
+            overtop.dvc.close();
+            //overtop.setCurrentDisplay(DisplayNil);
+        }
     }
 }
 

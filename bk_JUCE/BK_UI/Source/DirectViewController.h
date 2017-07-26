@@ -61,6 +61,7 @@ public:
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
     
     void fillSelectCB(void);
+    void close();
     
 private:
     
