@@ -119,6 +119,11 @@ public:
     
     void addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId);
     
+    void linkSynchronicWithTempo(Synchronic::Ptr synchronic, Tempo::Ptr thisTempo);
+    
+    void linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic);
+    
+    void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
     
     ValueTree getState(void);
     

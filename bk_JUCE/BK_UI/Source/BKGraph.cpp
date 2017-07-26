@@ -459,41 +459,6 @@ void BKItemGraph::clear(void)
     
 }
 
-void BKItemGraph::linkSynchronicWithTempo(Synchronic::Ptr synchronic, Tempo::Ptr thisTempo)
-{
-    synchronic->setTempo(thisTempo);
-}
-
-void BKItemGraph::linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic)
-{
-    nostalgic->setSynchronic(synchronic);
-}
-
-void BKItemGraph::linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning)
-{
-    if (thisType == PreparationTypeDirect)
-    {
-        Direct::Ptr thisDirect = processor.gallery->getDirect(thisId);
-        
-        thisDirect->setTuning(thisTuning);
-    }
-    else if (thisType == PreparationTypeSynchronic)
-    {
-        Synchronic::Ptr thisSynchronic = processor.gallery->getSynchronic(thisId);
-        
-        thisSynchronic->setTuning(thisTuning);
-    }
-    else if (thisType == PreparationTypeNostalgic)
-    {
-        Nostalgic::Ptr thisNostalgic = processor.gallery->getNostalgic(thisId);
-        
-        thisNostalgic->setTuning(thisTuning);
-    }
-}
-
-
-
-
 void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* item2)
 {
     BKPreparationType item1Type = item1->getType();

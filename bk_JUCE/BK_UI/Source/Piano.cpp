@@ -119,7 +119,7 @@ void Piano::configure(void)
                 
                 if (targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic)
                 {
-                    
+                    linkPreparationWithTuning(targetType, targetId, getTuning(Id));
                 }
             }
         }
@@ -133,7 +133,7 @@ void Piano::configure(void)
                 
                 if (targetType == PreparationTypeSynchronic)
                 {
-                    
+                    linkSynchronicWithTempo(getSynchronic(targetId), getTempo(Id));
                 }
             }
         }
@@ -147,10 +147,11 @@ void Piano::configure(void)
                 
                 if (targetType == PreparationTypeNostalgic)
                 {
-                    
+                    linkNostalgicWithSynchronic(getNostalgic(targetId), getSynchronic(Id));
                 }
             }
         }
+        /*
         else if (type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod)
         {
             // Look for direct, nostalgic, synchronic, tuning, and tempo targets
@@ -183,6 +184,7 @@ void Piano::configure(void)
         {
             // Configure piano map based on saved piano Id
         }
+         */
         
         
         
@@ -214,6 +216,37 @@ void Piano::remove(ItemMapper::Ptr item)
     if (removed) configure();
 }
 
+void Piano::linkSynchronicWithTempo(Synchronic::Ptr synchronic, Tempo::Ptr thisTempo)
+{
+    synchronic->setTempo(thisTempo);
+}
+
+void Piano::linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic)
+{
+    nostalgic->setSynchronic(synchronic);
+}
+
+void Piano::linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning)
+{
+    if (thisType == PreparationTypeDirect)
+    {
+        Direct::Ptr thisDirect = getDirect(thisId);
+        
+        thisDirect->setTuning(thisTuning);
+    }
+    else if (thisType == PreparationTypeSynchronic)
+    {
+        Synchronic::Ptr thisSynchronic = getSynchronic(thisId);
+        
+        thisSynchronic->setTuning(thisTuning);
+    }
+    else if (thisType == PreparationTypeNostalgic)
+    {
+        Nostalgic::Ptr thisNostalgic = getNostalgic(thisId);
+        
+        thisNostalgic->setTuning(thisTuning);
+    }
+}
 
 void Piano::addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId)
 {
