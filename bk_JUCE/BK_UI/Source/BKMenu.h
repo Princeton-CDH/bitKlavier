@@ -96,6 +96,7 @@ public:
     void focusLost(FocusChangeType cause) override
     {
         DBG("editable combobox FOCUS LOST");
+        ComboBox::focusLost(cause);
         //Component::prevFocused = nullptr;
         //getTopLevelComponent()->unfocusAllComponents();
         //Component::modalStateFinished(0);

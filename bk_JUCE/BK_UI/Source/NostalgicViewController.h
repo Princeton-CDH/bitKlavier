@@ -40,6 +40,24 @@ public:
     
     TextButton clearModsButton;
     
+    /*
+    void close() override
+    {
+        
+        DBG("====> nostalgic close() <====");
+        selectCB.exitModalState(-1);
+        selectCB.getRootMenu()->dismissAllActiveMenus();
+        //selectCB.hidePopup();
+        lengthModeSelectCB.exitModalState(-1);
+        lengthModeSelectCB.getRootMenu()->dismissAllActiveMenus();
+        //lengthModeSelectCB.hidePopup();
+        
+        processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+     */
+    
+    
+    
 private:
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NostalgicViewController)

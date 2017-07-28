@@ -9,10 +9,10 @@
               pluginWantsMidiIn="1" pluginProducesMidiOut="1" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="1" pluginAUExportPrefix="BKAU" pluginRTASCategory=""
               aaxIdentifier="com.manyarrowsmusic.bitKlavier" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
-              jucerVersion="5.0.2" companyName="manyarrowsmusic" companyEmail="dtrueman@princeton.edu"
+              jucerVersion="5.1.0" companyName="manyarrowsmusic" companyEmail="dtrueman@princeton.edu"
               maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
               displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Dark"
-              buildStandalone="1" enableIAA="0">
+              buildStandalone="1" enableIAA="0" cppLanguageStandard="11">
   <MAINGROUP id="s4R02g" name="BK_UI">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
       <GROUP id="{1E3013D4-6B2A-D996-A5C8-F92AE44A39F2}" name="Resources">

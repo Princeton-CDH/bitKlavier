@@ -299,14 +299,6 @@ void DirectPreparationEditor::buttonClicked (Button* b)
     }
 }
 
-void DirectPreparationEditor::close()
-{
-    Direct::Ptr direct = processor.gallery->getDirect(processor.updateState->currentDirectId);
-    direct->editted = true;
-    
-    processor.updateState->setCurrentDisplay(DisplayNil);
-}
-
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ DirectModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~//
 DirectModificationEditor::DirectModificationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
