@@ -168,8 +168,9 @@ void MainViewController::mouseDown(const MouseEvent &event)
         if (overtop.getCurrentDisplay() != DisplayNil)
         {
             
-            //overtop.dvc.close();
+            processor.updateState->setCurrentDisplay(DisplayNil);
             
+            /*
             BKPreparationDisplay thisDisplay = overtop.getCurrentDisplay();
             
             switch(thisDisplay)
@@ -213,6 +214,7 @@ void MainViewController::mouseDown(const MouseEvent &event)
                 default :
                     break;
             }
+             */
             
         }
     }

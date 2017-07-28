@@ -51,10 +51,12 @@ public:
         return optionMenu;
     }
     
+    /*
     virtual void close()
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
+     */
     
     
     
