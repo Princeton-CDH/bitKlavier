@@ -43,6 +43,11 @@ BKViewController(p, theGraph)
                 paramSliders[0]->setAllowSubSlider(true);
                 paramSliders[0]->setSubSliderName("add transposition");
             }
+            
+            if(paramSliders[0]->getName() == "sustain length multipliers")
+            {
+                paramSliders[0]->setSkewFromMidpoint(false);
+            }
         }
     }
     

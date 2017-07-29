@@ -455,7 +455,7 @@ static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc
     {0, 0, 0},
     {0, 4, 0, 1.0},
     {0.1, 2, 1, 0.001},
-    {0.1, 2, 1, 0.001},
+    {-2, 2, 1, 0.001},
     {0., 2., 1, 0.001},
     {-12, 12, 0, 0.01}
 };

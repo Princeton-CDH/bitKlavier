@@ -46,6 +46,7 @@ sliderHeight(height)
 
     setRange(sliderMin, sliderMax, sliderIncrement);
     setValue(sliderDefault, dontSendNotification);
+    setSkewFromMidpoint(true);
     
 }
 
@@ -64,8 +65,17 @@ void BKSubSlider::setMinMaxDefaultInc(std::vector<float> newvals)
     sliderDefault = newvals[2];
     sliderIncrement = newvals[3];
     setRange(sliderMin, sliderMax, sliderIncrement);
-    setSkewFactorFromMidPoint(sliderDefault);
+    if(skewFromMidpoint) setSkewFactorFromMidPoint(sliderDefault);
+    else setSkewFactor (1., false);
     setValue(sliderDefault, dontSendNotification);
+}
+
+void BKSubSlider::setSkewFromMidpoint(bool sfm)
+{
+    skewFromMidpoint = sfm;
+    
+    if(skewFromMidpoint) setSkewFactorFromMidPoint(sliderDefault);
+    else setSkewFactor (1., false);
 }
 
 
@@ -385,12 +395,35 @@ void BKMultiSlider::setMinMaxDefaultInc(std::vector<float> newvals)
             if(refSlider != nullptr)
             {
                 refSlider->setMinMaxDefaultInc(newvals);
+                refSlider->setSkewFromMidpoint(skewFromMidpoint);
             }
         }
     }
     
     displaySlider->setMinMaxDefaultInc(newvals);
     bigInvisibleSlider->setMinMaxDefaultInc(newvals);
+    displaySlider->setSkewFromMidpoint(skewFromMidpoint);
+    bigInvisibleSlider->setSkewFromMidpoint(skewFromMidpoint);
+}
+
+void BKMultiSlider::setSkewFromMidpoint(bool sfm)
+{
+    skewFromMidpoint = sfm;
+    
+    for(int i=0; i<sliders.size(); i++)
+    {
+        for(int j = 0; j<sliders[i]->size(); j++)
+        {
+            BKSubSlider* refSlider = sliders[i]->operator[](j);
+            if(refSlider != nullptr)
+            {
+                refSlider->setSkewFromMidpoint(skewFromMidpoint);
+            }
+        }
+    }
+    
+    displaySlider->setSkewFromMidpoint(skewFromMidpoint);
+    bigInvisibleSlider->setSkewFromMidpoint(skewFromMidpoint);
 }
 
 

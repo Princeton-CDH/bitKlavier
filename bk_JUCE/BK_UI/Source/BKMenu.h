@@ -87,24 +87,6 @@ public:
     void mouseDoubleClick(const MouseEvent& e) override;
     void textEditorEscapeKeyPressed (TextEditor &) override;
     
-    void mouseDown(const MouseEvent& e) override
-    {
-        DBG("editable combobox mousedown");
-        ComboBox::mouseDown(e);
-    }
-    
-    void focusLost(FocusChangeType cause) override
-    {
-        DBG("editable combobox FOCUS LOST");
-        ComboBox::focusLost(cause);
-        //Component::prevFocused = nullptr;
-        //getTopLevelComponent()->unfocusAllComponents();
-        //Component::modalStateFinished(0);
-        //exitModalState(-1);
-        //hidePopup();
-    }
-
-    
     ListenerList<BKEditableComboBoxListener> listeners;
     void addMyListener(BKEditableComboBoxListener* listener)     { listeners.add(listener);      }
     void removeMyListener(BKEditableComboBoxListener* listener)  { listeners.remove(listener);   }
