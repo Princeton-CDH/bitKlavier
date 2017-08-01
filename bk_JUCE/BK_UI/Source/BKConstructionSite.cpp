@@ -22,8 +22,6 @@ altDown(false),
 lastX(10),
 lastY(10)
 {
-    addKeyListener(this);
-    
     setWantsKeyboardFocus(true);
     
     graph->deselectAll();
@@ -207,7 +205,7 @@ void BKConstructionSite::draw(void)
             keymapCount++;
 #else
             
-            item->setTopLeftPosition(x, y);
+            item->setTopLeftPosition(xy);
 #endif
             
         }
@@ -224,7 +222,7 @@ void BKConstructionSite::draw(void)
             
             prepCount++;
 #else
-            item->setTopLeftPosition(x, y);
+            item->setTopLeftPosition(xy);
 #endif
             
         }
@@ -242,7 +240,7 @@ void BKConstructionSite::draw(void)
             
             ttCount++;
 #else
-            item->setTopLeftPosition(x, y);
+            item->setTopLeftPosition(xy);
 #endif
         }
         else if (type > PreparationTypeKeymap)
@@ -259,7 +257,7 @@ void BKConstructionSite::draw(void)
             
             modCount++;
 #else
-            item->setTopLeftPosition(x, y);
+            item->setTopLeftPosition(xy);
 #endif
         }
         else
@@ -275,7 +273,7 @@ void BKConstructionSite::draw(void)
             
             otherCount++;
 #else
-            item->setTopLeftPosition(x, y);
+            item->setTopLeftPosition(xy);
 #endif
             
         }
@@ -288,7 +286,7 @@ void BKConstructionSite::draw(void)
 #if AUTO_DRAW
         processor.currentPiano->configuration->addItem(item->getType(), item->getId());
 #endif
-        item->saveXY(item->getX(), item->getY());
+        item->saveBounds(item->getBounds());
     }
     
     repaint();
@@ -313,7 +311,7 @@ void BKConstructionSite::prepareItemDrag(BKItem* item, const MouseEvent& e, bool
 }
 void BKConstructionSite::deleteItem (BKItem* item)
 {
-    graph->remove(item);
+    graph->removeAndUnregisterItem(item);
     
     removeChildComponent(item);
 }
@@ -329,15 +327,15 @@ void BKConstructionSite::addItem(BKPreparationType type)
         processor.gallery->addTypeWithId(type, thisId);
     }
     
-    BKItem::Ptr toAdd = new BKItem(type, thisId, processor);
+    BKItem* toAdd = new BKItem(type, thisId, processor);
     
     toAdd->setTopLeftPosition(lastX, lastY);
     
-    toAdd->saveXY(lastX, lastY);
+    toAdd->saveBounds(toAdd->getBounds());
 
     lastX += 10; lastY += 10;
     
-    graph->add(toAdd);
+    graph->addAndRegisterItem(toAdd);
     
     addAndMakeVisible(toAdd);
 }
@@ -360,7 +358,7 @@ void BKConstructionSite::addItemsFromClipboard(void)
         
         BKPreparationType type = item->getType();
         
-        if (processor.updateState->isActive(type, thisId))
+        if (item->isActive())
         {
             thisId = processor.gallery->getNewId(type);
             
@@ -379,10 +377,7 @@ void BKConstructionSite::addItemsFromClipboard(void)
             toAdd->setTopLeftPosition(lastX+item->position.x-firstX, lastY+item->position.y-firstY);
         }
         
-        graph->add(toAdd);
-        
-        for (auto connection : graph->getConnections(toAdd))
-            graph->connect(toAdd, connection);
+        graph->addAndRegisterItem(toAdd);
         
         addAndMakeVisible(toAdd);
         
@@ -522,13 +517,12 @@ void BKConstructionSite::mouseDrag (const MouseEvent& e)
         for (auto item : graph->getSelectedItems())
         {
             item->performDrag(e);
+            item->saveBounds(item->getBounds());
         }
     }
     
     lineEX = e.getEventRelativeTo(this).x;
     lineEY = e.getEventRelativeTo(this).y;
-    
-    DBG("DRAG: "+String(lineEX) + " " +String(lineEY));
     
     repaint();
 }
@@ -560,7 +554,6 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
         if (itemTarget != nullptr)
         {
             graph->connect(itemSource, itemTarget);
-            graph->drawLine(lineOX, lineOY, X, Y);
         }
         
         connect = false;
@@ -570,7 +563,7 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
     {
         if (item->isDragging)
         {
-            item->saveXY(item->getX(), item->getY());
+            item->saveBounds(item->getBounds());
             item->isDragging = false;
         }
     }
@@ -581,12 +574,7 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
 
 void BKConstructionSite::reconfigureCurrentItem(void)
 {
-    BKItem::PtrArr connections;
-    
-    for (auto item : graph->getConnections(currentItem))
-    {
-        graph->reconnect(currentItem, item);
-    }
+    processor.currentPiano->configure();
 }
 
 void BKConstructionSite::removeItem(BKPreparationType type, int Id)
@@ -597,17 +585,6 @@ void BKConstructionSite::removeItem(BKPreparationType type, int Id)
 void BKConstructionSite::idDidChange(void)
 {
     BKPreparationType type = currentItem->getType();
-    int oldId = currentItem->getId();
-    
-    BKItem::PtrArr connections;
-    
-    // DISCONNECT
-    for (auto item : graph->getConnections(currentItem))
-    {
-        connections.add(item);
-        
-        graph->disconnect(currentItem, item);
-    }
     
     // GET NEW ID
     int newId = -1;
@@ -626,19 +603,7 @@ void BKConstructionSite::idDidChange(void)
     
     currentItem->setId(newId);
     
-    // RECONNECT
-    for (auto item : connections)   graph->connectWithoutCreatingNew(currentItem, item);
-
-    // ACTIVE
-    processor.updateState->removeActive(type, oldId);
-    processor.updateState->addActive(type, newId);
-    
-}
-
-
-bool BKConstructionSite::keyPressed (const KeyPress& e, Component*)
-{
-    
+    processor.currentPiano->configure();
 }
 
 BKItem* BKConstructionSite::getItemAtPoint(const int X, const int Y)

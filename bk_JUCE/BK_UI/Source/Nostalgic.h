@@ -12,8 +12,10 @@
 #define NOSTALGIC_H_INCLUDED
 
 #include "BKUtilities.h"
-#include "Synchronic.h"
+
 #include "BKSynthesiser.h"
+
+#include "Synchronic.h"
 #include "Tuning.h"
 #include "Keymap.h"
 

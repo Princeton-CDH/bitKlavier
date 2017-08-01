@@ -29,7 +29,8 @@ class BKViewController    : public BKComponent, public BKListener
 public:
     BKViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
     processor(p),
-    theGraph(theGraph)
+    theGraph(theGraph),
+    lastIndex(-1)
     {
         
     }
@@ -62,6 +63,8 @@ protected:
     
     ImageComponent iconImageComponent;
     TextButton hideOrShow;
+    
+    int lastIndex;
     
 private:
     

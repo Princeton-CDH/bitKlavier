@@ -290,6 +290,7 @@ public:
     SynchronicProcessor(BKSynthesiser* main,
                         SynchronicPreparation::Ptr active,
                         Tuning::Ptr tuning,
+                        Tempo::Ptr tempo,
                         GeneralSettings::Ptr general,
                         int Id);
     
@@ -421,7 +422,7 @@ public:
                int Id):
     sPrep(new SynchronicPreparation(prep)),
     aPrep(new SynchronicPreparation(sPrep)),
-    processor(new SynchronicProcessor(s, aPrep, tuning, general, Id)),
+    processor(new SynchronicProcessor(s, aPrep, tuning, tempo, general, Id)),
     Id(Id),
     name(String(Id)),
     X(-1),Y(-1),
@@ -444,7 +445,7 @@ public:
     {
         sPrep       = new SynchronicPreparation(tuning, tempo);
         aPrep       = new SynchronicPreparation(sPrep);
-        processor   = new SynchronicProcessor(s, aPrep, tuning, general, Id);
+        processor   = new SynchronicProcessor(s, aPrep, tuning, tempo, general, Id);
     };
     
     void prepareToPlay(double sampleRate, BKSynthesiser* main)

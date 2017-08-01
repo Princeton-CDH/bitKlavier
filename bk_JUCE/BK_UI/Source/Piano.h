@@ -21,10 +21,6 @@
 
 #include "Keymap.h"
 
-#include "Preparation.h"
-
-#include "Reset.h"
-
 #include "PianoConfig.h"
 
 #include "ItemMapper.h"
@@ -86,6 +82,23 @@ public:
     ItemMapper::PtrArr     items;
     
     inline ItemMapper::PtrArr getItems(void) const noexcept { return items; }
+    
+    inline bool isActive(BKPreparationType type, int Id)
+    {
+        for (auto item : items)
+        {
+            if (item->getType() == type && item->getId() == Id) return item->isActive();
+        }
+        return false;
+    }
+    
+    inline void setActive(BKPreparationType type, int Id, bool active)
+    {
+        for (auto item : items)
+        {
+            if (item->getType() == type && item->getId() == Id) item->setActive(active);
+        }
+    }
     
     inline void clearItems(void) { items.clear(); }
     

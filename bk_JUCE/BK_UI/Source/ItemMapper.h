@@ -31,7 +31,7 @@ public:
     {
         DBG("~ ~ ~ ~ ~ ~ ~ MAPPER ~ ~ ~ ~ ~ ~ ~ ~");
         DBG("type: " + String(type)  + "\nId: " + String(Id) + "\nConnections: ");
-        for (auto item : connections) item->print();
+        for (auto item : connections) DBG("ctype: " + String(item->getType()) + " cId: " + String(item->getId()));
         DBG("~ ~ ~ ~ ~ ~ ~ ~ ~~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
     }
     
@@ -120,6 +120,20 @@ public:
         }
     }
     
+    inline bool isConnectedToAnyPreparation(void)
+    {
+        ItemMapper::PtrArr theseItems;
+        
+        for (auto item : connections)
+        {
+            if (item->getType() >= PreparationTypeDirect && item->getType() <= PreparationTypeTempo)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     inline ItemMapper::PtrArr getConnectionsOfType(BKPreparationType type)
     {
         ItemMapper::PtrArr theseItems;
@@ -194,20 +208,18 @@ public:
     inline String getItemName(void) const noexcept { return name;}
     
     // CONFIGURATION
-    inline void saveX(int x) { XY.x = x; };
-    inline void saveY(int y) { XY.y = y; };
+    inline int retrieveX(void) const noexcept { return bounds.getX(); };
+    inline int retrieveY(void) const noexcept { return bounds.getY(); };
     
-    inline int retrieveX(void) const noexcept { return XY.x; };
-    inline int retrieveY(void) const noexcept { return XY.y; };
+    inline Point<int> retrieveXY(void) { return bounds.getPosition(); };
+    inline int retrieveWidth(void) { return bounds.getWidth(); }
+    inline int retrieveHeight(void) { return bounds.getHeight(); }
     
-    inline Point<int> retrieveXY(void) const noexcept { return XY; };
-    
-    inline void saveXY(int x, int y) { XY.x = x; XY.y = y;}
-    
-    inline void saveXY(Point<int> xy) { XY.x = xy.x; XY.y = xy.y;}
+    inline void saveBounds(Rectangle<int> newBounds) { bounds = newBounds; }
+    inline Rectangle<int> retrieveBounds(void) const noexcept { return bounds; }
     
     // ACTIVE
-    inline bool getActive(void) const noexcept {return active;}
+    inline bool isActive(void) const noexcept {return active;}
     inline void setActive(bool a) { active = a; }
     
     
@@ -227,7 +239,7 @@ protected:
     
     ItemMapper::PtrArr connections;
     
-    Point<int> XY;
+    Rectangle<int> bounds;
     
     bool active;
     bool editted;

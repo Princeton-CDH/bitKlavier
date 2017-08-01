@@ -13,13 +13,15 @@
 SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s,
                                          SynchronicPreparation::Ptr ap,
                                          Tuning::Ptr tuning,
+                                         Tempo::Ptr tempo,
                                          GeneralSettings::Ptr general,
                                          int Id):
 Id(Id),
 synth(s),
 general(general),
 active(ap),
-tuner(tuning)
+tuner(tuning),
+tempo(tempo)
 {
     velocities.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -29,17 +31,6 @@ tuner(tuning)
     
     clusterTimer = 0;
     phasor = 0;
-    
-    /*
-    atTimer = 0;
-    atLastTime = 0;
-    atDeltaHistory.ensureStorageAllocated(10);
-    for (int i = 0; i < 10; i++)
-    {
-        atDeltaHistory.insert(0, (60000.0/active->getTempo()));
-    }
-    adaptiveTempoPeriodMultiplier = 1.;
-    */
      
     inCluster = false;
     
@@ -96,6 +87,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
                      3,
                      30);
     }
+    
 }
 
 void SynchronicProcessor::resetPhase(int skipBeats)

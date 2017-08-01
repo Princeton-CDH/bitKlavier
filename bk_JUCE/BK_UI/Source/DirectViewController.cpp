@@ -122,7 +122,7 @@ DirectViewController(p, theGraph)
     selectCB.addMyListener(this);
     selectCB.addListener(this);
     
-    fillSelectCB();
+    fillSelectCB(-1,-1);
     
     transpositionSlider->addMyListener(this);
     
@@ -137,10 +137,7 @@ DirectViewController(p, theGraph)
 
 void DirectPreparationEditor::update(void)
 {
-    
     if (processor.updateState->currentDirectId < 0) return;
-    
-    fillSelectCB();
     
     DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
 
@@ -167,45 +164,30 @@ void DirectPreparationEditor::bkMessageReceived (const String& message)
 void DirectPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
+    int index = box->getSelectedItemIndex();
 
     if (name == "Direct")
     {
-        int index = box->getSelectedItemIndex();
-        
-        int oldId = processor.updateState->currentDirectId;
         int newId = processor.gallery->getIdFromIndex(PreparationTypeDirect, index);
         
         if (index == selectCB.getNumItems()-1)
         {
             processor.gallery->addDirect();
             
-            processor.gallery->setEditted(PreparationTypeDirect, oldId, true);
+            Direct::Ptr thisDirect = processor.gallery->getAllDirect().getLast();
             
-            processor.gallery->getAllDirect().getLast()->editted = true;
-            
-            newId = processor.gallery->getAllDirect().getLast()->getId();
+            newId = thisDirect->getId();
         }
         
         processor.updateState->currentDirectId = newId;
         
-        processor.updateState->removeActive(PreparationTypeDirect, oldId);
-        
-        #if AUTO_DELETE
-        if (!processor.gallery->getDirect(oldId)->editted)
-        {
-            processor.updateState->removePreparation(PreparationTypeDirect, oldId);
-            
-            processor.gallery->remove(PreparationTypeDirect, oldId);
-        }
-#endif
-        
-        processor.updateState->addActive(PreparationTypeDirect, newId);
-        
         processor.updateState->idDidChange = true;
         
-        fillSelectCB();
-        
         update();
+        
+        fillSelectCB(lastIndex+1, index+1);
+    
+        lastIndex = index;
     }
 }
 
@@ -258,7 +240,7 @@ void DirectPreparationEditor::BKStackedSliderValueChanged(String name, Array<flo
     active->setTransposition(val);
 }
 
-void DirectPreparationEditor::fillSelectCB(void)
+void DirectPreparationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
@@ -272,19 +254,26 @@ void DirectPreparationEditor::fillSelectCB(void)
         else                        selectCB.addItem(String(i+1), i+1);
         
         selectCB.setItemEnabled(i+1, true);
-        if (processor.updateState->isActive(PreparationTypeDirect, Id) &&
+        if (processor.currentPiano->isActive(PreparationTypeDirect, Id) &&
             (Id != processor.updateState->currentDirectId))
         {
             selectCB.setItemEnabled(i+1, false);
         }
     }
     
-    selectCB.addItem("New direct...", index.size()+1);
+    if (last != -1)     selectCB.setItemEnabled(last, true);
+    if (current != -1)  selectCB.setItemEnabled(current, false);
     
-    int currentId = processor.updateState->currentDirectId;
+    int selectedIndex = processor.gallery->getIndexFromId(PreparationTypeDirect,
+                                                          processor.updateState->currentDirectId);
+    selectCB.setSelectedItemIndex(selectedIndex,
+                                  NotificationType::dontSendNotification);
+    selectCB.setItemEnabled(selectedIndex+1, false);
     
     selectCB.addSeparator();
-    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeDirect, currentId), NotificationType::dontSendNotification);
+    selectCB.addItem("New Direct...", index.size()+1);
+    
+    lastIndex = selectedIndex;
     
 }
 
@@ -307,7 +296,7 @@ DirectViewController(p, theGraph)
     selectCB.addListener(this);
     selectCB.addMyListener(this);
     
-    fillSelectCB();
+    fillSelectCB(-1,-1);
     
     transpositionSlider->addMyListener(this);
     
@@ -344,10 +333,7 @@ void DirectModificationEditor::highlightModedComponents()
 
 void DirectModificationEditor::update(void)
 {
-    
     if (processor.updateState->currentModDirectId < 0) return;
-    
-    fillSelectCB();
     
     selectCB.setSelectedItemIndex(processor.updateState->currentModDirectId, dontSendNotification);
     
@@ -374,7 +360,7 @@ void DirectModificationEditor::update(void)
     
 }
 
-void DirectModificationEditor::fillSelectCB(void)
+void DirectModificationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
@@ -388,21 +374,26 @@ void DirectModificationEditor::fillSelectCB(void)
         else                        selectCB.addItem(String(i+1), i+1);
         
         selectCB.setItemEnabled(i+1, true);
-        if (processor.updateState->isActive(PreparationTypeDirectMod, Id) &&
+        if (processor.currentPiano->isActive(PreparationTypeDirectMod, Id) &&
             (Id != processor.updateState->currentModDirectId))
         {
             selectCB.setItemEnabled(i+1, false);
         }
     }
     
-    selectCB.addItem("New direct modification...", index.size()+1);
+    if (last != -1)     selectCB.setItemEnabled(last, true);
+    if (current != -1)  selectCB.setItemEnabled(current, false);
     
-    int currentId = processor.updateState->currentModDirectId;
-    
+    int selectedIndex = processor.gallery->getIndexFromId(PreparationTypeDirectMod,
+                                                          processor.updateState->currentModDirectId);
+    selectCB.setSelectedItemIndex(selectedIndex,
+                                  NotificationType::dontSendNotification);
+    selectCB.setItemEnabled(selectedIndex+1, false);
     
     selectCB.addSeparator();
-    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeDirectMod, currentId), NotificationType::dontSendNotification);
+    selectCB.addItem("New Direct modification...", index.size()+1);
     
+    lastIndex = selectedIndex;
     
 }
 
@@ -417,45 +408,30 @@ void DirectModificationEditor::bkMessageReceived (const String& message)
 void DirectModificationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
+    int index = box->getSelectedItemIndex();
     
     if (name == "Direct")
     {
-        int index = box->getSelectedItemIndex();
-        
-        int oldId = processor.updateState->currentModDirectId;
         int newId = processor.gallery->getIdFromIndex(PreparationTypeDirectMod, index);
         
         if (index == selectCB.getNumItems()-1)
         {
             processor.gallery->addDirectMod();
             
-            processor.gallery->setEditted(PreparationTypeDirectMod, oldId, true);
+            DirectModPreparation::Ptr thisMod = processor.gallery->getDirectModPreparations().getLast();
             
-            processor.gallery->getDirectModPreparations().getLast()->editted = true;
-            
-            newId = processor.gallery->getDirectModPreparations().getLast()->getId();
+            newId = thisMod->getId();
         }
         
         processor.updateState->currentModDirectId = newId;
-        
-        processor.updateState->removeActive(PreparationTypeDirectMod, oldId);
-        
-#if AUTO_DELETE
-        if (!processor.gallery->getDirectModPreparation(oldId)->editted)
-        {
-            processor.updateState->removePreparation(PreparationTypeDirectMod, oldId);
-            
-            processor.gallery->remove(PreparationTypeDirectMod, oldId);
-        }
-#endif
-        
-        processor.updateState->addActive(PreparationTypeDirectMod, newId);
-        
+  
         processor.updateState->idDidChange = true;
         
-        fillSelectCB();
-        
         update();
+        
+        fillSelectCB(lastIndex+1, index+1);
+        
+        lastIndex = index;
     }
 }
 

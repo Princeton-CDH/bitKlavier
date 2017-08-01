@@ -67,11 +67,23 @@ Piano::~Piano()
 
 void Piano::deconfigure(void)
 {
+    prepMaps.clear();
+    activePMaps.clear();
+    DBG("prepmapssizePRE: " + String(prepMaps.size()));
+    numPMaps = 0;
     
+    for (int key = 0; key < 128; key++)
+    {
+        modificationMap[key]->clearModifications();
+        modificationMap[key]->clearResets();
+    }
+    
+    pianoMap.clear();
 }
 
 void Piano::configure(void)
 {
+    deconfigure();
     for (auto item : items)
     {
         BKPreparationType type = item->getType();
@@ -85,7 +97,8 @@ void Piano::configure(void)
         
         if (type == PreparationTypeKeymap)
         {
-            for (auto target : item->getConnections())
+            ItemMapper::PtrArr connex = item->getConnections();
+            for (auto target : connex)
             {
                 BKPreparationType targetType = target->getType();
                 int targetId = target->getId();
@@ -94,20 +107,22 @@ void Piano::configure(void)
                 {
                     addPreparationToKeymap(targetType, targetId, Id);
                 }
-                else if (type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod)
+                else if (targetType >= PreparationTypeDirectMod && targetType <= PreparationTypeTempoMod)
                 {
-                    configureModification(item);
+                    configureModification(target);
                 }
                 else if (targetType == PreparationTypePianoMap)
                 {
-                    configurePianoMap(item);
+                    configurePianoMap(target);
                 }
                 else if (targetType == PreparationTypeReset)
                 {
-                    configureReset(item);
+                    configureReset(target);
                 }
             }
             
+            int count = 0;
+            for (auto pmap : prepMaps) DBG("PMAP" + String(count++) + ": " + pmap->getPreparationIds());
         }
         else if (type == PreparationTypeTuning)
         {
@@ -151,40 +166,6 @@ void Piano::configure(void)
                 }
             }
         }
-        /*
-        else if (type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod)
-        {
-            // Look for direct, nostalgic, synchronic, tuning, and tempo targets
-            for (auto target : item->getConnections())
-            {
-                BKPreparationType targetType = target->getType();
-                int targetId = target->getId();
-                
-                if (targetType >= PreparationTypeDirect && targetType <= PreparationTypeTempo)
-                {
-                    
-                }
-            }
-        }
-        else if (type == PreparationTypeReset)
-        {
-            // Look for direct, nostalgic, synchronic, tuning, and tempo targets
-            for (auto target : item->getConnections())
-            {
-                BKPreparationType targetType = target->getType();
-                int targetId = target->getId();
-                
-                if (targetType >= PreparationTypeDirect && targetType <= PreparationTypeTempo)
-                {
-                    
-                }
-            }
-        }
-        else if (type == PreparationTypePianoMap)
-        {
-            // Configure piano map based on saved piano Id
-        }
-         */
         
         
         
@@ -197,7 +178,10 @@ void Piano::add(ItemMapper::Ptr item)
 {
     bool added = items.addIfNotAlreadyThere(item);
     
-    if (added) configure();
+    if (added)
+    {
+        configure();
+    }
 }
 
 
@@ -206,6 +190,7 @@ void Piano::remove(ItemMapper::Ptr item)
     bool removed = false;
     for (int i = items.size(); --i >= 0; )
     {
+        // Check on this for piano map
         if (items[i] == item)
         {
             items.remove(i);
@@ -335,8 +320,6 @@ void Piano::removePreparationFromKeymap(BKPreparationType thisType, int thisId, 
 
 void Piano::configureDirectModification(int key, DirectModPreparation::Ptr dmod, Array<int> whichPreps)
 {
-    DBG("key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
-    
     int whichMod = dmod->getId();
     
     // Add Modifications
@@ -349,8 +332,6 @@ void Piano::configureDirectModification(int key, DirectModPreparation::Ptr dmod,
             for (auto prep : whichPreps)
             {
                 modificationMap[key]->addDirectModification(new DirectModification(key, prep, (DirectParameterType)n, param, whichMod));
-                
-                DBG("ADD whichmod: " + String(whichMod) + " whichprep: " + String(prep) + " whichtype: " + cDirectParameterTypes[n] + " val: " +param + " TO key: " + String(key));
             }
         }
     }
@@ -622,7 +603,9 @@ void Piano::configureModification(ItemMapper::Ptr map)
     
     Array<int> whichKeymaps = map->getConnectionIdsOfType(PreparationTypeKeymap);
     
-    if (modType < BKPreparationTypeNil) return;
+    DBG("keymaps: " + intArrayToString(whichKeymaps) + " preps: " + intArrayToString(whichPreps));
+    
+    if (modType == BKPreparationTypeNil) return;
     else if (modType == PreparationTypeDirectMod)
     {
         configureDirectModification(modDirect->getUnchecked(Id), whichKeymaps, whichPreps);
@@ -1078,17 +1061,12 @@ void Piano::setState(XmlElement* e)
     if (pianoName != String::empty)
         setName(e->getStringAttribute("bkPianoName"));
     
-    configuration = new PianoConfiguration();
     
     forEachXmlChildElement (*e, pc)
     {
         String map =  "mapper" + String(mapperCount);
         
-        if (pc->hasTagName("configuration"))
-        {
-            configuration->setState(pc);
-        }
-        else if (pc->hasTagName(map))
+        if (pc->hasTagName(map))
         {
             i = pc->getStringAttribute("type").getIntValue();
             BKPreparationType type = (BKPreparationType) i;
@@ -1117,7 +1095,7 @@ void Piano::setState(XmlElement* e)
                 else                        targets.add(attr.getIntValue());
             }
             
-            ItemMapper::Ptr mapper = new ItemMapper(type, thisId, keymaps, targets);
+            ItemMapper::Ptr mapper = new ItemMapper(type, thisId);
             mapper->piano = piano;
             
             int resetCount = 0;

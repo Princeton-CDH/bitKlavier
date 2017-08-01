@@ -75,7 +75,7 @@ public:
     
     void update(void) override;
     
-    void fillSelectCB(void);
+    void fillSelectCB(int last, int current);
 
 private:
     float lastPeriodMultiplier;
@@ -105,7 +105,7 @@ public:
     void update(void) override;
     void updateModification(void);
     
-    void fillSelectCB(void);
+    void fillSelectCB(int last, int current);
     
     void timerCallback(void) override {};
 private:

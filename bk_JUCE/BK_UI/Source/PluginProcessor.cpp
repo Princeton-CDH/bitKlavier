@@ -3,8 +3,6 @@
 #include "PluginEditor.h"
 #include "BKPianoSampler.h"
 
-#include "Reset.h"
-
 #define NOST_KEY_OFF 1
 
 //==============================================================================
@@ -149,54 +147,11 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         
         if (m.isNoteOn())
         {
-            /*
-            ++noteOnCount;
-            noteOn.set(noteNumber, true);
-            
-            if (allNotesOff)   allNotesOff = false;
-            
-            // Check PianoMap for whether piano should change due to key strike.
-            int whichPiano = currentPiano->pianoMap[noteNumber] - 1;
-            if (whichPiano >= 0 && whichPiano != currentPiano->getId())
-            {
-                DBG("change piano to " + String(whichPiano));
-                setCurrentPiano(whichPiano);
-            }
-            
-            // modifications
-            performResets(noteNumber);
-            performModifications(noteNumber);
-            
-            //tempo
-            
-            // Send key on to each pmap in current piano
-            for (p = currentPiano->activePMaps.size(); --p >= 0;) {
-                //DBG("noteon: " +String(noteNumber) + " pmap: " + String(p));
-                currentPiano->activePMaps[p]->keyPressed(noteNumber, velocity, channel);
-            }
-             */
             handleNoteOn(noteNumber, velocity, channel);
         }
         else if (m.isNoteOff())
         {
-            /*
-            noteOn.set(noteNumber, false);
-            
-            // Send key off to each pmap in current piano
-            for (p = currentPiano->activePMaps.size(); --p >= 0;)
-                currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel);
-            
-            // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
-            for (p = prevPianos.size(); --p >= 0;) {
-                for (pm = prevPianos[p]->activePMaps.size(); --pm >= 0;) {
-                    prevPianos[p]->activePMaps[pm]->postRelease(noteNumber, velocity, channel);
-                }
-            }
-            
-            --noteOnCount;
-             */
             handleNoteOff(noteNumber, velocity, channel);
-            
         }
         else if (m.isController())
         {

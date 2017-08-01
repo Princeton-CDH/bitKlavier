@@ -17,7 +17,6 @@
 
 #include "PluginProcessor.h"
 
-#include "Preparation.h"
 #include "ItemMapper.h"
 
 class BKItem : public ItemMapper, public BKDraggableComponent, public BKListener
@@ -28,6 +27,8 @@ public:
     typedef Array<Ptr>                          PtrArr;
     
     BKItem(BKPreparationType type, int Id, BKAudioProcessor& p);
+    
+    BKItem(ItemMapper::Ptr mapper, BKAudioProcessor& p);
     
     ~BKItem(void);
     
@@ -63,7 +64,7 @@ public:
         
         setBounds(X,Y,width,height);
         
-        saveXY(X,Y);
+        saveBounds(getBounds());
     }
     
     void copy(BKItem::Ptr);
@@ -91,6 +92,8 @@ private:
     // Piano stuff
     BKComboBox menu; int currentId;
     
+    BKItem::PtrArr connections;
+    
     // UI stuff
     Component fullChild;
     
@@ -112,15 +115,17 @@ public:
     }
 
     BKItem::Ptr get(BKPreparationType type, int Id);
-    BKItem::PtrArr getConnections(BKItem* item);
     
-    void add(BKItem* itemToAdd);
+    void addAndRegisterItem(BKItem* item);
+    void addItem(BKItem* item);
+    void registerItem(BKItem* item);
+    
+    void removeItem(BKItem* thisItem);
+    void unregisterItem(BKItem* thisItem);
+    void removeAndUnregisterItem(BKItem* thisItem);
     
     bool contains(BKItem* thisItem);
     bool contains(BKPreparationType type, int Id);
-    
-    void remove(BKItem* itemToRemove);
-    void remove(BKPreparationType type, int Id);
     
     void removeUI(BKItem* itemToRemove);
     void removeKeymap(BKItem* itemToRemove);
@@ -132,6 +137,9 @@ public:
     void disconnect(BKItem* item1, BKItem* item2);
     
     void reconnect(BKItem* item1, BKItem* item2);
+    
+    BKItem::Ptr getItem(ItemMapper::Ptr mapper);
+    BKItem::Ptr createItem(ItemMapper::Ptr mapper);
     
     void update(BKPreparationType type, int which);
     void updateMod(BKPreparationType modType, int modId);
@@ -193,12 +201,7 @@ public:
     }
     
     
-    Array<Line<float>> getLines(void);
-    
-    inline void drawLine(float ox, float oy, float ex, float ey)
-    {
-        //lines.add(Line<float>(ox,oy,ex,ey));
-    }
+    Array<Line<int>> getLines(void);
     
     inline void print(void)
     {

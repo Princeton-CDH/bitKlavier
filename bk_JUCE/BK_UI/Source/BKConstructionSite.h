@@ -20,7 +20,7 @@
 
 #include "BKGraph.h"
 
-class BKConstructionSite : public BKDraggableComponent, public KeyListener, public LassoSource<BKItem*>
+class BKConstructionSite : public BKDraggableComponent, public LassoSource<BKItem*>
 {
 public:
     BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph);
@@ -97,8 +97,6 @@ private:
     void mouseMove (const MouseEvent& e) override;
     
     void deleteItem (BKItem* item);
-    
-    bool keyPressed (const KeyPress& e, Component*) override;
     
     BKItem* getItemAtPoint(const int X, const int Y);
 

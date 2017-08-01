@@ -63,10 +63,6 @@ protected:
     
 private:
     
-    
-    
-    
-    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicViewController)
 };
 
@@ -87,6 +83,8 @@ public:
     
     void timerCallback() override;
     
+    void fillSelectCB(int last, int current);
+    
 private:
 
     void bkTextFieldDidChange       (TextEditor&)           override;
@@ -99,8 +97,6 @@ private:
     
     void multiSliderDidChange(String name, int whichSlider, Array<float> values) override;
     void multiSlidersDidChange(String name, Array<Array<float>> values) override;
-    
-    void fillSelectCB(void);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicPreparationEditor)
 };
@@ -125,6 +121,8 @@ public:
     
     void timerCallback() override;
     
+    void fillSelectCB(int last, int current);
+    
 private:
     
     void bkTextFieldDidChange       (TextEditor&)           override;
@@ -138,7 +136,6 @@ private:
     void multiSliderDidChange(String name, int whichSlider, Array<float> values) override;
     void multiSlidersDidChange(String name, Array<Array<float>> values) override;
     
-    void fillSelectCB(void);
     void greyOutAllComponents();
     void highlightModedComponents();
     

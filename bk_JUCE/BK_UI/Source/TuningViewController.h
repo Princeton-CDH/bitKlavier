@@ -102,6 +102,8 @@ public:
     
     void update(void) override;
     
+    void fillSelectCB(int last, int current);
+    
 private:
     
     void bkComboBoxDidChange (ComboBox* box) override;
@@ -110,7 +112,7 @@ private:
     void BKSingleSliderValueChanged(String name, double val) override;
     void keyboardSliderChanged(String name, Array<float> values) override;
     
-    void fillSelectCB(void);    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningPreparationEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningPreparationEditor)
     
 };
 
@@ -128,6 +130,8 @@ public:
     void update(void) override;
     void updateModification(void);
     
+    void fillSelectCB(int last, int current);
+    
 private:
     
     void bkComboBoxDidChange (ComboBox* box) override;
@@ -136,7 +140,6 @@ private:
     void BKSingleSliderValueChanged(String name, double val) override;
     void keyboardSliderChanged(String name, Array<float> values) override;
     
-    void fillSelectCB(void);
     void greyOutAllComponents();
     void highlightModedComponents();
     

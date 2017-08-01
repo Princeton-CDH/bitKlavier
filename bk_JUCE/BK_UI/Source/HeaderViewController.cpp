@@ -258,7 +258,8 @@ void HeaderViewController::fillPianoCB(void)
     int count = 0;
     for (auto piano : processor.gallery->getPianos())
     {
-        pianoCB.addItem(piano->getName(), ++count);
+        String name = piano->getName();
+        if (name != String::empty)  pianoCB.addItem(name, ++count);
     }
     pianoCB.addSeparator();
     pianoCB.addItem("New piano...", ++count);

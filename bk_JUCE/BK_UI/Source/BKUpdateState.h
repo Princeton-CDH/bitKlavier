@@ -24,74 +24,14 @@ public:
    
     BKUpdateState()
     {
-        for (int i = 0; i < BKPreparationTypeNil; i++)
-        {
-            active.add(Array<int>());
-        }
         
-    };
+    }
     
     ~BKUpdateState()
     {
-    };
-    
-    inline void removeActive(BKPreparationType type, int Id)
-    {
-        if (type == BKPreparationTypeNil) return;
         
-        Array<int> theseActive = active.getUnchecked(type);
-
-        for (int i = theseActive.size(); --i>=0;)
-        {
-            if (theseActive[i] == Id) theseActive.remove(i);
-        }
-        
-        active.set(type, theseActive);
-        
-        DBG("active: " + arrayIntArrayToString(active));
-
     }
-    
-    inline void addActive(BKPreparationType type, int Id)
-    {
-        if (type == BKPreparationTypeNil) return;
-        
-        Array<int> theseActive = active.getUnchecked(type);
-        
-        theseActive.addIfNotAlreadyThere(Id);
-        
-        active.set(type, theseActive);
-        
-        DBG("active: " + arrayIntArrayToString(active));
 
-    }
-    
-    inline bool isActive(BKPreparationType type, int Id)
-    {
-        if (type == BKPreparationTypeNil) return false;
-        
-        bool isThere = false;
-        
-        Array<int> theseActive = active.getUnchecked(type);
-        
-        isThere = theseActive.contains(Id);
-        
-        DBG("active: " + arrayIntArrayToString(active));
-
-        
-        return isThere;
-    }
-    
-    inline void clearActive(void)
-    {
-        for (int i = 0; i < BKPreparationTypeNil; i++)
-        {
-            active.set(i, Array<int>());
-        }
-    }
-    
-    Array< Array<int>> active = Array <Array<int>>();
-    
     int  currentDirectId = 1;
     int  currentSynchronicId = 1;
     int  currentNostalgicId = 1;

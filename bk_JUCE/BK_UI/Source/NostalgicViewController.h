@@ -63,7 +63,7 @@ public:
     
     void update(void) override;
     
-    void fillSelectCB(void);
+    void fillSelectCB(int last, int current);
     
     void timerCallback() override;
     
@@ -110,7 +110,7 @@ public:
     void BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow) override;
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
     
-    void fillSelectCB(void);
+    void fillSelectCB(int last, int current);
     void greyOutAllComponents();
     void highlightModedComponents();
     

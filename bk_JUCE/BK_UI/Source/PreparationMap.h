@@ -15,7 +15,12 @@
 
 #include "BKUtilities.h"
 #include "Keymap.h"
-#include "Preparation.h"
+
+#include "Synchronic.h"
+#include "Direct.h"
+#include "Nostalgic.h"
+#include "Tempo.h"
+#include "Tuning.h"
 
 class PreparationMap : public ReferenceCountedObject
 {
