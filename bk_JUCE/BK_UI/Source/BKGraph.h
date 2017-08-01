@@ -151,8 +151,114 @@ public:
         return (BKPreparationType)(type+6);
     }
     
-    
-
+    inline bool isValidConnection(BKPreparationType type1, BKPreparationType type2)
+    {
+        if (type1 == PreparationTypeDirect)
+        {
+            if (type2 == PreparationTypeKeymap ||
+                type2 == PreparationTypeTuning ||
+                type2 == PreparationTypeDirectMod ||
+                type2 == PreparationTypeGenericMod ||
+                type2 == PreparationTypeReset)
+                return true;
+        }
+        else if (type1 == PreparationTypeNostalgic)
+        {
+            if (type2 == PreparationTypeKeymap ||
+                type2 == PreparationTypeTuning ||
+                type2 == PreparationTypeNostalgicMod ||
+                type2 == PreparationTypeGenericMod ||
+                type2 == PreparationTypeSynchronic ||
+                type2 == PreparationTypeReset)
+                return true;
+        }
+        else if (type1 == PreparationTypeSynchronic)
+        {
+            if (type2 == PreparationTypeKeymap ||
+                type2 == PreparationTypeTuning ||
+                type2 == PreparationTypeSynchronicMod ||
+                type2 == PreparationTypeGenericMod ||
+                type2 == PreparationTypeNostalgic ||
+                type2 == PreparationTypeTempo ||
+                type2 == PreparationTypeReset)
+                return true;
+        }
+        else if (type1 == PreparationTypeTuning)
+        {
+            if (type2 == PreparationTypeKeymap ||
+                type2 == PreparationTypeSynchronic ||
+                type2 == PreparationTypeDirect ||
+                type2 == PreparationTypeNostalgic ||
+                type2 == PreparationTypeTuningMod ||
+                type2 == PreparationTypeGenericMod ||
+                type2 == PreparationTypeReset)
+                return true;
+        }
+        else if (type1 == PreparationTypeTempo)
+        {
+            if (type2 == PreparationTypeKeymap ||
+                type2 == PreparationTypeSynchronic ||
+                type2 == PreparationTypeTempoMod ||
+                type2 == PreparationTypeGenericMod ||
+                type2 == PreparationTypeReset)
+                return true;
+        }
+        else if (type1 == PreparationTypeKeymap)
+        {
+            if (type2 != PreparationTypeKeymap)
+                return true;
+        }
+        else if (type1 == PreparationTypeDirectMod)
+        {
+            if (type2 == PreparationTypeKeymap ||
+                type2 == PreparationTypeDirect)
+                return true;
+        }
+        else if (type1 == PreparationTypeNostalgicMod)
+        {
+            if (type2 == PreparationTypeKeymap ||
+                type2 == PreparationTypeNostalgic)
+                return true;
+        }
+        else if (type1 == PreparationTypeSynchronicMod)
+        {
+            if (type2 == PreparationTypeKeymap ||
+                type2 == PreparationTypeSynchronic)
+                return true;
+        }
+        else if (type1 == PreparationTypeTuningMod)
+        {
+            if (type2 == PreparationTypeKeymap ||
+                type2 == PreparationTypeTuning)
+                return true;
+        }
+        else if (type1 == PreparationTypeTempoMod)
+        {
+            if (type2 == PreparationTypeKeymap ||
+                type2 == PreparationTypeTempo)
+                return true;
+        }
+        else if (type1 == PreparationTypeReset)
+        {
+            if (type2 == PreparationTypeKeymap ||
+                (type2 >= PreparationTypeDirect && type2 <= PreparationTypeTempo))
+                return true;
+        }
+        else if (type1 == PreparationTypePianoMap)
+        {
+            if (type2 == PreparationTypeKeymap)
+                return true;
+        }
+        else if (type1 == PreparationTypeGenericMod)
+        {
+            if (type2 == PreparationTypeKeymap ||
+                (type2 >= PreparationTypeDirect && type2 <= PreparationTypeTempo))
+                return true;
+        }
+        
+        
+        return false;
+    }
     
     inline void select(BKItem* item)
     {

@@ -144,8 +144,13 @@ void BKItem::setItemType(BKPreparationType newType, bool create)
         Piano::PtrArr pianos = processor.gallery->getPianos();
         for (int i = 0; i < pianos.size(); i++)
         {
-            menu.addItem(pianos[i]->getName(), i+1);
-            menu.addSeparator();
+            String name = pianos[i]->getName();
+            
+            if (name != String::empty)
+            {
+                menu.addItem(pianos[i]->getName(), i+1);
+                menu.addSeparator();
+            }
         }
         
         menu.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypePiano, processor.currentPiano->getId()),
@@ -611,10 +616,12 @@ void BKItemGraph::disconnectUI(BKItem* item1, BKItem* item2)
 
 void BKItemGraph::connect(BKItem* item1, BKItem* item2)
 {
+    if ((item1 == item2) || (item1->isConnectedTo(item2) && item2->isConnectedTo(item1))) return;
+    
     BKPreparationType item1Type = item1->getType();
     BKPreparationType item2Type = item2->getType();
-    int item1Id = item1->getId();
-    int item2Id = item2->getId();
+    
+    if (!(isValidConnection(item1Type, item2Type))) return;
     
     if (item1Type == PreparationTypeGenericMod)
     {
@@ -624,13 +631,93 @@ void BKItemGraph::connect(BKItem* item1, BKItem* item2)
         }
         else return;
     }
-    if (item2Type == PreparationTypeGenericMod)
+    else if (item2Type == PreparationTypeGenericMod)
     {
         if (item1Type >= PreparationTypeDirect && item1Type <= PreparationTypeTempo)
         {
             item2->setItemType(getModType(item1Type), true);
         }
         else return;
+    }
+    else if (item1Type == PreparationTypeNostalgic && item2Type == PreparationTypeSynchronic)
+    {
+        ItemMapper::PtrArr synchronics = item1->getConnectionsOfType(PreparationTypeSynchronic);
+        
+        for (auto sync : synchronics)
+        {
+            item1->removeConnection(sync);
+            sync->removeConnection(item1);
+        }
+    }
+    else if (item1Type == PreparationTypeSynchronic && item2Type == PreparationTypeNostalgic)
+    {
+        ItemMapper::PtrArr synchronics = item2->getConnectionsOfType(PreparationTypeSynchronic);
+        
+        for (auto sync : synchronics)
+        {
+            item2->removeConnection(sync);
+            sync->removeConnection(item2);
+        }
+    }
+    else if (item1Type == PreparationTypeSynchronic && item2Type == PreparationTypeTempo)
+    {
+        ItemMapper::PtrArr tempos = item1->getConnectionsOfType(PreparationTypeTempo);
+        
+        for (auto temp : tempos)
+        {
+            item1->removeConnection(temp);
+            temp->removeConnection(item1);
+        }
+    }
+    else if (item1Type == PreparationTypeTempo && item2Type == PreparationTypeSynchronic)
+    {
+        ItemMapper::PtrArr tempos = item2->getConnectionsOfType(PreparationTypeTempo);
+        
+        for (auto temp : tempos)
+        {
+            item2->removeConnection(temp);
+            temp->removeConnection(item2);
+        }
+    }
+    else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypePianoMap)
+    {
+        ItemMapper::PtrArr pianos = item1->getConnectionsOfType(PreparationTypePianoMap);
+        
+        for (auto piano : pianos)
+        {
+            item1->removeConnection(piano);
+            piano->removeConnection(item1);
+        }
+    }
+    else if (item1Type == PreparationTypePianoMap && item2Type == PreparationTypeKeymap)
+    {
+        ItemMapper::PtrArr pianos = item2->getConnectionsOfType(PreparationTypePianoMap);
+        
+        for (auto piano : pianos)
+        {
+            item2->removeConnection(piano);
+            piano->removeConnection(item2);
+        }
+    }
+    else if ((item1Type >= PreparationTypeDirect && item1Type <= PreparationTypeTempo) && item2Type == PreparationTypeTuning)
+    {
+        ItemMapper::PtrArr tunings = item1->getConnectionsOfType(PreparationTypeTuning);
+        
+        for (auto tune : tunings)
+        {
+            item1->removeConnection(tune);
+            tune->removeConnection(item1);
+        }
+    }
+    else if (item1Type == PreparationTypeTuning && (item2Type >= PreparationTypeDirect && item2Type <= PreparationTypeTempo))
+    {
+        ItemMapper::PtrArr tunings = item2->getConnectionsOfType(PreparationTypeTuning);
+        
+        for (auto tune : tunings)
+        {
+            item2->removeConnection(tune);
+            tune->removeConnection(item2);
+        }
     }
     
     item1->addConnection(item2);
@@ -778,19 +865,103 @@ Array<Line<int>> BKItemGraph::getLines(void)
 {
     Array<Line<int>> lines;
     
-    for (auto thisItem : items)
+    for (auto item : items)
     {
-        for (auto otherItem : thisItem->getConnections())
-        {
-            Rectangle<int> otherBounds = otherItem->retrieveBounds();
-
-            lines.add(Line<int>(thisItem->getX() + thisItem->getWidth()/2.0f,
-                                thisItem->getY() + thisItem->getHeight()/2.0f,
-                                otherBounds.getX() + otherBounds.getWidth()/2.0f,
-                                otherBounds.getY() + otherBounds.getHeight()/2.0f));
-        }
-    }
+        BKPreparationType type = item->getType();
+        int Id = item->getId();
     
+        if (type == PreparationTypeKeymap)
+        {
+            ItemMapper::PtrArr connex = item->getConnections();
+            for (auto target : connex)
+            {
+                Rectangle<int> otherBounds = target->retrieveBounds();
+                
+                lines.add(Line<int>(item->getX() + item->getWidth()/2.0f,
+                                    item->getY() + item->getHeight()/2.0f,
+                                    otherBounds.getX() + otherBounds.getWidth()/2.0f,
+                                    otherBounds.getY() + otherBounds.getHeight()/2.0f));
+            }
+        }
+        else if (type == PreparationTypeTuning)
+        {
+            // Look for synchronic, direct, and nostalgic targets
+            for (auto target : item->getConnections())
+            {
+                BKPreparationType targetType = target->getType();
+                int targetId = target->getId();
+                
+                if (targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic)
+                {
+                    Rectangle<int> otherBounds = target->retrieveBounds();
+                    
+                    lines.add(Line<int>(item->getX() + item->getWidth()/2.0f,
+                                        item->getY() + item->getHeight()/2.0f,
+                                        otherBounds.getX() + otherBounds.getWidth()/2.0f,
+                                        otherBounds.getY() + otherBounds.getHeight()/2.0f));
+                }
+            }
+        }
+        else if (type == PreparationTypeTempo)
+        {
+            // Look for synchronic targets
+            for (auto target : item->getConnections())
+            {
+                BKPreparationType targetType = target->getType();
+                int targetId = target->getId();
+                
+                if (targetType == PreparationTypeSynchronic)
+                {
+                    Rectangle<int> otherBounds = target->retrieveBounds();
+                    
+                    lines.add(Line<int>(item->getX() + item->getWidth()/2.0f,
+                                        item->getY() + item->getHeight()/2.0f,
+                                        otherBounds.getX() + otherBounds.getWidth()/2.0f,
+                                        otherBounds.getY() + otherBounds.getHeight()/2.0f));
+                }
+            }
+        }
+        else if (type == PreparationTypeSynchronic)
+        {
+            // Look for nostalgic targets
+            for (auto target : item->getConnections())
+            {
+                BKPreparationType targetType = target->getType();
+                int targetId = target->getId();
+                
+                if (targetType == PreparationTypeNostalgic)
+                {
+                    Rectangle<int> otherBounds = target->retrieveBounds();
+                    
+                    lines.add(Line<int>(item->getX() + item->getWidth()/2.0f,
+                                        item->getY() + item->getHeight()/2.0f,
+                                        otherBounds.getX() + otherBounds.getWidth()/2.0f,
+                                        otherBounds.getY() + otherBounds.getHeight()/2.0f));
+                }
+            }
+        }
+        else if ((type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod) || type == PreparationTypeReset)
+        {
+            // Look for nostalgic targets
+            for (auto target : item->getConnections())
+            {
+                BKPreparationType targetType = target->getType();
+                
+                if (targetType != PreparationTypeKeymap)
+                {
+                    Rectangle<int> otherBounds = target->retrieveBounds();
+                    
+                    lines.add(Line<int>(item->getX() + item->getWidth()/2.0f,
+                                        item->getY() + item->getHeight()/2.0f,
+                                        otherBounds.getX() + otherBounds.getWidth()/2.0f,
+                                        otherBounds.getY() + otherBounds.getHeight()/2.0f));
+                }
+            }
+        }
+        
+        
+        
+    }
     return lines;
 }
 

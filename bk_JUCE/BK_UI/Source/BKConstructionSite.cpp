@@ -151,14 +151,14 @@ void BKConstructionSite::paint(Graphics& g)
     
     if (connect)
     {
-        g.setColour(Colours::goldenrod);
+        g.setColour(Colours::lightgrey);
         g.drawLine(lineOX, lineOY, lineEX, lineEY, 3);
     }
     
     for (auto line : graph->getLines())
     {
         g.setColour(Colours::goldenrod);
-        g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY(), 3);
+        g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY(), 2);
     }
 }
 
