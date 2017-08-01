@@ -240,8 +240,6 @@ void KeymapViewController::keymapUpdated(TextEditor& tf)
     
     keyboard->setKeysInKeymap(keys);
     
-    theGraph->update(PreparationTypeKeymap, processor.updateState->currentKeymapId);
-    
     keymapTF.setVisible(false);
     keymapTF.toBack();
 
@@ -317,9 +315,6 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
     BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
     
     keyboard->setKeysInKeymap(thisKeymap->keys());
-    
-    theGraph->update(PreparationTypeKeymap, processor.updateState->currentKeymapId);
-    
 }
 
 

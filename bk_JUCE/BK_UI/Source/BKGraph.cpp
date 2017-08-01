@@ -439,122 +439,12 @@ BKItem::Ptr BKItemGraph::get(BKPreparationType type, int Id)
     return thisItem;
 }
 
-void BKItemGraph::removeUI(BKItem* itemToRemove)
-{
-    for (auto item : itemToRemove->getConnections())
-    {
-        disconnectUI(itemToRemove, getItem(item));
-    }
-
-    items.removeObject(itemToRemove);
-    
-}
-
 void BKItemGraph::clear(void)
 {
     for (auto itemToRemove : items)
     {
         removeAndUnregisterItem(itemToRemove);
     }
-}
-
-void BKItemGraph::route(bool connect, bool reconfigure, BKItem* item1, BKItem* item2)
-{
-    BKPreparationType item1Type = item1->getType();
-    int item1Id = item1->getId();
-    
-    BKPreparationType item2Type = item2->getType();
-    int item2Id = item2->getId();
-    
-    // DEAL WITH CONNECTION STUFF OVER HERE... or not? maybe move all connection/graph stuff to piano
-
-    
-    if (connect)
-    {
-        if (item1->isConnectedTo(item2Type, item2Id) && item2->isConnectedTo(item1Type, item1Id)) return;
-        
-        if (item1Type == PreparationTypeTuning && item2Type <= PreparationTypeNostalgic)
-        {
-            if (item2Type == PreparationTypeDirect)
-            {
-                disconnectTuningFromDirect(item2);
-            }
-            else if (item2Type == PreparationTypeNostalgic)
-            {
-                disconnectTuningFromNostalgic(item2);
-            }
-            if (item2Type == PreparationTypeSynchronic)
-            {
-                disconnectTuningFromSynchronic(item2);
-            }
-        }
-        else if (item1Type <= PreparationTypeNostalgic && item2Type == PreparationTypeTuning)
-        {
-            if (item1Type == PreparationTypeDirect)
-            {
-                disconnectTuningFromDirect(item1);
-            }
-            else if (item1Type == PreparationTypeNostalgic)
-            {
-                disconnectTuningFromNostalgic(item1);
-            }
-            if (item1Type == PreparationTypeSynchronic)
-            {
-                disconnectTuningFromSynchronic(item1);
-            }
-
-        }
-        else if (item1Type == PreparationTypeSynchronic && item2Type == PreparationTypeTempo)
-        {
-            disconnectTempoFromSynchronic(item1);
-        }
-        else if (item1Type == PreparationTypeTempo && item2Type == PreparationTypeSynchronic)
-        {
-            disconnectTempoFromSynchronic(item2);
-        }
-        else if (item1Type == PreparationTypeSynchronic && item2Type == PreparationTypeNostalgic)
-        {
-            disconnectSynchronicFromNostalgic(item2);
-        }
-        else if (item1Type == PreparationTypeNostalgic && item2Type == PreparationTypeSynchronic)
-        {
-            disconnectSynchronicFromNostalgic(item1);
-        }
-        // MODS RESETS AND PMAPS CAN ONLY HAVE ONE KEYMAP!
-        else if (item2Type == PreparationTypeKeymap  &&
-                (item1Type == PreparationTypePianoMap || item1Type == PreparationTypeGenericMod || item1Type == PreparationTypeReset))
-        {
-            if (item1->getConnectionsOfType(PreparationTypeKeymap).size()) return;
-        }
-        else if (item1Type == PreparationTypeKeymap &&
-                (item2Type == PreparationTypePianoMap || item2Type == PreparationTypeGenericMod || item2Type == PreparationTypeReset))
-        {
-            if (item2->getConnectionsOfType(PreparationTypeKeymap).size()) return;
-        }
-        
-        // MODS RESETS AND PMAPS CAN ONLY HAVE ONE KEYMAP!
-        
-        item1->addConnection(item2);
-        item2->addConnection(item1);
-        
-    }
-    else // !connect
-    {
-        if (!item1->isConnectedTo(item2Type, item1Type) && !item2->isConnectedTo(item1Type, item1Id)) return;
-        
-        item1->removeConnection(item2Type, item2Id);
-        item2->removeConnection(item1Type, item1Id);
-    }
-}
-
-
-
-void BKItemGraph::reconnect(BKItem* item1, BKItem* item2)
-{
-    route(false, true, item1, item2);
-    route(true, true, item1, item2);
-    
-    print();
 }
 
 BKItem::Ptr BKItemGraph::getItem(ItemMapper::Ptr mapper)
@@ -569,49 +459,6 @@ BKItem::Ptr BKItemGraph::getItem(ItemMapper::Ptr mapper)
 BKItem::Ptr BKItemGraph::createItem(ItemMapper::Ptr mapper)
 {
     return new BKItem(mapper, processor);
-}
-
-void BKItemGraph::update(BKPreparationType type, int Id)
-{
-    // Only applies to Keymaps and Modification types, so as to make sure that when ModPreparations are changed, so are the Modifications.
-    // Also applies to PianoMaps.
-
-    if (type == PreparationTypeKeymap || type == PreparationTypePianoMap || (type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod)) // All the mods
-    {
-        for (auto item : items)
-        {
-            if (item->getType() == type && item->getId() == Id)
-            {
-                for (auto connection : item->getConnections())
-                {
-                    reconnect(item, getItem(connection));
-                }
-            }
-        }
-    }
-    
-
-}
-
-
-
-void BKItemGraph::updateMod(BKPreparationType modType, int modId)
-{
-    for (auto item : items)
-    {
-        if (item->getType() == modType && item->getId() == modId)
-        {
-            for (auto connection : item->getConnections())
-            {
-                reconnect(item,  getItem(connection));
-            }
-        }
-    }
-}
-
-void BKItemGraph::disconnectUI(BKItem* item1, BKItem* item2)
-{
-    
 }
 
 void BKItemGraph::connect(BKItem* item1, BKItem* item2)
@@ -726,12 +573,6 @@ void BKItemGraph::connect(BKItem* item1, BKItem* item2)
     processor.currentPiano->configure();
 }
 
-void BKItemGraph::connectWithoutCreatingNew(BKItem* item1, BKItem* item2)
-{
-    item1->addConnection(item2);
-    item2->addConnection(item1);
-}
-
 void BKItemGraph::disconnect(BKItem* item1, BKItem* item2)
 {
     BKPreparationType item1Type = item1->getType();
@@ -754,109 +595,6 @@ void BKItemGraph::disconnect(BKItem* item1, BKItem* item2)
         if (!item2->isConnectedToAnyPreparation())
         {
             item2->setItemType(PreparationTypeGenericMod, false);
-        }
-    }
-}
-
-void BKItemGraph::disconnectTuningFromSynchronic(BKItem* synchronicItem)
-{
-    BKPreparationType thisItemType = synchronicItem->getType();
-    
-    if (thisItemType != PreparationTypeSynchronic) return;
-    
-    for (auto otherItem : synchronicItem->getConnections())
-    {
-        BKPreparationType otherItemType = otherItem->getType();
-        
-        if (otherItemType == PreparationTypeTuning)
-        {
-            // reset tempo of synchronic in model
-            
-            synchronicItem->removeConnection(otherItem);
-            otherItem->removeConnection(synchronicItem);
-        }
-    }
-    
-}
-
-void BKItemGraph::disconnectTuningFromNostalgic(BKItem* nostalgicItem)
-{
-    BKPreparationType thisItemType = nostalgicItem->getType();
-    
-    if (thisItemType != PreparationTypeNostalgic) return;
-    
-    for (auto otherItem : nostalgicItem->getConnections())
-    {
-        BKPreparationType otherItemType = otherItem->getType();
-        
-        if (otherItemType == PreparationTypeTuning)
-        {
-            // reset tempo of synchronic in model
-            
-            nostalgicItem->removeConnection(otherItem);
-            otherItem->removeConnection(nostalgicItem);
-        }
-    }
-    
-}
-
-void BKItemGraph::disconnectTuningFromDirect(BKItem* directItem)
-{
-    BKPreparationType thisItemType = directItem->getType();
-    
-    if (thisItemType != PreparationTypeDirect) return;
-    
-    for (auto otherItem : directItem->getConnections())
-    {
-        BKPreparationType otherItemType = otherItem->getType();
-        
-        if (otherItemType == PreparationTypeTuning)
-        {
-            // reset tempo of synchronic in model
-            
-            directItem->removeConnection(otherItem);
-            otherItem->removeConnection(directItem);
-        }
-    }
-    
-}
-
-void BKItemGraph::disconnectTempoFromSynchronic(BKItem* synchronicItem)
-{
-    BKPreparationType thisItemType = synchronicItem->getType();
-    
-    if (thisItemType != PreparationTypeSynchronic) return;
-
-    for (auto otherItem : synchronicItem->getConnections())
-    {
-        BKPreparationType otherItemType = otherItem->getType();
-        
-        if (otherItemType == PreparationTypeTempo)
-        {
-            // reset tempo of synchronic in model
-            
-            synchronicItem->removeConnection(otherItem);
-            otherItem->removeConnection(synchronicItem);
-        }
-    }
-}
-
-void BKItemGraph::disconnectSynchronicFromNostalgic(BKItem* nostalgicItem)
-{
-    BKPreparationType thisItemType = nostalgicItem->getType();
-    
-    if (thisItemType != PreparationTypeNostalgic) return;
-    
-    for (auto otherItem : nostalgicItem->getConnections())
-    {
-        BKPreparationType otherItemType = otherItem->getType();
-        
-        if (otherItemType == PreparationTypeSynchronic)
-        {
-            // reset tempo of synchronic in model
-            
-            nostalgicItem->removeConnection(otherItem);
-            otherItem->removeConnection(nostalgicItem);
         }
     }
 }
@@ -978,6 +716,115 @@ void BKItemGraph::reconstruct(void)
         
         newItem->setTopLeftPosition(newItem->retrieveXY());
     }
+}
+
+bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType type2)
+{
+    if (type1 == PreparationTypeDirect)
+    {
+        if (type2 == PreparationTypeKeymap ||
+            type2 == PreparationTypeTuning ||
+            type2 == PreparationTypeDirectMod ||
+            type2 == PreparationTypeGenericMod ||
+            type2 == PreparationTypeReset)
+            return true;
+    }
+    else if (type1 == PreparationTypeNostalgic)
+    {
+        if (type2 == PreparationTypeKeymap ||
+            type2 == PreparationTypeTuning ||
+            type2 == PreparationTypeNostalgicMod ||
+            type2 == PreparationTypeGenericMod ||
+            type2 == PreparationTypeSynchronic ||
+            type2 == PreparationTypeReset)
+            return true;
+    }
+    else if (type1 == PreparationTypeSynchronic)
+    {
+        if (type2 == PreparationTypeKeymap ||
+            type2 == PreparationTypeTuning ||
+            type2 == PreparationTypeSynchronicMod ||
+            type2 == PreparationTypeGenericMod ||
+            type2 == PreparationTypeNostalgic ||
+            type2 == PreparationTypeTempo ||
+            type2 == PreparationTypeReset)
+            return true;
+    }
+    else if (type1 == PreparationTypeTuning)
+    {
+        if (type2 == PreparationTypeKeymap ||
+            type2 == PreparationTypeSynchronic ||
+            type2 == PreparationTypeDirect ||
+            type2 == PreparationTypeNostalgic ||
+            type2 == PreparationTypeTuningMod ||
+            type2 == PreparationTypeGenericMod ||
+            type2 == PreparationTypeReset)
+            return true;
+    }
+    else if (type1 == PreparationTypeTempo)
+    {
+        if (type2 == PreparationTypeKeymap ||
+            type2 == PreparationTypeSynchronic ||
+            type2 == PreparationTypeTempoMod ||
+            type2 == PreparationTypeGenericMod ||
+            type2 == PreparationTypeReset)
+            return true;
+    }
+    else if (type1 == PreparationTypeKeymap)
+    {
+        if (type2 != PreparationTypeKeymap)
+            return true;
+    }
+    else if (type1 == PreparationTypeDirectMod)
+    {
+        if (type2 == PreparationTypeKeymap ||
+            type2 == PreparationTypeDirect)
+            return true;
+    }
+    else if (type1 == PreparationTypeNostalgicMod)
+    {
+        if (type2 == PreparationTypeKeymap ||
+            type2 == PreparationTypeNostalgic)
+            return true;
+    }
+    else if (type1 == PreparationTypeSynchronicMod)
+    {
+        if (type2 == PreparationTypeKeymap ||
+            type2 == PreparationTypeSynchronic)
+            return true;
+    }
+    else if (type1 == PreparationTypeTuningMod)
+    {
+        if (type2 == PreparationTypeKeymap ||
+            type2 == PreparationTypeTuning)
+            return true;
+    }
+    else if (type1 == PreparationTypeTempoMod)
+    {
+        if (type2 == PreparationTypeKeymap ||
+            type2 == PreparationTypeTempo)
+            return true;
+    }
+    else if (type1 == PreparationTypeReset)
+    {
+        if (type2 == PreparationTypeKeymap ||
+            (type2 >= PreparationTypeDirect && type2 <= PreparationTypeTempo))
+            return true;
+    }
+    else if (type1 == PreparationTypePianoMap)
+    {
+        if (type2 == PreparationTypeKeymap)
+            return true;
+    }
+    else if (type1 == PreparationTypeGenericMod)
+    {
+        if (type2 == PreparationTypeKeymap ||
+            (type2 >= PreparationTypeDirect && type2 <= PreparationTypeTempo))
+            return true;
+    }
+    
+    
+    return false;
 }
 
 

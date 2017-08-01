@@ -127,22 +127,13 @@ public:
     bool contains(BKItem* thisItem);
     bool contains(BKPreparationType type, int Id);
     
-    void removeUI(BKItem* itemToRemove);
-    void removeKeymap(BKItem* itemToRemove);
     void clear(void);
-    void connectUI(BKItem* item1, BKItem* item2);
-    void disconnectUI(BKItem* item1, BKItem* item2);
-    void connect(BKItem* item1, BKItem* item2);
-    void connectWithoutCreatingNew(BKItem* item1, BKItem* item2);
-    void disconnect(BKItem* item1, BKItem* item2);
     
-    void reconnect(BKItem* item1, BKItem* item2);
+    void connect(BKItem* item1, BKItem* item2);
+    void disconnect(BKItem* item1, BKItem* item2);
     
     BKItem::Ptr getItem(ItemMapper::Ptr mapper);
     BKItem::Ptr createItem(ItemMapper::Ptr mapper);
-    
-    void update(BKPreparationType type, int which);
-    void updateMod(BKPreparationType modType, int modId);
     
     void reconstruct(void);
     
@@ -151,114 +142,7 @@ public:
         return (BKPreparationType)(type+6);
     }
     
-    inline bool isValidConnection(BKPreparationType type1, BKPreparationType type2)
-    {
-        if (type1 == PreparationTypeDirect)
-        {
-            if (type2 == PreparationTypeKeymap ||
-                type2 == PreparationTypeTuning ||
-                type2 == PreparationTypeDirectMod ||
-                type2 == PreparationTypeGenericMod ||
-                type2 == PreparationTypeReset)
-                return true;
-        }
-        else if (type1 == PreparationTypeNostalgic)
-        {
-            if (type2 == PreparationTypeKeymap ||
-                type2 == PreparationTypeTuning ||
-                type2 == PreparationTypeNostalgicMod ||
-                type2 == PreparationTypeGenericMod ||
-                type2 == PreparationTypeSynchronic ||
-                type2 == PreparationTypeReset)
-                return true;
-        }
-        else if (type1 == PreparationTypeSynchronic)
-        {
-            if (type2 == PreparationTypeKeymap ||
-                type2 == PreparationTypeTuning ||
-                type2 == PreparationTypeSynchronicMod ||
-                type2 == PreparationTypeGenericMod ||
-                type2 == PreparationTypeNostalgic ||
-                type2 == PreparationTypeTempo ||
-                type2 == PreparationTypeReset)
-                return true;
-        }
-        else if (type1 == PreparationTypeTuning)
-        {
-            if (type2 == PreparationTypeKeymap ||
-                type2 == PreparationTypeSynchronic ||
-                type2 == PreparationTypeDirect ||
-                type2 == PreparationTypeNostalgic ||
-                type2 == PreparationTypeTuningMod ||
-                type2 == PreparationTypeGenericMod ||
-                type2 == PreparationTypeReset)
-                return true;
-        }
-        else if (type1 == PreparationTypeTempo)
-        {
-            if (type2 == PreparationTypeKeymap ||
-                type2 == PreparationTypeSynchronic ||
-                type2 == PreparationTypeTempoMod ||
-                type2 == PreparationTypeGenericMod ||
-                type2 == PreparationTypeReset)
-                return true;
-        }
-        else if (type1 == PreparationTypeKeymap)
-        {
-            if (type2 != PreparationTypeKeymap)
-                return true;
-        }
-        else if (type1 == PreparationTypeDirectMod)
-        {
-            if (type2 == PreparationTypeKeymap ||
-                type2 == PreparationTypeDirect)
-                return true;
-        }
-        else if (type1 == PreparationTypeNostalgicMod)
-        {
-            if (type2 == PreparationTypeKeymap ||
-                type2 == PreparationTypeNostalgic)
-                return true;
-        }
-        else if (type1 == PreparationTypeSynchronicMod)
-        {
-            if (type2 == PreparationTypeKeymap ||
-                type2 == PreparationTypeSynchronic)
-                return true;
-        }
-        else if (type1 == PreparationTypeTuningMod)
-        {
-            if (type2 == PreparationTypeKeymap ||
-                type2 == PreparationTypeTuning)
-                return true;
-        }
-        else if (type1 == PreparationTypeTempoMod)
-        {
-            if (type2 == PreparationTypeKeymap ||
-                type2 == PreparationTypeTempo)
-                return true;
-        }
-        else if (type1 == PreparationTypeReset)
-        {
-            if (type2 == PreparationTypeKeymap ||
-                (type2 >= PreparationTypeDirect && type2 <= PreparationTypeTempo))
-                return true;
-        }
-        else if (type1 == PreparationTypePianoMap)
-        {
-            if (type2 == PreparationTypeKeymap)
-                return true;
-        }
-        else if (type1 == PreparationTypeGenericMod)
-        {
-            if (type2 == PreparationTypeKeymap ||
-                (type2 >= PreparationTypeDirect && type2 <= PreparationTypeTempo))
-                return true;
-        }
-        
-        
-        return false;
-    }
+    bool isValidConnection(BKPreparationType type1, BKPreparationType type2);
     
     inline void select(BKItem* item)
     {
@@ -323,27 +207,12 @@ public:
 
     BKItem::RCArr clipboard;
     
-    
-    int itemIdCount;
-    
 private:
     BKAudioProcessor& processor;
     
     BKItem::RCArr items;
 
     void addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId);
-    void removePreparationFromKeymap(BKPreparationType thisType, int thisId, int keymapId);
-    void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
-    void linkSynchronicWithTempo(Synchronic::Ptr synchronic, Tempo::Ptr thisTempo);
-    void linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic);
-    
-    void route(bool connect, bool reconfigure, BKItem* item1, BKItem* item2);
-    
-    void disconnectTuningFromSynchronic(BKItem* item);
-    void disconnectTuningFromNostalgic(BKItem* item);
-    void disconnectTuningFromDirect(BKItem* item);
-    void disconnectTempoFromSynchronic(BKItem* synchronicItem);
-    void disconnectSynchronicFromNostalgic(BKItem* thisItem);
     
     JUCE_LEAK_DETECTOR(BKItemGraph)
 };

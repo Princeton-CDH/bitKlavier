@@ -35,12 +35,7 @@ BKConstructionSite::~BKConstructionSite(void)
 void BKConstructionSite::redraw(void)
 {
     BKItem::RCArr items = graph->getItems();
-    
-    for (auto item : items)
-    {
-        graph->removeUI(item);
-    }
-    
+
     removeAllChildren();
     
     graph->reconstruct();
@@ -169,7 +164,7 @@ void BKConstructionSite::itemIsBeingDragged(BKItem* thisItem, Point<int> startPo
 
 void BKConstructionSite::pianoMapDidChange(BKItem* thisItem)
 {
-    graph->update(PreparationTypePianoMap, thisItem->getId());
+    processor.currentPiano->configure();
 }
 
 void BKConstructionSite::draw(void)
