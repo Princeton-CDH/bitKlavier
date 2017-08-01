@@ -430,6 +430,7 @@ void BKAudioProcessor::saveGalleryAs(void)
     {
         File myFile (myChooser.getResult());
         currentGallery = myFile.getFileName();
+        currentGalleryPath = myFile.getFullPathName();
         
         String currentURL = gallery->getURL();
         String newURL = myFile.getFullPathName();
@@ -484,6 +485,7 @@ void BKAudioProcessor::loadGalleryDialog(void)
     if (myChooser.browseForFileToOpen())
     {
         File myFile (myChooser.getResult());
+        currentGalleryPath = myFile.getFullPathName();
         
         ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
         
@@ -494,6 +496,8 @@ void BKAudioProcessor::loadGalleryDialog(void)
             gallery = new Gallery(xml, &mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, updateState);
             
             initializeGallery();
+            
+            galleryDidLoad = true;
         }
     }
     
@@ -502,6 +506,7 @@ void BKAudioProcessor::loadGalleryDialog(void)
 void BKAudioProcessor::loadGalleryFromPath(String path)
 {
     File myFile (path);
+    currentGalleryPath = path;
     
     ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
     
@@ -512,6 +517,8 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
         gallery = new Gallery(xml, &mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, updateState);
         
         initializeGallery();
+        
+        galleryDidLoad = true;
     }
 }
 
@@ -525,6 +532,7 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
     if (myChooser.browseForFileToOpen())
     {
         File myFile (myChooser.getResult());
+        currentGalleryPath = myFile.getFullPathName();
         
         currentGallery = myFile.getFileName();
         
@@ -533,6 +541,8 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
         gallery = new Gallery(myJson, &mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, updateState);
         
         initializeGallery();
+        
+        galleryDidLoad = true;
     }
     
 }
@@ -543,6 +553,7 @@ void BKAudioProcessor::initializeGallery(void)
     
     prevPiano = gallery->getPiano(0);
     currentPiano = gallery->getPiano(gallery->getCurrentPiano());
+    DBG("initializing current piano " + currentPiano->getName());
     
     updateUI();
     
@@ -560,6 +571,8 @@ void BKAudioProcessor::loadJsonGalleryFromPath(String path)
     gallery = new Gallery(myJson, &mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, updateState);
     
     initializeGallery();
+    
+    galleryDidLoad = true;
     
 }
 

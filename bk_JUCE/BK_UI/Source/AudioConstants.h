@@ -31,6 +31,7 @@ const String jsonDirectLayerX = "direct::directSub.";
 const String jsonNostalgicLayerX = "nostalgic::nostalgicSub.";
 
 const String vtagGallery = "gallery";
+const String vtagGalleryPath = "galleryPath";
 const String vtagGeneral = "general";
 const String ptagGeneral_globalGain = "globalGain";
 const String ptagGeneral_directGain = "directGain";
