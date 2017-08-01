@@ -202,14 +202,8 @@ public:
     void deconfigurePianoMap(ItemMapper::Ptr map);
     
     void configureReset(ItemMapper::Ptr item);
-    void deconfigureReset(ItemMapper::Ptr item);
     void deconfigureResetForKeys(ItemMapper::Ptr item, Array<int> otherKeys);
-    
-    void deconfigureResets(Array<Array<int>> resets, Array<int> whichKeymaps);
-    void configureResets(Array<Array<int>> resets, Array<int> whichKeymaps, Array<int> whichPreps);
-    void deconfigureResetsForKeys(Array<Array<int>> resets, Array<int> otherKeys);
-    
-    void configureModifications(ItemMapper::PtrArr maps);
+
     void configureModification(ItemMapper::Ptr map);
     void deconfigureModification(ItemMapper::Ptr map);
     
@@ -226,8 +220,6 @@ private:
 
     double sampleRate;
     
-    
-
     // Pointers to synths (flown in from BKAudioProcessor)
     BKSynthesiser*                      synth;
     BKSynthesiser*                      resonanceSynth;

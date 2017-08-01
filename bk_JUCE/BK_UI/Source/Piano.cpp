@@ -371,20 +371,6 @@ void Piano::deconfigureDirectModificationForKeys(DirectModPreparation::Ptr mod, 
     }
 }
 
-void Piano::deconfigureDirectModification(DirectModPreparation::Ptr mod, Array<int> whichKeymaps)
-{
-    int whichMod = mod->getId();
-    
-    for (auto keymap : whichKeymaps)
-    {
-        for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
-        {
-            // Remove Modification from Key
-            modificationMap.getUnchecked(key)->removeDirectModification(whichMod);
-        }
-    }
-}
-
 void Piano::configureNostalgicModification(int key, NostalgicModPreparation::Ptr dmod, Array<int> whichPreps)
 {
     DBG("key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
@@ -402,47 +388,6 @@ void Piano::configureNostalgicModification(int key, NostalgicModPreparation::Ptr
                 modificationMap[key]->addNostalgicModification(new NostalgicModification(key, prep, (NostalgicParameterType)n, param, whichMod));
             }
         }
-    }
-}
-
-void Piano::configureModifications(ItemMapper::PtrArr mods)
-{
-    for (auto mod : mods)
-    {
-        configureModification(mod);
-    }
-}
-
-void Piano::deconfigureModification(ItemMapper::Ptr map)
-{
-    BKPreparationType type = map->getType();
-    
-    Array<int> whichPreps = map->getConnectionIdsOfType(type);
-    
-    Array<int> whichKeymaps = map->getConnectionIdsOfType(PreparationTypeKeymap);
-    
-    int Id = map->getId();
-    
-    if (type == BKPreparationTypeNil) return;
-    else if (type == PreparationTypeDirect)
-    {
-        deconfigureDirectModification(modDirect->getUnchecked(Id), whichKeymaps);
-    }
-    else if (type == PreparationTypeSynchronic)
-    {
-        deconfigureSynchronicModification(modSynchronic->getUnchecked(Id), whichKeymaps);
-    }
-    else if (type == PreparationTypeNostalgic)
-    {
-        deconfigureNostalgicModification(modNostalgic->getUnchecked(Id), whichKeymaps);
-    }
-    else if (type == PreparationTypeTuning)
-    {
-        deconfigureTuningModification(modTuning->getUnchecked(Id), whichKeymaps);
-    }
-    else if (type == PreparationTypeTempo)
-    {
-        deconfigureTempoModification(modTempo->getUnchecked(Id), whichKeymaps);
     }
 }
 
@@ -483,21 +428,6 @@ void Piano::configureReset(ItemMapper::Ptr item)
     
     
     deconfigureResetForKeys(item, otherKeys);
-    
-}
-
-void Piano::deconfigureReset(ItemMapper::Ptr item)
-{
-    Array<int> otherKeys;
-    
-    Array<int> whichKeymaps = item->getConnectionIdsOfType(PreparationTypeKeymap);
-    
-    for (int i = 0; i < 128; i++) otherKeys.add(i);
-    
-    for (auto keymap : whichKeymaps)
-    {
-        deconfigureResetForKeys(item, bkKeymaps->getUnchecked(keymap)->keys());
-    }
     
 }
 
@@ -573,24 +503,6 @@ void Piano::configurePianoMap(ItemMapper::Ptr map)
     }
 }
 
-// MAYBE INSTEAD OF INDIVIDUAL DECONFIGURES HAVE ONE BIG DECONFIGURE???
-void Piano::deconfigurePianoMap(ItemMapper::Ptr map)
-{
-    int pianoTarget = map->getPianoTarget();
-    
-    Array<int> keymaps = map->getConnectionIdsOfType(PreparationTypeKeymap);
-    
-    for (auto keymap : keymaps)
-    {
-        Keymap::Ptr thisKeymap = getKeymap(keymap);
-        
-        for (auto key : thisKeymap->keys())
-        {
-            pianoMap.set(key, -1);
-        }
-    }
-}
-
 void Piano::configureModification(ItemMapper::Ptr map)
 {
     map->print();
@@ -658,21 +570,6 @@ void Piano::deconfigureNostalgicModificationForKeys(NostalgicModPreparation::Ptr
     }
 }
 
-void Piano::deconfigureNostalgicModification(NostalgicModPreparation::Ptr mod, Array<int> whichKeymaps)
-{
-    int whichMod = mod->getId();
-    
-    for (auto keymap : whichKeymaps)
-    {
-        for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
-        {
-            // Remove Modification from Key
-            modificationMap[key]->removeNostalgicModification(whichMod);
-        }
-    }
-}
-
-
 void Piano::configureSynchronicModification(int key, SynchronicModPreparation::Ptr dmod, Array<int> whichPreps)
 {
     int whichMod = dmod->getId();
@@ -719,21 +616,6 @@ void Piano::deconfigureSynchronicModificationForKeys(SynchronicModPreparation::P
     {
         // Remove Modification from Key
         modificationMap[key]->removeSynchronicModification(whichMod);
-    }
-}
-
-void Piano::deconfigureSynchronicModification(SynchronicModPreparation::Ptr mod, Array<int> whichKeymaps
-)
-{
-    int whichMod = mod->getId();
-    
-    for (auto keymap : whichKeymaps)
-    {
-        for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
-        {
-            // Remove Modification from Key
-            modificationMap[key]->removeSynchronicModification(whichMod);
-        }
     }
 }
 
@@ -790,22 +672,6 @@ void Piano::deconfigureTempoModificationForKeys(TempoModPreparation::Ptr mod, Ar
     }
 }
 
-void Piano::deconfigureTempoModification(TempoModPreparation::Ptr mod, Array<int> whichKeymaps)
-{
-    int whichMod = mod->getId();
-    
-    for (auto keymap : whichKeymaps)
-    {
-        for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
-        {
-            // Remove Modification from Key
-            modificationMap[key]->removeTempoModification(whichMod);
-            
-            DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
-        }
-    }
-}
-
 void Piano::configureTuningModification(int key, TuningModPreparation::Ptr dmod, Array<int> whichPreps)
 {
     
@@ -858,23 +724,6 @@ void Piano::deconfigureTuningModificationForKeys(TuningModPreparation::Ptr mod, 
         DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
     }
 }
-
-void Piano::deconfigureTuningModification(TuningModPreparation::Ptr mod, Array<int> whichKeymaps)
-{
-    int whichMod = mod->getId();
-    
-    for (auto keymap : whichKeymaps)
-    {
-        for (auto key : bkKeymaps->getUnchecked(keymap)->keys())
-        {
-            // Remove Modification from Key
-            modificationMap[key]->removeTuningModification(whichMod);
-            
-            DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
-        }
-    }
-}
-
 
 // Add preparation map, return its Id.
 int Piano::addPreparationMap(void)
