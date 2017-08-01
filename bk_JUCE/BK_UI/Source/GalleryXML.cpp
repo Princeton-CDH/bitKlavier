@@ -75,6 +75,8 @@ ValueTree  Gallery::getState(void)
     // Pianos
     for (int piano = 0; piano < bkPianos.size(); piano++)   galleryVT.addChild( bkPianos[piano]->getState(), -1, 0);
     
+    galleryVT.setProperty("defaultPiano", getCurrentPiano(), 0);
+    
     return galleryVT;
     
     
@@ -101,6 +103,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
             
             /* * * * * * * * * * * * * * */
             url = xml->getStringAttribute("url");
+            setCurrentPiano(xml->getStringAttribute("defaultPiano").getIntValue());
 
             DBG("loaded url: " + url);
             

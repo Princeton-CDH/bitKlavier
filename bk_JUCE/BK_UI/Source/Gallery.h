@@ -513,6 +513,16 @@ public:
         return nullptr;
     }
     
+    void setCurrentPiano(int Id)
+    {
+        currentPianoId = Id;
+    }
+    
+    int getCurrentPiano()
+    {
+        return currentPianoId;
+    }
+    
     void copy(BKPreparationType type, int from, int to);
     
     inline const SynchronicModPreparation::PtrArr getSynchronicModPreparations(void) const noexcept
@@ -624,11 +634,11 @@ private:
     
     GeneralSettings::Ptr                general;
     
-    Synchronic::PtrArr synchronic;
-    Nostalgic::PtrArr nostalgic;
-    Direct::PtrArr direct;
-    Tuning::PtrArr tuning;
-    Tempo::PtrArr tempo;
+    Synchronic::PtrArr                  synchronic;
+    Nostalgic::PtrArr                   nostalgic;
+    Direct::PtrArr                      direct;
+    Tuning::PtrArr                      tuning;
+    Tempo::PtrArr                       tempo;
     
     SynchronicModPreparation::PtrArr    modSynchronic;
     DirectModPreparation::PtrArr        modDirect;
@@ -638,6 +648,8 @@ private:
     
     Keymap::PtrArr                      bkKeymaps;
     Piano::PtrArr                       bkPianos;
+    
+    int                                 currentPianoId;
     
     JUCE_LEAK_DETECTOR(Gallery);
 };

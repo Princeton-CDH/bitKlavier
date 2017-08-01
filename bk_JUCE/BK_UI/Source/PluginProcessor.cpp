@@ -270,6 +270,8 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     updateState->directPreparationDidChange = true;
     updateState->tempoPreparationDidChange = true;
     updateState->tuningPreparationDidChange = true;
+    
+    gallery->setCurrentPiano(which);
 }
 
 
@@ -540,7 +542,7 @@ void BKAudioProcessor::initializeGallery(void)
     gallery->prepareToPlay(bkSampleRate);
     
     prevPiano = gallery->getPiano(0);
-    currentPiano = gallery->getPiano(0);
+    currentPiano = gallery->getPiano(gallery->getCurrentPiano());
     
     updateUI();
     
