@@ -143,7 +143,7 @@ void DirectPreparationEditor::update(void)
 
     if (prep != nullptr)
     {
-        selectCB.setSelectedItemIndex(processor.updateState->currentDirectId, dontSendNotification);
+        selectCB.setSelectedId(processor.updateState->currentDirectId, dontSendNotification);
         
         transpositionSlider->setValue(prep->getTransposition(), dontSendNotification);
         resonanceGainSlider->setValue(prep->getResonanceGain(), dontSendNotification);
@@ -326,7 +326,7 @@ void DirectModificationEditor::update(void)
 {
     if (processor.updateState->currentModDirectId < 0) return;
     
-    selectCB.setSelectedItemIndex(processor.updateState->currentModDirectId, dontSendNotification);
+    selectCB.setSelectedId(processor.updateState->currentModDirectId, dontSendNotification);
     
     DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
     

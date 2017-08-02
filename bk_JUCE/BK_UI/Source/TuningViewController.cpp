@@ -494,7 +494,7 @@ void TuningPreparationEditor::update(void)
     
     if (prep != nullptr)
     {
-        selectCB.setSelectedItemIndex(processor.updateState->currentTuningId, dontSendNotification);
+        selectCB.setSelectedId(processor.updateState->currentTuningId, dontSendNotification);
         scaleCB.setSelectedItemIndex(prep->getTuning(), dontSendNotification);
         fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
         offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
@@ -674,7 +674,7 @@ void TuningModificationEditor::update(void)
         greyOutAllComponents();
         highlightModedComponents();
         
-        selectCB.setSelectedItemIndex(processor.updateState->currentModTuningId, dontSendNotification);
+        selectCB.setSelectedId(processor.updateState->currentModTuningId, dontSendNotification);
         
         String val = mod->getParam(TuningScale);
         scaleCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);

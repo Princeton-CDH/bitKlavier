@@ -160,10 +160,21 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
     else if (result == 2) // Remove piano
     {
         int pianoId = hvc->pianoCB.getSelectedId();
+        int index = hvc->pianoCB.getSelectedItemIndex();
+        
+        if ((index == 0) && (hvc->pianoCB.getItemId(index+1) == -1)) return;
         
         hvc->processor.gallery->removePiano(pianoId);
         
-        hvc->switchGallery();
+        hvc->fillPianoCB();
+        
+        int newPianoId = hvc->pianoCB.getItemId(index);
+        
+        if (newPianoId == -1) newPianoId = hvc->pianoCB.getItemId(index-1);
+        
+        hvc->pianoCB.setSelectedId(newPianoId, dontSendNotification);
+        
+        hvc->processor.setCurrentPiano(newPianoId);
     }
     
 }
@@ -263,10 +274,8 @@ void HeaderViewController::fillPianoCB(void)
     
     pianoCB.addSeparator();
     pianoCB.addItem("New piano...", -1);
-    
 
     pianoCB.setSelectedId(processor.currentPiano->getId(), dontSendNotification);
-    
 }
 
 void HeaderViewController::bkTextFieldDidChange(TextEditor& tf)

@@ -195,7 +195,7 @@ void NostalgicPreparationEditor::update(void)
         nDisplaySlider.setWaveDistance(prep->getWavedistance(), dontSendNotification);
         nDisplaySlider.setUndertow(prep->getUndertow(), dontSendNotification);
         
-        selectCB.setSelectedItemIndex(processor.updateState->currentNostalgicId, dontSendNotification);
+        selectCB.setSelectedId(processor.updateState->currentNostalgicId, dontSendNotification);
         lengthModeSelectCB.setSelectedItemIndex(prep->getMode(), dontSendNotification);
         
         //transpositionSlider->setValue(prep->getTransposition(), dontSendNotification);
@@ -437,7 +437,7 @@ void NostalgicModificationEditor::update(void)
         greyOutAllComponents();
         highlightModedComponents();
         
-        selectCB.setSelectedItemIndex(processor.updateState->currentModNostalgicId, dontSendNotification);
+        selectCB.setSelectedId(processor.updateState->currentModNostalgicId, dontSendNotification);
         
         String val = mod->getParam(NostalgicWaveDistance);
         nDisplaySlider.setWaveDistance(val.getIntValue(), dontSendNotification);

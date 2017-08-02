@@ -555,6 +555,8 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
 
 void BKConstructionSite::idDidChange(void)
 {
+    if (currentItem == NULL) return;
+    
     BKPreparationType type = currentItem->getType();
     
     // GET NEW ID

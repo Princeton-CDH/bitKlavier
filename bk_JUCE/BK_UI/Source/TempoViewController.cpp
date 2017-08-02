@@ -365,7 +365,7 @@ void TempoPreparationEditor::update(void)
     
     if (prep != nullptr)
     {
-        selectCB.setSelectedItemIndex(processor.updateState->currentTempoId, dontSendNotification);
+        selectCB.setSelectedId(processor.updateState->currentTempoId, dontSendNotification);
         modeCB.setSelectedItemIndex((int)prep->getTempoSystem(), dontSendNotification);
         tempoSlider->setValue(prep->getTempo(), dontSendNotification);
         DBG("tempoSlider set to " + String(prep->getTempo()));
@@ -514,7 +514,7 @@ void TempoModificationEditor::fillSelectCB(int last, int current)
 
 void TempoModificationEditor::update(void)
 {
-    selectCB.setSelectedItemIndex(processor.updateState->currentModTempoId, dontSendNotification);
+    selectCB.setSelectedId(processor.updateState->currentModTempoId, dontSendNotification);
     
     TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
     

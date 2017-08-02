@@ -54,7 +54,7 @@ BKViewController(p, theGraph)
     selectCB.setName("Synchronic");
     selectCB.addSeparator();
     selectCB.addListener(this);
-    selectCB.setSelectedItemIndex(0);
+    selectCB.setSelectedId(1);
     addAndMakeVisible(selectCB);
     
     modeSelectCB.setName("Mode");
@@ -368,7 +368,7 @@ void SynchronicPreparationEditor::update(NotificationType notify)
     if (prep != nullptr)
     {
         
-        selectCB.setSelectedItemIndex(processor.updateState->currentSynchronicId, notify);
+        selectCB.setSelectedId(processor.updateState->currentSynchronicId, notify);
         modeSelectCB.setSelectedItemIndex(prep->getMode(), notify);
         offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
         releaseVelocitySetsSynchronicToggle.setToggleState(prep->getReleaseVelocitySetsSynchronic(), notify);
@@ -708,7 +708,7 @@ void SynchronicModificationEditor::update(NotificationType notify)
     greyOutAllComponents();
     highlightModedComponents();
     
-    selectCB.setSelectedItemIndex(processor.updateState->currentModSynchronicId, notify);
+    selectCB.setSelectedId(processor.updateState->currentModSynchronicId, notify);
     
     SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
     
