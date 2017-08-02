@@ -119,8 +119,8 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     if(numSamples != levelBuf.getNumSamples()) levelBuf.setSize(buffer.getNumChannels(), numSamples);
     
     // Process all active prep maps in current piano
-    for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-        currentPiano->activePMaps[p]->processBlock(numSamples, m.getChannel());
+    for (auto pmap : currentPiano->activePMaps)
+        pmap->processBlock(numSamples, m.getChannel());
     
     for(int i=0; i<notesOnUI.size(); i++)
     {
@@ -458,6 +458,8 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
         
         gallery = new Gallery(xml, *this);
         
+        gallery->print();
+        
         initializeGallery();
     }
 }
@@ -486,9 +488,9 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
 
 void BKAudioProcessor::initializeGallery(void)
 {
-    for (auto piano : gallery->getPianos()) piano->configure();
-    
     gallery->prepareToPlay(bkSampleRate);
+    
+    for (auto piano : gallery->getPianos()) piano->configure();
     
     prevPiano = gallery->getPiano(1);
     currentPiano = gallery->getPiano(1);

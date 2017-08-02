@@ -377,7 +377,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->addTuning();
+            processor.gallery->add(PreparationTypeTuning);
             
             Id = processor.gallery->getAllTuning().getLast()->getId();
         }
@@ -769,7 +769,7 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->addTuningMod();
+            processor.gallery->add(PreparationTypeTuningMod);
             
             Id = processor.gallery->getTuningModPreparations().getLast()->getId();
         }

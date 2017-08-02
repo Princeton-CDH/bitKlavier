@@ -70,11 +70,9 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
     
     bkPianos.clear();
     
-    int pianoCount = 0, sPrepCount = 0, sModPrepCount = 0, nPrepCount = 0, nModPrepCount = 0, dPrepCount = 0, dModPrepCount = 0, tPrepCount = 0, tModPrepCount = 0, keymapCount = 0, tempoPrepCount = 0, tempoModPrepCount = 0;
-    
     {
         
-        if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
+        if (xml != nullptr)
         {
             //general = new GeneralSettings();
             
@@ -106,13 +104,17 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 }
                 */
                 
-                if (e->hasTagName( vtagKeymap + String(keymapCount)))
+                if (e->hasTagName( vtagKeymap))
                 {
                     addKeymap();
                     
                     String n = e->getStringAttribute("name");
                     
+                    
+                    
                     Keymap::Ptr newKeymap = bkKeymaps.getLast();
+                    
+                    newKeymap->setId(e->getStringAttribute("Id").getIntValue());
                     
                     if (n != String::empty)     newKeymap->setName(n);
                     else                        newKeymap->setName(String(newKeymap->getId()));
@@ -133,115 +135,83 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                     newKeymap->setKeymap(keys);
                     
                     newKeymap->editted = true;
-                    
-                    ++keymapCount;
-                    
                 }
                 else if (e->hasTagName ( vtagGeneral))
                 {
                     general->setState(e);
                 }
-                else if (e->hasTagName( vtagTuning + String(tPrepCount)))
+                else if (e->hasTagName( vtagTuning))
                 {
-                    addTuning();
+                    addTuningWithId(-1);
                     
                     tuning.getLast()->setState(e);
-                    
-                    ++tPrepCount;
                 }
-                else if (e->hasTagName( vtagModTuning + String(tModPrepCount)))
+                else if (e->hasTagName( vtagModTuning))
                 {
-                    addTuningMod();
+                    addTuningModWithId(-1);
                     
                     modTuning.getLast()->setState(e);
-                    
-                    ++tModPrepCount;
                 }
-                else if (e->hasTagName( vtagDirect + String(dPrepCount)))
+                else if (e->hasTagName( vtagDirect))
                 {
-                    addDirect();
+                    addDirectWithId(-1);
                     
                     direct.getLast()->setState(e, tuning);
-                    
-                    ++dPrepCount;
                 }
-                else if (e->hasTagName( vtagModDirect + String(dModPrepCount)))
+                else if (e->hasTagName( vtagModDirect))
                 {
-                    addDirectMod();
+                    addDirectModWithId(-1);
                     
                     modDirect.getLast()->setState(e);
-                    
-                    ++dModPrepCount;
                 }
-                else if (e->hasTagName( vtagSynchronic + String(sPrepCount)))
+                else if (e->hasTagName( vtagSynchronic))
                 {
-                    addSynchronic();
+                    addSynchronicWithId(-1);
                     
                     synchronic.getLast()->setState(e, tuning, tempo);
                     
-                    ++sPrepCount;
-                    
                 }
-                else if (e->hasTagName( vtagModSynchronic + String(sModPrepCount)))
+                else if (e->hasTagName( vtagModSynchronic))
                 {
-                    addSynchronicMod();
+                    addSynchronicModWithId(-1);
                 
                     modSynchronic.getLast()->setState(e);
                     
-                    ++sModPrepCount;
-                    
                 }
-                else if (e->hasTagName( vtagTempo + String(tempoPrepCount)))
+                else if (e->hasTagName( vtagTempo))
                 {
-                    addTempo();
+                    addTempoWithId(-1);
 
                     tempo.getLast()->setState(e);
                     
-                    ++tempoPrepCount;
-                    
                 }
-                else if (e->hasTagName( vtagModTempo + String(tempoModPrepCount)))
+                else if (e->hasTagName( vtagModTempo))
                 {
-                    addTempoMod();
+                    addTempoModWithId(-1);
                     
                     modTempo.getLast()->setState(e);
                     
-                    ++tempoModPrepCount;
-                    
                 }
-                else if (e->hasTagName( vtagNostalgic + String(nPrepCount)))
+                else if (e->hasTagName( vtagNostalgic))
                 {
-                    addNostalgic();
+                    addNostalgicWithId(-1);
                     
                     nostalgic.getLast()->setState(e, tuning, synchronic);
-                    
-                    ++nPrepCount;
                 }
-                else if (e->hasTagName( vtagModNostalgic + String(nModPrepCount)))
+                else if (e->hasTagName( vtagModNostalgic))
                 {
-                    addNostalgicMod();
+                    addNostalgicModWithId(-1);
                     
                     modNostalgic.getLast()->setState(e);
-                    
-                    ++nModPrepCount;
                 }
-                else if (e->hasTagName( vtagPiano + String(pianoCount)))
+                else if (e->hasTagName(vtagPiano))
                 {
-                    addPiano();
+                    addPianoWithId(-1);
                     
                     bkPianos.getLast()->setState(e);
-                    
-                    ++pianoCount;
                 }
             }
         }
-        
-        for (int k = tuning.size(); --k >= 0;)      tuning[k]->prepareToPlay(bkSampleRate);
-        for (int k = tempo.size(); --k >= 0;)       tempo[k]->prepareToPlay(bkSampleRate);
-        for (int k = synchronic.size(); --k >= 0;)  synchronic[k]->prepareToPlay(bkSampleRate);
-        for (int k = nostalgic.size(); --k >= 0;)   nostalgic[k]->prepareToPlay(bkSampleRate);
-        for (int k = direct.size(); --k >= 0;)      direct[k]->prepareToPlay(bkSampleRate);
-        
     }
     
 }

@@ -18,7 +18,7 @@ url(String::empty)
 {
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
-        idCount.add(0);
+        idCount.add(10);
     }
     
     general = new GeneralSettings();
@@ -32,7 +32,7 @@ url(String::empty)
 {
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
-        idCount.add(0);
+        idCount.add(10);
     }
     
     general = new GeneralSettings();
@@ -44,13 +44,13 @@ void Gallery::prepareToPlay (double sampleRate)
 {
     bkSampleRate = sampleRate;
     
-    for (int i = bkPianos.size(); --i >= 0;) bkPianos[i]->prepareToPlay(bkSampleRate);
+    for (auto piano : bkPianos)     piano->prepareToPlay(bkSampleRate);
     
-    for (int i = tuning.size(); --i >= 0;)      tuning[i]->prepareToPlay(bkSampleRate);
-    for (int i = tempo.size(); --i >= 0;)       tempo[i]->prepareToPlay(bkSampleRate);
-    for (int i = synchronic.size(); --i >= 0;)  synchronic[i]->prepareToPlay(bkSampleRate);
-    for (int i = nostalgic.size(); --i >= 0;)   nostalgic[i]->prepareToPlay(bkSampleRate);
-    for (int i = direct.size(); --i >= 0;)      direct[i]->prepareToPlay(bkSampleRate);
+    for (auto prep : tuning)        prep->prepareToPlay(bkSampleRate);
+    for (auto prep : tempo)         prep->prepareToPlay(bkSampleRate);
+    for (auto prep : synchronic)    prep->prepareToPlay(bkSampleRate);
+    for (auto prep : nostalgic)     prep->prepareToPlay(bkSampleRate);
+    for (auto prep : direct)        prep->prepareToPlay(bkSampleRate);
     
 }
 

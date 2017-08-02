@@ -35,6 +35,47 @@ public:
     Gallery(var json, BKAudioProcessor&);
     ~Gallery();
     
+    inline void print(void)
+    {
+        String s = "direct";
+        for (auto item : direct) s += (" " + String(item->getId()));
+        
+        s += "\nnostalgic";
+        for (auto item : nostalgic) s += (" " + String(item->getId()));
+        
+        s += "\nsynchronic";
+        for (auto item : synchronic) s += (" " + String(item->getId()));
+        
+        s += "\ntuning";
+        for (auto item : tuning) s += (" " + String(item->getId()));
+        
+        s += "\ntempo";
+        for (auto item : tempo) s += (" " + String(item->getId()));
+        
+        s += "\nkeymap";
+        for (auto item : bkKeymaps) s += (" " + String(item->getId()));
+        
+        s += "\ndirectmod";
+        for (auto item : modDirect) s += (" " + String(item->getId()));
+        
+        s += "\nnostalgicmod";
+        for (auto item : modDirect) s += (" " + String(item->getId()));
+        
+        s += "\nsynchronicmod";
+        for (auto item : modDirect) s += (" " + String(item->getId()));
+        
+        s += "\ntuningmod";
+        for (auto item : modDirect) s += (" " + String(item->getId()));
+        
+        s += "\ntempomod";
+        for (auto item : modDirect) s += (" " + String(item->getId()));
+        
+        DBG("\n~ ~ ~ ~ ~ GALLERY ~ ~ ~ ~ ~ ~");
+        DBG(s);
+        DBG("\n");
+    }
+    
+    
     ValueTree  getState(void);
     void setStateFromXML(ScopedPointer<XmlElement> xml);
     void setStateFromJson(var myJson);
@@ -45,78 +86,17 @@ public:
     NostalgicProcessor::Ptr getNostalgicProcessor(int id);
     TuningProcessor::Ptr getTuningProcessor(int id);
     TempoProcessor::Ptr getTempoProcessor(int id);
-    
-    void addSynchronic(void);
-    void addSynchronicWithId(int Id);
-    void addSynchronic(SynchronicPreparation::Ptr);
-    int addSynchronicIfNotAlreadyThere(SynchronicPreparation::Ptr);
-    
-    void addNostalgic(void);
-    void addNostalgicWithId(int Id);
-    void addNostalgic(NostalgicPreparation::Ptr);
-    int addNostalgicIfNotAlreadyThere(NostalgicPreparation::Ptr);
-    
-    void addTuning(void);
-    void addTuningWithId(int Id);
-    void addTuning(TuningPreparation::Ptr);
-    int addTuningIfNotAlreadyThere(TuningPreparation::Ptr);
-    
-    void addTempo(void);
-    void addTempoWithId(int Id);
-    void addTempo(TempoPreparation::Ptr);
-    int addTempoIfNotAlreadyThere(TempoPreparation::Ptr);
-    
-    void addDirect(void);
-    void addDirectWithId(int Id);
-    void addDirect(DirectPreparation::Ptr);
-    int addDirectIfNotAlreadyThere(DirectPreparation::Ptr);
-    
 
     bool getEditted(BKPreparationType type, int Id);
     void setEditted(BKPreparationType type, int Id, bool editted);
     
-    void addPiano(void);
-    void addPianoWithId(int Id);
-    void removePiano(int Id);
-    inline const int getNumPianos(void) const noexcept {return bkPianos.size();}
     
-    void addKeymap(void);
-    void addKeymapWithId(int Id);
-    void addKeymap(Keymap::Ptr);
-    inline const int getNumKeymaps(void) const noexcept {return bkKeymaps.size();}
+    inline const int getNumPianos(void) const noexcept {return bkPianos.size();}
     
     void add(BKPreparationType type);
     void addTypeWithId(BKPreparationType type, int Id);
     void remove(BKPreparationType type, int Id);
     int  getNum(BKPreparationType type);
-    
-    
-    void addDirectMod(void);
-    void addNostalgicMod(void);
-    void addSynchronicMod(void);
-    void addTuningMod(void);
-    void addTempoMod(void);
-    
-    void addDirectModWithId(int Id);
-    void addNostalgicModWithId(int Id);
-    void addSynchronicModWithId(int Id);
-    void addTuningModWithId(int Id);
-    void addTempoModWithId(int Id);
-    
-    void addTuningMod(TuningModPreparation::Ptr tmod);
-    void addTempoMod(TempoModPreparation::Ptr tmod);
-    
-    void removeDirect(int Id);
-    void removeSynchronic(int Id);
-    void removeNostalgic(int Id);
-    void removeTuning(int Id);
-    void removeTempo(int Id);
-    void removeKeymap(int Id);
-    void removeDirectModPreparation(int Id);
-    void removeNostalgicModPreparation(int Id);
-    void removeSynchronicModPreparation(int Id);
-    void removeTuningModPreparation(int Id);
-    void removeTempoModPreparation(int Id);
     
     inline const int getNumSynchronic(void) const noexcept {return synchronic.size();}
     inline const int getNumNostalgic(void) const noexcept {return nostalgic.size();}
@@ -612,6 +592,72 @@ private:
     
     Keymap::PtrArr                      bkKeymaps;
     Piano::PtrArr                       bkPianos;
+    
+    void addSynchronic(void);
+    void addSynchronicWithId(int Id);
+    void addSynchronic(SynchronicPreparation::Ptr);
+    int addSynchronicIfNotAlreadyThere(SynchronicPreparation::Ptr);
+    
+    void addNostalgic(void);
+    void addNostalgicWithId(int Id);
+    void addNostalgic(NostalgicPreparation::Ptr);
+    int addNostalgicIfNotAlreadyThere(NostalgicPreparation::Ptr);
+    
+    void addTuning(void);
+    void addTuningWithId(int Id);
+    void addTuning(TuningPreparation::Ptr);
+    int addTuningIfNotAlreadyThere(TuningPreparation::Ptr);
+    
+    void addTempo(void);
+    void addTempoWithId(int Id);
+    void addTempo(TempoPreparation::Ptr);
+    int addTempoIfNotAlreadyThere(TempoPreparation::Ptr);
+    
+    void addDirect(void);
+    void addDirectWithId(int Id);
+    void addDirect(DirectPreparation::Ptr);
+    int addDirectIfNotAlreadyThere(DirectPreparation::Ptr);
+    
+    void addSynchronic(int Id, int tuningId, int tempoId);
+    void addNostalgic(int Id, int tuningId, int synchronicId);
+    void addDirect(int Id, int tuningId);
+    
+    void addKeymap(void);
+    void addKeymapWithId(int Id);
+    void addKeymap(Keymap::Ptr);
+    inline const int getNumKeymaps(void) const noexcept {return bkKeymaps.size();}
+    
+    void addPiano(void);
+    void addPianoWithId(int Id);
+    void removePiano(int Id);
+    
+    void addDirectMod(void);
+    void addNostalgicMod(void);
+    void addSynchronicMod(void);
+    void addTuningMod(void);
+    void addTempoMod(void);
+    
+    void addDirectModWithId(int Id);
+    void addNostalgicModWithId(int Id);
+    void addSynchronicModWithId(int Id);
+    void addTuningModWithId(int Id);
+    void addTempoModWithId(int Id);
+    
+    void addTuningMod(TuningModPreparation::Ptr tmod);
+    void addTempoMod(TempoModPreparation::Ptr tmod);
+    
+    void removeDirect(int Id);
+    void removeSynchronic(int Id);
+    void removeNostalgic(int Id);
+    void removeTuning(int Id);
+    void removeTempo(int Id);
+    void removeKeymap(int Id);
+    void removeDirectModPreparation(int Id);
+    void removeNostalgicModPreparation(int Id);
+    void removeSynchronicModPreparation(int Id);
+    void removeTuningModPreparation(int Id);
+    void removeTempoModPreparation(int Id);
+    
     
     JUCE_LEAK_DETECTOR(Gallery);
 };

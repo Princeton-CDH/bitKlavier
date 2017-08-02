@@ -453,7 +453,7 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->addSynchronic();
+            processor.gallery->add(PreparationTypeSynchronic);
             Id = processor.gallery->getAllSynchronic().getLast()->getId();
         }
         
@@ -922,7 +922,7 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->addSynchronicMod();
+            processor.gallery->add(PreparationTypeSynchronicMod);
             
             Id = processor.gallery->getSynchronicModPreparations().getLast()->getId();
         }

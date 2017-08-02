@@ -104,9 +104,7 @@ void Piano::configure(void)
                     configureReset(target);
                 }
             }
-            
-            int count = 0;
-            for (auto pmap : prepMaps) DBG("PMAP" + String(count++) + ": " + pmap->getPreparationIds());
+
         }
         else if (type == PreparationTypeTuning)
         {
@@ -798,15 +796,16 @@ int Piano::removeLastPreparationMap(void)
 void Piano::prepareToPlay(double sr)
 {
     sampleRate = sr;
-
 }
 
 ValueTree Piano::getState(void)
 {
-    ValueTree pianoVT( vtagPiano + String(getId()));
+    ValueTree pianoVT( vtagPiano);
     
     String name = getName();
-    pianoVT.setProperty("bkPianoName", ((name == String::empty) ? "Piano"+String(Id) : name) , 0);
+    pianoVT.setProperty("name", ((name == String::empty) ? "Piano"+String(Id) : name) , 0);
+    
+    pianoVT.setProperty("Id", Id, 0);
     
 
     for (auto item : items)
@@ -909,9 +908,14 @@ ValueTree Piano::getState(void)
 void Piano::setState(XmlElement* e)
 {
     int i = 0;
-    String pianoName = e->getStringAttribute("bkPianoName");
+    
+    Id = e->getStringAttribute("Id").getIntValue();
+    
+    String pianoName = e->getStringAttribute("name");
     
     if (pianoName != String::empty) setName(pianoName);
+    
+    setId(e->getStringAttribute("Id").getIntValue());
 
     forEachXmlChildElement (*e, group)
     {

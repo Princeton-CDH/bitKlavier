@@ -477,10 +477,12 @@ public:
     
     inline ValueTree getState(void)
     {
-        ValueTree prep( vtagSynchronic + String(Id));
+        ValueTree prep( vtagSynchronic);
         
-        prep.setProperty( ptagSynchronic_Id,                  Id, 0);
+        prep.setProperty( "Id",Id, 0);
         prep.setProperty( "name", name, 0);
+        prep.setProperty( "tuning", processor->getTuning()->getId(), 0);
+        prep.setProperty( "tempo", processor->getTempo()->getId(), 0);
         prep.setProperty( ptagSynchronic_numBeats,            sPrep->getNumBeats(), 0);
         prep.setProperty( ptagSynchronic_clusterMin,          sPrep->getClusterMin(), 0);
         prep.setProperty( ptagSynchronic_clusterMax,          sPrep->getClusterMax(), 0);
@@ -541,10 +543,38 @@ public:
         
         int i; float f;
         
+        Id = e->getStringAttribute("Id").getIntValue();
+        
         String n = e->getStringAttribute("name");
         
         if (n != String::empty)     name = n;
         else                        name = String(Id);
+        
+        i = e->getStringAttribute("tuning").getIntValue();
+        
+        bool found = false;
+        for (auto p : tuning)
+        {
+            if (p->getId() == i)
+            {
+                setTuning(p);
+                found = true;
+            }
+        }
+        if (!found) setTuning(tuning[0]);
+        
+        i = e->getStringAttribute("tempo").getIntValue();
+        
+        found = false;
+        for (auto p : tempo)
+        {
+            if (p->getId() == i)
+            {
+                setTempo(p);
+                found = true;
+            }
+        }
+        if (!found) setTempo(tempo[0]);
         
         i = e->getStringAttribute(ptagSynchronic_numBeats).getIntValue();
         sPrep->setNumBeats(i);
@@ -780,7 +810,9 @@ public:
     
     inline ValueTree getState(int Id)
     {
-        ValueTree prep( vtagModSynchronic + String(Id));
+        ValueTree prep( vtagModSynchronic );
+        
+        prep.setProperty( "Id",Id, 0);
         
         String p = "";
         
@@ -867,6 +899,8 @@ public:
         editted = true;
         
         float f;
+        
+        Id = e->getStringAttribute("Id").getIntValue();
         
         String p = e->getStringAttribute(ptagSynchronic_numBeats);
         setParam(SynchronicNumPulses, p);

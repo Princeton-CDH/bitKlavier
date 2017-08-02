@@ -225,9 +225,9 @@ public:
     
     inline ValueTree getState(void)
     {
-        ValueTree prep(vtagTempo + String(Id));
+        ValueTree prep(vtagTempo);
         
-        prep.setProperty( ptagTempo_Id,                    Id, 0);
+        prep.setProperty( "Id",Id, 0);
         prep.setProperty( "name",                          name, 0);
         prep.setProperty( ptagTempo_tempo,                 sPrep->getTempo(), 0);
         prep.setProperty( ptagTempo_system,                sPrep->getTempoSystem(), 0);
@@ -248,6 +248,8 @@ public:
         editted = true;
         
         float f; int i;
+        
+        Id = e->getStringAttribute("Id").getIntValue();
         
         String n = e->getStringAttribute("name");
         
@@ -442,7 +444,9 @@ public:
     inline ValueTree getState(int Id)
     {
         
-        ValueTree prep(vtagModTempo + String(Id));
+        ValueTree prep(vtagModTempo);
+        
+        prep.setProperty( "Id",Id, 0);
         
         prep.setProperty("name",name,0);
         
@@ -474,7 +478,11 @@ public:
     
     inline void setState(XmlElement* e)
     {
+        
+        Id = e->getStringAttribute("Id").getIntValue();
+        
         String n = e->getStringAttribute("name");
+        
         
         if (n != String::empty)     name = n;
         else                        name = "mm"+String(Id);

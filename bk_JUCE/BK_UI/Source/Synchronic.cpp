@@ -50,6 +50,7 @@ void SynchronicProcessor::setCurrentPlaybackSampleRate(double sr)
 {
     sampleRate = sr;
     tuner->processor->setCurrentPlaybackSampleRate(sr);
+    tempo->processor->setCurrentPlaybackSampleRate(sr);
 }
 
 

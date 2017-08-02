@@ -154,9 +154,9 @@ void TuningProcessor::adaptiveReset()
 ValueTree Tuning::getState(void)
 {
     
-    ValueTree prep(vtagTuning + String(Id));
+    ValueTree prep(vtagTuning);
     
-    prep.setProperty( ptagTuning_Id,                    Id, 0);
+    prep.setProperty( "Id",Id, 0);
     prep.setProperty( ptagTuning_scale,                 sPrep->getTuning(), 0);
     prep.setProperty( ptagTuning_fundamental,           sPrep->getFundamental(), 0);
     prep.setProperty( ptagTuning_offset,                sPrep->getFundamentalOffset(), 0 );
@@ -191,7 +191,9 @@ ValueTree Tuning::getState(void)
 
 ValueTree TuningModPreparation::getState(int Id)
 {
-    ValueTree prep(vtagModTuning + String(Id));
+    ValueTree prep(vtagModTuning);
+    
+    prep.setProperty( "Id",Id, 0);
     
     String p = getParam(TuningScale);
     if (p != String::empty) prep.setProperty( ptagTuning_scale, p.getIntValue(), 0);
@@ -258,6 +260,8 @@ void TuningModPreparation::setState(XmlElement* e)
     String p = "";
     
     float f;
+    
+    Id = e->getStringAttribute("Id").getIntValue();
     
     String n = e->getStringAttribute("name");
     
@@ -344,6 +348,8 @@ void Tuning::setState(XmlElement* e)
     editted = true;
     
     int i; float f; bool b;
+    
+    Id = e->getStringAttribute("Id").getIntValue();
     
     i = e->getStringAttribute( ptagTuning_scale).getIntValue();
     sPrep->setTuning((TuningSystem)i);

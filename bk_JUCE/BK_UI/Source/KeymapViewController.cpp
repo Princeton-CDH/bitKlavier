@@ -120,7 +120,7 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->addKeymap();
+            processor.gallery->add(PreparationTypeKeymap);
             
             Id = processor.gallery->getKeymaps().getLast()->getId();
         }

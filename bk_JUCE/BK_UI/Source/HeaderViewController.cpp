@@ -142,7 +142,7 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
         
         int newId = hvc->processor.gallery->getNewId(PreparationTypePiano);
         
-        hvc->processor.gallery->addPianoWithId(newId);
+        hvc->processor.gallery->addTypeWithId(PreparationTypePiano, newId);
         
         String newName = "Piano"+String(newId);
         
@@ -164,7 +164,7 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
         
         if ((index == 0) && (hvc->pianoCB.getItemId(index+1) == -1)) return;
         
-        hvc->processor.gallery->removePiano(pianoId);
+        hvc->processor.gallery->remove(PreparationTypePiano, pianoId);
         
         hvc->fillPianoCB();
         
@@ -302,7 +302,7 @@ void HeaderViewController::bkComboBoxDidChange            (ComboBox* cb)
     {
         if (Id == -1)
         {
-            processor.gallery->addPiano();
+            processor.gallery->add(PreparationTypePiano);
             
             Id = processor.gallery->getPianos().getLast()->getId();
         }

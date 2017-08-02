@@ -296,7 +296,7 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->addTempo();
+            processor.gallery->add(PreparationTypeTempo);
             
             Id = processor.gallery->getAllTempo().getLast()->getId();
         }
@@ -570,7 +570,7 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->addTempoMod();
+            processor.gallery->add(PreparationTypeTempoMod);
             
             Id = processor.gallery->getTempoModPreparations().getLast()->getId();
         }

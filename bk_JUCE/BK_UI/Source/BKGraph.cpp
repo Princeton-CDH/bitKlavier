@@ -358,7 +358,7 @@ ValueTree BKItem::getState(void)
 {
     ValueTree itemVT( "item");
     
-    itemVT.setProperty("name", name, 0);
+    itemVT.setProperty("name", getItemName(), 0);
     
     itemVT.setProperty("type", type, 0);
     itemVT.setProperty("Id", Id, 0);

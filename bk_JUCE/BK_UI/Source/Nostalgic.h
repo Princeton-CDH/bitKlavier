@@ -410,10 +410,14 @@ public:
     
     inline ValueTree getState(void)
     {
-        ValueTree prep( vtagNostalgic + String(Id));
+        ValueTree prep( vtagNostalgic );
         
-        prep.setProperty( ptagNostalgic_Id,                 Id, 0);
+        prep.setProperty( "Id",Id, 0);
         prep.setProperty( "name", name, 0);
+        
+        prep.setProperty( "tuning", processor->getTuner()->getId(), 0);
+        prep.setProperty( "synchronic", processor->getSynchronic()->getId(), 0);
+        
         prep.setProperty( ptagNostalgic_waveDistance,       sPrep->getWavedistance(), 0);
         prep.setProperty( ptagNostalgic_undertow,           sPrep->getUndertow(), 0);
         
@@ -443,10 +447,38 @@ public:
         
         int i; float f;
         
+        Id = e->getStringAttribute("Id").getIntValue();
+        
         String n = e->getStringAttribute("name");
         
         if (n != String::empty)     name = n;
         else                        name = String(Id);
+        
+        i = e->getStringAttribute("tuning").getIntValue();
+        
+        bool found = false;
+        for (auto p : tuning)
+        {
+            if (p->getId() == i)
+            {
+                setTuning(p);
+                found = true;
+            }
+        }
+        if (!found) setTuning(tuning[0]);
+        
+        i = e->getStringAttribute("synchronic").getIntValue();
+        
+        found = false;
+        for (auto p : synchronic)
+        {
+            if (p->getId() == i)
+            {
+                setSynchronic(p);
+                found = true;
+            }
+        }
+        if (!found) setSynchronic(synchronic[0]);
         
         i = e->getStringAttribute(ptagNostalgic_waveDistance).getIntValue();
         sPrep->setWaveDistance(i);
@@ -617,7 +649,9 @@ public:
     
     inline ValueTree getState(int Id)
     {
-        ValueTree prep( vtagModNostalgic + String(Id));
+        ValueTree prep( vtagModNostalgic );
+        
+        prep.setProperty( "Id",Id, 0);
         
         String p = "";
         
@@ -664,6 +698,8 @@ public:
         editted = true;
         
         float f;
+        
+        Id = e->getStringAttribute("Id").getIntValue();
         
         String p = e->getStringAttribute(ptagNostalgic_waveDistance);
         setParam(NostalgicWaveDistance, p);

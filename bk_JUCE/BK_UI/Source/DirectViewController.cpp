@@ -170,7 +170,7 @@ void DirectPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->addDirect();
+            processor.gallery->add(PreparationTypeDirect);
             
             Id = processor.gallery->getAllDirect().getLast()->getId();
         }
@@ -401,7 +401,7 @@ void DirectModificationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->addDirectMod();
+            processor.gallery->add(PreparationTypeDirectMod);
             
             Id = processor.gallery->getDirectModPreparations().getLast()->getId();
         }

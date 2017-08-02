@@ -42,6 +42,7 @@ void NostalgicProcessor::setCurrentPlaybackSampleRate(double sr)
 {
     sampleRate = sr;
     tuner->processor->setCurrentPlaybackSampleRate(sr);
+    synchronic->processor->setCurrentPlaybackSampleRate(sr);
 }
 
 //begin reverse note; called when key is released

@@ -237,7 +237,7 @@ void NostalgicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == selectCB.getNumItems()-1)
         {
-            processor.gallery->addNostalgic();
+            processor.gallery->add(PreparationTypeNostalgic);
             
             Id = processor.gallery->getAllNostalgic().getLast()->getId();
         }
@@ -563,7 +563,7 @@ void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->addNostalgicMod();
+            processor.gallery->add(PreparationTypeNostalgicMod);
             
             Id = processor.gallery->getNostalgicModPreparations().getLast()->getId();
         }

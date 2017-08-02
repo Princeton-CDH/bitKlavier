@@ -187,7 +187,9 @@ public:
     inline ValueTree getState(int ki)
     {
  
-        ValueTree keysave( vtagKeymap + String(ki));
+        ValueTree keysave( vtagKeymap );
+        
+        keysave.setProperty( "Id",Id, 0);
         
         keysave.setProperty("name",name,0);
         

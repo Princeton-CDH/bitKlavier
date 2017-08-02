@@ -243,10 +243,11 @@ public:
     
     inline ValueTree getState(void)
     {
-        ValueTree prep( vtagDirect+String(Id));
+        ValueTree prep( vtagDirect);
         
-        prep.setProperty( ptagDirect_id,                Id, 0);
+        prep.setProperty( "Id",Id, 0);
         prep.setProperty( "name", name, 0);
+        prep.setProperty( "tuning", processor->getTuning()->getId(), 0);
         
         ValueTree transp( vtagDirect_transposition);
         Array<float> m = sPrep->getTransposition();
@@ -270,10 +271,25 @@ public:
         
         float f; int i;
         
+        Id = e->getStringAttribute("Id").getIntValue();
+        
         String n = e->getStringAttribute("name");
         
         if (n != String::empty)     name = n;
         else                        name = String(Id);
+        
+        i = e->getStringAttribute("tuning").getIntValue();
+        
+        bool found = false;
+        for (auto p : tuning)
+        {
+            if (p->getId() == i)
+            {
+                setTuning(p);
+                found = true;
+            }
+        }
+        if (!found) setTuning(tuning[0]);
         
         f = e->getStringAttribute(ptagDirect_gain).getFloatValue();
         sPrep->setGain(f);
@@ -415,7 +431,9 @@ public:
     
     inline ValueTree getState(int Id)
     {
-        ValueTree prep( vtagModDirect+String(Id));
+        ValueTree prep( vtagModDirect);
+        
+        prep.setProperty( "Id",Id, 0);
         
         String p = "";
         
@@ -449,6 +467,8 @@ public:
     {
         editted = true;
         float f;
+        
+        Id = e->getStringAttribute("Id").getIntValue();
         
         String p = e->getStringAttribute(ptagDirect_gain);
         setParam(DirectGain, p);

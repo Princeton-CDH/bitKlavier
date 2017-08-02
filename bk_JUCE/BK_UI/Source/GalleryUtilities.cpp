@@ -315,6 +315,10 @@ void Gallery::remove(BKPreparationType type, int Id)
     {
         removeTempoModPreparation(Id);
     }
+    else if (type == PreparationTypePiano)
+    {
+        removePiano(Id);
+    }
 }
 
 
@@ -375,8 +379,14 @@ void Gallery::add(BKPreparationType type)
     {
         addTempoMod();
         newId = modTempo.getLast()->getId();
-        
     }
+    else if (type == PreparationTypePiano)
+    {
+        addPiano();
+        newId = bkPianos.getLast()->getId();
+    }
+    
+    prepareToPlay(bkSampleRate);
 }
 
 int Gallery::getNum(BKPreparationType type)
@@ -489,13 +499,16 @@ void Gallery::addSynchronic(void)
 {
     int newId = getNewId(PreparationTypeSynchronic);
     synchronic.add(new Synchronic(&processor.mainPianoSynth, tuning[0], tempo[0], general, processor.updateState, newId));
-    synchronic.getLast()->prepareToPlay(bkSampleRate);
 }
 
 void Gallery::addSynchronicWithId(int Id)
 {
     synchronic.add(new Synchronic(&processor.mainPianoSynth, tuning[0], tempo[0], general, processor.updateState, Id));
-    synchronic.getLast()->prepareToPlay(bkSampleRate);
+}
+
+void Gallery::addSynchronic(int Id, int tuningId, int tempoId)
+{
+    synchronic.add(new Synchronic(&processor.mainPianoSynth, getTuning(tuningId), getTempo(tempoId), general, processor.updateState, Id));
 }
 
 void Gallery::copy(BKPreparationType type, int from, int to)
@@ -592,6 +605,12 @@ void Gallery::addTypeWithId(BKPreparationType type, int Id)
     {
         addTempoModWithId(Id);
     }
+    else if (type == PreparationTypePiano)
+    {
+        addPianoWithId(Id);
+    }
+    
+    prepareToPlay(bkSampleRate);
 }
 
 
@@ -599,7 +618,6 @@ void Gallery::addSynchronic(SynchronicPreparation::Ptr sync)
 {
     int newId = getNewId(PreparationTypeSynchronic);
     synchronic.add(new Synchronic(&processor.mainPianoSynth, sync, tuning.getFirst(), tempo.getFirst(), general, newId));
-    synchronic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 // Returns index of Synchronic to be added/configured.
@@ -629,28 +647,22 @@ void Gallery::addNostalgic(void)
 {
     int newId = getNewId(PreparationTypeNostalgic);
     nostalgic.add(new Nostalgic(&processor.mainPianoSynth, tuning.getFirst(), synchronic.getFirst(), processor.updateState, newId));
-
-    nostalgic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
-    
-    nostalgic.getLast()->setSynchronic(synchronic[0]);
 }
 
 void Gallery::addNostalgicWithId(int Id)
 {
     nostalgic.add(new Nostalgic(&processor.mainPianoSynth, tuning.getFirst(), synchronic.getFirst(), processor.updateState, Id));
-    nostalgic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
-    
-    nostalgic.getLast()->setSynchronic(synchronic[0]);
 }
 
+void Gallery::addNostalgic(int Id, int tuningId, int synchronicId)
+{
+    nostalgic.add(new Nostalgic(&processor.mainPianoSynth, getTuning(tuningId), getSynchronic(synchronicId), processor.updateState, Id));
+}
 
 void Gallery::addNostalgic(NostalgicPreparation::Ptr nost)
 {
     int newId = getNewId(PreparationTypeNostalgic);
     nostalgic.add(new Nostalgic(&processor.mainPianoSynth, nost, tuning.getFirst(), synchronic.getFirst(), newId));
-    nostalgic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
-    
-    nostalgic.getLast()->setSynchronic(synchronic[0]);
 }
 
 // Returns index of Nostalgic to be added/configured.
@@ -673,27 +685,23 @@ int  Gallery::addNostalgicIfNotAlreadyThere(NostalgicPreparation::Ptr nost)
         addNostalgic(nost);
         return nostalgic.size()-1;
     }
-    
 }
 
 void Gallery::addTuning(void)
 {
     int newId = getNewId(PreparationTypeTuning);
     tuning.add(new Tuning(newId, processor.updateState));
-    tuning.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 void Gallery::addTuningWithId(int Id)
 {
     tuning.add(new Tuning(Id, processor.updateState));
-    tuning.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 void Gallery::addTuning(TuningPreparation::Ptr tune)
 {
     int newId = getNewId(PreparationTypeTuning);
     tuning.add(new Tuning(tune, newId, processor.updateState));
-    tuning.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 // Returns index of Tuning to be added/configured.
@@ -726,20 +734,18 @@ void Gallery::addTempo(void)
 {
     int newId = getNewId(PreparationTypeTempo);
     tempo.add(new Tempo(newId, processor.updateState));
-    tempo.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
+    
 }
 
 void Gallery::addTempoWithId(int Id)
 {
     tempo.add(new Tempo(Id, processor.updateState));
-    tempo.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 void Gallery::addTempo(TempoPreparation::Ptr tmp)
 {
     int newId = getNewId(PreparationTypeTempo);
     tempo.add(new Tempo(tmp, newId, processor.updateState));
-    tempo.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 // Returns index of Tempo to be added/configured.
@@ -773,20 +779,22 @@ void Gallery::addDirect(void)
 {
     int newId = getNewId(PreparationTypeDirect);
     direct.add(new Direct(&processor.mainPianoSynth, &processor.resonanceReleaseSynth, &processor.hammerReleaseSynth, tuning[0], processor.updateState, newId));
-    direct.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 void Gallery::addDirectWithId(int Id)
 {
     direct.add(new Direct(&processor.mainPianoSynth, &processor.resonanceReleaseSynth, &processor.hammerReleaseSynth, tuning[0], processor.updateState, Id));
-    direct.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
+}
+
+void Gallery::addDirect(int Id, int tuningId)
+{
+    direct.add(new Direct(&processor.mainPianoSynth, &processor.resonanceReleaseSynth, &processor.hammerReleaseSynth, getTuning(tuningId), processor.updateState, Id));
 }
 
 void Gallery::addDirect(DirectPreparation::Ptr drct)
 {
     int newId = getNewId(PreparationTypeDirect);
     direct.add(new Direct(&processor.mainPianoSynth, &processor.resonanceReleaseSynth, &processor.hammerReleaseSynth, drct, tuning.getFirst(), newId));
-    direct.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 // Returns index of tuning to be added/configured.
