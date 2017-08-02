@@ -903,7 +903,7 @@ void BKKeymapKeyboardComponent::setKeysInKeymap(Array<int> keys)
 
 void BKKeymapKeyboardComponent::setKeyValue(int midiNoteNumber, float val)
 {
-    DBG("setting keyValue directly " + String(midiNoteNumber) + " " + String(val));
+    //DBG("setting keyValue directly " + String(midiNoteNumber) + " " + String(val));
     keyValues.set(midiNoteNumber, val);
 }
 

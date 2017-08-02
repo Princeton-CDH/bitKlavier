@@ -25,7 +25,7 @@ processor(p)
     fullChild.setAlwaysOnTop(true);
     addAndMakeVisible(fullChild);
     
-    setPianoTarget(-1);
+    setPianoTarget(0);
     
     if (type == PreparationTypeTuning)
     {
@@ -104,15 +104,25 @@ void BKItem::configurePianoCB(void)
     menu.setName(cPreparationTypes[type]);
     
     Piano::PtrArr pianos = processor.gallery->getPianos();
+    
+    bool targetExists = false;
     for (int i = 0; i < pianos.size(); i++)
     {
         String name = pianos[i]->getName();
+        
+        if (pianos[i]->getId() == getPianoTarget()) targetExists = true;
         
         if (name != String::empty)
         {
             menu.addItem(pianos[i]->getName(), pianos[i]->getId());
             menu.addSeparator();
         }
+    }
+    
+    if (!targetExists)
+    {
+        setPianoTarget(0);
+        processor.currentPiano->configure();
     }
     
     menu.setSelectedId(getPianoTarget(), NotificationType::dontSendNotification);
@@ -765,7 +775,7 @@ void BKItemGraph::reconstruct(void)
     {
         if (item->getType() == PreparationTypePianoMap)
         {
-            item->setItemType(PreparationTypePianoMap, false);
+            item->configurePianoCB();
         }
         
         addItem(item);

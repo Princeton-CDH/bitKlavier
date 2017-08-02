@@ -65,7 +65,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
     
     // Check PianoMap for whether piano should change due to key strike.
     int whichPiano = currentPiano->pianoMap[noteNumber];
-    if (whichPiano >= 0 && whichPiano != currentPiano->getId())
+    if (whichPiano > 0 && whichPiano != currentPiano->getId())
     {
         DBG("change piano to " + String(whichPiano));
         setCurrentPiano(whichPiano);
