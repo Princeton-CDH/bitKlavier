@@ -15,9 +15,10 @@
 #include "BKComponent.h"
 #include "BKListener.h"
 
-#include "PluginProcessor.h"
-
 #include "ItemMapper.h"
+
+class BKAudioProcessor;
+
 
 class BKItem : public ItemMapper, public BKDraggableComponent, public BKListener
 {
@@ -27,8 +28,6 @@ public:
     typedef Array<Ptr>                          PtrArr;
     
     BKItem(BKPreparationType type, int Id, BKAudioProcessor& p);
-    
-    BKItem(ItemMapper::Ptr mapper, BKAudioProcessor& p);
     
     ~BKItem(void);
     
@@ -46,25 +45,170 @@ public:
     
     inline void setSelected(bool select) {isSelected = select; repaint();}
     inline bool getSelected(void) { return isSelected;}
-
-    inline int getSelectedPianoId(void) const noexcept {return currentId;}
-    inline void setSelectedPianoId(int Id)
+    
+    inline void setConnections(BKItem::PtrArr newConnections)
     {
-        menu.setSelectedItemIndex(Id, dontSendNotification);
+        connections = newConnections;
     }
     
-    inline Point<int> getItemPosition(void)
+    inline bool addConnection(BKItem::Ptr thisItem)
     {
-        return getPosition();
+        bool added = connections.addIfNotAlreadyThere(thisItem);
+        
+        return added;
     }
     
-    inline void setItemBounds(int X, int Y, int width, int height)
+    inline void addConnections(BKItem::PtrArr theseItems)
     {
-        DBG("SET X: " + String(X) + " Y: " + String(Y));
+        for (auto item : theseItems) connections.addIfNotAlreadyThere(item);
+    }
+    
+    
+    inline void removeConnection(BKPreparationType type, int Id)
+    {
+        for (int i = connections.size(); --i >= 0;)
+        {
+            if ((connections.getUnchecked(i)->getType() == type) && (connections.getUnchecked(i)->getId() == Id))
+            {
+                connections.remove(i);
+                break;
+            }
+        }
+    }
+    
+    inline void removeConnection(BKItem::Ptr thisItem)
+    {
+        int index = 0;
+        for (auto item : connections)
+        {
+            if (item == thisItem) connections.remove(index);
+            
+            index++;
+        }
+    }
+    
+    inline bool isConnectedTo(BKPreparationType type, int Id)
+    {
+        for (auto item : connections)
+        {
+            if (item->getType() == type && item->getId() == Id)
+            {
+                return true;
+            }
+        }
         
-        setBounds(X,Y,width,height);
+        return false;
+    }
+    
+    inline bool isConnectedTo(ItemMapper::Ptr thisItem)
+    {
+        for (auto item : connections)
+        {
+            if ((item->getType() == thisItem->getType()) && (item->getId() == thisItem->getId()))
+            {
+                return true;
+            }
+        }
         
-        saveBounds(getBounds());
+        return false;
+    }
+    
+    inline void changeIdOfConnection(BKPreparationType type, int oldId, int newId)
+    {
+        for (auto item : connections)
+        {
+            if (item->getType() == type && item->getId() == oldId)
+            {
+                item->setId(newId);
+                break;
+            }
+        }
+    }
+    
+    inline bool isConnectedToAnyPreparation(void)
+    {
+        BKItem::PtrArr theseItems;
+        
+        for (auto item : connections)
+        {
+            if (item->getType() >= PreparationTypeDirect && item->getType() <= PreparationTypeTempo)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    inline BKItem::PtrArr getConnectionsOfType(BKPreparationType type)
+    {
+        BKItem::PtrArr theseItems;
+        
+        for (auto item : connections)
+        {
+            if (item->getType() == type) theseItems.add(item);
+        }
+        
+        return theseItems;
+    }
+    
+    inline Array<int> getConnectionIdsOfType(BKPreparationType type)
+    {
+        Array<int> theseItems;
+        
+        for (auto item : connections)
+        {
+            if (item->getType() == type) theseItems.add(item->getId());
+        }
+        
+        return theseItems;
+    }
+    
+    inline BKItem::PtrArr getConnections(void) const noexcept { return connections; }
+    
+    inline Array<Array<int>> getConnectionIds(void)
+    {
+        Array<Array<int>> connectionIds;
+        
+        for (int i = 0; i < BKPreparationTypeNil; i++)
+        {
+            Array<int> theseItems = getConnectionIdsOfType((BKPreparationType)i);
+            connectionIds.add(theseItems);
+        }
+        return connectionIds;
+    }
+    
+    
+    inline String connectionsToString(void)
+    {
+        String s = "";
+        for (int type = 0; type < BKPreparationTypeNil; type++)
+        {
+            BKItem::PtrArr connex = getConnectionsOfType((BKPreparationType)type);
+            
+            s += cPreparationTypes[type]+":";
+            
+            for (auto item : connex)
+            {
+                s += " " + String(item->getId());
+            }
+        }
+        return s;
+    }
+    
+    ValueTree getState(void);
+    void setState(XmlElement* xml);
+    
+    inline void clearConnections(void)
+    {
+        connections.clear();
+    }
+    
+    inline void clearConnectionsOfType(BKPreparationType type)
+    {
+        for (int i = connections.size(); --i >= 0;)
+        {
+            if (connections.getUnchecked(i)->getType() == type) connections.remove(i);
+        }
     }
     
     void copy(BKItem::Ptr);
@@ -89,8 +233,8 @@ private:
     BKAudioProcessor& processor;
     Label label;
     
-    // Piano stuff
-    BKComboBox menu; int currentId;
+    // Piano menu
+    BKComboBox menu;
     
     BKItem::PtrArr connections;
     
@@ -132,8 +276,6 @@ public:
     void connect(BKItem* item1, BKItem* item2);
     void disconnect(BKItem* item1, BKItem* item2);
     
-    BKItem::Ptr getItem(ItemMapper::Ptr mapper);
-    BKItem::Ptr createItem(ItemMapper::Ptr mapper);
     
     void reconstruct(void);
     
@@ -216,6 +358,8 @@ private:
     
     JUCE_LEAK_DETECTOR(BKItemGraph)
 };
+
+
 
 
 

@@ -37,7 +37,7 @@ BKViewController(p, theGraph)
             paramSliders.insert(idx, new BKMultiSlider(HorizontalMultiBarSlider));
             addAndMakeVisible(paramSliders[idx]);
             paramSliders[idx]->addMyListener(this);
-            paramSliders[idx]->setName(cSynchronicParameterTypes[idx+SynchronicBeatMultipliers]);
+            paramSliders[idx]->setName(cSynchronicParameterTypes[idx+SynchronicTranspOffsets]);
             paramSliders[idx]->setMinMaxDefaultInc(cSynchronicDefaultRangeValuesAndInc[i]);
             
             if(paramSliders[idx]->getName() == "transpositions")

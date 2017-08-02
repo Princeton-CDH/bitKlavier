@@ -26,9 +26,6 @@ resonanceReleaseSynth()
     {
         noteOn.set(i, false);
     }
-    
-    
-    
 }
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -441,7 +438,7 @@ void BKAudioProcessor::loadGalleryDialog(void)
         {
             currentGallery = myFile.getFileName();
             
-            gallery = new Gallery(xml, &mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, updateState);
+            gallery = new Gallery(xml, *this);
             
             initializeGallery();
         }
@@ -459,7 +456,7 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
     {
         currentGallery = myFile.getFileName();
         
-        gallery = new Gallery(xml, &mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, updateState);
+        gallery = new Gallery(xml, *this);
         
         initializeGallery();
     }
@@ -480,7 +477,7 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
         
         var myJson = JSON::parse(myFile);
         
-        gallery = new Gallery(myJson, &mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, updateState);
+        gallery = new Gallery(myJson, *this);
         
         initializeGallery();
     }
@@ -489,6 +486,8 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
 
 void BKAudioProcessor::initializeGallery(void)
 {
+    for (auto piano : gallery->getPianos()) piano->configure();
+    
     gallery->prepareToPlay(bkSampleRate);
     
     prevPiano = gallery->getPiano(0);
@@ -507,7 +506,7 @@ void BKAudioProcessor::loadJsonGalleryFromPath(String path)
     
     var myJson = JSON::parse(myFile);
     
-    gallery = new Gallery(myJson, &mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, updateState);
+    gallery = new Gallery(myJson, *this);
     
     initializeGallery();
     

@@ -34,8 +34,6 @@ BKConstructionSite::~BKConstructionSite(void)
 
 void BKConstructionSite::redraw(void)
 {
-    BKItem::RCArr items = graph->getItems();
-
     removeAllChildren();
     
     graph->reconstruct();
@@ -43,7 +41,6 @@ void BKConstructionSite::redraw(void)
     graph->deselectAll();
     
     draw();
-    
 }
 
 void BKConstructionSite::move(int which, bool fine)
@@ -177,18 +174,22 @@ void BKConstructionSite::draw(void)
     
     for (auto item : graph->getItems())
     {
+        addAndMakeVisible(item);
+      
+#if AUTO_DRAW
+        
         BKPreparationType type = item->getType();
         int which = item->getId();
         
-        Point<int> xy = item->retrieveXY();
+        Point<int> xy = item->getPosition();
+        
+        DBG("itemxy: " + String(item->getX()) + " " + String(item->getY()));
         
         int x = xy.x; int y = xy.y;
         
-        DBG("DRAW X: " + String(x) + " Y: " + String(y));
-        
         if (type == PreparationTypeKeymap)
         {
-#if AUTO_DRAW
+
             int col = (int)(keymapCount / NUM_COL);
             int row = keymapCount % NUM_COL;
             
@@ -198,15 +199,15 @@ void BKConstructionSite::draw(void)
             item->setTopLeftPosition(X, Y);
             
             keymapCount++;
-#else
+
             
             item->setTopLeftPosition(xy);
-#endif
+
             
         }
         else if (type <= PreparationTypeNostalgic)
         {
-#if AUTO_DRAW
+
             int col = (int)(prepCount / NUM_COL);
             int row = prepCount % NUM_COL;
             
@@ -216,14 +217,12 @@ void BKConstructionSite::draw(void)
             item->setTopLeftPosition(X, Y);
             
             prepCount++;
-#else
-            item->setTopLeftPosition(xy);
-#endif
+
             
         }
         else if (type == PreparationTypeTuning || type == PreparationTypeTempo)
         {
-#if AUTO_DRAW
+
             int col = (int)(ttCount / NUM_COL);
             int row = ttCount % NUM_COL;
             
@@ -234,13 +233,11 @@ void BKConstructionSite::draw(void)
             item->setTopLeftPosition(X, Y);
             
             ttCount++;
-#else
-            item->setTopLeftPosition(xy);
-#endif
+
         }
         else if (type > PreparationTypeKeymap)
         {
-#if AUTO_DRAW
+
             int col = (int)(modCount / NUM_COL);
             int row = modCount % NUM_COL;
             
@@ -251,13 +248,11 @@ void BKConstructionSite::draw(void)
             item->setTopLeftPosition(X, Y);
             
             modCount++;
-#else
-            item->setTopLeftPosition(xy);
-#endif
+
         }
         else
         {
-#if AUTO_DRAW
+
             int col = (int)(otherCount / NUM_COL);
             int row = otherCount % NUM_COL;
             
@@ -267,21 +262,10 @@ void BKConstructionSite::draw(void)
             item->setTopLeftPosition(X, Y);
             
             otherCount++;
-#else
-            item->setTopLeftPosition(xy);
-#endif
+
             
         }
-        
-        addAndMakeVisible(item);
-    }
-    
-    for (auto item : graph->getItems())
-    {
-#if AUTO_DRAW
-        processor.currentPiano->configuration->addItem(item->getType(), item->getId());
 #endif
-        item->saveBounds(item->getBounds());
     }
     
     repaint();
@@ -325,8 +309,6 @@ void BKConstructionSite::addItem(BKPreparationType type)
     BKItem* toAdd = new BKItem(type, thisId, processor);
     
     toAdd->setTopLeftPosition(lastX, lastY);
-    
-    toAdd->saveBounds(toAdd->getBounds());
 
     lastX += 10; lastY += 10;
     
@@ -512,7 +494,6 @@ void BKConstructionSite::mouseDrag (const MouseEvent& e)
         for (auto item : graph->getSelectedItems())
         {
             item->performDrag(e);
-            item->saveBounds(item->getBounds());
         }
     }
     
@@ -558,7 +539,6 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
     {
         if (item->isDragging)
         {
-            item->saveBounds(item->getBounds());
             item->isDragging = false;
         }
     }

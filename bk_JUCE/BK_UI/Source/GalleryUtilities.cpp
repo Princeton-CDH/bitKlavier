@@ -10,6 +10,7 @@
 
 #include "Gallery.h"
 
+#include "PluginProcessor.h"
 
 SynchronicProcessor::Ptr Gallery::getSynchronicProcessor(int Id)
 {
@@ -62,16 +63,12 @@ TempoProcessor::Ptr Gallery::getTempoProcessor(int Id)
 void Gallery::addPiano()
 {
     int newId = getNewId(PreparationTypePiano);
-    bkPianos.add(new Piano(&synchronic, &nostalgic, &direct, &tuning, &tempo,
-                           &modSynchronic, &modNostalgic, &modDirect, &modTuning, &modTempo,
-                           &bkKeymaps, newId));
+    bkPianos.add(new Piano(processor, newId));
 }
 
 void Gallery::addPianoWithId(int Id)
 {
-    bkPianos.add(new Piano(&synchronic, &nostalgic, &direct, &tuning, &tempo,
-                           &modSynchronic, &modNostalgic, &modDirect, &modTuning, &modTempo,
-                           &bkKeymaps, Id));
+    bkPianos.add(new Piano(processor, Id));
 }
 
 void Gallery::removePiano(int Id)
@@ -502,13 +499,13 @@ void Gallery::addKeymap(Keymap::Ptr k)
 void Gallery::addSynchronic(void)
 {
     int newId = getNewId(PreparationTypeSynchronic);
-    synchronic.add(new Synchronic(main, tuning[0], tempo[0], general, updateState, newId));
+    synchronic.add(new Synchronic(&processor.mainPianoSynth, tuning[0], tempo[0], general, processor.updateState, newId));
     synchronic.getLast()->prepareToPlay(bkSampleRate);
 }
 
 void Gallery::addSynchronicWithId(int Id)
 {
-    synchronic.add(new Synchronic(main, tuning[0], tempo[0], general, updateState, Id));
+    synchronic.add(new Synchronic(&processor.mainPianoSynth, tuning[0], tempo[0], general, processor.updateState, Id));
     synchronic.getLast()->prepareToPlay(bkSampleRate);
 }
 
@@ -612,7 +609,7 @@ void Gallery::addTypeWithId(BKPreparationType type, int Id)
 void Gallery::addSynchronic(SynchronicPreparation::Ptr sync)
 {
     int newId = getNewId(PreparationTypeSynchronic);
-    synchronic.add(new Synchronic(main, sync, tuning.getFirst(), tempo.getFirst(), general, newId));
+    synchronic.add(new Synchronic(&processor.mainPianoSynth, sync, tuning.getFirst(), tempo.getFirst(), general, newId));
     synchronic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
@@ -642,7 +639,7 @@ int  Gallery::addSynchronicIfNotAlreadyThere(SynchronicPreparation::Ptr sync)
 void Gallery::addNostalgic(void)
 {
     int newId = getNewId(PreparationTypeNostalgic);
-    nostalgic.add(new Nostalgic(main, tuning.getFirst(), synchronic.getFirst(), updateState, newId));
+    nostalgic.add(new Nostalgic(&processor.mainPianoSynth, tuning.getFirst(), synchronic.getFirst(), processor.updateState, newId));
 
     nostalgic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
     
@@ -651,7 +648,7 @@ void Gallery::addNostalgic(void)
 
 void Gallery::addNostalgicWithId(int Id)
 {
-    nostalgic.add(new Nostalgic(main, tuning.getFirst(), synchronic.getFirst(), updateState, Id));
+    nostalgic.add(new Nostalgic(&processor.mainPianoSynth, tuning.getFirst(), synchronic.getFirst(), processor.updateState, Id));
     nostalgic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
     
     nostalgic.getLast()->setSynchronic(synchronic[0]);
@@ -661,7 +658,7 @@ void Gallery::addNostalgicWithId(int Id)
 void Gallery::addNostalgic(NostalgicPreparation::Ptr nost)
 {
     int newId = getNewId(PreparationTypeNostalgic);
-    nostalgic.add(new Nostalgic(main, nost, tuning.getFirst(), synchronic.getFirst(), newId));
+    nostalgic.add(new Nostalgic(&processor.mainPianoSynth, nost, tuning.getFirst(), synchronic.getFirst(), newId));
     nostalgic.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
     
     nostalgic.getLast()->setSynchronic(synchronic[0]);
@@ -693,20 +690,20 @@ int  Gallery::addNostalgicIfNotAlreadyThere(NostalgicPreparation::Ptr nost)
 void Gallery::addTuning(void)
 {
     int newId = getNewId(PreparationTypeTuning);
-    tuning.add(new Tuning(newId, updateState));
+    tuning.add(new Tuning(newId, processor.updateState));
     tuning.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 void Gallery::addTuningWithId(int Id)
 {
-    tuning.add(new Tuning(Id, updateState));
+    tuning.add(new Tuning(Id, processor.updateState));
     tuning.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 void Gallery::addTuning(TuningPreparation::Ptr tune)
 {
     int newId = getNewId(PreparationTypeTuning);
-    tuning.add(new Tuning(tune, newId, updateState));
+    tuning.add(new Tuning(tune, newId, processor.updateState));
     tuning.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
@@ -739,20 +736,20 @@ int  Gallery::addTuningIfNotAlreadyThere(TuningPreparation::Ptr tune)
 void Gallery::addTempo(void)
 {
     int newId = getNewId(PreparationTypeTempo);
-    tempo.add(new Tempo(newId, updateState));
+    tempo.add(new Tempo(newId, processor.updateState));
     tempo.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 void Gallery::addTempoWithId(int Id)
 {
-    tempo.add(new Tempo(Id, updateState));
+    tempo.add(new Tempo(Id, processor.updateState));
     tempo.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 void Gallery::addTempo(TempoPreparation::Ptr tmp)
 {
     int newId = getNewId(PreparationTypeTempo);
-    tempo.add(new Tempo(tmp, newId, updateState));
+    tempo.add(new Tempo(tmp, newId, processor.updateState));
     tempo.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
@@ -786,20 +783,20 @@ int  Gallery::addTempoIfNotAlreadyThere(TempoPreparation::Ptr tmp)
 void Gallery::addDirect(void)
 {
     int newId = getNewId(PreparationTypeDirect);
-    direct.add(new Direct(main, res, hammer, tuning[0], updateState, newId));
+    direct.add(new Direct(&processor.mainPianoSynth, &processor.resonanceReleaseSynth, &processor.hammerReleaseSynth, tuning[0], processor.updateState, newId));
     direct.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 void Gallery::addDirectWithId(int Id)
 {
-    direct.add(new Direct(main, res, hammer, tuning[0], updateState, Id));
+    direct.add(new Direct(&processor.mainPianoSynth, &processor.resonanceReleaseSynth, &processor.hammerReleaseSynth, tuning[0], processor.updateState, Id));
     direct.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 
 void Gallery::addDirect(DirectPreparation::Ptr drct)
 {
     int newId = getNewId(PreparationTypeDirect);
-    direct.add(new Direct(main, res, hammer, drct, tuning.getFirst(), newId));
+    direct.add(new Direct(&processor.mainPianoSynth, &processor.resonanceReleaseSynth, &processor.hammerReleaseSynth, drct, tuning.getFirst(), newId));
     direct.getLast()->processor->setCurrentPlaybackSampleRate(bkSampleRate);
 }
 

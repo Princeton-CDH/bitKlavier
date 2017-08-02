@@ -18,6 +18,10 @@
 
 #include "Piano.h"
 
+#include "BKGraph.h"
+
+class BKAudioProcessor;
+
 class Gallery : public ReferenceCountedObject
 {
 public:
@@ -27,10 +31,8 @@ public:
     typedef OwnedArray<Gallery>                  Arr;
     typedef OwnedArray<Gallery, CriticalSection> CSArr;
  
-    Gallery(ScopedPointer<XmlElement> xml);
-    Gallery(ScopedPointer<XmlElement> xml, BKSynthesiser* main, BKSynthesiser* res, BKSynthesiser* hammer, BKUpdateState::Ptr state);
-    Gallery(var json);
-    Gallery(var json, BKSynthesiser* main, BKSynthesiser* res, BKSynthesiser* hammer, BKUpdateState::Ptr state);
+    Gallery(ScopedPointer<XmlElement> xml, BKAudioProcessor&);
+    Gallery(var json, BKAudioProcessor&);
     ~Gallery();
     
     ValueTree  getState(void);
@@ -601,17 +603,13 @@ public:
     
 private:
     double bkSampleRate;
+    BKAudioProcessor& processor;
     
     Array< int> idCount;
     
     Array< Array<int>> idIndexList;
     
     String url;
-    
-    BKUpdateState::Ptr updateState;
-    BKSynthesiser* main;
-    BKSynthesiser* res;
-    BKSynthesiser* hammer;
     
     GeneralSettings::Ptr                general;
     

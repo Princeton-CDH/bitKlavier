@@ -10,8 +10,6 @@
 
 #include "PluginProcessor.h"
 
-
-
 Array<float> tempoAlreadyLoaded;
 
 #define jsonGetValue(ID) data.getProperty(ID, "").getArray()->getFirst()

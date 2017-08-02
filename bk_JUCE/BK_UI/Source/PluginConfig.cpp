@@ -95,7 +95,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
         ScopedPointer<XmlElement> galleryXML (getXmlFromBinary (data, sizeInBytes));
         if (galleryXML != nullptr)
         {
-            gallery = new Gallery(galleryXML, &mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, updateState);
+            gallery = new Gallery(galleryXML, *this);
             
             initializeGallery();
 

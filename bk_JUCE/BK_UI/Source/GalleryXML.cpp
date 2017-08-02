@@ -253,7 +253,6 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                     bkPianos.getLast()->setState(e);
                     
                     ++pianoCount;
-                    
                 }
             }
         }

@@ -259,8 +259,11 @@ void HeaderViewController::fillPianoCB(void)
     for (auto piano : processor.gallery->getPianos())
     {
         String name = piano->getName();
+        
         if (name != String::empty)  pianoCB.addItem(name, ++count);
+        else                        pianoCB.addItem("Piano" + String(piano->getId()), ++count);
     }
+    
     pianoCB.addSeparator();
     pianoCB.addItem("New piano...", ++count);
     
@@ -291,32 +294,22 @@ void HeaderViewController::bkComboBoxDidChange            (ComboBox* cb)
     
     if (name == "pianoCB")
     {
-        // Add piano if New piano... pressed.
-        if (index == (pianoCB.getNumItems()-1))
+        int newId = processor.gallery->getIdFromIndex(PreparationTypePiano, index);
+        
+        if (index == cb->getNumItems()-1)
         {
-            int newIndex = processor.gallery->getNumPianos();
+            processor.gallery->addPiano();
             
-            int newId = processor.gallery->getNewId(PreparationTypePiano);
+            Piano::Ptr thisPiano = processor.gallery->getPianos().getLast();
             
-            processor.gallery->addPianoWithId(newId);
-            
-            String newName = "Piano"+String(newId);
-            
-            processor.gallery->getPianos().getLast()->setName(newName);
-            
-            pianoCB.changeItemText(newIndex, newName);
-            
-            pianoCB.setSelectedId(newIndex+1);
-            
-            pianoCB.addSeparator();
-            pianoCB.addItem("New piano...", newIndex + 2);
-            
+            newId = thisPiano->getId();
         }
         
-        int pianoId = processor.gallery->getIdFromIndex(PreparationTypePiano, index);
+        processor.setCurrentPiano(newId);
         
-        processor.setCurrentPiano(pianoId);
+        fillPianoCB();
         
+        update();
         
     }
     else if (name == "galleryCB")

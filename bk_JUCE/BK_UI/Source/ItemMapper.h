@@ -12,6 +12,8 @@
 
 #include "BKUtilities.h"
 
+#include "BKGraph.h"
+
 class ItemMapper : public ReferenceCountedObject
 {
 public:
@@ -24,14 +26,13 @@ public:
     Id(Id),
     editted(false)
     {
-    
+        
     }
     
     void print(void)
     {
         DBG("~ ~ ~ ~ ~ ~ ~ MAPPER ~ ~ ~ ~ ~ ~ ~ ~");
-        DBG("type: " + String(type)  + "\nId: " + String(Id) + "\nConnections: ");
-        for (auto item : connections) DBG("ctype: " + String(item->getType()) + " cId: " + String(item->getId()));
+        DBG("type: " + String(type)  + "\nId: " + String(Id));
         DBG("~ ~ ~ ~ ~ ~ ~ ~ ~~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
     }
     
@@ -41,182 +42,8 @@ public:
     inline BKPreparationType getType(void) const noexcept { return type; }
     inline void setType(BKPreparationType newType) { type = newType; }
     
-    inline void setConnections(ItemMapper::PtrArr newConnections)
-    {
-        connections = newConnections;
-    }
-    
-    inline bool addConnection(ItemMapper::Ptr thisItem)
-    {
-        bool added = connections.addIfNotAlreadyThere(thisItem);
-        
-        return added;
-    }
-    
-    inline void addConnections(ItemMapper::PtrArr theseItems)
-    {
-        for (auto item : theseItems) connections.addIfNotAlreadyThere(item);
-    }
-    
-    
-    inline void removeConnection(BKPreparationType type, int Id)
-    {
-        for (int i = connections.size(); --i >= 0;)
-        {
-            if ((connections.getUnchecked(i)->getType() == type) && (connections.getUnchecked(i)->getId() == Id))
-            {
-                connections.remove(i);
-                break;
-            }
-        }
-    }
-    
-    inline void removeConnection(ItemMapper::Ptr thisItem)
-    {
-        int index = 0;
-        for (auto item : connections)
-        {
-            if (item == thisItem) connections.remove(index);
-            
-            index++;
-        }
-    }
-    
-    inline bool isConnectedTo(BKPreparationType type, int Id)
-    {
-        for (auto item : connections)
-        {
-            if (item->getType() == type && item->getId() == Id)
-            {
-                return true;
-            }
-        }
-        
-        return false;
-    }
-    
-    inline bool isConnectedTo(ItemMapper::Ptr thisItem)
-    {
-        for (auto item : connections)
-        {
-            if ((item->getType() == thisItem->getType()) && (item->getId() == thisItem->getId()))
-            {
-                return true;
-            }
-        }
-        
-        return false;
-    }
-    
-    inline void changeIdOfConnection(BKPreparationType type, int oldId, int newId)
-    {
-        for (auto item : connections)
-        {
-            if (item->getType() == type && item->getId() == oldId)
-            {
-                item->setId(newId);
-                break;
-            }
-        }
-    }
-    
-    inline bool isConnectedToAnyPreparation(void)
-    {
-        ItemMapper::PtrArr theseItems;
-        
-        for (auto item : connections)
-        {
-            if (item->getType() >= PreparationTypeDirect && item->getType() <= PreparationTypeTempo)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    inline ItemMapper::PtrArr getConnectionsOfType(BKPreparationType type)
-    {
-        ItemMapper::PtrArr theseItems;
-        
-        for (auto item : connections)
-        {
-            if (item->getType() == type) theseItems.add(item);
-        }
-        
-        return theseItems;
-    }
-    
-    inline Array<int> getConnectionIdsOfType(BKPreparationType type)
-    {
-        Array<int> theseItems;
-        
-        for (auto item : connections)
-        {
-            if (item->getType() == type) theseItems.add(item->getId());
-        }
-        
-        return theseItems;
-    }
-    
-    inline ItemMapper::PtrArr getConnections(void) const noexcept { return connections; }
-    
-    inline Array<Array<int>> getConnectionIds(void)
-    {
-        Array<Array<int>> connectionIds;
-        
-        for (int i = 0; i < BKPreparationTypeNil; i++)
-        {
-            Array<int> theseItems = getConnectionIdsOfType((BKPreparationType)i);
-            connectionIds.add(theseItems);
-        }
-        return connectionIds;
-    }
-    
-    
-    inline String connectionsToString(void)
-    {
-        String s = "";
-        for (int type = 0; type < BKPreparationTypeNil; type++)
-        {
-            ItemMapper::PtrArr connex = getConnectionsOfType((BKPreparationType)type);
-            
-            s += cPreparationTypes[type]+":";
-            
-            for (auto item : connex)
-            {
-                s += " " + String(item->getId());
-            }
-        }
-        return s;
-    }
-    
-
-    inline void clearConnections(void)
-    {
-        connections.clear();
-    }
-    
-    inline void clearConnectionsOfType(BKPreparationType type)
-    {
-        for (int i = connections.size(); --i >= 0;)
-        {
-            if (connections.getUnchecked(i)->getType() == type) connections.remove(i);
-        }
-    }
-    
     inline void setItemName(String s) { name = s; }
     inline String getItemName(void) const noexcept { return name;}
-    
-    // CONFIGURATION
-    inline int retrieveX(void) const noexcept { return bounds.getX(); };
-    inline int retrieveY(void) const noexcept { return bounds.getY(); };
-    
-    inline Point<int> retrieveXY(void) { return bounds.getPosition(); };
-    inline int retrieveWidth(void) { return bounds.getWidth(); }
-    inline int retrieveHeight(void) { return bounds.getHeight(); }
-    
-    inline void saveBounds(Rectangle<int> newBounds) { bounds = newBounds; }
-    inline Rectangle<int> retrieveBounds(void) const noexcept { return bounds; }
     
     // ACTIVE
     inline bool isActive(void) const noexcept {return active;}
@@ -237,10 +64,6 @@ protected:
     
     int pianoTarget;
     
-    ItemMapper::PtrArr connections;
-    
-    Rectangle<int> bounds;
-    
     bool active;
     bool editted;
     
@@ -248,3 +71,4 @@ private:
     
     JUCE_LEAK_DETECTOR(ItemMapper);
 };
+

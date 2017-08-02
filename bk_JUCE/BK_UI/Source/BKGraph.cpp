@@ -12,7 +12,7 @@
 
 #include "PreparationMap.h"
 
-#include "Piano.h"
+#include "PluginProcessor.h"
 
 #include "BKConstructionSite.h"
 
@@ -24,6 +24,8 @@ processor(p)
 {
     fullChild.setAlwaysOnTop(true);
     addAndMakeVisible(fullChild);
+    
+    setPianoTarget(-1);
     
     if (type == PreparationTypeTuning)
     {
@@ -53,12 +55,6 @@ processor(p)
     {
         setItemType(type, false);
     }
-}
-
-BKItem::BKItem(ItemMapper::Ptr mapper, BKAudioProcessor& p):
-BKItem(mapper->getType(), mapper->getId(), p)
-{
-    
 }
 
 BKItem::~BKItem()
@@ -130,7 +126,7 @@ void BKItem::setItemType(BKPreparationType newType, bool create)
     }
     else if (type == PreparationTypePianoMap)
     {
-        ItemMapper::setType(PreparationTypePianoMap);
+        setType(PreparationTypePianoMap);
         
         setPianoTarget(processor.currentPiano->getId());
         
@@ -161,7 +157,6 @@ void BKItem::setItemType(BKPreparationType newType, bool create)
     {
         setActive(true);
         
-        saveBounds(getBounds());
         processor.currentPiano->add(this);
     }
     
@@ -210,9 +205,6 @@ void BKItem::copy(BKItem::Ptr itemToCopy)
     position = itemToCopy->getPosition();
     type = itemToCopy->getType();
     Id = itemToCopy->getId();
-    currentId = itemToCopy->getSelectedPianoId();
-    
-    // COPY CONNECTIONS TOO, OR HAVE REDUNDANT 2D ARRAY OF CONNEX
 }
 
 void BKItem::bkComboBoxDidChange    (ComboBox* cb)
@@ -222,15 +214,11 @@ void BKItem::bkComboBoxDidChange    (ComboBox* cb)
     
     if (name == "PianoMap")
     {
-        if (pianoId != currentId)
+        if (pianoId != getPianoTarget())
         {
-            currentId = pianoId;
+            setPianoTarget(pianoId);
             
-            // FIX THIS
-            
-            ((BKConstructionSite*)getParentComponent())->pianoMapDidChange(this);
-            
-            DBG("New piano selected: "+String(currentId));
+            processor.currentPiano->configure();
         }
     }
 }
@@ -332,6 +320,53 @@ void BKItem::keyPressedWhileSelected(const KeyPress& e)
     
 }
 
+ValueTree BKItem::getState(void)
+{
+    ValueTree itemVT( "item");
+    
+    itemVT.setProperty("name", name, 0);
+    
+    itemVT.setProperty("type", type, 0);
+    itemVT.setProperty("Id", Id, 0);
+    
+    itemVT.setProperty("piano", getPianoTarget(), 0);
+    
+    itemVT.setProperty("active", isActive(), 0);
+    
+    itemVT.setProperty("X", getX(), 0);
+    itemVT.setProperty("Y", getY(), 0);
+    
+    return itemVT;
+}
+
+void BKItem::setState(XmlElement* e)
+{
+    String s; bool b; int i;
+    
+    s = e->getStringAttribute( "name" );
+    name = s;
+    
+    i = e->getStringAttribute( "type" ).getIntValue();
+    type = (BKPreparationType)i;
+    
+    i = e->getStringAttribute( "Id" ).getIntValue();
+    Id = i;
+    
+    i = e->getStringAttribute( "piano" ).getIntValue();
+    setPianoTarget(i);
+    b = (bool) e->getStringAttribute( "active" ).getIntValue();
+    setActive(b);
+    
+    i = e->getStringAttribute( "X" ).getIntValue();
+    int x = i;
+    
+    i = e->getStringAttribute( "Y" ).getIntValue();
+    int y = i;
+    
+    setTopLeftPosition(x,y);
+}
+
+
 
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ BKGraph ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -359,12 +394,12 @@ void BKItemGraph::addAndRegisterItem(BKItem* thisItem)
 void BKItemGraph::addItem(BKItem* thisItem)
 {
     items.add(thisItem);
+    
+    DBG("itemxy: " + String(thisItem->getX()) + " " + String(thisItem->getY()));
 }
 
 void BKItemGraph::registerItem(BKItem* thisItem)
 {
-    thisItem->saveBounds(thisItem->getBounds());
-    
     thisItem->setActive(true);
     
     processor.currentPiano->add(thisItem);
@@ -447,20 +482,6 @@ void BKItemGraph::clear(void)
     }
 }
 
-BKItem::Ptr BKItemGraph::getItem(ItemMapper::Ptr mapper)
-{
-    for (auto item : items)
-    {
-        if (item == mapper) return item;
-    }
-    return nullptr;
-}
-
-BKItem::Ptr BKItemGraph::createItem(ItemMapper::Ptr mapper)
-{
-    return new BKItem(mapper, processor);
-}
-
 void BKItemGraph::connect(BKItem* item1, BKItem* item2)
 {
     if ((item1 == item2) || (item1->isConnectedTo(item2) && item2->isConnectedTo(item1))) return;
@@ -488,7 +509,7 @@ void BKItemGraph::connect(BKItem* item1, BKItem* item2)
     }
     else if (item1Type == PreparationTypeNostalgic && item2Type == PreparationTypeSynchronic)
     {
-        ItemMapper::PtrArr synchronics = item1->getConnectionsOfType(PreparationTypeSynchronic);
+        BKItem::PtrArr synchronics = item1->getConnectionsOfType(PreparationTypeSynchronic);
         
         for (auto sync : synchronics)
         {
@@ -498,7 +519,7 @@ void BKItemGraph::connect(BKItem* item1, BKItem* item2)
     }
     else if (item1Type == PreparationTypeSynchronic && item2Type == PreparationTypeNostalgic)
     {
-        ItemMapper::PtrArr synchronics = item2->getConnectionsOfType(PreparationTypeSynchronic);
+        BKItem::PtrArr synchronics = item2->getConnectionsOfType(PreparationTypeSynchronic);
         
         for (auto sync : synchronics)
         {
@@ -508,7 +529,7 @@ void BKItemGraph::connect(BKItem* item1, BKItem* item2)
     }
     else if (item1Type == PreparationTypeSynchronic && item2Type == PreparationTypeTempo)
     {
-        ItemMapper::PtrArr tempos = item1->getConnectionsOfType(PreparationTypeTempo);
+        BKItem::PtrArr tempos = item1->getConnectionsOfType(PreparationTypeTempo);
         
         for (auto temp : tempos)
         {
@@ -518,7 +539,7 @@ void BKItemGraph::connect(BKItem* item1, BKItem* item2)
     }
     else if (item1Type == PreparationTypeTempo && item2Type == PreparationTypeSynchronic)
     {
-        ItemMapper::PtrArr tempos = item2->getConnectionsOfType(PreparationTypeTempo);
+        BKItem::PtrArr tempos = item2->getConnectionsOfType(PreparationTypeTempo);
         
         for (auto temp : tempos)
         {
@@ -528,7 +549,7 @@ void BKItemGraph::connect(BKItem* item1, BKItem* item2)
     }
     else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypePianoMap)
     {
-        ItemMapper::PtrArr pianos = item1->getConnectionsOfType(PreparationTypePianoMap);
+        BKItem::PtrArr pianos = item1->getConnectionsOfType(PreparationTypePianoMap);
         
         for (auto piano : pianos)
         {
@@ -538,7 +559,7 @@ void BKItemGraph::connect(BKItem* item1, BKItem* item2)
     }
     else if (item1Type == PreparationTypePianoMap && item2Type == PreparationTypeKeymap)
     {
-        ItemMapper::PtrArr pianos = item2->getConnectionsOfType(PreparationTypePianoMap);
+        BKItem::PtrArr pianos = item2->getConnectionsOfType(PreparationTypePianoMap);
         
         for (auto piano : pianos)
         {
@@ -548,7 +569,7 @@ void BKItemGraph::connect(BKItem* item1, BKItem* item2)
     }
     else if ((item1Type >= PreparationTypeDirect && item1Type <= PreparationTypeTempo) && item2Type == PreparationTypeTuning)
     {
-        ItemMapper::PtrArr tunings = item1->getConnectionsOfType(PreparationTypeTuning);
+        BKItem::PtrArr tunings = item1->getConnectionsOfType(PreparationTypeTuning);
         
         for (auto tune : tunings)
         {
@@ -558,7 +579,7 @@ void BKItemGraph::connect(BKItem* item1, BKItem* item2)
     }
     else if (item1Type == PreparationTypeTuning && (item2Type >= PreparationTypeDirect && item2Type <= PreparationTypeTempo))
     {
-        ItemMapper::PtrArr tunings = item2->getConnectionsOfType(PreparationTypeTuning);
+        BKItem::PtrArr tunings = item2->getConnectionsOfType(PreparationTypeTuning);
         
         for (auto tune : tunings)
         {
@@ -610,10 +631,10 @@ Array<Line<int>> BKItemGraph::getLines(void)
     
         if (type == PreparationTypeKeymap)
         {
-            ItemMapper::PtrArr connex = item->getConnections();
+            BKItem::PtrArr connex = item->getConnections();
             for (auto target : connex)
             {
-                Rectangle<int> otherBounds = target->retrieveBounds();
+                Rectangle<int> otherBounds = target->getBounds();
                 
                 lines.add(Line<int>(item->getX() + item->getWidth()/2.0f,
                                     item->getY() + item->getHeight()/2.0f,
@@ -631,7 +652,7 @@ Array<Line<int>> BKItemGraph::getLines(void)
                 
                 if (targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic)
                 {
-                    Rectangle<int> otherBounds = target->retrieveBounds();
+                    Rectangle<int> otherBounds = target->getBounds();
                     
                     lines.add(Line<int>(item->getX() + item->getWidth()/2.0f,
                                         item->getY() + item->getHeight()/2.0f,
@@ -650,7 +671,7 @@ Array<Line<int>> BKItemGraph::getLines(void)
                 
                 if (targetType == PreparationTypeSynchronic)
                 {
-                    Rectangle<int> otherBounds = target->retrieveBounds();
+                    Rectangle<int> otherBounds = target->getBounds();
                     
                     lines.add(Line<int>(item->getX() + item->getWidth()/2.0f,
                                         item->getY() + item->getHeight()/2.0f,
@@ -665,11 +686,10 @@ Array<Line<int>> BKItemGraph::getLines(void)
             for (auto target : item->getConnections())
             {
                 BKPreparationType targetType = target->getType();
-                int targetId = target->getId();
                 
                 if (targetType == PreparationTypeNostalgic)
                 {
-                    Rectangle<int> otherBounds = target->retrieveBounds();
+                    Rectangle<int> otherBounds = target->getBounds();
                     
                     lines.add(Line<int>(item->getX() + item->getWidth()/2.0f,
                                         item->getY() + item->getHeight()/2.0f,
@@ -687,7 +707,7 @@ Array<Line<int>> BKItemGraph::getLines(void)
                 
                 if (targetType != PreparationTypeKeymap)
                 {
-                    Rectangle<int> otherBounds = target->retrieveBounds();
+                    Rectangle<int> otherBounds = target->getBounds();
                     
                     lines.add(Line<int>(item->getX() + item->getWidth()/2.0f,
                                         item->getY() + item->getHeight()/2.0f,
@@ -696,26 +716,18 @@ Array<Line<int>> BKItemGraph::getLines(void)
                 }
             }
         }
-        
-        
-        
     }
     return lines;
 }
 
 void BKItemGraph::reconstruct(void)
 {
+    items.clear();
+    
     Piano::Ptr thisPiano = processor.currentPiano;
     
     // Create items based on the ItemMappers in current Piano and add them to BKItemGraph
-    for (auto item : thisPiano->getItems())
-    {
-        BKItem* newItem = new BKItem(item, processor);
-        
-        addItem(newItem);
-        
-        newItem->setTopLeftPosition(newItem->retrieveXY());
-    }
+    for (auto item : thisPiano->getItems()) addItem(item);
 }
 
 bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType type2)
@@ -826,5 +838,7 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
     
     return false;
 }
+
+
 
 
