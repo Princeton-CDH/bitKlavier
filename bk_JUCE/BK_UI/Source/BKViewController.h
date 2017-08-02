@@ -30,7 +30,7 @@ public:
     BKViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
     processor(p),
     theGraph(theGraph),
-    lastIndex(-1)
+    lastId(0)
     {
         
     }
@@ -64,7 +64,7 @@ protected:
     ImageComponent iconImageComponent;
     TextButton hideOrShow;
     
-    int lastIndex;
+    int lastId;
     
 private:
     

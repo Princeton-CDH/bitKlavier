@@ -230,30 +230,27 @@ void NostalgicPreparationEditor::bkMessageReceived (const String& message)
 void NostalgicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
+    int Id = box->getSelectedId();
     int index = box->getSelectedItemIndex();
     
     if (name == "Nostalgic")
     {
-        int newId = processor.gallery->getIdFromIndex(PreparationTypeNostalgic, index);
-        
-        if (index == selectCB.getNumItems()-1)
+        if (Id == selectCB.getNumItems()-1)
         {
             processor.gallery->addNostalgic();
             
-            Nostalgic::Ptr thisNostalgic = processor.gallery->getAllNostalgic().getLast();
-            
-            newId = thisNostalgic->getId();
+            Id = processor.gallery->getAllNostalgic().getLast()->getId();
         }
         
-        processor.updateState->currentNostalgicId = newId;
+        processor.updateState->currentNostalgicId = Id;
         
         processor.updateState->idDidChange = true;
         
         update();
         
-        fillSelectCB(lastIndex+1, index+1);
+        fillSelectCB(lastId, Id);
         
-        lastIndex = index;
+        lastId = Id;
     }
     else if (name == "Length Mode")
     {
@@ -263,8 +260,8 @@ void NostalgicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
         NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
         
-        prep    ->setMode((NostalgicSyncMode) box->getSelectedItemIndex());
-        active  ->setMode((NostalgicSyncMode) box->getSelectedItemIndex());
+        prep    ->setMode((NostalgicSyncMode) index);
+        active  ->setMode((NostalgicSyncMode) index);
         
         if(prep->getMode() == NoteLengthSync)
         {
@@ -324,36 +321,32 @@ void NostalgicPreparationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
-    Array<int> index = processor.gallery->getIndexList(PreparationTypeNostalgic);
-    
-    for (int i = 0; i < index.size(); i++)
+    for (auto prep : processor.gallery->getAllNostalgic())
     {
-        int Id = index[i];
-        String name = processor.gallery->getNostalgic(Id)->getName();
-        if (name != String::empty)  selectCB.addItem(name, i+1);
-        else                        selectCB.addItem(String(i+1), i+1);
+        int Id = prep->getId();;
+        String name = prep->getName();
         
-        selectCB.setItemEnabled(i+1, true);
-        if (processor.currentPiano->isActive(PreparationTypeNostalgic, Id) &&
-            (Id != processor.updateState->currentNostalgicId))
-        {
-            selectCB.setItemEnabled(i+1, false);
-        }
+        if (name != String::empty)  selectCB.addItem(name, Id);
+        else                        selectCB.addItem("Nostalgic"+String(Id), Id);
+        
+        selectCB.setItemEnabled(Id, true);
+        if (processor.currentPiano->isActive(PreparationTypeNostalgic, Id))
+            selectCB.setItemEnabled(Id, false);
     }
     
-    if (last != -1)     selectCB.setItemEnabled(last, true);
-    if (current != -1)  selectCB.setItemEnabled(current, false);
+    if (last != 0)      selectCB.setItemEnabled(last, true);
+    if (current != 0)   selectCB.setItemEnabled(current, false);
     
-    int selectedIndex = processor.gallery->getIndexFromId(PreparationTypeNostalgic,
-                                                          processor.updateState->currentNostalgicId);
-    selectCB.setSelectedItemIndex(selectedIndex,
-                                  NotificationType::dontSendNotification);
-    selectCB.setItemEnabled(selectedIndex+1, false);
+    int selectedId = processor.updateState->currentNostalgicId;
+    
+    selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
+    
+    selectCB.setItemEnabled(selectedId, false);
     
     selectCB.addSeparator();
-    selectCB.addItem("New Nostalgic...", index.size()+1);
+    selectCB.addItem("New Nostalgic...", -1);
     
-    lastIndex = selectedIndex;
+    lastId = selectedId;
     
 }
 
@@ -489,36 +482,32 @@ void NostalgicModificationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
-    Array<int> index = processor.gallery->getIndexList(PreparationTypeNostalgicMod);
-    
-    for (int i = 0; i < index.size(); i++)
+    for (auto prep : processor.gallery->getNostalgicModPreparations())
     {
-        int Id = index[i];
-        String name = processor.gallery->getNostalgicModPreparation(Id)->getName();
-        if (name != String::empty)  selectCB.addItem(name, i+1);
-        else                        selectCB.addItem(String(i+1), i+1);
+        int Id = prep->getId();;
+        String name = prep->getName();
         
-        selectCB.setItemEnabled(i+1, true);
-        if (processor.currentPiano->isActive(PreparationTypeNostalgicMod, Id) &&
-            (Id != processor.updateState->currentModNostalgicId))
-        {
-            selectCB.setItemEnabled(i+1, false);
-        }
+        if (name != String::empty)  selectCB.addItem(name, Id);
+        else                        selectCB.addItem("NostalgicMod"+String(Id), Id);
+        
+        selectCB.setItemEnabled(Id, true);
+        if (processor.currentPiano->isActive(PreparationTypeNostalgic, Id))
+            selectCB.setItemEnabled(Id, false);
     }
     
-    if (last != -1)     selectCB.setItemEnabled(last, true);
-    if (current != -1)  selectCB.setItemEnabled(current, false);
+    if (last != 0)      selectCB.setItemEnabled(last, true);
+    if (current != 0)   selectCB.setItemEnabled(current, false);
     
-    int selectedIndex = processor.gallery->getIndexFromId(PreparationTypeNostalgicMod,
-                                                          processor.updateState->currentModNostalgicId);
-    selectCB.setSelectedItemIndex(selectedIndex,
-                                  NotificationType::dontSendNotification);
-    selectCB.setItemEnabled(selectedIndex+1, false);
+    int selectedId = processor.updateState->currentNostalgicId;
+    
+    selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
+    
+    selectCB.setItemEnabled(selectedId, false);
     
     selectCB.addSeparator();
-    selectCB.addItem("New Nostalgic modification...", index.size()+1);
+    selectCB.addItem("New Nostalgic Mod...", -1);
     
-    lastIndex = selectedIndex;
+    lastId = selectedId;
 }
 
 void NostalgicModificationEditor::timerCallback()
@@ -567,36 +556,33 @@ void NostalgicModificationEditor::bkMessageReceived (const String& message)
 void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
+    int Id = box->getSelectedId();
     int index = box->getSelectedItemIndex();
     
     if (name == "Nostalgic")
     {
-        int newId = processor.gallery->getIdFromIndex(PreparationTypeNostalgicMod, index);
-        
-        if (index == selectCB.getNumItems()-1)
+        if (Id == -1)
         {
             processor.gallery->addNostalgicMod();
             
-            NostalgicModPreparation::Ptr thisMod = processor.gallery->getNostalgicModPreparations().getLast();
-            
-            newId = thisMod->getId();
+            Id = processor.gallery->getNostalgicModPreparations().getLast()->getId();
         }
         
-        processor.updateState->currentModNostalgicId = newId;
+        processor.updateState->currentModNostalgicId = Id;
         
         processor.updateState->idDidChange = true;
         
         update();
         
-        fillSelectCB(lastIndex+1, index+1);
+        fillSelectCB(lastId, Id);
         
-        lastIndex = index;
+        lastId = Id;
     }
     else if (name == "Length Mode")
     {
         NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
         
-        NostalgicSyncMode mode = (NostalgicSyncMode) box->getSelectedItemIndex();
+        NostalgicSyncMode mode = (NostalgicSyncMode) index;
         
         mod->setParam(NostalgicMode, String(mode));
         

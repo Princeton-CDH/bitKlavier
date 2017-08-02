@@ -164,30 +164,26 @@ void DirectPreparationEditor::bkMessageReceived (const String& message)
 void DirectPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
-    int index = box->getSelectedItemIndex();
+    int Id = box->getSelectedId();
 
     if (name == "Direct")
     {
-        int newId = processor.gallery->getIdFromIndex(PreparationTypeDirect, index);
-        
-        if (index == selectCB.getNumItems()-1)
+        if (Id == -1)
         {
             processor.gallery->addDirect();
             
-            Direct::Ptr thisDirect = processor.gallery->getAllDirect().getLast();
-            
-            newId = thisDirect->getId();
+            Id = processor.gallery->getAllDirect().getLast()->getId();
         }
         
-        processor.updateState->currentDirectId = newId;
+        processor.updateState->currentDirectId = Id;
         
         processor.updateState->idDidChange = true;
         
         update();
         
-        fillSelectCB(lastIndex+1, index+1);
+        fillSelectCB(lastId, Id);
     
-        lastIndex = index;
+        lastId = Id;
     }
 }
 
@@ -244,37 +240,32 @@ void DirectPreparationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
-    Array<int> index = processor.gallery->getIndexList(PreparationTypeDirect);
-    
-    for (int i = 0; i < index.size(); i++)
+    for (auto prep : processor.gallery->getAllDirect())
     {
-        int Id = index[i];
-        String name = processor.gallery->getDirect(Id)->getName();
-        if (name != String::empty)  selectCB.addItem(name, i+1);
-        else                        selectCB.addItem(String(i+1), i+1);
+        int Id = prep->getId();;
+        String name = prep->getName();
         
-        selectCB.setItemEnabled(i+1, true);
-        if (processor.currentPiano->isActive(PreparationTypeDirect, Id) &&
-            (Id != processor.updateState->currentDirectId))
-        {
-            selectCB.setItemEnabled(i+1, false);
-        }
+        if (name != String::empty)  selectCB.addItem(name, Id);
+        else                        selectCB.addItem("Direct"+String(Id), Id);
+        
+        selectCB.setItemEnabled(Id, true);
+        if (processor.currentPiano->isActive(PreparationTypeDirect, Id))
+            selectCB.setItemEnabled(Id, false);
     }
     
-    if (last != -1)     selectCB.setItemEnabled(last, true);
-    if (current != -1)  selectCB.setItemEnabled(current, false);
+    if (last != 0)      selectCB.setItemEnabled(last, true);
+    if (current != 0)   selectCB.setItemEnabled(current, false);
     
-    int selectedIndex = processor.gallery->getIndexFromId(PreparationTypeDirect,
-                                                          processor.updateState->currentDirectId);
-    selectCB.setSelectedItemIndex(selectedIndex,
-                                  NotificationType::dontSendNotification);
-    selectCB.setItemEnabled(selectedIndex+1, false);
+    int selectedId = processor.updateState->currentDirectId;
+    
+    selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
+    
+    selectCB.setItemEnabled(selectedId, false);
     
     selectCB.addSeparator();
-    selectCB.addItem("New Direct...", index.size()+1);
+    selectCB.addItem("New Direct...", -1);
     
-    lastIndex = selectedIndex;
-    
+    lastId = selectedId;
 }
 
 void DirectPreparationEditor::buttonClicked (Button* b)
@@ -364,36 +355,32 @@ void DirectModificationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
-    Array<int> index = processor.gallery->getIndexList(PreparationTypeDirectMod);
-    
-    for (int i = 0; i < index.size(); i++)
+    for (auto prep : processor.gallery->getDirectModPreparations())
     {
-        int Id = index[i];
-        String name = processor.gallery->getDirectModPreparation(Id)->getName();
-        if (name != String::empty)  selectCB.addItem(name, i+1);
-        else                        selectCB.addItem(String(i+1), i+1);
+        int Id = prep->getId();;
+        String name = prep->getName();
         
-        selectCB.setItemEnabled(i+1, true);
-        if (processor.currentPiano->isActive(PreparationTypeDirectMod, Id) &&
-            (Id != processor.updateState->currentModDirectId))
-        {
-            selectCB.setItemEnabled(i+1, false);
-        }
+        if (name != String::empty)  selectCB.addItem(name, Id);
+        else                        selectCB.addItem("DirectMod"+String(Id), Id);
+        
+        selectCB.setItemEnabled(Id, true);
+        if (processor.currentPiano->isActive(PreparationTypeDirect, Id))
+            selectCB.setItemEnabled(Id, false);
     }
     
-    if (last != -1)     selectCB.setItemEnabled(last, true);
-    if (current != -1)  selectCB.setItemEnabled(current, false);
+    if (last != 0)      selectCB.setItemEnabled(last, true);
+    if (current != 0)   selectCB.setItemEnabled(current, false);
     
-    int selectedIndex = processor.gallery->getIndexFromId(PreparationTypeDirectMod,
-                                                          processor.updateState->currentModDirectId);
-    selectCB.setSelectedItemIndex(selectedIndex,
-                                  NotificationType::dontSendNotification);
-    selectCB.setItemEnabled(selectedIndex+1, false);
+    int selectedId = processor.updateState->currentDirectId;
+    
+    selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
+    
+    selectCB.setItemEnabled(selectedId, false);
     
     selectCB.addSeparator();
-    selectCB.addItem("New Direct modification...", index.size()+1);
+    selectCB.addItem("New Direct Mod...", -1);
     
-    lastIndex = selectedIndex;
+    lastId = selectedId;
     
 }
 
@@ -408,30 +395,26 @@ void DirectModificationEditor::bkMessageReceived (const String& message)
 void DirectModificationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
-    int index = box->getSelectedItemIndex();
+    int Id = box->getSelectedId();
     
     if (name == "Direct")
     {
-        int newId = processor.gallery->getIdFromIndex(PreparationTypeDirectMod, index);
-        
-        if (index == selectCB.getNumItems()-1)
+        if (Id == -1)
         {
             processor.gallery->addDirectMod();
             
-            DirectModPreparation::Ptr thisMod = processor.gallery->getDirectModPreparations().getLast();
-            
-            newId = thisMod->getId();
+            Id = processor.gallery->getDirectModPreparations().getLast()->getId();
         }
         
-        processor.updateState->currentModDirectId = newId;
+        processor.updateState->currentModDirectId = Id;
   
         processor.updateState->idDidChange = true;
         
         update();
         
-        fillSelectCB(lastIndex+1, index+1);
+        fillSelectCB(lastId, Id);
         
-        lastIndex = index;
+        lastId = Id;
     }
 }
 

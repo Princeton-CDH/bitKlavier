@@ -310,6 +310,7 @@ public:
     
     inline const SynchronicPreparation::Ptr getStaticSynchronicPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : synchronic)
         {
             if (p->getId() == Id)   return p->sPrep;
@@ -319,6 +320,7 @@ public:
     
     inline const SynchronicPreparation::Ptr getActiveSynchronicPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : synchronic)
         {
             if (p->getId() == Id)   return p->aPrep;
@@ -328,6 +330,7 @@ public:
     
     inline const NostalgicPreparation::Ptr getStaticNostalgicPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : nostalgic)
         {
             if (p->getId() == Id)   return p->sPrep;
@@ -337,6 +340,7 @@ public:
     
     inline const NostalgicPreparation::Ptr getActiveNostalgicPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : nostalgic)
         {
             if (p->getId() == Id)   return p->aPrep;
@@ -346,6 +350,7 @@ public:
     
     inline const DirectPreparation::Ptr getStaticDirectPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : direct)
         {
             if (p->getId() == Id)   return p->sPrep;
@@ -355,6 +360,7 @@ public:
     
     inline const DirectPreparation::Ptr getActiveDirectPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : direct)
         {
             if (p->getId() == Id)   return p->aPrep;
@@ -364,6 +370,7 @@ public:
     
     inline const TuningPreparation::Ptr getStaticTuningPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : tuning)
         {
             if (p->getId() == Id)   return p->sPrep;
@@ -373,6 +380,7 @@ public:
     
     inline const TuningPreparation::Ptr getActiveTuningPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : tuning)
         {
             if (p->getId() == Id)   return p->aPrep;
@@ -382,6 +390,7 @@ public:
     
     inline const TempoPreparation::Ptr getStaticTempoPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : tempo)
         {
             if (p->getId() == Id)   return p->sPrep;
@@ -391,6 +400,7 @@ public:
     
     inline const TempoPreparation::Ptr getActiveTempoPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : tempo)
         {
             if (p->getId() == Id)   return p->aPrep;
@@ -400,6 +410,7 @@ public:
     
     inline const Synchronic::Ptr getSynchronic(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : synchronic)
         {
             if (p->getId() == Id)   return p;
@@ -409,6 +420,7 @@ public:
     
     inline const Nostalgic::Ptr getNostalgic(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : nostalgic)
         {
             if (p->getId() == Id)   return p;
@@ -418,6 +430,7 @@ public:
     
     inline const Direct::Ptr getDirect(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : direct)
         {
             if (p->getId() == Id)   return p;
@@ -427,6 +440,7 @@ public:
     
     inline const Tuning::Ptr getTuning(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : tuning)
         {
             if (p->getId() == Id)   return p;
@@ -436,6 +450,7 @@ public:
     
     inline const Tempo::Ptr getTempo(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : tempo)
         {
             if (p->getId() == Id)   return p;
@@ -445,6 +460,7 @@ public:
     
     inline const SynchronicModPreparation::Ptr getSynchronicModPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : modSynchronic)
         {
             if (p->getId() == Id)   return p;
@@ -454,6 +470,7 @@ public:
     
     inline const NostalgicModPreparation::Ptr getNostalgicModPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : modNostalgic)
         {
             if (p->getId() == Id)   return p;
@@ -463,6 +480,7 @@ public:
     
     inline const DirectModPreparation::Ptr getDirectModPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : modDirect)
         {
             if (p->getId() == Id)   return p;
@@ -472,6 +490,7 @@ public:
     
     inline const TuningModPreparation::Ptr getTuningModPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : modTuning)
         {
             if (p->getId() == Id)   return p;
@@ -481,6 +500,7 @@ public:
     
     inline const TempoModPreparation::Ptr getTempoModPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : modTempo)
         {
             if (p->getId() == Id)   return p;
@@ -490,6 +510,7 @@ public:
     
     inline const Keymap::Ptr getKeymap(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : bkKeymaps)
         {
             if (p->getId() == Id)   return p;
@@ -499,6 +520,7 @@ public:
     
     inline const Piano::Ptr getPiano(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : bkPianos)
         {
             if (p->getId() == Id)   return p;
@@ -555,44 +577,9 @@ public:
         
         idCount.set(type, newId);
         
-        Array<int> thisIndexList = getIndexList(type);
-        
-        thisIndexList.add(newId);
-        
-        idIndexList.set(type, thisIndexList);
-        
         DBG("NEW: " + String(newId));
         
         return newId;
-    }
-
-    
-    inline Array<int> getIndexList(BKPreparationType type)
-    {
-        DBG(arrayIntArrayToString(idIndexList));
-        return idIndexList.getUnchecked(type);
-    }
-    
-    inline int getIndexFromId(BKPreparationType type, int Id)
-    {
-        Array<int> index = getIndexList(type);
-        
-        int count = 0;
-        for (int i : index)
-        {
-            if (i == Id) return count;
-            
-            count++;
-        }
-        
-        return 0;
-    }
-    
-    inline int getIdFromIndex(BKPreparationType type, int idx)
-    {
-        Array<int> index = getIndexList(type);
-        
-        return index[idx];
     }
     
     
@@ -606,8 +593,6 @@ private:
     BKAudioProcessor& processor;
     
     Array< int> idCount;
-    
-    Array< Array<int>> idIndexList;
     
     String url;
     

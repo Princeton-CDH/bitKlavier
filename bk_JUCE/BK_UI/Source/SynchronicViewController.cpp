@@ -414,36 +414,32 @@ void SynchronicPreparationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
-    Array<int> index = processor.gallery->getIndexList(PreparationTypeSynchronic);
-    
-    for (int i = 0; i < index.size(); i++)
+    for (auto prep : processor.gallery->getAllSynchronic())
     {
-        int Id = index[i];
-        String name = processor.gallery->getSynchronic(Id)->getName();
-        if (name != String::empty)  selectCB.addItem(name, i+1);
-        else                        selectCB.addItem(String(i+1), i+1);
+        int Id = prep->getId();;
+        String name = prep->getName();
         
-        selectCB.setItemEnabled(i+1, true);
-        if (processor.currentPiano->isActive(PreparationTypeSynchronic, Id) &&
-            (Id != processor.updateState->currentSynchronicId))
-        {
-            selectCB.setItemEnabled(i+1, false);
-        }
+        if (name != String::empty)  selectCB.addItem(name, Id);
+        else                        selectCB.addItem("Synchronic"+String(Id), Id);
+        
+        selectCB.setItemEnabled(Id, true);
+        if (processor.currentPiano->isActive(PreparationTypeSynchronic, Id))
+            selectCB.setItemEnabled(Id, false);
     }
     
-    if (last != -1)     selectCB.setItemEnabled(last, true);
-    if (current != -1)  selectCB.setItemEnabled(current, false);
+    if (last != 0)      selectCB.setItemEnabled(last, true);
+    if (current != 0)   selectCB.setItemEnabled(current, false);
     
-    int selectedIndex = processor.gallery->getIndexFromId(PreparationTypeSynchronic,
-                                                          processor.updateState->currentSynchronicId);
-    selectCB.setSelectedItemIndex(selectedIndex,
-                                  NotificationType::dontSendNotification);
-    selectCB.setItemEnabled(selectedIndex+1, false);
+    int selectedId = processor.updateState->currentSynchronicId;
+    
+    selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
+    
+    selectCB.setItemEnabled(selectedId, false);
     
     selectCB.addSeparator();
-    selectCB.addItem("New Synchronic...", index.size()+1);
+    selectCB.addItem("New Synchronic...", -1);
     
-    lastIndex = selectedIndex;
+    lastId = selectedId;
 }
 
 
@@ -451,29 +447,25 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
     int index = box->getSelectedItemIndex();
+    int Id = box->getSelectedId();
     
     if (name == selectCB.getName())
     {
-        int newId = processor.gallery->getIdFromIndex(PreparationTypeSynchronic, index);
-        
-        if (index == selectCB.getNumItems()-1)
+        if (Id == -1)
         {
             processor.gallery->addSynchronic();
-            
-            Synchronic::Ptr thisSynchronic = processor.gallery->getAllSynchronic().getLast();
-            
-            newId = thisSynchronic->getId();
+            Id = processor.gallery->getAllSynchronic().getLast()->getId();
         }
         
-        processor.updateState->currentSynchronicId = newId;
+        processor.updateState->currentSynchronicId = Id;
         
         processor.updateState->idDidChange = true;
         
         update();
         
-        fillSelectCB(lastIndex+1, index+1);
+        fillSelectCB(lastId, Id);
         
-        lastIndex = index;
+        lastId = Id;
     }
     else if (name == "Mode")
     {
@@ -483,8 +475,8 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
         SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
         
-        prep    ->setMode((SynchronicSyncMode) box->getSelectedItemIndex());
-        active  ->setMode((SynchronicSyncMode) box->getSelectedItemIndex());
+        prep    ->setMode((SynchronicSyncMode) index);
+        active  ->setMode((SynchronicSyncMode) index);
         
         int toggleVal;
         if(offsetParamStartToggle.getToggleState()) toggleVal = 1;
@@ -782,36 +774,32 @@ void SynchronicModificationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
-    Array<int> index = processor.gallery->getIndexList(PreparationTypeSynchronicMod);
-    
-    for (int i = 0; i < index.size(); i++)
+    for (auto prep : processor.gallery->getSynchronicModPreparations())
     {
-        int Id = index[i];
-        String name = processor.gallery->getSynchronicModPreparation(Id)->getName();
-        if (name != String::empty)  selectCB.addItem(name, i+1);
-        else                        selectCB.addItem(String(i+1), i+1);
+        int Id = prep->getId();;
+        String name = prep->getName();
         
-        selectCB.setItemEnabled(i+1, true);
-        if (processor.currentPiano->isActive(PreparationTypeSynchronicMod, Id) &&
-            (Id != processor.updateState->currentModSynchronicId))
-        {
-            selectCB.setItemEnabled(i+1, false);
-        }
+        if (name != String::empty)  selectCB.addItem(name, Id);
+        else                        selectCB.addItem("SynchronicMod"+String(Id), Id);
+        
+        selectCB.setItemEnabled(Id, true);
+        if (processor.currentPiano->isActive(PreparationTypeSynchronic, Id))
+            selectCB.setItemEnabled(Id, false);
     }
     
-    if (last != -1)     selectCB.setItemEnabled(last, true);
-    if (current != -1)  selectCB.setItemEnabled(current, false);
+    if (last != 0)      selectCB.setItemEnabled(last, true);
+    if (current != 0)   selectCB.setItemEnabled(current, false);
     
-    int selectedIndex = processor.gallery->getIndexFromId(PreparationTypeSynchronicMod,
-                                                          processor.updateState->currentModSynchronicId);
-    selectCB.setSelectedItemIndex(selectedIndex,
-                                  NotificationType::dontSendNotification);
-    selectCB.setItemEnabled(selectedIndex+1, false);
+    int selectedId = processor.updateState->currentSynchronicId;
+    
+    selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
+    
+    selectCB.setItemEnabled(selectedId, false);
     
     selectCB.addSeparator();
-    selectCB.addItem("New Synchronic modification...", index.size()+1);
+    selectCB.addItem("New Synchronic Mod...", -1);
     
-    lastIndex = selectedIndex;
+    lastId = selectedId;
 }
 
 void SynchronicModificationEditor::multiSliderDidChange(String name, int whichSlider, Array<float> values)
@@ -928,35 +916,32 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
     int index = box->getSelectedItemIndex();
+    int Id = box->getSelectedId();
     
     if (name == selectCB.getName())
     {
-        int newId = processor.gallery->getIdFromIndex(PreparationTypeSynchronicMod, index);
-        
-        if (index == selectCB.getNumItems()-1)
+        if (Id == -1)
         {
             processor.gallery->addSynchronicMod();
             
-            SynchronicModPreparation::Ptr thisMod = processor.gallery->getSynchronicModPreparations().getLast();
-            
-            newId = thisMod->getId();
+            Id = processor.gallery->getSynchronicModPreparations().getLast()->getId();
         }
         
-        processor.updateState->currentModSynchronicId = newId;
+        processor.updateState->currentModSynchronicId = Id;
         
         processor.updateState->idDidChange = true;
         
         update();
         
-        fillSelectCB(lastIndex+1, index+1);
+        fillSelectCB(lastId, Id);
         
-        lastIndex = index;
+        lastId = Id;
     }
     else if (name == "Mode")
     {
         SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
         
-        mod->setParam(SynchronicMode, String(box->getSelectedItemIndex()));
+        mod->setParam(SynchronicMode, String(index));
         
         int toggleVal;
         if(offsetParamStartToggle.getToggleState()) toggleVal = 1;

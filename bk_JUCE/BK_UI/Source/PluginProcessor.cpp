@@ -490,8 +490,8 @@ void BKAudioProcessor::initializeGallery(void)
     
     gallery->prepareToPlay(bkSampleRate);
     
-    prevPiano = gallery->getPiano(0);
-    currentPiano = gallery->getPiano(0);
+    prevPiano = gallery->getPiano(1);
+    currentPiano = gallery->getPiano(1);
     
     updateUI();
     

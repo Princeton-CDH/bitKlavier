@@ -25,27 +25,6 @@ ValueTree  Gallery::getState(void)
     
     galleryVT.addChild(idCountVT, -1, 0);
     
-    
-    // Useful if we want to be able to reconfigure/organize menus of preparations.
-    ValueTree idIndexVT ("idIndexList");
-    
-    for (int i = 0; i < BKPreparationTypeNil; i++)
-    {
-        ValueTree vt ("index" + String(i));
-        
-        Array<int> index = idIndexList.getUnchecked(i);
-        
-        int count = 0;
-        for (auto id : index)
-        {
-            vt.setProperty("i"+String(count++), id, 0);
-        }
-        
-        idIndexVT.addChild(vt, -1, 0);
-    }
-    
-    galleryVT.addChild(idIndexVT, -1, 0);
-    
     galleryVT.addChild(general->getState(), -1, 0);
     
     // Preparations and keymaps must be first.

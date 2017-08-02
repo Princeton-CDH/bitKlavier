@@ -553,16 +553,6 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
     
 }
 
-void BKConstructionSite::reconfigureCurrentItem(void)
-{
-    processor.currentPiano->configure();
-}
-
-void BKConstructionSite::removeItem(BKPreparationType type, int Id)
-{
-    
-}
-
 void BKConstructionSite::idDidChange(void)
 {
     BKPreparationType type = currentItem->getType();

@@ -14,6 +14,7 @@
 
 SynchronicProcessor::Ptr Gallery::getSynchronicProcessor(int Id)
 {
+    Id = (Id <= 0) ? 1 : Id;
     for (auto p : synchronic)
     {
         if(p->getId() == Id)    return p->processor;
@@ -26,6 +27,7 @@ SynchronicProcessor::Ptr Gallery::getSynchronicProcessor(int Id)
 
 NostalgicProcessor::Ptr Gallery::getNostalgicProcessor(int Id)
 {
+    Id = (Id <= 0) ? 1 : Id;
     for (auto p : nostalgic)
     {
         if(p->getId() == Id)    return p->processor;
@@ -38,6 +40,7 @@ NostalgicProcessor::Ptr Gallery::getNostalgicProcessor(int Id)
 
 TuningProcessor::Ptr Gallery::getTuningProcessor(int Id)
 {
+    Id = (Id <= 0) ? 1 : Id;
     for (auto p : tuning)
     {
         if(p->getId() == Id)    return p->processor;
@@ -50,6 +53,7 @@ TuningProcessor::Ptr Gallery::getTuningProcessor(int Id)
 
 TempoProcessor::Ptr Gallery::getTempoProcessor(int Id)
 {
+    Id = (Id <= 0) ? 1 : Id;
     for (auto p : tempo)
     {
         if(p->getId() == Id)    return p->processor;
@@ -311,15 +315,6 @@ void Gallery::remove(BKPreparationType type, int Id)
     {
         removeTempoModPreparation(Id);
     }
-    
-    Array<int> thisIndexList = getIndexList(type);
-    
-    for (auto index : thisIndexList)
-    {
-        if (index == Id) thisIndexList.remove(index);
-    }
-    
-    idIndexList.set(type, thisIndexList);
 }
 
 
@@ -382,12 +377,6 @@ void Gallery::add(BKPreparationType type)
         newId = modTempo.getLast()->getId();
         
     }
-    
-    Array<int> thisIndexList = getIndexList(type);
-    
-    thisIndexList.add(newId);
-    
-    idIndexList.set(type, thisIndexList);
 }
 
 int Gallery::getNum(BKPreparationType type)

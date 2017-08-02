@@ -110,13 +110,12 @@ void BKItem::configurePianoCB(void)
         
         if (name != String::empty)
         {
-            menu.addItem(pianos[i]->getName(), i+1);
+            menu.addItem(pianos[i]->getName(), pianos[i]->getId());
             menu.addSeparator();
         }
     }
     
-    menu.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypePiano, getPianoTarget()),
-                              NotificationType::dontSendNotification);
+    menu.setSelectedId(getPianoTarget(), NotificationType::dontSendNotification);
 }
 
 void BKItem::setImage(Image newImage)
@@ -245,7 +244,7 @@ void BKItem::copy(BKItem::Ptr itemToCopy)
 void BKItem::bkComboBoxDidChange    (ComboBox* cb)
 {
     String name = cb->getName();
-    int pianoId = processor.gallery->getIdFromIndex(PreparationTypePiano, cb->getSelectedItemIndex());
+    int pianoId = cb->getSelectedId();
     
     if (name == "PianoMap")
     {

@@ -255,76 +255,72 @@ void TempoPreparationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
-    Array<int> index = processor.gallery->getIndexList(PreparationTypeTempo);
-    
-    for (int i = 0; i < index.size(); i++)
+    for (auto prep : processor.gallery->getAllTempo())
     {
-        int Id = index[i];
-        String name = processor.gallery->getTempo(Id)->getName();
-        if (name != String::empty)  selectCB.addItem(name, i+1);
-        else                        selectCB.addItem(String(i+1), i+1);
+        int Id = prep->getId();;
+        String name = prep->getName();
         
-        selectCB.setItemEnabled(i+1, true);
-        if (processor.currentPiano->isActive(PreparationTypeTempo, Id) &&
-            (Id != processor.updateState->currentTempoId))
-        {
-            selectCB.setItemEnabled(i+1, false);
-        }
+        if (name != String::empty)  selectCB.addItem(name, Id);
+        else                        selectCB.addItem("Tempo"+String(Id), Id);
+        
+        selectCB.setItemEnabled(Id, true);
+        if (processor.currentPiano->isActive(PreparationTypeTempo, Id))
+            selectCB.setItemEnabled(Id, false);
     }
     
-    if (last != -1)     selectCB.setItemEnabled(last, true);
-    if (current != -1)  selectCB.setItemEnabled(current, false);
+    if (last != 0)      selectCB.setItemEnabled(last, true);
+    if (current != 0)   selectCB.setItemEnabled(current, false);
+    
+    int selectedId = processor.updateState->currentTempoId;
+    
+    selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
+    
+    selectCB.setItemEnabled(selectedId, false);
     
     selectCB.addSeparator();
-    selectCB.addItem("New tempo...", index.size()+1);
+    selectCB.addItem("New Tempo...", -1);
     
-    int currentId = processor.updateState->currentTempoId;
-    
-    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeTempo, currentId), NotificationType::dontSendNotification);
-    
+    lastId = selectedId;
 }
 
 void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
     int index = box->getSelectedItemIndex();
+    int Id = box->getSelectedId();
     
     TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
     TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
     
     if (name == selectCB.getName())
     {
-        int newId = processor.gallery->getIdFromIndex(PreparationTypeTempo, index);
-        
-        if (index == selectCB.getNumItems()-1)
+        if (Id == -1)
         {
             processor.gallery->addTempo();
             
-            Tempo::Ptr thisTempo = processor.gallery->getAllTempo().getLast();
-            
-            newId = thisTempo->getId();
+            Id = processor.gallery->getAllTempo().getLast()->getId();
         }
         
-        processor.updateState->currentTempoId = newId;
+        processor.updateState->currentTempoId = Id;
         
         processor.updateState->idDidChange = true;
         
         update();
         
-        fillSelectCB(lastIndex+1, index+1);
+        fillSelectCB(lastId, Id);
         
-        lastIndex = index;
+        lastId = Id;
     }
     else if (name == modeCB.getName())
     {
-        prep->setTempoSystem(TempoType(modeCB.getSelectedItemIndex()));
-        active->setTempoSystem(TempoType(modeCB.getSelectedItemIndex()));
+        prep->setTempoSystem(TempoType(index));
+        active->setTempoSystem(TempoType(index));
         updateComponentVisibility();
     }
     else if (name == A1ModeCB.getName())
     {
-        prep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) A1ModeCB.getSelectedItemIndex());
-        active->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) A1ModeCB.getSelectedItemIndex());
+        prep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
+        active->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
     }
     
     if (name != selectCB.getName())
@@ -485,39 +481,34 @@ void TempoModificationEditor::highlightModedComponents()
 
 void TempoModificationEditor::fillSelectCB(int last, int current)
 {
-    
     selectCB.clear(dontSendNotification);
     
-    Array<int> index = processor.gallery->getIndexList(PreparationTypeTempoMod);
-    
-    for (int i = 0; i < index.size(); i++)
+    for (auto prep : processor.gallery->getTempoModPreparations())
     {
-        int Id = index[i];
-        String name = processor.gallery->getTempoModPreparation(Id)->getName();
-        if (name != String::empty)  selectCB.addItem(name, i+1);
-        else                        selectCB.addItem(String(i+1), i+1);
+        int Id = prep->getId();;
+        String name = prep->getName();
         
-        selectCB.setItemEnabled(i+1, true);
-        if (processor.currentPiano->isActive(PreparationTypeTempoMod, Id) &&
-            (Id != processor.updateState->currentModTempoId))
-        {
-            selectCB.setItemEnabled(i+1, false);
-        }
+        if (name != String::empty)  selectCB.addItem(name, Id);
+        else                        selectCB.addItem("TempoMod"+String(Id), Id);
+        
+        selectCB.setItemEnabled(Id, true);
+        if (processor.currentPiano->isActive(PreparationTypeTempo, Id))
+            selectCB.setItemEnabled(Id, false);
     }
     
-    if (last != -1)     selectCB.setItemEnabled(last, true);
-    if (current != -1)  selectCB.setItemEnabled(current, false);
+    if (last != 0)      selectCB.setItemEnabled(last, true);
+    if (current != 0)   selectCB.setItemEnabled(current, false);
     
-    int selectedIndex = processor.gallery->getIndexFromId(PreparationTypeTempo,
-                                                          processor.updateState->currentTempoId);
-    selectCB.setSelectedItemIndex(selectedIndex,
-                                  NotificationType::dontSendNotification);
-    selectCB.setItemEnabled(selectedIndex+1, false);
+    int selectedId = processor.updateState->currentTempoId;
+    
+    selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
+    
+    selectCB.setItemEnabled(selectedId, false);
     
     selectCB.addSeparator();
-    selectCB.addItem("New Tempo modification...", index.size()+1);
+    selectCB.addItem("New Tempo Mod...", -1);
     
-    lastIndex = selectedIndex;
+    lastId = selectedId;
 }
 
 
@@ -571,41 +562,38 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
     int index = box->getSelectedItemIndex();
+    int Id = box->getSelectedId();
     
     TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
     
     if (name == selectCB.getName())
     {
-        int newId = processor.gallery->getIdFromIndex(PreparationTypeTempoMod, index);
-        
-        if (index == selectCB.getNumItems()-1)
+        if (Id == -1)
         {
             processor.gallery->addTempoMod();
             
-            TempoModPreparation::Ptr thisMod = processor.gallery->getTempoModPreparations().getLast();
-            
-            newId = thisMod->getId();
+            Id = processor.gallery->getTempoModPreparations().getLast()->getId();
         }
         
-        processor.updateState->currentModTempoId = newId;
+        processor.updateState->currentModTempoId = Id;
         
         processor.updateState->idDidChange = true;
         
         update();
         
-        fillSelectCB(lastIndex+1, index+1);
+        fillSelectCB(lastId, Id);
         
-        lastIndex = index;
+        lastId = Id;
     }
     else if (name == modeCB.getName())
     {
-        mod->setParam(TempoSystem, String(modeCB.getSelectedItemIndex()));
+        mod->setParam(TempoSystem, String(index));
         modeCB.setAlpha(1.);
         updateComponentVisibility();
     }
     else if (name == A1ModeCB.getName())
     {
-        mod->setParam(AT1Mode, String(A1ModeCB.getSelectedItemIndex()));
+        mod->setParam(AT1Mode, String(index));
         A1ModeCB.setAlpha(1.);
         A1ModeLabel.setAlpha(1.);
     }

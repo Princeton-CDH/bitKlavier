@@ -63,19 +63,6 @@ public:
     BKPreparationDisplay currentDisplay = DisplayNil;
     bool displayDidChange;
     
-    bool preparationRemoved = false;
-    BKPreparationType preparationRemovedType = BKPreparationTypeNil;
-    int preparationRemovedId = -1;
-    
-    void removePreparation(BKPreparationType type, int Id)
-    {
-        preparationRemoved = true;
-        
-        preparationRemovedType = type;
-        
-        preparationRemovedId = Id;
-    }
-    
     void setCurrentDisplay(BKPreparationDisplay type)
     {
         currentDisplay = type;

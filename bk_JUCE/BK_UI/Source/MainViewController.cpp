@@ -329,7 +329,7 @@ void MainViewController::timerCallback()
     {
         state->modificationDidChange = false;
         
-        construction.reconfigureCurrentItem();
+        processor.currentPiano->configure();
     }
     
     if (state->idDidChange)
@@ -401,14 +401,6 @@ void MainViewController::timerCallback()
         state->displayDidChange = false;
         
         overtop.setCurrentDisplay(processor.updateState->currentDisplay);
-    }
-    
-    if (state->preparationRemoved)
-    {
-        state->preparationRemoved = false;
-        
-        construction.removeItem(state->preparationRemovedType, state->preparationRemovedId);
-        
     }
     
     levelMeterComponentL->updateLevel(processor.getLevelL());
