@@ -51,15 +51,72 @@ processor(p)
     {
         setImage(ImageCache::getFromMemory(BinaryData::keymap_icon_png, BinaryData::keymap_icon_pngSize));
     }
-    else if (type == PreparationTypePianoMap || type == PreparationTypeGenericMod || (type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod) || type == PreparationTypeReset)
+    else if (type == PreparationTypeGenericMod)
     {
-        setItemType(type, false);
+        setImage(ImageCache::getFromMemory(BinaryData::mod_unassigned_icon_png, BinaryData::mod_unassigned_icon_pngSize));
+    }
+    else if (type == PreparationTypeReset)
+    {
+        setImage(image = ImageCache::getFromMemory(BinaryData::reset_icon_png, BinaryData::reset_icon_pngSize));
+    }
+    else if (type == PreparationTypeDirectMod)
+    {
+        setImage(ImageCache::getFromMemory(BinaryData::mod_direct_icon_png, BinaryData::mod_direct_icon_pngSize));
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        setImage(ImageCache::getFromMemory(BinaryData::mod_synchronic_icon_png, BinaryData::mod_synchronic_icon_pngSize));
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        setImage(ImageCache::getFromMemory(BinaryData::mod_nostalgic_icon_png, BinaryData::mod_nostalgic_icon_pngSize));
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        setImage(ImageCache::getFromMemory(BinaryData::mod_tuning_icon_png, BinaryData::mod_tuning_icon_pngSize));
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        setImage(ImageCache::getFromMemory(BinaryData::mod_tempo_icon_png, BinaryData::mod_tempo_icon_pngSize));
+    }
+    else if (type == PreparationTypePianoMap)
+    {
+        //setPianoTarget(processor.currentPiano->getId());
+        
+        setImage(ImageCache::getFromMemory(BinaryData::piano_icon_png, BinaryData::piano_icon_pngSize));
+        
+        //addAndMakeVisible(menu);
     }
 }
 
 BKItem::~BKItem()
 {
 
+}
+
+void BKItem::configurePianoCB(void)
+{
+    addAndMakeVisible(menu);
+    
+    menu.clear();
+    
+    menu.addListener(this);
+    menu.setName(cPreparationTypes[type]);
+    
+    Piano::PtrArr pianos = processor.gallery->getPianos();
+    for (int i = 0; i < pianos.size(); i++)
+    {
+        String name = pianos[i]->getName();
+        
+        if (name != String::empty)
+        {
+            menu.addItem(pianos[i]->getName(), i+1);
+            menu.addSeparator();
+        }
+    }
+    
+    menu.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypePiano, getPianoTarget()),
+                              NotificationType::dontSendNotification);
 }
 
 void BKItem::setImage(Image newImage)
@@ -126,31 +183,9 @@ void BKItem::setItemType(BKPreparationType newType, bool create)
     }
     else if (type == PreparationTypePianoMap)
     {
-        setType(PreparationTypePianoMap);
-        
-        setPianoTarget(processor.currentPiano->getId());
-        
         setImage(ImageCache::getFromMemory(BinaryData::piano_icon_png, BinaryData::piano_icon_pngSize));
         
-        addAndMakeVisible(menu);
-        
-        menu.setName(cPreparationTypes[type]);
-        menu.addListener(this);
-        
-        Piano::PtrArr pianos = processor.gallery->getPianos();
-        for (int i = 0; i < pianos.size(); i++)
-        {
-            String name = pianos[i]->getName();
-            
-            if (name != String::empty)
-            {
-                menu.addItem(pianos[i]->getName(), i+1);
-                menu.addSeparator();
-            }
-        }
-        
-        menu.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypePiano, processor.currentPiano->getId()),
-                                  NotificationType::dontSendNotification);
+        configurePianoCB();
     }
     
     if (type != PreparationTypeGenericMod)
@@ -393,7 +428,7 @@ void BKItemGraph::addAndRegisterItem(BKItem* thisItem)
 
 void BKItemGraph::addItem(BKItem* thisItem)
 {
-    items.add(thisItem);
+    items.addIfNotAlreadyThere(thisItem);
     
     DBG("itemxy: " + String(thisItem->getX()) + " " + String(thisItem->getY()));
 }
@@ -727,7 +762,15 @@ void BKItemGraph::reconstruct(void)
     Piano::Ptr thisPiano = processor.currentPiano;
     
     // Create items based on the ItemMappers in current Piano and add them to BKItemGraph
-    for (auto item : thisPiano->getItems()) addItem(item);
+    for (auto item : thisPiano->getItems())
+    {
+        if (item->getType() == PreparationTypePianoMap)
+        {
+            item->setItemType(PreparationTypePianoMap, false);
+        }
+        
+        addItem(item);
+    }
 }
 
 bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType type2)

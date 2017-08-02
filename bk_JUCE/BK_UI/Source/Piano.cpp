@@ -814,20 +814,24 @@ ValueTree Piano::getState(void)
         BKPreparationType type = item->getType();
         
         ValueTree itemVT("item");
-        
-        itemVT.addChild(item->getState(), -1, 0);
-        
         ValueTree connectionsVT("connections");
         
         if (type == PreparationTypeKeymap)
         {
+            itemVT.addChild(item->getState(), -1, 0);
+            
             for (auto target : item->getConnections())
             {
                 connectionsVT.addChild(target->getState(), -1, 0);
             }
+            
+            itemVT.addChild(connectionsVT, -1, 0);
+            pianoVT.addChild(itemVT, -1, 0);
         }
         else if (type == PreparationTypeTuning)
         {
+            itemVT.addChild(item->getState(), -1, 0);
+            
             // Look for synchronic, direct, and nostalgic targets
             for (auto target : item->getConnections())
             {
@@ -838,9 +842,14 @@ ValueTree Piano::getState(void)
                     connectionsVT.addChild(target->getState(), -1, 0);
                 }
             }
+            
+            itemVT.addChild(connectionsVT, -1, 0);
+            pianoVT.addChild(itemVT, -1, 0);
         }
         else if (type == PreparationTypeTempo)
         {
+            itemVT.addChild(item->getState(), -1, 0);
+            
             // Look for synchronic targets
             for (auto target : item->getConnections())
             {
@@ -851,9 +860,14 @@ ValueTree Piano::getState(void)
                     connectionsVT.addChild(target->getState(), -1, 0);
                 }
             }
+            
+            itemVT.addChild(connectionsVT, -1, 0);
+            pianoVT.addChild(itemVT, -1, 0);
         }
         else if (type == PreparationTypeSynchronic)
         {
+            itemVT.addChild(item->getState(), -1, 0);
+            
             // Look for nostalgic targets
             for (auto target : item->getConnections())
             {
@@ -864,10 +878,15 @@ ValueTree Piano::getState(void)
                     connectionsVT.addChild(target->getState(), -1, 0);
                 }
             }
+            
+            itemVT.addChild(connectionsVT, -1, 0);
+            pianoVT.addChild(itemVT, -1, 0);
         }
         else if ((type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod) || type == PreparationTypeReset)
         {
-            // Look for nostalgic targets
+            itemVT.addChild(item->getState(), -1, 0);
+            
+            // Look for non-Keymap connections
             for (auto target : item->getConnections())
             {
                 BKPreparationType targetType = target->getType();
@@ -877,12 +896,10 @@ ValueTree Piano::getState(void)
                     connectionsVT.addChild(target->getState(), -1, 0);
                 }
             }
+            
+            itemVT.addChild(connectionsVT, -1, 0);
+            pianoVT.addChild(itemVT, -1, 0);
         }
-        
-        itemVT.addChild(connectionsVT, -1, 0);
-        
-        pianoVT.addChild(itemVT, -1, 0);
-        
     }
     
     return pianoVT;
@@ -933,7 +950,7 @@ void Piano::setState(XmlElement* e)
                 
                 thisItem->setActive(active);
                 
-                items.addIfNotAlreadyThere(thisItem);
+                if (!contains(thisItem->getType(), thisItem->getId())) items.add(thisItem);
             }
             
             XmlElement* connections = group->getChildByName("connections");
@@ -946,14 +963,14 @@ void Piano::setState(XmlElement* e)
                 i = connection->getStringAttribute("Id").getIntValue();
                 int cId = i;
                 
+                i = connection->getStringAttribute("piano").getIntValue();
+                int cPiano = i;
+                
                 thisConnection = itemWithTypeAndId(cType, cId);
                 
                 if (thisConnection == nullptr) thisConnection = new BKItem(cType, cId, processor);
                 
                 thisConnection->setItemName(connection->getStringAttribute("name"));
-                
-                i = connection->getStringAttribute("piano").getIntValue();
-                int cPiano = i;
                 
                 thisConnection->setPianoTarget(cPiano);
                 
@@ -973,7 +990,7 @@ void Piano::setState(XmlElement* e)
                 thisItem->addConnection(thisConnection);
                 thisConnection->addConnection(thisItem);
                 
-                items.addIfNotAlreadyThere(thisConnection);
+                if (!contains(thisConnection->getType(), thisConnection->getId())) items.add(thisConnection);
             }
             
         }

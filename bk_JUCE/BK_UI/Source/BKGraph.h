@@ -51,16 +51,17 @@ public:
         connections = newConnections;
     }
     
-    inline bool addConnection(BKItem::Ptr thisItem)
+    inline void addConnection(BKItem::Ptr thisItem)
     {
-        bool added = connections.addIfNotAlreadyThere(thisItem);
-        
-        return added;
+        if (!isConnectedTo(thisItem))   connections.add(thisItem);
     }
     
     inline void addConnections(BKItem::PtrArr theseItems)
     {
-        for (auto item : theseItems) connections.addIfNotAlreadyThere(item);
+        for (auto item : theseItems)
+        {
+            if (!isConnectedTo(item)) connections.add(item);
+        }
     }
     
     
@@ -100,7 +101,7 @@ public:
         return false;
     }
     
-    inline bool isConnectedTo(ItemMapper::Ptr thisItem)
+    inline bool isConnectedTo(BKItem::Ptr thisItem)
     {
         for (auto item : connections)
         {
@@ -228,6 +229,8 @@ public:
     Point<int> position;
     
     void setImage(Image newImage);
+    
+    void configurePianoCB(void);
     
 private:
     BKAudioProcessor& processor;

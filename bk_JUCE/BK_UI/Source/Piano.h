@@ -84,6 +84,15 @@ public:
         return nullptr;
     }
     
+    inline bool contains(BKPreparationType type, int thisId)
+    {
+        for (auto item : items)
+        {
+            if (item->getType() == type && item->getId() == thisId) return true;
+        }
+        return false;
+    }
+    
     inline bool isActive(BKPreparationType type, int thisId)
     {
         for (auto item : items)

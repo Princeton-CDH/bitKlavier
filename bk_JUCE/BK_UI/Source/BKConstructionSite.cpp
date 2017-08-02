@@ -308,6 +308,12 @@ void BKConstructionSite::addItem(BKPreparationType type)
     
     BKItem* toAdd = new BKItem(type, thisId, processor);
     
+    if (type == PreparationTypePianoMap)
+    {
+        toAdd->setPianoTarget(processor.currentPiano->getId());
+        toAdd->configurePianoCB();
+    }
+    
     toAdd->setTopLeftPosition(lastX, lastY);
 
     lastX += 10; lastY += 10;
