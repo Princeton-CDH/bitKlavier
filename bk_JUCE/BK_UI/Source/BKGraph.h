@@ -51,9 +51,9 @@ public:
         connections = newConnections;
     }
     
-    inline void addConnection(BKItem::Ptr thisItem)
+    inline void addConnection(BKItem::Ptr item)
     {
-        if (!isConnectedTo(thisItem))   connections.add(thisItem);
+        if (!isConnectedTo(item))   connections.add(item);
     }
     
     inline void addConnections(BKItem::PtrArr theseItems)

@@ -931,26 +931,31 @@ void Piano::setState(XmlElement* e)
                 i = item->getStringAttribute("piano").getIntValue();
                 int piano = i;
                 
-                thisItem = new BKItem(type, thisId, processor);
+                thisItem = itemWithTypeAndId(type, thisId);
                 
-                thisItem->setPianoTarget(piano);
-                
-                thisItem->setItemName(item->getStringAttribute("name"));
-                
-                i = item->getStringAttribute("X").getIntValue();
-                int x = i;
-                
-                i = item->getStringAttribute("Y").getIntValue();
-                int y = i;
-                
-                thisItem->setTopLeftPosition(x, y);
-                
-                i = item->getStringAttribute("active").getIntValue();
-                bool active = (bool)i;
-                
-                thisItem->setActive(active);
-                
-                if (!contains(thisItem->getType(), thisItem->getId())) items.add(thisItem);
+                if (thisItem == nullptr)
+                {
+                    thisItem = new BKItem(type, thisId, processor);
+                    
+                    thisItem->setPianoTarget(piano);
+                    
+                    thisItem->setItemName(item->getStringAttribute("name"));
+                    
+                    i = item->getStringAttribute("X").getIntValue();
+                    int x = i;
+                    
+                    i = item->getStringAttribute("Y").getIntValue();
+                    int y = i;
+                    
+                    thisItem->setTopLeftPosition(x, y);
+                    
+                    i = item->getStringAttribute("active").getIntValue();
+                    bool active = (bool)i;
+                    
+                    thisItem->setActive(active);
+                    
+                    items.add(thisItem);
+                }
             }
             
             XmlElement* connections = group->getChildByName("connections");
@@ -968,29 +973,48 @@ void Piano::setState(XmlElement* e)
                 
                 thisConnection = itemWithTypeAndId(cType, cId);
                 
-                if (thisConnection == nullptr) thisConnection = new BKItem(cType, cId, processor);
-                
-                thisConnection->setItemName(connection->getStringAttribute("name"));
-                
-                thisConnection->setPianoTarget(cPiano);
-                
-                i = connection->getStringAttribute("X").getIntValue();
-                int x = i;
-                
-                i = connection->getStringAttribute("Y").getIntValue();
-                int y = i;
-                
-                thisConnection->setTopLeftPosition(x, y);
-                
-                i = connection->getStringAttribute("active").getIntValue();
-                bool active = (bool)i;
-                
-                thisConnection->setActive(active);
+                if (thisConnection == nullptr)
+                {
+                    thisConnection = new BKItem(cType, cId, processor);
+                    
+                    thisConnection->setItemName(connection->getStringAttribute("name"));
+                    
+                    thisConnection->setPianoTarget(cPiano);
+                    
+                    i = connection->getStringAttribute("X").getIntValue();
+                    int x = i;
+                    
+                    i = connection->getStringAttribute("Y").getIntValue();
+                    int y = i;
+                    
+                    thisConnection->setTopLeftPosition(x, y);
+                    
+                    i = connection->getStringAttribute("active").getIntValue();
+                    bool active = (bool)i;
+                    
+                    thisConnection->setActive(active);
+                    
+                    items.add(thisConnection);
+                }
                 
                 thisItem->addConnection(thisConnection);
                 thisConnection->addConnection(thisItem);
                 
-                if (!contains(thisConnection->getType(), thisConnection->getId())) items.add(thisConnection);
+                DBG("~ ~ ~ ~ ~ ~ THIS ITEM  ~ ~ ~ ~ ~ ~");
+                thisItem->print();
+                DBG("CONNEX");
+                for (auto conn : thisItem->getConnections())
+                {
+                    conn->print();
+                }
+                
+                DBG("~ ~ ~ ~ ~ ~ CONNECTION ITEM ~ ~ ~ ~ ~ ~");
+                thisConnection->print();
+                DBG("CONNEX");
+                for (auto conn : thisConnection->getConnections())
+                {
+                    conn->print();
+                }
             }
             
         }

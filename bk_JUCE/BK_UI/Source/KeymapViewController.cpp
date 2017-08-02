@@ -315,6 +315,8 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
     BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
     
     keyboard->setKeysInKeymap(thisKeymap->keys());
+    
+    processor.currentPiano->configure();
 }
 
 

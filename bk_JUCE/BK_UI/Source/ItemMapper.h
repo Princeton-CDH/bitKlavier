@@ -31,9 +31,7 @@ public:
     
     void print(void)
     {
-        DBG("~ ~ ~ ~ ~ ~ ~ MAPPER ~ ~ ~ ~ ~ ~ ~ ~");
-        DBG("type: " + String(type)  + "\nId: " + String(Id));
-        DBG("~ ~ ~ ~ ~ ~ ~ ~ ~~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
+        DBG("ITEM type: " + String(type)  + " Id: " + String(Id));
     }
     
     inline int getId(void) const noexcept { return Id; }

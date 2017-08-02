@@ -79,7 +79,7 @@ public:
     {
         for (auto item : items)
         {
-            if (item->getType() == type && item->getId() == thisId) return item;
+            if ((item->getType() == type) && (item->getId() == thisId)) return item;
         }
         return nullptr;
     }
@@ -88,7 +88,7 @@ public:
     {
         for (auto item : items)
         {
-            if (item->getType() == type && item->getId() == thisId) return true;
+            if ((item->getType() == type) && (item->getId() == thisId)) return true;
         }
         return false;
     }
