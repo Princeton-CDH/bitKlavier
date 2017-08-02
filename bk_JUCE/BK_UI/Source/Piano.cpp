@@ -60,9 +60,10 @@ void Piano::deconfigure(void)
     {
         modificationMap[key]->clearModifications();
         modificationMap[key]->clearResets();
+        pianoMap.set(key, -1);
     }
     
-    pianoMap.clear();
+    
 }
 
 void Piano::configure(void)
