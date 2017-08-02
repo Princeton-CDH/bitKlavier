@@ -39,17 +39,17 @@ ValueTree  Gallery::getState(void)
     
     for (int i = 0; i < nostalgic.size(); i++)              galleryVT.addChild( nostalgic[i]->getState(), -1, 0);
     
-    for (int i = 0; i < modTempo.size(); i++)               galleryVT.addChild( modTempo[i]->getState(i), -1, 0);
+    for (int i = 0; i < modTempo.size(); i++)               galleryVT.addChild( modTempo[i]->getState(), -1, 0);
     
-    for (int i = 0; i < modTuning.size(); i++)              galleryVT.addChild( modTuning[i]->getState(i), -1, 0);
+    for (int i = 0; i < modTuning.size(); i++)              galleryVT.addChild( modTuning[i]->getState(), -1, 0);
     
-    for (int i = 0; i < modDirect.size(); i++)              galleryVT.addChild( modDirect[i]->getState(i), -1, 0);
+    for (int i = 0; i < modDirect.size(); i++)              galleryVT.addChild( modDirect[i]->getState(), -1, 0);
     
-    for (int i = 0; i < modSynchronic.size(); i++)          galleryVT.addChild( modSynchronic[i]->getState(i), -1, 0);
+    for (int i = 0; i < modSynchronic.size(); i++)          galleryVT.addChild( modSynchronic[i]->getState(), -1, 0);
     
-    for (int i = 0; i < modNostalgic.size(); i++)           galleryVT.addChild( modNostalgic[i]->getState(i), -1, 0);
+    for (int i = 0; i < modNostalgic.size(); i++)           galleryVT.addChild( modNostalgic[i]->getState(), -1, 0);
     
-    for (int i = 0; i < bkKeymaps.size(); i++)              galleryVT.addChild( bkKeymaps[i]->getState(i), -1, 0);
+    for (int i = 0; i < bkKeymaps.size(); i++)              galleryVT.addChild( bkKeymaps[i]->getState(), -1, 0);
     
     // Pianos
     for (int piano = 0; piano < bkPianos.size(); piano++)   galleryVT.addChild( bkPianos[piano]->getState(), -1, 0);
@@ -84,11 +84,10 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
             // iterate through its sub-elements
             forEachXmlChildElement (*xml, e)
             {
-                /*
+                
                 if (e->hasTagName("idCount"))
                 {
-                    
-                    for (int idType = 0; idType < (BKPreparationTypeNil-1); idType++)
+                    for (int idType = 0; idType < BKPreparationTypeNil; idType++)
                     {
                         String attr = e->getStringAttribute("i"+String(idType));
                         
@@ -97,14 +96,11 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                         i = attr.getIntValue();
                         
                         idCount.set(idType, i);
-                        
                     }
                     
                     DBG("idCountsPOSTLOAD: " + intArrayToString(idCount));
                 }
-                */
-                
-                if (e->hasTagName( vtagKeymap))
+                else if (e->hasTagName( vtagKeymap))
                 {
                     addKeymap();
                     

@@ -429,7 +429,7 @@ public:
         //param.add("");
     }
     
-    inline ValueTree getState(int Id)
+    inline ValueTree getState(void)
     {
         ValueTree prep( vtagModDirect);
         

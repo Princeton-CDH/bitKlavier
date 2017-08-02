@@ -561,7 +561,7 @@ public:
         }
     }
     
-    ValueTree getState(int Id);
+    ValueTree getState(void);
     
     void setState(XmlElement*);
     

@@ -153,7 +153,7 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
         hvc->pianoCB.addSeparator();
         hvc->pianoCB.addItem("New piano...", newIndex );
         
-        hvc->pianoCB.setSelectedId(newIndex);
+        hvc->pianoCB.setSelectedId(newIndex, dontSendNotification);
         
         hvc->processor.setCurrentPiano(newId);
     }

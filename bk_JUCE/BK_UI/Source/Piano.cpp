@@ -1003,22 +1003,6 @@ void Piano::setState(XmlElement* e)
                 
                 thisItem->addConnection(thisConnection);
                 thisConnection->addConnection(thisItem);
-                
-                DBG("~ ~ ~ ~ ~ ~ THIS ITEM  ~ ~ ~ ~ ~ ~");
-                thisItem->print();
-                DBG("CONNEX");
-                for (auto conn : thisItem->getConnections())
-                {
-                    conn->print();
-                }
-                
-                DBG("~ ~ ~ ~ ~ ~ CONNECTION ITEM ~ ~ ~ ~ ~ ~");
-                thisConnection->print();
-                DBG("CONNEX");
-                for (auto conn : thisConnection->getConnections())
-                {
-                    conn->print();
-                }
             }
             
         }

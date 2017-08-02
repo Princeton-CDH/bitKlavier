@@ -382,7 +382,6 @@ public:
     
     TempoModPreparation(int Id):
     Id(Id),
-    X(-1),Y(-1),
     editted(false)
     {
         param.set(TempoBPM, "");
@@ -438,10 +437,14 @@ public:
         }
     }
     
-    inline void setId(int newId) { Id = newId; }
+    inline void setId(int newId)
+    {
+        Id = newId;
+    }
+    
     inline int getId(void) const noexcept { return Id; }
     
-    inline ValueTree getState(int Id)
+    inline ValueTree getState(void)
     {
         
         ValueTree prep(vtagModTempo);

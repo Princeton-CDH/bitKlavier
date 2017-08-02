@@ -189,7 +189,7 @@ ValueTree Tuning::getState(void)
     
 }
 
-ValueTree TuningModPreparation::getState(int Id)
+ValueTree TuningModPreparation::getState(void)
 {
     ValueTree prep(vtagModTuning);
     

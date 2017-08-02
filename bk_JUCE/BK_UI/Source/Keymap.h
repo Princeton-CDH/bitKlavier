@@ -184,7 +184,7 @@ public:
         DBG("Keymap: "+ intArrayToString(keys()));
     }
     
-    inline ValueTree getState(int ki)
+    inline ValueTree getState(void)
     {
  
         ValueTree keysave( vtagKeymap );

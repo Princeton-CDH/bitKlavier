@@ -54,7 +54,7 @@ BKViewController(p, theGraph)
     selectCB.setName("Synchronic");
     selectCB.addSeparator();
     selectCB.addListener(this);
-    selectCB.setSelectedId(1);
+    selectCB.setSelectedId(1, dontSendNotification);
     addAndMakeVisible(selectCB);
     
     modeSelectCB.setName("Mode");
