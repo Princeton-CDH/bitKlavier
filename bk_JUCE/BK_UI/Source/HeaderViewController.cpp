@@ -138,8 +138,6 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
 {
     if (result == 1) // New piano
     {
-        int newIndex = hvc->processor.gallery->getNumPianos();
-        
         int newId = hvc->processor.gallery->getNewId(PreparationTypePiano);
         
         hvc->processor.gallery->addTypeWithId(PreparationTypePiano, newId);
@@ -148,12 +146,7 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
         
         hvc->processor.gallery->getPianos().getLast()->setName(newName);
         
-        hvc->pianoCB.changeItemText(newId, newName);
-        
-        hvc->pianoCB.addSeparator();
-        hvc->pianoCB.addItem("New piano...", -1);
-        
-        hvc->pianoCB.setSelectedId(newId, dontSendNotification);
+        hvc->fillPianoCB();
         
         hvc->processor.setCurrentPiano(newId);
     }
