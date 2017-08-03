@@ -879,9 +879,8 @@ public:
     inline const int getLengthMultiplierCounter() const noexcept { return lengthMultiplierCounter; }
     inline const int getTranspCounter() const noexcept { return transpCounter; }
     inline const SynchronicSyncMode getMode() const noexcept {return synchronic->aPrep->getMode(); }
-    
-    inline void setId(int newId) { Id = newId;}
-    inline int getId(void) const noexcept { return Id; }
+
+    inline int getId(void) const noexcept { return synchronic->getId(); }
     
     inline void setSynchronic(Synchronic::Ptr newSynchronic)
     {
@@ -931,7 +930,6 @@ public:
     //void  atReset();
     
 private:
-    int Id;
     BKSynthesiser* synth;
     GeneralSettings::Ptr general;
     

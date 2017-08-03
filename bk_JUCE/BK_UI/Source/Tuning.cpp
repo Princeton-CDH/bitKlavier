@@ -12,7 +12,6 @@
 
 
 TuningProcessor::TuningProcessor(Tuning::Ptr tuning):
-Id(tuning->getId()),
 tuning(tuning)
 {
 }

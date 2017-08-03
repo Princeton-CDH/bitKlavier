@@ -478,9 +478,8 @@ public:
     inline float getAdaptedTempo(void)                  {return tempo->aPrep->getTempo() / adaptiveTempoPeriodMultiplier;}
     
     void  reset();
-    
-    inline void setId(int newId) { Id = newId;}
-    inline int getId(void) const noexcept { return Id; }
+
+    inline int getId(void) const noexcept { return tempo->getId(); }
     
     inline void setTempo(Tempo::Ptr newTempo) { tempo = newTempo;}
     inline Tempo::Ptr getTempo(void) const noexcept { return tempo; }
@@ -491,7 +490,6 @@ public:
     }
     
 private:
-    int Id;
     GeneralSettings::Ptr general;
     
     Tempo::Ptr tempo;

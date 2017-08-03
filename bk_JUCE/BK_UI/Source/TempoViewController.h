@@ -107,9 +107,9 @@ public:
     
     void fillSelectCB(int last, int current);
     
-    inline void timerCallback(void) override
+    void timerCallback(void) override
     {
-        if (processor.updateState->currentDisplay != DisplayTempoMod) return;
+
     }
     
 private:

@@ -238,16 +238,21 @@ TempoViewController(p, theGraph)
 
 void TempoPreparationEditor::timerCallback()
 {
-    if (processor.updateState->currentDisplay != DisplayTempo) return;
-    
-    TempoProcessor::Ptr tProcessor = processor.currentPiano->getTempoProcessor(processor.updateState->currentTempoId);
-
-    if(tProcessor->getPeriodMultiplier() != lastPeriodMultiplier)
+    if (processor.updateState->currentDisplay == DisplayTempo)
     {
-        lastPeriodMultiplier = tProcessor->getPeriodMultiplier();
+        TempoProcessor::Ptr mProcessor = processor.currentPiano->getTempoProcessor(processor.updateState->currentTempoId);
+
+        if (mProcessor != nullptr)
+        {
+            if(mProcessor->getPeriodMultiplier() != lastPeriodMultiplier)
+            {
+                lastPeriodMultiplier = mProcessor->getPeriodMultiplier();
+                
+                A1AdaptedTempo.setText("Adapted Tempo = " + String(mProcessor->getAdaptedTempo()), dontSendNotification);
+                A1AdaptedPeriodMultiplier.setText("Adapted Period Multiplier = " + String(mProcessor->getPeriodMultiplier()), dontSendNotification);
+            }
+        }
         
-        A1AdaptedTempo.setText("Adapted Tempo = " + String(tProcessor->getAdaptedTempo()), dontSendNotification);
-        A1AdaptedPeriodMultiplier.setText("Adapted Period Multiplier = " + String(tProcessor->getPeriodMultiplier()), dontSendNotification);
     }
     
 }

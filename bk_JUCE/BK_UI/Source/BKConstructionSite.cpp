@@ -22,8 +22,6 @@ connect(false),
 lastX(10),
 lastY(10)
 {
-    setWantsKeyboardFocus(true);
-    
     graph->deselectAll();
 }
 

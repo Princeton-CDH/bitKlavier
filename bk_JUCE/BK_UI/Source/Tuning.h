@@ -523,8 +523,7 @@ public:
     //for calculating adaptive tuning
     void keyPressed(int midiNoteNumber);
     
-    inline void setId(int newId) { Id = newId;}
-    inline int getId(void) const noexcept { return Id; }
+    inline int getId(void) const noexcept { return tuning->getId(); }
     
     inline void setTuning(Tuning::Ptr newTuning) { tuning = newTuning;}
     inline Tuning::Ptr getTuning(void) const noexcept { return tuning; }
@@ -543,7 +542,6 @@ public:
     void adaptiveReset();
     
 private:
-    int Id;
     Tuning::Ptr tuning;
     
     float   intervalToRatio(float interval) const noexcept { return mtof(interval + 60.) / mtof(60.); }

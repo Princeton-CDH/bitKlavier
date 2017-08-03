@@ -354,14 +354,20 @@ TuningViewController(p, theGraph)
 
 void TuningPreparationEditor::timerCallback()
 {
-    if (processor.updateState->currentDisplay != DisplayTuning) return;
-    
-    TuningProcessor::Ptr tProcessor = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
-    if(tProcessor->getLastNoteTuning() != lastNoteTuningSave)
+    if (processor.updateState->currentDisplay == DisplayTuning)
     {
-        lastNoteTuningSave = tProcessor->getLastNoteTuning();
-        lastNote.setText("last note: " + String(lastNoteTuningSave), dontSendNotification);
-        lastInterval.setText("last interval: "  + String(tProcessor->getLastIntervalTuning()), dontSendNotification);
+        TuningProcessor::Ptr tProcessor = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
+        
+        if (tProcessor != nullptr)
+        {
+            if (tProcessor->getLastNoteTuning() != lastNoteTuningSave)
+            {
+                lastNoteTuningSave = tProcessor->getLastNoteTuning();
+                lastNote.setText("last note: " + String(lastNoteTuningSave), dontSendNotification);
+                lastInterval.setText("last interval: "  + String(tProcessor->getLastIntervalTuning()), dontSendNotification);
+            }
+        }
+        
     }
 }
 

@@ -221,28 +221,33 @@ SynchronicViewController(p, theGraph)
 
 void SynchronicPreparationEditor::timerCallback()
 {
-    if (processor.updateState->currentDisplay != DisplaySynchronic) return;
-    
-    SynchronicProcessor::Ptr sProcessor = processor.currentPiano->getSynchronicProcessor(processor.updateState->currentSynchronicId);
-
-    for (int i = 0; i < paramSliders.size(); i++)
+    if (processor.updateState->currentDisplay == DisplaySynchronic)
     {
-        if(paramSliders[i]->getName() == "beat length multipliers")
+        SynchronicProcessor::Ptr sProcessor = processor.currentPiano->getSynchronicProcessor(processor.updateState->currentSynchronicId);
+
+        if (sProcessor != nullptr)
         {
-            paramSliders[i]->setCurrentSlider(sProcessor->getBeatMultiplierCounter());
+            for (int i = 0; i < paramSliders.size(); i++)
+            {
+                if(paramSliders[i]->getName() == "beat length multipliers")
+                {
+                    paramSliders[i]->setCurrentSlider(sProcessor->getBeatMultiplierCounter());
+                }
+                else if(paramSliders[i]->getName() == "sustain length multipliers")
+                {
+                    paramSliders[i]->setCurrentSlider(sProcessor->getLengthMultiplierCounter());
+                }
+                else if(paramSliders[i]->getName() == "accents")
+                {
+                    paramSliders[i]->setCurrentSlider(sProcessor->getAccentMultiplierCounter());
+                }
+                else if(paramSliders[i]->getName() == "transpositions")
+                {
+                    paramSliders[i]->setCurrentSlider(sProcessor->getTranspCounter());
+                }
+            }
         }
-        else if(paramSliders[i]->getName() == "sustain length multipliers")
-        {
-            paramSliders[i]->setCurrentSlider(sProcessor->getLengthMultiplierCounter());
-        }
-        else if(paramSliders[i]->getName() == "accents")
-        {
-            paramSliders[i]->setCurrentSlider(sProcessor->getAccentMultiplierCounter());
-        }
-        else if(paramSliders[i]->getName() == "transpositions")
-        {
-            paramSliders[i]->setCurrentSlider(sProcessor->getTranspCounter());
-        }
+        
     }
 }
 
@@ -657,7 +662,6 @@ void SynchronicModificationEditor::highlightModedComponents()
 
 void SynchronicModificationEditor::timerCallback()
 {
-    if (processor.updateState->currentDisplay != DisplaySynchronicMod) return;
     /*
     SynchronicProcessor::Ptr sProcessor = processor.currentPiano->getSynchronicProcessor(processor.updateState->currentSynchronicId);
     

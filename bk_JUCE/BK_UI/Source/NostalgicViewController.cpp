@@ -339,16 +339,19 @@ void NostalgicPreparationEditor::fillSelectCB(int last, int current)
 
 void NostalgicPreparationEditor::timerCallback()
 {
-    if (processor.updateState->currentDisplay != DisplayNostalgic) return;
-    
-    NostalgicProcessor::Ptr nProcessor = processor.currentPiano->getNostalgicProcessor(processor.updateState->currentNostalgicId);
-    
-    Array<int> currentPlayPositions = nProcessor->getPlayPositions();
-    Array<int> currentUndertowPositions = nProcessor->getUndertowPositions();
-    currentPlayPositions.addArray(currentUndertowPositions);
-    
-    nDisplaySlider.updateSliderPositions(currentPlayPositions);
-    
+    if (processor.updateState->currentDisplay == DisplayNostalgic)
+    {
+        NostalgicProcessor::Ptr nProcessor = processor.currentPiano->getNostalgicProcessor(processor.updateState->currentNostalgicId);
+        
+        if (nProcessor != nullptr)
+        {
+            Array<int> currentPlayPositions = nProcessor->getPlayPositions();
+            Array<int> currentUndertowPositions = nProcessor->getUndertowPositions();
+            currentPlayPositions.addArray(currentUndertowPositions);
+            
+            nDisplaySlider.updateSliderPositions(currentPlayPositions);
+        }
+    }
 }
 
 
@@ -497,7 +500,8 @@ void NostalgicModificationEditor::fillSelectCB(int last, int current)
 
 void NostalgicModificationEditor::timerCallback()
 {
-    if (processor.updateState->currentDisplay != DisplayNostalgicMod) return;
+    if (processor.updateState->currentDisplay == DisplayNostalgicMod)
+    {
     /*
      NostalgicProcessor::Ptr nProcessor = processor.currentPiano->getNostalgicProcessor(processor.updateState->currentNostalgicId);
      
@@ -507,6 +511,7 @@ void NostalgicModificationEditor::timerCallback()
      
      nDisplaySlider.updateSliderPositions(currentPlayPositions);
      */
+    }
     
 }
 

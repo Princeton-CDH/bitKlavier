@@ -14,7 +14,6 @@ NostalgicProcessor::NostalgicProcessor(Nostalgic::Ptr nostalgic,
                                        TuningProcessor::Ptr tuning,
                                        SynchronicProcessor::Ptr synchronic,
                                        BKSynthesiser *s):
-Id(nostalgic->getId()),
 synth(s),
 nostalgic(nostalgic),
 tuner(tuning),
@@ -85,7 +84,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
                              Reverse,
                              FixedLengthFixedStart,
                              NostalgicNote,
-                             Id,
+                             nostalgic->getId(),
                              duration + nostalgic->aPrep->getWavedistance(),
                              duration,  // length
                              30,
@@ -128,7 +127,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
                              Reverse,
                              FixedLengthFixedStart,
                              NostalgicNote,
-                             Id,
+                             nostalgic->getId(),
                              duration + nostalgic->aPrep->getWavedistance(),
                              duration,  // length
                              30,
@@ -184,7 +183,7 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
                              Reverse,
                              FixedLengthFixedStart,
                              NostalgicNote,
-                             Id,
+                             nostalgic->getId(),
                              duration + nostalgic->aPrep->getWavedistance(),
                              duration,  // length
                              30,
@@ -246,7 +245,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
                                  Forward,
                                  FixedLengthFixedStart,
                                  NostalgicNote,
-                                 Id,
+                                 nostalgic->getId(),
                                  noteOnPrep->getWavedistance(),                        //start position
                                  noteOnPrep->getUndertow(),                            //play length
                                  aRampUndertowCrossMS,                                 //ramp up length

@@ -20,8 +20,8 @@ construction(p, &theGraph),
 overtop(p, &theGraph),
 timerCallbackCount(0)
 {
-    addKeyListener(this);
     addMouseListener(this, true);
+    addKeyListener(this);
     
     gen = processor.gallery->getGeneralSettings();
     
@@ -82,18 +82,6 @@ timerCallbackCount(0)
     DropShadow myshadow(Colours::darkgrey, 5, myshadowOffset);
     overtopShadow = new DropShadower(myshadow);
     overtopShadow->setOwner(&overtop);
-
-    
-    /*
-    File file ("~/bk_icons/icon.png");
-    FileInputStream inputStream(file);
-    PNGImageFormat tempimg;
-    Image bimg = tempimg.decodeImage(inputStream);
-    backgroundImageComponent.setImage(bimg);
-    backgroundImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
-    backgroundImageComponent.setAlpha(0.2);
-    addAndMakeVisible(backgroundImageComponent);
-     */
     
     startTimerHz (50);
     
@@ -101,7 +89,7 @@ timerCallbackCount(0)
 
 MainViewController::~MainViewController()
 {
-    
+    removeKeyListener(this);
 }
 
 

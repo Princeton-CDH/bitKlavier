@@ -15,7 +15,6 @@ DirectProcessor::DirectProcessor(Direct::Ptr direct,
                                  BKSynthesiser *s,
                                  BKSynthesiser *res,
                                  BKSynthesiser *ham):
-Id(direct->getId()),
 synth(s),
 resonanceSynth(res),
 hammerSynth(ham),
@@ -37,9 +36,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
         float offset = t + tuner->getOffset(noteNumber);
         int synthNoteNumber = noteNumber + (int)offset;
         float synthOffset = offset - (int)offset;
-        
-        DBG("ON dtransp: " + String(synthNoteNumber) +" offset: " + String(synthOffset));
-        
+
         synth->keyOn(channel,
                      synthNoteNumber,
                      synthOffset,
@@ -48,7 +45,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                      Forward,
                      Normal,
                      MainNote,
-                     Id,
+                     direct->getId(),
                      0, // start
                      0, // length
                      3,
@@ -68,11 +65,9 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
         int t = keyPlayed[noteNumber].getUnchecked(i);
         float t_offset = keyPlayedOffset[noteNumber].getUnchecked(i);
         
-        DBG("OFF dtransp: " + String(t) +" offset: " + String(t_offset));
-        
         synth->keyOff(channel,
                      MainNote,
-                     Id,
+                     direct->getId(),
                      t,
                      velocity,
                      true);
@@ -95,7 +90,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
                                  Forward,
                                  Normal, //FixedLength,
                                  HammerNote,
-                                 Id,
+                                 direct->getId(),
                                  0,
                                  2000,
                                  3,
@@ -115,7 +110,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
                                     Forward,
                                     Normal, //FixedLength,
                                     ResonanceNote,
-                                    Id,
+                                    direct->getId(),
                                     0,
                                     2000,
                                     3,

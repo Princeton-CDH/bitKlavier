@@ -62,6 +62,7 @@ public:
     
     BKPreparationDisplay currentDisplay = DisplayNil;
     bool displayDidChange;
+
     
     void setCurrentDisplay(BKPreparationDisplay type)
     {

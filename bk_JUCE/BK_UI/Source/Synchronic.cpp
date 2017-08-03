@@ -15,7 +15,6 @@ SynchronicProcessor::SynchronicProcessor(Synchronic::Ptr synchronic,
                                          TempoProcessor::Ptr tempo,
                                          BKSynthesiser* main,
                                          GeneralSettings::Ptr general):
-Id(synchronic->getId()),
 synth(main),
 general(general),
 synchronic(synchronic),
@@ -80,7 +79,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
                      noteDirection,
                      FixedLengthFixedStart,
                      SynchronicNote,
-                     Id,
+                     synchronic->getId(),
                      noteStartPos, // start
                      noteLength,
                      3,

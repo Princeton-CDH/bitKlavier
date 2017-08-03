@@ -84,7 +84,7 @@ octaveNumForMiddleC (3)
     rangeAll = (rangeEnd - rangeStart) + 1;
     
     colourChanged();
-    setWantsKeyboardFocus (true);
+    //setWantsKeyboardFocus (true);
     
     for(int i=0; i<128; i++)
     {

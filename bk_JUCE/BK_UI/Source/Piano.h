@@ -68,55 +68,22 @@ public:
     TempoProcessor::PtrArr               mprocessor;
     TuningProcessor::PtrArr              tprocessor;
     
-    inline DirectProcessor::Ptr getDirectProcessor(int Id)
-    {
-        for (auto proc : dprocessor)
-        {
-            if (proc->getId() == Id) return proc;
-        }
-        
-        return nullptr;
-    }
+    void addProcessor(BKPreparationType thisType, int thisId);
+    bool containsProcessor(BKPreparationType thisType, int thisId);
     
-    inline NostalgicProcessor::Ptr getNostalgicProcessor(int Id)
-    {
-        for (auto proc : nprocessor)
-        {
-            if (proc->getId() == Id) return proc;
-        }
-        
-        return nullptr;
-    }
+    DirectProcessor::Ptr        getDirectProcessor(int Id);
+    NostalgicProcessor::Ptr     getNostalgicProcessor(int Id);
+    SynchronicProcessor::Ptr    getSynchronicProcessor(int Id);
+    TuningProcessor::Ptr        getTuningProcessor(int Id);
+    TempoProcessor::Ptr         getTempoProcessor(int Id);
     
-    inline SynchronicProcessor::Ptr getSynchronicProcessor(int Id)
-    {
-        for (auto proc : sprocessor)
-        {
-            if (proc->getId() == Id) return proc;
-        }
-        
-        return nullptr;
-    }
+    NostalgicProcessor::Ptr     addNostalgicProcessor(int thisId);
+    SynchronicProcessor::Ptr    addSynchronicProcessor(int thisId);
+    DirectProcessor::Ptr        addDirectProcessor(int thisId);
+    TuningProcessor::Ptr        addTuningProcessor(int thisId);
+    TempoProcessor::Ptr         addTempoProcessor(int thisId);
     
-    inline TuningProcessor::Ptr getTuningProcessor(int Id)
-    {
-        for (auto proc : tprocessor)
-        {
-            if (proc->getId() == Id) return proc;
-        }
-        
-        return nullptr;
-    }
     
-    inline TempoProcessor::Ptr getTempoProcessor(int Id)
-    {
-        for (auto proc : mprocessor)
-        {
-            if (proc->getId() == Id) return proc;
-        }
-        
-        return nullptr;
-    }
     
     Array<int>                  pianoMap;
     int                         numPMaps;

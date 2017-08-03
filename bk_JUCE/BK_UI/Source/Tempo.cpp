@@ -11,7 +11,6 @@
 #include "Tempo.h"
 
 TempoProcessor::TempoProcessor(Tempo::Ptr t):
-Id(t->getId()),
 tempo(t)
 {
     atTimer = 0;

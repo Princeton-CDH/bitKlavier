@@ -703,14 +703,12 @@ public:
         synth = main;
     }
     
-    inline void setId(int newId) { Id = newId;}
-    inline int getId(void) const noexcept { return Id; }
+    inline int getId(void) const noexcept { return nostalgic->getId(); }
     
     Array<int> getPlayPositions();
     Array<int> getUndertowPositions();
     
 private:
-    int Id;
     BKSynthesiser*              synth;
     
     Nostalgic::Ptr                  nostalgic;

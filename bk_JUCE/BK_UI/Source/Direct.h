@@ -454,12 +454,9 @@ public:
         synth = main;
         resonanceSynth = res;
         hammerSynth = hammer;
-        
-        
     }
     
-    inline int getId(void) const noexcept { return Id; }
-    inline void setId(int newId) { Id = newId; }
+    inline int getId(void) const noexcept { return direct->getId(); }
     
     inline void setTuning(TuningProcessor::Ptr tuning)
     {
@@ -472,7 +469,6 @@ public:
     }
     
 private:
-    int Id;
     BKSynthesiser*      synth;
     BKSynthesiser*      resonanceSynth;
     BKSynthesiser*      hammerSynth;
