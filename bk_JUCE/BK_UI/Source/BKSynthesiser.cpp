@@ -332,6 +332,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                 && sound->appliesToVelocity((int)(velocity * 127.0))
                 && sound->appliesToChannel (midiChannel))
             {
+                //DBG("BKSynthesiser::keyOn " + String(noteNumber));
                 startVoice (findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes),
                             sound,
                             midiChannel,
@@ -457,7 +458,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             
             if (voice->getCurrentlyPlayingNote() == midiNoteNumber
                 && voice->isPlayingChannel (midiChannel)
-                && (voice->layerId == layerToLayerId(type, layerId)))
+                && (voice->layerId == layerToLayerId(type, layerId))) //need to add transposition level as well here
             {
                 
                 if (BKSynthesiserSound* const sound = voice->getCurrentlyPlayingSound())
@@ -472,6 +473,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                         
                         
                         if (! ((voice->type == FixedLengthFixedStart) || (voice->type == FixedLength) || voice->sustainPedalDown || voice->sostenutoPedalDown)) {
+                            DBG("BKSynthesiser::stopVoice " + String(midiNoteNumber));
                             stopVoice (voice, velocity, allowTailOff);
                         }
                     }

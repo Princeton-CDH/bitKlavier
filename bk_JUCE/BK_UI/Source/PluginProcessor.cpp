@@ -142,7 +142,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
         int noteNumber = m.getNoteNumber();
-        DBG("note: " + String(noteNumber) + " " + String(m.getVelocity()));
+        //DBG("note: " + String(noteNumber) + " " + String(m.getVelocity()));
         float velocity = m.getFloatVelocity();
          
         channel = m.getChannel();
