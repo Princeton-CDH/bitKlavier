@@ -482,6 +482,10 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
         
         addAndMakeVisible(lasso = new LassoComponent<BKItem*>());
         
+        lasso->setAlpha(0.5);
+        lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoFillColourId, Colours::lightgrey);
+        lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoOutlineColourId, Colours::white);
+        
         lasso->beginLasso(eo, this);
     }
     

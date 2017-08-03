@@ -773,10 +773,37 @@ void BKItemGraph::reconstruct(void)
     // Create items based on the ItemMappers in current Piano and add them to BKItemGraph
     for (auto item : thisPiano->getItems())
     {
-        if (item->getType() == PreparationTypePianoMap)
+        BKPreparationType type = item->getType();
+        
+        BKItem::PtrArr connex;
+        
+        if (type == PreparationTypePianoMap)
         {
             item->configurePianoCB();
         }
+        /*
+        else if (type >= PreparationTypeDirect && type <= PreparationTypeNostalgic)
+        {
+            connex = item->getConnectionsOfType(PreparationTypeTuning);
+            
+            if (connex.size()) processor.currentPiano->linkPreparationWithTuning(type, item->getId(), processor.gallery->getTuning(connex[0]->getId()));
+            
+            if (type == PreparationTypeSynchronic)
+            {
+                connex = item->getConnectionsOfType(PreparationTypeTempo);
+                
+                if (connex.size()) processor.currentPiano->linkSynchronicWithTempo(processor.gallery->getSynchronic(item->getId()), processor.gallery->getTempo(connex[0]->getId()));
+            }
+            
+            if (type == PreparationTypeNostalgic)
+            {
+                connex = item->getConnectionsOfType(PreparationTypeSynchronic);
+                
+                if (connex.size()) processor.currentPiano->linkNostalgicWithSynchronic(processor.gallery->getNostalgic(item->getId()), processor.gallery->getSynchronic(connex[0]->getId()));
+            }
+            
+        }
+         */
         
         addItem(item);
     }
