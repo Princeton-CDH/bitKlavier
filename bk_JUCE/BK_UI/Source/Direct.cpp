@@ -10,17 +10,16 @@
 
 #include "Direct.h"
 
-DirectProcessor::DirectProcessor(BKSynthesiser *s,
+DirectProcessor::DirectProcessor(Direct::Ptr direct,
+                                 TuningProcessor::Ptr tuning,
+                                 BKSynthesiser *s,
                                  BKSynthesiser *res,
-                                 BKSynthesiser *ham,
-                                 DirectPreparation::Ptr activePrep,
-                                 Tuning::Ptr tuning,
-                                 int Id):
-Id(Id),
+                                 BKSynthesiser *ham):
+Id(direct->getId()),
 synth(s),
 resonanceSynth(res),
 hammerSynth(ham),
-active(activePrep),
+direct(direct),
 tuner(tuning)
 {
     
@@ -31,26 +30,21 @@ DirectProcessor::~DirectProcessor(void)
     
 }
 
-
-void DirectProcessor::setCurrentPlaybackSampleRate(double sr)
-{
-    sampleRate = sr;
-    tuner->processor->setCurrentPlaybackSampleRate(sr);
-}
-
 void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 {
-    for (auto t : active->getTransposition())
+    for (auto t : direct->aPrep->getTransposition())
     {
-        float offset = t + tuner->processor->getOffset(noteNumber);
+        float offset = t + tuner->getOffset(noteNumber);
         int synthNoteNumber = noteNumber + (int)offset;
         float synthOffset = offset - (int)offset;
+        
+        DBG("ON dtransp: " + String(synthNoteNumber) +" offset: " + String(synthOffset));
         
         synth->keyOn(channel,
                      synthNoteNumber,
                      synthOffset,
                      velocity,
-                     active->getGain() * aGlobalGain,
+                     direct->aPrep->getGain() * aGlobalGain,
                      Forward,
                      Normal,
                      MainNote,
@@ -74,6 +68,8 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
         int t = keyPlayed[noteNumber].getUnchecked(i);
         float t_offset = keyPlayedOffset[noteNumber].getUnchecked(i);
         
+        DBG("OFF dtransp: " + String(t) +" offset: " + String(t_offset));
+        
         synth->keyOff(channel,
                      MainNote,
                      Id,
@@ -84,8 +80,8 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
         //only play hammers/resonance for first note in layers of transpositions
         if(i==0)
         {
-            float hGain = active->getHammerGain();
-            float rGain = active->getResonanceGain();
+            float hGain = direct->aPrep->getHammerGain();
+            float rGain = direct->aPrep->getResonanceGain();
             
             if (hGain > 0.0f)
             {

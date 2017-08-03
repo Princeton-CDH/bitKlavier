@@ -488,12 +488,12 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
 
 void BKAudioProcessor::initializeGallery(void)
 {
-    gallery->prepareToPlay(bkSampleRate);
+    prevPiano = gallery->getPiano(1);
+    currentPiano = gallery->getPiano(1);
     
     for (auto piano : gallery->getPianos()) piano->configure();
     
-    prevPiano = gallery->getPiano(1);
-    currentPiano = gallery->getPiano(1);
+    gallery->prepareToPlay(bkSampleRate);
     
     updateUI();
     

@@ -45,13 +45,6 @@ void Gallery::prepareToPlay (double sampleRate)
     bkSampleRate = sampleRate;
     
     for (auto piano : bkPianos)     piano->prepareToPlay(bkSampleRate);
-    
-    for (auto prep : tuning)        prep->prepareToPlay(bkSampleRate);
-    for (auto prep : tempo)         prep->prepareToPlay(bkSampleRate);
-    for (auto prep : synchronic)    prep->prepareToPlay(bkSampleRate);
-    for (auto prep : nostalgic)     prep->prepareToPlay(bkSampleRate);
-    for (auto prep : direct)        prep->prepareToPlay(bkSampleRate);
-    
 }
 
 Gallery::~Gallery()

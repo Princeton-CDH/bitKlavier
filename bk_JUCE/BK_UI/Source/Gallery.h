@@ -59,16 +59,16 @@ public:
         for (auto item : modDirect) s += (" " + String(item->getId()));
         
         s += "\nnostalgicmod";
-        for (auto item : modDirect) s += (" " + String(item->getId()));
+        for (auto item : modNostalgic) s += (" " + String(item->getId()));
         
         s += "\nsynchronicmod";
-        for (auto item : modDirect) s += (" " + String(item->getId()));
+        for (auto item : modSynchronic) s += (" " + String(item->getId()));
         
         s += "\ntuningmod";
-        for (auto item : modDirect) s += (" " + String(item->getId()));
+        for (auto item : modTuning) s += (" " + String(item->getId()));
         
         s += "\ntempomod";
-        for (auto item : modDirect) s += (" " + String(item->getId()));
+        for (auto item : modTempo) s += (" " + String(item->getId()));
         
         DBG("\n~ ~ ~ ~ ~ GALLERY ~ ~ ~ ~ ~ ~");
         DBG(s);
@@ -81,15 +81,6 @@ public:
     void setStateFromJson(var myJson);
     
     void resetPreparations(void);
-    
-    SynchronicProcessor::Ptr getSynchronicProcessor(int Id);
-    NostalgicProcessor::Ptr getNostalgicProcessor(int id);
-    TuningProcessor::Ptr getTuningProcessor(int id);
-    TempoProcessor::Ptr getTempoProcessor(int id);
-
-    bool getEditted(BKPreparationType type, int Id);
-    void setEditted(BKPreparationType type, int Id, bool editted);
-    
     
     inline const int getNumPianos(void) const noexcept {return bkPianos.size();}
     

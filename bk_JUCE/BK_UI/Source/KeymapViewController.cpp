@@ -181,16 +181,12 @@ void KeymapViewController::bkButtonClicked (Button* b)
         keymapTF.toFront(true);
         focusLostByEscapeKey = false;
     }
-    
-    Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-    thisKeymap->editted = true;
 }
 
 
 void KeymapViewController::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
     Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-    thisKeymap->editted = true;
     
     thisKeymap->setName(name);
 }
@@ -202,9 +198,6 @@ void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
     
     if (name == "KeymapMidi")
     {
-        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-        thisKeymap->editted = true;
-        
         keymapUpdated(tf);
     }
     else
@@ -238,11 +231,8 @@ void KeymapViewController::keymapUpdated(TextEditor& tf)
 
 void KeymapViewController::textEditorFocusLost(TextEditor& tf)
 {
-    if(!focusLostByEscapeKey) {
-        
-        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-        thisKeymap->editted = true;
-        
+    if(!focusLostByEscapeKey)
+    {
         keymapUpdated(tf);
     }
     
@@ -295,7 +285,6 @@ void KeymapViewController::handleKeymapNoteOff (BKKeymapKeyboardState* source, i
 void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber)
 {
     Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-    thisKeymap->editted = true;
     
     Array<int> oldKeys = thisKeymap->keys();
     

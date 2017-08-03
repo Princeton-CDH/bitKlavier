@@ -38,8 +38,7 @@ public:
                       float gain,
                       bool resAndHammer,
                       float resGain,
-                      float hamGain,
-                      Tuning::Ptr t):
+                      float hamGain):
     dTransposition(transp),
     dGain(gain),
     dResonanceGain(resGain),
@@ -48,7 +47,7 @@ public:
         
     }
     
-    DirectPreparation(Tuning::Ptr t):
+    DirectPreparation(void):
     dTransposition(Array<float>({0.0})),
     dGain(1.0),
     dResonanceGain(1.0),
@@ -116,62 +115,6 @@ private:
     JUCE_LEAK_DETECTOR(DirectPreparation);
 };
 
-class DirectProcessor : public ReferenceCountedObject
-{
-    
-public:
-    typedef ReferenceCountedObjectPtr<DirectProcessor>   Ptr;
-    typedef Array<DirectProcessor::Ptr>                  PtrArr;
-    typedef Array<DirectProcessor::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<DirectProcessor>                  Arr;
-    typedef OwnedArray<DirectProcessor, CriticalSection> CSArr;
-    
-    DirectProcessor(BKSynthesiser* main, BKSynthesiser* res,  BKSynthesiser* ham, DirectPreparation::Ptr active, Tuning::Ptr tuning, int Id);
-    
-    ~DirectProcessor();
-    
-    void processBlock(int numSamples, int midiChannel);
-    
-    inline void setTuning(Tuning::Ptr thisTuning)
-    {
-        tuner = thisTuning;
-    }
-    
-    inline Tuning::Ptr getTuning(void)
-    {
-        return tuner;
-    }
-    
-    void setCurrentPlaybackSampleRate(double sr);
-    
-    void    keyPressed(int noteNumber, float velocity, int channel);
-    void    keyReleased(int noteNumber, float velocity, int channel);
-    
-    inline void attachToSynthesiser(BKSynthesiser* main,BKSynthesiser* res, BKSynthesiser* ham)
-    {
-        synth = main;
-        resonanceSynth = res;
-        hammerSynth = ham;
-    }
-    
-private:
-    int Id;
-    BKSynthesiser*              synth;
-    BKSynthesiser*              resonanceSynth;
-    BKSynthesiser*              hammerSynth;
-    DirectPreparation::Ptr      active;
-    Tuning::Ptr        tuner;
-    
-    //need to keep track of the actual notes played and their offsets when a particular key is pressed
-    //so that they can all be turned off properly, even in the event of a preparation change
-    //while the key is held
-    Array<int>      keyPlayed[128];         //keep track of pitches played associated with particular key on keyboard
-    Array<float>    keyPlayedOffset[128];   //and also the offsets
-    
-    double sampleRate;
-    
-    JUCE_LEAK_DETECTOR(DirectProcessor);
-};
 
 /* ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ DIRECT ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ */
 
@@ -186,60 +129,25 @@ public:
     typedef OwnedArray<Direct, CriticalSection> CSArr;
     
     
-    Direct(BKSynthesiser *s,
-           BKSynthesiser *res,
-           BKSynthesiser *ham,
-           DirectPreparation::Ptr d,
-           Tuning::Ptr tuning,
+    Direct(DirectPreparation::Ptr d,
            int Id):
     sPrep(new DirectPreparation(d)),
     aPrep(new DirectPreparation(sPrep)),
-    processor(new DirectProcessor(s, res, ham, aPrep, tuning, Id)),
     Id(Id),
-    name(String(Id)),
-    X(-1),Y(-1),
-    editted(false)
+    name(String(Id))
     {
         
     }
     
-    Direct(BKSynthesiser *s,
-           BKSynthesiser *res,
-           BKSynthesiser *ham,
-           Tuning::Ptr tuning,
-           BKUpdateState::Ptr us,
+    Direct(BKUpdateState::Ptr us,
            int Id):
     Id(Id),
     name(String(Id)),
-    updateState(us),
-    X(-1),Y(-1),
-    editted(false)
+    updateState(us)
     {
-        sPrep       = new DirectPreparation(tuning);
+        sPrep       = new DirectPreparation();
         aPrep       = new DirectPreparation(sPrep);
-        processor   = new DirectProcessor(s, res, ham, aPrep, tuning, Id);
     };
-    
-    inline void prepareToPlay(double sampleRate, BKSynthesiser* main, BKSynthesiser* res, BKSynthesiser* hammer)
-    {
-        processor->attachToSynthesiser(main, res, hammer);
-        processor->setCurrentPlaybackSampleRate(sampleRate);
-    }
-    
-    inline void setTuning(Tuning::Ptr tuning)
-    {
-        processor->setTuning(tuning);
-    }
-    
-    inline Tuning::Ptr getTuning(void)
-    {
-        return processor->getTuning();
-    }
-    
-    inline void prepareToPlay(double sampleRate)
-    {
-        processor->setCurrentPlaybackSampleRate(sampleRate);
-    }
     
     inline ValueTree getState(void)
     {
@@ -247,7 +155,6 @@ public:
         
         prep.setProperty( "Id",Id, 0);
         prep.setProperty( "name", name, 0);
-        prep.setProperty( "tuning", processor->getTuning()->getId(), 0);
         
         ValueTree transp( vtagDirect_transposition);
         Array<float> m = sPrep->getTransposition();
@@ -259,17 +166,12 @@ public:
         prep.setProperty( ptagDirect_resGain,           sPrep->getResonanceGain(), 0);
         prep.setProperty( ptagDirect_hammerGain,        sPrep->getHammerGain(), 0);
         
-        prep.setProperty( posX, X, 0);
-        prep.setProperty( posY, Y, 0);
-        
         return prep;
     }
     
     inline void setState(XmlElement* e, Tuning::PtrArr tuning)
     {
-        editted = true;
-        
-        float f; int i;
+        float f;
         
         Id = e->getStringAttribute("Id").getIntValue();
         
@@ -277,19 +179,6 @@ public:
         
         if (n != String::empty)     name = n;
         else                        name = String(Id);
-        
-        i = e->getStringAttribute("tuning").getIntValue();
-        
-        bool found = false;
-        for (auto p : tuning)
-        {
-            if (p->getId() == i)
-            {
-                setTuning(p);
-                found = true;
-            }
-        }
-        if (!found) setTuning(tuning[0]);
         
         f = e->getStringAttribute(ptagDirect_gain).getFloatValue();
         sPrep->setGain(f);
@@ -299,14 +188,6 @@ public:
         
         f = e->getStringAttribute(ptagDirect_resGain).getFloatValue();
         sPrep->setResonanceGain(f);
-        
-        n = e->getStringAttribute(posX);
-        if (n != String::empty) X = n.getIntValue();
-        else                    X = -1;
-        
-        n = e->getStringAttribute(posY);
-        if (n != String::empty) Y = n.getIntValue();
-        else                    Y = -1;
         
         forEachXmlChildElement (*e, sub)
         {
@@ -339,7 +220,6 @@ public:
     
     DirectPreparation::Ptr      sPrep;
     DirectPreparation::Ptr      aPrep;
-    DirectProcessor::Ptr        processor;
     
     inline void reset(void)
     {
@@ -353,9 +233,6 @@ public:
         aPrep->copy(sPrep);
     }
     
-    
-    //void didChange(bool which) { updateState->directPreparationDidChange = which; }
-    
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName)
     {
@@ -363,22 +240,10 @@ public:
         updateState->directPreparationDidChange = true;
     }
     
-    inline void setPosition(int x, int y) { X=x;Y=y;}
-    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
-    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
-    inline void setX(int x) { X = x; }
-    inline void setY(int y) { Y = y; }
-    inline int getX(void) const noexcept { return X; }
-    inline int getY(void) const noexcept { return Y; }
-    
-    bool editted;
-    
 private:
     int Id;
     String name;
     BKUpdateState::Ptr          updateState;
-    
-    int X,Y;
     
     JUCE_LEAK_DETECTOR(Direct)
 };
@@ -404,11 +269,9 @@ public:
      */
     
     DirectModPreparation(DirectPreparation::Ptr p, int Id):
-    Id(Id),
-    X(-1),Y(-1),
-    editted(false)
+    Id(Id)
     {
-        param.ensureStorageAllocated(cDirectParameterTypes.size());
+        param.ensureStorageAllocated((int)cDirectParameterTypes.size());
         
         param.set(DirectTransposition, floatArrayToString(p->getTransposition()));
         param.set(DirectGain, String(p->getGain()));
@@ -418,9 +281,7 @@ public:
     
     
     DirectModPreparation(int Id):
-    Id(Id),
-    X(-1),Y(-1),
-    editted(false)
+    Id(Id)
     {
         param.add("");
         param.add("");
@@ -465,7 +326,6 @@ public:
     
     inline void setState(XmlElement* e)
     {
-        editted = true;
         float f;
         
         Id = e->getStringAttribute("Id").getIntValue();
@@ -552,24 +412,83 @@ public:
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
     
-    inline void setPosition(int x, int y) { X=x;Y=y;}
-    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
-    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
-    inline void setX(int x) { X = x; }
-    inline void setY(int y) { Y = y; }
-    inline int getX(void) const noexcept { return X; }
-    inline int getY(void) const noexcept { return Y; }
-    
-    bool editted;
-    
 private:
     int Id;
     String name;
     StringArray          param;
     
-    int X,Y;
-    
     JUCE_LEAK_DETECTOR(DirectModPreparation);
+};
+
+class DirectProcessor : public ReferenceCountedObject
+{
+    
+public:
+    typedef ReferenceCountedObjectPtr<DirectProcessor>   Ptr;
+    typedef Array<DirectProcessor::Ptr>                  PtrArr;
+    typedef Array<DirectProcessor::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<DirectProcessor>                  Arr;
+    typedef OwnedArray<DirectProcessor, CriticalSection> CSArr;
+    
+    DirectProcessor(Direct::Ptr direct,
+                    TuningProcessor::Ptr tuning,
+                    BKSynthesiser *s, BKSynthesiser *res, BKSynthesiser *ham);
+    
+    ~DirectProcessor();
+    
+    void processBlock(int numSamples, int midiChannel);
+    
+    
+    void    keyPressed(int noteNumber, float velocity, int channel);
+    void    keyReleased(int noteNumber, float velocity, int channel);
+    
+    inline void attachToSynthesiser(BKSynthesiser* main,BKSynthesiser* res, BKSynthesiser* ham)
+    {
+        
+    }
+    
+    inline void prepareToPlay(double sr, BKSynthesiser* main, BKSynthesiser* res, BKSynthesiser* hammer)
+    {
+        sampleRate = sr;
+        
+        synth = main;
+        resonanceSynth = res;
+        hammerSynth = hammer;
+        
+        
+    }
+    
+    inline int getId(void) const noexcept { return Id; }
+    inline void setId(int newId) { Id = newId; }
+    
+    inline void setTuning(TuningProcessor::Ptr tuning)
+    {
+        tuner = tuning;
+    }
+    
+    inline TuningProcessor::Ptr getTuning(void)
+    {
+        return tuner;
+    }
+    
+private:
+    int Id;
+    BKSynthesiser*      synth;
+    BKSynthesiser*      resonanceSynth;
+    BKSynthesiser*      hammerSynth;
+    
+    Direct::Ptr             direct;
+    TuningProcessor::Ptr    tuner;
+    
+    //need to keep track of the actual notes played and their offsets when a particular key is pressed
+    //so that they can all be turned off properly, even in the event of a preparation change
+    //while the key is held
+    Array<int>      keyPlayed[128];         //keep track of pitches played associated with particular key on keyboard
+    Array<float>    keyPlayedOffset[128];   //and also the offsets
+    
+    double sampleRate;
+    
+    JUCE_LEAK_DETECTOR(DirectProcessor);
 };
 
 

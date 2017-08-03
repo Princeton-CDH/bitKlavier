@@ -378,7 +378,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             voice->currentlyPlayingNote = midiNoteNumber; //midiNoteNumber + (int)midiNoteNumberOffset)
 #endif      
             voice->layerId = layerToLayerId(bktype, layer);
-            voice->length = length;
+            voice->length = (int)length;
             voice->type = type;
             voice->bktype = bktype;
             voice->currentPlayingMidiChannel = midiChannel;

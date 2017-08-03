@@ -16,10 +16,10 @@
 
 Piano::Piano(BKAudioProcessor& p,
              int Id):
-processor(p),
 currentPMap(PreparationMap::Ptr()),
 activePMaps(PreparationMap::CSPtrArr()),
 prepMaps(PreparationMap::CSPtrArr()),
+processor(p),
 Id(Id)
 {
     numPMaps = 0;
@@ -43,7 +43,6 @@ Id(Id)
 
 }
 
-
 Piano::~Piano()
 {
     
@@ -53,7 +52,6 @@ void Piano::deconfigure(void)
 {
     prepMaps.clear();
     activePMaps.clear();
-    DBG("prepmapssizePRE: " + String(prepMaps.size()));
     numPMaps = 0;
     
     for (int key = 0; key < 128; key++)
@@ -62,13 +60,44 @@ void Piano::deconfigure(void)
         modificationMap[key]->clearResets();
         pianoMap.set(key, -1);
     }
-    
-    
 }
 
+#define DEFAULT_ID 1
 void Piano::configure(void)
 {
     deconfigure();
+    
+    defaultT = processor.currentPiano->getTuningProcessor(DEFAULT_ID);
+    
+    if (defaultT == nullptr)
+    {
+        defaultT = new TuningProcessor(processor.gallery->getTuning(DEFAULT_ID));
+        defaultT->prepareToPlay(sampleRate);
+        tprocessor.add(defaultT);
+    }
+    
+    defaultM = getTempoProcessor(DEFAULT_ID);
+    
+    if (defaultM == nullptr)
+    {
+        defaultM = new TempoProcessor(processor.gallery->getTempo(DEFAULT_ID));
+        defaultM->prepareToPlay(sampleRate);
+        mprocessor.add(defaultM);
+    }
+    
+    defaultS = getSynchronicProcessor(DEFAULT_ID);
+    
+    if (defaultS == nullptr)
+    {
+        defaultS = new SynchronicProcessor(processor.gallery->getSynchronic(DEFAULT_ID),
+                                        defaultT,
+                                        defaultM,
+                                        &processor.mainPianoSynth,
+                                        processor.gallery->getGeneralSettings());
+        defaultS->prepareToPlay(sampleRate, &processor.mainPianoSynth);
+        sprocessor.add(defaultS);
+    }
+    
     for (auto item : items)
     {
         BKPreparationType type = item->getType();
@@ -89,7 +118,7 @@ void Piano::configure(void)
                 
                 if (targetType >= PreparationTypeDirect && targetType <= PreparationTypeTempo)
                 {
-                    addPreparationToKeymap(targetType, targetId, Id);
+                    linkPreparationWithKeymap(targetType, targetId, Id);
                 }
                 else if (targetType >= PreparationTypeDirectMod && targetType <= PreparationTypeTempoMod)
                 {
@@ -181,37 +210,112 @@ void Piano::remove(BKItem::Ptr item)
 
 void Piano::linkSynchronicWithTempo(Synchronic::Ptr synchronic, Tempo::Ptr thisTempo)
 {
-    synchronic->setTempo(thisTempo);
+    SynchronicProcessor::Ptr sproc = getSynchronicProcessor(synchronic->getId());
+    
+    TempoProcessor::Ptr mproc = getTempoProcessor(thisTempo->getId());
+    
+    if (mproc == nullptr)
+    {
+        mproc = new TempoProcessor(thisTempo);
+        mproc->prepareToPlay(sampleRate);
+        mprocessor.add(mproc);
+    }
+    
+    sproc->setTempo(mproc);
 }
 
 void Piano::linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic)
 {
-    nostalgic->setSynchronic(synchronic);
+    NostalgicProcessor::Ptr nproc = getNostalgicProcessor(nostalgic->getId());
+    
+    SynchronicProcessor::Ptr sproc = getSynchronicProcessor(synchronic->getId());
+    
+    if (sproc == nullptr)
+    {
+        sproc = new SynchronicProcessor(synchronic,
+                                        tprocessor[0],
+                                        mprocessor[0],
+                                        &processor.mainPianoSynth,
+                                        processor.gallery->getGeneralSettings());
+        sproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
+        sprocessor.add(sproc);
+    }
+    
+    nproc->setSynchronic(sproc);
 }
 
 void Piano::linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning)
 {
+    TuningProcessor::Ptr tproc = processor.currentPiano->getTuningProcessor(thisTuning->getId());
+    
+    if (tproc == nullptr)
+    {
+        tproc = new TuningProcessor(thisTuning);
+        tproc->prepareToPlay(sampleRate);
+        tprocessor.add(tproc);
+    }
+    
     if (thisType == PreparationTypeDirect)
     {
         Direct::Ptr thisDirect = processor.gallery->getDirect(thisId);
         
-        thisDirect->setTuning(thisTuning);
+        DirectProcessor::Ptr dproc = processor.currentPiano->getDirectProcessor(thisId);
+        
+        // might not need this/these here, just in configure()
+        if (dproc == nullptr)
+        {
+            dproc = new DirectProcessor(thisDirect,
+                                        tprocessor[0],
+                                        &processor.mainPianoSynth,
+                                        &processor.resonanceReleaseSynth,
+                                        &processor.hammerReleaseSynth);
+            dproc->prepareToPlay(sampleRate, &processor.mainPianoSynth, &processor.resonanceReleaseSynth,&processor.hammerReleaseSynth);
+            dprocessor.add(dproc);
+        }
+        
+        dproc->setTuning(tproc);
     }
     else if (thisType == PreparationTypeSynchronic)
     {
         Synchronic::Ptr thisSynchronic = processor.gallery->getSynchronic(thisId);
         
-        thisSynchronic->setTuning(thisTuning);
+        SynchronicProcessor::Ptr sproc = processor.currentPiano->getSynchronicProcessor(thisId);
+        
+        // might not need this/these here, just in configure()
+        if (sproc == nullptr)
+        {
+            sproc = new SynchronicProcessor(thisSynchronic,
+                                            defaultT,
+                                            defaultM,
+                                            &processor.mainPianoSynth,
+                                            processor.gallery->getGeneralSettings());
+            sproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
+            sprocessor.add(sproc);
+        }
+
+        sproc->setTuning(tproc);
     }
     else if (thisType == PreparationTypeNostalgic)
     {
         Nostalgic::Ptr thisNostalgic = processor.gallery->getNostalgic(thisId);
         
-        thisNostalgic->setTuning(thisTuning);
+        NostalgicProcessor::Ptr nproc = processor.currentPiano->getNostalgicProcessor(thisId);
+        
+        // might not need this/these here, just in configure()
+        if (nproc == nullptr)
+        {
+            nproc = new NostalgicProcessor(thisNostalgic,
+                                           defaultT,
+                                           defaultS,
+                                           &processor.mainPianoSynth);
+            nproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
+        }
+        
+        nproc->setTuning(tproc);
     }
 }
 
-void Piano::addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId)
+void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, int keymapId)
 {
     PreparationMap::Ptr thisPreparationMap = getPreparationMapWithKeymap(keymapId);
     
@@ -226,82 +330,98 @@ void Piano::addPreparationToKeymap(BKPreparationType thisType, int thisId, int k
     {
         Direct::Ptr thisDirect = processor.gallery->getDirect(thisId);
         
-        thisPreparationMap->addDirect(thisDirect);
+        DirectProcessor::Ptr dproc = processor.currentPiano->getDirectProcessor(thisId);
+        
+        // might not need this/these here, just in configure()
+        if (dproc == nullptr)
+        {
+            dproc = new DirectProcessor(thisDirect,
+                                        tprocessor[0],
+                                        &processor.mainPianoSynth,
+                                        &processor.resonanceReleaseSynth,
+                                        &processor.hammerReleaseSynth);
+            dproc->prepareToPlay(sampleRate, &processor.mainPianoSynth, &processor.resonanceReleaseSynth,&processor.hammerReleaseSynth);
+            dprocessor.add(dproc);
+        }
+        
+        thisPreparationMap->addDirectProcessor(dproc);
     }
     else if (thisType == PreparationTypeSynchronic)
     {
         Synchronic::Ptr thisSynchronic = processor.gallery->getSynchronic(thisId);
         
-        thisPreparationMap->addSynchronic(thisSynchronic);
+        SynchronicProcessor::Ptr sproc = processor.currentPiano->getSynchronicProcessor(thisId);
+        
+        // might not need this/these here, just in configure()
+        if (sproc == nullptr)
+        {
+            sproc = new SynchronicProcessor(thisSynchronic,
+                                            defaultT,
+                                            defaultM,
+                                            &processor.mainPianoSynth,
+                                            processor.gallery->getGeneralSettings());
+            sproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
+            sprocessor.add(sproc);
+        }
+        
+        thisPreparationMap->addSynchronicProcessor(sproc);
     }
     else if (thisType == PreparationTypeNostalgic)
     {
         Nostalgic::Ptr thisNostalgic = processor.gallery->getNostalgic(thisId);
         
-        thisPreparationMap->addNostalgic(thisNostalgic);
+        NostalgicProcessor::Ptr nproc = processor.currentPiano->getNostalgicProcessor(thisId);
+        
+        // might not need this/these here, just in configure()
+        if (nproc == nullptr)
+        {
+            nproc = new NostalgicProcessor(thisNostalgic,
+                                        defaultT,
+                                        defaultS,
+                                        &processor.mainPianoSynth);
+            nproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
+        }
+        
+        thisPreparationMap->addNostalgicProcessor(nproc);
     }
     else if (thisType == PreparationTypeTempo)
     {
         Tempo::Ptr thisTempo = processor.gallery->getTempo(thisId);
         
-        thisPreparationMap->addTempo(thisTempo);
+        TempoProcessor::Ptr mproc = processor.currentPiano->getTempoProcessor(thisId);
+        
+        // might not need this/these here, just in configure()
+        if (mproc == nullptr)
+        {
+            mproc = new TempoProcessor(thisTempo);
+        }
+        
+        thisPreparationMap->addTempoProcessor(mproc);
     }
     else if (thisType == PreparationTypeTuning)
     {
         Tuning::Ptr thisTuning = processor.gallery->getTuning(thisId);
         
-        thisPreparationMap->addTuning(thisTuning);
+        TuningProcessor::Ptr tproc = processor.currentPiano->getTuningProcessor(thisId);
+        
+        // might not need this/these here, just in configure()
+        if (tproc == nullptr)
+        {
+            tproc = new TuningProcessor(thisTuning);
+        }
+        
+        thisPreparationMap->addTuningProcessor(tproc);
     }
     
 }
 
-void Piano::removePreparationFromKeymap(BKPreparationType thisType, int thisId, int keymapId)
-{
-    PreparationMap::Ptr thisPreparationMap = getPreparationMapWithKeymap(keymapId);
-    
-    if (thisPreparationMap == nullptr) return;
-    
-    if (thisType == PreparationTypeDirect)
-    {
-        Direct::Ptr thisDirect = processor.gallery->getDirect(thisId);
-        
-        thisPreparationMap->removeDirect(thisDirect);
-    }
-    else if (thisType == PreparationTypeSynchronic)
-    {
-        Synchronic::Ptr thisSynchronic = processor.gallery->getSynchronic(thisId);
-        
-        thisPreparationMap->removeSynchronic(thisSynchronic);
-    }
-    else if (thisType == PreparationTypeNostalgic)
-    {
-        Nostalgic::Ptr thisNostalgic = processor.gallery->getNostalgic(thisId);
-        
-        thisPreparationMap->removeNostalgic(thisNostalgic);
-    }
-    else if (thisType == PreparationTypeTempo)
-    {
-        Tempo::Ptr thisTempo = processor.gallery->getTempo(thisId);
-        
-        thisPreparationMap->removeTempo(thisTempo);
-    }
-    else if (thisType == PreparationTypeTuning)
-    {
-        Tuning::Ptr thisTuning = processor.gallery->getTuning(thisId);
-        
-        thisPreparationMap->removeTuning(thisTuning);
-    }
-    
-    if (!thisPreparationMap->isActive) removePreparationMapWithKeymap(keymapId);
-    
-}
 
 void Piano::configureDirectModification(int key, DirectModPreparation::Ptr dmod, Array<int> whichPreps)
 {
     int whichMod = dmod->getId();
     
     // Add Modifications
-    for (int n = cDirectParameterTypes.size(); --n >= 0; )
+    for (int n = (int)cDirectParameterTypes.size(); --n >= 0; )
     {
         String param = dmod->getParam((DirectParameterType)n);
         
@@ -355,7 +475,7 @@ void Piano::configureNostalgicModification(int key, NostalgicModPreparation::Ptr
     
     int whichMod = dmod->getId();
     // Add Modifications
-    for (int n = cNostalgicParameterTypes.size(); --n >= 0; )
+    for (int n = (int)cNostalgicParameterTypes.size(); --n >= 0; )
     {
         String param = dmod->getParam((NostalgicParameterType)n);
         
@@ -553,7 +673,7 @@ void Piano::configureSynchronicModification(int key, SynchronicModPreparation::P
     int whichMod = dmod->getId();
     
     // Add Modifications
-    for (int n = cSynchronicParameterTypes.size(); --n >= 0; )
+    for (int n = (int)cSynchronicParameterTypes.size(); --n >= 0; )
     {
         String param = dmod->getParam((SynchronicParameterType)n);
         
@@ -604,7 +724,7 @@ void Piano::configureTempoModification(int key, TempoModPreparation::Ptr dmod, A
     int whichMod = dmod->getId();
     
     // Add Modifications
-    for (int n = cTempoParameterTypes.size(); --n >= 0; )
+    for (int n = (int)cTempoParameterTypes.size(); --n >= 0; )
     {
         String param = dmod->getParam((TempoParameterType)n);
         
@@ -658,7 +778,7 @@ void Piano::configureTuningModification(int key, TuningModPreparation::Ptr dmod,
     int whichMod = dmod->getId();
 
     // Add Modifications
-    for (int n = cTuningParameterTypes.size(); --n >= 0; )
+    for (int n = (int)cTuningParameterTypes.size(); --n >= 0; )
     {
         String param = dmod->getParam((TuningParameterType)n);
         
@@ -796,6 +916,24 @@ int Piano::removeLastPreparationMap(void)
 void Piano::prepareToPlay(double sr)
 {
     sampleRate = sr;
+    
+    for (auto pmap : prepMaps)
+    {
+        for (auto dproc : pmap->getDirectProcessors())
+            dproc->prepareToPlay(sampleRate, &processor.mainPianoSynth, &processor.resonanceReleaseSynth, &processor.hammerReleaseSynth);
+        
+        for (auto mproc : pmap->getTempoProcessors())
+            mproc->prepareToPlay(sampleRate);
+        
+        for (auto nproc : pmap->getNostalgicProcessors())
+            nproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
+        
+        for (auto sproc : pmap->getSynchronicProcessors())
+            sproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
+        
+        for (auto tproc : pmap->getTuningProcessors())
+            tproc->prepareToPlay(sampleRate);
+    }
 }
 
 ValueTree Piano::getState(void)

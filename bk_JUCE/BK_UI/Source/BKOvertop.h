@@ -33,7 +33,6 @@ class BKOvertop :  public Component
 {
 public:
     BKOvertop (BKAudioProcessor& p, BKItemGraph* theGraph):
-    processor(p),
     gvc(p, theGraph),
     kvc(p, theGraph),
     tvc(p, theGraph),
@@ -45,7 +44,8 @@ public:
     ovcm(p, theGraph),
     svcm(p, theGraph),
     nvcm(p, theGraph),
-    dvcm(p, theGraph)
+    dvcm(p, theGraph),
+    processor(p)
     {
         
         addChildComponent(gvc);

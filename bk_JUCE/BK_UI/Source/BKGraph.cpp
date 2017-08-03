@@ -642,8 +642,6 @@ void BKItemGraph::disconnect(BKItem* item1, BKItem* item2)
 {
     BKPreparationType item1Type = item1->getType();
     BKPreparationType item2Type = item2->getType();
-    int item1Id = item1->getId();
-    int item2Id = item2->getId();
     
     item1->removeConnection(item2);
     item2->removeConnection(item1);
@@ -671,7 +669,6 @@ Array<Line<int>> BKItemGraph::getLines(void)
     for (auto item : items)
     {
         BKPreparationType type = item->getType();
-        int Id = item->getId();
     
         if (type == PreparationTypeKeymap)
         {
@@ -692,7 +689,6 @@ Array<Line<int>> BKItemGraph::getLines(void)
             for (auto target : item->getConnections())
             {
                 BKPreparationType targetType = target->getType();
-                int targetId = target->getId();
                 
                 if (targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic)
                 {
@@ -711,7 +707,6 @@ Array<Line<int>> BKItemGraph::getLines(void)
             for (auto target : item->getConnections())
             {
                 BKPreparationType targetType = target->getType();
-                int targetId = target->getId();
                 
                 if (targetType == PreparationTypeSynchronic)
                 {
@@ -781,29 +776,6 @@ void BKItemGraph::reconstruct(void)
         {
             item->configurePianoCB();
         }
-        /*
-        else if (type >= PreparationTypeDirect && type <= PreparationTypeNostalgic)
-        {
-            connex = item->getConnectionsOfType(PreparationTypeTuning);
-            
-            if (connex.size()) processor.currentPiano->linkPreparationWithTuning(type, item->getId(), processor.gallery->getTuning(connex[0]->getId()));
-            
-            if (type == PreparationTypeSynchronic)
-            {
-                connex = item->getConnectionsOfType(PreparationTypeTempo);
-                
-                if (connex.size()) processor.currentPiano->linkSynchronicWithTempo(processor.gallery->getSynchronic(item->getId()), processor.gallery->getTempo(connex[0]->getId()));
-            }
-            
-            if (type == PreparationTypeNostalgic)
-            {
-                connex = item->getConnectionsOfType(PreparationTypeSynchronic);
-                
-                if (connex.size()) processor.currentPiano->linkNostalgicWithSynchronic(processor.gallery->getNostalgic(item->getId()), processor.gallery->getSynchronic(connex[0]->getId()));
-            }
-            
-        }
-         */
         
         addItem(item);
     }

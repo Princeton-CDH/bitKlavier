@@ -238,7 +238,9 @@ TempoViewController(p, theGraph)
 
 void TempoPreparationEditor::timerCallback()
 {
-    TempoProcessor::Ptr tProcessor = processor.gallery->getTempoProcessor(processor.updateState->currentTempoId);
+    if (processor.updateState->currentDisplay != DisplayTempo) return;
+    
+    TempoProcessor::Ptr tProcessor = processor.currentPiano->getTempoProcessor(processor.updateState->currentTempoId);
 
     if(tProcessor->getPeriodMultiplier() != lastPeriodMultiplier)
     {
@@ -322,29 +324,17 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         prep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
         active->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
     }
-    
-    if (name != selectCB.getName())
-    {
-        Tempo::Ptr tempo = processor.gallery->getTempo(processor.updateState->currentTempoId);
-        tempo->editted = true;
-    }
 }
 
 
 void TempoPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
     Tempo::Ptr tempo = processor.gallery->getTempo(processor.updateState->currentTempoId);
-    tempo->editted = true;
-        DBG("************** tempo->edited = true");
-    
     tempo->setName(name);
 }
 
 void TempoPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
 {
-    Tempo::Ptr tempo = processor.gallery->getTempo(processor.updateState->currentTempoId);
-    tempo->editted = true;
-    
     TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
     TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
     
@@ -383,9 +373,6 @@ void TempoPreparationEditor::update(void)
 
 void TempoPreparationEditor::BKSingleSliderValueChanged(String name, double val)
 {
-    Tempo::Ptr tempo = processor.gallery->getTempo(processor.updateState->currentTempoId);
-    tempo->editted = true;
-    
     TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
     TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);;
     
@@ -409,14 +396,11 @@ void TempoPreparationEditor::BKSingleSliderValueChanged(String name, double val)
 
 void TempoPreparationEditor::buttonClicked (Button* b)
 {
-    Tempo::Ptr tempo = processor.gallery->getTempo(processor.updateState->currentTempoId);
-    tempo->editted = true;
-    
     if (b == &A1reset)
     {
         DBG("resetting A1 tempo multiplier");
         
-        TempoProcessor::Ptr tProcessor = processor.gallery->getTempoProcessor(processor.updateState->currentTempoId);
+        TempoProcessor::Ptr tProcessor = processor.currentPiano->getTempoProcessor(processor.updateState->currentTempoId);
         tProcessor->reset();
     }
     else if (b == &hideOrShow)
@@ -652,9 +636,6 @@ void TempoModificationEditor::BKSingleSliderValueChanged(String name, double val
 
 void TempoModificationEditor::updateModification(void)
 {
-    TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
-    mod->editted = true;
-    
     processor.updateState->modificationDidChange = true;
 }
 
@@ -666,9 +647,6 @@ void TempoModificationEditor::buttonClicked (Button* b)
     }
     else if (b == &hideOrShow)
     {
-        TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
-        mod->editted = true;
-        
         processor.updateState->setCurrentDisplay(DisplayNil);
         
     }

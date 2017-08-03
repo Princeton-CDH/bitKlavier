@@ -173,6 +173,7 @@ typedef enum PitchClass {
     GFlat = FSharp,
     AFlat = GSharp,
     BFlat = ASharp,
+    PitchClassNil
 } PitchClass;
 
 #pragma mark - Synthesiser/Sampler
@@ -322,7 +323,7 @@ static const std::vector<std::string> cPianoName = {
     
 };
 
-static const int aMaxNumPianos = cPianoName.size();
+static const int aMaxNumPianos = (int)cPianoName.size();
 
 
 static const std::vector<std::string> cPrepMapName= {
@@ -340,7 +341,7 @@ static const std::vector<std::string> cPrepMapName= {
     "PrepMap12"
 };
 
-static const int aMaxNumPreparationKeymaps = cPrepMapName.size();
+static const int aMaxNumPreparationKeymaps = (int)cPrepMapName.size();
 
 typedef enum BKParameterDataType
 {

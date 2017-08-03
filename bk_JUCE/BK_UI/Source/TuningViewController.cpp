@@ -354,7 +354,9 @@ TuningViewController(p, theGraph)
 
 void TuningPreparationEditor::timerCallback()
 {
-    TuningProcessor::Ptr tProcessor = processor.gallery->getTuningProcessor(processor.updateState->currentTuningId);
+    if (processor.updateState->currentDisplay != DisplayTuning) return;
+    
+    TuningProcessor::Ptr tProcessor = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
     if(tProcessor->getLastNoteTuning() != lastNoteTuningSave)
     {
         lastNoteTuningSave = tProcessor->getLastNoteTuning();
@@ -435,12 +437,6 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         updateComponentVisibility();
         
     }
-    
-    if (name != selectCB.getName())
-    {
-        Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-        tuning->editted = true;
-    }
 }
 
 
@@ -480,8 +476,6 @@ void TuningPreparationEditor::fillSelectCB(int last, int current)
 void TuningPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
     Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-    tuning->editted = true;
-    
     tuning->setName(name);
 }
 
@@ -517,9 +511,6 @@ void TuningPreparationEditor::update(void)
 
 void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> values)
 {
-    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-    tuning->editted = true;
-    
     TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
     TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
  
@@ -544,9 +535,6 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
 
 void TuningPreparationEditor::BKSingleSliderValueChanged(String name, double val)
 {
-    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-    tuning->editted = true;
-    
     TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
     TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
     
@@ -569,9 +557,6 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(String name, double val
 
 void TuningPreparationEditor::buttonClicked (Button* b)
 {
-    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-    tuning->editted = true;
-    
     if (b == &A1Inversional)
     {
         DBG("setting A1Inversional " + String(A1Inversional.getToggleState()));
@@ -586,7 +571,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
     {
         DBG("resetting A1");
         
-        TuningProcessor::Ptr tProcessor = processor.gallery->getTuningProcessor(processor.updateState->currentTuningId);
+        TuningProcessor::Ptr tProcessor = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
         tProcessor->adaptiveReset();
     }
     else if (b == &hideOrShow)
@@ -877,9 +862,6 @@ void TuningModificationEditor::BKSingleSliderValueChanged(String name, double va
 
 void TuningModificationEditor::updateModification(void)
 {
-    TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
-    mod->editted = true;
-    
     processor.updateState->modificationDidChange = true;
 }
 

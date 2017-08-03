@@ -250,94 +250,6 @@ private:
 };
 
 
-class NostalgicProcessor : public ReferenceCountedObject
-{
-    
-public:
-    typedef ReferenceCountedObjectPtr<NostalgicProcessor>   Ptr;
-    typedef Array<NostalgicProcessor::Ptr>                  PtrArr;
-    typedef Array<NostalgicProcessor::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<NostalgicProcessor>                  Arr;
-    typedef OwnedArray<NostalgicProcessor, CriticalSection> CSArr;
-    
-    NostalgicProcessor(BKSynthesiser* main,
-                       NostalgicPreparation::Ptr active,
-                       Tuning::Ptr tuning,
-                       Synchronic::Ptr synchronic,
-                       int Id);
-    
-    virtual ~NostalgicProcessor();
-    
-    void setCurrentPlaybackSampleRate(double sr);
-    
-    //called with every audio vector
-    void processBlock(int numSamples, int midiChannel);
-    
-    //begin timing played note length, called with noteOn
-    void keyPressed(int midiNoteNumber, float midiNoteVelocity, int midiChannel);
-    
-    //begin playing reverse note, called with noteOff
-    void keyReleased(int midiNoteNumber, int midiChannel);
-    
-    void postRelease(int midiNoteNumber, int midiChannel);
-    
-    inline void attachToSynthesiser(BKSynthesiser* main)
-    {
-        synth = main;
-    }
-    
-    inline void setSynchronic(Synchronic::Ptr sync)
-    {
-        synchronic = sync;
-    }
-    
-    inline Synchronic::Ptr getSynchronic(void) const noexcept
-    {
-        return synchronic;
-    }
-    
-    inline int getSynchronicId(void)
-    {
-        return synchronic->getId();
-    }
-    
-    inline void setTuner(Tuning::Ptr p)
-    {
-        tuner = p;
-    }
-    
-    inline Tuning::Ptr getTuner(void)
-    {
-        return tuner;
-    }
-    
-    Array<int> getPlayPositions();
-    Array<int> getUndertowPositions();
-    
-private:
-    int Id;
-    BKSynthesiser*              synth;
-    NostalgicPreparation::Ptr   active;
-
-    Tuning::Ptr             tuner;
-    Synchronic::Ptr         synchronic;
-
-    Array<uint64> noteLengthTimers;     //store current length of played notes here
-    Array<int> activeNotes;             //table of notes currently being played by player
-    Array<bool> noteOn;                 // table of booleans representing state of each note
-    Array<float> velocities;            //table of velocities played
-    
-    OwnedArray<NostalgicNoteStuff> reverseNotes;
-    OwnedArray<NostalgicNoteStuff> undertowNotes;
-    
-    double sampleRate;
-
-    //move timers forward by blocksize
-    void incrementTimers(int numSamples);
-    
-    JUCE_LEAK_DETECTOR (NostalgicProcessor) //is this the right one to use here?
-};
-
 /* ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ NOSTALGIC ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ */
 
 class Nostalgic : public ReferenceCountedObject
@@ -358,11 +270,8 @@ public:
               int Id):
     sPrep(new NostalgicPreparation(prep)),
     aPrep(new NostalgicPreparation(sPrep)),
-    processor(new NostalgicProcessor(s, aPrep, tuning, sync, Id)),
     Id(Id),
-    editted(false),
-    name(String(Id)),
-    X(-1),Y(-1)
+    name(String(Id))
     {
     }
     
@@ -373,34 +282,14 @@ public:
               BKUpdateState::Ptr us,
               int Id):
     Id(Id),
-    updateState(us),
-    editted(false),
     name(String(Id)),
-    X(-1),Y(-1)
+    updateState(us)
     {
         sPrep       = new NostalgicPreparation(tuning);
         aPrep       = new NostalgicPreparation(sPrep);
-        processor   = new NostalgicProcessor(s, aPrep, tuning, sync, Id);
     };
     
     ~Nostalgic() {};
-    
-    inline void setSynchronic(Synchronic::Ptr synchronic)
-    {
-        processor->setSynchronic(synchronic);
-    }
-    
-    void prepareToPlay(double sampleRate, BKSynthesiser* main)
-    {
-        processor->attachToSynthesiser(main);
-        processor->setCurrentPlaybackSampleRate(sampleRate);
-    }
-    
-    void prepareToPlay(double sampleRate)
-    {
-        processor->setCurrentPlaybackSampleRate(sampleRate);
-    }
-    
     
     inline void copy(Nostalgic::Ptr from)
     {
@@ -414,9 +303,6 @@ public:
         
         prep.setProperty( "Id",Id, 0);
         prep.setProperty( "name", name, 0);
-        
-        prep.setProperty( "tuning", processor->getTuner()->getId(), 0);
-        prep.setProperty( "synchronic", processor->getSynchronic()->getId(), 0);
         
         prep.setProperty( ptagNostalgic_waveDistance,       sPrep->getWavedistance(), 0);
         prep.setProperty( ptagNostalgic_undertow,           sPrep->getUndertow(), 0);
@@ -435,16 +321,11 @@ public:
         prep.setProperty( ptagNostalgic_mode,               sPrep->getMode(), 0);
         prep.setProperty( ptagNostalgic_syncTarget,         sPrep->getSyncTarget(), 0);
         
-        prep.setProperty( posX, X, 0);
-        prep.setProperty( posY, Y, 0);
-        
         return prep;
     }
     
     inline void setState(XmlElement* e, Tuning::PtrArr tuning, Synchronic::PtrArr synchronic)
     {
-        editted = true;
-        
         int i; float f;
         
         Id = e->getStringAttribute("Id").getIntValue();
@@ -453,46 +334,13 @@ public:
         
         if (n != String::empty)     name = n;
         else                        name = String(Id);
-        
-        i = e->getStringAttribute("tuning").getIntValue();
-        
-        bool found = false;
-        for (auto p : tuning)
-        {
-            if (p->getId() == i)
-            {
-                setTuning(p);
-                found = true;
-            }
-        }
-        if (!found) setTuning(tuning[0]);
-        
-        i = e->getStringAttribute("synchronic").getIntValue();
-        
-        found = false;
-        for (auto p : synchronic)
-        {
-            if (p->getId() == i)
-            {
-                setSynchronic(p);
-                found = true;
-            }
-        }
-        if (!found) setSynchronic(synchronic[0]);
+
         
         i = e->getStringAttribute(ptagNostalgic_waveDistance).getIntValue();
         sPrep->setWaveDistance(i);
         
         i = e->getStringAttribute(ptagNostalgic_undertow).getIntValue();
         sPrep->setUndertow(i);
-        
-        n = e->getStringAttribute(posX);
-        if (n != String::empty) X = n.getIntValue();
-        else                    X = -1;
-        
-        n = e->getStringAttribute(posY);
-        if (n != String::empty) Y = n.getIntValue();
-        else                    Y = -1;
         
         forEachXmlChildElement (*e, sub)
         {
@@ -532,8 +380,6 @@ public:
         i = e->getStringAttribute(ptagNostalgic_syncTarget).getIntValue();
         sPrep->setSyncTarget(i);
         
-        processor->setSynchronic(synchronic[i]);
-        
         aPrep->copy(sPrep);
         
     }
@@ -542,12 +388,6 @@ public:
     
     NostalgicPreparation::Ptr      sPrep;
     NostalgicPreparation::Ptr      aPrep;
-    NostalgicProcessor::Ptr        processor;
-    
-    inline void setTuning(Tuning::Ptr tuning)
-    {
-        processor->setTuner(tuning);
-    }
     
     void reset()
     {
@@ -564,22 +404,10 @@ public:
         updateState->nostalgicPreparationDidChange = true;
     }
     
-    inline void setPosition(int x, int y) { X=x;Y=y;}
-    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
-    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
-    inline void setX(int x) { X = x; }
-    inline void setY(int y) { Y = y; }
-    inline int getX(void) const noexcept { return X; }
-    inline int getY(void) const noexcept { return Y; }
-    
-    bool editted;
-    
 private:
     int Id;
     String name;
     BKUpdateState::Ptr updateState;
-    
-    int X,Y;
     
     JUCE_LEAK_DETECTOR(Nostalgic)
 };
@@ -611,11 +439,9 @@ public:
      */
     
     NostalgicModPreparation(NostalgicPreparation::Ptr p, int Id):
-    Id(Id),
-    X(-1),Y(-1),
-    editted(false)
+    Id(Id)
     {
-        param.ensureStorageAllocated(cNostalgicParameterTypes.size());
+        param.ensureStorageAllocated((int)cNostalgicParameterTypes.size());
         
         param.set(NostalgicWaveDistance, String(p->getWavedistance()));
         param.set(NostalgicUndertow, String(p->getUndertow()));
@@ -630,9 +456,7 @@ public:
     
     
     NostalgicModPreparation(int Id):
-    Id(Id),
-    X(-1),Y(-1),
-    editted(false)
+    Id(Id)
     {
         param.set(NostalgicWaveDistance, "");
         param.set(NostalgicUndertow, "");
@@ -695,8 +519,6 @@ public:
     
     inline void setState(XmlElement* e)
     {
-        editted = true;
-        
         float f;
         
         Id = e->getStringAttribute("Id").getIntValue();
@@ -799,25 +621,116 @@ public:
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
     
-    inline void setPosition(int x, int y) { X=x;Y=y;}
-    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
-    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
-    inline void setX(int x) { X = x; }
-    inline void setY(int y) { Y = y; }
-    inline int getX(void) const noexcept { return X; }
-    inline int getY(void) const noexcept { return Y; }
-    
-    bool editted;
-    
 private:
     int Id;
     String name;
     StringArray          param;
     
-    int X,Y;
-    
     JUCE_LEAK_DETECTOR(NostalgicModPreparation);
 };
 
+class NostalgicProcessor : public ReferenceCountedObject
+{
+    
+public:
+    typedef ReferenceCountedObjectPtr<NostalgicProcessor>   Ptr;
+    typedef Array<NostalgicProcessor::Ptr>                  PtrArr;
+    typedef Array<NostalgicProcessor::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<NostalgicProcessor>                  Arr;
+    typedef OwnedArray<NostalgicProcessor, CriticalSection> CSArr;
+    
+    NostalgicProcessor(Nostalgic::Ptr nostalgic,
+                       TuningProcessor::Ptr tuning,
+                       SynchronicProcessor::Ptr synchronic,
+                       BKSynthesiser *s);
+    
+    virtual ~NostalgicProcessor();
+    
+    //called with every audio vector
+    void processBlock(int numSamples, int midiChannel);
+    
+    //begin timing played note length, called with noteOn
+    void keyPressed(int midiNoteNumber, float midiNoteVelocity, int midiChannel);
+    
+    //begin playing reverse note, called with noteOff
+    void keyReleased(int midiNoteNumber, int midiChannel);
+    
+    void postRelease(int midiNoteNumber, int midiChannel);
+    
+    inline void attachToSynthesiser(BKSynthesiser* main)
+    {
+        synth = main;
+    }
+    
+    inline void setNostalgic(Nostalgic::Ptr nost)
+    {
+        nostalgic = nost;
+    }
+    
+    inline Nostalgic::Ptr getNostalgic(void) const noexcept
+    {
+        return nostalgic;
+    }
+    
+    inline void setSynchronic(SynchronicProcessor::Ptr sync)
+    {
+        synchronic = sync;
+    }
+    
+    inline SynchronicProcessor::Ptr getSynchronic(void) const noexcept
+    {
+        return synchronic;
+    }
+    
+    inline int getSynchronicId(void)
+    {
+        return synchronic->getId();
+    }
+    
+    inline void setTuning(TuningProcessor::Ptr p)
+    {
+        tuner = p;
+    }
+    
+    inline TuningProcessor::Ptr getTuning(void)
+    {
+        return tuner;
+    }
+    
+    void prepareToPlay(double sr, BKSynthesiser* main)
+    {
+        sampleRate = sr;
+        synth = main;
+    }
+    
+    inline void setId(int newId) { Id = newId;}
+    inline int getId(void) const noexcept { return Id; }
+    
+    Array<int> getPlayPositions();
+    Array<int> getUndertowPositions();
+    
+private:
+    int Id;
+    BKSynthesiser*              synth;
+    
+    Nostalgic::Ptr                  nostalgic;
+    TuningProcessor::Ptr            tuner;
+    SynchronicProcessor::Ptr        synchronic;
+    
+    Array<uint64> noteLengthTimers;     //store current length of played notes here
+    Array<int> activeNotes;             //table of notes currently being played by player
+    Array<bool> noteOn;                 // table of booleans representing state of each note
+    Array<float> velocities;            //table of velocities played
+    
+    OwnedArray<NostalgicNoteStuff> reverseNotes;
+    OwnedArray<NostalgicNoteStuff> undertowNotes;
+    
+    double sampleRate;
+    
+    //move timers forward by blocksize
+    void incrementTimers(int numSamples);
+    
+    JUCE_LEAK_DETECTOR (NostalgicProcessor) //is this the right one to use here?
+};
 
 #endif  // NOSTALGIC_H_INCLUDED

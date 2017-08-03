@@ -61,10 +61,7 @@ ValueTree  Gallery::getState(void)
 
 void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
 {
-    
-    float f;
     int i;
-    bool b;
     Array<float> fa;
     Array<int> fi;
     
@@ -129,8 +126,6 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                     }
                     
                     newKeymap->setKeymap(keys);
-                    
-                    newKeymap->editted = true;
                 }
                 else if (e->hasTagName ( vtagGeneral))
                 {

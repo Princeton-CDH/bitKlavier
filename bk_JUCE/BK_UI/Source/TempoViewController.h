@@ -107,7 +107,11 @@ public:
     
     void fillSelectCB(int last, int current);
     
-    void timerCallback(void) override {};
+    inline void timerCallback(void) override
+    {
+        if (processor.updateState->currentDisplay != DisplayTempoMod) return;
+    }
+    
 private:
     void bkComboBoxDidChange (ComboBox* box) override;
     void buttonClicked (Button* b) override;

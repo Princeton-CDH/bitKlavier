@@ -62,6 +62,61 @@ public:
     PreparationMap::CSPtrArr    activePMaps;
     PreparationMap::CSPtrArr    prepMaps;
     
+    DirectProcessor::PtrArr              dprocessor;
+    SynchronicProcessor::PtrArr          sprocessor;
+    NostalgicProcessor::PtrArr           nprocessor;
+    TempoProcessor::PtrArr               mprocessor;
+    TuningProcessor::PtrArr              tprocessor;
+    
+    inline DirectProcessor::Ptr getDirectProcessor(int Id)
+    {
+        for (auto proc : dprocessor)
+        {
+            if (proc->getId() == Id) return proc;
+        }
+        
+        return nullptr;
+    }
+    
+    inline NostalgicProcessor::Ptr getNostalgicProcessor(int Id)
+    {
+        for (auto proc : nprocessor)
+        {
+            if (proc->getId() == Id) return proc;
+        }
+        
+        return nullptr;
+    }
+    
+    inline SynchronicProcessor::Ptr getSynchronicProcessor(int Id)
+    {
+        for (auto proc : sprocessor)
+        {
+            if (proc->getId() == Id) return proc;
+        }
+        
+        return nullptr;
+    }
+    
+    inline TuningProcessor::Ptr getTuningProcessor(int Id)
+    {
+        for (auto proc : tprocessor)
+        {
+            if (proc->getId() == Id) return proc;
+        }
+        
+        return nullptr;
+    }
+    
+    inline TempoProcessor::Ptr getTempoProcessor(int Id)
+    {
+        for (auto proc : mprocessor)
+        {
+            if (proc->getId() == Id) return proc;
+        }
+        
+        return nullptr;
+    }
     
     Array<int>                  pianoMap;
     int                         numPMaps;
@@ -120,7 +175,7 @@ public:
     
     void removePreparationFromKeymap(BKPreparationType thisType, int thisId, int keymapId);
     
-    void addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId);
+    void linkPreparationWithKeymap(BKPreparationType thisType, int thisId, int keymapId);
     
     void linkSynchronicWithTempo(Synchronic::Ptr synchronic, Tempo::Ptr thisTempo);
     
@@ -201,6 +256,10 @@ private:
     
 
     double sampleRate;
+    
+    TuningProcessor::Ptr defaultT;
+    TempoProcessor::Ptr defaultM;
+    SynchronicProcessor::Ptr defaultS;
     
     inline Array<int> getAllIds(Direct::PtrArr direct)
     {

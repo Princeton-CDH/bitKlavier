@@ -115,6 +115,7 @@ public:
         {
             return currentModTempoId;
         }
+        return -1;
     }
     
     void setAllCurrentIdsTo(int val)

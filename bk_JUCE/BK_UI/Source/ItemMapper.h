@@ -23,8 +23,7 @@ public:
     
     ItemMapper(BKPreparationType type, int Id):
     type(type),
-    Id(Id),
-    editted(false)
+    Id(Id)
     {
         
     }
@@ -47,11 +46,6 @@ public:
     inline bool isActive(void) const noexcept {return active;}
     inline void setActive(bool a) { active = a; }
     
-    
-    // EDITTED
-    inline bool getEditted(void) const noexcept { return editted;}
-    inline void setEditted(bool e) { editted = e; }
-    
     inline void setPianoTarget(int target) { pianoTarget = target; }
     inline int getPianoTarget(void) const noexcept { return pianoTarget; }
     
@@ -63,7 +57,6 @@ protected:
     int pianoTarget;
     
     bool active;
-    bool editted;
     
 private:
     

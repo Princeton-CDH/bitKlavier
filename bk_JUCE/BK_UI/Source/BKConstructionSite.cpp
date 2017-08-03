@@ -15,10 +15,10 @@
 
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
 BKDraggableComponent(false,false,false),
+altDown(false),
 processor(p),
 graph(theGraph),
 connect(false),
-altDown(false),
 lastX(10),
 lastY(10)
 {
@@ -166,9 +166,8 @@ void BKConstructionSite::pianoMapDidChange(BKItem* thisItem)
 
 void BKConstructionSite::draw(void)
 {
+#if AUTO_DRAW
     int keymapCount = 0, prepCount = 0, otherCount = 0, modCount = 0, ttCount = 0;
-    
-#if AUTO_DRAW 
     processor.currentPiano->configuration->clear();
 #endif
     
@@ -500,7 +499,6 @@ void BKConstructionSite::mouseDrag (const MouseEvent& e)
     
     if (!connect && !e.mods.isShiftDown())
     {
-        bool resizeX = false, resizeY = false;
         for (auto item : graph->getSelectedItems())
         {
             item->performDrag(e);

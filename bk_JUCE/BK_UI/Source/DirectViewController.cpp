@@ -190,17 +190,12 @@ void DirectPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 void DirectPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
     Direct::Ptr direct = processor.gallery->getDirect(processor.updateState->currentDirectId);
-    direct->editted = true;
-    
     direct->setName(name);
 }
 
 
 void DirectPreparationEditor::BKSingleSliderValueChanged(String name, double val)
 {
-    Direct::Ptr direct = processor.gallery->getDirect(processor.updateState->currentDirectId);
-    direct->editted = true;
-    
     DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
     DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
     
@@ -226,9 +221,6 @@ void DirectPreparationEditor::BKSingleSliderValueChanged(String name, double val
 
 void DirectPreparationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {
-    Direct::Ptr direct = processor.gallery->getDirect(processor.updateState->currentDirectId);
-    direct->editted = true;
-    
     DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
     DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
     
@@ -272,9 +264,6 @@ void DirectPreparationEditor::buttonClicked (Button* b)
 {
     if (b == &hideOrShow)
     {
-        DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
-        mod->editted = true;
-        
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
 }
@@ -463,9 +452,6 @@ void DirectModificationEditor::BKStackedSliderValueChanged(String name, Array<fl
 
 void DirectModificationEditor::updateModification(void)
 {
-    DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
-    mod->editted = true;
-    
     processor.updateState->modificationDidChange = true;
 }
 
@@ -473,9 +459,6 @@ void DirectModificationEditor::buttonClicked (Button* b)
 {
     if (b == &hideOrShow)
     {
-        DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
-        mod->editted = true;
-        
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
     else if (b == &clearModsButton)

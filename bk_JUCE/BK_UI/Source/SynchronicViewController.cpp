@@ -221,7 +221,9 @@ SynchronicViewController(p, theGraph)
 
 void SynchronicPreparationEditor::timerCallback()
 {
-    SynchronicProcessor::Ptr sProcessor = processor.gallery->getSynchronicProcessor(processor.updateState->currentSynchronicId);
+    if (processor.updateState->currentDisplay != DisplaySynchronic) return;
+    
+    SynchronicProcessor::Ptr sProcessor = processor.currentPiano->getSynchronicProcessor(processor.updateState->currentSynchronicId);
 
     for (int i = 0; i < paramSliders.size(); i++)
     {
@@ -247,9 +249,6 @@ void SynchronicPreparationEditor::timerCallback()
 
 void SynchronicPreparationEditor::multiSliderDidChange(String name, int whichSlider, Array<float> values)
 {
-    Synchronic::Ptr synchronic = processor.gallery->getSynchronic(processor.updateState->currentSynchronicId);
-    synchronic->editted = true;
-    
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
@@ -280,9 +279,6 @@ void SynchronicPreparationEditor::multiSliderDidChange(String name, int whichSli
 
 void SynchronicPreparationEditor::multiSlidersDidChange(String name, Array<Array<float>> values)
 {
-    Synchronic::Ptr synchronic = processor.gallery->getSynchronic(processor.updateState->currentSynchronicId);
-    synchronic->editted = true;
-    
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
@@ -317,9 +313,6 @@ void SynchronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
 
 void SynchronicPreparationEditor::BKSingleSliderValueChanged(String name, double val)
 {
-    Synchronic::Ptr synchronic = processor.gallery->getSynchronic(processor.updateState->currentSynchronicId);
-    synchronic->editted = true;
-    
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
@@ -344,9 +337,6 @@ void SynchronicPreparationEditor::BKSingleSliderValueChanged(String name, double
 
 void SynchronicPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
 {
-    Synchronic::Ptr synchronic = processor.gallery->getSynchronic(processor.updateState->currentSynchronicId);
-    synchronic->editted = true;
-    
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
@@ -469,9 +459,6 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (name == "Mode")
     {
-        Synchronic::Ptr synchronic = processor.gallery->getSynchronic(processor.updateState->currentSynchronicId);
-        synchronic->editted = true;
-        
         SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
         SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
         
@@ -506,7 +493,6 @@ void SynchronicPreparationEditor::bkTextFieldDidChange(TextEditor& tf)
     if (name == "Name")
     {
         Synchronic::Ptr synchronic = processor.gallery->getSynchronic(processor.updateState->currentSynchronicId);
-        synchronic->editted = true;
         
         synchronic->setName(text);
         
@@ -519,7 +505,6 @@ void SynchronicPreparationEditor::bkTextFieldDidChange(TextEditor& tf)
 void SynchronicPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
     Synchronic::Ptr synchronic = processor.gallery->getSynchronic(processor.updateState->currentSynchronicId);
-    synchronic->editted = true;
     
     synchronic->setName(name);
 }
@@ -534,10 +519,6 @@ void SynchronicPreparationEditor::bkMessageReceived (const String& message)
 
 void SynchronicPreparationEditor::buttonClicked (Button* b)
 {
-    
-    Synchronic::Ptr synchronic = processor.gallery->getSynchronic(processor.updateState->currentSynchronicId);
-    synchronic->editted = true;
-    
     if (b == &offsetParamStartToggle)
     {
         SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
@@ -676,8 +657,9 @@ void SynchronicModificationEditor::highlightModedComponents()
 
 void SynchronicModificationEditor::timerCallback()
 {
+    if (processor.updateState->currentDisplay != DisplaySynchronicMod) return;
     /*
-    SynchronicProcessor::Ptr sProcessor = processor.gallery->getSynchronicProcessor(processor.updateState->currentSynchronicId);
+    SynchronicProcessor::Ptr sProcessor = processor.currentPiano->getSynchronicProcessor(processor.updateState->currentSynchronicId);
     
     for (int i = 0; i < paramSliders.size(); i++)
     {
@@ -1045,9 +1027,6 @@ void SynchronicModificationEditor::buttonClicked (Button* b)
 
 void SynchronicModificationEditor::updateModification(void)
 {
-    SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
-    mod->editted = true;
-    
     processor.updateState->modificationDidChange = true;
 }
 

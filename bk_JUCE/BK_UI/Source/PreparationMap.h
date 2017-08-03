@@ -55,35 +55,35 @@ public:
     inline String getPreparationIds()
     {
         String prep = "";
-        for (auto p : synchronic)
+        for (auto p : sprocessor)
         {
             prep.append("S",1);
             prep.append(String(p->getId()), 3);
             prep.append(" ",1);
         }
         
-        for (auto p : nostalgic)
+        for (auto p : nprocessor)
         {
             prep.append("N",1);
             prep.append(String(p->getId()), 3);
             prep.append(" ",1);
         }
         
-        for (auto p : direct)
+        for (auto p : dprocessor)
         {
             prep.append("D",1);
             prep.append(String(p->getId()), 3);
             prep.append(" ",1);
         }
         
-        for (auto p : tempo)
+        for (auto p : mprocessor)
         {
             prep.append("M",1);
             prep.append(String(p->getId()), 3);
             prep.append(" ",1);
         }
         
-        for (auto p : tuning)
+        for (auto p : tprocessor)
         {
             prep.append("T",1);
             prep.append(String(p->getId()), 3);
@@ -97,42 +97,38 @@ public:
         
     }
     
-    void setSynchronic  (Synchronic::PtrArr);
-    void setNostalgic   (Nostalgic::PtrArr);
-    void setDirect      (Direct::PtrArr);
-    void setTempo       (Tempo::PtrArr);
-    void setTuning      (Tuning::PtrArr);
+    void                        addDirectProcessor      (DirectProcessor::Ptr );
+    void                        setDirectProcessors     (DirectProcessor::PtrArr);
+    DirectProcessor::PtrArr     getDirectProcessors     (void);
+    DirectProcessor::Ptr        getDirectProcessor      (int Id);
+    bool                        contains                (DirectProcessor::Ptr);
     
-    void addDirect(Direct::Ptr p);
-    void addNostalgic(Nostalgic::Ptr p);
-    void addSynchronic(Synchronic::Ptr p);
-    void addTempo(Tempo::Ptr p);
-    void addTuning(Tuning::Ptr p);
+    void                        addNostalgicProcessor   (NostalgicProcessor::Ptr );
+    void                        setNostalgicProcessors  (NostalgicProcessor::PtrArr);
+    NostalgicProcessor::PtrArr  getNostalgicProcessors  (void);
+    NostalgicProcessor::Ptr     getNostalgicProcessor   (int Id);
+    bool                        contains                (NostalgicProcessor::Ptr);
     
-    bool contains(Direct::Ptr thisOne);
-    bool contains(Synchronic::Ptr thisOne);
-    bool contains(Nostalgic::Ptr thisOne);
-    bool contains(Tempo::Ptr thisOne);
-    bool contains(Tuning::Ptr thisOne);
+    void                        addSynchronicProcessor  (SynchronicProcessor::Ptr );
+    void                        setSynchronicProcessors (SynchronicProcessor::PtrArr);
+    SynchronicProcessor::PtrArr getSynchronicProcessors (void);
+    SynchronicProcessor::Ptr    getSynchronicProcessor  (int Id);
+    bool                        contains                (SynchronicProcessor::Ptr);
     
+    void                        addTuningProcessor      (TuningProcessor::Ptr );
+    void                        setTuningProcessors     (TuningProcessor::PtrArr);
+    TuningProcessor::PtrArr     getTuningProcessors     (void);
+    TuningProcessor::Ptr        getTuningProcessor      (int Id);
+    bool                        contains                (TuningProcessor::Ptr);
     
-    void removeDirect(Direct::Ptr p);
-    void removeNostalgic(Nostalgic::Ptr p);
-    void removeSynchronic(Synchronic::Ptr p);
-    void removeTempo(Tempo::Ptr p);
-    void removeTuning(Tuning::Ptr p);
+    void                        addTempoProcessor       (TempoProcessor::Ptr );
+    void                        setTempoProcessors      (TempoProcessor::PtrArr);
+    TempoProcessor::PtrArr      getTempoProcessors      (void);
+    TempoProcessor::Ptr         getTempoProcessor       (int Id);
+    bool                        contains                (TempoProcessor::Ptr);
     
-    void removeKeymap(void);
-    
-    Synchronic::PtrArr  getSynchronic(void);
-    Nostalgic::PtrArr   getNostalgic(void);
-    Direct::PtrArr      getDirect(void);
-    Tempo::PtrArr       getTempo(void);
-    Tuning::PtrArr      getTuning(void);
 
     void deactivateIfNecessary();
-    
-    void removeAllPreparations();
     
     bool isActive;
     
@@ -142,23 +138,23 @@ public:
         DBG("Keymap: " + String(pKeymap->getId()));
         
         Array<int> ps;
-        for (auto p : synchronic) ps.add(p->getId());
+        for (auto p : sprocessor) ps.add(p->getId());
         DBG("Synchronic: " + intArrayToString(ps));
         
         ps.clear();
-        for (auto p : nostalgic) ps.add(p->getId());
+        for (auto p : nprocessor) ps.add(p->getId());
         DBG("Nostalgic: " + intArrayToString(ps));
         
         ps.clear();
-        for (auto p : direct) ps.add(p->getId());
+        for (auto p : dprocessor) ps.add(p->getId());
         DBG("Direct: " + intArrayToString(ps));
         
         ps.clear();
-        for (auto p : tuning) ps.add(p->getId());
+        for (auto p : tprocessor) ps.add(p->getId());
         DBG("Tuning: " + intArrayToString(ps));
         
         ps.clear();
-        for (auto p : tempo) ps.add(p->getId());
+        for (auto p : mprocessor) ps.add(p->getId());
         DBG("Tempo: " + intArrayToString(ps));
     }
     
@@ -168,11 +164,11 @@ private:
     // Keymap for this PreparationMap (one per PreparationMap)
     Keymap::Ptr                 pKeymap;
     
-    Synchronic::PtrArr          synchronic;
-    Nostalgic::PtrArr           nostalgic;
-    Direct::PtrArr              direct;
-    Tempo::PtrArr               tempo;
-    Tuning::PtrArr              tuning;
+    DirectProcessor::PtrArr              dprocessor;
+    SynchronicProcessor::PtrArr          sprocessor;
+    NostalgicProcessor::PtrArr           nprocessor;
+    TempoProcessor::PtrArr               mprocessor;
+    TuningProcessor::PtrArr              tprocessor;
     
     // Pointers to synths (flown in from BKAudioProcessor)
     BKSynthesiser*              synth;

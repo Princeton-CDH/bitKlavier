@@ -30,7 +30,7 @@ if (!keys.size() || keys[0] == -1) isLayer = false;
 void Gallery::setStateFromJson(var myJson)
 {
     //general = new GeneralSettings();
-    
+#if 0
     var pattr = myJson.getProperty("pattrstorage", "");
     
     String name = pattr.getProperty("name", "").toString();
@@ -584,7 +584,7 @@ void Gallery::setStateFromJson(var myJson)
     for (int k = synchronic.size(); --k >= 0;)  synchronic[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
     for (int k = nostalgic.size(); --k >= 0;)   nostalgic[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
     for (int k = direct.size(); --k >= 0;)      direct[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
-    
+#endif
 }
 
 

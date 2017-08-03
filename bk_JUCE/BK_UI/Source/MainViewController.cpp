@@ -206,9 +206,6 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     
     if (code == KeyPress::escapeKey)
     {
-        int Id = processor.updateState->getCurrentId(processor.updateState->currentDisplay);
-        processor.gallery->setEditted((BKPreparationType)processor.updateState->currentDisplay, Id, true);
-        
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
     else if (code == KeyPress::deleteKey)
@@ -293,6 +290,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     {
         if (e.getModifiers().isCommandDown())   construction.cut();
     }
+    return true;
 }
 
 
