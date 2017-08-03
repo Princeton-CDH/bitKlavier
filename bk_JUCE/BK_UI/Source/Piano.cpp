@@ -956,24 +956,21 @@ int Piano::removeLastPreparationMap(void)
 void Piano::prepareToPlay(double sr)
 {
     sampleRate = sr;
+
+    for (auto dproc : dprocessor)
+        dproc->prepareToPlay(sampleRate, &processor.mainPianoSynth, &processor.resonanceReleaseSynth, &processor.hammerReleaseSynth);
     
-    for (auto pmap : prepMaps)
-    {
-        for (auto dproc : pmap->getDirectProcessors())
-            dproc->prepareToPlay(sampleRate, &processor.mainPianoSynth, &processor.resonanceReleaseSynth, &processor.hammerReleaseSynth);
-        
-        for (auto mproc : pmap->getTempoProcessors())
-            mproc->prepareToPlay(sampleRate);
-        
-        for (auto nproc : pmap->getNostalgicProcessors())
-            nproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
-        
-        for (auto sproc : pmap->getSynchronicProcessors())
-            sproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
-        
-        for (auto tproc : pmap->getTuningProcessors())
-            tproc->prepareToPlay(sampleRate);
-    }
+    for (auto mproc : mprocessor)
+        mproc->prepareToPlay(sampleRate);
+    
+    for (auto nproc : nprocessor)
+        nproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
+    
+    for (auto sproc : sprocessor)
+        sproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
+    
+    for (auto tproc : tprocessor)
+        tproc->prepareToPlay(sampleRate);
 }
 
 ValueTree Piano::getState(void)

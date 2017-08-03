@@ -12,7 +12,6 @@
 
 void BKAudioProcessor::updateUI(void)
 {
-    updateState->pianoDidChange = true;
     updateState->pianoDidChangeForGraph = true;
     updateState->directPreparationDidChange = true;
     updateState->nostalgicPreparationDidChange = true;
