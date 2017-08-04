@@ -281,7 +281,6 @@ public:
     
     inline const SynchronicPreparation::Ptr getStaticSynchronicPreparation(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
         for (auto p : synchronic)
         {
             if (p->getId() == Id)   return p->sPrep;
@@ -291,7 +290,7 @@ public:
     
     inline const SynchronicPreparation::Ptr getActiveSynchronicPreparation(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : synchronic)
         {
             if (p->getId() == Id)   return p->aPrep;
@@ -301,7 +300,7 @@ public:
     
     inline const NostalgicPreparation::Ptr getStaticNostalgicPreparation(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : nostalgic)
         {
             if (p->getId() == Id)   return p->sPrep;
@@ -311,7 +310,7 @@ public:
     
     inline const NostalgicPreparation::Ptr getActiveNostalgicPreparation(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+ 
         for (auto p : nostalgic)
         {
             if (p->getId() == Id)   return p->aPrep;
@@ -321,7 +320,7 @@ public:
     
     inline const DirectPreparation::Ptr getStaticDirectPreparation(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : direct)
         {
             if (p->getId() == Id)   return p->sPrep;
@@ -331,7 +330,7 @@ public:
     
     inline const DirectPreparation::Ptr getActiveDirectPreparation(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+ 
         for (auto p : direct)
         {
             if (p->getId() == Id)   return p->aPrep;
@@ -341,7 +340,7 @@ public:
     
     inline const TuningPreparation::Ptr getStaticTuningPreparation(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : tuning)
         {
             if (p->getId() == Id)   return p->sPrep;
@@ -351,7 +350,7 @@ public:
     
     inline const TuningPreparation::Ptr getActiveTuningPreparation(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : tuning)
         {
             if (p->getId() == Id)   return p->aPrep;
@@ -361,7 +360,7 @@ public:
     
     inline const TempoPreparation::Ptr getStaticTempoPreparation(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : tempo)
         {
             if (p->getId() == Id)   return p->sPrep;
@@ -371,7 +370,7 @@ public:
     
     inline const TempoPreparation::Ptr getActiveTempoPreparation(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : tempo)
         {
             if (p->getId() == Id)   return p->aPrep;
@@ -381,7 +380,7 @@ public:
     
     inline const Synchronic::Ptr getSynchronic(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : synchronic)
         {
             if (p->getId() == Id)   return p;
@@ -391,7 +390,7 @@ public:
     
     inline const Nostalgic::Ptr getNostalgic(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : nostalgic)
         {
             if (p->getId() == Id)   return p;
@@ -401,7 +400,7 @@ public:
     
     inline const Direct::Ptr getDirect(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : direct)
         {
             if (p->getId() == Id)   return p;
@@ -411,7 +410,7 @@ public:
     
     inline const Tuning::Ptr getTuning(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : tuning)
         {
             if (p->getId() == Id)   return p;
@@ -421,7 +420,7 @@ public:
     
     inline const Tempo::Ptr getTempo(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : tempo)
         {
             if (p->getId() == Id)   return p;
@@ -431,7 +430,7 @@ public:
     
     inline const SynchronicModPreparation::Ptr getSynchronicModPreparation(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : modSynchronic)
         {
             if (p->getId() == Id)   return p;
@@ -441,7 +440,7 @@ public:
     
     inline const NostalgicModPreparation::Ptr getNostalgicModPreparation(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : modNostalgic)
         {
             if (p->getId() == Id)   return p;
@@ -451,7 +450,7 @@ public:
     
     inline const DirectModPreparation::Ptr getDirectModPreparation(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : modDirect)
         {
             if (p->getId() == Id)   return p;
@@ -461,7 +460,7 @@ public:
     
     inline const TuningModPreparation::Ptr getTuningModPreparation(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : modTuning)
         {
             if (p->getId() == Id)   return p;
@@ -471,7 +470,7 @@ public:
     
     inline const TempoModPreparation::Ptr getTempoModPreparation(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : modTempo)
         {
             if (p->getId() == Id)   return p;
@@ -481,7 +480,7 @@ public:
     
     inline const Keymap::Ptr getKeymap(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : bkKeymaps)
         {
             if (p->getId() == Id)   return p;
@@ -491,7 +490,7 @@ public:
     
     inline const Piano::Ptr getPiano(int Id) const noexcept
     {
-        Id = (Id <= 0) ? 1 : Id;
+
         for (auto p : bkPianos)
         {
             if (p->getId() == Id)   return p;
@@ -564,6 +563,13 @@ public:
     }
     
     
+    void addSynchronicWithId(int Id);
+    void addNostalgicWithId(int Id);
+    void addTuningWithId(int Id);
+    void addTempoWithId(int Id);
+    void addDirectWithId(int Id);
+    void addKeymapWithId(int Id);
+    
     inline void setURL(String newURL) { url = newURL; }
     
     inline String getURL(void) const noexcept {return url;}
@@ -599,27 +605,22 @@ private:
     
     
     void addSynchronic(void);
-    void addSynchronicWithId(int Id);
     void addSynchronic(SynchronicPreparation::Ptr);
     int addSynchronicIfNotAlreadyThere(SynchronicPreparation::Ptr);
     
     void addNostalgic(void);
-    void addNostalgicWithId(int Id);
     void addNostalgic(NostalgicPreparation::Ptr);
     int addNostalgicIfNotAlreadyThere(NostalgicPreparation::Ptr);
     
     void addTuning(void);
-    void addTuningWithId(int Id);
     void addTuning(TuningPreparation::Ptr);
     int addTuningIfNotAlreadyThere(TuningPreparation::Ptr);
     
     void addTempo(void);
-    void addTempoWithId(int Id);
     void addTempo(TempoPreparation::Ptr);
     int addTempoIfNotAlreadyThere(TempoPreparation::Ptr);
     
     void addDirect(void);
-    void addDirectWithId(int Id);
     void addDirect(DirectPreparation::Ptr);
     int addDirectIfNotAlreadyThere(DirectPreparation::Ptr);
     
@@ -628,7 +629,6 @@ private:
     void addDirect(int Id, int tuningId);
     
     void addKeymap(void);
-    void addKeymapWithId(int Id);
     void addKeymap(Keymap::Ptr);
     inline const int getNumKeymaps(void) const noexcept {return bkKeymaps.size();}
     

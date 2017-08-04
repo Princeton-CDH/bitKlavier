@@ -166,7 +166,6 @@ void BKConstructionSite::draw(void)
 {
 #if AUTO_DRAW
     int keymapCount = 0, prepCount = 0, otherCount = 0, modCount = 0, ttCount = 0;
-    processor.currentPiano->configuration->clear();
 #endif
     
     for (auto item : graph->getItems())
@@ -196,11 +195,6 @@ void BKConstructionSite::draw(void)
             item->setTopLeftPosition(X, Y);
             
             keymapCount++;
-
-            
-            item->setTopLeftPosition(xy);
-
-            
         }
         else if (type <= PreparationTypeNostalgic)
         {
@@ -214,7 +208,6 @@ void BKConstructionSite::draw(void)
             item->setTopLeftPosition(X, Y);
             
             prepCount++;
-
             
         }
         else if (type == PreparationTypeTuning || type == PreparationTypeTempo)

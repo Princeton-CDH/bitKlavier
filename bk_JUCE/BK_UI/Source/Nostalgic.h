@@ -36,8 +36,7 @@ public:
     nGain(p->getGain()),
     nLengthMultiplier(p->getLengthMultiplier()),
     nBeatsToSkip(p->getBeatsToSkip()),
-    nMode(p->getMode()),
-    nSyncTarget(p->getSyncTarget())
+    nMode(p->getMode())
     {
         
     }
@@ -49,7 +48,6 @@ public:
                          float lengthMultiplier,
                          float beatsToSkip,
                          NostalgicSyncMode mode,
-                         int syncTarget,
                          TuningSystem tuning,
                          PitchClass basePitch,
                          Tuning::Ptr t):
@@ -59,8 +57,7 @@ public:
     nGain(gain),
     nLengthMultiplier(lengthMultiplier),
     nBeatsToSkip(beatsToSkip),
-    nMode(mode),
-    nSyncTarget(syncTarget)
+    nMode(mode)
     {
         
     }
@@ -72,8 +69,7 @@ public:
     nGain(1.0),
     nLengthMultiplier(1.0),
     nBeatsToSkip(0.0),
-    nMode(NoteLengthSync),
-    nSyncTarget(0)
+    nMode(NoteLengthSync)
     {
 
     }
@@ -92,7 +88,6 @@ public:
         nLengthMultiplier = n->getLengthMultiplier();
         nBeatsToSkip = n->getBeatsToSkip();
         nMode = n->getMode();
-        nSyncTarget = n->getSyncTarget();
     }
     
     inline bool compare (NostalgicPreparation::Ptr n)
@@ -103,8 +98,7 @@ public:
                 nGain == n->getGain() &&
                 nLengthMultiplier == n->getLengthMultiplier() &&
                 nBeatsToSkip == n->getBeatsToSkip() &&
-                nMode == n->getMode() &&
-                nSyncTarget == n->getSyncTarget());
+                nMode == n->getMode());
     }
     
     inline const String getName() const noexcept {return name;}
@@ -117,9 +111,6 @@ public:
     inline const float getLengthMultiplier() const noexcept                {return nLengthMultiplier;  }
     inline const float getBeatsToSkip() const noexcept                     {return nBeatsToSkip;       }
     inline const NostalgicSyncMode getMode() const noexcept                {return nMode;              }
-    inline const int getSyncTarget() const noexcept                        {return nSyncTarget;        }
-    inline const SynchronicProcessor::Ptr getSyncTargetProcessor() const noexcept
-                                                                           {return nSyncProcessor;     }
     
     inline void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
     inline void setUndertow(int undertow)                                  {nUndertow = undertow;                  }
@@ -128,9 +119,6 @@ public:
     inline void setLengthMultiplier(float lengthMultiplier)                {nLengthMultiplier = lengthMultiplier;  }
     inline void setBeatsToSkip(float beatsToSkip)                          {nBeatsToSkip = beatsToSkip;            }
     inline void setMode(NostalgicSyncMode mode)                            {nMode = mode;                          }
-    inline void setSyncTarget(int syncTarget)                              {nSyncTarget = syncTarget;}
-    inline void setSyncTargetProcessor(SynchronicProcessor::Ptr syncTargetProcessor)
-                                                                           {nSyncProcessor = syncTargetProcessor;}
 
     void print(void)
     {
@@ -141,7 +129,6 @@ public:
         DBG("nLengthMultiplier: " + String(nLengthMultiplier));
         DBG("nBeatsToSkip: " + String(nBeatsToSkip));
         DBG("nMode: " + String(nMode));
-        DBG("nSyncTarget: " + String(nSyncTarget));
     }
     
     
@@ -163,8 +150,6 @@ private:
     float nLengthMultiplier;    //note-length mode: toscale reverse playback time
     float nBeatsToSkip;         //synchronic mode: beats to skip before reverse peak
     NostalgicSyncMode nMode;    //which sync mode to use
-    int nSyncTarget;            //which synchronic layer to sync to, when nMode = NostalgicSyncSynchronic
-    SynchronicProcessor::Ptr nSyncProcessor;
     
     //internal keymap for resetting internal values to static
     //Keymap::Ptr resetMap = new Keymap(0);
@@ -319,7 +304,6 @@ public:
         prep.setProperty( ptagNostalgic_lengthMultiplier,   sPrep->getLengthMultiplier(), 0);
         prep.setProperty( ptagNostalgic_beatsToSkip,        sPrep->getBeatsToSkip(), 0);
         prep.setProperty( ptagNostalgic_mode,               sPrep->getMode(), 0);
-        prep.setProperty( ptagNostalgic_syncTarget,         sPrep->getSyncTarget(), 0);
         
         return prep;
     }
@@ -377,9 +361,6 @@ public:
         i = e->getStringAttribute(ptagNostalgic_mode).getIntValue();
         sPrep->setMode((NostalgicSyncMode)i);
         
-        i = e->getStringAttribute(ptagNostalgic_syncTarget).getIntValue();
-        sPrep->setSyncTarget(i);
-        
         aPrep->copy(sPrep);
         
     }
@@ -433,7 +414,6 @@ public:
      NostalgicLengthMultiplier,
      NostalgicBeatsToSkip,
      NostalgicMode,
-     NostalgicSyncTarget,
      NostalgicParameterTypeNil
      
      */
@@ -450,7 +430,6 @@ public:
         param.set(NostalgicLengthMultiplier, String(p->getLengthMultiplier()));
         param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
         param.set(NostalgicMode, String(p->getMode()));
-        param.set(NostalgicSyncTarget, String(p->getSyncTarget()));
         
     }
     
@@ -465,7 +444,6 @@ public:
         param.set(NostalgicLengthMultiplier, "");
         param.set(NostalgicBeatsToSkip, "");
         param.set(NostalgicMode, "");
-        param.set(NostalgicSyncTarget, "");
     }
     
     inline void setId(int newId) { Id = newId; }
@@ -509,9 +487,6 @@ public:
         
         p = getParam(NostalgicMode);
         if (p != String::empty) prep.setProperty( ptagNostalgic_mode,               p.getIntValue(), 0);
-        
-        p = getParam(NostalgicSyncTarget);
-        if (p != String::empty) prep.setProperty( ptagNostalgic_syncTarget,         p.getIntValue(), 0);
         
         
         return prep;
@@ -562,9 +537,6 @@ public:
         
         p = e->getStringAttribute(ptagNostalgic_mode);
         setParam(NostalgicMode, p);
-        
-        p = e->getStringAttribute(ptagNostalgic_syncTarget);
-        setParam(NostalgicSyncTarget, p);
     }
     
     
@@ -582,7 +554,6 @@ public:
         param.set(NostalgicLengthMultiplier, String(p->getLengthMultiplier()));
         param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
         param.set(NostalgicMode, String(p->getMode()));
-        param.set(NostalgicSyncTarget, String(p->getSyncTarget()));
     }
     
     inline void copy(NostalgicModPreparation::Ptr p)

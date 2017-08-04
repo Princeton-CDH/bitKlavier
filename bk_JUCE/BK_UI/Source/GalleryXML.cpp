@@ -69,144 +69,142 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
     
     bkPianos.clear();
     
+    if (xml != nullptr)
     {
+        //general = new GeneralSettings();
         
-        if (xml != nullptr)
+        /* * * * * * * * * * * * * * */
+        url = xml->getStringAttribute("url");
+        setDefaultPiano(xml->getStringAttribute("defaultPiano").getIntValue());
+
+        DBG("loaded url: " + url);
+        
+        // iterate through its sub-elements
+        forEachXmlChildElement (*xml, e)
         {
-            //general = new GeneralSettings();
             
-            /* * * * * * * * * * * * * * */
-            url = xml->getStringAttribute("url");
-            setDefaultPiano(xml->getStringAttribute("defaultPiano").getIntValue());
-
-            DBG("loaded url: " + url);
-            
-            // iterate through its sub-elements
-            forEachXmlChildElement (*xml, e)
+            if (e->hasTagName("idCount"))
             {
-                
-                if (e->hasTagName("idCount"))
+                for (int idType = 0; idType < BKPreparationTypeNil; idType++)
                 {
-                    for (int idType = 0; idType < BKPreparationTypeNil; idType++)
+                    String attr = e->getStringAttribute("i"+String(idType));
+                    
+                    DBG("id" + String(idType) + " " + attr);
+                    
+                    i = attr.getIntValue();
+                    
+                    idCount.set(idType, i);
+                }
+                
+                DBG("idCountsPOSTLOAD: " + intArrayToString(idCount));
+            }
+            else if (e->hasTagName( vtagKeymap))
+            {
+                addKeymap();
+                
+                String n = e->getStringAttribute("name");
+                
+                
+                
+                Keymap::Ptr newKeymap = bkKeymaps.getLast();
+                
+                newKeymap->setId(e->getStringAttribute("Id").getIntValue());
+                
+                if (n != String::empty)     newKeymap->setName(n);
+                else                        newKeymap->setName(String(newKeymap->getId()));
+                
+                Array<int> keys;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = e->getStringAttribute(ptagKeymap_key + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
                     {
-                        String attr = e->getStringAttribute("i"+String(idType));
-                        
-                        DBG("id" + String(idType) + " " + attr);
-                        
                         i = attr.getIntValue();
-                        
-                        idCount.set(idType, i);
+                        keys.add(i);
                     }
-                    
-                    DBG("idCountsPOSTLOAD: " + intArrayToString(idCount));
                 }
-                else if (e->hasTagName( vtagKeymap))
-                {
-                    addKeymap();
-                    
-                    String n = e->getStringAttribute("name");
-                    
-                    
-                    
-                    Keymap::Ptr newKeymap = bkKeymaps.getLast();
-                    
-                    newKeymap->setId(e->getStringAttribute("Id").getIntValue());
-                    
-                    if (n != String::empty)     newKeymap->setName(n);
-                    else                        newKeymap->setName(String(newKeymap->getId()));
-                    
-                    Array<int> keys;
-                    for (int k = 0; k < 128; k++)
-                    {
-                        String attr = e->getStringAttribute(ptagKeymap_key + String(k));
-                        
-                        if (attr == String::empty) break;
-                        else
-                        {
-                            i = attr.getIntValue();
-                            keys.add(i);
-                        }
-                    }
-                    
-                    newKeymap->setKeymap(keys);
-                }
-                else if (e->hasTagName ( vtagGeneral))
-                {
-                    general->setState(e);
-                }
-                else if (e->hasTagName( vtagTuning))
-                {
-                    addTuningWithId(-1);
-                    
-                    tuning.getLast()->setState(e);
-                }
-                else if (e->hasTagName( vtagModTuning))
-                {
-                    addTuningModWithId(-1);
-                    
-                    modTuning.getLast()->setState(e);
-                }
-                else if (e->hasTagName( vtagDirect))
-                {
-                    addDirectWithId(-1);
-                    
-                    direct.getLast()->setState(e, tuning);
-                }
-                else if (e->hasTagName( vtagModDirect))
-                {
-                    addDirectModWithId(-1);
-                    
-                    modDirect.getLast()->setState(e);
-                }
-                else if (e->hasTagName( vtagSynchronic))
-                {
-                    addSynchronicWithId(-1);
-                    
-                    synchronic.getLast()->setState(e, tuning, tempo);
-                    
-                }
-                else if (e->hasTagName( vtagModSynchronic))
-                {
-                    addSynchronicModWithId(-1);
                 
-                    modSynchronic.getLast()->setState(e);
-                    
-                }
-                else if (e->hasTagName( vtagTempo))
-                {
-                    addTempoWithId(-1);
+                newKeymap->setKeymap(keys);
+            }
+            else if (e->hasTagName ( vtagGeneral))
+            {
+                general->setState(e);
+            }
+            else if (e->hasTagName( vtagTuning))
+            {
+                addTuningWithId(-1);
+                
+                tuning.getLast()->setState(e);
+            }
+            else if (e->hasTagName( vtagModTuning))
+            {
+                addTuningModWithId(-1);
+                
+                modTuning.getLast()->setState(e);
+            }
+            else if (e->hasTagName( vtagDirect))
+            {
+                addDirectWithId(-1);
+                
+                direct.getLast()->setState(e, tuning);
+            }
+            else if (e->hasTagName( vtagModDirect))
+            {
+                addDirectModWithId(-1);
+                
+                modDirect.getLast()->setState(e);
+            }
+            else if (e->hasTagName( vtagSynchronic))
+            {
+                addSynchronicWithId(-1);
+                
+                synchronic.getLast()->setState(e, tuning, tempo);
+                
+            }
+            else if (e->hasTagName( vtagModSynchronic))
+            {
+                addSynchronicModWithId(-1);
+            
+                modSynchronic.getLast()->setState(e);
+                
+            }
+            else if (e->hasTagName( vtagTempo))
+            {
+                addTempoWithId(-1);
 
-                    tempo.getLast()->setState(e);
-                    
-                }
-                else if (e->hasTagName( vtagModTempo))
-                {
-                    addTempoModWithId(-1);
-                    
-                    modTempo.getLast()->setState(e);
-                    
-                }
-                else if (e->hasTagName( vtagNostalgic))
-                {
-                    addNostalgicWithId(-1);
-                    
-                    nostalgic.getLast()->setState(e, tuning, synchronic);
-                }
-                else if (e->hasTagName( vtagModNostalgic))
-                {
-                    addNostalgicModWithId(-1);
-                    
-                    modNostalgic.getLast()->setState(e);
-                }
-                else if (e->hasTagName(vtagPiano))
-                {
-                    addPianoWithId(-1);
-                    
-                    bkPianos.getLast()->setState(e);
-                }
+                tempo.getLast()->setState(e);
+                
+            }
+            else if (e->hasTagName( vtagModTempo))
+            {
+                addTempoModWithId(-1);
+                
+                modTempo.getLast()->setState(e);
+                
+            }
+            else if (e->hasTagName( vtagNostalgic))
+            {
+                addNostalgicWithId(-1);
+                
+                nostalgic.getLast()->setState(e, tuning, synchronic);
+            }
+            else if (e->hasTagName( vtagModNostalgic))
+            {
+                addNostalgicModWithId(-1);
+                
+                modNostalgic.getLast()->setState(e);
+            }
+            else if (e->hasTagName(vtagPiano))
+            {
+                addPianoWithId(-1);
+                
+                bkPianos.getLast()->setState(e);
             }
         }
     }
+    
     
 }
 

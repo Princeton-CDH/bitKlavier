@@ -334,7 +334,6 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == NostalgicGain)             active->setGain(modf);
         else if (type == NostalgicMode)             active->setMode((NostalgicSyncMode)modi);
         else if (type == NostalgicUndertow)         active->setUndertow(modi);
-        else if (type == NostalgicSyncTarget)       active->setSyncTarget(modi);
         else if (type == NostalgicBeatsToSkip)      active->setBeatsToSkip(modf);
         else if (type == NostalgicWaveDistance)     active->setWaveDistance(modi);
         else if (type == NostalgicLengthMultiplier) active->setLengthMultiplier(modf);
@@ -501,6 +500,13 @@ void BKAudioProcessor::initializeGallery(void)
 {
     prevPiano = gallery->getPiano(1);
     currentPiano = gallery->getPiano(1);
+    
+    gallery->addTempoWithId(-1);
+    gallery->addTuningWithId(-1);
+    gallery->addSynchronicWithId(-1);
+    gallery->addNostalgicWithId(-1);
+    gallery->addDirectWithId(-1);
+    gallery->addKeymapWithId(-1);
     
     for (auto piano : gallery->getPianos()) piano->configure();
     
