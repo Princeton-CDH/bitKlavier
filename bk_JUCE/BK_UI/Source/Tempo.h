@@ -172,6 +172,8 @@ public:
         
         prep.setProperty( "Id",Id, 0);
         prep.setProperty( "name",                          name, 0);
+        
+        prep.setProperty( ptagTempo_tempo,                           sPrep->getTempo(), 0);
         prep.setProperty( ptagTempo_system,                sPrep->getTempoSystem(), 0);
         prep.setProperty( ptagTempo_at1Mode,               sPrep->getAdaptiveTempo1Mode(), 0 );
         prep.setProperty( ptagTempo_at1History,            sPrep->getAdaptiveTempo1History(), 0 );

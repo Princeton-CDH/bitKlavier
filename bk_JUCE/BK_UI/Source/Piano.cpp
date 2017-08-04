@@ -37,10 +37,6 @@ Id(Id)
         
         modificationMap.add(new Modifications());
     }
-    
-    
-    
-
 }
 
 Piano::~Piano()
