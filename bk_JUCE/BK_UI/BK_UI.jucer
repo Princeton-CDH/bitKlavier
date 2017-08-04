@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="R4yQHh" name="BK_UI" projectType="audioplug" version="0.0.1"
               bundleIdentifier="com.BK.BK0" includeBinaryInAppConfig="1" buildVST="1"
-              buildVST3="1" buildAU="0" buildAUv3="1" buildRTAS="0" buildAAX="0"
+              buildVST3="1" buildAU="1" buildAUv3="1" buildRTAS="1" buildAAX="0"
               pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
               pluginManufacturer="manyarrowsmusic" pluginManufacturerCode="Manu"
               pluginCode="R4yq" pluginChannelConfigs="{0,2}" pluginIsSynth="1"
@@ -235,7 +235,8 @@
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" vst3Folder="~/STKs/VST3 SDK" aaxFolder=""
-               customXcodeResourceFolders="" customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist version=&quot;1.0&quot;&gt;&#10;&lt;dict&gt;&#10;&#9;&lt;key&gt;CFBundleIconFile&lt;/key&gt;&#10;&#9;&lt;string&gt;bk&lt;/string&gt;&#10;&lt;/dict&gt;&#10;&lt;/plist&gt;&#10;">
+               customXcodeResourceFolders="" customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist version=&quot;1.0&quot;&gt;&#10;&lt;dict&gt;&#10;&#9;&lt;key&gt;CFBundleIconFile&lt;/key&gt;&#10;&#9;&lt;string&gt;bk&lt;/string&gt;&#10;&lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
+               rtasFolder="">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="BK_UI"
                        osxArchitecture="default" cppLibType="" osxCompatibility="default"
@@ -262,7 +263,7 @@
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="portraitlandscape"
                   aaxFolder="" iosBackgroundAudio="1" UIFileSharingEnabled="1"
-                  iosDevelopmentTeamID="">
+                  iosDevelopmentTeamID="" rtasFolder="">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="MRM" iosCompatibility="default"
                        codeSigningIdentity="iPhone Developer: Michael Mulshine (SW843MMG7S)"/>
