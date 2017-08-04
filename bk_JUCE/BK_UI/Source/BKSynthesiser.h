@@ -98,6 +98,7 @@ public:
      Returns a value less than 0 if no note is playing.
      */
     int getCurrentlyPlayingNote() const noexcept                        { return currentlyPlayingNote; }
+    int getCurrentlyPlayingKey() const noexcept                         { return currentlyPlayingKey; }
     
     /** Returns the sound that this voice is currently playing.
      Returns nullptr if it's not playing.
@@ -262,7 +263,8 @@ private:
     friend class BKSynthesiser;
     
     double currentSampleRate;
-    int currentlyPlayingNote, currentPlayingMidiChannel;
+    int currentlyPlayingNote, currentPlayingMidiChannel, currentlyPlayingKey;
+        //sometimes Note and Key might be different, with non-zero transpositions, hence the need for currentlyPlayingKey
     uint32 length;
     PianoSamplerNoteType direction;
     PianoSamplerNoteType type;
@@ -395,6 +397,7 @@ public:
      The midiChannel parameter is the channel, between 1 and 16 inclusive.
      */
     virtual void keyOn (int midiChannel,
+                        int keyNoteNumber,
                         int midiNoteNumber,
                         float transp,
                         float velocity,
@@ -423,6 +426,7 @@ public:
     virtual void keyOff (int midiChannel,
                          BKNoteType type,
                          int layerId,
+                         int keyNoteNumber,
                          int midiNoteNumber,
                          float velocity,
                          bool allowTailOff);
@@ -630,6 +634,7 @@ protected:
     void startVoice (BKSynthesiserVoice* voice,
                      BKSynthesiserSound* sound,
                      int midiChannel,
+                     int keyNoteNumber,
                      int midiNoteNumber,
                      float midiNoteNumberOffset,
                      float gain,

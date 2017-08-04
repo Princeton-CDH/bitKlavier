@@ -48,6 +48,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
         float synthOffset = offset - (int)offset;
         
         synth->keyOn(channel,
+                     noteNumber,
                      synthNoteNumber,
                      synthOffset,
                      velocity,
@@ -98,13 +99,14 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
         int t = keyPlayed[noteNumber].getUnchecked(i);
         float t_offset = keyPlayedOffset[noteNumber].getUnchecked(i);
         
-        DBG("DirectProcessor::keyReleased " + String(noteNumber) +  " " + String(Id));
+        //DBG("DirectProcessor::keyReleased " + String(noteNumber) +  " " + String(Id));
         synth->keyOff(channel,
-                     MainNote,
-                     Id,
-                     t,
-                     velocity,
-                     true);
+                      MainNote,
+                      Id,
+                      noteNumber,
+                      t,
+                      velocity,
+                      true);
         
         //float offset = tuner->getOffset(noteNumber);
         //int synthNoteNumber = noteNumber + (int)offset;
@@ -119,40 +121,42 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
             if (hGain > 0.0f)
             {
                 hammerSynth->keyOn(
-                                 channel,
-                                 //synthNoteNumber,
-                                 t,
-                                 0,
-                                 velocity,
-                                 hGain,
-                                 Forward,
-                                 Normal, //FixedLength,
-                                 HammerNote,
-                                 Id,
-                                 0,
-                                 2000,
-                                 3,
-                                 3 );
+                                   channel,
+                                   //synthNoteNumber,
+                                   noteNumber,
+                                   t,
+                                   0,
+                                   velocity,
+                                   hGain,
+                                   Forward,
+                                   Normal, //FixedLength,
+                                   HammerNote,
+                                   Id,
+                                   0,
+                                   2000,
+                                   3,
+                                   3 );
             }
             
             if (rGain > 0.0f)
             {
                 resonanceSynth->keyOn(
-                                    channel,
-                                    //synthNoteNumber,
-                                    t,
-                                    //synthOffset,
-                                    t_offset,
-                                    velocity,
-                                    rGain,
-                                    Forward,
-                                    Normal, //FixedLength,
-                                    ResonanceNote,
-                                    Id,
-                                    0,
-                                    2000,
-                                    3,
-                                    3 );
+                                      channel,
+                                      //synthNoteNumber,
+                                      noteNumber,
+                                      t,
+                                      //synthOffset,
+                                      t_offset,
+                                      velocity,
+                                      rGain,
+                                      Forward,
+                                      Normal, //FixedLength,
+                                      ResonanceNote,
+                                      Id,
+                                      0,
+                                      2000,
+                                      3,
+                                      3 );
             }
         }
     }
