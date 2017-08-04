@@ -20,7 +20,7 @@
 
 #include "BKGraph.h"
 
-class BKConstructionSite : public BKDraggableComponent, public KeyListener, public LassoSource<BKItem*>
+class BKConstructionSite : public BKDraggableComponent, public LassoSource<BKItem*>
 {
 public:
     BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph);
@@ -46,13 +46,11 @@ public:
     void addItemsFromClipboard(void);
     
     void addItem(BKPreparationType type);
-    void removeItem(BKPreparationType type, int Id);
     
     inline void setCurrentItem(BKItem* item) { currentItem = item;}
     inline BKItem* getCurrentItem(void) { return currentItem;}
 
     void idDidChange(void);
-    void reconfigureCurrentItem(void);
     
     bool altDown;
     
@@ -97,8 +95,6 @@ private:
     void mouseMove (const MouseEvent& e) override;
     
     void deleteItem (BKItem* item);
-    
-    bool keyPressed (const KeyPress& e, Component*) override;
     
     BKItem* getItemAtPoint(const int X, const int Y);
 

@@ -84,7 +84,7 @@ octaveNumForMiddleC (3)
     rangeAll = (rangeEnd - rangeStart) + 1;
     
     colourChanged();
-    setWantsKeyboardFocus (true);
+    //setWantsKeyboardFocus (true);
     
     for(int i=0; i<128; i++)
     {
@@ -903,7 +903,7 @@ void BKKeymapKeyboardComponent::setKeysInKeymap(Array<int> keys)
 
 void BKKeymapKeyboardComponent::setKeyValue(int midiNoteNumber, float val)
 {
-    DBG("setting keyValue directly " + String(midiNoteNumber) + " " + String(val));
+    //DBG("setting keyValue directly " + String(midiNoteNumber) + " " + String(val));
     keyValues.set(midiNoteNumber, val);
 }
 

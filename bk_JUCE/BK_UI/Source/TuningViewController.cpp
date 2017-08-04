@@ -315,7 +315,7 @@ void TuningViewController::updateComponentVisibility()
 TuningPreparationEditor::TuningPreparationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
 TuningViewController(p, theGraph)
 {
-    fillSelectCB();
+    fillSelectCB(-1,-1);
     
     selectCB.addMyListener(this);
     
@@ -354,12 +354,20 @@ TuningViewController(p, theGraph)
 
 void TuningPreparationEditor::timerCallback()
 {
-    TuningProcessor::Ptr tProcessor = processor.gallery->getTuningProcessor(processor.updateState->currentTuningId);
-    if(tProcessor->getLastNoteTuning() != lastNoteTuningSave)
+    if (processor.updateState->currentDisplay == DisplayTuning)
     {
-        lastNoteTuningSave = tProcessor->getLastNoteTuning();
-        lastNote.setText("last note: " + String(lastNoteTuningSave), dontSendNotification);
-        lastInterval.setText("last interval: "  + String(tProcessor->getLastIntervalTuning()), dontSendNotification);
+        TuningProcessor::Ptr tProcessor = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
+        
+        if (tProcessor != nullptr)
+        {
+            if (tProcessor->getLastNoteTuning() != lastNoteTuningSave)
+            {
+                lastNoteTuningSave = tProcessor->getLastNoteTuning();
+                lastNote.setText("last note: " + String(lastNoteTuningSave), dontSendNotification);
+                lastInterval.setText("last interval: "  + String(tProcessor->getLastIntervalTuning()), dontSendNotification);
+            }
+        }
+        
     }
 }
 
@@ -367,53 +375,35 @@ void TuningPreparationEditor::timerCallback()
 void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
+    int index = box->getSelectedItemIndex();
+    int Id = box->getSelectedId();
     
     TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
     TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
     
     if (name == selectCB.getName())
     {
-        int index = box->getSelectedItemIndex();
-        
-        int oldId = processor.updateState->currentTuningId;
-        int newId = processor.gallery->getIdFromIndex(PreparationTypeTuning, index);
-        
-        if (index == selectCB.getNumItems()-1)
+        if (Id == -1)
         {
-            processor.gallery->addTuning();
+            processor.gallery->add(PreparationTypeTuning);
             
-            processor.gallery->setEditted(PreparationTypeTuning, oldId, true);
-            
-            processor.gallery->getAllTuning().getLast()->editted = true;
-            
-            newId = processor.gallery->getAllTuning().getLast()->getId();
+            Id = processor.gallery->getAllTuning().getLast()->getId();
         }
         
-        processor.updateState->currentTuningId = newId;
-        
-        processor.updateState->removeActive(PreparationTypeTuning, oldId);
-        
-        #if AUTO_DELETE
-        if (!processor.gallery->getTuning(oldId)->editted)
-        {
-            processor.updateState->removePreparation(PreparationTypeTuning, oldId);
-            
-            processor.gallery->remove(PreparationTypeTuning, oldId);
-        }
-#endif
-        
-        processor.updateState->addActive(PreparationTypeTuning, newId);
+        processor.updateState->currentTuningId = Id;
         
         processor.updateState->idDidChange = true;
         
-        fillSelectCB();
-        
         update();
+        
+        fillSelectCB(lastId, Id);
+        
+        lastId = Id;
     }
     else if (name == scaleCB.getName())
     {
-        prep->setTuning((TuningSystem)scaleCB.getSelectedItemIndex());
-        active->setTuning((TuningSystem)scaleCB.getSelectedItemIndex());
+        prep->setTuning((TuningSystem) index);
+        active->setTuning((TuningSystem) index);
         
         Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         customKeyboard.setValues(currentTuning->getCurrentScaleCents());
@@ -423,82 +413,76 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (name == fundamentalCB.getName())
     {
-        prep->setFundamental((PitchClass)fundamentalCB.getSelectedItemIndex());
-        active->setFundamental((PitchClass)fundamentalCB.getSelectedItemIndex());
+        prep->setFundamental((PitchClass) index);
+        active->setFundamental((PitchClass) index);
         
-        customKeyboard.setFundamental(fundamentalCB.getSelectedItemIndex());
+        customKeyboard.setFundamental(index);
         
         updateComponentVisibility();
         
     }
     else if (name == A1IntervalScaleCB.getName())
     {
-        prep->setAdaptiveIntervalScale((TuningSystem)A1IntervalScaleCB.getSelectedItemIndex());
-        active->setAdaptiveIntervalScale((TuningSystem)A1IntervalScaleCB.getSelectedItemIndex());
+        prep->setAdaptiveIntervalScale((TuningSystem) index);
+        active->setAdaptiveIntervalScale((TuningSystem) index);
         
         updateComponentVisibility();
     }
     else if (name == A1AnchorScaleCB.getName())
     {
-        prep->setAdaptiveAnchorScale((TuningSystem)A1AnchorScaleCB.getSelectedItemIndex());
-        active->setAdaptiveAnchorScale((TuningSystem)A1AnchorScaleCB.getSelectedItemIndex());
+        prep->setAdaptiveAnchorScale((TuningSystem) index);
+        active->setAdaptiveAnchorScale((TuningSystem) index);
         
         updateComponentVisibility();
     }
     else if (name == A1FundamentalCB.getName())
     {
-        prep->setAdaptiveAnchorFundamental((PitchClass)A1FundamentalCB.getSelectedItemIndex());
-        active->setAdaptiveAnchorFundamental((PitchClass)A1FundamentalCB.getSelectedItemIndex());
+        prep->setAdaptiveAnchorFundamental((PitchClass) index);
+        active->setAdaptiveAnchorFundamental((PitchClass) index);
         
         updateComponentVisibility();
         
     }
-    
-    if (name != selectCB.getName())
-    {
-        Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-        tuning->editted = true;
-    }
 }
 
 
-void TuningPreparationEditor::fillSelectCB(void)
+void TuningPreparationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
-    Array<int> index = processor.gallery->getIndexList(PreparationTypeTuning);
-    
-    for (int i = 0; i < index.size(); i++)
+    for (auto prep : processor.gallery->getAllTuning())
     {
-        int Id = index[i];
-        String name = processor.gallery->getTuning(Id)->getName();
-        if (name != String::empty)  selectCB.addItem(name, i+1);
-        else                        selectCB.addItem(String(i+1), i+1);
+        int Id = prep->getId();;
+        String name = prep->getName();
         
-        selectCB.setItemEnabled(i+1, true);
-        if (processor.updateState->isActive(PreparationTypeTuning, Id) &&
-            (Id != processor.updateState->currentTuningId))
-        {
-            selectCB.setItemEnabled(i+1, false);
-        }
+        if (name != String::empty)  selectCB.addItem(name, Id);
+        else                        selectCB.addItem("Tuning"+String(Id), Id);
+        
+        selectCB.setItemEnabled(Id, true);
+        if (processor.currentPiano->isActive(PreparationTypeTuning, Id))
+            selectCB.setItemEnabled(Id, false);
     }
     
+    if (last != 0)      selectCB.setItemEnabled(last, true);
+    if (current != 0)   selectCB.setItemEnabled(current, false);
+    
+    int selectedId = processor.updateState->currentTuningId;
+    
+    selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
+    
+    selectCB.setItemEnabled(selectedId, false);
+    
     selectCB.addSeparator();
-    selectCB.addItem("New tuning...", index.size()+1);
+    selectCB.addItem("New Tuning...", -1);
     
-    int currentId = processor.updateState->currentTuningId;
-    
-    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeTuning, currentId), NotificationType::dontSendNotification);
-    
+    lastId = selectedId;
 }
 
 
 void TuningPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
     Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-    tuning->editted = true;
-    DBG("************** tuning->edited = true");
-    
+
     tuning->setName(name);
 }
 
@@ -507,13 +491,11 @@ void TuningPreparationEditor::update(void)
 {
     if (processor.updateState->currentTuningId < 0) return;
     
-    fillSelectCB();
-    
     TuningPreparation::Ptr prep = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
     
     if (prep != nullptr)
     {
-        selectCB.setSelectedItemIndex(processor.updateState->currentTuningId, dontSendNotification);
+        selectCB.setSelectedId(processor.updateState->currentTuningId, dontSendNotification);
         scaleCB.setSelectedItemIndex(prep->getTuning(), dontSendNotification);
         fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
         offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
@@ -536,9 +518,6 @@ void TuningPreparationEditor::update(void)
 
 void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> values)
 {
-    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-    tuning->editted = true;
-    
     TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
     TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
  
@@ -563,9 +542,6 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
 
 void TuningPreparationEditor::BKSingleSliderValueChanged(String name, double val)
 {
-    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-    tuning->editted = true;
-    
     TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
     TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
     
@@ -588,9 +564,6 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(String name, double val
 
 void TuningPreparationEditor::buttonClicked (Button* b)
 {
-    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-    tuning->editted = true;
-    
     if (b == &A1Inversional)
     {
         DBG("setting A1Inversional " + String(A1Inversional.getToggleState()));
@@ -605,7 +578,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
     {
         DBG("resetting A1");
         
-        TuningProcessor::Ptr tProcessor = processor.gallery->getTuningProcessor(processor.updateState->currentTuningId);
+        TuningProcessor::Ptr tProcessor = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
         tProcessor->adaptiveReset();
     }
     else if (b == &hideOrShow)
@@ -624,7 +597,7 @@ TuningViewController(p, theGraph)
     A1reset.setVisible(false);
     greyOutAllComponents();
     
-    fillSelectCB();
+    fillSelectCB(-1,-1);
     selectCB.addMyListener(this);
     selectCB.addListener(this);
     scaleCB.addListener(this);
@@ -689,12 +662,11 @@ void TuningModificationEditor::update(void)
     
     if (mod != nullptr)
     {
-        fillSelectCB();
         
         greyOutAllComponents();
         highlightModedComponents();
         
-        selectCB.setSelectedItemIndex(processor.updateState->currentModTuningId, dontSendNotification);
+        selectCB.setSelectedId(processor.updateState->currentModTuningId, dontSendNotification);
         
         String val = mod->getParam(TuningScale);
         scaleCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
@@ -745,84 +717,68 @@ void TuningModificationEditor::update(void)
     
 }
 
-void TuningModificationEditor::fillSelectCB(void)
+void TuningModificationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
-    Array<int> index = processor.gallery->getIndexList(PreparationTypeTuningMod);
-    
-    for (int i = 0; i < index.size(); i++)
+    for (auto prep : processor.gallery->getTuningModPreparations())
     {
-        int Id = index[i];
-        String name = processor.gallery->getTuningModPreparation(Id)->getName();
-        if (name != String::empty)  selectCB.addItem(name, i+1);
-        else                        selectCB.addItem(String(i+1), i+1);
+        int Id = prep->getId();;
+        String name = prep->getName();
         
-        selectCB.setItemEnabled(i+1, true);
-        if (processor.updateState->isActive(PreparationTypeTuningMod, Id) &&
-            (Id != processor.updateState->currentModTuningId))
-        {
-            selectCB.setItemEnabled(i+1, false);
-        }
+        if (name != String::empty)  selectCB.addItem(name, Id);
+        else                        selectCB.addItem("TuningMod"+String(Id), Id);
+        
+        selectCB.setItemEnabled(Id, true);
+        if (processor.currentPiano->isActive(PreparationTypeTuning, Id))
+            selectCB.setItemEnabled(Id, false);
     }
     
+    if (last != 0)      selectCB.setItemEnabled(last, true);
+    if (current != 0)   selectCB.setItemEnabled(current, false);
+    
+    int selectedId = processor.updateState->currentTuningId;
+    
+    selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
+    
+    selectCB.setItemEnabled(selectedId, false);
+    
     selectCB.addSeparator();
-    selectCB.addItem("New tuning modification...", index.size()+1);
+    selectCB.addItem("New Tuning Mod...", -1);
     
-    int currentId = processor.updateState->currentModTuningId;
-    
-    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeTuningMod, currentId), NotificationType::dontSendNotification);
-    
+    lastId = selectedId;
 }
 
 void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
+    int index = box->getSelectedItemIndex();
+    int Id = box->getSelectedId();
     
     TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
     
     if (name == selectCB.getName())
     {
-        int index = box->getSelectedItemIndex();
-        
-        int oldId = processor.updateState->currentModTuningId;
-        int newId = processor.gallery->getIdFromIndex(PreparationTypeTuningMod, index);
-        
-        if (index == selectCB.getNumItems()-1)
+        if (Id == -1)
         {
-            processor.gallery->addTuningMod();
+            processor.gallery->add(PreparationTypeTuningMod);
             
-            processor.gallery->setEditted(PreparationTypeTuningMod, oldId, true);
-            
-            processor.gallery->getTuningModPreparations().getLast()->editted = true;
-            
-            newId = processor.gallery->getTuningModPreparations().getLast()->getId();
+            Id = processor.gallery->getTuningModPreparations().getLast()->getId();
         }
         
-        processor.updateState->currentModTuningId = newId;
-        
-        processor.updateState->removeActive(PreparationTypeTuningMod, oldId);
-
-        #if AUTO_DELETE
-        if (!processor.gallery->getTuningModPreparation(oldId)->editted)
-        {
-            processor.updateState->removePreparation(PreparationTypeTuningMod, oldId);
-            
-            processor.gallery->remove(PreparationTypeTuningMod, oldId);
-        }
-#endif
-        
-        processor.updateState->addActive(PreparationTypeTuningMod, newId);
+        processor.updateState->currentModTuningId = Id;
         
         processor.updateState->idDidChange = true;
         
-        fillSelectCB();
-        
         update();
+        
+        fillSelectCB(lastId, Id);
+        
+        lastId = Id;
     }
     else if (name == scaleCB.getName())
     {
-        mod->setParam(TuningScale, String(scaleCB.getSelectedItemIndex()));
+        mod->setParam(TuningScale, String(index));
         scaleCB.setAlpha(1.);
         
         Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
@@ -830,26 +786,26 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (name == fundamentalCB.getName())
     {
-        mod->setParam(TuningFundamental, String(fundamentalCB.getSelectedItemIndex()));
+        mod->setParam(TuningFundamental, String(index));
         fundamentalCB.setAlpha(1.);
         
-        customKeyboard.setFundamental(fundamentalCB.getSelectedItemIndex());
+        customKeyboard.setFundamental(index);
     }
     else if (name == A1IntervalScaleCB.getName())
     {
-        mod->setParam(TuningA1IntervalScale, String(A1IntervalScaleCB.getSelectedItemIndex()));
+        mod->setParam(TuningA1IntervalScale, String(index));
         A1IntervalScaleCB.setAlpha(1.);
         A1IntervalScaleLabel.setAlpha(1);
     }
     else if (name == A1AnchorScaleCB.getName())
     {
-        mod->setParam(TuningA1AnchorScale, String(A1AnchorScaleCB.getSelectedItemIndex()));
+        mod->setParam(TuningA1AnchorScale, String(index));
         A1AnchorScaleCB.setAlpha(1.);
         A1AnchorScaleLabel.setAlpha(1);
     }
     else if (name == A1FundamentalCB.getName())
     {
-        mod->setParam(TuningA1AnchorFundamental, String(A1FundamentalCB.getSelectedItemIndex()));
+        mod->setParam(TuningA1AnchorFundamental, String(index));
         A1FundamentalCB.setAlpha(1.);
     }
     
@@ -913,9 +869,6 @@ void TuningModificationEditor::BKSingleSliderValueChanged(String name, double va
 
 void TuningModificationEditor::updateModification(void)
 {
-    TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
-    mod->editted = true;
-    
     processor.updateState->modificationDidChange = true;
 }
 

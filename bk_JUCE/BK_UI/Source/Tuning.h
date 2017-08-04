@@ -243,82 +243,6 @@ private:
 };
 
 
-class TuningProcessor : public ReferenceCountedObject
-{
-public:
-    typedef ReferenceCountedObjectPtr<TuningProcessor>      Ptr;
-    typedef Array<TuningProcessor::Ptr>                     Arr;
-    typedef Array<TuningProcessor::Ptr, CriticalSection>    CSArr;
-    typedef OwnedArray<TuningProcessor>                          PtrArr;
-    typedef OwnedArray<TuningProcessor, CriticalSection>         CSPtrArr;
-    
-    TuningProcessor(TuningPreparation::Ptr active);
-    ~TuningProcessor();
-    
-    inline void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr;}
-    
-    //returns tuning offsets; add to integer PitchClass
-    float getOffset(int midiNoteNumber);
-    Array<float> getTuningOffsets(TuningSystem which) {return tuningLibrary.getUnchecked(which); }
-    
-    //for calculating adaptive tuning
-    void keyPressed(int midiNoteNumber);
-    
-    //for cluster timing
-    void processBlock(int numSamples);
-    
-    //for global tuning adjustment, A442, etc...
-    void setGlobalTuningReference(float tuningRef) { globalTuningReference = tuningRef;}
-    const float getGlobalTuningReference(void) const noexcept {return globalTuningReference;}
-    
-    float getLastNoteTuning() { return lastNoteTuning; }
-    float getLastIntervalTuning() { return lastIntervalTuning; }
-    
-    //reset adaptive tuning
-    void adaptiveReset();
-    
-private:
-    
-    Array<Array<float>> tuningLibrary;
-    TuningPreparation::Ptr active;
-    
-    float   intervalToRatio(float interval) const noexcept { return mtof(interval + 60.) / mtof(60.); }
-    float   lastNote[128];
-    float   globalTuningReference = 440.; //A440
-    
-    float lastNoteTuning;
-    float lastIntervalTuning;
-    
-    //adaptive tuning functions
-    float   adaptiveCalculate(int midiNoteNumber) const;
-    void    newNote(int midiNoteNumber, TuningSystem tuningType);
-    float   adaptiveCalculateRatio(int midiNoteNumber) const;
-    uint64  clusterTime;
-    
-    int     adaptiveFundamentalNote = 60; //moves with adaptive tuning
-    float   adaptiveFundamentalFreq = mtof(adaptiveFundamentalNote);
-    int     adaptiveHistoryCounter = 0;
-    
-    double sampleRate;
-    
-    
-    /* Array of all the default tunings
-     Just:       1/1,    16/15,  9/8,    6/5,   5/4,    4/3,    7/5,    3/2,    8/5,    5/3,    7/4,    15/8
-     Partial:    1/1,    16/15,  9/8,    7/6,   5/4,    4/3,    11/8,   3/2,    13/8,   5/3,    7/4,    11/6
-     Duodene:    1/1,    16/15,  9/8,    6/5,   5/4,    4/3,    45/32,  3/2,    8/5,    5/3,    16/9,   15/8
-     Otonal:     1/1,    17/16,  9/8,    19/16, 5/4,    21/16,  11/8,   3/2,    13/8,   27/16,  7/4,    15/8
-     Utonal:     1/1,    16/15,  8/7,    32/27, 16/13,  4/3,    16/11,  32/21,  8/5,    32/19,  16/9,   32/17
-     */
-    const Array<float> tEqualTuning       = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};
-    const Array<float> tJustTuning        = {0., .117313, .039101,  .156414, -.13686, -.019547, -.174873, .019547, .136864, -.15641, -.311745, -.11731};
-    const Array<float> tPartialTuning     = {0., .117313, .039101, -.331291, -.13686, -.019547, -.486824, .019547, .405273, -.15641, -.311745, -.506371};
-    const Array<float> tDuodeneTuning     = {0., .117313, .039101, .156414, -.13686, -.019547, -.097763, .019547, .136864, -.15641, -.039101, -.11731};
-    const Array<float> tOtonalTuning      = {0., .049553, .039101, -.02872, -.13686, -.292191, -.486824, .019547, .405273, .058647, -.311745, -.11731};
-    const Array<float> tUtonalTuning      = {0., .117313, .311745, .156414, -.405273, -.019547, .486824, .292191, .136864, .024847, -.039101,  -.049553};
-    
-    JUCE_LEAK_DETECTOR(TuningProcessor);
-};
-
 class Tuning : public ReferenceCountedObject
 {
     
@@ -335,27 +259,39 @@ public:
            BKUpdateState::Ptr us):
     sPrep(new TuningPreparation(prep)),
     aPrep(new TuningPreparation(sPrep)),
-    processor(new TuningProcessor(aPrep)),
     Id(Id),
     name(String(Id)),
-    updateState(us),
-    X(-1),Y(-1),
-    editted(false)
+    updateState(us)
     {
+        tuningLibrary.ensureStorageAllocated((int)cTuningSystemNames.size());
+        for(int i=0; i<cTuningSystemNames.size(); i++) tuningLibrary.insert(EqualTemperament, tEqualTuning);
         
+        tuningLibrary.set(PartialTuning, tPartialTuning);
+        tuningLibrary.set(JustTuning, tJustTuning);
+        tuningLibrary.set(EqualTemperament, tEqualTuning);
+        tuningLibrary.set(DuodeneTuning, tDuodeneTuning);
+        tuningLibrary.set(OtonalTuning, tOtonalTuning);
+        tuningLibrary.set(UtonalTuning, tUtonalTuning);
     }
     
     Tuning(int Id,
            BKUpdateState::Ptr us):
     Id(Id),
     name(String(Id)),
-    updateState(us),
-    X(-1),Y(-1),
-    editted(false)
+    updateState(us)
     {
         sPrep = new TuningPreparation();
         aPrep = new TuningPreparation(sPrep);
-        processor = new TuningProcessor(aPrep);
+        
+        tuningLibrary.ensureStorageAllocated((int)cTuningSystemNames.size());
+        for(int i=0; i<cTuningSystemNames.size(); i++) tuningLibrary.insert(EqualTemperament, tEqualTuning);
+        
+        tuningLibrary.set(PartialTuning, tPartialTuning);
+        tuningLibrary.set(JustTuning, tJustTuning);
+        tuningLibrary.set(EqualTemperament, tEqualTuning);
+        tuningLibrary.set(DuodeneTuning, tDuodeneTuning);
+        tuningLibrary.set(OtonalTuning, tOtonalTuning);
+        tuningLibrary.set(UtonalTuning, tUtonalTuning);
     };
     
     
@@ -364,23 +300,15 @@ public:
     
     ~Tuning() {};
     
-    void prepareToPlay(double sampleRate)
-    {
-        processor->setCurrentPlaybackSampleRate(sampleRate);
-    }
-    
     inline int getId() {return Id;};
     
     
     TuningPreparation::Ptr      sPrep;
     TuningPreparation::Ptr      aPrep;
-    TuningProcessor::Ptr        processor;
-    
     
     void reset()
     {
         aPrep->copy(sPrep);
-        processor->adaptiveReset();
         DBG("resetting tuning");
     }
     
@@ -400,14 +328,6 @@ public:
         updateState->tuningPreparationDidChange = true;
     }
     
-    inline void setPosition(int x, int y) { X=x;Y=y;}
-    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
-    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
-    inline void setX(int x) { X = x; }
-    inline void setY(int y) { Y = y; }
-    inline int getX(void) const noexcept { return X; }
-    inline int getY(void) const noexcept { return Y; }
-    
     Array<float> getCurrentScale()
     {
         if(aPrep->getTuning() == CustomTuning)
@@ -415,7 +335,8 @@ public:
             return aPrep->getCustomScale();
         }
         DBG("current tuning " + String(aPrep->getTuning()));
-        return processor->getTuningOffsets(aPrep->getTuning());
+        
+        return getTuningOffsets(aPrep->getTuning());
     }
     
     Array<float> getCurrentScaleCents()
@@ -430,14 +351,21 @@ public:
         return cScale;
     }
     
-    bool editted;
+    Array<Array<float>> tuningLibrary;
     
 private:
     int Id;
     String name;
     BKUpdateState::Ptr updateState;
     
-    int X,Y;
+    Array<float> getTuningOffsets(TuningSystem which) {return tuningLibrary.getUnchecked(which); }
+    
+    const Array<float> tEqualTuning       = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};
+    const Array<float> tJustTuning        = {0., .117313, .039101,  .156414, -.13686, -.019547, -.174873, .019547, .136864, -.15641, -.311745, -.11731};
+    const Array<float> tPartialTuning     = {0., .117313, .039101, -.331291, -.13686, -.019547, -.486824, .019547, .405273, -.15641, -.311745, -.506371};
+    const Array<float> tDuodeneTuning     = {0., .117313, .039101, .156414, -.13686, -.019547, -.097763, .019547, .136864, -.15641, -.039101, -.11731};
+    const Array<float> tOtonalTuning      = {0., .049553, .039101, -.02872, -.13686, -.292191, -.486824, .019547, .405273, .058647, -.311745, -.11731};
+    const Array<float> tUtonalTuning      = {0., .117313, .311745, .156414, -.405273, -.019547, .486824, .292191, .136864, .024847, -.039101,  -.049553};
     
     JUCE_LEAK_DETECTOR(Tuning)
 };
@@ -452,27 +380,10 @@ public:
     typedef OwnedArray<TuningModPreparation>                  Arr;
     typedef OwnedArray<TuningModPreparation, CriticalSection> CSArr;
     
-    /*
-     TuningId = 0,
-     TuningScale,
-     TuningFundamental,
-     TuningOffset,
-     TuningA1IntervalScale,
-     TuningA1Inversional,
-     TuningA1AnchorScale,
-     TuningA1AnchorFundamental,
-     TuningA1ClusterThresh,
-     TuningA1History,
-     TuningCustomScale,
-     TuningAbsoluteOffsets
-     */
-    
     TuningModPreparation(TuningPreparation::Ptr p, int Id):
-    Id(Id),
-    X(-1),Y(-1),
-    editted(false)
+    Id(Id)
     {
-        param.ensureStorageAllocated(cTuningParameterTypes.size());
+        param.ensureStorageAllocated((int)cTuningParameterTypes.size());
         
         param.set(TuningScale, String(p->getTuning()));
         param.set(TuningFundamental, String(p->getFundamental()));
@@ -490,9 +401,7 @@ public:
     
     
     TuningModPreparation(int Id):
-    Id(Id),
-    X(-1),Y(-1),
-    editted(false)
+    Id(Id)
     {
         param.set(TuningScale, "");
         param.set(TuningFundamental, "");
@@ -562,7 +471,7 @@ public:
         }
     }
     
-    ValueTree getState(int Id);
+    ValueTree getState(void);
     
     void setState(XmlElement*);
     
@@ -587,24 +496,75 @@ public:
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
 
-    inline void setPosition(int x, int y) { X=x;Y=y;}
-    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
-    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
-    inline void setX(int x) { X = x; }
-    inline void setY(int y) { Y = y; }
-    inline int getX(void) const noexcept { return X; }
-    inline int getY(void) const noexcept { return Y; }
-    
-    bool editted;
 private:
     int Id; 
     String name;
     StringArray          param;
     
-    int X,Y;
-    
     JUCE_LEAK_DETECTOR(TuningModPreparation);
 };
 
+class TuningProcessor : public ReferenceCountedObject
+{
+public:
+    typedef ReferenceCountedObjectPtr<TuningProcessor>      Ptr;
+    typedef Array<TuningProcessor::Ptr>                     PtrArr;
+    typedef Array<TuningProcessor::Ptr, CriticalSection>    CSArr;
+    typedef OwnedArray<TuningProcessor>                          Arr;
+    typedef OwnedArray<TuningProcessor, CriticalSection>         CSPtrArr;
+    
+    TuningProcessor(Tuning::Ptr tuning);
+    ~TuningProcessor();
+    
+    inline void prepareToPlay(double sr) { sampleRate = sr; }
+    
+    //returns tuning offsets; add to integer PitchClass
+    float getOffset(int midiNoteNumber);
+    
+    //for calculating adaptive tuning
+    void keyPressed(int midiNoteNumber);
+    
+    inline int getId(void) const noexcept { return tuning->getId(); }
+    
+    inline void setTuning(Tuning::Ptr newTuning) { tuning = newTuning;}
+    inline Tuning::Ptr getTuning(void) const noexcept { return tuning; }
+    
+    //for cluster timing
+    void processBlock(int numSamples);
+    
+    //for global tuning adjustment, A442, etc...
+    void setGlobalTuningReference(float tuningRef) { globalTuningReference = tuningRef;}
+    const float getGlobalTuningReference(void) const noexcept {return globalTuningReference;}
+    
+    float getLastNoteTuning() { return lastNoteTuning; }
+    float getLastIntervalTuning() { return lastIntervalTuning; }
+    
+    //reset adaptive tuning
+    void adaptiveReset();
+    
+private:
+    Tuning::Ptr tuning;
+    
+    float   intervalToRatio(float interval) const noexcept { return mtof(interval + 60.) / mtof(60.); }
+    float   lastNote[128];
+    float   globalTuningReference = 440.; //A440
+    
+    float lastNoteTuning;
+    float lastIntervalTuning;
+    
+    //adaptive tuning functions
+    float   adaptiveCalculate(int midiNoteNumber) const;
+    void    newNote(int midiNoteNumber, TuningSystem tuningType);
+    float   adaptiveCalculateRatio(int midiNoteNumber) const;
+    uint64  clusterTime;
+    
+    int     adaptiveFundamentalNote = 60; //moves with adaptive tuning
+    float   adaptiveFundamentalFreq = mtof(adaptiveFundamentalNote);
+    int     adaptiveHistoryCounter = 0;
+    
+    double sampleRate;
+    
+    JUCE_LEAK_DETECTOR(TuningProcessor);
+};
 
 #endif  // TUNING_H_INCLUDED

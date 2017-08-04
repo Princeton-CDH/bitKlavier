@@ -33,7 +33,6 @@ class BKOvertop :  public Component
 {
 public:
     BKOvertop (BKAudioProcessor& p, BKItemGraph* theGraph):
-    processor(p),
     gvc(p, theGraph),
     kvc(p, theGraph),
     tvc(p, theGraph),
@@ -45,7 +44,8 @@ public:
     ovcm(p, theGraph),
     svcm(p, theGraph),
     nvcm(p, theGraph),
-    dvcm(p, theGraph)
+    dvcm(p, theGraph),
+    processor(p)
     {
         
         addChildComponent(gvc);
@@ -142,8 +142,8 @@ public:
         if (type == DisplayKeymap)
         {
             addAndMakeVisible(&kvc);
+            kvc.fillSelectCB(-1,-1);
             kvc.update();
-            //kvc.update();
         }
         else if (type == DisplayGeneral)
         {
@@ -153,51 +153,61 @@ public:
         else if (type == DisplayTuning)
         {
             addAndMakeVisible(&tvc);
+            tvc.fillSelectCB(-1,-1);
             tvc.update();
         }
         else if (type == DisplayTempo)
         {
             addAndMakeVisible(&ovc);
+            ovc.fillSelectCB(-1,-1);
             ovc.update();
         }
         else if (type == DisplaySynchronic)
         {
             addAndMakeVisible(&svc);
+            svc.fillSelectCB(-1,-1);
             svc.update();
         }
         else if (type == DisplayNostalgic)
         {
             addAndMakeVisible(&nvc);
+            nvc.fillSelectCB(-1,-1);
             nvc.update();
         }
         else if (type == DisplayDirect)
         {
             addAndMakeVisible(&dvc);
+            dvc.fillSelectCB(-1,-1);
             dvc.update();
         }
         else if (type == DisplayTuningMod)
         {
             addAndMakeVisible(&tvcm);
+            tvcm.fillSelectCB(-1,-1);
             tvcm.update();
         }
         else if (type == DisplayTempoMod)
         {
             addAndMakeVisible(&ovcm);
+            ovcm.fillSelectCB(-1,-1);
             ovcm.update();
         }
         else if (type == DisplaySynchronicMod)
         {
             addAndMakeVisible(&svcm);
+            svcm.fillSelectCB(-1,-1);
             svcm.update();
         }
         else if (type == DisplayNostalgicMod)
         {
             addAndMakeVisible(&nvcm);
+            nvcm.fillSelectCB(-1,-1);
             nvcm.update();
         }
         else if (type == DisplayDirectMod)
         {
             addAndMakeVisible(&dvcm);
+            dvcm.fillSelectCB(-1,-1);
             dvcm.update();
         }
         

@@ -10,15 +10,16 @@
 
 #include "Synchronic.h"
 
-SynchronicProcessor::SynchronicProcessor(BKSynthesiser *s,
-                                         SynchronicPreparation::Ptr ap,
-                                         GeneralSettings::Ptr general,
-                                         int Id):
-Id(Id),
-synth(s),
+SynchronicProcessor::SynchronicProcessor(Synchronic::Ptr synchronic,
+                                         TuningProcessor::Ptr tuning,
+                                         TempoProcessor::Ptr tempo,
+                                         BKSynthesiser* main,
+                                         GeneralSettings::Ptr general):
+synth(main),
 general(general),
-active(ap),
-tuner(active->getTuning()->processor)
+synchronic(synchronic),
+tuner(tuning),
+tempo(tempo)
 {
     velocities.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -28,17 +29,6 @@ tuner(active->getTuning()->processor)
     
     clusterTimer = 0;
     phasor = 0;
-    
-    /*
-    atTimer = 0;
-    atLastTime = 0;
-    atDeltaHistory.ensureStorageAllocated(10);
-    for (int i = 0; i < 10; i++)
-    {
-        atDeltaHistory.insert(0, (60000.0/active->getTempo()));
-    }
-    adaptiveTempoPeriodMultiplier = 1.;
-    */
      
     inCluster = false;
     
@@ -57,7 +47,7 @@ SynchronicProcessor::~SynchronicProcessor()
 void SynchronicProcessor::setCurrentPlaybackSampleRate(double sr)
 {
     sampleRate = sr;
-    tuner->setCurrentPlaybackSampleRate(sr);
+    
 }
 
 
@@ -66,16 +56,16 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
     PianoSamplerNoteDirection noteDirection = Forward;
     float noteStartPos = 0.0;
     
-    float noteLength = (fabs(active->getLengthMultipliers()[lengthMultiplierCounter]) * active->getTempoControl()->aPrep->getBeatThreshMS());
-    //float noteLength = (fabs(active->getLengthMultipliers()[lengthMultiplierCounter]) * 50.0); //original way,  multiples of 50ms
+    float noteLength = (fabs(synchronic->aPrep->getLengthMultipliers()[lengthMultiplierCounter]) * tempo->getTempo()->aPrep->getBeatThreshMS());
+    //float noteLength = (fabs(synchronic->aPrep->getLengthMultipliers()[lengthMultiplierCounter]) * 50.0); //original way,  multiples of 50ms
     
-    if (active->getLengthMultipliers()[lengthMultiplierCounter] < 0)
+    if (synchronic->aPrep->getLengthMultipliers()[lengthMultiplierCounter] < 0)
     {
         noteDirection = Reverse;
         noteStartPos = noteLength;
     }
     
-    for (auto t : active->getTransposition()[transpCounter])
+    for (auto t : synchronic->aPrep->getTransposition()[transpCounter])
     {
         float offset = tuner->getOffset(note) + t;
         int synthNoteNumber = ((float)note + (int)offset);
@@ -86,25 +76,26 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
                      synthNoteNumber,
                      synthOffset,
                      velocity,
-                     active->getGain() * aGlobalGain * active->getAccentMultipliers()[accentMultiplierCounter],
+                     synchronic->aPrep->getGain() * aGlobalGain * synchronic->aPrep->getAccentMultipliers()[accentMultiplierCounter],
                      noteDirection,
                      FixedLengthFixedStart,
                      SynchronicNote,
-                     Id,
+                     synchronic->getId(),
                      noteStartPos, // start
                      noteLength,
                      3,
                      30);
     }
+    
 }
 
 void SynchronicProcessor::resetPhase(int skipBeats)
 {
     
-    beatMultiplierCounter   = skipBeats % active->getBeatMultipliers().size();
-    lengthMultiplierCounter = skipBeats % active->getLengthMultipliers().size();
-    accentMultiplierCounter = skipBeats % active->getAccentMultipliers().size();
-    transpCounter           = skipBeats % active->getTransposition().size();
+    beatMultiplierCounter   = skipBeats % synchronic->aPrep->getBeatMultipliers().size();
+    lengthMultiplierCounter = skipBeats % synchronic->aPrep->getLengthMultipliers().size();
+    accentMultiplierCounter = skipBeats % synchronic->aPrep->getAccentMultipliers().size();
+    transpCounter           = skipBeats % synchronic->aPrep->getTransposition().size();
     
     beatCounter = 0;
 
@@ -112,12 +103,8 @@ void SynchronicProcessor::resetPhase(int skipBeats)
 
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
-
-    //set tuning
-    tuner = active->getTuning()->processor;
-    
     //store velocity
-    if(!active->getReleaseVelocitySetsSynchronic()) velocities.set(noteNumber, velocity);
+    if(!synchronic->aPrep->getReleaseVelocitySetsSynchronic()) velocities.set(noteNumber, velocity);
  
     //add note to array of depressed notes
     keysDepressed.addIfNotAlreadyThere(noteNumber);
@@ -126,8 +113,8 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     //atNewNote();
     
     //silence pulses if in NoteOffSync
-    if(    (active->getMode() == LastNoteOffSync)
-        || (active->getMode() == AnyNoteOffSync))
+    if(    (synchronic->aPrep->getMode() == LastNoteOffSync)
+        || (synchronic->aPrep->getMode() == AnyNoteOffSync))
             shouldPlay = false;
     
     else shouldPlay = true;
@@ -143,18 +130,18 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
         cluster.clearQuick();
         
         //reset parameter counters; need to account for skipBeats
-        resetPhase(active->getBeatsToSkip());
+        resetPhase(synchronic->aPrep->getBeatsToSkip());
 
         //now we are in a cluster!
         inCluster = true;
         
     }
-    else if (active->getMode() == AnyNoteOnSync)
+    else if (synchronic->aPrep->getMode() == AnyNoteOnSync)
     {
         
         //reset phasor if in AnyNoteOnSync
         phasor = 0;
-        resetPhase(active->getBeatsToSkip());
+        resetPhase(synchronic->aPrep->getBeatsToSkip());
 
     }
     
@@ -166,7 +153,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     //later, we remove dupes so we don't inadvertently play the same note twice in a pulse
     
     cluster.insert(0, noteNumber);
-    if(cluster.size() > active->getClusterCap()) cluster.resize(active->getClusterCap());
+    if(cluster.size() > synchronic->aPrep->getClusterCap()) cluster.resize(synchronic->aPrep->getClusterCap());
     DBG("cluster size: " + String(cluster.size()) + " " + String(clusterThresholdSamples/sampleRate));
     
     //why not use clusterMax for this? the intent is different:
@@ -197,19 +184,19 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     
     // If AnyNoteOffSync mode, reset phasor and multiplier indices.
     //only initiate pulses if ALL keys are released
-    if (    (active->getMode() == LastNoteOffSync && keysDepressed.size() == 0)
-         || (active->getMode() == AnyNoteOffSync))
+    if (    (synchronic->aPrep->getMode() == LastNoteOffSync && keysDepressed.size() == 0)
+         || (synchronic->aPrep->getMode() == AnyNoteOffSync))
     {
         
-        if(active->getReleaseVelocitySetsSynchronic()) velocities.set(noteNumber, velocity);
+        if(synchronic->aPrep->getReleaseVelocitySetsSynchronic()) velocities.set(noteNumber, velocity);
         
-        resetPhase(active->getBeatsToSkip() - 1);
+        resetPhase(synchronic->aPrep->getBeatsToSkip() - 1);
         
         //start right away
         phasor =    beatThresholdSamples *
-                    active->getBeatMultipliers()[beatMultiplierCounter] *
+                    synchronic->aPrep->getBeatMultipliers()[beatMultiplierCounter] *
                     general->getPeriodMultiplier() *
-                    active->getTempoControl()->processor->getPeriodMultiplier();
+                    tempo->getPeriodMultiplier();
         
         
         inCluster = true;
@@ -220,17 +207,10 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
 
 void SynchronicProcessor::processBlock(int numSamples, int channel)
 {
-    
-    //adaptive tuning timer update
-    //tuner->incrementAdaptiveClusterTime(numSamples); //why are we doing this here? in all the preparations?
-    
-    //adaptive tempo timer update
-    //atTimer += numSamples;
-    
     //need to do this every block?
-    clusterThresholdSamples = (active->getClusterThreshSEC() * sampleRate);
-    //beatThresholdSamples = (active->getBeatThresh() * sampleRate);
-    beatThresholdSamples = (active->getTempoControl()->aPrep->getBeatThresh() * sampleRate);
+    clusterThresholdSamples = (synchronic->aPrep->getClusterThreshSEC() * sampleRate);
+    //beatThresholdSamples = (synchronic->aPrep->getBeatThresh() * sampleRate);
+    beatThresholdSamples = (tempo->getTempo()->aPrep->getBeatThresh() * sampleRate);
     
     //cluster management
     if (inCluster)
@@ -265,9 +245,9 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
         
         //get time until next beat => beat length scaled by beatMultiplier parameter
         numSamplesBeat =    beatThresholdSamples *
-                            active->getBeatMultipliers()[beatMultiplierCounter] *
+                            synchronic->aPrep->getBeatMultipliers()[beatMultiplierCounter] *
                             general->getPeriodMultiplier() *
-                            active->getTempoControl()->processor->getPeriodMultiplier();
+                            tempo->getPeriodMultiplier();
         
         //check to see if enough time has passed for next beat
         if (phasor >= numSamplesBeat)
@@ -277,19 +257,19 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             phasor -= numSamplesBeat;
             
             //increment parameter counters
-            if (++lengthMultiplierCounter   >= active->getLengthMultipliers().size())     lengthMultiplierCounter = 0;
-            if (++accentMultiplierCounter   >= active->getAccentMultipliers().size())     accentMultiplierCounter = 0;
-            if (++transpCounter             >= active->getTransposition().size())         transpCounter = 0;
+            if (++lengthMultiplierCounter   >= synchronic->aPrep->getLengthMultipliers().size())     lengthMultiplierCounter = 0;
+            if (++accentMultiplierCounter   >= synchronic->aPrep->getAccentMultipliers().size())     accentMultiplierCounter = 0;
+            if (++transpCounter             >= synchronic->aPrep->getTransposition().size())         transpCounter = 0;
             
             
             //update display of counters in UI
             /*
             DBG(" samplerate: " + String(sampleRate) +
-                " length: "         + String(active->getLengthMultipliers()[lengthMultiplierCounter]) +
+                " length: "         + String(synchronic->aPrep->getLengthMultipliers()[lengthMultiplierCounter]) +
                 " length counter: "  + String(lengthMultiplierCounter) +
-                " accent: "         + String(active->getAccentMultipliers()[accentMultiplierCounter]) +
+                " accent: "         + String(synchronic->aPrep->getAccentMultipliers()[accentMultiplierCounter]) +
                 " accent counter: " + String(accentMultiplierCounter) +
-                " transp: "         + "{ "+floatArrayToString(active->getTransposition()[transpCounter]) + " }" +
+                " transp: "         + "{ "+floatArrayToString(synchronic->aPrep->getTransposition()[transpCounter]) + " }" +
                 " transp counter: " + String(transpCounter)
                 );
             */
@@ -298,19 +278,19 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             bool playCluster = false;
             
             //in the normal case, where cluster is within a range defined by clusterMin and Max
-            if(active->getClusterMin() <= active->getClusterMax())
+            if(synchronic->aPrep->getClusterMin() <= synchronic->aPrep->getClusterMax())
             {
-                if (cluster.size() >= active->getClusterMin() && cluster.size() <= active->getClusterMax())
+                if (cluster.size() >= synchronic->aPrep->getClusterMin() && cluster.size() <= synchronic->aPrep->getClusterMax())
                     playCluster = true;
             }
             //the inverse case, where we only play cluster that are *outside* the range set by clusterMin and Max
             else
             {
-                if (cluster.size() >= active->getClusterMin() || cluster.size() <= active->getClusterMax())
+                if (cluster.size() >= synchronic->aPrep->getClusterMin() || cluster.size() <= synchronic->aPrep->getClusterMax())
                     playCluster = true;
             }
      
-            //if (cluster.size() >= active->getClusterMin() && cluster.size() <= active->getClusterMax())
+            //if (cluster.size() >= synchronic->aPrep->getClusterMin() && cluster.size() <= synchronic->aPrep->getClusterMax())
             if(playCluster)
             {
                 //for (int n = slimCluster.size(); --n >= 0;)
@@ -329,12 +309,12 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             }
             
             //increment beat and beatMultiplier counters, for next beat; check maxes and adjust
-            if (++beatMultiplierCounter >= active->getBeatMultipliers().size()) beatMultiplierCounter = 0;
-            if (++beatCounter >= active->getNumBeats()) shouldPlay = false; //done with pulses
+            if (++beatMultiplierCounter >= synchronic->aPrep->getBeatMultipliers().size()) beatMultiplierCounter = 0;
+            if (++beatCounter >= synchronic->aPrep->getNumBeats()) shouldPlay = false; //done with pulses
             
             //update display of beat counter in UI
             /*
-            DBG(" beat length: "    + String(active->getBeatMultipliers()[beatMultiplierCounter]) +
+            DBG(" beat length: "    + String(synchronic->aPrep->getBeatMultipliers()[beatMultiplierCounter]) +
                 " beatMultiplier counter: "   + String(beatMultiplierCounter)
                 );
             DBG(" ");
@@ -360,11 +340,11 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
     
     while(beatsToSkip-- > 0)
     {
-        if (++myBeat >= active->getBeatMultipliers().size()) myBeat = 0;
-        timeToReturn += active->getBeatMultipliers()[myBeat] *
+        if (++myBeat >= synchronic->aPrep->getBeatMultipliers().size()) myBeat = 0;
+        timeToReturn += synchronic->aPrep->getBeatMultipliers()[myBeat] *
                         beatThresholdSamples *
                         general->getPeriodMultiplier() *
-                        active->getTempoControl()->processor->getPeriodMultiplier();
+                        tempo->getPeriodMultiplier();
                         //adaptiveTempoPeriodMultiplier;
     }
     
@@ -378,41 +358,41 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
 //adaptive tempo functions
 void SynchronicProcessor::atNewNote()
 {
-    if(active->getAdaptiveTempo1Mode() == TimeBetweenNotes) atCalculatePeriodMultiplier();
+    if(synchronic->aPrep->getAdaptiveTempo1Mode() == TimeBetweenNotes) atCalculatePeriodMultiplier();
     atLastTime = atTimer;
 }
 
 void SynchronicProcessor::atNewNoteOff()
 {
-    if(active->getAdaptiveTempo1Mode() == NoteLength) atCalculatePeriodMultiplier();
+    if(synchronic->aPrep->getAdaptiveTempo1Mode() == NoteLength) atCalculatePeriodMultiplier();
 }
 
 //really basic, using constrained moving average of time-between-notes (or note-length)
 void SynchronicProcessor::atCalculatePeriodMultiplier()
 {
     //only do if history val is > 0
-    if(active->getAdaptiveTempo1History()) {
+    if(synchronic->aPrep->getAdaptiveTempo1History()) {
         
         atDelta = (atTimer - atLastTime) / (0.001 * sampleRate);
         //DBG("atDelta = " + String(atDelta));
         
         //constrain be min and max times between notes
-        if(atDelta > active->getAdaptiveTempo1Min() && atDelta < active->getAdaptiveTempo1Max()) {
+        if(atDelta > synchronic->aPrep->getAdaptiveTempo1Min() && atDelta < synchronic->aPrep->getAdaptiveTempo1Max()) {
             
             //insert delta at beginning of history
             atDeltaHistory.insert(0, atDelta);
             
             //eliminate oldest time difference
-            atDeltaHistory.resize(active->getAdaptiveTempo1History());
+            atDeltaHistory.resize(synchronic->aPrep->getAdaptiveTempo1History());
             
             //calculate moving average and then tempo period multiplier
             int totalDeltas = 0;
             for(int i = 0; i < atDeltaHistory.size(); i++) totalDeltas += atDeltaHistory.getUnchecked(i);
-            float movingAverage = totalDeltas / active->getAdaptiveTempo1History();
+            float movingAverage = totalDeltas / synchronic->aPrep->getAdaptiveTempo1History();
             
             adaptiveTempoPeriodMultiplier = movingAverage /
                                             (beatThresholdSamples / (0.001 * sampleRate)) /
-                                            active->getAdaptiveTempo1Subdivisions();
+                                            synchronic->aPrep->getAdaptiveTempo1Subdivisions();
             
             DBG("adaptiveTempoPeriodMultiplier = " + String(adaptiveTempoPeriodMultiplier));
         }
@@ -421,9 +401,9 @@ void SynchronicProcessor::atCalculatePeriodMultiplier()
 
 void SynchronicProcessor::atReset()
 {
-    for (int i = 0; i < active->getAdaptiveTempo1History(); i++)
+    for (int i = 0; i < synchronic->aPrep->getAdaptiveTempo1History(); i++)
     {
-        //atDeltaHistory.insert(0, (60000.0/active->getTempo()));
+        //atDeltaHistory.insert(0, (60000.0/synchronic->aPrep->getTempo()));
     }
     adaptiveTempoPeriodMultiplier = 1.;
 }

@@ -174,6 +174,7 @@ typedef enum PitchClass {
     GFlat = FSharp,
     AFlat = GSharp,
     BFlat = ASharp,
+    PitchClassNil
 } PitchClass;
 
 #pragma mark - Synthesiser/Sampler
@@ -219,6 +220,16 @@ typedef enum BKPreparationType {
     PreparationTypePiano,
     BKPreparationTypeNil
 } BKPreparationType;
+
+inline BKPreparationType modToPrepType(BKPreparationType modType)
+{
+    return ((modType >= PreparationTypeDirectMod && modType <= PreparationTypeTempoMod) ? (BKPreparationType)(modType - 6) : BKPreparationTypeNil);
+}
+
+inline BKPreparationType prepToModType(BKPreparationType modType)
+{
+    return ((modType >= PreparationTypeDirect && modType <= PreparationTypeTempo) ? (BKPreparationType)(modType + 6) : BKPreparationTypeNil);
+}
 
 
 static const std::vector<std::string> cPreparationTypes = {
@@ -313,7 +324,7 @@ static const std::vector<std::string> cPianoName = {
     
 };
 
-static const int aMaxNumPianos = cPianoName.size();
+static const int aMaxNumPianos = (int)cPianoName.size();
 
 
 static const std::vector<std::string> cPrepMapName= {
@@ -331,7 +342,7 @@ static const std::vector<std::string> cPrepMapName= {
     "PrepMap12"
 };
 
-static const int aMaxNumPreparationKeymaps = cPrepMapName.size();
+static const int aMaxNumPreparationKeymaps = (int)cPrepMapName.size();
 
 typedef enum BKParameterDataType
 {
@@ -395,25 +406,24 @@ static const std::vector<std::string> cSynchronicSyncModes = {
 
 typedef enum SynchronicParameterType {
     SynchronicId = 0,
-    SynchronicTuning,
-    SynchronicTempo,
     SynchronicNumPulses,
     SynchronicClusterMin,
     SynchronicClusterMax,
     SynchronicClusterThresh,
     SynchronicMode,
     SynchronicBeatsToSkip,
-    SynchronicBeatMultipliers,
-    SynchronicLengthMultipliers,
-    SynchronicAccentMultipliers,
     SynchronicTranspOffsets,
+    SynchronicAccentMultipliers,
+    SynchronicLengthMultipliers,
+    SynchronicBeatMultipliers,
     SynchronicGain,
+    SynchronicTuning,
+    SynchronicTempo,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
+
 static const std::vector<BKParameterDataType> cSynchronicDataTypes = {
-    BKInt,
-    BKInt,
     BKInt,
     BKInt,
     BKInt,
@@ -421,44 +431,46 @@ static const std::vector<BKParameterDataType> cSynchronicDataTypes = {
     BKFloat,
     BKInt,
     BKInt,
-    BKFloatArr,
-    BKFloatArr,
-    BKFloatArr,
     BKArrFloatArr,
-    BKFloat
+    BKFloatArr,
+    BKFloatArr,
+    BKFloatArr,
+    BKFloat,
+    BKInt,
+    BKInt,
 };
 
 static const std::vector<std::string> cSynchronicParameterTypes = {
     "Synchronic Id",
-    "Tuning Id",
-    "Tempo Id",
     "NumPulses",
     "ClusterMin",
     "ClusterMax",
     "ClusterThresh",
     "Mode",
     "BeatsToSkip",
-    "beat length multipliers",
-    "sustain length multipliers",
-    "accents",
     "transpositions",
-    "gain"
+    "accents",
+    "sustain length multipliers",
+    "beat length multipliers",
+    "gain",
+    "Tuning Id",
+    "Tempo Id"
 };
 
 static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc = {
     {0., 0, 0, 0}, //min, max, default, increment, skew
-    {0., 0, 0, 0},
-    {0., 0, 0, 0},
     {1., 100, 1, 1.0},
     {1, 4, 1, 1.0},
     {2, 8, 8, 1.0},
     {20, 2000, 500, 10.0},
     {0, 0, 0},
     {0, 4, 0, 1.0},
+    {-12, 12, 0, 0.01},
     {0.1, 2, 1, 0.001},
     {-2, 2, 1, 0.001},
     {0., 2., 1, 0.001},
-    {-12, 12, 0, 0.01}
+    {0., 0, 0, 0},
+    {0., 0, 0, 0},
 };
 
 #pragma mark - Nostalgic
@@ -475,7 +487,6 @@ static const std::vector<std::string> cNostalgicSyncModes = {
 
 typedef enum NostalgicParameterType {
     NostalgicId = 0,
-    NostalgicTuning,
     NostalgicWaveDistance,
     NostalgicUndertow,
     NostalgicTransposition,
@@ -484,6 +495,7 @@ typedef enum NostalgicParameterType {
     NostalgicBeatsToSkip,
     NostalgicMode,
     NostalgicSyncTarget,
+    NostalgicTuning,
     NostalgicParameterTypeNil
     
 } NostalgicParameterType;
@@ -493,10 +505,10 @@ static const std::vector<BKParameterDataType> cNostalgicDataTypes =
     BKInt,
     BKInt,
     BKInt,
-    BKInt,
     BKFloatArr,
     BKFloat,
     BKFloat,
+    BKInt,
     BKInt,
     BKInt,
     BKInt
@@ -504,7 +516,6 @@ static const std::vector<BKParameterDataType> cNostalgicDataTypes =
 
 static const std::vector<std::string> cNostalgicParameterTypes = {
     "Nostalgic Id",
-    "Tuning Id",
     "WaveDistance",
     "Undertow",
     "Transposition",
@@ -512,18 +523,19 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
     "LengthMult",
     "BeatsToSkip",
     "Length Mode",
-    "SyncTarget"
+    "SyncTarget",
+    "Tuning Id"
 };
 
 #pragma mark - Direct
 typedef enum DirectParameterType
 {
     DirectId = 0,
-    DirectTuning,
     DirectTransposition,
     DirectGain,
     DirectResGain,
     DirectHammerGain,
+    DirectTuning,
     DirectParameterTypeNil,
     
 } DirectParameterType;
@@ -531,20 +543,20 @@ typedef enum DirectParameterType
 
 static const std::vector<BKParameterDataType> cDirectDataTypes = {
     BKInt,
-    BKInt,
     BKFloatArr,
     BKFloat,
     BKFloat,
-    BKFloat
+    BKFloat,
+    BKInt
 };
 
 static const std::vector<std::string> cDirectParameterTypes = {
     "Direct Id",
-    "Tuning Id",
     "Transposition",
     "Gain",
     "ResGain",
-    "HammerGain"
+    "HammerGain",
+    "Tuning Id"
 };
 
 #pragma mark - Tuning

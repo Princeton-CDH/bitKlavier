@@ -133,51 +133,6 @@ private:
     JUCE_LEAK_DETECTOR(TempoPreparation);
 };
 
-
-class TempoProcessor  : public ReferenceCountedObject
-{
-    
-public:
-    typedef ReferenceCountedObjectPtr<TempoProcessor>   Ptr;
-    typedef Array<TempoProcessor::Ptr>                  PtrArr;
-    typedef Array<TempoProcessor::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<TempoProcessor>                  Arr;
-    typedef OwnedArray<TempoProcessor,CriticalSection>  CSArr;
-    
-    TempoProcessor(TempoPreparation::Ptr active);
-    
-    ~TempoProcessor();
-    
-    void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr; /*DBG("setting tempo sample rate " + String(sampleRate));*/}
-    
-    void processBlock(int numSamples, int channel);
-    void keyPressed(int noteNumber, float velocity);
-    void keyReleased(int noteNumber, int channel);
-    inline float getPeriodMultiplier(void)              {return adaptiveTempoPeriodMultiplier;}
-    inline float getAdaptedTempo(void)                  {return active->getTempo() / adaptiveTempoPeriodMultiplier;}
-    
-    void  reset();
-    
-private:
-    int Id;
-    GeneralSettings::Ptr general;
-    TempoPreparation::Ptr active;
-    
-    double sampleRate;
-    
-    //adaptive tempo stuff
-    uint64 atTimer, atLastTime; //in samples
-    int atDelta;                //in ms
-    Array<int> atDeltaHistory;  //in ms
-    void atNewNote();
-    void atNewNoteOff();
-    void atCalculatePeriodMultiplier();
-    float adaptiveTempoPeriodMultiplier;
-
-    
-    JUCE_LEAK_DETECTOR(TempoProcessor);
-};
-
 class Tempo : public ReferenceCountedObject
 {
     
@@ -194,12 +149,9 @@ public:
           BKUpdateState::Ptr us):
     sPrep(new TempoPreparation(prep)),
     aPrep(new TempoPreparation(sPrep)),
-    processor(new TempoProcessor(aPrep)),
     Id(Id),
     name(String(Id)),
-    updateState(us),
-    X(-1),Y(-1),
-    editted(false)
+    updateState(us)
     {
         
     }
@@ -208,46 +160,34 @@ public:
           BKUpdateState::Ptr us):
     Id(Id),
     name(String(Id)),
-    updateState(us),
-    X(-1),Y(-1),
-    editted(false)
+    updateState(us)
     {
         sPrep = new TempoPreparation();
         aPrep = new TempoPreparation(sPrep);
-        processor = new TempoProcessor(aPrep);
     }
-    
-    void prepareToPlay(double sampleRate)
-    {
-        processor->setCurrentPlaybackSampleRate(sampleRate);
-    }
-    
     
     inline ValueTree getState(void)
     {
-        ValueTree prep(vtagTempo + String(Id));
+        ValueTree prep(vtagTempo);
         
-        prep.setProperty( ptagTempo_Id,                    Id, 0);
+        prep.setProperty( "Id",Id, 0);
         prep.setProperty( "name",                          name, 0);
-        prep.setProperty( ptagTempo_tempo,                 sPrep->getTempo(), 0);
         prep.setProperty( ptagTempo_system,                sPrep->getTempoSystem(), 0);
         prep.setProperty( ptagTempo_at1Mode,               sPrep->getAdaptiveTempo1Mode(), 0 );
         prep.setProperty( ptagTempo_at1History,            sPrep->getAdaptiveTempo1History(), 0 );
         prep.setProperty( ptagTempo_at1Subdivisions,       sPrep->getAdaptiveTempo1Subdivisions(), 0 );
         prep.setProperty( ptagTempo_at1Min,                sPrep->getAdaptiveTempo1Min(), 0 );
         prep.setProperty( ptagTempo_at1Max,                sPrep->getAdaptiveTempo1Max(), 0 );
-        
-        prep.setProperty( posX, X, 0);
-        prep.setProperty( posY, Y, 0);
-        
+    
         return prep;
     }
     
     inline void setState(XmlElement* e)
     {
-        editted = true;
         
         float f; int i;
+        
+        Id = e->getStringAttribute("Id").getIntValue();
         
         String n = e->getStringAttribute("name");
         
@@ -276,14 +216,6 @@ public:
         f = e->getStringAttribute(ptagTempo_at1Max).getFloatValue();
         sPrep->setAdaptiveTempo1Max(f);
         
-        n = e->getStringAttribute(posX);
-        if (n != String::empty) X = n.getIntValue();
-        else                    X = -1;
-        
-        n = e->getStringAttribute(posY);
-        if (n != String::empty) Y = n.getIntValue();
-        else                    Y = -1;
-        
         
         aPrep->copy(sPrep);
     }
@@ -295,14 +227,11 @@ public:
     
     TempoPreparation::Ptr      sPrep;
     TempoPreparation::Ptr      aPrep;
-    TempoProcessor::Ptr        processor;
     
     
     void reset()
     {
         aPrep->copy(sPrep);
-        processor->reset();
-        DBG("resetting tempo");
     }
     
     inline void copy(Tempo::Ptr from)
@@ -318,24 +247,13 @@ public:
         name = newName;
         updateState->tempoPreparationDidChange = true;
     }
-    
-    inline void setPosition(int x, int y) { X=x;Y=y;}
-    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
-    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
-    inline void setX(int x) { X = x; }
-    inline void setY(int y) { Y = y; }
-    inline int getX(void) const noexcept { return X; }
-    inline int getY(void) const noexcept { return Y; }
-    
-    bool editted;
+
 private:
     int Id;
     String name;
     
     BKUpdateState::Ptr updateState;
-    
-    int X,Y;
-    
+
     JUCE_LEAK_DETECTOR(Tempo)
 };
 
@@ -361,11 +279,9 @@ public:
      */
     
     TempoModPreparation(TempoPreparation::Ptr p, int Id):
-    Id(Id),
-    X(-1),Y(-1),
-    editted(false)
+    Id(Id)
     {
-        param.ensureStorageAllocated(cTempoParameterTypes.size());
+        param.ensureStorageAllocated((int)cTempoParameterTypes.size());
         
         param.set(TempoBPM, String(p->getTempo()));
         param.set(TempoSystem, String(p->getTempoSystem()));
@@ -379,9 +295,7 @@ public:
     
     
     TempoModPreparation(int Id):
-    Id(Id),
-    X(-1),Y(-1),
-    editted(false)
+    Id(Id)
     {
         param.set(TempoBPM, "");
         param.set(TempoSystem, "");
@@ -436,13 +350,20 @@ public:
         }
     }
     
-    inline void setId(int newId) { Id = newId; }
+    
+    inline void setId(int newId)
+    {
+        Id = newId;
+    }
+    
     inline int getId(void) const noexcept { return Id; }
     
-    inline ValueTree getState(int Id)
+    inline ValueTree getState(void)
     {
         
-        ValueTree prep(vtagModTempo + String(Id));
+        ValueTree prep(vtagModTempo);
+        
+        prep.setProperty( "Id",Id, 0);
         
         prep.setProperty("name",name,0);
         
@@ -474,7 +395,11 @@ public:
     
     inline void setState(XmlElement* e)
     {
+        
+        Id = e->getStringAttribute("Id").getIntValue();
+        
         String n = e->getStringAttribute("name");
+        
         
         if (n != String::empty)     name = n;
         else                        name = "mm"+String(Id);
@@ -524,27 +449,64 @@ public:
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
     
-    inline void setPosition(int x, int y) { X=x;Y=y;}
-    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
-    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
-    inline void setX(int x) { X = x; }
-    inline void setY(int y) { Y = y; }
-    inline int getX(void) const noexcept { return X; }
-    inline int getY(void) const noexcept { return Y; }
-    
-    bool editted;
-    
 private:
     int Id;
     String name;
     StringArray          param;
     
-    int X,Y;
-    
-    
-    
-    
     JUCE_LEAK_DETECTOR(TempoModPreparation);
+};
+
+class TempoProcessor  : public ReferenceCountedObject
+{
+    
+public:
+    typedef ReferenceCountedObjectPtr<TempoProcessor>   Ptr;
+    typedef Array<TempoProcessor::Ptr>                  PtrArr;
+    typedef Array<TempoProcessor::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<TempoProcessor>                  Arr;
+    typedef OwnedArray<TempoProcessor,CriticalSection>  CSArr;
+    
+    TempoProcessor(Tempo::Ptr tempo);
+    
+    ~TempoProcessor();
+    
+    void processBlock(int numSamples, int channel);
+    void keyPressed(int noteNumber, float velocity);
+    void keyReleased(int noteNumber, int channel);
+    inline float getPeriodMultiplier(void)              {return adaptiveTempoPeriodMultiplier;}
+    inline float getAdaptedTempo(void)                  {return tempo->aPrep->getTempo() / adaptiveTempoPeriodMultiplier;}
+    
+    void  reset();
+
+    inline int getId(void) const noexcept { return tempo->getId(); }
+    
+    inline void setTempo(Tempo::Ptr newTempo) { tempo = newTempo;}
+    inline Tempo::Ptr getTempo(void) const noexcept { return tempo; }
+    
+    inline void prepareToPlay(double sr)
+    {
+        sampleRate = sr;
+    }
+    
+private:
+    GeneralSettings::Ptr general;
+    
+    Tempo::Ptr tempo;
+    
+    double sampleRate;
+    
+    //adaptive tempo stuff
+    uint64 atTimer, atLastTime; //in samples
+    int atDelta;                //in ms
+    Array<int> atDeltaHistory;  //in ms
+    void atNewNote();
+    void atNewNoteOff();
+    void atCalculatePeriodMultiplier();
+    float adaptiveTempoPeriodMultiplier;
+    
+    
+    JUCE_LEAK_DETECTOR(TempoProcessor);
 };
 
 

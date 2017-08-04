@@ -407,7 +407,7 @@ String HeaderViewController::processmodificationMapString(const String& s)
                 // Set piano map parameters.
                 // keys | mod id | prepIds
                 
-                ModificationMapper::Ptr thisMapper = new ModificationMapper(type, whichMod, keys, whichPreps);
+                ItemMapper::Ptr thisMapper = new ItemMapper(type, whichMod, keys, whichPreps);
                 processor.currentPiano->addMapper(thisMapper);
                 processor.currentPiano->configureModification(thisMapper);
 

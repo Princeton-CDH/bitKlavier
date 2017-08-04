@@ -28,7 +28,6 @@ void BKEditableComboBox::mouseDoubleClick (const MouseEvent &event)
 
 void BKEditableComboBox::textEditorReturnKeyPressed(TextEditor& textEditor)
 {
-    
     nameEditor.toBack();
     nameEditor.setAlpha(0.);
 
@@ -42,7 +41,6 @@ void BKEditableComboBox::textEditorReturnKeyPressed(TextEditor& textEditor)
         
         changeItemText(lastItemId, textEditor.getText());
         setSelectedId(lastItemId, dontSendNotification);
-        
     }
 }
 

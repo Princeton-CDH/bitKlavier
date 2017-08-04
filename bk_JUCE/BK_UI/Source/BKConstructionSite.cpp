@@ -15,17 +15,13 @@
 
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
 BKDraggableComponent(false,false,false),
+altDown(false),
 processor(p),
 graph(theGraph),
 connect(false),
 lastX(10),
-lastY(10),
-altDown(false)
+lastY(10)
 {
-    addKeyListener(this);
-    
-    setWantsKeyboardFocus(true);
-    
     graph->deselectAll();
 }
 
@@ -36,13 +32,6 @@ BKConstructionSite::~BKConstructionSite(void)
 
 void BKConstructionSite::redraw(void)
 {
-    BKItem::RCArr items = graph->getAllItems();
-    
-    for (auto item : items)
-    {
-        graph->removeUI(item);
-    }
-    
     removeAllChildren();
     
     graph->reconstruct();
@@ -50,7 +39,6 @@ void BKConstructionSite::redraw(void)
     graph->deselectAll();
     
     draw();
-    
 }
 
 void BKConstructionSite::move(int which, bool fine)
@@ -153,14 +141,14 @@ void BKConstructionSite::paint(Graphics& g)
     
     if (connect)
     {
-        g.setColour(Colours::goldenrod);
+        g.setColour(Colours::lightgrey);
         g.drawLine(lineOX, lineOY, lineEX, lineEY, 3);
     }
     
     for (auto line : graph->getLines())
     {
         g.setColour(Colours::goldenrod);
-        g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY(), 3);
+        g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY(), 2);
     }
 }
 
@@ -171,31 +159,34 @@ void BKConstructionSite::itemIsBeingDragged(BKItem* thisItem, Point<int> startPo
 
 void BKConstructionSite::pianoMapDidChange(BKItem* thisItem)
 {
-    graph->update(PreparationTypePianoMap, thisItem->getId());
+    processor.currentPiano->configure();
 }
 
 void BKConstructionSite::draw(void)
 {
+#if AUTO_DRAW
     int keymapCount = 0, prepCount = 0, otherCount = 0, modCount = 0, ttCount = 0;
-    
-#if AUTO_DRAW 
     processor.currentPiano->configuration->clear();
 #endif
     
-    for (auto item : graph->getAllItems())
+    for (auto item : graph->getItems())
     {
+        addAndMakeVisible(item);
+      
+#if AUTO_DRAW
+        
         BKPreparationType type = item->getType();
         int which = item->getId();
         
-        Point<int> xy = processor.currentPiano->configuration->getXY(type, which);
+        Point<int> xy = item->getPosition();
+        
+        DBG("itemxy: " + String(item->getX()) + " " + String(item->getY()));
         
         int x = xy.x; int y = xy.y;
         
-        DBG("DRAW X: " + String(x) + " Y: " + String(y));
-        
         if (type == PreparationTypeKeymap)
         {
-#if AUTO_DRAW
+
             int col = (int)(keymapCount / NUM_COL);
             int row = keymapCount % NUM_COL;
             
@@ -205,15 +196,15 @@ void BKConstructionSite::draw(void)
             item->setTopLeftPosition(X, Y);
             
             keymapCount++;
-#else
+
             
-            item->setTopLeftPosition(x, y);
-#endif
+            item->setTopLeftPosition(xy);
+
             
         }
         else if (type <= PreparationTypeNostalgic)
         {
-#if AUTO_DRAW
+
             int col = (int)(prepCount / NUM_COL);
             int row = prepCount % NUM_COL;
             
@@ -223,14 +214,12 @@ void BKConstructionSite::draw(void)
             item->setTopLeftPosition(X, Y);
             
             prepCount++;
-#else
-            item->setTopLeftPosition(x, y);
-#endif
+
             
         }
         else if (type == PreparationTypeTuning || type == PreparationTypeTempo)
         {
-#if AUTO_DRAW
+
             int col = (int)(ttCount / NUM_COL);
             int row = ttCount % NUM_COL;
             
@@ -241,13 +230,11 @@ void BKConstructionSite::draw(void)
             item->setTopLeftPosition(X, Y);
             
             ttCount++;
-#else
-            item->setTopLeftPosition(x, y);
-#endif
+
         }
         else if (type > PreparationTypeKeymap)
         {
-#if AUTO_DRAW
+
             int col = (int)(modCount / NUM_COL);
             int row = modCount % NUM_COL;
             
@@ -258,13 +245,11 @@ void BKConstructionSite::draw(void)
             item->setTopLeftPosition(X, Y);
             
             modCount++;
-#else
-            item->setTopLeftPosition(x, y);
-#endif
+
         }
         else
         {
-#if AUTO_DRAW
+
             int col = (int)(otherCount / NUM_COL);
             int row = otherCount % NUM_COL;
             
@@ -274,24 +259,11 @@ void BKConstructionSite::draw(void)
             item->setTopLeftPosition(X, Y);
             
             otherCount++;
-#else
-            item->setTopLeftPosition(x, y);
-#endif
+
             
         }
-        
-        addAndMakeVisible(item);
-    }
-    
-    for (auto item : graph->getAllItems())
-    {
-#if AUTO_DRAW
-        processor.currentPiano->configuration->addItem(item->getType(), item->getId());
 #endif
-        processor.currentPiano->configuration->setItemXY(item->getType(), item->getId(), item->getX(), item->getY());
     }
-    
-    processor.currentPiano->configuration->print();
     
     repaint();
 }
@@ -315,9 +287,7 @@ void BKConstructionSite::prepareItemDrag(BKItem* item, const MouseEvent& e, bool
 }
 void BKConstructionSite::deleteItem (BKItem* item)
 {
-    processor.currentPiano->configuration->removeItem(item->getType(), item->getId());
-    
-    graph->remove(item);
+    graph->removeAndUnregisterItem(item);
     
     removeChildComponent(item);
 }
@@ -333,15 +303,19 @@ void BKConstructionSite::addItem(BKPreparationType type)
         processor.gallery->addTypeWithId(type, thisId);
     }
     
-    BKItem::Ptr toAdd = new BKItem(type, thisId, processor);
+    BKItem* toAdd = new BKItem(type, thisId, processor);
+    
+    if (type == PreparationTypePianoMap)
+    {
+        toAdd->setPianoTarget(processor.currentPiano->getId());
+        toAdd->configurePianoCB();
+    }
     
     toAdd->setTopLeftPosition(lastX, lastY);
-    
-    processor.currentPiano->configuration->addItem(type, thisId, lastX, lastY);
-    
+
     lastX += 10; lastY += 10;
     
-    graph->add(toAdd);
+    graph->addAndRegisterItem(toAdd);
     
     addAndMakeVisible(toAdd);
 }
@@ -364,7 +338,7 @@ void BKConstructionSite::addItemsFromClipboard(void)
         
         BKPreparationType type = item->getType();
         
-        if (processor.updateState->isActive(type, thisId))
+        if (item->isActive())
         {
             thisId = processor.gallery->getNewId(type);
             
@@ -383,10 +357,7 @@ void BKConstructionSite::addItemsFromClipboard(void)
             toAdd->setTopLeftPosition(lastX+item->position.x-firstX, lastY+item->position.y-firstY);
         }
         
-        graph->add(toAdd);
-        
-        for (auto connection : toAdd->getConnections())
-            graph->connect(toAdd, connection);
+        graph->addAndRegisterItem(toAdd);
         
         addAndMakeVisible(toAdd);
         
@@ -508,6 +479,10 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
         
         addAndMakeVisible(lasso = new LassoComponent<BKItem*>());
         
+        lasso->setAlpha(0.5);
+        lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoFillColourId, Colours::lightgrey);
+        lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoOutlineColourId, Colours::white);
+        
         lasso->beginLasso(eo, this);
     }
     
@@ -522,7 +497,6 @@ void BKConstructionSite::mouseDrag (const MouseEvent& e)
     
     if (!connect && !e.mods.isShiftDown())
     {
-        bool resizeX = false, resizeY = false;
         for (auto item : graph->getSelectedItems())
         {
             item->performDrag(e);
@@ -531,8 +505,6 @@ void BKConstructionSite::mouseDrag (const MouseEvent& e)
     
     lineEX = e.getEventRelativeTo(this).x;
     lineEY = e.getEventRelativeTo(this).y;
-    
-    DBG("DRAG: "+String(lineEX) + " " +String(lineEY));
     
     repaint();
 
@@ -566,7 +538,6 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
         if (itemTarget != nullptr)
         {
             graph->connect(itemSource, itemTarget);
-            graph->drawLine(lineOX, lineOY, X, Y);
         }
         
         connect = false;
@@ -576,50 +547,19 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
     {
         if (item->isDragging)
         {
-            int X = item->getX(); int Y = item->getY();
-            DBG("SET X: " + String(X) + " Y: " + String(Y));
-            processor.currentPiano->configuration->setItemXY(item->getType(), item->getId(), X, Y);
             item->isDragging = false;
         }
     }
-    
-    processor.currentPiano->configuration->print();
     
     repaint();
     
 }
 
-void BKConstructionSite::reconfigureCurrentItem(void)
-{
-    BKPreparationType type = currentItem->getType();
-    
-    BKItem::PtrArr connections;
-    
-    for (auto item : currentItem->getConnections())
-    {
-        graph->reconnect(currentItem, item);
-    }
-}
-
-void BKConstructionSite::removeItem(BKPreparationType type, int Id)
-{
-    
-}
-
 void BKConstructionSite::idDidChange(void)
 {
+    if (currentItem == NULL) return;
+    
     BKPreparationType type = currentItem->getType();
-    int oldId = currentItem->getId();
-    
-    BKItem::PtrArr connections;
-    
-    // DISCONNECT
-    for (auto item : currentItem->getConnections())
-    {
-        connections.add(item);
-        
-        graph->disconnect(currentItem, item);
-    }
     
     // GET NEW ID
     int newId = -1;
@@ -637,28 +577,8 @@ void BKConstructionSite::idDidChange(void)
     else if (type == PreparationTypeTempoMod)       newId = processor.updateState->currentModTempoId;
     
     currentItem->setId(newId);
-    
-    // RECONNECT
-    for (auto item : connections)   graph->connectWithoutCreatingNew(currentItem, item);
-    
-    // CONFIGURATION
-    Point<int> oldXY = processor.currentPiano->configuration->getXY(type, oldId);
-    processor.currentPiano->configuration->removeItem(type, oldId);
-    processor.currentPiano->configuration->addItem(type, newId, oldXY.x, oldXY.y);
-    
-    // ACTIVE
-    processor.updateState->removeActive(type, oldId);
-    processor.updateState->addActive(type, newId);
 
-    processor.currentPiano->configuration->print();
-    
-    
-}
-
-
-bool BKConstructionSite::keyPressed (const KeyPress& e, Component*)
-{
-    
+    processor.currentPiano->configure();
 }
 
 BKItem* BKConstructionSite::getItemAtPoint(const int X, const int Y)
@@ -669,7 +589,7 @@ BKItem* BKConstructionSite::getItemAtPoint(const int X, const int Y)
     {
         int which = 0;
         
-        for (auto item : graph->getAllItems())
+        for (auto item : graph->getItems())
         {
             int left = item->getX(); int right = left + item->getWidth();
             int top = item->getY(); int bottom = top + item->getHeight();
@@ -694,7 +614,7 @@ void BKConstructionSite::findLassoItemsInArea (Array <BKItem*>& itemsFound,
     
     // psuedocode determine if collide: if (x1 + w1) - x2 >= 0 and (x2 + w2) - x1 >= 0
     
-    for (auto item : graph->getAllItems())
+    for (auto item : graph->getItems())
     {
         int itemX = item->getX(); int itemWidth = item->getWidth();
         int itemY = item->getY(); int itemHeight = item->getHeight();

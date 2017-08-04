@@ -190,7 +190,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     }
     else
     {
-        int tempwidth;
+        int tempwidth = 0;
  
         bigInvisibleSlider = new BKSubSlider(Slider::LinearBar,
                                                 sliderMin,

@@ -15,16 +15,17 @@
 #include "BKComponent.h"
 #include "BKListener.h"
 
-#include "PluginProcessor.h"
+#include "ItemMapper.h"
 
-#include "Preparation.h"
+class BKAudioProcessor;
 
-class BKItem : public BKDraggableComponent, public ReferenceCountedObject, public BKListener
+
+class BKItem : public ItemMapper, public BKDraggableComponent, public BKListener
 {
 public:
-    typedef ReferenceCountedObjectPtr<BKItem>   Ptr;
-    typedef Array<BKItem::Ptr>                  PtrArr;
     typedef ReferenceCountedArray<BKItem>       RCArr;
+    typedef ReferenceCountedObjectPtr<BKItem>   Ptr;
+    typedef Array<Ptr>                          PtrArr;
     
     BKItem(BKPreparationType type, int Id, BKAudioProcessor& p);
     
@@ -35,79 +36,180 @@ public:
     void paint(Graphics& g) override;
     
     void resized(void) override;
-
-    void addConnection(BKItem* item);
-    
-    bool compare(BKItem* item);
-    
-    bool isConnectedWith(BKItem* item);
-    
-    void removeConnection(BKItem* toDisconnect);
     
     void itemIsBeingDragged(const MouseEvent&, Point<int>) override;
     
     void keyPressedWhileSelected(const KeyPress&) override;
 
-    inline String getName(void) { return name; }
-    
-    void setType(BKPreparationType type, bool create);
-    
-
-    inline BKPreparationType getType(void) const noexcept { return type; }
-    
-    inline void setId(int newId ) { Id = newId; }
-    
-    inline int getId() const noexcept { return Id; }
+    void setItemType(BKPreparationType type, bool create);
     
     inline void setSelected(bool select) {isSelected = select; repaint();}
     inline bool getSelected(void) { return isSelected;}
     
-    inline BKItem::PtrArr getConnections(void) const noexcept
+    inline void setConnections(BKItem::PtrArr newConnections)
     {
-        return connections;
+        connections = newConnections;
     }
     
-    inline BKItem::PtrArr getModifications(void) const noexcept
+    inline void addConnection(BKItem::Ptr item)
     {
-        return modifications;
+        if (!isConnectedTo(item))   connections.add(item);
     }
     
-    inline void print(void)
+    inline void addConnections(BKItem::PtrArr theseItems)
     {
-        DBG("PREPARATIONZ type: " + String(type) + " Id: " + String(Id));
+        for (auto item : theseItems)
+        {
+            if (!isConnectedTo(item)) connections.add(item);
+        }
+    }
+    
+    
+    inline void removeConnection(BKPreparationType type, int Id)
+    {
+        for (int i = connections.size(); --i >= 0;)
+        {
+            if ((connections.getUnchecked(i)->getType() == type) && (connections.getUnchecked(i)->getId() == Id))
+            {
+                connections.remove(i);
+                break;
+            }
+        }
+    }
+    
+    inline void removeConnection(BKItem::Ptr thisItem)
+    {
+        int index = 0;
         for (auto item : connections)
         {
-            DBG(cPreparationTypes[type]+((Id >= 0) ? String(Id) : "") +
-                " ==> " +
-                cPreparationTypes[item->getType()]+((item->getId() >= 0) ? String(item->getId()) : ""));
+            if (item == thisItem) connections.remove(index);
+            
+            index++;
+        }
+    }
+    
+    inline bool isConnectedTo(BKPreparationType type, int Id)
+    {
+        for (auto item : connections)
+        {
+            if (item->getType() == type && item->getId() == Id)
+            {
+                return true;
+            }
         }
         
-        mapper->print();
+        return false;
     }
     
-    inline ModificationMapper::Ptr getMapper() const noexcept { return mapper; }
-    inline void setMapper(ModificationMapper::Ptr map) {mapper = map; }
-    
-    inline int getSelectedPianoId(void) const noexcept {return currentId;}
-    inline void setSelectedPianoId(int Id)
+    inline bool isConnectedTo(BKItem::Ptr thisItem)
     {
-        menu.setSelectedItemIndex(Id, dontSendNotification);
-    }
-    
-    
-    
-    inline Point<int> getItemPosition(void)
-    {
-        return getPosition();
-    }
-    
-    inline void setItemBounds(int X, int Y, int width, int height)
-    {
-        setBounds(X,Y,width,height);
+        for (auto item : connections)
+        {
+            if ((item->getType() == thisItem->getType()) && (item->getId() == thisItem->getId()))
+            {
+                return true;
+            }
+        }
         
-        DBG("SET X: " + String(X) + " Y: " + String(Y));
+        return false;
+    }
+    
+    inline void changeIdOfConnection(BKPreparationType type, int oldId, int newId)
+    {
+        for (auto item : connections)
+        {
+            if (item->getType() == type && item->getId() == oldId)
+            {
+                item->setId(newId);
+                break;
+            }
+        }
+    }
+    
+    inline bool isConnectedToAnyPreparation(void)
+    {
+        BKItem::PtrArr theseItems;
         
-        processor.currentPiano->configuration->setItemXY(type, Id, X, Y);
+        for (auto item : connections)
+        {
+            if (item->getType() >= PreparationTypeDirect && item->getType() <= PreparationTypeTempo)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    inline BKItem::PtrArr getConnectionsOfType(BKPreparationType type)
+    {
+        BKItem::PtrArr theseItems;
+        
+        for (auto item : connections)
+        {
+            if (item->getType() == type) theseItems.add(item);
+        }
+        
+        return theseItems;
+    }
+    
+    inline Array<int> getConnectionIdsOfType(BKPreparationType type)
+    {
+        Array<int> theseItems;
+        
+        for (auto item : connections)
+        {
+            if (item->getType() == type) theseItems.add(item->getId());
+        }
+        
+        return theseItems;
+    }
+    
+    inline BKItem::PtrArr getConnections(void) const noexcept { return connections; }
+    
+    inline Array<Array<int>> getConnectionIds(void)
+    {
+        Array<Array<int>> connectionIds;
+        
+        for (int i = 0; i < BKPreparationTypeNil; i++)
+        {
+            Array<int> theseItems = getConnectionIdsOfType((BKPreparationType)i);
+            connectionIds.add(theseItems);
+        }
+        return connectionIds;
+    }
+    
+    
+    inline String connectionsToString(void)
+    {
+        String s = "";
+        for (int type = 0; type < BKPreparationTypeNil; type++)
+        {
+            BKItem::PtrArr connex = getConnectionsOfType((BKPreparationType)type);
+            
+            s += cPreparationTypes[type]+":";
+            
+            for (auto item : connex)
+            {
+                s += " " + String(item->getId());
+            }
+        }
+        return s;
+    }
+    
+    ValueTree getState(void);
+    void setState(XmlElement* xml);
+    
+    inline void clearConnections(void)
+    {
+        connections.clear();
+    }
+    
+    inline void clearConnectionsOfType(BKPreparationType type)
+    {
+        for (int i = connections.size(); --i >= 0;)
+        {
+            if (connections.getUnchecked(i)->getType() == type) connections.remove(i);
+        }
     }
     
     void copy(BKItem::Ptr);
@@ -128,26 +230,19 @@ public:
     
     void setImage(Image newImage);
     
-    Array<Array<int>> connex;
+    void configurePianoCB(void);
     
 private:
     BKAudioProcessor& processor;
     Label label;
-    BKComboBox menu; int currentId;
-    Component fullChild;
+    
+    // Piano menu
+    BKComboBox menu;
     
     BKItem::PtrArr connections;
-    BKItem::PtrArr modifications;
     
-    BKPreparationType type;
-    int Id;
-    
-    ModificationMapper::Ptr mapper;
-    
-    String name;
-    
-    
-
+    // UI stuff
+    Component fullChild;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKItem)
 };
@@ -165,28 +260,25 @@ public:
     {
         
     }
+
+    BKItem::Ptr get(BKPreparationType type, int Id);
     
+    void addAndRegisterItem(BKItem* item);
+    void addItem(BKItem* item);
+    void registerItem(BKItem* item);
     
-    BKItem* itemWithTypeAndId(BKPreparationType type, int Id);
-    BKItem* get(BKPreparationType type, int Id);
-    void add(BKItem* itemToAdd);
+    void removeItem(BKItem* thisItem);
+    void unregisterItem(BKItem* thisItem);
+    void removeAndUnregisterItem(BKItem* thisItem);
+    
     bool contains(BKItem* thisItem);
-    bool containsItemWithTypeAndId(BKPreparationType type, int Id);
-    void remove(BKItem* itemToRemove);
-    void remove(BKPreparationType type, int Id);
-    void removeUI(BKItem* itemToRemove);
-    void removeKeymap(BKItem* itemToRemove);
+    bool contains(BKPreparationType type, int Id);
+    
     void clear(void);
-    void connectUI(BKItem* item1, BKItem* item2);
-    void disconnectUI(BKItem* item1, BKItem* item2);
+    
     void connect(BKItem* item1, BKItem* item2);
-    void connectWithoutCreatingNew(BKItem* item1, BKItem* item2);
     void disconnect(BKItem* item1, BKItem* item2);
     
-    void reconnect(BKItem* item1, BKItem* item2);
-    
-    void update(BKPreparationType type, int which);
-    void updateMod(BKPreparationType modType, int modId);
     
     void reconstruct(void);
     
@@ -195,7 +287,7 @@ public:
         return (BKPreparationType)(type+6);
     }
     
-
+    bool isValidConnection(BKPreparationType type1, BKPreparationType type2);
     
     inline void select(BKItem* item)
     {
@@ -229,15 +321,11 @@ public:
         return selectedItems;
     }
     
-    inline BKItem::RCArr getAllItems(void) const noexcept
+    inline BKItem::RCArr getItems(void)
     {
         return items;
     }
     
-    inline BKItem* getItemAtXY(int x, int y) const noexcept
-    {
-        
-    }
     
     inline Array<int> getPreparationIds(BKItem::PtrArr theseItems)
     {
@@ -248,12 +336,7 @@ public:
     }
     
     
-    Array<Line<float>> getLines(void);
-    
-    inline void drawLine(float ox, float oy, float ex, float ey)
-    {
-        //lines.add(Line<float>(ox,oy,ex,ey));
-    }
+    Array<Line<int>> getLines(void);
     
     inline void print(void)
     {
@@ -265,46 +348,21 @@ public:
         DBG("\n~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n");
     }
     
-    void updateLast(void);
-    
     void updateClipboard(void);
-    
-    inline void setClipboad(BKItem::PtrArr theseItems)
-    {
-        
-    }
-    
-    inline BKItem::RCArr getLast(void) const noexcept { return last; }
-    
+
     BKItem::RCArr clipboard;
-    
-    
-    int itemIdCount;
     
 private:
     BKAudioProcessor& processor;
+    
     BKItem::RCArr items;
-    
-    BKItem::RCArr last;
-    
-    BKItem::RCArr preparations;
-    
+
     void addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId);
-    void removePreparationFromKeymap(BKPreparationType thisType, int thisId, int keymapId);
-    void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
-    void linkSynchronicWithTempo(Synchronic::Ptr synchronic, Tempo::Ptr thisTempo);
-    void linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic);
-    
-    void route(bool connect, bool reconfigure, BKItem* item1, BKItem* item2);
-    
-    void disconnectTuningFromSynchronic(BKItem* item);
-    void disconnectTuningFromNostalgic(BKItem* item);
-    void disconnectTuningFromDirect(BKItem* item);
-    void disconnectTempoFromSynchronic(BKItem* synchronicItem);
-    void disconnectSynchronicFromNostalgic(BKItem* thisItem);
     
     JUCE_LEAK_DETECTOR(BKItemGraph)
 };
+
+
 
 
 

@@ -104,10 +104,7 @@ public:
     
     void performDrag(const MouseEvent& e)
     {
-        int X = e.x, Y = e.y;
-        
         dragger.dragComponent (this, e, nullptr);
-
     }
     
 protected:
@@ -167,6 +164,7 @@ private:
         {
             keyPressedWhileSelected(e);
         }
+        return true;
     }
     
     ComponentBoundsConstrainer constrainer;

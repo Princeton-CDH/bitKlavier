@@ -10,13 +10,15 @@
 
 #include "Gallery.h"
 
-Gallery::Gallery(ScopedPointer<XmlElement> xml):
+#include "PluginProcessor.h"
+
+Gallery::Gallery(ScopedPointer<XmlElement> xml, BKAudioProcessor& p):
+processor(p),
 url(String::empty)
 {
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
-        idCount.add(-1);
-        idIndexList.set(i,Array<int>());
+        idCount.add(10);
     }
     
     general = new GeneralSettings();
@@ -24,69 +26,25 @@ url(String::empty)
     setStateFromXML(xml);
 }
 
-Gallery::Gallery(ScopedPointer<XmlElement> xml, BKSynthesiser* m, BKSynthesiser* r, BKSynthesiser* h, BKUpdateState::Ptr state):
-updateState(state),
-main(m),
-res(r),
-hammer(h),
+Gallery::Gallery(var myJson, BKAudioProcessor& p):
+processor(p),
 url(String::empty)
 {
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
-        idCount.add(-1);
-        idIndexList.set(i,Array<int>());
-    }
-    
-    general = new GeneralSettings();
-
-    setStateFromXML(xml);
-}
-
-Gallery::Gallery(var myJson):
-url(String::empty)
-{
-    for (int i = 0; i < BKPreparationTypeNil; i++)
-    {
-        idCount.add(-1);
-        idIndexList.set(i,Array<int>());
+        idCount.add(10);
     }
     
     general = new GeneralSettings();
 
     setStateFromJson(myJson);
-}
-
-Gallery::Gallery(var myJson, BKSynthesiser* m, BKSynthesiser* r, BKSynthesiser* h, BKUpdateState::Ptr state):
-updateState(state),
-main(m),
-res(r),
-hammer(h),
-url(String::empty)
-{
-    for (int i = 0; i < BKPreparationTypeNil; i++)
-    {
-        idCount.add(-1);
-        idIndexList.set(i,Array<int>());
-    }
-    
-    general = new GeneralSettings();
-    
-    setStateFromJson(myJson);
-    
 }
 
 void Gallery::prepareToPlay (double sampleRate)
 {
     bkSampleRate = sampleRate;
     
-    for (int i = bkPianos.size(); --i >= 0;) bkPianos[i]->prepareToPlay(bkSampleRate);
-    
-    for (int i = tuning.size(); --i >= 0;)      tuning[i]->prepareToPlay(bkSampleRate);
-    for (int i = tempo.size(); --i >= 0;)       tempo[i]->prepareToPlay(bkSampleRate);
-    for (int i = synchronic.size(); --i >= 0;)  synchronic[i]->prepareToPlay(bkSampleRate);
-    for (int i = nostalgic.size(); --i >= 0;)   nostalgic[i]->prepareToPlay(bkSampleRate);
-    for (int i = direct.size(); --i >= 0;)      direct[i]->prepareToPlay(bkSampleRate);
-    
+    for (auto piano : bkPianos)     piano->prepareToPlay(bkSampleRate);
 }
 
 Gallery::~Gallery()

@@ -10,8 +10,6 @@
 
 #include "BKUpdateState.h"
 
-#include "Preparation.h"
-
 #include "Keymap.h"
 
 #include "Tuning.h"
@@ -23,6 +21,8 @@
 #include "Piano.h"
 
 #include "Gallery.h"
+
+#include "ItemMapper.h"
 
 
 #define USE_SYNCHRONIC_TWO 0

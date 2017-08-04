@@ -3,8 +3,6 @@
 #include "PluginEditor.h"
 #include "BKPianoSampler.h"
 
-#include "Reset.h"
-
 #define NOST_KEY_OFF 1
 
 //==============================================================================
@@ -28,9 +26,6 @@ resonanceReleaseSynth()
     {
         noteOn.set(i, false);
     }
-    
-    
-    
 }
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -70,7 +65,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
     
     // Check PianoMap for whether piano should change due to key strike.
     int whichPiano = currentPiano->pianoMap[noteNumber];
-    if (whichPiano >= 0 && whichPiano != currentPiano->getId())
+    if (whichPiano > 0 && whichPiano != currentPiano->getId())
     {
         DBG("change piano to " + String(whichPiano));
         setCurrentPiano(whichPiano);
@@ -124,8 +119,8 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     if(numSamples != levelBuf.getNumSamples()) levelBuf.setSize(buffer.getNumChannels(), numSamples);
     
     // Process all active prep maps in current piano
-    for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-        currentPiano->activePMaps[p]->processBlock(numSamples, m.getChannel());
+    for (auto pmap : currentPiano->activePMaps)
+        pmap->processBlock(numSamples, m.getChannel());
     
     for(int i=0; i<notesOnUI.size(); i++)
     {
@@ -149,54 +144,11 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         
         if (m.isNoteOn())
         {
-            /*
-            ++noteOnCount;
-            noteOn.set(noteNumber, true);
-            
-            if (allNotesOff)   allNotesOff = false;
-            
-            // Check PianoMap for whether piano should change due to key strike.
-            int whichPiano = currentPiano->pianoMap[noteNumber] - 1;
-            if (whichPiano >= 0 && whichPiano != currentPiano->getId())
-            {
-                DBG("change piano to " + String(whichPiano));
-                setCurrentPiano(whichPiano);
-            }
-            
-            // modifications
-            performResets(noteNumber);
-            performModifications(noteNumber);
-            
-            //tempo
-            
-            // Send key on to each pmap in current piano
-            for (p = currentPiano->activePMaps.size(); --p >= 0;) {
-                //DBG("noteon: " +String(noteNumber) + " pmap: " + String(p));
-                currentPiano->activePMaps[p]->keyPressed(noteNumber, velocity, channel);
-            }
-             */
             handleNoteOn(noteNumber, velocity, channel);
         }
         else if (m.isNoteOff())
         {
-            /*
-            noteOn.set(noteNumber, false);
-            
-            // Send key off to each pmap in current piano
-            for (p = currentPiano->activePMaps.size(); --p >= 0;)
-                currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel);
-            
-            // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
-            for (p = prevPianos.size(); --p >= 0;) {
-                for (pm = prevPianos[p]->activePMaps.size(); --pm >= 0;) {
-                    prevPianos[p]->activePMaps[pm]->postRelease(noteNumber, velocity, channel);
-                }
-            }
-            
-            --noteOnCount;
-             */
             handleNoteOff(noteNumber, velocity, channel);
-            
         }
         else if (m.isController())
         {
@@ -263,7 +215,6 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     
     currentPiano = gallery->getPiano(which);
     
-    updateState->pianoDidChange = true;
     updateState->pianoDidChangeForGraph = true;
     updateState->synchronicPreparationDidChange = true;
     updateState->nostalgicPreparationDidChange = true;
@@ -271,7 +222,7 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     updateState->tempoPreparationDidChange = true;
     updateState->tuningPreparationDidChange = true;
     
-    gallery->setCurrentPiano(which);
+    gallery->setDefaultPiano(which);
 }
 
 
@@ -364,7 +315,6 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == DirectGain)        active->setGain(modf);
         else if (type == DirectHammerGain)  active->setHammerGain(modf);
         else if (type == DirectResGain)     active->setResonanceGain(modf);
-        else if (type == DirectTuning)      active->setTuning(gallery->getTuning(modi));
         
         
         updateState->directPreparationDidChange = true;
@@ -388,7 +338,6 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == NostalgicBeatsToSkip)      active->setBeatsToSkip(modf);
         else if (type == NostalgicWaveDistance)     active->setWaveDistance(modi);
         else if (type == NostalgicLengthMultiplier) active->setLengthMultiplier(modf);
-        else if (type == NostalgicTuning)           active->setTuning(gallery->getTuning(modi));
         
         updateState->nostalgicPreparationDidChange = true;
     }
@@ -405,7 +354,6 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modia = sMod[i]->getModIntArr();
         
         if (type == SynchronicTranspOffsets)            active->setTransposition(modafa);
-        else if (type == SynchronicTempo)               active->setTempoControl(gallery->getTempo(modi));
         else if (type == SynchronicMode)                active->setMode((SynchronicSyncMode)modi);
         else if (type == SynchronicClusterMin)          active->setClusterMin(modi);
         else if (type == SynchronicClusterMax)          active->setClusterMax(modi);
@@ -493,7 +441,7 @@ void BKAudioProcessor::loadGalleryDialog(void)
         {
             currentGallery = myFile.getFileName();
             
-            gallery = new Gallery(xml, &mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, updateState);
+            gallery = new Gallery(xml, *this);
             
             initializeGallery();
             
@@ -514,7 +462,9 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
     {
         currentGallery = myFile.getFileName();
         
-        gallery = new Gallery(xml, &mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, updateState);
+        gallery = new Gallery(xml, *this);
+        
+        gallery->print();
         
         initializeGallery();
         
@@ -538,7 +488,7 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
         
         var myJson = JSON::parse(myFile);
         
-        gallery = new Gallery(myJson, &mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, updateState);
+        gallery = new Gallery(myJson, *this);
         
         initializeGallery();
         
@@ -549,11 +499,12 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
 
 void BKAudioProcessor::initializeGallery(void)
 {
-    gallery->prepareToPlay(bkSampleRate);
+    prevPiano = gallery->getPiano(1);
+    currentPiano = gallery->getPiano(1);
     
-    prevPiano = gallery->getPiano(0);
-    currentPiano = gallery->getPiano(gallery->getCurrentPiano());
-    DBG("initializing current piano " + currentPiano->getName());
+    for (auto piano : gallery->getPianos()) piano->configure();
+    
+    gallery->prepareToPlay(bkSampleRate);
     
     updateUI();
     
@@ -568,7 +519,7 @@ void BKAudioProcessor::loadJsonGalleryFromPath(String path)
     
     var myJson = JSON::parse(myFile);
     
-    gallery = new Gallery(myJson, &mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, updateState);
+    gallery = new Gallery(myJson, *this);
     
     initializeGallery();
     

@@ -145,7 +145,7 @@ void NostalgicViewController::fillModeSelectCB(void)
 NostalgicPreparationEditor::NostalgicPreparationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
 NostalgicViewController(p, theGraph)
 {
-    fillSelectCB();
+    fillSelectCB(-1,-1);
     
     nDisplaySlider.addMyListener(this);
     selectCB.addListener(this);
@@ -163,9 +163,6 @@ NostalgicViewController(p, theGraph)
 
 void NostalgicPreparationEditor::BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow)
 {
-    Nostalgic::Ptr nostalgic = processor.gallery->getNostalgic(processor.updateState->currentNostalgicId);
-    nostalgic->editted = true;
-    
     NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
     NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
     
@@ -179,7 +176,6 @@ void NostalgicPreparationEditor::BKWaveDistanceUndertowSliderValueChanged(String
 void NostalgicPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
     Nostalgic::Ptr nostalgic = processor.gallery->getNostalgic(processor.updateState->currentNostalgicId);
-    nostalgic->editted = true;
     
     nostalgic->setName(name);
 }
@@ -195,7 +191,7 @@ void NostalgicPreparationEditor::update(void)
         nDisplaySlider.setWaveDistance(prep->getWavedistance(), dontSendNotification);
         nDisplaySlider.setUndertow(prep->getUndertow(), dontSendNotification);
         
-        selectCB.setSelectedItemIndex(processor.updateState->currentNostalgicId, dontSendNotification);
+        selectCB.setSelectedId(processor.updateState->currentNostalgicId, dontSendNotification);
         lengthModeSelectCB.setSelectedItemIndex(prep->getMode(), dontSendNotification);
         
         //transpositionSlider->setValue(prep->getTransposition(), dontSendNotification);
@@ -217,8 +213,6 @@ void NostalgicPreparationEditor::update(void)
 
     }
     
-    fillSelectCB();
-    
 }
 
 void NostalgicPreparationEditor::bkMessageReceived (const String& message)
@@ -232,56 +226,35 @@ void NostalgicPreparationEditor::bkMessageReceived (const String& message)
 void NostalgicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
+    int Id = box->getSelectedId();
+    int index = box->getSelectedItemIndex();
     
     if (name == "Nostalgic")
     {
-        int index = box->getSelectedItemIndex();
-        
-        int oldId = processor.updateState->currentNostalgicId;
-        int newId = processor.gallery->getIdFromIndex(PreparationTypeNostalgic, index);
-        
-        if (index == selectCB.getNumItems()-1)
+        if (Id == selectCB.getNumItems()-1)
         {
-            processor.gallery->addNostalgic();
+            processor.gallery->add(PreparationTypeNostalgic);
             
-            processor.gallery->setEditted(PreparationTypeNostalgic, oldId, true);
-            
-            processor.gallery->getAllNostalgic().getLast()->editted = true;
-            
-            newId = processor.gallery->getAllNostalgic().getLast()->getId();
+            Id = processor.gallery->getAllNostalgic().getLast()->getId();
         }
         
-        processor.updateState->currentNostalgicId = newId;
-        
-        processor.updateState->removeActive(PreparationTypeNostalgic, oldId);
-        
-        #if AUTO_DELETE
-        if (!processor.gallery->getNostalgic(oldId)->editted)
-        {
-            processor.updateState->removePreparation(PreparationTypeNostalgic, oldId);
-            
-            processor.gallery->remove(PreparationTypeNostalgic, oldId);
-        }
-#endif
-        
-        processor.updateState->addActive(PreparationTypeNostalgic, newId);
+        processor.updateState->currentNostalgicId = Id;
         
         processor.updateState->idDidChange = true;
         
-        fillSelectCB();
-        
         update();
+        
+        fillSelectCB(lastId, Id);
+        
+        lastId = Id;
     }
     else if (name == "Length Mode")
     {
-        Nostalgic::Ptr nostalgic = processor.gallery->getNostalgic(processor.updateState->currentNostalgicId);
-        nostalgic->editted = true;
-        
         NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
         NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
         
-        prep    ->setMode((NostalgicSyncMode) box->getSelectedItemIndex());
-        active  ->setMode((NostalgicSyncMode) box->getSelectedItemIndex());
+        prep    ->setMode((NostalgicSyncMode) index);
+        active  ->setMode((NostalgicSyncMode) index);
         
         if(prep->getMode() == NoteLengthSync)
         {
@@ -299,9 +272,6 @@ void NostalgicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 
 void NostalgicPreparationEditor::BKSingleSliderValueChanged(String name, double val)
 {
-    Nostalgic::Ptr nostalgic = processor.gallery->getNostalgic(processor.updateState->currentNostalgicId);
-    nostalgic->editted = true;
-    
     NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
     NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
     
@@ -327,9 +297,6 @@ void NostalgicPreparationEditor::BKSingleSliderValueChanged(String name, double 
 
 void NostalgicPreparationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {
-    Nostalgic::Ptr nostalgic = processor.gallery->getNostalgic(processor.updateState->currentNostalgicId);
-    nostalgic->editted = true;
-    
     NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
     NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
 
@@ -337,46 +304,54 @@ void NostalgicPreparationEditor::BKStackedSliderValueChanged(String name, Array<
     active->setTransposition(val);
 }
 
-void NostalgicPreparationEditor::fillSelectCB(void)
+void NostalgicPreparationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
-    Array<int> index = processor.gallery->getIndexList(PreparationTypeNostalgic);
-    
-    for (int i = 0; i < index.size(); i++)
+    for (auto prep : processor.gallery->getAllNostalgic())
     {
-        int Id = index[i];
-        String name = processor.gallery->getNostalgic(Id)->getName();
-        if (name != String::empty)  selectCB.addItem(name, i+1);
-        else                        selectCB.addItem(String(i+1), i+1);
+        int Id = prep->getId();;
+        String name = prep->getName();
         
-        selectCB.setItemEnabled(i+1, true);
-        if (processor.updateState->isActive(PreparationTypeNostalgic, Id) &&
-            (Id != processor.updateState->currentNostalgicId))
-        {
-            selectCB.setItemEnabled(i+1, false);
-        }
+        if (name != String::empty)  selectCB.addItem(name, Id);
+        else                        selectCB.addItem("Nostalgic"+String(Id), Id);
+        
+        selectCB.setItemEnabled(Id, true);
+        if (processor.currentPiano->isActive(PreparationTypeNostalgic, Id))
+            selectCB.setItemEnabled(Id, false);
     }
     
-    selectCB.addItem("New nostalgic...", index.size()+1);
+    if (last != 0)      selectCB.setItemEnabled(last, true);
+    if (current != 0)   selectCB.setItemEnabled(current, false);
     
-    int currentId = processor.updateState->currentNostalgicId;
+    int selectedId = processor.updateState->currentNostalgicId;
+    
+    selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
+    
+    selectCB.setItemEnabled(selectedId, false);
     
     selectCB.addSeparator();
-    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeNostalgic, currentId), NotificationType::dontSendNotification);
+    selectCB.addItem("New Nostalgic...", -1);
+    
+    lastId = selectedId;
     
 }
 
 void NostalgicPreparationEditor::timerCallback()
 {
-    NostalgicProcessor::Ptr nProcessor = processor.gallery->getNostalgicProcessor(processor.updateState->currentNostalgicId);
-    
-    Array<int> currentPlayPositions = nProcessor->getPlayPositions();
-    Array<int> currentUndertowPositions = nProcessor->getUndertowPositions();
-    currentPlayPositions.addArray(currentUndertowPositions);
-    
-    nDisplaySlider.updateSliderPositions(currentPlayPositions);
-    
+    if (processor.updateState->currentDisplay == DisplayNostalgic)
+    {
+        NostalgicProcessor::Ptr nProcessor = processor.currentPiano->getNostalgicProcessor(processor.updateState->currentNostalgicId);
+        
+        if (nProcessor != nullptr)
+        {
+            Array<int> currentPlayPositions = nProcessor->getPlayPositions();
+            Array<int> currentUndertowPositions = nProcessor->getUndertowPositions();
+            currentPlayPositions.addArray(currentUndertowPositions);
+            
+            nDisplaySlider.updateSliderPositions(currentPlayPositions);
+        }
+    }
 }
 
 
@@ -386,18 +361,14 @@ void NostalgicPreparationEditor::buttonClicked (Button* b)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
-    
-    Nostalgic::Ptr nostalgic = processor.gallery->getNostalgic(processor.updateState->currentNostalgicId);
-    nostalgic->editted = true;
 }
-
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ NostalgicModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
 
 NostalgicModificationEditor::NostalgicModificationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
 NostalgicViewController(p, theGraph)
 {
-    fillSelectCB();
+    fillSelectCB(-1,-1);
     
     clearModsButton.setButtonText("clear mods");
     addAndMakeVisible(clearModsButton);
@@ -449,12 +420,12 @@ void NostalgicModificationEditor::update(void)
     
     if (mod != nullptr)
     {
-        fillSelectCB();
+        fillSelectCB(-1,-1);
         
         greyOutAllComponents();
         highlightModedComponents();
         
-        selectCB.setSelectedItemIndex(processor.updateState->currentModNostalgicId, dontSendNotification);
+        selectCB.setSelectedId(processor.updateState->currentModNostalgicId, dontSendNotification);
         
         String val = mod->getParam(NostalgicWaveDistance);
         nDisplaySlider.setWaveDistance(val.getIntValue(), dontSendNotification);
@@ -495,40 +466,44 @@ void NostalgicModificationEditor::update(void)
 }
 
 
-void NostalgicModificationEditor::fillSelectCB(void)
+void NostalgicModificationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
-    Array<int> index = processor.gallery->getIndexList(PreparationTypeNostalgicMod);
-    
-    for (int i = 0; i < index.size(); i++)
+    for (auto prep : processor.gallery->getNostalgicModPreparations())
     {
-        int Id = index[i];
-        String name = processor.gallery->getNostalgicModPreparation(Id)->getName();
-        if (name != String::empty)  selectCB.addItem(name, i+1);
-        else                        selectCB.addItem(String(i+1), i+1);
+        int Id = prep->getId();;
+        String name = prep->getName();
         
-        selectCB.setItemEnabled(i+1, true);
-        if (processor.updateState->isActive(PreparationTypeNostalgicMod, Id) &&
-            (Id != processor.updateState->currentModNostalgicId))
-        {
-            selectCB.setItemEnabled(i+1, false);
-        }
+        if (name != String::empty)  selectCB.addItem(name, Id);
+        else                        selectCB.addItem("NostalgicMod"+String(Id), Id);
+        
+        selectCB.setItemEnabled(Id, true);
+        if (processor.currentPiano->isActive(PreparationTypeNostalgic, Id))
+            selectCB.setItemEnabled(Id, false);
     }
     
-    selectCB.addItem("New nostalgic modification...", index.size()+1);
+    if (last != 0)      selectCB.setItemEnabled(last, true);
+    if (current != 0)   selectCB.setItemEnabled(current, false);
     
-    int currentId = processor.updateState->currentModNostalgicId;
+    int selectedId = processor.updateState->currentNostalgicId;
+    
+    selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
+    
+    selectCB.setItemEnabled(selectedId, false);
     
     selectCB.addSeparator();
-    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeNostalgicMod, currentId), NotificationType::dontSendNotification);
+    selectCB.addItem("New Nostalgic Mod...", -1);
     
+    lastId = selectedId;
 }
 
 void NostalgicModificationEditor::timerCallback()
 {
+    if (processor.updateState->currentDisplay == DisplayNostalgicMod)
+    {
     /*
-     NostalgicProcessor::Ptr nProcessor = processor.gallery->getNostalgicProcessor(processor.updateState->currentNostalgicId);
+     NostalgicProcessor::Ptr nProcessor = processor.currentPiano->getNostalgicProcessor(processor.updateState->currentNostalgicId);
      
      Array<int> currentPlayPositions = nProcessor->getPlayPositions();
      Array<int> currentUndertowPositions = nProcessor->getUndertowPositions();
@@ -536,6 +511,7 @@ void NostalgicModificationEditor::timerCallback()
      
      nDisplaySlider.updateSliderPositions(currentPlayPositions);
      */
+    }
     
 }
 
@@ -571,51 +547,33 @@ void NostalgicModificationEditor::bkMessageReceived (const String& message)
 void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
+    int Id = box->getSelectedId();
+    int index = box->getSelectedItemIndex();
     
     if (name == "Nostalgic")
     {
-        int index = box->getSelectedItemIndex();
-        
-        int oldId = processor.updateState->currentModNostalgicId;
-        int newId = processor.gallery->getIdFromIndex(PreparationTypeNostalgicMod, index);
-        
-        if (index == selectCB.getNumItems()-1)
+        if (Id == -1)
         {
-            processor.gallery->addNostalgicMod();
+            processor.gallery->add(PreparationTypeNostalgicMod);
             
-            processor.gallery->setEditted(PreparationTypeNostalgicMod, oldId, true);
-            
-            processor.gallery->getNostalgicModPreparations().getLast()->editted = true;
-            
-            newId = processor.gallery->getNostalgicModPreparations().getLast()->getId();
+            Id = processor.gallery->getNostalgicModPreparations().getLast()->getId();
         }
         
-        processor.updateState->currentModNostalgicId = newId;
-        
-        processor.updateState->removeActive(PreparationTypeNostalgicMod, oldId);
-        
-        #if AUTO_DELETE
-        if (!processor.gallery->getNostalgicModPreparation(oldId)->editted)
-        {
-            processor.updateState->removePreparation(PreparationTypeNostalgicMod, oldId);
-            
-            processor.gallery->remove(PreparationTypeNostalgicMod, oldId);
-        }
-#endif
-        
-        processor.updateState->addActive(PreparationTypeNostalgicMod, newId);
+        processor.updateState->currentModNostalgicId = Id;
         
         processor.updateState->idDidChange = true;
         
-        fillSelectCB();
-        
         update();
+        
+        fillSelectCB(lastId, Id);
+        
+        lastId = Id;
     }
     else if (name == "Length Mode")
     {
         NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
         
-        NostalgicSyncMode mode = (NostalgicSyncMode) box->getSelectedItemIndex();
+        NostalgicSyncMode mode = (NostalgicSyncMode) index;
         
         mod->setParam(NostalgicMode, String(mode));
         
@@ -673,17 +631,11 @@ void NostalgicModificationEditor::BKStackedSliderValueChanged(String name, Array
 
 void NostalgicModificationEditor::updateModification(void)
 {
-    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
-    mod->editted = true;
-    
     processor.updateState->modificationDidChange = true;
 }
 
 void NostalgicModificationEditor::buttonClicked (Button* b)
 {
-    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
-    mod->editted = true;
-    
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);

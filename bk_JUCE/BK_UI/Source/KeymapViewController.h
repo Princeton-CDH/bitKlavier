@@ -34,6 +34,8 @@ public:
     void reset(void);
     
     void update(void);
+    
+    void fillSelectCB(int last, int current);
 
 private:
     
@@ -64,8 +66,6 @@ private:
     void bkComboBoxDidChange        (ComboBox* box)         override;
     void bkButtonClicked            (Button* b)             override;
     
-    
-    void fillKeymapSelectCB(void);
     
     void keymapUpdated(TextEditor& tf);
     

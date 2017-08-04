@@ -21,11 +21,11 @@
 
 #include "Keymap.h"
 
-#include "Preparation.h"
-
-#include "Reset.h"
-
 #include "PianoConfig.h"
+
+class BKAudioProcessor;
+
+#include "BKGraph.h"
 
 class Piano : public ReferenceCountedObject
 {
@@ -36,17 +36,7 @@ public:
     typedef OwnedArray<Piano>                  Arr;
     typedef OwnedArray<Piano, CriticalSection> CSArr;
     
-    Piano(Synchronic::PtrArr* synchronic,
-          Nostalgic::PtrArr* nostalgic,
-          Direct::PtrArr* direct,
-          Tuning::PtrArr* tuning,
-          Tempo::PtrArr* tempo,
-          SynchronicModPreparation::PtrArr* mSynchronic,
-          NostalgicModPreparation::PtrArr* mNostalgic,
-          DirectModPreparation::PtrArr* mDirect,
-          TuningModPreparation::PtrArr* mTuning,
-          TempoModPreparation::PtrArr* mTempo,
-          Keymap::PtrArr* keymap,
+    Piano(BKAudioProcessor& p,
           int Id);
     ~Piano();
     
@@ -72,6 +62,28 @@ public:
     PreparationMap::CSPtrArr    activePMaps;
     PreparationMap::CSPtrArr    prepMaps;
     
+    DirectProcessor::PtrArr              dprocessor;
+    SynchronicProcessor::PtrArr          sprocessor;
+    NostalgicProcessor::PtrArr           nprocessor;
+    TempoProcessor::PtrArr               mprocessor;
+    TuningProcessor::PtrArr              tprocessor;
+    
+    void addProcessor(BKPreparationType thisType, int thisId);
+    bool containsProcessor(BKPreparationType thisType, int thisId);
+    
+    DirectProcessor::Ptr        getDirectProcessor(int Id);
+    NostalgicProcessor::Ptr     getNostalgicProcessor(int Id);
+    SynchronicProcessor::Ptr    getSynchronicProcessor(int Id);
+    TuningProcessor::Ptr        getTuningProcessor(int Id);
+    TempoProcessor::Ptr         getTempoProcessor(int Id);
+    
+    NostalgicProcessor::Ptr     addNostalgicProcessor(int thisId);
+    SynchronicProcessor::Ptr    addSynchronicProcessor(int thisId);
+    DirectProcessor::Ptr        addDirectProcessor(int thisId);
+    TuningProcessor::Ptr        addTuningProcessor(int thisId);
+    TempoProcessor::Ptr         addTempoProcessor(int thisId);
+    
+    
     
     Array<int>                  pianoMap;
     int                         numPMaps;
@@ -81,89 +93,66 @@ public:
     OwnedArray<Modifications> modificationMap;
 
     
-    ModificationMapper::PtrArr mappers;
-    ModificationMapper::PtrArr resetMappers;
+    BKItem::PtrArr     items;
     
-    inline ModificationMapper::PtrArr getMappers(void) const noexcept { return mappers; }
+    inline BKItem::PtrArr getItems(void) const noexcept { return items; }
     
-    inline ModificationMapper::Ptr getMapper(int which) { return mappers[which]; }
-    
-    inline void clearMapper(void) { mappers.clear(); }
-    
-    inline ModificationMapper::Ptr getMapper(BKPreparationType type, int Id)
+    inline BKItem::Ptr itemWithTypeAndId(BKPreparationType type, int thisId)
     {
-        ModificationMapper::Ptr thisMapper = new ModificationMapper(type, Id);
-        
-        bool add = true;
-        for (auto map : mappers)
+        for (auto item : items)
         {
-            if (map->getType() == type && map->getId() == Id)
-            {
-                thisMapper = map;
-                add = false;
-                break;
-            }
+            if ((item->getType() == type) && (item->getId() == thisId)) return item;
         }
-        
-        if (add) mappers.add(thisMapper);
-        
-        return thisMapper;
+        return nullptr;
     }
     
-    inline void addMapper(ModificationMapper::Ptr thisMapper)
+    inline bool contains(BKPreparationType type, int thisId)
     {
-        mappers.addIfNotAlreadyThere(thisMapper);
-    }
-    
-    inline void removeMapper(ModificationMapper::Ptr thisMapper)
-    {
-        for (int i = mappers.size(); --i >= 0; )
+        for (auto item : items)
         {
-            if (mappers[i] == thisMapper) mappers.remove(i);
+            if ((item->getType() == type) && (item->getId() == thisId)) return true;
+        }
+        return false;
+    }
+    
+    inline bool isActive(BKPreparationType type, int thisId)
+    {
+        for (auto item : items)
+        {
+            if (item->getType() == type && item->getId() == thisId) return item->isActive();
+        }
+        return false;
+    }
+    
+    inline void setActive(BKPreparationType type, int thisId, bool active)
+    {
+        for (auto item : items)
+        {
+            if (item->getType() == type && item->getId() == thisId) item->setActive(active);
         }
     }
+    
+    inline void clearItems(void) { items.clear(); }
+    
+    void add(BKItem::Ptr item);
+    void remove(BKItem::Ptr item);
+    void configure(void);
+    void deconfigure(void);
+
+    
+    void removePreparationFromKeymap(BKPreparationType thisType, int thisId, int keymapId);
+    
+    void linkPreparationWithKeymap(BKPreparationType thisType, int thisId, int keymapId);
+    
+    void linkSynchronicWithTempo(Synchronic::Ptr synchronic, Tempo::Ptr thisTempo);
+    
+    void linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic);
+    
+    void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
     
     ValueTree getState(void);
     
     void setState(XmlElement* e);
-    
-    inline void setUIState(ValueTree vt)
-    {
-        
-    }
-    
-    inline ValueTree getUIState(void)
-    {
-        
-    }
-    
-    inline void configurePianoMap(Array<int> keymaps, int pianoId)
-    {
-        for (auto keymapId : keymaps)
-        {
-            Keymap::Ptr thisKeymap = getKeymap(keymapId);
-            for (auto key : thisKeymap->keys())
-            {
-                pianoMap.set(key, pianoId);
-                
-                DBG("key: " + String(key) + " piano: " + String(pianoId));
-            }
-        }
-    }
-    
-    inline void deconfigurePianoMap(Array<int> keymaps, int pianoId)
-    {
-        for (auto keymapId : keymaps)
-        {
-            Keymap::Ptr thisKeymap = getKeymap(keymapId);
-        
-            for (auto key : thisKeymap->keys())
-            {
-                pianoMap.set(key, -1);
-            }
-            
-        }
-    }
     
     String modificationMapsToString(void)
     {
@@ -171,15 +160,17 @@ public:
         for (int i = 0; i < 128; i++)
         {
             String ptype = "";
-            for (auto map : mappers)
+            for (auto item : items)
             {
-                if (map->getType() == PreparationTypeDirect) ptype = "d";
-                else if (map->getType() == PreparationTypeNostalgic) ptype = "n";
-                else if (map->getType() == PreparationTypeSynchronic) ptype = "s";
-                else if (map->getType() == PreparationTypeTuning) ptype = "t";
-                else if (map->getType() == PreparationTypeTempo) ptype = "m";
+                BKPreparationType type = item->getType();
                 
-                out += String(i) + ":" + ptype + String(map->getId()) + ":" + "{" + intArrayToString(map->getTargets()) +"} ";
+                if (type == PreparationTypeDirect) ptype = "d";
+                else if (type == PreparationTypeNostalgic) ptype = "n";
+                else if (type == PreparationTypeSynchronic) ptype = "s";
+                else if (type == PreparationTypeTuning) ptype = "t";
+                else if (type == PreparationTypeTempo) ptype = "m";
+                
+                out += String(i) + ":" + ptype + String(item->getId()) + ":" + "{" + item->connectionsToString() +"} ";
                 
             }
         }
@@ -208,49 +199,34 @@ public:
 
     void                        prepareToPlay(double sampleRate);
     
-    void deconfigureResets(Array<Array<int>> resets, Array<int> whichKeymaps);
-    void configureResets(Array<Array<int>> resets, Array<int> whichKeymaps, Array<int> whichPreps);
-    void deconfigureResetsForKeys(Array<Array<int>> resets, Array<int> otherKeys);
+    void configurePianoMap(BKItem::Ptr map);
+    void deconfigurePianoMap(BKItem::Ptr map);
     
-    void configureModifications(ModificationMapper::PtrArr maps);
-    void configureModification(ModificationMapper::Ptr map);
-    void deconfigureModification(ModificationMapper::Ptr map);
+    void configureReset(BKItem::Ptr item);
+    void deconfigureResetForKeys(BKItem::Ptr item, Array<int> otherKeys);
+
+    void configureModification(BKItem::Ptr map);
+    void deconfigureModification(BKItem::Ptr map);
     
     int                         addPreparationMap(void);
     int                         addPreparationMap(Keymap::Ptr keymap);
     PreparationMap::Ptr         getPreparationMapWithKeymap(int keymapId);
     int                         removeLastPreparationMap(void);
     int                         removePreparationMapWithKeymap(int keymapId);
-
-    PianoConfiguration::Ptr     configuration;
     
     Array<Array<int>> pianoMaps;
 private:
+    BKAudioProcessor& processor;
+    
     int Id;
     String pianoName;
+    
 
     double sampleRate;
     
-    
-
-    // Pointers to synths (flown in from BKAudioProcessor)
-    BKSynthesiser*                      synth;
-    BKSynthesiser*                      resonanceSynth;
-    BKSynthesiser*                      hammerSynth;
-    
-    Synchronic::PtrArr*  synchronic;
-    Nostalgic::PtrArr*   nostalgic;
-    Direct::PtrArr*      direct;
-    Tuning::PtrArr*      tuning;
-    Tempo::PtrArr*       tempo;
-    
-    SynchronicModPreparation::PtrArr*    modSynchronic;
-    NostalgicModPreparation::PtrArr*     modNostalgic;
-    DirectModPreparation::PtrArr*        modDirect;
-    TempoModPreparation::PtrArr*         modTempo;
-    
-    Keymap::PtrArr*                      bkKeymaps;
-    TuningModPreparation::PtrArr*        modTuning;
+    TuningProcessor::Ptr defaultT;
+    TempoProcessor::Ptr defaultM;
+    SynchronicProcessor::Ptr defaultS;
     
     inline Array<int> getAllIds(Direct::PtrArr direct)
     {
@@ -332,126 +308,6 @@ private:
     void deconfigureTempoModification(TempoModPreparation::Ptr, Array<int> whichKeymaps);
     void deconfigureTempoModificationForKeys(TempoModPreparation::Ptr, Array<int>);
     
-    inline const Synchronic::Ptr getSynchronic(int Id) const noexcept
-    {
-        for (int i = 0; i < synchronic->size(); i++)
-        {
-            Synchronic::Ptr thisOne = synchronic->getUnchecked(i);
-            
-            if (thisOne->getId() == Id)   return thisOne;
-        }
-        return nullptr;
-    }
-    
-    inline const Nostalgic::Ptr getNostalgic(int Id) const noexcept
-    {
-        for (int i = 0; i < nostalgic->size(); i++)
-        {
-            Nostalgic::Ptr thisOne = nostalgic->getUnchecked(i);
-            
-            if (thisOne->getId() == Id)   return thisOne;
-        }
-        return nullptr;
-    }
-    
-    inline const Direct::Ptr getDirect(int Id) const noexcept
-    {
-        for (int i = 0; i < direct->size(); i++)
-        {
-            Direct::Ptr thisOne = direct->getUnchecked(i);
-            
-            if (thisOne->getId() == Id)   return thisOne;
-        }
-        return nullptr;
-    }
-    
-    inline const Tuning::Ptr getTuning(int Id) const noexcept
-    {
-        for (int i = 0; i < tuning->size(); i++)
-        {
-            Tuning::Ptr thisOne = tuning->getUnchecked(i);
-            
-            if (thisOne->getId() == Id)   return thisOne;
-        }
-        return nullptr;
-    }
-    
-    inline const Tempo::Ptr getTempo(int Id) const noexcept
-    {
-        for (int i = 0; i < tempo->size(); i++)
-        {
-            Tempo::Ptr thisOne = tempo->getUnchecked(i);
-            
-            if (thisOne->getId() == Id)   return thisOne;
-        }
-        return nullptr;
-    }
-    
-    inline const SynchronicModPreparation::Ptr getSynchronicModPreparation(int Id) const noexcept
-    {
-        for (int i = 0; i < modSynchronic->size(); i++)
-        {
-            SynchronicModPreparation::Ptr thisOne = modSynchronic->getUnchecked(i);
-            
-            if (thisOne->getId() == Id)   return thisOne;
-        }
-        return nullptr;
-    }
-    
-    inline const NostalgicModPreparation::Ptr getNostalgicModPreparation(int Id) const noexcept
-    {
-        for (int i = 0; i < modNostalgic->size(); i++)
-        {
-            NostalgicModPreparation::Ptr thisOne = modNostalgic->getUnchecked(i);
-            
-            if (thisOne->getId() == Id)   return thisOne;
-        }
-        return nullptr;
-    }
-    
-    inline const DirectModPreparation::Ptr getDirectModPreparation(int Id) const noexcept
-    {
-        for (int i = 0; i < modDirect->size(); i++)
-        {
-            DirectModPreparation::Ptr thisOne = modDirect->getUnchecked(i);
-            
-            if (thisOne->getId() == Id)   return thisOne;
-        }
-        return nullptr;
-    }
-    
-    inline const TuningModPreparation::Ptr getTuningModPreparation(int Id) const noexcept
-    {
-        for (int i = 0; i < modTuning->size(); i++)
-        {
-            TuningModPreparation::Ptr thisOne = modTuning->getUnchecked(i);
-            
-            if (thisOne->getId() == Id)   return thisOne;
-        }
-        return nullptr;
-    }
-    
-    inline const TempoModPreparation::Ptr getTempoModPreparation(int Id) const noexcept
-    {
-        for (int i = 0; i < modTempo->size(); i++)
-        {
-            TempoModPreparation::Ptr thisOne = modTempo->getUnchecked(i);
-            
-            if (thisOne->getId() == Id)   return thisOne;
-        }
-        return nullptr;
-    }
-    
-    inline const Keymap::Ptr getKeymap(int Id) const noexcept
-    {
-        for (int i = 0; i < bkKeymaps->size(); i++)
-        {
-            Keymap::Ptr thisOne = bkKeymaps->getUnchecked(i);
-            
-            if (thisOne->getId() == Id)   return thisOne;
-        }
-        return nullptr;
-    }
     
     JUCE_LEAK_DETECTOR(Piano)
 };

@@ -78,7 +78,7 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
         
         ValueTree galleryVT(vtagGalleryPath);
         galleryVT.setProperty("galleryPath", currentGalleryPath, 0);
-        galleryVT.setProperty("defaultPiano", gallery->getCurrentPiano(), 0);
+        galleryVT.setProperty("defaultPiano", currentPiano->getId(), 0);
         
         DBG("saving gallery to plugin state: getStateInformation() " +  currentGalleryPath);
         ScopedPointer<XmlElement> galleryXML = galleryVT.createXml();
@@ -126,7 +126,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
         ScopedPointer<XmlElement> galleryXML (getXmlFromBinary (data, sizeInBytes));
         if (galleryXML != nullptr)
         {
-            gallery = new Gallery(galleryXML, &mainPianoSynth, &resonanceReleaseSynth, &hammerReleaseSynth, updateState);
+            gallery = new Gallery(galleryXML, *this);
             
             initializeGallery();
 

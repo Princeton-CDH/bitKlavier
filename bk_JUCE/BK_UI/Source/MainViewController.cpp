@@ -20,8 +20,8 @@ construction(p, &theGraph),
 overtop(p, &theGraph),
 timerCallbackCount(0)
 {
-    addKeyListener(this);
     addMouseListener(this, true);
+    addKeyListener(this);
     
     gen = processor.gallery->getGeneralSettings();
     
@@ -82,18 +82,6 @@ timerCallbackCount(0)
     DropShadow myshadow(Colours::darkgrey, 5, myshadowOffset);
     overtopShadow = new DropShadower(myshadow);
     overtopShadow->setOwner(&overtop);
-
-    
-    /*
-    File file ("~/bk_icons/icon.png");
-    FileInputStream inputStream(file);
-    PNGImageFormat tempimg;
-    Image bimg = tempimg.decodeImage(inputStream);
-    backgroundImageComponent.setImage(bimg);
-    backgroundImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
-    backgroundImageComponent.setAlpha(0.2);
-    addAndMakeVisible(backgroundImageComponent);
-     */
     
     startTimerHz (50);
     
@@ -101,7 +89,7 @@ timerCallbackCount(0)
 
 MainViewController::~MainViewController()
 {
-    
+    removeKeyListener(this);
 }
 
 
@@ -257,9 +245,6 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     
     if (code == KeyPress::escapeKey)
     {
-        int Id = processor.updateState->getCurrentId(processor.updateState->currentDisplay);
-        processor.gallery->setEditted((BKPreparationType)processor.updateState->currentDisplay, Id, true);
-        
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
     else if (code == KeyPress::deleteKey)
@@ -344,6 +329,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     {
         if (e.getModifiers().isCommandDown())   construction.cut();
     }
+    return true;
 }
 
 
@@ -380,7 +366,7 @@ void MainViewController::timerCallback()
     {
         state->modificationDidChange = false;
         
-        construction.reconfigureCurrentItem();
+        processor.currentPiano->configure();
     }
     
     if (state->idDidChange)
@@ -452,14 +438,6 @@ void MainViewController::timerCallback()
         state->displayDidChange = false;
         
         overtop.setCurrentDisplay(processor.updateState->currentDisplay);
-    }
-    
-    if (state->preparationRemoved)
-    {
-        state->preparationRemoved = false;
-        
-        construction.removeItem(state->preparationRemovedType, state->preparationRemovedId);
-        
     }
     
     levelMeterComponentL->updateLevel(processor.getLevelL());

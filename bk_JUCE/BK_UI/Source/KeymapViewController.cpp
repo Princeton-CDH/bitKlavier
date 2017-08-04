@@ -57,7 +57,7 @@ BKViewController(p, theGraph)
     hideOrShow.addListener(this);
     hideOrShow.setButtonText(" X ");
     
-    fillKeymapSelectCB();
+    fillSelectCB(-1,-1);
 
     update();
 }
@@ -68,7 +68,7 @@ KeymapViewController::~KeymapViewController()
 
 void KeymapViewController::reset(void)
 {
-    fillKeymapSelectCB();
+    fillSelectCB(-1,-1);
     update();
 }
 
@@ -114,75 +114,59 @@ void KeymapViewController::resized()
 void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
 {
     String name = box->getName();
+    int Id = box->getSelectedId();
     
     if (name == "Keymap")
     {
-        int index = box->getSelectedItemIndex();
-        
-        int oldId = processor.updateState->currentKeymapId;
-        int newId = processor.gallery->getIdFromIndex(PreparationTypeKeymap, index);
-        
-        if (index == selectCB.getNumItems()-1)
+        if (Id == -1)
         {
-            processor.gallery->setEditted(PreparationTypeKeymap, oldId, true);
+            processor.gallery->add(PreparationTypeKeymap);
             
-            processor.gallery->addKeymap();
-            
-            processor.gallery->getKeymaps().getLast()->editted = true;
-            
-            newId = processor.gallery->getKeymaps().getLast()->getId();
+            Id = processor.gallery->getKeymaps().getLast()->getId();
         }
         
-        processor.updateState->currentKeymapId = newId;
-        
-        #if AUTO_DELETE
-        processor.updateState->removeActive(PreparationTypeKeymap, oldId);
-
-        if (!processor.gallery->getKeymap(oldId)->editted)
-        {
-            processor.updateState->removePreparation(PreparationTypeKeymap, oldId);
-            
-            processor.gallery->remove(PreparationTypeKeymap, oldId);
-        }
-#endif
-        
-        processor.updateState->addActive(PreparationTypeKeymap, newId);
+        processor.updateState->currentKeymapId = Id;
         
         processor.updateState->idDidChange = true;
         
         update();
+        
+        fillSelectCB(lastId, Id);
+        
+        lastId = Id;
     }
 }
 
-void KeymapViewController::fillKeymapSelectCB(void)
+void KeymapViewController::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
-
-    Array<int> index = processor.gallery->getIndexList(PreparationTypeKeymap);
     
-    for (int i = 0; i < index.size(); i++)
+    for (auto prep : processor.gallery->getKeymaps())
     {
-        int Id = index[i];
-        String name = processor.gallery->getKeymap(Id)->getName();
-
-        if (name != String::empty)  selectCB.addItem(name, i+1);
-        else                        selectCB.addItem(String(i+1), i+1);
+        int Id = prep->getId();;
+        String name = prep->getName();
         
-        selectCB.setItemEnabled(i+1, true);
-        if (processor.updateState->isActive(PreparationTypeKeymap, Id) &&
-            (Id != processor.updateState->currentKeymapId))
-        {
-            selectCB.setItemEnabled(i+1, false);
-        }
+        if (name != String::empty)  selectCB.addItem(name, Id);
+        else                        selectCB.addItem("Keymap"+String(Id), Id);
+        
+        selectCB.setItemEnabled(Id, true);
+        if (processor.currentPiano->isActive(PreparationTypeKeymap, Id))
+            selectCB.setItemEnabled(Id, false);
     }
     
-    selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeKeymap,
-                                                                    processor.updateState->currentKeymapId),
-                                  NotificationType::dontSendNotification);
+    if (last != 0)      selectCB.setItemEnabled(last, true);
+    if (current != 0)   selectCB.setItemEnabled(current, false);
+    
+    int selectedId = processor.updateState->currentKeymapId;
+    
+    selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
+    
+    selectCB.setItemEnabled(selectedId, false);
     
     selectCB.addSeparator();
-    selectCB.addItem("New keymap...", index.size()+1);
+    selectCB.addItem("New Keymap...", -1);
     
+    lastId = selectedId;
 }
 
 void KeymapViewController::bkButtonClicked (Button* b)
@@ -197,16 +181,12 @@ void KeymapViewController::bkButtonClicked (Button* b)
         keymapTF.toFront(true);
         focusLostByEscapeKey = false;
     }
-    
-    Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-    thisKeymap->editted = true;
 }
 
 
 void KeymapViewController::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
     Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-    thisKeymap->editted = true;
     
     thisKeymap->setName(name);
 }
@@ -218,9 +198,6 @@ void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
     
     if (name == "KeymapMidi")
     {
-        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-        thisKeymap->editted = true;
-        
         keymapUpdated(tf);
     }
     else
@@ -247,8 +224,6 @@ void KeymapViewController::keymapUpdated(TextEditor& tf)
     
     keyboard->setKeysInKeymap(keys);
     
-    theGraph->update(PreparationTypeKeymap, processor.updateState->currentKeymapId);
-    
     keymapTF.setVisible(false);
     keymapTF.toBack();
 
@@ -256,11 +231,8 @@ void KeymapViewController::keymapUpdated(TextEditor& tf)
 
 void KeymapViewController::textEditorFocusLost(TextEditor& tf)
 {
-    if(!focusLostByEscapeKey) {
-        
-        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-        thisKeymap->editted = true;
-        
+    if(!focusLostByEscapeKey)
+    {
         keymapUpdated(tf);
     }
     
@@ -282,9 +254,7 @@ void KeymapViewController::update(void)
     
     if (km != nullptr)
     {
-        fillKeymapSelectCB();
-        
-        selectCB.setSelectedItemIndex(processor.gallery->getIndexFromId(PreparationTypeKeymap, processor.updateState->currentKeymapId), dontSendNotification);
+        selectCB.setSelectedId(processor.updateState->currentKeymapId, dontSendNotification);
         
         keymapTF.setText( intArrayToString(km->keys()));
         
@@ -315,7 +285,6 @@ void KeymapViewController::handleKeymapNoteOff (BKKeymapKeyboardState* source, i
 void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber)
 {
     Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-    thisKeymap->editted = true;
     
     Array<int> oldKeys = thisKeymap->keys();
     
@@ -327,8 +296,7 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
     
     keyboard->setKeysInKeymap(thisKeymap->keys());
     
-    theGraph->update(PreparationTypeKeymap, processor.updateState->currentKeymapId);
-    
+    processor.currentPiano->configure();
 }
 
 

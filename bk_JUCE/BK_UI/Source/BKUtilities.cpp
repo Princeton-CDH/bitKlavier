@@ -31,6 +31,7 @@ BKParameterDataType getBKDataType ( SynchronicParameterType type)
     if (type == SynchronicTranspOffsets)
         return BKArrFloatArr;
 
+    return BKParameterTypeNil;
 }
 /*
 TuningId = 0,
@@ -66,6 +67,8 @@ BKParameterDataType getBKDataType ( TuningParameterType type)
     
     if (type == TuningA1Inversional)
         return BKBool;
+    
+    return BKParameterTypeNil;
 }
 
 /*
@@ -124,7 +127,7 @@ PitchClass      letterNoteToPitchClass(String note)
     else if (note == "B" || note == "b")     return B;
     
     
-        
+    return PitchClassNil;
 }
 
 /*

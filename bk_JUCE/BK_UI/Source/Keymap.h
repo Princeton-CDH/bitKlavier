@@ -35,9 +35,7 @@ public:
     
     Keymap(int Id):
     Id(Id),
-    keymap(Array<bool>()),
-    X(-1),Y(-1),
-    editted(false)
+    keymap(Array<bool>())
     {
         keymap.ensureStorageAllocated(128);
         
@@ -48,17 +46,13 @@ public:
     }
     
     Keymap(Keymap::Ptr k):
-    Id(k->getId()),
-    X(-1),Y(-1),
-    editted(false)
+    Id(k->getId())
     {
         setKeymap(k->keys());
     }
     
     Keymap(void):
-    Id(-1),
-    X(-1),Y(-1),
-    editted(false)
+    Id(-1)
     {
     }
     
@@ -184,10 +178,12 @@ public:
         DBG("Keymap: "+ intArrayToString(keys()));
     }
     
-    inline ValueTree getState(int ki)
+    inline ValueTree getState(void)
     {
  
-        ValueTree keysave( vtagKeymap + String(ki));
+        ValueTree keysave( vtagKeymap );
+        
+        keysave.setProperty( "Id",Id, 0);
         
         keysave.setProperty("name",name,0);
         
@@ -203,23 +199,10 @@ public:
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
     
-    inline void setPosition(int x, int y) { X=x;Y=y;}
-    inline Point<int> getPosition(void) { return Point<int>(X,Y);}
-    inline void setPosition(Point<int> point) { X = point.getX(); Y= point.getY();}
-    
-    inline void setX(int x) { X = x; }
-    inline void setY(int y) { Y = y; }
-    inline int getX(void) const noexcept { return X; }
-    inline int getY(void) const noexcept { return Y; }
-    bool editted;
-    
 private:
     int Id;
     String name;
     Array<bool> keymap;
-    
-    
-    int X,Y;
     
     JUCE_LEAK_DETECTOR (Keymap)
 };

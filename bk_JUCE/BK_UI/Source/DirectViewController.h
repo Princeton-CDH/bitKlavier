@@ -60,7 +60,7 @@ public:
     void BKSingleSliderValueChanged(String name, double val) override;
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
     
-    void fillSelectCB(void);
+    void fillSelectCB(int last, int current);
     
 private:
     
@@ -91,7 +91,7 @@ public:
     void greyOutAllComponents();
     void highlightModedComponents();
     
-    void fillSelectCB(void);
+    void fillSelectCB(int last, int current);
     
 private:
     

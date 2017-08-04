@@ -30,7 +30,7 @@ if (!keys.size() || keys[0] == -1) isLayer = false;
 void Gallery::setStateFromJson(var myJson)
 {
     //general = new GeneralSettings();
-    
+#if 0
     var pattr = myJson.getProperty("pattrstorage", "");
     
     String name = pattr.getProperty("name", "").toString();
@@ -227,7 +227,8 @@ void Gallery::setStateFromJson(var myJson)
                     //if(tempo[tmpId]->sPrep->getTempoSystem() == AdaptiveTempo1) thisPiano->prepMaps[0]->addTempo(tempo[tmpId]);
                     
                     DBG("tmpId: "+String(tmpId));
-                    syncPrep->setTempoControl(tempo[tmpId]);
+                    // FIX THIS
+                    //syncPrep->setTempo(tempo[tmpId]);
                     
                     int syncMode = jsonGetValue(sx+"syncMode");
                     
@@ -562,22 +563,14 @@ void Gallery::setStateFromJson(var myJson)
                         
                         DBG("adding keymap");
                     }
+
+                    ItemMapper::Ptr thisTuning = new ItemMapper(PreparationTypeTuning, direct[dId]->getTuning()->getId());
+                    ItemMapper::Ptr thisKeymap = new ItemMapper(PreparationTypeKeymap, pmapkeymap->getId());
+                    ItemMapper::Ptr thisTuningMod = new ItemMapper(PreparationTypeTuningMod, whichTMod);
                     
-                    Array<int> whichTargets;
-                    
-                    whichTargets.add(direct[dId]->getTuningId());
-                    
-                    Array<int> whichKeymaps;
-                    
-                    whichKeymaps.add(pmapkeymap->getId());
-                    
-                    ModificationMapper::Ptr thisMapper = new ModificationMapper(PreparationTypeTuning, whichTMod, whichKeymaps, whichTargets);
-                    
-                    thisPiano->addMapper(thisMapper);
-                    
-                    thisMapper->print();
-                    
-                    thisPiano->configureModification(thisMapper);
+                    thisPiano->add(thisTuning);
+                    thisPiano->add(thisKeymap);
+                    thisPiano->add(thisTuningMod);
                     
                     ++modTuningCount;
                     
@@ -591,7 +584,7 @@ void Gallery::setStateFromJson(var myJson)
     for (int k = synchronic.size(); --k >= 0;)  synchronic[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
     for (int k = nostalgic.size(); --k >= 0;)   nostalgic[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
     for (int k = direct.size(); --k >= 0;)      direct[k]->processor->setCurrentPlaybackSampleRate(bkSampleRate);
-    
+#endif
 }
 
 

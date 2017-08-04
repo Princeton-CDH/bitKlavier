@@ -18,6 +18,10 @@
 
 #include "Piano.h"
 
+#include "BKGraph.h"
+
+class BKAudioProcessor;
+
 class Gallery : public ReferenceCountedObject
 {
 public:
@@ -27,11 +31,50 @@ public:
     typedef OwnedArray<Gallery>                  Arr;
     typedef OwnedArray<Gallery, CriticalSection> CSArr;
  
-    Gallery(ScopedPointer<XmlElement> xml);
-    Gallery(ScopedPointer<XmlElement> xml, BKSynthesiser* main, BKSynthesiser* res, BKSynthesiser* hammer, BKUpdateState::Ptr state);
-    Gallery(var json);
-    Gallery(var json, BKSynthesiser* main, BKSynthesiser* res, BKSynthesiser* hammer, BKUpdateState::Ptr state);
+    Gallery(ScopedPointer<XmlElement> xml, BKAudioProcessor&);
+    Gallery(var json, BKAudioProcessor&);
     ~Gallery();
+    
+    inline void print(void)
+    {
+        String s = "direct";
+        for (auto item : direct) s += (" " + String(item->getId()));
+        
+        s += "\nnostalgic";
+        for (auto item : nostalgic) s += (" " + String(item->getId()));
+        
+        s += "\nsynchronic";
+        for (auto item : synchronic) s += (" " + String(item->getId()));
+        
+        s += "\ntuning";
+        for (auto item : tuning) s += (" " + String(item->getId()));
+        
+        s += "\ntempo";
+        for (auto item : tempo) s += (" " + String(item->getId()));
+        
+        s += "\nkeymap";
+        for (auto item : bkKeymaps) s += (" " + String(item->getId()));
+        
+        s += "\ndirectmod";
+        for (auto item : modDirect) s += (" " + String(item->getId()));
+        
+        s += "\nnostalgicmod";
+        for (auto item : modNostalgic) s += (" " + String(item->getId()));
+        
+        s += "\nsynchronicmod";
+        for (auto item : modSynchronic) s += (" " + String(item->getId()));
+        
+        s += "\ntuningmod";
+        for (auto item : modTuning) s += (" " + String(item->getId()));
+        
+        s += "\ntempomod";
+        for (auto item : modTempo) s += (" " + String(item->getId()));
+        
+        DBG("\n~ ~ ~ ~ ~ GALLERY ~ ~ ~ ~ ~ ~");
+        DBG(s);
+        DBG("\n");
+    }
+    
     
     ValueTree  getState(void);
     void setStateFromXML(ScopedPointer<XmlElement> xml);
@@ -39,91 +82,12 @@ public:
     
     void resetPreparations(void);
     
-    inline void printPianoConfigurations(void)
-    {
-        for (auto piano : bkPianos)
-        {
-            DBG("PIANO "+ String(piano->getName()));
-            piano->configuration->print();
-        }
-    }
-    
-    SynchronicProcessor::Ptr getSynchronicProcessor(int Id);
-    NostalgicProcessor::Ptr getNostalgicProcessor(int id);
-    TuningProcessor::Ptr getTuningProcessor(int id);
-    TempoProcessor::Ptr getTempoProcessor(int id);
-    
-    void addSynchronic(void);
-    void addSynchronicWithId(int Id);
-    void addSynchronic(SynchronicPreparation::Ptr);
-    int addSynchronicIfNotAlreadyThere(SynchronicPreparation::Ptr);
-    
-    void addNostalgic(void);
-    void addNostalgicWithId(int Id);
-    void addNostalgic(NostalgicPreparation::Ptr);
-    int addNostalgicIfNotAlreadyThere(NostalgicPreparation::Ptr);
-    
-    void addTuning(void);
-    void addTuningWithId(int Id);
-    void addTuning(TuningPreparation::Ptr);
-    int addTuningIfNotAlreadyThere(TuningPreparation::Ptr);
-    
-    void addTempo(void);
-    void addTempoWithId(int Id);
-    void addTempo(TempoPreparation::Ptr);
-    int addTempoIfNotAlreadyThere(TempoPreparation::Ptr);
-    
-    void addDirect(void);
-    void addDirectWithId(int Id);
-    void addDirect(DirectPreparation::Ptr);
-    int addDirectIfNotAlreadyThere(DirectPreparation::Ptr);
-    
-
-    bool getEditted(BKPreparationType type, int Id);
-    void setEditted(BKPreparationType type, int Id, bool editted);
-    
-    void addPiano(void);
-    void addPianoWithId(int Id);
-    void removePiano(int Id);
     inline const int getNumPianos(void) const noexcept {return bkPianos.size();}
-    
-    void addKeymap(void);
-    void addKeymapWithId(int Id);
-    void addKeymap(Keymap::Ptr);
-    inline const int getNumKeymaps(void) const noexcept {return bkKeymaps.size();}
     
     void add(BKPreparationType type);
     void addTypeWithId(BKPreparationType type, int Id);
     void remove(BKPreparationType type, int Id);
     int  getNum(BKPreparationType type);
-    
-    
-    void addDirectMod(void);
-    void addNostalgicMod(void);
-    void addSynchronicMod(void);
-    void addTuningMod(void);
-    void addTempoMod(void);
-    
-    void addDirectModWithId(int Id);
-    void addNostalgicModWithId(int Id);
-    void addSynchronicModWithId(int Id);
-    void addTuningModWithId(int Id);
-    void addTempoModWithId(int Id);
-    
-    void addTuningMod(TuningModPreparation::Ptr tmod);
-    void addTempoMod(TempoModPreparation::Ptr tmod);
-    
-    void removeDirect(int Id);
-    void removeSynchronic(int Id);
-    void removeNostalgic(int Id);
-    void removeTuning(int Id);
-    void removeTempo(int Id);
-    void removeKeymap(int Id);
-    void removeDirectModPreparation(int Id);
-    void removeNostalgicModPreparation(int Id);
-    void removeSynchronicModPreparation(int Id);
-    void removeTuningModPreparation(int Id);
-    void removeTempoModPreparation(int Id);
     
     inline const int getNumSynchronic(void) const noexcept {return synchronic.size();}
     inline const int getNumNostalgic(void) const noexcept {return nostalgic.size();}
@@ -317,6 +281,7 @@ public:
     
     inline const SynchronicPreparation::Ptr getStaticSynchronicPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : synchronic)
         {
             if (p->getId() == Id)   return p->sPrep;
@@ -326,6 +291,7 @@ public:
     
     inline const SynchronicPreparation::Ptr getActiveSynchronicPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : synchronic)
         {
             if (p->getId() == Id)   return p->aPrep;
@@ -335,6 +301,7 @@ public:
     
     inline const NostalgicPreparation::Ptr getStaticNostalgicPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : nostalgic)
         {
             if (p->getId() == Id)   return p->sPrep;
@@ -344,6 +311,7 @@ public:
     
     inline const NostalgicPreparation::Ptr getActiveNostalgicPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : nostalgic)
         {
             if (p->getId() == Id)   return p->aPrep;
@@ -353,6 +321,7 @@ public:
     
     inline const DirectPreparation::Ptr getStaticDirectPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : direct)
         {
             if (p->getId() == Id)   return p->sPrep;
@@ -362,6 +331,7 @@ public:
     
     inline const DirectPreparation::Ptr getActiveDirectPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : direct)
         {
             if (p->getId() == Id)   return p->aPrep;
@@ -371,6 +341,7 @@ public:
     
     inline const TuningPreparation::Ptr getStaticTuningPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : tuning)
         {
             if (p->getId() == Id)   return p->sPrep;
@@ -380,6 +351,7 @@ public:
     
     inline const TuningPreparation::Ptr getActiveTuningPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : tuning)
         {
             if (p->getId() == Id)   return p->aPrep;
@@ -389,6 +361,7 @@ public:
     
     inline const TempoPreparation::Ptr getStaticTempoPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : tempo)
         {
             if (p->getId() == Id)   return p->sPrep;
@@ -398,6 +371,7 @@ public:
     
     inline const TempoPreparation::Ptr getActiveTempoPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : tempo)
         {
             if (p->getId() == Id)   return p->aPrep;
@@ -407,6 +381,7 @@ public:
     
     inline const Synchronic::Ptr getSynchronic(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : synchronic)
         {
             if (p->getId() == Id)   return p;
@@ -416,6 +391,7 @@ public:
     
     inline const Nostalgic::Ptr getNostalgic(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : nostalgic)
         {
             if (p->getId() == Id)   return p;
@@ -425,6 +401,7 @@ public:
     
     inline const Direct::Ptr getDirect(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : direct)
         {
             if (p->getId() == Id)   return p;
@@ -434,6 +411,7 @@ public:
     
     inline const Tuning::Ptr getTuning(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : tuning)
         {
             if (p->getId() == Id)   return p;
@@ -443,6 +421,7 @@ public:
     
     inline const Tempo::Ptr getTempo(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : tempo)
         {
             if (p->getId() == Id)   return p;
@@ -452,6 +431,7 @@ public:
     
     inline const SynchronicModPreparation::Ptr getSynchronicModPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : modSynchronic)
         {
             if (p->getId() == Id)   return p;
@@ -461,6 +441,7 @@ public:
     
     inline const NostalgicModPreparation::Ptr getNostalgicModPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : modNostalgic)
         {
             if (p->getId() == Id)   return p;
@@ -470,6 +451,7 @@ public:
     
     inline const DirectModPreparation::Ptr getDirectModPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : modDirect)
         {
             if (p->getId() == Id)   return p;
@@ -479,6 +461,7 @@ public:
     
     inline const TuningModPreparation::Ptr getTuningModPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : modTuning)
         {
             if (p->getId() == Id)   return p;
@@ -488,6 +471,7 @@ public:
     
     inline const TempoModPreparation::Ptr getTempoModPreparation(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : modTempo)
         {
             if (p->getId() == Id)   return p;
@@ -497,6 +481,7 @@ public:
     
     inline const Keymap::Ptr getKeymap(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : bkKeymaps)
         {
             if (p->getId() == Id)   return p;
@@ -506,23 +491,14 @@ public:
     
     inline const Piano::Ptr getPiano(int Id) const noexcept
     {
+        Id = (Id <= 0) ? 1 : Id;
         for (auto p : bkPianos)
         {
             if (p->getId() == Id)   return p;
         }
         return nullptr;
     }
-    
-    void setCurrentPiano(int Id)
-    {
-        currentPianoId = Id;
-    }
-    
-    int getCurrentPiano()
-    {
-        return currentPianoId;
-    }
-    
+
     void copy(BKPreparationType type, int from, int to);
     
     inline const SynchronicModPreparation::PtrArr getSynchronicModPreparations(void) const noexcept
@@ -572,44 +548,19 @@ public:
         
         idCount.set(type, newId);
         
-        Array<int> thisIndexList = getIndexList(type);
-        
-        thisIndexList.add(newId);
-        
-        idIndexList.set(type, thisIndexList);
-        
         DBG("NEW: " + String(newId));
         
         return newId;
     }
-
     
-    inline Array<int> getIndexList(BKPreparationType type)
+    inline void setDefaultPiano(int Id)
     {
-        DBG(arrayIntArrayToString(idIndexList));
-        return idIndexList.getUnchecked(type);
+        defaultPianoId = Id;
     }
     
-    inline int getIndexFromId(BKPreparationType type, int Id)
+    inline int getDefaultPiano(void)
     {
-        Array<int> index = getIndexList(type);
-        
-        int count = 0;
-        for (int i : index)
-        {
-            if (i == Id) return count;
-            
-            count++;
-        }
-        
-        return 0;
-    }
-    
-    inline int getIdFromIndex(BKPreparationType type, int idx)
-    {
-        Array<int> index = getIndexList(type);
-        
-        return index[idx];
+        return defaultPianoId;
     }
     
     
@@ -620,17 +571,11 @@ public:
     
 private:
     double bkSampleRate;
+    BKAudioProcessor& processor;
     
     Array< int> idCount;
     
-    Array< Array<int>> idIndexList;
-    
     String url;
-    
-    BKUpdateState::Ptr updateState;
-    BKSynthesiser* main;
-    BKSynthesiser* res;
-    BKSynthesiser* hammer;
     
     GeneralSettings::Ptr                general;
     
@@ -648,8 +593,75 @@ private:
     
     Keymap::PtrArr                      bkKeymaps;
     Piano::PtrArr                       bkPianos;
+
+    int defaultPianoId;
     
-    int                                 currentPianoId;
+    
+    
+    void addSynchronic(void);
+    void addSynchronicWithId(int Id);
+    void addSynchronic(SynchronicPreparation::Ptr);
+    int addSynchronicIfNotAlreadyThere(SynchronicPreparation::Ptr);
+    
+    void addNostalgic(void);
+    void addNostalgicWithId(int Id);
+    void addNostalgic(NostalgicPreparation::Ptr);
+    int addNostalgicIfNotAlreadyThere(NostalgicPreparation::Ptr);
+    
+    void addTuning(void);
+    void addTuningWithId(int Id);
+    void addTuning(TuningPreparation::Ptr);
+    int addTuningIfNotAlreadyThere(TuningPreparation::Ptr);
+    
+    void addTempo(void);
+    void addTempoWithId(int Id);
+    void addTempo(TempoPreparation::Ptr);
+    int addTempoIfNotAlreadyThere(TempoPreparation::Ptr);
+    
+    void addDirect(void);
+    void addDirectWithId(int Id);
+    void addDirect(DirectPreparation::Ptr);
+    int addDirectIfNotAlreadyThere(DirectPreparation::Ptr);
+    
+    void addSynchronic(int Id, int tuningId, int tempoId);
+    void addNostalgic(int Id, int tuningId, int synchronicId);
+    void addDirect(int Id, int tuningId);
+    
+    void addKeymap(void);
+    void addKeymapWithId(int Id);
+    void addKeymap(Keymap::Ptr);
+    inline const int getNumKeymaps(void) const noexcept {return bkKeymaps.size();}
+    
+    void addPiano(void);
+    void addPianoWithId(int Id);
+    void removePiano(int Id);
+    
+    void addDirectMod(void);
+    void addNostalgicMod(void);
+    void addSynchronicMod(void);
+    void addTuningMod(void);
+    void addTempoMod(void);
+    
+    void addDirectModWithId(int Id);
+    void addNostalgicModWithId(int Id);
+    void addSynchronicModWithId(int Id);
+    void addTuningModWithId(int Id);
+    void addTempoModWithId(int Id);
+    
+    void addTuningMod(TuningModPreparation::Ptr tmod);
+    void addTempoMod(TempoModPreparation::Ptr tmod);
+    
+    void removeDirect(int Id);
+    void removeSynchronic(int Id);
+    void removeNostalgic(int Id);
+    void removeTuning(int Id);
+    void removeTempo(int Id);
+    void removeKeymap(int Id);
+    void removeDirectModPreparation(int Id);
+    void removeNostalgicModPreparation(int Id);
+    void removeSynchronicModPreparation(int Id);
+    void removeTuningModPreparation(int Id);
+    void removeTempoModPreparation(int Id);
     
     JUCE_LEAK_DETECTOR(Gallery);
 };
