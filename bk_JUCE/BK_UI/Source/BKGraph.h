@@ -43,7 +43,11 @@ public:
 
     void setItemType(BKPreparationType type, bool create);
     
-    inline void setSelected(bool select) {isSelected = select; repaint();}
+    inline void setSelected(bool select)
+    {
+        isSelected = select;
+        repaint();
+    }
     inline bool getSelected(void) { return isSelected;}
     
     inline void setConnections(BKItem::PtrArr newConnections)
@@ -301,7 +305,11 @@ public:
     
     inline void deselectAll(void)
     {
-        for (auto item : items) item->setSelected(false);
+        for (auto item : items)
+        {
+            item->unfocusAllComponents();
+            item->setSelected(false);
+        }
     }
     
     inline void selectAll(void)

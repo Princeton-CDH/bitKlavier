@@ -21,6 +21,11 @@ overtop(p, &theGraph),
 timerCallbackCount(0)
 {
     addMouseListener(this, true);
+    
+    setWantsKeyboardFocus(true);
+    
+    
+    
     addKeyListener(this);
     
     gen = processor.gallery->getGeneralSettings();
@@ -155,55 +160,7 @@ void MainViewController::mouseDown(const MouseEvent &event)
         
         if (overtop.getCurrentDisplay() != DisplayNil)
         {
-            
             processor.updateState->setCurrentDisplay(DisplayNil);
-            
-            /*
-            BKPreparationDisplay thisDisplay = overtop.getCurrentDisplay();
-            
-            switch(thisDisplay)
-            {
-                case DisplayDirect :
-                    overtop.dvc.close();
-                    break;
-                case DisplaySynchronic  :
-                    overtop.svc.close();
-                    break;
-                case DisplayNostalgic  :
-                    overtop.nvc.close();
-                    break;
-                case DisplayTuning  :
-                    overtop.tvc.close();
-                    break;
-                case DisplayTempo  :
-                    overtop.ovc.close();
-                    break;
-                case DisplayKeymap  :
-                    overtop.kvc.close();
-                    break;
-                case DisplayDirectMod  :
-                    overtop.dvcm.close();
-                    break;
-                case DisplaySynchronicMod  :
-                    overtop.svcm.close();
-                    break;
-                case DisplayNostalgicMod  :
-                    overtop.nvcm.close();
-                    break;
-                case DisplayTuningMod  :
-                    overtop.tvcm.close();
-                    break;
-                case DisplayTempoMod  :
-                    overtop.ovcm.close();
-                    break;
-                case DisplayGeneral  :
-                    overtop.gvc.close();
-                    break;
-                default :
-                    break;
-            }
-             */
-            
         }
     }
 }
