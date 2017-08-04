@@ -162,12 +162,11 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
         else offRamp = aRampNostalgicOffMS;
         
         //get time in ms to target beat, summing over skipped beat lengths
-        SynchronicProcessor::Ptr syncTarget = nostalgic->aPrep->getSyncTargetProcessor();
-        SynchronicSyncMode syncTargetMode = syncTarget->getMode();
+        SynchronicSyncMode syncTargetMode = synchronic->getMode();
         
         if(syncTargetMode == FirstNoteOnSync || syncTargetMode == AnyNoteOnSync)
         {
-            duration = syncTarget->getTimeToBeatMS(nostalgic->aPrep->getBeatsToSkip()) + offRamp + 30; // sum
+            duration = synchronic->getTimeToBeatMS(nostalgic->aPrep->getBeatsToSkip()) + offRamp + 30; // sum
             
             for (auto t : nostalgic->aPrep->getTransposition())
             {

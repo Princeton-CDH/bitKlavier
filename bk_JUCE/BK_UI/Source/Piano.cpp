@@ -64,7 +64,7 @@ void Piano::deconfigure(void)
     }
 }
 
-#define DEFAULT_ID 1
+#define DEFAULT_ID -1
 void Piano::configure(void)
 {
     deconfigure();

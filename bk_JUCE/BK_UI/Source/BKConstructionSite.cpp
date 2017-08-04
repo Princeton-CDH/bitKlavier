@@ -10,7 +10,7 @@
 
 #include "BKConstructionSite.h"
 
-#define AUTO_DRAW 0
+#define AUTO_DRAW 1
 #define NUM_COL 6
 
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
@@ -166,7 +166,6 @@ void BKConstructionSite::draw(void)
 {
 #if AUTO_DRAW
     int keymapCount = 0, prepCount = 0, otherCount = 0, modCount = 0, ttCount = 0;
-    processor.currentPiano->configuration->clear();
 #endif
     
     for (auto item : graph->getItems())

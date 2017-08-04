@@ -143,7 +143,10 @@ void KeymapViewController::fillSelectCB(int last, int current)
     
     for (auto prep : processor.gallery->getKeymaps())
     {
-        int Id = prep->getId();;
+        int Id = prep->getId();
+    
+        if (Id == -1) continue;
+        
         String name = prep->getName();
         
         if (name != String::empty)  selectCB.addItem(name, Id);

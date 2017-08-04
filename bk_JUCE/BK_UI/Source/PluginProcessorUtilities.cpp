@@ -80,7 +80,7 @@ void BKAudioProcessor::updateGalleries()
 {
     collectGalleries();
     
-    updateState->setAllCurrentIdsTo(0);
+    updateState->setAllCurrentIdsTo(-1);
     
     gallery->getGeneralSettings();
     mainPianoSynth.updateGeneralSettings(gallery->getGeneralSettings());
