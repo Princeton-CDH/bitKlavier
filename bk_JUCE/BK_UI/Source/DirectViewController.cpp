@@ -292,12 +292,13 @@ void DirectPreparationEditor::buttonClicked (Button* b)
 {
     if (b == &hideOrShow)
     {
-        DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
-        mod->editted = true;
+        Direct::Ptr direct = processor.gallery->getDirect(processor.updateState->currentDirectId);
+        direct->editted = true;
         
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
 }
+
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ DirectModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~//
 DirectModificationEditor::DirectModificationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):

@@ -88,6 +88,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
                 //play nostalgic note
                 synth->keyOn(
                              midiChannel,
+                             midiNoteNumber,
                              synthNoteNumber,
                              synthOffset,
                              velocities.getUnchecked(midiNoteNumber),
@@ -131,6 +132,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
                 //play nostalgic note
                 synth->keyOn(
                              midiChannel,
+                             midiNoteNumber,
                              synthNoteNumber,
                              synthOffset,
                              velocities.getUnchecked(midiNoteNumber),
@@ -189,6 +191,7 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
                 //play nostalgic note
                 synth->keyOn(
                              midiChannel,
+                             midiNoteNumber,
                              synthNoteNumber,
                              synthOffset,
                              midiNoteVelocity,
@@ -254,6 +257,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
                     float synthOffset = offset - (int)offset;
                     
                     synth->keyOn(midiChannel,
+                                 thisNote->getNoteNumber(),
                                  synthNoteNumber,
                                  synthOffset,
                                  thisNote->getVelocityAtKeyOn(),

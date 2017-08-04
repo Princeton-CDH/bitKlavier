@@ -46,6 +46,7 @@ public:
     bool isActive() { return active; }
     void isActive(bool newactive) {active = newactive; }
     void setMinMaxDefaultInc(std::vector<float> newvals);
+    void setSkewFromMidpoint(bool sfm);
         
     
 private:
@@ -58,6 +59,7 @@ private:
     
     bool sliderIsVertical;
     bool sliderIsBar;
+    bool skewFromMidpoint;
     
     bool active;
     
@@ -123,6 +125,7 @@ public:
     
     void setAllowSubSlider(bool ss) { allowSubSliders = ss; }
     void setSubSliderName(String ssname) { subSliderName = ssname; }
+    void setSkewFromMidpoint(bool sfm);
     
     void cleanupSliderArray();
     void resetRanges();
@@ -157,6 +160,7 @@ private:
     int currentSubSlider;
     int lastHighlightedSlider;
     bool focusLostByEscapeKey;
+    bool skewFromMidpoint;
     
     Slider::SliderStyle subsliderStyle;
     

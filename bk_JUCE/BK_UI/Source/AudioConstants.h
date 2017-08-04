@@ -31,6 +31,7 @@ const String jsonDirectLayerX = "direct::directSub.";
 const String jsonNostalgicLayerX = "nostalgic::nostalgicSub.";
 
 const String vtagGallery = "gallery";
+const String vtagGalleryPath = "galleryPath";
 const String vtagGeneral = "general";
 const String ptagGeneral_globalGain = "globalGain";
 const String ptagGeneral_directGain = "directGain";
@@ -455,7 +456,7 @@ static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc
     {0, 0, 0},
     {0, 4, 0, 1.0},
     {0.1, 2, 1, 0.001},
-    {0.1, 2, 1, 0.001},
+    {-2, 2, 1, 0.001},
     {0., 2., 1, 0.001},
     {-12, 12, 0, 0.01}
 };

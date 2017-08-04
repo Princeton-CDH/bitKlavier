@@ -535,10 +535,12 @@ void BKConstructionSite::mouseDrag (const MouseEvent& e)
     DBG("DRAG: "+String(lineEX) + " " +String(lineEY));
     
     repaint();
+
 }
 
 void BKConstructionSite::mouseUp (const MouseEvent& eo)
 {
+    
     MouseEvent e = eo.getEventRelativeTo(this);
     
     if (itemToSelect == nullptr) lasso->endLasso();
@@ -580,8 +582,6 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
             item->isDragging = false;
         }
     }
-    
-    
     
     processor.currentPiano->configuration->print();
     
@@ -649,7 +649,7 @@ void BKConstructionSite::idDidChange(void)
     // ACTIVE
     processor.updateState->removeActive(type, oldId);
     processor.updateState->addActive(type, newId);
-    
+
     processor.currentPiano->configuration->print();
     
     

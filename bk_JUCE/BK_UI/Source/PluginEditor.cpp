@@ -32,6 +32,8 @@ resizer(new ResizableCornerComponent (this, constrain))
     
     mvc.setSize(gMainComponentWidth, gMainComponentHeight);
     setSize(gMainComponentWidth, gMainComponentHeight);
+    
+    processor.initializeGallery();
 
 }
 

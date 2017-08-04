@@ -66,6 +66,7 @@ public:
     
     StringArray                         galleryNames;
     String                              currentGallery;
+    String                              currentGalleryPath;
     
     
     void updateGalleries(void);

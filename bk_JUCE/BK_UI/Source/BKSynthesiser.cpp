@@ -304,6 +304,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     
     //==============================================================================
     void BKSynthesiser::keyOn (const int midiChannel,
+                               const int keyNoteNumber,
                                const int midiNoteNumber,
                                const float transp,
                                const float velocity,
@@ -332,9 +333,11 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                 && sound->appliesToVelocity((int)(velocity * 127.0))
                 && sound->appliesToChannel (midiChannel))
             {
+                //DBG("BKSynthesiser::keyOn " + String(noteNumber));
                 startVoice (findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes),
                             sound,
                             midiChannel,
+                            keyNoteNumber,
                             noteNumber,
                             transposition,
                             velocity * gain,
@@ -354,6 +357,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     void BKSynthesiser::startVoice (BKSynthesiserVoice* const voice,
                                     BKSynthesiserSound* const sound,
                                     const int midiChannel,
+                                    const int keyNoteNumber,
                                     const int midiNoteNumber,
                                     const float midiNoteNumberOffset,
                                     const float volume,
@@ -387,6 +391,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             voice->keyIsDown = true;
             voice->sostenutoPedalDown = false;
             voice->sustainPedalDown = sustainPedalsDown[midiChannel];
+            
+            voice->currentlyPlayingKey = keyNoteNumber; //keep track of which physical key is associated with this voice
             
             float gain = volume;
             
@@ -445,6 +451,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     void BKSynthesiser::keyOff (const int midiChannel,
                                 const BKNoteType type,
                                 const int layerId,
+                                const int keyNoteNumber,
                                 const int midiNoteNumber,
                                 const float velocity,
                                 bool allowTailOff)
@@ -456,8 +463,9 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             BKSynthesiserVoice* const voice = voices.getUnchecked (i);
             
             if (voice->getCurrentlyPlayingNote() == midiNoteNumber
+                && voice->getCurrentlyPlayingKey() == keyNoteNumber
                 && voice->isPlayingChannel (midiChannel)
-                && (voice->layerId == layerToLayerId(type, layerId)))
+                && (voice->layerId == layerToLayerId(type, layerId))) //need to add transposition level as well here
             {
                 
                 if (BKSynthesiserSound* const sound = voice->getCurrentlyPlayingSound())
@@ -472,6 +480,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                         
                         
                         if (! ((voice->type == FixedLengthFixedStart) || (voice->type == FixedLength) || voice->sustainPedalDown || voice->sostenutoPedalDown)) {
+                            //DBG("BKSynthesiser::stopVoice " + String(midiNoteNumber));
                             stopVoice (voice, velocity, allowTailOff);
                         }
                     }

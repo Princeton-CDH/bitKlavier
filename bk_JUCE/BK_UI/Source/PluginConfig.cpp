@@ -75,11 +75,24 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
     
     if (galleryDidLoad)
     {
+        
+        ValueTree galleryVT(vtagGalleryPath);
+        galleryVT.setProperty("galleryPath", currentGalleryPath, 0);
+        galleryVT.setProperty("defaultPiano", gallery->getCurrentPiano(), 0);
+        
+        DBG("saving gallery to plugin state: getStateInformation() " +  currentGalleryPath);
+        ScopedPointer<XmlElement> galleryXML = galleryVT.createXml();
+        copyXmlToBinary (*galleryXML, destData);
+        
+        
+        /* //this will save entire state, rather than just which Gallery/Piano is being used
         ValueTree galleryVT = gallery->getState();
     
         ScopedPointer<XmlElement> galleryXML = galleryVT.createXml();
         
         copyXmlToBinary (*galleryXML, destData);
+         */
+        
     }
 }
 
@@ -92,6 +105,24 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
     //loadGallery
     if (galleryDidLoad)
     {
+        
+        ScopedPointer<XmlElement> galleryXML (getXmlFromBinary (data, sizeInBytes));
+        if (galleryXML != nullptr)
+        {
+            currentGalleryPath = galleryXML->getStringAttribute("galleryPath");
+            DBG("loading gallery from plugin state: setStateInformation() " + currentGalleryPath);
+            
+            loadGalleryFromPath(currentGalleryPath);
+            
+            //override gallery-saved defaultPiano with pluginHost-saved defaultPiano
+            setCurrentPiano(galleryXML->getStringAttribute("defaultPiano").getIntValue());
+            
+            initializeGallery();
+            
+        }
+    
+        
+        /* //will load entire state rather than just galleryPath, assuming it has been saved
         ScopedPointer<XmlElement> galleryXML (getXmlFromBinary (data, sizeInBytes));
         if (galleryXML != nullptr)
         {
@@ -100,6 +131,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             initializeGallery();
 
         }
+         */
     }
 }
 

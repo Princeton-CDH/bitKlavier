@@ -497,6 +497,7 @@ void TuningPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableC
 {
     Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
     tuning->editted = true;
+    DBG("************** tuning->edited = true");
     
     tuning->setName(name);
 }
