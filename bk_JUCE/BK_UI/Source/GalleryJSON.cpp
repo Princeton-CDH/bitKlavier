@@ -368,9 +368,19 @@ void Gallery::setStateFromJson(var myJson)
                     }
                     
                     // Make new keymap
-                    addKeymap();
-                    Keymap::Ptr thisKeymap = bkKeymaps.getLast();
-                    for (int k = 0; k < keys.size(); k += 2 )   thisKeymap->addNote(keys[k]);
+                    Keymap::Ptr thisKeymap;
+                    bool isFull = true;
+                    for (int i = 21; i < 109; i++) if (!keys.contains(i)) {isFull = false;break;}
+                    if (isFull)
+                    {
+                        thisKeymap = defaultKeymap;
+                    }
+                    else
+                    {
+                        addKeymap();
+                        thisKeymap = bkKeymaps.getLast();
+                        for (int k = 0; k < keys.size(); k += 2 )   thisKeymap->addNote(keys[k]);
+                    }
                     
                     BKItem* keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, thisKeymap->getId());
                     
@@ -479,7 +489,6 @@ void Gallery::setStateFromJson(var myJson)
                     
                     nostPrep->setWaveDistance(wavedistance);
                     
-                    // Check if nostalgic[Id] already exists as another nostalgic.
                     addNostalgic();
                     Nostalgic::Ptr thisNostalgic = nostalgic.getLast();
                     nId = thisNostalgic->getId();
@@ -536,10 +545,20 @@ void Gallery::setStateFromJson(var myJson)
                     }
                     
                     // Make new keymap
-                    addKeymap();
-                    Keymap::Ptr thisKeymap = bkKeymaps.getLast();
-                    for (int k = 0; k < keys.size(); k += 2 )   thisKeymap->addNote(keys[k]);
-                    
+                    Keymap::Ptr thisKeymap;
+                    bool isFull = true;
+                    for (int i = 21; i < 109; i++) if (!keys.contains(i)) {isFull = false;break;}
+                    if (isFull)
+                    {
+                        thisKeymap = defaultKeymap;
+                    }
+                    else
+                    {
+                        addKeymap();
+                        thisKeymap = bkKeymaps.getLast();
+                        for (int k = 0; k < keys.size(); k += 2 )   thisKeymap->addNote(keys[k]);
+                    }
+                
                     BKItem* keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, thisKeymap->getId());
                     
                     if (keymapItem == nullptr)
@@ -627,9 +646,19 @@ void Gallery::setStateFromJson(var myJson)
                     }
                     
                     // Make new keymap
-                    addKeymap();
-                    Keymap::Ptr thisKeymap = bkKeymaps.getLast();
-                    for (int k = 0; k < keys.size(); k += 2 )   thisKeymap->addNote(keys[k]);
+                    Keymap::Ptr thisKeymap;
+                    bool isFull = true;
+                    for (int i = 21; i < 109; i++) if (!keys.contains(i)) {isFull = false;break;}
+                    if (isFull)
+                    {
+                        thisKeymap = defaultKeymap;
+                    }
+                    else
+                    {
+                        addKeymap();
+                        thisKeymap = bkKeymaps.getLast();
+                        for (int k = 0; k < keys.size(); k += 2 )   thisKeymap->addNote(keys[k]);
+                    }
                     
                     BKItem* keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, thisKeymap->getId());
                     

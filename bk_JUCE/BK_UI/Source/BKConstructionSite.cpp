@@ -10,7 +10,7 @@
 
 #include "BKConstructionSite.h"
 
-#define AUTO_DRAW 1
+#define AUTO_DRAW 0
 #define NUM_COL 6
 
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
@@ -195,11 +195,6 @@ void BKConstructionSite::draw(void)
             item->setTopLeftPosition(X, Y);
             
             keymapCount++;
-
-            
-            item->setTopLeftPosition(xy);
-
-            
         }
         else if (type <= PreparationTypeNostalgic)
         {
@@ -213,7 +208,6 @@ void BKConstructionSite::draw(void)
             item->setTopLeftPosition(X, Y);
             
             prepCount++;
-
             
         }
         else if (type == PreparationTypeTuning || type == PreparationTypeTempo)
