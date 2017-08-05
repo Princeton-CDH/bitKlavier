@@ -499,7 +499,10 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
 void BKAudioProcessor::initializeGallery(void)
 {
     prevPiano = gallery->getPiano(1);
-    currentPiano = gallery->getPiano(1/*gallery->getDefaultPiano()*/);
+    
+    int defPiano = gallery->getDefaultPiano();
+    if(defPiano >= gallery->getNumPianos() || defPiano < 1) defPiano = 1;
+    currentPiano = gallery->getPiano(defPiano);
     
     gallery->addTempoWithId(-1);
     gallery->addTuningWithId(-1);
