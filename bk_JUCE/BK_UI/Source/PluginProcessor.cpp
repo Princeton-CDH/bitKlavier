@@ -473,6 +473,7 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
 
 void BKAudioProcessor::loadJsonGalleryDialog(void)
 {
+    updateState->loadingJson = true;
     FileChooser myChooser ("Load gallery from json file...",
                            File::getSpecialLocation (File::userHomeDirectory),
                            "*.json");
@@ -493,7 +494,6 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
         
         galleryDidLoad = true;
     }
-    
 }
 
 void BKAudioProcessor::initializeGallery(void)
@@ -508,7 +508,11 @@ void BKAudioProcessor::initializeGallery(void)
     gallery->addDirectWithId(-1);
     gallery->addKeymapWithId(-1);
     
-    for (auto piano : gallery->getPianos()) piano->configure();
+    for (auto piano : gallery->getPianos())
+    {
+        piano->configure();
+        if (piano->getId() > gallery->getIdCount(PreparationTypePiano)) gallery->setIdCount(PreparationTypePiano, piano->getId());
+    }
     
     gallery->prepareToPlay(bkSampleRate);
     
@@ -519,6 +523,7 @@ void BKAudioProcessor::initializeGallery(void)
 
 void BKAudioProcessor::loadJsonGalleryFromPath(String path)
 {
+    updateState->loadingJson = true;
     File myFile (path);
     
     currentGallery = myFile.getFileName();

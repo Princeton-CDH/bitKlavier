@@ -15,12 +15,7 @@
 Gallery::Gallery(ScopedPointer<XmlElement> xml, BKAudioProcessor& p):
 processor(p),
 url(String::empty)
-{
-    for (int i = 0; i < BKPreparationTypeNil; i++)
-    {
-        idCount.add(10);
-    }
-    
+{    
     general = new GeneralSettings();
 
     setStateFromXML(xml);

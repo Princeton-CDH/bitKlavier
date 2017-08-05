@@ -259,9 +259,9 @@ public:
            BKUpdateState::Ptr us):
     sPrep(new TuningPreparation(prep)),
     aPrep(new TuningPreparation(sPrep)),
+    updateState(us),
     Id(Id),
-    name(String(Id)),
-    updateState(us)
+    name(String(Id))
     {
         tuningLibrary.ensureStorageAllocated((int)cTuningSystemNames.size());
         for(int i=0; i<cTuningSystemNames.size(); i++) tuningLibrary.insert(EqualTemperament, tEqualTuning);
