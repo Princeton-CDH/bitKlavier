@@ -388,18 +388,18 @@ void Gallery::setStateFromJson(var myJson)
                     }
                     
                     // Make new keymap
-                    Keymap::Ptr thisKeymap;
-                    bool isFull = true;
-                    for (int i = 21; i < 109; i++) if (!keys.contains(i)) {isFull = false;break;}
-                    if (isFull)
-                    {
-                        thisKeymap = defaultKeymap;
-                    }
-                    else
+                    Keymap::Ptr testKeymap = new Keymap();
+                    for (int k = 0; k < keys.size(); k += 2 )   testKeymap->addNote(keys[k]);
+                    Keymap::Ptr thisKeymap = matches(testKeymap);
+                    
+                    if (thisKeymap == nullptr)
                     {
                         addKeymap();
                         thisKeymap = bkKeymaps.getLast();
-                        for (int k = 0; k < keys.size(); k += 2 )   thisKeymap->addNote(keys[k]);
+                        for (int k = 0; k < keys.size(); k += 2 )
+                        {
+                            if (keys[k] != -1) thisKeymap->addNote(keys[k]);
+                        }
                     }
                     
                     BKItem* keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, thisKeymap->getId());
