@@ -90,7 +90,7 @@ void TempoProcessor::atCalculatePeriodMultiplier()
     }
 }
 
-void TempoProcessor::reset()
+void TempoProcessor::adaptiveReset()
 {
     for (int i = 0; i < tempo->aPrep->getAdaptiveTempo1History(); i++)
     {
