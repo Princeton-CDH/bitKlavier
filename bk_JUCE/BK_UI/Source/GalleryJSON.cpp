@@ -573,18 +573,18 @@ void Gallery::setStateFromJson(var myJson)
                     }
                     
                     // Make new keymap
-                    Keymap::Ptr thisKeymap;
-                    bool isFull = true;
-                    for (int i = 21; i < 109; i++) if (!keys.contains(i)) {isFull = false;break;}
-                    if (isFull)
-                    {
-                        thisKeymap = defaultKeymap;
-                    }
-                    else
+                    Keymap::Ptr testKeymap = new Keymap();
+                    for (int k = 0; k < keys.size(); k += 2 )   testKeymap->addNote(keys[k]);
+                    Keymap::Ptr thisKeymap = matches(testKeymap);
+                    
+                    if (thisKeymap == nullptr)
                     {
                         addKeymap();
                         thisKeymap = bkKeymaps.getLast();
-                        for (int k = 0; k < keys.size(); k += 2 )   thisKeymap->addNote(keys[k]);
+                        for (int k = 0; k < keys.size(); k += 2 )
+                        {
+                            if (keys[k] != -1) thisKeymap->addNote(keys[k]);
+                        }
                     }
                 
                     BKItem* keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, thisKeymap->getId());
@@ -679,18 +679,18 @@ void Gallery::setStateFromJson(var myJson)
                     }
                     
                     // Make new keymap
-                    Keymap::Ptr thisKeymap;
-                    bool isFull = true;
-                    for (int i = 21; i < 109; i++) if (!keys.contains(i)) {isFull = false;break;}
-                    if (isFull)
-                    {
-                        thisKeymap = defaultKeymap;
-                    }
-                    else
+                    Keymap::Ptr testKeymap = new Keymap();
+                    for (int k = 0; k < keys.size(); k += 2 )   testKeymap->addNote(keys[k]);
+                    Keymap::Ptr thisKeymap = matches(testKeymap);
+                    
+                    if (thisKeymap == nullptr)
                     {
                         addKeymap();
                         thisKeymap = bkKeymaps.getLast();
-                        for (int k = 0; k < keys.size(); k += 2 )   thisKeymap->addNote(keys[k]);
+                        for (int k = 0; k < keys.size(); k += 2 )
+                        {
+                            if (keys[k] != -1) thisKeymap->addNote(keys[k]);
+                        }
                     }
                     
                     BKItem* keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, thisKeymap->getId());
@@ -738,15 +738,18 @@ void Gallery::setStateFromJson(var myJson)
                     
                     if (key >= 0 && key < 128 && pId >= 1)
                     {
-                        Keymap::Ptr km = new Keymap();
-                        km->addNote(key);
-                        
-                        Keymap::Ptr thisKeymap = matches(km);
-                        
+                        // Make new keymap
+                        Keymap::Ptr testKeymap = new Keymap();
+                        testKeymap->addNote(key);
+                        Keymap::Ptr thisKeymap = matches(testKeymap);
                         if (thisKeymap == nullptr)
                         {
                             addKeymap();
                             thisKeymap = bkKeymaps.getLast();
+                            for (int k = 0; k < keys.size(); k += 2 )
+                            {
+                                if (keys[k] != -1) thisKeymap->addNote(keys[k]);
+                            }
                         }
                         
                         // MAKE PIANO MAP ITEM AND CONNECT TO KEYMAP
@@ -814,16 +817,19 @@ void Gallery::setStateFromJson(var myJson)
                     thisTuningMod->setParam(TuningFundamental, String(fund));
                     thisTuningMod->setParam(TuningScale, String(tscale));
                     
-                    // Make new keyma
-                    Keymap::Ptr km = new Keymap();
-                    km->addNote(noteNumber);
-                    
-                    Keymap::Ptr thisKeymap = matches(km);
+                    // Make new keymap
+                    Keymap::Ptr testKeymap = new Keymap();
+                    for (int k = 0; k < keys.size(); k += 2 )   testKeymap->addNote(noteNumber);
+                    Keymap::Ptr thisKeymap = matches(testKeymap);
                     
                     if (thisKeymap == nullptr)
                     {
                         addKeymap();
                         thisKeymap = bkKeymaps.getLast();
+                        for (int k = 0; k < keys.size(); k += 2 )
+                        {
+                            if (keys[k] != -1) thisKeymap->addNote(keys[k]);
+                        }
                     }
                     
                     BKItem* modItem = thisPiano->itemWithTypeAndId(PreparationTypeTuningMod, thisTuningMod->getId());
