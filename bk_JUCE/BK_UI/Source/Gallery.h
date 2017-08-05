@@ -607,6 +607,16 @@ public:
         return newId;
     }
     
+    inline void setIdCount(BKPreparationType type, int count)
+    {
+        idCount.set(type, count);
+    }
+    
+    inline int getIdCount(BKPreparationType type)
+    {
+        return idCount[type];
+    }
+    
     inline void setDefaultPiano(int Id)
     {
         defaultPianoId = Id;

@@ -415,6 +415,11 @@ void BKItem::setState(XmlElement* e)
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ BKGraph ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
+BKItemGraph::~BKItemGraph(void)
+{
+    items.clear();
+}
+
 void BKItemGraph::updateClipboard(void)
 {
     clipboard.clear();

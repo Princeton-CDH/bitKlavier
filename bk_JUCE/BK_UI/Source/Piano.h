@@ -91,13 +91,10 @@ public:
     int numResetMappers;
     
     OwnedArray<Modifications> modificationMap;
-
-    
-    BKItem::PtrArr     items;
     
     inline BKItem::PtrArr getItems(void) const noexcept { return items; }
     
-    inline BKItem::Ptr itemWithTypeAndId(BKPreparationType type, int thisId)
+    inline BKItem* itemWithTypeAndId(BKPreparationType type, int thisId)
     {
         for (auto item : items)
         {
@@ -139,6 +136,7 @@ public:
     void configure(void);
     void deconfigure(void);
 
+    BKItem::PtrArr    items;
     
     void removePreparationFromKeymap(BKPreparationType thisType, int thisId, int keymapId);
     
