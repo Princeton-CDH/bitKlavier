@@ -272,17 +272,9 @@ void BKItem::itemIsBeingDragged(const MouseEvent& e, Point<int> startPosition)
     ((BKConstructionSite*)getParentComponent())->itemIsBeingDragged(this, startPosition);
 }
 
-void BKItem::mouseDown(const MouseEvent& e)
+void BKItem::mouseDoubleClick(const MouseEvent& e)
 {
-    
-    ((BKConstructionSite*)getParentComponent())->setCurrentItem(this);
-    
-    if (isDraggable)
-    {
-        prepareDrag(e);
-    }
-    
-    if (e.getNumberOfClicks() >= 2)
+    //if (e.getNumberOfClicks() >= 2)
     {
         
         if (type == PreparationTypeDirect)
@@ -356,7 +348,16 @@ void BKItem::mouseDown(const MouseEvent& e)
             menu.showPopup();
         }
     }
+}
 
+void BKItem::mouseDown(const MouseEvent& e)
+{
+    ((BKConstructionSite*)getParentComponent())->setCurrentItem(this);
+    
+    if (isDraggable)
+    {
+        prepareDrag(e);
+    }
 }
 
 void BKItem::keyPressedWhileSelected(const KeyPress& e)
