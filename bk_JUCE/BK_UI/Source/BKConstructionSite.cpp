@@ -10,7 +10,6 @@
 
 #include "BKConstructionSite.h"
 
-#define AUTO_DRAW 0
 #define NUM_COL 6
 
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
@@ -165,98 +164,96 @@ void BKConstructionSite::pianoMapDidChange(BKItem* thisItem)
 
 void BKConstructionSite::draw(void)
 {
-#if AUTO_DRAW
-    int keymapCount = 0, prepCount = 0, otherCount = 0, modCount = 0, ttCount = 0;
-#endif
-    
+
     for (auto item : graph->getItems())
     {
         addAndMakeVisible(item);
-      
-#if AUTO_DRAW
+    }
+    
+    if (processor.updateState->loadingJson)
+    {
+        int keymapCount = 0, prepCount = 0, otherCount = 0, modCount = 0, ttCount = 0;
         
-        BKPreparationType type = item->getType();
-        int which = item->getId();
+        for (auto item : graph->getItems())
+        {
+            BKPreparationType type = item->getType();
+            
+            if (type == PreparationTypeKeymap)
+            {
+
+                int col = (int)(keymapCount / NUM_COL);
+                int row = keymapCount % NUM_COL;
+                
+                int X = 10 + (row * 155);
+                int Y = 50 + (col * 25);
+                
+                item->setTopLeftPosition(X, Y);
+                
+                keymapCount++;
+            }
+            else if (type <= PreparationTypeNostalgic)
+            {
+
+                int col = (int)(prepCount / NUM_COL);
+                int row = prepCount % NUM_COL;
+                
+                int X = 10 + (row * 155);
+                int Y = 350 + (col * 25);
+                
+                item->setTopLeftPosition(X, Y);
+                
+                prepCount++;
+                
+            }
+            else if (type == PreparationTypeTuning || type == PreparationTypeTempo)
+            {
+
+                int col = (int)(ttCount / NUM_COL);
+                int row = ttCount % NUM_COL;
+                
+                int X = 10 + (row * 155);
+                int Y = 500 + (col * 25);
+                
+                
+                item->setTopLeftPosition(X, Y);
+                
+                ttCount++;
+
+            }
+            else if (type > PreparationTypeKeymap)
+            {
+
+                int col = (int)(modCount / NUM_COL);
+                int row = modCount % NUM_COL;
+                
+                int X = 10 + (row * 155);
+                int Y = 200 + (col * 25);
+                
+                
+                item->setTopLeftPosition(X, Y);
+                
+                modCount++;
+
+            }
+            else
+            {
+
+                int col = (int)(otherCount / NUM_COL);
+                int row = otherCount % NUM_COL;
+                
+                int X = 10 + (row * 155);
+                int Y = 350 + (col * 25);
+                
+                item->setTopLeftPosition(X, Y);
+                
+                otherCount++;
+
+                
+            }
+            DBG("itemxy: " + String(item->getX()) + " " + String(item->getY()));
+        }
         
-        Point<int> xy = item->getPosition();
-        
-        DBG("itemxy: " + String(item->getX()) + " " + String(item->getY()));
-        
-        int x = xy.x; int y = xy.y;
-        
-        if (type == PreparationTypeKeymap)
-        {
-
-            int col = (int)(keymapCount / NUM_COL);
-            int row = keymapCount % NUM_COL;
-            
-            int X = 10 + (row * 155);
-            int Y = 50 + (col * 25);
-            
-            item->setTopLeftPosition(X, Y);
-            
-            keymapCount++;
-        }
-        else if (type <= PreparationTypeNostalgic)
-        {
-
-            int col = (int)(prepCount / NUM_COL);
-            int row = prepCount % NUM_COL;
-            
-            int X = 10 + (row * 155);
-            int Y = 350 + (col * 25);
-            
-            item->setTopLeftPosition(X, Y);
-            
-            prepCount++;
-            
-        }
-        else if (type == PreparationTypeTuning || type == PreparationTypeTempo)
-        {
-
-            int col = (int)(ttCount / NUM_COL);
-            int row = ttCount % NUM_COL;
-            
-            int X = 10 + (row * 155);
-            int Y = 500 + (col * 25);
-            
-            
-            item->setTopLeftPosition(X, Y);
-            
-            ttCount++;
-
-        }
-        else if (type > PreparationTypeKeymap)
-        {
-
-            int col = (int)(modCount / NUM_COL);
-            int row = modCount % NUM_COL;
-            
-            int X = 10 + (row * 155);
-            int Y = 200 + (col * 25);
-            
-            
-            item->setTopLeftPosition(X, Y);
-            
-            modCount++;
-
-        }
-        else
-        {
-
-            int col = (int)(otherCount / NUM_COL);
-            int row = otherCount % NUM_COL;
-            
-            int X = 10 + (row * 155);
-            int Y = 350 + (col * 25);
-            
-            item->setTopLeftPosition(X, Y);
-            
-            otherCount++;
-
-            
-        }
-#endif
+        processor.updateState->loadingJson = false;
     }
     
     repaint();

@@ -61,8 +61,9 @@ public:
     
     BKPreparationDisplay currentDisplay = DisplayNil;
     bool displayDidChange;
-
     
+    bool loadingJson = false;
+
     void setCurrentDisplay(BKPreparationDisplay type)
     {
         currentDisplay = type;
