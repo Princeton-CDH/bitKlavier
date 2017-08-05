@@ -117,8 +117,14 @@ void Gallery::setStateFromJson(var myJson)
             
             defaultTuning->setFundamentalOffset(offset);
             
-            addTuning(defaultTuning);
-            directTuning = tuning.getLast();
+            directTuning = matches(defaultTuning);
+            
+            if (directTuning == nullptr)
+            {
+                addTuning(defaultTuning);
+                directTuning = tuning.getLast();
+            }
+            
             
             BKItem* directTuningItem = thisPiano->itemWithTypeAndId(PreparationTypeTuning, directTuning->getId());
             
@@ -212,8 +218,14 @@ void Gallery::setStateFromJson(var myJson)
                     TuningPreparation::Ptr tuningPrep = new TuningPreparation(defaultTuning);
                     tuningPrep->setTuning(metroTuning);
                     tuningPrep->setFundamental((PitchClass)((12-metroFundamental)%12));
-                    addTuning(tuningPrep);
-                    synchronicTuning = tuning.getLast();
+                    
+                    
+                    synchronicTuning = matches(tuningPrep);
+                    if (synchronicTuning == nullptr)
+                    {
+                        addTuning(tuningPrep);
+                        synchronicTuning = tuning.getLast();
+                    }
                     tId = synchronicTuning->getId();
                     
                     SynchronicPreparation::Ptr syncPrep = new SynchronicPreparation();
@@ -270,8 +282,12 @@ void Gallery::setStateFromJson(var myJson)
                     
                     TempoPreparation::Ptr tempoPrep = new TempoPreparation();
                     tempoPrep->setTempo(tmp);
-                    addTempo(tempoPrep);
-                    Tempo::Ptr thisTempo = tempo.getLast();
+                    Tempo::Ptr thisTempo = matches(tempoPrep);
+                    if (thisTempo == nullptr)
+                    {
+                        addTempo(tempoPrep);
+                        thisTempo = tempo.getLast();
+                    }
                     oId = thisTempo->getId();
                     
                     int syncMode = jsonGetValue(sx+"syncMode");
@@ -311,8 +327,12 @@ void Gallery::setStateFromJson(var myJson)
                     
                     syncPrep->setLengthMultipliers(lens);
                     
-                    addSynchronic(syncPrep);
-                    Synchronic::Ptr thisSynchronic = synchronic.getLast();
+                    Synchronic::Ptr thisSynchronic = matches(syncPrep);
+                    if (thisSynchronic == nullptr)
+                    {
+                        addSynchronic(syncPrep);
+                        thisSynchronic = synchronic.getLast();
+                    }
                     synchronicTarget = thisSynchronic;
                     sId = thisSynchronic->getId();
                     
@@ -438,8 +458,14 @@ void Gallery::setStateFromJson(var myJson)
                     TuningPreparation::Ptr tunePrep = new TuningPreparation(defaultTuning);
                     tunePrep->setTuning(revTuning);
                     tunePrep->setFundamental((PitchClass)((12-revFundamental)%12));
-                    addTuning(tunePrep);
-                    nostalgicTuning = tuning.getLast();
+                    
+                    nostalgicTuning = matches(tunePrep);
+                    
+                    if (nostalgicTuning == nullptr)
+                    {
+                        addTuning(tunePrep);
+                        nostalgicTuning = tuning.getLast();
+                    }
                     tId = nostalgicTuning->getId();
                     
                     NostalgicPreparation::Ptr nostPrep = new NostalgicPreparation(tuning[tId]);
@@ -625,8 +651,13 @@ void Gallery::setStateFromJson(var myJson)
                             " OFF");
                     }
                     
-                    addDirect(dPrep);
-                    Direct::Ptr thisDirect = direct.getLast();
+                    Direct::Ptr thisDirect = matches(dPrep);
+                    if (thisDirect == nullptr)
+                    {
+                        addDirect(dPrep);
+                        thisDirect = direct.getLast();
+                        
+                    }
                     
                     BKItem* directItem = thisPiano->itemWithTypeAndId(PreparationTypeDirect, thisDirect->getId());
                     
@@ -705,9 +736,16 @@ void Gallery::setStateFromJson(var myJson)
                     
                     if (key >= 0 && key < 128 && pId >= 1)
                     {
-                        addKeymap();
-                        Keymap::Ptr thisKeymap = bkKeymaps.getLast();
-                        thisKeymap->addNote(key);
+                        Keymap::Ptr km = new Keymap();
+                        km->addNote(key);
+                        
+                        Keymap::Ptr thisKeymap = matches(km);
+                        
+                        if (thisKeymap == nullptr)
+                        {
+                            addKeymap();
+                            thisKeymap = bkKeymaps.getLast();
+                        }
                         
                         // MAKE PIANO MAP ITEM AND CONNECT TO KEYMAP
                         
@@ -774,10 +812,17 @@ void Gallery::setStateFromJson(var myJson)
                     thisTuningMod->setParam(TuningFundamental, String(fund));
                     thisTuningMod->setParam(TuningScale, String(tscale));
                     
-                    // Make new keymap
-                    addKeymap();
-                    Keymap::Ptr thisKeymap = bkKeymaps.getLast();
-                    thisKeymap->addNote(noteNumber);
+                    // Make new keyma
+                    Keymap::Ptr km = new Keymap();
+                    km->addNote(noteNumber);
+                    
+                    Keymap::Ptr thisKeymap = matches(km);
+                    
+                    if (thisKeymap == nullptr)
+                    {
+                        addKeymap();
+                        thisKeymap = bkKeymaps.getLast();
+                    }
                     
                     BKItem* modItem = thisPiano->itemWithTypeAndId(PreparationTypeTuningMod, thisTuningMod->getId());
                     

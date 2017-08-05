@@ -147,6 +147,61 @@ public:
         return tempo;
     }
     
+    inline Keymap::Ptr matches(Keymap::Ptr keymap)
+    {
+        for (auto p : bkKeymaps)
+        {
+            if (p->compare(keymap)) return p;
+        }
+        
+        return nullptr;
+    }
+    
+    inline Tuning::Ptr matches(TuningPreparation::Ptr prep)
+    {
+        for (auto p : tuning)
+        {
+            if (p->sPrep->compare(prep)) return p;
+        }
+        return nullptr;
+    }
+    
+    inline Direct::Ptr matches(DirectPreparation::Ptr prep)
+    {
+        for (auto p : direct)
+        {
+            if (p->sPrep->compare(prep)) return p;
+        }
+        return nullptr;
+    }
+    
+    inline Synchronic::Ptr matches(SynchronicPreparation::Ptr prep)
+    {
+        for (auto p : synchronic)
+        {
+            if (p->sPrep->compare(prep)) return p;
+        }
+        return nullptr;
+    }
+    
+    inline Nostalgic::Ptr matches(NostalgicPreparation::Ptr prep)
+    {
+        for (auto p : nostalgic)
+        {
+            if (p->sPrep->compare(prep)) return p;
+        }
+        return nullptr;
+    }
+    
+    inline Tempo::Ptr matches(TempoPreparation::Ptr prep)
+    {
+        for (auto p : tempo)
+        {
+            if (p->sPrep->compare(prep)) return p;
+        }
+        return nullptr;
+    }
+    
     inline const StringArray getAllKeymapNames(void) const noexcept
     {
         StringArray names;

@@ -10,7 +10,7 @@
 
 #include "BKConstructionSite.h"
 
-#define AUTO_DRAW 0
+#define AUTO_DRAW 1
 #define NUM_COL 6
 
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
@@ -22,6 +22,7 @@ connect(false),
 lastX(10),
 lastY(10)
 {
+    setWantsKeyboardFocus(false);
     graph->deselectAll();
 }
 
@@ -477,8 +478,10 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
         lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoOutlineColourId, Colours::white);
         
         lasso->beginLasso(eo, this);
+
     }
-    
+
+    getParentComponent()->grabKeyboardFocus();
     
 }
 
@@ -545,6 +548,8 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
     }
     
     repaint();
+    
+    getParentComponent()->grabKeyboardFocus();
     
 }
 

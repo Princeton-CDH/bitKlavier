@@ -134,71 +134,71 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
             }
             else if (e->hasTagName( vtagTuning))
             {
-                addTuningWithId(-1);
+                addTuningWithId(0);
                 
                 tuning.getLast()->setState(e);
             }
             else if (e->hasTagName( vtagModTuning))
             {
-                addTuningModWithId(-1);
+                addTuningModWithId(0);
                 
                 modTuning.getLast()->setState(e);
             }
             else if (e->hasTagName( vtagDirect))
             {
-                addDirectWithId(-1);
+                addDirectWithId(0);
                 
                 direct.getLast()->setState(e, tuning);
             }
             else if (e->hasTagName( vtagModDirect))
             {
-                addDirectModWithId(-1);
+                addDirectModWithId(0);
                 
                 modDirect.getLast()->setState(e);
             }
             else if (e->hasTagName( vtagSynchronic))
             {
-                addSynchronicWithId(-1);
+                addSynchronicWithId(0);
                 
                 synchronic.getLast()->setState(e, tuning, tempo);
                 
             }
             else if (e->hasTagName( vtagModSynchronic))
             {
-                addSynchronicModWithId(-1);
+                addSynchronicModWithId(0);
             
                 modSynchronic.getLast()->setState(e);
                 
             }
             else if (e->hasTagName( vtagTempo))
             {
-                addTempoWithId(-1);
+                addTempoWithId(0);
 
                 tempo.getLast()->setState(e);
                 
             }
             else if (e->hasTagName( vtagModTempo))
             {
-                addTempoModWithId(-1);
+                addTempoModWithId(0);
                 
                 modTempo.getLast()->setState(e);
                 
             }
             else if (e->hasTagName( vtagNostalgic))
             {
-                addNostalgicWithId(-1);
+                addNostalgicWithId(0);
                 
                 nostalgic.getLast()->setState(e, tuning, synchronic);
             }
             else if (e->hasTagName( vtagModNostalgic))
             {
-                addNostalgicModWithId(-1);
+                addNostalgicModWithId(0);
                 
                 modNostalgic.getLast()->setState(e);
             }
             else if (e->hasTagName(vtagPiano))
             {
-                addPianoWithId(-1);
+                addPianoWithId(0);
                 
                 bkPianos.getLast()->setState(e);
             }
