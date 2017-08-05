@@ -370,13 +370,6 @@ public:
     NostalgicPreparation::Ptr      sPrep;
     NostalgicPreparation::Ptr      aPrep;
     
-    void reset()
-    {
-        aPrep->copy(sPrep);
-        updateState->nostalgicPreparationDidChange = true;
-        DBG("nostalgic reset");
-    }
-    
     //void didChange(bool which) { updateState->nostalgicPreparationDidChange = which; }
     
     inline String getName(void) const noexcept {return name;}inline void setName(String newName)
@@ -385,10 +378,11 @@ public:
         updateState->nostalgicPreparationDidChange = true;
     }
     
+    BKUpdateState::Ptr updateState;
+    
 private:
     int Id;
     String name;
-    BKUpdateState::Ptr updateState;
     
     JUCE_LEAK_DETECTOR(Nostalgic)
 };
@@ -672,6 +666,13 @@ public:
     {
         sampleRate = sr;
         synth = main;
+    }
+    
+    inline void reset(void)
+    {
+        nostalgic->aPrep->copy(nostalgic->sPrep);
+        nostalgic->updateState->nostalgicPreparationDidChange = true;
+        DBG("nostalgic reset");
     }
     
     inline int getId(void) const noexcept { return nostalgic->getId(); }

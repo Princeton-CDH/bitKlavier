@@ -498,15 +498,7 @@ public:
     
     SynchronicPreparation::Ptr      sPrep;
     SynchronicPreparation::Ptr      aPrep;
-    
-    void reset()
-    {
-        aPrep->copy(sPrep);
-        //processor->atReset();
-        updateState->synchronicPreparationDidChange = true;
-        DBG("synchronic reset");
-    }
-    
+
     //void didChange(bool which) { updateState->synchronicPreparationDidChange = which; }
     
     inline String getName(void) const noexcept {return name;}
@@ -517,10 +509,12 @@ public:
         updateState->synchronicPreparationDidChange = true;
     }
     
+    BKUpdateState::Ptr updateState;
+    
 private:
     int Id;
     String name;
-    BKUpdateState::Ptr updateState;
+    
     
     JUCE_LEAK_DETECTOR(Synchronic)
 };
@@ -929,6 +923,13 @@ public:
     }
     //void  atReset();
     
+    inline void reset(void)
+    {
+        synchronic->aPrep->copy(synchronic->sPrep);
+        synchronic->updateState->synchronicPreparationDidChange = true;
+        DBG("synchronic reset");
+    }
+    
 private:
     BKSynthesiser* synth;
     GeneralSettings::Ptr general;
@@ -953,6 +954,8 @@ private:
     
     //reset the phase, including of all the parameter fields
     void resetPhase(int skipBeats);
+    
+    
     
     void playNote(int channel, int note, float velocity);
     Array<float> velocities;    //record of velocities

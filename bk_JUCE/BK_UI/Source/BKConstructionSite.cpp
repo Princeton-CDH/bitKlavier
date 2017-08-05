@@ -10,7 +10,7 @@
 
 #include "BKConstructionSite.h"
 
-#define AUTO_DRAW 1
+#define AUTO_DRAW 0
 #define NUM_COL 6
 
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):

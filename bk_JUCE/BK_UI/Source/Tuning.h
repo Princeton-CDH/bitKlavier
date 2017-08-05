@@ -353,10 +353,12 @@ public:
     
     Array<Array<float>> tuningLibrary;
     
+    
+    BKUpdateState::Ptr updateState;
+    
 private:
     int Id;
     String name;
-    BKUpdateState::Ptr updateState;
     
     Array<float> getTuningOffsets(TuningSystem which) {return tuningLibrary.getUnchecked(which); }
     
@@ -541,6 +543,14 @@ public:
     
     //reset adaptive tuning
     void adaptiveReset();
+    
+    inline void reset(void)
+    {
+        adaptiveReset();
+        tuning->aPrep->copy(tuning->sPrep);
+        tuning->updateState->tuningPreparationDidChange = true;
+        DBG("tuning reset");
+    }
     
 private:
     Tuning::Ptr tuning;

@@ -248,12 +248,13 @@ public:
         name = newName;
         updateState->tempoPreparationDidChange = true;
     }
+    
+    BKUpdateState::Ptr updateState;
 
 private:
     int Id;
     String name;
     
-    BKUpdateState::Ptr updateState;
 
     JUCE_LEAK_DETECTOR(Tempo)
 };
@@ -478,7 +479,7 @@ public:
     inline float getPeriodMultiplier(void)              {return adaptiveTempoPeriodMultiplier;}
     inline float getAdaptedTempo(void)                  {return tempo->aPrep->getTempo() / adaptiveTempoPeriodMultiplier;}
     
-    void  reset();
+    void  adaptiveReset();
 
     inline int getId(void) const noexcept { return tempo->getId(); }
     
@@ -488,6 +489,14 @@ public:
     inline void prepareToPlay(double sr)
     {
         sampleRate = sr;
+    }
+    
+    inline void reset(void)
+    {
+        tempo->aPrep->copy(tempo->sPrep);
+        tempo->updateState->tempoPreparationDidChange = true;
+        adaptiveReset();
+        DBG("tempo reset");
     }
     
 private:

@@ -221,12 +221,6 @@ public:
     DirectPreparation::Ptr      sPrep;
     DirectPreparation::Ptr      aPrep;
     
-    inline void reset(void)
-    {
-        aPrep->copy(sPrep);
-        updateState->directPreparationDidChange = true;
-    }
-    
     inline void copy(Direct::Ptr from)
     {
         sPrep->copy(from->sPrep);
@@ -240,10 +234,11 @@ public:
         updateState->directPreparationDidChange = true;
     }
     
+    BKUpdateState::Ptr          updateState;
+    
 private:
     int Id;
     String name;
-    BKUpdateState::Ptr          updateState;
     
     JUCE_LEAK_DETECTOR(Direct)
 };
@@ -454,6 +449,12 @@ public:
         synth = main;
         resonanceSynth = res;
         hammerSynth = hammer;
+    }
+    
+    inline void reset(void)
+    {
+        direct->aPrep->copy(direct->sPrep);
+        direct->updateState->directPreparationDidChange = true;
     }
     
     inline int getId(void) const noexcept { return direct->getId(); }
