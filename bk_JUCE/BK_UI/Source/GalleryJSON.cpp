@@ -478,6 +478,19 @@ void Gallery::setStateFromJson(var myJson)
                     
                     nostPrep->setLengthMultiplier(memoryMult);
                     
+                    float undertow = jsonGetValue(nx+"undertow");
+                    
+                    nostPrep->setUndertow(undertow);
+                    
+                    float wavedistance = jsonGetValue(nx+"wavedistance");
+                    
+                    nostPrep->setWaveDistance(wavedistance);
+                    
+                    float transp = jsonGetValue(nx+"transposition");
+                    
+                    Array<float> transps; transps.add(transp);
+                    nostPrep->setTransposition(transps);
+                    
                     float beatsToSkip = jsonGetValue(nx+"revBeatsToSkip");
                     
                     nostPrep->setBeatsToSkip(beatsToSkip);
@@ -500,23 +513,12 @@ void Gallery::setStateFromJson(var myJson)
                         thisSynchronic = defaultSynchronic;
                     }
                     
-                    float transposition = jsonGetValue(nx+"transposition");
-                    
-                    Array<float> ntransp;
-                    ntransp.add(transposition);
-                    
-                    nostPrep->setTransposition(ntransp);
-                    
-                    float undertow = jsonGetValue(nx+"undertow");
-                    
-                    nostPrep->setUndertow(undertow);
-                    
-                    float wavedistance = jsonGetValue(nx+"wavedistance");
-                    
-                    nostPrep->setWaveDistance(wavedistance);
-                    
-                    addNostalgic();
-                    Nostalgic::Ptr thisNostalgic = nostalgic.getLast();
+                    Nostalgic::Ptr thisNostalgic = matches(nostPrep);
+                    if (thisNostalgic == nullptr)
+                    {
+                        addNostalgic(nostPrep);
+                        thisNostalgic = nostalgic.getLast();
+                    }
                     nId = thisNostalgic->getId();
                     
                     BKItem* nostalgicItem = thisPiano->itemWithTypeAndId(PreparationTypeNostalgic, thisNostalgic->getId());
