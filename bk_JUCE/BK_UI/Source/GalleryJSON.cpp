@@ -39,6 +39,9 @@ void Gallery::setStateFromJson(var myJson)
     Array<int> keys; var kvar;  bool isLayer; bool isOld = true;
     
     addKeymap();
+    Keymap::Ptr emptyKeymap = bkKeymaps.getLast();
+    
+    addKeymap();
     // Default all on for first keymap
     for (int i = 0; i < 128; i++) bkKeymaps.getLast()->addNote(i);
     Keymap::Ptr defaultKeymap = bkKeymaps.getLast();
@@ -388,17 +391,25 @@ void Gallery::setStateFromJson(var myJson)
                     }
                     
                     // Make new keymap
-                    Keymap::Ptr testKeymap = new Keymap();
-                    for (int k = 0; k < keys.size(); k += 2 )   testKeymap->addNote(keys[k]);
-                    Keymap::Ptr thisKeymap = matches(testKeymap);
-                    
-                    if (thisKeymap == nullptr)
+                    Keymap::Ptr thisKeymap;
+                    if (keys.size() <= 1)
                     {
-                        addKeymap();
-                        thisKeymap = bkKeymaps.getLast();
-                        for (int k = 0; k < keys.size(); k += 2 )
+                        thisKeymap = emptyKeymap;
+                    }
+                    else
+                    {
+                        Keymap::Ptr testKeymap = new Keymap();
+                        for (int k = 0; k < keys.size(); k += 2 )   testKeymap->addNote(keys[k]);
+                        thisKeymap = matches(testKeymap);
+                        
+                        if (thisKeymap == nullptr)
                         {
-                            if (keys[k] != -1) thisKeymap->addNote(keys[k]);
+                            addKeymap();
+                            thisKeymap = bkKeymaps.getLast();
+                            for (int k = 0; k < keys.size(); k += 2 )
+                            {
+                                if (keys[k] != -1) thisKeymap->addNote(keys[k]);
+                            }
                         }
                     }
                     
@@ -573,17 +584,25 @@ void Gallery::setStateFromJson(var myJson)
                     }
                     
                     // Make new keymap
-                    Keymap::Ptr testKeymap = new Keymap();
-                    for (int k = 0; k < keys.size(); k += 2 )   testKeymap->addNote(keys[k]);
-                    Keymap::Ptr thisKeymap = matches(testKeymap);
-                    
-                    if (thisKeymap == nullptr)
+                    Keymap::Ptr thisKeymap;
+                    if (keys.size() <= 1)
                     {
-                        addKeymap();
-                        thisKeymap = bkKeymaps.getLast();
-                        for (int k = 0; k < keys.size(); k += 2 )
+                        thisKeymap = emptyKeymap;
+                    }
+                    else
+                    {
+                        Keymap::Ptr testKeymap = new Keymap();
+                        for (int k = 0; k < keys.size(); k += 2 )   testKeymap->addNote(keys[k]);
+                        thisKeymap = matches(testKeymap);
+                        
+                        if (thisKeymap == nullptr)
                         {
-                            if (keys[k] != -1) thisKeymap->addNote(keys[k]);
+                            addKeymap();
+                            thisKeymap = bkKeymaps.getLast();
+                            for (int k = 0; k < keys.size(); k += 2 )
+                            {
+                                if (keys[k] != -1) thisKeymap->addNote(keys[k]);
+                            }
                         }
                     }
                 
@@ -679,17 +698,25 @@ void Gallery::setStateFromJson(var myJson)
                     }
                     
                     // Make new keymap
-                    Keymap::Ptr testKeymap = new Keymap();
-                    for (int k = 0; k < keys.size(); k += 2 )   testKeymap->addNote(keys[k]);
-                    Keymap::Ptr thisKeymap = matches(testKeymap);
-                    
-                    if (thisKeymap == nullptr)
+                    Keymap::Ptr thisKeymap;
+                    if (keys.size() <= 1)
                     {
-                        addKeymap();
-                        thisKeymap = bkKeymaps.getLast();
-                        for (int k = 0; k < keys.size(); k += 2 )
+                        thisKeymap = emptyKeymap;
+                    }
+                    else
+                    {
+                        Keymap::Ptr testKeymap = new Keymap();
+                        for (int k = 0; k < keys.size(); k += 2 )   testKeymap->addNote(keys[k]);
+                        thisKeymap = matches(testKeymap);
+                        
+                        if (thisKeymap == nullptr)
                         {
-                            if (keys[k] != -1) thisKeymap->addNote(keys[k]);
+                            addKeymap();
+                            thisKeymap = bkKeymaps.getLast();
+                            for (int k = 0; k < keys.size(); k += 2 )
+                            {
+                                if (keys[k] != -1) thisKeymap->addNote(keys[k]);
+                            }
                         }
                     }
                     
@@ -739,16 +766,21 @@ void Gallery::setStateFromJson(var myJson)
                     if (key >= 0 && key < 128 && pId >= 1)
                     {
                         // Make new keymap
-                        Keymap::Ptr testKeymap = new Keymap();
-                        testKeymap->addNote(key);
-                        Keymap::Ptr thisKeymap = matches(testKeymap);
-                        if (thisKeymap == nullptr)
+                        Keymap::Ptr thisKeymap;
+                        if (keys.size() <= 1)
                         {
-                            addKeymap();
-                            thisKeymap = bkKeymaps.getLast();
-                            for (int k = 0; k < keys.size(); k += 2 )
+                            thisKeymap = emptyKeymap;
+                        }
+                        else
+                        {
+                            Keymap::Ptr testKeymap = new Keymap();
+                            testKeymap->addNote(key);
+                            thisKeymap = matches(testKeymap);
+                            
+                            if (thisKeymap == nullptr)
                             {
-                                if (keys[k] != -1) thisKeymap->addNote(keys[k]);
+                                addKeymap(testKeymap);
+                                thisKeymap = bkKeymaps.getLast();
                             }
                         }
                         
@@ -818,17 +850,21 @@ void Gallery::setStateFromJson(var myJson)
                     thisTuningMod->setParam(TuningScale, String(tscale));
                     
                     // Make new keymap
-                    Keymap::Ptr testKeymap = new Keymap();
-                    for (int k = 0; k < keys.size(); k += 2 )   testKeymap->addNote(noteNumber);
-                    Keymap::Ptr thisKeymap = matches(testKeymap);
-                    
-                    if (thisKeymap == nullptr)
+                    Keymap::Ptr thisKeymap;
+                    if (keys.size() <= 1)
                     {
-                        addKeymap();
-                        thisKeymap = bkKeymaps.getLast();
-                        for (int k = 0; k < keys.size(); k += 2 )
+                        thisKeymap = emptyKeymap;
+                    }
+                    else
+                    {
+                        Keymap::Ptr testKeymap = new Keymap();
+                        testKeymap->addNote(noteNumber);
+                        thisKeymap = matches(testKeymap);
+                        
+                        if (thisKeymap == nullptr)
                         {
-                            if (keys[k] != -1) thisKeymap->addNote(keys[k]);
+                            addKeymap(testKeymap);
+                            thisKeymap = bkKeymaps.getLast();
                         }
                     }
                     
