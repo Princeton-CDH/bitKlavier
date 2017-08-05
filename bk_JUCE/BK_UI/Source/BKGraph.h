@@ -23,8 +23,9 @@ class BKAudioProcessor;
 class BKItem : public ItemMapper, public BKDraggableComponent, public BKListener
 {
 public:
-    typedef ReferenceCountedArray<BKItem, CriticalSection>       PtrArr;
-    typedef ReferenceCountedObjectPtr<BKItem>   Ptr;
+    typedef ReferenceCountedArray<BKItem, CriticalSection>      RCArr;
+    typedef ReferenceCountedObjectPtr<BKItem>                   Ptr;
+    typedef Array<BKItem::Ptr>                                  PtrArr;
     
     BKItem(BKPreparationType type, int Id, BKAudioProcessor& p);
     
@@ -326,7 +327,7 @@ public:
         return selectedItems;
     }
     
-    inline BKItem::PtrArr getItems(void)
+    inline BKItem::RCArr getItems(void)
     {
         return items;
     }
@@ -360,7 +361,7 @@ public:
 private:
     BKAudioProcessor& processor;
     
-    BKItem::PtrArr items;
+    BKItem::RCArr items;
 
     void addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId);
     
