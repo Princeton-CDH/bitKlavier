@@ -579,7 +579,7 @@ void BKConstructionSite::idDidChange(void)
 
 BKItem* BKConstructionSite::getItemAtPoint(const int X, const int Y)
 {
-    ScopedPointer<BKItem> theItem = nullptr;
+    BKItem* theItem = nullptr;
     
     if (itemSource != nullptr)
     {

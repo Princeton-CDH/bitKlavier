@@ -557,7 +557,6 @@ void BKItemGraph::connect(BKItem* item1, BKItem* item2)
         {
             item1->setItemType(getModType(item2Type), true);
         }
-        else return;
     }
     else if (item2Type == PreparationTypeGenericMod)
     {
@@ -565,7 +564,6 @@ void BKItemGraph::connect(BKItem* item1, BKItem* item2)
         {
             item2->setItemType(getModType(item1Type), true);
         }
-        else return;
     }
     else if (item1Type == PreparationTypeNostalgic && item2Type == PreparationTypeSynchronic)
     {
