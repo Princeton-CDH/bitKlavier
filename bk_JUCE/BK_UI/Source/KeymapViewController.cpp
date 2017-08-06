@@ -268,6 +268,8 @@ void KeymapViewController::update(void)
         keyboard->setKeysInKeymap(km->keys());
     }
     
+    km->print();
+    
 }
 
 void KeymapViewController::bkMessageReceived (const String& message)

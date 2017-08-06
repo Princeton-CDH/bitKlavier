@@ -170,7 +170,7 @@ void BKConstructionSite::draw(void)
         addAndMakeVisible(item);
     }
     
-    if (processor.updateState->loadingJson)
+    if (processor.updateState->loadedJson)
     {
         int keymapCount = 0, prepCount = 0, otherCount = 0, modCount = 0, ttCount = 0;
         
@@ -252,8 +252,6 @@ void BKConstructionSite::draw(void)
             }
             DBG("itemxy: " + String(item->getX()) + " " + String(item->getY()));
         }
-        
-        processor.updateState->loadingJson = false;
     }
     
     repaint();

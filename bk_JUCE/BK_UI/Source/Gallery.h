@@ -147,6 +147,16 @@ public:
         return tempo;
     }
     
+    inline TuningModPreparation::Ptr matches(TuningModPreparation::Ptr prep)
+    {
+        for (auto p : modTuning)
+        {
+            if (p->compare(prep)) return p;
+        }
+        
+        return nullptr;
+    }
+    
     inline Keymap::Ptr matches(Keymap::Ptr keymap)
     {
         for (auto p : bkKeymaps)

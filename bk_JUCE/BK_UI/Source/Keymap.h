@@ -41,19 +41,32 @@ public:
         
         for (int i = 0; i < 128; i++)
         {
-            keymap.set(i,false);
+            keymap.add(false);
         }
     }
     
     Keymap(Keymap::Ptr k):
     Id(k->getId())
     {
+        keymap.ensureStorageAllocated(128);
+        
+        for (int i = 0; i < 128; i++)
+        {
+            keymap.add(false);
+        }
+        
         setKeymap(k->keys());
     }
     
     Keymap(void):
     Id(-1)
     {
+        keymap.ensureStorageAllocated(128);
+        
+        for (int i = 0; i < 128; i++)
+        {
+            keymap.add(false);
+        }
     }
     
     
@@ -65,9 +78,15 @@ public:
 
     inline bool compare(Keymap::Ptr k)
     {
+        Array<bool> otherKeymap = k->getKeymap();
         for (int i = 0; i < 128; i++)
-            if (keymap[i] != k->keymap[i]) return false;
-                                  
+        {
+            if (keymap[i] != otherKeymap[i])
+            {
+                return false;
+            }
+        }
+    
         return true;
     }
     
@@ -195,6 +214,8 @@ public:
         
         return keysave;
     }
+    
+    inline Array<bool> getKeymap(void) const noexcept { return keymap; }
     
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}

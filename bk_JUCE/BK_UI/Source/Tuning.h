@@ -40,7 +40,7 @@ public:
     tCustom(p->getCustomScale()),
     tAbsolute(p->getAbsoluteOffsets())
     {
-
+        for (int i = 0; i < 12; i++) tCustom.add(i);
     }
     
     inline void copy(TuningPreparation::Ptr p)
