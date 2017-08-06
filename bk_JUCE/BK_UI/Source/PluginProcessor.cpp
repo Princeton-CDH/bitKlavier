@@ -503,10 +503,14 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
 
 void BKAudioProcessor::initializeGallery(void)
 {
-    prevPiano = gallery->getPiano(1);
+    prevPiano = gallery->getPianos().getFirst();
     
     int defPiano = gallery->getDefaultPiano();
-    if (defPiano >= gallery->getNumPianos() || defPiano < 1) defPiano = 1;
+    if (defPiano >= gallery->getNumPianos() || defPiano < 1)
+    {
+        defPiano = gallery->getPianos().getFirst()->getId();
+    }
+
     currentPiano = gallery->getPiano(defPiano);
     
     for (auto item : currentPiano->getItems()) DBG("BEGIN INIT GALLERY: " + String(item->getReferenceCount()));
