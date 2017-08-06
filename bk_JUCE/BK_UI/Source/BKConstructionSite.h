@@ -54,6 +54,11 @@ public:
     
     bool altDown;
     
+    inline void clear(void)
+    {
+        graph->clear();
+    }
+    
 private:
     
     int leftMost, rightMost, topMost, bottomMost;

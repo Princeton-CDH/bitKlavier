@@ -91,7 +91,7 @@ processor(p)
 
 BKItem::~BKItem()
 {
-
+    connections.clear();
 }
 
 void BKItem::configurePianoCB(void)
@@ -418,8 +418,14 @@ void BKItem::setState(XmlElement* e)
 
 BKItemGraph::~BKItemGraph(void)
 {
-    for (auto item : items) item->clearConnections();
+    for (int i = 0; i < items.size(); i++)  items[i]->clearConnections();
     
+    clipboard.clear();
+    items.clear();
+}
+
+void BKItemGraph::clear()
+{
     clipboard.clear();
     items.clear();
 }
@@ -527,7 +533,7 @@ BKItem::Ptr BKItemGraph::get(BKPreparationType type, int Id)
     return thisItem;
 }
 
-void BKItemGraph::clear(void)
+void BKItemGraph::clearItems(void)
 {
     for (auto itemToRemove : items)
     {
@@ -770,8 +776,6 @@ Array<Line<int>> BKItemGraph::getLines(void)
 
 void BKItemGraph::reconstruct(void)
 {
-    items.clear();
-    
     Piano::Ptr thisPiano = processor.currentPiano;
     
     // Create items based on the ItemMappers in current Piano and add them to BKItemGraph

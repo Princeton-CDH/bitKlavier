@@ -276,6 +276,7 @@ public:
     bool contains(BKPreparationType type, int Id);
     
     void clear(void);
+    void clearItems(void);
     
     void connect(BKItem* item1, BKItem* item2);
     void disconnect(BKItem* item1, BKItem* item2);

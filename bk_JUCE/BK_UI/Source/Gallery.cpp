@@ -102,7 +102,6 @@ void Gallery::prepareToPlay (double sampleRate)
 
 Gallery::~Gallery()
 {
-    for (auto piano : bkPianos) piano->clearItems();
     bkPianos.clear();
 }
 

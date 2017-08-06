@@ -302,11 +302,18 @@ void MainViewController::timerCallback()
         header.fillGalleryCB();
     }
     
-    header.update();
+    
     
     Array<bool> noteOns = processor.getNoteOns();
     keyboardState.setKeymap(noteOns);
     keyboard->repaint();
+    
+    if (state->galleryDidChange)
+    {
+        state->galleryDidChange = false;
+        
+        header.switchGallery();
+    }
     
     if (state->generalSettingsDidChange)
     {

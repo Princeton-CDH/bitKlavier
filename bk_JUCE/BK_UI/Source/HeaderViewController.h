@@ -32,10 +32,11 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     
+    void switchGallery(void);
+    
 private:
     BKAudioProcessor& processor;
     
-    void switchGallery(void);
     
     Gallery::Ptr currentGallery;
     

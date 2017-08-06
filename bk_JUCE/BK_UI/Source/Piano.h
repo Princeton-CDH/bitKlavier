@@ -41,6 +41,7 @@ public:
     ~Piano();
     
 
+    void clear(void);
     
     void storeCurrentPiano();
     

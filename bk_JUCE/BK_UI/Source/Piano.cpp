@@ -41,7 +41,12 @@ Id(Id)
 
 Piano::~Piano()
 {
-    for (auto item : items) DBG("PIANO refcount: " + String(item->getReferenceCount()));
+    for (int i = 0; i < items.size(); i++)  items[i]->clearConnections();
+    items.clear();
+}
+
+void Piano::clear(void)
+{
     items.clear();
 }
 
@@ -69,8 +74,6 @@ void Piano::deconfigure(void)
 void Piano::configure(void)
 {
     deconfigure();
-    
-    for (auto item : items) DBG("PRECONFIG refcount: " + String(item->getReferenceCount()));
     
     defaultT = getTuningProcessor(DEFAULT_ID);
     
@@ -197,8 +200,6 @@ void Piano::configure(void)
             }
         }
     }
-    
-    for (auto item : items) DBG("POSTCONFIG refcount: " + String(item->getReferenceCount()));
 }
 
 SynchronicProcessor::Ptr Piano::addSynchronicProcessor(int thisId)
@@ -1186,12 +1187,6 @@ void Piano::setState(XmlElement* e)
                 
                 thisItem->addConnection(thisConnection);
                 thisConnection->addConnection(thisItem);
-                
-                //thisConnection->decReferenceCount();
-                //thisItem->decReferenceCount();
-                
-                DBG("ITEM refcount: " + String(thisItem->getReferenceCount()));
-                DBG("CONNECTION refcount: " + String(thisConnection->getReferenceCount()));
             }
             
         }

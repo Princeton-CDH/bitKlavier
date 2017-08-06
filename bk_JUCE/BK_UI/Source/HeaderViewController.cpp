@@ -252,12 +252,7 @@ void HeaderViewController::fillGalleryCB(void)
 
 void HeaderViewController::update(void)
 {
-    if (processor.updateState->galleryDidChange)
-    {
-        processor.updateState->galleryDidChange = false;
-        
-        switchGallery();
-    }
+    
 }
 
 void HeaderViewController::switchGallery()

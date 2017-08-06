@@ -44,9 +44,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     gallery->prepareToPlay(sampleRate);
     
-    loadPianoSamples(BKLoadLite);
-    
-    
+    loadPianoSamples(BKLoadLite);    
 }
 
 BKAudioProcessor::~BKAudioProcessor()
@@ -501,34 +499,10 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
     }
 }
 
-void BKAudioProcessor::initializeGallery(void)
-{
-    prevPiano = gallery->getPiano(1);
-    
-    int defPiano = gallery->getDefaultPiano();
-    if (defPiano >= gallery->getNumPianos() || defPiano < 1) defPiano = 1;
-    currentPiano = gallery->getPiano(defPiano);
-    
-    for (auto item : currentPiano->getItems()) DBG("BEGIN INIT GALLERY: " + String(item->getReferenceCount()));
-    
-    for (auto piano : gallery->getPianos())
-    {
-        piano->configure();
-        if (piano->getId() > gallery->getIdCount(PreparationTypePiano)) gallery->setIdCount(PreparationTypePiano, piano->getId());
-    }
-
-    gallery->prepareToPlay(bkSampleRate);
-    
-    updateUI();
-    
-    updateGalleries();
-    
-    for (auto item : currentPiano->getItems()) DBG("BEGIN INIT GALLERY: " + String(item->getReferenceCount()));
-}
-
 void BKAudioProcessor::loadJsonGalleryFromPath(String path)
 {
     updateState->loadedJson = true;
+    
     File myFile (path);
     
     currentGallery = myFile.getFileName();
@@ -542,6 +516,31 @@ void BKAudioProcessor::loadJsonGalleryFromPath(String path)
     galleryDidLoad = true;
     
 }
+
+
+void BKAudioProcessor::initializeGallery(void)
+{
+    prevPiano = gallery->getPiano(1);
+    
+    int defPiano = gallery->getDefaultPiano();
+    if (defPiano >= gallery->getNumPianos() || defPiano < 1) defPiano = 1;
+    currentPiano = gallery->getPiano(defPiano);
+    
+    for (auto piano : gallery->getPianos())
+    {
+        piano->configure();
+        if (piano->getId() > gallery->getIdCount(PreparationTypePiano)) gallery->setIdCount(PreparationTypePiano, piano->getId());
+    }
+
+    gallery->prepareToPlay(bkSampleRate);
+    
+    updateUI();
+    
+    updateGalleries();
+    
+    
+}
+
 
 
 

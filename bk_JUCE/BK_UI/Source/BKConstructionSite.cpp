@@ -33,6 +33,7 @@ BKConstructionSite::~BKConstructionSite(void)
 void BKConstructionSite::redraw(void)
 {
     removeAllChildren();
+    graph->clear();
     
     graph->reconstruct();
     
