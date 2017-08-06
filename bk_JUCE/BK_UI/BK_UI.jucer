@@ -11,7 +11,7 @@
               aaxIdentifier="com.manyarrowsmusic.bitKlavier" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
               jucerVersion="5.1.1" companyName="manyarrowsmusic" companyEmail="dtrueman@princeton.edu"
               maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
-              displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Dark"
+              displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Light"
               buildStandalone="1" enableIAA="0" cppLanguageStandard="11">
   <MAINGROUP id="s4R02g" name="BK_UI">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">

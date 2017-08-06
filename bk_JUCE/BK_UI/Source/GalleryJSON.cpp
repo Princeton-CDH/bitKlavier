@@ -59,6 +59,8 @@ void Gallery::setStateFromJson(var myJson)
     Tempo::Ptr defaultTempo = tempo.getLast();
     Synchronic::Ptr defaultSynchronic = synchronic.getLast();
     Nostalgic::Ptr defaultNostalgic = nostalgic.getLast();
+    
+    
 
     for (int i = 1; i <= 500; i++) //arbs
     {
@@ -78,6 +80,7 @@ void Gallery::setStateFromJson(var myJson)
             
             addPianoWithId(i);
             Piano::Ptr thisPiano = bkPianos.getLast();
+    
             
             String name = piano.getProperty("name", "").toString();
             thisPiano->setName(name);
@@ -86,8 +89,6 @@ void Gallery::setStateFromJson(var myJson)
             
             // V2 test
             if(jsonPropertyDoesExist(jsonSynchronicLayerX+"1::"+"tempo"))   isOld = false;
-            
-            bool alreadyExists; int which;
             
             // TUNING
             String tx = "tuning::";

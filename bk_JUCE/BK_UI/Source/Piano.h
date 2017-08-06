@@ -77,6 +77,13 @@ public:
     TuningProcessor::Ptr        getTuningProcessor(int Id);
     TempoProcessor::Ptr         getTempoProcessor(int Id);
     
+    inline DirectProcessor::PtrArr        getDirectProcessors(void) const noexcept { return dprocessor; }
+    inline NostalgicProcessor::PtrArr     getNostalgicProcessors(void) const noexcept { return nprocessor; }
+    inline SynchronicProcessor::PtrArr    getSynchronicProcessors(void) const noexcept { return sprocessor; }
+    inline TuningProcessor::PtrArr        getTuningProcessors(void) const noexcept { return tprocessor; }
+    inline TempoProcessor::PtrArr         getTempoProcessors(void) const noexcept { return mprocessor; }
+    inline PreparationMap::CSPtrArr       getPreparationMaps(void) const noexcept { return prepMaps; }
+    
     NostalgicProcessor::Ptr     addNostalgicProcessor(int thisId);
     SynchronicProcessor::Ptr    addSynchronicProcessor(int thisId);
     DirectProcessor::Ptr        addDirectProcessor(int thisId);

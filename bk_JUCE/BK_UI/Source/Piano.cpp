@@ -41,6 +41,7 @@ Id(Id)
 
 Piano::~Piano()
 {
+    for (auto item : items) DBG("PIANO refcount: " + String(item->getReferenceCount()));
     items.clear();
 }
 
@@ -68,6 +69,8 @@ void Piano::deconfigure(void)
 void Piano::configure(void)
 {
     deconfigure();
+    
+    for (auto item : items) DBG("PRECONFIG refcount: " + String(item->getReferenceCount()));
     
     defaultT = getTuningProcessor(DEFAULT_ID);
     
@@ -147,6 +150,8 @@ void Piano::configure(void)
                     configureReset(target);
                 }
             }
+            
+            connex.clear();
 
         }
         else if (type == PreparationTypeTuning)
@@ -192,6 +197,8 @@ void Piano::configure(void)
             }
         }
     }
+    
+    for (auto item : items) DBG("POSTCONFIG refcount: " + String(item->getReferenceCount()));
 }
 
 SynchronicProcessor::Ptr Piano::addSynchronicProcessor(int thisId)
@@ -1091,12 +1098,12 @@ void Piano::setState(XmlElement* e)
     if (pianoName != String::empty) setName(pianoName);
     
     setId(e->getStringAttribute("Id").getIntValue());
+    
+    BKItem::Ptr thisItem;
+    BKItem::Ptr thisConnection;
 
     forEachXmlChildElement (*e, group)
     {
-        BKItem* thisItem;
-        BKItem* thisConnection;
-        
         forEachXmlChildElement(*group, item)
         {
             if (item->getTagName() == "item")
@@ -1135,6 +1142,7 @@ void Piano::setState(XmlElement* e)
                     
                     items.add(thisItem);
                 }
+                
             }
             
             XmlElement* connections = group->getChildByName("connections");
@@ -1178,6 +1186,12 @@ void Piano::setState(XmlElement* e)
                 
                 thisItem->addConnection(thisConnection);
                 thisConnection->addConnection(thisItem);
+                
+                //thisConnection->decReferenceCount();
+                //thisItem->decReferenceCount();
+                
+                DBG("ITEM refcount: " + String(thisItem->getReferenceCount()));
+                DBG("CONNECTION refcount: " + String(thisConnection->getReferenceCount()));
             }
             
         }

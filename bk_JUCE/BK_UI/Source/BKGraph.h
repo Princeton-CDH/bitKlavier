@@ -23,9 +23,8 @@ class BKAudioProcessor;
 class BKItem : public ItemMapper, public BKDraggableComponent, public BKListener
 {
 public:
-    typedef ReferenceCountedArray<BKItem, CriticalSection>      RCArr;
+    typedef ReferenceCountedArray<BKItem, CriticalSection>      PtrArr;
     typedef ReferenceCountedObjectPtr<BKItem>                   Ptr;
-    typedef Array<BKItem::Ptr>                                  PtrArr;
     
     BKItem(BKPreparationType type, int Id, BKAudioProcessor& p);
     
@@ -133,8 +132,6 @@ public:
     
     inline bool isConnectedToAnyPreparation(void)
     {
-        BKItem::PtrArr theseItems;
-        
         for (auto item : connections)
         {
             if (item->getType() >= PreparationTypeDirect && item->getType() <= PreparationTypeTempo)
@@ -197,6 +194,8 @@ public:
             {
                 s += " " + String(item->getId());
             }
+            
+            connex.clear();
         }
         return s;
     }
@@ -327,7 +326,7 @@ public:
         return selectedItems;
     }
     
-    inline BKItem::RCArr getItems(void)
+    inline BKItem::PtrArr getItems(void)
     {
         return items;
     }
@@ -361,7 +360,7 @@ public:
 private:
     BKAudioProcessor& processor;
     
-    BKItem::RCArr items;
+    BKItem::PtrArr items;
 
     void addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId);
     

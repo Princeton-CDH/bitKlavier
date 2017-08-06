@@ -637,6 +637,8 @@ public:
         return defaultPianoId;
     }
     
+    void clean(void);
+    
     
     void addSynchronicWithId(int Id);
     void addNostalgicWithId(int Id);
@@ -737,6 +739,8 @@ private:
     void removeSynchronicModPreparation(int Id);
     void removeTuningModPreparation(int Id);
     void removeTempoModPreparation(int Id);
+    
+    Array<Array<int>> used;
     
     JUCE_LEAK_DETECTOR(Gallery);
 };

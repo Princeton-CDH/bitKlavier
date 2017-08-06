@@ -19,6 +19,35 @@ url(String::empty)
     general = new GeneralSettings();
 
     setStateFromXML(xml);
+    
+    bool add = true;
+    for (auto p : tempo) { if (p->getId() == -1) { add = false; break;} }
+    if (add) addTempoWithId(-1);
+    
+    add = true;
+    for (auto p : tuning) { if (p->getId() == -1) { add = false; break;} }
+    if (add) addTuningWithId(-1);
+    
+    add = true;
+    for (auto p : synchronic) { if (p->getId() == -1) { add = false; break;} }
+    if (add) addSynchronicWithId(-1);
+    
+    add = true;
+    for (auto p : nostalgic) { if (p->getId() == -1) { add = false; break;} }
+    if (add) addNostalgicWithId(-1);
+    
+    add = true;
+    for (auto p : direct) { if (p->getId() == -1) { add = false; break;} }
+    if (add) addDirectWithId(-1);
+    
+    add = true;
+    for (auto p : bkKeymaps) { if (p->getId() == -1) { add = false; break;} }
+    if (add) addKeymapWithId(-1);
+    
+    for (int i = 0; i < BKPreparationTypeNil; i++)
+    {
+        used.add(Array<int>({-1}));
+    }
 }
 
 Gallery::Gallery(var myJson, BKAudioProcessor& p):
@@ -33,6 +62,35 @@ url(String::empty)
     general = new GeneralSettings();
 
     setStateFromJson(myJson);
+    
+    bool add = true;
+    for (auto p : tempo) { if (p->getId() == -1) { add = false; break;} }
+    if (add) addTempoWithId(-1);
+    
+    add = true;
+    for (auto p : tuning) { if (p->getId() == -1) { add = false; break;} }
+    if (add) addTuningWithId(-1);
+    
+    add = true;
+    for (auto p : synchronic) { if (p->getId() == -1) { add = false; break;} }
+    if (add) addSynchronicWithId(-1);
+    
+    add = true;
+    for (auto p : nostalgic) { if (p->getId() == -1) { add = false; break;} }
+    if (add) addNostalgicWithId(-1);
+    
+    add = true;
+    for (auto p : direct) { if (p->getId() == -1) { add = false; break;} }
+    if (add) addDirectWithId(-1);
+    
+    add = true;
+    for (auto p : bkKeymaps) { if (p->getId() == -1) { add = false; break;} }
+    if (add) addKeymapWithId(-1);
+    
+    for (int i = 0; i < BKPreparationTypeNil; i++)
+    {
+        used.add(Array<int>({-1}));
+    }
 }
 
 void Gallery::prepareToPlay (double sampleRate)
@@ -44,7 +102,8 @@ void Gallery::prepareToPlay (double sampleRate)
 
 Gallery::~Gallery()
 {
-    
+    for (auto piano : bkPianos) piano->clearItems();
+    bkPianos.clear();
 }
 
 void Gallery::resetPreparations(void)

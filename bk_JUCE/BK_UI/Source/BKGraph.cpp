@@ -418,6 +418,9 @@ void BKItem::setState(XmlElement* e)
 
 BKItemGraph::~BKItemGraph(void)
 {
+    for (auto item : items) item->clearConnections();
+    
+    clipboard.clear();
     items.clear();
 }
 
@@ -530,6 +533,7 @@ void BKItemGraph::clear(void)
     {
         removeAndUnregisterItem(itemToRemove);
     }
+    items.clear();
 }
 
 void BKItemGraph::connect(BKItem* item1, BKItem* item2)
@@ -678,8 +682,7 @@ Array<Line<int>> BKItemGraph::getLines(void)
     
         if (type == PreparationTypeKeymap)
         {
-            BKItem::PtrArr connex = item->getConnections();
-            for (auto target : connex)
+            for (auto target : item->getConnections())
             {
                 Rectangle<int> otherBounds = target->getBounds();
                 
@@ -776,14 +779,13 @@ void BKItemGraph::reconstruct(void)
     {
         BKPreparationType type = item->getType();
         
-        BKItem::PtrArr connex;
-        
         if (type == PreparationTypePianoMap)
         {
             item->configurePianoCB();
         }
         
         addItem(item);
+    
     }
 }
 

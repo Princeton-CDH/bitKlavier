@@ -111,18 +111,27 @@ PopupMenu HeaderViewController::getPianoMenu(void)
     return pianoMenu;
 }
 
+#define SAVE_ID 1
+#define SAVEAS_ID 2
+#define OPEN_ID 3
+#define CLEAN_ID 4
+#define SETTINGS_ID 5
+#define OPENOLD_ID 6
+
 PopupMenu HeaderViewController::getGalleryMenu(void)
 {
     PopupMenu galleryMenu;
     galleryMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
-    galleryMenu.addItem(1, "Save");
-    galleryMenu.addItem(2, "Save as...");
-    galleryMenu.addItem(3, "Open...");
+    galleryMenu.addItem(SAVE_ID, "Save");
+    galleryMenu.addItem(SAVEAS_ID, "Save as...");
+    galleryMenu.addItem(OPEN_ID, "Open...");
     galleryMenu.addSeparator();
-    galleryMenu.addItem(4, "Gallery Settings");
+    galleryMenu.addItem(CLEAN_ID, "Clean");
     galleryMenu.addSeparator();
-    galleryMenu.addItem(5, "Open (legacy)...");
+    galleryMenu.addItem(SETTINGS_ID, "Gallery Settings");
+    galleryMenu.addSeparator();
+    galleryMenu.addItem(OPENOLD_ID, "Open (legacy)...");
     
     return galleryMenu;
     
@@ -174,23 +183,27 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
 
 void HeaderViewController::galleryMenuCallback(int result, HeaderViewController* gvc)
 {
-    if (result == 1)
+    if (result == SAVE_ID)
     {
         gvc->processor.saveGallery();
     }
-    if (result == 2)
+    if (result == SAVEAS_ID)
     {
         gvc->processor.saveGalleryAs();
     }
-    else if (result == 3) // Load
+    else if (result == OPEN_ID) // Load
     {
         gvc->processor.loadGalleryDialog();
     }
-    else if (result == 4) // open General settings
+    else if (result == SETTINGS_ID) // open General settings
     {
         gvc->processor.updateState->setCurrentDisplay(DisplayGeneral);
     }
-    else if (result == 5) // Load (old)
+    else if (result == CLEAN_ID) // Clean
+    {
+        gvc->processor.gallery->clean();
+    }
+    else if (result == OPENOLD_ID) // Load (old)
     {
         gvc->processor.loadJsonGalleryDialog();
     }

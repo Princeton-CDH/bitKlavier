@@ -104,8 +104,6 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 
                 String n = e->getStringAttribute("name");
                 
-                
-                
                 Keymap::Ptr newKeymap = bkKeymaps.getLast();
                 
                 newKeymap->setId(e->getStringAttribute("Id").getIntValue());
@@ -200,7 +198,9 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
             {
                 addPianoWithId(0);
                 
-                bkPianos.getLast()->setState(e);
+                Piano::Ptr thisPiano = bkPianos.getLast();
+                
+                thisPiano->setState(e);
             }
         }
     }

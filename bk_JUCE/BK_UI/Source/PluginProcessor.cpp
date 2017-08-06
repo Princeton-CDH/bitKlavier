@@ -506,15 +506,10 @@ void BKAudioProcessor::initializeGallery(void)
     prevPiano = gallery->getPiano(1);
     
     int defPiano = gallery->getDefaultPiano();
-    if(defPiano >= gallery->getNumPianos() || defPiano < 1) defPiano = 1;
+    if (defPiano >= gallery->getNumPianos() || defPiano < 1) defPiano = 1;
     currentPiano = gallery->getPiano(defPiano);
     
-    gallery->addTempoWithId(-1);
-    gallery->addTuningWithId(-1);
-    gallery->addSynchronicWithId(-1);
-    gallery->addNostalgicWithId(-1);
-    gallery->addDirectWithId(-1);
-    gallery->addKeymapWithId(-1);
+    for (auto item : currentPiano->getItems()) DBG("BEGIN INIT GALLERY: " + String(item->getReferenceCount()));
     
     for (auto piano : gallery->getPianos())
     {
@@ -527,6 +522,8 @@ void BKAudioProcessor::initializeGallery(void)
     updateUI();
     
     updateGalleries();
+    
+    for (auto item : currentPiano->getItems()) DBG("BEGIN INIT GALLERY: " + String(item->getReferenceCount()));
 }
 
 void BKAudioProcessor::loadJsonGalleryFromPath(String path)

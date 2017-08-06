@@ -27,7 +27,7 @@ lastY(10)
 
 BKConstructionSite::~BKConstructionSite(void)
 {
-    
+    removeAllChildren();
 }
 
 void BKConstructionSite::redraw(void)
@@ -74,6 +74,8 @@ void BKConstructionSite::deleteSelected(void)
     }
     
     selected.deselectAll();
+    
+    selectedItems.clear();
     
     repaint();
 }
@@ -334,7 +336,7 @@ void BKConstructionSite::addItemsFromClipboard(void)
             processor.gallery->addTypeWithId(type, thisId);
         }
         
-        BKItem::Ptr toAdd = new BKItem(item->getType(), thisId, processor);
+        BKItem* toAdd = new BKItem(item->getType(), thisId, processor);
         
         if (which == 0)
         {
@@ -576,7 +578,7 @@ void BKConstructionSite::idDidChange(void)
 
 BKItem* BKConstructionSite::getItemAtPoint(const int X, const int Y)
 {
-    BKItem* theItem = nullptr;
+    ScopedPointer<BKItem> theItem = nullptr;
     
     if (itemSource != nullptr)
     {

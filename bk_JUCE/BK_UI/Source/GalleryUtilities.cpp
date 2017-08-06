@@ -12,6 +12,8 @@
 
 #include "PluginProcessor.h"
 
+#include "BKGraph.h"
+
 void Gallery::addPiano()
 {
     int newId = getNewId(PreparationTypePiano);
@@ -667,6 +669,95 @@ int  Gallery::addDirectIfNotAlreadyThere(DirectPreparation::Ptr drct)
     {
         addDirect(drct);
         return direct.getLast()->getId();
+    }
+    
+}
+
+// Deletes unused preparations
+void Gallery::clean(void)
+{
+    for (int i = 0; i < BKPreparationTypeNil; i++) used.set(i, Array<int>({-1}));
+    
+    for (auto piano : bkPianos)
+    {
+        for (auto item : piano->getItems())
+        {
+            Array<int> thisUsed = used.getUnchecked(item->getType());
+            
+            thisUsed.add(item->getId());
+            
+            used.set(item->getType(), thisUsed);
+        }
+    }
+    
+    
+    Array<int> thisUsed = used.getUnchecked(PreparationTypeDirect);
+    for (int i = direct.size(); --i >= 0;)
+    {
+        if (!thisUsed.contains(direct[i]->getId()))
+        {
+            direct.remove(i);
+        }
+    }
+    
+    thisUsed = used.getUnchecked(PreparationTypeSynchronic);
+    for (int i = synchronic.size(); --i >= 0;)
+    {
+        if (!thisUsed.contains(synchronic[i]->getId())) synchronic.remove(i);
+    }
+    
+    thisUsed = used.getUnchecked(PreparationTypeNostalgic);
+    for (int i = nostalgic.size(); --i >= 0;)
+    {
+        if (!thisUsed.contains(nostalgic[i]->getId())) nostalgic.remove(i);
+    }
+    
+    thisUsed = used.getUnchecked(PreparationTypeTempo);
+    for (int i = tempo.size(); --i >= 0;)
+    {
+        if (!thisUsed.contains(tempo[i]->getId())) tempo.remove(i);
+    }
+    
+    thisUsed = used.getUnchecked(PreparationTypeTuning);
+    for (int i = tuning.size(); --i >= 0;)
+    {
+        if (!thisUsed.contains(tuning[i]->getId())) tuning.remove(i);
+    }
+    
+    thisUsed = used.getUnchecked(PreparationTypeKeymap);
+    for (int i = bkKeymaps.size(); --i >= 0;)
+    {
+        if (!thisUsed.contains(bkKeymaps[i]->getId())) bkKeymaps.remove(i);
+    }
+    
+    thisUsed = used.getUnchecked(PreparationTypeDirect);
+    for (int i = modDirect.size(); --i >= 0;)
+    {
+        if (!thisUsed.contains(modDirect[i]->getId())) modDirect.remove(i);
+    }
+    
+    thisUsed = used.getUnchecked(PreparationTypeSynchronicMod);
+    for (int i = modSynchronic.size(); --i >= 0;)
+    {
+        if (!thisUsed.contains(modSynchronic[i]->getId())) modSynchronic.remove(i);
+    }
+    
+    thisUsed = used.getUnchecked(PreparationTypeNostalgicMod);
+    for (int i = modNostalgic.size(); --i >= 0;)
+    {
+        if (!thisUsed.contains(modNostalgic[i]->getId())) modNostalgic.remove(i);
+    }
+    
+    thisUsed = used.getUnchecked(PreparationTypeTempoMod);
+    for (int i = modTempo.size(); --i >= 0;)
+    {
+        if (!thisUsed.contains(modTempo[i]->getId())) modTempo.remove(i);
+    }
+    
+    thisUsed = used.getUnchecked(PreparationTypeTuningMod);
+    for (int i = modTuning.size(); --i >= 0;)
+    {
+        if (!thisUsed.contains(modTuning[i]->getId())) modTuning.remove(i);
     }
     
 }
