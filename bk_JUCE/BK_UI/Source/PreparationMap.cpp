@@ -354,6 +354,11 @@ void PreparationMap::sustainPedalReleased()
     {
         SustainedNote releaseNote = sustainedNotes.getUnchecked(n);
         
+        for (auto proc : dprocessor)
+        {
+            proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel);
+        }
+        
         for (auto proc : sprocessor)
         {
             proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel);
