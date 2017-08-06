@@ -425,6 +425,8 @@ void BKAudioProcessor::saveGallery(void)
 // Gallery/Preset Management
 void BKAudioProcessor::loadGalleryDialog(void)
 {
+    updateState->loadedJson = false;
+    
     FileChooser myChooser ("Load gallery from xml file...",
                            File::getSpecialLocation (File::userHomeDirectory),
                            "*.xml");
@@ -452,6 +454,8 @@ void BKAudioProcessor::loadGalleryDialog(void)
 
 void BKAudioProcessor::loadGalleryFromPath(String path)
 {
+    updateState->loadedJson = false;
+    
     File myFile (path);
     currentGalleryPath = path;
     
@@ -473,7 +477,8 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
 
 void BKAudioProcessor::loadJsonGalleryDialog(void)
 {
-    updateState->loadingJson = true;
+    updateState->loadedJson = true;
+    
     FileChooser myChooser ("Load gallery from json file...",
                            File::getSpecialLocation (File::userHomeDirectory),
                            "*.json");
@@ -516,7 +521,7 @@ void BKAudioProcessor::initializeGallery(void)
         piano->configure();
         if (piano->getId() > gallery->getIdCount(PreparationTypePiano)) gallery->setIdCount(PreparationTypePiano, piano->getId());
     }
-    
+
     gallery->prepareToPlay(bkSampleRate);
     
     updateUI();
@@ -526,7 +531,7 @@ void BKAudioProcessor::initializeGallery(void)
 
 void BKAudioProcessor::loadJsonGalleryFromPath(String path)
 {
-    updateState->loadingJson = true;
+    updateState->loadedJson = true;
     File myFile (path);
     
     currentGallery = myFile.getFileName();

@@ -71,6 +71,10 @@ void Gallery::setStateFromJson(var myJson)
             Tuning::Ptr synchronicTuning;
             Tuning::Ptr nostalgicTuning;
             Synchronic::Ptr synchronicTarget;
+            Nostalgic::Ptr nostalgicTarget;
+            BKItem* directTuningItem;
+            BKItem* nostalgicTuningItem;
+            BKItem* synchronicTuningItem;
             
             addPianoWithId(i);
             Piano::Ptr thisPiano = bkPianos.getLast();
@@ -96,9 +100,10 @@ void Gallery::setStateFromJson(var myJson)
             float offset = jsonGetValue(tx+"globalFundamentalOffset");
             int howMany = jsonGetValue(tx+"howMany");
             
-            Array<float> custom;
+            Array<float> custom({0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.});
             var cvar =  jsonGetProperty(tx+"customScale");
-            for (int c = 0; c < cvar.size(); c++) custom.add(cvar[c]);
+    
+            for (int c = 0; c < cvar.size(); c++) custom.set(c, cvar[c]);
         
             TuningPreparation::Ptr defaultTuning = new TuningPreparation();
             
@@ -129,7 +134,7 @@ void Gallery::setStateFromJson(var myJson)
             }
             
             
-            BKItem* directTuningItem = thisPiano->itemWithTypeAndId(PreparationTypeTuning, directTuning->getId());
+            directTuningItem = thisPiano->itemWithTypeAndId(PreparationTypeTuning, directTuning->getId());
             
             if (directTuningItem == nullptr)
             {
@@ -356,21 +361,21 @@ void Gallery::setStateFromJson(var myJson)
                         thisPiano->items.add(synchronicItem);
                     }
                     
-                    BKItem* tuningItem = thisPiano->itemWithTypeAndId(PreparationTypeTuning, synchronicTuning->getId());
+                    synchronicTuningItem = thisPiano->itemWithTypeAndId(PreparationTypeTuning, synchronicTuning->getId());
                     
-                    if (tuningItem == nullptr)
+                    if (synchronicTuningItem == nullptr)
                     {
-                        tuningItem = new BKItem(PreparationTypeTuning, synchronicTuning->getId(), processor);
+                        synchronicTuningItem = new BKItem(PreparationTypeTuning, synchronicTuning->getId(), processor);
                         
-                        tuningItem->setPianoTarget(-1);
+                        synchronicTuningItem->setPianoTarget(-1);
                         
-                        tuningItem->setItemName("Tuning" + String(synchronicTuning->getId()));
+                        synchronicTuningItem->setItemName("Tuning" + String(synchronicTuning->getId()));
                         
-                        tuningItem->setTopLeftPosition(10, 10);
+                        synchronicTuningItem->setTopLeftPosition(10, 10);
                         
-                        tuningItem->setActive(true);
+                        synchronicTuningItem->setActive(true);
                         
-                        thisPiano->items.add(tuningItem);
+                        thisPiano->items.add(synchronicTuningItem);
                     }
                     
                     BKItem* tempoItem = thisPiano->itemWithTypeAndId(PreparationTypeTempo, thisTempo->getId());
@@ -437,8 +442,8 @@ void Gallery::setStateFromJson(var myJson)
                     tempoItem->addConnection(synchronicItem);
                     synchronicItem->addConnection(tempoItem);
                     
-                    tuningItem->addConnection(synchronicItem);
-                    synchronicItem->addConnection(tuningItem);
+                    synchronicTuningItem->addConnection(synchronicItem);
+                    synchronicItem->addConnection(synchronicTuningItem);
                     
                     
                     DBG("\nsynchronicPrep: " + String(sId) +
@@ -549,21 +554,21 @@ void Gallery::setStateFromJson(var myJson)
                         thisPiano->items.add(nostalgicItem);
                     }
                     
-                    BKItem* tuningItem = thisPiano->itemWithTypeAndId(PreparationTypeTuning, nostalgicTuning->getId());
+                    nostalgicTuningItem = thisPiano->itemWithTypeAndId(PreparationTypeTuning, nostalgicTuning->getId());
                     
-                    if (tuningItem == nullptr)
+                    if (nostalgicTuningItem == nullptr)
                     {
-                        tuningItem = new BKItem(PreparationTypeTuning, nostalgicTuning->getId(), processor);
+                        nostalgicTuningItem = new BKItem(PreparationTypeTuning, nostalgicTuning->getId(), processor);
                         
-                        tuningItem->setPianoTarget(-1);
+                        nostalgicTuningItem->setPianoTarget(-1);
                         
-                        tuningItem->setItemName("Tuning" + String(nostalgicTuning->getId()));
+                        nostalgicTuningItem->setItemName("Tuning" + String(nostalgicTuning->getId()));
                         
-                        tuningItem->setTopLeftPosition(10, 10);
+                        nostalgicTuningItem->setTopLeftPosition(10, 10);
                         
-                        tuningItem->setActive(true);
+                        nostalgicTuningItem->setActive(true);
                         
-                        thisPiano->items.add(tuningItem);
+                        thisPiano->items.add(nostalgicTuningItem);
                     }
                     
                     BKItem* synchronicItem = thisPiano->itemWithTypeAndId(PreparationTypeSynchronic, thisSynchronic->getId());
@@ -628,8 +633,8 @@ void Gallery::setStateFromJson(var myJson)
                     keymapItem->addConnection(nostalgicItem);
                     nostalgicItem->addConnection(keymapItem);
                     
-                    tuningItem->addConnection(nostalgicItem);
-                    nostalgicItem->addConnection(tuningItem);
+                    nostalgicTuningItem->addConnection(nostalgicItem);
+                    nostalgicItem->addConnection(nostalgicTuningItem);
                     
                     synchronicItem->addConnection(nostalgicItem);
                     nostalgicItem->addConnection(synchronicItem);
@@ -767,22 +772,18 @@ void Gallery::setStateFromJson(var myJson)
                     {
                         // Make new keymap
                         Keymap::Ptr thisKeymap;
-                        if (keys.size() <= 1)
+
+                        Keymap::Ptr testKeymap = new Keymap();
+                        testKeymap->addNote(key);
+                        
+                        thisKeymap = matches(testKeymap);
+                        
+                        if (thisKeymap == nullptr)
                         {
-                            thisKeymap = emptyKeymap;
+                            addKeymap(testKeymap);
+                            thisKeymap = bkKeymaps.getLast();
                         }
-                        else
-                        {
-                            Keymap::Ptr testKeymap = new Keymap();
-                            testKeymap->addNote(key);
-                            thisKeymap = matches(testKeymap);
-                            
-                            if (thisKeymap == nullptr)
-                            {
-                                addKeymap(testKeymap);
-                                thisKeymap = bkKeymaps.getLast();
-                            }
-                        }
+                        
                         
                         // MAKE PIANO MAP ITEM AND CONNECT TO KEYMAP
                         
@@ -832,31 +833,44 @@ void Gallery::setStateFromJson(var myJson)
             
             String tun,note,notenum;
             
-            var tuningmap = jsonGetProperty("tuning::tuningMap");
-            if (!(tuningmap.size() % 3))
+            // IF mapType < 3 THEN MAYBE GETS EM ALL
+            for (int mapType = 0; mapType < 1; mapType++)
             {
-                for (int j = 0; j < tuningmap.size(); j += 3)
+                var tuningmap;
+                
+                if (mapType == 0)       tuningmap = jsonGetProperty("tuning::tuningMap");
+                else if (mapType == 1)  tuningmap = jsonGetProperty("tuning::nostalgicTuningSub::nostalgicTuningMap");
+                else if (mapType == 2)  tuningmap = jsonGetProperty("tuning::synchronicTuningSub::synchronicTuningMap");
+                
+                if (tuningmap.toString() == "<empty>") continue;
+                
+                if (!(tuningmap.size() % 3))
                 {
-                    tun = tuningmap[j]; note = tuningmap[j+1]; notenum = tuningmap[j+2];
-                    
-                    PitchClass fund = letterNoteToPitchClass(note);
-                    TuningSystem tscale = tuningStringToTuningSystem(tun);
-                    int noteNumber = notenum.getIntValue();
-                    
-                    addTuningMod();
-                    TuningModPreparation::Ptr thisTuningMod = modTuning.getLast();
-                    
-                    thisTuningMod->setParam(TuningFundamental, String(fund));
-                    thisTuningMod->setParam(TuningScale, String(tscale));
-                    
-                    // Make new keymap
-                    Keymap::Ptr thisKeymap;
-                    if (keys.size() <= 1)
+                    for (int j = 0; j < tuningmap.size(); j += 3)
                     {
-                        thisKeymap = emptyKeymap;
-                    }
-                    else
-                    {
+                        tun = tuningmap[j]; note = tuningmap[j+1]; notenum = tuningmap[j+2];
+                        
+                        PitchClass fund = letterNoteToPitchClass(note);
+                        TuningSystem tscale = tuningStringToTuningSystem(tun);
+                        int noteNumber = notenum.getIntValue();
+                        
+                        
+                        TuningModPreparation::Ptr testMod = new TuningModPreparation(-1);
+                        
+                        testMod->setParam(TuningFundamental, String(fund));
+                        testMod->setParam(TuningScale, String(tscale));
+                        
+                        TuningModPreparation::Ptr thisTuningMod = matches(testMod);
+                        
+                        if (thisTuningMod == nullptr)
+                        {
+                            addTuningMod(testMod);
+                            thisTuningMod = modTuning.getLast();
+                        }
+                        
+                        // Make new keymap
+                        Keymap::Ptr thisKeymap;
+                        
                         Keymap::Ptr testKeymap = new Keymap();
                         testKeymap->addNote(noteNumber);
                         thisKeymap = matches(testKeymap);
@@ -866,48 +880,64 @@ void Gallery::setStateFromJson(var myJson)
                             addKeymap(testKeymap);
                             thisKeymap = bkKeymaps.getLast();
                         }
+                        
+                        
+                        BKItem* modItem = thisPiano->itemWithTypeAndId(PreparationTypeTuningMod, thisTuningMod->getId());
+                        
+                        if (modItem == nullptr)
+                        {
+                            modItem = new BKItem(PreparationTypeTuningMod, thisTuningMod->getId(), processor);
+                            
+                            modItem->setPianoTarget(-1);
+                            
+                            modItem->setItemName("TuningMod" + String(thisTuningMod->getId()));
+                            
+                            modItem->setTopLeftPosition(10, 10);
+                            
+                            modItem->setActive(true);
+                            
+                            thisPiano->items.add(modItem);
+                        }
+                        
+                        BKItem* keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, thisKeymap->getId());
+                        
+                        if (keymapItem == nullptr)
+                        {
+                            keymapItem = new BKItem(PreparationTypeKeymap, thisKeymap->getId(), processor);
+                            
+                            keymapItem->setPianoTarget(-1);
+                            
+                            keymapItem->setItemName("Keymap" + String(thisKeymap->getId()));
+                            
+                            keymapItem->setTopLeftPosition(10, 10);
+                            
+                            keymapItem->setActive(true);
+                            
+                            thisPiano->items.add(keymapItem);
+                        }
+                        
+                        // CONNECT TUNINGMOD AND KEYMAP AND directTuning
+                        keymapItem->addConnection(modItem);
+                        modItem->addConnection(keymapItem);
+                        
+                        if (mapType == 0)
+                        {
+                            directTuningItem->addConnection(modItem);
+                            modItem->addConnection(directTuningItem);
+                        }
+                        else if (mapType == 1)
+                        {
+                            nostalgicTuningItem->addConnection(modItem);
+                            modItem->addConnection(nostalgicTuningItem);
+                        }
+                        else if (mapType == 2)
+                        {
+                            synchronicTuningItem->addConnection(modItem);
+                            modItem->addConnection(synchronicTuningItem);
+                        }
+                        
+                        
                     }
-                    
-                    BKItem* modItem = thisPiano->itemWithTypeAndId(PreparationTypeTuningMod, thisTuningMod->getId());
-                    
-                    if (modItem == nullptr)
-                    {
-                        modItem = new BKItem(PreparationTypeTuningMod, thisTuningMod->getId(), processor);
-                        
-                        modItem->setPianoTarget(-1);
-                        
-                        modItem->setItemName("TuningMod" + String(thisTuningMod->getId()));
-                        
-                        modItem->setTopLeftPosition(10, 10);
-                        
-                        modItem->setActive(true);
-                        
-                        thisPiano->items.add(modItem);
-                    }
-                    
-                    BKItem* keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, thisKeymap->getId());
-                    
-                    if (keymapItem == nullptr)
-                    {
-                        keymapItem = new BKItem(PreparationTypeKeymap, thisKeymap->getId(), processor);
-                        
-                        keymapItem->setPianoTarget(-1);
-                        
-                        keymapItem->setItemName("Keymap" + String(thisKeymap->getId()));
-                        
-                        keymapItem->setTopLeftPosition(10, 10);
-                        
-                        keymapItem->setActive(true);
-                        
-                        thisPiano->items.add(keymapItem);
-                    }
-                
-                    // CONNECT TUNINGMOD AND KEYMAP AND directTuning
-                    keymapItem->addConnection(modItem);
-                    modItem->addConnection(keymapItem);
-                    
-                    directTuningItem->addConnection(modItem);
-                    modItem->addConnection(directTuningItem);
                 }
             }
         }
