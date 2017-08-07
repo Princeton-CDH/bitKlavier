@@ -41,7 +41,7 @@
 #if ! JUCE_DONT_DECLARE_PROJECTINFO
 namespace ProjectInfo
 {
-    const char* const  projectName    = "BK_UI";
+    const char* const  projectName    = "bitKlavier";
     const char* const  versionString  = "0.0.1";
     const int          versionNumber  = 0x1;
 }
