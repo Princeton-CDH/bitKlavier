@@ -393,6 +393,8 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     
     if (itemToSelect != nullptr)
     {
+        processor.gallery->setGalleryDirty(true);
+        
         if (e.mods.isShiftDown())
         {
             // also select this item

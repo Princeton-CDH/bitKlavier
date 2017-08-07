@@ -443,6 +443,8 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         updateComponentVisibility();
         
     }
+    
+    processor.gallery->setGalleryDirty(true);
 }
 
 
@@ -487,6 +489,8 @@ void TuningPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableC
     Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
 
     tuning->setName(name);
+    
+    processor.gallery->setGalleryDirty(true);
 }
 
 
@@ -541,6 +545,8 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
         prep->setTuning((TuningSystem)customIndex);
         active->setTuning((TuningSystem)customIndex);
     }
+    
+    processor.gallery->setGalleryDirty(true);
 }
 
 void TuningPreparationEditor::BKSingleSliderValueChanged(String name, double val)
@@ -563,6 +569,8 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(String name, double val
         prep->setAdaptiveHistory(val);
         active->setAdaptiveHistory(val);
     }
+    
+    processor.gallery->setGalleryDirty(true);
 }
 
 void TuningPreparationEditor::buttonClicked (Button* b)
@@ -576,6 +584,8 @@ void TuningPreparationEditor::buttonClicked (Button* b)
 
         prep->setAdaptiveInversional(A1Inversional.getToggleState());
         active->setAdaptiveInversional(A1Inversional.getToggleState());
+        
+        processor.gallery->setGalleryDirty(true);
     }
     else if (b == &A1reset)
     {

@@ -37,7 +37,9 @@ public:
 private:
     BKAudioProcessor& processor;
     
-    
+    void switchGallery(void);
+    int galleryIsDirtyAlertResult;
+
     Gallery::Ptr currentGallery;
     
     
@@ -63,6 +65,8 @@ private:
     
     BKComboBox galleryCB;
     BKEditableComboBox pianoCB;
+    int lastGalleryCBId;
+    bool galleryModalCallBackIsOpen;
     
     BKButtonAndMenuLAF buttonsAndMenusLAF;
     

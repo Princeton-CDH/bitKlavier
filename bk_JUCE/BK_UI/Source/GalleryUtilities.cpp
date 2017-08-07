@@ -172,6 +172,8 @@ void Gallery::remove(BKPreparationType type, int Id)
     {
         removePiano(Id);
     }
+    
+    setGalleryDirty(true);
 }
 
 
@@ -240,6 +242,8 @@ void Gallery::add(BKPreparationType type)
     }
     
     prepareToPlay(bkSampleRate);
+    
+    setGalleryDirty(true);
 }
 
 int Gallery::getNum(BKPreparationType type)
@@ -464,6 +468,8 @@ void Gallery::addTypeWithId(BKPreparationType type, int Id)
     }
     
     prepareToPlay(bkSampleRate);
+    
+    setGalleryDirty(true);
 }
 
 
@@ -493,7 +499,6 @@ int  Gallery::addSynchronicIfNotAlreadyThere(SynchronicPreparation::Ptr sync)
         addSynchronic(sync);
         return synchronic.getLast()->getId();
     }
-    
 }
 
 void Gallery::addNostalgic(void)
@@ -580,14 +585,12 @@ int  Gallery::addTuningIfNotAlreadyThere(TuningPreparation::Ptr tune)
         addTuning(tune);
         return tuning.getLast()->getId();
     }
-    
 }
 
 void Gallery::addTempo(void)
 {
     int newId = getNewId(PreparationTypeTempo);
     tempo.add(new Tempo(newId, processor.updateState));
-    
 }
 
 void Gallery::addTempoWithId(int Id)
@@ -624,7 +627,6 @@ int  Gallery::addTempoIfNotAlreadyThere(TempoPreparation::Ptr tmp)
         addTempo(tmp);
         return tempo.getLast()->getId();
     }
-    
 }
 
 
@@ -670,7 +672,6 @@ int  Gallery::addDirectIfNotAlreadyThere(DirectPreparation::Ptr drct)
         addDirect(drct);
         return direct.getLast()->getId();
     }
-    
 }
 
 // Deletes unused preparations
@@ -760,4 +761,5 @@ void Gallery::clean(void)
         if (!thisUsed.contains(modTuning[i]->getId())) modTuning.remove(i);
     }
     
+    setGalleryDirty(true);
 }
