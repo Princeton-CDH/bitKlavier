@@ -236,17 +236,53 @@ void HeaderViewController::fillGalleryCB(void)
 {
     galleryCB.clear(dontSendNotification);
     
+    PopupMenu* galleryCBPopUp = galleryCB.getRootMenu();
+    
     int index = 0;
+    
+    StringArray submenuNames;
+    OwnedArray<PopupMenu> submenus;
     
     for (int i = 0; i < processor.galleryNames.size(); i++)
     {
         File thisFile(processor.galleryNames[i]);
-        galleryCB.addItem(thisFile.getFileName(), i+1);
         
+        if(thisFile.getFileName() == thisFile.getRelativePathFrom(File ("~/bkGalleries"))) //if the file is in the main galleries directory....
+        {
+            galleryCB.addItem(thisFile.getFileName(), i+1); //add to toplevel popup
+        }
+        
+        else //otherwise add to or create submenu with name of subfolder
+        {
+            String submenuName = thisFile.getRelativePathFrom(File ("~/bkGalleries")).initialSectionNotContaining("/"); //name of submenu
+            
+            if(submenuNames.contains(submenuName)) //add to existing submenu
+            {
+                PopupMenu* existingMenu = submenus.getUnchecked(submenuNames.indexOf(submenuName));
+                existingMenu->addItem(i + 1, thisFile.getFileName());
+            }
+            else
+            {
+                submenus.add(new PopupMenu());
+                submenuNames.add(submenuName);
+
+                submenus.getLast()->addItem(i + 1, thisFile.getFileName());
+            }
+        }
+ 
         if (thisFile.getFileName() == processor.currentGallery) index = i;
     }
     
+    //add submenus
+    for(int i=0; i<submenus.size(); i++)
+    {
+        galleryCBPopUp->addSubMenu(submenuNames.operator[](i), *submenus.getUnchecked(i));
+    }
+    
     galleryCB.setSelectedId(index+1, NotificationType::dontSendNotification);
+    
+    File selectedFile(processor.galleryNames[index]);
+    processor.gallery->setURL(selectedFile.getFullPathName());
     
 }
 
@@ -318,6 +354,8 @@ void HeaderViewController::bkComboBoxDidChange            (ComboBox* cb)
     else if (name == "galleryCB")
     {
         String path = processor.galleryNames[cb->getSelectedItemIndex()];
+        DBG(String(cb->getSelectedItemIndex()) + " " + path);
+        
         if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
         else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
     }
