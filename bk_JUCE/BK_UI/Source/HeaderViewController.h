@@ -53,6 +53,8 @@ private:
     PopupMenu getLoadMenu(void);
     PopupMenu getPianoMenu(void);
     PopupMenu getGalleryMenu(void);
+    //OwnedArray<PopupMenu> submenus;
+    //StringArray submenuNames;
     
     TextButton  loadB;
     TextButton  pianoB;
