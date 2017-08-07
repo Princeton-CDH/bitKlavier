@@ -238,10 +238,10 @@
                customXcodeResourceFolders="" customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist version=&quot;1.0&quot;&gt;&#10;&lt;dict&gt;&#10;&#9;&lt;key&gt;CFBundleIconFile&lt;/key&gt;&#10;&#9;&lt;string&gt;bk&lt;/string&gt;&#10;&lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
                rtasFolder="">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="BK_UI"
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        osxArchitecture="default" cppLibType="" osxCompatibility="default"
                        osxSDK="default"/>
-        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="BK_UI"/>
+        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="bitKlavier"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../../../JUCE/modules"/>
