@@ -239,6 +239,8 @@ void HeaderViewController::fillGalleryCB(void)
     PopupMenu* galleryCBPopUp = galleryCB.getRootMenu();
     
     int index = 0;
+    bool creatingSubmenu = false;
+    String submenuName;
     
     StringArray submenuNames;
     OwnedArray<PopupMenu> submenus;
@@ -247,14 +249,25 @@ void HeaderViewController::fillGalleryCB(void)
     {
         File thisFile(processor.galleryNames[i]);
         
+        //moving on to new submenu, if there is one, add add last submenu to popup now that it's done
+        if(creatingSubmenu && thisFile.getRelativePathFrom(File ("~/bkGalleries")).initialSectionNotContaining("/") != submenuName)
+        {
+            galleryCBPopUp->addSubMenu(submenuName, *submenus.getLast());
+            creatingSubmenu = false;
+        }
+        
+        //add toplevel item, if there is one
         if(thisFile.getFileName() == thisFile.getRelativePathFrom(File ("~/bkGalleries"))) //if the file is in the main galleries directory....
         {
             galleryCB.addItem(thisFile.getFileName(), i+1); //add to toplevel popup
         }
         
-        else //otherwise add to or create submenu with name of subfolder
+        //otherwise add to or create submenu with name of subfolder
+        else
         {
-            String submenuName = thisFile.getRelativePathFrom(File ("~/bkGalleries")).initialSectionNotContaining("/"); //name of submenu
+            creatingSubmenu = true;
+            
+            submenuName = thisFile.getRelativePathFrom(File ("~/bkGalleries")).initialSectionNotContaining("/"); //name of submenu
             
             if(submenuNames.contains(submenuName)) //add to existing submenu
             {
@@ -266,19 +279,20 @@ void HeaderViewController::fillGalleryCB(void)
                 submenus.add(new PopupMenu());
                 submenuNames.add(submenuName);
 
-                submenus.getLast()->addItem(i + 1, thisFile.getFileName());
+                submenus.getLast()->addItem(i + 1, thisFile.getFileName());;
             }
         }
  
         if (thisFile.getFileName() == processor.currentGallery) index = i;
     }
     
-    //add submenus
-    for(int i=0; i<submenus.size(); i++)
+    //add last submenu to popup, if there is one
+    if(creatingSubmenu)
     {
-        galleryCBPopUp->addSubMenu(submenuNames.operator[](i), *submenus.getUnchecked(i));
+        galleryCBPopUp->addSubMenu(submenuName, *submenus.getLast());
+        creatingSubmenu = false;
     }
-    
+
     galleryCB.setSelectedId(index+1, NotificationType::dontSendNotification);
     
     File selectedFile(processor.galleryNames[index]);
