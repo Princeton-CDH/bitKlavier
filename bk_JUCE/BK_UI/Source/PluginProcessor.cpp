@@ -472,6 +472,8 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
         initializeGallery();
         
         galleryDidLoad = true;
+        
+        gallery->setGalleryDirty(false);
     }
 }
 
@@ -498,6 +500,8 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
         initializeGallery();
         
         galleryDidLoad = true;
+        
+        gallery->setGalleryDirty(false);
     }
 }
 

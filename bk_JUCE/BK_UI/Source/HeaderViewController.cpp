@@ -35,6 +35,7 @@ processor (p)
     //galleryCB.BKSetJustificationType(juce::Justification::centredRight);
     
     galleryCB.setSelectedId(0, dontSendNotification);
+    lastGalleryCBId = galleryCB.getSelectedId();
     
     // Piano CB
     addAndMakeVisible(pianoCB);
@@ -47,7 +48,7 @@ processor (p)
     pianoCB.addItem("New piano...",1);
     pianoCB.setSelectedId(0, dontSendNotification);
     
-
+    galleryModalCallBackIsOpen = false;
     fillGalleryCB();
     
 }
@@ -234,70 +235,74 @@ void HeaderViewController::bkButtonClicked (Button* b)
 
 void HeaderViewController::fillGalleryCB(void)
 {
-    galleryCB.clear(dontSendNotification);
     
-    PopupMenu* galleryCBPopUp = galleryCB.getRootMenu();
-    
-    int index = 0;
-    bool creatingSubmenu = false;
-    String submenuName;
-    
-    StringArray submenuNames;
-    OwnedArray<PopupMenu> submenus;
-    
-    for (int i = 0; i < processor.galleryNames.size(); i++)
+    if(!galleryModalCallBackIsOpen)
     {
-        File thisFile(processor.galleryNames[i]);
+        galleryCB.clear(dontSendNotification);
         
-        //moving on to new submenu, if there is one, add add last submenu to popup now that it's done
-        if(creatingSubmenu && thisFile.getRelativePathFrom(File ("~/bkGalleries")).initialSectionNotContaining("/") != submenuName)
+        PopupMenu* galleryCBPopUp = galleryCB.getRootMenu();
+        
+        int index = 0;
+        bool creatingSubmenu = false;
+        String submenuName;
+        
+        StringArray submenuNames;
+        OwnedArray<PopupMenu> submenus;
+        
+        for (int i = 0; i < processor.galleryNames.size(); i++)
+        {
+            File thisFile(processor.galleryNames[i]);
+            
+            //moving on to new submenu, if there is one, add add last submenu to popup now that it's done
+            if(creatingSubmenu && thisFile.getRelativePathFrom(File ("~/bkGalleries")).initialSectionNotContaining("/") != submenuName)
+            {
+                galleryCBPopUp->addSubMenu(submenuName, *submenus.getLast());
+                creatingSubmenu = false;
+            }
+            
+            //add toplevel item, if there is one
+            if(thisFile.getFileName() == thisFile.getRelativePathFrom(File ("~/bkGalleries"))) //if the file is in the main galleries directory....
+            {
+                galleryCB.addItem(thisFile.getFileName(), i+1); //add to toplevel popup
+            }
+            
+            //otherwise add to or create submenu with name of subfolder
+            else
+            {
+                creatingSubmenu = true;
+                
+                submenuName = thisFile.getRelativePathFrom(File ("~/bkGalleries")).initialSectionNotContaining("/"); //name of submenu
+                
+                if(submenuNames.contains(submenuName)) //add to existing submenu
+                {
+                    PopupMenu* existingMenu = submenus.getUnchecked(submenuNames.indexOf(submenuName));
+                    existingMenu->addItem(i + 1, thisFile.getFileName());
+                }
+                else
+                {
+                    submenus.add(new PopupMenu());
+                    submenuNames.add(submenuName);
+
+                    submenus.getLast()->addItem(i + 1, thisFile.getFileName());;
+                }
+            }
+     
+            if (thisFile.getFileName() == processor.currentGallery) index = i;
+        }
+        
+        //add last submenu to popup, if there is one
+        if(creatingSubmenu)
         {
             galleryCBPopUp->addSubMenu(submenuName, *submenus.getLast());
             creatingSubmenu = false;
         }
-        
-        //add toplevel item, if there is one
-        if(thisFile.getFileName() == thisFile.getRelativePathFrom(File ("~/bkGalleries"))) //if the file is in the main galleries directory....
-        {
-            galleryCB.addItem(thisFile.getFileName(), i+1); //add to toplevel popup
-        }
-        
-        //otherwise add to or create submenu with name of subfolder
-        else
-        {
-            creatingSubmenu = true;
-            
-            submenuName = thisFile.getRelativePathFrom(File ("~/bkGalleries")).initialSectionNotContaining("/"); //name of submenu
-            
-            if(submenuNames.contains(submenuName)) //add to existing submenu
-            {
-                PopupMenu* existingMenu = submenus.getUnchecked(submenuNames.indexOf(submenuName));
-                existingMenu->addItem(i + 1, thisFile.getFileName());
-            }
-            else
-            {
-                submenus.add(new PopupMenu());
-                submenuNames.add(submenuName);
 
-                submenus.getLast()->addItem(i + 1, thisFile.getFileName());;
-            }
-        }
- 
-        if (thisFile.getFileName() == processor.currentGallery) index = i;
+        galleryCB.setSelectedId(index+1, NotificationType::dontSendNotification);
+        
+        File selectedFile(processor.galleryNames[index]);
+        processor.gallery->setURL(selectedFile.getFullPathName());
+        
     }
-    
-    //add last submenu to popup, if there is one
-    if(creatingSubmenu)
-    {
-        galleryCBPopUp->addSubMenu(submenuName, *submenus.getLast());
-        creatingSubmenu = false;
-    }
-
-    galleryCB.setSelectedId(index+1, NotificationType::dontSendNotification);
-    
-    File selectedFile(processor.galleryNames[index]);
-    processor.gallery->setURL(selectedFile.getFullPathName());
-    
 }
 
 void HeaderViewController::update(void)
@@ -347,7 +352,7 @@ void HeaderViewController::BKEditableComboBoxChanged(String text, BKEditableComb
 }
 
 
-void HeaderViewController::bkComboBoxDidChange            (ComboBox* cb)
+void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
 {
     // Change piano
     String name = cb->getName();
@@ -372,11 +377,52 @@ void HeaderViewController::bkComboBoxDidChange            (ComboBox* cb)
     }
     else if (name == "galleryCB")
     {
-        String path = processor.galleryNames[cb->getSelectedItemIndex()];
-        DBG(String(cb->getSelectedItemIndex()) + " " + path);
+        galleryIsDirtyAlertResult = 1;
+
+        if(processor.gallery->isGalleryDirty())
+        {
+            DBG("GALLERY IS DIRTY, CHECK FOR SAVE HERE");
+            galleryModalCallBackIsOpen = true; //not sure, maybe should be doing some kind of Lock
+            
+            galleryIsDirtyAlertResult = AlertWindow::showYesNoCancelBox (AlertWindow::QuestionIcon,
+                                          "The currently gallery has changed!",
+                                          "do you want to save it before switching galleries?",
+                                          String(),
+                                          String(),
+                                          String(),
+                                          0,
+                                          //ModalCallbackFunction::forComponent (alertBoxResultChosen, this)
+                                             nullptr);
+        }
+
+        if(galleryIsDirtyAlertResult == 0)
+        {
+            cb->setSelectedId(lastGalleryCBId, dontSendNotification);
+            DBG("reverting to prior gallery");
+        }
+        else if(galleryIsDirtyAlertResult == 1)
+        {
+            DBG("saving gallery first");
+            processor.saveGallery();
+            
+            String path = processor.galleryNames[cb->getSelectedItemIndex()];
+            lastGalleryCBId = Id;
+            
+            if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
+            else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
+        }
+        else if(galleryIsDirtyAlertResult == 2)
+        {
+            DBG("changing galleries without saving first");
+            String path = processor.galleryNames[cb->getSelectedItemIndex()];
+            lastGalleryCBId = Id;
+            
+            if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
+            else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
+        }
         
-        if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
-        else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
+        galleryModalCallBackIsOpen = false;
+
     }
 }
 

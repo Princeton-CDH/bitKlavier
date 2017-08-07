@@ -48,6 +48,8 @@ url(String::empty)
     {
         used.add(Array<int>({-1}));
     }
+    
+    isDirty = false;
 }
 
 Gallery::Gallery(var myJson, BKAudioProcessor& p):
@@ -91,6 +93,8 @@ url(String::empty)
     {
         used.add(Array<int>({-1}));
     }
+    
+    isDirty = false;
 }
 
 void Gallery::prepareToPlay (double sampleRate)

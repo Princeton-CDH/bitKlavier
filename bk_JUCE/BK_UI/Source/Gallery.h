@@ -89,6 +89,9 @@ public:
     void remove(BKPreparationType type, int Id);
     int  getNum(BKPreparationType type);
     
+    inline const bool isGalleryDirty(void) const noexcept {return isDirty; }
+    void setGalleryDirty(bool dirt) {isDirty = dirt;}
+    
     inline const int getNumSynchronic(void) const noexcept {return synchronic.size();}
     inline const int getNumNostalgic(void) const noexcept {return nostalgic.size();}
     inline const int getNumDirect(void) const noexcept {return direct.size();}
@@ -620,6 +623,7 @@ public:
     inline void setIdCount(BKPreparationType type, int count)
     {
         idCount.set(type, count);
+        isDirty = true;
     }
     
     inline int getIdCount(BKPreparationType type)
@@ -630,6 +634,7 @@ public:
     inline void setDefaultPiano(int Id)
     {
         defaultPianoId = Id;
+        isDirty = true;
     }
     
     inline int getDefaultPiano(void)
@@ -678,7 +683,7 @@ private:
     Piano::PtrArr                       bkPianos;
 
     int defaultPianoId;
-    
+    bool isDirty;
     
     
     void addSynchronic(void);
