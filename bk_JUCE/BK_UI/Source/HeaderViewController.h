@@ -37,7 +37,6 @@ public:
 private:
     BKAudioProcessor& processor;
     
-    void switchGallery(void);
     int galleryIsDirtyAlertResult;
 
     Gallery::Ptr currentGallery;
