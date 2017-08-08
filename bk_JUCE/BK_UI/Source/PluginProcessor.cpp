@@ -224,6 +224,7 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     updateState->tuningPreparationDidChange = true;
     
     gallery->setDefaultPiano(which);
+    gallery->setGalleryDirty(false);
 }
 
 
