@@ -42,6 +42,7 @@ public:
     bool inPaste, inCopyDrag, inCut;
     void paste(void);
     void cut(void);
+    void selectAll(void);
     
     void addItemsFromClipboard(void);
     

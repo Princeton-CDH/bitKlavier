@@ -133,6 +133,19 @@ public:
     double getLevelL();
     double getLevelR();
     
+    BKItem::PtrArr clipboard;
+    
+    inline void setClipboard(BKItem::PtrArr items)
+    {
+        clipboard = items;
+    }
+    
+    inline BKItem::PtrArr getClipboard(void)
+    {
+        return clipboard;
+    }
+    
+    
 
 private:
     int  currentPianoId;

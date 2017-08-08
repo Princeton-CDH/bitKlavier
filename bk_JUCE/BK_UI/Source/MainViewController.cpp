@@ -236,6 +236,10 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     {
         
     }
+    else if (code == 65) // A all
+    {
+        if (e.getModifiers().isCommandDown())   construction.selectAll();
+    }
     else if (code == 67) // C modification
     {
         if (e.getModifiers().isCommandDown())   construction.copy();

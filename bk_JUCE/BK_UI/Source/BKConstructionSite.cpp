@@ -33,11 +33,10 @@ BKConstructionSite::~BKConstructionSite(void)
 void BKConstructionSite::redraw(void)
 {
     removeAllChildren();
-    graph->clear();
     
     graph->reconstruct();
     
-    graph->deselectAll();
+    //graph->deselectAll();
     
     draw();
 }
@@ -64,9 +63,14 @@ void BKConstructionSite::move(int which, bool fine)
     repaint();
 }
 
+void BKConstructionSite::selectAll(void)
+{
+    graph->selectAll();
+    repaint();
+}
+
 void BKConstructionSite::deleteSelected(void)
 {
-    
     BKItem::PtrArr selectedItems = graph->getSelectedItems();
     
     for (int i = selectedItems.size(); --i >= 0;)
@@ -77,8 +81,6 @@ void BKConstructionSite::deleteSelected(void)
     selected.deselectAll();
     
     selectedItems.clear();
-    
-    repaint();
 }
 
 void BKConstructionSite::align(int which)
@@ -128,7 +130,6 @@ void BKConstructionSite::resized()
 
 void BKConstructionSite::paint(Graphics& g)
 {
-    //g.setColour(Colours::gold);
     g.setColour(Colours::burlywood.withMultipliedBrightness(0.25));
     g.fillAll();
     
@@ -168,7 +169,7 @@ void BKConstructionSite::pianoMapDidChange(BKItem* thisItem)
 void BKConstructionSite::draw(void)
 {
 
-    for (auto item : graph->getItems())
+    for (auto item : processor.currentPiano->getItems())
     {
         addAndMakeVisible(item);
     }
@@ -279,7 +280,7 @@ void BKConstructionSite::prepareItemDrag(BKItem* item, const MouseEvent& e, bool
 }
 void BKConstructionSite::deleteItem (BKItem* item)
 {
-    graph->removeAndUnregisterItem(item);
+    processor.currentPiano->remove(item);
     
     removeChildComponent(item);
 }
@@ -307,68 +308,42 @@ void BKConstructionSite::addItem(BKPreparationType type)
 
     lastX += 10; lastY += 10;
     
-    graph->addAndRegisterItem(toAdd);
+    graph->addItem(toAdd);
     
     addAndMakeVisible(toAdd);
 }
 
 void BKConstructionSite::copy(void)
 {
-    graph->updateClipboard();
-}
-
-void BKConstructionSite::addItemsFromClipboard(void)
-{
-    graph->deselectAll();
-    
-    int which = 0;
-    int firstX, firstY;
-    
-    for (auto item : graph->clipboard)
-    {
-        int thisId = item->getId();
-        
-        BKPreparationType type = item->getType();
-        
-        if (item->isActive())
-        {
-            thisId = processor.gallery->getNewId(type);
-            
-            processor.gallery->addTypeWithId(type, thisId);
-        }
-        
-        BKItem* toAdd = new BKItem(item->getType(), thisId, processor);
-        
-        if (which == 0)
-        {
-            toAdd->setTopLeftPosition(lastX, lastY);
-            firstX = item->position.x; firstY = item->position.y;
-        }
-        else
-        {
-            toAdd->setTopLeftPosition(lastX+item->position.x-firstX, lastY+item->position.y-firstY);
-        }
-        
-        graph->addAndRegisterItem(toAdd);
-        
-        addAndMakeVisible(toAdd);
-        
-        which++;
-        
-        graph->select(toAdd);
-    }
+    processor.setClipboard(graph->getSelectedItems());
 }
 
 void BKConstructionSite::paste(void)
 {
-    addItemsFromClipboard();
+    BKItem::PtrArr clipboard = processor.getClipboard();
+    
+    for (auto item : clipboard)
+    {
+        processor.currentPiano->add(item);
+        item->setSelected(true);
+        addChildComponent(item);
+    }
+    
+    redraw();
 }
 
 void BKConstructionSite::cut(void)
 {
-    graph->updateClipboard();
-    deleteSelected();
+    processor.setClipboard(graph->getSelectedItems());
     
+    for (auto item : graph->getSelectedItems())
+    {
+        processor.currentPiano->remove(item);
+        graph->removeItem(item);
+        removeChildComponent(item);
+    }
+    
+    graph->deselectAll();
 }
 
 void BKConstructionSite::mouseMove (const MouseEvent& eo)
@@ -422,13 +397,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
                 graph->select(itemToSelect);
             }
             
-            graph->updateClipboard();
-            
             lastX = e.x; lastY = e.y;
-            
-            addItemsFromClipboard();
-            
-            
             
             
         }

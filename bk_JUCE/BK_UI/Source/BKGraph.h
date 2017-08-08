@@ -29,6 +29,8 @@ public:
     BKItem(BKPreparationType type, int Id, BKAudioProcessor& p);
     
     ~BKItem(void);
+
+    BKItem* duplicate(void);
     
     void mouseDown(const MouseEvent& e) override;
     void mouseDoubleClick(const MouseEvent& e) override;
@@ -263,14 +265,9 @@ public:
     ~BKItemGraph(void);
 
     BKItem::Ptr get(BKPreparationType type, int Id);
-    
-    void addAndRegisterItem(BKItem* item);
-    void addItem(BKItem* item);
-    void registerItem(BKItem* item);
-    
+
+    void addItem(BKItem* thisItem);
     void removeItem(BKItem* thisItem);
-    void unregisterItem(BKItem* thisItem);
-    void removeAndUnregisterItem(BKItem* thisItem);
     
     bool contains(BKItem* thisItem);
     bool contains(BKPreparationType type, int Id);
@@ -281,87 +278,35 @@ public:
     void connect(BKItem* item1, BKItem* item2);
     void disconnect(BKItem* item1, BKItem* item2);
     
+    bool isValidConnection(BKPreparationType type1, BKPreparationType type2);
     
     void reconstruct(void);
     
-    inline BKPreparationType getModType(BKPreparationType type)
-    {
-        return (BKPreparationType)(type+6);
-    }
     
-    bool isValidConnection(BKPreparationType type1, BKPreparationType type2);
+    BKPreparationType getModType(BKPreparationType type);
     
-    inline void select(BKItem* item)
-    {
-        item->setSelected(true);
-    }
+    void select(BKItem* item);
     
-    inline void deselect(BKItem* item)
-    {
-        item->setSelected(false);
-    }
+    void deselect(BKItem* item);
     
-    inline void deselectAll(void)
-    {
-        for (auto item : items)
-        {
-            item->unfocusAllComponents();
-            item->setSelected(false);
-        }
-    }
+    void deselectAll(void);
     
-    inline void selectAll(void)
-    {
-        for (auto item : items) item->setSelected(true);
-    }
+    void selectAll(void);
     
-    inline BKItem::PtrArr getSelectedItems(void) const noexcept
-    {
-        BKItem::PtrArr selectedItems;
-        
-        for (auto item : items)
-        {
-            if (item->getSelected()) selectedItems.add(item);
-        }
-        
-        return selectedItems;
-    }
+    BKItem::PtrArr getSelectedItems(void);
     
-    inline BKItem::PtrArr getItems(void)
-    {
-        return items;
-    }
+    Array<int> getPreparationIds(BKItem::PtrArr theseItems);
+    
+    void print(void);
     
     
-    inline Array<int> getPreparationIds(BKItem::PtrArr theseItems)
-    {
-        Array<int> whichPreps;
-        for (auto item : theseItems) whichPreps.add(item->getId());
-        
-        return whichPreps;
-    }
-    
+    BKItem::PtrArr getItems(void);
+
     
     Array<Line<int>> getLines(void);
     
-    inline void print(void)
-    {
-        DBG("\n~ ~ ~ ~ ~ ~ ~ GRAPH ~ ~ ~ ~ ~ ~ ~:\n");
-        for (auto item : items)
-        {
-            item->print();
-        }
-        DBG("\n~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n");
-    }
-    
-    void updateClipboard(void);
-
-    BKItem::PtrArr clipboard;
-    
 private:
     BKAudioProcessor& processor;
-    
-    BKItem::PtrArr items;
 
     void addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId);
     
