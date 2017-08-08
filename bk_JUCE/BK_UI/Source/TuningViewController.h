@@ -104,6 +104,13 @@ public:
     
     void fillSelectCB(int last, int current);
     
+    static void actionButtonCallback(int action, TuningPreparationEditor*);
+    
+    int addPreparation(void);
+    int duplicatePreparation(void);
+    void setCurrentId(int Id);
+    void deleteCurrent(void);
+    
 private:
     
     void bkComboBoxDidChange (ComboBox* box) override;
@@ -131,6 +138,13 @@ public:
     void updateModification(void);
     
     void fillSelectCB(int last, int current);
+    
+    static void actionButtonCallback(int action, TuningModificationEditor*);
+    
+    int addPreparation(void);
+    int duplicatePreparation(void);
+    void setCurrentId(int Id);
+    void deleteCurrent(void);
     
 private:
     

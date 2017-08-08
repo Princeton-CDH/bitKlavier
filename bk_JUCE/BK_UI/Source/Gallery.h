@@ -85,6 +85,7 @@ public:
     inline const int getNumPianos(void) const noexcept {return bkPianos.size();}
     
     void add(BKPreparationType type);
+    void duplicate(BKPreparationType type, int Id);
     void addTypeWithId(BKPreparationType type, int Id);
     void remove(BKPreparationType type, int Id);
     int  getNum(BKPreparationType type);
@@ -687,28 +688,24 @@ private:
     
     
     void addSynchronic(void);
+    void addSynchronic(Synchronic::Ptr);
     void addSynchronic(SynchronicPreparation::Ptr);
-    int addSynchronicIfNotAlreadyThere(SynchronicPreparation::Ptr);
     
     void addNostalgic(void);
+    void addNostalgic(Nostalgic::Ptr);
     void addNostalgic(NostalgicPreparation::Ptr);
-    int addNostalgicIfNotAlreadyThere(NostalgicPreparation::Ptr);
     
     void addTuning(void);
+    void addTuning(Tuning::Ptr);
     void addTuning(TuningPreparation::Ptr);
-    int addTuningIfNotAlreadyThere(TuningPreparation::Ptr);
     
     void addTempo(void);
+    void addTempo(Tempo::Ptr);
     void addTempo(TempoPreparation::Ptr);
-    int addTempoIfNotAlreadyThere(TempoPreparation::Ptr);
     
     void addDirect(void);
+    void addDirect(Direct::Ptr);
     void addDirect(DirectPreparation::Ptr);
-    int addDirectIfNotAlreadyThere(DirectPreparation::Ptr);
-    
-    void addSynchronic(int Id, int tuningId, int tempoId);
-    void addNostalgic(int Id, int tuningId, int synchronicId);
-    void addDirect(int Id, int tuningId);
     
     void addKeymap(void);
     void addKeymap(Keymap::Ptr);
@@ -730,8 +727,11 @@ private:
     void addTuningModWithId(int Id);
     void addTempoModWithId(int Id);
     
-    void addTuningMod(TuningModPreparation::Ptr tmod);
-    void addTempoMod(TempoModPreparation::Ptr tmod);
+    void addTuningMod(TuningModPreparation::Ptr);
+    void addTempoMod(TempoModPreparation::Ptr);
+    void addDirectMod(DirectModPreparation::Ptr);
+    void addSynchronicMod(SynchronicModPreparation::Ptr);
+    void addNostalgicMod(NostalgicModPreparation::Ptr);
     
     void removeDirect(int Id);
     void removeSynchronic(int Id);

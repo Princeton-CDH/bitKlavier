@@ -53,6 +53,10 @@ BKViewController(p, theGraph)
     hideOrShow.setName("hideOrShow");
     hideOrShow.setButtonText(" X ");
     
+    addAndMakeVisible(actionButton);
+    actionButton.setButtonText("Action");
+    actionButton.addListener(this);
+    
     addAndMakeVisible(nDisplaySlider);
 }
 
@@ -85,6 +89,12 @@ void NostalgicViewController::resized()
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
     comboBoxSlice.removeFromLeft(gXSpacing);
+
+    actionButton.setBounds(selectCB.getRight()+gXSpacing,
+                           selectCB.getY(),
+                           selectCB.getWidth() * 0.5,
+                           selectCB.getHeight());
+    
     clearModsButton.setBounds(comboBoxSlice.removeFromLeft(90));
     
     /* *** above here should be generic to all prep layouts *** */
@@ -223,6 +233,79 @@ void NostalgicPreparationEditor::bkMessageReceived (const String& message)
     }
 }
 
+int NostalgicPreparationEditor::addPreparation(void)
+{
+    processor.gallery->add(PreparationTypeNostalgic);
+    
+    return processor.gallery->getAllNostalgic().getLast()->getId();
+}
+
+int NostalgicPreparationEditor::duplicatePreparation(void)
+{
+    processor.gallery->duplicate(PreparationTypeNostalgic, processor.updateState->currentNostalgicId);
+    
+    return processor.gallery->getAllNostalgic().getLast()->getId();
+}
+
+void NostalgicPreparationEditor::deleteCurrent(void)
+{
+    int NostalgicId = selectCB.getSelectedId();
+    int index = selectCB.getSelectedItemIndex();
+    
+    if ((index == 0) && (selectCB.getItemId(index+1) == -1)) return;
+    
+    processor.gallery->remove(PreparationTypeNostalgic, NostalgicId);
+    
+    fillSelectCB(0, 0);
+    
+    int newId = 0;
+    
+    selectCB.setSelectedId(newId, dontSendNotification);
+    
+    processor.updateState->currentNostalgicId = -1;
+}
+
+void NostalgicPreparationEditor::setCurrentId(int Id)
+{
+    processor.updateState->currentNostalgicId = Id;
+    
+    processor.updateState->idDidChange = true;
+    
+    update();
+    
+    fillSelectCB(lastId, Id);
+    
+    lastId = Id;
+}
+
+void NostalgicPreparationEditor::actionButtonCallback(int action, NostalgicPreparationEditor* vc)
+{
+    BKAudioProcessor& processor = vc->processor;
+    
+    if (action == 1)
+    {
+        int Id = vc->addPreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 2)
+    {
+        int Id = vc->duplicatePreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 3)
+    {
+        vc->deleteCurrent();
+    }
+    else if (action == 4)
+    {
+        // IMPORT
+    }
+    else if (action == 5)
+    {
+        // EXPORT
+    }
+}
+
 void NostalgicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
@@ -233,20 +316,10 @@ void NostalgicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == selectCB.getNumItems()-1)
         {
-            processor.gallery->add(PreparationTypeNostalgic);
-            
-            Id = processor.gallery->getAllNostalgic().getLast()->getId();
+            Id = addPreparation();
         }
         
-        processor.updateState->currentNostalgicId = Id;
-        
-        processor.updateState->idDidChange = true;
-        
-        update();
-        
-        fillSelectCB(lastId, Id);
-        
-        lastId = Id;
+        setCurrentId(Id);
     }
     else if (name == "Length Mode")
     {
@@ -363,6 +436,10 @@ void NostalgicPreparationEditor::buttonClicked (Button* b)
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+    else if (b == &actionButton)
+    {
+        getOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 }
 
@@ -547,6 +624,79 @@ void NostalgicModificationEditor::bkMessageReceived (const String& message)
     }
 }
 
+int NostalgicModificationEditor::addPreparation(void)
+{
+    processor.gallery->add(PreparationTypeNostalgicMod);
+    
+    return processor.gallery->getNostalgicModPreparations().getLast()->getId();
+}
+
+int NostalgicModificationEditor::duplicatePreparation(void)
+{
+    processor.gallery->duplicate(PreparationTypeNostalgicMod, processor.updateState->currentModNostalgicId);
+    
+    return processor.gallery->getNostalgicModPreparations().getLast()->getId();
+}
+
+void NostalgicModificationEditor::deleteCurrent(void)
+{
+    int oldId = selectCB.getSelectedId();
+    int index = selectCB.getSelectedItemIndex();
+    
+    if ((index == 0) && (selectCB.getItemId(index+1) == -1)) return;
+    
+    processor.gallery->remove(PreparationTypeNostalgicMod, oldId);
+    
+    fillSelectCB(0, 0);
+    
+    int newId = 0;
+    
+    selectCB.setSelectedId(newId, dontSendNotification);
+    
+    processor.updateState->currentModNostalgicId = -1;
+}
+
+void NostalgicModificationEditor::setCurrentId(int Id)
+{
+    processor.updateState->currentModNostalgicId = Id;
+    
+    processor.updateState->idDidChange = true;
+    
+    update();
+    
+    fillSelectCB(lastId, Id);
+    
+    lastId = Id;
+}
+
+void NostalgicModificationEditor::actionButtonCallback(int action, NostalgicModificationEditor* vc)
+{
+    BKAudioProcessor& processor = vc->processor;
+    
+    if (action == 1)
+    {
+        int Id = vc->addPreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 2)
+    {
+        int Id = vc->duplicatePreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 3)
+    {
+        vc->deleteCurrent();
+    }
+    else if (action == 4)
+    {
+        // IMPORT
+    }
+    else if (action == 5)
+    {
+        // EXPORT
+    }
+}
+
 void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
@@ -557,20 +707,10 @@ void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->add(PreparationTypeNostalgicMod);
-            
-            Id = processor.gallery->getNostalgicModPreparations().getLast()->getId();
+            Id = addPreparation();
         }
         
-        processor.updateState->currentModNostalgicId = Id;
-        
-        processor.updateState->idDidChange = true;
-        
-        update();
-        
-        fillSelectCB(lastId, Id);
-        
-        lastId = Id;
+        setCurrentId(Id);
     }
     else if (name == "Length Mode")
     {
@@ -648,5 +788,9 @@ void NostalgicModificationEditor::buttonClicked (Button* b)
         NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
         mod->clearAll();
         update();
+    }
+    else if (b == &actionButton)
+    {
+        getOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 }

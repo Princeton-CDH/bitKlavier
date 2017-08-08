@@ -145,25 +145,32 @@ public:
     
     
     Tempo(TempoPreparation::Ptr prep,
-          int Id,
-          BKUpdateState::Ptr us):
+          int Id):
     sPrep(new TempoPreparation(prep)),
     aPrep(new TempoPreparation(sPrep)),
     Id(Id),
-    name(String(Id)),
-    updateState(us)
+    name(String(Id))
     {
         
     }
     
-    Tempo(int Id,
-          BKUpdateState::Ptr us):
+    Tempo(int Id):
     Id(Id),
-    name(String(Id)),
-    updateState(us)
+    name(String(Id))
     {
         sPrep = new TempoPreparation();
         aPrep = new TempoPreparation(sPrep);
+    }
+    
+    inline Tempo::Ptr duplicate()
+    {
+        TempoPreparation::Ptr copyPrep = new TempoPreparation(sPrep);
+        
+        Tempo::Ptr copy = new Tempo(copyPrep, -1);
+        
+        copy->setName(name + " copy");
+        
+        return copy;
     }
     
     inline ValueTree getState(void)
@@ -223,7 +230,8 @@ public:
     
     ~Tempo() {};
     
-    inline int getId() {return Id;};
+    inline int getId() {return Id;}
+    inline void setId(int newId) { Id = newId;}
     
     
     TempoPreparation::Ptr      sPrep;
@@ -246,10 +254,7 @@ public:
     inline void setName(String newName)
     {
         name = newName;
-        updateState->tempoPreparationDidChange = true;
     }
-    
-    BKUpdateState::Ptr updateState;
 
 private:
     int Id;
@@ -308,6 +313,16 @@ public:
         param.set(AT1Mode, "");
     }
     
+    inline TempoModPreparation::Ptr duplicate(void)
+    {
+        TempoModPreparation::Ptr copyPrep = new TempoModPreparation(-1);
+       
+        copyPrep->copy(this);
+        
+        copyPrep->setName(this->getName() + " copy");
+        
+        return copyPrep;
+    }
     
     ~TempoModPreparation(void)
     {
@@ -494,7 +509,6 @@ public:
     inline void reset(void)
     {
         tempo->aPrep->copy(tempo->sPrep);
-        tempo->updateState->tempoPreparationDidChange = true;
         adaptiveReset();
         DBG("tempo reset");
     }

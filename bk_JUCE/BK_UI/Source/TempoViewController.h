@@ -76,6 +76,13 @@ public:
     void update(void) override;
     
     void fillSelectCB(int last, int current);
+    
+    static void actionButtonCallback(int action, TempoPreparationEditor*);
+    
+    int addPreparation(void);
+    int duplicatePreparation(void);
+    void setCurrentId(int Id);
+    void deleteCurrent(void);
 
 private:
     float lastPeriodMultiplier;
@@ -111,6 +118,13 @@ public:
     {
 
     }
+    
+    static void actionButtonCallback(int action, TempoModificationEditor*);
+    
+    int addPreparation(void);
+    int duplicatePreparation(void);
+    void setCurrentId(int Id);
+    void deleteCurrent(void);
     
 private:
     void bkComboBoxDidChange (ComboBox* box) override;

@@ -61,6 +61,8 @@ protected:
     
     TextButton clearModsButton;
     
+    
+    
 private:
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicViewController)
@@ -84,6 +86,13 @@ public:
     void timerCallback() override;
     
     void fillSelectCB(int last, int current);
+    
+    static void actionButtonCallback(int action, SynchronicPreparationEditor*);
+    
+    int addPreparation(void);
+    int duplicatePreparation(void);
+    void setCurrentId(int Id);
+    void deleteCurrent(void);
     
 private:
 
@@ -122,6 +131,13 @@ public:
     void timerCallback() override;
     
     void fillSelectCB(int last, int current);
+    
+    static void actionButtonCallback(int action, SynchronicModificationEditor*);
+    
+    int addPreparation(void);
+    int duplicatePreparation(void);
+    void setCurrentId(int Id);
+    void deleteCurrent(void);
     
 private:
     

@@ -380,8 +380,8 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
             galleryModalCallBackIsOpen = true; //not sure, maybe should be doing some kind of Lock
             
             galleryIsDirtyAlertResult = AlertWindow::showYesNoCancelBox (AlertWindow::QuestionIcon,
-                                          "The currently gallery has changed!",
-                                          "do you want to save it before switching galleries?",
+                                          "The current gallery has changed.",
+                                          "Do you want to save before switching galleries?",
                                           String(),
                                           String(),
                                           String(),

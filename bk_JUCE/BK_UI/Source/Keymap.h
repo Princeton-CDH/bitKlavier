@@ -58,6 +58,30 @@ public:
         setKeymap(k->keys());
     }
     
+    inline Keymap::Ptr duplicate(void)
+    {
+        Keymap::Ptr copyPrep = new Keymap(-1);
+        
+        copyPrep->setKeymap(keys());
+        
+        copyPrep->setName(name + " copy");
+        
+        return copyPrep;
+    }
+    
+    Keymap(int Id, Keymap::Ptr k):
+    Id(Id)
+    {
+        keymap.ensureStorageAllocated(128);
+        
+        for (int i = 0; i < 128; i++)
+        {
+            keymap.add(false);
+        }
+        
+        setKeymap(k->keys());
+    }
+    
     Keymap(void):
     Id(-1)
     {

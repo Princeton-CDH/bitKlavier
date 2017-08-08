@@ -485,7 +485,7 @@ void Gallery::setStateFromJson(var myJson)
                     }
                     tId = nostalgicTuning->getId();
                     
-                    NostalgicPreparation::Ptr nostPrep = new NostalgicPreparation(tuning[tId]);
+                    NostalgicPreparation::Ptr nostPrep = new NostalgicPreparation();
                     
                     float gain = jsonGetValue(nx+"gain");
                     

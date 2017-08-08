@@ -286,11 +286,7 @@ public:
     typedef OwnedArray<Synchronic>                  Arr;
     typedef OwnedArray<Synchronic, CriticalSection> CSArr;
     
-    Synchronic(BKSynthesiser *s,
-               SynchronicPreparation::Ptr prep,
-               Tuning::Ptr tuning,
-               Tempo::Ptr tempo,
-               GeneralSettings::Ptr general,
+    Synchronic(SynchronicPreparation::Ptr prep,
                int Id):
     sPrep(new SynchronicPreparation(prep)),
     aPrep(new SynchronicPreparation(sPrep)),
@@ -300,19 +296,24 @@ public:
         
     }
     
-    Synchronic(BKSynthesiser *s,
-               Tuning::Ptr tuning,
-               Tempo::Ptr tempo,
-               GeneralSettings::Ptr general,
-               BKUpdateState::Ptr us,
-               int Id):
+    Synchronic(int Id):
     Id(Id),
-    name(String(Id)),
-    updateState(us)
+    name(String(Id))
     {
         sPrep       = new SynchronicPreparation();
         aPrep       = new SynchronicPreparation(sPrep);
-    };
+    }
+    
+    inline Synchronic::Ptr duplicate()
+    {
+        SynchronicPreparation::Ptr copyPrep = new SynchronicPreparation(sPrep);
+        
+        Synchronic::Ptr copy = new Synchronic(copyPrep, -1);
+        
+        copy->setName(name + " copy");
+        
+        return copy;
+    }
 
     inline void copy(Synchronic::Ptr from)
     {
@@ -495,21 +496,18 @@ public:
     ~Synchronic() {};
     
     inline int getId() {return Id;}
+    inline void setId(int newId) { Id = newId;}
     
     SynchronicPreparation::Ptr      sPrep;
     SynchronicPreparation::Ptr      aPrep;
 
-    //void didChange(bool which) { updateState->synchronicPreparationDidChange = which; }
     
     inline String getName(void) const noexcept {return name;}
     
     inline void setName(String newName)
     {
         name = newName;
-        updateState->synchronicPreparationDidChange = true;
     }
-    
-    BKUpdateState::Ptr updateState;
     
 private:
     int Id;
@@ -582,6 +580,17 @@ public:
         param.set(SynchronicLengthMultipliers, "");
         param.set(SynchronicAccentMultipliers, "");
         param.set(SynchronicTranspOffsets, "");
+    }
+    
+    inline SynchronicModPreparation::Ptr duplicate(void)
+    {
+        SynchronicModPreparation::Ptr copyPrep = new SynchronicModPreparation(-1);
+        
+        copyPrep->copy(this);
+        
+        copyPrep->setName(this->getName() + " copy");
+        
+        return copyPrep;
     }
     
     inline void setId(int newId) { Id = newId; }
@@ -926,7 +935,6 @@ public:
     inline void reset(void)
     {
         synchronic->aPrep->copy(synchronic->sPrep);
-        synchronic->updateState->synchronicPreparationDidChange = true;
         DBG("synchronic reset");
     }
     

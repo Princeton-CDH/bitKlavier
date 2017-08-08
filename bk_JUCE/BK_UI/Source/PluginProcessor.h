@@ -132,6 +132,7 @@ public:
     
     double getLevelL();
     double getLevelR();
+    
 
 private:
     int  currentPianoId;

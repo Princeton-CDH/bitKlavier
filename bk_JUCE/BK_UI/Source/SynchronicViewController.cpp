@@ -103,8 +103,10 @@ BKViewController(p, theGraph)
     addAndMakeVisible(hideOrShow);
     hideOrShow.setName("hideOrShow");
     hideOrShow.setButtonText(" X ");
-
     
+    addAndMakeVisible(actionButton);
+    actionButton.setButtonText("Action");
+    actionButton.addListener(this);
 }
 
 void SynchronicViewController::paint (Graphics& g)
@@ -129,6 +131,12 @@ void SynchronicViewController::resized()
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    
+    actionButton.setBounds(selectCB.getRight()+gXSpacing,
+                           selectCB.getY(),
+                           selectCB.getWidth() * 0.5,
+                           selectCB.getHeight());
+    
     comboBoxSlice.removeFromLeft(gXSpacing);
     clearModsButton.setBounds(comboBoxSlice.removeFromLeft(90));
     
@@ -447,6 +455,80 @@ void SynchronicPreparationEditor::fillSelectCB(int last, int current)
 }
 
 
+int SynchronicPreparationEditor::addPreparation(void)
+{
+    processor.gallery->add(PreparationTypeSynchronic);
+    
+    return processor.gallery->getAllSynchronic().getLast()->getId();
+}
+
+int SynchronicPreparationEditor::duplicatePreparation(void)
+{
+    processor.gallery->duplicate(PreparationTypeSynchronic, processor.updateState->currentSynchronicId);
+    
+    return processor.gallery->getAllSynchronic().getLast()->getId();
+}
+
+void SynchronicPreparationEditor::deleteCurrent(void)
+{
+    int SynchronicId = selectCB.getSelectedId();
+    int index = selectCB.getSelectedItemIndex();
+    
+    if ((index == 0) && (selectCB.getItemId(index+1) == -1)) return;
+    
+    processor.gallery->remove(PreparationTypeSynchronic, SynchronicId);
+    
+    fillSelectCB(0, 0);
+    
+    int newId = 0;
+    
+    selectCB.setSelectedId(newId, dontSendNotification);
+    
+    processor.updateState->currentSynchronicId = -1;
+}
+
+void SynchronicPreparationEditor::setCurrentId(int Id)
+{
+    processor.updateState->currentSynchronicId = Id;
+    
+    processor.updateState->idDidChange = true;
+    
+    update();
+    
+    fillSelectCB(lastId, Id);
+    
+    lastId = Id;
+}
+
+void SynchronicPreparationEditor::actionButtonCallback(int action, SynchronicPreparationEditor* vc)
+{
+    BKAudioProcessor& processor = vc->processor;
+    
+    if (action == 1)
+    {
+        int Id = vc->addPreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 2)
+    {
+        int Id = vc->duplicatePreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 3)
+    {
+        vc->deleteCurrent();
+    }
+    else if (action == 4)
+    {
+        // IMPORT
+    }
+    else if (action == 5)
+    {
+        // EXPORT
+    }
+}
+
+
 void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
@@ -457,19 +539,10 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->add(PreparationTypeSynchronic);
-            Id = processor.gallery->getAllSynchronic().getLast()->getId();
+            Id = addPreparation();
         }
         
-        processor.updateState->currentSynchronicId = Id;
-        
-        processor.updateState->idDidChange = true;
-        
-        update();
-        
-        fillSelectCB(lastId, Id);
-        
-        lastId = Id;
+        setCurrentId(Id);
     }
     else if (name == "Mode")
     {
@@ -565,6 +638,10 @@ void SynchronicPreparationEditor::buttonClicked (Button* b)
     else if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+    else if (b == &actionButton)
+    {
+        getOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 }
 
@@ -671,29 +748,7 @@ void SynchronicModificationEditor::highlightModedComponents()
 
 void SynchronicModificationEditor::timerCallback()
 {
-    /*
-    SynchronicProcessor::Ptr sProcessor = processor.currentPiano->getSynchronicProcessor(processor.updateState->currentSynchronicId);
-    
-    for (int i = 0; i < paramSliders.size(); i++)
-    {
-        if(paramSliders[i]->getName() == "beat length multipliers")
-        {
-            paramSliders[i]->setCurrentSlider(sProcessor->getBeatMultiplierCounter());
-        }
-        else if(paramSliders[i]->getName() == "sustain length multipliers")
-        {
-            paramSliders[i]->setCurrentSlider(sProcessor->getLengthMultiplierCounter());
-        }
-        else if(paramSliders[i]->getName() == "accents")
-        {
-            paramSliders[i]->setCurrentSlider(sProcessor->getAccentMultiplierCounter());
-        }
-        else if(paramSliders[i]->getName() == "transpositions")
-        {
-            paramSliders[i]->setCurrentSlider(sProcessor->getTranspCounter());
-        }
-    }
-     */
+
 }
 
 void SynchronicModificationEditor::update(NotificationType notify)
@@ -906,6 +961,79 @@ void SynchronicModificationEditor::BKRangeSliderValueChanged(String name, double
 }
 
 
+int SynchronicModificationEditor::addPreparation(void)
+{
+    processor.gallery->add(PreparationTypeSynchronicMod);
+    
+    return processor.gallery->getSynchronicModPreparations().getLast()->getId();
+}
+
+int SynchronicModificationEditor::duplicatePreparation(void)
+{
+    processor.gallery->duplicate(PreparationTypeSynchronicMod, processor.updateState->currentModSynchronicId);
+    
+    return processor.gallery->getSynchronicModPreparations().getLast()->getId();
+}
+
+void SynchronicModificationEditor::deleteCurrent(void)
+{
+    int oldId = selectCB.getSelectedId();
+    int index = selectCB.getSelectedItemIndex();
+    
+    if ((index == 0) && (selectCB.getItemId(index+1) == -1)) return;
+    
+    processor.gallery->remove(PreparationTypeSynchronicMod, oldId);
+    
+    fillSelectCB(0, 0);
+    
+    int newId = 0;
+    
+    selectCB.setSelectedId(newId, dontSendNotification);
+    
+    processor.updateState->currentModSynchronicId = -1;
+}
+
+void SynchronicModificationEditor::setCurrentId(int Id)
+{
+    processor.updateState->currentModSynchronicId = Id;
+    
+    processor.updateState->idDidChange = true;
+    
+    update();
+    
+    fillSelectCB(lastId, Id);
+    
+    lastId = Id;
+}
+
+void SynchronicModificationEditor::actionButtonCallback(int action, SynchronicModificationEditor* vc)
+{
+    BKAudioProcessor& processor = vc->processor;
+    
+    if (action == 1)
+    {
+        int Id = vc->addPreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 2)
+    {
+        int Id = vc->duplicatePreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 3)
+    {
+        vc->deleteCurrent();
+    }
+    else if (action == 4)
+    {
+        // IMPORT
+    }
+    else if (action == 5)
+    {
+        // EXPORT
+    }
+}
+
 
 void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
 {
@@ -917,20 +1045,10 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->add(PreparationTypeSynchronicMod);
-            
-            Id = processor.gallery->getSynchronicModPreparations().getLast()->getId();
+            Id = addPreparation();
         }
         
-        processor.updateState->currentModSynchronicId = Id;
-        
-        processor.updateState->idDidChange = true;
-        
-        update();
-        
-        fillSelectCB(lastId, Id);
-        
-        lastId = Id;
+        setCurrentId(Id);
     }
     else if (name == "Mode")
     {
@@ -1033,6 +1151,10 @@ void SynchronicModificationEditor::buttonClicked (Button* b)
         SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
         mod->clearAll();
         update();
+    }
+    else if (b == &actionButton)
+    {
+        getOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     
     updateModification();

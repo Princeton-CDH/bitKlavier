@@ -57,6 +57,10 @@ BKViewController(p, theGraph)
     hideOrShow.addListener(this);
     hideOrShow.setButtonText(" X ");
     
+    addAndMakeVisible(actionButton);
+    actionButton.setButtonText("Action");
+    actionButton.addListener(this);
+    
     fillSelectCB(-1,-1);
 
     update();
@@ -109,7 +113,86 @@ void KeymapViewController::resized()
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
     
+    actionButton.setBounds(selectCB.getRight()+gXSpacing,
+                           selectCB.getY(),
+                           selectCB.getWidth() * 0.5,
+                           selectCB.getHeight());
+    
 }
+
+int KeymapViewController::addKeymap(void)
+{
+    processor.gallery->add(PreparationTypeKeymap);
+    
+    return processor.gallery->getKeymaps().getLast()->getId();
+}
+
+int KeymapViewController::duplicateKeymap(void)
+{
+    processor.gallery->duplicate(PreparationTypeKeymap, processor.updateState->currentKeymapId);
+    
+    return processor.gallery->getKeymaps().getLast()->getId();
+}
+
+void KeymapViewController::deleteCurrent(void)
+{
+    int KeymapId = selectCB.getSelectedId();
+    int index = selectCB.getSelectedItemIndex();
+    
+    if ((index == 0) && (selectCB.getItemId(index+1) == -1)) return;
+    
+    processor.gallery->remove(PreparationTypeKeymap, KeymapId);
+    
+    fillSelectCB(0, 0);
+    
+    int newId = 0;
+    
+    selectCB.setSelectedId(newId, dontSendNotification);
+    
+    processor.updateState->currentKeymapId = -1;
+}
+
+void KeymapViewController::setCurrentId(int Id)
+{
+    processor.updateState->currentKeymapId = Id;
+    
+    processor.updateState->idDidChange = true;
+    
+    update();
+    
+    fillSelectCB(lastId, Id);
+    
+    lastId = Id;
+}
+
+void KeymapViewController::actionButtonCallback(int action, KeymapViewController* vc)
+{
+    BKAudioProcessor& processor = vc->processor;
+    
+    if (action == 1)
+    {
+        int Id = vc->addKeymap();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 2)
+    {
+        int Id = vc->duplicateKeymap();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 3)
+    {
+        vc->deleteCurrent();
+    }
+    else if (action == 4)
+    {
+        // IMPORT
+    }
+    else if (action == 5)
+    {
+        // EXPORT
+    }
+}
+
 
 void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
 {
@@ -183,6 +266,10 @@ void KeymapViewController::bkButtonClicked (Button* b)
         keymapTF.setVisible(true);
         keymapTF.toFront(true);
         focusLostByEscapeKey = false;
+    }
+    else if (b == &actionButton)
+    {
+        getOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 }
 

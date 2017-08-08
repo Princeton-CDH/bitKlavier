@@ -111,6 +111,10 @@ BKViewController(p,theGraph)
     addAndMakeVisible(hideOrShow);
     hideOrShow.setName("hideOrShow");
     hideOrShow.setButtonText(" X ");
+    
+    addAndMakeVisible(actionButton);
+    actionButton.setButtonText("Action");
+    actionButton.addListener(this);
 }
 
 void TuningViewController::resized()
@@ -134,6 +138,12 @@ void TuningViewController::resized()
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    
+    actionButton.setBounds(selectCB.getRight()+gXSpacing,
+                           selectCB.getY(),
+                           selectCB.getWidth() * 0.5,
+                           selectCB.getHeight());
+    
     comboBoxSlice.removeFromLeft(gXSpacing);
     A1reset.setBounds(comboBoxSlice.removeFromLeft(90));
     clearModsButton.setBounds(A1reset.getBounds());
@@ -371,6 +381,79 @@ void TuningPreparationEditor::timerCallback()
     }
 }
 
+int TuningPreparationEditor::addPreparation(void)
+{
+    processor.gallery->add(PreparationTypeTuning);
+    
+    return processor.gallery->getAllTuning().getLast()->getId();
+}
+
+int TuningPreparationEditor::duplicatePreparation(void)
+{
+    processor.gallery->duplicate(PreparationTypeTuning, processor.updateState->currentTuningId);
+    
+    return processor.gallery->getAllTuning().getLast()->getId();
+}
+
+void TuningPreparationEditor::deleteCurrent(void)
+{
+    int TuningId = selectCB.getSelectedId();
+    int index = selectCB.getSelectedItemIndex();
+    
+    if ((index == 0) && (selectCB.getItemId(index+1) == -1)) return;
+    
+    processor.gallery->remove(PreparationTypeTuning, TuningId);
+    
+    fillSelectCB(0, 0);
+    
+    int newId = 0;
+    
+    selectCB.setSelectedId(newId, dontSendNotification);
+    
+    processor.updateState->currentTuningId = -1;
+}
+
+void TuningPreparationEditor::setCurrentId(int Id)
+{
+    processor.updateState->currentTuningId = Id;
+    
+    processor.updateState->idDidChange = true;
+    
+    update();
+    
+    fillSelectCB(lastId, Id);
+    
+    lastId = Id;
+}
+
+void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparationEditor* vc)
+{
+    BKAudioProcessor& processor = vc->processor;
+    
+    if (action == 1)
+    {
+        int Id = vc->addPreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 2)
+    {
+        int Id = vc->duplicatePreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 3)
+    {
+        vc->deleteCurrent();
+    }
+    else if (action == 4)
+    {
+        // IMPORT
+    }
+    else if (action == 5)
+    {
+        // EXPORT
+    }
+}
+
 
 void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 {
@@ -385,20 +468,10 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->add(PreparationTypeTuning);
-            
-            Id = processor.gallery->getAllTuning().getLast()->getId();
+            Id = addPreparation();
         }
         
-        processor.updateState->currentTuningId = Id;
-        
-        processor.updateState->idDidChange = true;
-        
-        update();
-        
-        fillSelectCB(lastId, Id);
-        
-        lastId = Id;
+        setCurrentId(Id);
     }
     else if (name == scaleCB.getName())
     {
@@ -598,6 +671,10 @@ void TuningPreparationEditor::buttonClicked (Button* b)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
+    else if (b == &actionButton)
+    {
+        getOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+    }
 }
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ TuningModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
@@ -762,6 +839,79 @@ void TuningModificationEditor::fillSelectCB(int last, int current)
     lastId = selectedId;
 }
 
+int TuningModificationEditor::addPreparation(void)
+{
+    processor.gallery->add(PreparationTypeTuningMod);
+    
+    return processor.gallery->getTuningModPreparations().getLast()->getId();
+}
+
+int TuningModificationEditor::duplicatePreparation(void)
+{
+    processor.gallery->duplicate(PreparationTypeTuningMod, processor.updateState->currentModTuningId);
+    
+    return processor.gallery->getTuningModPreparations().getLast()->getId();
+}
+
+void TuningModificationEditor::deleteCurrent(void)
+{
+    int oldId = selectCB.getSelectedId();
+    int index = selectCB.getSelectedItemIndex();
+    
+    if ((index == 0) && (selectCB.getItemId(index+1) == -1)) return;
+    
+    processor.gallery->remove(PreparationTypeTuningMod, oldId);
+    
+    fillSelectCB(0, 0);
+    
+    int newId = 0;
+    
+    selectCB.setSelectedId(newId, dontSendNotification);
+    
+    processor.updateState->currentModTuningId = -1;
+}
+
+void TuningModificationEditor::setCurrentId(int Id)
+{
+    processor.updateState->currentModTuningId = Id;
+    
+    processor.updateState->idDidChange = true;
+    
+    update();
+    
+    fillSelectCB(lastId, Id);
+    
+    lastId = Id;
+}
+
+void TuningModificationEditor::actionButtonCallback(int action, TuningModificationEditor* vc)
+{
+    BKAudioProcessor& processor = vc->processor;
+    
+    if (action == 1)
+    {
+        int Id = vc->addPreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 2)
+    {
+        int Id = vc->duplicatePreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 3)
+    {
+        vc->deleteCurrent();
+    }
+    else if (action == 4)
+    {
+        // IMPORT
+    }
+    else if (action == 5)
+    {
+        // EXPORT
+    }
+}
+
 void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
@@ -774,20 +924,10 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->add(PreparationTypeTuningMod);
-            
-            Id = processor.gallery->getTuningModPreparations().getLast()->getId();
+            Id = addPreparation();
         }
         
-        processor.updateState->currentModTuningId = Id;
-        
-        processor.updateState->idDidChange = true;
-        
-        update();
-        
-        fillSelectCB(lastId, Id);
-        
-        lastId = Id;
+        setCurrentId(Id);
     }
     else if (name == scaleCB.getName())
     {

@@ -46,24 +46,21 @@ public:
         optionMenu.setLookAndFeel(&buttonsAndMenusLAF);
         
         optionMenu.addItem(1, "New");
-        optionMenu.addItem(2, "Save");
+        
+        optionMenu.addItem(2, "Duplicate");
         optionMenu.addItem(3, "Delete");
+        optionMenu.addSeparator();
+        optionMenu.addItem(4, "Import");
+        optionMenu.addItem(5, "Export");
         
         return optionMenu;
     }
     
-    /*
-    virtual void close()
-    {
-        processor.updateState->setCurrentDisplay(DisplayNil);
-    }
-     */
-    
-    
-    
 protected:
     BKAudioProcessor& processor;
     BKItemGraph* theGraph;
+    
+    TextButton actionButton;
     
     BKButtonAndMenuLAF buttonsAndMenusLAF;
     BKButtonAndMenuLAF buttonsAndMenusLAF2;
