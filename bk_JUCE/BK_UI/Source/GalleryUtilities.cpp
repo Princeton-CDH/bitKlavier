@@ -185,6 +185,76 @@ void Gallery::remove(BKPreparationType type, int Id)
 }
 
 
+int Gallery::numWithSameNameAs(BKPreparationType type, int Id)
+{
+    int num = 0;
+    String name;
+    if (type == PreparationTypeDirect)
+    {
+        name = getDirect(Id)->getName();
+        for (auto p : direct)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+         name = getSynchronic(Id)->getName();
+        for (auto p : synchronic)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+         name = getNostalgic(Id)->getName();
+        for (auto p : nostalgic)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+    }
+    else if (type == PreparationTypeTuning)
+    {
+         name = getTuning(Id)->getName();
+        for (auto p : tuning)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+    }
+    else if (type == PreparationTypeTempo)
+    {
+         name = getTempo(Id)->getName();
+        for (auto p : tempo)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+         name = getKeymap(Id)->getName();
+        for (auto p : bkKeymaps)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+    }
+    if (type == PreparationTypeDirectMod)
+    {
+         name = getDirectModPreparation(Id)->getName();
+        for (auto p : modDirect)    if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+         name = getSynchronicModPreparation(Id)->getName();
+        for (auto p : modSynchronic)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+         name = getNostalgicModPreparation(Id)->getName();
+        for (auto p : modNostalgic)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+         name = getTuningModPreparation(Id)->getName();
+        for (auto p : modTuning)     if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+         name = getTempoModPreparation(Id)->getName();
+        for (auto p : modTempo)    if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+    }
+    else if (type == PreparationTypePiano)
+    {
+         name = getPiano(Id)->getName();
+        for (auto p : bkPianos)    if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+    }
+    
+    
+    return num;
+}
+
+
 // Adds to end of preparation list
 int Gallery::duplicate(BKPreparationType type, int Id)
 {
@@ -192,74 +262,110 @@ int Gallery::duplicate(BKPreparationType type, int Id)
     if (type == PreparationTypeDirect)
     {
         Direct::Ptr toCopy = getDirect(Id);
-        addDirect(toCopy->duplicate());
-        newId = direct.getLast()->getId();
+        Direct::Ptr newOne = toCopy->duplicate();
+        addDirect(newOne);
+        newId = newOne->getId();
+        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeDirect, newId))+")";
+        newOne->setName(newName);
     }
     else if (type == PreparationTypeSynchronic)
     {
         Synchronic::Ptr toCopy = getSynchronic(Id);
-        addSynchronic(toCopy->duplicate());
-        newId = synchronic.getLast()->getId();
+        Synchronic::Ptr newOne = toCopy->duplicate();
+        addSynchronic(newOne);
+        newId = newOne->getId();
+        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeSynchronic, newId))+")";
+        newOne->setName(newName);
     }
     else if (type == PreparationTypeNostalgic)
     {
         Nostalgic::Ptr toCopy = getNostalgic(Id);
-        addNostalgic(toCopy->duplicate());
-        newId = nostalgic.getLast()->getId();
+        Nostalgic::Ptr newOne = toCopy->duplicate();
+        addNostalgic(newOne);
+        newId = newOne->getId();
+        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeNostalgic, newId))+")";
+        newOne->setName(newName);
     }
     else if (type == PreparationTypeTuning)
     {
         Tuning::Ptr toCopy = getTuning(Id);
-        addTuning(toCopy->duplicate());
-        newId = tuning.getLast()->getId();
+        Tuning::Ptr newOne = toCopy->duplicate();
+        addTuning(newOne);
+        newId = newOne->getId();
+        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeTuning, newId))+")";
+        newOne->setName(newName);
     }
     else if (type == PreparationTypeTempo)
     {
         Tempo::Ptr toCopy = getTempo(Id);
-        addTempo(toCopy->duplicate());
-        newId = tempo.getLast()->getId();
+        Tempo::Ptr newOne = toCopy->duplicate();
+        addTempo(newOne);
+        newId = newOne->getId();
+        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeTempo, newId))+")";
+        newOne->setName(newName);
     }
     else if (type == PreparationTypeKeymap)
     {
         Keymap::Ptr toCopy = getKeymap(Id);
-        addKeymap(toCopy->duplicate());
-        newId = bkKeymaps.getLast()->getId();
+        Keymap::Ptr newOne = toCopy->duplicate();
+        addKeymap(newOne);
+        newId = newOne->getId();
+        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeKeymap, newId))+")";
+        newOne->setName(newName);
     }
     if (type == PreparationTypeDirectMod)
     {
         DirectModPreparation::Ptr toCopy = getDirectModPreparation(Id);
-        addDirectMod(toCopy->duplicate());
-        newId = modDirect.getLast()->getId();
+        DirectModPreparation::Ptr newOne = toCopy->duplicate();
+        addDirectMod(newOne);
+        newId = newOne->getId();
+        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeDirectMod, newId))+")";
+        newOne->setName(newName);
     }
     else if (type == PreparationTypeSynchronicMod)
     {
         SynchronicModPreparation::Ptr toCopy = getSynchronicModPreparation(Id);
-        addSynchronicMod(toCopy->duplicate());
-        newId = modSynchronic.getLast()->getId();
+        SynchronicModPreparation::Ptr newOne = toCopy->duplicate();
+        addSynchronicMod(newOne);
+        newId = newOne->getId();
+        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeSynchronicMod, newId))+")";
+        newOne->setName(newName);
     }
     else if (type == PreparationTypeNostalgicMod)
     {
         NostalgicModPreparation::Ptr toCopy = getNostalgicModPreparation(Id);
-        addNostalgicMod(toCopy->duplicate());
-        newId = modNostalgic.getLast()->getId();
+        NostalgicModPreparation::Ptr newOne = toCopy->duplicate();
+        addNostalgicMod(newOne);
+        newId = newOne->getId();
+        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeNostalgicMod, newId))+")";
+        newOne->setName(newName);
     }
     else if (type == PreparationTypeTuningMod)
     {
         TuningModPreparation::Ptr toCopy = getTuningModPreparation(Id);
-        addTuningMod(toCopy->duplicate());
-        newId = modTuning.getLast()->getId();
+        TuningModPreparation::Ptr newOne = toCopy->duplicate();
+        addTuningMod(newOne);
+        newId = newOne->getId();
+        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeTuningMod, newId))+")";
+        newOne->setName(newName);
     }
     else if (type == PreparationTypeTempoMod)
     {
         TempoModPreparation::Ptr toCopy = getTempoModPreparation(Id);
-        addTempoMod(toCopy->duplicate());
-        newId = modTempo.getLast()->getId();
+        TempoModPreparation::Ptr newOne = toCopy->duplicate();
+        addTempoMod(newOne);
+        newId = newOne->getId();
+        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeTempoMod, newId))+")";
+        newOne->setName(newName);
     }
     else if (type == PreparationTypePiano)
     {
         Piano::Ptr toCopy = getPiano(Id);
-        addPiano(toCopy->duplicate());
-        newId = bkPianos.getLast()->getId();
+        Piano::Ptr newOne = toCopy->duplicate();
+        addPiano(newOne);
+        newId = newOne->getId();
+        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypePiano, newId))+")";
+        newOne->setName(newName);
     }
     
     prepareToPlay(bkSampleRate);

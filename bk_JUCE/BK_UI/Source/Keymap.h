@@ -64,7 +64,7 @@ public:
         
         copyPrep->setKeymap(keys());
         
-        copyPrep->setName(name + " copy");
+        copyPrep->setName(name);
         
         return copyPrep;
     }

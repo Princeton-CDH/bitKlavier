@@ -46,7 +46,7 @@ public:
         
         copyPiano->items = items;
         
-        copyPiano->setName(pianoName + " copy");
+        copyPiano->setName(pianoName );
         
         copyPiano->prepareToPlay(sampleRate);
         
@@ -154,6 +154,7 @@ public:
     inline void clearItems(void) { items.clear(); }
     
     void add(BKItem::Ptr item);
+    bool contains(BKItem::Ptr item);
     void remove(BKItem::Ptr item);
     void configure(void);
     void deconfigure(void);

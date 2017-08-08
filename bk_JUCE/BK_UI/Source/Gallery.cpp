@@ -97,6 +97,8 @@ url(String::empty)
     isDirty = false;
 }
 
+
+
 void Gallery::prepareToPlay (double sampleRate)
 {
     bkSampleRate = sampleRate;

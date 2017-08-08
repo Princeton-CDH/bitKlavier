@@ -149,7 +149,7 @@ public:
         
         Direct::Ptr copy = new Direct(copyPrep, -1);
         
-        copy->setName(name + " copy");
+        copy->setName(name);
         
         return copy;
     }
@@ -294,7 +294,7 @@ public:
         
         copyPrep->copy(this);
         
-        copyPrep->setName(getName() + " copy");
+        copyPrep->setName(getName());
         
         return copyPrep;
     }

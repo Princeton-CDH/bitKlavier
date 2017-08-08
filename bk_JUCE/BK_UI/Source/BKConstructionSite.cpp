@@ -318,16 +318,72 @@ void BKConstructionSite::copy(void)
     processor.setClipboard(graph->getSelectedItems());
 }
 
+
+
 void BKConstructionSite::paste(void)
 {
+    Array<Array<int>> copyMap;
+    
+    auto glambda = [](Array<Array<int>> cmap, int type, int oldId)
+    {
+        for (auto set : cmap)
+        {
+            if (set[0] == type && set[1] == oldId) return set[2];
+        }
+        return 0;
+    };
+
     BKItem::PtrArr clipboard = processor.getClipboard();
+    
+    BKItem::PtrArr newItems;
     
     for (auto item : clipboard)
     {
-        processor.currentPiano->add(item);
         item->setSelected(true);
+        if (processor.currentPiano->contains(item->getType(), item->getId()))
+        {
+            int newId = processor.gallery->duplicate(item->getType(), item->getId());
+            
+            copyMap.add(Array<int>({(int)item->getType(), item->getId(), newId}));
+            
+            BKItem* newItem = new BKItem(item->getType(), newId, processor);
+            
+            newItem->setBounds(item->getX()+10, item->getY()+10, item->getWidth(), item->getHeight());
+            
+            processor.currentPiano->add(newItem);
+            item->setSelected(false);
+            newItem->setSelected(true);
+            addChildComponent(newItem);
+            
+        }
+        
+        processor.currentPiano->add(item);
         addChildComponent(item);
     }
+    
+    DBG("COPYMAP: " + arrayIntArrayToString(copyMap));
+    
+    for (auto item : clipboard)
+    {
+        if (processor.currentPiano->contains(item))
+        {
+            int itemId = glambda(copyMap, item->getType(), item->getId());
+            
+            DBG("itemId: " + String(itemId));
+            
+            for (auto connection : item->getConnections())
+            {
+                int connectionId = glambda(copyMap, connection->getType(), connection->getId());
+                
+                DBG("connectionId: " + String(connectionId));
+                
+                if (processor.clipboardContains(connection))
+                    graph->connect(item->getType(), itemId, connection->getType(), connectionId);
+            }
+        }
+    }
+    
+    processor.currentPiano->configure();
     
     redraw();
 }

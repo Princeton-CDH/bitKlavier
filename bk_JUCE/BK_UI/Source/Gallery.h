@@ -85,6 +85,7 @@ public:
     inline const int getNumPianos(void) const noexcept {return bkPianos.size();}
     
     int add(BKPreparationType type);
+    int numWithSameNameAs(BKPreparationType type, int Id);
     int duplicate(BKPreparationType type, int Id);
     void addTypeWithId(BKPreparationType type, int Id);
     void remove(BKPreparationType type, int Id);
