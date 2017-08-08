@@ -20,6 +20,14 @@ void Gallery::addPiano()
     bkPianos.add(new Piano(processor, newId));
 }
 
+void Gallery::addPiano(Piano::Ptr thisPiano)
+{
+    int newId = getNewId(PreparationTypePiano);
+    thisPiano->setId(newId);
+    bkPianos.add(thisPiano);
+}
+
+
 void Gallery::addPianoWithId(int Id)
 {
     bkPianos.add(new Piano(processor, Id));
@@ -178,7 +186,7 @@ void Gallery::remove(BKPreparationType type, int Id)
 
 
 // Adds to end of preparation list
-void Gallery::duplicate(BKPreparationType type, int Id)
+int Gallery::duplicate(BKPreparationType type, int Id)
 {
     int newId = -1;
     if (type == PreparationTypeDirect)
@@ -247,21 +255,22 @@ void Gallery::duplicate(BKPreparationType type, int Id)
         addTempoMod(toCopy->duplicate());
         newId = modTempo.getLast()->getId();
     }
-    /*
     else if (type == PreparationTypePiano)
     {
-        addPiano();
+        Piano::Ptr toCopy = getPiano(Id);
+        addPiano(toCopy->duplicate());
         newId = bkPianos.getLast()->getId();
     }
-     */
     
     prepareToPlay(bkSampleRate);
     
     setGalleryDirty(true);
+    
+    return newId;
 }
 
 // Adds to end of preparation list
-void Gallery::add(BKPreparationType type)
+int Gallery::add(BKPreparationType type)
 {
     int newId = -1;
     if (type == PreparationTypeDirect)
@@ -328,6 +337,8 @@ void Gallery::add(BKPreparationType type)
     prepareToPlay(bkSampleRate);
     
     setGalleryDirty(true);
+    
+    return newId;
 }
 
 int Gallery::getNum(BKPreparationType type)

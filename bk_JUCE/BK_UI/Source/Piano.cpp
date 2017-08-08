@@ -77,34 +77,9 @@ void Piano::configure(void)
     
     defaultT = getTuningProcessor(DEFAULT_ID);
     
-    if (defaultT == nullptr)
-    {
-        defaultT = new TuningProcessor(processor.gallery->getTuning(DEFAULT_ID));
-        defaultT->prepareToPlay(sampleRate);
-        tprocessor.add(defaultT);
-    }
-    
     defaultM = getTempoProcessor(DEFAULT_ID);
     
-    if (defaultM == nullptr)
-    {
-        defaultM = new TempoProcessor(processor.gallery->getTempo(DEFAULT_ID));
-        defaultM->prepareToPlay(sampleRate);
-        mprocessor.add(defaultM);
-    }
-    
     defaultS = getSynchronicProcessor(DEFAULT_ID);
-    
-    if (defaultS == nullptr)
-    {
-        defaultS = new SynchronicProcessor(processor.gallery->getSynchronic(DEFAULT_ID),
-                                        defaultT,
-                                        defaultM,
-                                        &processor.mainPianoSynth,
-                                        processor.gallery->getGeneralSettings());
-        defaultS->prepareToPlay(sampleRate, &processor.mainPianoSynth);
-        sprocessor.add(defaultS);
-    }
     
     for (auto item : items)
     {
@@ -200,6 +175,8 @@ void Piano::configure(void)
             }
         }
     }
+    
+    processor.updateState->pianoDidChangeForGraph = true;
 }
 
 SynchronicProcessor::Ptr Piano::addSynchronicProcessor(int thisId)
@@ -222,7 +199,7 @@ DirectProcessor::Ptr Piano::getDirectProcessor(int Id)
         if (proc->getId() == Id) return proc;
     }
     
-    return nullptr;
+    return addDirectProcessor(Id);
 }
 
 NostalgicProcessor::Ptr Piano::getNostalgicProcessor(int Id)
@@ -232,7 +209,7 @@ NostalgicProcessor::Ptr Piano::getNostalgicProcessor(int Id)
         if (proc->getId() == Id) return proc;
     }
     
-    return nullptr;
+    return addNostalgicProcessor(Id);
 }
 
 SynchronicProcessor::Ptr Piano::getSynchronicProcessor(int Id)
@@ -242,7 +219,7 @@ SynchronicProcessor::Ptr Piano::getSynchronicProcessor(int Id)
         if (proc->getId() == Id) return proc;
     }
     
-    return nullptr;
+    return addSynchronicProcessor(Id);
 }
 
 TuningProcessor::Ptr Piano::getTuningProcessor(int Id)
@@ -252,7 +229,7 @@ TuningProcessor::Ptr Piano::getTuningProcessor(int Id)
         if (proc->getId() == Id) return proc;
     }
     
-    return nullptr;
+    return addTuningProcessor(Id);
 }
 
 TempoProcessor::Ptr Piano::getTempoProcessor(int Id)
@@ -262,7 +239,7 @@ TempoProcessor::Ptr Piano::getTempoProcessor(int Id)
         if (proc->getId() == Id) return proc;
     }
     
-    return nullptr;
+    return addTempoProcessor(Id);
 }
 
 
@@ -383,16 +360,16 @@ void Piano::remove(BKItem::Ptr item)
 
 void Piano::linkSynchronicWithTempo(Synchronic::Ptr synchronic, Tempo::Ptr thisTempo)
 {
-    SynchronicProcessor::Ptr sproc = getSynchronicProcessor(synchronic->getId());
-
-    sproc->setTempo(getTempoProcessor(thisTempo->getId()));
+    SynchronicProcessor::Ptr proc = getSynchronicProcessor(synchronic->getId());
+    
+    proc->setTempo(getTempoProcessor(thisTempo->getId()));
 }
 
 void Piano::linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic)
 {
-    NostalgicProcessor::Ptr nproc = getNostalgicProcessor(nostalgic->getId());
-
-    nproc->setSynchronic(getSynchronicProcessor(synchronic->getId()));
+    NostalgicProcessor::Ptr proc = getNostalgicProcessor(nostalgic->getId());
+    
+    proc->setSynchronic(getSynchronicProcessor(synchronic->getId()));
 }
 
 void Piano::linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning)
@@ -408,7 +385,7 @@ void Piano::linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tu
     else if (thisType == PreparationTypeSynchronic)
     {
         SynchronicProcessor::Ptr sproc = getSynchronicProcessor(thisId);
-
+        
         sproc->setTuning(tproc);
     }
     else if (thisType == PreparationTypeNostalgic)

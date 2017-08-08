@@ -139,9 +139,23 @@ public:
         saveGallery();
     }
     
+
     bool isDirty() override
     {
         return gallery->isGalleryDirty();
+    }
+
+
+    BKItem::PtrArr clipboard;
+    
+    inline void setClipboard(BKItem::PtrArr items)
+    {
+        clipboard = items;
+    }
+    
+    inline BKItem::PtrArr getClipboard(void)
+    {
+        return clipboard;
     }
 
 

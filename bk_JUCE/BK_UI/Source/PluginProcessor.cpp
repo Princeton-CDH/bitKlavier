@@ -205,6 +205,9 @@ double BKAudioProcessor::getLevelR()
 // Piano
 void  BKAudioProcessor::setCurrentPiano(int which)
 {
+    
+    updateState->setCurrentDisplay(DisplayNil);
+    
     gallery->resetPreparations();
     
     if (noteOnCount)  prevPianos.addIfNotAlreadyThere(currentPiano);

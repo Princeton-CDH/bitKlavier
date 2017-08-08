@@ -94,6 +94,21 @@ BKItem::~BKItem()
     connections.clear();
 }
 
+BKItem* BKItem::duplicate(void)
+{
+    BKItem* newItem = new BKItem(type, Id, processor);
+    
+    newItem->setImage(image);
+    
+    newItem->setItemName(name);
+    
+    newItem->setActive(active);
+    
+    newItem->setBounds(getBounds());
+    
+    return newItem;
+}
+
 void BKItem::configurePianoCB(void)
 {
     addAndMakeVisible(menu);
@@ -418,76 +433,36 @@ void BKItem::setState(XmlElement* e)
 
 BKItemGraph::~BKItemGraph(void)
 {
-    for (int i = 0; i < items.size(); i++)  items[i]->clearConnections();
+    BKItem::PtrArr items = getItems();
     
-    clipboard.clear();
-    items.clear();
+    for (int i = 0; i < items.size(); i++) items[i]->clearConnections();
+    
+    clear();
 }
 
 void BKItemGraph::clear()
 {
-    clipboard.clear();
-    items.clear();
-}
-
-void BKItemGraph::updateClipboard(void)
-{
-    clipboard.clear();
-    
-    for (auto item : getSelectedItems())
-    {
-        BKItem* toAdd = new BKItem(item->getType(), item->getId(), processor);
-        
-        toAdd->copy(item);
-        
-        clipboard.add(toAdd);
-    }
-}
-
-void BKItemGraph::addAndRegisterItem(BKItem* thisItem)
-{
-    addItem(thisItem);
-    registerItem(thisItem);
+    processor.currentPiano->clearItems();
 }
 
 void BKItemGraph::addItem(BKItem* thisItem)
 {
-    items.addIfNotAlreadyThere(thisItem);
-    
-    DBG("itemxy: " + String(thisItem->getX()) + " " + String(thisItem->getY()));
-}
-
-void BKItemGraph::registerItem(BKItem* thisItem)
-{
     thisItem->setActive(true);
-    
     processor.currentPiano->add(thisItem);
 }
 
+
 void BKItemGraph::removeItem(BKItem* thisItem)
 {
-    items.removeObject(thisItem);
-}
-
-void BKItemGraph::unregisterItem(BKItem* thisItem)
-{
-    for (auto item : thisItem->getConnections()) item->removeConnection(thisItem);
-    
     thisItem->setActive(false);
-    
     processor.currentPiano->remove(thisItem);
 }
 
-void BKItemGraph::removeAndUnregisterItem(BKItem* thisItem)
-{
-    unregisterItem(thisItem);
-    removeItem(thisItem);
-}
 
 bool BKItemGraph::contains(BKItem* thisItem)
 {
     bool alreadyThere = false;
-    for (auto item : items)
+    for (auto item : getItems())
     {
         if (item->getType() == BKPreparationTypeNil) continue;
         
@@ -505,7 +480,7 @@ bool BKItemGraph::contains(BKItem* thisItem)
 bool BKItemGraph::contains(BKPreparationType type, int Id)
 {
     bool alreadyThere = false;
-    for (auto item : items)
+    for (auto item : getItems())
     {
         if ((item->getType() == type) && (item->getId() == Id))
         {
@@ -521,7 +496,7 @@ BKItem::Ptr BKItemGraph::get(BKPreparationType type, int Id)
 {
     BKItem::Ptr thisItem = nullptr;
 
-    for (auto item : items)
+    for (auto item : getItems())
     {
         if (item->getType() == type && item->getId() == Id)
         {
@@ -535,11 +510,7 @@ BKItem::Ptr BKItemGraph::get(BKPreparationType type, int Id)
 
 void BKItemGraph::clearItems(void)
 {
-    for (auto itemToRemove : items)
-    {
-        removeAndUnregisterItem(itemToRemove);
-    }
-    items.clear();
+    processor.currentPiano->clearItems();
 }
 
 void BKItemGraph::connect(BKItem* item1, BKItem* item2)
@@ -680,7 +651,7 @@ Array<Line<int>> BKItemGraph::getLines(void)
 {
     Array<Line<int>> lines;
     
-    for (auto item : items)
+    for (auto item : getItems())
     {
         BKPreparationType type = item->getType();
     
@@ -785,11 +756,74 @@ void BKItemGraph::reconstruct(void)
         {
             item->configurePianoCB();
         }
-        
-        addItem(item);
-    
     }
 }
+
+BKPreparationType BKItemGraph::getModType(BKPreparationType type)
+{
+    return (BKPreparationType)(type+6);
+}
+
+void BKItemGraph::select(BKItem* item)
+{
+    item->setSelected(true);
+}
+
+void BKItemGraph::deselect(BKItem* item)
+{
+    item->setSelected(false);
+}
+
+void BKItemGraph::deselectAll(void)
+{
+    for (auto item : processor.currentPiano->getItems())
+    {
+        item->unfocusAllComponents();
+        item->setSelected(false);
+    }
+}
+
+void BKItemGraph::selectAll(void)
+{
+    for (auto item : processor.currentPiano->getItems())
+        item->setSelected(true);
+}
+
+BKItem::PtrArr BKItemGraph::getSelectedItems(void)
+{
+    BKItem::PtrArr selectedItems;
+    
+    for (auto item : processor.currentPiano->getItems())
+    {
+        if (item->getSelected()) selectedItems.add(item);
+    }
+    
+    return selectedItems;
+}
+
+Array<int> BKItemGraph::getPreparationIds(BKItem::PtrArr theseItems)
+{
+    Array<int> whichPreps;
+    for (auto item : theseItems) whichPreps.add(item->getId());
+    
+    return whichPreps;
+}
+
+BKItem::PtrArr BKItemGraph::getItems(void)
+{
+    return processor.currentPiano->getItems();
+}
+
+void BKItemGraph::print(void)
+{
+    DBG("\n~ ~ ~ ~ ~ ~ ~ GRAPH ~ ~ ~ ~ ~ ~ ~:\n");
+    for (auto item : processor.currentPiano->getItems())
+    {
+        item->print();
+    }
+    DBG("\n~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n");
+}
+
 
 bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType type2)
 {

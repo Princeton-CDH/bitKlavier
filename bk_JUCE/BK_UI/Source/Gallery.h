@@ -84,11 +84,12 @@ public:
     
     inline const int getNumPianos(void) const noexcept {return bkPianos.size();}
     
-    void add(BKPreparationType type);
-    void duplicate(BKPreparationType type, int Id);
+    int add(BKPreparationType type);
+    int duplicate(BKPreparationType type, int Id);
     void addTypeWithId(BKPreparationType type, int Id);
     void remove(BKPreparationType type, int Id);
     int  getNum(BKPreparationType type);
+    
     
     inline const bool isGalleryDirty(void) const noexcept {return isDirty; }
     void setGalleryDirty(bool dirt) {isDirty = dirt;}
@@ -712,6 +713,7 @@ private:
     inline const int getNumKeymaps(void) const noexcept {return bkKeymaps.size();}
     
     void addPiano(void);
+    void addPiano(Piano::Ptr);
     void addPianoWithId(int Id);
     void removePiano(int Id);
     

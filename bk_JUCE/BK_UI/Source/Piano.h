@@ -40,6 +40,20 @@ public:
           int Id);
     ~Piano();
     
+    inline Piano::Ptr duplicate(void)
+    {
+        Piano::Ptr copyPiano = new Piano(processor, -1);
+        
+        copyPiano->items = items;
+        
+        copyPiano->setName(pianoName + " copy");
+        
+        copyPiano->prepareToPlay(sampleRate);
+        
+        copyPiano->configure();
+        
+        return copyPiano;
+    }
 
     void clear(void);
     
@@ -50,7 +64,7 @@ public:
 
     ValueTree*  getPianoValueTree(void);
     
-    inline void setId(int Id) { Id = Id; }
+    inline void setId(int newId) { Id = newId; }
     
     inline int getId(void) { return Id; }
     

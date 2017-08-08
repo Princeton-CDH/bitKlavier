@@ -105,7 +105,8 @@ PopupMenu HeaderViewController::getPianoMenu(void)
     pianoMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
     pianoMenu.addItem(1, "New");
-    pianoMenu.addItem(2, "Delete");
+    pianoMenu.addItem(2, "Duplicate");
+    pianoMenu.addItem(3, "Delete");
     //pianoMenu.addSeparator();
     //pianoMenu.addItem(3, "Settings");
     
@@ -146,28 +147,39 @@ void HeaderViewController::loadMenuCallback(int result, HeaderViewController* gv
 
 void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* hvc)
 {
+    BKAudioProcessor& processor = hvc->processor;
     if (result == 1) // New piano
     {
-        int newId = hvc->processor.gallery->getNewId(PreparationTypePiano);
+        int newId = processor.gallery->getNewId(PreparationTypePiano);
         
-        hvc->processor.gallery->addTypeWithId(PreparationTypePiano, newId);
+        processor.gallery->addTypeWithId(PreparationTypePiano, newId);
         
         String newName = "Piano"+String(newId);
         
-        hvc->processor.gallery->getPianos().getLast()->setName(newName);
+        processor.gallery->getPianos().getLast()->setName(newName);
         
         hvc->fillPianoCB();
         
-        hvc->processor.setCurrentPiano(newId);
+        processor.setCurrentPiano(newId);
     }
-    else if (result == 2) // Remove piano
+    else if (result == 2) // Duplicate
+    {
+        int newId = processor.gallery->duplicate(PreparationTypePiano, processor.currentPiano->getId());
+        
+        String newName = "Piano"+String(newId);
+        
+        hvc->fillPianoCB();
+        
+        processor.setCurrentPiano(newId);
+    }
+    else if (result == 3) // Remove piano
     {
         int pianoId = hvc->pianoCB.getSelectedId();
         int index = hvc->pianoCB.getSelectedItemIndex();
         
         if ((index == 0) && (hvc->pianoCB.getItemId(index+1) == -1)) return;
         
-        hvc->processor.gallery->remove(PreparationTypePiano, pianoId);
+        processor.gallery->remove(PreparationTypePiano, pianoId);
         
         hvc->fillPianoCB();
         
@@ -177,7 +189,7 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
         
         hvc->pianoCB.setSelectedId(newPianoId, dontSendNotification);
         
-        hvc->processor.setCurrentPiano(newPianoId);
+        processor.setCurrentPiano(newPianoId);
     }
     
 }
@@ -323,6 +335,8 @@ void HeaderViewController::fillPianoCB(void)
     for (auto piano : processor.gallery->getPianos())
     {
         String name = piano->getName();
+        
+        DBG("string piano Id: " + String(piano->getId()));
         
         if (name != String::empty)  pianoCB.addItem(name,  piano->getId());
         else                        pianoCB.addItem("Piano" + String(piano->getId()), piano->getId());
