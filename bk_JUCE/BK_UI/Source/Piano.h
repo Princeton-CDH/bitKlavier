@@ -46,7 +46,7 @@ public:
         
         copyPiano->items = items;
         
-        copyPiano->setName(pianoName + " copy");
+        copyPiano->setName(pianoName );
         
         copyPiano->prepareToPlay(sampleRate);
         

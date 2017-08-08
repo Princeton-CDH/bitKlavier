@@ -377,7 +377,8 @@ void BKConstructionSite::paste(void)
                 
                 DBG("connectionId: " + String(connectionId));
                 
-                graph->connect(item->getType(), itemId, connection->getType(), connectionId);
+                if (processor.clipboardContains(connection))
+                    graph->connect(item->getType(), itemId, connection->getType(), connectionId);
             }
         }
     }

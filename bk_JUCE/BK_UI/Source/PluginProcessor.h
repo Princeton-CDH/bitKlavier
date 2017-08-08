@@ -145,6 +145,14 @@ public:
         return clipboard;
     }
     
+    inline bool clipboardContains(BKItem::Ptr thisItem)
+    {
+        for (auto item : clipboard)
+        {
+            if (item->getType() == thisItem->getType() && item->getId() == thisItem->getId()) return true;
+        }
+        return false;
+    }
     
 
 private:

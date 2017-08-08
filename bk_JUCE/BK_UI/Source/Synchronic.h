@@ -310,7 +310,7 @@ public:
         
         Synchronic::Ptr copy = new Synchronic(copyPrep, -1);
         
-        copy->setName(name + " copy");
+        copy->setName(name);
         
         return copy;
     }
@@ -588,7 +588,7 @@ public:
         
         copyPrep->copy(this);
         
-        copyPrep->setName(this->getName() + " copy");
+        copyPrep->setName(this->getName());
         
         return copyPrep;
     }
