@@ -158,7 +158,6 @@ public:
         return clipboard;
     }
 
-=======
     
     inline bool clipboardContains(BKItem::Ptr thisItem)
     {
