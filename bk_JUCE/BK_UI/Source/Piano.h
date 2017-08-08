@@ -154,6 +154,7 @@ public:
     inline void clearItems(void) { items.clear(); }
     
     void add(BKItem::Ptr item);
+    bool contains(BKItem::Ptr item);
     void remove(BKItem::Ptr item);
     void configure(void);
     void deconfigure(void);

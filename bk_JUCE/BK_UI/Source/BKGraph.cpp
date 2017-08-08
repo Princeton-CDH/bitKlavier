@@ -513,6 +513,12 @@ void BKItemGraph::clearItems(void)
     processor.currentPiano->clearItems();
 }
 
+void BKItemGraph::connect(BKPreparationType type1, int id1, BKPreparationType type2, int id2)
+{
+    BKItem* item1 = get(type1,id1); BKItem* item2 = get(type2,id2);
+    connect(item1,item2);
+}
+
 void BKItemGraph::connect(BKItem* item1, BKItem* item2)
 {
     if ((item1 == item2) || (item1->isConnectedTo(item2) && item2->isConnectedTo(item1))) return;

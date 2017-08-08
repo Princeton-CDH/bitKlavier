@@ -349,8 +349,6 @@ void TempoPreparationEditor::setCurrentId(int Id)
 
 void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEditor* vc)
 {
-    BKAudioProcessor& processor = vc->processor;
-    
     if (action == 1)
     {
         int Id = vc->addPreparation();
@@ -674,8 +672,6 @@ void TempoModificationEditor::setCurrentId(int Id)
 
 void TempoModificationEditor::actionButtonCallback(int action, TempoModificationEditor* vc)
 {
-    BKAudioProcessor& processor = vc->processor;
-    
     if (action == 1)
     {
         int Id = vc->addPreparation();

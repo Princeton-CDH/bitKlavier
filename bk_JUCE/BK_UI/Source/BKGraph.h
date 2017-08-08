@@ -275,6 +275,7 @@ public:
     void clear(void);
     void clearItems(void);
     
+    void connect(BKPreparationType type1, int id1, BKPreparationType type2, int id2);
     void connect(BKItem* item1, BKItem* item2);
     void disconnect(BKItem* item1, BKItem* item2);
     

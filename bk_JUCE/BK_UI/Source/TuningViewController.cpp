@@ -428,8 +428,6 @@ void TuningPreparationEditor::setCurrentId(int Id)
 
 void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparationEditor* vc)
 {
-    BKAudioProcessor& processor = vc->processor;
-    
     if (action == 1)
     {
         int Id = vc->addPreparation();
