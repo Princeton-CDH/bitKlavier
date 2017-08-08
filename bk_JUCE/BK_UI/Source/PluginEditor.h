@@ -32,6 +32,7 @@ public:
     void paint (Graphics&) override;
     void resized() override;
 
+
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it

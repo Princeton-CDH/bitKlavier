@@ -132,6 +132,17 @@ public:
     
     double getLevelL();
     double getLevelR();
+    
+    void saveOnClose() override
+    {
+        DBG("SAVE ON CLOSE CALLED");
+        saveGallery();
+    }
+    
+    bool isDirty() override
+    {
+        return gallery->isGalleryDirty();
+    }
 
 private:
     int  currentPianoId;
