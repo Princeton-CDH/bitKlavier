@@ -392,6 +392,8 @@ void BKAudioProcessor::saveGalleryAs(void)
         ScopedPointer<XmlElement> myXML = galleryVT.createXml();
         
         myXML->writeToFile(myFile, String::empty);
+        
+        gallery->setGalleryDirty(false);
     }
     
     
@@ -419,6 +421,8 @@ void BKAudioProcessor::saveGallery(void)
         ScopedPointer<XmlElement> myXML = galleryVT.createXml();
         
         myXML->writeToFile(myFile, String::empty);
+        
+        gallery->setGalleryDirty(false);
     }
 }
 
@@ -426,6 +430,33 @@ void BKAudioProcessor::saveGallery(void)
 // Gallery/Preset Management
 void BKAudioProcessor::loadGalleryDialog(void)
 {
+    int galleryIsDirtyAlertResult = 0;
+    if(gallery->isGalleryDirty())
+    {
+        DBG("GALLERY IS DIRTY, CHECK FOR SAVE HERE");
+        
+        galleryIsDirtyAlertResult = AlertWindow::showYesNoCancelBox (AlertWindow::QuestionIcon,
+                                                                     "The current gallery has changed!",
+                                                                     "do you want to save it before loading a new gallery?",
+                                                                     String(),
+                                                                     String(),
+                                                                     String(),
+                                                                     0,
+                                                                     //ModalCallbackFunction::forComponent (alertBoxResultChosen, this)
+                                                                     nullptr);
+        
+        
+        if(galleryIsDirtyAlertResult == 0)
+        {
+            return;
+        }
+        else if(galleryIsDirtyAlertResult == 1)
+        {
+            DBG("saving gallery first");
+            saveGallery();
+        }
+    }
+    
     updateState->loadedJson = false;
     
     FileChooser myChooser ("Load gallery from xml file...",
@@ -480,6 +511,34 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
 
 void BKAudioProcessor::loadJsonGalleryDialog(void)
 {
+    
+    int galleryIsDirtyAlertResult = 0;
+    if(gallery->isGalleryDirty())
+    {
+        DBG("GALLERY IS DIRTY, CHECK FOR SAVE HERE");
+        
+        galleryIsDirtyAlertResult = AlertWindow::showYesNoCancelBox (AlertWindow::QuestionIcon,
+                                                                     "The current gallery has changed!",
+                                                                     "do you want to save it before loading a new gallery?",
+                                                                     String(),
+                                                                     String(),
+                                                                     String(),
+                                                                     0,
+                                                                     //ModalCallbackFunction::forComponent (alertBoxResultChosen, this)
+                                                                     nullptr);
+        
+        
+        if(galleryIsDirtyAlertResult == 0)
+        {
+            return;
+        }
+        else if(galleryIsDirtyAlertResult == 1)
+        {
+            DBG("saving gallery first");
+            saveGallery();
+        }
+    }
+    
     updateState->loadedJson = true;
     
     FileChooser myChooser ("Load gallery from json file...",
