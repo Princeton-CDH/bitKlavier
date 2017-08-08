@@ -14,8 +14,6 @@
 #include "BKUtilities.h"
 #include "AudioConstants.h"
 
-#include "BKUpdateState.h"
-
 #include "Keymap.h"
 
 class TuningPreparation : public ReferenceCountedObject
@@ -255,11 +253,9 @@ public:
     
     
     Tuning(TuningPreparation::Ptr prep,
-           int Id,
-           BKUpdateState::Ptr us):
+           int Id):
     sPrep(new TuningPreparation(prep)),
     aPrep(new TuningPreparation(sPrep)),
-    updateState(us),
     Id(Id),
     name(String(Id))
     {
@@ -274,11 +270,9 @@ public:
         tuningLibrary.set(UtonalTuning, tUtonalTuning);
     }
     
-    Tuning(int Id,
-           BKUpdateState::Ptr us):
+    Tuning(int Id):
     Id(Id),
-    name(String(Id)),
-    updateState(us)
+    name(String(Id))
     {
         sPrep = new TuningPreparation();
         aPrep = new TuningPreparation(sPrep);
@@ -292,7 +286,18 @@ public:
         tuningLibrary.set(DuodeneTuning, tDuodeneTuning);
         tuningLibrary.set(OtonalTuning, tOtonalTuning);
         tuningLibrary.set(UtonalTuning, tUtonalTuning);
-    };
+    }
+    
+    inline Tuning::Ptr duplicate()
+    {
+        TuningPreparation::Ptr copyPrep = new TuningPreparation(sPrep);
+        
+        Tuning::Ptr copy = new Tuning(copyPrep, -1);
+        
+        copy->setName(name + " copy");
+        
+        return copy;
+    }
     
     
     ValueTree getState(void);
@@ -300,8 +305,8 @@ public:
     
     ~Tuning() {};
     
-    inline int getId() {return Id;};
-    
+    inline int getId() {return Id;}
+    inline void setId(int newId) { Id = newId;}
     
     TuningPreparation::Ptr      sPrep;
     TuningPreparation::Ptr      aPrep;
@@ -325,7 +330,6 @@ public:
     {
         name = newName;
         DBG("tuning name = " + name);
-        updateState->tuningPreparationDidChange = true;
     }
     
     Array<float> getCurrentScale()
@@ -352,9 +356,6 @@ public:
     }
     
     Array<Array<float>> tuningLibrary;
-    
-    
-    BKUpdateState::Ptr updateState;
     
 private:
     int Id;
@@ -416,6 +417,17 @@ public:
         param.set(TuningA1History, "");
         param.set(TuningCustomScale, "");
         param.set(TuningAbsoluteOffsets, "");
+    }
+    
+    inline TuningModPreparation::Ptr duplicate(void)
+    {
+        TuningModPreparation::Ptr copyPrep = new TuningModPreparation(-1);
+       
+        copyPrep->copy(this);
+        
+        copyPrep->setName(this->getName() + " copy");
+        
+        return copyPrep;
     }
     
     inline void setId(int newId) { Id = newId; }
@@ -548,7 +560,6 @@ public:
     {
         adaptiveReset();
         tuning->aPrep->copy(tuning->sPrep);
-        tuning->updateState->tuningPreparationDidChange = true;
         DBG("tuning reset");
     }
     

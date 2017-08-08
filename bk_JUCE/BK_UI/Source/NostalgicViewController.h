@@ -39,25 +39,7 @@ public:
     void fillModeSelectCB(void);
     
     TextButton clearModsButton;
-    
-    /*
-    void close() override
-    {
-        
-        DBG("====> nostalgic close() <====");
-        selectCB.exitModalState(-1);
-        selectCB.getRootMenu()->dismissAllActiveMenus();
-        //selectCB.hidePopup();
-        lengthModeSelectCB.exitModalState(-1);
-        lengthModeSelectCB.getRootMenu()->dismissAllActiveMenus();
-        //lengthModeSelectCB.hidePopup();
-        
-        processor.updateState->setCurrentDisplay(DisplayNil);
-    }
-     */
-    
-    
-    
+
 private:
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NostalgicViewController)
@@ -84,6 +66,13 @@ public:
     void fillSelectCB(int last, int current);
     
     void timerCallback() override;
+    
+    static void actionButtonCallback(int action, NostalgicPreparationEditor*);
+    
+    int addPreparation(void);
+    int duplicatePreparation(void);
+    void setCurrentId(int Id);
+    void deleteCurrent(void);
     
     
 private:
@@ -134,6 +123,12 @@ public:
     
     void timerCallback() override;
     
+    static void actionButtonCallback(int action, NostalgicModificationEditor*);
+    
+    int addPreparation(void);
+    int duplicatePreparation(void);
+    void setCurrentId(int Id);
+    void deleteCurrent(void);
     
 private:
     

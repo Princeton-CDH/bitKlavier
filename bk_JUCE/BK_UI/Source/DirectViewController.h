@@ -62,7 +62,16 @@ public:
     
     void fillSelectCB(int last, int current);
     
+    static void actionButtonCallback(int action, DirectPreparationEditor*);
+    
+    int addPreparation(void);
+    int duplicatePreparation(void);
+    void setCurrentId(int Id);
+    void deleteCurrent(void);
+    
 private:
+    
+    
     
 };
 
@@ -92,6 +101,13 @@ public:
     void highlightModedComponents();
     
     void fillSelectCB(int last, int current);
+    
+    static void actionButtonCallback(int action, DirectModificationEditor*);
+    
+    int addPreparation(void);
+    int duplicatePreparation(void);
+    void setCurrentId(int Id);
+    void deleteCurrent(void);
     
 private:
     

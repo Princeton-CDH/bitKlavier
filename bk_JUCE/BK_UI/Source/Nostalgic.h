@@ -62,7 +62,7 @@ public:
         
     }
     
-    NostalgicPreparation(Tuning::Ptr t):
+    NostalgicPreparation(void):
     nWaveDistance(0),
     nUndertow(0),
     nTransposition(Array<float>({0.0})),
@@ -248,10 +248,7 @@ public:
     typedef OwnedArray<Nostalgic, CriticalSection> CSArr;
     
     
-    Nostalgic(BKSynthesiser *s,
-              NostalgicPreparation::Ptr prep,
-              Tuning::Ptr tuning,
-              Synchronic::Ptr sync,
+    Nostalgic(NostalgicPreparation::Ptr prep,
               int Id):
     sPrep(new NostalgicPreparation(prep)),
     aPrep(new NostalgicPreparation(sPrep)),
@@ -261,18 +258,24 @@ public:
     }
     
     
-    Nostalgic(BKSynthesiser *s,
-              Tuning::Ptr tuning,
-              Synchronic::Ptr sync,
-              BKUpdateState::Ptr us,
-              int Id):
-    Id(Id),
-    name(String(Id)),
-    updateState(us)
+    Nostalgic(int Id):
+    name("Nostalgic"+String(Id)),
+    Id(Id)
     {
-        sPrep       = new NostalgicPreparation(tuning);
+        sPrep       = new NostalgicPreparation();
         aPrep       = new NostalgicPreparation(sPrep);
-    };
+    }
+    
+    inline Nostalgic::Ptr duplicate()
+    {
+        NostalgicPreparation::Ptr copyPrep = new NostalgicPreparation(sPrep);
+        
+        Nostalgic::Ptr copy = new Nostalgic(copyPrep, -1);
+        
+        copy->setName(name + " copy");
+        
+        return copy;
+    }
     
     ~Nostalgic() {};
     
@@ -366,19 +369,18 @@ public:
     }
     
     inline int getId() {return Id;}
+    inline void setId(int newId) { Id = newId;}
     
     NostalgicPreparation::Ptr      sPrep;
     NostalgicPreparation::Ptr      aPrep;
     
-    //void didChange(bool which) { updateState->nostalgicPreparationDidChange = which; }
     
-    inline String getName(void) const noexcept {return name;}inline void setName(String newName)
+    inline String getName(void) const noexcept {return name;}
+    
+    inline void setName(String newName)
     {
         name = newName;
-        updateState->nostalgicPreparationDidChange = true;
     }
-    
-    BKUpdateState::Ptr updateState;
     
 private:
     int Id;
@@ -438,6 +440,17 @@ public:
         param.set(NostalgicLengthMultiplier, "");
         param.set(NostalgicBeatsToSkip, "");
         param.set(NostalgicMode, "");
+    }
+    
+    inline NostalgicModPreparation::Ptr duplicate(void)
+    {
+        NostalgicModPreparation::Ptr copyPrep = new NostalgicModPreparation(-1);
+        
+        copyPrep->copy(this);
+        
+        copyPrep->setName(getName() + " copy");
+        
+        return copyPrep;
     }
     
     inline void setId(int newId) { Id = newId; }
@@ -671,7 +684,6 @@ public:
     inline void reset(void)
     {
         nostalgic->aPrep->copy(nostalgic->sPrep);
-        nostalgic->updateState->nostalgicPreparationDidChange = true;
         DBG("nostalgic reset");
     }
     

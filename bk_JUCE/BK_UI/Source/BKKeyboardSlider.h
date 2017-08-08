@@ -38,7 +38,10 @@ public BKKeymapKeyboardStateListener
 public:
     
     BKKeyboardSlider();
-    ~BKKeyboardSlider() {};
+    ~BKKeyboardSlider()
+    {
+        //delete keyboardComponent;
+    };
     
     //void setTo(Array<float> newvals, NotificationType newnotify);
     

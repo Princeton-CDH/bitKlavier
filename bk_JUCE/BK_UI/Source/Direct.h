@@ -25,13 +25,9 @@ public:
     typedef OwnedArray<DirectPreparation>                  Arr;
     typedef OwnedArray<DirectPreparation, CriticalSection> CSArr;
     
-    DirectPreparation(DirectPreparation::Ptr p):
-    dTransposition(p->getTransposition()),
-    dGain(p->getGain()),
-    dResonanceGain(p->getResonanceGain()),
-    dHammerGain(p->getHammerGain())
+    DirectPreparation(DirectPreparation::Ptr p)
     {
-        
+        copy(p);
     }
     
     DirectPreparation(Array<float> transp,
@@ -139,15 +135,24 @@ public:
         
     }
     
-    Direct(BKUpdateState::Ptr us,
-           int Id):
+    Direct(int Id):
     Id(Id),
-    name(String(Id)),
-    updateState(us)
+    name(String(Id))
     {
         sPrep       = new DirectPreparation();
         aPrep       = new DirectPreparation(sPrep);
     };
+    
+    inline Direct::Ptr duplicate()
+    {
+        DirectPreparation::Ptr copyPrep = new DirectPreparation(sPrep);
+        
+        Direct::Ptr copy = new Direct(copyPrep, -1);
+        
+        copy->setName(name + " copy");
+        
+        return copy;
+    }
     
     inline ValueTree getState(void)
     {
@@ -216,7 +221,8 @@ public:
     
     ~Direct() {};
     
-    inline int getId() {return Id;};
+    inline int getId() {return Id;}
+    inline void setId(int newId) { Id = newId;}
     
     DirectPreparation::Ptr      sPrep;
     DirectPreparation::Ptr      aPrep;
@@ -231,10 +237,7 @@ public:
     inline void setName(String newName)
     {
         name = newName;
-        updateState->directPreparationDidChange = true;
     }
-    
-    BKUpdateState::Ptr          updateState;
     
 private:
     int Id;
@@ -283,6 +286,17 @@ public:
         param.add("");
         param.add("");
         //param.add("");
+    }
+    
+    inline DirectModPreparation::Ptr duplicate(void)
+    {
+        DirectModPreparation::Ptr copyPrep = new DirectModPreparation(-1);
+        
+        copyPrep->copy(this);
+        
+        copyPrep->setName(getName() + " copy");
+        
+        return copyPrep;
     }
     
     inline ValueTree getState(void)
@@ -454,7 +468,6 @@ public:
     inline void reset(void)
     {
         direct->aPrep->copy(direct->sPrep);
-        direct->updateState->directPreparationDidChange = true;
     }
     
     inline int getId(void) const noexcept { return direct->getId(); }

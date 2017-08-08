@@ -36,6 +36,13 @@ public:
     void update(void);
     
     void fillSelectCB(int last, int current);
+    
+    static void actionButtonCallback(int action, KeymapViewController*);
+    
+    int addKeymap(void);
+    int duplicateKeymap(void);
+    void setCurrentId(int Id);
+    void deleteCurrent(void);
 
 private:
     

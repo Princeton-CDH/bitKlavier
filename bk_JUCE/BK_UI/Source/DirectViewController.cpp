@@ -47,6 +47,10 @@ BKViewController(p, theGraph)
     hideOrShow.setName("hideOrShow");
     hideOrShow.setButtonText(" X ");
     
+    addAndMakeVisible(actionButton);
+    actionButton.setButtonText("Action");
+    actionButton.addListener(this);
+    
 }
 
 void DirectViewController::paint (Graphics& g)
@@ -72,6 +76,12 @@ void DirectViewController::resized()
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
     comboBoxSlice.removeFromLeft(gXSpacing);
+    
+    actionButton.setBounds(selectCB.getRight()+gXSpacing,
+                           selectCB.getY(),
+                           selectCB.getWidth() * 0.5,
+                           selectCB.getHeight());
+    
     clearModsButton.setBounds(comboBoxSlice.removeFromLeft(90));
     
     /* *** above here should be generic to all prep layouts *** */
@@ -161,6 +171,79 @@ void DirectPreparationEditor::bkMessageReceived (const String& message)
     }
 }
 
+int DirectPreparationEditor::addPreparation(void)
+{
+    processor.gallery->add(PreparationTypeDirect);
+    
+    return processor.gallery->getAllDirect().getLast()->getId();
+}
+
+int DirectPreparationEditor::duplicatePreparation(void)
+{
+    processor.gallery->duplicate(PreparationTypeDirect, processor.updateState->currentDirectId);
+    
+    return processor.gallery->getAllDirect().getLast()->getId();
+}
+
+void DirectPreparationEditor::deleteCurrent(void)
+{
+    int directId = selectCB.getSelectedId();
+    int index = selectCB.getSelectedItemIndex();
+    
+    if ((index == 0) && (selectCB.getItemId(index+1) == -1)) return;
+    
+    processor.gallery->remove(PreparationTypeDirect, directId);
+    
+    fillSelectCB(0, 0);
+    
+    int newId = 0;
+    
+    selectCB.setSelectedId(newId, dontSendNotification);
+    
+    processor.updateState->currentDirectId = -1;
+}
+
+void DirectPreparationEditor::setCurrentId(int Id)
+{
+    processor.updateState->currentDirectId = Id;
+    
+    processor.updateState->idDidChange = true;
+    
+    update();
+    
+    fillSelectCB(lastId, Id);
+    
+    lastId = Id;
+}
+
+void DirectPreparationEditor::actionButtonCallback(int action, DirectPreparationEditor* vc)
+{
+    BKAudioProcessor& processor = vc->processor;
+    
+    if (action == 1)
+    {
+        int Id = vc->addPreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 2)
+    {
+        int Id = vc->duplicatePreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 3)
+    {
+        vc->deleteCurrent();
+    }
+    else if (action == 4)
+    {
+        // IMPORT
+    }
+    else if (action == 5)
+    {
+        // EXPORT
+    }
+}
+
 void DirectPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
@@ -170,20 +253,10 @@ void DirectPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->add(PreparationTypeDirect);
-            
-            Id = processor.gallery->getAllDirect().getLast()->getId();
+            Id = addPreparation();
         }
         
-        processor.updateState->currentDirectId = Id;
-        
-        processor.updateState->idDidChange = true;
-        
-        update();
-        
-        fillSelectCB(lastId, Id);
-    
-        lastId = Id;
+        setCurrentId(Id);
     }
 }
 
@@ -191,6 +264,8 @@ void DirectPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableC
 {
     Direct::Ptr direct = processor.gallery->getDirect(processor.updateState->currentDirectId);
     direct->setName(name);
+    
+    fillSelectCB(0, processor.updateState->currentDirectId);
 }
 
 
@@ -268,6 +343,10 @@ void DirectPreparationEditor::buttonClicked (Button* b)
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+    else if (b == &actionButton)
+    {
+        getOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 }
 
@@ -385,6 +464,79 @@ void DirectModificationEditor::bkMessageReceived (const String& message)
     }
 }
 
+int DirectModificationEditor::addPreparation(void)
+{
+    processor.gallery->add(PreparationTypeDirectMod);
+    
+    return processor.gallery->getDirectModPreparations().getLast()->getId();
+}
+
+int DirectModificationEditor::duplicatePreparation(void)
+{
+    processor.gallery->duplicate(PreparationTypeDirectMod, processor.updateState->currentModDirectId);
+    
+    return processor.gallery->getDirectModPreparations().getLast()->getId();
+}
+
+void DirectModificationEditor::deleteCurrent(void)
+{
+    int directId = selectCB.getSelectedId();
+    int index = selectCB.getSelectedItemIndex();
+    
+    if ((index == 0) && (selectCB.getItemId(index+1) == -1)) return;
+    
+    processor.gallery->remove(PreparationTypeDirect, directId);
+    
+    fillSelectCB(0, 0);
+    
+    int newId = 0;
+    
+    selectCB.setSelectedId(newId, dontSendNotification);
+    
+    processor.updateState->currentDirectId = -1;
+}
+
+void DirectModificationEditor::setCurrentId(int Id)
+{
+    processor.updateState->currentDirectId = Id;
+    
+    processor.updateState->idDidChange = true;
+    
+    update();
+    
+    fillSelectCB(lastId, Id);
+    
+    lastId = Id;
+}
+
+void DirectModificationEditor::actionButtonCallback(int action, DirectModificationEditor* vc)
+{
+    BKAudioProcessor& processor = vc->processor;
+    
+    if (action == 1)
+    {
+        int Id = vc->addPreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 2)
+    {
+        int Id = vc->duplicatePreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 3)
+    {
+        vc->deleteCurrent();
+    }
+    else if (action == 4)
+    {
+        // IMPORT
+    }
+    else if (action == 5)
+    {
+        // EXPORT
+    }
+}
+
 void DirectModificationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
@@ -394,20 +546,10 @@ void DirectModificationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->add(PreparationTypeDirectMod);
-            
-            Id = processor.gallery->getDirectModPreparations().getLast()->getId();
+            Id = addPreparation();
         }
         
-        processor.updateState->currentModDirectId = Id;
-  
-        processor.updateState->idDidChange = true;
-        
-        update();
-        
-        fillSelectCB(lastId, Id);
-        
-        lastId = Id;
+        setCurrentId(Id);
     }
 }
 
@@ -470,6 +612,10 @@ void DirectModificationEditor::buttonClicked (Button* b)
         DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
         mod->clearAll();
         update();
+    }
+    else if (b == &actionButton)
+    {
+        getOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 }
 

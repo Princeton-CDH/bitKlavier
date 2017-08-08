@@ -177,6 +177,90 @@ void Gallery::remove(BKPreparationType type, int Id)
 }
 
 
+// Adds to end of preparation list
+void Gallery::duplicate(BKPreparationType type, int Id)
+{
+    int newId = -1;
+    if (type == PreparationTypeDirect)
+    {
+        Direct::Ptr toCopy = getDirect(Id);
+        addDirect(toCopy->duplicate());
+        newId = direct.getLast()->getId();
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        Synchronic::Ptr toCopy = getSynchronic(Id);
+        addSynchronic(toCopy->duplicate());
+        newId = synchronic.getLast()->getId();
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        Nostalgic::Ptr toCopy = getNostalgic(Id);
+        addNostalgic(toCopy->duplicate());
+        newId = nostalgic.getLast()->getId();
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        Tuning::Ptr toCopy = getTuning(Id);
+        addTuning(toCopy->duplicate());
+        newId = tuning.getLast()->getId();
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        Tempo::Ptr toCopy = getTempo(Id);
+        addTempo(toCopy->duplicate());
+        newId = tempo.getLast()->getId();
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+        Keymap::Ptr toCopy = getKeymap(Id);
+        addKeymap(toCopy->duplicate());
+        newId = bkKeymaps.getLast()->getId();
+    }
+    if (type == PreparationTypeDirectMod)
+    {
+        DirectModPreparation::Ptr toCopy = getDirectModPreparation(Id);
+        addDirectMod(toCopy->duplicate());
+        newId = modDirect.getLast()->getId();
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        SynchronicModPreparation::Ptr toCopy = getSynchronicModPreparation(Id);
+        addSynchronicMod(toCopy->duplicate());
+        newId = modSynchronic.getLast()->getId();
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        NostalgicModPreparation::Ptr toCopy = getNostalgicModPreparation(Id);
+        addNostalgicMod(toCopy->duplicate());
+        newId = modNostalgic.getLast()->getId();
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        TuningModPreparation::Ptr toCopy = getTuningModPreparation(Id);
+        addTuningMod(toCopy->duplicate());
+        newId = modTuning.getLast()->getId();
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        TempoModPreparation::Ptr toCopy = getTempoModPreparation(Id);
+        addTempoMod(toCopy->duplicate());
+        newId = modTempo.getLast()->getId();
+    }
+    /*
+    else if (type == PreparationTypePiano)
+    {
+        addPiano();
+        newId = bkPianos.getLast()->getId();
+    }
+     */
+    
+    prepareToPlay(bkSampleRate);
+    
+    setGalleryDirty(true);
+}
+
+// Adds to end of preparation list
 void Gallery::add(BKPreparationType type)
 {
     int newId = -1;
@@ -274,6 +358,13 @@ void Gallery::addDirectModWithId(int Id)
     modDirect.add           (new DirectModPreparation(Id));
 }
 
+void Gallery::addDirectMod(DirectModPreparation::Ptr mod)
+{
+    int newId = getNewId(PreparationTypeDirectMod);
+    mod->setId(newId);
+    modDirect.add           (mod);
+}
+
 void Gallery::addSynchronicMod()
 {
     int newId = getNewId(PreparationTypeSynchronicMod);
@@ -285,6 +376,12 @@ void Gallery::addSynchronicModWithId(int Id)
     modSynchronic.add       (new SynchronicModPreparation(Id));
 }
 
+void Gallery::addSynchronicMod(SynchronicModPreparation::Ptr mod)
+{
+    int newId = getNewId(PreparationTypeSynchronicMod);
+    mod->setId(newId);
+    modSynchronic.add           (mod);
+}
 
 void Gallery::addNostalgicMod()
 {
@@ -297,6 +394,12 @@ void Gallery::addNostalgicModWithId(int Id)
     modNostalgic.add        (new NostalgicModPreparation(Id));
 }
 
+void Gallery::addNostalgicMod(NostalgicModPreparation::Ptr mod)
+{
+    int newId = getNewId(PreparationTypeNostalgicMod);
+    mod->setId(newId);
+    modNostalgic.add           (mod);
+}
 
 void Gallery::addTuningMod()
 {
@@ -355,17 +458,19 @@ void Gallery::addKeymap(Keymap::Ptr k)
 void Gallery::addSynchronic(void)
 {
     int newId = getNewId(PreparationTypeSynchronic);
-    synchronic.add(new Synchronic(&processor.mainPianoSynth, tuning[0], tempo[0], general, processor.updateState, newId));
+    synchronic.add(new Synchronic(newId));
+}
+
+void Gallery::addSynchronic(Synchronic::Ptr p)
+{
+    int newId = getNewId(PreparationTypeSynchronic);
+    p->setId(newId);
+    synchronic.add(p);
 }
 
 void Gallery::addSynchronicWithId(int Id)
 {
-    synchronic.add(new Synchronic(&processor.mainPianoSynth, tuning[0], tempo[0], general, processor.updateState, Id));
-}
-
-void Gallery::addSynchronic(int Id, int tuningId, int tempoId)
-{
-    synchronic.add(new Synchronic(&processor.mainPianoSynth, getTuning(tuningId), getTempo(tempoId), general, processor.updateState, Id));
+    synchronic.add(new Synchronic(Id));
 }
 
 void Gallery::copy(BKPreparationType type, int from, int to)
@@ -476,174 +581,99 @@ void Gallery::addTypeWithId(BKPreparationType type, int Id)
 void Gallery::addSynchronic(SynchronicPreparation::Ptr sync)
 {
     int newId = getNewId(PreparationTypeSynchronic);
-    synchronic.add(new Synchronic(&processor.mainPianoSynth, sync, tuning.getFirst(), tempo.getFirst(), general, newId));
+    synchronic.add(new Synchronic(sync, newId));
 }
 
-// Returns index of Synchronic to be added/configured.
-int  Gallery::addSynchronicIfNotAlreadyThere(SynchronicPreparation::Ptr sync)
-{
-    bool alreadyThere = false; int which = 0;
-    for (int i = 0; i < synchronic.size() - 1; i++)
-    {
-        if (sync->compare(synchronic[i]->sPrep))
-        {
-            alreadyThere = true;
-            which = i;
-            break;
-        }
-    }
-    
-    if (alreadyThere)   return which;
-    else
-    {
-        addSynchronic(sync);
-        return synchronic.getLast()->getId();
-    }
-}
 
 void Gallery::addNostalgic(void)
 {
     int newId = getNewId(PreparationTypeNostalgic);
-    nostalgic.add(new Nostalgic(&processor.mainPianoSynth, tuning.getFirst(), synchronic.getFirst(), processor.updateState, newId));
+    nostalgic.add(new Nostalgic(newId));
+}
+
+void Gallery::addNostalgic(Nostalgic::Ptr p)
+{
+    int newId = getNewId(PreparationTypeNostalgic);
+    p->setId(newId);
+    nostalgic.add(p);
 }
 
 void Gallery::addNostalgicWithId(int Id)
 {
-    nostalgic.add(new Nostalgic(&processor.mainPianoSynth, tuning.getFirst(), synchronic.getFirst(), processor.updateState, Id));
-}
-
-void Gallery::addNostalgic(int Id, int tuningId, int synchronicId)
-{
-    nostalgic.add(new Nostalgic(&processor.mainPianoSynth, getTuning(tuningId), getSynchronic(synchronicId), processor.updateState, Id));
+    nostalgic.add(new Nostalgic(Id));
 }
 
 void Gallery::addNostalgic(NostalgicPreparation::Ptr nost)
 {
     int newId = getNewId(PreparationTypeNostalgic);
-    nostalgic.add(new Nostalgic(&processor.mainPianoSynth, nost, tuning.getFirst(), synchronic.getFirst(), newId));
-}
-
-// Returns index of Nostalgic to be added/configured.
-int  Gallery::addNostalgicIfNotAlreadyThere(NostalgicPreparation::Ptr nost)
-{
-    bool alreadyThere = false; int which = 0;
-    for (int i = 0; i < nostalgic.size() - 1; i++)
-    {
-        if (nost->compare(nostalgic[i]->sPrep))
-        {
-            alreadyThere = true;
-            which = i;
-            break;
-        }
-    }
-    
-    if (alreadyThere)   return which;
-    else
-    {
-        addNostalgic(nost);
-        return nostalgic.size()-1;
-    }
+    nostalgic.add(new Nostalgic(nost, newId));
 }
 
 void Gallery::addTuning(void)
 {
     int newId = getNewId(PreparationTypeTuning);
-    tuning.add(new Tuning(newId, processor.updateState));
+    tuning.add(new Tuning(newId));
 }
 
 void Gallery::addTuningWithId(int Id)
 {
-    tuning.add(new Tuning(Id, processor.updateState));
+    tuning.add(new Tuning(Id));
 }
 
 void Gallery::addTuning(TuningPreparation::Ptr tune)
 {
     int newId = getNewId(PreparationTypeTuning);
-    tuning.add(new Tuning(tune, newId, processor.updateState));
+    tuning.add(new Tuning(tune, newId));
 }
 
-// Returns index of Tuning to be added/configured.
-int  Gallery::addTuningIfNotAlreadyThere(TuningPreparation::Ptr tune)
+void Gallery::addTuning(Tuning::Ptr p)
 {
-    bool alreadyThere = false; int which = 0;
-    for (int i = 0; i < tuning.size() - 1; i++)
-    {
-        if (tune->compare(tuning[i]->sPrep))
-        {
-            alreadyThere = true;
-            which = i;
-            break;
-        }
-    }
-    
-    if (alreadyThere)
-    {
-        return which;
-    }
-    else
-    {
-        addTuning(tune);
-        return tuning.getLast()->getId();
-    }
+    int newId = getNewId(PreparationTypeTuning);
+    p->setId(newId);
+    tuning.add(p);
 }
 
 void Gallery::addTempo(void)
 {
     int newId = getNewId(PreparationTypeTempo);
-    tempo.add(new Tempo(newId, processor.updateState));
+    tempo.add(new Tempo(newId));
 }
 
 void Gallery::addTempoWithId(int Id)
 {
-    tempo.add(new Tempo(Id, processor.updateState));
+    tempo.add(new Tempo(Id));
 }
 
 void Gallery::addTempo(TempoPreparation::Ptr tmp)
 {
     int newId = getNewId(PreparationTypeTempo);
-    tempo.add(new Tempo(tmp, newId, processor.updateState));
+    tempo.add(new Tempo(tmp, newId));
 }
 
-// Returns index of Tempo to be added/configured.
-int  Gallery::addTempoIfNotAlreadyThere(TempoPreparation::Ptr tmp)
+void Gallery::addTempo(Tempo::Ptr p)
 {
-    bool alreadyThere = false; int which = 0;
-    for (int i = 0; i < tempo.size() - 1; i++)
-    {
-        if (tmp->compare(tempo[i]->sPrep))
-        {
-            alreadyThere = true;
-            which = i;
-            break;
-        }
-    }
-    
-    if (alreadyThere)
-    {
-        return which;
-    }
-    else
-    {
-        addTempo(tmp);
-        return tempo.getLast()->getId();
-    }
+    int newId = getNewId(PreparationTypeTempo);
+    p->setId(newId);
+    tempo.add(p);
 }
 
+
+void Gallery::addDirect(Direct::Ptr p)
+{
+    int newId = getNewId(PreparationTypeDirect);
+    p->setId(newId);
+    direct.add(p);
+}
 
 void Gallery::addDirect(void)
 {
     int newId = getNewId(PreparationTypeDirect);
-    direct.add(new Direct(processor.updateState, newId));
+    direct.add(new Direct(newId));
 }
 
 void Gallery::addDirectWithId(int Id)
 {
-    direct.add(new Direct(processor.updateState, Id));
-}
-
-void Gallery::addDirect(int Id, int tuningId)
-{
-    direct.add(new Direct(processor.updateState, Id));
+    direct.add(new Direct(Id));
 }
 
 void Gallery::addDirect(DirectPreparation::Ptr drct)
@@ -652,27 +682,6 @@ void Gallery::addDirect(DirectPreparation::Ptr drct)
     direct.add(new Direct(drct, newId));
 }
 
-// Returns index of tuning to be added/configured.
-int  Gallery::addDirectIfNotAlreadyThere(DirectPreparation::Ptr drct)
-{
-    bool alreadyThere = false; int which = 0;
-    for (int i = 0; i < direct.size() - 1; i++)
-    {
-        if (drct->compare(direct[i]->sPrep))
-        {
-            alreadyThere = true;
-            which = i;
-            break;
-        }
-    }
-    
-    if (alreadyThere)   return which;
-    else
-    {
-        addDirect(drct);
-        return direct.getLast()->getId();
-    }
-}
 
 // Deletes unused preparations
 void Gallery::clean(void)

@@ -65,7 +65,10 @@ BKViewController(p, theGraph)
     hideOrShow.setName("hideOrShow");
     hideOrShow.setButtonText(" X ");
     
-    
+    addAndMakeVisible(actionButton);
+    actionButton.setButtonText("Action");
+    actionButton.addListener(this);
+
     updateComponentVisibility();
 }
 
@@ -87,6 +90,12 @@ void TempoViewController::resized()
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    
+    actionButton.setBounds(selectCB.getRight()+gXSpacing,
+                           selectCB.getY(),
+                           selectCB.getWidth() * 0.5,
+                           selectCB.getHeight());
+    
     comboBoxSlice.removeFromLeft(gXSpacing);
     A1reset.setBounds(comboBoxSlice.removeFromLeft(90));
     clearModsButton.setBounds(A1reset.getBounds());
@@ -293,6 +302,80 @@ void TempoPreparationEditor::fillSelectCB(int last, int current)
     lastId = selectedId;
 }
 
+int TempoPreparationEditor::addPreparation(void)
+{
+    processor.gallery->add(PreparationTypeTempo);
+    
+    return processor.gallery->getAllTempo().getLast()->getId();
+}
+
+int TempoPreparationEditor::duplicatePreparation(void)
+{
+    processor.gallery->duplicate(PreparationTypeTempo, processor.updateState->currentTempoId);
+    
+    return processor.gallery->getAllTempo().getLast()->getId();
+}
+
+void TempoPreparationEditor::deleteCurrent(void)
+{
+    int TempoId = selectCB.getSelectedId();
+    int index = selectCB.getSelectedItemIndex();
+    
+    if ((index == 0) && (selectCB.getItemId(index+1) == -1)) return;
+    
+    processor.gallery->remove(PreparationTypeTempo, TempoId);
+    
+    fillSelectCB(0, 0);
+    
+    int newId = 0;
+    
+    selectCB.setSelectedId(newId, dontSendNotification);
+    
+    processor.updateState->currentTempoId = -1;
+}
+
+void TempoPreparationEditor::setCurrentId(int Id)
+{
+    processor.updateState->currentTempoId = Id;
+    
+    processor.updateState->idDidChange = true;
+    
+    update();
+    
+    fillSelectCB(lastId, Id);
+    
+    lastId = Id;
+}
+
+void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEditor* vc)
+{
+    BKAudioProcessor& processor = vc->processor;
+    
+    if (action == 1)
+    {
+        int Id = vc->addPreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 2)
+    {
+        int Id = vc->duplicatePreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 3)
+    {
+        vc->deleteCurrent();
+    }
+    else if (action == 4)
+    {
+        // IMPORT
+    }
+    else if (action == 5)
+    {
+        // EXPORT
+    }
+}
+
+
 void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
@@ -306,20 +389,10 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->add(PreparationTypeTempo);
-            
-            Id = processor.gallery->getAllTempo().getLast()->getId();
+            Id = addPreparation();
         }
         
-        processor.updateState->currentTempoId = Id;
-        
-        processor.updateState->idDidChange = true;
-        
-        update();
-        
-        fillSelectCB(lastId, Id);
-        
-        lastId = Id;
+        setCurrentId(Id);
     }
     else if (name == modeCB.getName())
     {
@@ -414,6 +487,10 @@ void TempoPreparationEditor::buttonClicked (Button* b)
     else if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+    else if (b == &actionButton)
+    {
+        getOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     
 }
@@ -550,6 +627,79 @@ void TempoModificationEditor::update(void)
 }
 
 
+int TempoModificationEditor::addPreparation(void)
+{
+    processor.gallery->add(PreparationTypeTempoMod);
+    
+    return processor.gallery->getTempoModPreparations().getLast()->getId();
+}
+
+int TempoModificationEditor::duplicatePreparation(void)
+{
+    processor.gallery->duplicate(PreparationTypeTempoMod, processor.updateState->currentModTempoId);
+    
+    return processor.gallery->getTempoModPreparations().getLast()->getId();
+}
+
+void TempoModificationEditor::deleteCurrent(void)
+{
+    int oldId = selectCB.getSelectedId();
+    int index = selectCB.getSelectedItemIndex();
+    
+    if ((index == 0) && (selectCB.getItemId(index+1) == -1)) return;
+    
+    processor.gallery->remove(PreparationTypeTempoMod, oldId);
+    
+    fillSelectCB(0, 0);
+    
+    int newId = 0;
+    
+    selectCB.setSelectedId(newId, dontSendNotification);
+    
+    processor.updateState->currentModTempoId = -1;
+}
+
+void TempoModificationEditor::setCurrentId(int Id)
+{
+    processor.updateState->currentModTempoId = Id;
+    
+    processor.updateState->idDidChange = true;
+    
+    update();
+    
+    fillSelectCB(lastId, Id);
+    
+    lastId = Id;
+}
+
+void TempoModificationEditor::actionButtonCallback(int action, TempoModificationEditor* vc)
+{
+    BKAudioProcessor& processor = vc->processor;
+    
+    if (action == 1)
+    {
+        int Id = vc->addPreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 2)
+    {
+        int Id = vc->duplicatePreparation();
+        vc->setCurrentId(Id);
+    }
+    else if (action == 3)
+    {
+        vc->deleteCurrent();
+    }
+    else if (action == 4)
+    {
+        // IMPORT
+    }
+    else if (action == 5)
+    {
+        // EXPORT
+    }
+}
+
 void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
@@ -562,20 +712,10 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         if (Id == -1)
         {
-            processor.gallery->add(PreparationTypeTempoMod);
-            
-            Id = processor.gallery->getTempoModPreparations().getLast()->getId();
+            Id = addPreparation();
         }
         
-        processor.updateState->currentModTempoId = Id;
-        
-        processor.updateState->idDidChange = true;
-        
-        update();
-        
-        fillSelectCB(lastId, Id);
-        
-        lastId = Id;
+        setCurrentId(Id);
     }
     else if (name == modeCB.getName())
     {
