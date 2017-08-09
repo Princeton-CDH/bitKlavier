@@ -10,8 +10,9 @@
 
 #include "HeaderViewController.h"
 
-HeaderViewController::HeaderViewController (BKAudioProcessor& p):
-processor (p)
+HeaderViewController::HeaderViewController (BKAudioProcessor& p, BKConstructionSite* c):
+processor (p),
+construction(c)
 {
     
     setLookAndFeel(&buttonsAndMenusLAF);
@@ -116,9 +117,35 @@ PopupMenu HeaderViewController::getPianoMenu(void)
 #define SAVE_ID 1
 #define SAVEAS_ID 2
 #define OPEN_ID 3
-#define CLEAN_ID 4
-#define SETTINGS_ID 5
-#define OPENOLD_ID 6
+#define NEW_ID 4
+#define CLEAN_ID 5
+#define SETTINGS_ID 6
+#define OPENOLD_ID 7
+#define DIRECT_ID 8
+#define NOSTALGIC_ID 9
+#define SYNCHRONIC_ID 10
+#define TUNING_ID 11
+#define TEMPO_ID 12
+#define MODIFICATION_ID 13
+#define PIANOMAP_ID 14
+#define RESET_ID 15
+
+PopupMenu HeaderViewController::getNewMenu(void)
+{
+    PopupMenu newMenu;
+    newMenu.setLookAndFeel(&buttonsAndMenusLAF);
+    
+    newMenu.addItem(DIRECT_ID, "(D) Direct");
+    newMenu.addItem(NOSTALGIC_ID, "(N) Nostalgic");
+    newMenu.addItem(SYNCHRONIC_ID, "(S) Synchronic");
+    newMenu.addItem(TUNING_ID, "(T) Tuning");
+    newMenu.addItem(TEMPO_ID, "(M) Tempo");
+    newMenu.addItem(MODIFICATION_ID, "(C) Modification");
+    newMenu.addItem(PIANOMAP_ID, "(P) PianoMap");
+    newMenu.addItem(RESET_ID, "(R) Reset");
+    
+    return newMenu;
+}
 
 PopupMenu HeaderViewController::getGalleryMenu(void)
 {
@@ -128,6 +155,8 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addItem(SAVE_ID, "Save");
     galleryMenu.addItem(SAVEAS_ID, "Save as...");
     galleryMenu.addItem(OPEN_ID, "Open...");
+    galleryMenu.addSeparator();
+    galleryMenu.addSubMenu("New...", getNewMenu());
     galleryMenu.addSeparator();
     galleryMenu.addItem(CLEAN_ID, "Clean");
     galleryMenu.addSeparator();
@@ -196,29 +225,63 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
 
 void HeaderViewController::galleryMenuCallback(int result, HeaderViewController* gvc)
 {
+    BKAudioProcessor& processor = gvc->processor;
+    BKConstructionSite* construction = gvc->construction;
     if (result == SAVE_ID)
     {
-        gvc->processor.saveGallery();
+        processor.saveGallery();
     }
     if (result == SAVEAS_ID)
     {
-        gvc->processor.saveGalleryAs();
+        processor.saveGalleryAs();
     }
     else if (result == OPEN_ID) // Load
     {
-        gvc->processor.loadGalleryDialog();
+        processor.loadGalleryDialog();
     }
     else if (result == SETTINGS_ID) // open General settings
     {
-        gvc->processor.updateState->setCurrentDisplay(DisplayGeneral);
+        processor.updateState->setCurrentDisplay(DisplayGeneral);
     }
     else if (result == CLEAN_ID) // Clean
     {
-        gvc->processor.gallery->clean();
+        processor.gallery->clean();
     }
     else if (result == OPENOLD_ID) // Load (old)
     {
-        gvc->processor.loadJsonGalleryDialog();
+        processor.loadJsonGalleryDialog();
+    }
+    else if (result == DIRECT_ID)
+    {
+        construction->addItem(PreparationTypeDirect, true);
+    }
+    else if (result == NOSTALGIC_ID)
+    {
+        construction->addItem(PreparationTypeNostalgic, true);
+    }
+    else if (result == SYNCHRONIC_ID)
+    {
+        construction->addItem(PreparationTypeSynchronic, true);
+    }
+    else if (result == TUNING_ID)
+    {
+        construction->addItem(PreparationTypeTuning, true);
+    }
+    else if (result == TEMPO_ID)
+    {
+        construction->addItem(PreparationTypeTempo, true);
+    }
+    else if (result == MODIFICATION_ID)
+    {
+        construction->addItem(PreparationTypeGenericMod, true);
+    }
+    else if (result == PIANOMAP_ID)
+    {
+        construction->addItem(PreparationTypePianoMap, true);
+    }
+    else if (result == RESET_ID)
+    {
+        construction->addItem(PreparationTypeReset, true);
     }
 }
 

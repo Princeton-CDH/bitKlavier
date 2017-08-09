@@ -282,7 +282,7 @@ void BKConstructionSite::deleteItem (BKItem* item)
     removeChildComponent(item);
 }
 
-void BKConstructionSite::addItem(BKPreparationType type)
+void BKConstructionSite::addItem(BKPreparationType type, bool center)
 {
     int thisId = -1;
     
@@ -301,7 +301,14 @@ void BKConstructionSite::addItem(BKPreparationType type)
         toAdd->configurePianoCB();
     }
     
-    toAdd->setTopLeftPosition(lastX, lastY);
+    if (center)
+    {
+        toAdd->setTopLeftPosition(250, 250);
+    }
+    else
+    {
+        toAdd->setTopLeftPosition(lastX, lastY);
+    }
 
     lastX += 10; lastY += 10;
     

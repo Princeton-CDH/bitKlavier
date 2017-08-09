@@ -15,7 +15,7 @@
 MainViewController::MainViewController (BKAudioProcessor& p):
 processor (p),
 theGraph(p),
-header(p),
+header(p, &construction),
 construction(p, /*&viewPort,*/ &theGraph),
 overtop(p, &theGraph),
 timerCallbackCount(0)

@@ -47,7 +47,7 @@ public:
     
     void addItemsFromClipboard(void);
     
-    void addItem(BKPreparationType type);
+    void addItem(BKPreparationType type, bool center = false);
     
     inline void setCurrentItem(BKItem* item) { currentItem = item;}
     inline BKItem* getCurrentItem(void) { return currentItem;}
