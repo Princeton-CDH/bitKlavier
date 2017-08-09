@@ -77,6 +77,7 @@ private:
     BKItem* itemToSelect;
     BKItem* lastItem;
     BKItem* currentItem;
+    BKItem* upperLeftest;
     
     ScopedPointer<LassoComponent<BKItem*>> lasso;
     

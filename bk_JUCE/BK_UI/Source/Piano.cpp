@@ -355,7 +355,9 @@ void Piano::remove(BKItem::Ptr item)
     bool removed = false;
     for (int i = items.size(); --i >= 0; )
     {
-        if (items[i] == item)
+        DBG("ITEMINREMOVE:" );
+        items[i]->print();
+        if (items[i]->getType() == item->getType() && items[i]->getId() == item->getId())
         {
             items.remove(i);
             removed = true;

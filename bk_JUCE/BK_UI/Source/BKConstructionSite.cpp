@@ -280,6 +280,20 @@ void BKConstructionSite::prepareItemDrag(BKItem* item, const MouseEvent& e, bool
 }
 void BKConstructionSite::deleteItem (BKItem* item)
 {
+    BKItem::PtrArr connections = item->getConnections();
+    
+    for (int i = connections.size(); --i >= 0;)
+    {
+        BKItem* connectionItem = connections[i];
+        
+        connectionItem->removeConnection(item->getType(), item->getId());
+    }
+    
+    item->clearConnections();
+    
+    item->setActive(false);
+    item->setSelected(false);
+    
     processor.currentPiano->remove(item);
     
     removeChildComponent(item);
@@ -315,72 +329,98 @@ void BKConstructionSite::addItem(BKPreparationType type)
 
 void BKConstructionSite::copy(void)
 {
-    processor.setClipboard(graph->getSelectedItems());
+    int distFromOrigin = 20000;
+    
+    BKItem::PtrArr selected = graph->getSelectedItems();
+    
+    BKItem::PtrArr clipboard;
+    for (auto item : selected)
+    {
+        BKItem* newItem = new BKItem(item->getType(), item->getId(), processor);
+        
+        // relying on mouse anyway
+        newItem->setBounds(item->getX(),
+                           item->getY(),
+                           item->getWidth(),
+                           item->getHeight());
+        
+        float dist = newItem->getPosition().getDistanceFromOrigin();
+        
+        if (dist < distFromOrigin)
+        {
+            distFromOrigin = dist;
+            upperLeftest = newItem;
+        }
+    
+        clipboard.add(newItem);
+    }
+    
+    for (int i = 0; i < selected.size(); i++)
+    {
+        BKItem* selectedItem = selected[i];
+        BKItem* clipboardItem = clipboard[i];
+        
+        for (auto connection : selectedItem->getConnections())
+        {
+            BKPreparationType connectionType = connection->getType();
+            int connectionId = connection->getId();
+            
+            BKItem* connectionItem = nullptr;
+            
+            for (auto item : clipboard)
+            {
+                if (item->getType() == connectionType && item->getId() == connectionId) connectionItem = item;
+            }
+            
+            if (connectionItem != nullptr)
+            {
+                clipboardItem->addConnection(connectionItem);
+                connectionItem->addConnection(clipboardItem);
+            }
+        }
+    }
+    
+    processor.setClipboard(clipboard);
 }
 
-
+/*
+ 
+ Array<Array<int>> copyMap;
+ 
+auto glambda = [](Array<Array<int>> cmap, int type, int oldId)
+{
+    for (auto set : cmap)
+    {
+        if (set[0] == type && set[1] == oldId) return set[2];
+    }
+    return 0;
+};
+ */
 
 void BKConstructionSite::paste(void)
 {
-    Array<Array<int>> copyMap;
-    
-    auto glambda = [](Array<Array<int>> cmap, int type, int oldId)
-    {
-        for (auto set : cmap)
-        {
-            if (set[0] == type && set[1] == oldId) return set[2];
-        }
-        return 0;
-    };
-
     BKItem::PtrArr clipboard = processor.getClipboard();
     
-    BKItem::PtrArr newItems;
+    int offsetX = upperLeftest->getX(); int offsetY = upperLeftest->getY();
     
     for (auto item : clipboard)
     {
-        item->setSelected(true);
         if (processor.currentPiano->contains(item->getType(), item->getId()))
         {
+            // duplicate (all we need to do is set to new Id and add to gallery)
             int newId = processor.gallery->duplicate(item->getType(), item->getId());
             
-            copyMap.add(Array<int>({(int)item->getType(), item->getId(), newId}));
-            
-            BKItem* newItem = new BKItem(item->getType(), newId, processor);
-            
-            newItem->setBounds(item->getX()+10, item->getY()+10, item->getWidth(), item->getHeight());
-            
-            processor.currentPiano->add(newItem);
-            item->setSelected(false);
-            newItem->setSelected(true);
-            addChildComponent(newItem);
+            item->setId(newId);
             
         }
         
+        item->setSelected(true);
+        
+        item->setTopLeftPosition((item->getX()-offsetX) + lastEX, (item->getY()-offsetY) + lastEY);
+        
         processor.currentPiano->add(item);
-        addChildComponent(item);
-    }
-    
-    DBG("COPYMAP: " + arrayIntArrayToString(copyMap));
-    
-    for (auto item : clipboard)
-    {
-        if (processor.currentPiano->contains(item))
-        {
-            int itemId = glambda(copyMap, item->getType(), item->getId());
-            
-            DBG("itemId: " + String(itemId));
-            
-            for (auto connection : item->getConnections())
-            {
-                int connectionId = glambda(copyMap, connection->getType(), connection->getId());
-                
-                DBG("connectionId: " + String(connectionId));
-                
-                if (processor.clipboardContains(connection))
-                    graph->connect(item->getType(), itemId, connection->getType(), connectionId);
-            }
-        }
+        
+        addAndMakeVisible(item);
     }
     
     processor.currentPiano->configure();
@@ -390,14 +430,9 @@ void BKConstructionSite::paste(void)
 
 void BKConstructionSite::cut(void)
 {
-    processor.setClipboard(graph->getSelectedItems());
+    copy();
     
-    for (auto item : graph->getSelectedItems())
-    {
-        processor.currentPiano->remove(item);
-        graph->removeItem(item);
-        removeChildComponent(item);
-    }
+    for (auto item : graph->getSelectedItems()) deleteItem(item);
     
     graph->deselectAll();
 }
