@@ -191,62 +191,62 @@ int Gallery::numWithSameNameAs(BKPreparationType type, int Id)
     String name;
     if (type == PreparationTypeDirect)
     {
-        name = getDirect(Id)->getName();
+        name = getDirect(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : direct)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
     else if (type == PreparationTypeSynchronic)
     {
-         name = getSynchronic(Id)->getName();
+         name = getSynchronic(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : synchronic)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
     else if (type == PreparationTypeNostalgic)
     {
-         name = getNostalgic(Id)->getName();
+         name = getNostalgic(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : nostalgic)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
     else if (type == PreparationTypeTuning)
     {
-         name = getTuning(Id)->getName();
+         name = getTuning(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : tuning)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
     else if (type == PreparationTypeTempo)
     {
-         name = getTempo(Id)->getName();
+         name = getTempo(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : tempo)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
     else if (type == PreparationTypeKeymap)
     {
-         name = getKeymap(Id)->getName();
+         name = getKeymap(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : bkKeymaps)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
     if (type == PreparationTypeDirectMod)
     {
-         name = getDirectModPreparation(Id)->getName();
+         name = getDirectModPreparation(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : modDirect)    if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
     else if (type == PreparationTypeSynchronicMod)
     {
-         name = getSynchronicModPreparation(Id)->getName();
+         name = getSynchronicModPreparation(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : modSynchronic)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
     else if (type == PreparationTypeNostalgicMod)
     {
-         name = getNostalgicModPreparation(Id)->getName();
+         name = getNostalgicModPreparation(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : modNostalgic)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
     else if (type == PreparationTypeTuningMod)
     {
-         name = getTuningModPreparation(Id)->getName();
+         name = getTuningModPreparation(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : modTuning)     if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
     else if (type == PreparationTypeTempoMod)
     {
-         name = getTempoModPreparation(Id)->getName();
+         name = getTempoModPreparation(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : modTempo)    if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
     else if (type == PreparationTypePiano)
     {
-         name = getPiano(Id)->getName();
+         name = getPiano(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : bkPianos)    if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
     

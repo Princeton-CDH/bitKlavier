@@ -452,10 +452,24 @@ void BKItemGraph::addItem(BKItem* thisItem)
 }
 
 
-void BKItemGraph::removeItem(BKItem* thisItem)
+void BKItemGraph::removeItem(BKItem* item)
 {
-    thisItem->setActive(false);
-    processor.currentPiano->remove(thisItem);
+    BKItem::PtrArr connections = item->getConnections();
+    
+    for (int i = connections.size(); --i >= 0;)
+    {
+        BKItem* connectionItem = connections[i];
+        
+        connectionItem->removeConnection(item->getType(), item->getId());
+    }
+    
+    item->clearConnections();
+    
+    item->setActive(false);
+    item->setSelected(false);
+    
+    processor.currentPiano->remove(item);
+    
 }
 
 

@@ -39,6 +39,7 @@ public:
     void deleteSelected(void);
     void align(int which);
     void copy(void);
+    BKItem::PtrArr duplicate(BKItem::PtrArr these);
     bool inPaste, inCopyDrag, inCut;
     void paste(void);
     void cut(void);
@@ -72,11 +73,14 @@ private:
     bool connect; int lineOX, lineOY, lineEX, lineEY;
     bool multiple;
     
+    bool didCopy;
+    
     BKItem* itemSource;
     BKItem* itemTarget;
     BKItem* itemToSelect;
     BKItem* lastItem;
     BKItem* currentItem;
+    BKItem* upperLeftest;
     
     ScopedPointer<LassoComponent<BKItem*>> lasso;
     
