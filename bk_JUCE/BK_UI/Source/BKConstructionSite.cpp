@@ -29,7 +29,6 @@ viewport(vp)
 
 BKConstructionSite::~BKConstructionSite(void)
 {
-    removeAllChildren();
 }
 
 void BKConstructionSite::resized()

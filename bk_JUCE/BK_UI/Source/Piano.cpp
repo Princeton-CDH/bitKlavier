@@ -89,8 +89,6 @@ void Piano::configure(void)
         if (thisId > processor.gallery->getIdCount(thisType)) processor.gallery->setIdCount(thisType, thisId);
         
         addProcessor(thisType, thisId);
-        
-        DBG("type: " + cPreparationTypes[thisType] + " Id: " + String(thisId));
     }
     
     for (auto item : items)

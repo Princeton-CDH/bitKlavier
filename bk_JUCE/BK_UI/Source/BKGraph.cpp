@@ -1,12 +1,11 @@
-/*
-  ==============================================================================
+/*==============================================================================
 
     BKGraph.cpp
     Created: 6 Apr 2017 12:24:29pm
     Author:  Michael R Mulshine
 
-  ==============================================================================
-*/
+  ==============================================================================*/
+
 
 #include "BKGraph.h"
 
@@ -91,7 +90,6 @@ processor(p)
 
 BKItem::~BKItem()
 {
-    connections.clear();
 }
 
 BKItem* BKItem::duplicate(void)
@@ -433,11 +431,6 @@ void BKItem::setState(XmlElement* e)
 
 BKItemGraph::~BKItemGraph(void)
 {
-    BKItem::PtrArr items = getItems();
-    
-    for (int i = 0; i < items.size(); i++) items[i]->clearConnections();
-    
-    clear();
 }
 
 void BKItemGraph::clear()
