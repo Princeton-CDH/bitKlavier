@@ -68,12 +68,15 @@ timerCallbackCount(0)
     
     addAndMakeVisible(header);
     addChildComponent(overtop);
+    construction.setSize(4000,4000);
+    addAndMakeVisible(construction);
 
+    /*
     viewPort.setViewedComponent(&construction);
     viewPort.setViewPosition(0, 0);
     viewPort.setScrollBarsShown(true, true, true, true);
-    
     addAndMakeVisible(viewPort);
+    */
     
     
     Point<int> myshadowOffset(2, 2);
@@ -97,7 +100,7 @@ void MainViewController::paint (Graphics& g)
     
     g.setColour(Colours::white);
     
-    Rectangle<int> bounds = viewPort.getBounds().translated(-1, -1);
+    Rectangle<int> bounds = construction.getBounds().translated(-1, -1);
     bounds.expand(2,2);
     g.drawRect(bounds, 1);
 }
@@ -144,6 +147,9 @@ void MainViewController::resized()
     mainSlider->setBounds(gainSliderSlice);
     
     area.reduce(gXSpacing, 3);
+    construction.setBounds(area);
+    
+    /*
     viewPort.setBounds(area);
     viewPort.toBack();
     
@@ -151,7 +157,7 @@ void MainViewController::resized()
     {
         initial = false;
         initialWidth = viewPort.getWidth(); initialHeight = viewPort.getHeight();
-        construction.setSize(initialWidth, initialHeight);
+        construction.setBounds(viewPort.getBounds());
     }
     
     if (!construction.itemOutsideBounds(viewPort.getBounds()))
@@ -160,6 +166,7 @@ void MainViewController::resized()
         
         if (viewPort.getHeight() > initialHeight) construction.setSize(construction.getWidth(), viewPort.getHeight());
     }
+     */
     
     
     
