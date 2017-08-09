@@ -145,6 +145,7 @@ void MainViewController::resized()
     
     area.reduce(gXSpacing, 3);
     viewPort.setBounds(area);
+    viewPort.toBack();
     
     if (initial)
     {
