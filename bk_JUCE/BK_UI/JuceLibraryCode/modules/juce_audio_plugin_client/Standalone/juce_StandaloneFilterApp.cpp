@@ -117,6 +117,7 @@ public:
     //==============================================================================
     void systemRequestedQuit() override
     {
+        DBG("systemRequestedQuit() called");
         if(mainWindow->getAudioProcessor()->isDirty())
         {
             int saveBeforeQuit = AlertWindow::showOkCancelBox (AlertWindow::QuestionIcon,

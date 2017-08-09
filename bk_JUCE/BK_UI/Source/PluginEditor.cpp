@@ -34,6 +34,7 @@ resizer(new ResizableCornerComponent (this, constrain))
     setSize(gMainComponentWidth, gMainComponentHeight);
     
     processor.initializeGallery();
+    processor.updateState->pianoDidChangeForGraph = true;
 
 }
 

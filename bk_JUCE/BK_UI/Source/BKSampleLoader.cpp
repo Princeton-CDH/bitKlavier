@@ -22,7 +22,7 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
     String path = "~/bkSamples/";
     
     File bkSamples;
-    bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("samples");
+    bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
     
     int numLayers = 0;
     
@@ -167,7 +167,7 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
     String path = "~/bkSamples/";
     
     File bkSamples;
-    bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("samples");
+    bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
     
     synth->clearVoices();
     synth->clearSounds();
@@ -273,7 +273,7 @@ void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
     String path = "~/bkSamples/";
     
     File bkSamples;
-    bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("samples");
+    bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
     
     synth->clearVoices();
     synth->clearSounds();

@@ -262,7 +262,7 @@ void HeaderViewController::fillGalleryCB(void)
         OwnedArray<PopupMenu> submenus;
         
         File bkGalleries;
-        bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+        bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
         
         for (int i = 0; i < processor.galleryNames.size(); i++)
         {
@@ -394,7 +394,7 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
     }
     else if (name == "galleryCB")
     {
-        galleryIsDirtyAlertResult = 1;
+        galleryIsDirtyAlertResult = 2;
 
         if(processor.gallery->isGalleryDirty())
         {
