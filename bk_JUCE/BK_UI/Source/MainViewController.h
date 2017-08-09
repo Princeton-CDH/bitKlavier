@@ -45,10 +45,10 @@ public:
     
     inline void mouseDrag(const MouseEvent& e) override
     {
-        viewPort.autoScroll(e.x, e.y, 100, 150);
+        /*viewPort.autoScroll(e.x, e.y, 100, 150);*/
     }
     
-    inline Viewport* getViewport(void) { return &viewPort;}
+    /*inline Viewport* getViewport(void) { return &viewPort;}*/
     
 private:
     // This reference is provided as a quick way for your editor to
@@ -60,7 +60,7 @@ private:
     
     BKItemGraph theGraph;
     
-    Viewport viewPort;
+    //Viewport viewPort;
     
     HeaderViewController header;
     BKConstructionSite  construction;

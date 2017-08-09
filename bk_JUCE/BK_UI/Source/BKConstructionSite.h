@@ -23,7 +23,7 @@
 class BKConstructionSite : public BKDraggableComponent, public LassoSource<BKItem*>
 {
 public:
-    BKConstructionSite(BKAudioProcessor& p, Viewport* viewPort, BKItemGraph* theGraph);
+    BKConstructionSite(BKAudioProcessor& p, /*Viewport* viewPort, */ BKItemGraph* theGraph);
     
     ~BKConstructionSite(void);
     
@@ -74,8 +74,7 @@ private:
 
     bool connect; int lineOX, lineOY, lineEX, lineEY;
     bool multiple;
-    
-    bool didCopy;
+
     
     BKItem* itemSource;
     BKItem* itemTarget;
@@ -113,7 +112,7 @@ private:
     int lastX, lastY;
     int lastEX,lastEY;
     
-    Viewport* viewport;
+    /*Viewport* viewport;*/
     
     
     

@@ -16,7 +16,7 @@ MainViewController::MainViewController (BKAudioProcessor& p):
 processor (p),
 theGraph(p),
 header(p),
-construction(p, &viewPort, &theGraph),
+construction(p, /*&viewPort,*/ &theGraph),
 overtop(p, &theGraph),
 timerCallbackCount(0)
 {
@@ -52,7 +52,7 @@ timerCallbackCount(0)
     addAndMakeVisible (keyboardComponent =
                        new BKKeymapKeyboardComponent (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard));
     
-    keyboard =  ((BKKeymapKeyboardComponent*)keyboardComponent);
+    keyboard =  ((BKKeymapKeyboardComponent*) keyboardComponent);
     
     keyboard->setScrollButtonsVisible(false);
     keyboard->setAvailableRange(21, 108);
@@ -67,17 +67,9 @@ timerCallbackCount(0)
     addAndMakeVisible(preparationPanel);
     
     addAndMakeVisible(header);
-    addChildComponent(overtop);
-    construction.setSize(4000,4000);
     addAndMakeVisible(construction);
+    addAndMakeVisible(overtop);
 
-    /*
-    viewPort.setViewedComponent(&construction);
-    viewPort.setViewPosition(0, 0);
-    viewPort.setScrollBarsShown(true, true, true, true);
-    addAndMakeVisible(viewPort);
-    */
-    
     
     Point<int> myshadowOffset(2, 2);
     DropShadow myshadow(Colours::darkgrey, 5, myshadowOffset);

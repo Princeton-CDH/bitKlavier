@@ -12,19 +12,18 @@
 
 #define NUM_COL 6
 
-BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, Viewport* vp, BKItemGraph* theGraph):
+BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, /*Viewport* vp,*/ BKItemGraph* theGraph):
 BKDraggableComponent(false,false,false),
 altDown(false),
 processor(p),
 graph(theGraph),
 connect(false),
 lastX(10),
-lastY(10),
-viewport(vp)
+lastY(10)/*,
+viewport(vp)*/
 {
     setWantsKeyboardFocus(false);
     graph->deselectAll();
-    didCopy = false;
 }
 
 BKConstructionSite::~BKConstructionSite(void)
@@ -539,8 +538,6 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
 void BKConstructionSite::mouseDrag (const MouseEvent& e)
 {
     lastX = e.x; lastY = e.y;
-    
-    MouseEvent eViewport = e.getEventRelativeTo(this);
     
     if (itemToSelect == nullptr) lasso->dragLasso(e);
     
