@@ -41,7 +41,7 @@ Id(Id)
 
 Piano::~Piano()
 {
-    for (int i = 0; i < items.size(); i++)  items[i]->clearConnections();
+    //for (int i = 0; i < items.size(); i++)  items[i]->clearConnections();
     items.clear();
 }
 
