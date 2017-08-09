@@ -49,7 +49,11 @@ void BKAudioProcessor::collectGalleries(void)
 {
     galleryNames.clear();
     
-    DirectoryIterator xmlIter (File ("~/bkGalleries"), true, "*.xml");
+    File bkGalleries;
+    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+    
+    //DirectoryIterator xmlIter (File ("~/bkGalleries"), true, "*.xml");
+    DirectoryIterator xmlIter (File (bkGalleries), true, "*.xml");
     while (xmlIter.next())
     {
         File galleryFile (xmlIter.getFile());
@@ -58,7 +62,7 @@ void BKAudioProcessor::collectGalleries(void)
     }
     
     
-    DirectoryIterator jsonIter (File ("~/bkGalleries"), true, "*.json");
+    DirectoryIterator jsonIter (File (bkGalleries), true, "*.json");
     while (jsonIter.next())
     {
         File galleryFile (jsonIter.getFile());

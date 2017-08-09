@@ -21,6 +21,9 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
     
     String path = "~/bkSamples/";
     
+    File bkSamples;
+    bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("samples");
+    
     int numLayers = 0;
     
     if      (type == BKLoadLite)    numLayers = 2;
@@ -41,7 +44,8 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
             for (int k = 0; k < numLayers; k++)
             {
                 
-                String temp = path;
+                //String temp = path;
+                String temp;
                 temp.append(notes[j],3);
                 temp.append(String(i),3);
                 temp.append("v",2);
@@ -52,11 +56,11 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
                 }
                 else if (numLayers == 4)
                 {
-                    temp.append(String(((k*4)+2)),3);
+                    temp.append(String(((k*4)+3)),3);
                 }
                 else if (numLayers == 2)
                 {
-                    temp.append(String(k*7+8),3);
+                    temp.append(String(k*8+7),3);
                 }
                 else
                 {
@@ -64,13 +68,15 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
                 }
                 
                 temp.append(".wav",5);
-                File file(temp);
+                //File file(temp);
+                
+                File file(bkSamples.getChildFile(temp));
                 
                 FileInputStream inputStream(file);
                 
                 if (inputStream.openedOk()) {
                     
-                    DBG("file opened OK: " + file.getFileName());
+                    DBG("file opened OK: " + file.getFullPathName());
                     
                     String soundName = file.getFileName();
                     
@@ -160,6 +166,9 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
     
     String path = "~/bkSamples/";
     
+    File bkSamples;
+    bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("samples");
+    
     synth->clearVoices();
     synth->clearSounds();
     
@@ -174,7 +183,8 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
             
             for (int k = 0; k < 3; k++) //k => velocity layer
             {
-                String temp = path;
+                //String temp = path;
+                String temp;
                 temp += "harm";
                 if(k==0) temp += "V3";
                 else if(k==1) temp += "S";
@@ -183,7 +193,8 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
                 temp += std::to_string(i);
                 temp += ".wav";
                 
-                File file(temp);
+                //File file(temp);
+                File file(bkSamples.getChildFile(temp));
                 FileInputStream inputStream(file);
                 
                 if (inputStream.openedOk()) {
@@ -261,6 +272,9 @@ void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
     
     String path = "~/bkSamples/";
     
+    File bkSamples;
+    bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("samples");
+    
     synth->clearVoices();
     synth->clearSounds();
     
@@ -274,7 +288,8 @@ void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
         temp += std::to_string(i);
         temp += ".wav";
         
-        File file(temp);
+        //File file(temp);
+        File file(bkSamples.getChildFile(temp));
         FileInputStream inputStream(file);
         
         if (inputStream.openedOk()) {

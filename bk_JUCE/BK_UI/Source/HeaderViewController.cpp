@@ -261,19 +261,24 @@ void HeaderViewController::fillGalleryCB(void)
         StringArray submenuNames;
         OwnedArray<PopupMenu> submenus;
         
+        File bkGalleries;
+        bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+        
         for (int i = 0; i < processor.galleryNames.size(); i++)
         {
             File thisFile(processor.galleryNames[i]);
             
             //moving on to new submenu, if there is one, add add last submenu to popup now that it's done
-            if(creatingSubmenu && thisFile.getRelativePathFrom(File ("~/bkGalleries")).initialSectionNotContaining("/") != submenuName)
+            //if(creatingSubmenu && thisFile.getRelativePathFrom(File ("~/bkGalleries")).initialSectionNotContaining("/") != submenuName)
+            if(creatingSubmenu && thisFile.getParentDirectory().getFileName() != submenuName)
             {
                 galleryCBPopUp->addSubMenu(submenuName, *submenus.getLast());
                 creatingSubmenu = false;
             }
             
             //add toplevel item, if there is one
-            if(thisFile.getFileName() == thisFile.getRelativePathFrom(File ("~/bkGalleries"))) //if the file is in the main galleries directory....
+            //if(thisFile.getFileName() == thisFile.getRelativePathFrom(File ("~/bkGalleries"))) //if the file is in the main galleries
+            if(thisFile.getParentDirectory().getFileName() == bkGalleries.getFileName()) //if the file is in the main galleries directory....
             {
                 galleryCB.addItem(thisFile.getFileName(), i+1); //add to toplevel popup
             }
@@ -283,7 +288,8 @@ void HeaderViewController::fillGalleryCB(void)
             {
                 creatingSubmenu = true;
                 
-                submenuName = thisFile.getRelativePathFrom(File ("~/bkGalleries")).initialSectionNotContaining("/"); //name of submenu
+                //submenuName = thisFile.getRelativePathFrom(File ("~/bkGalleries")).initialSectionNotContaining("/"); //name of submenu
+                submenuName = thisFile.getParentDirectory().getFileName(); //name of submenu
                 
                 if(submenuNames.contains(submenuName)) //add to existing submenu
                 {
