@@ -305,7 +305,7 @@
  #define JucePlugin_ManufacturerCode       0x4d616e75 // 'Manu'
 #endif
 #ifndef  JucePlugin_PluginCode
- #define JucePlugin_PluginCode             0x52347971 // 'R4yq'
+ #define JucePlugin_PluginCode             0x624b326d // 'bK2m'
 #endif
 #ifndef  JucePlugin_IsSynth
  #define JucePlugin_IsSynth                1
@@ -323,13 +323,13 @@
  #define JucePlugin_EditorRequiresKeyboardFocus  1
 #endif
 #ifndef  JucePlugin_Version
- #define JucePlugin_Version                0.0.1
+ #define JucePlugin_Version                0.0.1.b1
 #endif
 #ifndef  JucePlugin_VersionCode
- #define JucePlugin_VersionCode            0x1
+ #define JucePlugin_VersionCode            0x100
 #endif
 #ifndef  JucePlugin_VersionString
- #define JucePlugin_VersionString          "0.0.1"
+ #define JucePlugin_VersionString          "0.0.1.b1"
 #endif
 #ifndef  JucePlugin_VSTUniqueID
  #define JucePlugin_VSTUniqueID            JucePlugin_PluginCode
@@ -353,7 +353,7 @@
  #define JucePlugin_AUManufacturerCode     JucePlugin_ManufacturerCode
 #endif
 #ifndef  JucePlugin_CFBundleIdentifier
- #define JucePlugin_CFBundleIdentifier     com.BK.BK0
+ #define JucePlugin_CFBundleIdentifier     com.manyarrowsmusic.bitKlavier
 #endif
 #ifndef  JucePlugin_RTASCategory
  #define JucePlugin_RTASCategory           ePlugInCategory_SWGenerators

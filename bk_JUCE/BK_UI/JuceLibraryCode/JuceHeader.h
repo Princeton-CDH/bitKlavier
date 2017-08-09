@@ -42,7 +42,7 @@
 namespace ProjectInfo
 {
     const char* const  projectName    = "bitKlavier";
-    const char* const  versionString  = "0.0.1";
-    const int          versionNumber  = 0x1;
+    const char* const  versionString  = "0.0.1.b1";
+    const int          versionNumber  = 0x100;
 }
 #endif
