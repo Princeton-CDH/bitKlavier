@@ -71,7 +71,7 @@ timerCallbackCount(0)
 
     viewPort.setViewedComponent(&construction);
     viewPort.setViewPosition(0, 0);
-    viewPort.setScrollBarsShown(false, false, true, true);
+    viewPort.setScrollBarsShown(true, true, true, true);
     
     addAndMakeVisible(viewPort);
     
