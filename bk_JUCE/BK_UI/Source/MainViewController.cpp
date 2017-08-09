@@ -68,7 +68,7 @@ timerCallbackCount(0)
     
     addAndMakeVisible(header);
     addAndMakeVisible(construction);
-    addAndMakeVisible(overtop);
+    addChildComponent(overtop);
 
     
     Point<int> myshadowOffset(2, 2);
