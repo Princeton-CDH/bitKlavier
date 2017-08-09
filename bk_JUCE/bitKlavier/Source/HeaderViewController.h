@@ -18,10 +18,12 @@
 #include "BKComponent.h"
 #include "BKListener.h"
 
+#include "BKConstructionSite.h"
+
 class HeaderViewController : public BKComponent, public BKListener, public BKEditableComboBoxListener
 {
 public:
-    HeaderViewController(BKAudioProcessor& p);
+    HeaderViewController(BKAudioProcessor& p, BKConstructionSite* construction);
     ~HeaderViewController();
     
     void update(void);
@@ -55,6 +57,7 @@ private:
     PopupMenu getLoadMenu(void);
     PopupMenu getPianoMenu(void);
     PopupMenu getGalleryMenu(void);
+    PopupMenu getNewMenu(void);
     //OwnedArray<PopupMenu> submenus;
     //StringArray submenuNames;
     
@@ -66,6 +69,8 @@ private:
     BKEditableComboBox pianoCB;
     int lastGalleryCBId;
     bool galleryModalCallBackIsOpen;
+    
+    BKConstructionSite* construction;
     
     BKButtonAndMenuLAF buttonsAndMenusLAF;
     
