@@ -237,6 +237,8 @@ public:
     void setImage(Image newImage);
     
     void configurePianoCB(void);
+
+    BKItem::PtrArr connections;
     
 private:
     BKAudioProcessor& processor;
@@ -245,7 +247,6 @@ private:
     // Piano menu
     BKComboBox menu;
     
-    BKItem::PtrArr connections;
     
     // UI stuff
     Component fullChild;
