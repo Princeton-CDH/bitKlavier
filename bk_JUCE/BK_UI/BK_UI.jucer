@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+
 <JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="0.0.1.b1"
               bundleIdentifier="com.manyarrowsmusic.bitKlavier" includeBinaryInAppConfig="1"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="1" buildRTAS="1"
@@ -263,7 +264,7 @@
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="portraitlandscape"
                   aaxFolder="" iosBackgroundAudio="1" UIFileSharingEnabled="1"
-                  iosDevelopmentTeamID="" rtasFolder="">
+                  iosDevelopmentTeamID="" rtasFolder="" vst3Folder="">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="MRM" iosCompatibility="default"
                        codeSigningIdentity="iPhone Developer: Michael Mulshine (SW843MMG7S)"/>

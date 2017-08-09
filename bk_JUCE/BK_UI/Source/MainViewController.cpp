@@ -16,10 +16,11 @@ MainViewController::MainViewController (BKAudioProcessor& p):
 processor (p),
 theGraph(p),
 header(p),
-construction(p, &theGraph),
+construction(p, &viewPort, &theGraph),
 overtop(p, &theGraph),
 timerCallbackCount(0)
 {
+    initial = true;
     addMouseListener(this, true);
     
     setWantsKeyboardFocus(true);
@@ -62,24 +63,18 @@ timerCallbackCount(0)
     keyboard->addMouseListener(this, true);
     keyboardState.addListener(this);
     
-    //keyboardComponent.setAvailableRange(21, 108);
-    //keyboardComponent.setScrollButtonsVisible(false);
-    //keyboardComponent.setOctaveForMiddleC(4);
-    //keyboardComponent.addMyListener (this);
-    //addAndMakeVisible (keyboardComponent);
-    /*
-     absoluteKeyboard.setName("Key-by-Key Offsets");
-     absoluteKeyboard.addMyListener(this);
-     addAndMakeVisible(absoluteKeyboard);
-    
-     */
-    
     preparationPanel = new PreparationPanel(processor);
     addAndMakeVisible(preparationPanel);
     
     addAndMakeVisible(header);
-    addAndMakeVisible(construction);
     addChildComponent(overtop);
+
+    viewPort.setViewedComponent(&construction);
+    viewPort.setViewPosition(0, 0);
+    viewPort.setScrollBarsShown(false, false, true, true);
+    
+    addAndMakeVisible(viewPort);
+    
     
     Point<int> myshadowOffset(2, 2);
     DropShadow myshadow(Colours::darkgrey, 5, myshadowOffset);
@@ -99,6 +94,12 @@ MainViewController::~MainViewController()
 void MainViewController::paint (Graphics& g)
 {
     g.fillAll(Colours::black);
+    
+    g.setColour(Colours::white);
+    
+    Rectangle<int> bounds = viewPort.getBounds().translated(-1, -1);
+    bounds.expand(2,2);
+    g.drawRect(bounds, 1);
 }
 
 void MainViewController::resized()
@@ -142,8 +143,25 @@ void MainViewController::resized()
     //gainSliderSlice.reduce(0, 1);
     mainSlider->setBounds(gainSliderSlice);
     
-    area.reduce(gXSpacing, 0);
-    construction.setBounds(area);
+    area.reduce(gXSpacing, 3);
+    viewPort.setBounds(area);
+    
+    if (initial)
+    {
+        initial = false;
+        initialWidth = viewPort.getWidth(); initialHeight = viewPort.getHeight();
+        construction.setSize(initialWidth, initialHeight);
+    }
+    
+    if (!construction.itemOutsideBounds(viewPort.getBounds()))
+    {
+        if (viewPort.getWidth() > initialWidth) construction.setSize(viewPort.getWidth(), construction.getHeight());
+        
+        if (viewPort.getHeight() > initialHeight) construction.setSize(construction.getWidth(), viewPort.getHeight());
+    }
+    
+    
+    
     
     /*
     backgroundImageComponent.setBounds(getBounds());
@@ -162,6 +180,8 @@ void MainViewController::mouseDown(const MouseEvent &event)
         }
     }
 }
+
+
 
 void MainViewController::bkButtonClicked (Button* b)
 {
@@ -182,13 +202,11 @@ void MainViewController::sliderValueChanged (Slider* slider)
 
 void MainViewController::handleNoteOn(BKKeymapKeyboardState* source, int midiNoteNumber, float velocity) 
 {
-    //DBG("MainViewController::handleKeymapNoteOn " + String(midiNoteNumber));
     processor.noteOnUI(midiNoteNumber);
 }
 
 void MainViewController::handleNoteOff(BKKeymapKeyboardState* source, int midiNoteNumber, float velocity)
 {
-    //DBG("MainViewController::handleKeymapNoteOff " + String(midiNoteNumber));
     processor.noteOffUI(midiNoteNumber);
 }
 

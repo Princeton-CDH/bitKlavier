@@ -1,12 +1,11 @@
-/*
-  ==============================================================================
+/*==============================================================================
 
     BKGraph.cpp
     Created: 6 Apr 2017 12:24:29pm
     Author:  Michael R Mulshine
 
-  ==============================================================================
-*/
+  ==============================================================================*/
+
 
 #include "BKGraph.h"
 
@@ -19,7 +18,7 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ BKItem ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 BKItem::BKItem(BKPreparationType type, int Id, BKAudioProcessor& p):
 ItemMapper(type, Id),
-BKDraggableComponent(true,false,true),
+BKDraggableComponent(true,false,true, 50, 50, 50, 50),
 processor(p)
 {
     fullChild.setAlwaysOnTop(true);
@@ -91,7 +90,6 @@ processor(p)
 
 BKItem::~BKItem()
 {
-    connections.clear();
 }
 
 BKItem* BKItem::duplicate(void)
@@ -282,9 +280,9 @@ void BKItem::bkComboBoxDidChange    (ComboBox* cb)
     }
 }
 
-void BKItem::itemIsBeingDragged(const MouseEvent& e, Point<int> startPosition)
+void BKItem::itemIsBeingDragged(const MouseEvent& e)
 {
-    ((BKConstructionSite*)getParentComponent())->itemIsBeingDragged(this, startPosition);
+    //((BKConstructionSite*)getParentComponent())->itemIsBeingDragged(this, e);
 }
 
 void BKItem::mouseDoubleClick(const MouseEvent& e)
@@ -433,11 +431,6 @@ void BKItem::setState(XmlElement* e)
 
 BKItemGraph::~BKItemGraph(void)
 {
-    BKItem::PtrArr items = getItems();
-    
-    for (int i = 0; i < items.size(); i++) items[i]->clearConnections();
-    
-    clear();
 }
 
 void BKItemGraph::clear()
