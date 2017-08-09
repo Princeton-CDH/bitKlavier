@@ -49,7 +49,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 
 BKAudioProcessor::~BKAudioProcessor()
 {
-    
+    clipboard.clear();
 }
 
 void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)  

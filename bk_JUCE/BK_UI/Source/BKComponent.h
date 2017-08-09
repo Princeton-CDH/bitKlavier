@@ -62,9 +62,8 @@ public:
     isDroppable(isDrop),
     isConnectable(isConn)
     {
+        constrainer.setMinimumOnscreenAmounts(50,50,50,50);
         addMouseListener(this,true);
-        
-        constrainer.setMinimumOnscreenAmounts(80,100,80,100);
     }
     
     BKDraggableComponent(bool isDrag, bool isDrop, bool isConn,
@@ -73,9 +72,8 @@ public:
     isDroppable(isDrop),
     isConnectable(isConn)
     {
-        addMouseListener(this,true);
-        
         constrainer.setMinimumOnscreenAmounts(top,left,bottom,right);
+        addMouseListener(this,true);
     }
     
     ~BKDraggableComponent()
@@ -85,11 +83,11 @@ public:
     
     inline void setConstrainer(int top, int left, int bottom, int right)
     {
-        constrainer.setMinimumOnscreenAmounts(top, left, bottom, right);
+        
     }
     
     virtual void itemWasDropped(BKPreparationType type, Array<int>, int x, int y){};
-    virtual void itemIsBeingDragged(const MouseEvent& e, Point<int> startPosition){};
+    virtual void itemIsBeingDragged(const MouseEvent& e){};
     virtual void itemWasDragged(const MouseEvent& e){};
     virtual void keyPressedWhileSelected(const KeyPress& e) {};
     
@@ -104,7 +102,9 @@ public:
     
     void performDrag(const MouseEvent& e)
     {
-        dragger.dragComponent (this, e, nullptr);
+        dragger.dragComponent (this, e, &constrainer);
+        
+        itemIsBeingDragged(e);
     }
     
 protected:
@@ -166,7 +166,7 @@ private:
         }
         return true;
     }
-    
+
     ComponentBoundsConstrainer constrainer;
     ComponentDragger dragger;
     

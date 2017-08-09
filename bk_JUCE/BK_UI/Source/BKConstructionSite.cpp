@@ -12,14 +12,15 @@
 
 #define NUM_COL 6
 
-BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
+BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, Viewport* vp, BKItemGraph* theGraph):
 BKDraggableComponent(false,false,false),
 altDown(false),
 processor(p),
 graph(theGraph),
 connect(false),
 lastX(10),
-lastY(10)
+lastY(10),
+viewport(vp)
 {
     setWantsKeyboardFocus(false);
     graph->deselectAll();
@@ -31,13 +32,34 @@ BKConstructionSite::~BKConstructionSite(void)
     removeAllChildren();
 }
 
+void BKConstructionSite::resized()
+{
+    repaint();
+}
+
+void BKConstructionSite::paint(Graphics& g)
+{
+    g.setColour(Colours::burlywood.withMultipliedBrightness(0.25));
+    g.fillAll();
+    
+    if (connect)
+    {
+        g.setColour(Colours::lightgrey);
+        g.drawLine(lineOX, lineOY, lineEX, lineEY, 3);
+    }
+    
+    for (auto line : graph->getLines())
+    {
+        g.setColour(Colours::goldenrod);
+        g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY(), 2);
+    }
+}
+
 void BKConstructionSite::redraw(void)
 {
     removeAllChildren();
     
     graph->reconstruct();
-    
-    //graph->deselectAll();
     
     draw();
 }
@@ -124,40 +146,7 @@ void BKConstructionSite::align(int which)
     repaint();
 }
 
-void BKConstructionSite::resized()
-{
-    repaint();
-}
-
-void BKConstructionSite::paint(Graphics& g)
-{
-    g.setColour(Colours::burlywood.withMultipliedBrightness(0.25));
-    g.fillAll();
-    
-    
-    g.setColour(Colours::white);
-    g.drawRect(getLocalBounds(), 1);
-    
-    if (itemIsHovering)
-    {
-        g.setColour(Colours::black);
-        g.drawRect(getLocalBounds(), 3);
-    }
-    
-    if (connect)
-    {
-        g.setColour(Colours::lightgrey);
-        g.drawLine(lineOX, lineOY, lineEX, lineEY, 3);
-    }
-    
-    for (auto line : graph->getLines())
-    {
-        g.setColour(Colours::goldenrod);
-        g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY(), 2);
-    }
-}
-
-void BKConstructionSite::itemIsBeingDragged(BKItem* thisItem, Point<int> startPosition)
+void BKConstructionSite::itemIsBeingDragged(BKItem* thisItem, const MouseEvent& e)
 {
     repaint();
 }
@@ -170,10 +159,7 @@ void BKConstructionSite::pianoMapDidChange(BKItem* thisItem)
 void BKConstructionSite::draw(void)
 {
 
-    for (auto item : processor.currentPiano->getItems())
-    {
-        addAndMakeVisible(item);
-    }
+    for (auto item : processor.currentPiano->getItems())    addAndMakeVisible(item);
     
     if (processor.updateState->loadedJson)
     {
@@ -309,7 +295,7 @@ void BKConstructionSite::addItem(BKPreparationType type)
     lastX += 10; lastY += 10;
     
     graph->addItem(toAdd);
-    
+
     addAndMakeVisible(toAdd);
 }
 
@@ -410,8 +396,6 @@ void BKConstructionSite::paste(void)
         processor.currentPiano->add(item);
         
         newItems.add(item);
-        
-        addAndMakeVisible(item);
     }
     
     processor.currentPiano->configure();
@@ -543,6 +527,8 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
 void BKConstructionSite::mouseDrag (const MouseEvent& e)
 {
     lastX = e.x; lastY = e.y;
+
+    MouseEvent eViewport = e.getEventRelativeTo(viewport);
     
     if (itemToSelect == nullptr) lasso->dragLasso(e);
     
@@ -551,6 +537,8 @@ void BKConstructionSite::mouseDrag (const MouseEvent& e)
         for (auto item : graph->getSelectedItems())
         {
             item->performDrag(e);
+            
+            //if (item->)
         }
     }
     

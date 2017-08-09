@@ -43,6 +43,13 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     
+    inline void mouseDrag(const MouseEvent& e) override
+    {
+        viewPort.autoScroll(e.x, e.y, 100, 150);
+    }
+    
+    inline Viewport* getViewport(void) { return &viewPort;}
+    
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it
@@ -73,6 +80,8 @@ private:
     BKKeymapKeyboardState keyboardState;
     Component *keyboardComponent;
     
+    bool initial;
+    int initialWidth, initialHeight;
     /*
     void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override;

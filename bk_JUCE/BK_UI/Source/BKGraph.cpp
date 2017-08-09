@@ -19,7 +19,7 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ BKItem ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 BKItem::BKItem(BKPreparationType type, int Id, BKAudioProcessor& p):
 ItemMapper(type, Id),
-BKDraggableComponent(true,false,true),
+BKDraggableComponent(true,false,true, 50, 50, 50, 50),
 processor(p)
 {
     fullChild.setAlwaysOnTop(true);
@@ -282,9 +282,9 @@ void BKItem::bkComboBoxDidChange    (ComboBox* cb)
     }
 }
 
-void BKItem::itemIsBeingDragged(const MouseEvent& e, Point<int> startPosition)
+void BKItem::itemIsBeingDragged(const MouseEvent& e)
 {
-    ((BKConstructionSite*)getParentComponent())->itemIsBeingDragged(this, startPosition);
+    //((BKConstructionSite*)getParentComponent())->itemIsBeingDragged(this, e);
 }
 
 void BKItem::mouseDoubleClick(const MouseEvent& e)

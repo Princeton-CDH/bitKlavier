@@ -23,7 +23,7 @@
 class BKConstructionSite : public BKDraggableComponent, public LassoSource<BKItem*>
 {
 public:
-    BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph);
+    BKConstructionSite(BKAudioProcessor& p, Viewport* viewPort, BKItemGraph* theGraph);
     
     ~BKConstructionSite(void);
     
@@ -31,7 +31,7 @@ public:
 
     void paint(Graphics& g) override;
     
-    void itemIsBeingDragged(BKItem* thisItem, Point<int> startPosition);
+    void itemIsBeingDragged(BKItem* thisItem, const MouseEvent& e);
     
     void pianoMapDidChange(BKItem* thisItem);
     
@@ -110,6 +110,8 @@ private:
 
     int lastX, lastY;
     int lastEX,lastEY;
+    
+    Viewport* viewport;
     
     
     

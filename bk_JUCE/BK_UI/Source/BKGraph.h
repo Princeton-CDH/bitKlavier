@@ -39,7 +39,7 @@ public:
     
     void resized(void) override;
     
-    void itemIsBeingDragged(const MouseEvent&, Point<int>) override;
+    void itemIsBeingDragged(const MouseEvent&) override;
     
     void keyPressedWhileSelected(const KeyPress&) override;
 
