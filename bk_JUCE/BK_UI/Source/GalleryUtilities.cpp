@@ -265,7 +265,7 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         Direct::Ptr newOne = toCopy->duplicate();
         addDirect(newOne);
         newId = newOne->getId();
-        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeDirect, newId))+")";
+        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeDirect, newId))+")";
         newOne->setName(newName);
     }
     else if (type == PreparationTypeSynchronic)
@@ -274,7 +274,7 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         Synchronic::Ptr newOne = toCopy->duplicate();
         addSynchronic(newOne);
         newId = newOne->getId();
-        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeSynchronic, newId))+")";
+        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeSynchronic, newId))+")";
         newOne->setName(newName);
     }
     else if (type == PreparationTypeNostalgic)
@@ -283,7 +283,7 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         Nostalgic::Ptr newOne = toCopy->duplicate();
         addNostalgic(newOne);
         newId = newOne->getId();
-        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeNostalgic, newId))+")";
+        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeNostalgic, newId))+")";
         newOne->setName(newName);
     }
     else if (type == PreparationTypeTuning)
@@ -292,7 +292,7 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         Tuning::Ptr newOne = toCopy->duplicate();
         addTuning(newOne);
         newId = newOne->getId();
-        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeTuning, newId))+")";
+        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeTuning, newId))+")";
         newOne->setName(newName);
     }
     else if (type == PreparationTypeTempo)
@@ -301,7 +301,7 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         Tempo::Ptr newOne = toCopy->duplicate();
         addTempo(newOne);
         newId = newOne->getId();
-        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeTempo, newId))+")";
+        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeTempo, newId))+")";
         newOne->setName(newName);
     }
     else if (type == PreparationTypeKeymap)
@@ -310,7 +310,7 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         Keymap::Ptr newOne = toCopy->duplicate();
         addKeymap(newOne);
         newId = newOne->getId();
-        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeKeymap, newId))+")";
+        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeKeymap, newId))+")";
         newOne->setName(newName);
     }
     if (type == PreparationTypeDirectMod)
@@ -319,7 +319,7 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         DirectModPreparation::Ptr newOne = toCopy->duplicate();
         addDirectMod(newOne);
         newId = newOne->getId();
-        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeDirectMod, newId))+")";
+        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeDirectMod, newId))+")";
         newOne->setName(newName);
     }
     else if (type == PreparationTypeSynchronicMod)
@@ -328,7 +328,7 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         SynchronicModPreparation::Ptr newOne = toCopy->duplicate();
         addSynchronicMod(newOne);
         newId = newOne->getId();
-        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeSynchronicMod, newId))+")";
+        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeSynchronicMod, newId))+")";
         newOne->setName(newName);
     }
     else if (type == PreparationTypeNostalgicMod)
@@ -337,7 +337,7 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         NostalgicModPreparation::Ptr newOne = toCopy->duplicate();
         addNostalgicMod(newOne);
         newId = newOne->getId();
-        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeNostalgicMod, newId))+")";
+        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeNostalgicMod, newId))+")";
         newOne->setName(newName);
     }
     else if (type == PreparationTypeTuningMod)
@@ -346,7 +346,7 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         TuningModPreparation::Ptr newOne = toCopy->duplicate();
         addTuningMod(newOne);
         newId = newOne->getId();
-        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeTuningMod, newId))+")";
+        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeTuningMod, newId))+")";
         newOne->setName(newName);
     }
     else if (type == PreparationTypeTempoMod)
@@ -355,7 +355,7 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         TempoModPreparation::Ptr newOne = toCopy->duplicate();
         addTempoMod(newOne);
         newId = newOne->getId();
-        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypeTempoMod, newId))+")";
+        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeTempoMod, newId))+")";
         newOne->setName(newName);
     }
     else if (type == PreparationTypePiano)
@@ -364,7 +364,7 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         Piano::Ptr newOne = toCopy->duplicate();
         addPiano(newOne);
         newId = newOne->getId();
-        String newName = toCopy->getName() + " ("+String(numWithSameNameAs(PreparationTypePiano, newId))+")";
+        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypePiano, newId))+")";
         newOne->setName(newName);
     }
     

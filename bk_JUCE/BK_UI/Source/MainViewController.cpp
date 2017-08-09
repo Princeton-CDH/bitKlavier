@@ -23,9 +23,7 @@ timerCallbackCount(0)
     addMouseListener(this, true);
     
     setWantsKeyboardFocus(true);
-    
-    
-    
+
     addKeyListener(this);
     
     gen = processor.gallery->getGeneralSettings();

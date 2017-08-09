@@ -268,6 +268,8 @@ void HeaderViewController::fillGalleryCB(void)
         {
             File thisFile(processor.galleryNames[i]);
             
+            String galleryName = thisFile.getFileName().upToFirstOccurrenceOf(".xml", false, false);
+            
             //moving on to new submenu, if there is one, add add last submenu to popup now that it's done
             //if(creatingSubmenu && thisFile.getRelativePathFrom(File ("~/bkGalleries")).initialSectionNotContaining("/") != submenuName)
             if(creatingSubmenu && thisFile.getParentDirectory().getFileName() != submenuName)
@@ -280,7 +282,7 @@ void HeaderViewController::fillGalleryCB(void)
             //if(thisFile.getFileName() == thisFile.getRelativePathFrom(File ("~/bkGalleries"))) //if the file is in the main galleries
             if(thisFile.getParentDirectory().getFileName() == bkGalleries.getFileName()) //if the file is in the main galleries directory....
             {
-                galleryCB.addItem(thisFile.getFileName(), i+1); //add to toplevel popup
+                galleryCB.addItem(galleryName, i+1); //add to toplevel popup
             }
             
             //otherwise add to or create submenu with name of subfolder
@@ -294,14 +296,14 @@ void HeaderViewController::fillGalleryCB(void)
                 if(submenuNames.contains(submenuName)) //add to existing submenu
                 {
                     PopupMenu* existingMenu = submenus.getUnchecked(submenuNames.indexOf(submenuName));
-                    existingMenu->addItem(i + 1, thisFile.getFileName());
+                    existingMenu->addItem(i + 1, galleryName);
                 }
                 else
                 {
                     submenus.add(new PopupMenu());
                     submenuNames.add(submenuName);
 
-                    submenus.getLast()->addItem(i + 1, thisFile.getFileName());;
+                    submenus.getLast()->addItem(i + 1, galleryName);;
                 }
             }
      

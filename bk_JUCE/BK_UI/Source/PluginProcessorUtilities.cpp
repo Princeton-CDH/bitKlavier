@@ -91,6 +91,8 @@ void BKAudioProcessor::updateGalleries()
     hammerReleaseSynth.updateGeneralSettings(gallery->getGeneralSettings());
     resonanceReleaseSynth.updateGeneralSettings(gallery->getGeneralSettings());
     
+    clipboard.clear();
+    
     updateState->galleryDidChange = true;
 }
 
