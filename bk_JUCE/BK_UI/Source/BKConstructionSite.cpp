@@ -527,8 +527,8 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
 void BKConstructionSite::mouseDrag (const MouseEvent& e)
 {
     lastX = e.x; lastY = e.y;
-
-    MouseEvent eViewport = e.getEventRelativeTo(viewport);
+    
+    MouseEvent eViewport = e.getEventRelativeTo(this);
     
     if (itemToSelect == nullptr) lasso->dragLasso(e);
     

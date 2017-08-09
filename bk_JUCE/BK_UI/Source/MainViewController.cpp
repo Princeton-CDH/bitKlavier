@@ -71,8 +71,7 @@ timerCallbackCount(0)
 
     viewPort.setViewedComponent(&construction);
     viewPort.setViewPosition(0, 0);
-    viewPort.setScrollBarsShown(false, false, true, true);
-    viewPort.setViewportIgnoreDragFlag(false);
+    viewPort.setScrollBarsShown(true, true, true, true);
     
     addAndMakeVisible(viewPort);
     
@@ -96,7 +95,6 @@ void MainViewController::paint (Graphics& g)
 {
     g.fillAll(Colours::black);
     
-    DBG("viewport bounds: " + String(viewPort.getX()) + " " + String(viewPort.getY()) + " " + String(viewPort.getWidth()) + " " + String(viewPort.getHeight()));
     g.setColour(Colours::white);
     
     Rectangle<int> bounds = viewPort.getBounds().translated(-1, -1);
