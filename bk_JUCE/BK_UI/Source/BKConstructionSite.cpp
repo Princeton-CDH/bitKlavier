@@ -23,6 +23,7 @@ lastY(10)
 {
     setWantsKeyboardFocus(false);
     graph->deselectAll();
+    didCopy = false;
 }
 
 BKConstructionSite::~BKConstructionSite(void)
@@ -280,22 +281,7 @@ void BKConstructionSite::prepareItemDrag(BKItem* item, const MouseEvent& e, bool
 }
 void BKConstructionSite::deleteItem (BKItem* item)
 {
-    BKItem::PtrArr connections = item->getConnections();
-    
-    for (int i = connections.size(); --i >= 0;)
-    {
-        BKItem* connectionItem = connections[i];
-        
-        connectionItem->removeConnection(item->getType(), item->getId());
-    }
-    
-    item->clearConnections();
-    
-    item->setActive(false);
-    item->setSelected(false);
-    
-    processor.currentPiano->remove(item);
-    
+    graph->removeItem(item);
     removeChildComponent(item);
 }
 
@@ -327,14 +313,13 @@ void BKConstructionSite::addItem(BKPreparationType type)
     addAndMakeVisible(toAdd);
 }
 
-void BKConstructionSite::copy(void)
+BKItem::PtrArr BKConstructionSite::duplicate(BKItem::PtrArr these)
 {
     int distFromOrigin = 20000;
     
-    BKItem::PtrArr selected = graph->getSelectedItems();
-    
     BKItem::PtrArr clipboard;
-    for (auto item : selected)
+    
+    for (auto item : these)
     {
         BKItem* newItem = new BKItem(item->getType(), item->getId(), processor);
         
@@ -351,16 +336,16 @@ void BKConstructionSite::copy(void)
             distFromOrigin = dist;
             upperLeftest = newItem;
         }
-    
+        
         clipboard.add(newItem);
     }
     
-    for (int i = 0; i < selected.size(); i++)
+    for (int i = 0; i < these.size(); i++)
     {
-        BKItem* selectedItem = selected[i];
+        BKItem* thisItem = these[i];
         BKItem* clipboardItem = clipboard[i];
         
-        for (auto connection : selectedItem->getConnections())
+        for (auto connection : thisItem->getConnections())
         {
             BKPreparationType connectionType = connection->getType();
             int connectionId = connection->getId();
@@ -380,35 +365,39 @@ void BKConstructionSite::copy(void)
         }
     }
     
-    processor.setClipboard(clipboard);
+    return clipboard;
 }
 
-/*
- 
- Array<Array<int>> copyMap;
- 
-auto glambda = [](Array<Array<int>> cmap, int type, int oldId)
+void BKConstructionSite::copy(void)
 {
-    for (auto set : cmap)
-    {
-        if (set[0] == type && set[1] == oldId) return set[2];
-    }
-    return 0;
-};
- */
+    
+    BKItem::PtrArr selected = graph->getSelectedItems();
+
+    processor.setClipboard(duplicate(selected));
+    
+    getParentComponent()->grabKeyboardFocus();
+}
 
 void BKConstructionSite::paste(void)
 {
     BKItem::PtrArr clipboard = processor.getClipboard();
     
+    if (!clipboard.size() || (upperLeftest == nullptr)) return;
+    
+    BKItem::PtrArr newItems = duplicate(clipboard);
+    
+    graph->deselectAll();
+    
     int offsetX = upperLeftest->getX(); int offsetY = upperLeftest->getY();
     
-    for (auto item : clipboard)
+    for (auto item : newItems)
     {
-        if (processor.currentPiano->contains(item->getType(), item->getId()))
+        BKPreparationType type = item->getType(); int Id = item->getId();
+
+        if (processor.currentPiano->contains(type, Id))
         {
             // duplicate (all we need to do is set to new Id and add to gallery)
-            int newId = processor.gallery->duplicate(item->getType(), item->getId());
+            int newId = processor.gallery->duplicate(type, Id);
             
             item->setId(newId);
             
@@ -420,12 +409,16 @@ void BKConstructionSite::paste(void)
         
         processor.currentPiano->add(item);
         
+        newItems.add(item);
+        
         addAndMakeVisible(item);
     }
     
     processor.currentPiano->configure();
     
     redraw();
+    
+    getParentComponent()->grabKeyboardFocus();
 }
 
 void BKConstructionSite::cut(void)
@@ -435,6 +428,8 @@ void BKConstructionSite::cut(void)
     for (auto item : graph->getSelectedItems()) deleteItem(item);
     
     graph->deselectAll();
+    
+    getParentComponent()->grabKeyboardFocus();
 }
 
 void BKConstructionSite::mouseMove (const MouseEvent& eo)
