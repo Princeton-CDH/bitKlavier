@@ -61,6 +61,8 @@ public:
         graph->clear();
     }
     
+    bool itemOutsideBounds(Rectangle<int>);
+    
 private:
     
     int leftMost, rightMost, topMost, bottomMost;

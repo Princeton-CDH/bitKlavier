@@ -55,6 +55,19 @@ void BKConstructionSite::paint(Graphics& g)
     }
 }
 
+bool BKConstructionSite::itemOutsideBounds(Rectangle<int> bounds)
+{
+    for (auto item : graph->getItems())
+    {
+        Point<int> xy = item->getPosition();
+        DBG("XY TEST: " + String(xy.x) + " " + String(xy.y));
+        
+        DBG("bounds: " + String(bounds.getX()) + " " + String(bounds.getHeight()));
+        if ((xy.x > bounds.getWidth()) || (xy.y > bounds.getHeight())) return true;
+    }
+    return false;
+}
+
 void BKConstructionSite::redraw(void)
 {
     removeAllChildren();

@@ -71,7 +71,7 @@ timerCallbackCount(0)
 
     viewPort.setViewedComponent(&construction);
     viewPort.setViewPosition(0, 0);
-    viewPort.setScrollBarsShown(true, true, true, true);
+    viewPort.setScrollBarsShown(false, false, true, true);
     
     addAndMakeVisible(viewPort);
     
@@ -151,12 +151,16 @@ void MainViewController::resized()
         initial = false;
         initialWidth = viewPort.getWidth(); initialHeight = viewPort.getHeight();
         construction.setSize(initialWidth, initialHeight);
-        
     }
     
-    if (viewPort.getWidth() > initialWidth) construction.setSize(viewPort.getWidth(), construction.getHeight());
+    if (!construction.itemOutsideBounds(viewPort.getBounds()))
+    {
+        if (viewPort.getWidth() > initialWidth) construction.setSize(viewPort.getWidth(), construction.getHeight());
+        
+        if (viewPort.getHeight() > initialHeight) construction.setSize(construction.getWidth(), viewPort.getHeight());
+    }
     
-    if (viewPort.getHeight() > initialHeight) construction.setSize(construction.getWidth(), viewPort.getHeight());
+    
     
     
     /*
