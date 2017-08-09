@@ -1,3 +1,3 @@
-# bitKlavier, by Dan Trueman
+# bitKlavier: the prepared digital piano
 
-Developed by Dan Trueman, Michael Mulshine, Spencer Salazar, and Miles Yucht. 
+Developed by Dan Trueman and Michael Mulshine.
