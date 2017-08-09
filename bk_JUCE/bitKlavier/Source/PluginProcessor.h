@@ -189,6 +189,8 @@ private:
     
     Array<int> notesOnUI;
     Array<int> notesOffUI;
+    
+    File lastGalleryPath;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)

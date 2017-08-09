@@ -20,6 +20,7 @@ resonanceReleaseSynth()
     updateUI();
     
     loadGalleryFromPath(galleryNames[0]);
+    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
     
     noteOn.ensureStorageAllocated(128);
     for(int i=0; i< 128; i++)
@@ -461,7 +462,8 @@ void BKAudioProcessor::loadGalleryDialog(void)
     updateState->loadedJson = false;
     
     FileChooser myChooser ("Load gallery from xml file...",
-                           File::getSpecialLocation (File::userHomeDirectory),
+                           //File::getSpecialLocation (File::userHomeDirectory),
+                           lastGalleryPath,
                            "*.xml");
     
     if (myChooser.browseForFileToOpen())
@@ -480,6 +482,8 @@ void BKAudioProcessor::loadGalleryDialog(void)
             initializeGallery();
             
             galleryDidLoad = true;
+            
+            lastGalleryPath = myFile;
         }
     }
     
