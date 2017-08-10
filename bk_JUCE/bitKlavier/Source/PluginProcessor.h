@@ -172,6 +172,9 @@ public:
         }
         return false;
     }
+    
+    void reset(BKPreparationType type, int Id);
+    void clear(BKPreparationType type, int Id);
 
 
 private:

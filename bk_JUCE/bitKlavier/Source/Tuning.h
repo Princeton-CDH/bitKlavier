@@ -299,6 +299,12 @@ public:
         return copy;
     }
     
+    inline void clear(void)
+    {
+        sPrep       = new TuningPreparation();
+        aPrep       = new TuningPreparation(sPrep);
+    }
+    
     
     ValueTree getState(void);
     void setState(XmlElement*);

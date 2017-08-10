@@ -64,8 +64,6 @@ construction(c)
     pianoCB.addMyListener(this);
     pianoCB.BKSetJustificationType(juce::Justification::centredRight);
     
-    pianoCB.addSeparator();
-    pianoCB.addItem("New piano...",1);
     pianoCB.setSelectedId(0, dontSendNotification);
     
     galleryModalCallBackIsOpen = false;
@@ -452,9 +450,6 @@ void HeaderViewController::fillPianoCB(void)
         if (name != String::empty)  pianoCB.addItem(name,  piano->getId());
         else                        pianoCB.addItem("Piano" + String(piano->getId()), piano->getId());
     }
-    
-    pianoCB.addSeparator();
-    pianoCB.addItem("New piano...", -1);
 
     pianoCB.setSelectedId(processor.currentPiano->getId(), dontSendNotification);
 }
@@ -536,13 +531,6 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
     
     if (name == "pianoCB")
     {
-        if (Id == -1)
-        {
-            processor.gallery->add(PreparationTypePiano);
-            
-            Id = processor.gallery->getPianos().getLast()->getId();
-        }
-        
         processor.setCurrentPiano(Id);
         
         fillPianoCB();

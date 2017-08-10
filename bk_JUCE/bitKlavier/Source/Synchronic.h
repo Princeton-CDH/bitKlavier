@@ -314,6 +314,12 @@ public:
         
         return copy;
     }
+    
+    inline void clear(void)
+    {
+        sPrep       = new SynchronicPreparation();
+        aPrep       = new SynchronicPreparation(sPrep);
+    }
 
     inline void copy(Synchronic::Ptr from)
     {

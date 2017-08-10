@@ -102,7 +102,7 @@ void BKAudioProcessor::renameGallery(String name)
     
     File newFile(newFilePath);
     
-    currentFile.moveFileTo(newFile);
+    bool success = currentFile.moveFileTo(newFile);
 }
 
 void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)  
@@ -279,7 +279,6 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     gallery->setDefaultPiano(which);
     gallery->setGalleryDirty(false);
 }
-
 
 // Reset
 void BKAudioProcessor::performResets(int noteNumber)
@@ -664,7 +663,134 @@ void BKAudioProcessor::initializeGallery(void)
     updateUI();
     
     updateGalleries();
+
+}
+
+void BKAudioProcessor::reset(BKPreparationType type, int Id)
+{
+    if (type == PreparationTypeDirect)
+    {
+        DirectProcessor::Ptr proc = currentPiano->getDirectProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        NostalgicProcessor::Ptr proc = currentPiano->getNostalgicProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        SynchronicProcessor::Ptr proc = currentPiano->getSynchronicProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        TuningProcessor::Ptr proc = currentPiano->getTuningProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        TempoProcessor::Ptr proc = currentPiano->getTempoProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+        gallery->getKeymap(Id)->clear();
+    }
+    if (type == PreparationTypeDirectMod)
+    {
+        gallery->getDirectModPreparation(Id)->clearAll();
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        gallery->getNostalgicModPreparation(Id)->clearAll();
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        gallery->getSynchronicModPreparation(Id)->clearAll();
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        gallery->getTuningModPreparation(Id)->clearAll();
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        gallery->getTempoModPreparation(Id)->clearAll();
+    }
     
+}
+
+void BKAudioProcessor::clear(BKPreparationType type, int Id)
+{
+    if (type == PreparationTypeDirect)
+    {
+        gallery->getDirect(Id)->clear();
+        
+        DirectProcessor::Ptr proc = currentPiano->getDirectProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        gallery->getNostalgic(Id)->clear();
+        
+        NostalgicProcessor::Ptr proc = currentPiano->getNostalgicProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        gallery->getSynchronic(Id)->clear();
+        
+        SynchronicProcessor::Ptr proc = currentPiano->getSynchronicProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        gallery->getTuning(Id)->clear();
+        
+        TuningProcessor::Ptr proc = currentPiano->getTuningProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        gallery->getTempo(Id)->clear();
+        
+        TempoProcessor::Ptr proc = currentPiano->getTempoProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+        gallery->getKeymap(Id)->clear();
+    }
+    if (type == PreparationTypeDirectMod)
+    {
+        gallery->getDirectModPreparation(Id)->clearAll();
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        gallery->getNostalgicModPreparation(Id)->clearAll();
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        gallery->getSynchronicModPreparation(Id)->clearAll();
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        gallery->getTuningModPreparation(Id)->clearAll();
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        gallery->getTempoModPreparation(Id)->clearAll();
+    }
     
 }
 

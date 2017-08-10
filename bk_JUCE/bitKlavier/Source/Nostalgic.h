@@ -79,6 +79,8 @@ public:
         
     }
     
+    
+    
     inline void copy(NostalgicPreparation::Ptr n)
     {
         nWaveDistance = n->getWavedistance();
@@ -261,6 +263,12 @@ public:
     Nostalgic(int Id):
     name("Nostalgic"+String(Id)),
     Id(Id)
+    {
+        sPrep       = new NostalgicPreparation();
+        aPrep       = new NostalgicPreparation(sPrep);
+    }
+    
+    inline void clear(void)
     {
         sPrep       = new NostalgicPreparation();
         aPrep       = new NostalgicPreparation(sPrep);

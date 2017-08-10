@@ -143,6 +143,12 @@ public:
         aPrep       = new DirectPreparation(sPrep);
     };
     
+    inline void clear(void)
+    {
+        sPrep       = new DirectPreparation();
+        aPrep       = new DirectPreparation(sPrep);
+    }
+    
     inline Direct::Ptr duplicate()
     {
         DirectPreparation::Ptr copyPrep = new DirectPreparation(sPrep);

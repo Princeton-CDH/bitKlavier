@@ -146,7 +146,6 @@ void TuningViewController::resized()
     
     comboBoxSlice.removeFromLeft(gXSpacing);
     A1reset.setBounds(comboBoxSlice.removeFromLeft(90));
-    clearModsButton.setBounds(A1reset.getBounds());
     
     /* *** above here should be generic (mostly) to all prep layouts *** */
     /* ***         below here will be specific to each prep          *** */
@@ -428,6 +427,7 @@ void TuningPreparationEditor::setCurrentId(int Id)
 
 void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparationEditor* vc)
 {
+    BKAudioProcessor& processor = vc->processor;
     if (action == 1)
     {
         int Id = vc->addPreparation();
@@ -444,11 +444,13 @@ void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparation
     }
     else if (action == 4)
     {
-        // IMPORT
+        processor.reset(PreparationTypeTuning, processor.updateState->currentTuningId);
+        vc->update();
     }
     else if (action == 5)
     {
-        // EXPORT
+        processor.clear(PreparationTypeTuning, processor.updateState->currentTuningId);
+        vc->update();
     }
 }
 
@@ -464,11 +466,6 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == selectCB.getName())
     {
-        if (Id == -1)
-        {
-            Id = addPreparation();
-        }
-        
         setCurrentId(Id);
     }
     else if (name == scaleCB.getName())
@@ -547,10 +544,7 @@ void TuningPreparationEditor::fillSelectCB(int last, int current)
     selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
     
     selectCB.setItemEnabled(selectedId, false);
-    
-    selectCB.addSeparator();
-    selectCB.addItem("New Tuning...", -1);
-    
+
     lastId = selectedId;
 }
 
@@ -671,7 +665,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        getPrepOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 }
 
@@ -702,10 +696,6 @@ TuningViewController(p, theGraph)
     customKeyboard.addMyListener(this);
     offsetSlider->addMyListener(this);
     hideOrShow.addListener(this);
-    
-    clearModsButton.setButtonText("clear mods");
-    addAndMakeVisible(clearModsButton);
-    clearModsButton.addListener(this);
 
     update();
 }
@@ -831,9 +821,6 @@ void TuningModificationEditor::fillSelectCB(int last, int current)
     
     selectCB.setItemEnabled(selectedId, false);
     
-    selectCB.addSeparator();
-    selectCB.addItem("New Tuning Mod...", -1);
-    
     lastId = selectedId;
 }
 
@@ -900,13 +887,10 @@ void TuningModificationEditor::actionButtonCallback(int action, TuningModificati
     {
         vc->deleteCurrent();
     }
-    else if (action == 4)
-    {
-        // IMPORT
-    }
     else if (action == 5)
     {
-        // EXPORT
+        processor.clear(PreparationTypeTuningMod, processor.updateState->currentModTuningId);
+        vc->update();
     }
 }
 
@@ -920,11 +904,6 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == selectCB.getName())
     {
-        if (Id == -1)
-        {
-            Id = addPreparation();
-        }
-        
         setCurrentId(Id);
     }
     else if (name == scaleCB.getName())
@@ -1040,11 +1019,9 @@ void TuningModificationEditor::buttonClicked (Button* b)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
-    else if (b == &clearModsButton)
+    else if (b == &actionButton)
     {
-        TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
-        mod->clearAll();
-        update();
+        getModOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     
     updateModification();

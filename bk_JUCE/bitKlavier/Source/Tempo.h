@@ -162,6 +162,12 @@ public:
         aPrep = new TempoPreparation(sPrep);
     }
     
+    inline void clear(void)
+    {
+        sPrep       = new TempoPreparation();
+        aPrep       = new TempoPreparation(sPrep);
+    }
+    
     inline Tempo::Ptr duplicate()
     {
         TempoPreparation::Ptr copyPrep = new TempoPreparation(sPrep);
