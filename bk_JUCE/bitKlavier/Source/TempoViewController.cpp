@@ -59,7 +59,7 @@ BKViewController(p, theGraph)
     A1AdaptedPeriodMultiplier.setJustificationType(juce::Justification::centredRight);
     
     A1reset.setButtonText("reset");
-    addAndMakeVisible(A1reset);
+    //addAndMakeVisible(A1reset);
     
     addAndMakeVisible(hideOrShow);
     hideOrShow.setName("hideOrShow");
