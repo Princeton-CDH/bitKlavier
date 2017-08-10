@@ -135,14 +135,14 @@ PopupMenu HeaderViewController::getNewMenu(void)
     PopupMenu newMenu;
     newMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
-    newMenu.addItem(DIRECT_ID, "(D) Direct");
-    newMenu.addItem(NOSTALGIC_ID, "(N) Nostalgic");
-    newMenu.addItem(SYNCHRONIC_ID, "(S) Synchronic");
-    newMenu.addItem(TUNING_ID, "(T) Tuning");
-    newMenu.addItem(TEMPO_ID, "(M) Tempo");
-    newMenu.addItem(MODIFICATION_ID, "(C) Modification");
-    newMenu.addItem(PIANOMAP_ID, "(P) PianoMap");
-    newMenu.addItem(RESET_ID, "(R) Reset");
+    newMenu.addItem(DIRECT_ID, "Direct (d)");
+    newMenu.addItem(NOSTALGIC_ID, "Nostalgic (n)");
+    newMenu.addItem(SYNCHRONIC_ID, "Synchronic (s)");
+    newMenu.addItem(TUNING_ID, "Tuning (t)");
+    newMenu.addItem(TEMPO_ID, "Tempo (m)");
+    newMenu.addItem(MODIFICATION_ID, "Modification (c)");
+    newMenu.addItem(PIANOMAP_ID, "Piano Map (p)");
+    newMenu.addItem(RESET_ID, "Reset (r)");
     
     return newMenu;
 }
