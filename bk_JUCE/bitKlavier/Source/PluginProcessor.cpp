@@ -53,6 +53,43 @@ BKAudioProcessor::~BKAudioProcessor()
     clipboard.clear();
 }
 
+void BKAudioProcessor::createNewGallery(String name)
+{
+    updateState->loadedJson = false;
+    
+    File bkGalleries;
+    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+    
+    String newFileName = name + ".xml";
+    String newFilePath= bkGalleries.getFullPathName() + "/" + newFileName;
+    
+    File myFile (newFilePath);
+    
+    myFile.appendData(BinaryData::__blank_xml, BinaryData::__blank_xmlSize);
+    
+    galleryNames.add(newFileName);
+    
+    currentGalleryPath = newFilePath;
+    
+    ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
+    
+    if (xml != nullptr)
+    {
+        currentGallery = myFile.getFileName();
+        
+        gallery = new Gallery(xml, *this);
+        
+        gallery->print();
+        
+        initializeGallery();
+        
+        galleryDidLoad = true;
+        
+        gallery->setGalleryDirty(false);
+    }
+    
+}
+
 void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)  
 {
     int p;

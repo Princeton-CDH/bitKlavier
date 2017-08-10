@@ -36,6 +36,8 @@ public:
     
     void switchGallery(void);
     
+    bool handleGalleryChange(void);
+    
 private:
     BKAudioProcessor& processor;
     

@@ -129,12 +129,15 @@ PopupMenu HeaderViewController::getPianoMenu(void)
 #define MODIFICATION_ID 13
 #define PIANOMAP_ID 14
 #define RESET_ID 15
+#define NEWGALLERY_ID 16
 
 PopupMenu HeaderViewController::getNewMenu(void)
 {
     PopupMenu newMenu;
     newMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
+    newMenu.addItem(NEWGALLERY_ID, "Gallery");
+    newMenu.addSeparator();
     newMenu.addItem(DIRECT_ID, "Direct (d)");
     newMenu.addItem(NOSTALGIC_ID, "Nostalgic (n)");
     newMenu.addItem(SYNCHRONIC_ID, "Synchronic (s)");
@@ -283,6 +286,29 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     {
         construction->addItem(PreparationTypeReset, true);
     }
+    else if (result == NEWGALLERY_ID)
+    {
+        bool shouldContinue = gvc->handleGalleryChange();
+        
+        if (!shouldContinue) return;
+        
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        prompt.addTextEditor("name", "My New Gallery");
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        DBG(name);
+        
+        if (result == 1)
+        {
+            processor.createNewGallery(name);
+        }
+    }
 }
 
 void HeaderViewController::bkButtonClicked (Button* b)
@@ -424,6 +450,8 @@ void HeaderViewController::bkTextFieldDidChange(TextEditor& tf)
     String text = tf.getText();
     String name = tf.getName();
     
+    DBG(text);
+    
 }
 
 void HeaderViewController::BKEditableComboBoxChanged(String text, BKEditableComboBox* cb)
@@ -431,12 +459,58 @@ void HeaderViewController::BKEditableComboBoxChanged(String text, BKEditableComb
     processor.currentPiano->setName(text);
 }
 
+bool HeaderViewController::handleGalleryChange(void)
+{
+    String name = galleryCB.getName();
+    
+    bool shouldSwitch = false;
+    
+    galleryIsDirtyAlertResult = 2;
+    
+    if(processor.gallery->isGalleryDirty())
+    {
+        DBG("GALLERY IS DIRTY, CHECK FOR SAVE HERE");
+        galleryModalCallBackIsOpen = true; //not sure, maybe should be doing some kind of Lock
+        
+        galleryIsDirtyAlertResult = AlertWindow::showYesNoCancelBox (AlertWindow::QuestionIcon,
+                                                                     "The current gallery has changed.",
+                                                                     "Do you want to save before switching galleries?",
+                                                                     String(),
+                                                                     String(),
+                                                                     String(),
+                                                                     0,
+                                                                     //ModalCallbackFunction::forComponent (alertBoxResultChosen, this)
+                                                                     nullptr);
+    }
+    
+    if(galleryIsDirtyAlertResult == 0)
+    {
+        DBG("cancelled");
+    }
+    else if(galleryIsDirtyAlertResult == 1)
+    {
+        DBG("saving gallery");
+        processor.saveGallery();
+        
+        shouldSwitch = true;
+    }
+    else if(galleryIsDirtyAlertResult == 2)
+    {
+        DBG("not saving");
+        shouldSwitch = true;
+    }
+    
+    galleryModalCallBackIsOpen = false;
+    
+    return shouldSwitch;
+}
+
 
 void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
 {
-    // Change piano
     String name = cb->getName();
     int Id = cb->getSelectedId();
+    int index = cb->getSelectedItemIndex();
 
     
     if (name == "pianoCB")
@@ -457,52 +531,20 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
     }
     else if (name == "galleryCB")
     {
-        galleryIsDirtyAlertResult = 2;
-
-        if(processor.gallery->isGalleryDirty())
+        bool shouldSwitch = handleGalleryChange();
+        
+        if (shouldSwitch)
         {
-            DBG("GALLERY IS DIRTY, CHECK FOR SAVE HERE");
-            galleryModalCallBackIsOpen = true; //not sure, maybe should be doing some kind of Lock
+            String path = processor.galleryNames[index];
+            lastGalleryCBId = Id;
             
-            galleryIsDirtyAlertResult = AlertWindow::showYesNoCancelBox (AlertWindow::QuestionIcon,
-                                          "The current gallery has changed!",
-                                          "do you want to save it before switching galleries?",
-                                          String(),
-                                          String(),
-                                          String(),
-                                          0,
-                                          //ModalCallbackFunction::forComponent (alertBoxResultChosen, this)
-                                             nullptr);
+            if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
+            else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
         }
-
-        if(galleryIsDirtyAlertResult == 0)
+        else
         {
             cb->setSelectedId(lastGalleryCBId, dontSendNotification);
-            DBG("reverting to prior gallery");
         }
-        else if(galleryIsDirtyAlertResult == 1)
-        {
-            DBG("saving gallery first");
-            processor.saveGallery();
-            
-            String path = processor.galleryNames[cb->getSelectedItemIndex()];
-            lastGalleryCBId = Id;
-            
-            if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
-            else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
-        }
-        else if(galleryIsDirtyAlertResult == 2)
-        {
-            DBG("changing galleries without saving first");
-            String path = processor.galleryNames[cb->getSelectedItemIndex()];
-            lastGalleryCBId = Id;
-            
-            if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
-            else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
-        }
-        
-        galleryModalCallBackIsOpen = false;
-
     }
 }
 
