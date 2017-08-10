@@ -51,6 +51,7 @@ construction(c)
     addAndMakeVisible(galleryCB);
     galleryCB.setName("galleryCB");
     galleryCB.addListener(this);
+    galleryCB.addMyListener(this);
     //galleryCB.BKSetJustificationType(juce::Justification::centredRight);
     
     galleryCB.setSelectedId(0, dontSendNotification);
@@ -469,7 +470,14 @@ void HeaderViewController::bkTextFieldDidChange(TextEditor& tf)
 
 void HeaderViewController::BKEditableComboBoxChanged(String text, BKEditableComboBox* cb)
 {
-    processor.currentPiano->setName(text);
+    if (cb == &pianoCB)
+    {
+        processor.currentPiano->setName(text);
+    }
+    else if (cb == &galleryCB)
+    {
+        processor.renameGallery(text);
+    }
 }
 
 bool HeaderViewController::handleGalleryChange(void)

@@ -48,6 +48,7 @@ public:
     void saveGalleryAs(void);
     void saveGallery(void);
     void createNewGallery(String name);
+    void renameGallery(String name);
     
     String firstGallery(void);
     void initializeGallery(void);

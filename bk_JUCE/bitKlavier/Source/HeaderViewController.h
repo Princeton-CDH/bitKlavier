@@ -67,7 +67,7 @@ private:
     TextButton  pianoB;
     TextButton  galleryB;
     
-    BKComboBox galleryCB;
+    BKEditableComboBox galleryCB;
     BKEditableComboBox pianoCB;
     int lastGalleryCBId;
     bool galleryModalCallBackIsOpen;

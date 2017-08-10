@@ -90,6 +90,21 @@ void BKAudioProcessor::createNewGallery(String name)
     
 }
 
+void BKAudioProcessor::renameGallery(String name)
+{
+    File bkGalleries;
+    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+    
+    File currentFile = bkGalleries.getChildFile(currentGallery);
+   
+    String newFileName = name + ".xml";
+    String newFilePath= bkGalleries.getFullPathName() + "/" + newFileName;
+    
+    File newFile(newFilePath);
+    
+    currentFile.moveFileTo(newFile);
+}
+
 void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)  
 {
     int p;
