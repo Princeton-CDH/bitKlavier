@@ -10,6 +10,24 @@
 
 #include "HeaderViewController.h"
 
+#define SAVE_ID 1
+#define SAVEAS_ID 2
+#define OPEN_ID 3
+#define NEW_ID 4
+#define CLEAN_ID 5
+#define SETTINGS_ID 6
+#define OPENOLD_ID 7
+#define DIRECT_ID 8
+#define NOSTALGIC_ID 9
+#define SYNCHRONIC_ID 10
+#define TUNING_ID 11
+#define TEMPO_ID 12
+#define MODIFICATION_ID 13
+#define PIANOMAP_ID 14
+#define RESET_ID 15
+#define NEWGALLERY_ID 16
+
+
 HeaderViewController::HeaderViewController (BKAudioProcessor& p, BKConstructionSite* c):
 processor (p),
 construction(c)
@@ -108,36 +126,22 @@ PopupMenu HeaderViewController::getPianoMenu(void)
     pianoMenu.addItem(1, "New");
     pianoMenu.addItem(2, "Duplicate");
     pianoMenu.addItem(3, "Delete");
+    
+    pianoMenu.addSeparator();
+    pianoMenu.addSubMenu("Add...", getNewMenu());
+    pianoMenu.addSeparator();
+   
     //pianoMenu.addSeparator();
     //pianoMenu.addItem(3, "Settings");
     
     return pianoMenu;
 }
 
-#define SAVE_ID 1
-#define SAVEAS_ID 2
-#define OPEN_ID 3
-#define NEW_ID 4
-#define CLEAN_ID 5
-#define SETTINGS_ID 6
-#define OPENOLD_ID 7
-#define DIRECT_ID 8
-#define NOSTALGIC_ID 9
-#define SYNCHRONIC_ID 10
-#define TUNING_ID 11
-#define TEMPO_ID 12
-#define MODIFICATION_ID 13
-#define PIANOMAP_ID 14
-#define RESET_ID 15
-#define NEWGALLERY_ID 16
-
 PopupMenu HeaderViewController::getNewMenu(void)
 {
     PopupMenu newMenu;
     newMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
-    newMenu.addItem(NEWGALLERY_ID, "Gallery");
-    newMenu.addSeparator();
     newMenu.addItem(DIRECT_ID, "Direct (d)");
     newMenu.addItem(NOSTALGIC_ID, "Nostalgic (n)");
     newMenu.addItem(SYNCHRONIC_ID, "Synchronic (s)");
@@ -155,20 +159,28 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     PopupMenu galleryMenu;
     galleryMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
-    galleryMenu.addItem(SAVE_ID, "Save");
-    galleryMenu.addItem(SAVEAS_ID, "Save as...");
-    galleryMenu.addItem(OPEN_ID, "Open...");
+    galleryMenu.addItem(SETTINGS_ID, "Settings...");
     galleryMenu.addSeparator();
-    galleryMenu.addSubMenu("New...", getNewMenu());
+    galleryMenu.addItem(NEWGALLERY_ID, "New...");
+    galleryMenu.addSeparator();
+    galleryMenu.addItem(OPEN_ID, "Open...");
+    galleryMenu.addItem(OPENOLD_ID, "Open (legacy)...");
+    galleryMenu.addSeparator();
+    
+    String saveKeystroke = "(Cmd-S)";
+    String saveAsKeystroke = "(Shift-Cmd-S)";
+    
+#if JUCE_WINDOWS
+    saveKeystroke = "(Ctrl-S)";
+    saveAsKeystroke = "(Shift-Ctrl-S)"
+#endif
+    
+    galleryMenu.addItem(SAVE_ID, "Save " );
+    galleryMenu.addItem(SAVEAS_ID, "Save as... ");
     galleryMenu.addSeparator();
     galleryMenu.addItem(CLEAN_ID, "Clean");
-    galleryMenu.addSeparator();
-    galleryMenu.addItem(SETTINGS_ID, "Gallery Settings");
-    galleryMenu.addSeparator();
-    galleryMenu.addItem(OPENOLD_ID, "Open (legacy)...");
     
     return galleryMenu;
-    
     
 }
 
@@ -180,6 +192,8 @@ void HeaderViewController::loadMenuCallback(int result, HeaderViewController* gv
 void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* hvc)
 {
     BKAudioProcessor& processor = hvc->processor;
+    BKConstructionSite* construction = hvc->construction;
+    
     if (result == 1) // New piano
     {
         int newId = processor.gallery->getNewId(PreparationTypePiano);
@@ -223,37 +237,6 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
         
         processor.setCurrentPiano(newPianoId);
     }
-    
-}
-
-void HeaderViewController::galleryMenuCallback(int result, HeaderViewController* gvc)
-{
-    BKAudioProcessor& processor = gvc->processor;
-    BKConstructionSite* construction = gvc->construction;
-    if (result == SAVE_ID)
-    {
-        processor.saveGallery();
-    }
-    if (result == SAVEAS_ID)
-    {
-        processor.saveGalleryAs();
-    }
-    else if (result == OPEN_ID) // Load
-    {
-        processor.loadGalleryDialog();
-    }
-    else if (result == SETTINGS_ID) // open General settings
-    {
-        processor.updateState->setCurrentDisplay(DisplayGeneral);
-    }
-    else if (result == CLEAN_ID) // Clean
-    {
-        processor.gallery->clean();
-    }
-    else if (result == OPENOLD_ID) // Load (old)
-    {
-        processor.loadJsonGalleryDialog();
-    }
     else if (result == DIRECT_ID)
     {
         construction->addItem(PreparationTypeDirect, true);
@@ -285,6 +268,36 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     else if (result == RESET_ID)
     {
         construction->addItem(PreparationTypeReset, true);
+    }
+    
+}
+
+void HeaderViewController::galleryMenuCallback(int result, HeaderViewController* gvc)
+{
+    BKAudioProcessor& processor = gvc->processor;
+    if (result == SAVE_ID)
+    {
+        processor.saveGallery();
+    }
+    if (result == SAVEAS_ID)
+    {
+        processor.saveGalleryAs();
+    }
+    else if (result == OPEN_ID) // Load
+    {
+        processor.loadGalleryDialog();
+    }
+    else if (result == SETTINGS_ID) // open General settings
+    {
+        processor.updateState->setCurrentDisplay(DisplayGeneral);
+    }
+    else if (result == CLEAN_ID) // Clean
+    {
+        processor.gallery->clean();
+    }
+    else if (result == OPENOLD_ID) // Load (old)
+    {
+        processor.loadJsonGalleryDialog();
     }
     else if (result == NEWGALLERY_ID)
     {
