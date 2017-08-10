@@ -53,6 +53,14 @@ BKAudioProcessor::~BKAudioProcessor()
     clipboard.clear();
 }
 
+void BKAudioProcessor::deleteGallery(void)
+{
+    File gallery(currentGalleryPath);
+    gallery.deleteFile();
+    
+    loadGalleryFromPath(firstGallery());
+}
+
 void BKAudioProcessor::createNewGallery(String name)
 {
     updateState->loadedJson = false;
@@ -75,7 +83,7 @@ void BKAudioProcessor::createNewGallery(String name)
     File myFile(bkGalleries);
     myFile = myFile.getNonexistentChildFile(name, ".xml", true);
     myFile.appendData(BinaryData::__blank_xml, BinaryData::__blank_xmlSize);
-    galleryNames.add(myFile.getFileName());
+    galleryNames.add(myFile.getFullPathName());
     
     ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
     

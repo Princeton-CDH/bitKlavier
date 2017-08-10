@@ -49,6 +49,7 @@ public:
     void saveGallery(void);
     void createNewGallery(String name);
     void renameGallery(String name);
+    void deleteGallery(void);
     
     String firstGallery(void);
     void initializeGallery(void);
@@ -71,7 +72,7 @@ public:
     String                              currentGalleryPath;
     
     
-    
+   
     void updateGalleries(void);
     
     void collectGalleries(void);
@@ -175,6 +176,7 @@ public:
     
     void reset(BKPreparationType type, int Id);
     void clear(BKPreparationType type, int Id);
+    
 
 
 private:

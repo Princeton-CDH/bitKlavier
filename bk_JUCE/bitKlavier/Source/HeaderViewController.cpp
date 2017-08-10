@@ -26,7 +26,7 @@
 #define PIANOMAP_ID 14
 #define RESET_ID 15
 #define NEWGALLERY_ID 16
-
+#define DELETE_ID 17
 
 HeaderViewController::HeaderViewController (BKAudioProcessor& p, BKConstructionSite* c):
 processor (p),
@@ -178,6 +178,9 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addItem(SAVEAS_ID, "Save as... ");
     galleryMenu.addSeparator();
     galleryMenu.addItem(CLEAN_ID, "Clean");
+    galleryMenu.addSeparator();
+    galleryMenu.addItem(DELETE_ID, "Delete");
+    
     
     return galleryMenu;
     
@@ -293,6 +296,10 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     else if (result == CLEAN_ID) // Clean
     {
         processor.gallery->clean();
+    }
+    else if (result == DELETE_ID) // Clean
+    {
+        processor.deleteGallery();
     }
     else if (result == OPENOLD_ID) // Load (old)
     {
