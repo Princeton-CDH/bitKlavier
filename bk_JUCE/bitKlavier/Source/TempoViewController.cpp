@@ -98,7 +98,6 @@ void TempoViewController::resized()
     
     comboBoxSlice.removeFromLeft(gXSpacing);
     A1reset.setBounds(comboBoxSlice.removeFromLeft(90));
-    clearModsButton.setBounds(A1reset.getBounds());
     
     /* *** above here should be generic (mostly) to all prep layouts *** */
     /* ***         below here will be specific to each prep          *** */
@@ -296,9 +295,6 @@ void TempoPreparationEditor::fillSelectCB(int last, int current)
     
     selectCB.setItemEnabled(selectedId, false);
     
-    selectCB.addSeparator();
-    selectCB.addItem("New Tempo...", -1);
-    
     lastId = selectedId;
 }
 
@@ -349,6 +345,7 @@ void TempoPreparationEditor::setCurrentId(int Id)
 
 void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEditor* vc)
 {
+    BKAudioProcessor& processor = vc->processor;
     if (action == 1)
     {
         int Id = vc->addPreparation();
@@ -365,11 +362,13 @@ void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEd
     }
     else if (action == 4)
     {
-        // IMPORT
+        processor.reset(PreparationTypeTempo, processor.updateState->currentTempoId);
+        vc->update();
     }
     else if (action == 5)
     {
-        // EXPORT
+        processor.clear(PreparationTypeTempo, processor.updateState->currentTempoId);
+        vc->update();
     }
 }
 
@@ -385,11 +384,6 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == selectCB.getName())
     {
-        if (Id == -1)
-        {
-            Id = addPreparation();
-        }
-        
         setCurrentId(Id);
     }
     else if (name == modeCB.getName())
@@ -488,7 +482,7 @@ void TempoPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        getPrepOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     
 }
@@ -511,11 +505,7 @@ TempoViewController(p, theGraph)
     AT1MinMaxSlider->addMyListener(this);
     A1ModeCB.addListener(this);
     hideOrShow.addListener(this);
-    
-    clearModsButton.setButtonText("clear mods");
-    addAndMakeVisible(clearModsButton);
-    clearModsButton.addListener(this);
-    
+
     update();
 }
 
@@ -571,9 +561,6 @@ void TempoModificationEditor::fillSelectCB(int last, int current)
     selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
     
     selectCB.setItemEnabled(selectedId, false);
-    
-    selectCB.addSeparator();
-    selectCB.addItem("New Tempo Mod...", -1);
     
     lastId = selectedId;
 }
@@ -672,6 +659,7 @@ void TempoModificationEditor::setCurrentId(int Id)
 
 void TempoModificationEditor::actionButtonCallback(int action, TempoModificationEditor* vc)
 {
+    BKAudioProcessor& processor = vc->processor;
     if (action == 1)
     {
         int Id = vc->addPreparation();
@@ -686,13 +674,11 @@ void TempoModificationEditor::actionButtonCallback(int action, TempoModification
     {
         vc->deleteCurrent();
     }
-    else if (action == 4)
-    {
-        // IMPORT
-    }
     else if (action == 5)
     {
-        // EXPORT
+        processor.clear(PreparationTypeTempoMod, processor.updateState->currentModTempoId);
+        vc->update();
+        vc->updateModification();
     }
 }
 
@@ -706,11 +692,6 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == selectCB.getName())
     {
-        if (Id == -1)
-        {
-            Id = addPreparation();
-        }
-        
         setCurrentId(Id);
     }
     else if (name == modeCB.getName())
@@ -792,13 +773,10 @@ void TempoModificationEditor::buttonClicked (Button* b)
     else if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
-        
     }
-    else if (b == &clearModsButton)
+    else if (b == &actionButton)
     {
-        TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
-        mod->clearAll();
-        update();
+        getModOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     
 }

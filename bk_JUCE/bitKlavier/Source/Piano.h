@@ -86,11 +86,11 @@ public:
     void addProcessor(BKPreparationType thisType, int thisId);
     bool containsProcessor(BKPreparationType thisType, int thisId);
     
-    DirectProcessor::Ptr        getDirectProcessor(int Id);
-    NostalgicProcessor::Ptr     getNostalgicProcessor(int Id);
-    SynchronicProcessor::Ptr    getSynchronicProcessor(int Id);
-    TuningProcessor::Ptr        getTuningProcessor(int Id);
-    TempoProcessor::Ptr         getTempoProcessor(int Id);
+    DirectProcessor::Ptr        getDirectProcessor(int Id, bool add = true);
+    NostalgicProcessor::Ptr     getNostalgicProcessor(int Id, bool add = true);
+    SynchronicProcessor::Ptr    getSynchronicProcessor(int Id, bool add = true);
+    TuningProcessor::Ptr        getTuningProcessor(int Id, bool add = true);
+    TempoProcessor::Ptr         getTempoProcessor(int Id, bool add = true);
     
     inline DirectProcessor::PtrArr        getDirectProcessors(void) const noexcept { return dprocessor; }
     inline NostalgicProcessor::PtrArr     getNostalgicProcessors(void) const noexcept { return nprocessor; }
@@ -105,8 +105,7 @@ public:
     TuningProcessor::Ptr        addTuningProcessor(int thisId);
     TempoProcessor::Ptr         addTempoProcessor(int thisId);
     
-    
-    
+
     Array<int>                  pianoMap;
     int                         numPMaps;
     

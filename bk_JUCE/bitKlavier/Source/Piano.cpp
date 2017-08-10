@@ -190,54 +190,54 @@ SynchronicProcessor::Ptr Piano::addSynchronicProcessor(int thisId)
     return sproc;
 }
 
-DirectProcessor::Ptr Piano::getDirectProcessor(int Id)
+DirectProcessor::Ptr Piano::getDirectProcessor(int Id, bool add)
 {
     for (auto proc : dprocessor)
     {
         if (proc->getId() == Id) return proc;
     }
     
-    return addDirectProcessor(Id);
+    return add ? addDirectProcessor(Id) : nullptr;
 }
 
-NostalgicProcessor::Ptr Piano::getNostalgicProcessor(int Id)
+NostalgicProcessor::Ptr Piano::getNostalgicProcessor(int Id, bool add)
 {
     for (auto proc : nprocessor)
     {
         if (proc->getId() == Id) return proc;
     }
     
-    return addNostalgicProcessor(Id);
+    return add ? addNostalgicProcessor(Id) : nullptr;
 }
 
-SynchronicProcessor::Ptr Piano::getSynchronicProcessor(int Id)
+SynchronicProcessor::Ptr Piano::getSynchronicProcessor(int Id, bool add)
 {
     for (auto proc : sprocessor)
     {
         if (proc->getId() == Id) return proc;
     }
     
-    return addSynchronicProcessor(Id);
+    return add ? addSynchronicProcessor(Id) : nullptr;
 }
 
-TuningProcessor::Ptr Piano::getTuningProcessor(int Id)
+TuningProcessor::Ptr Piano::getTuningProcessor(int Id, bool add)
 {
     for (auto proc : tprocessor)
     {
         if (proc->getId() == Id) return proc;
     }
     
-    return addTuningProcessor(Id);
+    return add ? addTuningProcessor(Id) : nullptr;
 }
 
-TempoProcessor::Ptr Piano::getTempoProcessor(int Id)
+TempoProcessor::Ptr Piano::getTempoProcessor(int Id, bool add)
 {
     for (auto proc : mprocessor)
     {
         if (proc->getId() == Id) return proc;
     }
     
-    return addTempoProcessor(Id);
+    return add ? addTempoProcessor(Id) : nullptr;
 }
 
 

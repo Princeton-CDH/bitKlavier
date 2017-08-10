@@ -48,8 +48,6 @@ protected:
     void fillModeCB(void);
     void fillA1ModeCB(void);
     
-    TextButton clearModsButton;
-    
     void updateComponentVisibility();
     
 private:

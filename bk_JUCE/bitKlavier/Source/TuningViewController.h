@@ -67,8 +67,6 @@ protected:
     ImageComponent iconImageComponent;
     TextButton hideOrShow;
     BKButtonAndMenuLAF buttonsAndMenusLAF;
-    
-    TextButton clearModsButton;
 
     //other overrides
     

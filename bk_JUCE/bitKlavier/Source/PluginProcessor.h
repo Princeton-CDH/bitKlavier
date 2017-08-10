@@ -47,6 +47,8 @@ public:
     void loadJsonGalleryFromPath(String path);
     void saveGalleryAs(void);
     void saveGallery(void);
+    void createNewGallery(String name);
+    void renameGallery(String name);
     
     String firstGallery(void);
     void initializeGallery(void);
@@ -67,6 +69,7 @@ public:
     StringArray                         galleryNames;
     String                              currentGallery;
     String                              currentGalleryPath;
+    
     
     
     void updateGalleries(void);
@@ -169,6 +172,9 @@ public:
         }
         return false;
     }
+    
+    void reset(BKPreparationType type, int Id);
+    void clear(BKPreparationType type, int Id);
 
 
 private:

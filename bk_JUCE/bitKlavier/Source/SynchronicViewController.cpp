@@ -138,7 +138,6 @@ void SynchronicViewController::resized()
                            selectCB.getHeight());
     
     comboBoxSlice.removeFromLeft(gXSpacing);
-    clearModsButton.setBounds(comboBoxSlice.removeFromLeft(90));
     
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
@@ -447,10 +446,7 @@ void SynchronicPreparationEditor::fillSelectCB(int last, int current)
     selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
     
     selectCB.setItemEnabled(selectedId, false);
-    
-    selectCB.addSeparator();
-    selectCB.addItem("New Synchronic...", -1);
-    
+
     lastId = selectedId;
 }
 
@@ -520,11 +516,13 @@ void SynchronicPreparationEditor::actionButtonCallback(int action, SynchronicPre
     }
     else if (action == 4)
     {
-        // IMPORT
+        processor.reset(PreparationTypeSynchronic, processor.updateState->currentSynchronicId);
+        vc->update();
     }
     else if (action == 5)
     {
-        // EXPORT
+        processor.clear(PreparationTypeSynchronic, processor.updateState->currentSynchronicId);
+        vc->update();
     }
 }
 
@@ -537,11 +535,6 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == selectCB.getName())
     {
-        if (Id == -1)
-        {
-            Id = addPreparation();
-        }
-        
         setCurrentId(Id);
     }
     else if (name == "Mode")
@@ -641,7 +634,7 @@ void SynchronicPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        getPrepOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 }
 
@@ -668,10 +661,6 @@ SynchronicViewController(p, theGraph)
     {
         paramSliders[i]->addMyListener(this);
     }
-    
-    clearModsButton.setButtonText("clear mods");
-    addAndMakeVisible(clearModsButton);
-    clearModsButton.addListener(this);
     
     //startTimer(20);
     
@@ -845,9 +834,6 @@ void SynchronicModificationEditor::fillSelectCB(int last, int current)
     selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
     
     selectCB.setItemEnabled(selectedId, false);
-    
-    selectCB.addSeparator();
-    selectCB.addItem("New Synchronic Mod...", -1);
     
     lastId = selectedId;
 }
@@ -1024,13 +1010,11 @@ void SynchronicModificationEditor::actionButtonCallback(int action, SynchronicMo
     {
         vc->deleteCurrent();
     }
-    else if (action == 4)
-    {
-        // IMPORT
-    }
     else if (action == 5)
     {
-        // EXPORT
+        processor.clear(PreparationTypeSynchronicMod, processor.updateState->currentModSynchronicId);
+        vc->update();
+        vc->updateModification();
     }
 }
 
@@ -1043,11 +1027,6 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == selectCB.getName())
     {
-        if (Id == -1)
-        {
-            Id = addPreparation();
-        }
-        
         setCurrentId(Id);
     }
     else if (name == "Mode")
@@ -1146,15 +1125,9 @@ void SynchronicModificationEditor::buttonClicked (Button* b)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
-    else if (b == &clearModsButton)
-    {
-        SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
-        mod->clearAll();
-        update();
-    }
     else if (b == &actionButton)
     {
-        getOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        getModOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     
     updateModification();

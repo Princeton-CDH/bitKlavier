@@ -183,13 +183,10 @@ void KeymapViewController::actionButtonCallback(int action, KeymapViewController
     {
         vc->deleteCurrent();
     }
-    else if (action == 4)
-    {
-        // IMPORT
-    }
     else if (action == 5)
     {
-        // EXPORT
+        processor.clear(PreparationTypeKeymap, processor.updateState->currentKeymapId);
+        vc->update();
     }
 }
 
@@ -248,10 +245,7 @@ void KeymapViewController::fillSelectCB(int last, int current)
     selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
     
     selectCB.setItemEnabled(selectedId, false);
-    
-    selectCB.addSeparator();
-    selectCB.addItem("New Keymap...", -1);
-    
+
     lastId = selectedId;
 }
 
@@ -269,7 +263,7 @@ void KeymapViewController::bkButtonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        getModOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 }
 

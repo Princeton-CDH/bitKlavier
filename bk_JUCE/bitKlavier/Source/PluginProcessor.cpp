@@ -53,6 +53,66 @@ BKAudioProcessor::~BKAudioProcessor()
     clipboard.clear();
 }
 
+void BKAudioProcessor::createNewGallery(String name)
+{
+    updateState->loadedJson = false;
+    
+    File bkGalleries;
+    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+    
+    /*
+    String newFileName = name + ".xml";
+    String newFilePath= bkGalleries.getFullPathName() + "/" + newFileName;
+    
+    File myFile (newFilePath);
+    myFile.appendData(BinaryData::__blank_xml, BinaryData::__blank_xmlSize);
+    
+    galleryNames.add(newFileName);
+    
+    currentGalleryPath = newFilePath;
+     */
+    
+    File myFile(bkGalleries);
+    myFile = myFile.getNonexistentChildFile(name, ".xml", true);
+    myFile.appendData(BinaryData::__blank_xml, BinaryData::__blank_xmlSize);
+    galleryNames.add(myFile.getFileName());
+    currentGalleryPath = myFile.getFullPathName();
+    DBG("new gallery = " + currentGalleryPath);
+    
+    ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
+    
+    if (xml != nullptr)
+    {
+        currentGallery = myFile.getFileName();
+        
+        gallery = new Gallery(xml, *this);
+        
+        gallery->print();
+        
+        initializeGallery();
+        
+        galleryDidLoad = true;
+        
+        gallery->setGalleryDirty(false);
+    }
+    
+}
+
+void BKAudioProcessor::renameGallery(String name)
+{
+    File bkGalleries;
+    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+    
+    File currentFile = bkGalleries.getChildFile(currentGallery);
+   
+    String newFileName = name + ".xml";
+    String newFilePath= bkGalleries.getFullPathName() + "/" + newFileName;
+    
+    File newFile(newFilePath);
+    
+    bool success = currentFile.moveFileTo(newFile);
+}
+
 void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)  
 {
     int p;
@@ -227,7 +287,6 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     gallery->setDefaultPiano(which);
     gallery->setGalleryDirty(false);
 }
-
 
 // Reset
 void BKAudioProcessor::performResets(int noteNumber)
@@ -612,7 +671,134 @@ void BKAudioProcessor::initializeGallery(void)
     updateUI();
     
     updateGalleries();
+
+}
+
+void BKAudioProcessor::reset(BKPreparationType type, int Id)
+{
+    if (type == PreparationTypeDirect)
+    {
+        DirectProcessor::Ptr proc = currentPiano->getDirectProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        NostalgicProcessor::Ptr proc = currentPiano->getNostalgicProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        SynchronicProcessor::Ptr proc = currentPiano->getSynchronicProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        TuningProcessor::Ptr proc = currentPiano->getTuningProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        TempoProcessor::Ptr proc = currentPiano->getTempoProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+        gallery->getKeymap(Id)->clear();
+    }
+    if (type == PreparationTypeDirectMod)
+    {
+        gallery->getDirectModPreparation(Id)->clearAll();
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        gallery->getNostalgicModPreparation(Id)->clearAll();
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        gallery->getSynchronicModPreparation(Id)->clearAll();
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        gallery->getTuningModPreparation(Id)->clearAll();
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        gallery->getTempoModPreparation(Id)->clearAll();
+    }
     
+}
+
+void BKAudioProcessor::clear(BKPreparationType type, int Id)
+{
+    if (type == PreparationTypeDirect)
+    {
+        gallery->getDirect(Id)->clear();
+        
+        DirectProcessor::Ptr proc = currentPiano->getDirectProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        gallery->getNostalgic(Id)->clear();
+        
+        NostalgicProcessor::Ptr proc = currentPiano->getNostalgicProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        gallery->getSynchronic(Id)->clear();
+        
+        SynchronicProcessor::Ptr proc = currentPiano->getSynchronicProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        gallery->getTuning(Id)->clear();
+        
+        TuningProcessor::Ptr proc = currentPiano->getTuningProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        gallery->getTempo(Id)->clear();
+        
+        TempoProcessor::Ptr proc = currentPiano->getTempoProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+        gallery->getKeymap(Id)->clear();
+    }
+    if (type == PreparationTypeDirectMod)
+    {
+        gallery->getDirectModPreparation(Id)->clearAll();
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        gallery->getNostalgicModPreparation(Id)->clearAll();
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        gallery->getSynchronicModPreparation(Id)->clearAll();
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        gallery->getTuningModPreparation(Id)->clearAll();
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        gallery->getTempoModPreparation(Id)->clearAll();
+    }
     
 }
 

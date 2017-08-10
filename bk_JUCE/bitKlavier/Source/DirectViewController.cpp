@@ -82,8 +82,6 @@ void DirectViewController::resized()
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
     
-    clearModsButton.setBounds(comboBoxSlice.removeFromLeft(90));
-    
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
     
@@ -236,11 +234,13 @@ void DirectPreparationEditor::actionButtonCallback(int action, DirectPreparation
     }
     else if (action == 4)
     {
-        // IMPORT
+        processor.reset(PreparationTypeDirect, processor.updateState->currentDirectId);
+        vc->update();
     }
     else if (action == 5)
     {
-        // EXPORT
+        processor.clear(PreparationTypeDirect, processor.updateState->currentDirectId);
+        vc->update();
     }
 }
 
@@ -251,11 +251,6 @@ void DirectPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 
     if (name == "Direct")
     {
-        if (Id == -1)
-        {
-            Id = addPreparation();
-        }
-        
         setCurrentId(Id);
     }
 }
@@ -332,8 +327,6 @@ void DirectPreparationEditor::fillSelectCB(int last, int current)
     
     selectCB.setItemEnabled(selectedId, false);
     
-    selectCB.addSeparator();
-    selectCB.addItem("New Direct...", -1);
     
     lastId = selectedId;
 }
@@ -346,7 +339,7 @@ void DirectPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        getPrepOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 }
 
@@ -370,10 +363,6 @@ DirectViewController(p, theGraph)
     hammerGainSlider->addMyListener(this);
     
     hideOrShow.addListener(this);
-    
-    clearModsButton.setButtonText("clear mods");
-    addAndMakeVisible(clearModsButton);
-    clearModsButton.addListener(this);
 }
 
 void DirectModificationEditor::greyOutAllComponents()
@@ -448,9 +437,6 @@ void DirectModificationEditor::fillSelectCB(int last, int current)
     selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
     
     selectCB.setItemEnabled(selectedId, false);
-    
-    selectCB.addSeparator();
-    selectCB.addItem("New Direct Mod...", -1);
     
     lastId = selectedId;
     
@@ -527,13 +513,11 @@ void DirectModificationEditor::actionButtonCallback(int action, DirectModificati
     {
         vc->deleteCurrent();
     }
-    else if (action == 4)
-    {
-        // IMPORT
-    }
     else if (action == 5)
     {
-        // EXPORT
+        processor.clear(PreparationTypeDirectMod, processor.updateState->currentModDirectId);
+        vc->update();
+        vc->updateModification();
     }
 }
 
@@ -544,11 +528,6 @@ void DirectModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == "Direct")
     {
-        if (Id == -1)
-        {
-            Id = addPreparation();
-        }
-        
         setCurrentId(Id);
     }
 }
@@ -607,15 +586,9 @@ void DirectModificationEditor::buttonClicked (Button* b)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
-    else if (b == &clearModsButton)
-    {
-        DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
-        mod->clearAll();
-        update();
-    }
     else if (b == &actionButton)
     {
-        getOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        getModOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 }
 

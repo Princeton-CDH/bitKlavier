@@ -303,7 +303,7 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
     
     if (center)
     {
-        toAdd->setTopLeftPosition(250, 250);
+        toAdd->setTopLeftPosition(300, 250);
     }
     else
     {

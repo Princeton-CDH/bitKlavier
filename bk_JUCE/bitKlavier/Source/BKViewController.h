@@ -40,7 +40,7 @@ public:
         
     }
     
-    PopupMenu getOptionMenu(void)
+    PopupMenu getPrepOptionMenu(void)
     {
         PopupMenu optionMenu;
         optionMenu.setLookAndFeel(&buttonsAndMenusLAF);
@@ -50,8 +50,28 @@ public:
         optionMenu.addItem(2, "Duplicate");
         optionMenu.addItem(3, "Delete");
         optionMenu.addSeparator();
-        optionMenu.addItem(4, "Import");
-        optionMenu.addItem(5, "Export");
+        optionMenu.addItem(4, "Reset");
+        optionMenu.addItem(5, "Clear");
+        
+        return optionMenu;
+    }
+    
+    PopupMenu getModOptionMenu(void)
+    {
+        PopupMenu optionMenu;
+        optionMenu.setLookAndFeel(&buttonsAndMenusLAF);
+        
+        optionMenu.addItem(1, "New");
+        
+        optionMenu.addItem(2, "Duplicate");
+        optionMenu.addItem(3, "Delete");
+        optionMenu.addSeparator();
+        optionMenu.addItem(5, "Clear");
+        /*
+         optionMenu.addSeparator();
+         optionMenu.addItem(4, "Import");
+         optionMenu.addItem(5, "Export");
+         */
         
         return optionMenu;
     }

@@ -36,6 +36,8 @@ public:
     
     void switchGallery(void);
     
+    bool handleGalleryChange(void);
+    
 private:
     BKAudioProcessor& processor;
     
@@ -65,7 +67,7 @@ private:
     TextButton  pianoB;
     TextButton  galleryB;
     
-    BKComboBox galleryCB;
+    BKEditableComboBox galleryCB;
     BKEditableComboBox pianoCB;
     int lastGalleryCBId;
     bool galleryModalCallBackIsOpen;

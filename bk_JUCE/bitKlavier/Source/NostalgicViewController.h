@@ -37,8 +37,6 @@ public:
     virtual void update(void) {};
     
     void fillModeSelectCB(void);
-    
-    TextButton clearModsButton;
 
 private:
     

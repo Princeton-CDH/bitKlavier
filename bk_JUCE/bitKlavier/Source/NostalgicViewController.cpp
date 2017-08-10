@@ -95,8 +95,6 @@ void NostalgicViewController::resized()
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
     
-    clearModsButton.setBounds(comboBoxSlice.removeFromLeft(90));
-    
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
     
@@ -298,11 +296,13 @@ void NostalgicPreparationEditor::actionButtonCallback(int action, NostalgicPrepa
     }
     else if (action == 4)
     {
-        // IMPORT
+        processor.reset(PreparationTypeNostalgic, processor.updateState->currentNostalgicId);
+        vc->update();
     }
-    else if (action == 5)
+    else if (action == 4)
     {
-        // EXPORT
+        processor.clear(PreparationTypeNostalgic, processor.updateState->currentNostalgicId);
+        vc->update();
     }
 }
 
@@ -314,11 +314,6 @@ void NostalgicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == "Nostalgic")
     {
-        if (Id == selectCB.getNumItems()-1)
-        {
-            Id = addPreparation();
-        }
-        
         setCurrentId(Id);
     }
     else if (name == "Length Mode")
@@ -406,9 +401,6 @@ void NostalgicPreparationEditor::fillSelectCB(int last, int current)
     
     selectCB.setItemEnabled(selectedId, false);
     
-    selectCB.addSeparator();
-    selectCB.addItem("New Nostalgic...", -1);
-    
     lastId = selectedId;
     
 }
@@ -439,7 +431,7 @@ void NostalgicPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        getPrepOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 }
 
@@ -449,10 +441,6 @@ NostalgicModificationEditor::NostalgicModificationEditor(BKAudioProcessor& p, BK
 NostalgicViewController(p, theGraph)
 {
     fillSelectCB(-1,-1);
-    
-    clearModsButton.setButtonText("clear mods");
-    addAndMakeVisible(clearModsButton);
-    clearModsButton.addListener(this);
     
     nDisplaySlider.addMyListener(this);
     selectCB.addListener(this);
@@ -571,10 +559,7 @@ void NostalgicModificationEditor::fillSelectCB(int last, int current)
     selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
     
     selectCB.setItemEnabled(selectedId, false);
-    
-    selectCB.addSeparator();
-    selectCB.addItem("New Nostalgic Mod...", -1);
-    
+
     lastId = selectedId;
 }
 
@@ -687,13 +672,11 @@ void NostalgicModificationEditor::actionButtonCallback(int action, NostalgicModi
     {
         vc->deleteCurrent();
     }
-    else if (action == 4)
-    {
-        // IMPORT
-    }
     else if (action == 5)
     {
-        // EXPORT
+        processor.clear(PreparationTypeNostalgicMod, processor.updateState->currentModNostalgicId);
+        vc->update();
+        vc->updateModification();
     }
 }
 
@@ -705,11 +688,6 @@ void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name == "Nostalgic")
     {
-        if (Id == -1)
-        {
-            Id = addPreparation();
-        }
-        
         setCurrentId(Id);
     }
     else if (name == "Length Mode")
@@ -783,14 +761,8 @@ void NostalgicModificationEditor::buttonClicked (Button* b)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
-    else if (b == &clearModsButton)
-    {
-        NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
-        mod->clearAll();
-        update();
-    }
     else if (b == &actionButton)
     {
-        getOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        getModOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 }

@@ -32,8 +32,6 @@ public:
     void resized() override;
     
     virtual void update(void) {};
-        
-    TextButton clearModsButton;
     
 private:
 
