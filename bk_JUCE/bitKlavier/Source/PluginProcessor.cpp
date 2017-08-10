@@ -76,14 +76,14 @@ void BKAudioProcessor::createNewGallery(String name)
     myFile = myFile.getNonexistentChildFile(name, ".xml", true);
     myFile.appendData(BinaryData::__blank_xml, BinaryData::__blank_xmlSize);
     galleryNames.add(myFile.getFileName());
-    currentGalleryPath = myFile.getFullPathName();
-    DBG("new gallery = " + currentGalleryPath);
     
     ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
     
     if (xml != nullptr)
     {
         currentGallery = myFile.getFileName();
+        currentGalleryPath = myFile.getFullPathName();
+        DBG("new gallery = " + currentGalleryPath);
         
         gallery = new Gallery(xml, *this);
         
@@ -103,10 +103,14 @@ void BKAudioProcessor::renameGallery(String name)
     File bkGalleries;
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
     
-    File currentFile = bkGalleries.getChildFile(currentGallery);
-   
+    String relativePath = currentGalleryPath.fromFirstOccurrenceOf("bitKlavier resources/galleries/", false, false);
+    
+    File currentFile = bkGalleries.getChildFile(relativePath);
+    
     String newFileName = name + ".xml";
-    String newFilePath= bkGalleries.getFullPathName() + "/" + newFileName;
+    String newFilePath= currentGalleryPath.upToFirstOccurrenceOf(currentGallery, false, false) + newFileName;
+    
+    DBG("new file: "+ String(newFilePath));
     
     File newFile(newFilePath);
     
