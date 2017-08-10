@@ -18,7 +18,7 @@ tempo(t)
     atDeltaHistory.ensureStorageAllocated(10);
     for (int i = 0; i < 10; i++)
     {
-        atDeltaHistory.insert(0, (60000.0/tempo->aPrep->getTempo()));
+        atDeltaHistory.insert(0, (tempo->aPrep->getAdaptiveTempo1Subdivisions() * 60000.0/tempo->aPrep->getTempo()));
     }
     adaptiveTempoPeriodMultiplier = 1.;
 }
