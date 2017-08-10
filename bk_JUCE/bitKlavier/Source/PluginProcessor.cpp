@@ -60,16 +60,24 @@ void BKAudioProcessor::createNewGallery(String name)
     File bkGalleries;
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
     
+    /*
     String newFileName = name + ".xml";
     String newFilePath= bkGalleries.getFullPathName() + "/" + newFileName;
     
     File myFile (newFilePath);
-    
     myFile.appendData(BinaryData::__blank_xml, BinaryData::__blank_xmlSize);
     
     galleryNames.add(newFileName);
     
     currentGalleryPath = newFilePath;
+     */
+    
+    File myFile(bkGalleries);
+    myFile = myFile.getNonexistentChildFile(name, ".xml", true);
+    myFile.appendData(BinaryData::__blank_xml, BinaryData::__blank_xmlSize);
+    galleryNames.add(myFile.getFileName());
+    currentGalleryPath = myFile.getFullPathName();
+    DBG("new gallery = " + currentGalleryPath);
     
     ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
     
