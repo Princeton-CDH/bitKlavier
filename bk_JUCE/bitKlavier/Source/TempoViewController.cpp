@@ -678,6 +678,7 @@ void TempoModificationEditor::actionButtonCallback(int action, TempoModification
     {
         processor.clear(PreparationTypeTempoMod, processor.updateState->currentModTempoId);
         vc->update();
+        vc->updateModification();
     }
 }
 

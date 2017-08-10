@@ -676,6 +676,7 @@ void NostalgicModificationEditor::actionButtonCallback(int action, NostalgicModi
     {
         processor.clear(PreparationTypeNostalgicMod, processor.updateState->currentModNostalgicId);
         vc->update();
+        vc->updateModification();
     }
 }
 

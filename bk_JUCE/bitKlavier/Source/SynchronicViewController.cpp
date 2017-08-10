@@ -1014,6 +1014,7 @@ void SynchronicModificationEditor::actionButtonCallback(int action, SynchronicMo
     {
         processor.clear(PreparationTypeSynchronicMod, processor.updateState->currentModSynchronicId);
         vc->update();
+        vc->updateModification();
     }
 }
 

@@ -517,6 +517,7 @@ void DirectModificationEditor::actionButtonCallback(int action, DirectModificati
     {
         processor.clear(PreparationTypeDirectMod, processor.updateState->currentModDirectId);
         vc->update();
+        vc->updateModification();
     }
 }
 

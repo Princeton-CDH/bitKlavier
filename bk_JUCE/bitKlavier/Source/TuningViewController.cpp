@@ -891,6 +891,7 @@ void TuningModificationEditor::actionButtonCallback(int action, TuningModificati
     {
         processor.clear(PreparationTypeTuningMod, processor.updateState->currentModTuningId);
         vc->update();
+        vc->updateModification();
     }
 }
 
