@@ -111,6 +111,12 @@ void BKAudioProcessor::renameGallery(String name)
     File newFile(newFilePath);
     
     bool success = currentFile.moveFileTo(newFile);
+    
+    if (success )
+    {
+        currentGallery = newFileName;
+        currentGalleryPath = newFilePath;
+    }
 }
 
 void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)  

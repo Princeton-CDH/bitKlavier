@@ -472,6 +472,7 @@ void HeaderViewController::BKEditableComboBoxChanged(String text, BKEditableComb
     else if (cb == &galleryCB)
     {
         processor.renameGallery(text);
+        fillGalleryCB();
     }
 }
 
