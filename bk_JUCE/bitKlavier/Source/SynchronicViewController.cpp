@@ -238,25 +238,35 @@ void SynchronicPreparationEditor::timerCallback()
     {
         SynchronicProcessor::Ptr sProcessor = processor.currentPiano->getSynchronicProcessor(processor.updateState->currentSynchronicId);
 
+        int counter = 0, size = 0;
+        
         if (sProcessor != nullptr)
         {
             for (int i = 0; i < paramSliders.size(); i++)
             {
                 if(paramSliders[i]->getName() == "beat length multipliers")
                 {
-                    paramSliders[i]->setCurrentSlider(sProcessor->getBeatMultiplierCounter());
+                    size = paramSliders[i]->getNumActive();
+                    counter = sProcessor->getBeatMultiplierCounter();
+                    paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
                 else if(paramSliders[i]->getName() == "sustain length multipliers")
                 {
-                    paramSliders[i]->setCurrentSlider(sProcessor->getLengthMultiplierCounter());
+                    size = paramSliders[i]->getNumActive();
+                    counter = sProcessor->getLengthMultiplierCounter();
+                    paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
                 else if(paramSliders[i]->getName() == "accents")
                 {
-                    paramSliders[i]->setCurrentSlider(sProcessor->getAccentMultiplierCounter());
+                    size = paramSliders[i]->getNumActive();
+                    counter = sProcessor->getAccentMultiplierCounter();
+                    paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
                 else if(paramSliders[i]->getName() == "transpositions")
                 {
-                    paramSliders[i]->setCurrentSlider(sProcessor->getTranspCounter());
+                    size = paramSliders[i]->getNumActive();
+                    counter = sProcessor->getTranspCounter();
+                    paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
             }
         }

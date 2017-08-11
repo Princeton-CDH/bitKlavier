@@ -322,6 +322,10 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
         const ScopedLock sl (lock);
         
         int noteNumber = midiNoteNumber;
+        
+        // ADDED THIS
+        if (noteNumber > 108 || noteNumber < 21) return;
+        
         float transposition = transp;
         
         for (int i = sounds.size(); --i >= 0;)

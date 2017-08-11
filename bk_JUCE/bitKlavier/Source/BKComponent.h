@@ -158,15 +158,6 @@ private:
         }
     }
     
-    bool keyPressed(const KeyPress& e) override
-    {
-        if (isSelected)
-        {
-            keyPressedWhileSelected(e);
-        }
-        return true;
-    }
-
     ComponentBoundsConstrainer constrainer;
     ComponentDragger dragger;
     
