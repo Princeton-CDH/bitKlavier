@@ -473,7 +473,10 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         prep->setTuning((TuningSystem) index);
         active->setTuning((TuningSystem) index);
         
+        DBG("setting tungin to :" + String(index));
+        
         Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+        DBG("current tuning from processor = " + String(processor.updateState->currentTuningId));
         customKeyboard.setValues(currentTuning->getCurrentScaleCents());
         
         updateComponentVisibility();
@@ -603,12 +606,13 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
     {
         DBG("updating custom tuning vals");
         scaleCB.setSelectedItemIndex(customIndex, dontSendNotification);
-
-        prep->setCustomScaleCents(values);
-        active->setCustomScaleCents(values);
         
         prep->setTuning((TuningSystem)customIndex);
         active->setTuning((TuningSystem)customIndex);
+        
+        DBG("keyboardSliderChanged values.size() = " + String(values.size()));
+        prep->setCustomScaleCents(values);
+        active->setCustomScaleCents(values);
     }
     
     processor.gallery->setGalleryDirty(true);

@@ -45,7 +45,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     gallery->prepareToPlay(sampleRate);
     
-    loadPianoSamples(BKLoadLite);    
+    loadPianoSamples(BKLoadHeavy);    
 }
 
 BKAudioProcessor::~BKAudioProcessor()

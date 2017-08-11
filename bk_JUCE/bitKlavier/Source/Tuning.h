@@ -38,7 +38,7 @@ public:
     tCustom(p->getCustomScale()),
     tAbsolute(p->getAbsoluteOffsets())
     {
-        for (int i = 0; i < 12; i++) tCustom.add(i);
+
     }
     
     inline void copy(TuningPreparation::Ptr p)
@@ -117,7 +117,6 @@ public:
     {
         tAbsolute.ensureStorageAllocated(128);
         for(int i=0; i<128; i++) tAbsolute.set(i, 0.);
-
     }
     
     TuningPreparation(void):
@@ -192,7 +191,12 @@ public:
     void setAbsoluteOffset(int which, float val)                                    {tAbsolute.set(which, val);                             }
 
     inline void setCustomScaleCents(Array<float> tuning) {
-        for(int i=0; i<tCustom.size(); i++) tCustom.setUnchecked(i, tuning.getUnchecked(i) * 0.01f);
+        DBG("tCustom.size = " + String(tCustom.size()));
+        for(int i=0; i<tCustom.size(); i++)
+        {
+            tCustom.setUnchecked(i, tuning.getUnchecked(i) * 0.01f);
+            DBG("custom scale = " + String(i) + " " + String(tCustom.getUnchecked(i)));
+        }
     }
     
     inline void setAbsoluteOffsetCents(Array<float> abs) {
