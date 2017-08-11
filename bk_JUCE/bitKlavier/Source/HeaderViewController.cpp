@@ -195,6 +195,7 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
 {
     BKAudioProcessor& processor = hvc->processor;
     BKConstructionSite* construction = hvc->construction;
+    BKEditableComboBox* pianoCB = &hvc->pianoCB;
     
     if (result == 1) // New piano
     {
@@ -222,10 +223,11 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
     }
     else if (result == 3) // Remove piano
     {
+        
         int pianoId = hvc->pianoCB.getSelectedId();
         int index = hvc->pianoCB.getSelectedItemIndex();
         
-        if ((index == 0) && (hvc->pianoCB.getItemId(index+1) == -1)) return;
+        if ((index == 0) && (hvc->pianoCB.getNumItems() == 1)) return;
         
         processor.gallery->remove(PreparationTypePiano, pianoId);
         
@@ -233,7 +235,7 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
         
         int newPianoId = hvc->pianoCB.getItemId(index);
         
-        if (newPianoId == -1) newPianoId = hvc->pianoCB.getItemId(index-1);
+        if (newPianoId == 0) newPianoId = hvc->pianoCB.getItemId(index-1);
         
         hvc->pianoCB.setSelectedId(newPianoId, dontSendNotification);
         

@@ -75,9 +75,9 @@ private:
     BKLabel showName;
 
     TextEditor keyboardValueTF;
-    BKKeymapKeyboardComponent* keyboard;
     BKKeymapKeyboardState keyboardState;
     ScopedPointer<Component> keyboardComponent;
+    BKKeymapKeyboardComponent* keyboard;
     ScopedPointer<TextEditor> keyboardValsTextField;
     TextButton keyboardValsTextFieldOpen;
     
