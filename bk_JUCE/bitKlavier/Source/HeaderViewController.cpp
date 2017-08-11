@@ -454,7 +454,7 @@ void HeaderViewController::fillPianoCB(void)
     {
         String name = piano->getName();
         
-        DBG("string piano Id: " + String(piano->getId()));
+        DBG("pianoName: " + String(piano->getName()));
         
         if (name != String::empty)  pianoCB.addItem(name,  piano->getId());
         else                        pianoCB.addItem("Piano" + String(piano->getId()), piano->getId());

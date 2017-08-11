@@ -96,6 +96,7 @@ void Piano::configure(void)
         BKPreparationType type = item->getType();
         int Id = item->getId();
         
+        
         // Connect keymaps to everything
         // Connect tunings, tempos, synchronics to preparations
         // Connect mods and resets to all their targets
@@ -503,7 +504,7 @@ void Piano::deconfigureDirectModificationForKeys(DirectModPreparation::Ptr mod, 
 
 void Piano::configureNostalgicModification(int key, NostalgicModPreparation::Ptr dmod, Array<int> whichPreps)
 {
-    DBG("key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
+    DBG("PIANO key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
     
     int whichMod = dmod->getId();
     // Add Modifications
@@ -619,6 +620,8 @@ void Piano::configurePianoMap(BKItem::Ptr map)
 {
     int pianoTarget = map->getPianoTarget();
     
+    if (pianoTarget == getId()) return;
+    
     Array<int> keymaps = map->getConnectionIdsOfType(PreparationTypeKeymap);
     
     for (auto keymap : keymaps)
@@ -628,7 +631,7 @@ void Piano::configurePianoMap(BKItem::Ptr map)
         {
             pianoMap.set(key, pianoTarget);
             
-            DBG("key: " + String(key) + " piano: " + String(pianoTarget));
+            DBG("PIANOMAP key: " + String(key) + " piano: " + String(pianoTarget));
         }
     }
 }
@@ -751,7 +754,7 @@ void Piano::deconfigureSynchronicModificationForKeys(SynchronicModPreparation::P
 
 void Piano::configureTempoModification(int key, TempoModPreparation::Ptr dmod, Array<int> whichPreps)
 {
-    DBG("key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
+    DBG("TEMPOMOD key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
     
     int whichMod = dmod->getId();
     
@@ -805,7 +808,7 @@ void Piano::deconfigureTempoModificationForKeys(TempoModPreparation::Ptr mod, Ar
 void Piano::configureTuningModification(int key, TuningModPreparation::Ptr dmod, Array<int> whichPreps)
 {
     
-    DBG("key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
+    DBG("TUNINGMOD key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
     
     int whichMod = dmod->getId();
 

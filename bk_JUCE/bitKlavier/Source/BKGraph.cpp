@@ -134,7 +134,7 @@ void BKItem::configurePianoCB(void)
     
     if (!targetExists)
     {
-        setPianoTarget(0);
+        setPianoTarget(processor.currentPiano->getId());
         processor.currentPiano->configure();
     }
     
