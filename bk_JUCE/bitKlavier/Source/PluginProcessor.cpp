@@ -309,11 +309,31 @@ void  BKAudioProcessor::setCurrentPiano(int which)
 // Reset
 void BKAudioProcessor::performResets(int noteNumber)
 {
-    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->directReset)       currentPiano->getDirectProcessor(prep)->reset();
-    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->synchronicReset)   currentPiano->getSynchronicProcessor(prep)->reset();
-    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->nostalgicReset)    currentPiano->getNostalgicProcessor(prep)->reset();
-    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->tuningReset)       currentPiano->getTuningProcessor(prep)->reset();
-    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->tempoReset)        currentPiano->getTempoProcessor(prep)->reset();
+    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->directReset)
+    {
+        currentPiano->getDirectProcessor(prep)->reset();
+        updateState->directPreparationDidChange = true;
+    }
+    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->synchronicReset)
+    {
+        currentPiano->getSynchronicProcessor(prep)->reset();
+        updateState->synchronicPreparationDidChange = true;
+    }
+    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->nostalgicReset)
+    {
+        currentPiano->getNostalgicProcessor(prep)->reset();
+        updateState->nostalgicPreparationDidChange = true;
+    }
+    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->tuningReset)
+    {
+        currentPiano->getTuningProcessor(prep)->reset();
+        updateState->tuningPreparationDidChange = true;
+    }
+    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->tempoReset)
+    {
+        currentPiano->getTempoProcessor(prep)->reset();
+        updateState->tempoPreparationDidChange = true;
+    }
 }
 
 // Modification
