@@ -333,6 +333,7 @@ public:
         
         prep.setProperty( "Id",Id, 0);
         prep.setProperty( "name", name, 0);
+        prep.setProperty( "gain", sPrep->getGain(), 0);
         prep.setProperty( ptagSynchronic_numBeats,            sPrep->getNumBeats(), 0);
         prep.setProperty( ptagSynchronic_clusterMin,          sPrep->getClusterMin(), 0);
         prep.setProperty( ptagSynchronic_clusterMax,          sPrep->getClusterMax(), 0);
@@ -393,6 +394,10 @@ public:
         
         if (n != String::empty)     name = n;
         else                        name = String(Id);
+        
+        n = e->getStringAttribute("gain");
+        if (n != "") sPrep->setGain(n.getFloatValue());
+        else         sPrep->setGain(1.0);
         
         i = e->getStringAttribute(ptagSynchronic_numBeats).getIntValue();
         sPrep->setNumBeats(i);

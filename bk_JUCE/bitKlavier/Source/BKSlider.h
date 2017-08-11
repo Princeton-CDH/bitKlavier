@@ -130,6 +130,8 @@ public:
     void cleanupSliderArray();
     void resetRanges();
     
+    inline int getNumActive(void)const noexcept { return numActiveSliders;}
+    
     void resized() override;
     
     ListenerList<BKMultiSliderListener> listeners;

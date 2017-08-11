@@ -1087,7 +1087,7 @@ int BKMultiSlider::getActiveSlider(int sliderNum)
 {
     int sliderCount = 0;
     
-    for(int i = 0; i<sliders.size(); i++)
+    for(int i = 0; i < sliders.size(); i++)
     {
         if(sliderCount == sliderNum && sliders[i]->operator[](0)->isActive())
             return i;
