@@ -246,25 +246,25 @@ void SynchronicPreparationEditor::timerCallback()
             {
                 if(paramSliders[i]->getName() == "beat length multipliers")
                 {
-                    size = paramSliders[i]->getNumActive();
+                    size = paramSliders[i]->getNumVisible();
                     counter = sProcessor->getBeatMultiplierCounter();
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
                 else if(paramSliders[i]->getName() == "sustain length multipliers")
                 {
-                    size = paramSliders[i]->getNumActive();
+                    size = paramSliders[i]->getNumVisible();
                     counter = sProcessor->getLengthMultiplierCounter();
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
                 else if(paramSliders[i]->getName() == "accents")
                 {
-                    size = paramSliders[i]->getNumActive();
+                    size = paramSliders[i]->getNumVisible();
                     counter = sProcessor->getAccentMultiplierCounter();
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
                 else if(paramSliders[i]->getName() == "transpositions")
                 {
-                    size = paramSliders[i]->getNumActive();
+                    size = paramSliders[i]->getNumVisible();
                     counter = sProcessor->getTranspCounter();
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }

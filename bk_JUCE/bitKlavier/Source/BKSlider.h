@@ -130,7 +130,8 @@ public:
     void cleanupSliderArray();
     void resetRanges();
     
-    inline int getNumActive(void)const noexcept { return numActiveSliders;}
+    inline int getNumActive(void) const noexcept { return numActiveSliders;}
+    inline int getNumVisible(void) const noexcept { return numVisibleSliders;}
     
     void resized() override;
     
