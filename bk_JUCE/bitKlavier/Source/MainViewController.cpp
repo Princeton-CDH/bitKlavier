@@ -306,6 +306,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     {
         if (e.getModifiers().isCommandDown())   construction.cut();
     }
+    
     return true;
 }
 
