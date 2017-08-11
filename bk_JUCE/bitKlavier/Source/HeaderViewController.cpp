@@ -27,6 +27,7 @@
 #define RESET_ID 15
 #define NEWGALLERY_ID 16
 #define DELETE_ID 17
+#define KEYMAP_ID 18
 
 HeaderViewController::HeaderViewController (BKAudioProcessor& p, BKConstructionSite* c):
 processor (p),
@@ -141,6 +142,7 @@ PopupMenu HeaderViewController::getNewMenu(void)
     PopupMenu newMenu;
     newMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
+    newMenu.addItem(KEYMAP_ID, "Keymap (k)");
     newMenu.addItem(DIRECT_ID, "Direct (d)");
     newMenu.addItem(NOSTALGIC_ID, "Nostalgic (n)");
     newMenu.addItem(SYNCHRONIC_ID, "Synchronic (s)");
@@ -240,6 +242,10 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
         hvc->pianoCB.setSelectedId(newPianoId, dontSendNotification);
         
         processor.setCurrentPiano(newPianoId);
+    }
+    else if (result == KEYMAP_ID)
+    {
+        construction->addItem(PreparationTypeKeymap, true);
     }
     else if (result == DIRECT_ID)
     {
