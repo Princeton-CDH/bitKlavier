@@ -77,7 +77,7 @@ BKViewController(p,theGraph)
     A1ClusterMax->setJustifyRight(false);
     addAndMakeVisible(A1ClusterMax);
     
-    A1reset.setButtonText("reset");
+    //A1reset.setButtonText("reset");
     addAndMakeVisible(A1reset);
     
     fillTuningCB();
