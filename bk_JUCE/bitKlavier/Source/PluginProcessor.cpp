@@ -450,7 +450,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
 void BKAudioProcessor::saveGalleryAs(void)
 {
     FileChooser myChooser ("Save gallery to file...",
-                           File::getSpecialLocation (File::userHomeDirectory),
+                           lastGalleryPath,
                            "*.xml");
     
     if (myChooser.browseForFileToSave(true))
@@ -473,6 +473,8 @@ void BKAudioProcessor::saveGalleryAs(void)
         myXML->writeToFile(myFile, String::empty);
         
         gallery->setGalleryDirty(false);
+        
+        lastGalleryPath = myFile;
     }
     
     
