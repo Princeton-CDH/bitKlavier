@@ -20,7 +20,12 @@ resonanceReleaseSynth()
     updateUI();
     
     loadGalleryFromPath(galleryNames[0]);
+
+    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
+    
+#if JUCE_MAC
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
     
     noteOn.ensureStorageAllocated(128);
     for(int i=0; i< 128; i++)
@@ -45,7 +50,12 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     gallery->prepareToPlay(sampleRate);
     
-    loadPianoSamples(BKLoadHeavy);    
+    
+    loadPianoSamples(BKLoadLite);
+    
+#if JUCE_MAC
+    loadPianoSamples(BKLoadHeavy);
+#endif
 }
 
 BKAudioProcessor::~BKAudioProcessor()
@@ -66,7 +76,12 @@ void BKAudioProcessor::createNewGallery(String name)
     updateState->loadedJson = false;
     
     File bkGalleries;
+    
+    bkGalleries = bkGalleries.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
+    
+#if JUCE_MAC
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
     
     /*
     String newFileName = name + ".xml";
@@ -109,7 +124,11 @@ void BKAudioProcessor::createNewGallery(String name)
 void BKAudioProcessor::renameGallery(String name)
 {
     File bkGalleries;
+    bkGalleries = bkGalleries.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
+    
+#if JUCE_MAC
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
     
     String relativePath = currentGalleryPath.fromFirstOccurrenceOf("bitKlavier resources/galleries/", false, false);
     

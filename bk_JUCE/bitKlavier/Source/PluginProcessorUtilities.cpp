@@ -50,7 +50,12 @@ void BKAudioProcessor::collectGalleries(void)
     galleryNames.clear();
     
     File bkGalleries;
+    
+    bkGalleries = bkGalleries.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
+    
+#if JUCE_MAC
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
     
     //DirectoryIterator xmlIter (File ("~/bkGalleries"), true, "*.xml");
     DirectoryIterator xmlIter (File (bkGalleries), true, "*.xml");

@@ -22,7 +22,12 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
     String path = "~/bkSamples/";
     
     File bkSamples;
+    
+    bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("samples");
+    
+#if JUCE_MAC
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
+#endif
     
     int numLayers = 0;
     
@@ -167,7 +172,11 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
     String path = "~/bkSamples/";
     
     File bkSamples;
+    bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("samples");
+    
+#if JUCE_MAC
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
+#endif
     
     synth->clearVoices();
     synth->clearSounds();
@@ -273,7 +282,11 @@ void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
     String path = "~/bkSamples/";
     
     File bkSamples;
+    bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("samples");
+    
+#if JUCE_MAC
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
+#endif
     
     synth->clearVoices();
     synth->clearSounds();

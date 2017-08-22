@@ -30,10 +30,14 @@ public:
         directGain(1.0),
         resonanceGain(1.0),
         hammerGain(0.01),
-        globalGain(1.0),
         resonanceAndHammer(true),
         invertSustain(false)
     {
+     
+        globalGain = 0.75;
+#if JUCE_MAC
+        globalGain = 1.0;
+#endif
     }
     
     ~GeneralSettings()
