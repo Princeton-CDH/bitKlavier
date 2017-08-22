@@ -259,7 +259,6 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
                 NostalgicNoteStuff* newNote = undertowNotes.getUnchecked(0);
                 newNote->setUndertowTargetLength(thisNote->getUndertowTargetLength());
                 newNote->setUndertowStartPosition(noteOnPrep->getWavedistance() * sampleRate/1000.);
-                
             }
             
             //remove from active notes list
