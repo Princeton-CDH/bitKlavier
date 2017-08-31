@@ -10,25 +10,6 @@
 
 #include "HeaderViewController.h"
 
-#define SAVE_ID 1
-#define SAVEAS_ID 2
-#define OPEN_ID 3
-#define NEW_ID 4
-#define CLEAN_ID 5
-#define SETTINGS_ID 6
-#define OPENOLD_ID 7
-#define DIRECT_ID 8
-#define NOSTALGIC_ID 9
-#define SYNCHRONIC_ID 10
-#define TUNING_ID 11
-#define TEMPO_ID 12
-#define MODIFICATION_ID 13
-#define PIANOMAP_ID 14
-#define RESET_ID 15
-#define NEWGALLERY_ID 16
-#define DELETE_ID 17
-#define KEYMAP_ID 18
-
 HeaderViewController::HeaderViewController (BKAudioProcessor& p, BKConstructionSite* c):
 processor (p),
 construction(c)
@@ -137,23 +118,7 @@ PopupMenu HeaderViewController::getPianoMenu(void)
     return pianoMenu;
 }
 
-PopupMenu HeaderViewController::getNewMenu(void)
-{
-    PopupMenu newMenu;
-    newMenu.setLookAndFeel(&buttonsAndMenusLAF);
-    
-    newMenu.addItem(KEYMAP_ID, "Keymap (k)");
-    newMenu.addItem(DIRECT_ID, "Direct (d)");
-    newMenu.addItem(NOSTALGIC_ID, "Nostalgic (n)");
-    newMenu.addItem(SYNCHRONIC_ID, "Synchronic (s)");
-    newMenu.addItem(TUNING_ID, "Tuning (t)");
-    newMenu.addItem(TEMPO_ID, "Tempo (m)");
-    newMenu.addItem(MODIFICATION_ID, "Modification (c)");
-    newMenu.addItem(PIANOMAP_ID, "Piano Map (p)");
-    newMenu.addItem(RESET_ID, "Reset (r)");
-    
-    return newMenu;
-}
+
 
 PopupMenu HeaderViewController::getGalleryMenu(void)
 {
@@ -186,6 +151,24 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     
     return galleryMenu;
     
+}
+
+PopupMenu HeaderViewController::getNewMenu(void)
+{
+    PopupMenu newMenu;
+    newMenu.setLookAndFeel(&buttonsAndMenusLAF);
+    
+    newMenu.addItem(KEYMAP_ID, "Keymap (k)");
+    newMenu.addItem(DIRECT_ID, "Direct (d)");
+    newMenu.addItem(NOSTALGIC_ID, "Nostalgic (n)");
+    newMenu.addItem(SYNCHRONIC_ID, "Synchronic (s)");
+    newMenu.addItem(TUNING_ID, "Tuning (t)");
+    newMenu.addItem(TEMPO_ID, "Tempo (m)");
+    newMenu.addItem(MODIFICATION_ID, "Modification (c)");
+    newMenu.addItem(PIANOMAP_ID, "Piano Map (p)");
+    newMenu.addItem(RESET_ID, "Reset (r)");
+    
+    return newMenu;
 }
 
 void HeaderViewController::loadMenuCallback(int result, HeaderViewController* gvc)

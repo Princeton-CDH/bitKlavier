@@ -21,7 +21,9 @@ resonanceReleaseSynth()
     
     loadGalleryFromPath(galleryNames[0]);
 
+#if JUCE_IOS
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
     
 #if JUCE_MAC
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
@@ -51,7 +53,9 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     gallery->prepareToPlay(sampleRate);
     
     
+#if JUCE_IOS
     loadPianoSamples(BKLoadLite);
+#endif
     
 #if JUCE_MAC
     loadPianoSamples(BKLoadHeavy);
@@ -278,6 +282,10 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     mainPianoSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
+    
+#if JUCE_IOS
+    buffer.applyGain(0, numSamples, 0.25);
+#endif
     
     // store buffer for level calculation when needed
     levelBuf.copyFrom(0, 0, buffer, 0, 0, numSamples);

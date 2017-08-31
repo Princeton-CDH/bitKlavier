@@ -13,7 +13,6 @@
 #define NUM_COL 6
 
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, /*Viewport* vp,*/ BKItemGraph* theGraph):
-BKDraggableComponent(false,false,false),
 altDown(false),
 processor(p),
 graph(theGraph),
@@ -24,6 +23,8 @@ viewport(vp)*/
 {
     setWantsKeyboardFocus(false);
     graph->deselectAll();
+    
+    addMouseListener(this, true);
 }
 
 BKConstructionSite::~BKConstructionSite(void)
@@ -301,6 +302,11 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
         toAdd->configurePianoCB();
     }
     
+#if JUCE_IOS
+    toAdd->setTopLeftPosition(lastX, lastY);
+#endif
+    
+#if JUCE_MAC
     if (center)
     {
         toAdd->setTopLeftPosition(300, 250);
@@ -309,6 +315,7 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
     {
         toAdd->setTopLeftPosition(lastX, lastY);
     }
+#endif
 
     lastX += 10; lastY += 10;
     
@@ -446,6 +453,76 @@ void BKConstructionSite::mouseMove (const MouseEvent& eo)
     lastEY = e.y;
 }
 
+PopupMenu BKConstructionSite::getNewMenu(void)
+{
+    PopupMenu newMenu;
+    newMenu.setLookAndFeel(&buttonsAndMenusLAF);
+    
+    newMenu.addItem(KEYMAP_ID, "Keymap");
+    newMenu.addItem(DIRECT_ID, "Direct");
+    newMenu.addItem(NOSTALGIC_ID, "Nostalgic");
+    newMenu.addItem(SYNCHRONIC_ID, "Synchronic");
+    newMenu.addItem(TUNING_ID, "Tuning");
+    newMenu.addItem(TEMPO_ID, "Tempo");
+    newMenu.addItem(MODIFICATION_ID, "Modification");
+    newMenu.addItem(PIANOMAP_ID, "Piano Map");
+    newMenu.addItem(RESET_ID, "Reset");
+    
+    return newMenu;
+}
+
+void BKConstructionSite::newMenuCallback(int result, BKConstructionSite* vc)
+{
+    if (result == KEYMAP_ID)
+    {
+        vc->addItem(PreparationTypeKeymap, true);
+    }
+    else if (result == DIRECT_ID)
+    {
+        vc->addItem(PreparationTypeDirect, true);
+    }
+    else if (result == NOSTALGIC_ID)
+    {
+        vc->addItem(PreparationTypeNostalgic, true);
+    }
+    else if (result == SYNCHRONIC_ID)
+    {
+        vc->addItem(PreparationTypeSynchronic, true);
+    }
+    else if (result == TUNING_ID)
+    {
+        vc->addItem(PreparationTypeTuning, true);
+    }
+    else if (result == TEMPO_ID)
+    {
+        vc->addItem(PreparationTypeTempo, true);
+    }
+    else if (result == MODIFICATION_ID)
+    {
+        vc->addItem(PreparationTypeGenericMod, true);
+    }
+    else if (result == PIANOMAP_ID)
+    {
+        vc->addItem(PreparationTypePianoMap, true);
+    }
+    else if (result == RESET_ID)
+    {
+        vc->addItem(PreparationTypeReset, true);
+    }
+}
+
+
+void BKConstructionSite::mouseDoubleClick(const MouseEvent& eo)
+{
+
+}
+
+void BKConstructionSite::mouseHold(Component* frame)
+{
+    getNewMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (frame), ModalCallbackFunction::forComponent (newMenuCallback, this) );
+}
+
+
 void BKConstructionSite::mouseDown (const MouseEvent& eo)
 {
     MouseEvent e = eo.getEventRelativeTo(this);
@@ -453,6 +530,8 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
     
     lastX = e.x; lastY = e.y;
+    
+    mouseClicked(lastX, lastY, e.eventTime);
     
     if (itemToSelect != nullptr)
     {
@@ -542,34 +621,11 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     
 }
 
-void BKConstructionSite::mouseDrag (const MouseEvent& e)
-{
-    lastX = e.x; lastY = e.y;
-    
-    if (itemToSelect == nullptr) lasso->dragLasso(e);
-    
-    if (!connect && !e.mods.isShiftDown())
-    {
-        for (auto item : graph->getSelectedItems())
-        {
-            item->performDrag(e);
-            
-            //if (item->)
-        }
-    }
-    
-    lineEX = e.getEventRelativeTo(this).x;
-    lineEY = e.getEventRelativeTo(this).y;
-    
-    repaint();
-
-}
-
 void BKConstructionSite::mouseUp (const MouseEvent& eo)
 {
     
     MouseEvent e = eo.getEventRelativeTo(this);
-    
+
     if (itemToSelect == nullptr) lasso->endLasso();
     
     if (selected.getNumSelected())
@@ -611,6 +667,32 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
     getParentComponent()->grabKeyboardFocus();
     
 }
+
+void BKConstructionSite::mouseDrag (const MouseEvent& e)
+{
+    lastX = e.x; lastY = e.y;
+    
+    mouseDragged();
+    
+    if (itemToSelect == nullptr) lasso->dragLasso(e);
+    
+    if (!connect && !e.mods.isShiftDown())
+    {
+        for (auto item : graph->getSelectedItems())
+        {
+            item->performDrag(e);
+            
+            //if (item->)
+        }
+    }
+    
+    lineEX = e.getEventRelativeTo(this).x;
+    lineEY = e.getEventRelativeTo(this).y;
+    
+    repaint();
+
+}
+
 
 void BKConstructionSite::idDidChange(void)
 {

@@ -53,6 +53,81 @@ private:
     JUCE_LEAK_DETECTOR (BKComponent)
 };
 
+
+class MouseHoldListener : public Component, private Timer
+{
+public:
+    
+    MouseHoldListener()
+    {
+        addMouseListener(this,true);
+        
+        mouseDownComponent = new Component();
+        mouseDownComponent->setSize(5,5);
+        addAndMakeVisible(mouseDownComponent);
+        
+        startTimer(50);
+    }
+    
+    ~MouseHoldListener(void)
+    {
+        
+    }
+    
+    virtual void mouseHold(Component* frame) = 0;
+    
+    /*
+    void mouseDown(const MouseEvent& e) override
+    {
+        mouseDownTime = e.eventTime;
+        mouseHoldHappened = false;
+        mouseDragHappened = false;
+        mouseDownComponent->setTopLeftPosition(e.x, e.y);
+    }
+    
+    void mouseDrag(const MouseEvent& e) override
+    {
+        mouseDragHappened = true;
+    }
+    */
+    
+    void mouseClicked(int x, int y, Time time)
+    {
+        mouseDownTime = time;
+        mouseHoldHappened = false;
+        mouseDragHappened = false;
+        mouseDownComponent->setTopLeftPosition(x, y);
+    }
+    
+    void mouseDragged()
+    {
+        mouseDragHappened = true;
+    }
+     
+    
+private:
+    
+    void timerCallback(void) override
+    {
+        mouseDownDuration = Time::getCurrentTime() - mouseDownTime;
+        
+        if (isMouseButtonDown() && !mouseDragHappened && !mouseHoldHappened && (mouseDownDuration.inMilliseconds() > 250))
+        {
+            mouseHoldHappened = true;
+            
+            mouseHold(mouseDownComponent);
+        }
+    }
+
+    Time mouseDownTime;
+    RelativeTime mouseDownDuration;
+    bool mouseHoldHappened;
+    bool mouseDragHappened;
+    Component* mouseDownComponent;
+    
+    JUCE_LEAK_DETECTOR (MouseHoldListener)
+};
+
 class BKDraggableComponent    : public BKComponent, public DragAndDropTarget
 {
 public:

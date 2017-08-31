@@ -257,11 +257,7 @@ private:
 class BKItemGraph
 {
 public:
-    BKItemGraph(BKAudioProcessor& p):
-    processor(p)
-    {
-        
-    }
+    BKItemGraph(BKAudioProcessor& p);
     
     ~BKItemGraph(void);
 

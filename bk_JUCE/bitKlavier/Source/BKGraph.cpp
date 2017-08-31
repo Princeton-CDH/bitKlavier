@@ -141,6 +141,8 @@ void BKItem::configurePianoCB(void)
     menu.setSelectedId(getPianoTarget(), NotificationType::dontSendNotification);
 }
 
+#define IOS_SCALE 0.5
+
 void BKItem::setImage(Image newImage)
 {
     image = newImage;
@@ -158,8 +160,15 @@ void BKItem::setImage(Image newImage)
     while (!(image.getWidth() < val || image.getHeight() < val))
         image = image.rescaled(image.getWidth() * 0.8, image.getHeight() * 0.8);
     
+#if JUCE_MAC
     if (type != PreparationTypePianoMap)    setSize(image.getWidth(), image.getHeight());
     else                                    setSize(image.getWidth(), image.getHeight() + 25);
+#endif
+    
+#if JUCE_IOS
+    if (type != PreparationTypePianoMap)    setSize(image.getWidth(), image.getHeight());
+    else                                    setSize(image.getWidth(), image.getHeight() + 25);
+#endif
 }
 
 void BKItem::setItemType(BKPreparationType newType, bool create)
@@ -429,8 +438,15 @@ void BKItem::setState(XmlElement* e)
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ BKGraph ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
+BKItemGraph::BKItemGraph(BKAudioProcessor& p):
+processor(p)
+{
+    
+}
+
 BKItemGraph::~BKItemGraph(void)
 {
+    
 }
 
 void BKItemGraph::clear()

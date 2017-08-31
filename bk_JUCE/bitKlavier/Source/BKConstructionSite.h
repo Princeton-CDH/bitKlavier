@@ -20,7 +20,7 @@
 
 #include "BKGraph.h"
 
-class BKConstructionSite : public BKDraggableComponent, public LassoSource<BKItem*>
+class BKConstructionSite : public LassoSource<BKItem*>, public MouseHoldListener
 {
 public:
     BKConstructionSite(BKAudioProcessor& p, /*Viewport* viewPort, */ BKItemGraph* theGraph);
@@ -65,6 +65,8 @@ public:
     
 private:
     
+    void mouseHold(Component* frame) override;
+    
     int leftMost, rightMost, topMost, bottomMost;
     BKAudioProcessor& processor;
     
@@ -74,7 +76,9 @@ private:
 
     bool connect; int lineOX, lineOY, lineEX, lineEY;
     bool multiple;
-
+    
+    PopupMenu getNewMenu(void);
+    static void newMenuCallback(int result, BKConstructionSite* vc);
     
     BKItem* itemSource;
     BKItem* itemTarget;
@@ -97,7 +101,10 @@ private:
     void prepareItemDrag(BKItem* item, const MouseEvent& e, bool center);
     
     void resized() override;
+    
     void mouseDown (const MouseEvent& eo) override;
+    
+    void mouseDoubleClick (const MouseEvent& eo) override;
     
     void mouseUp (const MouseEvent& eo) override;
     
@@ -112,9 +119,7 @@ private:
     int lastX, lastY;
     int lastEX,lastEY;
     
-    /*Viewport* viewport;*/
-    
-    
+    BKButtonAndMenuLAF buttonsAndMenusLAF;
     
     JUCE_LEAK_DETECTOR(BKConstructionSite)
 };
