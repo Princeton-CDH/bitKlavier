@@ -349,7 +349,7 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
                         //adaptiveTempoPeriodMultiplier;
     }
     
-    DBG("time in ms to next beat = " + std::to_string(timeToReturn * 1000./sampleRate));
+    DBG("time in ms to next beat = " + String(timeToReturn * 1000./sampleRate));
     return timeToReturn * 1000./sampleRate; //optimize later....
 }
 

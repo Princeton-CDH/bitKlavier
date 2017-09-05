@@ -132,7 +132,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
             activeNotes.removeFirstMatchingValue(midiNoteNumber);
             noteOn.set(midiNoteNumber, false);
             noteLengthTimers.set(midiNoteNumber, 0);
-            DBG("nostalgic removed active note " + std::to_string(midiNoteNumber));
+            DBG("nostalgic removed active note " + String(midiNoteNumber));
             
             //time how long the reverse note has played, to trigger undertow note
             activeReverseNotes.addIfNotAlreadyThere(midiNoteNumber);
