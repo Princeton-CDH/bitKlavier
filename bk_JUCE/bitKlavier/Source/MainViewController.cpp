@@ -108,13 +108,14 @@ void MainViewController::setDisplay(DisplayType type)
     display = type;
     
     resized();
+    repaint();
 }
 
 void MainViewController::resized()
 {
    
     int headerHeight = (platform == BKIOS) ? 40 : 30;
-    int sidebarWidth = 20;
+    int sidebarWidth = (platform == BKIOS) ? 30 : 20;
     int footerHeight = 40;
     
     float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
@@ -150,28 +151,44 @@ void MainViewController::resized()
     mainSlider->setBounds(gainSliderSlice);
     
     area.reduce(gXSpacing, 3);
-    if (display != DisplayKeyboard)
-    {
-        construction.setBounds(area);
-    }
-    else
+    construction.setBounds(area);
+
+    if (display == DisplayKeyboard)
     {
         float keyWidth = area.getWidth() / round((keyEnd - keyStart) * 7./12 + 1); //num white keys
         keyboard->setKeyWidth(keyWidth);
         keyboard->setBlackNoteLengthProportion(0.65);
         keyboardComponent->setBounds(area);
+        
+        construction.setVisible(false);
+        keyboardComponent->setVisible(true);
     }
+    else
+    {
+        construction.setVisible(true);
+        keyboardComponent->setVisible(false);
+    }
+    
 }
 
 void MainViewController::mouseDown(const MouseEvent &event)
 {
     if(event.eventComponent == &construction)
     {
-        
         if (overtop.getCurrentDisplay() != DisplayNil)
         {
             processor.updateState->setCurrentDisplay(DisplayNil);
         }
+    
+    }
+    else
+    {
+#if JUCE_IOS
+        if (event.eventComponent == levelMeterComponentL)
+        {
+            setDisplay((display == DisplayKeyboard) ? DisplayConstruction : DisplayKeyboard);
+        }
+#endif
     }
 }
 

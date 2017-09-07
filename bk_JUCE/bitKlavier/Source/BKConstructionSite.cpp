@@ -502,8 +502,12 @@ PopupMenu BKConstructionSite::getItemOptionMenu(void)
 
     if (graph->getSelectedItems().size() == 1)
     {
-        menu.addItem(EDIT_ID, "Edit");
-        menu.addSeparator();
+        BKPreparationType type = graph->getSelectedItems().getFirst()->getType();
+        if (type <= PreparationTypeTempoMod)
+        {
+            menu.addItem(EDIT_ID, "Edit");
+            menu.addSeparator();
+        }
     }
     
     if (graph->getSelectedItems().size() > 1)
@@ -789,8 +793,10 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
 
 void BKConstructionSite::mouseDrag (const MouseEvent& e)
 {
-#if JUCE_IOS
-    if ((e.x - lastX) > 50)
+    
+#if 0 //JUCE_IOS
+    DBG("mousedragdiff: " + String(e.y - lastY));
+    if ((e.y - lastY) > 50)
     {
         ((MainViewController*)getParentComponent())->setDisplay(DisplayKeyboard);
     }
