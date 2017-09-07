@@ -110,6 +110,7 @@ PopupMenu HeaderViewController::getPianoMenu(void)
     
     pianoMenu.addSeparator();
     pianoMenu.addSubMenu("Add...", getNewMenu());
+    pianoMenu.addSubMenu("Edit...", getEditMenu());
     pianoMenu.addSeparator();
    
     //pianoMenu.addSeparator();
@@ -151,6 +152,26 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     
     return galleryMenu;
     
+}
+
+PopupMenu HeaderViewController::getEditMenu(void)
+{
+    PopupMenu menu;
+    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    
+    menu.addItem(KEYMAP_EDIT_ID, "Keymap");
+    menu.addItem(DIRECT_EDIT_ID, "Direct");
+    menu.addItem(NOSTALGIC_EDIT_ID, "Nostalgic");
+    menu.addItem(SYNCHRONIC_EDIT_ID, "Synchronic");
+    menu.addItem(TUNING_EDIT_ID, "Tuning");
+    menu.addItem(TEMPO_EDIT_ID, "Tempo");
+    menu.addItem(DIRECTMOD_EDIT_ID, "Direct Mod");
+    menu.addItem(NOSTALGICMOD_EDIT_ID, "Nostalgic Mod");
+    menu.addItem(SYNCHRONICMOD_EDIT_ID, "Synchronic Mod");
+    menu.addItem(TUNINGMOD_EDIT_ID, "Tuning Mod");
+    menu.addItem(TEMPOMOD_EDIT_ID, "Tempo Mod");
+    
+    return menu;
 }
 
 PopupMenu HeaderViewController::getNewMenu(void)
@@ -261,6 +282,52 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
     else if (result == RESET_ID)
     {
         construction->addItem(PreparationTypeReset, true);
+    }
+    
+    // EDIT
+    else if (result == KEYMAP_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeKeymap);
+    }
+    else if (result == DIRECT_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeDirect);
+    }
+    else if (result == NOSTALGIC_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeNostalgic);
+    }
+    else if (result == SYNCHRONIC_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeSynchronic);
+    }
+    else if (result == TUNING_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeTuning);
+    }
+    else if (result == TEMPO_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeTempo);
+    }
+    else if (result == DIRECTMOD_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeDirectMod);
+    }
+    else if (result == NOSTALGICMOD_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeNostalgicMod);
+    }
+    else if (result == SYNCHRONICMOD_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeSynchronicMod);
+    }
+    else if (result == TUNINGMOD_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeTuningMod);
+    }
+    else if (result == TEMPOMOD_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeTempoMod);
     }
     
 }

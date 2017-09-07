@@ -65,7 +65,7 @@ public:
     
 private:
     
-    void mouseHold(Component* frame) override;
+    void mouseHold(Component* frame, bool onItem) override;
     
     int leftMost, rightMost, topMost, bottomMost;
     BKAudioProcessor& processor;
@@ -78,7 +78,10 @@ private:
     bool multiple;
     
     PopupMenu getNewMenu(void);
-    static void newMenuCallback(int result, BKConstructionSite* vc);
+    PopupMenu getConstructionOptionMenu(void);
+    PopupMenu getItemOptionMenu(void);
+    static void constructionOptionMenuCallback(int result, BKConstructionSite* vc);
+    static void itemOptionMenuCallback(int result, BKConstructionSite* vc);
     
     BKItem* itemSource;
     BKItem* itemTarget;
@@ -118,6 +121,8 @@ private:
 
     int lastX, lastY;
     int lastEX,lastEY;
+    
+    Component clickFrame;
     
     BKButtonAndMenuLAF buttonsAndMenusLAF;
     

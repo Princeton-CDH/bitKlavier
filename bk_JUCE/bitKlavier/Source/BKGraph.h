@@ -240,9 +240,13 @@ public:
 
     BKItem::PtrArr connections;
     
+    bool scaled;
+    
 private:
     BKAudioProcessor& processor;
     Label label;
+    
+
     
     // Piano menu
     BKComboBox menu;

@@ -10,6 +10,8 @@
 
 #include "BKConstructionSite.h"
 
+#include "MainViewController.h"
+
 #define NUM_COL 6
 
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, /*Viewport* vp,*/ BKItemGraph* theGraph):
@@ -21,6 +23,9 @@ lastX(10),
 lastY(10)/*,
 viewport(vp)*/
 {
+    addAndMakeVisible(clickFrame);
+    clickFrame.setSize(5,5);
+    
     setWantsKeyboardFocus(false);
     graph->deselectAll();
     
@@ -44,13 +49,17 @@ void BKConstructionSite::paint(Graphics& g)
     if (connect)
     {
         g.setColour(Colours::lightgrey);
-        g.drawLine(lineOX, lineOY, lineEX, lineEY, 3);
+        
+        
+        g.drawLine(lineOX, lineOY, lineEX, lineEY, (platform == BKIOS) ? 2 : 3);
+        
     }
     
     for (auto line : graph->getLines())
     {
         g.setColour(Colours::goldenrod);
-        g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY(), 2);
+
+        g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY(), (platform == BKIOS) ? 1 : 2);
     }
 }
 
@@ -170,9 +179,8 @@ void BKConstructionSite::pianoMapDidChange(BKItem* thisItem)
 
 void BKConstructionSite::draw(void)
 {
-
-    for (auto item : processor.currentPiano->getItems())    addAndMakeVisible(item);
-    
+    for (auto item : processor.currentPiano->getItems()) addAndMakeVisible(item);
+        
     if (processor.updateState->loadedJson)
     {
         int keymapCount = 0, prepCount = 0, otherCount = 0, modCount = 0, ttCount = 0;
@@ -471,7 +479,93 @@ PopupMenu BKConstructionSite::getNewMenu(void)
     return newMenu;
 }
 
-void BKConstructionSite::newMenuCallback(int result, BKConstructionSite* vc)
+PopupMenu BKConstructionSite::getConstructionOptionMenu(void)
+{
+    PopupMenu menu;
+    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    
+    
+    menu.addItem(PASTE_ID, "Paste");
+    menu.addSeparator();
+    menu.addItem(UNDO_ID, "Undo");
+    menu.addItem(REDO_ID, "Redo");
+    menu.addSeparator();
+    menu.addSubMenu("Add...", getNewMenu());
+    
+    return menu;
+}
+
+PopupMenu BKConstructionSite::getItemOptionMenu(void)
+{
+    PopupMenu menu;
+    menu.setLookAndFeel(&buttonsAndMenusLAF);
+
+    if (graph->getSelectedItems().size() == 1)
+    {
+        menu.addItem(EDIT_ID, "Edit");
+        menu.addSeparator();
+    }
+    
+    if (graph->getSelectedItems().size() > 1)
+    {
+        menu.addItem(ALIGN_VERTICAL, "Align (vertical)");
+        menu.addItem(ALIGN_HORIZONTAL, "Align (horizontal)");
+        menu.addSeparator();
+    }
+    
+    menu.addItem(COPY_ID, "Copy");
+    menu.addItem(CUT_ID, "Cut");
+    menu.addItem(PASTE_ID, "Paste");
+    menu.addSeparator();
+    menu.addItem(UNDO_ID, "Undo");
+    menu.addItem(REDO_ID, "Redo");
+    menu.addSeparator();
+    menu.addItem(DELETE_ID, "Delete");
+    
+    return menu;
+}
+
+void BKConstructionSite::itemOptionMenuCallback(int result, BKConstructionSite* vc)
+{
+    if (result == EDIT_ID)
+    {
+        vc->processor.updateState->setCurrentDisplay(vc->currentItem->getType(), vc->currentItem->getId());
+    }
+    else if (result == COPY_ID)
+    {
+        vc->copy();
+    }
+    else if (result == CUT_ID)
+    {
+        vc->cut();
+    }
+    else if (result == PASTE_ID)
+    {
+        vc->paste();
+    }
+    else if (result == UNDO_ID)
+    {
+        
+    }
+    else if (result == REDO_ID)
+    {
+        
+    }
+    else if (result == ALIGN_VERTICAL)
+    {
+        vc->align(0);
+    }
+    else if (result == ALIGN_HORIZONTAL)
+    {
+        vc->align(3);
+    }
+    else if (result == DELETE_ID)
+    {
+        vc->deleteSelected();
+    }
+}
+
+void BKConstructionSite::constructionOptionMenuCallback(int result, BKConstructionSite* vc)
 {
     if (result == KEYMAP_ID)
     {
@@ -509,19 +603,40 @@ void BKConstructionSite::newMenuCallback(int result, BKConstructionSite* vc)
     {
         vc->addItem(PreparationTypeReset, true);
     }
+    else if (result == UNDO_ID)
+    {
+        
+    }
+    else if (result == REDO_ID)
+    {
+        
+    }
+    else if (result == PASTE_ID)
+    {
+        vc->paste();
+    }
 }
-
 
 void BKConstructionSite::mouseDoubleClick(const MouseEvent& eo)
 {
-
+    
 }
 
-void BKConstructionSite::mouseHold(Component* frame)
+void BKConstructionSite::mouseHold(Component* frame, bool onItem)
 {
-    getNewMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (frame), ModalCallbackFunction::forComponent (newMenuCallback, this) );
+    frame->setTopLeftPosition(frame->getX()+20, frame->getY());
+    
+    if (onItem)
+    {
+        getItemOptionMenu().showMenuAsync(PopupMenu::Options().withTargetComponent (frame),
+                                          ModalCallbackFunction::forComponent (itemOptionMenuCallback, this) );
+    }
+    else
+    {
+        getConstructionOptionMenu().showMenuAsync(PopupMenu::Options().withTargetComponent (frame),
+                                                  ModalCallbackFunction::forComponent (constructionOptionMenuCallback, this) );
+    }
 }
-
 
 void BKConstructionSite::mouseDown (const MouseEvent& eo)
 {
@@ -535,6 +650,8 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     
     if (itemToSelect != nullptr)
     {
+        setMouseDownOnItem(true);
+        
         processor.gallery->setGalleryDirty(true);
         
         if (e.mods.isShiftDown())
@@ -625,6 +742,8 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
 {
     
     MouseEvent e = eo.getEventRelativeTo(this);
+    
+    mouseReleased();
 
     if (itemToSelect == nullptr) lasso->endLasso();
     
@@ -670,7 +789,16 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
 
 void BKConstructionSite::mouseDrag (const MouseEvent& e)
 {
+#if JUCE_IOS
+    if ((e.x - lastX) > 50)
+    {
+        ((MainViewController*)getParentComponent())->setDisplay(DisplayKeyboard);
+    }
+#endif
+    
     lastX = e.x; lastY = e.y;
+
+    
     
     mouseDragged();
     

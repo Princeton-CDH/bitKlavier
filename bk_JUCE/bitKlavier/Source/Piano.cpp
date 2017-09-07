@@ -1184,6 +1184,15 @@ void Piano::setState(XmlElement* e)
             
         }
     }
+    
+#if JUCE_IOS
+    {
+        for (auto item : items)
+        {
+            item->setTopLeftPosition(item->getX() * IOS_SCALE, item->getY() * IOS_SCALE);
+        }
+    }
+#endif
 }
 
 

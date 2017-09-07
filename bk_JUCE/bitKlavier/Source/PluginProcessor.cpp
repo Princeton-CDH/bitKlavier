@@ -3,8 +3,6 @@
 #include "PluginEditor.h"
 #include "BKPianoSampler.h"
 
-#define NOST_KEY_OFF 1
-
 //==============================================================================
 BKAudioProcessor::BKAudioProcessor():
 updateState(new BKUpdateState()),
@@ -22,11 +20,14 @@ resonanceReleaseSynth()
     loadGalleryFromPath(galleryNames[0]);
 
 #if JUCE_IOS
+    platform = BKIOS;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
-    
+ 
 #if JUCE_MAC
+    platform = BKOSX;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+
 #endif
     
     noteOn.ensureStorageAllocated(128);

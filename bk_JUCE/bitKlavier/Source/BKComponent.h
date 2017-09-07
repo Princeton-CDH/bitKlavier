@@ -60,8 +60,6 @@ public:
     
     MouseHoldListener()
     {
-        addMouseListener(this,true);
-        
         mouseDownComponent = new Component();
         mouseDownComponent->setSize(5,5);
         addAndMakeVisible(mouseDownComponent);
@@ -74,35 +72,30 @@ public:
         
     }
     
-    virtual void mouseHold(Component* frame) = 0;
-    
-    /*
-    void mouseDown(const MouseEvent& e) override
-    {
-        mouseDownTime = e.eventTime;
-        mouseHoldHappened = false;
-        mouseDragHappened = false;
-        mouseDownComponent->setTopLeftPosition(e.x, e.y);
-    }
-    
-    void mouseDrag(const MouseEvent& e) override
-    {
-        mouseDragHappened = true;
-    }
-    */
+    virtual void mouseHold(Component* frame, bool on) = 0;
     
     void mouseClicked(int x, int y, Time time)
     {
+        onItem = false;
+        mouseIsDown = true;
         mouseDownTime = time;
         mouseHoldHappened = false;
         mouseDragHappened = false;
         mouseDownComponent->setTopLeftPosition(x, y);
     }
     
+    void mouseReleased()
+    {
+        onItem = false;
+        mouseIsDown = false;
+    }
+    
     void mouseDragged()
     {
         mouseDragHappened = true;
     }
+    
+    void setMouseDownOnItem(bool on) { onItem = on; }
      
     
 private:
@@ -111,11 +104,11 @@ private:
     {
         mouseDownDuration = Time::getCurrentTime() - mouseDownTime;
         
-        if (isMouseButtonDown() && !mouseDragHappened && !mouseHoldHappened && (mouseDownDuration.inMilliseconds() > 250))
+        if (mouseIsDown && !mouseDragHappened && !mouseHoldHappened && (mouseDownDuration.inMilliseconds() > 250))
         {
             mouseHoldHappened = true;
             
-            mouseHold(mouseDownComponent);
+            mouseHold(mouseDownComponent, onItem);
         }
     }
 
@@ -123,7 +116,10 @@ private:
     RelativeTime mouseDownDuration;
     bool mouseHoldHappened;
     bool mouseDragHappened;
-    Component* mouseDownComponent;
+    bool mouseIsDown;
+    ScopedPointer<Component> mouseDownComponent;
+    bool onItem;
+    
     
     JUCE_LEAK_DETECTOR (MouseHoldListener)
 };

@@ -60,6 +60,7 @@ private:
     PopupMenu getPianoMenu(void);
     PopupMenu getGalleryMenu(void);
     PopupMenu getNewMenu(void);
+    PopupMenu getEditMenu(void);
     //OwnedArray<PopupMenu> submenus;
     //StringArray submenuNames;
     
