@@ -24,9 +24,11 @@ resizer(new ResizableCornerComponent (this, constrain))
     viewPort.setViewPosition(0, 0);
     addAndMakeVisible(viewPort);
     
+#if !JUCE_IOS
     addAndMakeVisible (resizer);
     
     resizer->setAlwaysOnTop(true);
+#endif
     
     constrain->setSizeLimits(gMainComponentMinWidth, gMainComponentMinHeight, gMainComponentWidth * 2, gMainComponentHeight * 2);
     
@@ -54,7 +56,9 @@ void BKAudioProcessorEditor::resized()
     
     viewPort.setBoundsRelative(0.0f,0.0f,1.0f,1.0f);
     
+#if !JUCE_IOS
     resizer->setBounds(getWidth()-16, getHeight()-16, 16, 16);
+#endif
     
     mvc.setSize(getWidth(), getHeight());
     mvc.resized();

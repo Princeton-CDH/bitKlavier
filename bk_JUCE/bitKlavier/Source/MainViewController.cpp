@@ -69,6 +69,14 @@ timerCallbackCount(0)
     keyboard->addMouseListener(this, true);
     keyboardState.addListener(this);
     
+    octaveSlider.setRange(0, 6, 1);
+    octaveSlider.addListener(this);
+    octaveSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
+    octaveSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+    octaveSlider.setValue(3);
+
+    addAndMakeVisible(octaveSlider);
+    
     preparationPanel = new PreparationPanel(processor);
     addAndMakeVisible(preparationPanel);
     
@@ -155,17 +163,27 @@ void MainViewController::resized()
 
     if (display == DisplayKeyboard)
     {
+        int octaveSliderHeight = 40;
+        octaveSlider.setTopLeftPosition(area.getX(), area.getY());
+        octaveSlider.setSize(area.getWidth(), octaveSliderHeight);
+        
+        //area.reduce(0, octaveSliderHeight*0.5);
+        
         float keyWidth = area.getWidth() / round((keyEnd - keyStart) * 7./12 + 1); //num white keys
         keyboard->setKeyWidth(keyWidth);
         keyboard->setBlackNoteLengthProportion(0.65);
         keyboardComponent->setBounds(area);
         
-        construction.setVisible(false);
+        octaveSlider.setVisible(true);
         keyboardComponent->setVisible(true);
+                               
+        construction.setVisible(false);
     }
     else
     {
         construction.setVisible(true);
+        
+        octaveSlider.setVisible(false);
         keyboardComponent->setVisible(false);
     }
     
@@ -203,10 +221,17 @@ void MainViewController::bkButtonClicked (Button* b)
 void MainViewController::sliderValueChanged (Slider* slider)
 {
     
-    if(slider == mainSlider)
+    if (slider == mainSlider)
     {
         gen->setGlobalGain(Decibels::decibelsToGain(mainSlider->getValue()));
         overtop.gvc.update();
+    }
+    else if (slider == &octaveSlider)
+    {
+        int octave = (int) octaveSlider.getValue();
+        
+        if (octave == 0)    keyboard->setAvailableRange(21, 45);
+        else                keyboard->setAvailableRange(12+octave*12, 36+octave*12);
     }
 }
 

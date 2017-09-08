@@ -53,14 +53,16 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     gallery->prepareToPlay(sampleRate);
     
-    
+    if (!didLoadMainPianoSamples)
+    {
 #if JUCE_IOS
-    loadPianoSamples(BKLoadLite);
+        loadPianoSamples(BKLoadLite);
 #endif
     
 #if JUCE_MAC
-    loadPianoSamples(BKLoadHeavy);
+        loadPianoSamples(BKLoadHeavy);
 #endif
+    }
 }
 
 BKAudioProcessor::~BKAudioProcessor()
