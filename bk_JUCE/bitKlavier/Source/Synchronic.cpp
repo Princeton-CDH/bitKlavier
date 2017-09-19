@@ -53,6 +53,7 @@ void SynchronicProcessor::setCurrentPlaybackSampleRate(double sr)
 
 void SynchronicProcessor::playNote(int channel, int note, float velocity)
 {
+	
     PianoSamplerNoteDirection noteDirection = Forward;
     float noteStartPos = 0.0;
     
@@ -70,7 +71,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
         float offset = tuner->getOffset(note) + t;
         int synthNoteNumber = ((float)note + (int)offset);
         float synthOffset = offset - (int)offset;
-        //DBG("playing synchronic note/vel " + String(note) +  " " + String(velocity));
+        DBG("playing synchronic note/vel " + String(note) +  " " + String(velocity));
         synth->keyOn(channel,
                      note,
                      synthNoteNumber,
@@ -104,7 +105,13 @@ void SynchronicProcessor::resetPhase(int skipBeats)
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
     //store velocity
-    if(!synchronic->aPrep->getReleaseVelocitySetsSynchronic()) velocities.set(noteNumber, velocity);
+#if JUCE_WINDOWS
+	velocities.set(noteNumber, velocity);
+#endif
+	if (!synchronic->aPrep->getReleaseVelocitySetsSynchronic())
+	{
+		velocities.set(noteNumber, velocity);
+	}
  
     //add note to array of depressed notes
     keysDepressed.addIfNotAlreadyThere(noteNumber);
@@ -184,11 +191,16 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     
     // If AnyNoteOffSync mode, reset phasor and multiplier indices.
     //only initiate pulses if ALL keys are released
-    if (    (synchronic->aPrep->getMode() == LastNoteOffSync && keysDepressed.size() == 0)
-         || (synchronic->aPrep->getMode() == AnyNoteOffSync))
+    if ((synchronic->aPrep->getMode() == LastNoteOffSync && keysDepressed.size() == 0) || 
+		(synchronic->aPrep->getMode() == AnyNoteOffSync))
     {
         
-        if(synchronic->aPrep->getReleaseVelocitySetsSynchronic()) velocities.set(noteNumber, velocity);
+#if !JUCE_WINDOWS
+		if (synchronic->aPrep->getReleaseVelocitySetsSynchronic())
+		{
+			velocities.set(noteNumber, velocity);
+		}
+#endif
         
         resetPhase(synchronic->aPrep->getBeatsToSkip() - 1);
         
@@ -294,16 +306,18 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             if(playCluster)
             {
                 //for (int n = slimCluster.size(); --n >= 0;)
-                for (int n=0; n<slimCluster.size(); n++)
+                for (int n=0; n < cluster.size(); n++)
                 {
-                    /*
-                    playNote(channel,
+                    
+                    /*playNote(channel,
                              cluster[n],
-                             velocities.getUnchecked(cluster[n]));
-                     */
-                    playNote(channel,
+                             velocities.getUnchecked(cluster[n]));*/
+                     
+                   
+					playNote(channel,
                              slimCluster[n],
                              velocities.getUnchecked(slimCluster[n]));
+					
                 }
                 
             }
@@ -348,7 +362,7 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
                         //adaptiveTempoPeriodMultiplier;
     }
     
-    //DBG("time in ms to next beat = " + std::to_string(timeToReturn * 1000./sampleRate));
+    //DBG("time in ms to next beat = " + String(timeToReturn * 1000./sampleRate));
     return timeToReturn * 1000./sampleRate; //optimize later....
 }
 

@@ -173,7 +173,7 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     
 #if JUCE_WINDOWS
     saveKeystroke = "(Ctrl-S)";
-    saveAsKeystroke = "(Shift-Ctrl-S)"
+	saveAsKeystroke = "(Shift-Ctrl-S)";
 #endif
     
     galleryMenu.addItem(SAVE_ID, "Save " );

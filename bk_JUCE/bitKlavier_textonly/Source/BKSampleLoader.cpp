@@ -180,7 +180,7 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
                 else if(k==1) temp += "S";
                 else if(k==2) temp += "L";
                 temp += notes[j];
-                temp += std::to_string(i);
+                temp += String(i);
                 temp += ".wav";
                 
                 File file(temp);
@@ -236,7 +236,7 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
                         BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels),maxLength);
                         sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, sampleReader->lengthInSamples, 0, true, true);
                         
-                        //DBG("added resonance: " + std::to_string(noteRange.toInteger()) + " " + std::to_string(root) + " " + std::to_string(velocityRange.toInteger()) );
+                        //DBG("added resonance: " + String(noteRange.toInteger()) + " " + String(root) + " " + String(velocityRange.toInteger()) );
                         synth->addSound(new BKPianoSamplerSound(soundName,
                                                                                newBuffer,
                                                                                maxLength,
@@ -271,7 +271,7 @@ void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
         
         String temp = path;
         temp += "rel";
-        temp += std::to_string(i);
+        temp += String(i);
         temp += ".wav";
         
         File file(temp);
