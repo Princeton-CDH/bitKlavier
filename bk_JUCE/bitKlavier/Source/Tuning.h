@@ -211,7 +211,7 @@ public:
         DBG("tFundamental: " +                  String(tFundamental));
         DBG("tFundamentalOffset: " +            String(tFundamentalOffset));
         DBG("tAdaptiveIntervalScale: " +        String(tAdaptiveIntervalScale));
-        DBG("tAdaptiveInversional: " +          String(tAdaptiveInversional));
+        DBG("tAdaptiveInversional: " +          String((int)tAdaptiveInversional));
         DBG("tAdaptiveAnchorScale: " +          String(tAdaptiveAnchorScale));
         DBG("tAdaptiveAnchorFundamental: " +    String(tAdaptiveAnchorFundamental));
         DBG("tAdaptiveClusterThresh: " +        String(tAdaptiveClusterThresh));
@@ -402,7 +402,7 @@ public:
         param.set(TuningFundamental, String(p->getFundamental()));
         param.set(TuningOffset, String(p->getFundamentalOffset()));
         param.set(TuningA1IntervalScale, String(p->getAdaptiveIntervalScale()));
-        param.set(TuningA1Inversional, String(p->getAdaptiveInversional()));
+        param.set(TuningA1Inversional, String((int)p->getAdaptiveInversional()));
         param.set(TuningA1AnchorScale, String(p->getAdaptiveAnchorScale()));
         param.set(TuningA1AnchorFundamental, String(p->getAdaptiveAnchorFundamental()));
         param.set(TuningA1ClusterThresh, String(p->getAdaptiveClusterThresh()));
@@ -454,7 +454,7 @@ public:
         param.set(TuningFundamental, String(p->getFundamental()));
         param.set(TuningOffset, String(p->getFundamentalOffset()));
         param.set(TuningA1IntervalScale, String(p->getAdaptiveIntervalScale()));
-        param.set(TuningA1Inversional, String(p->getAdaptiveInversional()));
+        param.set(TuningA1Inversional, String((int)p->getAdaptiveInversional()));
         param.set(TuningA1AnchorScale, String(p->getAdaptiveAnchorScale()));
         param.set(TuningA1AnchorFundamental, String(p->getAdaptiveAnchorFundamental()));
         param.set(TuningA1ClusterThresh, String(p->getAdaptiveClusterThresh()));

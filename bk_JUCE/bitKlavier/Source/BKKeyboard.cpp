@@ -98,7 +98,6 @@ octaveNumForMiddleC (3)
 
 BKKeymapKeyboardComponent::~BKKeymapKeyboardComponent()
 {
-    state.removeListener (this);
 }
 
 //==============================================================================

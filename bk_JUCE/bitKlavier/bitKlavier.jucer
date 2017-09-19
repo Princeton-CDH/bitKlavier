@@ -9,7 +9,7 @@
               pluginWantsMidiIn="1" pluginProducesMidiOut="1" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="1" pluginAUExportPrefix="BKAU" pluginRTASCategory=""
               aaxIdentifier="com.manyarrowsmusic.bitKlavier" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
-              jucerVersion="5.1.1" companyName="manyarrowsmusic" companyEmail="dtrueman@princeton.edu"
+              jucerVersion="5.1.2" companyName="manyarrowsmusic" companyEmail="dtrueman@princeton.edu"
               maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
               displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Light"
               buildStandalone="1" enableIAA="0" cppLanguageStandard="11">
@@ -26,6 +26,10 @@
           <FILE id="CHQGaP" name="general_icon.png" compile="0" resource="1"
                 file="Source/icons/general_icon.png"/>
           <FILE id="a9zMwc" name="icon.png" compile="0" resource="1" file="Source/icons/icon.png"/>
+          <FILE id="D50AzU" name="icon_win_large.png" compile="0" resource="1"
+                file="Source/icons/icon_win_large.png"/>
+          <FILE id="wvKUCU" name="icon_win_small.png" compile="0" resource="1"
+                file="Source/icons/icon_win_small.png"/>
           <FILE id="jAEdvs" name="keymap_icon.png" compile="0" resource="1" file="Source/icons/keymap_icon.png"/>
           <FILE id="iljBYp" name="mod_direct_icon.png" compile="0" resource="1"
                 file="Source/icons/mod_direct_icon.png"/>
@@ -291,7 +295,8 @@
         <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
-    <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="">
+    <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="C:\SDKs\VST3_SDK"
+            bigIcon="D50AzU" smallIcon="wvKUCU">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="1" optimisation="1" targetName="bitKlavier"/>

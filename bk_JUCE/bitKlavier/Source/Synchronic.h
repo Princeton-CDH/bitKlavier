@@ -235,7 +235,7 @@ public:
         DBG("sClusterMax: " + String(sClusterMax));
         DBG("sClusterCap: " + String(sClusterCap));
         DBG("sClusterThresh: " + String(sClusterThresh));
-        DBG("sReleaseVelocitySetsSynchronic: " + String(sReleaseVelocitySetsSynchronic));
+        DBG("sReleaseVelocitySetsSynchronic: " + String((int)sReleaseVelocitySetsSynchronic));
         DBG("sMode: " + String(sMode));
         DBG("sBeatsToSkip: " + String(sBeatsToSkip));
         DBG("sBeatMultipliers: " + floatArrayToString(sBeatMultipliers));
