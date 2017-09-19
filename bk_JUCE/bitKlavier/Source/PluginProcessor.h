@@ -28,6 +28,8 @@
 #define USE_SYNCHRONIC_TWO 0
 
 
+
+
 //==============================================================================
 /**
 */
@@ -71,7 +73,7 @@ public:
     String                              currentGallery;
     String                              currentGalleryPath;
     
-    
+
    
     void updateGalleries(void);
     
@@ -180,6 +182,7 @@ public:
 
 
 private:
+    
     int  currentPianoId;
     
     double bkSampleRate;

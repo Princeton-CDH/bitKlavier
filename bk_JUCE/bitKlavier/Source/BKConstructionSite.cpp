@@ -10,10 +10,11 @@
 
 #include "BKConstructionSite.h"
 
+#include "MainViewController.h"
+
 #define NUM_COL 6
 
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, /*Viewport* vp,*/ BKItemGraph* theGraph):
-BKDraggableComponent(false,false,false),
 altDown(false),
 processor(p),
 graph(theGraph),
@@ -22,8 +23,13 @@ lastX(10),
 lastY(10)/*,
 viewport(vp)*/
 {
+    addAndMakeVisible(clickFrame);
+    clickFrame.setSize(5,5);
+    
     setWantsKeyboardFocus(false);
     graph->deselectAll();
+    
+    addMouseListener(this, true);
 }
 
 BKConstructionSite::~BKConstructionSite(void)
@@ -43,13 +49,17 @@ void BKConstructionSite::paint(Graphics& g)
     if (connect)
     {
         g.setColour(Colours::lightgrey);
-        g.drawLine(lineOX, lineOY, lineEX, lineEY, 3);
+        
+        
+        g.drawLine(lineOX, lineOY, lineEX, lineEY, (platform == BKIOS) ? 2 : 3);
+        
     }
     
     for (auto line : graph->getLines())
     {
         g.setColour(Colours::goldenrod);
-        g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY(), 2);
+
+        g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY(), (platform == BKIOS) ? 1 : 2);
     }
 }
 
@@ -169,9 +179,8 @@ void BKConstructionSite::pianoMapDidChange(BKItem* thisItem)
 
 void BKConstructionSite::draw(void)
 {
-
-    for (auto item : processor.currentPiano->getItems())    addAndMakeVisible(item);
-    
+    for (auto item : processor.currentPiano->getItems()) addAndMakeVisible(item);
+        
     if (processor.updateState->loadedJson)
     {
         int keymapCount = 0, prepCount = 0, otherCount = 0, modCount = 0, ttCount = 0;
@@ -301,6 +310,11 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
         toAdd->configurePianoCB();
     }
     
+#if JUCE_IOS
+    toAdd->setTopLeftPosition(lastX, lastY);
+#endif
+    
+#if JUCE_MAC
     if (center)
     {
         toAdd->setTopLeftPosition(300, 250);
@@ -309,6 +323,7 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
     {
         toAdd->setTopLeftPosition(lastX, lastY);
     }
+#endif
 
     lastX += 10; lastY += 10;
     
@@ -446,6 +461,187 @@ void BKConstructionSite::mouseMove (const MouseEvent& eo)
     lastEY = e.y;
 }
 
+PopupMenu BKConstructionSite::getNewMenu(void)
+{
+    PopupMenu newMenu;
+    newMenu.setLookAndFeel(&buttonsAndMenusLAF);
+    
+    newMenu.addItem(KEYMAP_ID, "Keymap");
+    newMenu.addItem(DIRECT_ID, "Direct");
+    newMenu.addItem(NOSTALGIC_ID, "Nostalgic");
+    newMenu.addItem(SYNCHRONIC_ID, "Synchronic");
+    newMenu.addItem(TUNING_ID, "Tuning");
+    newMenu.addItem(TEMPO_ID, "Tempo");
+    newMenu.addItem(MODIFICATION_ID, "Modification");
+    newMenu.addItem(PIANOMAP_ID, "Piano Map");
+    newMenu.addItem(RESET_ID, "Reset");
+    
+    return newMenu;
+}
+
+PopupMenu BKConstructionSite::getConstructionOptionMenu(void)
+{
+    PopupMenu menu;
+    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    
+    
+    menu.addItem(PASTE_ID, "Paste");
+    menu.addSeparator();
+    menu.addItem(UNDO_ID, "Undo");
+    menu.addItem(REDO_ID, "Redo");
+    menu.addSeparator();
+    menu.addSubMenu("Add...", getNewMenu());
+    
+    return menu;
+}
+
+PopupMenu BKConstructionSite::getItemOptionMenu(void)
+{
+    PopupMenu menu;
+    menu.setLookAndFeel(&buttonsAndMenusLAF);
+
+    if (graph->getSelectedItems().size() == 1)
+    {
+        BKPreparationType type = graph->getSelectedItems().getFirst()->getType();
+        if (type <= PreparationTypeTempoMod)
+        {
+            menu.addItem(EDIT_ID, "Edit");
+            menu.addSeparator();
+        }
+    }
+    
+    if (graph->getSelectedItems().size() > 1)
+    {
+        menu.addItem(ALIGN_VERTICAL, "Align (vertical)");
+        menu.addItem(ALIGN_HORIZONTAL, "Align (horizontal)");
+        menu.addSeparator();
+    }
+    
+    menu.addItem(COPY_ID, "Copy");
+    menu.addItem(CUT_ID, "Cut");
+    menu.addItem(PASTE_ID, "Paste");
+    menu.addSeparator();
+    menu.addItem(UNDO_ID, "Undo");
+    menu.addItem(REDO_ID, "Redo");
+    menu.addSeparator();
+    menu.addItem(DELETE_ID, "Delete");
+    
+    return menu;
+}
+
+void BKConstructionSite::itemOptionMenuCallback(int result, BKConstructionSite* vc)
+{
+    if (result == EDIT_ID)
+    {
+        vc->processor.updateState->setCurrentDisplay(vc->currentItem->getType(), vc->currentItem->getId());
+    }
+    else if (result == COPY_ID)
+    {
+        vc->copy();
+    }
+    else if (result == CUT_ID)
+    {
+        vc->cut();
+    }
+    else if (result == PASTE_ID)
+    {
+        vc->paste();
+    }
+    else if (result == UNDO_ID)
+    {
+        
+    }
+    else if (result == REDO_ID)
+    {
+        
+    }
+    else if (result == ALIGN_VERTICAL)
+    {
+        vc->align(0);
+    }
+    else if (result == ALIGN_HORIZONTAL)
+    {
+        vc->align(3);
+    }
+    else if (result == DELETE_ID)
+    {
+        vc->deleteSelected();
+    }
+}
+
+void BKConstructionSite::constructionOptionMenuCallback(int result, BKConstructionSite* vc)
+{
+    if (result == KEYMAP_ID)
+    {
+        vc->addItem(PreparationTypeKeymap, true);
+    }
+    else if (result == DIRECT_ID)
+    {
+        vc->addItem(PreparationTypeDirect, true);
+    }
+    else if (result == NOSTALGIC_ID)
+    {
+        vc->addItem(PreparationTypeNostalgic, true);
+    }
+    else if (result == SYNCHRONIC_ID)
+    {
+        vc->addItem(PreparationTypeSynchronic, true);
+    }
+    else if (result == TUNING_ID)
+    {
+        vc->addItem(PreparationTypeTuning, true);
+    }
+    else if (result == TEMPO_ID)
+    {
+        vc->addItem(PreparationTypeTempo, true);
+    }
+    else if (result == MODIFICATION_ID)
+    {
+        vc->addItem(PreparationTypeGenericMod, true);
+    }
+    else if (result == PIANOMAP_ID)
+    {
+        vc->addItem(PreparationTypePianoMap, true);
+    }
+    else if (result == RESET_ID)
+    {
+        vc->addItem(PreparationTypeReset, true);
+    }
+    else if (result == UNDO_ID)
+    {
+        
+    }
+    else if (result == REDO_ID)
+    {
+        
+    }
+    else if (result == PASTE_ID)
+    {
+        vc->paste();
+    }
+}
+
+void BKConstructionSite::mouseDoubleClick(const MouseEvent& eo)
+{
+    
+}
+
+void BKConstructionSite::mouseHold(Component* frame, bool onItem)
+{
+    frame->setTopLeftPosition(frame->getX()+20, frame->getY());
+    
+    if (onItem)
+    {
+        getItemOptionMenu().showMenuAsync(PopupMenu::Options().withTargetComponent (frame),
+                                          ModalCallbackFunction::forComponent (itemOptionMenuCallback, this) );
+    }
+    else
+    {
+        getConstructionOptionMenu().showMenuAsync(PopupMenu::Options().withTargetComponent (frame),
+                                                  ModalCallbackFunction::forComponent (constructionOptionMenuCallback, this) );
+    }
+}
+
 void BKConstructionSite::mouseDown (const MouseEvent& eo)
 {
     MouseEvent e = eo.getEventRelativeTo(this);
@@ -454,8 +650,12 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     
     lastX = e.x; lastY = e.y;
     
+    mouseClicked(lastX, lastY, e.eventTime);
+    
     if (itemToSelect != nullptr)
     {
+        setMouseDownOnItem(true);
+        
         processor.gallery->setGalleryDirty(true);
         
         if (e.mods.isShiftDown())
@@ -542,34 +742,13 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     
 }
 
-void BKConstructionSite::mouseDrag (const MouseEvent& e)
-{
-    lastX = e.x; lastY = e.y;
-    
-    if (itemToSelect == nullptr) lasso->dragLasso(e);
-    
-    if (!connect && !e.mods.isShiftDown())
-    {
-        for (auto item : graph->getSelectedItems())
-        {
-            item->performDrag(e);
-            
-            //if (item->)
-        }
-    }
-    
-    lineEX = e.getEventRelativeTo(this).x;
-    lineEY = e.getEventRelativeTo(this).y;
-    
-    repaint();
-
-}
-
 void BKConstructionSite::mouseUp (const MouseEvent& eo)
 {
     
     MouseEvent e = eo.getEventRelativeTo(this);
     
+    mouseReleased();
+
     if (itemToSelect == nullptr) lasso->endLasso();
     
     if (selected.getNumSelected())
@@ -611,6 +790,34 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
     getParentComponent()->grabKeyboardFocus();
     
 }
+
+void BKConstructionSite::mouseDrag (const MouseEvent& e)
+{
+    lastX = e.x; lastY = e.y;
+
+    
+    
+    mouseDragged();
+    
+    if (itemToSelect == nullptr) lasso->dragLasso(e);
+    
+    if (!connect && !e.mods.isShiftDown())
+    {
+        for (auto item : graph->getSelectedItems())
+        {
+            item->performDrag(e);
+            
+            //if (item->)
+        }
+    }
+    
+    lineEX = e.getEventRelativeTo(this).x;
+    lineEY = e.getEventRelativeTo(this).y;
+    
+    repaint();
+
+}
+
 
 void BKConstructionSite::idDidChange(void)
 {

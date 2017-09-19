@@ -77,8 +77,6 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
         url = xml->getStringAttribute("url");
         setDefaultPiano(xml->getStringAttribute("defaultPiano").getIntValue());
 
-        DBG("loaded url: " + url);
-        
         // iterate through its sub-elements
         forEachXmlChildElement (*xml, e)
         {
@@ -95,8 +93,6 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                     
                     idCount.set(idType, i);
                 }
-                
-                DBG("idCountsPOSTLOAD: " + intArrayToString(idCount));
             }
             else if (e->hasTagName( vtagKeymap))
             {

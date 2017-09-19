@@ -40,7 +40,9 @@ BKViewController(p, theGraph)
     
     keyboard = (BKKeymapKeyboardComponent*)keyboardComponent.get();
     keyboard->setScrollButtonsVisible(false);
+    
     keyboard->setAvailableRange(21, 108);
+    
     keyboard->setAllowDrag(true);
     keyboard->setOctaveForMiddleC(4);
     keyboardState.addListener(this);

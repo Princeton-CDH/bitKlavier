@@ -70,6 +70,75 @@ public:
         currentDisplay = type;
         displayDidChange = true;
     }
+    void setCurrentDisplay(BKPreparationType type, int Id = -1)
+    {
+        if (type == PreparationTypeDirect)
+        {
+            currentDirectId = (Id == -1) ? currentDirectId : Id;
+            directPreparationDidChange = true;
+            setCurrentDisplay(DisplayDirect);
+        }
+        else if (type == PreparationTypeSynchronic)
+        {
+            currentSynchronicId = (Id == -1) ? currentSynchronicId : Id;
+            synchronicPreparationDidChange = true;
+            setCurrentDisplay(DisplaySynchronic);
+        }
+        else if (type == PreparationTypeNostalgic)
+        {
+            currentNostalgicId = (Id == -1) ? currentNostalgicId : Id;
+            nostalgicPreparationDidChange = true;
+            setCurrentDisplay(DisplayNostalgic);
+        }
+        else if (type == PreparationTypeTuning)
+        {
+            currentTuningId = (Id == -1) ? currentTuningId : Id;
+            tuningPreparationDidChange = true;
+            setCurrentDisplay(DisplayTuning);
+        }
+        else if (type == PreparationTypeTempo)
+        {
+            currentTempoId = (Id == -1) ? currentTempoId : Id;
+            tempoPreparationDidChange = true;
+            setCurrentDisplay(DisplayTempo);
+        }
+        else if (type == PreparationTypeKeymap)
+        {
+            currentKeymapId = (Id == -1) ? currentKeymapId : Id;
+            keymapDidChange = true;
+            setCurrentDisplay(DisplayKeymap);
+        }
+        else if (type == PreparationTypeDirectMod)
+        {
+            currentModDirectId = (Id == -1) ? currentModDirectId : Id;
+            directDidChange = true;
+            setCurrentDisplay(DisplayDirectMod);
+        }
+        else if (type == PreparationTypeNostalgicMod)
+        {
+            currentModNostalgicId = (Id == -1) ? currentModNostalgicId : Id;
+            nostalgicPreparationDidChange = true;
+            setCurrentDisplay(DisplayNostalgicMod);
+        }
+        else if (type == PreparationTypeSynchronicMod)
+        {
+            currentModSynchronicId = (Id == -1) ? currentModSynchronicId : Id;
+            synchronicPreparationDidChange = true;
+            setCurrentDisplay(DisplaySynchronicMod);
+        }
+        else if (type == PreparationTypeTuningMod)
+        {
+            currentModTuningId = (Id == -1) ? currentModTuningId : Id;
+            tuningPreparationDidChange = true;
+            setCurrentDisplay(DisplayTuningMod);
+        }
+        else if (type == PreparationTypeTempoMod)
+        {
+            currentModTempoId = (Id == -1) ? currentModTempoId : Id;
+            tempoPreparationDidChange = true;
+            setCurrentDisplay(DisplayTempoMod);
+        }
+    }
     
     int getCurrentId(BKPreparationDisplay type)
     {

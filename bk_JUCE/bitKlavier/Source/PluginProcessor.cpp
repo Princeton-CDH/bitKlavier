@@ -3,8 +3,6 @@
 #include "PluginEditor.h"
 #include "BKPianoSampler.h"
 
-#define NOST_KEY_OFF 1
-
 //==============================================================================
 BKAudioProcessor::BKAudioProcessor():
 updateState(new BKUpdateState()),
@@ -20,7 +18,17 @@ resonanceReleaseSynth()
     updateUI();
     
     loadGalleryFromPath(galleryNames[0]);
+
+#if JUCE_IOS
+    platform = BKIOS;
+    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
+ 
+#if JUCE_MAC
+    platform = BKOSX;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+
+#endif
     
     noteOn.ensureStorageAllocated(128);
     for(int i=0; i< 128; i++)
@@ -45,7 +53,16 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     gallery->prepareToPlay(sampleRate);
     
-    loadPianoSamples(BKLoadHeavy);    
+    if (!didLoadMainPianoSamples)
+    {
+#if JUCE_IOS
+        loadPianoSamples(BKLoadLite);
+#endif
+    
+#if JUCE_MAC
+        loadPianoSamples(BKLoadHeavy);
+#endif
+    }
 }
 
 BKAudioProcessor::~BKAudioProcessor()
@@ -66,7 +83,14 @@ void BKAudioProcessor::createNewGallery(String name)
     updateState->loadedJson = false;
     
     File bkGalleries;
+
+#if JUCE_IOS
+    bkGalleries = bkGalleries.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
+    
+#if JUCE_MAC
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
     
     /*
     String newFileName = name + ".xml";
@@ -109,7 +133,14 @@ void BKAudioProcessor::createNewGallery(String name)
 void BKAudioProcessor::renameGallery(String name)
 {
     File bkGalleries;
+    
+#if JUCE_IOS
+    bkGalleries = bkGalleries.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
+    
+#if JUCE_MAC
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
     
     String relativePath = currentGalleryPath.fromFirstOccurrenceOf("bitKlavier resources/galleries/", false, false);
     
@@ -259,6 +290,10 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     mainPianoSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
+    
+#if JUCE_IOS
+    buffer.applyGain(0, numSamples, 0.25);
+#endif
     
     // store buffer for level calculation when needed
     levelBuf.copyFrom(0, 0, buffer, 0, 0, numSamples);

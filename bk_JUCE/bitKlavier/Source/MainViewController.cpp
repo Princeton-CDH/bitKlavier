@@ -10,16 +10,20 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainViewController.h"
+#include "BKConstructionSite.h"
 
 //==============================================================================
 MainViewController::MainViewController (BKAudioProcessor& p):
 processor (p),
 theGraph(p),
 header(p, &construction),
-construction(p, /*&viewPort,*/ &theGraph),
+construction(p, &theGraph),
 overtop(p, &theGraph),
 timerCallbackCount(0)
 {
+    if (platform == BKIOS)  display = DisplayConstruction;
+    else                    display = DisplayDefault;
+    
     initial = true;
     addMouseListener(this, true);
     
@@ -42,26 +46,36 @@ timerCallbackCount(0)
     mainSlider->setPopupMenuEnabled (true);
     mainSlider->setValue (0);
     mainSlider->setSliderStyle (Slider::LinearBarVertical);
-    //mainSlider->setSliderStyle (Slider::LinearVertical);
     mainSlider->setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
     mainSlider->setPopupDisplayEnabled (true, true, this);
     mainSlider->setDoubleClickReturnValue (true, 0.0); // double-clicking this slider will set it to 50.0
     mainSlider->setTextValueSuffix (" dB");
     mainSlider->addListener(this);
     
+
     addAndMakeVisible (keyboardComponent =
                        new BKKeymapKeyboardComponent (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard));
     
-    keyboard =  ((BKKeymapKeyboardComponent*) keyboardComponent);
+    if (platform == BKIOS)  {keyStart = 48; keyEnd = 72;    }
+    else                    {keyStart = 21; keyEnd = 108;   }
     
+    keyboard =  ((BKKeymapKeyboardComponent*) keyboardComponent);
     keyboard->setScrollButtonsVisible(false);
-    keyboard->setAvailableRange(21, 108);
+    keyboard->setAvailableRange(keyStart, keyEnd);
     keyboard->setOctaveForMiddleC(4);
     keyboard->setFundamental(-1);
     keyboard->setAllowDrag(true);
     keyboard->doKeysToggle(false);
     keyboard->addMouseListener(this, true);
     keyboardState.addListener(this);
+    
+    octaveSlider.setRange(0, 6, 1);
+    octaveSlider.addListener(this);
+    octaveSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
+    octaveSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+    octaveSlider.setValue(3);
+
+    addAndMakeVisible(octaveSlider);
     
     preparationPanel = new PreparationPanel(processor);
     addAndMakeVisible(preparationPanel);
@@ -97,11 +111,19 @@ void MainViewController::paint (Graphics& g)
     g.drawRect(bounds, 1);
 }
 
+void MainViewController::setDisplay(DisplayType type)
+{
+    display = type;
+    
+    resized();
+    repaint();
+}
+
 void MainViewController::resized()
 {
    
-    int headerHeight = 30;
-    int sidebarWidth = 20;
+    int headerHeight = (platform == BKIOS) ? 40 : 30;
+    int sidebarWidth = (platform == BKIOS) ? 30 : 20;
     int footerHeight = 40;
     
     float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
@@ -111,22 +133,20 @@ void MainViewController::resized()
     header.setBounds(area.removeFromTop(headerHeight));
     
     Rectangle<int> overtopSlice = area;
-    //overtopSlice.reduce(70 * paddingScalarX, 90 * paddingScalarY);
     overtopSlice.removeFromTop(60 * paddingScalarY);
     overtopSlice.removeFromBottom(120 * paddingScalarY);
     overtopSlice.reduce(70 * paddingScalarX, 0);
     overtop.setBounds(overtopSlice);
     
-    Rectangle<int> footerSlice = area.removeFromBottom(footerHeight + footerHeight * paddingScalarY + gYSpacing);
-    //float keyWidth = footerSlice.getWidth() / round((108 - 21) * 7./12 + 1);
-    footerSlice.reduce(gXSpacing, gYSpacing);
-    //keyboardComponent.setKeyWidth(keyWidth);
-    //keyboardComponent.setBlackNoteLengthProportion(0.65);
-    //keyboardComponent.setBounds(footerSlice);
-    float keyWidth = footerSlice.getWidth() / round((108 - 21) * 7./12 + 1); //num white keys
-    keyboard->setKeyWidth(keyWidth);
-    keyboard->setBlackNoteLengthProportion(0.65);
-    keyboardComponent->setBounds(footerSlice);
+    if (display == DisplayDefault)
+    {
+        Rectangle<int> footerSlice = area.removeFromBottom(footerHeight + footerHeight * paddingScalarY + gYSpacing);
+        footerSlice.reduce(gXSpacing, gYSpacing);
+        float keyWidth = footerSlice.getWidth() / round((keyEnd - keyStart) * 7./12 + 1); //num white keys
+        keyboard->setKeyWidth(keyWidth);
+        keyboard->setBlackNoteLengthProportion(0.65);
+        keyboardComponent->setBounds(footerSlice);
+    }
     
     Rectangle<int> levelMeterSlice = area.removeFromLeft(sidebarWidth + gXSpacing);
     levelMeterSlice.removeFromLeft(gXSpacing);
@@ -140,44 +160,53 @@ void MainViewController::resized()
     
     area.reduce(gXSpacing, 3);
     construction.setBounds(area);
-    
-    /*
-    viewPort.setBounds(area);
-    viewPort.toBack();
-    
-    if (initial)
+
+    if (display == DisplayKeyboard)
     {
-        initial = false;
-        initialWidth = viewPort.getWidth(); initialHeight = viewPort.getHeight();
-        construction.setBounds(viewPort.getBounds());
-    }
-    
-    if (!construction.itemOutsideBounds(viewPort.getBounds()))
-    {
-        if (viewPort.getWidth() > initialWidth) construction.setSize(viewPort.getWidth(), construction.getHeight());
+        int octaveSliderHeight = 40;
+        octaveSlider.setTopLeftPosition(area.getX(), area.getY());
+        octaveSlider.setSize(area.getWidth(), octaveSliderHeight);
         
-        if (viewPort.getHeight() > initialHeight) construction.setSize(construction.getWidth(), viewPort.getHeight());
+        //area.reduce(0, octaveSliderHeight*0.5);
+        
+        float keyWidth = area.getWidth() / round((keyEnd - keyStart) * 7./12 + 1); //num white keys
+        keyboard->setKeyWidth(keyWidth);
+        keyboard->setBlackNoteLengthProportion(0.65);
+        keyboardComponent->setBounds(area);
+        
+        octaveSlider.setVisible(true);
+        keyboardComponent->setVisible(true);
+                               
+        construction.setVisible(false);
     }
-     */
+    else
+    {
+        construction.setVisible(true);
+        
+        octaveSlider.setVisible(false);
+        keyboardComponent->setVisible(false);
+    }
     
-    
-    
-    
-    /*
-    backgroundImageComponent.setBounds(getBounds());
-    backgroundImageComponent.toBack();
-     */
 }
 
 void MainViewController::mouseDown(const MouseEvent &event)
 {
     if(event.eventComponent == &construction)
     {
-        
         if (overtop.getCurrentDisplay() != DisplayNil)
         {
             processor.updateState->setCurrentDisplay(DisplayNil);
         }
+    
+    }
+    else
+    {
+#if JUCE_IOS
+        if (event.eventComponent == levelMeterComponentL)
+        {
+            setDisplay((display == DisplayKeyboard) ? DisplayConstruction : DisplayKeyboard);
+        }
+#endif
     }
 }
 
@@ -192,10 +221,17 @@ void MainViewController::bkButtonClicked (Button* b)
 void MainViewController::sliderValueChanged (Slider* slider)
 {
     
-    if(slider == mainSlider)
+    if (slider == mainSlider)
     {
         gen->setGlobalGain(Decibels::decibelsToGain(mainSlider->getValue()));
         overtop.gvc.update();
+    }
+    else if (slider == &octaveSlider)
+    {
+        int octave = (int) octaveSlider.getValue();
+        
+        if (octave == 0)    keyboard->setAvailableRange(21, 45);
+        else                keyboard->setAvailableRange(12+octave*12, 36+octave*12);
     }
 }
 

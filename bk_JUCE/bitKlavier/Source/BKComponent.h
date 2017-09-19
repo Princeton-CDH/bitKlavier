@@ -53,6 +53,77 @@ private:
     JUCE_LEAK_DETECTOR (BKComponent)
 };
 
+
+class MouseHoldListener : public Component, private Timer
+{
+public:
+    
+    MouseHoldListener()
+    {
+        mouseDownComponent = new Component();
+        mouseDownComponent->setSize(5,5);
+        addAndMakeVisible(mouseDownComponent);
+        
+        startTimer(50);
+    }
+    
+    ~MouseHoldListener(void)
+    {
+        
+    }
+    
+    virtual void mouseHold(Component* frame, bool on) = 0;
+    
+    void mouseClicked(int x, int y, Time time)
+    {
+        onItem = false;
+        mouseIsDown = true;
+        mouseDownTime = time;
+        mouseHoldHappened = false;
+        mouseDragHappened = false;
+        mouseDownComponent->setTopLeftPosition(x, y);
+    }
+    
+    void mouseReleased()
+    {
+        onItem = false;
+        mouseIsDown = false;
+    }
+    
+    void mouseDragged()
+    {
+        mouseDragHappened = true;
+    }
+    
+    void setMouseDownOnItem(bool on) { onItem = on; }
+     
+    
+private:
+    
+    void timerCallback(void) override
+    {
+        mouseDownDuration = Time::getCurrentTime() - mouseDownTime;
+        
+        if (mouseIsDown && !mouseDragHappened && !mouseHoldHappened && (mouseDownDuration.inMilliseconds() > 250))
+        {
+            mouseHoldHappened = true;
+            
+            mouseHold(mouseDownComponent, onItem);
+        }
+    }
+
+    Time mouseDownTime;
+    RelativeTime mouseDownDuration;
+    bool mouseHoldHappened;
+    bool mouseDragHappened;
+    bool mouseIsDown;
+    ScopedPointer<Component> mouseDownComponent;
+    bool onItem;
+    
+    
+    JUCE_LEAK_DETECTOR (MouseHoldListener)
+};
+
 class BKDraggableComponent    : public BKComponent, public DragAndDropTarget
 {
 public:

@@ -279,6 +279,18 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel)
 {
     if (pKeymap->containsNote(noteNumber))
     {
+        
+        if(sustainPedalIsDepressed)
+        {
+            DBG("removing sustained note " + String(noteNumber));
+            
+            for(int i=0; i<sustainedNotes.size(); i++)
+            {
+                if(sustainedNotes.getUnchecked(i).noteNumber == noteNumber)
+                    sustainedNotes.remove(i);
+            }
+        }
+        
         for (auto proc : dprocessor)
             proc->keyPressed(noteNumber, velocity, channel);
         

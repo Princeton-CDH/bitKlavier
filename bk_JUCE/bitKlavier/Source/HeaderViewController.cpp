@@ -10,25 +10,6 @@
 
 #include "HeaderViewController.h"
 
-#define SAVE_ID 1
-#define SAVEAS_ID 2
-#define OPEN_ID 3
-#define NEW_ID 4
-#define CLEAN_ID 5
-#define SETTINGS_ID 6
-#define OPENOLD_ID 7
-#define DIRECT_ID 8
-#define NOSTALGIC_ID 9
-#define SYNCHRONIC_ID 10
-#define TUNING_ID 11
-#define TEMPO_ID 12
-#define MODIFICATION_ID 13
-#define PIANOMAP_ID 14
-#define RESET_ID 15
-#define NEWGALLERY_ID 16
-#define DELETE_ID 17
-#define KEYMAP_ID 18
-
 HeaderViewController::HeaderViewController (BKAudioProcessor& p, BKConstructionSite* c):
 processor (p),
 construction(c)
@@ -129,6 +110,7 @@ PopupMenu HeaderViewController::getPianoMenu(void)
     
     pianoMenu.addSeparator();
     pianoMenu.addSubMenu("Add...", getNewMenu());
+    pianoMenu.addSubMenu("Edit...", getEditMenu());
     pianoMenu.addSeparator();
    
     //pianoMenu.addSeparator();
@@ -137,23 +119,7 @@ PopupMenu HeaderViewController::getPianoMenu(void)
     return pianoMenu;
 }
 
-PopupMenu HeaderViewController::getNewMenu(void)
-{
-    PopupMenu newMenu;
-    newMenu.setLookAndFeel(&buttonsAndMenusLAF);
-    
-    newMenu.addItem(KEYMAP_ID, "Keymap (k)");
-    newMenu.addItem(DIRECT_ID, "Direct (d)");
-    newMenu.addItem(NOSTALGIC_ID, "Nostalgic (n)");
-    newMenu.addItem(SYNCHRONIC_ID, "Synchronic (s)");
-    newMenu.addItem(TUNING_ID, "Tuning (t)");
-    newMenu.addItem(TEMPO_ID, "Tempo (m)");
-    newMenu.addItem(MODIFICATION_ID, "Modification (c)");
-    newMenu.addItem(PIANOMAP_ID, "Piano Map (p)");
-    newMenu.addItem(RESET_ID, "Reset (r)");
-    
-    return newMenu;
-}
+
 
 PopupMenu HeaderViewController::getGalleryMenu(void)
 {
@@ -186,6 +152,44 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     
     return galleryMenu;
     
+}
+
+PopupMenu HeaderViewController::getEditMenu(void)
+{
+    PopupMenu menu;
+    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    
+    menu.addItem(KEYMAP_EDIT_ID, "Keymap");
+    menu.addItem(DIRECT_EDIT_ID, "Direct");
+    menu.addItem(NOSTALGIC_EDIT_ID, "Nostalgic");
+    menu.addItem(SYNCHRONIC_EDIT_ID, "Synchronic");
+    menu.addItem(TUNING_EDIT_ID, "Tuning");
+    menu.addItem(TEMPO_EDIT_ID, "Tempo");
+    menu.addItem(DIRECTMOD_EDIT_ID, "Direct Mod");
+    menu.addItem(NOSTALGICMOD_EDIT_ID, "Nostalgic Mod");
+    menu.addItem(SYNCHRONICMOD_EDIT_ID, "Synchronic Mod");
+    menu.addItem(TUNINGMOD_EDIT_ID, "Tuning Mod");
+    menu.addItem(TEMPOMOD_EDIT_ID, "Tempo Mod");
+    
+    return menu;
+}
+
+PopupMenu HeaderViewController::getNewMenu(void)
+{
+    PopupMenu newMenu;
+    newMenu.setLookAndFeel(&buttonsAndMenusLAF);
+    
+    newMenu.addItem(KEYMAP_ID, "Keymap (k)");
+    newMenu.addItem(DIRECT_ID, "Direct (d)");
+    newMenu.addItem(NOSTALGIC_ID, "Nostalgic (n)");
+    newMenu.addItem(SYNCHRONIC_ID, "Synchronic (s)");
+    newMenu.addItem(TUNING_ID, "Tuning (t)");
+    newMenu.addItem(TEMPO_ID, "Tempo (m)");
+    newMenu.addItem(MODIFICATION_ID, "Modification (c)");
+    newMenu.addItem(PIANOMAP_ID, "Piano Map (p)");
+    newMenu.addItem(RESET_ID, "Reset (r)");
+    
+    return newMenu;
 }
 
 void HeaderViewController::loadMenuCallback(int result, HeaderViewController* gvc)
@@ -278,6 +282,52 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
     else if (result == RESET_ID)
     {
         construction->addItem(PreparationTypeReset, true);
+    }
+    
+    // EDIT
+    else if (result == KEYMAP_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeKeymap);
+    }
+    else if (result == DIRECT_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeDirect);
+    }
+    else if (result == NOSTALGIC_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeNostalgic);
+    }
+    else if (result == SYNCHRONIC_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeSynchronic);
+    }
+    else if (result == TUNING_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeTuning);
+    }
+    else if (result == TEMPO_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeTempo);
+    }
+    else if (result == DIRECTMOD_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeDirectMod);
+    }
+    else if (result == NOSTALGICMOD_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeNostalgicMod);
+    }
+    else if (result == SYNCHRONICMOD_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeSynchronicMod);
+    }
+    else if (result == TUNINGMOD_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeTuningMod);
+    }
+    else if (result == TEMPOMOD_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeTempoMod);
     }
     
 }
@@ -378,7 +428,14 @@ void HeaderViewController::fillGalleryCB(void)
         OwnedArray<PopupMenu> submenus;
         
         File bkGalleries;
+        
+#if JUCE_IOS
+        bkGalleries = bkGalleries.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
+        
+#if JUCE_MAC
         bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
         
         for (int i = 0; i < processor.galleryNames.size(); i++)
         {

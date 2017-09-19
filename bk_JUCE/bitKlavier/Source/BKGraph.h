@@ -240,9 +240,13 @@ public:
 
     BKItem::PtrArr connections;
     
+    bool scaled;
+    
 private:
     BKAudioProcessor& processor;
     Label label;
+    
+
     
     // Piano menu
     BKComboBox menu;
@@ -257,11 +261,7 @@ private:
 class BKItemGraph
 {
 public:
-    BKItemGraph(BKAudioProcessor& p):
-    processor(p)
-    {
-        
-    }
+    BKItemGraph(BKAudioProcessor& p);
     
     ~BKItemGraph(void);
 
