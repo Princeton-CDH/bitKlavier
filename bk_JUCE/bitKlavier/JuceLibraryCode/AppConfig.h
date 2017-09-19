@@ -131,6 +131,10 @@
  //#define JUCE_FORCE_USE_LEGACY_PARAM_IDS 1
 #endif
 
+#ifndef    JUCE_FORCE_LEGACY_PARAMETER_AUTOMATION_TYPE
+ //#define JUCE_FORCE_LEGACY_PARAMETER_AUTOMATION_TYPE 1
+#endif
+
 #ifndef    JUCE_USE_STUDIO_ONE_COMPATIBLE_PARAMETERS
  //#define JUCE_USE_STUDIO_ONE_COMPATIBLE_PARAMETERS 1
 #endif
@@ -266,7 +270,7 @@
  #define JucePlugin_Build_VST              1
 #endif
 #ifndef  JucePlugin_Build_VST3
- #define JucePlugin_Build_VST3             1
+ #define JucePlugin_Build_VST3             0
 #endif
 #ifndef  JucePlugin_Build_AU
  #define JucePlugin_Build_AU               1

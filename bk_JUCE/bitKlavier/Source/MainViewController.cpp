@@ -44,7 +44,7 @@ timerCallbackCount(0)
     mainSlider->setSliderStyle (Slider::LinearBarVertical);
     //mainSlider->setSliderStyle (Slider::LinearVertical);
     mainSlider->setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
-    mainSlider->setPopupDisplayEnabled (true, this);
+    mainSlider->setPopupDisplayEnabled (true, true, this);
     mainSlider->setDoubleClickReturnValue (true, 0.0); // double-clicking this slider will set it to 50.0
     mainSlider->setTextValueSuffix (" dB");
     mainSlider->addListener(this);

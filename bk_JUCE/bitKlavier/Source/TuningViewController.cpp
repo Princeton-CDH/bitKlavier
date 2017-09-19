@@ -646,7 +646,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
 {
     if (b == &A1Inversional)
     {
-        DBG("setting A1Inversional " + String(A1Inversional.getToggleState()));
+        DBG("setting A1Inversional " + String((int)A1Inversional.getToggleState()));
         
         TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
         TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
@@ -1013,7 +1013,7 @@ void TuningModificationEditor::buttonClicked (Button* b)
     
     if (b == &A1Inversional)
     {
-        mod->setParam(TuningA1Inversional, String(A1Inversional.getToggleState()));
+        mod->setParam(TuningA1Inversional, String((int)A1Inversional.getToggleState()));
         A1Inversional.setAlpha(1.);
     }
     else if (b == &A1reset)
