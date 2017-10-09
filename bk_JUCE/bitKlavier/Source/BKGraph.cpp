@@ -249,7 +249,7 @@ void BKItem::resized(void)
 {
     if (type == PreparationTypePianoMap)
     {
-        menu.setBounds(0, image.getHeight(), getWidth(), (platform == BKIOS) ? 15 : 25);
+        menu.setBounds(0, image.getHeight(), getWidth(), (processor.platform == BKIOS) ? 15 : 25);
     }
     else
     {

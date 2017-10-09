@@ -78,6 +78,7 @@ public:
     void updateGalleries(void);
     
     void collectGalleries(void);
+    void collectGalleriesFromFolder(File folder);
     
     void updateUI(void);
     
@@ -179,7 +180,7 @@ public:
     void reset(BKPreparationType type, int Id);
     void clear(BKPreparationType type, int Id);
     
-
+    BKPlatform      platform;
 
 private:
     

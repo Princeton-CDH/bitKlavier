@@ -27,7 +27,7 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
     bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("samples");
 #endif 
     
-#if JUCE_MAC
+#if JUCE_MAC || JUCE_WINDOWS
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
 #endif
     
@@ -179,7 +179,7 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
     bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("samples");
 #endif
     
-#if JUCE_MAC
+#if JUCE_MAC || JUCE_WINDOWS
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
 #endif
     
@@ -292,7 +292,7 @@ void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
     bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("samples");
 #endif
     
-#if JUCE_MAC
+#if JUCE_MAC || JUCE_WINDOWS
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
 #endif
     

@@ -83,10 +83,8 @@ typedef enum DisplayType
     DisplayTypeNil
 }DisplayType;
 
-BKPlatform platform;
-
 PitchClass      letterNoteToPitchClass(String note);
-TuningSystem tuningStringToTuningSystem(String tuning);
+TuningSystem    tuningStringToTuningSystem(String tuning);
 
 String          intArrayToString(Array<int> arr);
 

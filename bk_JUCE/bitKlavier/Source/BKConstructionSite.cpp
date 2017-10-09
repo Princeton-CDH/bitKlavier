@@ -51,7 +51,7 @@ void BKConstructionSite::paint(Graphics& g)
         g.setColour(Colours::lightgrey);
         
         
-        g.drawLine(lineOX, lineOY, lineEX, lineEY, (platform == BKIOS) ? 2 : 3);
+        g.drawLine(lineOX, lineOY, lineEX, lineEY, (processor.platform == BKIOS) ? 2 : 3);
         
     }
     
@@ -59,7 +59,7 @@ void BKConstructionSite::paint(Graphics& g)
     {
         g.setColour(Colours::goldenrod);
 
-        g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY(), (platform == BKIOS) ? 1 : 2);
+        g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY(), (processor.platform == BKIOS) ? 1 : 2);
     }
 }
 
@@ -314,7 +314,7 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
     toAdd->setTopLeftPosition(lastX, lastY);
 #endif
     
-#if JUCE_MAC
+#if JUCE_MAC || JUCE_WINDOWS
     if (center)
     {
         toAdd->setTopLeftPosition(300, 250);

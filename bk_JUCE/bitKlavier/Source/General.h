@@ -38,7 +38,7 @@ public:
         globalGain = 0.75;
 #endif
         
-#if JUCE_MAC
+#if JUCE_MAC || JUCE_WINDOWS
         globalGain = 1.0;
 #endif
     }

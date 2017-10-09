@@ -108,7 +108,7 @@ public:
     
     inline const void setKeymap(int Id, Array<int> keys) const noexcept
     {
-        bkKeymaps[Id]->setKeymap(keys);
+        getKeymap(Id)->setKeymap(keys);
     }
     
     inline const Piano::PtrArr getPianos(void) const noexcept

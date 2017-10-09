@@ -24,7 +24,7 @@ resonanceReleaseSynth()
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
  
-#if JUCE_MAC
+#if JUCE_MAC || JUCE_WINDOWS
     platform = BKOSX;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 
@@ -59,7 +59,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
         loadPianoSamples(BKLoadLite);
 #endif
     
-#if JUCE_MAC
+#if JUCE_MAC || JUCE_WINDOWS
         loadPianoSamples(BKLoadHeavy);
 #endif
     }
@@ -88,7 +88,7 @@ void BKAudioProcessor::createNewGallery(String name)
     bkGalleries = bkGalleries.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
-#if JUCE_MAC
+#if JUCE_MAC || JUCE_WINDOWS
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
@@ -138,7 +138,7 @@ void BKAudioProcessor::renameGallery(String name)
     bkGalleries = bkGalleries.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
-#if JUCE_MAC
+#if JUCE_MAC || JUCE_WINDOWS
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     

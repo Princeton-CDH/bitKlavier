@@ -45,6 +45,34 @@ void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
     }
 }
 
+void BKAudioProcessor::collectGalleriesFromFolder(File folder)
+{
+    //DirectoryIterator xmlIter (File ("~/bkGalleries"), true, "*.xml");
+    
+    DBG("folder: " + folder.getFileName());
+    
+    DirectoryIterator xmlIter (File (folder), true, "*.xml");
+    while (xmlIter.next())
+    {
+        File galleryFile (xmlIter.getFile());
+        
+        DBG("- - - " + galleryFile.getFileName());
+        
+        galleryNames.add(galleryFile.getFullPathName());
+    }
+    
+    
+    DirectoryIterator jsonIter (File (folder), true, "*.json");
+    while (jsonIter.next())
+    {
+        File galleryFile (jsonIter.getFile());
+        
+        DBG("- - - " + galleryFile.getFileName());
+        
+        galleryNames.add(galleryFile.getFullPathName());
+    }
+}
+
 void BKAudioProcessor::collectGalleries(void)
 {
     galleryNames.clear();
@@ -53,29 +81,21 @@ void BKAudioProcessor::collectGalleries(void)
     
 #if JUCE_IOS
     bkGalleries = bkGalleries.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
+    
+    collectGalleriesFromFolder(bkGalleries);
+    
+    File moreGalleries = File::getSpecialLocation (File::userDocumentsDirectory);
+    
+    
+    collectGalleriesFromFolder(moreGalleries);
+    
 #endif
     
-#if JUCE_MAC
+#if JUCE_MAC || JUCE_WINDOWS
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+    
+    collectGalleriesFromFolder(bkGalleries);
 #endif
-    
-    //DirectoryIterator xmlIter (File ("~/bkGalleries"), true, "*.xml");
-    DirectoryIterator xmlIter (File (bkGalleries), true, "*.xml");
-    while (xmlIter.next())
-    {
-        File galleryFile (xmlIter.getFile());
-        
-        galleryNames.add(galleryFile.getFullPathName());
-    }
-    
-    
-    DirectoryIterator jsonIter (File (bkGalleries), true, "*.json");
-    while (jsonIter.next())
-    {
-        File galleryFile (jsonIter.getFile());
-        
-        galleryNames.add(galleryFile.getFullPathName());
-    }
 }
 
 String BKAudioProcessor::firstGallery(void)

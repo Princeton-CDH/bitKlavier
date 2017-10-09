@@ -21,8 +21,10 @@ construction(p, &theGraph),
 overtop(p, &theGraph),
 timerCallbackCount(0)
 {
-    if (platform == BKIOS)  display = DisplayConstruction;
-    else                    display = DisplayDefault;
+    if (processor.platform == BKIOS)
+        display = DisplayConstruction;
+    else
+        display = DisplayDefault;
     
     initial = true;
     addMouseListener(this, true);
@@ -56,8 +58,14 @@ timerCallbackCount(0)
     addAndMakeVisible (keyboardComponent =
                        new BKKeymapKeyboardComponent (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard));
     
-    if (platform == BKIOS)  {keyStart = 48; keyEnd = 72;    }
-    else                    {keyStart = 21; keyEnd = 108;   }
+    if (processor.platform == BKIOS)
+    {
+        keyStart = 48;  keyEnd = 72;
+    }
+    else
+    {
+        keyStart = 21;  keyEnd = 108;
+    }
     
     keyboard =  ((BKKeymapKeyboardComponent*) keyboardComponent);
     keyboard->setScrollButtonsVisible(false);
@@ -91,7 +99,6 @@ timerCallbackCount(0)
     overtopShadow->setOwner(&overtop);
     
     startTimerHz (50);
-    
 }
 
 MainViewController::~MainViewController()
@@ -122,8 +129,8 @@ void MainViewController::setDisplay(DisplayType type)
 void MainViewController::resized()
 {
    
-    int headerHeight = (platform == BKIOS) ? 40 : 30;
-    int sidebarWidth = (platform == BKIOS) ? 30 : 20;
+    int headerHeight = (processor.platform == BKIOS) ? 40 : 30;
+    int sidebarWidth = (processor.platform == BKIOS) ? 30 : 20;
     int footerHeight = 40;
     
     float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
@@ -146,6 +153,7 @@ void MainViewController::resized()
         keyboard->setKeyWidth(keyWidth);
         keyboard->setBlackNoteLengthProportion(0.65);
         keyboardComponent->setBounds(footerSlice);
+        keyboardComponent->setVisible(true);
     }
     
     Rectangle<int> levelMeterSlice = area.removeFromLeft(sidebarWidth + gXSpacing);
@@ -179,7 +187,7 @@ void MainViewController::resized()
                                
         construction.setVisible(false);
     }
-    else
+    else if (display == DisplayConstruction)
     {
         construction.setVisible(true);
         
@@ -226,7 +234,7 @@ void MainViewController::sliderValueChanged (Slider* slider)
         gen->setGlobalGain(Decibels::decibelsToGain(mainSlider->getValue()));
         overtop.gvc.update();
     }
-    else if (slider == &octaveSlider)
+    else if (display == DisplayKeyboard && slider == &octaveSlider)
     {
         int octave = (int) octaveSlider.getValue();
         

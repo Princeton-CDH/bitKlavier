@@ -411,12 +411,31 @@ void HeaderViewController::bkButtonClicked (Button* b)
     
 }
 
+void HeaderViewController::addGalleriesFromFolder(File folder)
+{
+    
+}
+
 void HeaderViewController::fillGalleryCB(void)
 {
     
     if(!galleryModalCallBackIsOpen)
     {
         galleryCB.clear(dontSendNotification);
+        
+        File bkGalleries;
+        
+        File moreGalleries = File::getSpecialLocation(File::userDocumentsDirectory);
+        
+#if JUCE_MAC || JUCE_WINDOWS
+        bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
+        
+#if JUCE_IOS
+        
+        bkGalleries = bkGalleries.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
+    
+#endif
         
         PopupMenu* galleryCBPopUp = galleryCB.getRootMenu();
         
@@ -427,16 +446,6 @@ void HeaderViewController::fillGalleryCB(void)
         StringArray submenuNames;
         OwnedArray<PopupMenu> submenus;
         
-        File bkGalleries;
-        
-#if JUCE_IOS
-        bkGalleries = bkGalleries.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
-#endif
-        
-#if JUCE_MAC
-        bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
-#endif
-        
         for (int i = 0; i < processor.galleryNames.size(); i++)
         {
             File thisFile(processor.galleryNames[i]);
@@ -444,7 +453,6 @@ void HeaderViewController::fillGalleryCB(void)
             String galleryName = thisFile.getFileName().upToFirstOccurrenceOf(".xml", false, false);
             
             //moving on to new submenu, if there is one, add add last submenu to popup now that it's done
-            //if(creatingSubmenu && thisFile.getRelativePathFrom(File ("~/bkGalleries")).initialSectionNotContaining("/") != submenuName)
             if(creatingSubmenu && thisFile.getParentDirectory().getFileName() != submenuName)
             {
                 galleryCBPopUp->addSubMenu(submenuName, *submenus.getLast());
@@ -452,8 +460,8 @@ void HeaderViewController::fillGalleryCB(void)
             }
             
             //add toplevel item, if there is one
-            //if(thisFile.getFileName() == thisFile.getRelativePathFrom(File ("~/bkGalleries"))) //if the file is in the main galleries
-            if(thisFile.getParentDirectory().getFileName() == bkGalleries.getFileName()) //if the file is in the main galleries directory....
+            if(thisFile.getParentDirectory().getFileName() == bkGalleries.getFileName() ||
+               thisFile.getParentDirectory().getFileName() == moreGalleries.getFileName()) //if the file is in the main galleries directory....
             {
                 galleryCB.addItem(galleryName, i+1); //add to toplevel popup
             }
@@ -463,7 +471,6 @@ void HeaderViewController::fillGalleryCB(void)
             {
                 creatingSubmenu = true;
                 
-                //submenuName = thisFile.getRelativePathFrom(File ("~/bkGalleries")).initialSectionNotContaining("/"); //name of submenu
                 submenuName = thisFile.getParentDirectory().getFileName(); //name of submenu
                 
                 if(submenuNames.contains(submenuName)) //add to existing submenu
@@ -475,11 +482,11 @@ void HeaderViewController::fillGalleryCB(void)
                 {
                     submenus.add(new PopupMenu());
                     submenuNames.add(submenuName);
-
+                    
                     submenus.getLast()->addItem(i + 1, galleryName);;
                 }
             }
-     
+            
             if (thisFile.getFileName() == processor.currentGallery) index = i;
         }
         
@@ -489,11 +496,13 @@ void HeaderViewController::fillGalleryCB(void)
             galleryCBPopUp->addSubMenu(submenuName, *submenus.getLast());
             creatingSubmenu = false;
         }
-
+        
         galleryCB.setSelectedId(index+1, NotificationType::dontSendNotification);
         
         File selectedFile(processor.galleryNames[index]);
         processor.gallery->setURL(selectedFile.getFullPathName());
+        
+        
         
     }
 }

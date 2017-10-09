@@ -56,6 +56,8 @@ private:
     static void pianoMenuCallback(int result, HeaderViewController*);
     static void galleryMenuCallback(int result, HeaderViewController*);
     
+    void addGalleriesFromFolder(File folder);
+    
     PopupMenu getLoadMenu(void);
     PopupMenu getPianoMenu(void);
     PopupMenu getGalleryMenu(void);
