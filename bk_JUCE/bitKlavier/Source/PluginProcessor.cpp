@@ -13,6 +13,8 @@ resonanceReleaseSynth()
     didLoadHammersAndRes            = false;
     didLoadMainPianoSamples         = false;
     
+    Process::setPriority(juce::Process::RealtimePriority);
+    
     collectGalleries();
     
     updateUI();

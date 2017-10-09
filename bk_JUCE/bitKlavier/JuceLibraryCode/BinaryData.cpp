@@ -13,7 +13,7 @@ static const unsigned char temp_binary_data_0[] =
 "\r\n"
 "<gallery url=\"/Users/airship/Documents/bitKlavier resources/galleries/__blank.xml\"\r\n"
 "         defaultPiano=\"1\">\r\n"
-"  <idCount i0=\"15\" i1=\"28\" i2=\"24\" i3=\"20\" i4=\"16\" i5=\"1523\" i6=\"10\" i7=\"10\"\r\n"
+"  <idCount i0=\"15\" i1=\"28\" i2=\"24\" i3=\"20\" i4=\"16\" i5=\"1525\" i6=\"10\" i7=\"10\"\r\n"
 "           i8=\"10\" i9=\"12\" i10=\"10\" i11=\"10\" i12=\"10\" i13=\"11\" i14=\"30\"/>\r\n"
 "  <general globalGain=\"1\" directGain=\"1\" synchronicGain=\"1\" nostalgicGain=\"1\"\r\n"
 "           resonanceGain=\"1\" hammerGain=\"0.0099999997764825820923\" tempoMultiplier=\"1\"\r\n"
