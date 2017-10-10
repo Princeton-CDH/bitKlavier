@@ -35,7 +35,7 @@ void Gallery::setStateFromJson(var myJson)
     
     var pianos = pattr.getProperty("slots", "");
     
-    int sId,nId,dId,tId,oId;
+    int sId,nId,tId,oId;
     Array<int> keys; var kvar;  bool isLayer; bool isOld = true;
     
     addKeymap();

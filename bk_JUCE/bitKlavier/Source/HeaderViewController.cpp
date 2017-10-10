@@ -17,10 +17,6 @@ construction(c)
     
     setLookAndFeel(&buttonsAndMenusLAF);
     
-    addAndMakeVisible(loadB);
-    loadB.setButtonText("Load Samples");
-    loadB.addListener(this);
-    
     addAndMakeVisible(galleryB);
     galleryB.setButtonText("Gallery Action");
     galleryB.addListener(this);
@@ -65,7 +61,7 @@ void HeaderViewController::paint (Graphics& g)
 
 void HeaderViewController::resized()
 {
-    float width = getWidth() / 7 - gXSpacing;
+    float width = getWidth() / 5 - gXSpacing;
     
     Rectangle<int> area (getLocalBounds());
     area.reduce(0, gYSpacing);
@@ -82,9 +78,6 @@ void HeaderViewController::resized()
     area.removeFromRight(gXSpacing);
     pianoCB.setBounds(area.removeFromRight(2*width));
     area.removeFromRight(gXSpacing);
-
-    area.removeFromLeft(gXSpacing);
-    loadB.setBounds(area);
 }
 
 PopupMenu HeaderViewController::getLoadMenu(void)
@@ -93,8 +86,10 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     loadMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
     int count = 0;
-    for (auto loadType : cBKSampleLoadTypes)
-        loadMenu.addItem(++count, loadType);
+    
+    loadMenu.addItem(LOAD_LITE, "Light");
+    loadMenu.addItem(LOAD_MEDIUM, "Medium");
+    loadMenu.addItem(LOAD_HEAVY, "Heavy");
     
     return loadMenu;
 }
@@ -126,6 +121,8 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     PopupMenu galleryMenu;
     galleryMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
+    galleryMenu.addSubMenu("Samples...", getLoadMenu());
+    galleryMenu.addSeparator();
     galleryMenu.addItem(SETTINGS_ID, "Settings...");
     galleryMenu.addSeparator();
     galleryMenu.addItem(NEWGALLERY_ID, "New...");
@@ -201,7 +198,6 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
 {
     BKAudioProcessor& processor = hvc->processor;
     BKConstructionSite* construction = hvc->construction;
-    BKEditableComboBox* pianoCB = &hvc->pianoCB;
     
     if (result == 1) // New piano
     {
@@ -335,7 +331,20 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
 void HeaderViewController::galleryMenuCallback(int result, HeaderViewController* gvc)
 {
     BKAudioProcessor& processor = gvc->processor;
-    if (result == SAVE_ID)
+    
+    if (result == LOAD_LITE)
+    {
+        processor.loadPianoSamples(BKLoadLite);
+    }
+    else if (result == LOAD_MEDIUM)
+    {
+        processor.loadPianoSamples(BKLoadMedium);
+    }
+    else if (result == LOAD_HEAVY)
+    {
+        processor.loadPianoSamples(BKLoadHeavy);
+    }
+    else if (result == SAVE_ID)
     {
         processor.saveGallery();
     }
@@ -392,14 +401,7 @@ void HeaderViewController::bkButtonClicked (Button* b)
 {
     String name = b->getName();
     
-    if (b == &loadB)
-    {
-        PopupMenu loadMenu = getLoadMenu();
-        loadMenu.setLookAndFeel(&buttonsAndMenusLAF);
-        
-        loadMenu.showMenuAsync (PopupMenu::Options().withTargetComponent (&loadB), ModalCallbackFunction::forComponent (loadMenuCallback, this) );
-    }
-    else if (b == &pianoB)
+    if (b == &pianoB)
     {
         getPianoMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&pianoB), ModalCallbackFunction::forComponent (pianoMenuCallback, this) );
     }

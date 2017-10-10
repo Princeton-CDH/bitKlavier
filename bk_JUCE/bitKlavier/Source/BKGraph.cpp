@@ -19,8 +19,7 @@
 BKItem::BKItem(BKPreparationType type, int Id, BKAudioProcessor& p):
 ItemMapper(type, Id),
 BKDraggableComponent(true,false,true, 50, 50, 50, 50),
-processor(p),
-scaled(false)
+processor(p)
 {
     fullChild.setAlwaysOnTop(true);
     addAndMakeVisible(fullChild);
