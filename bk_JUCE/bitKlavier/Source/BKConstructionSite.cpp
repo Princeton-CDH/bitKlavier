@@ -20,8 +20,8 @@ processor(p),
 graph(theGraph),
 connect(false),
 lastX(10),
-lastY(10)/*,
-viewport(vp)*/
+lastY(10),
+held(false)
 {
     addAndMakeVisible(clickFrame);
     clickFrame.setSize(5,5);
@@ -461,76 +461,9 @@ void BKConstructionSite::mouseMove (const MouseEvent& eo)
     lastEY = e.y;
 }
 
-PopupMenu BKConstructionSite::getNewMenu(void)
+void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
 {
-    PopupMenu newMenu;
-    newMenu.setLookAndFeel(&buttonsAndMenusLAF);
-    
-    newMenu.addItem(KEYMAP_ID, "Keymap");
-    newMenu.addItem(DIRECT_ID, "Direct");
-    newMenu.addItem(NOSTALGIC_ID, "Nostalgic");
-    newMenu.addItem(SYNCHRONIC_ID, "Synchronic");
-    newMenu.addItem(TUNING_ID, "Tuning");
-    newMenu.addItem(TEMPO_ID, "Tempo");
-    newMenu.addItem(MODIFICATION_ID, "Modification");
-    newMenu.addItem(PIANOMAP_ID, "Piano Map");
-    newMenu.addItem(RESET_ID, "Reset");
-    
-    return newMenu;
-}
-
-PopupMenu BKConstructionSite::getConstructionOptionMenu(void)
-{
-    PopupMenu menu;
-    menu.setLookAndFeel(&buttonsAndMenusLAF);
-    
-    
-    menu.addItem(PASTE_ID, "Paste");
-    menu.addSeparator();
-    menu.addItem(UNDO_ID, "Undo");
-    menu.addItem(REDO_ID, "Redo");
-    menu.addSeparator();
-    menu.addSubMenu("Add...", getNewMenu());
-    
-    return menu;
-}
-
-PopupMenu BKConstructionSite::getItemOptionMenu(void)
-{
-    PopupMenu menu;
-    menu.setLookAndFeel(&buttonsAndMenusLAF);
-
-    if (graph->getSelectedItems().size() == 1)
-    {
-        BKPreparationType type = graph->getSelectedItems().getFirst()->getType();
-        if (type <= PreparationTypeTempoMod)
-        {
-            menu.addItem(EDIT_ID, "Edit");
-            menu.addSeparator();
-        }
-    }
-    
-    if (graph->getSelectedItems().size() > 1)
-    {
-        menu.addItem(ALIGN_VERTICAL, "Align (vertical)");
-        menu.addItem(ALIGN_HORIZONTAL, "Align (horizontal)");
-        menu.addSeparator();
-    }
-    
-    menu.addItem(COPY_ID, "Copy");
-    menu.addItem(CUT_ID, "Cut");
-    menu.addItem(PASTE_ID, "Paste");
-    menu.addSeparator();
-    menu.addItem(UNDO_ID, "Undo");
-    menu.addItem(REDO_ID, "Redo");
-    menu.addSeparator();
-    menu.addItem(DELETE_ID, "Delete");
-    
-    return menu;
-}
-
-void BKConstructionSite::itemOptionMenuCallback(int result, BKConstructionSite* vc)
-{
+    BKAudioProcessor& processor = vc->processor;
     if (result == EDIT_ID)
     {
         vc->processor.updateState->setCurrentDisplay(vc->currentItem->getType(), vc->currentItem->getId());
@@ -567,11 +500,7 @@ void BKConstructionSite::itemOptionMenuCallback(int result, BKConstructionSite* 
     {
         vc->deleteSelected();
     }
-}
-
-void BKConstructionSite::constructionOptionMenuCallback(int result, BKConstructionSite* vc)
-{
-    if (result == KEYMAP_ID)
+    else if (result == KEYMAP_ID)
     {
         vc->addItem(PreparationTypeKeymap, true);
     }
@@ -607,17 +536,51 @@ void BKConstructionSite::constructionOptionMenuCallback(int result, BKConstructi
     {
         vc->addItem(PreparationTypeReset, true);
     }
-    else if (result == UNDO_ID)
+    
+    // EDIT
+    else if (result == KEYMAP_EDIT_ID)
     {
-        
+        processor.updateState->setCurrentDisplay(PreparationTypeKeymap);
     }
-    else if (result == REDO_ID)
+    else if (result == DIRECT_EDIT_ID)
     {
-        
+        processor.updateState->setCurrentDisplay(PreparationTypeDirect);
     }
-    else if (result == PASTE_ID)
+    else if (result == NOSTALGIC_EDIT_ID)
     {
-        vc->paste();
+        processor.updateState->setCurrentDisplay(PreparationTypeNostalgic);
+    }
+    else if (result == SYNCHRONIC_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeSynchronic);
+    }
+    else if (result == TUNING_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeTuning);
+    }
+    else if (result == TEMPO_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeTempo);
+    }
+    else if (result == DIRECTMOD_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeDirectMod);
+    }
+    else if (result == NOSTALGICMOD_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeNostalgicMod);
+    }
+    else if (result == SYNCHRONICMOD_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeSynchronicMod);
+    }
+    else if (result == TUNINGMOD_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeTuningMod);
+    }
+    else if (result == TEMPOMOD_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeTempoMod);
     }
 }
 
@@ -628,18 +591,36 @@ void BKConstructionSite::mouseDoubleClick(const MouseEvent& eo)
 
 void BKConstructionSite::mouseHold(Component* frame, bool onItem)
 {
+#if JUCE_IOS
     frame->setTopLeftPosition(frame->getX()+20, frame->getY());
     
     if (onItem)
     {
-        getItemOptionMenu().showMenuAsync(PopupMenu::Options().withTargetComponent (frame),
-                                          ModalCallbackFunction::forComponent (itemOptionMenuCallback, this) );
+        //getItemOptionMenu().showMenuAsync(PopupMenu::Options().withTargetComponent (frame),
+        //                                  ModalCallbackFunction::forComponent (itemOptionMenuCallback, this) );
+        
+        if (itemToSelect != nullptr)
+        {
+            itemSource = itemToSelect;
+            
+            if (itemSource != nullptr)
+            {
+                connect = true;
+                
+                lineOX = itemSource->getX() + itemSource->getWidth() * 0.5;
+                lineOY = itemSource->getY() + itemSource->getHeight() * 0.5;
+                
+                DBG("ORIGIN: " + String(lineOX) + " " + String(lineOY));
+            }
+        }
     }
     else
     {
-        getConstructionOptionMenu().showMenuAsync(PopupMenu::Options().withTargetComponent (frame),
-                                                  ModalCallbackFunction::forComponent (constructionOptionMenuCallback, this) );
+        getEditMenu(&buttonsAndMenusLAF, 0, true).showMenuAsync(PopupMenu::Options().withTargetComponent(getMouseFrame()),
+                                                                ModalCallbackFunction::forComponent(editMenuCallback, this));
     }
+    
+#endif
 }
 
 void BKConstructionSite::mouseDown (const MouseEvent& eo)
@@ -647,6 +628,8 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     MouseEvent e = eo.getEventRelativeTo(this);
     
     itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
+    
+    held = false;
     
     lastX = e.x; lastY = e.y;
     
@@ -795,8 +778,6 @@ void BKConstructionSite::mouseDrag (const MouseEvent& e)
 {
     lastX = e.x; lastY = e.y;
 
-    
-    
     mouseDragged();
     
     if (itemToSelect == nullptr) lasso->dragLasso(e);

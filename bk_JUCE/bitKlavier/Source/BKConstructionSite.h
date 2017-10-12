@@ -45,6 +45,8 @@ public:
     void cut(void);
     void selectAll(void);
     
+    inline int getNumSelected(void) { return graph->getSelectedItems().size(); }
+    
     void addItemsFromClipboard(void);
     
     void addItem(BKPreparationType type, bool center = false);
@@ -63,6 +65,8 @@ public:
     
     bool itemOutsideBounds(Rectangle<int>);
     
+    static void editMenuCallback(int result, BKConstructionSite*);
+    
 private:
     
     void mouseHold(Component* frame, bool onItem) override;
@@ -76,12 +80,9 @@ private:
 
     bool connect; int lineOX, lineOY, lineEX, lineEY;
     bool multiple;
+    bool held;
+
     
-    PopupMenu getNewMenu(void);
-    PopupMenu getConstructionOptionMenu(void);
-    PopupMenu getItemOptionMenu(void);
-    static void constructionOptionMenuCallback(int result, BKConstructionSite* vc);
-    static void itemOptionMenuCallback(int result, BKConstructionSite* vc);
     
     BKItem* itemSource;
     BKItem* itemTarget;

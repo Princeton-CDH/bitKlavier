@@ -18,12 +18,16 @@ construction(c)
     setLookAndFeel(&buttonsAndMenusLAF);
     
     addAndMakeVisible(galleryB);
-    galleryB.setButtonText("Gallery Action");
+    galleryB.setButtonText("Gallery");
     galleryB.addListener(this);
     
     addAndMakeVisible(pianoB);
-    pianoB.setButtonText("Piano Action");
+    pianoB.setButtonText("Piano");
     pianoB.addListener(this);
+    
+    addAndMakeVisible(editB);
+    editB.setButtonText("Action");
+    editB.addListener(this);
     
     // Gallery CB
     addAndMakeVisible(galleryCB);
@@ -40,7 +44,7 @@ construction(c)
     pianoCB.setName("pianoCB");
     pianoCB.addListener(this);
     pianoCB.addMyListener(this);
-    pianoCB.BKSetJustificationType(juce::Justification::centredRight);
+    //pianoCB.BKSetJustificationType(juce::Justification::centredRight);
     
     pianoCB.setSelectedId(0, dontSendNotification);
     
@@ -61,7 +65,7 @@ void HeaderViewController::paint (Graphics& g)
 
 void HeaderViewController::resized()
 {
-    float width = getWidth() / 5 - gXSpacing;
+    float width = getWidth() / 7 - gXSpacing;
     
     Rectangle<int> area (getLocalBounds());
     area.reduce(0, gYSpacing);
@@ -78,14 +82,15 @@ void HeaderViewController::resized()
     area.removeFromRight(gXSpacing);
     pianoCB.setBounds(area.removeFromRight(2*width));
     area.removeFromRight(gXSpacing);
+    
+    area.removeFromLeft(gXSpacing);
+    editB.setBounds(area);
 }
 
 PopupMenu HeaderViewController::getLoadMenu(void)
 {
     PopupMenu loadMenu;
     loadMenu.setLookAndFeel(&buttonsAndMenusLAF);
-    
-    int count = 0;
     
     loadMenu.addItem(LOAD_LITE, "Light");
     loadMenu.addItem(LOAD_MEDIUM, "Medium");
@@ -101,15 +106,7 @@ PopupMenu HeaderViewController::getPianoMenu(void)
     
     pianoMenu.addItem(1, "New");
     pianoMenu.addItem(2, "Duplicate");
-    pianoMenu.addItem(3, "Delete");
-    
-    pianoMenu.addSeparator();
-    pianoMenu.addSubMenu("Add...", getNewMenu());
-    pianoMenu.addSubMenu("Edit...", getEditMenu());
-    pianoMenu.addSeparator();
-   
-    //pianoMenu.addSeparator();
-    //pianoMenu.addItem(3, "Settings");
+    pianoMenu.addItem(3, "Remove");
     
     return pianoMenu;
 }
@@ -120,9 +117,7 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
 {
     PopupMenu galleryMenu;
     galleryMenu.setLookAndFeel(&buttonsAndMenusLAF);
-    
-    galleryMenu.addSubMenu("Samples...", getLoadMenu());
-    galleryMenu.addSeparator();
+
     galleryMenu.addItem(SETTINGS_ID, "Settings...");
     galleryMenu.addSeparator();
     galleryMenu.addItem(NEWGALLERY_ID, "New...");
@@ -144,54 +139,13 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     galleryMenu.addItem(CLEAN_ID, "Clean");
     galleryMenu.addSeparator();
-    galleryMenu.addItem(DELETE_ID, "Delete");
+    galleryMenu.addItem(DELETE_ID, "Remove");
+    galleryMenu.addSeparator();
+    galleryMenu.addSubMenu("Load", getLoadMenu());
     
     
     return galleryMenu;
     
-}
-
-PopupMenu HeaderViewController::getEditMenu(void)
-{
-    PopupMenu menu;
-    menu.setLookAndFeel(&buttonsAndMenusLAF);
-    
-    menu.addItem(KEYMAP_EDIT_ID, "Keymap");
-    menu.addItem(DIRECT_EDIT_ID, "Direct");
-    menu.addItem(NOSTALGIC_EDIT_ID, "Nostalgic");
-    menu.addItem(SYNCHRONIC_EDIT_ID, "Synchronic");
-    menu.addItem(TUNING_EDIT_ID, "Tuning");
-    menu.addItem(TEMPO_EDIT_ID, "Tempo");
-    menu.addItem(DIRECTMOD_EDIT_ID, "Direct Mod");
-    menu.addItem(NOSTALGICMOD_EDIT_ID, "Nostalgic Mod");
-    menu.addItem(SYNCHRONICMOD_EDIT_ID, "Synchronic Mod");
-    menu.addItem(TUNINGMOD_EDIT_ID, "Tuning Mod");
-    menu.addItem(TEMPOMOD_EDIT_ID, "Tempo Mod");
-    
-    return menu;
-}
-
-PopupMenu HeaderViewController::getNewMenu(void)
-{
-    PopupMenu newMenu;
-    newMenu.setLookAndFeel(&buttonsAndMenusLAF);
-    
-    newMenu.addItem(KEYMAP_ID, "Keymap (k)");
-    newMenu.addItem(DIRECT_ID, "Direct (d)");
-    newMenu.addItem(NOSTALGIC_ID, "Nostalgic (n)");
-    newMenu.addItem(SYNCHRONIC_ID, "Synchronic (s)");
-    newMenu.addItem(TUNING_ID, "Tuning (t)");
-    newMenu.addItem(TEMPO_ID, "Tempo (m)");
-    newMenu.addItem(MODIFICATION_ID, "Modification (c)");
-    newMenu.addItem(PIANOMAP_ID, "Piano Map (p)");
-    newMenu.addItem(RESET_ID, "Reset (r)");
-    
-    return newMenu;
-}
-
-void HeaderViewController::loadMenuCallback(int result, HeaderViewController* gvc)
-{
-    gvc->processor.loadPianoSamples((BKSampleLoadType)(result-1));
 }
 
 void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* hvc)
@@ -401,7 +355,12 @@ void HeaderViewController::bkButtonClicked (Button* b)
 {
     String name = b->getName();
     
-    if (b == &pianoB)
+    if (b == &editB)
+    {
+         getEditMenu(&buttonsAndMenusLAF, construction->getNumSelected()).showMenuAsync(PopupMenu::Options().withTargetComponent (b),
+         ModalCallbackFunction::forComponent (construction->editMenuCallback, construction) );
+    }
+    else if (b == &pianoB)
     {
         getPianoMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&pianoB), ModalCallbackFunction::forComponent (pianoMenuCallback, this) );
     }

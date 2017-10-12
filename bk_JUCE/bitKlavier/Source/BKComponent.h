@@ -96,7 +96,11 @@ public:
     }
     
     void setMouseDownOnItem(bool on) { onItem = on; }
-     
+    
+    Component* getMouseFrame(void)
+    {
+        return mouseDownComponent;
+    }
     
 private:
     
@@ -104,7 +108,7 @@ private:
     {
         mouseDownDuration = Time::getCurrentTime() - mouseDownTime;
         
-        if (mouseIsDown && !mouseDragHappened && !mouseHoldHappened && (mouseDownDuration.inMilliseconds() > 250))
+        if (mouseIsDown && !mouseDragHappened && !mouseHoldHappened && (mouseDownDuration.inMilliseconds() > 300))
         {
             mouseHoldHappened = true;
             

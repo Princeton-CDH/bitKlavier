@@ -301,7 +301,6 @@ void BKItem::mouseDoubleClick(const MouseEvent& e)
     {
         processor.updateState->setCurrentDisplay(type, Id);
     }
-    
 }
 
 void BKItem::mouseDown(const MouseEvent& e)

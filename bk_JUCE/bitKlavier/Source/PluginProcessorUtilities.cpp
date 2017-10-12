@@ -47,16 +47,10 @@ void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
 
 void BKAudioProcessor::collectGalleriesFromFolder(File folder)
 {
-    //DirectoryIterator xmlIter (File ("~/bkGalleries"), true, "*.xml");
-    
-    DBG("folder: " + folder.getFileName());
-    
     DirectoryIterator xmlIter (File (folder), true, "*.xml");
     while (xmlIter.next())
     {
         File galleryFile (xmlIter.getFile());
-        
-        DBG("- - - " + galleryFile.getFileName());
         
         galleryNames.add(galleryFile.getFullPathName());
     }
@@ -66,8 +60,6 @@ void BKAudioProcessor::collectGalleriesFromFolder(File folder)
     while (jsonIter.next())
     {
         File galleryFile (jsonIter.getFile());
-        
-        DBG("- - - " + galleryFile.getFileName());
         
         galleryNames.add(galleryFile.getFullPathName());
     }

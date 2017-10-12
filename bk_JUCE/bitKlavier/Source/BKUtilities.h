@@ -63,9 +63,96 @@
 #define TUNINGMOD_EDIT_ID 36
 #define TEMPOMOD_EDIT_ID 37
 
-
-
 #define IOS_SCALE 0.5
+
+inline PopupMenu getNewItemMenu(LookAndFeel* laf)
+{
+    PopupMenu newMenu;
+    newMenu.setLookAndFeel(laf);
+    
+    newMenu.addItem(KEYMAP_ID, "Keymap (K)");
+    newMenu.addItem(DIRECT_ID, "Direct (D)");
+    newMenu.addItem(NOSTALGIC_ID, "Nostalgic (N)");
+    newMenu.addItem(SYNCHRONIC_ID, "Synchronic (S)");
+    newMenu.addItem(TUNING_ID, "Tuning (T)");
+    newMenu.addItem(TEMPO_ID, "Tempo (M)");
+    newMenu.addItem(MODIFICATION_ID, "Modification (C)");
+    newMenu.addItem(PIANOMAP_ID, "Piano Map (P)");
+    newMenu.addItem(RESET_ID, "Reset (R)");
+    
+    return newMenu;
+}
+
+inline PopupMenu getEditItemMenu(LookAndFeel* laf)
+{
+    PopupMenu menu;
+    menu.setLookAndFeel(laf);
+    
+    menu.addItem(KEYMAP_EDIT_ID, "Keymap");
+    menu.addItem(DIRECT_EDIT_ID, "Direct");
+    menu.addItem(NOSTALGIC_EDIT_ID, "Nostalgic");
+    menu.addItem(SYNCHRONIC_EDIT_ID, "Synchronic");
+    menu.addItem(TUNING_EDIT_ID, "Tuning");
+    menu.addItem(TEMPO_EDIT_ID, "Tempo");
+    menu.addItem(DIRECTMOD_EDIT_ID, "Direct Mod");
+    menu.addItem(NOSTALGICMOD_EDIT_ID, "Nostalgic Mod");
+    menu.addItem(SYNCHRONICMOD_EDIT_ID, "Synchronic Mod");
+    menu.addItem(TUNINGMOD_EDIT_ID, "Tuning Mod");
+    menu.addItem(TEMPOMOD_EDIT_ID, "Tempo Mod");
+    
+    return menu;
+}
+
+inline PopupMenu getAlignMenu(LookAndFeel* laf)
+{
+    PopupMenu menu;
+    menu.setLookAndFeel(laf);
+    
+    menu.addItem(ALIGN_VERTICAL, "Align (vertical)");
+    menu.addItem(ALIGN_HORIZONTAL, "Align (horizontal)");
+    
+    return menu;
+}
+
+inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGraph = false)
+{
+    PopupMenu menu;
+    menu.setLookAndFeel(laf);
+    
+    if (onGraph)
+    {
+        menu.addItem(PASTE_ID, "Paste");
+    }
+    else
+    {
+        menu.addItem(UNDO_ID, "Undo");
+        menu.addItem(REDO_ID, "Redo");
+    }
+    
+    if (numItemsSelected)
+    {
+        menu.addSeparator();
+        menu.addItem(COPY_ID, "Copy");
+        menu.addItem(CUT_ID, "Cut");
+        menu.addItem(DELETE_ID, "Delete");
+    }
+    
+    if (numItemsSelected > 1)
+    {
+        menu.addSeparator();
+        menu.addSubMenu("Align", getAlignMenu(laf));
+    }
+    
+    menu.addSeparator();
+    menu.addSubMenu("Edit...", getEditItemMenu(laf));
+    
+    if (numItemsSelected == 0)
+    {
+        menu.addSubMenu("Add...", getNewItemMenu(laf));
+    }
+
+    return menu;
+}
 
 
 typedef enum BKPlatform

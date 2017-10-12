@@ -52,21 +52,21 @@ private:
     void bkButtonClicked            (Button* b)             override;
     void BKEditableComboBoxChanged(String text, BKEditableComboBox* cb) override;
     
-    static void loadMenuCallback(int result, HeaderViewController*);
     static void pianoMenuCallback(int result, HeaderViewController*);
     static void galleryMenuCallback(int result, HeaderViewController*);
+    
+    
     
     void addGalleriesFromFolder(File folder);
     
     PopupMenu getLoadMenu(void);
     PopupMenu getPianoMenu(void);
     PopupMenu getGalleryMenu(void);
-    PopupMenu getNewMenu(void);
-    PopupMenu getEditMenu(void);
+    
     //OwnedArray<PopupMenu> submenus;
     //StringArray submenuNames;
     
-    TextButton  loadB;
+    TextButton  editB;
     TextButton  pianoB;
     TextButton  galleryB;
     
