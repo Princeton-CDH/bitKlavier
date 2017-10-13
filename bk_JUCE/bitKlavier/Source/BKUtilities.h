@@ -50,7 +50,6 @@
 #define LOAD_MEDIUM 39
 #define LOAD_HEAVY 40
 
-
 #define KEYMAP_EDIT_ID 27
 #define DIRECT_EDIT_ID 28
 #define NOSTALGIC_EDIT_ID 29
@@ -62,8 +61,6 @@
 #define SYNCHRONICMOD_EDIT_ID 35
 #define TUNINGMOD_EDIT_ID 36
 #define TEMPOMOD_EDIT_ID 37
-
-#define IOS_SCALE 0.5
 
 inline PopupMenu getNewItemMenu(LookAndFeel* laf)
 {
@@ -108,8 +105,8 @@ inline PopupMenu getAlignMenu(LookAndFeel* laf)
     PopupMenu menu;
     menu.setLookAndFeel(laf);
     
-    menu.addItem(ALIGN_VERTICAL, "Align (row)");
-    menu.addItem(ALIGN_HORIZONTAL, "Align (column)");
+    menu.addItem(ALIGN_VERTICAL, "Row");
+    menu.addItem(ALIGN_HORIZONTAL, "Column");
     
     return menu;
 }

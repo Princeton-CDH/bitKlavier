@@ -30,14 +30,12 @@ resizer(new ResizableCornerComponent (this, constrain))
     resizer->setAlwaysOnTop(true);
 #endif
     
-    constrain->setSizeLimits(gMainComponentMinWidth, gMainComponentMinHeight, gMainComponentWidth * 2, gMainComponentHeight * 2);
+    setSize(processor.uiWidth, processor.uiHeight);
     
-    mvc.setSize(gMainComponentWidth, gMainComponentHeight);
-    setSize(gMainComponentWidth, gMainComponentHeight);
+    constrain->setSizeLimits(processor.uiWidth, processor.uiHeight, processor.uiWidth * 2, processor.uiHeight * 2);
     
     processor.initializeGallery();
     processor.updateState->pianoDidChangeForGraph = true;
-
 }
 
 BKAudioProcessorEditor::~BKAudioProcessorEditor()

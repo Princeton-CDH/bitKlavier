@@ -182,6 +182,10 @@ public:
     
     BKPlatform      platform;
 
+    float uiScaleFactor;
+    
+    int uiWidth, uiHeight, uiMinWidth, uiMinHeight;
+    
 private:
     
     int  currentPianoId;

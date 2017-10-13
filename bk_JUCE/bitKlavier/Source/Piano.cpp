@@ -1127,7 +1127,7 @@ void Piano::setState(XmlElement* e)
                     i = item->getStringAttribute("Y").getIntValue();
                     int y = i;
                     
-                    thisItem->setTopLeftPosition(x, y);
+                    thisItem->setCentrePosition(x, y);
                     
                     i = item->getStringAttribute("active").getIntValue();
                     bool active = (bool)i;
@@ -1168,7 +1168,7 @@ void Piano::setState(XmlElement* e)
                     i = connection->getStringAttribute("Y").getIntValue();
                     int y = i;
                     
-                    thisConnection->setTopLeftPosition(x, y);
+                    thisConnection->setCentrePosition(x, y);
                     
                     i = connection->getStringAttribute("active").getIntValue();
                     bool active = (bool)i;
@@ -1186,11 +1186,10 @@ void Piano::setState(XmlElement* e)
     }
     
 #if JUCE_IOS
+    for (auto item : items)
     {
-        for (auto item : items)
-        {
-            item->setTopLeftPosition(item->getX() * IOS_SCALE, item->getY() * IOS_SCALE);
-        }
+        DBG("centre x: " + String(item->getX() + item->getWidth() / 2));
+        item->setCentrePosition((item->getX() + item->getWidth() / 2) * processor.uiScaleFactor, (item->getY() + item->getHeight() / 2) * processor.uiScaleFactor);
     }
 #endif
 }

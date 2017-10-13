@@ -155,7 +155,7 @@ void BKItem::setImage(Image newImage)
     65;
     
 #if JUCE_IOS 
-    val *= IOS_SCALE;
+    val *= processor.uiScaleFactor;
 #endif
     
     while (!(image.getWidth() < val || image.getHeight() < val))
@@ -333,11 +333,11 @@ ValueTree BKItem::getState(void)
     
     float scale = 1.0f;
 #if JUCE_IOS
-    scale /= IOS_SCALE;
+    scale /= processor.uiScaleFactor;
 #endif
 
-    itemVT.setProperty("X", getX()*scale, 0);
-    itemVT.setProperty("Y", getY()*scale, 0);
+    itemVT.setProperty("X", (getX() + getWidth() / 2) * scale, 0);
+    itemVT.setProperty("Y", (getY() + getHeight() / 2) * scale, 0);
 
     return itemVT;
 }

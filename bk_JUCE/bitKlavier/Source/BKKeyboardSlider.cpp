@@ -65,7 +65,7 @@ void BKKeyboardSlider::paint (Graphics& g)
 
 void BKKeyboardSlider::resized()
 {
-    Rectangle<int> area (getLocalBounds());
+    Rectangle<int> area (getBounds());
     float keyboardHeight = area.getHeight() - 20;
     Rectangle<int> keymapRow = area.removeFromBottom(keyboardHeight + 20);
     

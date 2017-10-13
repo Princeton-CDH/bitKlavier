@@ -133,8 +133,8 @@ void MainViewController::resized()
     int sidebarWidth = (processor.platform == BKIOS) ? 30 : 20;
     int footerHeight = 40;
     
-    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
-    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
+    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - processor.uiMinWidth) / (processor.uiWidth - processor.uiMinWidth);
+    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - processor.uiMinHeight) / (processor.uiHeight - processor.uiMinHeight);
     
     Rectangle<int> area (getLocalBounds());
     header.setBounds(area.removeFromTop(headerHeight));
