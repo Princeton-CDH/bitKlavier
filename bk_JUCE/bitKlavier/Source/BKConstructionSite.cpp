@@ -139,8 +139,8 @@ void BKConstructionSite::align(int which)
     
     for (auto item : graph->getSelectedItems())
     {
-        float X = item->getX();
-        float Y = item->getY();
+        float X = item->getX() + item->getWidth() / 2;
+        float Y = item->getY() + item->getHeight() / 2;
         
         if (X < mostLeft)   mostLeft = X;
         
@@ -158,10 +158,10 @@ void BKConstructionSite::align(int which)
     
     for (auto item : graph->getSelectedItems())
     {
-        float X = (left ? mostLeft : (right ? mostRight : item->getX()));
-        float Y = (top ? mostTop : (bottom ? mostBottom : item->getY()));
+        float X = (left ? mostLeft : (right ? mostRight : item->getX() + item->getWidth() / 2));
+        float Y = (top ? mostTop : (bottom ? mostBottom : item->getY() + item->getHeight() / 2));
         
-        item->setTopLeftPosition(X, Y);
+        item->setCentrePosition(X, Y);
     }
     
     repaint();

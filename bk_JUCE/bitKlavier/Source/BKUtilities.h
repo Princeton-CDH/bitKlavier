@@ -108,8 +108,8 @@ inline PopupMenu getAlignMenu(LookAndFeel* laf)
     PopupMenu menu;
     menu.setLookAndFeel(laf);
     
-    menu.addItem(ALIGN_VERTICAL, "Align (vertical)");
-    menu.addItem(ALIGN_HORIZONTAL, "Align (horizontal)");
+    menu.addItem(ALIGN_VERTICAL, "Align (row)");
+    menu.addItem(ALIGN_HORIZONTAL, "Align (column)");
     
     return menu;
 }
