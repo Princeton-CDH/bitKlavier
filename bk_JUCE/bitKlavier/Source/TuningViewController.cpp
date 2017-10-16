@@ -87,6 +87,7 @@ BKViewController(p,theGraph)
     absoluteOffsets.ensureStorageAllocated(128);
     for(int i=0; i<128; i++) absoluteOffsets.add(0.);
     absoluteKeyboard.setName("Key-by-Key Offsets");
+    absoluteKeyboard.setAlpha(1);
     addAndMakeVisible(absoluteKeyboard);
     
     //Custom Tuning Keyboard
