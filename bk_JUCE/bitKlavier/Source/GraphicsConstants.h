@@ -13,9 +13,11 @@
 
 static const float gMainComponentFontSize = 12.0f;
 
-#define DEFAULT_HEIGHT 700
 #define DEFAULT_WIDTH 933
+#define DEFAULT_HEIGHT 700
 
+#define DEFAULT_MIN_WIDTH 466
+#define DEFAULT_MIN_HEIGHT 290
 
 
 static const int gComponentLeftOffset = 5;

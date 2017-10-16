@@ -121,24 +121,19 @@ void TuningViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
     
-    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - processor.uiMinWidth) / (processor.uiWidth - processor.uiMinWidth);
-    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - processor.uiMinHeight) / (processor.uiHeight - processor.uiMinHeight);
-    
     iconImageComponent.setBounds(area);
-    area.reduce(10 * paddingScalarX + 4, 10 * paddingScalarY + 4);
+    area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
     
-    float keyboardHeight = 60 + 50 * paddingScalarY;
+    float keyboardHeight = 60 + 50 * processor.paddingScalarY;
     Rectangle<int> absoluteKeymapRow = area.removeFromBottom(keyboardHeight);
     absoluteKeymapRow.reduce(gXSpacing, 0);
     absoluteKeyboard.setBounds(absoluteKeymapRow);
     
     DBG("TVC - " + rectangleToString(absoluteKeymapRow));
     
-    DBG("TVC - W: " + String(processor.uiWidth) + " H: " + String(processor.uiHeight) + " mW: " + String(processor.uiMinWidth) + " mH: " + String(processor.uiMinHeight));
-    
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    comboBoxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    comboBoxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
@@ -157,31 +152,31 @@ void TuningViewController::resized()
     // ********* right column
     
     Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
-    modeSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    modeSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     modeSlice.removeFromRight(gXSpacing);
     scaleCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
     
-    modeSlice.removeFromLeft(gXSpacing + gPaddingConst * paddingScalarX);
+    modeSlice.removeFromLeft(gXSpacing + gPaddingConst * processor.paddingScalarX);
     fundamentalCB.setBounds(modeSlice);
     
-    int customKeyboardHeight = 60 + 70. * paddingScalarY;
+    int customKeyboardHeight = 60 + 70. * processor.paddingScalarY;
     int extraY = (area.getHeight() - (customKeyboardHeight + gComponentSingleSliderHeight + gComponentTextFieldHeight + gYSpacing * 4)) * 0.25;
     
     area.removeFromTop(extraY + gYSpacing);
     Rectangle<int> customKeyboardSlice = area.removeFromTop(customKeyboardHeight);
-    customKeyboardSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    customKeyboardSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     customKeyboardSlice.removeFromRight(gXSpacing);
     customKeyboard.setBounds(customKeyboardSlice);
     
     area.removeFromTop(extraY + gYSpacing);
     Rectangle<int> offsetSliderSlice = area.removeFromTop(gComponentSingleSliderHeight);
-    offsetSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
+    offsetSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     offsetSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
     offsetSlider->setBounds(offsetSliderSlice);
     
     area.removeFromTop(extraY + gYSpacing);
     Rectangle<int> lastNoteSlice = area.removeFromTop(gComponentTextFieldHeight);
-    lastNoteSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    lastNoteSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     lastNoteSlice.removeFromRight(gXSpacing);
     lastNote.setBounds(lastNoteSlice.removeFromLeft(lastNoteSlice.getWidth() * 0.5));
     lastInterval.setBounds(lastNoteSlice);
@@ -197,7 +192,7 @@ void TuningViewController::resized()
     
     leftColumn.removeFromTop(extraY + gYSpacing);
     Rectangle<int> A1IntervalScaleCBSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    A1IntervalScaleCBSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    A1IntervalScaleCBSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     A1IntervalScaleCBSlice.removeFromLeft(gXSpacing);
     int tempwidth = A1IntervalScaleCBSlice.getWidth() / 3.;
     A1Inversional.setBounds(A1IntervalScaleCBSlice.removeFromRight(tempwidth));
@@ -206,19 +201,19 @@ void TuningViewController::resized()
     
     leftColumn.removeFromTop(extraY + gYSpacing);
     Rectangle<int> A1ClusterMaxSlice = leftColumn.removeFromTop(gComponentSingleSliderHeight);
-    A1ClusterMaxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
+    A1ClusterMaxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     //A1ClusterMaxSlice.removeFromLeft(gXSpacing);
     A1ClusterMax->setBounds(A1ClusterMaxSlice);
     
     leftColumn.removeFromTop(gYSpacing);
     Rectangle<int> A1ClusterThreshSlice = leftColumn.removeFromTop(gComponentSingleSliderHeight);
-    A1ClusterThreshSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
+    A1ClusterThreshSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     //A1ClusterThreshSlice.removeFromLeft(gXSpacing);
     A1ClusterThresh->setBounds(A1ClusterThreshSlice);
     
     leftColumn.removeFromTop(extraY + gYSpacing);
     Rectangle<int> A1AnchorScaleCBSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    A1AnchorScaleCBSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    A1AnchorScaleCBSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     A1AnchorScaleCBSlice.removeFromLeft(gXSpacing);
     tempwidth = A1AnchorScaleCBSlice.getWidth() / 3.;
     A1AnchorScaleLabel.setBounds(A1AnchorScaleCBSlice.removeFromLeft(tempwidth));

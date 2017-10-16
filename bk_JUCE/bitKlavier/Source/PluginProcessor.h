@@ -184,10 +184,12 @@ public:
 
     float uiScaleFactor;
     
-    int uiWidth;
-    int uiHeight;
-    int uiMinWidth;
-    int uiMinHeight;
+    
+    float paddingScalarX;
+    float paddingScalarY;
+    
+    int screenWidth;
+    int screenHeight;
     
 private:
     

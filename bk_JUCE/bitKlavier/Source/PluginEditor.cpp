@@ -30,9 +30,16 @@ resizer(new ResizableCornerComponent (this, constrain))
     resizer->setAlwaysOnTop(true);
 #endif
     
-    setSize(processor.uiWidth, processor.uiHeight);
+#if JUCE_IOS
+    setSize(processor.screenWidth, processor.screenHeight);
     
-    constrain->setSizeLimits(processor.uiWidth, processor.uiHeight, processor.uiWidth * 2, processor.uiHeight * 2);
+    constrain->setSizeLimits(processor.screenWidth, processor.screenHeight, processor.screenWidth, processor.screenHeight);
+#else
+    setSize((processor.screenWidth < DEFAULT_WIDTH) ? processor.screenWidth : DEFAULT_WIDTH,
+            (processor.screenHeight < DEFAULT_HEIGHT) ? processor.screenHeight : DEFAULT_HEIGHT);
+    
+    constrain->setSizeLimits(getBounds().getWidth(), getBounds().getWidth() * 2, getBounds().getHeight(),  getBounds().getHeight() * 2);
+#endif
     
     processor.initializeGallery();
     processor.updateState->pianoDidChangeForGraph = true;
