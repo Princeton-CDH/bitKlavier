@@ -9,7 +9,7 @@
 namespace BinaryData
 {
     extern const char*   __blank_xml;
-    const int            __blank_xmlSize = 4281;
+    const int            __blank_xmlSize = 4215;
 
     extern const char*   direct_icon_png;
     const int            direct_icon_pngSize = 7648;

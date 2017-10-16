@@ -11,9 +11,8 @@ namespace BinaryData
 static const unsigned char temp_binary_data_0[] =
 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
 "\r\n"
-"<gallery url=\"/Users/dan/Documents/bitKlavier resources/galleries/Basic Piano.xml\"\r\n"
-"         defaultPiano=\"1\">\r\n"
-"  <idCount i0=\"15\" i1=\"28\" i2=\"24\" i3=\"20\" i4=\"16\" i5=\"1531\" i6=\"10\" i7=\"10\"\r\n"
+"<gallery url=\"/Users/dan/Documents/bitKlavier/galleries/__blank.xml\" defaultPiano=\"1\">\r\n"
+"  <idCount i0=\"15\" i1=\"28\" i2=\"24\" i3=\"20\" i4=\"16\" i5=\"1521\" i6=\"10\" i7=\"10\"\r\n"
 "           i8=\"10\" i9=\"12\" i10=\"10\" i11=\"10\" i12=\"10\" i13=\"11\" i14=\"30\"/>\r\n"
 "  <general globalGain=\"1\" directGain=\"1\" synchronicGain=\"1\" nostalgicGain=\"1\"\r\n"
 "           resonanceGain=\"1\" hammerGain=\"0.0099999997764825820923\" tempoMultiplier=\"1\"\r\n"
@@ -34,14 +33,13 @@ static const unsigned char temp_binary_data_0[] =
 "                 f9=\"0\" f10=\"0\" f11=\"0\"/>\r\n"
 "    <absoluteOffsets/>\r\n"
 "  </tuning>\r\n"
-"  <direct Id=\"11\" name=\"Plain\" gain=\"1\" resGain=\"0.30000001192092895508\"\r\n"
-"          hammerGain=\"0.5\">\r\n"
+"  <direct Id=\"11\" name=\"Plain\" gain=\"1\" resGain=\"1\" hammerGain=\"1\">\r\n"
 "    <transposition f0=\"0\"/>\r\n"
 "  </direct>\r\n"
 "  <direct Id=\"-1\" name=\"-1\" gain=\"1\" resGain=\"1\" hammerGain=\"1\">\r\n"
 "    <transposition f0=\"0\"/>\r\n"
 "  </direct>\r\n"
-"  <synchronic Id=\"-1\" name=\"-1\" gain=\"1\" numBeats=\"0\" clusterMin=\"1\" clusterMax=\"100\"\r\n"
+"  <synchronic Id=\"-1\" name=\"-1\" numBeats=\"0\" clusterMin=\"1\" clusterMax=\"100\"\r\n"
 "              clusterThresh=\"500\" mode=\"0\" beatsToSkip=\"0\">\r\n"
 "    <beatMultipliers f0=\"1\"/>\r\n"
 "    <lengthMultipliers f0=\"1\"/>\r\n"
@@ -76,19 +74,19 @@ static const unsigned char temp_binary_data_0[] =
 "  <keymap Id=\"-1\" name=\"-1\"/>\r\n"
 "  <piano name=\"Basic Piano\" Id=\"1\">\r\n"
 "    <item>\r\n"
-"      <item name=\"Tuning12\" type=\"3\" Id=\"11\" piano=\"-1\" active=\"1\" X=\"415\"\r\n"
-"            Y=\"86\"/>\r\n"
+"      <item name=\"Tuning12\" type=\"3\" Id=\"11\" piano=\"-1\" active=\"1\" X=\"450\"\r\n"
+"            Y=\"142\"/>\r\n"
 "      <connections>\r\n"
-"        <item name=\"Direct11\" type=\"0\" Id=\"11\" piano=\"-1\" active=\"1\" X=\"372\"\r\n"
-"              Y=\"219\"/>\r\n"
+"        <item name=\"Direct11\" type=\"0\" Id=\"11\" piano=\"-1\" active=\"1\" X=\"410\"\r\n"
+"              Y=\"275\"/>\r\n"
 "      </connections>\r\n"
 "    </item>\r\n"
 "    <item>\r\n"
-"      <item name=\"Keymap11\" type=\"5\" Id=\"11\" piano=\"-1\" active=\"1\" X=\"388\"\r\n"
-"            Y=\"328\"/>\r\n"
+"      <item name=\"Keymap11\" type=\"5\" Id=\"11\" piano=\"-1\" active=\"1\" X=\"426\"\r\n"
+"            Y=\"384\"/>\r\n"
 "      <connections>\r\n"
-"        <item name=\"Direct11\" type=\"0\" Id=\"11\" piano=\"-1\" active=\"1\" X=\"372\"\r\n"
-"              Y=\"219\"/>\r\n"
+"        <item name=\"Direct11\" type=\"0\" Id=\"11\" piano=\"-1\" active=\"1\" X=\"410\"\r\n"
+"              Y=\"275\"/>\r\n"
 "      </connections>\r\n"
 "    </item>\r\n"
 "  </piano>\r\n"
@@ -5692,7 +5690,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes) throw
 
     switch (hash)
     {
-        case 0x4a5316cc:  numBytes = 4281; return __blank_xml;
+        case 0x4a5316cc:  numBytes = 4215; return __blank_xml;
         case 0x1c4324f9:  numBytes = 7648; return direct_icon_png;
         case 0x1c6ce6da:  numBytes = 12817; return general_icon_png;
         case 0xd4093963:  numBytes = 38622; return icon_png;
