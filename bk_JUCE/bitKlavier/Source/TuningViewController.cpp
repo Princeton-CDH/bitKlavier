@@ -129,8 +129,8 @@ void TuningViewController::resized()
     Rectangle<int> absoluteKeymapRow = area.removeFromBottom(keyboardHeight);
     absoluteKeymapRow.reduce(gXSpacing, 0);
     absoluteKeyboard.setBounds(absoluteKeymapRow);
-    
-    DBG("TVC - " + rectangleToString(absoluteKeymapRow));
+
+    DBG("TVC - absoluteKeyboard" + rectangleToString(absoluteKeymapRow));
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
@@ -168,6 +168,8 @@ void TuningViewController::resized()
     customKeyboardSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     customKeyboardSlice.removeFromRight(gXSpacing);
     customKeyboard.setBounds(customKeyboardSlice);
+    
+    DBG("TVC - customKeyboard " + rectangleToString(customKeyboardSlice));
     
     area.removeFromTop(extraY + gYSpacing);
     Rectangle<int> offsetSliderSlice = area.removeFromTop(gComponentSingleSliderHeight);

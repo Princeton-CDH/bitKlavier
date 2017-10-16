@@ -65,7 +65,8 @@ void BKKeyboardSlider::paint (Graphics& g)
 
 void BKKeyboardSlider::resized()
 {
-    Rectangle<int> area (getBounds());
+    //Rectangle<int> area (getBounds());
+    Rectangle<int> area (getLocalBounds());
     float keyboardHeight = area.getHeight() - 20;
     Rectangle<int> keymapRow = area.removeFromBottom(keyboardHeight + 20);
     
@@ -74,7 +75,9 @@ void BKKeyboardSlider::resized()
     keyboard->setKeyWidth(keyWidth);
     keyboard->setBlackNoteLengthProportion(0.65);
     //keyboardComponent->setBounds(keymapRow.removeFromBottom(keyboardHeight - gYSpacing));
-    keyboard->setBounds(keymapRow.removeFromBottom(keyboardHeight - gYSpacing));
+    Rectangle<int> keyboardRect = keymapRow.removeFromBottom(keyboardHeight - gYSpacing);
+    //keyboard->setBounds(keymapRow.removeFromBottom(keyboardHeight - gYSpacing));
+    keyboard->setBounds(keyboardRect);
     keymapRow.removeFromBottom(gYSpacing);
     Rectangle<int> textSlab (keymapRow.removeFromBottom(20));
     keyboardValueTF.setBounds(textSlab.removeFromRight(50));
@@ -83,7 +86,7 @@ void BKKeyboardSlider::resized()
     keyboardValsTextField->setBounds(keyboard->getBounds());
     
     DBG("keywidth: " + String(keyWidth) + " keyheight: " + String(keyboardHeight));
-    DBG("keymapRow: " + rectangleToString(keymapRow));
+    DBG("keyboardRect: " + rectangleToString(keyboardRect));
 
 }
 
