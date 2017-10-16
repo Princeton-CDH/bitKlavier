@@ -18,10 +18,6 @@ resonanceReleaseSynth()
     Rectangle<int> r = Desktop::getInstance().getDisplays().getMainDisplay().userArea;
     screenWidth = r.getWidth();
     screenHeight = r.getHeight();
-
-
-    paddingScalarX = (float)(screenWidth - DEFAULT_MIN_WIDTH) / (DEFAULT_WIDTH - DEFAULT_MIN_WIDTH);
-    paddingScalarY = (float)(screenHeight - DEFAULT_MIN_HEIGHT) / (DEFAULT_HEIGHT - DEFAULT_MIN_HEIGHT);
         
     float w_factor = ((float) screenWidth / (float) DEFAULT_WIDTH);
     float h_factor = ((float) screenHeight / (float) DEFAULT_HEIGHT);
