@@ -132,6 +132,10 @@ void TuningViewController::resized()
     absoluteKeymapRow.reduce(gXSpacing, 0);
     absoluteKeyboard.setBounds(absoluteKeymapRow);
     
+    DBG("TVC - " + rectangleToString(absoluteKeymapRow));
+    
+    DBG("TVC - W: " + String(processor.uiWidth) + " H: " + String(processor.uiHeight) + " mW: " + String(processor.uiMinWidth) + " mH: " + String(processor.uiMinHeight));
+    
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
     comboBoxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);

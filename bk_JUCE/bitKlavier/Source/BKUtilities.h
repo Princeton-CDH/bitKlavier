@@ -194,6 +194,11 @@ Array<float>    stringOrderedPairsToFloatArray(String s, int size);
 double          mtof(double f);
 double          ftom(double f);
 
+String rectangleToString(Rectangle<int> rect);
+String rectangleToString(Rectangle<float> rect);
+
+
+
 BKParameterDataType getBKDataType ( SynchronicParameterType param);
 BKParameterDataType getBKDataType ( TuningParameterType param);
 BKParameterDataType getBKDataType ( DirectParameterType param);

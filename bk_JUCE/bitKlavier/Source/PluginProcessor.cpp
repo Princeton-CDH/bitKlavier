@@ -18,8 +18,7 @@ resonanceReleaseSynth()
     Rectangle<int> r = Desktop::getInstance().getDisplays().getMainDisplay().userArea;
     int width = r.getWidth();
     int height = r.getHeight();
-    
-    DBG("screen W: " + String(width) + " H: " + String(height));
+
     uiWidth = (width > DEFAULT_WIDTH) ? DEFAULT_WIDTH : width;
     uiHeight = (height > DEFAULT_HEIGHT) ? DEFAULT_HEIGHT : height;
     
@@ -29,8 +28,6 @@ resonanceReleaseSynth()
     uiScaleFactor = (w_factor + h_factor) * 0.5f;
     
     uiScaleFactor = (uiScaleFactor > 1.0f) ? 1.0f : uiScaleFactor;
-    
-    DBG("uiScale: " + String(uiScaleFactor));
 
 #if JUCE_IOS
     uiMinWidth = uiWidth;
@@ -87,7 +84,11 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 #endif
     
 #if JUCE_MAC || JUCE_WINDOWS
-        loadPianoSamples(BKLoadHeavy);
+#if DEBUG
+    loadPianoSamples(BKLoadLite);
+#else
+    loadPianoSamples(BKLoadHeavy);
+#endif
 #endif
     }
 }
