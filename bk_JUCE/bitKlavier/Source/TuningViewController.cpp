@@ -374,8 +374,8 @@ void TuningPreparationEditor::timerCallback()
             if (tProcessor->getLastNoteTuning() != lastNoteTuningSave)
             {
                 lastNoteTuningSave = tProcessor->getLastNoteTuning();
-                lastNote.setText("last note: " + String(lastNoteTuningSave), dontSendNotification);
-                lastInterval.setText("last interval: "  + String(tProcessor->getLastIntervalTuning()), dontSendNotification);
+                lastNote.setText("last note: " + String(lastNoteTuningSave, 3), dontSendNotification);
+                lastInterval.setText("last interval: "  + String(tProcessor->getLastIntervalTuning(), 3), dontSendNotification);
             }
         }
         
