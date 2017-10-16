@@ -393,6 +393,7 @@ void BKKeyboardSlider::setValues(Array<float> newvals)
     int valCounter = 0;
     
     //for(int i=minKey; i<=maxKey; i++)
+    DBG("BKKeyboardSlider::setValues newvals size = " + String(newvals.size()));
     for(int i=0; i<newvals.size(); i++)
     {
         if(valCounter < newvals.size()) {
@@ -403,5 +404,15 @@ void BKKeyboardSlider::setValues(Array<float> newvals)
     
     if(fund > -1) keyboard->setFundamental(fund);
     
+    updateDisplay();
+}
+
+void BKKeyboardSlider::setValuesAbsolute(Array<float> newvals)
+{
+    for(int i=0; i<newvals.size(); i++)
+    {
+        keyboard->setKeyValue(i, newvals.getUnchecked(i));
+    }
+
     updateDisplay();
 }

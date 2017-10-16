@@ -158,7 +158,7 @@ public:
     inline const Array<float> getAbsoluteOffsetsCents() const noexcept {
         Array<float> tAbsoluteCents;
         tAbsoluteCents.ensureStorageAllocated(128);
-        for(int i=tAbsolute.size(); --i >= 0;)
+        for(int i=0; i<tAbsolute.size(); i++)
         {
             tAbsoluteCents.set(i, tAbsolute.getUnchecked(i) * 100.);
         }
@@ -191,11 +191,9 @@ public:
     void setAbsoluteOffset(int which, float val)                                    {tAbsolute.set(which, val);                             }
 
     inline void setCustomScaleCents(Array<float> tuning) {
-        DBG("tCustom.size = " + String(tCustom.size()));
         for(int i=0; i<tCustom.size(); i++)
         {
             tCustom.setUnchecked(i, tuning.getUnchecked(i) * 0.01f);
-            DBG("custom scale = " + String(i) + " " + String(tCustom.getUnchecked(i)));
         }
     }
     

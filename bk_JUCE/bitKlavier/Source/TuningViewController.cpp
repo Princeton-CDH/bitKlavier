@@ -577,7 +577,8 @@ void TuningPreparationEditor::update(void)
         fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
         offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
         
-        absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
+        //absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
+        absoluteKeyboard.setValuesAbsolute(prep->getAbsoluteOffsetsCents());
         Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         customKeyboard.setValues(currentTuning->getCurrentScaleCents());
         
@@ -765,7 +766,8 @@ void TuningModificationEditor::update(void)
         //                       offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
         
         val = mod->getParam(TuningAbsoluteOffsets);
-        absoluteKeyboard.setValues(stringToFloatArray(val));
+        //absoluteKeyboard.setValues(stringToFloatArray(val));
+        absoluteKeyboard.setValuesAbsolute(stringToFloatArray(val));
         //                       absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
         
         val = mod->getParam(TuningCustomScale);

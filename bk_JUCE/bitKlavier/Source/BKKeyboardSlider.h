@@ -67,6 +67,7 @@ public:
     void setAllValues(Array<float> newvals);
     void setActiveValues(Array<float> newvals);
     void setValues(Array<float> newvals);
+    void setValuesAbsolute(Array<float> newvals);
     void updateDisplay();
     
 private:
