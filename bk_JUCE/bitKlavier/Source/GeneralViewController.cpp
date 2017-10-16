@@ -81,21 +81,18 @@ void GeneralViewController::paint (Graphics& g)
 void GeneralViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
-    
-    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - processor.uiMinWidth) / (processor.uiWidth - processor.uiMinWidth);
-    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - processor.uiMinHeight) / (processor.uiHeight - processor.uiMinHeight);
-    
+
     iconImageComponent.setBounds(area);
-    area.reduce(10 * paddingScalarX + 4, 10 * paddingScalarY + 4);
+    area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * paddingScalarX);
+    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * processor.paddingScalarX);
     comboBoxSlice.removeFromLeft(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     
     Rectangle<int> sliderSlice = leftColumn;
-    sliderSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    sliderSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     
     int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 4.;
     A4tuningReferenceFrequencySlider->setBounds(sliderSlice.getX(),

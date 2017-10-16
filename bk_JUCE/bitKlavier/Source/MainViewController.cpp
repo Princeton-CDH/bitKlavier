@@ -133,21 +133,18 @@ void MainViewController::resized()
     int sidebarWidth = (processor.platform == BKIOS) ? 30 : 20;
     int footerHeight = 40;
     
-    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - processor.uiMinWidth) / (processor.uiWidth - processor.uiMinWidth);
-    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - processor.uiMinHeight) / (processor.uiHeight - processor.uiMinHeight);
-    
     Rectangle<int> area (getLocalBounds());
     header.setBounds(area.removeFromTop(headerHeight));
     
     Rectangle<int> overtopSlice = area;
-    overtopSlice.removeFromTop(60 * paddingScalarY);
-    overtopSlice.removeFromBottom(120 * paddingScalarY);
-    overtopSlice.reduce(70 * paddingScalarX, 0);
+    overtopSlice.removeFromTop(60 * processor.paddingScalarY);
+    overtopSlice.removeFromBottom(120 * processor.paddingScalarY);
+    overtopSlice.reduce(70 * processor.paddingScalarX, 0);
     overtop.setBounds(overtopSlice);
     
     if (display == DisplayDefault)
     {
-        Rectangle<int> footerSlice = area.removeFromBottom(footerHeight + footerHeight * paddingScalarY + gYSpacing);
+        Rectangle<int> footerSlice = area.removeFromBottom(footerHeight + footerHeight * processor.paddingScalarY + gYSpacing);
         footerSlice.reduce(gXSpacing, gYSpacing);
         float keyWidth = footerSlice.getWidth() / round((keyEnd - keyStart) * 7./12 + 1); //num white keys
         keyboard->setKeyWidth(keyWidth);
@@ -158,7 +155,7 @@ void MainViewController::resized()
     
     Rectangle<int> levelMeterSlice = area.removeFromLeft(sidebarWidth + gXSpacing);
     levelMeterSlice.removeFromLeft(gXSpacing);
-    levelMeterSlice.removeFromTop(2 * gYSpacing * paddingScalarY);
+    levelMeterSlice.removeFromTop(2 * gYSpacing * processor.paddingScalarY);
     levelMeterComponentL->setBounds(levelMeterSlice);
     
     Rectangle<int> gainSliderSlice = area.removeFromRight(sidebarWidth + gXSpacing);

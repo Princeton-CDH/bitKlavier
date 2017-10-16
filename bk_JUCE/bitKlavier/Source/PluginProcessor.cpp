@@ -16,29 +16,19 @@ resonanceReleaseSynth()
     Process::setPriority(juce::Process::RealtimePriority);
     
     Rectangle<int> r = Desktop::getInstance().getDisplays().getMainDisplay().userArea;
-    int width = r.getWidth();
-    int height = r.getHeight();
-    
-    DBG("screen W: " + String(width) + " H: " + String(height));
-    uiWidth = (width > DEFAULT_WIDTH) ? DEFAULT_WIDTH : width;
-    uiHeight = (height > DEFAULT_HEIGHT) ? DEFAULT_HEIGHT : height;
-    
-    float w_factor = ((float) width / (float) DEFAULT_WIDTH);
-    float h_factor = ((float) height / (float) DEFAULT_HEIGHT);
+    screenWidth = r.getWidth();
+    screenHeight = r.getHeight();
+
+
+    paddingScalarX = (float)(screenWidth - DEFAULT_MIN_WIDTH) / (DEFAULT_WIDTH - DEFAULT_MIN_WIDTH);
+    paddingScalarY = (float)(screenHeight - DEFAULT_MIN_HEIGHT) / (DEFAULT_HEIGHT - DEFAULT_MIN_HEIGHT);
+        
+    float w_factor = ((float) screenWidth / (float) DEFAULT_WIDTH);
+    float h_factor = ((float) screenHeight / (float) DEFAULT_HEIGHT);
 
     uiScaleFactor = (w_factor + h_factor) * 0.5f;
     
     uiScaleFactor = (uiScaleFactor > 1.0f) ? 1.0f : uiScaleFactor;
-    
-    DBG("uiScale: " + String(uiScaleFactor));
-
-#if JUCE_IOS
-    uiMinWidth = uiWidth;
-    uiMinHeight = uiMinWidth;
-#else
-    uiMinWidth = uiWidth * .5;
-    uiMinHeight = uiMinWidth *.56;
-#endif
     
     collectGalleries();
     
@@ -87,7 +77,11 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 #endif
     
 #if JUCE_MAC || JUCE_WINDOWS
-        loadPianoSamples(BKLoadHeavy);
+#if DEBUG
+    loadPianoSamples(BKLoadLite);
+#else
+    loadPianoSamples(BKLoadHeavy);
+#endif
 #endif
     }
 }

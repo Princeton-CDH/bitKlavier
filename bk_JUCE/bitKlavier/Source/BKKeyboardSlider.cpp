@@ -81,6 +81,9 @@ void BKKeyboardSlider::resized()
     showName.setBounds(textSlab.removeFromRight(125));
     keyboardValsTextFieldOpen.setBounds(textSlab.removeFromLeft(75));
     keyboardValsTextField->setBounds(keyboard->getBounds());
+    
+    DBG("keywidth: " + String(keyWidth) + " keyheight: " + String(keyboardHeight));
+    DBG("keymapRow: " + rectangleToString(keymapRow));
 
 }
 

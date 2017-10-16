@@ -19,8 +19,6 @@
         <GROUP id="{7F0BF645-3E7B-170B-9D26-4D950F9268C2}" name="presets">
           <FILE id="AHezW2" name="__blank.xml" compile="0" resource="1" file="../../../../Documents/bitKlavier resources/galleries/__blank.xml"/>
         </GROUP>
-        <FILE id="U1tlUf" name="bk.icns" compile="0" resource="0" file="Source/icons/bk.icns"
-              xcodeResource="1"/>
         <GROUP id="{6F7CFDA8-D246-D5B9-B60B-EDBE0C6F3537}" name="icons">
           <FILE id="fiXHO5" name="direct_icon.png" compile="0" resource="1" file="Source/icons/direct_icon.png"/>
           <FILE id="CHQGaP" name="general_icon.png" compile="0" resource="1"
