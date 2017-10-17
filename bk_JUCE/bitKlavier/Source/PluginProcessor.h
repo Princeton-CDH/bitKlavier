@@ -56,6 +56,8 @@ public:
     String firstGallery(void);
     void initializeGallery(void);
     
+    BKSampleLoadType currentSampleType;
+    
     Gallery::Ptr                        gallery;
     
     BKUpdateState::Ptr                  updateState;

@@ -16,6 +16,8 @@ ValueTree  Gallery::getState(void)
     
     galleryVT.setProperty("url", url, 0);
     
+    galleryVT.setProperty("sampleType", sampleType, 0);
+    
     ValueTree idCountVT( "idCount");
     
     for (int i = 0; i < BKPreparationTypeNil; i++)
@@ -76,6 +78,18 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
         /* * * * * * * * * * * * * * */
         url = xml->getStringAttribute("url");
         setDefaultPiano(xml->getStringAttribute("defaultPiano").getIntValue());
+        
+        String st = xml->getStringAttribute("sampleType");
+        
+        if (st != String::empty)    sampleType = (BKSampleLoadType) st.getIntValue();
+        else
+        {
+#if JUCE_IOS
+            sampleType = BKLoadMedium;
+#else
+            sampleType = BKLoadHeavy;
+#endif
+        }
 
         // iterate through its sub-elements
         forEachXmlChildElement (*xml, e)

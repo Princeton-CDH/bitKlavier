@@ -30,7 +30,11 @@ void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
     // TO IMPLEMENT: Should turn off all notes in the processors/synths before loading new samples.
     if(type >= 0)
     {
+        currentSampleType = type;
+        
         didLoadMainPianoSamples = false;
+        
+        DBG("SAMPLE_SET: " + cBKSampleLoadTypes[type]);
         
         BKSampleLoader::loadMainPianoSamples(&mainPianoSynth, type);
         

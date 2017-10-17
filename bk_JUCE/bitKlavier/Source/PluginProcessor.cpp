@@ -65,21 +65,6 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     levelBuf.setSize(2, 25);
     
     gallery->prepareToPlay(sampleRate);
-    
-    if (!didLoadMainPianoSamples)
-    {
-#if JUCE_IOS
-        loadPianoSamples(BKLoadLite);
-#endif
-    
-#if JUCE_MAC || JUCE_WINDOWS
-#if DEBUG
-    loadPianoSamples(BKLoadLite);
-#else
-    loadPianoSamples(BKLoadHeavy);
-#endif
-#endif
-    }
 }
 
 BKAudioProcessor::~BKAudioProcessor()
@@ -745,6 +730,11 @@ void BKAudioProcessor::loadJsonGalleryFromPath(String path)
 
 void BKAudioProcessor::initializeGallery(void)
 {
+    if (currentSampleType != gallery->sampleType)
+    {
+        loadPianoSamples(gallery->sampleType);
+    }
+    
     prevPiano = gallery->getPianos().getFirst();
     
     int defPiano = gallery->getDefaultPiano();
@@ -760,7 +750,7 @@ void BKAudioProcessor::initializeGallery(void)
         piano->configure();
         if (piano->getId() > gallery->getIdCount(PreparationTypePiano)) gallery->setIdCount(PreparationTypePiano, piano->getId());
     }
-
+    
     gallery->prepareToPlay(bkSampleRate);
     
     updateUI();

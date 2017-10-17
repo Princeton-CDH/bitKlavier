@@ -288,14 +288,17 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     
     if (result == LOAD_LITE)
     {
+        processor.gallery->sampleType = BKLoadLite;
         processor.loadPianoSamples(BKLoadLite);
     }
     else if (result == LOAD_MEDIUM)
     {
+        processor.gallery->sampleType = BKLoadMedium;
         processor.loadPianoSamples(BKLoadMedium);
     }
     else if (result == LOAD_HEAVY)
     {
+        processor.gallery->sampleType = BKLoadHeavy;
         processor.loadPianoSamples(BKLoadHeavy);
     }
     else if (result == SAVE_ID)

@@ -261,8 +261,6 @@ void BKPianoSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
     {
         clearCurrentNote();
     }
-    
-    DBG("stopped note");
 }
 
 void BKPianoSamplerVoice::pitchWheelMoved (const int /*newValue*/)

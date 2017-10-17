@@ -35,6 +35,8 @@ public:
     Gallery(var json, BKAudioProcessor&);
     ~Gallery();
     
+    BKSampleLoadType sampleType;
+    
     inline void print(void)
     {
         String s = "direct";
