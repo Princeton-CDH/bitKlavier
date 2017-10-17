@@ -102,7 +102,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
             NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
             currentNote->setPrepAtKeyOn(nostalgic->aPrep);
             currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber));
-            currentNote->setVelocityAtKeyOn(velocities.getUnchecked(midiNoteNumber) * nostalgic->aPrep->getGain());
+            currentNote->setVelocityAtKeyOn(velocities.getUnchecked(midiNoteNumber));
             currentNote->setReverseStartPosition((duration + nostalgic->aPrep->getWavedistance()) * sampleRate/1000.);
             //currentNote->setReverseTargetLength((duration - (aRampUndertowCrossMS + 30)) * sampleRate/1000.);
             currentNote->setReverseTargetLength((duration - (aRampUndertowCrossMS)) * sampleRate/1000.);
@@ -241,13 +241,17 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
                     int synthNoteNumber = thisNote->getNoteNumber() +  (int)offset;
                     float synthOffset = offset - (int)offset;
                     
-                    //DBG("nostalgic note on " + String(synthNoteNumber));
+                    DBG("undertow note on noteNum/Velocity/Gain " +
+                        String(synthNoteNumber) + " " +
+                        String(thisNote->getVelocityAtKeyOn()) + " " +
+                        String(noteOnPrep->getGain() * aGlobalGain));
+                    
                     synth->keyOn(midiChannel,
                                  thisNote->getNoteNumber(),
                                  synthNoteNumber,
                                  synthOffset,
                                  thisNote->getVelocityAtKeyOn(),
-                                 aGlobalGain,
+                                 noteOnPrep->getGain() * aGlobalGain,
                                  Forward,
                                  FixedLengthFixedStart,
                                  NostalgicNote,
