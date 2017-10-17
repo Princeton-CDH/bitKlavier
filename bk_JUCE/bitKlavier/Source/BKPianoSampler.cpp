@@ -109,9 +109,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         {
             if(voiceRampOn  > (0.5 * length))   voiceRampOn     = 0.5 * length;
             if(voiceRampOff > (0.5 * length))   voiceRampOff    = 0.5 * length;
-            
-            //playLength = (length - voiceRampOff) * pitchRatio;
-            playLength = (length - (voiceRampOff + voiceRampOn)) * pitchRatio; 
+
+            playLength = (length - (voiceRampOff + voiceRampOn)) * pitchRatio;
         }
         
         if (playDirection == Forward)
@@ -262,6 +261,8 @@ void BKPianoSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
     {
         clearCurrentNote();
     }
+    
+    DBG("stopped note");
 }
 
 void BKPianoSamplerVoice::pitchWheelMoved (const int /*newValue*/)
@@ -369,6 +370,12 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
                         stopNote (0.0f, true);
                         //DBG("stopping forward note, playEndPosition = " + String(playEndPosition * 1000./getSampleRate()));
                     }
+                }
+                
+                if(sourceSamplePosition >= playingSound->soundLength)
+                {
+                    clearCurrentNote();
+                    //DBG("forward sound reached end of file");
                 }
             }
             else if (playDirection == Reverse)

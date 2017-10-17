@@ -218,12 +218,14 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
     incrementTimers(numSamples);
 
     for(int i = undertowNotes.size() - 1; i >= 0; --i)
+    //for(int i=0; i<undertowNotes.size(); i++)
     {
         if(undertowNotes.getUnchecked(i)->undertowTimerExceedsTarget())
             undertowNotes.remove(i);
     }
     
     for(int i = reverseNotes.size() - 1; i >= 0; --i)
+    //for(int i=0; i<reverseNotes.size(); i++)
     {
         NostalgicNoteStuff* thisNote = reverseNotes.getUnchecked(i);
         
@@ -239,6 +241,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
                     int synthNoteNumber = thisNote->getNoteNumber() +  (int)offset;
                     float synthOffset = offset - (int)offset;
                     
+                    //DBG("nostalgic note on " + String(synthNoteNumber));
                     synth->keyOn(midiChannel,
                                  thisNote->getNoteNumber(),
                                  synthNoteNumber,
