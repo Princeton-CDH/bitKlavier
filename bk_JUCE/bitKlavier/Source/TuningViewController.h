@@ -87,8 +87,8 @@ private:
 class TuningPreparationEditor :
 public TuningViewController,
 public BKEditableComboBoxListener,
-public BKSingleSliderListener,
-public BKKeyboardSliderListener,
+public BKSingleSlider::Listener,
+public BKKeyboardSlider::Listener,
 public Timer
 {
 public:
@@ -124,8 +124,8 @@ private:
 class TuningModificationEditor :
 public TuningViewController,
 public BKEditableComboBoxListener,
-public BKSingleSliderListener,
-public BKKeyboardSliderListener
+public BKSingleSlider::Listener,
+public BKKeyboardSlider::Listener
 {
 public:
     

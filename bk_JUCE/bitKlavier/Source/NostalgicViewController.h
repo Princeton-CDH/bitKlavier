@@ -47,10 +47,10 @@ private:
 
 class NostalgicPreparationEditor :
 public NostalgicViewController,
-public BKWaveDistanceUndertowSliderListener,
+public BKWaveDistanceUndertowSlider::Listener,
 public BKEditableComboBoxListener,
-public BKSingleSliderListener,
-public BKStackedSliderListener,
+public BKSingleSlider::Listener,
+public BKStackedSlider::Listener,
 //public SliderListener,
 public Timer
 {
@@ -90,10 +90,10 @@ private:
 
 class NostalgicModificationEditor :
 public NostalgicViewController,
-public BKWaveDistanceUndertowSliderListener,
+public BKWaveDistanceUndertowSlider::Listener,
 public BKEditableComboBoxListener,
-public BKSingleSliderListener,
-public BKStackedSliderListener,
+public BKSingleSlider::Listener,
+public BKStackedSlider::Listener,
 //public SliderListener,
 public Timer
 {

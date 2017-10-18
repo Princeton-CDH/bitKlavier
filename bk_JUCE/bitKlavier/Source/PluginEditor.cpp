@@ -41,7 +41,6 @@ resizer(new ResizableCornerComponent (this, constrain))
     constrain->setSizeLimits(DEFAULT_MIN_WIDTH, DEFAULT_MIN_HEIGHT, DEFAULT_MIN_WIDTH * 3, DEFAULT_MIN_HEIGHT * 3);
 #endif
     
-    processor.initializeGallery();
     processor.updateState->pianoDidChangeForGraph = true;
 }
 

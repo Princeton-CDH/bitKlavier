@@ -28,6 +28,8 @@ public:
     ScopedPointer<BKSingleSlider> resonanceGainSlider;
     ScopedPointer<BKSingleSlider> hammerGainSlider;
     
+    BKSingleSlider* sliderThatRequestedNumberPad;
+    
     void paint (Graphics&) override;
     void resized() override;
     
@@ -35,13 +37,14 @@ public:
     
 private:
 
+
 };
 
 class DirectPreparationEditor :
 public DirectViewController,
 public BKEditableComboBoxListener,
-public BKSingleSliderListener,
-public BKStackedSliderListener
+public BKSingleSlider::Listener,
+public BKStackedSlider::Listener
 {
 public:
     
@@ -56,7 +59,13 @@ public:
     void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(String name, double val) override;
+    
+    void bkSingleSliderWantsKeyboard(BKSingleSlider*) override;
+    
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
+    
+    void numberPadChanged(BKNumberPad*) override;
+    void numberPadDismissed(BKNumberPad*) override;
     
     void fillSelectCB(int last, int current);
     
@@ -76,8 +85,8 @@ private:
 class DirectModificationEditor :
 public DirectViewController,
 public BKEditableComboBoxListener,
-public BKSingleSliderListener,
-public BKStackedSliderListener
+public BKSingleSlider::Listener,
+public BKStackedSlider::Listener
 {
 public:
     

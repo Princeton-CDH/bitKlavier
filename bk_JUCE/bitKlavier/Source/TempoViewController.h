@@ -60,8 +60,8 @@ private:
 class TempoPreparationEditor :
 public TempoViewController,
 public BKEditableComboBoxListener,
-public BKRangeSliderListener,
-public BKSingleSliderListener,
+public BKRangeSlider::Listener,
+public BKSingleSlider::Listener,
 public Timer
 {
 public:
@@ -98,8 +98,8 @@ private:
 class TempoModificationEditor :
 public TempoViewController,
 public BKEditableComboBoxListener,
-public BKRangeSliderListener,
-public BKSingleSliderListener,
+public BKRangeSlider::Listener,
+public BKSingleSlider::Listener,
 private Timer
 {
 public:

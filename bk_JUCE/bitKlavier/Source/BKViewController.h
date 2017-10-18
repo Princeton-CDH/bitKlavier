@@ -24,7 +24,9 @@
 #include "BKSlider.h"
 #include "BKKeyboardSlider.h"
 
-class BKViewController    : public BKComponent, public BKListener
+#include "BKNumberPad.h"
+
+class BKViewController    : public BKComponent, public BKListener, public BKNumberPad::Listener
 {
 public:
     BKViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
@@ -87,6 +89,8 @@ protected:
     
     ImageComponent iconImageComponent;
     TextButton hideOrShow;
+    
+    BKNumberPad numberPad;
     
     int lastId;
     

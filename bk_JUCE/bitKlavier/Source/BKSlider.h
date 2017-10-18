@@ -21,6 +21,8 @@
 #include "BKComponent.h"
 #include "BKLookAndFeel.h"
 
+#include "BKNumberPad.h"
+
 typedef enum BKMultiSliderType {
     HorizontalMultiSlider = 0,
     VerticalMultiSlider,
@@ -73,20 +75,6 @@ private:
 // **************************************************  BKMultiSlider ************************************************** //
 // ******************************************************************************************************************** //
 
-
-class BKMultiSliderListener
-{
-    
-public:
-    
-    //BKMultiSliderListener() {}
-    virtual ~BKMultiSliderListener() {};
-    
-    virtual void multiSliderValueChanged(String name, int whichSlider, Array<float> values) = 0;
-    virtual void multiSliderAllValuesChanged(String name, Array<Array<float>> values) = 0;
-};
-
-
 class BKMultiSlider :
 public Component,
 public Slider::Listener,
@@ -135,9 +123,21 @@ public:
     
     void resized() override;
     
-    ListenerList<BKMultiSliderListener> listeners;
-    void addMyListener(BKMultiSliderListener* listener)     { listeners.add(listener);      }
-    void removeMyListener(BKMultiSliderListener* listener)  { listeners.remove(listener);   }
+    class Listener
+    {
+        
+    public:
+        
+        //BKMultiSlider::Listener() {}
+        virtual ~Listener() {};
+        
+        virtual void multiSliderValueChanged(String name, int whichSlider, Array<float> values) = 0;
+        virtual void multiSliderAllValuesChanged(String name, Array<Array<float>> values) = 0;
+    };
+    
+    ListenerList<Listener> listeners;
+    void addMyListener(Listener* listener)     { listeners.add(listener);      }
+    void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
     
     void setName(String newName)                            { sliderName = newName; showName.setText(sliderName, dontSendNotification);        }
     String getName()                                        { return sliderName; }
@@ -213,17 +213,6 @@ private:
 // ******************************************************************************************************************** //
 
 
-class BKSingleSliderListener
-{
-    
-public:
-    
-    //BKSingleSliderListener() {}
-    virtual ~BKSingleSliderListener() {};
-    
-    virtual void BKSingleSliderValueChanged(String name, double val) = 0;
-};
-
 //basic horizontal slider with its own text box and label
 //entering values in the text box will reset the range as needed
 class BKSingleSlider :
@@ -243,9 +232,12 @@ public:
     
     TextEditor valueTF;
     
+    inline void setText(String text, NotificationType notify = dontSendNotification) { valueTF.setText(text, notify);}
+    
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName()                { return sliderName; }
     void setTextIsAbove(bool nt)    { textIsAbove = nt; }
+    
     void setJustifyRight(bool jr)
     {
         justifyRight = jr;
@@ -259,6 +251,7 @@ public:
     
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+    void mouseDown(const MouseEvent &event) override;
     void mouseUp(const MouseEvent &event) override;
     void mouseDrag(const MouseEvent &e) override;
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
@@ -269,13 +262,27 @@ public:
     void setSkewFactor (double factor, bool symmetricSkew) { thisSlider.setSkewFactor(factor, symmetricSkew); }
     void setSkewFactorFromMidPoint (double sliderValueToShowAtMidPoint	) { thisSlider.setSkewFactorFromMidPoint(sliderValueToShowAtMidPoint); }
     
-    ListenerList<BKSingleSliderListener> listeners;
-    void addMyListener(BKSingleSliderListener* listener)     { listeners.add(listener);      }
-    void removeMyListener(BKSingleSliderListener* listener)  { listeners.remove(listener);   }
+    class Listener
+    {
+    public:
+        
+        //BKSingleSlider::Listener() {}
+        virtual ~Listener() {};
+        
+        virtual void BKSingleSliderValueChanged(String name, double val) = 0;
+        
+        virtual void bkSingleSliderWantsKeyboard(BKSingleSlider*){};
+    };
+    
+    
+    ListenerList<Listener> listeners;
+    void addMyListener(Listener* listener)     { listeners.add(listener);      }
+    void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
     
     void setDim(float newAlpha);
     void setBright();
     
+
 private:
     
     double sliderMin, sliderMax;
@@ -295,19 +302,6 @@ private:
 // ******************************************************************************************************************** //
 // **************************************************  BKRangeSlider ************************************************** //
 // ******************************************************************************************************************** //
-
-
-class BKRangeSliderListener
-{
-    
-public:
-    
-    //BKRangeSliderListener() {}
-    virtual ~BKRangeSliderListener() {};
-    
-    virtual void BKRangeSliderValueChanged(String name, double min, double max) = 0;
-};
-
 
 class BKRangeSlider :
 public Component,
@@ -359,9 +353,18 @@ public:
     void setDim(float newAlpha);
     void setBright();
     
-    ListenerList<BKRangeSliderListener> listeners;
-    void addMyListener(BKRangeSliderListener* listener)     { listeners.add(listener);      }
-    void removeMyListener(BKRangeSliderListener* listener)  { listeners.remove(listener);   }
+    class Listener
+    {
+        
+    public:
+        virtual ~Listener() {};
+        
+        virtual void BKRangeSliderValueChanged(String name, double min, double max) = 0;
+    };
+    
+    ListenerList<Listener> listeners;
+    void addMyListener(Listener* listener)     { listeners.add(listener);      }
+    void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
     
 private:
     
@@ -389,23 +392,10 @@ private:
 // ******************************************************************************************************************** //
 
 
-class BKWaveDistanceUndertowSliderListener
-{
-    
-public:
-    
-    //BKRangeSliderListener() {}
-    virtual ~BKWaveDistanceUndertowSliderListener() {};
-    
-    virtual void BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow) = 0;
-};
-
-
-
 class BKWaveDistanceUndertowSlider :
 public Component,
 public Slider::Listener
-//public BKSingleSliderListener,
+//public BKSingleSlider::Listener,
 //public TextEditor::Listener
 {
 public:
@@ -442,9 +432,21 @@ public:
     void setDim(float newAlpha);
     void setBright();
     
-    ListenerList<BKWaveDistanceUndertowSliderListener> listeners;
-    void addMyListener(BKWaveDistanceUndertowSliderListener* listener)     { listeners.add(listener);      }
-    void removeMyListener(BKWaveDistanceUndertowSliderListener* listener)  { listeners.remove(listener);   }
+    
+    class Listener
+    {
+        
+    public:
+        
+        //BKRangeSlider::Listener() {}
+        virtual ~Listener() {};
+        
+        virtual void BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow) = 0;
+    };
+    
+    ListenerList<Listener> listeners;
+    void addMyListener(Listener* listener)     { listeners.add(listener);      }
+    void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
     
 private:
     double sliderMin, sliderMax;
@@ -470,19 +472,6 @@ private:
 // ******************************************************************************************************************** //
 // ************************************************** BKStackedSlider ************************************************* //
 // ******************************************************************************************************************** //
-
-
-
-class BKStackedSliderListener
-{
-    
-public:
-    
-    //BKStackedSliderListener() {}
-    virtual ~BKStackedSliderListener() {};
-    
-    virtual void BKStackedSliderValueChanged(String name, Array<float> val) = 0; //rewrite all this to pass "this" and check by slider ref instead of name?
-};
 
 class BKStackedSlider :
 public Component,
@@ -519,9 +508,19 @@ public:
     void setDim(float newAlpha);
     void setBright();
     
-    ListenerList<BKStackedSliderListener> listeners;
-    void addMyListener(BKStackedSliderListener* listener)     { listeners.add(listener);      }
-    void removeMyListener(BKStackedSliderListener* listener)  { listeners.remove(listener);   }
+    class Listener
+    {
+        
+    public:
+        
+        virtual ~Listener() {};
+        
+        virtual void BKStackedSliderValueChanged(String name, Array<float> val) = 0; //rewrite all this to pass "this" and check by slider ref instead of name?
+    };
+    
+    ListenerList<Listener> listeners;
+    void addMyListener(Listener* listener)     { listeners.add(listener);      }
+    void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
     
 private:
     

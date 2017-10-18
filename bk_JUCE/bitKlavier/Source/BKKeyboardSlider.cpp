@@ -146,7 +146,7 @@ void BKKeyboardSlider::mouseUp(const MouseEvent& e)
         }
     }
     
-    listeners.call(&BKKeyboardSliderListener::keyboardSliderChanged,
+    listeners.call(&BKKeyboardSlider::Listener::keyboardSliderChanged,
                    getName(),
                    keyboard->getValuesRotatedByFundamental());
     
@@ -186,7 +186,7 @@ void BKKeyboardSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 
         else keyboard->setValuesDirectly(stringToFloatArray(keyboardValsTextField->getText()));
         
-        listeners.call(&BKKeyboardSliderListener::keyboardSliderChanged,
+        listeners.call(&BKKeyboardSlider::Listener::keyboardSliderChanged,
                        getName(),
                        keyboard->getValuesRotatedByFundamental());
         
@@ -199,7 +199,7 @@ void BKKeyboardSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
     {
         keyboard->setKeyValue(lastKeyPressed, keyboardValueTF.getText().getDoubleValue());
         
-        listeners.call(&BKKeyboardSliderListener::keyboardSliderChanged,
+        listeners.call(&BKKeyboardSlider::Listener::keyboardSliderChanged,
                        getName(),
                        keyboard->getValuesRotatedByFundamental());
         

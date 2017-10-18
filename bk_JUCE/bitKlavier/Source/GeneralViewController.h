@@ -17,7 +17,7 @@
 */
 class GeneralViewController :
 public BKViewController,
-public BKSingleSliderListener
+public BKSingleSlider::Listener
 {
 public:
     GeneralViewController(BKAudioProcessor&, BKItemGraph* theGraph);

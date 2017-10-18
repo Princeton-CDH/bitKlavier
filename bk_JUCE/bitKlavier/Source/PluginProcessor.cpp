@@ -732,7 +732,11 @@ void BKAudioProcessor::initializeGallery(void)
 {
     if (currentSampleType != gallery->sampleType)
     {
+#if !DEBUG
         loadPianoSamples(gallery->sampleType);
+#else
+        loadPianoSamples(BKLoadLite);
+#endif
     }
     
     prevPiano = gallery->getPianos().getFirst();

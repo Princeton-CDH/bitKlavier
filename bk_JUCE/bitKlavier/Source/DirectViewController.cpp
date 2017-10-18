@@ -51,6 +51,8 @@ BKViewController(p, theGraph)
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
     
+    addChildComponent(numberPad);
+    numberPad.addListener(this);
 }
 
 void DirectViewController::paint (Graphics& g)
@@ -61,6 +63,10 @@ void DirectViewController::paint (Graphics& g)
 void DirectViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
+    
+    float numberPadHeight = getHeight() - 2 * gYSpacing;
+    float numberPadWidth = getWidth() / 2 - 2 * gXSpacing;
+    numberPad.setSize(numberPadWidth, numberPadHeight);
 
     iconImageComponent.setBounds(area);
     area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
@@ -119,7 +125,6 @@ void DirectViewController::resized()
     
 }
 
-
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ DirectPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~//
 DirectPreparationEditor::DirectPreparationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
 DirectViewController(p, theGraph)
@@ -161,7 +166,6 @@ void DirectPreparationEditor::bkMessageReceived (const String& message)
 {
     if (message == "direct/update")
     {
-        
         update();
     }
 }
@@ -260,6 +264,47 @@ void DirectPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableC
     fillSelectCB(0, processor.updateState->currentDirectId);
 }
 
+
+void DirectPreparationEditor::bkSingleSliderWantsKeyboard(BKSingleSlider* slider)
+{
+    DBG("BEGIN: " + String(slider->getValue()));
+    
+    //numberPadDismissed(&numberPad);
+    
+    sliderThatRequestedNumberPad = slider;
+
+    numberPad.setTopLeftPosition((slider->getX() > getWidth()) ? gXSpacing : (0.5 * getWidth() + gXSpacing), gYSpacing);
+    
+    numberPad.setEnabled(NumberLBracket, false);
+    numberPad.setEnabled(NumberRBracket, false);
+    numberPad.setEnabled(NumberNegative, false);
+    numberPad.setEnabled(NumberColon, false);
+    
+    numberPad.setText(String(slider->getValue()));
+    
+    numberPad.setVisible(true);
+}
+
+void DirectPreparationEditor::numberPadChanged(BKNumberPad*)
+{
+    String text = numberPad.getText();
+    
+    DBG("CHANGED: " + text);
+    
+    sliderThatRequestedNumberPad->setText(text);
+}
+
+void DirectPreparationEditor::numberPadDismissed(BKNumberPad*)
+{
+    String text = numberPad.getText();
+    
+    DBG("DISMISSED: " + text);
+    
+    if (sliderThatRequestedNumberPad != nullptr)
+        sliderThatRequestedNumberPad->setValue(text.getDoubleValue(), sendNotification);
+    
+    numberPad.setVisible(false);
+}
 
 void DirectPreparationEditor::BKSingleSliderValueChanged(String name, double val)
 {
@@ -561,6 +606,7 @@ void DirectModificationEditor::BKSingleSliderValueChanged(String name, double va
     
     updateModification();
 }
+
 
 void DirectModificationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {

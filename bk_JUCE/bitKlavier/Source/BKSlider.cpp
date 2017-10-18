@@ -472,7 +472,7 @@ void BKMultiSlider::addSlider(int where, bool active, NotificationType newnotify
     
     if(newnotify == sendNotification)
     {
-        listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
+        listeners.call(&BKMultiSlider::Listener::multiSliderAllValuesChanged,
                        getName(),
                        getAllActiveValues());
     }
@@ -518,7 +518,7 @@ void BKMultiSlider::addSubSlider(int where, bool active, NotificationType newnot
     
     if(newnotify == sendNotification)
     {
-        listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
+        listeners.call(&BKMultiSlider::Listener::multiSliderAllValuesChanged,
                        getName(),
                        getAllActiveValues());
     }
@@ -551,7 +551,7 @@ void BKMultiSlider::deactivateSlider(int where, NotificationType notify)
         cleanupSliderArray();
 
         if(notify) {
-            listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
+            listeners.call(&BKMultiSlider::Listener::multiSliderAllValuesChanged,
                            getName(),
                            getAllActiveValues());
         }
@@ -610,13 +610,13 @@ void BKMultiSlider::mouseDrag(const MouseEvent& e)
                 if(!currentSlider->isActive()){
                     currentSlider->isActive(true);
                     currentSlider->setLookAndFeel(&activeSliderLookAndFeel);
-                    listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
+                    listeners.call(&BKMultiSlider::Listener::multiSliderAllValuesChanged,
                                    getName(),
                                    getAllActiveValues());
                 }
                 else
                 {
-                    listeners.call(&BKMultiSliderListener::multiSliderValueChanged,
+                    listeners.call(&BKMultiSlider::Listener::multiSliderValueChanged,
                                    getName(),
                                    whichActiveSlider(which),
                                    getOneSliderBank(which));
@@ -724,7 +724,7 @@ void BKMultiSlider::mouseUp (const MouseEvent &event)
 
                 displaySlider->setValue(sliderDefault);
                 
-                listeners.call(&BKMultiSliderListener::multiSliderValueChanged,
+                listeners.call(&BKMultiSlider::Listener::multiSliderValueChanged,
                                getName(),
                                whichActiveSlider(which),
                                getOneSliderBank(which));
@@ -931,7 +931,7 @@ void BKMultiSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
         resetRanges();
         resized();
         
-        listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
+        listeners.call(&BKMultiSlider::Listener::multiSliderAllValuesChanged,
                        getName(),
                        getAllActiveValues());
         
@@ -962,7 +962,7 @@ void BKMultiSlider::textEditorFocusLost(TextEditor& textEditor)
             resetRanges();
             resized();
             
-            listeners.call(&BKMultiSliderListener::multiSliderAllValuesChanged,
+            listeners.call(&BKMultiSlider::Listener::multiSliderAllValuesChanged,
                            getName(),
                            getAllActiveValues());
         }
@@ -1130,7 +1130,6 @@ sliderMax(max),
 sliderDefault(def),
 sliderIncrement(increment)
 {
-    
     textIsAbove = true;
     justifyRight = true;
     
@@ -1148,14 +1147,18 @@ sliderIncrement(increment)
     showName.setText(name, dontSendNotification);
     if (justifyRight) showName.setJustificationType(Justification::bottomRight);
     else showName.setJustificationType(Justification::bottomLeft);
+    showName.addMouseListener(this, true);
     addAndMakeVisible(showName);
     
     valueTF.setText(String(sliderDefault));
     valueTF.addListener(this);
     valueTF.setSelectAllWhenFocused(true);
+#if JUCE_IOS
+    valueTF.setReadOnly(true);
+#endif
+    valueTF.addMouseListener(this, true);
     valueTF.setColour(TextEditor::highlightColourId, Colours::darkgrey);
-    addAndMakeVisible(valueTF);
-    
+    addAndMakeVisible(valueTF);    
 }
 
 void BKSingleSlider::setDim(float alphaVal)
@@ -1176,7 +1179,7 @@ void BKSingleSlider::sliderValueChanged (Slider *slider)
 {
     if(slider == &thisSlider)
     {
-        listeners.call(&BKSingleSliderListener::BKSingleSliderValueChanged,
+        listeners.call(&BKSingleSlider::Listener::BKSingleSliderValueChanged,
                        getName(),
                        thisSlider.getValue());
         
@@ -1193,7 +1196,7 @@ void BKSingleSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
     
     unfocusAllComponents();
     
-    listeners.call(&BKSingleSliderListener::BKSingleSliderValueChanged,
+    listeners.call(&BKSingleSlider::Listener::BKSingleSliderValueChanged,
                    getName(),
                    thisSlider.getValue());
 }
@@ -1236,6 +1239,16 @@ void BKSingleSlider::checkValue(double newval)
     {
         thisSlider.setRange(sliderMin, thisSlider.getMaximum(), sliderIncrement);
     }
+}
+
+void BKSingleSlider::mouseDown(const MouseEvent& e)
+{
+#if JUCE_IOS
+    if (e.originalComponent == &valueTF || e.originalComponent == &showName)
+    {
+        listeners.call(&Listener::bkSingleSliderWantsKeyboard, this);
+    }
+#endif
 }
 
 void BKSingleSlider::mouseUp(const MouseEvent &event)
@@ -1440,7 +1453,7 @@ void BKRangeSlider::sliderValueChanged (Slider *slider)
                         setMaxValue(minSlider.getValue(), dontSendNotification);
             }
             
-            listeners.call(&BKRangeSliderListener::BKRangeSliderValueChanged,
+            listeners.call(&BKRangeSlider::Listener::BKRangeSliderValueChanged,
                            getName(),
                            minSlider.getValue(),
                            maxSlider.getValue());
@@ -1505,7 +1518,7 @@ void BKRangeSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
     
     unfocusAllComponents();
     
-    listeners.call(&BKRangeSliderListener::BKRangeSliderValueChanged,
+    listeners.call(&BKRangeSlider::Listener::BKRangeSliderValueChanged,
                    getName(),
                    minSlider.getValue(),
                    maxSlider.getValue());
@@ -1739,7 +1752,7 @@ void BKWaveDistanceUndertowSlider::sliderDragEnded(Slider *slider)
         setWaveDistance(wavedistanceSlider->getValue(), dontSendNotification);
     }
     
-    listeners.call(&BKWaveDistanceUndertowSliderListener::BKWaveDistanceUndertowSliderValueChanged,
+    listeners.call(&BKWaveDistanceUndertowSlider::Listener::BKWaveDistanceUndertowSliderValueChanged,
                    "nSlider",
                    wavedistanceSlider->getValue(),
                    undertowSlider->getValue());
@@ -1990,7 +2003,7 @@ void BKStackedSlider::mouseDrag(const MouseEvent& e)
 
 void BKStackedSlider::mouseUp(const MouseEvent& e)
 {
-    listeners.call(&BKStackedSliderListener::BKStackedSliderValueChanged,
+    listeners.call(&BKStackedSlider::Listener::BKStackedSliderValueChanged,
                    getName(),
                    getAllActiveValues());
 }
@@ -2040,7 +2053,7 @@ void BKStackedSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
         clickedSlider = 0;
         resized();
         
-        listeners.call(&BKStackedSliderListener::BKStackedSliderValueChanged,
+        listeners.call(&BKStackedSlider::Listener::BKStackedSliderValueChanged,
                        getName(),
                        getAllActiveValues());
         

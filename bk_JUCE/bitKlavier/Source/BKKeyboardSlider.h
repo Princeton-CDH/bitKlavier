@@ -16,19 +16,6 @@
 #include "BKKeyboard.h"
 #include "BKKeyboardState.h"
 
-class BKKeyboardSliderListener
-{
-    
-public:
-    
-    //BKMultiSliderListener() {}
-    virtual ~BKKeyboardSliderListener() {};
-    
-    virtual void keyboardSliderChanged(String name, Array<float> values) = 0;
-
-};
-
-
 class BKKeyboardSlider :
 public BKComponent,
 public BKListener,
@@ -48,9 +35,19 @@ public:
     void resized() override;
     void paint (Graphics&) override;
     
-    ListenerList<BKKeyboardSliderListener> listeners;
-    void addMyListener(BKKeyboardSliderListener* listener)     { listeners.add(listener); }
-    void removeMyListener(BKKeyboardSliderListener* listener)  { listeners.remove(listener); }
+    class Listener
+    {
+        
+    public:
+        virtual ~Listener() {};
+        
+        virtual void keyboardSliderChanged(String name, Array<float> values) = 0;
+        
+    };
+    
+    ListenerList<Listener> listeners;
+    void addMyListener(Listener* listener)     { listeners.add(listener); }
+    void removeMyListener(Listener* listener)  { listeners.remove(listener); }
     
     void setName(String newName) { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName() { return sliderName; }
