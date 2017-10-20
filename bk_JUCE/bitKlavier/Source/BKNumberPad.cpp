@@ -32,19 +32,18 @@ void BKNumberPad::setTarget(TextEditor* tf)
 }
 
 void BKNumberPad::buttonClicked(Button* button)
-{
+{    
+    bool sendChange = true;
+    
+    String toAdd;
+    
     for (int i = 0; i < NumberPadButtonNil; ++i)
     {
-        if (button == buttons[i]) // found right index
+        if (button == buttons[i])
         {
             if (i == NumberDelete)
             {
-                int pos = target->getCaretPosition();
-                
-                String sub1 = target->getText().substring(0, pos - 1), sub2 = target->getText().substring(pos + 1);
-                current = sub1+sub2;
-                
-                target->setCaretPosition(pos-1);
+                current = current.substring(0, current.length()-1);
             }
             else if (i == NumberCancel)
             {
@@ -57,15 +56,14 @@ void BKNumberPad::buttonClicked(Button* button)
             }
             else
             {
-                target->insertTextAtCaret(bkNumberPadTextToInsert[i]);
-                current = target->getText();
-                target->setText(current);
-                
+                current += bkNumberPadTextToInsert[i];
             }
+            
+            target->setText(current);
+            break;
         }
-        
+       
     }
-    DBG("current: " + current);
 }
 
 void BKNumberPad::resized(void)
