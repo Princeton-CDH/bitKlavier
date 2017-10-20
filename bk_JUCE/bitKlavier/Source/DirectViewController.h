@@ -28,7 +28,8 @@ public:
     ScopedPointer<BKSingleSlider> resonanceGainSlider;
     ScopedPointer<BKSingleSlider> hammerGainSlider;
     
-    BKSingleSlider* sliderThatRequestedNumberPad;
+    void numberPadChanged(BKNumberPad*) override;
+    void numberPadDismissed(BKNumberPad*) override;
     
     void paint (Graphics&) override;
     void resized() override;
@@ -60,16 +61,14 @@ public:
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(String name, double val) override;
     
-    void bkSingleSliderWantsKeyboard(BKSingleSlider*) override;
-    
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
-    
-    void numberPadChanged(BKNumberPad*) override;
-    void numberPadDismissed(BKNumberPad*) override;
     
     void fillSelectCB(int last, int current);
     
     static void actionButtonCallback(int action, DirectPreparationEditor*);
+    
+    void bkSingleSliderWantsKeyboard(BKSingleSlider*) override;
+    void bkStackedSliderWantsKeyboard(BKStackedSlider*) override;
     
     int addPreparation(void);
     int duplicatePreparation(void);

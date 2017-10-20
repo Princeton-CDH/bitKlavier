@@ -155,8 +155,14 @@ void BKKeyboardSlider::mouseUp(const MouseEvent& e)
 
 void BKKeyboardSlider::mouseDown(const MouseEvent& e)
 {
-    lastKeyPressed = keyboard->getLastNoteOver();
-    DBG("lastKeyPressed = " + String(lastKeyPressed));
+    if (e.originalComponent == &keyboardValueTF || e.originalComponent == &showName)
+    {
+        listeners.call(&Listener::keyboardSliderWantsKeyboard, this);
+    }
+    else
+    {
+        lastKeyPressed = keyboard->getLastNoteOver();
+    }
 }
 
 void BKKeyboardSlider::bkTextFieldDidChange (TextEditor& textEditor)

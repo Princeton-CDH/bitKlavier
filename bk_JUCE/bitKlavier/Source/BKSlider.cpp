@@ -694,6 +694,13 @@ void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
 
 void BKMultiSlider::mouseDown (const MouseEvent &event)
 {
+#if JUCE_IOS
+    if (event.originalComponent == editValsTextField.get() || event.originalComponent == &showName)
+    {
+        listeners.call(&Listener::multiSliderWantsKeyboard, this);
+    }
+    else
+#endif
     if(event.mouseWasClicked())
     {
         currentSubSlider = whichSubSlider(whichSlider(event));
@@ -1155,6 +1162,7 @@ sliderIncrement(increment)
     valueTF.setSelectAllWhenFocused(true);
 #if JUCE_IOS
     valueTF.setReadOnly(true);
+    valueTF.setCaretVisible(true);
 #endif
     valueTF.addMouseListener(this, true);
     valueTF.setColour(TextEditor::highlightColourId, Colours::darkgrey);
@@ -1464,7 +1472,18 @@ void BKRangeSlider::sliderValueChanged (Slider *slider)
 
 void BKRangeSlider::mouseDown (const MouseEvent &event)
 {
-    if(event.eventComponent == &invisibleSlider)
+#if JUCE_IOS
+    if (event.originalComponent == &minValueTF)
+    {
+        listeners.call(&Listener::bkRangeSliderWantsKeyboard, this, BKRangeSliderMin);
+    }
+    else if (event.originalComponent == &maxValueTF)
+    {
+        listeners.call(&Listener::bkRangeSliderWantsKeyboard, this, BKRangeSliderMax);
+    }
+    else
+#endif
+    if (event.eventComponent == &invisibleSlider)
     {
         if(event.mouseWasClicked())
         {
@@ -1745,6 +1764,20 @@ void BKWaveDistanceUndertowSlider::resized()
     
 }
 
+void BKWaveDistanceUndertowSlider::mouseDown(const MouseEvent& e)
+{
+    Component* c = e.originalComponent;
+    
+    if (c == &wavedistanceValueTF || c == &wavedistanceName)
+    {
+        listeners.call(&Listener::bkWaveDistanceUndertowSliderWantsKeyboard, this, NostalgicWaveDistance);
+    }
+    else if (c == &undertowValueTF || c == &undertowName)
+    {
+        listeners.call(&Listener::bkWaveDistanceUndertowSliderWantsKeyboard, this, NostalgicUndertow);
+    }
+}
+
 void BKWaveDistanceUndertowSlider::sliderDragEnded(Slider *slider)
 {
     if(slider == wavedistanceSlider)
@@ -1807,6 +1840,10 @@ sliderIncrement(increment)
     editValsTextField->setName("PARAMTXTEDIT");
     editValsTextField->addListener(this);
     editValsTextField->setColour(TextEditor::highlightColourId, Colours::darkgrey);
+#if JUCE_IOS
+    editValsTextField->setReadOnly(true);
+    editValsTextField->setCaretVisible(true);
+#endif
     addAndMakeVisible(editValsTextField);
     editValsTextField->setVisible(false);
     
@@ -1889,8 +1926,7 @@ void BKStackedSlider::setBright()
 
 void BKStackedSlider::sliderValueChanged (Slider *slider)
 {
-    //leave unimplelemented; only drag and setTo should actually change values of subSliders
-    DBG("stacked sliderValueChanged");
+
 }
 
 void BKStackedSlider::addSlider(NotificationType newnotify)
@@ -1901,7 +1937,6 @@ void BKStackedSlider::addSlider(NotificationType newnotify)
     setTo(sliderVals, newnotify);
     topSlider->setValue(topSlider->proportionOfLengthToValue((double)clickedPosition / getWidth()), dontSendNotification);
 }
-
 
 void BKStackedSlider::setTo(Array<float> newvals, NotificationType newnotify)
 {
@@ -1958,8 +1993,6 @@ void BKStackedSlider::setTo(Array<float> newvals, NotificationType newnotify)
     resetRanges();
     
     topSlider->setValue(dataSliders.getFirst()->getValue(), dontSendNotification);
-
-
 }
 
 
@@ -2040,6 +2073,10 @@ void BKStackedSlider::mouseDoubleClick (const MouseEvent &e)
     editValsTextField->setHighlightedRegion(highlightRange);
     
     focusLostByEscapeKey = false;
+    
+#if JUCE_IOS
+    listeners.call(&Listener::bkStackedSliderWantsKeyboard, this);
+#endif
 }
 
 void BKStackedSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
@@ -2062,9 +2099,11 @@ void BKStackedSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 
 void BKStackedSlider::textEditorFocusLost(TextEditor& textEditor)
 {
+#if !JUCE_IOS
     if(!focusLostByEscapeKey) {
         textEditorReturnKeyPressed(textEditor);
     }
+#endif
 }
 
 void BKStackedSlider::textEditorEscapeKeyPressed (TextEditor& textEditor)

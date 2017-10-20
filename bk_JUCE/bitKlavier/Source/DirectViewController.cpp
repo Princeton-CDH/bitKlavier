@@ -125,6 +125,33 @@ void DirectViewController::resized()
     
 }
 
+void DirectViewController::numberPadChanged(BKNumberPad*)
+{
+    String text = numberPad.getText();
+    
+    DBG("CHANGED: " + text);
+    
+    if (latched_BKSingleSlider != nullptr)  latched_BKSingleSlider->setText(text);
+    if (latched_BKStackedSlider != nullptr) latched_BKStackedSlider->setText(text);
+}
+
+void DirectViewController::numberPadDismissed(BKNumberPad*)
+{
+    String text = numberPad.getText();
+    
+    DBG("DISMISSED: " + text);
+    
+    if (latched_BKSingleSlider != nullptr)
+        latched_BKSingleSlider->setValue(text.getDoubleValue(), sendNotification);
+    
+    if (latched_BKStackedSlider != nullptr)
+    {
+        latched_BKStackedSlider->dismissTextEditor(true);
+    }
+    
+    numberPad.setVisible(false);
+}
+
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ DirectPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~//
 DirectPreparationEditor::DirectPreparationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
 DirectViewController(p, theGraph)
@@ -215,6 +242,56 @@ void DirectPreparationEditor::setCurrentId(int Id)
     lastId = Id;
 }
 
+void DirectPreparationEditor::bkSingleSliderWantsKeyboard(BKSingleSlider* slider)
+{
+    DBG("BEGIN: " + String(slider->getValue()));
+    
+    //numberPadDismissed(&numberPad);
+    
+    latched_BKStackedSlider = nullptr;
+    latched_BKSingleSlider = slider;
+    
+    numberPad.setTarget(&slider->valueTF);
+    
+    numberPad.setTopLeftPosition((slider->getX() > (getWidth() * 0.5)) ? gXSpacing : (0.5 * getWidth() + gXSpacing), gYSpacing);
+    
+    numberPad.setEnabled(NumberLBracket, false);
+    numberPad.setEnabled(NumberRBracket, false);
+    numberPad.setEnabled(NumberNegative, false);
+    numberPad.setEnabled(NumberColon, false);
+    numberPad.setEnabled(NumberSpace, false);
+    
+    numberPad.setText(String(slider->getValue()));
+    
+    numberPad.setVisible(true);
+}
+
+void DirectPreparationEditor::bkStackedSliderWantsKeyboard(BKStackedSlider* slider)
+{
+    DBG("BEGIN: " + slider->getText());
+    
+    //numberPadDismissed(&numberPad);
+    
+    latched_BKStackedSlider = slider;
+    latched_BKSingleSlider = nullptr;
+    
+    numberPad.setTarget(slider->getTextEditor());
+    
+    DBG("sliderX: " + String(slider->getX()) + " width: " + String(getWidth()));
+    numberPad.setTopLeftPosition((slider->getX() > (getWidth() * 0.5)) ? gXSpacing : (0.5 * getWidth() + gXSpacing), gYSpacing);
+    
+    
+    numberPad.setEnabled(NumberLBracket, false);
+    numberPad.setEnabled(NumberRBracket, false);
+    numberPad.setEnabled(NumberNegative, false);
+    numberPad.setEnabled(NumberColon, false);
+    numberPad.setEnabled(NumberSpace, true);
+    
+    numberPad.setText(slider->getText());
+    
+    numberPad.setVisible(true);
+}
+
 void DirectPreparationEditor::actionButtonCallback(int action, DirectPreparationEditor* vc)
 {
     BKAudioProcessor& processor = vc->processor;
@@ -262,48 +339,6 @@ void DirectPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableC
     direct->setName(name);
     
     fillSelectCB(0, processor.updateState->currentDirectId);
-}
-
-
-void DirectPreparationEditor::bkSingleSliderWantsKeyboard(BKSingleSlider* slider)
-{
-    DBG("BEGIN: " + String(slider->getValue()));
-    
-    //numberPadDismissed(&numberPad);
-    
-    sliderThatRequestedNumberPad = slider;
-
-    numberPad.setTopLeftPosition((slider->getX() > getWidth()) ? gXSpacing : (0.5 * getWidth() + gXSpacing), gYSpacing);
-    
-    numberPad.setEnabled(NumberLBracket, false);
-    numberPad.setEnabled(NumberRBracket, false);
-    numberPad.setEnabled(NumberNegative, false);
-    numberPad.setEnabled(NumberColon, false);
-    
-    numberPad.setText(String(slider->getValue()));
-    
-    numberPad.setVisible(true);
-}
-
-void DirectPreparationEditor::numberPadChanged(BKNumberPad*)
-{
-    String text = numberPad.getText();
-    
-    DBG("CHANGED: " + text);
-    
-    sliderThatRequestedNumberPad->setText(text);
-}
-
-void DirectPreparationEditor::numberPadDismissed(BKNumberPad*)
-{
-    String text = numberPad.getText();
-    
-    DBG("DISMISSED: " + text);
-    
-    if (sliderThatRequestedNumberPad != nullptr)
-        sliderThatRequestedNumberPad->setValue(text.getDoubleValue(), sendNotification);
-    
-    numberPad.setVisible(false);
 }
 
 void DirectPreparationEditor::BKSingleSliderValueChanged(String name, double val)

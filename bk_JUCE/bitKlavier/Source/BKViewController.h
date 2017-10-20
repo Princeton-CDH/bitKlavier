@@ -92,6 +92,13 @@ protected:
     
     BKNumberPad numberPad;
     
+    BKSingleSlider* latched_BKSingleSlider;
+    BKStackedSlider* latched_BKStackedSlider;
+    BKRangeSlider* latched_BKRangeSlider;
+    BKMultiSlider* latched_BKMultiSlider;
+    BKWaveDistanceUndertowSlider* latched_BKWDUTSlider;
+    BKKeyboardSlider* latched_BKKeyboardSlider;
+    
     int lastId;
     
 private:

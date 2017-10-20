@@ -26,93 +26,46 @@ BKNumberPad::~BKNumberPad(void)
     
 }
 
+void BKNumberPad::setTarget(TextEditor* tf)
+{
+    target = tf;
+}
+
 void BKNumberPad::buttonClicked(Button* button)
-{    
-    bool sendChange = true;
-    
-    if (button == buttons[NumberZero])
+{
+    for (int i = 0; i < NumberPadButtonNil; ++i)
     {
-        current += "0";
-    }
-    else if (button == buttons[NumberOne])
-    {
-        current += "1";
-    }
-    else if (button == buttons[NumberTwo])
-    {
-        current += "2";
-    }
-    else if (button == buttons[NumberThree])
-    {
-        current += "3";
-    }
-    else if (button == buttons[NumberFour])
-    {
-        current += "4";
-    }
-    else if (button == buttons[NumberFive])
-    {
-        current += "5";
-    }
-    else if (button == buttons[NumberSix])
-    {
-        current += "6";
-    }
-    else if (button == buttons[NumberSeven])
-    {
-        current += "7";
-    }
-    else if (button == buttons[NumberEight])
-    {
-        current += "8";
-    }
-    else if (button == buttons[NumberNine])
-    {
-        current += "9";
-    }
-    else if (button == buttons[NumberNegative])
-    {
-        current += "-";
-    }
-    else if (button == buttons[NumberDecimal])
-    {
-        current += ".";
-    }
-    else if (button == buttons[NumberColon])
-    {
-        current += ":";
-    }
-    else if (button == buttons[NumberLBracket])
-    {
-        current += "[";
-    }
-    else if (button == buttons[NumberRBracket])
-    {
-        current += "]";
-    }
-    else if (button == buttons[NumberDelete])
-    {
-        current = current.substring(0, current.length()-1);
-    }
-    else if (button == buttons[NumberSpace])
-    {
-        current += " ";
-    }
-    else if (button == buttons[NumberCancel])
-    {
-        current = initial;
-        listeners.call(&Listener::numberPadDismissed, this);
+        if (button == buttons[i]) // found right index
+        {
+            if (i == NumberDelete)
+            {
+                int pos = target->getCaretPosition();
+                
+                String sub1 = target->getText().substring(0, pos - 1), sub2 = target->getText().substring(pos + 1);
+                current = sub1+sub2;
+                
+                target->setCaretPosition(pos-1);
+            }
+            else if (i == NumberCancel)
+            {
+                current = initial;
+                listeners.call(&Listener::numberPadDismissed, this);
+            }
+            else if (i == NumberOk)
+            {
+                listeners.call(&Listener::numberPadDismissed, this);
+            }
+            else
+            {
+                target->insertTextAtCaret(bkNumberPadTextToInsert[i]);
+                current = target->getText();
+                target->setText(current);
+                
+            }
+        }
         
-        sendChange = false;
     }
-    else if (button == buttons[NumberOk])
-    {
-        listeners.call(&Listener::numberPadDismissed, this);
-        
-        sendChange = false;
-    }
-    
-    if (sendChange) listeners.call(&Listener::numberPadChanged, this);
+    DBG("current: " + current);
 }
 
 void BKNumberPad::resized(void)

@@ -133,6 +133,8 @@ public:
         
         virtual void multiSliderValueChanged(String name, int whichSlider, Array<float> values) = 0;
         virtual void multiSliderAllValuesChanged(String name, Array<Array<float>> values) = 0;
+        
+        virtual void multiSliderWantsKeyboard(BKMultiSlider*) {};
     };
     
     ListenerList<Listener> listeners;
@@ -271,9 +273,8 @@ public:
         
         virtual void BKSingleSliderValueChanged(String name, double val) = 0;
         
-        virtual void bkSingleSliderWantsKeyboard(BKSingleSlider*){};
+        virtual void bkSingleSliderWantsKeyboard(BKSingleSlider*) {};
     };
-    
     
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
@@ -281,7 +282,6 @@ public:
     
     void setDim(float newAlpha);
     void setBright();
-    
 
 private:
     
@@ -302,6 +302,14 @@ private:
 // ******************************************************************************************************************** //
 // **************************************************  BKRangeSlider ************************************************** //
 // ******************************************************************************************************************** //
+
+typedef enum BKRangeSliderType
+{
+    BKRangeSliderMin = 0,
+    BKRangeSliderMax,
+    BKRangeSliderNi
+    
+} BKRangeSliderType;
 
 class BKRangeSlider :
 public Component,
@@ -360,6 +368,8 @@ public:
         virtual ~Listener() {};
         
         virtual void BKRangeSliderValueChanged(String name, double min, double max) = 0;
+        
+        virtual void bkRangeSliderWantsKeyboard(BKRangeSlider*, BKRangeSliderType which) {};
     };
     
     ListenerList<Listener> listeners;
@@ -424,7 +434,7 @@ public:
     void sliderValueChanged (Slider *slider) override {};
     void resized() override;
     void sliderDragEnded(Slider *slider) override;
-    void mouseDown (const MouseEvent &event) override {};
+    void mouseDown (const MouseEvent &event) override;
     
     void setWaveDistance(int newwavedist, NotificationType notify);
     void setUndertow(int newundertow, NotificationType notify);
@@ -442,6 +452,8 @@ public:
         virtual ~Listener() {};
         
         virtual void BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow) = 0;
+        
+        virtual void bkWaveDistanceUndertowSliderWantsKeyboard(BKWaveDistanceUndertowSlider*, NostalgicParameterType type) {};
     };
     
     ListenerList<Listener> listeners;
@@ -493,12 +505,26 @@ public:
     void mouseMove(const MouseEvent& e) override;
     void mouseDoubleClick (const MouseEvent &e) override;
     
+    inline TextEditor* getTextEditor(void)
+    {
+        return editValsTextField.get();
+    }
+    
+    inline void dismissTextEditor(bool setValue = false)
+    {
+        if (setValue)   textEditorReturnKeyPressed(*editValsTextField);
+        else            textEditorEscapeKeyPressed(*editValsTextField);
+    }
+    
     void setTo(Array<float> newvals, NotificationType newnotify);
     void setValue(Array<float> newvals, NotificationType newnotify) { setTo(newvals, newnotify); }
     void resetRanges();
     int whichSlider();
     int whichSlider(const MouseEvent& e);
     void addSlider(NotificationType newnotify);
+    
+    inline String getText(void) { return editValsTextField->getText(); }
+    inline void setText(String text) { editValsTextField->setText(text, dontSendNotification); }
     
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName()                { return sliderName; }
@@ -516,6 +542,10 @@ public:
         virtual ~Listener() {};
         
         virtual void BKStackedSliderValueChanged(String name, Array<float> val) = 0; //rewrite all this to pass "this" and check by slider ref instead of name?
+        
+        virtual void bkStackedSliderValueChanged(BKStackedSlider*) {};
+        
+        virtual void bkStackedSliderWantsKeyboard(BKStackedSlider*) {};
     };
     
     ListenerList<Listener> listeners;
@@ -548,6 +578,7 @@ private:
     double currentDisplaySliderValue;
     
     bool focusLostByEscapeKey;
+    bool focusLostByNumPad;
     bool mouseJustDown;
     
     Array<float> getAllActiveValues();

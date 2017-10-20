@@ -43,6 +43,8 @@ public:
         
         virtual void keyboardSliderChanged(String name, Array<float> values) = 0;
         
+        virtual void keyboardSliderWantsKeyboard(BKKeyboardSlider*) {};
+        
     };
     
     ListenerList<Listener> listeners;

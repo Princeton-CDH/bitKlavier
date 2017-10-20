@@ -69,6 +69,34 @@ static const std::vector<std::string> bkNumberPadText = {
     "Ok"
 };
 
+static const std::vector<std::string> bkNumberPadTextToInsert = {
+    "1",
+    "2",
+    "3",
+    "~",
+    
+    "4",
+    "5",
+    "6",
+    "~",
+    
+    "7",
+    "8",
+    "9",
+    "~",
+    
+    "-",
+    "0",
+    ".",
+    "~",
+    
+    " ",
+    "~",
+    "~"
+};
+
+
+
 
 class BKNumberPad : public Component, public TextButton::Listener
 {
@@ -79,6 +107,8 @@ public:
     
     void resized(void) override;
     void paint(Graphics& g) override;
+    
+    void setTarget(TextEditor* tf);
     
     void setEnabled(NumberPadButtonType type, bool enabled)
     {
@@ -97,6 +127,7 @@ public:
     void addListener(Listener* listener)     { listeners.add(listener);      }
     void removeListener(Listener* listener)  { listeners.remove(listener);   }
     
+    
     inline void setText(String text)
     {
         initial = text;
@@ -112,6 +143,8 @@ private:
     
     String initial;
     String current;
+    
+    TextEditor* target;
     
     void buttonClicked(Button*) override;
     
