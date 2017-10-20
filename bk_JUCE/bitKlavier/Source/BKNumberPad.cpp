@@ -32,10 +32,11 @@ void BKNumberPad::setTarget(TextEditor* tf)
 }
 
 void BKNumberPad::buttonClicked(Button* button)
-{    
-    bool sendChange = true;
+{
+    int start = target->getHighlightedRegion().getStart();
+    int end =   target->getHighlightedRegion().getEnd();
     
-    String toAdd;
+    DBG("start: " + String(start) + " end: " + String(end));
     
     for (int i = 0; i < NumberPadButtonNil; ++i)
     {
@@ -43,7 +44,11 @@ void BKNumberPad::buttonClicked(Button* button)
         {
             if (i == NumberDelete)
             {
-                current = current.substring(0, current.length()-1);
+                if (end != start)   current = current.replaceSection(start, (end-1)-start, "");
+                
+                DBG("current here: " + String(current));
+                
+                current = current.replaceSection(target->getCaretPosition()-1, 1, "");
             }
             else if (i == NumberCancel)
             {
@@ -59,7 +64,8 @@ void BKNumberPad::buttonClicked(Button* button)
                 current += bkNumberPadTextToInsert[i];
             }
             
-            target->setText(current);
+            target->setText(current, dontSendNotification);
+            
             break;
         }
        

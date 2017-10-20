@@ -244,7 +244,7 @@ void DirectPreparationEditor::setCurrentId(int Id)
 
 void DirectPreparationEditor::bkSingleSliderWantsKeyboard(BKSingleSlider* slider)
 {
-    DBG("BEGIN: " + String(slider->getValue()));
+    DBG("BEGIN: " + String(slider->getText()));
     
     //numberPadDismissed(&numberPad);
     
@@ -261,13 +261,14 @@ void DirectPreparationEditor::bkSingleSliderWantsKeyboard(BKSingleSlider* slider
     numberPad.setEnabled(NumberColon, false);
     numberPad.setEnabled(NumberSpace, false);
     
-    numberPad.setText(String(slider->getValue()));
+    numberPad.setText(String(slider->getText()));
     
     numberPad.setVisible(true);
 }
 
 void DirectPreparationEditor::bkStackedSliderWantsKeyboard(BKStackedSlider* slider)
 {
+    
     DBG("BEGIN: " + slider->getText());
     
     //numberPadDismissed(&numberPad);

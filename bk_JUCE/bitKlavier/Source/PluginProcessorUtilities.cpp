@@ -39,7 +39,7 @@ void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
         BKSampleLoader::loadMainPianoSamples(&mainPianoSynth, type);
         
         didLoadMainPianoSamples = true;
-        
+    
         if (!didLoadHammersAndRes)
         {
             didLoadHammersAndRes = true;
@@ -47,6 +47,7 @@ void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
             BKSampleLoader::loadResonanceReleaseSamples(&resonanceReleaseSynth);
         }   
     }
+    
 }
 
 void BKAudioProcessor::collectGalleriesFromFolder(File folder)

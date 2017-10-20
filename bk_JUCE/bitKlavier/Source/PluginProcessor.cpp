@@ -732,10 +732,29 @@ void BKAudioProcessor::initializeGallery(void)
 {
     if (currentSampleType != gallery->sampleType)
     {
+        
+#if JUCE_IOS
+        String osname = SystemStats::getOperatingSystemName();
+        float iosVersion = osname.fromLastOccurrenceOf("iOS ", false, true).getFloatValue();
+#endif
+        
 #if !DEBUG
+
+#if JUCE_IOS
+        if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
+        else                    loadPianoSamples(BKLoadMedium);
+#else
         loadPianoSamples(gallery->sampleType);
+#endif
+        
+#else
+#if JUCE_IOS
+        if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
+        else                    loadPianoSamples(BKLoadLite);
 #else
         loadPianoSamples(BKLoadLite);
+#endif
+        
 #endif
     }
     

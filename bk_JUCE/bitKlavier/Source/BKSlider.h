@@ -234,6 +234,7 @@ public:
     
     TextEditor valueTF;
     
+    inline String getText(void) { return valueTF.getText(); }
     inline void setText(String text, NotificationType notify = dontSendNotification) { valueTF.setText(text, notify);}
     
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }

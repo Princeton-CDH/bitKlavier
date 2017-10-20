@@ -49,6 +49,7 @@
 #define LOAD_LITE 38
 #define LOAD_MEDIUM 39
 #define LOAD_HEAVY 40
+#define LOAD_LITEST 41
 
 #define KEYMAP_EDIT_ID 27
 #define DIRECT_EDIT_ID 28

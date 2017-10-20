@@ -1163,6 +1163,7 @@ sliderIncrement(increment)
 #if JUCE_IOS
     valueTF.setReadOnly(true);
     valueTF.setCaretVisible(true);
+    valueTF.setSelectAllWhenFocused(false);
 #endif
     valueTF.addMouseListener(this, true);
     valueTF.setColour(TextEditor::highlightColourId, Colours::darkgrey);

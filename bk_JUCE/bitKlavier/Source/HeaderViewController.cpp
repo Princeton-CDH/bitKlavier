@@ -92,6 +92,7 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     PopupMenu loadMenu;
     loadMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
+    loadMenu.addItem(LOAD_LITEST, "Lightest");
     loadMenu.addItem(LOAD_LITE, "Light");
     loadMenu.addItem(LOAD_MEDIUM, "Medium");
     loadMenu.addItem(LOAD_HEAVY, "Heavy");
@@ -286,7 +287,12 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
 {
     BKAudioProcessor& processor = gvc->processor;
     
-    if (result == LOAD_LITE)
+    if (result == LOAD_LITEST)
+    {
+        processor.gallery->sampleType = BKLoadLitest;
+        processor.loadPianoSamples(BKLoadLitest);
+    }
+    else if (result == LOAD_LITE)
     {
         processor.gallery->sampleType = BKLoadLite;
         processor.loadPianoSamples(BKLoadLite);

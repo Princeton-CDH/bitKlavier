@@ -279,8 +279,9 @@
                   smallIcon="RCvUKe" bigIcon="ThAZEr" customPList="&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&#10;&lt;plist&gt;&#10;    &lt;dict&gt;&#10;        &lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;&#10;            &lt;array&gt;&#10;            &lt;dict&gt;&#10;                &lt;key&gt;CFBundleTypeName&lt;/key&gt;&#10;                    &lt;string&gt;xml&lt;/string&gt;&#10;            &lt;/dict&gt;&#10;    &lt;/dict&gt;&#10;&lt;/plist&gt;">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
-                       plistPreprocessorDefinitions=""/>
-        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="bitKlavier"/>
+                       plistPreprocessorDefinitions="" iosCompatibility="8.0"/>
+        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="bitKlavier"
+                       iosCompatibility="8.0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="../../../JUCE/modules"/>
