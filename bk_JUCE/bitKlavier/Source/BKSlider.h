@@ -513,9 +513,10 @@ private:
 
 class BKWaveDistanceUndertowSlider :
 public Component,
-public Slider::Listener
+public Slider::Listener,
+public TextEditor::Listener
 //public BKSingleSlider::Listener,
-//public TextEditor::Listener
+
 {
 public:
     BKWaveDistanceUndertowSlider();
@@ -566,6 +567,19 @@ public:
         return nullptr;
     }
     
+    inline void dismissTextEditor(bool setValue = false)
+    {
+        if (setValue)
+        {
+            textEditorReturnKeyPressed(wavedistanceValueTF);
+            textEditorReturnKeyPressed(undertowValueTF);
+        }
+        else
+        {
+            textEditorEscapeKeyPressed(wavedistanceValueTF);
+            textEditorEscapeKeyPressed(undertowValueTF);
+        }
+    }
     
     class Listener
     {
@@ -586,6 +600,12 @@ public:
     void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
     void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
     
+    
+    void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+    void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
+    void textEditorFocusLost(TextEditor& textEditor) override;
+    void textEditorTextChanged(TextEditor& textEditor) override;
+    
 private:
     double sliderMin, sliderMax;
     double sliderIncrement;
@@ -596,6 +616,8 @@ private:
     bool clickedOnMinSlider;
 
     ImageComponent sampleImageComponent;
+    
+    bool focusLostByEscapeKey;
     
     //BKRangeMinSliderLookAndFeel minSliderLookAndFeel; //possibly need to remake for this
     //BKRangeMaxSliderLookAndFeel maxSliderLookAndFeel;

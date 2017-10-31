@@ -1716,11 +1716,16 @@ BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
         addAndMakeVisible(newSlider);
     }
     
+    undertowValueTF.setName("ut");
     addChildComponent(undertowValueTF);
+    
+    wavedistanceValueTF.setName("wd");
     addChildComponent(wavedistanceValueTF);
     
     
 }
+
+
 
 void BKWaveDistanceUndertowSlider::setDim(float alphaVal)
 {
@@ -1805,6 +1810,53 @@ void BKWaveDistanceUndertowSlider::mouseDoubleClick(const MouseEvent& e)
         inputListeners.call(&WantsKeyboardListener::bkWaveDistanceUndertowSliderWantsKeyboard, this, NostalgicUndertow);
     }
     
+}
+
+void BKWaveDistanceUndertowSlider::textEditorReturnKeyPressed(TextEditor& editor)
+{
+    double newval = editor.getText().getDoubleValue();
+    
+    if (editor.getName() == "ut")
+    {
+        undertowSlider->setValue(newval, sendNotification);
+    }
+    else if (editor.getName() == "wd")
+    {
+        wavedistanceSlider->setValue(newval, sendNotification);
+    }
+    
+    wavedistanceValueTF.setVisible(false);
+    undertowValueTF.setVisible(false);
+
+    setWaveDistance(wavedistanceSlider->getValue(), dontSendNotification);
+
+    listeners.call(&BKWaveDistanceUndertowSlider::Listener::BKWaveDistanceUndertowSliderValueChanged,
+                   "nSlider",
+                   wavedistanceSlider->getValue(),
+                   undertowSlider->getValue());
+
+    unfocusAllComponents();
+}
+
+void BKWaveDistanceUndertowSlider::textEditorTextChanged(TextEditor& textEditor)
+{
+    focusLostByEscapeKey = false;
+}
+
+void BKWaveDistanceUndertowSlider::textEditorEscapeKeyPressed (TextEditor& textEditor)
+{
+    focusLostByEscapeKey = true;
+    unfocusAllComponents();
+}
+
+void BKWaveDistanceUndertowSlider::textEditorFocusLost(TextEditor& textEditor)
+{
+#if !JUCE_IOS
+    if(!focusLostByEscapeKey)
+    {
+        textEditorReturnKeyPressed(textEditor);
+    }
+#endif
 }
 
 void BKWaveDistanceUndertowSlider::sliderDragEnded(Slider *slider)
