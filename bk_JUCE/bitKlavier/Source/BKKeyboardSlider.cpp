@@ -42,7 +42,7 @@ BKKeyboardSlider::BKKeyboardSlider()
     keyboardValueTF.addListener(this);
     addAndMakeVisible(keyboardValueTF);
 
-    keyboardValsTextField = new TextEditor();
+    keyboardValsTextField = new BKTextEditor();
     keyboardValsTextField->setMultiLine(true);
     keyboardValsTextField->setName("KSLIDERTXTEDITALL");
     keyboardValsTextField->addListener(this);
@@ -157,7 +157,7 @@ void BKKeyboardSlider::mouseDown(const MouseEvent& e)
 {
     if (e.originalComponent == &keyboardValueTF || e.originalComponent == &showName)
     {
-        listeners.call(&Listener::keyboardSliderWantsKeyboard, this);
+        inputListeners.call(&WantsKeyboardListener::keyboardSliderWantsKeyboard, this);
     }
     else
     {
@@ -231,10 +231,12 @@ void BKKeyboardSlider::textEditorEscapeKeyPressed (TextEditor& textEditor)
 
 void BKKeyboardSlider::textEditorFocusLost(TextEditor& textEditor)
 {
+#if !JUCE_IOS
     if(!focusLostByEscapeKey)
     {
         textEditorReturnKeyPressed(textEditor);
     }
+#endif
 }
 
 void BKKeyboardSlider::handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber)
@@ -248,7 +250,12 @@ void BKKeyboardSlider::bkButtonClicked (Button* b)
     {
         focusLostByEscapeKey = false;
         keyboardValsTextField->setAlpha(1);
+#if !JUCE_IOS
         keyboardValsTextField->toFront(true);
+#else
+        keyboardValsTextField->toFront(false);
+        inputListeners.call(&WantsKeyboardListener::keyboardSliderWantsKeyboard, this);
+#endif
         if(orderedPairs) {
             keyboardValsTextField->setText(offsetArrayToString2(keyboard->getValuesDirectly()), dontSendNotification);
             //keyboardValsTextField->setText(offsetArrayToString2(keyboard->getAbsoluteValues())

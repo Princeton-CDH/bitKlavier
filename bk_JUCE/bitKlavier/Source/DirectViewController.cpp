@@ -26,6 +26,7 @@ BKViewController(p, theGraph)
     addAndMakeVisible(selectCB);
     
     transpositionSlider = new BKStackedSlider("transpositions", -12, 12, -12, 12, 0, 0.01);
+
     addAndMakeVisible(transpositionSlider);
     
     gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
@@ -43,6 +44,13 @@ BKViewController(p, theGraph)
     hammerGainSlider->setJustifyRight(false);
     addAndMakeVisible(hammerGainSlider);
     
+#if JUCE_IOS
+    transpositionSlider->addWantsKeyboardListener(this);
+    gainSlider->addWantsKeyboardListener(this);
+    resonanceGainSlider->addWantsKeyboardListener(this);
+    hammerGainSlider->addWantsKeyboardListener(this);
+#endif
+    
     addAndMakeVisible(hideOrShow);
     hideOrShow.setName("hideOrShow");
     hideOrShow.setButtonText(" X ");
@@ -50,9 +58,6 @@ BKViewController(p, theGraph)
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
-    
-    addChildComponent(numberPad);
-    numberPad.addListener(this);
 }
 
 void DirectViewController::paint (Graphics& g)
@@ -63,10 +68,6 @@ void DirectViewController::paint (Graphics& g)
 void DirectViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
-    
-    float numberPadHeight = getHeight() - 2 * gYSpacing;
-    float numberPadWidth = getWidth() / 2 - 2 * gXSpacing;
-    numberPad.setSize(numberPadWidth, numberPadHeight);
 
     iconImageComponent.setBounds(area);
     area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
@@ -123,33 +124,6 @@ void DirectViewController::resized()
                                    area.getWidth(),
                                    gComponentStackedSliderHeight + processor.paddingScalarY * 30);
     
-}
-
-void DirectViewController::numberPadChanged(BKNumberPad*)
-{
-    String text = numberPad.getText();
-    
-    DBG("CHANGED: " + text);
-    
-    if (latched_BKSingleSlider != nullptr)  latched_BKSingleSlider->setText(text);
-    if (latched_BKStackedSlider != nullptr) latched_BKStackedSlider->setText(text);
-}
-
-void DirectViewController::numberPadDismissed(BKNumberPad*)
-{
-    String text = numberPad.getText();
-    
-    DBG("DISMISSED: " + text);
-    
-    if (latched_BKSingleSlider != nullptr)
-        latched_BKSingleSlider->setValue(text.getDoubleValue(), sendNotification);
-    
-    if (latched_BKStackedSlider != nullptr)
-    {
-        latched_BKStackedSlider->dismissTextEditor(true);
-    }
-    
-    numberPad.setVisible(false);
 }
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ DirectPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~//
@@ -240,57 +214,6 @@ void DirectPreparationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
-}
-
-void DirectPreparationEditor::bkSingleSliderWantsKeyboard(BKSingleSlider* slider)
-{
-    DBG("BEGIN: " + String(slider->getText()));
-    
-    //numberPadDismissed(&numberPad);
-    
-    latched_BKStackedSlider = nullptr;
-    latched_BKSingleSlider = slider;
-    
-    numberPad.setTarget(&slider->valueTF);
-    
-    numberPad.setTopLeftPosition((slider->getX() > (getWidth() * 0.5)) ? gXSpacing : (0.5 * getWidth() + gXSpacing), gYSpacing);
-    
-    numberPad.setEnabled(NumberLBracket, false);
-    numberPad.setEnabled(NumberRBracket, false);
-    numberPad.setEnabled(NumberNegative, false);
-    numberPad.setEnabled(NumberColon, false);
-    numberPad.setEnabled(NumberSpace, false);
-    
-    numberPad.setText(String(slider->getText()));
-    
-    numberPad.setVisible(true);
-}
-
-void DirectPreparationEditor::bkStackedSliderWantsKeyboard(BKStackedSlider* slider)
-{
-    
-    DBG("BEGIN: " + slider->getText());
-    
-    //numberPadDismissed(&numberPad);
-    
-    latched_BKStackedSlider = slider;
-    latched_BKSingleSlider = nullptr;
-    
-    numberPad.setTarget(slider->getTextEditor());
-    
-    DBG("sliderX: " + String(slider->getX()) + " width: " + String(getWidth()));
-    numberPad.setTopLeftPosition((slider->getX() > (getWidth() * 0.5)) ? gXSpacing : (0.5 * getWidth() + gXSpacing), gYSpacing);
-    
-    
-    numberPad.setEnabled(NumberLBracket, false);
-    numberPad.setEnabled(NumberRBracket, false);
-    numberPad.setEnabled(NumberNegative, false);
-    numberPad.setEnabled(NumberColon, false);
-    numberPad.setEnabled(NumberSpace, true);
-    
-    numberPad.setText(slider->getText());
-    
-    numberPad.setVisible(true);
 }
 
 void DirectPreparationEditor::actionButtonCallback(int action, DirectPreparationEditor* vc)
@@ -670,5 +593,4 @@ void DirectModificationEditor::buttonClicked (Button* b)
         getModOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 }
-
 

@@ -34,6 +34,10 @@ BKViewController(p, theGraph)
     keymapTF.setName("KeymapMidi");
     keymapTF.setMultiLine(true);
     
+#if JUCE_IOS
+    keymapTF.addWantsKeyboardListener(this);
+#endif
+    
     // Keyboard
     addAndMakeVisible (keyboardComponent = new BKKeymapKeyboardComponent (keyboardState,
                                                                  BKKeymapKeyboardComponent::horizontalKeyboard));
@@ -97,7 +101,13 @@ void KeymapViewController::resized()
     keyboard->setBlackNoteLengthProportion(0.65);
     keyboardRow.reduce(gXSpacing, 0);
     keyboard->setBounds(keyboardRow);
+    
+#if JUCE_IOS
     keymapTF.setBounds(keyboardRow);
+    keymapTF.setSize(keyboardRow.getWidth() * 0.5, keyboardRow.getHeight());
+#else
+    keymapTF.setBounds(keyboardRow);
+#endif
     
     area.removeFromBottom(gYSpacing);
     Rectangle<int> textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
@@ -258,6 +268,9 @@ void KeymapViewController::bkButtonClicked (Button* b)
     {
         keymapTF.setVisible(true);
         keymapTF.toFront(true);
+        
+        textEditorWantsKeyboard(&keymapTF);
+        
         focusLostByEscapeKey = false;
     }
     else if (b == &actionButton)
@@ -314,10 +327,12 @@ void KeymapViewController::keymapUpdated(TextEditor& tf)
 
 void KeymapViewController::textEditorFocusLost(TextEditor& tf)
 {
+#if !JUCE_IOS
     if(!focusLostByEscapeKey)
     {
         keymapUpdated(tf);
     }
+#endif
     
 }
 
@@ -340,8 +355,6 @@ void KeymapViewController::update(void)
         selectCB.setSelectedId(processor.updateState->currentKeymapId, dontSendNotification);
         
         keymapTF.setText( intArrayToString(km->keys()));
-        
-        keymapNameTF.setText(km->getName());
         
         BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
         

@@ -58,6 +58,15 @@ BKViewController(p, theGraph)
     actionButton.addListener(this);
     
     addAndMakeVisible(nDisplaySlider);
+    
+#if JUCE_IOS
+    transpositionSlider->addWantsKeyboardListener(this);
+    gainSlider->addWantsKeyboardListener(this);
+    beatsToSkipSlider->addWantsKeyboardListener(this);
+    lengthMultiplierSlider->addWantsKeyboardListener(this);
+    gainSlider->addWantsKeyboardListener(this);
+    nDisplaySlider.addWantsKeyboardListener(this);
+#endif
 }
 
 void NostalgicViewController::paint (Graphics& g)

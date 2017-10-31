@@ -12,7 +12,6 @@
 
 #include "BKUtilities.h"
 
-
 typedef enum NumberPadButtonType
 {
     NumberOne = 0,

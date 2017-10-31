@@ -116,6 +116,12 @@ BKViewController(p,theGraph)
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
+    
+#if JUCE_IOS
+    offsetSlider->addWantsKeyboardListener(this);
+    absoluteKeyboard.addWantsKeyboardListener(this);
+    customKeyboard.addWantsKeyboardListener(this);
+#endif
 }
 
 void TuningViewController::resized()
@@ -128,7 +134,13 @@ void TuningViewController::resized()
     float keyboardHeight = 60 + 50 * processor.paddingScalarY;
     Rectangle<int> absoluteKeymapRow = area.removeFromBottom(keyboardHeight);
     absoluteKeymapRow.reduce(gXSpacing, 0);
+    
+#if JUCE_IOS
     absoluteKeyboard.setBounds(absoluteKeymapRow);
+    absoluteKeyboard.setSize(absoluteKeymapRow.getWidth() * 0.5, absoluteKeymapRow.getHeight());
+#else
+    absoluteKeyboard.setBounds(absoluteKeymapRow);
+#endif
 
     DBG("TVC - absoluteKeyboard" + rectangleToString(absoluteKeymapRow));
     

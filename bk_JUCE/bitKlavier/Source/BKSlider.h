@@ -20,8 +20,71 @@
 #include "BKUtilities.h"
 #include "BKComponent.h"
 #include "BKLookAndFeel.h"
-
 #include "BKNumberPad.h"
+
+class BKStackedSlider;
+class BKSingleSlider;
+class BKMultiSlider;
+class BKRangeSlider;
+class BKWaveDistanceUndertowSlider;
+class BKKeyboardSlider;
+class BKTextEditor;
+
+typedef enum BKRangeSliderType
+{
+    BKRangeSliderMin = 0,
+    BKRangeSliderMax,
+    BKRangeSliderNi
+    
+} BKRangeSliderType;
+
+
+class WantsKeyboardListener
+{
+    
+public:
+    virtual ~WantsKeyboardListener() {};
+    
+    virtual void textEditorWantsKeyboard(BKTextEditor*) {};
+    virtual void bkStackedSliderWantsKeyboard(BKStackedSlider*) {};
+    virtual void bkSingleSliderWantsKeyboard(BKSingleSlider*) {};
+    virtual void multiSliderWantsKeyboard(BKMultiSlider*) {};
+    virtual void bkRangeSliderWantsKeyboard(BKRangeSlider*, BKRangeSliderType which) {};
+    virtual void bkWaveDistanceUndertowSliderWantsKeyboard(BKWaveDistanceUndertowSlider*, NostalgicParameterType type) {};
+    virtual void keyboardSliderWantsKeyboard(BKKeyboardSlider*) {};
+    
+};
+
+class BKTextEditor : public TextEditor
+{
+public:
+    BKTextEditor(void):
+    TextEditor()
+    {
+#if JUCE_IOS
+        setReadOnly(true);
+        setCaretVisible(true);
+        setSelectAllWhenFocused(false);
+#endif
+    }
+    
+    ~BKTextEditor(void){}
+    
+    inline void mouseDown(const MouseEvent& e)
+    {
+        inputListeners.call(&WantsKeyboardListener::textEditorWantsKeyboard, this);
+    }
+
+    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
+    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
+
+private:
+    
+    ListenerList<WantsKeyboardListener> inputListeners;
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKTextEditor)
+    
+};
 
 typedef enum BKMultiSliderType {
     HorizontalMultiSlider = 0,
@@ -30,7 +93,6 @@ typedef enum BKMultiSliderType {
     VerticalMultiBarSlider,
     BKMultiSliderTypeNil
 } BKMultiSliderType;
-
 
 
 // ******************************************************************************************************************** //
@@ -94,6 +156,21 @@ public:
     void deactivateAllAfter(int where, NotificationType notify);
     void deactivateAllBefore(int where, NotificationType notify);
     
+    
+    
+    inline void setText(String text) { editValsTextField->setText(text, dontSendNotification); }
+    
+    inline TextEditor* getTextEditor(void)
+    {
+        return editValsTextField.get();
+    }
+    
+    inline void dismissTextEditor(bool setValue = false)
+    {
+        if (setValue)   textEditorReturnKeyPressed(*editValsTextField);
+        else            textEditorEscapeKeyPressed(*editValsTextField);
+    }
+    
     int whichSlider (const MouseEvent &e);
     int whichSubSlider (int which);
     int whichSubSlider (int which, const MouseEvent &e);
@@ -133,13 +210,15 @@ public:
         
         virtual void multiSliderValueChanged(String name, int whichSlider, Array<float> values) = 0;
         virtual void multiSliderAllValuesChanged(String name, Array<Array<float>> values) = 0;
-        
-        virtual void multiSliderWantsKeyboard(BKMultiSlider*) {};
     };
     
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
+    
+    ListenerList<WantsKeyboardListener> inputListeners;
+    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
+    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
     
     void setName(String newName)                            { sliderName = newName; showName.setText(sliderName, dontSendNotification);        }
     String getName()                                        { return sliderName; }
@@ -147,6 +226,10 @@ public:
     Array<Array<float>> getAllValues();
     Array<Array<float>> getAllActiveValues();
     Array<float> getOneSliderBank(int which);
+
+    inline String getText(void){
+        return editValsTextField->getText();
+    }
     
 private:
     
@@ -232,7 +315,7 @@ public:
     BKLabel showName;
     bool textIsAbove;
     
-    TextEditor valueTF;
+    BKTextEditor valueTF;
     
     inline String getText(void) { return valueTF.getText(); }
     inline void setText(String text, NotificationType notify = dontSendNotification) { valueTF.setText(text, notify);}
@@ -273,13 +356,15 @@ public:
         virtual ~Listener() {};
         
         virtual void BKSingleSliderValueChanged(String name, double val) = 0;
-        
-        virtual void bkSingleSliderWantsKeyboard(BKSingleSlider*) {};
     };
     
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
+    
+    ListenerList<WantsKeyboardListener> inputListeners;
+    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
+    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
     
     void setDim(float newAlpha);
     void setBright();
@@ -304,13 +389,6 @@ private:
 // **************************************************  BKRangeSlider ************************************************** //
 // ******************************************************************************************************************** //
 
-typedef enum BKRangeSliderType
-{
-    BKRangeSliderMin = 0,
-    BKRangeSliderMax,
-    BKRangeSliderNi
-    
-} BKRangeSliderType;
 
 class BKRangeSlider :
 public Component,
@@ -331,8 +409,8 @@ public:
     String sliderName;
     BKLabel showName;
     
-    TextEditor minValueTF;
-    TextEditor maxValueTF;
+    BKTextEditor minValueTF;
+    BKTextEditor maxValueTF;
     
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName()                { return sliderName; }
@@ -344,6 +422,34 @@ public:
         justifyRight = jr;
         if (justifyRight) showName.setJustificationType(Justification::bottomRight);
         else showName.setJustificationType(Justification::bottomLeft);
+    }
+    
+    inline void setText(BKRangeSliderType which, String text)
+    {
+        if (which == BKRangeSliderMin)      minValueTF.setText(text, false);
+        else if (which == BKRangeSliderMax) maxValueTF.setText(text, false);
+    }
+    
+    inline TextEditor* getTextEditor(BKRangeSliderType which)
+    {
+        if (which == BKRangeSliderMin) return &minValueTF;
+        if (which == BKRangeSliderMax) return &maxValueTF;
+        
+        return nullptr;
+    }
+    
+    inline void dismissTextEditor(bool setValue = false)
+    {
+        if (setValue)
+        {
+            textEditorReturnKeyPressed(minValueTF);
+            textEditorReturnKeyPressed(maxValueTF);
+        }
+        else
+        {
+            textEditorEscapeKeyPressed(minValueTF);
+            textEditorEscapeKeyPressed(maxValueTF);
+        }
     }
     
     void checkValue(double newval);
@@ -369,13 +475,15 @@ public:
         virtual ~Listener() {};
         
         virtual void BKRangeSliderValueChanged(String name, double min, double max) = 0;
-        
-        virtual void bkRangeSliderWantsKeyboard(BKRangeSlider*, BKRangeSliderType which) {};
     };
     
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
+    
+    ListenerList<WantsKeyboardListener> inputListeners;
+    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
+    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
     
 private:
     
@@ -424,8 +532,8 @@ public:
     BKLabel wavedistanceName;
     BKLabel undertowName;
     
-    TextEditor wavedistanceValueTF;
-    TextEditor undertowValueTF;
+    BKTextEditor wavedistanceValueTF;
+    BKTextEditor undertowValueTF;
     
     void setName(String newName)    { sliderName = newName; }
     String getName()                { return sliderName; }
@@ -435,13 +543,28 @@ public:
     void sliderValueChanged (Slider *slider) override {};
     void resized() override;
     void sliderDragEnded(Slider *slider) override;
-    void mouseDown (const MouseEvent &event) override;
+    void mouseDoubleClick (const MouseEvent &event) override;
     
     void setWaveDistance(int newwavedist, NotificationType notify);
     void setUndertow(int newundertow, NotificationType notify);
     
     void setDim(float newAlpha);
     void setBright();
+    
+    inline void setText(NostalgicParameterType which, String text)
+    {
+        if (which == NostalgicUndertow)             undertowValueTF.setText(text, false);
+        else if (which == NostalgicWaveDistance)    wavedistanceValueTF.setText(text, false);
+    }
+    
+    inline TextEditor* getTextEditor(NostalgicParameterType which)
+    {
+        if (which == NostalgicUndertow) return &undertowValueTF;
+        
+        if (which == NostalgicWaveDistance) return &wavedistanceValueTF;
+        
+        return nullptr;
+    }
     
     
     class Listener
@@ -453,13 +576,15 @@ public:
         virtual ~Listener() {};
         
         virtual void BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow) = 0;
-        
-        virtual void bkWaveDistanceUndertowSliderWantsKeyboard(BKWaveDistanceUndertowSlider*, NostalgicParameterType type) {};
     };
     
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
+    
+    ListenerList<WantsKeyboardListener> inputListeners;
+    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
+    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
     
 private:
     double sliderMin, sliderMax;
@@ -506,7 +631,7 @@ public:
     void mouseMove(const MouseEvent& e) override;
     void mouseDoubleClick (const MouseEvent &e) override;
     
-    inline TextEditor* getTextEditor(void)
+    inline BKTextEditor* getTextEditor(void)
     {
         return editValsTextField.get();
     }
@@ -545,13 +670,15 @@ public:
         virtual void BKStackedSliderValueChanged(String name, Array<float> val) = 0; //rewrite all this to pass "this" and check by slider ref instead of name?
         
         virtual void bkStackedSliderValueChanged(BKStackedSlider*) {};
-        
-        virtual void bkStackedSliderWantsKeyboard(BKStackedSlider*) {};
     };
     
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
+    
+    ListenerList<WantsKeyboardListener> inputListeners;
+    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
+    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
     
 private:
     
@@ -559,7 +686,7 @@ private:
     OwnedArray<Slider> dataSliders;  //displays data, user controls with topSlider
     Array<bool> activeSliders;
     
-    ScopedPointer<TextEditor> editValsTextField;
+    ScopedPointer<BKTextEditor> editValsTextField;
     
     int numSliders;
     int numActiveSliders;
@@ -589,6 +716,8 @@ private:
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKStackedSlider)
 };
+
+
 
 
 #endif  // BKSLIDER_H_INCLUDED

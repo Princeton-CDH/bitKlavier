@@ -46,9 +46,7 @@ void BKNumberPad::buttonClicked(Button* button)
             {
                 if (end != start)   current = current.replaceSection(start, (end-1)-start, "");
                 
-                DBG("current here: " + String(current));
-                
-                current = current.replaceSection(target->getCaretPosition()-1, 1, "");
+                if (target->getCaretPosition() >= 1) current = current.replaceSection(target->getCaretPosition()-1, 1, "");
             }
             else if (i == NumberCancel)
             {

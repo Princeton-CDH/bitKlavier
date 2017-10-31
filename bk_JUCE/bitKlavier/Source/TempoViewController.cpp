@@ -70,6 +70,13 @@ BKViewController(p, theGraph)
     actionButton.addListener(this);
 
     updateComponentVisibility();
+    
+#if JUCE_IOS
+    AT1MinMaxSlider->addWantsKeyboardListener(this);
+    AT1HistorySlider->addWantsKeyboardListener(this);
+    AT1SubdivisionsSlider->addWantsKeyboardListener(this);
+    tempoSlider->addWantsKeyboardListener(this);
+#endif
 }
 
 

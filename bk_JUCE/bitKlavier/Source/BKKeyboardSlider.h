@@ -16,6 +16,8 @@
 #include "BKKeyboard.h"
 #include "BKKeyboardState.h"
 
+#include "BKSlider.h"
+
 class BKKeyboardSlider :
 public BKComponent,
 public BKListener,
@@ -43,13 +45,33 @@ public:
         
         virtual void keyboardSliderChanged(String name, Array<float> values) = 0;
         
-        virtual void keyboardSliderWantsKeyboard(BKKeyboardSlider*) {};
-        
     };
     
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener); }
     void removeMyListener(Listener* listener)  { listeners.remove(listener); }
+    
+    ListenerList<WantsKeyboardListener> inputListeners;
+    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
+    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
+    
+    inline void setText(String text)
+    {
+        keyboardValueTF.setText(text, false);
+    }
+    
+    inline TextEditor* getTextEditor(BKRangeSliderType which)
+    {
+        return &keyboardValueTF;
+        
+        return nullptr;
+    }
+    
+    inline void dismissTextEditor(bool setValue = false)
+    {
+        if (setValue)   textEditorReturnKeyPressed(keyboardValueTF);
+        else            textEditorEscapeKeyPressed(keyboardValueTF);
+    }
     
     void setName(String newName) { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName() { return sliderName; }
@@ -74,11 +96,11 @@ private:
     String sliderName;
     BKLabel showName;
 
-    TextEditor keyboardValueTF;
+    BKTextEditor keyboardValueTF;
     BKKeymapKeyboardState keyboardState;
     ScopedPointer<Component> keyboardComponent;
     BKKeymapKeyboardComponent* keyboard;
-    ScopedPointer<TextEditor> keyboardValsTextField;
+    ScopedPointer<BKTextEditor> keyboardValsTextField;
     TextButton keyboardValsTextFieldOpen;
     
     int keyboardSize, minKey, maxKey;

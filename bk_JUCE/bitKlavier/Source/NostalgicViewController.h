@@ -31,6 +31,16 @@ public:
     
     ScopedPointer<BKStackedSlider> transpositionSlider;
     
+    /*
+    void numberPadChanged(BKNumberPad*) override;
+    void numberPadDismissed(BKNumberPad*) override;
+    
+    void bkSingleSliderWantsKeyboard(BKSingleSlider*) override;
+    void bkStackedSliderWantsKeyboard(BKStackedSlider*) override;
+    void bkWaveDistanceUndertowSliderWantsKeyboard(BKWaveDistanceUndertowSlider*)override;
+     
+     */
+    
     void paint (Graphics&) override;
     void resized() override;
     

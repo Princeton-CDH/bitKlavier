@@ -107,6 +107,14 @@ BKViewController(p, theGraph)
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
+    
+#if JUCE_IOS
+    for (auto mslider : paramSliders) mslider->addWantsKeyboardListener(this);
+    howManySlider->addWantsKeyboardListener(this);
+    clusterThreshSlider->addWantsKeyboardListener(this);
+    clusterMinMaxSlider->addWantsKeyboardListener(this);
+    gainSlider->addWantsKeyboardListener(this);
+#endif
 }
 
 void SynchronicViewController::paint (Graphics& g)
