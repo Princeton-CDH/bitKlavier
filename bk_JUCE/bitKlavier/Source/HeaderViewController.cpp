@@ -385,7 +385,8 @@ void HeaderViewController::fillGalleryCB(void)
             
             //add toplevel item, if there is one
             if(thisFile.getParentDirectory().getFileName() == bkGalleries.getFileName() ||
-               thisFile.getParentDirectory().getFileName() == moreGalleries.getFileName()) //if the file is in the main galleries directory....
+               thisFile.getParentDirectory().getFileName() == moreGalleries.getFileName() ||
+               thisFile.getParentDirectory().getFileName() == moreGalleries.getChildFile("Inbox").getFileName()) //if the file is in the main galleries directory....
             {
                 galleryCB.addItem(galleryName, i+1); //add to toplevel popup
             }

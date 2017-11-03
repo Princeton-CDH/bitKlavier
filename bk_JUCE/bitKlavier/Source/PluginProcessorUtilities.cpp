@@ -57,6 +57,8 @@ void BKAudioProcessor::collectGalleriesFromFolder(File folder)
     {
         File galleryFile (xmlIter.getFile());
         
+        DBG("gallery: " + galleryFile.getFullPathName());
+        
         galleryNames.add(galleryFile.getFullPathName());
     }
     
@@ -82,7 +84,6 @@ void BKAudioProcessor::collectGalleries(void)
     collectGalleriesFromFolder(bkGalleries);
     
     File moreGalleries = File::getSpecialLocation (File::userDocumentsDirectory);
-    
     
     collectGalleriesFromFolder(moreGalleries);
     

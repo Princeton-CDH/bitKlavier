@@ -244,8 +244,15 @@ void BKViewController::keyboardSliderWantsKeyboard(BKKeyboardSlider* slider, KSl
     float numberPadWidth = getWidth() / 2 - 2 * gXSpacing;
     numberPad.setSize(numberPadWidth, numberPadHeight);
     
-    if (which == KSliderAllValues)      numberPad.setTopLeftPosition((0.5 * getWidth() + gXSpacing), gYSpacing);
-    else if (which == KSliderThisValue) numberPad.setTopLeftPosition(gXSpacing, gYSpacing);
+    if (slider->getX() > (getWidth() * 0.45))
+    {
+        numberPad.setTopLeftPosition(gXSpacing, gYSpacing);
+    }
+    else
+    {
+        if (which == KSliderAllValues)      numberPad.setTopLeftPosition((0.5 * getWidth() + gXSpacing), gYSpacing);
+        else if (which == KSliderThisValue) numberPad.setTopLeftPosition(gXSpacing, gYSpacing);
+    }
     
     numberPad.setEnabled(NumberLBracket, false);
     numberPad.setEnabled(NumberRBracket, false);
