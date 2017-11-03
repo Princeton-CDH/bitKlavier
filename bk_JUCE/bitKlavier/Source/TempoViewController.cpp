@@ -48,10 +48,10 @@ BKViewController(p, theGraph)
     AT1MinMaxSlider->setIsMinAlwaysLessThanMax(true);
     addAndMakeVisible(AT1MinMaxSlider);
     
-    A1ModeCB.setName("Adaptive Mode");
+    A1ModeCB.setName("Mode");
     addAndMakeVisible(A1ModeCB);
     fillA1ModeCB();
-    A1ModeLabel.setText("Adaptive Mode", dontSendNotification);
+    A1ModeLabel.setText("Mode", dontSendNotification);
     addAndMakeVisible(A1ModeLabel);
     
     addAndMakeVisible(A1AdaptedTempo);

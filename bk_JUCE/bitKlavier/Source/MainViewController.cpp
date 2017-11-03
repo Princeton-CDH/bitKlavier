@@ -127,9 +127,20 @@ void MainViewController::setDisplay(DisplayType type)
 void MainViewController::resized()
 {
    
-    int headerHeight = (processor.platform == BKIOS) ? processor.screenHeight * 0.09: processor.screenHeight * 0.045;
-    int sidebarWidth = (processor.platform == BKIOS) ? processor.screenHeight * 0.075 : processor.screenHeight * 0.0375;
-    int footerHeight = 40;
+    int headerHeight,sidebarWidth,footerHeight;
+    
+#if JUCE_IOS
+    headerHeight = processor.screenHeight * 0.125;
+    headerHeight = (headerHeight > 90) ? 90 : headerHeight;
+    
+    sidebarWidth = processor.screenWidth * 0.075;
+    sidebarWidth = (sidebarWidth > 75) ? 75 : sidebarWidth;
+#else
+    headerHeight = 75;
+    sidebarWidth = 100;
+#endif
+    footerHeight = 40;
+    
     
     Rectangle<int> area (getLocalBounds());
     header.setBounds(area.removeFromTop(headerHeight));
@@ -166,7 +177,7 @@ void MainViewController::resized()
 
     if (display == DisplayKeyboard)
     {
-        int octaveSliderHeight = 40;
+        int octaveSliderHeight = 30;
         octaveSlider.setTopLeftPosition(area.getX(), area.getY());
         octaveSlider.setSize(area.getWidth(), octaveSliderHeight);
         

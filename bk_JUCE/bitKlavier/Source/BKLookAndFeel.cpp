@@ -34,20 +34,18 @@ void BKButtonAndMenuLAF::positionComboBoxText (ComboBox& box, Label& label)
     
 }
 
-#define HEIGHT_IOS 25
+#define HEIGHT_IOS 22
 #define HEIGHT 15
 #define HORIZONTAL 0.75f
 #define KERNING 0.25f
 #define STYLE 0
+#define IOS_RATIO 1.5f
 
 Font BKButtonAndMenuLAF::getComboBoxFont (ComboBox& cb)
 {
     Font font;
-#if JUCE_IOS
-    font.setSizeAndStyle(HEIGHT_IOS, STYLE, HORIZONTAL, KERNING);
-#else
-    font.setHeight(HEIGHT);
-#endif
+
+    font.setSizeAndStyle(fontHeight, STYLE, HORIZONTAL, KERNING);
     
     return font;
 }
@@ -55,11 +53,8 @@ Font BKButtonAndMenuLAF::getComboBoxFont (ComboBox& cb)
 Font BKButtonAndMenuLAF::getPopupMenuFont (void)
 {
     Font font;
-#if JUCE_IOS
-    font.setSizeAndStyle(HEIGHT_IOS, STYLE, HORIZONTAL, KERNING);
-#else
-    font.setHeight(HEIGHT);
-#endif
+
+    font.setSizeAndStyle(fontHeight, STYLE, HORIZONTAL, KERNING);
     
     return font;
 }
@@ -67,11 +62,8 @@ Font BKButtonAndMenuLAF::getPopupMenuFont (void)
 Font BKButtonAndMenuLAF::getTextButtonFont (TextButton&, int buttonHeight)
 {
     Font font;
-#if JUCE_IOS
-    font.setSizeAndStyle(25, STYLE, HORIZONTAL, KERNING);
-#else
-    font.setHeight(HEIGHT);
-#endif
+
+    font.setSizeAndStyle(fontHeight, STYLE, HORIZONTAL, KERNING);
     
     return font;
 }
@@ -79,11 +71,8 @@ Font BKButtonAndMenuLAF::getTextButtonFont (TextButton&, int buttonHeight)
 Font BKButtonAndMenuLAF::getLabelFont (Label& label)
 {
     Font font;
-#if JUCE_IOS
-    font.setSizeAndStyle(HEIGHT_IOS, STYLE, HORIZONTAL, KERNING);
-#else
-    font.setHeight(HEIGHT);
-#endif
+
+    font.setSizeAndStyle(fontHeight, STYLE, HORIZONTAL, KERNING);
     
     return font;
 }

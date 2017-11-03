@@ -10,7 +10,8 @@
 
 #include "BKKeyboardSlider.h"
 
-BKKeyboardSlider::BKKeyboardSlider()
+BKKeyboardSlider::BKKeyboardSlider():
+ratio(1.0)
 {
     
     addAndMakeVisible (keyboardComponent =
@@ -69,24 +70,29 @@ void BKKeyboardSlider::paint (Graphics& g)
 
 void BKKeyboardSlider::resized()
 {
+    float heightUnit = getHeight() * 0.1;
+    float widthUnit = getWidth() * 0.1;
+    
     //Rectangle<int> area (getBounds());
     Rectangle<int> area (getLocalBounds());
-    float keyboardHeight = area.getHeight() - 20;
-    Rectangle<int> keymapRow = area.removeFromBottom(keyboardHeight + 20);
+    float keyboardHeight = 8 * heightUnit;
+    Rectangle<int> keymapRow = area.removeFromBottom(10 * heightUnit);
     
     //absolute keymap
     float keyWidth = keymapRow.getWidth() / round((maxKey - minKey) * 7./12 + 1); //num white keys
     keyboard->setKeyWidth(keyWidth);
     keyboard->setBlackNoteLengthProportion(0.65);
-    //keyboardComponent->setBounds(keymapRow.removeFromBottom(keyboardHeight - gYSpacing));
+    
     Rectangle<int> keyboardRect = keymapRow.removeFromBottom(keyboardHeight - gYSpacing);
-    //keyboard->setBounds(keymapRow.removeFromBottom(keyboardHeight - gYSpacing));
+    
     keyboard->setBounds(keyboardRect);
+    
     keymapRow.removeFromBottom(gYSpacing);
-    Rectangle<int> textSlab (keymapRow.removeFromBottom(20));
-    keyboardValueTF.setBounds(textSlab.removeFromRight(50));
-    showName.setBounds(textSlab.removeFromRight(125));
-    keyboardValsTextFieldOpen.setBounds(textSlab.removeFromLeft(75));
+    
+    Rectangle<int> textSlab (keymapRow.removeFromBottom(2*heightUnit));
+    keyboardValueTF.setBounds(textSlab.removeFromRight(ratio * widthUnit));
+    showName.setBounds(textSlab.removeFromRight(2*ratio*widthUnit));
+    keyboardValsTextFieldOpen.setBounds(textSlab.removeFromLeft(ratio*widthUnit));
     
 #if JUCE_IOS
     keyboardValsTextField->setBounds(keyboard->getBounds());
@@ -213,6 +219,8 @@ void BKKeyboardSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
     }
     else if(textEditor.getName() == keyboardValueTF.getName())
     {
+        if (lastKeyPressed < 0) return;
+        
         keyboard->setKeyValue(lastKeyPressed, keyboardValueTF.getText().getDoubleValue());
         
         listeners.call(&BKKeyboardSlider::Listener::keyboardSliderChanged,

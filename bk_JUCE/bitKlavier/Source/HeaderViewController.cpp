@@ -130,9 +130,11 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     galleryMenu.addItem(NEWGALLERY_ID, "New...");
     galleryMenu.addSeparator();
+#if !JUCE_IOS
     galleryMenu.addItem(OPEN_ID, "Open...");
     galleryMenu.addItem(OPENOLD_ID, "Open (legacy)...");
     galleryMenu.addSeparator();
+#endif
     
     String saveKeystroke = "(Cmd-S)";
     String saveAsKeystroke = "(Shift-Cmd-S)";
@@ -142,8 +144,11 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
 	saveAsKeystroke = "(Shift-Ctrl-S)";
 #endif
     
+
     galleryMenu.addItem(SAVE_ID, "Save " );
+#if !JUCE_IOS
     galleryMenu.addItem(SAVEAS_ID, "Save as... ");
+#endif
     galleryMenu.addSeparator();
     galleryMenu.addItem(CLEAN_ID, "Clean");
     galleryMenu.addSeparator();

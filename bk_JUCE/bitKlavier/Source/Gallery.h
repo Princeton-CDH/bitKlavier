@@ -661,6 +661,11 @@ public:
     
     inline String getURL(void) const noexcept {return url;}
     
+    inline String getName(void) { return name;}
+    
+    inline void setName(String n) { name = n;}
+    
+    
     
 private:
     double bkSampleRate;
@@ -669,6 +674,7 @@ private:
     Array< int> idCount;
     
     String url;
+    String name;
     
     GeneralSettings::Ptr                general;
     

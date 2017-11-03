@@ -44,7 +44,7 @@ BKViewController(p,theGraph)
     A1IntervalScaleCB.addListener(this);
     addAndMakeVisible(A1IntervalScaleCB);
     
-    A1IntervalScaleLabel.setText("Adaptive Scale:", dontSendNotification);
+    A1IntervalScaleLabel.setText("Adaptive:", dontSendNotification);
     //A1IntervalScaleLabel.setJustificationType(juce::Justification::centredRight);
     addAndMakeVisible(A1IntervalScaleLabel);
     
@@ -59,7 +59,7 @@ BKViewController(p,theGraph)
     A1AnchorScaleCB.setName("A1AnchorScale");
     addAndMakeVisible(A1AnchorScaleCB);
     
-    A1AnchorScaleLabel.setText("Anchor Scale:", dontSendNotification);
+    A1AnchorScaleLabel.setText("Anchor:", dontSendNotification);
     //A1AnchorScaleLabel.setJustificationType(juce::Justification::centredRight);
     addAndMakeVisible(A1AnchorScaleLabel);
     
@@ -69,15 +69,15 @@ BKViewController(p,theGraph)
     //A1FundamentalLabel.setText("Adaptive 1 Anchor Fundamental", dontSendNotification);
     //addAndMakeVisible(A1FundamentalLabel);
     
-    A1ClusterThresh = new BKSingleSlider("Cluster Threshold", 1, 1000, 0, 1);
+    A1ClusterThresh = new BKSingleSlider("Threshold", 1, 1000, 0, 1);
     A1ClusterThresh->setJustifyRight(false);
     addAndMakeVisible(A1ClusterThresh);
     
-    A1ClusterMax = new BKSingleSlider("Cluster Maximum", 1, 8, 1, 1);
+    A1ClusterMax = new BKSingleSlider("Maximum", 1, 8, 1, 1);
     A1ClusterMax->setJustifyRight(false);
     addAndMakeVisible(A1ClusterMax);
     
-    //A1reset.setButtonText("reset");
+    A1reset.setButtonText("reset");
     addAndMakeVisible(A1reset);
     
     fillTuningCB();
@@ -86,21 +86,23 @@ BKViewController(p,theGraph)
     // Absolute Tuning Keyboard
     absoluteOffsets.ensureStorageAllocated(128);
     for(int i=0; i<128; i++) absoluteOffsets.add(0.);
-    absoluteKeyboard.setName("Key-by-Key Offsets");
+    absoluteKeyboard.setName("absolute");
     absoluteKeyboard.setAlpha(1);
     addAndMakeVisible(absoluteKeyboard);
     
     //Custom Tuning Keyboard
     customOffsets.ensureStorageAllocated(12);
     for(int i=0; i<12; i++) customOffsets.add(0.);
-    customKeyboard.setName("Temperament Offsets");
+
+    customKeyboard.setName("scale");
     //customKeyboard.setAvailableRange(60, 71);
+    customKeyboard.setDimensionRatio(2.0);
     customKeyboard.setAvailableRange(0, 11);
     customKeyboard.useOrderedPairs(false);
     customKeyboard.setFundamental(0);
     addAndMakeVisible(customKeyboard);
     
-    offsetSlider = new BKSingleSlider("Global Offset (cents)", -100, 100, 0, 0.1);
+    offsetSlider = new BKSingleSlider("offset: ", -100, 100, 0, 0.1);
     addAndMakeVisible(offsetSlider);
     
     lastNote.setText("note: ", dontSendNotification);
@@ -154,7 +156,11 @@ void TuningViewController::resized()
                            selectCB.getHeight());
     
     comboBoxSlice.removeFromLeft(gXSpacing);
-    A1reset.setBounds(comboBoxSlice.removeFromLeft(90));
+    
+    A1reset.setBounds(actionButton.getRight()+gXSpacing,
+                      actionButton.getY(),
+                      actionButton.getWidth(),
+                      actionButton.getHeight());
     
     /* *** above here should be generic (mostly) to all prep layouts *** */
     /* ***         below here will be specific to each prep          *** */
@@ -383,8 +389,8 @@ void TuningPreparationEditor::timerCallback()
             if (tProcessor->getLastNoteTuning() != lastNoteTuningSave)
             {
                 lastNoteTuningSave = tProcessor->getLastNoteTuning();
-                lastNote.setText("last note: " + String(lastNoteTuningSave, 3), dontSendNotification);
-                lastInterval.setText("last interval: "  + String(tProcessor->getLastIntervalTuning(), 3), dontSendNotification);
+                lastNote.setText("note: " + String(lastNoteTuningSave, 3), dontSendNotification);
+                lastInterval.setText("interval: "  + String(tProcessor->getLastIntervalTuning(), 3), dontSendNotification);
             }
         }
         

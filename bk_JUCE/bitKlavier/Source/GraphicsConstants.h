@@ -29,16 +29,16 @@ static const int gComponentTextFieldWidth = 80;
 
 static const int gComponentLabelWidth = 160;
 
-
+int fontHeight;
 
 #if JUCE_IOS
-static const int gComponentComboBoxHeight = 48;
-static const int gComponentLabelHeight = 34;
-static const int gComponentTextFieldHeight = 34;
+int gComponentComboBoxHeight;
+int gComponentLabelHeight;
+int gComponentTextFieldHeight;
 
-static const int gComponentRangeSliderHeight = 60;
-static const int gComponentSingleSliderHeight = 60;
-static const int gComponentStackedSliderHeight = 60;
+int gComponentRangeSliderHeight;
+int gComponentSingleSliderHeight;
+int gComponentStackedSliderHeight;
 
 #else
 static const int gComponentComboBoxHeight = 24;

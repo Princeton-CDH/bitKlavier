@@ -100,10 +100,14 @@ public:
     void setValuesAbsolute(Array<float> newvals);
     void updateDisplay();
     
+    inline void setDimensionRatio(float r) { ratio = r; }
+    
 private:
     
     String sliderName;
     BKLabel showName;
+    
+    float ratio;
 
     BKTextEditor keyboardValueTF;
     BKKeymapKeyboardState keyboardState;

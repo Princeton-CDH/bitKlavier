@@ -68,7 +68,10 @@ public:
     TextEditor()
     {
         Font font;
-        font.setSizeAndStyle(25, 0, 0.75, 0.25);
+        
+        font.setSizeAndStyle(fontHeight, 0, 0.75, 0.25);
+        
+        
         setFont(font);
 #if JUCE_IOS
         setReadOnly(true);

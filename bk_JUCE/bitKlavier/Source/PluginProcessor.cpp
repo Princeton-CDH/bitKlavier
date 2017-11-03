@@ -21,6 +21,23 @@ resonanceReleaseSynth()
         
     float w_factor = ((float) screenWidth / (float) DEFAULT_WIDTH);
     float h_factor = ((float) screenHeight / (float) DEFAULT_HEIGHT);
+    
+    int heightUnit = ((screenHeight * 0.1) > 48) ? 48 : (screenHeight * 0.1);
+    
+#if JUCE_IOS
+    fontHeight = screenHeight * 0.03;
+    fontHeight = (fontHeight < 15) ? 15 : fontHeight;
+#else
+    fontHeight = 15;
+#endif
+    
+    gComponentComboBoxHeight = heightUnit;
+    gComponentLabelHeight = heightUnit * 0.75;
+    gComponentTextFieldHeight = heightUnit * 0.75;
+
+    gComponentRangeSliderHeight = heightUnit * 1.25;
+    gComponentSingleSliderHeight = heightUnit * 1.25;
+    gComponentStackedSliderHeight = heightUnit * 1.25;
 
     uiScaleFactor = (w_factor + h_factor) * 0.5f;
     
@@ -87,24 +104,13 @@ void BKAudioProcessor::createNewGallery(String name)
     File bkGalleries;
 
 #if JUCE_IOS
-    bkGalleries = bkGalleries.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
+    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory);
 #endif
     
 #if JUCE_MAC || JUCE_WINDOWS
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
-    /*
-    String newFileName = name + ".xml";
-    String newFilePath= bkGalleries.getFullPathName() + "/" + newFileName;
-    
-    File myFile (newFilePath);
-    myFile.appendData(BinaryData::__blank_xml, BinaryData::__blank_xmlSize);
-    
-    galleryNames.add(newFileName);
-    
-    currentGalleryPath = newFilePath;
-     */
     
     File myFile(bkGalleries);
     myFile = myFile.getNonexistentChildFile(name, ".xml", true);
@@ -113,13 +119,22 @@ void BKAudioProcessor::createNewGallery(String name)
     
     ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
     
+    
+    
     if (xml != nullptr)
     {
         currentGallery = myFile.getFileName();
         currentGalleryPath = myFile.getFullPathName();
+        
+        xml->setAttribute("url", currentGalleryPath);
+        xml->setAttribute("name", currentGallery);
+        
         DBG("new gallery = " + currentGalleryPath);
         
         gallery = new Gallery(xml, *this);
+        
+        gallery->setURL(currentGalleryPath);
+        gallery->setName(currentGallery);
         
         gallery->print();
         
@@ -523,7 +538,6 @@ void BKAudioProcessor::saveGalleryAs(void)
         currentGallery = myFile.getFileName();
         currentGalleryPath = myFile.getFullPathName();
         
-        String currentURL = gallery->getURL();
         String newURL = myFile.getFullPathName();
         
         DBG("newURL: " + newURL);
@@ -553,6 +567,19 @@ void BKAudioProcessor::saveGalleryAs(void)
 void BKAudioProcessor::saveGallery(void)
 {
 #if JUCE_IOS
+    String url = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + gallery->getName();
+    
+    DBG("url: " + url);
+    
+    File file (url);
+    
+    ValueTree galleryVT = gallery->getState();
+    
+    ScopedPointer<XmlElement> myXML = galleryVT.createXml();
+    
+    myXML->writeToFile(file, String::empty);
+    
+    gallery->setGalleryDirty(false);
     
 #else
     String currentURL = gallery->getURL();
@@ -590,8 +617,8 @@ void BKAudioProcessor::loadGalleryDialog(void)
         DBG("GALLERY IS DIRTY, CHECK FOR SAVE HERE");
         
         galleryIsDirtyAlertResult = AlertWindow::showYesNoCancelBox (AlertWindow::QuestionIcon,
-                                                                     "The current gallery has changed!",
-                                                                     "do you want to save it before loading a new gallery?",
+                                                                     "The current gallery has been modified.",
+                                                                     "Do you want to save before loading a new gallery?",
                                                                      String(),
                                                                      String(),
                                                                      String(),

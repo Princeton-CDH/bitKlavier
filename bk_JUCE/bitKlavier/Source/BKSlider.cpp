@@ -1779,7 +1779,7 @@ void BKWaveDistanceUndertowSlider::resized()
     wavedistanceSlider->setBounds(area.removeFromTop(getHeight() * 0.2));
     undertowSlider->setBounds(area.removeFromBottom(getHeight() * 0.2));
 #else
-    wavedistanceSlider->setBounds(area.removeFromTop(getHeight() * 0.1)));
+    wavedistanceSlider->setBounds(area.removeFromTop(getHeight() * 0.1));
     undertowSlider->setBounds(area.removeFromBottom(getHeight() * 0.1));
 #endif
     
