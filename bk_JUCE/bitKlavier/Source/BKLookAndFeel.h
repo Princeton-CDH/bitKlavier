@@ -47,6 +47,7 @@ public:
         setColour(TextEditor::textColourId, Colours::white);
         
         setColour(Label::textColourId, Colours::white);
+    
         
         toggleTextToRight = true;
         
@@ -71,6 +72,13 @@ public:
     
     void drawToggleButton (Graphics& g, ToggleButton& button,
                                                bool isMouseOverButton, bool isButtonDown) override;
+    
+    Font getComboBoxFont (ComboBox&) override;
+    Font getPopupMenuFont (void) override;
+    Font getTextButtonFont (TextButton&, int buttonHeight)  override;
+    Font getLabelFont (Label&) override;
+    int getDefaultMenuBarHeight() override;
+    
     
 private:
     Justification comboBoxJustification;

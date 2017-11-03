@@ -34,6 +34,73 @@ void BKButtonAndMenuLAF::positionComboBoxText (ComboBox& box, Label& label)
     
 }
 
+#define HEIGHT_IOS 25
+#define HEIGHT 15
+#define HORIZONTAL 0.75f
+#define KERNING 0.25f
+#define STYLE 0
+
+Font BKButtonAndMenuLAF::getComboBoxFont (ComboBox& cb)
+{
+    Font font;
+#if JUCE_IOS
+    font.setSizeAndStyle(HEIGHT_IOS, STYLE, HORIZONTAL, KERNING);
+#else
+    font.setHeight(HEIGHT);
+#endif
+    
+    return font;
+}
+
+Font BKButtonAndMenuLAF::getPopupMenuFont (void)
+{
+    Font font;
+#if JUCE_IOS
+    font.setSizeAndStyle(HEIGHT_IOS, STYLE, HORIZONTAL, KERNING);
+#else
+    font.setHeight(HEIGHT);
+#endif
+    
+    return font;
+}
+
+Font BKButtonAndMenuLAF::getTextButtonFont (TextButton&, int buttonHeight)
+{
+    Font font;
+#if JUCE_IOS
+    font.setSizeAndStyle(25, STYLE, HORIZONTAL, KERNING);
+#else
+    font.setHeight(HEIGHT);
+#endif
+    
+    return font;
+}
+
+Font BKButtonAndMenuLAF::getLabelFont (Label& label)
+{
+    Font font;
+#if JUCE_IOS
+    font.setSizeAndStyle(HEIGHT_IOS, STYLE, HORIZONTAL, KERNING);
+#else
+    font.setHeight(HEIGHT);
+#endif
+    
+    return font;
+}
+
+
+#define MENUBARHEIGHT_IOS 40
+#define MENUBARHEIGHT  25
+
+int BKButtonAndMenuLAF::getDefaultMenuBarHeight()
+{
+#if JUCE_IOS
+    return MENUBARHEIGHT_IOS;
+#else
+    return MENUBARHEIGHT;
+#endif
+}
+
 void BKButtonAndMenuLAF::drawComboBox (Graphics& g, int width, int height, bool,
                                    int, int, int, int, ComboBox& box)
 {
@@ -45,7 +112,6 @@ void BKButtonAndMenuLAF::drawComboBox (Graphics& g, int width, int height, bool,
     
     g.setColour (box.findColour (ComboBox::outlineColourId));
     g.drawRoundedRectangle (boxBounds.toFloat().reduced (0.5f, 0.5f), cornerSize, 1.0f);
-    
     
     Rectangle<int> arrowZone (width - 30, 0, 20, height);
     if(comboBoxJustification == Justification::centredRight)

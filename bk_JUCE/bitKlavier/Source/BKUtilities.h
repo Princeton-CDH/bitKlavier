@@ -120,29 +120,34 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
     if (onGraph)
     {
         menu.addItem(PASTE_ID, "Paste");
+        menu.addSeparator();
     }
     else
     {
         menu.addItem(UNDO_ID, "Undo");
+        menu.addSeparator();
         menu.addItem(REDO_ID, "Redo");
+        menu.addSeparator();
     }
     
     if (numItemsSelected)
     {
-        menu.addSeparator();
         menu.addItem(COPY_ID, "Copy");
+        menu.addSeparator();
         menu.addItem(CUT_ID, "Cut");
+        menu.addSeparator();
         menu.addItem(DELETE_ID, "Delete");
+        menu.addSeparator();
     }
     
     if (numItemsSelected > 1)
     {
-        menu.addSeparator();
         menu.addSubMenu("Align", getAlignMenu(laf));
+        menu.addSeparator();
     }
     
-    menu.addSeparator();
     menu.addSubMenu("Edit...", getEditItemMenu(laf));
+    menu.addSeparator();
     
     if (numItemsSelected == 0)
     {

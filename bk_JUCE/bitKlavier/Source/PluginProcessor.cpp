@@ -509,6 +509,10 @@ void BKAudioProcessor::performModifications(int noteNumber)
 
 void BKAudioProcessor::saveGalleryAs(void)
 {
+#if JUCE_IOS
+    
+#else
+    
     FileChooser myChooser ("Save gallery to file...",
                            lastGalleryPath,
                            "*.xml");
@@ -537,6 +541,8 @@ void BKAudioProcessor::saveGalleryAs(void)
         lastGalleryPath = myFile;
     }
     
+#endif
+    
     
     updateGalleries();
     
@@ -546,9 +552,15 @@ void BKAudioProcessor::saveGalleryAs(void)
 
 void BKAudioProcessor::saveGallery(void)
 {
+#if JUCE_IOS
+    
+#else
     String currentURL = gallery->getURL();
 
-    if (currentURL == String::empty)
+    File file (currentURL);
+    // NOT SURE ABOUT THIS FILE.EXISTSASFILE METHOD
+    
+    if (currentURL == String::empty || !file.existsAsFile())
     {
         saveGalleryAs();
         return;
@@ -565,6 +577,7 @@ void BKAudioProcessor::saveGallery(void)
         
         gallery->setGalleryDirty(false);
     }
+#endif
 }
 
 
@@ -748,13 +761,7 @@ void BKAudioProcessor::initializeGallery(void)
 #endif
         
 #else
-#if JUCE_IOS
-        if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
-        else                    loadPianoSamples(BKLoadLite);
-#else
-        loadPianoSamples(BKLoadLite);
-#endif
-        
+        loadPianoSamples(BKLoadLitest);
 #endif
     }
     

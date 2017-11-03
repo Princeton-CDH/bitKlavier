@@ -103,8 +103,8 @@ void KeymapViewController::resized()
     keyboard->setBounds(keyboardRow);
     
 #if JUCE_IOS
-    keymapTF.setBounds(keyboardRow);
-    keymapTF.setSize(keyboardRow.getWidth() * 0.5, keyboardRow.getHeight());
+    keymapTF.setTopLeftPosition(hideOrShow.getX(), hideOrShow.getBottom() + gYSpacing);
+    keymapTF.setSize(keyboardRow.getWidth() * 0.5, getBottom() - hideOrShow.getBottom() - 2 * gYSpacing);
 #else
     keymapTF.setBounds(keyboardRow);
 #endif
@@ -112,7 +112,7 @@ void KeymapViewController::resized()
     area.removeFromBottom(gYSpacing);
     Rectangle<int> textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
     textButtonSlab.removeFromLeft(gXSpacing);
-    keyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(75));
+    keyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(getWidth() * 0.15));
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);

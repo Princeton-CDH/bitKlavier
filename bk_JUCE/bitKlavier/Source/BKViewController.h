@@ -47,7 +47,7 @@ public:
     
     void bkWaveDistanceUndertowSliderWantsKeyboard(BKWaveDistanceUndertowSlider* slider, NostalgicParameterType type) override;
     
-    void keyboardSliderWantsKeyboard(BKKeyboardSlider* slider) override;
+    void keyboardSliderWantsKeyboard(BKKeyboardSlider* slider, KSliderTextFieldType which) override;
     
     void textEditorWantsKeyboard(BKTextEditor* editor) override;
     

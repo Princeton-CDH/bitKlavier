@@ -60,17 +60,26 @@ public:
         keyboardValueTF.setText(text, false);
     }
     
-    inline TextEditor* getTextEditor(BKRangeSliderType which)
+    inline TextEditor* getTextEditor(KSliderTextFieldType which)
     {
-        return &keyboardValueTF;
+        if (which == KSliderAllValues) return keyboardValsTextField.get();
+        if (which == KSliderThisValue) return &keyboardValueTF;
         
         return nullptr;
     }
     
     inline void dismissTextEditor(bool setValue = false)
     {
-        if (setValue)   textEditorReturnKeyPressed(keyboardValueTF);
-        else            textEditorEscapeKeyPressed(keyboardValueTF);
+        if (setValue)
+        {
+            textEditorReturnKeyPressed(keyboardValueTF);
+            textEditorReturnKeyPressed(*((TextEditor*)keyboardValsTextField.get()));
+        }
+        else
+        {
+            textEditorEscapeKeyPressed(keyboardValueTF);
+            textEditorReturnKeyPressed(*((TextEditor*)keyboardValsTextField.get()));
+        }
     }
     
     void setName(String newName) { sliderName = newName; showName.setText(sliderName, dontSendNotification); }

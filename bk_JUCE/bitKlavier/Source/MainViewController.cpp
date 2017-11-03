@@ -58,14 +58,12 @@ timerCallbackCount(0)
     addAndMakeVisible (keyboardComponent =
                        new BKKeymapKeyboardComponent (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard));
     
-    if (processor.platform == BKIOS)
-    {
-        keyStart = 48;  keyEnd = 72;
-    }
-    else
-    {
-        keyStart = 21;  keyEnd = 108;
-    }
+#if JUCE_IOS
+    keyStart = 48;  keyEnd = 72;
+#else
+    keyStart = 21;  keyEnd = 108;
+#endif
+
     
     keyboard =  ((BKKeymapKeyboardComponent*) keyboardComponent);
     keyboard->setScrollButtonsVisible(false);
@@ -129,8 +127,8 @@ void MainViewController::setDisplay(DisplayType type)
 void MainViewController::resized()
 {
    
-    int headerHeight = (processor.platform == BKIOS) ? 40 : 30;
-    int sidebarWidth = (processor.platform == BKIOS) ? 30 : 20;
+    int headerHeight = (processor.platform == BKIOS) ? processor.screenHeight * 0.09: processor.screenHeight * 0.045;
+    int sidebarWidth = (processor.platform == BKIOS) ? processor.screenHeight * 0.075 : processor.screenHeight * 0.0375;
     int footerHeight = 40;
     
     Rectangle<int> area (getLocalBounds());

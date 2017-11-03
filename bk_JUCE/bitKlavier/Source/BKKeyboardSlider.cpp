@@ -35,11 +35,15 @@ BKKeyboardSlider::BKKeyboardSlider()
 
     showName.setText("unnamed keyboard slider", dontSendNotification);
     showName.setJustificationType(Justification::bottomRight);
+    showName.addMouseListener(this, true);
     addAndMakeVisible(showName);
 
     keyboardValueTF.setText(String(0.0, 1));
     keyboardValueTF.setName("KSLIDERTXT");
     keyboardValueTF.addListener(this);
+#if JUCE_IOS
+    keyboardValueTF.addMouseListener(this, true);
+#endif
     addAndMakeVisible(keyboardValueTF);
 
     keyboardValsTextField = new BKTextEditor();
@@ -83,7 +87,13 @@ void BKKeyboardSlider::resized()
     keyboardValueTF.setBounds(textSlab.removeFromRight(50));
     showName.setBounds(textSlab.removeFromRight(125));
     keyboardValsTextFieldOpen.setBounds(textSlab.removeFromLeft(75));
+    
+#if JUCE_IOS
     keyboardValsTextField->setBounds(keyboard->getBounds());
+    keyboardValsTextField->setSize(keyboard->getWidth() * 0.5f, keyboard->getHeight());
+#else
+    keyboardValsTextField->setBounds(keyboard->getBounds());
+#endif
     
     DBG("keywidth: " + String(keyWidth) + " keyheight: " + String(keyboardHeight));
     DBG("keyboardRect: " + rectangleToString(keyboardRect));
@@ -157,7 +167,7 @@ void BKKeyboardSlider::mouseDown(const MouseEvent& e)
 {
     if (e.originalComponent == &keyboardValueTF || e.originalComponent == &showName)
     {
-        inputListeners.call(&WantsKeyboardListener::keyboardSliderWantsKeyboard, this);
+        inputListeners.call(&WantsKeyboardListener::keyboardSliderWantsKeyboard, this, KSliderThisValue);
     }
     else
     {
@@ -254,7 +264,7 @@ void BKKeyboardSlider::bkButtonClicked (Button* b)
         keyboardValsTextField->toFront(true);
 #else
         keyboardValsTextField->toFront(false);
-        inputListeners.call(&WantsKeyboardListener::keyboardSliderWantsKeyboard, this);
+        inputListeners.call(&WantsKeyboardListener::keyboardSliderWantsKeyboard, this, KSliderAllValues);
 #endif
         if(orderedPairs) {
             keyboardValsTextField->setText(offsetArrayToString2(keyboard->getValuesDirectly()), dontSendNotification);

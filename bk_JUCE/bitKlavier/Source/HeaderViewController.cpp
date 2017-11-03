@@ -16,6 +16,7 @@ construction(c)
 {
     
     setLookAndFeel(&buttonsAndMenusLAF);
+
     
     addAndMakeVisible(galleryB);
     galleryB.setButtonText("Gallery");
@@ -44,6 +45,8 @@ construction(c)
     pianoCB.setName("pianoCB");
     pianoCB.addListener(this);
     pianoCB.addMyListener(this);
+    
+    
     //pianoCB.BKSetJustificationType(juce::Justification::centredRight);
     
     pianoCB.setSelectedId(0, dontSendNotification);
@@ -106,7 +109,11 @@ PopupMenu HeaderViewController::getPianoMenu(void)
     pianoMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
     pianoMenu.addItem(1, "New");
+    pianoMenu.addSeparator();
     pianoMenu.addItem(2, "Duplicate");
+    pianoMenu.addSeparator();
+    pianoMenu.addItem(4, "Rename");
+    pianoMenu.addSeparator();
     pianoMenu.addItem(3, "Remove");
     
     return pianoMenu;
@@ -198,87 +205,29 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
         
         processor.setCurrentPiano(newPianoId);
     }
-    else if (result == KEYMAP_ID)
+    else if (result == 3) // Remove piano
     {
-        construction->addItem(PreparationTypeKeymap, true);
+        
+        int pianoId = hvc->pianoCB.getSelectedId();
+        int index = hvc->pianoCB.getSelectedItemIndex();
+        
+        if ((index == 0) && (hvc->pianoCB.getNumItems() == 1)) return;
+        
+        processor.gallery->remove(PreparationTypePiano, pianoId);
+        
+        hvc->fillPianoCB();
+        
+        int newPianoId = hvc->pianoCB.getItemId(index);
+        
+        if (newPianoId == 0) newPianoId = hvc->pianoCB.getItemId(index-1);
+        
+        hvc->pianoCB.setSelectedId(newPianoId, dontSendNotification);
+        
+        processor.setCurrentPiano(newPianoId);
     }
-    else if (result == DIRECT_ID)
+    else if (result == 4) // Rename
     {
-        construction->addItem(PreparationTypeDirect, true);
-    }
-    else if (result == NOSTALGIC_ID)
-    {
-        construction->addItem(PreparationTypeNostalgic, true);
-    }
-    else if (result == SYNCHRONIC_ID)
-    {
-        construction->addItem(PreparationTypeSynchronic, true);
-    }
-    else if (result == TUNING_ID)
-    {
-        construction->addItem(PreparationTypeTuning, true);
-    }
-    else if (result == TEMPO_ID)
-    {
-        construction->addItem(PreparationTypeTempo, true);
-    }
-    else if (result == MODIFICATION_ID)
-    {
-        construction->addItem(PreparationTypeGenericMod, true);
-    }
-    else if (result == PIANOMAP_ID)
-    {
-        construction->addItem(PreparationTypePianoMap, true);
-    }
-    else if (result == RESET_ID)
-    {
-        construction->addItem(PreparationTypeReset, true);
-    }
-    
-    // EDIT
-    else if (result == KEYMAP_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeKeymap);
-    }
-    else if (result == DIRECT_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeDirect);
-    }
-    else if (result == NOSTALGIC_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeNostalgic);
-    }
-    else if (result == SYNCHRONIC_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeSynchronic);
-    }
-    else if (result == TUNING_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeTuning);
-    }
-    else if (result == TEMPO_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeTempo);
-    }
-    else if (result == DIRECTMOD_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeDirectMod);
-    }
-    else if (result == NOSTALGICMOD_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeNostalgicMod);
-    }
-    else if (result == SYNCHRONICMOD_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeSynchronicMod);
-    }
-    else if (result == TUNINGMOD_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeTuningMod);
-    }
-    else if (result == TEMPOMOD_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeTempoMod);
+
     }
     
 }

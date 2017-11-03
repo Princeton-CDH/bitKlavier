@@ -103,8 +103,8 @@ BKViewController(p,theGraph)
     offsetSlider = new BKSingleSlider("Global Offset (cents)", -100, 100, 0, 0.1);
     addAndMakeVisible(offsetSlider);
     
-    lastNote.setText("last note: ", dontSendNotification);
-    lastInterval.setText("last interval: ", dontSendNotification);
+    lastNote.setText("note: ", dontSendNotification);
+    lastInterval.setText("interval: ", dontSendNotification);
     lastInterval.setJustificationType(juce::Justification::centredRight);
     addAndMakeVisible(lastNote);
     addAndMakeVisible(lastInterval);
@@ -121,6 +121,8 @@ BKViewController(p,theGraph)
     offsetSlider->addWantsKeyboardListener(this);
     absoluteKeyboard.addWantsKeyboardListener(this);
     customKeyboard.addWantsKeyboardListener(this);
+    A1ClusterThresh->addWantsKeyboardListener(this);
+    A1ClusterMax->addWantsKeyboardListener(this);
 #endif
 }
 
@@ -135,12 +137,7 @@ void TuningViewController::resized()
     Rectangle<int> absoluteKeymapRow = area.removeFromBottom(keyboardHeight);
     absoluteKeymapRow.reduce(gXSpacing, 0);
     
-#if JUCE_IOS
     absoluteKeyboard.setBounds(absoluteKeymapRow);
-    absoluteKeyboard.setSize(absoluteKeymapRow.getWidth() * 0.5, absoluteKeymapRow.getHeight());
-#else
-    absoluteKeyboard.setBounds(absoluteKeymapRow);
-#endif
 
     DBG("TVC - absoluteKeyboard" + rectangleToString(absoluteKeymapRow));
     

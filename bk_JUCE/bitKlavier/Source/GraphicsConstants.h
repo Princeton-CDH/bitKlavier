@@ -26,20 +26,34 @@ static const int gComponentYSpacing = 5;
 static const int gComponentXSpacing = 5;
 
 static const int gComponentTextFieldWidth = 80;
-static const int gComponentTextFieldHeight = 17;
 
 static const int gComponentLabelWidth = 160;
-static const int gComponentLabelHeight = 17;
 
+
+
+#if JUCE_IOS
+static const int gComponentComboBoxHeight = 48;
+static const int gComponentLabelHeight = 34;
+static const int gComponentTextFieldHeight = 34;
+
+static const int gComponentRangeSliderHeight = 60;
+static const int gComponentSingleSliderHeight = 60;
+static const int gComponentStackedSliderHeight = 60;
+
+#else
 static const int gComponentComboBoxHeight = 24;
-static const int gComponentToggleBoxWidth  = gComponentComboBoxHeight;
-static const int gComponentToggleBoxHeight  = gComponentToggleBoxWidth;
-
-static const int gComponentSingleSliderXOffset  = 8;
+static const int gComponentLabelHeight = 17;
+static const int gComponentTextFieldHeight = 17;
 
 static const int gComponentRangeSliderHeight = 40;
 static const int gComponentSingleSliderHeight = 40;
 static const int gComponentStackedSliderHeight = 40;
+#endif
+
+static const int gComponentToggleBoxWidth  = gComponentComboBoxHeight;
+static const int gComponentToggleBoxHeight  = gComponentToggleBoxWidth;
+
+static const int gComponentSingleSliderXOffset  = 8;
 
 static const int gVCWidth = 375;
 

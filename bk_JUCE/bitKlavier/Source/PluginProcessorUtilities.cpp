@@ -28,7 +28,7 @@ void BKAudioProcessor::updateUI(void)
 void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
 {
     // TO IMPLEMENT: Should turn off all notes in the processors/synths before loading new samples.
-    if(type >= 0)
+    if(type >= 0 && currentSampleType != type)
     {
         currentSampleType = type;
         
@@ -40,7 +40,7 @@ void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
         
         didLoadMainPianoSamples = true;
     
-        if (!didLoadHammersAndRes)
+        if (!didLoadHammersAndRes && type != BKLoadLitest)
         {
             didLoadHammersAndRes = true;
             BKSampleLoader::loadHammerReleaseSamples(&hammerReleaseSynth);

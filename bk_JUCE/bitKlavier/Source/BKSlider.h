@@ -34,10 +34,16 @@ typedef enum BKRangeSliderType
 {
     BKRangeSliderMin = 0,
     BKRangeSliderMax,
-    BKRangeSliderNi
+    BKRangeSliderNil
     
 } BKRangeSliderType;
 
+typedef enum KSliderTextFieldType
+{
+    KSliderAllValues,
+    KSliderThisValue,
+    KSliderTextFieldTypeNil,
+} KSliderTextFieldType;
 
 class WantsKeyboardListener
 {
@@ -51,7 +57,7 @@ public:
     virtual void multiSliderWantsKeyboard(BKMultiSlider*) {};
     virtual void bkRangeSliderWantsKeyboard(BKRangeSlider*, BKRangeSliderType which) {};
     virtual void bkWaveDistanceUndertowSliderWantsKeyboard(BKWaveDistanceUndertowSlider*, NostalgicParameterType type) {};
-    virtual void keyboardSliderWantsKeyboard(BKKeyboardSlider*) {};
+    virtual void keyboardSliderWantsKeyboard(BKKeyboardSlider*, KSliderTextFieldType which) {};
     
 };
 
@@ -61,6 +67,9 @@ public:
     BKTextEditor(void):
     TextEditor()
     {
+        Font font;
+        font.setSizeAndStyle(25, 0, 0.75, 0.25);
+        setFont(font);
 #if JUCE_IOS
         setReadOnly(true);
         setCaretVisible(true);
