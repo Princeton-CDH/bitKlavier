@@ -357,7 +357,7 @@
  #define JucePlugin_AUManufacturerCode     JucePlugin_ManufacturerCode
 #endif
 #ifndef  JucePlugin_CFBundleIdentifier
- #define JucePlugin_CFBundleIdentifier     com.manyarrowsmusic.bitKlaviermodel_b
+ #define JucePlugin_CFBundleIdentifier     com.manyarrowsmusic.bitKlavier
 #endif
 #ifndef  JucePlugin_RTASCategory
  #define JucePlugin_RTASCategory           ePlugInCategory_SWGenerators
@@ -375,7 +375,7 @@
  #define JucePlugin_RTASDisableMultiMono   0
 #endif
 #ifndef  JucePlugin_AAXIdentifier
- #define JucePlugin_AAXIdentifier          com.manyarrowsmusic.bitKlavier_b
+ #define JucePlugin_AAXIdentifier          com.manyarrowsmusic.bitKlavier
 #endif
 #ifndef  JucePlugin_AAXManufacturerCode
  #define JucePlugin_AAXManufacturerCode    JucePlugin_ManufacturerCode
