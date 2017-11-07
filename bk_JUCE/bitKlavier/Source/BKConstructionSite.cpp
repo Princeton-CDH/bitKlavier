@@ -61,6 +61,9 @@ void BKConstructionSite::paint(Graphics& g)
 
         g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY(), (processor.platform == BKIOS) ? 1 : 2);
     }
+    
+    for (int i = 0; i < touches.size(); ++i)
+        drawTouch (*touches.getUnchecked(i), g);
 }
 
 bool BKConstructionSite::itemOutsideBounds(Rectangle<int> bounds)
@@ -627,6 +630,23 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
 {
     MouseEvent e = eo.getEventRelativeTo(this);
     
+
+#if JUCE_IOS
+    TouchEvent* t = getTouchEvent(e.source);
+    
+    if (t == nullptr)
+    {
+        t = new TouchEvent(e.source);
+        t->path.startNewSubPath(e.position);
+        touches.add(t);
+    }
+    
+    t->pushPoint(e.position, e.mods);
+    
+    repaint();
+#endif
+
+    
     itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
     
     held = false;
@@ -730,6 +750,8 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
     
     MouseEvent e = eo.getEventRelativeTo(this);
     
+    touches.removeObject (getTouchEvent(e.source));
+    
     mouseReleased();
 
     if (itemToSelect == nullptr) lasso->endLasso();
@@ -778,6 +800,24 @@ void BKConstructionSite::mouseDrag (const MouseEvent& e)
 {
     lastX = e.x; lastY = e.y;
 
+    
+#if JUCE_IOS
+    MouseEvent eo = (e.eventComponent != this) ? e.getEventRelativeTo(this) : e;
+    
+    TouchEvent* t = getTouchEvent(eo.source);
+    
+    if (t == nullptr)
+    {
+        t = new TouchEvent(eo.source);
+        t->path.startNewSubPath(eo.position);
+        touches.add(t);
+    }
+    
+    t->pushPoint(eo.position, eo.mods);
+    
+    repaint();
+#endif
+    
     mouseDragged();
     
     if (itemToSelect == nullptr) lasso->dragLasso(e);

@@ -27,18 +27,17 @@ resonanceReleaseSynth()
 #if JUCE_IOS
     fontHeight = screenHeight * 0.03;
     fontHeight = (fontHeight < 15) ? 15 : fontHeight;
-#else
-    fontHeight = 15;
-#endif
     
     gComponentComboBoxHeight = heightUnit;
     gComponentLabelHeight = heightUnit * 0.75;
     gComponentTextFieldHeight = heightUnit * 0.75;
-
+    
     gComponentRangeSliderHeight = heightUnit * 1.25;
     gComponentSingleSliderHeight = heightUnit * 1.25;
     gComponentStackedSliderHeight = heightUnit * 1.25;
 
+#endif
+    
     uiScaleFactor = (w_factor + h_factor) * 0.5f;
     
     uiScaleFactor = (uiScaleFactor > 1.0f) ? 1.0f : uiScaleFactor;
@@ -542,9 +541,9 @@ void BKAudioProcessor::saveGalleryAs(void)
         
         String newURL = myFile.getFullPathName();
         
-        DBG("newURL: " + newURL);
+        //DBG("newURL: " + newURL);
         
-        if (currentURL != newURL)   gallery->setURL(newURL);
+        //if (currentURL != newURL)   gallery->setURL(newURL);
         
         ValueTree galleryVT = gallery->getState();
         

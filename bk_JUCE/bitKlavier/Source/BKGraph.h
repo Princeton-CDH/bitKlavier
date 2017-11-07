@@ -245,7 +245,6 @@ private:
     Label label;
     
 
-    
     // Piano menu
     BKComboBox menu;
     
