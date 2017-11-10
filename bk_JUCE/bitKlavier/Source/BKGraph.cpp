@@ -86,6 +86,8 @@ processor(p)
         
         //addAndMakeVisible(menu);
     }
+    
+    startTimerHz(10);
 }
 
 BKItem::~BKItem()
@@ -293,19 +295,43 @@ void BKItem::itemIsBeingDragged(const MouseEvent& e)
 
 void BKItem::mouseDoubleClick(const MouseEvent& e)
 {
-    if (type == PreparationTypePianoMap)
-    {
-        menu.showPopup();
-    }
-    else
-    {
-        processor.updateState->setCurrentDisplay(type, Id);
-    }
+    
 }
+
+
+#define RESET 0
+#define PHATNESS 10
 
 void BKItem::mouseDown(const MouseEvent& e)
 {
-    ((BKConstructionSite*)getParentComponent())->setCurrentItem(this);
+    BKConstructionSite* cs = ((BKConstructionSite*)getParentComponent());
+    BKItem* current = cs->getCurrentItem();
+
+    
+    if (current == this)
+    {
+        if (time < PHATNESS)
+        {
+            if (type == PreparationTypePianoMap)
+            {
+                menu.showPopup();
+            }
+            else
+            {
+                processor.updateState->setCurrentDisplay(type, Id);
+            }
+        }
+        else
+        {
+            time = RESET;
+        }
+    }
+    else
+    {
+        time = RESET;
+    }
+    
+    cs->setCurrentItem(this);
     
     if (isDraggable)
     {

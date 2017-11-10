@@ -20,13 +20,19 @@
 class BKAudioProcessor;
 
 
-class BKItem : public ItemMapper, public BKDraggableComponent, public BKListener
+class BKItem : public ItemMapper, public BKDraggableComponent, public BKListener, private Timer
 {
 public:
     typedef ReferenceCountedArray<BKItem, CriticalSection>      PtrArr;
     typedef ReferenceCountedObjectPtr<BKItem>                   Ptr;
     
     BKItem(BKPreparationType type, int Id, BKAudioProcessor& p);
+    
+    uint64 time;
+    inline void timerCallback(void)
+    {
+        time++;
+    };
     
     ~BKItem(void);
 

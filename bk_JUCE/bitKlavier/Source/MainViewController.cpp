@@ -120,13 +120,14 @@ void MainViewController::setDisplay(DisplayType type)
 {
     display = type;
     
+    
+    
     resized();
     repaint();
 }
 
 void MainViewController::resized()
 {
-   
     int headerHeight,sidebarWidth,footerHeight;
     
 #if JUCE_IOS

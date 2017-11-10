@@ -14,6 +14,8 @@
 
 #define NUM_COL 6
 
+#define DRAW_MULTITOUCH 0
+
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, /*Viewport* vp,*/ BKItemGraph* theGraph):
 altDown(false),
 processor(p),
@@ -62,8 +64,10 @@ void BKConstructionSite::paint(Graphics& g)
         g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY(), (processor.platform == BKIOS) ? 1 : 2);
     }
     
+#if DRAW_MULTITOUCH
     for (int i = 0; i < touches.size(); ++i)
         drawTouch (*touches.getUnchecked(i), g);
+#endif
 }
 
 bool BKConstructionSite::itemOutsideBounds(Rectangle<int> bounds)
@@ -798,9 +802,7 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
 
 void BKConstructionSite::mouseDrag (const MouseEvent& e)
 {
-    lastX = e.x; lastY = e.y;
 
-    
 #if JUCE_IOS
     MouseEvent eo = (e.eventComponent != this) ? e.getEventRelativeTo(this) : e;
     

@@ -51,6 +51,8 @@ public:
     
     void textEditorWantsKeyboard(BKTextEditor* editor) override;
     
+    inline void setDisplayNumPad(bool display) { numberPad.setVisible(display);}
+    
     void numberPadChanged(BKNumberPad*) override;
     
     void numberPadDismissed(BKNumberPad*) override;

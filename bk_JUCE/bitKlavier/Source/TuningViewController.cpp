@@ -632,7 +632,6 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
         prep->setCustomScaleCents(values);
         active->setCustomScaleCents(values);
     }
-    
     processor.gallery->setGalleryDirty(true);
 }
 

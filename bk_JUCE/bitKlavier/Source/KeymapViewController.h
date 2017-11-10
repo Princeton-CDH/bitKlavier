@@ -20,7 +20,8 @@
 //==============================================================================
 /*
 */
-class KeymapViewController : public BKViewController,
+class KeymapViewController :
+public BKViewController,
 public BKKeymapKeyboardStateListener,
 public BKEditableComboBoxListener
 {
