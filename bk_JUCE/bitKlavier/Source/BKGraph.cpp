@@ -19,7 +19,8 @@
 BKItem::BKItem(BKPreparationType type, int Id, BKAudioProcessor& p):
 ItemMapper(type, Id),
 BKDraggableComponent(true,false,true, 50, 50, 50, 50),
-processor(p)
+processor(p),
+wasJustDragged(false)
 {
     fullChild.setAlwaysOnTop(true);
     addAndMakeVisible(fullChild);
@@ -288,7 +289,7 @@ void BKItem::bkComboBoxDidChange    (ComboBox* cb)
 
 void BKItem::itemIsBeingDragged(const MouseEvent& e)
 {
-    //((BKConstructionSite*)getParentComponent())->itemIsBeingDragged(this, e);
+    wasJustDragged = true;
 }
 
 
@@ -307,8 +308,7 @@ void BKItem::mouseDown(const MouseEvent& e)
     BKConstructionSite* cs = ((BKConstructionSite*)getParentComponent());
     BKItem* current = cs->getCurrentItem();
 
-    
-    if (current == this)
+    if ((current == this) && !wasJustDragged)
     {
         if (time < PHATNESS)
         {
@@ -328,6 +328,7 @@ void BKItem::mouseDown(const MouseEvent& e)
     }
     else
     {
+        wasJustDragged = false;
         time = RESET;
     }
     

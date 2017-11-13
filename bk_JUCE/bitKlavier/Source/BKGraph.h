@@ -250,6 +250,8 @@ private:
     BKAudioProcessor& processor;
     Label label;
     
+    bool wasJustDragged;
+    
 
     // Piano menu
     BKComboBox menu;

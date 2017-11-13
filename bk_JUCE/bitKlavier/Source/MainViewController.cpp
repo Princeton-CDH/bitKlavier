@@ -146,10 +146,20 @@ void MainViewController::resized()
     Rectangle<int> area (getLocalBounds());
     header.setBounds(area.removeFromTop(headerHeight));
     
-    Rectangle<int> overtopSlice = area;
-    overtopSlice.removeFromTop(60 * processor.paddingScalarY);
-    overtopSlice.removeFromBottom(120 * processor.paddingScalarY);
-    overtopSlice.reduce(70 * processor.paddingScalarX, 0);
+    Rectangle<int> overtopSlice;
+    
+    if (processor.screenWidth > 640 || processor.screenHeight > 480)
+    {
+        overtopSlice = area;
+        overtopSlice.removeFromTop(60 * processor.paddingScalarY);
+        overtopSlice.removeFromBottom(120 * processor.paddingScalarY);
+        overtopSlice.reduce(70 * processor.paddingScalarX, 0);
+    }
+    else
+    {
+        overtopSlice = getLocalBounds();
+    }
+    
     overtop.setBounds(overtopSlice);
     
     if (display == DisplayDefault)
