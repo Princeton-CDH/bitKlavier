@@ -51,10 +51,6 @@ BKViewController(p, theGraph)
     hammerGainSlider->addWantsKeyboardListener(this);
 #endif
     
-    addAndMakeVisible(hideOrShow);
-    hideOrShow.setName("hideOrShow");
-    hideOrShow.setButtonText(" X ");
-    
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
@@ -154,8 +150,6 @@ DirectViewController(p, theGraph)
     resonanceGainSlider->addMyListener(this);
     
     hammerGainSlider->addMyListener(this);
-    
-    hideOrShow.addListener(this);
 }
 
 void DirectPreparationEditor::update(void)
@@ -374,8 +368,6 @@ DirectViewController(p, theGraph)
     resonanceGainSlider->addMyListener(this);
     
     hammerGainSlider->addMyListener(this);
-    
-    hideOrShow.addListener(this);
 }
 
 void DirectModificationEditor::greyOutAllComponents()

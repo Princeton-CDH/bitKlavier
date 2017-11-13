@@ -33,14 +33,7 @@ BKViewController(p, theGraph)
     tempoMultiplierSlider->setJustifyRight(false);
     tempoMultiplierSlider->addMyListener(this);
     addAndMakeVisible(tempoMultiplierSlider);
-    
-    addAndMakeVisible(hideOrShow);
-    hideOrShow.setName("hideOrShow");
-    hideOrShow.setButtonText(" X ");
-    hideOrShow.addListener(this);
-    
-    addChildComponent(numberPad);
-    numberPad.addListener(this);
+
     /*
     // Labels
     generalL = OwnedArray<BKLabel>();

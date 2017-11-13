@@ -21,6 +21,11 @@ lastId(0)
     addChildComponent(numberPad);
     numberPad.setAlwaysOnTop(true);
     numberPad.addListener(this);
+    
+    addAndMakeVisible(hideOrShow);
+    hideOrShow.setAlwaysOnTop(true);
+    hideOrShow.setName("hideOrShow");
+    hideOrShow.addListener(this);
 }
 
 BKViewController::~BKViewController()

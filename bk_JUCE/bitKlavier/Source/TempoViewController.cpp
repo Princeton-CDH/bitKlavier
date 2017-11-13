@@ -61,10 +61,6 @@ BKViewController(p, theGraph)
     A1reset.setButtonText("reset");
     //addAndMakeVisible(A1reset);
     
-    addAndMakeVisible(hideOrShow);
-    hideOrShow.setName("hideOrShow");
-    hideOrShow.setButtonText(" X ");
-    
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
@@ -243,7 +239,7 @@ TempoViewController(p, theGraph)
     AT1HistorySlider->addMyListener(this);
     AT1SubdivisionsSlider->addMyListener(this);
     AT1MinMaxSlider->addMyListener(this);
-    hideOrShow.addListener(this);
+    
     
     startTimer(50);
     
@@ -510,7 +506,6 @@ TempoViewController(p, theGraph)
     AT1SubdivisionsSlider->addMyListener(this);
     AT1MinMaxSlider->addMyListener(this);
     A1ModeCB.addListener(this);
-    hideOrShow.addListener(this);
 
     update();
 }

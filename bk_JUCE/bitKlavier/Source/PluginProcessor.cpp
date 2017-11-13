@@ -22,23 +22,25 @@ resonanceReleaseSynth()
     float w_factor = ((float) screenWidth / (float) DEFAULT_WIDTH);
     float h_factor = ((float) screenHeight / (float) DEFAULT_HEIGHT);
     
-    int heightUnit = ((screenHeight * 0.1) > 48) ? 48 : (screenHeight * 0.1);
+    int heightUnit = ((screenHeight * 0.1f) > 48) ? 48 : (screenHeight * 0.1f);
     
 #if JUCE_IOS
-    fontHeight = screenHeight * 0.03;
+    fontHeight = screenHeight * 0.03f;
     fontHeight = (fontHeight < 15) ? 15 : fontHeight;
     
     gComponentComboBoxHeight = heightUnit;
-    gComponentLabelHeight = heightUnit * 0.75;
-    gComponentTextFieldHeight = heightUnit * 0.75;
+    gComponentLabelHeight = heightUnit * 0.75f;
+    gComponentTextFieldHeight = heightUnit * 0.75f;
     
-    gComponentRangeSliderHeight = heightUnit * 1.25;
-    gComponentSingleSliderHeight = heightUnit * 1.25;
-    gComponentStackedSliderHeight = heightUnit * 1.25;
+    gComponentRangeSliderHeight = heightUnit * 1.25f;
+    gComponentSingleSliderHeight = heightUnit * 1.25f;
+    gComponentStackedSliderHeight = heightUnit * 1.25f;
 
 #endif
     
     uiScaleFactor = (w_factor + h_factor) * 0.5f;
+    
+    uiScaleFactor *= 1.15f; // making up for smallness on little ios devices
     
     uiScaleFactor = (uiScaleFactor > 1.0f) ? 1.0f : uiScaleFactor;
     

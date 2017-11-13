@@ -12,6 +12,8 @@
 
 #include "BKUtilities.h"
 
+#include "BKUIComponents.h"
+
 typedef enum NumberPadButtonType
 {
     NumberOne = 0,
@@ -147,7 +149,7 @@ private:
     
     void buttonClicked(Button*) override;
     
-    OwnedArray<TextButton> buttons;
+    OwnedArray<BKTextButton> buttons;
     
     ListenerList<Listener> listeners;
     

@@ -113,6 +113,8 @@ private:
     bool keyPressed (const KeyPress& e, Component*) override;
     
     bool isAddingFromMidiInput;
+    
+    BKButtonAndMenuLAF laf;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainViewController)
 };

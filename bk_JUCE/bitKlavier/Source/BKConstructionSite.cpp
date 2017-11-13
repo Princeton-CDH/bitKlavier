@@ -45,7 +45,7 @@ void BKConstructionSite::resized()
 
 void BKConstructionSite::paint(Graphics& g)
 {
-    g.setColour(Colours::burlywood.withMultipliedBrightness(0.25));
+    g.setColour(Colours::burlywood.withMultipliedBrightness(0.4));
     g.fillAll();
     
     if (connect)
@@ -739,7 +739,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
         
         lasso->setAlpha(0.5);
         lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoFillColourId, Colours::lightgrey);
-        lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoOutlineColourId, Colours::white);
+        lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoOutlineColourId, Colours::antiquewhite);
         
         lasso->beginLasso(eo, this);
 

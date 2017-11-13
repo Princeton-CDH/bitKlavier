@@ -43,7 +43,7 @@ protected:
     BKLabel A1AdaptedTempo;
     BKLabel A1AdaptedPeriodMultiplier;
     
-    TextButton A1reset;
+    BKTextButton A1reset;
     
     void fillModeCB(void);
     void fillA1ModeCB(void);

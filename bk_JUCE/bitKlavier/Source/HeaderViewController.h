@@ -20,6 +20,8 @@
 
 #include "BKConstructionSite.h"
 
+#include "BKSlider.h"
+
 class HeaderViewController : public BKComponent, public BKListener, public BKEditableComboBoxListener
 {
 public:
@@ -66,9 +68,9 @@ private:
     //OwnedArray<PopupMenu> submenus;
     //StringArray submenuNames;
     
-    TextButton  editB;
-    TextButton  pianoB;
-    TextButton  galleryB;
+    BKTextButton  editB;
+    BKTextButton  pianoB;
+    BKTextButton  galleryB;
     
     BKEditableComboBox galleryCB;
     BKEditableComboBox pianoCB;

@@ -58,11 +58,6 @@ BKViewController(p, theGraph)
     keymapTF.setVisible(false);
     keymapTF.toBack();
     
-    addAndMakeVisible(hideOrShow);
-    hideOrShow.setName("hideOrShow");
-    hideOrShow.addListener(this);
-    hideOrShow.setButtonText(" X ");
-    
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);

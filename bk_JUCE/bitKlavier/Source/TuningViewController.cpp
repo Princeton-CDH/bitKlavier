@@ -51,9 +51,9 @@ BKViewController(p,theGraph)
     A1Inversional.setButtonText ("invert");
     A1Inversional.setToggleState (true, dontSendNotification);
     //buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
-    A1Inversional.setColour(ToggleButton::textColourId, Colours::white);
-    A1Inversional.setColour(ToggleButton::tickColourId, Colours::white);
-    A1Inversional.setColour(ToggleButton::tickDisabledColourId, Colours::white);
+    A1Inversional.setColour(ToggleButton::textColourId, Colours::antiquewhite);
+    A1Inversional.setColour(ToggleButton::tickColourId, Colours::antiquewhite);
+    A1Inversional.setColour(ToggleButton::tickDisabledColourId, Colours::antiquewhite);
     addAndMakeVisible(A1Inversional);
     
     A1AnchorScaleCB.setName("A1AnchorScale");
@@ -111,9 +111,7 @@ BKViewController(p,theGraph)
     addAndMakeVisible(lastNote);
     addAndMakeVisible(lastInterval);
     
-    addAndMakeVisible(hideOrShow);
-    hideOrShow.setName("hideOrShow");
-    hideOrShow.setButtonText(" X ");
+    
     
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
@@ -370,8 +368,6 @@ TuningViewController(p, theGraph)
     customKeyboard.addMyListener(this);
     
     offsetSlider->addMyListener(this);
-    
-    hideOrShow.addListener(this);
     
     startTimer(50);
     
@@ -716,7 +712,6 @@ TuningViewController(p, theGraph)
     absoluteKeyboard.addMyListener(this);
     customKeyboard.addMyListener(this);
     offsetSlider->addMyListener(this);
-    hideOrShow.addListener(this);
 
     update();
 }

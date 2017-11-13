@@ -17,7 +17,6 @@ construction(c)
     
     setLookAndFeel(&buttonsAndMenusLAF);
 
-    
     addAndMakeVisible(galleryB);
     galleryB.setButtonText("Gallery");
     galleryB.addListener(this);
@@ -68,7 +67,7 @@ void HeaderViewController::paint (Graphics& g)
 
 void HeaderViewController::resized()
 {
-    float width = getWidth() / 7 - gXSpacing;
+    float width = getWidth() / 7;
     
     Rectangle<int> area (getLocalBounds());
     area.reduce(0, gYSpacing);

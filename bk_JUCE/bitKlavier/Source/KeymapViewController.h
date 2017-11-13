@@ -60,7 +60,7 @@ private:
     BKKeymapKeyboardState keyboardState;
     ScopedPointer<Component> keyboardComponent;
     BKKeymapKeyboardComponent* keyboard;
-    TextButton keyboardValsTextFieldOpen;
+    BKTextButton keyboardValsTextFieldOpen;
     
     void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override;

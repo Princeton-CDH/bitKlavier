@@ -26,6 +26,8 @@ public:
     {
         setSize(200,20);
         
+        
+        
         //lookAndFeelChanged();
         setLookAndFeel(&thisLAF);
         

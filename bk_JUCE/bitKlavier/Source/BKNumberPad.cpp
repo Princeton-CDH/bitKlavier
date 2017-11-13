@@ -14,7 +14,7 @@ BKNumberPad::BKNumberPad(void)
 {
     for (int i = 0; i < NumberPadButtonNil; ++i)
     {
-        buttons.set(i, new TextButton(bkNumberPadText[i]));
+        buttons.set(i, new BKTextButton(bkNumberPadText[i]));
         buttons[i]->setButtonText(bkNumberPadText[i]);
         buttons[i]->addListener(this);
         addAndMakeVisible(buttons[i]);

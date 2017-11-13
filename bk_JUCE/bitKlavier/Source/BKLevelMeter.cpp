@@ -39,9 +39,9 @@ void BKLevelMeterComponent::timerCallback()
 
 void BKLevelMeterComponent::drawLevelMeter (Graphics& g, int width, int height, float level)
 {
-    g.setColour (Colours::black.withAlpha (0.7f));
+    g.setColour (Colours::black.withAlpha (0.8f));
     g.fillRoundedRectangle (0.0f, 0.0f, (float) width, (float) height, 3.0f);
-    g.setColour (Colours::black.withAlpha (0.2f));
+    g.setColour (Colours::black.withAlpha (0.4f));
     g.drawRoundedRectangle (1.0f, 1.0f, width - 2.0f, height - 2.0f, 3.0f, 1.0f);
     
     const int totalBlocks = 14;
@@ -53,9 +53,9 @@ void BKLevelMeterComponent::drawLevelMeter (Graphics& g, int width, int height, 
     {
         if (i >= numBlocks)
         {
-            g.setColour (Colours::green.withAlpha (0.2f));
-            if(i >= totalBlocks - 2) g.setColour(Colours::red.withAlpha (0.2f));
-            else if(i >= totalBlocks - 4) g.setColour(Colours::yellow.withAlpha (0.2f));
+            g.setColour (Colours::green.withAlpha (0.4f));
+            if(i >= totalBlocks - 2) g.setColour(Colours::red.withAlpha (0.4f));
+            else if(i >= totalBlocks - 4) g.setColour(Colours::yellow.withAlpha (0.4f));
         }
         else if(i < totalBlocks - 4) g.setColour(Colours::green.withAlpha (0.9f));
         else if(i < totalBlocks - 2) g.setColour(Colours::yellow.withAlpha (0.9f));

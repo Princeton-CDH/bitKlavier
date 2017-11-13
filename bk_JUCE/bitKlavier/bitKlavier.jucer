@@ -20,6 +20,8 @@
           <FILE id="EqvF0v" name="__blank.xml" compile="0" resource="1" file="Source/__blank.xml"/>
         </GROUP>
         <GROUP id="{6F7CFDA8-D246-D5B9-B60B-EDBE0C6F3537}" name="icons">
+          <FILE id="Dl47P7" name="bitKlavier_x.png" compile="0" resource="1"
+                file="Source/bitKlavier_x.png"/>
           <FILE id="fiXHO5" name="direct_icon.png" compile="0" resource="1" file="Source/icons/direct_icon.png"/>
           <FILE id="CHQGaP" name="general_icon.png" compile="0" resource="1"
                 file="Source/icons/general_icon.png"/>
@@ -205,6 +207,8 @@
         </GROUP>
       </GROUP>
       <GROUP id="{E98AFB64-DE96-83A1-81DC-1FA2D8D37DB8}" name="View">
+        <FILE id="sM6zCj" name="BKUIComponents.h" compile="0" resource="0"
+              file="Source/BKUIComponents.h"/>
         <FILE id="Rorw4u" name="BKNumberPad.cpp" compile="1" resource="0" file="Source/BKNumberPad.cpp"/>
         <FILE id="wjhX6E" name="BKNumberPad.h" compile="0" resource="0" file="Source/BKNumberPad.h"/>
         <GROUP id="{312ACC06-200C-E792-F54F-FC9ABB97A738}" name="BKSlider">

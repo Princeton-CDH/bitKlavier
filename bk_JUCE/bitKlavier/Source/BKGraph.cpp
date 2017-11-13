@@ -162,7 +162,7 @@ void BKItem::setImage(Image newImage)
 #endif
     
     while (!(image.getWidth() < val || image.getHeight() < val))
-        image = image.rescaled(image.getWidth() * 0.8, image.getHeight() * 0.8);
+        image = image.rescaled(image.getWidth() * 0.9, image.getHeight() * 0.9);
     
     if (type != PreparationTypePianoMap)    setSize(image.getWidth(), image.getHeight());
     else                                    setSize(image.getWidth(), image.getHeight() + 25);
@@ -235,7 +235,7 @@ void BKItem::paint(Graphics& g)
     
     if (isSelected)
     {
-        g.setColour(Colours::white);
+        g.setColour(Colours::antiquewhite);
         g.drawRect(getLocalBounds(),2);
     }
     else
@@ -296,7 +296,16 @@ void BKItem::itemIsBeingDragged(const MouseEvent& e)
 
 void BKItem::mouseDoubleClick(const MouseEvent& e)
 {
-    
+#if !JUCE_IOS
+    if (type == PreparationTypePianoMap)
+    {
+        menu.showPopup();
+    }
+    else
+    {
+        processor.updateState->setCurrentDisplay(type, Id);
+    }
+#endif
 }
 
 

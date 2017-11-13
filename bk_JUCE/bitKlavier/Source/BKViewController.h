@@ -61,13 +61,13 @@ protected:
     BKAudioProcessor& processor;
     BKItemGraph* theGraph;
     
-    TextButton actionButton;
+    BKTextButton actionButton;
     
     BKButtonAndMenuLAF buttonsAndMenusLAF;
     BKButtonAndMenuLAF buttonsAndMenusLAF2;
     
     ImageComponent iconImageComponent;
-    TextButton hideOrShow;
+    BKExitButton hideOrShow;
     
     BKNumberPad numberPad;
     
