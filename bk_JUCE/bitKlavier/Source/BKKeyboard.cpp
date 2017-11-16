@@ -279,7 +279,7 @@ int BKKeymapKeyboardComponent::getTotalKeyboardWidth() const noexcept
     return x + w;
 }
 
-int BKKeymapKeyboardComponent::getNoteAtPosition (Point<int> p)
+int BKKeymapKeyboardComponent::getNoteAtPosition (juce::Point<int> p)
 {
     float v;
     return xyToNote (p, v);
@@ -288,27 +288,27 @@ int BKKeymapKeyboardComponent::getNoteAtPosition (Point<int> p)
 const uint8 BKKeymapKeyboardComponent::whiteNotes[] = { 0, 2, 4, 5, 7, 9, 11 };
 const uint8 BKKeymapKeyboardComponent::blackNotes[] = { 1, 3, 6, 8, 10 };
 
-int BKKeymapKeyboardComponent::xyToNote (Point<int> pos, float& mousePositionVelocity)
+int BKKeymapKeyboardComponent::xyToNote (juce::Point<int> pos, float& mousePositionVelocity)
 {
     if (! reallyContains (pos, false))
         return -1;
     
-    Point<int> p (pos);
+    juce::Point<int> p (pos);
     
     if (orientation != horizontalKeyboard)
     {
-        p = Point<int> (p.y, p.x);
+        p = juce::Point<int> (p.y, p.x);
         
         if (orientation == verticalKeyboardFacingLeft)
-            p = Point<int> (p.x, getWidth() - p.y);
+            p = juce::Point<int> (p.x, getWidth() - p.y);
         else
-            p = Point<int> (getHeight() - p.x, p.y);
+            p = juce::Point<int> (getHeight() - p.x, p.y);
     }
     
-    return remappedXYToNote (p + Point<int> (xOffset, 0), mousePositionVelocity);
+    return remappedXYToNote (p + juce::Point<int> (xOffset, 0), mousePositionVelocity);
 }
 
-int BKKeymapKeyboardComponent::remappedXYToNote (Point<int> pos, float& mousePositionVelocity) const
+int BKKeymapKeyboardComponent::remappedXYToNote (juce::Point<int> pos, float& mousePositionVelocity) const
 {
     const int blackNoteLength = getBlackNoteLength();
     
@@ -751,7 +751,7 @@ void BKKeymapKeyboardComponent::resized()
             
             float mousePositionVelocity;
             const int spaceAvailable = w;
-            const int lastStartKey = remappedXYToNote (Point<int> (endOfLastKey - spaceAvailable, 0), mousePositionVelocity) + 1;
+            const int lastStartKey = remappedXYToNote (juce::Point<int> (endOfLastKey - spaceAvailable, 0), mousePositionVelocity) + 1;
             
             if (lastStartKey >= 0 && ((int) firstKey) > lastStartKey)
             {
@@ -822,7 +822,7 @@ void BKKeymapKeyboardComponent::updateNoteUnderMouse (const MouseEvent& e, bool 
     updateNoteUnderMouse (e.getEventRelativeTo (this).getPosition(), isDown, e.source.getIndex());
 }
 
-void BKKeymapKeyboardComponent::updateNoteUnderMouse (Point<int> pos, bool isDown, int fingerNum)
+void BKKeymapKeyboardComponent::updateNoteUnderMouse (juce::Point<int> pos, bool isDown, int fingerNum)
 {
     float mousePositionVelocity = 0.0f;
     const int newNote = xyToNote (pos, mousePositionVelocity);

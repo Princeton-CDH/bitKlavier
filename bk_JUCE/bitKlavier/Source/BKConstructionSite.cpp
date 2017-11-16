@@ -74,7 +74,7 @@ bool BKConstructionSite::itemOutsideBounds(Rectangle<int> bounds)
 {
     for (auto item : graph->getItems())
     {
-        Point<int> xy = item->getPosition();
+        juce::Point<int> xy = item->getPosition();
         DBG("XY TEST: " + String(xy.x) + " " + String(xy.y));
         
         DBG("bounds: " + String(bounds.getX()) + " " + String(bounds.getHeight()));
@@ -282,7 +282,7 @@ void BKConstructionSite::prepareItemDrag(BKItem* item, const MouseEvent& e, bool
     {
         float X = item->getPosition().getX() + item->getWidth() / 2.0f;
         float Y = item->getPosition().getY() + item->getHeight() / 2.0f;
-        Point<float>pos(X,Y);
+        juce::Point<float>pos(X,Y);
         MouseEvent newEvent = e.withNewPosition(pos);
         
         item->prepareDrag(newEvent);

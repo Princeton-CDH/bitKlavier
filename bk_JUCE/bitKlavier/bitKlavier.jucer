@@ -141,6 +141,8 @@
         </GROUP>
       </GROUP>
       <GROUP id="{07677963-38EF-2F51-36FA-17646727446F}" name="Controller">
+        <FILE id="ybYtMd" name="ShareBot.h" compile="0" resource="0" file="Source/ShareBot.h"/>
+        <FILE id="rnxxIN" name="ShareBot.mm" compile="1" resource="0" file="Source/ShareBot.mm"/>
         <FILE id="QpXmnO" name="BKViewController.cpp" compile="1" resource="0"
               file="Source/BKViewController.cpp"/>
         <FILE id="pXYbqY" name="BKViewController.h" compile="0" resource="0"

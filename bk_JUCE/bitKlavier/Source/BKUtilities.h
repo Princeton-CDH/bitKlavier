@@ -46,6 +46,10 @@
 #define CUT_ID 25
 #define EDIT_ID 26
 
+#define SHARE_EMAIL_ID 42
+#define SHARE_FACEBOOK_ID 43
+#define SHARE_MESSAGE_ID 44
+
 #define LOAD_LITE 38
 #define LOAD_MEDIUM 39
 #define LOAD_HEAVY 40

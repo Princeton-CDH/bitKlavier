@@ -170,17 +170,17 @@ public:
         return 50;
     }
     
-    inline Point<int> getXY(BKPreparationType type, int Id)
+    inline juce::Point<int> getXY(BKPreparationType type, int Id)
     {
         for (auto item : items)
         {
             if (item->getType() == type && item->getId() == Id)
             {
-                return Point<int>(item->getX(), item->getY());
+                return juce::Point<int>(item->getX(), item->getY());
             }
         }
         
-        return Point<int>(50,50);
+        return juce::Point<int>(50,50);
     }
     
     

@@ -226,7 +226,7 @@ public:
     
     void copy(BKItem::Ptr);
     // Public members
-    Point<float> origin;
+    juce::Point<float> origin;
     
     Image image;
     RectanglePlacement placement;
@@ -236,9 +236,9 @@ public:
     void bkButtonClicked        (Button* b)             override {};
     void bkMessageReceived      (const String& message) override {};
     
-    Point<int> lastClick;
+    juce::Point<int> lastClick;
     
-    Point<int> position;
+    juce::Point<int> position;
     
     void setImage(Image newImage);
     

@@ -75,7 +75,7 @@ public:
     String                              currentGallery;
     String                              currentGalleryPath;
     
-
+    
    
     void updateGalleries(void);
     
@@ -192,6 +192,8 @@ public:
     
     int screenWidth;
     int screenHeight;
+    
+    inline String getCurrentGalleryPath(void) { return currentGalleryPath;}
     
 private:
     

@@ -93,7 +93,7 @@ timerCallbackCount(0)
     addChildComponent(overtop);
 
     
-    Point<int> myshadowOffset(2, 2);
+    juce::Point<int> myshadowOffset(2, 2);
     DropShadow myshadow(Colours::darkgrey, 5, myshadowOffset);
     overtopShadow = new DropShadower(myshadow);
     overtopShadow->setOwner(&overtop);
@@ -121,8 +121,8 @@ void MainViewController::paint (Graphics& g)
     g.drawRoundedRectangle(bounds, 2.0, 0.5f);
     
     bounds = levelMeterComponentL->getBounds().toFloat();
-    bounds.expand(1, 6);
-    bounds.translate(0, -3);
+    bounds.expand(1, 1);
+    bounds.translate(0, -5);
     g.drawRoundedRectangle(bounds, 2.0, 0.5f);
 }
 
@@ -193,8 +193,8 @@ void MainViewController::resized()
     
     Rectangle<int> levelMeterSlice = area.removeFromLeft(sidebarWidth+gXSpacing);
     levelMeterSlice.removeFromRight(gXSpacing);
-    levelMeterSlice.reduce(1, 6);
-    levelMeterComponentL->setBounds(header.getX()+gXSpacing, levelMeterSlice.getY()+3,
+    levelMeterSlice.reduce(1, 1);
+    levelMeterComponentL->setBounds(header.getX()+gXSpacing, levelMeterSlice.getY()+5,
                           mainSlider->getWidth(),
                           levelMeterSlice.getHeight());
     

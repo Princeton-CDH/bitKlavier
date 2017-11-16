@@ -73,14 +73,14 @@ public:
         : source (ms)
         {}
         
-        void pushPoint (Point<float> newPoint, ModifierKeys newMods)
+        void pushPoint (juce::Point<float> newPoint, ModifierKeys newMods)
         {
             currentPosition = newPoint;
             modifierKeys = newMods;
             
             if (lastPoint.getDistanceFrom (newPoint) > 5.0f)
             {
-                if (lastPoint != Point<float>())
+                if (lastPoint != juce::Point<float>())
                 {
                     Path newSegment;
                     newSegment.startNewSubPath (lastPoint);
@@ -97,7 +97,7 @@ public:
         
         MouseInputSource source;
         Path path;
-        Point<float> lastPoint, currentPosition;
+        juce::Point<float> lastPoint, currentPosition;
         ModifierKeys modifierKeys;
         
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TouchEvent)
@@ -165,7 +165,7 @@ private:
     
     BKItemGraph* graph;
     
-    Point<int> lastPosition;
+    juce::Point<int> lastPosition;
 
     bool connect; int lineOX, lineOY, lineEX, lineEY;
     bool multiple;

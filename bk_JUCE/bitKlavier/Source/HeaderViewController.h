@@ -22,6 +22,8 @@
 
 #include "BKSlider.h"
 
+#include "ShareBot.h"
+
 class HeaderViewController : public BKComponent, public BKListener, public BKEditableComboBoxListener
 {
 public:
@@ -46,6 +48,8 @@ private:
     int galleryIsDirtyAlertResult;
 
     Gallery::Ptr currentGallery;
+    
+    ShareBot bot;
     
     
     void bkTextFieldDidChange       (TextEditor&)           override;

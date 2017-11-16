@@ -8,13 +8,15 @@
   ==============================================================================
 */
 
+
+
 #include "HeaderViewController.h"
+
 
 HeaderViewController::HeaderViewController (BKAudioProcessor& p, BKConstructionSite* c):
 processor (p),
 construction(c)
 {
-    
     setLookAndFeel(&buttonsAndMenusLAF);
 
     addAndMakeVisible(galleryB);
@@ -44,7 +46,7 @@ construction(c)
     pianoCB.setName("pianoCB");
     pianoCB.addListener(this);
     pianoCB.addMyListener(this);
-    
+
     
     //pianoCB.BKSetJustificationType(juce::Justification::centredRight);
     
@@ -149,6 +151,18 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addItem(SAVEAS_ID, "Save as... ");
 #endif
     galleryMenu.addSeparator();
+    
+    PopupMenu shareMenu;
+    
+    shareMenu.addItem(SHARE_EMAIL_ID, "Email");
+    galleryMenu.addSeparator();
+    shareMenu.addItem(SHARE_MESSAGE_ID, "Messages");
+    galleryMenu.addSeparator();
+    shareMenu.addItem(SHARE_FACEBOOK_ID, "Facebook");
+    
+    galleryMenu.addSubMenu("Share...", shareMenu);
+    
+    galleryMenu.addSeparator();
     galleryMenu.addItem(CLEAN_ID, "Clean");
     galleryMenu.addSeparator();
     galleryMenu.addItem(DELETE_ID, "Remove");
@@ -240,7 +254,19 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
 {
     BKAudioProcessor& processor = gvc->processor;
     
-    if (result == LOAD_LITEST)
+    if (result == SHARE_EMAIL_ID)
+    {
+        gvc->bot.share(processor.getCurrentGalleryPath(), 0);
+    }
+    else if (result == SHARE_MESSAGE_ID)
+    {
+        gvc->bot.share(processor.getCurrentGalleryPath(), 1);
+    }
+    else if (result == SHARE_FACEBOOK_ID)
+    {
+        gvc->bot.share(processor.getCurrentGalleryPath(), 2);
+    }
+    else if (result == LOAD_LITEST)
     {
         processor.gallery->sampleType = BKLoadLitest;
         processor.loadPianoSamples(BKLoadLitest);

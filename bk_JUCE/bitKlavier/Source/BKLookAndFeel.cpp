@@ -329,10 +329,10 @@ void BKButtonAndMenuLAF::drawLinearSlider (Graphics& g, int x, int y, int width,
         
         const auto trackWidth = jmin (6.0f, slider.isHorizontal() ? height * 0.25f : width * 0.25f);
         
-        const Point<float> startPoint (slider.isHorizontal() ? x : x + width * 0.5f,
+        const juce::Point<float> startPoint (slider.isHorizontal() ? x : x + width * 0.5f,
                                        slider.isHorizontal() ? y + height * 0.5f : height + y);
         
-        const Point<float> endPoint (slider.isHorizontal() ? width + x : startPoint.x,
+        const juce::Point<float> endPoint (slider.isHorizontal() ? width + x : startPoint.x,
                                      slider.isHorizontal() ? startPoint.y : y);
         
         Path backgroundTrack;
@@ -342,7 +342,7 @@ void BKButtonAndMenuLAF::drawLinearSlider (Graphics& g, int x, int y, int width,
         g.strokePath (backgroundTrack, PathStrokeType (trackWidth, PathStrokeType::curved, PathStrokeType::rounded));
         
         Path valueTrack;
-        Point<float> minPoint, maxPoint, thumbPoint;
+        juce::Point<float> minPoint, maxPoint, thumbPoint;
         
         if (isTwoVal || isThreeVal)
         {
@@ -459,10 +459,10 @@ void BKRangeMinSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, i
         
         const auto trackWidth = jmin (6.0f, slider.isHorizontal() ? height * 0.25f : width * 0.25f);
         
-        const Point<float> startPoint (slider.isHorizontal() ? x : width * 0.5f,
+        const juce::Point<float> startPoint (slider.isHorizontal() ? x : width * 0.5f,
                                        slider.isHorizontal() ? height * 0.5f : height + y);
         
-        const Point<float> endPoint (slider.isHorizontal() ? width + x : startPoint.x,
+        const juce::Point<float> endPoint (slider.isHorizontal() ? width + x : startPoint.x,
                                      slider.isHorizontal() ? startPoint.y : y);
         
         Path backgroundTrack;
@@ -472,7 +472,7 @@ void BKRangeMinSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, i
         g.strokePath (backgroundTrack, PathStrokeType (trackWidth, PathStrokeType::curved, PathStrokeType::rounded));
         
         Path valueTrack;
-        Point<float> minPoint, maxPoint, thumbPoint;
+        juce::Point<float> minPoint, maxPoint, thumbPoint;
         
         const auto kx = slider.isHorizontal() ? sliderPos : (x + width * 0.5f);
         const auto ky = slider.isHorizontal() ? (y + height * 0.5f) : sliderPos;
@@ -509,13 +509,13 @@ void BKRangeMaxSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, i
         
         const auto trackWidth = jmin (6.0f, slider.isHorizontal() ? height * 0.25f : width * 0.25f);
         
-        const Point<float> startPoint (slider.isHorizontal() ? x : width * 0.5f,
+        const juce::Point<float> startPoint (slider.isHorizontal() ? x : width * 0.5f,
                                        slider.isHorizontal() ? height * 0.5f : height + y);
         
-        const Point<float> endPoint (slider.isHorizontal() ? width + x : startPoint.x,
+        const juce::Point<float> endPoint (slider.isHorizontal() ? width + x : startPoint.x,
                                      slider.isHorizontal() ? startPoint.y : y);
         Path valueTrack;
-        Point<float> minPoint, maxPoint, thumbPoint;
+        juce::Point<float> minPoint, maxPoint, thumbPoint;
         
         const auto kx = slider.isHorizontal() ? sliderPos : (x + width * 0.5f);
         const auto ky = slider.isHorizontal() ? (y + height * 0.5f) : sliderPos;
