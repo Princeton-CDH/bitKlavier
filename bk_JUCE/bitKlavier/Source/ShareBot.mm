@@ -128,7 +128,7 @@ void ShareBot::share(String galleryPath, int where)
 {
     CocoaShareBot* bot = [[CocoaShareBot alloc] initWithOwner: this];
     
-    NSString* path = [[NSString stringWithCString:galleryPath.toRawUTF8() encoding:[NSString defaultCStringEncoding]] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSString* path = [[NSString stringWithCString:galleryPath.toRawUTF8() encoding:[NSString defaultCStringEncoding]] stringByRemovingPercentEncoding];
     
     NSURL* url = [NSURL fileURLWithPath:path];
     
@@ -144,6 +144,9 @@ void ShareBot::share(String galleryPath, int where)
     }
 #elif JUCE_IOS
     if (bot != nil) {
+        
+        getParentComponent()->addAndMakeVisible((Component*)bot);
+        
         [bot share:url];
     }
 #endif

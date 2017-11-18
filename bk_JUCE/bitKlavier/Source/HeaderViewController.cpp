@@ -46,7 +46,10 @@ construction(c)
     pianoCB.setName("pianoCB");
     pianoCB.addListener(this);
     pianoCB.addMyListener(this);
-
+    
+#if JUCE_IOS || JUCE_MAC
+    addChildComponent(bot);
+#endif
     
     //pianoCB.BKSetJustificationType(juce::Justification::centredRight);
     
@@ -119,8 +122,6 @@ PopupMenu HeaderViewController::getPianoMenu(void)
     
     return pianoMenu;
 }
-
-
 
 PopupMenu HeaderViewController::getGalleryMenu(void)
 {
