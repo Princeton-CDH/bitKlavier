@@ -35,7 +35,6 @@ construction(c)
     addAndMakeVisible(galleryCB);
     galleryCB.setName("galleryCB");
     galleryCB.addListener(this);
-    galleryCB.addMyListener(this);
     //galleryCB.BKSetJustificationType(juce::Justification::centredRight);
     
     galleryCB.setSelectedId(0, dontSendNotification);
@@ -45,7 +44,6 @@ construction(c)
     addAndMakeVisible(pianoCB);
     pianoCB.setName("pianoCB");
     pianoCB.addListener(this);
-    pianoCB.addMyListener(this);
     
 #if JUCE_IOS || JUCE_MAC
     addChildComponent(bot);
@@ -560,19 +558,6 @@ void HeaderViewController::bkTextFieldDidChange(TextEditor& tf)
     
     DBG(text);
     
-}
-
-void HeaderViewController::BKEditableComboBoxChanged(String text, BKEditableComboBox* cb)
-{
-    if (cb == &pianoCB)
-    {
-        processor.currentPiano->setName(text);
-    }
-    else if (cb == &galleryCB)
-    {
-        processor.renameGallery(text);
-        fillGalleryCB();
-    }
 }
 
 bool HeaderViewController::handleGalleryChange(void)

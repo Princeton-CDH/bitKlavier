@@ -24,7 +24,7 @@
 
 #include "ShareBot.h"
 
-class HeaderViewController : public BKComponent, public BKListener, public BKEditableComboBoxListener
+class HeaderViewController : public BKComponent, public BKListener
 {
 public:
     HeaderViewController(BKAudioProcessor& p, BKConstructionSite* construction);
@@ -56,7 +56,6 @@ private:
     void bkMessageReceived          (const String& message) override{};
     void bkComboBoxDidChange        (ComboBox* box)         override;
     void bkButtonClicked            (Button* b)             override;
-    void BKEditableComboBoxChanged(String text, BKEditableComboBox* cb) override;
     
     static void pianoMenuCallback(int result, HeaderViewController*);
     static void galleryMenuCallback(int result, HeaderViewController*);
@@ -76,8 +75,8 @@ private:
     BKTextButton  pianoB;
     BKTextButton  galleryB;
     
-    BKEditableComboBox galleryCB;
-    BKEditableComboBox pianoCB;
+    BKComboBox galleryCB;
+    BKComboBox pianoCB;
     int lastGalleryCBId;
     bool galleryModalCallBackIsOpen;
     
