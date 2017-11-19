@@ -46,15 +46,6 @@
 #define CUT_ID 25
 #define EDIT_ID 26
 
-#define SHARE_EMAIL_ID 42
-#define SHARE_FACEBOOK_ID 43
-#define SHARE_MESSAGE_ID 44
-
-#define LOAD_LITE 38
-#define LOAD_MEDIUM 39
-#define LOAD_HEAVY 40
-#define LOAD_LITEST 41
-
 #define KEYMAP_EDIT_ID 27
 #define DIRECT_EDIT_ID 28
 #define NOSTALGIC_EDIT_ID 29
@@ -66,6 +57,20 @@
 #define SYNCHRONICMOD_EDIT_ID 35
 #define TUNINGMOD_EDIT_ID 36
 #define TEMPOMOD_EDIT_ID 37
+
+
+#define LOAD_LITE 38
+#define LOAD_MEDIUM 39
+#define LOAD_HEAVY 40
+#define LOAD_LITEST 41
+
+#define SHARE_EMAIL_ID 42
+#define SHARE_FACEBOOK_ID 43
+#define SHARE_MESSAGE_ID 44
+
+#define RENAME_ID 45
+
+
 
 inline PopupMenu getNewItemMenu(LookAndFeel* laf)
 {

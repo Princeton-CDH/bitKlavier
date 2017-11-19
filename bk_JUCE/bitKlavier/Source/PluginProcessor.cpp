@@ -22,9 +22,11 @@ resonanceReleaseSynth()
     float w_factor = ((float) screenWidth / (float) DEFAULT_WIDTH);
     float h_factor = ((float) screenHeight / (float) DEFAULT_HEIGHT);
     
-    int heightUnit = ((screenHeight * 0.1f) > 48) ? 48 : (screenHeight * 0.1f);
+    
     
 #if JUCE_IOS
+    int heightUnit = ((screenHeight * 0.1f) > 48) ? 48 : (screenHeight * 0.1f);
+    
     fontHeight = screenHeight * 0.03f;
     fontHeight = (fontHeight < 15) ? 15 : fontHeight;
     
@@ -131,9 +133,7 @@ void BKAudioProcessor::createNewGallery(String name)
         
         xml->setAttribute("url", currentGalleryPath);
         xml->setAttribute("name", currentGallery);
-        
-        DBG("new gallery = " + currentGalleryPath);
-        
+
         gallery = new Gallery(xml, *this);
         
         gallery->setURL(currentGalleryPath);

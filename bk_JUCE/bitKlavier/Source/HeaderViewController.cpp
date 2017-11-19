@@ -127,32 +127,44 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
 {
     PopupMenu galleryMenu;
     galleryMenu.setLookAndFeel(&buttonsAndMenusLAF);
-
-    galleryMenu.addItem(SETTINGS_ID, "Settings...");
+    
     galleryMenu.addSeparator();
-    galleryMenu.addItem(NEWGALLERY_ID, "New...");
+    galleryMenu.addItem(NEWGALLERY_ID, "New");
     galleryMenu.addSeparator();
-#if !JUCE_IOS
-    galleryMenu.addItem(OPEN_ID, "Open...");
-    galleryMenu.addItem(OPENOLD_ID, "Open (legacy)...");
+    galleryMenu.addItem(RENAME_ID, "Rename");
     galleryMenu.addSeparator();
-#endif
+    galleryMenu.addItem(DELETE_ID, "Remove");
+    
+    
     
     String saveKeystroke = "(Cmd-S)";
     String saveAsKeystroke = "(Shift-Cmd-S)";
     
 #if JUCE_WINDOWS
     saveKeystroke = "(Ctrl-S)";
-	saveAsKeystroke = "(Shift-Ctrl-S)";
+    saveAsKeystroke = "(Shift-Ctrl-S)";
 #endif
     
-
+    galleryMenu.addSeparator();
     galleryMenu.addItem(SAVE_ID, "Save " );
 #if !JUCE_IOS
-    galleryMenu.addItem(SAVEAS_ID, "Save as... ");
+    galleryMenu.addItem(SAVEAS_ID, "Save as");
 #endif
-    galleryMenu.addSeparator();
     
+#if !JUCE_IOS
+    galleryMenu.addSeparator();
+    galleryMenu.addItem(OPEN_ID, "Open");
+    galleryMenu.addItem(OPENOLD_ID, "Open (legacy)");
+#endif
+    
+    galleryMenu.addSeparator();
+    galleryMenu.addSubMenu("Load", getLoadMenu());
+    galleryMenu.addSeparator();
+    galleryMenu.addItem(CLEAN_ID, "Clean");
+    galleryMenu.addSeparator();
+    galleryMenu.addItem(SETTINGS_ID, "Settings");
+    
+    // ~ ~ ~ share menu ~ ~ ~
     PopupMenu shareMenu;
     
     shareMenu.addItem(SHARE_EMAIL_ID, "Email");
@@ -160,15 +172,12 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     shareMenu.addItem(SHARE_MESSAGE_ID, "Messages");
     galleryMenu.addSeparator();
     shareMenu.addItem(SHARE_FACEBOOK_ID, "Facebook");
+    // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+     
     
-    galleryMenu.addSubMenu("Share...", shareMenu);
+    galleryMenu.addSeparator();
+    galleryMenu.addSubMenu("Share", shareMenu);
     
-    galleryMenu.addSeparator();
-    galleryMenu.addItem(CLEAN_ID, "Clean");
-    galleryMenu.addSeparator();
-    galleryMenu.addItem(DELETE_ID, "Remove");
-    galleryMenu.addSeparator();
-    galleryMenu.addSubMenu("Load", getLoadMenu());
     
     
     return galleryMenu;
@@ -178,31 +187,56 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
 void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* hvc)
 {
     BKAudioProcessor& processor = hvc->processor;
-    BKConstructionSite* construction = hvc->construction;
     
     if (result == 1) // New piano
     {
-        int newId = processor.gallery->getNewId(PreparationTypePiano);
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
-        processor.gallery->addTypeWithId(PreparationTypePiano, newId);
+        prompt.addTextEditor("name", "My New Piano");
         
-        String newName = "Piano"+String(newId);
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
         
-        processor.gallery->getPianos().getLast()->setName(newName);
+        int result = prompt.runModalLoop();
         
-        hvc->fillPianoCB();
+        String name = prompt.getTextEditorContents("name");
         
-        processor.setCurrentPiano(newId);
+        if (result == 1)
+        {
+            int newId = processor.gallery->getNewId(PreparationTypePiano);
+            
+            processor.gallery->addTypeWithId(PreparationTypePiano, newId);
+            
+            processor.gallery->getPianos().getLast()->setName(name);
+            
+            hvc->fillPianoCB();
+            
+            processor.setCurrentPiano(newId);
+        }
     }
     else if (result == 2) // Duplicate
     {
-        int newId = processor.gallery->duplicate(PreparationTypePiano, processor.currentPiano->getId());
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
-        String newName = "Piano"+String(newId);
+        prompt.addTextEditor("name", processor.currentPiano->getName() + " (2)");
         
-        hvc->fillPianoCB();
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
         
-        processor.setCurrentPiano(newId);
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            int newId = processor.gallery->duplicate(PreparationTypePiano, processor.currentPiano->getId());
+            
+            processor.setCurrentPiano(newId);
+            
+            processor.currentPiano->setName(name);
+            
+            hvc->fillPianoCB();
+        }
     }
     else if (result == 3) // Remove piano
     {
@@ -246,7 +280,23 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
     }
     else if (result == 4) // Rename
     {
-
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        prompt.addTextEditor("name", processor.currentPiano->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            processor.currentPiano->setName(name);
+        }
+        
+        hvc->fillPianoCB();
     }
     
 }
@@ -255,7 +305,27 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
 {
     BKAudioProcessor& processor = gvc->processor;
     
-    if (result == SHARE_EMAIL_ID)
+    if (result == RENAME_ID)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        prompt.addTextEditor("name", processor.gallery->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            processor.renameGallery(name);
+        }
+        
+        gvc->fillGalleryCB();
+    }
+    else if (result == SHARE_EMAIL_ID)
     {
         gvc->bot.share(processor.getCurrentGalleryPath(), 0);
     }
@@ -452,9 +522,6 @@ void HeaderViewController::fillGalleryCB(void)
         
         File selectedFile(processor.galleryNames[index]);
         processor.gallery->setURL(selectedFile.getFullPathName());
-        
-        
-        
     }
 }
 

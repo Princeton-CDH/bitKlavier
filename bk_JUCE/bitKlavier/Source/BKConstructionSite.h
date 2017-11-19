@@ -141,6 +141,7 @@ public:
         return touches.size();
     }
     
+    
 private:
     
     OwnedArray<TouchEvent> touches;
