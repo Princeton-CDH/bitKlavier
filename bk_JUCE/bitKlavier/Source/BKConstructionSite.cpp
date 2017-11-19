@@ -14,6 +14,8 @@
 
 #define NUM_COL 6
 
+#define DRAW_MULTITOUCH 0
+
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, /*Viewport* vp,*/ BKItemGraph* theGraph):
 altDown(false),
 processor(p),
@@ -43,7 +45,7 @@ void BKConstructionSite::resized()
 
 void BKConstructionSite::paint(Graphics& g)
 {
-    g.setColour(Colours::burlywood.withMultipliedBrightness(0.25));
+    g.setColour(Colours::burlywood.withMultipliedBrightness(0.4));
     g.fillAll();
     
     if (connect)
@@ -61,13 +63,18 @@ void BKConstructionSite::paint(Graphics& g)
 
         g.drawLine(line.getStartX(), line.getStartY(), line.getEndX(), line.getEndY(), (processor.platform == BKIOS) ? 1 : 2);
     }
+    
+#if DRAW_MULTITOUCH
+    for (int i = 0; i < touches.size(); ++i)
+        drawTouch (*touches.getUnchecked(i), g);
+#endif
 }
 
 bool BKConstructionSite::itemOutsideBounds(Rectangle<int> bounds)
 {
     for (auto item : graph->getItems())
     {
-        Point<int> xy = item->getPosition();
+        juce::Point<int> xy = item->getPosition();
         DBG("XY TEST: " + String(xy.x) + " " + String(xy.y));
         
         DBG("bounds: " + String(bounds.getX()) + " " + String(bounds.getHeight()));
@@ -275,7 +282,7 @@ void BKConstructionSite::prepareItemDrag(BKItem* item, const MouseEvent& e, bool
     {
         float X = item->getPosition().getX() + item->getWidth() / 2.0f;
         float Y = item->getPosition().getY() + item->getHeight() / 2.0f;
-        Point<float>pos(X,Y);
+        juce::Point<float>pos(X,Y);
         MouseEvent newEvent = e.withNewPosition(pos);
         
         item->prepareDrag(newEvent);
@@ -627,6 +634,23 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
 {
     MouseEvent e = eo.getEventRelativeTo(this);
     
+
+#if JUCE_IOS
+    TouchEvent* t = getTouchEvent(e.source);
+    
+    if (t == nullptr)
+    {
+        t = new TouchEvent(e.source);
+        t->path.startNewSubPath(e.position);
+        touches.add(t);
+    }
+    
+    t->pushPoint(e.position, e.mods);
+    
+    repaint();
+#endif
+
+    
     itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
     
     held = false;
@@ -715,7 +739,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
         
         lasso->setAlpha(0.5);
         lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoFillColourId, Colours::lightgrey);
-        lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoOutlineColourId, Colours::white);
+        lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoOutlineColourId, Colours::antiquewhite);
         
         lasso->beginLasso(eo, this);
 
@@ -729,6 +753,8 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
 {
     
     MouseEvent e = eo.getEventRelativeTo(this);
+    
+    touches.removeObject (getTouchEvent(e.source));
     
     mouseReleased();
 
@@ -776,8 +802,24 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
 
 void BKConstructionSite::mouseDrag (const MouseEvent& e)
 {
-    lastX = e.x; lastY = e.y;
 
+#if JUCE_IOS
+    MouseEvent eo = (e.eventComponent != this) ? e.getEventRelativeTo(this) : e;
+    
+    TouchEvent* t = getTouchEvent(eo.source);
+    
+    if (t == nullptr)
+    {
+        t = new TouchEvent(eo.source);
+        t->path.startNewSubPath(eo.position);
+        touches.add(t);
+    }
+    
+    t->pushPoint(eo.position, eo.mods);
+    
+    repaint();
+#endif
+    
     mouseDragged();
     
     if (itemToSelect == nullptr) lasso->dragLasso(e);

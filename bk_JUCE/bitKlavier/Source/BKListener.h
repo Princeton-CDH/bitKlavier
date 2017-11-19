@@ -13,6 +13,7 @@
 
 #include "BKUtilities.h"
 
+
 class BKListener :
 public TextEditor::Listener,
 public ComboBox::Listener,
@@ -24,9 +25,11 @@ public:
     BKListener();
     ~BKListener();
     
+    virtual void bkTextFieldDidChange   (TextEditor&)           {};
+    
 private:
     // TextEditor input parsing
-    virtual void bkTextFieldDidChange   (TextEditor&)           {};
+    
     virtual void bkComboBoxDidChange    (ComboBox*)             {};
     virtual void bkButtonClicked        (Button* b)             {};
     virtual void bkMessageReceived      (const String& message) {};

@@ -33,9 +33,10 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
     
     int numLayers = 0;
     
-    if      (type == BKLoadLite)    numLayers = 2;
-    else if (type == BKLoadMedium)  numLayers = 4;
-    else if (type == BKLoadHeavy)   numLayers = 8;
+    if      (type == BKLoadLitest)      numLayers = 1;
+    else if (type == BKLoadLite)        numLayers = 2;
+    else if (type == BKLoadMedium)      numLayers = 4;
+    else if (type == BKLoadHeavy)       numLayers = 8;
     
     synth->clearVoices();
     synth->clearSounds();
@@ -69,9 +70,9 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
                 {
                     temp.append(String(k*8+7),3);
                 }
-                else
+                else if (numLayers == 1)
                 {
-                    
+                    temp += "13";
                 }
                 
                 temp.append(".wav",5);
@@ -126,9 +127,9 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
                     {
                         velocityRange.setRange(aVelocityThresh_Two[k], (aVelocityThresh_Two[k+1] - aVelocityThresh_Two[k]), true);
                     }
-                    else
+                    else if (numLayers == 1)
                     {
-                        
+                        velocityRange.setRange(aVelocityThresh_One[k], (aVelocityThresh_One[k+1] - aVelocityThresh_One[k]), true);
                     }
                     
                     double sourceSampleRate = sampleReader->sampleRate;

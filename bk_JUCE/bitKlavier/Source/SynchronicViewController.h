@@ -14,7 +14,7 @@
 #include "BKViewController.h"
 
 class SynchronicViewController :
-public BKMultiSliderListener,
+public BKMultiSlider::Listener,
 public BKViewController
 {
 public:
@@ -66,8 +66,8 @@ private:
 
 class SynchronicPreparationEditor :
 public SynchronicViewController,
-public BKSingleSliderListener,
-public BKRangeSliderListener,
+public BKSingleSlider::Listener,
+public BKRangeSlider::Listener,
 public BKEditableComboBoxListener,
 public Timer
 {
@@ -110,8 +110,8 @@ private:
 
 class SynchronicModificationEditor :
 public SynchronicViewController,
-public BKSingleSliderListener,
-public BKRangeSliderListener,
+public BKSingleSlider::Listener,
+public BKRangeSlider::Listener,
 public BKEditableComboBoxListener,
 public Timer
 {

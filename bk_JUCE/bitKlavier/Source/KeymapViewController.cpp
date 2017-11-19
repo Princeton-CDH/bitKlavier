@@ -34,6 +34,10 @@ BKViewController(p, theGraph)
     keymapTF.setName("KeymapMidi");
     keymapTF.setMultiLine(true);
     
+#if JUCE_IOS
+    keymapTF.addWantsKeyboardListener(this);
+#endif
+    
     // Keyboard
     addAndMakeVisible (keyboardComponent = new BKKeymapKeyboardComponent (keyboardState,
                                                                  BKKeymapKeyboardComponent::horizontalKeyboard));
@@ -53,11 +57,6 @@ BKViewController(p, theGraph)
     addAndMakeVisible(keyboardValsTextFieldOpen);
     keymapTF.setVisible(false);
     keymapTF.toBack();
-    
-    addAndMakeVisible(hideOrShow);
-    hideOrShow.setName("hideOrShow");
-    hideOrShow.addListener(this);
-    hideOrShow.setButtonText(" X ");
     
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
@@ -97,12 +96,18 @@ void KeymapViewController::resized()
     keyboard->setBlackNoteLengthProportion(0.65);
     keyboardRow.reduce(gXSpacing, 0);
     keyboard->setBounds(keyboardRow);
+    
+#if JUCE_IOS
+    keymapTF.setTopLeftPosition(hideOrShow.getX(), hideOrShow.getBottom() + gYSpacing);
+    keymapTF.setSize(keyboardRow.getWidth() * 0.5, getBottom() - hideOrShow.getBottom() - 2 * gYSpacing);
+#else
     keymapTF.setBounds(keyboardRow);
+#endif
     
     area.removeFromBottom(gYSpacing);
     Rectangle<int> textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
     textButtonSlab.removeFromLeft(gXSpacing);
-    keyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(75));
+    keyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(getWidth() * 0.15));
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
@@ -258,6 +263,9 @@ void KeymapViewController::bkButtonClicked (Button* b)
     {
         keymapTF.setVisible(true);
         keymapTF.toFront(true);
+        
+        textEditorWantsKeyboard(&keymapTF);
+        
         focusLostByEscapeKey = false;
     }
     else if (b == &actionButton)
@@ -314,10 +322,12 @@ void KeymapViewController::keymapUpdated(TextEditor& tf)
 
 void KeymapViewController::textEditorFocusLost(TextEditor& tf)
 {
+#if !JUCE_IOS
     if(!focusLostByEscapeKey)
     {
         keymapUpdated(tf);
     }
+#endif
     
 }
 
@@ -340,8 +350,6 @@ void KeymapViewController::update(void)
         selectCB.setSelectedId(processor.updateState->currentKeymapId, dontSendNotification);
         
         keymapTF.setText( intArrayToString(km->keys()));
-        
-        keymapNameTF.setText(km->getName());
         
         BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
         

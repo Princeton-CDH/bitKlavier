@@ -20,7 +20,8 @@
 //==============================================================================
 /*
 */
-class KeymapViewController : public BKViewController,
+class KeymapViewController :
+public BKViewController,
 public BKKeymapKeyboardStateListener,
 public BKEditableComboBoxListener
 {
@@ -43,22 +44,23 @@ public:
     int duplicateKeymap(void);
     void setCurrentId(int Id);
     void deleteCurrent(void);
+    
+    void keymapUpdated(TextEditor& tf);
+    
+    void bkTextFieldDidChange       (TextEditor&)           override;
 
 private:
     
     BKLabel     keymapSelectL;
     BKEditableComboBox  selectCB;
     
-    BKLabel     keymapNameL;
-    BKTextField keymapNameTF;
-    
     BKLabel     keymapL;
-    TextEditor  keymapTF;
-
+    BKTextEditor  keymapTF;
+    
     BKKeymapKeyboardState keyboardState;
     ScopedPointer<Component> keyboardComponent;
     BKKeymapKeyboardComponent* keyboard;
-    TextButton keyboardValsTextFieldOpen;
+    BKTextButton keyboardValsTextFieldOpen;
     
     void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override;
@@ -67,14 +69,11 @@ private:
     void textEditorFocusLost(TextEditor& textEditor) override;
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
     
-    void bkTextFieldDidChange       (TextEditor&)           override;
+    
     void bkMessageReceived          (const String& message) override;
     
     void bkComboBoxDidChange        (ComboBox* box)         override;
     void bkButtonClicked            (Button* b)             override;
-    
-    
-    void keymapUpdated(TextEditor& tf);
     
     bool focusLostByEscapeKey;
     

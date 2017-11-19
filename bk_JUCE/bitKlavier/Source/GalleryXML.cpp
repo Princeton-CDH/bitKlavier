@@ -16,6 +16,8 @@ ValueTree  Gallery::getState(void)
     
     galleryVT.setProperty("url", url, 0);
     
+    galleryVT.setProperty("name", name, 0);
+    
     galleryVT.setProperty("sampleType", sampleType, 0);
     
     ValueTree idCountVT( "idCount");
@@ -77,6 +79,13 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
         
         /* * * * * * * * * * * * * * */
         url = xml->getStringAttribute("url");
+        
+#if WINDOWS
+        name = url.fromLastOccurrenceOf("\\", false, true);
+#else
+        name = url.fromLastOccurrenceOf("/", false, true);
+#endif
+        
         setDefaultPiano(xml->getStringAttribute("defaultPiano").getIntValue());
         
         String st = xml->getStringAttribute("sampleType");

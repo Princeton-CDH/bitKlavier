@@ -35,13 +35,14 @@ public:
     
 private:
 
+
 };
 
 class DirectPreparationEditor :
 public DirectViewController,
 public BKEditableComboBoxListener,
-public BKSingleSliderListener,
-public BKStackedSliderListener
+public BKSingleSlider::Listener,
+public BKStackedSlider::Listener
 {
 public:
     
@@ -56,11 +57,13 @@ public:
     void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(String name, double val) override;
+    
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
     
     void fillSelectCB(int last, int current);
     
     static void actionButtonCallback(int action, DirectPreparationEditor*);
+
     
     int addPreparation(void);
     int duplicatePreparation(void);
@@ -76,8 +79,8 @@ private:
 class DirectModificationEditor :
 public DirectViewController,
 public BKEditableComboBoxListener,
-public BKSingleSliderListener,
-public BKStackedSliderListener
+public BKSingleSlider::Listener,
+public BKStackedSlider::Listener
 {
 public:
     

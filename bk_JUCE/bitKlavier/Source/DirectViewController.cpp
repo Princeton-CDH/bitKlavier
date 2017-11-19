@@ -26,6 +26,7 @@ BKViewController(p, theGraph)
     addAndMakeVisible(selectCB);
     
     transpositionSlider = new BKStackedSlider("transpositions", -12, 12, -12, 12, 0, 0.01);
+
     addAndMakeVisible(transpositionSlider);
     
     gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
@@ -43,14 +44,16 @@ BKViewController(p, theGraph)
     hammerGainSlider->setJustifyRight(false);
     addAndMakeVisible(hammerGainSlider);
     
-    addAndMakeVisible(hideOrShow);
-    hideOrShow.setName("hideOrShow");
-    hideOrShow.setButtonText(" X ");
+#if JUCE_IOS
+    transpositionSlider->addWantsKeyboardListener(this);
+    gainSlider->addWantsKeyboardListener(this);
+    resonanceGainSlider->addWantsKeyboardListener(this);
+    hammerGainSlider->addWantsKeyboardListener(this);
+#endif
     
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
-    
 }
 
 void DirectViewController::paint (Graphics& g)
@@ -61,6 +64,10 @@ void DirectViewController::paint (Graphics& g)
 void DirectViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
+    
+    
+    int widthUnit = getWidth() * 0.1;
+    int heightUnit = getWidth() * 0.1;
 
     iconImageComponent.setBounds(area);
     area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
@@ -72,12 +79,20 @@ void DirectViewController::resized()
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+
     comboBoxSlice.removeFromLeft(gXSpacing);
     
+#if JUCE_IOS
     actionButton.setBounds(selectCB.getRight()+gXSpacing,
                            selectCB.getY(),
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
+#else
+    actionButton.setBounds(selectCB.getRight()+gXSpacing,
+                           selectCB.getY(),
+                           selectCB.getWidth() * 0.5,
+                           selectCB.getHeight());
+#endif
     
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
@@ -119,7 +134,6 @@ void DirectViewController::resized()
     
 }
 
-
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ DirectPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~//
 DirectPreparationEditor::DirectPreparationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
 DirectViewController(p, theGraph)
@@ -136,8 +150,6 @@ DirectViewController(p, theGraph)
     resonanceGainSlider->addMyListener(this);
     
     hammerGainSlider->addMyListener(this);
-    
-    hideOrShow.addListener(this);
 }
 
 void DirectPreparationEditor::update(void)
@@ -161,7 +173,6 @@ void DirectPreparationEditor::bkMessageReceived (const String& message)
 {
     if (message == "direct/update")
     {
-        
         update();
     }
 }
@@ -260,7 +271,6 @@ void DirectPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableC
     fillSelectCB(0, processor.updateState->currentDirectId);
 }
 
-
 void DirectPreparationEditor::BKSingleSliderValueChanged(String name, double val)
 {
     DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
@@ -358,8 +368,6 @@ DirectViewController(p, theGraph)
     resonanceGainSlider->addMyListener(this);
     
     hammerGainSlider->addMyListener(this);
-    
-    hideOrShow.addListener(this);
 }
 
 void DirectModificationEditor::greyOutAllComponents()
@@ -562,6 +570,7 @@ void DirectModificationEditor::BKSingleSliderValueChanged(String name, double va
     updateModification();
 }
 
+
 void DirectModificationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {
     DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
@@ -588,5 +597,4 @@ void DirectModificationEditor::buttonClicked (Button* b)
         getModOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 }
-
 

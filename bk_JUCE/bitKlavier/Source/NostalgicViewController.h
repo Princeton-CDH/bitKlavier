@@ -31,6 +31,16 @@ public:
     
     ScopedPointer<BKStackedSlider> transpositionSlider;
     
+    /*
+    void numberPadChanged(BKNumberPad*) override;
+    void numberPadDismissed(BKNumberPad*) override;
+    
+    void bkSingleSliderWantsKeyboard(BKSingleSlider*) override;
+    void bkStackedSliderWantsKeyboard(BKStackedSlider*) override;
+    void bkWaveDistanceUndertowSliderWantsKeyboard(BKWaveDistanceUndertowSlider*)override;
+     
+     */
+    
     void paint (Graphics&) override;
     void resized() override;
     
@@ -47,10 +57,10 @@ private:
 
 class NostalgicPreparationEditor :
 public NostalgicViewController,
-public BKWaveDistanceUndertowSliderListener,
+public BKWaveDistanceUndertowSlider::Listener,
 public BKEditableComboBoxListener,
-public BKSingleSliderListener,
-public BKStackedSliderListener,
+public BKSingleSlider::Listener,
+public BKStackedSlider::Listener,
 //public SliderListener,
 public Timer
 {
@@ -90,10 +100,10 @@ private:
 
 class NostalgicModificationEditor :
 public NostalgicViewController,
-public BKWaveDistanceUndertowSliderListener,
+public BKWaveDistanceUndertowSlider::Listener,
 public BKEditableComboBoxListener,
-public BKSingleSliderListener,
-public BKStackedSliderListener,
+public BKSingleSlider::Listener,
+public BKStackedSlider::Listener,
 //public SliderListener,
 public Timer
 {

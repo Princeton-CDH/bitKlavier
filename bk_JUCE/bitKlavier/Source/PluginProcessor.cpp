@@ -21,8 +21,26 @@ resonanceReleaseSynth()
         
     float w_factor = ((float) screenWidth / (float) DEFAULT_WIDTH);
     float h_factor = ((float) screenHeight / (float) DEFAULT_HEIGHT);
+    
+    int heightUnit = ((screenHeight * 0.1f) > 48) ? 48 : (screenHeight * 0.1f);
+    
+#if JUCE_IOS
+    fontHeight = screenHeight * 0.03f;
+    fontHeight = (fontHeight < 15) ? 15 : fontHeight;
+    
+    gComponentComboBoxHeight = heightUnit;
+    gComponentLabelHeight = heightUnit * 0.75f;
+    gComponentTextFieldHeight = heightUnit * 0.75f;
+    
+    gComponentRangeSliderHeight = heightUnit * 1.25f;
+    gComponentSingleSliderHeight = heightUnit * 1.25f;
+    gComponentStackedSliderHeight = heightUnit * 1.25f;
 
+#endif
+    
     uiScaleFactor = (w_factor + h_factor) * 0.5f;
+    
+    uiScaleFactor *= 1.15f; // making up for smallness on little ios devices
     
     uiScaleFactor = (uiScaleFactor > 1.0f) ? 1.0f : uiScaleFactor;
     
@@ -37,9 +55,11 @@ resonanceReleaseSynth()
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
  
+
 #if JUCE_MAC || JUCE_WINDOWS
     platform = BKOSX;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+
 
 #endif
     
@@ -87,24 +107,13 @@ void BKAudioProcessor::createNewGallery(String name)
     File bkGalleries;
 
 #if JUCE_IOS
-    bkGalleries = bkGalleries.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
+    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory);
 #endif
     
 #if JUCE_MAC || JUCE_WINDOWS
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
-    /*
-    String newFileName = name + ".xml";
-    String newFilePath= bkGalleries.getFullPathName() + "/" + newFileName;
-    
-    File myFile (newFilePath);
-    myFile.appendData(BinaryData::__blank_xml, BinaryData::__blank_xmlSize);
-    
-    galleryNames.add(newFileName);
-    
-    currentGalleryPath = newFilePath;
-     */
     
     File myFile(bkGalleries);
     myFile = myFile.getNonexistentChildFile(name, ".xml", true);
@@ -113,13 +122,22 @@ void BKAudioProcessor::createNewGallery(String name)
     
     ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
     
+    
+    
     if (xml != nullptr)
     {
         currentGallery = myFile.getFileName();
         currentGalleryPath = myFile.getFullPathName();
+        
+        xml->setAttribute("url", currentGalleryPath);
+        xml->setAttribute("name", currentGallery);
+        
         DBG("new gallery = " + currentGalleryPath);
         
         gallery = new Gallery(xml, *this);
+        
+        gallery->setURL(currentGalleryPath);
+        gallery->setName(currentGallery);
         
         gallery->print();
         
@@ -509,6 +527,10 @@ void BKAudioProcessor::performModifications(int noteNumber)
 
 void BKAudioProcessor::saveGalleryAs(void)
 {
+#if JUCE_IOS
+    
+#else
+    
     FileChooser myChooser ("Save gallery to file...",
                            lastGalleryPath,
                            "*.xml");
@@ -519,12 +541,11 @@ void BKAudioProcessor::saveGalleryAs(void)
         currentGallery = myFile.getFileName();
         currentGalleryPath = myFile.getFullPathName();
         
-        String currentURL = gallery->getURL();
         String newURL = myFile.getFullPathName();
         
-        DBG("newURL: " + newURL);
+        //DBG("newURL: " + newURL);
         
-        if (currentURL != newURL)   gallery->setURL(newURL);
+        //if (currentURL != newURL)   gallery->setURL(newURL);
         
         ValueTree galleryVT = gallery->getState();
         
@@ -537,6 +558,8 @@ void BKAudioProcessor::saveGalleryAs(void)
         lastGalleryPath = myFile;
     }
     
+#endif
+    
     
     updateGalleries();
     
@@ -546,9 +569,28 @@ void BKAudioProcessor::saveGalleryAs(void)
 
 void BKAudioProcessor::saveGallery(void)
 {
+#if JUCE_IOS
+    String url = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + gallery->getName();
+    
+    DBG("url: " + url);
+    
+    File file (url);
+    
+    ValueTree galleryVT = gallery->getState();
+    
+    ScopedPointer<XmlElement> myXML = galleryVT.createXml();
+    
+    myXML->writeToFile(file, String::empty);
+    
+    gallery->setGalleryDirty(false);
+    
+#else
     String currentURL = gallery->getURL();
 
-    if (currentURL == String::empty)
+    File file (currentURL);
+    // NOT SURE ABOUT THIS FILE.EXISTSASFILE METHOD
+    
+    if (currentURL == String::empty || !file.existsAsFile())
     {
         saveGalleryAs();
         return;
@@ -565,6 +607,7 @@ void BKAudioProcessor::saveGallery(void)
         
         gallery->setGalleryDirty(false);
     }
+#endif
 }
 
 
@@ -577,8 +620,8 @@ void BKAudioProcessor::loadGalleryDialog(void)
         DBG("GALLERY IS DIRTY, CHECK FOR SAVE HERE");
         
         galleryIsDirtyAlertResult = AlertWindow::showYesNoCancelBox (AlertWindow::QuestionIcon,
-                                                                     "The current gallery has changed!",
-                                                                     "do you want to save it before loading a new gallery?",
+                                                                     "The current gallery has been modified.",
+                                                                     "Do you want to save before loading a new gallery?",
                                                                      String(),
                                                                      String(),
                                                                      String(),
@@ -732,7 +775,24 @@ void BKAudioProcessor::initializeGallery(void)
 {
     if (currentSampleType != gallery->sampleType)
     {
+        
+#if JUCE_IOS
+        String osname = SystemStats::getOperatingSystemName();
+        float iosVersion = osname.fromLastOccurrenceOf("iOS ", false, true).getFloatValue();
+#endif
+        
+#if !DEBUG
+
+#if JUCE_IOS
+        if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
+        else                    loadPianoSamples(BKLoadMedium);
+#else
         loadPianoSamples(gallery->sampleType);
+#endif
+        
+#else
+        loadPianoSamples(BKLoadLitest);
+#endif
     }
     
     prevPiano = gallery->getPianos().getFirst();

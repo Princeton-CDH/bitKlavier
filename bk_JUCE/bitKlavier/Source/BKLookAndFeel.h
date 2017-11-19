@@ -13,6 +13,8 @@
 
 #include "BKUtilities.h"
 
+
+
 class BKTextFieldLAF : public LookAndFeel_V3
 {
 public:
@@ -32,21 +34,31 @@ public:
     BKButtonAndMenuLAF() :
     comboBoxJustification (Justification::centredLeft)
     {
+        
         setColour(ComboBox::backgroundColourId, Colours::black);
-        setColour(ComboBox::textColourId, Colours::white);
+        setColour(ComboBox::textColourId, Colours::antiquewhite);
         setColour(ComboBox::buttonColourId, Colours::black);
+        setColour(ComboBox::outlineColourId, Colours::antiquewhite);
+        setColour(ComboBox::arrowColourId, Colours::antiquewhite);
+        
 
         setColour(PopupMenu::backgroundColourId, Colours::black);
-        setColour(PopupMenu::textColourId, Colours::white);
+        setColour(PopupMenu::textColourId, Colours::antiquewhite);
         
         setColour(TextButton::buttonColourId, Colours::black);
-        setColour(TextButton::textColourOffId, Colours::white);
-        setColour(TextButton::textColourOnId, Colours::white);
-        
+        setColour(TextButton::textColourOffId, Colours::antiquewhite);
+        setColour(TextButton::textColourOnId, Colours::antiquewhite);
         setColour(TextEditor::backgroundColourId, Colours::black);
-        setColour(TextEditor::textColourId, Colours::white);
+        setColour(TextEditor::textColourId, Colours::antiquewhite);
         
-        setColour(Label::textColourId, Colours::white);
+        setColour(Label::textColourId, Colours::antiquewhite);
+        
+        setColour(Slider::trackColourId, Colours::burlywood.withMultipliedBrightness(0.4));
+        setColour(Slider::thumbColourId, Colours::lightgrey);
+        setColour(Slider::backgroundColourId, Colours::black);
+        setColour(Slider::textBoxOutlineColourId, Colours::transparentWhite);
+        
+    
         
         toggleTextToRight = true;
         
@@ -54,6 +66,9 @@ public:
         //getCurrentColourScheme().setUIColour(juce::LookAndFeel_V4::ColourScheme::widgetBackground, Colours::yellow);
         
     }
+    
+    void drawButtonBackground (Graphics&, Button&, const Colour& backgroundColour,
+                               bool isMouseOverButton, bool isButtonDown) override;
     
     void positionComboBoxText (ComboBox& box, Label& label) override;
     void drawComboBox (Graphics& g, int width, int height, bool,
@@ -68,9 +83,21 @@ public:
     
     void setComboBoxJustificationType (Justification justification)    { comboBoxJustification = justification; }
     void setToggleBoxTextToRightBool (bool ttr)    { toggleTextToRight = ttr; }
+    void drawLinearSlider (Graphics& g, int x, int y, int width, int height,
+                                               float sliderPos,
+                                               float minSliderPos,
+                                               float maxSliderPos,
+                                                   const Slider::SliderStyle style, Slider& slider) override;
     
     void drawToggleButton (Graphics& g, ToggleButton& button,
                                                bool isMouseOverButton, bool isButtonDown) override;
+    
+    Font getComboBoxFont (ComboBox&) override;
+    Font getPopupMenuFont (void) override;
+    Font getTextButtonFont (TextButton&, int buttonHeight)  override;
+    Font getLabelFont (Label&) override;
+    int getDefaultMenuBarHeight() override;
+    
     
 private:
     Justification comboBoxJustification;

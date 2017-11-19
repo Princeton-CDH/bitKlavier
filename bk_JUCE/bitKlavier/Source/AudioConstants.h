@@ -702,6 +702,7 @@ static const std::vector<std::string> cKeymapParameterTypes = {
 
 typedef enum BKSampleLoadType
 {
+    BKLoadLitest,
     BKLoadLite,
     BKLoadMedium,
     BKLoadHeavy,
@@ -710,6 +711,7 @@ typedef enum BKSampleLoadType
 }BKSampleLoadType;
 
 static const std::vector<std::string> cBKSampleLoadTypes = {
+    "Load Very Light",
     "Load Light",
     "Load Medium",
     "Load Heavy"
@@ -757,6 +759,11 @@ static const int aVelocityThresh_Four[5] = {
 static const int aVelocityThresh_Two[3] = {
     0,
     76,
+    128
+};
+
+static const int aVelocityThresh_One[3] = {
+    0,
     128
 };
 

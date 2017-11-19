@@ -16,18 +16,7 @@
 #include "BKKeyboard.h"
 #include "BKKeyboardState.h"
 
-class BKKeyboardSliderListener
-{
-    
-public:
-    
-    //BKMultiSliderListener() {}
-    virtual ~BKKeyboardSliderListener() {};
-    
-    virtual void keyboardSliderChanged(String name, Array<float> values) = 0;
-
-};
-
+#include "BKSlider.h"
 
 class BKKeyboardSlider :
 public BKComponent,
@@ -48,9 +37,50 @@ public:
     void resized() override;
     void paint (Graphics&) override;
     
-    ListenerList<BKKeyboardSliderListener> listeners;
-    void addMyListener(BKKeyboardSliderListener* listener)     { listeners.add(listener); }
-    void removeMyListener(BKKeyboardSliderListener* listener)  { listeners.remove(listener); }
+    class Listener
+    {
+        
+    public:
+        virtual ~Listener() {};
+        
+        virtual void keyboardSliderChanged(String name, Array<float> values) = 0;
+        
+    };
+    
+    ListenerList<Listener> listeners;
+    void addMyListener(Listener* listener)     { listeners.add(listener); }
+    void removeMyListener(Listener* listener)  { listeners.remove(listener); }
+    
+    ListenerList<WantsKeyboardListener> inputListeners;
+    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
+    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
+    
+    inline void setText(String text)
+    {
+        keyboardValueTF.setText(text, false);
+    }
+    
+    inline TextEditor* getTextEditor(KSliderTextFieldType which)
+    {
+        if (which == KSliderAllValues) return keyboardValsTextField.get();
+        if (which == KSliderThisValue) return &keyboardValueTF;
+        
+        return nullptr;
+    }
+    
+    inline void dismissTextEditor(bool setValue = false)
+    {
+        if (setValue)
+        {
+            textEditorReturnKeyPressed(keyboardValueTF);
+            textEditorReturnKeyPressed(*((TextEditor*)keyboardValsTextField.get()));
+        }
+        else
+        {
+            textEditorEscapeKeyPressed(keyboardValueTF);
+            textEditorReturnKeyPressed(*((TextEditor*)keyboardValsTextField.get()));
+        }
+    }
     
     void setName(String newName) { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName() { return sliderName; }
@@ -70,16 +100,20 @@ public:
     void setValuesAbsolute(Array<float> newvals);
     void updateDisplay();
     
+    inline void setDimensionRatio(float r) { ratio = r; }
+    
 private:
     
     String sliderName;
     BKLabel showName;
+    
+    float ratio;
 
-    TextEditor keyboardValueTF;
+    BKTextEditor keyboardValueTF;
     BKKeymapKeyboardState keyboardState;
     ScopedPointer<Component> keyboardComponent;
     BKKeymapKeyboardComponent* keyboard;
-    ScopedPointer<TextEditor> keyboardValsTextField;
+    ScopedPointer<BKTextEditor> keyboardValsTextField;
     TextButton keyboardValsTextFieldOpen;
     
     int keyboardSize, minKey, maxKey;

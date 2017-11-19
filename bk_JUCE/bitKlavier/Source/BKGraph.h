@@ -20,13 +20,19 @@
 class BKAudioProcessor;
 
 
-class BKItem : public ItemMapper, public BKDraggableComponent, public BKListener
+class BKItem : public ItemMapper, public BKDraggableComponent, public BKListener, private Timer
 {
 public:
     typedef ReferenceCountedArray<BKItem, CriticalSection>      PtrArr;
     typedef ReferenceCountedObjectPtr<BKItem>                   Ptr;
     
     BKItem(BKPreparationType type, int Id, BKAudioProcessor& p);
+    
+    uint64 time;
+    inline void timerCallback(void)
+    {
+        time++;
+    };
     
     ~BKItem(void);
 
@@ -220,7 +226,7 @@ public:
     
     void copy(BKItem::Ptr);
     // Public members
-    Point<float> origin;
+    juce::Point<float> origin;
     
     Image image;
     RectanglePlacement placement;
@@ -230,9 +236,9 @@ public:
     void bkButtonClicked        (Button* b)             override {};
     void bkMessageReceived      (const String& message) override {};
     
-    Point<int> lastClick;
+    juce::Point<int> lastClick;
     
-    Point<int> position;
+    juce::Point<int> position;
     
     void setImage(Image newImage);
     
@@ -244,8 +250,9 @@ private:
     BKAudioProcessor& processor;
     Label label;
     
-
+    bool wasJustDragged;
     
+
     // Piano menu
     BKComboBox menu;
     

@@ -28,7 +28,7 @@ void BKAudioProcessor::updateUI(void)
 void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
 {
     // TO IMPLEMENT: Should turn off all notes in the processors/synths before loading new samples.
-    if(type >= 0)
+    if(type >= 0 && currentSampleType != type)
     {
         currentSampleType = type;
         
@@ -39,14 +39,15 @@ void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
         BKSampleLoader::loadMainPianoSamples(&mainPianoSynth, type);
         
         didLoadMainPianoSamples = true;
-        
-        if (!didLoadHammersAndRes)
+    
+        if (!didLoadHammersAndRes && type != BKLoadLitest)
         {
             didLoadHammersAndRes = true;
             BKSampleLoader::loadHammerReleaseSamples(&hammerReleaseSynth);
             BKSampleLoader::loadResonanceReleaseSamples(&resonanceReleaseSynth);
         }   
     }
+    
 }
 
 void BKAudioProcessor::collectGalleriesFromFolder(File folder)
@@ -81,7 +82,6 @@ void BKAudioProcessor::collectGalleries(void)
     collectGalleriesFromFolder(bkGalleries);
     
     File moreGalleries = File::getSpecialLocation (File::userDocumentsDirectory);
-    
     
     collectGalleriesFromFolder(moreGalleries);
     

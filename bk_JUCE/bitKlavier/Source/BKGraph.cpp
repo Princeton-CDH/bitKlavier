@@ -19,7 +19,8 @@
 BKItem::BKItem(BKPreparationType type, int Id, BKAudioProcessor& p):
 ItemMapper(type, Id),
 BKDraggableComponent(true,false,true, 50, 50, 50, 50),
-processor(p)
+processor(p),
+wasJustDragged(false)
 {
     fullChild.setAlwaysOnTop(true);
     addAndMakeVisible(fullChild);
@@ -86,6 +87,8 @@ processor(p)
         
         //addAndMakeVisible(menu);
     }
+    
+    startTimerHz(10);
 }
 
 BKItem::~BKItem()
@@ -159,7 +162,7 @@ void BKItem::setImage(Image newImage)
 #endif
     
     while (!(image.getWidth() < val || image.getHeight() < val))
-        image = image.rescaled(image.getWidth() * 0.8, image.getHeight() * 0.8);
+        image = image.rescaled(image.getWidth() * 0.9, image.getHeight() * 0.9);
     
     if (type != PreparationTypePianoMap)    setSize(image.getWidth(), image.getHeight());
     else                                    setSize(image.getWidth(), image.getHeight() + 25);
@@ -232,7 +235,7 @@ void BKItem::paint(Graphics& g)
     
     if (isSelected)
     {
-        g.setColour(Colours::white);
+        g.setColour(Colours::antiquewhite);
         g.drawRect(getLocalBounds(),2);
     }
     else
@@ -286,13 +289,14 @@ void BKItem::bkComboBoxDidChange    (ComboBox* cb)
 
 void BKItem::itemIsBeingDragged(const MouseEvent& e)
 {
-    //((BKConstructionSite*)getParentComponent())->itemIsBeingDragged(this, e);
+    wasJustDragged = true;
 }
 
 
 
 void BKItem::mouseDoubleClick(const MouseEvent& e)
 {
+#if !JUCE_IOS
     if (type == PreparationTypePianoMap)
     {
         menu.showPopup();
@@ -301,11 +305,43 @@ void BKItem::mouseDoubleClick(const MouseEvent& e)
     {
         processor.updateState->setCurrentDisplay(type, Id);
     }
+#endif
 }
+
+
+#define RESET 0
+#define PHATNESS 10
 
 void BKItem::mouseDown(const MouseEvent& e)
 {
-    ((BKConstructionSite*)getParentComponent())->setCurrentItem(this);
+    BKConstructionSite* cs = ((BKConstructionSite*)getParentComponent());
+    BKItem* current = cs->getCurrentItem();
+
+    if ((current == this) && !wasJustDragged)
+    {
+        if (time < PHATNESS)
+        {
+            if (type == PreparationTypePianoMap)
+            {
+                menu.showPopup();
+            }
+            else
+            {
+                processor.updateState->setCurrentDisplay(type, Id);
+            }
+        }
+        else
+        {
+            time = RESET;
+        }
+    }
+    else
+    {
+        wasJustDragged = false;
+        time = RESET;
+    }
+    
+    cs->setCurrentItem(this);
     
     if (isDraggable)
     {

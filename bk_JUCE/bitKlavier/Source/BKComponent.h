@@ -221,7 +221,7 @@ private:
         BKPreparationType type = (BKPreparationType)data[0];
         data.remove(0);
         
-        Point<int> where = dragSourceDetails.localPosition;
+        juce::Point<int> where = dragSourceDetails.localPosition;
         
         if (isDroppable)
         {
@@ -236,8 +236,8 @@ private:
     ComponentBoundsConstrainer constrainer;
     ComponentDragger dragger;
     
-    Point<int> startPosition;
-    Point<int> vector;
+    juce::Point<int> startPosition;
+    juce::Point<int> vector;
 
     
     JUCE_LEAK_DETECTOR (BKDraggableComponent)

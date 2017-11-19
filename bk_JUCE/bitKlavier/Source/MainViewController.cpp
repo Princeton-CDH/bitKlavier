@@ -39,11 +39,9 @@ timerCallbackCount(0)
     addAndMakeVisible(levelMeterComponentL);
     
     mainSlider = new Slider();
-    addAndMakeVisible (mainSlider);
+    mainSlider->setLookAndFeel(&laf);
+    
     mainSlider->setRange (-90, 12.0, 0.1);
-    mainSlider->getLookAndFeel().setColour(Slider::thumbColourId, Colours::goldenrod);
-    mainSlider->getLookAndFeel().setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.25));
-    mainSlider->getLookAndFeel().setColour(Slider::backgroundColourId, Colours::goldenrod.withMultipliedAlpha(0.1));
     mainSlider->setSkewFactor (2.5, false);
     mainSlider->setPopupMenuEnabled (true);
     mainSlider->setValue (0);
@@ -53,19 +51,20 @@ timerCallbackCount(0)
     mainSlider->setDoubleClickReturnValue (true, 0.0); // double-clicking this slider will set it to 50.0
     mainSlider->setTextValueSuffix (" dB");
     mainSlider->addListener(this);
+
+    
+    addAndMakeVisible (mainSlider);
     
 
     addAndMakeVisible (keyboardComponent =
                        new BKKeymapKeyboardComponent (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard));
     
-    if (processor.platform == BKIOS)
-    {
-        keyStart = 48;  keyEnd = 72;
-    }
-    else
-    {
-        keyStart = 21;  keyEnd = 108;
-    }
+#if JUCE_IOS
+    keyStart = 48;  keyEnd = 72;
+#else
+    keyStart = 21;  keyEnd = 108;
+#endif
+
     
     keyboard =  ((BKKeymapKeyboardComponent*) keyboardComponent);
     keyboard->setScrollButtonsVisible(false);
@@ -79,6 +78,7 @@ timerCallbackCount(0)
     
     octaveSlider.setRange(0, 6, 1);
     octaveSlider.addListener(this);
+    octaveSlider.setLookAndFeel(&laf);
     octaveSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
     octaveSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
     octaveSlider.setValue(3);
@@ -93,7 +93,7 @@ timerCallbackCount(0)
     addChildComponent(overtop);
 
     
-    Point<int> myshadowOffset(2, 2);
+    juce::Point<int> myshadowOffset(2, 2);
     DropShadow myshadow(Colours::darkgrey, 5, myshadowOffset);
     overtopShadow = new DropShadower(myshadow);
     overtopShadow->setOwner(&overtop);
@@ -111,11 +111,19 @@ void MainViewController::paint (Graphics& g)
 {
     g.fillAll(Colours::black);
     
-    g.setColour(Colours::white);
+    g.setColour(Colours::antiquewhite);
     
-    Rectangle<int> bounds = construction.getBounds().translated(-1, -1);
-    bounds.expand(2,2);
-    g.drawRect(bounds, 1);
+    Rectangle<float> bounds = construction.getBounds().toFloat();
+    bounds.expand(2.0f,2.0f);
+    g.drawRoundedRectangle(bounds, 2.0f, 0.5f);
+    
+    bounds = mainSlider->getBounds().toFloat();
+    g.drawRoundedRectangle(bounds, 2.0, 0.5f);
+    
+    bounds = levelMeterComponentL->getBounds().toFloat();
+    bounds.expand(1, 1);
+    bounds.translate(0, -5);
+    g.drawRoundedRectangle(bounds, 2.0, 0.5f);
 }
 
 void MainViewController::setDisplay(DisplayType type)
@@ -128,18 +136,39 @@ void MainViewController::setDisplay(DisplayType type)
 
 void MainViewController::resized()
 {
-   
-    int headerHeight = (processor.platform == BKIOS) ? 40 : 30;
-    int sidebarWidth = (processor.platform == BKIOS) ? 30 : 20;
-    int footerHeight = 40;
+    int headerHeight,sidebarWidth,footerHeight;
+    
+#if JUCE_IOS
+    headerHeight = processor.screenHeight * 0.125;
+    headerHeight = (headerHeight > 90) ? 90 : headerHeight;
+    
+    sidebarWidth = processor.screenWidth * 0.075;
+    sidebarWidth = (sidebarWidth > 75) ? 75 : sidebarWidth;
+#else
+    headerHeight = 40;
+    sidebarWidth = 30;
+#endif
+    footerHeight = 50;
+    
     
     Rectangle<int> area (getLocalBounds());
     header.setBounds(area.removeFromTop(headerHeight));
     
-    Rectangle<int> overtopSlice = area;
-    overtopSlice.removeFromTop(60 * processor.paddingScalarY);
-    overtopSlice.removeFromBottom(120 * processor.paddingScalarY);
-    overtopSlice.reduce(70 * processor.paddingScalarX, 0);
+    Rectangle<int> overtopSlice;
+    
+    if (processor.screenWidth > 640 || processor.screenHeight > 480)
+    {
+        //overtopSlice = area;
+        //overtopSlice.removeFromTop(60 * processor.paddingScalarY);
+        //overtopSlice.removeFromBottom(60 * processor.paddingScalarY);
+        //overtopSlice.reduce(70 * processor.paddingScalarX, 0);
+        overtopSlice = construction.getBounds();
+    }
+    else
+    {
+        overtopSlice = getLocalBounds();
+    }
+    
     overtop.setBounds(overtopSlice);
     
     if (display == DisplayDefault)
@@ -153,22 +182,30 @@ void MainViewController::resized()
         keyboardComponent->setVisible(true);
     }
     
-    Rectangle<int> levelMeterSlice = area.removeFromLeft(sidebarWidth + gXSpacing);
-    levelMeterSlice.removeFromLeft(gXSpacing);
-    levelMeterSlice.removeFromTop(2 * gYSpacing * processor.paddingScalarY);
-    levelMeterComponentL->setBounds(levelMeterSlice);
     
-    Rectangle<int> gainSliderSlice = area.removeFromRight(sidebarWidth + gXSpacing);
-    gainSliderSlice.removeFromRight(gXSpacing);
-    //gainSliderSlice.reduce(0, 1);
-    mainSlider->setBounds(gainSliderSlice);
     
-    area.reduce(gXSpacing, 3);
+    Rectangle<int> gainSliderSlice = area.removeFromRight(sidebarWidth+gXSpacing);
+    
+    gainSliderSlice.removeFromLeft(gXSpacing);
+    mainSlider->setBounds(gainSliderSlice.getX(), gainSliderSlice.getY(),
+                          header.getRight() - gainSliderSlice.getX() - gXSpacing,
+                          area.getHeight());
+    
+    Rectangle<int> levelMeterSlice = area.removeFromLeft(sidebarWidth+gXSpacing);
+    levelMeterSlice.removeFromRight(gXSpacing);
+    levelMeterSlice.reduce(1, 1);
+    levelMeterComponentL->setBounds(header.getX()+gXSpacing, levelMeterSlice.getY()+5,
+                          mainSlider->getWidth(),
+                          levelMeterSlice.getHeight());
+    
+    area.reduce(2, 2);
     construction.setBounds(area);
+    
+    
 
     if (display == DisplayKeyboard)
     {
-        int octaveSliderHeight = 40;
+        int octaveSliderHeight = 30;
         octaveSlider.setTopLeftPosition(area.getX(), area.getY());
         octaveSlider.setSize(area.getWidth(), octaveSliderHeight);
         
@@ -177,7 +214,7 @@ void MainViewController::resized()
         float keyWidth = area.getWidth() / round((keyEnd - keyStart) * 7./12 + 1); //num white keys
         keyboard->setKeyWidth(keyWidth);
         keyboard->setBlackNoteLengthProportion(0.65);
-        keyboardComponent->setBounds(area);
+        keyboardComponent->setBounds(area.removeFromTop(octaveSliderHeight + gYSpacing));
         
         octaveSlider.setVisible(true);
         keyboardComponent->setVisible(true);

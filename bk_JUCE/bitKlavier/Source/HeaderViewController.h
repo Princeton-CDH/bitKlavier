@@ -20,6 +20,10 @@
 
 #include "BKConstructionSite.h"
 
+#include "BKSlider.h"
+
+#include "ShareBot.h"
+
 class HeaderViewController : public BKComponent, public BKListener, public BKEditableComboBoxListener
 {
 public:
@@ -45,6 +49,8 @@ private:
 
     Gallery::Ptr currentGallery;
     
+    ShareBot bot;
+    
     
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override{};
@@ -66,9 +72,9 @@ private:
     //OwnedArray<PopupMenu> submenus;
     //StringArray submenuNames;
     
-    TextButton  editB;
-    TextButton  pianoB;
-    TextButton  galleryB;
+    BKTextButton  editB;
+    BKTextButton  pianoB;
+    BKTextButton  galleryB;
     
     BKEditableComboBox galleryCB;
     BKEditableComboBox pianoCB;

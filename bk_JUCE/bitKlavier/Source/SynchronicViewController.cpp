@@ -100,13 +100,17 @@ BKViewController(p, theGraph)
     releaseVelocitySetsSynchronicToggle.setToggleState (false, dontSendNotification);
     //addAndMakeVisible(releaseVelocitySetsSynchronicToggle); //possibly for future version, but it seems even keyboards that do noteOff velocity suck at it.
     
-    addAndMakeVisible(hideOrShow);
-    hideOrShow.setName("hideOrShow");
-    hideOrShow.setButtonText(" X ");
-    
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
+    
+#if JUCE_IOS
+    for (auto mslider : paramSliders) mslider->addWantsKeyboardListener(this);
+    howManySlider->addWantsKeyboardListener(this);
+    clusterThreshSlider->addWantsKeyboardListener(this);
+    clusterMinMaxSlider->addWantsKeyboardListener(this);
+    gainSlider->addWantsKeyboardListener(this);
+#endif
 }
 
 void SynchronicViewController::paint (Graphics& g)
@@ -221,7 +225,6 @@ SynchronicViewController(p, theGraph)
     howManySlider->addMyListener(this);
     clusterThreshSlider->addMyListener(this);
     clusterMinMaxSlider->addMyListener(this);
-    hideOrShow.addListener(this);
 
     gainSlider->addMyListener(this);
     
@@ -662,7 +665,6 @@ SynchronicViewController(p, theGraph)
     howManySlider->addMyListener(this);
     clusterThreshSlider->addMyListener(this);
     clusterMinMaxSlider->addMyListener(this);
-    hideOrShow.addListener(this);
     gainSlider->addMyListener(this);
     for(int i = 0; i < paramSliders.size(); i++)
     {

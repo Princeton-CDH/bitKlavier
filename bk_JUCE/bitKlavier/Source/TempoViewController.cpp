@@ -48,10 +48,10 @@ BKViewController(p, theGraph)
     AT1MinMaxSlider->setIsMinAlwaysLessThanMax(true);
     addAndMakeVisible(AT1MinMaxSlider);
     
-    A1ModeCB.setName("Adaptive Mode");
+    A1ModeCB.setName("Mode");
     addAndMakeVisible(A1ModeCB);
     fillA1ModeCB();
-    A1ModeLabel.setText("Adaptive Mode", dontSendNotification);
+    A1ModeLabel.setText("Mode", dontSendNotification);
     addAndMakeVisible(A1ModeLabel);
     
     addAndMakeVisible(A1AdaptedTempo);
@@ -61,15 +61,18 @@ BKViewController(p, theGraph)
     A1reset.setButtonText("reset");
     //addAndMakeVisible(A1reset);
     
-    addAndMakeVisible(hideOrShow);
-    hideOrShow.setName("hideOrShow");
-    hideOrShow.setButtonText(" X ");
-    
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
 
     updateComponentVisibility();
+    
+#if JUCE_IOS
+    AT1MinMaxSlider->addWantsKeyboardListener(this);
+    AT1HistorySlider->addWantsKeyboardListener(this);
+    AT1SubdivisionsSlider->addWantsKeyboardListener(this);
+    tempoSlider->addWantsKeyboardListener(this);
+#endif
 }
 
 
@@ -88,11 +91,11 @@ void TempoViewController::resized()
     comboBoxSlice.removeFromLeft(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
-    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() * 0.75));
     
     actionButton.setBounds(selectCB.getRight()+gXSpacing,
                            selectCB.getY(),
-                           selectCB.getWidth() * 0.5,
+                           selectCB.getWidth() * 0.75,
                            selectCB.getHeight());
     
     comboBoxSlice.removeFromLeft(gXSpacing);
@@ -236,7 +239,7 @@ TempoViewController(p, theGraph)
     AT1HistorySlider->addMyListener(this);
     AT1SubdivisionsSlider->addMyListener(this);
     AT1MinMaxSlider->addMyListener(this);
-    hideOrShow.addListener(this);
+    
     
     startTimer(50);
     
@@ -255,8 +258,8 @@ void TempoPreparationEditor::timerCallback()
             {
                 lastPeriodMultiplier = mProcessor->getPeriodMultiplier();
                 
-                A1AdaptedTempo.setText("Adapted Tempo = " + String(mProcessor->getAdaptedTempo()), dontSendNotification);
-                A1AdaptedPeriodMultiplier.setText("Adapted Period Multiplier = " + String(mProcessor->getPeriodMultiplier()), dontSendNotification);
+                A1AdaptedTempo.setText("Tempo = " + String(mProcessor->getAdaptedTempo()), dontSendNotification);
+                A1AdaptedPeriodMultiplier.setText("Period Multiplier = " + String(mProcessor->getPeriodMultiplier()), dontSendNotification);
             }
         }
         
@@ -503,7 +506,6 @@ TempoViewController(p, theGraph)
     AT1SubdivisionsSlider->addMyListener(this);
     AT1MinMaxSlider->addMyListener(this);
     A1ModeCB.addListener(this);
-    hideOrShow.addListener(this);
 
     update();
 }

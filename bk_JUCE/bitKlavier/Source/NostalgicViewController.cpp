@@ -49,15 +49,20 @@ BKViewController(p, theGraph)
     gainSlider->setSkewFactorFromMidPoint(1.);
     addAndMakeVisible(gainSlider);
     
-    addAndMakeVisible(hideOrShow);
-    hideOrShow.setName("hideOrShow");
-    hideOrShow.setButtonText(" X ");
-    
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
     
     addAndMakeVisible(nDisplaySlider);
+    
+#if JUCE_IOS
+    transpositionSlider->addWantsKeyboardListener(this);
+    gainSlider->addWantsKeyboardListener(this);
+    beatsToSkipSlider->addWantsKeyboardListener(this);
+    lengthMultiplierSlider->addWantsKeyboardListener(this);
+    gainSlider->addWantsKeyboardListener(this);
+    nDisplaySlider.addWantsKeyboardListener(this);
+#endif
 }
 
 void NostalgicViewController::paint (Graphics& g)
@@ -161,7 +166,6 @@ NostalgicViewController(p, theGraph)
     beatsToSkipSlider->addMyListener(this);
     
     gainSlider->addMyListener(this);
-    hideOrShow.addListener(this);
     
     startTimer(20);
 }
@@ -446,7 +450,6 @@ NostalgicViewController(p, theGraph)
     transpositionSlider->addMyListener(this);
     lengthMultiplierSlider->addMyListener(this);
     beatsToSkipSlider->addMyListener(this);
-    hideOrShow.addListener(this);
     
     gainSlider->addMyListener(this);
     

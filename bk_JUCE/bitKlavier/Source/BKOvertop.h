@@ -138,76 +138,87 @@ public:
         removeChildComponent(&svcm);
         removeChildComponent(&nvcm);
         
-        
         if (type == DisplayKeymap)
         {
             addAndMakeVisible(&kvc);
             kvc.fillSelectCB(-1,-1);
+            kvc.setDisplayNumPad(false);
             kvc.update();
         }
         else if (type == DisplayGeneral)
         {
             addAndMakeVisible(&gvc);
+            gvc.setDisplayNumPad(false);
             gvc.update();
         }
         else if (type == DisplayTuning)
         {
             addAndMakeVisible(&tvc);
             tvc.fillSelectCB(-1,-1);
+            tvc.setDisplayNumPad(false);
             tvc.update();
         }
         else if (type == DisplayTempo)
         {
             addAndMakeVisible(&ovc);
             ovc.fillSelectCB(-1,-1);
+            ovc.setDisplayNumPad(false);
             ovc.update();
         }
         else if (type == DisplaySynchronic)
         {
             addAndMakeVisible(&svc);
             svc.fillSelectCB(-1,-1);
+            svc.setDisplayNumPad(false);
             svc.update();
         }
         else if (type == DisplayNostalgic)
         {
             addAndMakeVisible(&nvc);
             nvc.fillSelectCB(-1,-1);
+            nvc.setDisplayNumPad(false);
             nvc.update();
         }
         else if (type == DisplayDirect)
         {
             addAndMakeVisible(&dvc);
             dvc.fillSelectCB(-1,-1);
+            dvc.setDisplayNumPad(false);
             dvc.update();
         }
         else if (type == DisplayTuningMod)
         {
             addAndMakeVisible(&tvcm);
             tvcm.fillSelectCB(-1,-1);
+            tvcm.setDisplayNumPad(false);
             tvcm.update();
         }
         else if (type == DisplayTempoMod)
         {
             addAndMakeVisible(&ovcm);
             ovcm.fillSelectCB(-1,-1);
+            ovcm.setDisplayNumPad(false);
             ovcm.update();
         }
         else if (type == DisplaySynchronicMod)
         {
             addAndMakeVisible(&svcm);
             svcm.fillSelectCB(-1,-1);
+            svcm.setDisplayNumPad(false);
             svcm.update();
         }
         else if (type == DisplayNostalgicMod)
         {
             addAndMakeVisible(&nvcm);
             nvcm.fillSelectCB(-1,-1);
+            nvcm.setDisplayNumPad(false);
             nvcm.update();
         }
         else if (type == DisplayDirectMod)
         {
             addAndMakeVisible(&dvcm);
             dvcm.fillSelectCB(-1,-1);
+            dvcm.setDisplayNumPad(false);
             dvcm.update();
         }
         

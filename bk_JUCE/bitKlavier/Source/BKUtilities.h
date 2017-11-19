@@ -46,9 +46,14 @@
 #define CUT_ID 25
 #define EDIT_ID 26
 
+#define SHARE_EMAIL_ID 42
+#define SHARE_FACEBOOK_ID 43
+#define SHARE_MESSAGE_ID 44
+
 #define LOAD_LITE 38
 #define LOAD_MEDIUM 39
 #define LOAD_HEAVY 40
+#define LOAD_LITEST 41
 
 #define KEYMAP_EDIT_ID 27
 #define DIRECT_EDIT_ID 28
@@ -119,29 +124,34 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
     if (onGraph)
     {
         menu.addItem(PASTE_ID, "Paste");
+        menu.addSeparator();
     }
     else
     {
         menu.addItem(UNDO_ID, "Undo");
+        menu.addSeparator();
         menu.addItem(REDO_ID, "Redo");
+        menu.addSeparator();
     }
     
     if (numItemsSelected)
     {
-        menu.addSeparator();
         menu.addItem(COPY_ID, "Copy");
+        menu.addSeparator();
         menu.addItem(CUT_ID, "Cut");
+        menu.addSeparator();
         menu.addItem(DELETE_ID, "Delete");
+        menu.addSeparator();
     }
     
     if (numItemsSelected > 1)
     {
-        menu.addSeparator();
         menu.addSubMenu("Align", getAlignMenu(laf));
+        menu.addSeparator();
     }
     
-    menu.addSeparator();
     menu.addSubMenu("Edit...", getEditItemMenu(laf));
+    menu.addSeparator();
     
     if (numItemsSelected == 0)
     {

@@ -8,15 +8,17 @@
   ==============================================================================
 */
 
+
+
 #include "HeaderViewController.h"
+
 
 HeaderViewController::HeaderViewController (BKAudioProcessor& p, BKConstructionSite* c):
 processor (p),
 construction(c)
 {
-    
     setLookAndFeel(&buttonsAndMenusLAF);
-    
+
     addAndMakeVisible(galleryB);
     galleryB.setButtonText("Gallery");
     galleryB.addListener(this);
@@ -44,6 +46,11 @@ construction(c)
     pianoCB.setName("pianoCB");
     pianoCB.addListener(this);
     pianoCB.addMyListener(this);
+    
+#if JUCE_IOS || JUCE_MAC
+    addChildComponent(bot);
+#endif
+    
     //pianoCB.BKSetJustificationType(juce::Justification::centredRight);
     
     pianoCB.setSelectedId(0, dontSendNotification);
@@ -65,7 +72,7 @@ void HeaderViewController::paint (Graphics& g)
 
 void HeaderViewController::resized()
 {
-    float width = getWidth() / 7 - gXSpacing;
+    float width = getWidth() / 7;
     
     Rectangle<int> area (getLocalBounds());
     area.reduce(0, gYSpacing);
@@ -92,6 +99,7 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     PopupMenu loadMenu;
     loadMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
+    loadMenu.addItem(LOAD_LITEST, "Lightest");
     loadMenu.addItem(LOAD_LITE, "Light");
     loadMenu.addItem(LOAD_MEDIUM, "Medium");
     loadMenu.addItem(LOAD_HEAVY, "Heavy");
@@ -105,13 +113,15 @@ PopupMenu HeaderViewController::getPianoMenu(void)
     pianoMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
     pianoMenu.addItem(1, "New");
+    pianoMenu.addSeparator();
     pianoMenu.addItem(2, "Duplicate");
+    pianoMenu.addSeparator();
+    pianoMenu.addItem(4, "Rename");
+    pianoMenu.addSeparator();
     pianoMenu.addItem(3, "Remove");
     
     return pianoMenu;
 }
-
-
 
 PopupMenu HeaderViewController::getGalleryMenu(void)
 {
@@ -122,9 +132,11 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     galleryMenu.addItem(NEWGALLERY_ID, "New...");
     galleryMenu.addSeparator();
+#if !JUCE_IOS
     galleryMenu.addItem(OPEN_ID, "Open...");
     galleryMenu.addItem(OPENOLD_ID, "Open (legacy)...");
     galleryMenu.addSeparator();
+#endif
     
     String saveKeystroke = "(Cmd-S)";
     String saveAsKeystroke = "(Shift-Cmd-S)";
@@ -134,8 +146,23 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
 	saveAsKeystroke = "(Shift-Ctrl-S)";
 #endif
     
+
     galleryMenu.addItem(SAVE_ID, "Save " );
+#if !JUCE_IOS
     galleryMenu.addItem(SAVEAS_ID, "Save as... ");
+#endif
+    galleryMenu.addSeparator();
+    
+    PopupMenu shareMenu;
+    
+    shareMenu.addItem(SHARE_EMAIL_ID, "Email");
+    galleryMenu.addSeparator();
+    shareMenu.addItem(SHARE_MESSAGE_ID, "Messages");
+    galleryMenu.addSeparator();
+    shareMenu.addItem(SHARE_FACEBOOK_ID, "Facebook");
+    
+    galleryMenu.addSubMenu("Share...", shareMenu);
+    
     galleryMenu.addSeparator();
     galleryMenu.addItem(CLEAN_ID, "Clean");
     galleryMenu.addSeparator();
@@ -197,87 +224,29 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
         
         processor.setCurrentPiano(newPianoId);
     }
-    else if (result == KEYMAP_ID)
+    else if (result == 3) // Remove piano
     {
-        construction->addItem(PreparationTypeKeymap, true);
+        
+        int pianoId = hvc->pianoCB.getSelectedId();
+        int index = hvc->pianoCB.getSelectedItemIndex();
+        
+        if ((index == 0) && (hvc->pianoCB.getNumItems() == 1)) return;
+        
+        processor.gallery->remove(PreparationTypePiano, pianoId);
+        
+        hvc->fillPianoCB();
+        
+        int newPianoId = hvc->pianoCB.getItemId(index);
+        
+        if (newPianoId == 0) newPianoId = hvc->pianoCB.getItemId(index-1);
+        
+        hvc->pianoCB.setSelectedId(newPianoId, dontSendNotification);
+        
+        processor.setCurrentPiano(newPianoId);
     }
-    else if (result == DIRECT_ID)
+    else if (result == 4) // Rename
     {
-        construction->addItem(PreparationTypeDirect, true);
-    }
-    else if (result == NOSTALGIC_ID)
-    {
-        construction->addItem(PreparationTypeNostalgic, true);
-    }
-    else if (result == SYNCHRONIC_ID)
-    {
-        construction->addItem(PreparationTypeSynchronic, true);
-    }
-    else if (result == TUNING_ID)
-    {
-        construction->addItem(PreparationTypeTuning, true);
-    }
-    else if (result == TEMPO_ID)
-    {
-        construction->addItem(PreparationTypeTempo, true);
-    }
-    else if (result == MODIFICATION_ID)
-    {
-        construction->addItem(PreparationTypeGenericMod, true);
-    }
-    else if (result == PIANOMAP_ID)
-    {
-        construction->addItem(PreparationTypePianoMap, true);
-    }
-    else if (result == RESET_ID)
-    {
-        construction->addItem(PreparationTypeReset, true);
-    }
-    
-    // EDIT
-    else if (result == KEYMAP_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeKeymap);
-    }
-    else if (result == DIRECT_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeDirect);
-    }
-    else if (result == NOSTALGIC_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeNostalgic);
-    }
-    else if (result == SYNCHRONIC_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeSynchronic);
-    }
-    else if (result == TUNING_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeTuning);
-    }
-    else if (result == TEMPO_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeTempo);
-    }
-    else if (result == DIRECTMOD_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeDirectMod);
-    }
-    else if (result == NOSTALGICMOD_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeNostalgicMod);
-    }
-    else if (result == SYNCHRONICMOD_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeSynchronicMod);
-    }
-    else if (result == TUNINGMOD_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeTuningMod);
-    }
-    else if (result == TEMPOMOD_EDIT_ID)
-    {
-        processor.updateState->setCurrentDisplay(PreparationTypeTempoMod);
+
     }
     
 }
@@ -286,7 +255,24 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
 {
     BKAudioProcessor& processor = gvc->processor;
     
-    if (result == LOAD_LITE)
+    if (result == SHARE_EMAIL_ID)
+    {
+        gvc->bot.share(processor.getCurrentGalleryPath(), 0);
+    }
+    else if (result == SHARE_MESSAGE_ID)
+    {
+        gvc->bot.share(processor.getCurrentGalleryPath(), 1);
+    }
+    else if (result == SHARE_FACEBOOK_ID)
+    {
+        gvc->bot.share(processor.getCurrentGalleryPath(), 2);
+    }
+    else if (result == LOAD_LITEST)
+    {
+        processor.gallery->sampleType = BKLoadLitest;
+        processor.loadPianoSamples(BKLoadLitest);
+    }
+    else if (result == LOAD_LITE)
     {
         processor.gallery->sampleType = BKLoadLite;
         processor.loadPianoSamples(BKLoadLite);
@@ -425,7 +411,8 @@ void HeaderViewController::fillGalleryCB(void)
             
             //add toplevel item, if there is one
             if(thisFile.getParentDirectory().getFileName() == bkGalleries.getFileName() ||
-               thisFile.getParentDirectory().getFileName() == moreGalleries.getFileName()) //if the file is in the main galleries directory....
+               thisFile.getParentDirectory().getFileName() == moreGalleries.getFileName() ||
+               thisFile.getParentDirectory().getFileName() == moreGalleries.getChildFile("Inbox").getFileName()) //if the file is in the main galleries directory....
             {
                 galleryCB.addItem(galleryName, i+1); //add to toplevel popup
             }
