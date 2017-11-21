@@ -21,7 +21,8 @@
 class BKKeyboardSlider :
 public BKComponent,
 public BKListener,
-public BKKeymapKeyboardStateListener
+public BKKeymapKeyboardStateListener,
+private juce::Slider::Listener
 {
     
 public:
@@ -109,6 +110,7 @@ private:
     
 #if JUCE_IOS
     Slider octaveSlider;
+    void sliderValueChanged     (Slider* slider)                override;
 #endif
     
     float ratio;
@@ -146,6 +148,8 @@ private:
     void mouseDown(const MouseEvent& e) override;
     
     bool focusLostByEscapeKey;
+    
+    BKButtonAndMenuLAF laf;
 
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKKeyboardSlider)

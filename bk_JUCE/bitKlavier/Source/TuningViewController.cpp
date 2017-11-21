@@ -133,7 +133,7 @@ void TuningViewController::resized()
     iconImageComponent.setBounds(area);
     area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
     
-    float keyboardHeight = 100 + 50 * processor.paddingScalarY;
+    float keyboardHeight = 120 + 50 * processor.paddingScalarY;
     Rectangle<int> absoluteKeymapRow = area.removeFromBottom(keyboardHeight);
     absoluteKeymapRow.reduce(gXSpacing, 0);
     

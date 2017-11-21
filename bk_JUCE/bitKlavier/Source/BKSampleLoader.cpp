@@ -19,15 +19,11 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
 {
     WavAudioFormat wavFormat;
     
-    String path = "~/bkSamples/";
-    
     File bkSamples;
     
 #if JUCE_IOS
     bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("samples");
-#endif 
-    
-#if JUCE_MAC || JUCE_WINDOWS
+#else
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
 #endif
     
@@ -170,15 +166,11 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
 {
     WavAudioFormat wavFormat;
     
-    String path = "~/bkSamples/";
-    
     File bkSamples;
     
 #if JUCE_IOS
     bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("samples");
-#endif
-    
-#if JUCE_MAC || JUCE_WINDOWS
+#else
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
 #endif
     
@@ -196,7 +188,6 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
             
             for (int k = 0; k < 3; k++) //k => velocity layer
             {
-                //String temp = path;
                 String temp;
                 temp += "harm";
                 if(k==0) temp += "V3";
@@ -283,15 +274,11 @@ void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
 {
     WavAudioFormat wavFormat;
     
-    String path = "~/bkSamples/";
-    
     File bkSamples;
     
 #if JUCE_IOS
     bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("samples");
-#endif
-    
-#if JUCE_MAC || JUCE_WINDOWS
+#else
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
 #endif
     
@@ -303,7 +290,7 @@ void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
     //load hammer release samples
     for (int i = 1; i <= 88; i++) {
         
-        String temp = path;
+        String temp;
         temp += "rel";
         temp += String(i);
         temp += ".wav";

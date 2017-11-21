@@ -21,8 +21,17 @@ ratio(1.0)
     
     // need slider or other interface for octave change
 #if JUCE_IOS
-    minKey = 36; // 21
+    minKey = 48; // 21
     maxKey = 72; // 108
+    
+    octaveSlider.setRange(0, 6, 1);
+    octaveSlider.addListener(this);
+    octaveSlider.setLookAndFeel(&laf);
+    octaveSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
+    octaveSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+    octaveSlider.setValue(3);
+    
+    addAndMakeVisible(octaveSlider);
 #else
     minKey = 21; // 21
     maxKey = 108; // 108
@@ -68,6 +77,19 @@ ratio(1.0)
 
 }
 
+#if JUCE_IOS
+void BKKeyboardSlider::sliderValueChanged     (Slider* slider)
+{
+    if (slider == &octaveSlider)
+    {
+        int octave = (int) octaveSlider.getValue();
+        
+        if (octave == 0)    keyboard->setAvailableRange(21, 45);
+        else                keyboard->setAvailableRange(12+octave*12, 36+octave*12);
+    }
+}
+#endif
+
 void BKKeyboardSlider::paint (Graphics& g)
 {
     //g.fillAll(Colours::lightgrey);
@@ -91,6 +113,11 @@ void BKKeyboardSlider::resized()
     
     Rectangle<int> keyboardRect = keymapRow.removeFromBottom(keyboardHeight - gYSpacing);
     
+#if JUCE_IOS
+    float sliderHeight = 15;
+    Rectangle<int> sliderArea = keyboardRect.removeFromTop(sliderHeight);
+    octaveSlider.setBounds(sliderArea);
+#endif
     keyboard->setBounds(keyboardRect);
     
     keymapRow.removeFromBottom(gYSpacing);
