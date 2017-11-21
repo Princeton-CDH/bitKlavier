@@ -21,8 +21,10 @@
 class BKKeyboardSlider :
 public BKComponent,
 public BKListener,
-public BKKeymapKeyboardStateListener,
-private juce::Slider::Listener
+public BKKeymapKeyboardStateListener
+#if JUCE_IOS
+,private juce::Slider::Listener
+#endif
 {
     
 public:
