@@ -82,10 +82,8 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
                 
                 FileInputStream inputStream(file);
                 
-                if (inputStream.openedOk()) {
-                    
-                    DBG("file opened OK: " + file.getFullPathName());
-                    
+                if (inputStream.openedOk())
+                {
                     String soundName = file.getFileName();
                     
                     sampleReader = wavFormat.createReaderFor(new FileInputStream(file), true);

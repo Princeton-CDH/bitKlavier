@@ -71,21 +71,7 @@ resonanceReleaseSynth()
         noteOn.set(i, false);
     }
     
-#if !DEBUG
-    
-#if JUCE_IOS
-    String osname = SystemStats::getOperatingSystemName();
-    float iosVersion = osname.fromLastOccurrenceOf("iOS ", false, true).getFloatValue();
-    
-    if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
-    else                    loadPianoSamples(BKLoadMedium);
-#else
-    loadPianoSamples(BKLoadHeavy);
-#endif
-    
-#else
-    loadPianoSamples(BKLoadLite);
-#endif
+
 }
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -103,6 +89,18 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     levelBuf.setSize(2, 25);
     
     gallery->prepareToPlay(sampleRate);
+
+    
+#if JUCE_IOS
+    String osname = SystemStats::getOperatingSystemName();
+    float iosVersion = osname.fromLastOccurrenceOf("iOS ", false, true).getFloatValue();
+    
+    if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
+    else                    loadPianoSamples(BKLoadMedium);
+#else
+    loadPianoSamples(BKLoadHeavy);
+#endif
+
 }
 
 BKAudioProcessor::~BKAudioProcessor()
