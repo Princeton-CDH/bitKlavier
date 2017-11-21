@@ -117,7 +117,9 @@
     
     //[self.view.window.rootViewController presentViewController:activityVC animated:YES completion:nil];
     
-    [self presentViewController:activityVC animated:YES completion:nil];
+    [self.parentViewController presentViewController:activityVC animated:YES completion:nil];
+    
+    //[self presentViewController:activityVC animated:YES completion:nil];
 }
 
 @end
