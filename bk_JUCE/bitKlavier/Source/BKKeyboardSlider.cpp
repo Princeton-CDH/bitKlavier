@@ -19,8 +19,14 @@ ratio(1.0)
 
     keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
     
-    minKey = 21;
-    maxKey = 108;
+    // need slider or other interface for octave change
+#if JUCE_IOS
+    minKey = 36; // 21
+    maxKey = 72; // 108
+#else
+    minKey = 21; // 21
+    maxKey = 108; // 108
+#endif
     keyboard->setScrollButtonsVisible(false);
     keyboard->setAvailableRange(minKey, maxKey);
     keyboard->setOctaveForMiddleC(4);

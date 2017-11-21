@@ -164,6 +164,7 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addItem(SETTINGS_ID, "Settings");
     
     // ~ ~ ~ share menu ~ ~ ~
+#if !JUCE_IOS
     PopupMenu shareMenu;
     
     shareMenu.addItem(SHARE_EMAIL_ID, "Email");
@@ -176,6 +177,10 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     
     galleryMenu.addSeparator();
     galleryMenu.addSubMenu("Share", shareMenu);
+#else
+    galleryMenu.addSeparator();
+    galleryMenu.addItem(SHARE_MESSAGE_ID, "Share");
+#endif
     
     
     

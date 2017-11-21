@@ -93,7 +93,17 @@
     
     NSArray * shareItems = [NSArray arrayWithObjects:text, gallery, nil];
     
+    /*
+    UIViewController *contentViewController = [[UIViewController alloc] init];
+    contentViewController.preferredContentSize = CGSizeMake(200, 200);
+    contentViewController.modalPresentationStyle = UIModalPresentationPopover;
+    */
+    
     UIActivityViewController *activityVC = [[UIActivityViewController alloc] initWithActivityItems:shareItems applicationActivities:nil];
+    
+    
+    activityVC.popoverPresentationController.sourceView = self.view;
+
     
     NSArray *excludeActivities = @[UIActivityTypeAirDrop,
                                    UIActivityTypePrint,
@@ -104,6 +114,8 @@
                                    UIActivityTypePostToVimeo];
     
     activityVC.excludedActivityTypes = excludeActivities;
+    
+    //[self.view.window.rootViewController presentViewController:activityVC animated:YES completion:nil];
     
     [self presentViewController:activityVC animated:YES completion:nil];
 }
@@ -127,8 +139,6 @@ ShareBot::~ShareBot(void)
 void ShareBot::share(String galleryPath, int where)
 {
     CocoaShareBot* bot = [[CocoaShareBot alloc] initWithOwner: this];
-
-    [[UIApplication sharedApplication].keyWindow.rootViewController addChildViewController:bot];
     
     NSString* path = [[NSString stringWithCString:galleryPath.toRawUTF8() encoding:[NSString defaultCStringEncoding]] stringByRemovingPercentEncoding];
     
@@ -147,6 +157,7 @@ void ShareBot::share(String galleryPath, int where)
 #elif JUCE_IOS
     if (bot != nil)
     {
+        [[UIApplication sharedApplication].keyWindow.rootViewController addChildViewController:bot];
         [bot share:url];
     }
 #endif
