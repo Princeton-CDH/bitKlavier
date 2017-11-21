@@ -95,6 +95,8 @@
     
     UIActivityViewController *activityVC = [[UIActivityViewController alloc] initWithActivityItems:shareItems applicationActivities:nil];
     
+    //[self addChildViewController:activityVC];
+    
     NSArray *excludeActivities = @[UIActivityTypeAirDrop,
                                    UIActivityTypePrint,
                                    UIActivityTypeAssignToContact,
@@ -104,7 +106,7 @@
                                    UIActivityTypePostToVimeo];
     
     activityVC.excludedActivityTypes = excludeActivities;
-
+    
     [self presentViewController:activityVC animated:YES completion:nil];
 }
 
@@ -127,6 +129,8 @@ ShareBot::~ShareBot(void)
 void ShareBot::share(String galleryPath, int where)
 {
     CocoaShareBot* bot = [[CocoaShareBot alloc] initWithOwner: this];
+
+    [[UIApplication sharedApplication].keyWindow.rootViewController addChildViewController:bot];
     
     NSString* path = [[NSString stringWithCString:galleryPath.toRawUTF8() encoding:[NSString defaultCStringEncoding]] stringByRemovingPercentEncoding];
     
@@ -143,10 +147,8 @@ void ShareBot::share(String galleryPath, int where)
         [bot share:url to:service];
     }
 #elif JUCE_IOS
-    if (bot != nil) {
-        
-        getParentComponent()->addAndMakeVisible((Component*)bot);
-        
+    if (bot != nil)
+    {
         [bot share:url];
     }
 #endif

@@ -46,7 +46,8 @@ construction(c)
     pianoCB.addListener(this);
     
 #if JUCE_IOS || JUCE_MAC
-    addChildComponent(bot);
+    bot.setBounds(0,0,20,20);
+    addAndMakeVisible(bot);
 #endif
     
     //pianoCB.BKSetJustificationType(juce::Justification::centredRight);
