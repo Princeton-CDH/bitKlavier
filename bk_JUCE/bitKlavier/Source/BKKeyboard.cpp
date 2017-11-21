@@ -947,9 +947,7 @@ void BKKeymapKeyboardComponent::setValuesDirectly(Array<float> vals)
 {
     for(int i=rangeStart; i<=rangeEnd; i++)
     {
-        //DBG("keyValues SET DIRECT " + String(i) + " " + String(i - rangeStart) + " " + String(vals.getUnchecked(i - rangeStart)));
         DBG("keyValues SET DIRECT " + String(i) + " " + String(i) + " " + String(vals.getUnchecked(i)));
-        //keyValues.set(i, vals.getUnchecked(i - rangeStart));
         keyValues.set(i, vals.getUnchecked(i));
     }
 }

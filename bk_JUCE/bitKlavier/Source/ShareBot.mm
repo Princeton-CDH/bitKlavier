@@ -95,8 +95,6 @@
     
     UIActivityViewController *activityVC = [[UIActivityViewController alloc] initWithActivityItems:shareItems applicationActivities:nil];
     
-    //[self addChildViewController:activityVC];
-    
     NSArray *excludeActivities = @[UIActivityTypeAirDrop,
                                    UIActivityTypePrint,
                                    UIActivityTypeAssignToContact,

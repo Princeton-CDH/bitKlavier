@@ -68,17 +68,15 @@ public:
         return nullptr;
     }
     
-    inline void dismissTextEditor(bool setValue = false)
+    inline void dismissTextEditor(TextEditor* which, bool setValue = false)
     {
         if (setValue)
         {
-            textEditorReturnKeyPressed(keyboardValueTF);
-            textEditorReturnKeyPressed(*((TextEditor*)keyboardValsTextField.get()));
+            textEditorReturnKeyPressed(*which);
         }
         else
         {
-            textEditorEscapeKeyPressed(keyboardValueTF);
-            textEditorReturnKeyPressed(*((TextEditor*)keyboardValsTextField.get()));
+            textEditorEscapeKeyPressed(*which);
         }
     }
     
@@ -101,6 +99,8 @@ public:
     void updateDisplay();
     
     inline void setDimensionRatio(float r) { ratio = r; }
+    
+    inline Rectangle<float> getEditAllBounds(void) { return keyboardValsTextFieldOpen.getBounds().toFloat();}
     
 private:
     

@@ -23,7 +23,7 @@ lastId(0)
     numberPad.addListener(this);
     
     addAndMakeVisible(hideOrShow);
-    hideOrShow.setAlwaysOnTop(true);
+    //hideOrShow.setAlwaysOnTop(true);
     hideOrShow.setName("hideOrShow");
     hideOrShow.addListener(this);
 }
@@ -330,7 +330,7 @@ void BKViewController::numberPadDismissed(BKNumberPad*)
     
     if (latched_BKRangeSlider != nullptr)       latched_BKRangeSlider       ->dismissTextEditor(true);
     
-    if (latched_BKKeyboardSlider != nullptr)    latched_BKKeyboardSlider    ->dismissTextEditor(true);
+    if (latched_BKKeyboardSlider != nullptr)    latched_BKKeyboardSlider    ->dismissTextEditor(numberPad.getTarget(), true);
     if (latched_BKMultiSlider != nullptr)       latched_BKMultiSlider       ->dismissTextEditor(true);
     
     if (latched_BKWDUTSlider != nullptr)        latched_BKWDUTSlider        ->dismissTextEditor(true);
