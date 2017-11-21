@@ -84,7 +84,7 @@ resonanceReleaseSynth()
 #endif
     
 #else
-    loadPianoSamples(BKLoadLitest);
+    loadPianoSamples(BKLoadLite);
 #endif
 }
 

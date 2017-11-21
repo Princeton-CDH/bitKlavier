@@ -107,6 +107,10 @@ private:
     String sliderName;
     BKLabel showName;
     
+#if JUCE_IOS
+    Slider octaveSlider;
+#endif
+    
     float ratio;
 
     BKTextEditor keyboardValueTF;
