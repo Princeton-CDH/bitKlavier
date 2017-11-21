@@ -37,6 +37,7 @@ construction(c)
     galleryCB.addListener(this);
     //galleryCB.BKSetJustificationType(juce::Justification::centredRight);
     
+    galleryCB.setLookAndFeel(&comboBoxLeftJustifyLAF);
     galleryCB.setSelectedId(0, dontSendNotification);
     lastGalleryCBId = galleryCB.getSelectedId();
     
@@ -50,8 +51,10 @@ construction(c)
     addAndMakeVisible(bot);
 #endif
     
+    pianoCB.setLookAndFeel(&comboBoxRightJustifyLAF);
+    comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
     //pianoCB.BKSetJustificationType(juce::Justification::centredRight);
-    
+    //pianoCB.setJustificationType(juce::Justification::centredRight);
     pianoCB.setSelectedId(0, dontSendNotification);
     
     galleryModalCallBackIsOpen = false;

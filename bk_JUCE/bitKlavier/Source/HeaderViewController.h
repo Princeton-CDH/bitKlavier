@@ -75,13 +75,17 @@ private:
     BKTextButton  pianoB;
     BKTextButton  galleryB;
     
-    BKComboBox galleryCB;
-    BKComboBox pianoCB;
+    //BKComboBox galleryCB;
+    //BKComboBox pianoCB;
+    ComboBox galleryCB;
+    ComboBox pianoCB;
     int lastGalleryCBId;
     bool galleryModalCallBackIsOpen;
     
     BKConstructionSite* construction;
     
+    BKButtonAndMenuLAF comboBoxRightJustifyLAF;
+    BKButtonAndMenuLAF comboBoxLeftJustifyLAF;
     BKButtonAndMenuLAF buttonsAndMenusLAF;
     
     JUCE_LEAK_DETECTOR(HeaderViewController)

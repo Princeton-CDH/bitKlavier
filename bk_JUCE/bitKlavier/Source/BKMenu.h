@@ -25,9 +25,7 @@ public:
     thisJustification (Justification::centredLeft)
     {
         setSize(200,20);
-        
-        
-        
+
         //lookAndFeelChanged();
         //setLookAndFeel(&thisLAF);
         
@@ -40,7 +38,7 @@ public:
     void BKSetJustificationType (Justification justification)
     {
         thisJustification = justification;
-        setJustificationType(justification);
+        //setJustificationType(justification);
         //thisLAF.setComboBoxJustificationType(justification);
     }
 
