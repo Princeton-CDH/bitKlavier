@@ -23,7 +23,7 @@ lastId(0)
     numberPad.addListener(this);
     
     addAndMakeVisible(hideOrShow);
-    //hideOrShow.setAlwaysOnTop(true);
+    hideOrShow.setAlwaysOnTop(true);
     hideOrShow.setName("hideOrShow");
     hideOrShow.addListener(this);
 }
@@ -99,6 +99,7 @@ void BKViewController::bkSingleSliderWantsKeyboard(BKSingleSlider* slider)
     
     numberPad.setText(String(slider->getText()));
     
+    numberPad.toFront(true);
     numberPad.setVisible(true);
 }
 
@@ -135,6 +136,7 @@ void BKViewController::bkStackedSliderWantsKeyboard(BKStackedSlider* slider)
     
     numberPad.setText(slider->getText());
     
+    numberPad.toFront(true);
     numberPad.setVisible(true);
 }
 
@@ -164,6 +166,7 @@ void BKViewController::multiSliderWantsKeyboard(BKMultiSlider* slider)
     
     numberPad.setText(String(slider->getText()));
     
+    numberPad.toFront(true);
     numberPad.setVisible(true);
 }
 
@@ -197,6 +200,7 @@ void BKViewController::bkRangeSliderWantsKeyboard(BKRangeSlider* slider, BKRange
     
     numberPad.setText(editor->getText());
     
+    numberPad.toFront(true);
     numberPad.setVisible(true);
 }
 
@@ -228,6 +232,7 @@ void BKViewController::bkWaveDistanceUndertowSliderWantsKeyboard(BKWaveDistanceU
     
     numberPad.setText(target->getText());
     
+    numberPad.toFront(true);
     numberPad.setVisible(true);
 }
 
@@ -261,12 +266,13 @@ void BKViewController::keyboardSliderWantsKeyboard(BKKeyboardSlider* slider, KSl
     
     numberPad.setEnabled(NumberLBracket, false);
     numberPad.setEnabled(NumberRBracket, false);
-    numberPad.setEnabled(NumberNegative, false);
+    numberPad.setEnabled(NumberNegative, true);
     numberPad.setEnabled(NumberColon, true);
     numberPad.setEnabled(NumberSpace, true);
     
     numberPad.setText(String(editor->getText()));
     
+    numberPad.toFront(true);
     numberPad.setVisible(true);
 }
 
@@ -296,9 +302,8 @@ void BKViewController::textEditorWantsKeyboard(BKTextEditor* editor)
     
     numberPad.setText(String(editor->getText()));
     
+    numberPad.toFront(true);
     numberPad.setVisible(true);
-    
-    
 }
 
 void BKViewController::numberPadChanged(BKNumberPad*)
@@ -340,5 +345,6 @@ void BKViewController::numberPadDismissed(BKNumberPad*)
         ((BKViewController*)latched_BKTextEditor->getParentComponent())->bkTextFieldDidChange(*((TextEditor*)latched_BKTextEditor));
     }
     
+    numberPad.toFront(true);
     numberPad.setVisible(false);
 }
