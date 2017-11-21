@@ -27,7 +27,7 @@ private juce::Slider::Listener
     
 public:
     
-    BKKeyboardSlider();
+    BKKeyboardSlider(bool needsOctaveSlider = false);
     ~BKKeyboardSlider()
     {
         //delete keyboardComponent;
@@ -108,9 +108,11 @@ private:
     String sliderName;
     BKLabel showName;
     
+    bool needsOctaveSlider;
 #if JUCE_IOS
     Slider octaveSlider;
     void sliderValueChanged     (Slider* slider)                override;
+    BKButtonAndMenuLAF laf;
 #endif
     
     float ratio;
@@ -148,8 +150,6 @@ private:
     void mouseDown(const MouseEvent& e) override;
     
     bool focusLostByEscapeKey;
-    
-    BKButtonAndMenuLAF laf;
 
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKKeyboardSlider)

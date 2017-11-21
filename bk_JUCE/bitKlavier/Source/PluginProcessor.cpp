@@ -27,8 +27,8 @@ resonanceReleaseSynth()
 #if JUCE_IOS
     int heightUnit = ((screenHeight * 0.1f) > 48) ? 48 : (screenHeight * 0.1f);
     
-    fontHeight = screenHeight * 0.03f;
-    fontHeight = (fontHeight < 15) ? 15 : fontHeight;
+    fontHeight = screenHeight * 0.025f;
+    fontHeight = (fontHeight < 13) ? 13 : fontHeight;
     
     gComponentComboBoxHeight = heightUnit;
     gComponentLabelHeight = heightUnit * 0.75f;
@@ -96,7 +96,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     float iosVersion = osname.fromLastOccurrenceOf("iOS ", false, true).getFloatValue();
     
     if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
-    else                    loadPianoSamples(BKLoadMedium);
+    else                    loadPianoSamples(BKLoadLite);
 #else
     loadPianoSamples(BKLoadHeavy);
 #endif

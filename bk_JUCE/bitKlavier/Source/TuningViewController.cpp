@@ -111,11 +111,9 @@ BKViewController(p,theGraph)
     addAndMakeVisible(lastNote);
     addAndMakeVisible(lastInterval);
     
-    
-    
-    addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
+    addAndMakeVisible(actionButton);
     
 #if JUCE_IOS
     offsetSlider->addWantsKeyboardListener(this);
@@ -131,15 +129,13 @@ void TuningViewController::resized()
     Rectangle<int> area (getLocalBounds());
     
     iconImageComponent.setBounds(area);
-    area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+    area.reduce(10 * processor.paddingScalarX+3, 10 * processor.paddingScalarY+3);
     
-    float keyboardHeight = 120 + 50 * processor.paddingScalarY;
+    float keyboardHeight = 100 + 50 * processor.paddingScalarY;
     Rectangle<int> absoluteKeymapRow = area.removeFromBottom(keyboardHeight);
     absoluteKeymapRow.reduce(gXSpacing, 0);
     
     absoluteKeyboard.setBounds(absoluteKeymapRow);
-
-    DBG("TVC - absoluteKeyboard" + rectangleToString(absoluteKeymapRow));
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
@@ -176,7 +172,7 @@ void TuningViewController::resized()
     int customKeyboardHeight = 80 + 70. * processor.paddingScalarY;
     int extraY = (area.getHeight() - (customKeyboardHeight + gComponentSingleSliderHeight + gYSpacing * 3)) * 0.25;
     
-    area.removeFromTop(extraY + gYSpacing);
+    area.removeFromTop(extraY);
     Rectangle<int> customKeyboardSlice = area.removeFromTop(customKeyboardHeight);
     customKeyboardSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     customKeyboardSlice.removeFromRight(gXSpacing);
@@ -184,7 +180,7 @@ void TuningViewController::resized()
     
     DBG("TVC - customKeyboard " + rectangleToString(customKeyboardSlice));
     
-    area.removeFromTop(extraY + gYSpacing);
+    area.removeFromTop(extraY);
     Rectangle<int> offsetSliderSlice = area.removeFromTop(gComponentSingleSliderHeight);
     offsetSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     offsetSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);

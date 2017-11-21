@@ -45,7 +45,25 @@ BKViewController(p, theGraph)
     keyboard = (BKKeymapKeyboardComponent*)keyboardComponent.get();
     keyboard->setScrollButtonsVisible(false);
     
-    keyboard->setAvailableRange(21, 108);
+#if JUCE_IOS
+    minKey = 48; // 21
+    maxKey = 72; // 108
+    
+    octaveSlider.setRange(0, 6, 1);
+    octaveSlider.addListener(this);
+    octaveSlider.setLookAndFeel(&laf);
+    octaveSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
+    octaveSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+    octaveSlider.setValue(3);
+    
+    addAndMakeVisible(octaveSlider);
+
+#else
+    minKey = 21; // 21
+    maxKey = 108; // 108
+#endif
+    
+    keyboard->setAvailableRange(minKey, maxKey);
     
     keyboard->setAllowDrag(true);
     keyboard->setOctaveForMiddleC(4);
@@ -89,17 +107,27 @@ void KeymapViewController::resized()
     iconImageComponent.setBounds(area);
     area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
     
-    float keyboardHeight = 86; // + 36 * processor.paddingScalarY;
+    
+    
+    float keyboardHeight = 100; // + 36 * processor.paddingScalarY;
     Rectangle<int> keyboardRow = area.removeFromBottom(keyboardHeight);
-    float keyWidth = keyboardRow.getWidth() / round((108 - 21) * 7./12 + 1); //num white keys
+    float keyWidth = keyboardRow.getWidth() / round((maxKey - minKey) * 7./12 + 1); //num white keys
     keyboard->setKeyWidth(keyWidth);
-    keyboard->setBlackNoteLengthProportion(0.65);
+    keyboard->setBlackNoteLengthProportion(0.6);
     keyboardRow.reduce(gXSpacing, 0);
+    
+    float sliderHeight = 15;
+    Rectangle<int> sliderArea = keyboardRow.removeFromTop(sliderHeight);
+    octaveSlider.setBounds(sliderArea);
+    
     keyboard->setBounds(keyboardRow);
     
 #if JUCE_IOS
     keymapTF.setTopLeftPosition(hideOrShow.getX(), hideOrShow.getBottom() + gYSpacing);
     keymapTF.setSize(keyboardRow.getWidth() * 0.5, getBottom() - hideOrShow.getBottom() - 2 * gYSpacing);
+    
+    
+    
 #else
     keymapTF.setBounds(keyboardRow);
 #endif
@@ -391,6 +419,20 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
     
     processor.currentPiano->configure();
 }
+
+
+#if JUCE_IOS
+void KeymapViewController::sliderValueChanged     (Slider* slider)
+{
+    if (slider == &octaveSlider)
+    {
+        int octave = (int) octaveSlider.getValue();
+        
+        if (octave == 0)    keyboard->setAvailableRange(21, 45);
+        else                keyboard->setAvailableRange(12+octave*12, 36+octave*12);
+    }
+}
+#endif
 
 
 
