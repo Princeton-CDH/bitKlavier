@@ -1297,7 +1297,7 @@ void BKSingleSlider::resized()
         if(justifyRight)
         {
             textSlab.removeFromRight(gComponentSingleSliderXOffset);
-            valueTF.setBounds(textSlab.removeFromRight(75));
+            valueTF.setBounds(textSlab.removeFromRight(85));
             showName.setBounds(textSlab.removeFromLeft(getWidth() - 75));
         }
         else
