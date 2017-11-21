@@ -70,6 +70,22 @@ resonanceReleaseSynth()
     {
         noteOn.set(i, false);
     }
+    
+#if !DEBUG
+    
+#if JUCE_IOS
+    String osname = SystemStats::getOperatingSystemName();
+    float iosVersion = osname.fromLastOccurrenceOf("iOS ", false, true).getFloatValue();
+    
+    if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
+    else                    loadPianoSamples(BKLoadMedium);
+#else
+    loadPianoSamples(BKLoadHeavy);
+#endif
+    
+#else
+    loadPianoSamples(BKLoadLitest);
+#endif
 }
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -155,19 +171,33 @@ void BKAudioProcessor::renameGallery(String name)
     File bkGalleries;
     
 #if JUCE_IOS
-    bkGalleries = bkGalleries.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
+    if (currentGalleryPath.contains("/bitKlavier resources/galleries/"))
+    {
+        bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+    }
+    else
+    {
+        bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory);
+    }
 #endif
     
 #if JUCE_MAC || JUCE_WINDOWS
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
-    String relativePath = currentGalleryPath.fromFirstOccurrenceOf("bitKlavier resources/galleries/", false, false);
+    String relativePath = currentGalleryPath.fromLastOccurrenceOf("/", false, false);
+    
+    DBG("relative path: " + relativePath);
     
     File currentFile = bkGalleries.getChildFile(relativePath);
     
     String newFileName = name + ".xml";
+    
+#if !JUCE_IOS
     String newFilePath= currentGalleryPath.upToFirstOccurrenceOf(currentGallery, false, false) + newFileName;
+#else
+    String newFilePath= bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + newFileName;
+#endif
     
     DBG("new file: "+ String(newFilePath));
     
@@ -773,27 +803,6 @@ void BKAudioProcessor::loadJsonGalleryFromPath(String path)
 
 void BKAudioProcessor::initializeGallery(void)
 {
-    if (currentSampleType != gallery->sampleType)
-    {
-        
-#if JUCE_IOS
-        String osname = SystemStats::getOperatingSystemName();
-        float iosVersion = osname.fromLastOccurrenceOf("iOS ", false, true).getFloatValue();
-#endif
-        
-#if !DEBUG
-
-#if JUCE_IOS
-        if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
-        else                    loadPianoSamples(BKLoadMedium);
-#else
-        loadPianoSamples(gallery->sampleType);
-#endif
-        
-#else
-        loadPianoSamples(BKLoadLitest);
-#endif
-    }
     
     prevPiano = gallery->getPianos().getFirst();
     
