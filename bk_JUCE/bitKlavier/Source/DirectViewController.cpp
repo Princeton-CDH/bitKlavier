@@ -64,10 +64,6 @@ void DirectViewController::paint (Graphics& g)
 void DirectViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
-    
-    
-    int widthUnit = getWidth() * 0.1;
-    int heightUnit = getWidth() * 0.1;
 
     iconImageComponent.setBounds(area);
     area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);

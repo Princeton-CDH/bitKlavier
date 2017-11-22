@@ -12,7 +12,6 @@
 
 void BKButtonAndMenuLAF::positionComboBoxText (ComboBox& box, Label& label)
 {
-    
     label.setFont (getComboBoxFont (box));
     
     if(comboBoxJustification == Justification::centredRight)
@@ -31,7 +30,6 @@ void BKButtonAndMenuLAF::positionComboBoxText (ComboBox& box, Label& label)
         
         label.setJustificationType (Justification::centredLeft);
     }
-    
 }
 
 #define HEIGHT_IOS 22

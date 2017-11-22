@@ -39,7 +39,7 @@ timerCallbackCount(0)
     addAndMakeVisible(levelMeterComponentL);
     
     mainSlider = new Slider();
-    mainSlider->setLookAndFeel(&laf);
+    //mainSlider->setLookAndFeel(&laf);
     
     mainSlider->setRange (-90, 12.0, 0.1);
     mainSlider->setSkewFactor (2.5, false);
@@ -78,8 +78,8 @@ timerCallbackCount(0)
     
     octaveSlider.setRange(0, 6, 1);
     octaveSlider.addListener(this);
-    octaveSlider.setLookAndFeel(&laf);
-    octaveSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
+    //octaveSlider.setLookAndFeel(&laf);
+    octaveSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
     octaveSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
     octaveSlider.setValue(3);
 
@@ -104,6 +104,12 @@ timerCallbackCount(0)
 MainViewController::~MainViewController()
 {
     removeKeyListener(this);
+}
+
+void MainViewController::setSliderLookAndFeel(BKButtonAndMenuLAF *laf)
+{
+    octaveSlider.setLookAndFeel(laf);
+    mainSlider->setLookAndFeel(laf);
 }
 
 
@@ -205,7 +211,7 @@ void MainViewController::resized()
 
     if (display == DisplayKeyboard)
     {
-        int octaveSliderHeight = 30;
+        int octaveSliderHeight = 20;
         octaveSlider.setTopLeftPosition(area.getX(), area.getY());
         octaveSlider.setSize(area.getWidth(), octaveSliderHeight);
         
@@ -213,8 +219,9 @@ void MainViewController::resized()
         
         float keyWidth = area.getWidth() / round((keyEnd - keyStart) * 7./12 + 1); //num white keys
         keyboard->setKeyWidth(keyWidth);
-        keyboard->setBlackNoteLengthProportion(0.65);
-        keyboardComponent->setBounds(area.removeFromTop(octaveSliderHeight + gYSpacing));
+        keyboard->setBlackNoteLengthProportion(0.6);
+        area.removeFromTop(octaveSliderHeight + gYSpacing);
+        keyboardComponent->setBounds(area);
         
         octaveSlider.setVisible(true);
         keyboardComponent->setVisible(true);

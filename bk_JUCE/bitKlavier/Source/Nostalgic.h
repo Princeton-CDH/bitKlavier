@@ -391,8 +391,9 @@ public:
     }
     
 private:
-    int Id;
+    
     String name;
+    int Id;
     
     JUCE_LEAK_DETECTOR(Nostalgic)
 };

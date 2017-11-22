@@ -12,7 +12,7 @@
 
 #include "BKUtilities.h"
     
-class ShareBot : public juce::Component 
+class ShareBot : public juce::Component
 {
 public:
     ShareBot(void);

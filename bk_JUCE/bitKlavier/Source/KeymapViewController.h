@@ -24,6 +24,9 @@ class KeymapViewController :
 public BKViewController,
 public BKKeymapKeyboardStateListener,
 public BKEditableComboBoxListener
+#if JUCE_IOS
+, public Slider::Listener
+#endif
 {
 public:
     KeymapViewController(BKAudioProcessor&, BKItemGraph* theGraph);
@@ -75,7 +78,17 @@ private:
     void bkComboBoxDidChange        (ComboBox* box)         override;
     void bkButtonClicked            (Button* b)             override;
     
+    
     bool focusLostByEscapeKey;
+    
+    bool needsOctaveSlider;
+#if JUCE_IOS
+    Slider octaveSlider;
+    void sliderValueChanged     (Slider* slider)                override;
+    BKButtonAndMenuLAF laf;
+#endif
+    
+    int minKey, maxKey;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KeymapViewController)
 };

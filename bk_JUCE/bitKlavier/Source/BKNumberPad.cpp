@@ -31,6 +31,11 @@ void BKNumberPad::setTarget(TextEditor* tf)
     target = tf;
 }
 
+TextEditor* BKNumberPad::getTarget(void)
+{
+    return target;
+}
+
 void BKNumberPad::buttonClicked(Button* button)
 {
     int start = target->getHighlightedRegion().getStart();

@@ -110,6 +110,7 @@ public:
     void paint(Graphics& g) override;
     
     void setTarget(TextEditor* tf);
+    TextEditor* getTarget(void);
     
     void setEnabled(NumberPadButtonType type, bool enabled)
     {

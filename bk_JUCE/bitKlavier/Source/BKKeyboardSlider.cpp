@@ -10,8 +10,9 @@
 
 #include "BKKeyboardSlider.h"
 
-BKKeyboardSlider::BKKeyboardSlider():
-ratio(1.0)
+BKKeyboardSlider::BKKeyboardSlider(bool nos):
+ratio(1.0),
+needsOctaveSlider(nos)
 {
     
     addAndMakeVisible (keyboardComponent =
@@ -19,8 +20,26 @@ ratio(1.0)
 
     keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
     
-    minKey = 21;
-    maxKey = 108;
+    // need slider or other interface for octave change
+#if JUCE_IOS
+    minKey = 48; // 21
+    maxKey = 72; // 108
+    
+    if (needsOctaveSlider)
+    {
+        octaveSlider.setRange(0, 6, 1);
+        octaveSlider.addListener(this);
+        octaveSlider.setLookAndFeel(&laf);
+        octaveSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
+        octaveSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+        octaveSlider.setValue(3);
+        
+        addAndMakeVisible(octaveSlider);
+    }
+#else
+    minKey = 21; // 21
+    maxKey = 108; // 108
+#endif
     keyboard->setScrollButtonsVisible(false);
     keyboard->setAvailableRange(minKey, maxKey);
     keyboard->setOctaveForMiddleC(4);
@@ -62,6 +81,19 @@ ratio(1.0)
 
 }
 
+#if JUCE_IOS
+void BKKeyboardSlider::sliderValueChanged     (Slider* slider)
+{
+    if (slider == &octaveSlider)
+    {
+        int octave = (int) octaveSlider.getValue();
+        
+        if (octave == 0)    keyboard->setAvailableRange(21, 45);
+        else                keyboard->setAvailableRange(12+octave*12, 36+octave*12);
+    }
+}
+#endif
+
 void BKKeyboardSlider::paint (Graphics& g)
 {
     //g.fillAll(Colours::lightgrey);
@@ -83,16 +115,22 @@ void BKKeyboardSlider::resized()
     keyboard->setKeyWidth(keyWidth);
     keyboard->setBlackNoteLengthProportion(0.65);
     
-    Rectangle<int> keyboardRect = keymapRow.removeFromBottom(keyboardHeight - gYSpacing);
+    Rectangle<int> keyboardRect = keymapRow.removeFromBottom(keyboardHeight);
     
+#if JUCE_IOS
+    if (needsOctaveSlider)
+    {
+        float sliderHeight = 15;
+        Rectangle<int> sliderArea = keyboardRect.removeFromTop(sliderHeight);
+        octaveSlider.setBounds(sliderArea);
+    }
+#endif
     keyboard->setBounds(keyboardRect);
     
-    keymapRow.removeFromBottom(gYSpacing);
-    
-    Rectangle<int> textSlab (keymapRow.removeFromBottom(2*heightUnit));
+    Rectangle<int> textSlab (keymapRow.removeFromBottom(2*heightUnit + gYSpacing));
     keyboardValueTF.setBounds(textSlab.removeFromRight(ratio * widthUnit));
     showName.setBounds(textSlab.removeFromRight(2*ratio*widthUnit));
-    keyboardValsTextFieldOpen.setBounds(textSlab.removeFromLeft(ratio*widthUnit));
+    keyboardValsTextFieldOpen.setBounds(textSlab.removeFromLeft(ratio*widthUnit*1.5));
     
 #if JUCE_IOS
     keyboardValsTextField->setBounds(keyboard->getBounds());
@@ -103,7 +141,6 @@ void BKKeyboardSlider::resized()
     
     DBG("keywidth: " + String(keyWidth) + " keyheight: " + String(keyboardHeight));
     DBG("keyboardRect: " + rectangleToString(keyboardRect));
-
 }
 
 void BKKeyboardSlider::setFundamental(int fund)

@@ -27,7 +27,7 @@ public:
     }
 };
 
-class BKButtonAndMenuLAF : public LookAndFeel_V4
+class BKButtonAndMenuLAF : public LookAndFeel_V4, public DeletedAtShutdown
 {
 public:
     
@@ -64,6 +64,11 @@ public:
         
         //setColour(juce::LookAndFeel_V4::ColourScheme::outline, Colours::black);
         //getCurrentColourScheme().setUIColour(juce::LookAndFeel_V4::ColourScheme::widgetBackground, Colours::yellow);
+        
+    }
+    
+    ~BKButtonAndMenuLAF()
+    {
         
     }
     

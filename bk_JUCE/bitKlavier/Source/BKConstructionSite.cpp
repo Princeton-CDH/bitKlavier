@@ -634,7 +634,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
 {
     MouseEvent e = eo.getEventRelativeTo(this);
     
-
+    DBG("currentpiano: " + String(processor.currentPiano->getId()));
 #if JUCE_IOS
     TouchEvent* t = getTouchEvent(e.source);
     

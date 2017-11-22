@@ -111,11 +111,9 @@ BKViewController(p,theGraph)
     addAndMakeVisible(lastNote);
     addAndMakeVisible(lastInterval);
     
-    
-    
-    addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
+    addAndMakeVisible(actionButton);
     
 #if JUCE_IOS
     offsetSlider->addWantsKeyboardListener(this);
@@ -131,15 +129,13 @@ void TuningViewController::resized()
     Rectangle<int> area (getLocalBounds());
     
     iconImageComponent.setBounds(area);
-    area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+    area.reduce(10 * processor.paddingScalarX+3, 10 * processor.paddingScalarY+3);
     
-    float keyboardHeight = 60 + 50 * processor.paddingScalarY;
+    float keyboardHeight = 100 + 50 * processor.paddingScalarY;
     Rectangle<int> absoluteKeymapRow = area.removeFromBottom(keyboardHeight);
     absoluteKeymapRow.reduce(gXSpacing, 0);
     
     absoluteKeyboard.setBounds(absoluteKeymapRow);
-
-    DBG("TVC - absoluteKeyboard" + rectangleToString(absoluteKeymapRow));
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
@@ -173,10 +169,10 @@ void TuningViewController::resized()
     modeSlice.removeFromLeft(gXSpacing + gPaddingConst * processor.paddingScalarX);
     fundamentalCB.setBounds(modeSlice);
     
-    int customKeyboardHeight = 60 + 70. * processor.paddingScalarY;
-    int extraY = (area.getHeight() - (customKeyboardHeight + gComponentSingleSliderHeight + gComponentTextFieldHeight + gYSpacing * 4)) * 0.25;
+    int customKeyboardHeight = 80 + 70. * processor.paddingScalarY;
+    int extraY = (area.getHeight() - (customKeyboardHeight + gComponentSingleSliderHeight + gYSpacing * 3)) * 0.25;
     
-    area.removeFromTop(extraY + gYSpacing);
+    area.removeFromTop(extraY);
     Rectangle<int> customKeyboardSlice = area.removeFromTop(customKeyboardHeight);
     customKeyboardSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     customKeyboardSlice.removeFromRight(gXSpacing);
@@ -184,18 +180,11 @@ void TuningViewController::resized()
     
     DBG("TVC - customKeyboard " + rectangleToString(customKeyboardSlice));
     
-    area.removeFromTop(extraY + gYSpacing);
+    area.removeFromTop(extraY);
     Rectangle<int> offsetSliderSlice = area.removeFromTop(gComponentSingleSliderHeight);
     offsetSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     offsetSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
     offsetSlider->setBounds(offsetSliderSlice);
-    
-    area.removeFromTop(extraY + gYSpacing);
-    Rectangle<int> lastNoteSlice = area.removeFromTop(gComponentTextFieldHeight);
-    lastNoteSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
-    lastNoteSlice.removeFromRight(gXSpacing);
-    lastNote.setBounds(lastNoteSlice.removeFromLeft(lastNoteSlice.getWidth() * 0.5));
-    lastInterval.setBounds(lastNoteSlice);
     
     // ********* left column
     
@@ -236,6 +225,11 @@ void TuningViewController::resized()
     A1AnchorScaleCB.setBounds(A1AnchorScaleCBSlice.removeFromLeft(tempwidth));
     A1AnchorScaleCBSlice.removeFromLeft(gXSpacing);
     A1FundamentalCB.setBounds(A1AnchorScaleCBSlice);
+    
+    Rectangle<float> editAllBounds = absoluteKeyboard.getEditAllBounds();
+    editAllBounds.translate(absoluteKeyboard.getX(), absoluteKeyboard.getY());
+    lastNote.setBounds(editAllBounds.getRight() + gXSpacing, editAllBounds.getY(),editAllBounds.getWidth() * 2, editAllBounds.getHeight());
+    lastInterval.setBounds(lastNote.getRight() + gXSpacing, lastNote.getY(),lastNote.getWidth(), lastNote.getHeight());
     
 }
 

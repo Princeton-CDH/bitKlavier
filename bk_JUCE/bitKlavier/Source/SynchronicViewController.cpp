@@ -228,7 +228,7 @@ SynchronicViewController(p, theGraph)
 
     gainSlider->addMyListener(this);
     
-    startTimer(20);
+    startTimer(30);
     
 }
 

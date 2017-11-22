@@ -29,7 +29,7 @@ public:
     BKItem(BKPreparationType type, int Id, BKAudioProcessor& p);
     
     uint64 time;
-    inline void timerCallback(void)
+    inline void timerCallback(void) override
     {
         time++;
     };
@@ -315,7 +315,6 @@ public:
 private:
     BKAudioProcessor& processor;
 
-    void addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId);
     
     JUCE_LEAK_DETECTOR(BKItemGraph)
 };

@@ -44,7 +44,39 @@ public:
     {
         Piano::Ptr copyPiano = new Piano(processor, -1);
         
-        copyPiano->items = items;
+        BKItem::PtrArr newItems;
+        
+        for (auto item : items)
+        {
+            BKItem* newItem = new BKItem(item->getType(), item->getId(), processor);
+            
+            newItem->setTopLeftPosition(item->getPosition());
+            newItem->setName(item->getName());
+            
+            copyPiano->add(newItem);
+            newItems.add(newItem);
+            
+        }
+        
+        int idx = 0;
+        for (auto item : items)
+        {
+            BKItem* newItem = newItems.getUnchecked(idx++);
+            
+            BKItem::PtrArr oldConnections = item->getConnections();
+            
+            for (auto connection : item->getConnections())
+            {
+                for (auto newConnection : newItems)
+                {
+                    if ((newConnection->getType() == connection->getType()) &&
+                        (newConnection->getId() == connection->getId()))
+                    {
+                        newItem->addConnection(newConnection);
+                    }
+                }
+            }
+        }
         
         copyPiano->setName(pianoName );
         
