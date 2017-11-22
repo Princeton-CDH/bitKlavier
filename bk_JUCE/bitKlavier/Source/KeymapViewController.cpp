@@ -118,7 +118,10 @@ void KeymapViewController::resized()
     
     float sliderHeight = 15;
     Rectangle<int> sliderArea = keyboardRow.removeFromTop(sliderHeight);
+    
+#if JUCE_IOS
     octaveSlider.setBounds(sliderArea);
+#endif
     
     keyboard->setBounds(keyboardRow);
     
