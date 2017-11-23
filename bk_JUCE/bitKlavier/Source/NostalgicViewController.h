@@ -18,7 +18,10 @@ public BKViewController
 {
 public:
     NostalgicViewController(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~NostalgicViewController() {};
+    ~NostalgicViewController()
+    {
+        setLookAndFeel(nullptr);
+    };
     
     BKWaveDistanceUndertowSlider nDisplaySlider;
 

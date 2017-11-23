@@ -177,7 +177,7 @@ public:
     
     ~BKTextButton(void)
     {
-        
+        setLookAndFeel(nullptr);
     }
     
 private:

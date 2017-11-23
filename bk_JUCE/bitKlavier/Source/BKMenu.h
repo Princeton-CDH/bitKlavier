@@ -81,6 +81,7 @@ public:
     
     ~BKEditableComboBox()
     {
+        setLookAndFeel(nullptr);
     }
     
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;

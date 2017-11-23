@@ -324,7 +324,11 @@ public TextEditor::Listener
 {
 public:
     BKRangeSlider(String sliderName, double min, double max, double defmin, double defmax, double increment);
-    ~BKRangeSlider() {};
+    ~BKRangeSlider()
+    {
+        minSlider.setLookAndFeel(nullptr);
+        maxSlider.setLookAndFeel(nullptr);
+    };
     
     Slider minSlider;
     Slider maxSlider;
@@ -447,7 +451,14 @@ public TextEditor::Listener
 {
 public:
     BKWaveDistanceUndertowSlider();
-    ~BKWaveDistanceUndertowSlider() {};
+    ~BKWaveDistanceUndertowSlider()
+    {
+        for(int i=0; i<maxSliders; i++)
+        {
+            Slider* newSlider = displaySliders.getUnchecked(i);
+            newSlider->setLookAndFeel(nullptr);
+        }
+    };
     
     ScopedPointer<Slider> wavedistanceSlider;
     ScopedPointer<Slider> undertowSlider;
@@ -568,7 +579,20 @@ public TextEditor::Listener
 public:
     
     BKStackedSlider(String sliderName, double min, double max, double defmin, double defmax, double def, double increment);
-    ~BKStackedSlider() {};
+    
+    ~BKStackedSlider()
+    {
+        topSlider->setLookAndFeel(nullptr);
+        
+        for(int i=0; i<numSliders; i++)
+        {
+            Slider* newSlider = dataSliders.operator[](i);
+            if(newSlider != nullptr)
+            {
+                newSlider->setLookAndFeel(nullptr);
+            }
+        }
+    };
     
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;

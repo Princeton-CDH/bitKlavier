@@ -19,7 +19,10 @@ public BKViewController
 public:
     
     DirectViewController(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~DirectViewController() {};
+    ~DirectViewController()
+    {
+        setLookAndFeel(nullptr);
+    };
     
     BKEditableComboBox selectCB;
     
@@ -85,7 +88,10 @@ public BKStackedSlider::Listener
 public:
     
     DirectModificationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~DirectModificationEditor() {};
+    ~DirectModificationEditor()
+    {
+        setLookAndFeel(nullptr);
+    };
     
     void update(void) override;
     void updateModification(void);

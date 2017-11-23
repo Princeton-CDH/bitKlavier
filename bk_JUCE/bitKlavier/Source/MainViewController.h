@@ -53,7 +53,7 @@ public:
     void setDisplay(DisplayType type);
     
     Slider octaveSlider;
-    void setSliderLookAndFeel(BKButtonAndMenuLAF *laf);
+    //void setSliderLookAndFeel(BKButtonAndMenuLAF *laf);
     
 private:
     // This reference is provided as a quick way for your editor to
@@ -115,7 +115,7 @@ private:
     
     bool isAddingFromMidiInput;
     
-    //BKButtonAndMenuLAF laf;
+    BKButtonAndMenuLAF laf;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainViewController)
 };

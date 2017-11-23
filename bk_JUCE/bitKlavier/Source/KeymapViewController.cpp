@@ -87,6 +87,7 @@ BKViewController(p, theGraph)
 
 KeymapViewController::~KeymapViewController()
 {
+    setLookAndFeel(nullptr);
 }
 
 void KeymapViewController::reset(void)

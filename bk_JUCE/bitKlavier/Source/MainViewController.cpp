@@ -39,7 +39,7 @@ timerCallbackCount(0)
     addAndMakeVisible(levelMeterComponentL);
     
     mainSlider = new Slider();
-    //mainSlider->setLookAndFeel(&laf);
+    mainSlider->setLookAndFeel(&laf);
     
     mainSlider->setRange (-90, 12.0, 0.1);
     mainSlider->setSkewFactor (2.5, false);
@@ -78,7 +78,7 @@ timerCallbackCount(0)
     
     octaveSlider.setRange(0, 6, 1);
     octaveSlider.addListener(this);
-    //octaveSlider.setLookAndFeel(&laf);
+    octaveSlider.setLookAndFeel(&laf);
     octaveSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
     octaveSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
     octaveSlider.setValue(3);
@@ -103,14 +103,19 @@ timerCallbackCount(0)
 
 MainViewController::~MainViewController()
 {
+    setLookAndFeel(nullptr);
+    octaveSlider.setLookAndFeel(nullptr);
+    mainSlider->setLookAndFeel(nullptr);
     removeKeyListener(this);
 }
 
+/*
 void MainViewController::setSliderLookAndFeel(BKButtonAndMenuLAF *laf)
 {
     octaveSlider.setLookAndFeel(laf);
     mainSlider->setLookAndFeel(laf);
 }
+ */
 
 
 void MainViewController::paint (Graphics& g)

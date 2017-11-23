@@ -64,7 +64,9 @@ construction(c)
 
 HeaderViewController::~HeaderViewController()
 {
-    
+    galleryCB.setLookAndFeel(nullptr);
+    pianoCB.setLookAndFeel(nullptr);
+    setLookAndFeel(nullptr);
 }
 
 void HeaderViewController::paint (Graphics& g)

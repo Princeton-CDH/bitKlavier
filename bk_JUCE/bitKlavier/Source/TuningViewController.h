@@ -18,7 +18,10 @@ public BKViewController
 public:
     
     TuningViewController(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~TuningViewController() {};
+    ~TuningViewController()
+    {
+        setLookAndFeel(nullptr);
+    };
     
     void paint (Graphics&) override;
     void resized() override;
@@ -129,7 +132,10 @@ public BKKeyboardSlider::Listener
 public:
     
     TuningModificationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~TuningModificationEditor() {};
+    ~TuningModificationEditor()
+    {
+        setLookAndFeel(nullptr);
+    };
     
     void update(void) override;
     void updateModification(void);
