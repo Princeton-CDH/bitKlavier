@@ -492,6 +492,7 @@ public:
     
     inline void setText(NostalgicParameterType which, String text)
     {
+        //DBG("Nostalgic setText " + text);
         if (which == NostalgicUndertow)             undertowValueTF.setText(text, false);
         else if (which == NostalgicWaveDistance)    wavedistanceValueTF.setText(text, false);
     }
@@ -507,6 +508,7 @@ public:
     
     inline void dismissTextEditor(bool setValue = false)
     {
+        //DBG("nostalgic text editor dismissed");
         if (setValue)
         {
             textEditorReturnKeyPressed(wavedistanceValueTF);

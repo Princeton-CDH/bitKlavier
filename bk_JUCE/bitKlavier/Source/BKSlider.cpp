@@ -1717,9 +1717,11 @@ BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
     }
     
     undertowValueTF.setName("ut");
+    undertowValueTF.addListener(this);
     addChildComponent(undertowValueTF);
     
     wavedistanceValueTF.setName("wd");
+    wavedistanceValueTF.addListener(this);
     addChildComponent(wavedistanceValueTF);
     
     
@@ -1812,11 +1814,13 @@ void BKWaveDistanceUndertowSlider::mouseDoubleClick(const MouseEvent& e)
     if (c == wavedistanceSlider.get())
     {
         wavedistanceValueTF.setVisible(true);
+        wavedistanceValueTF.grabKeyboardFocus();
         inputListeners.call(&WantsKeyboardListener::bkWaveDistanceUndertowSliderWantsKeyboard, this, NostalgicWaveDistance);
     }
     else if (c == undertowSlider.get())
     {
         undertowValueTF.setVisible(true);
+        undertowValueTF.grabKeyboardFocus();
         inputListeners.call(&WantsKeyboardListener::bkWaveDistanceUndertowSliderWantsKeyboard, this, NostalgicUndertow);
     }
     
@@ -1825,6 +1829,8 @@ void BKWaveDistanceUndertowSlider::mouseDoubleClick(const MouseEvent& e)
 void BKWaveDistanceUndertowSlider::textEditorReturnKeyPressed(TextEditor& editor)
 {
     double newval = editor.getText().getDoubleValue();
+    
+    //DBG("nostalgic wavedistance/undertow slider return key pressed");
     
     if (editor.getName() == "ut")
     {
@@ -1850,11 +1856,13 @@ void BKWaveDistanceUndertowSlider::textEditorReturnKeyPressed(TextEditor& editor
 
 void BKWaveDistanceUndertowSlider::textEditorTextChanged(TextEditor& textEditor)
 {
+    //DBG("Nostalgic textEditorTextChanged");
     focusLostByEscapeKey = false;
 }
 
 void BKWaveDistanceUndertowSlider::textEditorEscapeKeyPressed (TextEditor& textEditor)
 {
+    //DBG("Nostalgic textEditorEscapeKeyPressed");
     focusLostByEscapeKey = true;
     unfocusAllComponents();
 }
@@ -1862,6 +1870,7 @@ void BKWaveDistanceUndertowSlider::textEditorEscapeKeyPressed (TextEditor& textE
 void BKWaveDistanceUndertowSlider::textEditorFocusLost(TextEditor& textEditor)
 {
 #if !JUCE_IOS
+    //DBG("Nostalgic textEditorFocusLost");
     if(!focusLostByEscapeKey)
     {
         textEditorReturnKeyPressed(textEditor);
