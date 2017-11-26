@@ -116,9 +116,11 @@ void KeymapViewController::resized()
     keyboard->setBlackNoteLengthProportion(0.6);
     keyboardRow.reduce(gXSpacing, 0);
     
+#if JUCE_IOS
     float sliderHeight = 15;
     Rectangle<int> sliderArea = keyboardRow.removeFromTop(sliderHeight);
     octaveSlider.setBounds(sliderArea);
+#endif
     
     keyboard->setBounds(keyboardRow);
     
