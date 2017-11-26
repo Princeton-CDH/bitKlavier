@@ -805,12 +805,20 @@ void BKAudioProcessor::initializeGallery(void)
     prevPiano = gallery->getPianos().getFirst();
     
     int defPiano = gallery->getDefaultPiano();
-    if (defPiano >= gallery->getNumPianos() || defPiano < 1)
+
+    //if (defPiano >= gallery->getNumPianos() || defPiano < 1)
+    if (defPiano < 1)
     {
         defPiano = gallery->getPianos().getFirst()->getId();
     }
 
+
     currentPiano = gallery->getPiano(defPiano);
+    if(currentPiano == nullptr)
+    {
+        defPiano = gallery->getPianos().getFirst()->getId();
+        currentPiano = gallery->getPiano(defPiano);
+    }
     
     for (auto piano : gallery->getPianos())
     {

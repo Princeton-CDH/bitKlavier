@@ -24,6 +24,9 @@ resizer(new ResizableCornerComponent (this, constrain))
     viewPort.setViewPosition(0, 0);
     addAndMakeVisible(viewPort);
     
+    //laf = new BKButtonAndMenuLAF();
+    //mvc.setSliderLookAndFeel(&laf); 
+    
 #if !JUCE_IOS
     addAndMakeVisible (resizer);
     

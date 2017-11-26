@@ -103,8 +103,19 @@ timerCallbackCount(0)
 
 MainViewController::~MainViewController()
 {
+    setLookAndFeel(nullptr);
+    octaveSlider.setLookAndFeel(nullptr);
+    mainSlider->setLookAndFeel(nullptr);
     removeKeyListener(this);
 }
+
+/*
+void MainViewController::setSliderLookAndFeel(BKButtonAndMenuLAF *laf)
+{
+    octaveSlider.setLookAndFeel(laf);
+    mainSlider->setLookAndFeel(laf);
+}
+ */
 
 
 void MainViewController::paint (Graphics& g)

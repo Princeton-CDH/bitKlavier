@@ -87,6 +87,7 @@ BKViewController(p, theGraph)
 
 KeymapViewController::~KeymapViewController()
 {
+    setLookAndFeel(nullptr);
 }
 
 void KeymapViewController::reset(void)
@@ -119,6 +120,8 @@ void KeymapViewController::resized()
 #if JUCE_IOS
     float sliderHeight = 15;
     Rectangle<int> sliderArea = keyboardRow.removeFromTop(sliderHeight);
+    
+#if JUCE_IOS
     octaveSlider.setBounds(sliderArea);
 #endif
     

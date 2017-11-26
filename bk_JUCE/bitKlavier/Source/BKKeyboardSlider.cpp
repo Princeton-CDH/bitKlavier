@@ -54,7 +54,7 @@ needsOctaveSlider(nos)
     orderedPairs = true;
 
     showName.setText("unnamed keyboard slider", dontSendNotification);
-    showName.setJustificationType(Justification::bottomRight);
+    showName.setJustificationType(Justification::centredRight);
     showName.addMouseListener(this, true);
     addAndMakeVisible(showName);
 

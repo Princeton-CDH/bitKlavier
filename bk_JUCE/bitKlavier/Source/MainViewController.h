@@ -53,6 +53,7 @@ public:
     void setDisplay(DisplayType type);
     
     Slider octaveSlider;
+    //void setSliderLookAndFeel(BKButtonAndMenuLAF *laf);
     
 private:
     // This reference is provided as a quick way for your editor to

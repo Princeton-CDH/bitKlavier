@@ -66,6 +66,7 @@ BKViewController(p, theGraph)
 
 GeneralViewController::~GeneralViewController()
 {
+    setLookAndFeel(nullptr);
 }
 
 void GeneralViewController::paint (Graphics& g)

@@ -19,7 +19,10 @@ public BKViewController
 {
 public:
     SynchronicViewController(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~SynchronicViewController() {};
+    ~SynchronicViewController()
+    {
+        setLookAndFeel(nullptr);
+    };
     
     void paint (Graphics&) override;
     void resized() override;
@@ -117,7 +120,10 @@ public Timer
 {
 public:
     SynchronicModificationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~SynchronicModificationEditor() {};
+    ~SynchronicModificationEditor()
+    {
+        setLookAndFeel(nullptr);
+    };
     
     void update(void) override;
     

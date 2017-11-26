@@ -17,7 +17,10 @@ class TempoViewController : public BKViewController
 public:
     
     TempoViewController(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~TempoViewController() {};
+    ~TempoViewController()
+    {
+        setLookAndFeel(nullptr);
+    };
     
     void paint (Graphics&) override;
     void resized() override;
@@ -105,7 +108,10 @@ private Timer
 public:
     
     TempoModificationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~TempoModificationEditor(){};
+    ~TempoModificationEditor()
+    {
+        setLookAndFeel(nullptr);
+    };
     
     void update(void) override;
     void updateModification(void);
