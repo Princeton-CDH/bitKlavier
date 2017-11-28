@@ -9,9 +9,16 @@ updateState(new BKUpdateState()),
 mainPianoSynth(),
 hammerReleaseSynth(),
 resonanceReleaseSynth()
+#if TRY_UNDO
+,epoch(0)
+#endif
 {
     didLoadHammersAndRes            = false;
     didLoadMainPianoSamples         = false;
+    
+#if TRY_UNDO
+    history.ensureStorageAllocated(10);
+#endif
     
     Process::setPriority(juce::Process::RealtimePriority);
     
@@ -99,6 +106,13 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     else                    loadPianoSamples(BKLoadLite);
 #else
     loadPianoSamples(BKLoadHeavy);
+#endif
+    
+#if TRY_UNDO
+    for (int i = 0; i < NUM_EPOCHS; i++)
+    {
+        history.set(i, currentPiano);
+    }
 #endif
 
 }
@@ -962,6 +976,32 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     
 }
 
+#if TRY_UNDO
+void BKAudioProcessor::updateHistory(void)
+{
+    for (int i = 0; i < NUM_EPOCHS; i++)
+    {
+        history.set(i+1, history.getUnchecked(i));
+    }
+    
+    history.set(0, currentPiano->duplicate(true));
+}
+
+void BKAudioProcessor::timeTravel(bool forward)
+{
+    if (forward)    epoch--;
+    else            epoch++;
+    
+    if (epoch >= NUM_EPOCHS) epoch = NUM_EPOCHS-1;
+    if (epoch <  0 ) epoch = 0;
+    
+    Piano::Ptr newPiano = history.getUnchecked(epoch);
+    
+    if (newPiano != nullptr) currentPiano = newPiano;
+    
+    updateState->pianoDidChangeForGraph = true;
+}
+#endif
 
 
 

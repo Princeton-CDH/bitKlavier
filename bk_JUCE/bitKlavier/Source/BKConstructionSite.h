@@ -45,6 +45,12 @@ public:
     void cut(void);
     void selectAll(void);
     
+    
+#if TRY_UNDO
+    void undo(void);
+    void redo(void);
+#endif
+    
     inline int getNumSelected(void) { return graph->getSelectedItems().size(); }
     
     void addItemsFromClipboard(void);

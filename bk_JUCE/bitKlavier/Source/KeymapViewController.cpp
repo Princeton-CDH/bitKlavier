@@ -121,7 +121,6 @@ void KeymapViewController::resized()
     float sliderHeight = 15;
     Rectangle<int> sliderArea = keyboardRow.removeFromTop(sliderHeight);
     
-#if JUCE_IOS
     octaveSlider.setBounds(sliderArea);
 #endif
     
@@ -130,9 +129,7 @@ void KeymapViewController::resized()
 #if JUCE_IOS
     keymapTF.setTopLeftPosition(hideOrShow.getX(), hideOrShow.getBottom() + gYSpacing);
     keymapTF.setSize(keyboardRow.getWidth() * 0.5, getBottom() - hideOrShow.getBottom() - 2 * gYSpacing);
-    
-    
-    
+
 #else
     keymapTF.setBounds(keyboardRow);
 #endif

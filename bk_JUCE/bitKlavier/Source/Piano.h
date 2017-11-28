@@ -40,9 +40,9 @@ public:
           int Id);
     ~Piano();
     
-    inline Piano::Ptr duplicate(void)
+    inline Piano::Ptr duplicate(bool withSameId = false)
     {
-        Piano::Ptr copyPiano = new Piano(processor, -1);
+        Piano::Ptr copyPiano = new Piano(processor, withSameId ? Id : -1);
         
         BKItem::PtrArr newItems;
         
@@ -359,7 +359,6 @@ private:
     void configureTempoModification(int key, TempoModPreparation::Ptr, Array<int>);
     void deconfigureTempoModification(TempoModPreparation::Ptr, Array<int> whichKeymaps);
     void deconfigureTempoModificationForKeys(TempoModPreparation::Ptr, Array<int>);
-    
     
     JUCE_LEAK_DETECTOR(Piano)
 };
