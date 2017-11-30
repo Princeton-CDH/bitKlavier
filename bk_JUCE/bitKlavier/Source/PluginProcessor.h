@@ -46,6 +46,7 @@ public:
     void loadGalleryDialog(void);
     void loadJsonGalleryDialog(void);
     void loadGalleryFromPath(String path);
+    void loadGalleryFromXml(ScopedPointer<XmlElement> xml);
     void loadJsonGalleryFromPath(String path);
     void saveGalleryAs(void);
     void saveGallery(void);
@@ -70,6 +71,8 @@ public:
     Piano::Ptr                          prevPiano;
     Piano::Ptr                          currentPiano;
     Piano::PtrArr                       prevPianos;
+    
+    StringArray mikroetudes, ns_etudes;
     
     StringArray                         galleryNames;
     String                              currentGallery;

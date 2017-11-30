@@ -16,9 +16,66 @@
   <MAINGROUP id="s4R02g" name="bitKlavier">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
       <GROUP id="{1E3013D4-6B2A-D996-A5C8-F92AE44A39F2}" name="Resources">
-        <GROUP id="{7F0BF645-3E7B-170B-9D26-4D950F9268C2}" name="presets">
-          <FILE id="EqvF0v" name="__blank.xml" compile="0" resource="1" file="Source/__blank.xml"/>
+        <GROUP id="{9C4FD35C-3F21-4A4D-09A9-8F441E5BC3BE}" name="_Mikroetudes">
+          <FILE id="M5OWag" name="And So....xml" compile="0" resource="1" file="Source/galleries/_Mikroetudes/And So....xml"/>
+          <FILE id="aXDKuW" name="Around 60.xml" compile="0" resource="1" file="Source/galleries/_Mikroetudes/Around 60.xml"/>
+          <FILE id="IoVnL6" name="Circleville.xml" compile="0" resource="1" file="Source/galleries/_Mikroetudes/Circleville.xml"/>
+          <FILE id="n5r1Q5" name="Crests.xml" compile="0" resource="1" file="Source/galleries/_Mikroetudes/Crests.xml"/>
+          <FILE id="eZ95xe" name="Cygnet.xml" compile="0" resource="1" file="Source/galleries/_Mikroetudes/Cygnet.xml"/>
+          <FILE id="BNYH5c" name="Daily Decrease.xml" compile="0" resource="1"
+                file="Source/galleries/_Mikroetudes/Daily Decrease.xml"/>
+          <FILE id="lAjYXl" name="Didymus.xml" compile="0" resource="1" file="Source/galleries/_Mikroetudes/Didymus.xml"/>
+          <FILE id="oqdepD" name="for Bill D.xml" compile="0" resource="1" file="Source/galleries/_Mikroetudes/for Bill D.xml"/>
+          <FILE id="K9Cjep" name="Gigue Interrupted.xml" compile="0" resource="1"
+                file="Source/galleries/_Mikroetudes/Gigue Interrupted.xml"/>
+          <FILE id="Y8lHbh" name="Houseboat.xml" compile="0" resource="1" file="Source/galleries/_Mikroetudes/Houseboat.xml"/>
+          <FILE id="iiV0Is" name="Hurra.xml" compile="0" resource="1" file="Source/galleries/_Mikroetudes/Hurra.xml"/>
+          <FILE id="uvLyhr" name="Juxtaposed Weather.xml" compile="0" resource="1"
+                file="Source/galleries/_Mikroetudes/Juxtaposed Weather.xml"/>
+          <FILE id="kGNkgt" name="Keep It Steady (OrNot).xml" compile="0" resource="1"
+                file="Source/galleries/_Mikroetudes/Keep It Steady (OrNot).xml"/>
+          <FILE id="vOW1rD" name="Keep It Steady.xml" compile="0" resource="1"
+                file="Source/galleries/_Mikroetudes/Keep It Steady.xml"/>
+          <FILE id="Ofb02r" name="Listen.xml" compile="0" resource="1" file="Source/galleries/_Mikroetudes/Listen.xml"/>
+          <FILE id="Sger8F" name="Mama's Musette.xml" compile="0" resource="1"
+                file="Source/galleries/_Mikroetudes/Mama's Musette.xml"/>
+          <FILE id="d7mCmo" name="Petite Gymnopedie.xml" compile="0" resource="1"
+                file="Source/galleries/_Mikroetudes/Petite Gymnopedie.xml"/>
+          <FILE id="zGzrQb" name="Pyramids.xml" compile="0" resource="1" file="Source/galleries/_Mikroetudes/Pyramids.xml"/>
+          <FILE id="okWh7H" name="Quickie.xml" compile="0" resource="1" file="Source/galleries/_Mikroetudes/Quickie.xml"/>
+          <FILE id="pWgrNX" name="Scales within Sliding Scales.xml" compile="0"
+                resource="1" file="Source/galleries/_Mikroetudes/Scales within Sliding Scales.xml"/>
+          <FILE id="ZX2a4M" name="Slow To Come Back.xml" compile="0" resource="1"
+                file="Source/galleries/_Mikroetudes/Slow To Come Back.xml"/>
+          <FILE id="QqPwnQ" name="Southwing.xml" compile="0" resource="1" file="Source/galleries/_Mikroetudes/Southwing.xml"/>
+          <FILE id="x9aICJ" name="Who do you think you are, Mars?.xml" compile="0"
+                resource="1" file="Source/galleries/_Mikroetudes/Who do you think you are, Mars?.xml"/>
+          <FILE id="Nyvjor" name="Worm.xml" compile="0" resource="1" file="Source/galleries/_Mikroetudes/Worm.xml"/>
         </GROUP>
+        <GROUP id="{BD73FF61-C9B2-FCBE-4FC7-FB5C0C1410DC}" name="_Nostalgic Synchronic">
+          <FILE id="xCN0zp" name="NS_1_Prelude.xml" compile="0" resource="1"
+                file="Source/galleries/_Nostalgic Synchronic/NS_1_Prelude.xml"/>
+          <FILE id="QwMd7l" name="NS_2_Undertow.xml" compile="0" resource="1"
+                file="Source/galleries/_Nostalgic Synchronic/NS_2_Undertow.xml"/>
+          <FILE id="wq52fF" name="NS_3_Song.xml" compile="0" resource="1" file="Source/galleries/_Nostalgic Synchronic/NS_3_Song.xml"/>
+          <FILE id="WxawtA" name="NS_4_Marbles.xml" compile="0" resource="1"
+                file="Source/galleries/_Nostalgic Synchronic/NS_4_Marbles.xml"/>
+          <FILE id="f36mgI" name="NS_5_Wallumrod.xml" compile="0" resource="1"
+                file="Source/galleries/_Nostalgic Synchronic/NS_5_Wallumrod.xml"/>
+          <FILE id="Ff3VEC" name="NS_6_PointsAmongLines.xml" compile="0" resource="1"
+                file="Source/galleries/_Nostalgic Synchronic/NS_6_PointsAmongLines.xml"/>
+          <FILE id="IIUkhg" name="NS_7_Systerslaat.xml" compile="0" resource="1"
+                file="Source/galleries/_Nostalgic Synchronic/NS_7_Systerslaat.xml"/>
+          <FILE id="adDuQ8" name="NS_8_ItIsEnough.xml" compile="0" resource="1"
+                file="Source/galleries/_Nostalgic Synchronic/NS_8_ItIsEnough.xml"/>
+        </GROUP>
+        <FILE id="XTBny2" name="__blank.xml" compile="0" resource="1" file="Source/galleries/__blank.xml"/>
+        <FILE id="ghRxiw" name="_bitKlavier examples.xml" compile="0" resource="1"
+              file="Source/galleries/_bitKlavier examples.xml"/>
+        <FILE id="thuSkk" name="HistoricalTemperaments.xml" compile="0" resource="1"
+              file="Source/galleries/HistoricalTemperaments.xml"/>
+        <FILE id="uOZ1Sj" name="Mike's Gallery.xml" compile="0" resource="1"
+              file="Source/galleries/Mike's Gallery.xml"/>
         <GROUP id="{6F7CFDA8-D246-D5B9-B60B-EDBE0C6F3537}" name="icons">
           <FILE id="Dl47P7" name="bitKlavier_x.png" compile="0" resource="1"
                 file="Source/bitKlavier_x.png"/>

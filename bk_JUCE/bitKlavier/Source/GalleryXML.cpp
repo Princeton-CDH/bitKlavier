@@ -14,9 +14,9 @@ ValueTree  Gallery::getState(void)
 {
     ValueTree galleryVT( vtagGallery);
     
-    galleryVT.setProperty("url", url, 0);
-    
     galleryVT.setProperty("name", name, 0);
+    
+    galleryVT.setProperty("url", url, 0);
     
     galleryVT.setProperty("sampleType", sampleType, 0);
     

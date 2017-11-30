@@ -60,7 +60,9 @@ private:
     static void pianoMenuCallback(int result, HeaderViewController*);
     static void galleryMenuCallback(int result, HeaderViewController*);
     
+    void loadDefaultGalleries(void);
     
+    int numberOfDefaultGalleryItems;
     
     void addGalleriesFromFolder(File folder);
     

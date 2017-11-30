@@ -73,8 +73,6 @@
 
 #define RENAME_ID 45
 
-
-
 inline PopupMenu getNewItemMenu(LookAndFeel* laf)
 {
     PopupMenu newMenu;

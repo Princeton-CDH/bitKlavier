@@ -11,7 +11,6 @@
 #include "BKUtilities.h"
 
 
-
 String rectangleToString(Rectangle<int> rect)
 {
     return ("X: " + String(rect.getX()) +

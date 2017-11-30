@@ -58,6 +58,9 @@ construction(c)
     pianoCB.setSelectedId(0, dontSendNotification);
     
     galleryModalCallBackIsOpen = false;
+    
+    loadDefaultGalleries();
+    
     fillGalleryCB();
     
 }
@@ -445,12 +448,58 @@ void HeaderViewController::addGalleriesFromFolder(File folder)
     
 }
 
-void HeaderViewController::fillGalleryCB(void)
+
+void HeaderViewController::loadDefaultGalleries(void)
 {
     
     if(!galleryModalCallBackIsOpen)
     {
         galleryCB.clear(dontSendNotification);
+        
+        PopupMenu* popupRoot = galleryCB.getRootMenu();
+        
+        String data,name, resource;
+        int id = 1;
+        
+        int size;
+        
+        PopupMenu mikroetudes_menu, ns_etudes_menu;
+        
+        //data = BinaryData::__blank_xml;
+        for (int i = 0; i < BinaryData::namedResourceListSize; i++)
+        {
+            resource = BinaryData::namedResourceList[i];
+            
+            if (resource.contains("_xml"))
+            {
+                data = BinaryData::getNamedResource(BinaryData::namedResourceList[i], size);
+                
+                name = data.fromFirstOccurrenceOf("<gallery name=\"", false, true).upToFirstOccurrenceOf("\" ", false, true);
+                
+                DBG(name);
+                
+                if (processor.mikroetudes.contains(name))       mikroetudes_menu.addItem(id++, name);
+                else if (processor.ns_etudes.contains(name))    ns_etudes_menu.addItem(id++, name);
+                else                                            galleryCB.addItem(name, id++);
+                
+            }
+        }
+        
+        popupRoot->addSubMenu("_Nostalgic Synchronic", ns_etudes_menu);
+        popupRoot->addSubMenu("_Mikroetudes", mikroetudes_menu);
+        
+        galleryCB.addSeparator();
+        
+        numberOfDefaultGalleryItems = galleryCB.getNumItems();
+    }
+}
+
+void HeaderViewController::fillGalleryCB(void)
+{
+    
+    if(!galleryModalCallBackIsOpen)
+    {
+        loadDefaultGalleries();
         
         File bkGalleries;
         
@@ -468,7 +517,7 @@ void HeaderViewController::fillGalleryCB(void)
         
         PopupMenu* galleryCBPopUp = galleryCB.getRootMenu();
         
-        int index = 0;
+        int id = numberOfDefaultGalleryItems, index = 0;
         bool creatingSubmenu = false;
         String submenuName;
         
@@ -493,7 +542,7 @@ void HeaderViewController::fillGalleryCB(void)
                thisFile.getParentDirectory().getFileName() == moreGalleries.getFileName() ||
                thisFile.getParentDirectory().getFileName() == moreGalleries.getChildFile("Inbox").getFileName()) //if the file is in the main galleries directory....
             {
-                galleryCB.addItem(galleryName, i+1); //add to toplevel popup
+                galleryCB.addItem(galleryName, ++id); //add to toplevel popup
             }
             
             //otherwise add to or create submenu with name of subfolder
@@ -506,14 +555,14 @@ void HeaderViewController::fillGalleryCB(void)
                 if(submenuNames.contains(submenuName)) //add to existing submenu
                 {
                     PopupMenu* existingMenu = submenus.getUnchecked(submenuNames.indexOf(submenuName));
-                    existingMenu->addItem(i + 1, galleryName);
+                    existingMenu->addItem(++id, galleryName);
                 }
                 else
                 {
                     submenus.add(new PopupMenu());
                     submenuNames.add(submenuName);
                     
-                    submenus.getLast()->addItem(i + 1, galleryName);;
+                    submenus.getLast()->addItem(++id, galleryName);;
                 }
             }
             
@@ -527,10 +576,14 @@ void HeaderViewController::fillGalleryCB(void)
             creatingSubmenu = false;
         }
         
-        galleryCB.setSelectedId(index+1, NotificationType::dontSendNotification);
+        // THIS IS WHERE NAME OF GALLERY DISPLAYED IS SET
+        galleryCB.setSelectedId(lastGalleryCBId, NotificationType::dontSendNotification);
         
-        File selectedFile(processor.galleryNames[index]);
-        processor.gallery->setURL(selectedFile.getFullPathName());
+        if (lastGalleryCBId > numberOfDefaultGalleryItems)
+        {
+            File selectedFile(processor.galleryNames[index]);
+            processor.gallery->setURL(selectedFile.getFullPathName());
+        }
     }
 }
 
@@ -542,7 +595,6 @@ void HeaderViewController::update(void)
 void HeaderViewController::switchGallery()
 {
     fillPianoCB();
-    fillGalleryCB();
 }
 
 void HeaderViewController::fillPianoCB(void)
@@ -622,9 +674,7 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
 {
     String name = cb->getName();
     int Id = cb->getSelectedId();
-    int index = cb->getSelectedItemIndex();
 
-    
     if (name == "pianoCB")
     {
         processor.setCurrentPiano(Id);
@@ -640,11 +690,28 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
         
         if (shouldSwitch)
         {
-            String path = processor.galleryNames[index];
             lastGalleryCBId = Id;
+            int index = Id - 1;
             
-            if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
-            else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
+            DBG("load Id: " + String(Id) + " binary length: " + String(numberOfDefaultGalleryItems));
+            
+            if (index < numberOfDefaultGalleryItems)
+            {
+                int size;
+                int index = Id - 1;
+                String xmlData = CharPointer_UTF8 (BinaryData::getNamedResource(BinaryData::namedResourceList[index], size));
+                
+                processor.loadGalleryFromXml(XmlDocument::parse(xmlData));
+            }
+            else
+            {
+                index = index - numberOfDefaultGalleryItems;
+                String path = processor.galleryNames[index];
+                
+                if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
+                else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
+            }
+            
         }
         else
         {

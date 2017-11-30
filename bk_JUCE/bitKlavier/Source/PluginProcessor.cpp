@@ -78,7 +78,45 @@ resonanceReleaseSynth()
         noteOn.set(i, false);
     }
     
-
+    mikroetudes = StringArray({
+        "And So...",
+        "Around 60",
+        "Circleville",
+        "Crests",
+        "Cygnet",
+        "Daily Decrease",
+        "Didymus",
+        "for Bill D",
+        "Gigue Interrupted",
+        "Houseboat",
+        "Hurra",
+        "Juxtaposed Weather",
+        "Keep It Steady (OrNot)",
+        "Keep It Steady",
+        "Listen!",
+        "Mama's Musette",
+        "Petite Gymnopedie",
+        "Pyramids",
+        "Quickie",
+        "Scales within Sliding Scales",
+        "Slow To Come Back",
+        "Southwing",
+        "Who do you think you are, Mars?",
+        "Worm"
+    });
+    
+    ns_etudes = StringArray({
+        "NS_1_Prelude",
+        "NS_2_Undertow",
+        "NS_3_Song",
+        "NS_4_Marbles",
+        "NS_5_Wallumrod",
+        "NS_6_PointsAmongLines",
+        "NS_7_Systerslaat",
+        "NS_8_ItIsEnough"
+    });
+    
+    
 }
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -191,9 +229,7 @@ void BKAudioProcessor::renameGallery(String name)
     {
         bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory);
     }
-#endif
-    
-#if JUCE_MAC || JUCE_WINDOWS
+#else
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
@@ -346,6 +382,13 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     // Sets some flags to determine whether to send noteoffs to previous pianos.
     if (!allNotesOff && !noteOnCount) {
+        
+        /*
+        // Process all active prep maps in previous piano
+        for (auto pmap : prevPiano->activePMaps)
+            pmap->processBlock(numSamples, m.getChannel());
+         */
+        
         prevPianos.clearQuick();
         allNotesOff = true;
     }
@@ -714,20 +757,13 @@ void BKAudioProcessor::loadGalleryDialog(void)
     
 }
 
-void BKAudioProcessor::loadGalleryFromPath(String path)
+void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
 {
-    updateState->loadedJson = false;
-    
-    File myFile (path);
-    currentGalleryPath = path;
-    
-    ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
-    
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
-        currentGallery = myFile.getFileName();
-        
         gallery = new Gallery(xml, *this);
+        
+        currentGallery = gallery->getName();
         
         gallery->print();
         
@@ -737,6 +773,18 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
         
         gallery->setGalleryDirty(false);
     }
+}
+
+void BKAudioProcessor::loadGalleryFromPath(String path)
+{
+    updateState->loadedJson = false;
+    
+    File myFile (path);
+    currentGalleryPath = path;
+    
+    ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
+    
+    loadGalleryFromXml(xml);
 }
 
 void BKAudioProcessor::loadJsonGalleryDialog(void)
