@@ -640,7 +640,7 @@ public:
     void keyPressed(int midiNoteNumber, float midiNoteVelocity, int midiChannel);
     
     //begin playing reverse note, called with noteOff
-    void keyReleased(int midiNoteNumber, int midiChannel);
+    void keyReleased(int midiNoteNumber, int midiChannel, bool post = false);
     
     void postRelease(int midiNoteNumber, int midiChannel);
     

@@ -44,14 +44,16 @@ void NostalgicProcessor::postRelease(int midiNoteNumber, int midiChannel)
     activeNotes.removeFirstMatchingValue(midiNoteNumber);
     noteOn.set(midiNoteNumber, false);
     noteLengthTimers.set(midiNoteNumber, 0);
+    
+
 }
 
 //begin reverse note; called when key is released
-void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
+void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel, bool post)
 {
     float duration = 0.0;
     
-    if (noteOn[midiNoteNumber])
+    if (post || noteOn[midiNoteNumber])
     {
         
         int offRamp;
@@ -280,7 +282,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
 void NostalgicProcessor::incrementTimers(int numSamples)
 {
     
-    for(int i = (activeNotes.size() - 1); i >= 0; --i)
+    for(int i=(activeNotes.size()-1); i >= 0; --i)
     {
         noteLengthTimers.set(activeNotes.getUnchecked(i),
                              noteLengthTimers.getUnchecked(activeNotes.getUnchecked(i)) + numSamples);

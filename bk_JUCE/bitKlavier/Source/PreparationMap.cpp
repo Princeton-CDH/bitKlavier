@@ -255,23 +255,25 @@ void PreparationMap::deactivateIfNecessary()
 }
 
 
-void PreparationMap::processBlock(int numSamples, int midiChannel)
+void PreparationMap::processBlock(int numSamples, int midiChannel, bool onlyNostalgic)
 {
-    for (auto dproc : dprocessor)
-        dproc->processBlock(numSamples, midiChannel);
-    
     for (auto nproc : nprocessor)
         nproc->processBlock(numSamples, midiChannel);
-    
-    for (auto sproc : sprocessor)
-        sproc->processBlock(numSamples, midiChannel);
-    
-    for (auto tproc : tprocessor)
-        tproc->processBlock(numSamples);
-    
-    for (auto mproc : mprocessor)
-        mproc->processBlock(numSamples, midiChannel);
 
+    if (!onlyNostalgic)
+    {
+        for (auto dproc : dprocessor)
+            dproc->processBlock(numSamples, midiChannel);
+        
+        for (auto sproc : sprocessor)
+            sproc->processBlock(numSamples, midiChannel);
+        
+        for (auto tproc : tprocessor)
+            tproc->processBlock(numSamples);
+        
+        for (auto mproc : mprocessor)
+            mproc->processBlock(numSamples, midiChannel);
+    }
 }
 
 //not sure why some of these have Channel and some don't; should rectify?
@@ -396,7 +398,7 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
         
         for (auto proc : nprocessor)
         {
-            proc->keyReleased(noteNumber, velocity);
+            proc->keyReleased(noteNumber, velocity, true);
         }
         
         for (auto proc : mprocessor)
