@@ -257,16 +257,21 @@ void PreparationMap::deactivateIfNecessary()
 
 void PreparationMap::processBlock(int numSamples, int midiChannel, bool onlyNostalgic)
 {
-    for (auto nproc : nprocessor)
-        nproc->processBlock(numSamples, midiChannel);
+    if(onlyNostalgic) {
+        for (auto nproc : nprocessor)
+            nproc->processBlock(numSamples, midiChannel);
+    }
 
-    if (!onlyNostalgic)
+    else
     {
         for (auto dproc : dprocessor)
             dproc->processBlock(numSamples, midiChannel);
         
         for (auto sproc : sprocessor)
             sproc->processBlock(numSamples, midiChannel);
+        
+        for (auto nproc : nprocessor)
+            nproc->processBlock(numSamples, midiChannel);
         
         for (auto tproc : tprocessor)
             tproc->processBlock(numSamples);
