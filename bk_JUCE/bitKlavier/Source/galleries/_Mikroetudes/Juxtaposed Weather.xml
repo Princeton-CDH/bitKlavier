@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<gallery name="Juxtaposed Weather" url="/Users/dan/bkGalleries/_Mikroetudes/Juxtaposed Weather.xml"
+         defaultPiano="1">
+  <idCount i0="12" i1="12" i2="12" i3="17" i4="14" i5="69" i6="10" i7="10"
+           i8="10" i9="17" i10="10" i11="10" i12="10" i13="10" i14="10"/>
+  <general globalGain="1" directGain="1" synchronicGain="1" nostalgicGain="1"
+           resonanceGain="1" hammerGain="0.0099999997764825820923" tempoMultiplier="1"
+           resAndHammer="1" invertSustain="0" tuningFund="440"/>
+  <tempo Id="12" name="12" tempo="252" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="13" name="13" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="14" name="14" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="15" name="15" scale="0" fundamental="9" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="16" name="16" scale="0" fundamental="9" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="17" name="17" scale="6" fundamental="9" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <direct Id="12" name="12" gain="0" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <synchronic Id="12" name="12" numBeats="1" clusterMin="1" clusterMax="100"
+              clusterThresh="100" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="0.20999999344348907471"/>
+    <accentMultipliers f0="2"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <nostalgic Id="12" name="12" waveDistance="50" undertow="1000" gain="1"
+             lengthMultiplier="1.2999999523162841797" beatsToSkip="1" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="Nostalgic-1" waveDistance="0" undertow="0" gain="1"
+             lengthMultiplier="1" beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <modTuning Id="13" scale="1" fundamental="8">
+    <customScale/>
+    <absoluteOffsets/>
+  </modTuning>
+  <modTuning Id="14" scale="6" fundamental="8">
+    <customScale/>
+    <absoluteOffsets/>
+  </modTuning>
+  <modTuning Id="15" scale="0" fundamental="8">
+    <customScale/>
+    <absoluteOffsets/>
+  </modTuning>
+  <modTuning Id="16" scale="0" fundamental="9">
+    <customScale/>
+    <absoluteOffsets/>
+  </modTuning>
+  <modTuning Id="17" scale="6" fundamental="9">
+    <customScale/>
+    <absoluteOffsets/>
+  </modTuning>
+  <keymap Id="13" name="13" k0="78" k1="79" k2="80" k3="81" k4="82" k5="83"
+          k6="84" k7="85" k8="86" k9="87" k10="88" k11="89" k12="90" k13="91"
+          k14="92" k15="93" k16="94" k17="95" k18="96" k19="97" k20="98"
+          k21="99" k22="100" k23="101" k24="102" k25="103" k26="104" k27="105"
+          k28="106" k29="107" k30="108" k31="109"/>
+  <keymap Id="14" name="14" k0="20" k1="21" k2="22" k3="23" k4="24" k5="25"
+          k6="26" k7="27" k8="28" k9="29" k10="30" k11="31" k12="32" k13="33"
+          k14="34" k15="35" k16="36" k17="37" k18="38" k19="39" k20="40"
+          k21="41" k22="42" k23="43" k24="44" k25="45" k26="46" k27="47"
+          k28="48" k29="49" k30="50" k31="51" k32="52" k33="53" k34="54"
+          k35="55" k36="56" k37="57" k38="58" k39="59" k40="60" k41="61"
+          k42="62" k43="63" k44="64" k45="65" k46="66" k47="67" k48="68"
+          k49="69" k50="70" k51="71" k52="72" k53="73" k54="74" k55="75"
+          k56="76" k57="77"/>
+  <keymap Id="15" name="15" k0="44" k1="45" k2="46" k3="47" k4="48" k5="49"
+          k6="50" k7="51" k8="52" k9="53" k10="54" k11="55" k12="56" k13="57"
+          k14="58" k15="59" k16="60" k17="61" k18="62" k19="63" k20="64"
+          k21="65" k22="66" k23="67" k24="68" k25="69" k26="70" k27="71"
+          k28="72" k29="73" k30="74" k31="75" k32="76" k33="77" k34="78"
+          k35="79" k36="80" k37="81" k38="82" k39="83" k40="84" k41="85"
+          k42="86" k43="87" k44="88" k45="89" k46="90" k47="91" k48="92"
+          k49="93" k50="94" k51="95" k52="96" k53="97" k54="98" k55="99"
+          k56="100" k57="101" k58="102" k59="103" k60="104" k61="105" k62="106"
+          k63="107" k64="108"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="50" name="50" k0="29" k1="41" k2="53" k3="65" k4="77" k5="89"
+          k6="101"/>
+  <keymap Id="51" name="51" k0="30" k1="42" k2="54" k3="66" k4="78" k5="90"
+          k6="102"/>
+  <piano name="JuxtaposedWeather" Id="1">
+    <item>
+      <item name="Synchronic12" type="1" Id="12" piano="-1" active="1" X="556"
+            Y="392"/>
+      <connections/>
+    </item>
+    <item>
+      <item name="Tempo12" type="4" Id="12" piano="-1" active="1" X="555"
+            Y="276"/>
+      <connections>
+        <item name="Synchronic12" type="1" Id="12" piano="-1" active="1" X="556"
+              Y="392"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Keymap13" type="5" Id="13" piano="-1" active="1" X="573"
+            Y="499"/>
+      <connections>
+        <item name="Synchronic12" type="1" Id="12" piano="-1" active="1" X="556"
+              Y="392"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Keymap14" type="5" Id="14" piano="-1" active="1" X="426"
+            Y="499"/>
+      <connections>
+        <item name="Nostalgic12" type="2" Id="12" piano="-1" active="1" X="410"
+              Y="392"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Keymap15" type="5" Id="15" piano="-1" active="1" X="280"
+            Y="499"/>
+      <connections>
+        <item name="Direct12" type="0" Id="12" piano="-1" active="1" X="264"
+              Y="392"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="3" Id="15" piano="0" active="1" X="305" Y="56"/>
+      <connections>
+        <item name="Direct12" type="0" Id="12" piano="-1" active="1" X="264"
+              Y="392"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="3" Id="16" piano="0" active="1" X="451" Y="56"/>
+      <connections>
+        <item name="Nostalgic12" type="2" Id="12" piano="-1" active="1" X="410"
+              Y="392"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="3" Id="17" piano="0" active="1" X="597" Y="56"/>
+      <connections>
+        <item name="Synchronic12" type="1" Id="12" piano="-1" active="1" X="556"
+              Y="392"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="50" piano="0" active="1" X="91" Y="389"/>
+      <connections>
+        <item name="" type="9" Id="13" piano="0" active="1" X="42" Y="282"/>
+        <item name="" type="9" Id="14" piano="0" active="1" X="110" Y="282"/>
+        <item name="" type="9" Id="15" piano="0" active="1" X="177" Y="282"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="9" Id="13" piano="0" active="1" X="42" Y="282"/>
+      <connections>
+        <item name="" type="3" Id="15" piano="0" active="1" X="305" Y="56"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="9" Id="14" piano="0" active="1" X="110" Y="282"/>
+      <connections>
+        <item name="" type="3" Id="16" piano="0" active="1" X="451" Y="56"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="9" Id="15" piano="0" active="1" X="177" Y="282"/>
+      <connections>
+        <item name="" type="3" Id="17" piano="0" active="1" X="597" Y="56"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="9" Id="16" piano="0" active="1" X="714" Y="282"/>
+      <connections>
+        <item name="" type="3" Id="15" piano="0" active="1" X="305" Y="56"/>
+        <item name="" type="3" Id="16" piano="0" active="1" X="451" Y="56"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="9" Id="17" piano="0" active="1" X="786" Y="282"/>
+      <connections>
+        <item name="" type="3" Id="17" piano="0" active="1" X="597" Y="56"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="51" piano="0" active="1" X="767" Y="389"/>
+      <connections>
+        <item name="" type="9" Id="16" piano="0" active="1" X="714" Y="282"/>
+        <item name="" type="9" Id="17" piano="0" active="1" X="786" Y="282"/>
+      </connections>
+    </item>
+  </piano>
+</gallery>
