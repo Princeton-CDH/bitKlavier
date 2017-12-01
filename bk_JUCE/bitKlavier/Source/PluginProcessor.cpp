@@ -101,7 +101,7 @@ resonanceReleaseSynth()
         "Scales within Sliding Scales",
         "Slow To Come Back",
         "Southwing",
-        "Who do you think you are, Mars?",
+        "Who do you think you are Mars",
         "Worm"
     });
     
