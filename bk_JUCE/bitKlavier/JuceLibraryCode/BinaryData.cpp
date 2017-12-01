@@ -5203,7 +5203,7 @@ static const unsigned char temp_binary_data_21[] =
 
 const char* Southwing_xml = (const char*) temp_binary_data_21;
 
-//================== Who do you think you are, Mars?.xml ==================
+//================== Who do you think you are Mars.xml ==================
 static const unsigned char temp_binary_data_22[] =
 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
 "\r\n"
