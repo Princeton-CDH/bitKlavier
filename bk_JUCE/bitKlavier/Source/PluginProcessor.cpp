@@ -8,9 +8,10 @@ BKAudioProcessor::BKAudioProcessor():
 updateState(new BKUpdateState()),
 mainPianoSynth(),
 hammerReleaseSynth(),
-resonanceReleaseSynth()
+resonanceReleaseSynth(),
+sustainIsDown(false)
 #if TRY_UNDO
-,epoch(0)
+,epoch(0),
 #endif
 {
     didLoadHammersAndRes            = false;
@@ -239,6 +240,13 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
     {
         DBG("change piano to " + String(whichPiano));
         setCurrentPiano(whichPiano);
+        
+        if (sustainIsDown)
+        {
+            for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                currentPiano->activePMaps[p]->sustainPedalPressed();
+        }
+        
     }
     
     // modifications
@@ -328,22 +336,19 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         {
             handleNoteOff(noteNumber, velocity, channel);
         }
-        else if (m.isController())
-        {
-            int controller = m.getControllerNumber();
-            int piano = controller-51;
-            
-            if ((m.getControllerValue() != 0) && piano >= 0 && piano < 5)   setCurrentPiano(piano);
-        }
         
         if (m.isSustainPedalOn())
         {
+            sustainIsDown = true;
+            
             for (int p = currentPiano->activePMaps.size(); --p >= 0;)
                 currentPiano->activePMaps[p]->sustainPedalPressed();
             
         }
         else if (m.isSustainPedalOff())
         {
+            sustainIsDown = false;
+            
             for (int p = currentPiano->activePMaps.size(); --p >= 0;)
                 currentPiano->activePMaps[p]->sustainPedalReleased();
             
