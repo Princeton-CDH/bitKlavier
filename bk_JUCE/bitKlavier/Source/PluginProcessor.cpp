@@ -359,8 +359,11 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
                 for (int p = currentPiano->activePMaps.size(); --p >= 0;)
                     currentPiano->activePMaps[p]->sustainPedalReleased();
                 
-                for (int p = prevPiano->activePMaps.size(); --p >= 0;)
-                    prevPiano->activePMaps[p]->sustainPedalReleased();
+                if(prevPiano != currentPiano)
+                {
+                    for (int p = prevPiano->activePMaps.size(); --p >= 0;)
+                        prevPiano->activePMaps[p]->sustainPedalReleased();
+                }
             }
         }
     }
