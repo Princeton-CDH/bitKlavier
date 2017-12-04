@@ -51,6 +51,9 @@ void NostalgicProcessor::postRelease(int midiNoteNumber, int midiChannel)
 //begin reverse note; called when key is released
 void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel, bool post)
 {
+    
+    DBG("NostalgicProcessor::keyReleased");
+    
     float duration = 0.0;
     
     if (post || noteOn[midiNoteNumber])

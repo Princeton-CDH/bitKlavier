@@ -339,21 +339,31 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         
         if (m.isSustainPedalOn())
         {
-            sustainIsDown = true;
             
-            for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                currentPiano->activePMaps[p]->sustainPedalPressed();
-            
+            if(!sustainIsDown)
+            {
+                sustainIsDown = true;
+                DBG("sustainPedalIsDown");
+                
+                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                    currentPiano->activePMaps[p]->sustainPedalPressed();
+            }
         }
         else if (m.isSustainPedalOff())
         {
-            sustainIsDown = false;
-            
-            for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                currentPiano->activePMaps[p]->sustainPedalReleased();
-            
-            for (int p = prevPiano->activePMaps.size(); --p >= 0;)
-                prevPiano->activePMaps[p]->sustainPedalReleased(true);
+            if(sustainIsDown)
+            {
+                sustainIsDown = false;
+                
+                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                    currentPiano->activePMaps[p]->sustainPedalReleased();
+                
+                if(prevPiano != currentPiano)
+                {
+                    for (int p = prevPiano->activePMaps.size(); --p >= 0;)
+                        prevPiano->activePMaps[p]->sustainPedalReleased(true);
+                }
+            }
         }
     }
     

@@ -395,6 +395,7 @@ void PreparationMap::sustainPedalReleased(bool post)
 
 void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
 {
+    DBG("PreparationMap::postRelease");
     if (pKeymap->containsNote(noteNumber))
     {
         for (auto proc : dprocessor)
@@ -404,7 +405,7 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
         
         for (auto proc : nprocessor)
         {
-            proc->keyReleased(noteNumber, velocity, true);
+            if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber, velocity, true);
         }
         
         for (auto proc : mprocessor)
