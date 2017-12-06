@@ -274,9 +274,12 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
         currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel);
     
     // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
-    for (p = prevPianos.size(); --p >= 0;) {
-        for (pm = prevPianos[p]->activePMaps.size(); --pm >= 0;) {
-            prevPianos[p]->activePMaps[pm]->postRelease(noteNumber, velocity, channel);
+    if (prevPiano != currentPiano)
+    {
+        for (p = prevPianos.size(); --p >= 0;) {
+            for (pm = prevPianos[p]->activePMaps.size(); --pm >= 0;) {
+                prevPianos[p]->activePMaps[pm]->postRelease(noteNumber, velocity, channel);
+            }
         }
     }
     
@@ -339,7 +342,6 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         
         if (m.isSustainPedalOn())
         {
-            
             if(!sustainIsDown)
             {
                 sustainIsDown = true;

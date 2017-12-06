@@ -370,9 +370,13 @@ void PreparationMap::sustainPedalReleased(bool post)
     
     //do all keyReleased calls now
     
+
+    
     for(int n=0; n<sustainedNotes.size(); n++)
     {
         SustainedNote releaseNote = sustainedNotes.getUnchecked(n);
+        
+        DBG(releaseNote.noteNumber);
         
         for (auto proc : dprocessor)
         {
