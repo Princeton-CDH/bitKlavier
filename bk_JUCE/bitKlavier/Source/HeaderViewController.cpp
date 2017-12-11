@@ -594,7 +594,7 @@ void HeaderViewController::fillGalleryCB(void)
         
         // THIS IS WHERE NAME OF GALLERY DISPLAYED IS SET
         galleryCB.setSelectedId(lastGalleryCBId, NotificationType::dontSendNotification);
-        galleryCB.setText(processor.gallery->getName());
+        galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true));
         
         if (lastGalleryCBId > numberOfDefaultGalleryItems)
         {

@@ -370,7 +370,7 @@
       </MODULEPATHS>
     </XCODE_IPHONE>
     <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="C:\SDKs\VST3_SDK"
-            bigIcon="D50AzU" smallIcon="wvKUCU">
+            bigIcon="D50AzU" smallIcon="wvKUCU" windowsTargetPlatformVersion="10.0.16299.0">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="1" optimisation="1" targetName="bitKlavier" debugInformationFormat="ProgramDatabase"

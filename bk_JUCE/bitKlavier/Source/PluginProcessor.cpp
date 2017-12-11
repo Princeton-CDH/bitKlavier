@@ -181,7 +181,7 @@ void BKAudioProcessor::deleteGalleryWithName(String name)
 #endif
     
 #if JUCE_MAC || JUCE_WINDOWS
-    galleryPath = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+    galleryPath = galleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
     galleryPath = galleryPath.getChildFile(name+".xml");
@@ -654,6 +654,8 @@ void BKAudioProcessor::saveGalleryAs(void)
         ScopedPointer<XmlElement> myXML = galleryVT.createXml();
         
         myXML->writeToFile(myFile, String::empty);
+        
+        myXML->setAttribute("name", currentGallery);
         
         gallery->setGalleryDirty(false);
         
