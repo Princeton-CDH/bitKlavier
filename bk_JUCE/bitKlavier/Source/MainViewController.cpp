@@ -302,7 +302,6 @@ void MainViewController::handleNoteOff(BKKeymapKeyboardState* source, int midiNo
 
 bool MainViewController::keyPressed (const KeyPress& e, Component*)
 {
-    DBG(e.getKeyCode());
     
     int code = e.getKeyCode();
     

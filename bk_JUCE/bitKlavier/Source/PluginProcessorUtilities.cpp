@@ -77,14 +77,9 @@ void BKAudioProcessor::collectGalleries(void)
     File bkGalleries;
     
 #if JUCE_IOS
-    bkGalleries = bkGalleries.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
-    
-    collectGalleriesFromFolder(bkGalleries);
-    
     File moreGalleries = File::getSpecialLocation (File::userDocumentsDirectory);
     
     collectGalleriesFromFolder(moreGalleries);
-    
 #endif
     
 #if JUCE_MAC || JUCE_WINDOWS

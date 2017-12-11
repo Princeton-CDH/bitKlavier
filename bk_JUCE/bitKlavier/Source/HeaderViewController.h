@@ -81,7 +81,7 @@ private:
     //BKComboBox pianoCB;
     ComboBox galleryCB;
     ComboBox pianoCB;
-    int lastGalleryCBId;
+    int lastGalleryCBId, lastGalleryCBIndex;
     bool galleryModalCallBackIsOpen;
     
     BKConstructionSite* construction;

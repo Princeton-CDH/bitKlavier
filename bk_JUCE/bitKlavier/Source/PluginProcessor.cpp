@@ -57,11 +57,15 @@ resonanceReleaseSynth()
     
     updateUI();
     
-    loadGalleryFromPath(galleryNames[0]);
+    String xmlData = CharPointer_UTF8 (BinaryData::__blank_xml);
+    
+    defaultLoaded = true;
+    
+    loadGalleryFromXml(XmlDocument::parse(xmlData));
 
 #if JUCE_IOS
     platform = BKIOS;
-    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
+    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory);
 #endif
  
 
@@ -168,6 +172,25 @@ void BKAudioProcessor::deleteGallery(void)
     loadGalleryFromPath(firstGallery());
 }
 
+void BKAudioProcessor::deleteGalleryWithName(String name)
+{
+    File galleryPath;
+    
+#if JUCE_IOS
+    galleryPath = galleryPath.getSpecialLocation(File::userDocumentsDirectory);
+#endif
+    
+#if JUCE_MAC || JUCE_WINDOWS
+    galleryPath = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
+    
+    galleryPath = galleryPath.getChildFile(name+".xml");
+    
+    DBG("path: " + galleryPath.getFullPathName());
+    
+    galleryPath.deleteFile();
+}
+
 void BKAudioProcessor::createNewGallery(String name)
 {
     updateState->loadedJson = false;
@@ -189,8 +212,6 @@ void BKAudioProcessor::createNewGallery(String name)
     galleryNames.add(myFile.getFullPathName());
     
     ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
-    
-    
     
     if (xml != nullptr)
     {
@@ -221,32 +242,19 @@ void BKAudioProcessor::renameGallery(String name)
     File bkGalleries;
     
 #if JUCE_IOS
-    if (currentGalleryPath.contains("/bitKlavier resources/galleries/"))
-    {
-        bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
-    }
-    else
-    {
-        bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory);
-    }
+    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory);
 #else
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
     String relativePath = currentGalleryPath.fromLastOccurrenceOf("/", false, false);
     
-    DBG("relative path: " + relativePath);
-    
     File currentFile = bkGalleries.getChildFile(relativePath);
     
     String newFileName = name + ".xml";
     
-#if !JUCE_IOS
     String newFilePath= currentGalleryPath.upToFirstOccurrenceOf(currentGallery, false, false) + newFileName;
-#else
-    String newFilePath= bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + newFileName;
-#endif
-    
+
     DBG("new file: "+ String(newFilePath));
     
     File newFile(newFilePath);
@@ -661,6 +669,26 @@ void BKAudioProcessor::saveGalleryAs(void)
     
 }
 
+void BKAudioProcessor::createGalleryWithName(String name)
+{
+    String newURL = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + name + ".xml";
+    
+    File file;
+    File myFile(newURL);
+    
+    ValueTree galleryVT = gallery->getState();
+    
+    galleryVT.setProperty("name", name, 0);
+    
+    ScopedPointer<XmlElement> myXML = galleryVT.createXml();
+    
+    myXML->writeToFile(myFile, String::empty);
+    
+    loadGalleryFromXml(myXML);
+    
+    lastGalleryPath = myFile;
+}
+
 void BKAudioProcessor::saveGallery(void)
 {
 #if JUCE_IOS
@@ -679,6 +707,7 @@ void BKAudioProcessor::saveGallery(void)
     gallery->setGalleryDirty(false);
     
 #else
+    
     String currentURL = gallery->getURL();
 
     File file (currentURL);
@@ -731,7 +760,11 @@ void BKAudioProcessor::loadGalleryDialog(void)
         else if(galleryIsDirtyAlertResult == 1)
         {
             DBG("saving gallery first");
+#if JUCE_IOS
+            createGalleryWithName(gallery->getName());
+#else
             saveGallery();
+#endif
         }
     }
     

@@ -5207,7 +5207,7 @@ const char* Southwing_xml = (const char*) temp_binary_data_21;
 static const unsigned char temp_binary_data_22[] =
 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
 "\r\n"
-"<gallery name=\"Who do you think you are, Mars?\" url=\"/Users/dan/bkGalleries/_Mikroetudes/Who do you think you are, Mars?.xml\"\r\n"
+"<gallery name=\"Who do you think you are Mars\" url=\"\"\r\n"
 "         defaultPiano=\"1\">\r\n"
 "  <idCount i0=\"11\" i1=\"11\" i2=\"12\" i3=\"12\" i4=\"11\" i5=\"139\" i6=\"10\" i7=\"10\"\r\n"
 "           i8=\"10\" i9=\"11\" i10=\"10\" i11=\"10\" i12=\"10\" i13=\"10\" i14=\"10\"/>\r\n"
@@ -16703,7 +16703,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes) throw
         case 0x3c6a0e50:  numBytes = 7941; return Scales_within_Sliding_Scales_xml;
         case 0x25408f54:  numBytes = 15568; return Slow_To_Come_Back_xml;
         case 0x61c38e90:  numBytes = 7831; return Southwing_xml;
-        case 0xaf908c98:  numBytes = 5029; return Who_do_you_think_you_are_Mars_xml;
+        case 0xaf908c98:  numBytes = 4956; return Who_do_you_think_you_are_Mars_xml;
         case 0x060f690b:  numBytes = 7005; return Worm_xml;
         case 0xafa8699d:  numBytes = 16477; return NS_1_Prelude_xml;
         case 0x21172da3:  numBytes = 15489; return NS_2_Undertow_xml;

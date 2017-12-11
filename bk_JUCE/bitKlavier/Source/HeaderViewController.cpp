@@ -15,7 +15,8 @@
 
 HeaderViewController::HeaderViewController (BKAudioProcessor& p, BKConstructionSite* c):
 processor (p),
-construction(c)
+construction(c),
+lastGalleryCBId(-1)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
 
@@ -39,7 +40,6 @@ construction(c)
     
     galleryCB.setLookAndFeel(&comboBoxLeftJustifyLAF);
     galleryCB.setSelectedId(0, dontSendNotification);
-    lastGalleryCBId = galleryCB.getSelectedId();
     
     // Piano CB
     addAndMakeVisible(pianoCB);
@@ -137,26 +137,19 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     
     galleryMenu.addSeparator();
     galleryMenu.addItem(NEWGALLERY_ID, "New");
-    galleryMenu.addSeparator();
-    galleryMenu.addItem(RENAME_ID, "Rename");
-    galleryMenu.addSeparator();
-    galleryMenu.addItem(DELETE_ID, "Remove");
     
-    
-    
-    String saveKeystroke = "(Cmd-S)";
-    String saveAsKeystroke = "(Shift-Cmd-S)";
-    
-#if JUCE_WINDOWS
-    saveKeystroke = "(Ctrl-S)";
-    saveAsKeystroke = "(Shift-Ctrl-S)";
-#endif
+    if (!processor.defaultLoaded)
+    {
+        galleryMenu.addSeparator();
+        galleryMenu.addItem(RENAME_ID, "Rename");
+        galleryMenu.addSeparator();
+        galleryMenu.addItem(DELETE_ID, "Remove");
+    }
     
     galleryMenu.addSeparator();
-    galleryMenu.addItem(SAVE_ID, "Save " );
-#if !JUCE_IOS
+    
+    if (!processor.defaultLoaded)   galleryMenu.addItem(SAVE_ID, "Save " );
     galleryMenu.addItem(SAVEAS_ID, "Save as");
-#endif
     
 #if !JUCE_IOS
     galleryMenu.addSeparator();
@@ -165,14 +158,14 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
 #endif
     
     galleryMenu.addSeparator();
-    galleryMenu.addSubMenu("Load", getLoadMenu());
-    galleryMenu.addSeparator();
     galleryMenu.addItem(CLEAN_ID, "Clean");
+    galleryMenu.addSeparator();
+    galleryMenu.addSubMenu("Load", getLoadMenu());
     galleryMenu.addSeparator();
     galleryMenu.addItem(SETTINGS_ID, "Settings");
     
     // ~ ~ ~ share menu ~ ~ ~
-#if !JUCE_IOS
+#if JUCE_MAC
     PopupMenu shareMenu;
     
     shareMenu.addItem(SHARE_EMAIL_ID, "Email");
@@ -181,11 +174,9 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     shareMenu.addItem(SHARE_FACEBOOK_ID, "Facebook");
     // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-     
-    
     galleryMenu.addSeparator();
     galleryMenu.addSubMenu("Share", shareMenu);
-#else
+#elif JUCE_IOS
     galleryMenu.addSeparator();
     galleryMenu.addItem(SHARE_MESSAGE_ID, "Share");
 #endif
@@ -332,7 +323,13 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         
         if (result == 1)
         {
+#if JUCE_IOS
+            String lastName = processor.gallery->getName();
+            processor.createGalleryWithName(name);
+            processor.deleteGalleryWithName(lastName);
+#else
             processor.renameGallery(name);
+#endif
         }
         
         gvc->fillGalleryCB();
@@ -372,10 +369,32 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     else if (result == SAVE_ID)
     {
         processor.saveGallery();
+        
+        processor.createGalleryWithName(processor.gallery->getName());
     }
     if (result == SAVEAS_ID)
     {
+#if JUCE_IOS
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        prompt.addTextEditor("name", processor.gallery->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            processor.createGalleryWithName(name);
+        }
+        
+        gvc->fillGalleryCB();
+#else
         processor.saveGalleryAs();
+#endif
     }
     else if (result == OPEN_ID) // Load
     {
@@ -391,7 +410,13 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     }
     else if (result == DELETE_ID) // Clean
     {
+#if JUCE_IOS
+        processor.deleteGalleryWithName(processor.gallery->getName());
+        
+        gvc->galleryCB.setSelectedItemIndex(0);
+#else
         processor.deleteGallery();
+#endif
     }
     else if (result == OPENOLD_ID) // Load (old)
     {
@@ -413,7 +438,6 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         int result = prompt.runModalLoop();
         
         String name = prompt.getTextEditorContents("name");
-        DBG(name);
         
         if (result == 1)
         {
@@ -475,9 +499,7 @@ void HeaderViewController::loadDefaultGalleries(void)
                 data = BinaryData::getNamedResource(BinaryData::namedResourceList[i], size);
                 
                 name = data.fromFirstOccurrenceOf("<gallery name=\"", false, true).upToFirstOccurrenceOf("\" ", false, true);
-                
-                DBG(name);
-                
+
                 if (processor.mikroetudes.contains(name))       mikroetudes_menu.addItem(id++, name);
                 else if (processor.ns_etudes.contains(name))    ns_etudes_menu.addItem(id++, name);
                 else                                            galleryCB.addItem(name, id++);
@@ -507,12 +529,6 @@ void HeaderViewController::fillGalleryCB(void)
         
 #if JUCE_MAC || JUCE_WINDOWS
         bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
-#endif
-        
-#if JUCE_IOS
-        
-        bkGalleries = bkGalleries.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("bitKlavier resources").getChildFile("galleries");
-    
 #endif
         
         PopupMenu* galleryCBPopUp = galleryCB.getRootMenu();
@@ -578,6 +594,7 @@ void HeaderViewController::fillGalleryCB(void)
         
         // THIS IS WHERE NAME OF GALLERY DISPLAYED IS SET
         galleryCB.setSelectedId(lastGalleryCBId, NotificationType::dontSendNotification);
+        galleryCB.setText(processor.gallery->getName());
         
         if (lastGalleryCBId > numberOfDefaultGalleryItems)
         {
@@ -594,6 +611,7 @@ void HeaderViewController::update(void)
 
 void HeaderViewController::switchGallery()
 {
+    fillGalleryCB();
     fillPianoCB();
 }
 
@@ -604,8 +622,6 @@ void HeaderViewController::fillPianoCB(void)
     for (auto piano : processor.gallery->getPianos())
     {
         String name = piano->getName();
-        
-        DBG("pianoName: " + String(piano->getName()));
         
         if (name != String::empty)  pianoCB.addItem(name,  piano->getId());
         else                        pianoCB.addItem("Piano" + String(piano->getId()), piano->getId());
@@ -654,7 +670,38 @@ bool HeaderViewController::handleGalleryChange(void)
     else if(galleryIsDirtyAlertResult == 1)
     {
         DBG("saving gallery");
+        
+        
+#if JUCE_IOS
+        if (processor.defaultLoaded)
+        {
+            AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+            
+            prompt.addTextEditor("name", processor.gallery->getName());
+            
+            prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+            prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+            
+            int result = prompt.runModalLoop();
+            
+            String name = prompt.getTextEditorContents("name");
+            
+            if (result == 1)
+            {
+                processor.createGalleryWithName(name);
+            }
+        }
+        else
+        {
+            processor.createGalleryWithName(processor.gallery->getName());
+        }
+        
+        fillGalleryCB();
+#else
+        
         processor.saveGallery();
+        
+#endif
         
         shouldSwitch = true;
     }
@@ -692,14 +739,14 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
         {
             lastGalleryCBId = Id;
             int index = Id - 1;
-            
-            DBG("load Id: " + String(Id) + " binary length: " + String(numberOfDefaultGalleryItems));
-            
+
             if (index < numberOfDefaultGalleryItems)
             {
                 int size;
                 int index = Id - 1;
                 String xmlData = CharPointer_UTF8 (BinaryData::getNamedResource(BinaryData::namedResourceList[index], size));
+                
+                processor.defaultLoaded = true;
                 
                 processor.loadGalleryFromXml(XmlDocument::parse(xmlData));
             }
@@ -707,6 +754,8 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
             {
                 index = index - numberOfDefaultGalleryItems;
                 String path = processor.galleryNames[index];
+                
+                processor.defaultLoaded = false;
                 
                 if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
                 else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);

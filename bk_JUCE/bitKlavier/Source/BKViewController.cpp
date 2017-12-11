@@ -71,8 +71,6 @@ PopupMenu BKViewController::getModOptionMenu(void)
 
 void BKViewController::bkSingleSliderWantsKeyboard(BKSingleSlider* slider)
 {
-    DBG("BEGIN: " + String(slider->getText()));
-    
     //numberPadDismissed(&numberPad);
     
     latched_BKWDUTSlider = nullptr;
@@ -106,8 +104,6 @@ void BKViewController::bkSingleSliderWantsKeyboard(BKSingleSlider* slider)
 void BKViewController::bkStackedSliderWantsKeyboard(BKStackedSlider* slider)
 {
     
-    DBG("BEGIN: " + slider->getText());
-    
     //numberPadDismissed(&numberPad);
     
     latched_BKWDUTSlider = nullptr;
@@ -124,7 +120,6 @@ void BKViewController::bkStackedSliderWantsKeyboard(BKStackedSlider* slider)
     float numberPadWidth = getWidth() / 2 - 2 * gXSpacing;
     numberPad.setSize(numberPadWidth, numberPadHeight);
     
-    DBG("sliderX: " + String(slider->getX()) + " width: " + String(getWidth()));
     numberPad.setTopLeftPosition((slider->getX() > (getWidth() * 0.45)) ? gXSpacing : (0.5 * getWidth() + gXSpacing), gYSpacing);
     
     
@@ -310,7 +305,6 @@ void BKViewController::numberPadChanged(BKNumberPad*)
 {
     String text = numberPad.getText();
     
-    DBG("CHANGED: " + text);
     
     if (latched_BKSingleSlider!= nullptr)       latched_BKSingleSlider->setText(text);
     if (latched_BKStackedSlider != nullptr)     latched_BKStackedSlider->setText(text);
@@ -328,7 +322,6 @@ void BKViewController::numberPadDismissed(BKNumberPad*)
 {
     String text = numberPad.getText();
     
-    DBG("DISMISSED: " + text);
     
     if (latched_BKSingleSlider != nullptr)      latched_BKSingleSlider      ->setValue(text.getDoubleValue(), sendNotification);
     if (latched_BKStackedSlider != nullptr)     latched_BKStackedSlider     ->dismissTextEditor(true);

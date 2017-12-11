@@ -75,7 +75,7 @@ namespace BinaryData
     const int            Southwing_xmlSize = 7831;
 
     extern const char*   Who_do_you_think_you_are_Mars_xml;
-    const int            Who_do_you_think_you_are_Mars_xmlSize = 5029;
+    const int            Who_do_you_think_you_are_Mars_xmlSize = 4956;
 
     extern const char*   Worm_xml;
     const int            Worm_xmlSize = 7005;

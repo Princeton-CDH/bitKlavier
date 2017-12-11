@@ -50,9 +50,11 @@ public:
     void loadJsonGalleryFromPath(String path);
     void saveGalleryAs(void);
     void saveGallery(void);
+    void createGalleryWithName(String name);
     void createNewGallery(String name);
     void renameGallery(String name);
     void deleteGallery(void);
+    void deleteGalleryWithName(String name);
     
     String firstGallery(void);
     void initializeGallery(void);
@@ -77,6 +79,8 @@ public:
     StringArray                         galleryNames;
     String                              currentGallery;
     String                              currentGalleryPath;
+    
+    bool                                defaultLoaded;
     
 #if TRY_UNDO
     Piano::PtrArr                       history;
