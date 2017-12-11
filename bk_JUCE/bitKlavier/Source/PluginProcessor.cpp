@@ -8,9 +8,10 @@ BKAudioProcessor::BKAudioProcessor():
 updateState(new BKUpdateState()),
 mainPianoSynth(),
 hammerReleaseSynth(),
-resonanceReleaseSynth()
+resonanceReleaseSynth(),
+sustainIsDown(false)
 #if TRY_UNDO
-,epoch(0)
+,epoch(0),
 #endif
 {
     didLoadHammersAndRes            = false;
@@ -283,6 +284,13 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
     {
         DBG("change piano to " + String(whichPiano));
         setCurrentPiano(whichPiano);
+        
+        if (sustainIsDown)
+        {
+            for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                currentPiano->activePMaps[p]->sustainPedalPressed();
+        }
+        
     }
     
     // modifications
@@ -310,9 +318,12 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
         currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel);
     
     // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
-    for (p = prevPianos.size(); --p >= 0;) {
-        for (pm = prevPianos[p]->activePMaps.size(); --pm >= 0;) {
-            prevPianos[p]->activePMaps[pm]->postRelease(noteNumber, velocity, channel);
+    if (prevPiano != currentPiano)
+    {
+        for (p = prevPianos.size(); --p >= 0;) {
+            for (pm = prevPianos[p]->activePMaps.size(); --pm >= 0;) {
+                prevPianos[p]->activePMaps[pm]->postRelease(noteNumber, velocity, channel);
+            }
         }
     }
     
@@ -372,27 +383,33 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         {
             handleNoteOff(noteNumber, velocity, channel);
         }
-        else if (m.isController())
-        {
-            int controller = m.getControllerNumber();
-            int piano = controller-51;
-            
-            if ((m.getControllerValue() != 0) && piano >= 0 && piano < 5)   setCurrentPiano(piano);
-        }
         
         if (m.isSustainPedalOn())
         {
-            for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                currentPiano->activePMaps[p]->sustainPedalPressed();
-            
+            if(!sustainIsDown)
+            {
+                sustainIsDown = true;
+                DBG("sustainPedalIsDown");
+                
+                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                    currentPiano->activePMaps[p]->sustainPedalPressed();
+            }
         }
         else if (m.isSustainPedalOff())
         {
-            for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                currentPiano->activePMaps[p]->sustainPedalReleased();
-            
-            for (int p = prevPiano->activePMaps.size(); --p >= 0;)
-                prevPiano->activePMaps[p]->sustainPedalReleased();
+            if(sustainIsDown)
+            {
+                sustainIsDown = false;
+                
+                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                    currentPiano->activePMaps[p]->sustainPedalReleased();
+                
+                if(prevPiano != currentPiano)
+                {
+                    for (int p = prevPiano->activePMaps.size(); --p >= 0;)
+                        prevPiano->activePMaps[p]->sustainPedalReleased(true);
+                }
+            }
         }
     }
     

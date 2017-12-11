@@ -213,6 +213,8 @@ private:
     
     int  currentPianoId;
     
+    bool sustainIsDown;
+    
     double bkSampleRate;
     
     bool didLoadHammersAndRes, didLoadMainPianoSamples;
