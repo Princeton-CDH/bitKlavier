@@ -96,7 +96,7 @@ public Timer
 public:
     
     TuningPreparationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~TuningPreparationEditor() {};
+    ~TuningPreparationEditor() {setLookAndFeel(nullptr);};
     
     void timerCallback() override;
     

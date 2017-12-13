@@ -49,7 +49,7 @@ resizer(new ResizableCornerComponent (this, constrain))
 
 BKAudioProcessorEditor::~BKAudioProcessorEditor()
 {
-    
+    setLookAndFeel(nullptr);
 }
 
 void BKAudioProcessorEditor::paint (Graphics& g)
