@@ -872,6 +872,8 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
     ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
     
     loadGalleryFromXml(xml);
+    
+    gallery->setURL(path);
 }
 
 void BKAudioProcessor::loadJsonGalleryDialog(void)
