@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<gallery name="Worm" defaultPiano="1">
+  <idCount i0="11" i1="11" i2="12" i3="12" i4="11" i5="17" i6="10" i7="10"
+           i8="10" i9="10" i10="10" i11="10" i12="10" i13="10" i14="10"/>
+  <general globalGain="1" directGain="1" synchronicGain="1" nostalgicGain="1"
+           resonanceGain="1" hammerGain="0.0099999997764825820923" tempoMultiplier="1"
+           resAndHammer="1" invertSustain="0" tuningFund="440"/>
+  <tempo Id="11" name="11" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tuning Id="11" name="11" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="12" name="12" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="0"
+          adaptiveInversional="0" adaptiveAnchorScale="0" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="300" adaptiveHistory="5">
+    <customScale f0="0.059999998658895492554" f1="0" f2="0.019999999552965164185"
+                 f3="0.039999999105930328369" f4="-0.019999999552965164185" f5="0.059999998658895492554"
+                 f6="-0.019999999552965164185" f7="0.039999999105930328369" f8="0.019999999552965164185"
+                 f9="0" f10="0.059999998658895492554" f11="-0.019999999552965164185"
+                 f12="0" f13="1" f14="2" f15="3" f16="4" f17="5" f18="6" f19="7"
+                 f20="8" f21="9" f22="10" f23="11"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <direct Id="11" name="11" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <synchronic Id="11" name="11" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <nostalgic Id="11" name="Nostalgic11" waveDistance="0" undertow="0" gain="1"
+             lengthMultiplier="1" beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="12" name="12" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="1" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="Nostalgic-1" waveDistance="0" undertow="0" gain="1"
+             lengthMultiplier="1" beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <keymap Id="11" name="11"/>
+  <keymap Id="12" name="12" k0="0" k1="1" k2="2" k3="3" k4="4" k5="5" k6="6"
+          k7="7" k8="8" k9="9" k10="10" k11="11" k12="12" k13="13" k14="14"
+          k15="15" k16="16" k17="17" k18="18" k19="19" k20="20" k21="21"
+          k22="22" k23="23" k24="24" k25="25" k26="26" k27="27" k28="28"
+          k29="29" k30="30" k31="31" k32="32" k33="33" k34="34" k35="35"
+          k36="36" k37="37" k38="38" k39="39" k40="40" k41="41" k42="42"
+          k43="43" k44="44" k45="45" k46="46" k47="47" k48="48" k49="49"
+          k50="50" k51="51" k52="52" k53="53" k54="54" k55="55" k56="56"
+          k57="57" k58="58" k59="59" k60="60" k61="61" k62="62" k63="63"
+          k64="64" k65="65" k66="66" k67="67" k68="68" k69="69" k70="70"
+          k71="71" k72="72" k73="73" k74="74" k75="75" k76="76" k77="77"
+          k78="78" k79="79" k80="80" k81="81" k82="82" k83="83" k84="84"
+          k85="85" k86="86" k87="87" k88="88" k89="89" k90="90" k91="91"
+          k92="92" k93="93" k94="94" k95="95" k96="96" k97="97" k98="98"
+          k99="99" k100="100" k101="101" k102="102" k103="103" k104="104"
+          k105="105" k106="106" k107="107" k108="108" k109="109" k110="110"
+          k111="111" k112="112" k113="113" k114="114" k115="115" k116="116"
+          k117="117" k118="118" k119="119" k120="120" k121="121" k122="122"
+          k123="123" k124="124" k125="125" k126="126" k127="127"/>
+  <keymap Id="13" name="13" k0="21" k1="22" k2="23" k3="24" k4="25" k5="26"
+          k6="27" k7="28" k8="29" k9="30" k10="31" k11="32" k12="33" k13="34"
+          k14="35" k15="36" k16="37" k17="38" k18="39" k19="40" k20="41"
+          k21="42" k22="43" k23="44" k24="45" k25="46" k26="47" k27="48"
+          k28="49" k29="50" k30="51" k31="52" k32="53" k33="54" k34="55"
+          k35="56" k36="57" k37="58" k38="59" k39="60" k40="61" k41="62"
+          k42="63" k43="64" k44="65" k45="66" k46="67" k47="68" k48="69"
+          k49="70" k50="71" k51="72" k52="73" k53="74" k54="75" k55="76"
+          k56="77" k57="78" k58="79" k59="80" k60="81" k61="82" k62="83"
+          k63="84" k64="85" k65="86" k66="87" k67="88" k68="89" k69="90"
+          k70="91" k71="92" k72="93" k73="94" k74="95" k75="96" k76="97"
+          k77="98" k78="99" k79="100" k80="101" k81="102" k82="103" k83="104"
+          k84="105" k85="106" k86="107" k87="108"/>
+  <keymap Id="-1" name="-1"/>
+  <piano name="Worm" Id="1">
+    <item>
+      <item name="Tuning12" type="3" Id="12" piano="-1" active="1" X="451"
+            Y="108"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="333"
+              Y="273"/>
+        <item name="Nostalgic12" type="2" Id="12" piano="-1" active="1" X="488"
+              Y="273"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Keymap12" type="5" Id="12" piano="-1" active="1" X="429"
+            Y="400"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="333"
+              Y="273"/>
+        <item name="Nostalgic12" type="2" Id="12" piano="-1" active="1" X="488"
+              Y="273"/>
+      </connections>
+    </item>
+  </piano>
+</gallery>

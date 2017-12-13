@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<gallery name="Circleville" defaultPiano="1">
+  <idCount i0="11" i1="13" i2="12" i3="14" i4="12" i5="35" i6="10" i7="10"
+           i8="10" i9="10" i10="10" i11="10" i12="10" i13="10" i14="10"/>
+  <general globalGain="1" directGain="1" synchronicGain="1" nostalgicGain="1"
+           resonanceGain="1" hammerGain="0.0099999997764825820923" tempoMultiplier="1"
+           resAndHammer="1" invertSustain="0" tuningFund="440"/>
+  <tempo Id="12" name="12" tempo="60" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tuning Id="12" name="12" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="0"
+          adaptiveInversional="0" adaptiveAnchorScale="0" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="0" adaptiveHistory="0">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0" f12="0" f13="1" f14="2" f15="3" f16="4"
+                 f17="5" f18="6" f19="7" f20="8" f21="9" f22="10" f23="11"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <direct Id="11" name="11" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <synchronic Id="12" name="12" numBeats="64" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="0.5"/>
+    <lengthMultipliers f0="0.050000000745058059692"/>
+    <accentMultipliers f0="1" f1="0.60000002384185791016" f2="1" f3="0.60000002384185791016"
+                       f4="0.60000002384185791016"/>
+    <transpOffsets>
+      <t0/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="13" name="13" numBeats="64" clusterMin="1" clusterMax="100"
+              clusterThresh="10" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="0.25"/>
+    <lengthMultipliers f0="0.050000000745058059692" f1="0.050000000745058059692" f2="0.050000000745058059692"
+                       f3="0.050000000745058059692" f4="0.050000000745058059692" f5="0.050000000745058059692"
+                       f6="0.050000000745058059692" f7="0.050000000745058059692" f8="0.050000000745058059692"
+                       f9="0.10000000149011611938"/>
+    <accentMultipliers f0="0.10000000149011611938" f1="0.20000000298023223877" f2="0.30000001192092895508"
+                       f3="0.40000000596046447754" f4="0.5" f5="0.60000002384185791016"
+                       f6="0.69999998807907104492" f7="0.80000001192092895508" f8="0.89999997615814208984"
+                       f9="1"/>
+    <transpOffsets>
+      <t0/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <nostalgic Id="12" name="12" waveDistance="0" undertow="0" gain="1" lengthMultiplier="2"
+             beatsToSkip="1" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="Nostalgic-1" waveDistance="0" undertow="0" gain="1"
+             lengthMultiplier="1" beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <keymap Id="12" name="12" k0="0" k1="1" k2="2" k3="3" k4="4" k5="5" k6="6"
+          k7="7" k8="8" k9="9" k10="10" k11="11" k12="12" k13="13" k14="14"
+          k15="15" k16="16" k17="17" k18="18" k19="19" k20="20" k21="21"
+          k22="22" k23="23" k24="24" k25="25" k26="26" k27="27" k28="28"
+          k29="29" k30="30" k31="31" k32="32" k33="33" k34="34" k35="35"
+          k36="36" k37="37" k38="38" k39="39" k40="40" k41="41" k42="42"
+          k43="43" k44="44" k45="45" k46="46" k47="47" k48="48" k49="49"
+          k50="50" k51="51" k52="52" k53="53" k54="54" k55="55" k56="56"
+          k57="57" k58="58" k59="59" k60="60" k61="61" k62="62" k63="63"
+          k64="64" k65="65" k66="66" k67="67" k68="68" k69="69" k70="70"
+          k71="71" k72="72" k73="73" k74="74" k75="75" k76="76" k77="77"
+          k78="78" k79="79" k80="80" k81="81" k82="82" k83="83" k84="84"
+          k85="85" k86="86" k87="87" k88="88" k89="89" k90="90" k91="91"
+          k92="92" k93="93" k94="94" k95="95" k96="96" k97="97" k98="98"
+          k99="99" k100="100" k101="101" k102="102" k103="103" k104="104"
+          k105="105" k106="106" k107="107" k108="108" k109="109" k110="110"
+          k111="111" k112="112" k113="113" k114="114" k115="115" k116="116"
+          k117="117" k118="118" k119="119" k120="120" k121="121" k122="122"
+          k123="123" k124="124" k125="125" k126="126" k127="127"/>
+  <keymap Id="13" name="13" k0="39"/>
+  <keymap Id="16" name="16" k0="58" k1="82"/>
+  <keymap Id="17" name="17" k0="51"/>
+  <keymap Id="-1" name="-1"/>
+  <piano name="Circleville|" Id="1">
+    <item>
+      <item name="Tuning12" type="3" Id="12" piano="-1" active="1" X="453"
+            Y="135"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="414"
+              Y="263"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Keymap12" type="5" Id="12" piano="-1" active="1" X="430"
+            Y="376"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="414"
+              Y="263"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Keymap13" type="5" Id="13" piano="-1" active="1" X="803"
+            Y="265"/>
+      <connections>
+        <item name="PianoMap1" type="12" Id="1" piano="2" active="1" X="660"
+              Y="238"/>
+      </connections>
+    </item>
+  </piano>
+  <piano name="Circleville||" Id="2">
+    <item>
+      <item name="Tuning12" type="3" Id="12" piano="-1" active="1" X="418"
+            Y="124"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="301"
+              Y="256"/>
+        <item name="Synchronic12" type="1" Id="12" piano="-1" active="1" X="456"
+              Y="256"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Synchronic12" type="1" Id="12" piano="-1" active="1" X="456"
+            Y="256"/>
+      <connections/>
+    </item>
+    <item>
+      <item name="Keymap12" type="5" Id="12" piano="-1" active="1" X="396"
+            Y="374"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="301"
+              Y="256"/>
+        <item name="Synchronic12" type="1" Id="12" piano="-1" active="1" X="456"
+              Y="256"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Tempo12" type="4" Id="12" piano="-1" active="1" X="498"
+            Y="124"/>
+      <connections>
+        <item name="Synchronic12" type="1" Id="12" piano="-1" active="1" X="456"
+              Y="256"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Keymap16" type="5" Id="16" piano="-1" active="1" X="794"
+            Y="339"/>
+      <connections>
+        <item name="PianoMap3" type="12" Id="3" piano="3" active="1" X="644"
+              Y="312"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Keymap17" type="5" Id="17" piano="-1" active="1" X="794"
+            Y="197"/>
+      <connections>
+        <item name="PianoMap4" type="12" Id="4" piano="4" active="1" X="644"
+              Y="170"/>
+      </connections>
+    </item>
+  </piano>
+  <piano name="Circleville|||" Id="3">
+    <item>
+      <item name="Tuning12" type="3" Id="12" piano="-1" active="1" X="427"
+            Y="130"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="306"
+              Y="272"/>
+        <item name="Synchronic13" type="1" Id="13" piano="-1" active="1" X="461"
+              Y="272"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Synchronic13" type="1" Id="13" piano="-1" active="1" X="461"
+            Y="272"/>
+      <connections/>
+    </item>
+    <item>
+      <item name="Keymap12" type="5" Id="12" piano="-1" active="1" X="402"
+            Y="381"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="306"
+              Y="272"/>
+        <item name="Synchronic13" type="1" Id="13" piano="-1" active="1" X="461"
+              Y="272"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Tempo12" type="4" Id="12" piano="-1" active="1" X="502"
+            Y="130"/>
+      <connections>
+        <item name="Synchronic13" type="1" Id="13" piano="-1" active="1" X="461"
+              Y="272"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Keymap16" type="5" Id="16" piano="-1" active="1" X="801"
+            Y="206"/>
+      <connections>
+        <item name="PianoMap6" type="12" Id="6" piano="2" active="1" X="657"
+              Y="179"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Keymap17" type="5" Id="17" piano="-1" active="1" X="801"
+            Y="337"/>
+      <connections>
+        <item name="PianoMap7" type="12" Id="7" piano="4" active="1" X="657"
+              Y="312"/>
+      </connections>
+    </item>
+  </piano>
+  <piano name="Circleville||||" Id="4">
+    <item>
+      <item name="Tuning12" type="3" Id="12" piano="-1" active="1" X="442"
+            Y="91"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="326"
+              Y="233"/>
+        <item name="Nostalgic12" type="2" Id="12" piano="-1" active="1" X="481"
+              Y="233"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Keymap12" type="5" Id="12" piano="-1" active="1" X="415"
+            Y="335"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="326"
+              Y="233"/>
+        <item name="Nostalgic12" type="2" Id="12" piano="-1" active="1" X="481"
+              Y="233"/>
+      </connections>
+    </item>
+  </piano>
+</gallery>

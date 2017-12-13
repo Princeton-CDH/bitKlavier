@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<gallery name="NS_5_Wallumrod" defaultPiano="1">
+  <idCount i0="13" i1="25" i2="16" i3="37" i4="21" i5="519" i6="10" i7="10"
+           i8="10" i9="52" i10="10" i11="10" i12="38" i13="10" i14="24"/>
+  <general globalGain="1" directGain="1" synchronicGain="1" nostalgicGain="1"
+           resonanceGain="1" hammerGain="0.0099999997764825820923" tempoMultiplier="1"
+           resAndHammer="1" invertSustain="0" tuningFund="440"/>
+  <tempo Id="15" name="15" tempo="110" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="16" name="16" tempo="1000" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tuning Id="14" name="ET" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="0" adaptiveAnchorScale="3" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="1" adaptiveHistory="1">
+    <customScale f0="0.059999998658895492554" f1="0" f2="0.019999999552965164185"
+                 f3="0.039999999105930328369" f4="-0.019999999552965164185" f5="0.059999998658895492554"
+                 f6="-0.019999999552965164185" f7="0.039999999105930328369" f8="0.019999999552965164185"
+                 f9="0" f10="0.059999998658895492554" f11="-0.019999999552965164185"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="21" name="21" scale="1" fundamental="9" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="0" adaptiveAnchorScale="0" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="1" adaptiveHistory="1">
+    <customScale f0="0.059999998658895492554" f1="0" f2="0.019999999552965164185"
+                 f3="0.039999999105930328369" f4="-0.019999999552965164185" f5="0.059999998658895492554"
+                 f6="-0.019999999552965164185" f7="0.039999999105930328369" f8="0.019999999552965164185"
+                 f9="0" f10="0.059999998658895492554" f11="-0.019999999552965164185"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="22" name="Just_D" scale="1" fundamental="2" offset="0" adaptiveIntervalScale="0"
+          adaptiveInversional="1" adaptiveAnchorScale="1" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="1" adaptiveHistory="1">
+    <customScale f0="0.059999998658895492554" f1="0" f2="0.019999999552965164185"
+                 f3="0.039999999105930328369" f4="-0.019999999552965164185" f5="0.059999998658895492554"
+                 f6="-0.019999999552965164185" f7="0.039999999105930328369" f8="0.019999999552965164185"
+                 f9="0" f10="0.059999998658895492554" f11="-0.019999999552965164185"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="24" name="24" scale="1" fundamental="2" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="0" adaptiveAnchorScale="0" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="1" adaptiveHistory="1">
+    <customScale f0="0.059999998658895492554" f1="0" f2="0.019999999552965164185"
+                 f3="0.039999999105930328369" f4="-0.019999999552965164185" f5="0.059999998658895492554"
+                 f6="-0.019999999552965164185" f7="0.039999999105930328369" f8="0.019999999552965164185"
+                 f9="0" f10="0.059999998658895492554" f11="-0.019999999552965164185"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="25" name="25" scale="1" fundamental="9" offset="0" adaptiveIntervalScale="0"
+          adaptiveInversional="1" adaptiveAnchorScale="0" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="1" adaptiveHistory="1">
+    <customScale f0="0.059999998658895492554" f1="0" f2="0.019999999552965164185"
+                 f3="0.039999999105930328369" f4="-0.019999999552965164185" f5="0.059999998658895492554"
+                 f6="-0.019999999552965164185" f7="0.039999999105930328369" f8="0.019999999552965164185"
+                 f9="0" f10="0.059999998658895492554" f11="-0.019999999552965164185"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <direct Id="11" name="Plain" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <synchronic Id="16" name="5-1" numBeats="8" clusterMin="1" clusterMax="100"
+              clusterThresh="1200" mode="1" beatsToSkip="-1">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="0.22916667163372039795" f1="0.22916667163372039795" f2="0.32083332538604736328"
+                       f3="0.36666667461395263672" f4="0.41249999403953552246" f5="0.4583333432674407959"
+                       f6="0.50416666269302368164" f7="1.1000000238418579102"/>
+    <accentMultipliers f0="0.60000002384185791016" f1="0.5" f2="0.40000000596046447754"
+                       f3="0.30000001192092895508" f4="0.20000000298023223877" f5="0.10000000149011611938"
+                       f6="0.10000000149011611938" f7="0.10000000149011611938"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="17" name="17" numBeats="10" clusterMin="2" clusterMax="100"
+              clusterThresh="500" mode="1" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="8.3333330154418945312"/>
+    <accentMultipliers f0="0.10000000149011611938" f1="0.20000000298023223877" f2="0.30000001192092895508"
+                       f3="0.40000000596046447754" f4="0.5" f5="0.60000002384185791016"
+                       f6="0.69999998807907104492" f7="0.80000001192092895508" f8="0.80000001192092895508"
+                       f9="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <nostalgic Id="11" name="NS1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <modTuning Id="13" scale="1" fundamental="8">
+    <customScale/>
+    <absoluteOffsets/>
+  </modTuning>
+  <modTuning Id="14" scale="1" fundamental="9">
+    <customScale/>
+    <absoluteOffsets/>
+  </modTuning>
+  <modTuning Id="15" scale="1" fundamental="11">
+    <customScale/>
+    <absoluteOffsets/>
+  </modTuning>
+  <keymap Id="11" name="All" k0="0" k1="1" k2="2" k3="3" k4="4" k5="5"
+          k6="6" k7="7" k8="8" k9="9" k10="10" k11="11" k12="12" k13="13"
+          k14="14" k15="15" k16="16" k17="17" k18="18" k19="19" k20="20"
+          k21="21" k22="22" k23="23" k24="24" k25="25" k26="26" k27="27"
+          k28="28" k29="29" k30="30" k31="31" k32="32" k33="33" k34="34"
+          k35="35" k36="36" k37="37" k38="38" k39="39" k40="40" k41="41"
+          k42="42" k43="43" k44="44" k45="45" k46="46" k47="47" k48="48"
+          k49="49" k50="50" k51="51" k52="52" k53="53" k54="54" k55="55"
+          k56="56" k57="57" k58="58" k59="59" k60="60" k61="61" k62="62"
+          k63="63" k64="64" k65="65" k66="66" k67="67" k68="68" k69="69"
+          k70="70" k71="71" k72="72" k73="73" k74="74" k75="75" k76="76"
+          k77="77" k78="78" k79="79" k80="80" k81="81" k82="82" k83="83"
+          k84="84" k85="85" k86="86" k87="87" k88="88" k89="89" k90="90"
+          k91="91" k92="92" k93="93" k94="94" k95="95" k96="96" k97="97"
+          k98="98" k99="99" k100="100" k101="101" k102="102" k103="103"
+          k104="104" k105="105" k106="106" k107="107" k108="108" k109="109"
+          k110="110" k111="111" k112="112" k113="113" k114="114" k115="115"
+          k116="116" k117="117" k118="118" k119="119" k120="120" k121="121"
+          k122="122" k123="123" k124="124" k125="125" k126="126" k127="127"/>
+  <keymap Id="31" name="5-2NostalgicMap" k0="22" k1="46" k2="79" k3="81"
+          k4="87" k5="88" k6="91" k7="93" k8="99" k9="100" k10="105"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="184" name="B3" k0="59"/>
+  <keymap Id="185" name="C#4" k0="61"/>
+  <keymap Id="186" name="D#4" k0="63"/>
+  <keymap Id="187" name="A6" k0="93"/>
+  <keymap Id="188" name="D1" k0="26"/>
+  <keymap Id="189" name="A2" k0="45"/>
+  <keymap Id="190" name="D3" k0="50"/>
+  <keymap Id="191" name="D2" k0="38"/>
+  <keymap Id="-1" name="-1"/>
+  <piano name="Etude5-1" Id="8">
+    <item>
+      <item name="Tuning21" type="3" Id="21" piano="-1" active="1" X="409"
+            Y="147"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="214"
+              Y="396"/>
+        <item name="Synchronic16" type="1" Id="16" piano="-1" active="1" X="367"
+              Y="396"/>
+        <item name="Nostalgic13" type="2" Id="11" piano="-1" active="1" X="526"
+              Y="396"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Synchronic16" type="1" Id="16" piano="-1" active="1" X="367"
+            Y="396"/>
+      <connections>
+        <item name="Nostalgic13" type="2" Id="11" piano="-1" active="1" X="526"
+              Y="396"/>
+      </connections>
+    </item>
+    <item>
+      <item name="TuningMod13" type="9" Id="13" piano="-1" active="1" X="254"
+            Y="48"/>
+      <connections>
+        <item name="Tuning21" type="3" Id="21" piano="-1" active="1" X="409"
+              Y="147"/>
+      </connections>
+    </item>
+    <item>
+      <item name="TuningMod14" type="9" Id="14" piano="-1" active="1" X="254"
+            Y="153"/>
+      <connections>
+        <item name="Tuning21" type="3" Id="21" piano="-1" active="1" X="409"
+              Y="147"/>
+      </connections>
+    </item>
+    <item>
+      <item name="TuningMod15" type="9" Id="15" piano="-1" active="1" X="254"
+            Y="255"/>
+      <connections>
+        <item name="Tuning21" type="3" Id="21" piano="-1" active="1" X="409"
+              Y="147"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Tempo15" type="4" Id="15" piano="-1" active="1" X="446"
+            Y="281"/>
+      <connections>
+        <item name="Synchronic16" type="1" Id="16" piano="-1" active="1" X="367"
+              Y="396"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="11" piano="0" active="1" X="384" Y="510"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="214"
+              Y="396"/>
+        <item name="Synchronic16" type="1" Id="16" piano="-1" active="1" X="367"
+              Y="396"/>
+        <item name="Nostalgic13" type="2" Id="11" piano="-1" active="1" X="526"
+              Y="396"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="184" piano="0" active="1" X="124" Y="40"/>
+      <connections>
+        <item name="TuningMod13" type="9" Id="13" piano="-1" active="1" X="254"
+              Y="48"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="185" piano="0" active="1" X="124" Y="146"/>
+      <connections>
+        <item name="TuningMod14" type="9" Id="14" piano="-1" active="1" X="254"
+              Y="153"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="186" piano="0" active="1" X="124" Y="249"/>
+      <connections>
+        <item name="TuningMod15" type="9" Id="15" piano="-1" active="1" X="254"
+              Y="255"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="187" piano="0" active="1" X="765" Y="61"/>
+      <connections>
+        <item name="PianoMap13" type="12" Id="13" piano="9" active="1" X="611"
+              Y="35"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="188" piano="0" active="1" X="765" Y="204"/>
+      <connections>
+        <item name="PianoMap14" type="12" Id="14" piano="11" active="1" X="612"
+              Y="179"/>
+      </connections>
+    </item>
+  </piano>
+  <piano name="Etude5-2" Id="9">
+    <item>
+      <item name="Tuning22" type="3" Id="22" piano="-1" active="1" X="285"
+            Y="115"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="172"
+              Y="263"/>
+        <item name="Nostalgic13" type="2" Id="11" piano="-1" active="1" X="326"
+              Y="263"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Keymap31" type="5" Id="31" piano="-1" active="1" X="343"
+            Y="403"/>
+      <connections>
+        <item name="Nostalgic13" type="2" Id="11" piano="-1" active="1" X="326"
+              Y="263"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="11" piano="0" active="1" X="188" Y="403"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="172"
+              Y="263"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="189" piano="0" active="1" X="564" Y="198"/>
+      <connections>
+        <item name="PianoMap15" type="12" Id="15" piano="10" active="1" X="734"
+              Y="170"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="190" piano="0" active="1" X="560" Y="357"/>
+      <connections>
+        <item name="PianoMap16" type="12" Id="16" piano="12" active="1" X="743"
+              Y="315"/>
+      </connections>
+    </item>
+  </piano>
+  <piano name="Etude5-3" Id="10">
+    <item>
+      <item name="Tuning24" type="3" Id="24" piano="-1" active="1" X="218"
+            Y="99"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="174"
+              Y="243"/>
+        <item name="Synchronic17" type="1" Id="17" piano="-1" active="1" X="325"
+              Y="243"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Synchronic17" type="1" Id="17" piano="-1" active="1" X="325"
+            Y="243"/>
+      <connections/>
+    </item>
+    <item>
+      <item name="Tempo16" type="4" Id="16" piano="-1" active="1" X="371"
+            Y="100"/>
+      <connections>
+        <item name="Synchronic17" type="1" Id="17" piano="-1" active="1" X="325"
+              Y="243"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="11" piano="0" active="1" X="267" Y="378"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="174"
+              Y="243"/>
+        <item name="Synchronic17" type="1" Id="17" piano="-1" active="1" X="325"
+              Y="243"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="191" piano="0" active="1" X="582" Y="112"/>
+      <connections>
+        <item name="PianoMap17" type="12" Id="17" piano="8" active="1" X="725"
+              Y="85"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="187" piano="0" active="1" X="581" Y="261"/>
+      <connections>
+        <item name="PianoMap18" type="12" Id="18" piano="9" active="1" X="725"
+              Y="234"/>
+      </connections>
+    </item>
+  </piano>
+  <piano name="Etude5-4" Id="11">
+    <item>
+      <item name="" type="3" Id="24" piano="0" active="1" X="219" Y="92"/>
+      <connections>
+        <item name="" type="0" Id="11" piano="0" active="1" X="175" Y="236"/>
+        <item name="" type="1" Id="17" piano="0" active="1" X="326" Y="236"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="1" Id="17" piano="0" active="1" X="326" Y="236"/>
+      <connections/>
+    </item>
+    <item>
+      <item name="" type="4" Id="16" piano="0" active="1" X="372" Y="92"/>
+      <connections>
+        <item name="" type="1" Id="17" piano="0" active="1" X="326" Y="236"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="11" piano="0" active="1" X="268" Y="370"/>
+      <connections>
+        <item name="" type="0" Id="11" piano="0" active="1" X="175" Y="236"/>
+        <item name="" type="1" Id="17" piano="0" active="1" X="326" Y="236"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="191" piano="0" active="1" X="583" Y="104"/>
+      <connections>
+        <item name="" type="12" Id="34" piano="8" active="1" X="726" Y="78"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="187" piano="0" active="1" X="582" Y="253"/>
+      <connections>
+        <item name="" type="12" Id="18" piano="9" active="1" X="726" Y="227"/>
+      </connections>
+    </item>
+  </piano>
+  <piano name="Etude5-5" Id="12">
+    <item>
+      <item name="Tuning25" type="3" Id="25" piano="-1" active="1" X="493"
+            Y="179"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="453"
+              Y="312"/>
+      </connections>
+    </item>
+    <item>
+      <item name="TuningMod18" type="9" Id="13" piano="-1" active="1" X="349"
+            Y="98"/>
+      <connections>
+        <item name="Tuning25" type="3" Id="25" piano="-1" active="1" X="493"
+              Y="179"/>
+      </connections>
+    </item>
+    <item>
+      <item name="TuningMod19" type="9" Id="14" piano="-1" active="1" X="349"
+            Y="204"/>
+      <connections>
+        <item name="Tuning25" type="3" Id="25" piano="-1" active="1" X="493"
+              Y="179"/>
+      </connections>
+    </item>
+    <item>
+      <item name="TuningMod20" type="9" Id="15" piano="-1" active="1" X="349"
+            Y="306"/>
+      <connections>
+        <item name="Tuning25" type="3" Id="25" piano="-1" active="1" X="493"
+              Y="179"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="11" piano="0" active="1" X="467" Y="420"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="453"
+              Y="312"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="184" piano="0" active="1" X="209" Y="92"/>
+      <connections>
+        <item name="TuningMod18" type="9" Id="13" piano="-1" active="1" X="349"
+              Y="98"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="185" piano="0" active="1" X="209" Y="198"/>
+      <connections>
+        <item name="TuningMod19" type="9" Id="14" piano="-1" active="1" X="349"
+              Y="204"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="186" piano="0" active="1" X="209" Y="301"/>
+      <connections>
+        <item name="TuningMod20" type="9" Id="15" piano="-1" active="1" X="349"
+              Y="306"/>
+      </connections>
+    </item>
+  </piano>
+  <piano name="Blank" Id="24">
+    <item>
+      <item name="Tuning14" type="3" Id="14" piano="-1" active="1" X="456"
+            Y="90"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="416"
+              Y="239"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Keymap11" type="5" Id="11" piano="-1" active="1" X="431"
+            Y="363"/>
+      <connections>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="416"
+              Y="239"/>
+      </connections>
+    </item>
+  </piano>
+</gallery>

@@ -475,7 +475,6 @@ void HeaderViewController::addGalleriesFromFolder(File folder)
 
 void HeaderViewController::loadDefaultGalleries(void)
 {
-    
     if(!galleryModalCallBackIsOpen)
     {
         galleryCB.clear(dontSendNotification);
@@ -487,9 +486,9 @@ void HeaderViewController::loadDefaultGalleries(void)
         
         int size;
         
-        PopupMenu mikroetudes_menu, ns_etudes_menu;
+        PopupMenu mikroetudes_menu, ns_etudes_menu, bk_examples_menu;
         
-        //data = BinaryData::__blank_xml;
+        //data = BinaryData::Basic_Piano_xml;
         for (int i = 0; i < BinaryData::namedResourceListSize; i++)
         {
             resource = BinaryData::namedResourceList[i];
@@ -498,17 +497,19 @@ void HeaderViewController::loadDefaultGalleries(void)
             {
                 data = BinaryData::getNamedResource(BinaryData::namedResourceList[i], size);
                 
-                name = data.fromFirstOccurrenceOf("<gallery name=\"", false, true).upToFirstOccurrenceOf("\" ", false, true);
+                name = data.fromFirstOccurrenceOf("<gallery name=\"", false, true).upToFirstOccurrenceOf("\"", false, true);
 
                 if (processor.mikroetudes.contains(name))       mikroetudes_menu.addItem(id++, name);
                 else if (processor.ns_etudes.contains(name))    ns_etudes_menu.addItem(id++, name);
+                else if (processor.bk_examples.contains(name))  bk_examples_menu.addItem(id++, name);
                 else                                            galleryCB.addItem(name, id++);
                 
             }
         }
         
-        popupRoot->addSubMenu("_Nostalgic Synchronic", ns_etudes_menu);
-        popupRoot->addSubMenu("_Mikroetudes", mikroetudes_menu);
+        popupRoot->addSubMenu("Examples", bk_examples_menu);
+        popupRoot->addSubMenu("Nostalgic Synchronic", ns_etudes_menu);
+        popupRoot->addSubMenu("Mikroetudes", mikroetudes_menu);
         
         galleryCB.addSeparator();
         

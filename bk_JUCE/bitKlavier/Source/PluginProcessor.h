@@ -74,7 +74,7 @@ public:
     Piano::Ptr                          currentPiano;
     Piano::PtrArr                       prevPianos;
     
-    StringArray mikroetudes, ns_etudes;
+    StringArray mikroetudes, ns_etudes, bk_examples;
     
     StringArray                         galleryNames;
     String                              currentGallery;

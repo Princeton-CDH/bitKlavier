@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<gallery name="Mike's Gallery" url="/Users/airship/Documents/bitKlavier resources/galleries/Mike's Gallery.xml"
-         defaultPiano="34">
+<gallery name="Mike's Gallery" defaultPiano="1">
   <idCount i0="22" i1="32" i2="45" i3="30" i4="19" i5="1682" i6="10" i7="10"
            i8="10" i9="12" i10="10" i11="10" i12="16" i13="11" i14="36"/>
   <general globalGain="1" directGain="1" synchronicGain="1" nostalgicGain="1"

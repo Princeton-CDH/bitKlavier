@@ -58,7 +58,7 @@ sustainIsDown(false)
     
     updateUI();
     
-    String xmlData = CharPointer_UTF8 (BinaryData::__blank_xml);
+    String xmlData = CharPointer_UTF8 (BinaryData::Basic_Piano_xml);
     
     defaultLoaded = true;
     
@@ -83,6 +83,37 @@ sustainIsDown(false)
         noteOn.set(i, false);
     }
     
+    bk_examples = StringArray({
+        "1. Synchronic 1",
+        "2. Synchronic 2",
+        "3. Synchronic 3",
+        "4. Synchronic 4",
+        "5. Synchronic 5",
+        "6. Synchronic 6",
+        "7. Synchronic 7",
+        "8. Synchronic 8",
+        "9. Synchronic 9",
+        "10. Nostalgic 1",
+        "11. Nostalgic 2",
+        "12. Nostalgic 3",
+        "13. Nostalgic 4",
+        "14. Nostalgic 5",
+        "15. Nostalgic 6",
+        "16. Tuning 1",
+        "17. Tuning 2",
+        "18. Tuning 3",
+        "19. Tuning 4",
+        "20. Tuning 5",
+        "21. Direct 1",
+        "22. Direct 2",
+        "23. Adaptive Tempo 1",
+        "24. Adaptive Tempo 2",
+        "25. Adaptive Tempo 3",
+        "26. Adaptive Tempo 4",
+        "27. PianoMapGallery"
+        
+    });
+    
     mikroetudes = StringArray({
         "And So...",
         "Around 60",
@@ -106,7 +137,7 @@ sustainIsDown(false)
         "Scales within Sliding Scales",
         "Slow To Come Back",
         "Southwing",
-        "Who do you think you are Mars",
+        "Who do you think you are, Mars?",
         "Worm"
     });
     
@@ -209,7 +240,7 @@ void BKAudioProcessor::createNewGallery(String name)
     
     File myFile(bkGalleries);
     myFile = myFile.getNonexistentChildFile(name, ".xml", true);
-    myFile.appendData(BinaryData::__blank_xml, BinaryData::__blank_xmlSize);
+    myFile.appendData(BinaryData::Basic_Piano_xml, BinaryData::Basic_Piano_xmlSize);
     galleryNames.add(myFile.getFullPathName());
     
     ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
@@ -662,18 +693,14 @@ void BKAudioProcessor::saveGalleryAs(void)
         
         String newURL = myFile.getFullPathName();
         
-        //DBG("newURL: " + newURL);
-        
-        //if (currentURL != newURL)   gallery->setURL(newURL);
-        
         ValueTree galleryVT = gallery->getState();
+        
+        galleryVT.setProperty("name", currentGallery, 0);
         
         ScopedPointer<XmlElement> myXML = galleryVT.createXml();
         
         myXML->writeToFile(myFile, String::empty);
-        
-        myXML->setAttribute("name", currentGallery);
-        
+
         gallery->setGalleryDirty(false);
         
         lastGalleryPath = myFile;
