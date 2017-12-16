@@ -177,10 +177,10 @@ namespace BinaryData
     const int            NS_5_Wallumrod_xmlSize = 28121;
 
     extern const char*   NS_6_PointsAmongLines_xml;
-    const int            NS_6_PointsAmongLines_xmlSize = 15647;
+    const int            NS_6_PointsAmongLines_xmlSize = 15637;
 
     extern const char*   NS_7_Systerslaat_xml;
-    const int            NS_7_Systerslaat_xmlSize = 43920;
+    const int            NS_7_Systerslaat_xmlSize = 43910;
 
     extern const char*   NS_8_ItIsEnough_xml;
     const int            NS_8_ItIsEnough_xmlSize = 22310;
