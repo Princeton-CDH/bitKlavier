@@ -390,6 +390,7 @@ void PreparationMap::sustainPedalReleased(bool post)
         
         for (auto proc : nprocessor)
         {
+            DBG("nostalgic sustainPedalReleased " + String((int)post));
             proc->keyReleased(releaseNote.noteNumber, releaseNote.channel, post);
         }
     }
@@ -400,6 +401,18 @@ void PreparationMap::sustainPedalReleased(bool post)
 void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
 {
     DBG("PreparationMap::postRelease");
+    
+    if(sustainPedalIsDepressed && pKeymap->containsNote(noteNumber))
+    {
+        SustainedNote newNote;
+        newNote.noteNumber = noteNumber;
+        newNote.velocity = velocity;
+        newNote.channel = channel;
+        DBG("storing sustained note " + String(noteNumber));
+        
+        sustainedNotes.add(newNote);
+    }
+    
     if (pKeymap->containsNote(noteNumber))
     {
         for (auto proc : dprocessor)

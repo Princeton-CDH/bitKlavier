@@ -437,6 +437,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
                 
                 if(prevPiano != currentPiano)
                 {
+                    DBG("prev piano sustainPedalReleased() called");
                     for (int p = prevPiano->activePMaps.size(); --p >= 0;)
                         prevPiano->activePMaps[p]->sustainPedalReleased(true);
                 }

@@ -69,6 +69,7 @@ HeaderViewController::~HeaderViewController()
 {
     galleryCB.setLookAndFeel(nullptr);
     pianoCB.setLookAndFeel(nullptr);
+
     setLookAndFeel(nullptr);
 }
 

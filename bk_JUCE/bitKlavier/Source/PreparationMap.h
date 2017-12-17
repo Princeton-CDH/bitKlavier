@@ -46,7 +46,8 @@ public:
     void keyReleased(int noteNumber, float velocity, int channel);
     void postRelease(int noteNumber, float velocity, int channel);
     void sustainPedalPressed()  { sustainPedalIsDepressed = true;  }
-    void sustainPedalReleased(bool post = false);
+    void sustainPedalReleased(bool post);
+    void sustainPedalReleased() {sustainPedalReleased(false);};
     
     void setKeymap(Keymap::Ptr km);
     inline Keymap::Ptr getKeymap()              { return pKeymap; }
