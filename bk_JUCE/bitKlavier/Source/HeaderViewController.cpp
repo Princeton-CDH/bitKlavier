@@ -596,7 +596,7 @@ void HeaderViewController::fillGalleryCB(void)
         
         // THIS IS WHERE NAME OF GALLERY DISPLAYED IS SET
         galleryCB.setSelectedId(lastGalleryCBId, NotificationType::dontSendNotification);
-        galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true));
+        if(lastGalleryCBId < 0) galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true));
     }
 }
 
@@ -737,7 +737,7 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
             int index = Id - 1;
 
             //if (index < numberOfDefaultGalleryItems)
-            if(cb->getSelectedItemIndex() <= numberOfDefaultGalleryItems)
+            if(cb->getSelectedItemIndex() < numberOfDefaultGalleryItems)
             {
                 int size;
                 int index = Id - 1;
@@ -757,11 +757,11 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
                 
                 processor.defaultLoaded = false;
                 processor.defaultName = "";
-                
-                DBG("HeaderViewController::bkComboBoxDidChange " + String(Id) + " " + String(index) + " " + String(numberOfDefaultGalleryItems));
-                
+         
                 if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
                 else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
+                
+                DBG("HeaderViewController::bkComboBoxDidChange combobox text = " + galleryCB.getText());
             }
             
         }
