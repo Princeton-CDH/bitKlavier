@@ -842,6 +842,8 @@ public:
     inline void setParam(SynchronicParameterType type, String val)
     {
         param.set(type, val);
+        
+        
     }
     
     void print(void)
@@ -946,7 +948,6 @@ public:
     inline void reset(void)
     {
         synchronic->aPrep->copy(synchronic->sPrep);
-        DBG("synchronic reset");
     }
     
 private:

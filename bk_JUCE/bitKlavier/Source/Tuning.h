@@ -568,7 +568,6 @@ public:
     {
         adaptiveReset();
         tuning->aPrep->copy(tuning->sPrep);
-        DBG("tuning reset");
     }
     
 private:

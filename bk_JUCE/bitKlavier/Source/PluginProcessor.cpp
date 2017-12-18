@@ -172,7 +172,9 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     gallery->prepareToPlay(sampleRate);
 
-#if JUCE_DEBUG
+
+#if DEBUG
+
     loadPianoSamples(BKLoadLite);
 #else
     
