@@ -459,7 +459,7 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
 
 static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc = {
 	{ 0.0f, 0.0f, 0.0f, 0.0f }, //min, max, default, increment, skew
-	{ 1.0f, 100.0f, 1.0f, 1.0f },
+	{ 1.0f, 100.0f, 20.0f, 1.0f },
 	{ 1.0f, 4.0f, 1.0f, 1.0f },
 	{ 2.0f, 8.0f, 8.0f, 1.0f },
 	{ 20.0f, 2000.0f, 500.0f, 10.0f },

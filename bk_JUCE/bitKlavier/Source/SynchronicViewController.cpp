@@ -76,7 +76,7 @@ BKViewController(p, theGraph)
     offsetParamStartToggle.setToggleState (true, dontSendNotification);
     addAndMakeVisible(offsetParamStartToggle);
     
-    howManySlider = new BKSingleSlider("how many", 1, 100, 1, 1);
+    howManySlider = new BKSingleSlider("how many", 1, 100, 20, 1);
     howManySlider->setJustifyRight(false);
     addAndMakeVisible(howManySlider);
     
