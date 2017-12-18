@@ -232,6 +232,7 @@ public:
     RectanglePlacement placement;
     
     void bkTextFieldDidChange   (TextEditor&)           override;
+    void textEditorFocusLost    (TextEditor&)           override;
     void bkComboBoxDidChange    (ComboBox*)             override;
     void bkButtonClicked        (Button* b)             override {};
     void bkMessageReceived      (const String& message) override {};
@@ -250,6 +251,9 @@ public:
     void setCommentText(String text) { comment.setText(text);}
     String getCommentText(void) { return comment.getText();}
     void exitComment(void) { comment.exitModalState(0);}
+    
+    bool resizing;
+    
 private:
     BKAudioProcessor& processor;
     Label label;
@@ -266,6 +270,7 @@ private:
     
     // UI stuff
     Component fullChild;
+    
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKItem)

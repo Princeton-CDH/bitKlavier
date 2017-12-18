@@ -697,7 +697,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     
     mouseClicked(lastX, lastY, e.eventTime);
     
-    if (itemToSelect != nullptr)
+    if (itemToSelect != nullptr && !itemToSelect->resizing)
     {
         setMouseDownOnItem(true);
         

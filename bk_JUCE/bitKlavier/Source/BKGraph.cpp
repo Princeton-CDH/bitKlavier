@@ -22,7 +22,8 @@ BKDraggableComponent(true,false,true, 50, 50, 50, 50),
 processor(p),
 wasJustDragged(false),
 constrain(new ComponentBoundsConstrainer()),
-resizer(new ResizableCornerComponent (this, constrain))
+resizer(new ResizableCornerComponent (this, constrain)),
+resizing(false)
 {
     fullChild.setAlwaysOnTop(true);
     addAndMakeVisible(fullChild);
@@ -98,7 +99,7 @@ resizer(new ResizableCornerComponent (this, constrain))
         
         addAndMakeVisible (resizer);
         resizer->setAlwaysOnTop(true);
-        constrain->setSizeLimits(50,50,300,300);
+        constrain->setSizeLimits(30,20,600,400);
     }
     
     startTimerHz(10);
@@ -125,6 +126,18 @@ BKItem* BKItem::duplicate(void)
     newItem->setBounds(getBounds());
     
     return newItem;
+}
+
+void BKItem::textEditorFocusLost(TextEditor& tf)
+{
+    String text = tf.getText();
+    String name = tf.getName();
+    
+    if (name == comment.getName())
+    {
+        DBG(text);
+        comment.exitModalState(0);
+    }
 }
 
 void BKItem::bkTextFieldDidChange(TextEditor& tf)
@@ -366,6 +379,9 @@ void BKItem::mouseDoubleClick(const MouseEvent& e)
 
 void BKItem::mouseDown(const MouseEvent& e)
 {
+    if (e.originalComponent == resizer) resizing = true;
+    else                                resizing = false;
+        
     BKConstructionSite* cs = ((BKConstructionSite*)getParentComponent());
     BKItem* current = cs->getCurrentItem();
 
