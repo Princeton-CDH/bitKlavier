@@ -34,7 +34,7 @@ BKViewController(p, theGraph)
     gainSlider->setJustifyRight(false);
     addAndMakeVisible(gainSlider);
     
-    resonanceGainSlider = new BKSingleSlider("resonance gain", 0, 10, 1, 0.01);
+    resonanceGainSlider = new BKSingleSlider("resonance gain", 0, 10, 0.2, 0.01);
     resonanceGainSlider->setSkewFactorFromMidPoint(1.);
     resonanceGainSlider->setJustifyRight(false);
     addAndMakeVisible(resonanceGainSlider);
