@@ -516,7 +516,6 @@ public:
     {
         tempo->aPrep->copy(tempo->sPrep);
         adaptiveReset();
-        DBG("tempo reset");
     }
     
 private:

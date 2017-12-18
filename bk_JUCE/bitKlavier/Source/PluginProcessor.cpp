@@ -172,6 +172,9 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     gallery->prepareToPlay(sampleRate);
 
+#if DEBUG
+    loadPianoSamples(BKLoadLite);
+#else
     
 #if JUCE_IOS
     String osname = SystemStats::getOperatingSystemName();
@@ -181,6 +184,8 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     else                    loadPianoSamples(BKLoadLite);
 #else
     loadPianoSamples(BKLoadHeavy);
+#endif
+    
 #endif
     
 #if TRY_UNDO

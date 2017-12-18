@@ -805,6 +805,7 @@ void SynchronicModificationEditor::update(NotificationType notify)
             else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicTranspOffsets])
             {
                 val = mod->getParam(SynchronicTranspOffsets);
+                DBG("update val: " + val);
                 paramSliders[i]->setTo(stringToArrayFloatArray(val), notify);
             }
         }
@@ -853,19 +854,28 @@ void SynchronicModificationEditor::multiSliderDidChange(String name, int whichSl
     
     if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
     {
-        mod->setParam(SynchronicAccentMultipliers, String(values[0]));
+        Array<float> accents = stringToFloatArray(mod->getParam(SynchronicAccentMultipliers));
+        accents.set(whichSlider, values[0]);
+        mod->setParam(SynchronicAccentMultipliers, floatArrayToString(accents));
     }
     else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
     {
-        mod->setParam(SynchronicBeatMultipliers, String(values[0]));
+        Array<float> beats = stringToFloatArray(mod->getParam(SynchronicBeatMultipliers));
+        beats.set(whichSlider, values[0]);
+        mod->setParam(SynchronicBeatMultipliers, floatArrayToString(beats));
     }
     else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
     {
-        mod->setParam(SynchronicLengthMultipliers, String(values[0]));
+        Array<float> lens = stringToFloatArray(mod->getParam(SynchronicLengthMultipliers));
+        lens.set(whichSlider, values[0]);
+        mod->setParam(SynchronicLengthMultipliers, floatArrayToString(lens));
     }
     else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
     {
-        mod->setParam(SynchronicTranspOffsets, floatArrayToString(values));
+        //paramSliders
+        Array<Array<float>> transps = stringToArrayFloatArray(mod->getParam(SynchronicTranspOffsets));
+        transps.set(whichSlider, values);
+        mod->setParam(SynchronicTranspOffsets, arrayFloatArrayToString(transps));
     }
     
     for(int i = 0; i < paramSliders.size(); i++)
@@ -879,7 +889,7 @@ void SynchronicModificationEditor::multiSliderDidChange(String name, int whichSl
 
 void SynchronicModificationEditor::multiSlidersDidChange(String name, Array<Array<float>> values)
 {
-    
+    DBG("input from slider: " + arrayFloatArrayToString(values));
     SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
     
     //only transposition allows multiple simultaneous vals, so trim down to 1D array
