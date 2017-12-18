@@ -736,7 +736,8 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
             lastGalleryCBId = Id;
             int index = Id - 1;
 
-            if (index < numberOfDefaultGalleryItems)
+            //if (index < numberOfDefaultGalleryItems)
+            if(cb->getSelectedItemIndex() <= numberOfDefaultGalleryItems)
             {
                 int size;
                 int index = Id - 1;
@@ -746,6 +747,8 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
                 processor.defaultName = BinaryData::namedResourceList[index];
                 
                 processor.loadGalleryFromXml(XmlDocument::parse(xmlData));
+                
+                
             }
             else
             {
@@ -754,6 +757,8 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
                 
                 processor.defaultLoaded = false;
                 processor.defaultName = "";
+                
+                DBG("HeaderViewController::bkComboBoxDidChange " + String(Id) + " " + String(index) + " " + String(numberOfDefaultGalleryItems));
                 
                 if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
                 else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
