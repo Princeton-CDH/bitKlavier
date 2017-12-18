@@ -61,6 +61,7 @@ sustainIsDown(false)
     String xmlData = CharPointer_UTF8 (BinaryData::Basic_Piano_xml);
     
     defaultLoaded = true;
+    defaultName = "Basic_Piano_xml";
     
     loadGalleryFromXml(XmlDocument::parse(xmlData));
 

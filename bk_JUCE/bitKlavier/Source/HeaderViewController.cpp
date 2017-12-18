@@ -743,6 +743,7 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
                 String xmlData = CharPointer_UTF8 (BinaryData::getNamedResource(BinaryData::namedResourceList[index], size));
                 
                 processor.defaultLoaded = true;
+                processor.defaultName = BinaryData::namedResourceList[index];
                 
                 processor.loadGalleryFromXml(XmlDocument::parse(xmlData));
             }
@@ -752,6 +753,7 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
                 String path = processor.galleryNames[index];
                 
                 processor.defaultLoaded = false;
+                processor.defaultName = "";
                 
                 if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
                 else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);

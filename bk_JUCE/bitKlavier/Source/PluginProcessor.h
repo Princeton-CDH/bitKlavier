@@ -81,6 +81,7 @@ public:
     String                              currentGalleryPath;
     
     bool                                defaultLoaded;
+    String                              defaultName;
     
 #if TRY_UNDO
     Piano::PtrArr                       history;
