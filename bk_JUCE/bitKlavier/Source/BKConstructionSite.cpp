@@ -265,8 +265,6 @@ void BKConstructionSite::draw(void)
                 item->setTopLeftPosition(X, Y);
                 
                 otherCount++;
-
-                
             }
             DBG("itemxy: " + String(item->getX()) + " " + String(item->getY()));
         }
@@ -302,7 +300,7 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
 {
     int thisId = -1;
     
-    if (type != PreparationTypeGenericMod)
+    if (type != PreparationTypeGenericMod && type != PreparationTypeComment)
     {
         thisId = processor.gallery->getNewId(type);
         
@@ -315,6 +313,10 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
     {
         toAdd->setPianoTarget(processor.currentPiano->getId());
         toAdd->configurePianoCB();
+    }
+    else if (type == PreparationTypeComment)
+    {
+        toAdd->configureComment();
     }
     
 #if JUCE_IOS
@@ -671,7 +673,6 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
 {
     MouseEvent e = eo.getEventRelativeTo(this);
     
-    DBG("currentpiano: " + String(processor.currentPiano->getId()));
 #if JUCE_IOS
     TouchEvent* t = getTouchEvent(e.source);
     
@@ -769,7 +770,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
         {
             graph->deselectAll();
         }
-        
+
         selected.deselectAll();
         
         addAndMakeVisible(lasso = new LassoComponent<BKItem*>());
@@ -779,7 +780,6 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
         lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoOutlineColourId, Colours::antiquewhite);
         
         lasso->beginLasso(eo, this);
-
     }
 
     getParentComponent()->grabKeyboardFocus();

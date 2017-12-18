@@ -172,6 +172,9 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     gallery->prepareToPlay(sampleRate);
 
+#if JUCE_DEBUG
+    loadPianoSamples(BKLoadLite);
+#else
     
 #if JUCE_IOS
     String osname = SystemStats::getOperatingSystemName();
@@ -181,6 +184,8 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     else                    loadPianoSamples(BKLoadLite);
 #else
     loadPianoSamples(BKLoadHeavy);
+#endif
+    
 #endif
     
 #if TRY_UNDO
@@ -661,6 +666,8 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modfa = sMod[i]->getModFloatArr();
         modafa = sMod[i]->getModArrFloatArr();
         modia = sMod[i]->getModIntArr();
+        
+        DBG("transps: " + arrayFloatArrayToString(modafa));
         
         if (type == SynchronicTranspOffsets)            active->setTransposition(modafa);
         else if (type == SynchronicMode)                active->setMode((SynchronicSyncMode)modi);

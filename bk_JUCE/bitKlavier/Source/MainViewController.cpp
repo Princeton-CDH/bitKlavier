@@ -370,6 +370,10 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     {
         construction.addItem(PreparationTypePianoMap);
     }
+    else if (code == 81) // Q comment
+    {
+        construction.addItem(PreparationTypeComment);
+    }
     else if (code == 82) // R reset
     {
         construction.addItem(PreparationTypeReset);

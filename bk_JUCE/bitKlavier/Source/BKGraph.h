@@ -231,7 +231,7 @@ public:
     Image image;
     RectanglePlacement placement;
     
-    void bkTextFieldDidChange   (TextEditor&)           override {};
+    void bkTextFieldDidChange   (TextEditor&)           override;
     void bkComboBoxDidChange    (ComboBox*)             override;
     void bkButtonClicked        (Button* b)             override {};
     void bkMessageReceived      (const String& message) override {};
@@ -243,22 +243,30 @@ public:
     void setImage(Image newImage);
     
     void configurePianoCB(void);
+    void configureComment(void);
 
     BKItem::PtrArr connections;
     
+    void setCommentText(String text) { comment.setText(text);}
+    String getCommentText(void) { return comment.getText();}
+    void exitComment(void) { comment.exitModalState(0);}
 private:
     BKAudioProcessor& processor;
     Label label;
     
     bool wasJustDragged;
     
-
+    ScopedPointer<ComponentBoundsConstrainer> constrain;
+    
+    ScopedPointer<ResizableCornerComponent> resizer;
+    
     // Piano menu
     BKComboBox menu;
-    
+    BKTextField comment;
     
     // UI stuff
     Component fullChild;
+    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKItem)
 };

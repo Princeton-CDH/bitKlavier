@@ -805,6 +805,7 @@ void SynchronicModificationEditor::update(NotificationType notify)
             else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicTranspOffsets])
             {
                 val = mod->getParam(SynchronicTranspOffsets);
+                DBG("update mod: " + val);
                 paramSliders[i]->setTo(stringToArrayFloatArray(val), notify);
             }
         }
@@ -879,7 +880,6 @@ void SynchronicModificationEditor::multiSliderDidChange(String name, int whichSl
 
 void SynchronicModificationEditor::multiSlidersDidChange(String name, Array<Array<float>> values)
 {
-    
     SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
     
     //only transposition allows multiple simultaneous vals, so trim down to 1D array
@@ -901,6 +901,7 @@ void SynchronicModificationEditor::multiSlidersDidChange(String name, Array<Arra
     //pass original 2D array for transpositions
     else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
     {
+        DBG("set mod: " + arrayFloatArrayToString(values));
         mod->setParam(SynchronicTranspOffsets, arrayFloatArrayToString(values));
     }
     
