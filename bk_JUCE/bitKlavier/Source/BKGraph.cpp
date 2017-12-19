@@ -30,12 +30,6 @@ resizing(false)
     
     setPianoTarget(0);
     
-    comment.setText("Text here...");
-    comment.addListener(this);
-    comment.setName("comment");
-    comment.setSize(150, 75);
-    //addMouseListener(&comment, false);
-    
     if (type == PreparationTypeTuning)
     {
         setImage(ImageCache::getFromMemory(BinaryData::tuning_icon_png, BinaryData::tuning_icon_pngSize));
@@ -92,15 +86,6 @@ resizing(false)
     {
         setImage(ImageCache::getFromMemory(BinaryData::piano_icon_png, BinaryData::piano_icon_pngSize));
     }
-    else if (type == PreparationTypeComment)
-    {
-        setSize(150,75);
-        comment.setSize(150,75);
-        
-        addAndMakeVisible (resizer);
-        resizer->setAlwaysOnTop(true);
-        constrain->setSizeLimits(30,20,600,400);
-    }
     
     startTimerHz(10);
 }
@@ -115,8 +100,6 @@ BKItem* BKItem::duplicate(void)
     
     newItem->setPianoTarget(pianoTarget);
     
-    newItem->setCommentText(comment.getText());
-    
     newItem->setImage(image);
     
     newItem->setItemName(name);
@@ -126,37 +109,6 @@ BKItem* BKItem::duplicate(void)
     newItem->setBounds(getBounds());
     
     return newItem;
-}
-
-void BKItem::textEditorFocusLost(TextEditor& tf)
-{
-    String text = tf.getText();
-    String name = tf.getName();
-    
-    if (name == comment.getName())
-    {
-        DBG(text);
-        comment.exitModalState(0);
-    }
-}
-
-void BKItem::bkTextFieldDidChange(TextEditor& tf)
-{
-    String text = tf.getText();
-    String name = tf.getName();
-    
-    if (name == comment.getName())
-    {
-        DBG(text);
-        comment.exitModalState(0);
-    }
-}
-
-void BKItem::configureComment(void)
-{
-    comment.setColour(TextEditor::ColourIds::backgroundColourId, Colours::antiquewhite.withAlpha(0.5f));
-    comment.setColour(TextEditor::ColourIds::textColourId, Colours::black.withAlpha(0.5f));
-    addAndMakeVisible(comment);
 }
 
 void BKItem::configurePianoCB(void)
@@ -265,10 +217,6 @@ void BKItem::setItemType(BKPreparationType newType, bool create)
         
         configurePianoCB();
     }
-    else if (type == PreparationTypeComment)
-    {
-        
-    }
     
     if (type != PreparationTypeGenericMod)
     {
@@ -308,10 +256,6 @@ void BKItem::resized(void)
     if (type == PreparationTypePianoMap)
     {
         menu.setBounds(0, image.getHeight(), getWidth(), (processor.platform == BKIOS) ? 15 : 25);
-    }
-    else if (type == PreparationTypeComment)
-    {
-        comment.setSize(getWidth(), getHeight());
     }
     else
     {
@@ -361,11 +305,6 @@ void BKItem::mouseDoubleClick(const MouseEvent& e)
     {
         menu.showPopup();
     }
-    else if (type == PreparationTypeComment)
-    {
-        comment.enterModalState();
-        comment.setColour(TextEditor::ColourIds::textColourId, Colours::black);
-    }
     else
     {
         processor.updateState->setCurrentDisplay(type, Id);
@@ -392,10 +331,6 @@ void BKItem::mouseDown(const MouseEvent& e)
             if (type == PreparationTypePianoMap)
             {
                 menu.showPopup();
-            }
-            else if (type == PreparationTypeComment)
-            {
-                comment.enterModalState();
             }
             else
             {
@@ -850,7 +785,6 @@ void BKItemGraph::deselectAll(void)
 {
     for (auto item : processor.currentPiano->getItems())
     {
-        if (item->getType() == PreparationTypeComment) item->exitComment();
         item->unfocusAllComponents();
         item->setSelected(false);
     }

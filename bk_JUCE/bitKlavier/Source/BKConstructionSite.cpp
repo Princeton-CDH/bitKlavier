@@ -300,7 +300,7 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
 {
     int thisId = -1;
     
-    if (type != PreparationTypeGenericMod && type != PreparationTypeComment)
+    if (type != PreparationTypeGenericMod)
     {
         thisId = processor.gallery->getNewId(type);
         
@@ -313,10 +313,6 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
     {
         toAdd->setPianoTarget(processor.currentPiano->getId());
         toAdd->configurePianoCB();
-    }
-    else if (type == PreparationTypeComment)
-    {
-        toAdd->configureComment();
     }
     
 #if JUCE_IOS

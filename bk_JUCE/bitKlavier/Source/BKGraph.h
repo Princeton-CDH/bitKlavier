@@ -231,8 +231,7 @@ public:
     Image image;
     RectanglePlacement placement;
     
-    void bkTextFieldDidChange   (TextEditor&)           override;
-    void textEditorFocusLost    (TextEditor&)           override;
+    void bkTextFieldDidChange   (TextEditor&)           override {};
     void bkComboBoxDidChange    (ComboBox*)             override;
     void bkButtonClicked        (Button* b)             override {};
     void bkMessageReceived      (const String& message) override {};
@@ -244,13 +243,8 @@ public:
     void setImage(Image newImage);
     
     void configurePianoCB(void);
-    void configureComment(void);
 
     BKItem::PtrArr connections;
-    
-    void setCommentText(String text) { comment.setText(text);}
-    String getCommentText(void) { return comment.getText();}
-    void exitComment(void) { comment.exitModalState(0);}
     
     bool resizing;
     
@@ -266,7 +260,6 @@ private:
     
     // Piano menu
     BKComboBox menu;
-    BKTextField comment;
     
     // UI stuff
     Component fullChild;

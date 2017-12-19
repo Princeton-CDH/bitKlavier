@@ -745,15 +745,12 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
             if(cb->getSelectedItemIndex() < numberOfDefaultGalleryItems)
             {
                 int size;
-                int index = Id - 1;
                 String xmlData = CharPointer_UTF8 (BinaryData::getNamedResource(BinaryData::namedResourceList[index], size));
                 
                 processor.defaultLoaded = true;
                 processor.defaultName = BinaryData::namedResourceList[index];
                 
                 processor.loadGalleryFromXml(XmlDocument::parse(xmlData));
-                
-                
             }
             else
             {
