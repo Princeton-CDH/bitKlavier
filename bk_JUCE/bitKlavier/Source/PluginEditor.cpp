@@ -44,7 +44,7 @@ resizer(new ResizableCornerComponent (this, constrain))
     constrain->setSizeLimits(DEFAULT_MIN_WIDTH, DEFAULT_MIN_HEIGHT, DEFAULT_MIN_WIDTH * 8, DEFAULT_MIN_HEIGHT * 8);
 #endif
     
-    processor.updateState->pianoDidChangeForGraph = true;
+    //processor.updateState->pianoDidChangeForGraph = true;
 }
 
 BKAudioProcessorEditor::~BKAudioProcessorEditor()

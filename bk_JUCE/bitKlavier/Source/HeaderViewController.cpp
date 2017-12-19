@@ -59,9 +59,11 @@ lastGalleryCBId(-1)
     
     galleryModalCallBackIsOpen = false;
     
-    loadDefaultGalleries();
+    //loadDefaultGalleries();
     
     fillGalleryCB();
+    fillPianoCB();
+    processor.updateState->pianoDidChangeForGraph = true;
     
 }
 
@@ -596,7 +598,8 @@ void HeaderViewController::fillGalleryCB(void)
         
         // THIS IS WHERE NAME OF GALLERY DISPLAYED IS SET
         galleryCB.setSelectedId(lastGalleryCBId, NotificationType::dontSendNotification);
-        if(lastGalleryCBId < 0) galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true));
+        if(lastGalleryCBId < 0)galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true), dontSendNotification);
+
     }
 }
 

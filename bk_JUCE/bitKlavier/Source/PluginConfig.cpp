@@ -113,6 +113,8 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
     //loadGallery
     if (galleryDidLoad)
     {
+        DBG("BKAudioProcessor::setStateInformation");
+        
         ScopedPointer<XmlElement> galleryXML (getXmlFromBinary (data, sizeInBytes));
         if (galleryXML != nullptr)
         {

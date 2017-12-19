@@ -853,6 +853,7 @@ void BKAudioProcessor::loadGalleryDialog(void)
 
 void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
 {
+    DBG("BKAudioProcessor::loadGalleryFromXml");
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
         gallery = new Gallery(xml, *this);
