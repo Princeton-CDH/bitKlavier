@@ -372,7 +372,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     }
     else if (code == 81) // Q comment
     {
-        construction.addItem(PreparationTypeComment);
+        //construction.addItem(PreparationTypeComment);
     }
     else if (code == 82) // R reset
     {
@@ -432,15 +432,13 @@ void MainViewController::timerCallback()
         header.fillGalleryCB();
     }
     
-    
-    
     Array<bool> noteOns = processor.getNoteOns();
     keyboardState.setKeymap(noteOns);
     keyboard->repaint();
     
-    if (state->galleryDidChange)
+    if (state->galleriesUpdated)
     {
-        state->galleryDidChange = false;
+        state->galleriesUpdated = false;
         
         header.switchGallery();
     }

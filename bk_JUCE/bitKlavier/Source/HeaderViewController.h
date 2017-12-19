@@ -46,8 +46,6 @@ private:
     BKAudioProcessor& processor;
     
     int galleryIsDirtyAlertResult;
-
-    Gallery::Ptr currentGallery;
     
     ShareBot bot;
     

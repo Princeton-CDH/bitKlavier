@@ -111,6 +111,6 @@ void BKAudioProcessor::updateGalleries()
     
     clipboard.clear();
     
-    updateState->galleryDidChange = true;
+    updateState->galleriesUpdated = true;
 }
 

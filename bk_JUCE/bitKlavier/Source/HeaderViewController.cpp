@@ -15,8 +15,7 @@
 
 HeaderViewController::HeaderViewController (BKAudioProcessor& p, BKConstructionSite* c):
 processor (p),
-construction(c),
-lastGalleryCBId(-1)
+construction(c)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
 
@@ -53,8 +52,7 @@ lastGalleryCBId(-1)
     
     pianoCB.setLookAndFeel(&comboBoxRightJustifyLAF);
     comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
-    //pianoCB.BKSetJustificationType(juce::Justification::centredRight);
-    //pianoCB.setJustificationType(juce::Justification::centredRight);
+
     pianoCB.setSelectedId(0, dontSendNotification);
     
     galleryModalCallBackIsOpen = false;
@@ -62,6 +60,8 @@ lastGalleryCBId(-1)
     loadDefaultGalleries();
     
     fillGalleryCB();
+    fillPianoCB();
+    processor.updateState->pianoDidChangeForGraph = true;
     
 }
 
@@ -584,7 +584,12 @@ void HeaderViewController::fillGalleryCB(void)
                 }
             }
             
-            if (thisFile.getFileName() == processor.currentGallery) index = i;
+            if (thisFile.getFileName() == processor.currentGallery)
+            {
+                DBG("filename: " + thisFile.getFileName() + " gallery: " + processor.currentGallery );
+                index = i;
+                lastGalleryCBId = id;
+            }
         }
         
         //add last submenu to popup, if there is one
@@ -596,7 +601,7 @@ void HeaderViewController::fillGalleryCB(void)
         
         // THIS IS WHERE NAME OF GALLERY DISPLAYED IS SET
         galleryCB.setSelectedId(lastGalleryCBId, NotificationType::dontSendNotification);
-        galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true));
+        galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true), NotificationType::dontSendNotification);
     }
 }
 

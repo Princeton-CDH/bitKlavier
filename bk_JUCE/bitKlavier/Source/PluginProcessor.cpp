@@ -861,9 +861,7 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
     {
         gallery = new Gallery(xml, *this);
         
-        currentGallery = gallery->getName();
-        
-        gallery->print();
+        currentGallery = gallery->getName() + ".xml";
         
         initializeGallery();
         
@@ -878,6 +876,7 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
     updateState->loadedJson = false;
     
     File myFile (path);
+    
     currentGalleryPath = path;
     
     ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
@@ -974,7 +973,6 @@ void BKAudioProcessor::initializeGallery(void)
     {
         defPiano = gallery->getPianos().getFirst()->getId();
     }
-
 
     currentPiano = gallery->getPiano(defPiano);
     if(currentPiano == nullptr)
