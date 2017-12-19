@@ -218,11 +218,13 @@ private:
     
     double bkSampleRate;
     
+    double progress, progressInc;
+    
     bool didLoadHammersAndRes, didLoadMainPianoSamples;
     
-    void loadMainPianoSamples(BKSynthesiser *synth, int numLayers);
-    void loadResonanceRelaseSamples(BKSynthesiser *synth);
-    void loadHammerReleaseSamples(BKSynthesiser *synth);
+    void loadMainPianoSamples(BKSynthesiser *synth, int numLayers, double progress, double progressInc);
+    void loadResonanceRelaseSamples(BKSynthesiser *synth, double progress, double progressInc);
+    void loadHammerReleaseSamples(BKSynthesiser *synth, double progress, double progressInc);
     
     AudioSampleBuffer levelBuf; //for storing samples for metering/RMS calculation
     

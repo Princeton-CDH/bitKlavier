@@ -35,16 +35,22 @@ void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
         didLoadMainPianoSamples = false;
         
         DBG("SAMPLE_SET: " + cBKSampleLoadTypes[type]);
+        progress = 0.0;
+        progressInc = 1.0f / (88.0 + 88.0 + ((type == BKLoadHeavy)  ? (8 * 4 * 8) :
+                                             (type == BKLoadMedium) ? (8 * 4 * 4) :
+                                             (type == BKLoadLite)   ? (8 * 4 * 2) :
+                                             (type == BKLoadLitest) ? (8 * 4 * 1) :
+                                             1.0));
         
-        BKSampleLoader::loadMainPianoSamples(&mainPianoSynth, type);
+        BKSampleLoader::loadMainPianoSamples(&mainPianoSynth, type, progress, progressInc);
         
         didLoadMainPianoSamples = true;
     
         if (!didLoadHammersAndRes && type != BKLoadLitest)
         {
             didLoadHammersAndRes = true;
-            BKSampleLoader::loadHammerReleaseSamples(&hammerReleaseSynth);
-            BKSampleLoader::loadResonanceReleaseSamples(&resonanceReleaseSynth);
+            BKSampleLoader::loadHammerReleaseSamples(&hammerReleaseSynth, progress, progressInc);
+            BKSampleLoader::loadResonanceReleaseSamples(&resonanceReleaseSynth, progress, progressInc);
         }   
     }
     

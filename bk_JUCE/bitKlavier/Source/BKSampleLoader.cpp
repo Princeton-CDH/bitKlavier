@@ -15,7 +15,7 @@
 
 String notes[4] = {"A","C","D#","F#"};
 
-void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadType type)
+void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadType type, double progress, double progressInc)
 {
     WavAudioFormat wavFormat;
     
@@ -150,9 +150,12 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
                     
                     
                     
+                    progress += progressInc;
+                    DBG("progress: " + String(progress));
                     
-                    
-                } else {
+                }
+                else
+                {
                     DBG("file not opened OK: " + temp);
                 }
                 
@@ -162,7 +165,7 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
     }
 }
 
-void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
+void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth, double progress, double progressInc)
 {
     WavAudioFormat wavFormat;
     
@@ -260,6 +263,9 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
                                                                                root,
                                                                                velocityRange));
                     }
+                    
+                    progress += progressInc;
+                    DBG("progress: " + String(progress));
                 }
                 else
                 {
@@ -270,7 +276,7 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
     }
 }
 
-void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
+void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth, double progress, double progressInc )
 {
     WavAudioFormat wavFormat;
     
@@ -334,7 +340,11 @@ void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
                                                                     root,
                                                                     velocityRange));
             }
-        } else {
+            progress += progressInc;
+            DBG("progress: " + String(progress));
+        }
+        else
+        {
             DBG("file not opened OK: " + temp);
         }
     }

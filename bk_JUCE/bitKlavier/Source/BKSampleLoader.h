@@ -19,9 +19,9 @@
 class BKSampleLoader
 {
 public:
-    void loadMainPianoSamples(BKSynthesiser *synth, BKSampleLoadType type);
-    void loadResonanceReleaseSamples(BKSynthesiser *synth);
-    void loadHammerReleaseSamples(BKSynthesiser *synth);
+    void loadMainPianoSamples(BKSynthesiser *synth, BKSampleLoadType type, double progress, double progressInc);
+    void loadResonanceReleaseSamples(BKSynthesiser *synth, double progress, double progressInc);
+    void loadHammerReleaseSamples(BKSynthesiser *synth, double progress, double progressInc);
     
 private:
     
