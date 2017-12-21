@@ -28,6 +28,7 @@ loadView(p)
         display = DisplayDefault;
     
     addChildComponent(loadView);
+    loadView.setAlwaysOnTop(true);
     
     initial = true;
     addMouseListener(this, true);
@@ -440,7 +441,7 @@ void MainViewController::timerCallback()
     if (state->pianoSamplesAreLoading)
     {
         loadView.setVisible(true);
-        loadView.toFront(false);
+        //loadView.toFront(false);
     }
     else
     {
