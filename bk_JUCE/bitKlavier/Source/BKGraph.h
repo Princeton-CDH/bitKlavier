@@ -246,19 +246,25 @@ public:
 
     BKItem::PtrArr connections;
     
+    bool resizing;
+    
 private:
     BKAudioProcessor& processor;
     Label label;
     
     bool wasJustDragged;
     
-
+    ScopedPointer<ComponentBoundsConstrainer> constrain;
+    
+    ScopedPointer<ResizableCornerComponent> resizer;
+    
     // Piano menu
     BKComboBox menu;
     
-    
     // UI stuff
     Component fullChild;
+    
+    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKItem)
 };

@@ -20,7 +20,10 @@ BKItem::BKItem(BKPreparationType type, int Id, BKAudioProcessor& p):
 ItemMapper(type, Id),
 BKDraggableComponent(true,false,true, 50, 50, 50, 50),
 processor(p),
-wasJustDragged(false)
+wasJustDragged(false),
+constrain(new ComponentBoundsConstrainer()),
+resizer(new ResizableCornerComponent (this, constrain)),
+resizing(false)
 {
     fullChild.setAlwaysOnTop(true);
     addAndMakeVisible(fullChild);
@@ -81,11 +84,7 @@ wasJustDragged(false)
     }
     else if (type == PreparationTypePianoMap)
     {
-        //setPianoTarget(processor.currentPiano->getId());
-        
         setImage(ImageCache::getFromMemory(BinaryData::piano_icon_png, BinaryData::piano_icon_pngSize));
-        
-        //addAndMakeVisible(menu);
     }
     
     startTimerHz(10);
@@ -98,6 +97,8 @@ BKItem::~BKItem()
 BKItem* BKItem::duplicate(void)
 {
     BKItem* newItem = new BKItem(type, Id, processor);
+    
+    newItem->setPianoTarget(pianoTarget);
     
     newItem->setImage(image);
     
@@ -249,6 +250,9 @@ void BKItem::paint(Graphics& g)
 
 void BKItem::resized(void)
 {
+    
+    resizer->setBounds(getWidth()-10, getHeight()-10, 10, 10);
+    
     if (type == PreparationTypePianoMap)
     {
         menu.setBounds(0, image.getHeight(), getWidth(), (processor.platform == BKIOS) ? 15 : 25);
@@ -314,6 +318,9 @@ void BKItem::mouseDoubleClick(const MouseEvent& e)
 
 void BKItem::mouseDown(const MouseEvent& e)
 {
+    if (e.originalComponent == resizer) resizing = true;
+    else                                resizing = false;
+        
     BKConstructionSite* cs = ((BKConstructionSite*)getParentComponent());
     BKItem* current = cs->getCurrentItem();
 

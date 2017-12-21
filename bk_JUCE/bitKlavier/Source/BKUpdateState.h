@@ -47,7 +47,7 @@ public:
     int  currentKeymapId = 1;
     
     bool idDidChange = false;
-    bool galleryDidChange = false;
+    bool galleriesUpdated = false;
     bool galleryLoaded = false;
     bool directDidChange = false;
     bool pianoDidChangeForGraph = false;

@@ -43,5 +43,4 @@ private:
     
 };
 
-
 #endif  // BKTEXTFIELD_H_INCLUDED

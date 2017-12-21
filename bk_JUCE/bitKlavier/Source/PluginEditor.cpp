@@ -24,9 +24,6 @@ resizer(new ResizableCornerComponent (this, constrain))
     viewPort.setViewPosition(0, 0);
     addAndMakeVisible(viewPort);
     
-    //laf = new BKButtonAndMenuLAF();
-    //mvc.setSliderLookAndFeel(&laf); 
-    
 #if !JUCE_IOS
     addAndMakeVisible (resizer);
     
@@ -44,7 +41,7 @@ resizer(new ResizableCornerComponent (this, constrain))
     constrain->setSizeLimits(DEFAULT_MIN_WIDTH, DEFAULT_MIN_HEIGHT, DEFAULT_MIN_WIDTH * 8, DEFAULT_MIN_HEIGHT * 8);
 #endif
     
-    processor.updateState->pianoDidChangeForGraph = true;
+    //processor.updateState->pianoDidChangeForGraph = true;
 }
 
 BKAudioProcessorEditor::~BKAudioProcessorEditor()

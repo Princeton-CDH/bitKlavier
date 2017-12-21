@@ -15,8 +15,7 @@
 
 HeaderViewController::HeaderViewController (BKAudioProcessor& p, BKConstructionSite* c):
 processor (p),
-construction(c),
-lastGalleryCBId(-1)
+construction(c)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
 
@@ -53,15 +52,16 @@ lastGalleryCBId(-1)
     
     pianoCB.setLookAndFeel(&comboBoxRightJustifyLAF);
     comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
-    //pianoCB.BKSetJustificationType(juce::Justification::centredRight);
-    //pianoCB.setJustificationType(juce::Justification::centredRight);
+
     pianoCB.setSelectedId(0, dontSendNotification);
     
     galleryModalCallBackIsOpen = false;
     
-    loadDefaultGalleries();
+    //loadDefaultGalleries();
     
     fillGalleryCB();
+    fillPianoCB();
+    processor.updateState->pianoDidChangeForGraph = true;
     
 }
 
@@ -107,10 +107,10 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     PopupMenu loadMenu;
     loadMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
-    loadMenu.addItem(LOAD_LITEST, "Lightest");
-    loadMenu.addItem(LOAD_LITE, "Light");
-    loadMenu.addItem(LOAD_MEDIUM, "Medium");
-    loadMenu.addItem(LOAD_HEAVY, "Heavy");
+    if (processor.currentSampleType != BKLoadLitest)    loadMenu.addItem(LOAD_LITEST,   "Lightest");
+    if (processor.currentSampleType != BKLoadLite)      loadMenu.addItem(LOAD_LITE,     "Light");
+    if (processor.currentSampleType != BKLoadMedium)    loadMenu.addItem(LOAD_MEDIUM,   "Medium");
+    if (processor.currentSampleType != BKLoadHeavy)     loadMenu.addItem(LOAD_HEAVY,    "Heavy");
     
     return loadMenu;
 }
@@ -385,6 +385,8 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         
         int result = prompt.runModalLoop();
         
+        prompt.setTopLeftPosition(gvc->getWidth() / 2, gvc->getBottom() + gYSpacing);
+        
         String name = prompt.getTextEditorContents("name");
         
         if (result == 1)
@@ -584,7 +586,12 @@ void HeaderViewController::fillGalleryCB(void)
                 }
             }
             
-            if (thisFile.getFileName() == processor.currentGallery) index = i;
+            if (thisFile.getFileName() == processor.currentGallery)
+            {
+                DBG("filename: " + thisFile.getFileName() + " gallery: " + processor.currentGallery );
+                index = i;
+                lastGalleryCBId = id;
+            }
         }
         
         //add last submenu to popup, if there is one
@@ -596,7 +603,7 @@ void HeaderViewController::fillGalleryCB(void)
         
         // THIS IS WHERE NAME OF GALLERY DISPLAYED IS SET
         galleryCB.setSelectedId(lastGalleryCBId, NotificationType::dontSendNotification);
-        galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true));
+        galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true), NotificationType::dontSendNotification);
     }
 }
 
@@ -736,10 +743,10 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
             lastGalleryCBId = Id;
             int index = Id - 1;
 
-            if (index < numberOfDefaultGalleryItems)
+            //if (index < numberOfDefaultGalleryItems)
+            if(cb->getSelectedItemIndex() < numberOfDefaultGalleryItems)
             {
                 int size;
-                int index = Id - 1;
                 String xmlData = CharPointer_UTF8 (BinaryData::getNamedResource(BinaryData::namedResourceList[index], size));
                 
                 processor.defaultLoaded = true;
@@ -754,9 +761,11 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
                 
                 processor.defaultLoaded = false;
                 processor.defaultName = "";
-                
+         
                 if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
                 else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
+                
+                DBG("HeaderViewController::bkComboBoxDidChange combobox text = " + galleryCB.getText());
             }
             
         }

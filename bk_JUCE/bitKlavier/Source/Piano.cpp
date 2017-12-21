@@ -89,8 +89,12 @@ void Piano::configure(void)
     
     for (auto item : items)
     {
+        
         BKPreparationType thisType = item->getType();
         int thisId = item->getId();
+        
+        DBG("type: " + cPreparationTypes[thisType] + " Id: " + String(thisId));
+        DBG("bounds: " + rectangleToString(item->getBounds()));
         
         if (thisId > processor.gallery->getIdCount(thisType)) processor.gallery->setIdCount(thisType, thisId);
         
@@ -807,14 +811,14 @@ void Piano::deconfigureTempoModificationForKeys(TempoModPreparation::Ptr mod, Ar
         // Remove Modification from Key
         modificationMap[key]->removeTempoModification(whichMod);
         
-        DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
+        //DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
     }
 }
 
 void Piano::configureTuningModification(int key, TuningModPreparation::Ptr dmod, Array<int> whichPreps)
 {
     
-    DBG("TUNINGMOD key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
+    //DBG("TUNINGMOD key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
     
     int whichMod = dmod->getId();
 
@@ -860,7 +864,7 @@ void Piano::deconfigureTuningModificationForKeys(TuningModPreparation::Ptr mod, 
         // Remove Modification from Key
         modificationMap[key]->removeTuningModification(whichMod);
         
-        DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
+        //DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
     }
 }
 

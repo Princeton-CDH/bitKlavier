@@ -265,8 +265,6 @@ void BKConstructionSite::draw(void)
                 item->setTopLeftPosition(X, Y);
                 
                 otherCount++;
-
-                
             }
             DBG("itemxy: " + String(item->getX()) + " " + String(item->getY()));
         }
@@ -695,7 +693,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     
     mouseClicked(lastX, lastY, e.eventTime);
     
-    if (itemToSelect != nullptr)
+    if (itemToSelect != nullptr && !itemToSelect->resizing)
     {
         setMouseDownOnItem(true);
         
@@ -768,7 +766,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
         {
             graph->deselectAll();
         }
-        
+
         selected.deselectAll();
         
         addAndMakeVisible(lasso = new LassoComponent<BKItem*>());
@@ -778,7 +776,6 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
         lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoOutlineColourId, Colours::antiquewhite);
         
         lasso->beginLasso(eo, this);
-
     }
 
     getParentComponent()->grabKeyboardFocus();
