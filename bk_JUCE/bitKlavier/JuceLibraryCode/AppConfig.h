@@ -288,7 +288,7 @@
  #define JucePlugin_Build_Standalone       1
 #endif
 #ifndef  JucePlugin_Enable_IAA
- #define JucePlugin_Enable_IAA             0
+ #define JucePlugin_Enable_IAA             1
 #endif
 #ifndef  JucePlugin_Name
  #define JucePlugin_Name                   "bitKlavier"
@@ -327,13 +327,13 @@
  #define JucePlugin_EditorRequiresKeyboardFocus  1
 #endif
 #ifndef  JucePlugin_Version
- #define JucePlugin_Version                1.9
+ #define JucePlugin_Version                0.9
 #endif
 #ifndef  JucePlugin_VersionCode
- #define JucePlugin_VersionCode            0x10900
+ #define JucePlugin_VersionCode            0x900
 #endif
 #ifndef  JucePlugin_VersionString
- #define JucePlugin_VersionString          "1.9"
+ #define JucePlugin_VersionString          "0.9"
 #endif
 #ifndef  JucePlugin_VSTUniqueID
  #define JucePlugin_VSTUniqueID            JucePlugin_PluginCode
