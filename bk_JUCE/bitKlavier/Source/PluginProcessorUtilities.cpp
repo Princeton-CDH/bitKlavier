@@ -35,6 +35,7 @@ void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
         didLoadMainPianoSamples = false;
         
         DBG("SAMPLE_SET: " + cBKSampleLoadTypes[type]);
+        updateState->pianoSamplesAreLoading = true;
         int numSamplesPerLayer = 29;
         int numHarmSamples = 69;
         int numResSamples = 88;
@@ -58,7 +59,8 @@ void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
             didLoadHammersAndRes = true;
             BKSampleLoader::loadHammerReleaseSamples(*this);
             BKSampleLoader::loadResonanceReleaseSamples(*this);
-        }   
+        }
+        updateState->pianoSamplesAreLoading = false;
     }
     
 }

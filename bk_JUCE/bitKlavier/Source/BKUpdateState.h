@@ -59,6 +59,8 @@ public:
     bool generalSettingsDidChange = false;
     bool keymapDidChange = false;
     bool modificationDidChange = false;
+    bool pianoSamplesAreLoading = false;
+    
     
     BKPreparationDisplay currentDisplay = DisplayNil;
     bool displayDidChange;

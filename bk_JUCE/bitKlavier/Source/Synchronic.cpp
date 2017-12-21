@@ -105,13 +105,7 @@ void SynchronicProcessor::resetPhase(int skipBeats)
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
     //store velocity
-#if JUCE_WINDOWS
 	velocities.set(noteNumber, velocity);
-#endif
-	if (!synchronic->aPrep->getReleaseVelocitySetsSynchronic())
-	{
-		velocities.set(noteNumber, velocity);
-	}
  
     //add note to array of depressed notes
     keysDepressed.addIfNotAlreadyThere(noteNumber);

@@ -26,6 +26,39 @@ class BKConstructionSite;
 
 #include "BKOvertop.h"
 
+class SampleLoadView : public Component
+{
+public:
+    SampleLoadView(BKAudioProcessor& p):
+    processor(p)
+    {
+        addAndMakeVisible(progressSlider);
+        progressSlider.setRange (0.0, 1.0, 0.001);
+        progressSlider.setSliderStyle (Slider::LinearBarVertical);
+    }
+    
+    ~SampleLoadView()
+    {
+        
+    }
+    
+    void paint(Graphics& g)
+    {
+        g.fillAll(Colours::black.withAlpha(0.5f));
+    }
+    
+    void resized(void)
+    {
+        progressSlider.setSize(processor.screenWidth * 0.75, processor.screenHeight * 0.5);
+        progressSlider.setCentrePosition(getWidth() * 0.5, getHeight() * 0.5);
+    }
+    
+private:
+    Slider progressSlider;
+    BKAudioProcessor& processor;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SampleLoadView)
+};
+
 class MainViewController :
 public Component,
 private Timer,
@@ -73,6 +106,8 @@ private:
 
     BKOvertop overtop;
     ScopedPointer<DropShadower> overtopShadow;
+    
+    SampleLoadView loadView;
     
     //ImageComponent backgroundImageComponent;
     
