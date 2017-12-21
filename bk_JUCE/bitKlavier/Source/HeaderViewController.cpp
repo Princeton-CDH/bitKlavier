@@ -107,10 +107,13 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     PopupMenu loadMenu;
     loadMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
-    if (processor.currentSampleType != BKLoadLitest)    loadMenu.addItem(LOAD_LITEST,   "Lightest");
-    if (processor.currentSampleType != BKLoadLite)      loadMenu.addItem(LOAD_LITE,     "Light");
-    if (processor.currentSampleType != BKLoadMedium)    loadMenu.addItem(LOAD_MEDIUM,   "Medium");
-    if (processor.currentSampleType != BKLoadHeavy)     loadMenu.addItem(LOAD_HEAVY,    "Heavy");
+    loadMenu.addItem(LOAD_LITEST,   "Lightest", processor.currentSampleType != BKLoadLitest, processor.currentSampleType == BKLoadLitest);
+
+    loadMenu.addItem(LOAD_LITE,     "Light", processor.currentSampleType != BKLoadLite, processor.currentSampleType == BKLoadLite);
+    
+    loadMenu.addItem(LOAD_MEDIUM,   "Medium", processor.currentSampleType != BKLoadMedium, processor.currentSampleType == BKLoadMedium);
+   
+    loadMenu.addItem(LOAD_HEAVY,    "Heavy", processor.currentSampleType != BKLoadHeavy, processor.currentSampleType == BKLoadHeavy);
     
     return loadMenu;
 }
