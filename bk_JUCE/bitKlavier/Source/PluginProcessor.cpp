@@ -174,20 +174,14 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     gallery->prepareToPlay(sampleRate);
 
 
-#if JUCE_DEBUG
-    loadPianoSamples(BKLoadLite);
-#else
-    
 #if JUCE_IOS
     String osname = SystemStats::getOperatingSystemName();
     float iosVersion = osname.fromLastOccurrenceOf("iOS ", false, true).getFloatValue();
     
     if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
-    else                    loadPianoSamples(BKLoadLite);
+    else                    loadPianoSamples(BKLoadMedium);
 #else
     loadPianoSamples(BKLoadHeavy);
-#endif
-    
 #endif
     
 #if TRY_UNDO
