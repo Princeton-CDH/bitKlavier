@@ -107,10 +107,10 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     PopupMenu loadMenu;
     loadMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
-    loadMenu.addItem(LOAD_LITEST, "Lightest");
-    loadMenu.addItem(LOAD_LITE, "Light");
-    loadMenu.addItem(LOAD_MEDIUM, "Medium");
-    loadMenu.addItem(LOAD_HEAVY, "Heavy");
+    if (processor.currentSampleType != BKLoadLitest)    loadMenu.addItem(LOAD_LITEST,   "Lightest");
+    if (processor.currentSampleType != BKLoadLite)      loadMenu.addItem(LOAD_LITE,     "Light");
+    if (processor.currentSampleType != BKLoadMedium)    loadMenu.addItem(LOAD_MEDIUM,   "Medium");
+    if (processor.currentSampleType != BKLoadHeavy)     loadMenu.addItem(LOAD_HEAVY,    "Heavy");
     
     return loadMenu;
 }
@@ -384,6 +384,8 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
         
         int result = prompt.runModalLoop();
+        
+        prompt.setTopLeftPosition(gvc->getWidth() / 2, gvc->getBottom() + gYSpacing);
         
         String name = prompt.getTextEditorContents("name");
         

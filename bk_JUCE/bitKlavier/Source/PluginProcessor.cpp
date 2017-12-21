@@ -9,7 +9,8 @@ updateState(new BKUpdateState()),
 mainPianoSynth(),
 hammerReleaseSynth(),
 resonanceReleaseSynth(),
-sustainIsDown(false)
+sustainIsDown(false),
+currentSampleType(BKLoadNil)
 #if TRY_UNDO
 ,epoch(0),
 #endif
@@ -173,8 +174,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     gallery->prepareToPlay(sampleRate);
 
 
-#if DEBUG
-
+#if JUCE_DEBUG
     loadPianoSamples(BKLoadLite);
 #else
     
