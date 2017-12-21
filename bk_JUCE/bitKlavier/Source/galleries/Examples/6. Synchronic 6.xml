@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<gallery name="6. Synchronic 6" defaultPiano="1">
+<gallery name="6. Synchronic 6" defaultPiano="7">
   <idCount i0="15" i1="28" i2="24" i3="20" i4="16" i5="1489" i6="10" i7="10"
            i8="10" i9="12" i10="10" i11="10" i12="10" i13="11" i14="30"/>
   <general globalGain="1" directGain="1" synchronicGain="1" nostalgicGain="1"

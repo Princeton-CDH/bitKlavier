@@ -178,8 +178,6 @@ void TuningViewController::resized()
     customKeyboardSlice.removeFromRight(gXSpacing);
     customKeyboard.setBounds(customKeyboardSlice);
     
-    DBG("TVC - customKeyboard " + rectangleToString(customKeyboardSlice));
-    
     area.removeFromTop(extraY);
     Rectangle<int> offsetSliderSlice = area.removeFromTop(gComponentSingleSliderHeight);
     offsetSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
@@ -264,7 +262,6 @@ void TuningViewController::fillTuningCB(void)
                 
         if(name == "Custom") {
             customIndex = i;
-            DBG("assigned to customIndex " + String(customIndex));
         }
     }
 }

@@ -138,16 +138,11 @@ void BKKeyboardSlider::resized()
 #else
     keyboardValsTextField->setBounds(keyboard->getBounds());
 #endif
-    
-    DBG("keywidth: " + String(keyWidth) + " keyheight: " + String(keyboardHeight));
-    DBG("keyboardRect: " + rectangleToString(keyboardRect));
 }
 
 void BKKeyboardSlider::setFundamental(int fund)
 {
     keyboard->setFundamental(fund);
-    
-    DBG("new fundamental = " + String(fund));
 }
 
 void BKKeyboardSlider::setAvailableRange(int min, int max)
