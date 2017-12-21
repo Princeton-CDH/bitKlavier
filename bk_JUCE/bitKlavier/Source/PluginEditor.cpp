@@ -24,23 +24,29 @@ resizer(new ResizableCornerComponent (this, constrain))
     viewPort.setViewPosition(0, 0);
     addAndMakeVisible(viewPort);
     
+#if !JUCE_IOS
     addAndMakeVisible (resizer);
     
     resizer->setAlwaysOnTop(true);
+#endif
     
-    constrain->setSizeLimits(gMainComponentMinWidth, gMainComponentMinHeight, gMainComponentWidth * 2, gMainComponentHeight * 2);
+#if JUCE_IOS
+    setSize(processor.screenWidth, processor.screenHeight);
     
-    mvc.setSize(gMainComponentWidth, gMainComponentHeight);
-    setSize(gMainComponentWidth, gMainComponentHeight);
+    constrain->setSizeLimits(processor.screenWidth, processor.screenHeight, processor.screenWidth, processor.screenHeight);
+#else
+    setSize((processor.screenWidth < DEFAULT_WIDTH) ? processor.screenWidth : DEFAULT_WIDTH,
+            (processor.screenHeight < DEFAULT_HEIGHT) ? processor.screenHeight : DEFAULT_HEIGHT);
     
-    processor.initializeGallery();
-    processor.updateState->pianoDidChangeForGraph = true;
-
+    constrain->setSizeLimits(DEFAULT_MIN_WIDTH, DEFAULT_MIN_HEIGHT, DEFAULT_MIN_WIDTH * 8, DEFAULT_MIN_HEIGHT * 8);
+#endif
+    
+    //processor.updateState->pianoDidChangeForGraph = true;
 }
 
 BKAudioProcessorEditor::~BKAudioProcessorEditor()
 {
-    
+    setLookAndFeel(nullptr);
 }
 
 void BKAudioProcessorEditor::paint (Graphics& g)
@@ -51,10 +57,14 @@ void BKAudioProcessorEditor::paint (Graphics& g)
 
 void BKAudioProcessorEditor::resized()
 {
+    processor.paddingScalarX = (float)(getTopLevelComponent()->getWidth() - DEFAULT_MIN_WIDTH) / (DEFAULT_WIDTH - DEFAULT_MIN_WIDTH);
+    processor.paddingScalarY = (float)(getTopLevelComponent()->getHeight() - DEFAULT_MIN_HEIGHT) / (DEFAULT_HEIGHT - DEFAULT_MIN_HEIGHT);
     
     viewPort.setBoundsRelative(0.0f,0.0f,1.0f,1.0f);
     
+#if !JUCE_IOS
     resizer->setBounds(getWidth()-16, getHeight()-16, 16, 16);
+#endif
     
     mvc.setSize(getWidth(), getHeight());
     mvc.resized();

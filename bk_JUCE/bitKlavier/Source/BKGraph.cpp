@@ -19,7 +19,11 @@
 BKItem::BKItem(BKPreparationType type, int Id, BKAudioProcessor& p):
 ItemMapper(type, Id),
 BKDraggableComponent(true,false,true, 50, 50, 50, 50),
-processor(p)
+processor(p),
+wasJustDragged(false),
+constrain(new ComponentBoundsConstrainer()),
+resizer(new ResizableCornerComponent (this, constrain)),
+resizing(false)
 {
     fullChild.setAlwaysOnTop(true);
     addAndMakeVisible(fullChild);
@@ -80,12 +84,10 @@ processor(p)
     }
     else if (type == PreparationTypePianoMap)
     {
-        //setPianoTarget(processor.currentPiano->getId());
-        
         setImage(ImageCache::getFromMemory(BinaryData::piano_icon_png, BinaryData::piano_icon_pngSize));
-        
-        //addAndMakeVisible(menu);
     }
+    
+    startTimerHz(10);
 }
 
 BKItem::~BKItem()
@@ -95,6 +97,8 @@ BKItem::~BKItem()
 BKItem* BKItem::duplicate(void)
 {
     BKItem* newItem = new BKItem(type, Id, processor);
+    
+    newItem->setPianoTarget(pianoTarget);
     
     newItem->setImage(image);
     
@@ -154,12 +158,16 @@ void BKItem::setImage(Image newImage)
     (type == PreparationTypeTempo || type == PreparationTypeTuning) ? 60 :
     65;
     
+#if JUCE_IOS 
+    val *= processor.uiScaleFactor;
+#endif
     
     while (!(image.getWidth() < val || image.getHeight() < val))
-        image = image.rescaled(image.getWidth() * 0.8, image.getHeight() * 0.8);
+        image = image.rescaled(image.getWidth() * 0.9, image.getHeight() * 0.9);
     
     if (type != PreparationTypePianoMap)    setSize(image.getWidth(), image.getHeight());
     else                                    setSize(image.getWidth(), image.getHeight() + 25);
+
 }
 
 void BKItem::setItemType(BKPreparationType newType, bool create)
@@ -228,7 +236,7 @@ void BKItem::paint(Graphics& g)
     
     if (isSelected)
     {
-        g.setColour(Colours::white);
+        g.setColour(Colours::antiquewhite);
         g.drawRect(getLocalBounds(),2);
     }
     else
@@ -242,9 +250,12 @@ void BKItem::paint(Graphics& g)
 
 void BKItem::resized(void)
 {
+    
+    resizer->setBounds(getWidth()-10, getHeight()-10, 10, 10);
+    
     if (type == PreparationTypePianoMap)
     {
-        menu.setBounds(0, image.getHeight(), getWidth(), 25);
+        menu.setBounds(0, image.getHeight(), getWidth(), (processor.platform == BKIOS) ? 15 : 25);
     }
     else
     {
@@ -282,90 +293,62 @@ void BKItem::bkComboBoxDidChange    (ComboBox* cb)
 
 void BKItem::itemIsBeingDragged(const MouseEvent& e)
 {
-    //((BKConstructionSite*)getParentComponent())->itemIsBeingDragged(this, e);
+    wasJustDragged = true;
 }
+
+
 
 void BKItem::mouseDoubleClick(const MouseEvent& e)
 {
-    //if (e.getNumberOfClicks() >= 2)
+#if !JUCE_IOS
+    if (type == PreparationTypePianoMap)
     {
-        
-        if (type == PreparationTypeDirect)
-        {
-            processor.updateState->currentDirectId = Id;
-            processor.updateState->directPreparationDidChange = true;
-            processor.updateState->setCurrentDisplay(DisplayDirect);
-        }
-        else if (type == PreparationTypeSynchronic)
-        {
-            processor.updateState->currentSynchronicId = Id;
-            processor.updateState->synchronicPreparationDidChange = true;
-            processor.updateState->setCurrentDisplay(DisplaySynchronic);
-        }
-        else if (type == PreparationTypeNostalgic)
-        {
-            processor.updateState->currentNostalgicId = Id;
-            processor.updateState->nostalgicPreparationDidChange = true;
-            processor.updateState->setCurrentDisplay(DisplayNostalgic);
-        }
-        else if (type == PreparationTypeTuning)
-        {
-            processor.updateState->currentTuningId = Id;
-            processor.updateState->tuningPreparationDidChange = true;
-            processor.updateState->setCurrentDisplay(DisplayTuning);
-        }
-        else if (type == PreparationTypeTempo)
-        {
-            processor.updateState->currentTempoId = Id;
-            processor.updateState->tempoPreparationDidChange = true;
-            processor.updateState->setCurrentDisplay(DisplayTempo);
-        }
-        else if (type == PreparationTypeKeymap)
-        {
-            processor.updateState->currentKeymapId = Id;
-            processor.updateState->keymapDidChange = true;
-            processor.updateState->setCurrentDisplay(DisplayKeymap);
-        }
-        else if (type == PreparationTypeDirectMod)
-        {
-            processor.updateState->currentModDirectId = Id;
-            processor.updateState->directDidChange = true;
-            processor.updateState->setCurrentDisplay(DisplayDirectMod);
-        }
-        else if (type == PreparationTypeNostalgicMod)
-        {
-            processor.updateState->currentModNostalgicId = Id;
-            processor.updateState->nostalgicPreparationDidChange = true;
-            processor.updateState->setCurrentDisplay(DisplayNostalgicMod);
-        }
-        else if (type == PreparationTypeSynchronicMod)
-        {
-            processor.updateState->currentModSynchronicId = Id;
-            processor.updateState->synchronicPreparationDidChange = true;
-            processor.updateState->setCurrentDisplay(DisplaySynchronicMod);
-        }
-        else if (type == PreparationTypeTuningMod)
-        {
-            processor.updateState->currentModTuningId = Id;
-            processor.updateState->tuningPreparationDidChange = true;
-            processor.updateState->setCurrentDisplay(DisplayTuningMod);
-        }
-        else if (type == PreparationTypeTempoMod)
-        {
-            processor.updateState->currentModTempoId = Id;
-            processor.updateState->tempoPreparationDidChange = true;
-            processor.updateState->setCurrentDisplay(DisplayTempoMod);
-        }
-        else if (type == PreparationTypePianoMap)
-        {
-            menu.showPopup();
-        }
+        menu.showPopup();
     }
+    else
+    {
+        processor.updateState->setCurrentDisplay(type, Id);
+    }
+#endif
 }
+
+
+#define RESET 0
+#define PHATNESS 10
 
 void BKItem::mouseDown(const MouseEvent& e)
 {
-    ((BKConstructionSite*)getParentComponent())->setCurrentItem(this);
+    if (e.originalComponent == resizer) resizing = true;
+    else                                resizing = false;
+        
+    BKConstructionSite* cs = ((BKConstructionSite*)getParentComponent());
+    BKItem* current = cs->getCurrentItem();
+
+    if ((current == this) && !wasJustDragged)
+    {
+        if (time < PHATNESS)
+        {
+            if (type == PreparationTypePianoMap)
+            {
+                menu.showPopup();
+            }
+            else
+            {
+                processor.updateState->setCurrentDisplay(type, Id);
+            }
+        }
+        else
+        {
+            time = RESET;
+        }
+    }
+    else
+    {
+        wasJustDragged = false;
+        time = RESET;
+    }
+    
+    cs->setCurrentItem(this);
     
     if (isDraggable)
     {
@@ -391,9 +374,14 @@ ValueTree BKItem::getState(void)
     
     itemVT.setProperty("active", isActive(), 0);
     
-    itemVT.setProperty("X", getX(), 0);
-    itemVT.setProperty("Y", getY(), 0);
-    
+    float scale = 1.0f;
+#if JUCE_IOS
+    scale /= processor.uiScaleFactor;
+#endif
+
+    itemVT.setProperty("X", (getX() + getWidth() / 2) * scale, 0);
+    itemVT.setProperty("Y", (getY() + getHeight() / 2) * scale, 0);
+
     return itemVT;
 }
 
@@ -429,8 +417,15 @@ void BKItem::setState(XmlElement* e)
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ BKGraph ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
+BKItemGraph::BKItemGraph(BKAudioProcessor& p):
+processor(p)
+{
+    
+}
+
 BKItemGraph::~BKItemGraph(void)
 {
+    
 }
 
 void BKItemGraph::clear()
@@ -760,15 +755,14 @@ void BKItemGraph::reconstruct(void)
 {
     Piano::Ptr thisPiano = processor.currentPiano;
     
-    // Create items based on the ItemMappers in current Piano and add them to BKItemGraph
     for (auto item : thisPiano->getItems())
     {
-        BKPreparationType type = item->getType();
-        
-        if (type == PreparationTypePianoMap)
-        {
-            item->configurePianoCB();
-        }
+         BKPreparationType type = item->getType();
+         
+         if (type == PreparationTypePianoMap)
+         {
+             item->configurePianoCB();
+         }
     }
 }
 

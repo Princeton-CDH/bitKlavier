@@ -10,7 +10,9 @@
 
 #include "BKKeyboardSlider.h"
 
-BKKeyboardSlider::BKKeyboardSlider()
+BKKeyboardSlider::BKKeyboardSlider(bool nos):
+ratio(1.0),
+needsOctaveSlider(nos)
 {
     
     addAndMakeVisible (keyboardComponent =
@@ -18,8 +20,26 @@ BKKeyboardSlider::BKKeyboardSlider()
 
     keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
     
-    minKey = 21;
-    maxKey = 108;
+    // need slider or other interface for octave change
+#if JUCE_IOS
+    minKey = 48; // 21
+    maxKey = 72; // 108
+    
+    if (needsOctaveSlider)
+    {
+        octaveSlider.setRange(0, 6, 1);
+        octaveSlider.addListener(this);
+        octaveSlider.setLookAndFeel(&laf);
+        octaveSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
+        octaveSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+        octaveSlider.setValue(3);
+        
+        addAndMakeVisible(octaveSlider);
+    }
+#else
+    minKey = 21; // 21
+    maxKey = 108; // 108
+#endif
     keyboard->setScrollButtonsVisible(false);
     keyboard->setAvailableRange(minKey, maxKey);
     keyboard->setOctaveForMiddleC(4);
@@ -34,15 +54,19 @@ BKKeyboardSlider::BKKeyboardSlider()
     orderedPairs = true;
 
     showName.setText("unnamed keyboard slider", dontSendNotification);
-    showName.setJustificationType(Justification::bottomRight);
+    showName.setJustificationType(Justification::centredRight);
+    showName.addMouseListener(this, true);
     addAndMakeVisible(showName);
 
     keyboardValueTF.setText(String(0.0, 1));
     keyboardValueTF.setName("KSLIDERTXT");
     keyboardValueTF.addListener(this);
+#if JUCE_IOS
+    keyboardValueTF.addMouseListener(this, true);
+#endif
     addAndMakeVisible(keyboardValueTF);
 
-    keyboardValsTextField = new TextEditor();
+    keyboardValsTextField = new BKTextEditor();
     keyboardValsTextField->setMultiLine(true);
     keyboardValsTextField->setName("KSLIDERTXTEDITALL");
     keyboardValsTextField->addListener(this);
@@ -57,6 +81,19 @@ BKKeyboardSlider::BKKeyboardSlider()
 
 }
 
+#if JUCE_IOS
+void BKKeyboardSlider::sliderValueChanged     (Slider* slider)
+{
+    if (slider == &octaveSlider)
+    {
+        int octave = (int) octaveSlider.getValue();
+        
+        if (octave == 0)    keyboard->setAvailableRange(21, 45);
+        else                keyboard->setAvailableRange(12+octave*12, 36+octave*12);
+    }
+}
+#endif
+
 void BKKeyboardSlider::paint (Graphics& g)
 {
     //g.fillAll(Colours::lightgrey);
@@ -65,30 +102,47 @@ void BKKeyboardSlider::paint (Graphics& g)
 
 void BKKeyboardSlider::resized()
 {
+    float heightUnit = getHeight() * 0.1;
+    float widthUnit = getWidth() * 0.1;
+    
+    //Rectangle<int> area (getBounds());
     Rectangle<int> area (getLocalBounds());
-    float keyboardHeight = area.getHeight() - 20;
-    Rectangle<int> keymapRow = area.removeFromBottom(keyboardHeight + 20);
+    float keyboardHeight = 8 * heightUnit;
+    Rectangle<int> keymapRow = area.removeFromBottom(10 * heightUnit);
     
     //absolute keymap
     float keyWidth = keymapRow.getWidth() / round((maxKey - minKey) * 7./12 + 1); //num white keys
     keyboard->setKeyWidth(keyWidth);
     keyboard->setBlackNoteLengthProportion(0.65);
-    //keyboardComponent->setBounds(keymapRow.removeFromBottom(keyboardHeight - gYSpacing));
-    keyboard->setBounds(keymapRow.removeFromBottom(keyboardHeight - gYSpacing));
-    keymapRow.removeFromBottom(gYSpacing);
-    Rectangle<int> textSlab (keymapRow.removeFromBottom(20));
-    keyboardValueTF.setBounds(textSlab.removeFromRight(50));
-    showName.setBounds(textSlab.removeFromRight(125));
-    keyboardValsTextFieldOpen.setBounds(textSlab.removeFromLeft(75));
+    
+    Rectangle<int> keyboardRect = keymapRow.removeFromBottom(keyboardHeight);
+    
+#if JUCE_IOS
+    if (needsOctaveSlider)
+    {
+        float sliderHeight = 15;
+        Rectangle<int> sliderArea = keyboardRect.removeFromTop(sliderHeight);
+        octaveSlider.setBounds(sliderArea);
+    }
+#endif
+    keyboard->setBounds(keyboardRect);
+    
+    Rectangle<int> textSlab (keymapRow.removeFromBottom(2*heightUnit + gYSpacing));
+    keyboardValueTF.setBounds(textSlab.removeFromRight(ratio * widthUnit));
+    showName.setBounds(textSlab.removeFromRight(2*ratio*widthUnit));
+    keyboardValsTextFieldOpen.setBounds(textSlab.removeFromLeft(ratio*widthUnit*1.5));
+    
+#if JUCE_IOS
     keyboardValsTextField->setBounds(keyboard->getBounds());
-
+    keyboardValsTextField->setSize(keyboard->getWidth() * 0.5f, keyboard->getHeight());
+#else
+    keyboardValsTextField->setBounds(keyboard->getBounds());
+#endif
 }
 
 void BKKeyboardSlider::setFundamental(int fund)
 {
     keyboard->setFundamental(fund);
-    
-    DBG("new fundamental = " + String(fund));
 }
 
 void BKKeyboardSlider::setAvailableRange(int min, int max)
@@ -140,7 +194,7 @@ void BKKeyboardSlider::mouseUp(const MouseEvent& e)
         }
     }
     
-    listeners.call(&BKKeyboardSliderListener::keyboardSliderChanged,
+    listeners.call(&BKKeyboardSlider::Listener::keyboardSliderChanged,
                    getName(),
                    keyboard->getValuesRotatedByFundamental());
     
@@ -149,8 +203,14 @@ void BKKeyboardSlider::mouseUp(const MouseEvent& e)
 
 void BKKeyboardSlider::mouseDown(const MouseEvent& e)
 {
-    lastKeyPressed = keyboard->getLastNoteOver();
-    DBG("lastKeyPressed = " + String(lastKeyPressed));
+    if (e.originalComponent == &keyboardValueTF || e.originalComponent == &showName)
+    {
+        inputListeners.call(&WantsKeyboardListener::keyboardSliderWantsKeyboard, this, KSliderThisValue);
+    }
+    else
+    {
+        lastKeyPressed = keyboard->getLastNoteOver();
+    }
 }
 
 void BKKeyboardSlider::bkTextFieldDidChange (TextEditor& textEditor)
@@ -180,7 +240,7 @@ void BKKeyboardSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 
         else keyboard->setValuesDirectly(stringToFloatArray(keyboardValsTextField->getText()));
         
-        listeners.call(&BKKeyboardSliderListener::keyboardSliderChanged,
+        listeners.call(&BKKeyboardSlider::Listener::keyboardSliderChanged,
                        getName(),
                        keyboard->getValuesRotatedByFundamental());
         
@@ -191,9 +251,11 @@ void BKKeyboardSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
     }
     else if(textEditor.getName() == keyboardValueTF.getName())
     {
+        if (lastKeyPressed < 0) return;
+        
         keyboard->setKeyValue(lastKeyPressed, keyboardValueTF.getText().getDoubleValue());
         
-        listeners.call(&BKKeyboardSliderListener::keyboardSliderChanged,
+        listeners.call(&BKKeyboardSlider::Listener::keyboardSliderChanged,
                        getName(),
                        keyboard->getValuesRotatedByFundamental());
         
@@ -219,10 +281,12 @@ void BKKeyboardSlider::textEditorEscapeKeyPressed (TextEditor& textEditor)
 
 void BKKeyboardSlider::textEditorFocusLost(TextEditor& textEditor)
 {
+#if !JUCE_IOS
     if(!focusLostByEscapeKey)
     {
         textEditorReturnKeyPressed(textEditor);
     }
+#endif
 }
 
 void BKKeyboardSlider::handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber)
@@ -236,7 +300,12 @@ void BKKeyboardSlider::bkButtonClicked (Button* b)
     {
         focusLostByEscapeKey = false;
         keyboardValsTextField->setAlpha(1);
+#if !JUCE_IOS
         keyboardValsTextField->toFront(true);
+#else
+        keyboardValsTextField->toFront(false);
+        inputListeners.call(&WantsKeyboardListener::keyboardSliderWantsKeyboard, this, KSliderAllValues);
+#endif
         if(orderedPairs) {
             keyboardValsTextField->setText(offsetArrayToString2(keyboard->getValuesDirectly()), dontSendNotification);
             //keyboardValsTextField->setText(offsetArrayToString2(keyboard->getAbsoluteValues())
@@ -387,6 +456,7 @@ void BKKeyboardSlider::setValues(Array<float> newvals)
     int valCounter = 0;
     
     //for(int i=minKey; i<=maxKey; i++)
+    DBG("BKKeyboardSlider::setValues newvals size = " + String(newvals.size()));
     for(int i=0; i<newvals.size(); i++)
     {
         if(valCounter < newvals.size()) {
@@ -397,5 +467,15 @@ void BKKeyboardSlider::setValues(Array<float> newvals)
     
     if(fund > -1) keyboard->setFundamental(fund);
     
+    updateDisplay();
+}
+
+void BKKeyboardSlider::setValuesAbsolute(Array<float> newvals)
+{
+    for(int i=0; i<newvals.size(); i++)
+    {
+        keyboard->setKeyValue(i, newvals.getUnchecked(i));
+    }
+
     updateDisplay();
 }

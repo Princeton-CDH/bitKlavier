@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<gallery name="21. Direct 1" defaultPiano="22">
+  <idCount i0="15" i1="28" i2="24" i3="20" i4="16" i5="1494" i6="10" i7="10"
+           i8="10" i9="12" i10="10" i11="10" i12="10" i13="11" i14="30"/>
+  <general globalGain="1" directGain="1" synchronicGain="1" nostalgicGain="1"
+           resonanceGain="1" hammerGain="0.0099999997764825820923" tempoMultiplier="1"
+           resAndHammer="1" invertSustain="0" tuningFund="440"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
+         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
+  <tuning Id="12" name="Just_C" scale="1" fundamental="0" offset="0" adaptiveIntervalScale="0"
+          adaptiveInversional="0" adaptiveAnchorScale="0" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="300" adaptiveHistory="5">
+    <customScale f0="0.059999998658895492554" f1="0" f2="0.019999999552965164185"
+                 f3="0.039999999105930328369" f4="-0.019999999552965164185" f5="0.059999998658895492554"
+                 f6="-0.019999999552965164185" f7="0.039999999105930328369" f8="0.019999999552965164185"
+                 f9="0" f10="0.059999998658895492554" f11="-0.019999999552965164185"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
+          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
+          adaptiveClusterThresh="100" adaptiveHistory="4">
+    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
+                 f9="0" f10="0" f11="0"/>
+    <absoluteOffsets/>
+  </tuning>
+  <direct Id="12" name="BigTriad" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0" f1="7" f2="10"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+              clusterThresh="500" mode="0" beatsToSkip="0">
+    <beatMultipliers f0="1"/>
+    <lengthMultipliers f0="1"/>
+    <accentMultipliers f0="1"/>
+    <transpOffsets>
+      <t0 f0="0"/>
+    </transpOffsets>
+  </synchronic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <nostalgic Id="-1" name="-1" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
+             beatsToSkip="0" mode="0">
+    <transposition f0="0"/>
+  </nostalgic>
+  <keymap Id="16" name="NoCDE4" k0="21" k1="22" k2="23" k3="24" k4="25"
+          k5="26" k6="27" k7="28" k8="29" k9="30" k10="31" k11="32" k12="33"
+          k13="34" k14="35" k15="36" k16="37" k17="38" k18="39" k19="40"
+          k20="41" k21="42" k22="43" k23="44" k24="45" k25="46" k26="47"
+          k27="48" k28="49" k29="50" k30="51" k31="52" k32="53" k33="54"
+          k34="55" k35="56" k36="57" k37="58" k38="59" k39="61" k40="63"
+          k41="65" k42="66" k43="67" k44="68" k45="69" k46="70" k47="71"
+          k48="72" k49="73" k50="74" k51="75" k52="76" k53="77" k54="78"
+          k55="79" k56="80" k57="81" k58="82" k59="83" k60="84" k61="85"
+          k62="86" k63="87" k64="88" k65="89" k66="90" k67="91" k68="92"
+          k69="93" k70="94" k71="95" k72="96" k73="97" k74="98" k75="99"
+          k76="100" k77="101" k78="102" k79="103" k80="104" k81="105" k82="106"
+          k83="107" k84="108"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="-1" name="-1"/>
+  <keymap Id="-1" name="-1"/>
+  <piano name="Direct1" Id="22">
+    <item>
+      <item name="Tuning12" type="3" Id="12" piano="-1" active="1" X="448"
+            Y="101"/>
+      <connections>
+        <item name="Direct11" type="0" Id="12" piano="-1" active="1" X="407"
+              Y="253"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Keymap11" type="5" Id="16" piano="-1" active="1" X="422"
+            Y="360"/>
+      <connections>
+        <item name="Direct11" type="0" Id="12" piano="-1" active="1" X="407"
+              Y="253"/>
+      </connections>
+    </item>
+  </piano>
+</gallery>

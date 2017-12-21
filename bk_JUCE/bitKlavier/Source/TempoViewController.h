@@ -17,7 +17,10 @@ class TempoViewController : public BKViewController
 public:
     
     TempoViewController(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~TempoViewController() {};
+    ~TempoViewController()
+    {
+        setLookAndFeel(nullptr);
+    };
     
     void paint (Graphics&) override;
     void resized() override;
@@ -43,7 +46,7 @@ protected:
     BKLabel A1AdaptedTempo;
     BKLabel A1AdaptedPeriodMultiplier;
     
-    TextButton A1reset;
+    BKTextButton A1reset;
     
     void fillModeCB(void);
     void fillA1ModeCB(void);
@@ -60,8 +63,8 @@ private:
 class TempoPreparationEditor :
 public TempoViewController,
 public BKEditableComboBoxListener,
-public BKRangeSliderListener,
-public BKSingleSliderListener,
+public BKRangeSlider::Listener,
+public BKSingleSlider::Listener,
 public Timer
 {
 public:
@@ -98,14 +101,17 @@ private:
 class TempoModificationEditor :
 public TempoViewController,
 public BKEditableComboBoxListener,
-public BKRangeSliderListener,
-public BKSingleSliderListener,
+public BKRangeSlider::Listener,
+public BKSingleSlider::Listener,
 private Timer
 {
 public:
     
     TempoModificationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~TempoModificationEditor(){};
+    ~TempoModificationEditor()
+    {
+        setLookAndFeel(nullptr);
+    };
     
     void update(void) override;
     void updateModification(void);

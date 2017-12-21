@@ -31,7 +31,7 @@ public:
 
     ~BKTextField()
     {
-        
+        setLookAndFeel(nullptr);
     }
     
     
@@ -42,6 +42,5 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKTextField)
     
 };
-
 
 #endif  // BKTEXTFIELD_H_INCLUDED

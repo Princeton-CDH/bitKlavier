@@ -20,7 +20,7 @@
 
 #include "PreparationPanel.h"
 
-#include "BKConstructionSite.h"
+class BKConstructionSite;
 
 #include "BKGraph.h"
 
@@ -50,6 +50,11 @@ public:
     
     /*inline Viewport* getViewport(void) { return &viewPort;}*/
     
+    void setDisplay(DisplayType type);
+    
+    Slider octaveSlider;
+    //void setSliderLookAndFeel(BKButtonAndMenuLAF *laf);
+    
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it
@@ -60,6 +65,7 @@ private:
     
     BKItemGraph theGraph;
     
+    int keyStart, keyEnd;
     //Viewport viewPort;
     
     HeaderViewController header;
@@ -79,6 +85,10 @@ private:
     ScopedPointer<BKKeymapKeyboardComponent> keyboard;
     BKKeymapKeyboardState keyboardState;
     Component *keyboardComponent;
+    
+    
+
+    DisplayType display;
     
     bool initial;
     int initialWidth, initialHeight;
@@ -104,6 +114,8 @@ private:
     bool keyPressed (const KeyPress& e, Component*) override;
     
     bool isAddingFromMidiInput;
+    
+    BKButtonAndMenuLAF laf;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainViewController)
 };

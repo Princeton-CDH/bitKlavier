@@ -28,6 +28,8 @@
 #define USE_SYNCHRONIC_TWO 0
 
 
+
+
 //==============================================================================
 /**
 */
@@ -44,15 +46,20 @@ public:
     void loadGalleryDialog(void);
     void loadJsonGalleryDialog(void);
     void loadGalleryFromPath(String path);
+    void loadGalleryFromXml(ScopedPointer<XmlElement> xml);
     void loadJsonGalleryFromPath(String path);
     void saveGalleryAs(void);
     void saveGallery(void);
+    void createGalleryWithName(String name);
     void createNewGallery(String name);
     void renameGallery(String name);
     void deleteGallery(void);
+    void deleteGalleryWithName(String name);
     
     String firstGallery(void);
     void initializeGallery(void);
+    
+    BKSampleLoadType currentSampleType;
     
     Gallery::Ptr                        gallery;
     
@@ -67,15 +74,28 @@ public:
     Piano::Ptr                          currentPiano;
     Piano::PtrArr                       prevPianos;
     
+    StringArray mikroetudes, ns_etudes, bk_examples;
+    
     StringArray                         galleryNames;
     String                              currentGallery;
     String                              currentGalleryPath;
     
+    bool                                defaultLoaded;
+    String                              defaultName;
     
-   
+#if TRY_UNDO
+    Piano::PtrArr                       history;
+    int epoch;
+    
+    void updateHistory(void);
+    
+    void timeTravel(bool forward);
+#endif
+    
     void updateGalleries(void);
     
     void collectGalleries(void);
+    void collectGalleriesFromFolder(File folder);
     
     void updateUI(void);
     
@@ -177,18 +197,33 @@ public:
     void reset(BKPreparationType type, int Id);
     void clear(BKPreparationType type, int Id);
     
+    BKPlatform      platform;
 
-
+    float uiScaleFactor;
+    
+    
+    float paddingScalarX;
+    float paddingScalarY;
+    
+    int screenWidth;
+    int screenHeight;
+    
+    inline String getCurrentGalleryPath(void) { return currentGalleryPath;}
+    
+    double progress;
+    double progressInc;
+    
 private:
+    
     int  currentPianoId;
+    
+    bool sustainIsDown;
     
     double bkSampleRate;
     
-    bool didLoadHammersAndRes, didLoadMainPianoSamples;
     
-    void loadMainPianoSamples(BKSynthesiser *synth, int numLayers);
-    void loadResonanceRelaseSamples(BKSynthesiser *synth);
-    void loadHammerReleaseSamples(BKSynthesiser *synth);
+    
+    bool didLoadHammersAndRes, didLoadMainPianoSamples;
     
     AudioSampleBuffer levelBuf; //for storing samples for metering/RMS calculation
     

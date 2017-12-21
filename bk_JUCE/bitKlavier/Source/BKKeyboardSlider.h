@@ -16,28 +16,20 @@
 #include "BKKeyboard.h"
 #include "BKKeyboardState.h"
 
-class BKKeyboardSliderListener
-{
-    
-public:
-    
-    //BKMultiSliderListener() {}
-    virtual ~BKKeyboardSliderListener() {};
-    
-    virtual void keyboardSliderChanged(String name, Array<float> values) = 0;
-
-};
-
+#include "BKSlider.h"
 
 class BKKeyboardSlider :
 public BKComponent,
 public BKListener,
 public BKKeymapKeyboardStateListener
+#if JUCE_IOS
+,private juce::Slider::Listener
+#endif
 {
     
 public:
     
-    BKKeyboardSlider();
+    BKKeyboardSlider(bool needsOctaveSlider = false);
     ~BKKeyboardSlider()
     {
         //delete keyboardComponent;
@@ -48,9 +40,48 @@ public:
     void resized() override;
     void paint (Graphics&) override;
     
-    ListenerList<BKKeyboardSliderListener> listeners;
-    void addMyListener(BKKeyboardSliderListener* listener)     { listeners.add(listener); }
-    void removeMyListener(BKKeyboardSliderListener* listener)  { listeners.remove(listener); }
+    class Listener
+    {
+        
+    public:
+        virtual ~Listener() {};
+        
+        virtual void keyboardSliderChanged(String name, Array<float> values) = 0;
+        
+    };
+    
+    ListenerList<Listener> listeners;
+    void addMyListener(Listener* listener)     { listeners.add(listener); }
+    void removeMyListener(Listener* listener)  { listeners.remove(listener); }
+    
+    ListenerList<WantsKeyboardListener> inputListeners;
+    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
+    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
+    
+    inline void setText(String text)
+    {
+        keyboardValueTF.setText(text, false);
+    }
+    
+    inline TextEditor* getTextEditor(KSliderTextFieldType which)
+    {
+        if (which == KSliderAllValues) return keyboardValsTextField.get();
+        if (which == KSliderThisValue) return &keyboardValueTF;
+        
+        return nullptr;
+    }
+    
+    inline void dismissTextEditor(TextEditor* which, bool setValue = false)
+    {
+        if (setValue)
+        {
+            textEditorReturnKeyPressed(*which);
+        }
+        else
+        {
+            textEditorEscapeKeyPressed(*which);
+        }
+    }
     
     void setName(String newName) { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName() { return sliderName; }
@@ -67,18 +98,32 @@ public:
     void setAllValues(Array<float> newvals);
     void setActiveValues(Array<float> newvals);
     void setValues(Array<float> newvals);
+    void setValuesAbsolute(Array<float> newvals);
     void updateDisplay();
+    
+    inline void setDimensionRatio(float r) { ratio = r; }
+    
+    inline Rectangle<float> getEditAllBounds(void) { return keyboardValsTextFieldOpen.getBounds().toFloat();}
     
 private:
     
     String sliderName;
     BKLabel showName;
+    
+    bool needsOctaveSlider;
+#if JUCE_IOS
+    Slider octaveSlider;
+    void sliderValueChanged     (Slider* slider)                override;
+    BKButtonAndMenuLAF laf;
+#endif
+    
+    float ratio;
 
-    TextEditor keyboardValueTF;
+    BKTextEditor keyboardValueTF;
     BKKeymapKeyboardState keyboardState;
     ScopedPointer<Component> keyboardComponent;
     BKKeymapKeyboardComponent* keyboard;
-    ScopedPointer<TextEditor> keyboardValsTextField;
+    ScopedPointer<BKTextEditor> keyboardValsTextField;
     TextButton keyboardValsTextFieldOpen;
     
     int keyboardSize, minKey, maxKey;

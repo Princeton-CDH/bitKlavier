@@ -20,7 +20,7 @@
 
 #include "BKGraph.h"
 
-class BKConstructionSite : public BKDraggableComponent, public LassoSource<BKItem*>
+class BKConstructionSite : public LassoSource<BKItem*>, public MouseHoldListener
 {
 public:
     BKConstructionSite(BKAudioProcessor& p, /*Viewport* viewPort, */ BKItemGraph* theGraph);
@@ -45,6 +45,14 @@ public:
     void cut(void);
     void selectAll(void);
     
+    
+#if TRY_UNDO
+    void undo(void);
+    void redo(void);
+#endif
+    
+    inline int getNumSelected(void) { return graph->getSelectedItems().size(); }
+    
     void addItemsFromClipboard(void);
     
     void addItem(BKPreparationType type, bool center = false);
@@ -63,18 +71,114 @@ public:
     
     bool itemOutsideBounds(Rectangle<int>);
     
+    static void editMenuCallback(int result, BKConstructionSite*);
+    
+    struct TouchEvent
+    {
+        TouchEvent (const MouseInputSource& ms)
+        : source (ms)
+        {}
+        
+        void pushPoint (juce::Point<float> newPoint, ModifierKeys newMods)
+        {
+            currentPosition = newPoint;
+            modifierKeys = newMods;
+            
+            if (lastPoint.getDistanceFrom (newPoint) > 5.0f)
+            {
+                if (lastPoint != juce::Point<float>())
+                {
+                    Path newSegment;
+                    newSegment.startNewSubPath (lastPoint);
+                    newSegment.lineTo (newPoint);
+                    
+                    PathStrokeType (1.0f, PathStrokeType::curved, PathStrokeType::rounded).createStrokedPath (newSegment, newSegment);
+                    path.addPath (newSegment);
+                    
+                }
+                
+                lastPoint = newPoint;
+            }
+        }
+        
+        MouseInputSource source;
+        Path path;
+        juce::Point<float> lastPoint, currentPosition;
+        ModifierKeys modifierKeys;
+        
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TouchEvent)
+    };
+    
+    void drawTouch (TouchEvent& touch, Graphics& g)
+    {
+        g.setColour (Colours::antiquewhite);
+        g.fillPath (touch.path);
+        
+        const float radius = 10.0f;
+        
+        g.drawEllipse (touch.currentPosition.x - radius,
+                       touch.currentPosition.y - radius,
+                       radius * 2.0f, radius * 2.0f, 2.0f);
+        
+        g.setFont (14.0f);
+        
+        String desc ("Mouse #");
+        desc << touch.source.getIndex();
+        
+        float pressure = touch.source.getCurrentPressure();
+        
+        if (pressure > 0.0f && pressure < 1.0f)
+            desc << "  (pressure: " << (int) (pressure * 100.0f) << "%)";
+        
+        if (touch.modifierKeys.isCommandDown()) desc << " (CMD)";
+        if (touch.modifierKeys.isShiftDown())   desc << " (SHIFT)";
+        if (touch.modifierKeys.isCtrlDown())    desc << " (CTRL)";
+        if (touch.modifierKeys.isAltDown())     desc << " (ALT)";
+        
+        g.drawText (desc,
+                    Rectangle<int> ((int) touch.currentPosition.x - 200,
+                                    (int) touch.currentPosition.y - 60,
+                                    400, 20),
+                    Justification::centredTop, false);
+    }
+    
+    inline int getNumberOfTouches(void)
+    {
+        return touches.size();
+    }
+    
+    
 private:
+    
+    OwnedArray<TouchEvent> touches;
+    
+    TouchEvent* getTouchEvent (const MouseInputSource& source)
+    {
+        for (int i = 0; i < touches.size(); ++i)
+        {
+            TouchEvent* t = touches.getUnchecked(i);
+            
+            if (t->source == source)
+                return t;
+        }
+        
+        return nullptr;
+    }
+    
+    void mouseHold(Component* frame, bool onItem) override;
     
     int leftMost, rightMost, topMost, bottomMost;
     BKAudioProcessor& processor;
     
     BKItemGraph* graph;
     
-    Point<int> lastPosition;
+    juce::Point<int> lastPosition;
 
     bool connect; int lineOX, lineOY, lineEX, lineEY;
     bool multiple;
+    bool held;
 
+    
     
     BKItem* itemSource;
     BKItem* itemTarget;
@@ -97,7 +201,10 @@ private:
     void prepareItemDrag(BKItem* item, const MouseEvent& e, bool center);
     
     void resized() override;
+    
     void mouseDown (const MouseEvent& eo) override;
+    
+    void mouseDoubleClick (const MouseEvent& eo) override;
     
     void mouseUp (const MouseEvent& eo) override;
     
@@ -112,9 +219,9 @@ private:
     int lastX, lastY;
     int lastEX,lastEY;
     
-    /*Viewport* viewport;*/
+    Component clickFrame;
     
-    
+    BKButtonAndMenuLAF buttonsAndMenusLAF;
     
     JUCE_LEAK_DETECTOR(BKConstructionSite)
 };

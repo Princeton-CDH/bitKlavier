@@ -12,7 +12,6 @@
 
 void BKButtonAndMenuLAF::positionComboBoxText (ComboBox& box, Label& label)
 {
-    
     label.setFont (getComboBoxFont (box));
     
     if(comboBoxJustification == Justification::centredRight)
@@ -31,21 +30,78 @@ void BKButtonAndMenuLAF::positionComboBoxText (ComboBox& box, Label& label)
         
         label.setJustificationType (Justification::centredLeft);
     }
-    
 }
+
+#define HEIGHT_IOS 22
+#define HEIGHT 15
+#define HORIZONTAL 0.75f
+#define KERNING 0.25f
+#define STYLE 0
+#define IOS_RATIO 1.5f
+
+Font BKButtonAndMenuLAF::getComboBoxFont (ComboBox& cb)
+{
+    Font font;
+
+    font.setSizeAndStyle(fontHeight, STYLE, HORIZONTAL, KERNING);
+    
+    return font;
+}
+
+Font BKButtonAndMenuLAF::getPopupMenuFont (void)
+{
+    Font font;
+
+    font.setSizeAndStyle(fontHeight, STYLE, HORIZONTAL, KERNING);
+    
+    return font;
+}
+
+Font BKButtonAndMenuLAF::getTextButtonFont (TextButton&, int buttonHeight)
+{
+    Font font;
+
+    font.setSizeAndStyle(fontHeight, STYLE, HORIZONTAL, KERNING);
+    
+    return font;
+}
+
+Font BKButtonAndMenuLAF::getLabelFont (Label& label)
+{
+    Font font;
+
+    font.setSizeAndStyle(fontHeight, STYLE, HORIZONTAL, KERNING);
+    
+    return font;
+}
+
+
+#define MENUBARHEIGHT_IOS 40
+#define MENUBARHEIGHT  25
+
+int BKButtonAndMenuLAF::getDefaultMenuBarHeight()
+{
+#if JUCE_IOS
+    return MENUBARHEIGHT_IOS;
+#else
+    return MENUBARHEIGHT;
+#endif
+}
+
+#define CORNER_SIZE 2.0f
 
 void BKButtonAndMenuLAF::drawComboBox (Graphics& g, int width, int height, bool,
                                    int, int, int, int, ComboBox& box)
 {
-    const auto cornerSize = box.findParentComponentOfClass<ChoicePropertyComponent>() != nullptr ? 0.0f : 3.0f;
+    //const auto cornerSize = box.findParentComponentOfClass<ChoicePropertyComponent>() != nullptr ? 0.0f : 0.0f;
+    const auto cornerSize = CORNER_SIZE;
     const Rectangle<int> boxBounds (0, 0, width, height);
     
     g.setColour (box.findColour (ComboBox::backgroundColourId));
     g.fillRoundedRectangle (boxBounds.toFloat(), cornerSize);
     
     g.setColour (box.findColour (ComboBox::outlineColourId));
-    g.drawRoundedRectangle (boxBounds.toFloat().reduced (0.5f, 0.5f), cornerSize, 1.0f);
-    
+    g.drawRoundedRectangle (boxBounds.toFloat().reduced (0.5f, 0.5f), cornerSize, 0.5f);
     
     Rectangle<int> arrowZone (width - 30, 0, 20, height);
     if(comboBoxJustification == Justification::centredRight)
@@ -153,6 +209,44 @@ void BKButtonAndMenuLAF::drawPopupMenuItem (Graphics& g, const Rectangle<int>& a
     }
 }
 
+void BKButtonAndMenuLAF::drawButtonBackground (Graphics& g, Button& button, const Colour& backgroundColour,
+                                               bool isMouseOverButton, bool isButtonDown)
+{
+    const auto cornerSize = CORNER_SIZE;
+    const auto bounds = button.getLocalBounds().toFloat().reduced (0.5f, 0.5f);
+    
+    auto baseColour = backgroundColour.withMultipliedSaturation (button.hasKeyboardFocus (true) ? 1.3f : 0.9f)
+    .withMultipliedAlpha (button.isEnabled() ? 1.0f : 0.5f);
+    
+    if (isButtonDown || isMouseOverButton)
+        baseColour = baseColour.contrasting (isButtonDown ? 0.2f : 0.05f);
+    
+    g.setColour (baseColour);
+    
+    if (button.isConnectedOnLeft() || button.isConnectedOnRight())
+    {
+        Path path;
+        path.addRoundedRectangle (bounds.getX(), bounds.getY(),
+                                  bounds.getWidth(), bounds.getHeight(),
+                                  cornerSize, cornerSize,
+                                  ! button.isConnectedOnLeft(),
+                                  ! button.isConnectedOnRight(),
+                                  ! button.isConnectedOnLeft(),
+                                  ! button.isConnectedOnRight());
+        
+        g.fillPath (path);
+        
+        g.setColour (button.findColour (ComboBox::outlineColourId));
+        g.strokePath (path, PathStrokeType (0.5f));
+    }
+    else
+    {
+        g.fillRoundedRectangle (bounds, cornerSize);
+        
+        g.setColour (button.findColour (ComboBox::outlineColourId));
+        g.drawRoundedRectangle (bounds, cornerSize, 0.5f);
+    }
+}
 
 void BKButtonAndMenuLAF::drawToggleButton (Graphics& g, ToggleButton& button,
                                        bool isMouseOverButton, bool isButtonDown)
@@ -214,6 +308,102 @@ void BKButtonAndMenuLAF::drawToggleButton (Graphics& g, ToggleButton& button,
     }
 }
 
+void BKButtonAndMenuLAF::drawLinearSlider (Graphics& g, int x, int y, int width, int height,
+                                       float sliderPos,
+                                       float minSliderPos,
+                                       float maxSliderPos,
+                                       const Slider::SliderStyle style, Slider& slider)
+{
+    if (slider.isBar())
+    {
+        g.setColour (slider.findColour (Slider::trackColourId));
+        g.fillRect (slider.isHorizontal() ? Rectangle<float> (static_cast<float> (x), y + 0.5f, sliderPos - x, height - 1.0f)
+                    : Rectangle<float> (x + 0.5f, sliderPos, width - 1.0f, y + (height - sliderPos)));
+    }
+    else
+    {
+        const auto isTwoVal   = (style == Slider::SliderStyle::TwoValueVertical   || style == Slider::SliderStyle::TwoValueHorizontal);
+        const auto isThreeVal = (style == Slider::SliderStyle::ThreeValueVertical || style == Slider::SliderStyle::ThreeValueHorizontal);
+        
+        const auto trackWidth = jmin (6.0f, slider.isHorizontal() ? height * 0.25f : width * 0.25f);
+        
+        const juce::Point<float> startPoint (slider.isHorizontal() ? x : x + width * 0.5f,
+                                       slider.isHorizontal() ? y + height * 0.5f : height + y);
+        
+        const juce::Point<float> endPoint (slider.isHorizontal() ? width + x : startPoint.x,
+                                     slider.isHorizontal() ? startPoint.y : y);
+        
+        Path backgroundTrack;
+        backgroundTrack.startNewSubPath (startPoint);
+        backgroundTrack.lineTo (endPoint);
+        g.setColour (slider.findColour (Slider::backgroundColourId));
+        g.strokePath (backgroundTrack, PathStrokeType (trackWidth, PathStrokeType::curved, PathStrokeType::rounded));
+        
+        Path valueTrack;
+        juce::Point<float> minPoint, maxPoint, thumbPoint;
+        
+        if (isTwoVal || isThreeVal)
+        {
+            minPoint = { slider.isHorizontal() ? minSliderPos : width * 0.5f,
+                slider.isHorizontal() ? height * 0.5f : minSliderPos };
+            
+            if (isThreeVal)
+                thumbPoint = { slider.isHorizontal() ? sliderPos : width * 0.5f,
+                    slider.isHorizontal() ? height * 0.5f : sliderPos };
+            
+            maxPoint = { slider.isHorizontal() ? maxSliderPos : width * 0.5f,
+                slider.isHorizontal() ? height * 0.5f : maxSliderPos };
+        }
+        else
+        {
+            const auto kx = slider.isHorizontal() ? sliderPos : (x + width * 0.5f);
+            const auto ky = slider.isHorizontal() ? (y + height * 0.5f) : sliderPos;
+            
+            minPoint = startPoint;
+            maxPoint = { kx, ky };
+        }
+        
+        const auto thumbWidth = trackWidth * 2.0f;
+        
+        valueTrack.startNewSubPath (minPoint);
+        valueTrack.lineTo (isThreeVal ? thumbPoint : maxPoint);
+        g.setColour (slider.findColour (Slider::trackColourId));
+        g.strokePath (valueTrack, PathStrokeType (trackWidth, PathStrokeType::curved, PathStrokeType::rounded));
+        
+        if (! isTwoVal)
+        {
+            g.setColour (slider.findColour (Slider::thumbColourId));
+            g.fillEllipse (Rectangle<float> (thumbWidth, thumbWidth).withCentre (isThreeVal ? thumbPoint : maxPoint));
+        }
+        
+        if (isTwoVal || isThreeVal)
+        {
+            const auto sr = jmin (trackWidth, (slider.isHorizontal() ? height : width) * 0.4f);
+            const auto pointerColour = slider.findColour (Slider::thumbColourId);
+            
+            if (slider.isHorizontal())
+            {
+                drawPointer (g, minSliderPos - sr,
+                             jmax (0.0f, y + height * 0.5f - trackWidth * 2.0f),
+                             trackWidth * 2.0f, pointerColour, 2);
+                
+                drawPointer (g, maxSliderPos - trackWidth,
+                             jmin (y + height - trackWidth * 2.0f, y + height * 0.5f),
+                             trackWidth * 2.0f, pointerColour, 4);
+            }
+            else
+            {
+                drawPointer (g, jmax (0.0f, x + width * 0.5f - trackWidth * 2.0f),
+                             minSliderPos - trackWidth,
+                             trackWidth * 2.0f, pointerColour, 1);
+                
+                drawPointer (g, jmin (x + width - trackWidth * 2.0f, x + width * 0.5f), maxSliderPos - sr,
+                             trackWidth * 2.0f, pointerColour, 3);
+            }
+        }
+    }
+}
+
 void BKMultiSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int width, int height,
                                                  float sliderPos, float minSliderPos, float maxSliderPos,
                                                  const Slider::SliderStyle style, Slider& slider)
@@ -267,10 +457,10 @@ void BKRangeMinSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, i
         
         const auto trackWidth = jmin (6.0f, slider.isHorizontal() ? height * 0.25f : width * 0.25f);
         
-        const Point<float> startPoint (slider.isHorizontal() ? x : width * 0.5f,
+        const juce::Point<float> startPoint (slider.isHorizontal() ? x : width * 0.5f,
                                        slider.isHorizontal() ? height * 0.5f : height + y);
         
-        const Point<float> endPoint (slider.isHorizontal() ? width + x : startPoint.x,
+        const juce::Point<float> endPoint (slider.isHorizontal() ? width + x : startPoint.x,
                                      slider.isHorizontal() ? startPoint.y : y);
         
         Path backgroundTrack;
@@ -280,7 +470,7 @@ void BKRangeMinSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, i
         g.strokePath (backgroundTrack, PathStrokeType (trackWidth, PathStrokeType::curved, PathStrokeType::rounded));
         
         Path valueTrack;
-        Point<float> minPoint, maxPoint, thumbPoint;
+        juce::Point<float> minPoint, maxPoint, thumbPoint;
         
         const auto kx = slider.isHorizontal() ? sliderPos : (x + width * 0.5f);
         const auto ky = slider.isHorizontal() ? (y + height * 0.5f) : sliderPos;
@@ -317,13 +507,13 @@ void BKRangeMaxSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, i
         
         const auto trackWidth = jmin (6.0f, slider.isHorizontal() ? height * 0.25f : width * 0.25f);
         
-        const Point<float> startPoint (slider.isHorizontal() ? x : width * 0.5f,
+        const juce::Point<float> startPoint (slider.isHorizontal() ? x : width * 0.5f,
                                        slider.isHorizontal() ? height * 0.5f : height + y);
         
-        const Point<float> endPoint (slider.isHorizontal() ? width + x : startPoint.x,
+        const juce::Point<float> endPoint (slider.isHorizontal() ? width + x : startPoint.x,
                                      slider.isHorizontal() ? startPoint.y : y);
         Path valueTrack;
-        Point<float> minPoint, maxPoint, thumbPoint;
+        juce::Point<float> minPoint, maxPoint, thumbPoint;
         
         const auto kx = slider.isHorizontal() ? sliderPos : (x + width * 0.5f);
         const auto ky = slider.isHorizontal() ? (y + height * 0.5f) : sliderPos;

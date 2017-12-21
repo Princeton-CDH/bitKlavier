@@ -44,14 +44,19 @@ void NostalgicProcessor::postRelease(int midiNoteNumber, int midiChannel)
     activeNotes.removeFirstMatchingValue(midiNoteNumber);
     noteOn.set(midiNoteNumber, false);
     noteLengthTimers.set(midiNoteNumber, 0);
+    
+
 }
 
 //begin reverse note; called when key is released
-void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
+void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel, bool post)
 {
+    
+    DBG("NostalgicProcessor::keyReleased");
+    
     float duration = 0.0;
     
-    if (noteOn[midiNoteNumber])
+    if (post || noteOn[midiNoteNumber])
     {
         
         int offRamp;
@@ -96,13 +101,13 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel)
             activeNotes.removeFirstMatchingValue(midiNoteNumber);
             noteOn.set(midiNoteNumber, false);
             noteLengthTimers.set(midiNoteNumber, 0);
-            //DBG("nostalgic removed active note " + std::to_string(midiNoteNumber));
+            //DBG("nostalgic removed active note " + String(midiNoteNumber));
             
             reverseNotes.insert(0, new NostalgicNoteStuff(midiNoteNumber));
             NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
             currentNote->setPrepAtKeyOn(nostalgic->aPrep);
             currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber));
-            currentNote->setVelocityAtKeyOn(velocities.getUnchecked(midiNoteNumber) * nostalgic->aPrep->getGain());
+            currentNote->setVelocityAtKeyOn(velocities.getUnchecked(midiNoteNumber));
             currentNote->setReverseStartPosition((duration + nostalgic->aPrep->getWavedistance()) * sampleRate/1000.);
             //currentNote->setReverseTargetLength((duration - (aRampUndertowCrossMS + 30)) * sampleRate/1000.);
             currentNote->setReverseTargetLength((duration - (aRampUndertowCrossMS)) * sampleRate/1000.);
@@ -218,12 +223,14 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
     incrementTimers(numSamples);
 
     for(int i = undertowNotes.size() - 1; i >= 0; --i)
+    //for(int i=0; i<undertowNotes.size(); i++)
     {
         if(undertowNotes.getUnchecked(i)->undertowTimerExceedsTarget())
             undertowNotes.remove(i);
     }
     
     for(int i = reverseNotes.size() - 1; i >= 0; --i)
+    //for(int i=0; i<reverseNotes.size(); i++)
     {
         NostalgicNoteStuff* thisNote = reverseNotes.getUnchecked(i);
         
@@ -239,12 +246,17 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
                     int synthNoteNumber = thisNote->getNoteNumber() +  (int)offset;
                     float synthOffset = offset - (int)offset;
                     
+                    DBG("undertow note on noteNum/Velocity/Gain " +
+                        String(synthNoteNumber) + " " +
+                        String(thisNote->getVelocityAtKeyOn()) + " " +
+                        String(noteOnPrep->getGain() * aGlobalGain));
+                    
                     synth->keyOn(midiChannel,
                                  thisNote->getNoteNumber(),
                                  synthNoteNumber,
                                  synthOffset,
                                  thisNote->getVelocityAtKeyOn(),
-                                 aGlobalGain,
+                                 noteOnPrep->getGain() * aGlobalGain,
                                  Forward,
                                  FixedLengthFixedStart,
                                  NostalgicNote,
@@ -259,7 +271,6 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
                 NostalgicNoteStuff* newNote = undertowNotes.getUnchecked(0);
                 newNote->setUndertowTargetLength(thisNote->getUndertowTargetLength());
                 newNote->setUndertowStartPosition(noteOnPrep->getWavedistance() * sampleRate/1000.);
-                
             }
             
             //remove from active notes list
@@ -274,7 +285,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
 void NostalgicProcessor::incrementTimers(int numSamples)
 {
     
-    for(int i = (activeNotes.size() - 1); i >= 0; --i)
+    for(int i=(activeNotes.size()-1); i >= 0; --i)
     {
         noteLengthTimers.set(activeNotes.getUnchecked(i),
                              noteLengthTimers.getUnchecked(activeNotes.getUnchecked(i)) + numSamples);

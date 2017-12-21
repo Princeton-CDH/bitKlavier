@@ -97,7 +97,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                         * generalSettings->getTuningRatio()
                         / getSampleRate();
         
-        DBG("pitch ratio: " + String(pitchRatio) + String(" ssr: ") + String(sound->sourceSampleRate) + " tuning ratio: " + String(generalSettings->getTuningRatio()));
         
         bkType = bktype;
         playType = type;
@@ -110,9 +109,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         {
             if(voiceRampOn  > (0.5 * length))   voiceRampOn     = 0.5 * length;
             if(voiceRampOff > (0.5 * length))   voiceRampOff    = 0.5 * length;
-            
-            //playLength = (length - voiceRampOff) * pitchRatio;
-            playLength = (length - (voiceRampOff + voiceRampOn)) * pitchRatio; 
+
+            playLength = (length - (voiceRampOff + voiceRampOn)) * pitchRatio;
         }
         
         if (playDirection == Forward)
@@ -138,9 +136,9 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                 playEndPosition = jmin( (startingPosition + playLength), maxLength) - 1;
                 /*
                  DBG("starting forward note, starting position = "
-                 + std::to_string(startingPosition * 1000./getSampleRate())
+                 + String(startingPosition * 1000./getSampleRate())
                  + " ending position = "
-                 + std::to_string(playEndPosition * 1000./getSampleRate())
+                 + String(playEndPosition * 1000./getSampleRate())
                  );
                  */
             }
@@ -368,8 +366,14 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
                     if (sourceSamplePosition >= playEndPosition)
                     {
                         stopNote (0.0f, true);
-                        //DBG("stopping forward note, playEndPosition = " + std::to_string(playEndPosition * 1000./getSampleRate()));
+                        //DBG("stopping forward note, playEndPosition = " + String(playEndPosition * 1000./getSampleRate()));
                     }
+                }
+                
+                if(sourceSamplePosition >= playingSound->soundLength)
+                {
+                    clearCurrentNote();
+                    //DBG("forward sound reached end of file");
                 }
             }
             else if (playDirection == Reverse)

@@ -12,23 +12,30 @@
 
 #include "BKPianoSampler.h"
 
+#include "PluginProcessor.h"
+
 
 String notes[4] = {"A","C","D#","F#"};
 
-void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadType type)
+void BKSampleLoader::loadMainPianoSamples(BKAudioProcessor& processor,  BKSampleLoadType type)
 {
     WavAudioFormat wavFormat;
-    
-    String path = "~/bkSamples/";
+    BKSynthesiser* synth = &processor.mainPianoSynth;
     
     File bkSamples;
+    
+#if JUCE_IOS
+    bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
+#else
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
+#endif
     
     int numLayers = 0;
     
-    if      (type == BKLoadLite)    numLayers = 2;
-    else if (type == BKLoadMedium)  numLayers = 4;
-    else if (type == BKLoadHeavy)   numLayers = 8;
+    if      (type == BKLoadLitest)      numLayers = 1;
+    else if (type == BKLoadLite)        numLayers = 2;
+    else if (type == BKLoadMedium)      numLayers = 4;
+    else if (type == BKLoadHeavy)       numLayers = 8;
     
     synth->clearVoices();
     synth->clearSounds();
@@ -62,9 +69,9 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
                 {
                     temp.append(String(k*8+7),3);
                 }
-                else
+                else if (numLayers == 1)
                 {
-                    
+                    temp += "13";
                 }
                 
                 temp.append(".wav",5);
@@ -74,10 +81,8 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
                 
                 FileInputStream inputStream(file);
                 
-                if (inputStream.openedOk()) {
-                    
-                    DBG("file opened OK: " + file.getFullPathName());
-                    
+                if (inputStream.openedOk())
+                {
                     String soundName = file.getFileName();
                     
                     sampleReader = wavFormat.createReaderFor(new FileInputStream(file), true);
@@ -119,9 +124,9 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
                     {
                         velocityRange.setRange(aVelocityThresh_Two[k], (aVelocityThresh_Two[k+1] - aVelocityThresh_Two[k]), true);
                     }
-                    else
+                    else if (numLayers == 1)
                     {
-                        
+                        velocityRange.setRange(aVelocityThresh_One[k], (aVelocityThresh_One[k+1] - aVelocityThresh_One[k]), true);
                     }
                     
                     double sourceSampleRate = sampleReader->sampleRate;
@@ -148,9 +153,12 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
                     
                     
                     
+                    processor.progress += processor.progressInc;
+                    DBG(soundName+": " + String(processor.progress));
                     
-                    
-                } else {
+                }
+                else
+                {
                     DBG("file not opened OK: " + temp);
                 }
                 
@@ -160,14 +168,18 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
     }
 }
 
-void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
+void BKSampleLoader::loadResonanceReleaseSamples(BKAudioProcessor& processor)
 {
     WavAudioFormat wavFormat;
-    
-    String path = "~/bkSamples/";
+    BKSynthesiser* synth = &processor.resonanceReleaseSynth;
     
     File bkSamples;
+    
+#if JUCE_IOS
+    bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
+#else
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
+#endif
     
     synth->clearVoices();
     synth->clearSounds();
@@ -183,14 +195,13 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
             
             for (int k = 0; k < 3; k++) //k => velocity layer
             {
-                //String temp = path;
                 String temp;
                 temp += "harm";
                 if(k==0) temp += "V3";
                 else if(k==1) temp += "S";
                 else if(k==2) temp += "L";
                 temp += notes[j];
-                temp += std::to_string(i);
+                temp += String(i);
                 temp += ".wav";
                 
                 //File file(temp);
@@ -198,8 +209,6 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
                 FileInputStream inputStream(file);
                 
                 if (inputStream.openedOk()) {
-                    
-                    DBG("file opened OK: " + file.getFileName());
                     String soundName = file.getFileName();
                     sampleReader = wavFormat.createReaderFor(new FileInputStream(file), true);
                     
@@ -247,7 +256,7 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
                         BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels), (int)maxLength);
                         sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
                         
-                        //DBG("added resonance: " + std::to_string(noteRange.toInteger()) + " " + std::to_string(root) + " " + std::to_string(velocityRange.toInteger()) );
+                        //DBG("added resonance: " + String(noteRange.toInteger()) + " " + String(root) + " " + String(velocityRange.toInteger()) );
                         synth->addSound(new BKPianoSamplerSound(soundName,
                                                                                newBuffer,
                                                                                maxLength,
@@ -256,6 +265,9 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
                                                                                root,
                                                                                velocityRange));
                     }
+                    
+                    processor.progress += processor.progressInc;
+                    DBG(soundName+": " + String(processor.progress));
                 }
                 else
                 {
@@ -266,14 +278,17 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
     }
 }
 
-void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
+void BKSampleLoader::loadHammerReleaseSamples(BKAudioProcessor& processor)
 {
     WavAudioFormat wavFormat;
-    
-    String path = "~/bkSamples/";
-    
+    BKSynthesiser* synth = &processor.hammerReleaseSynth;
     File bkSamples;
+    
+#if JUCE_IOS
+    bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
+#else
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
+#endif
     
     synth->clearVoices();
     synth->clearSounds();
@@ -283,9 +298,9 @@ void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
     //load hammer release samples
     for (int i = 1; i <= 88; i++) {
         
-        String temp = path;
+        String temp;
         temp += "rel";
-        temp += std::to_string(i);
+        temp += String(i);
         temp += ".wav";
         
         //File file(temp);
@@ -293,8 +308,6 @@ void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
         FileInputStream inputStream(file);
         
         if (inputStream.openedOk()) {
-            
-            DBG("file opened OK: " + file.getFileName());
             String soundName = file.getFileName();
             sampleReader = wavFormat.createReaderFor(new FileInputStream(file), true);
             
@@ -327,7 +340,11 @@ void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
                                                                     root,
                                                                     velocityRange));
             }
-        } else {
+            processor.progress += processor.progressInc;
+            DBG(soundName+": " + String(processor.progress));
+        }
+        else
+        {
             DBG("file not opened OK: " + temp);
         }
     }

@@ -135,9 +135,9 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                 playEndPosition = jmin( (startingPosition + playLength), maxLength) - 1;
                 /*
                  DBG("starting forward note, starting position = "
-                 + std::to_string(startingPosition * 1000./getSampleRate())
+                 + String(startingPosition * 1000./getSampleRate())
                  + " ending position = "
-                 + std::to_string(playEndPosition * 1000./getSampleRate())
+                 + String(playEndPosition * 1000./getSampleRate())
                  );
                  */
             }
@@ -364,7 +364,7 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
                     if (sourceSamplePosition >= playEndPosition)
                     {
                         stopNote (0.0f, true);
-                        //DBG("stopping forward note, playEndPosition = " + std::to_string(playEndPosition * 1000./getSampleRate()));
+                        //DBG("stopping forward note, playEndPosition = " + String(playEndPosition * 1000./getSampleRate()));
                     }
                 }
             }

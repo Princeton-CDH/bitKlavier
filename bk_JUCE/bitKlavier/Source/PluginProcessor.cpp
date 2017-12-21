@@ -3,30 +3,158 @@
 #include "PluginEditor.h"
 #include "BKPianoSampler.h"
 
-#define NOST_KEY_OFF 1
-
 //==============================================================================
 BKAudioProcessor::BKAudioProcessor():
 updateState(new BKUpdateState()),
 mainPianoSynth(),
 hammerReleaseSynth(),
-resonanceReleaseSynth()
+resonanceReleaseSynth(),
+sustainIsDown(false),
+currentSampleType(BKLoadNil)
+#if TRY_UNDO
+,epoch(0),
+#endif
 {
     didLoadHammersAndRes            = false;
     didLoadMainPianoSamples         = false;
+    
+#if TRY_UNDO
+    history.ensureStorageAllocated(10);
+#endif
+    
+    Process::setPriority(juce::Process::RealtimePriority);
+    
+    Rectangle<int> r = Desktop::getInstance().getDisplays().getMainDisplay().userArea;
+    screenWidth = r.getWidth();
+    screenHeight = r.getHeight();
+        
+    float w_factor = ((float) screenWidth / (float) DEFAULT_WIDTH);
+    float h_factor = ((float) screenHeight / (float) DEFAULT_HEIGHT);
+    
+    
+    
+#if JUCE_IOS
+    int heightUnit = ((screenHeight * 0.1f) > 48) ? 48 : (screenHeight * 0.1f);
+    
+    fontHeight = screenHeight * 0.025f;
+    fontHeight = (fontHeight < 13) ? 13 : fontHeight;
+    
+    gComponentComboBoxHeight = heightUnit;
+    gComponentLabelHeight = heightUnit * 0.75f;
+    gComponentTextFieldHeight = heightUnit * 0.75f;
+    
+    gComponentRangeSliderHeight = heightUnit * 1.25f;
+    gComponentSingleSliderHeight = heightUnit * 1.25f;
+    gComponentStackedSliderHeight = heightUnit * 1.25f;
+
+#endif
+    
+    uiScaleFactor = (w_factor + h_factor) * 0.5f;
+    
+    uiScaleFactor *= 1.15f; // making up for smallness on little ios devices
+    
+    uiScaleFactor = (uiScaleFactor > 1.0f) ? 1.0f : uiScaleFactor;
     
     collectGalleries();
     
     updateUI();
     
-    loadGalleryFromPath(galleryNames[0]);
+    String xmlData = CharPointer_UTF8 (BinaryData::Basic_Piano_xml);
+    
+    defaultLoaded = true;
+    defaultName = "Basic_Piano_xml";
+    
+    loadGalleryFromXml(XmlDocument::parse(xmlData));
+
+#if JUCE_IOS
+    platform = BKIOS;
+    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory);
+#endif
+ 
+
+#if JUCE_MAC || JUCE_WINDOWS
+    platform = BKOSX;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+
+
+#endif
     
     noteOn.ensureStorageAllocated(128);
     for(int i=0; i< 128; i++)
     {
         noteOn.set(i, false);
     }
+    
+    bk_examples = StringArray({
+        "1. Synchronic 1",
+        "2. Synchronic 2",
+        "3. Synchronic 3",
+        "4. Synchronic 4",
+        "5. Synchronic 5",
+        "6. Synchronic 6",
+        "7. Synchronic 7",
+        "8. Synchronic 8",
+        "9. Synchronic 9",
+        "10. Nostalgic 1",
+        "11. Nostalgic 2",
+        "12. Nostalgic 3",
+        "13. Nostalgic 4",
+        "14. Nostalgic 5",
+        "15. Nostalgic 6",
+        "16. Tuning 1",
+        "17. Tuning 2",
+        "18. Tuning 3",
+        "19. Tuning 4",
+        "20. Tuning 5",
+        "21. Direct 1",
+        "22. Direct 2",
+        "23. Adaptive Tempo 1",
+        "24. Adaptive Tempo 2",
+        "25. Adaptive Tempo 3",
+        "26. Adaptive Tempo 4",
+        "27. PianoMapGallery"
+        
+    });
+    
+    mikroetudes = StringArray({
+        "And So...",
+        "Around 60",
+        "Circleville",
+        "Crests",
+        "Cygnet",
+        "Daily Decrease",
+        "Didymus",
+        "for Bill D",
+        "Gigue Interrupted",
+        "Houseboat",
+        "Hurra",
+        "Juxtaposed Weather",
+        "Keep It Steady (OrNot)",
+        "Keep It Steady",
+        "Listen!",
+        "Mama's Musette",
+        "Petite Gymnopedie",
+        "Pyramids",
+        "Quickie",
+        "Scales within Sliding Scales",
+        "Slow To Come Back",
+        "Southwing",
+        "Who do you think you are, Mars?",
+        "Worm"
+    });
+    
+    ns_etudes = StringArray({
+        "NS_1_Prelude",
+        "NS_2_Undertow",
+        "NS_3_Song",
+        "NS_4_Marbles",
+        "NS_5_Wallumrod",
+        "NS_6_PointsAmongLines",
+        "NS_7_Systerslaat",
+        "NS_8_ItIsEnough"
+    });
+    
+    
 }
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -44,8 +172,25 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     levelBuf.setSize(2, 25);
     
     gallery->prepareToPlay(sampleRate);
+
+
+#if JUCE_IOS
+    String osname = SystemStats::getOperatingSystemName();
+    float iosVersion = osname.fromLastOccurrenceOf("iOS ", false, true).getFloatValue();
     
-    loadPianoSamples(BKLoadHeavy);    
+    if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
+    else                    loadPianoSamples(BKLoadMedium);
+#else
+    loadPianoSamples(BKLoadHeavy);
+#endif
+    
+#if TRY_UNDO
+    for (int i = 0; i < NUM_EPOCHS; i++)
+    {
+        history.set(i, currentPiano);
+    }
+#endif
+
 }
 
 BKAudioProcessor::~BKAudioProcessor()
@@ -61,28 +206,43 @@ void BKAudioProcessor::deleteGallery(void)
     loadGalleryFromPath(firstGallery());
 }
 
+void BKAudioProcessor::deleteGalleryWithName(String name)
+{
+    File galleryPath;
+    
+#if JUCE_IOS
+    galleryPath = galleryPath.getSpecialLocation(File::userDocumentsDirectory);
+#endif
+    
+#if JUCE_MAC || JUCE_WINDOWS
+    galleryPath = galleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
+    
+    galleryPath = galleryPath.getChildFile(name+".xml");
+    
+    DBG("path: " + galleryPath.getFullPathName());
+    
+    galleryPath.deleteFile();
+}
+
 void BKAudioProcessor::createNewGallery(String name)
 {
     updateState->loadedJson = false;
     
     File bkGalleries;
+
+#if JUCE_IOS
+    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory);
+#endif
+    
+#if JUCE_MAC || JUCE_WINDOWS
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
     
-    /*
-    String newFileName = name + ".xml";
-    String newFilePath= bkGalleries.getFullPathName() + "/" + newFileName;
-    
-    File myFile (newFilePath);
-    myFile.appendData(BinaryData::__blank_xml, BinaryData::__blank_xmlSize);
-    
-    galleryNames.add(newFileName);
-    
-    currentGalleryPath = newFilePath;
-     */
     
     File myFile(bkGalleries);
     myFile = myFile.getNonexistentChildFile(name, ".xml", true);
-    myFile.appendData(BinaryData::__blank_xml, BinaryData::__blank_xmlSize);
+    myFile.appendData(BinaryData::Basic_Piano_xml, BinaryData::Basic_Piano_xmlSize);
     galleryNames.add(myFile.getFullPathName());
     
     ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
@@ -91,9 +251,14 @@ void BKAudioProcessor::createNewGallery(String name)
     {
         currentGallery = myFile.getFileName();
         currentGalleryPath = myFile.getFullPathName();
-        DBG("new gallery = " + currentGalleryPath);
         
+        xml->setAttribute("url", currentGalleryPath);
+        xml->setAttribute("name", currentGallery);
+
         gallery = new Gallery(xml, *this);
+        
+        gallery->setURL(currentGalleryPath);
+        gallery->setName(currentGallery);
         
         gallery->print();
         
@@ -109,15 +274,21 @@ void BKAudioProcessor::createNewGallery(String name)
 void BKAudioProcessor::renameGallery(String name)
 {
     File bkGalleries;
-    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
     
-    String relativePath = currentGalleryPath.fromFirstOccurrenceOf("bitKlavier resources/galleries/", false, false);
+#if JUCE_IOS
+    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory);
+#else
+    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
+    
+    String relativePath = currentGalleryPath.fromLastOccurrenceOf("/", false, false);
     
     File currentFile = bkGalleries.getChildFile(relativePath);
     
     String newFileName = name + ".xml";
-    String newFilePath= currentGalleryPath.upToFirstOccurrenceOf(currentGallery, false, false) + newFileName;
     
+    String newFilePath= currentGalleryPath.upToFirstOccurrenceOf(currentGallery, false, false) + newFileName;
+
     DBG("new file: "+ String(newFilePath));
     
     File newFile(newFilePath);
@@ -146,6 +317,13 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
     {
         DBG("change piano to " + String(whichPiano));
         setCurrentPiano(whichPiano);
+        
+        if (sustainIsDown)
+        {
+            for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                currentPiano->activePMaps[p]->sustainPedalPressed();
+        }
+        
     }
     
     // modifications
@@ -173,9 +351,12 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
         currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel);
     
     // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
-    for (p = prevPianos.size(); --p >= 0;) {
-        for (pm = prevPianos[p]->activePMaps.size(); --pm >= 0;) {
-            prevPianos[p]->activePMaps[pm]->postRelease(noteNumber, velocity, channel);
+    if (prevPiano != currentPiano)
+    {
+        for (p = prevPianos.size(); --p >= 0;) {
+            for (pm = prevPianos[p]->activePMaps.size(); --pm >= 0;) {
+                prevPianos[p]->activePMaps[pm]->postRelease(noteNumber, velocity, channel);
+            }
         }
     }
     
@@ -197,7 +378,15 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     // Process all active prep maps in current piano
     for (auto pmap : currentPiano->activePMaps)
-        pmap->processBlock(numSamples, m.getChannel());
+        pmap->processBlock(numSamples, m.getChannel(), false);
+    
+    // OLAGON: Process all active nostalgic preps in previous piano
+    if(prevPiano != currentPiano)
+    {
+        for (auto pmap : prevPiano->activePMaps)
+            pmap->processBlock(numSamples, m.getChannel(), true); // true for onlyNostalgic
+    }
+
     
     for(int i=0; i<notesOnUI.size(); i++)
     {
@@ -227,31 +416,46 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         {
             handleNoteOff(noteNumber, velocity, channel);
         }
-        else if (m.isController())
-        {
-            int controller = m.getControllerNumber();
-            int piano = controller-51;
-            
-            if ((m.getControllerValue() != 0) && piano >= 0 && piano < 5)   setCurrentPiano(piano);
-        }
         
         if (m.isSustainPedalOn())
         {
-            DBG("sustain pedal depressed");
-            for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                currentPiano->activePMaps[p]->sustainPedalPressed();
-            
+            if(!sustainIsDown)
+            {
+                sustainIsDown = true;
+                DBG("sustainPedalIsDown");
+                
+                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                    currentPiano->activePMaps[p]->sustainPedalPressed();
+            }
         }
         else if (m.isSustainPedalOff())
         {
-            DBG("sustain pedal released");
-            for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                currentPiano->activePMaps[p]->sustainPedalReleased();
+            if(sustainIsDown)
+            {
+                sustainIsDown = false;
+                
+                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                    currentPiano->activePMaps[p]->sustainPedalReleased();
+                
+                if(prevPiano != currentPiano)
+                {
+                    DBG("prev piano sustainPedalReleased() called");
+                    for (int p = prevPiano->activePMaps.size(); --p >= 0;)
+                        prevPiano->activePMaps[p]->sustainPedalReleased(true);
+                }
+            }
         }
     }
     
     // Sets some flags to determine whether to send noteoffs to previous pianos.
     if (!allNotesOff && !noteOnCount) {
+        
+        /*
+        // Process all active prep maps in previous piano
+        for (auto pmap : prevPiano->activePMaps)
+            pmap->processBlock(numSamples, m.getChannel());
+         */
+        
         prevPianos.clearQuick();
         allNotesOff = true;
     }
@@ -259,6 +463,10 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     mainPianoSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
+    
+#if JUCE_IOS
+    buffer.applyGain(0, numSamples, 0.25);
+#endif
     
     // store buffer for level calculation when needed
     levelBuf.copyFrom(0, 0, buffer, 0, 0, numSamples);
@@ -367,11 +575,14 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == TuningA1ClusterThresh)     active->setAdaptiveClusterThresh(modi);
         else if (type == TuningA1AnchorFundamental) active->setAdaptiveAnchorFundamental((PitchClass) modi);
         else if (type == TuningA1History)           active->setAdaptiveHistory(modi);
-        else if (type == TuningCustomScale)         active->setCustomScale(modfa);
+        else if (type == TuningCustomScale)
+        {
+            active->setTuning(CustomTuning);
+            active->setCustomScaleCents(modfa);
+        }
         else if (type == TuningAbsoluteOffsets)
         {
             for(int i = 0; i< modfa.size(); i+=2) {
-                //DBG("modfa AbsoluteOffsets val = " + String(modfa[i]) + " " + String(modfa[i+1]));
                 active->setAbsoluteOffset(modfa[i], modfa[i+1] * .01);
             }
         }
@@ -452,6 +663,8 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modafa = sMod[i]->getModArrFloatArr();
         modia = sMod[i]->getModIntArr();
         
+        DBG("transps: " + arrayFloatArrayToString(modafa));
+        
         if (type == SynchronicTranspOffsets)            active->setTransposition(modafa);
         else if (type == SynchronicMode)                active->setMode((SynchronicSyncMode)modi);
         else if (type == SynchronicClusterMin)          active->setClusterMin(modi);
@@ -469,6 +682,10 @@ void BKAudioProcessor::performModifications(int noteNumber)
 
 void BKAudioProcessor::saveGalleryAs(void)
 {
+#if JUCE_IOS
+    
+#else
+    
     FileChooser myChooser ("Save gallery to file...",
                            lastGalleryPath,
                            "*.xml");
@@ -479,23 +696,22 @@ void BKAudioProcessor::saveGalleryAs(void)
         currentGallery = myFile.getFileName();
         currentGalleryPath = myFile.getFullPathName();
         
-        String currentURL = gallery->getURL();
         String newURL = myFile.getFullPathName();
         
-        DBG("newURL: " + newURL);
-        
-        if (currentURL != newURL)   gallery->setURL(newURL);
-        
         ValueTree galleryVT = gallery->getState();
+        
+        galleryVT.setProperty("name", currentGallery, 0);
         
         ScopedPointer<XmlElement> myXML = galleryVT.createXml();
         
         myXML->writeToFile(myFile, String::empty);
-        
+
         gallery->setGalleryDirty(false);
         
         lastGalleryPath = myFile;
     }
+    
+#endif
     
     
     updateGalleries();
@@ -504,11 +720,51 @@ void BKAudioProcessor::saveGalleryAs(void)
     
 }
 
+void BKAudioProcessor::createGalleryWithName(String name)
+{
+    String newURL = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + name + ".xml";
+    
+    File file;
+    File myFile(newURL);
+    
+    ValueTree galleryVT = gallery->getState();
+    
+    galleryVT.setProperty("name", name, 0);
+    
+    ScopedPointer<XmlElement> myXML = galleryVT.createXml();
+    
+    myXML->writeToFile(myFile, String::empty);
+    
+    loadGalleryFromXml(myXML);
+    
+    lastGalleryPath = myFile;
+}
+
 void BKAudioProcessor::saveGallery(void)
 {
+#if JUCE_IOS
+    String url = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + gallery->getName();
+    
+    DBG("url: " + url);
+    
+    File file (url);
+    
+    ValueTree galleryVT = gallery->getState();
+    
+    ScopedPointer<XmlElement> myXML = galleryVT.createXml();
+    
+    myXML->writeToFile(file, String::empty);
+    
+    gallery->setGalleryDirty(false);
+    
+#else
+    
     String currentURL = gallery->getURL();
 
-    if (currentURL == String::empty)
+    File file (currentURL);
+    // NOT SURE ABOUT THIS FILE.EXISTSASFILE METHOD
+    
+    if (currentURL == String::empty || !file.existsAsFile())
     {
         saveGalleryAs();
         return;
@@ -525,6 +781,7 @@ void BKAudioProcessor::saveGallery(void)
         
         gallery->setGalleryDirty(false);
     }
+#endif
 }
 
 
@@ -537,8 +794,8 @@ void BKAudioProcessor::loadGalleryDialog(void)
         DBG("GALLERY IS DIRTY, CHECK FOR SAVE HERE");
         
         galleryIsDirtyAlertResult = AlertWindow::showYesNoCancelBox (AlertWindow::QuestionIcon,
-                                                                     "The current gallery has changed!",
-                                                                     "do you want to save it before loading a new gallery?",
+                                                                     "The current gallery has been modified.",
+                                                                     "Do you want to save before loading a new gallery?",
                                                                      String(),
                                                                      String(),
                                                                      String(),
@@ -554,7 +811,11 @@ void BKAudioProcessor::loadGalleryDialog(void)
         else if(galleryIsDirtyAlertResult == 1)
         {
             DBG("saving gallery first");
+#if JUCE_IOS
+            createGalleryWithName(gallery->getName());
+#else
             saveGallery();
+#endif
         }
     }
     
@@ -588,22 +849,14 @@ void BKAudioProcessor::loadGalleryDialog(void)
     
 }
 
-void BKAudioProcessor::loadGalleryFromPath(String path)
+void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
 {
-    updateState->loadedJson = false;
-    
-    File myFile (path);
-    currentGalleryPath = path;
-    
-    ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
-    
+    DBG("BKAudioProcessor::loadGalleryFromXml");
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
-        currentGallery = myFile.getFileName();
-        
         gallery = new Gallery(xml, *this);
         
-        gallery->print();
+        currentGallery = gallery->getName() + ".xml";
         
         initializeGallery();
         
@@ -611,6 +864,21 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
         
         gallery->setGalleryDirty(false);
     }
+}
+
+void BKAudioProcessor::loadGalleryFromPath(String path)
+{
+    updateState->loadedJson = false;
+    
+    File myFile (path);
+    
+    currentGalleryPath = path;
+    
+    ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
+    
+    loadGalleryFromXml(xml);
+    
+    gallery->setURL(path);
 }
 
 void BKAudioProcessor::loadJsonGalleryDialog(void)
@@ -690,22 +958,30 @@ void BKAudioProcessor::loadJsonGalleryFromPath(String path)
 
 void BKAudioProcessor::initializeGallery(void)
 {
+    
     prevPiano = gallery->getPianos().getFirst();
     
     int defPiano = gallery->getDefaultPiano();
-    if (defPiano >= gallery->getNumPianos() || defPiano < 1)
+
+    //if (defPiano >= gallery->getNumPianos() || defPiano < 1)
+    if (defPiano < 1)
     {
         defPiano = gallery->getPianos().getFirst()->getId();
     }
 
     currentPiano = gallery->getPiano(defPiano);
+    if(currentPiano == nullptr)
+    {
+        defPiano = gallery->getPianos().getFirst()->getId();
+        currentPiano = gallery->getPiano(defPiano);
+    }
     
     for (auto piano : gallery->getPianos())
     {
         piano->configure();
         if (piano->getId() > gallery->getIdCount(PreparationTypePiano)) gallery->setIdCount(PreparationTypePiano, piano->getId());
     }
-
+    
     gallery->prepareToPlay(bkSampleRate);
     
     updateUI();
@@ -842,6 +1118,32 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     
 }
 
+#if TRY_UNDO
+void BKAudioProcessor::updateHistory(void)
+{
+    for (int i = 0; i < NUM_EPOCHS; i++)
+    {
+        history.set(i+1, history.getUnchecked(i));
+    }
+    
+    history.set(0, currentPiano->duplicate(true));
+}
+
+void BKAudioProcessor::timeTravel(bool forward)
+{
+    if (forward)    epoch--;
+    else            epoch++;
+    
+    if (epoch >= NUM_EPOCHS) epoch = NUM_EPOCHS-1;
+    if (epoch <  0 ) epoch = 0;
+    
+    Piano::Ptr newPiano = history.getUnchecked(epoch);
+    
+    if (newPiano != nullptr) currentPiano = newPiano;
+    
+    updateState->pianoDidChangeForGraph = true;
+}
+#endif
 
 
 

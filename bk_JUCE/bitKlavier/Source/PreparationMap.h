@@ -40,13 +40,14 @@ public:
     inline void setId(int val)         { Id = val; print();   }
     inline int getId(void)             { return Id;           }
     
-    void processBlock(int numSamples, int midiChannel);
+    void processBlock(int numSamples, int midiChannel, bool onlyNostalgic = false);
     
     void keyPressed(int noteNumber, float velocity, int channel);
     void keyReleased(int noteNumber, float velocity, int channel);
     void postRelease(int noteNumber, float velocity, int channel);
     void sustainPedalPressed()  { sustainPedalIsDepressed = true;  }
-    void sustainPedalReleased();
+    void sustainPedalReleased(bool post);
+    void sustainPedalReleased() {sustainPedalReleased(false);};
     
     void setKeymap(Keymap::Ptr km);
     inline Keymap::Ptr getKeymap()              { return pKeymap; }

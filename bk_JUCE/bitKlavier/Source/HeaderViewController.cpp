@@ -8,73 +8,69 @@
   ==============================================================================
 */
 
+
+
 #include "HeaderViewController.h"
 
-#define SAVE_ID 1
-#define SAVEAS_ID 2
-#define OPEN_ID 3
-#define NEW_ID 4
-#define CLEAN_ID 5
-#define SETTINGS_ID 6
-#define OPENOLD_ID 7
-#define DIRECT_ID 8
-#define NOSTALGIC_ID 9
-#define SYNCHRONIC_ID 10
-#define TUNING_ID 11
-#define TEMPO_ID 12
-#define MODIFICATION_ID 13
-#define PIANOMAP_ID 14
-#define RESET_ID 15
-#define NEWGALLERY_ID 16
-#define DELETE_ID 17
-#define KEYMAP_ID 18
 
 HeaderViewController::HeaderViewController (BKAudioProcessor& p, BKConstructionSite* c):
 processor (p),
 construction(c)
 {
-    
     setLookAndFeel(&buttonsAndMenusLAF);
-    
-    addAndMakeVisible(loadB);
-    loadB.setButtonText("Load Samples");
-    loadB.addListener(this);
-    
+
     addAndMakeVisible(galleryB);
-    galleryB.setButtonText("Gallery Action");
+    galleryB.setButtonText("Gallery");
     galleryB.addListener(this);
     
     addAndMakeVisible(pianoB);
-    pianoB.setButtonText("Piano Action");
+    pianoB.setButtonText("Piano");
     pianoB.addListener(this);
+    
+    addAndMakeVisible(editB);
+    editB.setButtonText("Action");
+    editB.addListener(this);
     
     // Gallery CB
     addAndMakeVisible(galleryCB);
     galleryCB.setName("galleryCB");
     galleryCB.addListener(this);
-    galleryCB.addMyListener(this);
     //galleryCB.BKSetJustificationType(juce::Justification::centredRight);
     
+    galleryCB.setLookAndFeel(&comboBoxLeftJustifyLAF);
     galleryCB.setSelectedId(0, dontSendNotification);
-    lastGalleryCBId = galleryCB.getSelectedId();
     
     // Piano CB
     addAndMakeVisible(pianoCB);
     pianoCB.setName("pianoCB");
     pianoCB.addListener(this);
-    pianoCB.addMyListener(this);
-    pianoCB.BKSetJustificationType(juce::Justification::centredRight);
     
+#if JUCE_IOS || JUCE_MAC
+    bot.setBounds(0,0,20,20);
+    addAndMakeVisible(bot);
+#endif
+    
+    pianoCB.setLookAndFeel(&comboBoxRightJustifyLAF);
+    comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
+
     pianoCB.setSelectedId(0, dontSendNotification);
     
     galleryModalCallBackIsOpen = false;
+    
+    //loadDefaultGalleries();
+    
     fillGalleryCB();
+    fillPianoCB();
+    processor.updateState->pianoDidChangeForGraph = true;
     
 }
 
 HeaderViewController::~HeaderViewController()
 {
-    
+    galleryCB.setLookAndFeel(nullptr);
+    pianoCB.setLookAndFeel(nullptr);
+
+    setLookAndFeel(nullptr);
 }
 
 void HeaderViewController::paint (Graphics& g)
@@ -84,7 +80,7 @@ void HeaderViewController::paint (Graphics& g)
 
 void HeaderViewController::resized()
 {
-    float width = getWidth() / 7 - gXSpacing;
+    float width = getWidth() / 7;
     
     Rectangle<int> area (getLocalBounds());
     area.reduce(0, gYSpacing);
@@ -101,9 +97,9 @@ void HeaderViewController::resized()
     area.removeFromRight(gXSpacing);
     pianoCB.setBounds(area.removeFromRight(2*width));
     area.removeFromRight(gXSpacing);
-
+    
     area.removeFromLeft(gXSpacing);
-    loadB.setBounds(area);
+    editB.setBounds(area);
 }
 
 PopupMenu HeaderViewController::getLoadMenu(void)
@@ -111,9 +107,13 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     PopupMenu loadMenu;
     loadMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
-    int count = 0;
-    for (auto loadType : cBKSampleLoadTypes)
-        loadMenu.addItem(++count, loadType);
+    loadMenu.addItem(LOAD_LITEST,   "Lightest", processor.currentSampleType != BKLoadLitest, processor.currentSampleType == BKLoadLitest);
+
+    loadMenu.addItem(LOAD_LITE,     "Light", processor.currentSampleType != BKLoadLite, processor.currentSampleType == BKLoadLite);
+    
+    loadMenu.addItem(LOAD_MEDIUM,   "Medium", processor.currentSampleType != BKLoadMedium, processor.currentSampleType == BKLoadMedium);
+   
+    loadMenu.addItem(LOAD_HEAVY,    "Heavy", processor.currentSampleType != BKLoadHeavy, processor.currentSampleType == BKLoadHeavy);
     
     return loadMenu;
 }
@@ -124,35 +124,14 @@ PopupMenu HeaderViewController::getPianoMenu(void)
     pianoMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
     pianoMenu.addItem(1, "New");
+    pianoMenu.addSeparator();
     pianoMenu.addItem(2, "Duplicate");
-    pianoMenu.addItem(3, "Delete");
-    
     pianoMenu.addSeparator();
-    pianoMenu.addSubMenu("Add...", getNewMenu());
+    pianoMenu.addItem(4, "Rename");
     pianoMenu.addSeparator();
-   
-    //pianoMenu.addSeparator();
-    //pianoMenu.addItem(3, "Settings");
+    pianoMenu.addItem(3, "Remove");
     
     return pianoMenu;
-}
-
-PopupMenu HeaderViewController::getNewMenu(void)
-{
-    PopupMenu newMenu;
-    newMenu.setLookAndFeel(&buttonsAndMenusLAF);
-    
-    newMenu.addItem(KEYMAP_ID, "Keymap (k)");
-    newMenu.addItem(DIRECT_ID, "Direct (d)");
-    newMenu.addItem(NOSTALGIC_ID, "Nostalgic (n)");
-    newMenu.addItem(SYNCHRONIC_ID, "Synchronic (s)");
-    newMenu.addItem(TUNING_ID, "Tuning (t)");
-    newMenu.addItem(TEMPO_ID, "Tempo (m)");
-    newMenu.addItem(MODIFICATION_ID, "Modification (c)");
-    newMenu.addItem(PIANOMAP_ID, "Piano Map (p)");
-    newMenu.addItem(RESET_ID, "Reset (r)");
-    
-    return newMenu;
 }
 
 PopupMenu HeaderViewController::getGalleryMenu(void)
@@ -160,68 +139,111 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     PopupMenu galleryMenu;
     galleryMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
-    galleryMenu.addItem(SETTINGS_ID, "Settings...");
     galleryMenu.addSeparator();
-    galleryMenu.addItem(NEWGALLERY_ID, "New...");
-    galleryMenu.addSeparator();
-    galleryMenu.addItem(OPEN_ID, "Open...");
-    galleryMenu.addItem(OPENOLD_ID, "Open (legacy)...");
+    galleryMenu.addItem(NEWGALLERY_ID, "New");
+    
+    if (!processor.defaultLoaded)
+    {
+        galleryMenu.addSeparator();
+        galleryMenu.addItem(RENAME_ID, "Rename");
+        galleryMenu.addSeparator();
+        galleryMenu.addItem(DELETE_ID, "Remove");
+    }
+    
     galleryMenu.addSeparator();
     
-    String saveKeystroke = "(Cmd-S)";
-    String saveAsKeystroke = "(Shift-Cmd-S)";
+    if (!processor.defaultLoaded)   galleryMenu.addItem(SAVE_ID, "Save " );
+    galleryMenu.addItem(SAVEAS_ID, "Save as");
     
-#if JUCE_WINDOWS
-    saveKeystroke = "(Ctrl-S)";
-    saveAsKeystroke = "(Shift-Ctrl-S)"
+#if !JUCE_IOS
+    galleryMenu.addSeparator();
+    galleryMenu.addItem(OPEN_ID, "Open");
+    galleryMenu.addItem(OPENOLD_ID, "Open (legacy)");
 #endif
     
-    galleryMenu.addItem(SAVE_ID, "Save " );
-    galleryMenu.addItem(SAVEAS_ID, "Save as... ");
     galleryMenu.addSeparator();
     galleryMenu.addItem(CLEAN_ID, "Clean");
     galleryMenu.addSeparator();
-    galleryMenu.addItem(DELETE_ID, "Delete");
+    galleryMenu.addSubMenu("Load", getLoadMenu());
+    galleryMenu.addSeparator();
+    galleryMenu.addItem(SETTINGS_ID, "Settings");
+    
+    // ~ ~ ~ share menu ~ ~ ~
+#if JUCE_MAC
+    PopupMenu shareMenu;
+    
+    shareMenu.addItem(SHARE_EMAIL_ID, "Email");
+    galleryMenu.addSeparator();
+    shareMenu.addItem(SHARE_MESSAGE_ID, "Messages");
+    galleryMenu.addSeparator();
+    shareMenu.addItem(SHARE_FACEBOOK_ID, "Facebook");
+    // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    galleryMenu.addSeparator();
+    galleryMenu.addSubMenu("Share", shareMenu);
+#elif JUCE_IOS
+    galleryMenu.addSeparator();
+    galleryMenu.addItem(SHARE_MESSAGE_ID, "Share");
+#endif
+    
     
     
     return galleryMenu;
     
 }
 
-void HeaderViewController::loadMenuCallback(int result, HeaderViewController* gvc)
-{
-    gvc->processor.loadPianoSamples((BKSampleLoadType)(result-1));
-}
-
 void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* hvc)
 {
     BKAudioProcessor& processor = hvc->processor;
-    BKConstructionSite* construction = hvc->construction;
-    BKEditableComboBox* pianoCB = &hvc->pianoCB;
     
     if (result == 1) // New piano
     {
-        int newId = processor.gallery->getNewId(PreparationTypePiano);
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
-        processor.gallery->addTypeWithId(PreparationTypePiano, newId);
+        prompt.addTextEditor("name", "My New Piano");
         
-        String newName = "Piano"+String(newId);
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
         
-        processor.gallery->getPianos().getLast()->setName(newName);
+        int result = prompt.runModalLoop();
         
-        hvc->fillPianoCB();
+        String name = prompt.getTextEditorContents("name");
         
-        processor.setCurrentPiano(newId);
+        if (result == 1)
+        {
+            int newId = processor.gallery->getNewId(PreparationTypePiano);
+            
+            processor.gallery->addTypeWithId(PreparationTypePiano, newId);
+            
+            processor.gallery->getPianos().getLast()->setName(name);
+            
+            hvc->fillPianoCB();
+            
+            processor.setCurrentPiano(newId);
+        }
     }
     else if (result == 2) // Duplicate
     {
-        int newId = processor.gallery->duplicate(PreparationTypePiano, processor.currentPiano->getId());
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
-        String newName = "Piano"+String(newId);
+        prompt.addTextEditor("name", processor.currentPiano->getName() + " (2)");
         
-        hvc->fillPianoCB();
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
         
-        processor.setCurrentPiano(newId);
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            int newId = processor.gallery->duplicate(PreparationTypePiano, processor.currentPiano->getId());
+            
+            processor.setCurrentPiano(newId);
+            
+            processor.currentPiano->setName(name);
+            
+            hvc->fillPianoCB();
+        }
     }
     else if (result == 3) // Remove piano
     {
@@ -243,41 +265,45 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
         
         processor.setCurrentPiano(newPianoId);
     }
-    else if (result == KEYMAP_ID)
+    else if (result == 3) // Remove piano
     {
-        construction->addItem(PreparationTypeKeymap, true);
+        
+        int pianoId = hvc->pianoCB.getSelectedId();
+        int index = hvc->pianoCB.getSelectedItemIndex();
+        
+        if ((index == 0) && (hvc->pianoCB.getNumItems() == 1)) return;
+        
+        processor.gallery->remove(PreparationTypePiano, pianoId);
+        
+        hvc->fillPianoCB();
+        
+        int newPianoId = hvc->pianoCB.getItemId(index);
+        
+        if (newPianoId == 0) newPianoId = hvc->pianoCB.getItemId(index-1);
+        
+        hvc->pianoCB.setSelectedId(newPianoId, dontSendNotification);
+        
+        processor.setCurrentPiano(newPianoId);
     }
-    else if (result == DIRECT_ID)
+    else if (result == 4) // Rename
     {
-        construction->addItem(PreparationTypeDirect, true);
-    }
-    else if (result == NOSTALGIC_ID)
-    {
-        construction->addItem(PreparationTypeNostalgic, true);
-    }
-    else if (result == SYNCHRONIC_ID)
-    {
-        construction->addItem(PreparationTypeSynchronic, true);
-    }
-    else if (result == TUNING_ID)
-    {
-        construction->addItem(PreparationTypeTuning, true);
-    }
-    else if (result == TEMPO_ID)
-    {
-        construction->addItem(PreparationTypeTempo, true);
-    }
-    else if (result == MODIFICATION_ID)
-    {
-        construction->addItem(PreparationTypeGenericMod, true);
-    }
-    else if (result == PIANOMAP_ID)
-    {
-        construction->addItem(PreparationTypePianoMap, true);
-    }
-    else if (result == RESET_ID)
-    {
-        construction->addItem(PreparationTypeReset, true);
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        prompt.addTextEditor("name", processor.currentPiano->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            processor.currentPiano->setName(name);
+        }
+        
+        hvc->fillPianoCB();
     }
     
 }
@@ -285,13 +311,96 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
 void HeaderViewController::galleryMenuCallback(int result, HeaderViewController* gvc)
 {
     BKAudioProcessor& processor = gvc->processor;
-    if (result == SAVE_ID)
+    
+    if (result == RENAME_ID)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        prompt.addTextEditor("name", processor.gallery->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+#if JUCE_IOS
+            String lastName = processor.gallery->getName();
+            processor.createGalleryWithName(name);
+            processor.deleteGalleryWithName(lastName);
+#else
+            processor.renameGallery(name);
+#endif
+        }
+        
+        gvc->fillGalleryCB();
+    }
+    else if (result == SHARE_EMAIL_ID)
+    {
+        gvc->bot.share(processor.getCurrentGalleryPath(), 0);
+    }
+    else if (result == SHARE_MESSAGE_ID)
+    {
+        gvc->bot.share(processor.getCurrentGalleryPath(), 1);
+    }
+    else if (result == SHARE_FACEBOOK_ID)
+    {
+        gvc->bot.share(processor.getCurrentGalleryPath(), 2);
+    }
+    else if (result == LOAD_LITEST)
+    {
+        processor.gallery->sampleType = BKLoadLitest;
+        processor.loadPianoSamples(BKLoadLitest);
+    }
+    else if (result == LOAD_LITE)
+    {
+        processor.gallery->sampleType = BKLoadLite;
+        processor.loadPianoSamples(BKLoadLite);
+    }
+    else if (result == LOAD_MEDIUM)
+    {
+        processor.gallery->sampleType = BKLoadMedium;
+        processor.loadPianoSamples(BKLoadMedium);
+    }
+    else if (result == LOAD_HEAVY)
+    {
+        processor.gallery->sampleType = BKLoadHeavy;
+        processor.loadPianoSamples(BKLoadHeavy);
+    }
+    else if (result == SAVE_ID)
     {
         processor.saveGallery();
+        
+        processor.createGalleryWithName(processor.gallery->getName());
     }
     if (result == SAVEAS_ID)
     {
+#if JUCE_IOS
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        prompt.addTextEditor("name", processor.gallery->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        prompt.setTopLeftPosition(gvc->getWidth() / 2, gvc->getBottom() + gYSpacing);
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            processor.createGalleryWithName(name);
+        }
+        
+        gvc->fillGalleryCB();
+#else
         processor.saveGalleryAs();
+#endif
     }
     else if (result == OPEN_ID) // Load
     {
@@ -307,7 +416,13 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     }
     else if (result == DELETE_ID) // Clean
     {
+#if JUCE_IOS
+        processor.deleteGalleryWithName(processor.gallery->getName());
+        
+        gvc->galleryCB.setSelectedItemIndex(0);
+#else
         processor.deleteGallery();
+#endif
     }
     else if (result == OPENOLD_ID) // Load (old)
     {
@@ -329,7 +444,6 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         int result = prompt.runModalLoop();
         
         String name = prompt.getTextEditorContents("name");
-        DBG(name);
         
         if (result == 1)
         {
@@ -342,12 +456,10 @@ void HeaderViewController::bkButtonClicked (Button* b)
 {
     String name = b->getName();
     
-    if (b == &loadB)
+    if (b == &editB)
     {
-        PopupMenu loadMenu = getLoadMenu();
-        loadMenu.setLookAndFeel(&buttonsAndMenusLAF);
-        
-        loadMenu.showMenuAsync (PopupMenu::Options().withTargetComponent (&loadB), ModalCallbackFunction::forComponent (loadMenuCallback, this) );
+         getEditMenu(&buttonsAndMenusLAF, construction->getNumSelected()).showMenuAsync(PopupMenu::Options().withTargetComponent (b),
+         ModalCallbackFunction::forComponent (construction->editMenuCallback, construction) );
     }
     else if (b == &pianoB)
     {
@@ -361,24 +473,79 @@ void HeaderViewController::bkButtonClicked (Button* b)
     
 }
 
+void HeaderViewController::addGalleriesFromFolder(File folder)
+{
+    
+}
+
+
+void HeaderViewController::loadDefaultGalleries(void)
+{
+    if(!galleryModalCallBackIsOpen)
+    {
+        galleryCB.clear(dontSendNotification);
+        
+        PopupMenu* popupRoot = galleryCB.getRootMenu();
+        
+        String data,name, resource;
+        int id = 1;
+        
+        int size;
+        
+        PopupMenu mikroetudes_menu, ns_etudes_menu, bk_examples_menu;
+        
+        //data = BinaryData::Basic_Piano_xml;
+        for (int i = 0; i < BinaryData::namedResourceListSize; i++)
+        {
+            resource = BinaryData::namedResourceList[i];
+            
+            if (resource.contains("_xml"))
+            {
+                data = BinaryData::getNamedResource(BinaryData::namedResourceList[i], size);
+                
+                name = data.fromFirstOccurrenceOf("<gallery name=\"", false, true).upToFirstOccurrenceOf("\"", false, true);
+
+                if (processor.mikroetudes.contains(name))       mikroetudes_menu.addItem(id++, name);
+                else if (processor.ns_etudes.contains(name))    ns_etudes_menu.addItem(id++, name);
+                else if (processor.bk_examples.contains(name))  bk_examples_menu.addItem(id++, name);
+                else                                            galleryCB.addItem(name, id++);
+                
+            }
+        }
+        
+        popupRoot->addSubMenu("Examples", bk_examples_menu);
+        popupRoot->addSubMenu("Nostalgic Synchronic", ns_etudes_menu);
+        popupRoot->addSubMenu("Mikroetudes", mikroetudes_menu);
+        
+        galleryCB.addSeparator();
+        
+        numberOfDefaultGalleryItems = galleryCB.getNumItems();
+    }
+}
+
 void HeaderViewController::fillGalleryCB(void)
 {
     
     if(!galleryModalCallBackIsOpen)
     {
-        galleryCB.clear(dontSendNotification);
+        loadDefaultGalleries();
+        
+        File bkGalleries;
+        
+        File moreGalleries = File::getSpecialLocation(File::userDocumentsDirectory);
+        
+#if JUCE_MAC || JUCE_WINDOWS
+        bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
         
         PopupMenu* galleryCBPopUp = galleryCB.getRootMenu();
         
-        int index = 0;
+        int id = numberOfDefaultGalleryItems, index = 0;
         bool creatingSubmenu = false;
         String submenuName;
         
         StringArray submenuNames;
         OwnedArray<PopupMenu> submenus;
-        
-        File bkGalleries;
-        bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
         
         for (int i = 0; i < processor.galleryNames.size(); i++)
         {
@@ -387,7 +554,6 @@ void HeaderViewController::fillGalleryCB(void)
             String galleryName = thisFile.getFileName().upToFirstOccurrenceOf(".xml", false, false);
             
             //moving on to new submenu, if there is one, add add last submenu to popup now that it's done
-            //if(creatingSubmenu && thisFile.getRelativePathFrom(File ("~/bkGalleries")).initialSectionNotContaining("/") != submenuName)
             if(creatingSubmenu && thisFile.getParentDirectory().getFileName() != submenuName)
             {
                 galleryCBPopUp->addSubMenu(submenuName, *submenus.getLast());
@@ -395,10 +561,11 @@ void HeaderViewController::fillGalleryCB(void)
             }
             
             //add toplevel item, if there is one
-            //if(thisFile.getFileName() == thisFile.getRelativePathFrom(File ("~/bkGalleries"))) //if the file is in the main galleries
-            if(thisFile.getParentDirectory().getFileName() == bkGalleries.getFileName()) //if the file is in the main galleries directory....
+            if(thisFile.getParentDirectory().getFileName() == bkGalleries.getFileName() ||
+               thisFile.getParentDirectory().getFileName() == moreGalleries.getFileName() ||
+               thisFile.getParentDirectory().getFileName() == moreGalleries.getChildFile("Inbox").getFileName()) //if the file is in the main galleries directory....
             {
-                galleryCB.addItem(galleryName, i+1); //add to toplevel popup
+                galleryCB.addItem(galleryName, ++id); //add to toplevel popup
             }
             
             //otherwise add to or create submenu with name of subfolder
@@ -406,24 +573,28 @@ void HeaderViewController::fillGalleryCB(void)
             {
                 creatingSubmenu = true;
                 
-                //submenuName = thisFile.getRelativePathFrom(File ("~/bkGalleries")).initialSectionNotContaining("/"); //name of submenu
                 submenuName = thisFile.getParentDirectory().getFileName(); //name of submenu
                 
                 if(submenuNames.contains(submenuName)) //add to existing submenu
                 {
                     PopupMenu* existingMenu = submenus.getUnchecked(submenuNames.indexOf(submenuName));
-                    existingMenu->addItem(i + 1, galleryName);
+                    existingMenu->addItem(++id, galleryName);
                 }
                 else
                 {
                     submenus.add(new PopupMenu());
                     submenuNames.add(submenuName);
-
-                    submenus.getLast()->addItem(i + 1, galleryName);;
+                    
+                    submenus.getLast()->addItem(++id, galleryName);;
                 }
             }
-     
-            if (thisFile.getFileName() == processor.currentGallery) index = i;
+            
+            if (thisFile.getFileName() == processor.currentGallery)
+            {
+                DBG("filename: " + thisFile.getFileName() + " gallery: " + processor.currentGallery );
+                index = i;
+                lastGalleryCBId = id;
+            }
         }
         
         //add last submenu to popup, if there is one
@@ -432,12 +603,10 @@ void HeaderViewController::fillGalleryCB(void)
             galleryCBPopUp->addSubMenu(submenuName, *submenus.getLast());
             creatingSubmenu = false;
         }
-
-        galleryCB.setSelectedId(index+1, NotificationType::dontSendNotification);
         
-        File selectedFile(processor.galleryNames[index]);
-        processor.gallery->setURL(selectedFile.getFullPathName());
-        
+        // THIS IS WHERE NAME OF GALLERY DISPLAYED IS SET
+        galleryCB.setSelectedId(lastGalleryCBId, NotificationType::dontSendNotification);
+        galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true), NotificationType::dontSendNotification);
     }
 }
 
@@ -448,8 +617,8 @@ void HeaderViewController::update(void)
 
 void HeaderViewController::switchGallery()
 {
-    fillPianoCB();
     fillGalleryCB();
+    fillPianoCB();
 }
 
 void HeaderViewController::fillPianoCB(void)
@@ -459,8 +628,6 @@ void HeaderViewController::fillPianoCB(void)
     for (auto piano : processor.gallery->getPianos())
     {
         String name = piano->getName();
-        
-        DBG("pianoName: " + String(piano->getName()));
         
         if (name != String::empty)  pianoCB.addItem(name,  piano->getId());
         else                        pianoCB.addItem("Piano" + String(piano->getId()), piano->getId());
@@ -476,19 +643,6 @@ void HeaderViewController::bkTextFieldDidChange(TextEditor& tf)
     
     DBG(text);
     
-}
-
-void HeaderViewController::BKEditableComboBoxChanged(String text, BKEditableComboBox* cb)
-{
-    if (cb == &pianoCB)
-    {
-        processor.currentPiano->setName(text);
-    }
-    else if (cb == &galleryCB)
-    {
-        processor.renameGallery(text);
-        fillGalleryCB();
-    }
 }
 
 bool HeaderViewController::handleGalleryChange(void)
@@ -522,7 +676,38 @@ bool HeaderViewController::handleGalleryChange(void)
     else if(galleryIsDirtyAlertResult == 1)
     {
         DBG("saving gallery");
+        
+        
+#if JUCE_IOS
+        if (processor.defaultLoaded)
+        {
+            AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+            
+            prompt.addTextEditor("name", processor.gallery->getName());
+            
+            prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+            prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+            
+            int result = prompt.runModalLoop();
+            
+            String name = prompt.getTextEditorContents("name");
+            
+            if (result == 1)
+            {
+                processor.createGalleryWithName(name);
+            }
+        }
+        else
+        {
+            processor.createGalleryWithName(processor.gallery->getName());
+        }
+        
+        fillGalleryCB();
+#else
+        
         processor.saveGallery();
+        
+#endif
         
         shouldSwitch = true;
     }
@@ -542,9 +727,7 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
 {
     String name = cb->getName();
     int Id = cb->getSelectedId();
-    int index = cb->getSelectedItemIndex();
 
-    
     if (name == "pianoCB")
     {
         processor.setCurrentPiano(Id);
@@ -560,11 +743,34 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
         
         if (shouldSwitch)
         {
-            String path = processor.galleryNames[index];
             lastGalleryCBId = Id;
+            int index = Id - 1;
+
+            //if (index < numberOfDefaultGalleryItems)
+            if(cb->getSelectedItemIndex() < numberOfDefaultGalleryItems)
+            {
+                int size;
+                String xmlData = CharPointer_UTF8 (BinaryData::getNamedResource(BinaryData::namedResourceList[index], size));
+                
+                processor.defaultLoaded = true;
+                processor.defaultName = BinaryData::namedResourceList[index];
+                
+                processor.loadGalleryFromXml(XmlDocument::parse(xmlData));
+            }
+            else
+            {
+                index = index - numberOfDefaultGalleryItems;
+                String path = processor.galleryNames[index];
+                
+                processor.defaultLoaded = false;
+                processor.defaultName = "";
+         
+                if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
+                else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
+                
+                DBG("HeaderViewController::bkComboBoxDidChange combobox text = " + galleryCB.getText());
+            }
             
-            if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
-            else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
         }
         else
         {

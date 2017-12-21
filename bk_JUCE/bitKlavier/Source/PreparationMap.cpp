@@ -255,23 +255,30 @@ void PreparationMap::deactivateIfNecessary()
 }
 
 
-void PreparationMap::processBlock(int numSamples, int midiChannel)
+void PreparationMap::processBlock(int numSamples, int midiChannel, bool onlyNostalgic)
 {
-    for (auto dproc : dprocessor)
-        dproc->processBlock(numSamples, midiChannel);
-    
-    for (auto nproc : nprocessor)
-        nproc->processBlock(numSamples, midiChannel);
-    
-    for (auto sproc : sprocessor)
-        sproc->processBlock(numSamples, midiChannel);
-    
-    for (auto tproc : tprocessor)
-        tproc->processBlock(numSamples);
-    
-    for (auto mproc : mprocessor)
-        mproc->processBlock(numSamples, midiChannel);
+    if(onlyNostalgic) {
+        for (auto nproc : nprocessor)
+            nproc->processBlock(numSamples, midiChannel);
+    }
 
+    else
+    {
+        for (auto dproc : dprocessor)
+            dproc->processBlock(numSamples, midiChannel);
+        
+        for (auto sproc : sprocessor)
+            sproc->processBlock(numSamples, midiChannel);
+        
+        for (auto nproc : nprocessor)
+            nproc->processBlock(numSamples, midiChannel);
+        
+        for (auto tproc : tprocessor)
+            tproc->processBlock(numSamples);
+        
+        for (auto mproc : mprocessor)
+            mproc->processBlock(numSamples, midiChannel);
+    }
 }
 
 //not sure why some of these have Channel and some don't; should rectify?
@@ -279,6 +286,18 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel)
 {
     if (pKeymap->containsNote(noteNumber))
     {
+        
+        if(sustainPedalIsDepressed)
+        {
+            DBG("removing sustained note " + String(noteNumber));
+            
+            for(int i=0; i<sustainedNotes.size(); i++)
+            {
+                if(sustainedNotes.getUnchecked(i).noteNumber == noteNumber)
+                    sustainedNotes.remove(i);
+            }
+        }
+        
         for (auto proc : dprocessor)
             proc->keyPressed(noteNumber, velocity, channel);
         
@@ -345,14 +364,19 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
     }
 }
 
-void PreparationMap::sustainPedalReleased()
+void PreparationMap::sustainPedalReleased(bool post)
 {
     sustainPedalIsDepressed = false;
     
     //do all keyReleased calls now
+    
+
+    
     for(int n=0; n<sustainedNotes.size(); n++)
     {
         SustainedNote releaseNote = sustainedNotes.getUnchecked(n);
+        
+        DBG(releaseNote.noteNumber);
         
         for (auto proc : dprocessor)
         {
@@ -366,7 +390,8 @@ void PreparationMap::sustainPedalReleased()
         
         for (auto proc : nprocessor)
         {
-            proc->keyReleased(releaseNote.noteNumber, releaseNote.channel);
+            DBG("nostalgic sustainPedalReleased " + String((int)post));
+            proc->keyReleased(releaseNote.noteNumber, releaseNote.channel, post);
         }
     }
     
@@ -375,6 +400,19 @@ void PreparationMap::sustainPedalReleased()
 
 void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
 {
+    DBG("PreparationMap::postRelease");
+    
+    if(sustainPedalIsDepressed && pKeymap->containsNote(noteNumber))
+    {
+        SustainedNote newNote;
+        newNote.noteNumber = noteNumber;
+        newNote.velocity = velocity;
+        newNote.channel = channel;
+        DBG("storing sustained note " + String(noteNumber));
+        
+        sustainedNotes.add(newNote);
+    }
+    
     if (pKeymap->containsNote(noteNumber))
     {
         for (auto proc : dprocessor)
@@ -384,7 +422,7 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
         
         for (auto proc : nprocessor)
         {
-            proc->keyReleased(noteNumber, velocity);
+            if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber, velocity, true);
         }
         
         for (auto proc : mprocessor)

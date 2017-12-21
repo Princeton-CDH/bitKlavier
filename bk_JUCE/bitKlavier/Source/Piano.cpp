@@ -89,8 +89,12 @@ void Piano::configure(void)
     
     for (auto item : items)
     {
+        
         BKPreparationType thisType = item->getType();
         int thisId = item->getId();
+        
+        DBG("type: " + cPreparationTypes[thisType] + " Id: " + String(thisId));
+        DBG("bounds: " + rectangleToString(item->getBounds()));
         
         if (thisId > processor.gallery->getIdCount(thisType)) processor.gallery->setIdCount(thisType, thisId);
         
@@ -807,14 +811,14 @@ void Piano::deconfigureTempoModificationForKeys(TempoModPreparation::Ptr mod, Ar
         // Remove Modification from Key
         modificationMap[key]->removeTempoModification(whichMod);
         
-        DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
+        //DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
     }
 }
 
 void Piano::configureTuningModification(int key, TuningModPreparation::Ptr dmod, Array<int> whichPreps)
 {
     
-    DBG("TUNINGMOD key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
+    //DBG("TUNINGMOD key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
     
     int whichMod = dmod->getId();
 
@@ -860,7 +864,7 @@ void Piano::deconfigureTuningModificationForKeys(TuningModPreparation::Ptr mod, 
         // Remove Modification from Key
         modificationMap[key]->removeTuningModification(whichMod);
         
-        DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
+        //DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
     }
 }
 
@@ -1127,7 +1131,7 @@ void Piano::setState(XmlElement* e)
                     i = item->getStringAttribute("Y").getIntValue();
                     int y = i;
                     
-                    thisItem->setTopLeftPosition(x, y);
+                    thisItem->setCentrePosition(x, y);
                     
                     i = item->getStringAttribute("active").getIntValue();
                     bool active = (bool)i;
@@ -1168,7 +1172,7 @@ void Piano::setState(XmlElement* e)
                     i = connection->getStringAttribute("Y").getIntValue();
                     int y = i;
                     
-                    thisConnection->setTopLeftPosition(x, y);
+                    thisConnection->setCentrePosition(x, y);
                     
                     i = connection->getStringAttribute("active").getIntValue();
                     bool active = (bool)i;
@@ -1184,6 +1188,14 @@ void Piano::setState(XmlElement* e)
             
         }
     }
+    
+#if JUCE_IOS
+    for (auto item : items)
+    {
+        DBG("centre x: " + String(item->getX() + item->getWidth() / 2));
+        item->setCentrePosition((item->getX() + item->getWidth() / 2) * processor.uiScaleFactor, (item->getY() + item->getHeight() / 2) * processor.uiScaleFactor);
+    }
+#endif
 }
 
 

@@ -14,12 +14,15 @@
 #include "BKViewController.h"
 
 class SynchronicViewController :
-public BKMultiSliderListener,
+public BKMultiSlider::Listener,
 public BKViewController
 {
 public:
     SynchronicViewController(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~SynchronicViewController() {};
+    ~SynchronicViewController()
+    {
+        setLookAndFeel(nullptr);
+    };
     
     void paint (Graphics&) override;
     void resized() override;
@@ -66,8 +69,8 @@ private:
 
 class SynchronicPreparationEditor :
 public SynchronicViewController,
-public BKSingleSliderListener,
-public BKRangeSliderListener,
+public BKSingleSlider::Listener,
+public BKRangeSlider::Listener,
 public BKEditableComboBoxListener,
 public Timer
 {
@@ -110,14 +113,17 @@ private:
 
 class SynchronicModificationEditor :
 public SynchronicViewController,
-public BKSingleSliderListener,
-public BKRangeSliderListener,
+public BKSingleSlider::Listener,
+public BKRangeSlider::Listener,
 public BKEditableComboBoxListener,
 public Timer
 {
 public:
     SynchronicModificationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~SynchronicModificationEditor() {};
+    ~SynchronicModificationEditor()
+    {
+        setLookAndFeel(nullptr);
+    };
     
     void update(void) override;
     

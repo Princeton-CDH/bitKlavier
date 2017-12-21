@@ -20,7 +20,11 @@
 
 #include "BKConstructionSite.h"
 
-class HeaderViewController : public BKComponent, public BKListener, public BKEditableComboBoxListener
+#include "BKSlider.h"
+
+#include "ShareBot.h"
+
+class HeaderViewController : public BKComponent, public BKListener
 {
 public:
     HeaderViewController(BKAudioProcessor& p, BKConstructionSite* construction);
@@ -42,38 +46,46 @@ private:
     BKAudioProcessor& processor;
     
     int galleryIsDirtyAlertResult;
-
-    Gallery::Ptr currentGallery;
+    
+    ShareBot bot;
     
     
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override{};
     void bkComboBoxDidChange        (ComboBox* box)         override;
     void bkButtonClicked            (Button* b)             override;
-    void BKEditableComboBoxChanged(String text, BKEditableComboBox* cb) override;
     
-    static void loadMenuCallback(int result, HeaderViewController*);
     static void pianoMenuCallback(int result, HeaderViewController*);
     static void galleryMenuCallback(int result, HeaderViewController*);
+    
+    void loadDefaultGalleries(void);
+    
+    int numberOfDefaultGalleryItems;
+    
+    void addGalleriesFromFolder(File folder);
     
     PopupMenu getLoadMenu(void);
     PopupMenu getPianoMenu(void);
     PopupMenu getGalleryMenu(void);
-    PopupMenu getNewMenu(void);
+    
     //OwnedArray<PopupMenu> submenus;
     //StringArray submenuNames;
     
-    TextButton  loadB;
-    TextButton  pianoB;
-    TextButton  galleryB;
+    BKTextButton  editB;
+    BKTextButton  pianoB;
+    BKTextButton  galleryB;
     
-    BKEditableComboBox galleryCB;
-    BKEditableComboBox pianoCB;
-    int lastGalleryCBId;
+    //BKComboBox galleryCB;
+    //BKComboBox pianoCB;
+    ComboBox galleryCB;
+    ComboBox pianoCB;
+    int lastGalleryCBId, lastGalleryCBIndex;
     bool galleryModalCallBackIsOpen;
     
     BKConstructionSite* construction;
     
+    BKButtonAndMenuLAF comboBoxRightJustifyLAF;
+    BKButtonAndMenuLAF comboBoxLeftJustifyLAF;
     BKButtonAndMenuLAF buttonsAndMenusLAF;
     
     JUCE_LEAK_DETECTOR(HeaderViewController)

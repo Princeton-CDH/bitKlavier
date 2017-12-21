@@ -61,7 +61,6 @@ bool BKAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* BKAudioProcessor::createEditor()
 {
-
     return new BKAudioProcessorEditor (*this);
 }
 
@@ -77,10 +76,15 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
     {
         
         ValueTree galleryVT(vtagGalleryPath);
+        
+        galleryVT.setProperty("defaultLoaded", (int)defaultLoaded, 0);
+        galleryVT.setProperty("defaultName", defaultName, 0);
+        
         galleryVT.setProperty("galleryPath", currentGalleryPath, 0);
+        
         galleryVT.setProperty("defaultPiano", currentPiano->getId(), 0);
         
-        DBG("saving gallery to plugin state: getStateInformation() "
+        DBG("saving gallery and piano to plugin state: getStateInformation() "
             +  currentGalleryPath + " "
             + String(currentPiano->getId()));
         
@@ -108,16 +112,35 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
     //loadGallery
     if (galleryDidLoad)
     {
+        DBG("BKAudioProcessor::setStateInformation");
         
         ScopedPointer<XmlElement> galleryXML (getXmlFromBinary (data, sizeInBytes));
         if (galleryXML != nullptr)
         {
-            currentGalleryPath = galleryXML->getStringAttribute("galleryPath");
-            DBG("loading gallery from plugin state: setStateInformation() "
-                + currentGalleryPath + " "
-                + String(galleryXML->getStringAttribute("defaultPiano").getIntValue()));
+            defaultLoaded = (bool) galleryXML->getStringAttribute("defaultLoaded").getIntValue();
             
-            loadGalleryFromPath(currentGalleryPath);
+            if (defaultLoaded)
+            {
+                defaultName = galleryXML->getStringAttribute("defaultName");
+                
+                int size;
+                
+                String xmlData = BinaryData::getNamedResource(defaultName.toUTF8(), size);
+                
+                loadGalleryFromXml(XmlDocument::parse(xmlData));
+            }
+            else
+            {
+                currentGalleryPath = galleryXML->getStringAttribute("galleryPath");
+                currentGallery = galleryXML->getStringAttribute("name");
+                
+                DBG("loading gallery and piano from plugin state: setStateInformation() "
+                    + currentGalleryPath + " "
+                    + String(galleryXML->getStringAttribute("defaultPiano").getIntValue()));
+                
+                loadGalleryFromPath(currentGalleryPath);
+            }
+            
             
             //override gallery-saved defaultPiano with pluginHost-saved defaultPiano
             setCurrentPiano(galleryXML->getStringAttribute("defaultPiano").getIntValue());

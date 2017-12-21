@@ -10,6 +10,22 @@
 
 #include "BKUtilities.h"
 
+
+String rectangleToString(Rectangle<int> rect)
+{
+    return ("X: " + String(rect.getX()) +
+            " Y: " + String(rect.getY()) +
+            " W: " + String(rect.getWidth()) +
+            " H: " + String(rect.getHeight()));
+}
+String rectangleToString(Rectangle<float> rect)
+{
+    return ("X: " + String(rect.getX()) +
+            " Y: " + String(rect.getY()) +
+            " W: " + String(rect.getWidth()) +
+            " H: " + String(rect.getHeight()));
+}
+
 BKParameterDataType getBKDataType ( SynchronicParameterType type)
 {
     if ((type == SynchronicTuning) ||
@@ -596,9 +612,7 @@ Array<float> stringOrderedPairsToFloatArray(String s, int size)
             
             newval = tempFloat.getFloatValue();
             tempFloat = "";
-            
-            DBG("new array index and value " + String(newindex) + " " + String(newval));
-            
+
             newarray.set(newindex, newval);
         }
         else previousSpace = false;

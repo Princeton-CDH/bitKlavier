@@ -13,15 +13,14 @@
 
 #include "BKUtilities.h"
 
-#include "BKSynthesiser.h"
-
+class BKAudioProcessor;
 
 class BKSampleLoader
 {
 public:
-    void loadMainPianoSamples(BKSynthesiser *synth, BKSampleLoadType type);
-    void loadResonanceReleaseSamples(BKSynthesiser *synth);
-    void loadHammerReleaseSamples(BKSynthesiser *synth);
+    void loadMainPianoSamples(BKAudioProcessor& processor, BKSampleLoadType type);
+    void loadResonanceReleaseSamples(BKAudioProcessor& processor);
+    void loadHammerReleaseSamples(BKAudioProcessor& processor);
     
 private:
     

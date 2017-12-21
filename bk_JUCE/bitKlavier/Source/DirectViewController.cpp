@@ -26,6 +26,7 @@ BKViewController(p, theGraph)
     addAndMakeVisible(selectCB);
     
     transpositionSlider = new BKStackedSlider("transpositions", -12, 12, -12, 12, 0, 0.01);
+
     addAndMakeVisible(transpositionSlider);
     
     gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
@@ -33,7 +34,7 @@ BKViewController(p, theGraph)
     gainSlider->setJustifyRight(false);
     addAndMakeVisible(gainSlider);
     
-    resonanceGainSlider = new BKSingleSlider("resonance gain", 0, 10, 1, 0.01);
+    resonanceGainSlider = new BKSingleSlider("resonance gain", 0, 10, 0.2, 0.01);
     resonanceGainSlider->setSkewFactorFromMidPoint(1.);
     resonanceGainSlider->setJustifyRight(false);
     addAndMakeVisible(resonanceGainSlider);
@@ -43,14 +44,16 @@ BKViewController(p, theGraph)
     hammerGainSlider->setJustifyRight(false);
     addAndMakeVisible(hammerGainSlider);
     
-    addAndMakeVisible(hideOrShow);
-    hideOrShow.setName("hideOrShow");
-    hideOrShow.setButtonText(" X ");
+#if JUCE_IOS
+    transpositionSlider->addWantsKeyboardListener(this);
+    gainSlider->addWantsKeyboardListener(this);
+    resonanceGainSlider->addWantsKeyboardListener(this);
+    hammerGainSlider->addWantsKeyboardListener(this);
+#endif
     
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
-    
 }
 
 void DirectViewController::paint (Graphics& g)
@@ -61,36 +64,41 @@ void DirectViewController::paint (Graphics& g)
 void DirectViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
-    
-    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
-    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
-    
+
     iconImageComponent.setBounds(area);
-    area.reduce(10 * paddingScalarX + 4, 10 * paddingScalarY + 4);
+    area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * paddingScalarX);
+    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * processor.paddingScalarX);
     comboBoxSlice.removeFromLeft(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+
     comboBoxSlice.removeFromLeft(gXSpacing);
     
+#if JUCE_IOS
     actionButton.setBounds(selectCB.getRight()+gXSpacing,
                            selectCB.getY(),
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
+#else
+    actionButton.setBounds(selectCB.getRight()+gXSpacing,
+                           selectCB.getY(),
+                           selectCB.getWidth() * 0.5,
+                           selectCB.getHeight());
+#endif
     
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
     
     Rectangle<int> sliderSlice = leftColumn;
-    sliderSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    sliderSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     //sliderSlice.removeFromLeft(gXSpacing);
     /*
-     sliderSlice.reduce(4 + 2.*gPaddingConst * paddingScalarX,
-     4 + 2.*gPaddingConst * paddingScalarY);
+     sliderSlice.reduce(4 + 2.*gPaddingConst * processor.paddingScalarX,
+     4 + 2.*gPaddingConst * processor.paddingScalarY);
      */
     
     int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 5.;
@@ -112,16 +120,15 @@ void DirectViewController::resized()
                           gComponentSingleSliderHeight);
     
     //leftColumn.reduce(4, 0);
-    area.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    area.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     area.removeFromRight(gXSpacing);
     
     transpositionSlider->setBounds(area.getX(),
                                    resonanceGainSlider->getY(),
                                    area.getWidth(),
-                                   gComponentStackedSliderHeight + paddingScalarY * 30);
+                                   gComponentStackedSliderHeight + processor.paddingScalarY * 30);
     
 }
-
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ DirectPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~//
 DirectPreparationEditor::DirectPreparationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
@@ -139,8 +146,6 @@ DirectViewController(p, theGraph)
     resonanceGainSlider->addMyListener(this);
     
     hammerGainSlider->addMyListener(this);
-    
-    hideOrShow.addListener(this);
 }
 
 void DirectPreparationEditor::update(void)
@@ -164,7 +169,6 @@ void DirectPreparationEditor::bkMessageReceived (const String& message)
 {
     if (message == "direct/update")
     {
-        
         update();
     }
 }
@@ -263,7 +267,6 @@ void DirectPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableC
     fillSelectCB(0, processor.updateState->currentDirectId);
 }
 
-
 void DirectPreparationEditor::BKSingleSliderValueChanged(String name, double val)
 {
     DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
@@ -361,8 +364,6 @@ DirectViewController(p, theGraph)
     resonanceGainSlider->addMyListener(this);
     
     hammerGainSlider->addMyListener(this);
-    
-    hideOrShow.addListener(this);
 }
 
 void DirectModificationEditor::greyOutAllComponents()
@@ -565,6 +566,7 @@ void DirectModificationEditor::BKSingleSliderValueChanged(String name, double va
     updateModification();
 }
 
+
 void DirectModificationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {
     DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
@@ -591,5 +593,4 @@ void DirectModificationEditor::buttonClicked (Button* b)
         getModOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 }
-
 

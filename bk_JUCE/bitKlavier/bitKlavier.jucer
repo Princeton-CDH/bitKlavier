@@ -1,31 +1,150 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="0.0.1.b1"
+<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="1.9"
               bundleIdentifier="com.manyarrowsmusic.bitKlavier" includeBinaryInAppConfig="1"
-              buildVST="1" buildVST3="0" buildAU="1" buildAUv3="1" buildRTAS="0"
+              buildVST="1" buildVST3="0" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
               pluginManufacturer="manyarrowsmusic" pluginManufacturerCode="Manu"
               pluginCode="bK2m" pluginChannelConfigs="{0,2}" pluginIsSynth="1"
               pluginWantsMidiIn="1" pluginProducesMidiOut="1" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="1" pluginAUExportPrefix="BKAU" pluginRTASCategory=""
               aaxIdentifier="com.manyarrowsmusic.bitKlavier" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
-              jucerVersion="5.1.2" companyName="manyarrowsmusic" companyEmail="dtrueman@princeton.edu"
+              jucerVersion="5.2.0" companyName="manyarrowsmusic" companyEmail="dtrueman@princeton.edu"
               maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
               displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Light"
-              buildStandalone="1" enableIAA="0" cppLanguageStandard="11">
+              buildStandalone="1" enableIAA="0" cppLanguageStandard="11" companyCopyright="manyarrowsmusic">
   <MAINGROUP id="s4R02g" name="bitKlavier">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
       <GROUP id="{1E3013D4-6B2A-D996-A5C8-F92AE44A39F2}" name="Resources">
-        <GROUP id="{7F0BF645-3E7B-170B-9D26-4D950F9268C2}" name="presets">
-          <FILE id="GDbSie" name="__blank.xml" compile="0" resource="1" file="Source/__blank.xml"/>
+        <GROUP id="{9410D6F7-7039-77FB-F92B-3580A2A099FE}" name="galleries">
+          <GROUP id="{B6FA1321-FBCA-C3B2-8ADC-1F597F69E3E5}" name="Examples">
+            <FILE id="QvZSwW" name="1. Synchronic 1.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/1. Synchronic 1.xml"/>
+            <FILE id="Yj9I4e" name="2. Synchronic 2.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/2. Synchronic 2.xml"/>
+            <FILE id="Twyf0I" name="3. Synchronic 3.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/3. Synchronic 3.xml"/>
+            <FILE id="dBecZ2" name="4. Synchronic 4.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/4. Synchronic 4.xml"/>
+            <FILE id="z4MR7W" name="5. Synchronic 5.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/5. Synchronic 5.xml"/>
+            <FILE id="ISJSvc" name="6. Synchronic 6.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/6. Synchronic 6.xml"/>
+            <FILE id="HxyYCt" name="7. Synchronic 7.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/7. Synchronic 7.xml"/>
+            <FILE id="yRVvfr" name="8. Synchronic 8.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/8. Synchronic 8.xml"/>
+            <FILE id="MmG6TS" name="9. Synchronic 9.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/9. Synchronic 9.xml"/>
+            <FILE id="RNEUmL" name="10. Nostalgic 1.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/10. Nostalgic 1.xml"/>
+            <FILE id="VbY5IX" name="11. Nostalgic 2.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/11. Nostalgic 2.xml"/>
+            <FILE id="H6ji3v" name="12. Nostalgic 3.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/12. Nostalgic 3.xml"/>
+            <FILE id="HncW4r" name="13. Nostalgic 4.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/13. Nostalgic 4.xml"/>
+            <FILE id="lIRWH6" name="14. Nostalgic 5.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/14. Nostalgic 5.xml"/>
+            <FILE id="Egfl1d" name="15. Nostalgic 6.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/15. Nostalgic 6.xml"/>
+            <FILE id="jgn0eL" name="16. Tuning 1.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/16. Tuning 1.xml"/>
+            <FILE id="zaTArf" name="17. Tuning 2.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/17. Tuning 2.xml"/>
+            <FILE id="b5wTkJ" name="18. Tuning 3.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/18. Tuning 3.xml"/>
+            <FILE id="TxXKp8" name="19. Tuning 4.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/19. Tuning 4.xml"/>
+            <FILE id="gktl3L" name="20. Tuning 5.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/20. Tuning 5.xml"/>
+            <FILE id="pGIiRJ" name="21. Direct 1.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/21. Direct 1.xml"/>
+            <FILE id="cDkksP" name="22. Direct 2.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/22. Direct 2.xml"/>
+            <FILE id="tPjGZI" name="23. Adaptive Tempo 1.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/23. Adaptive Tempo 1.xml"/>
+            <FILE id="AhoDp9" name="24. Adaptive Tempo 2.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/24. Adaptive Tempo 2.xml"/>
+            <FILE id="Z2DkMi" name="25. Adaptive Tempo 3.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/25. Adaptive Tempo 3.xml"/>
+            <FILE id="Y08EzR" name="26. Adaptive Tempo 4.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/26. Adaptive Tempo 4.xml"/>
+            <FILE id="rH1HKW" name="27. PianoMapGallery.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/27. PianoMapGallery.xml"/>
+          </GROUP>
+          <GROUP id="{DC95ED57-B0B0-DFDE-4EA4-2AEDDF41B82F}" name="Mikroetudes">
+            <FILE id="o6aLKt" name="And So.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/And So.xml"/>
+            <FILE id="AYvN4l" name="Around 60.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/Around 60.xml"/>
+            <FILE id="UqmXa6" name="Circleville.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/Circleville.xml"/>
+            <FILE id="xjwjAJ" name="Crests.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/Crests.xml"/>
+            <FILE id="izQRPk" name="Cygnet.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/Cygnet.xml"/>
+            <FILE id="uDXWjy" name="Daily Decrease.xml" compile="0" resource="1"
+                  file="Source/galleries/Mikroetudes/Daily Decrease.xml"/>
+            <FILE id="KkwqzR" name="Didymus.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/Didymus.xml"/>
+            <FILE id="P0V7Gh" name="for Bill D.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/for Bill D.xml"/>
+            <FILE id="W6JUZC" name="Gigue Interrupted.xml" compile="0" resource="1"
+                  file="Source/galleries/Mikroetudes/Gigue Interrupted.xml"/>
+            <FILE id="HS0U3W" name="Houseboat.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/Houseboat.xml"/>
+            <FILE id="CzFPb2" name="Hurra.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/Hurra.xml"/>
+            <FILE id="YoRObk" name="Juxtaposed Weather.xml" compile="0" resource="1"
+                  file="Source/galleries/Mikroetudes/Juxtaposed Weather.xml"/>
+            <FILE id="GuWuXb" name="Keep It Steady (OrNot).xml" compile="0" resource="1"
+                  file="Source/galleries/Mikroetudes/Keep It Steady (OrNot).xml"/>
+            <FILE id="ao50Tl" name="Keep It Steady.xml" compile="0" resource="1"
+                  file="Source/galleries/Mikroetudes/Keep It Steady.xml"/>
+            <FILE id="sHlb5b" name="Listen.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/Listen.xml"/>
+            <FILE id="YVLn32" name="Mama's Musette.xml" compile="0" resource="1"
+                  file="Source/galleries/Mikroetudes/Mama's Musette.xml"/>
+            <FILE id="vNmvjy" name="Petite Gymnopedie.xml" compile="0" resource="1"
+                  file="Source/galleries/Mikroetudes/Petite Gymnopedie.xml"/>
+            <FILE id="oVpWpb" name="Pyramids.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/Pyramids.xml"/>
+            <FILE id="eOQnNt" name="Quickie.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/Quickie.xml"/>
+            <FILE id="xiGOYh" name="Scales within Sliding Scales.xml" compile="0"
+                  resource="1" file="Source/galleries/Mikroetudes/Scales within Sliding Scales.xml"/>
+            <FILE id="Bcbg9J" name="Slow To Come Back.xml" compile="0" resource="1"
+                  file="Source/galleries/Mikroetudes/Slow To Come Back.xml"/>
+            <FILE id="WwPj4w" name="Southwing.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/Southwing.xml"/>
+            <FILE id="wlDQ25" name="Who do you think you are Mars.xml" compile="0"
+                  resource="1" file="Source/galleries/Mikroetudes/Who do you think you are Mars.xml"/>
+            <FILE id="djGU0V" name="Worm.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/Worm.xml"/>
+          </GROUP>
+          <GROUP id="{045CD559-8422-68D9-36F0-6ADFE0AF19C2}" name="Nostalgic Synchronic">
+            <FILE id="jOwwkD" name="NS_1_Prelude.xml" compile="0" resource="1"
+                  file="Source/galleries/Nostalgic Synchronic/NS_1_Prelude.xml"/>
+            <FILE id="u06nQX" name="NS_2_Undertow.xml" compile="0" resource="1"
+                  file="Source/galleries/Nostalgic Synchronic/NS_2_Undertow.xml"/>
+            <FILE id="qDPPdy" name="NS_3_Song.xml" compile="0" resource="1" file="Source/galleries/Nostalgic Synchronic/NS_3_Song.xml"/>
+            <FILE id="dMpeFo" name="NS_4_Marbles.xml" compile="0" resource="1"
+                  file="Source/galleries/Nostalgic Synchronic/NS_4_Marbles.xml"/>
+            <FILE id="yJI0Jm" name="NS_5_Wallumrod.xml" compile="0" resource="1"
+                  file="Source/galleries/Nostalgic Synchronic/NS_5_Wallumrod.xml"/>
+            <FILE id="y0LuZ7" name="NS_6_PointsAmongLines.xml" compile="0" resource="1"
+                  file="Source/galleries/Nostalgic Synchronic/NS_6_PointsAmongLines.xml"/>
+            <FILE id="ZZBif2" name="NS_7_Systerslaat.xml" compile="0" resource="1"
+                  file="Source/galleries/Nostalgic Synchronic/NS_7_Systerslaat.xml"/>
+            <FILE id="NyhWGm" name="NS_8_ItIsEnough.xml" compile="0" resource="1"
+                  file="Source/galleries/Nostalgic Synchronic/NS_8_ItIsEnough.xml"/>
+          </GROUP>
+          <FILE id="askqrZ" name="Basic Piano.xml" compile="0" resource="1" file="Source/galleries/Basic Piano.xml"/>
+          <FILE id="wtEnXB" name="Mike's Gallery.xml" compile="0" resource="1"
+                file="Source/galleries/Mike's Gallery.xml"/>
         </GROUP>
-        <FILE id="U1tlUf" name="bk.icns" compile="0" resource="0" file="Source/icons/bk.icns"
-              xcodeResource="1"/>
         <GROUP id="{6F7CFDA8-D246-D5B9-B60B-EDBE0C6F3537}" name="icons">
+          <FILE id="Dl47P7" name="bitKlavier_x.png" compile="0" resource="1"
+                file="Source/bitKlavier_x.png"/>
           <FILE id="fiXHO5" name="direct_icon.png" compile="0" resource="1" file="Source/icons/direct_icon.png"/>
           <FILE id="CHQGaP" name="general_icon.png" compile="0" resource="1"
                 file="Source/icons/general_icon.png"/>
           <FILE id="a9zMwc" name="icon.png" compile="0" resource="1" file="Source/icons/icon.png"/>
+          <FILE id="ThAZEr" name="icon_ios_large.png" compile="0" resource="1"
+                file="Source/icons/icon_ios_large.png"/>
+          <FILE id="RCvUKe" name="icon_ios_small.png" compile="0" resource="1"
+                file="Source/icons/icon_ios_small.png"/>
+          <FILE id="XA1tC4" name="icon_win_large.png" compile="0" resource="1"
+                file="Source/icons/icon_win_large.png"/>
+          <FILE id="u4lh0r" name="icon_win_small.png" compile="0" resource="1"
+                file="Source/icons/icon_win_small.png"/>
           <FILE id="jAEdvs" name="keymap_icon.png" compile="0" resource="1" file="Source/icons/keymap_icon.png"/>
           <FILE id="iljBYp" name="mod_direct_icon.png" compile="0" resource="1"
                 file="Source/icons/mod_direct_icon.png"/>
@@ -133,6 +252,10 @@
         </GROUP>
       </GROUP>
       <GROUP id="{07677963-38EF-2F51-36FA-17646727446F}" name="Controller">
+        <FILE id="ybYtMd" name="ShareBot.h" compile="0" resource="0" file="Source/ShareBot.h"/>
+        <FILE id="rnxxIN" name="ShareBot.mm" compile="1" resource="0" file="Source/ShareBot.mm"/>
+        <FILE id="QpXmnO" name="BKViewController.cpp" compile="1" resource="0"
+              file="Source/BKViewController.cpp"/>
         <FILE id="pXYbqY" name="BKViewController.h" compile="0" resource="0"
               file="Source/BKViewController.h"/>
         <FILE id="PVkjL7" name="BKOvertop.h" compile="0" resource="0" file="Source/BKOvertop.h"/>
@@ -197,6 +320,10 @@
         </GROUP>
       </GROUP>
       <GROUP id="{E98AFB64-DE96-83A1-81DC-1FA2D8D37DB8}" name="View">
+        <FILE id="sM6zCj" name="BKUIComponents.h" compile="0" resource="0"
+              file="Source/BKUIComponents.h"/>
+        <FILE id="Rorw4u" name="BKNumberPad.cpp" compile="1" resource="0" file="Source/BKNumberPad.cpp"/>
+        <FILE id="wjhX6E" name="BKNumberPad.h" compile="0" resource="0" file="Source/BKNumberPad.h"/>
         <GROUP id="{312ACC06-200C-E792-F54F-FC9ABB97A738}" name="BKSlider">
           <FILE id="mqhm7K" name="BKSlider.cpp" compile="1" resource="0" file="Source/BKSlider.cpp"/>
           <FILE id="NyvzY3" name="BKSlider.h" compile="0" resource="0" file="Source/BKSlider.h"/>
@@ -243,54 +370,87 @@
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        osxArchitecture="default" cppLibType="" osxCompatibility="default"
-                       osxSDK="default"/>
-        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="bitKlavier"/>
+                       osxSDK="default" enablePluginBinaryCopyStep="1"/>
+        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="bitKlavier"
+                       osxCompatibility="10.9 SDK" osxSDK="default" enablePluginBinaryCopyStep="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_video" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_opengl" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_video" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../../JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
-    <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="portraitlandscape"
-                  aaxFolder="" iosBackgroundAudio="1" UIFileSharingEnabled="1"
-                  iosDevelopmentTeamID="" rtasFolder="" vst3Folder="">
+    <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="landscape" keepCustomXcodeSchemes="1"
+                  customXcodeResourceFolders="~/Documents/bitKlavier resources/samples/"
+                  iosBackgroundAudio="1" iosDevelopmentTeamID="YT6AXURH62" UIFileSharingEnabled="1"
+                  smallIcon="RCvUKe" bigIcon="ThAZEr" customPList="&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&#10;&lt;plist&gt;&#10;&#9;&lt;dict&gt;&#10;&#9;&#9;&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&lt;dict&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;CFBundleTypeName&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;XML&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSHandlerRank&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;Alternate&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSItemContentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;public.xml&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&#9;&#9;&#9;&lt;/dict&gt;&#10;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
+                  iPadScreenOrientation="landscape" iosDeviceFamily="1,2" PListPreprocess="1"
+                  iosBackgroundBle="1">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="MRM" iosCompatibility="default"
-                       codeSigningIdentity="iPhone Developer: Michael Mulshine (SW843MMG7S)"/>
-        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="MRM"
-                       iosCompatibility="default" codeSigningIdentity="iPhone Developer: Michael Mulshine (SW843MMG7S)"/>
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
+                       plistPreprocessorDefinitions="" iosCompatibility="8.0" enablePluginBinaryCopyStep="1"
+                       codeSigningIdentity="QY96HSP2FJ"/>
+        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="bitKlavier"
+                       iosCompatibility="8.0" enablePluginBinaryCopyStep="1" codeSigningIdentity="QY96HSP2FJ"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_video" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_opengl" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_video" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../../../JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
+    <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="C:\SDKs\VST3_SDK"
+            bigIcon="D50AzU" smallIcon="wvKUCU" windowsTargetPlatformVersion="10.0.16299.0">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="1" optimisation="1" targetName="bitKlavier" debugInformationFormat="ProgramDatabase"
+                       enablePluginBinaryCopyStep="0"/>
+        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="0" optimisation="3" targetName="bitKlavier" debugInformationFormat="ProgramDatabase"
+                       enablePluginBinaryCopyStep="0" linkTimeOptimisation="1"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_video" path="..\..\..\JUCE\modules"/>
+        <MODULEPATH id="juce_opengl" path="..\..\..\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_extra" path="..\..\..\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_basics" path="..\..\..\JUCE\modules"/>
+        <MODULEPATH id="juce_graphics" path="..\..\..\JUCE\modules"/>
+        <MODULEPATH id="juce_events" path="..\..\..\JUCE\modules"/>
+        <MODULEPATH id="juce_data_structures" path="..\..\..\JUCE\modules"/>
+        <MODULEPATH id="juce_cryptography" path="..\..\..\JUCE\modules"/>
+        <MODULEPATH id="juce_core" path="..\..\..\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_utils" path="..\..\..\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_processors" path="..\..\..\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="..\..\..\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_formats" path="..\..\..\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_devices" path="..\..\..\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_basics" path="..\..\..\JUCE\modules"/>
+      </MODULEPATHS>
+    </VS2017>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0"/>

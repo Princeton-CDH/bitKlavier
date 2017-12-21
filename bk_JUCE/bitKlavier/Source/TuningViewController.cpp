@@ -44,22 +44,22 @@ BKViewController(p,theGraph)
     A1IntervalScaleCB.addListener(this);
     addAndMakeVisible(A1IntervalScaleCB);
     
-    A1IntervalScaleLabel.setText("Adaptive Scale:", dontSendNotification);
+    A1IntervalScaleLabel.setText("Adaptive:", dontSendNotification);
     //A1IntervalScaleLabel.setJustificationType(juce::Justification::centredRight);
     addAndMakeVisible(A1IntervalScaleLabel);
     
     A1Inversional.setButtonText ("invert");
     A1Inversional.setToggleState (true, dontSendNotification);
     //buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
-    A1Inversional.setColour(ToggleButton::textColourId, Colours::white);
-    A1Inversional.setColour(ToggleButton::tickColourId, Colours::white);
-    A1Inversional.setColour(ToggleButton::tickDisabledColourId, Colours::white);
+    A1Inversional.setColour(ToggleButton::textColourId, Colours::antiquewhite);
+    A1Inversional.setColour(ToggleButton::tickColourId, Colours::antiquewhite);
+    A1Inversional.setColour(ToggleButton::tickDisabledColourId, Colours::antiquewhite);
     addAndMakeVisible(A1Inversional);
     
     A1AnchorScaleCB.setName("A1AnchorScale");
     addAndMakeVisible(A1AnchorScaleCB);
     
-    A1AnchorScaleLabel.setText("Anchor Scale:", dontSendNotification);
+    A1AnchorScaleLabel.setText("Anchor:", dontSendNotification);
     //A1AnchorScaleLabel.setJustificationType(juce::Justification::centredRight);
     addAndMakeVisible(A1AnchorScaleLabel);
     
@@ -69,15 +69,15 @@ BKViewController(p,theGraph)
     //A1FundamentalLabel.setText("Adaptive 1 Anchor Fundamental", dontSendNotification);
     //addAndMakeVisible(A1FundamentalLabel);
     
-    A1ClusterThresh = new BKSingleSlider("Cluster Threshold", 1, 1000, 0, 1);
+    A1ClusterThresh = new BKSingleSlider("Threshold", 1, 1000, 0, 1);
     A1ClusterThresh->setJustifyRight(false);
     addAndMakeVisible(A1ClusterThresh);
     
-    A1ClusterMax = new BKSingleSlider("Cluster Maximum", 1, 8, 1, 1);
+    A1ClusterMax = new BKSingleSlider("Maximum", 1, 8, 1, 1);
     A1ClusterMax->setJustifyRight(false);
     addAndMakeVisible(A1ClusterMax);
     
-    //A1reset.setButtonText("reset");
+    A1reset.setButtonText("reset");
     addAndMakeVisible(A1reset);
     
     fillTuningCB();
@@ -86,55 +86,60 @@ BKViewController(p,theGraph)
     // Absolute Tuning Keyboard
     absoluteOffsets.ensureStorageAllocated(128);
     for(int i=0; i<128; i++) absoluteOffsets.add(0.);
-    absoluteKeyboard.setName("Key-by-Key Offsets");
+    absoluteKeyboard.setName("absolute");
+    absoluteKeyboard.setAlpha(1);
     addAndMakeVisible(absoluteKeyboard);
     
     //Custom Tuning Keyboard
     customOffsets.ensureStorageAllocated(12);
     for(int i=0; i<12; i++) customOffsets.add(0.);
-    customKeyboard.setName("Temperament Offsets");
+
+    customKeyboard.setName("scale");
     //customKeyboard.setAvailableRange(60, 71);
+    customKeyboard.setDimensionRatio(2.0);
     customKeyboard.setAvailableRange(0, 11);
     customKeyboard.useOrderedPairs(false);
     customKeyboard.setFundamental(0);
     addAndMakeVisible(customKeyboard);
     
-    offsetSlider = new BKSingleSlider("Global Offset (cents)", -100, 100, 0, 0.1);
+    offsetSlider = new BKSingleSlider("offset: ", -100, 100, 0, 0.1);
     addAndMakeVisible(offsetSlider);
     
-    lastNote.setText("last note: ", dontSendNotification);
-    lastInterval.setText("last interval: ", dontSendNotification);
+    lastNote.setText("note: ", dontSendNotification);
+    lastInterval.setText("interval: ", dontSendNotification);
     lastInterval.setJustificationType(juce::Justification::centredRight);
     addAndMakeVisible(lastNote);
     addAndMakeVisible(lastInterval);
     
-    addAndMakeVisible(hideOrShow);
-    hideOrShow.setName("hideOrShow");
-    hideOrShow.setButtonText(" X ");
-    
-    addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
+    addAndMakeVisible(actionButton);
+    
+#if JUCE_IOS
+    offsetSlider->addWantsKeyboardListener(this);
+    absoluteKeyboard.addWantsKeyboardListener(this);
+    customKeyboard.addWantsKeyboardListener(this);
+    A1ClusterThresh->addWantsKeyboardListener(this);
+    A1ClusterMax->addWantsKeyboardListener(this);
+#endif
 }
 
 void TuningViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
     
-    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
-    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
-    
     iconImageComponent.setBounds(area);
-    area.reduce(10 * paddingScalarX + 4, 10 * paddingScalarY + 4);
+    area.reduce(10 * processor.paddingScalarX+3, 10 * processor.paddingScalarY+3);
     
-    float keyboardHeight = 60 + 50 * paddingScalarY;
+    float keyboardHeight = 100 + 50 * processor.paddingScalarY;
     Rectangle<int> absoluteKeymapRow = area.removeFromBottom(keyboardHeight);
     absoluteKeymapRow.reduce(gXSpacing, 0);
+    
     absoluteKeyboard.setBounds(absoluteKeymapRow);
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    comboBoxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    comboBoxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
@@ -145,7 +150,11 @@ void TuningViewController::resized()
                            selectCB.getHeight());
     
     comboBoxSlice.removeFromLeft(gXSpacing);
-    A1reset.setBounds(comboBoxSlice.removeFromLeft(90));
+    
+    A1reset.setBounds(actionButton.getRight()+gXSpacing,
+                      actionButton.getY(),
+                      actionButton.getWidth(),
+                      actionButton.getHeight());
     
     /* *** above here should be generic (mostly) to all prep layouts *** */
     /* ***         below here will be specific to each prep          *** */
@@ -153,34 +162,27 @@ void TuningViewController::resized()
     // ********* right column
     
     Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
-    modeSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    modeSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     modeSlice.removeFromRight(gXSpacing);
     scaleCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
     
-    modeSlice.removeFromLeft(gXSpacing + gPaddingConst * paddingScalarX);
+    modeSlice.removeFromLeft(gXSpacing + gPaddingConst * processor.paddingScalarX);
     fundamentalCB.setBounds(modeSlice);
     
-    int customKeyboardHeight = 60 + 70. * paddingScalarY;
-    int extraY = (area.getHeight() - (customKeyboardHeight + gComponentSingleSliderHeight + gComponentTextFieldHeight + gYSpacing * 4)) * 0.25;
+    int customKeyboardHeight = 80 + 70. * processor.paddingScalarY;
+    int extraY = (area.getHeight() - (customKeyboardHeight + gComponentSingleSliderHeight + gYSpacing * 3)) * 0.25;
     
-    area.removeFromTop(extraY + gYSpacing);
+    area.removeFromTop(extraY);
     Rectangle<int> customKeyboardSlice = area.removeFromTop(customKeyboardHeight);
-    customKeyboardSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    customKeyboardSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     customKeyboardSlice.removeFromRight(gXSpacing);
     customKeyboard.setBounds(customKeyboardSlice);
     
-    area.removeFromTop(extraY + gYSpacing);
+    area.removeFromTop(extraY);
     Rectangle<int> offsetSliderSlice = area.removeFromTop(gComponentSingleSliderHeight);
-    offsetSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
+    offsetSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     offsetSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
     offsetSlider->setBounds(offsetSliderSlice);
-    
-    area.removeFromTop(extraY + gYSpacing);
-    Rectangle<int> lastNoteSlice = area.removeFromTop(gComponentTextFieldHeight);
-    lastNoteSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);
-    lastNoteSlice.removeFromRight(gXSpacing);
-    lastNote.setBounds(lastNoteSlice.removeFromLeft(lastNoteSlice.getWidth() * 0.5));
-    lastInterval.setBounds(lastNoteSlice);
     
     // ********* left column
     
@@ -193,7 +195,7 @@ void TuningViewController::resized()
     
     leftColumn.removeFromTop(extraY + gYSpacing);
     Rectangle<int> A1IntervalScaleCBSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    A1IntervalScaleCBSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    A1IntervalScaleCBSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     A1IntervalScaleCBSlice.removeFromLeft(gXSpacing);
     int tempwidth = A1IntervalScaleCBSlice.getWidth() / 3.;
     A1Inversional.setBounds(A1IntervalScaleCBSlice.removeFromRight(tempwidth));
@@ -202,25 +204,30 @@ void TuningViewController::resized()
     
     leftColumn.removeFromTop(extraY + gYSpacing);
     Rectangle<int> A1ClusterMaxSlice = leftColumn.removeFromTop(gComponentSingleSliderHeight);
-    A1ClusterMaxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
+    A1ClusterMaxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     //A1ClusterMaxSlice.removeFromLeft(gXSpacing);
     A1ClusterMax->setBounds(A1ClusterMaxSlice);
     
     leftColumn.removeFromTop(gYSpacing);
     Rectangle<int> A1ClusterThreshSlice = leftColumn.removeFromTop(gComponentSingleSliderHeight);
-    A1ClusterThreshSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
+    A1ClusterThreshSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     //A1ClusterThreshSlice.removeFromLeft(gXSpacing);
     A1ClusterThresh->setBounds(A1ClusterThreshSlice);
     
     leftColumn.removeFromTop(extraY + gYSpacing);
     Rectangle<int> A1AnchorScaleCBSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    A1AnchorScaleCBSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    A1AnchorScaleCBSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     A1AnchorScaleCBSlice.removeFromLeft(gXSpacing);
     tempwidth = A1AnchorScaleCBSlice.getWidth() / 3.;
     A1AnchorScaleLabel.setBounds(A1AnchorScaleCBSlice.removeFromLeft(tempwidth));
     A1AnchorScaleCB.setBounds(A1AnchorScaleCBSlice.removeFromLeft(tempwidth));
     A1AnchorScaleCBSlice.removeFromLeft(gXSpacing);
     A1FundamentalCB.setBounds(A1AnchorScaleCBSlice);
+    
+    Rectangle<float> editAllBounds = absoluteKeyboard.getEditAllBounds();
+    editAllBounds.translate(absoluteKeyboard.getX(), absoluteKeyboard.getY());
+    lastNote.setBounds(editAllBounds.getRight() + gXSpacing, editAllBounds.getY(),editAllBounds.getWidth() * 2, editAllBounds.getHeight());
+    lastInterval.setBounds(lastNote.getRight() + gXSpacing, lastNote.getY(),lastNote.getWidth(), lastNote.getHeight());
     
 }
 
@@ -255,7 +262,6 @@ void TuningViewController::fillTuningCB(void)
                 
         if(name == "Custom") {
             customIndex = i;
-            DBG("assigned to customIndex " + String(customIndex));
         }
     }
 }
@@ -354,8 +360,6 @@ TuningViewController(p, theGraph)
     
     offsetSlider->addMyListener(this);
     
-    hideOrShow.addListener(this);
-    
     startTimer(50);
     
     update();
@@ -372,8 +376,8 @@ void TuningPreparationEditor::timerCallback()
             if (tProcessor->getLastNoteTuning() != lastNoteTuningSave)
             {
                 lastNoteTuningSave = tProcessor->getLastNoteTuning();
-                lastNote.setText("last note: " + String(lastNoteTuningSave), dontSendNotification);
-                lastInterval.setText("last interval: "  + String(tProcessor->getLastIntervalTuning()), dontSendNotification);
+                lastNote.setText("note: " + String(lastNoteTuningSave, 3), dontSendNotification);
+                lastInterval.setText("interval: "  + String(tProcessor->getLastIntervalTuning(), 3), dontSendNotification);
             }
         }
         
@@ -575,7 +579,8 @@ void TuningPreparationEditor::update(void)
         fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
         offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
         
-        absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
+        //absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
+        absoluteKeyboard.setValuesAbsolute(prep->getAbsoluteOffsetsCents());
         Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         customKeyboard.setValues(currentTuning->getCurrentScaleCents());
         
@@ -614,7 +619,6 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
         prep->setCustomScaleCents(values);
         active->setCustomScaleCents(values);
     }
-    
     processor.gallery->setGalleryDirty(true);
 }
 
@@ -699,7 +703,6 @@ TuningViewController(p, theGraph)
     absoluteKeyboard.addMyListener(this);
     customKeyboard.addMyListener(this);
     offsetSlider->addMyListener(this);
-    hideOrShow.addListener(this);
 
     update();
 }
@@ -763,7 +766,8 @@ void TuningModificationEditor::update(void)
         //                       offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
         
         val = mod->getParam(TuningAbsoluteOffsets);
-        absoluteKeyboard.setValues(stringToFloatArray(val));
+        //absoluteKeyboard.setValues(stringToFloatArray(val));
+        absoluteKeyboard.setValuesAbsolute(stringToFloatArray(val));
         //                       absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
         
         val = mod->getParam(TuningCustomScale);

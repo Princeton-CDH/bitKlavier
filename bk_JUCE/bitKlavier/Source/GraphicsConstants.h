@@ -13,12 +13,12 @@
 
 static const float gMainComponentFontSize = 12.0f;
 
-static const int gMainComponentHeight = 700;
-static const int gMainComponentWidth = gMainComponentHeight * 4./3.;
+#define DEFAULT_WIDTH 933
+#define DEFAULT_HEIGHT 700
 
+#define DEFAULT_MIN_WIDTH 466
+#define DEFAULT_MIN_HEIGHT 290
 
-static const int gMainComponentMinWidth = gMainComponentWidth * .5;
-static const int gMainComponentMinHeight = gMainComponentMinWidth *.56;
 
 static const int gComponentLeftOffset = 5;
 static const int gComponentTopOffset = 5;
@@ -26,20 +26,38 @@ static const int gComponentYSpacing = 5;
 static const int gComponentXSpacing = 5;
 
 static const int gComponentTextFieldWidth = 80;
-static const int gComponentTextFieldHeight = 17;
 
 static const int gComponentLabelWidth = 160;
-static const int gComponentLabelHeight = 17;
+
+
+
+#if JUCE_IOS
+int fontHeight;
+
+int gComponentComboBoxHeight;
+int gComponentLabelHeight;
+int gComponentTextFieldHeight;
+
+int gComponentRangeSliderHeight;
+int gComponentSingleSliderHeight;
+int gComponentStackedSliderHeight;
+
+#else
+static const int fontHeight = 15;
 
 static const int gComponentComboBoxHeight = 24;
-static const int gComponentToggleBoxWidth  = gComponentComboBoxHeight;
-static const int gComponentToggleBoxHeight  = gComponentToggleBoxWidth;
-
-static const int gComponentSingleSliderXOffset  = 8;
+static const int gComponentLabelHeight = 17;
+static const int gComponentTextFieldHeight = 17;
 
 static const int gComponentRangeSliderHeight = 40;
 static const int gComponentSingleSliderHeight = 40;
 static const int gComponentStackedSliderHeight = 40;
+#endif
+
+static const int gComponentToggleBoxWidth  = gComponentComboBoxHeight;
+static const int gComponentToggleBoxHeight  = gComponentToggleBoxWidth;
+
+static const int gComponentSingleSliderXOffset  = 8;
 
 static const int gVCWidth = 375;
 

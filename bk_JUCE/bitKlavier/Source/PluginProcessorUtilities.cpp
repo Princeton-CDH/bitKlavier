@@ -28,32 +28,44 @@ void BKAudioProcessor::updateUI(void)
 void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
 {
     // TO IMPLEMENT: Should turn off all notes in the processors/synths before loading new samples.
-    if(type >= 0)
+    if(type >= 0 && currentSampleType != type)
     {
+        currentSampleType = type;
+        
         didLoadMainPianoSamples = false;
         
-        BKSampleLoader::loadMainPianoSamples(&mainPianoSynth, type);
+        DBG("SAMPLE_SET: " + cBKSampleLoadTypes[type]);
+        int numSamplesPerLayer = 29;
+        int numHarmSamples = 69;
+        int numResSamples = 88;
+        
+        //ProgressBar bar(progress);
+        
+        progress = 0.0;
+        progressInc = 1.0f / (((type != BKLoadLitest) ? (numResSamples + numHarmSamples) : 0) +
+                                            ((type == BKLoadHeavy)  ? (numSamplesPerLayer * 8) :
+                                             (type == BKLoadMedium) ? (numSamplesPerLayer * 4) :
+                                             (type == BKLoadLite)   ? (numSamplesPerLayer * 2) :
+                                             (type == BKLoadLitest) ? (numSamplesPerLayer * 1) :
+                                             1.0));
+        
+        BKSampleLoader::loadMainPianoSamples(*this, type);
         
         didLoadMainPianoSamples = true;
-        
-        if (!didLoadHammersAndRes)
+    
+        if (!didLoadHammersAndRes && type != BKLoadLitest)
         {
             didLoadHammersAndRes = true;
-            BKSampleLoader::loadHammerReleaseSamples(&hammerReleaseSynth);
-            BKSampleLoader::loadResonanceReleaseSamples(&resonanceReleaseSynth);
+            BKSampleLoader::loadHammerReleaseSamples(*this);
+            BKSampleLoader::loadResonanceReleaseSamples(*this);
         }   
     }
+    
 }
 
-void BKAudioProcessor::collectGalleries(void)
+void BKAudioProcessor::collectGalleriesFromFolder(File folder)
 {
-    galleryNames.clear();
-    
-    File bkGalleries;
-    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
-    
-    //DirectoryIterator xmlIter (File ("~/bkGalleries"), true, "*.xml");
-    DirectoryIterator xmlIter (File (bkGalleries), true, "*.xml");
+    DirectoryIterator xmlIter (File (folder), true, "*.xml");
     while (xmlIter.next())
     {
         File galleryFile (xmlIter.getFile());
@@ -62,13 +74,32 @@ void BKAudioProcessor::collectGalleries(void)
     }
     
     
-    DirectoryIterator jsonIter (File (bkGalleries), true, "*.json");
+    DirectoryIterator jsonIter (File (folder), true, "*.json");
     while (jsonIter.next())
     {
         File galleryFile (jsonIter.getFile());
         
         galleryNames.add(galleryFile.getFullPathName());
     }
+}
+
+void BKAudioProcessor::collectGalleries(void)
+{
+    galleryNames.clear();
+    
+    File bkGalleries;
+    
+#if JUCE_IOS
+    File moreGalleries = File::getSpecialLocation (File::userDocumentsDirectory);
+    
+    collectGalleriesFromFolder(moreGalleries);
+#endif
+    
+#if JUCE_MAC || JUCE_WINDOWS
+    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+    
+    collectGalleriesFromFolder(bkGalleries);
+#endif
 }
 
 String BKAudioProcessor::firstGallery(void)
@@ -93,6 +124,6 @@ void BKAudioProcessor::updateGalleries()
     
     clipboard.clear();
     
-    updateState->galleryDidChange = true;
+    updateState->galleriesUpdated = true;
 }
 

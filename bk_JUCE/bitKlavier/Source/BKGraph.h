@@ -20,13 +20,19 @@
 class BKAudioProcessor;
 
 
-class BKItem : public ItemMapper, public BKDraggableComponent, public BKListener
+class BKItem : public ItemMapper, public BKDraggableComponent, public BKListener, private Timer
 {
 public:
     typedef ReferenceCountedArray<BKItem, CriticalSection>      PtrArr;
     typedef ReferenceCountedObjectPtr<BKItem>                   Ptr;
     
     BKItem(BKPreparationType type, int Id, BKAudioProcessor& p);
+    
+    uint64 time;
+    inline void timerCallback(void) override
+    {
+        time++;
+    };
     
     ~BKItem(void);
 
@@ -220,7 +226,7 @@ public:
     
     void copy(BKItem::Ptr);
     // Public members
-    Point<float> origin;
+    juce::Point<float> origin;
     
     Image image;
     RectanglePlacement placement;
@@ -230,9 +236,9 @@ public:
     void bkButtonClicked        (Button* b)             override {};
     void bkMessageReceived      (const String& message) override {};
     
-    Point<int> lastClick;
+    juce::Point<int> lastClick;
     
-    Point<int> position;
+    juce::Point<int> position;
     
     void setImage(Image newImage);
     
@@ -240,16 +246,25 @@ public:
 
     BKItem::PtrArr connections;
     
+    bool resizing;
+    
 private:
     BKAudioProcessor& processor;
     Label label;
     
+    bool wasJustDragged;
+    
+    ScopedPointer<ComponentBoundsConstrainer> constrain;
+    
+    ScopedPointer<ResizableCornerComponent> resizer;
+    
     // Piano menu
     BKComboBox menu;
     
-    
     // UI stuff
     Component fullChild;
+    
+    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKItem)
 };
@@ -257,11 +272,7 @@ private:
 class BKItemGraph
 {
 public:
-    BKItemGraph(BKAudioProcessor& p):
-    processor(p)
-    {
-        
-    }
+    BKItemGraph(BKAudioProcessor& p);
     
     ~BKItemGraph(void);
 
@@ -310,7 +321,6 @@ public:
 private:
     BKAudioProcessor& processor;
 
-    void addPreparationToKeymap(BKPreparationType thisType, int thisId, int keymapId);
     
     JUCE_LEAK_DETECTOR(BKItemGraph)
 };

@@ -76,7 +76,7 @@ BKViewController(p, theGraph)
     offsetParamStartToggle.setToggleState (true, dontSendNotification);
     addAndMakeVisible(offsetParamStartToggle);
     
-    howManySlider = new BKSingleSlider("how many", 1, 100, 1, 1);
+    howManySlider = new BKSingleSlider("how many", 1, 100, 20, 1);
     howManySlider->setJustifyRight(false);
     addAndMakeVisible(howManySlider);
     
@@ -100,13 +100,17 @@ BKViewController(p, theGraph)
     releaseVelocitySetsSynchronicToggle.setToggleState (false, dontSendNotification);
     //addAndMakeVisible(releaseVelocitySetsSynchronicToggle); //possibly for future version, but it seems even keyboards that do noteOff velocity suck at it.
     
-    addAndMakeVisible(hideOrShow);
-    hideOrShow.setName("hideOrShow");
-    hideOrShow.setButtonText(" X ");
-    
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
+    
+#if JUCE_IOS
+    for (auto mslider : paramSliders) mslider->addWantsKeyboardListener(this);
+    howManySlider->addWantsKeyboardListener(this);
+    clusterThreshSlider->addWantsKeyboardListener(this);
+    clusterMinMaxSlider->addWantsKeyboardListener(this);
+    gainSlider->addWantsKeyboardListener(this);
+#endif
 }
 
 void SynchronicViewController::paint (Graphics& g)
@@ -117,16 +121,13 @@ void SynchronicViewController::paint (Graphics& g)
 void SynchronicViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
-    
-    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
-    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
-    
+
     iconImageComponent.setBounds(area);
-    area.reduce(10 * paddingScalarX + 4, 10 * paddingScalarY + 4);
+    area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * paddingScalarX);
+    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * processor.paddingScalarX);
     comboBoxSlice.removeFromLeft(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
@@ -147,38 +148,38 @@ void SynchronicViewController::resized()
     modeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
     offsetParamStartToggle.setBounds(modeSlice);
     
-    int tempHeight = (area.getHeight() - paramSliders.size() * (gYSpacing + gPaddingConst * paddingScalarY)) / paramSliders.size();
-    area.removeFromLeft(4 + 2.*gPaddingConst * paddingScalarX);
+    int tempHeight = (area.getHeight() - paramSliders.size() * (gYSpacing + gPaddingConst * processor.paddingScalarY)) / paramSliders.size();
+    area.removeFromLeft(4 + 2.*gPaddingConst * processor.paddingScalarX);
     area.removeFromRight(gXSpacing);
     for(int i = 0; i < paramSliders.size(); i++)
     {
-        area.removeFromTop(gYSpacing + gPaddingConst * paddingScalarY);
+        area.removeFromTop(gYSpacing + gPaddingConst * processor.paddingScalarY);
         paramSliders[i]->setBounds(area.removeFromTop(tempHeight));
     }
     
     //leftColumn.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
-    leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX - gComponentSingleSliderXOffset);
+    leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     //leftColumn.removeFromLeft(gXSpacing);
     
-    int nextCenter = paramSliders[0]->getY() + paramSliders[0]->getHeight() / 2 + gPaddingConst * (1. - paddingScalarY) ;
+    int nextCenter = paramSliders[0]->getY() + paramSliders[0]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY) ;
     howManySlider->setBounds(leftColumn.getX(),
                              nextCenter - gComponentSingleSliderHeight/2.,
                              leftColumn.getWidth(),
                              gComponentSingleSliderHeight);
     
-    nextCenter = paramSliders[1]->getY() + paramSliders[1]->getHeight() / 2 + gPaddingConst * (1. - paddingScalarY);
+    nextCenter = paramSliders[1]->getY() + paramSliders[1]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
     clusterThreshSlider->setBounds(leftColumn.getX(),
                                    nextCenter - gComponentSingleSliderHeight/2.,
                                    leftColumn.getWidth(),
                                    gComponentSingleSliderHeight);
     
-    nextCenter = paramSliders[2]->getY() + paramSliders[2]->getHeight() / 2 + gPaddingConst * (1. - paddingScalarY);
+    nextCenter = paramSliders[2]->getY() + paramSliders[2]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
     clusterMinMaxSlider->setBounds(leftColumn.getX(),
                                    nextCenter - gComponentRangeSliderHeight/2.,
                                    leftColumn.getWidth(),
                                    gComponentRangeSliderHeight);
     
-    nextCenter = paramSliders[3]->getY() + paramSliders[3]->getHeight() / 2 + gPaddingConst * (1. - paddingScalarY);
+    nextCenter = paramSliders[3]->getY() + paramSliders[3]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
     gainSlider->setBounds(leftColumn.getX(),
                           nextCenter - gComponentSingleSliderHeight/2.,
                           leftColumn.getWidth(),
@@ -224,11 +225,10 @@ SynchronicViewController(p, theGraph)
     howManySlider->addMyListener(this);
     clusterThreshSlider->addMyListener(this);
     clusterMinMaxSlider->addMyListener(this);
-    hideOrShow.addListener(this);
 
     gainSlider->addMyListener(this);
     
-    startTimer(20);
+    startTimer(30);
     
 }
 
@@ -665,7 +665,6 @@ SynchronicViewController(p, theGraph)
     howManySlider->addMyListener(this);
     clusterThreshSlider->addMyListener(this);
     clusterMinMaxSlider->addMyListener(this);
-    hideOrShow.addListener(this);
     gainSlider->addMyListener(this);
     for(int i = 0; i < paramSliders.size(); i++)
     {
@@ -854,19 +853,28 @@ void SynchronicModificationEditor::multiSliderDidChange(String name, int whichSl
     
     if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
     {
-        mod->setParam(SynchronicAccentMultipliers, String(values[0]));
+        Array<float> accents = stringToFloatArray(mod->getParam(SynchronicAccentMultipliers));
+        accents.set(whichSlider, values[0]);
+        mod->setParam(SynchronicAccentMultipliers, floatArrayToString(accents));
     }
     else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
     {
-        mod->setParam(SynchronicBeatMultipliers, String(values[0]));
+        Array<float> beats = stringToFloatArray(mod->getParam(SynchronicBeatMultipliers));
+        beats.set(whichSlider, values[0]);
+        mod->setParam(SynchronicBeatMultipliers, floatArrayToString(beats));
     }
     else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
     {
-        mod->setParam(SynchronicLengthMultipliers, String(values[0]));
+        Array<float> lens = stringToFloatArray(mod->getParam(SynchronicLengthMultipliers));
+        lens.set(whichSlider, values[0]);
+        mod->setParam(SynchronicLengthMultipliers, floatArrayToString(lens));
     }
     else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
     {
-        mod->setParam(SynchronicTranspOffsets, floatArrayToString(values));
+        //paramSliders
+        Array<Array<float>> transps = stringToArrayFloatArray(mod->getParam(SynchronicTranspOffsets));
+        transps.set(whichSlider, values);
+        mod->setParam(SynchronicTranspOffsets, arrayFloatArrayToString(transps));
     }
     
     for(int i = 0; i < paramSliders.size(); i++)
@@ -880,7 +888,6 @@ void SynchronicModificationEditor::multiSliderDidChange(String name, int whichSl
 
 void SynchronicModificationEditor::multiSlidersDidChange(String name, Array<Array<float>> values)
 {
-    
     SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
     
     //only transposition allows multiple simultaneous vals, so trim down to 1D array
@@ -902,6 +909,7 @@ void SynchronicModificationEditor::multiSlidersDidChange(String name, Array<Arra
     //pass original 2D array for transpositions
     else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
     {
+        DBG("set mod: " + arrayFloatArrayToString(values));
         mod->setParam(SynchronicTranspOffsets, arrayFloatArrayToString(values));
     }
     

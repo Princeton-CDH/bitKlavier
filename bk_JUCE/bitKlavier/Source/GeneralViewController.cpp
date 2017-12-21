@@ -33,12 +33,7 @@ BKViewController(p, theGraph)
     tempoMultiplierSlider->setJustifyRight(false);
     tempoMultiplierSlider->addMyListener(this);
     addAndMakeVisible(tempoMultiplierSlider);
-    
-    addAndMakeVisible(hideOrShow);
-    hideOrShow.setName("hideOrShow");
-    hideOrShow.setButtonText(" X ");
-    hideOrShow.addListener(this);
-    
+
     /*
     // Labels
     generalL = OwnedArray<BKLabel>();
@@ -71,6 +66,7 @@ BKViewController(p, theGraph)
 
 GeneralViewController::~GeneralViewController()
 {
+    setLookAndFeel(nullptr);
 }
 
 void GeneralViewController::paint (Graphics& g)
@@ -82,20 +78,21 @@ void GeneralViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
     
-    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
-    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
-    
+    float numberPadHeight = getHeight() - 2 * gYSpacing;
+    float numberPadWidth = getWidth() / 2 - 2 * gXSpacing;
+    numberPad.setSize(numberPadWidth, numberPadHeight);
+
     iconImageComponent.setBounds(area);
-    area.reduce(10 * paddingScalarX + 4, 10 * paddingScalarY + 4);
+    area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * paddingScalarX);
+    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * processor.paddingScalarX);
     comboBoxSlice.removeFromLeft(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     
     Rectangle<int> sliderSlice = leftColumn;
-    sliderSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    sliderSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     
     int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 4.;
     A4tuningReferenceFrequencySlider->setBounds(sliderSlice.getX(),
@@ -227,6 +224,48 @@ void GeneralViewController::BKSingleSliderValueChanged(String name, double val)
         DBG("general tempo multiplier " + String(val));
         gen->setTempoMultiplier(val);
     }
+}
+
+void GeneralViewController::bkSingleSliderWantsKeyboard(BKSingleSlider* slider)
+{
+    DBG("BEGIN: " + String(slider->getValue()));
+    
+    //numberPadDismissed(&numberPad);
+    
+    latched_BKSingleSlider = slider;
+    
+    numberPad.setTopLeftPosition((slider->getX() > getWidth()) ? gXSpacing : (0.5 * getWidth() + gXSpacing), gYSpacing);
+    
+    numberPad.setEnabled(NumberLBracket, false);
+    numberPad.setEnabled(NumberRBracket, false);
+    numberPad.setEnabled(NumberNegative, false);
+    numberPad.setEnabled(NumberColon, false);
+    numberPad.setEnabled(NumberSpace, false);
+    
+    numberPad.setText(String(slider->getValue()));
+    
+    numberPad.setVisible(true);
+}
+
+void GeneralViewController::numberPadChanged(BKNumberPad*)
+{
+    String text = numberPad.getText();
+    
+    DBG("CHANGED: " + text);
+    
+    latched_BKSingleSlider->setText(text);
+}
+
+void GeneralViewController::numberPadDismissed(BKNumberPad*)
+{
+    String text = numberPad.getText();
+    
+    DBG("DISMISSED: " + text);
+    
+    if (latched_BKSingleSlider != nullptr)
+        latched_BKSingleSlider->setValue(text.getDoubleValue(), sendNotification);
+    
+    numberPad.setVisible(false);
 }
 
 void GeneralViewController::bkButtonClicked (Button* b)

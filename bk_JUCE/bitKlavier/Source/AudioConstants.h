@@ -458,19 +458,19 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
 };
 
 static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc = {
-    {0., 0, 0, 0}, //min, max, default, increment, skew
-    {1., 100, 1, 1.0},
-    {1, 4, 1, 1.0},
-    {2, 8, 8, 1.0},
-    {20, 2000, 500, 10.0},
-    {0, 0, 0},
-    {0, 4, 0, 1.0},
-    {-12, 12, 0, 0.01},
-    {0.1, 2, 1, 0.001},
-    {-2, 2, 1, 0.001},
-    {0., 2., 1, 0.001},
-    {0., 0, 0, 0},
-    {0., 0, 0, 0},
+	{ 0.0f, 0.0f, 0.0f, 0.0f }, //min, max, default, increment, skew
+	{ 1.0f, 100.0f, 20.0f, 1.0f },
+	{ 1.0f, 4.0f, 1.0f, 1.0f },
+	{ 2.0f, 8.0f, 8.0f, 1.0f },
+	{ 20.0f, 2000.0f, 500.0f, 10.0f },
+	{ 0.0f, 0.0f, 0.0f },
+	{ 0.0f, 4.0f, 0.0f, 1.0f },
+	{ -12.0f, 12.0f, 0.0f, 0.01f },
+	{ 0.0f, 2.0f, 1.0f, 0.001f },
+	{ -2.0f, 2.0f, 1.0f, 0.001f },
+	{ 0.0f, 2.0f, 1.0f, 0.001f },
+	{ 0.0f, 0.0f, 0.0f, 0.0f },
+	{ 0.0f, 0.0f, 0.0f, 0.0f },
 };
 
 #pragma mark - Nostalgic
@@ -702,6 +702,7 @@ static const std::vector<std::string> cKeymapParameterTypes = {
 
 typedef enum BKSampleLoadType
 {
+    BKLoadLitest,
     BKLoadLite,
     BKLoadMedium,
     BKLoadHeavy,
@@ -710,6 +711,7 @@ typedef enum BKSampleLoadType
 }BKSampleLoadType;
 
 static const std::vector<std::string> cBKSampleLoadTypes = {
+    "Load Very Light",
     "Load Light",
     "Load Medium",
     "Load Heavy"
@@ -757,6 +759,11 @@ static const int aVelocityThresh_Four[5] = {
 static const int aVelocityThresh_Two[3] = {
     0,
     76,
+    128
+};
+
+static const int aVelocityThresh_One[3] = {
+    0,
     128
 };
 

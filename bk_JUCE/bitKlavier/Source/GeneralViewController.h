@@ -17,7 +17,7 @@
 */
 class GeneralViewController :
 public BKViewController,
-public BKSingleSliderListener
+public BKSingleSlider::Listener
 {
 public:
     GeneralViewController(BKAudioProcessor&, BKItemGraph* theGraph);
@@ -39,13 +39,17 @@ private:
     ScopedPointer<BKSingleSlider> A4tuningReferenceFrequencySlider; //A440
     ScopedPointer<BKSingleSlider> tempoMultiplierSlider;
     
+    
     void bkTextFieldDidChange       (TextEditor&)               override;
     void bkComboBoxDidChange        (ComboBox* box)             override { };
     void bkButtonClicked            (Button* b)                 override;
     void bkMessageReceived          (const String& message)     override { };
     void BKSingleSliderValueChanged (String name, double val)   override;
     
+    void bkSingleSliderWantsKeyboard(BKSingleSlider*) override;
     
+    void numberPadChanged(BKNumberPad*) override;
+    void numberPadDismissed(BKNumberPad*) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GeneralViewController)
 };

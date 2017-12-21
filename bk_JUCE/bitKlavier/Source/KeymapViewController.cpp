@@ -34,13 +34,37 @@ BKViewController(p, theGraph)
     keymapTF.setName("KeymapMidi");
     keymapTF.setMultiLine(true);
     
+#if JUCE_IOS
+    keymapTF.addWantsKeyboardListener(this);
+#endif
+    
     // Keyboard
     addAndMakeVisible (keyboardComponent = new BKKeymapKeyboardComponent (keyboardState,
                                                                  BKKeymapKeyboardComponent::horizontalKeyboard));
     
     keyboard = (BKKeymapKeyboardComponent*)keyboardComponent.get();
     keyboard->setScrollButtonsVisible(false);
-    keyboard->setAvailableRange(21, 108);
+    
+#if JUCE_IOS
+    minKey = 48; // 21
+    maxKey = 72; // 108
+    
+    octaveSlider.setRange(0, 6, 1);
+    octaveSlider.addListener(this);
+    octaveSlider.setLookAndFeel(&laf);
+    octaveSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
+    octaveSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+    octaveSlider.setValue(3);
+    
+    addAndMakeVisible(octaveSlider);
+
+#else
+    minKey = 21; // 21
+    maxKey = 108; // 108
+#endif
+    
+    keyboard->setAvailableRange(minKey, maxKey);
+    
     keyboard->setAllowDrag(true);
     keyboard->setOctaveForMiddleC(4);
     keyboardState.addListener(this);
@@ -51,11 +75,6 @@ BKViewController(p, theGraph)
     addAndMakeVisible(keyboardValsTextFieldOpen);
     keymapTF.setVisible(false);
     keymapTF.toBack();
-    
-    addAndMakeVisible(hideOrShow);
-    hideOrShow.setName("hideOrShow");
-    hideOrShow.addListener(this);
-    hideOrShow.setButtonText(" X ");
     
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
@@ -68,6 +87,7 @@ BKViewController(p, theGraph)
 
 KeymapViewController::~KeymapViewController()
 {
+    setLookAndFeel(nullptr);
 }
 
 void KeymapViewController::reset(void)
@@ -84,30 +104,44 @@ void KeymapViewController::paint (Graphics& g)
 void KeymapViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
-    
-    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
-    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
-    
+
     iconImageComponent.setBounds(area);
-    area.reduce(10 * paddingScalarX + 4, 10 * paddingScalarY + 4);
+    area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
     
-    float keyboardHeight = 86; // + 36 * paddingScalarY;
+    
+    
+    float keyboardHeight = 100; // + 36 * processor.paddingScalarY;
     Rectangle<int> keyboardRow = area.removeFromBottom(keyboardHeight);
-    float keyWidth = keyboardRow.getWidth() / round((108 - 21) * 7./12 + 1); //num white keys
+    float keyWidth = keyboardRow.getWidth() / round((maxKey - minKey) * 7./12 + 1); //num white keys
     keyboard->setKeyWidth(keyWidth);
-    keyboard->setBlackNoteLengthProportion(0.65);
+    keyboard->setBlackNoteLengthProportion(0.6);
     keyboardRow.reduce(gXSpacing, 0);
+    
+#if JUCE_IOS
+    float sliderHeight = 15;
+    Rectangle<int> sliderArea = keyboardRow.removeFromTop(sliderHeight);
+    
+    octaveSlider.setBounds(sliderArea);
+#endif
+    
     keyboard->setBounds(keyboardRow);
+    
+#if JUCE_IOS
+    keymapTF.setTopLeftPosition(hideOrShow.getX(), hideOrShow.getBottom() + gYSpacing);
+    keymapTF.setSize(keyboardRow.getWidth() * 0.5, getBottom() - hideOrShow.getBottom() - 2 * gYSpacing);
+
+#else
     keymapTF.setBounds(keyboardRow);
+#endif
     
     area.removeFromBottom(gYSpacing);
     Rectangle<int> textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
     textButtonSlab.removeFromLeft(gXSpacing);
-    keyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(75));
+    keyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(getWidth() * 0.15));
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * paddingScalarX);
+    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * processor.paddingScalarX);
     comboBoxSlice.removeFromLeft(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
@@ -259,6 +293,9 @@ void KeymapViewController::bkButtonClicked (Button* b)
     {
         keymapTF.setVisible(true);
         keymapTF.toFront(true);
+        
+        textEditorWantsKeyboard(&keymapTF);
+        
         focusLostByEscapeKey = false;
     }
     else if (b == &actionButton)
@@ -315,10 +352,12 @@ void KeymapViewController::keymapUpdated(TextEditor& tf)
 
 void KeymapViewController::textEditorFocusLost(TextEditor& tf)
 {
+#if !JUCE_IOS
     if(!focusLostByEscapeKey)
     {
         keymapUpdated(tf);
     }
+#endif
     
 }
 
@@ -341,8 +380,6 @@ void KeymapViewController::update(void)
         selectCB.setSelectedId(processor.updateState->currentKeymapId, dontSendNotification);
         
         keymapTF.setText( intArrayToString(km->keys()));
-        
-        keymapNameTF.setText(km->getName());
         
         BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
         
@@ -384,6 +421,20 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
     
     processor.currentPiano->configure();
 }
+
+
+#if JUCE_IOS
+void KeymapViewController::sliderValueChanged     (Slider* slider)
+{
+    if (slider == &octaveSlider)
+    {
+        int octave = (int) octaveSlider.getValue();
+        
+        if (octave == 0)    keyboard->setAvailableRange(21, 45);
+        else                keyboard->setAvailableRange(12+octave*12, 36+octave*12);
+    }
+}
+#endif
 
 
 

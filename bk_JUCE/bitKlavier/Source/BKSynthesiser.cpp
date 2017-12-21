@@ -427,8 +427,6 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             
             gain *= generalSettings->getGlobalGain();
 
-            
-            DBG("midi: " + String(midiNoteNumber) + "off: " + String(midiNoteNumberOffset));
             voice->startNote (
                               (float)midiNoteNumber+midiNoteNumberOffset,
                               gain,

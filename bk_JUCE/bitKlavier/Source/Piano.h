@@ -40,11 +40,43 @@ public:
           int Id);
     ~Piano();
     
-    inline Piano::Ptr duplicate(void)
+    inline Piano::Ptr duplicate(bool withSameId = false)
     {
-        Piano::Ptr copyPiano = new Piano(processor, -1);
+        Piano::Ptr copyPiano = new Piano(processor, withSameId ? Id : -1);
         
-        copyPiano->items = items;
+        BKItem::PtrArr newItems;
+        
+        for (auto item : items)
+        {
+            BKItem* newItem = new BKItem(item->getType(), item->getId(), processor);
+            
+            newItem->setTopLeftPosition(item->getPosition());
+            newItem->setName(item->getName());
+            
+            copyPiano->add(newItem);
+            newItems.add(newItem);
+            
+        }
+        
+        int idx = 0;
+        for (auto item : items)
+        {
+            BKItem* newItem = newItems.getUnchecked(idx++);
+            
+            BKItem::PtrArr oldConnections = item->getConnections();
+            
+            for (auto connection : item->getConnections())
+            {
+                for (auto newConnection : newItems)
+                {
+                    if ((newConnection->getType() == connection->getType()) &&
+                        (newConnection->getId() == connection->getId()))
+                    {
+                        newItem->addConnection(newConnection);
+                    }
+                }
+            }
+        }
         
         copyPiano->setName(pianoName );
         
@@ -327,7 +359,6 @@ private:
     void configureTempoModification(int key, TempoModPreparation::Ptr, Array<int>);
     void deconfigureTempoModification(TempoModPreparation::Ptr, Array<int> whichKeymaps);
     void deconfigureTempoModificationForKeys(TempoModPreparation::Ptr, Array<int>);
-    
     
     JUCE_LEAK_DETECTOR(Piano)
 };

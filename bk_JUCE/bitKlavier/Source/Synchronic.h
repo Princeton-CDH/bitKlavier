@@ -77,9 +77,9 @@ public:
 
     
     SynchronicPreparation(void):
-    sNumBeats(0),
+    sNumBeats(20),
     sClusterMin(1),
-    sClusterMax(100),
+    sClusterMax(12),
     sClusterCap(8), //8 in original bK, but behavior is different here?
     sMode(FirstNoteOnSync),
     sBeatsToSkip(0),
@@ -842,6 +842,8 @@ public:
     inline void setParam(SynchronicParameterType type, String val)
     {
         param.set(type, val);
+        
+        
     }
     
     void print(void)
@@ -946,7 +948,6 @@ public:
     inline void reset(void)
     {
         synchronic->aPrep->copy(synchronic->sPrep);
-        DBG("synchronic reset");
     }
     
 private:

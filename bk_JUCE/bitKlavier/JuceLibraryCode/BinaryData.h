@@ -8,8 +8,191 @@
 
 namespace BinaryData
 {
-    extern const char*   __blank_xml;
-    const int            __blank_xmlSize = 4215;
+    extern const char*   _1__Synchronic_1_xml;
+    const int            _1__Synchronic_1_xmlSize = 23919;
+
+    extern const char*   _2__Synchronic_2_xml;
+    const int            _2__Synchronic_2_xmlSize = 23922;
+
+    extern const char*   _3__Synchronic_3_xml;
+    const int            _3__Synchronic_3_xmlSize = 23941;
+
+    extern const char*   _4__Synchronic_4_xml;
+    const int            _4__Synchronic_4_xmlSize = 24208;
+
+    extern const char*   _5__Synchronic_5_xml;
+    const int            _5__Synchronic_5_xmlSize = 23997;
+
+    extern const char*   _6__Synchronic_6_xml;
+    const int            _6__Synchronic_6_xmlSize = 24822;
+
+    extern const char*   _7__Synchronic_7_xml;
+    const int            _7__Synchronic_7_xmlSize = 24880;
+
+    extern const char*   _8__Synchronic_8_xml;
+    const int            _8__Synchronic_8_xmlSize = 24974;
+
+    extern const char*   _9__Synchronic_9_xml;
+    const int            _9__Synchronic_9_xmlSize = 24964;
+
+    extern const char*   _10__Nostalgic_1_xml;
+    const int            _10__Nostalgic_1_xmlSize = 37230;
+
+    extern const char*   _11__Nostalgic_2_xml;
+    const int            _11__Nostalgic_2_xmlSize = 37230;
+
+    extern const char*   _12__Nostalgic_3_xml;
+    const int            _12__Nostalgic_3_xmlSize = 37229;
+
+    extern const char*   _13__Nostalgic_4_xml;
+    const int            _13__Nostalgic_4_xmlSize = 37993;
+
+    extern const char*   _14__Nostalgic_5_xml;
+    const int            _14__Nostalgic_5_xmlSize = 37993;
+
+    extern const char*   _15__Nostalgic_6_xml;
+    const int            _15__Nostalgic_6_xmlSize = 25282;
+
+    extern const char*   _16__Tuning_1_xml;
+    const int            _16__Tuning_1_xmlSize = 24453;
+
+    extern const char*   _17__Tuning_2_xml;
+    const int            _17__Tuning_2_xmlSize = 23682;
+
+    extern const char*   _18__Tuning_3_xml;
+    const int            _18__Tuning_3_xmlSize = 23685;
+
+    extern const char*   _19__Tuning_4_xml;
+    const int            _19__Tuning_4_xmlSize = 23169;
+
+    extern const char*   _20__Tuning_5_xml;
+    const int            _20__Tuning_5_xmlSize = 23166;
+
+    extern const char*   _21__Direct_1_xml;
+    const int            _21__Direct_1_xmlSize = 22581;
+
+    extern const char*   _22__Direct_2_xml;
+    const int            _22__Direct_2_xmlSize = 23125;
+
+    extern const char*   _23__Adaptive_Tempo_1_xml;
+    const int            _23__Adaptive_Tempo_1_xmlSize = 24491;
+
+    extern const char*   _24__Adaptive_Tempo_2_xml;
+    const int            _24__Adaptive_Tempo_2_xmlSize = 24491;
+
+    extern const char*   _25__Adaptive_Tempo_3_xml;
+    const int            _25__Adaptive_Tempo_3_xmlSize = 24488;
+
+    extern const char*   _26__Adaptive_Tempo_4_xml;
+    const int            _26__Adaptive_Tempo_4_xmlSize = 24485;
+
+    extern const char*   _27__PianoMapGallery_xml;
+    const int            _27__PianoMapGallery_xmlSize = 31183;
+
+    extern const char*   And_So_xml;
+    const int            And_So_xmlSize = 7254;
+
+    extern const char*   Around_60_xml;
+    const int            Around_60_xmlSize = 6261;
+
+    extern const char*   Circleville_xml;
+    const int            Circleville_xmlSize = 10751;
+
+    extern const char*   Crests_xml;
+    const int            Crests_xmlSize = 10605;
+
+    extern const char*   Cygnet_xml;
+    const int            Cygnet_xmlSize = 10157;
+
+    extern const char*   Daily_Decrease_xml;
+    const int            Daily_Decrease_xmlSize = 7404;
+
+    extern const char*   Didymus_xml;
+    const int            Didymus_xmlSize = 5166;
+
+    extern const char*   for_Bill_D_xml;
+    const int            for_Bill_D_xmlSize = 23322;
+
+    extern const char*   Gigue_Interrupted_xml;
+    const int            Gigue_Interrupted_xmlSize = 10613;
+
+    extern const char*   Houseboat_xml;
+    const int            Houseboat_xmlSize = 23661;
+
+    extern const char*   Hurra_xml;
+    const int            Hurra_xmlSize = 7848;
+
+    extern const char*   Juxtaposed_Weather_xml;
+    const int            Juxtaposed_Weather_xmlSize = 10274;
+
+    extern const char*   Keep_It_Steady_OrNot_xml;
+    const int            Keep_It_Steady_OrNot_xmlSize = 9682;
+
+    extern const char*   Keep_It_Steady_xml;
+    const int            Keep_It_Steady_xmlSize = 14264;
+
+    extern const char*   Listen_xml;
+    const int            Listen_xmlSize = 13704;
+
+    extern const char*   Mamas_Musette_xml;
+    const int            Mamas_Musette_xmlSize = 10646;
+
+    extern const char*   Petite_Gymnopedie_xml;
+    const int            Petite_Gymnopedie_xmlSize = 8328;
+
+    extern const char*   Pyramids_xml;
+    const int            Pyramids_xmlSize = 8033;
+
+    extern const char*   Quickie_xml;
+    const int            Quickie_xmlSize = 10127;
+
+    extern const char*   Scales_within_Sliding_Scales_xml;
+    const int            Scales_within_Sliding_Scales_xmlSize = 7856;
+
+    extern const char*   Slow_To_Come_Back_xml;
+    const int            Slow_To_Come_Back_xmlSize = 15494;
+
+    extern const char*   Southwing_xml;
+    const int            Southwing_xmlSize = 7775;
+
+    extern const char*   Who_do_you_think_you_are_Mars_xml;
+    const int            Who_do_you_think_you_are_Mars_xmlSize = 4941;
+
+    extern const char*   Worm_xml;
+    const int            Worm_xmlSize = 6954;
+
+    extern const char*   NS_1_Prelude_xml;
+    const int            NS_1_Prelude_xmlSize = 16398;
+
+    extern const char*   NS_2_Undertow_xml;
+    const int            NS_2_Undertow_xmlSize = 15410;
+
+    extern const char*   NS_3_Song_xml;
+    const int            NS_3_Song_xmlSize = 16392;
+
+    extern const char*   NS_4_Marbles_xml;
+    const int            NS_4_Marbles_xmlSize = 23841;
+
+    extern const char*   NS_5_Wallumrod_xml;
+    const int            NS_5_Wallumrod_xmlSize = 28121;
+
+    extern const char*   NS_6_PointsAmongLines_xml;
+    const int            NS_6_PointsAmongLines_xmlSize = 15638;
+
+    extern const char*   NS_7_Systerslaat_xml;
+    const int            NS_7_Systerslaat_xmlSize = 43911;
+
+    extern const char*   NS_8_ItIsEnough_xml;
+    const int            NS_8_ItIsEnough_xmlSize = 22311;
+
+    extern const char*   Basic_Piano_xml;
+    const int            Basic_Piano_xmlSize = 4177;
+
+    extern const char*   Mikes_Gallery_xml;
+    const int            Mikes_Gallery_xmlSize = 35379;
+
+    extern const char*   bitKlavier_x_png;
+    const int            bitKlavier_x_pngSize = 2519;
 
     extern const char*   direct_icon_png;
     const int            direct_icon_pngSize = 7648;
@@ -19,6 +202,18 @@ namespace BinaryData
 
     extern const char*   icon_png;
     const int            icon_pngSize = 38622;
+
+    extern const char*   icon_ios_large_png;
+    const int            icon_ios_large_pngSize = 10272;
+
+    extern const char*   icon_ios_small_png;
+    const int            icon_ios_small_pngSize = 3448;
+
+    extern const char*   icon_win_large_png;
+    const int            icon_win_large_pngSize = 2598;
+
+    extern const char*   icon_win_small_png;
+    const int            icon_win_small_pngSize = 1405;
 
     extern const char*   keymap_icon_png;
     const int            keymap_icon_pngSize = 5963;
@@ -66,7 +261,7 @@ namespace BinaryData
     extern const char* namedResourceList[];
 
     // Number of elements in the namedResourceList array.
-    const int namedResourceListSize = 18;
+    const int namedResourceListSize = 83;
 
     // If you provide the name of one of the binary resource variables above, this function will
     // return the corresponding data and its size (or a null pointer if the name isn't found).

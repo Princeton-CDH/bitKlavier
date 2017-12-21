@@ -49,15 +49,20 @@ BKViewController(p, theGraph)
     gainSlider->setSkewFactorFromMidPoint(1.);
     addAndMakeVisible(gainSlider);
     
-    addAndMakeVisible(hideOrShow);
-    hideOrShow.setName("hideOrShow");
-    hideOrShow.setButtonText(" X ");
-    
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
     
     addAndMakeVisible(nDisplaySlider);
+    
+#if JUCE_IOS
+    transpositionSlider->addWantsKeyboardListener(this);
+    gainSlider->addWantsKeyboardListener(this);
+    beatsToSkipSlider->addWantsKeyboardListener(this);
+    lengthMultiplierSlider->addWantsKeyboardListener(this);
+    gainSlider->addWantsKeyboardListener(this);
+    nDisplaySlider.addWantsKeyboardListener(this);
+#endif
 }
 
 void NostalgicViewController::paint (Graphics& g)
@@ -69,21 +74,18 @@ void NostalgicViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
     
-    float paddingScalarX = (float)(getTopLevelComponent()->getWidth() - gMainComponentMinWidth) / (gMainComponentWidth - gMainComponentMinWidth);
-    float paddingScalarY = (float)(getTopLevelComponent()->getHeight() - gMainComponentMinHeight) / (gMainComponentHeight - gMainComponentMinHeight);
-    
     iconImageComponent.setBounds(area);
-    area.reduce(10 * paddingScalarX + 4, 10 * paddingScalarY + 4);
+    area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
     
-    Rectangle<int> nDisplayRow = area.removeFromBottom(100 + 80 * paddingScalarY);
+    Rectangle<int> nDisplayRow = area.removeFromBottom(100 + 80 * processor.paddingScalarY);
     nDisplayRow.reduce(0, 4);
-    nDisplayRow.removeFromLeft(gXSpacing + gPaddingConst * paddingScalarX * 0.5);
-    nDisplayRow.removeFromRight(gXSpacing + gPaddingConst * paddingScalarX * 0.5);
+    nDisplayRow.removeFromLeft(gXSpacing + gPaddingConst * processor.paddingScalarX * 0.5);
+    nDisplayRow.removeFromRight(gXSpacing + gPaddingConst * processor.paddingScalarX * 0.5);
     nDisplaySlider.setBounds(nDisplayRow);
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * paddingScalarX);
+    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * processor.paddingScalarX);
     comboBoxSlice.removeFromLeft(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
@@ -100,16 +102,16 @@ void NostalgicViewController::resized()
     
     Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
     modeSlice.removeFromRight(gXSpacing);
-    //modeSlice.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
+    //modeSlice.reduce(4 + 2.*gPaddingConst * processor.paddingScalarX, 0);
     //lengthModeSelectCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
     lengthModeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
     
     Rectangle<int> sliderSlice = area;
-    sliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    sliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     //sliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
     /*
-     sliderSlice.reduce(4 + 2.*gPaddingConst * paddingScalarX,
-     4 + 2.*gPaddingConst * paddingScalarY);
+     sliderSlice.reduce(4 + 2.*gPaddingConst * processor.paddingScalarX,
+     4 + 2.*gPaddingConst * processor.paddingScalarY);
      */
     
     int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 4.;
@@ -126,12 +128,12 @@ void NostalgicViewController::resized()
                           gComponentSingleSliderHeight);
     
     //leftColumn.reduce(4, 0);
-    leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * paddingScalarX);
+    leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     leftColumn.removeFromLeft(gXSpacing);
     transpositionSlider->setBounds(leftColumn.getX(),
                                    lengthMultiplierSlider->getY(),
                                    leftColumn.getWidth(),
-                                   gComponentStackedSliderHeight + paddingScalarY * 30);
+                                   gComponentStackedSliderHeight + processor.paddingScalarY * 30);
 }
 
 void NostalgicViewController::fillModeSelectCB(void)
@@ -164,7 +166,6 @@ NostalgicViewController(p, theGraph)
     beatsToSkipSlider->addMyListener(this);
     
     gainSlider->addMyListener(this);
-    hideOrShow.addListener(this);
     
     startTimer(20);
 }
@@ -449,7 +450,6 @@ NostalgicViewController(p, theGraph)
     transpositionSlider->addMyListener(this);
     lengthMultiplierSlider->addMyListener(this);
     beatsToSkipSlider->addMyListener(this);
-    hideOrShow.addListener(this);
     
     gainSlider->addMyListener(this);
     

@@ -12,7 +12,9 @@
 
 
 TuningProcessor::TuningProcessor(Tuning::Ptr tuning):
-tuning(tuning)
+tuning(tuning),
+lastNoteTuning(0),
+lastIntervalTuning(0)
 {
 }
 

@@ -35,6 +35,8 @@ public:
     Gallery(var json, BKAudioProcessor&);
     ~Gallery();
     
+    BKSampleLoadType sampleType;
+    
     inline void print(void)
     {
         String s = "direct";
@@ -108,7 +110,7 @@ public:
     
     inline const void setKeymap(int Id, Array<int> keys) const noexcept
     {
-        bkKeymaps[Id]->setKeymap(keys);
+        getKeymap(Id)->setKeymap(keys);
     }
     
     inline const Piano::PtrArr getPianos(void) const noexcept
@@ -659,6 +661,11 @@ public:
     
     inline String getURL(void) const noexcept {return url;}
     
+    inline String getName(void) { return name;}
+    
+    inline void setName(String n) { name = n;}
+    
+    
     
 private:
     double bkSampleRate;
@@ -667,6 +674,7 @@ private:
     Array< int> idCount;
     
     String url;
+    String name;
     
     GeneralSettings::Ptr                general;
     

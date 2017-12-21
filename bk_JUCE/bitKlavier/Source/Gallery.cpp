@@ -13,8 +13,7 @@
 #include "PluginProcessor.h"
 
 Gallery::Gallery(ScopedPointer<XmlElement> xml, BKAudioProcessor& p):
-processor(p),
-url(String::empty)
+processor(p)
 {    
     general = new GeneralSettings();
 
