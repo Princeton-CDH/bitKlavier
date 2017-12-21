@@ -188,8 +188,6 @@ void TempoViewController::fillA1ModeCB(void)
 
 void TempoViewController::updateComponentVisibility()
 {
-    
-    DBG("updating component visibility");
     if(modeCB.getText() == "Adaptive Tempo 1")
     {
         AT1HistorySlider->setVisible(true);

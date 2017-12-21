@@ -210,6 +210,9 @@ public:
     
     inline String getCurrentGalleryPath(void) { return currentGalleryPath;}
     
+    double progress;
+    double progressInc;
+    
 private:
     
     int  currentPianoId;
@@ -218,11 +221,9 @@ private:
     
     double bkSampleRate;
     
-    bool didLoadHammersAndRes, didLoadMainPianoSamples;
     
-    void loadMainPianoSamples(BKSynthesiser *synth, int numLayers);
-    void loadResonanceRelaseSamples(BKSynthesiser *synth);
-    void loadHammerReleaseSamples(BKSynthesiser *synth);
+    
+    bool didLoadHammersAndRes, didLoadMainPianoSamples;
     
     AudioSampleBuffer levelBuf; //for storing samples for metering/RMS calculation
     

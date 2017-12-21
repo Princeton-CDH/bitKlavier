@@ -12,12 +12,15 @@
 
 #include "BKPianoSampler.h"
 
+#include "PluginProcessor.h"
+
 
 String notes[4] = {"A","C","D#","F#"};
 
-void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadType type)
+void BKSampleLoader::loadMainPianoSamples(BKAudioProcessor& processor,  BKSampleLoadType type)
 {
     WavAudioFormat wavFormat;
+    BKSynthesiser* synth = &processor.mainPianoSynth;
     
     File bkSamples;
     
@@ -150,9 +153,12 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
                     
                     
                     
+                    processor.progress += processor.progressInc;
+                    DBG(soundName+": " + String(processor.progress));
                     
-                    
-                } else {
+                }
+                else
+                {
                     DBG("file not opened OK: " + temp);
                 }
                 
@@ -162,9 +168,10 @@ void BKSampleLoader::loadMainPianoSamples(BKSynthesiser *synth,  BKSampleLoadTyp
     }
 }
 
-void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
+void BKSampleLoader::loadResonanceReleaseSamples(BKAudioProcessor& processor)
 {
     WavAudioFormat wavFormat;
+    BKSynthesiser* synth = &processor.resonanceReleaseSynth;
     
     File bkSamples;
     
@@ -202,8 +209,6 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
                 FileInputStream inputStream(file);
                 
                 if (inputStream.openedOk()) {
-                    
-                    DBG("file opened OK: " + file.getFileName());
                     String soundName = file.getFileName();
                     sampleReader = wavFormat.createReaderFor(new FileInputStream(file), true);
                     
@@ -260,6 +265,9 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
                                                                                root,
                                                                                velocityRange));
                     }
+                    
+                    processor.progress += processor.progressInc;
+                    DBG(soundName+": " + String(processor.progress));
                 }
                 else
                 {
@@ -270,10 +278,10 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKSynthesiser *synth)
     }
 }
 
-void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
+void BKSampleLoader::loadHammerReleaseSamples(BKAudioProcessor& processor)
 {
     WavAudioFormat wavFormat;
-    
+    BKSynthesiser* synth = &processor.hammerReleaseSynth;
     File bkSamples;
     
 #if JUCE_IOS
@@ -300,8 +308,6 @@ void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
         FileInputStream inputStream(file);
         
         if (inputStream.openedOk()) {
-            
-            DBG("file opened OK: " + file.getFileName());
             String soundName = file.getFileName();
             sampleReader = wavFormat.createReaderFor(new FileInputStream(file), true);
             
@@ -334,7 +340,11 @@ void BKSampleLoader::loadHammerReleaseSamples(BKSynthesiser *synth)
                                                                     root,
                                                                     velocityRange));
             }
-        } else {
+            processor.progress += processor.progressInc;
+            DBG(soundName+": " + String(processor.progress));
+        }
+        else
+        {
             DBG("file not opened OK: " + temp);
         }
     }
