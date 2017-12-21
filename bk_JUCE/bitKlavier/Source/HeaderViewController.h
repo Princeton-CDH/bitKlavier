@@ -22,7 +22,9 @@
 
 #include "BKSlider.h"
 
+#if !JUCE_WINDOWS
 #include "ShareBot.h"
+#endif
 
 class HeaderViewController : public BKComponent, public BKListener
 {
@@ -47,7 +49,9 @@ private:
     
     int galleryIsDirtyAlertResult;
     
+#if !JUCE_WINDOWS
     ShareBot bot;
+#endif
     
     
     void bkTextFieldDidChange       (TextEditor&)           override;

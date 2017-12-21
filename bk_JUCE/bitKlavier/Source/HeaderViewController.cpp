@@ -335,6 +335,7 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         
         gvc->fillGalleryCB();
     }
+#if !JUCE_WINDOWS
     else if (result == SHARE_EMAIL_ID)
     {
         gvc->bot.share(processor.getCurrentGalleryPath(), 0);
@@ -347,6 +348,7 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     {
         gvc->bot.share(processor.getCurrentGalleryPath(), 2);
     }
+#endif
     else if (result == LOAD_LITEST)
     {
         processor.gallery->sampleType = BKLoadLitest;
