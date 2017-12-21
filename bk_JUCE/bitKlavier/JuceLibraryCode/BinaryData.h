@@ -33,61 +33,61 @@ namespace BinaryData
     const int            _8__Synchronic_8_xmlSize = 24974;
 
     extern const char*   _9__Synchronic_9_xml;
-    const int            _9__Synchronic_9_xmlSize = 24963;
+    const int            _9__Synchronic_9_xmlSize = 24964;
 
     extern const char*   _10__Nostalgic_1_xml;
-    const int            _10__Nostalgic_1_xmlSize = 37229;
+    const int            _10__Nostalgic_1_xmlSize = 37230;
 
     extern const char*   _11__Nostalgic_2_xml;
-    const int            _11__Nostalgic_2_xmlSize = 37229;
+    const int            _11__Nostalgic_2_xmlSize = 37230;
 
     extern const char*   _12__Nostalgic_3_xml;
-    const int            _12__Nostalgic_3_xmlSize = 37228;
+    const int            _12__Nostalgic_3_xmlSize = 37229;
 
     extern const char*   _13__Nostalgic_4_xml;
-    const int            _13__Nostalgic_4_xmlSize = 37992;
+    const int            _13__Nostalgic_4_xmlSize = 37993;
 
     extern const char*   _14__Nostalgic_5_xml;
-    const int            _14__Nostalgic_5_xmlSize = 37992;
+    const int            _14__Nostalgic_5_xmlSize = 37993;
 
     extern const char*   _15__Nostalgic_6_xml;
-    const int            _15__Nostalgic_6_xmlSize = 25281;
+    const int            _15__Nostalgic_6_xmlSize = 25282;
 
     extern const char*   _16__Tuning_1_xml;
-    const int            _16__Tuning_1_xmlSize = 24452;
+    const int            _16__Tuning_1_xmlSize = 24453;
 
     extern const char*   _17__Tuning_2_xml;
-    const int            _17__Tuning_2_xmlSize = 23681;
+    const int            _17__Tuning_2_xmlSize = 23682;
 
     extern const char*   _18__Tuning_3_xml;
-    const int            _18__Tuning_3_xmlSize = 23684;
+    const int            _18__Tuning_3_xmlSize = 23685;
 
     extern const char*   _19__Tuning_4_xml;
-    const int            _19__Tuning_4_xmlSize = 23168;
+    const int            _19__Tuning_4_xmlSize = 23169;
 
     extern const char*   _20__Tuning_5_xml;
-    const int            _20__Tuning_5_xmlSize = 23165;
+    const int            _20__Tuning_5_xmlSize = 23166;
 
     extern const char*   _21__Direct_1_xml;
-    const int            _21__Direct_1_xmlSize = 22580;
+    const int            _21__Direct_1_xmlSize = 22581;
 
     extern const char*   _22__Direct_2_xml;
-    const int            _22__Direct_2_xmlSize = 23124;
+    const int            _22__Direct_2_xmlSize = 23125;
 
     extern const char*   _23__Adaptive_Tempo_1_xml;
-    const int            _23__Adaptive_Tempo_1_xmlSize = 24490;
+    const int            _23__Adaptive_Tempo_1_xmlSize = 24491;
 
     extern const char*   _24__Adaptive_Tempo_2_xml;
-    const int            _24__Adaptive_Tempo_2_xmlSize = 24490;
+    const int            _24__Adaptive_Tempo_2_xmlSize = 24491;
 
     extern const char*   _25__Adaptive_Tempo_3_xml;
-    const int            _25__Adaptive_Tempo_3_xmlSize = 24487;
+    const int            _25__Adaptive_Tempo_3_xmlSize = 24488;
 
     extern const char*   _26__Adaptive_Tempo_4_xml;
-    const int            _26__Adaptive_Tempo_4_xmlSize = 24484;
+    const int            _26__Adaptive_Tempo_4_xmlSize = 24485;
 
     extern const char*   _27__PianoMapGallery_xml;
-    const int            _27__PianoMapGallery_xmlSize = 31182;
+    const int            _27__PianoMapGallery_xmlSize = 31183;
 
     extern const char*   And_So_xml;
     const int            And_So_xmlSize = 7254;
@@ -177,13 +177,13 @@ namespace BinaryData
     const int            NS_5_Wallumrod_xmlSize = 28121;
 
     extern const char*   NS_6_PointsAmongLines_xml;
-    const int            NS_6_PointsAmongLines_xmlSize = 15637;
+    const int            NS_6_PointsAmongLines_xmlSize = 15638;
 
     extern const char*   NS_7_Systerslaat_xml;
-    const int            NS_7_Systerslaat_xmlSize = 43910;
+    const int            NS_7_Systerslaat_xmlSize = 43911;
 
     extern const char*   NS_8_ItIsEnough_xml;
-    const int            NS_8_ItIsEnough_xmlSize = 22310;
+    const int            NS_8_ItIsEnough_xmlSize = 22311;
 
     extern const char*   Basic_Piano_xml;
     const int            Basic_Piano_xmlSize = 4177;
