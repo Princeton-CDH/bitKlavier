@@ -60,7 +60,7 @@ timerCallbackCount(0)
                        new BKKeymapKeyboardComponent (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard));
     
 #if JUCE_IOS
-    keyStart = 48;  keyEnd = 72;
+    keyStart = 60;  keyEnd = 72;
 #else
     keyStart = 21;  keyEnd = 108;
 #endif
