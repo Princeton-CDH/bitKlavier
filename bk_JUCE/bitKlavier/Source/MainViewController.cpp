@@ -157,10 +157,10 @@ void MainViewController::resized()
     
 #if JUCE_IOS
     headerHeight = processor.screenHeight * 0.125;
-    headerHeight = (headerHeight > 90) ? 90 : headerHeight;
+    headerHeight = (headerHeight > 60) ? 60 : headerHeight;
     
     sidebarWidth = processor.screenWidth * 0.075;
-    sidebarWidth = (sidebarWidth > 75) ? 75 : sidebarWidth;
+    sidebarWidth = (sidebarWidth > 45) ? 45 : sidebarWidth;
 #else
     headerHeight = 40;
     sidebarWidth = 30;
