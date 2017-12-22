@@ -104,8 +104,6 @@ void SynchronicProcessor::resetPhase(int skipBeats)
 
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
-
-    //store velocity
 	velocities.set(noteNumber, velocity);
  
     //add note to array of depressed notes

@@ -15,21 +15,36 @@
 
 class BKAudioProcessor;
 
-class BKSampleLoader
+class BKSampleLoader : public Thread
 {
 public:
-    void loadMainPianoSamples(BKAudioProcessor& processor, BKSampleLoadType type);
-    void loadResonanceReleaseSamples(BKAudioProcessor& processor);
-    void loadHammerReleaseSamples(BKAudioProcessor& processor);
+    BKSampleLoader(BKAudioProcessor& p):
+    processor(p),
+    Thread("sample_loader")
+    {
+        
+    }
     
+    ~BKSampleLoader(void)
+    {
+        
+    }
 private:
     
     // Sample loading.
     AudioFormatManager formatManager;
     ScopedPointer<AudioFormatReader> sampleReader;
     ScopedPointer<AudioSampleBuffer> sampleBuffer;
+    
+    void run(void) override;
+    
+    void loadMainPianoSamples(BKSampleLoadType type);
+    void loadResonanceReleaseSamples(void);
+    void loadHammerReleaseSamples(void);
+    
+    BKAudioProcessor& processor;
   
-    JUCE_LEAK_DETECTOR(BKSampleLoader)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BKSampleLoader)
 };
 
 

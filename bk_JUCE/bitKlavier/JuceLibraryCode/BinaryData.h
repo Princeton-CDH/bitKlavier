@@ -15,7 +15,7 @@ namespace BinaryData
     const int            _2__Synchronic_2_xmlSize = 23922;
 
     extern const char*   _3__Synchronic_3_xml;
-    const int            _3__Synchronic_3_xmlSize = 23941;
+    const int            _3__Synchronic_3_xmlSize = 23445;
 
     extern const char*   _4__Synchronic_4_xml;
     const int            _4__Synchronic_4_xmlSize = 24208;
@@ -194,29 +194,41 @@ namespace BinaryData
     extern const char*   bitKlavier_x_png;
     const int            bitKlavier_x_pngSize = 2519;
 
+    extern const char*   Icon_icns;
+    const int            Icon_icnsSize = 345336;
+
     extern const char*   direct_icon_png;
     const int            direct_icon_pngSize = 7648;
 
     extern const char*   general_icon_png;
     const int            general_icon_pngSize = 12817;
 
+    extern const char*   icon_iOS_72_jpg;
+    const int            icon_iOS_72_jpgSize = 44916;
+
+    extern const char*   icon_iOS_300_jpg;
+    const int            icon_iOS_300_jpgSize = 738779;
+
+    extern const char*   icon_iOS_72_png;
+    const int            icon_iOS_72_pngSize = 8662;
+
+    extern const char*   icon_iOS_300_png;
+    const int            icon_iOS_300_pngSize = 39172;
+
     extern const char*   icon_png;
-    const int            icon_pngSize = 38622;
-
-    extern const char*   icon_ios_large_png;
-    const int            icon_ios_large_pngSize = 10272;
-
-    extern const char*   icon_ios_small_png;
-    const int            icon_ios_small_pngSize = 3448;
+    const int            icon_pngSize = 207890;
 
     extern const char*   icon_win_large_png;
-    const int            icon_win_large_pngSize = 2598;
+    const int            icon_win_large_pngSize = 1743;
 
     extern const char*   icon_win_small_png;
-    const int            icon_win_small_pngSize = 1405;
+    const int            icon_win_small_pngSize = 771;
 
     extern const char*   keymap_icon_png;
     const int            keymap_icon_pngSize = 5963;
+
+    extern const char*   logo_jpg;
+    const int            logo_jpgSize = 266033;
 
     extern const char*   mod_direct_icon_png;
     const int            mod_direct_icon_pngSize = 11541;
@@ -261,7 +273,7 @@ namespace BinaryData
     extern const char* namedResourceList[];
 
     // Number of elements in the namedResourceList array.
-    const int namedResourceListSize = 83;
+    const int namedResourceListSize = 87;
 
     // If you provide the name of one of the binary resource variables above, this function will
     // return the corresponding data and its size (or a null pointer if the name isn't found).
