@@ -34,33 +34,21 @@ void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
         
         didLoadMainPianoSamples = false;
         
-        DBG("SAMPLE_SET: " + cBKSampleLoadTypes[type]);
-        updateState->pianoSamplesAreLoading = true;
+        DBG("SAMPLE_SET: " + cBKSampleLoadTypes[type]);\
         int numSamplesPerLayer = 29;
         int numHarmSamples = 69;
         int numResSamples = 88;
         
-        //ProgressBar bar(progress);
-        
         progress = 0.0;
-        progressInc = 1.0f / (((type != BKLoadLitest) ? (numResSamples + numHarmSamples) : 0) +
-                                            ((type == BKLoadHeavy)  ? (numSamplesPerLayer * 8) :
-                                             (type == BKLoadMedium) ? (numSamplesPerLayer * 4) :
-                                             (type == BKLoadLite)   ? (numSamplesPerLayer * 2) :
-                                             (type == BKLoadLitest) ? (numSamplesPerLayer * 1) :
-                                             1.0));
+        progressInc = 1.0f / ((type == BKLoadHeavy)  ? (numSamplesPerLayer * 8 + (numResSamples + numHarmSamples)) :
+                              (type == BKLoadMedium) ? (numSamplesPerLayer * 4) :
+                              (type == BKLoadLite)   ? (numSamplesPerLayer * 2) :
+                              (type == BKLoadLitest) ? (numSamplesPerLayer * 1) :
+                                             1.0);
         
-        BKSampleLoader::loadMainPianoSamples(*this, type);
+        DBG("progressInc: " + String(progressInc));
         
-        didLoadMainPianoSamples = true;
-    
-        if (!didLoadHammersAndRes && type != BKLoadLitest)
-        {
-            didLoadHammersAndRes = true;
-            BKSampleLoader::loadHammerReleaseSamples(*this);
-            BKSampleLoader::loadResonanceReleaseSamples(*this);
-        }
-        updateState->pianoSamplesAreLoading = false;
+        loader.startThread();
     }
     
 }

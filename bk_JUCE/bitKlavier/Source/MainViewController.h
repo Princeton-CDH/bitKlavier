@@ -26,37 +26,66 @@ class BKConstructionSite;
 
 #include "BKOvertop.h"
 
-class SampleLoadView : public Component
+class BKSplashScreen : public Component
 {
 public:
-    SampleLoadView(BKAudioProcessor& p):
+    BKSplashScreen(BKAudioProcessor& p):
     processor(p)
     {
         addAndMakeVisible(progressSlider);
         progressSlider.setRange (0.0, 1.0, 0.001);
-        progressSlider.setSliderStyle (Slider::LinearBarVertical);
+        progressSlider.setSliderStyle (Slider::LinearBar );
+        progressSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+        progressSlider.setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.95));
+        
+        image = ImageCache::getFromMemory(BinaryData::logo_jpg, BinaryData::logo_jpgSize);
+        placement = RectanglePlacement::centred;
+        
+#ifdef LABEL
+        addAndMakeVisible(label);
+        label.setText("Loading samples...", dontSendNotification);
+#endif
     }
     
-    ~SampleLoadView()
+    ~BKSplashScreen()
     {
         
     }
     
+    void setProgress(double progress)
+    {
+        progressSlider.setValue(progress, dontSendNotification);
+    }
+    
     void paint(Graphics& g)
     {
-        g.fillAll(Colours::black.withAlpha(0.5f));
+        g.fillAll(Colours::black.withAlpha(0.9f));
+        
+        g.drawImage (image, getLocalBounds().toFloat(), placement);
     }
     
     void resized(void)
     {
-        progressSlider.setSize(processor.screenWidth * 0.75, processor.screenHeight * 0.5);
-        progressSlider.setCentrePosition(getWidth() * 0.5, getHeight() * 0.5);
+        progressSlider.setSize(getWidth() * 0.875, 25);
+        progressSlider.setCentrePosition(getWidth() * 0.5, getHeight() * 0.75);
+#ifdef LABEL
+        label.setBounds(progressSlider.getX(), progressSlider.getY() - 25 - gYSpacing, 100, 25);
+#endif
     }
     
 private:
     Slider progressSlider;
     BKAudioProcessor& processor;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SampleLoadView)
+    
+#ifdef LABEL
+    BKLabel label;
+#endif
+    
+    Image image;
+    RectanglePlacement placement;
+    
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSplashScreen)
 };
 
 class MainViewController :
@@ -107,7 +136,7 @@ private:
     BKOvertop overtop;
     ScopedPointer<DropShadower> overtopShadow;
     
-    SampleLoadView loadView;
+    BKSplashScreen splash;
     
     //ImageComponent backgroundImageComponent;
     

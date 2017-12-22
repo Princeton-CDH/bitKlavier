@@ -189,7 +189,7 @@ void BKItem::setItemType(BKPreparationType newType, bool create)
     }
     else if (type == PreparationTypeReset)
     {
-        setImage(image = ImageCache::getFromMemory(BinaryData::reset_icon_png, BinaryData::reset_icon_pngSize));
+        setImage(ImageCache::getFromMemory(BinaryData::reset_icon_png, BinaryData::reset_icon_pngSize));
     }
     else if (type == PreparationTypeDirectMod)
     {

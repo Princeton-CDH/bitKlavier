@@ -591,7 +591,6 @@ void HeaderViewController::fillGalleryCB(void)
             
             if (thisFile.getFileName() == processor.currentGallery)
             {
-                DBG("filename: " + thisFile.getFileName() + " gallery: " + processor.currentGallery );
                 index = i;
                 lastGalleryCBId = id;
             }

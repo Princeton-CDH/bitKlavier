@@ -4,13 +4,14 @@
 #include "BKPianoSampler.h"
 
 //==============================================================================
-BKAudioProcessor::BKAudioProcessor():
+BKAudioProcessor::BKAudioProcessor(void):
 updateState(new BKUpdateState()),
 mainPianoSynth(),
 hammerReleaseSynth(),
 resonanceReleaseSynth(),
 sustainIsDown(false),
-currentSampleType(BKLoadNil)
+currentSampleType(BKLoadNil),
+loader(*this)
 #if TRY_UNDO
 ,epoch(0),
 #endif
@@ -183,6 +184,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 #else
     loadPianoSamples(BKLoadHeavy);
 #endif
+    
     
 #if TRY_UNDO
     for (int i = 0; i < NUM_EPOCHS; i++)

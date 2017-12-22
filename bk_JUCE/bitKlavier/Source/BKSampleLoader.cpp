@@ -17,7 +17,36 @@
 
 String notes[4] = {"A","C","D#","F#"};
 
-void BKSampleLoader::loadMainPianoSamples(BKAudioProcessor& processor,  BKSampleLoadType type)
+#define EXIT_CHECK if (threadShouldExit()) { processor.updateState->pianoSamplesAreLoading = false; return; }
+
+void BKSampleLoader::run(void)
+{
+    BKSampleLoadType type = processor.currentSampleType;
+    
+    processor.updateState->pianoSamplesAreLoading = true;
+    
+    EXIT_CHECK;
+    
+    loadMainPianoSamples(type);
+    
+    EXIT_CHECK;
+    
+    processor.didLoadMainPianoSamples = true;
+    
+    if (!processor.didLoadHammersAndRes && type == BKLoadHeavy)
+    {
+        processor.didLoadHammersAndRes = true;
+        loadHammerReleaseSamples();
+        
+        EXIT_CHECK;
+        
+        loadResonanceReleaseSamples();
+    }
+    
+    processor.updateState->pianoSamplesAreLoading = false;
+}
+
+void BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
 {
     WavAudioFormat wavFormat;
     BKSynthesiser* synth = &processor.mainPianoSynth;
@@ -168,7 +197,7 @@ void BKSampleLoader::loadMainPianoSamples(BKAudioProcessor& processor,  BKSample
     }
 }
 
-void BKSampleLoader::loadResonanceReleaseSamples(BKAudioProcessor& processor)
+void BKSampleLoader::loadResonanceReleaseSamples(void)
 {
     WavAudioFormat wavFormat;
     BKSynthesiser* synth = &processor.resonanceReleaseSynth;
@@ -278,7 +307,7 @@ void BKSampleLoader::loadResonanceReleaseSamples(BKAudioProcessor& processor)
     }
 }
 
-void BKSampleLoader::loadHammerReleaseSamples(BKAudioProcessor& processor)
+void BKSampleLoader::loadHammerReleaseSamples(void)
 {
     WavAudioFormat wavFormat;
     BKSynthesiser* synth = &processor.hammerReleaseSynth;

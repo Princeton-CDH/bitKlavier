@@ -19,16 +19,16 @@ theGraph(p),
 header(p, &construction),
 construction(p, &theGraph),
 overtop(p, &theGraph),
-timerCallbackCount(0),
-loadView(p)
+splash(p),
+timerCallbackCount(0)
 {
     if (processor.platform == BKIOS)
         display = DisplayConstruction;
     else
         display = DisplayDefault;
     
-    addChildComponent(loadView);
-    loadView.setAlwaysOnTop(true);
+    addAndMakeVisible(splash);
+    splash.setAlwaysOnTop(true);
     
     initial = true;
     addMouseListener(this, true);
@@ -153,7 +153,7 @@ void MainViewController::resized()
 {
     int headerHeight,sidebarWidth,footerHeight;
     
-    loadView.setBounds(getBounds());
+    splash.setBounds(getLocalBounds());
     
 #if JUCE_IOS
     headerHeight = processor.screenHeight * 0.125;
@@ -440,12 +440,13 @@ void MainViewController::timerCallback()
     
     if (state->pianoSamplesAreLoading)
     {
-        loadView.setVisible(true);
-        //loadView.toFront(false);
+        splash.setVisible(true);
+        
+        splash.setProgress(processor.progress);
     }
     else
     {
-        loadView.setVisible(false);
+        splash.setVisible(false);
     }
     
     if (state->galleriesUpdated)
