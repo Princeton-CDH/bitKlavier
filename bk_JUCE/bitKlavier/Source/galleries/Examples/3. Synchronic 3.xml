@@ -472,22 +472,6 @@
           k116="116" k117="117" k118="118" k119="119" k120="120" k121="121"
           k122="122" k123="123" k124="124" k125="125" k126="126" k127="127"/>
   <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
   <piano name="Synchronic3" Id="4">
     <item>
       <item name="Tuning12" type="3" Id="11" piano="-1" active="1" X="337"

@@ -4,6 +4,8 @@
 
 #include "BKUtilities.h"
 
+#include "BKGalleryLoader.h"
+
 #include "BKSampleLoader.h"
 
 #include "BKSynthesiser.h"
@@ -23,19 +25,11 @@
 #include "Gallery.h"
 
 #include "ItemMapper.h"
-
-
-#define USE_SYNCHRONIC_TWO 0
-
-
-
-
 //==============================================================================
 /**
 */
 class BKAudioProcessor  : public AudioProcessor,
-                           public ChangeListener,
-                            public BKSampleLoader
+                           public ChangeListener
 {
     
 public:
@@ -212,6 +206,7 @@ public:
     
     double progress;
     double progressInc;
+    bool didLoadHammersAndRes, didLoadMainPianoSamples;
     
 private:
     
@@ -221,9 +216,7 @@ private:
     
     double bkSampleRate;
     
-    
-    
-    bool didLoadHammersAndRes, didLoadMainPianoSamples;
+    BKSampleLoader loader;
     
     AudioSampleBuffer levelBuf; //for storing samples for metering/RMS calculation
     

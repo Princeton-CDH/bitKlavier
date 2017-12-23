@@ -19,12 +19,16 @@ theGraph(p),
 header(p, &construction),
 construction(p, &theGraph),
 overtop(p, &theGraph),
+splash(p),
 timerCallbackCount(0)
 {
     if (processor.platform == BKIOS)
         display = DisplayConstruction;
     else
         display = DisplayDefault;
+    
+    addAndMakeVisible(splash);
+    splash.setAlwaysOnTop(true);
     
     initial = true;
     addMouseListener(this, true);
@@ -148,6 +152,8 @@ void MainViewController::setDisplay(DisplayType type)
 void MainViewController::resized()
 {
     int headerHeight,sidebarWidth,footerHeight;
+    
+    splash.setBounds(getLocalBounds());
     
 #if JUCE_IOS
     headerHeight = processor.screenHeight * 0.125;
@@ -431,6 +437,17 @@ void MainViewController::timerCallback()
     Array<bool> noteOns = processor.getNoteOns();
     keyboardState.setKeymap(noteOns);
     keyboard->repaint();
+    
+    if (state->pianoSamplesAreLoading)
+    {
+        splash.setVisible(true);
+        
+        splash.setProgress(processor.progress);
+    }
+    else
+    {
+        splash.setVisible(false);
+    }
     
     if (state->galleriesUpdated)
     {
