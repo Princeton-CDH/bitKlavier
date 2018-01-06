@@ -218,6 +218,7 @@ typedef enum BKPreparationType {
     PreparationTypePianoMap,
     PreparationTypeReset,
     PreparationTypePiano,
+    PreparationTypeComment,
     BKPreparationTypeNil
 } BKPreparationType;
 
