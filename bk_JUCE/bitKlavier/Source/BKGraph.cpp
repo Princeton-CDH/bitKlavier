@@ -106,8 +106,6 @@ resizer(new ResizableCornerComponent (this, constrain))
         
         comment.setName("Comment");
     }
-    
-    
     startTimerHz(10);
 }
 

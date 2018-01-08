@@ -91,7 +91,9 @@ timerCallbackCount(0)
     addAndMakeVisible(preparationPanel);
     
     addAndMakeVisible(header);
+    
     addAndMakeVisible(construction);
+    
     addChildComponent(overtop);
 
     

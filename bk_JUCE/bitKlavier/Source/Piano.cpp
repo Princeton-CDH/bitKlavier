@@ -1136,8 +1136,8 @@ void Piano::setState(XmlElement* e)
                     String s = item->getStringAttribute("text");
                     thisItem->setCommentText(s);
                     
-                    thisItem->setCentrePosition(x, y);
                     thisItem->setSize(w, h);
+                    thisItem->setCentrePosition(x, y);
                     
                     items.add(thisItem);
                 }
