@@ -97,17 +97,16 @@ resizer(new ResizableCornerComponent (this, constrain))
     }
     else if (type == PreparationTypeComment)
     {
-        setSize(150,75);
-        comment.setSize(150,75);
+
+        setSize(150*processor.uiScaleFactor,75*processor.uiScaleFactor);
+        comment.setSize(150*processor.uiScaleFactor,75*processor.uiScaleFactor);
+        constrain->setSizeLimits(50,25,500,500);
         
         addAndMakeVisible (resizer);
         resizer->setAlwaysOnTop(true);
-        constrain->setSizeLimits(50,25,500,500);
         
         comment.setName("Comment");
     }
-    
-    
     startTimerHz(10);
 }
 
@@ -311,8 +310,11 @@ void BKItem::paint(Graphics& g)
 
 void BKItem::resized(void)
 {
-    
+#if JUCE_IOS
+    resizer->setBounds(getWidth()-18, getHeight()-18, 18, 18);
+#else
     resizer->setBounds(getWidth()-10, getHeight()-10, 10, 10);
+#endif
     
     if (type == PreparationTypePianoMap)
     {
@@ -421,8 +423,7 @@ void BKItem::mouseDown(const MouseEvent& e)
             }
             else if (type == PreparationTypeComment)
             {
-                comment.setWantsKeyboardFocus(true);
-                comment.toFront(true);
+                enterComment();
             }
             else
             {

@@ -546,6 +546,10 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     {
         vc->deleteSelected();
     }
+    else if (result == COMMENT_ID)
+    {
+        vc->addItem(PreparationTypeComment, true);
+    }
     else if (result == KEYMAP_ID)
     {
         vc->addItem(PreparationTypeKeymap, true);
