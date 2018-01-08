@@ -131,18 +131,15 @@
                 file="Source/galleries/Mike's Gallery.xml"/>
         </GROUP>
         <GROUP id="{6F7CFDA8-D246-D5B9-B60B-EDBE0C6F3537}" name="icons">
+          <FILE id="smHM8h" name="icon_iOS_72.jpg" compile="0" resource="1" file="Source/icons/icon_iOS_72.jpg"/>
+          <FILE id="iHGLGD" name="icon_iOS_300.jpg" compile="0" resource="1"
+                file="Source/icons/icon_iOS_300.jpg"/>
           <FILE id="Dl47P7" name="bitKlavier_x.png" compile="0" resource="1"
                 file="Source/bitKlavier_x.png"/>
           <FILE id="hXCh3E" name="Icon.icns" compile="0" resource="1" file="Source/icons/Icon.icns"/>
           <FILE id="fiXHO5" name="direct_icon.png" compile="0" resource="1" file="Source/icons/direct_icon.png"/>
           <FILE id="CHQGaP" name="general_icon.png" compile="0" resource="1"
                 file="Source/icons/general_icon.png"/>
-          <FILE id="h07ja0" name="icon_iOS_72.jpg" compile="0" resource="1" file="../../../../Google Drive/bitKlavier/UI/icons/icon_iOS_72.jpg"/>
-          <FILE id="yczvZY" name="icon_iOS_300.jpg" compile="0" resource="1"
-                file="Source/icons/icon_iOS_300.jpg"/>
-          <FILE id="jg9tlf" name="icon_iOS_72.png" compile="0" resource="1" file="Source/icons/icon_iOS_72.png"/>
-          <FILE id="vc4Wfq" name="icon_iOS_300.png" compile="0" resource="1"
-                file="Source/icons/icon_iOS_300.png"/>
           <FILE id="puwr6J" name="icon.png" compile="0" resource="1" file="Source/icons/icon.png"/>
           <FILE id="XA1tC4" name="icon_win_large.png" compile="0" resource="1"
                 file="Source/icons/icon_win_large.png"/>
@@ -403,7 +400,7 @@
     <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="landscape" keepCustomXcodeSchemes="1"
                   customXcodeResourceFolders="~/Documents/bitKlavier resources/samples/"
                   iosBackgroundAudio="1" iosDevelopmentTeamID="YT6AXURH62" UIFileSharingEnabled="1"
-                  smallIcon="h07ja0" bigIcon="yczvZY" customPList="&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&#10;&lt;plist&gt;&#10;&#9;&lt;dict&gt;&#10;&#9;&#9;&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&lt;dict&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;CFBundleTypeName&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;XML&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSHandlerRank&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;Alternate&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSItemContentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;public.xml&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&#9;&#9;&#9;&lt;/dict&gt;&#10;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
+                  smallIcon="smHM8h" bigIcon="iHGLGD" customPList="&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&#10;&lt;plist&gt;&#10;&#9;&lt;dict&gt;&#10;&#9;&#9;&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&lt;dict&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;CFBundleTypeName&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;XML&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSHandlerRank&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;Alternate&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSItemContentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;public.xml&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&#9;&#9;&#9;&lt;/dict&gt;&#10;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
                   iPadScreenOrientation="landscape" iosDeviceFamily="1,2" PListPreprocess="1"
                   iosBackgroundBle="1">
       <CONFIGURATIONS>

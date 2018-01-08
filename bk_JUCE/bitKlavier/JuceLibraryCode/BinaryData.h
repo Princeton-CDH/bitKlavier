@@ -191,6 +191,12 @@ namespace BinaryData
     extern const char*   Mikes_Gallery_xml;
     const int            Mikes_Gallery_xmlSize = 35379;
 
+    extern const char*   icon_iOS_72_jpg;
+    const int            icon_iOS_72_jpgSize = 23465;
+
+    extern const char*   icon_iOS_300_jpg;
+    const int            icon_iOS_300_jpgSize = 121625;
+
     extern const char*   bitKlavier_x_png;
     const int            bitKlavier_x_pngSize = 2519;
 
@@ -202,18 +208,6 @@ namespace BinaryData
 
     extern const char*   general_icon_png;
     const int            general_icon_pngSize = 12817;
-
-    extern const char*   icon_iOS_72_jpg;
-    const int            icon_iOS_72_jpgSize = 44916;
-
-    extern const char*   icon_iOS_300_jpg;
-    const int            icon_iOS_300_jpgSize = 738779;
-
-    extern const char*   icon_iOS_72_png;
-    const int            icon_iOS_72_pngSize = 8662;
-
-    extern const char*   icon_iOS_300_png;
-    const int            icon_iOS_300_pngSize = 39172;
 
     extern const char*   icon_png;
     const int            icon_pngSize = 207890;
@@ -273,7 +267,7 @@ namespace BinaryData
     extern const char* namedResourceList[];
 
     // Number of elements in the namedResourceList array.
-    const int namedResourceListSize = 87;
+    const int namedResourceListSize = 85;
 
     // If you provide the name of one of the binary resource variables above, this function will
     // return the corresponding data and its size (or a null pointer if the name isn't found).
