@@ -22,10 +22,8 @@ overtop(p, &theGraph),
 splash(p),
 timerCallbackCount(0)
 {
-    if (processor.platform == BKIOS)
-        display = DisplayConstruction;
-    else
-        display = DisplayDefault;
+    if (processor.platform == BKIOS)    display = DisplayConstruction;
+    else                                display = DisplayDefault;
     
     addAndMakeVisible(splash);
     splash.setAlwaysOnTop(true);
@@ -311,7 +309,11 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     
     int code = e.getKeyCode();
     
-    if (code == KeyPress::escapeKey)
+    if (code == KeyPress::returnKey)
+    {
+        construction.returnKeyPressed();
+    }
+    else if (code == KeyPress::escapeKey)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
@@ -378,7 +380,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     }
     else if (code == 81) // Q comment
     {
-        
+        construction.addItem(PreparationTypeComment);
     }
     else if (code == 82) // R reset
     {

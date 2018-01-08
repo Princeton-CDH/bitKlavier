@@ -182,7 +182,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
     else                    loadPianoSamples(BKLoadMedium);
 #else
-    loadPianoSamples(BKLoadHeavy);
+    loadPianoSamples(BKLoadLite); // CHANGE THIS BACK TO HEAVY
 #endif
     
     

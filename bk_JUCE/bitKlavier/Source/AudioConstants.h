@@ -248,7 +248,8 @@ static const std::vector<std::string> cPreparationTypes = {
     "GenericMod",
     "PianoMap",
     "Reset",
-    "Piano"
+    "Piano",
+    "Comment"
 };
 
 typedef enum BKPreparationDisplay {
