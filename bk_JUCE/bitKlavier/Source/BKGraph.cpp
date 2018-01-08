@@ -102,7 +102,7 @@ resizer(new ResizableCornerComponent (this, constrain))
         
         addAndMakeVisible (resizer);
         resizer->setAlwaysOnTop(true);
-        constrain->setSizeLimits(50,50,500,500);
+        constrain->setSizeLimits(50,25,500,500);
         
         comment.setName("Comment");
     }
@@ -134,7 +134,8 @@ BKItem* BKItem::duplicate(void)
     return newItem;
 }
 
-void BKItem::bkTextFieldDidChange(TextEditor& tf)
+/*
+void BKItem::bkTextFieldReturnKeyPressed(TextEditor& tf)
 {
     String text = tf.getText();
     String name = tf.getName();
@@ -145,6 +146,20 @@ void BKItem::bkTextFieldDidChange(TextEditor& tf)
         
         exitComment();
         unfocusAllComponents();
+    }
+}
+ */
+
+void BKItem::bkTextFieldDidChange(TextEditor& tf)
+{
+    String text = tf.getText();
+    String name = tf.getName();
+    
+    if (name == comment.getName())
+    {
+        DBG(text);
+        unfocusAllComponents();
+        exitComment();
     }
 }
 
@@ -371,8 +386,9 @@ void BKItem::exitComment(void)
     comment.setWantsKeyboardFocus(false);
     BKConstructionSite* cs = ((BKConstructionSite*)getParentComponent());
     cs->edittingComment = false;
-    cs->grabKeyboardFocus();
     comment.toBack();
+    cs->grabKeyboardFocus();
+    
 }
 
 void BKItem::enterComment(void)

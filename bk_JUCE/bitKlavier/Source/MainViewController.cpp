@@ -309,11 +309,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     
     int code = e.getKeyCode();
     
-    if (code == KeyPress::returnKey)
-    {
-        construction.returnKeyPressed();
-    }
-    else if (code == KeyPress::escapeKey)
+    if (code == KeyPress::escapeKey)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
     }

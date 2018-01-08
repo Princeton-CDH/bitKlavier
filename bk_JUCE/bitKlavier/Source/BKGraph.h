@@ -233,6 +233,7 @@ public:
     
     //void textEditorReturnKeyPressed     (TextEditor&)           override;
     void bkTextFieldDidChange           (TextEditor&)           override;
+    //void bkTextFieldReturnKeyPressed    (TextEditor&)           override;
     void bkComboBoxDidChange            (ComboBox*)             override;
     void bkButtonClicked                (Button* b)             override {};
     void bkMessageReceived              (const String& message) override {};

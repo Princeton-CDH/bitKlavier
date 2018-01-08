@@ -149,17 +149,6 @@ public:
     
     bool edittingComment;
     
-    void returnKeyPressed(void)
-    {/*
-        if (edittingComment)
-        {
-            for (auto item : graph->getItems())
-            {
-                item->exitComment();
-            }
-        }
-      */
-    }
 private:
     
     OwnedArray<TouchEvent> touches;
