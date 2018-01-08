@@ -102,7 +102,7 @@ resizer(new ResizableCornerComponent (this, constrain))
         
         addAndMakeVisible (resizer);
         resizer->setAlwaysOnTop(true);
-        constrain->setSizeLimits(50,50,300,300);
+        constrain->setSizeLimits(50,50,500,500);
         
         comment.setName("Comment");
     }
@@ -464,8 +464,8 @@ ValueTree BKItem::getState(void)
     scale /= processor.uiScaleFactor;
 #endif
 
-    itemVT.setProperty("X", (getX() + getWidth() / 2) * scale, 0);
-    itemVT.setProperty("Y", (getY() + getHeight() / 2) * scale, 0);
+    itemVT.setProperty("X", (getX() + getWidth() * 0.5f) * scale, 0);
+    itemVT.setProperty("Y", (getY() + getHeight() * 0.5f) * scale, 0);
     
     itemVT.setProperty("W", getWidth() * scale, 0);
     itemVT.setProperty("H", getHeight() * scale, 0);
@@ -500,7 +500,7 @@ void BKItem::setState(XmlElement* e)
     i = e->getStringAttribute( "Y" ).getIntValue();
     int y = i;
     
-    setTopLeftPosition(x,y);
+    setCentrePosition(x,y);
     
     if (type == PreparationTypeComment)
     {
