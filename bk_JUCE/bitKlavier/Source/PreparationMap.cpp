@@ -301,11 +301,11 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel)
         for (auto proc : dprocessor)
             proc->keyPressed(noteNumber, velocity, channel);
         
-        for (auto proc : nprocessor)
-            proc->keyPressed(noteNumber, velocity, channel);
-        
         for (auto proc : sprocessor)
             proc->keyPressed(noteNumber, velocity);
+        
+        for (auto proc : nprocessor)
+            proc->keyPressed(noteNumber, velocity, channel);
         
         for (auto proc : tprocessor)
             proc->keyPressed(noteNumber);
