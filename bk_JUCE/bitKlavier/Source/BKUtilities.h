@@ -163,8 +163,10 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
         menu.addSeparator();
     }
     
+    /*
     menu.addSubMenu("Edit...", getEditItemMenu(laf));
     menu.addSeparator();
+     */
     
     if (numItemsSelected == 0)
     {
