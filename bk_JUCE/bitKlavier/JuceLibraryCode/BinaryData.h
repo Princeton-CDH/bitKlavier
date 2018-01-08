@@ -194,32 +194,35 @@ namespace BinaryData
     extern const char*   bitKlavier_x_png;
     const int            bitKlavier_x_pngSize = 2519;
 
+    extern const char*   Icon_icns;
+    const int            Icon_icnsSize = 345336;
+
     extern const char*   direct_icon_png;
     const int            direct_icon_pngSize = 7648;
 
     extern const char*   general_icon_png;
     const int            general_icon_pngSize = 12817;
 
+    extern const char*   icon_iOS_72_jpg;
+    const int            icon_iOS_72_jpgSize = 44916;
+
+    extern const char*   icon_iOS_300_jpg;
+    const int            icon_iOS_300_jpgSize = 738779;
+
+    extern const char*   icon_iOS_72_png;
+    const int            icon_iOS_72_pngSize = 8662;
+
+    extern const char*   icon_iOS_300_png;
+    const int            icon_iOS_300_pngSize = 39172;
+
     extern const char*   icon_png;
-    const int            icon_pngSize = 38622;
-
-    extern const char*   icon_iOS_72_jpeg;
-    const int            icon_iOS_72_jpegSize = 23465;
-
-    extern const char*   icon_iOS_300_jpeg;
-    const int            icon_iOS_300_jpegSize = 121625;
-
-    extern const char*   icon_ios_large_png;
-    const int            icon_ios_large_pngSize = 10272;
-
-    extern const char*   icon_ios_small_png;
-    const int            icon_ios_small_pngSize = 3448;
+    const int            icon_pngSize = 207890;
 
     extern const char*   icon_win_large_png;
-    const int            icon_win_large_pngSize = 2598;
+    const int            icon_win_large_pngSize = 1743;
 
     extern const char*   icon_win_small_png;
-    const int            icon_win_small_pngSize = 1405;
+    const int            icon_win_small_pngSize = 771;
 
     extern const char*   keymap_icon_png;
     const int            keymap_icon_pngSize = 5963;
@@ -270,7 +273,7 @@ namespace BinaryData
     extern const char* namedResourceList[];
 
     // Number of elements in the namedResourceList array.
-    const int namedResourceListSize = 86;
+    const int namedResourceListSize = 87;
 
     // If you provide the name of one of the binary resource variables above, this function will
     // return the corresponding data and its size (or a null pointer if the name isn't found).
