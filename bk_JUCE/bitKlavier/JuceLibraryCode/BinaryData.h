@@ -191,8 +191,8 @@ namespace BinaryData
     extern const char*   Mikes_Gallery_xml;
     const int            Mikes_Gallery_xmlSize = 35379;
 
-    extern const char*   icon_iOS_72_jpg;
-    const int            icon_iOS_72_jpgSize = 23465;
+    extern const char*   icon_iOS_72_png;
+    const int            icon_iOS_72_pngSize = 8662;
 
     extern const char*   icon_iOS_300_jpg;
     const int            icon_iOS_300_jpgSize = 121625;
