@@ -63,7 +63,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
     if (synchronic->aPrep->getLengthMultipliers()[lengthMultiplierCounter] < 0)
     {
         noteDirection = Reverse;
-        noteStartPos = noteLength;
+        noteStartPos = noteLength + 3; //adjust for rampOn time == 3ms
     }
     
     for (auto t : synchronic->aPrep->getTransposition()[transpCounter])
@@ -71,7 +71,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
         float offset = tuner->getOffset(note) + t;
         int synthNoteNumber = ((float)note + (int)offset);
         float synthOffset = offset - (int)offset;
-        DBG("playing synchronic note/vel " + String(note) +  " " + String(velocity));
+        DBG("playing synchronic note/vel, sample# " + String(note) +  " " + String(velocity) + " " + String(synthNoteNumber));
         synth->keyOn(channel,
                      note,
                      synthNoteNumber,
