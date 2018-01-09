@@ -23,7 +23,8 @@ graph(theGraph),
 connect(false),
 lastX(10),
 lastY(10),
-held(false)
+held(false),
+edittingComment(false)
 {
     addAndMakeVisible(clickFrame);
     clickFrame.setSize(5,5);
@@ -693,6 +694,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
         {
             graph->deselectAll();
         }
+        edittingComment = false;
         return;
     }
     

@@ -327,13 +327,10 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         
         if (result == 1)
         {
-#if JUCE_IOS
             String lastName = processor.gallery->getName();
             processor.createGalleryWithName(name);
             processor.deleteGalleryWithName(lastName);
-#else
-            processor.renameGallery(name);
-#endif
+
         }
         
         gvc->fillGalleryCB();
