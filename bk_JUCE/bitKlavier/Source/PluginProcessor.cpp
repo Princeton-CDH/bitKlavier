@@ -270,38 +270,13 @@ void BKAudioProcessor::createNewGallery(String name)
         
         gallery->setGalleryDirty(false);
     }
-    
 }
 
 void BKAudioProcessor::renameGallery(String name)
 {
-    File bkGalleries;
-    
-#if JUCE_IOS
-    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory);
-#else
-    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
-#endif
-    
-    String relativePath = currentGalleryPath.fromLastOccurrenceOf("/", false, false);
-    
-    File currentFile = bkGalleries.getChildFile(relativePath);
-    
-    String newFileName = name + ".xml";
-    
-    String newFilePath= currentGalleryPath.upToFirstOccurrenceOf(currentGallery, false, false) + newFileName;
-
-    DBG("new file: "+ String(newFilePath));
-    
-    File newFile(newFilePath);
-    
-    bool success = currentFile.moveFileTo(newFile);
-    
-    if (success )
-    {
-        currentGallery = newFileName;
-        currentGalleryPath = newFilePath;
-    }
+    String lastName = gallery->getName();
+    createGalleryWithName(name);
+    deleteGalleryWithName(lastName);
 }
 
 void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)  
@@ -743,6 +718,8 @@ void BKAudioProcessor::createGalleryWithName(String name)
     
     loadGalleryFromXml(myXML);
     
+    gallery->setURL(newURL);
+    
     lastGalleryPath = myFile;
 }
 
@@ -768,7 +745,6 @@ void BKAudioProcessor::saveGallery(void)
     String currentURL = gallery->getURL();
 
     File file (currentURL);
-    // NOT SURE ABOUT THIS FILE.EXISTSASFILE METHOD
     
     if (currentURL == String::empty || !file.existsAsFile())
     {

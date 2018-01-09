@@ -327,10 +327,7 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         
         if (result == 1)
         {
-            String lastName = processor.gallery->getName();
-            processor.createGalleryWithName(name);
-            processor.deleteGalleryWithName(lastName);
-
+            processor.renameGallery(name);
         }
         
         gvc->fillGalleryCB();
