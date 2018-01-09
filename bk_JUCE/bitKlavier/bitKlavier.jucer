@@ -406,9 +406,9 @@
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        plistPreprocessorDefinitions="" iosCompatibility="8.0" enablePluginBinaryCopyStep="1"
-                       codeSigningIdentity="QY96HSP2FJ"/>
+                       codeSigningIdentity="YT6AXURH62"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="bitKlavier"
-                       iosCompatibility="8.0" enablePluginBinaryCopyStep="1" codeSigningIdentity="QY96HSP2FJ"/>
+                       iosCompatibility="8.0" enablePluginBinaryCopyStep="1" codeSigningIdentity="YT6AXURH62"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="../../../JUCE/modules"/>

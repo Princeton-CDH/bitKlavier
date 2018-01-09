@@ -478,13 +478,15 @@ static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc
 #pragma mark - Nostalgic
 typedef enum NostalgicSyncMode {
     NoteLengthSync = 0, //reverse note length set by played note length
-    SynchronicSync,     //reverse note length set by next synchronic pulse
+    SynchronicSync,     //reverse note length set by next synchronic pulse, begins with keyOn
+    SynchronicSync2,    //reverse note length set by next synchronic pulse, and begins with keyOff
     NostalgicSyncModeNil
 } NostalgicSyncMode;
 
 static const std::vector<std::string> cNostalgicSyncModes = {
     "Note Length",
-    "Synchronic Sync"
+    "Synchronic Sync KeyDown",
+    "Synchronic Sync KeyUp"
 };
 
 typedef enum NostalgicParameterType {
