@@ -509,7 +509,17 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     
 #endif
     
-    if (result == EDIT_ID)
+    
+    if (result == OFF_ID)
+    {
+        // OFF
+        processor.clearBitKlavier();
+    }
+    else if (result == KEYBOARD_ID)
+    {
+        ((MainViewController*)vc->getParentComponent())->toggleDisplay();
+    }
+    else if (result == EDIT_ID)
     {
         vc->processor.updateState->setCurrentDisplay(vc->currentItem->getType(), vc->currentItem->getId());
     }

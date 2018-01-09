@@ -141,9 +141,9 @@ void MainViewController::paint (Graphics& g)
     g.drawRoundedRectangle(bounds, 2.0, 0.5f);
 }
 
-void MainViewController::setDisplay(DisplayType type)
+void MainViewController::toggleDisplay(void)
 {
-    display = type;
+    display = (display == DisplayKeyboard) ? DisplayConstruction : DisplayKeyboard;
     
     resized();
     repaint();
@@ -264,7 +264,7 @@ void MainViewController::mouseDown(const MouseEvent &event)
 #if JUCE_IOS
         if (event.eventComponent == levelMeterComponentL)
         {
-            setDisplay((display == DisplayKeyboard) ? DisplayConstruction : DisplayKeyboard);
+            toggleDisplay();
         }
 #endif
     }

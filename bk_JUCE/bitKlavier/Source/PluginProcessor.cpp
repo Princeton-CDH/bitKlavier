@@ -230,6 +230,21 @@ void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
     defaultLoaded = false;
 }
 
+void BKAudioProcessor::clearBitKlavier(void)
+{
+    for (int i = 0; i < 15; i++)
+    {
+        hammerReleaseSynth.allNotesOff(i, true);
+        resonanceReleaseSynth.allNotesOff(i, true);
+        mainPianoSynth.allNotesOff(i, true);
+    }
+    
+    for (auto piano : gallery->getPianos())
+    {
+        piano->reset();
+    }
+}
+
 void BKAudioProcessor::deleteGalleryAtURL(String path)
 {
     File galleryPath(path);

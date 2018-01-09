@@ -164,7 +164,7 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     galleryMenu.addItem(CLEAN_ID, "Clean");
     galleryMenu.addSeparator();
-    galleryMenu.addSubMenu("Load", getLoadMenu());
+    galleryMenu.addSubMenu("Load Samples", getLoadMenu());
     galleryMenu.addSeparator();
     galleryMenu.addItem(SETTINGS_ID, "Settings");
     
@@ -191,11 +191,11 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     
 }
 
-void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* hvc)
+void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
 {
     BKAudioProcessor& processor = hvc->processor;
     
-    if (result == 1) // New piano
+    if (res == 1) // New piano
     {
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
@@ -221,7 +221,7 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
             processor.setCurrentPiano(newId);
         }
     }
-    else if (result == 2) // Duplicate
+    else if (res == 2) // Duplicate
     {
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
@@ -245,7 +245,7 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
             hvc->fillPianoCB();
         }
     }
-    else if (result == 3) // Remove piano
+    else if (res == 3) // Remove piano
     {
         
         int pianoId = hvc->pianoCB.getSelectedId();
@@ -265,27 +265,7 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
         
         processor.setCurrentPiano(newPianoId);
     }
-    else if (result == 3) // Remove piano
-    {
-        
-        int pianoId = hvc->pianoCB.getSelectedId();
-        int index = hvc->pianoCB.getSelectedItemIndex();
-        
-        if ((index == 0) && (hvc->pianoCB.getNumItems() == 1)) return;
-        
-        processor.gallery->remove(PreparationTypePiano, pianoId);
-        
-        hvc->fillPianoCB();
-        
-        int newPianoId = hvc->pianoCB.getItemId(index);
-        
-        if (newPianoId == 0) newPianoId = hvc->pianoCB.getItemId(index-1);
-        
-        hvc->pianoCB.setSelectedId(newPianoId, dontSendNotification);
-        
-        processor.setCurrentPiano(newPianoId);
-    }
-    else if (result == 4) // Rename
+    else if (res == 4) // Rename
     {
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         

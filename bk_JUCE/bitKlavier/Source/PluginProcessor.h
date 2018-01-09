@@ -207,6 +207,8 @@ public:
     double progressInc;
     bool didLoadHammersAndRes, didLoadMainPianoSamples;
     
+    void clearBitKlavier(void);
+    
 private:
     
     int  currentPianoId;

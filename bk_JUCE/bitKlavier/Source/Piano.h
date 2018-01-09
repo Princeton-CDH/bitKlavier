@@ -267,6 +267,8 @@ public:
     int                         removePreparationMapWithKeymap(int keymapId);
     
     Array<Array<int>> pianoMaps;
+    
+    void reset(void);
 private:
     BKAudioProcessor& processor;
     

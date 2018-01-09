@@ -295,6 +295,11 @@ TempoProcessor::Ptr Piano::addTempoProcessor(int thisId)
     return mproc;
 }
 
+void Piano::reset(void)
+{
+    configure();
+}
+
 bool Piano::containsProcessor(BKPreparationType thisType, int thisId)
 {
     if (thisType == PreparationTypeDirect)

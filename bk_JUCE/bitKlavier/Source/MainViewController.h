@@ -111,8 +111,7 @@ public:
     }
     
     /*inline Viewport* getViewport(void) { return &viewPort;}*/
-    
-    void setDisplay(DisplayType type);
+    void toggleDisplay(void);
     
     Slider octaveSlider;
     //void setSliderLookAndFeel(BKButtonAndMenuLAF *laf);
@@ -150,8 +149,6 @@ private:
     BKKeymapKeyboardState keyboardState;
     Component *keyboardComponent;
     
-    
-
     DisplayType display;
     
     bool initial;
