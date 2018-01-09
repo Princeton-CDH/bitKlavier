@@ -388,8 +388,8 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     {
         if (e.getModifiers().isCommandDown())
         {
-            if (e.getModifiers().isShiftDown()) processor.saveGalleryAs();
-            else                                processor.saveGallery();
+            if (e.getModifiers().isShiftDown()) processor.saveCurrentGalleryAs();
+            else                                processor.saveCurrentGallery();
         }
         else                                    construction.addItem(PreparationTypeSynchronic);
     }

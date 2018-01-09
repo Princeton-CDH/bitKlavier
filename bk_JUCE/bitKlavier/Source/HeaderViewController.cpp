@@ -334,15 +334,15 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     }
     else if (result == SHARE_EMAIL_ID)
     {
-        gvc->bot.share(processor.getCurrentGalleryPath(), 0);
+        gvc->bot.share(processor.gallery->getURL(), 0);
     }
     else if (result == SHARE_MESSAGE_ID)
     {
-        gvc->bot.share(processor.getCurrentGalleryPath(), 1);
+        gvc->bot.share(processor.gallery->getURL(), 1);
     }
     else if (result == SHARE_FACEBOOK_ID)
     {
-        gvc->bot.share(processor.getCurrentGalleryPath(), 2);
+        gvc->bot.share(processor.gallery->getURL(), 2);
     }
     else if (result == LOAD_LITEST)
     {
@@ -366,7 +366,7 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     }
     else if (result == SAVE_ID)
     {
-        processor.saveGallery();
+        processor.saveCurrentGallery();
         
         //processor.createGalleryWithName(processor.gallery->getName());
     }
@@ -388,12 +388,13 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         
         if (result == 1)
         {
-            processor.createGalleryWithName(name);
+            String url = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + name.upToFirstOccurrenceOf(".xml", false, false) + ".xml";
+            processor.writeCurrentGalleryToURL(url);
         }
         
         gvc->fillGalleryCB();
 #else
-        processor.saveGalleryAs();
+        processor.saveCurrentGalleryAs();
 #endif
     }
     else if (result == OPEN_ID) // Load
@@ -408,15 +409,9 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     {
         processor.gallery->clean();
     }
-    else if (result == DELETE_ID) // Clean
+    else if (result == DELETE_ID) // Delete
     {
-#if JUCE_IOS
-        processor.deleteGalleryWithName(processor.gallery->getName());
-        
-        gvc->galleryCB.setSelectedItemIndex(0);
-#else
         processor.deleteGallery();
-#endif
     }
     else if (result == OPENOLD_ID) // Load (old)
     {
@@ -670,8 +665,6 @@ bool HeaderViewController::handleGalleryChange(void)
     {
         DBG("saving gallery");
         
-        
-#if JUCE_IOS
         if (processor.defaultLoaded)
         {
             AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
@@ -683,24 +676,25 @@ bool HeaderViewController::handleGalleryChange(void)
             
             int result = prompt.runModalLoop();
             
-            String name = prompt.getTextEditorContents("name");
+            String name = prompt.getTextEditorContents("name").upToFirstOccurrenceOf(".xml", false, false);
             
             if (result == 1)
             {
-                processor.createGalleryWithName(name);
+#if JUCE_IOS
+                File newFile = File::getSpecialLocation(File::userDocumentsDirectory);
+#else
+                File newFile = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
+                String newURL = newFile.getFullPathName() + name + ".xml";
+                processor.writeCurrentGalleryToURL(newURL);
             }
         }
         else
         {
-            processor.createGalleryWithName(processor.gallery->getName());
+            processor.saveCurrentGallery();
         }
         
         fillGalleryCB();
-#else
-        
-        processor.saveGallery();
-        
-#endif
         
         shouldSwitch = true;
     }

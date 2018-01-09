@@ -42,10 +42,11 @@ public:
     void loadGalleryFromPath(String path);
     void loadGalleryFromXml(ScopedPointer<XmlElement> xml);
     void loadJsonGalleryFromPath(String path);
-    void saveGalleryAs(void);
-    void saveGallery(void);
+    void saveCurrentGalleryAs(void);
+    void saveCurrentGallery(void);
     void createNewGallery(String name);
     void renameGallery(String name);
+    void duplicateGallery(String name);
     void deleteGallery(void);
     
     void writeCurrentGalleryToURL(String url);
@@ -73,7 +74,6 @@ public:
     
     StringArray                         galleryNames;
     String                              currentGallery;
-    String                              currentGalleryPath;
     
     bool                                defaultLoaded;
     String                              defaultName;
@@ -156,7 +156,7 @@ public:
     void saveOnClose() override
     {
         DBG("SAVE ON CLOSE CALLED");
-        saveGallery();
+        saveCurrentGallery();
     }
     
 
@@ -202,8 +202,6 @@ public:
     
     int screenWidth;
     int screenHeight;
-    
-    inline String getCurrentGalleryPath(void) { return currentGalleryPath;}
     
     double progress;
     double progressInc;

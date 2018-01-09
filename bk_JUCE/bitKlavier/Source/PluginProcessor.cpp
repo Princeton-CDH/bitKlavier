@@ -202,8 +202,8 @@ BKAudioProcessor::~BKAudioProcessor()
 
 void BKAudioProcessor::deleteGallery(void)
 {
-    File gallery(currentGalleryPath);
-    gallery.deleteFile();
+    File file(gallery->getURL());
+    file.deleteFile();
     
     loadGalleryFromPath(firstGallery());
 }
@@ -226,6 +226,8 @@ void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
     gallery->setURL(newURL);
     
     lastGalleryPath = myFile;
+    
+    defaultLoaded = false;
 }
 
 void BKAudioProcessor::deleteGalleryAtURL(String path)
@@ -260,14 +262,12 @@ void BKAudioProcessor::createNewGallery(String name)
     if (xml != nullptr)
     {
         currentGallery = myFile.getFileName();
-        currentGalleryPath = myFile.getFullPathName();
         
-        xml->setAttribute("url", currentGalleryPath);
-        xml->setAttribute("name", currentGallery);
+        xml->setAttribute("name", currentGallery.upToFirstOccurrenceOf(".xml", false, false));
 
         gallery = new Gallery(xml, *this);
         
-        gallery->setURL(currentGalleryPath);
+        gallery->setURL(myFile.getFullPathName());
         gallery->setName(currentGallery);
         
         gallery->print();
@@ -277,7 +277,23 @@ void BKAudioProcessor::createNewGallery(String name)
         galleryDidLoad = true;
         
         gallery->setGalleryDirty(false);
+        
+        defaultLoaded = false;
     }
+}
+
+void BKAudioProcessor::duplicateGallery(String newName)
+{
+    newName = newName.upToFirstOccurrenceOf(".xml",false,false);
+    
+    File oldFile (gallery->getURL());
+    String baseURL = oldFile.getParentDirectory().getFullPathName();
+    
+    String newURL = baseURL + "/" + newName + ".xml";
+    
+    DBG("to create: " + newURL);
+    
+    writeCurrentGalleryToURL(newURL);
 }
 
 void BKAudioProcessor::renameGallery(String newName)
@@ -676,7 +692,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
     }
 }
 
-void BKAudioProcessor::saveGalleryAs(void)
+void BKAudioProcessor::saveCurrentGalleryAs(void)
 {
 #if JUCE_IOS
     
@@ -688,27 +704,7 @@ void BKAudioProcessor::saveGalleryAs(void)
     
     if (myChooser.browseForFileToSave(true))
     {
-        File myFile (myChooser.getResult());
-        currentGallery = myFile.getFileName();
-        currentGalleryPath = myFile.getFullPathName();
-        
-        String newURL = myFile.getFullPathName();
-        
-        ValueTree galleryVT = gallery->getState();
-        
-        galleryVT.setProperty("name", currentGallery, 0);
-        
-        ScopedPointer<XmlElement> myXML = galleryVT.createXml();
-        
-        myXML->writeToFile(myFile, String::empty);
-        
-        loadGalleryFromXml(myXML);
-
-        gallery->setGalleryDirty(false);
-        
-        gallery->setURL(newURL);
-        
-        lastGalleryPath = myFile;
+        writeCurrentGalleryToURL(myChooser.getResult().getFullPathName());
     }
     
 #endif
@@ -721,47 +717,9 @@ void BKAudioProcessor::saveGalleryAs(void)
 
 
 
-void BKAudioProcessor::saveGallery(void)
+void BKAudioProcessor::saveCurrentGallery(void)
 {
-#if JUCE_IOS
-    String url = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + gallery->getName().upToFirstOccurrenceOf(".xml",false,false)+".xml";
-    
-    DBG("url: " + url);
-    
-    File file (url);
-    
-    ValueTree galleryVT = gallery->getState();
-    
-    ScopedPointer<XmlElement> myXML = galleryVT.createXml();
-    
-    myXML->writeToFile(file, String::empty);
-    
-    gallery->setGalleryDirty(false);
-    
-#else
-    
-    String currentURL = gallery->getURL();
-
-    File file (currentURL);
-    
-    if (currentURL == String::empty || !file.existsAsFile())
-    {
-        saveGalleryAs();
-        return;
-    }
-    else
-    {
-        File myFile (currentURL);
-        
-        ValueTree galleryVT = gallery->getState();
-        
-        ScopedPointer<XmlElement> myXML = galleryVT.createXml();
-        
-        myXML->writeToFile(myFile, String::empty);
-        
-        gallery->setGalleryDirty(false);
-    }
-#endif
+    writeCurrentGalleryToURL(gallery->getURL());
 }
 
 
@@ -791,11 +749,8 @@ void BKAudioProcessor::loadGalleryDialog(void)
         else if(galleryIsDirtyAlertResult == 1)
         {
             DBG("saving gallery first");
-#if JUCE_IOS
-            createGalleryWithName(gallery->getName());
-#else
-            saveGallery();
-#endif
+
+            saveCurrentGallery();
         }
     }
     
@@ -809,7 +764,6 @@ void BKAudioProcessor::loadGalleryDialog(void)
     if (myChooser.browseForFileToOpen())
     {
         File myFile (myChooser.getResult());
-        currentGalleryPath = myFile.getFullPathName();
         
         ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
         
@@ -818,6 +772,8 @@ void BKAudioProcessor::loadGalleryDialog(void)
             currentGallery = myFile.getFileName();
             
             gallery = new Gallery(xml, *this);
+            
+            gallery->setURL(myFile.getFullPathName());
             
             initializeGallery();
             
@@ -831,7 +787,6 @@ void BKAudioProcessor::loadGalleryDialog(void)
 
 void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
 {
-    DBG("BKAudioProcessor::loadGalleryFromXml");
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
         gallery = new Gallery(xml, *this);
@@ -851,8 +806,6 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
     updateState->loadedJson = false;
     
     File myFile (path);
-    
-    currentGalleryPath = path;
     
     ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
     
@@ -887,7 +840,7 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
         else if(galleryIsDirtyAlertResult == 1)
         {
             DBG("saving gallery first");
-            saveGallery();
+            saveCurrentGallery();
         }
     }
     
@@ -901,13 +854,14 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
     if (myChooser.browseForFileToOpen())
     {
         File myFile (myChooser.getResult());
-        currentGalleryPath = myFile.getFullPathName();
         
         currentGallery = myFile.getFileName();
         
         var myJson = JSON::parse(myFile);
         
         gallery = new Gallery(myJson, *this);
+        
+        gallery->setURL(myFile.getFullPathName());
         
         initializeGallery();
         
