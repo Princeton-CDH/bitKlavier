@@ -35,7 +35,10 @@ resizer(new ResizableCornerComponent (this, constrain))
     comment.setMultiLine(true);
     comment.setName("comment");
     comment.setSize(150, 75);
+    comment.setSelectAllWhenFocused(true);
     comment.addMouseListener(this,true);
+    comment.setReturnKeyStartsNewLine(true);
+    comment.setScrollbarsShown(false);
     
     setPianoTarget(0);
     
@@ -112,6 +115,7 @@ resizer(new ResizableCornerComponent (this, constrain))
 
 BKItem::~BKItem()
 {
+    exitComment();
 }
 
 BKItem* BKItem::duplicate(void)
@@ -386,10 +390,13 @@ void BKItem::mouseDoubleClick(const MouseEvent& e)
 void BKItem::exitComment(void)
 {
     comment.setWantsKeyboardFocus(false);
+    
     BKConstructionSite* cs = ((BKConstructionSite*)getParentComponent());
-    cs->edittingComment = false;
+    if (cs != nullptr) cs->edittingComment = false;
+    
     comment.toBack();
-    cs->grabKeyboardFocus();
+    comment.setHighlightedRegion(Range<int>(0,0));
+    //cs->grabKeyboardFocus();
     
 }
 

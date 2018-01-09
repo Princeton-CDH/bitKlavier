@@ -214,15 +214,15 @@ void BKAudioProcessor::deleteGalleryWithName(String name)
     
 #if JUCE_IOS
     galleryPath = galleryPath.getSpecialLocation(File::userDocumentsDirectory);
-#endif
-    
-#if JUCE_MAC || JUCE_WINDOWS
+#else
     galleryPath = galleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
-    galleryPath = galleryPath.getChildFile(name+".xml");
+    DBG("path of thing removed 1: " + galleryPath.getFullPathName());
     
-    DBG("path: " + galleryPath.getFullPathName());
+    galleryPath = galleryPath.getChildFile(name.upToFirstOccurrenceOf(".xml", false, true)+".xml");
+    
+    DBG("path of thing removed 2: " + galleryPath.getFullPathName());
     
     galleryPath.deleteFile();
 }
@@ -724,7 +724,11 @@ void BKAudioProcessor::saveGalleryAs(void)
 
 void BKAudioProcessor::createGalleryWithName(String name)
 {
+#if JUCE_IOS
     String newURL = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + name + ".xml";
+#else
+    String newURL = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries").getFullPathName() + "/" + name + ".xml";
+#endif
     
     File file;
     File myFile(newURL);

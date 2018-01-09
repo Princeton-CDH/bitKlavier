@@ -23,7 +23,8 @@ graph(theGraph),
 connect(false),
 lastX(10),
 lastY(10),
-held(false)
+held(false),
+edittingComment(false)
 {
     addAndMakeVisible(clickFrame);
     clickFrame.setSize(5,5);
@@ -126,6 +127,7 @@ void BKConstructionSite::deleteSelected(void)
     
     for (int i = selectedItems.size(); --i >= 0;)
     {
+        selectedItems[i]->print();
         deleteItem(selectedItems[i]);
     }
     
@@ -316,7 +318,6 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
     }
     else if (type == PreparationTypeComment)
     {
-        //toAdd->addMouseListener(this, true);
         toAdd->configureComment();
     }
     
@@ -693,6 +694,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
         {
             graph->deselectAll();
         }
+        edittingComment = false;
         return;
     }
     
