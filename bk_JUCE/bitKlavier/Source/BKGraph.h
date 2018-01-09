@@ -258,6 +258,11 @@ public:
     
     void enterComment(void);
     
+    void focusLost (FocusChangeType) override
+    {
+        exitComment();
+    }
+    
 private:
     
     BKAudioProcessor& processor;

@@ -126,6 +126,7 @@ void BKConstructionSite::deleteSelected(void)
     
     for (int i = selectedItems.size(); --i >= 0;)
     {
+        selectedItems[i]->print();
         deleteItem(selectedItems[i]);
     }
     
@@ -316,7 +317,6 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
     }
     else if (type == PreparationTypeComment)
     {
-        //toAdd->addMouseListener(this, true);
         toAdd->configureComment();
     }
     

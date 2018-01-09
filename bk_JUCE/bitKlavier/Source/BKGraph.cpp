@@ -35,6 +35,7 @@ resizer(new ResizableCornerComponent (this, constrain))
     comment.setMultiLine(true);
     comment.setName("comment");
     comment.setSize(150, 75);
+    comment.setSelectAllWhenFocused(true);
     comment.addMouseListener(this,true);
     
     setPianoTarget(0);
@@ -389,7 +390,8 @@ void BKItem::exitComment(void)
     BKConstructionSite* cs = ((BKConstructionSite*)getParentComponent());
     cs->edittingComment = false;
     comment.toBack();
-    cs->grabKeyboardFocus();
+    comment.setHighlightedRegion(Range<int>(0,0));
+    //cs->grabKeyboardFocus();
     
 }
 
