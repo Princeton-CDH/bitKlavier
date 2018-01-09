@@ -316,7 +316,7 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     {
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
-        prompt.addTextEditor("name", processor.gallery->getName());
+        prompt.addTextEditor("name", processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, false));
         
         prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
         prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
@@ -368,7 +368,7 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     {
         processor.saveGallery();
         
-        processor.createGalleryWithName(processor.gallery->getName());
+        //processor.createGalleryWithName(processor.gallery->getName());
     }
     if (result == SAVEAS_ID)
     {

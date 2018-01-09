@@ -44,11 +44,12 @@ public:
     void loadJsonGalleryFromPath(String path);
     void saveGalleryAs(void);
     void saveGallery(void);
-    void createGalleryWithName(String name);
     void createNewGallery(String name);
     void renameGallery(String name);
     void deleteGallery(void);
-    void deleteGalleryWithName(String name);
+    
+    void writeCurrentGalleryToURL(String url);
+    void deleteGalleryAtURL(String url);
     
     String firstGallery(void);
     void initializeGallery(void);

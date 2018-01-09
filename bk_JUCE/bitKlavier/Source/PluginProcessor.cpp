@@ -208,21 +208,29 @@ void BKAudioProcessor::deleteGallery(void)
     loadGalleryFromPath(firstGallery());
 }
 
-void BKAudioProcessor::deleteGalleryWithName(String name)
+// Duplicates current gallery and gives it name
+void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
 {
-    File galleryPath;
+    File myFile(newURL);
     
-#if JUCE_IOS
-    galleryPath = galleryPath.getSpecialLocation(File::userDocumentsDirectory);
-#else
-    galleryPath = galleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
-#endif
+    ValueTree galleryVT = gallery->getState();
     
-    DBG("path of thing removed 1: " + galleryPath.getFullPathName());
+    galleryVT.setProperty("name", myFile.getFileName().upToFirstOccurrenceOf(".xml", false, false), 0);
     
-    galleryPath = galleryPath.getChildFile(name.upToFirstOccurrenceOf(".xml", false, true)+".xml");
+    ScopedPointer<XmlElement> myXML = galleryVT.createXml();
     
-    DBG("path of thing removed 2: " + galleryPath.getFullPathName());
+    myXML->writeToFile(myFile, String::empty);
+    
+    loadGalleryFromXml(myXML);
+    
+    gallery->setURL(newURL);
+    
+    lastGalleryPath = myFile;
+}
+
+void BKAudioProcessor::deleteGalleryAtURL(String path)
+{
+    File galleryPath(path);
     
     galleryPath.deleteFile();
 }
@@ -243,7 +251,7 @@ void BKAudioProcessor::createNewGallery(String name)
     
     
     File myFile(bkGalleries);
-    myFile = myFile.getNonexistentChildFile(name, ".xml", true);
+    myFile = myFile.getNonexistentChildFile(name.upToFirstOccurrenceOf(".xml",false,false)+".xml", ".xml", true);
     myFile.appendData(BinaryData::Basic_Piano_xml, BinaryData::Basic_Piano_xmlSize);
     galleryNames.add(myFile.getFullPathName());
     
@@ -272,11 +280,22 @@ void BKAudioProcessor::createNewGallery(String name)
     }
 }
 
-void BKAudioProcessor::renameGallery(String name)
+void BKAudioProcessor::renameGallery(String newName)
 {
-    String lastName = gallery->getName();
-    createGalleryWithName(name);
-    deleteGalleryWithName(lastName);
+    String oldName = gallery->getName().upToFirstOccurrenceOf(".xml",false,false);
+    newName = newName.upToFirstOccurrenceOf(".xml",false,false);
+
+    File oldFile (gallery->getURL());
+    String baseURL = oldFile.getParentDirectory().getFullPathName();
+    
+    String newURL = baseURL + "/" + newName + ".xml";
+    String oldURL = baseURL + "/" + oldName + ".xml";
+    
+    DBG("to create: " + newURL);
+    DBG("to delete: " + oldURL);
+    
+    writeCurrentGalleryToURL(newURL);
+    deleteGalleryAtURL(oldURL);
 }
 
 void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)  
@@ -682,14 +701,17 @@ void BKAudioProcessor::saveGalleryAs(void)
         ScopedPointer<XmlElement> myXML = galleryVT.createXml();
         
         myXML->writeToFile(myFile, String::empty);
+        
+        loadGalleryFromXml(myXML);
 
         gallery->setGalleryDirty(false);
+        
+        gallery->setURL(newURL);
         
         lastGalleryPath = myFile;
     }
     
 #endif
-    
     
     updateGalleries();
     
@@ -697,36 +719,12 @@ void BKAudioProcessor::saveGalleryAs(void)
     
 }
 
-void BKAudioProcessor::createGalleryWithName(String name)
-{
-#if JUCE_IOS
-    String newURL = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + name + ".xml";
-#else
-    String newURL = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries").getFullPathName() + "/" + name + ".xml";
-#endif
-    
-    File file;
-    File myFile(newURL);
-    
-    ValueTree galleryVT = gallery->getState();
-    
-    galleryVT.setProperty("name", name, 0);
-    
-    ScopedPointer<XmlElement> myXML = galleryVT.createXml();
-    
-    myXML->writeToFile(myFile, String::empty);
-    
-    loadGalleryFromXml(myXML);
-    
-    gallery->setURL(newURL);
-    
-    lastGalleryPath = myFile;
-}
+
 
 void BKAudioProcessor::saveGallery(void)
 {
 #if JUCE_IOS
-    String url = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + gallery->getName();
+    String url = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + gallery->getName().upToFirstOccurrenceOf(".xml",false,false)+".xml";
     
     DBG("url: " + url);
     

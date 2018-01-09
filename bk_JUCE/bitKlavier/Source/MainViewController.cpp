@@ -431,7 +431,7 @@ void MainViewController::timerCallback()
 {
     BKUpdateState::Ptr state = processor.updateState;
     
-    if (++timerCallbackCount >= 100)
+    if (++timerCallbackCount >= 50)
     {
         timerCallbackCount = 0;
         processor.collectGalleries();
