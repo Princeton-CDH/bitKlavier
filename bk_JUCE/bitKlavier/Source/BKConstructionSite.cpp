@@ -23,7 +23,8 @@ graph(theGraph),
 connect(false),
 lastX(10),
 lastY(10),
-held(false)
+held(false),
+edittingComment(false)
 {
     addAndMakeVisible(clickFrame);
     clickFrame.setSize(5,5);
@@ -126,6 +127,7 @@ void BKConstructionSite::deleteSelected(void)
     
     for (int i = selectedItems.size(); --i >= 0;)
     {
+        selectedItems[i]->print();
         deleteItem(selectedItems[i]);
     }
     
@@ -300,7 +302,7 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
 {
     int thisId = -1;
     
-    if (type != PreparationTypeGenericMod)
+    if (type != PreparationTypeGenericMod && type != PreparationTypeComment)
     {
         thisId = processor.gallery->getNewId(type);
         
@@ -313,6 +315,10 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
     {
         toAdd->setPianoTarget(processor.currentPiano->getId());
         toAdd->configurePianoCB();
+    }
+    else if (type == PreparationTypeComment)
+    {
+        toAdd->configureComment();
     }
     
 #if JUCE_IOS
@@ -329,11 +335,11 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
         toAdd->setTopLeftPosition(lastX, lastY);
     }
 #endif
-
+    
     lastX += 10; lastY += 10;
     
     graph->addItem(toAdd);
-
+    
     addAndMakeVisible(toAdd);
 }
 
@@ -503,7 +509,17 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     
 #endif
     
-    if (result == EDIT_ID)
+    
+    if (result == OFF_ID)
+    {
+        // OFF
+        processor.clearBitKlavier();
+    }
+    else if (result == KEYBOARD_ID)
+    {
+        ((MainViewController*)vc->getParentComponent())->toggleDisplay();
+    }
+    else if (result == EDIT_ID)
     {
         vc->processor.updateState->setCurrentDisplay(vc->currentItem->getType(), vc->currentItem->getId());
     }
@@ -540,6 +556,10 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     else if (result == DELETE_ID)
     {
         vc->deleteSelected();
+    }
+    else if (result == COMMENT_ID)
+    {
+        vc->addItem(PreparationTypeComment, true);
     }
     else if (result == KEYMAP_ID)
     {
@@ -628,7 +648,17 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
 
 void BKConstructionSite::mouseDoubleClick(const MouseEvent& eo)
 {
-    
+    /*
+    BKItem* item = dynamic_cast<BKItem*> (eo.originalComponent->getParentComponent());
+
+    if (item != nullptr)
+    {
+        if (item->getType() == PreparationTypeComment)
+        {
+            //item->
+        }
+    }
+     */
 }
 
 void BKConstructionSite::mouseHold(Component* frame, bool onItem)
@@ -667,6 +697,17 @@ void BKConstructionSite::mouseHold(Component* frame, bool onItem)
 
 void BKConstructionSite::mouseDown (const MouseEvent& eo)
 {
+    if (edittingComment)
+    {
+        BKItem* anItem = dynamic_cast<BKItem*> (eo.originalComponent->getParentComponent());
+        if (anItem == nullptr)
+        {
+            graph->deselectAll();
+        }
+        edittingComment = false;
+        return;
+    }
+    
     MouseEvent e = eo.getEventRelativeTo(this);
     
 #if JUCE_IOS
@@ -779,11 +820,11 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     }
 
     getParentComponent()->grabKeyboardFocus();
-    
 }
 
 void BKConstructionSite::mouseUp (const MouseEvent& eo)
 {
+    if (edittingComment) return;
     
     MouseEvent e = eo.getEventRelativeTo(this);
     
@@ -835,7 +876,8 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
 
 void BKConstructionSite::mouseDrag (const MouseEvent& e)
 {
-
+    if (edittingComment) return;
+    
 #if JUCE_IOS
     MouseEvent eo = (e.eventComponent != this) ? e.getEventRelativeTo(this) : e;
     
@@ -862,8 +904,6 @@ void BKConstructionSite::mouseDrag (const MouseEvent& e)
         for (auto item : graph->getSelectedItems())
         {
             item->performDrag(e);
-            
-            //if (item->)
         }
     }
     

@@ -83,8 +83,6 @@ public:
     void deactivateAllAfter(int where, NotificationType notify);
     void deactivateAllBefore(int where, NotificationType notify);
     
-    
-    
     inline void setText(String text) { editValsTextField->setText(text, dontSendNotification); }
     
     inline TextEditor* getTextEditor(void)
@@ -181,10 +179,10 @@ private:
     
     double currentInvisibleSliderValue;
     
-    OwnedArray<OwnedArray<BKSubSlider>> sliders;
-    ScopedPointer<BKSubSlider> displaySlider;
-    ScopedPointer<BKSubSlider> bigInvisibleSlider;
-    ScopedPointer<TextEditor> editValsTextField;
+    OwnedArray< OwnedArray<BKSubSlider>> sliders;
+    ScopedPointer< BKSubSlider> displaySlider;
+    ScopedPointer< BKSubSlider> bigInvisibleSlider;
+    ScopedPointer< TextEditor> editValsTextField;
     
     double sliderMin, sliderMax, sliderMinDefault, sliderMaxDefault;
     double sliderDefault;

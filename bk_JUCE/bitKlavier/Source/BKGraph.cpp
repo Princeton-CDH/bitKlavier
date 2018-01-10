@@ -22,11 +22,23 @@ BKDraggableComponent(true,false,true, 50, 50, 50, 50),
 processor(p),
 wasJustDragged(false),
 constrain(new ComponentBoundsConstrainer()),
-resizer(new ResizableCornerComponent (this, constrain)),
-resizing(false)
+resizer(new ResizableCornerComponent (this, constrain))
 {
     fullChild.setAlwaysOnTop(true);
     addAndMakeVisible(fullChild);
+    
+    comment.setColour(TextEditor::ColourIds::backgroundColourId, Colours::antiquewhite.withAlpha(0.4f));
+    comment.setColour(TextEditor::ColourIds::textColourId, Colours::antiquewhite);
+    
+    comment.setText("Text here...");
+    comment.addListener(this);
+    comment.setMultiLine(true);
+    comment.setName("comment");
+    comment.setSize(150, 75);
+    comment.setSelectAllWhenFocused(true);
+    comment.addMouseListener(this,true);
+    comment.setReturnKeyStartsNewLine(true);
+    comment.setScrollbarsShown(false);
     
     setPianoTarget(0);
     
@@ -86,12 +98,24 @@ resizing(false)
     {
         setImage(ImageCache::getFromMemory(BinaryData::piano_icon_png, BinaryData::piano_icon_pngSize));
     }
-    
+    else if (type == PreparationTypeComment)
+    {
+
+        setSize(150*processor.uiScaleFactor,75*processor.uiScaleFactor);
+        comment.setSize(150*processor.uiScaleFactor,75*processor.uiScaleFactor);
+        constrain->setSizeLimits(50,25,500,500);
+        
+        addAndMakeVisible (resizer);
+        resizer->setAlwaysOnTop(true);
+        
+        comment.setName("Comment");
+    }
     startTimerHz(10);
 }
 
 BKItem::~BKItem()
 {
+    exitComment();
 }
 
 BKItem* BKItem::duplicate(void)
@@ -99,6 +123,8 @@ BKItem* BKItem::duplicate(void)
     BKItem* newItem = new BKItem(type, Id, processor);
     
     newItem->setPianoTarget(pianoTarget);
+    
+    newItem->setCommentText(comment.getText());
     
     newItem->setImage(image);
     
@@ -109,6 +135,40 @@ BKItem* BKItem::duplicate(void)
     newItem->setBounds(getBounds());
     
     return newItem;
+}
+
+/*
+void BKItem::bkTextFieldReturnKeyPressed(TextEditor& tf)
+{
+    String text = tf.getText();
+    String name = tf.getName();
+    
+    if (name == comment.getName())
+    {
+        DBG(text);
+        
+        exitComment();
+        unfocusAllComponents();
+    }
+}
+ */
+
+void BKItem::bkTextFieldDidChange(TextEditor& tf)
+{
+    String text = tf.getText();
+    String name = tf.getName();
+    
+    if (name == comment.getName())
+    {
+        DBG(text);
+        unfocusAllComponents();
+        exitComment();
+    }
+}
+
+void BKItem::configureComment(void)
+{
+    addAndMakeVisible(comment);
 }
 
 void BKItem::configurePianoCB(void)
@@ -217,6 +277,10 @@ void BKItem::setItemType(BKPreparationType newType, bool create)
         
         configurePianoCB();
     }
+    else if (type == PreparationTypeComment)
+    {
+        
+    }
     
     if (type != PreparationTypeGenericMod)
     {
@@ -250,12 +314,19 @@ void BKItem::paint(Graphics& g)
 
 void BKItem::resized(void)
 {
-    
+#if JUCE_IOS
+    resizer->setBounds(getWidth()-18, getHeight()-18, 18, 18);
+#else
     resizer->setBounds(getWidth()-10, getHeight()-10, 10, 10);
+#endif
     
     if (type == PreparationTypePianoMap)
     {
         menu.setBounds(0, image.getHeight(), getWidth(), (processor.platform == BKIOS) ? 15 : 25);
+    }
+    else if (type == PreparationTypeComment)
+    {
+        comment.setSize(getWidth(), getHeight());
     }
     else
     {
@@ -305,11 +376,36 @@ void BKItem::mouseDoubleClick(const MouseEvent& e)
     {
         menu.showPopup();
     }
+    else if (type == PreparationTypeComment)
+    {
+        enterComment();
+    }
     else
     {
         processor.updateState->setCurrentDisplay(type, Id);
     }
 #endif
+}
+
+void BKItem::exitComment(void)
+{
+    comment.setWantsKeyboardFocus(false);
+    
+    BKConstructionSite* cs = ((BKConstructionSite*)getParentComponent());
+    if (cs != nullptr) cs->edittingComment = false;
+    
+    comment.toBack();
+    comment.setHighlightedRegion(Range<int>(0,0));
+    //cs->grabKeyboardFocus();
+    
+}
+
+void BKItem::enterComment(void)
+{
+    comment.setWantsKeyboardFocus(true);
+    ((BKConstructionSite*)getParentComponent())->edittingComment = true;
+    comment.grabKeyboardFocus();
+    comment.toFront(true);
 }
 
 
@@ -331,6 +427,10 @@ void BKItem::mouseDown(const MouseEvent& e)
             if (type == PreparationTypePianoMap)
             {
                 menu.showPopup();
+            }
+            else if (type == PreparationTypeComment)
+            {
+                enterComment();
             }
             else
             {
@@ -368,19 +468,31 @@ ValueTree BKItem::getState(void)
     itemVT.setProperty("name", getItemName(), 0);
     
     itemVT.setProperty("type", type, 0);
-    itemVT.setProperty("Id", Id, 0);
     
-    itemVT.setProperty("piano", getPianoTarget(), 0);
+    if (type != PreparationTypeComment)
+    {
+        itemVT.setProperty("Id", Id, 0);
+        
+        itemVT.setProperty("piano", getPianoTarget(), 0);
+        
+        itemVT.setProperty("active", isActive(), 0);
+    }
+    else
+    {
+        itemVT.setProperty("text", getCommentText(), 0);
+    }
     
-    itemVT.setProperty("active", isActive(), 0);
     
     float scale = 1.0f;
 #if JUCE_IOS
     scale /= processor.uiScaleFactor;
 #endif
 
-    itemVT.setProperty("X", (getX() + getWidth() / 2) * scale, 0);
-    itemVT.setProperty("Y", (getY() + getHeight() / 2) * scale, 0);
+    itemVT.setProperty("X", (getX() + getWidth() * 0.5f) * scale, 0);
+    itemVT.setProperty("Y", (getY() + getHeight() * 0.5f) * scale, 0);
+    
+    itemVT.setProperty("W", getWidth() * scale, 0);
+    itemVT.setProperty("H", getHeight() * scale, 0);
 
     return itemVT;
 }
@@ -395,13 +507,16 @@ void BKItem::setState(XmlElement* e)
     i = e->getStringAttribute( "type" ).getIntValue();
     type = (BKPreparationType)i;
     
-    i = e->getStringAttribute( "Id" ).getIntValue();
-    Id = i;
-    
-    i = e->getStringAttribute( "piano" ).getIntValue();
-    setPianoTarget(i);
-    b = (bool) e->getStringAttribute( "active" ).getIntValue();
-    setActive(b);
+    if (type != PreparationTypeComment)
+    {
+        i = e->getStringAttribute( "Id" ).getIntValue();
+        Id = i;
+        
+        i = e->getStringAttribute( "piano" ).getIntValue();
+        setPianoTarget(i);
+        b = (bool) e->getStringAttribute( "active" ).getIntValue();
+        setActive(b);
+    }
     
     i = e->getStringAttribute( "X" ).getIntValue();
     int x = i;
@@ -409,8 +524,23 @@ void BKItem::setState(XmlElement* e)
     i = e->getStringAttribute( "Y" ).getIntValue();
     int y = i;
     
-    setTopLeftPosition(x,y);
+    setCentrePosition(x,y);
+    
+    if (type == PreparationTypeComment)
+    {
+        i = e->getStringAttribute( "W" ).getIntValue();
+        int w = i;
+        
+        i = e->getStringAttribute( "H" ).getIntValue();
+        int h = i;
+        
+        setSize(w, h);
+        
+        s = e->getStringAttribute( "text" );
+        setCommentText(s);
+    }
 }
+    
 
 
 
@@ -757,12 +887,16 @@ void BKItemGraph::reconstruct(void)
     
     for (auto item : thisPiano->getItems())
     {
-         BKPreparationType type = item->getType();
-         
-         if (type == PreparationTypePianoMap)
-         {
-             item->configurePianoCB();
-         }
+        BKPreparationType type = item->getType();
+
+        if (type == PreparationTypePianoMap)
+        {
+            item->configurePianoCB();
+        }
+        else if (type == PreparationTypeComment)
+        {
+            item->configureComment();
+        }
     }
 }
 
@@ -785,6 +919,8 @@ void BKItemGraph::deselectAll(void)
 {
     for (auto item : processor.currentPiano->getItems())
     {
+        if (item->getType() == PreparationTypeComment)
+            item->exitComment();
         item->unfocusAllComponents();
         item->setSelected(false);
     }

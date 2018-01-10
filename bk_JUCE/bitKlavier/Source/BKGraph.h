@@ -18,7 +18,7 @@
 #include "ItemMapper.h"
 
 class BKAudioProcessor;
-
+class BKConstructionSite;
 
 class BKItem : public ItemMapper, public BKDraggableComponent, public BKListener, private Timer
 {
@@ -231,10 +231,12 @@ public:
     Image image;
     RectanglePlacement placement;
     
-    void bkTextFieldDidChange   (TextEditor&)           override {};
-    void bkComboBoxDidChange    (ComboBox*)             override;
-    void bkButtonClicked        (Button* b)             override {};
-    void bkMessageReceived      (const String& message) override {};
+    //void textEditorReturnKeyPressed     (TextEditor&)           override;
+    void bkTextFieldDidChange           (TextEditor&)           override;
+    //void bkTextFieldReturnKeyPressed    (TextEditor&)           override;
+    void bkComboBoxDidChange            (ComboBox*)             override;
+    void bkButtonClicked                (Button* b)             override {};
+    void bkMessageReceived              (const String& message) override {};
     
     juce::Point<int> lastClick;
     
@@ -243,12 +245,26 @@ public:
     void setImage(Image newImage);
     
     void configurePianoCB(void);
+    void configureComment(void);
 
     BKItem::PtrArr connections;
     
     bool resizing;
     
+    void setCommentText(String text) { comment.setText(text);}
+    String getCommentText(void) { return comment.getText();}
+    
+    void exitComment(void);
+    
+    void enterComment(void);
+    
+    void focusLost (FocusChangeType) override
+    {
+        exitComment();
+    }
+    
 private:
+    
     BKAudioProcessor& processor;
     Label label;
     
@@ -261,9 +277,11 @@ private:
     // Piano menu
     BKComboBox menu;
     
+    // Comment
+    TextEditor comment;
+    
     // UI stuff
     Component fullChild;
-    
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKItem)

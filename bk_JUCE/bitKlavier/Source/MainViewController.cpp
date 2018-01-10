@@ -22,10 +22,8 @@ overtop(p, &theGraph),
 splash(p),
 timerCallbackCount(0)
 {
-    if (processor.platform == BKIOS)
-        display = DisplayConstruction;
-    else
-        display = DisplayDefault;
+    if (processor.platform == BKIOS)    display = DisplayConstruction;
+    else                                display = DisplayDefault;
     
     addAndMakeVisible(splash);
     splash.setAlwaysOnTop(true);
@@ -93,7 +91,9 @@ timerCallbackCount(0)
     addAndMakeVisible(preparationPanel);
     
     addAndMakeVisible(header);
+    
     addAndMakeVisible(construction);
+    
     addChildComponent(overtop);
 
     
@@ -141,9 +141,9 @@ void MainViewController::paint (Graphics& g)
     g.drawRoundedRectangle(bounds, 2.0, 0.5f);
 }
 
-void MainViewController::setDisplay(DisplayType type)
+void MainViewController::toggleDisplay(void)
 {
-    display = type;
+    display = (display == DisplayKeyboard) ? DisplayConstruction : DisplayKeyboard;
     
     resized();
     repaint();
@@ -264,7 +264,7 @@ void MainViewController::mouseDown(const MouseEvent &event)
 #if JUCE_IOS
         if (event.eventComponent == levelMeterComponentL)
         {
-            setDisplay((display == DisplayKeyboard) ? DisplayConstruction : DisplayKeyboard);
+            toggleDisplay();
         }
 #endif
     }
@@ -376,6 +376,10 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     {
         construction.addItem(PreparationTypePianoMap);
     }
+    else if (code == 81) // Q comment
+    {
+        construction.addItem(PreparationTypeComment);
+    }
     else if (code == 82) // R reset
     {
         construction.addItem(PreparationTypeReset);
@@ -384,8 +388,8 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     {
         if (e.getModifiers().isCommandDown())
         {
-            if (e.getModifiers().isShiftDown()) processor.saveGalleryAs();
-            else                                processor.saveGallery();
+            if (e.getModifiers().isShiftDown()) processor.saveCurrentGalleryAs();
+            else                                processor.saveCurrentGallery();
         }
         else                                    construction.addItem(PreparationTypeSynchronic);
     }
@@ -427,7 +431,7 @@ void MainViewController::timerCallback()
 {
     BKUpdateState::Ptr state = processor.updateState;
     
-    if (++timerCallbackCount >= 100)
+    if (++timerCallbackCount >= 50)
     {
         timerCallbackCount = 0;
         processor.collectGalleries();

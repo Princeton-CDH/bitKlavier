@@ -164,7 +164,7 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     galleryMenu.addItem(CLEAN_ID, "Clean");
     galleryMenu.addSeparator();
-    galleryMenu.addSubMenu("Load", getLoadMenu());
+    galleryMenu.addSubMenu("Load Samples", getLoadMenu());
     galleryMenu.addSeparator();
     galleryMenu.addItem(SETTINGS_ID, "Settings");
     
@@ -191,11 +191,11 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     
 }
 
-void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* hvc)
+void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
 {
     BKAudioProcessor& processor = hvc->processor;
     
-    if (result == 1) // New piano
+    if (res == 1) // New piano
     {
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
@@ -221,7 +221,7 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
             processor.setCurrentPiano(newId);
         }
     }
-    else if (result == 2) // Duplicate
+    else if (res == 2) // Duplicate
     {
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
@@ -245,7 +245,7 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
             hvc->fillPianoCB();
         }
     }
-    else if (result == 3) // Remove piano
+    else if (res == 3) // Remove piano
     {
         
         int pianoId = hvc->pianoCB.getSelectedId();
@@ -265,27 +265,7 @@ void HeaderViewController::pianoMenuCallback(int result, HeaderViewController* h
         
         processor.setCurrentPiano(newPianoId);
     }
-    else if (result == 3) // Remove piano
-    {
-        
-        int pianoId = hvc->pianoCB.getSelectedId();
-        int index = hvc->pianoCB.getSelectedItemIndex();
-        
-        if ((index == 0) && (hvc->pianoCB.getNumItems() == 1)) return;
-        
-        processor.gallery->remove(PreparationTypePiano, pianoId);
-        
-        hvc->fillPianoCB();
-        
-        int newPianoId = hvc->pianoCB.getItemId(index);
-        
-        if (newPianoId == 0) newPianoId = hvc->pianoCB.getItemId(index-1);
-        
-        hvc->pianoCB.setSelectedId(newPianoId, dontSendNotification);
-        
-        processor.setCurrentPiano(newPianoId);
-    }
-    else if (result == 4) // Rename
+    else if (res == 4) // Rename
     {
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
@@ -316,7 +296,7 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     {
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
-        prompt.addTextEditor("name", processor.gallery->getName());
+        prompt.addTextEditor("name", processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, false));
         
         prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
         prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
@@ -327,13 +307,7 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         
         if (result == 1)
         {
-#if JUCE_IOS
-            String lastName = processor.gallery->getName();
-            processor.createGalleryWithName(name);
-            processor.deleteGalleryWithName(lastName);
-#else
             processor.renameGallery(name);
-#endif
         }
         
         gvc->fillGalleryCB();
@@ -341,15 +315,15 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
 #if !JUCE_WINDOWS
     else if (result == SHARE_EMAIL_ID)
     {
-        gvc->bot.share(processor.getCurrentGalleryPath(), 0);
+        gvc->bot.share(processor.gallery->getURL(), 0);
     }
     else if (result == SHARE_MESSAGE_ID)
     {
-        gvc->bot.share(processor.getCurrentGalleryPath(), 1);
+        gvc->bot.share(processor.gallery->getURL(), 1);
     }
     else if (result == SHARE_FACEBOOK_ID)
     {
-        gvc->bot.share(processor.getCurrentGalleryPath(), 2);
+        gvc->bot.share(processor.gallery->getURL(), 2);
     }
 #endif
     else if (result == LOAD_LITEST)
@@ -374,9 +348,9 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     }
     else if (result == SAVE_ID)
     {
-        processor.saveGallery();
+        processor.saveCurrentGallery();
         
-        processor.createGalleryWithName(processor.gallery->getName());
+        //processor.createGalleryWithName(processor.gallery->getName());
     }
     if (result == SAVEAS_ID)
     {
@@ -396,12 +370,13 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         
         if (result == 1)
         {
-            processor.createGalleryWithName(name);
+            String url = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + name.upToFirstOccurrenceOf(".xml", false, false) + ".xml";
+            processor.writeCurrentGalleryToURL(url);
         }
         
         gvc->fillGalleryCB();
 #else
-        processor.saveGalleryAs();
+        processor.saveCurrentGalleryAs();
 #endif
     }
     else if (result == OPEN_ID) // Load
@@ -416,15 +391,9 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     {
         processor.gallery->clean();
     }
-    else if (result == DELETE_ID) // Clean
+    else if (result == DELETE_ID) // Delete
     {
-#if JUCE_IOS
-        processor.deleteGalleryWithName(processor.gallery->getName());
-        
-        gvc->galleryCB.setSelectedItemIndex(0);
-#else
         processor.deleteGallery();
-#endif
     }
     else if (result == OPENOLD_ID) // Load (old)
     {
@@ -678,8 +647,6 @@ bool HeaderViewController::handleGalleryChange(void)
     {
         DBG("saving gallery");
         
-        
-#if JUCE_IOS
         if (processor.defaultLoaded)
         {
             AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
@@ -691,24 +658,25 @@ bool HeaderViewController::handleGalleryChange(void)
             
             int result = prompt.runModalLoop();
             
-            String name = prompt.getTextEditorContents("name");
+            String name = prompt.getTextEditorContents("name").upToFirstOccurrenceOf(".xml", false, false);
             
             if (result == 1)
             {
-                processor.createGalleryWithName(name);
+#if JUCE_IOS
+                File newFile = File::getSpecialLocation(File::userDocumentsDirectory);
+#else
+                File newFile = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
+                String newURL = newFile.getFullPathName() + name + ".xml";
+                processor.writeCurrentGalleryToURL(newURL);
             }
         }
         else
         {
-            processor.createGalleryWithName(processor.gallery->getName());
+            processor.saveCurrentGallery();
         }
         
         fillGalleryCB();
-#else
-        
-        processor.saveGallery();
-        
-#endif
         
         shouldSwitch = true;
     }
