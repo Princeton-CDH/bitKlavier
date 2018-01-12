@@ -34,10 +34,6 @@ BKViewController(p, theGraph)
     keymapTF.setName("KeymapMidi");
     keymapTF.setMultiLine(true);
     
-#if JUCE_IOS
-    keymapTF.addWantsKeyboardListener(this);
-#endif
-    
     // Keyboard
     addAndMakeVisible (keyboardComponent = new BKKeymapKeyboardComponent (keyboardState,
                                                                  BKKeymapKeyboardComponent::horizontalKeyboard));
@@ -293,8 +289,6 @@ void KeymapViewController::bkButtonClicked (Button* b)
     {
         keymapTF.setVisible(true);
         keymapTF.toFront(true);
-        
-        textEditorWantsKeyboard(&keymapTF);
         
         focusLostByEscapeKey = false;
     }

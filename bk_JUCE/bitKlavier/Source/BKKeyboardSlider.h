@@ -54,10 +54,6 @@ public:
     void addMyListener(Listener* listener)     { listeners.add(listener); }
     void removeMyListener(Listener* listener)  { listeners.remove(listener); }
     
-    ListenerList<WantsKeyboardListener> inputListeners;
-    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
-    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
-    
     inline void setText(String text)
     {
         keyboardValueTF.setText(text, false);

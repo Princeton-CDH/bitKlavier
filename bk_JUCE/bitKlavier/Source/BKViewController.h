@@ -24,9 +24,7 @@
 #include "BKSlider.h"
 #include "BKKeyboardSlider.h"
 
-#include "BKNumberPad.h"
-
-class BKViewController    : public BKComponent, public BKListener, public BKNumberPad::Listener, public WantsKeyboardListener
+class BKViewController    : public BKComponent, public BKListener
 {
 public:
     BKViewController(BKAudioProcessor& p, BKItemGraph* theGraph);
@@ -36,26 +34,6 @@ public:
     PopupMenu getPrepOptionMenu(void);
     
     PopupMenu getModOptionMenu(void);
-    
-    void bkSingleSliderWantsKeyboard(BKSingleSlider* slider) override;
-    
-    void bkStackedSliderWantsKeyboard(BKStackedSlider* slider) override;
-    
-    void multiSliderWantsKeyboard(BKMultiSlider* slider) override;
-    
-    void bkRangeSliderWantsKeyboard(BKRangeSlider* slider, BKRangeSliderType which) override;
-    
-    void bkWaveDistanceUndertowSliderWantsKeyboard(BKWaveDistanceUndertowSlider* slider, NostalgicParameterType type) override;
-    
-    void keyboardSliderWantsKeyboard(BKKeyboardSlider* slider, KSliderTextFieldType which) override;
-    
-    void textEditorWantsKeyboard(BKTextEditor* editor) override;
-    
-    inline void setDisplayNumPad(bool display) { numberPad.setVisible(display);}
-    
-    void numberPadChanged(BKNumberPad*) override;
-    
-    void numberPadDismissed(BKNumberPad*) override;
     
 protected:
     BKAudioProcessor& processor;
@@ -68,8 +46,6 @@ protected:
     
     ImageComponent iconImageComponent;
     BKExitButton hideOrShow;
-    
-    BKNumberPad numberPad;
     
     BKSingleSlider* latched_BKSingleSlider;
     BKStackedSlider* latched_BKStackedSlider;

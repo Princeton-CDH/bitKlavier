@@ -44,22 +44,6 @@ typedef enum BKMultiSliderType {
     BKMultiSliderTypeNil
 } BKMultiSliderType;
 
-class WantsKeyboardListener
-{
-    
-public:
-    virtual ~WantsKeyboardListener() {};
-    
-    virtual void textEditorWantsKeyboard(BKTextEditor*) {};
-    virtual void bkStackedSliderWantsKeyboard(BKStackedSlider*) {};
-    virtual void bkSingleSliderWantsKeyboard(BKSingleSlider*) {};
-    virtual void multiSliderWantsKeyboard(BKMultiSlider*) {};
-    virtual void bkRangeSliderWantsKeyboard(BKRangeSlider*, BKRangeSliderType which) {};
-    virtual void bkWaveDistanceUndertowSliderWantsKeyboard(BKWaveDistanceUndertowSlider*, NostalgicParameterType type) {};
-    virtual void keyboardSliderWantsKeyboard(BKKeyboardSlider*, KSliderTextFieldType which) {};
-    
-};
-
 class BKTextEditor : public TextEditor
 {
 public:
@@ -70,28 +54,17 @@ public:
         
         font.setSizeAndStyle(fontHeight, 0, 0.75, 0.25);
         
-        
         setFont(font);
 #if JUCE_IOS
-        setReadOnly(true);
-        setCaretVisible(true);
-        setSelectAllWhenFocused(false);
+        setKeyboardType(TextInputTarget::VirtualKeyboardType::textKeyboard);
+        setInputRestrictions(10000, "0123456789[]()-.");
 #endif
+        
     }
     
     ~BKTextEditor(void){}
     
-    inline void mouseDown(const MouseEvent& e)
-    {
-        inputListeners.call(&WantsKeyboardListener::textEditorWantsKeyboard, this);
-    }
-    
-    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
-    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
-    
 private:
-    
-    ListenerList<WantsKeyboardListener> inputListeners;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKTextEditor)
     

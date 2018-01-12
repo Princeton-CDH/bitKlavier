@@ -77,10 +77,6 @@ void GeneralViewController::paint (Graphics& g)
 void GeneralViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
-    
-    float numberPadHeight = getHeight() - 2 * gYSpacing;
-    float numberPadWidth = getWidth() / 2 - 2 * gXSpacing;
-    numberPad.setSize(numberPadWidth, numberPadHeight);
 
     iconImageComponent.setBounds(area);
     area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
@@ -226,47 +222,6 @@ void GeneralViewController::BKSingleSliderValueChanged(String name, double val)
     }
 }
 
-void GeneralViewController::bkSingleSliderWantsKeyboard(BKSingleSlider* slider)
-{
-    DBG("BEGIN: " + String(slider->getValue()));
-    
-    //numberPadDismissed(&numberPad);
-    
-    latched_BKSingleSlider = slider;
-    
-    numberPad.setTopLeftPosition((slider->getX() > getWidth()) ? gXSpacing : (0.5 * getWidth() + gXSpacing), gYSpacing);
-    
-    numberPad.setEnabled(NumberLBracket, false);
-    numberPad.setEnabled(NumberRBracket, false);
-    numberPad.setEnabled(NumberNegative, false);
-    numberPad.setEnabled(NumberColon, false);
-    numberPad.setEnabled(NumberSpace, false);
-    
-    numberPad.setText(String(slider->getValue()));
-    
-    numberPad.setVisible(true);
-}
-
-void GeneralViewController::numberPadChanged(BKNumberPad*)
-{
-    String text = numberPad.getText();
-    
-    DBG("CHANGED: " + text);
-    
-    latched_BKSingleSlider->setText(text);
-}
-
-void GeneralViewController::numberPadDismissed(BKNumberPad*)
-{
-    String text = numberPad.getText();
-    
-    DBG("DISMISSED: " + text);
-    
-    if (latched_BKSingleSlider != nullptr)
-        latched_BKSingleSlider->setValue(text.getDoubleValue(), sendNotification);
-    
-    numberPad.setVisible(false);
-}
 
 void GeneralViewController::bkButtonClicked (Button* b)
 {

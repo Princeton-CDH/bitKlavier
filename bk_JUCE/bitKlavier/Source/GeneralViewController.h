@@ -46,10 +46,6 @@ private:
     void bkMessageReceived          (const String& message)     override { };
     void BKSingleSliderValueChanged (String name, double val)   override;
     
-    void bkSingleSliderWantsKeyboard(BKSingleSlider*) override;
-    
-    void numberPadChanged(BKNumberPad*) override;
-    void numberPadDismissed(BKNumberPad*) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GeneralViewController)
 };

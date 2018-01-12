@@ -36,7 +36,6 @@ BKViewController(p, theGraph)
         {
             paramSliders.insert(idx, new BKMultiSlider(HorizontalMultiBarSlider));
             addAndMakeVisible(paramSliders[idx]);
-            paramSliders[idx]->addMyListener(this);
             paramSliders[idx]->setName(cSynchronicParameterTypes[idx+SynchronicTranspOffsets]);
             paramSliders[idx]->setMinMaxDefaultInc(cSynchronicDefaultRangeValuesAndInc[i]);
             
@@ -103,14 +102,6 @@ BKViewController(p, theGraph)
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
-    
-#if JUCE_IOS
-    for (auto mslider : paramSliders) mslider->addWantsKeyboardListener(this);
-    howManySlider->addWantsKeyboardListener(this);
-    clusterThreshSlider->addWantsKeyboardListener(this);
-    clusterMinMaxSlider->addWantsKeyboardListener(this);
-    gainSlider->addWantsKeyboardListener(this);
-#endif
 }
 
 void SynchronicViewController::paint (Graphics& g)
@@ -666,10 +657,6 @@ SynchronicViewController(p, theGraph)
     clusterThreshSlider->addMyListener(this);
     clusterMinMaxSlider->addMyListener(this);
     gainSlider->addMyListener(this);
-    for(int i = 0; i < paramSliders.size(); i++)
-    {
-        paramSliders[i]->addMyListener(this);
-    }
     
     //startTimer(20);
     

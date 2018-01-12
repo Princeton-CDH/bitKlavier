@@ -694,9 +694,6 @@ void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
     
     focusLostByEscapeKey = false;
     
-#if JUCE_IOS
-    inputListeners.call(&WantsKeyboardListener::multiSliderWantsKeyboard, this);
-#endif
 }
 
 
@@ -1252,16 +1249,6 @@ void BKSingleSlider::checkValue(double newval)
     }
 }
 
-void BKSingleSlider::mouseDown(const MouseEvent& e)
-{
-#if JUCE_IOS
-    if (e.originalComponent == &valueTF || e.originalComponent == &showName)
-    {
-        inputListeners.call(&WantsKeyboardListener::bkSingleSliderWantsKeyboard, this);
-    }
-#endif
-}
-
 void BKSingleSlider::mouseUp(const MouseEvent &event)
 {
     if(event.mouseWasClicked())
@@ -1485,17 +1472,6 @@ void BKRangeSlider::sliderValueChanged (Slider *slider)
 
 void BKRangeSlider::mouseDown (const MouseEvent &event)
 {
-#if JUCE_IOS
-    if (event.originalComponent == &minValueTF)
-    {
-        inputListeners.call(&WantsKeyboardListener::bkRangeSliderWantsKeyboard, this, BKRangeSliderMin);
-    }
-    else if (event.originalComponent == &maxValueTF)
-    {
-        inputListeners.call(&WantsKeyboardListener::bkRangeSliderWantsKeyboard, this, BKRangeSliderMax);
-    }
-    else
-#endif
     if (event.eventComponent == &invisibleSlider)
     {
         if(event.mouseWasClicked())
@@ -1815,13 +1791,11 @@ void BKWaveDistanceUndertowSlider::mouseDoubleClick(const MouseEvent& e)
     {
         wavedistanceValueTF.setVisible(true);
         wavedistanceValueTF.grabKeyboardFocus();
-        inputListeners.call(&WantsKeyboardListener::bkWaveDistanceUndertowSliderWantsKeyboard, this, NostalgicWaveDistance);
     }
     else if (c == undertowSlider.get())
     {
         undertowValueTF.setVisible(true);
         undertowValueTF.grabKeyboardFocus();
-        inputListeners.call(&WantsKeyboardListener::bkWaveDistanceUndertowSliderWantsKeyboard, this, NostalgicUndertow);
     }
     
 }
@@ -2098,13 +2072,6 @@ void BKStackedSlider::setTo(Array<float> newvals, NotificationType newnotify)
 
 void BKStackedSlider::mouseDown (const MouseEvent &event)
 {
-#if JUCE_IOS
-    if (event.originalComponent == editValsTextField.get() || event.originalComponent == &showName)
-    {
-        inputListeners.call(&WantsKeyboardListener::bkStackedSliderWantsKeyboard, this);
-    }
-    else
-#endif
     if(event.mouseWasClicked())
     {
         clickedSlider = whichSlider();
@@ -2180,10 +2147,6 @@ void BKStackedSlider::mouseDoubleClick (const MouseEvent &e)
     editValsTextField->setHighlightedRegion(highlightRange);
     
     focusLostByEscapeKey = false;
-    
-#if JUCE_IOS
-    inputListeners.call(&WantsKeyboardListener::bkStackedSliderWantsKeyboard, this);
-#endif
 }
 
 void BKStackedSlider::textEditorReturnKeyPressed(TextEditor& textEditor)

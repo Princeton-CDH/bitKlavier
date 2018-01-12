@@ -115,13 +115,6 @@ BKViewController(p,theGraph)
     actionButton.addListener(this);
     addAndMakeVisible(actionButton);
     
-#if JUCE_IOS
-    offsetSlider->addWantsKeyboardListener(this);
-    absoluteKeyboard.addWantsKeyboardListener(this);
-    customKeyboard.addWantsKeyboardListener(this);
-    A1ClusterThresh->addWantsKeyboardListener(this);
-    A1ClusterMax->addWantsKeyboardListener(this);
-#endif
 }
 
 void TuningViewController::resized()

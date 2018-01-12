@@ -203,14 +203,9 @@ void BKKeyboardSlider::mouseUp(const MouseEvent& e)
 
 void BKKeyboardSlider::mouseDown(const MouseEvent& e)
 {
-    if (e.originalComponent == &keyboardValueTF || e.originalComponent == &showName)
-    {
-        inputListeners.call(&WantsKeyboardListener::keyboardSliderWantsKeyboard, this, KSliderThisValue);
-    }
-    else
-    {
-        lastKeyPressed = keyboard->getLastNoteOver();
-    }
+
+    lastKeyPressed = keyboard->getLastNoteOver();
+    
 }
 
 void BKKeyboardSlider::bkTextFieldDidChange (TextEditor& textEditor)
@@ -300,12 +295,9 @@ void BKKeyboardSlider::bkButtonClicked (Button* b)
     {
         focusLostByEscapeKey = false;
         keyboardValsTextField->setAlpha(1);
-#if !JUCE_IOS
+
         keyboardValsTextField->toFront(true);
-#else
-        keyboardValsTextField->toFront(false);
-        inputListeners.call(&WantsKeyboardListener::keyboardSliderWantsKeyboard, this, KSliderAllValues);
-#endif
+
         if(orderedPairs) {
             keyboardValsTextField->setText(offsetArrayToString2(keyboard->getValuesDirectly()), dontSendNotification);
             //keyboardValsTextField->setText(offsetArrayToString2(keyboard->getAbsoluteValues())

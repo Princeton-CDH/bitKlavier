@@ -19,8 +19,8 @@
 
 #include "BKUtilities.h"
 #include "BKComponent.h"
+#include "BKUIComponents.h"
 #include "BKLookAndFeel.h"
-#include "BKNumberPad.h"
 
 // ******************************************************************************************************************** //
 // **************************************************  BKSubSlider **************************************************** //
@@ -136,14 +136,6 @@ public:
         virtual void multiSliderValueChanged(String name, int whichSlider, Array<float> values) = 0;
         virtual void multiSliderAllValuesChanged(String name, Array<Array<float>> values) = 0;
     };
-    
-    ListenerList<Listener> listeners;
-    void addMyListener(Listener* listener)     { listeners.add(listener);      }
-    void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
-    
-    ListenerList<WantsKeyboardListener> inputListeners;
-    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
-    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
     
     void setName(String newName)                            { sliderName = newName; showName.setText(sliderName, dontSendNotification);        }
     String getName()                                        { return sliderName; }
@@ -286,11 +278,7 @@ public:
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
-    
-    ListenerList<WantsKeyboardListener> inputListeners;
-    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
-    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
-    
+
     void setDim(float newAlpha);
     void setBright();
 
@@ -409,10 +397,6 @@ public:
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
-    
-    ListenerList<WantsKeyboardListener> inputListeners;
-    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
-    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
     
 private:
     
@@ -534,10 +518,6 @@ public:
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
     
-    ListenerList<WantsKeyboardListener> inputListeners;
-    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
-    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
-    
     
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
@@ -648,10 +628,6 @@ public:
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
-    
-    ListenerList<WantsKeyboardListener> inputListeners;
-    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
-    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
     
 private:
     

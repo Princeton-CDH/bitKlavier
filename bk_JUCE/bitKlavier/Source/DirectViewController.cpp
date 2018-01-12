@@ -44,13 +44,6 @@ BKViewController(p, theGraph)
     hammerGainSlider->setJustifyRight(false);
     addAndMakeVisible(hammerGainSlider);
     
-#if JUCE_IOS
-    transpositionSlider->addWantsKeyboardListener(this);
-    gainSlider->addWantsKeyboardListener(this);
-    resonanceGainSlider->addWantsKeyboardListener(this);
-    hammerGainSlider->addWantsKeyboardListener(this);
-#endif
-    
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
