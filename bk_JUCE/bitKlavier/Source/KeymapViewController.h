@@ -23,7 +23,8 @@
 class KeymapViewController :
 public BKViewController,
 public BKKeymapKeyboardStateListener,
-public BKEditableComboBoxListener
+public BKEditableComboBoxListener,
+public BKTextEditor::WantsBigOneListener,
 #if JUCE_IOS
 , public Slider::Listener
 #endif
@@ -51,6 +52,8 @@ public:
     void keymapUpdated(TextEditor& tf);
     
     void bkTextFieldDidChange       (TextEditor&)           override;
+    
+    void textEditorWantsBigOne(BKTextEditor*) override;
 
 private:
     

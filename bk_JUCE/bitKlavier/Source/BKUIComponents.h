@@ -36,6 +36,16 @@ typedef enum KSliderTextFieldType
     KSliderTextFieldTypeNil,
 } KSliderTextFieldType;
 
+class WantsBigOneListener
+{
+    
+public:
+    virtual ~WantsBigOneListener() {};
+    
+    virtual void textEditorWantsBigOne(BKTextEditor*) {};
+    
+};
+
 typedef enum BKMultiSliderType {
     HorizontalMultiSlider = 0,
     VerticalMultiSlider,
@@ -57,14 +67,24 @@ public:
         setFont(font);
 #if JUCE_IOS
         setKeyboardType(TextInputTarget::VirtualKeyboardType::textKeyboard);
-        setInputRestrictions(10000, "0123456789[]()-.");
+        setInputRestrictions(10000, "0123456789 []()-.");
 #endif
         
     }
     
     ~BKTextEditor(void){}
     
+    inline void mouseDown(const MouseEvent& e)
+    {
+        listeners.call(&WantsBigOneListener::textEditorWantsBigOne, this);
+    }
+    
+    void addWantsBigOneListener(WantsBigOneListener* listener)     { listeners.add(listener);      }
+    void removeWantsBigOneListener(WantsBigOneListener* listener)  { listeners.remove(listener);   }
+    
 private:
+    
+    ListenerList<WantsBigOneListener> listeners;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKTextEditor)
     

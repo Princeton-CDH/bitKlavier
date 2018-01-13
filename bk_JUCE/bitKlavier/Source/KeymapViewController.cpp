@@ -306,9 +306,13 @@ void KeymapViewController::BKEditableComboBoxChanged(String name, BKEditableComb
     thisKeymap->setName(name);
 }
 
+void KeymapViewController::textEditorWantsBigOne(BKTextEditor*)
+{
+    
+}
+
 void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
 {
-
     String name = tf.getName();
     
     if (name == "KeymapMidi")
@@ -319,8 +323,6 @@ void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         DBG("Unregistered text field entered input.");
     }
-    
-    
 }
 
 void KeymapViewController::keymapUpdated(TextEditor& tf)

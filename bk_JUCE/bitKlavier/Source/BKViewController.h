@@ -46,15 +46,7 @@ protected:
     
     ImageComponent iconImageComponent;
     BKExitButton hideOrShow;
-    
-    BKSingleSlider* latched_BKSingleSlider;
-    BKStackedSlider* latched_BKStackedSlider;
-    BKRangeSlider* latched_BKRangeSlider;
-    BKMultiSlider* latched_BKMultiSlider;
-    BKWaveDistanceUndertowSlider* latched_BKWDUTSlider;
-    BKKeyboardSlider* latched_BKKeyboardSlider;
-    BKTextEditor* latched_BKTextEditor;
-    
+
     int lastId;
     
 private:

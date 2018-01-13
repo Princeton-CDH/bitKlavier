@@ -1,12 +1,12 @@
 /*
-  ==============================================================================
-
-    BKSlider.h
-    Created: 6 Apr 2017 9:50:44pm
-    Author:  Daniel Trueman
-
-  ==============================================================================
-*/
+ ==============================================================================
+ 
+ BKSlider.h
+ Created: 6 Apr 2017 9:50:44pm
+ Author:  Daniel Trueman
+ 
+ ==============================================================================
+ */
 
 /* TODO
  
@@ -19,8 +19,8 @@
 
 #include "BKUtilities.h"
 #include "BKComponent.h"
-#include "BKUIComponents.h"
 #include "BKLookAndFeel.h"
+#include "BKUIComponents.h"
 
 // ******************************************************************************************************************** //
 // **************************************************  BKSubSlider **************************************************** //
@@ -32,13 +32,13 @@ public:
     
     BKSubSlider (SliderStyle sstyle, double min, double max, double def, double increment, int width, int height);
     ~BKSubSlider();
-
-    double getValueFromText	(const String & text ) override;
+    
+    double getValueFromText    (const String & text ) override;
     bool isActive() { return active; }
     void isActive(bool newactive) {active = newactive; }
     void setMinMaxDefaultInc(std::vector<float> newvals);
     void setSkewFromMidpoint(bool sfm);
-        
+    
     
 private:
     
@@ -74,10 +74,10 @@ public:
     
     BKMultiSlider(BKMultiSliderType which);
     ~BKMultiSlider();
-
+    
     void addSlider(int where, bool active, NotificationType newnotify);
     void addSubSlider(int where, bool active, NotificationType newnotify);
-
+    
     void deactivateSlider(int where, NotificationType notify);
     void deactivateAll(NotificationType notify);
     void deactivateAllAfter(int where, NotificationType notify);
@@ -137,13 +137,17 @@ public:
         virtual void multiSliderAllValuesChanged(String name, Array<Array<float>> values) = 0;
     };
     
+    ListenerList<Listener> listeners;
+    void addMyListener(Listener* listener)     { listeners.add(listener);      }
+    void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
+    
     void setName(String newName)                            { sliderName = newName; showName.setText(sliderName, dontSendNotification);        }
     String getName()                                        { return sliderName; }
     
     Array<Array<float>> getAllValues();
     Array<Array<float>> getAllActiveValues();
     Array<float> getOneSliderBank(int which);
-
+    
     inline String getText(void){
         return editValsTextField->getText();
     }
@@ -157,7 +161,7 @@ private:
     
     String sliderName;
     BKLabel showName;
-
+    
     bool dragging;
     bool arrangedHorizontally;
     bool sliderIsVertical;
@@ -254,7 +258,6 @@ public:
     
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
-    void mouseDown(const MouseEvent &event) override;
     void mouseUp(const MouseEvent &event) override;
     void mouseDrag(const MouseEvent &e) override;
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
@@ -263,7 +266,7 @@ public:
     void resized() override;
     
     void setSkewFactor (double factor, bool symmetricSkew) { thisSlider.setSkewFactor(factor, symmetricSkew); }
-    void setSkewFactorFromMidPoint (double sliderValueToShowAtMidPoint	) { thisSlider.setSkewFactorFromMidPoint(sliderValueToShowAtMidPoint); }
+    void setSkewFactorFromMidPoint (double sliderValueToShowAtMidPoint    ) { thisSlider.setSkewFactorFromMidPoint(sliderValueToShowAtMidPoint); }
     
     class Listener
     {
@@ -279,9 +282,10 @@ public:
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
 
+    
     void setDim(float newAlpha);
     void setBright();
-
+    
 private:
     
     double sliderMin, sliderMax;
@@ -293,7 +297,7 @@ private:
     bool justifyRight;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSingleSlider)
-
+    
 };
 
 
@@ -322,7 +326,7 @@ public:
     String maxSliderName;
     
     Slider invisibleSlider;
-
+    
     String sliderName;
     BKLabel showName;
     
@@ -397,6 +401,7 @@ public:
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
+    
     
 private:
     
@@ -519,6 +524,7 @@ public:
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
     
     
+    
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
     void textEditorFocusLost(TextEditor& textEditor) override;
@@ -532,7 +538,7 @@ private:
     
     bool newDrag;
     bool clickedOnMinSlider;
-
+    
     ImageComponent sampleImageComponent;
     
     bool focusLostByEscapeKey;
@@ -629,6 +635,7 @@ public:
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
     
+    
 private:
     
     ScopedPointer<Slider> topSlider; //user interacts with this
@@ -648,7 +655,7 @@ private:
     
     BKMultiSliderLookAndFeel stackedSliderLookAndFeel;
     BKMultiSliderLookAndFeel topSliderLookAndFeel;
-
+    
     double sliderMin, sliderMax, sliderMinDefault, sliderMaxDefault;
     double sliderDefault;
     double sliderIncrement;
@@ -670,3 +677,4 @@ private:
 
 
 #endif  // BKSLIDER_H_INCLUDED
+
