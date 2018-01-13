@@ -139,7 +139,6 @@ public:
     
     void copyAdaptiveTuningState (Piano::Ptr prevPiano)
     {
-        DBG("copyAdaptiveTuningState called");
         TuningProcessor::PtrArr prevTuningProcessors = prevPiano->getTuningProcessors();
         for(int i=0; i<prevTuningProcessors.size(); i++)
         {
@@ -150,6 +149,24 @@ public:
                     tprocessor.getUnchecked(j)->setAdaptiveHistoryCounter(prevTuningProcessors.getUnchecked(i)->getAdaptiveHistoryCounter());
                     tprocessor.getUnchecked(j)->setAdaptiveFundamentalFreq(prevTuningProcessors.getUnchecked(i)->getAdaptiveFundamentalFreq());
                     tprocessor.getUnchecked(j)->setAdaptiveFundamentalNote(prevTuningProcessors.getUnchecked(i)->getAdaptiveFundamentalNote());
+                }
+            }
+        }
+    }
+    
+    void copyAdaptiveTempoState (Piano::Ptr prevPiano)
+    {
+        TempoProcessor::PtrArr prevTempoProcessors = prevPiano->getTempoProcessors();
+        for(int i=0; i<prevTempoProcessors.size(); i++)
+        {
+            for(int j=0; j<mprocessor.size(); j++)
+            {
+                if(mprocessor.getUnchecked(j)->getId() == prevTempoProcessors.getUnchecked(i)->getId())
+                {
+                    mprocessor.getUnchecked(j)->setAtTimer(prevTempoProcessors.getUnchecked(i)->getAtTimer());
+                    mprocessor.getUnchecked(j)->setAtLastTime(prevTempoProcessors.getUnchecked(i)->getAtLastTime());
+                    mprocessor.getUnchecked(j)->setAtDeltaHistory(prevTempoProcessors.getUnchecked(i)->getAtDeltaHistory());
+                    mprocessor.getUnchecked(j)->setAdaptiveTempoPeriodMultiplier(prevTempoProcessors.getUnchecked(i)->getAdaptiveTempoPeriodMultiplier());
                 }
             }
         }

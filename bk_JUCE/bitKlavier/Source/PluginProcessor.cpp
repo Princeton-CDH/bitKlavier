@@ -529,7 +529,9 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     prevPiano = currentPiano;
     
     currentPiano = gallery->getPiano(which);
-    currentPiano->copyAdaptiveTuningState(prevPiano); 
+    
+    currentPiano->copyAdaptiveTuningState(prevPiano);
+    currentPiano->copyAdaptiveTempoState(prevPiano);
     
     updateState->pianoDidChangeForGraph = true;
     updateState->synchronicPreparationDidChange = true;
