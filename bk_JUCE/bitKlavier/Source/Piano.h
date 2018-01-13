@@ -137,6 +137,24 @@ public:
     TuningProcessor::Ptr        addTuningProcessor(int thisId);
     TempoProcessor::Ptr         addTempoProcessor(int thisId);
     
+    void copyAdaptiveTuningState (Piano::Ptr prevPiano)
+    {
+        DBG("copyAdaptiveTuningState called");
+        TuningProcessor::PtrArr prevTuningProcessors = prevPiano->getTuningProcessors();
+        for(int i=0; i<prevTuningProcessors.size(); i++)
+        {
+            for(int j=0; j<tprocessor.size(); j++)
+            {
+                if(tprocessor.getUnchecked(j)->getId() == prevTuningProcessors.getUnchecked(i)->getId())
+                {
+                    tprocessor.getUnchecked(j)->setAdaptiveHistoryCounter(prevTuningProcessors.getUnchecked(i)->getAdaptiveHistoryCounter());
+                    tprocessor.getUnchecked(j)->setAdaptiveFundamentalFreq(prevTuningProcessors.getUnchecked(i)->getAdaptiveFundamentalFreq());
+                    tprocessor.getUnchecked(j)->setAdaptiveFundamentalNote(prevTuningProcessors.getUnchecked(i)->getAdaptiveFundamentalNote());
+                }
+            }
+        }
+    }
+    
 
     Array<int>                  pianoMap;
     int                         numPMaps;

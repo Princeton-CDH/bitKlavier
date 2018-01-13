@@ -630,7 +630,7 @@ bool HeaderViewController::handleGalleryChange(void)
         
         galleryIsDirtyAlertResult = AlertWindow::showYesNoCancelBox (AlertWindow::QuestionIcon,
                                                                      "The current gallery has changed.",
-                                                                     "Do you want to save before switching galleries?",
+                                                                     "Do you want to save first?",
                                                                      String(),
                                                                      String(),
                                                                      String(),
