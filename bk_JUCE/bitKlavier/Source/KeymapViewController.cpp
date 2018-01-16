@@ -306,11 +306,6 @@ void KeymapViewController::BKEditableComboBoxChanged(String name, BKEditableComb
     thisKeymap->setName(name);
 }
 
-void KeymapViewController::textEditorWantsBigOne(BKTextEditor*)
-{
-    
-}
-
 void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
 {
     String name = tf.getName();

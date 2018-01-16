@@ -26,7 +26,7 @@ public:
     ~BKListener();
     
     virtual void bkTextFieldDidChange   (TextEditor&)           {};
-    virtual void bkTextFieldReturnKeyPressed(TextEditor&)       {};
+    virtual void bkTextFieldTextEntered (TextEditor&)           {};
     
     void textEditorTextChanged      (TextEditor&) override;
     void textEditorFocusLost        (TextEditor&) override;

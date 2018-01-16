@@ -19,9 +19,11 @@ theGraph(theGraph),
 lastId(0)
 {
     addAndMakeVisible(hideOrShow);
-    hideOrShow.setAlwaysOnTop(true);
+    hideOrShow.toFront(false);
     hideOrShow.setName("hideOrShow");
     hideOrShow.addListener(this);
+    
+    addChildComponent(bigOne);
 }
 
 BKViewController::~BKViewController()
@@ -64,3 +66,4 @@ PopupMenu BKViewController::getModOptionMenu(void)
     
     return optionMenu;
 }
+

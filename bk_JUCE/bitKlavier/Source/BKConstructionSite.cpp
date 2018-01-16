@@ -16,13 +16,12 @@
 
 #define DRAW_MULTITOUCH 0
 
-BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, /*Viewport* vp,*/ BKItemGraph* theGraph):
+BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
 altDown(false),
 processor(p),
 graph(theGraph),
 connect(false),
-lastX(10),
-lastY(10),
+lastX(10), lastY(10),
 held(false),
 edittingComment(false)
 {

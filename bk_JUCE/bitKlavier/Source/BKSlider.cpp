@@ -1161,7 +1161,9 @@ sliderIncrement(increment)
     valueTF.setText(String(sliderDefault));
     valueTF.addListener(this);
     valueTF.setSelectAllWhenFocused(true);
-    
+#if JUCE_IOS
+    valueTF.setReadOnly(true);
+#endif
     
     valueTF.addMouseListener(this, true);
     valueTF.setColour(TextEditor::highlightColourId, Colours::darkgrey);
@@ -1194,7 +1196,6 @@ void BKSingleSlider::sliderValueChanged (Slider *slider)
     }
 }
 
-
 void BKSingleSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 {
     double newval = textEditor.getText().getDoubleValue();
@@ -1211,6 +1212,12 @@ void BKSingleSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 void BKSingleSlider::textEditorTextChanged(TextEditor& textEditor)
 {
     focusLostByEscapeKey = false;
+    
+    if (hasBigOne)
+    {
+        hasBigOne = false;
+        textEditorReturnKeyPressed(textEditor);
+    }
 }
 
 void BKSingleSlider::textEditorEscapeKeyPressed (TextEditor& textEditor)
@@ -1250,6 +1257,15 @@ void BKSingleSlider::checkValue(double newval)
     }
 }
 
+void BKSingleSlider::mouseDown(const MouseEvent& e)
+{
+    if (e.eventComponent != &thisSlider)
+    {
+        hasBigOne = true;
+        WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, &valueTF);
+    }
+    
+}
 
 void BKSingleSlider::mouseUp(const MouseEvent &event)
 {

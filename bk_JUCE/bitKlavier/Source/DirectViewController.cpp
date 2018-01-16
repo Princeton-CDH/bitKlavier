@@ -32,16 +32,19 @@ BKViewController(p, theGraph)
     gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(false);
+    gainSlider->addWantsBigOneListener(this);
     addAndMakeVisible(gainSlider);
     
     resonanceGainSlider = new BKSingleSlider("resonance gain", 0, 10, 0.2, 0.01);
     resonanceGainSlider->setSkewFactorFromMidPoint(1.);
     resonanceGainSlider->setJustifyRight(false);
+    resonanceGainSlider->addWantsBigOneListener(this);
     addAndMakeVisible(resonanceGainSlider);
     
     hammerGainSlider = new BKSingleSlider("hammer gain", 0, 10, 1, 0.01);
     hammerGainSlider->setSkewFactorFromMidPoint(1.);
     hammerGainSlider->setJustifyRight(false);
+    hammerGainSlider->addWantsBigOneListener(this);
     addAndMakeVisible(hammerGainSlider);
     
     addAndMakeVisible(actionButton);
@@ -139,6 +142,13 @@ DirectViewController(p, theGraph)
     resonanceGainSlider->addMyListener(this);
     
     hammerGainSlider->addMyListener(this);
+    
+    
+}
+
+void DirectPreparationEditor::iWantTheBigOne(TextEditor* tf)
+{
+    bigOne.display(tf, getBounds());
 }
 
 void DirectPreparationEditor::update(void)

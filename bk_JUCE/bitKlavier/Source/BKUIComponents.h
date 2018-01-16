@@ -36,16 +36,6 @@ typedef enum KSliderTextFieldType
     KSliderTextFieldTypeNil,
 } KSliderTextFieldType;
 
-class WantsBigOneListener
-{
-    
-public:
-    virtual ~WantsBigOneListener() {};
-    
-    virtual void textEditorWantsBigOne(BKTextEditor*) {};
-    
-};
-
 typedef enum BKMultiSliderType {
     HorizontalMultiSlider = 0,
     VerticalMultiSlider,
@@ -53,6 +43,51 @@ typedef enum BKMultiSliderType {
     VerticalMultiBarSlider,
     BKMultiSliderTypeNil
 } BKMultiSliderType;
+
+class WantsBigOne
+{
+public:
+    
+    WantsBigOne(void)
+    {
+        
+    }
+    
+    virtual ~WantsBigOne(void)
+    {
+        listeners.clear();
+    }
+    
+    class Listener
+    {
+        
+    public:
+        virtual ~Listener() {};
+        
+        virtual void iWantTheBigOne(TextEditor*) {};
+    };
+    
+    bool hasBigOne;
+    
+    void addWantsBigOneListener(WantsBigOne::Listener* listener)
+    {
+        listeners.add(listener);
+    }
+    
+    void removeWantsBigOneListener(WantsBigOne::Listener* listener)
+    {
+        listeners.remove(listener);
+    }
+
+    
+protected:
+    
+    ListenerList<WantsBigOne::Listener> listeners;
+    
+private:
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WantsBigOne)
+};
 
 class BKTextEditor : public TextEditor
 {
@@ -74,17 +109,7 @@ public:
     
     ~BKTextEditor(void){}
     
-    inline void mouseDown(const MouseEvent& e)
-    {
-        listeners.call(&WantsBigOneListener::textEditorWantsBigOne, this);
-    }
-    
-    void addWantsBigOneListener(WantsBigOneListener* listener)     { listeners.add(listener);      }
-    void removeWantsBigOneListener(WantsBigOneListener* listener)  { listeners.remove(listener);   }
-    
 private:
-    
-    ListenerList<WantsBigOneListener> listeners;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKTextEditor)
     
