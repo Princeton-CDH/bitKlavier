@@ -16,7 +16,8 @@
 BKViewController::BKViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
 processor(p),
 theGraph(theGraph),
-lastId(0)
+lastId(0),
+bigOne(p)
 {
     addAndMakeVisible(hideOrShow);
     hideOrShow.setAlwaysOnTop(true);

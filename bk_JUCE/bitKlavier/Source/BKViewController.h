@@ -27,14 +27,14 @@
 class BigOne : public Component, public BKListener
 {
 public:
-    BigOne(void):
+    BigOne(BKAudioProcessor& p):
     space("Space"),
     ok("Ok"),
     lb("["),
     rb("]"),
-    neg("-")
+    neg("-"),
+    processor(p)
     {
-        
         addAndMakeVisible(bigOne);
         bigOne.setSelectAllWhenFocused(true);
         bigOne.setName("bigOne");
@@ -45,6 +45,7 @@ public:
         bigOne.setKeyboardType(TextInputTarget::VirtualKeyboardType::decimalKeyboard);
         bigOne.setInputRestrictions(10000, "0123456789 []()-.");
         bigOne.setSelectAllWhenFocused(true);
+        bigOne.setMouseClickGrabsKeyboardFocus(true);
         
         addAndMakeVisible(bigOneLabel);
         bigOneLabel.setName("bigOneLabel");
@@ -52,10 +53,6 @@ public:
         bigOneLabel.setColour(TextEditor::ColourIds::textColourId, Colours::antiquewhite);
 
         bigOneLabel.setJustificationType(Justification::centredLeft);
-        
-        addAndMakeVisible(space);
-        space.addListener(this);
-        space.setWantsKeyboardFocus(false);
         
         addAndMakeVisible(ok);
         ok.addListener(this);
@@ -69,10 +66,16 @@ public:
         rb.addListener(this);
         rb.setWantsKeyboardFocus(false);
         
-        addAndMakeVisible(neg);
-        neg.addListener(this);
-        neg.setWantsKeyboardFocus(false);
-    
+        if (processor.updateState->needsExtraKeys)
+        {
+            addAndMakeVisible(space);
+            space.addListener(this);
+            space.setWantsKeyboardFocus(false);
+            
+            addAndMakeVisible(neg);
+            neg.addListener(this);
+            neg.setWantsKeyboardFocus(false);
+        }
     }
     
     ~BigOne()
@@ -162,19 +165,39 @@ public:
     {
         int perRow = 2, perCol = 3;
         int s = 2;
-        int buttonDim = (getHeight() * 0.4f)  / perCol - s;
+        int xoff = getWidth() * 0.025 * 0.5;
     
-        bigOneLabel.setBounds(getWidth() * 0.05 * 0.5, getHeight() * 0.05 * 0.5, getWidth() * 0.95, getHeight() * 0.05);
+        bigOneLabel.setBounds(xoff, getHeight()*0.025*0.5, getWidth() - 2*xoff, getHeight() * 0.05);
+
+        int width = bigOneLabel.getWidth();
         
-        bigOne.setBounds(bigOneLabel.getX(), bigOneLabel.getBottom(), bigOneLabel.getWidth() - perRow * (buttonDim - gXSpacing), getHeight() * 0.4f);
+        if (processor.updateState->needsExtraKeys)
+        {
+            int buttonDim = (getHeight() * 0.42f)  / perCol;
+            
+            width -= (perRow * (buttonDim + s));
+            
+            bigOne.setBounds(bigOneLabel.getX(), bigOneLabel.getBottom(), width, (buttonDim +s) * perCol);
+            
+            lb.setBounds(bigOne.getRight() + s, bigOne.getY(), buttonDim, buttonDim);
+            rb.setBounds(lb.getRight() + s, lb.getY(), buttonDim, buttonDim);
+            
+            space.setBounds(lb.getX(), lb.getBottom()+s, buttonDim*2+s, buttonDim);
+            
+            neg.setBounds(lb.getX(), space.getBottom()+s, buttonDim, buttonDim);
+            ok.setBounds(rb.getX(), neg.getY(), buttonDim, buttonDim);
+        }
+        else
+        {
+            int buttonDim = (getHeight() * 0.365f)  / perCol;
+            
+            bigOne.setBounds(bigOneLabel.getX(), bigOneLabel.getBottom(), width - buttonDim - 2*s, (buttonDim +s) * perCol);
+            
+            lb.setBounds(bigOne.getRight() + s, bigOne.getY(), buttonDim, buttonDim);
+            rb.setBounds(lb.getX(), lb.getBottom()+gYSpacing, buttonDim, buttonDim);
+            ok.setBounds(rb.getX(), rb.getBottom()+gYSpacing, buttonDim, buttonDim);
+        }
         
-        lb.setBounds(bigOne.getRight() + gXSpacing, bigOne.getY(), buttonDim, buttonDim);
-        rb.setBounds(lb.getRight() + s, lb.getY(), buttonDim, buttonDim);
-        
-        space.setBounds(lb.getX(), lb.getBottom()+s, buttonDim*2, buttonDim);
-        
-        neg.setBounds(lb.getX(), space.getBottom()+s, buttonDim, buttonDim);
-        ok.setBounds(rb.getX(), neg.getY(), buttonDim, buttonDim);
     }
     
     void setText(String text)
@@ -225,7 +248,9 @@ protected:
     Label bigOneLabel;
     
 private:
-     ListenerList<BigOne::Listener> listeners;
+    ListenerList<BigOne::Listener> listeners;
+    
+    BKAudioProcessor& processor;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BigOne)
 };
