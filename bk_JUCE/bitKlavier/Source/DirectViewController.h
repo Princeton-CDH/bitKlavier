@@ -68,7 +68,7 @@ public:
     
     static void actionButtonCallback(int action, DirectPreparationEditor*);
     
-    void iWantTheBigOne(TextEditor*) override;
+    void iWantTheBigOne(TextEditor*, String name) override;
     
     int addPreparation(void);
     int duplicatePreparation(void);

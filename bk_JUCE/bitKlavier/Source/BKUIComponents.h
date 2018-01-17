@@ -64,7 +64,7 @@ public:
     public:
         virtual ~Listener() {};
         
-        virtual void iWantTheBigOne(TextEditor*) {};
+        virtual void iWantTheBigOne(TextEditor*, String name) {};
     };
     
     bool hasBigOne;

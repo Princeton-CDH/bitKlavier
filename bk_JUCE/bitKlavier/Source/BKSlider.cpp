@@ -1262,7 +1262,7 @@ void BKSingleSlider::mouseDown(const MouseEvent& e)
     if (e.eventComponent != &thisSlider)
     {
         hasBigOne = true;
-        WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, &valueTF);
+        WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, &valueTF, sliderName);
     }
     
 }

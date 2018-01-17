@@ -146,9 +146,9 @@ DirectViewController(p, theGraph)
     
 }
 
-void DirectPreparationEditor::iWantTheBigOne(TextEditor* tf)
+void DirectPreparationEditor::iWantTheBigOne(TextEditor* tf, String name)
 {
-    bigOne.display(tf, getBounds());
+    bigOne.display(tf, name, getBounds());
 }
 
 void DirectPreparationEditor::update(void)

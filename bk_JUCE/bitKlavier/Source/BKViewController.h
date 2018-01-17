@@ -27,7 +27,12 @@
 class BigOne : public Component, public BKListener
 {
 public:
-    BigOne(void)
+    BigOne(void):
+    space("Space"),
+    ok("Ok"),
+    lb("["),
+    rb("]"),
+    neg("-")
     {
         
         addAndMakeVisible(bigOne);
@@ -37,21 +42,70 @@ public:
         bigOne.setColour(TextEditor::ColourIds::backgroundColourId, Colours::black.withAlpha(0.9f));
         bigOne.setMultiLine(true);
         
-        bigOne.setKeyboardType(TextInputTarget::VirtualKeyboardType::textKeyboard);
+        bigOne.setKeyboardType(TextInputTarget::VirtualKeyboardType::decimalKeyboard);
         bigOne.setInputRestrictions(10000, "0123456789 []()-.");
-        
+        bigOne.setSelectAllWhenFocused(true);
         
         addAndMakeVisible(bigOneLabel);
         bigOneLabel.setName("bigOneLabel");
         bigOneLabel.setColour(TextEditor::ColourIds::backgroundColourId, Colours::black.withAlpha(0.9f));
         bigOneLabel.setColour(TextEditor::ColourIds::textColourId, Colours::antiquewhite);
 
-        bigOneLabel.setJustificationType(Justification::centred);
+        bigOneLabel.setJustificationType(Justification::centredLeft);
+        
+        addAndMakeVisible(space);
+        space.addListener(this);
+        space.setWantsKeyboardFocus(false);
+        
+        addAndMakeVisible(ok);
+        ok.addListener(this);
+        ok.setWantsKeyboardFocus(false);
+        
+        addAndMakeVisible(lb);
+        lb.addListener(this);
+        lb.setWantsKeyboardFocus(false);
+        
+        addAndMakeVisible(rb);
+        rb.addListener(this);
+        rb.setWantsKeyboardFocus(false);
+        
+        addAndMakeVisible(neg);
+        neg.addListener(this);
+        neg.setWantsKeyboardFocus(false);
+    
     }
     
     ~BigOne()
     {
         
+    }
+    
+    void bkButtonClicked(Button* button) override
+    {
+        String text = bigOne.getText();
+ 
+        DBG("text: " + text);
+        
+        String insert = "";
+        
+        if (button == &ok)
+        {
+            setAndHide();
+        }
+        else
+        {
+            if (button == &space)       insert = " ";
+            else if (button == &neg)    insert = "-";
+            else if (button == &lb)     insert = "[";
+            else if (button == &rb)     insert = "]";
+        
+            bigOne.insertTextAtCaret(insert);
+
+            DBG("new text: " +  bigOne.getText());
+            
+            // Give focus back to keyboard
+            bigOne.grabKeyboardFocus();
+        }
     }
     
     void bkTextFieldTextEntered (TextEditor& tf) override
@@ -62,12 +116,17 @@ public:
         }
     }
     
+    void setAndHide(void)
+    {
+        target->setText(bigOne.getText(), sendNotification);
+        hide();
+    }
+    
     void bkTextFieldDidChange   (TextEditor& tf) override
     {
         if (tf.getName() == "bigOne")
         {
-            target->setText(tf.getText(), sendNotification);
-            hide();
+            setAndHide();
         }
     };
     
@@ -82,6 +141,21 @@ public:
     
     void resized(void) override
     {
+        int perRow = 2, perCol = 3;
+        int s = 2;
+        int buttonDim = (getHeight() * 0.4f)  / perCol - s;
+    
+        bigOneLabel.setBounds(getWidth() * 0.05 * 0.5, getHeight() * 0.05 * 0.5, getWidth() * 0.95, getHeight() * 0.05);
+        
+        bigOne.setBounds(bigOneLabel.getX(), bigOneLabel.getBottom(), bigOneLabel.getWidth() - perRow * (buttonDim - gXSpacing), getHeight() * 0.4f);
+        
+        lb.setBounds(bigOne.getRight() + gXSpacing, bigOne.getY(), buttonDim, buttonDim);
+        rb.setBounds(lb.getRight() + s, lb.getY(), buttonDim, buttonDim);
+        
+        space.setBounds(lb.getX(), lb.getBottom()+s, buttonDim*2, buttonDim);
+        
+        neg.setBounds(lb.getX(), space.getBottom()+s, buttonDim, buttonDim);
+        ok.setBounds(rb.getX(), neg.getY(), buttonDim, buttonDim);
     }
     
     void setText(String text)
@@ -98,19 +172,16 @@ public:
         bigOne.setText(text, dontSendNotification);
     }
     
-    inline void display(TextEditor* tf, Rectangle<int> rect)
+    inline void display(TextEditor* tf, String name, Rectangle<int> rect)
     {
         target = tf;
         
         setBounds(rect);
         
-        bigOneLabel.setBounds(getWidth() * 0.05 * 0.5, getHeight() * 0.05 * 0.5, getWidth() * 0.95, getHeight() * 0.05);
-        bigOne.setBounds(bigOneLabel.getX(), bigOneLabel.getBottom(), bigOneLabel.getWidth(), getHeight() * 0.4f);
-        
         setVisible(true);
         toFront(true);
         
-        bigOneLabel.setText(target->getName(), dontSendNotification);
+        bigOneLabel.setText(name, dontSendNotification);
         bigOneLabel.toFront(true);
         
         bigOne.toFront(true);
@@ -127,6 +198,8 @@ public:
     
 protected:
     TextEditor* target;
+    
+    BKTextButton neg, space, ok, lb, rb;
     
     TextEditor bigOne;
     Label bigOneLabel;
