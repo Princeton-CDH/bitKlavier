@@ -19,7 +19,7 @@ theGraph(theGraph),
 lastId(0)
 {
     addAndMakeVisible(hideOrShow);
-    hideOrShow.toFront(false);
+    hideOrShow.setAlwaysOnTop(true);
     hideOrShow.setName("hideOrShow");
     hideOrShow.addListener(this);
     

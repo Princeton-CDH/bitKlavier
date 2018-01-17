@@ -80,6 +80,25 @@ public:
         
     }
     
+    class Listener
+    {
+        
+    public:
+        virtual ~Listener() {};
+        
+        virtual void bigOneDismissed(void) {};
+    };
+    
+    void addBigOneListener(BigOne::Listener* listener)
+    {
+        listeners.add(listener);
+    }
+    
+    void removeBigOneListener(BigOne::Listener* listener)
+    {
+        listeners.remove(listener);
+    }
+    
     void bkButtonClicked(Button* button) override
     {
         String text = bigOne.getText();
@@ -193,6 +212,7 @@ public:
     
     inline void hide(void)
     {
+        listeners.call(&BigOne::Listener::bigOneDismissed);
         setVisible(false);
     }
     
@@ -205,11 +225,12 @@ protected:
     Label bigOneLabel;
     
 private:
+     ListenerList<BigOne::Listener> listeners;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BigOne)
 };
 
-class BKViewController    : public BKComponent, public BKListener
+class BKViewController    : public BKComponent, public BKListener, public BigOne::Listener
 {
 public:
     BKViewController(BKAudioProcessor& p, BKItemGraph* theGraph);
@@ -219,6 +240,11 @@ public:
     PopupMenu getPrepOptionMenu(void);
     
     PopupMenu getModOptionMenu(void);
+    
+    inline void bigOneDismissed(void) override
+    {
+        hideOrShow.setAlwaysOnTop(true);
+    }
     
 protected:
     BKAudioProcessor& processor;
@@ -231,9 +257,10 @@ protected:
     BKButtonAndMenuLAF buttonsAndMenusLAF;
     BKButtonAndMenuLAF buttonsAndMenusLAF2;
 
-    
-    ImageComponent iconImageComponent;
     BKExitButton hideOrShow;
+    ImageComponent iconImageComponent;
+    
+    
 
     int lastId;
     

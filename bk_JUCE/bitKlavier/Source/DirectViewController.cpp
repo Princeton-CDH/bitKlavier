@@ -148,6 +148,7 @@ DirectViewController(p, theGraph)
 
 void DirectPreparationEditor::iWantTheBigOne(TextEditor* tf, String name)
 {
+    hideOrShow.setAlwaysOnTop(false);
     bigOne.display(tf, name, getBounds());
 }
 
