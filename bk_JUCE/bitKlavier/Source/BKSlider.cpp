@@ -2142,9 +2142,13 @@ void BKStackedSlider::mouseMove(const MouseEvent& e)
 
 void BKStackedSlider::mouseDoubleClick (const MouseEvent &e)
 {
-    
     //highlight number for current slider
     
+#if JUCE_IOS
+    
+    WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, editValsTextField, sliderName);
+    
+#else
     StringArray tokens;
     tokens.addTokens(floatArrayToString(getAllActiveValues()), false); //arrayFloatArrayToString
     int startPoint = 0;
@@ -2165,6 +2169,7 @@ void BKStackedSlider::mouseDoubleClick (const MouseEvent &e)
     editValsTextField->setHighlightedRegion(highlightRange);
     
     focusLostByEscapeKey = false;
+#endif
     
 }
 
@@ -2203,6 +2208,15 @@ void BKStackedSlider::textEditorEscapeKeyPressed (TextEditor& textEditor)
         editValsTextField->setVisible(false);
         editValsTextField->toBack();
         unfocusAllComponents();
+    }
+}
+
+void BKStackedSlider::textEditorTextChanged(TextEditor& textEditor)
+{
+    if (hasBigOne)
+    {
+        hasBigOne = false;
+        textEditorReturnKeyPressed(textEditor);
     }
 }
 

@@ -26,6 +26,7 @@ BKViewController(p, theGraph)
     addAndMakeVisible(selectCB);
     
     transpositionSlider = new BKStackedSlider("transpositions", -12, 12, -12, 12, 0, 0.01);
+    transpositionSlider->addWantsBigOneListener(this);
 
     addAndMakeVisible(transpositionSlider);
     

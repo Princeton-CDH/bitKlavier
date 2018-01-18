@@ -566,6 +566,9 @@ class BKStackedSlider :
 public Component,
 public Slider::Listener,
 public TextEditor::Listener
+#if JUCE_IOS
+, public WantsBigOne
+#endif
 {
 public:
     
@@ -589,6 +592,7 @@ public:
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void textEditorFocusLost(TextEditor& textEditor) override;
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
+    void textEditorTextChanged(TextEditor& textEditor) override;
     void mouseDown (const MouseEvent &event) override;
     void mouseDrag(const MouseEvent& e) override;
     void mouseUp(const MouseEvent& e) override;
