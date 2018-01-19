@@ -30,7 +30,9 @@ public:
     
     virtual void update(void){};
     
+#if JUCE_IOS
     void iWantTheBigOne(TextEditor*, String name) override;
+#endif
     
 protected:
     BKLabel selectLabel;

@@ -53,7 +53,9 @@ public:
     
     void bkTextFieldDidChange       (TextEditor&)           override;
 
+#if JUCE_IOS
     void iWantTheBigOne(TextEditor*, String name) override;
+#endif
     
 private:
     

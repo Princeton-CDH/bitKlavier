@@ -150,11 +150,13 @@ void NostalgicViewController::fillModeSelectCB(void)
     lengthModeSelectCB.setSelectedItemIndex(0, NotificationType::dontSendNotification);
 }
 
+#if JUCE_IOS
 void NostalgicViewController::iWantTheBigOne(TextEditor* tf, String name)
 {
     hideOrShow.setAlwaysOnTop(false);
     bigOne.display(tf, name, getBounds());
 }
+#endif
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ NostalgicPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
 

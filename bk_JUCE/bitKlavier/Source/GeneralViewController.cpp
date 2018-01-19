@@ -42,11 +42,13 @@ BKViewController(p, theGraph)
     
 }
 
+#if JUCE_IOS
 void GeneralViewController::iWantTheBigOne(TextEditor* tf, String name)
 {
     hideOrShow.setAlwaysOnTop(false);
     bigOne.display(tf, name, getBounds());
 }
+#endif
 
 GeneralViewController::~GeneralViewController()
 {

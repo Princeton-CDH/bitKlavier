@@ -213,12 +213,13 @@ void SynchronicViewController::fillModeSelectCB(void)
     modeSelectCB.setSelectedItemIndex(0, NotificationType::dontSendNotification);
 }
 
-
+#if JUCE_IOS
 void SynchronicViewController::iWantTheBigOne(TextEditor* tf, String name)
 {
     hideOrShow.setAlwaysOnTop(false);
     bigOne.display(tf, name, getBounds());
 }
+#endif
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ SynchronicPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
 

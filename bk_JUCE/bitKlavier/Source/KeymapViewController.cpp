@@ -351,11 +351,13 @@ void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
     }
 }
 
+#if JUCE_IOS
 void KeymapViewController::iWantTheBigOne(TextEditor* tf, String name)
 {
     hideOrShow.setAlwaysOnTop(false);
     bigOne.display(tf, name, getBounds());
 }
+#endif
 
 void KeymapViewController::keymapUpdated(TextEditor& tf)
 {

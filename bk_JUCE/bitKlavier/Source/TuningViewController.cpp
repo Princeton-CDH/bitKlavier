@@ -330,11 +330,13 @@ void TuningViewController::updateComponentVisibility()
     }
 }
 
+#if JUCE_IOS
 void TuningViewController::iWantTheBigOne(TextEditor* tf, String name)
 {
     hideOrShow.setAlwaysOnTop(false);
     bigOne.display(tf, name, getBounds());
 }
+#endif
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ TuningPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
 
