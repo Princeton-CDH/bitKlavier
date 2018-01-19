@@ -9,31 +9,31 @@
 namespace BinaryData
 {
     extern const char*   _1__Synchronic_1_xml;
-    const int            _1__Synchronic_1_xmlSize = 25063;
+    const int            _1__Synchronic_1_xmlSize = 25068;
 
     extern const char*   _2__Synchronic_2_xml;
-    const int            _2__Synchronic_2_xmlSize = 23922;
+    const int            _2__Synchronic_2_xmlSize = 24656;
 
     extern const char*   _3__Synchronic_3_xml;
-    const int            _3__Synchronic_3_xmlSize = 23445;
+    const int            _3__Synchronic_3_xmlSize = 24159;
 
     extern const char*   _4__Synchronic_4_xml;
-    const int            _4__Synchronic_4_xmlSize = 24208;
+    const int            _4__Synchronic_4_xmlSize = 24840;
 
     extern const char*   _5__Synchronic_5_xml;
-    const int            _5__Synchronic_5_xmlSize = 23997;
+    const int            _5__Synchronic_5_xmlSize = 24657;
 
     extern const char*   _6__Synchronic_6_xml;
-    const int            _6__Synchronic_6_xmlSize = 24822;
+    const int            _6__Synchronic_6_xmlSize = 25533;
 
     extern const char*   _7__Synchronic_7_xml;
-    const int            _7__Synchronic_7_xmlSize = 24880;
+    const int            _7__Synchronic_7_xmlSize = 25466;
 
     extern const char*   _8__Synchronic_8_xml;
-    const int            _8__Synchronic_8_xmlSize = 24974;
+    const int            _8__Synchronic_8_xmlSize = 25819;
 
     extern const char*   _9__Synchronic_9_xml;
-    const int            _9__Synchronic_9_xmlSize = 24964;
+    const int            _9__Synchronic_9_xmlSize = 25584;
 
     extern const char*   _10__Nostalgic_1_xml;
     const int            _10__Nostalgic_1_xmlSize = 37230;
