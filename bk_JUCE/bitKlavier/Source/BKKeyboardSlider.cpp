@@ -201,7 +201,7 @@ void BKKeyboardSlider::mouseUp(const MouseEvent& e)
     keyboard->repaint();
 }
 
-void BKKeyboardSlider::mouseDown(const MouseEvent& e)
+void BKKeyboardSlider::mouseDoubleClick(const MouseEvent& e)
 {
 #if JUCE_IOS
     lastKeyPressed = -1;
@@ -216,10 +216,13 @@ void BKKeyboardSlider::mouseDown(const MouseEvent& e)
                                         "value for note " + midiToPitchClass(lastKeyPressed));
         }
     }
-    
-#else
-    lastKeyPressed = keyboard->getLastNoteOver();
 #endif
+}
+
+void BKKeyboardSlider::mouseDown(const MouseEvent& e)
+{
+
+    lastKeyPressed = keyboard->getLastNoteOver();
     
 }
 
