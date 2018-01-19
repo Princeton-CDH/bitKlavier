@@ -187,7 +187,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     else                            updateState->needsExtraKeys = false;
     
     if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
-    else                    loadPianoSamples(BKLoadLite); // CHANGE BACK TO MEDIUM
+    else                    loadPianoSamples(BKLoadMedium); // CHANGE BACK TO MEDIUM
 #else
     loadPianoSamples(BKLoadHeavy); // CHANGE THIS BACK TO HEAVY
 #endif
