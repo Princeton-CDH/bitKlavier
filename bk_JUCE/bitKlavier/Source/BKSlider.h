@@ -39,7 +39,6 @@ public:
     void setMinMaxDefaultInc(std::vector<float> newvals);
     void setSkewFromMidpoint(bool sfm);
     
-    
 private:
     
     double sliderMin, sliderMax;
@@ -68,6 +67,9 @@ class BKMultiSlider :
 public Component,
 public Slider::Listener,
 public TextEditor::Listener
+#if JUCE_IOS
+, public WantsBigOne
+#endif
 {
     
 public:
@@ -201,6 +203,7 @@ private:
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void textEditorFocusLost(TextEditor& textEditor) override;
+    void textEditorTextChanged(TextEditor&) override;
     
     void showModifyPopupMenu(int which);
     static void sliderModifyMenuCallback (const int result, BKMultiSlider* slider, int which);
@@ -316,6 +319,9 @@ class BKRangeSlider :
 public Component,
 public Slider::Listener,
 public TextEditor::Listener
+#if JUCE_IOS
+, public WantsBigOne
+#endif
 {
 public:
     BKRangeSlider(String sliderName, double min, double max, double defmin, double defmax, double increment);
@@ -438,8 +444,9 @@ class BKWaveDistanceUndertowSlider :
 public Component,
 public Slider::Listener,
 public TextEditor::Listener
-//public BKSingleSlider::Listener,
-
+#if JUCE_IOS
+, public WantsBigOne
+#endif
 {
 public:
     BKWaveDistanceUndertowSlider();

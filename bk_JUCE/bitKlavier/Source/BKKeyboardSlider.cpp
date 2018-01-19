@@ -62,7 +62,7 @@ needsOctaveSlider(nos)
     keyboardValueTF.setName("KSLIDERTXT");
     keyboardValueTF.addListener(this);
 #if JUCE_IOS
-    keyboardValueTF.addMouseListener(this, true);
+    keyboardValueTF.setReadOnly(true);
 #endif
     addAndMakeVisible(keyboardValueTF);
 
@@ -203,8 +203,13 @@ void BKKeyboardSlider::mouseUp(const MouseEvent& e)
 
 void BKKeyboardSlider::mouseDown(const MouseEvent& e)
 {
-
     lastKeyPressed = keyboard->getLastNoteOver();
+    
+    if (e.eventComponent == &keyboardValueTF || e.eventComponent == &showName)
+    {
+        hasBigOne = true;
+        WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, &keyboardValueTF, "value for note " + String(lastKeyPressed));
+    }
     
 }
 
@@ -284,6 +289,17 @@ void BKKeyboardSlider::textEditorFocusLost(TextEditor& textEditor)
 #endif
 }
 
+void BKKeyboardSlider::textEditorTextChanged(TextEditor& tf)
+{
+#if JUCE_IOS
+    if (hasBigOne)
+    {
+        hasBigOne = false;
+        textEditorReturnKeyPressed(tf);
+    }
+#endif
+}
+
 void BKKeyboardSlider::handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber)
 {
 
@@ -291,9 +307,16 @@ void BKKeyboardSlider::handleKeymapNoteToggled (BKKeymapKeyboardState* source, i
 
 void BKKeyboardSlider::bkButtonClicked (Button* b)
 {
+#if JUCE_IOS
+    hasBigOne = true;
+    WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, keyboardValsTextField, "scale offsets");
+    //WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, &keyboardValsTextFieldOpen, "scale offsets");
+#else
+    
     if(b->getName() == keyboardValsTextFieldOpen.getName())
     {
         focusLostByEscapeKey = false;
+    
         keyboardValsTextField->setAlpha(1);
 
         keyboardValsTextField->toFront(true);
@@ -307,7 +330,11 @@ void BKKeyboardSlider::bkButtonClicked (Button* b)
             keyboardValsTextField->setText(floatArrayToString(keyboard->getValuesDirectly()), dontSendNotification);
             //keyboardValsTextField->setText(floatArrayToString(keyboard->getRotatedValues())
         }
+
     }
+    
+#endif
+
 }
 
 // * cut this

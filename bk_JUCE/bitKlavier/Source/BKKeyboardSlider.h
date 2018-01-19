@@ -18,12 +18,15 @@
 
 #include "BKSlider.h"
 
+#include "BKUIComponents.h"
+
 class BKKeyboardSlider :
 public BKComponent,
 public BKListener,
 public BKKeymapKeyboardStateListener
 #if JUCE_IOS
-,private juce::Slider::Listener
+, private juce::Slider::Listener,
+public WantsBigOne
 #endif
 {
     
@@ -140,6 +143,7 @@ private:
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void textEditorFocusLost(TextEditor& textEditor) override;
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
+    void textEditorTextChanged(TextEditor& textEditor) override;
     void bkTextFieldDidChange (TextEditor& txt) override;
     void bkButtonClicked (Button* b) override;
     void mouseMove(const MouseEvent& e) override;

@@ -14,8 +14,10 @@
 
 
 class DirectViewController :
-public BKViewController,
-public WantsBigOne::Listener
+public BKViewController
+#if JUCE_IOS
+, public WantsBigOne::Listener
+#endif
 {
 public:
     

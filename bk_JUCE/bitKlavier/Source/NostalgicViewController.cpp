@@ -55,6 +55,14 @@ BKViewController(p, theGraph)
     
     addAndMakeVisible(nDisplaySlider);
     
+#if JUCE_IOS
+    beatsToSkipSlider->addWantsBigOneListener(this);
+    gainSlider->addWantsBigOneListener(this);
+    lengthMultiplierSlider->addWantsBigOneListener(this);
+    transpositionSlider->addWantsBigOneListener(this);
+    nDisplaySlider.addWantsBigOneListener(this);
+#endif
+    
 }
 
 void NostalgicViewController::paint (Graphics& g)
@@ -160,6 +168,12 @@ NostalgicViewController(p, theGraph)
     gainSlider->addMyListener(this);
     
     startTimer(20);
+}
+
+void NostalgicPreparationEditor::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
 }
 
 void NostalgicPreparationEditor::BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow)

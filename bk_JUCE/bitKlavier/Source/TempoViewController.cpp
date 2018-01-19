@@ -258,6 +258,11 @@ void TempoPreparationEditor::timerCallback()
     
 }
 
+void TempoPreparationEditor::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
+}
 
 void TempoPreparationEditor::fillSelectCB(int last, int current)
 {

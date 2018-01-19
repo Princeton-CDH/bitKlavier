@@ -37,6 +37,10 @@ BKViewController(p, theGraph)
             paramSliders.insert(idx, new BKMultiSlider(HorizontalMultiBarSlider));
             addAndMakeVisible(paramSliders[idx]);
             paramSliders[idx]->setName(cSynchronicParameterTypes[idx+SynchronicTranspOffsets]);
+            paramSliders[idx]->addMyListener(this);
+#if JUCE_IOS
+            paramSliders[idx]->addWantsBigOneListener(this);
+#endif
             paramSliders[idx]->setMinMaxDefaultInc(cSynchronicDefaultRangeValuesAndInc[i]);
             
             if(paramSliders[idx]->getName() == "transpositions")
@@ -91,6 +95,16 @@ BKViewController(p, theGraph)
     gainSlider->setJustifyRight(false);
     gainSlider->setSkewFactorFromMidPoint(1.);
     addAndMakeVisible(gainSlider);
+    
+#if JUCE_IOS
+    howManySlider->addWantsBigOneListener(this);
+
+    clusterThreshSlider->addWantsBigOneListener(this);
+
+    gainSlider->addWantsBigOneListener(this);
+    
+    clusterMinMaxSlider->addWantsBigOneListener(this);
+#endif
     
     releaseVelocitySetsSynchronicToggle.addListener(this);
     releaseVelocitySetsSynchronicToggle.setLookAndFeel(&buttonsAndMenusLAF2); //need different one so toggle text can be on other side
@@ -561,6 +575,12 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
             active->setBeatsToSkip(toggleVal);
         }
     }
+}
+
+void SynchronicPreparationEditor::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
 }
 
 void SynchronicPreparationEditor::bkTextFieldDidChange(TextEditor& tf)

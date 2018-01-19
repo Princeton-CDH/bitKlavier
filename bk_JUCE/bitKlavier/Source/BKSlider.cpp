@@ -652,6 +652,10 @@ void BKMultiSlider::mouseMove(const MouseEvent& e)
 
 void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
 {
+#if JUCE_IOS
+    hasBigOne = true;
+    WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, editValsTextField, sliderName);
+#else
     int which = whichSlider(e);
     int whichSave = which;
     
@@ -695,6 +699,7 @@ void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
     editValsTextField->setHighlightedRegion(highlightRange);
     
     focusLostByEscapeKey = false;
+#endif
 }
 
 
@@ -940,7 +945,6 @@ void BKMultiSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
         listeners.call(&BKMultiSlider::Listener::multiSliderAllValuesChanged,
                        getName(),
                        getAllActiveValues());
-        
     }
 }
 
@@ -953,6 +957,17 @@ void BKMultiSlider::textEditorEscapeKeyPressed (TextEditor& textEditor)
         editValsTextField->toBack();
         unfocusAllComponents();
     }
+}
+
+void BKMultiSlider::textEditorTextChanged(TextEditor& tf)
+{
+#if JUCE_IOS
+    if (hasBigOne)
+    {
+        hasBigOne = false;
+        textEditorReturnKeyPressed(tf);
+    }
+#endif
 }
 
 void BKMultiSlider::textEditorFocusLost(TextEditor& textEditor)
@@ -976,6 +991,7 @@ void BKMultiSlider::textEditorFocusLost(TextEditor& textEditor)
     }
 #endif
 }
+
 
 Array<Array<float>> BKMultiSlider::getAllValues()
 {
@@ -1212,12 +1228,13 @@ void BKSingleSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 void BKSingleSlider::textEditorTextChanged(TextEditor& textEditor)
 {
     focusLostByEscapeKey = false;
-    
+#if JUCE_IOS
     if (hasBigOne)
     {
         hasBigOne = false;
         textEditorReturnKeyPressed(textEditor);
     }
+#endif
 }
 
 void BKSingleSlider::textEditorEscapeKeyPressed (TextEditor& textEditor)
@@ -1259,11 +1276,13 @@ void BKSingleSlider::checkValue(double newval)
 
 void BKSingleSlider::mouseDown(const MouseEvent& e)
 {
+#if JUCE_IOS
     if (e.eventComponent != &thisSlider)
     {
         hasBigOne = true;
         WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, &valueTF, sliderName);
     }
+#endif
     
 }
 
@@ -1490,24 +1509,40 @@ void BKRangeSlider::sliderValueChanged (Slider *slider)
 
 void BKRangeSlider::mouseDown (const MouseEvent &event)
 {
-        if (event.eventComponent == &invisibleSlider)
+    Component* ec = event.eventComponent;
+    
+    if (ec == &invisibleSlider)
+    {
+        if(event.mouseWasClicked())
         {
-            if(event.mouseWasClicked())
+            if(event.y > invisibleSlider.getHeight() / 2.)
             {
-                if(event.y > invisibleSlider.getHeight() / 2.)
-                {
-                    clickedOnMinSlider = true;
-                }
-                else
-                {
-                    clickedOnMinSlider = false;
-                }
-                
-                newDrag = true;
+                clickedOnMinSlider = true;
+            }
+            else
+            {
+                clickedOnMinSlider = false;
             }
             
-            unfocusAllComponents();
+            newDrag = true;
         }
+        
+        unfocusAllComponents();
+    }
+    
+#if JUCE_IOS
+    else if (ec == &minValueTF)
+    {
+        hasBigOne = true;
+        WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, &minValueTF, "cluster min");
+    }
+    else if (ec == &maxValueTF)
+    {
+        hasBigOne = true;
+        WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, &maxValueTF, "cluster max");
+    }
+#endif
+    
 }
 
 
@@ -1554,6 +1589,14 @@ void BKRangeSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 void BKRangeSlider::textEditorTextChanged(TextEditor& textEditor)
 {
     focusLostByEscapeKey = false;
+    
+#if JUCE_IOS
+    if (hasBigOne)
+    {
+        hasBigOne = false;
+        textEditorReturnKeyPressed(textEditor);
+    }
+#endif
 }
 
 
@@ -1807,13 +1850,23 @@ void BKWaveDistanceUndertowSlider::mouseDoubleClick(const MouseEvent& e)
     
     if (c == wavedistanceSlider.get())
     {
+#if JUCE_IOS
+        hasBigOne = true;
+        WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, &wavedistanceValueTF, "wave distance (ms)");
+#else
         wavedistanceValueTF.setVisible(true);
         wavedistanceValueTF.grabKeyboardFocus();
+#endif
     }
     else if (c == undertowSlider.get())
     {
+#if JUCE_IOS
+        hasBigOne = true;
+        WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, &undertowValueTF, "undertow (ms)");
+#else
         undertowValueTF.setVisible(true);
         undertowValueTF.grabKeyboardFocus();
+#endif
     }
     
 }
@@ -1848,8 +1901,15 @@ void BKWaveDistanceUndertowSlider::textEditorReturnKeyPressed(TextEditor& editor
 
 void BKWaveDistanceUndertowSlider::textEditorTextChanged(TextEditor& textEditor)
 {
-    //DBG("Nostalgic textEditorTextChanged");
     focusLostByEscapeKey = false;
+    
+#if JUCE_IOS
+    if (hasBigOne)
+    {
+        hasBigOne = false;
+        textEditorReturnKeyPressed(textEditor);
+    }
+#endif
 }
 
 void BKWaveDistanceUndertowSlider::textEditorEscapeKeyPressed (TextEditor& textEditor)
@@ -2145,9 +2205,8 @@ void BKStackedSlider::mouseDoubleClick (const MouseEvent &e)
     //highlight number for current slider
     
 #if JUCE_IOS
-    
+    hasBigOne = true;
     WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, editValsTextField, sliderName);
-    
 #else
     StringArray tokens;
     tokens.addTokens(floatArrayToString(getAllActiveValues()), false); //arrayFloatArrayToString
@@ -2213,11 +2272,13 @@ void BKStackedSlider::textEditorEscapeKeyPressed (TextEditor& textEditor)
 
 void BKStackedSlider::textEditorTextChanged(TextEditor& textEditor)
 {
+#if JUCE_IOS
     if (hasBigOne)
     {
         hasBigOne = false;
         textEditorReturnKeyPressed(textEditor);
     }
+#endif
 }
 
 void BKStackedSlider::resetRanges()

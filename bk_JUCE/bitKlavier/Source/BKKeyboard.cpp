@@ -946,10 +946,16 @@ Array<float> BKKeymapKeyboardComponent::getValuesRotatedByFundamental()
 
 void BKKeymapKeyboardComponent::setValuesDirectly(Array<float> vals)
 {
-    for(int i=rangeStart; i<=rangeEnd; i++)
+    for(int i=rangeStart; i<vals.size(); i++)
     {
         DBG("keyValues SET DIRECT " + String(i) + " " + String(i) + " " + String(vals.getUnchecked(i)));
         keyValues.set(i, vals.getUnchecked(i));
+    }
+    
+    for (int i = vals.size(); i<=rangeEnd;i++)
+    {
+        DBG("keyValues SET DIRECT " + String(i) + " " + String(i) + " 0");
+        keyValues.set(i, 0);
     }
 }
 

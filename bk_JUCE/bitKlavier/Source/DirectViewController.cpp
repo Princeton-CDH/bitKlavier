@@ -26,27 +26,30 @@ BKViewController(p, theGraph)
     addAndMakeVisible(selectCB);
     
     transpositionSlider = new BKStackedSlider("transpositions", -12, 12, -12, 12, 0, 0.01);
-    transpositionSlider->addWantsBigOneListener(this);
-
     addAndMakeVisible(transpositionSlider);
     
     gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(false);
-    gainSlider->addWantsBigOneListener(this);
     addAndMakeVisible(gainSlider);
     
     resonanceGainSlider = new BKSingleSlider("resonance gain", 0, 10, 0.2, 0.01);
     resonanceGainSlider->setSkewFactorFromMidPoint(1.);
     resonanceGainSlider->setJustifyRight(false);
-    resonanceGainSlider->addWantsBigOneListener(this);
     addAndMakeVisible(resonanceGainSlider);
     
     hammerGainSlider = new BKSingleSlider("hammer gain", 0, 10, 1, 0.01);
     hammerGainSlider->setSkewFactorFromMidPoint(1.);
     hammerGainSlider->setJustifyRight(false);
-    hammerGainSlider->addWantsBigOneListener(this);
     addAndMakeVisible(hammerGainSlider);
+    
+    
+#if JUCE_IOS
+    transpositionSlider->addWantsBigOneListener(this);
+    gainSlider->addWantsBigOneListener(this);
+    resonanceGainSlider->addWantsBigOneListener(this);
+    hammerGainSlider->addWantsBigOneListener(this);
+#endif
     
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");

@@ -18,6 +18,9 @@
 class GeneralViewController :
 public BKViewController,
 public BKSingleSlider::Listener
+#if JUCE_IOS
+, public WantsBigOne::Listener
+#endif
 {
 public:
     GeneralViewController(BKAudioProcessor&, BKItemGraph* theGraph);
@@ -27,6 +30,8 @@ public:
     void resized() override;
     
     void update(void);
+    
+    void iWantTheBigOne(TextEditor*, String name) override;
 
 private:
     //BKAudioProcessor& processor;

@@ -15,6 +15,9 @@
 
 class NostalgicViewController :
 public BKViewController
+#if JUCE_IOS
+, public WantsBigOne::Listener
+#endif
 {
 public:
     NostalgicViewController(BKAudioProcessor&, BKItemGraph* theGraph);
@@ -75,6 +78,8 @@ public:
     int duplicatePreparation(void);
     void setCurrentId(int Id);
     void deleteCurrent(void);
+    
+    void iWantTheBigOne(TextEditor*, String name) override;
     
     
 private:

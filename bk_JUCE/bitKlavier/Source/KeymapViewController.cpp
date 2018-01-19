@@ -77,6 +77,8 @@ BKViewController(p, theGraph)
     actionButton.addListener(this);
     
     fillSelectCB(-1,-1);
+    
+    
 
     update();
 }
@@ -247,6 +249,15 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
     }
 }
 
+void KeymapViewController::mouseDown(const MouseEvent& e)
+{
+    if (e.eventComponent == &keymapTF)
+    {
+        hasBigOne = true;
+        iWantTheBigOne(&keymapTF, "keymap");
+    }
+}
+
 void KeymapViewController::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
@@ -320,6 +331,12 @@ void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
     }
 }
 
+void KeymapViewController::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
+}
+
 void KeymapViewController::keymapUpdated(TextEditor& tf)
 {
     String text = tf.getText();
@@ -358,6 +375,15 @@ void KeymapViewController::textEditorEscapeKeyPressed (TextEditor& textEditor)
     keymapTF.setVisible(false);
     keymapTF.toBack();
     unfocusAllComponents();
+}
+
+void KeymapViewController::textEditorTextChanged(TextEditor& tf)
+{
+    if (hasBigOne)
+    {
+        hasBigOne = false;
+        bkTextFieldDidChange(tf);
+    }
 }
 
 void KeymapViewController::update(void)

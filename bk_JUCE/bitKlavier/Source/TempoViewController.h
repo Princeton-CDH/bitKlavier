@@ -13,6 +13,9 @@
 #include "BKViewController.h"
 
 class TempoViewController : public BKViewController
+#if JUCE_IOS
+, public WantsBigOne::Listener
+#endif
 {
 public:
     
@@ -84,6 +87,8 @@ public:
     int duplicatePreparation(void);
     void setCurrentId(int Id);
     void deleteCurrent(void);
+    
+    void iWantTheBigOne(TextEditor*, String name) override;
 
 private:
     float lastPeriodMultiplier;

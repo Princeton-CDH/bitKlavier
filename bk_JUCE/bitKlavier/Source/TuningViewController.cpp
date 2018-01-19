@@ -115,6 +115,15 @@ BKViewController(p,theGraph)
     actionButton.addListener(this);
     addAndMakeVisible(actionButton);
     
+#if JUCE_IOS
+    offsetSlider->addWantsBigOneListener(this);
+    A1ClusterMax->addWantsBigOneListener(this);
+    A1ClusterThresh->addWantsBigOneListener(this);
+    
+    absoluteKeyboard.addWantsBigOneListener(this);
+    customKeyboard.addWantsBigOneListener(this);
+#endif
+    
 }
 
 void TuningViewController::resized()
@@ -420,6 +429,12 @@ void TuningPreparationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
+}
+
+void TuningPreparationEditor::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
 }
 
 void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparationEditor* vc)
