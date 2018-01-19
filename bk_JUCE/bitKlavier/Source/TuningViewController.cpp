@@ -12,6 +12,9 @@
 
 TuningViewController::TuningViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
 BKViewController(p,theGraph)
+#if JUCE_IOS
+, absoluteKeyboard(true)
+#endif
 {
     
     setLookAndFeel(&buttonsAndMenusLAF);
