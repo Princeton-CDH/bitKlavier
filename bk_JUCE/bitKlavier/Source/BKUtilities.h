@@ -201,6 +201,8 @@ typedef enum DisplayType
     DisplayTypeNil
 }DisplayType;
 
+String midiToPitchClass(int midi);
+
 PitchClass      letterNoteToPitchClass(String note);
 TuningSystem    tuningStringToTuningSystem(String tuning);
 

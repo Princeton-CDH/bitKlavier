@@ -207,7 +207,8 @@ public:
         DBG("len size: " + String(len) + " " + String(size));
         
         //bigOne.setFont(Font(size > 15.0f ? size : 15.0f));
-        bigOne.setFont(Font(20));
+        
+        bigOne.setFont(Font((len > 75) ? 16 : 25));
         
         bigOne.setJustification(juce::Justification::centredLeft);
         

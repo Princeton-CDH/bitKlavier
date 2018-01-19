@@ -55,8 +55,6 @@ public:
 
     void iWantTheBigOne(TextEditor*, String name) override;
     
-    void mouseDown(const MouseEvent& e) override;
-    
 private:
     
     bool hasBigOne;

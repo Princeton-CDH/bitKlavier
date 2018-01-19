@@ -116,6 +116,16 @@ TuningSystem tuningStringToTuningSystem(String tuning)
 
 }
 
+String pitch_classes[12] = {"C","C#","D","D#","E","F","F#","G","G#","A","A#","B",};
+
+String midiToPitchClass(int midi)
+{
+    int pc = midi % 12;
+    int octave = (midi / 12) - 1;
+    
+    return String(pitch_classes[pc]) + String(octave);
+}
+
 PitchClass      letterNoteToPitchClass(String note)
 {
     if (note == "C" || note == "c") return C;

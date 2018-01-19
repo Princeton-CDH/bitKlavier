@@ -249,15 +249,6 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
     }
 }
 
-void KeymapViewController::mouseDown(const MouseEvent& e)
-{
-    if (e.eventComponent == &keymapTF)
-    {
-        hasBigOne = true;
-        iWantTheBigOne(&keymapTF, "keymap");
-    }
-}
-
 void KeymapViewController::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
@@ -298,10 +289,15 @@ void KeymapViewController::bkButtonClicked (Button* b)
     }
     else if(b->getName() == keyboardValsTextFieldOpen.getName())
     {
+#if JUCE_IOS
+        hasBigOne = true;
+        iWantTheBigOne(&keymapTF, "keymap");
+#else
         keymapTF.setVisible(true);
         keymapTF.toFront(true);
         
         focusLostByEscapeKey = false;
+#endif
     }
     else if (b == &actionButton)
     {

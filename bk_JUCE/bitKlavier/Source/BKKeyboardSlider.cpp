@@ -203,13 +203,23 @@ void BKKeyboardSlider::mouseUp(const MouseEvent& e)
 
 void BKKeyboardSlider::mouseDown(const MouseEvent& e)
 {
+#if JUCE_IOS
+    lastKeyPressed = -1;
     lastKeyPressed = keyboard->getLastNoteOver();
     
-    if (e.eventComponent == &keyboardValueTF || e.eventComponent == &showName)
+    if (e.eventComponent == keyboard)
     {
-        hasBigOne = true;
-        WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, &keyboardValueTF, "value for note " + String(lastKeyPressed));
+        if (lastKeyPressed >= 0)
+        {
+            hasBigOne = true;
+            WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, &keyboardValueTF,
+                                        "value for note " + midiToPitchClass(lastKeyPressed));
+        }
     }
+    
+#else
+    lastKeyPressed = keyboard->getLastNoteOver();
+#endif
     
 }
 
@@ -309,8 +319,8 @@ void BKKeyboardSlider::bkButtonClicked (Button* b)
 {
 #if JUCE_IOS
     hasBigOne = true;
-    WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, keyboardValsTextField, "scale offsets");
-    //WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, &keyboardValsTextFieldOpen, "scale offsets");
+    WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, keyboardValsTextField,
+                                needsOctaveSlider ? "absolute offsets" : "scale offsets");
 #else
     
     if(b->getName() == keyboardValsTextFieldOpen.getName())
