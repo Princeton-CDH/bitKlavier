@@ -69,7 +69,11 @@ HeaderViewController::~HeaderViewController()
 {
     galleryCB.setLookAndFeel(nullptr);
     pianoCB.setLookAndFeel(nullptr);
-
+    
+    pianoB.setLookAndFeel(nullptr);
+    galleryB.setLookAndFeel(nullptr);
+    editB.setLookAndFeel(nullptr);
+    
     setLookAndFeel(nullptr);
 }
 
@@ -353,16 +357,17 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     if (result == SAVEAS_ID)
     {
 #if JUCE_IOS
-        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon, gvc);
         
         prompt.addTextEditor("name", processor.gallery->getName());
         
         prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
         prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
         
-        int result = prompt.runModalLoop();
         
         prompt.setTopLeftPosition(gvc->getWidth() / 2, gvc->getBottom() + gYSpacing);
+        
+        int result = prompt.runModalLoop();
         
         String name = prompt.getTextEditorContents("name");
         

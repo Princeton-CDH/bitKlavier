@@ -34,10 +34,6 @@ BKViewController(p, theGraph)
     keymapTF.setName("KeymapMidi");
     keymapTF.setMultiLine(true);
     
-#if JUCE_IOS
-    keymapTF.addWantsKeyboardListener(this);
-#endif
-    
     // Keyboard
     addAndMakeVisible (keyboardComponent = new BKKeymapKeyboardComponent (keyboardState,
                                                                  BKKeymapKeyboardComponent::horizontalKeyboard));
@@ -81,6 +77,8 @@ BKViewController(p, theGraph)
     actionButton.addListener(this);
     
     fillSelectCB(-1,-1);
+    
+    
 
     update();
 }
@@ -222,6 +220,30 @@ void KeymapViewController::actionButtonCallback(int action, KeymapViewController
         processor.clear(PreparationTypeKeymap, processor.updateState->currentKeymapId);
         vc->update();
     }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon, vc);
+        
+        int Id = processor.updateState->currentKeymapId;
+        Keymap::Ptr prep = processor.gallery->getKeymap(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
+    }
 }
 
 
@@ -291,12 +313,15 @@ void KeymapViewController::bkButtonClicked (Button* b)
     }
     else if(b->getName() == keyboardValsTextFieldOpen.getName())
     {
+#if JUCE_IOS
+        hasBigOne = true;
+        iWantTheBigOne(&keymapTF, "keymap");
+#else
         keymapTF.setVisible(true);
         keymapTF.toFront(true);
         
-        textEditorWantsKeyboard(&keymapTF);
-        
         focusLostByEscapeKey = false;
+#endif
     }
     else if (b == &actionButton)
     {
@@ -314,7 +339,6 @@ void KeymapViewController::BKEditableComboBoxChanged(String name, BKEditableComb
 
 void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
 {
-
     String name = tf.getName();
     
     if (name == "KeymapMidi")
@@ -325,9 +349,15 @@ void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
     {
         DBG("Unregistered text field entered input.");
     }
-    
-    
 }
+
+#if JUCE_IOS
+void KeymapViewController::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
+}
+#endif
 
 void KeymapViewController::keymapUpdated(TextEditor& tf)
 {
@@ -367,6 +397,15 @@ void KeymapViewController::textEditorEscapeKeyPressed (TextEditor& textEditor)
     keymapTF.setVisible(false);
     keymapTF.toBack();
     unfocusAllComponents();
+}
+
+void KeymapViewController::textEditorTextChanged(TextEditor& tf)
+{
+    if (hasBigOne)
+    {
+        hasBigOne = false;
+        bkTextFieldDidChange(tf);
+    }
 }
 
 void KeymapViewController::update(void)

@@ -42,10 +42,6 @@ void BKListener::textEditorReturnKeyPressed(TextEditor& tf)
         bkTextFieldDidChange(tf);
         shouldChange = false;
     }
-    else
-    {
-        bkTextFieldReturnKeyPressed(tf);
-    }
 }
 
 void BKListener::textEditorEscapeKeyPressed(TextEditor& tf)
@@ -60,6 +56,8 @@ void BKListener::textEditorEscapeKeyPressed(TextEditor& tf)
 void BKListener::textEditorTextChanged(TextEditor& tf)
 {
     shouldChange = true;
+    
+    bkTextFieldTextEntered(tf);
 }
 
 void BKListener::buttonClicked (Button* b)

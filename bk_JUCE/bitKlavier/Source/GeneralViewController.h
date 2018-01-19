@@ -18,6 +18,9 @@
 class GeneralViewController :
 public BKViewController,
 public BKSingleSlider::Listener
+#if JUCE_IOS
+, public WantsBigOne::Listener
+#endif
 {
 public:
     GeneralViewController(BKAudioProcessor&, BKItemGraph* theGraph);
@@ -27,6 +30,10 @@ public:
     void resized() override;
     
     void update(void);
+    
+#if JUCE_IOS
+    void iWantTheBigOne(TextEditor*, String name) override;
+#endif
 
 private:
     //BKAudioProcessor& processor;
@@ -46,10 +53,6 @@ private:
     void bkMessageReceived          (const String& message)     override { };
     void BKSingleSliderValueChanged (String name, double val)   override;
     
-    void bkSingleSliderWantsKeyboard(BKSingleSlider*) override;
-    
-    void numberPadChanged(BKNumberPad*) override;
-    void numberPadDismissed(BKNumberPad*) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GeneralViewController)
 };

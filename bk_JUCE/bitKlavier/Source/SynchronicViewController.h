@@ -16,6 +16,9 @@
 class SynchronicViewController :
 public BKMultiSlider::Listener,
 public BKViewController
+#if JUCE_IOS
+, public WantsBigOne::Listener
+#endif
 {
 public:
     SynchronicViewController(BKAudioProcessor&, BKItemGraph* theGraph);
@@ -28,6 +31,10 @@ public:
     void resized() override;
     
     virtual void update(void) {};
+    
+#if JUCE_IOS
+    void iWantTheBigOne(TextEditor*, String name) override;
+#endif
     
 protected:
     

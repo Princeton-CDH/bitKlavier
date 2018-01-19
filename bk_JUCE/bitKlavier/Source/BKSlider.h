@@ -1,12 +1,12 @@
 /*
-  ==============================================================================
-
-    BKSlider.h
-    Created: 6 Apr 2017 9:50:44pm
-    Author:  Daniel Trueman
-
-  ==============================================================================
-*/
+ ==============================================================================
+ 
+ BKSlider.h
+ Created: 6 Apr 2017 9:50:44pm
+ Author:  Daniel Trueman
+ 
+ ==============================================================================
+ */
 
 /* TODO
  
@@ -20,7 +20,7 @@
 #include "BKUtilities.h"
 #include "BKComponent.h"
 #include "BKLookAndFeel.h"
-#include "BKNumberPad.h"
+#include "BKUIComponents.h"
 
 // ******************************************************************************************************************** //
 // **************************************************  BKSubSlider **************************************************** //
@@ -32,13 +32,12 @@ public:
     
     BKSubSlider (SliderStyle sstyle, double min, double max, double def, double increment, int width, int height);
     ~BKSubSlider();
-
-    double getValueFromText	(const String & text ) override;
+    
+    double getValueFromText    (const String & text ) override;
     bool isActive() { return active; }
     void isActive(bool newactive) {active = newactive; }
     void setMinMaxDefaultInc(std::vector<float> newvals);
     void setSkewFromMidpoint(bool sfm);
-        
     
 private:
     
@@ -68,16 +67,19 @@ class BKMultiSlider :
 public Component,
 public Slider::Listener,
 public TextEditor::Listener
+#if JUCE_IOS
+, public WantsBigOne
+#endif
 {
     
 public:
     
     BKMultiSlider(BKMultiSliderType which);
     ~BKMultiSlider();
-
+    
     void addSlider(int where, bool active, NotificationType newnotify);
     void addSubSlider(int where, bool active, NotificationType newnotify);
-
+    
     void deactivateSlider(int where, NotificationType notify);
     void deactivateAll(NotificationType notify);
     void deactivateAllAfter(int where, NotificationType notify);
@@ -141,17 +143,13 @@ public:
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
     
-    ListenerList<WantsKeyboardListener> inputListeners;
-    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
-    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
-    
     void setName(String newName)                            { sliderName = newName; showName.setText(sliderName, dontSendNotification);        }
     String getName()                                        { return sliderName; }
     
     Array<Array<float>> getAllValues();
     Array<Array<float>> getAllActiveValues();
     Array<float> getOneSliderBank(int which);
-
+    
     inline String getText(void){
         return editValsTextField->getText();
     }
@@ -165,7 +163,7 @@ private:
     
     String sliderName;
     BKLabel showName;
-
+    
     bool dragging;
     bool arrangedHorizontally;
     bool sliderIsVertical;
@@ -205,6 +203,7 @@ private:
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void textEditorFocusLost(TextEditor& textEditor) override;
+    void textEditorTextChanged(TextEditor&) override;
     
     void showModifyPopupMenu(int which);
     static void sliderModifyMenuCallback (const int result, BKMultiSlider* slider, int which);
@@ -229,6 +228,9 @@ class BKSingleSlider :
 public Component,
 public Slider::Listener,
 public TextEditor::Listener
+#if JUCE_IOS
+, public WantsBigOne
+#endif
 {
 public:
     BKSingleSlider(String sliderName, double min, double max, double def, double increment);
@@ -265,13 +267,14 @@ public:
     void mouseDown(const MouseEvent &event) override;
     void mouseUp(const MouseEvent &event) override;
     void mouseDrag(const MouseEvent &e) override;
+    
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
     void textEditorFocusLost(TextEditor& textEditor) override;
     void textEditorTextChanged(TextEditor& textEditor) override;
     void resized() override;
     
     void setSkewFactor (double factor, bool symmetricSkew) { thisSlider.setSkewFactor(factor, symmetricSkew); }
-    void setSkewFactorFromMidPoint (double sliderValueToShowAtMidPoint	) { thisSlider.setSkewFactorFromMidPoint(sliderValueToShowAtMidPoint); }
+    void setSkewFactorFromMidPoint (double sliderValueToShowAtMidPoint    ) { thisSlider.setSkewFactorFromMidPoint(sliderValueToShowAtMidPoint); }
     
     class Listener
     {
@@ -286,14 +289,11 @@ public:
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
-    
-    ListenerList<WantsKeyboardListener> inputListeners;
-    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
-    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
+
     
     void setDim(float newAlpha);
     void setBright();
-
+    
 private:
     
     double sliderMin, sliderMax;
@@ -305,7 +305,7 @@ private:
     bool justifyRight;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSingleSlider)
-
+    
 };
 
 
@@ -319,6 +319,9 @@ class BKRangeSlider :
 public Component,
 public Slider::Listener,
 public TextEditor::Listener
+#if JUCE_IOS
+, public WantsBigOne
+#endif
 {
 public:
     BKRangeSlider(String sliderName, double min, double max, double defmin, double defmax, double increment);
@@ -334,7 +337,7 @@ public:
     String maxSliderName;
     
     Slider invisibleSlider;
-
+    
     String sliderName;
     BKLabel showName;
     
@@ -410,9 +413,6 @@ public:
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
     
-    ListenerList<WantsKeyboardListener> inputListeners;
-    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
-    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
     
 private:
     
@@ -444,8 +444,9 @@ class BKWaveDistanceUndertowSlider :
 public Component,
 public Slider::Listener,
 public TextEditor::Listener
-//public BKSingleSlider::Listener,
-
+#if JUCE_IOS
+, public WantsBigOne
+#endif
 {
 public:
     BKWaveDistanceUndertowSlider();
@@ -534,9 +535,6 @@ public:
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
     
-    ListenerList<WantsKeyboardListener> inputListeners;
-    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
-    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
     
     
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
@@ -552,7 +550,7 @@ private:
     
     bool newDrag;
     bool clickedOnMinSlider;
-
+    
     ImageComponent sampleImageComponent;
     
     bool focusLostByEscapeKey;
@@ -575,6 +573,9 @@ class BKStackedSlider :
 public Component,
 public Slider::Listener,
 public TextEditor::Listener
+#if JUCE_IOS
+, public WantsBigOne
+#endif
 {
 public:
     
@@ -598,6 +599,7 @@ public:
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void textEditorFocusLost(TextEditor& textEditor) override;
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
+    void textEditorTextChanged(TextEditor& textEditor) override;
     void mouseDown (const MouseEvent &event) override;
     void mouseDrag(const MouseEvent& e) override;
     void mouseUp(const MouseEvent& e) override;
@@ -649,9 +651,6 @@ public:
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
     
-    ListenerList<WantsKeyboardListener> inputListeners;
-    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
-    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
     
 private:
     
@@ -672,7 +671,7 @@ private:
     
     BKMultiSliderLookAndFeel stackedSliderLookAndFeel;
     BKMultiSliderLookAndFeel topSliderLookAndFeel;
-
+    
     double sliderMin, sliderMax, sliderMinDefault, sliderMaxDefault;
     double sliderDefault;
     double sliderIncrement;
@@ -694,3 +693,4 @@ private:
 
 
 #endif  // BKSLIDER_H_INCLUDED
+
