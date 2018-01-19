@@ -38,8 +38,8 @@ PopupMenu BKViewController::getPrepOptionMenu(void)
     optionMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
     optionMenu.addItem(1, "New");
-    
     optionMenu.addItem(2, "Duplicate");
+    optionMenu.addItem(6, "Rename");
     optionMenu.addItem(3, "Delete");
     optionMenu.addSeparator();
     optionMenu.addItem(4, "Reset");
@@ -56,6 +56,7 @@ PopupMenu BKViewController::getModOptionMenu(void)
     optionMenu.addItem(1, "New");
     
     optionMenu.addItem(2, "Duplicate");
+    optionMenu.addItem(6, "Rename");
     optionMenu.addItem(3, "Delete");
     optionMenu.addSeparator();
     optionMenu.addItem(5, "Clear");

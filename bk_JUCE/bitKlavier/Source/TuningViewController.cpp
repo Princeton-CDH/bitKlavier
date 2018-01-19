@@ -330,6 +330,12 @@ void TuningViewController::updateComponentVisibility()
     }
 }
 
+void TuningViewController::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
+}
+
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ TuningPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
 
 TuningPreparationEditor::TuningPreparationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
@@ -434,12 +440,6 @@ void TuningPreparationEditor::setCurrentId(int Id)
     lastId = Id;
 }
 
-void TuningPreparationEditor::iWantTheBigOne(TextEditor* tf, String name)
-{
-    hideOrShow.setAlwaysOnTop(false);
-    bigOne.display(tf, name, getBounds());
-}
-
 void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparationEditor* vc)
 {
     BKAudioProcessor& processor = vc->processor;
@@ -465,6 +465,30 @@ void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparation
     else if (action == 5)
     {
         processor.clear(PreparationTypeTuning, processor.updateState->currentTuningId);
+        vc->update();
+    }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentTuningId;
+        Tuning::Ptr prep = processor.gallery->getTuning(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
         vc->update();
     }
 }
@@ -911,6 +935,30 @@ void TuningModificationEditor::actionButtonCallback(int action, TuningModificati
         processor.clear(PreparationTypeTuningMod, processor.updateState->currentModTuningId);
         vc->update();
         vc->updateModification();
+    }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentModTuningId;
+        TuningModPreparation::Ptr prep = processor.gallery->getTuningModPreparation(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
     }
 }
 

@@ -39,6 +39,8 @@ public:
     
     virtual void update(void) {};
     
+    void iWantTheBigOne(TextEditor*, String name) override;
+    
 private:
 
 
@@ -69,8 +71,6 @@ public:
     void fillSelectCB(int last, int current);
     
     static void actionButtonCallback(int action, DirectPreparationEditor*);
-    
-    void iWantTheBigOne(TextEditor*, String name) override;
     
     int addPreparation(void);
     int duplicatePreparation(void);

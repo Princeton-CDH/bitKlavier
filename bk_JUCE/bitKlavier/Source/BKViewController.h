@@ -33,6 +33,7 @@ public:
     lb("["),
     rb("]"),
     neg("-"),
+    colon(":"),
     processor(p)
     {
         addAndMakeVisible(bigOne);
@@ -75,6 +76,11 @@ public:
             addAndMakeVisible(neg);
             neg.addListener(this);
             neg.setWantsKeyboardFocus(false);
+            
+            addAndMakeVisible(colon);
+            colon.addListener(this);
+            colon.setWantsKeyboardFocus(false);
+            
         }
     }
     
@@ -120,6 +126,7 @@ public:
             else if (button == &neg)    insert = "-";
             else if (button == &lb)     insert = "[";
             else if (button == &rb)     insert = "]";
+            else if (button == &colon)  insert = ":";
         
             bigOne.insertTextAtCaret(insert);
 
@@ -182,10 +189,11 @@ public:
             lb.setBounds(bigOne.getRight() + s, bigOne.getY(), buttonDim, buttonDim);
             rb.setBounds(lb.getRight() + s, lb.getY(), buttonDim, buttonDim);
             
-            space.setBounds(lb.getX(), lb.getBottom()+s, buttonDim*2+s, buttonDim);
+            neg.setBounds(lb.getX(), lb.getBottom()+s, buttonDim, buttonDim);
+            colon.setBounds(neg.getRight()+s, neg.getY(), buttonDim, buttonDim);
             
-            neg.setBounds(lb.getX(), space.getBottom()+s, buttonDim, buttonDim);
-            ok.setBounds(rb.getX(), neg.getY(), buttonDim, buttonDim);
+            space.setBounds(neg.getX(), neg.getBottom()+s, buttonDim, buttonDim);
+            ok.setBounds(space.getRight()+s, space.getY(), buttonDim, buttonDim);
         }
         else
         {
@@ -243,8 +251,7 @@ public:
 protected:
     TextEditor* target;
     
-    BKTextButton neg, space, ok, lb, rb;
-    
+    BKTextButton neg, space, ok, lb, rb, colon;
     TextEditor bigOne;
     Label bigOneLabel;
     

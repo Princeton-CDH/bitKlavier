@@ -130,6 +130,12 @@ void DirectViewController::resized()
     
 }
 
+void DirectViewController::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
+}
+
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ DirectPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~//
 DirectPreparationEditor::DirectPreparationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
 DirectViewController(p, theGraph)
@@ -148,12 +154,6 @@ DirectViewController(p, theGraph)
     hammerGainSlider->addMyListener(this);
     
     
-}
-
-void DirectPreparationEditor::iWantTheBigOne(TextEditor* tf, String name)
-{
-    hideOrShow.setAlwaysOnTop(false);
-    bigOne.display(tf, name, getBounds());
 }
 
 void DirectPreparationEditor::update(void)
@@ -252,6 +252,30 @@ void DirectPreparationEditor::actionButtonCallback(int action, DirectPreparation
     else if (action == 5)
     {
         processor.clear(PreparationTypeDirect, processor.updateState->currentDirectId);
+        vc->update();
+    }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentDirectId;
+        Direct::Ptr prep = processor.gallery->getDirect(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
         vc->update();
     }
 }
@@ -527,6 +551,30 @@ void DirectModificationEditor::actionButtonCallback(int action, DirectModificati
         processor.clear(PreparationTypeDirectMod, processor.updateState->currentModDirectId);
         vc->update();
         vc->updateModification();
+    }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentModDirectId;
+        DirectModPreparation::Ptr prep = processor.gallery->getDirectModPreparation(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
     }
 }
 

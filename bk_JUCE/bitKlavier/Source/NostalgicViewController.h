@@ -44,6 +44,8 @@ public:
     virtual void update(void) {};
     
     void fillModeSelectCB(void);
+    
+    void iWantTheBigOne(TextEditor*, String name) override;
 
 private:
     
@@ -78,9 +80,6 @@ public:
     int duplicatePreparation(void);
     void setCurrentId(int Id);
     void deleteCurrent(void);
-    
-    void iWantTheBigOne(TextEditor*, String name) override;
-    
     
 private:
     

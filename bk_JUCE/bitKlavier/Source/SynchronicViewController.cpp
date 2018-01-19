@@ -214,6 +214,12 @@ void SynchronicViewController::fillModeSelectCB(void)
 }
 
 
+void SynchronicViewController::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
+}
+
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ SynchronicPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
 
 SynchronicPreparationEditor::SynchronicPreparationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
@@ -539,6 +545,30 @@ void SynchronicPreparationEditor::actionButtonCallback(int action, SynchronicPre
         processor.clear(PreparationTypeSynchronic, processor.updateState->currentSynchronicId);
         vc->update();
     }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentSynchronicId;
+        Synchronic::Ptr prep = processor.gallery->getSynchronic(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
+    }
 }
 
 
@@ -575,12 +605,6 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
             active->setBeatsToSkip(toggleVal);
         }
     }
-}
-
-void SynchronicPreparationEditor::iWantTheBigOne(TextEditor* tf, String name)
-{
-    hideOrShow.setAlwaysOnTop(false);
-    bigOne.display(tf, name, getBounds());
 }
 
 void SynchronicPreparationEditor::bkTextFieldDidChange(TextEditor& tf)
@@ -1040,6 +1064,30 @@ void SynchronicModificationEditor::actionButtonCallback(int action, SynchronicMo
         processor.clear(PreparationTypeSynchronicMod, processor.updateState->currentModSynchronicId);
         vc->update();
         vc->updateModification();
+    }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentModSynchronicId;
+        SynchronicModPreparation::Ptr prep = processor.gallery->getSynchronicModPreparation(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
     }
 }
 

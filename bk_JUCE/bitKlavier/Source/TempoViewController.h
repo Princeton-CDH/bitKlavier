@@ -30,6 +30,8 @@ public:
     
     virtual void update(void){};
     
+    void iWantTheBigOne(TextEditor*, String name) override;
+    
 protected:
     BKLabel selectLabel;
     BKEditableComboBox selectCB;
@@ -87,8 +89,6 @@ public:
     int duplicatePreparation(void);
     void setCurrentId(int Id);
     void deleteCurrent(void);
-    
-    void iWantTheBigOne(TextEditor*, String name) override;
 
 private:
     float lastPeriodMultiplier;

@@ -23,7 +23,6 @@ BKViewController(p, theGraph)
     addAndMakeVisible(iconImageComponent);
     
     A4tuningReferenceFrequencySlider = new BKSingleSlider("A4 reference frequency", 415., 450., 440., 0.1);
-    //A4tuningReferenceFrequencySlider->setSkewFactorFromMidPoint(1.);
     A4tuningReferenceFrequencySlider->setJustifyRight(false);
     A4tuningReferenceFrequencySlider->addMyListener(this);
     addAndMakeVisible(A4tuningReferenceFrequencySlider);

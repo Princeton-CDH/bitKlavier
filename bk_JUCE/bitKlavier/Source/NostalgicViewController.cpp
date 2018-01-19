@@ -150,6 +150,12 @@ void NostalgicViewController::fillModeSelectCB(void)
     lengthModeSelectCB.setSelectedItemIndex(0, NotificationType::dontSendNotification);
 }
 
+void NostalgicViewController::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
+}
+
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ NostalgicPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
 
 NostalgicPreparationEditor::NostalgicPreparationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
@@ -168,12 +174,6 @@ NostalgicViewController(p, theGraph)
     gainSlider->addMyListener(this);
     
     startTimer(20);
-}
-
-void NostalgicPreparationEditor::iWantTheBigOne(TextEditor* tf, String name)
-{
-    hideOrShow.setAlwaysOnTop(false);
-    bigOne.display(tf, name, getBounds());
 }
 
 void NostalgicPreparationEditor::BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow)
@@ -306,9 +306,33 @@ void NostalgicPreparationEditor::actionButtonCallback(int action, NostalgicPrepa
         processor.reset(PreparationTypeNostalgic, processor.updateState->currentNostalgicId);
         vc->update();
     }
-    else if (action == 4)
+    else if (action == 5)
     {
         processor.clear(PreparationTypeNostalgic, processor.updateState->currentNostalgicId);
+        vc->update();
+    }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentNostalgicId;
+        Nostalgic::Ptr prep = processor.gallery->getNostalgic(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
         vc->update();
     }
 }
@@ -683,6 +707,30 @@ void NostalgicModificationEditor::actionButtonCallback(int action, NostalgicModi
         processor.clear(PreparationTypeNostalgicMod, processor.updateState->currentModNostalgicId);
         vc->update();
         vc->updateModification();
+    }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentModNostalgicId;
+        NostalgicModPreparation::Ptr prep = processor.gallery->getNostalgicModPreparation(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
     }
 }
 

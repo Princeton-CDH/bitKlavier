@@ -220,6 +220,30 @@ void KeymapViewController::actionButtonCallback(int action, KeymapViewController
         processor.clear(PreparationTypeKeymap, processor.updateState->currentKeymapId);
         vc->update();
     }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon, vc);
+        
+        int Id = processor.updateState->currentKeymapId;
+        Keymap::Ptr prep = processor.gallery->getKeymap(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
+    }
 }
 
 
