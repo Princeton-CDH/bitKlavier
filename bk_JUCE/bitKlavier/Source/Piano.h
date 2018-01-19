@@ -50,6 +50,8 @@ public:
         {
             BKItem* newItem = new BKItem(item->getType(), item->getId(), processor);
             
+            newItem->setCommentText(item->getCommentText());
+            
             newItem->setTopLeftPosition(item->getPosition());
             newItem->setName(item->getName());
             

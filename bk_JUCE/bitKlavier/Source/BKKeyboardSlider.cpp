@@ -320,19 +320,8 @@ void BKKeyboardSlider::handleKeymapNoteToggled (BKKeymapKeyboardState* source, i
 
 void BKKeyboardSlider::bkButtonClicked (Button* b)
 {
-#if JUCE_IOS
-    hasBigOne = true;
-    WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, keyboardValsTextField,
-                                needsOctaveSlider ? "absolute offsets" : "scale offsets");
-#else
-    
     if(b->getName() == keyboardValsTextFieldOpen.getName())
     {
-        focusLostByEscapeKey = false;
-    
-        keyboardValsTextField->setAlpha(1);
-
-        keyboardValsTextField->toFront(true);
 
         if(orderedPairs) {
             keyboardValsTextField->setText(offsetArrayToString2(keyboard->getValuesDirectly()), dontSendNotification);
@@ -343,10 +332,22 @@ void BKKeyboardSlider::bkButtonClicked (Button* b)
             keyboardValsTextField->setText(floatArrayToString(keyboard->getValuesDirectly()), dontSendNotification);
             //keyboardValsTextField->setText(floatArrayToString(keyboard->getRotatedValues())
         }
+        
+#if JUCE_IOS
+        hasBigOne = true;
+        WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, keyboardValsTextField,
+                                    needsOctaveSlider ? "absolute offsets" : "scale offsets");
+#else
+        
+        focusLostByEscapeKey = false;
+        
+        keyboardValsTextField->setAlpha(1);
+        
+        keyboardValsTextField->toFront(true);
+#endif
 
     }
-    
-#endif
+
 
 }
 
