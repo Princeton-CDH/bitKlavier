@@ -1428,12 +1428,10 @@ sliderIncrement(increment)
     
 #if JUCE_IOS
     maxValueTF.setReadOnly(true);
-    maxValueTF.setCaretVisible(true);
-    maxValueTF.setSelectAllWhenFocused(false);
+    maxValueTF.addMouseListener(this, true);
     
     minValueTF.setReadOnly(true);
-    minValueTF.setCaretVisible(true);
-    minValueTF.setSelectAllWhenFocused(false);
+    minValueTF.addMouseListener(this, true);
 #endif
 }
 
