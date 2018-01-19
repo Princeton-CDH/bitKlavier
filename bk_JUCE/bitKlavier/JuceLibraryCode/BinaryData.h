@@ -9,7 +9,7 @@
 namespace BinaryData
 {
     extern const char*   _1__Synchronic_1_xml;
-    const int            _1__Synchronic_1_xmlSize = 23919;
+    const int            _1__Synchronic_1_xmlSize = 25063;
 
     extern const char*   _2__Synchronic_2_xml;
     const int            _2__Synchronic_2_xmlSize = 23922;
@@ -186,7 +186,7 @@ namespace BinaryData
     const int            NS_8_ItIsEnough_xmlSize = 22311;
 
     extern const char*   Basic_Piano_xml;
-    const int            Basic_Piano_xmlSize = 4177;
+    const int            Basic_Piano_xmlSize = 4393;
 
     extern const char*   Mikes_Gallery_xml;
     const int            Mikes_Gallery_xmlSize = 35379;
