@@ -20,6 +20,8 @@
 
 #include "BKGraph.h"
 
+#include "BKViewController.h"
+
 class BKConstructionSite : public LassoSource<BKItem*>, public MouseHoldListener
 {
 public:
