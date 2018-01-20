@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <gallery name="12. Nostalgic 3" sampleType="3" defaultPiano="13">
-  <idCount i0="15" i1="28" i2="24" i3="20" i4="16" i5="1540" i6="10" i7="10"
+  <idCount i0="15" i1="28" i2="24" i3="20" i4="16" i5="1563" i6="10" i7="10"
            i8="10" i9="12" i10="10" i11="10" i12="10" i13="11" i14="30"
            i15="0"/>
   <general globalGain="1" directGain="1" synchronicGain="1" nostalgicGain="1"
@@ -750,7 +750,7 @@
       </connections>
     </item>
     <item>
-      <item name="" type="15" text="Also just like Nostalgic 1, but the &quot;wave distance&quot; is set to 200, and the &quot;undertow&quot; is set to 1000, so:&#10;&#10;The reverse note will play backwards for the same length of time that you held your note.&#10;&#10;Instead of going all the way back to the attack of the piano note, it will crest 200ms short of the attack.&#10;&#10;It will then change directions, playing forward for 1000ms&#10;&#10;So we get a lovely crest and fade rather than a lovely but harsh peak . "
+      <item name="Comment" type="15" text="Also just like Nostalgic 1, but the &quot;wave distance&quot; is set to 200, and the &quot;undertow&quot; is set to 1000, so:&#10;&#10;The reverse note will play backwards for the same length of time that you held your note.&#10;&#10;Instead of going all the way back to the attack of the piano note, it will crest 200ms short of the attack.&#10;&#10;It will then change directions, playing forward for 1000ms&#10;&#10;So we get a lovely crest and fade rather than a lovely but harsh peak . "
             X="552" Y="248" W="260" H="268"/>
     </item>
   </piano>
