@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <gallery name="6. Synchronic 6" sampleType="3" defaultPiano="7">
-  <idCount i0="15" i1="28" i2="24" i3="20" i4="16" i5="1561" i6="10" i7="10"
+  <idCount i0="15" i1="28" i2="24" i3="20" i4="16" i5="1579" i6="10" i7="10"
            i8="10" i9="12" i10="10" i11="10" i12="10" i13="11" i14="30"
            i15="0"/>
   <general globalGain="1" directGain="1" synchronicGain="1" nostalgicGain="1"
@@ -540,7 +540,7 @@
     </item>
     <item>
       <item name="Comment" type="15" text="Play a G-major (or minor) triad and listen&#10;&#10;This is just like Synchronic 5, except the synchronic tuning is different than the played tuning, so you&#8217;ll hear the quality of the chord change from what you play to what pulses. "
-            X="582" Y="203.5" W="294" H="153"/>
+            X="552.5" Y="206.5" W="235" H="159"/>
     </item>
   </piano>
 </gallery>

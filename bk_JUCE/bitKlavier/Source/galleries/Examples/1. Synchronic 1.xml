@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <gallery name="1. Synchronic 1" sampleType="3" defaultPiano="2">
-  <idCount i0="15" i1="29" i2="24" i3="20" i4="16" i5="1715" i6="10" i7="10"
+  <idCount i0="15" i1="29" i2="24" i3="20" i4="16" i5="1751" i6="10" i7="10"
            i8="10" i9="12" i10="10" i11="10" i12="10" i13="11" i14="30"
            i15="0"/>
   <general globalGain="1" directGain="1" synchronicGain="1" nostalgicGain="1"
@@ -503,8 +503,8 @@
       <item name="Tuning12" type="3" Id="11" piano="-1" active="1" X="171.5"
             Y="88.5" W="57" H="129"/>
       <connections>
-        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="94"
-              Y="210" W="144" H="64"/>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="85"
+              Y="214" W="144" H="64"/>
         <item name="Synchronic12" type="1" Id="12" piano="-1" active="1" X="249"
               Y="210" W="144" H="64"/>
       </connections>
@@ -518,23 +518,23 @@
       <item name="Keymap11" type="5" Id="11" piano="-1" active="1" X="171"
             Y="308" W="106" H="72"/>
       <connections>
-        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="94"
-              Y="210" W="144" H="64"/>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="85"
+              Y="214" W="144" H="64"/>
         <item name="Synchronic12" type="1" Id="12" piano="-1" active="1" X="249"
               Y="210" W="144" H="64"/>
       </connections>
     </item>
     <item>
       <item name="Tempo11" type="4" Id="11" piano="-1" active="1" X="249.5"
-            Y="88.5" W="57" H="129"/>
+            Y="87.5" W="57" H="129"/>
       <connections>
         <item name="Synchronic12" type="1" Id="12" piano="-1" active="1" X="249"
               Y="210" W="144" H="64"/>
       </connections>
     </item>
     <item>
-      <item name="Comment" type="15" text="Simple Metronome at 120bpm.&#10;&#10;=&gt; Play a chord.&#10;&#10;=&gt; Play a quick arpeggio, note how it collapses into a chordal pulse. If you leave more than 500ms between notes (cluster threshold), however, the pulse will stop. &#10;&#10;=&gt; Play a single note. The pulse stops, because the cluster min is set to 2 (at least two notes required to start a pulse). "
-            X="567" Y="173" W="264" H="242"/>
+      <item name="Comment" type="15" text="Simple Metronome at 120bpm.&#10;&#10;Play a chord, listen.&#10;&#10;Play a quick arpeggio, note how it collapses into a chordal pulse. If you leave more than 500ms between notes (cluster threshold), however, the pulse will stop. &#10;&#10;Play a single note. The pulse stops, because the cluster min is set to 2 (at least two notes required to start a pulse). "
+            X="552" Y="217" W="232" H="210"/>
     </item>
   </piano>
 </gallery>

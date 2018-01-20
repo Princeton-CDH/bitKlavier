@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <gallery name="7. Synchronic 7" sampleType="3" defaultPiano="8">
-  <idCount i0="15" i1="28" i2="24" i3="20" i4="16" i5="1507" i6="10" i7="10"
+  <idCount i0="15" i1="28" i2="24" i3="20" i4="16" i5="1525" i6="10" i7="10"
            i8="10" i9="12" i10="10" i11="10" i12="10" i13="11" i14="30"
            i15="0"/>
   <general globalGain="1" directGain="1" synchronicGain="1" nostalgicGain="1"
@@ -539,8 +539,8 @@
       </connections>
     </item>
     <item>
-      <item name="" type="15" text="Like Synchronic 6, but with a pattern of &quot;beat length multipliers,&quot; which creates a kind of lopsided pulse. "
-            X="562" Y="179.5" W="268" H="83"/>
+      <item name="Comment" type="15" text="Like Synchronic 6, but with a pattern of &quot;beat length multipliers,&quot; which creates a kind of lopsided pulse. "
+            X="533.5" Y="193.5" W="211" H="111"/>
     </item>
   </piano>
 </gallery>

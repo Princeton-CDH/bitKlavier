@@ -9,7 +9,7 @@
 namespace BinaryData
 {
     extern const char*   _1__Synchronic_1_xml;
-    const int            _1__Synchronic_1_xmlSize = 25068;
+    const int            _1__Synchronic_1_xmlSize = 25058;
 
     extern const char*   _2__Synchronic_2_xml;
     const int            _2__Synchronic_2_xmlSize = 24656;
@@ -24,10 +24,10 @@ namespace BinaryData
     const int            _5__Synchronic_5_xmlSize = 24657;
 
     extern const char*   _6__Synchronic_6_xml;
-    const int            _6__Synchronic_6_xmlSize = 25533;
+    const int            _6__Synchronic_6_xmlSize = 25535;
 
     extern const char*   _7__Synchronic_7_xml;
-    const int            _7__Synchronic_7_xmlSize = 25466;
+    const int            _7__Synchronic_7_xmlSize = 25476;
 
     extern const char*   _8__Synchronic_8_xml;
     const int            _8__Synchronic_8_xmlSize = 25819;
@@ -36,13 +36,13 @@ namespace BinaryData
     const int            _9__Synchronic_9_xmlSize = 25584;
 
     extern const char*   _10__Nostalgic_1_xml;
-    const int            _10__Nostalgic_1_xmlSize = 37230;
+    const int            _10__Nostalgic_1_xmlSize = 37994;
 
     extern const char*   _11__Nostalgic_2_xml;
-    const int            _11__Nostalgic_2_xmlSize = 37230;
+    const int            _11__Nostalgic_2_xmlSize = 37865;
 
     extern const char*   _12__Nostalgic_3_xml;
-    const int            _12__Nostalgic_3_xmlSize = 37229;
+    const int            _12__Nostalgic_3_xmlSize = 38210;
 
     extern const char*   _13__Nostalgic_4_xml;
     const int            _13__Nostalgic_4_xmlSize = 37993;
