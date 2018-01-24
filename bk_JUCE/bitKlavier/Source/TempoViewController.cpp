@@ -48,7 +48,7 @@ BKViewController(p, theGraph)
     AT1MinMaxSlider->setIsMinAlwaysLessThanMax(true);
     addAndMakeVisible(AT1MinMaxSlider);
     
-    A1ModeCB.setName("Mode");
+    A1ModeCB.setName("AT1Mode");
     addAndMakeVisible(A1ModeCB);
     fillA1ModeCB();
     A1ModeLabel.setText("Mode", dontSendNotification);
@@ -64,15 +64,15 @@ BKViewController(p, theGraph)
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
-
-    updateComponentVisibility();
     
 #if JUCE_IOS
-    AT1MinMaxSlider->addWantsKeyboardListener(this);
-    AT1HistorySlider->addWantsKeyboardListener(this);
-    AT1SubdivisionsSlider->addWantsKeyboardListener(this);
-    tempoSlider->addWantsKeyboardListener(this);
+    AT1MinMaxSlider->addWantsBigOneListener(this);
+    AT1HistorySlider->addWantsBigOneListener(this);
+    AT1SubdivisionsSlider->addWantsBigOneListener(this);
+    tempoSlider->addWantsBigOneListener(this);
 #endif
+
+    updateComponentVisibility();
 }
 
 
@@ -219,6 +219,15 @@ void TempoViewController::updateComponentVisibility()
     
 }
 
+#if JUCE_IOS
+void TempoViewController::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
+}
+#endif
+
+
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ TempoPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~//
 
@@ -237,7 +246,6 @@ TempoViewController(p, theGraph)
     AT1HistorySlider->addMyListener(this);
     AT1SubdivisionsSlider->addMyListener(this);
     AT1MinMaxSlider->addMyListener(this);
-    
     
     startTimer(50);
     
@@ -264,7 +272,6 @@ void TempoPreparationEditor::timerCallback()
     }
     
 }
-
 
 void TempoPreparationEditor::fillSelectCB(int last, int current)
 {
@@ -370,6 +377,30 @@ void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEd
         processor.clear(PreparationTypeTempo, processor.updateState->currentTempoId);
         vc->update();
     }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentTempoId;
+        Tempo::Ptr prep = processor.gallery->getTempo(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
+    }
 }
 
 
@@ -394,6 +425,7 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (name == A1ModeCB.getName())
     {
+        DBG("A1ModeCB = " + String(index));
         prep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
         active->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
     }
@@ -678,6 +710,30 @@ void TempoModificationEditor::actionButtonCallback(int action, TempoModification
         processor.clear(PreparationTypeTempoMod, processor.updateState->currentModTempoId);
         vc->update();
         vc->updateModification();
+    }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentModTempoId;
+        TempoModPreparation::Ptr prep = processor.gallery->getTempoModPreparation(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
     }
 }
 

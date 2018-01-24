@@ -561,6 +561,14 @@ public:
     float getLastNoteTuning() { return lastNoteTuning; }
     float getLastIntervalTuning() { return lastIntervalTuning; }
     
+    int getAdaptiveFundamentalNote() { return adaptiveFundamentalNote;}
+    float getAdaptiveFundamentalFreq() { return adaptiveFundamentalFreq;}
+    int getAdaptiveHistoryCounter() { return adaptiveHistoryCounter;}
+    
+    void setAdaptiveFundamentalNote(int newNote) { adaptiveFundamentalNote = newNote;}
+    void setAdaptiveFundamentalFreq(float newFreq) { adaptiveFundamentalFreq = newFreq;}
+    void setAdaptiveHistoryCounter(int newCounter) { adaptiveHistoryCounter = newCounter;}
+    
     //reset adaptive tuning
     void adaptiveReset();
     

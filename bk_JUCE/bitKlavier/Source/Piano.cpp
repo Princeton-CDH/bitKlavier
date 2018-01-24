@@ -295,6 +295,11 @@ TempoProcessor::Ptr Piano::addTempoProcessor(int thisId)
     return mproc;
 }
 
+void Piano::reset(void)
+{
+    configure();
+}
+
 bool Piano::containsProcessor(BKPreparationType thisType, int thisId)
 {
     if (thisType == PreparationTypeDirect)
@@ -364,9 +369,9 @@ void Piano::remove(BKItem::Ptr item)
     bool removed = false;
     for (int i = items.size(); --i >= 0; )
     {
-        DBG("ITEMINREMOVE:" );
         items[i]->print();
-        if (items[i]->getType() == item->getType() && items[i]->getId() == item->getId())
+
+        if (items[i] == item)
         {
             items.remove(i);
             removed = true;
@@ -1079,6 +1084,12 @@ ValueTree Piano::getState(void)
             itemVT.addChild(connectionsVT, -1, 0);
             pianoVT.addChild(itemVT, -1, 0);
         }
+        else if (type == PreparationTypeComment)
+        {
+            itemVT.addChild(item->getState(), -1, 0);
+            
+            pianoVT.addChild(itemVT, -1, 0);
+        }
     }
     
     return pianoVT;
@@ -1109,21 +1120,11 @@ void Piano::setState(XmlElement* e)
                 i = item->getStringAttribute("type").getIntValue();
                 BKPreparationType type = (BKPreparationType) i;
                 
-                i = item->getStringAttribute("Id").getIntValue();
-                int thisId = i;
-                
-                i = item->getStringAttribute("piano").getIntValue();
-                int piano = i;
-                
-                thisItem = itemWithTypeAndId(type, thisId);
-                
-                if (thisItem == nullptr)
+                if (type == PreparationTypeComment)
                 {
-                    thisItem = new BKItem(type, thisId, processor);
+                    thisItem = new BKItem(PreparationTypeComment, -1, processor);
                     
-                    thisItem->setPianoTarget(piano);
-                    
-                    thisItem->setItemName(item->getStringAttribute("name"));
+                    thisItem->setItemName("Comment");
                     
                     i = item->getStringAttribute("X").getIntValue();
                     int x = i;
@@ -1131,61 +1132,103 @@ void Piano::setState(XmlElement* e)
                     i = item->getStringAttribute("Y").getIntValue();
                     int y = i;
                     
+                    i = item->getStringAttribute("W").getIntValue();
+                    int w = i;
+                    
+                    i = item->getStringAttribute("H").getIntValue();
+                    int h = i;
+                    
+                    String s = item->getStringAttribute("text");
+                    thisItem->setCommentText(s);
+                    
+                    thisItem->setSize(w, h);
                     thisItem->setCentrePosition(x, y);
-                    
-                    i = item->getStringAttribute("active").getIntValue();
-                    bool active = (bool)i;
-                    
-                    thisItem->setActive(active);
                     
                     items.add(thisItem);
                 }
+                else
+                {
+                    i = item->getStringAttribute("Id").getIntValue();
+                    int thisId = i;
+                    
+                    i = item->getStringAttribute("piano").getIntValue();
+                    int piano = i;
+                    
+                    thisItem = itemWithTypeAndId(type, thisId);
+                    
+                    if (thisItem == nullptr)
+                    {
+                        thisItem = new BKItem(type, thisId, processor);
+                        
+                        thisItem->setPianoTarget(piano);
+                        
+                        thisItem->setItemName(item->getStringAttribute("name"));
+                        
+                        i = item->getStringAttribute("X").getIntValue();
+                        int x = i;
+                        
+                        i = item->getStringAttribute("Y").getIntValue();
+                        int y = i;
+                        
+                        thisItem->setCentrePosition(x, y);
+                        
+                        i = item->getStringAttribute("active").getIntValue();
+                        bool active = (bool)i;
+                        
+                        thisItem->setActive(active);
+                        
+                        items.add(thisItem);
+                    }
+                }
+                
                 
             }
             
             XmlElement* connections = group->getChildByName("connections");
             
-            forEachXmlChildElement (*connections, connection)
+            if (connections != nullptr)
             {
-                i = connection->getStringAttribute("type").getIntValue();
-                BKPreparationType cType = (BKPreparationType) i;
-                
-                i = connection->getStringAttribute("Id").getIntValue();
-                int cId = i;
-                
-                i = connection->getStringAttribute("piano").getIntValue();
-                int cPiano = i;
-                
-                thisConnection = itemWithTypeAndId(cType, cId);
-                
-                if (thisConnection == nullptr)
+                forEachXmlChildElement (*connections, connection)
                 {
-                    thisConnection = new BKItem(cType, cId, processor);
+                    i = connection->getStringAttribute("type").getIntValue();
+                    BKPreparationType cType = (BKPreparationType) i;
                     
-                    thisConnection->setItemName(connection->getStringAttribute("name"));
+                    i = connection->getStringAttribute("Id").getIntValue();
+                    int cId = i;
                     
-                    thisConnection->setPianoTarget(cPiano);
+                    i = connection->getStringAttribute("piano").getIntValue();
+                    int cPiano = i;
                     
-                    i = connection->getStringAttribute("X").getIntValue();
-                    int x = i;
+                    thisConnection = itemWithTypeAndId(cType, cId);
                     
-                    i = connection->getStringAttribute("Y").getIntValue();
-                    int y = i;
+                    if (thisConnection == nullptr)
+                    {
+                        thisConnection = new BKItem(cType, cId, processor);
+                        
+                        thisConnection->setItemName(connection->getStringAttribute("name"));
+                        
+                        thisConnection->setPianoTarget(cPiano);
+                        
+                        i = connection->getStringAttribute("X").getIntValue();
+                        int x = i;
+                        
+                        i = connection->getStringAttribute("Y").getIntValue();
+                        int y = i;
+                        
+                        thisConnection->setCentrePosition(x, y);
+                        
+                        i = connection->getStringAttribute("active").getIntValue();
+                        bool active = (bool)i;
+                        
+                        thisConnection->setActive(active);
+                        
+                        items.add(thisConnection);
+                    }
                     
-                    thisConnection->setCentrePosition(x, y);
-                    
-                    i = connection->getStringAttribute("active").getIntValue();
-                    bool active = (bool)i;
-                    
-                    thisConnection->setActive(active);
-                    
-                    items.add(thisConnection);
+                    thisItem->addConnection(thisConnection);
+                    thisConnection->addConnection(thisItem);
                 }
-                
-                thisItem->addConnection(thisConnection);
-                thisConnection->addConnection(thisItem);
             }
-            
         }
     }
     

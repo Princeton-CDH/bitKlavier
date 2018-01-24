@@ -80,16 +80,12 @@ void BKAudioProcessor::collectGalleries(void)
     File bkGalleries;
     
 #if JUCE_IOS
-    File moreGalleries = File::getSpecialLocation (File::userDocumentsDirectory);
-    
-    collectGalleriesFromFolder(moreGalleries);
+    bkGalleries = File::getSpecialLocation (File::userDocumentsDirectory);
+#else
+    bkGalleries = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
-    
-#if JUCE_MAC || JUCE_WINDOWS
-    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
     
     collectGalleriesFromFolder(bkGalleries);
-#endif
 }
 
 String BKAudioProcessor::firstGallery(void)

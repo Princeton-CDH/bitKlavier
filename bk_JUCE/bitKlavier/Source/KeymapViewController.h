@@ -25,7 +25,8 @@ public BKViewController,
 public BKKeymapKeyboardStateListener,
 public BKEditableComboBoxListener
 #if JUCE_IOS
-, public Slider::Listener
+, public Slider::Listener,
+public WantsBigOne::Listener
 #endif
 {
 public:
@@ -52,7 +53,13 @@ public:
     
     void bkTextFieldDidChange       (TextEditor&)           override;
 
+#if JUCE_IOS
+    void iWantTheBigOne(TextEditor*, String name) override;
+#endif
+    
 private:
+    
+    bool hasBigOne;
     
     BKLabel     keymapSelectL;
     BKEditableComboBox  selectCB;
@@ -71,6 +78,7 @@ private:
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void textEditorFocusLost(TextEditor& textEditor) override;
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
+    void textEditorTextChanged(TextEditor& tf) override;
     
     
     void bkMessageReceived          (const String& message) override;

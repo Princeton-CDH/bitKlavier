@@ -18,12 +18,15 @@
 
 #include "BKSlider.h"
 
+#include "BKUIComponents.h"
+
 class BKKeyboardSlider :
 public BKComponent,
 public BKListener,
 public BKKeymapKeyboardStateListener
 #if JUCE_IOS
-,private juce::Slider::Listener
+, private juce::Slider::Listener,
+public WantsBigOne
 #endif
 {
     
@@ -53,10 +56,6 @@ public:
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener); }
     void removeMyListener(Listener* listener)  { listeners.remove(listener); }
-    
-    ListenerList<WantsKeyboardListener> inputListeners;
-    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
-    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
     
     inline void setText(String text)
     {
@@ -144,12 +143,14 @@ private:
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void textEditorFocusLost(TextEditor& textEditor) override;
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
+    void textEditorTextChanged(TextEditor& textEditor) override;
     void bkTextFieldDidChange (TextEditor& txt) override;
     void bkButtonClicked (Button* b) override;
     void mouseMove(const MouseEvent& e) override;
     void mouseDrag(const MouseEvent& e) override;
     void mouseUp(const MouseEvent& e) override;
     void mouseDown(const MouseEvent& e) override;
+    void mouseDoubleClick(const MouseEvent& e) override;
     
     bool focusLostByEscapeKey;
 

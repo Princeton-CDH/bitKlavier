@@ -26,7 +26,6 @@ BKViewController(p, theGraph)
     addAndMakeVisible(selectCB);
     
     transpositionSlider = new BKStackedSlider("transpositions", -12, 12, -12, 12, 0, 0.01);
-
     addAndMakeVisible(transpositionSlider);
     
     gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
@@ -44,11 +43,12 @@ BKViewController(p, theGraph)
     hammerGainSlider->setJustifyRight(false);
     addAndMakeVisible(hammerGainSlider);
     
+    
 #if JUCE_IOS
-    transpositionSlider->addWantsKeyboardListener(this);
-    gainSlider->addWantsKeyboardListener(this);
-    resonanceGainSlider->addWantsKeyboardListener(this);
-    hammerGainSlider->addWantsKeyboardListener(this);
+    transpositionSlider->addWantsBigOneListener(this);
+    gainSlider->addWantsBigOneListener(this);
+    resonanceGainSlider->addWantsBigOneListener(this);
+    hammerGainSlider->addWantsBigOneListener(this);
 #endif
     
     addAndMakeVisible(actionButton);
@@ -130,6 +130,14 @@ void DirectViewController::resized()
     
 }
 
+#if JUCE_IOS
+void DirectViewController::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
+}
+#endif
+
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ DirectPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~//
 DirectPreparationEditor::DirectPreparationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
 DirectViewController(p, theGraph)
@@ -146,6 +154,8 @@ DirectViewController(p, theGraph)
     resonanceGainSlider->addMyListener(this);
     
     hammerGainSlider->addMyListener(this);
+    
+    
 }
 
 void DirectPreparationEditor::update(void)
@@ -244,6 +254,30 @@ void DirectPreparationEditor::actionButtonCallback(int action, DirectPreparation
     else if (action == 5)
     {
         processor.clear(PreparationTypeDirect, processor.updateState->currentDirectId);
+        vc->update();
+    }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentDirectId;
+        Direct::Ptr prep = processor.gallery->getDirect(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
         vc->update();
     }
 }
@@ -519,6 +553,30 @@ void DirectModificationEditor::actionButtonCallback(int action, DirectModificati
         processor.clear(PreparationTypeDirectMod, processor.updateState->currentModDirectId);
         vc->update();
         vc->updateModification();
+    }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentModDirectId;
+        DirectModPreparation::Ptr prep = processor.gallery->getDirectModPreparation(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
     }
 }
 

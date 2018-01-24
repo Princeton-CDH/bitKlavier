@@ -15,6 +15,9 @@
 
 class DirectViewController :
 public BKViewController
+#if JUCE_IOS
+, public WantsBigOne::Listener
+#endif
 {
 public:
     
@@ -30,11 +33,15 @@ public:
     ScopedPointer<BKSingleSlider> gainSlider;
     ScopedPointer<BKSingleSlider> resonanceGainSlider;
     ScopedPointer<BKSingleSlider> hammerGainSlider;
-    
+
     void paint (Graphics&) override;
     void resized() override;
     
     virtual void update(void) {};
+    
+#if JUCE_IOS
+    void iWantTheBigOne(TextEditor*, String name) override;
+#endif
     
 private:
 
@@ -56,7 +63,7 @@ public:
     
     void bkMessageReceived (const String& message) override;
     void bkComboBoxDidChange (ComboBox* box) override;
-    void bkTextFieldDidChange (TextEditor&) override {};
+    
     void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(String name, double val) override;
@@ -66,7 +73,6 @@ public:
     void fillSelectCB(int last, int current);
     
     static void actionButtonCallback(int action, DirectPreparationEditor*);
-
     
     int addPreparation(void);
     int duplicatePreparation(void);

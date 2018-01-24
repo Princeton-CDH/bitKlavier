@@ -72,6 +72,9 @@
 #define SHARE_MESSAGE_ID 44
 
 #define RENAME_ID 45
+#define COMMENT_ID 46
+#define OFF_ID 47
+#define KEYBOARD_ID 48
 
 inline PopupMenu getNewItemMenu(LookAndFeel* laf)
 {
@@ -84,9 +87,12 @@ inline PopupMenu getNewItemMenu(LookAndFeel* laf)
     newMenu.addItem(SYNCHRONIC_ID, "Synchronic (S)");
     newMenu.addItem(TUNING_ID, "Tuning (T)");
     newMenu.addItem(TEMPO_ID, "Tempo (M)");
+    newMenu.addSeparator();
     newMenu.addItem(MODIFICATION_ID, "Modification (C)");
     newMenu.addItem(PIANOMAP_ID, "Piano Map (P)");
     newMenu.addItem(RESET_ID, "Reset (R)");
+    newMenu.addSeparator();
+    newMenu.addItem(COMMENT_ID, "Comment (Q)");
     
     return newMenu;
 }
@@ -159,14 +165,19 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
         menu.addSeparator();
     }
     
-    menu.addSubMenu("Edit...", getEditItemMenu(laf));
-    menu.addSeparator();
-    
     if (numItemsSelected == 0)
     {
         menu.addSubMenu("Add...", getNewItemMenu(laf));
     }
-
+    
+#if JUCE_IOS
+    menu.addSeparator();
+    menu.addItem(KEYBOARD_ID, "Show/Hide Keyboard");
+#endif
+    
+    menu.addSeparator();
+    menu.addItem(OFF_ID, "All Off");
+    
     return menu;
 }
 
@@ -189,6 +200,8 @@ typedef enum DisplayType
     DisplayKeyboard,
     DisplayTypeNil
 }DisplayType;
+
+String midiToPitchClass(int midi);
 
 PitchClass      letterNoteToPitchClass(String note);
 TuningSystem    tuningStringToTuningSystem(String tuning);

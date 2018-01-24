@@ -59,7 +59,7 @@ public:
     
     void paint(Graphics& g)
     {
-        g.fillAll(Colours::black.withAlpha(0.9f));
+        g.fillAll(Colours::black);
         
         g.drawImage (image, getLocalBounds().toFloat(), placement);
     }
@@ -67,7 +67,7 @@ public:
     void resized(void)
     {
         progressSlider.setSize(getWidth() * 0.875, 25);
-        progressSlider.setCentrePosition(getWidth() * 0.5, getHeight() * 0.75);
+        progressSlider.setCentrePosition(getWidth() * 0.5, getHeight() * 0.7);
 #ifdef LABEL
         label.setBounds(progressSlider.getX(), progressSlider.getY() - 25 - gYSpacing, 100, 25);
 #endif
@@ -111,8 +111,7 @@ public:
     }
     
     /*inline Viewport* getViewport(void) { return &viewPort;}*/
-    
-    void setDisplay(DisplayType type);
+    void toggleDisplay(void);
     
     Slider octaveSlider;
     //void setSliderLookAndFeel(BKButtonAndMenuLAF *laf);
@@ -150,8 +149,6 @@ private:
     BKKeymapKeyboardState keyboardState;
     Component *keyboardComponent;
     
-    
-
     DisplayType display;
     
     bool initial;

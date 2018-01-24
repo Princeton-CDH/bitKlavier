@@ -62,7 +62,7 @@ needsOctaveSlider(nos)
     keyboardValueTF.setName("KSLIDERTXT");
     keyboardValueTF.addListener(this);
 #if JUCE_IOS
-    keyboardValueTF.addMouseListener(this, true);
+    keyboardValueTF.setReadOnly(true);
 #endif
     addAndMakeVisible(keyboardValueTF);
 
@@ -201,16 +201,29 @@ void BKKeyboardSlider::mouseUp(const MouseEvent& e)
     keyboard->repaint();
 }
 
+void BKKeyboardSlider::mouseDoubleClick(const MouseEvent& e)
+{
+#if JUCE_IOS
+    lastKeyPressed = -1;
+    lastKeyPressed = keyboard->getLastNoteOver();
+    
+    if (e.eventComponent == keyboard)
+    {
+        if (lastKeyPressed >= 0)
+        {
+            hasBigOne = true;
+            WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, &keyboardValueTF,
+                                        "value for note " + midiToPitchClass(lastKeyPressed));
+        }
+    }
+#endif
+}
+
 void BKKeyboardSlider::mouseDown(const MouseEvent& e)
 {
-    if (e.originalComponent == &keyboardValueTF || e.originalComponent == &showName)
-    {
-        inputListeners.call(&WantsKeyboardListener::keyboardSliderWantsKeyboard, this, KSliderThisValue);
-    }
-    else
-    {
-        lastKeyPressed = keyboard->getLastNoteOver();
-    }
+
+    lastKeyPressed = keyboard->getLastNoteOver();
+    
 }
 
 void BKKeyboardSlider::bkTextFieldDidChange (TextEditor& textEditor)
@@ -289,6 +302,17 @@ void BKKeyboardSlider::textEditorFocusLost(TextEditor& textEditor)
 #endif
 }
 
+void BKKeyboardSlider::textEditorTextChanged(TextEditor& tf)
+{
+#if JUCE_IOS
+    if (hasBigOne)
+    {
+        hasBigOne = false;
+        textEditorReturnKeyPressed(tf);
+    }
+#endif
+}
+
 void BKKeyboardSlider::handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber)
 {
 
@@ -298,14 +322,7 @@ void BKKeyboardSlider::bkButtonClicked (Button* b)
 {
     if(b->getName() == keyboardValsTextFieldOpen.getName())
     {
-        focusLostByEscapeKey = false;
-        keyboardValsTextField->setAlpha(1);
-#if !JUCE_IOS
-        keyboardValsTextField->toFront(true);
-#else
-        keyboardValsTextField->toFront(false);
-        inputListeners.call(&WantsKeyboardListener::keyboardSliderWantsKeyboard, this, KSliderAllValues);
-#endif
+
         if(orderedPairs) {
             keyboardValsTextField->setText(offsetArrayToString2(keyboard->getValuesDirectly()), dontSendNotification);
             //keyboardValsTextField->setText(offsetArrayToString2(keyboard->getAbsoluteValues())
@@ -315,7 +332,23 @@ void BKKeyboardSlider::bkButtonClicked (Button* b)
             keyboardValsTextField->setText(floatArrayToString(keyboard->getValuesDirectly()), dontSendNotification);
             //keyboardValsTextField->setText(floatArrayToString(keyboard->getRotatedValues())
         }
+        
+#if JUCE_IOS
+        hasBigOne = true;
+        WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, keyboardValsTextField,
+                                    needsOctaveSlider ? "absolute offsets" : "scale offsets");
+#else
+        
+        focusLostByEscapeKey = false;
+        
+        keyboardValsTextField->setAlpha(1);
+        
+        keyboardValsTextField->toFront(true);
+#endif
+
     }
+
+
 }
 
 // * cut this

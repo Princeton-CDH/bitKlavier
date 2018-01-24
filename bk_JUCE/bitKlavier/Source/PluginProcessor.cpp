@@ -174,17 +174,24 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     gallery->prepareToPlay(sampleRate);
 
-
+    
+    
 #if JUCE_IOS
     String osname = SystemStats::getOperatingSystemName();
     float iosVersion = osname.fromLastOccurrenceOf("iOS ", false, true).getFloatValue();
     
-    if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
-    else                    loadPianoSamples(BKLoadMedium);
-#else
-    loadPianoSamples(BKLoadHeavy);
-#endif
+    String device = SystemStats::getDeviceDescription();
+    DBG("device: " + device);
     
+    if (device.contains("iPhone"))  updateState->needsExtraKeys = true;
+    else                            updateState->needsExtraKeys = false;
+    
+    if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
+    else                    loadPianoSamples(BKLoadLite); // CHANGE BACK TO MEDIUM
+#else
+    loadPianoSamples(BKLoadHeavy); // CHANGE THIS BACK TO HEAVY
+#endif
+
     
 #if TRY_UNDO
     for (int i = 0; i < NUM_EPOCHS; i++)
@@ -202,27 +209,52 @@ BKAudioProcessor::~BKAudioProcessor()
 
 void BKAudioProcessor::deleteGallery(void)
 {
-    File gallery(currentGalleryPath);
-    gallery.deleteFile();
+    File file(gallery->getURL());
+    file.deleteFile();
     
     loadGalleryFromPath(firstGallery());
 }
 
-void BKAudioProcessor::deleteGalleryWithName(String name)
+// Duplicates current gallery and gives it name
+void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
 {
-    File galleryPath;
+    File myFile(newURL);
     
-#if JUCE_IOS
-    galleryPath = galleryPath.getSpecialLocation(File::userDocumentsDirectory);
-#endif
+    ValueTree galleryVT = gallery->getState();
     
-#if JUCE_MAC || JUCE_WINDOWS
-    galleryPath = galleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
-#endif
+    galleryVT.setProperty("name", myFile.getFileName().upToFirstOccurrenceOf(".xml", false, false), 0);
     
-    galleryPath = galleryPath.getChildFile(name+".xml");
+    ScopedPointer<XmlElement> myXML = galleryVT.createXml();
     
-    DBG("path: " + galleryPath.getFullPathName());
+    myXML->writeToFile(myFile, String::empty);
+    
+    loadGalleryFromXml(myXML);
+    
+    gallery->setURL(newURL);
+    
+    lastGalleryPath = myFile;
+    
+    defaultLoaded = false;
+}
+
+void BKAudioProcessor::clearBitKlavier(void)
+{
+    for (int i = 0; i < 15; i++)
+    {
+        hammerReleaseSynth.allNotesOff(i, true);
+        resonanceReleaseSynth.allNotesOff(i, true);
+        mainPianoSynth.allNotesOff(i, true);
+    }
+    
+    for (auto piano : gallery->getPianos())
+    {
+        piano->reset();
+    }
+}
+
+void BKAudioProcessor::deleteGalleryAtURL(String path)
+{
+    File galleryPath(path);
     
     galleryPath.deleteFile();
 }
@@ -243,7 +275,7 @@ void BKAudioProcessor::createNewGallery(String name)
     
     
     File myFile(bkGalleries);
-    myFile = myFile.getNonexistentChildFile(name, ".xml", true);
+    myFile = myFile.getNonexistentChildFile(name.upToFirstOccurrenceOf(".xml",false,false)+".xml", ".xml", true);
     myFile.appendData(BinaryData::Basic_Piano_xml, BinaryData::Basic_Piano_xmlSize);
     galleryNames.add(myFile.getFullPathName());
     
@@ -252,14 +284,12 @@ void BKAudioProcessor::createNewGallery(String name)
     if (xml != nullptr)
     {
         currentGallery = myFile.getFileName();
-        currentGalleryPath = myFile.getFullPathName();
         
-        xml->setAttribute("url", currentGalleryPath);
-        xml->setAttribute("name", currentGallery);
+        xml->setAttribute("name", currentGallery.upToFirstOccurrenceOf(".xml", false, false));
 
         gallery = new Gallery(xml, *this);
         
-        gallery->setURL(currentGalleryPath);
+        gallery->setURL(myFile.getFullPathName());
         gallery->setName(currentGallery);
         
         gallery->print();
@@ -269,39 +299,41 @@ void BKAudioProcessor::createNewGallery(String name)
         galleryDidLoad = true;
         
         gallery->setGalleryDirty(false);
+        
+        defaultLoaded = false;
     }
-    
 }
 
-void BKAudioProcessor::renameGallery(String name)
+void BKAudioProcessor::duplicateGallery(String newName)
 {
-    File bkGalleries;
+    newName = newName.upToFirstOccurrenceOf(".xml",false,false);
     
-#if JUCE_IOS
-    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory);
-#else
-    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
-#endif
+    File oldFile (gallery->getURL());
+    String baseURL = oldFile.getParentDirectory().getFullPathName();
     
-    String relativePath = currentGalleryPath.fromLastOccurrenceOf("/", false, false);
+    String newURL = baseURL + "/" + newName + ".xml";
     
-    File currentFile = bkGalleries.getChildFile(relativePath);
+    DBG("to create: " + newURL);
     
-    String newFileName = name + ".xml";
-    
-    String newFilePath= currentGalleryPath.upToFirstOccurrenceOf(currentGallery, false, false) + newFileName;
+    writeCurrentGalleryToURL(newURL);
+}
 
-    DBG("new file: "+ String(newFilePath));
+void BKAudioProcessor::renameGallery(String newName)
+{
+    String oldName = gallery->getName().upToFirstOccurrenceOf(".xml",false,false);
+    newName = newName.upToFirstOccurrenceOf(".xml",false,false);
+
+    File oldFile (gallery->getURL());
+    String baseURL = oldFile.getParentDirectory().getFullPathName();
     
-    File newFile(newFilePath);
+    String newURL = baseURL + "/" + newName + ".xml";
+    String oldURL = baseURL + "/" + oldName + ".xml";
     
-    bool success = currentFile.moveFileTo(newFile);
+    DBG("to create: " + newURL);
+    DBG("to delete: " + oldURL);
     
-    if (success )
-    {
-        currentGallery = newFileName;
-        currentGalleryPath = newFilePath;
-    }
+    writeCurrentGalleryToURL(newURL);
+    deleteGalleryAtURL(oldURL);
 }
 
 void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)  
@@ -505,6 +537,9 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     
     currentPiano = gallery->getPiano(which);
     
+    currentPiano->copyAdaptiveTuningState(prevPiano);
+    currentPiano->copyAdaptiveTempoState(prevPiano);
+    
     updateState->pianoDidChangeForGraph = true;
     updateState->synchronicPreparationDidChange = true;
     updateState->nostalgicPreparationDidChange = true;
@@ -682,7 +717,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
     }
 }
 
-void BKAudioProcessor::saveGalleryAs(void)
+void BKAudioProcessor::saveCurrentGalleryAs(void)
 {
 #if JUCE_IOS
     
@@ -694,27 +729,10 @@ void BKAudioProcessor::saveGalleryAs(void)
     
     if (myChooser.browseForFileToSave(true))
     {
-        File myFile (myChooser.getResult());
-        currentGallery = myFile.getFileName();
-        currentGalleryPath = myFile.getFullPathName();
-        
-        String newURL = myFile.getFullPathName();
-        
-        ValueTree galleryVT = gallery->getState();
-        
-        galleryVT.setProperty("name", currentGallery, 0);
-        
-        ScopedPointer<XmlElement> myXML = galleryVT.createXml();
-        
-        myXML->writeToFile(myFile, String::empty);
-
-        gallery->setGalleryDirty(false);
-        
-        lastGalleryPath = myFile;
+        writeCurrentGalleryToURL(myChooser.getResult().getFullPathName());
     }
     
 #endif
-    
     
     updateGalleries();
     
@@ -722,68 +740,11 @@ void BKAudioProcessor::saveGalleryAs(void)
     
 }
 
-void BKAudioProcessor::createGalleryWithName(String name)
-{
-    String newURL = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + name + ".xml";
-    
-    File file;
-    File myFile(newURL);
-    
-    ValueTree galleryVT = gallery->getState();
-    
-    galleryVT.setProperty("name", name, 0);
-    
-    ScopedPointer<XmlElement> myXML = galleryVT.createXml();
-    
-    myXML->writeToFile(myFile, String::empty);
-    
-    loadGalleryFromXml(myXML);
-    
-    lastGalleryPath = myFile;
-}
 
-void BKAudioProcessor::saveGallery(void)
-{
-#if JUCE_IOS
-    String url = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + gallery->getName();
-    
-    DBG("url: " + url);
-    
-    File file (url);
-    
-    ValueTree galleryVT = gallery->getState();
-    
-    ScopedPointer<XmlElement> myXML = galleryVT.createXml();
-    
-    myXML->writeToFile(file, String::empty);
-    
-    gallery->setGalleryDirty(false);
-    
-#else
-    
-    String currentURL = gallery->getURL();
 
-    File file (currentURL);
-    // NOT SURE ABOUT THIS FILE.EXISTSASFILE METHOD
-    
-    if (currentURL == String::empty || !file.existsAsFile())
-    {
-        saveGalleryAs();
-        return;
-    }
-    else
-    {
-        File myFile (currentURL);
-        
-        ValueTree galleryVT = gallery->getState();
-        
-        ScopedPointer<XmlElement> myXML = galleryVT.createXml();
-        
-        myXML->writeToFile(myFile, String::empty);
-        
-        gallery->setGalleryDirty(false);
-    }
-#endif
+void BKAudioProcessor::saveCurrentGallery(void)
+{
+    writeCurrentGalleryToURL(gallery->getURL());
 }
 
 
@@ -813,11 +774,8 @@ void BKAudioProcessor::loadGalleryDialog(void)
         else if(galleryIsDirtyAlertResult == 1)
         {
             DBG("saving gallery first");
-#if JUCE_IOS
-            createGalleryWithName(gallery->getName());
-#else
-            saveGallery();
-#endif
+
+            saveCurrentGallery();
         }
     }
     
@@ -831,7 +789,6 @@ void BKAudioProcessor::loadGalleryDialog(void)
     if (myChooser.browseForFileToOpen())
     {
         File myFile (myChooser.getResult());
-        currentGalleryPath = myFile.getFullPathName();
         
         ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
         
@@ -840,6 +797,8 @@ void BKAudioProcessor::loadGalleryDialog(void)
             currentGallery = myFile.getFileName();
             
             gallery = new Gallery(xml, *this);
+            
+            gallery->setURL(myFile.getFullPathName());
             
             initializeGallery();
             
@@ -853,7 +812,6 @@ void BKAudioProcessor::loadGalleryDialog(void)
 
 void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
 {
-    DBG("BKAudioProcessor::loadGalleryFromXml");
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
         gallery = new Gallery(xml, *this);
@@ -873,8 +831,6 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
     updateState->loadedJson = false;
     
     File myFile (path);
-    
-    currentGalleryPath = path;
     
     ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
     
@@ -909,7 +865,7 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
         else if(galleryIsDirtyAlertResult == 1)
         {
             DBG("saving gallery first");
-            saveGallery();
+            saveCurrentGallery();
         }
     }
     
@@ -923,13 +879,14 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
     if (myChooser.browseForFileToOpen())
     {
         File myFile (myChooser.getResult());
-        currentGalleryPath = myFile.getFullPathName();
         
         currentGallery = myFile.getFileName();
         
         var myJson = JSON::parse(myFile);
         
         gallery = new Gallery(myJson, *this);
+        
+        gallery->setURL(myFile.getFullPathName());
         
         initializeGallery();
         

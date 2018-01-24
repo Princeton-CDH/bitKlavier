@@ -80,12 +80,12 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
         galleryVT.setProperty("defaultLoaded", (int)defaultLoaded, 0);
         galleryVT.setProperty("defaultName", defaultName, 0);
         
-        galleryVT.setProperty("galleryPath", currentGalleryPath, 0);
+        galleryVT.setProperty("galleryPath", gallery->getURL(), 0);
         
         galleryVT.setProperty("defaultPiano", currentPiano->getId(), 0);
         
         DBG("saving gallery and piano to plugin state: getStateInformation() "
-            +  currentGalleryPath + " "
+            +  gallery->getURL() + " "
             + String(currentPiano->getId()));
         
         ScopedPointer<XmlElement> galleryXML = galleryVT.createXml();
@@ -131,7 +131,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             }
             else
             {
-                currentGalleryPath = galleryXML->getStringAttribute("galleryPath");
+                String currentGalleryPath = galleryXML->getStringAttribute("galleryPath");
                 currentGallery = galleryXML->getStringAttribute("name");
                 
                 DBG("loading gallery and piano from plugin state: setStateInformation() "

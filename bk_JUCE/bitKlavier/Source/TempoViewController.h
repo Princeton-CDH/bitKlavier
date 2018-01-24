@@ -13,6 +13,9 @@
 #include "BKViewController.h"
 
 class TempoViewController : public BKViewController
+#if JUCE_IOS
+, public WantsBigOne::Listener
+#endif
 {
 public:
     
@@ -26,6 +29,10 @@ public:
     void resized() override;
     
     virtual void update(void){};
+    
+#if JUCE_IOS
+    void iWantTheBigOne(TextEditor*, String name) override;
+#endif
     
 protected:
     BKLabel selectLabel;

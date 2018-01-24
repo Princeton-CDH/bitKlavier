@@ -56,6 +56,8 @@ void BKListener::textEditorEscapeKeyPressed(TextEditor& tf)
 void BKListener::textEditorTextChanged(TextEditor& tf)
 {
     shouldChange = true;
+    
+    bkTextFieldTextEntered(tf);
 }
 
 void BKListener::buttonClicked (Button* b)

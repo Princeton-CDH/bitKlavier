@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="1.9"
-              bundleIdentifier="com.manyarrowsmusic.bitKlavier" includeBinaryInAppConfig="1"
+<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="2"
+              bundleIdentifier="com.manyarrowsmusic.bitKlavier1" includeBinaryInAppConfig="1"
               buildVST="1" buildVST3="0" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
               pluginManufacturer="manyarrowsmusic" pluginManufacturerCode="Manu"
@@ -131,18 +131,15 @@
                 file="Source/galleries/Mike's Gallery.xml"/>
         </GROUP>
         <GROUP id="{6F7CFDA8-D246-D5B9-B60B-EDBE0C6F3537}" name="icons">
+          <FILE id="A1o3FE" name="icon_iOS_72.png" compile="0" resource="1" file="Source/icons/icon_iOS_72.png"/>
+          <FILE id="iHGLGD" name="icon_iOS_300.jpg" compile="0" resource="1"
+                file="Source/icons/icon_iOS_300.jpg"/>
           <FILE id="Dl47P7" name="bitKlavier_x.png" compile="0" resource="1"
                 file="Source/bitKlavier_x.png"/>
           <FILE id="hXCh3E" name="Icon.icns" compile="0" resource="1" file="Source/icons/Icon.icns"/>
           <FILE id="fiXHO5" name="direct_icon.png" compile="0" resource="1" file="Source/icons/direct_icon.png"/>
           <FILE id="CHQGaP" name="general_icon.png" compile="0" resource="1"
                 file="Source/icons/general_icon.png"/>
-          <FILE id="h07ja0" name="icon_iOS_72.jpg" compile="0" resource="1" file="../../../../Google Drive/bitKlavier/UI/icons/icon_iOS_72.jpg"/>
-          <FILE id="yczvZY" name="icon_iOS_300.jpg" compile="0" resource="1"
-                file="Source/icons/icon_iOS_300.jpg"/>
-          <FILE id="jg9tlf" name="icon_iOS_72.png" compile="0" resource="1" file="Source/icons/icon_iOS_72.png"/>
-          <FILE id="vc4Wfq" name="icon_iOS_300.png" compile="0" resource="1"
-                file="Source/icons/icon_iOS_300.png"/>
           <FILE id="puwr6J" name="icon.png" compile="0" resource="1" file="Source/icons/icon.png"/>
           <FILE id="XA1tC4" name="icon_win_large.png" compile="0" resource="1"
                 file="Source/icons/icon_win_large.png"/>
@@ -330,8 +327,6 @@
       <GROUP id="{E98AFB64-DE96-83A1-81DC-1FA2D8D37DB8}" name="View">
         <FILE id="sM6zCj" name="BKUIComponents.h" compile="0" resource="0"
               file="Source/BKUIComponents.h"/>
-        <FILE id="Rorw4u" name="BKNumberPad.cpp" compile="1" resource="0" file="Source/BKNumberPad.cpp"/>
-        <FILE id="wjhX6E" name="BKNumberPad.h" compile="0" resource="0" file="Source/BKNumberPad.h"/>
         <GROUP id="{312ACC06-200C-E792-F54F-FC9ABB97A738}" name="BKSlider">
           <FILE id="mqhm7K" name="BKSlider.cpp" compile="1" resource="0" file="Source/BKSlider.cpp"/>
           <FILE id="NyvzY3" name="BKSlider.h" compile="0" resource="0" file="Source/BKSlider.h"/>
@@ -373,8 +368,8 @@
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" vst3Folder="~/STKs/VST3 SDK" aaxFolder=""
-               customXcodeResourceFolders="" customPList="" rtasFolder="" smallIcon="a9zMwc"
-               bigIcon="a9zMwc">
+               customXcodeResourceFolders="" customPList="" rtasFolder="" smallIcon="smHM8h"
+               bigIcon="iHGLGD">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        osxArchitecture="default" cppLibType="" osxCompatibility="default"
@@ -402,16 +397,16 @@
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="landscape" keepCustomXcodeSchemes="1"
                   customXcodeResourceFolders="~/Documents/bitKlavier resources/samples/"
-                  iosBackgroundAudio="1" iosDevelopmentTeamID="YT6AXURH62" UIFileSharingEnabled="1"
-                  smallIcon="h07ja0" bigIcon="yczvZY" customPList="&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&#10;&lt;plist&gt;&#10;&#9;&lt;dict&gt;&#10;&#9;&#9;&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&lt;dict&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;CFBundleTypeName&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;XML&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSHandlerRank&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;Alternate&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSItemContentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;public.xml&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&#9;&#9;&#9;&lt;/dict&gt;&#10;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
+                  iosBackgroundAudio="1" iosDevelopmentTeamID="" UIFileSharingEnabled="1"
+                  smallIcon="smHM8h" bigIcon="iHGLGD" customPList="&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&#10;&lt;plist&gt;&#10;&#9;&lt;dict&gt;&#10;&#9;&#9;&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&lt;dict&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;CFBundleTypeName&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;XML&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSHandlerRank&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;Alternate&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSItemContentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;public.xml&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&#9;&#9;&#9;&lt;/dict&gt;&#10;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
                   iPadScreenOrientation="landscape" iosDeviceFamily="1,2" PListPreprocess="1"
                   iosBackgroundBle="1">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        plistPreprocessorDefinitions="" iosCompatibility="8.0" enablePluginBinaryCopyStep="1"
-                       codeSigningIdentity="QY96HSP2FJ"/>
+                       codeSigningIdentity="YT6AXURH62"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="bitKlavier"
-                       iosCompatibility="8.0" enablePluginBinaryCopyStep="1" codeSigningIdentity="QY96HSP2FJ"/>
+                       iosCompatibility="8.0" enablePluginBinaryCopyStep="1" codeSigningIdentity="YT6AXURH62"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="../../../../JUCE/modules"/>
@@ -432,7 +427,7 @@
       </MODULEPATHS>
     </XCODE_IPHONE>
     <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="C:\SDKs\VST3_SDK"
-            bigIcon="D50AzU" smallIcon="wvKUCU" windowsTargetPlatformVersion="10.0.16299.0">
+            bigIcon="iHGLGD" smallIcon="smHM8h" windowsTargetPlatformVersion="10.0.16299.0">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="1" optimisation="1" targetName="bitKlavier" debugInformationFormat="ProgramDatabase"

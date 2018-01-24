@@ -60,6 +60,7 @@ public:
     bool keymapDidChange = false;
     bool modificationDidChange = false;
     bool pianoSamplesAreLoading = false;
+    bool needsExtraKeys = true;
     
     
     BKPreparationDisplay currentDisplay = DisplayNil;

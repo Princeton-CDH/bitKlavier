@@ -518,6 +518,23 @@ public:
         adaptiveReset();
     }
     
+    uint64 getAtTimer() { return atTimer; }
+    uint64 getAtLastTime() { return atLastTime; }
+    Array<int> getAtDeltaHistory() { return atDeltaHistory; }
+    float getAdaptiveTempoPeriodMultiplier() { return adaptiveTempoPeriodMultiplier; }
+    
+    void setAtTimer(uint64 newval) { atTimer = newval; }
+    void setAtLastTime(uint64 newval) { atLastTime = newval; }
+    void setAtDeltaHistory(Array<int> newvals)
+    {
+        atDeltaHistory.clearQuick();
+        for(int i=0; i<newvals.size(); i++)
+        {
+            atDeltaHistory.add(newvals.getUnchecked(i));
+        }
+    }
+    void setAdaptiveTempoPeriodMultiplier(float val) { adaptiveTempoPeriodMultiplier = val; }
+    
 private:
     GeneralSettings::Ptr general;
     

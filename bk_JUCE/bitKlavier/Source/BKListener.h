@@ -26,6 +26,12 @@ public:
     ~BKListener();
     
     virtual void bkTextFieldDidChange   (TextEditor&)           {};
+    virtual void bkTextFieldTextEntered (TextEditor&)           {};
+    
+    void textEditorTextChanged      (TextEditor&) override;
+    void textEditorFocusLost        (TextEditor&) override;
+    void textEditorReturnKeyPressed (TextEditor&) override;
+    void textEditorEscapeKeyPressed (TextEditor&) override;
     
 private:
     // TextEditor input parsing
@@ -33,11 +39,6 @@ private:
     virtual void bkComboBoxDidChange    (ComboBox*)             {};
     virtual void bkButtonClicked        (Button* b)             {};
     virtual void bkMessageReceived      (const String& message) {};
-    
-    void textEditorTextChanged      (TextEditor&) override;
-    void textEditorFocusLost        (TextEditor&) override;
-    void textEditorReturnKeyPressed (TextEditor&) override;
-    void textEditorEscapeKeyPressed (TextEditor&) override;
     
     void comboBoxChanged            (ComboBox* comboBoxThatHasChanged) override;
     

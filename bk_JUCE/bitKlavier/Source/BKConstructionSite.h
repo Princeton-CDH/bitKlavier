@@ -147,6 +147,7 @@ public:
         return touches.size();
     }
     
+    bool edittingComment;
     
 private:
     

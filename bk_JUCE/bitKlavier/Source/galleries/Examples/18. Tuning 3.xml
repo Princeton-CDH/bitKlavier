@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<gallery name="18. Tuning 3" defaultPiano="19">
-  <idCount i0="15" i1="28" i2="24" i3="20" i4="16" i5="1494" i6="10" i7="10"
-           i8="10" i9="12" i10="10" i11="10" i12="10" i13="11" i14="30"/>
+<gallery name="18. Tuning 3" sampleType="3" defaultPiano="18">
+  <idCount i0="15" i1="28" i2="24" i3="20" i4="16" i5="1627" i6="10" i7="10"
+           i8="10" i9="12" i10="10" i11="10" i12="10" i13="11" i14="30"
+           i15="0"/>
   <general globalGain="1" directGain="1" synchronicGain="1" nostalgicGain="1"
            resonanceGain="1" hammerGain="0.0099999997764825820923" tempoMultiplier="1"
            resAndHammer="1" invertSustain="0" tuningFund="440"/>
@@ -40,7 +41,7 @@
          at1Subdivisions="1" at1Min="100" at1Max="2000"/>
   <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
          at1Subdivisions="1" at1Min="100" at1Max="2000"/>
-  <tuning Id="16" name="Adaptive Vertical" scale="3" fundamental="0" offset="0"
+  <tuning Id="15" name="Basic Adaptive" scale="3" fundamental="0" offset="0"
           adaptiveIntervalScale="1" adaptiveInversional="0" adaptiveAnchorScale="2"
           adaptiveAnchorFund="0" adaptiveClusterThresh="1" adaptiveHistory="1">
     <customScale f0="0.059999998658895492554" f1="0" f2="0.019999999552965164185"
@@ -222,7 +223,7 @@
   <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
     <transposition f0="0"/>
   </direct>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -231,7 +232,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -240,7 +241,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -249,7 +250,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -258,7 +259,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -267,7 +268,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -276,7 +277,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -285,7 +286,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -294,7 +295,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -303,7 +304,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -312,7 +313,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -321,7 +322,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -330,7 +331,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -339,7 +340,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -348,7 +349,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -357,7 +358,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -366,7 +367,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -480,37 +481,44 @@
   <keymap Id="-1" name="-1"/>
   <keymap Id="-1" name="-1"/>
   <keymap Id="-1" name="-1"/>
-  <piano name="Tuning3" Id="19">
+  <piano name="Tuning2" Id="18">
     <item>
-      <item name="Tuning16" type="3" Id="16" piano="-1" active="1" X="432"
-            Y="167"/>
+      <item name="Tuning15" type="3" Id="15" piano="-1" active="1" X="214.5"
+            Y="83.5" W="57" H="129"/>
       <connections>
-        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="554"
-              Y="188"/>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="89"
+              Y="83" W="144" H="64"/>
       </connections>
     </item>
     <item>
-      <item name="Keymap11" type="5" Id="11" piano="-1" active="1" X="571"
-            Y="332"/>
+      <item name="Keymap11" type="5" Id="11" piano="-1" active="1" X="89"
+            Y="286" W="106" H="72"/>
       <connections>
-        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="554"
-              Y="188"/>
-        <item name="Tuning16" type="3" Id="16" piano="-1" active="1" X="432"
-              Y="167"/>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="89"
+              Y="83" W="144" H="64"/>
+        <item name="Tuning15" type="3" Id="15" piano="-1" active="1" X="214.5"
+              Y="83.5" W="57" H="129"/>
       </connections>
     </item>
     <item>
-      <item name="" type="13" Id="11" piano="0" active="1" X="321" Y="191"/>
+      <item name="" type="13" Id="11" piano="0" active="1" X="214" Y="204"
+            W="64" H="64"/>
       <connections>
-        <item name="Tuning16" type="3" Id="16" piano="-1" active="1" X="432"
-              Y="167"/>
+        <item name="Tuning15" type="3" Id="15" piano="-1" active="1" X="214.5"
+              Y="83.5" W="57" H="129"/>
       </connections>
     </item>
     <item>
-      <item name="" type="5" Id="12" piano="0" active="1" X="300" Y="330"/>
+      <item name="" type="5" Id="12" piano="0" active="1" X="214" Y="286"
+            W="106" H="72"/>
       <connections>
-        <item name="" type="13" Id="11" piano="0" active="1" X="321" Y="191"/>
+        <item name="" type="13" Id="11" piano="0" active="1" X="214" Y="204"
+              W="64" H="64"/>
       </connections>
+    </item>
+    <item>
+      <item name="Comment" type="15" text="Just like Tuning 2, but here the &quot;invert&quot; toggle is turned off.&#10;&#10;Compare playing D-E-F# over and over with playing F#-E-D over and over.&#10;&#10;Again, too much to explain here, but listen to the differences...."
+            X="520" Y="181.5" W="272" H="165"/>
     </item>
   </piano>
 </gallery>

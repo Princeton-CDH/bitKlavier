@@ -15,6 +15,9 @@
 
 class NostalgicViewController :
 public BKViewController
+#if JUCE_IOS
+, public WantsBigOne::Listener
+#endif
 {
 public:
     NostalgicViewController(BKAudioProcessor&, BKItemGraph* theGraph);
@@ -33,16 +36,7 @@ public:
     ScopedPointer<BKSingleSlider> gainSlider;
     
     ScopedPointer<BKStackedSlider> transpositionSlider;
-    
-    /*
-    void numberPadChanged(BKNumberPad*) override;
-    void numberPadDismissed(BKNumberPad*) override;
-    
-    void bkSingleSliderWantsKeyboard(BKSingleSlider*) override;
-    void bkStackedSliderWantsKeyboard(BKStackedSlider*) override;
-    void bkWaveDistanceUndertowSliderWantsKeyboard(BKWaveDistanceUndertowSlider*)override;
-     
-     */
+
     
     void paint (Graphics&) override;
     void resized() override;
@@ -50,6 +44,10 @@ public:
     virtual void update(void) {};
     
     void fillModeSelectCB(void);
+    
+#if JUCE_IOS
+    void iWantTheBigOne(TextEditor*, String name) override;
+#endif
 
 private:
     
@@ -84,7 +82,6 @@ public:
     int duplicatePreparation(void);
     void setCurrentId(int Id);
     void deleteCurrent(void);
-    
     
 private:
     

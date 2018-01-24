@@ -36,8 +36,11 @@ BKViewController(p, theGraph)
         {
             paramSliders.insert(idx, new BKMultiSlider(HorizontalMultiBarSlider));
             addAndMakeVisible(paramSliders[idx]);
-            paramSliders[idx]->addMyListener(this);
             paramSliders[idx]->setName(cSynchronicParameterTypes[idx+SynchronicTranspOffsets]);
+            paramSliders[idx]->addMyListener(this);
+#if JUCE_IOS
+            paramSliders[idx]->addWantsBigOneListener(this);
+#endif
             paramSliders[idx]->setMinMaxDefaultInc(cSynchronicDefaultRangeValuesAndInc[i]);
             
             if(paramSliders[idx]->getName() == "transpositions")
@@ -93,6 +96,16 @@ BKViewController(p, theGraph)
     gainSlider->setSkewFactorFromMidPoint(1.);
     addAndMakeVisible(gainSlider);
     
+#if JUCE_IOS
+    howManySlider->addWantsBigOneListener(this);
+
+    clusterThreshSlider->addWantsBigOneListener(this);
+
+    gainSlider->addWantsBigOneListener(this);
+    
+    clusterMinMaxSlider->addWantsBigOneListener(this);
+#endif
+    
     releaseVelocitySetsSynchronicToggle.addListener(this);
     releaseVelocitySetsSynchronicToggle.setLookAndFeel(&buttonsAndMenusLAF2); //need different one so toggle text can be on other side
     releaseVelocitySetsSynchronicToggle.setButtonText ("noteOff loudness");
@@ -103,14 +116,6 @@ BKViewController(p, theGraph)
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
-    
-#if JUCE_IOS
-    for (auto mslider : paramSliders) mslider->addWantsKeyboardListener(this);
-    howManySlider->addWantsKeyboardListener(this);
-    clusterThreshSlider->addWantsKeyboardListener(this);
-    clusterMinMaxSlider->addWantsKeyboardListener(this);
-    gainSlider->addWantsKeyboardListener(this);
-#endif
 }
 
 void SynchronicViewController::paint (Graphics& g)
@@ -208,6 +213,13 @@ void SynchronicViewController::fillModeSelectCB(void)
     modeSelectCB.setSelectedItemIndex(0, NotificationType::dontSendNotification);
 }
 
+#if JUCE_IOS
+void SynchronicViewController::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
+}
+#endif
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ SynchronicPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
 
@@ -534,6 +546,30 @@ void SynchronicPreparationEditor::actionButtonCallback(int action, SynchronicPre
         processor.clear(PreparationTypeSynchronic, processor.updateState->currentSynchronicId);
         vc->update();
     }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentSynchronicId;
+        Synchronic::Ptr prep = processor.gallery->getSynchronic(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
+    }
 }
 
 
@@ -666,10 +702,6 @@ SynchronicViewController(p, theGraph)
     clusterThreshSlider->addMyListener(this);
     clusterMinMaxSlider->addMyListener(this);
     gainSlider->addMyListener(this);
-    for(int i = 0; i < paramSliders.size(); i++)
-    {
-        paramSliders[i]->addMyListener(this);
-    }
     
     //startTimer(20);
     
@@ -1033,6 +1065,30 @@ void SynchronicModificationEditor::actionButtonCallback(int action, SynchronicMo
         processor.clear(PreparationTypeSynchronicMod, processor.updateState->currentModSynchronicId);
         vc->update();
         vc->updateModification();
+    }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentModSynchronicId;
+        SynchronicModPreparation::Ptr prep = processor.gallery->getSynchronicModPreparation(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
     }
 }
 

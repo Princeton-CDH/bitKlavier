@@ -12,6 +12,9 @@
 
 TuningViewController::TuningViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
 BKViewController(p,theGraph)
+#if JUCE_IOS
+, absoluteKeyboard(true)
+#endif
 {
     
     setLookAndFeel(&buttonsAndMenusLAF);
@@ -116,12 +119,14 @@ BKViewController(p,theGraph)
     addAndMakeVisible(actionButton);
     
 #if JUCE_IOS
-    offsetSlider->addWantsKeyboardListener(this);
-    absoluteKeyboard.addWantsKeyboardListener(this);
-    customKeyboard.addWantsKeyboardListener(this);
-    A1ClusterThresh->addWantsKeyboardListener(this);
-    A1ClusterMax->addWantsKeyboardListener(this);
+    offsetSlider->addWantsBigOneListener(this);
+    A1ClusterMax->addWantsBigOneListener(this);
+    A1ClusterThresh->addWantsBigOneListener(this);
+    
+    absoluteKeyboard.addWantsBigOneListener(this);
+    customKeyboard.addWantsBigOneListener(this);
 #endif
+    
 }
 
 void TuningViewController::resized()
@@ -325,6 +330,14 @@ void TuningViewController::updateComponentVisibility()
     }
 }
 
+#if JUCE_IOS
+void TuningViewController::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
+}
+#endif
+
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ TuningPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
 
 TuningPreparationEditor::TuningPreparationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
@@ -454,6 +467,30 @@ void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparation
     else if (action == 5)
     {
         processor.clear(PreparationTypeTuning, processor.updateState->currentTuningId);
+        vc->update();
+    }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentTuningId;
+        Tuning::Ptr prep = processor.gallery->getTuning(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
         vc->update();
     }
 }
@@ -900,6 +937,30 @@ void TuningModificationEditor::actionButtonCallback(int action, TuningModificati
         processor.clear(PreparationTypeTuningMod, processor.updateState->currentModTuningId);
         vc->update();
         vc->updateModification();
+    }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentModTuningId;
+        TuningModPreparation::Ptr prep = processor.gallery->getTuningModPreparation(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
     }
 }
 
