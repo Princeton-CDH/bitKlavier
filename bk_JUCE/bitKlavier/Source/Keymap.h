@@ -19,11 +19,12 @@
 typedef enum KeySet
 {
     KeySetAll = 1,
-    KeySetBlack = 2,
-    KeySetWhite = 3,
-    KeySetOctatonicOne = 4,
-    KeySetOctatonicTwo = 5,
-    KeySetOctatonicThree = 6,
+    KeySetAllPC,
+    KeySetBlack,
+    KeySetWhite,
+    KeySetOctatonicOne,
+    KeySetOctatonicTwo,
+    KeySetOctatonicThree,
     KeySetMajorTriad,
     KeySetMinorTriad,
     KeySetMajorSeven,
@@ -71,6 +72,7 @@ public:
     Array<int> majorseven = {0,4,7,11};
     Array<int> domseven = {0,4,7,10};
     Array<int> minorseven = {0,3,7,10};
+    Array<int> allpc = {0};
     
     Keymap(int Id):
     Id(Id),
@@ -315,7 +317,8 @@ public:
         else if (set == KeySetMajorSeven)          chord = majorseven;
         else if (set == KeySetDomSeven)            chord = domseven;
         else if (set == KeySetMinorSeven)          chord = minorseven;
-        else                            return;
+        else if (set == KeySetAllPC)               chord = allpc;
+        else                                       return;
         
         for (int note = 0; note < 128; note++)
         {
@@ -333,6 +336,10 @@ public:
         if (set == KeySetAll)
         {
             setAll(action);
+        }
+        else if (set == KeySetAllPC)
+        {
+            setChord(set, pc, action);
         }
         else if (set == KeySetBlack)
         {

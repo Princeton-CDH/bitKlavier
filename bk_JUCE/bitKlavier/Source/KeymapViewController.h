@@ -80,7 +80,7 @@ private:
     bool selectType;
     
     PopupMenu getKeysMenu(void);
-    PopupMenu getPitchClassMenu(KeySet set);
+    PopupMenu getPitchClassMenu(int offset);
     
     void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override;

@@ -16,6 +16,8 @@
 #define DESELECT_ID 8
 #define TOGGLE_ID 9
 
+#define ID(IN) (IN*12)
+
 //==============================================================================
 KeymapViewController::KeymapViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
 BKViewController(p, theGraph)
@@ -312,11 +314,8 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
 
 String pcs[12] = {"C","C#/Db","D","D#/Eb","E","F","F#/Gb","G","G#/Ab","A","A#/Bb","B",};
 
-PopupMenu KeymapViewController::getPitchClassMenu(KeySet set)
+PopupMenu KeymapViewController::getPitchClassMenu(int offset)
 {
-    int offset = ((int)set - KeySetMajorTriad);
-    int spacing = ((int)KeySetNil - KeySetMajorTriad);
-    int start = KeySetMajorTriad;
     int Id;
     
     PopupMenu menu;
@@ -324,8 +323,8 @@ PopupMenu KeymapViewController::getPitchClassMenu(KeySet set)
     
     for (int i = 0; i < 12; i++)
     {
-        Id = start + offset*12 + i;
-        DBG("set and Id: " + String(set) + " " + String(Id));
+        Id = offset + i;
+        DBG("ID: " + String(Id));
         menu.addItem(Id, pcs[i]);
     }
     
@@ -337,18 +336,19 @@ PopupMenu KeymapViewController::getKeysMenu(void)
     PopupMenu menu;
     menu.setLookAndFeel(&buttonsAndMenusLAF);
     
-    menu.addItem(KeySetAll, "All");
-    menu.addItem(KeySetBlack, "Black");
-    menu.addItem(KeySetWhite, "White");
-    menu.addItem(KeySetOctatonicOne, "Octatonic 1");
-    menu.addItem(KeySetOctatonicTwo, "Octatonic 2");
-    menu.addItem(KeySetOctatonicThree, "Octatonic 3");
+    menu.addItem(ID(KeySetAll), "All");
+    menu.addSubMenu("All...",  getPitchClassMenu((KeySet) ID(KeySetAllPC)));
+    menu.addItem(ID(KeySetBlack), "Black");
+    menu.addItem(ID(KeySetWhite), "White");
+    menu.addItem(ID(KeySetOctatonicOne), "Octatonic 1");
+    menu.addItem(ID(KeySetOctatonicTwo), "Octatonic 2");
+    menu.addItem(ID(KeySetOctatonicThree), "Octatonic 3");
     
-    menu.addSubMenu("Major Triad",  getPitchClassMenu((KeySet)(KeySetMajorTriad+0)));
-    menu.addSubMenu("Minor Triad",  getPitchClassMenu((KeySet)(KeySetMajorTriad+1)));
-    menu.addSubMenu("Major Seven",  getPitchClassMenu((KeySet)(KeySetMajorTriad+2)));
-    menu.addSubMenu("Dom Seven",    getPitchClassMenu((KeySet)(KeySetMajorTriad+3)));
-    menu.addSubMenu("Minor Seven",  getPitchClassMenu((KeySet)(KeySetMajorTriad+4)));
+    menu.addSubMenu("Major Triad",  getPitchClassMenu((KeySet) ID(KeySetMajorTriad)));
+    menu.addSubMenu("Minor Triad",  getPitchClassMenu((KeySet) ID(KeySetMinorTriad)));
+    menu.addSubMenu("Major Seven",  getPitchClassMenu((KeySet) ID(KeySetMajorSeven)));
+    menu.addSubMenu("Dom Seven",    getPitchClassMenu((KeySet) ID(KeySetDomSeven)));
+    menu.addSubMenu("Minor Seven",  getPitchClassMenu((KeySet) ID(KeySetMinorSeven)));
     
     return menu;
 }
@@ -360,19 +360,13 @@ void KeymapViewController::keysMenuCallback(int result, KeymapViewController* vc
     // get old keys to send to update
     Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
 
-    if (result < KeySetMajorTriad)
     {
-        keymap->setKeys((KeySet)result, vc->selectType);
-    }
-    else
-    {
-        int which = result - KeySetMajorTriad;
-        int set = which / 12;
-        int pc = which % 12;
+        int set = result/ 12;
+        int pc = result % 12;
         
         DBG("set: " + String(set) + " pc: " + String(pc));
         
-        keymap->setKeys((KeySet)(set+KeySetMajorTriad), vc->selectType, (PitchClass)pc);
+        keymap->setKeys((KeySet)set, vc->selectType, (PitchClass)pc);
     }
     
     BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)(vc->keyboardComponent.get());
