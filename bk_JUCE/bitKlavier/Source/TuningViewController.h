@@ -71,6 +71,8 @@ protected:
     BKLabel lastInterval;
     float lastNoteTuningSave = -.1;
     
+    BKLabel currentFundamental;
+    
     BKKeyboardSlider absoluteKeyboard;
     BKKeyboardSlider customKeyboard;
     

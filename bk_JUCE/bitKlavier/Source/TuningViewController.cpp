@@ -114,6 +114,9 @@ BKViewController(p,theGraph)
     addAndMakeVisible(lastNote);
     addAndMakeVisible(lastInterval);
     
+    currentFundamental.setJustificationType(juce::Justification::centredRight);
+    addAndMakeVisible(currentFundamental);
+    
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
     addAndMakeVisible(actionButton);
@@ -188,6 +191,10 @@ void TuningViewController::resized()
     offsetSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     offsetSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
     offsetSlider->setBounds(offsetSliderSlice);
+    
+    area.removeFromTop(extraY);
+    Rectangle<int> currentFundamentalSlice = area.removeFromTop(gComponentTextFieldHeight);
+    currentFundamental.setBounds(currentFundamentalSlice);
     
     // ********* left column
     
@@ -299,6 +306,7 @@ void TuningViewController::updateComponentVisibility()
         A1AnchorScaleLabel.setVisible(false);
         A1FundamentalLabel.setVisible(false);
         A1reset.setVisible(true);
+        currentFundamental.setVisible(true);
 
     }
     else if(scaleCB.getText() == "Adaptive Anchored Tuning 1")
@@ -313,6 +321,7 @@ void TuningViewController::updateComponentVisibility()
         A1AnchorScaleLabel.setVisible(true);
         A1FundamentalLabel.setVisible(true);
         A1reset.setVisible(true);
+        currentFundamental.setVisible(true);
 
     }
     else
@@ -327,6 +336,7 @@ void TuningViewController::updateComponentVisibility()
         A1AnchorScaleLabel.setVisible(false);
         A1FundamentalLabel.setVisible(false);
         A1reset.setVisible(false);
+        currentFundamental.setVisible(false);
     }
 }
 
@@ -391,6 +401,8 @@ void TuningPreparationEditor::timerCallback()
                 lastNoteTuningSave = tProcessor->getLastNoteTuning();
                 lastNote.setText("note: " + String(lastNoteTuningSave, 3), dontSendNotification);
                 lastInterval.setText("interval: "  + String(tProcessor->getLastIntervalTuning(), 3), dontSendNotification);
+                
+                currentFundamental.setText("current fundamental: " + String(ftom(tProcessor->getAdaptiveFundamentalFreq()), 3), dontSendNotification);
             }
         }
         
