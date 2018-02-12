@@ -878,8 +878,6 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
         }
     }
     
-    updateState->loadedJson = true;
-    
     FileChooser myChooser ("Load gallery from json file...",
                            File::getSpecialLocation (File::userHomeDirectory),
                            "*.json");
@@ -887,15 +885,28 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
     
     if (myChooser.browseForFileToOpen())
     {
+        updateState->loadedJson = true;
+        
         File myFile (myChooser.getResult());
         
-        currentGallery = myFile.getFileName();
+        File user   (File::getSpecialLocation(File::userDocumentsDirectory));
+        user = user.getChildFile("bitKlavier resources/galleries/");
         
-        var myJson = JSON::parse(myFile);
+        user = user.getChildFile(myFile.getFileName());
+        
+        if (myFile.getFullPathName() != user.getFullPathName())
+        {
+            if (myFile.moveFileTo(user))    DBG("MOVED");
+            else                            DBG("NOT MOVED");
+        }
+        
+        currentGallery = user.getFileName();
+        
+        var myJson = JSON::parse(user);
         
         gallery = new Gallery(myJson, *this);
         
-        gallery->setURL(myFile.getFullPathName());
+        gallery->setURL(user.getFullPathName());
         
         initializeGallery();
         

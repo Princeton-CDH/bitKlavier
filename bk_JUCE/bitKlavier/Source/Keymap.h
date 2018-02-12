@@ -16,13 +16,40 @@
 
 #include "BKUtilities.h"
 
-typedef enum OctatonicType
+typedef enum KeySet
 {
-    OctatonicOne,
-    OctatonicTwo,
-    OctatonicThree,
-    OctatonicNil
-} OctatonicType;
+    KeySetAll = 1,
+    KeySetBlack = 2,
+    KeySetWhite = 3,
+    KeySetOctatonicOne = 4,
+    KeySetOctatonicTwo = 5,
+    KeySetOctatonicThree = 6,
+    KeySetMajorTriad,
+    KeySetMinorTriad,
+    KeySetMajorSeven,
+    KeySetDomSeven,
+    KeySetMinorSeven,
+    KeySetNil
+} KeySet;
+
+typedef enum OctType
+{
+    Oct1 = 0,
+    Oct2,
+    Oct3,
+    OctNil
+} OctType;
+
+typedef enum ChordType
+{
+    MajorTriad = 0,
+    MinorTriad,
+    MajorSeven,
+    DomSeven,
+    MinorSeven,
+    ChordTypeNil
+} ChordType;
+
 
 class Keymap : public ReferenceCountedObject
 {
@@ -32,6 +59,18 @@ public:
     typedef Array<Keymap::Ptr, CriticalSection> CSPtrArr;
     typedef OwnedArray<Keymap>                  Arr;
     typedef OwnedArray<Keymap, CriticalSection> CSArr;
+    
+    Array<int> white = {0,2,4,5,7,9,11};
+    Array<int> black = {1,3,6,8,10};
+    Array<int> octatonic1 = {0,1,3,4,6,7,9,10};
+    Array<int> octatonic2 = {1,2,4,5,7,8,10,11};
+    Array<int> octatonic3 = {0,2,3,5,6,8,9,11};
+    
+    Array<int> majortriad = {0,4,7};
+    Array<int> minortriad = {0,3,7};
+    Array<int> majorseven = {0,4,7,11};
+    Array<int> domseven = {0,4,7,10};
+    Array<int> minorseven = {0,3,7,10};
     
     Keymap(int Id):
     Id(Id),
@@ -211,9 +250,115 @@ public:
         return k;
     }
     
-    void setAllWhiteKeys(void);
-    void setAllBlackKeys(void);
-    void setAllOctatonicKeys(OctatonicType type);
+    void setAll(bool action)
+    {
+        for (int note = 0; note < 128; note++)
+        {
+            keymap.set(note, action);
+        }
+    }
+    
+    void setWhite(bool action)
+    {
+        int pc;
+        for (int note = 0; note < 128; note++)
+        {
+            pc = note % 12;
+            
+            if (white.contains(pc))
+            {
+                keymap.set(note, action);
+            }
+        }
+    }
+    
+    void setBlack(bool action)
+    {
+        int pc;
+        for (int note = 0; note < 128; note++)
+        {
+            pc = note % 12;
+            
+            if (black.contains(pc))
+            {
+                keymap.set(note, action);
+            }
+        }
+    }
+    
+    void setOctatonic(OctType type, bool action)
+    {
+        int pc;
+        Array<int> octatonic;
+        if (type == Oct1)       octatonic = octatonic1;
+        else if (type == Oct2)  octatonic = octatonic2;
+        else if (type == Oct3)  octatonic = octatonic3;
+        else                            return;
+        
+        for (int note = 0; note < 128; note++)
+        {
+            pc = note % 12;
+            
+            if (octatonic.contains(pc))
+            {
+                keymap.set(note, action);
+            }
+        }
+    }
+    
+    void setChord(KeySet set, PitchClass root, bool action)
+    {
+        int pc;
+        Array<int> chord;
+        if      (set == KeySetMajorTriad)          chord = majortriad;
+        else if (set == KeySetMinorTriad)          chord = minortriad;
+        else if (set == KeySetMajorSeven)          chord = majorseven;
+        else if (set == KeySetDomSeven)            chord = domseven;
+        else if (set == KeySetMinorSeven)          chord = minorseven;
+        else                            return;
+        
+        for (int note = 0; note < 128; note++)
+        {
+            pc = ((note - root) % 12);
+            
+            if (chord.contains(pc))
+            {
+                keymap.set(note, action);
+            }
+        }
+    }
+    
+    void setKeys(KeySet set, bool action, PitchClass pc = PitchClassNil)
+    {
+        if (set == KeySetAll)
+        {
+            setAll(action);
+        }
+        else if (set == KeySetBlack)
+        {
+            setBlack(action);
+        }
+        else if (set == KeySetWhite)
+        {
+            setWhite(action);
+        }
+        else if (set == KeySetOctatonicOne)
+        {
+            setOctatonic(Oct1,action);
+        }
+        else if (set == KeySetOctatonicTwo)
+        {
+            setOctatonic(Oct2,action);
+        }
+        else if (set == KeySetOctatonicThree)
+        {
+            setOctatonic(Oct3,action);
+        }
+        else
+        {
+            setChord(set, pc, action);
+        }
+    }
     
     void print(void)
     {

@@ -43,6 +43,7 @@ public:
     void fillSelectCB(int last, int current);
     
     static void actionButtonCallback(int action, KeymapViewController*);
+    static void keysMenuCallback(int result, KeymapViewController* vc);
     
     int addKeymap(void);
     int duplicateKeymap(void);
@@ -72,6 +73,15 @@ private:
     BKKeymapKeyboardComponent* keyboard;
     BKTextButton keyboardValsTextFieldOpen;
     
+    TextButton      keysButton;
+    TextButton      clearButton;
+    BKComboBox      keysCB;
+    
+    bool selectType;
+    
+    PopupMenu getKeysMenu(void);
+    PopupMenu getPitchClassMenu(KeySet set);
+    
     void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber) override;
@@ -79,7 +89,6 @@ private:
     void textEditorFocusLost(TextEditor& textEditor) override;
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
     void textEditorTextChanged(TextEditor& tf) override;
-    
     
     void bkMessageReceived          (const String& message) override;
     
