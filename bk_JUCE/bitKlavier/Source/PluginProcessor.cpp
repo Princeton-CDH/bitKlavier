@@ -173,8 +173,6 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     levelBuf.setSize(2, 25);
     
     gallery->prepareToPlay(sampleRate);
-
-    
     
 #if JUCE_IOS
     String osname = SystemStats::getOperatingSystemName();
@@ -189,7 +187,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
     else                    loadPianoSamples(BKLoadMedium); // CHANGE BACK TO MEDIUM
 #else
-    loadPianoSamples(BKLoadHeavy); // CHANGE THIS BACK TO HEAVY
+    loadPianoSamples(BKLoadLite); // CHANGE THIS BACK TO HEAVY
 #endif
 
     
@@ -789,22 +787,33 @@ void BKAudioProcessor::loadGalleryDialog(void)
     if (myChooser.browseForFileToOpen())
     {
         File myFile (myChooser.getResult());
+
+        File user   (File::getSpecialLocation(File::userDocumentsDirectory));
+        user = user.getChildFile("bitKlavier resources/galleries/");
+
+        user = user.getChildFile(myFile.getFileName());
         
-        ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
+        if (myFile.getFullPathName() != user.getFullPathName())
+        {
+            if (myFile.moveFileTo(user))    DBG("MOVED");
+            else                            DBG("NOT MOVED");
+        }
+        
+        ScopedPointer<XmlElement> xml (XmlDocument::parse (user));
         
         if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
         {
-            currentGallery = myFile.getFileName();
+            currentGallery = user.getFileName();
             
             gallery = new Gallery(xml, *this);
             
-            gallery->setURL(myFile.getFullPathName());
+            gallery->setURL(user.getFullPathName());
             
             initializeGallery();
             
             galleryDidLoad = true;
             
-            lastGalleryPath = myFile;
+            lastGalleryPath = user;
         }
     }
     

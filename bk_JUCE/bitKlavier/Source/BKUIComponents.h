@@ -102,7 +102,7 @@ public:
         setFont(font);
 #if JUCE_IOS
         setKeyboardType(TextInputTarget::VirtualKeyboardType::textKeyboard);
-        setInputRestrictions(10000, "0123456789 []()-.");
+        setInputRestrictions(10000, "0123456789 []()-.:");
 #endif
         
     }

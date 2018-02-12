@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<gallery name="11. Nostalgic 2" defaultPiano="12">
-  <idCount i0="15" i1="28" i2="24" i3="20" i4="16" i5="1471" i6="10" i7="10"
-           i8="10" i9="12" i10="10" i11="10" i12="10" i13="11" i14="30"/>
+<gallery name="11. Nostalgic 2" sampleType="3" defaultPiano="12">
+  <idCount i0="15" i1="28" i2="24" i3="20" i4="16" i5="1494" i6="10" i7="10"
+           i8="10" i9="12" i10="10" i11="10" i12="10" i13="11" i14="30"
+           i15="0"/>
   <general globalGain="1" directGain="1" synchronicGain="1" nostalgicGain="1"
            resonanceGain="1" hammerGain="0.0099999997764825820923" tempoMultiplier="1"
            resAndHammer="1" invertSustain="0" tuningFund="440"/>
@@ -316,8 +317,8 @@
   <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
     <transposition f0="0"/>
   </direct>
-  <synchronic Id="12" name="AnyOn" numBeats="10000" clusterMin="2" clusterMax="100"
-              clusterThresh="500" mode="1" beatsToSkip="0">
+  <synchronic Id="12" name="AnyOn" gain="1" numBeats="10000" clusterMin="2"
+              clusterMax="100" clusterThresh="500" mode="1" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="0.15000009536743164062"/>
     <accentMultipliers f0="1"/>
@@ -325,8 +326,8 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="13" name="FirstOn" numBeats="10000" clusterMin="2" clusterMax="100"
-              clusterThresh="500" mode="0" beatsToSkip="-1">
+  <synchronic Id="13" name="FirstOn" gain="1" numBeats="10000" clusterMin="2"
+              clusterMax="100" clusterThresh="500" mode="0" beatsToSkip="-1">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="0.10000000149011611938"/>
     <accentMultipliers f0="1"/>
@@ -334,8 +335,8 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="14" name="Accents" numBeats="10000" clusterMin="2" clusterMax="100"
-              clusterThresh="500" mode="0" beatsToSkip="-1">
+  <synchronic Id="14" name="Accents" gain="1" numBeats="10000" clusterMin="2"
+              clusterMax="100" clusterThresh="500" mode="0" beatsToSkip="-1">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="0.10000000149011611938"/>
     <accentMultipliers f0="1" f1="0.5" f2="0.25"/>
@@ -343,7 +344,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="15" name="AccentsSkipFirst" numBeats="10000" clusterMin="2"
+  <synchronic Id="15" name="AccentsSkipFirst" gain="1" numBeats="10000" clusterMin="2"
               clusterMax="3" clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="0.10000000149011611938"/>
@@ -352,8 +353,8 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="16" name="SustainLength" numBeats="12" clusterMin="2" clusterMax="3"
-              clusterThresh="500" mode="0" beatsToSkip="0">
+  <synchronic Id="16" name="SustainLength" gain="1" numBeats="12" clusterMin="2"
+              clusterMax="3" clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="0.60000002384185791016" f1="0.40000000596046447754" f2="0.20000000298023223877"/>
     <accentMultipliers f0="1" f1="0.5" f2="0.25"/>
@@ -361,7 +362,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="17" name="VariableBeatLengths" numBeats="12" clusterMin="2"
+  <synchronic Id="17" name="VariableBeatLengths" gain="1" numBeats="12" clusterMin="2"
               clusterMax="3" clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1.2000000476837158203" f1="1" f2="0.69999998807907104492"/>
     <lengthMultipliers f0="0.40000000596046447754" f1="0.60000002384185791016" f2="0.20000000298023223877"/>
@@ -370,7 +371,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="18" name="ParameterPhasing" numBeats="10000" clusterMin="2"
+  <synchronic Id="18" name="ParameterPhasing" gain="1" numBeats="10000" clusterMin="2"
               clusterMax="3" clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1.2000000476837158203" f1="1" f2="0.69999998807907104492"/>
     <lengthMultipliers f0="0.40000000596046447754" f1="0.60000002384185791016" f2="0.20000000298023223877"
@@ -380,8 +381,8 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="19" name="NoteOff" numBeats="10000" clusterMin="2" clusterMax="3"
-              clusterThresh="500" mode="2" beatsToSkip="0">
+  <synchronic Id="19" name="NoteOff" gain="1" numBeats="10000" clusterMin="2"
+              clusterMax="3" clusterThresh="500" mode="2" beatsToSkip="0">
     <beatMultipliers f0="1.2000000476837158203" f1="1" f2="0.69999998807907104492"/>
     <lengthMultipliers f0="0.40000000596046447754" f1="0.60000002384185791016" f2="0.20000000298023223877"
                        f3="0.10000000149011611938" f4="0.15000000596046447754"/>
@@ -390,8 +391,8 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="20" name="LastOff" numBeats="10000" clusterMin="2" clusterMax="4"
-              clusterThresh="500" mode="2" beatsToSkip="0">
+  <synchronic Id="20" name="LastOff" gain="1" numBeats="10000" clusterMin="2"
+              clusterMax="4" clusterThresh="500" mode="2" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="0.15000009536743164062"/>
     <accentMultipliers f0="1"/>
@@ -399,7 +400,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="21" name="21" numBeats="10000" clusterMin="2" clusterMax="100"
+  <synchronic Id="21" name="21" gain="1" numBeats="10000" clusterMin="2" clusterMax="100"
               clusterThresh="1200" mode="0" beatsToSkip="-1">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="0.050000000745058059692"/>
@@ -408,7 +409,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="26" name="26" numBeats="12" clusterMin="2" clusterMax="100"
+  <synchronic Id="26" name="26" gain="1" numBeats="12" clusterMin="2" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1.2000000476837158203" f1="1" f2="0.69999998807907104492"/>
     <lengthMultipliers f0="0.40000000596046447754" f1="0.60000002384185791016" f2="0.20000000298023223877"/>
@@ -417,7 +418,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -426,7 +427,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -435,7 +436,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -444,7 +445,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -453,7 +454,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -462,7 +463,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -471,7 +472,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -480,7 +481,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -489,7 +490,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -498,7 +499,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -507,7 +508,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -516,7 +517,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -525,7 +526,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -534,7 +535,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -543,7 +544,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -552,7 +553,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -561,7 +562,7 @@
       <t0 f0="0"/>
     </transpOffsets>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -729,24 +730,28 @@
   <keymap Id="-1" name="-1"/>
   <piano name="Nostalgic2" Id="12">
     <item>
-      <item name="Tuning12" type="3" Id="11" piano="-1" active="1" X="439"
-            Y="121"/>
+      <item name="Tuning12" type="3" Id="11" piano="-1" active="1" X="169.5"
+            Y="85.5" W="57" H="129"/>
       <connections>
-        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="318"
-              Y="285"/>
-        <item name="Nostalgic13" type="2" Id="13" piano="-1" active="1" X="473"
-              Y="285"/>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="95"
+              Y="194" W="144" H="64"/>
+        <item name="Nostalgic13" type="2" Id="13" piano="-1" active="1" X="250"
+              Y="194" W="144" H="64"/>
       </connections>
     </item>
     <item>
-      <item name="Keymap11" type="5" Id="11" piano="-1" active="1" X="413"
-            Y="412"/>
+      <item name="Keymap11" type="5" Id="11" piano="-1" active="1" X="171"
+            Y="284" W="106" H="72"/>
       <connections>
-        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="318"
-              Y="285"/>
-        <item name="Nostalgic13" type="2" Id="13" piano="-1" active="1" X="473"
-              Y="285"/>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="95"
+              Y="194" W="144" H="64"/>
+        <item name="Nostalgic13" type="2" Id="13" piano="-1" active="1" X="250"
+              Y="194" W="144" H="64"/>
       </connections>
+    </item>
+    <item>
+      <item name="" type="15" text="Just like Nostalgic 1, but the &quot;note length multiplier&quot; is set to 2, so the reverse note will be twice the length of what you played. "
+            X="523" Y="199.5" W="194" H="117"/>
     </item>
   </piano>
 </gallery>

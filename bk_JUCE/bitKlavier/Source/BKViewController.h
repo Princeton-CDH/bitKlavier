@@ -45,6 +45,7 @@ public:
         
         bigOne.setKeyboardType(TextInputTarget::VirtualKeyboardType::decimalKeyboard);
         bigOne.setInputRestrictions(10000, "0123456789 :[]()-.");
+
         bigOne.setSelectAllWhenFocused(true);
         bigOne.setMouseClickGrabsKeyboardFocus(true);
         

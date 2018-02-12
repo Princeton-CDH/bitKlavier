@@ -48,7 +48,7 @@ BKViewController(p, theGraph)
     AT1MinMaxSlider->setIsMinAlwaysLessThanMax(true);
     addAndMakeVisible(AT1MinMaxSlider);
     
-    A1ModeCB.setName("Mode");
+    A1ModeCB.setName("AT1Mode");
     addAndMakeVisible(A1ModeCB);
     fillA1ModeCB();
     A1ModeLabel.setText("Mode", dontSendNotification);
@@ -425,6 +425,7 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (name == A1ModeCB.getName())
     {
+        DBG("A1ModeCB = " + String(index));
         prep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
         active->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
     }
