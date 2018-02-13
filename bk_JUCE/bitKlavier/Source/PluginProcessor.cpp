@@ -680,7 +680,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == NostalgicGain)             active->setGain(modf);
         else if (type == NostalgicMode)             active->setMode((NostalgicSyncMode)modi);
         else if (type == NostalgicUndertow)         active->setUndertow(modi);
-        else if (type == NostalgicBeatsToSkip)      active->setBeatsToSkip(modf);
+        else if (type == NostalgicBeatsToSkip)      active->setBeatsToSkip(modi);
         else if (type == NostalgicWaveDistance)     active->setWaveDistance(modi);
         else if (type == NostalgicLengthMultiplier) active->setLengthMultiplier(modf);
         
