@@ -48,15 +48,16 @@ public:
         f = e->getStringAttribute( ptagGeneral_globalGain ).getFloatValue();
         setGlobalGain(f);
         
-        
         f = e->getStringAttribute( ptagGeneral_tempoMultiplier ).getFloatValue();
         setTempoMultiplier(f);
         
         f = e->getStringAttribute( ptagGeneral_tuningFund ).getFloatValue();
         setTuningFundamental(f);
         
+        /*
         b = (bool) e->getStringAttribute( ptagGeneral_invertSustain ).getIntValue();
         setInvertSustain(b);
+         */
     }
     
     inline ValueTree getState(void)

@@ -9,7 +9,6 @@ updateState(new BKUpdateState()),
 mainPianoSynth(),
 hammerReleaseSynth(),
 resonanceReleaseSynth(),
-sustainIsDown(false),
 currentSampleType(BKLoadNil),
 loader(*this)
 #if TRY_UNDO

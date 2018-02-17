@@ -34,8 +34,8 @@ BKViewController(p, theGraph)
     addAndMakeVisible(tempoMultiplierSlider);
     
     invertSustainB.addListener(this);
-    invertSustainB.setToggleState(processor.gallery->getGeneralSettings()->getInvertSustain(), dontSendNotification);
-    processor.setSustainInversion(processor.gallery->getGeneralSettings()->getInvertSustain());
+    invertSustainB.setToggleState(processor.getSustainInversion(), dontSendNotification);
+    processor.setSustainInversion(processor.getSustainInversion());
     addAndMakeVisible(invertSustainB);
     
     invertSustainL.setText("invert sustain", dontSendNotification);
@@ -169,7 +169,5 @@ void GeneralViewController::bkButtonClicked (Button* b)
     {
         bool inversion =  (bool) b->getToggleStateValue().toString().getIntValue();
         processor.setSustainInversion(inversion);
-        processor.updateSustainState();
-        
     }
 }

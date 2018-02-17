@@ -451,8 +451,6 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                     if (sound->appliesToNote (midiNoteNumber) 
                         && sound->appliesToChannel (midiChannel))
                     {
-                        jassert (! voice->keyIsDown || voice->sustainPedalDown == sustainPedalsDown [midiChannel]);
-                        
                         // Let synthesiser know that key is no longer down,
                         voice->keyIsDown = false;
                         

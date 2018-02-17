@@ -212,11 +212,7 @@ public:
     inline void setSustainInversion(bool sus)
     {
         sustainInverted = sus;
-        gallery->getGeneralSettings()->setInvertSustain(sus);
-    }
-    
-    inline void updateSustainState(void)
-    {
+        
         if (sustainInverted)
         {
             if(sustainIsDown)
@@ -267,8 +263,8 @@ public:
                     currentPiano->activePMaps[p]->sustainPedalPressed();
             }
         }
-        
     }
+
     
     inline bool getSustainInversion(void) { return sustainInverted; }
     
