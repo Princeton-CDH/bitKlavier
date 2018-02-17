@@ -209,11 +209,78 @@ public:
     
     void clearBitKlavier(void);
     
+    inline void setSustainInversion(bool sus)
+    {
+        sustainInverted = sus;
+        gallery->getGeneralSettings()->setInvertSustain(sus);
+    }
+    
+    inline void updateSustainState(void)
+    {
+        if (sustainInverted)
+        {
+            if(sustainIsDown)
+            {
+                sustainIsDown = false;
+                
+                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                    currentPiano->activePMaps[p]->sustainPedalReleased();
+                
+                if(prevPiano != currentPiano)
+                {
+                    DBG("sustain inverted, sustain is now released");
+                    for (int p = prevPiano->activePMaps.size(); --p >= 0;)
+                        prevPiano->activePMaps[p]->sustainPedalReleased(true);
+                }
+            }
+            else
+            {
+                sustainIsDown = true;
+                DBG("sustain inverted, sustain is now pressed");
+                
+                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                    currentPiano->activePMaps[p]->sustainPedalPressed();
+            }
+        }
+        else
+        {
+            if(sustainIsDown)
+            {
+                sustainIsDown = false;
+                
+                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                    currentPiano->activePMaps[p]->sustainPedalReleased();
+                
+                if(prevPiano != currentPiano)
+                {
+                    DBG("sustain inverted, sustain is now released");
+                    for (int p = prevPiano->activePMaps.size(); --p >= 0;)
+                        prevPiano->activePMaps[p]->sustainPedalReleased(true);
+                }
+            }
+            else
+            {
+                sustainIsDown = true;
+                DBG("sustain inverted, sustain is now pressed");
+                
+                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                    currentPiano->activePMaps[p]->sustainPedalPressed();
+            }
+        }
+        
+    }
+    
+    inline bool getSustainInversion(void) { return sustainInverted; }
+    
 private:
     
     int  currentPianoId;
     
     bool sustainIsDown;
+    bool sustainInverted;
+   
+    void sustainActivate(void);
+    void sustainDeactivate(void);
     
     double bkSampleRate;
     

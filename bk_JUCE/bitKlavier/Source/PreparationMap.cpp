@@ -352,14 +352,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
             {
                 proc->keyReleased(noteNumber, velocity);
             }
-            
-            /* // need this ???
-             for (int i = tuning.size(); --i >= 0; )
-             {
-             if (pKeymap->containsNote(noteNumber))
-             tuning[i]->processor->keyReleased(noteNumber, channel);
-             }
-             */
+
         }
     }
 }
@@ -369,9 +362,6 @@ void PreparationMap::sustainPedalReleased(bool post)
     sustainPedalIsDepressed = false;
     
     //do all keyReleased calls now
-    
-
-    
     for(int n=0; n<sustainedNotes.size(); n++)
     {
         SustainedNote releaseNote = sustainedNotes.getUnchecked(n);

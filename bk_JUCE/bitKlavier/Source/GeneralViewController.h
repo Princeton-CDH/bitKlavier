@@ -39,9 +39,8 @@ private:
     //BKAudioProcessor& processor;
     int currentNostalgicLayer;
     
-    // BKLabels
-    OwnedArray<BKLabel> generalL;
-    OwnedArray<BKTextField> generalTF;
+    ToggleButton invertSustainB;
+    BKLabel     invertSustainL;
     
     ScopedPointer<BKSingleSlider> A4tuningReferenceFrequencySlider; //A440
     ScopedPointer<BKSingleSlider> tempoMultiplierSlider;

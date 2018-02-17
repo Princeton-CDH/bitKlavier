@@ -396,6 +396,39 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     
 }
 
+void BKAudioProcessor::sustainActivate(void)
+{
+    if(!sustainIsDown)
+    {
+        sustainIsDown = true;
+        DBG("SUSTAIN ON");
+        
+        for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+            currentPiano->activePMaps[p]->sustainPedalPressed();
+    }
+    
+}
+
+void BKAudioProcessor::sustainDeactivate(void)
+{
+    
+    if(sustainIsDown)
+    {
+        sustainIsDown = false;
+        DBG("SUSTAIN OFF");
+        
+        for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+            currentPiano->activePMaps[p]->sustainPedalReleased();
+        
+        if(prevPiano != currentPiano)
+        {
+            for (int p = prevPiano->activePMaps.size(); --p >= 0;)
+                prevPiano->activePMaps[p]->sustainPedalReleased(true);
+        }
+    }
+}
+
+
 void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
     buffer.clear();
@@ -451,31 +484,14 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         
         if (m.isSustainPedalOn())
         {
-            if(!sustainIsDown)
-            {
-                sustainIsDown = true;
-                DBG("sustainPedalIsDown");
-                
-                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                    currentPiano->activePMaps[p]->sustainPedalPressed();
-            }
+            if (sustainInverted)    sustainDeactivate();
+            else                    sustainActivate();
+               
         }
         else if (m.isSustainPedalOff())
         {
-            if(sustainIsDown)
-            {
-                sustainIsDown = false;
-                
-                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                    currentPiano->activePMaps[p]->sustainPedalReleased();
-                
-                if(prevPiano != currentPiano)
-                {
-                    DBG("prev piano sustainPedalReleased() called");
-                    for (int p = prevPiano->activePMaps.size(); --p >= 0;)
-                        prevPiano->activePMaps[p]->sustainPedalReleased(true);
-                }
-            }
+            if (sustainInverted)    sustainActivate();
+            else                    sustainDeactivate();
         }
     }
     

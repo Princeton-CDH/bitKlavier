@@ -12,7 +12,7 @@
 
 //==============================================================================
 GeneralViewController::GeneralViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph) 
+BKViewController(p, theGraph)
 {
     
     setLookAndFeel(&buttonsAndMenusLAF);
@@ -32,6 +32,14 @@ BKViewController(p, theGraph)
     tempoMultiplierSlider->setJustifyRight(false);
     tempoMultiplierSlider->addMyListener(this);
     addAndMakeVisible(tempoMultiplierSlider);
+    
+    invertSustainB.addListener(this);
+    invertSustainB.setToggleState(processor.gallery->getGeneralSettings()->getInvertSustain(), dontSendNotification);
+    processor.setSustainInversion(processor.gallery->getGeneralSettings()->getInvertSustain());
+    addAndMakeVisible(invertSustainB);
+    
+    invertSustainL.setText("invert sustain", dontSendNotification);
+    addAndMakeVisible(invertSustainL);
 
 #if JUCE_IOS
     tempoMultiplierSlider->addWantsBigOneListener(this);
@@ -73,9 +81,29 @@ void GeneralViewController::resized()
     comboBoxSlice.removeFromLeft(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     
+   
+    
+    A4tuningReferenceFrequencySlider->setBounds(hideOrShow.getX()+gXSpacing, hideOrShow.getBottom()+100,
+                                                getWidth()/2.-10, gComponentSingleSliderHeight);
+    
+    tempoMultiplierSlider->setBounds(A4tuningReferenceFrequencySlider->getX(), A4tuningReferenceFrequencySlider->getBottom()+10,
+                                                A4tuningReferenceFrequencySlider->getWidth(), A4tuningReferenceFrequencySlider->getHeight());
+    
+    invertSustainB.setBounds(tempoMultiplierSlider->getX()+5, tempoMultiplierSlider->getBottom() + 10,
+                             tempoMultiplierSlider->getWidth() * 0.25, 30);
+    
+    invertSustainB.changeWidthToFitText();
+    
+    invertSustainL.setBounds(invertSustainB.getRight() +gXSpacing, invertSustainB.getY(),
+                             150, 30);
+    
+   
+    
+    
+    /*
     Rectangle<int> sliderSlice = leftColumn;
     sliderSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
-    
+     
     int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 4.;
     A4tuningReferenceFrequencySlider->setBounds(sliderSlice.getX(),
                                    nextCenter - gComponentSingleSliderHeight/2 + 8,
@@ -87,7 +115,19 @@ void GeneralViewController::resized()
                                           nextCenter - gComponentSingleSliderHeight/2 + 8,
                                           sliderSlice.getWidth(),
                                           gComponentSingleSliderHeight);
+     
+    
+    nextCenter = sliderSlice.getY() + sliderSlice.getHeight();
+    invertSustainL.setBounds(sliderSlice.getX(),
+                            nextCenter - gComponentSingleSliderHeight/2 + 8,
+                            sliderSlice.getWidth()/2,
+                            gComponentSingleSliderHeight*2);
+    
+    invertSustainB.setBounds(invertSustainL.getRight()+gXSpacing,
+                             invertSustainL.getY(), invertSustainL.getHeight(), invertSustainL.getHeight());
+     */
 }
+
 
 void GeneralViewController::bkTextFieldDidChange(TextEditor& tf)
 {
@@ -124,5 +164,12 @@ void GeneralViewController::bkButtonClicked (Button* b)
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+    else if (b == &invertSustainB)
+    {
+        bool inversion =  (bool) b->getToggleStateValue().toString().getIntValue();
+        processor.setSustainInversion(inversion);
+        processor.updateSustainState();
+        
     }
 }
