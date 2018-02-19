@@ -373,7 +373,7 @@
  #define JucePlugin_AUManufacturerCode     JucePlugin_ManufacturerCode
 #endif
 #ifndef  JucePlugin_CFBundleIdentifier
- #define JucePlugin_CFBundleIdentifier     com.manyarrowsmusic.bitKlavier1
+ #define JucePlugin_CFBundleIdentifier     com.manyarrowsmusic.bitKlavier
 #endif
 #ifndef  JucePlugin_RTASCategory
  #define JucePlugin_RTASCategory           ePlugInCategory_SWGenerators
