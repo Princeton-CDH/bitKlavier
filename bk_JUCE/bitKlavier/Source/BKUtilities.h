@@ -76,6 +76,8 @@
 #define OFF_ID 47
 #define KEYBOARD_ID 48
 
+#define ABOUT_ID 49
+
 inline PopupMenu getNewItemMenu(LookAndFeel* laf)
 {
     PopupMenu newMenu;

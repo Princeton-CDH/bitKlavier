@@ -45,10 +45,12 @@ public:
     svcm(p, theGraph),
     nvcm(p, theGraph),
     dvcm(p, theGraph),
+    avc(p,theGraph),
     processor(p)
     {
         
         addChildComponent(gvc);
+        addChildComponent(avc);
         addChildComponent(kvc);
 
         addChildComponent(tvc);
@@ -82,6 +84,8 @@ public:
         kvc.setBounds(area);
         
         gvc.setBounds(area);
+        
+        avc.setBounds(area);
         
         tvc.setBounds(area);
         
@@ -125,6 +129,7 @@ public:
         
         removeChildComponent(&kvc);
         removeChildComponent(&gvc);
+        removeChildComponent(&avc);
         
         removeChildComponent(&tvc);
         removeChildComponent(&dvc);
@@ -148,6 +153,10 @@ public:
         {
             addAndMakeVisible(&gvc);
             gvc.update();
+        }
+        else if (type == DisplayAbout)
+        {
+            addAndMakeVisible(&avc);
         }
         else if (type == DisplayTuning)
         {
@@ -220,6 +229,7 @@ public:
     }
     
     GeneralViewController gvc;
+    AboutViewController avc;
     
     KeymapViewController kvc;
     

@@ -10,6 +10,61 @@
 
 #include "GeneralViewController.h"
 
+
+AboutViewController::AboutViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
+BKViewController(p,theGraph)
+{
+    setLookAndFeel(&buttonsAndMenusLAF);
+    
+    addAndMakeVisible(about);
+    about.setEnabled(false);
+    about.setJustification(Justification::centredTop);
+    about.setMultiLine(true);
+    about.setText("Welcome to bitKlavier!\n\n\n\n   bitKlavier was created by Dan Trueman and Mike Mulshine at Princeton University.\n\n\n\n   For more information, visit www.bitKlavier.com.");
+    
+    image = ImageCache::getFromMemory(BinaryData::icon_png, BinaryData::icon_pngSize);
+    
+    placement = RectanglePlacement::centred;
+}
+
+AboutViewController::~AboutViewController()
+{
+    setLookAndFeel(nullptr);
+}
+
+void AboutViewController::paint (Graphics& g)
+{
+    g.fillAll(Colours::black);
+    
+    g.setOpacity (1.0f);
+    
+    g.drawImage (image, imageRect, placement);
+}
+
+void AboutViewController::resized(void)
+{
+    hideOrShow.setBounds(10,10,gComponentComboBoxHeight,gComponentComboBoxHeight);
+    
+    float imageZ = getHeight() * 0.5;
+    float imageX = getWidth() * 0.5 - imageZ * 0.5;
+    float imageY = 50;
+    
+    imageRect.setBounds(imageX, imageY, imageZ, imageZ);
+    
+    about.setBounds(10, imageRect.getBottom() + 20, getWidth() - 20, getBottom() - (imageRect.getBottom() + 20));
+    
+    repaint();
+}
+
+void AboutViewController::bkButtonClicked (Button* b)
+{
+    if (b == &hideOrShow)
+    {
+        processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+}
+
+
 //==============================================================================
 GeneralViewController::GeneralViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
 BKViewController(p, theGraph)

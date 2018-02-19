@@ -12,6 +12,33 @@
 
 #include "BKViewController.h"
 
+class AboutViewController :
+public BKViewController
+{
+public:
+    AboutViewController(BKAudioProcessor&, BKItemGraph* theGraph);
+    ~AboutViewController();
+    
+    void paint (Graphics&) override;
+    void resized() override;
+    
+private:
+    
+    Image image;
+    RectanglePlacement placement;
+    Rectangle<float> imageRect;
+    
+    BKTextEditor about;
+
+    void bkTextFieldDidChange       (TextEditor&)               override {};
+    void bkComboBoxDidChange        (ComboBox* box)             override {};
+    void bkButtonClicked            (Button* b)                 override;
+    void bkMessageReceived          (const String& message)     override {};
+    
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AboutViewController)
+};
+
 //==============================================================================
 /*
 */

@@ -231,16 +231,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
         //remove duplicates from cluster, so we don't play the same note twice in a single pulse
         slimCluster.clearQuick();
         for(int i = 0; i< cluster.size(); i++) slimCluster.addIfNotAlreadyThere(cluster.getUnchecked(i));
-        
-        /*
-        String clusterNotes = " ";
-        for(int i=0; i<slimCluster.size(); i++)
-        {
-            clusterNotes = clusterNotes + String(slimCluster.getUnchecked(i)) + " ";
-        }
-        DBG("slimCluster = " + clusterNotes);
-        */
-        
+    
         //get time until next beat => beat length scaled by beatMultiplier parameter
         numSamplesBeat =    beatThresholdSamples *
                             synchronic->aPrep->getBeatMultipliers()[beatMultiplierCounter] *
@@ -311,14 +302,6 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             //increment beat and beatMultiplier counters, for next beat; check maxes and adjust
             if (++beatMultiplierCounter >= synchronic->aPrep->getBeatMultipliers().size()) beatMultiplierCounter = 0;
             if (++beatCounter >= synchronic->aPrep->getNumBeats()) shouldPlay = false; //done with pulses
-            
-            //update display of beat counter in UI
-            /*
-            DBG(" beat length: "    + String(synchronic->aPrep->getBeatMultipliers()[beatMultiplierCounter]) +
-                " beatMultiplier counter: "   + String(beatMultiplierCounter)
-                );
-            DBG(" ");
-              */
 
         }
         

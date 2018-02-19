@@ -170,7 +170,6 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     galleryMenu.addSubMenu("Load Samples", getLoadMenu());
     galleryMenu.addSeparator();
-    galleryMenu.addItem(SETTINGS_ID, "Settings");
     
     // ~ ~ ~ share menu ~ ~ ~
 #if JUCE_MAC
@@ -189,6 +188,10 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addItem(SHARE_MESSAGE_ID, "Share");
 #endif
     
+    galleryMenu.addItem(SETTINGS_ID, "Settings");
+    
+    galleryMenu.addSeparator();
+    galleryMenu.addItem(ABOUT_ID, "About bitKlavier...");
     
     
     return galleryMenu;
@@ -423,6 +426,10 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         {
             processor.createNewGallery(name);
         }
+    }
+    else if (result == ABOUT_ID)
+    {
+        processor.updateState->setCurrentDisplay(DisplayAbout);
     }
 }
 
