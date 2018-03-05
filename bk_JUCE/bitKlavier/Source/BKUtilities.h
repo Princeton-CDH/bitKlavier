@@ -77,6 +77,8 @@
 #define KEYBOARD_ID 48
 
 #define ABOUT_ID 49
+#define EXPORT_ID 50
+#define IMPORT_ID 51
 
 inline PopupMenu getNewItemMenu(LookAndFeel* laf)
 {

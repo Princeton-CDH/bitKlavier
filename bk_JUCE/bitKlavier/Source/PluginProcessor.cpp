@@ -3,6 +3,19 @@
 #include "PluginEditor.h"
 #include "BKPianoSampler.h"
 
+#if JUCE_IOS
+int fontHeight;
+
+int gComponentComboBoxHeight;
+int gComponentLabelHeight;
+int gComponentTextFieldHeight;
+
+int gComponentRangeSliderHeight;
+int gComponentSingleSliderHeight;
+int gComponentStackedSliderHeight;
+#endif
+
+
 //==============================================================================
 BKAudioProcessor::BKAudioProcessor(void):
 updateState(new BKUpdateState()),
@@ -184,7 +197,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     else                            updateState->needsExtraKeys = false;
     
     if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
-    else                    loadPianoSamples(BKLoadMedium); // CHANGE BACK TO MEDIUM
+    else                    loadPianoSamples(BKLoadLite); // CHANGE BACK TO MEDIUM
 #else
     loadPianoSamples(BKLoadLite); // CHANGE THIS BACK TO HEAVY
 #endif
@@ -215,6 +228,7 @@ void BKAudioProcessor::deleteGallery(void)
 // Duplicates current gallery and gives it name
 void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
 {
+
     File myFile(newURL);
     
     ValueTree galleryVT = gallery->getState();
@@ -730,12 +744,78 @@ void BKAudioProcessor::performModifications(int noteNumber)
     }
 }
 
+void BKAudioProcessor::importCurrentGallery(void)
+{
+    
+   // File where (File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory));
+    fc = new FileChooser ("Import your gallery",
+                          File::getCurrentWorkingDirectory(),
+                          "*",
+                          true);
+    
+    
+    
+    fc->launchAsync (FileBrowserComponent::canSelectMultipleItems | FileBrowserComponent::openMode
+                     | FileBrowserComponent::canSelectFiles,
+                     [] (const FileChooser& chooser)
+                     {
+                         String chosen;
+                         auto results = chooser.getURLResults();
+                         
+                         for (auto result : results)
+                             chosen << (result.isLocalFile() ? result.getLocalFile().getFullPathName() : result.toString (false)) << "\n";
+                         
+                         
+                         File openThis(chosen);
+                         
+                         openThis.moveFileTo(File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory));
+                         
+                         AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
+                                                           "File Chooser...",
+                                                           "You picked: " + chosen);
+                     });
+}
+
+void BKAudioProcessor::exportCurrentGallery(void)
+{
+    saveCurrentGallery();
+
+    File fileToSave (gallery->getURL());
+    
+    fc = new FileChooser ("Export your gallery.",
+                          fileToSave,
+                          "*",
+                          true);
+    
+    fc->launchAsync (FileBrowserComponent::saveMode | FileBrowserComponent::canSelectFiles | FileBrowserComponent::canSelectDirectories,
+                     [fileToSave] (const FileChooser& chooser)
+                     {
+                         auto result = chooser.getURLResult();
+                         auto name = result.isEmpty() ? String()
+                         : (result.isLocalFile() ? result.getLocalFile().getFullPathName()
+                            : result.toString (true));
+                         
+                         // Android and iOS file choosers will create placeholder files for chosen
+                         // paths, so we may as well write into those files.
+                         if (! result.isEmpty())
+                         {
+                             ScopedPointer<InputStream> wi (fileToSave.createInputStream());
+                             ScopedPointer<OutputStream> wo (result.createOutputStream());
+                             
+                             if (wi != nullptr && wo != nullptr)
+                             {
+                                 auto numWritten = wo->writeFromInputStream (*wi, -1);
+                                 jassert (numWritten > 0);
+                                 ignoreUnused (numWritten);
+                                 wo->flush();
+                             }
+                         }
+                     });
+
+}
+
 void BKAudioProcessor::saveCurrentGalleryAs(void)
 {
-#if JUCE_IOS
-    
-#else
-    
     FileChooser myChooser ("Save gallery to file...",
                            lastGalleryPath,
                            "*.xml");
@@ -745,7 +825,6 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
         writeCurrentGalleryToURL(myChooser.getResult().getFullPathName());
     }
     
-#endif
     
     updateGalleries();
     
@@ -757,7 +836,18 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
 
 void BKAudioProcessor::saveCurrentGallery(void)
 {
-    writeCurrentGalleryToURL(gallery->getURL());
+    if (gallery->getURL() == "")
+    {
+#if JUCE_IOS
+        writeCurrentGalleryToURL( File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/bitKlavier resources/galleries/" + gallery->getName());
+#else
+        writeCurrentGalleryToURL( File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + gallery->getName());
+#endif
+    }
+    else
+    {
+        writeCurrentGalleryToURL(gallery->getURL());
+    }
 }
 
 

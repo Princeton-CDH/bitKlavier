@@ -159,6 +159,11 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     if (!processor.defaultLoaded)   galleryMenu.addItem(SAVE_ID, "Save " );
     galleryMenu.addItem(SAVEAS_ID, "Save as");
     
+#if JUCE_IOS
+    galleryMenu.addItem(EXPORT_ID, "Export");
+    galleryMenu.addItem(IMPORT_ID, "Import");
+#endif
+    
 #if !JUCE_IOS
     galleryMenu.addSeparator();
     galleryMenu.addItem(OPEN_ID, "Open");
@@ -187,7 +192,7 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     galleryMenu.addItem(SHARE_MESSAGE_ID, "Share");
 #endif
-    
+    galleryMenu.addSeparator();
     galleryMenu.addItem(SETTINGS_ID, "Settings");
     
     galleryMenu.addSeparator();
@@ -294,7 +299,7 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
     }
     
 }
-
+#define CLOUD_TEST 1
 void HeaderViewController::galleryMenuCallback(int result, HeaderViewController* gvc)
 {
     BKAudioProcessor& processor = gvc->processor;
@@ -383,6 +388,18 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         gvc->fillGalleryCB();
 #else
         processor.saveCurrentGalleryAs();
+#endif
+    }
+    else if (result == EXPORT_ID)
+    {
+#if JUCE_IOS
+        processor.exportCurrentGallery();
+#endif
+    }
+    else if (result == IMPORT_ID)
+    {
+#if JUCE_IOS
+        processor.importCurrentGallery();
 #endif
     }
     else if (result == OPEN_ID) // Load

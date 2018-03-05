@@ -49,6 +49,10 @@ public:
     void duplicateGallery(String name);
     void deleteGallery(void);
     
+    
+    void importCurrentGallery(void);
+    void exportCurrentGallery(void);
+    
     void writeCurrentGalleryToURL(String url);
     void deleteGalleryAtURL(String url);
     
@@ -56,6 +60,8 @@ public:
     void initializeGallery(void);
     
     BKSampleLoadType currentSampleType;
+    
+    FileChooser* fc;
     
     Gallery::Ptr                        gallery;
     

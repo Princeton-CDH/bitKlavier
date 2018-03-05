@@ -322,7 +322,6 @@ void BKKeyboardSlider::bkButtonClicked (Button* b)
 {
     if(b->getName() == keyboardValsTextFieldOpen.getName())
     {
-
         if(orderedPairs) {
             keyboardValsTextField->setText(offsetArrayToString2(keyboard->getValuesDirectly()), dontSendNotification);
             //keyboardValsTextField->setText(offsetArrayToString2(keyboard->getAbsoluteValues())

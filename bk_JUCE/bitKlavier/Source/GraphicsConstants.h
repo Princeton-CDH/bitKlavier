@@ -32,15 +32,15 @@ static const int gComponentLabelWidth = 160;
 
 
 #if JUCE_IOS
-int fontHeight;
+extern int fontHeight;
 
-int gComponentComboBoxHeight;
-int gComponentLabelHeight;
-int gComponentTextFieldHeight;
+extern int gComponentComboBoxHeight;
+extern int gComponentLabelHeight;
+extern int gComponentTextFieldHeight;
 
-int gComponentRangeSliderHeight;
-int gComponentSingleSliderHeight;
-int gComponentStackedSliderHeight;
+extern int gComponentRangeSliderHeight;
+extern int gComponentSingleSliderHeight;
+extern int gComponentStackedSliderHeight;
 
 #else
 static const int fontHeight = 15;
