@@ -748,27 +748,46 @@ void BKAudioProcessor::importCurrentGallery(void)
 {
     
    // File where (File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory));
-    fc = new FileChooser ("Import your gallery",
+    fc = new FileChooser ("Import your gallery.",
                           File::getCurrentWorkingDirectory(),
-                          "*",
+                          "*.xml",
                           true);
     
+    File local(File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory)
+               .getChildFile("temp.xml"));
     
+    DBG("current: " + gallery->getURL());
     
     fc->launchAsync (FileBrowserComponent::canSelectMultipleItems | FileBrowserComponent::openMode
                      | FileBrowserComponent::canSelectFiles,
-                     [] (const FileChooser& chooser)
+                     [local] (const FileChooser& chooser)
                      {
                          String chosen;
                          auto results = chooser.getURLResults();
                          
                          for (auto result : results)
+                         {
                              chosen << (result.isLocalFile() ? result.getLocalFile().getFullPathName() : result.toString (false)) << "\n";
-                         
-                         
-                         File openThis(chosen);
-                         
-                         openThis.moveFileTo(File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory));
+                             
+                             if (!result.isEmpty())
+                             {
+                                 File remote(chosen);
+                                 
+                                 
+                                 DBG("chosen: " + chosen);
+                                 DBG("remote: " + remote.getFullPathName());
+                                 DBG("local: " + local.getFullPathName());
+                                 
+                                 
+                                  ScopedPointer<InputStream> wi (result.createInputStream(false));
+                                  ScopedPointer<OutputStream> wo (local.createOutputStream());
+    
+                                 if ( remote.copyFileTo(local)) DBG("copied.");
+                                 else                           DBG("not copied");
+                                 
+                                 
+                             }
+                         }
                          
                          AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
                                                            "File Chooser...",
@@ -805,8 +824,6 @@ void BKAudioProcessor::exportCurrentGallery(void)
                              if (wi != nullptr && wo != nullptr)
                              {
                                  auto numWritten = wo->writeFromInputStream (*wi, -1);
-                                 jassert (numWritten > 0);
-                                 ignoreUnused (numWritten);
                                  wo->flush();
                              }
                          }
