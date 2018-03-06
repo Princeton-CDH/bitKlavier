@@ -143,29 +143,22 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     PopupMenu galleryMenu;
     galleryMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
-    galleryMenu.addSeparator();
     galleryMenu.addItem(NEWGALLERY_ID, "New");
-    
-    if (!processor.defaultLoaded)
-    {
-        galleryMenu.addSeparator();
-        galleryMenu.addItem(RENAME_ID, "Rename");
-        galleryMenu.addSeparator();
-        galleryMenu.addItem(DELETE_ID, "Remove");
-    }
-    
-    galleryMenu.addSeparator();
     
     if (!processor.defaultLoaded)   galleryMenu.addItem(SAVE_ID, "Save " );
     galleryMenu.addItem(SAVEAS_ID, "Save as");
     
+    if (!processor.defaultLoaded)
+    {
+        galleryMenu.addItem(RENAME_ID, "Rename");
+        galleryMenu.addItem(DELETE_ID, "Remove");
+    }
+    
 #if JUCE_IOS
+    galleryMenu.addSeparator();
     galleryMenu.addItem(EXPORT_ID, "Export");
     galleryMenu.addItem(IMPORT_ID, "Import");
-#endif
-    
-#if !JUCE_IOS
-    galleryMenu.addSeparator();
+#else
     galleryMenu.addItem(OPEN_ID, "Open");
     galleryMenu.addItem(OPENOLD_ID, "Open (legacy)");
 #endif
@@ -192,6 +185,7 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     galleryMenu.addItem(SHARE_MESSAGE_ID, "Share");
 #endif
+    
     galleryMenu.addSeparator();
     galleryMenu.addItem(SETTINGS_ID, "Settings");
     

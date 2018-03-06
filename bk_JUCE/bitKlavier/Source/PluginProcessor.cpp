@@ -270,7 +270,8 @@ void BKAudioProcessor::deleteGalleryAtURL(String path)
     galleryPath.deleteFile();
 }
 
-void BKAudioProcessor::createNewGallery(String name)
+
+void BKAudioProcessor::createNewGallery(String name, ScopedPointer<XmlElement> xml)
 {
     updateState->loadedJson = false;
     
@@ -286,17 +287,36 @@ void BKAudioProcessor::createNewGallery(String name)
     
     
     File myFile(bkGalleries);
-    myFile = myFile.getNonexistentChildFile(name.upToFirstOccurrenceOf(".xml",false,false)+".xml", ".xml", true);
-    myFile.appendData(BinaryData::Basic_Piano_xml, BinaryData::Basic_Piano_xmlSize);
-    galleryNames.add(myFile.getFullPathName());
+    String galleryName = name.upToFirstOccurrenceOf(".xml",false,false);
+    DBG("new file name: " + galleryName);
+    myFile = myFile.getNonexistentChildFile(name.upToFirstOccurrenceOf(".xml",false,false), ".xml", true);
+    if (xml == nullptr)
+    {
+        myFile.appendData(BinaryData::Basic_Piano_xml, BinaryData::Basic_Piano_xmlSize);
+        xml = XmlDocument::parse(myFile);
+        xml->setAttribute("name", galleryName);
+        xml->writeToFile(myFile, "");
+    }
+    else
+    {
+        xml->setAttribute("name", galleryName);
+        xml->writeToFile(myFile, "");
+    }
     
-    ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
+    
+    
+    
+    
+    xml->writeToFile(myFile, "");
+    
+    
+    galleryNames.add(myFile.getFullPathName());
     
     if (xml != nullptr)
     {
         currentGallery = myFile.getFileName();
         
-        xml->setAttribute("name", currentGallery.upToFirstOccurrenceOf(".xml", false, false));
+        DBG("new gallery: " + currentGallery);
 
         gallery = new Gallery(xml, *this);
         
@@ -746,57 +766,47 @@ void BKAudioProcessor::performModifications(int noteNumber)
 
 void BKAudioProcessor::importCurrentGallery(void)
 {
-    
-   // File where (File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory));
-    fc = new FileChooser ("Import your gallery.",
+    fc = new FileChooser ("Import your gallery",
                           File::getCurrentWorkingDirectory(),
                           "*.xml",
                           true);
     
-    File local(File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory)
-               .getChildFile("temp.xml"));
-    
-    DBG("current: " + gallery->getURL());
-    
-    fc->launchAsync (FileBrowserComponent::canSelectMultipleItems | FileBrowserComponent::openMode
-                     | FileBrowserComponent::canSelectFiles,
-                     [local] (const FileChooser& chooser)
+    fc->launchAsync (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles,
+                     [this] (const FileChooser& chooser)
                      {
-                         String chosen;
                          auto results = chooser.getURLResults();
-                         
-                         for (auto result : results)
+                         if (results.size() > 0)
                          {
-                             chosen << (result.isLocalFile() ? result.getLocalFile().getFullPathName() : result.toString (false)) << "\n";
+                             auto url = results.getReference (0);
                              
-                             if (!result.isEmpty())
+                             ScopedPointer<InputStream> wi (url.createInputStream (false));
+                             
+                             if (wi != nullptr)
                              {
-                                 File remote(chosen);
+                                 MemoryBlock block(wi->getTotalLength());
+                                 wi->readIntoMemoryBlock(block);
                                  
+                                 XmlDocument doc(block.toString());
+                                 ScopedPointer<XmlElement> xml = doc.getDocumentElement();
                                  
-                                 DBG("chosen: " + chosen);
-                                 DBG("remote: " + remote.getFullPathName());
-                                 DBG("local: " + local.getFullPathName());
-                                 
-                                 
-                                  ScopedPointer<InputStream> wi (result.createInputStream(false));
-                                  ScopedPointer<OutputStream> wo (local.createOutputStream());
-    
-                                 if ( remote.copyFileTo(local)) DBG("copied.");
-                                 else                           DBG("not copied");
-                                 
+                                 DBG("url file name: " + url.getFileName().replace("%20", " "));
+                                 createNewGallery(url.getFileName().replace("%20", " "), xml);
                                  
                              }
                          }
-                         
-                         AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
-                                                           "File Chooser...",
-                                                           "You picked: " + chosen);
                      });
+
 }
 
 void BKAudioProcessor::exportCurrentGallery(void)
 {
+    if (defaultLoaded)
+    {
+        AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
+                                          "Export not available",
+                                          "You cannot export a default gallery.");
+        return;
+    }
     saveCurrentGallery();
 
     File fileToSave (gallery->getURL());
@@ -856,9 +866,9 @@ void BKAudioProcessor::saveCurrentGallery(void)
     if (gallery->getURL() == "")
     {
 #if JUCE_IOS
-        writeCurrentGalleryToURL( File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/bitKlavier resources/galleries/" + gallery->getName());
-#else
         writeCurrentGalleryToURL( File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + gallery->getName());
+#else
+        writeCurrentGalleryToURL( File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/bitKlavier resources/galleries/" + gallery->getName());
 #endif
     }
     else

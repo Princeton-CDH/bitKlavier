@@ -44,7 +44,7 @@ public:
     void loadJsonGalleryFromPath(String path);
     void saveCurrentGalleryAs(void);
     void saveCurrentGallery(void);
-    void createNewGallery(String name);
+    void createNewGallery(String name, ScopedPointer<XmlElement> xml = nullptr);
     void renameGallery(String name);
     void duplicateGallery(String name);
     void deleteGallery(void);
