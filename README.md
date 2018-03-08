@@ -14,10 +14,9 @@ This project is made available under the [GPLv3 license](https://www.gnu.org/lic
 
 ## Installation
 
-bitKlavier is currently in beta. See [releases](https://github.com/Princeton-CDH/bitKlavier/releases)
-to download the latest version.  The current version requires that you also
-download a [resource package with samples and galleries](http://manyarrowsmusic.com/bitKlavier/bitKlavier_ModelB/bitKlavier_resources.zip).  Currently, this resource folder must be placed in your
-Documents folder.
+Visit the  [releases](https://github.com/Princeton-CDH/bitKlavier/releases) page
+to download the latest version. You also need to
+download a [resource package with samples and galleries](http://manyarrowsmusic.com/bitKlavier/bitKlavier_ModelB/bitKlavier_resources.zip); this resource folder must be placed in your Documents folder.
 
 ## Development setup and instructions
 
