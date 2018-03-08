@@ -87,6 +87,7 @@ void BKConstructionSite::redraw(void)
 {
     removeAllChildren();
     
+    graph->deselectAll();
     graph->reconstruct();
     
     draw();

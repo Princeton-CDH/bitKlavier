@@ -399,33 +399,6 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             voice->currentlyPlayingKey = keyNoteNumber; //keep track of which physical key is associated with this voice
             
             float gain = volume;
-            
-            if (bktype == MainNote)
-            {
-                gain *= 1.0f;
-            }
-            else if (bktype == SynchronicNote)
-            {
-                gain *= generalSettings->getSynchronicGain();
-            }
-            else if (bktype == NostalgicNote)
-            {
-                gain *= generalSettings->getNostalgicGain();
-            }
-            else if (bktype == DirectNote)
-            {
-                gain *= generalSettings->getDirectGain();
-            }
-            else if (bktype == HammerNote)
-            {
-                gain *= generalSettings->getHammerGain();
-            }
-            else if (bktype == ResonanceNote)
-            {
-                gain *= generalSettings->getResonanceGain();
-            }
-            
-            gain *= generalSettings->getGlobalGain();
 
             voice->startNote (
                               (float)midiNoteNumber+midiNoteNumberOffset,
@@ -476,13 +449,11 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                     if (sound->appliesToNote (midiNoteNumber) 
                         && sound->appliesToChannel (midiChannel))
                     {
-                        jassert (! voice->keyIsDown || voice->sustainPedalDown == sustainPedalsDown [midiChannel]);
-                        
                         // Let synthesiser know that key is no longer down,
                         voice->keyIsDown = false;
                         
                         
-                        if (! ((voice->type == FixedLengthFixedStart) || (voice->type == FixedLength) || voice->sustainPedalDown || voice->sostenutoPedalDown)) {
+                        if (! ((voice->type == FixedLengthFixedStart) || (voice->type == FixedLength) || voice->sostenutoPedalDown)) {
                             //DBG("BKSynthesiser::stopVoice " + String(midiNoteNumber));
                             stopVoice (voice, velocity, allowTailOff);
                         }

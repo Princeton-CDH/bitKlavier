@@ -265,6 +265,7 @@ typedef enum BKPreparationDisplay {
     DisplayTuningMod,
     DisplayTempoMod,
     DisplayGeneral,
+    DisplayAbout,
     DisplayNil,
 } BKPreparationDisplay;
 

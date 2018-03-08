@@ -11,6 +11,13 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "KeymapViewController.h"
 
+
+#define SELECT_ID  7
+#define DESELECT_ID 8
+#define TOGGLE_ID 9
+
+#define ID(IN) (IN*12)
+
 //==============================================================================
 KeymapViewController::KeymapViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
 BKViewController(p, theGraph)
@@ -28,6 +35,26 @@ BKViewController(p, theGraph)
     selectCB.addMyListener(this);
     selectCB.setSelectedItemIndex(0);
     addAndMakeVisible(selectCB);
+    
+    clearButton.setName("ClearButton");
+    clearButton.setButtonText("Clear");
+    clearButton.addListener(this);
+    addAndMakeVisible(clearButton);
+    
+    keysButton.setName("KeysButton");
+    keysButton.setButtonText("Keys");
+    keysButton.addListener(this);
+    addAndMakeVisible(keysButton);
+    
+    keysCB.setName("keysCB");
+    keysCB.addListener(this);
+    
+    keysCB.addItem("Select", SELECT_ID);
+    keysCB.addItem("Deselect", DESELECT_ID);
+    
+    keysCB.setSelectedId(SELECT_ID);
+    
+    addAndMakeVisible(keysCB);
     
     addAndMakeVisible(keymapTF);
     keymapTF.addListener(this);
@@ -99,6 +126,8 @@ void KeymapViewController::paint (Graphics& g)
     g.fillAll(Colours::black);
 }
 
+
+
 void KeymapViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
@@ -136,6 +165,11 @@ void KeymapViewController::resized()
     Rectangle<int> textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
     textButtonSlab.removeFromLeft(gXSpacing);
     keyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(getWidth() * 0.15));
+    
+    keysCB.setBounds(keyboardValsTextFieldOpen.getRight() + gXSpacing, keyboardValsTextFieldOpen.getY(), keyboardValsTextFieldOpen.getWidth(), keyboardValsTextFieldOpen.getHeight());
+    keysButton.setBounds(keysCB.getRight()+gXSpacing, keysCB.getY(), keysCB.getWidth(), keysCB.getHeight());
+    
+    clearButton.setBounds(keyboard->getRight() - keyboardValsTextFieldOpen.getWidth(), keyboardValsTextFieldOpen.getY(), keyboardValsTextFieldOpen.getWidth(),keyboardValsTextFieldOpen.getHeight());
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
@@ -271,6 +305,73 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
         
         lastId = Id;
     }
+    else if (box == &keysCB)
+    {
+        if (Id == SELECT_ID)        selectType = true;
+        else if (Id == DESELECT_ID) selectType = false;
+    }
+}
+
+String pcs[12] = {"C","C#/Db","D","D#/Eb","E","F","F#/Gb","G","G#/Ab","A","A#/Bb","B",};
+
+PopupMenu KeymapViewController::getPitchClassMenu(int offset)
+{
+    int Id;
+    
+    PopupMenu menu;
+    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    
+    for (int i = 0; i < 12; i++)
+    {
+        Id = offset + i;
+        DBG("ID: " + String(Id));
+        menu.addItem(Id, pcs[i]);
+    }
+    
+    return menu;
+}
+
+PopupMenu KeymapViewController::getKeysMenu(void)
+{
+    PopupMenu menu;
+    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    
+    menu.addItem(ID(KeySetAll), "All");
+    menu.addSubMenu("All...",  getPitchClassMenu((KeySet) ID(KeySetAllPC)));
+    menu.addItem(ID(KeySetBlack), "Black");
+    menu.addItem(ID(KeySetWhite), "White");
+    menu.addItem(ID(KeySetOctatonicOne), "Octatonic 1");
+    menu.addItem(ID(KeySetOctatonicTwo), "Octatonic 2");
+    menu.addItem(ID(KeySetOctatonicThree), "Octatonic 3");
+    
+    menu.addSubMenu("Major Triad",  getPitchClassMenu((KeySet) ID(KeySetMajorTriad)));
+    menu.addSubMenu("Minor Triad",  getPitchClassMenu((KeySet) ID(KeySetMinorTriad)));
+    menu.addSubMenu("Major Seven",  getPitchClassMenu((KeySet) ID(KeySetMajorSeven)));
+    menu.addSubMenu("Dom Seven",    getPitchClassMenu((KeySet) ID(KeySetDomSeven)));
+    menu.addSubMenu("Minor Seven",  getPitchClassMenu((KeySet) ID(KeySetMinorSeven)));
+    
+    return menu;
+}
+
+void KeymapViewController::keysMenuCallback(int result, KeymapViewController* vc)
+{
+    BKAudioProcessor& processor = vc->processor;
+    
+    // get old keys to send to update
+    Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+
+    {
+        int set = result/ 12;
+        int pc = result % 12;
+        
+        DBG("set: " + String(set) + " pc: " + String(pc));
+        
+        keymap->setKeys((KeySet)set, vc->selectType, (PitchClass)pc);
+    }
+    
+    BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)(vc->keyboardComponent.get());
+    
+    keyboard->setKeysInKeymap(keymap->keys());
 }
 
 void KeymapViewController::fillSelectCB(int last, int current)
@@ -327,6 +428,19 @@ void KeymapViewController::bkButtonClicked (Button* b)
     {
         getModOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
+    else if (b == &keysButton)
+    {
+        getKeysMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(&keysButton), ModalCallbackFunction::forComponent(keysMenuCallback, this));
+    }
+    else if (b == &clearButton)
+    {
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        keymap->setKeys(KeySetAll, false);
+        
+        BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)(keyboardComponent.get());
+
+        keyboard->setKeysInKeymap(keymap->keys());
+    }
 }
 
 
@@ -336,6 +450,8 @@ void KeymapViewController::BKEditableComboBoxChanged(String name, BKEditableComb
     
     thisKeymap->setName(name);
 }
+
+
 
 void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
 {

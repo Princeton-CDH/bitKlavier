@@ -46,8 +46,8 @@ public:
     DirectPreparation(void):
     dTransposition(Array<float>({0.0})),
     dGain(1.0),
-    dResonanceGain(1.0),
-    dHammerGain(1.0)
+    dResonanceGain(0.5),
+    dHammerGain(0.5)
     {
         
     }

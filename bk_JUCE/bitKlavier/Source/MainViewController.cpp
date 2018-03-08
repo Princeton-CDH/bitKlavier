@@ -283,7 +283,7 @@ void MainViewController::sliderValueChanged (Slider* slider)
     
     if (slider == mainSlider)
     {
-        gen->setGlobalGain(Decibels::decibelsToGain(mainSlider->getValue()));
+        processor.gallery->getGeneralSettings()->setGlobalGain(Decibels::decibelsToGain(mainSlider->getValue()));
         overtop.gvc.update();
     }
     else if (display == DisplayKeyboard && slider == &octaveSlider)
@@ -467,9 +467,10 @@ void MainViewController::timerCallback()
     }
     
     //check to see if General Settings globalGain has changed, update slider accordingly
-    float genGain = Decibels::gainToDecibels(gen->getGlobalGain());
+    float globalGain = processor.gallery->getGeneralSettings()->getGlobalGain();
+    float genGain = Decibels::gainToDecibels(globalGain);
     if(genGain != mainSlider->getValue())
-        mainSlider->setValue(Decibels::gainToDecibels(gen->getGlobalGain()), dontSendNotification);
+        mainSlider->setValue(Decibels::gainToDecibels(globalGain), dontSendNotification);
     
     if (state->modificationDidChange)
     {

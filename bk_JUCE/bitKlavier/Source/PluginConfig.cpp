@@ -84,6 +84,10 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
         
         galleryVT.setProperty("defaultPiano", currentPiano->getId(), 0);
         
+        galleryVT.setProperty("invertSustain", getSustainInversion(), 0);
+        
+        DBG("sustain inversion saved: " + String((int)getSustainInversion()));
+        
         DBG("saving gallery and piano to plugin state: getStateInformation() "
             +  gallery->getURL() + " "
             + String(currentPiano->getId()));
@@ -141,6 +145,9 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
                 loadGalleryFromPath(currentGalleryPath);
             }
             
+            bool invertSustain = (bool)galleryXML->getStringAttribute("invertSustain").getIntValue();
+            
+            setSustainInversion(invertSustain);
             
             //override gallery-saved defaultPiano with pluginHost-saved defaultPiano
             setCurrentPiano(galleryXML->getStringAttribute("defaultPiano").getIntValue());

@@ -338,7 +338,6 @@ public:
     
 private:
     BKAudioProcessor& processor;
-
     
     JUCE_LEAK_DETECTOR(BKItemGraph)
 };

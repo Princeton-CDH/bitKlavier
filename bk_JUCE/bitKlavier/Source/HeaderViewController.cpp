@@ -143,24 +143,22 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     PopupMenu galleryMenu;
     galleryMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
-    galleryMenu.addSeparator();
     galleryMenu.addItem(NEWGALLERY_ID, "New");
-    
-    if (!processor.defaultLoaded)
-    {
-        galleryMenu.addSeparator();
-        galleryMenu.addItem(RENAME_ID, "Rename");
-        galleryMenu.addSeparator();
-        galleryMenu.addItem(DELETE_ID, "Remove");
-    }
-    
-    galleryMenu.addSeparator();
     
     if (!processor.defaultLoaded)   galleryMenu.addItem(SAVE_ID, "Save " );
     galleryMenu.addItem(SAVEAS_ID, "Save as");
     
-#if !JUCE_IOS
+    if (!processor.defaultLoaded)
+    {
+        galleryMenu.addItem(RENAME_ID, "Rename");
+        galleryMenu.addItem(DELETE_ID, "Remove");
+    }
+    
+#if JUCE_IOS
     galleryMenu.addSeparator();
+    galleryMenu.addItem(EXPORT_ID, "Export");
+    galleryMenu.addItem(IMPORT_ID, "Import");
+#else
     galleryMenu.addItem(OPEN_ID, "Open");
     galleryMenu.addItem(OPENOLD_ID, "Open (legacy)");
 #endif
@@ -170,7 +168,6 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     galleryMenu.addSubMenu("Load Samples", getLoadMenu());
     galleryMenu.addSeparator();
-    galleryMenu.addItem(SETTINGS_ID, "Settings");
     
     // ~ ~ ~ share menu ~ ~ ~
 #if JUCE_MAC
@@ -189,6 +186,11 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addItem(SHARE_MESSAGE_ID, "Share");
 #endif
     
+    galleryMenu.addSeparator();
+    galleryMenu.addItem(SETTINGS_ID, "Settings");
+    
+    galleryMenu.addSeparator();
+    galleryMenu.addItem(ABOUT_ID, "About bitKlavier...");
     
     
     return galleryMenu;
@@ -291,7 +293,7 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
     }
     
 }
-
+#define CLOUD_TEST 1
 void HeaderViewController::galleryMenuCallback(int result, HeaderViewController* gvc)
 {
     BKAudioProcessor& processor = gvc->processor;
@@ -382,6 +384,18 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         processor.saveCurrentGalleryAs();
 #endif
     }
+    else if (result == EXPORT_ID)
+    {
+#if JUCE_IOS
+        processor.exportCurrentGallery();
+#endif
+    }
+    else if (result == IMPORT_ID)
+    {
+#if JUCE_IOS
+        processor.importCurrentGallery();
+#endif
+    }
     else if (result == OPEN_ID) // Load
     {
         processor.loadGalleryDialog();
@@ -423,6 +437,10 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         {
             processor.createNewGallery(name);
         }
+    }
+    else if (result == ABOUT_ID)
+    {
+        processor.updateState->setCurrentDisplay(DisplayAbout);
     }
 }
 

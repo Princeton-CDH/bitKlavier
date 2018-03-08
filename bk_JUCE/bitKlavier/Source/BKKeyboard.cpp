@@ -520,20 +520,20 @@ void BKKeymapKeyboardComponent::drawWhiteNote (int midiNoteNumber,
         
         if(fundamental >= 0)
        {
-           const float fontHeight = jmin (12.0f, keyWidth * 0.9f);
+           const float height = jmin (12.0f, keyWidth * 0.9f);
            
            g.setColour (c.contrasting());
-           g.setFont (Font (fontHeight * 2));
+           g.setFont (Font (height * 2));
            textOffset = 8;
            
            
        }
        else
        {
-           const float fontHeight = jmin (12.0f, keyWidth * 0.9f);
+           const float height = jmin (12.0f, keyWidth * 0.9f);
            
            g.setColour (c.contrasting());
-           g.setFont (Font (fontHeight).withHorizontalScale (0.8f));
+           g.setFont (Font (height).withHorizontalScale (0.8f));
        }
 
         
@@ -618,11 +618,11 @@ void BKKeymapKeyboardComponent::drawBlackNote (int midiNoteNumber,
         {
             String text ("*");
             
-            const float fontHeight = jmin (12.0f, keyWidth * 0.9f);
+            const float height = jmin (12.0f, keyWidth * 0.9f);
             
             g.setColour (c.contrasting());
             //g.setFont (Font (fontHeight).withHorizontalScale (0.8f));
-            g.setFont (Font (fontHeight * 2));
+            g.setFont (Font (height * 2));
             
             switch (orientation)
             {
@@ -959,12 +959,13 @@ void BKKeymapKeyboardComponent::setValuesDirectly(Array<float> vals)
     }
 }
 
+
 Array<float> BKKeymapKeyboardComponent::getValuesDirectly()
 {
     Array<float> valsToSend;
     for (int i = 0; i < rangeAll; i++) valsToSend.add(0.);
     
-    for(int i=rangeStart; i<=rangeEnd; i++)
+    for(int i=21; i<=108; i++)
     {
         //DBG("keyValues GET DIRECT " + String(i - rangeStart) + " " + String(keyValues.getUnchecked(i)));
         DBG("keyValues GET DIRECT " + String(i) + " " + String(keyValues.getUnchecked(i)));

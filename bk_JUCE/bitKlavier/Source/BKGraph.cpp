@@ -40,6 +40,10 @@ resizer(new ResizableCornerComponent (this, constrain))
     comment.setReturnKeyStartsNewLine(true);
     comment.setScrollbarsShown(false);
     
+#if JUCE_IOS
+    comment.removeMouseListener(this);
+#endif
+    
     setPianoTarget(0);
     
     if (type == PreparationTypeTuning)
@@ -371,20 +375,22 @@ void BKItem::itemIsBeingDragged(const MouseEvent& e)
 
 void BKItem::mouseDoubleClick(const MouseEvent& e)
 {
-#if !JUCE_IOS
+#if JUCE_IOS
+    if (type == PreparationTypeComment)
+    {
+        enterComment();
+    }
+#else
     if (type == PreparationTypePianoMap)
     {
         menu.showPopup();
-    }
-    else if (type == PreparationTypeComment)
-    {
-        enterComment();
     }
     else
     {
         processor.updateState->setCurrentDisplay(type, Id);
     }
 #endif
+    
 }
 
 void BKItem::exitComment(void)
@@ -427,10 +433,6 @@ void BKItem::mouseDown(const MouseEvent& e)
             if (type == PreparationTypePianoMap)
             {
                 menu.showPopup();
-            }
-            else if (type == PreparationTypeComment)
-            {
-                enterComment();
             }
             else
             {

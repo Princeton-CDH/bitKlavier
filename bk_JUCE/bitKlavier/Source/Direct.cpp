@@ -59,6 +59,8 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
     }
 }
 
+#define HAMMER_GAIN_SCALE 0.15f
+#define RES_GAIN_SCALE 0.15f
 void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
 {
     for (int i = 0; i<keyPlayed[noteNumber].size(); i++)
@@ -89,7 +91,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
                                    t,
                                    0,
                                    velocity,
-                                   hGain,
+                                   hGain * HAMMER_GAIN_SCALE,
                                    Forward,
                                    Normal, //FixedLength,
                                    HammerNote,
@@ -109,7 +111,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
                                       //synthOffset,
                                       t_offset,
                                       velocity,
-                                      rGain,
+                                      rGain * RES_GAIN_SCALE,
                                       Forward,
                                       Normal, //FixedLength,
                                       ResonanceNote,
