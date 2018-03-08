@@ -215,10 +215,12 @@ public:
     
     void clearBitKlavier(void);
     
+    
+    bool firstTime;
     inline void setSustainInversion(bool sus)
     {
         sustainInverted = sus;
-        
+        if (firstTime){firstTime = false; return;}
         if (sustainInverted)
         {
             if(sustainIsDown)

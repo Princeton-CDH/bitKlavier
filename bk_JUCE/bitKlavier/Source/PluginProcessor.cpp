@@ -18,6 +18,7 @@ int gComponentStackedSliderHeight;
 
 //==============================================================================
 BKAudioProcessor::BKAudioProcessor(void):
+firstTime(true),
 updateState(new BKUpdateState()),
 mainPianoSynth(),
 hammerReleaseSynth(),
@@ -535,7 +536,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         // Process all active prep maps in previous piano
         for (auto pmap : prevPiano->activePMaps)
             pmap->processBlock(numSamples, m.getChannel());
-         */
+        */
         
         prevPianos.clearQuick();
         allNotesOff = true;

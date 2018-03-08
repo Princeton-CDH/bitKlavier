@@ -24,8 +24,7 @@ public:
         tuningFundamental(440.0),
         tuningRatio(1.),
         tempoMultiplier(1.0),
-        periodMultiplier(1.0),
-        invertSustain(false)
+        periodMultiplier(1.0)
     {
 
 #if JUCE_IOS
@@ -66,7 +65,6 @@ public:
         
         generalVT.setProperty( ptagGeneral_globalGain,       getGlobalGain(), 0);
         generalVT.setProperty( ptagGeneral_tempoMultiplier,  getTempoMultiplier(), 0);
-        generalVT.setProperty( ptagGeneral_invertSustain,    getInvertSustain(), 0);
         generalVT.setProperty( ptagGeneral_tuningFund,       getTuningFundamental(), 0);
         
         return generalVT;
@@ -78,7 +76,6 @@ public:
     const float getTempoMultiplier(void)    const noexcept  { return tempoMultiplier;       };
     const float getPeriodMultiplier(void)   const noexcept  { return periodMultiplier;      };
     const float getGlobalGain(void)         const noexcept  { return globalGain;            };
-    const bool getInvertSustain(void)       const noexcept  { return invertSustain;         };
     
     void setTuningFundamental(float val)    {
         tuningFundamental = val;
@@ -88,7 +85,6 @@ public:
     void setTempoMultiplier(float val)      { tempoMultiplier = val;
                                               periodMultiplier = 1./tempoMultiplier;};
     void setGlobalGain(float val)           { globalGain = val;            };
-    void setInvertSustain(bool val)         { invertSustain = val;         };
     
 private:
     
@@ -102,7 +98,6 @@ private:
     
     bool resonanceAndHammer;
     
-    bool invertSustain;
     
     JUCE_LEAK_DETECTOR(GeneralSettings);
 };
