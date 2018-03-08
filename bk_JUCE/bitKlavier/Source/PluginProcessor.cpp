@@ -199,7 +199,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
     else                    loadPianoSamples(BKLoadLite); // CHANGE BACK TO MEDIUM
 #else
-    loadPianoSamples(BKLoadLite); // CHANGE THIS BACK TO HEAVY
+    loadPianoSamples(BKLoadHeavy); // CHANGE THIS BACK TO HEAVY
 #endif
 
     
@@ -546,7 +546,9 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     
 #if JUCE_IOS
-    buffer.applyGain(0, numSamples, 0.25);
+    buffer.applyGain(0, numSamples, 0.3 * gallery->getGeneralSettings()->getGlobalGain());
+#else
+    buffer.applyGain(0, numSamples, gallery->getGeneralSettings()->getGlobalGain());
 #endif
     
     // store buffer for level calculation when needed

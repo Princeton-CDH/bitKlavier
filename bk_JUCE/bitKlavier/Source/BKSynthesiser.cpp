@@ -399,8 +399,6 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             voice->currentlyPlayingKey = keyNoteNumber; //keep track of which physical key is associated with this voice
             
             float gain = volume;
-            
-            gain *= generalSettings->getGlobalGain();
 
             voice->startNote (
                               (float)midiNoteNumber+midiNoteNumberOffset,
