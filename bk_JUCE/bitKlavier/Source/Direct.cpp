@@ -59,8 +59,8 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
     }
 }
 
-#define HAMMER_GAIN_SCALE 0.15f
-#define RES_GAIN_SCALE 0.15f
+#define HAMMER_GAIN_SCALE 0.02f
+#define RES_GAIN_SCALE 0.2f
 void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
 {
     for (int i = 0; i<keyPlayed[noteNumber].size(); i++)
