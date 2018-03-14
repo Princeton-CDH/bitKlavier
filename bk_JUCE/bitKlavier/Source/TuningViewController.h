@@ -78,6 +78,10 @@ protected:
     
     ImageComponent iconImageComponent;
     BKButtonAndMenuLAF buttonsAndMenusLAF;
+    
+    BKComboBox nToneRootCB;
+    BKComboBox nToneRootOctaveCB;
+    ScopedPointer<BKSingleSlider> nToneSemitoneWidthSlider;
 
     //other overrides
     

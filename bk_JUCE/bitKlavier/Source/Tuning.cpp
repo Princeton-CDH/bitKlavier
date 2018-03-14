@@ -27,7 +27,7 @@ float TuningProcessor::getOffset(int midiNoteNumber)
 {
     float lastNoteTuningTemp = lastNoteTuning;
     float lastNoteOffset;
-    
+ 
     //do adaptive tunings if using
     if(tuning->aPrep->getTuning() == AdaptiveTuning || tuning->aPrep->getTuning() == AdaptiveAnchoredTuning)
     {
@@ -37,6 +37,27 @@ float TuningProcessor::getOffset(int midiNoteNumber)
         return lastNoteOffset;
     }
     
+    
+    //do nTone tuning if nToneSemitoneWidth != 100cents
+    if(tuning->aPrep->getNToneSemitoneWidth() != 100)
+    {
+        lastNoteOffset = .01 * (midiNoteNumber - tuning->aPrep->getNToneRoot()) * (tuning->aPrep->getNToneSemitoneWidth() - 100);
+        int midiNoteNumberTemp = round(midiNoteNumber + lastNoteOffset);
+        
+        Array<float> currentTuning;
+        if(tuning->aPrep->getTuning() == CustomTuning) currentTuning = tuning->aPrep->getCustomScale();
+        else currentTuning = tuning->tuningLibrary.getUnchecked(tuning->aPrep->getTuning());
+        
+        lastNoteOffset += (currentTuning[(midiNoteNumberTemp - tuning->aPrep->getFundamental()) % currentTuning.size()] +
+                          + tuning->aPrep->getAbsoluteOffsets().getUnchecked(midiNoteNumber) +
+                          tuning->aPrep->getFundamentalOffset());
+        
+        
+        lastNoteTuning = midiNoteNumber + lastNoteOffset;
+        lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
+        
+        return lastNoteOffset;
+    }
 
     //else do regular tunings
     Array<float> currentTuning;
