@@ -146,6 +146,9 @@ const String ptagTuning_adaptiveAnchorFund = "adaptiveAnchorFund";
 const String ptagTuning_adaptiveClusterThresh = "adaptiveClusterThresh";
 const String ptagTuning_adaptiveHistory = "adaptiveHistory";
 
+const String ptagTuning_nToneRoot = "nToneRoot";
+const String ptagTuning_nToneSemitoneWidth = "nToneSemitoneWidth";
+
 const String vtagTuning_customScale = "customScale";
 const String ptagTuning_customScaleLength = "customScaleLength";
 const String ptagTuning_customScaleDegree = "scaleDegree";

@@ -180,6 +180,9 @@ ValueTree Tuning::getState(void)
     prep.setProperty( ptagTuning_adaptiveClusterThresh, (int)sPrep->getAdaptiveClusterThresh(), 0 );
     prep.setProperty( ptagTuning_adaptiveHistory,       sPrep->getAdaptiveHistory(), 0 );
     
+    prep.setProperty( ptagTuning_nToneRoot,             sPrep->getNToneRoot(), 0);
+    prep.setProperty( ptagTuning_nToneSemitoneWidth,    sPrep->getNToneSemitoneWidth(), 0 );
+    
     ValueTree scale( vtagTuning_customScale);
     int count = 0;
     for (auto note : sPrep->getCustomScale())
@@ -377,6 +380,14 @@ void Tuning::setState(XmlElement* e)
     
     i = e->getStringAttribute( ptagTuning_adaptiveAnchorFund).getIntValue();
     sPrep->setAdaptiveAnchorFundamental((PitchClass)i);
+    
+    i = e->getStringAttribute( ptagTuning_nToneRoot).getIntValue();
+    if(i > 0) sPrep->setNToneRoot(i);
+    else sPrep->setNToneRoot(60);
+    
+    i = e->getStringAttribute( ptagTuning_nToneSemitoneWidth).getIntValue();
+    if(i > 0) sPrep->setNToneSemitoneWidth(i);
+    else sPrep->setNToneSemitoneWidth(100);
     
     // custom scale
     forEachXmlChildElement (*e, sub)
