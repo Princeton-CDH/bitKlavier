@@ -313,8 +313,11 @@ void TuningModPreparation::setState(XmlElement* e)
     p = e->getStringAttribute( ptagTuning_adaptiveAnchorFund);
     setParam(TuningA1AnchorFundamental, p);
     
-    p = e->getStringAttribute( ptagTuning_nToneRoot);
-    setParam(TuningNToneRoot, p);
+    p = e->getStringAttribute( ptagTuning_nToneRootCB);
+    setParam(TuningNToneRootCB, p);
+    
+    p = e->getStringAttribute( ptagTuning_nToneRootOctaveCB);
+    setParam(TuningNToneRootOctaveCB, p);
     
     p = e->getStringAttribute( ptagTuning_nToneSemitoneWidth);
     setParam(TuningNToneSemitoneWidth, p);
