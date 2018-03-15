@@ -147,6 +147,8 @@ const String ptagTuning_adaptiveClusterThresh = "adaptiveClusterThresh";
 const String ptagTuning_adaptiveHistory = "adaptiveHistory";
 
 const String ptagTuning_nToneRoot = "nToneRoot";
+const String ptagTuning_nToneRootCB = "nToneRootCB";
+const String ptagTuning_nToneRootOctaveCB = "nToneRootOctaveCB";
 const String ptagTuning_nToneSemitoneWidth = "nToneSemitoneWidth";
 
 const String vtagTuning_customScale = "customScale";
@@ -580,6 +582,10 @@ typedef enum TuningParameterType
     TuningA1AnchorFundamental,
     TuningA1ClusterThresh,
     TuningA1History,
+    TuningNToneRoot,
+    TuningNToneRootCB,
+    TuningNToneRootOctaveCB,
+    TuningNToneSemitoneWidth,
     TuningCustomScale,
     TuningAbsoluteOffsets,
     TuningParameterTypeNil
@@ -593,6 +599,10 @@ static const std::vector<BKParameterDataType> cTuningDataTypes = {
     BKFloat,
     BKInt,
     BKBool,
+    BKInt,
+    BKInt,
+    BKInt,
+    BKInt,
     BKInt,
     BKInt,
     BKInt,
@@ -612,6 +622,10 @@ static const std::vector<std::string> cTuningParameterTypes = {
     "A1AnchorFund",
     "A1ClusterThresh",
     "A1History",
+    "NToneRoot",
+    "NToneRootCB",
+    "NToneRootOctave",
+    "NToneSemitoneWidth",
     "CustomScale",
     "AbsoluteOffsets"
 };

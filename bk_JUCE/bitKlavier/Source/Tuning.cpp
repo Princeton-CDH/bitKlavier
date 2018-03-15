@@ -235,6 +235,16 @@ ValueTree TuningModPreparation::getState(void)
     p = getParam(TuningA1History);
     if (p != String::empty) prep.setProperty( ptagTuning_adaptiveHistory,       p.getIntValue(), 0 );
     
+    p = getParam(TuningNToneRootCB);
+    if (p != String::empty) prep.setProperty( ptagTuning_nToneRootCB,           p.getIntValue(), 0 );
+    
+    p = getParam(TuningNToneRootOctaveCB);
+    if (p != String::empty) prep.setProperty( ptagTuning_nToneRootOctaveCB,     p.getIntValue(), 0 );
+    
+    p = getParam(TuningNToneSemitoneWidth);
+    if (p != String::empty) prep.setProperty( ptagTuning_nToneSemitoneWidth,    p.getIntValue(), 0 );
+
+    
     ValueTree scale( vtagTuning_customScale);
     int count = 0;
     p = getParam(TuningCustomScale);
@@ -302,6 +312,12 @@ void TuningModPreparation::setState(XmlElement* e)
     
     p = e->getStringAttribute( ptagTuning_adaptiveAnchorFund);
     setParam(TuningA1AnchorFundamental, p);
+    
+    p = e->getStringAttribute( ptagTuning_nToneRoot);
+    setParam(TuningNToneRoot, p);
+    
+    p = e->getStringAttribute( ptagTuning_nToneSemitoneWidth);
+    setParam(TuningNToneSemitoneWidth, p);
     
     // custom scale
     forEachXmlChildElement (*e, sub)
