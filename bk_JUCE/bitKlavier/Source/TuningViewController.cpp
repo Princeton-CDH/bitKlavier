@@ -89,7 +89,7 @@ BKViewController(p,theGraph)
     nToneRootOctaveCB.setName("nToneRootOctave");
     addAndMakeVisible(nToneRootOctaveCB);
     
-    nToneSemitoneWidthSlider = new BKSingleSlider("semitone width and root", 1, 200, 100, 1);
+    nToneSemitoneWidthSlider = new BKSingleSlider("semitone width and root", 1, 200, 100, 0.001);
     nToneSemitoneWidthSlider->setJustifyRight(false);
     addAndMakeVisible(nToneSemitoneWidthSlider);
     
@@ -936,7 +936,7 @@ void TuningModificationEditor::update(void)
         //                       fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
         
         val = mod->getParam(TuningNToneSemitoneWidth);
-        nToneSemitoneWidthSlider->setValue(val.getIntValue(), dontSendNotification);
+        nToneSemitoneWidthSlider->setValue(val.getFloatValue(), dontSendNotification);
         //                       offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
         
         updateComponentVisibility();

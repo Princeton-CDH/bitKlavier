@@ -242,7 +242,7 @@ ValueTree TuningModPreparation::getState(void)
     if (p != String::empty) prep.setProperty( ptagTuning_nToneRootOctaveCB,     p.getIntValue(), 0 );
     
     p = getParam(TuningNToneSemitoneWidth);
-    if (p != String::empty) prep.setProperty( ptagTuning_nToneSemitoneWidth,    p.getIntValue(), 0 );
+    if (p != String::empty) prep.setProperty( ptagTuning_nToneSemitoneWidth,    p.getFloatValue(), 0 );
 
     
     ValueTree scale( vtagTuning_customScale);
@@ -404,8 +404,8 @@ void Tuning::setState(XmlElement* e)
     if(i > 0) sPrep->setNToneRoot(i);
     else sPrep->setNToneRoot(60);
     
-    i = e->getStringAttribute( ptagTuning_nToneSemitoneWidth).getIntValue();
-    if(i > 0) sPrep->setNToneSemitoneWidth(i);
+    f = e->getStringAttribute( ptagTuning_nToneSemitoneWidth).getFloatValue();
+    if(f > 0) sPrep->setNToneSemitoneWidth(f);
     else sPrep->setNToneSemitoneWidth(100);
     
     // custom scale
