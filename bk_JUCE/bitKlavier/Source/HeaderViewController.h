@@ -47,7 +47,9 @@ private:
     
     int galleryIsDirtyAlertResult;
     
+#if !JUCE_WINDOWS
     ShareBot bot;
+#endif
     
     
     void bkTextFieldDidChange       (TextEditor&)           override;
