@@ -83,6 +83,16 @@ BKViewController(p,theGraph)
     A1reset.setButtonText("reset");
     addAndMakeVisible(A1reset);
     
+    nToneRootCB.setName("nToneRoot");
+    addAndMakeVisible(nToneRootCB);
+    
+    nToneRootOctaveCB.setName("nToneRootOctave");
+    addAndMakeVisible(nToneRootOctaveCB);
+    
+    nToneSemitoneWidthSlider = new BKSingleSlider("semitone width and root", 1, 200, 100, 0.001);
+    nToneSemitoneWidthSlider->setJustifyRight(false);
+    addAndMakeVisible(nToneSemitoneWidthSlider);
+    
     fillTuningCB();
     fillFundamentalCB();
     
@@ -128,6 +138,8 @@ BKViewController(p,theGraph)
     
     absoluteKeyboard.addWantsBigOneListener(this);
     customKeyboard.addWantsBigOneListener(this);
+    
+    nToneSemitoneWidthSlider->addWantsBigOneListener(this);
 #endif
     
 }
@@ -219,12 +231,23 @@ void TuningViewController::resized()
     A1ClusterMaxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     //A1ClusterMaxSlice.removeFromLeft(gXSpacing);
     A1ClusterMax->setBounds(A1ClusterMaxSlice);
+    nToneSemitoneWidthSlider->setBounds(A1ClusterMaxSlice);
     
     leftColumn.removeFromTop(gYSpacing);
     Rectangle<int> A1ClusterThreshSlice = leftColumn.removeFromTop(gComponentSingleSliderHeight);
     A1ClusterThreshSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     //A1ClusterThreshSlice.removeFromLeft(gXSpacing);
     A1ClusterThresh->setBounds(A1ClusterThreshSlice);
+    
+    Rectangle<int> nToneRootCBSlice = A1ClusterThreshSlice.removeFromLeft(tempwidth);
+    nToneRootCBSlice = nToneRootCBSlice.removeFromTop(gComponentComboBoxHeight);
+    nToneRootCBSlice.removeFromLeft(gXSpacing * 2);
+    nToneRootCB.setBounds(nToneRootCBSlice);
+    
+    Rectangle<int> nToneRootOctaveCBSlice = A1ClusterThreshSlice.removeFromLeft(tempwidth);
+    nToneRootOctaveCBSlice = nToneRootOctaveCBSlice.removeFromTop(gComponentComboBoxHeight);
+    nToneRootOctaveCBSlice.removeFromLeft(gXSpacing * 2);
+    nToneRootOctaveCB.setBounds(nToneRootOctaveCBSlice);
     
     leftColumn.removeFromTop(extraY + gYSpacing);
     Rectangle<int> A1AnchorScaleCBSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
@@ -282,12 +305,20 @@ void TuningViewController::fillFundamentalCB(void)
 {
     fundamentalCB.clear(dontSendNotification);
     A1FundamentalCB.clear(dontSendNotification);
+    nToneRootCB.clear(dontSendNotification);
+    nToneRootOctaveCB.clear(dontSendNotification);
     
     for (int i = 0; i < cFundamentalNames.size(); i++)
     {
         String name = cFundamentalNames[i];
         fundamentalCB.addItem(name, i+1);
         A1FundamentalCB.addItem(name, i+1);
+        nToneRootCB.addItem(name, i+1);
+    }
+    
+    for (int i = 0; i < 9; i++)
+    {
+        nToneRootOctaveCB.addItem(String(i), i+1);
     }
 }
 
@@ -307,6 +338,9 @@ void TuningViewController::updateComponentVisibility()
         A1FundamentalLabel.setVisible(false);
         A1reset.setVisible(true);
         currentFundamental.setVisible(true);
+        nToneRootCB.setVisible(false);
+        nToneRootOctaveCB.setVisible(false);
+        nToneSemitoneWidthSlider->setVisible(false);
 
     }
     else if(scaleCB.getText() == "Adaptive Anchored Tuning 1")
@@ -322,6 +356,9 @@ void TuningViewController::updateComponentVisibility()
         A1FundamentalLabel.setVisible(true);
         A1reset.setVisible(true);
         currentFundamental.setVisible(true);
+        nToneRootCB.setVisible(false);
+        nToneRootOctaveCB.setVisible(false);
+        nToneSemitoneWidthSlider->setVisible(false);
 
     }
     else
@@ -337,6 +374,9 @@ void TuningViewController::updateComponentVisibility()
         A1FundamentalLabel.setVisible(false);
         A1reset.setVisible(false);
         currentFundamental.setVisible(false);
+        nToneRootCB.setVisible(true);
+        nToneRootOctaveCB.setVisible(true);
+        nToneSemitoneWidthSlider->setVisible(true);
     }
 }
 
@@ -382,6 +422,12 @@ TuningViewController(p, theGraph)
     customKeyboard.addMyListener(this);
     
     offsetSlider->addMyListener(this);
+    
+    nToneRootCB.addListener(this);
+    
+    nToneRootOctaveCB.addListener(this);
+    
+    nToneSemitoneWidthSlider->addMyListener(this);
     
     startTimer(50);
     
@@ -567,6 +613,21 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         updateComponentVisibility();
         
     }
+    else if (name == nToneRootCB.getName())
+    {
+        prep->setNToneRootPC(index);
+        active->setNToneRootPC(index);
+        
+        updateComponentVisibility();
+    }
+    
+    else if (name == nToneRootOctaveCB.getName())
+    {
+        prep->setNToneRootOctave(index);
+        active->setNToneRootOctave(index);
+        
+        updateComponentVisibility();
+    }
     
     processor.gallery->setGalleryDirty(true);
 }
@@ -640,6 +701,10 @@ void TuningPreparationEditor::update(void)
         A1ClusterThresh->setValue(prep->getAdaptiveClusterThresh(), dontSendNotification);
         A1ClusterMax->setValue(prep->getAdaptiveHistory(), dontSendNotification);
         
+        nToneRootCB.setSelectedItemIndex(prep->getNToneRootPC(), dontSendNotification);
+        nToneRootOctaveCB.setSelectedItemIndex(prep->getNToneRootOctave(), dontSendNotification);
+        nToneSemitoneWidthSlider->setValue(prep->getNToneSemitoneWidth(), dontSendNotification);
+        
         updateComponentVisibility();
     }
     
@@ -690,6 +755,11 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(String name, double val
         DBG("got A1ClusterMax " + String(val));
         prep->setAdaptiveHistory(val);
         active->setAdaptiveHistory(val);
+    }
+    else if(name == nToneSemitoneWidthSlider->getName()) {
+        DBG("got nToneSemiToneSliderWidth " + String(val));
+        prep->setNToneSemitoneWidth(val);
+        active->setNToneSemitoneWidth(val);
     }
     
     processor.gallery->setGalleryDirty(true);
@@ -752,6 +822,10 @@ TuningViewController(p, theGraph)
     absoluteKeyboard.addMyListener(this);
     customKeyboard.addMyListener(this);
     offsetSlider->addMyListener(this);
+    
+    nToneRootCB.addListener(this);
+    nToneRootOctaveCB.addListener(this);
+    nToneSemitoneWidthSlider->addMyListener(this);
 
     update();
 }
@@ -771,6 +845,10 @@ void TuningModificationEditor::greyOutAllComponents()
     offsetSlider->setDim(gModAlpha);
     A1IntervalScaleLabel.setAlpha(gModAlpha);
     A1AnchorScaleLabel.setAlpha(gModAlpha);
+    
+    nToneRootCB.setAlpha(gModAlpha);
+    nToneRootOctaveCB.setAlpha(gModAlpha);
+    nToneSemitoneWidthSlider->setDim(gModAlpha);
 }
 
 void TuningModificationEditor::highlightModedComponents()
@@ -788,6 +866,9 @@ void TuningModificationEditor::highlightModedComponents()
     if(mod->getParam(TuningAbsoluteOffsets) != "")      absoluteKeyboard.setAlpha(1);
     if(mod->getParam(TuningCustomScale) != "")          customKeyboard.setAlpha(1);
     if(mod->getParam(TuningOffset) != "")               offsetSlider->setBright();
+    if(mod->getParam(TuningNToneRootCB) != "")          nToneRootCB.setAlpha(1);
+    if(mod->getParam(TuningNToneRootOctaveCB) != "")    nToneRootOctaveCB.setAlpha(1);
+    if(mod->getParam(TuningNToneSemitoneWidth) != "")   nToneSemitoneWidthSlider->setBright();
 }
 
 void TuningModificationEditor::update(void)
@@ -845,6 +926,18 @@ void TuningModificationEditor::update(void)
         val = mod->getParam(TuningA1History);
         A1ClusterMax->setValue(val.getIntValue(), dontSendNotification);
         //                       A1ClusterMax->setValue(prep->getAdaptiveHistory(), dontSendNotification);
+        
+        val = mod->getParam(TuningNToneRootCB);
+        nToneRootCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+        //                       fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
+        
+        val = mod->getParam(TuningNToneRootOctaveCB);
+        nToneRootOctaveCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+        //                       fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
+        
+        val = mod->getParam(TuningNToneSemitoneWidth);
+        nToneSemitoneWidthSlider->setValue(val.getFloatValue(), dontSendNotification);
+        //                       offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
         
         updateComponentVisibility();
         A1reset.setVisible(false);
@@ -1020,6 +1113,16 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
         mod->setParam(TuningA1AnchorFundamental, String(index));
         A1FundamentalCB.setAlpha(1.);
     }
+    else if (name == nToneRootCB.getName())
+    {
+        mod->setParam(TuningNToneRootCB, String(index));
+        nToneRootCB.setAlpha(1.);
+    }
+    else if (name == nToneRootOctaveCB.getName())
+    {
+        mod->setParam(TuningNToneRootOctaveCB, String(index));
+        nToneRootOctaveCB.setAlpha(1.);
+    }
     
     if (name != selectCB.getName()) updateModification();
     
@@ -1074,6 +1177,11 @@ void TuningModificationEditor::BKSingleSliderValueChanged(String name, double va
     {
         mod->setParam(TuningA1History, String(val));
         A1ClusterMax->setBright();
+    }
+    if(name == nToneSemitoneWidthSlider->getName())
+    {
+        mod->setParam(TuningNToneSemitoneWidth, String(val));
+        nToneSemitoneWidthSlider->setBright();
     }
     
     updateModification();

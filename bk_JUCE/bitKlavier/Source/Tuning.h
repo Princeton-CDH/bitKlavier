@@ -36,7 +36,9 @@ public:
     tAdaptiveClusterThresh(p->getAdaptiveClusterThresh()),
     tAdaptiveHistory(p->getAdaptiveHistory()),
     tCustom(p->getCustomScale()),
-    tAbsolute(p->getAbsoluteOffsets())
+    tAbsolute(p->getAbsoluteOffsets()),
+    nToneSemitoneWidth(p->getNToneSemitoneWidth()),
+    nToneRoot(p->getNToneRoot())
     {
 
     }
@@ -54,6 +56,8 @@ public:
         tAdaptiveHistory = p->getAdaptiveHistory();
         tCustom = p->getCustomScale();
         tAbsolute = p->getAbsoluteOffsets();
+        nToneSemitoneWidth = p->getNToneSemitoneWidth();
+        nToneRoot = p->getNToneRoot();
         //resetMap->copy(p->resetMap);
         
     }
@@ -91,6 +95,8 @@ public:
                 tAdaptiveAnchorScale == p->getAdaptiveAnchorScale() &&
                 tAdaptiveAnchorFundamental == p->getAdaptiveAnchorFundamental() &&
                 tAdaptiveClusterThresh == p->getAdaptiveClusterThresh() &&
+                nToneSemitoneWidth == p->getNToneSemitoneWidth() &&
+                nToneRoot == p->getNToneRoot() &&
                 (tAdaptiveHistory == p->getAdaptiveHistory()) && custom && absolute);
     }
     
@@ -103,7 +109,9 @@ public:
                       PitchClass adaptiveAnchorFundamental,
                       uint64 adaptiveClusterThresh,
                       int adaptiveHistory,
-                      Array<float> customScale):
+                      Array<float> customScale,
+                      float semitoneWidth,
+                      int semitoneRoot):
     tWhichTuning(whichTuning),
     tFundamental(fundamental),
     tFundamentalOffset(fundamentalOffset),
@@ -113,7 +121,9 @@ public:
     tAdaptiveAnchorFundamental(adaptiveAnchorFundamental),
     tAdaptiveClusterThresh(adaptiveClusterThresh),
     tAdaptiveHistory(adaptiveHistory),
-    tCustom(customScale)
+    tCustom(customScale),
+    nToneSemitoneWidth(semitoneWidth),
+    nToneRoot(semitoneRoot)
     {
         tAbsolute.ensureStorageAllocated(128);
         for(int i=0; i<128; i++) tAbsolute.set(i, 0.);
@@ -129,7 +139,9 @@ public:
     tAdaptiveAnchorFundamental(C),
     tAdaptiveClusterThresh(100),
     tAdaptiveHistory(4),
-    tCustom({0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.})
+    tCustom({0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}),
+    nToneSemitoneWidth(100),
+    nToneRoot(60)
     {
         tAbsolute.ensureStorageAllocated(128);
         for(int i=0; i<128; i++) tAbsolute.set(i, 0.);
@@ -154,6 +166,10 @@ public:
     inline const Array<float> getCustomScale() const noexcept               {return tCustom;                    }
     inline const Array<float> getAbsoluteOffsets() const noexcept           {return tAbsolute;                  }
     float getAbsoluteOffset(int midiNoteNumber) const noexcept              {return tAbsolute.getUnchecked(midiNoteNumber);}
+    inline const float getNToneSemitoneWidth() const noexcept               {return nToneSemitoneWidth;         }
+    inline const int getNToneRoot() const noexcept                          {return nToneRoot;                  }
+    inline const int getNToneRootPC() const noexcept                        {return nToneRoot % 12;             }
+    inline const int getNToneRootOctave() const noexcept                    {return (nToneRoot / 12) - 1;       }
     
     inline const Array<float> getAbsoluteOffsetsCents() const noexcept {
         Array<float> tAbsoluteCents;
@@ -189,6 +205,23 @@ public:
     inline void setCustomScale(Array<float> tuning)                                 {tCustom = tuning;                                      }
     inline void setAbsoluteOffsets(Array<float> abs)                                {tAbsolute = abs;                                       }
     void setAbsoluteOffset(int which, float val)                                    {tAbsolute.set(which, val);                             }
+    inline void setNToneSemitoneWidth(float width)                                  {nToneSemitoneWidth = width;                            }
+    inline void setNToneRoot(int root)
+    {
+        nToneRoot = root;
+        nToneRootPC = nToneRoot % 12;
+        nToneRootOctave = (nToneRoot / 12) - 1;
+    }
+    inline void setNToneRootPC(int pc)
+    {
+        nToneRootPC = pc;
+        nToneRoot = (nToneRootOctave + 1) * 12 + nToneRootPC;
+    }
+    inline void setNToneRootOctave(int octave)
+    {
+        nToneRootOctave = octave;
+        nToneRoot = (nToneRootOctave + 1) * 12 + nToneRootPC;
+    }
 
     inline void setCustomScaleCents(Array<float> tuning) {
         for(int i=0; i<tCustom.size(); i++)
@@ -216,6 +249,8 @@ public:
         DBG("tAdaptiveHistory: " +              String(tAdaptiveHistory));
         DBG("tCustom: " +                       floatArrayToString(tCustom));
         DBG("tAbsolute: " +                     floatArrayToString(tAbsolute));
+        DBG("nToneSemitoneWidth: " +            String(nToneSemitoneWidth));
+        DBG("nToneRoot: " +                     String(nToneRoot));
     }
     
 private:
@@ -238,6 +273,11 @@ private:
     // custom scale and absolute offsets
     Array<float>    tCustom = Array<float>({0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}); //custom scale
     Array<float>    tAbsolute;  //offset (in MIDI fractional offsets, like other tunings) for specific notes; size = 128
+    
+    float nToneSemitoneWidth;
+    int nToneRoot;              //which key matches 12-tone ET; 60 by default
+    int nToneRootPC = 0;        //which pitch class; 0 by default
+    int nToneRootOctave = 4;    //which octave; 4 by default, so C4
     
     JUCE_LEAK_DETECTOR(TuningPreparation);
 };

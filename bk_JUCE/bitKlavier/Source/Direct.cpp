@@ -47,10 +47,10 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                      Normal,
                      MainNote,
                      direct->getId(),
-                     0, // start
-                     0, // length
-                     3,
-                     30); //release time
+                     0,     // start
+                     0,     // length
+                     3,     // allow user to set, directly in ms
+                     30);   // release time
         
         //store synthNoteNumbers by noteNumber
         keyPlayed[noteNumber].add(synthNoteNumber);
