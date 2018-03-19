@@ -83,9 +83,9 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
                      SynchronicNote,
                      synchronic->getId(),
                      noteStartPos,  // start
-                     noteLength,    
+                     noteLength,
                      3,     // + noteLength * synchronic->aPrep->rampUpPercentage()[rampPercentageCounter]
-                     30);   // + noteLength * synchronic->aPrep->rampDownPercentage()[rampPercentageCounter]
+                     30);   //30 + noteLength * 0.4);   // + noteLength * synchronic->aPrep->rampDownPercentage()[rampPercentageCounter]
     }
     
 }
