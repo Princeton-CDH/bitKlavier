@@ -171,6 +171,8 @@ loader(*this)
     
 }
 
+#define SFZ_TEST 1
+
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     bkSampleRate = sampleRate;
@@ -187,12 +189,28 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     gallery->prepareToPlay(sampleRate);
     
+#if SFZ_TEST
+    for (int i = 0; i < 300; ++i)
+    {
+        mainPianoSynth.addVoice(new BKPianoSamplerVoice(gallery->getGeneralSettings()));
+    }
+    
+    AudioFormatManager formatManager;
+    auto sfzFile = File("/Users/airship/soundfonts/Drum\ \&\ Percussion\ Soundfonts/1115-Standard\ Rock\ Set.sf2");
+    auto sound = new sfzero::Sound(sfzFile);
+    sound->loadRegions();
+    sound->loadSamples(&formatManager);
+    
+    mainPianoSynth.clearSounds();
+    mainPianoSynth.addSound(sound);
+    
+#else
+    
 #if JUCE_IOS
     String osname = SystemStats::getOperatingSystemName();
     float iosVersion = osname.fromLastOccurrenceOf("iOS ", false, true).getFloatValue();
     
     String device = SystemStats::getDeviceDescription();
-    DBG("device: " + device);
     
     if (device.contains("iPhone"))  updateState->needsExtraKeys = true;
     else                            updateState->needsExtraKeys = false;
@@ -201,6 +219,9 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     else                    loadPianoSamples(BKLoadLite); // CHANGE BACK TO MEDIUM
 #else
     loadPianoSamples(BKLoadHeavy); // CHANGE THIS BACK TO HEAVY
+#endif
+    
+    
 #endif
 
     

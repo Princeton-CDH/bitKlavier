@@ -31,7 +31,7 @@
  
  @see BKSynthesiser, BKSynthesiserVoice
  */
-class BKSynthesiserSound    : public ReferenceCountedObject
+class BKSynthesiserSound    : public sfzero::Sound
 {
 protected:
     //==============================================================================
@@ -83,7 +83,7 @@ private:
  
  @see BKSynthesiser, BKSynthesiserSound
  */
-class  BKSynthesiserVoice
+class  BKSynthesiserVoice : public sfzero::Voice
 {
 public:
     //==============================================================================
