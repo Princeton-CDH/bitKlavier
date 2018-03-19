@@ -296,40 +296,42 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
 #define CLOUD_TEST 1
 void HeaderViewController::galleryMenuCallback(int result, HeaderViewController* gvc)
 {
-    BKAudioProcessor& processor = gvc->processor;
-    
-    if (result == RENAME_ID)
-    {
-        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
-        
-        prompt.addTextEditor("name", processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, false));
-        
-        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
-        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
-        
-        int result = prompt.runModalLoop();
-        
-        String name = prompt.getTextEditorContents("name");
-        
-        if (result == 1)
-        {
-            processor.renameGallery(name);
-        }
-        
-        gvc->fillGalleryCB();
-    }
-    else if (result == SHARE_EMAIL_ID)
-    {
-        gvc->bot.share(processor.gallery->getURL(), 0);
-    }
-    else if (result == SHARE_MESSAGE_ID)
-    {
-        gvc->bot.share(processor.gallery->getURL(), 1);
-    }
-    else if (result == SHARE_FACEBOOK_ID)
-    {
-        gvc->bot.share(processor.gallery->getURL(), 2);
-    }
+	BKAudioProcessor& processor = gvc->processor;
+
+	if (result == RENAME_ID)
+	{
+		AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+
+		prompt.addTextEditor("name", processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, false));
+
+		prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+		prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+
+		int result = prompt.runModalLoop();
+
+		String name = prompt.getTextEditorContents("name");
+
+		if (result == 1)
+		{
+			processor.renameGallery(name);
+		}
+
+		gvc->fillGalleryCB();
+	}
+#if !JUCE_WINDOWS
+	else if (result == SHARE_EMAIL_ID)
+	{
+		gvc->bot.share(processor.gallery->getURL(), 0);
+	}
+	else if (result == SHARE_MESSAGE_ID)
+	{
+		gvc->bot.share(processor.gallery->getURL(), 1);
+	}
+	else if (result == SHARE_FACEBOOK_ID)
+	{
+		gvc->bot.share(processor.gallery->getURL(), 2);
+	}
+#endif
     else if (result == LOAD_LITEST)
     {
         processor.gallery->sampleType = BKLoadLitest;
