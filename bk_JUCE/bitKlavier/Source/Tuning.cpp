@@ -27,7 +27,7 @@ float TuningProcessor::getOffset(int midiNoteNumber)
 {
     float lastNoteTuningTemp = lastNoteTuning;
     float lastNoteOffset;
-    
+ 
     //do adaptive tunings if using
     if(tuning->aPrep->getTuning() == AdaptiveTuning || tuning->aPrep->getTuning() == AdaptiveAnchoredTuning)
     {
@@ -37,6 +37,27 @@ float TuningProcessor::getOffset(int midiNoteNumber)
         return lastNoteOffset;
     }
     
+    
+    //do nTone tuning if nToneSemitoneWidth != 100cents
+    if(tuning->aPrep->getNToneSemitoneWidth() != 100)
+    {
+        lastNoteOffset = .01 * (midiNoteNumber - tuning->aPrep->getNToneRoot()) * (tuning->aPrep->getNToneSemitoneWidth() - 100);
+        int midiNoteNumberTemp = round(midiNoteNumber + lastNoteOffset);
+        
+        Array<float> currentTuning;
+        if(tuning->aPrep->getTuning() == CustomTuning) currentTuning = tuning->aPrep->getCustomScale();
+        else currentTuning = tuning->tuningLibrary.getUnchecked(tuning->aPrep->getTuning());
+        
+        lastNoteOffset += (currentTuning[(midiNoteNumberTemp - tuning->aPrep->getFundamental()) % currentTuning.size()] +
+                          + tuning->aPrep->getAbsoluteOffsets().getUnchecked(midiNoteNumber) +
+                          tuning->aPrep->getFundamentalOffset());
+        
+        
+        lastNoteTuning = midiNoteNumber + lastNoteOffset;
+        lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
+        
+        return lastNoteOffset;
+    }
 
     //else do regular tunings
     Array<float> currentTuning;
@@ -159,6 +180,9 @@ ValueTree Tuning::getState(void)
     prep.setProperty( ptagTuning_adaptiveClusterThresh, (int)sPrep->getAdaptiveClusterThresh(), 0 );
     prep.setProperty( ptagTuning_adaptiveHistory,       sPrep->getAdaptiveHistory(), 0 );
     
+    prep.setProperty( ptagTuning_nToneRoot,             sPrep->getNToneRoot(), 0);
+    prep.setProperty( ptagTuning_nToneSemitoneWidth,    sPrep->getNToneSemitoneWidth(), 0 );
+    
     ValueTree scale( vtagTuning_customScale);
     int count = 0;
     for (auto note : sPrep->getCustomScale())
@@ -210,6 +234,16 @@ ValueTree TuningModPreparation::getState(void)
     
     p = getParam(TuningA1History);
     if (p != String::empty) prep.setProperty( ptagTuning_adaptiveHistory,       p.getIntValue(), 0 );
+    
+    p = getParam(TuningNToneRootCB);
+    if (p != String::empty) prep.setProperty( ptagTuning_nToneRootCB,           p.getIntValue(), 0 );
+    
+    p = getParam(TuningNToneRootOctaveCB);
+    if (p != String::empty) prep.setProperty( ptagTuning_nToneRootOctaveCB,     p.getIntValue(), 0 );
+    
+    p = getParam(TuningNToneSemitoneWidth);
+    if (p != String::empty) prep.setProperty( ptagTuning_nToneSemitoneWidth,    p.getFloatValue(), 0 );
+
     
     ValueTree scale( vtagTuning_customScale);
     int count = 0;
@@ -278,6 +312,15 @@ void TuningModPreparation::setState(XmlElement* e)
     
     p = e->getStringAttribute( ptagTuning_adaptiveAnchorFund);
     setParam(TuningA1AnchorFundamental, p);
+    
+    p = e->getStringAttribute( ptagTuning_nToneRootCB);
+    setParam(TuningNToneRootCB, p);
+    
+    p = e->getStringAttribute( ptagTuning_nToneRootOctaveCB);
+    setParam(TuningNToneRootOctaveCB, p);
+    
+    p = e->getStringAttribute( ptagTuning_nToneSemitoneWidth);
+    setParam(TuningNToneSemitoneWidth, p);
     
     // custom scale
     forEachXmlChildElement (*e, sub)
@@ -356,6 +399,14 @@ void Tuning::setState(XmlElement* e)
     
     i = e->getStringAttribute( ptagTuning_adaptiveAnchorFund).getIntValue();
     sPrep->setAdaptiveAnchorFundamental((PitchClass)i);
+    
+    i = e->getStringAttribute( ptagTuning_nToneRoot).getIntValue();
+    if(i > 0) sPrep->setNToneRoot(i);
+    else sPrep->setNToneRoot(60);
+    
+    f = e->getStringAttribute( ptagTuning_nToneSemitoneWidth).getFloatValue();
+    if(f > 0) sPrep->setNToneSemitoneWidth(f);
+    else sPrep->setNToneSemitoneWidth(100);
     
     // custom scale
     forEachXmlChildElement (*e, sub)
