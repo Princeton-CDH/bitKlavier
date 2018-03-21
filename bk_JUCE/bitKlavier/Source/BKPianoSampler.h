@@ -148,7 +148,10 @@ private:
     PianoSamplerNoteType playType;
     PianoSamplerNoteDirection playDirection;
     float lgain, rgain, rampOnOffLevel, rampOnDelta, rampOffDelta;
-    bool isInRampOn, isInRampOff;
+    bool isInRampOn, isInRampOff;    
+    
+    stk::ADSR adsr;
+    bool originalRamp; //true is using original rampUp/Down and not adsr
     
     JUCE_LEAK_DETECTOR (BKPianoSamplerVoice)
 };
