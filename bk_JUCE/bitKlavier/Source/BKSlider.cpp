@@ -2437,4 +2437,118 @@ void BKStackedSlider::resized ()
 }
 
 
+// ******************************************************************************************************************** //
+// **************************************************  BKADSRSlider ************************************************** //
+// ******************************************************************************************************************** //
+
+BKADSRSlider::BKADSRSlider (String name):
+sliderName(name)
+{
+    
+    justifyRight = true;
+    
+    showName.setText(sliderName, dontSendNotification);
+    if(justifyRight) showName.setJustificationType(Justification::bottomRight);
+    else showName.setJustificationType(Justification::bottomLeft);
+    addAndMakeVisible(showName);
+    
+    attackSlider = new BKSingleSlider("attack time (ms)", 1, 1000, 10, 1);
+    attackSlider->setSkewFactorFromMidPoint(200);
+    attackSlider->setJustifyRight(false);
+    attackSlider->addMyListener(this);
+    addAndMakeVisible(attackSlider);
+    
+    decaySlider = new BKSingleSlider("decay time (ms)", 1, 1000, 10, 1);
+    decaySlider->setSkewFactorFromMidPoint(200);
+    decaySlider->setJustifyRight(false);
+    decaySlider->addMyListener(this);
+    addAndMakeVisible(decaySlider);
+    
+    sustainSlider = new BKSingleSlider("sustain level", 0., 1., 1., 0.001);
+    sustainSlider->setJustifyRight(false);
+    sustainSlider->addMyListener(this);
+    addAndMakeVisible(sustainSlider);
+    
+    releaseSlider = new BKSingleSlider("release time (ms)", 1, 1000, 30, 1);
+    releaseSlider->setSkewFactorFromMidPoint(200);
+    releaseSlider->setJustifyRight(false);
+    releaseSlider->addMyListener(this);
+    addAndMakeVisible(releaseSlider);
+    
+}
+
+void BKADSRSlider::setDim(float alphaVal)
+{
+    attackSlider->setAlpha(alphaVal);
+    decaySlider->setAlpha(alphaVal);
+    sustainSlider->setAlpha(alphaVal);
+    releaseSlider->setAlpha(alphaVal);
+    showName.setAlpha(alphaVal);
+}
+
+void BKADSRSlider::setBright()
+{
+    attackSlider->setAlpha(1.);
+    decaySlider->setAlpha(1.);
+    sustainSlider->setAlpha(1.);
+    releaseSlider->setAlpha(1.);
+    showName.setAlpha(1.);
+}
+
+
+void BKADSRSlider::BKSingleSliderValueChanged(String name, double val)
+{
+    
+    if(name == attackSlider->getName())
+    {
+        //DBG("attackSlider " + String(val));
+    }
+    else if(name == decaySlider->getName())
+    {
+        //DBG("decaySlider " + String(val));
+    }
+    else if(name == sustainSlider->getName())
+    {
+        //DBG("sustainSlider " + String(val));
+    }
+    else if(name == releaseSlider->getName())
+    {
+        //DBG("releaseSlider " + String(val));
+    }
+            
+    listeners.call(&BKADSRSlider::Listener::BKADSRSliderValueChanged,
+                   getName(),
+                   attackSlider->getValue(),
+                   decaySlider->getValue(),
+                   sustainSlider->getValue(),
+                   releaseSlider->getValue());
+}
+
+
+void BKADSRSlider::resized()
+{
+    
+    Rectangle<int> area (getLocalBounds());
+    Rectangle<int> topSlab (area.removeFromTop(gComponentTextFieldHeight));
+    
+    if(justifyRight)
+    {
+        topSlab.removeFromRight(5);
+        showName.setBounds(topSlab.removeFromRight(getWidth() - 150));
+    }
+    else
+    {
+        topSlab.removeFromLeft(5);
+        showName.setBounds(topSlab.removeFromLeft(getWidth() - 150));
+    }
+    
+    attackSlider->setBounds(area.removeFromTop(gComponentSingleSliderHeight));
+    decaySlider->setBounds(area.removeFromTop(gComponentSingleSliderHeight));
+    sustainSlider->setBounds(area.removeFromTop(gComponentSingleSliderHeight));
+    releaseSlider->setBounds(area.removeFromTop(gComponentSingleSliderHeight));
+
+    
+}
+
+
 

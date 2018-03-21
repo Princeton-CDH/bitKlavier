@@ -34,11 +34,19 @@ public:
                       float gain,
                       bool resAndHammer,
                       float resGain,
-                      float hamGain):
+                      float hamGain,
+                      int atk,
+                      int dca,
+                      float sust,
+                      int rel):
     dTransposition(transp),
     dGain(gain),
     dResonanceGain(resGain),
-    dHammerGain(hamGain)
+    dHammerGain(hamGain),
+    dAttack(atk),
+    dDecay(dca),
+    dRelease(rel),
+    dSustain(sust)
     {
         
     }
@@ -47,7 +55,11 @@ public:
     dTransposition(Array<float>({0.0})),
     dGain(1.0),
     dResonanceGain(0.5),
-    dHammerGain(0.5)
+    dHammerGain(0.5),
+    dAttack(3),
+    dDecay(3),
+    dRelease(30),
+    dSustain(1.)
     {
         
     }
@@ -63,6 +75,10 @@ public:
         dGain = d->getGain();
         dResonanceGain = d->getResonanceGain();
         dHammerGain = d->getHammerGain();
+        dAttack = d->getAttack();
+        dDecay = d->getDecay();
+        dSustain = d->getSustain();
+        dRelease = d->getRelease();
     }
     
     inline bool compare(DirectPreparation::Ptr d)
@@ -70,7 +86,12 @@ public:
         return (dTransposition == d->getTransposition() &&
                 dGain == d->getGain() &&
                 dResonanceGain == d->getResonanceGain() &&
-                dHammerGain == d->getHammerGain());
+                dHammerGain == d->getHammerGain()       &&
+                dAttack == d->getAttack()               &&
+                dDecay == d->getDecay()                 &&
+                dSustain == d->getSustain()             &&
+                dRelease == d->getRelease()
+                );
     }
     
     
@@ -78,15 +99,23 @@ public:
     inline const String getName() const noexcept {return name;}
     inline void setName(String n){name = n;}
     
-    inline Array<float> getTransposition() const noexcept         {return dTransposition; }
+    inline Array<float> getTransposition() const noexcept               {return dTransposition; }
     inline const float getGain() const noexcept                         {return dGain;          }
     inline const float getResonanceGain() const noexcept                {return dResonanceGain; }
     inline const float getHammerGain() const noexcept                   {return dHammerGain;    }
+    inline const int getAttack() const noexcept                         {return dAttack;        }
+    inline const int getDecay() const noexcept                          {return dDecay;         }
+    inline const float getSustain() const noexcept                      {return dSustain;       }
+    inline const int getRelease() const noexcept                         {return dRelease;       }
     
     inline void setTransposition(Array<float> val)                      {dTransposition = val;  }
     inline void setGain(float val)                                      {dGain = val;           }
     inline void setResonanceGain(float val)                             {dResonanceGain = val;  }
     inline void setHammerGain(float val)                                {dHammerGain = val;     }
+    inline void setAttack(int val)                                      {dAttack = val;         }
+    inline void setDecay(int val)                                       {dDecay = val;          }
+    inline void setSustain(float val)                                   {dSustain = val;        }
+    inline void setRelease(int val)                                     {dRelease = val;        }
     
     
     void print(void)
@@ -95,15 +124,21 @@ public:
         DBG("dGain: "           + String(dGain));
         DBG("dResGain: "        + String(dResonanceGain));
         DBG("dHammerGain: "     + String(dHammerGain));
+        DBG("dAttack: "         + String(dAttack));
+        DBG("dDecay: "          + String(dDecay));
+        DBG("dSustain: "        + String(dSustain));
+        DBG("dRelease: "        + String(dRelease));
     }
     
     
 
 private:
     String  name;
-    Array<float>   dTransposition;       //transposition, in half steps
-    float   dGain;                //gain multiplier
+    Array<float>   dTransposition;          //transposition, in half steps
+    float   dGain;                          //gain multiplier
     float   dResonanceGain, dHammerGain;
+    int     dAttack, dDecay, dRelease;      //ADSR, in ms
+    float   dSustain;
     
     //internal keymap for resetting internal values to static
     //Keymap::Ptr resetMap = new Keymap(0);

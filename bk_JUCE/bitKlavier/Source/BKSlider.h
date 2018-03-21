@@ -690,6 +690,92 @@ private:
 };
 
 
+// ******************************************************************************************************************** //
+// **************************************************  BKADSRSlider ************************************************** //
+// ******************************************************************************************************************** //
+
+
+class BKADSRSlider :
+public Component,
+public BKSingleSlider::Listener
+#if JUCE_IOS
+, public WantsBigOne
+#endif
+{
+public:
+    BKADSRSlider(String name);
+    BKADSRSlider()
+    {
+        attackSlider->setLookAndFeel(nullptr);
+        decaySlider->setLookAndFeel(nullptr);
+        sustainSlider->setLookAndFeel(nullptr);
+        releaseSlider->setLookAndFeel(nullptr);
+    };
+    
+    void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
+    String getName()                { return sliderName; }
+    
+    void setAttackValue(int newval, NotificationType notify)
+    {
+        attackSlider->setValue(newval, notify);
+    }
+    void setDecayValue(int newval, NotificationType notify)
+    {
+        decaySlider->setValue(newval, notify);
+    }
+    void setSustainValue(float newval, NotificationType notify)
+    {
+        sustainSlider->setValue(newval, notify);
+    }
+    void setReleaseValue(int newval, NotificationType notify)
+    {
+        releaseSlider->setValue(newval, notify);
+    }
+    
+    void setJustifyRight(bool jr)
+    {
+        justifyRight = jr;
+        if (justifyRight) showName.setJustificationType(Justification::bottomRight);
+        else showName.setJustificationType(Justification::bottomLeft);
+    }
+    
+    void BKSingleSliderValueChanged(String name, double val) override;
+    
+    void resized() override;
+    
+    void setDim(float newAlpha);
+    void setBright();
+    
+    class Listener
+    {
+    public:
+        virtual ~Listener() {};
+        
+        virtual void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) = 0;
+    };
+    
+    ListenerList<Listener> listeners;
+    void addMyListener(Listener* listener)     { listeners.add(listener);      }
+    void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
+    
+    
+private:
+    
+    ScopedPointer<BKSingleSlider> attackSlider;
+    ScopedPointer<BKSingleSlider> decaySlider;
+    ScopedPointer<BKSingleSlider> sustainSlider;
+    ScopedPointer<BKSingleSlider> releaseSlider;
+    
+    String sliderName;
+    BKLabel showName;
+
+    bool justifyRight;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKADSRSlider)
+    
+};
+
+
 
 
 #endif  // BKSLIDER_H_INCLUDED

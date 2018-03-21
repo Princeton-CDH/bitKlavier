@@ -29,6 +29,16 @@ typedef enum BKRangeSliderType
     
 } BKRangeSliderType;
 
+typedef enum BKADSRSliderType
+{
+    BKADSRAttackSlider = 0,
+    BKADSRDecaySlider,
+    BKADSRSustainSlider,
+    BKADSRReleaseSlider,
+    BKADSRSliderNil
+    
+} BKADSRSliderType;
+
 typedef enum KSliderTextFieldType
 {
     KSliderAllValues,

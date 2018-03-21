@@ -37,6 +37,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
         int synthNoteNumber = noteNumber + (int)offset;
         float synthOffset = offset - (int)offset;
 
+        /*
         synth->keyOn(channel,
                      noteNumber,
                      synthNoteNumber,
@@ -51,6 +52,26 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                      0,     // length
                      3,     // allow user to set, directly in ms
                      30);   // release time
+        
+        */
+        
+        synth->keyOn(channel,
+                     noteNumber,
+                     synthNoteNumber,
+                     synthOffset,
+                     velocity,
+                     direct->aPrep->getGain() * aGlobalGain,
+                     Forward,
+                     Normal,
+                     MainNote,
+                     direct->getId(),
+                     0,     // start
+                     0,     // length
+                     direct->aPrep->getAttack(),
+                     direct->aPrep->getDecay(),
+                     direct->aPrep->getSustain(),
+                     direct->aPrep->getRelease());
+        
         
         //store synthNoteNumbers by noteNumber
         keyPlayed[noteNumber].add(synthNoteNumber);

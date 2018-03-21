@@ -33,6 +33,8 @@ public:
     ScopedPointer<BKSingleSlider> gainSlider;
     ScopedPointer<BKSingleSlider> resonanceGainSlider;
     ScopedPointer<BKSingleSlider> hammerGainSlider;
+    
+    ScopedPointer<BKADSRSlider> ADSRSlider;
 
     void paint (Graphics&) override;
     void resized() override;
@@ -52,7 +54,8 @@ class DirectPreparationEditor :
 public DirectViewController,
 public BKEditableComboBoxListener,
 public BKSingleSlider::Listener,
-public BKStackedSlider::Listener
+public BKStackedSlider::Listener,
+public BKADSRSlider::Listener
 {
 public:
     
@@ -69,6 +72,7 @@ public:
     void BKSingleSliderValueChanged(String name, double val) override;
     
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
+    void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
     
     void fillSelectCB(int last, int current);
     

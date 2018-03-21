@@ -43,6 +43,9 @@ BKViewController(p, theGraph)
     hammerGainSlider->setJustifyRight(false);
     addAndMakeVisible(hammerGainSlider);
     
+    ADSRSlider = new BKADSRSlider("ADSR");
+    addAndMakeVisible(ADSRSlider);
+    
     
 #if JUCE_IOS
     transpositionSlider->addWantsBigOneListener(this);
@@ -123,10 +126,18 @@ void DirectViewController::resized()
     area.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     area.removeFromRight(gXSpacing);
     
+    /*
     transpositionSlider->setBounds(area.getX(),
                                    resonanceGainSlider->getY(),
                                    area.getWidth(),
                                    gComponentStackedSliderHeight + processor.paddingScalarY * 30);
+     */
+    
+    area.removeFromTop(gYSpacing + 4.*gPaddingConst * processor.paddingScalarY);
+    transpositionSlider->setBounds(area.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
+    
+    area.removeFromTop(gYSpacing + 6.*gPaddingConst * processor.paddingScalarY);
+    ADSRSlider->setBounds(area.removeFromTop(5*gComponentSingleSliderHeight));
     
 }
 
@@ -155,6 +166,8 @@ DirectViewController(p, theGraph)
     
     hammerGainSlider->addMyListener(this);
     
+    ADSRSlider->addMyListener(this);
+    
     
 }
 
@@ -172,6 +185,10 @@ void DirectPreparationEditor::update(void)
         resonanceGainSlider->setValue(prep->getResonanceGain(), dontSendNotification);
         hammerGainSlider->setValue(prep->getHammerGain(), dontSendNotification);
         gainSlider->setValue(prep->getGain(), dontSendNotification);
+        ADSRSlider->setAttackValue(prep->getAttack(), dontSendNotification);
+        ADSRSlider->setDecayValue(prep->getDecay(), dontSendNotification);
+        ADSRSlider->setSustainValue(prep->getSustain(), dontSendNotification);
+        ADSRSlider->setReleaseValue(prep->getRelease(), dontSendNotification);
     }
 }
 
@@ -335,6 +352,23 @@ void DirectPreparationEditor::BKStackedSliderValueChanged(String name, Array<flo
     active->setTransposition(val);
 }
 
+void DirectPreparationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
+{
+    DBG("BKADSRSliderValueChanged received");
+    
+    DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
+    DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
+    
+    prep->setAttack(attack);
+    active->setAttack(attack);
+    prep->setDecay(decay);
+    active->setDecay(decay);
+    prep->setSustain(sustain);
+    active->setSustain(sustain);
+    prep->setRelease(release);
+    active->setRelease(release);
+}
+
 void DirectPreparationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
@@ -398,6 +432,8 @@ DirectViewController(p, theGraph)
     resonanceGainSlider->addMyListener(this);
     
     hammerGainSlider->addMyListener(this);
+    
+    //ADSRSlider->addMyListener(this);
 }
 
 void DirectModificationEditor::greyOutAllComponents()
