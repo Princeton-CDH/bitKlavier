@@ -75,6 +75,7 @@ bool BKPianoSamplerVoice::canPlaySound (BKSynthesiserSound* sound)
     return dynamic_cast<const BKPianoSamplerSound*> (sound) != nullptr;
 }
 
+
 void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                                      const float gain,
                                      PianoSamplerNoteDirection direction,
@@ -86,15 +87,35 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                                      int voiceRampOff,
                                      BKSynthesiserSound* s)
 {
+                        startNote   (midiNoteNumber,
+                                     gain,
+                                     direction,
+                                     type,
+                                     bktype,
+                                     startingPosition,
+                                     length,
+                                     voiceRampOn,
+                                     (int)(3*getSampleRate()),
+                                     1.,
+                                     voiceRampOff,
+                                     s);
+}
+
+void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
+                                     const float gain,
+                                     PianoSamplerNoteDirection direction,
+                                     PianoSamplerNoteType type,
+                                     BKNoteType bktype,
+                                     const uint64 startingPosition,
+                                     const uint64 length,
+                                     int adsrAttack,
+                                     int adsrDecay,
+                                     float adsrSustain,
+                                     int adsrRelease,
+                                     BKSynthesiserSound* s)
+{
     if (const BKPianoSamplerSound* const sound = dynamic_cast<const BKPianoSamplerSound*> (s))
     {
-        
-        //DBG(sound->getName());
-        //DBG("startNote: getting tuning ratio " + String(generalSettings->getTuningRatio()));
-        
-        originalRamp = false;
-        //adsr.setAllTimes(.003, .003, 1., .03);
-        
         pitchRatio = powf(2.0f, (midiNoteNumber - (float)sound->midiRootNote) / 12.0f)
                         * sound->sourceSampleRate
                         * generalSettings->getTuningRatio()
@@ -106,27 +127,23 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         playDirection = direction;
         
         double playLength = 0.0;
-        double maxLength = sound->soundLength - voiceRampOff;
+        double maxLength = sound->soundLength - adsrRelease;
         
         if (bkType != MainNote)
         {
-            if(voiceRampOn  > (0.5 * length))   voiceRampOn     = 0.5 * length;
-            if(voiceRampOff > (0.5 * length))   voiceRampOff    = 0.5 * length;
+            if(adsrAttack  > (0.5 * length))   adsrAttack     = 0.5 * length;
+            if(adsrRelease > (0.5 * length))   adsrRelease    = 0.5 * length;
 
-            //if (playDirection == Reverse) playLength = (length - (voiceRampOff + voiceRampOn)) * pitchRatio;
-            //else playLength = (length - voiceRampOff) * pitchRatio;
-            playLength = (length - voiceRampOff) * pitchRatio;
-            //DBG("Playlength, length, voiceRampOff, pitchRatio = " + String(playLength) + " " + String(length) + " " + String(voiceRampOff) + " " + String(pitchRatio));
+            playLength = (length - adsrRelease) * pitchRatio;
         }
-        
-        //DBG("ramp Up/down times in seconds = " + String(voiceRampOn / getSampleRate()) + " " + String(voiceRampOff / getSampleRate()));
-        adsr.setAllTimes(voiceRampOn / getSampleRate(), .03, 1., voiceRampOff / getSampleRate());
+
+        adsr.setSampleRate(getSampleRate());
+        adsr.setAllTimes(adsrAttack / getSampleRate(), adsrDecay / getSampleRate(), adsrSustain, adsrRelease / getSampleRate());
         
         if (playDirection == Forward)
         {
             if (playType == Normal)
             {
-                //sourceSamplePosition = 220; //was 0.0
                 sourceSamplePosition = 0;
                 playEndPosition = maxLength - 1;
             }
@@ -144,15 +161,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             {
                 sourceSamplePosition = startingPosition;
                 playEndPosition = jmin( (startingPosition + playLength), maxLength) - 1;
-                
-                /*
-                 DBG("starting forward note, starting position = "
-                 + String(startingPosition * 1000./getSampleRate())
-                 + " ending position = "
-                 + String(playEndPosition * 1000./getSampleRate())
-                 );
-                */
-                
             }
             else
             {
@@ -164,15 +172,13 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             if (playType == Normal)
             {
                 sourceSamplePosition = sound->soundLength - 1;
-                playEndPosition = voiceRampOff;
+                playEndPosition = adsrRelease;
             }
             else if (playType == NormalFixedStart)
             {
-                //if (startingPosition < sound->rampOffSamples)
-                if (startingPosition < voiceRampOff)
+                if (startingPosition < adsrRelease)
                 {
-                    //sourceSamplePosition = sound->rampOffSamples;
-                    sourceSamplePosition = voiceRampOff;
+                    sourceSamplePosition = adsrRelease;
                 }
                 else if (startingPosition >= sound->soundLength)
                 {
@@ -182,16 +188,15 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                 {
                     sourceSamplePosition = startingPosition;
                 }
-                //playEndPosition = sound->rampOffSamples;
-                playEndPosition = voiceRampOff;
+
+                playEndPosition = adsrRelease;
             }
             else if (playType == FixedLength)
             {
                 sourceSamplePosition = sound->soundLength - 1;
                 if (playLength >= sourceSamplePosition)
                 {
-                    //playEndPosition = (double)sound->rampOffSamples;
-                    playEndPosition = (double)voiceRampOff;
+                    playEndPosition = (double)adsrRelease;
                 }
                 else
                 {
@@ -200,19 +205,14 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             }
             else if (playType == FixedLengthFixedStart)
             {
-                //sourceSamplePosition = startingPosition; //* pitchRatio! do this here, instead of outside as it is now?
                 sourceSamplePosition = startingPosition * pitchRatio;
                 if (playLength >= sourceSamplePosition)
                 {
-                    //playEndPosition = (double)sound->rampOffSamples;
-                    playEndPosition = (double)voiceRampOff;
-                    //DBG("playEndPosition1 = " + String(playEndPosition / getSampleRate()));
+                    playEndPosition = (double)adsrRelease;
                 }
                 else
                 {
-                    //playEndPosition = (double)(startingPosition - playLength);
                     playEndPosition = (double)(sourceSamplePosition - playLength);
-                    //DBG("playEndPosition2 = " + String(playEndPosition / getSampleRate()));
                 }
             }
             else
@@ -228,35 +228,10 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         lgain = gain;
         rgain = gain;
         
-        isInRampOn = (voiceRampOn > 0);
-        isInRampOff = false;
-        
         adsr.keyOn();
         
         noteStartingPosition = sourceSamplePosition;
         noteEndPosition = playEndPosition;
-        
-        
-        if (isInRampOn)
-        {
-            rampOnOffLevel = 0.0f;
-            //rampOnDelta = (float) (pitchRatio / sound->rampOnSamples);
-            rampOnDelta = (float) (pitchRatio / voiceRampOn);
-        }
-        else
-        {
-            rampOnOffLevel = 1.0f;
-            rampOnDelta = 0.0f;
-        }
-        
-        if (voiceRampOff > 0)
-        {
-            rampOffDelta = (float) (-pitchRatio / voiceRampOff);
-        }
-        else
-        {
-            rampOffDelta = -1.0f;
-        }
     }
     else
     {
@@ -270,9 +245,6 @@ void BKPianoSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
 {
     if (allowTailOff)
     {
-        isInRampOn = false;
-        isInRampOff = true;
-        
         adsr.keyOff();
     }
     else
@@ -300,16 +272,14 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
         
         const float* const inL = playingSound->data->getAudioSampleBuffer()->getReadPointer (0);
         const float* const inR = playingSound->data->getAudioSampleBuffer()->getNumChannels() > 1
-        ? playingSound->data->getAudioSampleBuffer()->getReadPointer (1) : nullptr;
-        
+                               ? playingSound->data->getAudioSampleBuffer()->getReadPointer (1)
+                               : nullptr;
         
         float* outL = outputBuffer.getWritePointer (0, startSample);
         float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
         
-        
         while (--numSamples >= 0)
         {
-            
             if (playDirection == Reverse && sourceSamplePosition > playingSound->soundLength)
             {
                 if (outR != nullptr)
@@ -335,48 +305,14 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
             
             l *= lgain;
             r *= rgain;
+
+            l *= adsr.tick();
+            r *= adsr.lastOut();
             
-            if(originalRamp)
+            if (adsr.getState() == stk::ADSR::IDLE)
             {
-                if (isInRampOn)
-                {
-                    l *= rampOnOffLevel;
-                    r *= rampOnOffLevel;
-                    
-                    rampOnOffLevel += rampOnDelta;
-                    
-                    if (rampOnOffLevel >= 1.0f)
-                    {
-                        rampOnOffLevel = 1.0f;
-                        isInRampOff = false;
-                        isInRampOn = false; //wasn't here before!
-                    }
-                }
-                else if (isInRampOff)
-                {
-                    l *= rampOnOffLevel;
-                    r *= rampOnOffLevel;
-                    
-                    rampOnOffLevel += rampOffDelta;
-                    
-                    if (rampOnOffLevel <= 0.0f)
-                    {
-                        stopNote (0.0f, false);
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                l *= adsr.tick();
-                r *= adsr.lastOut();
-                
-                if (adsr.getState() == stk::ADSR::IDLE)
-                {
-                    stopNote (0.0f, false);
-                    //DBG("ABOUT TO BREAK");
-                    break;
-                }
+                stopNote (0.0f, false);
+                break;
             }
 
             if (outR != nullptr)
@@ -392,64 +328,41 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
             if (playDirection == Forward)
             {
                 sourceSamplePosition += pitchRatio;
-                
-            
+
                 if (sourceSamplePosition >= playEndPosition)
                 {
-                    //stopNote (0.0f, true);
                     if (adsr.getState() != stk::ADSR::RELEASE)
                     {
                         adsr.keyOff();
-                        //DBG("keyOff reverse note");
                     }
-                    //if (!originalRamp) adsr.keyOff();
-                    //else if (!isInRampOff) stopNote (0.0f, true);
-                    //DBG("stopping forward note, playEndPosition = " + String(playEndPosition * 1000./getSampleRate()));
                 }
-                
                 if(sourceSamplePosition >= playingSound->soundLength)
                 {
                     clearCurrentNote();
-                    //DBG("forward sound reached end of file");
                 }
             }
             else if (playDirection == Reverse)
             {
                 sourceSamplePosition -= pitchRatio;
-                
-#if !CRAY_COOL_MUSIC_MAKER_2
-                
+         
                 if (sourceSamplePosition <= playEndPosition)
                 {
-                    //stopNote (0.0f, true);
-                    //DBG("stopping reverse note, playEndPosition = " + String(playEndPosition * 1000./getSampleRate()));
                     if (adsr.getState() != stk::ADSR::RELEASE)
                     {
                         adsr.keyOff();
-                        //DBG("keyOff reverse note");
                     }
-                    //else if (!isInRampOff) stopNote (0.0f, true);
                 }
-                
                 if(sourceSamplePosition <= 0)
                 {
                     clearCurrentNote();
-                    //DBG("reverse sound reached beginning of file");
                 }
-
-                
-#endif
             }
             else
             {
                 DBG("Invalid note direction.");
             }
-            
-            
-            
         }
     }
-    
 }
 
 

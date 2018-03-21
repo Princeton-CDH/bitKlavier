@@ -130,6 +130,19 @@ public:
                             int voiceRampOff,
                             BKSynthesiserSound* sound) = 0;
     
+    virtual void startNote (float midiNoteNumber,
+                            float gain,
+                            PianoSamplerNoteDirection direction,
+                            PianoSamplerNoteType type,
+                            BKNoteType bktype,
+                            uint64 startingPosition,
+                            uint64 length,
+                            int adsrAttack,
+                            int adsrDecay,
+                            float adsrSustain,
+                            int adsrRelease,
+                            BKSynthesiserSound* sound) = 0;
+    
     /** Called to stop a note.
      
      This will be called during the rendering callback, so must be fast and thread-safe.
@@ -411,6 +424,23 @@ public:
                         float rampOnMS,
                         float rampOffMS);
     
+    virtual void keyOn (int midiChannel,
+                        int keyNoteNumber,
+                        int midiNoteNumber,
+                        float transp,
+                        float velocity,
+                        float gain,
+                        PianoSamplerNoteDirection direction,
+                        PianoSamplerNoteType type,
+                        BKNoteType bktype,
+                        int layer,
+                        float startingPositionMS,
+                        float lengthMS,
+                        float adsrAttackMS,
+                        float adsrDecayMS,
+                        float adsrSustain,
+                        float adsrReleaseMS);
+    
     /** Triggers a note-off event.
      
      This will turn off any voices that are playing a sound for the given note/channel.
@@ -646,6 +676,24 @@ protected:
                      uint64 length,
                      int voiceRampOn,
                      int voiceRampOff);
+    
+    void startVoice (BKSynthesiserVoice* voice,
+                     BKSynthesiserSound* sound,
+                     int midiChannel,
+                     int keyNoteNumber,
+                     int midiNoteNumber,
+                     float midiNoteNumberOffset,
+                     float gain,
+                     PianoSamplerNoteDirection direction,
+                     PianoSamplerNoteType type,
+                     BKNoteType bktype,
+                     int layer,
+                     uint64 startingPosition,
+                     uint64 length,
+                     int adsrAttack,
+                     int adsrDecay,
+                     float adsrSustain,
+                     int adsrRelease);
     
     /** Stops a given voice.
      You should never need to call this, it's used internally by noteOff, but is protected

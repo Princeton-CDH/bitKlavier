@@ -123,6 +123,21 @@ public:
                     BKSynthesiserSound* sound
                     ) override;
     
+    void startNote (
+                    float midiNoteNumber,
+                    float velocity,
+                    PianoSamplerNoteDirection direction,
+                    PianoSamplerNoteType type,
+                    BKNoteType bktype,
+                    uint64 startingPosition,
+                    uint64 length,
+                    int adsrAttack,
+                    int adsrDecay,
+                    float adsrSustain,
+                    int adsrRelease,
+                    BKSynthesiserSound* sound
+                    ) override;
+    
     void stopNote (float velocity, bool allowTailOff) override;
     
     void pitchWheelMoved (int newValue) override;
@@ -151,7 +166,6 @@ private:
     bool isInRampOn, isInRampOff;    
     
     stk::ADSR adsr;
-    bool originalRamp; //true is using original rampUp/Down and not adsr
     
     JUCE_LEAK_DETECTOR (BKPianoSamplerVoice)
 };

@@ -303,6 +303,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     }
     
     //==============================================================================
+    
     void BKSynthesiser::keyOn (const int midiChannel,
                                const int keyNoteNumber,
                                const int midiNoteNumber,
@@ -317,6 +318,42 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                const float lengthMS,
                                const float rampOnMS, //included in lengthMS
                                const float rampOffMS //included in lengthMS
+                               )
+    {
+                    keyOn   (midiChannel,
+                             keyNoteNumber,
+                             midiNoteNumber,
+                             transp,
+                             velocity,
+                             gain,
+                             direction,
+                             type,
+                             bktype,
+                             layer,
+                             startingPositionMS,
+                             lengthMS,
+                             rampOnMS,
+                             3.,
+                             1.,
+                             rampOffMS);
+    }
+    
+    void BKSynthesiser::keyOn (const int midiChannel,
+                               const int keyNoteNumber,
+                               const int midiNoteNumber,
+                               const float transp,
+                               const float velocity,
+                               const float gain,
+                               PianoSamplerNoteDirection direction,
+                               PianoSamplerNoteType type,
+                               BKNoteType bktype,
+                               int layer,
+                               const float startingPositionMS,
+                               const float lengthMS,
+                               float adsrAttackMS,
+                               float adsrDecayMS,
+                               float adsrSustain,
+                               float adsrReleaseMS
                                )
     {
         const ScopedLock sl (lock);
@@ -351,8 +388,10 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                             layer,
                             (uint64)((startingPositionMS * 0.001f) * getSampleRate()),
                             (uint64)(lengthMS*0.001f* getSampleRate()),
-                            rampOnMS*0.001f* getSampleRate(),
-                            rampOffMS*0.001f* getSampleRate());
+                            adsrAttackMS*0.001f* getSampleRate(),
+                            adsrDecayMS*0.001f* getSampleRate(),
+                            adsrSustain,
+                            adsrReleaseMS*0.001f* getSampleRate());
                 
             }
         }
@@ -373,6 +412,45 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                     const uint64 length,
                                     int voiceRampOn,
                                     int voiceRampOff
+                                    )
+    {
+                    startVoice      (voice,
+                                     sound,
+                                     midiChannel,
+                                     keyNoteNumber,
+                                     midiNoteNumber,
+                                     midiNoteNumberOffset,
+                                     volume,
+                                     direction,
+                                     type,
+                                     bktype,
+                                     layer,
+                                     startingPosition,
+                                     length,
+                                     voiceRampOn,
+                                     3.*0.001f* getSampleRate(),
+                                     1.,
+                                     30.*0.001f* getSampleRate());
+    }
+    
+    
+    void BKSynthesiser::startVoice (BKSynthesiserVoice* const voice,
+                                    BKSynthesiserSound* const sound,
+                                    const int midiChannel,
+                                    const int keyNoteNumber,
+                                    const int midiNoteNumber,
+                                    const float midiNoteNumberOffset,
+                                    const float volume,
+                                    PianoSamplerNoteDirection direction,
+                                    PianoSamplerNoteType type,
+                                    BKNoteType bktype,
+                                    int layer,
+                                    const uint64 startingPosition,
+                                    const uint64 length,
+                                    int adsrAttack,
+                                    int adsrDecay,
+                                    float adsrSustain,
+                                    int adsrRelease
                                     )
     {
         if (voice != nullptr && sound != nullptr)
@@ -408,8 +486,10 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                               bktype,
                               startingPosition,
                               length,
-                              voiceRampOn,
-                              voiceRampOff,
+                              adsrAttack,
+                              adsrDecay,
+                              adsrSustain,
+                              adsrRelease,
                               sound);
         }
     }
