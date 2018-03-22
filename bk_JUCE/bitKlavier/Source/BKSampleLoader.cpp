@@ -170,7 +170,7 @@ void BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
                         
                         BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels),(int)maxLength);
                         sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
-                        
+
                         synth->addSound(new BKPianoSamplerSound(soundName,
                                                                         newBuffer,
                                                                         maxLength,

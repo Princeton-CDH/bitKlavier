@@ -334,8 +334,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             
             // Check if sound applies to note, velocity, and channel.
             if (sound->appliesToNote (noteNumber)
-                && sound->appliesToVelocity((int)(velocity * 127.0))
-                && sound->appliesToChannel (midiChannel))
+                && sound->appliesToVelocity((int)(velocity * 127.0)))
             {
                 //DBG("BKSynthesiser::keyOn " + String(noteNumber));
                 startVoice (findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes),
@@ -380,11 +379,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             if (voice->currentlyPlayingSound != nullptr)
                 voice->stopNote (0.0f, false);
             
-#if CRAY_COOL_MUSIC_MAKER
-            voice->currentlyPlayingNote = (float)midiNoteNumber + midiNoteNumberOffset;
-#else
-            voice->currentlyPlayingNote = midiNoteNumber; //midiNoteNumber + (int)midiNoteNumberOffset)
-#endif      
+            voice->currentlyPlayingNote = midiNoteNumber; //midiNoteNumber + (int)midiNoteNumberOffset)  
             voice->layerId = layerToLayerId(bktype, layer);
             voice->length = (int)length;
             voice->type = type;
@@ -400,8 +395,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             
             float gain = volume;
 
-            voice->startNote (
-                              (float)midiNoteNumber+midiNoteNumberOffset,
+            voice->startNote ((float)midiNoteNumber+midiNoteNumberOffset,
                               gain,
                               direction,
                               type,

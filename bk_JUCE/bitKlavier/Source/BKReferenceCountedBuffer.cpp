@@ -33,3 +33,8 @@ AudioSampleBuffer* BKReferenceCountedBuffer::getAudioSampleBuffer()
 {
     return &buffer;
 }
+
+void BKReferenceCountedBuffer::setAudioSampleBuffer(AudioSampleBuffer* from)
+{
+
+}

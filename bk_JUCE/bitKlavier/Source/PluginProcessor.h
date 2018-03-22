@@ -67,10 +67,18 @@ public:
     
     BKUpdateState::Ptr                  updateState;
 
+    void mySF2Read(sfzero::SF2Sound* sound_, sfzero::SF2Reader* reader, File* file_);
+    
+    AudioFormatManager formatManager;
+    ScopedPointer<AudioFormatReader> sampleReader;
+    ScopedPointer<AudioSampleBuffer> sampleBuffer;
+    
     // Synthesisers.
     BKSynthesiser                       mainPianoSynth;
     BKSynthesiser                       hammerReleaseSynth;
     BKSynthesiser                       resonanceReleaseSynth;
+    
+    //sfzero::Synth                       synth;
     
     Piano::Ptr                          prevPiano;
     Piano::Ptr                          currentPiano;

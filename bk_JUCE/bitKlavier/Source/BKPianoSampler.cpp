@@ -19,7 +19,8 @@ BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                           const BigInteger& notes,
                                           const int rootMidiNote,
                                           const BigInteger& velocities)
-: name (soundName),
+:
+name (soundName),
 data(buffer),
 sourceSampleRate(sourceSampleRate),
 midiNotes (notes),
@@ -89,9 +90,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
     if (const BKPianoSamplerSound* const sound = dynamic_cast<const BKPianoSamplerSound*> (s))
     {
         
-        //DBG(sound->getName());
-        //DBG("startNote: getting tuning ratio " + String(generalSettings->getTuningRatio()));
-        
         pitchRatio = powf(2.0f, (midiNoteNumber - (float)sound->midiRootNote) / 12.0f)
                         * sound->sourceSampleRate
                         * generalSettings->getTuningRatio()
@@ -134,13 +132,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             {
                 sourceSamplePosition = startingPosition;
                 playEndPosition = jmin( (startingPosition + playLength), maxLength) - 1;
-                /*
-                 DBG("starting forward note, starting position = "
-                 + String(startingPosition * 1000./getSampleRate())
-                 + " ending position = "
-                 + String(playEndPosition * 1000./getSampleRate())
-                 );
-                 */
             }
             else
             {

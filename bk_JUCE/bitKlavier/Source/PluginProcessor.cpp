@@ -171,6 +171,20 @@ loader(*this)
     
 }
 
+/*
+void BKAudioProcessor::myLoadRegions()
+{
+    sfzero::SF2Reader reader(this, getFile());
+    
+    reader.read();
+    
+    // Sort the presets.
+    PresetComparator comparator;
+    presets_.sort(comparator);
+    
+    useSubsound(0);
+}
+ */
 #define SFZ_TEST 1
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -181,7 +195,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     hammerReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     resonanceReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     
-    mainPianoSynth.setGeneralSettings(gallery->getGeneralSettings());
+    //mainPianoSynth.setGeneralSettings(gallery->getGeneralSettings());
     resonanceReleaseSynth.setGeneralSettings(gallery->getGeneralSettings());
     hammerReleaseSynth.setGeneralSettings(gallery->getGeneralSettings());
     
@@ -190,19 +204,62 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     gallery->prepareToPlay(sampleRate);
     
 #if SFZ_TEST
+    
     for (int i = 0; i < 300; ++i)
     {
         mainPianoSynth.addVoice(new BKPianoSamplerVoice(gallery->getGeneralSettings()));
     }
     
     AudioFormatManager formatManager;
-    auto sfzFile = File("/Users/airship/soundfonts/Drum\ \&\ Percussion\ Soundfonts/1115-Standard\ Rock\ Set.sf2");
-    auto sound = new sfzero::Sound(sfzFile);
+    
+    auto sfzFile =  File("/Users/airship/soundfonts/drums/GoldDrums.sf2");
+    
+    auto sound = new sfzero::SF2Sound(sfzFile);
+    
+    auto reader = new sfzero::SF2Reader(sound, sfzFile);
+    
+    mainPianoSynth.clearSounds();
+    
+    
     sound->loadRegions();
     sound->loadSamples(&formatManager);
     
-    mainPianoSynth.clearSounds();
-    mainPianoSynth.addSound(sound);
+    for (auto region : sound->getRegions())
+    {
+        DBG("R: "+region->dump());
+        
+        int64 sampleStart = region->loop_start;
+        int64 sampleLength = region->loop_end - sampleStart;
+        double sourceSampleRate = region->sample->getSampleRate();
+        
+        DBG("start: " + String(region->loop_start) + " end: " + String(region->loop_end) + " len: " + String(region->loop_end - region->loop_start));
+        
+        
+        AudioSampleBuffer* sourceBuffer = region->sample->getBuffer();
+        
+        BKReferenceCountedBuffer::Ptr buffer = new BKReferenceCountedBuffer(region->sample->getShortName(), 1, (int)sampleLength);
+        
+        AudioSampleBuffer* destBuffer = buffer->getAudioSampleBuffer();
+        
+        destBuffer->copyFrom(0, 0, sourceBuffer->getReadPointer(0, sampleStart), (int)sampleLength);
+        
+        DBG("dest: " + String(destBuffer->getNumSamples()) + " " + String(destBuffer->getNumChannels()));
+        
+        int nbits = region->hikey - region->lokey; nbits = (nbits > 0) ? nbits : 1;
+        int vbits = region->hivel - region->lovel; vbits = (vbits > 0) ? vbits : 1;
+        BigInteger nrange; nrange.setRange(region->lokey, nbits, true);
+        BigInteger vrange; vrange.setRange(region->lovel, vbits, true);
+        
+        mainPianoSynth.addSound(new BKPianoSamplerSound(region->sample->getShortName(),
+                                                        buffer,
+                                                        sampleLength,
+                                                        sourceSampleRate,
+                                                        nrange,
+                                                        region->pitch_keycenter,
+                                                        vrange));
+    }
+
+    didLoadMainPianoSamples = true;
     
 #else
     
