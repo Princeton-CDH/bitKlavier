@@ -697,7 +697,8 @@ private:
 
 class BKADSRSlider :
 public Component,
-public BKSingleSlider::Listener
+public BKSingleSlider::Listener,
+public BKTextButton::Listener
 #if JUCE_IOS
 , public WantsBigOne
 #endif
@@ -714,6 +715,11 @@ public:
     
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName()                { return sliderName; }
+    
+    void setButtonText(String buttonText)
+    {
+        adsrButton.setButtonText(buttonText);
+    }
     
     void setAttackValue(int newval, NotificationType notify)
     {
@@ -740,6 +746,8 @@ public:
     }
     
     void BKSingleSliderValueChanged(String name, double val) override;
+    void buttonStateChanged (Button*) override;
+    void buttonClicked (Button*) override;
     
     void resized() override;
     
@@ -752,6 +760,7 @@ public:
         virtual ~Listener() {};
         
         virtual void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) = 0;
+        virtual void BKADSRButtonStateChanged(bool state) = 0;
     };
     
     ListenerList<Listener> listeners;
@@ -768,8 +777,10 @@ private:
     
     String sliderName;
     BKLabel showName;
+    BKTextButton adsrButton;
 
     bool justifyRight;
+    bool isButtonOnly;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKADSRSlider)
     

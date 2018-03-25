@@ -2450,31 +2450,36 @@ sliderName(name)
     showName.setText(sliderName, dontSendNotification);
     if(justifyRight) showName.setJustificationType(Justification::bottomRight);
     else showName.setJustificationType(Justification::bottomLeft);
-    addAndMakeVisible(showName);
+    //addAndMakeVisible(showName);
     
-    attackSlider = new BKSingleSlider("attack time (ms)", 1, 1000, 10, 1);
+    attackSlider = new BKSingleSlider("attack time", 1, 1000, 10, 1);
     attackSlider->setSkewFactorFromMidPoint(200);
-    attackSlider->setJustifyRight(false);
+    attackSlider->setJustifyRight(true);
     attackSlider->addMyListener(this);
     addAndMakeVisible(attackSlider);
     
-    decaySlider = new BKSingleSlider("decay time (ms)", 1, 1000, 10, 1);
+    decaySlider = new BKSingleSlider("decay time", 1, 1000, 10, 1);
     decaySlider->setSkewFactorFromMidPoint(200);
     decaySlider->setJustifyRight(false);
     decaySlider->addMyListener(this);
     addAndMakeVisible(decaySlider);
     
     sustainSlider = new BKSingleSlider("sustain level", 0., 1., 1., 0.001);
-    sustainSlider->setJustifyRight(false);
+    sustainSlider->setJustifyRight(true);
     sustainSlider->addMyListener(this);
     addAndMakeVisible(sustainSlider);
     
-    releaseSlider = new BKSingleSlider("release time (ms)", 1, 1000, 30, 1);
+    releaseSlider = new BKSingleSlider("release time", 1, 1000, 30, 1);
     releaseSlider->setSkewFactorFromMidPoint(200);
     releaseSlider->setJustifyRight(false);
     releaseSlider->addMyListener(this);
     addAndMakeVisible(releaseSlider);
     
+    adsrButton.setButtonText("ADSR");
+    adsrButton.addListener(this);
+    addAndMakeVisible(adsrButton);
+    
+    isButtonOnly = true;
 }
 
 void BKADSRSlider::setDim(float alphaVal)
@@ -2524,11 +2529,25 @@ void BKADSRSlider::BKSingleSliderValueChanged(String name, double val)
                    releaseSlider->getValue());
 }
 
+void BKADSRSlider::buttonStateChanged (Button*)
+{
+
+    
+}
+
+void BKADSRSlider::buttonClicked (Button*)
+{
+    if(isButtonOnly) isButtonOnly = false;
+    else isButtonOnly = true;
+    resized();
+    listeners.call(&BKADSRSlider::Listener::BKADSRButtonStateChanged, isButtonOnly);
+}
 
 void BKADSRSlider::resized()
 {
     
     Rectangle<int> area (getLocalBounds());
+    /*
     Rectangle<int> topSlab (area.removeFromTop(gComponentTextFieldHeight));
     
     if(justifyRight)
@@ -2541,11 +2560,25 @@ void BKADSRSlider::resized()
         topSlab.removeFromLeft(5);
         showName.setBounds(topSlab.removeFromLeft(getWidth() - 150));
     }
+     */
     
-    attackSlider->setBounds(area.removeFromTop(gComponentSingleSliderHeight));
-    decaySlider->setBounds(area.removeFromTop(gComponentSingleSliderHeight));
-    sustainSlider->setBounds(area.removeFromTop(gComponentSingleSliderHeight));
-    releaseSlider->setBounds(area.removeFromTop(gComponentSingleSliderHeight));
+    if(!isButtonOnly)
+    {
+        adsrButton.setBounds(area.removeFromBottom(gComponentComboBoxHeight));
+        Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
+        
+        attackSlider->setBounds(leftColumn.removeFromTop(gComponentSingleSliderHeight));
+        decaySlider->setBounds(area.removeFromTop(gComponentSingleSliderHeight));
+        leftColumn.removeFromTop(gYSpacing * 2);
+        area.removeFromTop(gYSpacing * 2);
+        sustainSlider->setBounds(leftColumn.removeFromTop(gComponentSingleSliderHeight));
+        releaseSlider->setBounds(area.removeFromTop(gComponentSingleSliderHeight));
+    }
+    else
+    {
+        adsrButton.setBounds(area);
+    }
+    
 
     
 }

@@ -44,6 +44,7 @@ BKViewController(p, theGraph)
     addAndMakeVisible(hammerGainSlider);
     
     ADSRSlider = new BKADSRSlider("ADSR");
+    ADSRSlider->setButtonText("edit ADSR");
     addAndMakeVisible(ADSRSlider);
     
     
@@ -57,12 +58,40 @@ BKViewController(p, theGraph)
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
+    
+    showADSR = false;
 }
 
 void DirectViewController::paint (Graphics& g)
 {
     g.fillAll(Colours::black);
 }
+
+void DirectViewController::setShowADSR(bool newval)
+{
+    showADSR = newval;
+    
+    if(showADSR)
+    {
+        resonanceGainSlider->setVisible(false);
+        hammerGainSlider->setVisible(false);
+        gainSlider->setVisible(false);
+        transpositionSlider->setVisible(false);
+        
+        ADSRSlider->setButtonText("close ADSR");
+
+    }
+    else
+    {
+        resonanceGainSlider->setVisible(true);
+        hammerGainSlider->setVisible(true);
+        gainSlider->setVisible(true);
+        transpositionSlider->setVisible(true);
+        
+        ADSRSlider->setButtonText("edit ADSR");
+    }
+    
+    resized();}
 
 void DirectViewController::resized()
 {
@@ -71,6 +100,8 @@ void DirectViewController::resized()
     iconImageComponent.setBounds(area);
     area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
     
+    Rectangle<int> areaSave = area;
+
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
     comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * processor.paddingScalarX);
@@ -96,49 +127,67 @@ void DirectViewController::resized()
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
     
-    Rectangle<int> sliderSlice = leftColumn;
-    sliderSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
-    //sliderSlice.removeFromLeft(gXSpacing);
-    /*
-     sliderSlice.reduce(4 + 2.*gPaddingConst * processor.paddingScalarX,
-     4 + 2.*gPaddingConst * processor.paddingScalarY);
-     */
-    
-    int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 5.;
-    resonanceGainSlider->setBounds(sliderSlice.getX(),
-                                   nextCenter - gComponentSingleSliderHeight/2 + 8,
-                                   sliderSlice.getWidth(),
-                                   gComponentSingleSliderHeight);
-    
-    nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 2.;
-    hammerGainSlider->setBounds(sliderSlice.getX(),
-                                nextCenter - gComponentSingleSliderHeight/2 + 8,
-                                sliderSlice.getWidth(),
-                                gComponentSingleSliderHeight);
-    
-    nextCenter = sliderSlice.getY() + 4. * sliderSlice.getHeight() / 5.;
-    gainSlider->setBounds(sliderSlice.getX(),
-                          nextCenter - gComponentSingleSliderHeight/2 + 4,
-                          sliderSlice.getWidth(),
-                          gComponentSingleSliderHeight);
-    
-    //leftColumn.reduce(4, 0);
-    area.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
-    area.removeFromRight(gXSpacing);
-    
-    /*
-    transpositionSlider->setBounds(area.getX(),
-                                   resonanceGainSlider->getY(),
-                                   area.getWidth(),
-                                   gComponentStackedSliderHeight + processor.paddingScalarY * 30);
-     */
-    
-    area.removeFromTop(gYSpacing + 4.*gPaddingConst * processor.paddingScalarY);
-    transpositionSlider->setBounds(area.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
-    
-    area.removeFromTop(gYSpacing + 6.*gPaddingConst * processor.paddingScalarY);
-    ADSRSlider->setBounds(area.removeFromTop(5*gComponentSingleSliderHeight));
-    
+    if(!showADSR)
+    {
+        Rectangle<int> sliderSlice = leftColumn;
+        sliderSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
+        //sliderSlice.removeFromLeft(gXSpacing);
+        /*
+         sliderSlice.reduce(4 + 2.*gPaddingConst * processor.paddingScalarX,
+         4 + 2.*gPaddingConst * processor.paddingScalarY);
+         */
+        
+        int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 5.;
+        resonanceGainSlider->setBounds(sliderSlice.getX(),
+                                       nextCenter - gComponentSingleSliderHeight/2 + 8,
+                                       sliderSlice.getWidth(),
+                                       gComponentSingleSliderHeight);
+        
+        nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 2.;
+        hammerGainSlider->setBounds(sliderSlice.getX(),
+                                    nextCenter - gComponentSingleSliderHeight/2 + 8,
+                                    sliderSlice.getWidth(),
+                                    gComponentSingleSliderHeight);
+        
+        nextCenter = sliderSlice.getY() + 4. * sliderSlice.getHeight() / 5.;
+        gainSlider->setBounds(sliderSlice.getX(),
+                              nextCenter - gComponentSingleSliderHeight/2 + 4,
+                              sliderSlice.getWidth(),
+                              gComponentSingleSliderHeight);
+        
+        
+        
+        //leftColumn.reduce(4, 0);
+        area.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
+        area.removeFromRight(gXSpacing);
+        
+        
+        transpositionSlider->setBounds(area.getX(),
+                                       resonanceGainSlider->getY(),
+                                       area.getWidth(),
+                                       gComponentStackedSliderHeight + processor.paddingScalarY * 30);
+        
+        
+        //area.removeFromTop(gComponentComboBoxHeight);
+        //transpositionSlider->setBounds(area.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 40));
+        
+        //area.removeFromTop(gYSpacing + 6.*gPaddingConst * processor.paddingScalarY);
+        //ADSRSlider->setBounds(area.removeFromTop(5*gComponentSingleSliderHeight));
+        
+        //area.removeFromBottom(gYSpacing + 6.*gPaddingConst * processor.paddingScalarY);
+        //ADSRSlider->setBounds(area.removeFromBottom(gComponentComboBoxHeight));
+        
+        ADSRSlider->setBounds(area.getX(),
+                              gainSlider->getY(),
+                              area.getWidth(),
+                              gComponentComboBoxHeight);
+    }
+    else
+    {
+        areaSave.removeFromTop(gComponentComboBoxHeight * 2 + gYSpacing + 8.*gPaddingConst * processor.paddingScalarY);
+        ADSRSlider->setBounds(areaSave);
+        selectCB.toFront(false);
+    }
 }
 
 #if JUCE_IOS
@@ -368,6 +417,12 @@ void DirectPreparationEditor::BKADSRSliderValueChanged(String name, int attack, 
     prep->setRelease(release);
     active->setRelease(release);
 }
+
+void DirectPreparationEditor::BKADSRButtonStateChanged(bool state)
+{
+    setShowADSR(!state);
+}
+
 
 void DirectPreparationEditor::fillSelectCB(int last, int current)
 {

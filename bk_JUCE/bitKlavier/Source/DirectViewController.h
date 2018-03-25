@@ -12,6 +12,7 @@
 
 #include "BKViewController.h"
 
+//==============================================================================
 
 class DirectViewController :
 public BKViewController
@@ -35,9 +36,11 @@ public:
     ScopedPointer<BKSingleSlider> hammerGainSlider;
     
     ScopedPointer<BKADSRSlider> ADSRSlider;
-
+    
     void paint (Graphics&) override;
     void resized() override;
+    
+    void setShowADSR(bool newval);
     
     virtual void update(void) {};
     
@@ -46,7 +49,8 @@ public:
 #endif
     
 private:
-
+    
+    bool showADSR;
 
 };
 
@@ -73,9 +77,10 @@ public:
     
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
     void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
+    void BKADSRButtonStateChanged(bool state) override;
     
     void fillSelectCB(int last, int current);
-    
+
     static void actionButtonCallback(int action, DirectPreparationEditor*);
     
     int addPreparation(void);
@@ -84,8 +89,7 @@ public:
     void deleteCurrent(void);
     
 private:
-    
-    
+
     
 };
 
