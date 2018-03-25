@@ -30,6 +30,9 @@ typedef enum KeySet
     KeySetMajorSeven,
     KeySetDomSeven,
     KeySetMinorSeven,
+    KeySetMajor,
+    KeySetNaturalMinor,
+    KeySetHarmonicMinor,
     KeySetNil
 } KeySet;
 
@@ -72,6 +75,11 @@ public:
     Array<int> majorseven = {0,4,7,11};
     Array<int> domseven = {0,4,7,10};
     Array<int> minorseven = {0,3,7,10};
+    
+    Array<int> major = {0,2,4,5,7,9,11};
+    Array<int> naturalminor = {0,2,3,5,7,8,10};
+    Array<int> harmonicminor = {0,2,3,5,7,8,11};
+    
     Array<int> allpc = {0};
     
     Keymap(int Id):
@@ -318,6 +326,9 @@ public:
         else if (set == KeySetDomSeven)            chord = domseven;
         else if (set == KeySetMinorSeven)          chord = minorseven;
         else if (set == KeySetAllPC)               chord = allpc;
+        else if (set == KeySetMajor)               chord = major;
+        else if (set == KeySetNaturalMinor)        chord = naturalminor;
+        else if (set == KeySetHarmonicMinor)       chord = harmonicminor;
         else                                       return;
         
         for (int note = 0; note < 128; note++)
