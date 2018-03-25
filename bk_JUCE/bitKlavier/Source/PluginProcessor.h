@@ -67,7 +67,11 @@ public:
     
     BKUpdateState::Ptr                  updateState;
 
-    void mySF2Read(sfzero::SF2Sound* sound_, sfzero::SF2Reader* reader, File* file_);
+    void loadSFZ(File sfzFile);
+    
+    void loadSF2(File sfzFile);
+    
+    void openSoundfont(void);
     
     AudioFormatManager formatManager;
     ScopedPointer<AudioFormatReader> sampleReader;

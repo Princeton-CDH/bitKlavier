@@ -70,7 +70,7 @@ void BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
     synth->clearSounds();
     
     // 88 or more seems to work well
-    for (int i = 0; i < 300; i++)   synth->addVoice(new BKPianoSamplerVoice(synth->generalSettings));
+    for (int i = 0; i < 300; i++)   synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
     
     
     for (int i = 0; i < 8; i++) {
@@ -213,7 +213,7 @@ void BKSampleLoader::loadResonanceReleaseSamples(void)
     synth->clearVoices();
     synth->clearSounds();
     
-    for (int i = 0; i < 88; i++)    synth->addVoice(new BKPianoSamplerVoice(synth->generalSettings));
+    for (int i = 0; i < 88; i++)    synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
 
     //load release resonance samples
     for (int i = 0; i < 7; i++) {       //i => octave
@@ -322,7 +322,7 @@ void BKSampleLoader::loadHammerReleaseSamples(void)
     synth->clearVoices();
     synth->clearSounds();
     
-    for (int i = 0; i < 88; i++)    synth->addVoice(new BKPianoSamplerVoice(synth->generalSettings));
+    for (int i = 0; i < 88; i++)    synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
     
     //load hammer release samples
     for (int i = 1; i <= 88; i++) {
