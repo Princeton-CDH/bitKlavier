@@ -285,6 +285,10 @@ void NostalgicPreparationEditor::BKEditableComboBoxChanged(String name, BKEditab
 void NostalgicPreparationEditor::update(void)
 {
     if (processor.updateState->currentNostalgicId < 0) return;
+    setShowADSR(reverseADSRSlider->getName(), false);
+    reverseADSRSlider->setIsButtonOnly(true);
+    setShowADSR(undertowADSRSlider->getName(), false);
+    undertowADSRSlider->setIsButtonOnly(true);
     
     NostalgicPreparation::Ptr prep = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
     

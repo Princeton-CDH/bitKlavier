@@ -226,6 +226,8 @@ DirectViewController(p, theGraph)
 void DirectPreparationEditor::update(void)
 {
     if (processor.updateState->currentDirectId < 0) return;
+    setShowADSR(false);
+    ADSRSlider->setIsButtonOnly(true);
     
     DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
 

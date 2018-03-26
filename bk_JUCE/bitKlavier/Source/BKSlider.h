@@ -738,6 +738,8 @@ public:
         releaseSlider->setValue(newval, notify);
     }
     
+    void setIsButtonOnly(bool state) { isButtonOnly = state; }
+    
     void setJustifyRight(bool jr)
     {
         justifyRight = jr;
