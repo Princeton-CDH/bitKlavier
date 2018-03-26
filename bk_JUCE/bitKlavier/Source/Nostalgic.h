@@ -36,7 +36,15 @@ public:
     nGain(p->getGain()),
     nLengthMultiplier(p->getLengthMultiplier()),
     nBeatsToSkip(p->getBeatsToSkip()),
-    nMode(p->getMode())
+    nMode(p->getMode()),
+    nReverseAttack(p->getReverseAttack()),
+    nReverseDecay(p->getReverseDecay()),
+    nReverseRelease(p->getReverseRelease()),
+    nReverseSustain(p->getReverseSustain()),
+    nUndertowAttack(p->getUndertowAttack()),
+    nUndertowDecay(p->getUndertowDecay()),
+    nUndertowRelease(p->getUndertowRelease()),
+    nUndertowSustain(p->getUndertowSustain())
     {
         
     }
@@ -69,7 +77,15 @@ public:
     nGain(1.0),
     nLengthMultiplier(1.0),
     nBeatsToSkip(0.0),
-    nMode(NoteLengthSync)
+    nMode(NoteLengthSync),
+    nReverseAttack(30),
+    nReverseDecay(3),
+    nReverseRelease(50),
+    nReverseSustain(1.),
+    nUndertowAttack(50),
+    nUndertowDecay(3),
+    nUndertowRelease(2000),
+    nUndertowSustain(1.)
     {
 
     }
@@ -90,6 +106,14 @@ public:
         nLengthMultiplier = n->getLengthMultiplier();
         nBeatsToSkip = n->getBeatsToSkip();
         nMode = n->getMode();
+        nReverseAttack = n->getReverseAttack();
+        nReverseDecay = n->getReverseDecay();
+        nReverseSustain = n->getReverseSustain();
+        nReverseRelease = n->getReverseRelease();
+        nUndertowAttack = n->getUndertowAttack();
+        nUndertowDecay = n->getUndertowDecay();
+        nUndertowSustain = n->getUndertowSustain();
+        nUndertowRelease = n->getUndertowRelease();
     }
     
     inline bool compare (NostalgicPreparation::Ptr n)
@@ -100,6 +124,14 @@ public:
                 nGain == n->getGain() &&
                 nLengthMultiplier == n->getLengthMultiplier() &&
                 nBeatsToSkip == n->getBeatsToSkip() &&
+                nReverseAttack == n->getReverseAttack() &&
+                nReverseDecay == n->getReverseDecay() &&
+                nReverseSustain == n->getReverseSustain() &&
+                nReverseRelease == n->getReverseRelease() &&
+                nUndertowAttack == n->getUndertowAttack() &&
+                nUndertowDecay == n->getUndertowDecay() &&
+                nUndertowSustain == n->getUndertowSustain() &&
+                nUndertowRelease == n->getUndertowRelease() &&
                 nMode == n->getMode());
     }
     
@@ -114,6 +146,16 @@ public:
     inline const float getBeatsToSkip() const noexcept                     {return nBeatsToSkip;       }
     inline const NostalgicSyncMode getMode() const noexcept                {return nMode;              }
     
+    inline const int getReverseAttack() const noexcept                     {return nReverseAttack;        }
+    inline const int getReverseDecay() const noexcept                      {return nReverseDecay;         }
+    inline const float getReverseSustain() const noexcept                  {return nReverseSustain;       }
+    inline const int getReverseRelease() const noexcept                    {return nReverseRelease;       }
+    
+    inline const int getUndertowAttack() const noexcept                    {return nUndertowAttack;        }
+    inline const int getUndertowDecay() const noexcept                     {return nUndertowDecay;         }
+    inline const float getUndertowSustain() const noexcept                 {return nUndertowSustain;       }
+    inline const int getUndertowRelease() const noexcept                   {return nUndertowRelease;       }
+    
     inline void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
     inline void setUndertow(int undertow)                                  {nUndertow = undertow;                  }
     inline void setTransposition(Array<float> transposition)               {nTransposition = transposition;        }
@@ -121,6 +163,16 @@ public:
     inline void setLengthMultiplier(float lengthMultiplier)                {nLengthMultiplier = lengthMultiplier;  }
     inline void setBeatsToSkip(float beatsToSkip)                          {nBeatsToSkip = beatsToSkip;            }
     inline void setMode(NostalgicSyncMode mode)                            {nMode = mode;                          }
+    
+    inline void setReverseAttack(int val)                                  {nReverseAttack = val;         }
+    inline void setReverseDecay(int val)                                   {nReverseDecay = val;          }
+    inline void setReverseSustain(float val)                               {nReverseSustain = val;        }
+    inline void setReverseRelease(int val)                                 {nReverseRelease = val;        }
+    
+    inline void setUndertowAttack(int val)                                 {nUndertowAttack = val;         }
+    inline void setUndertowDecay(int val)                                  {nUndertowDecay = val;          }
+    inline void setUndertowSustain(float val)                              {nUndertowSustain = val;        }
+    inline void setUndertowRelease(int val)                                {nUndertowRelease = val;        }
 
     void print(void)
     {
@@ -152,6 +204,12 @@ private:
     float nLengthMultiplier;    //note-length mode: toscale reverse playback time
     float nBeatsToSkip;         //synchronic mode: beats to skip before reverse peak
     NostalgicSyncMode nMode;    //which sync mode to use
+    
+    int     nReverseAttack, nReverseDecay, nReverseRelease;         //reverse ADSR, in ms
+    float   nReverseSustain;
+    
+    int     nUndertowAttack, nUndertowDecay, nUndertowRelease;      //undertow ADSR, in ms
+    float   nUndertowSustain;
     
     //internal keymap for resetting internal values to static
     //Keymap::Ptr resetMap = new Keymap(0);

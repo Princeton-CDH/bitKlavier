@@ -760,7 +760,7 @@ public:
         virtual ~Listener() {};
         
         virtual void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) = 0;
-        virtual void BKADSRButtonStateChanged(bool state) = 0;
+        virtual void BKADSRButtonStateChanged(String name, bool state) = 0;
     };
     
     ListenerList<Listener> listeners;

@@ -55,6 +55,14 @@ BKViewController(p, theGraph)
     
     addAndMakeVisible(nDisplaySlider);
     
+    reverseADSRSlider = new BKADSRSlider("reverseEnvelope");
+    reverseADSRSlider->setButtonText("edit reverse envelope");
+    addAndMakeVisible(reverseADSRSlider);
+    
+    undertowADSRSlider = new BKADSRSlider("undertowEnvelope");
+    undertowADSRSlider->setButtonText("edit undertow envelope");
+    addAndMakeVisible(undertowADSRSlider);
+    
 #if JUCE_IOS
     beatsToSkipSlider->addWantsBigOneListener(this);
     gainSlider->addWantsBigOneListener(this);
@@ -63,11 +71,63 @@ BKViewController(p, theGraph)
     nDisplaySlider.addWantsBigOneListener(this);
 #endif
     
+    showADSR = false;
+    showReverseADSR = false;
+    showUndertowADSR = false;
+    
 }
 
 void NostalgicViewController::paint (Graphics& g)
 {
     g.fillAll(Colours::black);
+}
+
+void NostalgicViewController::setShowADSR(String name, bool newval)
+{
+    showADSR = newval;
+    
+    if(showADSR)
+    {
+        beatsToSkipSlider->setVisible(false);
+        gainSlider->setVisible(false);
+        lengthMultiplierSlider->setVisible(false);
+        transpositionSlider->setVisible(false);
+        nDisplaySlider.setVisible(false);
+        lengthModeSelectCB.setVisible(false);
+        
+        if(name == reverseADSRSlider->getName()) {
+            reverseADSRSlider->setButtonText("close  reverse envelope");
+            undertowADSRSlider->setVisible(false);
+            
+            showReverseADSR = true;
+            showUndertowADSR = false;
+        }
+        else if(name == undertowADSRSlider->getName()) {
+            undertowADSRSlider->setButtonText("close undertow envelope");
+            reverseADSRSlider->setVisible(false);
+            
+            showReverseADSR = false;
+            showUndertowADSR = true;
+        }
+    }
+    else
+    {
+        if(lengthModeSelectCB.getSelectedId() == 0) lengthMultiplierSlider->setVisible(true);
+        else beatsToSkipSlider->setVisible(true);
+        
+        gainSlider->setVisible(true);
+        transpositionSlider->setVisible(true);
+        nDisplaySlider.setVisible(true);
+        lengthModeSelectCB.setVisible(true);
+        
+        reverseADSRSlider->setVisible(true);
+        undertowADSRSlider->setVisible(true);
+        
+        if(name == reverseADSRSlider->getName()) reverseADSRSlider->setButtonText("edit reverse envelope");
+        else if(name == undertowADSRSlider->getName()) undertowADSRSlider->setButtonText("edit undertow envelope");
+    }
+    
+    resized();
 }
 
 void NostalgicViewController::resized()
@@ -76,6 +136,8 @@ void NostalgicViewController::resized()
     
     iconImageComponent.setBounds(area);
     area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+    
+    Rectangle<int> areaSave = area;
     
     Rectangle<int> nDisplayRow = area.removeFromBottom(100 + 80 * processor.paddingScalarY);
     nDisplayRow.reduce(0, 4);
@@ -99,41 +161,61 @@ void NostalgicViewController::resized()
     
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
-    
-    Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
-    modeSlice.removeFromRight(gXSpacing);
-    //modeSlice.reduce(4 + 2.*gPaddingConst * processor.paddingScalarX, 0);
-    //lengthModeSelectCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
-    lengthModeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
-    
-    Rectangle<int> sliderSlice = area;
-    sliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
-    //sliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
-    /*
-     sliderSlice.reduce(4 + 2.*gPaddingConst * processor.paddingScalarX,
-     4 + 2.*gPaddingConst * processor.paddingScalarY);
-     */
-    
-    int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 4.;
-    lengthMultiplierSlider->setBounds(sliderSlice.getX(),
-                                      nextCenter - gComponentSingleSliderHeight/2 + 8,
-                                      sliderSlice.getWidth(),
-                                      gComponentSingleSliderHeight);
-    beatsToSkipSlider->setBounds(lengthMultiplierSlider->getBounds());
-    
-    nextCenter = sliderSlice.getY() + 3. * sliderSlice.getHeight() / 4.;
-    gainSlider->setBounds(sliderSlice.getX(),
-                          nextCenter - gComponentSingleSliderHeight/2 + 4,
-                          sliderSlice.getWidth(),
-                          gComponentSingleSliderHeight);
-    
-    //leftColumn.reduce(4, 0);
-    leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
-    leftColumn.removeFromLeft(gXSpacing);
-    transpositionSlider->setBounds(leftColumn.getX(),
-                                   lengthMultiplierSlider->getY(),
-                                   leftColumn.getWidth(),
-                                   gComponentStackedSliderHeight + processor.paddingScalarY * 30);
+    if(!showADSR)
+    {
+        Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
+        modeSlice.removeFromRight(gXSpacing);
+        //modeSlice.reduce(4 + 2.*gPaddingConst * processor.paddingScalarX, 0);
+        //lengthModeSelectCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
+        lengthModeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
+        
+        Rectangle<int> sliderSlice = area;
+        sliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
+        //sliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
+        /*
+         sliderSlice.reduce(4 + 2.*gPaddingConst * processor.paddingScalarX,
+         4 + 2.*gPaddingConst * processor.paddingScalarY);
+         */
+        
+        int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 4.;
+        lengthMultiplierSlider->setBounds(sliderSlice.getX(),
+                                          nextCenter - gComponentSingleSliderHeight/2 + 8,
+                                          sliderSlice.getWidth(),
+                                          gComponentSingleSliderHeight);
+        beatsToSkipSlider->setBounds(lengthMultiplierSlider->getBounds());
+        
+        nextCenter = sliderSlice.getY() + 3. * sliderSlice.getHeight() / 4.;
+        gainSlider->setBounds(sliderSlice.getX(),
+                              nextCenter - gComponentSingleSliderHeight/2 + 4,
+                              sliderSlice.getWidth(),
+                              gComponentSingleSliderHeight);
+        
+        //leftColumn.reduce(4, 0);
+        leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
+        leftColumn.removeFromLeft(gXSpacing);
+        transpositionSlider->setBounds(leftColumn.getX(),
+                                       lengthMultiplierSlider->getY(),
+                                       leftColumn.getWidth(),
+                                       gComponentStackedSliderHeight + processor.paddingScalarY * 30);
+        
+        reverseADSRSlider->setBounds(leftColumn.getX(),
+                                      gainSlider->getY() + gComponentComboBoxHeight * 0.5,
+                                      leftColumn.getWidth() * 0.5 - gYSpacing,
+                                      gComponentComboBoxHeight);
+        
+        undertowADSRSlider->setBounds(leftColumn.getX() + leftColumn.getWidth() * 0.5 + gYSpacing,
+                                     gainSlider->getY() + gComponentComboBoxHeight * 0.5,
+                                     leftColumn.getWidth() * 0.5 - gYSpacing,
+                                     gComponentComboBoxHeight);
+    }
+    else
+    {
+        areaSave.removeFromTop(gComponentComboBoxHeight * 2 + gYSpacing + 8.*gPaddingConst * processor.paddingScalarY);
+        if(showReverseADSR) reverseADSRSlider->setBounds(areaSave);
+        else undertowADSRSlider->setBounds(areaSave);
+        
+        selectCB.toFront(false);
+    }
 }
 
 void NostalgicViewController::fillModeSelectCB(void)
@@ -174,6 +256,9 @@ NostalgicViewController(p, theGraph)
     beatsToSkipSlider->addMyListener(this);
     
     gainSlider->addMyListener(this);
+    
+    reverseADSRSlider->addMyListener(this);
+    undertowADSRSlider->addMyListener(this);
     
     startTimer(20);
 }
@@ -227,7 +312,17 @@ void NostalgicPreparationEditor::update(void)
             lengthMultiplierSlider->setVisible(false);
             beatsToSkipSlider->setVisible(true);
         }
-
+        
+        reverseADSRSlider->setAttackValue(prep->getReverseAttack(), dontSendNotification);
+        reverseADSRSlider->setDecayValue(prep->getReverseDecay(), dontSendNotification);
+        reverseADSRSlider->setSustainValue(prep->getReverseSustain(), dontSendNotification);
+        reverseADSRSlider->setReleaseValue(prep->getReverseRelease(), dontSendNotification);
+        
+        undertowADSRSlider->setAttackValue(prep->getUndertowAttack(), dontSendNotification);
+        undertowADSRSlider->setDecayValue(prep->getUndertowDecay(), dontSendNotification);
+        undertowADSRSlider->setSustainValue(prep->getUndertowSustain(), dontSendNotification);
+        undertowADSRSlider->setReleaseValue(prep->getUndertowRelease(), dontSendNotification);
+       
     }
     
 }
@@ -394,6 +489,45 @@ void NostalgicPreparationEditor::BKSingleSliderValueChanged(String name, double 
         prep->setGain(val);
         active->setGain(val);
     }
+}
+
+void NostalgicPreparationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
+{
+    DBG("received ADSR slider " + name);
+    
+    NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
+    NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
+    
+    if(name == reverseADSRSlider->getName())
+    {
+        prep->setReverseAttack(attack);
+        prep->setReverseDecay(decay);
+        prep->setReverseSustain(sustain);
+        prep->setReverseRelease(release);
+        active->setReverseAttack(attack);
+        active->setReverseDecay(decay);
+        active->setReverseSustain(sustain);
+        active->setReverseRelease(release);
+    }
+    else if(name == undertowADSRSlider->getName())
+    {
+        prep->setUndertowAttack(attack);
+        prep->setUndertowDecay(decay);
+        prep->setUndertowSustain(sustain);
+        prep->setUndertowRelease(release);
+        active->setUndertowAttack(attack);
+        active->setUndertowDecay(decay);
+        active->setUndertowSustain(sustain);
+        active->setUndertowRelease(release);
+    }
+
+}
+
+
+void NostalgicPreparationEditor::BKADSRButtonStateChanged(String name, bool state)
+{
+    //DBG("BKADSRButtonStateChanged " + name);
+    setShowADSR(name, !state);
 }
 
 void NostalgicPreparationEditor::BKStackedSliderValueChanged(String name, Array<float> val)

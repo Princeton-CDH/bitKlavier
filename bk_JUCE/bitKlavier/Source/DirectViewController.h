@@ -52,6 +52,7 @@ private:
     
     bool showADSR;
 
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DirectViewController)
 };
 
 class DirectPreparationEditor :
@@ -77,7 +78,7 @@ public:
     
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
     void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
-    void BKADSRButtonStateChanged(bool state) override;
+    void BKADSRButtonStateChanged(String name, bool state) override;
     
     void fillSelectCB(int last, int current);
 

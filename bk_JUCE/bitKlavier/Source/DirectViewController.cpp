@@ -44,7 +44,7 @@ BKViewController(p, theGraph)
     addAndMakeVisible(hammerGainSlider);
     
     ADSRSlider = new BKADSRSlider("ADSR");
-    ADSRSlider->setButtonText("edit ADSR");
+    ADSRSlider->setButtonText("edit envelope");
     addAndMakeVisible(ADSRSlider);
     
     
@@ -78,7 +78,7 @@ void DirectViewController::setShowADSR(bool newval)
         gainSlider->setVisible(false);
         transpositionSlider->setVisible(false);
         
-        ADSRSlider->setButtonText("close ADSR");
+        ADSRSlider->setButtonText("close envelope");
 
     }
     else
@@ -88,10 +88,12 @@ void DirectViewController::setShowADSR(bool newval)
         gainSlider->setVisible(true);
         transpositionSlider->setVisible(true);
         
-        ADSRSlider->setButtonText("edit ADSR");
+        ADSRSlider->setButtonText("edit envelope");
     }
     
-    resized();}
+    resized();
+    
+}
 
 void DirectViewController::resized()
 {
@@ -178,7 +180,7 @@ void DirectViewController::resized()
         //ADSRSlider->setBounds(area.removeFromBottom(gComponentComboBoxHeight));
         
         ADSRSlider->setBounds(area.getX(),
-                              gainSlider->getY(),
+                              gainSlider->getY() + gComponentComboBoxHeight * 0.5,
                               area.getWidth(),
                               gComponentComboBoxHeight);
     }
@@ -186,6 +188,7 @@ void DirectViewController::resized()
     {
         areaSave.removeFromTop(gComponentComboBoxHeight * 2 + gYSpacing + 8.*gPaddingConst * processor.paddingScalarY);
         ADSRSlider->setBounds(areaSave);
+        
         selectCB.toFront(false);
     }
 }
@@ -418,7 +421,7 @@ void DirectPreparationEditor::BKADSRSliderValueChanged(String name, int attack, 
     active->setRelease(release);
 }
 
-void DirectPreparationEditor::BKADSRButtonStateChanged(bool state)
+void DirectPreparationEditor::BKADSRButtonStateChanged(String name, bool state)
 {
     setShowADSR(!state);
 }

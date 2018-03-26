@@ -37,9 +37,13 @@ public:
     
     ScopedPointer<BKStackedSlider> transpositionSlider;
 
+    ScopedPointer<BKADSRSlider> reverseADSRSlider;
+    ScopedPointer<BKADSRSlider> undertowADSRSlider;
     
     void paint (Graphics&) override;
     void resized() override;
+    
+    void setShowADSR(String name, bool newval);
     
     virtual void update(void) {};
     
@@ -50,6 +54,10 @@ public:
 #endif
 
 private:
+    
+    bool showADSR;
+    bool showReverseADSR;
+    bool showUndertowADSR;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NostalgicViewController)
     
@@ -62,6 +70,7 @@ public BKWaveDistanceUndertowSlider::Listener,
 public BKEditableComboBoxListener,
 public BKSingleSlider::Listener,
 public BKStackedSlider::Listener,
+public BKADSRSlider::Listener,
 //public SliderListener,
 public Timer
 {
@@ -93,6 +102,8 @@ private:
     void BKSingleSliderValueChanged(String name, double val) override;
     void BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow) override;
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
+    void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
+    void BKADSRButtonStateChanged(String name, bool state) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NostalgicPreparationEditor)
     
