@@ -87,6 +87,8 @@ public:
     
     static void actionButtonCallback(int action, NostalgicPreparationEditor*);
     
+    void closeSubWindow();
+    
     int addPreparation(void);
     int duplicatePreparation(void);
     void setCurrentId(int Id);

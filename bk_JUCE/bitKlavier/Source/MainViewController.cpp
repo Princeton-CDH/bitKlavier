@@ -313,7 +313,18 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     
     if (code == KeyPress::escapeKey)
     {
-        processor.updateState->setCurrentDisplay(DisplayNil);
+        BKPreparationDisplay currentDisplay = overtop.getCurrentDisplay();
+        if(currentDisplay == DisplayDirect)
+        {
+            if(overtop.dvc.getSubWindowInFront()) overtop.dvc.closeSubWindow();
+            else processor.updateState->setCurrentDisplay(DisplayNil);
+        }
+        else if(currentDisplay == DisplayNostalgic)
+        {
+            if(overtop.nvc.getSubWindowInFront()) overtop.nvc.closeSubWindow();
+            else processor.updateState->setCurrentDisplay(DisplayNil);
+        }
+        else processor.updateState->setCurrentDisplay(DisplayNil);
     }
     else if (code == KeyPress::deleteKey)
     {

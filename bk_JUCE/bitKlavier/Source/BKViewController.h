@@ -280,6 +280,9 @@ public:
         hideOrShow.setAlwaysOnTop(true);
     }
     
+    bool getSubWindowInFront(void) {return subWindowInFront; }
+    void setSubWindowInFront(bool f) { subWindowInFront = f; }
+    
 protected:
     BKAudioProcessor& processor;
     BKItemGraph* theGraph;
@@ -294,6 +297,7 @@ protected:
     BKExitButton hideOrShow;
     ImageComponent iconImageComponent;
     
+    bool subWindowInFront;
     
 
     int lastId;

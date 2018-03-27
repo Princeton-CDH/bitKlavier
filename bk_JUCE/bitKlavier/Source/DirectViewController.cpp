@@ -80,6 +80,7 @@ void DirectViewController::setShowADSR(bool newval)
         
         ADSRSlider->setButtonText("close envelope");
 
+        
     }
     else
     {
@@ -227,6 +228,7 @@ void DirectPreparationEditor::update(void)
 {
     if (processor.updateState->currentDirectId < 0) return;
     setShowADSR(false);
+    setSubWindowInFront(false);
     ADSRSlider->setIsButtonOnly(true);
     
     DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
@@ -426,6 +428,13 @@ void DirectPreparationEditor::BKADSRSliderValueChanged(String name, int attack, 
 void DirectPreparationEditor::BKADSRButtonStateChanged(String name, bool state)
 {
     setShowADSR(!state);
+    setSubWindowInFront(!state);
+}
+
+void DirectPreparationEditor::closeSubWindow()
+{
+    setShowADSR(false);
+    setSubWindowInFront(false);
 }
 
 

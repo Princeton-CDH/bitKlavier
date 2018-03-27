@@ -750,6 +750,7 @@ public:
     void BKSingleSliderValueChanged(String name, double val) override;
     void buttonStateChanged (Button*) override;
     void buttonClicked (Button*) override;
+
     
     void resized() override;
     

@@ -289,6 +289,7 @@ void NostalgicPreparationEditor::update(void)
     reverseADSRSlider->setIsButtonOnly(true);
     setShowADSR(undertowADSRSlider->getName(), false);
     undertowADSRSlider->setIsButtonOnly(true);
+    setSubWindowInFront(false);
     
     NostalgicPreparation::Ptr prep = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
     
@@ -527,11 +528,19 @@ void NostalgicPreparationEditor::BKADSRSliderValueChanged(String name, int attac
 
 }
 
+void NostalgicPreparationEditor::closeSubWindow()
+{
+    setShowADSR(reverseADSRSlider->getName(), false);
+    setShowADSR(undertowADSRSlider->getName(), false);
+    setSubWindowInFront(false);
+}
+
 
 void NostalgicPreparationEditor::BKADSRButtonStateChanged(String name, bool state)
 {
     //DBG("BKADSRButtonStateChanged " + name);
     setShowADSR(name, !state);
+    setSubWindowInFront(!state);
 }
 
 void NostalgicPreparationEditor::BKStackedSliderValueChanged(String name, Array<float> val)

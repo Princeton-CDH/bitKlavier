@@ -25,6 +25,8 @@ bigOne(p)
     hideOrShow.addListener(this);
     
     addChildComponent(bigOne);
+    
+    subWindowInFront = false;
 }
 
 BKViewController::~BKViewController()

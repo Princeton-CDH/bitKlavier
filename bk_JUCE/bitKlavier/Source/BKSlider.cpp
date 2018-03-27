@@ -2537,11 +2537,13 @@ void BKADSRSlider::buttonStateChanged (Button*)
 
 void BKADSRSlider::buttonClicked (Button*)
 {
+    //DBG("BKADSRSlider::buttonClicked");
     if(isButtonOnly) isButtonOnly = false;
     else isButtonOnly = true;
     resized();
     listeners.call(&BKADSRSlider::Listener::BKADSRButtonStateChanged, getName(), isButtonOnly);
 }
+
 
 void BKADSRSlider::resized()
 {

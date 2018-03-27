@@ -80,6 +80,8 @@ public:
     void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
     void BKADSRButtonStateChanged(String name, bool state) override;
     
+    void closeSubWindow();
+    
     void fillSelectCB(int last, int current);
 
     static void actionButtonCallback(int action, DirectPreparationEditor*);
