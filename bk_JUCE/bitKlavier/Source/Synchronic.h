@@ -40,6 +40,11 @@ public:
     sAccentMultipliers(p->getAccentMultipliers()),
     sLengthMultipliers(p->getLengthMultipliers()),
     sTransposition(p->getTransposition()),
+    sAttacks(p->getAttacks()),
+    sDecays(p->getDecays()),
+    sSustains(p->getSustains()),
+    sReleases(p->getReleases()),
+    envelopeOn(p->getEnvelopesOn()),
     sGain(p->getGain()),
     sClusterThresh(p->getClusterThreshMS()),
     sClusterThreshSec(p->getClusterThreshSEC()),
@@ -86,6 +91,11 @@ public:
     sBeatMultipliers(Array<float>({1.0})),
     sAccentMultipliers(Array<float>({1.0})),
     sLengthMultipliers(Array<float>({1.0})),
+    sAttacks(Array<int>({3,3,3,3,3,3,3,3,3,3,3,3})),
+    sDecays(Array<int>({3,3,3,3,3,3,3,3,3,3,3,3})),
+    sSustains(Array<float>({1.,1,1,1,1,1,1,1,1,1,1,1})),
+    sReleases(Array<int>({30,30,30,30,30,30,30,30,30,30,30,30})),
+    envelopeOn(Array<bool>({true,false,false,false,false,false,false,false,false,false,false,false})),
     sGain(1.0),
     sClusterThresh(500),
     sClusterThreshSec(.001 * sClusterThresh)
@@ -110,6 +120,11 @@ public:
         sClusterThresh = s->getClusterThreshMS();
         sClusterThreshSec = s->getClusterThreshSEC();
         sReleaseVelocitySetsSynchronic = s->getReleaseVelocitySetsSynchronic();
+        
+        sAttacks = s->getAttacks();
+        sDecays = s->getDecays();
+        sSustains = s->getSustains();
+        sReleases = s->getReleases();
     }
     
     bool compare(SynchronicPreparation::Ptr s)
@@ -118,6 +133,10 @@ public:
         bool accents = true;
         bool beats = true;
         bool transp = true;
+        bool attack = true;
+        bool decay = true;
+        bool sustain = true;
+        bool release = true;
         
         for (int i = s->getLengthMultipliers().size(); --i>=0;)
         {
@@ -163,12 +182,48 @@ public:
             }
         }
         
+        for (int i = s->getAttacks().size(); --i>=0;)
+        {
+            if (s->getAttacks()[i] != sAttacks[i])
+            {
+                attack = false;
+                break;
+            }
+        }
+        
+        for (int i = s->getDecays().size(); --i>=0;)
+        {
+            if (s->getDecays()[i] != sDecays[i])
+            {
+                decay = false;
+                break;
+            }
+        }
+        
+        for (int i = s->getSustains().size(); --i>=0;)
+        {
+            if (s->getSustains()[i] != sSustains[i])
+            {
+                sustain = false;
+                break;
+            }
+        }
+        
+        for (int i = s->getReleases().size(); --i>=0;)
+        {
+            if (s->getReleases()[i] != sReleases[i])
+            {
+                release = false;
+                break;
+            }
+        }
+        
         return (sNumBeats == s->getNumBeats() &&
                 sClusterMin == s->getClusterMin() &&
                 sClusterMax == s->getClusterMax() &&
                 sClusterCap == s->getClusterCap() &&
                 (sMode == s->getMode()) &&
-                transp && lens && accents && beats &&
+                transp && lens && accents && beats && attack && decay && sustain && release &&
                 sGain == s->getGain() &&
                 sClusterThresh == s->getClusterThreshMS() &&
                 sClusterThreshSec == s->getClusterThreshSEC() &&
@@ -197,7 +252,18 @@ public:
     inline const bool getReleaseVelocitySetsSynchronic() const noexcept{return sReleaseVelocitySetsSynchronic; }
     inline const float getGain() const noexcept                        {return sGain;                   }
     
-
+    inline const Array<int> getAttacks() const noexcept         {return sAttacks;   }
+    inline const Array<int> getDecays() const noexcept          {return sDecays;    }
+    inline const Array<float> getSustains() const noexcept      {return sSustains;  }
+    inline const Array<int> getReleases() const noexcept        {return sReleases;  }
+    inline const Array<bool> getEnvelopesOn() const noexcept    {return envelopeOn; }
+    
+    inline const int getAttack(int which) const noexcept    {return sAttacks[which];}
+    inline const int getDecay(int which) const noexcept     {return sDecays[which];}
+    inline const float getSustain(int which) const noexcept {return sSustains[which];}
+    inline const int getRelease(int which) const noexcept   {return sReleases[which];}
+    inline const bool getEnvelopeOn(int which) const noexcept   {return envelopeOn[which];}
+    
     inline void setClusterThresh(float clusterThresh)
     {
         sClusterThresh = clusterThresh;
@@ -225,6 +291,17 @@ public:
     inline void setSingleTransposition(int whichSlider, Array<float> values) {sTransposition.set(whichSlider, values); }
     inline void setReleaseVelocitySetsSynchronic(bool rvss)            {sReleaseVelocitySetsSynchronic = rvss;          }
     inline void setGain(float gain)                                    {sGain = gain;                          }
+    
+    inline void setAttacks(Array<int> attacks)      {sAttacks.swapWith(attacks);    }
+    inline void setDecays(Array<int> decays)        {sDecays.swapWith(decays);      }
+    inline void setSustains(Array<float> sustains)  {sSustains.swapWith(sustains);  }
+    inline void setReleases(Array<int> releases)    {sReleases.swapWith(releases);  }
+    
+    inline void setAttack(int which, int val)       {sAttacks.set(which, val);}
+    inline void setDecay(int which, int val)        {sDecays.set(which, val);}
+    inline void setSustain(int which, float val)    {sSustains.set(which, val);}
+    inline void setRelease(int which, int val)      {sReleases.set(which, val);}
+    inline void setEnvelopeOn(int which, bool val)  {envelopeOn.set(which, val);}
     
     void print(void)
     {
@@ -263,7 +340,14 @@ private:
     Array<float> sBeatMultipliers;      //multiply pulse lengths by these
     Array<float> sAccentMultipliers;    //multiply velocities by these
     Array<float> sLengthMultipliers;    //multiply note duration by these
-    Array<Array<float>> sTransposition;        //transpose by these
+    Array<Array<float>> sTransposition; //transpose by these
+    
+    Array<int> sAttacks;
+    Array<int> sDecays;
+    Array<float> sSustains;
+    Array<int> sReleases;
+    Array<bool> envelopeOn;
+    
 
     float sGain;                //gain multiplier
     float sClusterThresh;      //max time between played notes before new cluster is started, in MS
@@ -971,6 +1055,7 @@ private:
     int accentMultiplierCounter; //accent multipliers
     int lengthMultiplierCounter; //note length (sounding length) multipliers (multiples of 50ms, at least for now)
     int transpCounter;     //transposition offsets
+    int envelopeCounter;
     
     //reset the phase, including of all the parameter fields
     void resetPhase(int skipBeats);

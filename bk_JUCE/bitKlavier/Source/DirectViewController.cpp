@@ -187,8 +187,12 @@ void DirectViewController::resized()
     }
     else
     {
-        areaSave.removeFromTop(gComponentComboBoxHeight * 2 + gYSpacing + 8.*gPaddingConst * processor.paddingScalarY);
-        ADSRSlider->setBounds(areaSave);
+        areaSave.removeFromTop(gYSpacing * 2 + 8.*gPaddingConst * processor.paddingScalarY);
+        Rectangle<int> adsrSliderSlice = areaSave.removeFromTop(gComponentComboBoxHeight * 2 + gComponentSingleSliderHeight * 2 + gYSpacing * 3);
+        ADSRSlider->setBounds(adsrSliderSlice);
+        
+        //areaSave.removeFromTop(gComponentComboBoxHeight * 2 + gYSpacing + 8.*gPaddingConst * processor.paddingScalarY);
+        //ADSRSlider->setBounds(areaSave);
         
         selectCB.toFront(false);
     }
@@ -425,7 +429,7 @@ void DirectPreparationEditor::BKADSRSliderValueChanged(String name, int attack, 
     active->setRelease(release);
 }
 
-void DirectPreparationEditor::BKADSRButtonStateChanged(String name, bool state)
+void DirectPreparationEditor::BKADSRButtonStateChanged(String name, bool mod, bool state)
 {
     setShowADSR(!state);
     setSubWindowInFront(!state);
@@ -433,6 +437,7 @@ void DirectPreparationEditor::BKADSRButtonStateChanged(String name, bool state)
 
 void DirectPreparationEditor::closeSubWindow()
 {
+    ADSRSlider->setIsButtonOnly(true);
     setShowADSR(false);
     setSubWindowInFront(false);
 }

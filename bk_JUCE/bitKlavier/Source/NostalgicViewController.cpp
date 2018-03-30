@@ -210,9 +210,10 @@ void NostalgicViewController::resized()
     }
     else
     {
-        areaSave.removeFromTop(gComponentComboBoxHeight * 2 + gYSpacing + 8.*gPaddingConst * processor.paddingScalarY);
-        if(showReverseADSR) reverseADSRSlider->setBounds(areaSave);
-        else undertowADSRSlider->setBounds(areaSave);
+        areaSave.removeFromTop(gYSpacing * 2 + gYSpacing + 8.*gPaddingConst * processor.paddingScalarY);
+         Rectangle<int> adsrSliderSlice = areaSave.removeFromTop(gComponentComboBoxHeight * 2 + gComponentSingleSliderHeight * 2 + gYSpacing * 3);
+        if(showReverseADSR) reverseADSRSlider->setBounds(adsrSliderSlice);
+        else undertowADSRSlider->setBounds(adsrSliderSlice);
         
         selectCB.toFront(false);
     }
@@ -530,13 +531,15 @@ void NostalgicPreparationEditor::BKADSRSliderValueChanged(String name, int attac
 
 void NostalgicPreparationEditor::closeSubWindow()
 {
+    reverseADSRSlider->setIsButtonOnly(true);
+    undertowADSRSlider->setIsButtonOnly(true);
     setShowADSR(reverseADSRSlider->getName(), false);
     setShowADSR(undertowADSRSlider->getName(), false);
     setSubWindowInFront(false);
 }
 
 
-void NostalgicPreparationEditor::BKADSRButtonStateChanged(String name, bool state)
+void NostalgicPreparationEditor::BKADSRButtonStateChanged(String name, bool mod, bool state)
 {
     //DBG("BKADSRButtonStateChanged " + name);
     setShowADSR(name, !state);

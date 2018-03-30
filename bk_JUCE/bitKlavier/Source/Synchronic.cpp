@@ -71,7 +71,8 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
         float offset = tuner->getOffset(note) + t;
         int synthNoteNumber = ((float)note + (int)offset);
         float synthOffset = offset - (int)offset;
-        DBG("playing synchronic note/vel, sample# " + String(note) +  " " + String(velocity) + " " + String(synthNoteNumber));
+        //DBG("playing synchronic note/vel, sample# " + String(note) +  " " + String(velocity) + " " + String(synthNoteNumber));
+        /*
         synth->keyOn(channel,
                      note,
                      synthNoteNumber,
@@ -86,17 +87,36 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
                      noteLength,
                      3,     // + noteLength * synchronic->aPrep->rampUpPercentage()[rampPercentageCounter]
                      30);   //30 + noteLength * 0.4);   // + noteLength * synchronic->aPrep->rampDownPercentage()[rampPercentageCounter]
+        */
+        synth->keyOn(channel,
+                     note,
+                     synthNoteNumber,
+                     synthOffset,
+                     velocity,
+                     synchronic->aPrep->getGain() * aGlobalGain * synchronic->aPrep->getAccentMultipliers()[accentMultiplierCounter],
+                     noteDirection,
+                     FixedLengthFixedStart,
+                     SynchronicNote,
+                     synchronic->getId(),
+                     noteStartPos,  // start
+                     noteLength,
+                     synchronic->aPrep->getAttack(envelopeCounter),
+                     synchronic->aPrep->getDecay(envelopeCounter),
+                     synchronic->aPrep->getSustain(envelopeCounter),
+                     synchronic->aPrep->getRelease(envelopeCounter)
+                     );
     }
     
 }
 
 void SynchronicProcessor::resetPhase(int skipBeats)
 {
-    
+    //DBG("resetting phase");
     beatMultiplierCounter   = skipBeats % synchronic->aPrep->getBeatMultipliers().size();
     lengthMultiplierCounter = skipBeats % synchronic->aPrep->getLengthMultipliers().size();
     accentMultiplierCounter = skipBeats % synchronic->aPrep->getAccentMultipliers().size();
     transpCounter           = skipBeats % synchronic->aPrep->getTransposition().size();
+    envelopeCounter         = skipBeats % synchronic->aPrep->getEnvelopesOn().size();
     
     beatCounter = 0;
 
@@ -249,7 +269,13 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             if (++lengthMultiplierCounter   >= synchronic->aPrep->getLengthMultipliers().size())     lengthMultiplierCounter = 0;
             if (++accentMultiplierCounter   >= synchronic->aPrep->getAccentMultipliers().size())     accentMultiplierCounter = 0;
             if (++transpCounter             >= synchronic->aPrep->getTransposition().size())         transpCounter = 0;
-            
+            if (++envelopeCounter           >= synchronic->aPrep->getEnvelopesOn().size())           envelopeCounter = 0;
+  
+            while(!synchronic->aPrep->getEnvelopesOn()[envelopeCounter]) //skip untoggled envelopes
+            {
+                envelopeCounter++;
+                if (envelopeCounter >= synchronic->aPrep->getEnvelopesOn().size()) envelopeCounter = 0;
+            }
             
             //update display of counters in UI
             /*
@@ -259,7 +285,10 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 " accent: "         + String(synchronic->aPrep->getAccentMultipliers()[accentMultiplierCounter]) +
                 " accent counter: " + String(accentMultiplierCounter) +
                 " transp: "         + "{ "+floatArrayToString(synchronic->aPrep->getTransposition()[transpCounter]) + " }" +
-                " transp counter: " + String(transpCounter)
+                " transp counter: " + String(transpCounter) +
+                " envelope on: "       + String((int)synchronic->aPrep->getEnvelopesOn()[envelopeCounter]) +
+                " envelope counter: " + String(envelopeCounter) +
+                " ADSR :" + String(synchronic->aPrep->getAttack(envelopeCounter)) + " " + String(synchronic->aPrep->getDecay(envelopeCounter)) + " " + String(synchronic->aPrep->getSustain(envelopeCounter)) + " " + String(synchronic->aPrep->getRelease(envelopeCounter))
                 );
             */
             

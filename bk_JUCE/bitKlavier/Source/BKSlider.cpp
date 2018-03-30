@@ -2476,10 +2476,13 @@ sliderName(name)
     addAndMakeVisible(releaseSlider);
     
     adsrButton.setButtonText("ADSR");
+    adsrButton.setClickingTogglesState(true);
     adsrButton.addListener(this);
+    adsrButton.addMouseListener(this, false);
     addAndMakeVisible(adsrButton);
     
     isButtonOnly = true;
+
 }
 
 void BKADSRSlider::setDim(float alphaVal)
@@ -2535,13 +2538,35 @@ void BKADSRSlider::buttonStateChanged (Button*)
     
 }
 
-void BKADSRSlider::buttonClicked (Button*)
+void BKADSRSlider::mouseDown (const MouseEvent &event)
+{
+    if(event.mods.isShiftDown())
+    {
+        //DBG("shift is down");
+        listeners.call(&BKADSRSlider::Listener::BKADSRButtonStateChanged, getName(), true, !adsrButton.getToggleState());
+    }
+    else
+    {
+        //DBG("no shift down");
+        if(isButtonOnly) isButtonOnly = false;
+        else isButtonOnly = true;
+        resized();
+        listeners.call(&BKADSRSlider::Listener::BKADSRButtonStateChanged, getName(), false, isButtonOnly);
+    }
+}
+
+void BKADSRSlider::buttonClicked (Button* b)
 {
     //DBG("BKADSRSlider::buttonClicked");
-    if(isButtonOnly) isButtonOnly = false;
-    else isButtonOnly = true;
-    resized();
-    listeners.call(&BKADSRSlider::Listener::BKADSRButtonStateChanged, getName(), isButtonOnly);
+    /*
+    if(b->getName() == adsrButton.getName())
+    {
+        if(isButtonOnly) isButtonOnly = false;
+        else isButtonOnly = true;
+        resized();
+        listeners.call(&BKADSRSlider::Listener::BKADSRButtonStateChanged, getName(), isButtonOnly);
+    }
+     */
 }
 
 
@@ -2566,7 +2591,16 @@ void BKADSRSlider::resized()
     
     if(!isButtonOnly)
     {
-        adsrButton.setBounds(area.removeFromBottom(gComponentComboBoxHeight));
+        Rectangle<int> topSlice = area.removeFromTop(gComponentComboBoxHeight);
+        Rectangle<int> bottomSlice = area.removeFromBottom(gComponentComboBoxHeight);
+        
+        int midSpace = (bottomSlice.getWidth() - gComponentLabelWidth) * 0.5;
+        bottomSlice.removeFromLeft(midSpace);
+        bottomSlice.removeFromRight(midSpace);
+        adsrButton.setBounds(bottomSlice);
+        
+        area.removeFromTop(gYSpacing);
+        
         Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
         
         attackSlider->setBounds(leftColumn.removeFromTop(gComponentSingleSliderHeight));

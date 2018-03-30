@@ -60,6 +60,20 @@ BKViewController(p, theGraph)
         
     }
     
+    //Envelope Sliders
+    envelopeSliders = OwnedArray<BKADSRSlider>();
+    for(int i=0; i<12; i++)
+    {
+        envelopeSliders.insert(i, new BKADSRSlider("e"+String(i)));
+        envelopeSliders[i]->setButtonText("");
+        envelopeSliders[i]->toFront(false);
+        envelopeSliders[i]->setAlpha(0.5);
+        addAndMakeVisible(envelopeSliders[i]);
+    }
+    showADSR = false;
+    visibleADSR = 0;
+    envelopeSliders[0]->setButtonToggle(true);
+    
     selectCB.setName("Synchronic");
     selectCB.addSeparator();
     selectCB.addListener(this);
@@ -116,6 +130,13 @@ BKViewController(p, theGraph)
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
+    
+    envelopeName.setText("envelopes", dontSendNotification);
+    envelopeName.setJustificationType(Justification::centredRight);
+    envelopeName.toBack();
+    envelopeName.setInterceptsMouseClicks(false, true);
+    addAndMakeVisible(envelopeName);
+
 }
 
 void SynchronicViewController::paint (Graphics& g)
@@ -129,6 +150,8 @@ void SynchronicViewController::resized()
 
     iconImageComponent.setBounds(area);
     area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+    
+    Rectangle<int> areaSave = area;
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
@@ -148,53 +171,140 @@ void SynchronicViewController::resized()
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
     
-    Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
-    modeSlice.removeFromRight(gXSpacing);
-    modeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
-    offsetParamStartToggle.setBounds(modeSlice);
-    
-    int tempHeight = (area.getHeight() - paramSliders.size() * (gYSpacing + gPaddingConst * processor.paddingScalarY)) / paramSliders.size();
-    area.removeFromLeft(4 + 2.*gPaddingConst * processor.paddingScalarX);
-    area.removeFromRight(gXSpacing);
-    for(int i = 0; i < paramSliders.size(); i++)
+    if(!showADSR)
     {
-        area.removeFromTop(gYSpacing + gPaddingConst * processor.paddingScalarY);
-        paramSliders[i]->setBounds(area.removeFromTop(tempHeight));
+        Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
+        modeSlice.removeFromRight(gXSpacing);
+        modeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
+        offsetParamStartToggle.setBounds(modeSlice);
+        
+        Rectangle<float> envelopeSlice = area.removeFromBottom(gComponentComboBoxHeight + gPaddingConst * processor.paddingScalarY).toFloat();
+        
+        int tempHeight = (area.getHeight() - paramSliders.size() * (gYSpacing + gPaddingConst * processor.paddingScalarY)) / paramSliders.size();
+        area.removeFromLeft(4 + 2.*gPaddingConst * processor.paddingScalarX);
+        area.removeFromRight(gXSpacing);
+        for(int i = 0; i < paramSliders.size(); i++)
+        {
+            area.removeFromTop(gYSpacing + gPaddingConst * processor.paddingScalarY);
+            paramSliders[i]->setBounds(area.removeFromTop(tempHeight));
+        }
+        
+        //leftColumn.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
+        leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
+        //leftColumn.removeFromLeft(gXSpacing);
+        
+        int nextCenter = paramSliders[0]->getY() + paramSliders[0]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY) ;
+        howManySlider->setBounds(leftColumn.getX(),
+                                 nextCenter - gComponentSingleSliderHeight/2.,
+                                 leftColumn.getWidth(),
+                                 gComponentSingleSliderHeight);
+        
+        nextCenter = paramSliders[1]->getY() + paramSliders[1]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
+        clusterThreshSlider->setBounds(leftColumn.getX(),
+                                       nextCenter - gComponentSingleSliderHeight/2.,
+                                       leftColumn.getWidth(),
+                                       gComponentSingleSliderHeight);
+        
+        nextCenter = paramSliders[2]->getY() + paramSliders[2]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
+        clusterMinMaxSlider->setBounds(leftColumn.getX(),
+                                       nextCenter - gComponentRangeSliderHeight/2.,
+                                       leftColumn.getWidth(),
+                                       gComponentRangeSliderHeight);
+        
+        nextCenter = paramSliders[3]->getY() + paramSliders[3]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
+        gainSlider->setBounds(leftColumn.getX(),
+                              nextCenter - gComponentSingleSliderHeight/2.,
+                              leftColumn.getWidth(),
+                              gComponentSingleSliderHeight);
+        
+        Rectangle<int> releaseToggleSlice = gainSlider->getBounds().removeFromTop(gComponentTextFieldHeight);
+        releaseToggleSlice.removeFromRight(gYSpacing);
+        releaseVelocitySetsSynchronicToggle.setBounds(releaseToggleSlice.removeFromRight(releaseToggleSlice.getWidth() * 0.5));
+        
+        // envelopeSlice.removeFromTop(gPaddingConst * (1. - processor.paddingScalarY));
+        envelopeSlice.removeFromTop(gPaddingConst * processor.paddingScalarY);
+        envelopeSlice.removeFromRight(gXSpacing);
+        envelopeName.setBounds(envelopeSlice.toNearestInt());
+        
+        float envWidth = (float)(paramSliders[0]->getWidth() - 50) / 12.;
+        for(int i=envelopeSliders.size() - 1; i>=0; i--)
+        {
+            Rectangle<float> envArea (envelopeSlice.removeFromRight(envWidth));
+            envelopeSliders[i]->setBounds(envArea.toNearestInt());
+        }
+    }
+    else
+    {
+        areaSave.removeFromTop(gYSpacing * 2 + 8.*gPaddingConst * processor.paddingScalarY);
+        Rectangle<int> adsrSliderSlice = areaSave.removeFromTop(gComponentComboBoxHeight * 2 + gComponentSingleSliderHeight * 2 + gYSpacing * 3);
+        envelopeSliders[visibleADSR]->setBounds(adsrSliderSlice);
+        
+        //areaSave.removeFromTop(gComponentComboBoxHeight * 2 + gYSpacing + 8.*gPaddingConst * processor.paddingScalarY);
+        //ADSRSlider->setBounds(areaSave);
+        
+        selectCB.toFront(false);
     }
     
-    //leftColumn.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
-    leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
-    //leftColumn.removeFromLeft(gXSpacing);
-    
-    int nextCenter = paramSliders[0]->getY() + paramSliders[0]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY) ;
-    howManySlider->setBounds(leftColumn.getX(),
-                             nextCenter - gComponentSingleSliderHeight/2.,
-                             leftColumn.getWidth(),
-                             gComponentSingleSliderHeight);
-    
-    nextCenter = paramSliders[1]->getY() + paramSliders[1]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
-    clusterThreshSlider->setBounds(leftColumn.getX(),
-                                   nextCenter - gComponentSingleSliderHeight/2.,
-                                   leftColumn.getWidth(),
-                                   gComponentSingleSliderHeight);
-    
-    nextCenter = paramSliders[2]->getY() + paramSliders[2]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
-    clusterMinMaxSlider->setBounds(leftColumn.getX(),
-                                   nextCenter - gComponentRangeSliderHeight/2.,
-                                   leftColumn.getWidth(),
-                                   gComponentRangeSliderHeight);
-    
-    nextCenter = paramSliders[3]->getY() + paramSliders[3]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
-    gainSlider->setBounds(leftColumn.getX(),
-                          nextCenter - gComponentSingleSliderHeight/2.,
-                          leftColumn.getWidth(),
-                          gComponentSingleSliderHeight);
-    
-    Rectangle<int> releaseToggleSlice = gainSlider->getBounds().removeFromTop(gComponentTextFieldHeight);
-    releaseToggleSlice.removeFromRight(gYSpacing);
-    releaseVelocitySetsSynchronicToggle.setBounds(releaseToggleSlice.removeFromRight(releaseToggleSlice.getWidth() * 0.5));
-    
     repaint();
+    
+}
+
+void SynchronicViewController::setShowADSR(String name, bool newval)
+{
+    showADSR = newval;
+    
+    for(int i=0; i<envelopeSliders.size(); i++)
+    {
+        if(envelopeSliders[i]->getName() == name) visibleADSR = i;
+    }
+    
+    if(showADSR)
+    {
+        for(int i = 0; i < paramSliders.size(); i++)
+        {
+            paramSliders[i]->setVisible(false);
+        }
+        howManySlider->setVisible(false);
+        clusterThreshSlider->setVisible(false);
+        gainSlider->setVisible(false);
+        clusterThreshSlider->setVisible(false);
+        clusterMinMaxSlider->setVisible(false);
+        offsetParamStartToggle.setVisible(false);
+        modeSelectCB.setVisible(false);
+        
+        for(int i=0; i<envelopeSliders.size(); i++)
+        {
+            if(i != visibleADSR) envelopeSliders[i]->setVisible(false);
+            envelopeSliders[i]->setAlpha(1.);
+        }
+        envelopeName.setVisible(false);
+        envelopeSliders[visibleADSR]->setButtonText("close");
+    }
+    else
+    {
+        for(int i = 0; i < paramSliders.size(); i++)
+        {
+            paramSliders[i]->setVisible(true);
+        }
+        howManySlider->setVisible(true);
+        clusterThreshSlider->setVisible(true);
+        gainSlider->setVisible(true);
+        clusterThreshSlider->setVisible(true);
+        clusterMinMaxSlider->setVisible(true);
+        offsetParamStartToggle.setVisible(true);
+        modeSelectCB.setVisible(true);
+        
+        for(int i=0; i<envelopeSliders.size(); i++)
+        {
+            envelopeSliders[i]->setVisible(true);
+            envelopeSliders[i]->setAlpha(0.5);
+        }
+        envelopeName.setVisible(true);
+        envelopeSliders[visibleADSR]->setButtonText("");
+        
+    }
+    
+    resized();
     
 }
 
@@ -239,6 +349,11 @@ SynchronicViewController(p, theGraph)
     clusterMinMaxSlider->addMyListener(this);
 
     gainSlider->addMyListener(this);
+    
+    for(int i=0; i<envelopeSliders.size(); i++)
+    {
+        envelopeSliders[i]->addMyListener(this);
+    }
     
     startTimer(30);
     
@@ -438,6 +553,60 @@ void SynchronicPreparationEditor::update(NotificationType notify)
 void SynchronicPreparationEditor::update()
 {
     update(dontSendNotification);
+}
+
+void SynchronicPreparationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
+{
+    DBG("BKADSRSliderValueChanged received " + name);
+    
+    int which = 0;
+    for(int i=0; i<envelopeSliders.size(); i++)
+    {
+        if(envelopeSliders[i]->getName() == name) which = i;
+    }
+    
+    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+    SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
+    prep->setAttack(which, attack);
+    active->setAttack(which, attack);
+    prep->setDecay(which, decay);
+    active->setDecay(which, decay);
+    prep->setSustain(which, sustain);
+    active->setSustain(which, sustain);
+    prep->setRelease(which, release);
+    active->setRelease(which, release);
+    
+}
+
+void SynchronicPreparationEditor::BKADSRButtonStateChanged(String name, bool shift, bool state)
+{
+    DBG("BKADSRButtonStateChanged + " + String((int)state));
+    
+    int which = 0;
+    for(int i=0; i<envelopeSliders.size(); i++)
+    {
+        if(envelopeSliders[i]->getName() == name) which = i;
+    }
+    
+    if(shift)
+    {
+        DBG("toggling " + String((int)state));
+        
+        SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+        SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+        
+        if(which != 0) //first envelope is always on...
+        {
+            prep->setEnvelopeOn(which, state);
+            active->setEnvelopeOn(which, state);
+        }
+    }
+    else
+    {
+        setShowADSR(name, !state);
+        setSubWindowInFront(!state);
+    }
 }
 
 void SynchronicPreparationEditor::fillSelectCB(int last, int current)

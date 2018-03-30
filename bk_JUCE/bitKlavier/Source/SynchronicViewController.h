@@ -43,6 +43,7 @@ protected:
     OwnedArray<BKTextField> modSynchronicTF;
     
     OwnedArray<BKMultiSlider> paramSliders;
+    OwnedArray<BKADSRSlider> envelopeSliders;
     
     virtual void multiSliderDidChange(String name, int whichSlider, Array<float> values) = 0;
     virtual void multiSlidersDidChange(String name, Array<Array<float>> values) = 0;
@@ -67,9 +68,16 @@ protected:
     ScopedPointer<BKRangeSlider> clusterMinMaxSlider;
     ScopedPointer<BKSingleSlider> gainSlider;
     
+    void setShowADSR(String name, bool newval);
+    int visibleADSR;
+    
+    BKLabel envelopeName;
+    
     void fillModeSelectCB(void);
     
 private:
+    
+    bool showADSR;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicViewController)
 };
@@ -79,6 +87,7 @@ public SynchronicViewController,
 public BKSingleSlider::Listener,
 public BKRangeSlider::Listener,
 public BKEditableComboBoxListener,
+public BKADSRSlider::Listener,
 public Timer
 {
 public:
@@ -108,6 +117,9 @@ private:
     void BKSingleSliderValueChanged(String name, double val) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
+    void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
+    void BKADSRButtonStateChanged(String name, bool shift, bool state) override;
+    
     void buttonClicked (Button* b) override;
     
     void multiSliderDidChange(String name, int whichSlider, Array<float> values) override;

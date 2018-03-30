@@ -105,7 +105,7 @@ private:
     void BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow) override;
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
     void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
-    void BKADSRButtonStateChanged(String name, bool state) override;
+    void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NostalgicPreparationEditor)
     

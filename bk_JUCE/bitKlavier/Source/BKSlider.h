@@ -739,6 +739,7 @@ public:
     }
     
     void setIsButtonOnly(bool state) { isButtonOnly = state; }
+    void setButtonToggle(bool state) {adsrButton.setToggleState(true, dontSendNotification);}
     
     void setJustifyRight(bool jr)
     {
@@ -750,6 +751,7 @@ public:
     void BKSingleSliderValueChanged(String name, double val) override;
     void buttonStateChanged (Button*) override;
     void buttonClicked (Button*) override;
+    void mouseDown (const MouseEvent &event) override;
 
     
     void resized() override;
@@ -763,7 +765,7 @@ public:
         virtual ~Listener() {};
         
         virtual void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) = 0;
-        virtual void BKADSRButtonStateChanged(String name, bool state) = 0;
+        virtual void BKADSRButtonStateChanged(String name, bool mod, bool state) = 0;
     };
     
     ListenerList<Listener> listeners;

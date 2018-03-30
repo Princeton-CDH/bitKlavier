@@ -129,16 +129,16 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         double playLength = 0.0;
         double maxLength = sound->soundLength - adsrRelease;
         
+        
         if (bkType != MainNote)
         {
+            //should redo this to scale ADSR rather than just set this way...
             if(adsrAttack  > (0.5 * length))   adsrAttack     = 0.5 * length;
             if(adsrRelease > (0.5 * length))   adsrRelease    = 0.5 * length;
 
             playLength = (length - adsrRelease) * pitchRatio;
         }
-
-        adsr.setSampleRate(getSampleRate());
-        adsr.setAllTimes(adsrAttack / getSampleRate(), adsrDecay / getSampleRate(), adsrSustain, adsrRelease / getSampleRate());
+         
         
         if (playDirection == Forward)
         {
@@ -227,8 +227,14 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         
         lgain = gain;
         rgain = gain;
+
+        adsr.setSampleRate(getSampleRate());
         
+        DBG("BKPianoSamplerVoice::startNote ADSR vals: " + String(adsrAttack/(0.001*getSampleRate())) + " " + String(adsrDecay/(0.001*getSampleRate())) + " " + String(adsrSustain) + " " + String(adsrRelease/(0.001*getSampleRate())));
+        adsr.setAllTimes(adsrAttack / getSampleRate(), adsrDecay / getSampleRate(), adsrSustain, adsrRelease / getSampleRate());
+
         adsr.keyOn();
+        DBG("ADSR vals = " + String(adsr.getAttackRate()) + " " + String(adsr.getDecayRate()) + " " + String(adsr.getSustainLevel()) + " " + String(adsr.getReleaseRate()) + " " );
         
         noteStartingPosition = sourceSamplePosition;
         noteEndPosition = playEndPosition;

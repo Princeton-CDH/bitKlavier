@@ -78,7 +78,7 @@ public:
     
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
     void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
-    void BKADSRButtonStateChanged(String name, bool state) override;
+    void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
     
     void closeSubWindow();
     
