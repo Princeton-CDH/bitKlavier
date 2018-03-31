@@ -72,7 +72,6 @@ BKViewController(p, theGraph)
     }
     showADSR = false;
     visibleADSR = 0;
-    envelopeSliders[0]->setButtonToggle(true);
     
     selectCB.setName("Synchronic");
     selectCB.addSeparator();
@@ -189,37 +188,6 @@ void SynchronicViewController::resized()
             paramSliders[i]->setBounds(area.removeFromTop(tempHeight));
         }
         
-        //leftColumn.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
-        leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
-        //leftColumn.removeFromLeft(gXSpacing);
-        
-        int nextCenter = paramSliders[0]->getY() + paramSliders[0]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY) ;
-        howManySlider->setBounds(leftColumn.getX(),
-                                 nextCenter - gComponentSingleSliderHeight/2.,
-                                 leftColumn.getWidth(),
-                                 gComponentSingleSliderHeight);
-        
-        nextCenter = paramSliders[1]->getY() + paramSliders[1]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
-        clusterThreshSlider->setBounds(leftColumn.getX(),
-                                       nextCenter - gComponentSingleSliderHeight/2.,
-                                       leftColumn.getWidth(),
-                                       gComponentSingleSliderHeight);
-        
-        nextCenter = paramSliders[2]->getY() + paramSliders[2]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
-        clusterMinMaxSlider->setBounds(leftColumn.getX(),
-                                       nextCenter - gComponentRangeSliderHeight/2.,
-                                       leftColumn.getWidth(),
-                                       gComponentRangeSliderHeight);
-        
-        nextCenter = paramSliders[3]->getY() + paramSliders[3]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
-        gainSlider->setBounds(leftColumn.getX(),
-                              nextCenter - gComponentSingleSliderHeight/2.,
-                              leftColumn.getWidth(),
-                              gComponentSingleSliderHeight);
-        
-        Rectangle<int> releaseToggleSlice = gainSlider->getBounds().removeFromTop(gComponentTextFieldHeight);
-        releaseToggleSlice.removeFromRight(gYSpacing);
-        releaseVelocitySetsSynchronicToggle.setBounds(releaseToggleSlice.removeFromRight(releaseToggleSlice.getWidth() * 0.5));
         
         // envelopeSlice.removeFromTop(gPaddingConst * (1. - processor.paddingScalarY));
         envelopeSlice.removeFromTop(gPaddingConst * processor.paddingScalarY);
@@ -232,6 +200,40 @@ void SynchronicViewController::resized()
             Rectangle<float> envArea (envelopeSlice.removeFromRight(envWidth));
             envelopeSliders[i]->setBounds(envArea.toNearestInt());
         }
+        
+        //leftColumn.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
+        leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
+        //leftColumn.removeFromLeft(gXSpacing);
+        
+        int nextCenter = paramSliders[0]->getY() + paramSliders[0]->getHeight()  + gPaddingConst * (1. - processor.paddingScalarY) ;
+        howManySlider->setBounds(leftColumn.getX(),
+                                 nextCenter - gComponentSingleSliderHeight/2.,
+                                 leftColumn.getWidth(),
+                                 gComponentSingleSliderHeight);
+        
+        nextCenter = paramSliders[1]->getY() + paramSliders[1]->getHeight()  + gPaddingConst * (1. - processor.paddingScalarY);
+        clusterThreshSlider->setBounds(leftColumn.getX(),
+                                       nextCenter - gComponentSingleSliderHeight/2.,
+                                       leftColumn.getWidth(),
+                                       gComponentSingleSliderHeight);
+        
+        nextCenter = paramSliders[2]->getY() + paramSliders[2]->getHeight()  + gPaddingConst * (1. - processor.paddingScalarY);
+        clusterMinMaxSlider->setBounds(leftColumn.getX(),
+                                       nextCenter - gComponentRangeSliderHeight/2.,
+                                       leftColumn.getWidth(),
+                                       gComponentRangeSliderHeight);
+        
+        //nextCenter = paramSliders[3]->getY() + paramSliders[3]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
+        nextCenter = envelopeSliders[0]->getY() + gPaddingConst * (1. - processor.paddingScalarY);
+        gainSlider->setBounds(leftColumn.getX(),
+                              nextCenter - gComponentSingleSliderHeight/2.,
+                              leftColumn.getWidth(),
+                              gComponentSingleSliderHeight);
+        
+        Rectangle<int> releaseToggleSlice = gainSlider->getBounds().removeFromTop(gComponentTextFieldHeight);
+        releaseToggleSlice.removeFromRight(gYSpacing);
+        releaseVelocitySetsSynchronicToggle.setBounds(releaseToggleSlice.removeFromRight(releaseToggleSlice.getWidth() * 0.5));
+
     }
     else
     {
@@ -298,9 +300,9 @@ void SynchronicViewController::setShowADSR(String name, bool newval)
         {
             envelopeSliders[i]->setVisible(true);
             envelopeSliders[i]->setAlpha(0.5);
+            envelopeSliders[i]->setButtonText(String(""));
         }
         envelopeName.setVisible(true);
-        envelopeSliders[visibleADSR]->setButtonText("");
         
     }
     
@@ -339,6 +341,7 @@ SynchronicViewController(p, theGraph)
     fillSelectCB(-1,-1);
     
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+    SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
     selectCB.addListener(this);
     selectCB.addMyListener(this);
@@ -354,6 +357,8 @@ SynchronicViewController(p, theGraph)
     {
         envelopeSliders[i]->addMyListener(this);
     }
+    
+    envelopeSliders[0]->adsrButton.triggerClick(); //initialize first envelope, since it is always active
     
     startTimer(30);
     
@@ -396,8 +401,15 @@ void SynchronicPreparationEditor::timerCallback()
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
             }
+            
+            SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+            for(int i = 0; i < envelopeSliders.size(); i++)
+            {
+                if(i == sProcessor->getEnvelopeCounter()) envelopeSliders[i]->setHighlighted();
+                else if(active->getEnvelopeOn(i)) envelopeSliders[i]->setActive();
+                else envelopeSliders[i]->setPassive();
+            }
         }
-        
     }
 }
 
@@ -581,7 +593,7 @@ void SynchronicPreparationEditor::BKADSRSliderValueChanged(String name, int atta
 
 void SynchronicPreparationEditor::BKADSRButtonStateChanged(String name, bool shift, bool state)
 {
-    DBG("BKADSRButtonStateChanged + " + String((int)state));
+    //DBG("BKADSRButtonStateChanged + " + String((int)state));
     
     int which = 0;
     for(int i=0; i<envelopeSliders.size(); i++)
@@ -591,15 +603,18 @@ void SynchronicPreparationEditor::BKADSRButtonStateChanged(String name, bool shi
     
     if(shift)
     {
-        DBG("toggling " + String((int)state));
-        
         SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
         SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
         
         if(which != 0) //first envelope is always on...
         {
+            DBG("toggling " + String(which) + " " + String((int)state));
             prep->setEnvelopeOn(which, state);
             active->setEnvelopeOn(which, state);
+        }
+        else
+        {
+            envelopeSliders[0]->setButtonToggle(true);
         }
     }
     else

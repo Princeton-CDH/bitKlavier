@@ -29,6 +29,7 @@ tempo(tempo)
     
     clusterTimer = 0;
     phasor = 0;
+    envelopeCounter = 0;
      
     inCluster = false;
     

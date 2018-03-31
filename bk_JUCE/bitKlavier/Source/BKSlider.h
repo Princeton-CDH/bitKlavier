@@ -739,7 +739,12 @@ public:
     }
     
     void setIsButtonOnly(bool state) { isButtonOnly = state; }
-    void setButtonToggle(bool state) {adsrButton.setToggleState(true, dontSendNotification);}
+    void setButtonToggle(bool state) {adsrButton.setToggleState(state, dontSendNotification);}
+    bool getButtonToggle() { return adsrButton.getToggleState(); }
+    
+    void setHighlighted() { adsrButton.setLookAndFeel(&highlightedADSRLookAndFeel); }
+    void setActive() { adsrButton.setLookAndFeel(&activeADSRLookAndFeel);}
+    void setPassive() { adsrButton.setLookAndFeel(&passiveADSRLookAndFeel); }
     
     void setJustifyRight(bool jr)
     {
@@ -752,6 +757,7 @@ public:
     void buttonStateChanged (Button*) override;
     void buttonClicked (Button*) override;
     void mouseDown (const MouseEvent &event) override;
+    void mouseUp (const MouseEvent &event) override {};
 
     
     void resized() override;
@@ -772,6 +778,8 @@ public:
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
     
+    BKTextButton adsrButton;
+    
     
 private:
     
@@ -782,7 +790,10 @@ private:
     
     String sliderName;
     BKLabel showName;
-    BKTextButton adsrButton;
+    
+    BKButtonAndMenuLAF highlightedADSRLookAndFeel;
+    BKButtonAndMenuLAF activeADSRLookAndFeel;
+    BKButtonAndMenuLAF passiveADSRLookAndFeel;
 
     bool justifyRight;
     bool isButtonOnly;

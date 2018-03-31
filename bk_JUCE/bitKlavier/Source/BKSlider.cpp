@@ -2480,8 +2480,13 @@ sliderName(name)
     adsrButton.addListener(this);
     adsrButton.addMouseListener(this, false);
     addAndMakeVisible(adsrButton);
+        
+    passiveADSRLookAndFeel.setColour(TextButton::buttonColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.13f));
+    highlightedADSRLookAndFeel.setColour(TextButton::buttonColourId, Colours::red.withSaturation(1.));
+    activeADSRLookAndFeel.setColour(TextButton::buttonColourId, Colours::goldenrod.withMultipliedAlpha(0.75));
     
     isButtonOnly = true;
+    setButtonToggle(true);
 
 }
 
@@ -2543,7 +2548,9 @@ void BKADSRSlider::mouseDown (const MouseEvent &event)
     if(event.mods.isShiftDown())
     {
         //DBG("shift is down");
-        listeners.call(&BKADSRSlider::Listener::BKADSRButtonStateChanged, getName(), true, !adsrButton.getToggleState());
+        bool toggleState = adsrButton.getToggleState();
+        DBG("BKADSRSlider::mouseDown = " + getName() + " " + String((int)toggleState));
+        listeners.call(&BKADSRSlider::Listener::BKADSRButtonStateChanged, getName(), true, toggleState);
     }
     else
     {

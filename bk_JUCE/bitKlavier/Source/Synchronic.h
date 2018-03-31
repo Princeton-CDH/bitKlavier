@@ -978,6 +978,8 @@ public:
     inline const int getAccentMultiplierCounter() const noexcept { return accentMultiplierCounter; }
     inline const int getLengthMultiplierCounter() const noexcept { return lengthMultiplierCounter; }
     inline const int getTranspCounter() const noexcept { return transpCounter; }
+    inline const int getEnvelopeCounter() const noexcept { return envelopeCounter; }
+    
     inline const SynchronicSyncMode getMode() const noexcept {return synchronic->aPrep->getMode(); }
 
     inline int getId(void) const noexcept { return synchronic->getId(); }
