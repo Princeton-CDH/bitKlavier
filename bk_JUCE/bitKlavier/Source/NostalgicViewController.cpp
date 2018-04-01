@@ -611,6 +611,12 @@ void NostalgicPreparationEditor::buttonClicked (Button* b)
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
+        reverseADSRSlider->setIsButtonOnly(true);
+        undertowADSRSlider->setIsButtonOnly(true);
+        setShowADSR(reverseADSRSlider->getName(), false);
+        setShowADSR(undertowADSRSlider->getName(), false);
+        setSubWindowInFront(false);
     }
     else if (b == &actionButton)
     {

@@ -46,6 +46,7 @@ BKViewController(p, theGraph)
     ADSRSlider = new BKADSRSlider("ADSR");
     ADSRSlider->setButtonText("edit envelope");
     addAndMakeVisible(ADSRSlider);
+    setShowADSR(false);
     
     
 #if JUCE_IOS
@@ -58,8 +59,7 @@ BKViewController(p, theGraph)
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.addListener(this);
-    
-    showADSR = false;
+
 }
 
 void DirectViewController::paint (Graphics& g)
@@ -88,7 +88,7 @@ void DirectViewController::setShowADSR(bool newval)
         hammerGainSlider->setVisible(true);
         gainSlider->setVisible(true);
         transpositionSlider->setVisible(true);
-        
+
         ADSRSlider->setButtonText("edit envelope");
     }
     
@@ -481,6 +481,10 @@ void DirectPreparationEditor::buttonClicked (Button* b)
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
+        ADSRSlider->setIsButtonOnly(true);
+        setShowADSR(false);
+        setSubWindowInFront(false);
     }
     else if (b == &actionButton)
     {
