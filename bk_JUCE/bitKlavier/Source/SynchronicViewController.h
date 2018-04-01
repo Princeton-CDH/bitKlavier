@@ -104,6 +104,8 @@ public:
     
     static void actionButtonCallback(int action, SynchronicPreparationEditor*);
     
+    void closeSubWindow();
+    
     int addPreparation(void);
     int duplicatePreparation(void);
     void setCurrentId(int Id);

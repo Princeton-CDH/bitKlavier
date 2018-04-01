@@ -324,6 +324,11 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
             if(overtop.nvc.getSubWindowInFront()) overtop.nvc.closeSubWindow();
             else processor.updateState->setCurrentDisplay(DisplayNil);
         }
+        else if(currentDisplay == DisplaySynchronic)
+        {
+            if(overtop.svc.getSubWindowInFront()) overtop.svc.closeSubWindow();
+            else processor.updateState->setCurrentDisplay(DisplayNil);
+        }
         else processor.updateState->setCurrentDisplay(DisplayNil);
     }
     else if (code == KeyPress::deleteKey)

@@ -624,6 +624,17 @@ void SynchronicPreparationEditor::BKADSRButtonStateChanged(String name, bool shi
     }
 }
 
+void SynchronicPreparationEditor::closeSubWindow()
+{
+    for(int i=0; i<envelopeSliders.size(); i++)
+    {
+        envelopeSliders[i]->setIsButtonOnly(true);
+        setShowADSR(envelopeSliders[i]->getName(), false);
+    }
+    
+    setSubWindowInFront(false);
+}
+
 void SynchronicPreparationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
@@ -861,6 +872,13 @@ void SynchronicPreparationEditor::buttonClicked (Button* b)
     else if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
+        for(int i=0; i<envelopeSliders.size(); i++)
+        {
+            envelopeSliders[i]->setIsButtonOnly(true);
+            setShowADSR(envelopeSliders[i]->getName(), false);
+        }
+        setSubWindowInFront(false);
     }
     else if (b == &actionButton)
     {
