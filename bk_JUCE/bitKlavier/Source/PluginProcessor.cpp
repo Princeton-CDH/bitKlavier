@@ -662,6 +662,9 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == TuningA1ClusterThresh)     active->setAdaptiveClusterThresh(modi);
         else if (type == TuningA1AnchorFundamental) active->setAdaptiveAnchorFundamental((PitchClass) modi);
         else if (type == TuningA1History)           active->setAdaptiveHistory(modi);
+        else if (type == TuningNToneRootCB)         active->setNToneRoot(modi);
+        else if (type == TuningNToneRootOctaveCB)   active->setNToneRootOctave(modi);
+        else if (type == TuningNToneSemitoneWidth)  active->setNToneSemitoneWidth(modi);
         else if (type == TuningCustomScale)
         {
             active->setTuning(CustomTuning);
