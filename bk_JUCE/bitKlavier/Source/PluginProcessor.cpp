@@ -317,6 +317,7 @@ void BKAudioProcessor::openSoundfont(void)
         if      (ext == ".sf2")
         {
             sf2sound   = new sfzero::SF2Sound(sfzFile);
+            //sf2sound->useSubsound(0);
             
             sf2reader  = new sfzero::SF2Reader(sf2sound, sfzFile);
             
@@ -396,6 +397,10 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     gallery->prepareToPlay(sampleRate);
     
+#if JUCE_DEBUG
+    loadPianoSamples(BKLoadLite);
+#else
+    
 #if JUCE_IOS
     String osname = SystemStats::getOperatingSystemName();
     float iosVersion = osname.fromLastOccurrenceOf("iOS ", false, true).getFloatValue();
@@ -409,6 +414,8 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     else                    loadPianoSamples(BKLoadLite); // CHANGE BACK TO MEDIUM
 #else
     loadPianoSamples(BKLoadHeavy); // CHANGE THIS BACK TO HEAVY
+#endif
+    
 #endif
 
     

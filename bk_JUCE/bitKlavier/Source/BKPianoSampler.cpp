@@ -196,6 +196,10 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             {
                 DBG("Invalid note type.");
             }
+            
+            DBG("- - - - - - - - - - - ");
+            DBG("ssp: " + String(sourceSamplePosition));
+            DBG("pep: " + String(playEndPosition));
         }
         else
         {
