@@ -18,17 +18,30 @@ BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                           double sourceSampleRate,
                                           const BigInteger& notes,
                                           const int rootMidiNote,
-                                          const BigInteger& velocities)
-: name (soundName),
+                                          const BigInteger& velocities,
+                                          sfzero::Region* reg)
+:
+name (soundName),
 data(buffer),
 sourceSampleRate(sourceSampleRate),
 midiNotes (notes),
 midiVelocities(velocities),
 soundLength(soundLength),
-midiRootNote (rootMidiNote)
+midiRootNote (rootMidiNote),
+region(reg)
 {
     rampOnSamples = roundToInt (aRampOnTimeSec* sourceSampleRate);
     rampOffSamples = roundToInt (aRampOffTimeSec * sourceSampleRate);
+    
+    if (region != nullptr)
+    {
+        float attack = region->ampeg.attack * 0.001f;
+        float decay = region->ampeg.decay * 0.001f;
+        float sustain = region->ampeg.sustain / 100.0f;
+        float release = region->ampeg.release * 0.001f;
+        
+        adsr.setAllTimes((attack > 1.0f) ? attack : 1.0f, (decay > 1.0f) ? decay : 1.0f, sustain, (release > 1.0f) ? release : 1.0f);
+    }
     
 }
 
@@ -120,11 +133,12 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                         * sound->sourceSampleRate
                         * generalSettings->getTuningRatio()
                         / getSampleRate();
-        
-        
+    
         bkType = bktype;
         playType = type;
         playDirection = direction;
+        
+        revRamped = false;
         
         double playLength = 0.0;
         double maxLength = sound->soundLength - adsrRelease;
@@ -230,11 +244,11 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
 
         adsr.setSampleRate(getSampleRate());
         
-        DBG("BKPianoSamplerVoice::startNote ADSR vals: " + String(adsrAttack/(0.001*getSampleRate())) + " " + String(adsrDecay/(0.001*getSampleRate())) + " " + String(adsrSustain) + " " + String(adsrRelease/(0.001*getSampleRate())));
+        //DBG("BKPianoSamplerVoice::startNote ADSR vals: " + String(adsrAttack/(0.001*getSampleRate())) + " " + String(adsrDecay/(0.001*getSampleRate())) + " " + String(adsrSustain) + " " + String(adsrRelease/(0.001*getSampleRate())));
         adsr.setAllTimes(adsrAttack / getSampleRate(), adsrDecay / getSampleRate(), adsrSustain, adsrRelease / getSampleRate());
 
         adsr.keyOn();
-        DBG("ADSR vals = " + String(adsr.getAttackRate()) + " " + String(adsr.getDecayRate()) + " " + String(adsr.getSustainLevel()) + " " + String(adsr.getReleaseRate()) + " " );
+        //DBG("ADSR vals = " + String(adsr.getAttackRate()) + " " + String(adsr.getDecayRate()) + " " + String(adsr.getSustainLevel()) + " " + String(adsr.getReleaseRate()));
         
         noteStartingPosition = sourceSamplePosition;
         noteEndPosition = playEndPosition;
@@ -270,23 +284,133 @@ void BKPianoSamplerVoice::controllerMoved (const int /*controllerNumber*/,
 
 //==============================================================================
 
-
-void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int startSample, int numSamples)
+void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
+                                       int startSample, int numSamples,
+                                       const BKPianoSamplerSound* playingSound)
 {
-    if (const BKPianoSamplerSound* const playingSound = static_cast<BKPianoSamplerSound*> (getCurrentlyPlayingSound().get()))
+    const float* const inL = playingSound->data->getAudioSampleBuffer()->getReadPointer (0);
+    const float* const inR = playingSound->data->getAudioSampleBuffer()->getNumChannels() > 1
+    ? playingSound->data->getAudioSampleBuffer()->getReadPointer (1)
+    : nullptr;
+    
+    float* outL = outputBuffer.getWritePointer (0, startSample);
+    float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
+    
+    DBG("sourceSamplePosition: " + String(sourceSamplePosition) );
+    
+    while (--numSamples >= 0)
     {
-        
-        const float* const inL = playingSound->data->getAudioSampleBuffer()->getReadPointer (0);
-        const float* const inR = playingSound->data->getAudioSampleBuffer()->getNumChannels() > 1
-                               ? playingSound->data->getAudioSampleBuffer()->getReadPointer (1)
-                               : nullptr;
-        
-        float* outL = outputBuffer.getWritePointer (0, startSample);
-        float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
-        
-        while (--numSamples >= 0)
+        if ((adsr.getState() != stk::ADSR::IDLE) &&
+            (playDirection == Reverse) &&
+            (sourceSamplePosition > playingSound->soundLength))
         {
-            if (playDirection == Reverse && sourceSamplePosition > playingSound->soundLength)
+            if (outR != nullptr)
+            {
+                *outL++ += 0;
+                *outR++ += 0;
+            }
+            else
+            {
+                *outL++ += 0;
+            }
+            sourceSamplePosition -= pitchRatio;
+            continue;
+        }
+        
+        const int pos = (int) sourceSamplePosition;
+        const float alpha = (float) (sourceSamplePosition - pos);
+        const float invAlpha = 1.0f - alpha;
+        
+        // just using a very simple linear interpolation here..
+        float l = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
+        float r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l;
+        
+        l *= (lgain * adsr.tick());
+        r *= (rgain * adsr.lastOut());
+        
+        if (adsr.getState() == stk::ADSR::IDLE)
+        {
+            stopNote (0.0f, false);
+            break;
+        }
+        
+        if (outR != nullptr)
+        {
+            *outL++ += (l * 1.0f);
+            *outR++ += (r * 1.0f);
+        }
+        else
+        {
+            *outL++ += ((l + r) * 0.5f) * 1.0f;
+        }
+        
+        if (playDirection == Forward)
+        {
+            sourceSamplePosition += pitchRatio;
+            
+            if (sourceSamplePosition >= playEndPosition)
+            {
+                if (adsr.getState() != stk::ADSR::RELEASE)
+                {
+                    adsr.keyOff();
+                }
+            }
+            
+            if(sourceSamplePosition >= playingSound->soundLength)
+            {
+                //clearCurrentNote();
+                stopNote(0.0f, true);
+            }
+        }
+        else if (playDirection == Reverse)
+        {
+            sourceSamplePosition -= pitchRatio;
+
+            if (sourceSamplePosition <= playEndPosition)
+            {
+                if ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE))
+                {
+                    adsr.keyOff();
+                }
+            }
+            
+            if(sourceSamplePosition <= 0)
+            {
+                clearCurrentNote();
+            }
+        }
+        else
+        {
+            DBG("Invalid note direction.");
+        }
+    }
+}
+
+
+
+
+void BKPianoSamplerVoice::processSoundfont(AudioSampleBuffer& outputBuffer,
+                                           int startSample, int numSamples,
+                                           const BKPianoSamplerSound* playingSound)
+{
+    sfzero::Region* region = playingSound->region;
+    
+    const float* const inL = playingSound->data->getAudioSampleBuffer()->getReadPointer (0);
+    const float* const inR = playingSound->data->getAudioSampleBuffer()->getNumChannels() > 1
+    ? playingSound->data->getAudioSampleBuffer()->getReadPointer (1)
+    : nullptr;
+
+    float* outL = outputBuffer.getWritePointer (0, startSample);
+    float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
+    
+    DBG("pos " + String(sourceSamplePosition) );
+    
+    while (--numSamples >= 0)
+    {
+        if (playDirection == Reverse)
+        {
+        
+            if (sourceSamplePosition > playingSound->soundLength)
             {
                 if (outR != nullptr)
                 {
@@ -300,74 +424,135 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
                 sourceSamplePosition -= pitchRatio;
                 continue;
             }
-            
-            const int pos = (int) sourceSamplePosition;
-            const float alpha = (float) (sourceSamplePosition - pos);
-            const float invAlpha = 1.0f - alpha;
-            
-            // just using a very simple linear interpolation here..
-            float l = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-            float r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l;
-            
-            l *= lgain;
-            r *= rgain;
-
-            l *= adsr.tick();
-            r *= adsr.lastOut();
-            
-            if (adsr.getState() == stk::ADSR::IDLE)
+            else if (!revRamped && (sourceSamplePosition < (playingSound->soundLength + pitchRatio)))
             {
-                stopNote (0.0f, false);
-                break;
-            }
-
-            if (outR != nullptr)
-            {
-                *outL++ += (l * 1.0f);
-                *outR++ += (r * 1.0f);
-            }
-            else
-            {
-                *outL++ += ((l + r) * 0.5f) * 1.0f;
-            }
-            
-            if (playDirection == Forward)
-            {
-                sourceSamplePosition += pitchRatio;
-
-                if (sourceSamplePosition >= playEndPosition)
-                {
-                    if (adsr.getState() != stk::ADSR::RELEASE)
-                    {
-                        adsr.keyOff();
-                    }
-                }
-                if(sourceSamplePosition >= playingSound->soundLength)
-                {
-                    clearCurrentNote();
-                }
-            }
-            else if (playDirection == Reverse)
-            {
-                sourceSamplePosition -= pitchRatio;
-         
-                if (sourceSamplePosition <= playEndPosition)
-                {
-                    if (adsr.getState() != stk::ADSR::RELEASE)
-                    {
-                        adsr.keyOff();
-                    }
-                }
-                if(sourceSamplePosition <= 0)
-                {
-                    clearCurrentNote();
-                }
-            }
-            else
-            {
-                DBG("Invalid note direction.");
+                revRamped = true;
+                adsr.keyOn();
             }
         }
+        
+        const int pos = (int) sourceSamplePosition;
+        const float alpha = (float) (sourceSamplePosition - pos);
+        const float invAlpha = 1.0f - alpha;
+        int64 loopStart, loopEnd;
+        
+        loopStart = region->loop_start;
+        loopEnd = region->loop_end;
+        
+        /*
+        int64 nextPos = pos + 1;
+        
+        if ((playDirection == Forward) && (pos > loopEnd))
+        {
+            nextPos = loopStart;
+        }
+        else if ((playDirection == Reverse) && (pos < loopStart))
+        {
+            nextPos = loopEnd;
+        }
+        
+        // just using a very simple linear interpolation here..
+        // Simple linear interpolation with buffer overrun check
+        float nextL = nextPos < numSamples ? inL[nextPos] : inL[pos];
+        float nextR = inR ? (nextPos < numSamples ? inR[nextPos] : inR[pos]) : nextL;
+        float l = (inL[pos] * invAlpha + nextL * alpha);
+        float r = inR ? (inR[pos] * invAlpha + nextR * alpha) : l;
+         */
+        
+        float l = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
+        float r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l;
+        
+        l *= (lgain * adsr.tick());
+        r *= (rgain * adsr.lastOut());
+        
+        if (outR != nullptr)
+        {
+            *outL++ += (l * 1.0f);
+            *outR++ += (r * 1.0f);
+        }
+        else
+        {
+            *outL++ += ((l + r) * 0.5f) * 1.0f;
+        }
+        
+        if (adsr.getState() == stk::ADSR::IDLE)
+        {
+            stopNote (0.0f, false);
+            break;
+        }
+        
+        
+        if (playDirection == Forward)
+        {
+            sourceSamplePosition += pitchRatio;
+            /*
+            if (sourceSamplePosition > loopEnd)
+            {
+                sourceSamplePosition = loopStart;
+                DBG("loopStart: " + String(loopStart));
+                numLoops += 1;
+            }
+             */
+            
+            if (sourceSamplePosition >= playEndPosition)
+            {
+                if (adsr.getState() != stk::ADSR::RELEASE)
+                {
+                    adsr.keyOff();
+                }
+            }
+            
+            if(sourceSamplePosition >= playingSound->soundLength )
+            {
+                //stopNote(0.0f, true);
+                clearCurrentNote();
+            }
+        }
+        else if (playDirection == Reverse)
+        {
+            sourceSamplePosition -= pitchRatio;
+            
+            
+            /*
+            if (sourceSamplePosition < loopStart)
+            {
+                sourceSamplePosition = loopEnd;
+                numLoops += 1;
+            }
+             */
+            
+            
+            if (sourceSamplePosition <= playEndPosition)
+            {
+                if ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE))
+                {
+                    adsr.keyOff();
+                }
+            }
+            
+            if (sourceSamplePosition <= 0.0)
+            {
+                //stopNote(0.0f, true);
+                clearCurrentNote();
+            }
+        }
+        else
+        {
+            DBG("Invalid note direction.");
+        }
+    }
+}
+
+void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int startSample, int numSamples)
+{
+    if (const BKPianoSamplerSound* const playingSound = static_cast<BKPianoSamplerSound*> (getCurrentlyPlayingSound().get()))
+    {
+        
+        sfzero::Region* region = playingSound->region;
+        
+        if (region == nullptr)  processPiano(outputBuffer, startSample, numSamples, playingSound);
+        else                    processSoundfont(outputBuffer, startSample, numSamples, playingSound);
+        
     }
 }
 

@@ -72,23 +72,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
         float offset = tuner->getOffset(note) + t;
         int synthNoteNumber = ((float)note + (int)offset);
         float synthOffset = offset - (int)offset;
-        //DBG("playing synchronic note/vel, sample# " + String(note) +  " " + String(velocity) + " " + String(synthNoteNumber));
-        /*
-        synth->keyOn(channel,
-                     note,
-                     synthNoteNumber,
-                     synthOffset,
-                     velocity,
-                     synchronic->aPrep->getGain() * aGlobalGain * synchronic->aPrep->getAccentMultipliers()[accentMultiplierCounter],
-                     noteDirection,
-                     FixedLengthFixedStart,
-                     SynchronicNote,
-                     synchronic->getId(),
-                     noteStartPos,  // start
-                     noteLength,
-                     3,     // + noteLength * synchronic->aPrep->rampUpPercentage()[rampPercentageCounter]
-                     30);   //30 + noteLength * 0.4);   // + noteLength * synchronic->aPrep->rampDownPercentage()[rampPercentageCounter]
-        */
+
         synth->keyOn(channel,
                      note,
                      synthNoteNumber,

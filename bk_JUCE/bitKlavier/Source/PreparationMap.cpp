@@ -390,7 +390,6 @@ void PreparationMap::sustainPedalReleased(bool post)
 
 void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
 {
-    DBG("PreparationMap::postRelease");
     
     if(sustainPedalIsDepressed && pKeymap->containsNote(noteNumber))
     {

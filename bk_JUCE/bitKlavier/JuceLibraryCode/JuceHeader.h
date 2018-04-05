@@ -30,6 +30,7 @@
 #include <juce_opengl/juce_opengl.h>
 #include <juce_video/juce_video.h>
 #include <stk/stk.h>
+#include <SFZero/SFZero.h>
 
 #include "BinaryData.h"
 

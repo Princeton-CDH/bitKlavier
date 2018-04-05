@@ -168,6 +168,8 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     galleryMenu.addSubMenu("Load Samples", getLoadMenu());
     galleryMenu.addSeparator();
+    galleryMenu.addItem(SOUNDFONT_ID, "Load Soundfont");
+    galleryMenu.addSeparator();
     
     // ~ ~ ~ share menu ~ ~ ~
 #if JUCE_MAC
@@ -358,6 +360,12 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         
         //processor.createGalleryWithName(processor.gallery->getName());
     }
+#if !JUCE_IOS
+    if (result == SOUNDFONT_ID)
+    {
+        processor.openSoundfont();
+    }
+#endif
     if (result == SAVEAS_ID)
     {
 #if JUCE_IOS

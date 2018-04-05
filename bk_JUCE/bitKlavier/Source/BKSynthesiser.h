@@ -17,21 +17,7 @@
 
 #include "General.h"
 
-
-//==============================================================================
-/**
- Describes one of the sounds that a BKSynthesiser can play.
- 
- A BKSynthesiser can contain one or more sounds, and a sound can choose which
- midi notes and channels can trigger it.
- 
- The BKSynthesiserSound is a passive class that just describes what the sound is -
- the actual audio rendering for a sound is done by a BKSynthesiserVoice. This allows
- more than one BKSynthesiserVoice to play the same sound at the same time.
- 
- @see BKSynthesiser, BKSynthesiserVoice
- */
-class BKSynthesiserSound    : public ReferenceCountedObject
+class JUCE_API  BKSynthesiserSound    : public ReferenceCountedObject
 {
 protected:
     //==============================================================================
@@ -44,25 +30,24 @@ public:
     //==============================================================================
     /** Returns true if this sound should be played when a given midi note is pressed.
      
-     The BKSynthesiser will use this information when deciding which sounds to trigger
+     The Synthesiser will use this information when deciding which sounds to trigger
      for a given note.
      */
     virtual bool appliesToNote (int midiNoteNumber) = 0;
     
-    /** Returns true if this sound should be played when a given midi velocity is played.
-     
-     The BKSynthesiser will use this information when deciding which sounds to trigger
-     for a given velocity.
-     */
-    virtual bool appliesToVelocity (int midiNoteVelocity) = 0;
-    
     /** Returns true if the sound should be triggered by midi events on a given channel.
      
-     The BKSynthesiser will use this information when deciding which sounds to trigger
+     The Synthesiser will use this information when deciding which sounds to trigger
      for a given note.
      */
     virtual bool appliesToChannel (int midiChannel) = 0;
     
+    /** Returns true if the sound should be triggered by midi veloctity.
+     
+     The Synthesiser will use this information when deciding which sounds to trigger
+     for a given note.
+     */
+    virtual bool appliesToVelocity (int midiVelocity) = 0;
     
     /** The class is reference-counted, so this is a handy pointer class for it. */
     typedef ReferenceCountedObjectPtr<BKSynthesiserSound> Ptr;

@@ -40,13 +40,15 @@ public:
      @param maxSampleLengthSeconds   a maximum length of audio to read from the audio
      source, in seconds
      */
+    
     BKPianoSamplerSound (const String& name,
                          BKReferenceCountedBuffer::Ptr buffer,
                          uint64 soundLength,
                          double sourceSampleRate,
                          const BigInteger& midiNotes,
                          int rootMidiNote,
-                         const BigInteger& midiVelocities);
+                         const BigInteger& midiVelocities,
+                         sfzero::Region* region = nullptr);
     
     /** Destructor. */
     ~BKPianoSamplerSound();
@@ -70,6 +72,9 @@ private:
     //==============================================================================
     friend class BKPianoSamplerVoice;
     
+    //sfzero::Region* region;
+
+    
     String name;
     
     BKReferenceCountedBuffer::Ptr data;
@@ -80,6 +85,9 @@ private:
     uint64 soundLength;
     int midiRootNote;
     int rampOnSamples, rampOffSamples;
+    
+    stk::ADSR adsr;
+    sfzero::Region* region;
     
     JUCE_LEAK_DETECTOR (BKPianoSamplerSound)
 };
@@ -146,6 +154,13 @@ public:
     void renderNextBlock (AudioSampleBuffer&, int startSample, int numSamples) override;
     
     
+    void processPiano(AudioSampleBuffer& outputBuffer,
+                      int startSample, int numSamples,
+                      const BKPianoSamplerSound* playingSound);
+    
+    void processSoundfont(AudioSampleBuffer& outputBuffer,
+                          int startSample, int numSamples,
+                          const BKPianoSamplerSound* playingSound);
     
     
 private:
@@ -162,10 +177,16 @@ private:
     BKNoteType bkType;
     PianoSamplerNoteType playType;
     PianoSamplerNoteDirection playDirection;
+    bool revRamped;
     float lgain, rgain, rampOnOffLevel, rampOnDelta, rampOffDelta;
-    bool isInRampOn, isInRampOff;    
+    bool isInRampOn, isInRampOff;
+    
+    // SFZ stuff
+    sfzero::Region *region_;
+    sfzero::EG ampeg_;
     
     stk::ADSR adsr;
+    int numLoops;
     
     JUCE_LEAK_DETECTOR (BKPianoSamplerVoice)
 };

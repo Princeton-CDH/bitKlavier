@@ -67,10 +67,26 @@ public:
     
     BKUpdateState::Ptr                  updateState;
 
+    void loadSFZ(File sfzFile);
+    
+    void loadSF2(File sfzFile);
+    
+    void openSoundfont(void);
+    
+    void loadSoundfontFromFile(File sfzFile);
+    
+    juce::Array<sfzero::Region*> regions;
+    
+    AudioFormatManager formatManager;
+    ScopedPointer<AudioFormatReader> sampleReader;
+    ScopedPointer<AudioSampleBuffer> sampleBuffer;
+    
     // Synthesisers.
     BKSynthesiser                       mainPianoSynth;
     BKSynthesiser                       hammerReleaseSynth;
     BKSynthesiser                       resonanceReleaseSynth;
+    
+    //sfzero::Synth                       synth;
     
     Piano::Ptr                          prevPiano;
     Piano::Ptr                          currentPiano;

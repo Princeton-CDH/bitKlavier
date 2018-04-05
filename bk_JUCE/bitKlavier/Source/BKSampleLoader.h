@@ -33,6 +33,7 @@ private:
     
     // Sample loading.
     AudioFormatManager formatManager;
+    WavAudioFormat wavFormat;
     ScopedPointer<AudioFormatReader> sampleReader;
     ScopedPointer<AudioSampleBuffer> sampleBuffer;
     
