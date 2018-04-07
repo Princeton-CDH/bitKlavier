@@ -150,11 +150,14 @@ public:
     inline const int getReverseDecay() const noexcept                      {return nReverseDecay;         }
     inline const float getReverseSustain() const noexcept                  {return nReverseSustain;       }
     inline const int getReverseRelease() const noexcept                    {return nReverseRelease;       }
+    inline const Array<float> getReverseADSRvals() const noexcept         {return {nReverseAttack, nReverseDecay, nReverseSustain, nReverseRelease}; }
+    
     
     inline const int getUndertowAttack() const noexcept                    {return nUndertowAttack;        }
     inline const int getUndertowDecay() const noexcept                     {return nUndertowDecay;         }
     inline const float getUndertowSustain() const noexcept                 {return nUndertowSustain;       }
     inline const int getUndertowRelease() const noexcept                   {return nUndertowRelease;       }
+    inline const Array<float> getUndertowADSRvals() const noexcept         {return {nUndertowAttack, nUndertowDecay, nUndertowSustain, nUndertowRelease}; }
     
     inline void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
     inline void setUndertow(int undertow)                                  {nUndertow = undertow;                  }
@@ -173,6 +176,22 @@ public:
     inline void setUndertowDecay(int val)                                  {nUndertowDecay = val;          }
     inline void setUndertowSustain(float val)                              {nUndertowSustain = val;        }
     inline void setUndertowRelease(int val)                                {nUndertowRelease = val;        }
+    
+    inline void setReverseADSRvals(Array<float> vals)
+    {
+        nReverseAttack = vals[0];
+        nReverseDecay = vals[1];
+        nReverseSustain = vals[2];
+        nReverseRelease = vals[3];
+    }
+    
+    inline void setUndertowADSRvals(Array<float> vals)
+    {
+        nUndertowAttack = vals[0];
+        nUndertowDecay = vals[1];
+        nUndertowSustain = vals[2];
+        nUndertowRelease = vals[3];
+    }
 
     void print(void)
     {
@@ -374,6 +393,22 @@ public:
         prep.setProperty( ptagNostalgic_beatsToSkip,        sPrep->getBeatsToSkip(), 0);
         prep.setProperty( ptagNostalgic_mode,               sPrep->getMode(), 0);
         
+        ValueTree reverseADSRvals( vtagNostalgic_reverseADSR);
+        count = 0;
+        for (auto f : sPrep->getReverseADSRvals())
+        {
+            reverseADSRvals.setProperty( ptagFloat + String(count++), f, 0);
+        }
+        prep.addChild(reverseADSRvals, -1, 0);
+        
+        ValueTree undertowADSRvals( vtagNostalgic_undertowADSR);
+        count = 0;
+        for (auto f : sPrep->getUndertowADSRvals())
+        {
+            undertowADSRvals.setProperty( ptagFloat + String(count++), f, 0);
+        }
+        prep.addChild(undertowADSRvals, -1, 0);
+        
         return prep;
     }
     
@@ -413,6 +448,42 @@ public:
                 }
                 
                 sPrep->setTransposition(transp);
+                
+            }
+            else  if (sub->hasTagName(vtagNostalgic_reverseADSR))
+            {
+                Array<float> envVals;
+                for (int k = 0; k < 4; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        envVals.add(f);
+                    }
+                }
+                
+                sPrep->setReverseADSRvals(envVals);
+                
+            }
+            else  if (sub->hasTagName(vtagNostalgic_undertowADSR))
+            {
+                Array<float> envVals;
+                for (int k = 0; k < 4; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        envVals.add(f);
+                    }
+                }
+                
+                sPrep->setUndertowADSRvals(envVals);
                 
             }
         }

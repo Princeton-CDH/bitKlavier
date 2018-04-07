@@ -120,6 +120,8 @@ const String ptagNostalgic_mode = "mode";
 const String ptagNostalgic_beatsToSkip = "beatsToSkip";
 const String ptagNostalgic_syncTarget = "syncTarget";
 const String ptagNostalgic_reset = "nostalgicReset";
+const String vtagNostalgic_reverseADSR = "reverseADSR";
+const String vtagNostalgic_undertowADSR = "undertowADSR";
 
 
 const String vtagDirect = "direct";
@@ -507,6 +509,8 @@ typedef enum NostalgicParameterType {
     NostalgicMode,
     NostalgicSyncTarget,
     NostalgicTuning,
+    NostalgicReverseADSR,
+    NostalgicUndertowADSR,
     NostalgicParameterTypeNil
     
 } NostalgicParameterType;
@@ -522,6 +526,8 @@ static const std::vector<BKParameterDataType> cNostalgicDataTypes =
     BKInt,
     BKInt,
     BKInt,
+    BKFloatArr,
+    BKFloatArr,
     BKInt
 };
 
@@ -535,6 +541,8 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
     "BeatsToSkip",
     "Length Mode",
     "SyncTarget",
+    "ReverseADSR",
+    "UndertowADSR",
     "Tuning Id"
 };
 
