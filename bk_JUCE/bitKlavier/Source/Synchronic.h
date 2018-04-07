@@ -125,6 +125,8 @@ public:
         sDecays = s->getDecays();
         sSustains = s->getSustains();
         sReleases = s->getReleases();
+        
+        envelopeOn = s->getEnvelopesOn();
     }
     
     bool compare(SynchronicPreparation::Ptr s)
@@ -137,6 +139,7 @@ public:
         bool decay = true;
         bool sustain = true;
         bool release = true;
+        bool envelope = true;
         
         for (int i = s->getLengthMultipliers().size(); --i>=0;)
         {
@@ -218,6 +221,15 @@ public:
             }
         }
         
+        for (int i = s->getEnvelopesOn().size(); --i>=0;)
+        {
+            if (s->getEnvelopesOn()[i] != envelopeOn[i])
+            {
+                envelope = false;
+                break;
+            }
+        }
+        
         return (sNumBeats == s->getNumBeats() &&
                 sClusterMin == s->getClusterMin() &&
                 sClusterMax == s->getClusterMax() &&
@@ -262,6 +274,26 @@ public:
     inline const int getDecay(int which) const noexcept     {return sDecays[which];}
     inline const float getSustain(int which) const noexcept {return sSustains[which];}
     inline const int getRelease(int which) const noexcept   {return sReleases[which];}
+    
+    inline const Array<Array<float>> getADSRs() const noexcept
+    {
+        Array<Array<float>> allADSRs;
+        for(int i=0; i<sAttacks.size(); i++)
+        {
+            Array<float> singleADSR;
+            singleADSR.insert(0, sAttacks[i]);
+            singleADSR.insert(1, sDecays[i]);
+            singleADSR.insert(2, sSustains[i]);
+            singleADSR.insert(3, sReleases[i]);
+            if(envelopeOn[i])singleADSR.insert(4, 1);
+            else singleADSR.insert(4, 0);
+            
+            allADSRs.insert(i, singleADSR);
+        }
+        
+        return allADSRs;
+    }
+    
     inline const bool getEnvelopeOn(int which) const noexcept   {return envelopeOn[which];}
     
     inline void setClusterThresh(float clusterThresh)
@@ -301,6 +333,21 @@ public:
     inline void setDecay(int which, int val)        {sDecays.set(which, val);}
     inline void setSustain(int which, float val)    {sSustains.set(which, val);}
     inline void setRelease(int which, int val)      {sReleases.set(which, val);}
+    
+    inline void setADSRs(Array<Array<float>> allADSRs)
+    {
+        for(int i=0; i<allADSRs.size(); i++)
+        {
+            setAttack(i, allADSRs[i][0]);
+            setDecay(i, allADSRs[i][1]);
+            setSustain(i, allADSRs[i][2]);
+            setRelease(i, allADSRs[i][3]);
+            if(allADSRs[i][4] > 0 || i==0) setEnvelopeOn(i, true);
+            else setEnvelopeOn(i, false);
+            DBG("ADSR envelopeOn = " + String(i) + " " + String((int)getEnvelopeOn(i)));
+        }
+    }
+    
     inline void setEnvelopeOn(int which, bool val)  {envelopeOn.set(which, val);}
     
     void print(void)
@@ -349,7 +396,7 @@ private:
     Array<bool> envelopeOn;
     
 
-    float sGain;                //gain multiplier
+    float sGain;               //gain multiplier
     float sClusterThresh;      //max time between played notes before new cluster is started, in MS
     float sClusterThreshSec;
     
@@ -463,6 +510,18 @@ public:
             transposition.addChild(t,-1,0);
         }
         prep.addChild(transposition, -1, 0);
+        
+        ValueTree ADSRs( vtagSynchronic_ADSRs);
+        
+        tcount = 0;
+        for (auto arr : sPrep->getADSRs())
+        {
+            ValueTree e("e"+String(tcount++));
+            count = 0;
+            for (auto f : arr)  e.setProperty( ptagFloat + String(count++), f, 0);
+            ADSRs.addChild(e,-1,0);
+        }
+        prep.addChild(ADSRs, -1, 0);
         
         return prep;
         
@@ -582,6 +641,32 @@ public:
                 }
                 
                 sPrep->setTransposition(atransp);
+            }
+            else  if (sub->hasTagName(vtagSynchronic_ADSRs))
+            {
+                Array<Array<float>> aADSRs;
+                int tcount = 0;
+                forEachXmlChildElement (*sub, asub)
+                {
+                    if (asub->hasTagName("e"+String(tcount++)))
+                    {
+                        Array<float> singleADSR;
+                        for (int k = 0; k < 5; k++)
+                        {
+                            String attr = asub->getStringAttribute(ptagFloat + String(k));
+                            
+                            if (attr == String::empty) break;
+                            else
+                            {
+                                f = attr.getFloatValue();
+                                singleADSR.add(f);
+                            }
+                        }
+                        aADSRs.set(tcount-1, singleADSR);
+                    }
+                }
+                
+                sPrep->setADSRs(aADSRs);
             }
         }
         

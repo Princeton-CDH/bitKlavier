@@ -32,7 +32,7 @@ BKViewController(p, theGraph)
     int idx = 0;
     for (int i = 0; i < cSynchronicParameterTypes.size(); i++)
     {
-        if (cSynchronicDataTypes[i] == BKFloatArr || cSynchronicDataTypes[i] == BKArrFloatArr)
+        if ((cSynchronicDataTypes[i] == BKFloatArr || cSynchronicDataTypes[i] == BKArrFloatArr) && cSynchronicParameterTypes[i] != "ADSRs")
         {
             paramSliders.insert(idx, new BKMultiSlider(HorizontalMultiBarSlider));
             addAndMakeVisible(paramSliders[idx]);
@@ -406,7 +406,7 @@ void SynchronicPreparationEditor::timerCallback()
             for(int i = 0; i < envelopeSliders.size(); i++)
             {
                 if(i == sProcessor->getEnvelopeCounter()) envelopeSliders[i]->setHighlighted();
-                else if(active->getEnvelopeOn(i)) envelopeSliders[i]->setActive();
+                else if(active->getEnvelopeOn(i))envelopeSliders[i]->setActive(); 
                 else envelopeSliders[i]->setPassive();
             }
         }
@@ -558,6 +558,17 @@ void SynchronicPreparationEditor::update(NotificationType notify)
             }
         }
         
+        for(int i=0; i<envelopeSliders.size(); i++)
+        {
+            envelopeSliders[i]->setAttackValue(prep->getAttack(i), notify);
+            envelopeSliders[i]->setDecayValue(prep->getDecay(i), notify);
+            envelopeSliders[i]->setSustainValue(prep->getSustain(i), notify);
+            envelopeSliders[i]->setReleaseValue(prep->getRelease(i), notify);
+            DBG("prep->getEnvelopeOn(i) = " + String(i) + " " + String((int)prep->getEnvelopeOn(i)));
+            //if(i != 0)envelopeSliders[i]->setButtonToggle(prep->getEnvelopeOn(i));
+            //if(prep->getEnvelopeOn(i)) envelopeSliders[i]->setActive();
+            //else envelopeSliders[i]->setPassive();
+        }
     }
     
 }

@@ -742,9 +742,9 @@ public:
     void setButtonToggle(bool state) {adsrButton.setToggleState(state, dontSendNotification);}
     bool getButtonToggle() { return adsrButton.getToggleState(); }
     
-    void setHighlighted() { adsrButton.setLookAndFeel(&highlightedADSRLookAndFeel); }
-    void setActive() { adsrButton.setLookAndFeel(&activeADSRLookAndFeel);}
-    void setPassive() { adsrButton.setLookAndFeel(&passiveADSRLookAndFeel); }
+    void setHighlighted() { adsrButton.setToggleState(false, dontSendNotification); adsrButton.setLookAndFeel(&highlightedADSRLookAndFeel); }
+    void setActive() { adsrButton.setToggleState(false, dontSendNotification); adsrButton.setLookAndFeel(&activeADSRLookAndFeel);}
+    void setPassive() { adsrButton.setToggleState(true, dontSendNotification); adsrButton.setLookAndFeel(&passiveADSRLookAndFeel); }
     
     void setJustifyRight(bool jr)
     {

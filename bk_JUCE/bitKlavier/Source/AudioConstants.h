@@ -105,6 +105,7 @@ const String vtagSynchronic_lengthMults = "lengthMultipliers";
 const String vtagSynchronic_accentMults = "accentMultipliers";
 const String vtagSynchronic_transpOffsets = "transpOffsets";
 const String ptagSynchronic_reset = "synchronicReset";
+const String vtagSynchronic_ADSRs = "ADSRs";
 
 
 const String vtagNostalgic = "nostalgic";
@@ -430,6 +431,7 @@ typedef enum SynchronicParameterType {
     SynchronicGain,
     SynchronicTuning,
     SynchronicTempo,
+    SynhronicADSRs,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
@@ -449,6 +451,7 @@ static const std::vector<BKParameterDataType> cSynchronicDataTypes = {
     BKFloat,
     BKInt,
     BKInt,
+    BKArrFloatArr
 };
 
 static const std::vector<std::string> cSynchronicParameterTypes = {
@@ -465,7 +468,8 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "beat length multipliers",
     "gain",
     "Tuning Id",
-    "Tempo Id"
+    "Tempo Id",
+    "ADSRs"
 };
 
 static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc = {
