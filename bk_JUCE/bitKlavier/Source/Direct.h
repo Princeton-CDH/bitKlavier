@@ -107,6 +107,7 @@ public:
     inline const int getDecay() const noexcept                          {return dDecay;         }
     inline const float getSustain() const noexcept                      {return dSustain;       }
     inline const int getRelease() const noexcept                        {return dRelease;       }
+    inline const Array<float> getADSRvals() const noexcept              {return {dAttack, dDecay, dSustain, dRelease}; }
     
     inline void setTransposition(Array<float> val)                      {dTransposition = val;  }
     inline void setGain(float val)                                      {dGain = val;           }
@@ -116,6 +117,13 @@ public:
     inline void setDecay(int val)                                       {dDecay = val;          }
     inline void setSustain(float val)                                   {dSustain = val;        }
     inline void setRelease(int val)                                     {dRelease = val;        }
+    inline void setADSRvals(Array<float> vals)
+    {
+        dAttack = vals[0];
+        dDecay = vals[1];
+        dSustain = vals[2];
+        dRelease = vals[3];
+    }
     
     
     void print(void)
@@ -212,6 +220,14 @@ public:
         prep.setProperty( ptagDirect_resGain,           sPrep->getResonanceGain(), 0);
         prep.setProperty( ptagDirect_hammerGain,        sPrep->getHammerGain(), 0);
         
+        ValueTree ADSRvals( vtagDirect_ADSR);
+        count = 0;
+        for (auto f : sPrep->getADSRvals())
+        {
+            ADSRvals.setProperty( ptagFloat + String(count++), f, 0);
+        }
+        prep.addChild(ADSRvals, -1, 0);
+        
         return prep;
     }
     
@@ -255,6 +271,24 @@ public:
                 sPrep->setTransposition(transp);
                 
             }
+            else  if (sub->hasTagName(vtagDirect_ADSR))
+            {
+                Array<float> envVals;
+                for (int k = 0; k < 4; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        envVals.add(f);
+                    }
+                }
+                
+                sPrep->setADSRvals(envVals);
+                
+            }
         }
         // copy static to active
         aPrep->copy(sPrep);
@@ -282,7 +316,7 @@ public:
     
 private:
     int Id;
-    String name;
+    String name;;
     
     JUCE_LEAK_DETECTOR(Direct)
 };
