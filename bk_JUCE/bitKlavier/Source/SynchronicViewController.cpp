@@ -301,6 +301,7 @@ void SynchronicViewController::setShowADSR(String name, bool newval)
             envelopeSliders[i]->setVisible(true);
             envelopeSliders[i]->setAlpha(0.5);
             envelopeSliders[i]->setButtonText(String(""));
+            envelopeSliders[i]->resized();
         }
         envelopeName.setVisible(true);
         
@@ -406,7 +407,7 @@ void SynchronicPreparationEditor::timerCallback()
             for(int i = 0; i < envelopeSliders.size(); i++)
             {
                 if(i == sProcessor->getEnvelopeCounter()) envelopeSliders[i]->setHighlighted();
-                else if(active->getEnvelopeOn(i))envelopeSliders[i]->setActive(); 
+                else if(active->getEnvelopeOn(i))envelopeSliders[i]->setActive();
                 else envelopeSliders[i]->setPassive();
             }
         }
@@ -564,10 +565,6 @@ void SynchronicPreparationEditor::update(NotificationType notify)
             envelopeSliders[i]->setDecayValue(prep->getDecay(i), notify);
             envelopeSliders[i]->setSustainValue(prep->getSustain(i), notify);
             envelopeSliders[i]->setReleaseValue(prep->getRelease(i), notify);
-            DBG("prep->getEnvelopeOn(i) = " + String(i) + " " + String((int)prep->getEnvelopeOn(i)));
-            //if(i != 0)envelopeSliders[i]->setButtonToggle(prep->getEnvelopeOn(i));
-            //if(prep->getEnvelopeOn(i)) envelopeSliders[i]->setActive();
-            //else envelopeSliders[i]->setPassive();
         }
     }
     
@@ -642,7 +639,7 @@ void SynchronicPreparationEditor::closeSubWindow()
         envelopeSliders[i]->setIsButtonOnly(true);
         setShowADSR(envelopeSliders[i]->getName(), false);
     }
-    
+    DBG("SynchronicPreparationEditor::closeSubWindow()");
     setSubWindowInFront(false);
 }
 
