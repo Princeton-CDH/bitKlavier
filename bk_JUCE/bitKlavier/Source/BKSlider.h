@@ -738,6 +738,22 @@ public:
         releaseSlider->setValue(newval, notify);
     }
     
+    void setValue(Array<float> newvals, NotificationType notify)
+    {
+        setAttackValue(newvals[0], notify);
+        setDecayValue(newvals[1], notify);
+        setSustainValue(newvals[2], notify);
+        setReleaseValue(newvals[3], notify);
+        
+        if(newvals[4] > 0) setActive();
+        else setPassive();
+    }
+    
+    int getAttackValue()    { return attackSlider->getValue(); }
+    int getDecayValue()     { return decaySlider->getValue(); }
+    float getSustainValue() { return sustainSlider->getValue(); }
+    int getReleaseValue()   { return releaseSlider->getValue(); }
+    
     void setIsButtonOnly(bool state) { isButtonOnly = state; }
     void setButtonToggle(bool state) {adsrButton.setToggleState(state, dontSendNotification);}
     bool getButtonToggle() { return adsrButton.getToggleState(); }

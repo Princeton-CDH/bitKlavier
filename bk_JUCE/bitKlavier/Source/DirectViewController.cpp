@@ -511,7 +511,7 @@ DirectViewController(p, theGraph)
     
     hammerGainSlider->addMyListener(this);
     
-    //ADSRSlider->addMyListener(this);
+    ADSRSlider->addMyListener(this);
 }
 
 void DirectModificationEditor::greyOutAllComponents()
@@ -520,6 +520,7 @@ void DirectModificationEditor::greyOutAllComponents()
     resonanceGainSlider->setDim(gModAlpha);
     transpositionSlider->setDim(gModAlpha);
     gainSlider->setDim(gModAlpha);
+    ADSRSlider->setDim(gModAlpha);
 }
 
 void DirectModificationEditor::highlightModedComponents()
@@ -530,6 +531,7 @@ void DirectModificationEditor::highlightModedComponents()
     if(mod->getParam(DirectGain) != "")             gainSlider->setBright();
     if(mod->getParam(DirectResGain) != "")          resonanceGainSlider->setBright();
     if(mod->getParam(DirectHammerGain) != "")       hammerGainSlider->setBright();
+    if(mod->getParam(DirectADSR) != "")             ADSRSlider->setBright();
 }
 
 void DirectModificationEditor::update(void)
@@ -556,6 +558,9 @@ void DirectModificationEditor::update(void)
         
         val = mod->getParam(DirectGain);
         gainSlider->setValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(DirectADSR);
+        ADSRSlider->setValue(stringToFloatArray(val), dontSendNotification);
     }
     
     
@@ -747,6 +752,23 @@ void DirectModificationEditor::BKStackedSliderValueChanged(String name, Array<fl
     transpositionSlider->setBright();
     
     updateModification();
+}
+
+void DirectModificationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
+{
+    DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
+    
+    Array<float> newvals = {(float)attack, (float)decay, sustain, (float)release};
+    mod->setParam(DirectADSR, floatArrayToString(newvals));
+    ADSRSlider->setBright();
+    
+    updateModification();
+}
+
+void DirectModificationEditor::BKADSRButtonStateChanged(String name, bool mod, bool state)
+{
+    setShowADSR(!state);
+    setSubWindowInFront(!state);
 }
 
 void DirectModificationEditor::updateModification(void)

@@ -2496,6 +2496,7 @@ void BKADSRSlider::setDim(float alphaVal)
     decaySlider->setAlpha(alphaVal);
     sustainSlider->setAlpha(alphaVal);
     releaseSlider->setAlpha(alphaVal);
+    adsrButton.setAlpha(alphaVal);
     showName.setAlpha(alphaVal);
 }
 
@@ -2505,6 +2506,7 @@ void BKADSRSlider::setBright()
     decaySlider->setAlpha(1.);
     sustainSlider->setAlpha(1.);
     releaseSlider->setAlpha(1.);
+    adsrButton.setAlpha(1.);
     showName.setAlpha(1.);
 }
 
@@ -2581,21 +2583,7 @@ void BKADSRSlider::resized()
 {
     
     Rectangle<int> area (getLocalBounds());
-    /*
-    Rectangle<int> topSlab (area.removeFromTop(gComponentTextFieldHeight));
-    
-    if(justifyRight)
-    {
-        topSlab.removeFromRight(5);
-        showName.setBounds(topSlab.removeFromRight(getWidth() - 150));
-    }
-    else
-    {
-        topSlab.removeFromLeft(5);
-        showName.setBounds(topSlab.removeFromLeft(getWidth() - 150));
-    }
-     */
-    
+
     if(!isButtonOnly)
     {
         Rectangle<int> topSlice = area.removeFromTop(gComponentComboBoxHeight);
@@ -2621,9 +2609,6 @@ void BKADSRSlider::resized()
     {
         adsrButton.setBounds(area);
     }
-    
-
-    
 }
 
 

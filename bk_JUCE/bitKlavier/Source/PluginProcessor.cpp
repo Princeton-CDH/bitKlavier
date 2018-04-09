@@ -716,7 +716,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == DirectGain)        active->setGain(modf);
         else if (type == DirectHammerGain)  active->setHammerGain(modf);
         else if (type == DirectResGain)     active->setResonanceGain(modf);
-        
+        else if (type == DirectADSR)        active->setADSRvals(modfa);
         
         updateState->directPreparationDidChange = true;
     }

@@ -571,8 +571,8 @@ static const std::vector<BKParameterDataType> cDirectDataTypes = {
     BKFloat,
     BKFloat,
     BKFloat,
-    BKFloatArr,
-    BKInt
+    BKInt,
+    BKFloatArr
 };
 
 static const std::vector<std::string> cDirectParameterTypes = {
@@ -581,8 +581,8 @@ static const std::vector<std::string> cDirectParameterTypes = {
     "Gain",
     "ResGain",
     "HammerGain",
-    "ADSR",
-    "Tuning Id"
+    "Tuning Id",
+    "ADSR"
 };
 
 #pragma mark - Tuning

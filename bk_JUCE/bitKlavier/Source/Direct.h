@@ -123,6 +123,7 @@ public:
         dDecay = vals[1];
         dSustain = vals[2];
         dRelease = vals[3];
+        print();
     }
     
     
@@ -330,17 +331,7 @@ public:
     typedef Array<DirectModPreparation::Ptr, CriticalSection> CSPtrArr;
     typedef OwnedArray<DirectModPreparation>                  Arr;
     typedef OwnedArray<DirectModPreparation, CriticalSection> CSArr;
-    
-    /*
-     DirectId = 0,
-     DirectTuning,
-     DirectTransposition,
-     DirectGain,
-     DirectResGain,
-     DirectHammerGain,
-     DirectParameterTypeNil,
-     */
-    
+
     DirectModPreparation(DirectPreparation::Ptr p, int Id):
     Id(Id)
     {
@@ -350,6 +341,7 @@ public:
         param.set(DirectGain, String(p->getGain()));
         param.set(DirectResGain, String(p->getResonanceGain()));
         param.set(DirectHammerGain, String(p->getHammerGain()));
+        param.set(DirectADSR, floatArrayToString(p->getADSRvals()));
     }
     
     
@@ -360,7 +352,7 @@ public:
         param.add("");
         param.add("");
         param.add("");
-        //param.add("");
+        param.add("");
     }
     
     inline DirectModPreparation::Ptr duplicate(void)
@@ -394,6 +386,19 @@ public:
             }
         }
         prep.addChild(transp, -1, 0);
+        
+        ValueTree envelope( vtagDirect_ADSR);
+        count = 0;
+        p = getParam(DirectADSR);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                envelope.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(envelope, -1, 0);
         
         p = getParam(DirectGain);
         if (p != String::empty) prep.setProperty( ptagDirect_gain,              p.getFloatValue(), 0);
@@ -443,6 +448,24 @@ public:
                 setParam(DirectTransposition, floatArrayToString(transp));
                 
             }
+            else if (sub->hasTagName(vtagDirect_ADSR))
+            {
+                Array<float> envelope;
+                for (int k = 0; k < 4; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        envelope.add(f);
+                    }
+                }
+                
+                setParam(DirectADSR, floatArrayToString(envelope));
+                
+            }
         }
     }
     
@@ -457,6 +480,7 @@ public:
         param.set(DirectGain, String(d->getGain()));
         param.set(DirectResGain, String(d->getResonanceGain()));
         param.set(DirectHammerGain, String(d->getHammerGain()));
+        param.set(DirectADSR, floatArrayToString(d->getADSRvals()));
     }
     
     inline void copy(DirectModPreparation::Ptr p)
@@ -481,7 +505,7 @@ public:
         else                    return "";
     }
     
-    inline void setParam(DirectParameterType type, String val) { param.set(type, val);}
+    inline void setParam(DirectParameterType type, String val) { param.set(type, val); }
     
     inline const StringArray getStringArray(void) { return param; }
     
