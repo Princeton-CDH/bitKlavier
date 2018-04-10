@@ -346,12 +346,16 @@ public:
     DirectModPreparation(int Id):
     Id(Id)
     {
+        /*
         param.add("");
         param.add("");
         param.add("");
         param.add("");
         param.add("");
         param.add("");
+         */
+        
+        for(int i=0; i<cDirectDataTypes.size(); i++) param.add("");
     }
     
     inline DirectModPreparation::Ptr duplicate(void)
