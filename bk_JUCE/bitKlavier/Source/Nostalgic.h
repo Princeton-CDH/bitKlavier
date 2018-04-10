@@ -563,6 +563,8 @@ public:
         param.set(NostalgicGain, String(p->getGain()));
         param.set(NostalgicLengthMultiplier, String(p->getLengthMultiplier()));
         param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
+        param.set(NostalgicReverseADSR, String(floatArrayToString(p->getReverseADSRvals())));
+        param.set(NostalgicUndertowADSR, String(floatArrayToString(p->getUndertowADSRvals())));
         param.set(NostalgicMode, String(p->getMode()));
         
     }
@@ -571,6 +573,7 @@ public:
     NostalgicModPreparation(int Id):
     Id(Id)
     {
+        /*
         param.set(NostalgicWaveDistance, "");
         param.set(NostalgicUndertow, "");
         param.set(NostalgicTransposition, "");
@@ -578,6 +581,9 @@ public:
         param.set(NostalgicLengthMultiplier, "");
         param.set(NostalgicBeatsToSkip, "");
         param.set(NostalgicMode, "");
+         */
+        
+        for(int i=0; i<cNostalgicDataTypes.size(); i++) param.add("");
     }
     
     inline NostalgicModPreparation::Ptr duplicate(void)
@@ -620,6 +626,32 @@ public:
             }
         }
         prep.addChild(transp, -1, 0);
+        
+        ValueTree revADSR( vtagNostalgic_reverseADSR);
+        count = 0;
+        p = getParam(NostalgicReverseADSR);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                revADSR.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(revADSR, -1, 0);
+        
+        ValueTree undADSR( vtagNostalgic_undertowADSR);
+        count = 0;
+        p = getParam(NostalgicUndertowADSR);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                undADSR.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(undADSR, -1, 0);
         
         p = getParam(NostalgicGain);
         if (p != String::empty) prep.setProperty( ptagNostalgic_gain,               p.getFloatValue(), 0);
@@ -669,6 +701,44 @@ public:
                 setParam(NostalgicTransposition, floatArrayToString(transp));
                 
             }
+            
+            if (sub->hasTagName(vtagNostalgic_reverseADSR))
+            {
+                Array<float> revADSR;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        revADSR.add(f);
+                    }
+                }
+                
+                setParam(NostalgicReverseADSR, floatArrayToString(revADSR));
+                
+            }
+            
+            if (sub->hasTagName(vtagNostalgic_undertowADSR))
+            {
+                Array<float> undADSR;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        undADSR.add(f);
+                    }
+                }
+                
+                setParam(NostalgicUndertowADSR, floatArrayToString(undADSR));
+                
+            }
         }
         
         p = e->getStringAttribute(ptagNostalgic_lengthMultiplier);
@@ -699,6 +769,8 @@ public:
         param.set(NostalgicLengthMultiplier, String(p->getLengthMultiplier()));
         param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
         param.set(NostalgicMode, String(p->getMode()));
+        param.set(NostalgicReverseADSR, floatArrayToString(p->getReverseADSRvals()));
+        param.set(NostalgicUndertowADSR, floatArrayToString(p->getUndertowADSRvals()));
     }
     
     inline void copy(NostalgicModPreparation::Ptr p)

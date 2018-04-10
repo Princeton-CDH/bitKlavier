@@ -561,7 +561,6 @@ void DirectModificationEditor::update(void)
         
         val = mod->getParam(DirectADSR);
         ADSRSlider->setValue(stringToFloatArray(val), dontSendNotification);
-        DBG("DirectModificationEditor::update mod->getParam(DirectADSR) = " + val);
     }
     
     

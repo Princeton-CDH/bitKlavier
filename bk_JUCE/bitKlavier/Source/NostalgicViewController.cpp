@@ -641,6 +641,9 @@ NostalgicViewController(p, theGraph)
     
     gainSlider->addMyListener(this);
     
+    reverseADSRSlider->addMyListener(this);
+    undertowADSRSlider->addMyListener(this);
+    
     //startTimer(20);
 }
 
@@ -652,6 +655,8 @@ void NostalgicModificationEditor::greyOutAllComponents()
     lengthMultiplierSlider->setDim(gModAlpha);
     beatsToSkipSlider->setDim(gModAlpha);
     gainSlider->setDim(gModAlpha);
+    reverseADSRSlider->setDim(gModAlpha);
+    undertowADSRSlider->setDim(gModAlpha);
 }
 
 void NostalgicModificationEditor::highlightModedComponents()
@@ -665,6 +670,8 @@ void NostalgicModificationEditor::highlightModedComponents()
     if(mod->getParam(NostalgicBeatsToSkip) != "")       beatsToSkipSlider->setBright();
     if(mod->getParam(NostalgicMode) != "")              lengthModeSelectCB.setAlpha(1.);
     if(mod->getParam(NostalgicGain) != "")              gainSlider->setBright();
+    if(mod->getParam(NostalgicReverseADSR) != "")       reverseADSRSlider->setBright();
+    if(mod->getParam(NostalgicUndertowADSR) != "")      undertowADSRSlider->setBright();
 }
 
 void NostalgicModificationEditor::update(void)
@@ -716,6 +723,12 @@ void NostalgicModificationEditor::update(void)
         
         val = mod->getParam(NostalgicGain);
         gainSlider->setValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(NostalgicReverseADSR);
+        reverseADSRSlider->setValue(stringToFloatArray(val), dontSendNotification);
+        
+        val = mod->getParam(NostalgicUndertowADSR);
+        undertowADSRSlider->setValue(stringToFloatArray(val), dontSendNotification);
     }
     
     
@@ -977,4 +990,30 @@ void NostalgicModificationEditor::buttonClicked (Button* b)
     {
         getModOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
+}
+
+void NostalgicModificationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
+{
+    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
+    
+    Array<float> newvals = {(float)attack, (float)decay, sustain, (float)release};
+    if(name == reverseADSRSlider->getName())
+    {
+        mod->setParam(NostalgicReverseADSR, floatArrayToString(newvals));
+        reverseADSRSlider->setBright();
+    }
+    else if(name == undertowADSRSlider->getName())
+    {
+        mod->setParam(NostalgicUndertowADSR, floatArrayToString(newvals));
+        undertowADSRSlider->setBright();
+    }
+
+    
+    updateModification();
+}
+
+void NostalgicModificationEditor::BKADSRButtonStateChanged(String name, bool mod, bool state)
+{
+    setShowADSR(name, !state);
+    setSubWindowInFront(!state);
 }

@@ -738,6 +738,8 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == NostalgicBeatsToSkip)      active->setBeatsToSkip(modi);
         else if (type == NostalgicWaveDistance)     active->setWaveDistance(modi);
         else if (type == NostalgicLengthMultiplier) active->setLengthMultiplier(modf);
+        else if (type == NostalgicReverseADSR)      active->setReverseADSRvals(modf);
+        else if (type == NostalgicUndertowADSR)     active->setUndertowADSRvals(modf);
         
         updateState->nostalgicPreparationDidChange = true;
     }
