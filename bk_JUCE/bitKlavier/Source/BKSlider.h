@@ -745,8 +745,11 @@ public:
         setSustainValue(newvals[2], notify);
         setReleaseValue(newvals[3], notify);
         
-        if(newvals[4] > 0) setActive();
-        else setPassive();
+        if(newvals.size() > 4)
+        {
+            if(newvals[4] > 0) setActive();
+            else setPassive();
+        }
     }
     
     int getAttackValue()    { return attackSlider->getValue(); }

@@ -211,22 +211,20 @@ public:
         prep.setProperty( "Id",Id, 0);
         prep.setProperty( "name", name, 0);
         
+        prep.setProperty( ptagDirect_gain,              sPrep->getGain(), 0);
+        prep.setProperty( ptagDirect_resGain,           sPrep->getResonanceGain(), 0);
+        prep.setProperty( ptagDirect_hammerGain,        sPrep->getHammerGain(), 0);
+        
         ValueTree transp( vtagDirect_transposition);
         Array<float> m = sPrep->getTransposition();
         int count = 0;
         for (auto f : m)    transp.setProperty( ptagFloat + String(count++), f, 0);
         prep.addChild(transp, -1, 0);
         
-        prep.setProperty( ptagDirect_gain,              sPrep->getGain(), 0);
-        prep.setProperty( ptagDirect_resGain,           sPrep->getResonanceGain(), 0);
-        prep.setProperty( ptagDirect_hammerGain,        sPrep->getHammerGain(), 0);
-        
         ValueTree ADSRvals( vtagDirect_ADSR);
+        m = sPrep->getADSRvals();
         count = 0;
-        for (auto f : sPrep->getADSRvals())
-        {
-            ADSRvals.setProperty( ptagFloat + String(count++), f, 0);
-        }
+        for (auto f : m) ADSRvals.setProperty( ptagFloat + String(count++), f, 0);
         prep.addChild(ADSRvals, -1, 0);
         
         return prep;
@@ -353,6 +351,7 @@ public:
         param.add("");
         param.add("");
         param.add("");
+        param.add("");
     }
     
     inline DirectModPreparation::Ptr duplicate(void)
@@ -433,6 +432,7 @@ public:
             if (sub->hasTagName(vtagDirect_transposition))
             {
                 Array<float> transp;
+                
                 for (int k = 0; k < 128; k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
@@ -451,7 +451,7 @@ public:
             else if (sub->hasTagName(vtagDirect_ADSR))
             {
                 Array<float> envelope;
-                for (int k = 0; k < 4; k++)
+                for (int k = 0; k < 128; k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
                     
@@ -462,6 +462,8 @@ public:
                         envelope.add(f);
                     }
                 }
+                
+                DBG("DirectMod setState " + String(envelope[0]) + " " + String(envelope[1]) + " " + String(envelope[2]) + " " + String(envelope[3]));
                 
                 setParam(DirectADSR, floatArrayToString(envelope));
                 
@@ -501,11 +503,11 @@ public:
     
     inline const String getParam(DirectParameterType type)
     {
-        if (type != DirectId)   return param[type];
+        if (type != DirectId)   { DBG("Direct getParam " + String(type) + " " + param[type]); return param[type]; }
         else                    return "";
     }
     
-    inline void setParam(DirectParameterType type, String val) { param.set(type, val); }
+    inline void setParam(DirectParameterType type, String val) { param.set(type, val); DBG("Direct setParam " + String(type) + " " + param[type]);};
     
     inline const StringArray getStringArray(void) { return param; }
     
