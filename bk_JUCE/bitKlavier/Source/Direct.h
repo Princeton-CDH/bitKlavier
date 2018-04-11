@@ -346,15 +346,22 @@ public:
     Id(Id)
     {
         /*
-        param.add("");
-        param.add("");
-        param.add("");
-        param.add("");
-        param.add("");
-        param.add("");
+         DirectTransposition,
+         DirectGain,
+         DirectResGain,
+         DirectHammerGain,
+         DirectTuning,
+         DirectADSR,
          */
         
         for(int i=0; i<=cDirectDataTypes.size(); i++) param.add("");
+        param.set(DirectTransposition, "");
+        param.set(DirectGain, "");
+        param.set(DirectResGain, "");
+        param.set(DirectHammerGain, "");
+        param.set(DirectTuning, "");
+        param.set(DirectADSR, "");
+
     }
     
     inline DirectModPreparation::Ptr duplicate(void)

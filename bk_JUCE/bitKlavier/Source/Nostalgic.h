@@ -573,17 +573,18 @@ public:
     NostalgicModPreparation(int Id):
     Id(Id)
     {
-        /*
+        
+        for(int i=0; i<=cNostalgicDataTypes.size(); i++) param.add("");
         param.set(NostalgicWaveDistance, "");
         param.set(NostalgicUndertow, "");
         param.set(NostalgicTransposition, "");
         param.set(NostalgicGain, "");
         param.set(NostalgicLengthMultiplier, "");
         param.set(NostalgicBeatsToSkip, "");
+        param.set(NostalgicReverseADSR, "");
+        param.set(NostalgicUndertowADSR, "");
         param.set(NostalgicMode, "");
-         */
-        
-        for(int i=0; i<=cNostalgicDataTypes.size(); i++) param.add("");
+
     }
     
     inline NostalgicModPreparation::Ptr duplicate(void)

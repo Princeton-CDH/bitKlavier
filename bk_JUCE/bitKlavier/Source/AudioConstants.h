@@ -530,9 +530,9 @@ static const std::vector<BKParameterDataType> cNostalgicDataTypes =
     BKInt,
     BKInt,
     BKInt,
+    BKInt,
     BKFloatArr,
-    BKFloatArr,
-    BKInt
+    BKFloatArr
 };
 
 static const std::vector<std::string> cNostalgicParameterTypes = {
