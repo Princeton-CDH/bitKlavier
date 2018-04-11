@@ -123,7 +123,6 @@ public:
         dDecay = vals[1];
         dSustain = vals[2];
         dRelease = vals[3];
-        print();
     }
     
     
@@ -355,7 +354,7 @@ public:
         param.add("");
          */
         
-        for(int i=0; i<cDirectDataTypes.size(); i++) param.add("");
+        for(int i=0; i<=cDirectDataTypes.size(); i++) param.add("");
     }
     
     inline DirectModPreparation::Ptr duplicate(void)

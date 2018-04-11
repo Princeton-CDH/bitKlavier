@@ -583,7 +583,7 @@ public:
         param.set(NostalgicMode, "");
          */
         
-        for(int i=0; i<cNostalgicDataTypes.size(); i++) param.add("");
+        for(int i=0; i<=cNostalgicDataTypes.size(); i++) param.add("");
     }
     
     inline NostalgicModPreparation::Ptr duplicate(void)
