@@ -281,6 +281,9 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     bkSampleRate = sampleRate;
     
+    
+    stk::Stk::setSampleRate(bkSampleRate);
+    
     mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
     hammerReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     resonanceReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
