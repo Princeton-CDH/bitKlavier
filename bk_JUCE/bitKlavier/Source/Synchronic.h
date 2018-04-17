@@ -719,22 +719,6 @@ public:
     typedef OwnedArray<SynchronicModPreparation>                  Arr;
     typedef OwnedArray<SynchronicModPreparation, CriticalSection> CSArr;
     
-    /*
-     SynchronicId = 0,
-     SynchronicNumPulses,
-     SynchronicClusterMin,
-     SynchronicClusterMax,
-     SynchronicClusterThresh,
-     SynchronicMode,
-     SynchronicBeatsToSkip,
-     SynchronicTranspOffsets,
-     SynchronicAccentMultipliers,
-     SynchronicLengthMultipliers,
-     SynchronicBeatMultipliers,
-     SynchronicGain,
-     SynchronicADSRs,
-     */
-    
     SynchronicModPreparation(SynchronicPreparation::Ptr p, int Id):
     Id(Id)
     {
@@ -772,12 +756,6 @@ public:
         param.set(SynchronicGain, "");
         param.set(SynchronicADSRs, "");
 
-        /*
-        Array<Array<float>> envs;
-        for(int i=0; i<12; i++) envs.set(i, {3, 3, 1., 30, 0, i}); //A/D/S/R/active/which
-        param.set(SynchronicADSRs, arrayFloatArrayToString(envs));
-        */
-        
     }
     
     inline SynchronicModPreparation::Ptr duplicate(void)
@@ -860,30 +838,37 @@ public:
             }
         }
         prep.addChild(accentMults, -1, 0);
-        
+ 
         
         ValueTree transpOffsets( vtagSynchronic_transpOffsets);
-        count = 0;
+        int tcount = 0;
         p = getParam(SynchronicTranspOffsets);
         if (p != String::empty)
         {
-            Array<float> m = stringToFloatArray(p);
+            Array<Array<float>> m = stringToArrayFloatArray(p);
             for (auto f : m)
             {
-                transpOffsets.      setProperty( ptagFloat + String(count++), f, 0);
+                ValueTree t("t"+String(tcount++));
+                count = 0;
+                for (auto nf : f) t.setProperty( ptagFloat + String(count++), nf, 0);
+                transpOffsets.addChild(t,-1,0);
             }
         }
         prep.addChild(transpOffsets, -1, 0);
         
+        
         ValueTree envelopes( vtagSynchronic_ADSRs);
-        count = 0;
+        tcount = 0;
         p = getParam(SynchronicADSRs);
         if (p != String::empty)
         {
-            Array<float> m = stringToFloatArray(p);
+            Array<Array<float>> m = stringToArrayFloatArray(p);
             for (auto f : m)
             {
-                envelopes.      setProperty( ptagFloat + String(count++), f, 0);
+                ValueTree e("e"+String(tcount++));
+                count = 0;
+                for (auto nf : f) e.setProperty( ptagFloat + String(count++), nf, 0);
+                envelopes.addChild(e,-1,0);
             }
         }
         prep.addChild(envelopes, -1, 0);
@@ -973,37 +958,56 @@ public:
             }
             else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
             {
-                Array<float> transp;
-                for (int k = 0; k < 128; k++)
+                Array<Array<float>> atransp;
+                int tcount = 0;
+                forEachXmlChildElement (*sub, asub)
                 {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
+                    if (asub->hasTagName("t"+String(tcount++)))
                     {
-                        f = attr.getFloatValue();
-                        transp.add(f);
+                        Array<float> transp;
+                        for (int k = 0; k < 128; k++)
+                        {
+                            String attr = asub->getStringAttribute(ptagFloat + String(k));
+                            
+                            if (attr == String::empty) break;
+                            else
+                            {
+                                f = attr.getFloatValue();
+                                transp.add(f);
+                            }
+                        }
+                        atransp.set(tcount-1, transp);
                     }
                 }
                 
-                setParam(SynchronicTranspOffsets, floatArrayToString(transp));
+                setParam(SynchronicTranspOffsets, arrayFloatArrayToString(atransp));
+                
             }
             else  if (sub->hasTagName(vtagSynchronic_ADSRs))
             {
-                Array<float> envs;
-                for (int k = 0; k < 128; k++)
+                Array<Array<float>> aenvs;
+                int tcount = 0;
+                forEachXmlChildElement (*sub, asub)
                 {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
+                    if (asub->hasTagName("e"+String(tcount++)))
                     {
-                        f = attr.getFloatValue();
-                        envs.add(f);
+                        Array<float> envs;
+                        for (int k = 0; k < 128; k++)
+                        {
+                            String attr = asub->getStringAttribute(ptagFloat + String(k));
+                            
+                            if (attr == String::empty) break;
+                            else
+                            {
+                                f = attr.getFloatValue();
+                                envs.add(f);
+                            }
+                        }
+                        aenvs.set(tcount-1, envs);
                     }
                 }
                 
-                setParam(SynchronicADSRs, floatArrayToString(envs));
+                setParam(SynchronicADSRs, arrayFloatArrayToString(aenvs));
             }
         }
         

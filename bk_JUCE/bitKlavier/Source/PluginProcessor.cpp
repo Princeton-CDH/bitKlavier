@@ -767,8 +767,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == SynchronicBeatMultipliers)     active->setBeatMultipliers(modfa);
         else if (type == SynchronicLengthMultipliers)   active->setLengthMultipliers(modfa);
         else if (type == SynchronicAccentMultipliers)   active->setAccentMultipliers(modfa);
-        //else if (type == SynchronicADSRs)               active->setADSR(modfa[5], modfa);
-        else if (type == SynchronicADSRs)                { active->setADSRs(modafa); DBG(" SynchronicADSRs mod = " + arrayFloatArrayToString(modafa)); }
+        else if (type == SynchronicADSRs)               active->setADSRs(modafa);
         
         updateState->synchronicPreparationDidChange = true;
     }

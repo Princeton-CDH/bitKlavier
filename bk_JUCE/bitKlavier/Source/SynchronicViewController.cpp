@@ -627,7 +627,7 @@ void SynchronicPreparationEditor::BKADSRButtonStateChanged(String name, bool shi
         
         if(which != 0) //first envelope is always on...
         {
-            DBG("toggling " + String(which) + " " + String((int)state));
+            //DBG("toggling " + String(which) + " " + String((int)state));
             prep->setEnvelopeOn(which, state);
             active->setEnvelopeOn(which, state);
             if(state) envelopeSliders[which]->setBright();
