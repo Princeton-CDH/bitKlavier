@@ -220,7 +220,7 @@ public:
     inline void setSustainInversion(bool sus)
     {
         sustainInverted = sus;
-        if (firstTime){firstTime = false; return;}
+        
         if (sustainInverted)
         {
             if(sustainIsDown)
@@ -242,8 +242,12 @@ public:
                 sustainIsDown = true;
                 DBG("sustain inverted, sustain is now pressed");
                 
-                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                    currentPiano->activePMaps[p]->sustainPedalPressed();
+                if (firstTime) {firstTime = false; return;}
+                else
+                {
+                    for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                        currentPiano->activePMaps[p]->sustainPedalPressed();
+                }
             }
         }
         else
@@ -267,8 +271,12 @@ public:
                 sustainIsDown = true;
                 DBG("sustain inverted, sustain is now pressed");
                 
-                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                    currentPiano->activePMaps[p]->sustainPedalPressed();
+                if (firstTime) {firstTime = false; return;}
+                else
+                {
+                    for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                        currentPiano->activePMaps[p]->sustainPedalPressed();
+                }
             }
         }
     }
