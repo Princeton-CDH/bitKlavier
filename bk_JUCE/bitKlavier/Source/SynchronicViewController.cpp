@@ -1083,15 +1083,24 @@ void SynchronicModificationEditor::update(NotificationType notify)
             }
         }
         
-        val = mod->getParam(SynchronicADSRs);
-        Array<Array<float>> fvals = stringToArrayFloatArray(val);
-        for(int i=0; i<envelopeSliders.size(); i++)
+        if(mod->getParam(SynchronicADSRs) != "")
         {
-            if(fvals[i][4] > 0)
+            Array<Array<float>> fvals = stringToArrayFloatArray(mod->getParam(SynchronicADSRs));
+            for(int i=0; i<envelopeSliders.size(); i++)
             {
-                envelopeSliders[fvals[i][5]]->setValue(fvals[i], notify);
+                if(fvals[i][4] > 0)
+                {
+                    envelopeSliders[fvals[i][5]]->setValue(fvals[i], notify);
+                }
+                envelopeSliders[i]->setValue(fvals[i], notify);
             }
-            envelopeSliders[i]->setValue(fvals[i], notify);
+        }
+        else
+        {
+            for(int i=0; i<envelopeSliders.size(); i++)
+            {
+                envelopeSliders[i]->setPassive();
+            }
         }
     }
 
@@ -1480,7 +1489,7 @@ void SynchronicModificationEditor::BKADSRSliderValueChanged(String name, int att
         }
         else
         {                              //A, D, S,  R,  inactive, which
-            if(!envs[i][4]) envs.set(i, {3, 3, 1., 30, 0,        i}); //create inactive default if there is not one there yet
+            if(!envs[i][4]) envs.set(i, {3, 3, 1., 30, 0,        i}); //create inactive default
         }
     }
     mod->setParam(SynchronicADSRs, arrayFloatArrayToString(envs));
