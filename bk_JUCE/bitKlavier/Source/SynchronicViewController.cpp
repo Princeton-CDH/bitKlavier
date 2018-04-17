@@ -1475,8 +1475,8 @@ void SynchronicModificationEditor::BKADSRSliderValueChanged(String name, int att
         if(envelopeSliders[i]->getName() == name)
         {
             envs.set(i, {attack, decay, sustain, release, 1, i});
+            envelopeSliders[i]->setActive();
             envelopeSliders[i]->setBright();
-            //envelopeSliders[i]->setButtonToggle(true);
         }
         else
         {                              //A, D, S,  R,  inactive, which
