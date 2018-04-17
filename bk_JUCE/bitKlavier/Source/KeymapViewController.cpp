@@ -350,6 +350,10 @@ PopupMenu KeymapViewController::getKeysMenu(void)
     menu.addSubMenu("Dom Seven",    getPitchClassMenu((KeySet) ID(KeySetDomSeven)));
     menu.addSubMenu("Minor Seven",  getPitchClassMenu((KeySet) ID(KeySetMinorSeven)));
     
+    menu.addSubMenu("Major", getPitchClassMenu((KeySet) ID(KeySetMajor)));
+    menu.addSubMenu("Natural Minor", getPitchClassMenu((KeySet) ID(KeySetNaturalMinor)));
+    menu.addSubMenu("Harmonic Minor", getPitchClassMenu((KeySet) ID(KeySetHarmonicMinor)));
+    
     return menu;
 }
 
