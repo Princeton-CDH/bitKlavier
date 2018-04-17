@@ -137,6 +137,7 @@ public SynchronicViewController,
 public BKSingleSlider::Listener,
 public BKRangeSlider::Listener,
 public BKEditableComboBoxListener,
+public BKADSRSlider::Listener,
 public Timer
 {
 public:
@@ -170,6 +171,8 @@ private:
     void BKSingleSliderValueChanged(String name, double val) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
+    void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
+    void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
     void buttonClicked (Button* b) override;
     
     void multiSliderDidChange(String name, int whichSlider, Array<float> values) override;

@@ -67,9 +67,11 @@ BKViewController(p, theGraph)
         envelopeSliders.insert(i, new BKADSRSlider("e"+String(i)));
         envelopeSliders[i]->setButtonText("");
         envelopeSliders[i]->toFront(false);
-        envelopeSliders[i]->setAlpha(0.5);
+        //envelopeSliders[i]->setAlpha(0.5);
+        envelopeSliders[i]->setDim(0.5);
         addAndMakeVisible(envelopeSliders[i]);
     }
+    envelopeSliders[0]->setBright();
     showADSR = false;
     visibleADSR = 0;
     
@@ -407,8 +409,17 @@ void SynchronicPreparationEditor::timerCallback()
             for(int i = 0; i < envelopeSliders.size(); i++)
             {
                 if(i == sProcessor->getEnvelopeCounter()) envelopeSliders[i]->setHighlighted();
-                else if(active->getEnvelopeOn(i))envelopeSliders[i]->setActive();
-                else envelopeSliders[i]->setPassive();
+                
+                else if(active->getEnvelopeOn(i))
+                {
+                    envelopeSliders[i]->setActive();
+                    envelopeSliders[i]->setBright();
+                }
+                else
+                {
+                    envelopeSliders[i]->setPassive();
+                    envelopeSliders[i]->setDim(gModAlpha);
+                }
             }
         }
     }
@@ -619,10 +630,14 @@ void SynchronicPreparationEditor::BKADSRButtonStateChanged(String name, bool shi
             DBG("toggling " + String(which) + " " + String((int)state));
             prep->setEnvelopeOn(which, state);
             active->setEnvelopeOn(which, state);
+            if(state) envelopeSliders[which]->setBright();
+            else envelopeSliders[which]->setDim(gModAlpha);
+            
         }
         else
         {
             envelopeSliders[0]->setButtonToggle(true);
+            envelopeSliders[0]->setBright();
         }
     }
     else
@@ -913,8 +928,8 @@ SynchronicViewController(p, theGraph)
     clusterMinMaxSlider->addMyListener(this);
     gainSlider->addMyListener(this);
     
-    //startTimer(20);
-    
+    for(int i = 0; i < envelopeSliders.size(); i++) envelopeSliders[i]->addMyListener(this);
+
 }
 
 void SynchronicModificationEditor::greyOutAllComponents()
@@ -938,6 +953,13 @@ void SynchronicModificationEditor::greyOutAllComponents()
     {
         paramSliders[i]->setAlpha(gModAlpha);
     }
+    
+    for(int i=0; i<envelopeSliders.size(); i++)
+    {
+        envelopeSliders[i]->setDim(gModAlpha);
+    }
+    envelopeName.setAlpha(gModAlpha);
+    
 }
 
 void SynchronicModificationEditor::highlightModedComponents()
@@ -983,6 +1005,16 @@ void SynchronicModificationEditor::highlightModedComponents()
             if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicTranspOffsets])
                 paramSliders[i]->setAlpha(1.);
         }
+    }
+    if(mod->getParam(SynchronicADSRs) != "")
+    {
+        Array<Array<float>> envs = stringToArrayFloatArray(mod->getParam(SynchronicADSRs));
+        for(int i = 0; i < envelopeSliders.size(); i++)
+        {
+            if(envs[i][4]) envelopeSliders[i]->setBright();
+            else envelopeSliders[i]->setDim(gModAlpha);
+        }
+        envelopeName.setAlpha(1.);
     }
 }
 
@@ -1049,6 +1081,17 @@ void SynchronicModificationEditor::update(NotificationType notify)
                 val = mod->getParam(SynchronicTranspOffsets);
                 paramSliders[i]->setTo(stringToArrayFloatArray(val), notify);
             }
+        }
+        
+        val = mod->getParam(SynchronicADSRs);
+        Array<Array<float>> fvals = stringToArrayFloatArray(val);
+        for(int i=0; i<envelopeSliders.size(); i++)
+        {
+            if(fvals[i][4] > 0)
+            {
+                envelopeSliders[fvals[i][5]]->setValue(fvals[i], notify);
+            }
+            envelopeSliders[i]->setValue(fvals[i], notify);
         }
     }
 
@@ -1421,6 +1464,36 @@ void SynchronicModificationEditor::updateModification(void)
 {
     processor.updateState->modificationDidChange = true;
 }
+
+void SynchronicModificationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
+{
+    SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
+
+    Array<Array<float>> envs = stringToArrayFloatArray(mod->getParam(SynchronicADSRs));
+    for(int i=0; i<envelopeSliders.size(); i++)
+    {
+        if(envelopeSliders[i]->getName() == name)
+        {
+            envs.set(i, {attack, decay, sustain, release, 1, i});
+            envelopeSliders[i]->setBright();
+            //envelopeSliders[i]->setButtonToggle(true);
+        }
+        else
+        {                              //A, D, S,  R,  inactive, which
+            if(!envs[i][4]) envs.set(i, {3, 3, 1., 30, 0,        i}); //create inactive default if there is not one there yet
+        }
+    }
+    mod->setParam(SynchronicADSRs, arrayFloatArrayToString(envs));
+    
+    updateModification();
+}
+
+void SynchronicModificationEditor::BKADSRButtonStateChanged(String name, bool mod, bool state)
+{
+    setShowADSR(name, !state);
+    setSubWindowInFront(!state);
+}
+
 
 
 

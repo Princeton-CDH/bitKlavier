@@ -2086,6 +2086,10 @@ void BKStackedSlider::addSlider(NotificationType newnotify)
     sliderVals.add(topSlider->proportionOfLengthToValue((double)clickedPosition / getWidth()));
     setTo(sliderVals, newnotify);
     topSlider->setValue(topSlider->proportionOfLengthToValue((double)clickedPosition / getWidth()), dontSendNotification);
+    
+    listeners.call(&BKStackedSlider::Listener::BKStackedSliderValueChanged,
+                   getName(),
+                   getAllActiveValues());
 }
 
 void BKStackedSlider::setTo(Array<float> newvals, NotificationType newnotify)
@@ -2186,6 +2190,7 @@ void BKStackedSlider::mouseDrag(const MouseEvent& e)
 
 void BKStackedSlider::mouseUp(const MouseEvent& e)
 {
+    DBG("BKStackedSlider::mouseUp");
     listeners.call(&BKStackedSlider::Listener::BKStackedSliderValueChanged,
                    getName(),
                    getAllActiveValues());

@@ -429,9 +429,7 @@ typedef enum SynchronicParameterType {
     SynchronicLengthMultipliers,
     SynchronicBeatMultipliers,
     SynchronicGain,
-    SynchronicTuning,
-    SynchronicTempo,
-    SynhronicADSRs,
+    SynchronicADSRs,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
@@ -449,8 +447,6 @@ static const std::vector<BKParameterDataType> cSynchronicDataTypes = {
     BKFloatArr,
     BKFloatArr,
     BKFloat,
-    BKInt,
-    BKInt,
     BKArrFloatArr
 };
 
@@ -467,8 +463,6 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "sustain length multipliers",
     "beat length multipliers",
     "gain",
-    "Tuning Id",
-    "Tempo Id",
     "ADSRs"
 };
 
@@ -485,7 +479,7 @@ static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc
 	{ -2.0f, 2.0f, 1.0f, 0.001f },
 	{ 0.0f, 2.0f, 1.0f, 0.001f },
 	{ 0.0f, 0.0f, 0.0f, 0.0f },
-	{ 0.0f, 0.0f, 0.0f, 0.0f },
+	{ 0.0f, 0.0f, 0.0f, 0.0f }
 };
 
 #pragma mark - Nostalgic

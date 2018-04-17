@@ -348,6 +348,18 @@ public:
         }
     }
     
+    inline void setADSR(int which, Array<float> oneADSR)
+    {
+        setAttack(which, oneADSR[0]);
+        setDecay(which, oneADSR[1]);
+        setSustain(which, oneADSR[2]);
+        setRelease(which, oneADSR[3]);
+        if(oneADSR[4] > 0 || which==0) setEnvelopeOn(which, true);
+        else setEnvelopeOn(which, false);
+        DBG("ADSR envelopeOn = " + String(which) + " " + String((int)getEnvelopeOn(which)));
+        
+    }
+    
     inline void setEnvelopeOn(int which, bool val)  {envelopeOn.set(which, val);}
     
     void print(void)
@@ -709,23 +721,18 @@ public:
     
     /*
      SynchronicId = 0,
-     SynchronicTuning,
-     SynchronicTempo,
      SynchronicNumPulses,
      SynchronicClusterMin,
      SynchronicClusterMax,
      SynchronicClusterThresh,
      SynchronicMode,
      SynchronicBeatsToSkip,
-     SynchronicBeatMultipliers,
-     SynchronicLengthMultipliers,
-     SynchronicAccentMultipliers,
      SynchronicTranspOffsets,
-     AT1Mode,
-     AT1History,
-     AT1Subdivisions,
-     AT1Min,
-     AT1Max,
+     SynchronicAccentMultipliers,
+     SynchronicLengthMultipliers,
+     SynchronicBeatMultipliers,
+     SynchronicGain,
+     SynchronicADSRs,
      */
     
     SynchronicModPreparation(SynchronicPreparation::Ptr p, int Id):
@@ -739,10 +746,12 @@ public:
         param.set(SynchronicClusterThresh, String(p->getClusterThreshMS()));
         param.set(SynchronicMode, String(p->getMode()));
         param.set(SynchronicBeatsToSkip, String(p->getBeatsToSkip()));
-        param.set(SynchronicBeatMultipliers, floatArrayToString(p->getBeatMultipliers()));
-        param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
-        param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
         param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p->getTransposition()));
+        param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
+        param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
+        param.set(SynchronicBeatMultipliers, floatArrayToString(p->getBeatMultipliers()));
+        param.set(SynchronicGain, String(p->getGain()));
+        param.set(SynchronicADSRs, arrayFloatArrayToString(p->getADSRs()));
         
     }
     
@@ -756,10 +765,19 @@ public:
         param.set(SynchronicClusterThresh, "");
         param.set(SynchronicMode, "");
         param.set(SynchronicBeatsToSkip, "");
-        param.set(SynchronicBeatMultipliers, "");
-        param.set(SynchronicLengthMultipliers, "");
-        param.set(SynchronicAccentMultipliers, "");
         param.set(SynchronicTranspOffsets, "");
+        param.set(SynchronicAccentMultipliers, "");
+        param.set(SynchronicLengthMultipliers, "");
+        param.set(SynchronicBeatMultipliers, "");
+        param.set(SynchronicGain, "");
+        param.set(SynchronicADSRs, "");
+
+        /*
+        Array<Array<float>> envs;
+        for(int i=0; i<12; i++) envs.set(i, {3, 3, 1., 30, 0, i}); //A/D/S/R/active/which
+        param.set(SynchronicADSRs, arrayFloatArrayToString(envs));
+        */
+        
     }
     
     inline SynchronicModPreparation::Ptr duplicate(void)
@@ -856,6 +874,19 @@ public:
             }
         }
         prep.addChild(transpOffsets, -1, 0);
+        
+        ValueTree envelopes( vtagSynchronic_ADSRs);
+        count = 0;
+        p = getParam(SynchronicADSRs);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                envelopes.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(envelopes, -1, 0);
         
         
         return prep;
@@ -957,6 +988,23 @@ public:
                 
                 setParam(SynchronicTranspOffsets, floatArrayToString(transp));
             }
+            else  if (sub->hasTagName(vtagSynchronic_ADSRs))
+            {
+                Array<float> envs;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        envs.add(f);
+                    }
+                }
+                
+                setParam(SynchronicADSRs, floatArrayToString(envs));
+            }
         }
         
     }
@@ -979,6 +1027,7 @@ public:
         param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
         param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
         param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p->getTransposition()));
+        param.set(SynchronicADSRs, arrayFloatArrayToString(p->getADSRs()));
     }
     
     inline void copy(SynchronicModPreparation::Ptr p)
