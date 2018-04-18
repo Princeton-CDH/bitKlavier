@@ -374,14 +374,15 @@ void SynchronicPreparationEditor::timerCallback()
         SynchronicProcessor::Ptr sProcessor = processor.currentPiano->getSynchronicProcessor(processor.updateState->currentSynchronicId);
         SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
         
-        if(sProcessor->getBeatCounter() < active->getNumBeats()) howManySlider->setDisplayValue(sProcessor->getBeatCounter());
+        if(sProcessor->getBeatCounter() < active->getNumBeats() && sProcessor->getClusterSize() <= active->getClusterMax())
+            howManySlider->setDisplayValue(sProcessor->getBeatCounter());
         else howManySlider->setDisplayValue(0);
         
         if(sProcessor->getClusterThresholdTimer() < active->getClusterThreshMS())
              clusterThreshSlider->setDisplayValue(sProcessor->getClusterThresholdTimer());
         else clusterThreshSlider->setDisplayValue(0);
         
-        if(sProcessor->getClusterSize() <= active->getClusterMax())
+        if(sProcessor->getClusterSize() <= active->getClusterMax() && sProcessor->getClusterThresholdTimer() < active->getClusterThreshMS())
             clusterMinMaxSlider->setDisplayValue(sProcessor->getClusterSize());
         else clusterMinMaxSlider->setDisplayValue(0);
         
