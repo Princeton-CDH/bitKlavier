@@ -127,6 +127,22 @@ public:
                            const Slider::SliderStyle style, Slider& slider) override;
 };
 
+class BKDisplaySliderLookAndFeel :  public BKButtonAndMenuLAF
+{
+    
+public:
+    
+    BKDisplaySliderLookAndFeel()
+    {
+        setColour(Slider::trackColourId, Colours::deepskyblue.withMultipliedBrightness(0.75));
+        setColour(Slider::thumbColourId, Colours::deepskyblue.withMultipliedAlpha(0.75));
+        setColour(Slider::backgroundColourId, Colours::deepskyblue.withMultipliedAlpha(0.));
+        setColour(Slider::textBoxTextColourId, Colours::deepskyblue.withMultipliedAlpha(0.));
+    }
+    ~BKDisplaySliderLookAndFeel() {}
+    
+};
+
 class BKRangeMinSliderLookAndFeel : public BKButtonAndMenuLAF
 {
     

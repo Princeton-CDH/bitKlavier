@@ -1184,6 +1184,14 @@ sliderIncrement(increment)
     valueTF.addMouseListener(this, true);
     valueTF.setColour(TextEditor::highlightColourId, Colours::darkgrey);
     addAndMakeVisible(valueTF);
+    
+    displaySlider = new Slider(); 
+    displaySlider->setRange(min, max, increment);
+    displaySlider->setSliderStyle(juce::Slider::SliderStyle::LinearBar);
+    displaySlider->setLookAndFeel(&displaySliderLookAndFeel);
+    displaySlider->setInterceptsMouseClicks(false, false);
+    addAndMakeVisible(displaySlider);
+
 }
 
 void BKSingleSlider::setDim(float alphaVal)
@@ -1257,20 +1265,24 @@ void BKSingleSlider::checkValue(double newval)
 {
     if(newval > thisSlider.getMaximum()) {
         thisSlider.setRange(thisSlider.getMinimum(), newval, sliderIncrement);
+        displaySlider->setRange(thisSlider.getMinimum(), newval, sliderIncrement);
     }
     
     if(newval < thisSlider.getMinimum()) {
         thisSlider.setRange(newval, thisSlider.getMaximum(), sliderIncrement);
+        displaySlider->setRange(newval, thisSlider.getMaximum(), sliderIncrement);
     }
     
     if(newval <= sliderMax && thisSlider.getMaximum() > sliderMax)
     {
         thisSlider.setRange(thisSlider.getMinimum(), sliderMax, sliderIncrement);
+        displaySlider->setRange(thisSlider.getMinimum(), sliderMax, sliderIncrement);
     }
     
     if(newval >= sliderMin && thisSlider.getMinimum() < sliderMin)
     {
         thisSlider.setRange(sliderMin, thisSlider.getMaximum(), sliderIncrement);
+        displaySlider->setRange(sliderMin, thisSlider.getMaximum(), sliderIncrement);
     }
 }
 
@@ -1312,12 +1324,8 @@ void BKSingleSlider::resized()
     if(textIsAbove)
     {
         Rectangle<int> area (getLocalBounds());
-        
-        //Rectangle<int> textSlab (area.removeFromTop(area.getHeight() / 3));
-        //Rectangle<int> textSlab (area.removeFromTop(gComponentSingleSliderHeight * 0.5));
         Rectangle<int> textSlab (area.removeFromTop(gComponentTextFieldHeight));
-        //gComponentTextFieldHeight
-        //textSlab.removeFromTop(textSlab.getHeight() - 20);
+
         if(justifyRight)
         {
             textSlab.removeFromRight(gComponentSingleSliderXOffset);
@@ -1331,8 +1339,13 @@ void BKSingleSlider::resized()
             showName.setBounds(textSlab.removeFromRight(getWidth() - 75));
         }
         
-        //thisSlider.setBounds(area.removeFromTop(gComponentSingleSliderHeight * 0.5 - 12));
         thisSlider.setBounds(area.removeFromTop(gComponentSingleSliderHeight - gComponentTextFieldHeight));
+        
+        Rectangle<int> displaySliderArea = thisSlider.getBounds();
+        displaySliderArea.reduce(8, 0);
+        displaySlider->setBounds(displaySliderArea.removeFromBottom(8));
+        
+        
     }
     else
     {
@@ -1425,6 +1438,13 @@ sliderIncrement(increment)
     
     newDrag = false;
     isMinAlwaysLessThanMax = false;
+    
+    displaySlider = new Slider();
+    displaySlider->setRange(min, max, increment);
+    displaySlider->setSliderStyle(juce::Slider::SliderStyle::LinearBar);
+    displaySlider->setLookAndFeel(&displaySliderLookAndFeel);
+    displaySlider->setInterceptsMouseClicks(false, false);
+    addAndMakeVisible(displaySlider);
     
 #if JUCE_IOS
     maxValueTF.setReadOnly(true);
@@ -1685,6 +1705,10 @@ void BKRangeSlider::resized()
     minSlider.setBounds(sliderArea);
     maxSlider.setBounds(sliderArea);
     invisibleSlider.setBounds(sliderArea);
+    
+    Rectangle<int> displaySliderArea = maxSlider.getBounds();
+    displaySliderArea.reduce(8, 0);
+    displaySlider->setBounds(displaySliderArea.removeFromBottom(8));
     
 }
 

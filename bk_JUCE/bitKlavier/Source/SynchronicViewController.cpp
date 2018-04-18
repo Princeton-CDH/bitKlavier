@@ -97,7 +97,7 @@ BKViewController(p, theGraph)
     howManySlider = new BKSingleSlider("how many", 1, 100, 20, 1);
     howManySlider->setJustifyRight(false);
     addAndMakeVisible(howManySlider);
-    
+        
     clusterThreshSlider = new BKSingleSlider("cluster threshold", 20, 2000, 200, 10);
     clusterThreshSlider->setJustifyRight(false);
     addAndMakeVisible(clusterThreshSlider);
@@ -212,7 +212,7 @@ void SynchronicViewController::resized()
                                  nextCenter - gComponentSingleSliderHeight/2.,
                                  leftColumn.getWidth(),
                                  gComponentSingleSliderHeight);
-        
+
         nextCenter = paramSliders[1]->getY() + paramSliders[1]->getHeight()  + gPaddingConst * (1. - processor.paddingScalarY);
         clusterThreshSlider->setBounds(leftColumn.getX(),
                                        nextCenter - gComponentSingleSliderHeight/2.,
@@ -372,7 +372,19 @@ void SynchronicPreparationEditor::timerCallback()
     if (processor.updateState->currentDisplay == DisplaySynchronic)
     {
         SynchronicProcessor::Ptr sProcessor = processor.currentPiano->getSynchronicProcessor(processor.updateState->currentSynchronicId);
-
+        SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+        
+        if(sProcessor->getBeatCounter() < active->getNumBeats()) howManySlider->setDisplayValue(sProcessor->getBeatCounter());
+        else howManySlider->setDisplayValue(0);
+        
+        if(sProcessor->getClusterThresholdTimer() < active->getClusterThreshMS())
+             clusterThreshSlider->setDisplayValue(sProcessor->getClusterThresholdTimer());
+        else clusterThreshSlider->setDisplayValue(0);
+        
+        if(sProcessor->getClusterSize() <= active->getClusterMax())
+            clusterMinMaxSlider->setDisplayValue(sProcessor->getClusterSize());
+        else clusterMinMaxSlider->setDisplayValue(0);
+        
         int counter = 0, size = 0;
         
         if (sProcessor != nullptr)

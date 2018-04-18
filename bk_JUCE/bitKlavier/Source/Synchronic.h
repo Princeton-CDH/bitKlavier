@@ -1117,6 +1117,10 @@ public:
     inline const int getLengthMultiplierCounter() const noexcept { return lengthMultiplierCounter; }
     inline const int getTranspCounter() const noexcept { return transpCounter; }
     inline const int getEnvelopeCounter() const noexcept { return envelopeCounter; }
+    inline const int getBeatCounter() const noexcept { return beatCounter; }
+    inline const float getClusterThresholdTimer() const noexcept { return 1000. * clusterThresholdTimer / sampleRate ;}
+    inline const float getClusterThreshold() const noexcept { return 1000. * clusterThresholdSamples / sampleRate ;}
+    inline const int getClusterSize() const noexcept {return cluster.size(); }
     
     inline const SynchronicSyncMode getMode() const noexcept {return synchronic->aPrep->getMode(); }
 

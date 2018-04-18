@@ -237,6 +237,7 @@ public:
     ~BKSingleSlider() {};
     
     Slider thisSlider;
+    ScopedPointer<Slider> displaySlider;
     
     String sliderName;
     BKLabel showName;
@@ -261,6 +262,8 @@ public:
     void setValue(double newval, NotificationType notify);
     void checkValue(double newval);
     double getValue() {return thisSlider.getValue();}
+    
+    void setDisplayValue(double newval) { displaySlider->setValue(newval); }
     
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
@@ -304,6 +307,8 @@ private:
     
     bool justifyRight;
     
+    BKDisplaySliderLookAndFeel displaySliderLookAndFeel;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSingleSlider)
     
 };
@@ -338,6 +343,8 @@ public:
     
     Slider invisibleSlider;
     
+    ScopedPointer<Slider> displaySlider;
+    
     String sliderName;
     BKLabel showName;
     
@@ -349,6 +356,9 @@ public:
     void setMinValue(double newval, NotificationType notify);
     void setMaxValue(double newval, NotificationType notify);
     void setIsMinAlwaysLessThanMax(bool im) { isMinAlwaysLessThanMax = im; }
+    
+    void setDisplayValue(double newval) { displaySlider->setValue(newval); }
+    
     void setJustifyRight(bool jr)
     {
         justifyRight = jr;
@@ -428,6 +438,7 @@ private:
     
     BKRangeMinSliderLookAndFeel minSliderLookAndFeel;
     BKRangeMaxSliderLookAndFeel maxSliderLookAndFeel;
+    BKDisplaySliderLookAndFeel displaySliderLookAndFeel;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKRangeSlider)
     
