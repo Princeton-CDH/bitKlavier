@@ -264,6 +264,7 @@ public:
     double getValue() {return thisSlider.getValue();}
     
     void setDisplayValue(double newval) { displaySlider->setValue(newval); }
+    void displaySliderVisible(bool vis) { displaySlider->setVisible(vis); }
     
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
@@ -358,6 +359,7 @@ public:
     void setIsMinAlwaysLessThanMax(bool im) { isMinAlwaysLessThanMax = im; }
     
     void setDisplayValue(double newval) { displaySlider->setValue(newval); }
+    void displaySliderVisible(bool vis) { displaySlider->setVisible(vis); }
     
     void setJustifyRight(bool jr)
     {

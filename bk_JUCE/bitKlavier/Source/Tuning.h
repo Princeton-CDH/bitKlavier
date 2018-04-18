@@ -604,6 +604,7 @@ public:
     int getAdaptiveFundamentalNote() { return adaptiveFundamentalNote;}
     float getAdaptiveFundamentalFreq() { return adaptiveFundamentalFreq;}
     int getAdaptiveHistoryCounter() { return adaptiveHistoryCounter;}
+    int getAdaptiveClusterTimer() { return clusterTime * (1000.0 / sampleRate); }
     
     void setAdaptiveFundamentalNote(int newNote) { adaptiveFundamentalNote = newNote;}
     void setAdaptiveFundamentalFreq(float newFreq) { adaptiveFundamentalFreq = newFreq;}

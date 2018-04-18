@@ -91,6 +91,7 @@ BKViewController(p,theGraph)
     
     nToneSemitoneWidthSlider = new BKSingleSlider("semitone width and root", 1, 200, 100, 0.001);
     nToneSemitoneWidthSlider->setJustifyRight(false);
+    nToneSemitoneWidthSlider->displaySliderVisible(false);
     addAndMakeVisible(nToneSemitoneWidthSlider);
     
     fillTuningCB();
@@ -116,6 +117,7 @@ BKViewController(p,theGraph)
     addAndMakeVisible(customKeyboard);
     
     offsetSlider = new BKSingleSlider("offset: ", -100, 100, 0, 0.1);
+    offsetSlider->displaySliderVisible(false);
     addAndMakeVisible(offsetSlider);
     
     lastNote.setText("note: ", dontSendNotification);
@@ -439,6 +441,7 @@ void TuningPreparationEditor::timerCallback()
     if (processor.updateState->currentDisplay == DisplayTuning)
     {
         TuningProcessor::Ptr tProcessor = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
+        TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
         
         if (tProcessor != nullptr)
         {
@@ -450,8 +453,20 @@ void TuningPreparationEditor::timerCallback()
                 
                 currentFundamental.setText("current fundamental: " + String(ftom(tProcessor->getAdaptiveFundamentalFreq()), 3), dontSendNotification);
             }
+            
+            if(active->getTuning() == AdaptiveTuning || active->getTuning() == AdaptiveAnchoredTuning )
+            {
+                A1ClusterMax->setDisplayValue(tProcessor->getAdaptiveHistoryCounter() + 1);
+                
+                if(tProcessor->getAdaptiveClusterTimer() < active->getAdaptiveClusterThresh())
+                    A1ClusterThresh->setDisplayValue(tProcessor->getAdaptiveClusterTimer());
+                else
+                {
+                    A1ClusterThresh->setDisplayValue(0);
+                    A1ClusterMax->setDisplayValue(0);
+                }
+            }
         }
-        
     }
 }
 
@@ -717,19 +732,19 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
  
     if(name == absoluteKeyboard.getName())
     {
-        DBG("updating absolute tuning vals");
+        //DBG("updating absolute tuning vals");
         prep->setAbsoluteOffsetCents(values);
         active->setAbsoluteOffsetCents(values);
     }
     else if(name == customKeyboard.getName())
     {
-        DBG("updating custom tuning vals");
+        //DBG("updating custom tuning vals");
         scaleCB.setSelectedItemIndex(customIndex, dontSendNotification);
         
         prep->setTuning((TuningSystem)customIndex);
         active->setTuning((TuningSystem)customIndex);
         
-        DBG("keyboardSliderChanged values.size() = " + String(values.size()));
+        //DBG("keyboardSliderChanged values.size() = " + String(values.size()));
         prep->setCustomScaleCents(values);
         active->setCustomScaleCents(values);
     }
@@ -742,22 +757,22 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(String name, double val
     TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
     
     if(name == offsetSlider->getName()) {
-        DBG("got offset " + String(val));
+        //DBG("got offset " + String(val));
         prep->setFundamentalOffset(val * 0.01);
         active->setFundamentalOffset(val * 0.01);
     }
     else if(name == A1ClusterThresh->getName()) {
-        DBG("got A1ClusterThresh " + String(val));
+        //DBG("got A1ClusterThresh " + String(val));
         prep->setAdaptiveClusterThresh(val);
         active->setAdaptiveClusterThresh(val);
     }
     else if(name == A1ClusterMax->getName()) {
-        DBG("got A1ClusterMax " + String(val));
+        //DBG("got A1ClusterMax " + String(val));
         prep->setAdaptiveHistory(val);
         active->setAdaptiveHistory(val);
     }
     else if(name == nToneSemitoneWidthSlider->getName()) {
-        DBG("got nToneSemiToneSliderWidth " + String(val));
+        //DBG("got nToneSemiToneSliderWidth " + String(val));
         prep->setNToneSemitoneWidth(val);
         active->setNToneSemitoneWidth(val);
     }
