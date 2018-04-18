@@ -788,8 +788,8 @@ public:
     void BKSingleSliderValueChanged(String name, double val) override;
     void buttonStateChanged (Button*) override;
     void buttonClicked (Button*) override;
-    void mouseDown (const MouseEvent &event) override;
-    void mouseUp (const MouseEvent &event) override {};
+    void mouseDown (const MouseEvent &event) override {};
+    void mouseUp (const MouseEvent &event) override;
 
     
     void resized() override;

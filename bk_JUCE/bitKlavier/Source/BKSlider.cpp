@@ -2574,14 +2574,14 @@ void BKADSRSlider::buttonStateChanged (Button*)
     
 }
 
-void BKADSRSlider::mouseDown (const MouseEvent &event)
+void BKADSRSlider::mouseUp (const MouseEvent &event)
 {
-    if(event.mods.isShiftDown())
+    if(event.mods.isShiftDown() || event.getLengthOfMousePress() > 500)
     {
         //DBG("shift is down");
         bool toggleState = adsrButton.getToggleState();
         DBG("BKADSRSlider::mouseDown = " + getName() + " " + String((int)toggleState));
-        listeners.call(&BKADSRSlider::Listener::BKADSRButtonStateChanged, getName(), true, toggleState);
+        listeners.call(&BKADSRSlider::Listener::BKADSRButtonStateChanged, getName(), true, !toggleState);
     }
     else
     {
