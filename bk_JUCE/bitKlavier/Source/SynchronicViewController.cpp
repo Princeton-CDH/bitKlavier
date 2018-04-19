@@ -382,8 +382,10 @@ void SynchronicPreparationEditor::timerCallback()
              clusterThreshSlider->setDisplayValue(sProcessor->getClusterThresholdTimer());
         else clusterThreshSlider->setDisplayValue(0);
         
-        if(sProcessor->getClusterSize() <= active->getClusterMax() && sProcessor->getClusterThresholdTimer() < active->getClusterThreshMS())
-            clusterMinMaxSlider->setDisplayValue(sProcessor->getClusterSize());
+        int maxTemp = 12; //arbitrary
+        if(active->getClusterMax() > active->getClusterMin()) maxTemp = active->getClusterMax();
+        if(sProcessor->getNumKeysDepressed() <= maxTemp && sProcessor->getClusterThresholdTimer() < active->getClusterThreshMS())
+            clusterMinMaxSlider->setDisplayValue(sProcessor->getNumKeysDepressed());
         else clusterMinMaxSlider->setDisplayValue(0);
         
         int counter = 0, size = 0;

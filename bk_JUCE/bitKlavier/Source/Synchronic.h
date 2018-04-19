@@ -1121,6 +1121,7 @@ public:
     inline const float getClusterThresholdTimer() const noexcept { return 1000. * clusterThresholdTimer / sampleRate ;}
     inline const float getClusterThreshold() const noexcept { return 1000. * clusterThresholdSamples / sampleRate ;}
     inline const int getClusterSize() const noexcept {return cluster.size(); }
+    inline const int getNumKeysDepressed() const noexcept {return keysDepressed.size(); }
     
     inline const SynchronicSyncMode getMode() const noexcept {return synchronic->aPrep->getMode(); }
 
