@@ -2580,7 +2580,7 @@ void BKADSRSlider::mouseUp (const MouseEvent &event)
     {
         //DBG("shift is down");
         bool toggleState = adsrButton.getToggleState();
-        DBG("BKADSRSlider::mouseDown = " + getName() + " " + String((int)toggleState));
+        DBG("BKADSRSlider::mouseUp = " + getName() + " " + String((int)toggleState));
         listeners.call(&BKADSRSlider::Listener::BKADSRButtonStateChanged, getName(), true, !toggleState);
     }
     else

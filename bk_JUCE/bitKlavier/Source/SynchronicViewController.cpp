@@ -307,6 +307,8 @@ void SynchronicViewController::setShowADSR(String name, bool newval)
         }
         envelopeName.setVisible(true);
         
+        if(envelopeSliders[visibleADSR]->isEnabled()) envelopeSliders[visibleADSR]->setActive();
+        
     }
     
     resized();
@@ -943,6 +945,10 @@ SynchronicViewController(p, theGraph)
     clusterMinMaxSlider->addMyListener(this);
     gainSlider->addMyListener(this);
     
+    howManySlider->displaySliderVisible(false);
+    clusterThreshSlider->displaySliderVisible(false);
+    clusterMinMaxSlider->displaySliderVisible(false);
+    
     for(int i = 0; i < envelopeSliders.size(); i++) envelopeSliders[i]->addMyListener(this);
 
 }
@@ -1514,6 +1520,7 @@ void SynchronicModificationEditor::BKADSRSliderValueChanged(String name, int att
 
 void SynchronicModificationEditor::BKADSRButtonStateChanged(String name, bool mod, bool state)
 {
+    DBG("SynchronicModificationEditor::BKADSRButtonStateChanged " + String((int)state));
     setShowADSR(name, !state);
     setSubWindowInFront(!state);
 }
