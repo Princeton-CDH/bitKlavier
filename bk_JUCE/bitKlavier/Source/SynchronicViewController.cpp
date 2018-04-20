@@ -376,7 +376,7 @@ void SynchronicPreparationEditor::timerCallback()
         SynchronicProcessor::Ptr sProcessor = processor.currentPiano->getSynchronicProcessor(processor.updateState->currentSynchronicId);
         SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
         
-        if(sProcessor->getBeatCounter() < active->getNumBeats() && sProcessor->getClusterSize() <= active->getClusterMax())
+        if(sProcessor->getBeatCounter() < active->getNumBeats() && sProcessor->getPlayCluster())
             howManySlider->setDisplayValue(sProcessor->getBeatCounter());
         else howManySlider->setDisplayValue(0);
         

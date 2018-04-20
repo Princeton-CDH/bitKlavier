@@ -1122,6 +1122,7 @@ public:
     inline const float getClusterThreshold() const noexcept { return 1000. * clusterThresholdSamples / sampleRate ;}
     inline const int getClusterSize() const noexcept {return cluster.size(); }
     inline const int getNumKeysDepressed() const noexcept {return keysDepressed.size(); }
+    inline const bool getPlayCluster() const noexcept { return playCluster; }
     
     inline const SynchronicSyncMode getMode() const noexcept {return synchronic->aPrep->getMode(); }
 
@@ -1210,6 +1211,7 @@ private:
     void playNote(int channel, int note, float velocity);
     Array<float> velocities;    //record of velocities
     Array<int> keysDepressed;   //current keys that are depressed
+    bool playCluster;
     
     bool inCluster;
     uint64 clusterThresholdSamples;
