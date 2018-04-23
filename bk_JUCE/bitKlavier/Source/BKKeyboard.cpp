@@ -926,6 +926,7 @@ Array<float> BKKeymapKeyboardComponent::getValuesRotatedByFundamental()
 {
     Array<float> valsToSend;
     for (int i = 0; i < 128; i++) valsToSend.add(0.);
+    //for (int i = 0; i < 12; i++) valsToSend.add(0.);
     
     int offset;
     if(fundamental <= 0) offset = 0;
@@ -940,7 +941,7 @@ Array<float> BKKeymapKeyboardComponent::getValuesRotatedByFundamental()
         //DBG("keyValues GET ROTATED " + String(i - rangeStart) + " " + String(keyValues.getUnchecked(index)));
         DBG("keyValues GET ROTATED " + String(i) + " " + String(keyValues.getUnchecked(index)));
     }
-    
+
     return valsToSend;
 }
 
