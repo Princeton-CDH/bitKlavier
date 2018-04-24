@@ -143,8 +143,8 @@ void BKKeyboardSlider::resized()
 void BKKeyboardSlider::setFundamental(int fund)
 {
     keyboard->setFundamental(fund);
-    if(fund <=0) orderedPairs = false;
-    else orderedPairs = true;
+    //if(fund <=0) orderedPairs = false;
+    //else orderedPairs = true;
 }
 
 void BKKeyboardSlider::setAvailableRange(int min, int max)
@@ -253,8 +253,8 @@ void BKKeyboardSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
     {
         if(orderedPairs) keyboard->setValuesDirectly(stringOrderedPairsToFloatArray(keyboardValsTextField->getText(), 128));
 
-        else keyboard->setValuesDirectly(stringToFloatArray(keyboardValsTextField->getText()));
-        //else keyboard->setValuesRotatedByFundamental(stringToFloatArray(keyboardValsTextField->getText()));
+        //else keyboard->setValuesDirectly(stringToFloatArray(keyboardValsTextField->getText()));
+        else keyboard->setValuesRotatedByFundamental(stringToFloatArray(keyboardValsTextField->getText()));
         
         listeners.call(&BKKeyboardSlider::Listener::keyboardSliderChanged,
                        getName(),
@@ -331,10 +331,11 @@ void BKKeyboardSlider::bkButtonClicked (Button* b)
         }
         else
         {
-            DBG("keyboardValsTextField->setText(floatArrayToString(keyboard->getValuesDirectly()), dontSendNotification);");
             //keyboardValsTextField->setText(floatArrayToString(keyboard->getValuesDirectly()), dontSendNotification);
             
             Array<float> newVals = keyboard->getValuesRotatedByFundamental();
+            DBG("BKKeyboardSlider::bkButtonClicked newVals = " + floatArrayToString(newVals));
+            //Array<float> newVals = keyboard->getValuesDirectly();
             newVals.removeRange(12, 128);
             keyboardValsTextField->setText(floatArrayToString(newVals), dontSendNotification);
             //keyboardValsTextField->setText(floatArrayToString(keyboard->getValuesRotatedByFundamental()), dontSendNotification);
