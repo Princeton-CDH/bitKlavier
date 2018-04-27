@@ -705,7 +705,7 @@ void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
 
 void BKMultiSlider::mouseDown (const MouseEvent &event)
 {
-    if(event.mouseWasClicked())
+    if (event.mouseWasClicked())
     {
         currentSubSlider = whichSubSlider(whichSlider(event));
         clickedHeight = event.y;

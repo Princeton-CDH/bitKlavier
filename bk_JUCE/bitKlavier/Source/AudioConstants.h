@@ -19,6 +19,8 @@
 #define CRAY_COOL_MUSIC_MAKER 0
 #define CRAY_COOL_MUSIC_MAKER_2 0
 
+#define PAD 50
+
 const String posX = "X";
 const String posY = "Y";
 

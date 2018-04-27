@@ -67,13 +67,11 @@ public:
     bool appliesToNote (int midiNoteNumber) override;
     bool appliesToVelocity (int midiNoteVelocity) override;
     bool appliesToChannel (int midiChannel) override;
+    bool isSoundfontSound(void);
     
 private:
     //==============================================================================
     friend class BKPianoSamplerVoice;
-    
-    //sfzero::Region* region;
-
     
     String name;
     
@@ -87,7 +85,9 @@ private:
     int rampOnSamples, rampOffSamples;
     
     stk::ADSR adsr;
-    sfzero::Region* region;
+    
+    int64 loopStart, loopEnd;
+    bool isSoundfont;
     
     JUCE_LEAK_DETECTOR (BKPianoSamplerSound)
 };
@@ -171,8 +171,10 @@ private:
     uint64 noteStartingPosition, noteEndPosition;
     double pitchRatio;
     double sourceSamplePosition;
+    double fadeTracker;
+    double lengthTracker;
     double playEndPosition;
-    uint32 playLength;
+    double playLength;
     uint64 timer;
     BKNoteType bkType;
     PianoSamplerNoteType playType;
@@ -180,10 +182,6 @@ private:
     bool revRamped;
     float lgain, rgain, rampOnOffLevel, rampOnDelta, rampOffDelta;
     bool isInRampOn, isInRampOff;
-    
-    // SFZ stuff
-    sfzero::Region *region_;
-    sfzero::EG ampeg_;
     
     stk::ADSR adsr;
     int numLoops;

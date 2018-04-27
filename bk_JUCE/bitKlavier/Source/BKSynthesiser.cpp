@@ -10,7 +10,7 @@
 
 #include "BKSynthesiser.h"
 
-BKSynthesiserSound::BKSynthesiserSound() {}
+BKSynthesiserSound::BKSynthesiserSound(void) {}
 BKSynthesiserSound::~BKSynthesiserSound() {}
 
 //==============================================================================
@@ -525,7 +525,6 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                     {
                         // Let synthesiser know that key is no longer down,
                         voice->keyIsDown = false;
-                        
                         
                         if (! ((voice->type == FixedLengthFixedStart) || (voice->type == FixedLength) || voice->sostenutoPedalDown)) {
                             //DBG("BKSynthesiser::stopVoice " + String(midiNoteNumber));

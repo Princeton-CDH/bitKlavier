@@ -203,6 +203,7 @@ void BKAudioProcessor::loadSoundfontFromFile(File sfzFile)
         
         regions.clear();
         regions = sf2sound->getRegions();
+        DBG("regions.size: " + String(regions.size()));
     }
     else if (ext == ".sfz")
     {
@@ -215,38 +216,40 @@ void BKAudioProcessor::loadSoundfontFromFile(File sfzFile)
         
         regions.clear();
         regions = sfzsound->getRegions();
+        DBG("regions.size: " + String(regions.size()));
     }
     else    return;
     
     for (auto region : regions)
     {
-        
-        
         int64 sampleStart = region->loop_start;
-        
         
         int64 sampleLength = region->loop_end - sampleStart;
         double sourceSampleRate = region->sample->getSampleRate();
         
         DBG("start: " + String(region->loop_start) + " end: " + String(region->loop_end) + " len: " + String(region->loop_end - region->loop_start));
         
-        
+        // check out fluidsynth as alternative
         AudioSampleBuffer* sourceBuffer = region->sample->getBuffer();
         
-        BKReferenceCountedBuffer::Ptr buffer = new BKReferenceCountedBuffer(region->sample->getShortName(), 1, (int)sampleLength);
+        BKReferenceCountedBuffer::Ptr buffer = new BKReferenceCountedBuffer(region->sample->getShortName(), 1, (int)sampleLength + 2*PAD);
         
         AudioSampleBuffer* destBuffer = buffer->getAudioSampleBuffer();
         
-        destBuffer->copyFrom(0, 0, sourceBuffer->getReadPointer(0, sampleStart), (int)sampleLength);
+        destBuffer->copyFrom(0, 0, sourceBuffer->getReadPointer(0, sampleStart - PAD), (int)sampleLength+2*PAD);
         
         int nbits = region->hikey - region->lokey; nbits = (nbits > 0) ? nbits : 1;
         int vbits = region->hivel - region->lovel; vbits = (vbits > 0) ? vbits : 1;
         BigInteger nrange; nrange.setRange(region->lokey, nbits, true);
         BigInteger vrange; vrange.setRange(region->lovel, vbits, true);
         
-        region->loop_end -= region->loop_start;
-        region->loop_start = 0;
+        region->loop_end = (region->loop_end - region->loop_start) + PAD;
+        region->loop_start = PAD;
         
+        DBG("LOAD loop start: " + String(region->loop_start));
+        DBG("LOAD loop   end: " + String(region->loop_end));
+
+        DBG("len: " + String(sampleLength));
         mainPianoSynth.addSound(new BKPianoSamplerSound(region->sample->getShortName(),
                                                         buffer,
                                                         sampleLength,

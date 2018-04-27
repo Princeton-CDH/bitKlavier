@@ -17,11 +17,31 @@
 
 #include "General.h"
 
+#if 0
+class SFRegion : public ReferenceCountedObject
+{
+public:
+    typedef ReferenceCountedObjectPtr<SFRegion>   Ptr;
+    typedef Array<SFRegion::Ptr>                  PtrArr;
+    SFRegion(sfzero::Region* r):
+    region(r){}
+    
+    ~SFRegion(){}
+    
+    sfzero::Region* region;
+    
+private:
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SFRegion)
+};
+#endif
+
 class JUCE_API  BKSynthesiserSound    : public ReferenceCountedObject
 {
+ 
 protected:
     //==============================================================================
-    BKSynthesiserSound();
+    BKSynthesiserSound(void);
     
 public:
     /** Destructor. */
@@ -52,8 +72,8 @@ public:
     /** The class is reference-counted, so this is a handy pointer class for it. */
     typedef ReferenceCountedObjectPtr<BKSynthesiserSound> Ptr;
     
-    
 private:
+    
     //==============================================================================
     JUCE_LEAK_DETECTOR (BKSynthesiserSound)
 };
