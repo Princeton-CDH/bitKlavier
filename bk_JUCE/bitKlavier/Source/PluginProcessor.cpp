@@ -531,6 +531,7 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     
     noteOn.set(noteNumber, false);
     //DBG("noteoff velocity = " + String(velocity));
+    if(velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
     
     // Send key off to each pmap in current piano
     for (p = currentPiano->activePMaps.size(); --p >= 0;)
@@ -836,7 +837,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == DirectGain)        active->setGain(modf);
         else if (type == DirectHammerGain)  active->setHammerGain(modf);
         else if (type == DirectResGain)     active->setResonanceGain(modf);
-        
+        else if (type == DirectADSR)        active->setADSRvals(modfa);
         
         updateState->directPreparationDidChange = true;
     }
@@ -858,6 +859,8 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == NostalgicBeatsToSkip)      active->setBeatsToSkip(modi);
         else if (type == NostalgicWaveDistance)     active->setWaveDistance(modi);
         else if (type == NostalgicLengthMultiplier) active->setLengthMultiplier(modf);
+        else if (type == NostalgicReverseADSR)      active->setReverseADSRvals(modfa);
+        else if (type == NostalgicUndertowADSR)     active->setUndertowADSRvals(modfa);
         
         updateState->nostalgicPreparationDidChange = true;
     }
@@ -885,6 +888,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == SynchronicBeatMultipliers)     active->setBeatMultipliers(modfa);
         else if (type == SynchronicLengthMultipliers)   active->setLengthMultipliers(modfa);
         else if (type == SynchronicAccentMultipliers)   active->setAccentMultipliers(modfa);
+        else if (type == SynchronicADSRs)               active->setADSRs(modafa);
         
         updateState->synchronicPreparationDidChange = true;
     }

@@ -237,6 +237,7 @@ public:
     ~BKSingleSlider() {};
     
     Slider thisSlider;
+    ScopedPointer<Slider> displaySlider;
     
     String sliderName;
     BKLabel showName;
@@ -261,6 +262,9 @@ public:
     void setValue(double newval, NotificationType notify);
     void checkValue(double newval);
     double getValue() {return thisSlider.getValue();}
+    
+    void setDisplayValue(double newval) { displaySlider->setValue(newval); }
+    void displaySliderVisible(bool vis) { displaySlider->setVisible(vis); }
     
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
@@ -304,6 +308,8 @@ private:
     
     bool justifyRight;
     
+    BKDisplaySliderLookAndFeel displaySliderLookAndFeel;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSingleSlider)
     
 };
@@ -338,6 +344,8 @@ public:
     
     Slider invisibleSlider;
     
+    ScopedPointer<Slider> displaySlider;
+    
     String sliderName;
     BKLabel showName;
     
@@ -349,6 +357,10 @@ public:
     void setMinValue(double newval, NotificationType notify);
     void setMaxValue(double newval, NotificationType notify);
     void setIsMinAlwaysLessThanMax(bool im) { isMinAlwaysLessThanMax = im; }
+    
+    void setDisplayValue(double newval) { displaySlider->setValue(newval); }
+    void displaySliderVisible(bool vis) { displaySlider->setVisible(vis); }
+    
     void setJustifyRight(bool jr)
     {
         justifyRight = jr;
@@ -428,6 +440,7 @@ private:
     
     BKRangeMinSliderLookAndFeel minSliderLookAndFeel;
     BKRangeMaxSliderLookAndFeel maxSliderLookAndFeel;
+    BKDisplaySliderLookAndFeel displaySliderLookAndFeel;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKRangeSlider)
     
@@ -738,13 +751,32 @@ public:
         releaseSlider->setValue(newval, notify);
     }
     
+    void setValue(Array<float> newvals, NotificationType notify)
+    {
+        setAttackValue(newvals[0], notify);
+        setDecayValue(newvals[1], notify);
+        setSustainValue(newvals[2], notify);
+        setReleaseValue(newvals[3], notify);
+        
+        if(newvals.size() > 4)
+        {
+            if(newvals[4] > 0) setActive();
+            else setPassive();
+        }
+    }
+    
+    int getAttackValue()    { return attackSlider->getValue(); }
+    int getDecayValue()     { return decaySlider->getValue(); }
+    float getSustainValue() { return sustainSlider->getValue(); }
+    int getReleaseValue()   { return releaseSlider->getValue(); }
+    
     void setIsButtonOnly(bool state) { isButtonOnly = state; }
     void setButtonToggle(bool state) {adsrButton.setToggleState(state, dontSendNotification);}
     bool getButtonToggle() { return adsrButton.getToggleState(); }
     
-    void setHighlighted() { adsrButton.setLookAndFeel(&highlightedADSRLookAndFeel); }
-    void setActive() { adsrButton.setLookAndFeel(&activeADSRLookAndFeel);}
-    void setPassive() { adsrButton.setLookAndFeel(&passiveADSRLookAndFeel); }
+    void setHighlighted() { adsrButton.setToggleState(false, dontSendNotification); adsrButton.setLookAndFeel(&highlightedADSRLookAndFeel); }
+    void setActive() { adsrButton.setToggleState(false, dontSendNotification); adsrButton.setLookAndFeel(&activeADSRLookAndFeel);}
+    void setPassive() { adsrButton.setToggleState(true, dontSendNotification); adsrButton.setLookAndFeel(&passiveADSRLookAndFeel); }
     
     void setJustifyRight(bool jr)
     {
@@ -756,8 +788,8 @@ public:
     void BKSingleSliderValueChanged(String name, double val) override;
     void buttonStateChanged (Button*) override;
     void buttonClicked (Button*) override;
-    void mouseDown (const MouseEvent &event) override;
-    void mouseUp (const MouseEvent &event) override {};
+    void mouseDown (const MouseEvent &event) override {};
+    void mouseUp (const MouseEvent &event) override;
 
     
     void resized() override;

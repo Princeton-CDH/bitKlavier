@@ -107,6 +107,7 @@ const String vtagSynchronic_lengthMults = "lengthMultipliers";
 const String vtagSynchronic_accentMults = "accentMultipliers";
 const String vtagSynchronic_transpOffsets = "transpOffsets";
 const String ptagSynchronic_reset = "synchronicReset";
+const String vtagSynchronic_ADSRs = "ADSRs";
 
 
 const String vtagNostalgic = "nostalgic";
@@ -122,6 +123,8 @@ const String ptagNostalgic_mode = "mode";
 const String ptagNostalgic_beatsToSkip = "beatsToSkip";
 const String ptagNostalgic_syncTarget = "syncTarget";
 const String ptagNostalgic_reset = "nostalgicReset";
+const String vtagNostalgic_reverseADSR = "reverseADSR";
+const String vtagNostalgic_undertowADSR = "undertowADSR";
 
 
 const String vtagDirect = "direct";
@@ -133,6 +136,7 @@ const String ptagDirect_gain = "gain";
 const String ptagDirect_resGain = "resGain";
 const String ptagDirect_hammerGain = "hammerGain";
 const String ptagDirect_reset = "directReset";
+const String vtagDirect_ADSR = "ADSR";
 
 
 const String vtagTuning = "tuning";
@@ -427,8 +431,7 @@ typedef enum SynchronicParameterType {
     SynchronicLengthMultipliers,
     SynchronicBeatMultipliers,
     SynchronicGain,
-    SynchronicTuning,
-    SynchronicTempo,
+    SynchronicADSRs,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
@@ -446,8 +449,7 @@ static const std::vector<BKParameterDataType> cSynchronicDataTypes = {
     BKFloatArr,
     BKFloatArr,
     BKFloat,
-    BKInt,
-    BKInt,
+    BKArrFloatArr
 };
 
 static const std::vector<std::string> cSynchronicParameterTypes = {
@@ -463,8 +465,7 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "sustain length multipliers",
     "beat length multipliers",
     "gain",
-    "Tuning Id",
-    "Tempo Id"
+    "ADSRs"
 };
 
 static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc = {
@@ -480,7 +481,7 @@ static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc
 	{ -2.0f, 2.0f, 1.0f, 0.001f },
 	{ 0.0f, 2.0f, 1.0f, 0.001f },
 	{ 0.0f, 0.0f, 0.0f, 0.0f },
-	{ 0.0f, 0.0f, 0.0f, 0.0f },
+	{ 0.0f, 0.0f, 0.0f, 0.0f }
 };
 
 #pragma mark - Nostalgic
@@ -508,6 +509,8 @@ typedef enum NostalgicParameterType {
     NostalgicMode,
     NostalgicSyncTarget,
     NostalgicTuning,
+    NostalgicReverseADSR,
+    NostalgicUndertowADSR,
     NostalgicParameterTypeNil
     
 } NostalgicParameterType;
@@ -523,7 +526,9 @@ static const std::vector<BKParameterDataType> cNostalgicDataTypes =
     BKInt,
     BKInt,
     BKInt,
-    BKInt
+    BKInt,
+    BKFloatArr,
+    BKFloatArr
 };
 
 static const std::vector<std::string> cNostalgicParameterTypes = {
@@ -536,6 +541,8 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
     "BeatsToSkip",
     "Length Mode",
     "SyncTarget",
+    "ReverseADSR",
+    "UndertowADSR",
     "Tuning Id"
 };
 
@@ -548,6 +555,7 @@ typedef enum DirectParameterType
     DirectResGain,
     DirectHammerGain,
     DirectTuning,
+    DirectADSR,
     DirectParameterTypeNil,
     
 } DirectParameterType;
@@ -559,7 +567,8 @@ static const std::vector<BKParameterDataType> cDirectDataTypes = {
     BKFloat,
     BKFloat,
     BKFloat,
-    BKInt
+    BKInt,
+    BKFloatArr
 };
 
 static const std::vector<std::string> cDirectParameterTypes = {
@@ -568,7 +577,8 @@ static const std::vector<std::string> cDirectParameterTypes = {
     "Gain",
     "ResGain",
     "HammerGain",
-    "Tuning Id"
+    "Tuning Id",
+    "ADSR"
 };
 
 #pragma mark - Tuning

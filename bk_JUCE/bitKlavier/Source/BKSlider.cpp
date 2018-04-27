@@ -1184,6 +1184,14 @@ sliderIncrement(increment)
     valueTF.addMouseListener(this, true);
     valueTF.setColour(TextEditor::highlightColourId, Colours::darkgrey);
     addAndMakeVisible(valueTF);
+    
+    displaySlider = new Slider(); 
+    displaySlider->setRange(min, max, increment);
+    displaySlider->setSliderStyle(juce::Slider::SliderStyle::LinearBar);
+    displaySlider->setLookAndFeel(&displaySliderLookAndFeel);
+    displaySlider->setInterceptsMouseClicks(false, false);
+    addAndMakeVisible(displaySlider);
+
 }
 
 void BKSingleSlider::setDim(float alphaVal)
@@ -1257,20 +1265,24 @@ void BKSingleSlider::checkValue(double newval)
 {
     if(newval > thisSlider.getMaximum()) {
         thisSlider.setRange(thisSlider.getMinimum(), newval, sliderIncrement);
+        displaySlider->setRange(thisSlider.getMinimum(), newval, sliderIncrement);
     }
     
     if(newval < thisSlider.getMinimum()) {
         thisSlider.setRange(newval, thisSlider.getMaximum(), sliderIncrement);
+        displaySlider->setRange(newval, thisSlider.getMaximum(), sliderIncrement);
     }
     
     if(newval <= sliderMax && thisSlider.getMaximum() > sliderMax)
     {
         thisSlider.setRange(thisSlider.getMinimum(), sliderMax, sliderIncrement);
+        displaySlider->setRange(thisSlider.getMinimum(), sliderMax, sliderIncrement);
     }
     
     if(newval >= sliderMin && thisSlider.getMinimum() < sliderMin)
     {
         thisSlider.setRange(sliderMin, thisSlider.getMaximum(), sliderIncrement);
+        displaySlider->setRange(sliderMin, thisSlider.getMaximum(), sliderIncrement);
     }
 }
 
@@ -1312,12 +1324,8 @@ void BKSingleSlider::resized()
     if(textIsAbove)
     {
         Rectangle<int> area (getLocalBounds());
-        
-        //Rectangle<int> textSlab (area.removeFromTop(area.getHeight() / 3));
-        //Rectangle<int> textSlab (area.removeFromTop(gComponentSingleSliderHeight * 0.5));
         Rectangle<int> textSlab (area.removeFromTop(gComponentTextFieldHeight));
-        //gComponentTextFieldHeight
-        //textSlab.removeFromTop(textSlab.getHeight() - 20);
+
         if(justifyRight)
         {
             textSlab.removeFromRight(gComponentSingleSliderXOffset);
@@ -1331,8 +1339,13 @@ void BKSingleSlider::resized()
             showName.setBounds(textSlab.removeFromRight(getWidth() - 75));
         }
         
-        //thisSlider.setBounds(area.removeFromTop(gComponentSingleSliderHeight * 0.5 - 12));
         thisSlider.setBounds(area.removeFromTop(gComponentSingleSliderHeight - gComponentTextFieldHeight));
+        
+        Rectangle<int> displaySliderArea = thisSlider.getBounds();
+        displaySliderArea.reduce(8, 0);
+        displaySlider->setBounds(displaySliderArea.removeFromBottom(8));
+        
+        
     }
     else
     {
@@ -1425,6 +1438,13 @@ sliderIncrement(increment)
     
     newDrag = false;
     isMinAlwaysLessThanMax = false;
+    
+    displaySlider = new Slider();
+    displaySlider->setRange(min, max, increment);
+    displaySlider->setSliderStyle(juce::Slider::SliderStyle::LinearBar);
+    displaySlider->setLookAndFeel(&displaySliderLookAndFeel);
+    displaySlider->setInterceptsMouseClicks(false, false);
+    addAndMakeVisible(displaySlider);
     
 #if JUCE_IOS
     maxValueTF.setReadOnly(true);
@@ -1685,6 +1705,10 @@ void BKRangeSlider::resized()
     minSlider.setBounds(sliderArea);
     maxSlider.setBounds(sliderArea);
     invisibleSlider.setBounds(sliderArea);
+    
+    Rectangle<int> displaySliderArea = maxSlider.getBounds();
+    displaySliderArea.reduce(8, 0);
+    displaySlider->setBounds(displaySliderArea.removeFromBottom(8));
     
 }
 
@@ -2086,6 +2110,10 @@ void BKStackedSlider::addSlider(NotificationType newnotify)
     sliderVals.add(topSlider->proportionOfLengthToValue((double)clickedPosition / getWidth()));
     setTo(sliderVals, newnotify);
     topSlider->setValue(topSlider->proportionOfLengthToValue((double)clickedPosition / getWidth()), dontSendNotification);
+    
+    listeners.call(&BKStackedSlider::Listener::BKStackedSliderValueChanged,
+                   getName(),
+                   getAllActiveValues());
 }
 
 void BKStackedSlider::setTo(Array<float> newvals, NotificationType newnotify)
@@ -2186,6 +2214,7 @@ void BKStackedSlider::mouseDrag(const MouseEvent& e)
 
 void BKStackedSlider::mouseUp(const MouseEvent& e)
 {
+    DBG("BKStackedSlider::mouseUp");
     listeners.call(&BKStackedSlider::Listener::BKStackedSliderValueChanged,
                    getName(),
                    getAllActiveValues());
@@ -2496,6 +2525,7 @@ void BKADSRSlider::setDim(float alphaVal)
     decaySlider->setAlpha(alphaVal);
     sustainSlider->setAlpha(alphaVal);
     releaseSlider->setAlpha(alphaVal);
+    adsrButton.setAlpha(alphaVal);
     showName.setAlpha(alphaVal);
 }
 
@@ -2505,6 +2535,7 @@ void BKADSRSlider::setBright()
     decaySlider->setAlpha(1.);
     sustainSlider->setAlpha(1.);
     releaseSlider->setAlpha(1.);
+    adsrButton.setAlpha(1.);
     showName.setAlpha(1.);
 }
 
@@ -2543,14 +2574,14 @@ void BKADSRSlider::buttonStateChanged (Button*)
     
 }
 
-void BKADSRSlider::mouseDown (const MouseEvent &event)
+void BKADSRSlider::mouseUp (const MouseEvent &event)
 {
-    if(event.mods.isShiftDown())
+    if(event.mods.isShiftDown() || event.getLengthOfMousePress() > 500)
     {
         //DBG("shift is down");
         bool toggleState = adsrButton.getToggleState();
-        DBG("BKADSRSlider::mouseDown = " + getName() + " " + String((int)toggleState));
-        listeners.call(&BKADSRSlider::Listener::BKADSRButtonStateChanged, getName(), true, toggleState);
+        DBG("BKADSRSlider::mouseUp = " + getName() + " " + String((int)toggleState));
+        listeners.call(&BKADSRSlider::Listener::BKADSRButtonStateChanged, getName(), true, !toggleState);
     }
     else
     {
@@ -2581,21 +2612,7 @@ void BKADSRSlider::resized()
 {
     
     Rectangle<int> area (getLocalBounds());
-    /*
-    Rectangle<int> topSlab (area.removeFromTop(gComponentTextFieldHeight));
-    
-    if(justifyRight)
-    {
-        topSlab.removeFromRight(5);
-        showName.setBounds(topSlab.removeFromRight(getWidth() - 150));
-    }
-    else
-    {
-        topSlab.removeFromLeft(5);
-        showName.setBounds(topSlab.removeFromLeft(getWidth() - 150));
-    }
-     */
-    
+
     if(!isButtonOnly)
     {
         Rectangle<int> topSlice = area.removeFromTop(gComponentComboBoxHeight);
@@ -2621,9 +2638,6 @@ void BKADSRSlider::resized()
     {
         adsrButton.setBounds(area);
     }
-    
-
-    
 }
 
 

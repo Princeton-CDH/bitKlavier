@@ -278,7 +278,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             */
             
             //figure out whether to play the cluster
-            bool playCluster = false;
+            playCluster = false;
             
             //in the normal case, where cluster is within a range defined by clusterMin and Max
             if(synchronic->aPrep->getClusterMin() <= synchronic->aPrep->getClusterMax())
@@ -350,59 +350,4 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
 }
 
 
-
-/*
-//adaptive tempo functions
-void SynchronicProcessor::atNewNote()
-{
-    if(synchronic->aPrep->getAdaptiveTempo1Mode() == TimeBetweenNotes) atCalculatePeriodMultiplier();
-    atLastTime = atTimer;
-}
-
-void SynchronicProcessor::atNewNoteOff()
-{
-    if(synchronic->aPrep->getAdaptiveTempo1Mode() == NoteLength) atCalculatePeriodMultiplier();
-}
-
-//really basic, using constrained moving average of time-between-notes (or note-length)
-void SynchronicProcessor::atCalculatePeriodMultiplier()
-{
-    //only do if history val is > 0
-    if(synchronic->aPrep->getAdaptiveTempo1History()) {
-        
-        atDelta = (atTimer - atLastTime) / (0.001 * sampleRate);
-        //DBG("atDelta = " + String(atDelta));
-        
-        //constrain be min and max times between notes
-        if(atDelta > synchronic->aPrep->getAdaptiveTempo1Min() && atDelta < synchronic->aPrep->getAdaptiveTempo1Max()) {
-            
-            //insert delta at beginning of history
-            atDeltaHistory.insert(0, atDelta);
-            
-            //eliminate oldest time difference
-            atDeltaHistory.resize(synchronic->aPrep->getAdaptiveTempo1History());
-            
-            //calculate moving average and then tempo period multiplier
-            int totalDeltas = 0;
-            for(int i = 0; i < atDeltaHistory.size(); i++) totalDeltas += atDeltaHistory.getUnchecked(i);
-            float movingAverage = totalDeltas / synchronic->aPrep->getAdaptiveTempo1History();
-            
-            adaptiveTempoPeriodMultiplier = movingAverage /
-                                            (beatThresholdSamples / (0.001 * sampleRate)) /
-                                            synchronic->aPrep->getAdaptiveTempo1Subdivisions();
-            
-            DBG("adaptiveTempoPeriodMultiplier = " + String(adaptiveTempoPeriodMultiplier));
-        }
-    }
-}
-
-void SynchronicProcessor::atReset()
-{
-    for (int i = 0; i < synchronic->aPrep->getAdaptiveTempo1History(); i++)
-    {
-        //atDeltaHistory.insert(0, (60000.0/synchronic->aPrep->getTempo()));
-    }
-    adaptiveTempoPeriodMultiplier = 1.;
-}
- */
 

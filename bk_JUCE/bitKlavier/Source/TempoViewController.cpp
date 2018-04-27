@@ -257,6 +257,7 @@ void TempoPreparationEditor::timerCallback()
     if (processor.updateState->currentDisplay == DisplayTempo)
     {
         TempoProcessor::Ptr mProcessor = processor.currentPiano->getTempoProcessor(processor.updateState->currentTempoId);
+        TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
 
         if (mProcessor != nullptr)
         {
@@ -267,6 +268,11 @@ void TempoPreparationEditor::timerCallback()
                 A1AdaptedTempo.setText("Tempo = " + String(mProcessor->getAdaptedTempo()), dontSendNotification);
                 A1AdaptedPeriodMultiplier.setText("Period Multiplier = " + String(mProcessor->getPeriodMultiplier()), dontSendNotification);
             }
+            
+            if(mProcessor->getAtDelta() < active->getAdaptiveTempo1Max())
+                AT1MinMaxSlider->setDisplayValue(mProcessor->getAtDelta());
+            else
+                AT1MinMaxSlider->setDisplayValue(0);
         }
         
     }

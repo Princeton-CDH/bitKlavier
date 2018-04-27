@@ -91,13 +91,13 @@ public:
     
     inline const String getName() const noexcept                {return name;}
     inline void setName(String n)                               {name = n;}
-    inline void setTempoSystem(TempoType ts)                    {sWhichTempoSystem = ts; DBG("Tempo System = " + String(ts));}
+    inline void setTempoSystem(TempoType ts)                    {sWhichTempoSystem = ts;}
     inline void setTempo(float tempo)
     {
         sTempo = tempo;
         sBeatThreshSec = (60.0/sTempo);
         sBeatThreshMS = sBeatThreshSec * 1000.;
-        DBG("tempo = " + String(sTempo));
+        //DBG("tempo = " + String(sTempo));
     }
     
     //Adaptive Tempo 1
@@ -520,6 +520,7 @@ public:
     
     uint64 getAtTimer() { return atTimer; }
     uint64 getAtLastTime() { return atLastTime; }
+    int getAtDelta() { return atDelta = (atTimer - atLastTime) * 1000. / sampleRate; }
     Array<int> getAtDeltaHistory() { return atDeltaHistory; }
     float getAdaptiveTempoPeriodMultiplier() { return adaptiveTempoPeriodMultiplier; }
     

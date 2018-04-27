@@ -143,6 +143,8 @@ void BKKeyboardSlider::resized()
 void BKKeyboardSlider::setFundamental(int fund)
 {
     keyboard->setFundamental(fund);
+    //if(fund <=0) orderedPairs = false;
+    //else orderedPairs = true;
 }
 
 void BKKeyboardSlider::setAvailableRange(int min, int max)
@@ -251,7 +253,8 @@ void BKKeyboardSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
     {
         if(orderedPairs) keyboard->setValuesDirectly(stringOrderedPairsToFloatArray(keyboardValsTextField->getText(), 128));
 
-        else keyboard->setValuesDirectly(stringToFloatArray(keyboardValsTextField->getText()));
+        //else keyboard->setValuesDirectly(stringToFloatArray(keyboardValsTextField->getText()));
+        else keyboard->setValuesRotatedByFundamental(stringToFloatArray(keyboardValsTextField->getText()));
         
         listeners.call(&BKKeyboardSlider::Listener::keyboardSliderChanged,
                        getName(),
@@ -328,8 +331,14 @@ void BKKeyboardSlider::bkButtonClicked (Button* b)
         }
         else
         {
-            keyboardValsTextField->setText(floatArrayToString(keyboard->getValuesDirectly()), dontSendNotification);
-            //keyboardValsTextField->setText(floatArrayToString(keyboard->getRotatedValues())
+            //keyboardValsTextField->setText(floatArrayToString(keyboard->getValuesDirectly()), dontSendNotification);
+            
+            Array<float> newVals = keyboard->getValuesRotatedByFundamental();
+            DBG("BKKeyboardSlider::bkButtonClicked newVals = " + floatArrayToString(newVals));
+            //Array<float> newVals = keyboard->getValuesDirectly();
+            newVals.removeRange(12, 128);
+            keyboardValsTextField->setText(floatArrayToString(newVals), dontSendNotification);
+            //keyboardValsTextField->setText(floatArrayToString(keyboard->getValuesRotatedByFundamental()), dontSendNotification);
         }
         
 #if JUCE_IOS
@@ -494,6 +503,7 @@ void BKKeyboardSlider::setValues(Array<float> newvals)
         if(valCounter < newvals.size()) {
             //keyboardVals.set(i, newvals.getUnchecked(valCounter++));
             keyboard->setKeyValue(i, newvals.getUnchecked(valCounter++));
+            DBG("new tuning val " + String(i) + " " + String(newvals.getUnchecked(valCounter - 1)));
         }
     }
     

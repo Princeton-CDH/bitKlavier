@@ -28,8 +28,7 @@ String rectangleToString(Rectangle<float> rect)
 
 BKParameterDataType getBKDataType ( SynchronicParameterType type)
 {
-    if ((type == SynchronicTuning) ||
-        (type == SynchronicNumPulses) ||
+    if ((type == SynchronicNumPulses) ||
         (type == SynchronicClusterMin) ||
         (type == SynchronicClusterMax) ||
         (type == SynchronicClusterThresh) ||

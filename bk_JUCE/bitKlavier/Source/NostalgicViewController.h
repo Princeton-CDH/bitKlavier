@@ -117,6 +117,7 @@ public BKWaveDistanceUndertowSlider::Listener,
 public BKEditableComboBoxListener,
 public BKSingleSlider::Listener,
 public BKStackedSlider::Listener,
+public BKADSRSlider::Listener,
 //public SliderListener,
 public Timer
 {
@@ -137,6 +138,8 @@ public:
     void BKSingleSliderValueChanged(String name, double val) override;
     void BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow) override;
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
+    void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
+    void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
     
     void fillSelectCB(int last, int current);
     void greyOutAllComponents();

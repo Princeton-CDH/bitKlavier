@@ -125,6 +125,8 @@ public:
         sDecays = s->getDecays();
         sSustains = s->getSustains();
         sReleases = s->getReleases();
+        
+        envelopeOn = s->getEnvelopesOn();
     }
     
     bool compare(SynchronicPreparation::Ptr s)
@@ -137,6 +139,7 @@ public:
         bool decay = true;
         bool sustain = true;
         bool release = true;
+        bool envelope = true;
         
         for (int i = s->getLengthMultipliers().size(); --i>=0;)
         {
@@ -218,6 +221,15 @@ public:
             }
         }
         
+        for (int i = s->getEnvelopesOn().size(); --i>=0;)
+        {
+            if (s->getEnvelopesOn()[i] != envelopeOn[i])
+            {
+                envelope = false;
+                break;
+            }
+        }
+        
         return (sNumBeats == s->getNumBeats() &&
                 sClusterMin == s->getClusterMin() &&
                 sClusterMax == s->getClusterMax() &&
@@ -262,6 +274,26 @@ public:
     inline const int getDecay(int which) const noexcept     {return sDecays[which];}
     inline const float getSustain(int which) const noexcept {return sSustains[which];}
     inline const int getRelease(int which) const noexcept   {return sReleases[which];}
+    
+    inline const Array<Array<float>> getADSRs() const noexcept
+    {
+        Array<Array<float>> allADSRs;
+        for(int i=0; i<sAttacks.size(); i++)
+        {
+            Array<float> singleADSR;
+            singleADSR.insert(0, sAttacks[i]);
+            singleADSR.insert(1, sDecays[i]);
+            singleADSR.insert(2, sSustains[i]);
+            singleADSR.insert(3, sReleases[i]);
+            if(envelopeOn[i])singleADSR.insert(4, 1);
+            else singleADSR.insert(4, 0);
+            
+            allADSRs.insert(i, singleADSR);
+        }
+        
+        return allADSRs;
+    }
+    
     inline const bool getEnvelopeOn(int which) const noexcept   {return envelopeOn[which];}
     
     inline void setClusterThresh(float clusterThresh)
@@ -301,6 +333,33 @@ public:
     inline void setDecay(int which, int val)        {sDecays.set(which, val);}
     inline void setSustain(int which, float val)    {sSustains.set(which, val);}
     inline void setRelease(int which, int val)      {sReleases.set(which, val);}
+    
+    inline void setADSRs(Array<Array<float>> allADSRs)
+    {
+        for(int i=0; i<allADSRs.size(); i++)
+        {
+            setAttack(i, allADSRs[i][0]);
+            setDecay(i, allADSRs[i][1]);
+            setSustain(i, allADSRs[i][2]);
+            setRelease(i, allADSRs[i][3]);
+            if(allADSRs[i][4] > 0 || i==0) setEnvelopeOn(i, true);
+            else setEnvelopeOn(i, false);
+            DBG("ADSR envelopeOn = " + String(i) + " " + String((int)getEnvelopeOn(i)));
+        }
+    }
+    
+    inline void setADSR(int which, Array<float> oneADSR)
+    {
+        setAttack(which, oneADSR[0]);
+        setDecay(which, oneADSR[1]);
+        setSustain(which, oneADSR[2]);
+        setRelease(which, oneADSR[3]);
+        if(oneADSR[4] > 0 || which==0) setEnvelopeOn(which, true);
+        else setEnvelopeOn(which, false);
+        DBG("ADSR envelopeOn = " + String(which) + " " + String((int)getEnvelopeOn(which)));
+        
+    }
+    
     inline void setEnvelopeOn(int which, bool val)  {envelopeOn.set(which, val);}
     
     void print(void)
@@ -349,7 +408,7 @@ private:
     Array<bool> envelopeOn;
     
 
-    float sGain;                //gain multiplier
+    float sGain;               //gain multiplier
     float sClusterThresh;      //max time between played notes before new cluster is started, in MS
     float sClusterThreshSec;
     
@@ -463,6 +522,18 @@ public:
             transposition.addChild(t,-1,0);
         }
         prep.addChild(transposition, -1, 0);
+        
+        ValueTree ADSRs( vtagSynchronic_ADSRs);
+        
+        tcount = 0;
+        for (auto arr : sPrep->getADSRs())
+        {
+            ValueTree e("e"+String(tcount++));
+            count = 0;
+            for (auto f : arr)  e.setProperty( ptagFloat + String(count++), f, 0);
+            ADSRs.addChild(e,-1,0);
+        }
+        prep.addChild(ADSRs, -1, 0);
         
         return prep;
         
@@ -583,6 +654,32 @@ public:
                 
                 sPrep->setTransposition(atransp);
             }
+            else  if (sub->hasTagName(vtagSynchronic_ADSRs))
+            {
+                Array<Array<float>> aADSRs;
+                int tcount = 0;
+                forEachXmlChildElement (*sub, asub)
+                {
+                    if (asub->hasTagName("e"+String(tcount++)))
+                    {
+                        Array<float> singleADSR;
+                        for (int k = 0; k < 5; k++)
+                        {
+                            String attr = asub->getStringAttribute(ptagFloat + String(k));
+                            
+                            if (attr == String::empty) break;
+                            else
+                            {
+                                f = attr.getFloatValue();
+                                singleADSR.add(f);
+                            }
+                        }
+                        aADSRs.set(tcount-1, singleADSR);
+                    }
+                }
+                
+                sPrep->setADSRs(aADSRs);
+            }
         }
         
         aPrep->copy(sPrep);
@@ -622,27 +719,6 @@ public:
     typedef OwnedArray<SynchronicModPreparation>                  Arr;
     typedef OwnedArray<SynchronicModPreparation, CriticalSection> CSArr;
     
-    /*
-     SynchronicId = 0,
-     SynchronicTuning,
-     SynchronicTempo,
-     SynchronicNumPulses,
-     SynchronicClusterMin,
-     SynchronicClusterMax,
-     SynchronicClusterThresh,
-     SynchronicMode,
-     SynchronicBeatsToSkip,
-     SynchronicBeatMultipliers,
-     SynchronicLengthMultipliers,
-     SynchronicAccentMultipliers,
-     SynchronicTranspOffsets,
-     AT1Mode,
-     AT1History,
-     AT1Subdivisions,
-     AT1Min,
-     AT1Max,
-     */
-    
     SynchronicModPreparation(SynchronicPreparation::Ptr p, int Id):
     Id(Id)
     {
@@ -654,10 +730,12 @@ public:
         param.set(SynchronicClusterThresh, String(p->getClusterThreshMS()));
         param.set(SynchronicMode, String(p->getMode()));
         param.set(SynchronicBeatsToSkip, String(p->getBeatsToSkip()));
-        param.set(SynchronicBeatMultipliers, floatArrayToString(p->getBeatMultipliers()));
-        param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
-        param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
         param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p->getTransposition()));
+        param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
+        param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
+        param.set(SynchronicBeatMultipliers, floatArrayToString(p->getBeatMultipliers()));
+        param.set(SynchronicGain, String(p->getGain()));
+        param.set(SynchronicADSRs, arrayFloatArrayToString(p->getADSRs()));
         
     }
     
@@ -671,10 +749,13 @@ public:
         param.set(SynchronicClusterThresh, "");
         param.set(SynchronicMode, "");
         param.set(SynchronicBeatsToSkip, "");
-        param.set(SynchronicBeatMultipliers, "");
-        param.set(SynchronicLengthMultipliers, "");
-        param.set(SynchronicAccentMultipliers, "");
         param.set(SynchronicTranspOffsets, "");
+        param.set(SynchronicAccentMultipliers, "");
+        param.set(SynchronicLengthMultipliers, "");
+        param.set(SynchronicBeatMultipliers, "");
+        param.set(SynchronicGain, "");
+        param.set(SynchronicADSRs, "");
+
     }
     
     inline SynchronicModPreparation::Ptr duplicate(void)
@@ -757,20 +838,40 @@ public:
             }
         }
         prep.addChild(accentMults, -1, 0);
-        
+ 
         
         ValueTree transpOffsets( vtagSynchronic_transpOffsets);
-        count = 0;
+        int tcount = 0;
         p = getParam(SynchronicTranspOffsets);
         if (p != String::empty)
         {
-            Array<float> m = stringToFloatArray(p);
+            Array<Array<float>> m = stringToArrayFloatArray(p);
             for (auto f : m)
             {
-                transpOffsets.      setProperty( ptagFloat + String(count++), f, 0);
+                ValueTree t("t"+String(tcount++));
+                count = 0;
+                for (auto nf : f) t.setProperty( ptagFloat + String(count++), nf, 0);
+                transpOffsets.addChild(t,-1,0);
             }
         }
         prep.addChild(transpOffsets, -1, 0);
+        
+        
+        ValueTree envelopes( vtagSynchronic_ADSRs);
+        tcount = 0;
+        p = getParam(SynchronicADSRs);
+        if (p != String::empty)
+        {
+            Array<Array<float>> m = stringToArrayFloatArray(p);
+            for (auto f : m)
+            {
+                ValueTree e("e"+String(tcount++));
+                count = 0;
+                for (auto nf : f) e.setProperty( ptagFloat + String(count++), nf, 0);
+                envelopes.addChild(e,-1,0);
+            }
+        }
+        prep.addChild(envelopes, -1, 0);
         
         
         return prep;
@@ -857,20 +958,56 @@ public:
             }
             else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
             {
-                Array<float> transp;
-                for (int k = 0; k < 128; k++)
+                Array<Array<float>> atransp;
+                int tcount = 0;
+                forEachXmlChildElement (*sub, asub)
                 {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
+                    if (asub->hasTagName("t"+String(tcount++)))
                     {
-                        f = attr.getFloatValue();
-                        transp.add(f);
+                        Array<float> transp;
+                        for (int k = 0; k < 128; k++)
+                        {
+                            String attr = asub->getStringAttribute(ptagFloat + String(k));
+                            
+                            if (attr == String::empty) break;
+                            else
+                            {
+                                f = attr.getFloatValue();
+                                transp.add(f);
+                            }
+                        }
+                        atransp.set(tcount-1, transp);
                     }
                 }
                 
-                setParam(SynchronicTranspOffsets, floatArrayToString(transp));
+                setParam(SynchronicTranspOffsets, arrayFloatArrayToString(atransp));
+                
+            }
+            else  if (sub->hasTagName(vtagSynchronic_ADSRs))
+            {
+                Array<Array<float>> aenvs;
+                int tcount = 0;
+                forEachXmlChildElement (*sub, asub)
+                {
+                    if (asub->hasTagName("e"+String(tcount++)))
+                    {
+                        Array<float> envs;
+                        for (int k = 0; k < 128; k++)
+                        {
+                            String attr = asub->getStringAttribute(ptagFloat + String(k));
+                            
+                            if (attr == String::empty) break;
+                            else
+                            {
+                                f = attr.getFloatValue();
+                                envs.add(f);
+                            }
+                        }
+                        aenvs.set(tcount-1, envs);
+                    }
+                }
+                
+                setParam(SynchronicADSRs, arrayFloatArrayToString(aenvs));
             }
         }
         
@@ -894,6 +1031,7 @@ public:
         param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
         param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
         param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p->getTransposition()));
+        param.set(SynchronicADSRs, arrayFloatArrayToString(p->getADSRs()));
     }
     
     inline void copy(SynchronicModPreparation::Ptr p)
@@ -979,6 +1117,12 @@ public:
     inline const int getLengthMultiplierCounter() const noexcept { return lengthMultiplierCounter; }
     inline const int getTranspCounter() const noexcept { return transpCounter; }
     inline const int getEnvelopeCounter() const noexcept { return envelopeCounter; }
+    inline const int getBeatCounter() const noexcept { return beatCounter; }
+    inline const float getClusterThresholdTimer() const noexcept { return 1000. * clusterThresholdTimer / sampleRate ;}
+    inline const float getClusterThreshold() const noexcept { return 1000. * clusterThresholdSamples / sampleRate ;}
+    inline const int getClusterSize() const noexcept {return cluster.size(); }
+    inline const int getNumKeysDepressed() const noexcept {return keysDepressed.size(); }
+    inline const bool getPlayCluster() const noexcept { return playCluster; }
     
     inline const SynchronicSyncMode getMode() const noexcept {return synchronic->aPrep->getMode(); }
 
@@ -1067,6 +1211,7 @@ private:
     void playNote(int channel, int note, float velocity);
     Array<float> velocities;    //record of velocities
     Array<int> keysDepressed;   //current keys that are depressed
+    bool playCluster;
     
     bool inCluster;
     uint64 clusterThresholdSamples;

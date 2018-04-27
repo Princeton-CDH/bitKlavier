@@ -177,8 +177,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
          
         lengthTracker = 0.0;
         
-        DBG("playlength: " + String(playLength));
-        
         if (playDirection == Forward)
         {
             if (playType == Normal)
@@ -282,11 +280,9 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
 
         adsr.setSampleRate(getSampleRate());
         
-        //DBG("BKPianoSamplerVoice::startNote ADSR vals: " + String(adsrAttack/(0.001*getSampleRate())) + " " + String(adsrDecay/(0.001*getSampleRate())) + " " + String(adsrSustain) + " " + String(adsrRelease/(0.001*getSampleRate())));
         adsr.setAllTimes(adsrAttack / getSampleRate(), adsrDecay / getSampleRate(), adsrSustain, adsrRelease / getSampleRate());
 
         adsr.keyOn();
-        //DBG("ADSR vals = " + String(adsr.getAttackRate()) + " " + String(adsr.getDecayRate()) + " " + String(adsr.getSustainLevel()) + " " + String(adsr.getReleaseRate()));
         
         noteStartingPosition = sourceSamplePosition;
         noteEndPosition = playEndPosition;
@@ -480,24 +476,13 @@ void BKPianoSamplerVoice::processSoundfont(AudioSampleBuffer& outputBuffer,
             const float fadeInvAlpha = 1.0f - fadeAlpha;
             
             float fade = (fadeTracker > 0.0) ? (float)(fadeTracker / PAD) : 1.0f;
-            
-            if (playDirection == Forward)
-            {
-                l = (1.0f - fade) * (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-                r = (1.0f - fade) * ((inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l);
-                
-                l += fade * (inL [fadePos] * fadeInvAlpha + inL [fadePos + 1] * fadeAlpha);
-                r += fade * ((inR != nullptr) ? (inR [fadePos] * fadeInvAlpha + inR [fadePos + 1] * fadeAlpha) : l);
-            }
-            else
-            {
-                l = fade * (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-                r = fade * ((inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l);
-                
-                l += (1.0f - fade) * (inL [fadePos] * fadeInvAlpha + inL [fadePos + 1] * fadeAlpha);
-                r += (1.0f - fade) * ((inR != nullptr) ? (inR [fadePos] * fadeInvAlpha + inR [fadePos + 1] * fadeAlpha) : l);
-            }
-            
+        
+            l = (1.0f - fade) * (inL [pos] * invAlpha + inL [pos + 1] * alpha);
+            r = (1.0f - fade) * ((inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l);
+        
+            l += fade * (inL [fadePos] * fadeInvAlpha + inL [fadePos + 1] * fadeAlpha);
+            r += fade * ((inR != nullptr) ? (inR [fadePos] * fadeInvAlpha + inR [fadePos + 1] * fadeAlpha) : l);
+        
         }
         else
         {
@@ -559,7 +544,7 @@ void BKPianoSamplerVoice::processSoundfont(AudioSampleBuffer& outputBuffer,
             sourceSamplePosition -= pitchRatio;
             lengthTracker += pitchRatio;
             
-            fadeTracker = PAD - (sourceSamplePosition - loopStart);
+            fadeTracker = (sourceSamplePosition < (loopStart + PAD)) ? (PAD - (sourceSamplePosition - PAD)): -1.0;
             
             if (sourceSamplePosition <= loopStart)
             {
