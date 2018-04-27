@@ -469,8 +469,14 @@ void BKPianoSamplerVoice::processSoundfont(AudioSampleBuffer& outputBuffer,
         const float invAlpha = 1.0f - alpha;
         
         float l,r;
+    
+        // fadetracker will be positive when fade should be performed
         if (fadeTracker > 0.0)
         {
+            // if in crossfade region, perform fade between start/end
+            // loopStart and loopEnd are offset by PAD in buffer
+            // PAD is fade time in samples
+            // *BUG* with reverse fade
             const int fadePos = (int) fadeTracker;
             const float fadeAlpha = (float) (fadeTracker - fadePos);
             const float fadeInvAlpha = 1.0f - fadeAlpha;
@@ -521,7 +527,8 @@ void BKPianoSamplerVoice::processSoundfont(AudioSampleBuffer& outputBuffer,
             {
                 sourceSamplePosition = loopStart;
             }
-                          
+            
+            // keep track of fade region, will be positive when should be fading
             fadeTracker = (sourceSamplePosition -  (loopEnd-PAD));
                           
             
@@ -544,7 +551,10 @@ void BKPianoSamplerVoice::processSoundfont(AudioSampleBuffer& outputBuffer,
             sourceSamplePosition -= pitchRatio;
             lengthTracker += pitchRatio;
             
-            fadeTracker = (sourceSamplePosition < (loopStart + PAD)) ? (PAD - (sourceSamplePosition - PAD)): -1.0;
+            // keep track of fade region, will be positive when should be fading
+            
+            // *BUG* SOMETHING ABOUT THIS or implementation of reverse fade above is off.
+            fadeTracker = (PAD - (sourceSamplePosition - loopStart));
             
             if (sourceSamplePosition <= loopStart)
             {
