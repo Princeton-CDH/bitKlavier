@@ -300,10 +300,10 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     gallery->prepareToPlay(sampleRate);
     
 #if JUCE_DEBUG
-    File file("~/soundfonts/elecanl/Elecanl.sf2");
-    loadSoundfontFromFile(file);
+    //File file("~/soundfonts/elecanl/Elecanl.sf2");
+    //loadSoundfontFromFile(file);
     
-    //loadPianoSamples(BKLoadLite);
+    loadPianoSamples(BKLoadLite);
 #else
     
 #if JUCE_IOS
