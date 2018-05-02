@@ -377,5 +377,4 @@ void BKSampleLoader::loadHammerReleaseSamples(void)
             DBG("file not opened OK: " + temp);
         }
     }
-    
 }

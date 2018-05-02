@@ -288,8 +288,8 @@ private:
     
     int  currentPianoId;
     
-    bool sustainIsDown;
-    bool sustainInverted;
+    bool sustainIsDown = false;
+    bool sustainInverted = false;
    
     void sustainActivate(void);
     void sustainDeactivate(void);

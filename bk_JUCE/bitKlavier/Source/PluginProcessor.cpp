@@ -167,8 +167,6 @@ loader(*this)
         "NS_7_Systerslaat",
         "NS_8_ItIsEnough"
     });
-    
-    
 }
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)

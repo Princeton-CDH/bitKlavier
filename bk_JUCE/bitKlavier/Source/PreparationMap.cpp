@@ -328,6 +328,11 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
         DBG("storing sustained note " + String(noteNumber));
         
         sustainedNotes.add(newNote);
+        
+        for (auto proc : dprocessor)
+        {
+            proc->playHammerResonance(noteNumber, velocity, channel);
+        }
     }
     else
     {
@@ -335,6 +340,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
         {
             for (auto proc : dprocessor)
             {
+                proc->playHammerResonance(noteNumber, velocity, channel);
                 proc->keyReleased(noteNumber, velocity, channel);
             }
             

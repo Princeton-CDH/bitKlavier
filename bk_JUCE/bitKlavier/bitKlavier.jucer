@@ -7,12 +7,12 @@
               pluginManufacturer="manyarrowsmusic" pluginManufacturerCode="Manu"
               pluginCode="bK2m" pluginChannelConfigs="{0,2}" pluginIsSynth="1"
               pluginWantsMidiIn="1" pluginProducesMidiOut="1" pluginIsMidiEffectPlugin="0"
-              pluginEditorRequiresKeys="1" pluginAUExportPrefix="BKAU" pluginRTASCategory=""
-              aaxIdentifier="com.manyarrowsmusic.bitKlavier" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
-              jucerVersion="5.3.0" companyName="manyarrowsmusic" companyEmail="dtrueman@princeton.edu"
-              maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
+              pluginEditorRequiresKeys="1" pluginAUExportPrefix="BKAU" aaxIdentifier="com.manyarrowsmusic.bitKlavier"
+              pluginAAXCategory="2" jucerVersion="5.3.1" companyName="manyarrowsmusic"
+              companyEmail="dtrueman@princeton.edu" maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
               displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Light"
-              buildStandalone="1" enableIAA="1" cppLanguageStandard="11" companyCopyright="manyarrowsmusic">
+              buildStandalone="1" enableIAA="1" cppLanguageStandard="11" companyCopyright="manyarrowsmusic"
+              pluginFormats="buildVST,buildAU,buildStandalone,enableIAA" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut,pluginEditorRequiresKeys">
   <MAINGROUP id="s4R02g" name="bitKlavier">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
       <GROUP id="{1E3013D4-6B2A-D996-A5C8-F92AE44A39F2}" name="Resources">

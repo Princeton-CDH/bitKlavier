@@ -99,6 +99,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
                       true);
         
         //only play hammers/resonance for first note in layers of transpositions
+        /*
         if(i==0)
         {
             float hGain = direct->aPrep->getHammerGain();
@@ -144,11 +145,68 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
 
             }
         }
+         */
     }
 
     keyPlayed[noteNumber].clearQuick();
     keyPlayedOffset[noteNumber].clearQuick();
     
+}
+
+void DirectProcessor::playHammerResonance(int noteNumber, float velocity, int channel)
+{
+    for (int i = 0; i<keyPlayed[noteNumber].size(); i++)
+    {
+        int t = keyPlayed[noteNumber].getUnchecked(i);
+        float t_offset = keyPlayedOffset[noteNumber].getUnchecked(i);
+        
+        //only play hammers/resonance for first note in layers of transpositions
+        if(i==0)
+        {
+            float hGain = direct->aPrep->getHammerGain();
+            float rGain = direct->aPrep->getResonanceGain();
+            
+            if (hGain > 0.0f)
+            {
+                hammerSynth->keyOn(channel,
+                                   //synthNoteNumber,
+                                   noteNumber,
+                                   t,
+                                   0,
+                                   velocity,
+                                   hGain * HAMMER_GAIN_SCALE,
+                                   Forward,
+                                   Normal, //FixedLength,
+                                   HammerNote,
+                                   direct->getId(),
+                                   0,
+                                   2000,
+                                   3,
+                                   3 );
+            }
+            
+            if (rGain > 0.0f)
+            {
+                resonanceSynth->keyOn(channel,
+                                      //synthNoteNumber,
+                                      noteNumber,
+                                      t,
+                                      //synthOffset,
+                                      t_offset,
+                                      velocity,
+                                      rGain * RES_GAIN_SCALE,
+                                      Forward,
+                                      Normal, //FixedLength,
+                                      ResonanceNote,
+                                      direct->getId(),
+                                      0,
+                                      2000,
+                                      3,
+                                      3 );
+                
+            }
+        }
+    }
 }
 
 void DirectProcessor::processBlock(int numSamples, int midiChannel)
