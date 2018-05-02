@@ -31,6 +31,7 @@ loader(*this)
 {
     didLoadHammersAndRes            = false;
     didLoadMainPianoSamples         = false;
+    sustainIsDown                   = false;
     
 #if TRY_UNDO
     history.ensureStorageAllocated(10);
@@ -209,6 +210,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     }
 #endif
 
+    sustainIsDown = false;
 }
 
 BKAudioProcessor::~BKAudioProcessor()
@@ -431,6 +433,7 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
 
 void BKAudioProcessor::sustainActivate(void)
 {
+    DBG("BKAudioProcessor::sustainActivate");
     if(!sustainIsDown)
     {
         sustainIsDown = true;
@@ -517,12 +520,14 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         
         if (m.isSustainPedalOn())
         {
+            DBG("m.isSustainPedalOn()");
             if (sustainInverted)    sustainDeactivate();
             else                    sustainActivate();
                
         }
         else if (m.isSustainPedalOff())
         {
+            DBG("m.isSustainPedalOff()");
             if (sustainInverted)    sustainActivate();
             else                    sustainDeactivate();
         }
