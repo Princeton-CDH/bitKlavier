@@ -798,6 +798,9 @@ public:
         p = getParam(SynchronicBeatsToSkip);
         if (p != String::empty) prep.setProperty( ptagSynchronic_beatsToSkip,         p.getIntValue(), 0);
         
+        p = getParam(SynchronicGain);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_gain,                p.getFloatValue(), 0);
+        
         ValueTree beatMults( vtagSynchronic_beatMults);
         int count = 0;
         p = getParam(SynchronicBeatMultipliers);
@@ -898,6 +901,9 @@ public:
         
         p = e->getStringAttribute(ptagSynchronic_mode);
         setParam(SynchronicMode, p);
+        
+        p = e->getStringAttribute(ptagSynchronic_gain);
+        setParam(SynchronicGain, p);
         
         forEachXmlChildElement (*e, sub)
         {
@@ -1025,6 +1031,7 @@ public:
         param.set(SynchronicClusterMin, String(p->getClusterMin()));
         param.set(SynchronicClusterMax, String(p->getClusterMax()));
         param.set(SynchronicClusterThresh, String(p->getClusterThreshMS()));
+        param.set(SynchronicGain, String(p->getGain()));
         param.set(SynchronicMode, String(p->getMode()));
         param.set(SynchronicBeatsToSkip, String(p->getBeatsToSkip()));
         param.set(SynchronicBeatMultipliers, floatArrayToString(p->getBeatMultipliers()));

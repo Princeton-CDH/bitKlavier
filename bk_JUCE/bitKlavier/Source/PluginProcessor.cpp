@@ -767,6 +767,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == SynchronicClusterMax)          active->setClusterMax(modi);
         else if (type == SynchronicClusterThresh)       active->setClusterThresh(modi);
         else if (type == SynchronicNumPulses )          active->setNumBeats(modi);
+        else if (type == SynchronicGain )               active->setGain(modf);
         else if (type == SynchronicBeatsToSkip)         active->setBeatsToSkip(modi);
         else if (type == SynchronicBeatMultipliers)     active->setBeatMultipliers(modfa);
         else if (type == SynchronicLengthMultipliers)   active->setLengthMultipliers(modfa);

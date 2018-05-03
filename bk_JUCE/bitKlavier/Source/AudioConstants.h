@@ -88,6 +88,7 @@ const String ptagSynchronic_clusterMax = "clusterMax";
 const String ptagSynchronic_clusterThresh = "clusterThresh";
 const String ptagSynchronic_mode = "mode";
 const String ptagSynchronic_beatsToSkip = "beatsToSkip";
+const String ptagSynchronic_gain = "gain";
 
 const String vtagTempo= "tempo";
 const String vtagModTempo = "modTempo";
