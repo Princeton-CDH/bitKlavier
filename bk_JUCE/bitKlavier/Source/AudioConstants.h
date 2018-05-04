@@ -209,6 +209,7 @@ typedef enum BKNoteType {
     MainNote,
     HammerNote,
     ResonanceNote,
+    PedalNote,
     BKNoteTypeNil,
 } BKNoteType;
 

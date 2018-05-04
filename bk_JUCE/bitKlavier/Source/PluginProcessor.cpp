@@ -23,6 +23,7 @@ updateState(new BKUpdateState()),
 mainPianoSynth(),
 hammerReleaseSynth(),
 resonanceReleaseSynth(),
+pedalSynth(),
 currentSampleType(BKLoadNil),
 loader(*this)
 #if TRY_UNDO
@@ -177,10 +178,12 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
     hammerReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     resonanceReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
+    pedalSynth.setCurrentPlaybackSampleRate(sampleRate);
     
     mainPianoSynth.setGeneralSettings(gallery->getGeneralSettings());
     resonanceReleaseSynth.setGeneralSettings(gallery->getGeneralSettings());
     hammerReleaseSynth.setGeneralSettings(gallery->getGeneralSettings());
+    pedalSynth.setGeneralSettings(gallery->getGeneralSettings());
     
     levelBuf.setSize(2, 25);
     
@@ -256,6 +259,7 @@ void BKAudioProcessor::clearBitKlavier(void)
         hammerReleaseSynth.allNotesOff(i, true);
         resonanceReleaseSynth.allNotesOff(i, true);
         mainPianoSynth.allNotesOff(i, true);
+        pedalSynth.allNotesOff(i, true);
     }
     
     for (auto piano : gallery->getPianos())
@@ -441,6 +445,23 @@ void BKAudioProcessor::sustainActivate(void)
         
         for (int p = currentPiano->activePMaps.size(); --p >= 0;)
             currentPiano->activePMaps[p]->sustainPedalPressed();
+        
+        //play pedalDown resonance
+        pedalSynth.keyOn(channel,
+                           //synthNoteNumber,
+                           21,
+                           21,
+                           0,
+                           0.1, //gain
+                           1.,
+                           Forward,
+                           Normal, //FixedLength,
+                           PedalNote,
+                           0,
+                           0,
+                           20000,
+                           3,
+                           3 );
     }
     
 }
@@ -461,6 +482,32 @@ void BKAudioProcessor::sustainDeactivate(void)
             for (int p = prevPiano->activePMaps.size(); --p >= 0;)
                 prevPiano->activePMaps[p]->sustainPedalReleased(true);
         }
+        
+        //turn off pedal down resonance
+        pedalSynth.keyOff(channel,
+                      PedalNote,
+                      0,
+                      21,
+                      21,
+                      1.,
+                      true);
+        
+        //play pedalUp sample
+        pedalSynth.keyOn(channel,
+                         //synthNoteNumber,
+                         22,
+                         22,
+                         0,
+                         0.1, //gain
+                         1.,
+                         Forward,
+                         Normal, //FixedLength,
+                         PedalNote,
+                         0,
+                         0,
+                         2000,
+                         3,
+                         3 );
     }
 }
 
@@ -549,6 +596,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     mainPianoSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
+    pedalSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     
 #if JUCE_IOS
     buffer.applyGain(0, numSamples, 0.3 * gallery->getGeneralSettings()->getGlobalGain());

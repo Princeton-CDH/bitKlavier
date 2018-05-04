@@ -71,6 +71,7 @@ public:
     BKSynthesiser                       mainPianoSynth;
     BKSynthesiser                       hammerReleaseSynth;
     BKSynthesiser                       resonanceReleaseSynth;
+    BKSynthesiser                       pedalSynth;
     
     Piano::Ptr                          prevPiano;
     Piano::Ptr                          currentPiano;

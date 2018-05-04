@@ -41,6 +41,8 @@ void BKSampleLoader::run(void)
         EXIT_CHECK;
         
         loadResonanceReleaseSamples();
+        
+        loadPedalSamples();
     }
     
     processor.updateState->pianoSamplesAreLoading = false;
@@ -368,6 +370,81 @@ void BKSampleLoader::loadHammerReleaseSamples(void)
                                                                     noteRange,
                                                                     root,
                                                                     velocityRange));
+            }
+            processor.progress += processor.progressInc;
+            DBG(soundName+": " + String(processor.progress));
+        }
+        else
+        {
+            DBG("file not opened OK: " + temp);
+        }
+    }
+}
+
+void BKSampleLoader::loadPedalSamples(void)
+{
+    WavAudioFormat wavFormat;
+    BKSynthesiser* synth = &processor.pedalSynth;
+    File bkSamples;
+    
+#if JUCE_IOS
+    bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
+#else
+    bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
+#endif
+    
+    synth->clearVoices();
+    synth->clearSounds();
+    
+    for (int i = 0; i < 88; i++)    synth->addVoice(new BKPianoSamplerVoice(synth->generalSettings));
+    
+    //load hammer release samples
+    for (int i = 0; i < 4; i++) {
+        
+        String temp;
+        
+        if(i==0) temp = "pedalD1.wav";
+        else if(i==1) temp = "pedalD2.wav";
+        else if(i==2) temp = "pedalU1.wav";
+        else if(i==3) temp = "pedalU2.wav";
+
+        
+        //File file(temp);
+        File file(bkSamples.getChildFile(temp));
+        FileInputStream inputStream(file);
+        
+        if (inputStream.openedOk()) {
+            String soundName = file.getFileName();
+            sampleReader = wavFormat.createReaderFor(new FileInputStream(file), true);
+            
+            BigInteger noteRange;
+            noteRange.setRange(20 + i, 1, true);
+            
+            BigInteger velocityRange;
+            velocityRange.setRange(0, 128, true);
+            
+            int root = 20 + i;
+            
+            double sourceSampleRate = sampleReader->sampleRate;
+            const int numChannels = sampleReader->numChannels;
+            uint64 maxLength;
+            
+            if (sourceSampleRate <= 0 || sampleReader->lengthInSamples <= 0) {
+                maxLength = 0;
+                
+            } else {
+                maxLength = jmin((uint64)sampleReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
+                
+                BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels), (int)maxLength);
+                sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
+                
+                synth->addSound(new BKPianoSamplerSound(soundName,
+                                                        newBuffer,
+                                                        maxLength,
+                                                        sourceSampleRate,
+                                                        noteRange,
+                                                        root,
+                                                        velocityRange));
             }
             processor.progress += processor.progressInc;
             DBG(soundName+": " + String(processor.progress));
