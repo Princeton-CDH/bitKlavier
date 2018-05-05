@@ -155,6 +155,8 @@ private:
     float noteVelocity;
     uint64 noteStartingPosition, noteEndPosition;
     double pitchRatio;
+    double pitchbendMultiplier;
+    
     double sourceSamplePosition;
     double playEndPosition;
     uint32 playLength;

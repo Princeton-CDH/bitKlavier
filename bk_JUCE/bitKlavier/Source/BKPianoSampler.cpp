@@ -56,6 +56,7 @@ bool BKPianoSamplerSound::appliesToChannel (int /*midiChannel*/)
 BKPianoSamplerVoice::BKPianoSamplerVoice(GeneralSettings::Ptr gen) :
 //generalSettings(gen),
 pitchRatio (0.0),
+pitchbendMultiplier(1.),
 sourceSamplePosition (0.0),
 lgain (0.0f), rgain (0.0f),
 rampOnOffLevel (0),
@@ -259,8 +260,10 @@ void BKPianoSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
     }
 }
 
-void BKPianoSamplerVoice::pitchWheelMoved (const int /*newValue*/)
+void BKPianoSamplerVoice::pitchWheelMoved (const int newValue)
 {
+    pitchbendMultiplier = powf(2.0f, (newValue / 8192. - 1.)/12.);
+    //DBG("BKPianoSamplerVoice::pitchWheelMoved " + String(pitchbendMultiplier));
 }
 
 void BKPianoSamplerVoice::controllerMoved (const int /*controllerNumber*/,
@@ -284,6 +287,8 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
         float* outL = outputBuffer.getWritePointer (0, startSample);
         float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
         
+        double bentRatio = pitchRatio * pitchbendMultiplier;
+        
         while (--numSamples >= 0)
         {
             if (playDirection == Reverse && sourceSamplePosition > playingSound->soundLength)
@@ -297,7 +302,7 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
                 {
                     *outL++ += 0;
                 }
-                sourceSamplePosition -= pitchRatio;
+                sourceSamplePosition -= bentRatio;
                 continue;
             }
             
@@ -333,7 +338,7 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
             
             if (playDirection == Forward)
             {
-                sourceSamplePosition += pitchRatio;
+                sourceSamplePosition += bentRatio;
 
                 if (sourceSamplePosition >= playEndPosition)
                 {
@@ -349,7 +354,7 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
             }
             else if (playDirection == Reverse)
             {
-                sourceSamplePosition -= pitchRatio;
+                sourceSamplePosition -= bentRatio;
          
                 if (sourceSamplePosition <= playEndPosition)
                 {

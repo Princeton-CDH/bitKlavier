@@ -298,6 +298,7 @@ private:
     void sustainDeactivate(void);
     
     double bkSampleRate;
+    double pitchbendVal;
     
     BKSampleLoader loader;
     
