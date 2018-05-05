@@ -42,6 +42,7 @@ const String ptagGeneral_hammerGain = "hammerGain";
 const String ptagGeneral_tempoMultiplier = "tempoMultiplier";
 const String ptagGeneral_resAndHammer = "resAndHammer";
 const String ptagGeneral_invertSustain = "invertSustain";
+const String ptagGeneral_noteOnSetsNoteOffVelocity = "noteOnSetsNoteOffVelocity";
 const String ptagGeneral_tuningFund = "tuningFund";
 
 const String vtagPiano = "piano";

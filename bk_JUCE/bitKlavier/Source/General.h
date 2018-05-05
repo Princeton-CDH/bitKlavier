@@ -24,7 +24,9 @@ public:
         tuningFundamental(440.0),
         tuningRatio(1.),
         tempoMultiplier(1.0),
-        periodMultiplier(1.0)
+        periodMultiplier(1.0),
+        invertSustain(false),
+        noteOnSetsNoteOffVelocity(true)
     {
 
 #if JUCE_IOS
@@ -53,10 +55,12 @@ public:
         f = e->getStringAttribute( ptagGeneral_tuningFund ).getFloatValue();
         setTuningFundamental(f);
         
-        /*
         b = (bool) e->getStringAttribute( ptagGeneral_invertSustain ).getIntValue();
         setInvertSustain(b);
-         */
+        
+        b = (bool) e->getStringAttribute( ptagGeneral_noteOnSetsNoteOffVelocity ).getIntValue();
+        setNoteOnSetsNoteOffVelocity(b);
+        
     }
     
     inline ValueTree getState(void)
@@ -66,6 +70,8 @@ public:
         generalVT.setProperty( ptagGeneral_globalGain,       getGlobalGain(), 0);
         generalVT.setProperty( ptagGeneral_tempoMultiplier,  getTempoMultiplier(), 0);
         generalVT.setProperty( ptagGeneral_tuningFund,       getTuningFundamental(), 0);
+        generalVT.setProperty( ptagGeneral_invertSustain,    getInvertSustain(), 0);
+        generalVT.setProperty( ptagGeneral_noteOnSetsNoteOffVelocity,    getNoteOnSetsNoteOffVelocity(), 0);
         
         return generalVT;
         
@@ -76,6 +82,8 @@ public:
     const float getTempoMultiplier(void)    const noexcept  { return tempoMultiplier;       };
     const float getPeriodMultiplier(void)   const noexcept  { return periodMultiplier;      };
     const float getGlobalGain(void)         const noexcept  { return globalGain;            };
+    const bool  getInvertSustain(void)      const noexcept  { return invertSustain;         };
+    const bool  getNoteOnSetsNoteOffVelocity(void)      const noexcept  { return noteOnSetsNoteOffVelocity;         };
     
     void setTuningFundamental(float val)    {
         tuningFundamental = val;
@@ -85,6 +93,8 @@ public:
     void setTempoMultiplier(float val)      { tempoMultiplier = val;
                                               periodMultiplier = 1./tempoMultiplier;};
     void setGlobalGain(float val)           { globalGain = val;            };
+    void setInvertSustain(bool inv)         { invertSustain = inv;}
+    void setNoteOnSetsNoteOffVelocity(bool inv)         { noteOnSetsNoteOffVelocity = inv;}
     
 private:
     
@@ -97,6 +107,8 @@ private:
     float globalGain;
     
     bool resonanceAndHammer;
+    bool invertSustain;
+    bool noteOnSetsNoteOffVelocity;
     
     
     JUCE_LEAK_DETECTOR(GeneralSettings);

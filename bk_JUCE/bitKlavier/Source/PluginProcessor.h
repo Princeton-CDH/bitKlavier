@@ -103,6 +103,7 @@ public:
     
     Array<bool>                         noteOn; //which notes are on, for the UI
     Array<bool>                         getNoteOns() { return noteOn; }
+    Array<float>                        noteVelocity;
     
     void                                noteOnUI (int noteNumber) { if(didLoadMainPianoSamples) notesOnUI.add(noteNumber); }
     void                                noteOffUI(int noteNumber) { if(didLoadMainPianoSamples) notesOffUI.add(noteNumber); }
@@ -291,6 +292,7 @@ private:
     
     bool sustainIsDown = false;
     bool sustainInverted = false;
+    bool noteOnSetsNoteOffVelocity = true;
    
     void sustainActivate(void);
     void sustainDeactivate(void);

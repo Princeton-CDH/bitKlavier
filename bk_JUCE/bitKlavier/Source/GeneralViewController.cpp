@@ -88,13 +88,22 @@ BKViewController(p, theGraph)
     tempoMultiplierSlider->addMyListener(this);
     addAndMakeVisible(tempoMultiplierSlider);
     
+    GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
+    
     invertSustainB.addListener(this);
-    invertSustainB.setToggleState(processor.getSustainInversion(), dontSendNotification);
-    processor.setSustainInversion(processor.getSustainInversion());
+    invertSustainB.setToggleState(gen->getInvertSustain(), dontSendNotification);
+    processor.setSustainInversion(gen->getInvertSustain());
     addAndMakeVisible(invertSustainB);
+    
+    noteOnSetsNoteOffVelocityB.addListener(this);
+    noteOnSetsNoteOffVelocityB.setToggleState(gen->getNoteOnSetsNoteOffVelocity(), dontSendNotification);
+    addAndMakeVisible(noteOnSetsNoteOffVelocityB);
     
     invertSustainL.setText("invert sustain", dontSendNotification);
     addAndMakeVisible(invertSustainL);
+    
+    noteOnSetsNoteOffVelocityL.setText("noteOn velocity sets noteOff velocity", dontSendNotification);
+    addAndMakeVisible(noteOnSetsNoteOffVelocityL);
 
 #if JUCE_IOS
     tempoMultiplierSlider->addWantsBigOneListener(this);
@@ -146,11 +155,15 @@ void GeneralViewController::resized()
     
     invertSustainB.setBounds(tempoMultiplierSlider->getX()+5, tempoMultiplierSlider->getBottom() + 10,
                              tempoMultiplierSlider->getWidth() * 0.25, 30);
-    
     invertSustainB.changeWidthToFitText();
-    
     invertSustainL.setBounds(invertSustainB.getRight() +gXSpacing, invertSustainB.getY(),
                              150, 30);
+    
+    noteOnSetsNoteOffVelocityB.setBounds(tempoMultiplierSlider->getX()+5, invertSustainL.getBottom() + 10,
+                             tempoMultiplierSlider->getWidth() * 0.25, 30);
+    noteOnSetsNoteOffVelocityB.changeWidthToFitText();
+    noteOnSetsNoteOffVelocityL.setBounds(noteOnSetsNoteOffVelocityB.getRight() +gXSpacing, noteOnSetsNoteOffVelocityB.getY(),
+                             250, 30);
     
    
     
@@ -195,7 +208,7 @@ void GeneralViewController::update(void)
     
     A4tuningReferenceFrequencySlider->setValue(gen->getTuningFundamental(), dontSendNotification);
     tempoMultiplierSlider->setValue(gen->getTempoMultiplier(), dontSendNotification);
-    
+    invertSustainB.setToggleState(gen->getInvertSustain(), dontSendNotification);
 }
 
 void GeneralViewController::BKSingleSliderValueChanged(String name, double val)
@@ -216,13 +229,24 @@ void GeneralViewController::BKSingleSliderValueChanged(String name, double val)
 
 void GeneralViewController::bkButtonClicked (Button* b)
 {
+    GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
+    
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
     else if (b == &invertSustainB)
     {
-        bool inversion =  (bool) b->getToggleStateValue().toString().getIntValue();
+        //bool inversion =  (bool) b->getToggleStateValue().toString().getIntValue();
+        bool inversion =  b->getToggleState();
+        DBG("invert sustain button = " + String((int)inversion));
         processor.setSustainInversion(inversion);
+        gen->setInvertSustain(inversion);
+    }
+    else if (b == &noteOnSetsNoteOffVelocityB)
+    {
+        bool newstate =  b->getToggleState();
+        DBG("invert noteOnSetsNoteOffVelocity = " + String((int)newstate));
+        gen->setNoteOnSetsNoteOffVelocity(newstate);
     }
 }

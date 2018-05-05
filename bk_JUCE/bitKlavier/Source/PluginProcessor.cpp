@@ -96,9 +96,11 @@ loader(*this)
 #endif
     
     noteOn.ensureStorageAllocated(128);
+    noteVelocity.ensureStorageAllocated(128);
     for(int i=0; i< 128; i++)
     {
         noteOn.set(i, false);
+        noteVelocity.set(i, 0.);
     }
     
     bk_examples = StringArray({
@@ -378,6 +380,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
     
     ++noteOnCount;
     noteOn.set(noteNumber, true);
+    noteVelocity.set(noteNumber, velocity);
     
     if (allNotesOff)   allNotesOff = false;
     
@@ -415,7 +418,10 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     
     noteOn.set(noteNumber, false);
     //DBG("noteoff velocity = " + String(velocity));
-    if(velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
+    
+    noteOnSetsNoteOffVelocity = gallery->getGeneralSettings()->getNoteOnSetsNoteOffVelocity();
+    if(noteOnSetsNoteOffVelocity) velocity = noteVelocity.getUnchecked(noteNumber);
+    else if(velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
     
     // Send key off to each pmap in current piano
     for (p = currentPiano->activePMaps.size(); --p >= 0;)
@@ -567,14 +573,16 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         
         if (m.isSustainPedalOn())
         {
-            DBG("m.isSustainPedalOn()");
+            //DBG("m.isSustainPedalOn()");
+            sustainInverted = gallery->getGeneralSettings()->getInvertSustain();
             if (sustainInverted)    sustainDeactivate();
             else                    sustainActivate();
                
         }
         else if (m.isSustainPedalOff())
         {
-            DBG("m.isSustainPedalOff()");
+            //DBG("m.isSustainPedalOff()");
+            sustainInverted = gallery->getGeneralSettings()->getInvertSustain();
             if (sustainInverted)    sustainActivate();
             else                    sustainDeactivate();
         }

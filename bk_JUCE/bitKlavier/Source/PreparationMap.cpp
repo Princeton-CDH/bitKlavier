@@ -325,10 +325,11 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
         newNote.noteNumber = noteNumber;
         newNote.velocity = velocity;
         newNote.channel = channel;
-        DBG("storing sustained note " + String(noteNumber));
+        //DBG("storing sustained note " + String(noteNumber));
         
         sustainedNotes.add(newNote);
         
+        //play hammers and resonance when keys are released, even with pedal down
         for (auto proc : dprocessor)
         {
             proc->playHammerResonance(noteNumber, velocity, channel);
