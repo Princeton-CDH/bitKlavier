@@ -47,6 +47,7 @@ public:
                          double sourceSampleRate,
                          const BigInteger& midiNotes,
                          int rootMidiNote,
+                         int transpose,
                          const BigInteger& midiVelocities,
                          sfzero::Region* region = nullptr);
     
@@ -81,12 +82,13 @@ private:
     BigInteger midiNotes;
     BigInteger midiVelocities;
     uint64 soundLength;
-    int midiRootNote;
+    int midiRootNote, transpose;
     int rampOnSamples, rampOffSamples;
     
     stk::ADSR adsr;
     
     int64 loopStart, loopEnd;
+    int64 start, end;
     bool isSoundfont;
     
     JUCE_LEAK_DETECTOR (BKPianoSamplerSound)
@@ -171,7 +173,8 @@ private:
     uint64 noteStartingPosition, noteEndPosition;
     double pitchRatio;
     double sourceSamplePosition;
-    double fadeTracker;
+    bool inComplicatedFade, needsComplicatedFade;
+    double fadeTracker,fadeOffset;
     double lengthTracker;
     double playEndPosition;
     double playLength;

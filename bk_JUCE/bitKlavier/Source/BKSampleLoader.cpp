@@ -177,6 +177,7 @@ void BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
                                                                         sourceSampleRate,
                                                                         noteRange,
                                                                         root,
+                                                                        0,
                                                                         velocityRange));
                     }
                     
@@ -290,7 +291,7 @@ void BKSampleLoader::loadResonanceReleaseSamples(void)
                                                                 maxLength,
                                                                 sourceSampleRate,
                                                                 noteRange,
-                                                                root,
+                                                                root, 0,
                                                                 velocityRange));
                     }
                     
@@ -365,7 +366,7 @@ void BKSampleLoader::loadHammerReleaseSamples(void)
                                                                     maxLength,
                                                                     sourceSampleRate,
                                                                     noteRange,
-                                                                    root,
+                                                                    root, 0,
                                                                     velocityRange));
             }
             processor.progress += processor.progressInc;

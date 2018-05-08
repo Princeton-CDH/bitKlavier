@@ -220,42 +220,49 @@ void BKAudioProcessor::loadSoundfontFromFile(File sfzFile)
     }
     else    return;
     
+    int count = 0;
     for (auto region : regions)
     {
-        int64 sampleStart = region->loop_start;
         
-        int64 sampleLength = region->loop_end - sampleStart;
+        int64 sampleStart = region->offset;
+        
+        int64 sampleLength = region->end - sampleStart;
         double sourceSampleRate = region->sample->getSampleRate();
-        
-        DBG("start: " + String(region->loop_start) + " end: " + String(region->loop_end) + " len: " + String(region->loop_end - region->loop_start));
-        
+
         // check out fluidsynth as alternative
         AudioSampleBuffer* sourceBuffer = region->sample->getBuffer();
         
-        BKReferenceCountedBuffer::Ptr buffer = new BKReferenceCountedBuffer(region->sample->getShortName(), 1, (int)sampleLength + 2*PAD);
+        BKReferenceCountedBuffer::Ptr buffer = new BKReferenceCountedBuffer(region->sample->getShortName(), 1, (int)sampleLength);
         
         AudioSampleBuffer* destBuffer = buffer->getAudioSampleBuffer();
         
-        destBuffer->copyFrom(0, 0, sourceBuffer->getReadPointer(0, sampleStart - PAD), (int)sampleLength+2*PAD);
+        destBuffer->copyFrom(0, 0, sourceBuffer->getReadPointer(0, sampleStart), (int)sampleLength);
+        
+        
+        
+        DBG("region " + String(count) + " offset: " + String(region->offset));
+        region->end             -= region->offset;
+        region->loop_start      -= region->offset;
+        region->loop_end        -= region->offset;
+        region->offset           = 0;
+        
+        DBG("region " + String(count) + " | transp: " + String(region->transpose) + "   keycenter: " + String(region->pitch_keycenter) + " keytrack: " + String(region->pitch_keytrack));
+        
+        DBG("region " + String(count++) + " |   end: " + String(region->end) + "   ls: " + String(region->loop_start) + "   le: " + String(region->loop_end) + "   keyrange: " + String(region->lokey) + "-" + String(region->hikey) + "   velrange: " + String(region->lovel) + "-" + String(region->hivel));
         
         int nbits = region->hikey - region->lokey; nbits = (nbits > 0) ? nbits : 1;
         int vbits = region->hivel - region->lovel; vbits = (vbits > 0) ? vbits : 1;
-        BigInteger nrange; nrange.setRange(region->lokey, nbits, true);
-        BigInteger vrange; vrange.setRange(region->lovel, vbits, true);
+        BigInteger nrange; nrange.setRange(region->lokey, nbits + 1, true);
+        BigInteger vrange; vrange.setRange(region->lovel, vbits + 1, true);
         
-        region->loop_end = (region->loop_end - region->loop_start) + PAD;
-        region->loop_start = PAD;
-        
-        DBG("LOAD loop start: " + String(region->loop_start));
-        DBG("LOAD loop   end: " + String(region->loop_end));
 
-        DBG("len: " + String(sampleLength));
         mainPianoSynth.addSound(new BKPianoSamplerSound(region->sample->getShortName(),
                                                         buffer,
                                                         sampleLength,
                                                         sourceSampleRate,
                                                         nrange,
                                                         region->pitch_keycenter,
+                                                        region->transpose,
                                                         vrange,
                                                         region));
     }
@@ -300,10 +307,10 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     gallery->prepareToPlay(sampleRate);
     
 #if JUCE_DEBUG
-    //File file("~/soundfonts/elecanl/Elecanl.sf2");
-    //loadSoundfontFromFile(file);
+    File file("~/soundfonts/elecanl/Elecanl.sf2");
+    loadSoundfontFromFile(file);
     
-    loadPianoSamples(BKLoadLite);
+    //loadPianoSamples(BKLoadLite);
 #else
     
 #if JUCE_IOS
