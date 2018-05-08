@@ -180,7 +180,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         }
          
         lengthTracker = 0.0;
-        inComplicatedFade = false;
         
         if (playDirection == Forward)
         {
@@ -261,17 +260,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                 
                 if (sound->isSoundfont)
                 {
-                    if (playLength < sound->loopStart)
-                    {
-                        inComplicatedFade = false;
-                        needsComplicatedFade = false;
-                    }
-                    else
-                    {
-                        pos = sound->loopStart;
-                        inComplicatedFade = false;
-                        needsComplicatedFade = true;
-                    }
+                    pos = (pos < sound->loopStart) ? pos : sound->loopStart;
                     
                     sourceSamplePosition = pos * pitchRatio;
                     
@@ -292,7 +281,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                     
                 }
                 
-                DBG("start: " + String(sourceSamplePosition) + " end: " + String(playEndPosition));
             }
             else
             {
@@ -409,58 +397,31 @@ void BKPianoSamplerVoice::processSoundfont(AudioSampleBuffer& outputBuffer,
         
         float l,r;
         
+        // fadetracker will be positive when fade should be performed
+        // if in crossfade region, perform fade between start/end
+        fadeTracker = sourceSamplePosition - (loopEnd - FADE);
         
-        if (needsComplicatedFade && inComplicatedFade)
+        if (fadeTracker > 0.0)
         {
-            int fadeOutPos = sourceSamplePosition;
-            int fadeInPos = playLength - lengthTracker;
-            
-            fadeTracker = (FADE - (fadeInPos - loopStart));
-            float fade = fadeTracker / FADE;
-            
-            //DBG("fade: " + String(fade));
+            float fade = (float)(fadeTracker / FADE);
             
             int fadePos = (int) fadeTracker;
             const float fadeAlpha = (float) (fadeTracker - fadePos);
             const float fadeInvAlpha = 1.0f - fadeAlpha;
             
+            fadePos += loopStart-FADE;
+            
             l = (1.0f - fade) * (inL [pos] * invAlpha + inL [pos + 1] * alpha);
             r = (1.0f - fade) * ((inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l);
             
-            l += fade * (inL [fadeInPos] * fadeInvAlpha + inL [fadeInPos+1] * fadeAlpha);
-            r += fade * ((inR != nullptr) ? (inR [fadeInPos] * fadeInvAlpha + inR [fadeInPos+1] * fadeAlpha) : l);
+            l += fade * (inL [fadePos] * fadeInvAlpha + inL [fadePos+1] * fadeAlpha);
+            r += fade * ((inR != nullptr) ? (inR [fadePos] * fadeInvAlpha + inR [fadePos+1] * fadeAlpha) : l);
             
-            
-            if (fadeTracker == FADE) { inComplicatedFade = false; needsComplicatedFade = false; }
         }
         else
         {
-            // fadetracker will be positive when fade should be performed
-            // if in crossfade region, perform fade between start/end
-            fadeTracker = sourceSamplePosition - (loopEnd - FADE);
-            
-            if (fadeTracker > 0.0)
-            {
-                float fade = (float)(fadeTracker / FADE);
-                
-                int fadePos = (int) fadeTracker;
-                const float fadeAlpha = (float) (fadeTracker - fadePos);
-                const float fadeInvAlpha = 1.0f - fadeAlpha;
-                
-                fadePos += loopStart-FADE;
-                
-                l = (1.0f - fade) * (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-                r = (1.0f - fade) * ((inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l);
-                
-                l += fade * (inL [fadePos] * fadeInvAlpha + inL [fadePos+1] * fadeAlpha);
-                r += fade * ((inR != nullptr) ? (inR [fadePos] * fadeInvAlpha + inR [fadePos+1] * fadeAlpha) : l);
-                
-            }
-            else
-            {
-                l = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-                r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l;
-            }
+            l = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
+            r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l;
         }
         
         
@@ -496,7 +457,7 @@ void BKPianoSamplerVoice::processSoundfont(AudioSampleBuffer& outputBuffer,
             }
             
             
-            if ((playType != Normal) && (lengthTracker >= playLength))
+            if ((playType != Normal) && (lengthTracker >= (playLength-FADE)))
             {
                 if (adsr.getState() != stk::ADSR::RELEASE)
                 {
@@ -504,7 +465,7 @@ void BKPianoSamplerVoice::processSoundfont(AudioSampleBuffer& outputBuffer,
                 }
             }
             
-            if(sourceSamplePosition >= (playingSound->soundLength+FADE) )
+            if(sourceSamplePosition >= playingSound->soundLength )
             {
                 //stopNote(0.0f, true);
                 clearCurrentNote();
@@ -514,11 +475,6 @@ void BKPianoSamplerVoice::processSoundfont(AudioSampleBuffer& outputBuffer,
         {
             
             // Check for break out of loop.
-            if (needsComplicatedFade && !inComplicatedFade && ((playLength - lengthTracker) <= (loopStart + FADE)))
-            {
-                inComplicatedFade = true;
-            }
-                
             if ((playLength - lengthTracker) <= loopStart)
             {
                 sourceSamplePosition = playLength - lengthTracker;
@@ -535,7 +491,7 @@ void BKPianoSamplerVoice::processSoundfont(AudioSampleBuffer& outputBuffer,
                 sourceSamplePosition = loopStart;
             }
             
-            if ((playType != Normal) && (lengthTracker >= playLength))
+            if ((playType != Normal) && (lengthTracker >= playLength - (adsr.getReleaseTime() * getSampleRate())))
             {
                 if ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE))
                 {
