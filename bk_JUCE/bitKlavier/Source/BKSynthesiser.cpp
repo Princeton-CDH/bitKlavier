@@ -572,6 +572,22 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
         }
     }
     
+    /*
+    void BKSynthesiser::updateTuning (int midiChannel, int midiNoteNumber, float offset) //or should it be a multiplier?
+    {
+        const ScopedLock sl (lock);
+        
+        for (int i = voices.size(); --i >= 0;)
+        {
+            BKSynthesiserVoice* const voice = voices.getUnchecked (i);
+            
+            if (voice->getCurrentlyPlayingNote() == midiNoteNumber
+                && (midiChannel <= 0 || voice->isPlayingChannel (midiChannel)))
+                voice->tuningChanged (offset);
+        }
+    }
+     */
+    
     void BKSynthesiser::handleController (const int midiChannel,
                                           const int controllerNumber,
                                           const int controllerValue)

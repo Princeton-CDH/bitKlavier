@@ -586,16 +586,6 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             if (sustainInverted)    sustainActivate();
             else                    sustainDeactivate();
         }
-        
-        /*
-        if (m.isPitchWheel())
-        {
-            pitchbendVal = powf(2.0f, (m.getPitchWheelValue() / 8192. - 1.)/12.);
-            DBG("pitch bend val = " + String(pitchbendVal));
-            mainPianoSynth.handlePitchWheel(channel, pitchbendVal);
-            
-        }
-         */
     }
     
     // Sets some flags to determine whether to send noteoffs to previous pianos.
