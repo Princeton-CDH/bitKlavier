@@ -307,7 +307,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     gallery->prepareToPlay(sampleRate);
     
 #if JUCE_DEBUG
-    File file("~/soundfonts/elecanl/Elecanl.sf2");
+    File file("~/soundfonts/seinbass/Seinbass.sf2");
     loadSoundfontFromFile(file);
     
     //loadPianoSamples(BKLoadLite);

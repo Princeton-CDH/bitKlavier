@@ -382,11 +382,13 @@ void BKPianoSamplerVoice::processSoundfont(AudioSampleBuffer& outputBuffer,
                 adsr.keyOn();
             }
              */
+            /*
             if (!revRamped)
             {
                 revRamped = true;
                 adsr.keyOn();
             }
+             */
             
         }
 
@@ -491,7 +493,7 @@ void BKPianoSamplerVoice::processSoundfont(AudioSampleBuffer& outputBuffer,
                 sourceSamplePosition = loopStart;
             }
             
-            if ((playType != Normal) && (lengthTracker >= playLength - (adsr.getReleaseTime() * getSampleRate())))
+            if ((playType != Normal) && (lengthTracker >= (playLength - FADE)))
             {
                 if ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE))
                 {
