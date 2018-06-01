@@ -232,7 +232,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         adsr.setSampleRate(getSampleRate());
         
         //DBG("BKPianoSamplerVoice::startNote ADSR vals: " + String(adsrAttack/(0.001*getSampleRate())) + " " + String(adsrDecay/(0.001*getSampleRate())) + " " + String(adsrSustain) + " " + String(adsrRelease/(0.001*getSampleRate())));
-        adsr.setAllTimes(adsrAttack / getSampleRate(), adsrDecay / getSampleRate(), adsrSustain, adsrRelease / getSampleRate());
+        //adsr.setAllTimes(adsrAttack / getSampleRate(), adsrDecay / getSampleRate(), adsrSustain, adsrRelease / getSampleRate());
+        adsr.setAllTimes(adsrAttack / (getSampleRate() * pitchRatio), adsrDecay / (getSampleRate() * pitchRatio), adsrSustain, adsrRelease / (getSampleRate() * pitchRatio));
 
         adsr.keyOn();
         //DBG("ADSR vals = " + String(adsr.getAttackRate()) + " " + String(adsr.getDecayRate()) + " " + String(adsr.getSustainLevel()) + " " + String(adsr.getReleaseRate()) + " " );
