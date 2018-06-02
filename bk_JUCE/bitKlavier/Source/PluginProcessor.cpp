@@ -398,11 +398,6 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
             for (int p = currentPiano->activePMaps.size(); --p >= 0;)
                 currentPiano->activePMaps[p]->sustainPedalPressed();
         }
-        else
-        {
-            for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                currentPiano->activePMaps[p]->sustainPedalReleased();
-        }
         */
         
     }
