@@ -263,6 +263,7 @@ void BKAudioProcessor::clearBitKlavier(void)
         mainPianoSynth.allNotesOff(i, true);
         pedalSynth.allNotesOff(i, true);
     }
+    sustainDeactivate();
     
     for (auto piano : gallery->getPianos())
     {
@@ -391,11 +392,18 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
         DBG("change piano to " + String(whichPiano));
         setCurrentPiano(whichPiano);
         
+        /*
         if (sustainIsDown)
         {
             for (int p = currentPiano->activePMaps.size(); --p >= 0;)
                 currentPiano->activePMaps[p]->sustainPedalPressed();
         }
+        else
+        {
+            for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                currentPiano->activePMaps[p]->sustainPedalReleased();
+        }
+        */
         
     }
     
@@ -659,6 +667,14 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     
     gallery->setDefaultPiano(which);
     gallery->setGalleryDirty(false);
+    
+    DBG("setting current piano to: " + String(which));
+    
+    if (sustainIsDown)
+    {
+        for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+            currentPiano->activePMaps[p]->sustainPedalPressed();
+    }
 }
 
 // Reset
