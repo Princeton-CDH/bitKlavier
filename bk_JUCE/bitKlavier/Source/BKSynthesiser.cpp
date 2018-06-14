@@ -392,7 +392,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                             adsrDecayMS*0.001f* getSampleRate(),
                             adsrSustain,
                             adsrReleaseMS*0.001f* getSampleRate());
-                
+ 
             }
         }
     }
@@ -410,8 +410,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                     int layer,
                                     const uint64 startingPosition,
                                     const uint64 length,
-                                    int voiceRampOn,
-                                    int voiceRampOff
+                                    uint64 voiceRampOn,
+                                    uint64 voiceRampOff
                                     )
     {
                     startVoice      (voice,
@@ -447,10 +447,10 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                     int layer,
                                     const uint64 startingPosition,
                                     const uint64 length,
-                                    int adsrAttack,
-                                    int adsrDecay,
+                                    uint64 adsrAttack,
+                                    uint64 adsrDecay,
                                     float adsrSustain,
-                                    int adsrRelease
+                                    uint64 adsrRelease
                                     )
     {
         if (voice != nullptr && sound != nullptr)
