@@ -84,11 +84,18 @@ private:
     uint64 soundLength;
     int midiRootNote, transpose;
     int rampOnSamples, rampOffSamples;
-    
-    stk::ADSR adsr;
-    
+
     int64 loopStart, loopEnd;
     int64 start, end;
+    float attack,decay,sustain,release; // for sfz
+    int loopMode; // sample_loop = 0, no_loop, one_shot, loop_continuous, loop_sustain
+    /*
+     0 indicates a sound reproduced with no loop,
+     1 indicates a sound which loops continuously,
+     2 is unused but should be interpreted as indicating no loop, and
+     3 indicates a sound which loops for the duration of key depression then proceeds to play the remainder of the sample
+     */
+    
     bool isSoundfont;
     
     JUCE_LEAK_DETECTOR (BKPianoSamplerSound)
@@ -160,9 +167,13 @@ public:
                       int startSample, int numSamples,
                       const BKPianoSamplerSound* playingSound);
     
-    void processSoundfont(AudioSampleBuffer& outputBuffer,
-                          int startSample, int numSamples,
-                          const BKPianoSamplerSound* playingSound);
+    void processSoundfontNoLoop(AudioSampleBuffer& outputBuffer,
+                                 int startSample, int numSamples,
+                                 const BKPianoSamplerSound* playingSound);
+    
+    void processSoundfontLoop(AudioSampleBuffer& outputBuffer,
+                                int startSample, int numSamples,
+                                const BKPianoSamplerSound* playingSound);
     
     
 private:
@@ -171,11 +182,13 @@ private:
     int layer;
     float noteVelocity;
     uint64 noteStartingPosition, noteEndPosition;
+    uint64 envstart;
     double pitchRatio;
     double sourceSamplePosition;
+    double lastPartPosition;
     bool inComplicatedFade, needsComplicatedFade;
     double fadeTracker,fadeOffset;
-    double lengthTracker;
+    double lengthTracker, lengthEnv;
     double playEndPosition;
     double playLength;
     uint64 timer;
@@ -186,8 +199,32 @@ private:
     float lgain, rgain, rampOnOffLevel, rampOnDelta, rampOffDelta;
     bool isInRampOn, isInRampOff;
     
+    double cfSamples; // number of samples for crossfade
+    
+    //double beginPosition, loopPosition, endPosition;
+    stk::Envelope sampleEnv, loopEnv;
+
+    bool sfzEnvApplied;
+    
+    double samplePosition, loopPosition;
+    
     stk::ADSR adsr;
+    stk::ADSR sfzadsr;
+    
+    bool lastRamp;
     int numLoops;
+    
+    bool inLoop;
+    stk::ADSR lastIn, lastOut;
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     JUCE_LEAK_DETECTOR (BKPianoSamplerVoice)
 };

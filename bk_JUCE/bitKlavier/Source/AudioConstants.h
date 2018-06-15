@@ -13,8 +13,6 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-#define FADE 20
-
 const String posX = "X";
 const String posY = "Y";
 

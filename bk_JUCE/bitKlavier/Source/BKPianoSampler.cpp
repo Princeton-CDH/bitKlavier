@@ -11,6 +11,7 @@
 #include "BKPianoSampler.h"
 #include "AudioConstants.h"
 
+#define FADE 5
 
 BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                           BKReferenceCountedBuffer::Ptr buffer,
@@ -43,12 +44,13 @@ transpose(transp)
         loopEnd = reg->loop_end;
         start = reg->offset;
         end = reg->end;
-        float attack = reg->ampeg.attack * 0.001f;
-        float decay = reg->ampeg.decay * 0.001f;
-        float sustain = reg->ampeg.sustain / 100.0f;
-        float release = reg->ampeg.release * 0.001f;
         
-        adsr.setAllTimes((attack > 1.0f) ? attack : 1.0f, (decay > 1.0f) ? decay : 1.0f, sustain, (release > 1.0f) ? release : 1.0f);
+        attack = reg->ampeg.attack;
+        decay = reg->ampeg.decay;
+        sustain = reg->ampeg.sustain / 100.0f;
+        release = reg->ampeg.release;
+        
+        loopMode = reg->loop_mode-1;
     }
     else
     {
@@ -58,6 +60,7 @@ transpose(transp)
 
 BKPianoSamplerSound::~BKPianoSamplerSound()
 {
+    
 }
 
 bool BKPianoSamplerSound::isSoundfontSound(void)
@@ -158,7 +161,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         
         revRamped = false;
         
-        playLength = 0.0;
+        playLength = length * pitchRatio;
         double maxLength;
         if (sound->isSoundfont)
         {
@@ -168,6 +171,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         {
             maxLength = sound->soundLength - adsrRelease;
         }
+        
+        DBG("loopmode: " + String(sound->loopMode));
         
         
         if (bkType != MainNote)
@@ -278,9 +283,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                     {
                         playEndPosition = (double)(sourceSamplePosition - playLength);
                     }
-                    
                 }
-                
             }
             else
             {
@@ -294,13 +297,67 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         
         lgain = gain;
         rgain = gain;
-
+        
+        inLoop = false;
+    
         adsr.setSampleRate(getSampleRate());
         
         adsr.setAllTimes(adsrAttack / getSampleRate(), adsrDecay / getSampleRate(), adsrSustain, adsrRelease / getSampleRate());
 
         adsr.keyOn();
         
+        if (sound->isSoundfont)
+        {
+            cfSamples = 50.0;
+            sampleEnv.setTime(cfSamples / getSampleRate());
+            loopEnv.setTime(cfSamples / getSampleRate());
+            
+            if (playDirection == Forward)
+            {
+                inLoop = false;
+                samplePosition = 0.0;
+                loopPosition = sound->loopStart * pitchRatio;
+                sampleEnv.setValue(1.0f);
+                loopEnv.setValue(0.0f);
+                
+                sfzadsr.setSampleRate(getSampleRate());
+                
+                sfzadsr.setAllTimes((sound->attack > 0.0f) ? sound->attack : 0.001f,
+                                    (sound->decay > 0.0f) ? sound->decay : 0.001f,
+                                    sound->sustain,
+                                    (sound->release > 0.0f) ? sound->release : 0.001f );
+                
+                sfzEnvApplied = true;
+                sfzadsr.keyOn();
+            }
+            else
+            {
+                inLoop = true;
+                if (sound->loopMode == 0 || sound->loopMode == 2)
+                {
+                    samplePosition = playLength - 1;
+                    loopEnv.setValue(0.0);
+                    sampleEnv.setValue(1.0);
+                }
+                else
+                {
+                    samplePosition = 0.0;
+                    loopEnv.setValue(1.0f);
+                    sampleEnv.setValue(0.0f);
+                    
+                    loopPosition = sound->loopStart * pitchRatio;
+                    
+                    lengthEnv =  (sound->attack + sound->decay + sound->release) * getSampleRate();
+                    
+                    lengthEnv = (playLength < lengthEnv) ? playLength : lengthEnv;
+                    float lengthEnvSec = lengthEnv / getSampleRate();
+                    
+                    sfzadsr.setValue(0.0f);
+                    sfzadsr.setAllTimes(lengthEnvSec - 0.01f, 0.01f, 0.0f, 0.001f);
+                    sfzEnvApplied = false;
+                }
+            }
+        }
         noteStartingPosition = sourceSamplePosition;
         noteEndPosition = playEndPosition;
     }
@@ -310,13 +367,12 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
     }
 }
 
-
-
 void BKPianoSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
 {
     if (allowTailOff)
     {
         adsr.keyOff();
+        sfzadsr.keyOff();
     }
     else
     {
@@ -336,7 +392,7 @@ void BKPianoSamplerVoice::controllerMoved (const int /*controllerNumber*/,
 //==============================================================================
 #define INTERP 0
 
-void BKPianoSamplerVoice::processSoundfont(AudioSampleBuffer& outputBuffer,
+void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
                                            int startSample, int numSamples,
                                            const BKPianoSamplerSound* playingSound)
 {
@@ -358,50 +414,25 @@ void BKPianoSamplerVoice::processSoundfont(AudioSampleBuffer& outputBuffer,
     
     while (--numSamples >= 0)
     {
-
-        if (playDirection == Reverse)
+        // always increment length
+        lengthTracker += pitchRatio;
+        
+        // We always tick loop area sample and begin/end area samples.
+        // We envelope on and off each area when needed, and reset sample positions for begin/end.
+        //================LOOP STUFF=================
+        loopPosition += pitchRatio;
+        if (loopPosition >= loopEnd)
         {
-            // commented out now, but this will be back for non-looped samples
-            /*if (sourceSamplePosition > playingSound->soundLength)
-            {
-                if (outR != nullptr)
-                {
-                    *outL++ += 0;
-                    *outR++ += 0;
-                }
-                else
-                {
-                    *outL++ += 0;
-                }
-                sourceSamplePosition -= pitchRatio;
-                continue;
-            }
-            else if (!revRamped && (sourceSamplePosition < (playingSound->soundLength + pitchRatio)))
-            {
-                revRamped = true;
-                adsr.keyOn();
-            }
-             */
-            /*
-            if (!revRamped)
-            {
-                revRamped = true;
-                adsr.keyOn();
-            }
-             */
-            
+            loopPosition = loopStart;
         }
-
+    
+        float loopL, loopR;
         
-        const int pos = (int) sourceSamplePosition;
-        const float alpha = (float) (sourceSamplePosition - pos);
-        const float invAlpha = 1.0f - alpha;
+        fadeTracker = loopPosition - loopEnd + FADE;
         
-        float l,r;
-        
-        // fadetracker will be positive when fade should be performed
-        // if in crossfade region, perform fade between start/end
-        fadeTracker = sourceSamplePosition - (loopEnd - FADE);
+        int pos = (int) loopPosition;
+        float alpha = (float) (loopPosition - pos);
+        float invAlpha = 1.0f - alpha;
         
         if (fadeTracker > 0.0)
         {
@@ -413,84 +444,183 @@ void BKPianoSamplerVoice::processSoundfont(AudioSampleBuffer& outputBuffer,
             
             fadePos += loopStart-FADE;
             
-            l = (1.0f - fade) * (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-            r = (1.0f - fade) * ((inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l);
+            loopL = (1.0f - fade) * (inL [pos] * invAlpha + inL [pos + 1] * alpha);
+            loopR = (1.0f - fade) * ((inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : loopL);
             
-            l += fade * (inL [fadePos] * fadeInvAlpha + inL [fadePos+1] * fadeAlpha);
-            r += fade * ((inR != nullptr) ? (inR [fadePos] * fadeInvAlpha + inR [fadePos+1] * fadeAlpha) : l);
+            loopL += fade * (inL [fadePos] * fadeInvAlpha + inL [fadePos+1] * fadeAlpha);
+            loopR += fade * ((inR != nullptr) ? (inR [fadePos] * fadeInvAlpha + inR [fadePos+1] * fadeAlpha) : loopL);
             
         }
         else
         {
-            l = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-            r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l;
+            loopL = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
+            loopR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : loopL;
         }
+        //===========================================
         
+        //==============SAMPLE STUFF=================
+        float sampleL, sampleR;
+        if (playDirection == Forward)   samplePosition += pitchRatio;
+        else                            samplePosition -= pitchRatio;
         
+        pos = (int) samplePosition;
+        alpha = (float) (samplePosition - pos);
+        invAlpha = 1.0f - alpha;
         
-        l *= (lgain * adsr.tick());
-        r *= (rgain * adsr.lastOut());
-        
-        if (outR != nullptr)
+        if (pos >= 0 && pos < (playingSound->soundLength - 1))
         {
-            *outL++ += (l * 1.0f);
-            *outR++ += (r * 1.0f);
+            sampleL = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
+            sampleR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : sampleL;
         }
-        else
-        {
-            *outL++ += ((l + r) * 0.5f) * 1.0f;
-        }
-        
-        if (adsr.getState() == stk::ADSR::IDLE)
-        {
-            stopNote (0.0f, false);
-            break;
-        }
-        
-        
+        //===========================================
         if (playDirection == Forward)
         {
-            sourceSamplePosition += pitchRatio;
-            lengthTracker += pitchRatio;
-            
-            if (sourceSamplePosition >= loopEnd)
+            if (adsr.getState() == stk::ADSR::IDLE)
             {
-                sourceSamplePosition = loopStart;
+                stopNote(0.0f, false);
+                break;
+            }
+            
+            // if we are about to enter loop, turn on loopEnv, turn off sampleEnv
+            if (!inLoop && (samplePosition >= (loopStart - cfSamples)))
+            {
+                inLoop = true;
+                
+                loopPosition = samplePosition;
+                
+                loopEnv.keyOn();
+                
+                sampleEnv.keyOff();
+            }
+        
+            if (playType != Normal)
+            {
+                if ((adsr.getState() != stk::ADSR::RELEASE) && (lengthTracker >= (playLength-FADE)))
+                {
+                    adsr.keyOff();
+                    sfzadsr.keyOff();
+                }
             }
             
             
-            if ((playType != Normal) && (lengthTracker >= (playLength-FADE)))
+        }
+        else if (playDirection == Reverse)
+        {
+            if(lengthTracker >= playLength)
             {
-                if (adsr.getState() != stk::ADSR::RELEASE)
+                clearCurrentNote(); break;
+            }
+
+            int64 reversePosition = playLength - lengthTracker;
+            
+            if (!sfzEnvApplied && (reversePosition <= lengthEnv))
+            {
+                sfzEnvApplied = true;
+                sfzadsr.keyOn();
+            }
+            
+            // if we are about to leave loop, turn off loopEnv, turn on sampleEnv
+            if (inLoop && (reversePosition <= (loopStart + cfSamples)))
+            {
+                inLoop = false;
+                
+                samplePosition = reversePosition;
+                
+                loopEnv.keyOff();
+                
+                sampleEnv.keyOn();
+            }
+
+            if ((playType != Normal) && (lengthTracker >= (playLength - FADE)))
+            {
+                if ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE))
+                {
+                    adsr.keyOff();
+                    sfzadsr.keyOff();
+                }
+            }
+        }
+        else
+        {
+            DBG("Invalid note direction.");
+        }
+        
+        float l = lgain * adsr.tick() * sfzadsr.tick() * (loopL * loopEnv.tick() + sampleL * sampleEnv.tick());
+        float r = rgain * adsr.lastOut() * sfzadsr.lastOut() * (loopR * loopEnv.lastOut() + sampleR * sampleEnv.lastOut());
+        
+        if (outR != nullptr)
+        {
+            *outL++ += (l);
+            *outR++ += (r);
+        }
+        else
+        {
+            *outL++ += ((l + r) * 0.5f);
+        }
+    }
+}
+
+void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer,
+                                       int startSample, int numSamples,
+                                       const BKPianoSamplerSound* playingSound)
+{
+    const float* const inL = playingSound->data->getAudioSampleBuffer()->getReadPointer (0);
+    const float* const inR = playingSound->data->getAudioSampleBuffer()->getNumChannels() > 1
+    ? playingSound->data->getAudioSampleBuffer()->getReadPointer (1)
+    : nullptr;
+    
+    float* outL = outputBuffer.getWritePointer (0, startSample);
+    float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
+    
+    int64 loopStart, loopEnd, start, end;
+    
+    start = playingSound->start;
+    end = playingSound->end;
+    loopStart = playingSound->loopStart;
+    loopEnd = playingSound->loopEnd;
+    
+    while (--numSamples >= 0)
+    {
+        // always increment length
+        lengthTracker += pitchRatio;
+        
+        //==============SAMPLE STUFF=================
+        float sampleL, sampleR;
+        if (playDirection == Forward)   samplePosition += pitchRatio;
+        else                            samplePosition -= pitchRatio;
+        
+        const int pos = (int) samplePosition;
+        const float alpha = (float) (samplePosition - pos);
+        const float invAlpha = 1.0f - alpha;
+        
+        if (pos >= 0 && pos < (playingSound->soundLength - 1))
+        {
+            sampleL = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
+            sampleR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : sampleL;
+        }
+        //===========================================
+        if (playDirection == Forward)
+        {
+            if (adsr.getState() == stk::ADSR::IDLE)
+            {
+                stopNote(0.0f, false);
+                break;
+            }
+            
+            if (playType != Normal)
+            {
+                if ((adsr.getState() != stk::ADSR::RELEASE) && (lengthTracker >= (playLength-FADE)))
                 {
                     adsr.keyOff();
                 }
             }
             
-            if(sourceSamplePosition >= playingSound->soundLength )
-            {
-                //stopNote(0.0f, true);
-                clearCurrentNote();
-            }
         }
         else if (playDirection == Reverse)
         {
-            
-            // Check for break out of loop.
-            if ((playLength - lengthTracker) <= loopStart)
+            if(lengthTracker >= playLength)
             {
-                sourceSamplePosition = playLength - lengthTracker;
-            }
-            else
-            {
-                sourceSamplePosition += pitchRatio;
-            }
-            
-            lengthTracker += pitchRatio;
-            
-            if (sourceSamplePosition >= loopEnd)
-            {
-                sourceSamplePosition = loopStart;
+                clearCurrentNote(); break;
             }
             
             if ((playType != Normal) && (lengthTracker >= (playLength - FADE)))
@@ -500,20 +630,49 @@ void BKPianoSamplerVoice::processSoundfont(AudioSampleBuffer& outputBuffer,
                     adsr.keyOff();
                 }
             }
-            
-            if (sourceSamplePosition <= 0.0)
-            {
-                //stopNote(0.0f, true);
-                clearCurrentNote();
-            }
         }
         else
         {
             DBG("Invalid note direction.");
         }
+        
+        float l = lgain * adsr.tick() * (sampleL * sampleEnv.tick());
+        float r = rgain * adsr.lastOut() * (sampleR * sampleEnv.lastOut());
+        
+        if (outR != nullptr)
+        {
+            *outL++ += (l);
+            *outR++ += (r);
+        }
+        else
+        {
+            *outL++ += ((l + r) * 0.5f);
+        }
     }
 }
 
+void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int startSample, int numSamples)
+{
+    if (const BKPianoSamplerSound* const playingSound = static_cast<BKPianoSamplerSound*> (getCurrentlyPlayingSound().get()))
+    {
+        if (playingSound->isSoundfont)
+        {
+            if (playingSound->loopMode == 0 || playingSound->loopMode == 2)
+            {
+                processSoundfontNoLoop(outputBuffer, startSample, numSamples, playingSound);
+            }
+            else
+            {
+                processSoundfontLoop(outputBuffer, startSample, numSamples, playingSound);
+            }
+        }
+        else
+        {
+            processPiano(outputBuffer, startSample, numSamples, playingSound);
+        }
+        
+    }
+}
 
 void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
                                        int startSample, int numSamples,
@@ -594,7 +753,7 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         else if (playDirection == Reverse)
         {
             sourceSamplePosition -= pitchRatio;
-
+            
             if (sourceSamplePosition <= playEndPosition)
             {
                 if ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE))
@@ -614,15 +773,4 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         }
     }
 }
-
-void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int startSample, int numSamples)
-{
-    if (const BKPianoSamplerSound* const playingSound = static_cast<BKPianoSamplerSound*> (getCurrentlyPlayingSound().get()))
-    {
-        if (playingSound->isSoundfont)  processSoundfont(outputBuffer, startSample, numSamples, playingSound);
-        else                            processPiano(outputBuffer, startSample, numSamples, playingSound);
-        
-    }
-}
-
 

@@ -371,7 +371,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             
             // Check if sound applies to note, velocity, and channel.
             if (sound->appliesToNote (noteNumber)
-                && sound->appliesToVelocity((int)(velocity * 127.0)))
+                && sound->appliesToVelocity((int)(velocity*127.0)))
             {
                 //DBG("BKSynthesiser::keyOn " + String(noteNumber));
                 startVoice (findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes),

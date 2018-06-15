@@ -250,10 +250,15 @@ void BKAudioProcessor::loadSoundfontFromFile(File sfzFile)
         
         DBG("region " + String(count++) + " |   end: " + String(region->end) + "   ls: " + String(region->loop_start) + "   le: " + String(region->loop_end) + "   keyrange: " + String(region->lokey) + "-" + String(region->hikey) + "   velrange: " + String(region->lovel) + "-" + String(region->hivel));
         
-        int nbits = region->hikey - region->lokey; nbits = (nbits > 0) ? nbits : 1;
-        int vbits = region->hivel - region->lovel; vbits = (vbits > 0) ? vbits : 1;
-        BigInteger nrange; nrange.setRange(region->lokey, nbits + 1, true);
-        BigInteger vrange; vrange.setRange(region->lovel, vbits + 1, true);
+        if ((region->lokey == region->hikey) && (region->lokey != region->pitch_keycenter))
+        {
+            region->transpose = region->lokey - region->pitch_keycenter;
+        }
+        
+        int nbits = region->hikey - region->lokey;
+        int vbits = region->hivel - region->lovel;
+        BigInteger nrange; nrange.setRange(region->lokey, nbits+1, true);
+        BigInteger vrange; vrange.setRange(region->lovel, vbits+1, true);
         
 
         mainPianoSynth.addSound(new BKPianoSamplerSound(region->sample->getShortName(),
@@ -307,7 +312,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     gallery->prepareToPlay(sampleRate);
     
 #if JUCE_DEBUG
-    File file("~/soundfonts/seinbass/Seinbass.sf2");
+    File file("~/soundfonts/drums/1276-The KiKaZ DrUmZ.sf2");
     loadSoundfontFromFile(file);
     
     //loadPianoSamples(BKLoadLite);

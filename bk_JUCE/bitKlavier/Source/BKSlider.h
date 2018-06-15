@@ -234,7 +234,7 @@ public TextEditor::Listener
 {
 public:
     BKSingleSlider(String sliderName, double min, double max, double def, double increment);
-    ~BKSingleSlider() {};
+    ~BKSingleSlider() {setLookAndFeel(nullptr);};
     
     Slider thisSlider;
     ScopedPointer<Slider> displaySlider;
@@ -720,10 +720,12 @@ public:
     BKADSRSlider(String name);
     BKADSRSlider()
     {
-        attackSlider->setLookAndFeel(nullptr);
-        decaySlider->setLookAndFeel(nullptr);
-        sustainSlider->setLookAndFeel(nullptr);
-        releaseSlider->setLookAndFeel(nullptr);
+        
+    };
+    
+    ~BKADSRSlider()
+    {
+        setLookAndFeel(nullptr);
     };
     
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
