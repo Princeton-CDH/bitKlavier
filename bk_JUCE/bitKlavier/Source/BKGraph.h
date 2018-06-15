@@ -196,7 +196,7 @@ public:
         {
             BKItem::PtrArr connex = getConnectionsOfType((BKPreparationType)type);
             
-            s += cPreparationTypes[type]+":";
+            s = s + cPreparationTypes[type]+":";
             
             for (auto item : connex)
             {

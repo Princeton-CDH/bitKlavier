@@ -42,6 +42,7 @@ private:
     void loadMainPianoSamples(BKSampleLoadType type);
     void loadResonanceReleaseSamples(void);
     void loadHammerReleaseSamples(void);
+    void loadPedalSamples(void);
     
     BKAudioProcessor& processor;
   

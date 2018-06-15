@@ -135,8 +135,8 @@ public:
                     BKNoteType bktype,
                     uint64 startingPosition,
                     uint64 length,
-                    int voiceRampOn,
-                    int voiceRampOff,
+                    uint64 voiceRampOn,
+                    uint64 voiceRampOff,
                     BKSynthesiserSound* sound
                     ) override;
     
@@ -148,10 +148,10 @@ public:
                     BKNoteType bktype,
                     uint64 startingPosition,
                     uint64 length,
-                    int adsrAttack,
-                    int adsrDecay,
+                    uint64 adsrAttack,
+                    uint64 adsrDecay,
                     float adsrSustain,
-                    int adsrRelease,
+                    uint64 adsrRelease,
                     BKSynthesiserSound* sound
                     ) override;
     
@@ -182,13 +182,16 @@ private:
     int layer;
     float noteVelocity;
     uint64 noteStartingPosition, noteEndPosition;
-    uint64 envstart;
+    
     double pitchRatio;
+    double pitchbendMultiplier;
+    double bentRatio;
+    
     double sourceSamplePosition;
-    double lastPartPosition;
-    bool inComplicatedFade, needsComplicatedFade;
+    
     double fadeTracker,fadeOffset;
     double lengthTracker, lengthEnv;
+
     double playEndPosition;
     double playLength;
     uint64 timer;

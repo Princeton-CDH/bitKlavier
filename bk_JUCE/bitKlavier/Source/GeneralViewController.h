@@ -69,6 +69,9 @@ private:
     ToggleButton invertSustainB;
     BKLabel     invertSustainL;
     
+    ToggleButton noteOnSetsNoteOffVelocityB;
+    BKLabel     noteOnSetsNoteOffVelocityL;
+    
     ScopedPointer<BKSingleSlider> A4tuningReferenceFrequencySlider; //A440
     ScopedPointer<BKSingleSlider> tempoMultiplierSlider;
     

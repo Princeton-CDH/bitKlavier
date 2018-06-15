@@ -36,6 +36,7 @@ const String ptagGeneral_hammerGain = "hammerGain";
 const String ptagGeneral_tempoMultiplier = "tempoMultiplier";
 const String ptagGeneral_resAndHammer = "resAndHammer";
 const String ptagGeneral_invertSustain = "invertSustain";
+const String ptagGeneral_noteOnSetsNoteOffVelocity = "noteOnSetsNoteOffVelocity";
 const String ptagGeneral_tuningFund = "tuningFund";
 
 const String vtagPiano = "piano";
@@ -82,6 +83,7 @@ const String ptagSynchronic_clusterMax = "clusterMax";
 const String ptagSynchronic_clusterThresh = "clusterThresh";
 const String ptagSynchronic_mode = "mode";
 const String ptagSynchronic_beatsToSkip = "beatsToSkip";
+const String ptagSynchronic_gain = "gain";
 
 const String vtagTempo= "tempo";
 const String vtagModTempo = "modTempo";
@@ -202,6 +204,7 @@ typedef enum BKNoteType {
     MainNote,
     HammerNote,
     ResonanceNote,
+    PedalNote,
     BKNoteTypeNil,
 } BKNoteType;
 

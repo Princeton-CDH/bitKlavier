@@ -391,7 +391,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                             adsrDecayMS*0.001f* getSampleRate(),
                             adsrSustain,
                             adsrReleaseMS*0.001f* getSampleRate());
-                
+ 
             }
         }
     }
@@ -409,8 +409,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                     int layer,
                                     const uint64 startingPosition,
                                     const uint64 length,
-                                    int voiceRampOn,
-                                    int voiceRampOff
+                                    uint64 voiceRampOn,
+                                    uint64 voiceRampOff
                                     )
     {
                     startVoice      (voice,
@@ -446,10 +446,10 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                     int layer,
                                     const uint64 startingPosition,
                                     const uint64 length,
-                                    int adsrAttack,
-                                    int adsrDecay,
+                                    uint64 adsrAttack,
+                                    uint64 adsrDecay,
                                     float adsrSustain,
-                                    int adsrRelease
+                                    uint64 adsrRelease
                                     )
     {
         if (voice != nullptr && sound != nullptr)
@@ -564,6 +564,22 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                 voice->pitchWheelMoved (wheelValue);
         }
     }
+    
+    /*
+    void BKSynthesiser::updateTuning (int midiChannel, int midiNoteNumber, float offset) //or should it be a multiplier?
+    {
+        const ScopedLock sl (lock);
+        
+        for (int i = voices.size(); --i >= 0;)
+        {
+            BKSynthesiserVoice* const voice = voices.getUnchecked (i);
+            
+            if (voice->getCurrentlyPlayingNote() == midiNoteNumber
+                && (midiChannel <= 0 || voice->isPlayingChannel (midiChannel)))
+                voice->tuningChanged (offset);
+        }
+    }
+     */
     
     void BKSynthesiser::handleController (const int midiChannel,
                                           const int controllerNumber,

@@ -561,6 +561,7 @@ public:
     
     void    keyPressed(int noteNumber, float velocity, int channel);
     void    keyReleased(int noteNumber, float velocity, int channel);
+    void    playHammerResonance(int noteNumber, float velocity, int channel);
     
     inline void prepareToPlay(double sr, BKSynthesiser* main, BKSynthesiser* res, BKSynthesiser* hammer)
     {

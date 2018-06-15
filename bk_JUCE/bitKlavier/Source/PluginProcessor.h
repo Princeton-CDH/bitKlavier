@@ -85,6 +85,7 @@ public:
     BKSynthesiser                       mainPianoSynth;
     BKSynthesiser                       hammerReleaseSynth;
     BKSynthesiser                       resonanceReleaseSynth;
+    BKSynthesiser                       pedalSynth;
     
     //sfzero::Synth                       synth;
     
@@ -118,6 +119,7 @@ public:
     
     Array<bool>                         noteOn; //which notes are on, for the UI
     Array<bool>                         getNoteOns() { return noteOn; }
+    Array<float>                        noteVelocity;
     
     void                                noteOnUI (int noteNumber) { if(didLoadMainPianoSamples) notesOnUI.add(noteNumber); }
     void                                noteOffUI(int noteNumber) { if(didLoadMainPianoSamples) notesOffUI.add(noteNumber); }
@@ -268,7 +270,7 @@ public:
         }
         else
         {
-            if(sustainIsDown)
+            if(!sustainIsDown)
             {
                 sustainIsDown = false;
                 
@@ -277,7 +279,7 @@ public:
                 
                 if(prevPiano != currentPiano)
                 {
-                    DBG("sustain inverted, sustain is now released");
+                    DBG("sustain NOT inverted, sustain is now released");
                     for (int p = prevPiano->activePMaps.size(); --p >= 0;)
                         prevPiano->activePMaps[p]->sustainPedalReleased(true);
                 }
@@ -285,7 +287,7 @@ public:
             else
             {
                 sustainIsDown = true;
-                DBG("sustain inverted, sustain is now pressed");
+                DBG("sustain NOT inverted, sustain is now pressed");
                 
                 if (firstTime) {firstTime = false; return;}
                 else
@@ -304,13 +306,15 @@ private:
     
     int  currentPianoId;
     
-    bool sustainIsDown;
-    bool sustainInverted;
+    bool sustainIsDown = false;
+    bool sustainInverted = false;
+    bool noteOnSetsNoteOffVelocity = true;
    
     void sustainActivate(void);
     void sustainDeactivate(void);
     
     double bkSampleRate;
+    double pitchbendVal;
     
     BKSampleLoader loader;
     

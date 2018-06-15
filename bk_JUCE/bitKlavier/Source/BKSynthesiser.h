@@ -131,8 +131,8 @@ public:
                             BKNoteType bktype,
                             uint64 startingPosition,
                             uint64 length,
-                            int voiceRampOn,
-                            int voiceRampOff,
+                            uint64 voiceRampOn,
+                            uint64 voiceRampOff,
                             BKSynthesiserSound* sound) = 0;
     
     virtual void startNote (float midiNoteNumber,
@@ -142,10 +142,10 @@ public:
                             BKNoteType bktype,
                             uint64 startingPosition,
                             uint64 length,
-                            int adsrAttack,
-                            int adsrDecay,
+                            uint64 adsrAttack,
+                            uint64 adsrDecay,
                             float adsrSustain,
-                            int adsrRelease,
+                            uint64 adsrRelease,
                             BKSynthesiserSound* sound) = 0;
     
     /** Called to stop a note.
@@ -679,8 +679,8 @@ protected:
                      int layer,
                      uint64 startingPosition,
                      uint64 length,
-                     int voiceRampOn,
-                     int voiceRampOff);
+                     uint64 voiceRampOn,
+                     uint64 voiceRampOff);
     
     void startVoice (BKSynthesiserVoice* voice,
                      BKSynthesiserSound* sound,
@@ -695,10 +695,10 @@ protected:
                      int layer,
                      uint64 startingPosition,
                      uint64 length,
-                     int adsrAttack,
-                     int adsrDecay,
+                     uint64 adsrAttack,
+                     uint64 adsrDecay,
                      float adsrSustain,
-                     int adsrRelease);
+                     uint64 adsrRelease);
     
     /** Stops a given voice.
      You should never need to call this, it's used internally by noteOff, but is protected

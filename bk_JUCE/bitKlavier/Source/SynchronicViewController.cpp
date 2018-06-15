@@ -481,24 +481,25 @@ void SynchronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
     //only transposition allows multiple simultaneous vals, so trim down to 1D array
     Array<float> newvals = Array<float>();
     for(int i=0; i<values.size(); i++) newvals.add(values[i][0]);
-    
-    if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+
+    //if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+    if (!name.compare(cSynchronicParameterTypes[SynchronicAccentMultipliers]))
     {
         prep    ->setAccentMultipliers(newvals);
         active  ->setAccentMultipliers(newvals);
     }
-    else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+    else if (!name.compare(cSynchronicParameterTypes[SynchronicBeatMultipliers]))
     {
         prep    ->setBeatMultipliers(newvals);
         active  ->setBeatMultipliers(newvals);
     }
-    else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+    else if (!name.compare(cSynchronicParameterTypes[SynchronicLengthMultipliers]))
     {
         prep    ->setLengthMultipliers(newvals);
         active  ->setLengthMultipliers(newvals);
     }
     //pass original 2D array for transpositions
-    else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
+    else if (!name.compare(cSynchronicParameterTypes[SynchronicTranspOffsets]))
     {
         prep    ->setTransposition(values);
         active  ->setTransposition(values);
@@ -566,22 +567,22 @@ void SynchronicPreparationEditor::update(NotificationType notify)
         
         for(int i = 0; i < paramSliders.size(); i++)
         {
-            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+            if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicAccentMultipliers]))
             {
                 paramSliders[i]->setTo(prep->getAccentMultipliers(), notify);
             }
             
-            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+            if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicBeatMultipliers]))
             {
                 paramSliders[i]->setTo(prep->getBeatMultipliers(), notify);
             }
             
-            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+            if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicLengthMultipliers]))
             {
                 paramSliders[i]->setTo(prep->getLengthMultipliers(), notify);
             }
             
-            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicTranspOffsets])
+            if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicTranspOffsets]))
             {
                 paramSliders[i]->setTo(prep->getTransposition(), notify);
             }
@@ -999,7 +1000,7 @@ void SynchronicModificationEditor::highlightModedComponents()
     {
         for(int i = 0; i < paramSliders.size(); i++)
         {
-            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+            if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicBeatMultipliers]))
                 paramSliders[i]->setAlpha(1.);
         }
     }
@@ -1007,7 +1008,7 @@ void SynchronicModificationEditor::highlightModedComponents()
     {
         for(int i = 0; i < paramSliders.size(); i++)
         {
-            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+            if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicLengthMultipliers]))
                 paramSliders[i]->setAlpha(1.);
         }
     }
@@ -1015,7 +1016,7 @@ void SynchronicModificationEditor::highlightModedComponents()
     {
         for(int i = 0; i < paramSliders.size(); i++)
         {
-            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+            if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicAccentMultipliers]))
                 paramSliders[i]->setAlpha(1.);
         }
     }
@@ -1023,7 +1024,7 @@ void SynchronicModificationEditor::highlightModedComponents()
     {
         for(int i = 0; i < paramSliders.size(); i++)
         {
-            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicTranspOffsets])
+            if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicTranspOffsets]))
                 paramSliders[i]->setAlpha(1.);
         }
     }
@@ -1082,22 +1083,22 @@ void SynchronicModificationEditor::update(NotificationType notify)
         
         for (int i = 0; i < paramSliders.size(); i++)
         {
-            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+            if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicAccentMultipliers]))
             {
                 val = mod->getParam(SynchronicAccentMultipliers);
                 paramSliders[i]->setTo(stringToFloatArray(val), notify);
             }
-            else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+            else if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicBeatMultipliers]))
             {
                 val = mod->getParam(SynchronicBeatMultipliers);
                 paramSliders[i]->setTo(stringToFloatArray(val), notify);
             }
-            else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+            else if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicLengthMultipliers]))
             {
                 val = mod->getParam(SynchronicLengthMultipliers);
                 paramSliders[i]->setTo(stringToFloatArray(val), notify);
             }
-            else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicTranspOffsets])
+            else if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicTranspOffsets]))
             {
                 val = mod->getParam(SynchronicTranspOffsets);
                 paramSliders[i]->setTo(stringToArrayFloatArray(val), notify);
@@ -1166,25 +1167,25 @@ void SynchronicModificationEditor::multiSliderDidChange(String name, int whichSl
 {
     SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
     
-    if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+    if (!name.compare(cSynchronicParameterTypes[SynchronicAccentMultipliers]))
     {
         Array<float> accents = stringToFloatArray(mod->getParam(SynchronicAccentMultipliers));
         accents.set(whichSlider, values[0]);
         mod->setParam(SynchronicAccentMultipliers, floatArrayToString(accents));
     }
-    else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+    else if (!name.compare(cSynchronicParameterTypes[SynchronicBeatMultipliers]))
     {
         Array<float> beats = stringToFloatArray(mod->getParam(SynchronicBeatMultipliers));
         beats.set(whichSlider, values[0]);
         mod->setParam(SynchronicBeatMultipliers, floatArrayToString(beats));
     }
-    else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+    else if (!name.compare(cSynchronicParameterTypes[SynchronicLengthMultipliers]))
     {
         Array<float> lens = stringToFloatArray(mod->getParam(SynchronicLengthMultipliers));
         lens.set(whichSlider, values[0]);
         mod->setParam(SynchronicLengthMultipliers, floatArrayToString(lens));
     }
-    else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
+    else if (!name.compare(cSynchronicParameterTypes[SynchronicTranspOffsets]))
     {
         //paramSliders
         Array<Array<float>> transps = stringToArrayFloatArray(mod->getParam(SynchronicTranspOffsets));
@@ -1209,20 +1210,20 @@ void SynchronicModificationEditor::multiSlidersDidChange(String name, Array<Arra
     Array<float> newvals = Array<float>();
     for(int i=0; i<values.size(); i++) newvals.add(values[i][0]);
     
-    if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+    if (!name.compare(cSynchronicParameterTypes[SynchronicAccentMultipliers]))
     {
         mod->setParam(SynchronicAccentMultipliers, floatArrayToString(newvals));
     }
-    else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+    else if (!name.compare(cSynchronicParameterTypes[SynchronicBeatMultipliers]))
     {
         mod->setParam(SynchronicBeatMultipliers, floatArrayToString(newvals));
     }
-    else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+    else if (!name.compare(cSynchronicParameterTypes[SynchronicLengthMultipliers]))
     {
         mod->setParam(SynchronicLengthMultipliers, floatArrayToString(newvals));
     }
     //pass original 2D array for transpositions
-    else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
+    else if (!name.compare(cSynchronicParameterTypes[SynchronicTranspOffsets]))
     {
         DBG("set mod: " + arrayFloatArrayToString(values));
         mod->setParam(SynchronicTranspOffsets, arrayFloatArrayToString(values));
