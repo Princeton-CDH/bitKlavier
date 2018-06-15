@@ -52,7 +52,7 @@ void NostalgicProcessor::postRelease(int midiNoteNumber, int midiChannel)
 void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel, bool post)
 {
     
-    DBG("NostalgicProcessor::keyReleased");
+    //DBG("NostalgicProcessor::keyReleased");
     
     float duration = 0.0;
     
@@ -104,6 +104,9 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel, bool p
                                  30,
                                  offRamp ); //ramp off
                      */
+                    DBG("reverse note on noteNum/offset " +
+                        String(synthNoteNumber) + " " +
+                        String(synthOffset));
                     synth->keyOn(
                                  midiChannel,
                                  midiNoteNumber,
@@ -166,6 +169,9 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel, bool p
                              30,
                              offRamp ); //ramp off
                  */
+                DBG("reverse note on noteNum/offset " +
+                    String(synthNoteNumber) + " " +
+                    String(synthOffset));
                 synth->keyOn(
                              midiChannel,
                              midiNoteNumber,
@@ -230,6 +236,9 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel, bool p
                              30,
                              offRamp ); //ramp off
                  */
+                DBG("reverse note on noteNum/offset " +
+                    String(synthNoteNumber) + " " +
+                    String(synthOffset));
                 synth->keyOn(
                              midiChannel,
                              midiNoteNumber,
@@ -306,6 +315,11 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
                              30,
                              offRamp ); //ramp off
                  */
+                
+                DBG("reverse note on noteNum/offset " +
+                    String(synthNoteNumber) + " " +
+                    String(synthOffset));
+                
                 synth->keyOn(
                              midiChannel,
                              midiNoteNumber,
@@ -375,10 +389,9 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
                     int synthNoteNumber = thisNote->getNoteNumber() +  (int)offset;
                     float synthOffset = offset - (int)offset;
                     
-                    DBG("undertow note on noteNum/Velocity/Gain " +
+                    DBG("undertow note on noteNum/offset " +
                         String(synthNoteNumber) + " " +
-                        String(thisNote->getVelocityAtKeyOn()) + " " +
-                        String(noteOnPrep->getGain() * aGlobalGain));
+                        String(synthOffset));
                     
                     /*
                     synth->keyOn(midiChannel,
