@@ -298,6 +298,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                     * generalSettings->getTuningRatio()
                     / getSampleRate();
         
+        DBG("PITCHRATIO = " + String(pitchRatio));
         
         bkType = bktype;
         playType = type;
