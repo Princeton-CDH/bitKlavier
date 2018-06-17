@@ -693,11 +693,13 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
     float* outL = outputBuffer.getWritePointer (0, startSample);
     float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
     
+    double bentRatio = pitchRatio * pitchbendMultiplier;
+    
     while (--numSamples >= 0)
     {
         if ((adsr.getState() != stk::ADSR::IDLE) &&
             (playDirection == Reverse) &&
-            (sourceSamplePosition > playingSound->soundLength))
+            (sourceSamplePosition > playingSound->soundLength - 1))
         {
             if (outR != nullptr)
             {
@@ -708,9 +710,11 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             {
                 *outL++ += 0;
             }
-            sourceSamplePosition -= pitchRatio;
+            sourceSamplePosition -= bentRatio;
             continue;
         }
+        
+        if(sourceSamplePosition < 0) sourceSamplePosition = 0;
         
         const int pos = (int) sourceSamplePosition;
         const float alpha = (float) (sourceSamplePosition - pos);
@@ -741,7 +745,7 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         
         if (playDirection == Forward)
         {
-            sourceSamplePosition += pitchRatio;
+            sourceSamplePosition += bentRatio;
             
             if (sourceSamplePosition >= playEndPosition)
             {
@@ -759,7 +763,7 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         }
         else if (playDirection == Reverse)
         {
-            sourceSamplePosition -= pitchRatio;
+            sourceSamplePosition -= bentRatio;
             
             if (sourceSamplePosition <= playEndPosition)
             {
