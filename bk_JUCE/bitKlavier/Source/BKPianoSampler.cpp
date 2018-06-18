@@ -50,7 +50,17 @@ transpose(transp)
         sustain = reg->ampeg.sustain / 100.0f;
         release = reg->ampeg.release;
         
-        loopMode = reg->loop_mode-1;
+        if ((loopStart < loopEnd) && (loopStart >= 0) && (loopEnd >= 0))
+        {
+            loopMode = reg->loop_mode-1;
+            
+            if ((loopMode == 0) || (loopMode == 2)) loopMode = 1;
+        }
+        else
+        {
+            loopMode = 0;
+        }
+        
     }
     else
     {
@@ -318,6 +328,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             cfSamples = 50.0;
             sampleEnv.setTime(cfSamples / getSampleRate());
             loopEnv.setTime(cfSamples / getSampleRate());
+            
+            DBG("loop mode: " + String(sound->loopMode));
             
             if (playDirection == Forward)
             {
