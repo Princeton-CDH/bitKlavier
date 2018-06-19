@@ -360,13 +360,12 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         
         //processor.createGalleryWithName(processor.gallery->getName());
     }
-#if !JUCE_IOS
+
     if (result == SOUNDFONT_ID)
     {
         processor.openSoundfont();
     }
-#endif
-    if (result == SAVEAS_ID)
+    else if (result == SAVEAS_ID)
     {
 #if JUCE_IOS
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon, gvc);
@@ -420,7 +419,19 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     }
     else if (result == DELETE_ID) // Delete
     {
-        processor.deleteGallery();
+        AlertWindow prompt("", "Are you sure you want to delete this gallery?", AlertWindow::AlertIconType::QuestionIcon);
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            processor.deleteGallery();
+        }
     }
     else if (result == OPENOLD_ID) // Load (old)
     {

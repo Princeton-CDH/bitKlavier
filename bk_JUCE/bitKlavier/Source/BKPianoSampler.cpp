@@ -50,6 +50,10 @@ transpose(transp)
         sustain = reg->ampeg.sustain / 100.0f;
         release = reg->ampeg.release;
         
+        loopMode = reg->loop_mode;
+
+        
+        /*
         if ((loopStart < loopEnd) && (loopStart >= 0) && (loopEnd >= 0))
         {
             loopMode = reg->loop_mode-1;
@@ -60,7 +64,7 @@ transpose(transp)
         {
             loopMode = 0;
         }
-        
+         */
     }
     else
     {
@@ -352,13 +356,13 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             else
             {
                 inLoop = true;
-                if (sound->loopMode == 0 || sound->loopMode == 2)
+                if (sound->loopMode == 1 || sound->loopMode == 2)
                 {
                     samplePosition = playLength - 1;
                     loopEnv.setValue(0.0);
                     sampleEnv.setValue(1.0);
                 }
-                else
+                else // loop
                 {
                     samplePosition = 0.0;
                     loopEnv.setValue(1.0f);
@@ -426,6 +430,8 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
     
     int64 loopStart, loopEnd, start, end;
     
+    double bentRatio = pitchRatio * pitchbendMultiplier;
+    
     start = playingSound->start;
     end = playingSound->end;
     loopStart = playingSound->loopStart;
@@ -434,12 +440,12 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
     while (--numSamples >= 0)
     {
         // always increment length
-        lengthTracker += pitchRatio;
+        lengthTracker += bentRatio;
         
         // We always tick loop area sample and begin/end area samples.
         // We envelope on and off each area when needed, and reset sample positions for begin/end.
         //================LOOP STUFF=================
-        loopPosition += pitchRatio;
+        loopPosition += bentRatio;
         if (loopPosition >= loopEnd)
         {
             loopPosition = loopStart;
@@ -479,8 +485,8 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         
         //==============SAMPLE STUFF=================
         float sampleL, sampleR;
-        if (playDirection == Forward)   samplePosition += pitchRatio;
-        else                            samplePosition -= pitchRatio;
+        if (playDirection == Forward)   samplePosition += bentRatio;
+        else                            samplePosition -= bentRatio;
         
         pos = (int) samplePosition;
         alpha = (float) (samplePosition - pos);
@@ -593,6 +599,8 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
     
     int64 loopStart, loopEnd, start, end;
     
+    double bentRatio = pitchRatio * pitchbendMultiplier;
+    
     start = playingSound->start;
     end = playingSound->end;
     loopStart = playingSound->loopStart;
@@ -601,12 +609,12 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
     while (--numSamples >= 0)
     {
         // always increment length
-        lengthTracker += pitchRatio;
+        lengthTracker += bentRatio;
         
         //==============SAMPLE STUFF=================
         float sampleL, sampleR;
-        if (playDirection == Forward)   samplePosition += pitchRatio;
-        else                            samplePosition -= pitchRatio;
+        if (playDirection == Forward)   samplePosition += bentRatio;
+        else                            samplePosition -= bentRatio;
         
         const int pos = (int) samplePosition;
         const float alpha = (float) (samplePosition - pos);
@@ -676,7 +684,7 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
     {
         if (playingSound->isSoundfont)
         {
-            if (playingSound->loopMode == 0 || playingSound->loopMode == 2)
+            if (playingSound->loopMode == 1 || playingSound->loopMode == 2)
             {
                 processSoundfontNoLoop(outputBuffer, startSample, numSamples, playingSound);
             }

@@ -175,6 +175,8 @@ loader(*this)
 
 void BKAudioProcessor::loadSoundfontFromFile(File sfzFile)
 {
+    DBG("filesize: "+ String(sfzFile.getSize()));
+    
     AudioFormatManager formatManager;
     formatManager.registerBasicFormats();
     
@@ -279,6 +281,47 @@ void BKAudioProcessor::loadSoundfontFromFile(File sfzFile)
 
 void BKAudioProcessor::openSoundfont(void)
 {
+#if JUCE_IOS
+    fc = new FileChooser ("Import a soundfont",
+                          File::getCurrentWorkingDirectory(),
+                          "*",
+                          true);
+    
+    fc->launchAsync (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles,
+                     [this] (const FileChooser& chooser)
+                     {
+                         auto results = chooser.getURLResults();
+                         if (results.size() > 0)
+                         {
+                             auto url = results.getReference (0);
+                             
+                             ScopedPointer<InputStream> wi (url.createInputStream (false));
+                             
+                             if (wi != nullptr)
+                             {
+                                 MemoryBlock block(wi->getTotalLength());
+                                 wi->readIntoMemoryBlock(block);
+                                 
+                                 String name = url.getFileName();
+                                 String path = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + name.upToFirstOccurrenceOf(".sf2", false, false) + ".sf2";
+                                 
+                                 DBG("path: " + String(path));
+                                 
+                                 File sfzFile = File(path);
+                                 
+                                 FileOutputStream fos (sfzFile);
+                                 if (fos.write (block.getData(), block.getSize()))
+                                 {
+                                     fos.flush();
+                                     loadSoundfontFromFile(sfzFile);
+                                 }
+
+                                
+                             }
+                         }
+                     });
+
+#else
     FileChooser myChooser ("Load soundfont file...",
                            //File::getSpecialLocation (File::userHomeDirectory),
                            lastGalleryPath,
@@ -290,6 +333,7 @@ void BKAudioProcessor::openSoundfont(void)
         
         loadSoundfontFromFile(sfzFile);
     }
+#endif
         
     
 }
@@ -523,15 +567,6 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
     {
         DBG("change piano to " + String(whichPiano));
         setCurrentPiano(whichPiano);
-        
-        /*
-        if (sustainIsDown)
-        {
-            for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                currentPiano->activePMaps[p]->sustainPedalPressed();
-        }
-        */
-        
     }
     
     // modifications
