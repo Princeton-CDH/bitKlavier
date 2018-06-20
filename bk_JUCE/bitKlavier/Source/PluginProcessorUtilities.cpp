@@ -51,6 +51,8 @@ void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
         loader.startThread();
     }
     
+    isSoundfontLoaded = false;
+    
 }
 
 void BKAudioProcessor::collectSoundfontsFromFolder(File folder)

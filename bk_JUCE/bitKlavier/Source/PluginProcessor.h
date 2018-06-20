@@ -71,8 +71,8 @@ public:
     
     void loadSF2(File sfzFile);
     
+    void openSoundfont(String path);
     void openSoundfont(void);
-    void openSoundfont(int which);
     
     void loadSoundfontFromFile(File sfzFile);
     
@@ -235,7 +235,7 @@ public:
     
     double progress;
     double progressInc;
-    bool didLoadHammersAndRes, didLoadMainPianoSamples;
+    bool didLoadHammersAndRes, didLoadMainPianoSamples, isSoundfontLoaded;
     
     void clearBitKlavier(void);
     

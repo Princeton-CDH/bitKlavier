@@ -371,7 +371,7 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
 
     if (result >= SOUNDFONT_ID)
     {
-        processor.openSoundfont(result-SOUNDFONT_ID);
+        processor.openSoundfont(processor.soundfontNames[result-SOUNDFONT_ID]);
     }
     else if (result == SAVEAS_ID)
     {

@@ -176,6 +176,8 @@ loader(*this)
 
 void BKAudioProcessor::loadSoundfontFromFile(File sfzFile)
 {
+    currentSoundfont = sfzFile.getFullPathName();
+    
     DBG("filesize: "+ String(sfzFile.getSize()));
     
     AudioFormatManager formatManager;
@@ -272,17 +274,15 @@ void BKAudioProcessor::loadSoundfontFromFile(File sfzFile)
                                                         vrange,
                                                         region));
     }
-    
+
+    isSoundfontLoaded = true;
     didLoadMainPianoSamples = true;
 }
 
-void BKAudioProcessor::openSoundfont(int which)
+void BKAudioProcessor::openSoundfont(String path)
 {
 #if !JUCE_IOS
-    DBG("number of soundfonts: " + String(soundfontNames.size()));
-    
-    DBG("tryna load soundfont: " + soundfontNames[which]);
-    File sfzFile (soundfontNames[which]);
+    File sfzFile (path);
     
     loadSoundfontFromFile(sfzFile);
 #endif
@@ -345,7 +345,6 @@ void BKAudioProcessor::openSoundfont(void)
         loadSoundfontFromFile(sfzFile);
     }
 #endif
-        
     
 }
 
@@ -371,10 +370,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     gallery->prepareToPlay(sampleRate);
     
 #if JUCE_DEBUG
-    File file("~/soundfonts/Orgue de salon.sf2");
-    loadSoundfontFromFile(file);
-    
-    //loadPianoSamples(BKLoadLite);
+
 #else
     
 #if JUCE_IOS

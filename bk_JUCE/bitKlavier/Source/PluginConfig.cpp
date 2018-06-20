@@ -80,6 +80,9 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
         galleryVT.setProperty("defaultLoaded", (int)defaultLoaded, 0);
         galleryVT.setProperty("defaultName", defaultName, 0);
         
+        galleryVT.setProperty("loadSoundfont", (int)isSoundfontLoaded, 0);
+        galleryVT.setProperty("soundfontURL", currentSoundfont, 0);
+        
         galleryVT.setProperty("galleryPath", gallery->getURL(), 0);
         
         galleryVT.setProperty("defaultPiano", currentPiano->getId(), 0);
@@ -94,16 +97,6 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
         
         ScopedPointer<XmlElement> galleryXML = galleryVT.createXml();
         copyXmlToBinary (*galleryXML, destData);
-        
-        
-        /* //this will save entire state, rather than just which Gallery/Piano is being used
-        ValueTree galleryVT = gallery->getState();
-    
-        ScopedPointer<XmlElement> galleryXML = galleryVT.createXml();
-        
-        copyXmlToBinary (*galleryXML, destData);
-         */
-        
     }
 }
 
@@ -121,6 +114,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
         ScopedPointer<XmlElement> galleryXML (getXmlFromBinary (data, sizeInBytes));
         if (galleryXML != nullptr)
         {
+            DBG(galleryXML->createDocument("haha"));
             defaultLoaded = (bool) galleryXML->getStringAttribute("defaultLoaded").getIntValue();
             
             if (defaultLoaded)
@@ -153,6 +147,28 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             setCurrentPiano(galleryXML->getStringAttribute("defaultPiano").getIntValue());
             
             initializeGallery();
+            
+            isSoundfontLoaded = (bool)(galleryXML->getStringAttribute("loadSoundfont").getIntValue());
+    
+            
+            if (isSoundfontLoaded)
+            {
+                currentSoundfont = galleryXML->getStringAttribute("soundfontURL");
+                openSoundfont(currentSoundfont);
+            }
+            else
+            {
+                currentSoundfont = "";
+#if JUCE_DEBUG
+                loadPianoSamples(BKLoadLite);
+#else
+#if JUCE_IOS
+                loadPianoSamples(BKLoadMedium);
+#else
+                loadPianoSamples(BKLoadHeavy);
+#endif
+#endif
+            }
             
         }
     
