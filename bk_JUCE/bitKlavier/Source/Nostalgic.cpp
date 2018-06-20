@@ -126,6 +126,10 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel, bool p
                                  nostalgic->aPrep->getReverseRelease() );
                 }
                 
+                activeNotes.removeFirstMatchingValue(midiNoteNumber);
+                noteOn.set(midiNoteNumber, false);
+                noteLengthTimers.set(midiNoteNumber, 0);
+                
                 reverseNotes.insert(0, new NostalgicNoteStuff(midiNoteNumber));
                 NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
                 currentNote->setPrepAtKeyOn(nostalgic->aPrep);
@@ -351,10 +355,14 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
         }
     }
     
-    activeNotes.addIfNotAlreadyThere(midiNoteNumber);
-    //activeNotes.add(midiNoteNumber);
+    //activeNotes is for measuring lengths of held notes, so only relevant in NoteLengthSync mode
+    if(nostalgic->aPrep->getMode() == NoteLengthSync)
+    {
+        activeNotes.addIfNotAlreadyThere(midiNoteNumber);
+        noteLengthTimers.set(midiNoteNumber, 0);
+    }
+    
     noteOn.set(midiNoteNumber, true);
-    noteLengthTimers.set(midiNoteNumber, 0);
     velocities.set(midiNoteNumber, midiNoteVelocity);
     
 }

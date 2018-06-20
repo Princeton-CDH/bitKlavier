@@ -130,6 +130,12 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     //add note to array of depressed notes
     keysDepressed.addIfNotAlreadyThere(noteNumber);
     
+    beatThresholdSamples = (tempo->getTempo()->aPrep->getBeatThresh() * sampleRate);
+    numSamplesBeat =    beatThresholdSamples *
+                        synchronic->aPrep->getBeatMultipliers()[beatMultiplierCounter] *
+                        general->getPeriodMultiplier() *
+                        tempo->getPeriodMultiplier();
+    
     //add to adaptive tempo history, update adaptive tempo
     //atNewNote();
     
@@ -361,7 +367,7 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
                         //adaptiveTempoPeriodMultiplier;
     }
     
-    //DBG("time in ms to next beat = " + String(timeToReturn * 1000./sampleRate));
+    DBG("time in ms to next beat = " + String(timeToReturn * 1000./sampleRate));
     return timeToReturn * 1000./sampleRate; //optimize later....
 }
 
