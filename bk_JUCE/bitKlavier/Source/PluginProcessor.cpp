@@ -72,6 +72,7 @@ loader(*this)
     uiScaleFactor = (uiScaleFactor > 1.0f) ? 1.0f : uiScaleFactor;
     
     collectGalleries();
+    collectSoundfonts();
     
     updateUI();
     
@@ -198,16 +199,15 @@ void BKAudioProcessor::loadSoundfontFromFile(File sfzFile)
     if      (ext == ".sf2")
     {
         sf2sound   = new sfzero::SF2Sound(sfzFile);
-        //sf2sound->useSubsound(0);
+        
         
         sf2reader  = new sfzero::SF2Reader(sf2sound, sfzFile);
         
-        sf2sound->loadRegions();
+        sf2sound->loadRegions(0);
         sf2sound->loadSamples(&formatManager);
         
         regions.clear();
         regions = sf2sound->getRegions();
-        DBG("regions.size: " + String(regions.size()));
     }
     else if (ext == ".sfz")
     {
@@ -215,7 +215,7 @@ void BKAudioProcessor::loadSoundfontFromFile(File sfzFile)
         
         sfzreader  = new sfzero::Reader(sfzsound);
         
-        sfzsound->loadRegions();
+        sfzsound->loadRegions(0);
         sfzsound->loadSamples(&formatManager);
         
         regions.clear();
@@ -227,7 +227,6 @@ void BKAudioProcessor::loadSoundfontFromFile(File sfzFile)
     int count = 0;
     for (auto region : regions)
     {
-        
         int64 sampleStart = region->offset;
         
         int64 sampleLength = region->end - sampleStart;
@@ -241,9 +240,7 @@ void BKAudioProcessor::loadSoundfontFromFile(File sfzFile)
         AudioSampleBuffer* destBuffer = buffer->getAudioSampleBuffer();
         
         destBuffer->copyFrom(0, 0, sourceBuffer->getReadPointer(0, sampleStart), (int)sampleLength);
-        
-        
-        
+    
         DBG("region " + String(count) + " offset: " + String(region->offset));
         region->end             -= region->offset;
         region->loop_start      -= region->offset;
@@ -277,6 +274,20 @@ void BKAudioProcessor::loadSoundfontFromFile(File sfzFile)
     }
     
     didLoadMainPianoSamples = true;
+}
+
+void BKAudioProcessor::openSoundfont(int which)
+{
+#if !JUCE_IOS
+    DBG("number of soundfonts: " + String(soundfontNames.size()));
+    
+    DBG("tryna load soundfont: " + soundfontNames[which]);
+    File sfzFile (soundfontNames[which]);
+    
+    loadSoundfontFromFile(sfzFile);
+#endif
+    
+    
 }
 
 void BKAudioProcessor::openSoundfont(void)
@@ -360,10 +371,10 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     gallery->prepareToPlay(sampleRate);
     
 #if JUCE_DEBUG
-    //File file("~/soundfonts/drums/1276-The KiKaZ DrUmZ.sf2");
-    //loadSoundfontFromFile(file);
+    File file("~/soundfonts/Orgue de salon.sf2");
+    loadSoundfontFromFile(file);
     
-    loadPianoSamples(BKLoadLite);
+    //loadPianoSamples(BKLoadLite);
 #else
     
 #if JUCE_IOS

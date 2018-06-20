@@ -72,6 +72,7 @@ public:
     void loadSF2(File sfzFile);
     
     void openSoundfont(void);
+    void openSoundfont(int which);
     
     void loadSoundfontFromFile(File sfzFile);
     
@@ -98,6 +99,9 @@ public:
     StringArray                         galleryNames;
     String                              currentGallery;
     
+    StringArray                         soundfontNames;
+    String                              currentSoundfont;
+    
     bool                                defaultLoaded;
     String                              defaultName;
     
@@ -113,7 +117,9 @@ public:
     void updateGalleries(void);
     
     void collectGalleries(void);
+    void collectSoundfonts(void);
     void collectGalleriesFromFolder(File folder);
+    void collectSoundfontsFromFolder(File folder);
     
     void updateUI(void);
     

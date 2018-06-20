@@ -53,6 +53,19 @@ void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
     
 }
 
+void BKAudioProcessor::collectSoundfontsFromFolder(File folder)
+{
+    DirectoryIterator iter (File (folder), true, "*.sf2");
+    while (iter.next())
+    {
+        File soundfontFile (iter.getFile());
+        
+        soundfontNames.add(soundfontFile.getFullPathName());
+    }
+    
+    
+}
+
 void BKAudioProcessor::collectGalleriesFromFolder(File folder)
 {
     DirectoryIterator xmlIter (File (folder), true, "*.xml");
@@ -86,6 +99,21 @@ void BKAudioProcessor::collectGalleries(void)
 #endif
     
     collectGalleriesFromFolder(bkGalleries);
+}
+
+void BKAudioProcessor::collectSoundfonts(void)
+{
+    soundfontNames.clear();
+    
+    File bkSoundfonts;
+    
+#if JUCE_IOS
+    bkSoundfonts = File::getSpecialLocation (File::userDocumentsDirectory);
+#else
+    bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("soundfonts");
+#endif
+    
+    collectSoundfontsFromFolder(bkSoundfonts);
 }
 
 String BKAudioProcessor::firstGallery(void)

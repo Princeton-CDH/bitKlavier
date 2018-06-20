@@ -11,7 +11,7 @@
 #include "BKPianoSampler.h"
 #include "AudioConstants.h"
 
-#define FADE 5
+#define FADE 4
 
 BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                           BKReferenceCountedBuffer::Ptr buffer,
@@ -40,7 +40,7 @@ transpose(transp)
     {
         isSoundfont = true;
         
-        loopStart = reg->loop_start;
+        loopStart = reg->loop_start; // loop start and end take in account minimum fade amt
         loopEnd = reg->loop_end;
         start = reg->offset;
         end = reg->end;
@@ -51,20 +51,6 @@ transpose(transp)
         release = reg->ampeg.release;
         
         loopMode = reg->loop_mode;
-
-        
-        /*
-        if ((loopStart < loopEnd) && (loopStart >= 0) && (loopEnd >= 0))
-        {
-            loopMode = reg->loop_mode-1;
-            
-            if ((loopMode == 0) || (loopMode == 2)) loopMode = 1;
-        }
-        else
-        {
-            loopMode = 0;
-        }
-         */
     }
     else
     {
@@ -376,8 +362,19 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                     float lengthEnvSec = lengthEnv / getSampleRate();
                     
                     sfzadsr.setValue(0.0f);
-                    sfzadsr.setAllTimes(lengthEnvSec - 0.01f, 0.01f, 0.0f, 0.001f);
-                    sfzEnvApplied = false;
+                    if (lengthEnvSec <= 0.005f)
+                    {
+                        sfzadsr.setAllTimes(0.005f, 0.001f, 1.0f, 0.005f);
+                        sfzadsr.keyOn();
+                        sfzEnvApplied = true;
+                    }
+                    else
+                    {
+                        sfzadsr.setAllTimes(lengthEnvSec - 0.01f, 0.01f, 0.0f, 0.001f);
+                        sfzEnvApplied = false;
+                    }
+                    
+                    
                 }
             }
         }
@@ -520,7 +517,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
             
             if (playType != Normal)
             {
-                if ((adsr.getState() != stk::ADSR::RELEASE) && (lengthTracker >= (playLength-FADE)))
+                if ((adsr.getState() != stk::ADSR::RELEASE) && (lengthTracker >= (playLength - (0.005f * getSampleRate()))))
                 {
                     adsr.keyOff();
                     sfzadsr.keyOff();

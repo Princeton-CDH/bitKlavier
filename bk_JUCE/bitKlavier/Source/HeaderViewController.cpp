@@ -111,6 +111,7 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     PopupMenu loadMenu;
     loadMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
+    
     loadMenu.addItem(LOAD_LITEST,   "Lightest", processor.currentSampleType != BKLoadLitest, processor.currentSampleType == BKLoadLitest);
 
     loadMenu.addItem(LOAD_LITE,     "Light", processor.currentSampleType != BKLoadLite, processor.currentSampleType == BKLoadLite);
@@ -118,6 +119,15 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     loadMenu.addItem(LOAD_MEDIUM,   "Medium", processor.currentSampleType != BKLoadMedium, processor.currentSampleType == BKLoadMedium);
    
     loadMenu.addItem(LOAD_HEAVY,    "Heavy", processor.currentSampleType != BKLoadHeavy, processor.currentSampleType == BKLoadHeavy);
+    
+    loadMenu.addSeparator();
+    
+    int i = 0;
+    for (auto sf : processor.soundfontNames)
+    {
+        String sfName = sf.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf2", false, true);
+        loadMenu.addItem(SOUNDFONT_ID + (i++), sfName);
+    }
     
     return loadMenu;
 }
@@ -167,8 +177,6 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addItem(CLEAN_ID, "Clean");
     galleryMenu.addSeparator();
     galleryMenu.addSubMenu("Load Samples", getLoadMenu());
-    galleryMenu.addSeparator();
-    galleryMenu.addItem(SOUNDFONT_ID, "Load Soundfont");
     galleryMenu.addSeparator();
     
     // ~ ~ ~ share menu ~ ~ ~
@@ -361,9 +369,9 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         //processor.createGalleryWithName(processor.gallery->getName());
     }
 
-    if (result == SOUNDFONT_ID)
+    if (result >= SOUNDFONT_ID)
     {
-        processor.openSoundfont();
+        processor.openSoundfont(result-SOUNDFONT_ID);
     }
     else if (result == SAVEAS_ID)
     {

@@ -80,7 +80,7 @@
 #define EXPORT_ID 50
 #define IMPORT_ID 51
 
-#define SOUNDFONT_ID 52
+#define SOUNDFONT_ID 1000
 
 inline PopupMenu getNewItemMenu(LookAndFeel* laf)
 {
