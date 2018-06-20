@@ -529,6 +529,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     int time;
     MidiMessage m;
+    bool didNoteOffs = false;
     
     int numSamples = buffer.getNumSamples();
     if(numSamples != levelBuf.getNumSamples()) levelBuf.setSize(buffer.getNumChannels(), numSamples);
@@ -560,7 +561,6 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
         int noteNumber = m.getNoteNumber();
-        //DBG("note: " + String(noteNumber) + " " + String(m.getVelocity()));
         float velocity = m.getFloatVelocity();
          
         channel = m.getChannel();
@@ -572,6 +572,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         else if (m.isNoteOff())
         {
             handleNoteOff(noteNumber, velocity, channel);
+            didNoteOffs = true;
         }
         
         if (m.isSustainPedalOn())
@@ -590,6 +591,8 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             else                    sustainDeactivate();
         }
     }
+    
+    if(didNoteOffs && !sustainIsDown) prevPianos.clearQuick();
     
     // Sets some flags to determine whether to send noteoffs to previous pianos.
     if (!allNotesOff && !noteOnCount) {
