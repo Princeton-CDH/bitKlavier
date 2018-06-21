@@ -19,6 +19,120 @@ String notes[4] = {"A","C","D#","F#"};
 
 #define EXIT_CHECK if (threadShouldExit()) { processor.updateState->pianoSamplesAreLoading = false; return; }
 
+void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
+{
+    BKSynthesiser* synth = &processor.mainPianoSynth;
+    
+    processor.currentSoundfont = sfzFile.getFullPathName();
+    
+    DBG("filesize: "+ String(sfzFile.getSize()));
+    
+    AudioFormatManager formatManager;
+    formatManager.registerBasicFormats();
+    
+    String ext = sfzFile.getFileExtension();
+    
+    synth->clearVoices();
+    synth->clearSounds();
+    
+    for (int i = 0; i < 300; ++i)
+    {
+        synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
+    }
+    
+    ScopedPointer<sfzero::SF2Sound>     sf2sound;
+    ScopedPointer<sfzero::SF2Reader>    sf2reader;
+    ScopedPointer<sfzero::Sound>     sfzsound;
+    ScopedPointer<sfzero::Reader>    sfzreader;
+    
+    if      (ext == ".sf2")
+    {
+        sf2sound   = new sfzero::SF2Sound(sfzFile);
+        
+        
+        sf2reader  = new sfzero::SF2Reader(sf2sound, sfzFile);
+        
+        sf2sound->loadRegions(0);
+        sf2sound->loadSamples(&formatManager);
+        
+        processor.regions.clear();
+        processor.regions = sf2sound->getRegions();
+        
+        processor.progress = 0.0;
+        processor.progressInc = 1.0 / processor.regions.size();
+    }
+    else if (ext == ".sfz")
+    {
+        sfzsound   = new sfzero::Sound(sfzFile);
+        
+        sfzreader  = new sfzero::Reader(sfzsound);
+        
+        sfzsound->loadRegions(0);
+        sfzsound->loadSamples(&formatManager);
+        
+        processor.regions.clear();
+        processor.regions = sfzsound->getRegions();
+        DBG("regions.size: " + String(processor.regions.size()));
+    }
+    else    return;
+    
+    int count = 0;
+    for (auto region : processor.regions)
+    {
+        processor.progress += processor.progressInc;
+        
+        int64 sampleStart = region->offset;
+        
+        int64 sampleLength = region->end - sampleStart;
+        double sourceSampleRate = region->sample->getSampleRate();
+        
+        // check out fluidsynth as alternative
+        AudioSampleBuffer* sourceBuffer = region->sample->getBuffer();
+        
+        BKReferenceCountedBuffer::Ptr buffer = new BKReferenceCountedBuffer(region->sample->getShortName(), 1, (int)sampleLength);
+        
+        AudioSampleBuffer* destBuffer = buffer->getAudioSampleBuffer();
+        
+        destBuffer->copyFrom(0, 0, sourceBuffer->getReadPointer(0, sampleStart), (int)sampleLength);
+        
+        DBG("region " + String(count) + " offset: " + String(region->offset));
+        region->end             -= region->offset;
+        region->loop_start      -= region->offset;
+        region->loop_end        -= region->offset;
+        region->offset           = 0;
+        
+        DBG("region " + String(count) + " | transp: " + String(region->transpose) + "   keycenter: " + String(region->pitch_keycenter) + " keytrack: " + String(region->pitch_keytrack));
+        
+        DBG("region " + String(count++) + " |   end: " + String(region->end) + "   ls: " + String(region->loop_start) + "   le: " + String(region->loop_end) + "   keyrange: " + String(region->lokey) + "-" + String(region->hikey) + "   velrange: " + String(region->lovel) + "-" + String(region->hivel));
+        
+        if ((region->lokey == region->hikey) && (region->lokey != region->pitch_keycenter))
+        {
+            region->transpose = region->lokey - region->pitch_keycenter;
+        }
+        
+        int nbits = region->hikey - region->lokey;
+        int vbits = region->hivel - region->lovel;
+        BigInteger nrange; nrange.setRange(region->lokey, nbits+1, true);
+        BigInteger vrange; vrange.setRange(region->lovel, vbits+1, true);
+        
+        
+        synth->addSound(new BKPianoSamplerSound(region->sample->getShortName(),
+                                                        buffer,
+                                                        sampleLength,
+                                                        sourceSampleRate,
+                                                        nrange,
+                                                        region->pitch_keycenter,
+                                                        region->transpose,
+                                                        vrange,
+                                                        region));
+    }
+    
+    processor.isSoundfontLoaded = true;
+    processor.didLoadMainPianoSamples = true;
+}
+
+
+
 void BKSampleLoader::run(void)
 {
     BKSampleLoadType type = processor.currentSampleType;
@@ -27,22 +141,31 @@ void BKSampleLoader::run(void)
     
     EXIT_CHECK;
     
-    loadMainPianoSamples(type);
-    
-    EXIT_CHECK;
-    
-    processor.didLoadMainPianoSamples = true;
-    
-    if (!processor.didLoadHammersAndRes && type == BKLoadHeavy)
+    if (type == BKLoadSoundfont)
     {
-        processor.didLoadHammersAndRes = true;
-        loadHammerReleaseSamples();
+        File file (processor.currentSoundfont);
+        
+        loadSoundfontFromFile(file);
+    }
+    else
+    {
+        loadMainPianoSamples(type);
         
         EXIT_CHECK;
         
-        loadResonanceReleaseSamples();
+        processor.didLoadMainPianoSamples = true;
         
-        loadPedalSamples();
+        if (!processor.didLoadHammersAndRes && type == BKLoadHeavy)
+        {
+            processor.didLoadHammersAndRes = true;
+            loadHammerReleaseSamples();
+            
+            EXIT_CHECK;
+            
+            loadResonanceReleaseSamples();
+            
+            loadPedalSamples();
+        }
     }
     
     processor.updateState->pianoSamplesAreLoading = false;
@@ -182,8 +305,6 @@ void BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
                                                                         0,
                                                                         velocityRange));
                     }
-                    
-                    
                     
                     processor.progress += processor.progressInc;
                     DBG(soundName+": " + String(processor.progress));

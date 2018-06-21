@@ -39,6 +39,7 @@ private:
     
     void run(void) override;
     
+    void loadSoundfontFromFile(File sfzFile);
     void loadMainPianoSamples(BKSampleLoadType type);
     void loadResonanceReleaseSamples(void);
     void loadHammerReleaseSamples(void);

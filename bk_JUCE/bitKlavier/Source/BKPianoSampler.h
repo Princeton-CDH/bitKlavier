@@ -86,12 +86,13 @@ private:
     int rampOnSamples, rampOffSamples;
 
     int64 loopStart, loopEnd;
+    int64 delayS, holdS;
     int64 start, end;
-    float attack,decay,sustain,release; // for sfz
+    float attack,decay,sustain,release, hold, delay; // for sfz
     int loopMode; // sample_loop = 0, no_loop, one_shot, loop_continuous, loop_sustain
     /*
-     0 indicates a sound reproduced with no loop,
-     1 indicates a sound which loops continuously,
+     0
+     1 indicates a sound reproduced with no loop,
      2 is unused but should be interpreted as indicating no loop, and
      3 indicates a sound which loops for the duration of key depression then proceeds to play the remainder of the sample
      */

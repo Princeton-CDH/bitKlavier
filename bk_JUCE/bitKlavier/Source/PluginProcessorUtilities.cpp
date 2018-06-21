@@ -25,10 +25,22 @@ void BKAudioProcessor::updateUI(void)
     updateState->keymapDidChange = true;
 }
 
-void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
+void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path)
 {
     // TO IMPLEMENT: Should turn off all notes in the processors/synths before loading new samples.
-    if(type >= 0 && currentSampleType != type)
+    if (type == BKLoadSoundfont)
+    {
+        if (path == "") return;
+        
+        currentSampleType = BKLoadSoundfont;
+        
+        currentSoundfont = path;
+        
+        loader.startThread();
+        
+        isSoundfontLoaded = true;
+    }
+    else if (type < BKLoadSoundfont && currentSampleType != type)
     {
         currentSampleType = type;
         
@@ -49,9 +61,11 @@ void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
         DBG("progressInc: " + String(progressInc));
         
         loader.startThread();
+        
+        isSoundfontLoaded = false;
     }
     
-    isSoundfontLoaded = false;
+    
     
 }
 
@@ -64,8 +78,6 @@ void BKAudioProcessor::collectSoundfontsFromFolder(File folder)
         
         soundfontNames.add(soundfontFile.getFullPathName());
     }
-    
-    
 }
 
 void BKAudioProcessor::collectGalleriesFromFolder(File folder)
@@ -116,6 +128,7 @@ void BKAudioProcessor::collectSoundfonts(void)
 #endif
     
     collectSoundfontsFromFolder(bkSoundfonts);
+    soundfontNames.sort(true);
 }
 
 String BKAudioProcessor::firstGallery(void)

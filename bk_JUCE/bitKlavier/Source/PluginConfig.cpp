@@ -91,10 +91,6 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
         
         DBG("sustain inversion saved: " + String((int)getSustainInversion()));
         
-        DBG("saving gallery and piano to plugin state: getStateInformation() "
-            +  gallery->getURL() + " "
-            + String(currentPiano->getId()));
-        
         ScopedPointer<XmlElement> galleryXML = galleryVT.createXml();
         copyXmlToBinary (*galleryXML, destData);
     }
@@ -102,11 +98,6 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
 
 void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
-    
-    //loadGallery
     if (galleryDidLoad)
     {
         DBG("BKAudioProcessor::setStateInformation");
@@ -154,35 +145,23 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             if (isSoundfontLoaded)
             {
                 currentSoundfont = galleryXML->getStringAttribute("soundfontURL");
-                openSoundfont(currentSoundfont);
+                loadSamples(BKLoadSoundfont, currentSoundfont);
             }
             else
             {
                 currentSoundfont = "";
 #if JUCE_DEBUG
-                loadPianoSamples(BKLoadLite);
+                loadSamples(BKLoadLite);
 #else
 #if JUCE_IOS
-                loadPianoSamples(BKLoadMedium);
+                loadSamples(BKLoadMedium);
 #else
-                loadPianoSamples(BKLoadHeavy);
+                loadSamples(BKLoadHeavy);
 #endif
 #endif
             }
             
         }
-    
-        
-        /* //will load entire state rather than just galleryPath, assuming it has been saved
-        ScopedPointer<XmlElement> galleryXML (getXmlFromBinary (data, sizeInBytes));
-        if (galleryXML != nullptr)
-        {
-            gallery = new Gallery(galleryXML, *this);
-            
-            initializeGallery();
-
-        }
-         */
     }
 }
 

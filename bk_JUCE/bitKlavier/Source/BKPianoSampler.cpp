@@ -11,7 +11,7 @@
 #include "BKPianoSampler.h"
 #include "AudioConstants.h"
 
-#define FADE 4
+#define FADE 10
 
 BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                           BKReferenceCountedBuffer::Ptr buffer,
@@ -45,7 +45,9 @@ transpose(transp)
         start = reg->offset;
         end = reg->end;
         
+        delay = reg->ampeg.delay;
         attack = reg->ampeg.attack;
+        hold = reg->ampeg.hold;
         decay = reg->ampeg.decay;
         sustain = reg->ampeg.sustain / 100.0f;
         release = reg->ampeg.release;
@@ -362,19 +364,21 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                     float lengthEnvSec = lengthEnv / getSampleRate();
                     
                     sfzadsr.setValue(0.0f);
-                    if (lengthEnvSec <= 0.005f)
+                    if (sound->sustain > 0.0f)
                     {
-                        sfzadsr.setAllTimes(0.005f, 0.001f, 1.0f, 0.005f);
+                        sfzadsr.setAllTimes(0.001f, 0.001f, sound->sustain, 0.001f);
                         sfzadsr.keyOn();
                         sfzEnvApplied = true;
                     }
                     else
                     {
-                        sfzadsr.setAllTimes(lengthEnvSec - 0.01f, 0.01f, 0.0f, 0.001f);
+                        float sfattack = playLength * - sound->attack;
+                        float sfdecay = sound->attack;
+                
+                        sfzadsr.setAllTimes((sfattack > 0.001f) ? sfattack : 0.001f , (sfdecay > 0.001f) ? sfdecay : 0.001f, 0.0f, 0.001f);
                         sfzEnvApplied = false;
                     }
-                    
-                    
+
                 }
             }
         }
@@ -537,7 +541,6 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
             
             if (!sfzEnvApplied && (reversePosition <= lengthEnv))
             {
-                sfzEnvApplied = true;
                 sfzadsr.keyOn();
             }
             
@@ -558,7 +561,6 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
                 if ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE))
                 {
                     adsr.keyOff();
-                    sfzadsr.keyOff();
                 }
             }
         }
@@ -567,8 +569,18 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
             DBG("Invalid note direction.");
         }
         
-        float l = lgain * adsr.tick() * sfzadsr.tick() * (loopL * loopEnv.tick() + sampleL * sampleEnv.tick());
-        float r = rgain * adsr.lastOut() * sfzadsr.lastOut() * (loopR * loopEnv.lastOut() + sampleR * sampleEnv.lastOut());
+        float l,r;
+        
+        if (playDirection == Forward)
+        {
+            l = lgain * adsr.tick() * sfzadsr.tick() * (loopL * loopEnv.tick() + sampleL * sampleEnv.tick());
+            r = rgain * adsr.lastOut() * sfzadsr.lastOut() * (loopR * loopEnv.lastOut() + sampleR * sampleEnv.lastOut());
+        }
+        else
+        {
+            l = lgain * adsr.tick()* (loopL * loopEnv.tick() + sampleL * sampleEnv.tick());
+            r = rgain * adsr.lastOut() * (loopR * loopEnv.lastOut() + sampleR * sampleEnv.lastOut());
+        }
         
         if (outR != nullptr)
         {

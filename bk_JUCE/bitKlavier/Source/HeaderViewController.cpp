@@ -345,22 +345,22 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     else if (result == LOAD_LITEST)
     {
         processor.gallery->sampleType = BKLoadLitest;
-        processor.loadPianoSamples(BKLoadLitest);
+        processor.loadSamples(BKLoadLitest);
     }
     else if (result == LOAD_LITE)
     {
         processor.gallery->sampleType = BKLoadLite;
-        processor.loadPianoSamples(BKLoadLite);
+        processor.loadSamples(BKLoadLite);
     }
     else if (result == LOAD_MEDIUM)
     {
         processor.gallery->sampleType = BKLoadMedium;
-        processor.loadPianoSamples(BKLoadMedium);
+        processor.loadSamples(BKLoadMedium);
     }
     else if (result == LOAD_HEAVY)
     {
         processor.gallery->sampleType = BKLoadHeavy;
-        processor.loadPianoSamples(BKLoadHeavy);
+        processor.loadSamples(BKLoadHeavy);
     }
     else if (result == SAVE_ID)
     {
@@ -371,7 +371,7 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
 
     if (result >= SOUNDFONT_ID)
     {
-        processor.openSoundfont(processor.soundfontNames[result-SOUNDFONT_ID]);
+        processor.loadSamples(BKLoadSoundfont, processor.soundfontNames[result-SOUNDFONT_ID]);
     }
     else if (result == SAVEAS_ID)
     {

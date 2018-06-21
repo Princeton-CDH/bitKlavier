@@ -71,10 +71,7 @@ public:
     
     void loadSF2(File sfzFile);
     
-    void openSoundfont(String path);
     void openSoundfont(void);
-    
-    void loadSoundfontFromFile(File sfzFile);
     
     juce::Array<sfzero::Region*> regions;
     
@@ -140,7 +137,7 @@ public:
     
     
     //==============================================================================
-    void loadPianoSamples(BKSampleLoadType type);
+    void loadSamples(BKSampleLoadType type, String path ="");
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 

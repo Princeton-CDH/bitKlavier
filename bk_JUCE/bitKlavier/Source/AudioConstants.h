@@ -735,6 +735,7 @@ typedef enum BKSampleLoadType
     BKLoadLite,
     BKLoadMedium,
     BKLoadHeavy,
+    BKLoadSoundfont,
     BKLoadNil
     
 }BKSampleLoadType;

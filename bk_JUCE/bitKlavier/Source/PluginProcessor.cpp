@@ -174,125 +174,11 @@ loader(*this)
     });
 }
 
-void BKAudioProcessor::loadSoundfontFromFile(File sfzFile)
-{
-    currentSoundfont = sfzFile.getFullPathName();
-    
-    DBG("filesize: "+ String(sfzFile.getSize()));
-    
-    AudioFormatManager formatManager;
-    formatManager.registerBasicFormats();
-    
-    String ext = sfzFile.getFileExtension();
-    
-    mainPianoSynth.clearVoices();
-    mainPianoSynth.clearSounds();
-    
-    for (int i = 0; i < 300; ++i)
-    {
-        mainPianoSynth.addVoice(new BKPianoSamplerVoice(gallery->getGeneralSettings()));
-    }
-    
-    ScopedPointer<sfzero::SF2Sound>     sf2sound;
-    ScopedPointer<sfzero::SF2Reader>    sf2reader;
-    ScopedPointer<sfzero::Sound>     sfzsound;
-    ScopedPointer<sfzero::Reader>    sfzreader;
-    
-    if      (ext == ".sf2")
-    {
-        sf2sound   = new sfzero::SF2Sound(sfzFile);
-        
-        
-        sf2reader  = new sfzero::SF2Reader(sf2sound, sfzFile);
-        
-        sf2sound->loadRegions(0);
-        sf2sound->loadSamples(&formatManager);
-        
-        regions.clear();
-        regions = sf2sound->getRegions();
-    }
-    else if (ext == ".sfz")
-    {
-        sfzsound   = new sfzero::Sound(sfzFile);
-        
-        sfzreader  = new sfzero::Reader(sfzsound);
-        
-        sfzsound->loadRegions(0);
-        sfzsound->loadSamples(&formatManager);
-        
-        regions.clear();
-        regions = sfzsound->getRegions();
-        DBG("regions.size: " + String(regions.size()));
-    }
-    else    return;
-    
-    int count = 0;
-    for (auto region : regions)
-    {
-        int64 sampleStart = region->offset;
-        
-        int64 sampleLength = region->end - sampleStart;
-        double sourceSampleRate = region->sample->getSampleRate();
-
-        // check out fluidsynth as alternative
-        AudioSampleBuffer* sourceBuffer = region->sample->getBuffer();
-        
-        BKReferenceCountedBuffer::Ptr buffer = new BKReferenceCountedBuffer(region->sample->getShortName(), 1, (int)sampleLength);
-        
-        AudioSampleBuffer* destBuffer = buffer->getAudioSampleBuffer();
-        
-        destBuffer->copyFrom(0, 0, sourceBuffer->getReadPointer(0, sampleStart), (int)sampleLength);
-    
-        DBG("region " + String(count) + " offset: " + String(region->offset));
-        region->end             -= region->offset;
-        region->loop_start      -= region->offset;
-        region->loop_end        -= region->offset;
-        region->offset           = 0;
-        
-        DBG("region " + String(count) + " | transp: " + String(region->transpose) + "   keycenter: " + String(region->pitch_keycenter) + " keytrack: " + String(region->pitch_keytrack));
-        
-        DBG("region " + String(count++) + " |   end: " + String(region->end) + "   ls: " + String(region->loop_start) + "   le: " + String(region->loop_end) + "   keyrange: " + String(region->lokey) + "-" + String(region->hikey) + "   velrange: " + String(region->lovel) + "-" + String(region->hivel));
-        
-        if ((region->lokey == region->hikey) && (region->lokey != region->pitch_keycenter))
-        {
-            region->transpose = region->lokey - region->pitch_keycenter;
-        }
-        
-        int nbits = region->hikey - region->lokey;
-        int vbits = region->hivel - region->lovel;
-        BigInteger nrange; nrange.setRange(region->lokey, nbits+1, true);
-        BigInteger vrange; vrange.setRange(region->lovel, vbits+1, true);
-        
-
-        mainPianoSynth.addSound(new BKPianoSamplerSound(region->sample->getShortName(),
-                                                        buffer,
-                                                        sampleLength,
-                                                        sourceSampleRate,
-                                                        nrange,
-                                                        region->pitch_keycenter,
-                                                        region->transpose,
-                                                        vrange,
-                                                        region));
-    }
-
-    isSoundfontLoaded = true;
-    didLoadMainPianoSamples = true;
-}
-
-void BKAudioProcessor::openSoundfont(String path)
-{
-#if !JUCE_IOS
-    File sfzFile (path);
-    
-    loadSoundfontFromFile(sfzFile);
-#endif
-    
-    
-}
 
 void BKAudioProcessor::openSoundfont(void)
 {
 #if JUCE_IOS
+#if JUCE_DEBUG
     fc = new FileChooser ("Import a soundfont",
                           File::getCurrentWorkingDirectory(),
                           "*",
@@ -324,14 +210,14 @@ void BKAudioProcessor::openSoundfont(void)
                                  if (fos.write (block.getData(), block.getSize()))
                                  {
                                      fos.flush();
-                                     loadSoundfontFromFile(sfzFile);
+               
                                  }
 
                                 
                              }
                          }
                      });
-
+#endif
 #else
     FileChooser myChooser ("Load soundfont file...",
                            //File::getSpecialLocation (File::userHomeDirectory),
@@ -342,7 +228,9 @@ void BKAudioProcessor::openSoundfont(void)
     {
         File sfzFile (myChooser.getResult());
         
-        loadSoundfontFromFile(sfzFile);
+        currentSoundfont = sfzFile.getFullPathName();
+        
+        loadSamples(BKLoadSoundfont, sfzFile.getFullPathName());
     }
 #endif
     
