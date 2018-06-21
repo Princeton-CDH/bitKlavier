@@ -23,6 +23,8 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
 {
     BKSynthesiser* synth = &processor.mainPianoSynth;
     
+    processor.progress = 0.0;
+    
     processor.currentSoundfont = sfzFile.getFullPathName();
     
     DBG("filesize: "+ String(sfzFile.getSize()));
@@ -57,8 +59,6 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         
         processor.regions.clear();
         processor.regions = sf2sound->getRegions();
-        
-        processor.progress = 0.0;
         processor.progressInc = 1.0 / processor.regions.size();
     }
     else if (ext == ".sfz")

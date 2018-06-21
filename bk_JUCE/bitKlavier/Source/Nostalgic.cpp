@@ -101,6 +101,9 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel, bool p
                                  30,
                                  offRamp ); //ramp off
                      */
+                    DBG("reverse note on noteNum/offset " +
+                        String(synthNoteNumber) + " " +
+                        String(synthOffset));
                     synth->keyOn(
                                  midiChannel,
                                  midiNoteNumber,
@@ -119,6 +122,10 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel, bool p
                                  nostalgic->aPrep->getReverseSustain(),
                                  nostalgic->aPrep->getReverseRelease() );
                 }
+                
+                activeNotes.removeFirstMatchingValue(midiNoteNumber);
+                noteOn.set(midiNoteNumber, false);
+                noteLengthTimers.set(midiNoteNumber, 0);
                 
                 reverseNotes.insert(0, new NostalgicNoteStuff(midiNoteNumber));
                 NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
@@ -163,6 +170,9 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel, bool p
                              30,
                              offRamp ); //ramp off
                  */
+                DBG("reverse note on noteNum/offset " +
+                    String(synthNoteNumber) + " " +
+                    String(synthOffset));
                 synth->keyOn(
                              midiChannel,
                              midiNoteNumber,
@@ -227,6 +237,9 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel, bool p
                              30,
                              offRamp ); //ramp off
                  */
+                DBG("reverse note on noteNum/offset " +
+                    String(synthNoteNumber) + " " +
+                    String(synthOffset));
                 synth->keyOn(
                              midiChannel,
                              midiNoteNumber,
@@ -303,6 +316,11 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
                              30,
                              offRamp ); //ramp off
                  */
+                
+                DBG("reverse note on noteNum/offset " +
+                    String(synthNoteNumber) + " " +
+                    String(synthOffset));
+                
                 synth->keyOn(
                              midiChannel,
                              midiNoteNumber,
@@ -334,10 +352,14 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
         }
     }
     
-    activeNotes.addIfNotAlreadyThere(midiNoteNumber);
-    //activeNotes.add(midiNoteNumber);
+    //activeNotes is for measuring lengths of held notes, so only relevant in NoteLengthSync mode
+    if(nostalgic->aPrep->getMode() == NoteLengthSync)
+    {
+        activeNotes.addIfNotAlreadyThere(midiNoteNumber);
+        noteLengthTimers.set(midiNoteNumber, 0);
+    }
+    
     noteOn.set(midiNoteNumber, true);
-    noteLengthTimers.set(midiNoteNumber, 0);
     velocities.set(midiNoteNumber, midiNoteVelocity);
     
 }
@@ -372,10 +394,9 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
                     int synthNoteNumber = thisNote->getNoteNumber() +  (int)offset;
                     float synthOffset = offset - (int)offset;
                     
-                    DBG("undertow note on noteNum/Velocity/Gain " +
+                    DBG("undertow note on noteNum/offset " +
                         String(synthNoteNumber) + " " +
-                        String(thisNote->getVelocityAtKeyOn()) + " " +
-                        String(noteOnPrep->getGain() * aGlobalGain));
+                        String(synthOffset));
                     
                     /*
                     synth->keyOn(midiChannel,

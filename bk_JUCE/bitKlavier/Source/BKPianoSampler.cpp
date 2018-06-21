@@ -375,7 +375,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                         float sfattack = playLength * - sound->attack;
                         float sfdecay = sound->attack;
                 
-                        sfzadsr.setAllTimes((sfattack > 0.001f) ? sfattack : 0.001f , (sfdecay > 0.001f) ? sfdecay : 0.001f, 0.0f, 0.001f);
+                        sfzadsr.setAllTimes((sfattack > 0.005f) ? sfattack : 0.005f , (sfdecay > 0.005f) ? sfdecay : 0.005f, 0.0f, 0.005f);
                         sfzEnvApplied = false;
                     }
 
@@ -454,11 +454,12 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         
         float loopL, loopR;
         
-        fadeTracker = loopPosition - loopEnd + FADE;
         
         int pos = (int) loopPosition;
         float alpha = (float) (loopPosition - pos);
         float invAlpha = 1.0f - alpha;
+        /*
+        fadeTracker = loopPosition - loopEnd + FADE;
         
         if (fadeTracker > 0.0)
         {
@@ -477,7 +478,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
             loopR += fade * ((inR != nullptr) ? (inR [fadePos] * fadeInvAlpha + inR [fadePos+1] * fadeAlpha) : loopL);
             
         }
-        else
+        else*/
         {
             loopL = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
             loopR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : loopL;
