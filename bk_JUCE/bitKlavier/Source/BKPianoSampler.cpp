@@ -163,11 +163,13 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         bkType = bktype;
         playType = type;
         playDirection = direction;
-        offset = startingPosition;
-        
         revRamped = false;
         
         playLength = length * pitchRatio;
+        offset = startingPosition * pitchRatio - playLength;
+        offset = (offset > 0.0) ? offset : 0.0;
+        DBG("offset: " + String(offset));
+        
         
         uint64 totalLength = length;
         
@@ -336,6 +338,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             else
             {
                 inLoop = true;
+                
                 if (sound->loopMode == 1 || sound->loopMode == 2)
                 {
                     //samplePosition = playLength - 1;
@@ -354,22 +357,11 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                     lengthEnv = (playLength < lengthEnv) ? playLength : lengthEnv;
                     
                     sfzadsr.setValue(0.0f);
-                    //if (sound->sustain > 0.0f)
-                    {
-                        sfzadsr.setAllTimes(0.001f, 0.001f, 1.0f, 0.001f);
-                        sfzadsr.keyOn();
-                        sfzEnvApplied = true;
-                    }
-                    /*
-                    else
-                    {
-                        float sfattack = playLengthSec - sound->attack;
-                        float sfdecay = sound->attack;
                 
-                        sfzadsr.setAllTimes((sfattack > 0.005f) ? sfattack : 0.005f , (sfdecay > 0.005f) ? sfdecay : 0.005f, 0.0f, 0.005f);
-                        sfzEnvApplied = false;
-                    }
-                     */
+                    sfzadsr.setAllTimes(0.001f, 0.001f, 1.0f, 0.001f);
+                    sfzadsr.keyOn();
+                    sfzEnvApplied = true;
+                    
 
                 }
             }
@@ -502,17 +494,12 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         }
         else if (playDirection == Reverse)
         {
-            if(lengthTracker >= playLength)
+            if (lengthTracker >= playLength)
             {
                 clearCurrentNote(); break;
             }
             
-            int64 reversePosition = playLength - lengthTracker + offset;
-            
-            if (!sfzEnvApplied && (reversePosition <= lengthEnv))
-            {
-                sfzadsr.keyOn();
-            }
+            double reversePosition = playLength - lengthTracker + offset;
             
             // if we are about to leave loop, turn off loopEnv, turn on sampleEnv
             if (inLoop && (reversePosition <= (loopStart + cfSamples)))
@@ -526,7 +513,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
                 sampleEnv.keyOn();
             }
             
-            if ((playType != Normal) && (lengthTracker >= (playLength - FADE)))
+            if ((playType != Normal) && (lengthTracker >= (playLength - (adsr.getReleaseTime() * getSampleRate()))))
             {
                 if ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE))
                 {
