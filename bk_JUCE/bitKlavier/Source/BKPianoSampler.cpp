@@ -170,6 +170,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         
         uint64 totalLength = length;
         
+        /*
         if (sound->isSoundfont)
         {
             if (bkType != MainNote)
@@ -182,6 +183,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             }
         }
         else
+         */
         {
             if (bkType != MainNote)
             {
@@ -306,17 +308,23 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         
         inLoop = false;
         
-        adsr.setSampleRate(getSampleRate());
-        
-        adsr.setAllTimes(adsrAttack / getSampleRate(),
-                         adsrDecay / getSampleRate(),
-                         adsrSustain,
-                         adsrRelease / getSampleRate());
-        
-        adsr.keyOn();
+        //if (!sound->isSoundfont)
+        {
+            adsr.setSampleRate(getSampleRate());
+            
+            adsr.setAllTimes(adsrAttack / getSampleRate(),
+                             adsrDecay / getSampleRate(),
+                             adsrSustain,
+                             adsrRelease / getSampleRate());
+            
+            adsr.keyOn();
+        }
         
         if (sound->isSoundfont)
+        //else
         {
+            samplePosition = sourceSamplePosition; //DT addition
+            
             cfSamples = 50.0;
             sampleEnv.setTime(cfSamples / getSampleRate());
             loopEnv.setTime(cfSamples / getSampleRate());
@@ -326,7 +334,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             if (playDirection == Forward)
             {
                 inLoop = false;
-                samplePosition = 0.0;
+                //samplePosition = 0.0;
                 loopPosition = sound->loopStart * pitchRatio;
                 sampleEnv.setValue(1.0f);
                 loopEnv.setValue(0.0f);
@@ -346,13 +354,13 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                 inLoop = true;
                 if (sound->loopMode == 1 || sound->loopMode == 2)
                 {
-                    samplePosition = playLength - 1;
+                    //samplePosition = playLength - 1;
                     loopEnv.setValue(0.0);
                     sampleEnv.setValue(1.0);
                 }
                 else // loop
                 {
-                    samplePosition = 0.0;
+                    //samplePosition = 0.0;
                     loopEnv.setValue(1.0f);
                     sampleEnv.setValue(0.0f);
                     
