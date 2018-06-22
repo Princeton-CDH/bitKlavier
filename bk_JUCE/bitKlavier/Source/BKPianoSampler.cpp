@@ -603,33 +603,23 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
         }
         else if (playDirection == Reverse)
         {
-            //DT replaced lengthTracker with samplePosition, from processPiano(), which *should* be ok for non-looping samples?
-            if (samplePosition <= playEndPosition)
-            {
-                if ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE))
-                {
-                    adsr.keyOff();
-                }
-            }
-            
-            if(samplePosition <= 0)
-            {
-                clearCurrentNote();
-            }
-            /*
-            if(lengthTracker >= playLength)
+
+            //DT: changed if checks here; lengthTracker already has adsrReleaseTime in it....
+            //if(lengthTracker >= playLength)
+            if(lengthTracker >= playLength + adsr.getReleaseTime() * getSampleRate())
             {
                 clearCurrentNote(); break;
             }
             
-            if ((playType != Normal) && (lengthTracker >= (playLength - (adsr.getReleaseTime() * getSampleRate()))))
+            //if ((playType != Normal) && (lengthTracker >= (playLength - (adsr.getReleaseTime() * getSampleRate()))))
+            if (playType != Normal && lengthTracker >= (playLength))
             {
                 if ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE))
                 {
                     adsr.keyOff();
                 }
             }
-             */
+            
         }
         else
         {
