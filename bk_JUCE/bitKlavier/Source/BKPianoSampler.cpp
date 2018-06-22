@@ -327,9 +327,15 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                 
                 sfzadsr.setSampleRate(getSampleRate());
                 
+                float sustain = sound->sustain;
+                if ((sound->attack == 0.0f) && (sound->decay == 0.0f) && (sound->release == 0.0f))
+                {
+                    sustain = 1.0f;
+                }
+                
                 sfzadsr.setAllTimes((sound->attack > 0.0f) ? sound->attack : 0.001f,
                                     (sound->decay > 0.0f) ? sound->decay : 0.001f,
-                                    sound->sustain,
+                                    sustain,
                                     (sound->release > 0.0f) ? sound->release : 0.001f );
                 
                 sfzEnvApplied = true;
@@ -611,7 +617,6 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
                 clearCurrentNote(); break;
             }
             
-            //if ((playType != Normal) && (lengthTracker >= (playLength - (adsr.getReleaseTime() * getSampleRate()))))
             if (playType != Normal && lengthTracker >= (playLength))
             {
                 if ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE))
