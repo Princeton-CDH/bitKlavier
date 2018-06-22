@@ -163,6 +163,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         bkType = bktype;
         playType = type;
         playDirection = direction;
+        offset = startingPosition;
         
         revRamped = false;
         
@@ -170,136 +171,121 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         
         uint64 totalLength = length;
         
-        /*
-        if (sound->isSoundfont)
+        if (bkType != MainNote)
         {
-            if (bkType != MainNote)
+            
+            //constrain total length minimum to no less than 50ms
+            if(totalLength < .05 * getSampleRate()) totalLength = .05 * getSampleRate();
+            
+            //constrain adsr times
+            uint64 envLen = adsrAttack + adsrDecay + adsrRelease;
+            if(envLen > totalLength) {
+                adsrAttack = adsrAttack * totalLength / envLen;
+                adsrDecay = adsrDecay * totalLength / envLen;
+                adsrRelease = adsrRelease * totalLength / envLen;
+            }
+            
+            //set min adsrTimes, based on 50ms minimum note size.
+            if(adsrAttack < .01 * getSampleRate()) adsrAttack = .01 * getSampleRate();
+            if(adsrDecay < .003 * getSampleRate()) adsrDecay = .003 * getSampleRate();
+            if(adsrRelease < .037 * getSampleRate()) adsrRelease = .037 * getSampleRate();
+            
+            //playLength => how long to play before keyOff/adsrRelease, accounting for playbackSpeed (pitchRatio)
+            playLength = (totalLength - adsrRelease) * pitchRatio;
+            
+        }
+        
+        //playLength should now be the actual duration we want to hear, minus the release time, all scaled for playbackSpeed.
+        
+        //actual maxLength, based on soundfile size, leaving enough samples for release
+        double maxLength = sound->soundLength - adsrRelease * pitchRatio;
+        
+        
+        if (playDirection == Forward)
+        {
+            if (playType == Normal)
             {
-                //should redo this to scale ADSR rather than just set this way...
-                if(adsrAttack  > (0.5 * length))   adsrAttack     = 0.5 * length;
-                if(adsrRelease > (0.5 * length))   adsrRelease    = 0.5 * length;
-                
-                playLength = (length - adsrRelease) * pitchRatio;
+                sourceSamplePosition = 0;
+                playEndPosition = maxLength - 1;
+            }
+            else if (playType == NormalFixedStart)
+            {
+                sourceSamplePosition = startingPosition;
+                playEndPosition = maxLength - 1;
+            }
+            else if (playType == FixedLength)
+            {
+                sourceSamplePosition = 0.0;
+                playEndPosition = jmin(playLength, maxLength) - 1;
+            }
+            else if (playType == FixedLengthFixedStart)
+            {
+                sourceSamplePosition = startingPosition;
+                playEndPosition = jmin( (startingPosition + playLength), maxLength) - 1;
+            }
+            else
+            {
+                DBG("Invalid note type.");
             }
         }
-        else
-         */
+        else if (playDirection == Reverse)
         {
-            if (bkType != MainNote)
+            if (playType == Normal)
             {
-                
-                //constrain total length minimum to no less than 50ms
-                if(totalLength < .05 * getSampleRate()) totalLength = .05 * getSampleRate();
-                
-                //constrain adsr times
-                uint64 envLen = adsrAttack + adsrDecay + adsrRelease;
-                if(envLen > totalLength) {
-                    adsrAttack = adsrAttack * totalLength / envLen;
-                    adsrDecay = adsrDecay * totalLength / envLen;
-                    adsrRelease = adsrRelease * totalLength / envLen;
-                }
-                
-                //set min adsrTimes, based on 50ms minimum note size.
-                if(adsrAttack < .01 * getSampleRate()) adsrAttack = .01 * getSampleRate();
-                if(adsrDecay < .003 * getSampleRate()) adsrDecay = .003 * getSampleRate();
-                if(adsrRelease < .037 * getSampleRate()) adsrRelease = .037 * getSampleRate();
-                
-                //playLength => how long to play before keyOff/adsrRelease, accounting for playbackSpeed (pitchRatio)
-                playLength = (totalLength - adsrRelease) * pitchRatio;
-                
+                sourceSamplePosition = sound->soundLength - 1;
+                playEndPosition = adsrRelease * pitchRatio;
             }
-            
-            //playLength should now be the actual duration we want to hear, minus the release time, all scaled for playbackSpeed.
-            
-            //actual maxLength, based on soundfile size, leaving enough samples for release
-            double maxLength = sound->soundLength - adsrRelease * pitchRatio;
-            
-            
-            if (playDirection == Forward)
+            else if (playType == NormalFixedStart)
             {
-                if (playType == Normal)
+                if (startingPosition < adsrRelease)
                 {
-                    sourceSamplePosition = 0;
-                    playEndPosition = maxLength - 1;
+                    sourceSamplePosition = adsrRelease * pitchRatio;
                 }
-                else if (playType == NormalFixedStart)
+                else if (startingPosition >= sound->soundLength)
                 {
-                    sourceSamplePosition = startingPosition;
-                    playEndPosition = maxLength - 1;
-                }
-                else if (playType == FixedLength)
-                {
-                    sourceSamplePosition = 0.0;
-                    playEndPosition = jmin(playLength, maxLength) - 1;
-                }
-                else if (playType == FixedLengthFixedStart)
-                {
-                    sourceSamplePosition = startingPosition;
-                    playEndPosition = jmin( (startingPosition + playLength), maxLength) - 1;
+                    sourceSamplePosition = (sound->soundLength - 1);
                 }
                 else
                 {
-                    DBG("Invalid note type.");
+                    sourceSamplePosition = startingPosition;
                 }
+                
+                playEndPosition = adsrRelease;
             }
-            else if (playDirection == Reverse)
+            else if (playType == FixedLength)
             {
-                if (playType == Normal)
+                sourceSamplePosition = sound->soundLength - 1;
+                if (playLength >= sourceSamplePosition)
                 {
-                    sourceSamplePosition = sound->soundLength - 1;
-                    playEndPosition = adsrRelease * pitchRatio;
-                }
-                else if (playType == NormalFixedStart)
-                {
-                    if (startingPosition < adsrRelease)
-                    {
-                        sourceSamplePosition = adsrRelease * pitchRatio;
-                    }
-                    else if (startingPosition >= sound->soundLength)
-                    {
-                        sourceSamplePosition = (sound->soundLength - 1);
-                    }
-                    else
-                    {
-                        sourceSamplePosition = startingPosition;
-                    }
-                    
-                    playEndPosition = adsrRelease;
-                }
-                else if (playType == FixedLength)
-                {
-                    sourceSamplePosition = sound->soundLength - 1;
-                    if (playLength >= sourceSamplePosition)
-                    {
-                        playEndPosition = (double)adsrRelease * pitchRatio;
-                    }
-                    else
-                    {
-                        playEndPosition = (double)(sourceSamplePosition - playLength);
-                    }
-                }
-                else if (playType == FixedLengthFixedStart)
-                {
-                    sourceSamplePosition = startingPosition * pitchRatio;
-                    if (playLength >= sourceSamplePosition)
-                    {
-                        playEndPosition = (double)adsrRelease * pitchRatio;
-                    }
-                    else
-                    {
-                        playEndPosition = (double)(sourceSamplePosition - playLength);
-                    }
+                    playEndPosition = (double)adsrRelease * pitchRatio;
                 }
                 else
                 {
-                    DBG("Invalid note type.");
+                    playEndPosition = (double)(sourceSamplePosition - playLength);
+                }
+            }
+            else if (playType == FixedLengthFixedStart)
+            {
+                sourceSamplePosition = startingPosition * pitchRatio;
+                if (playLength >= sourceSamplePosition)
+                {
+                    playEndPosition = (double)adsrRelease * pitchRatio;
+                }
+                else
+                {
+                    playEndPosition = (double)(sourceSamplePosition - playLength);
                 }
             }
             else
             {
-                DBG("Invalid note direction.");
+                DBG("Invalid note type.");
             }
         }
+        else
+        {
+            DBG("Invalid note direction.");
+        }
+        
         
         lgain = gain;
         rgain = gain;
@@ -308,24 +294,22 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         
         inLoop = false;
         
-        //if (!sound->isSoundfont)
-        {
-            adsr.setSampleRate(getSampleRate());
-            
-            adsr.setAllTimes(adsrAttack / getSampleRate(),
-                             adsrDecay / getSampleRate(),
-                             adsrSustain,
-                             adsrRelease / getSampleRate());
-            
-            adsr.keyOn();
-        }
+        adsr.setSampleRate(getSampleRate());
+        
+        adsr.setAllTimes(adsrAttack / getSampleRate(),
+                         adsrDecay / getSampleRate(),
+                         adsrSustain,
+                         adsrRelease / getSampleRate());
+        
+        adsr.keyOn();
+        
+        float playLengthSec = playLength / getSampleRate();
         
         if (sound->isSoundfont)
-        //else
         {
             samplePosition = sourceSamplePosition; //DT addition
             
-            cfSamples = 50.0;
+            cfSamples = 25.0;
             sampleEnv.setTime(cfSamples / getSampleRate());
             loopEnv.setTime(cfSamples / getSampleRate());
             
@@ -335,7 +319,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             {
                 inLoop = false;
                 //samplePosition = 0.0;
-                loopPosition = sound->loopStart * pitchRatio;
+                loopPosition = sound->loopStart;
                 sampleEnv.setValue(1.0f);
                 loopEnv.setValue(0.0f);
                 
@@ -360,7 +344,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                 }
                 else // loop
                 {
-                    //samplePosition = 0.0;
                     loopEnv.setValue(1.0f);
                     sampleEnv.setValue(0.0f);
                     
@@ -369,23 +352,24 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                     lengthEnv =  (sound->attack + sound->decay + sound->release) * getSampleRate();
                     
                     lengthEnv = (playLength < lengthEnv) ? playLength : lengthEnv;
-                    float lengthEnvSec = lengthEnv / getSampleRate();
                     
                     sfzadsr.setValue(0.0f);
-                    if (sound->sustain > 0.0f)
+                    //if (sound->sustain > 0.0f)
                     {
-                        sfzadsr.setAllTimes(0.001f, 0.001f, sound->sustain, 0.001f);
+                        sfzadsr.setAllTimes(0.001f, 0.001f, 1.0f, 0.001f);
                         sfzadsr.keyOn();
                         sfzEnvApplied = true;
                     }
+                    /*
                     else
                     {
-                        float sfattack = playLength * - sound->attack;
+                        float sfattack = playLengthSec - sound->attack;
                         float sfdecay = sound->attack;
                 
                         sfzadsr.setAllTimes((sfattack > 0.005f) ? sfattack : 0.005f , (sfdecay > 0.005f) ? sfdecay : 0.005f, 0.0f, 0.005f);
                         sfzEnvApplied = false;
                     }
+                     */
 
                 }
             }
@@ -462,35 +446,12 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         
         float loopL, loopR;
         
-        
         int pos = (int) loopPosition;
         float alpha = (float) (loopPosition - pos);
         float invAlpha = 1.0f - alpha;
-        /*
-        fadeTracker = loopPosition - loopEnd + FADE;
         
-        if (fadeTracker > 0.0)
-        {
-            float fade = (float)(fadeTracker / FADE);
-            
-            int fadePos = (int) fadeTracker;
-            const float fadeAlpha = (float) (fadeTracker - fadePos);
-            const float fadeInvAlpha = 1.0f - fadeAlpha;
-            
-            fadePos += loopStart-FADE;
-            
-            loopL = (1.0f - fade) * (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-            loopR = (1.0f - fade) * ((inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : loopL);
-            
-            loopL += fade * (inL [fadePos] * fadeInvAlpha + inL [fadePos+1] * fadeAlpha);
-            loopR += fade * ((inR != nullptr) ? (inR [fadePos] * fadeInvAlpha + inR [fadePos+1] * fadeAlpha) : loopL);
-            
-        }
-        else*/
-        {
-            loopL = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-            loopR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : loopL;
-        }
+        loopL = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
+        loopR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : loopL;
         //===========================================
         
         //==============SAMPLE STUFF=================
@@ -546,7 +507,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
                 clearCurrentNote(); break;
             }
             
-            int64 reversePosition = playLength - lengthTracker;
+            int64 reversePosition = playLength - lengthTracker + offset;
             
             if (!sfzEnvApplied && (reversePosition <= lengthEnv))
             {
@@ -580,16 +541,8 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         
         float l,r;
         
-        if (playDirection == Forward)
-        {
-            l = lgain * adsr.tick() * sfzadsr.tick() * (loopL * loopEnv.tick() + sampleL * sampleEnv.tick());
-            r = rgain * adsr.lastOut() * sfzadsr.lastOut() * (loopR * loopEnv.lastOut() + sampleR * sampleEnv.lastOut());
-        }
-        else
-        {
-            l = lgain * adsr.tick()* (loopL * loopEnv.tick() + sampleL * sampleEnv.tick());
-            r = rgain * adsr.lastOut() * (loopR * loopEnv.lastOut() + sampleR * sampleEnv.lastOut());
-        }
+        l = lgain * adsr.tick() * sfzadsr.tick() * (loopL * loopEnv.tick() + sampleL * sampleEnv.tick());
+        r = rgain * adsr.lastOut() * sfzadsr.lastOut() * (loopR * loopEnv.lastOut() + sampleR * sampleEnv.lastOut());
         
         if (outR != nullptr)
         {

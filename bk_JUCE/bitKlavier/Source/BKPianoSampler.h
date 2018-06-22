@@ -203,6 +203,7 @@ private:
     float lgain, rgain, rampOnOffLevel, rampOnDelta, rampOffDelta;
     bool isInRampOn, isInRampOff;
     
+    double offset;
     double cfSamples; // number of samples for crossfade
     
     //double beginPosition, loopPosition, endPosition;

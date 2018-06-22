@@ -19,14 +19,12 @@ position (0),
 name (nameToUse),
 buffer (numChannels, numSamples)
 {
-
-    //DBG (String ("Buffer named '") + name + "' constructed. numChannels = " + String (numChannels) + ", numSamples = " + String (numSamples));
     
 }
 
 BKReferenceCountedBuffer::~BKReferenceCountedBuffer()
 {
-    //DBG (String ("Buffer named '") + name + "' destroyed");
+
 }
 
 AudioSampleBuffer* BKReferenceCountedBuffer::getAudioSampleBuffer()
