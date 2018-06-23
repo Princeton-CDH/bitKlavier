@@ -385,7 +385,7 @@ void BKPianoSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
     if (allowTailOff)
     {
         adsr.keyOff();
-        sfzadsr.keyOff();
+        //sfzadsr.keyOff();
     }
     else
     {
@@ -492,7 +492,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
                 if ((adsr.getState() != stk::ADSR::RELEASE) && (lengthTracker >= (playLength - (0.005f * getSampleRate()))))
                 {
                     adsr.keyOff();
-                    sfzadsr.keyOff();
+                    //sfzadsr.keyOff();
                 }
             }
             
