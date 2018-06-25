@@ -49,7 +49,7 @@ void NostalgicProcessor::postRelease(int midiNoteNumber, int midiChannel)
 }
 
 //begin reverse note; called when key is released
-void NostalgicProcessor::keyReleased(int midiNoteNumber, int midiChannel, bool post)
+void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int midiChannel, bool post)
 {
     float duration = 0.0;
     

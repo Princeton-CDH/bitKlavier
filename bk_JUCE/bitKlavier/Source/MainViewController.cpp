@@ -191,6 +191,16 @@ void MainViewController::resized()
     if (display == DisplayDefault)
     {
         Rectangle<int> footerSlice = area.removeFromBottom(footerHeight + footerHeight * processor.paddingScalarY + gYSpacing);
+        
+        /*
+        Rectangle<int> sampleSlice = footerSlice.removeFromTop(40);
+        
+        sampleSlice.reduce(gXSpacing, gYSpacing);
+        sampleCB.setBounds(sampleSlice.getX(), sampleSlice.getY(), 100, sampleSlice.getHeight());
+        instrumentCB.setBounds(sampleCB.getRight()+gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
+        
+        footerSlice.removeFromTop(40);
+         */
         footerSlice.reduce(gXSpacing, gYSpacing);
         float keyWidth = footerSlice.getWidth() / round((keyEnd - keyStart) * 7./12 + 1); //num white keys
         keyboard->setKeyWidth(keyWidth);

@@ -125,6 +125,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
     
     
                         startNote   (midiNoteNumber,
+                                     64,
                                      gain,
                                      direction,
                                      type,
@@ -133,12 +134,13 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                                      length,
                                      voiceRampOn,
                                      (int)(3*getSampleRate()),
-                                     1.,
+                                     1.0,
                                      voiceRampOff,
                                      s);
 }
 
 void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
+                                     const int pitchWheelValue,
                                      const float gain,
                                      PianoSamplerNoteDirection direction,
                                      PianoSamplerNoteType type,
@@ -153,6 +155,9 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
 {
     if (const BKPianoSamplerSound* const sound = dynamic_cast<const BKPianoSamplerSound*> (s))
     {
+        
+        pitchbendMultiplier = powf(2.0f, (pitchWheelValue / 8192. - 1.)/12.);
+        
         pitchRatio = powf(2.0f, (midiNoteNumber - (float)sound->midiRootNote + sound->transpose) / 12.0f)
         * sound->sourceSampleRate
         * generalSettings->getTuningRatio()
@@ -166,10 +171,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         revRamped = false;
         
         playLength = length * pitchRatio;
-        offset = startingPosition * pitchRatio - playLength;
+        offset = startingPosition - playLength;
         offset = (offset > 0.0) ? offset : 0.0;
-        DBG("offset: " + String(offset));
-        
         
         uint64 totalLength = length;
         
@@ -177,7 +180,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         {
             
             //constrain total length minimum to no less than 50ms
-            if(totalLength < .05 * getSampleRate()) totalLength = .05 * getSampleRate();
+            if(totalLength < 0.05 * getSampleRate()) totalLength = 0.05 * getSampleRate();
             
             //constrain adsr times
             uint64 envLen = adsrAttack + adsrDecay + adsrRelease;
@@ -188,9 +191,9 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             }
             
             //set min adsrTimes, based on 50ms minimum note size.
-            if(adsrAttack < .01 * getSampleRate()) adsrAttack = .01 * getSampleRate();
-            if(adsrDecay < .003 * getSampleRate()) adsrDecay = .003 * getSampleRate();
-            if(adsrRelease < .037 * getSampleRate()) adsrRelease = .037 * getSampleRate();
+            if(adsrAttack < 0.01f * getSampleRate()) adsrAttack = 0.01f * getSampleRate();
+            if(adsrDecay < 0.003f * getSampleRate()) adsrDecay = 0.003f * getSampleRate();
+            if(adsrRelease < 0.037f * getSampleRate()) adsrRelease = 0.037f * getSampleRate();
             
             //playLength => how long to play before keyOff/adsrRelease, accounting for playbackSpeed (pitchRatio)
             playLength = (totalLength - adsrRelease) * pitchRatio;
@@ -305,13 +308,11 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         
         adsr.keyOn();
         
-        float playLengthSec = playLength / getSampleRate();
-        
         if (sound->isSoundfont)
         {
             samplePosition = sourceSamplePosition; //DT addition
             
-            cfSamples = 25.0;
+            cfSamples = 100.0;
             sampleEnv.setTime(cfSamples / getSampleRate());
             loopEnv.setTime(cfSamples / getSampleRate());
             
@@ -397,7 +398,7 @@ void BKPianoSamplerVoice::pitchWheelMoved (const int newValue)
 {
     pitchbendMultiplier = powf(2.0f, (newValue / 8192. - 1.)/12.);
     bentRatio = pitchRatio * pitchbendMultiplier;
-    //DBG("BKPianoSamplerVoice::pitchWheelMoved " + String(pitchbendMultiplier));
+    DBG("BKPianoSamplerVoice::pitchWheelMoved " + String(pitchbendMultiplier));
 }
 
 void BKPianoSamplerVoice::controllerMoved (const int /*controllerNumber*/,
@@ -476,7 +477,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
             }
             
             // if we are about to enter loop, turn on loopEnv, turn off sampleEnv
-            if (!inLoop && (samplePosition >= (loopStart - cfSamples)))
+            if (!inLoop && (samplePosition >= loopStart))
             {
                 inLoop = true;
                 
@@ -500,7 +501,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         }
         else if (playDirection == Reverse)
         {
-            if (lengthTracker >= playLength)
+            if(lengthTracker >= (playLength + adsr.getReleaseTime() * getSampleRate()))
             {
                 clearCurrentNote(); break;
             }
@@ -508,18 +509,20 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
             double reversePosition = playLength - lengthTracker + offset;
             
             // if we are about to leave loop, turn off loopEnv, turn on sampleEnv
-            if (inLoop && (reversePosition <= (loopStart + cfSamples)))
+            if (inLoop && (reversePosition <= (loopStart)))
             {
                 inLoop = false;
                 
                 samplePosition = reversePosition;
                 
-                loopEnv.keyOff();
+                //loopEnv.keyOff();
+                loopEnv.setValue(0.0f);
                 
-                sampleEnv.keyOn();
+                //sampleEnv.keyOn();
+                sampleEnv.setValue(1.0f);
             }
             
-            if ((playType != Normal) && (lengthTracker >= (playLength - (adsr.getReleaseTime() * getSampleRate()))))
+            if ((playType != Normal) && (lengthTracker >= playLength))
             {
                 if ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE))
                 {
@@ -534,8 +537,8 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         
         float l,r;
         
-        l = lgain * adsr.tick() * sfzadsr.tick() * (loopL * loopEnv.tick() + sampleL * sampleEnv.tick());
-        r = rgain * adsr.lastOut() * sfzadsr.lastOut() * (loopR * loopEnv.lastOut() + sampleR * sampleEnv.lastOut());
+        l = lgain * adsr.tick()     * sfzadsr.tick()    * (loopL * loopEnv.tick()       + sampleL * sampleEnv.tick());
+        r = rgain * adsr.lastOut()  * sfzadsr.lastOut() * (loopR * loopEnv.lastOut()    + sampleR * sampleEnv.lastOut());
         
         if (outR != nullptr)
         {
@@ -561,14 +564,7 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
     float* outL = outputBuffer.getWritePointer (0, startSample);
     float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
     
-    int64 loopStart, loopEnd, start, end;
-    
     double bentRatio = pitchRatio * pitchbendMultiplier;
-    
-    start = playingSound->start;
-    end = playingSound->end;
-    loopStart = playingSound->loopStart;
-    loopEnd = playingSound->loopEnd;
     
     while (--numSamples >= 0)
     {
@@ -600,7 +596,7 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
             
             if (playType != Normal)
             {
-                if ((adsr.getState() != stk::ADSR::RELEASE) && (lengthTracker >= (playLength-FADE)))
+                if ((adsr.getState() != stk::ADSR::RELEASE) && (lengthTracker >= playLength))
                 {
                     adsr.keyOff();
                 }
@@ -617,7 +613,7 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
                 clearCurrentNote(); break;
             }
             
-            if (playType != Normal && lengthTracker >= (playLength))
+            if (playType != Normal && (lengthTracker >= playLength))
             {
                 if ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE))
                 {

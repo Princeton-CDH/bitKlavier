@@ -143,6 +143,7 @@ public:
     
     void startNote (
                     float midiNoteNumber,
+                    int pitchWheelValue,
                     float velocity,
                     PianoSamplerNoteDirection direction,
                     PianoSamplerNoteType type,

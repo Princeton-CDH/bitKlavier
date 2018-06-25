@@ -347,7 +347,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
             
             for (auto proc : nprocessor)
             {
-                proc->keyReleased(noteNumber, velocity);
+                proc->keyReleased(noteNumber, velocity, channel);
             }
             
             for (auto proc : sprocessor)

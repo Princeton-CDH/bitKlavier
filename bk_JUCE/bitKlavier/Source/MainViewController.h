@@ -149,6 +149,9 @@ private:
     BKKeymapKeyboardState keyboardState;
     Component *keyboardComponent;
     
+    BKComboBox sampleCB;
+    BKComboBox instrumentCB;
+    
     DisplayType display;
     
     bool initial;

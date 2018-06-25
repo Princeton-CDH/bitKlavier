@@ -842,7 +842,7 @@ public:
     void keyPressed(int midiNoteNumber, float midiNoteVelocity, int midiChannel);
     
     //begin playing reverse note, called with noteOff
-    void keyReleased(int midiNoteNumber, int midiChannel, bool post = false);
+    void keyReleased(int midiNoteNumber, float midiVelocity, int midiChannel, bool post = false);
     
     void postRelease(int midiNoteNumber, int midiChannel);
     

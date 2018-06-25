@@ -74,6 +74,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     
     //==============================================================================
     BKSynthesiser::BKSynthesiser(GeneralSettings::Ptr gen):
+    pitchWheelValue(64),
     generalSettings(gen),
     sampleRate (0),
     lastNoteOnCounter (0),
@@ -87,6 +88,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     }
     
     BKSynthesiser::BKSynthesiser(void):
+    pitchWheelValue(64),
     sampleRate (0),
     lastNoteOnCounter (0),
     minimumSubBlockSize (32),
@@ -474,6 +476,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             float gain = volume;
 
             voice->startNote ((float)midiNoteNumber+midiNoteNumberOffset,
+                              pitchWheelValue,
                               gain,
                               direction,
                               type,
@@ -556,12 +559,15 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     {
         const ScopedLock sl (lock);
         
+        pitchWheelValue = wheelValue;
+        
         for (int i = voices.size(); --i >= 0;)
         {
             BKSynthesiserVoice* const voice = voices.getUnchecked (i);
             
+            //DBG("midichannel: " + String(midiChannel) + " voice active channel: " + String(voice->currentPlayingMidiChannel));
             if (midiChannel <= 0 || voice->isPlayingChannel (midiChannel))
-                voice->pitchWheelMoved (wheelValue);
+                voice->pitchWheelMoved (pitchWheelValue);
         }
     }
     

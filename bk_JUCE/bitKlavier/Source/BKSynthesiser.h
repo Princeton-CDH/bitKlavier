@@ -136,6 +136,7 @@ public:
                             BKSynthesiserSound* sound) = 0;
     
     virtual void startNote (float midiNoteNumber,
+                            int pitchWheelValue,
                             float gain,
                             PianoSamplerNoteDirection direction,
                             PianoSamplerNoteType type,
@@ -721,7 +722,7 @@ private:
                            int numSamples);
     //==============================================================================
     
-    
+    int pitchWheelValue;
     double sampleRate;
     uint32 lastNoteOnCounter;
     int minimumSubBlockSize;
