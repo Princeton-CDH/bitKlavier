@@ -170,7 +170,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         playDirection = direction;
         revRamped = false;
         
-        playLength = length * pitchRatio;
+        playLength = length;
         offset = startingPosition - playLength;
         offset = (offset > 0.0) ? offset : 0.0;
         
@@ -312,7 +312,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         {
             samplePosition = sourceSamplePosition; //DT addition
             
-            cfSamples = 100.0;
+            cfSamples = 10.0;
             sampleEnv.setTime(cfSamples / getSampleRate());
             loopEnv.setTime(cfSamples / getSampleRate());
             
@@ -357,7 +357,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                     loopEnv.setValue(1.0f);
                     sampleEnv.setValue(0.0f);
                     
-                    loopPosition = sound->loopStart * pitchRatio;
+                    loopPosition = sound->loopStart;
                     
                     lengthEnv =  (sound->attack + sound->decay + sound->release) * getSampleRate();
                     
