@@ -67,6 +67,16 @@ timerCallbackCount(0)
     keyStart = 21;  keyEnd = 108;
 #endif
 
+    //~~~~~~~~~~~MENUS~~~~~~~~
+    sampleCB.setLookAndFeel(&laf);
+    instrumentCB.setLookAndFeel(&laf);
+    
+    sampleCB.addListener(this);
+    instrumentCB.addListener(this);
+    
+    addAndMakeVisible(sampleCB);
+    addAndMakeVisible(instrumentCB);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~`
     
     keyboard =  ((BKKeymapKeyboardComponent*) keyboardComponent);
     keyboard->setScrollButtonsVisible(false);
@@ -165,7 +175,7 @@ void MainViewController::resized()
     headerHeight = 40;
     sidebarWidth = 30;
 #endif
-    footerHeight = 50;
+    footerHeight = 60;
     
     
     Rectangle<int> area (getLocalBounds());
@@ -192,20 +202,15 @@ void MainViewController::resized()
     {
         Rectangle<int> footerSlice = area.removeFromBottom(footerHeight + footerHeight * processor.paddingScalarY + gYSpacing);
         
-        /*
-        Rectangle<int> sampleSlice = footerSlice.removeFromTop(40);
-        
-        sampleSlice.reduce(gXSpacing, gYSpacing);
-        sampleCB.setBounds(sampleSlice.getX(), sampleSlice.getY(), 100, sampleSlice.getHeight());
-        instrumentCB.setBounds(sampleCB.getRight()+gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
-        
-        footerSlice.removeFromTop(40);
-         */
         footerSlice.reduce(gXSpacing, gYSpacing);
+        
+        sampleCB.setBounds(footerSlice.getX(), footerSlice.getY(), footerSlice.getWidth() * 0.25, 20);
+        instrumentCB.setBounds(sampleCB.getRight() + gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
+        
         float keyWidth = footerSlice.getWidth() / round((keyEnd - keyStart) * 7./12 + 1); //num white keys
         keyboard->setKeyWidth(keyWidth);
         keyboard->setBlackNoteLengthProportion(0.65);
-        keyboardComponent->setBounds(footerSlice);
+        keyboardComponent->setBounds(footerSlice.getX(), sampleCB.getBottom() + gYSpacing, footerSlice.getWidth(), footerSlice.getHeight() - sampleCB.getHeight());
         keyboardComponent->setVisible(true);
     }
     
@@ -280,7 +285,30 @@ void MainViewController::mouseDown(const MouseEvent &event)
     }
 }
 
-
+void MainViewController::bkComboBoxDidChange(ComboBox* cb)
+{
+    if (cb == &sampleCB)
+    {
+        String name = cb->getText();
+        
+        int selectedId = cb->getSelectedId();
+        
+        if (selectedId <= 4)
+        {
+            processor.loadSamples((BKSampleLoadType)(selectedId - 1));
+        }
+        else
+        {
+            int index = selectedId - BKLoadSoundfont - 1;
+            
+            processor.loadSamples(BKLoadSoundfont, processor.soundfontNames[index], 0);
+        }
+    }
+    else if (cb == &instrumentCB)
+    {
+        processor.loadSamples(BKLoadSoundfont, processor.currentSoundfont, cb->getSelectedItemIndex());
+    }
+}
 
 void MainViewController::bkButtonClicked (Button* b)
 {
@@ -451,18 +479,81 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     return true;
 }
 
+void MainViewController::fillSampleCB()
+{
+    sampleCB.clear(dontSendNotification);
+
+    sampleCB.addItem("Piano (litest)", 1);
+    sampleCB.addItem("Piano (lite)", 2);
+    sampleCB.addItem("Piano (medium)", 3);
+    sampleCB.addItem("Piano (heavy)", 4);
+    
+    if (processor.currentSampleType <= BKLoadHeavy)
+    {
+        sampleCB.setSelectedItemIndex(processor.currentSampleType, dontSendNotification);
+    }
+    
+    int id = 5;
+    for (auto sf : processor.soundfontNames)
+    {
+        String name = sf.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf2", false, true);
+        sampleCB.addItem(name, id);
+        
+        if ((processor.currentSampleType == BKLoadSoundfont) && (name == processor.getCurrentSoundfontName()))
+        {
+            sampleCB.setSelectedId(id, dontSendNotification);
+        }
+        
+        id++;
+    }
+    
+    
+}
+
+void MainViewController::fillInstrumentCB()
+{
+    instrumentCB.clear(dontSendNotification);
+    
+    if (processor.currentSampleType < BKLoadSoundfont)
+    {
+        instrumentCB.setVisible(false);
+    }
+    else
+    {
+        // If theres only one instrument, dont bother showing name
+        if (processor.instrumentNames.size() <= 1)
+        {
+            instrumentCB.setVisible(false);
+        }
+        else
+        {
+            instrumentCB.setVisible(true);
+            int i = 1;
+            for (auto inst : processor.instrumentNames)
+            {
+                instrumentCB.addItem(inst, i++);
+            }
+            
+            instrumentCB.setSelectedItemIndex(processor.currentInstrument, dontSendNotification);
+        }
+    }
+}
 
 
 void MainViewController::timerCallback()
 {
     BKUpdateState::Ptr state = processor.updateState;
     
-    if (++timerCallbackCount >= 50)
+    if (++timerCallbackCount >= 25)
     {
         timerCallbackCount = 0;
         processor.collectGalleries();
         processor.collectSoundfonts();
+        
         header.fillGalleryCB();
+        
+        fillSampleCB();
+        fillInstrumentCB();
     }
     
     Array<bool> noteOns = processor.getNoteOns();

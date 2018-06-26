@@ -24,10 +24,7 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     BKSynthesiser* synth = &processor.mainPianoSynth;
     
     processor.progress = 0.0;
-    
     processor.currentSoundfont = sfzFile.getFullPathName();
-    
-    DBG("filesize: "+ String(sfzFile.getSize()));
     
     AudioFormatManager formatManager;
     formatManager.registerBasicFormats();
@@ -51,11 +48,18 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     {
         sf2sound   = new sfzero::SF2Sound(sfzFile);
         
-        
         sf2reader  = new sfzero::SF2Reader(sf2sound, sfzFile);
         
-        sf2sound->loadRegions(0);
+        sf2sound->loadRegions(processor.currentInstrument);
         sf2sound->loadSamples(&formatManager);
+        
+        processor.currentInstrumentName = sf2sound->subsoundName(processor.currentInstrument);
+        
+        processor.instrumentNames.clear();
+        for (int i = 0; i < sf2sound->numSubsounds(); i++)
+        {
+            processor.instrumentNames.add(sf2sound->subsoundName(i));
+        }
         
         processor.regions.clear();
         processor.regions = sf2sound->getRegions();
@@ -67,7 +71,7 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         
         sfzreader  = new sfzero::Reader(sfzsound);
         
-        sfzsound->loadRegions(0);
+        sfzsound->loadRegions(processor.currentInstrument);
         sfzsound->loadSamples(&formatManager);
         
         processor.regions.clear();
@@ -127,7 +131,6 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
                                                         region));
     }
     
-    processor.isSoundfontLoaded = true;
     processor.didLoadMainPianoSamples = true;
 }
 

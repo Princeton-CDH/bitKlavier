@@ -368,7 +368,7 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         newOne->setName(newName);
     }
     
-    prepareToPlay(bkSampleRate);
+    prepareToPlay(processor.getSampleRate());
     
     setGalleryDirty(true);
     
@@ -440,7 +440,7 @@ int Gallery::add(BKPreparationType type)
         newId = bkPianos.getLast()->getId();
     }
     
-    prepareToPlay(bkSampleRate);
+    prepareToPlay(processor.getSampleRate());
     
     setGalleryDirty(true);
     
@@ -689,7 +689,7 @@ void Gallery::addTypeWithId(BKPreparationType type, int Id)
         addPianoWithId(Id);
     }
     
-    prepareToPlay(bkSampleRate);
+    prepareToPlay(processor.getSampleRate());
     
     setGalleryDirty(true);
 }

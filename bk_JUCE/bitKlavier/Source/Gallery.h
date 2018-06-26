@@ -31,11 +31,9 @@ public:
     typedef OwnedArray<Gallery>                  Arr;
     typedef OwnedArray<Gallery, CriticalSection> CSArr;
  
-    Gallery(ScopedPointer<XmlElement> xml, BKAudioProcessor&);
+    Gallery(ScopedPointer<XmlElement> xml, BKAudioProcessor&, bool firstTime=false);
     Gallery(var json, BKAudioProcessor&);
     ~Gallery();
-    
-    BKSampleLoadType sampleType;
     
     inline void print(void)
     {
@@ -79,7 +77,7 @@ public:
     
     
     ValueTree  getState(void);
-    void setStateFromXML(ScopedPointer<XmlElement> xml);
+    void setStateFromXML(ScopedPointer<XmlElement> xml, bool firstTime = false);
     void setStateFromJson(var myJson);
     
     void resetPreparations(void);
@@ -668,7 +666,6 @@ public:
     
     
 private:
-    double bkSampleRate;
     BKAudioProcessor& processor;
     
     Array< int> idCount;

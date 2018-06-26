@@ -12,12 +12,12 @@
 
 #include "PluginProcessor.h"
 
-Gallery::Gallery(ScopedPointer<XmlElement> xml, BKAudioProcessor& p):
+Gallery::Gallery(ScopedPointer<XmlElement> xml, BKAudioProcessor& p, bool firstTime):
 processor(p)
 {    
     general = new GeneralSettings();
 
-    setStateFromXML(xml);
+    setStateFromXML(xml, firstTime);
     
     bool add = true;
     for (auto p : tempo) { if (p->getId() == -1) { add = false; break;} }
@@ -100,9 +100,8 @@ url(String::empty)
 
 void Gallery::prepareToPlay (double sampleRate)
 {
-    bkSampleRate = sampleRate;
     
-    for (auto piano : bkPianos)     piano->prepareToPlay(bkSampleRate);
+    for (auto piano : bkPianos)     piano->prepareToPlay(sampleRate);
 }
 
 Gallery::~Gallery()

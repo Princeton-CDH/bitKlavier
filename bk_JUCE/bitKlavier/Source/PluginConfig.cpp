@@ -80,8 +80,9 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
         galleryVT.setProperty("defaultLoaded", (int)defaultLoaded, 0);
         galleryVT.setProperty("defaultName", defaultName, 0);
         
-        galleryVT.setProperty("loadSoundfont", (int)isSoundfontLoaded, 0);
+        galleryVT.setProperty("sampleType", (int)currentSampleType, 0);
         galleryVT.setProperty("soundfontURL", currentSoundfont, 0);
+        galleryVT.setProperty("soundfontInst", currentInstrument, 0);
         
         galleryVT.setProperty("galleryPath", gallery->getURL(), 0);
         
@@ -139,27 +140,22 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             
             initializeGallery();
             
-            isSoundfontLoaded = (bool)(galleryXML->getStringAttribute("loadSoundfont").getIntValue());
-    
+            /*
+            currentSampleType = (BKSampleLoadType)(galleryXML->getStringAttribute("sampleType").getIntValue());
             
-            if (isSoundfontLoaded)
+            if (currentSampleType == BKLoadSoundfont)
             {
                 currentSoundfont = galleryXML->getStringAttribute("soundfontURL");
-                loadSamples(BKLoadSoundfont, currentSoundfont);
+                currentInstrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
+                loadSamples(BKLoadSoundfont, currentSoundfont, currentInstrument);
             }
             else
             {
                 currentSoundfont = "";
-#if JUCE_DEBUG
-                loadSamples(BKLoadLite);
-#else
-#if JUCE_IOS
-                loadSamples(BKLoadMedium);
-#else
-                loadSamples(BKLoadHeavy);
-#endif
-#endif
+
+                loadSamples(currentSampleType);
             }
+             */
             
         }
     }

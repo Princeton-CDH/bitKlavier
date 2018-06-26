@@ -29,7 +29,6 @@ edittingComment(false)
     clickFrame.setSize(5,5);
     
     setWantsKeyboardFocus(false);
-    graph->deselectAll();
     
     addMouseListener(this, true);
 }

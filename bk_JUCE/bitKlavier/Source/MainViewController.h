@@ -171,6 +171,11 @@ private:
     void sliderValueChanged     (Slider* slider)                override;
     void mouseDown (const MouseEvent &event) override;
     
+    void bkComboBoxDidChange(ComboBox* cb) override;
+    
+    void fillSampleCB();
+    void fillInstrumentCB();
+    
     void drawPreparationPanel(void);
 
     int timerCallbackCount;

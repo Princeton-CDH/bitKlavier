@@ -16,7 +16,9 @@ ValueTree  Gallery::getState(void)
     
     galleryVT.setProperty("name", name, 0);
     
-    galleryVT.setProperty("sampleType", sampleType, 0);
+    galleryVT.setProperty("sampleType", processor.currentSampleType, 0);
+    galleryVT.setProperty("soundfontURL", processor.currentSoundfont, 0);
+    galleryVT.setProperty("soundfontInst", processor.currentInstrument, 0);
     
     ValueTree idCountVT( "idCount");
     
@@ -63,7 +65,7 @@ ValueTree  Gallery::getState(void)
     
 }
 
-void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
+void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml, bool firstTime)
 {
     int i;
     Array<float> fa;
@@ -77,18 +79,6 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
         
         setDefaultPiano(xml->getStringAttribute("defaultPiano").getIntValue());
         
-        String st = xml->getStringAttribute("sampleType");
-        
-        if (st != String::empty)    sampleType = (BKSampleLoadType) st.getIntValue();
-        else
-        {
-#if JUCE_IOS
-            sampleType = BKLoadMedium;
-#else
-            sampleType = BKLoadHeavy;
-#endif
-        }
-
         // iterate through its sub-elements
         forEachXmlChildElement (*xml, e)
         {
@@ -210,6 +200,42 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 
                 thisPiano->setState(e);
             }
+        }
+      
+        if (firstTime) return;
+        
+        String st = xml->getStringAttribute("sampleType");
+        
+        String soundfontURL = xml->getStringAttribute("soundfontURL");
+        
+        String soundfontInst = xml->getStringAttribute("soundfontInst");
+        
+        if (st != String::empty)
+        {
+            BKSampleLoadType type = (BKSampleLoadType) st.getIntValue();
+            
+            if (type < BKLoadSoundfont)
+            {
+#if JUCE_DEBUG
+                processor.loadSamples(BKLoadLite);
+#else
+                processor.loadSamples(type);
+#endif
+            }
+            else if ((type == BKLoadSoundfont) &&
+                     (soundfontURL != String::empty) &&
+                     (soundfontInst != String::empty))
+            {
+                processor.loadSamples(BKLoadSoundfont, soundfontURL, soundfontInst.getIntValue());
+            }
+        }
+        else
+        {
+#if JUCE_IOS
+            processor.loadSamples(BKLoadMedium);
+#else
+            processor.loadSamples(BKLoadHeavy);
+#endif
         }
     }
     

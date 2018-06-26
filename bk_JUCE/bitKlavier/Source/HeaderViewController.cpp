@@ -344,22 +344,18 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
 #endif
     else if (result == LOAD_LITEST)
     {
-        processor.gallery->sampleType = BKLoadLitest;
         processor.loadSamples(BKLoadLitest);
     }
     else if (result == LOAD_LITE)
     {
-        processor.gallery->sampleType = BKLoadLite;
         processor.loadSamples(BKLoadLite);
     }
     else if (result == LOAD_MEDIUM)
     {
-        processor.gallery->sampleType = BKLoadMedium;
         processor.loadSamples(BKLoadMedium);
     }
     else if (result == LOAD_HEAVY)
     {
-        processor.gallery->sampleType = BKLoadHeavy;
         processor.loadSamples(BKLoadHeavy);
     }
     else if (result == SAVE_ID)
@@ -371,7 +367,7 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
 
     if (result >= SOUNDFONT_ID)
     {
-        processor.loadSamples(BKLoadSoundfont, processor.soundfontNames[result-SOUNDFONT_ID]);
+        processor.loadSamples(BKLoadSoundfont, processor.soundfontNames[result-SOUNDFONT_ID], 0);
     }
     else if (result == SAVEAS_ID)
     {
@@ -546,6 +542,7 @@ void HeaderViewController::loadDefaultGalleries(void)
 
 void HeaderViewController::fillGalleryCB(void)
 {
+    if (processor.gallery == nullptr) return;
     
     if(!galleryModalCallBackIsOpen)
     {
@@ -643,6 +640,8 @@ void HeaderViewController::switchGallery()
 
 void HeaderViewController::fillPianoCB(void)
 {
+    if (processor.gallery == nullptr) return;
+    
     pianoCB.clear(dontSendNotification);
 
     for (auto piano : processor.gallery->getPianos())

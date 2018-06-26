@@ -25,20 +25,18 @@ void BKAudioProcessor::updateUI(void)
     updateState->keymapDidChange = true;
 }
 
-void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path)
+void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsound)
 {
-    // TO IMPLEMENT: Should turn off all notes in the processors/synths before loading new samples.
     if (type == BKLoadSoundfont)
     {
         if (path == "") return;
-        
+
         currentSampleType = BKLoadSoundfont;
         
         currentSoundfont = path;
+        currentInstrument = subsound;
         
         loader.startThread();
-        
-        isSoundfontLoaded = true;
     }
     else if (type < BKLoadSoundfont && currentSampleType != type)
     {
@@ -61,8 +59,6 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path)
         DBG("progressInc: " + String(progressInc));
         
         loader.startThread();
-        
-        isSoundfontLoaded = false;
     }
     
     

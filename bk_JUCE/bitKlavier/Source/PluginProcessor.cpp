@@ -81,7 +81,7 @@ loader(*this)
     defaultLoaded = true;
     defaultName = "Basic_Piano_xml";
     
-    loadGalleryFromXml(XmlDocument::parse(xmlData));
+    loadGalleryFromXml(XmlDocument::parse(xmlData), true);
 
 #if JUCE_IOS
     platform = BKIOS;
@@ -238,10 +238,7 @@ void BKAudioProcessor::openSoundfont(void)
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    bkSampleRate = sampleRate;
-    
-    
-    stk::Stk::setSampleRate(bkSampleRate);
+    stk::Stk::setSampleRate(sampleRate);
     
     mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
     hammerReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
@@ -1097,11 +1094,11 @@ void BKAudioProcessor::loadGalleryDialog(void)
     
 }
 
-void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
+void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml, bool firstTime)
 {
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
-        gallery = new Gallery(xml, *this);
+        gallery = new Gallery(xml, *this, firstTime);
         
         currentGallery = gallery->getName() + ".xml";
         
@@ -1239,7 +1236,7 @@ void BKAudioProcessor::initializeGallery(void)
         if (piano->getId() > gallery->getIdCount(PreparationTypePiano)) gallery->setIdCount(PreparationTypePiano, piano->getId());
     }
     
-    gallery->prepareToPlay(bkSampleRate);
+    gallery->prepareToPlay(getSampleRate());
     
     updateUI();
     

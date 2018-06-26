@@ -40,7 +40,7 @@ public:
     void loadGalleryDialog(void);
     void loadJsonGalleryDialog(void);
     void loadGalleryFromPath(String path);
-    void loadGalleryFromXml(ScopedPointer<XmlElement> xml);
+    void loadGalleryFromXml(ScopedPointer<XmlElement> xml, bool firstTime = false);
     void loadJsonGalleryFromPath(String path);
     void saveCurrentGalleryAs(void);
     void saveCurrentGallery(void);
@@ -98,6 +98,9 @@ public:
     
     StringArray                         soundfontNames;
     String                              currentSoundfont;
+    StringArray                         instrumentNames;
+    String                              currentInstrumentName;
+    int                                 currentInstrument;
     
     bool                                defaultLoaded;
     String                              defaultName;
@@ -137,7 +140,7 @@ public:
     
     
     //==============================================================================
-    void loadSamples(BKSampleLoadType type, String path ="");
+    void loadSamples(BKSampleLoadType type, String path ="", int subsound=0);
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
@@ -179,21 +182,6 @@ public:
     double getLevelL();
     double getLevelR();
 
-    /*
-    void saveOnClose() override
-    {
-        DBG("SAVE ON CLOSE CALLED");
-        saveCurrentGallery();
-    }
-    
-
-    bool isDirty() override
-    {
-        return gallery->isGalleryDirty();
-    }
-     */
-
-
     BKItem::PtrArr clipboard;
     
     inline void setClipboard(BKItem::PtrArr items)
@@ -232,10 +220,9 @@ public:
     
     double progress;
     double progressInc;
-    bool didLoadHammersAndRes, didLoadMainPianoSamples, isSoundfontLoaded;
+    bool didLoadHammersAndRes, didLoadMainPianoSamples;
     
     void clearBitKlavier(void);
-    
     
     bool firstTime;
     inline void setSustainInversion(bool sus)
@@ -305,6 +292,11 @@ public:
     
     inline bool getSustainInversion(void) { return sustainInverted; }
     
+    inline String getCurrentSoundfontName(void)
+    {
+        return (currentSoundfont.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf2", false, true));
+    }
+    
 private:
     
     int  currentPianoId;
@@ -316,7 +308,6 @@ private:
     void sustainActivate(void);
     void sustainDeactivate(void);
     
-    double bkSampleRate;
     double pitchbendVal;
     
     BKSampleLoader loader;
