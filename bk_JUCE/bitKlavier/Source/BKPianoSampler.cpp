@@ -311,7 +311,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         {
             samplePosition = sourceSamplePosition; //DT addition
             
-            cfSamples = 10.0;
+            //cfSamples = 10.0;  //DT: 10 samples too small...
+            cfSamples = getSampleRate() / 50.; //20ms; possibly an issue if the loop length is really small, but 20ms is a typical ramp length
             sampleEnv.setTime(cfSamples / getSampleRate());
             loopEnv.setTime(cfSamples / getSampleRate());
             
@@ -510,14 +511,20 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
             if (inLoop && (reversePosition <= (loopStart)))
             {
                 inLoop = false;
+
+                DBG("&&&&&&&& pos / loopPosition / samplePosition / reversePosition: " +
+                    String(pos) + " / " +
+                    String(loopPosition) + " / " +
+                    String(samplePosition) + " / " +
+                    String(reversePosition) + " / ");
                 
-                samplePosition = reversePosition;
+                samplePosition = reversePosition;  //was original code
                 
-                //loopEnv.keyOff();
-                loopEnv.setValue(0.0f);
+                loopEnv.keyOff(); //DT: should be keyOff/On or setTarget, set setValue
+                //loopEnv.setValue(0.0f);
                 
-                //sampleEnv.keyOn();
-                sampleEnv.setValue(1.0f);
+                sampleEnv.keyOn();
+                //sampleEnv.setValue(1.0f);
             }
             
             if ((playType != Normal) && (lengthTracker >= (playLength - adsr.getReleaseTime() * getSampleRate())))
