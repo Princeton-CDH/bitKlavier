@@ -169,9 +169,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         playType = type;
         playDirection = direction;
         revRamped = false;
-        
-        playLength = length;
-        offset = startingPosition - playLength;
+    
+        offset = startingPosition - length;
         offset = (offset > 0.0) ? offset : 0.0;
         
         uint64 totalLength = length;
@@ -490,10 +489,9 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
             
             if (playType != Normal)
             {
-                if ((adsr.getState() != stk::ADSR::RELEASE) && (lengthTracker >= (playLength - (0.005f * getSampleRate()))))
+                if ((playType != Normal) && (lengthTracker >= (playLength - adsr.getReleaseTime() * getSampleRate())))
                 {
                     adsr.keyOff();
-                    //sfzadsr.keyOff();
                 }
             }
             
@@ -501,7 +499,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         }
         else if (playDirection == Reverse)
         {
-            if(lengthTracker >= (playLength + adsr.getReleaseTime() * getSampleRate()))
+            if(lengthTracker >= playLength)
             {
                 clearCurrentNote(); break;
             }
@@ -522,7 +520,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
                 sampleEnv.setValue(1.0f);
             }
             
-            if ((playType != Normal) && (lengthTracker >= playLength))
+            if ((playType != Normal) && (lengthTracker >= (playLength - adsr.getReleaseTime() * getSampleRate())))
             {
                 if ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE))
                 {
