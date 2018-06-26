@@ -176,8 +176,8 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     galleryMenu.addItem(CLEAN_ID, "Clean");
     galleryMenu.addSeparator();
-    galleryMenu.addSubMenu("Load Samples", getLoadMenu());
-    galleryMenu.addSeparator();
+    //galleryMenu.addSubMenu("Load Samples", getLoadMenu());
+    //galleryMenu.addSeparator();
     
     // ~ ~ ~ share menu ~ ~ ~
 #if JUCE_MAC
