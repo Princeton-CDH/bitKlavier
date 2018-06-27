@@ -204,6 +204,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml, bool firstTime)
       
         if (firstTime) return;
         
+#if LOAD_SAMPLES_IN_GALLERY
         String st = xml->getStringAttribute("sampleType");
         
         String soundfontURL = xml->getStringAttribute("soundfontURL");
@@ -237,6 +238,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml, bool firstTime)
             processor.loadSamples(BKLoadHeavy);
 #endif
         }
+#endif
     }
     
     

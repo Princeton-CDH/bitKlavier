@@ -25,6 +25,8 @@
 #include "Gallery.h"
 
 #include "ItemMapper.h"
+
+#define LOAD_SAMPLES_IN_GALLERY 0
 //==============================================================================
 /**
 */

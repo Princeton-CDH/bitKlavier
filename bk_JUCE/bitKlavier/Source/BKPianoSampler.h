@@ -209,6 +209,9 @@ private:
     
     //double beginPosition, loopPosition, endPosition;
     stk::Envelope sampleEnv, loopEnv;
+    
+    stk::Envelope renv1,renv2,renv3;
+    float renvVal;
 
     bool sfzEnvApplied;
     

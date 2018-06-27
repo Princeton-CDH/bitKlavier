@@ -175,7 +175,7 @@ void MainViewController::resized()
     headerHeight = 40;
     sidebarWidth = 30;
 #endif
-    footerHeight = 60;
+    footerHeight = 65;
     
     
     Rectangle<int> area (getLocalBounds());
@@ -204,8 +204,10 @@ void MainViewController::resized()
         
         footerSlice.reduce(gXSpacing, gYSpacing);
         
-        sampleCB.setBounds(footerSlice.getX(), footerSlice.getY(), footerSlice.getWidth() * 0.25, 20);
-        instrumentCB.setBounds(sampleCB.getRight() + gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
+        float unit = footerSlice.getWidth() * 0.25;
+        
+        sampleCB.setBounds(unit, footerSlice.getY(), unit-0.5*gXSpacing, 20);
+        instrumentCB.setBounds(2*unit+0.5*gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
         
         float keyWidth = footerSlice.getWidth() / round((keyEnd - keyStart) * 7./12 + 1); //num white keys
         keyboard->setKeyWidth(keyWidth);
@@ -213,8 +215,6 @@ void MainViewController::resized()
         keyboardComponent->setBounds(footerSlice.getX(), sampleCB.getBottom() + gYSpacing, footerSlice.getWidth(), footerSlice.getHeight() - sampleCB.getHeight());
         keyboardComponent->setVisible(true);
     }
-    
-    
     
     Rectangle<int> gainSliderSlice = area.removeFromRight(sidebarWidth+gXSpacing);
     
@@ -514,29 +514,24 @@ void MainViewController::fillInstrumentCB()
 {
     instrumentCB.clear(dontSendNotification);
     
+    // If theres only one instrument, dont bother showing name
     if (processor.currentSampleType < BKLoadSoundfont)
     {
-        instrumentCB.setVisible(false);
+        instrumentCB.setEnabled(false);
     }
     else
     {
-        // If theres only one instrument, dont bother showing name
-        if (processor.instrumentNames.size() <= 1)
+        instrumentCB.setEnabled(true);
+        
+        int i = 1;
+        for (auto inst : processor.instrumentNames)
         {
-            instrumentCB.setVisible(false);
+            instrumentCB.addItem(inst, i++);
         }
-        else
-        {
-            instrumentCB.setVisible(true);
-            int i = 1;
-            for (auto inst : processor.instrumentNames)
-            {
-                instrumentCB.addItem(inst, i++);
-            }
-            
-            instrumentCB.setSelectedItemIndex(processor.currentInstrument, dontSendNotification);
-        }
+        
+        instrumentCB.setSelectedItemIndex(processor.currentInstrument, dontSendNotification);
     }
+    
 }
 
 

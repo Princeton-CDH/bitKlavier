@@ -139,11 +139,10 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             setCurrentPiano(galleryXML->getStringAttribute("defaultPiano").getIntValue());
             
             initializeGallery();
+#if !LOAD_SAMPLES_IN_GALLERY
+            BKSampleLoadType toLoadType = (BKSampleLoadType)(galleryXML->getStringAttribute("sampleType").getIntValue());
             
-            /*
-            currentSampleType = (BKSampleLoadType)(galleryXML->getStringAttribute("sampleType").getIntValue());
-            
-            if (currentSampleType == BKLoadSoundfont)
+            if (toLoadType == BKLoadSoundfont)
             {
                 currentSoundfont = galleryXML->getStringAttribute("soundfontURL");
                 currentInstrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
@@ -153,9 +152,10 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             {
                 currentSoundfont = "";
 
-                loadSamples(currentSampleType);
+                loadSamples(toLoadType);
             }
-             */
+#endif
+             
             
         }
     }

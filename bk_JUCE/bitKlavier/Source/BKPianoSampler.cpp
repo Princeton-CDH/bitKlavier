@@ -362,13 +362,20 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                     
                     lengthEnv = (playLength < lengthEnv) ? playLength : lengthEnv;
                     
+                   
+                    /*
+                    if (sound->sustain > 0.0)   renv1.setValue(sound->sustain);
+                    else                        renv1.setValue(0.0);
+                    
+                    renv1.setTarget(1.0);
+                    renv1.setTime(sound->decay);
+                     */
+                    
                     sfzadsr.setValue(0.0f);
-                
                     sfzadsr.setAllTimes(0.001f, 0.001f, 1.0f, 0.001f);
                     sfzadsr.keyOn();
                     sfzEnvApplied = true;
                     
-
                 }
             }
         }
