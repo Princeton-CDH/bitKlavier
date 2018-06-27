@@ -497,9 +497,11 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
             
             if (playType != Normal)
             {
-                if ((playType != Normal) && (lengthTracker >= (playLength - adsr.getReleaseTime() * getSampleRate())))
+                //if ((playType != Normal) && (lengthTracker >= (playLength - adsr.getReleaseTime() * getSampleRate())))
+                if ((playType != Normal) && (lengthTracker >= playLength))
                 {
                     adsr.keyOff();
+                    //DBG("keyOff on Forward note!, lengthTracker = " + String(lengthTracker));
                 }
             }
             
@@ -507,7 +509,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         }
         else if (playDirection == Reverse)
         {
-            if(lengthTracker >= playLength)
+            if(lengthTracker >= playLength + adsr.getReleaseTime() * getSampleRate()) //DT: changed, added getReleaseTime, which i think should be here.
             {
                 clearCurrentNote(); break;
             }
@@ -519,12 +521,6 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
             {
                 inLoop = false;
 
-                DBG("&&&&&&&& pos / loopPosition / samplePosition / reversePosition: " +
-                    String(pos) + " / " +
-                    String(loopPosition) + " / " +
-                    String(samplePosition) + " / " +
-                    String(reversePosition) + " / ");
-                
                 samplePosition = reversePosition;  //was original code
                 
                 loopEnv.keyOff(); //DT: should be keyOff/On or setTarget, set setValue
