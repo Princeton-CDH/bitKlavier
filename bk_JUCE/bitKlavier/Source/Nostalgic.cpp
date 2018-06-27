@@ -353,9 +353,10 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
                         synthOffset     -= (int)offset;
                     }
                     
-                    DBG("undertow note on noteNum/offset " +
+                    DBG("undertow note on noteNum/offset/duration " +
                         String(synthNoteNumber) + " " +
-                        String(synthOffset));
+                        String(synthOffset) + " " +
+                        String(noteOnPrep->getUndertow()));
                     
                     synth->keyOn(midiChannel,
                                  thisNote->getNoteNumber(),
