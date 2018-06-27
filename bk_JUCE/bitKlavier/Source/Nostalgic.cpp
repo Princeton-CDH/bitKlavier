@@ -82,7 +82,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                     float offset = t + tuner->getOffset(midiNoteNumber), synthOffset = offset;
                     int synthNoteNumber = midiNoteNumber;
                     
-                    if (sampleType < BKLoadSoundfont)
+                    //if (sampleType < BKLoadSoundfont)
                     {
                         synthNoteNumber += (int)offset;
                         synthOffset     -= (int)offset;
@@ -141,7 +141,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                 float offset = t + tuner->getOffset(midiNoteNumber), synthOffset = offset;
                 int synthNoteNumber = midiNoteNumber;
                 
-                if (sampleType < BKLoadSoundfont)
+                //if (sampleType < BKLoadSoundfont)
                 {
                     synthNoteNumber += (int)offset;
                     synthOffset     -= (int)offset;
@@ -197,7 +197,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                 float offset = t + tuner->getOffset(midiNoteNumber), synthOffset = offset;
                 int synthNoteNumber = midiNoteNumber;
                 
-                if (sampleType < BKLoadSoundfont)
+                //if (sampleType < BKLoadSoundfont)
                 {
                     synthNoteNumber += (int)offset;
                     synthOffset     -= (int)offset;
@@ -264,7 +264,7 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
                 float offset = t + tuner->getOffset(midiNoteNumber), synthOffset = offset;
                 int synthNoteNumber = midiNoteNumber;
                 
-                if (sampleType < BKLoadSoundfont)
+                //if (sampleType < BKLoadSoundfont)
                 {
                     synthNoteNumber += (int)offset;
                     synthOffset     -= (int)offset;
@@ -347,7 +347,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
                     float offset = t + thisNote->getTuningAtKeyOn(), synthOffset = offset;
                     int synthNoteNumber = thisNote->getNoteNumber();
                     
-                    if (sampleType < BKLoadSoundfont)
+                    //if (sampleType < BKLoadSoundfont)
                     {
                         synthNoteNumber += (int)offset;
                         synthOffset     -= (int)offset;

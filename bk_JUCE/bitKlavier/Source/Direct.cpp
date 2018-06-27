@@ -36,7 +36,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
         float offset = t + tuner->getOffset(noteNumber), synthOffset = offset;
         int synthNoteNumber = noteNumber;
         
-        if (sampleType < BKLoadSoundfont)
+        //if (sampleType < BKLoadSoundfont)
         {
             synthNoteNumber += (int)offset;
             synthOffset     -= (int)offset;
