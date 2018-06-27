@@ -74,6 +74,9 @@ timerCallbackCount(0)
     sampleCB.addListener(this);
     instrumentCB.addListener(this);
     
+    instrumentCB.setLookAndFeel(&comboBoxRightJustifyLAF);
+    comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
+    
     addAndMakeVisible(sampleCB);
     addAndMakeVisible(instrumentCB);
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~`

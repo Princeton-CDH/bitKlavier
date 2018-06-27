@@ -84,7 +84,6 @@ private:
     Image image;
     RectanglePlacement placement;
     
-    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSplashScreen)
 };
 
@@ -185,6 +184,7 @@ private:
     bool isAddingFromMidiInput;
     
     BKButtonAndMenuLAF laf;
+    BKButtonAndMenuLAF comboBoxRightJustifyLAF;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainViewController)
 };
