@@ -550,15 +550,16 @@ public:
     typedef OwnedArray<DirectProcessor>                  Arr;
     typedef OwnedArray<DirectProcessor, CriticalSection> CSArr;
     
+    
     DirectProcessor(Direct::Ptr direct,
                     TuningProcessor::Ptr tuning,
                     BKSynthesiser *s, BKSynthesiser *res, BKSynthesiser *ham);
     
     ~DirectProcessor();
     
-    void processBlock(int numSamples, int midiChannel);
-    
-    
+    BKSampleLoadType sampleType;
+    void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
+
     void    keyPressed(int noteNumber, float velocity, int channel);
     void    keyReleased(int noteNumber, float velocity, int channel);
     void    playHammerResonance(int noteNumber, float velocity, int channel);

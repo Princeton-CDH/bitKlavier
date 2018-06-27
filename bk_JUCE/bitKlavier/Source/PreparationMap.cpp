@@ -255,23 +255,24 @@ void PreparationMap::deactivateIfNecessary()
 }
 
 
-void PreparationMap::processBlock(int numSamples, int midiChannel, bool onlyNostalgic)
+void PreparationMap::processBlock(int numSamples, int midiChannel, BKSampleLoadType type, bool onlyNostalgic)
 {
+    sampleType = type;
     if(onlyNostalgic) {
         for (auto nproc : nprocessor)
-            nproc->processBlock(numSamples, midiChannel);
+            nproc->processBlock(numSamples, midiChannel, sampleType);
     }
 
     else
     {
         for (auto dproc : dprocessor)
-            dproc->processBlock(numSamples, midiChannel);
+            dproc->processBlock(numSamples, midiChannel, sampleType);
         
         for (auto sproc : sprocessor)
-            sproc->processBlock(numSamples, midiChannel);
+            sproc->processBlock(numSamples, midiChannel, sampleType);
         
         for (auto nproc : nprocessor)
-            nproc->processBlock(numSamples, midiChannel);
+            nproc->processBlock(numSamples, midiChannel, sampleType);
         
         for (auto tproc : tprocessor)
             tproc->processBlock(numSamples);

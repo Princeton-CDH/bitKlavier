@@ -1114,7 +1114,8 @@ public:
     inline const uint64 getCurrentNumSamplesBeat(void) const noexcept   { return numSamplesBeat;    }
     inline const uint64 getCurrentPhasor(void) const noexcept           { return phasor;            }
     
-    void processBlock(int numSamples, int channel);
+    BKSampleLoadType sampleType;
+    void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
     void keyPressed(int noteNumber, float velocity);
     void keyReleased(int noteNumber, float velocity, int channel);
     float getTimeToBeatMS(float beatsToSkip);

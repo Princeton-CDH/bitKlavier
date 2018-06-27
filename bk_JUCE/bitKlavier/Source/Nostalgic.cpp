@@ -79,31 +79,21 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                 
                 for (auto t : nostalgic->aPrep->getTransposition())
                 {
-                    float offset = t + tuner->getOffset(midiNoteNumber);
-                    int synthNoteNumber = midiNoteNumber + (int)offset;
-                    float synthOffset = offset - (int)offset;
+                    float offset = t + tuner->getOffset(midiNoteNumber), synthOffset = offset;
+                    int synthNoteNumber = midiNoteNumber;
+                    
+                    if (sampleType < BKLoadSoundfont)
+                    {
+                        synthNoteNumber += (int)offset;
+                        synthOffset     -= (int)offset;
+                    }
                     
                     //play nostalgic note
-                    /*
-                    synth->keyOn(
-                                 midiChannel,
-                                 midiNoteNumber,
-                                 synthNoteNumber,
-                                 synthOffset,
-                                 velocities.getUnchecked(midiNoteNumber),
-                                 nostalgic->aPrep->getGain() * aGlobalGain,
-                                 Reverse,
-                                 FixedLengthFixedStart,
-                                 NostalgicNote,
-                                 nostalgic->getId(),
-                                 duration + nostalgic->aPrep->getWavedistance(),
-                                 duration,  // length
-                                 30,
-                                 offRamp ); //ramp off
-                     */
+
                     DBG("reverse note on noteNum/offset " +
                         String(synthNoteNumber) + " " +
                         String(synthOffset));
+                    
                     synth->keyOn(
                                  midiChannel,
                                  midiNoteNumber,
@@ -148,31 +138,20 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
             
             for (auto t : nostalgic->aPrep->getTransposition())
             {
-                float offset = t + tuner->getOffset(midiNoteNumber);
-                int synthNoteNumber = midiNoteNumber + (int)offset;
-                float synthOffset = offset - (int)offset;
+                float offset = t + tuner->getOffset(midiNoteNumber), synthOffset = offset;
+                int synthNoteNumber = midiNoteNumber;
+                
+                if (sampleType < BKLoadSoundfont)
+                {
+                    synthNoteNumber += (int)offset;
+                    synthOffset     -= (int)offset;
+                }
                 
                 //play nostalgic note
-                /*
-                synth->keyOn(
-                             midiChannel,
-                             midiNoteNumber,
-                             synthNoteNumber,
-                             synthOffset,
-                             velocities.getUnchecked(midiNoteNumber),
-                             nostalgic->aPrep->getGain() * aGlobalGain,
-                             Reverse,
-                             FixedLengthFixedStart,
-                             NostalgicNote,
-                             nostalgic->getId(),
-                             duration + nostalgic->aPrep->getWavedistance(),
-                             duration,  // length
-                             30,
-                             offRamp ); //ramp off
-                 */
                 DBG("reverse note on noteNum/offset " +
                     String(synthNoteNumber) + " " +
                     String(synthOffset));
+                
                 synth->keyOn(
                              midiChannel,
                              midiNoteNumber,
@@ -215,33 +194,21 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
             
             for (auto t : nostalgic->aPrep->getTransposition())
             {
-                float offset = t + tuner->getOffset(midiNoteNumber);
-                int synthNoteNumber = midiNoteNumber + (int)offset;
-                float synthOffset = offset - (int)offset;
+                float offset = t + tuner->getOffset(midiNoteNumber), synthOffset = offset;
+                int synthNoteNumber = midiNoteNumber;
+                
+                if (sampleType < BKLoadSoundfont)
+                {
+                    synthNoteNumber += (int)offset;
+                    synthOffset     -= (int)offset;
+                }
                 
                 //play nostalgic note
-                /*
-                synth->keyOn(
-                             midiChannel,
-                             midiNoteNumber,
-                             synthNoteNumber,
-                             synthOffset,
-                             velocities.getUnchecked(midiNoteNumber),
-                             nostalgic->aPrep->getGain() * aGlobalGain,
-                             Reverse,
-                             FixedLengthFixedStart,
-                             NostalgicNote,
-                             nostalgic->getId(),
-                             duration + nostalgic->aPrep->getWavedistance(),
-                             duration,  // length
-                             30,
-                             offRamp ); //ramp off
-                 */
                 DBG("reverse note on noteNum/offset " +
                     String(synthNoteNumber) + " " +
                     String(synthOffset));
-                synth->keyOn(
-                             midiChannel,
+                
+                synth->keyOn(midiChannel,
                              midiNoteNumber,
                              synthNoteNumber,
                              synthOffset,
@@ -294,29 +261,16 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
             
             for (auto t : nostalgic->aPrep->getTransposition())
             {
-                float offset = t + tuner->getOffset(midiNoteNumber);
-                int synthNoteNumber = midiNoteNumber + (int)offset;
-                float synthOffset = offset - (int)offset;
+                float offset = t + tuner->getOffset(midiNoteNumber), synthOffset = offset;
+                int synthNoteNumber = midiNoteNumber;
+                
+                if (sampleType < BKLoadSoundfont)
+                {
+                    synthNoteNumber += (int)offset;
+                    synthOffset     -= (int)offset;
+                }
 
                 //play nostalgic note
-                /*
-                synth->keyOn(
-                             midiChannel,
-                             midiNoteNumber,
-                             synthNoteNumber,
-                             synthOffset,
-                             midiNoteVelocity,
-                             nostalgic->aPrep->getGain() * aGlobalGain,
-                             Reverse,
-                             FixedLengthFixedStart,
-                             NostalgicNote,
-                             nostalgic->getId(),
-                             duration + nostalgic->aPrep->getWavedistance(),
-                             duration,  // length
-                             30,
-                             offRamp ); //ramp off
-                 */
-                
                 DBG("reverse note on noteNum/offset " +
                     String(synthNoteNumber) + " " +
                     String(synthOffset));
@@ -365,9 +319,9 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
 }
 
 //main scheduling function
-void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
+void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleLoadType type)
 {
-    
+    sampleType = type;
     incrementTimers(numSamples);
 
     for(int i = undertowNotes.size() - 1; i >= 0; --i)
@@ -390,30 +344,19 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel)
             {
                 for (auto t : noteOnPrep->getTransposition())
                 {
-                    float offset = t + thisNote->getTuningAtKeyOn();
-                    int synthNoteNumber = thisNote->getNoteNumber() +  (int)offset;
-                    float synthOffset = offset - (int)offset;
+                    float offset = t + thisNote->getTuningAtKeyOn(), synthOffset = offset;
+                    int synthNoteNumber = thisNote->getNoteNumber();
+                    
+                    if (sampleType < BKLoadSoundfont)
+                    {
+                        synthNoteNumber += (int)offset;
+                        synthOffset     -= (int)offset;
+                    }
                     
                     DBG("undertow note on noteNum/offset " +
                         String(synthNoteNumber) + " " +
                         String(synthOffset));
                     
-                    /*
-                    synth->keyOn(midiChannel,
-                                 thisNote->getNoteNumber(),
-                                 synthNoteNumber,
-                                 synthOffset,
-                                 thisNote->getVelocityAtKeyOn(),
-                                 noteOnPrep->getGain() * aGlobalGain,
-                                 Forward,
-                                 FixedLengthFixedStart,
-                                 NostalgicNote,
-                                 nostalgic->getId(),
-                                 noteOnPrep->getWavedistance(),                        //start position
-                                 noteOnPrep->getUndertow(),                            //play length
-                                 aRampUndertowCrossMS,                                 //ramp up length
-                                 noteOnPrep->getUndertow() - aRampUndertowCrossMS);    //ramp down length
-                     */
                     synth->keyOn(midiChannel,
                                  thisNote->getNoteNumber(),
                                  synthNoteNumber,

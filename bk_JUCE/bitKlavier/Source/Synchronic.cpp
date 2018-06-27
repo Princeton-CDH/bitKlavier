@@ -69,9 +69,15 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
     
     for (auto t : synchronic->aPrep->getTransposition()[transpCounter])
     {
-        float offset = tuner->getOffset(note) + t;
-        int synthNoteNumber = ((float)note + (int)offset);
-        float synthOffset = offset - (int)offset;
+
+        float offset = t + tuner->getOffset(note), synthOffset = offset;
+        int synthNoteNumber = (float)note;
+        
+        if (sampleType < BKLoadSoundfont)
+        {
+            synthNoteNumber += (int)offset;
+            synthOffset     -= (int)offset;
+        }
 
         synth->keyOn(channel,
                      note,
@@ -214,9 +220,10 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
 }
 
 
-void SynchronicProcessor::processBlock(int numSamples, int channel)
+void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoadType type)
 {
     //need to do this every block?
+    sampleType = type;
     clusterThresholdSamples = (synchronic->aPrep->getClusterThreshSEC() * sampleRate);
     //beatThresholdSamples = (synchronic->aPrep->getBeatThresh() * sampleRate);
     beatThresholdSamples = (tempo->getTempo()->aPrep->getBeatThresh() * sampleRate);

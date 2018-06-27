@@ -33,28 +33,15 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 {
     for (auto t : direct->aPrep->getTransposition())
     {
-        float offset = t + tuner->getOffset(noteNumber);
-        int synthNoteNumber = noteNumber + (int)offset;
-        float synthOffset = offset - (int)offset;
+        float offset = t + tuner->getOffset(noteNumber), synthOffset = offset;
+        int synthNoteNumber = noteNumber;
+        
+        if (sampleType < BKLoadSoundfont)
+        {
+            synthNoteNumber += (int)offset;
+            synthOffset     -= (int)offset;
+        }
 
-        /*
-        synth->keyOn(channel,
-                     noteNumber,
-                     synthNoteNumber,
-                     synthOffset,
-                     velocity,
-                     direct->aPrep->getGain() * aGlobalGain,
-                     Forward,
-                     Normal,
-                     MainNote,
-                     direct->getId(),
-                     0,     // start
-                     0,     // length
-                     3,     // allow user to set, directly in ms
-                     30);   // release time
-        
-        */
-        
         synth->keyOn(channel,
                      noteNumber,
                      synthNoteNumber,
@@ -89,7 +76,6 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
         int t = keyPlayed[noteNumber].getUnchecked(i);
         float t_offset = keyPlayedOffset[noteNumber].getUnchecked(i);
         
-        //DBG("DirectProcessor::keyReleased " + String(noteNumber) +  " " + String(Id));
         synth->keyOff(channel,
                       MainNote,
                       direct->getId(),
@@ -97,55 +83,6 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
                       t,
                       velocity,
                       true);
-        
-        //only play hammers/resonance for first note in layers of transpositions
-        /*
-        if(i==0)
-        {
-            float hGain = direct->aPrep->getHammerGain();
-            float rGain = direct->aPrep->getResonanceGain();
-            
-            if (hGain > 0.0f)
-            {
-                hammerSynth->keyOn(channel,
-                                   //synthNoteNumber,
-                                   noteNumber,
-                                   t,
-                                   0,
-                                   velocity,
-                                   hGain * HAMMER_GAIN_SCALE,
-                                   Forward,
-                                   Normal, //FixedLength,
-                                   HammerNote,
-                                   direct->getId(),
-                                   0,
-                                   2000,
-                                   3,
-                                   3 );
-            }
-            
-            if (rGain > 0.0f)
-            {
-                resonanceSynth->keyOn(channel,
-                                      //synthNoteNumber,
-                                      noteNumber,
-                                      t,
-                                      //synthOffset,
-                                      t_offset,
-                                      velocity,
-                                      rGain * RES_GAIN_SCALE,
-                                      Forward,
-                                      Normal, //FixedLength,
-                                      ResonanceNote,
-                                      direct->getId(),
-                                      0,
-                                      2000,
-                                      3,
-                                      3 );
-
-            }
-        }
-         */
     }
 
     keyPlayed[noteNumber].clearQuick();
@@ -169,14 +106,13 @@ void DirectProcessor::playHammerResonance(int noteNumber, float velocity, int ch
             if (hGain > 0.0f)
             {
                 hammerSynth->keyOn(channel,
-                                   //synthNoteNumber,
                                    noteNumber,
                                    t,
                                    0,
                                    velocity,
                                    hGain * HAMMER_GAIN_SCALE,
                                    Forward,
-                                   Normal, //FixedLength,
+                                   Normal, 
                                    HammerNote,
                                    direct->getId(),
                                    0,
@@ -188,15 +124,13 @@ void DirectProcessor::playHammerResonance(int noteNumber, float velocity, int ch
             if (rGain > 0.0f)
             {
                 resonanceSynth->keyOn(channel,
-                                      //synthNoteNumber,
                                       noteNumber,
                                       t,
-                                      //synthOffset,
                                       t_offset,
                                       velocity,
                                       rGain * RES_GAIN_SCALE,
                                       Forward,
-                                      Normal, //FixedLength,
+                                      Normal,
                                       ResonanceNote,
                                       direct->getId(),
                                       0,
@@ -209,8 +143,9 @@ void DirectProcessor::playHammerResonance(int noteNumber, float velocity, int ch
     }
 }
 
-void DirectProcessor::processBlock(int numSamples, int midiChannel)
+void DirectProcessor::processBlock(int numSamples, int midiChannel, BKSampleLoadType type)
 {
+    sampleType = type;
     //tuner->processor->incrementAdaptiveClusterTime(numSamples);
 }
 

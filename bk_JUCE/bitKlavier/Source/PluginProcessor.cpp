@@ -595,13 +595,13 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     // Process all active prep maps in current piano
     for (auto pmap : currentPiano->activePMaps)
-        pmap->processBlock(numSamples, m.getChannel(), false);
+        pmap->processBlock(numSamples, m.getChannel(), currentSampleType, false);
     
     // OLAGON: Process all active nostalgic preps in previous piano
     if(prevPiano != currentPiano)
     {
         for (auto pmap : prevPiano->activePMaps)
-            pmap->processBlock(numSamples, m.getChannel(), true); // true for onlyNostalgic
+            pmap->processBlock(numSamples, m.getChannel(), currentSampleType, true); // true for onlyNostalgic
     }
 
     

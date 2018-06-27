@@ -836,7 +836,8 @@ public:
     virtual ~NostalgicProcessor();
     
     //called with every audio vector
-    void processBlock(int numSamples, int midiChannel);
+    BKSampleLoadType sampleType;
+    void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
     
     //begin timing played note length, called with noteOn
     void keyPressed(int midiNoteNumber, float midiNoteVelocity, int midiChannel);
