@@ -528,6 +528,15 @@ void KeymapViewController::textEditorTextChanged(TextEditor& tf)
     }
 }
 
+void KeymapViewController::textEditorReturnKeyPressed(TextEditor& textEditor)
+{
+    if(textEditor.getName() == keymapTF.getName())
+    {
+        keymapUpdated(textEditor);
+    }
+}
+       
+
 void KeymapViewController::update(void)
 {
     if (processor.updateState->currentKeymapId < 0) return;
