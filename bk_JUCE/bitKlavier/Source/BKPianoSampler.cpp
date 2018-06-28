@@ -483,8 +483,8 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         int next = pos + 1;
         if(next >= playingSound->soundLength) next = 0; //DT: another constraint
         
-        loopL = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-        loopR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : loopL;
+        loopL = (inL [pos] * invAlpha + inL [next] * alpha);
+        loopR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : loopL;
         //===========================================
         
         //==============SAMPLE STUFF=================
@@ -502,8 +502,8 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         
         if (pos >= 0 && pos < (playingSound->soundLength - 1))
         {
-            sampleL = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-            sampleR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : sampleL;
+            sampleL = (inL [pos] * invAlpha + inL [next] * alpha);
+            sampleR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : sampleL;
         }
         //===========================================
         if (playDirection == Forward)
