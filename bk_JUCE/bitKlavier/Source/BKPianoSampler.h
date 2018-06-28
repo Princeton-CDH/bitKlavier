@@ -218,7 +218,7 @@ private:
     double samplePosition, loopPosition;
     
     stk::ADSR adsr;
-    stk::ADSR sfzadsr;
+    stk::AHDSR sfzadsr;
     
     bool lastRamp;
     int numLoops;

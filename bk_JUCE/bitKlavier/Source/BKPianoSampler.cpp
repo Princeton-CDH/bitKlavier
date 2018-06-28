@@ -335,6 +335,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                 }
                 
                 sfzadsr.setAllTimes((sound->attack > 0.0f) ? sound->attack : 0.001f,
+                                    (sound->hold > 0.0f) ? sound->hold : 0.001f,
                                     (sound->decay > 0.0f) ? sound->decay : 0.001f,
                                     sustain,
                                     (sound->release > 0.0f) ? sound->release : 0.001f );
@@ -373,7 +374,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                      */
                     
                     sfzadsr.setValue(0.0f);
-                    sfzadsr.setAllTimes(0.001f, 0.001f, 1.0f, 0.001f);
+                    sfzadsr.setAllTimes(0.001f, 0.001f, 0.001f, 1.0f, 0.001f);
                     sfzadsr.keyOn();
                     sfzEnvApplied = true;
                     
