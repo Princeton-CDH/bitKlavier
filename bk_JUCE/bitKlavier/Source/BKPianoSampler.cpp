@@ -479,6 +479,10 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         float alpha = (float) (loopPosition - pos);
         float invAlpha = 1.0f - alpha;
         
+        if(pos >= playingSound->soundLength) pos = 0; //DT: added constraint
+        int next = pos + 1;
+        if(next >= playingSound->soundLength) next = 0; //DT: another constraint
+        
         loopL = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
         loopR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : loopL;
         //===========================================
@@ -491,6 +495,10 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         pos = (int) samplePosition;
         alpha = (float) (samplePosition - pos);
         invAlpha = 1.0f - alpha;
+        
+        if(pos >= playingSound->soundLength) pos = 0; //DT: added constraint
+        next = pos + 1;
+        if(next >= playingSound->soundLength) next = 0; //DT: another constraint
         
         if (pos >= 0 && pos < (playingSound->soundLength - 1))
         {
