@@ -601,14 +601,20 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
         if (playDirection == Forward)   samplePosition += bentRatio;
         else                            samplePosition -= bentRatio;
         
-        const int pos = (int) samplePosition;
+        int pos = (int) samplePosition;
         const float alpha = (float) (samplePosition - pos);
         const float invAlpha = 1.0f - alpha;
         
+        if(pos >= playingSound->soundLength) pos = 0; //DT: added constraint
+        int next = pos + 1;
+        if(next >= playingSound->soundLength) next = 0; //DT: another constraint
+        
         if (pos >= 0 && pos < (playingSound->soundLength - 1))
         {
-            sampleL = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-            sampleR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : sampleL;
+            //sampleL = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
+            //sampleR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : sampleL;
+            sampleL = (inL [pos] * invAlpha + inL [next] * alpha);
+            sampleR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : sampleL;
         }
         //===========================================
         if (playDirection == Forward)
