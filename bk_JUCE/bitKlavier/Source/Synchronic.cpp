@@ -170,8 +170,10 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     //later, we remove dupes so we don't inadvertently play the same note twice in a pulse
     
     cluster.insert(0, noteNumber);
-    if(cluster.size() > synchronic->aPrep->getClusterCap()) cluster.resize(synchronic->aPrep->getClusterCap());
-    DBG("cluster size: " + String(cluster.size()) + " " + String(clusterThresholdSamples/sampleRate));
+    //if(cluster.size() > synchronic->aPrep->getClusterCap()) cluster.resize(synchronic->aPrep->getClusterCap());
+    //DBG("cluster size: " + String(cluster.size()) + " " + String(clusterThresholdSamples/sampleRate));
+    
+    //**** logic is the same, but instead of changing the size of cluster directly, we do it only to slimCluster in processBlock
     
     //why not use clusterMax for this? the intent is different:
     //clusterMax: max number of keys pressed within clusterThresh, otherwise shut off pulses
@@ -180,6 +182,8 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     //and we want the pulse to emerge when we stop; clusterMax wouldn't allow this to happen
     //if we had exceeded clusterMax in that passage, which is bad, but we still want clusterCap
     //to limit the number of notes included in the cluster.
+    //another example: clusterMax=9, clusterCap=8; playing 9 notes simultaneously will result in cluster with 8 notes, but playing 10 notes will shut off pulse
+    
     //for now, we'll leave clusterCap unexposed, just to avoid confusion for the user. after all,
     //I used it this way for all of the etudes to date! but might want to expose eventually...
     //perhaps call beatVoices? since it's essentially the number of "voices" in the pulse chord?
@@ -249,6 +253,9 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
         //remove duplicates from cluster, so we don't play the same note twice in a single pulse
         slimCluster.clearQuick();
         for(int i = 0; i< cluster.size(); i++) slimCluster.addIfNotAlreadyThere(cluster.getUnchecked(i));
+        if(slimCluster.size() > synchronic->aPrep->getClusterCap()) slimCluster.resize(synchronic->aPrep->getClusterCap());
+        DBG("slimCluster size: " + String(slimCluster.size()));
+        //see above for explanation of difference between clusterCap and clusterMax
     
         //get time until next beat => beat length scaled by beatMultiplier parameter
         numSamplesBeat =    beatThresholdSamples *
@@ -310,7 +317,8 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
             if(playCluster)
             {
                 //for (int n = slimCluster.size(); --n >= 0;)
-                for (int n=0; n < cluster.size(); n++)
+                //for (int n=0; n < cluster.size(); n++)
+                for (int n=0; n < slimCluster.size(); n++)
                 {
                     
                     /*playNote(channel,
