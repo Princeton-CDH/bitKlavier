@@ -251,6 +251,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
         //if we had exceeded clusterMax in that passage, which is bad, but we still want clusterCap
         //to limit the number of notes included in the cluster so it doesn't get too thick.
         //another example: clusterMax=9, clusterCap=8; playing 9 notes simultaneously will result in cluster with 8 notes, but playing 10 notes will shut off pulse
+        //another example: clusterMax=100, clusterCap=8; play a rapid ascedning scale more than 8 notes, then stop; only last 8 notes will be in the cluster
         
         //for now, we'll leave clusterCap unexposed, just to avoid confusion for the user. after all,
         //I used it this way for all of the etudes to date! but might want to expose eventually...
