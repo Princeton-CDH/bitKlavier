@@ -33,6 +33,7 @@ loader(*this)
     didLoadHammersAndRes            = false;
     didLoadMainPianoSamples         = false;
     sustainIsDown                   = false;
+    noteOnCount                     = 0;
     
 #if TRY_UNDO
     history.ensureStorageAllocated(10);
@@ -500,6 +501,7 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     }
     
     --noteOnCount;
+    if(noteOnCount < 0) noteOnCount = 0;
     
 }
 
@@ -651,7 +653,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         }
     }
     
-    if(didNoteOffs && !sustainIsDown) prevPianos.clearQuick();
+    //if(didNoteOffs && !sustainIsDown) prevPianos.clearQuick(); //fixes phantom piano, but breaks Nostalgic keyUps over Piano changes. grr...
     
     // Sets some flags to determine whether to send noteoffs to previous pianos.
     if (!allNotesOff && !noteOnCount) {
