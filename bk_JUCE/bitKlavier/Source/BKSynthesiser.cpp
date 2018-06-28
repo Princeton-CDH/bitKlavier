@@ -74,7 +74,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     
     //==============================================================================
     BKSynthesiser::BKSynthesiser(GeneralSettings::Ptr gen):
-    pitchWheelValue(64),
+    pitchWheelValue(8192),
     generalSettings(gen),
     sampleRate (0),
     lastNoteOnCounter (0),
@@ -88,7 +88,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     }
     
     BKSynthesiser::BKSynthesiser(void):
-    pitchWheelValue(64),
+    pitchWheelValue(8192),
     sampleRate (0),
     lastNoteOnCounter (0),
     minimumSubBlockSize (32),
