@@ -393,6 +393,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                             adsrDecayMS*0.001f* getSampleRate(),
                             adsrSustain,
                             adsrReleaseMS*0.001f* getSampleRate());
+                
+                break;
  
             }
         }
