@@ -664,6 +664,8 @@ void MainViewController::timerCallback()
         state->displayDidChange = false;
         
         overtop.setCurrentDisplay(processor.updateState->currentDisplay);
+        
+        header.update();
     }
     
     levelMeterComponentL->updateLevel(processor.getLevelL());

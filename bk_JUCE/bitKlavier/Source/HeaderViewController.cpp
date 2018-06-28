@@ -627,7 +627,22 @@ void HeaderViewController::fillGalleryCB(void)
 
 void HeaderViewController::update(void)
 {
-    
+    if (processor.updateState->currentDisplay == DisplayNil)
+    {
+        editB.setEnabled(true);
+        pianoB.setEnabled(true);
+        galleryB.setEnabled(true);
+        pianoCB.setEnabled(true);
+        galleryCB.setEnabled(true);
+    }
+    else
+    {
+        editB.setEnabled(false);
+        pianoB.setEnabled(false);
+        galleryB.setEnabled(false);
+        pianoCB.setEnabled(false);
+        galleryCB.setEnabled(false);
+    }
 }
 
 void HeaderViewController::switchGallery()

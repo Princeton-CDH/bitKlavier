@@ -255,28 +255,6 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     gallery->prepareToPlay(sampleRate);
     
-#if JUCE_DEBUG
-
-#else
-    
-#if JUCE_IOS
-    String osname = SystemStats::getOperatingSystemName();
-    float iosVersion = osname.fromLastOccurrenceOf("iOS ", false, true).getFloatValue();
-    
-    String device = SystemStats::getDeviceDescription();
-    
-    if (device.contains("iPhone"))  updateState->needsExtraKeys = true;
-    else                            updateState->needsExtraKeys = false;
-    
-    if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
-    else                    loadPianoSamples(BKLoadLite); // CHANGE BACK TO MEDIUM
-#else
-    loadPianoSamples(BKLoadHeavy); // CHANGE THIS BACK TO HEAVY
-#endif
-    
-#endif
-
-    
 #if TRY_UNDO
     for (int i = 0; i < NUM_EPOCHS; i++)
     {
