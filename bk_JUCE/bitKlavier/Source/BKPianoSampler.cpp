@@ -725,13 +725,18 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         
         if(sourceSamplePosition < 0) sourceSamplePosition = 0;
         
-        const int pos = (int) sourceSamplePosition;
+        int pos = (int) sourceSamplePosition;
         const float alpha = (float) (sourceSamplePosition - pos);
         const float invAlpha = 1.0f - alpha;
+        if(pos >= playingSound->soundLength) pos = 0; //DT: added constraint
         
         // just using a very simple linear interpolation here..
-        float l = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-        float r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l;
+        int next = pos + 1;
+        if(next >= playingSound->soundLength) next = 0; //DT: another constraint
+        //float l = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
+        //float r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l;
+        float l = (inL [pos] * invAlpha + inL [next] * alpha);
+        float r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : l;
         
         l *= (lgain * adsr.tick());
         r *= (rgain * adsr.lastOut());
