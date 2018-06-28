@@ -239,7 +239,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
         slimCluster.clearQuick();
         for(int i = 0; i< cluster.size(); i++) slimCluster.addIfNotAlreadyThere(cluster.getUnchecked(i));
         
-        //cap size of slimCluster
+        //cap size of slimCluster, removing oldest notes
         if(slimCluster.size() > synchronic->aPrep->getClusterCap()) slimCluster.resize(synchronic->aPrep->getClusterCap());
         //DBG("slimCluster size: " + String(slimCluster.size()));
         
