@@ -246,12 +246,8 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
         //why not use clusterMax for this? the intent is different:
         //clusterMax: max number of keys pressed within clusterThresh, otherwise shut off pulses
         //clusterCap: the most number of notes allowed in a cluster when playing pulses
-        //so, let's say we are playing a rapid passage where successive notes are within the clusterThresh
-        //and we want the pulse to emerge when we stop; clusterMax wouldn't allow this to happen
-        //if we had exceeded clusterMax in that passage, which is bad, but we still want clusterCap
-        //to limit the number of notes included in the cluster so it doesn't get too thick.
-        //another example: clusterMax=9, clusterCap=8; playing 9 notes simultaneously will result in cluster with 8 notes, but playing 10 notes will shut off pulse
-        //another example: clusterMax=100, clusterCap=8; play a rapid ascedning scale more than 8 notes, then stop; only last 8 notes will be in the cluster
+        //an example: clusterMax=9, clusterCap=8; playing 9 notes simultaneously will result in cluster with 8 notes, but playing 10 notes will shut off pulse
+        //another example: clusterMax=20, clusterCap=8; play a rapid ascending scale more than 8 and less than 20 notes, then stop; only last 8 notes will be in the cluster. If your scale exceeds 20 notes then it won't play.
         
         //for now, we'll leave clusterCap unexposed, just to avoid confusion for the user. after all,
         //I used it this way for all of the etudes to date! but might want to expose eventually...
