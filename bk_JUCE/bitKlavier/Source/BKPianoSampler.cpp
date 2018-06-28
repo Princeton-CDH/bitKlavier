@@ -313,6 +313,9 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         {
             samplePosition = sourceSamplePosition; //DT addition
             
+            lgain *= 0.5;
+            rgain *= 0.5;
+            
             //cfSamples = 10.0;  //DT: 10 samples too small...
             cfSamples = getSampleRate() / 50.; //20ms; possibly an issue if the loop length is really small, but 20ms is a typical ramp length
             sampleEnv.setTime(cfSamples / getSampleRate());
