@@ -139,6 +139,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                                      s);
 }
 
+#define REVENV 0
+
 void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                                      const int pitchWheelValue,
                                      const float gain,
@@ -333,12 +335,14 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                 {
                     sustain = 1.0f;
                 }
-                
+                sfzadsr.setAttackTarget(1.0f);
                 sfzadsr.setAllTimes((sound->attack > 0.0f) ? sound->attack : 0.001f,
                                     (sound->hold > 0.0f) ? sound->hold : 0.001f,
                                     (sound->decay > 0.0f) ? sound->decay : 0.001f,
                                     sustain,
                                     (sound->release > 0.0f) ? sound->release : 0.001f );
+                
+                playLengthSF2 = (totalLength - (sound->release * getSampleRate())) * pitchRatio;
                 
                 sfzEnvApplied = true;
                 sfzadsr.keyOn();
@@ -360,25 +364,40 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                     
                     loopPosition = sound->loopStart;
                     
-                    lengthEnv =  (sound->attack + sound->decay + sound->release) * getSampleRate();
+#if REVENV
+                    // total length of sound minus the length of the AHDR should be how long sample was sustained (hold in reverse)
+                    double totalLen = (totalLength * pitchRatio);
+                    double envLen = ((sound->release + sound->decay + sound->hold + sound->attack) * getSampleRate());
+                    double envLenNoRelease = ((sound->release + sound->decay + sound->hold + sound->attack) * getSampleRate());
+
+                    if (totalLen > envLen)
+                    {
+                        double holdSamples = totalLen - envLen;
+                        sfzadsr.setAttackTarget(sound->sustain);
+                        sfzadsr.setAllTimes(sound->release,
+                                            (holdSamples / getSampleRate()), // hold length in seconds
+                                            sound->decay,
+                                            1.0f,
+                                            sound->attack);
+                    }
+                    else
+#endif
+                    {
+                        sfzadsr.setAttackTarget(1.0f);
+                        sfzadsr.setAllTimes(0.001f,
+                                            0.001f,
+                                            0.001f,
+                                            1.0f,
+                                            0.001f);
+                    }
                     
-                    lengthEnv = (playLength < lengthEnv) ? playLength : lengthEnv;
-                    
-                   
-                    /*
-                    if (sound->sustain > 0.0)   renv1.setValue(sound->sustain);
-                    else                        renv1.setValue(0.0);
-                    
-                    renv1.setTarget(1.0);
-                    renv1.setTime(sound->decay);
-                     */
-                    
-                    sfzadsr.setValue(0.0f);
-                    sfzadsr.setAllTimes(0.001f, 0.001f, 0.001f, 1.0f, 0.001f);
                     sfzadsr.keyOn();
+                    
                     sfzEnvApplied = true;
                     
                 }
+                
+                playLengthSF2 = (totalLength - (sound->attack * getSampleRate())) * pitchRatio;
             }
         }
         noteStartingPosition = sourceSamplePosition;
@@ -495,22 +514,10 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
                 
                 sampleEnv.keyOff();
             }
-            
-            if (playType != Normal)
-            {
-                //if ((playType != Normal) && (lengthTracker >= (playLength - adsr.getReleaseTime() * getSampleRate())))
-                if ((playType != Normal) && (lengthTracker >= playLength))
-                {
-                    adsr.keyOff();
-                    //DBG("keyOff on Forward note!, lengthTracker = " + String(lengthTracker));
-                }
-            }
-            
-            
         }
         else if (playDirection == Reverse)
         {
-            if(lengthTracker >= playLength + adsr.getReleaseTime() * getSampleRate()) //DT: changed, added getReleaseTime, which i think should be here.
+            if(lengthTracker >= playLength + adsr.getReleaseTime() * getSampleRate())
             {
                 clearCurrentNote(); break;
             }
@@ -530,18 +537,24 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
                 sampleEnv.keyOn();
                 //sampleEnv.setValue(1.0f);
             }
-            
-            if ((playType != Normal) && (lengthTracker >= (playLength - adsr.getReleaseTime() * getSampleRate())))
-            {
-                if ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE))
-                {
-                    adsr.keyOff();
-                }
-            }
         }
         else
         {
             DBG("Invalid note direction.");
+        }
+        
+        // Check for adsr keyOffs
+        if ((playType != Normal) && ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE)))
+        {
+            if (lengthTracker >= (playLength - adsr.getReleaseTime() * getSampleRate()))
+            {
+                adsr.keyOff();
+            }
+            
+            if (lengthTracker >= (playLengthSF2 - sfzadsr.getReleaseTime() * getSampleRate()))
+            {
+                sfzadsr.keyOff();
+            }
         }
         
         float l,r;

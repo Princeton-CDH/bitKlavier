@@ -195,7 +195,7 @@ private:
     double lengthTracker, lengthEnv;
 
     double playEndPosition;
-    double playLength;
+    double playLength, playLengthSF2;
     uint64 timer;
     BKNoteType bkType;
     PianoSamplerNoteType playType;
