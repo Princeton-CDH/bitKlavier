@@ -2215,9 +2215,11 @@ void BKStackedSlider::mouseDrag(const MouseEvent& e)
 void BKStackedSlider::mouseUp(const MouseEvent& e)
 {
     DBG("BKStackedSlider::mouseUp");
+
     listeners.call(&BKStackedSlider::Listener::BKStackedSliderValueChanged,
                    getName(),
                    getAllActiveValues());
+    
 }
 
 void BKStackedSlider::mouseMove(const MouseEvent& e)
@@ -2249,7 +2251,8 @@ void BKStackedSlider::mouseDoubleClick (const MouseEvent &e)
     
     editValsTextField->setVisible(true);
     editValsTextField->toFront(true);
-    editValsTextField->setText(floatArrayToString(getAllActiveValues())); //arrayFloatArrayToString
+    editValsTextField->grabKeyboardFocus();
+    editValsTextField->setText(floatArrayToString(getAllActiveValues()), dontSendNotification); //arrayFloatArrayToString
     
     Range<int> highlightRange(startPoint, endPoint);
     editValsTextField->setHighlightedRegion(highlightRange);

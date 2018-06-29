@@ -647,17 +647,6 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
 
 void BKConstructionSite::mouseDoubleClick(const MouseEvent& eo)
 {
-    /*
-    BKItem* item = dynamic_cast<BKItem*> (eo.originalComponent->getParentComponent());
-
-    if (item != nullptr)
-    {
-        if (item->getType() == PreparationTypeComment)
-        {
-            //item->
-        }
-    }
-     */
 }
 
 void BKConstructionSite::mouseHold(Component* frame, bool onItem)

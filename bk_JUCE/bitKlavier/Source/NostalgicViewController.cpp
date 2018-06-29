@@ -712,7 +712,6 @@ void NostalgicModificationEditor::update(void)
         }
         
         val = mod->getParam(NostalgicTransposition);
-        //transpositionSlider->setValue(stringToFloatArray(val), dontSendNotification);
         transpositionSlider->setTo(stringToFloatArray(val), dontSendNotification);
         
         val = mod->getParam(NostalgicLengthMultiplier);

@@ -517,7 +517,11 @@ public:
         else                    return "";
     }
     
-    inline void setParam(DirectParameterType type, String val) { param.set(type, val); DBG("Direct setParam " + String(type) + " " + param[type]);};
+    inline void setParam(DirectParameterType type, String val)
+    {
+        param.set(type, val); DBG("Direct setParam " + String(type) + " " + param[type]);
+        
+    };
     
     inline const StringArray getStringArray(void) { return param; }
     
