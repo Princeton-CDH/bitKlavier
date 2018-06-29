@@ -70,7 +70,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
     for (auto t : synchronic->aPrep->getTransposition()[transpCounter])
     {
 
-        float offset = t + tuner->getOffset(note), synthOffset = offset;
+        float offset = t + tuner->getOffset(note, false), synthOffset = offset;
         int synthNoteNumber = (float)note;
         
         //if (sampleType < BKLoadSoundfont)

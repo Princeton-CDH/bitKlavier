@@ -31,9 +31,11 @@ DirectProcessor::~DirectProcessor(void)
 
 void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 {
+    tuner->getOffset(noteNumber, true);
+    
     for (auto t : direct->aPrep->getTransposition())
     {
-        float offset = t + tuner->getOffset(noteNumber), synthOffset = offset;
+        float offset = t + tuner->getOffset(noteNumber, false), synthOffset = offset;
         int synthNoteNumber = noteNumber;
         
         //if (sampleType < BKLoadSoundfont)
