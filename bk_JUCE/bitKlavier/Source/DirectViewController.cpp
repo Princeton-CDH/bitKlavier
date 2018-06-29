@@ -746,12 +746,15 @@ void DirectModificationEditor::BKSingleSliderValueChanged(String name, double va
 
 void DirectModificationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {
+    
     DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
     
     mod->setParam(DirectTransposition, floatArrayToString(val));
+    
     transpositionSlider->setBright();
     
     updateModification();
+    
 }
 
 void DirectModificationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)

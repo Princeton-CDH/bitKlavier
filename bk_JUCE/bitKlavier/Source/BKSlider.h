@@ -656,8 +656,6 @@ public:
         virtual ~Listener() {};
         
         virtual void BKStackedSliderValueChanged(String name, Array<float> val) = 0; //rewrite all this to pass "this" and check by slider ref instead of name?
-        
-        virtual void bkStackedSliderValueChanged(BKStackedSlider*) {};
     };
     
     ListenerList<Listener> listeners;
