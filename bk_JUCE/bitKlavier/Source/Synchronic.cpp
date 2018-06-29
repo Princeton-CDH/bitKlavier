@@ -234,14 +234,10 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
     
     if(shouldPlay)
     {
-        
-        //remove duplicates from cluster, so we don't play the same note twice in a single pulse
-        slimCluster.clearQuick();
-        for(int i = 0; i< cluster.size(); i++) slimCluster.addIfNotAlreadyThere(cluster.getUnchecked(i));
-        
         //cap size of slimCluster, removing oldest notes
-        if(slimCluster.size() > synchronic->aPrep->getClusterCap()) slimCluster.resize(synchronic->aPrep->getClusterCap());
-        //DBG("slimCluster size: " + String(slimCluster.size()));
+        Array<int> tempCluster;
+        for(int i = 0; i< cluster.size(); i++) tempCluster.set(i, cluster.getUnchecked(i));
+        if(tempCluster.size() > synchronic->aPrep->getClusterCap()) tempCluster.resize(synchronic->aPrep->getClusterCap());
         
         //why not use clusterMax for this? the intent is different:
         //clusterMax: max number of keys pressed within clusterThresh, otherwise shut off pulses
@@ -251,9 +247,13 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
         
         //for now, we'll leave clusterCap unexposed, just to avoid confusion for the user. after all,
         //I used it this way for all of the etudes to date! but might want to expose eventually...
-        //perhaps call beatVoices? since it's essentially the number of "voices" in the pulse chord?
+        //perhaps call beatVoices? since it's essentially the number of "voices" in the pulse chord?        
         
-    
+        //remove duplicates from cluster, so we don't play the same note twice in a single pulse
+        slimCluster.clearQuick();
+        //for(int i = 0; i< cluster.size(); i++) slimCluster.addIfNotAlreadyThere(cluster.getUnchecked(i));
+        for(int i = 0; i< tempCluster.size(); i++) slimCluster.addIfNotAlreadyThere(tempCluster.getUnchecked(i));
+        
         //get time until next beat => beat length scaled by beatMultiplier parameter
         numSamplesBeat =    beatThresholdSamples *
                             synchronic->aPrep->getBeatMultipliers()[beatMultiplierCounter] *
