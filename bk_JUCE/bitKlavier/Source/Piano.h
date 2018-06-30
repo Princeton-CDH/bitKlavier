@@ -139,12 +139,20 @@ public:
     TuningProcessor::Ptr        addTuningProcessor(int thisId);
     TempoProcessor::Ptr         addTempoProcessor(int thisId);
     
-    void clearOldNotes()
+    void clearOldNotes(Piano::Ptr prevPiano)
     {
         SynchronicProcessor::PtrArr sprocessors = getSynchronicProcessors();
+        SynchronicProcessor::PtrArr prevSprocessors = prevPiano->getSynchronicProcessors();
+        
         for(int i=0; i<sprocessors.size(); i++)
         {
-            sprocessors.getUnchecked(i)->clearOldNotes();
+            bool inPrevSproc = false;
+            for(int j=0; j<prevSprocessors.size(); j++)
+            {
+                if(sprocessors.getUnchecked(i) == prevSprocessors.getUnchecked(j))
+                    inPrevSproc = true;
+            }
+            if(!inPrevSproc) sprocessors.getUnchecked(i)->clearOldNotes(); //want to keep oldNotes if sProc is in previous piano
         }
     }
     

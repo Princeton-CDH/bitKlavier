@@ -171,7 +171,7 @@ namespace BinaryData
     const int            NS_3_Song_xmlSize = 47563;
 
     extern const char*   NS_4_Marbles_xml;
-    const int            NS_4_Marbles_xmlSize = 56592;
+    const int            NS_4_Marbles_xmlSize = 56590;
 
     extern const char*   NS_5_Wallumrod_xml;
     const int            NS_5_Wallumrod_xmlSize = 68903;
