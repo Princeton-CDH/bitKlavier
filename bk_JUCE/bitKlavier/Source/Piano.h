@@ -139,6 +139,15 @@ public:
     TuningProcessor::Ptr        addTuningProcessor(int thisId);
     TempoProcessor::Ptr         addTempoProcessor(int thisId);
     
+    void clearOldNotes()
+    {
+        SynchronicProcessor::PtrArr sprocessors = getSynchronicProcessors();
+        for(int i=0; i<sprocessors.size(); i++)
+        {
+            sprocessors.getUnchecked(i)->clearOldNotes();
+        }
+    }
+    
     void copyAdaptiveTuningState (Piano::Ptr prevPiano)
     {
         TuningProcessor::PtrArr prevTuningProcessors = prevPiano->getTuningProcessors();
