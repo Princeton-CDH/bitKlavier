@@ -45,7 +45,7 @@ private:
     
     ScopedPointer<ComponentBoundsConstrainer> constrain;
 
-    ScopedPointer<ResizableCornerComponent> resizer;
+    ScopedPointer<ResizableCornerComponent> resizerCorner;
     
     //BKButtonAndMenuLAF laf;
 
