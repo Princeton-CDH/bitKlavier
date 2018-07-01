@@ -684,14 +684,14 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     
     updateState->setCurrentDisplay(DisplayNil);
     
-    gallery->resetPreparations();
+    //gallery->resetPreparations(); //modded preps should remain modded across piano changes; user can Reset if desired
     
     if (noteOnCount)  prevPianos.addIfNotAlreadyThere(currentPiano);
     
     prevPiano = currentPiano;
     
     currentPiano = gallery->getPiano(which);
-    
+    currentPiano->clearOldNotes(prevPiano); // to clearOldNotes so it doesn't playback shit from before
     currentPiano->copyAdaptiveTuningState(prevPiano);
     currentPiano->copyAdaptiveTempoState(prevPiano);
     

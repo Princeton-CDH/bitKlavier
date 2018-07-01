@@ -162,28 +162,28 @@ namespace BinaryData
     const int            Worm_xmlSize = 6954;
 
     extern const char*   NS_1_Prelude_xml;
-    const int            NS_1_Prelude_xmlSize = 16398;
+    const int            NS_1_Prelude_xmlSize = 47562;
 
     extern const char*   NS_2_Undertow_xml;
-    const int            NS_2_Undertow_xmlSize = 15410;
+    const int            NS_2_Undertow_xmlSize = 44344;
 
     extern const char*   NS_3_Song_xml;
-    const int            NS_3_Song_xmlSize = 16392;
+    const int            NS_3_Song_xmlSize = 47563;
 
     extern const char*   NS_4_Marbles_xml;
-    const int            NS_4_Marbles_xmlSize = 23841;
+    const int            NS_4_Marbles_xmlSize = 56590;
 
     extern const char*   NS_5_Wallumrod_xml;
-    const int            NS_5_Wallumrod_xmlSize = 28121;
+    const int            NS_5_Wallumrod_xmlSize = 68903;
 
     extern const char*   NS_6_PointsAmongLines_xml;
-    const int            NS_6_PointsAmongLines_xmlSize = 15638;
+    const int            NS_6_PointsAmongLines_xmlSize = 46095;
 
     extern const char*   NS_7_Systerslaat_xml;
-    const int            NS_7_Systerslaat_xmlSize = 43911;
+    const int            NS_7_Systerslaat_xmlSize = 94887;
 
     extern const char*   NS_8_ItIsEnough_xml;
-    const int            NS_8_ItIsEnough_xmlSize = 22311;
+    const int            NS_8_ItIsEnough_xmlSize = 65316;
 
     extern const char*   Basic_Piano_xml;
     const int            Basic_Piano_xmlSize = 4393;
