@@ -53,7 +53,6 @@ timerCallbackCount(0)
     mainSlider->setDoubleClickReturnValue (true, 0.0); // double-clicking this slider will set it to 50.0
     mainSlider->setTextValueSuffix (" dB");
     mainSlider->addListener(this);
-
     
     addAndMakeVisible (mainSlider);
     
@@ -108,7 +107,6 @@ timerCallbackCount(0)
     addAndMakeVisible(construction);
     
     addChildComponent(overtop);
-
     
     juce::Point<int> myshadowOffset(2, 2);
     DropShadow myshadow(Colours::darkgrey, 5, myshadowOffset);
