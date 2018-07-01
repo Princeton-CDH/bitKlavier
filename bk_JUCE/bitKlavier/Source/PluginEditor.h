@@ -43,10 +43,6 @@ private:
     
     MainViewController mvc;
     
-    ScopedPointer<ComponentBoundsConstrainer> constrain;
-
-    ScopedPointer<ResizableCornerComponent> resizerCorner;
-    
     //BKButtonAndMenuLAF laf;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessorEditor)
