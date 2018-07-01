@@ -152,7 +152,7 @@ public:
     
     void resized(void) override
     {
-        image.rescaled(getWidth(), getHeight());
+        image.rescaled((getWidth() > 2) ? getWidth() : 2, (getHeight() > 2) ? getHeight() : 2);
     }
 private:
     
