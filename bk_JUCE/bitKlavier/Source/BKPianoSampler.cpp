@@ -354,7 +354,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             {
                 inLoop = true;
                 
-                if (sound->loopMode == 1 || sound->loopMode == 2)
+                if (sound->loopMode <=  2)
                 {
                     //samplePosition = playLength - 1;
                     loopEnv.setValue(0.0);
@@ -681,7 +681,7 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
     {
         if (playingSound->isSoundfont)
         {
-            if (playingSound->loopMode == 1 || playingSound->loopMode == 2)
+            if (playingSound->loopMode <= 2)
             {
                 processSoundfontNoLoop(outputBuffer, startSample, numSamples, playingSound);
             }

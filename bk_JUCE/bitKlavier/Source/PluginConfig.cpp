@@ -106,7 +106,6 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
         ScopedPointer<XmlElement> galleryXML (getXmlFromBinary (data, sizeInBytes));
         if (galleryXML != nullptr)
         {
-            DBG(galleryXML->createDocument("haha"));
             defaultLoaded = (bool) galleryXML->getStringAttribute("defaultLoaded").getIntValue();
             
             if (defaultLoaded)
@@ -139,23 +138,38 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             setCurrentPiano(galleryXML->getStringAttribute("defaultPiano").getIntValue());
             
             initializeGallery();
-#if !LOAD_SAMPLES_IN_GALLERY
-            BKSampleLoadType toLoadType = (BKSampleLoadType)(galleryXML->getStringAttribute("sampleType").getIntValue());
             
-            if (toLoadType == BKLoadSoundfont)
+            
+#if !LOAD_SAMPLES_IN_GALLERY
+            String loadAttr = galleryXML->getStringAttribute("sampleType");
+            
+            if (loadAttr != String())
             {
-                currentSoundfont = galleryXML->getStringAttribute("soundfontURL");
-                currentInstrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
-                loadSamples(BKLoadSoundfont, currentSoundfont, currentInstrument);
+                BKSampleLoadType toLoadType = (BKSampleLoadType)(loadAttr.getIntValue());
+                
+                if (toLoadType == BKLoadSoundfont)
+                {
+                    currentSoundfont = galleryXML->getStringAttribute("soundfontURL");
+                    currentInstrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
+                    loadSamples(BKLoadSoundfont, currentSoundfont, currentInstrument);
+                }
+                else
+                {
+                    currentSoundfont = "";
+                    
+                    loadSamples(toLoadType);
+                }
+
             }
             else
             {
-                currentSoundfont = "";
-
-                loadSamples(toLoadType);
+#if JUCE_IOS
+                loadSamples(BKLoadMedium);
+#else
+                loadSamples(BKLoadHeavy);
+#endif
             }
 #endif
-             
             
         }
     }

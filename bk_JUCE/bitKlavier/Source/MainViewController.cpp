@@ -491,6 +491,8 @@ void MainViewController::fillSampleCB()
     sampleCB.addItem("Piano (medium)", 3);
     sampleCB.addItem("Piano (heavy)", 4);
     
+    sampleCB.addSeparator();
+    
     if (processor.currentSampleType <= BKLoadHeavy)
     {
         sampleCB.setSelectedItemIndex(processor.currentSampleType, dontSendNotification);
@@ -499,7 +501,7 @@ void MainViewController::fillSampleCB()
     int id = 5;
     for (auto sf : processor.soundfontNames)
     {
-        String name = sf.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf2", false, true);
+        String name = sf.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf", false, true);
         sampleCB.addItem(name, id);
         
         if ((processor.currentSampleType == BKLoadSoundfont) && (name == processor.getCurrentSoundfontName()))
@@ -529,6 +531,7 @@ void MainViewController::fillInstrumentCB()
         int i = 1;
         for (auto inst : processor.instrumentNames)
         {
+            if (inst == "") inst = "Inst" + String(i);
             instrumentCB.addItem(inst, i++);
         }
         

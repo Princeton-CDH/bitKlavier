@@ -67,11 +67,11 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
 
 void BKAudioProcessor::collectSoundfontsFromFolder(File folder)
 {
-    DirectoryIterator iter (File (folder), true, "*.sf2");
+    DirectoryIterator iter (File (folder), true, "*.sf2;");
     while (iter.next())
     {
         File soundfontFile (iter.getFile());
-        
+
         soundfontNames.add(soundfontFile.getFullPathName());
     }
 }

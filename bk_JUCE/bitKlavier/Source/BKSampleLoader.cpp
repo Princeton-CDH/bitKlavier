@@ -67,6 +67,7 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     }
     else if (ext == ".sfz")
     {
+        /*
         sfzsound   = new sfzero::Sound(sfzFile);
         
         sfzreader  = new sfzero::Reader(sfzsound);
@@ -77,6 +78,26 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         processor.regions.clear();
         processor.regions = sfzsound->getRegions();
         DBG("regions.size: " + String(processor.regions.size()));
+        */
+        sfzsound   = new sfzero::Sound(sfzFile);
+    
+        sfzreader  = new sfzero::Reader(sfzsound);
+        sfzreader->read(sfzFile);
+        
+        sfzsound->loadRegions(processor.currentInstrument);
+        sfzsound->loadSamples(&formatManager);
+        
+        processor.currentInstrumentName = sfzsound->subsoundName(processor.currentInstrument);
+        
+        processor.instrumentNames.clear();
+        for (int i = 0; i < sfzsound->numSubsounds(); i++)
+        {
+            processor.instrumentNames.add(sfzsound->subsoundName(i));
+        }
+        
+        processor.regions.clear();
+        processor.regions = sfzsound->getRegions();
+        processor.progressInc = 1.0 / processor.regions.size();
     }
     else    return;
     

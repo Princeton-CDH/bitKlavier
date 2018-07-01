@@ -296,7 +296,7 @@ public:
     
     inline String getCurrentSoundfontName(void)
     {
-        return (currentSoundfont.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf2", false, true));
+        return (currentSoundfont.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf", false, true));
     }
     
 private:
