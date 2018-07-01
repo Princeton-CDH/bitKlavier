@@ -150,8 +150,10 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
                                                         region->transpose,
                                                         vrange,
                                                         region));
+        
+        DBG("ref: " +String(buffer->getReferenceCount()));
     }
-    
+
     processor.didLoadMainPianoSamples = true;
 }
 

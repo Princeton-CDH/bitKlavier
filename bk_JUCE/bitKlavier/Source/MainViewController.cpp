@@ -121,6 +121,8 @@ timerCallbackCount(0)
 MainViewController::~MainViewController()
 {
     setLookAndFeel(nullptr);
+    sampleCB.setLookAndFeel(nullptr);
+    instrumentCB.setLookAndFeel(nullptr);
     octaveSlider.setLookAndFeel(nullptr);
     mainSlider->setLookAndFeel(nullptr);
     removeKeyListener(this);

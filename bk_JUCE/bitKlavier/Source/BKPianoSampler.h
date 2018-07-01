@@ -50,6 +50,7 @@ public:
                          int transpose,
                          const BigInteger& midiVelocities,
                          sfzero::Region* region = nullptr);
+
     
     /** Destructor. */
     ~BKPianoSamplerSound();

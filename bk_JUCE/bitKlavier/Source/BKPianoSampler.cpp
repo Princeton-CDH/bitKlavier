@@ -34,7 +34,6 @@ transpose(transp)
 {
     rampOnSamples = roundToInt (aRampOnTimeSec* sourceSampleRate);
     rampOffSamples = roundToInt (aRampOffTimeSec * sourceSampleRate);
-
     
     if (reg != nullptr)
     {
@@ -62,7 +61,6 @@ transpose(transp)
 
 BKPianoSamplerSound::~BKPianoSamplerSound()
 {
-    
 }
 
 bool BKPianoSamplerSound::isSoundfontSound(void)
