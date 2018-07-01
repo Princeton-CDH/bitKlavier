@@ -27,10 +27,13 @@ void BKAudioProcessor::updateUI(void)
 
 void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsound)
 {
+    didLoadMainPianoSamples = false;    
     if (type == BKLoadSoundfont)
     {
         if (path == "") return;
 
+        shouldLoadDefault = false;
+        
         currentSampleType = BKLoadSoundfont;
         
         currentSoundfont = path;
@@ -42,7 +45,7 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
     {
         currentSampleType = type;
         
-        didLoadMainPianoSamples = false;
+        shouldLoadDefault = false;
         
         DBG("SAMPLE_SET: " + cBKSampleLoadTypes[type]);\
         int numSamplesPerLayer = 29;
@@ -60,9 +63,6 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
         
         loader.startThread();
     }
-    
-    
-    
 }
 
 void BKAudioProcessor::collectSoundfontsFromFolder(File folder)

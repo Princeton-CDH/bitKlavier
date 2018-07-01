@@ -222,7 +222,7 @@ public:
     
     double progress;
     double progressInc;
-    bool didLoadHammersAndRes, didLoadMainPianoSamples;
+    bool didLoadHammersAndRes, didLoadMainPianoSamples, shouldLoadDefault;
     
     void clearBitKlavier(void);
     

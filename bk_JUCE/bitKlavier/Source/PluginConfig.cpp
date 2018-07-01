@@ -147,7 +147,15 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             {
                 BKSampleLoadType toLoadType = (BKSampleLoadType)(loadAttr.getIntValue());
                 
-                if (toLoadType == BKLoadSoundfont)
+                if (toLoadType == BKLoadNil)
+                {
+#if JUCE_IOS
+                    loadSamples(BKLoadMedium);
+#else
+                    loadSamples(BKLoadHeavy);
+#endif
+                }
+                else if (toLoadType == BKLoadSoundfont)
                 {
                     currentSoundfont = galleryXML->getStringAttribute("soundfontURL");
                     currentInstrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();

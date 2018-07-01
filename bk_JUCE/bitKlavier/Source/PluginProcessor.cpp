@@ -25,7 +25,8 @@ hammerReleaseSynth(),
 resonanceReleaseSynth(),
 pedalSynth(),
 currentSampleType(BKLoadNil),
-loader(*this)
+loader(*this),
+shouldLoadDefault(true)
 #if TRY_UNDO
 ,epoch(0),
 #endif
@@ -239,6 +240,15 @@ void BKAudioProcessor::openSoundfont(void)
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    if (shouldLoadDefault)
+    {
+#if JUCE_IOS
+        loadSamples(BKLoadMedium);
+#else
+        loadSamples(BKLoadHeavy);
+#endif
+    }
+    
     stk::Stk::setSampleRate(sampleRate);
     
     mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
@@ -268,6 +278,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 BKAudioProcessor::~BKAudioProcessor()
 {
     clipboard.clear();
+    //loader.stopThread(1000);
 }
 
 void BKAudioProcessor::deleteGallery(void)
