@@ -531,7 +531,7 @@ void MainViewController::fillInstrumentCB()
         int i = 1;
         for (auto inst : processor.instrumentNames)
         {
-            if (inst == "") inst = "Inst" + String(i);
+            if (inst == "") inst = "Instrument " + String(i);
             instrumentCB.addItem(inst, i++);
         }
         

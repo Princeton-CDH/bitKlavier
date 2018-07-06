@@ -224,7 +224,7 @@ void BKAudioProcessor::openSoundfont(void)
     FileChooser myChooser ("Load soundfont file...",
                            //File::getSpecialLocation (File::userHomeDirectory),
                            lastGalleryPath,
-                           "*.sf2;");
+                           "*.sf2;*.sfz;");
     
     if (myChooser.browseForFileToOpen())
     {

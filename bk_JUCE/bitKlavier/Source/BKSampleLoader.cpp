@@ -44,8 +44,11 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     ScopedPointer<sfzero::Sound>     sfzsound;
     ScopedPointer<sfzero::Reader>    sfzreader;
     
+    bool isSF2 = false;
+    
     if      (ext == ".sf2")
     {
+        isSF2 = true;
         sf2sound   = new sfzero::SF2Sound(sfzFile);
         
         sf2reader  = new sfzero::SF2Reader(sf2sound, sfzFile);
@@ -67,18 +70,8 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     }
     else if (ext == ".sfz")
     {
-        /*
-        sfzsound   = new sfzero::Sound(sfzFile);
+        processor.currentInstrument = 0;
         
-        sfzreader  = new sfzero::Reader(sfzsound);
-        
-        sfzsound->loadRegions(processor.currentInstrument);
-        sfzsound->loadSamples(&formatManager);
-        
-        processor.regions.clear();
-        processor.regions = sfzsound->getRegions();
-        DBG("regions.size: " + String(processor.regions.size()));
-        */
         sfzsound   = new sfzero::Sound(sfzFile);
     
         sfzreader  = new sfzero::Reader(sfzsound);
@@ -100,15 +93,25 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         processor.progressInc = 1.0 / processor.regions.size();
     }
     else    return;
-    
+
     int count = 0;
     for (auto region : processor.regions)
     {
         processor.progress += processor.progressInc;
         
-        int64 sampleStart = region->offset;
+        int64 sampleStart, sampleLength;
         
-        int64 sampleLength = region->end - sampleStart;
+        if (isSF2)
+        {
+            sampleStart = region->offset;
+            sampleLength = region->end - sampleStart;
+        }
+        else
+        {
+            sampleStart = 0;
+            sampleLength = region->sample->getSampleLength();
+        }
+   
         double sourceSampleRate = region->sample->getSampleRate();
         
         // check out fluidsynth as alternative
