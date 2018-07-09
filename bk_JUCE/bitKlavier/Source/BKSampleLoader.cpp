@@ -116,6 +116,7 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         }
    
         double sourceSampleRate = region->sample->getSampleRate();
+
         
         // check out fluidsynth as alternative
         AudioSampleBuffer* sourceBuffer = region->sample->getBuffer();
@@ -126,17 +127,30 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         
         destBuffer->copyFrom(0, 0, sourceBuffer->getReadPointer(0, sampleStart), (int)sampleLength);
         
-        DBG("region " + String(count) + " offset: " + String(region->offset));
+        // WEIRD thing where sample metadata defines loop point instead of the sfz format
+        if (!isSF2 && (region->loop_mode == 0))
+        {
+            if ((region->sample->getLoopStart() > 0) &&
+                (region->sample->getLoopEnd() > 0))
+            {
+                region->loop_mode = sfzero::Region::loop_continuous;
+                region->loop_start = region->sample->getLoopStart();
+                region->loop_end = region->sample->getLoopEnd();
+            }
+        }
+        
+        DBG("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
+        DBG("region " + String(count) + " | offset: " + String(region->offset));
         region->end             -= region->offset;
         region->loop_start      -= region->offset;
         region->loop_end        -= region->offset;
         region->offset           = 0;
         
-        
-        
         DBG("region " + String(count) + " | transp: " + String(region->transpose) + "   keycenter: " + String(region->pitch_keycenter) + " keytrack: " + String(region->pitch_keytrack));
         
         DBG("region " + String(count++) + " |   end: " + String(region->end) + "   ls: " + String(region->loop_start) + "   le: " + String(region->loop_end) + "   keyrange: " + String(region->lokey) + "-" + String(region->hikey) + "   velrange: " + String(region->lovel) + "-" + String(region->hivel));
+
+        
         
         if ((region->lokey == region->hikey) && (region->lokey != region->pitch_keycenter))
         {

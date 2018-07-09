@@ -360,7 +360,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                 
                 if (sound->loopMode <=  2)
                 {
-                    //samplePosition = playLength - 1;
                     loopEnv.setValue(0.0);
                     sampleEnv.setValue(1.0);
                 }
@@ -370,7 +369,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                     sampleEnv.setValue(0.0f);
                     
                     loopPosition = sound->loopStart;
-                    
 #if REVENV
                     // total length of sound minus the length of the AHDR should be how long sample was sustained (hold in reverse)
                     double totalLen = (totalLength * pitchRatio);
@@ -420,7 +418,7 @@ void BKPianoSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
     if (allowTailOff)
     {
         adsr.keyOff();
-        //sfzadsr.keyOff();
+        sfzadsr.keyOff();
     }
     else
     {
@@ -545,10 +543,8 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
                 samplePosition = reversePosition;  //was original code
                 
                 loopEnv.keyOff(); //DT: should be keyOff/On or setTarget, set setValue
-                //loopEnv.setValue(0.0f);
                 
                 sampleEnv.keyOn();
-                //sampleEnv.setValue(1.0f);
             }
         }
         else
