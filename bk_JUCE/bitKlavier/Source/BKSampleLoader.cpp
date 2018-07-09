@@ -39,12 +39,12 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
     }
     
+    bool isSF2 = false;
+    
     ScopedPointer<sfzero::SF2Sound>     sf2sound;
     ScopedPointer<sfzero::SF2Reader>    sf2reader;
     ScopedPointer<sfzero::Sound>     sfzsound;
     ScopedPointer<sfzero::Reader>    sfzreader;
-    
-    bool isSF2 = false;
     
     if      (ext == ".sf2")
     {
@@ -70,9 +70,11 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     }
     else if (ext == ".sfz")
     {
+        sfzsound   = new sfzero::Sound(sfzFile);
+        
         processor.currentInstrument = 0;
         
-        sfzsound   = new sfzero::Sound(sfzFile);
+        DBG("numsubs: " + String(sfzsound->numSubsounds()));
     
         sfzreader  = new sfzero::Reader(sfzsound);
         sfzreader->read(sfzFile);
@@ -91,6 +93,7 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         processor.regions.clear();
         processor.regions = sfzsound->getRegions();
         processor.progressInc = 1.0 / processor.regions.size();
+
     }
     else    return;
 
@@ -129,6 +132,8 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         region->loop_end        -= region->offset;
         region->offset           = 0;
         
+        
+        
         DBG("region " + String(count) + " | transp: " + String(region->transpose) + "   keycenter: " + String(region->pitch_keycenter) + " keytrack: " + String(region->pitch_keytrack));
         
         DBG("region " + String(count++) + " |   end: " + String(region->end) + "   ls: " + String(region->loop_start) + "   le: " + String(region->loop_end) + "   keyrange: " + String(region->lokey) + "-" + String(region->hikey) + "   velrange: " + String(region->lovel) + "-" + String(region->hivel));
@@ -143,7 +148,6 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         BigInteger nrange; nrange.setRange(region->lokey, nbits+1, true);
         BigInteger vrange; vrange.setRange(region->lovel, vbits+1, true);
         
-        
         synth->addSound(new BKPianoSamplerSound(region->sample->getShortName(),
                                                         buffer,
                                                         sampleLength,
@@ -152,7 +156,7 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
                                                         region->pitch_keycenter,
                                                         region->transpose,
                                                         vrange,
-                                                        region));
+                                                        region,isSF2));
     }
 
     processor.didLoadMainPianoSamples = true;

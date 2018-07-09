@@ -178,6 +178,8 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     
     // ~ ~ ~ share menu ~ ~ ~
+    if (!processor.defaultLoaded)
+    {
 #if JUCE_MAC
     PopupMenu shareMenu;
     
@@ -193,6 +195,7 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     galleryMenu.addItem(SHARE_MESSAGE_ID, "Share");
 #endif
+    }
     
     galleryMenu.addSeparator();
     galleryMenu.addItem(SETTINGS_ID, "Settings");

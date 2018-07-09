@@ -711,6 +711,8 @@ protected:
     /** Can be overridden to do custom handling of incoming midi events. */
     virtual void handleMidiEvent (const MidiMessage&);
     
+    juce::Array<sfzero::Region *> regions_;
+    
 private:
     
     

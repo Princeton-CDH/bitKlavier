@@ -49,7 +49,8 @@ public:
                          int rootMidiNote,
                          int transpose,
                          const BigInteger& midiVelocities,
-                         sfzero::Region* region = nullptr);
+                         sfzero::Region* region = nullptr,
+                         bool isSF2 = true);
 
     
     /** Destructor. */
@@ -70,6 +71,8 @@ public:
     bool appliesToVelocity (int midiNoteVelocity) override;
     bool appliesToChannel (int midiChannel) override;
     bool isSoundfontSound(void);
+    
+    sfzero::Region* region_;
     
 private:
     //==============================================================================

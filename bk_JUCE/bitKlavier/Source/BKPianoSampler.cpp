@@ -21,7 +21,7 @@ BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                           const int rootMidiNote,
                                           const int transp,
                                           const BigInteger& velocities,
-                                          sfzero::Region* reg)
+                                          sfzero::Region* reg, bool isSF2)
 :
 name (soundName),
 data(buffer),
@@ -37,24 +37,31 @@ transpose(transp)
     
     if (reg != nullptr)
     {
+        region_ = new sfzero::Region();
+        *region_ = *reg;
+        
         isSoundfont = true;
         
-        loopStart = reg->loop_start; // loop start and end take in account minimum fade amt
-        loopEnd = reg->loop_end;
-        start = reg->offset;
-        end = reg->end;
+        loopStart = region_->loop_start; // loop start and end take in account minimum fade amt
+        loopEnd = region_->loop_end;
+        start = region_->offset;
+        end = region_->end;
         
-        delay = reg->ampeg.delay;
-        attack = reg->ampeg.attack;
-        hold = reg->ampeg.hold;
-        decay = reg->ampeg.decay;
-        sustain = reg->ampeg.sustain / 100.0f;
-        release = reg->ampeg.release;
+        delay = region_->ampeg.delay;
+        attack = region_->ampeg.attack;
+        hold = region_->ampeg.hold;
+        decay = region_->ampeg.decay;
+        sustain = region_->ampeg.sustain / 100.0f;
+        release = region_->ampeg.release;
         
-        loopMode = reg->loop_mode;
+        loopMode = region_->loop_mode;
+        
+        
+        //if (!isSF2 && (loopMode == 0)) loopMode = 3;
     }
     else
     {
+        region_ = nullptr;
         isSoundfont = false;
     }
 }
@@ -203,7 +210,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         
         //actual maxLength, based on soundfile size, leaving enough samples for release
         double maxLength = sound->soundLength - adsrRelease * pitchRatio;
-        
         
         if (playDirection == Forward)
         {
@@ -636,9 +642,6 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
         }
         else if (playDirection == Reverse)
         {
-
-            //DT: changed if checks here; lengthTracker already has adsrReleaseTime in it....
-            //if(lengthTracker >= playLength)
             if(lengthTracker >= playLength + adsr.getReleaseTime() * getSampleRate())
             {
                 clearCurrentNote(); break;
