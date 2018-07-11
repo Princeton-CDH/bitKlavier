@@ -372,10 +372,13 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             BKSynthesiserSound* const sound = sounds.getUnchecked(i);
             
             // Check if sound applies to note, velocity, and channel.
-            if (sound->appliesToNote (noteNumber)
-                && sound->appliesToVelocity((int)(velocity*127.0)))
+            if (sound->appliesToNote (noteNumber) &&
+                sound->appliesToVelocity((int)(velocity*127.0)) &&
+                (sound->trigger != sfzero::Region::release) &&
+                (sound->trigger != sfzero::Region::release_key) &&
+                sustainPedalsDown[midiChannel] == sound->pedal)
             {
-                //DBG("BKSynthesiser::keyOn " + String(noteNumber));
+                
                 startVoice (findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes),
                             sound,
                             midiChannel,
@@ -394,11 +397,13 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                             adsrSustain,
                             adsrReleaseMS*0.001f* getSampleRate());
                 
-                break;
+                //break;
  
             }
         }
     }
+    
+    VELOCITY IN MASTER REGIONS NEEDS TO BE APPLIED APPROPRIATELY
     
     void BKSynthesiser::startVoice (BKSynthesiserVoice* const voice,
                                     BKSynthesiserSound* const sound,
@@ -537,6 +542,72 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                         }
                     }
                 }
+            }
+        }
+        
+        int noteNumber = midiNoteNumber;
+        
+        if (noteNumber > 108 || noteNumber < 21) return;
+        
+        for (int i = sounds.size(); --i >= 0;)
+        {
+            BKSynthesiserSound* const sound = sounds.getUnchecked(i);
+            
+            // Check if sound applies to note, velocity, and channel.
+            
+            bool appliesToNote = sound->appliesToNote (noteNumber);
+            bool appliesToVel = sound->appliesToVelocity((int)(velocity*127.0));
+            bool isRelease = /*(sound->trigger == sfzero::Region::release) || */(sound->trigger == sfzero::Region::release_key);
+            bool pedalStatesMatch = (sustainPedalsDown[midiChannel] == sound->pedal);
+           
+            /*
+            DBG(String((int)appliesToNote) + " " +
+                String((int)appliesToVel) + " " +
+                String((int)isRelease) + " " +
+                String((int) pedalStatesMatch) + " | " + sound->sampleName + " pedal: " + String((int)sound->pedal));
+             */
+            
+            if (appliesToNote && appliesToVel && isRelease && pedalStatesMatch)
+            {
+                /*
+                 (BKSynthesiserVoice* voice,
+                 BKSynthesiserSound* sound,
+                 int midiChannel,
+                 int keyNoteNumber,
+                 int midiNoteNumber,
+                 float midiNoteNumberOffset,
+                 float gain,
+                 PianoSamplerNoteDirection direction,
+                 PianoSamplerNoteType type,
+                 BKNoteType bktype,
+                 int layer,
+                 uint64 startingPosition,
+                 uint64 length,
+                 uint64 adsrAttack,
+                 uint64 adsrDecay,
+                 float adsrSustain,
+                 uint64 adsrRelease)*/
+                
+                startVoice (findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes),
+                            sound,
+                            midiChannel,
+                            keyNoteNumber,
+                            noteNumber,
+                            0, // might need to deal with this
+                            velocity,
+                            Forward,
+                            Normal,
+                            DirectNote,
+                            0,
+                            0,
+                            0,
+                            0.001f,
+                            0.001f,
+                            1.0f,
+                            0.001f);
+                
+                //break;
+                
             }
         }
     }

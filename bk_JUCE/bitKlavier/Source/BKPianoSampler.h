@@ -72,8 +72,6 @@ public:
     bool appliesToChannel (int midiChannel) override;
     bool isSoundfontSound(void);
     
-    sfzero::Region* region_;
-    
 private:
     //==============================================================================
     friend class BKPianoSamplerVoice;

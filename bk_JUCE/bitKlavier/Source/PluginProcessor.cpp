@@ -460,7 +460,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
     // Send key on to each pmap in current piano
     for (p = currentPiano->activePMaps.size(); --p >= 0;) {
         //DBG("noteon: " +String(noteNumber) + " pmap: " + String(p));
-        currentPiano->activePMaps[p]->keyPressed(noteNumber, velocity, channel);
+        currentPiano->activePMaps[p]->keyPressed(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont));
     }
 }
 
@@ -477,7 +477,7 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     
     // Send key off to each pmap in current piano
     for (p = currentPiano->activePMaps.size(); --p >= 0;)
-        currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel);
+        currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont));
     
     // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
     if (prevPiano != currentPiano)

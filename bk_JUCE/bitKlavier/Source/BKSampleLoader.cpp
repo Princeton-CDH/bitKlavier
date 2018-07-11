@@ -51,7 +51,8 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         isSF2 = true;
         sf2sound   = new sfzero::SF2Sound(sfzFile);
         
-        sf2reader  = new sfzero::SF2Reader(sf2sound, sfzFile);
+        // MIGHT BE DOUBLE LOADING REGIONS/SAMPLES (line below could disappear, will test)
+        //sf2reader  = new sfzero::SF2Reader(sf2sound, sfzFile);
         
         sf2sound->loadRegions(processor.currentInstrument);
         sf2sound->loadSamples(&formatManager);
@@ -75,12 +76,10 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         processor.currentInstrument = 0;
         
         DBG("numsubs: " + String(sfzsound->numSubsounds()));
-    
-        sfzreader  = new sfzero::Reader(sfzsound);
-        sfzreader->read(sfzFile);
-        
+
         sfzsound->loadRegions(processor.currentInstrument);
-        sfzsound->loadSamples(&formatManager);
+        DBG("region number: " + String(sfzsound->getRegions().size()));
+        sfzsound->loadSamples(&formatManager, &processor.progress);
         
         processor.currentInstrumentName = sfzsound->subsoundName(processor.currentInstrument);
         
@@ -90,8 +89,10 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
             processor.instrumentNames.add(sfzsound->subsoundName(i));
         }
         
+        
         processor.regions.clear();
         processor.regions = sfzsound->getRegions();
+        processor.progress = 0.0;
         processor.progressInc = 1.0 / processor.regions.size();
 
     }
@@ -139,23 +140,27 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
             }
         }
         
-        DBG("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
-        DBG("region " + String(count) + " | offset: " + String(region->offset));
+        DBG("~ ~ ~ ~ region " + String(count++) + " ~ ~ ~ ~ ~ ~");
+        DBG("sample: " + region->sample->getShortName());
+        DBG("offset: " + String(region->offset));
         region->end             -= region->offset;
         region->loop_start      -= region->offset;
         region->loop_end        -= region->offset;
         region->offset           = 0;
         
-        DBG("region " + String(count) + " | transp: " + String(region->transpose) + "   keycenter: " + String(region->pitch_keycenter) + " keytrack: " + String(region->pitch_keytrack));
+        DBG("transp: " + String(region->transpose) + "   keycenter: " + String(region->pitch_keycenter) + " keytrack: " + String(region->pitch_keytrack));
         
-        DBG("region " + String(count++) + " |   end: " + String(region->end) + "   ls: " + String(region->loop_start) + "   le: " + String(region->loop_end) + "   keyrange: " + String(region->lokey) + "-" + String(region->hikey) + "   velrange: " + String(region->lovel) + "-" + String(region->hivel));
+        DBG("end: " + String(region->end) + "   ls: " + String(region->loop_start) + "   le: " + String(region->loop_end) + "   keyrange: " + String(region->lokey) + "-" + String(region->hikey) + "   velrange: " + String(region->lovel) + "-" + String(region->hivel));
 
-        
+        DBG("region->trigger: " +String(region->trigger));
+        DBG("pedal needed: " + String((int)region->pedal));
         
         if ((region->lokey == region->hikey) && (region->lokey != region->pitch_keycenter))
         {
             region->transpose = region->lokey - region->pitch_keycenter;
         }
+    
+        
         
         int nbits = region->hikey - region->lokey;
         int vbits = region->hivel - region->lovel;

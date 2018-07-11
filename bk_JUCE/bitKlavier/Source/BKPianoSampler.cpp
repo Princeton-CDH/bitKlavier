@@ -56,7 +56,11 @@ transpose(transp)
         
         loopMode = region_->loop_mode;
         
+        trigger = region_->trigger;
         
+        pedal = region_->pedal;
+        
+        sampleName = soundName;
         //if (!isSF2 && (loopMode == 0)) loopMode = 3;
     }
     else
@@ -170,6 +174,9 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         * generalSettings->getTuningRatio()
         / getSampleRate();
         
+        
+        DBG("sound->name: " + sound->name);
+        
         bentRatio = pitchbendMultiplier * pitchRatio;
         
         bkType = bktype;
@@ -203,7 +210,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             
             //playLength => how long to play before keyOff/adsrRelease, accounting for playbackSpeed (pitchRatio)
             playLength = (totalLength - adsrRelease) * pitchRatio;
-            
         }
         
         //playLength should now be the actual duration we want to hear, minus the release time, all scaled for playbackSpeed.
@@ -326,6 +332,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             loopEnv.setTime(cfSamples / getSampleRate());
             
             DBG("loop mode: " + String(sound->loopMode));
+            DBG("ahdsr: " + String(sound->attack) +" "+ String(sound->hold) +" "+ String (sound->decay) +" "+ String(sound->sustain) +" "+ String(sound->release));
             
             if (playDirection == Forward)
             {

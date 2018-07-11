@@ -72,6 +72,10 @@ public:
     /** The class is reference-counted, so this is a handy pointer class for it. */
     typedef ReferenceCountedObjectPtr<BKSynthesiserSound> Ptr;
     
+    sfzero::Region* region_;
+    sfzero::Region::Trigger trigger;
+    bool pedal;
+    String sampleName;
 private:
     
     //==============================================================================
@@ -731,6 +735,7 @@ private:
     bool subBlockSubdivisionIsStrict;
     bool shouldStealNotes;
     BigInteger sustainPedalsDown;
+
     
 #if JUCE_CATCH_DEPRECATED_CODE_MISUSE
     // Note the new parameters for these methods.
