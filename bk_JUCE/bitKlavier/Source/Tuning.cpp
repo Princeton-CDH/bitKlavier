@@ -124,6 +124,7 @@ void TuningProcessor::keyPressed(int midiNoteNumber)
                                            anchorTuning[(midiNoteNumber + tuning->aPrep->getAdaptiveAnchorFundamental()) % anchorTuning.size()]
                                            );
             adaptiveFundamentalNote = midiNoteNumber;
+
         }
         else adaptiveHistoryCounter++;
     }
