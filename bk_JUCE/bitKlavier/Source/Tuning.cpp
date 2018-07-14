@@ -100,22 +100,25 @@ void TuningProcessor::processBlock(int numSamples)
 //add note to the adaptive tuning history, update adaptive fundamental
 void TuningProcessor::keyPressed(int midiNoteNumber)
 {
+    adaptiveHistoryCounter++;
 
     if(tuning->aPrep->getTuning() == AdaptiveTuning)
     {
-        if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory() - 1)
+        //if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory() - 1)
+        if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory())
         {
             adaptiveHistoryCounter = 0;
             adaptiveFundamentalFreq = adaptiveFundamentalFreq * adaptiveCalculateRatio(midiNoteNumber);
             adaptiveFundamentalNote = midiNoteNumber;
         }
-        else adaptiveHistoryCounter++;
+        //else adaptiveHistoryCounter++;
         
     }
     
     else if(tuning->aPrep->getTuning() == AdaptiveAnchoredTuning)
     {
-        if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory() - 1)
+        //if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory() - 1)
+        if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory())
         {
             adaptiveHistoryCounter = 0;
             
@@ -126,7 +129,7 @@ void TuningProcessor::keyPressed(int midiNoteNumber)
             adaptiveFundamentalNote = midiNoteNumber;
 
         }
-        else adaptiveHistoryCounter++;
+        //else adaptiveHistoryCounter++;
     }
     
     clusterTime = 0;
