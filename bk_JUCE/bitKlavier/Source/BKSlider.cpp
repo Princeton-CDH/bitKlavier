@@ -2484,24 +2484,24 @@ sliderName(name)
     else showName.setJustificationType(Justification::bottomLeft);
     //addAndMakeVisible(showName);
     
-    attackSlider = new BKSingleSlider("attack time", 1, 1000, 10, 1);
+    attackSlider = new BKSingleSlider("attack time (ms)", 1, 1000, 10, 1);
     attackSlider->setSkewFactorFromMidPoint(200);
     attackSlider->setJustifyRight(true);
     attackSlider->addMyListener(this);
     addAndMakeVisible(attackSlider);
     
-    decaySlider = new BKSingleSlider("decay time", 1, 1000, 10, 1);
+    decaySlider = new BKSingleSlider("decay time (ms)", 1, 1000, 10, 1);
     decaySlider->setSkewFactorFromMidPoint(200);
     decaySlider->setJustifyRight(false);
     decaySlider->addMyListener(this);
     addAndMakeVisible(decaySlider);
     
-    sustainSlider = new BKSingleSlider("sustain level", 0., 1., 1., 0.001);
+    sustainSlider = new BKSingleSlider("sustain level (0-1)", 0., 1., 1., 0.001);
     sustainSlider->setJustifyRight(true);
     sustainSlider->addMyListener(this);
     addAndMakeVisible(sustainSlider);
     
-    releaseSlider = new BKSingleSlider("release time", 1, 1000, 30, 1);
+    releaseSlider = new BKSingleSlider("release time (ms)", 1, 1000, 30, 1);
     releaseSlider->setSkewFactorFromMidPoint(200);
     releaseSlider->setJustifyRight(false);
     releaseSlider->addMyListener(this);
@@ -2545,7 +2545,11 @@ void BKADSRSlider::setBright()
 
 void BKADSRSlider::BKSingleSliderValueChanged(String name, double val)
 {
+    float sustainVal = sustainSlider->getValue();
+    if (sustainVal > 1.) { sustainVal = 1.; sustainSlider->setValue(1., dontSendNotification); }
+    if (sustainVal < 0.) { sustainVal = 0.; ; sustainSlider->setValue(0., dontSendNotification); }
     
+    /*
     if(name == attackSlider->getName())
     {
         //DBG("attackSlider " + String(val));
@@ -2562,12 +2566,13 @@ void BKADSRSlider::BKSingleSliderValueChanged(String name, double val)
     {
         //DBG("releaseSlider " + String(val));
     }
+     */
             
     listeners.call(&BKADSRSlider::Listener::BKADSRSliderValueChanged,
                    getName(),
                    attackSlider->getValue(),
                    decaySlider->getValue(),
-                   sustainSlider->getValue(),
+                   sustainVal,
                    releaseSlider->getValue());
 }
 
