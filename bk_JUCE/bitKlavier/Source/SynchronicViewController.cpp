@@ -626,6 +626,10 @@ void SynchronicPreparationEditor::BKADSRSliderValueChanged(String name, int atta
     prep->setRelease(which, release);
     active->setRelease(which, release);
     
+    prep->setEnvelopeOn(which, true);
+    active->setEnvelopeOn(which, true);
+    envelopeSliders[which]->setBright();
+    
 }
 
 void SynchronicPreparationEditor::BKADSRButtonStateChanged(String name, bool shift, bool state)
