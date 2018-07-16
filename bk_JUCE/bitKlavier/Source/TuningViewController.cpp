@@ -108,7 +108,7 @@ BKViewController(p,theGraph)
     customOffsets.ensureStorageAllocated(12);
     for(int i=0; i<12; i++) customOffsets.add(0.);
 
-    customKeyboard.setName("scale");
+    customKeyboard.setName("offset from ET");
     //customKeyboard.setAvailableRange(60, 71);
     customKeyboard.setDimensionRatio(2.0);
     customKeyboard.setAvailableRange(0, 11);
