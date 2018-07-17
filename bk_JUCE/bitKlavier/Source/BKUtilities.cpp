@@ -631,6 +631,8 @@ Array<float> stringOrderedPairsToFloatArray(String s, int size)
     return newarray;
 }
 
+
+
 // the following 2 functions are
 // lifted from  PD source
 // specifically x_acoustics.c
@@ -663,3 +665,43 @@ double ftom( double f )
     return (f > 0 ? (log(f / 440.0) / LOGTWO) * 12.0 + 69 : -1500);
 }
 
+#if BK_UNIT_TESTS
+
+#define	MAX_FREQ 20000.f
+
+class UtilitiesTests : public UnitTest
+{
+public:
+	UtilitiesTests() : UnitTest("Utilities", "Utilities") {}
+
+	void runTest() override
+	{
+		beginTest("Utilities");
+		
+		DBG("//////testing freq to midi////////");
+
+		//test ftom
+		for (int i = 0; i < 10; i++)
+		{
+			double r = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
+			double freq1 = r * MAX_FREQ;
+			double freq2 = mtof(ftom(freq1));
+			expect(abs(freq1 - freq2) < 0.005, String(freq1) + " and " + String(freq2) + " do not match");
+		}
+
+		DBG("//////testing midi to freq////////");
+
+		//test mtof
+		for (int i = 0; i < 10; i++)
+		{
+			double r = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
+			double midi1 = r * 128.0;
+			double midi2 = ftom(mtof(midi1));
+			expect(abs(midi1 - midi2) < 0.005, String(midi1) + " and " + String(midi2) + " do not match");
+		}
+	}
+};
+
+static UtilitiesTests test;
+
+#endif

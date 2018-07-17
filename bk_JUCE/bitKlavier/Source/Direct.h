@@ -107,7 +107,7 @@ public:
     inline const int getDecay() const noexcept                          {return dDecay;         }
     inline const float getSustain() const noexcept                      {return dSustain;       }
     inline const int getRelease() const noexcept                        {return dRelease;       }
-    inline const Array<float> getADSRvals() const noexcept              {return {dAttack, dDecay, dSustain, dRelease}; }
+    inline const Array<float> getADSRvals() const noexcept              {return {(float) dAttack, (float) dDecay,(float) dSustain, (float)dRelease}; }
     
     inline void setTransposition(Array<float> val)                      {dTransposition = val;  }
     inline void setGain(float val)                                      {dGain = val;           }

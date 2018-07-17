@@ -150,14 +150,14 @@ public:
     inline const int getReverseDecay() const noexcept                      {return nReverseDecay;         }
     inline const float getReverseSustain() const noexcept                  {return nReverseSustain;       }
     inline const int getReverseRelease() const noexcept                    {return nReverseRelease;       }
-    inline const Array<float> getReverseADSRvals() const noexcept         {return {nReverseAttack, nReverseDecay, nReverseSustain, nReverseRelease}; }
+    inline const Array<float> getReverseADSRvals() const noexcept         {return { (float) nReverseAttack, (float)nReverseDecay,(float)nReverseSustain, (float)nReverseRelease}; }
     
     
     inline const int getUndertowAttack() const noexcept                    {return nUndertowAttack;        }
     inline const int getUndertowDecay() const noexcept                     {return nUndertowDecay;         }
     inline const float getUndertowSustain() const noexcept                 {return nUndertowSustain;       }
     inline const int getUndertowRelease() const noexcept                   {return nUndertowRelease;       }
-    inline const Array<float> getUndertowADSRvals() const noexcept         {return {nUndertowAttack, nUndertowDecay, nUndertowSustain, nUndertowRelease}; }
+    inline const Array<float> getUndertowADSRvals() const noexcept         {return { (float)nUndertowAttack, (float)nUndertowDecay,(float)nUndertowSustain,(float)nUndertowRelease}; }
     
     inline void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
     inline void setUndertow(int undertow)                                  {nUndertow = undertow;                  }

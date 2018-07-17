@@ -30,6 +30,10 @@ loader(*this)
 ,epoch(0),
 #endif
 {
+#if BK_UNIT_TESTS
+	BKUnitTestRunner test;
+	test.runAllTests();
+#endif
     didLoadHammersAndRes            = false;
     didLoadMainPianoSamples         = false;
     sustainIsDown                   = false;

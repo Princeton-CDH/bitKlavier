@@ -301,6 +301,7 @@ public:
     
 private:
     
+
     int  currentPianoId;
     
     bool sustainIsDown = false;
