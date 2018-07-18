@@ -1172,6 +1172,7 @@ sliderIncrement(increment)
     if (justifyRight) showName.setJustificationType(Justification::bottomRight);
     else showName.setJustificationType(Justification::bottomLeft);
     showName.addMouseListener(this, true);
+    showName.setTooltip("tooltip text");
     addAndMakeVisible(showName);
     
     valueTF.setText(String(sliderDefault));
