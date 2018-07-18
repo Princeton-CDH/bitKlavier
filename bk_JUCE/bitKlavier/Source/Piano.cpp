@@ -645,8 +645,6 @@ void Piano::configurePianoMap(BKItem::Ptr map)
         for (auto key : thisKeymap->keys())
         {
             pianoMap.set(key, pianoTarget);
-            
-            DBG("PIANOMAP key: " + String(key) + " piano: " + String(pianoTarget));
         }
     }
 }

@@ -896,7 +896,6 @@ public:
     inline void reset(void)
     {
         nostalgic->aPrep->copy(nostalgic->sPrep);
-        DBG("nostalgic reset");
     }
     
     inline int getId(void) const noexcept { return nostalgic->getId(); }
