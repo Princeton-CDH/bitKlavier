@@ -88,6 +88,10 @@ BKViewController(p, theGraph)
     fillModeSelectCB();
     addAndMakeVisible(modeSelectCB);
     
+    modeLabel.setText("triggers pulse", dontSendNotification);
+    //modeLabel.setJustificationType(Justification::bottomLeft);
+    addAndMakeVisible(modeLabel);
+    
     //offsetParamStartToggle = new BKSingleSlider("skip first", 0, 1, 0, 1);
     offsetParamStartToggle.setButtonText ("skip first");
     buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
@@ -241,7 +245,9 @@ void SynchronicViewController::resized()
         
         Rectangle<int> modeSlice2 = leftColumn.removeFromBottom(gComponentComboBoxHeight);
         modeSlice2.removeFromLeft(gXSpacing * 2);
-        modeSlice2.removeFromRight(2 * modeSlice2.getWidth() / 3);
+        int modeSlice2Chunk = modeSlice2.getWidth() / 3;
+        modeSlice2.removeFromRight(modeSlice2Chunk);
+        modeLabel.setBounds(modeSlice2.removeFromRight(modeSlice2Chunk));
         modeSelectCB.setBounds(modeSlice2);
         
         /*
