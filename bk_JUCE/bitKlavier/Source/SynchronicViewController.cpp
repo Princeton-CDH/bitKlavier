@@ -176,8 +176,12 @@ void SynchronicViewController::resized()
     {
         Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
         modeSlice.removeFromRight(gXSpacing);
-        modeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
-        offsetParamStartToggle.setBounds(modeSlice);
+        //modeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 3.));
+        //offsetParamStartToggle.setBounds(modeSlice);
+        //modeSlice.removeFromLeft(4 + 2.*gPaddingConst * processor.paddingScalarX);
+        //offsetParamStartToggle.setBounds(modeSlice.removeFromLeft(modeSelectCB.getWidth()));
+        offsetParamStartToggle.setBounds(modeSlice.removeFromRight(modeSlice.getWidth()));
+                                         
         
         Rectangle<float> envelopeSlice = area.removeFromBottom(gComponentComboBoxHeight + gPaddingConst * processor.paddingScalarY).toFloat();
         
@@ -207,30 +211,83 @@ void SynchronicViewController::resized()
         leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
         //leftColumn.removeFromLeft(gXSpacing);
         
+        leftColumn.removeFromTop(gPaddingConst * (1. - processor.paddingScalarY));
+        leftColumn.removeFromBottom(gYSpacing * 2);
+        int sliderHeight = leftColumn.getHeight() / 5;
+        
+        /*
+        Rectangle<int> modeSlice2 = leftColumn.removeFromTop(sliderHeight);
+        modeSlice2.removeFromLeft(gXSpacing * 2);
+        modeSlice2.removeFromTop(gYSpacing * 2);
+        modeSlice2.removeFromRight(modeSlice2.getWidth() / 3);
+        modeSelectCB.setBounds(modeSlice2.removeFromTop(gComponentComboBoxHeight));
+        howManySlider->setBounds(leftColumn.removeFromTop(sliderHeight));
+        clusterThreshSlider->setBounds(leftColumn.removeFromTop(sliderHeight));
+        clusterMinMaxSlider->setBounds(leftColumn.removeFromTop(sliderHeight));
+        gainSlider->setBounds(leftColumn.removeFromTop(sliderHeight));
+         */
+        
+        gainSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
+        leftColumn.removeFromBottom(sliderHeight - gComponentSingleSliderHeight);
+        
+        clusterMinMaxSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
+        leftColumn.removeFromBottom(sliderHeight - gComponentSingleSliderHeight);
+        
+        clusterThreshSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
+        leftColumn.removeFromBottom(sliderHeight - gComponentSingleSliderHeight);
+        
+        howManySlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
+        leftColumn.removeFromBottom(sliderHeight - gComponentSingleSliderHeight);
+        
+        Rectangle<int> modeSlice2 = leftColumn.removeFromBottom(gComponentComboBoxHeight);
+        modeSlice2.removeFromLeft(gXSpacing * 2);
+        modeSlice2.removeFromRight(2 * modeSlice2.getWidth() / 3);
+        modeSelectCB.setBounds(modeSlice2);
+        
+        /*
+        int sliderSpacing = leftColumn.getHeight() / 4;
+        
+        modeSelectCB.setBounds(leftColumn.getX() + gXSpacing * 2,
+                               //sliderSpacing * 1 - gComponentComboBoxHeight/2.,
+                               //sliderSpacing * 1,
+                               leftColumn.getY() + gYSpacing * 2,
+                               leftColumn.getWidth() / 3,
+                               gComponentComboBoxHeight);
+        
         int nextCenter = paramSliders[0]->getY() + paramSliders[0]->getHeight()  + gPaddingConst * (1. - processor.paddingScalarY) ;
         howManySlider->setBounds(leftColumn.getX(),
-                                 nextCenter - gComponentSingleSliderHeight/2.,
+                                 //nextCenter - gComponentSingleSliderHeight/2.,
+                                 //sliderSpacing * 2 - gComponentSingleSliderHeight/2.,
+                                 leftColumn.getY() + sliderSpacing * 1,
                                  leftColumn.getWidth(),
                                  gComponentSingleSliderHeight);
 
         nextCenter = paramSliders[1]->getY() + paramSliders[1]->getHeight()  + gPaddingConst * (1. - processor.paddingScalarY);
         clusterThreshSlider->setBounds(leftColumn.getX(),
-                                       nextCenter - gComponentSingleSliderHeight/2.,
+                                       //nextCenter - gComponentSingleSliderHeight/2.,
+                                       //sliderSpacing * 3 - gComponentSingleSliderHeight/2.,
+                                       leftColumn.getY() + sliderSpacing * 2,
                                        leftColumn.getWidth(),
                                        gComponentSingleSliderHeight);
         
         nextCenter = paramSliders[2]->getY() + paramSliders[2]->getHeight()  + gPaddingConst * (1. - processor.paddingScalarY);
         clusterMinMaxSlider->setBounds(leftColumn.getX(),
-                                       nextCenter - gComponentRangeSliderHeight/2.,
+                                       //nextCenter - gComponentRangeSliderHeight/2.,
+                                       //sliderSpacing * 4 - gComponentSingleSliderHeight/2.,
+                                       leftColumn.getY() + sliderSpacing * 3,
                                        leftColumn.getWidth(),
                                        gComponentRangeSliderHeight);
         
         //nextCenter = paramSliders[3]->getY() + paramSliders[3]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
         nextCenter = envelopeSliders[0]->getY() + gPaddingConst * (1. - processor.paddingScalarY);
         gainSlider->setBounds(leftColumn.getX(),
-                              nextCenter - gComponentSingleSliderHeight/2.,
+                              //nextCenter - gComponentSingleSliderHeight/2.,
+                              //sliderSpacing * 5 - gComponentSingleSliderHeight/2.,
+                              leftColumn.getY() + sliderSpacing * 4,
                               leftColumn.getWidth(),
                               gComponentSingleSliderHeight);
+        
+        */
         
         Rectangle<int> releaseToggleSlice = gainSlider->getBounds().removeFromTop(gComponentTextFieldHeight);
         releaseToggleSlice.removeFromRight(gYSpacing);
