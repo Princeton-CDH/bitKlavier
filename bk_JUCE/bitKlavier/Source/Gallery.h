@@ -27,9 +27,12 @@ class Gallery : public ReferenceCountedObject
 public:
     typedef ReferenceCountedObjectPtr<Gallery>   Ptr;
     typedef Array<Gallery::Ptr>                  PtrArr;
+    
     typedef Array<Gallery::Ptr, CriticalSection> CSPtrArr;
     typedef OwnedArray<Gallery>                  Arr;
     typedef OwnedArray<Gallery, CriticalSection> CSArr;
+    
+
  
     Gallery(ScopedPointer<XmlElement> xml, BKAudioProcessor&, bool firstTime=false);
     Gallery(var json, BKAudioProcessor&);

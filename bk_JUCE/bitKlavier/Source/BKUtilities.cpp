@@ -678,7 +678,7 @@ public:
 	{
 		beginTest("Utilities");
 		
-		DBG("//////testing freq to midi////////");
+		DBG("====== testing freq to midi ======");
 
 		//test ftom
 		for (int i = 0; i < 10; i++)
@@ -689,7 +689,7 @@ public:
 			expect(abs(freq1 - freq2) < 0.005, String(freq1) + " and " + String(freq2) + " do not match");
 		}
 
-		DBG("//////testing midi to freq////////");
+		DBG("====== testing midi to freq ======");
 
 		//test mtof
 		for (int i = 0; i < 10; i++)
@@ -702,6 +702,6 @@ public:
 	}
 };
 
-static UtilitiesTests test;
+static UtilitiesTests utilitiesTests;
 
 #endif
