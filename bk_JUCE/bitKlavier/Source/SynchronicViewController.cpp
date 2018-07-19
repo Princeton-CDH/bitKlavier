@@ -338,6 +338,7 @@ void SynchronicViewController::setShowADSR(String name, bool newval)
         clusterMinMaxSlider->setVisible(false);
         offsetParamStartToggle.setVisible(false);
         modeSelectCB.setVisible(false);
+        modeLabel.setVisible(false);
         
         for(int i=0; i<envelopeSliders.size(); i++)
         {
@@ -360,6 +361,7 @@ void SynchronicViewController::setShowADSR(String name, bool newval)
         clusterMinMaxSlider->setVisible(true);
         offsetParamStartToggle.setVisible(true);
         modeSelectCB.setVisible(true);
+        modeLabel.setVisible(true);
         
         for(int i=0; i<envelopeSliders.size(); i++)
         {
