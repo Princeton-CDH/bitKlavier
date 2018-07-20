@@ -403,7 +403,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
         }
     }
     
-    VELOCITY IN MASTER REGIONS NEEDS TO BE APPLIED APPROPRIATELY
+    // VELOCITY IN MASTER REGIONS NEEDS TO BE APPLIED APPROPRIATELY
     
     void BKSynthesiser::startVoice (BKSynthesiserVoice* const voice,
                                     BKSynthesiserSound* const sound,

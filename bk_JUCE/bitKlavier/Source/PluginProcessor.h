@@ -271,7 +271,6 @@ public:
                 
                 if(prevPiano != currentPiano)
                 {
-                    DBG("sustain NOT inverted, sustain is now released");
                     for (int p = prevPiano->activePMaps.size(); --p >= 0;)
                         prevPiano->activePMaps[p]->sustainPedalReleased(true);
                 }
@@ -279,7 +278,6 @@ public:
             else
             {
                 sustainIsDown = true;
-                DBG("sustain NOT inverted, sustain is now pressed");
                 
                 if (firstTime) {firstTime = false; return;}
                 else
@@ -301,6 +299,7 @@ public:
     
 private:
     
+
     int  currentPianoId;
     
     bool sustainIsDown = false;

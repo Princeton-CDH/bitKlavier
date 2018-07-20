@@ -151,3 +151,102 @@ void DirectProcessor::processBlock(int numSamples, int midiChannel, BKSampleLoad
     //tuner->processor->incrementAdaptiveClusterTime(numSamples);
 }
 
+
+#if BK_UNIT_TESTS
+
+class DirectTests : public UnitTest
+{
+public:
+    DirectTests() : UnitTest("Direct", "Direct") {}
+    
+    void runTest() override
+    {
+        beginTest("Direct");
+
+        for (int i = 0; i < 10; i++)
+        {
+            // create direct preparation and randomize it
+            // call getState() to convert to ValueTree
+            // call setState() to convert from ValueTree to preparation
+            // compare begin and end states
+            String name = "random direct " + String(i);
+            DBG("test consistency: " + name);
+            
+            DirectPreparation::Ptr dp1 = new DirectPreparation();
+            
+            Direct d1(dp1, 1);
+            d1.setName(name);
+            
+            ValueTree vt1 = d1.getState();
+            
+            ScopedPointer<XmlElement> xml = vt1.createXml();
+            
+            DirectPreparation::Ptr dp2 = new DirectPreparation();
+            
+            Direct d2(dp2, 1);
+            
+            d2.setState(xml);
+            d2.setName(name);
+            
+            ValueTree vt2 = d2.getState();
+            
+            expect(vt1.isEquivalentTo(vt2), "direct value trees don't match");
+            
+            expect(dp2->compare(dp1), dp1->getName() + " and " + dp2->getName() + " did not match.");
+        }
+        
+    }
+};
+
+static DirectTests directTests;
+
+class DirectModTests : public UnitTest
+{
+public:
+    DirectModTests() : UnitTest("DirectMod", "DirectMod") {}
+    
+    void runTest() override
+    {
+        beginTest("DirectMod");
+        
+        for (int i = 0; i < 10; i++)
+        {
+            // create direct preparation and randomize it
+            // call getState() to convert to ValueTree
+            // call setState() to convert from ValueTree to preparation
+            // compare begin and end states
+            String name = "random direct mod " + String(i);
+            DBG("test consistency: " + name);
+            
+            DirectPreparation::Ptr dp1 = new DirectPreparation();
+            DirectModPreparation::Ptr dm1 = new DirectModPreparation(dp1, 1);
+            
+            dm1->randomize();
+            
+            ValueTree vt1 = dm1->getState();
+            
+            ScopedPointer<XmlElement> xml = vt1.createXml();
+            
+            DirectPreparation::Ptr dp2 = new DirectPreparation();
+            DirectModPreparation::Ptr dm2 = new DirectModPreparation(dp2, 1);
+            
+            dm2->setState(xml);
+        
+            ValueTree vt2 = dm2->getState();
+            
+            expect(vt1.isEquivalentTo(vt2),
+                   "direct mod: value trees do not match\n" +
+                   vt1.toXmlString() +
+                   "\n=======================\n" +
+                   vt2.toXmlString());
+            
+            //expect(dm1->compare(dm2), "direct mod: preparations do not match");
+        }
+        
+    }
+};
+
+static DirectModTests directModTests;
+
+#endif
+

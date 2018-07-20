@@ -61,8 +61,6 @@ ValueTree  Gallery::getState(void)
     galleryVT.setProperty("defaultPiano", getDefaultPiano(), 0);
     
     return galleryVT;
-    
-    
 }
 
 void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml, bool firstTime)
@@ -144,7 +142,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml, bool firstTime)
             {
                 addDirectWithId(0);
                 
-                direct.getLast()->setState(e, tuning);
+                direct.getLast()->setState(e);
             }
             else if (e->hasTagName( vtagModDirect))
             {
@@ -240,7 +238,5 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml, bool firstTime)
         }
 #endif
     }
-    
-    
 }
 

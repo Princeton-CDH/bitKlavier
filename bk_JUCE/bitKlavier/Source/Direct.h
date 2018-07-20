@@ -83,18 +83,37 @@ public:
     
     inline bool compare(DirectPreparation::Ptr d)
     {
-        return (dTransposition == d->getTransposition() &&
-                dGain == d->getGain() &&
-                dResonanceGain == d->getResonanceGain() &&
-                dHammerGain == d->getHammerGain()       &&
-                dAttack == d->getAttack()               &&
-                dDecay == d->getDecay()                 &&
-                dSustain == d->getSustain()             &&
-                dRelease == d->getRelease()
-                );
+        return  (dTransposition     ==      d->getTransposition()   )   &&
+                (dGain              ==      d->getGain()            )   &&
+                (dResonanceGain     ==      d->getResonanceGain()   )   &&
+                (dHammerGain        ==      d->getHammerGain()      )   &&
+                (dAttack            ==      d->getAttack()          )   &&
+                (dDecay             ==      d->getDecay()           )   &&
+                (dSustain           ==      d->getSustain()         )   &&
+                (dRelease           ==      d->getRelease()         )   ;
     }
     
-    
+    inline void randomize(void)
+    {
+        float r[20];
+        
+        for (int i = 0; i < 20; i++)    r[i] = ((float)rand() / RAND_MAX);
+        int idx = 0;
+        
+        dTransposition.clear();
+        for (int i = 0; i < (int)((float)rand()/RAND_MAX*10); ++i)
+        {
+            dTransposition.add(i, ((float)rand()/RAND_MAX) * 48.0f - 24.0f);
+        }
+        
+        dGain = r[idx++];
+        dResonanceGain = r[idx++];
+        dHammerGain = r[idx++];
+        dAttack = r[idx++] * 2000.0f + 1.0f;
+        dDecay = r[idx++] * 2000.0f + 1.0f;
+        dSustain = r[idx++];
+        dRelease = r[idx++] * 2000.0f + 1.0f;
+    }
     
     inline const String getName() const noexcept {return name;}
     inline void setName(String n){name = n;}
@@ -107,7 +126,7 @@ public:
     inline const int getDecay() const noexcept                          {return dDecay;         }
     inline const float getSustain() const noexcept                      {return dSustain;       }
     inline const int getRelease() const noexcept                        {return dRelease;       }
-    inline const Array<float> getADSRvals() const noexcept              {return {dAttack, dDecay, dSustain, dRelease}; }
+    inline const Array<float> getADSRvals() const noexcept              {return {(float) dAttack, (float) dDecay,(float) dSustain, (float)dRelease}; }
     
     inline void setTransposition(Array<float> val)                      {dTransposition = val;  }
     inline void setGain(float val)                                      {dGain = val;           }
@@ -147,9 +166,6 @@ private:
     float   dResonanceGain, dHammerGain;
     int     dAttack, dDecay, dRelease;      //ADSR, in ms
     float   dSustain;
-    
-    //internal keymap for resetting internal values to static
-    //Keymap::Ptr resetMap = new Keymap(0);
     
     JUCE_LEAK_DETECTOR(DirectPreparation);
 };
@@ -229,7 +245,7 @@ public:
         return prep;
     }
     
-    inline void setState(XmlElement* e, Tuning::PtrArr tuning)
+    inline void setState(XmlElement* e)
     {
         float f;
         
@@ -332,8 +348,7 @@ public:
     DirectModPreparation(DirectPreparation::Ptr p, int Id):
     Id(Id)
     {
-        param.ensureStorageAllocated((int)cDirectParameterTypes.size());
-        
+        init();
         param.set(DirectTransposition, floatArrayToString(p->getTransposition()));
         param.set(DirectGain, String(p->getGain()));
         param.set(DirectResGain, String(p->getResonanceGain()));
@@ -345,23 +360,62 @@ public:
     DirectModPreparation(int Id):
     Id(Id)
     {
-        /*
-         DirectTransposition,
-         DirectGain,
-         DirectResGain,
-         DirectHammerGain,
-         DirectTuning,
-         DirectADSR,
-         */
+        init();
+    }
+    
+    inline void init(void)
+    {
+        param.clear();
+        param.ensureStorageAllocated((int)DirectParameterTypeNil);
+        for (int i = 0; i < DirectParameterTypeNil; i++) param.add({});
+        param.set(DirectTransposition, {});
+        param.set(DirectGain, {});
+        param.set(DirectResGain, {});
+        param.set(DirectHammerGain, {});
+        param.set(DirectTuning, "blah");
+        param.set(DirectADSR, {});
+    }
+    
+    inline void randomize (void)
+    {
+        float r[20];
         
-        for(int i=0; i<=cDirectDataTypes.size(); i++) param.add("");
-        param.set(DirectTransposition, "");
-        param.set(DirectGain, "");
-        param.set(DirectResGain, "");
-        param.set(DirectHammerGain, "");
-        param.set(DirectTuning, "");
-        param.set(DirectADSR, "");
-
+        for (int i = 0; i < 20; i++)    r[i] = ((float)rand() / RAND_MAX);
+        int idx = 0;
+        
+        Array<float> transps;
+        
+        for (int i = 0; i < (int)((float)rand()/RAND_MAX*10); ++i)
+        {
+            transps.add(i, ((float)rand()/RAND_MAX) * 48.0f - 24.0f);
+        }
+        
+        Array<float> adsr;
+        
+        adsr.add(r[idx++] * 2000.0f);
+        adsr.add(r[idx++] * 2000.0f);
+        adsr.add(r[idx++]          );
+        adsr.add(r[idx++] * 2000.0f);
+        
+        param.set(DirectTransposition, floatArrayToString(transps));
+        param.set(DirectGain, String(r[idx++]));
+        param.set(DirectResGain, String(r[idx++]));
+        param.set(DirectTuning, "blah");
+        param.set(DirectHammerGain, String(r[idx++]));
+        param.set(DirectADSR, floatArrayToString(adsr));
+    }
+    
+    inline bool compare(DirectModPreparation::Ptr dm)
+    {
+        for (int i = 0; i < param.size(); ++i)
+        {
+            DBG("param" + String(i) + "A " + param[i]);
+            DBG("param" + String(i) + "B " + dm->param[i]);
+            
+            if (param[i] != dm->param[i]) return false;
+        }
+        
+        return true;
     }
     
     inline DirectModPreparation::Ptr duplicate(void)
@@ -386,7 +440,7 @@ public:
         ValueTree transp( vtagDirect_transposition);
         int count = 0;
         p = getParam(DirectTransposition);
-        if (p != String::empty)
+        if (p != "")
         {
             Array<float> m = stringToFloatArray(p);
             for (auto f : m)
@@ -399,7 +453,7 @@ public:
         ValueTree envelope( vtagDirect_ADSR);
         count = 0;
         p = getParam(DirectADSR);
-        if (p != String::empty)
+        if (p != "")
         {
             Array<float> m = stringToFloatArray(p);
             for (auto f : m)
@@ -410,13 +464,13 @@ public:
         prep.addChild(envelope, -1, 0);
         
         p = getParam(DirectGain);
-        if (p != String::empty) prep.setProperty( ptagDirect_gain,              p.getFloatValue(), 0);
+        if (p != "") prep.setProperty( ptagDirect_gain,              p.getFloatValue(), 0);
         
         p = getParam(DirectResGain);
-        if (p != String::empty) prep.setProperty( ptagDirect_resGain,           p.getFloatValue(), 0);
+        if (p != "") prep.setProperty( ptagDirect_resGain,           p.getFloatValue(), 0);
         
         p = getParam(DirectHammerGain);
-        if (p != String::empty) prep.setProperty( ptagDirect_hammerGain,        p.getFloatValue(), 0);
+        if (p != "") prep.setProperty( ptagDirect_hammerGain,        p.getFloatValue(), 0);
         
         
         return prep;
@@ -473,10 +527,7 @@ public:
                     }
                 }
                 
-                DBG("DirectMod setState " + String(envelope[0]) + " " + String(envelope[1]) + " " + String(envelope[2]) + " " + String(envelope[3]));
-                
                 setParam(DirectADSR, floatArrayToString(envelope));
-                
             }
         }
     }
@@ -507,21 +558,21 @@ public:
     {
         for (int i = DirectId+1; i < DirectParameterTypeNil; i++)
         {
-            param.set(i, "");
+            param.set(i, " ");
         }
     }
     
     inline const String getParam(DirectParameterType type)
     {
-        if (type != DirectId)   { DBG("Direct getParam " + String(type) + " " + param[type]); return param[type]; }
-        else                    return "";
+        if (type != DirectId)   { return param[type]; }
+        else                    return " ";
     }
     
     inline void setParam(DirectParameterType type, String val)
     {
-        param.set(type, val); DBG("Direct setParam " + String(type) + " " + param[type]);
-        
-    };
+        param.set((int)type, val);
+    }
+
     
     inline const StringArray getStringArray(void) { return param; }
     

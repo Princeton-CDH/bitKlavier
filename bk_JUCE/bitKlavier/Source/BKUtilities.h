@@ -19,6 +19,8 @@
 
 #include "AudioConstants.h"
 
+#define BK_UNIT_TESTS 1
+
 #define TRY_UNDO 0 //enable attempt at undo/redo
 #define NUM_EPOCHS 10
 
@@ -81,6 +83,14 @@
 #define IMPORT_ID 51
 
 #define SOUNDFONT_ID 1000
+
+class BKUnitTestRunner : public UnitTestRunner
+{
+	void logMessage(const String& message) override
+	{
+		Logger::writeToLog(message);
+	}
+};
 
 inline PopupMenu getNewItemMenu(LookAndFeel* laf)
 {

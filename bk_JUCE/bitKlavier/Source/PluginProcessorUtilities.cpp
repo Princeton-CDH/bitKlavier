@@ -47,7 +47,6 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
         
         shouldLoadDefault = false;
         
-        DBG("SAMPLE_SET: " + cBKSampleLoadTypes[type]);\
         int numSamplesPerLayer = 29;
         int numHarmSamples = 69;
         int numResSamples = 88;
@@ -58,8 +57,6 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
                               (type == BKLoadLite)   ? (numSamplesPerLayer * 2) :
                               (type == BKLoadLitest) ? (numSamplesPerLayer * 1) :
                                              1.0);
-        
-        DBG("progressInc: " + String(progressInc));
         
         loader.startThread();
     }

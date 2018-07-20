@@ -106,6 +106,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
         ScopedPointer<XmlElement> galleryXML (getXmlFromBinary (data, sizeInBytes));
         if (galleryXML != nullptr)
         {
+            DBG(galleryXML->createDocument("haha"));
             defaultLoaded = (bool) galleryXML->getStringAttribute("defaultLoaded").getIntValue();
             
             if (defaultLoaded)
@@ -133,49 +134,26 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             bool invertSustain = (bool)galleryXML->getStringAttribute("invertSustain").getIntValue();
             
             setSustainInversion(invertSustain);
+
             
             //override gallery-saved defaultPiano with pluginHost-saved defaultPiano
             setCurrentPiano(galleryXML->getStringAttribute("defaultPiano").getIntValue());
             
             initializeGallery();
-            
-            
 #if !LOAD_SAMPLES_IN_GALLERY
-            String loadAttr = galleryXML->getStringAttribute("sampleType");
+            BKSampleLoadType toLoadType = (BKSampleLoadType)(galleryXML->getStringAttribute("sampleType").getIntValue());
             
-            if (loadAttr != String())
+            if (toLoadType == BKLoadSoundfont)
             {
-                BKSampleLoadType toLoadType = (BKSampleLoadType)(loadAttr.getIntValue());
-                
-                if (toLoadType == BKLoadNil)
-                {
-#if JUCE_IOS
-                    loadSamples(BKLoadMedium);
-#else
-                    loadSamples(BKLoadHeavy);
-#endif
-                }
-                else if (toLoadType == BKLoadSoundfont)
-                {
-                    currentSoundfont = galleryXML->getStringAttribute("soundfontURL");
-                    currentInstrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
-                    loadSamples(BKLoadSoundfont, currentSoundfont, currentInstrument);
-                }
-                else
-                {
-                    currentSoundfont = "";
-                    
-                    loadSamples(toLoadType);
-                }
-
+                currentSoundfont = galleryXML->getStringAttribute("soundfontURL");
+                currentInstrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
+                loadSamples(BKLoadSoundfont, currentSoundfont, currentInstrument);
             }
             else
             {
-#if JUCE_IOS
-                loadSamples(BKLoadMedium);
-#else
-                loadSamples(BKLoadHeavy);
-#endif
+                currentSoundfont = "";
+
+                loadSamples(toLoadType);
             }
 #endif
             
