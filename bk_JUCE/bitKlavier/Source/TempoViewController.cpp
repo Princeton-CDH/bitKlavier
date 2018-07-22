@@ -51,7 +51,7 @@ BKViewController(p, theGraph)
     AT1MinMaxSlider = new BKRangeSlider("Min/Max (ms)", 1, 2000, 100, 500, 10);
     AT1MinMaxSlider->setJustifyRight(false);
     AT1MinMaxSlider->setIsMinAlwaysLessThanMax(true);
-    AT1MinMaxSlider->setToolTipString("Time within which Tempo will consider notes to be part of a constant pulse; any notes played before or after Min/Max will not be used to determine pulse");
+    AT1MinMaxSlider->setToolTipString("Time within which Tempo will consider notes to be part of a constant pulse; any notes played futher apart than Max, or closer together than Min, will be ignored");
     addAndMakeVisible(AT1MinMaxSlider);
     
     A1ModeCB.setName("AT1Mode");
