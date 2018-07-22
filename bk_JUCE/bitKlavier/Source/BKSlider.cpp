@@ -899,7 +899,7 @@ void BKMultiSlider::resized()
     nameSlab.removeFromTop(gYSpacing / 2.).removeFromRight(gXSpacing);
     showName.setBounds(nameSlab.toNearestInt());
     showName.setJustificationType(Justification::topRight);
-    showName.toFront(false);
+    //showName.toFront(false);
     
     bigInvisibleSlider->setBounds(area.toNearestInt());
     
@@ -1731,15 +1731,8 @@ BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
     
     sampleImageComponent.setImage(ImageCache::getFromMemory(BinaryData::samplePic_png, BinaryData::samplePic_pngSize));
     sampleImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
+    sampleImageComponent.setTooltip("Provides real-time visualization of each independent Nostalgic wave");
     addAndMakeVisible(sampleImageComponent);
-    
-    wavedistanceName.setText("wave distance (ms)", dontSendNotification);
-    wavedistanceName.setJustificationType(Justification::topRight);
-    addAndMakeVisible(wavedistanceName);
-    
-    undertowName.setText("undertow (ms)", dontSendNotification);
-    undertowName.setJustificationType(Justification::bottomRight);
-    addAndMakeVisible(undertowName);
     
     wavedistanceSlider = new Slider();
     wavedistanceSlider->addMouseListener(this, true);
@@ -1784,7 +1777,13 @@ BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
     wavedistanceValueTF.addListener(this);
     addChildComponent(wavedistanceValueTF);
     
+    wavedistanceName.setText("wave distance (ms)", dontSendNotification);
+    wavedistanceName.setJustificationType(Justification::topRight);
+    addAndMakeVisible(wavedistanceName);
     
+    undertowName.setText("undertow (ms)", dontSendNotification);
+    undertowName.setJustificationType(Justification::bottomRight);
+    addAndMakeVisible(undertowName);
 }
 
 
@@ -1843,18 +1842,30 @@ void BKWaveDistanceUndertowSlider::resized()
 #else
     wavedistanceSlider->setBounds(area.removeFromTop(getHeight() * 0.1));
     undertowSlider->setBounds(area.removeFromBottom(getHeight() * 0.1));
+    //wavedistanceSlider->setBounds(area.removeFromTop(gComponentSingleSliderHeight));
+    //undertowSlider->setBounds(area.removeFromBottom(gComponentSingleSliderHeight));
 #endif
     
     wavedistanceValueTF.setBounds(wavedistanceSlider->getBounds());
     
-    int xpos = wavedistanceSlider->getPositionOfValue(wavedistanceSlider->getValue());
+    //int xpos = wavedistanceSlider->getPositionOfValue(wavedistanceSlider->getValue());
     
-    undertowSlider->setBounds(xpos, undertowSlider->getY(), getWidth() - xpos, undertowSlider->getHeight());
+    //undertowSlider->setBounds(xpos, undertowSlider->getY(), getWidth() - xpos, undertowSlider->getHeight());
     
     undertowValueTF.setBounds(undertowSlider->getBounds());
     
-    undertowName.setBounds(area);
-    wavedistanceName.setBounds(area);
+    //undertowName.setBounds(area);
+    //wavedistanceName.setBounds(area);
+    undertowName.setBounds(
+                           undertowSlider->getRight() - undertowSlider->getWidth() / 4,
+                           undertowSlider->getY() - undertowSlider->getHeight(),
+                           undertowSlider->getWidth() / 4,
+                           undertowSlider->getHeight());
+    wavedistanceName.setBounds(
+                               wavedistanceSlider->getRight() - wavedistanceSlider->getWidth() / 4,
+                               wavedistanceSlider->getBottom(),
+                               wavedistanceSlider->getWidth() / 4,
+                               wavedistanceSlider->getHeight());
     
     sampleImageComponent.setBounds(area);
     
@@ -2009,7 +2020,7 @@ sliderIncrement(increment)
     showName.setText(sliderName, dontSendNotification);
     showName.setInterceptsMouseClicks(false, true);
     addAndMakeVisible(showName);
-    
+
     editValsTextField = new BKTextEditor();
     editValsTextField->setMultiLine(true);
     editValsTextField->setName("PARAMTXTEDIT");
@@ -2045,18 +2056,15 @@ sliderIncrement(increment)
     }
     
     topSlider = new Slider;
-    topSlider->setSliderStyle(Slider::LinearBar);
+    //topSlider->setSliderStyle(Slider::LinearBar);
     topSlider->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxLeft, true, 0,0);
     topSlider->setRange(sliderMin, sliderMax, sliderIncrement);
     topSlider->setValue(sliderDefault, dontSendNotification);
     topSlider->addListener(this);
     topSlider->addMouseListener(this, true);
     topSlider->setLookAndFeel(&topSliderLookAndFeel);
+    topSlider->setAlpha(0.);
     addAndMakeVisible(topSlider);
-    
-    showName.setText(sliderName, dontSendNotification);
-    showName.setInterceptsMouseClicks(false, true);
-    addAndMakeVisible(showName);
     
     topSliderLookAndFeel.setColour(Slider::thumbColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.0f));
     stackedSliderLookAndFeel.setColour(Slider::thumbColourId, Colours::goldenrod.withMultipliedAlpha(0.95));
@@ -2066,7 +2074,7 @@ sliderIncrement(increment)
 void BKStackedSlider::setDim(float alphaVal)
 {
     showName.setAlpha(alphaVal);
-    topSlider->setAlpha(alphaVal);
+    //topSlider->setAlpha(alphaVal);
     
     for(int i=0; i<numSliders; i++)
     {
@@ -2084,7 +2092,7 @@ void BKStackedSlider::setDim(float alphaVal)
 void BKStackedSlider::setBright()
 {
     showName.setAlpha(1.);
-    topSlider->setAlpha(1.);
+    //topSlider->setAlpha(1.);
     
     for(int i=0; i<numSliders; i++)
     {

@@ -145,6 +145,7 @@ public:
     
     void setName(String newName)                            { sliderName = newName; showName.setText(sliderName, dontSendNotification);        }
     String getName()                                        { return sliderName; }
+    void setToolTipString(String newTip) { showName.setTooltip(newTip); bigInvisibleSlider->setTooltip(newTip); }
     
     Array<Array<float>> getAllValues();
     Array<Array<float>> getAllActiveValues();
@@ -256,6 +257,7 @@ public:
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName()                { return sliderName; }
     void setTextIsAbove(bool nt)    { textIsAbove = nt; }
+    void setToolTipString(String newTip) { showName.setTooltip(newTip); thisSlider.setTooltip(newTip); valueTF.setTooltip(newTip);}
     
     void setJustifyRight(bool jr)
     {
@@ -361,6 +363,11 @@ public:
     
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName()                { return sliderName; }
+    void setToolTipString(String newTip) {  showName.setTooltip(newTip);
+                                            invisibleSlider.setTooltip(newTip);
+                                            minValueTF.setTooltip(newTip);
+                                            maxValueTF.setTooltip(newTip); }
+    
     void setMinValue(double newval, NotificationType notify);
     void setMaxValue(double newval, NotificationType notify);
     void setIsMinAlwaysLessThanMax(bool im) { isMinAlwaysLessThanMax = im; }
@@ -516,6 +523,14 @@ public:
         else if (which == NostalgicWaveDistance)    wavedistanceValueTF.setText(text, false);
     }
     
+    inline void setUndertowTooltip(String tip) {    undertowSlider->setTooltip(tip);
+                                                    undertowName.setTooltip(tip);
+                                                    undertowValueTF.setTooltip(tip); }
+    
+    inline void setWaveDistanceTooltip(String tip) {    wavedistanceSlider->setTooltip(tip);
+                                                        wavedistanceName.setTooltip(tip);
+                                                        wavedistanceValueTF.setTooltip(tip); }
+    
     inline TextEditor* getTextEditor(NostalgicParameterType which)
     {
         if (which == NostalgicUndertow) return &undertowValueTF;
@@ -649,6 +664,7 @@ public:
     
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName()                { return sliderName; }
+    void setTooltip(String newTip)  { topSlider->setTooltip(newTip); showName.setTooltip(newTip); }
     
     void resized() override;
     
@@ -735,6 +751,7 @@ public:
     
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName()                { return sliderName; }
+    void setToolTip(String newTip)  { adsrButton.setTooltip(newTip); }
     
     void setButtonText(String buttonText)
     {

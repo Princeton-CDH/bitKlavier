@@ -47,6 +47,19 @@ BKViewController(p, theGraph)
             {
                 paramSliders[idx]->setAllowSubSlider(true);
                 paramSliders[idx]->setSubSliderName("add transposition");
+                paramSliders[idx]->setToolTipString("Determines pitch of sequenced notes or chords; control-click to add another voice, double-click to edit all or add additional sequence steps");
+            }
+            else if(paramSliders[idx]->getName() == "accents")
+            {
+                paramSliders[idx]->setToolTipString("Determines gain of sequenced pitches; double-click to edit all or add additional sequence steps");
+            }
+            else if(paramSliders[idx]->getName() == "sustain length multipliers")
+            {
+                paramSliders[idx]->setToolTipString("Determines duration of each sequenced note; double-click to edit all or add additional sequence steps");
+            }
+            else if(paramSliders[idx]->getName() == "beat length multipliers")
+            {
+                paramSliders[idx]->setToolTipString("Determines length of each sequenced beat as a factor of Synchronic tempo; double-click to edit all or add additional sequence steps");
             }
             
             /* // need this?
@@ -65,6 +78,7 @@ BKViewController(p, theGraph)
     for(int i=0; i<12; i++)
     {
         envelopeSliders.insert(i, new BKADSRSlider("e"+String(i)));
+        envelopeSliders[i]->setToolTip("Provides ADSR settings for up to 12 sequenced steps");
         envelopeSliders[i]->setButtonText("");
         envelopeSliders[i]->toFront(false);
         //envelopeSliders[i]->setAlpha(0.5);
@@ -79,38 +93,46 @@ BKViewController(p, theGraph)
     selectCB.addSeparator();
     selectCB.addListener(this);
     selectCB.setSelectedId(1, dontSendNotification);
+    selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
     
     modeSelectCB.setName("Mode");
     modeSelectCB.addSeparator();
     modeSelectCB.BKSetJustificationType(juce::Justification::centredRight);
     modeSelectCB.setSelectedItemIndex(0);
+    modeSelectCB.setTooltip("Determines which aspect of MIDI signal triggers the Synchronic sequence");
     fillModeSelectCB();
     addAndMakeVisible(modeSelectCB);
     
     modeLabel.setText("triggers pulse", dontSendNotification);
+    modeLabel.setTooltip("Determines which aspect of MIDI signal triggers the Synchronic sequence");
     //modeLabel.setJustificationType(Justification::bottomLeft);
     addAndMakeVisible(modeLabel);
     
     //offsetParamStartToggle = new BKSingleSlider("skip first", 0, 1, 0, 1);
     offsetParamStartToggle.setButtonText ("skip first");
+    offsetParamStartToggle.setTooltip("Indicates whether Synchronic will skip first column of sequenced parameters for first cycle");
     buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
     offsetParamStartToggle.setToggleState (true, dontSendNotification);
     addAndMakeVisible(offsetParamStartToggle);
     
     howManySlider = new BKSingleSlider("how many", 1, 100, 20, 1);
+    howManySlider->setToolTipString("Indicates number of steps/repetitions in Synchronic pulse");
     howManySlider->setJustifyRight(false);
     addAndMakeVisible(howManySlider);
         
     clusterThreshSlider = new BKSingleSlider("cluster threshold", 20, 2000, 200, 10);
+    clusterThreshSlider->setToolTipString("Indicates window of time (milliseconds) within which notes are grouped as a cluster");
     clusterThreshSlider->setJustifyRight(false);
     addAndMakeVisible(clusterThreshSlider);
     
     clusterMinMaxSlider = new BKRangeSlider("cluster min/max", 1, 12, 3, 4, 1);
+    clusterMinMaxSlider->setToolTipString("Sets Min and Max numbers of keys pressed to launch pulse; Min can be greater than Max");
     clusterMinMaxSlider->setJustifyRight(false);
     addAndMakeVisible(clusterMinMaxSlider);
     
     gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
+    gainSlider->setToolTipString("Overall volume of Synchronic pulse");
     gainSlider->setJustifyRight(false);
     gainSlider->setSkewFactorFromMidPoint(1.);
     addAndMakeVisible(gainSlider);
@@ -134,9 +156,11 @@ BKViewController(p, theGraph)
     
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
+    actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
     
     envelopeName.setText("envelopes", dontSendNotification);
+    //envelopeName.setTooltip("Provides ADSR settings for up to 12 sequenced steps");
     envelopeName.setJustificationType(Justification::centredRight);
     envelopeName.toBack();
     envelopeName.setInterceptsMouseClicks(false, true);

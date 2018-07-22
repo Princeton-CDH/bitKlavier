@@ -22,12 +22,14 @@ BKViewController(p, theGraph)
     addAndMakeVisible(iconImageComponent);
     
     selectCB.setName("Nostalgic");
+    selectCB.setTooltip("Select from available saved preparation settings");
     selectCB.addSeparator();
     selectCB.addListener(this);
     selectCB.setSelectedItemIndex(0);
     addAndMakeVisible(selectCB);
     
     lengthModeSelectCB.setName("Length Mode");
+    lengthModeSelectCB.setTooltip("Indicates how Nostalgic calculates length of reverse wave");
     lengthModeSelectCB.addSeparator();
     lengthModeSelectCB.BKSetJustificationType(juce::Justification::centredRight);
     lengthModeSelectCB.setSelectedItemIndex(0);
@@ -35,32 +37,41 @@ BKViewController(p, theGraph)
     addAndMakeVisible(lengthModeSelectCB);
     
     transpositionSlider = new BKStackedSlider("transpositions", -12, 12, -12, 12, 0, 0.01);
+    transpositionSlider->setTooltip("Determines pitch (in semitones) of Nostalgic notes; control-click to add another voice, double-click to edit all");
     addAndMakeVisible(transpositionSlider);
     
     lengthMultiplierSlider = new BKSingleSlider("note length multiplier", 0, 10, 1, 0.01);
+    lengthMultiplierSlider->setToolTipString("Changes length of Nostalgic wave as a factor of note duration");
     lengthMultiplierSlider->setSkewFactorFromMidPoint(1.);
     addAndMakeVisible(lengthMultiplierSlider);
     
     beatsToSkipSlider = new BKSingleSlider("beats to skip", 0, 10, 0, 1);
+    beatsToSkipSlider->setToolTipString("Indicates how long Nostalgic wave lasts with respect to linked Synchronic sequence");
     addAndMakeVisible(beatsToSkipSlider);
     beatsToSkipSlider->setVisible(false);
     
     gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
+    gainSlider->setToolTipString("Volume multiplier for Nostalgic notes");
     gainSlider->setSkewFactorFromMidPoint(1.);
     addAndMakeVisible(gainSlider);
     
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
+    actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
     
+    nDisplaySlider.setWaveDistanceTooltip("Determines endpoint of Nostalgic wave with respect to waveform");
+    nDisplaySlider.setUndertowTooltip("Determines total length of Undertow beginning at wave endpoint");
     addAndMakeVisible(nDisplaySlider);
     
     reverseADSRSlider = new BKADSRSlider("reverseEnvelope");
     reverseADSRSlider->setButtonText("edit reverse envelope");
+    reverseADSRSlider->setToolTip("ADSR settings for Nostalgic wave");
     addAndMakeVisible(reverseADSRSlider);
     
     undertowADSRSlider = new BKADSRSlider("undertowEnvelope");
     undertowADSRSlider->setButtonText("edit undertow envelope");
+    undertowADSRSlider->setToolTip("ADSR settings for Undertow");
     addAndMakeVisible(undertowADSRSlider);
     
 #if JUCE_IOS
