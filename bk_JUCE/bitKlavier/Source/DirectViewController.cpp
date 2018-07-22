@@ -23,28 +23,34 @@ BKViewController(p, theGraph)
     selectCB.setName("Direct");
     selectCB.addSeparator();
     selectCB.setSelectedItemIndex(0);
+    selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
     
     transpositionSlider = new BKStackedSlider("transpositions", -12, 12, -12, 12, 0, 0.01);
+    transpositionSlider->setTooltip("Determines pitch (in semitones) of Direct notes; control-click to add another voice, double-click to edit all");
     addAndMakeVisible(transpositionSlider);
     
     gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(false);
+    gainSlider->setToolTipString("Adjusts overall volume of keyboard");
     addAndMakeVisible(gainSlider);
     
     resonanceGainSlider = new BKSingleSlider("resonance gain", 0, 10, 0.2, 0.01);
     resonanceGainSlider->setSkewFactorFromMidPoint(1.);
     resonanceGainSlider->setJustifyRight(false);
+    resonanceGainSlider->setToolTipString("Adjusts overall resonance/reverb based on keyOff velocity; change to keyOn velocity in Gallery>settings");
     addAndMakeVisible(resonanceGainSlider);
     
     hammerGainSlider = new BKSingleSlider("hammer gain", 0, 10, 1, 0.01);
     hammerGainSlider->setSkewFactorFromMidPoint(1.);
     hammerGainSlider->setJustifyRight(false);
+    hammerGainSlider->setToolTipString("Adjusts mechanical noise sample based on keyOff velocity; change to keyOn velocity in Gallery>settings");
     addAndMakeVisible(hammerGainSlider);
     
     ADSRSlider = new BKADSRSlider("ADSR");
     ADSRSlider->setButtonText("edit envelope");
+    ADSRSlider->setToolTip("adjust Attack, Decay, Sustain, and Release envelope parameters");
     addAndMakeVisible(ADSRSlider);
     setShowADSR(false);
     
@@ -58,6 +64,7 @@ BKViewController(p, theGraph)
     
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
+    actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
 
 }
