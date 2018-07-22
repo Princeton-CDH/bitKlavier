@@ -52,6 +52,7 @@ timerCallbackCount(0)
     mainSlider->setPopupDisplayEnabled (true, true, this);
     mainSlider->setDoubleClickReturnValue (true, 0.0); // double-clicking this slider will set it to 50.0
     mainSlider->setTextValueSuffix (" dB");
+    mainSlider->setTooltip("Controls dB output of bitKlavier audio");
     mainSlider->addListener(this);
     
     addAndMakeVisible (mainSlider);
@@ -68,7 +69,10 @@ timerCallbackCount(0)
 
     //~~~~~~~~~~~MENUS~~~~~~~~
     sampleCB.setLookAndFeel(&laf);
+    sampleCB.setTooltip("Choose and load sample set from bitKlavier resources/soundfonts/");
+    
     instrumentCB.setLookAndFeel(&laf);
+    instrumentCB.setTooltip("Load specific instrument from selected sample set (if available)");
     
     sampleCB.addListener(this);
     instrumentCB.addListener(this);
