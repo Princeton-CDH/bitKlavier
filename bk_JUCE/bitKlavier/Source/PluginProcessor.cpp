@@ -629,6 +629,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             didNoteOffs = true;
         }
         
+        // NEED WAY TO TRIGGER RELEASE PEDAL SAMPLE FOR SFZ
         if (m.isSustainPedalOn())
         {
             //DBG("m.isSustainPedalOn()");
