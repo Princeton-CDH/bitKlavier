@@ -617,7 +617,7 @@ public:
 
     void    keyPressed(int noteNumber, float velocity, int channel);
     void    keyReleased(int noteNumber, float velocity, int channel);
-    void    playHammerResonance(int noteNumber, float velocity, int channel);
+    void    playReleaseSample(int noteNumber, float velocity, int channel, bool soundfont = false);
     
     inline void prepareToPlay(double sr, BKSynthesiser* main, BKSynthesiser* res, BKSynthesiser* hammer)
     {

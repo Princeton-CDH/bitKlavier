@@ -481,6 +481,13 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             voice->currentlyPlayingKey = keyNoteNumber; //keep track of which physical key is associated with this voice
             
             float gain = volume;
+            /*
+            if (sound->region_ != nullptr)
+            {
+                gain *= Decibels::decibelsToGain(sound->region_->volume);
+            }
+             */
+            
 
             voice->startNote ((float)midiNoteNumber+midiNoteNumberOffset,
                               pitchWheelValue,
@@ -557,36 +564,14 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             
             bool appliesToNote = sound->appliesToNote (noteNumber);
             bool appliesToVel = sound->appliesToVelocity((int)(velocity*127.0));
-            bool isRelease = /*(sound->trigger == sfzero::Region::release) || */(sound->trigger == sfzero::Region::release_key);
+            bool isRelease = (sound->trigger == sfzero::Region::release) || (sound->trigger == sfzero::Region::release_key);
             bool pedalStatesMatch = (sustainPedalsDown[midiChannel] == sound->pedal);
-           
-            /*
-            DBG(String((int)appliesToNote) + " " +
-                String((int)appliesToVel) + " " +
-                String((int)isRelease) + " " +
-                String((int) pedalStatesMatch) + " | " + sound->sampleName + " pedal: " + String((int)sound->pedal));
-             */
             
             if (appliesToNote && appliesToVel && isRelease && pedalStatesMatch)
             {
-                /*
-                 (BKSynthesiserVoice* voice,
-                 BKSynthesiserSound* sound,
-                 int midiChannel,
-                 int keyNoteNumber,
-                 int midiNoteNumber,
-                 float midiNoteNumberOffset,
-                 float gain,
-                 PianoSamplerNoteDirection direction,
-                 PianoSamplerNoteType type,
-                 BKNoteType bktype,
-                 int layer,
-                 uint64 startingPosition,
-                 uint64 length,
-                 uint64 adsrAttack,
-                 uint64 adsrDecay,
-                 float adsrSustain,
-                 uint64 adsrRelease)*/
+                DBG("release note!!!!!!");
+                float volume = Decibels::decibelsToGain(sound->region_->volume);
+                DBG("volume: " + String(volume));
                 
                 startVoice (findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes),
                             sound,
@@ -594,7 +579,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                             keyNoteNumber,
                             noteNumber,
                             0, // might need to deal with this
-                            velocity,
+                            velocity * volume,
                             Forward,
                             Normal,
                             DirectNote,

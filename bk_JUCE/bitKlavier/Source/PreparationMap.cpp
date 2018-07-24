@@ -335,7 +335,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
             //play hammers and resonance when keys are released, even with pedal down
             for (auto proc : dprocessor)
             {
-                proc->playHammerResonance(noteNumber, velocity, channel);
+                proc->playReleaseSample(noteNumber, velocity, channel);
             }
         }
     }
@@ -345,7 +345,8 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
         {
             for (auto proc : dprocessor)
             {
-                if (!soundfont) proc->playHammerResonance(noteNumber, velocity, channel);
+                proc->playReleaseSample(noteNumber, velocity, channel, soundfont);
+                
                 proc->keyReleased(noteNumber, velocity, channel);
             }
             

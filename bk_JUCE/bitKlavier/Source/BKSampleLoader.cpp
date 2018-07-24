@@ -50,10 +50,7 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     {
         isSF2 = true;
         sf2sound   = new sfzero::SF2Sound(sfzFile);
-        
-        // MIGHT BE DOUBLE LOADING REGIONS/SAMPLES (line below could disappear, will test)
-        //sf2reader  = new sfzero::SF2Reader(sf2sound, sfzFile);
-        
+    
         sf2sound->loadRegions(processor.currentInstrument);
         sf2sound->loadSamples(&formatManager);
         
@@ -74,11 +71,9 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         sfzsound   = new sfzero::Sound(sfzFile);
         
         processor.currentInstrument = 0;
-        
-        DBG("numsubs: " + String(sfzsound->numSubsounds()));
 
+        // POSSIBLY STILL DOUBLE LOADING SAMPLES? 
         sfzsound->loadRegions(processor.currentInstrument);
-        DBG("region number: " + String(sfzsound->getRegions().size()));
         sfzsound->loadSamples(&formatManager, &processor.progress);
         
         processor.currentInstrumentName = sfzsound->subsoundName(processor.currentInstrument);
