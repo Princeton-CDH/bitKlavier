@@ -322,9 +322,7 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
     
 #if JUCE_IOS
     toAdd->setTopLeftPosition(lastX, lastY);
-#endif
-    
-#if JUCE_MAC || JUCE_WINDOWS
+#else
     if (center)
     {
         toAdd->setTopLeftPosition(300, 250);

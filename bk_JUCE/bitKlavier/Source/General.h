@@ -31,9 +31,7 @@ public:
 
 #if JUCE_IOS
         globalGain = 0.75;
-#endif
-        
-#if JUCE_MAC || JUCE_WINDOWS
+#else
         globalGain = 1.0;
 #endif
     }

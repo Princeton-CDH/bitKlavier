@@ -92,10 +92,7 @@ shouldLoadDefault(true)
 #if JUCE_IOS
     platform = BKIOS;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory);
-#endif
- 
-
-#if JUCE_MAC || JUCE_WINDOWS
+#else
     platform = BKOSX;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 
@@ -349,9 +346,7 @@ void BKAudioProcessor::createNewGallery(String name, ScopedPointer<XmlElement> x
 
 #if JUCE_IOS
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory);
-#endif
-    
-#if JUCE_MAC || JUCE_WINDOWS
+#else
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
