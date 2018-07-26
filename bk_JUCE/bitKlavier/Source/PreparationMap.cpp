@@ -283,7 +283,7 @@ void PreparationMap::processBlock(int numSamples, int midiChannel, BKSampleLoadT
 }
 
 //not sure why some of these have Channel and some don't; should rectify?
-void PreparationMap::keyPressed(int noteNumber, float velocity, int channel)
+void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, bool soundfont)
 {
     if (pKeymap->containsNote(noteNumber))
     {
@@ -317,7 +317,7 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel)
 }
 
 
-void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
+void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bool soundfont)
 {
     
     if(sustainPedalIsDepressed && pKeymap->containsNote(noteNumber))
@@ -330,10 +330,13 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
         
         sustainedNotes.add(newNote);
         
-        //play hammers and resonance when keys are released, even with pedal down
-        for (auto proc : dprocessor)
+        if (!soundfont)
         {
-            proc->playHammerResonance(noteNumber, velocity, channel);
+            //play hammers and resonance when keys are released, even with pedal down
+            for (auto proc : dprocessor)
+            {
+                proc->playReleaseSample(noteNumber, velocity, channel);
+            }
         }
     }
     else
@@ -342,8 +345,9 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
         {
             for (auto proc : dprocessor)
             {
-                proc->playHammerResonance(noteNumber, velocity, channel);
-                proc->keyReleased(noteNumber, velocity, channel);
+                proc->playReleaseSample(noteNumber, velocity, channel, soundfont);
+                
+                proc->keyReleased(noteNumber, velocity, channel, soundfont);
             }
             
             for (auto proc : nprocessor)

@@ -125,7 +125,7 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     int i = 0;
     for (auto sf : processor.soundfontNames)
     {
-        String sfName = sf.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf2", false, true);
+        String sfName = sf.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf", false, true);
         loadMenu.addItem(SOUNDFONT_ID + (i++), sfName);
     }
     
@@ -178,6 +178,8 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     
     // ~ ~ ~ share menu ~ ~ ~
+    if (!processor.defaultLoaded)
+    {
 #if JUCE_MAC
     PopupMenu shareMenu;
     
@@ -193,6 +195,7 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     galleryMenu.addItem(SHARE_MESSAGE_ID, "Share");
 #endif
+    }
     
     galleryMenu.addSeparator();
     galleryMenu.addItem(SETTINGS_ID, "Settings");
@@ -326,7 +329,7 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
 
 		gvc->fillGalleryCB();
 	}
-#if !JUCE_WINDOWS
+#if (JUCE_MAC || JUCE_IOS)
 	else if (result == SHARE_EMAIL_ID)
 	{
 		gvc->bot.share(processor.gallery->getURL(), 0);
@@ -550,7 +553,7 @@ void HeaderViewController::fillGalleryCB(void)
         
         File moreGalleries = File::getSpecialLocation(File::userDocumentsDirectory);
         
-#if JUCE_MAC || JUCE_WINDOWS
+#if (JUCE_MAC || JUCE_WINDOWS || JUCE_LINUX)
         bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
         
@@ -627,7 +630,22 @@ void HeaderViewController::fillGalleryCB(void)
 
 void HeaderViewController::update(void)
 {
-    
+    if (processor.updateState->currentDisplay == DisplayNil)
+    {
+        editB.setEnabled(true);
+        pianoB.setEnabled(true);
+        galleryB.setEnabled(true);
+        pianoCB.setEnabled(true);
+        galleryCB.setEnabled(true);
+    }
+    else
+    {
+        editB.setEnabled(false);
+        pianoB.setEnabled(false);
+        galleryB.setEnabled(false);
+        pianoCB.setEnabled(false);
+        galleryCB.setEnabled(false);
+    }
 }
 
 void HeaderViewController::switchGallery()

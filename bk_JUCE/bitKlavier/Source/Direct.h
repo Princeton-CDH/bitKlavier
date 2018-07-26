@@ -572,12 +572,13 @@ public:
     {
         param.set((int)type, val);
     }
+
     
     inline const StringArray getStringArray(void) { return param; }
     
     void print(void)
     {
-        
+        DBG("hey");
     }
     
     inline void setId(int newId) { Id = newId; }
@@ -615,8 +616,8 @@ public:
     void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
 
     void    keyPressed(int noteNumber, float velocity, int channel);
-    void    keyReleased(int noteNumber, float velocity, int channel);
-    void    playHammerResonance(int noteNumber, float velocity, int channel);
+    void    keyReleased(int noteNumber, float velocity, int channel, bool soundfont = false);
+    void    playReleaseSample(int noteNumber, float velocity, int channel, bool soundfont = false);
     
     inline void prepareToPlay(double sr, BKSynthesiser* main, BKSynthesiser* res, BKSynthesiser* hammer)
     {

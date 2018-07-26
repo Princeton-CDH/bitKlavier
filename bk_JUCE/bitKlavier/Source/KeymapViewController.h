@@ -88,6 +88,7 @@ private:
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void textEditorFocusLost(TextEditor& textEditor) override;
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
+    void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void textEditorTextChanged(TextEditor& tf) override;
     
     void bkMessageReceived          (const String& message) override;

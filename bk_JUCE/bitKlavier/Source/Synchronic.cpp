@@ -70,7 +70,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
     for (auto t : synchronic->aPrep->getTransposition()[transpCounter])
     {
 
-        float offset = t + tuner->getOffset(note), synthOffset = offset;
+        float offset = t + tuner->getOffset(note, false), synthOffset = offset;
         int synthNoteNumber = (float)note;
         
         //if (sampleType < BKLoadSoundfont)
@@ -170,19 +170,8 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     //later, we remove dupes so we don't inadvertently play the same note twice in a pulse
     
     cluster.insert(0, noteNumber);
-    if(cluster.size() > synchronic->aPrep->getClusterCap()) cluster.resize(synchronic->aPrep->getClusterCap());
-    DBG("cluster size: " + String(cluster.size()) + " " + String(clusterThresholdSamples/sampleRate));
-    
-    //why not use clusterMax for this? the intent is different:
-    //clusterMax: max number of keys pressed within clusterThresh, otherwise shut off pulses
-    //clusterCap: the most number of notes allowed in a cluster when playing pulses
-    //so, let's say we are playing a rapid passage where successive notes are within the clusterThresh
-    //and we want the pulse to emerge when we stop; clusterMax wouldn't allow this to happen
-    //if we had exceeded clusterMax in that passage, which is bad, but we still want clusterCap
-    //to limit the number of notes included in the cluster.
-    //for now, we'll leave clusterCap unexposed, just to avoid confusion for the user. after all,
-    //I used it this way for all of the etudes to date! but might want to expose eventually...
-    //perhaps call beatVoices? since it's essentially the number of "voices" in the pulse chord?
+    //if(cluster.size() > synchronic->aPrep->getClusterCap()) cluster.resize(synchronic->aPrep->getClusterCap());
+    //DBG("cluster size: " + String(cluster.size()) + " " + String(clusterThresholdSamples/sampleRate));
     
     //reset the timer for time between notes
     clusterThresholdTimer = 0;
@@ -245,11 +234,26 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
     
     if(shouldPlay)
     {
+        //cap size of slimCluster, removing oldest notes
+        Array<int> tempCluster;
+        for(int i = 0; i< cluster.size(); i++) tempCluster.set(i, cluster.getUnchecked(i));
+        if(tempCluster.size() > synchronic->aPrep->getClusterCap()) tempCluster.resize(synchronic->aPrep->getClusterCap());
+        
+        //why not use clusterMax for this? the intent is different:
+        //clusterMax: max number of keys pressed within clusterThresh, otherwise shut off pulses
+        //clusterCap: the most number of notes allowed in a cluster when playing pulses
+        //an example: clusterMax=9, clusterCap=8; playing 9 notes simultaneously will result in cluster with 8 notes, but playing 10 notes will shut off pulse
+        //another example: clusterMax=20, clusterCap=8; play a rapid ascending scale more than 8 and less than 20 notes, then stop; only last 8 notes will be in the cluster. If your scale exceeds 20 notes then it won't play.
+        
+        //for now, we'll leave clusterCap unexposed, just to avoid confusion for the user. after all,
+        //I used it this way for all of the etudes to date! but might want to expose eventually...
+        //perhaps call beatVoices? since it's essentially the number of "voices" in the pulse chord?        
         
         //remove duplicates from cluster, so we don't play the same note twice in a single pulse
         slimCluster.clearQuick();
-        for(int i = 0; i< cluster.size(); i++) slimCluster.addIfNotAlreadyThere(cluster.getUnchecked(i));
-    
+        //for(int i = 0; i< cluster.size(); i++) slimCluster.addIfNotAlreadyThere(cluster.getUnchecked(i));
+        for(int i = 0; i< tempCluster.size(); i++) slimCluster.addIfNotAlreadyThere(tempCluster.getUnchecked(i));
+        
         //get time until next beat => beat length scaled by beatMultiplier parameter
         numSamplesBeat =    beatThresholdSamples *
                             synchronic->aPrep->getBeatMultipliers()[beatMultiplierCounter] *
@@ -310,7 +314,8 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
             if(playCluster)
             {
                 //for (int n = slimCluster.size(); --n >= 0;)
-                for (int n=0; n < cluster.size(); n++)
+                //for (int n=0; n < cluster.size(); n++)
+                for (int n=0; n < slimCluster.size(); n++)
                 {
                     
                     /*playNote(channel,

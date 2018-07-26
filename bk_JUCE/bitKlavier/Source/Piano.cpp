@@ -185,7 +185,7 @@ void Piano::configure(void)
         }
     }
     
-    processor.updateState->pianoDidChangeForGraph = true;
+    //processor.updateState->pianoDidChangeForGraph = true;
 }
 
 SynchronicProcessor::Ptr Piano::addSynchronicProcessor(int thisId)

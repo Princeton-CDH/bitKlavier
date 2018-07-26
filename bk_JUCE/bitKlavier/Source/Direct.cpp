@@ -31,9 +31,11 @@ DirectProcessor::~DirectProcessor(void)
 
 void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 {
+    tuner->getOffset(noteNumber, true);
+    
     for (auto t : direct->aPrep->getTransposition())
     {
-        float offset = t + tuner->getOffset(noteNumber), synthOffset = offset;
+        float offset = t + tuner->getOffset(noteNumber, false), synthOffset = offset;
         int synthNoteNumber = noteNumber;
         
         //if (sampleType < BKLoadSoundfont)
@@ -69,7 +71,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 
 #define HAMMER_GAIN_SCALE 0.02f
 #define RES_GAIN_SCALE 0.2f
-void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
+void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel, bool soundfont)
 {
     for (int i = 0; i<keyPlayed[noteNumber].size(); i++)
     {
@@ -80,7 +82,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
                       MainNote,
                       direct->getId(),
                       noteNumber,
-                      t,
+                      (soundfont ? noteNumber : t),
                       velocity,
                       true);
     }
@@ -90,8 +92,9 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
     
 }
 
-void DirectProcessor::playHammerResonance(int noteNumber, float velocity, int channel)
+void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int channel, bool soundfont)
 {
+    // CHECK THIS OUT WITH DAN (dont need loop right? can just do keyPlayed[noteNumber].getUnchecked(0);
     for (int i = 0; i<keyPlayed[noteNumber].size(); i++)
     {
         int t = keyPlayed[noteNumber].getUnchecked(i);
@@ -105,20 +108,32 @@ void DirectProcessor::playHammerResonance(int noteNumber, float velocity, int ch
             
             if (hGain > 0.0f)
             {
-                hammerSynth->keyOn(channel,
-                                   noteNumber,
-                                   t,
-                                   0,
-                                   velocity,
-                                   hGain * HAMMER_GAIN_SCALE,
-                                   Forward,
-                                   Normal, 
-                                   HammerNote,
-                                   direct->getId(),
-                                   0,
-                                   2000,
-                                   3,
-                                   3 );
+                
+                /*
+                if (soundfont)
+                {
+                    synth->keyOff(channel, HammerNote, direct->getId(), noteNumber, noteNumber, velocity, true);
+                }
+                else
+                 */
+                if (!soundfont)
+                {
+                    hammerSynth->keyOn  (channel,
+                                       noteNumber,
+                                       t,
+                                       0,
+                                       velocity,
+                                       hGain * HAMMER_GAIN_SCALE,
+                                       Forward,
+                                       Normal,
+                                       HammerNote,
+                                       direct->getId(),
+                                       0,
+                                       2000,
+                                       3,
+                                       3 );
+                }
+                
             }
             
             if (rGain > 0.0f)

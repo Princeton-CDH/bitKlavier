@@ -613,7 +613,7 @@ public:
     inline void prepareToPlay(double sr) { sampleRate = sr; }
     
     //returns tuning offsets; add to integer PitchClass
-    float getOffset(int midiNoteNumber);
+    float getOffset(int midiNoteNumber, bool updateLastInterval);
     
     //for calculating adaptive tuning
     void keyPressed(int midiNoteNumber);

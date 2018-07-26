@@ -74,7 +74,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     
     //==============================================================================
     BKSynthesiser::BKSynthesiser(GeneralSettings::Ptr gen):
-    pitchWheelValue(64),
+    pitchWheelValue(8192),
     generalSettings(gen),
     sampleRate (0),
     lastNoteOnCounter (0),
@@ -88,7 +88,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     }
     
     BKSynthesiser::BKSynthesiser(void):
-    pitchWheelValue(64),
+    pitchWheelValue(8192),
     sampleRate (0),
     lastNoteOnCounter (0),
     minimumSubBlockSize (32),
@@ -372,10 +372,13 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             BKSynthesiserSound* const sound = sounds.getUnchecked(i);
             
             // Check if sound applies to note, velocity, and channel.
-            if (sound->appliesToNote (noteNumber)
-                && sound->appliesToVelocity((int)(velocity*127.0)))
+            if (sound->appliesToNote (noteNumber) &&
+                sound->appliesToVelocity((int)(velocity*127.0)) &&
+                (sound->trigger != sfzero::Region::release) &&
+                (sound->trigger != sfzero::Region::release_key) &&
+                sustainPedalsDown[midiChannel] == sound->pedal)
             {
-                //DBG("BKSynthesiser::keyOn " + String(noteNumber));
+                
                 startVoice (findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes),
                             sound,
                             midiChannel,
@@ -393,10 +396,14 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                             adsrDecayMS*0.001f* getSampleRate(),
                             adsrSustain,
                             adsrReleaseMS*0.001f* getSampleRate());
+                
+                //break;
  
             }
         }
     }
+    
+    // VELOCITY IN MASTER REGIONS NEEDS TO BE APPLIED APPROPRIATELY
     
     void BKSynthesiser::startVoice (BKSynthesiserVoice* const voice,
                                     BKSynthesiserSound* const sound,
@@ -474,6 +481,13 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             voice->currentlyPlayingKey = keyNoteNumber; //keep track of which physical key is associated with this voice
             
             float gain = volume;
+            /*
+            if (sound->region_ != nullptr)
+            {
+                gain *= Decibels::decibelsToGain(sound->region_->volume);
+            }
+             */
+            
 
             voice->startNote ((float)midiNoteNumber+midiNoteNumberOffset,
                               pitchWheelValue,
@@ -535,6 +549,50 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                         }
                     }
                 }
+            }
+        }
+        
+        int noteNumber = midiNoteNumber;
+        
+        if (noteNumber > 108 || noteNumber < 21) return;
+        
+        for (int i = sounds.size(); --i >= 0;)
+        {
+            BKSynthesiserSound* const sound = sounds.getUnchecked(i);
+            
+            // Check if sound applies to note, velocity, and channel.
+            
+            bool appliesToNote = sound->appliesToNote (noteNumber);
+            bool appliesToVel = sound->appliesToVelocity((int)(velocity*127.0));
+            bool isRelease = (sound->trigger == sfzero::Region::release) || (sound->trigger == sfzero::Region::release_key);
+            bool pedalStatesMatch = (sustainPedalsDown[midiChannel] == sound->pedal);
+            
+            if (appliesToNote && appliesToVel && isRelease && pedalStatesMatch)
+            {
+                DBG("release note!!!!!!");
+                float volume = Decibels::decibelsToGain(sound->region_->volume);
+                DBG("volume: " + String(volume));
+                
+                startVoice (findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes),
+                            sound,
+                            midiChannel,
+                            keyNoteNumber,
+                            noteNumber,
+                            0, // might need to deal with this
+                            velocity * volume,
+                            Forward,
+                            Normal,
+                            DirectNote,
+                            0,
+                            0,
+                            0,
+                            0.001f,
+                            0.001f,
+                            1.0f,
+                            0.001f);
+                
+                //break;
+                
             }
         }
     }

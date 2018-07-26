@@ -23,7 +23,7 @@ TuningProcessor::~TuningProcessor()
 }
 
 //returns offsets; main callback
-float TuningProcessor::getOffset(int midiNoteNumber)
+float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
 {
     float lastNoteTuningTemp = lastNoteTuning;
     float lastNoteOffset;
@@ -32,8 +32,13 @@ float TuningProcessor::getOffset(int midiNoteNumber)
     if(tuning->aPrep->getTuning() == AdaptiveTuning || tuning->aPrep->getTuning() == AdaptiveAnchoredTuning)
     {
         float lastNoteOffset = adaptiveCalculate(midiNoteNumber);
-        lastNoteTuning = midiNoteNumber + lastNoteOffset;
-        lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
+        
+        if(updateLastInterval)
+        {
+            lastNoteTuning = midiNoteNumber + lastNoteOffset;
+            lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
+        }
+
         return lastNoteOffset;
     }
     
@@ -52,9 +57,11 @@ float TuningProcessor::getOffset(int midiNoteNumber)
                           + tuning->aPrep->getAbsoluteOffsets().getUnchecked(midiNoteNumber) +
                           tuning->aPrep->getFundamentalOffset());
         
-        
-        lastNoteTuning = midiNoteNumber + lastNoteOffset;
-        lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
+        if(updateLastInterval)
+        {
+            lastNoteTuning = midiNoteNumber + lastNoteOffset;
+            lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
+        }
         
         return lastNoteOffset;
     }
@@ -68,9 +75,11 @@ float TuningProcessor::getOffset(int midiNoteNumber)
                       + tuning->aPrep->getAbsoluteOffsets().getUnchecked(midiNoteNumber) +
                       tuning->aPrep->getFundamentalOffset());
     
-    
-    lastNoteTuning = midiNoteNumber + lastNoteOffset;
-    lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
+    if(updateLastInterval)
+    {
+        lastNoteTuning = midiNoteNumber + lastNoteOffset;
+        lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
+    }
     
     return lastNoteOffset;
     

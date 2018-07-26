@@ -53,7 +53,6 @@ timerCallbackCount(0)
     mainSlider->setDoubleClickReturnValue (true, 0.0); // double-clicking this slider will set it to 50.0
     mainSlider->setTextValueSuffix (" dB");
     mainSlider->addListener(this);
-
     
     addAndMakeVisible (mainSlider);
     
@@ -108,7 +107,6 @@ timerCallbackCount(0)
     addAndMakeVisible(construction);
     
     addChildComponent(overtop);
-
     
     juce::Point<int> myshadowOffset(2, 2);
     DropShadow myshadow(Colours::darkgrey, 5, myshadowOffset);
@@ -121,6 +119,8 @@ timerCallbackCount(0)
 MainViewController::~MainViewController()
 {
     setLookAndFeel(nullptr);
+    sampleCB.setLookAndFeel(nullptr);
+    instrumentCB.setLookAndFeel(nullptr);
     octaveSlider.setLookAndFeel(nullptr);
     mainSlider->setLookAndFeel(nullptr);
     removeKeyListener(this);
@@ -464,19 +464,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     }
     else if (code == 90) // Z
     {
-#if TRY_UNDO
-        if (e.getModifiers().isCommandDown())
-        {
-            if (e.getModifiers().isShiftDown())
-            {
-                construction.redo();
-            }
-            else
-            {
-                construction.undo();
-            }
-        }
-#endif
+
     }
     
     return true;
@@ -491,6 +479,8 @@ void MainViewController::fillSampleCB()
     sampleCB.addItem("Piano (medium)", 3);
     sampleCB.addItem("Piano (heavy)", 4);
     
+    sampleCB.addSeparator();
+    
     if (processor.currentSampleType <= BKLoadHeavy)
     {
         sampleCB.setSelectedItemIndex(processor.currentSampleType, dontSendNotification);
@@ -499,7 +489,7 @@ void MainViewController::fillSampleCB()
     int id = 5;
     for (auto sf : processor.soundfontNames)
     {
-        String name = sf.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf2", false, true);
+        String name = sf.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf", false, true);
         sampleCB.addItem(name, id);
         
         if ((processor.currentSampleType == BKLoadSoundfont) && (name == processor.getCurrentSoundfontName()))
@@ -529,6 +519,7 @@ void MainViewController::fillInstrumentCB()
         int i = 1;
         for (auto inst : processor.instrumentNames)
         {
+            if (inst == "") inst = "Instrument " + String(i);
             instrumentCB.addItem(inst, i++);
         }
         
@@ -664,6 +655,8 @@ void MainViewController::timerCallback()
         state->displayDidChange = false;
         
         overtop.setCurrentDisplay(processor.updateState->currentDisplay);
+        
+        header.update();
     }
     
     levelMeterComponentL->updateLevel(processor.getLevelL());

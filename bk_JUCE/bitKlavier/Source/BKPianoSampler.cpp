@@ -21,7 +21,7 @@ BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                           const int rootMidiNote,
                                           const int transp,
                                           const BigInteger& velocities,
-                                          sfzero::Region* reg)
+                                          sfzero::Region* reg, bool isSF2)
 :
 name (soundName),
 data(buffer),
@@ -34,35 +34,44 @@ transpose(transp)
 {
     rampOnSamples = roundToInt (aRampOnTimeSec* sourceSampleRate);
     rampOffSamples = roundToInt (aRampOffTimeSec * sourceSampleRate);
-
     
     if (reg != nullptr)
     {
+        region_ = new sfzero::Region();
+        *region_ = *reg;
+        
         isSoundfont = true;
         
-        loopStart = reg->loop_start; // loop start and end take in account minimum fade amt
-        loopEnd = reg->loop_end;
-        start = reg->offset;
-        end = reg->end;
+        loopStart = region_->loop_start; // loop start and end take in account minimum fade amt
+        loopEnd = region_->loop_end;
+        start = region_->offset;
+        end = region_->end;
         
-        delay = reg->ampeg.delay;
-        attack = reg->ampeg.attack;
-        hold = reg->ampeg.hold;
-        decay = reg->ampeg.decay;
-        sustain = reg->ampeg.sustain / 100.0f;
-        release = reg->ampeg.release;
+        delay = region_->ampeg.delay;
+        attack = region_->ampeg.attack;
+        hold = region_->ampeg.hold;
+        decay = region_->ampeg.decay;
+        sustain = region_->ampeg.sustain / 100.0f;
+        release = region_->ampeg.release;
         
-        loopMode = reg->loop_mode;
+        loopMode = region_->loop_mode;
+        
+        trigger = region_->trigger;
+        
+        pedal = region_->pedal;
+        
+        sampleName = soundName;
+        //if (!isSF2 && (loopMode == 0)) loopMode = 3;
     }
     else
     {
+        region_ = nullptr;
         isSoundfont = false;
     }
 }
 
 BKPianoSamplerSound::~BKPianoSamplerSound()
 {
-    
 }
 
 bool BKPianoSamplerSound::isSoundfontSound(void)
@@ -139,6 +148,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                                      s);
 }
 
+#define REVENV 0
+
 void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                                      const int pitchWheelValue,
                                      const float gain,
@@ -162,6 +173,9 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         * sound->sourceSampleRate
         * generalSettings->getTuningRatio()
         / getSampleRate();
+        
+        
+        DBG("sound->name: " + sound->name);
         
         bentRatio = pitchbendMultiplier * pitchRatio;
         
@@ -196,14 +210,12 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             
             //playLength => how long to play before keyOff/adsrRelease, accounting for playbackSpeed (pitchRatio)
             playLength = (totalLength - adsrRelease) * pitchRatio;
-            
         }
         
         //playLength should now be the actual duration we want to hear, minus the release time, all scaled for playbackSpeed.
         
         //actual maxLength, based on soundfile size, leaving enough samples for release
         double maxLength = sound->soundLength - adsrRelease * pitchRatio;
-        
         
         if (playDirection == Forward)
         {
@@ -311,12 +323,16 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         {
             samplePosition = sourceSamplePosition; //DT addition
             
+            lgain *= 0.5;
+            rgain *= 0.5;
+            
             //cfSamples = 10.0;  //DT: 10 samples too small...
             cfSamples = getSampleRate() / 50.; //20ms; possibly an issue if the loop length is really small, but 20ms is a typical ramp length
             sampleEnv.setTime(cfSamples / getSampleRate());
             loopEnv.setTime(cfSamples / getSampleRate());
             
             DBG("loop mode: " + String(sound->loopMode));
+            DBG("ahdsr: " + String(sound->attack) +" "+ String(sound->hold) +" "+ String (sound->decay) +" "+ String(sound->sustain) +" "+ String(sound->release));
             
             if (playDirection == Forward)
             {
@@ -333,11 +349,14 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                 {
                     sustain = 1.0f;
                 }
-                
+                sfzadsr.setAttackTarget(1.0f);
                 sfzadsr.setAllTimes((sound->attack > 0.0f) ? sound->attack : 0.001f,
+                                    (sound->hold > 0.0f) ? sound->hold : 0.001f,
                                     (sound->decay > 0.0f) ? sound->decay : 0.001f,
                                     sustain,
                                     (sound->release > 0.0f) ? sound->release : 0.001f );
+                
+                playLengthSF2 = (totalLength - (sound->release * getSampleRate())) * pitchRatio;
                 
                 sfzEnvApplied = true;
                 sfzadsr.keyOn();
@@ -346,9 +365,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             {
                 inLoop = true;
                 
-                if (sound->loopMode == 1 || sound->loopMode == 2)
+                if (sound->loopMode <=  2)
                 {
-                    //samplePosition = playLength - 1;
                     loopEnv.setValue(0.0);
                     sampleEnv.setValue(1.0);
                 }
@@ -358,26 +376,40 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                     sampleEnv.setValue(0.0f);
                     
                     loopPosition = sound->loopStart;
+#if REVENV
+                    // total length of sound minus the length of the AHDR should be how long sample was sustained (hold in reverse)
+                    double totalLen = (totalLength * pitchRatio);
+                    double envLen = ((sound->release + sound->decay + sound->hold + sound->attack) * getSampleRate());
+                    double envLenNoRelease = ((sound->release + sound->decay + sound->hold + sound->attack) * getSampleRate());
+
+                    if (totalLen > envLen)
+                    {
+                        double holdSamples = totalLen - envLen;
+                        sfzadsr.setAttackTarget(sound->sustain);
+                        sfzadsr.setAllTimes(sound->release,
+                                            (holdSamples / getSampleRate()), // hold length in seconds
+                                            sound->decay,
+                                            1.0f,
+                                            sound->attack);
+                    }
+                    else
+#endif
+                    {
+                        sfzadsr.setAttackTarget(1.0f);
+                        sfzadsr.setAllTimes(0.001f,
+                                            0.001f,
+                                            0.001f,
+                                            1.0f,
+                                            0.001f);
+                    }
                     
-                    lengthEnv =  (sound->attack + sound->decay + sound->release) * getSampleRate();
-                    
-                    lengthEnv = (playLength < lengthEnv) ? playLength : lengthEnv;
-                    
-                   
-                    /*
-                    if (sound->sustain > 0.0)   renv1.setValue(sound->sustain);
-                    else                        renv1.setValue(0.0);
-                    
-                    renv1.setTarget(1.0);
-                    renv1.setTime(sound->decay);
-                     */
-                    
-                    sfzadsr.setValue(0.0f);
-                    sfzadsr.setAllTimes(0.001f, 0.001f, 1.0f, 0.001f);
                     sfzadsr.keyOn();
+                    
                     sfzEnvApplied = true;
                     
                 }
+                
+                playLengthSF2 = (totalLength - (sound->attack * getSampleRate())) * pitchRatio;
             }
         }
         noteStartingPosition = sourceSamplePosition;
@@ -393,7 +425,7 @@ void BKPianoSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
     if (allowTailOff)
     {
         adsr.keyOff();
-        //sfzadsr.keyOff();
+        sfzadsr.keyOff();
     }
     else
     {
@@ -452,12 +484,16 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         
         float loopL, loopR;
         
+        if(loopPosition < 0) loopPosition = 0;
+        if(loopPosition > playingSound->soundLength - 2) loopPosition = playingSound->soundLength - 2;
+        
         int pos = (int) loopPosition;
         float alpha = (float) (loopPosition - pos);
         float invAlpha = 1.0f - alpha;
+        int next = pos + 1;
         
-        loopL = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-        loopR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : loopL;
+        loopL = (inL [pos] * invAlpha + inL [next] * alpha);
+        loopR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : loopL;
         //===========================================
         
         //==============SAMPLE STUFF=================
@@ -465,15 +501,17 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         if (playDirection == Forward)   samplePosition += bentRatio;
         else                            samplePosition -= bentRatio;
         
+        if(samplePosition < 0) samplePosition = 0;
+        if(samplePosition > playingSound->soundLength - 2) samplePosition = playingSound->soundLength - 2;
+        
         pos = (int) samplePosition;
         alpha = (float) (samplePosition - pos);
         invAlpha = 1.0f - alpha;
-        
-        if (pos >= 0 && pos < (playingSound->soundLength - 1))
-        {
-            sampleL = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-            sampleR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : sampleL;
-        }
+        next = pos + 1;
+
+        sampleL = (inL [pos] * invAlpha + inL [next] * alpha);
+        sampleR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : sampleL;
+
         //===========================================
         if (playDirection == Forward)
         {
@@ -494,22 +532,10 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
                 
                 sampleEnv.keyOff();
             }
-            
-            if (playType != Normal)
-            {
-                //if ((playType != Normal) && (lengthTracker >= (playLength - adsr.getReleaseTime() * getSampleRate())))
-                if ((playType != Normal) && (lengthTracker >= playLength))
-                {
-                    adsr.keyOff();
-                    //DBG("keyOff on Forward note!, lengthTracker = " + String(lengthTracker));
-                }
-            }
-            
-            
         }
         else if (playDirection == Reverse)
         {
-            if(lengthTracker >= playLength + adsr.getReleaseTime() * getSampleRate()) //DT: changed, added getReleaseTime, which i think should be here.
+            if(lengthTracker >= playLength + adsr.getReleaseTime() * getSampleRate())
             {
                 clearCurrentNote(); break;
             }
@@ -524,23 +550,27 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
                 samplePosition = reversePosition;  //was original code
                 
                 loopEnv.keyOff(); //DT: should be keyOff/On or setTarget, set setValue
-                //loopEnv.setValue(0.0f);
                 
                 sampleEnv.keyOn();
-                //sampleEnv.setValue(1.0f);
-            }
-            
-            if ((playType != Normal) && (lengthTracker >= (playLength - adsr.getReleaseTime() * getSampleRate())))
-            {
-                if ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE))
-                {
-                    adsr.keyOff();
-                }
             }
         }
         else
         {
             DBG("Invalid note direction.");
+        }
+        
+        // Check for adsr keyOffs
+        if ((playType != Normal) && ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE)))
+        {
+            if (lengthTracker >= (playLength - adsr.getReleaseTime() * getSampleRate()))
+            {
+                adsr.keyOff();
+            }
+            
+            if (lengthTracker >= (playLengthSF2 - sfzadsr.getReleaseTime() * getSampleRate()))
+            {
+                sfzadsr.keyOff();
+            }
         }
         
         float l,r;
@@ -584,15 +614,17 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
         if (playDirection == Forward)   samplePosition += bentRatio;
         else                            samplePosition -= bentRatio;
         
+        if(samplePosition < 0) samplePosition = 0;
+        if(samplePosition > playingSound->soundLength - 2) samplePosition = playingSound->soundLength - 2;
+        
         const int pos = (int) samplePosition;
         const float alpha = (float) (samplePosition - pos);
         const float invAlpha = 1.0f - alpha;
-        
-        if (pos >= 0 && pos < (playingSound->soundLength - 1))
-        {
-            sampleL = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-            sampleR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : sampleL;
-        }
+        int next = pos + 1;
+
+        sampleL = (inL [pos] * invAlpha + inL [next] * alpha);
+        sampleR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : sampleL;
+
         //===========================================
         if (playDirection == Forward)
         {
@@ -613,9 +645,6 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
         }
         else if (playDirection == Reverse)
         {
-
-            //DT: changed if checks here; lengthTracker already has adsrReleaseTime in it....
-            //if(lengthTracker >= playLength)
             if(lengthTracker >= playLength + adsr.getReleaseTime() * getSampleRate())
             {
                 clearCurrentNote(); break;
@@ -656,7 +685,7 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
     {
         if (playingSound->isSoundfont)
         {
-            if (playingSound->loopMode == 1 || playingSound->loopMode == 2)
+            if (playingSound->loopMode <= 2)
             {
                 processSoundfontNoLoop(outputBuffer, startSample, numSamples, playingSound);
             }
@@ -707,14 +736,15 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         }
         
         if(sourceSamplePosition < 0) sourceSamplePosition = 0;
+        if(sourceSamplePosition > playingSound->soundLength - 2) sourceSamplePosition = playingSound->soundLength - 2;
         
-        const int pos = (int) sourceSamplePosition;
+        int pos = (int) sourceSamplePosition;
         const float alpha = (float) (sourceSamplePosition - pos);
         const float invAlpha = 1.0f - alpha;
-        
-        // just using a very simple linear interpolation here..
-        float l = (inL [pos] * invAlpha + inL [pos + 1] * alpha);
-        float r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [pos + 1] * alpha) : l;
+        int next = pos + 1;
+
+        float l = (inL [pos] * invAlpha + inL [next] * alpha);
+        float r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : l;
         
         l *= (lgain * adsr.tick());
         r *= (rgain * adsr.lastOut());

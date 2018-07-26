@@ -25,10 +25,8 @@ hammerReleaseSynth(),
 resonanceReleaseSynth(),
 pedalSynth(),
 currentSampleType(BKLoadNil),
-loader(*this)
-#if TRY_UNDO
-,epoch(0),
-#endif
+loader(*this),
+shouldLoadDefault(true)
 {
 #if BK_UNIT_TESTS
 	BKUnitTestRunner test;
@@ -38,10 +36,6 @@ loader(*this)
     didLoadMainPianoSamples         = false;
     sustainIsDown                   = false;
     noteOnCount                     = 0;
-    
-#if TRY_UNDO
-    history.ensureStorageAllocated(10);
-#endif
     
     Process::setPriority(juce::Process::RealtimePriority);
     
@@ -91,10 +85,7 @@ loader(*this)
 #if JUCE_IOS
     platform = BKIOS;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory);
-#endif
- 
-
-#if JUCE_MAC || JUCE_WINDOWS
+#else
     platform = BKOSX;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 
@@ -227,7 +218,7 @@ void BKAudioProcessor::openSoundfont(void)
     FileChooser myChooser ("Load soundfont file...",
                            //File::getSpecialLocation (File::userHomeDirectory),
                            lastGalleryPath,
-                           "*.sf2;*.sfz");
+                           "*.sf2;*.sfz;");
     
     if (myChooser.browseForFileToOpen())
     {
@@ -243,6 +234,15 @@ void BKAudioProcessor::openSoundfont(void)
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    if (shouldLoadDefault)
+    {
+#if JUCE_IOS
+        loadSamples(BKLoadMedium);
+#else
+        loadSamples(BKLoadHeavy);
+#endif
+    }
+    
     stk::Stk::setSampleRate(sampleRate);
     
     mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
@@ -259,34 +259,6 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     gallery->prepareToPlay(sampleRate);
     
-#if JUCE_DEBUG
-
-#else
-    
-#if JUCE_IOS
-    String osname = SystemStats::getOperatingSystemName();
-    float iosVersion = osname.fromLastOccurrenceOf("iOS ", false, true).getFloatValue();
-    
-    String device = SystemStats::getDeviceDescription();
-    
-    if (device.contains("iPhone"))  updateState->needsExtraKeys = true;
-    else                            updateState->needsExtraKeys = false;
-    
-    if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
-    else                    loadPianoSamples(BKLoadLite); // CHANGE BACK TO MEDIUM
-#else
-    loadPianoSamples(BKLoadHeavy); // CHANGE THIS BACK TO HEAVY
-#endif
-    
-#endif
-
-    
-#if TRY_UNDO
-    for (int i = 0; i < NUM_EPOCHS; i++)
-    {
-        history.set(i, currentPiano);
-    }
-#endif
 
     sustainIsDown = false;
 }
@@ -294,6 +266,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 BKAudioProcessor::~BKAudioProcessor()
 {
     clipboard.clear();
+    //loader.stopThread(1000);
 }
 
 void BKAudioProcessor::deleteGallery(void)
@@ -360,9 +333,7 @@ void BKAudioProcessor::createNewGallery(String name, ScopedPointer<XmlElement> x
 
 #if JUCE_IOS
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory);
-#endif
-    
-#if JUCE_MAC || JUCE_WINDOWS
+#else
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
@@ -475,7 +446,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
     // Send key on to each pmap in current piano
     for (p = currentPiano->activePMaps.size(); --p >= 0;) {
         //DBG("noteon: " +String(noteNumber) + " pmap: " + String(p));
-        currentPiano->activePMaps[p]->keyPressed(noteNumber, velocity, channel);
+        currentPiano->activePMaps[p]->keyPressed(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont));
     }
 }
 
@@ -492,7 +463,7 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     
     // Send key off to each pmap in current piano
     for (p = currentPiano->activePMaps.size(); --p >= 0;)
-        currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel);
+        currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont));
     
     // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
     if (prevPiano != currentPiano)
@@ -640,6 +611,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             didNoteOffs = true;
         }
         
+        // NEED WAY TO TRIGGER RELEASE PEDAL SAMPLE FOR SFZ
         if (m.isSustainPedalOn())
         {
             //DBG("m.isSustainPedalOn()");
@@ -710,14 +682,14 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     
     updateState->setCurrentDisplay(DisplayNil);
     
-    gallery->resetPreparations();
+    //gallery->resetPreparations(); //modded preps should remain modded across piano changes; user can Reset if desired
     
     if (noteOnCount)  prevPianos.addIfNotAlreadyThere(currentPiano);
     
     prevPiano = currentPiano;
     
     currentPiano = gallery->getPiano(which);
-    
+    currentPiano->clearOldNotes(prevPiano); // to clearOldNotes so it doesn't playback shit from before
     currentPiano->copyAdaptiveTuningState(prevPiano);
     currentPiano->copyAdaptiveTempoState(prevPiano);
     
@@ -1377,33 +1349,6 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     }
     
 }
-
-#if TRY_UNDO
-void BKAudioProcessor::updateHistory(void)
-{
-    for (int i = 0; i < NUM_EPOCHS; i++)
-    {
-        history.set(i+1, history.getUnchecked(i));
-    }
-    
-    history.set(0, currentPiano->duplicate(true));
-}
-
-void BKAudioProcessor::timeTravel(bool forward)
-{
-    if (forward)    epoch--;
-    else            epoch++;
-    
-    if (epoch >= NUM_EPOCHS) epoch = NUM_EPOCHS-1;
-    if (epoch <  0 ) epoch = 0;
-    
-    Piano::Ptr newPiano = history.getUnchecked(epoch);
-    
-    if (newPiano != nullptr) currentPiano = newPiano;
-    
-    updateState->pianoDidChangeForGraph = true;
-}
-#endif
 
 
 

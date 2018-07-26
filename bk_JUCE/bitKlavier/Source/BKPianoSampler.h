@@ -49,7 +49,9 @@ public:
                          int rootMidiNote,
                          int transpose,
                          const BigInteger& midiVelocities,
-                         sfzero::Region* region = nullptr);
+                         sfzero::Region* region = nullptr,
+                         bool isSF2 = true);
+
     
     /** Destructor. */
     ~BKPianoSamplerSound();
@@ -195,7 +197,7 @@ private:
     double lengthTracker, lengthEnv;
 
     double playEndPosition;
-    double playLength;
+    double playLength, playLengthSF2;
     uint64 timer;
     BKNoteType bkType;
     PianoSamplerNoteType playType;
@@ -218,7 +220,7 @@ private:
     double samplePosition, loopPosition;
     
     stk::ADSR adsr;
-    stk::ADSR sfzadsr;
+    stk::AHDSR sfzadsr;
     
     bool lastRamp;
     int numLoops;

@@ -1188,6 +1188,12 @@ public:
         synchronic->aPrep->copy(synchronic->sPrep);
     }
     
+    void clearOldNotes()
+    {
+        keysDepressed.clearQuick();
+        cluster.clearQuick();
+    }
+    
 private:
     BKSynthesiser* synth;
     GeneralSettings::Ptr general;

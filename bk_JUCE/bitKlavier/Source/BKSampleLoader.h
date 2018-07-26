@@ -27,7 +27,6 @@ public:
     
     ~BKSampleLoader(void)
     {
-        
     }
 private:
     

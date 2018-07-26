@@ -39,6 +39,8 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
     }
     
+    bool isSF2 = false;
+    
     ScopedPointer<sfzero::SF2Sound>     sf2sound;
     ScopedPointer<sfzero::SF2Reader>    sf2reader;
     ScopedPointer<sfzero::Sound>     sfzsound;
@@ -46,10 +48,9 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     
     if      (ext == ".sf2")
     {
+        isSF2 = true;
         sf2sound   = new sfzero::SF2Sound(sfzFile);
-        
-        sf2reader  = new sfzero::SF2Reader(sf2sound, sfzFile);
-        
+    
         sf2sound->loadRegions(processor.currentInstrument);
         sf2sound->loadSamples(&formatManager);
         
@@ -69,26 +70,49 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     {
         sfzsound   = new sfzero::Sound(sfzFile);
         
-        sfzreader  = new sfzero::Reader(sfzsound);
-        
+        processor.currentInstrument = 0;
+
+        // POSSIBLY STILL DOUBLE LOADING SAMPLES? 
         sfzsound->loadRegions(processor.currentInstrument);
-        sfzsound->loadSamples(&formatManager);
+        sfzsound->loadSamples(&formatManager, &processor.progress);
+        
+        processor.currentInstrumentName = sfzsound->subsoundName(processor.currentInstrument);
+        
+        processor.instrumentNames.clear();
+        for (int i = 0; i < sfzsound->numSubsounds(); i++)
+        {
+            processor.instrumentNames.add(sfzsound->subsoundName(i));
+        }
+        
         
         processor.regions.clear();
         processor.regions = sfzsound->getRegions();
-        DBG("regions.size: " + String(processor.regions.size()));
+        processor.progress = 0.0;
+        processor.progressInc = 1.0 / processor.regions.size();
+
     }
     else    return;
-    
+
     int count = 0;
     for (auto region : processor.regions)
     {
         processor.progress += processor.progressInc;
         
-        int64 sampleStart = region->offset;
+        int64 sampleStart, sampleLength;
         
-        int64 sampleLength = region->end - sampleStart;
+        if (isSF2)
+        {
+            sampleStart = region->offset;
+            sampleLength = region->end - sampleStart;
+        }
+        else
+        {
+            sampleStart = 0;
+            sampleLength = region->sample->getSampleLength();
+        }
+   
         double sourceSampleRate = region->sample->getSampleRate();
+
         
         // check out fluidsynth as alternative
         AudioSampleBuffer* sourceBuffer = region->sample->getBuffer();
@@ -99,26 +123,53 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         
         destBuffer->copyFrom(0, 0, sourceBuffer->getReadPointer(0, sampleStart), (int)sampleLength);
         
-        DBG("region " + String(count) + " offset: " + String(region->offset));
+        // WEIRD thing where sample metadata defines loop point instead of the sfz format
+        if (!isSF2 && (region->loop_mode == 0))
+        {
+            if ((region->sample->getLoopStart() > 0) &&
+                (region->sample->getLoopEnd() > 0))
+            {
+                region->loop_mode = sfzero::Region::loop_continuous;
+                region->loop_start = region->sample->getLoopStart();
+                region->loop_end = region->sample->getLoopEnd();
+            }
+        }
+        
+        DBG("~ ~ ~ ~ region " + String(count++) + " ~ ~ ~ ~ ~ ~");
+        DBG("sample: " + region->sample->getShortName());
+        DBG("offset: " + String(region->offset));
         region->end             -= region->offset;
         region->loop_start      -= region->offset;
         region->loop_end        -= region->offset;
         region->offset           = 0;
         
-        DBG("region " + String(count) + " | transp: " + String(region->transpose) + "   keycenter: " + String(region->pitch_keycenter) + " keytrack: " + String(region->pitch_keytrack));
+       
         
-        DBG("region " + String(count++) + " |   end: " + String(region->end) + "   ls: " + String(region->loop_start) + "   le: " + String(region->loop_end) + "   keyrange: " + String(region->lokey) + "-" + String(region->hikey) + "   velrange: " + String(region->lovel) + "-" + String(region->hivel));
         
-        if ((region->lokey == region->hikey) && (region->lokey != region->pitch_keycenter))
+        if (region->pitch_keycenter < 0) region->pitch_keycenter = region->lokey;
+        
+        if (region->lokey == region->hikey)
         {
-            region->transpose = region->lokey - region->pitch_keycenter;
+            if (region->lokey != region->pitch_keycenter)
+            {
+                region->transpose = region->lokey - region->pitch_keycenter;
+            }
         }
+    
+        
+        DBG("transp: " + String(region->transpose) + "   keycenter: " + String(region->pitch_keycenter) + " keytrack: " + String(region->pitch_keytrack));
+        
+        DBG("end: " + String(region->end) + "   ls: " + String(region->loop_start) + "   le: " + String(region->loop_end) + "   keyrange: " + String(region->lokey) + "-" + String(region->hikey) + "   velrange: " + String(region->lovel) + "-" + String(region->hivel));
+        
+        DBG("region->trigger: " +String(region->trigger));
+        DBG("pedal needed: " + String((int)region->pedal));
+        
+        
         
         int nbits = region->hikey - region->lokey;
         int vbits = region->hivel - region->lovel;
         BigInteger nrange; nrange.setRange(region->lokey, nbits+1, true);
         BigInteger vrange; vrange.setRange(region->lovel, vbits+1, true);
-        
         
         synth->addSound(new BKPianoSamplerSound(region->sample->getShortName(),
                                                         buffer,
@@ -128,9 +179,9 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
                                                         region->pitch_keycenter,
                                                         region->transpose,
                                                         vrange,
-                                                        region));
+                                                        region,isSF2));
     }
-    
+
     processor.didLoadMainPianoSamples = true;
 }
 

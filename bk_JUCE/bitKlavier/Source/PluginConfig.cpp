@@ -134,6 +134,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             bool invertSustain = (bool)galleryXML->getStringAttribute("invertSustain").getIntValue();
             
             setSustainInversion(invertSustain);
+
             
             //override gallery-saved defaultPiano with pluginHost-saved defaultPiano
             setCurrentPiano(galleryXML->getStringAttribute("defaultPiano").getIntValue());
@@ -155,7 +156,6 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
                 loadSamples(toLoadType);
             }
 #endif
-             
             
         }
     }

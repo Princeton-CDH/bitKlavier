@@ -234,7 +234,12 @@ public TextEditor::Listener
 {
 public:
     BKSingleSlider(String sliderName, double min, double max, double def, double increment);
-    ~BKSingleSlider() {setLookAndFeel(nullptr);};
+    ~BKSingleSlider()
+    {
+        displaySlider->setLookAndFeel(nullptr);
+        setLookAndFeel(nullptr);
+        
+    };
     
     Slider thisSlider;
     ScopedPointer<Slider> displaySlider;
@@ -335,6 +340,8 @@ public:
     {
         minSlider.setLookAndFeel(nullptr);
         maxSlider.setLookAndFeel(nullptr);
+        invisibleSlider.setLookAndFeel(nullptr);
+        displaySlider->setLookAndFeel(nullptr);
     };
     
     Slider minSlider;
@@ -656,8 +663,6 @@ public:
         virtual ~Listener() {};
         
         virtual void BKStackedSliderValueChanged(String name, Array<float> val) = 0; //rewrite all this to pass "this" and check by slider ref instead of name?
-        
-        virtual void bkStackedSliderValueChanged(BKStackedSlider*) {};
     };
     
     ListenerList<Listener> listeners;

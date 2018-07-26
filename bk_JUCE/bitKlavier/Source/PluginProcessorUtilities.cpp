@@ -27,10 +27,13 @@ void BKAudioProcessor::updateUI(void)
 
 void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsound)
 {
+    didLoadMainPianoSamples = false;    
     if (type == BKLoadSoundfont)
     {
         if (path == "") return;
 
+        shouldLoadDefault = false;
+        
         currentSampleType = BKLoadSoundfont;
         
         currentSoundfont = path;
@@ -42,7 +45,7 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
     {
         currentSampleType = type;
         
-        didLoadMainPianoSamples = false;
+        shouldLoadDefault = false;
         
         int numSamplesPerLayer = 29;
         int numHarmSamples = 69;
@@ -57,18 +60,15 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
         
         loader.startThread();
     }
-    
-    
-    
 }
 
 void BKAudioProcessor::collectSoundfontsFromFolder(File folder)
 {
-    DirectoryIterator iter (File (folder), true, "*.sf2");
+    DirectoryIterator iter (File (folder), true, "*.sf2;*.sfz");
     while (iter.next())
     {
         File soundfontFile (iter.getFile());
-        
+
         soundfontNames.add(soundfontFile.getFullPathName());
     }
 }

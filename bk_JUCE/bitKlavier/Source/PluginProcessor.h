@@ -106,16 +106,7 @@ public:
     
     bool                                defaultLoaded;
     String                              defaultName;
-    
-#if TRY_UNDO
-    Piano::PtrArr                       history;
-    int epoch;
-    
-    void updateHistory(void);
-    
-    void timeTravel(bool forward);
-#endif
-    
+
     void updateGalleries(void);
     
     void collectGalleries(void);
@@ -222,7 +213,7 @@ public:
     
     double progress;
     double progressInc;
-    bool didLoadHammersAndRes, didLoadMainPianoSamples;
+    bool didLoadHammersAndRes, didLoadMainPianoSamples, shouldLoadDefault;
     
     void clearBitKlavier(void);
     
@@ -294,7 +285,7 @@ public:
     
     inline String getCurrentSoundfontName(void)
     {
-        return (currentSoundfont.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf2", false, true));
+        return (currentSoundfont.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf", false, true));
     }
     
 private:
