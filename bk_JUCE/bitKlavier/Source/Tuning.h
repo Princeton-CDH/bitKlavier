@@ -99,6 +99,38 @@ public:
                 nToneRoot == p->getNToneRoot() &&
                 (tAdaptiveHistory == p->getAdaptiveHistory()) && custom && absolute);
     }
+
+	inline void randomize()
+	{
+		float r[21];
+
+		for (int i = 0; i < 21; i++)  r[i] = ((float)rand() / RAND_MAX);
+		int idx = 0;
+
+
+		//need something for tuning and fundamental
+		tWhichTuning = (TuningSystem)(int)( r[idx++] * TuningSystemNil);
+		tFundamental = (PitchClass)(int)(r[idx++] * PitchClassNil);
+		tFundamentalOffset = r[idx++] * 48.0f - 24.0f;
+		tAdaptiveIntervalScale = (TuningSystem)(int)(r[idx++] * TuningSystemNil);
+		tAdaptiveInversional = (bool)((int) (r[idx++] * 2));
+		tAdaptiveAnchorScale = (TuningSystem)(int)(r[idx++] * TuningSystemNil);
+		tAdaptiveAnchorFundamental = (PitchClass)(int)(r[idx++] * PitchClassNil);
+		tAdaptiveClusterThresh = (uint64) (r[idx++] * 50000);
+		tAdaptiveHistory = (int)(r[idx++] * 100) + 1;
+		tCustom.clear();
+		for (int i = 0; i < 12; ++i)
+		{
+			tCustom.add(i, ((float)rand() / RAND_MAX) * 2.0f - 1.0f);
+		}
+		tAbsolute.clear();
+		for (int i = 0; i < 128; ++i)
+		{
+			tAbsolute.add(i, ((float)rand() / RAND_MAX) * 2.0f - 1.0f);
+		}
+		nToneSemitoneWidth = r[idx++] * 200.0f;
+		nToneRoot = (int)(r[idx++] * 128);
+	}
     
     TuningPreparation(TuningSystem whichTuning,
                       PitchClass fundamental,

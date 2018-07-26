@@ -76,6 +76,22 @@ public:
                 at1Subdivisions == s->getAdaptiveTempo1Subdivisions() &&
                 at1Mode == s->getAdaptiveTempo1Mode());
     }
+
+	inline void randomize(void)
+	{
+		float r[10];
+
+		for (int i = 0; i < 10; i++)  r[i] = ((float)rand() / RAND_MAX);
+		int idx = 0;
+
+		sTempo = r[idx++];
+		sWhichTempoSystem = (TempoType)(int)(r[idx++] * TempoSystemNil);
+		at1History = r[idx++];
+		at1Min = r[idx++];
+		at1Max = r[idx++];
+		at1Subdivisions = r[idx++];
+		at1Mode = (AdaptiveTempo1Mode)(int)(r[idx++] * AdaptiveTempo1ModeNil);
+	}
     
     inline const TempoType getTempoSystem() const noexcept      {return sWhichTempoSystem; }
     inline const float getTempo() const noexcept                {return sTempo; }
@@ -365,6 +381,22 @@ public:
                 getParam(AT1Mode)           == t->getParam(AT1Mode));
     }
     
+	inline void randomize(void)
+	{
+		float r[10];
+
+		for (int i = 0; i < 10; i++)  r[i] = ((float)rand() / RAND_MAX);
+		int idx = 0;
+
+		param.set(TempoBPM, String(r[idx++]));
+		param.set(TempoSystem, String(r[idx++]));
+		param.set(AT1History, String(r[idx++]));
+		param.set(AT1Subdivisions, String(r[idx++]));
+		param.set(AT1Min, String(r[idx++]));
+		param.set(AT1Max, String(r[idx++]));
+		param.set(AT1Mode, String(r[idx++]));
+	}
+
     void clearAll()
     {
         for (int i = TempoId+1; i < TempoParameterTypeNil; i++)
