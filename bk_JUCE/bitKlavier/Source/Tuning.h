@@ -556,6 +556,24 @@ public:
                 getParam(TuningAbsoluteOffsets) == t->getParam(TuningAbsoluteOffsets));
             
     }
+
+	inline void randomize()
+	{
+		TuningPreparation p;
+		p.randomize();
+
+		param.set(TuningScale, String(p.getTuning()));
+		param.set(TuningFundamental, String(p.getFundamental()));
+		param.set(TuningOffset, String(p.getFundamentalOffset()));
+		param.set(TuningA1IntervalScale, String(p.getAdaptiveIntervalScale()));
+		param.set(TuningA1Inversional, String((int)p.getAdaptiveInversional()));
+		param.set(TuningA1AnchorScale, String(p.getAdaptiveAnchorScale()));
+		param.set(TuningA1AnchorFundamental, String(p.getAdaptiveAnchorFundamental()));
+		param.set(TuningA1ClusterThresh, String(p.getAdaptiveClusterThresh()));
+		param.set(TuningA1History, String(p.getAdaptiveHistory()));
+		param.set(TuningCustomScale, floatArrayToString(p.getCustomScale()));
+		param.set(TuningAbsoluteOffsets, offsetArrayToString(p.getAbsoluteOffsets()));
+	}
     
     void clearAll()
     {

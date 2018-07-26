@@ -378,31 +378,15 @@ public:
     
     inline void randomize (void)
     {
-        float r[20];
+		DirectPreparation p;
+		p.randomize();
         
-        for (int i = 0; i < 20; i++)    r[i] = ((float)rand() / RAND_MAX);
-        int idx = 0;
-        
-        Array<float> transps;
-        
-        for (int i = 0; i < (int)((float)rand()/RAND_MAX*10); ++i)
-        {
-            transps.add(i, ((float)rand()/RAND_MAX) * 48.0f - 24.0f);
-        }
-        
-        Array<float> adsr;
-        
-        adsr.add(r[idx++] * 2000.0f);
-        adsr.add(r[idx++] * 2000.0f);
-        adsr.add(r[idx++]          );
-        adsr.add(r[idx++] * 2000.0f);
-        
-        param.set(DirectTransposition, floatArrayToString(transps));
-        param.set(DirectGain, String(r[idx++]));
-        param.set(DirectResGain, String(r[idx++]));
+        param.set(DirectTransposition, floatArrayToString(p.getTransposition()));
+        param.set(DirectGain, String(p.getGain()));
+        param.set(DirectResGain, String(p.getResonanceGain()));
         param.set(DirectTuning, "blah");
-        param.set(DirectHammerGain, String(r[idx++]));
-        param.set(DirectADSR, floatArrayToString(adsr));
+        param.set(DirectHammerGain, String(p.getHammerGain()));
+        param.set(DirectADSR, floatArrayToString(p.getADSRvals()));
     }
     
     inline bool compare(DirectModPreparation::Ptr dm)

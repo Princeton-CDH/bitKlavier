@@ -448,4 +448,103 @@ void Tuning::setState(XmlElement* e)
     aPrep->copy( sPrep);
 }
 
+#if BK_UNIT_TESTS
 
+class TuningTests : public UnitTest
+{
+public:
+	TuningTests() : UnitTest("Tunings", "Tuning") {}
+
+	void runTest() override
+	{
+		beginTest("Tuning");
+
+		for (int i = 0; i < 10; i++)
+		{
+			// create tuning preparation and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random tuning " + String(i);
+			DBG("test consistency: " + name);
+
+			TuningPreparation::Ptr tp1 = new TuningPreparation();
+
+			Tuning t1(tp1, 1);
+			t1.setName(name);
+
+			ValueTree vt1 = t1.getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			TuningPreparation::Ptr tp2 = new TuningPreparation();
+
+			Tuning t2(tp2, 1);
+
+			t2.setState(xml);
+			t2.setName(name);
+
+			ValueTree vt2 = t2.getState();
+
+			expect(vt1.isEquivalentTo(vt2), "direct value trees don't match");
+
+			expect(tp2->compare(tp1), tp1->getName() + " and " + tp2->getName() + " did not match.");
+		}
+
+	}
+};
+
+static TuningTests directTests;
+
+class TuningModTests : public UnitTest
+{
+public:
+	TuningModTests() : UnitTest("TuningMod", "TuningMod") {}
+
+	void runTest() override
+	{
+		beginTest("TuningMod");
+
+		for (int i = 0; i < 10; i++)
+		{
+			// create direct preparation and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random direct mod " + String(i);
+			DBG("test consistency: " + name);
+
+			TuningPreparation::Ptr tp1 = new TuningPreparation();
+			TuningModPreparation::Ptr tm1 = new TuningModPreparation(tp1, 1);
+
+
+			tm1->randomize();
+			tm1->setName(name);
+
+			ValueTree vt1 = tm1->getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			TuningPreparation::Ptr tp2 = new TuningPreparation();
+			TuningModPreparation::Ptr tm2 = new TuningModPreparation(tp2, 1);
+
+			tm2->setState(xml);
+
+			ValueTree vt2 = tm2->getState();
+
+			expect(vt1.isEquivalentTo(vt2),
+				"tempo mod: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
+
+
+			//expect(tm1->compare(tm2), "tempo mod: preparations do not match");
+		}
+
+	}
+};
+
+static TuningModTests tuningModTests;
+
+#endif
