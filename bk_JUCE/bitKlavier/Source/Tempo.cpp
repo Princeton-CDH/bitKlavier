@@ -158,7 +158,7 @@ public:
 
 		for (int i = 0; i < 10; i++)
 		{
-			// create direct preparation and randomize it
+			// create tempo mod preparation and randomize it
 			// call getState() to convert to ValueTree
 			// call setState() to convert from ValueTree to preparation
 			// compare begin and end states

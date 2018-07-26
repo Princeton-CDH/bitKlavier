@@ -507,7 +507,7 @@ public:
 
 		for (int i = 0; i < 10; i++)
 		{
-			// create direct preparation and randomize it
+			// create tuning mod preparation and randomize it
 			// call getState() to convert to ValueTree
 			// call setState() to convert from ValueTree to preparation
 			// compare begin and end states
@@ -533,13 +533,13 @@ public:
 			ValueTree vt2 = tm2->getState();
 
 			expect(vt1.isEquivalentTo(vt2),
-				"tempo mod: value trees do not match\n" +
+				"tuning mod: value trees do not match\n" +
 				vt1.toXmlString() +
 				"\n=======================\n" +
 				vt2.toXmlString());
 
 
-			//expect(tm1->compare(tm2), "tempo mod: preparations do not match");
+			//expect(tm1->compare(tm2), "tuning mod: preparations do not match");
 		}
 
 	}

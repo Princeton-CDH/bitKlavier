@@ -108,7 +108,6 @@ public:
 		int idx = 0;
 
 
-		//need something for tuning and fundamental
 		tWhichTuning = (TuningSystem)(int)( r[idx++] * TuningSystemNil);
 		tFundamental = (PitchClass)(int)(r[idx++] * PitchClassNil);
 		tFundamentalOffset = r[idx++] * 48.0f - 24.0f;

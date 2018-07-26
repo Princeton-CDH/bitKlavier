@@ -433,3 +433,106 @@ Array<int> NostalgicProcessor::getUndertowPositions() //return playback position
     
     return newpositions;
 }
+
+#if BK_UNIT_TESTS
+
+/*
+class NostalgicTests : public UnitTest
+{
+public:
+	NostalgicTests() : UnitTest("Nostalgics", "Nostalgic") {}
+
+	void runTest() override
+	{
+		beginTest("Nostalgic");
+
+		for (int i = 0; i < 10; i++)
+		{
+			// create nostalgic preparation and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random nostalgic " + String(i);
+			DBG("test consistency: " + name);
+
+			NostalgicPreparation::Ptr np1 = new NostalgicPreparation();
+
+			Nostalgic n1(np1, 1);
+			n1.setName(name);
+
+			ValueTree vt1 = n1.getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			NostalgicPreparation::Ptr np2 = new NostalgicPreparation();
+
+			Nostalgic n2(np2, 1);
+
+			//setState needs more parameters??????
+			n2.setState(xml);
+			n2.setName(name);
+
+			ValueTree vt2 = n2.getState();
+
+			expect(vt1.isEquivalentTo(vt2), "direct value trees don't match");
+
+			expect(np2->compare(np1), np1->getName() + " and " + np2->getName() + " did not match.");
+		}
+
+	}
+};
+
+static NostalgicTests nostalgicTests;
+*/
+class NostalgicModTests : public UnitTest
+{
+public:
+	NostalgicModTests() : UnitTest("NostalgicMods", "NostalgicMod") {}
+
+	void runTest() override
+	{
+		beginTest("NostalgicMod");
+
+		for (int i = 0; i < 10; i++)
+		{
+			// create nostalgic mod preparation and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random nostalgic mod " + String(i);
+			DBG("test consistency: " + name);
+
+			NostalgicPreparation::Ptr np1 = new NostalgicPreparation();
+			NostalgicModPreparation::Ptr nm1 = new NostalgicModPreparation(np1, 1);
+
+
+			nm1->randomize();
+			nm1->setName(name);
+
+			ValueTree vt1 = nm1->getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			NostalgicPreparation::Ptr np2 = new NostalgicPreparation();
+			NostalgicModPreparation::Ptr nm2 = new NostalgicModPreparation(np2, 1);
+
+			nm2->setState(xml);
+
+			ValueTree vt2 = nm2->getState();
+
+			expect(vt1.isEquivalentTo(vt2),
+				"nostalgic mod: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
+
+
+			//expect(tm1->compare(tm2), "tempo mod: preparations do not match");
+		}
+
+	}
+};
+
+static NostalgicModTests tuningModTests;
+
+#endif
