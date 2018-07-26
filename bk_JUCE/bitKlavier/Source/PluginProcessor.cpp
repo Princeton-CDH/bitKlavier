@@ -27,9 +27,6 @@ pedalSynth(),
 currentSampleType(BKLoadNil),
 loader(*this),
 shouldLoadDefault(true)
-#if TRY_UNDO
-,epoch(0),
-#endif
 {
 #if BK_UNIT_TESTS
 	BKUnitTestRunner test;
@@ -39,10 +36,6 @@ shouldLoadDefault(true)
     didLoadMainPianoSamples         = false;
     sustainIsDown                   = false;
     noteOnCount                     = 0;
-    
-#if TRY_UNDO
-    history.ensureStorageAllocated(10);
-#endif
     
     Process::setPriority(juce::Process::RealtimePriority);
     
@@ -92,10 +85,7 @@ shouldLoadDefault(true)
 #if JUCE_IOS
     platform = BKIOS;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory);
-#endif
- 
-
-#if JUCE_MAC || JUCE_WINDOWS
+#else
     platform = BKOSX;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 
@@ -269,12 +259,6 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     gallery->prepareToPlay(sampleRate);
     
-#if TRY_UNDO
-    for (int i = 0; i < NUM_EPOCHS; i++)
-    {
-        history.set(i, currentPiano);
-    }
-#endif
 
     sustainIsDown = false;
 }
@@ -349,9 +333,7 @@ void BKAudioProcessor::createNewGallery(String name, ScopedPointer<XmlElement> x
 
 #if JUCE_IOS
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory);
-#endif
-    
-#if JUCE_MAC || JUCE_WINDOWS
+#else
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
@@ -1367,33 +1349,6 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     }
     
 }
-
-#if TRY_UNDO
-void BKAudioProcessor::updateHistory(void)
-{
-    for (int i = 0; i < NUM_EPOCHS; i++)
-    {
-        history.set(i+1, history.getUnchecked(i));
-    }
-    
-    history.set(0, currentPiano->duplicate(true));
-}
-
-void BKAudioProcessor::timeTravel(bool forward)
-{
-    if (forward)    epoch--;
-    else            epoch++;
-    
-    if (epoch >= NUM_EPOCHS) epoch = NUM_EPOCHS-1;
-    if (epoch <  0 ) epoch = 0;
-    
-    Piano::Ptr newPiano = history.getUnchecked(epoch);
-    
-    if (newPiano != nullptr) currentPiano = newPiano;
-    
-    updateState->pianoDidChangeForGraph = true;
-}
-#endif
 
 
 

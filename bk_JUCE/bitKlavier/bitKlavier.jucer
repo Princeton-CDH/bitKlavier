@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="2.2-beta.1"
               bundleIdentifier="com.manyarrowsmusic.bitKlavier" includeBinaryInAppConfig="1"
-              buildVST="1" buildVST3="1" buildAU="1" buildAUv3="1" buildRTAS="0"
+              buildVST="1" buildVST3="0" buildAU="1" buildAUv3="1" buildRTAS="0"
               buildAAX="0" pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
               pluginManufacturer="manyarrowsmusic" pluginManufacturerCode="Manu"
               pluginCode="bK2m" pluginChannelConfigs="{0,2}" pluginIsSynth="1"
@@ -13,7 +13,7 @@
               maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
               displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Light"
               buildStandalone="1" enableIAA="1" cppLanguageStandard="11" companyCopyright="manyarrowsmusic"
-              pluginFormats="buildAU,buildAUv3,buildStandalone,buildVST,buildVST3,enableIAA"
+              pluginFormats="buildAU,buildAUv3,buildStandalone,buildVST,enableIAA"
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut,pluginEditorRequiresKeys">
   <MAINGROUP id="s4R02g" name="bitKlavier">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">

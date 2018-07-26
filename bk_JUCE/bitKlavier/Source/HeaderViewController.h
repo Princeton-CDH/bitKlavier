@@ -47,10 +47,9 @@ private:
     
     int galleryIsDirtyAlertResult;
     
-#if !JUCE_WINDOWS
+#if (JUCE_MAC || JUCE_IOS)
     ShareBot bot;
 #endif
-    
     
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override{};

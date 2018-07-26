@@ -464,19 +464,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     }
     else if (code == 90) // Z
     {
-#if TRY_UNDO
-        if (e.getModifiers().isCommandDown())
-        {
-            if (e.getModifiers().isShiftDown())
-            {
-                construction.redo();
-            }
-            else
-            {
-                construction.undo();
-            }
-        }
-#endif
+
     }
     
     return true;

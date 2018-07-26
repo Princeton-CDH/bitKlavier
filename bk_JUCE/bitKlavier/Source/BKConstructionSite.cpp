@@ -322,9 +322,7 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
     
 #if JUCE_IOS
     toAdd->setTopLeftPosition(lastX, lastY);
-#endif
-    
-#if JUCE_MAC || JUCE_WINDOWS
+#else 
     if (center)
     {
         toAdd->setTopLeftPosition(300, 250);
@@ -459,18 +457,6 @@ void BKConstructionSite::cut(void)
     getParentComponent()->grabKeyboardFocus();
 }
 
-#if TRY_UNDO
-void BKConstructionSite::undo(void)
-{
-    processor.timeTravel(false);
-}
-
-void BKConstructionSite::redo(void)
-{
-    processor.timeTravel(true);
-}
-#endif
-
 void BKConstructionSite::mouseMove (const MouseEvent& eo)
 {
     MouseEvent e = eo.getEventRelativeTo(this);
@@ -486,28 +472,6 @@ void BKConstructionSite::mouseMove (const MouseEvent& eo)
 void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
 {
     BKAudioProcessor& processor = vc->processor;
-    
-#if TRY_UNDO
-    if (result == CUT_ID ||
-        result == PASTE_ID ||
-        result == ALIGN_VERTICAL ||
-        result == ALIGN_HORIZONTAL ||
-        result == DELETE_ID ||
-        result == KEYMAP_ID ||
-        result == DIRECT_ID ||
-        result == NOSTALGIC_ID ||
-        result == SYNCHRONIC_ID ||
-        result == TEMPO_ID ||
-        result == TUNING_ID||
-        result == MODIFICATION_ID||
-        result == PIANOMAP_ID||
-        result == RESET_ID)
-    {
-        processor.updateHistory();
-    }
-    
-#endif
-    
     
     if (result == OFF_ID)
     {
@@ -534,16 +498,6 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     {
         vc->paste();
     }
-#if TRY_UNDO
-    else if (result == UNDO_ID)
-    {
-        vc->undo();
-    }
-    else if (result == REDO_ID)
-    {
-        vc->redo();
-    }
-#endif
     else if (result == ALIGN_VERTICAL)
     {
         vc->align(0);

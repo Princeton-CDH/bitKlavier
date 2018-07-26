@@ -329,7 +329,7 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
 
 		gvc->fillGalleryCB();
 	}
-#if !JUCE_WINDOWS
+#if (JUCE_MAC || JUCE_IOS)
 	else if (result == SHARE_EMAIL_ID)
 	{
 		gvc->bot.share(processor.gallery->getURL(), 0);
@@ -553,7 +553,7 @@ void HeaderViewController::fillGalleryCB(void)
         
         File moreGalleries = File::getSpecialLocation(File::userDocumentsDirectory);
         
-#if JUCE_MAC || JUCE_WINDOWS
+#if (JUCE_MAC || JUCE_WINDOWS || JUCE_LINUX)
         bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
         
