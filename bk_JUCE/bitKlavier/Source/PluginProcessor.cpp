@@ -250,7 +250,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 #endif
     }
     
-    //stk::Stk::setSampleRate(sampleRate);
+    //stk::Stk::setSampleRate(sampleRate); //crashes Logic Audio Unit Validation Tool
     
     mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
     hammerReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
