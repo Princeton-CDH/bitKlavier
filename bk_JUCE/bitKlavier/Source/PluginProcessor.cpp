@@ -245,11 +245,12 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 #if JUCE_IOS
         loadSamples(BKLoadMedium);
 #else
-        loadSamples(BKLoadHeavy);
+        if(wrapperType == wrapperType_AudioUnit) loadSamples(BKLoadLitest);
+        else loadSamples(BKLoadHeavy);
 #endif
     }
     
-    stk::Stk::setSampleRate(sampleRate);
+    //stk::Stk::setSampleRate(sampleRate);
     
     mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
     hammerReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
