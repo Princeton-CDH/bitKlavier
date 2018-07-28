@@ -436,7 +436,7 @@ Array<int> NostalgicProcessor::getUndertowPositions() //return playback position
 
 #if BK_UNIT_TESTS
 
-/*
+
 class NostalgicTests : public UnitTest
 {
 public:
@@ -468,8 +468,11 @@ public:
 
 			Nostalgic n2(np2, 1);
 
-			//setState needs more parameters??????
-			n2.setState(xml);
+			//dummy parameters for setState
+			Tuning::PtrArr t;
+			Synchronic::PtrArr s;
+
+			n2.setState(xml, t, s);
 			n2.setName(name);
 
 			ValueTree vt2 = n2.getState();
@@ -483,7 +486,7 @@ public:
 };
 
 static NostalgicTests nostalgicTests;
-*/
+
 class NostalgicModTests : public UnitTest
 {
 public:
