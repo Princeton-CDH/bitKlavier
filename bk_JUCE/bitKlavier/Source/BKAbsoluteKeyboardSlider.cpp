@@ -49,7 +49,6 @@ needsOctaveSlider(nos)
     keyboardState.addListener(this);
     lastKeyPressed = 0;
 
-
     showName.setText("unnamed keyboard slider", dontSendNotification);
     showName.setJustificationType(Justification::centredRight);
     showName.addMouseListener(this, true);
@@ -101,8 +100,7 @@ void BKAbsoluteKeyboardSlider::resized()
 {
     float heightUnit = getHeight() * 0.1;
     float widthUnit = getWidth() * 0.1;
-    
-    //Rectangle<int> area (getBounds());
+
     Rectangle<int> area (getLocalBounds());
     float keyboardHeight = 8 * heightUnit;
     Rectangle<int> keymapRow = area.removeFromBottom(10 * heightUnit);

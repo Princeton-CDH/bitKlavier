@@ -75,7 +75,6 @@ void BKCircularKeyboardSlider::resized()
     float heightUnit = getHeight() * 0.1;
     float widthUnit = getWidth() * 0.1;
     
-    //Rectangle<int> area (getBounds());
     Rectangle<int> area (getLocalBounds());
     float keyboardHeight = 8 * heightUnit;
     Rectangle<int> keymapRow = area.removeFromBottom(10 * heightUnit);
@@ -194,7 +193,6 @@ void BKCircularKeyboardSlider::textEditorReturnKeyPressed(TextEditor& textEditor
             //DBG("textEditorReturnKeyPressed keyboardValsTextField");
             listeners.call(&BKCircularKeyboardSlider::Listener::keyboardSliderChanged,
                            getName(),
-                           //keyboard->getValuesRotatedByFundamental());
                            keyboard->getValues());
             
             keyboardValsTextField->setAlpha(0);
