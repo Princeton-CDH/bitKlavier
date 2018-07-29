@@ -1,8 +1,8 @@
 /*
   ==============================================================================
 
-    BKKeyboardSlider.h
-    Created: 12 Jun 2017 7:10:27am
+    BKAbsoluteKeyboardSlider.h
+    Created: 29 Jul 2018 4:40:55pm
     Author:  Daniel Trueman
 
   ==============================================================================
@@ -20,7 +20,7 @@
 
 #include "BKUIComponents.h"
 
-class BKKeyboardSlider :
+class BKAbsoluteKeyboardSlider :
 public BKComponent,
 public BKListener,
 public BKKeymapKeyboardStateListener
@@ -32,13 +32,11 @@ public WantsBigOne
     
 public:
     
-    BKKeyboardSlider(bool needsOctaveSlider = false);
-    ~BKKeyboardSlider()
+    BKAbsoluteKeyboardSlider(bool needsOctaveSlider = false);
+    ~BKAbsoluteKeyboardSlider()
     {
         //delete keyboardComponent;
     };
-    
-    //void setTo(Array<float> newvals, NotificationType newnotify);
     
     void resized() override;
     void paint (Graphics&) override;
@@ -86,20 +84,8 @@ public:
     String getName() { return sliderName; }
     
     void setAvailableRange(int min, int max);
-    void useOrderedPairs(bool op) { orderedPairs = op; };
-    
-    void setFundamental(int fund);
-    
-    Array<float> getAllValues();
-    Array<float> getActiveValues();
-    Array<float> getActiveValuesWithFundamentalOffset();
-    
-    void setAllValues(Array<float> newvals);
-    void setActiveValues(Array<float> newvals);
     void setValues(Array<float> newvals);
-    void setValuesAbsolute(Array<float> newvals);
-    void updateDisplay();
-    
+
     inline void setDimensionRatio(float r) { ratio = r; }
     
     inline Rectangle<float> getEditAllBounds(void) { return keyboardValsTextFieldOpen.getBounds().toFloat();}
@@ -127,9 +113,6 @@ private:
     
     int keyboardSize, minKey, maxKey;
     int lastKeyPressed;
-    Array<float> keyboardVals;
-    Array<float> keyboardValsFundamentalOffset;
-    bool orderedPairs;
     
     void setActiveValsFromString(String s);
     void setActiveValsFromStringWithFundamentalOffset(String s);
@@ -155,7 +138,7 @@ private:
     bool focusLostByEscapeKey;
 
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKKeyboardSlider)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAbsoluteKeyboardSlider)
 };
 
 

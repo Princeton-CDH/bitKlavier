@@ -18,7 +18,9 @@ class BKSingleSlider;
 class BKMultiSlider;
 class BKRangeSlider;
 class BKWaveDistanceUndertowSlider;
-class BKKeyboardSlider;
+//class BKKeyboardSlider;
+class BKAbsoluteKeyboardSlider;
+class BKCustomKeyboardSlider;
 class BKTextEditor;
 
 typedef enum BKRangeSliderType

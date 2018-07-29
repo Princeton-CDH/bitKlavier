@@ -903,10 +903,11 @@ void BKKeymapKeyboardComponent::setKeysInKeymap(Array<int> keys)
 
 void BKKeymapKeyboardComponent::setKeyValue(int midiNoteNumber, float val)
 {
-    //DBG("setting keyValue directly " + String(midiNoteNumber) + " " + String(val));
+    DBG("setting keyValue directly " + String(midiNoteNumber) + " " + String(val));
     if (midiNoteNumber >= 0 && midiNoteNumber < 128) keyValues.set(midiNoteNumber, val);
 }
 
+//keep
 void BKKeymapKeyboardComponent::setValuesRotatedByFundamental(Array<float> vals)
 {
     int offset;
@@ -922,7 +923,9 @@ void BKKeymapKeyboardComponent::setValuesRotatedByFundamental(Array<float> vals)
     }
 }
 
-Array<float> BKKeymapKeyboardComponent::getValuesRotatedByFundamental()
+//rename getValues
+//Array<float> BKKeymapKeyboardComponent::getValuesRotatedByFundamental()
+Array<float> BKKeymapKeyboardComponent::getValues()
 {
     Array<float> valsToSend;
     for (int i = 0; i < 128; i++) valsToSend.add(0.);
@@ -945,7 +948,8 @@ Array<float> BKKeymapKeyboardComponent::getValuesRotatedByFundamental()
     return valsToSend;
 }
 
-void BKKeymapKeyboardComponent::setValuesDirectly(Array<float> vals)
+
+void BKKeymapKeyboardComponent::setValues(Array<float> vals)
 {
     for(int i=rangeStart; i<vals.size(); i++)
     {
@@ -960,22 +964,6 @@ void BKKeymapKeyboardComponent::setValuesDirectly(Array<float> vals)
     }
 }
 
-
-Array<float> BKKeymapKeyboardComponent::getValuesDirectly()
-{
-    Array<float> valsToSend;
-    for (int i = 0; i < rangeAll; i++) valsToSend.add(0.);
-    
-    for(int i=21; i<=108; i++)
-    {
-        //DBG("keyValues GET DIRECT " + String(i - rangeStart) + " " + String(keyValues.getUnchecked(i)));
-        DBG("keyValues GET DIRECT " + String(i) + " " + String(keyValues.getUnchecked(i)));
-        //valsToSend.set(i - rangeStart, keyValues.getUnchecked(i));
-        valsToSend.set(i, keyValues.getUnchecked(i));
-    }
-    
-    return valsToSend;
-}
 
 float BKKeymapKeyboardComponent::getLastNoteOverValue()
 {

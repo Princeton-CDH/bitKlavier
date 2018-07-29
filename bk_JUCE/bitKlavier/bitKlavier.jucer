@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="2.2-beta1"
+<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="2.2-beta2"
               bundleIdentifier="com.manyarrowsmusic.bitKlavier" includeBinaryInAppConfig="1"
               buildVST="1" buildVST3="0" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
@@ -345,6 +345,14 @@
           <FILE id="SZIe4m" name="BKLevelMeter.h" compile="0" resource="0" file="Source/BKLevelMeter.h"/>
         </GROUP>
         <GROUP id="{CAAFD165-DFE7-A7F9-44CA-A33CEFE40708}" name="BKKeyboard">
+          <FILE id="XMOl2D" name="BKAbsoluteKeyboardSlider.cpp" compile="1" resource="0"
+                file="Source/BKAbsoluteKeyboardSlider.cpp"/>
+          <FILE id="UwvVBT" name="BKAbsoluteKeyboardSlider.h" compile="0" resource="0"
+                file="Source/BKAbsoluteKeyboardSlider.h"/>
+          <FILE id="NhsMzJ" name="BKCircularKeyboardSlider.cpp" compile="1" resource="0"
+                file="Source/BKCircularKeyboardSlider.cpp"/>
+          <FILE id="MNLlJ3" name="BKCircularKeyboardSlider.h" compile="0" resource="0"
+                file="Source/BKCircularKeyboardSlider.h"/>
           <FILE id="oxVQCp" name="BKKeyboard.cpp" compile="1" resource="0" file="Source/BKKeyboard.cpp"/>
           <FILE id="IrRGH7" name="BKKeyboard.h" compile="0" resource="0" file="Source/BKKeyboard.h"/>
           <FILE id="Gzzl3Q" name="BKKeyboardState.cpp" compile="1" resource="0"

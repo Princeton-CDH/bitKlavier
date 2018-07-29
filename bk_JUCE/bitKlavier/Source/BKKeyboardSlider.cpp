@@ -198,7 +198,8 @@ void BKKeyboardSlider::mouseUp(const MouseEvent& e)
     
     listeners.call(&BKKeyboardSlider::Listener::keyboardSliderChanged,
                    getName(),
-                   keyboard->getValuesRotatedByFundamental());
+                   //keyboard->getValuesRotatedByFundamental());
+                   keyboard->getValues());
     
     keyboard->repaint();
 }
@@ -251,14 +252,16 @@ void BKKeyboardSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 {
     if(textEditor.getName() == keyboardValsTextField->getName())
     {
-        if(orderedPairs) keyboard->setValuesDirectly(stringOrderedPairsToFloatArray(keyboardValsTextField->getText(), 128));
+        //if(orderedPairs) keyboard->setValuesDirectly(stringOrderedPairsToFloatArray(keyboardValsTextField->getText(), 128));
+        if(orderedPairs) keyboard->setValues(stringOrderedPairsToFloatArray(keyboardValsTextField->getText(), 128));
 
         //else keyboard->setValuesDirectly(stringToFloatArray(keyboardValsTextField->getText()));
         else keyboard->setValuesRotatedByFundamental(stringToFloatArray(keyboardValsTextField->getText()));
         
         listeners.call(&BKKeyboardSlider::Listener::keyboardSliderChanged,
                        getName(),
-                       keyboard->getValuesRotatedByFundamental());
+                       //keyboard->getValuesRotatedByFundamental());
+                       keyboard->getValues());
         
         keyboardValsTextField->setAlpha(0);
         keyboardValsTextField->toBack();
@@ -273,7 +276,8 @@ void BKKeyboardSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
         
         listeners.call(&BKKeyboardSlider::Listener::keyboardSliderChanged,
                        getName(),
-                       keyboard->getValuesRotatedByFundamental());
+                       //keyboard->getValuesRotatedByFundamental());
+                       keyboard->getValues());
         
         keyboard->repaint();
     }
@@ -326,14 +330,16 @@ void BKKeyboardSlider::bkButtonClicked (Button* b)
     if(b->getName() == keyboardValsTextFieldOpen.getName())
     {
         if(orderedPairs) {
-            keyboardValsTextField->setText(offsetArrayToString2(keyboard->getValuesDirectly()), dontSendNotification);
+            //keyboardValsTextField->setText(offsetArrayToString2(keyboard->getValuesDirectly()), dontSendNotification);
+            keyboardValsTextField->setText(offsetArrayToString2(keyboard->getValues()), dontSendNotification);
             //keyboardValsTextField->setText(offsetArrayToString2(keyboard->getAbsoluteValues())
         }
         else
         {
             //keyboardValsTextField->setText(floatArrayToString(keyboard->getValuesDirectly()), dontSendNotification);
             
-            Array<float> newVals = keyboard->getValuesRotatedByFundamental();
+            //Array<float> newVals = keyboard->getValuesRotatedByFundamental();
+            Array<float> newVals = keyboard->getValues();
             DBG("BKKeyboardSlider::bkButtonClicked newVals = " + floatArrayToString(newVals));
             //Array<float> newVals = keyboard->getValuesDirectly();
             newVals.removeRange(12, 128);
