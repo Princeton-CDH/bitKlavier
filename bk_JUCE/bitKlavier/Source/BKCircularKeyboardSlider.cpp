@@ -23,8 +23,8 @@ needsOctaveSlider(nos)
     
     // need slider or other interface for octave change
 
-    minKey = 0; // 21
-    maxKey = 11; // 108
+    minKey = 0;
+    maxKey = 11;
 
     keyboard->setScrollButtonsVisible(false);
     keyboard->setAvailableRange(minKey, maxKey);
