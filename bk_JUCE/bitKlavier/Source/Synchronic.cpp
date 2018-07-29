@@ -362,5 +362,108 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
     return timeToReturn * 1000./sampleRate; //optimize later....
 }
 
+#if BK_UNIT_TESTS
 
 
+class SynchronicTests : public UnitTest
+{
+public:
+	SynchronicTests() : UnitTest("Synchronics", "Synchronic") {}
+
+	void runTest() override
+	{
+		beginTest("Synchronic");
+
+		for (int i = 0; i < 10; i++)
+		{
+			// create synchronic preparation and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random synchronic " + String(i);
+			DBG("test consistency: " + name);
+
+			SynchronicPreparation::Ptr sp1 = new SynchronicPreparation();
+
+			Synchronic s1(sp1, 1);
+			s1.setName(name);
+
+			ValueTree vt1 = s1.getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			SynchronicPreparation::Ptr sp2 = new SynchronicPreparation();
+
+			Synchronic s2(sp2, 1);
+
+			//dummy parameters for setState
+			Tuning::PtrArr t;
+			Tempo::PtrArr m;
+
+			s2.setState(xml, t, m);
+			s2.setName(name);
+
+			ValueTree vt2 = s2.getState();
+
+			expect(vt1.isEquivalentTo(vt2), "synchronic value trees don't match");
+
+			expect(sp2->compare(sp1), sp1->getName() + " and " + sp2->getName() + " did not match.");
+		}
+
+	}
+};
+
+static SynchronicTests synchronicTests;
+
+
+class SynchronicModTests : public UnitTest
+{
+public:
+	SynchronicModTests() : UnitTest("SynchronicMods", "SynchronicMod") {}
+
+	void runTest() override
+	{
+		beginTest("SynchronicMod");
+
+		for (int i = 0; i < 10; i++)
+		{
+			// create synchronic mod preparation and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random synchronic mod " + String(i);
+			DBG("test consistency: " + name);
+
+			SynchronicPreparation::Ptr sp1 = new SynchronicPreparation();
+			SynchronicModPreparation::Ptr sm1 = new SynchronicModPreparation(sp1, 1);
+
+
+			sm1->randomize();
+			sm1->setName(name);
+
+			ValueTree vt1 = sm1->getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			SynchronicPreparation::Ptr sp2 = new SynchronicPreparation();
+			SynchronicModPreparation::Ptr sm2 = new SynchronicModPreparation(sp2, 1);
+
+			sm2->setState(xml);
+
+			ValueTree vt2 = sm2->getState();
+
+			expect(vt1.isEquivalentTo(vt2),
+				"synchronic mod: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
+
+		}
+
+	}
+};
+
+static SynchronicModTests synchronicModTests;
+
+
+#endif

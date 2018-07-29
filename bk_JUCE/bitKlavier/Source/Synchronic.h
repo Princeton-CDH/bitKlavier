@@ -241,6 +241,75 @@ public:
                 sClusterThreshSec == s->getClusterThreshSEC() &&
                 sReleaseVelocitySetsSynchronic == s->getReleaseVelocitySetsSynchronic());
     }
+
+	inline void randomize()
+	{
+		float r[100];
+
+		for (int i = 0; i < 100; i++)  r[i] = ((float)rand() / RAND_MAX);
+		int idx = 0;
+
+		sNumBeats = (int)(r[idx++] * 100);
+		sClusterMin = (int)(r[idx++] * 20);
+		sClusterMax = (int)(r[idx++] * 20);
+		sClusterCap = (int)(r[idx++] * 20);
+		sMode = (SynchronicSyncMode)(int)(r[idx++] * SynchronicSyncModeNil);
+		sBeatsToSkip = (int)(r[idx++] * 2);
+		sBeatMultipliers.clear();
+		for (int i = 0; i < (int)((float)rand() / RAND_MAX * 10); ++i)
+		{
+			sBeatMultipliers.add(i, ((float)rand() / RAND_MAX) * 2.0f);
+		}
+		sAccentMultipliers.clear();
+		for (int i = 0; i < (int)((float)rand() / RAND_MAX * 10); ++i)
+		{
+			sAccentMultipliers.add(i, ((float)rand() / RAND_MAX) * 2.0f);
+		}
+		sLengthMultipliers.clear();
+		for (int i = 0; i < (int)((float)rand() / RAND_MAX * 10); ++i)
+		{
+			sLengthMultipliers.add(i, ((float)rand() / RAND_MAX) * 4.0f - 2.0f);
+		}
+		sGain = r[idx++] * 10;
+		sTransposition.clear();
+		for (int i = 0; i < (int)((float)rand() / RAND_MAX * 10); ++i)
+		{
+			Array<float> transposition;
+			for (int j = 0; j < (int)((float)rand() / RAND_MAX * 10); j++)
+			{
+				transposition.add(i, ((float)rand() / RAND_MAX) * 48.0f - 24.0f);
+			}
+			sTransposition.add(transposition);
+		}
+		sClusterThresh = (r[idx++] * 2000) + 1;
+		sClusterThreshSec = sClusterThresh * 0.001f;
+		sReleaseVelocitySetsSynchronic = (bool)((int)(r[idx++] * 2));
+
+		int numEnvelopes = (int)(r[idx++] * 10);
+
+		sAttacks.clear();
+		for (int i = 0; i < numEnvelopes; ++i)
+		{
+			sAttacks.add(i, ((int)rand() / RAND_MAX) * 1000 + 1);
+		}
+		sDecays.clear();
+		for (int i = 0; i < numEnvelopes; ++i)
+		{
+			sDecays.add(i, ((int)rand() / RAND_MAX) * 1000 + 1);
+		}
+		sSustains.clear();
+		for (int i = 0; i < numEnvelopes; ++i)
+		{
+			sSustains.add(i, ((float)rand() / RAND_MAX));
+		}
+		sReleases.clear();
+		for (int i = 0; i < numEnvelopes; ++i)
+		{
+			sReleases.add(i, ((int)rand() / RAND_MAX) * 1000 + 1);
+		}
+
+		envelopeOn = (bool)((int)(r[idx++] * 2));
+	}
     
     //inline const float getTempo() const noexcept                       {return sTempo;               }
     inline const int getNumBeats() const noexcept                      {return sNumBeats;              }
@@ -902,6 +971,9 @@ public:
         p = e->getStringAttribute(ptagSynchronic_mode);
         setParam(SynchronicMode, p);
         
+		p = e->getStringAttribute(ptagSynchronic_beatsToSkip);
+		setParam(SynchronicBeatsToSkip, p);
+
         p = e->getStringAttribute(ptagSynchronic_gain);
         setParam(SynchronicGain, p);
         
@@ -1025,6 +1097,22 @@ public:
         
     }
     
+	inline bool compare(SynchronicModPreparation::Ptr t)
+	{
+		return (getParam(SynchronicNumPulses) == t->getParam(SynchronicNumPulses) &&
+			getParam(SynchronicClusterMin) == t->getParam(SynchronicClusterMin) &&
+			getParam(SynchronicClusterMax) == t->getParam(SynchronicClusterMax) &&
+			getParam(SynchronicClusterThresh) == t->getParam(SynchronicClusterThresh) &&
+			getParam(SynchronicGain) == t->getParam(SynchronicGain) &&
+			getParam(SynchronicGain) == t->getParam(SynchronicGain) &&
+			getParam(SynchronicBeatsToSkip) == t->getParam(SynchronicBeatsToSkip) &&
+			getParam(SynchronicBeatMultipliers) == t->getParam(SynchronicBeatMultipliers) &&
+			getParam(SynchronicLengthMultipliers) == t->getParam(SynchronicLengthMultipliers) && 
+			getParam(SynchronicAccentMultipliers) == t->getParam(SynchronicAccentMultipliers) &&
+			getParam(SynchronicTranspOffsets) == t->getParam(SynchronicTranspOffsets) &&
+			getParam(SynchronicADSRs) == t->getParam(SynchronicADSRs));
+	}
+
     inline void copy(SynchronicPreparation::Ptr p)
     {
         param.set(SynchronicNumPulses, String(p->getNumBeats()));
@@ -1048,6 +1136,25 @@ public:
             param.set(i, p->getParam((SynchronicParameterType)i));
         }
     }
+
+	inline void randomize()
+	{
+		SynchronicPreparation p;
+		p.randomize();
+
+		param.set(SynchronicNumPulses, String(p.getNumBeats()));
+		param.set(SynchronicClusterMin, String(p.getClusterMin()));
+		param.set(SynchronicClusterMax, String(p.getClusterMax()));
+		param.set(SynchronicClusterThresh, String(p.getClusterThreshMS()));
+		param.set(SynchronicGain, String(p.getGain()));
+		param.set(SynchronicMode, String(p.getMode()));
+		param.set(SynchronicBeatsToSkip, String(p.getBeatsToSkip()));
+		param.set(SynchronicBeatMultipliers, floatArrayToString(p.getBeatMultipliers()));
+		param.set(SynchronicLengthMultipliers, floatArrayToString(p.getLengthMultipliers()));
+		param.set(SynchronicAccentMultipliers, floatArrayToString(p.getAccentMultipliers()));
+		param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p.getTransposition()));
+		param.set(SynchronicADSRs, arrayFloatArrayToString(p.getADSRs()));
+	}
     
     void clearAll()
     {

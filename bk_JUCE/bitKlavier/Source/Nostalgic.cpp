@@ -477,7 +477,7 @@ public:
 
 			ValueTree vt2 = n2.getState();
 
-			expect(vt1.isEquivalentTo(vt2), "direct value trees don't match");
+			expect(vt1.isEquivalentTo(vt2), "synchronic value trees don't match");
 
 			expect(np2->compare(np1), np1->getName() + " and " + np2->getName() + " did not match.");
 		}
@@ -530,12 +530,12 @@ public:
 				vt2.toXmlString());
 
 
-			//expect(tm1->compare(tm2), "tempo mod: preparations do not match");
+			//expect(nm1->compare(nm2), "nostalgic mod: preparations do not match");
 		}
 
 	}
 };
 
-static NostalgicModTests tuningModTests;
+static NostalgicModTests nostalgicModTests;
 
 #endif
