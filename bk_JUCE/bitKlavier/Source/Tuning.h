@@ -128,7 +128,7 @@ public:
 			tAbsolute.add(i, ((float)rand() / RAND_MAX) * 2.0f - 1.0f);
 		}
 		nToneSemitoneWidth = r[idx++] * 200.0f;
-		nToneRoot = (int)(r[idx++] * 128);
+		nToneRoot = (int)(r[idx++] * 127) + 1;
 	}
     
     TuningPreparation(TuningSystem whichTuning,

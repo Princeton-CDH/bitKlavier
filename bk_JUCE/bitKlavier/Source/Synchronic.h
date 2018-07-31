@@ -285,7 +285,7 @@ public:
 		sClusterThreshSec = sClusterThresh * 0.001f;
 		sReleaseVelocitySetsSynchronic = (bool)((int)(r[idx++] * 2));
 
-		int numEnvelopes = (int)(r[idx++] * 10);
+		int numEnvelopes = 12;
 
 		sAttacks.clear();
 		for (int i = 0; i < numEnvelopes; ++i)
@@ -308,7 +308,12 @@ public:
 			sReleases.add(i, ((int)rand() / RAND_MAX) * 1000 + 1);
 		}
 
-		envelopeOn = (bool)((int)(r[idx++] * 2));
+		envelopeOn.clear();
+		for (int i = 0; i < numEnvelopes; ++i)
+		{
+			envelopeOn.add((bool)((int)(r[idx++] * 2)));
+		}
+		
 	}
     
     //inline const float getTempo() const noexcept                       {return sTempo;               }
@@ -403,8 +408,18 @@ public:
     inline void setSustain(int which, float val)    {sSustains.set(which, val);}
     inline void setRelease(int which, int val)      {sReleases.set(which, val);}
     
+	inline void clearADSRs()
+	{
+		sAttacks.clear();
+		sDecays.clear();
+		sSustains.clear();
+		sReleases.clear();
+		envelopeOn.clear();
+	}
+
     inline void setADSRs(Array<Array<float>> allADSRs)
     {
+		clearADSRs();
         for(int i=0; i<allADSRs.size(); i++)
         {
             setAttack(i, allADSRs[i][0]);
@@ -508,12 +523,16 @@ public:
         
     }
     
-    Synchronic(int Id):
+	Synchronic(int Id, bool random = false) :
     Id(Id),
     name(String(Id))
     {
-        sPrep       = new SynchronicPreparation();
-        aPrep       = new SynchronicPreparation(sPrep);
+		if (random) randomize();
+		else
+		{
+			sPrep = new SynchronicPreparation();
+			aPrep = new SynchronicPreparation(sPrep);
+		}
     }
     
     inline Synchronic::Ptr duplicate()
@@ -538,6 +557,15 @@ public:
         sPrep->copy(from->sPrep);
         aPrep->copy(sPrep);
     }
+
+	inline void randomize()
+	{
+		clear();
+		sPrep->randomize();
+		aPrep->randomize();
+		Id = (int)((float)rand() / RAND_MAX * 1000.0f);
+		name = "random";
+	}
     
     inline ValueTree getState(void)
     {
@@ -632,8 +660,8 @@ public:
         i = e->getStringAttribute(ptagSynchronic_clusterMax).getIntValue();
         sPrep->setClusterMax(i);
         
-        i = e->getStringAttribute(ptagSynchronic_clusterThresh).getIntValue();
-        sPrep->setClusterThresh(i);
+        f = e->getStringAttribute(ptagSynchronic_clusterThresh).getFloatValue();
+        sPrep->setClusterThresh(f);
         
         i = e->getStringAttribute(ptagSynchronic_mode).getIntValue();
         sPrep->setMode((SynchronicSyncMode) i);

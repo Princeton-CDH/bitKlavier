@@ -1237,7 +1237,49 @@ void Piano::setState(XmlElement* e)
         item->setCentrePosition((item->getX() + item->getWidth() / 2) * processor.uiScaleFactor, (item->getY() + item->getHeight() / 2) * processor.uiScaleFactor);
     }
 #endif
+
 }
+
+#if BK_UNIT_TEST
+/*
+class PianoTests : public PianoTest
+{
+public:
+	PianoTests() : UnitTest("Pianos", "Piano") {}
+
+	void runTest() override
+	{
+		beginTest("Piano");
+
+		for (int i = 0; i < 10; i++)
+		{
+			// create piano preparation and randomize it
+			// duplicate the preparation
+			// compare begin and end states
+			String name = "random piano " + String(i);
+			DBG("test consistency: " + name);
+
+			Piano p1 = new Piano();
+
+			p1.randomize();
+
+			ValueTree vt1 = p1.getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			Piano p2 = new Piano();
+
+			p2.setState(xml);
+
+			expect(vt1.isEquivalentTo(vt2), "piano value trees don't match");
+		}
+
+	}
+};
+
+static PianoTests pianoTest;
+*/
+#endif
 
 
 

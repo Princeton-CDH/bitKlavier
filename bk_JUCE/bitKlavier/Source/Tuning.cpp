@@ -9,6 +9,7 @@
  */
 
 #include "Tuning.h"
+#define ABSOLUTE_OFFSET_SIZE 256
 
 
 TuningProcessor::TuningProcessor(Tuning::Ptr tuning):
@@ -345,10 +346,10 @@ void TuningModPreparation::setState(XmlElement* e)
         else if (sub->hasTagName(vTagTuning_absoluteOffsets))
         {
             Array<float> absolute;
-            absolute.ensureStorageAllocated(128);
+            absolute.ensureStorageAllocated(ABSOLUTE_OFFSET_SIZE);
             String abs = "";
             
-            for (int k = 0; k < 128; k++)
+            for (int k = 0; k < ABSOLUTE_OFFSET_SIZE; k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 f = attr.getFloatValue() * 100.;
@@ -431,8 +432,8 @@ void Tuning::setState(XmlElement* e)
         else if (sub->hasTagName(vTagTuning_absoluteOffsets))
         {
             Array<float> absolute;
-            absolute.ensureStorageAllocated(128);
-            for (int k = 0; k < 128; k++)
+            absolute.ensureStorageAllocated(ABSOLUTE_OFFSET_SIZE);
+            for (int k = 0; k < ABSOLUTE_OFFSET_SIZE; k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 f = attr.getFloatValue();
@@ -470,6 +471,8 @@ public:
 
 			TuningPreparation::Ptr tp1 = new TuningPreparation();
 
+			tp1->randomize();
+
 			Tuning t1(tp1, 1);
 			t1.setName(name);
 
@@ -486,9 +489,16 @@ public:
 
 			ValueTree vt2 = t2.getState();
 
-			expect(vt1.isEquivalentTo(vt2), "tuning value trees don't match");
+			//t2.sPrep->getNToneRoot;
+			//t2.sPrep->get;
 
-			expect(tp2->compare(tp1), tp1->getName() + " and " + tp2->getName() + " did not match.");
+			expect(vt1.isEquivalentTo(vt2),
+				"tuning: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
+
+			//expect(tp2->compare(tp1), tp1->getName() + " and " + tp2->getName() + " did not match.");
 		}
 
 	}

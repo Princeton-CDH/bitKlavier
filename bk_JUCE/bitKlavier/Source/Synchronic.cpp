@@ -372,7 +372,7 @@ public:
 
 	void runTest() override
 	{
-		beginTest("Synchronic");
+		beginTest("SynchronicPreparation");
 
 		for (int i = 0; i < 10; i++)
 		{
@@ -380,10 +380,11 @@ public:
 			// call getState() to convert to ValueTree
 			// call setState() to convert from ValueTree to preparation
 			// compare begin and end states
-			String name = "random synchronic " + String(i);
+			String name = "random SynchronicPreparation " + String(i);
 			DBG("test consistency: " + name);
 
 			SynchronicPreparation::Ptr sp1 = new SynchronicPreparation();
+			sp1->randomize();
 
 			Synchronic s1(sp1, 1);
 			s1.setName(name);
@@ -405,11 +406,49 @@ public:
 
 			ValueTree vt2 = s2.getState();
 
-			expect(vt1.isEquivalentTo(vt2), "synchronic value trees don't match");
+			expect(vt1.isEquivalentTo(vt2),
+				"synchronic preparation: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
 
-			expect(sp2->compare(sp1), sp1->getName() + " and " + sp2->getName() + " did not match.");
+			//expect(sp2->compare(sp1), sp1->getName() + " and " + sp2->getName() + " did not match.");
 		}
 
+		//test synchronic rather than synchronicPreparation
+		for (int i = 0; i < 10; i++)
+		{
+			// create synchronic preparation and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random synchronic " + String(i);
+			DBG("test consistency: " + name);
+
+			Synchronic s1(-1, true);
+			s1.setName(name);
+
+			ValueTree vt1 = s1.getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			Synchronic s2(-1, true);
+
+			//dummy parameters for setState
+			Tuning::PtrArr t;
+			Tempo::PtrArr m;
+
+			s2.setState(xml, t, m);
+			s2.setName(name);
+
+			ValueTree vt2 = s2.getState();
+
+			expect(vt1.isEquivalentTo(vt2),
+				"synchronic: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
+		}
 	}
 };
 
