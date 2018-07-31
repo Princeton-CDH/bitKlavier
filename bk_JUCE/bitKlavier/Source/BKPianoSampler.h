@@ -211,9 +211,6 @@ private:
     
     //double beginPosition, loopPosition, endPosition;
     stk::Envelope sampleEnv, loopEnv;
-    
-    stk::Envelope renv1,renv2,renv3;
-    float renvVal;
 
     bool sfzEnvApplied;
     
@@ -227,14 +224,6 @@ private:
     
     bool inLoop;
     stk::ADSR lastIn, lastOut;
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     JUCE_LEAK_DETECTOR (BKPianoSamplerVoice)

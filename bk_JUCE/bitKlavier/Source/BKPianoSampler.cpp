@@ -61,6 +61,7 @@ transpose(transp)
         pedal = region_->pedal;
         
         sampleName = soundName;
+        sampleLength = region_->sample->getSampleLength();
         //if (!isSF2 && (loopMode == 0)) loopMode = 3;
     }
     else
@@ -437,7 +438,7 @@ void BKPianoSamplerVoice::pitchWheelMoved (const int newValue)
 {
     pitchbendMultiplier = powf(2.0f, (newValue / 8192. - 1.)/12.);
     bentRatio = pitchRatio * pitchbendMultiplier;
-    DBG("BKPianoSamplerVoice::pitchWheelMoved " + String(pitchbendMultiplier));
+    DBG("PBW " + String(pitchbendMultiplier) + " " + String(noteNumber));
 }
 
 void BKPianoSamplerVoice::controllerMoved (const int /*controllerNumber*/,
