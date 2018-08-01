@@ -169,15 +169,15 @@ public:
 		keymap.clear();
 		for (int i = 0; i < 128; i++)
 		{
-			keymap.add(i, ((bool)((int)(rand() / RAND_MAX * 2))));
+			keymap.add(i, Random::getSystemRandom().nextBool());
 		}
 	}
 
 	//sets keymap to a random keyset
 	inline void randomizeKeyset()
 	{
-		KeySet set = (KeySet)(int)(rand() / RAND_MAX * KeySetNil);
-		PitchClass pitch = (PitchClass)(int)(rand() / RAND_MAX * PitchClassNil);
+		KeySet set = (KeySet)(Random::getSystemRandom().nextInt(KeySetNil));
+		PitchClass pitch = (PitchClass)(Random::getSystemRandom().nextInt(PitchClassNil));
 		keymap.clear();
 		setKeys(set, true, pitch);
 	}

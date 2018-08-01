@@ -452,7 +452,7 @@ public:
 			// call getState() to convert to ValueTree
 			// call setState() to convert from ValueTree to preparation
 			// compare begin and end states
-			String name = "random nostalgic " + String(i);
+			String name = "random nostalgic preparation " + String(i);
 			DBG("test consistency: " + name);
 
 			NostalgicPreparation::Ptr np1 = new NostalgicPreparation();
@@ -478,9 +478,44 @@ public:
 
 			ValueTree vt2 = n2.getState();
 
-			expect(vt1.isEquivalentTo(vt2), "synchronic value trees don't match");
+			expect(vt1.isEquivalentTo(vt2), "synchronic preparation value trees don't match");
 
 			//expect(np2->compare(np1), np1->getName() + " and " + np2->getName() + " did not match.");
+		}
+
+		//test nostalgic wrapper class
+		for (int i = 0; i < 10; i++)
+		{
+			// create nostalgic and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random nostalgic " + String(i);
+			DBG("test consistency: " + name);
+
+			Nostalgic n1(-1, true);
+			n1.setName(name);
+
+			ValueTree vt1 = n1.getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			Nostalgic n2(-1, true);
+
+			//dummy parameters for setState
+			Tuning::PtrArr t;
+			Synchronic::PtrArr s;
+
+			n2.setState(xml, t, s);
+			n2.setName(name);
+
+			ValueTree vt2 = n2.getState();
+
+			expect(vt1.isEquivalentTo(vt2),
+				"nostalgic: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
 		}
 
 	}

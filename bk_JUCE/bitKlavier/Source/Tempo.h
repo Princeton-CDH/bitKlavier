@@ -81,7 +81,7 @@ public:
 	{
 		float r[10];
 
-		for (int i = 0; i < 10; i++)  r[i] = ((float)rand() / RAND_MAX);
+		for (int i = 0; i < 10; i++)  r[i] = (Random::getSystemRandom().nextFloat());
 		int idx = 0;
 
 		sTempo = r[idx++];
@@ -170,12 +170,13 @@ public:
         
     }
     
-    Tempo(int Id):
+    Tempo(int Id, bool random = false):
     Id(Id),
     name(String(Id))
     {
-        sPrep = new TempoPreparation();
-        aPrep = new TempoPreparation(sPrep);
+		sPrep = new TempoPreparation();
+		aPrep = new TempoPreparation(sPrep);
+		if (random) randomize();
     }
     
     inline void clear(void)
@@ -270,6 +271,15 @@ public:
         sPrep->copy(from->sPrep);
         aPrep->copy(sPrep);
     }
+
+	inline void randomize()
+	{
+		clear();
+		sPrep->randomize();
+		aPrep->randomize();
+		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
+		name = "random";
+	}
     
     inline String getName(void) const noexcept {return name;}
     

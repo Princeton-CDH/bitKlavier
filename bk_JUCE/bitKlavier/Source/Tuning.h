@@ -104,7 +104,7 @@ public:
 	{
 		float r[21];
 
-		for (int i = 0; i < 21; i++)  r[i] = ((float)rand() / RAND_MAX);
+		for (int i = 0; i < 21; i++)  r[i] = (Random::getSystemRandom().nextFloat());
 		int idx = 0;
 
 
@@ -120,12 +120,12 @@ public:
 		tCustom.clear();
 		for (int i = 0; i < 12; ++i)
 		{
-			tCustom.add(i, ((float)rand() / RAND_MAX) * 2.0f - 1.0f);
+			tCustom.add(i, (Random::getSystemRandom().nextFloat() * 2.0f - 1.0f));
 		}
 		tAbsolute.clear();
 		for (int i = 0; i < 128; ++i)
 		{
-			tAbsolute.add(i, ((float)rand() / RAND_MAX) * 2.0f - 1.0f);
+			tAbsolute.add(i, (Random::getSystemRandom().nextFloat() * 2.0f - 1.0f));
 		}
 		nToneSemitoneWidth = r[idx++] * 200.0f;
 		nToneRoot = (int)(r[idx++] * 127) + 1;
@@ -343,12 +343,13 @@ public:
         tuningLibrary.set(UtonalTuning, tUtonalTuning);
     }
     
-    Tuning(int Id):
+	Tuning(int Id, bool random = false) :
     Id(Id),
     name(String(Id))
     {
-        sPrep = new TuningPreparation();
-        aPrep = new TuningPreparation(sPrep);
+		sPrep = new TuningPreparation();
+		aPrep = new TuningPreparation(sPrep);
+		if (random) randomize();
         
         tuningLibrary.ensureStorageAllocated((int)cTuningSystemNames.size());
         for(int i=0; i<cTuningSystemNames.size(); i++) tuningLibrary.insert(EqualTemperament, tEqualTuning);
@@ -401,6 +402,15 @@ public:
         sPrep->copy(from->sPrep);
         aPrep->copy(sPrep);
     }
+
+	inline void randomize()
+	{
+		clear();
+		sPrep->randomize();
+		aPrep->randomize();
+		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
+		name = "random";
+	}
     
     
     inline String getName(void) const noexcept {return name;}

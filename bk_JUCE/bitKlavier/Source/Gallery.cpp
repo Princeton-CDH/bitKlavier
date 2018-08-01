@@ -128,3 +128,65 @@ void Gallery::resetPreparations(void)
         tempo[i]->aPrep->copy(tempo[i]->sPrep);
 }
 
+void Gallery::randomize()
+	{
+		BKAudioProcessor dummyAudio;
+		BKSynthesiser* dummySynth;
+		GeneralSettings::Ptr dummyGeneral = new GeneralSettings();
+
+		//each piano
+		for (int h = 0; h < Random::getSystemRandom().nextInt(Range<int>(1, 5)); h++)
+		{
+			Piano::Ptr p = new Piano(dummyAudio, h);
+			addPiano(p);
+			//each set of preparations in the piano
+			for (int i = 0; i < Random::getSystemRandom().nextInt(Range<int>(1, 10)); i++)
+			{
+				Keymap::Ptr kp = new Keymap();
+				kp->randomize();
+				addKeymap(kp);
+				p->addPreparationMap(kp);
+
+				Tuning::Ptr t = new Tuning(-1, true);
+				addTuning(t);
+				TuningProcessor::Ptr tProc = new TuningProcessor(t);
+				p->addTuningProcessor(tProc->getId());
+
+				Direct::Ptr d = new Direct(-1, true);
+				addDirect(d);
+				DirectProcessor::Ptr dProc = new DirectProcessor(d, tProc, dummySynth, dummySynth, dummySynth);
+				p->addDirectProcessor(dProc->getId());
+
+				Tempo::Ptr m = new Tempo(-1, true);
+				addTempo(m);
+				TempoProcessor::Ptr mProc = new TempoProcessor(m);
+				p->addTempoProcessor(mProc->getId());
+
+				Synchronic::Ptr s = new Synchronic(-1, true);
+				addSynchronic(s);
+				SynchronicProcessor::Ptr sProc = new SynchronicProcessor(s, tProc, mProc, dummySynth, dummyGeneral);
+				p->addSynchronicProcessor(sProc->getId());
+
+				Nostalgic::Ptr n = new Nostalgic(-1, true);
+				addNostalgic(n);
+				NostalgicProcessor::Ptr nProc = new NostalgicProcessor(n, tProc, sProc, dummySynth);
+				p->addNostalgicProcessor(nProc->getId());
+
+				p->linkPreparationWithKeymap(PreparationTypeDirect, d->getId(), kp->getId());
+
+				p->linkPreparationWithTuning(PreparationTypeDirect, d->getId(), t);
+
+				//randomly chooses whether to link nostalgic with keymap or tuning
+				if (Random::getSystemRandom().nextFloat() > 0.5) p->linkPreparationWithKeymap(PreparationTypeNostalgic, nProc->getId(), kp->getId());
+				else p->linkPreparationWithTuning(PreparationTypeNostalgic, nProc->getId(), t);
+
+				//randomly chooses whether to link synchronic with keymap, tuning, or nostalgic
+				float linkType = Random::getSystemRandom().nextFloat();
+				if (linkType > 0.66) p->linkPreparationWithKeymap(PreparationTypeSynchronic, sProc->getId(), kp->getId());
+				else if (linkType > 0.33) p->linkPreparationWithTuning(PreparationTypeSynchronic, sProc->getId(), t);
+				else p->linkNostalgicWithSynchronic(n, s);
+
+				p->linkSynchronicWithTempo(s, m);
+			}
+		}
+	}

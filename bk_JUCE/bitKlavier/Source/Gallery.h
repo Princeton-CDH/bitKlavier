@@ -84,6 +84,9 @@ public:
     void setStateFromJson(var myJson);
     
     void resetPreparations(void);
+
+	void randomize();
+	
     
     inline const int getNumPianos(void) const noexcept {return bkPianos.size();}
     

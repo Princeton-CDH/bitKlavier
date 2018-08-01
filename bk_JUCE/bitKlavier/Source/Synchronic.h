@@ -246,7 +246,7 @@ public:
 	{
 		float r[100];
 
-		for (int i = 0; i < 100; i++)  r[i] = ((float)rand() / RAND_MAX);
+		for (int i = 0; i < 100; i++)  r[i] = (Random::getSystemRandom().nextFloat());
 		int idx = 0;
 
 		sNumBeats = (int)(r[idx++] * 100);
@@ -256,28 +256,28 @@ public:
 		sMode = (SynchronicSyncMode)(int)(r[idx++] * SynchronicSyncModeNil);
 		sBeatsToSkip = (int)(r[idx++] * 2);
 		sBeatMultipliers.clear();
-		for (int i = 0; i < (int)((float)rand() / RAND_MAX * 10); ++i)
+		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
 		{
-			sBeatMultipliers.add(i, ((float)rand() / RAND_MAX) * 2.0f);
+			sBeatMultipliers.add(i, (Random::getSystemRandom().nextFloat() * 2.0f));
 		}
 		sAccentMultipliers.clear();
-		for (int i = 0; i < (int)((float)rand() / RAND_MAX * 10); ++i)
+		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
 		{
-			sAccentMultipliers.add(i, ((float)rand() / RAND_MAX) * 2.0f);
+			sAccentMultipliers.add(i, (Random::getSystemRandom().nextFloat() * 2.0f));
 		}
 		sLengthMultipliers.clear();
-		for (int i = 0; i < (int)((float)rand() / RAND_MAX * 10); ++i)
+		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
 		{
-			sLengthMultipliers.add(i, ((float)rand() / RAND_MAX) * 4.0f - 2.0f);
+			sLengthMultipliers.add(i, (Random::getSystemRandom().nextFloat() * 4.0f - 2.0f));
 		}
 		sGain = r[idx++] * 10;
 		sTransposition.clear();
-		for (int i = 0; i < (int)((float)rand() / RAND_MAX * 10); ++i)
+		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
 		{
 			Array<float> transposition;
-			for (int j = 0; j < (int)((float)rand() / RAND_MAX * 10); j++)
+			for (int j = 0; j < Random::getSystemRandom().nextInt(10); j++)
 			{
-				transposition.add(i, ((float)rand() / RAND_MAX) * 48.0f - 24.0f);
+				transposition.add(i, (Random::getSystemRandom().nextFloat()) * 48.0f - 24.0f);
 			}
 			sTransposition.add(transposition);
 		}
@@ -290,28 +290,29 @@ public:
 		sAttacks.clear();
 		for (int i = 0; i < numEnvelopes; ++i)
 		{
-			sAttacks.add(i, ((int)rand() / RAND_MAX) * 1000 + 1);
+			sAttacks.add(i, Random::getSystemRandom().nextInt(Range<int>(1, 1000)));
 		}
 		sDecays.clear();
 		for (int i = 0; i < numEnvelopes; ++i)
 		{
-			sDecays.add(i, ((int)rand() / RAND_MAX) * 1000 + 1);
+			sDecays.add(i, Random::getSystemRandom().nextInt(Range<int>(1, 1000)));
 		}
 		sSustains.clear();
 		for (int i = 0; i < numEnvelopes; ++i)
 		{
-			sSustains.add(i, ((float)rand() / RAND_MAX));
+			sSustains.add(i, (Random::getSystemRandom().nextFloat()));
 		}
 		sReleases.clear();
 		for (int i = 0; i < numEnvelopes; ++i)
 		{
-			sReleases.add(i, ((int)rand() / RAND_MAX) * 1000 + 1);
+			sReleases.add(i, Random::getSystemRandom().nextInt(Range<int>(1, 1000)));
 		}
 
 		envelopeOn.clear();
-		for (int i = 0; i < numEnvelopes; ++i)
+		envelopeOn.add(true); // needed for accurate unit testing - set state always defaults first to be true so there is 1 ADSR
+		for (int i = 1; i < numEnvelopes; ++i)
 		{
-			envelopeOn.add((bool)((int)(r[idx++] * 2)));
+			envelopeOn.add(i, Random::getSystemRandom().nextBool());
 		}
 		
 	}
@@ -428,7 +429,7 @@ public:
             setRelease(i, allADSRs[i][3]);
             if(allADSRs[i][4] > 0 || i==0) setEnvelopeOn(i, true);
             else setEnvelopeOn(i, false);
-            DBG("ADSR envelopeOn = " + String(i) + " " + String((int)getEnvelopeOn(i)));
+            //DBG("ADSR envelopeOn = " + String(i) + " " + String((int)getEnvelopeOn(i)));
         }
     }
     
@@ -527,12 +528,9 @@ public:
     Id(Id),
     name(String(Id))
     {
+		sPrep = new SynchronicPreparation();
+		aPrep = new SynchronicPreparation(sPrep);
 		if (random) randomize();
-		else
-		{
-			sPrep = new SynchronicPreparation();
-			aPrep = new SynchronicPreparation(sPrep);
-		}
     }
     
     inline Synchronic::Ptr duplicate()
@@ -563,7 +561,7 @@ public:
 		clear();
 		sPrep->randomize();
 		aPrep->randomize();
-		Id = (int)((float)rand() / RAND_MAX * 1000.0f);
+		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
 		name = "random";
 	}
     

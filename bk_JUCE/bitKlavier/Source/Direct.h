@@ -97,13 +97,13 @@ public:
     {
         float r[20];
         
-        for (int i = 0; i < 20; i++)    r[i] = ((float)rand() / RAND_MAX);
+        for (int i = 0; i < 20; i++)    r[i] = (Random::getSystemRandom().nextFloat());
         int idx = 0;
         
         dTransposition.clear();
-        for (int i = 0; i < (int)((float)rand()/RAND_MAX*10); ++i)
+        for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
         {
-            dTransposition.add(i, ((float)rand()/RAND_MAX) * 48.0f - 24.0f);
+			dTransposition.add(i, (Random::getSystemRandom().nextFloat() * 48.0f - 24.0f));
         }
         
         dGain = r[idx++];
@@ -194,12 +194,13 @@ public:
         
     }
     
-    Direct(int Id):
+    Direct(int Id, bool random = false):
     Id(Id),
     name(String(Id))
     {
-        sPrep       = new DirectPreparation();
-        aPrep       = new DirectPreparation(sPrep);
+		sPrep = new DirectPreparation();
+		aPrep = new DirectPreparation(sPrep);
+		if (random) randomize();
     };
     
     inline void clear(void)
@@ -321,6 +322,15 @@ public:
         sPrep->copy(from->sPrep);
         aPrep->copy(sPrep);
     }
+
+	inline void randomize()
+	{
+		clear();
+		sPrep->randomize();
+		aPrep->randomize();
+		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
+		name = "random";
+	}
     
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName)

@@ -466,7 +466,7 @@ public:
 			// call getState() to convert to ValueTree
 			// call setState() to convert from ValueTree to preparation
 			// compare begin and end states
-			String name = "random tuning " + String(i);
+			String name = "random tuning prep " + String(i);
 			DBG("test consistency: " + name);
 
 			TuningPreparation::Ptr tp1 = new TuningPreparation();
@@ -489,18 +489,42 @@ public:
 
 			ValueTree vt2 = t2.getState();
 
-			//t2.sPrep->getNToneRoot;
-			//t2.sPrep->get;
+			expect(vt1.isEquivalentTo(vt2),
+				"tuning prep: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
+		}
+
+		for (int i = 0; i < 10; i++)
+		{
+			// create tuning and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random tuning " + String(i);
+			DBG("test consistency: " + name);
+
+			Tuning t1(-1, true);
+			t1.setName(name);
+
+			ValueTree vt1 = t1.getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			Tuning t2(-1, true);
+
+			t2.setState(xml);
+			t2.setName(name);
+
+			ValueTree vt2 = t2.getState();
 
 			expect(vt1.isEquivalentTo(vt2),
 				"tuning: value trees do not match\n" +
 				vt1.toXmlString() +
 				"\n=======================\n" +
 				vt2.toXmlString());
-
-			//expect(tp2->compare(tp1), tp1->getName() + " and " + tp2->getName() + " did not match.");
 		}
-
 	}
 };
 

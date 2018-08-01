@@ -139,15 +139,15 @@ public:
 	{
 		float r[25];
 
-		for (int i = 0; i < 25; i++)  r[i] = ((float)rand() / RAND_MAX);
+		for (int i = 0; i < 25; i++)  r[i] = (Random::getSystemRandom().nextFloat());
 		int idx = 0;
 
 		nWaveDistance = (int)(r[idx++] * 20000);
 		nUndertow = (int)(r[idx++] * 20000);
 		nTransposition.clear();
-		for (int i = 0; i < (int)((float)rand() / RAND_MAX * 10); ++i)
+		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
 		{
-			nTransposition.add(i, ((float)rand() / RAND_MAX) * 48.0f - 24.0f);
+			nTransposition.add(i, (Random::getSystemRandom().nextFloat()) * 48.0f - 24.0f);
 		}
 		nGain = r[idx++] * 10.0f;
 		nLengthMultiplier = r[idx++] * 10.0f;
@@ -365,12 +365,13 @@ public:
     }
     
     
-    Nostalgic(int Id):
+    Nostalgic(int Id, bool random = false):
     name("Nostalgic"+String(Id)),
     Id(Id)
     {
-        sPrep       = new NostalgicPreparation();
-        aPrep       = new NostalgicPreparation(sPrep);
+		sPrep = new NostalgicPreparation();
+		aPrep = new NostalgicPreparation(sPrep);
+		if (random) randomize();
     }
     
     inline void clear(void)
@@ -546,6 +547,15 @@ public:
     {
         name = newName;
     }
+
+	inline void randomize()
+	{
+		clear();
+		sPrep->randomize();
+		aPrep->randomize();
+		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
+		name = "random";
+	}
     
 private:
     
