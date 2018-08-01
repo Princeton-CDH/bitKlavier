@@ -573,7 +573,6 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             
             if (appliesToNote && appliesToVel && isRelease && pedalStatesMatch)
             {
-                DBG("len: " + String(sound->sampleLength) + " name: " + sound->sampleName);
                 startVoice (findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes),
                             sound,
                             midiChannel,
@@ -583,16 +582,16 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                             velocity,
                             Forward,
                             FixedLengthFixedStart,
-                            DirectNote,
-                            0,
-                            0,
-                            sound->sampleLength,
-                            0.001f,
-                            0.001f,
-                            1.0f,
-                            0.001f);
+                            DirectNote,             // 
+                            0,                      //
+                            0,                      //
+                            sound->sampleLength,    //  len
+                            0.001f,                 //  A
+                            0.001f,                 //  D
+                            1.0f,                   //  S
+                            0.001f);                //  R
                 
-                //break;
+                // break;
                 
             }
         }
