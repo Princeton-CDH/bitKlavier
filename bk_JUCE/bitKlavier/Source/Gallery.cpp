@@ -190,3 +190,58 @@ void Gallery::randomize()
 			}
 		}
 	}
+/* ///unit test currently commented out because it creates infinite loop
+#if BK_UNIT_TESTS
+
+class GalleryTests : public UnitTest
+{
+public:
+	GalleryTests() : UnitTest("Galleries", "Gallery") {}
+
+	void runTest() override
+	{
+		beginTest("GalleryXML");
+
+		for (int i = 0; i < 10; i++)
+		{
+			// create gallery and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random gallery " + String(i);
+			DBG("test consistency: " + name);
+
+			ScopedPointer<XmlElement> dummyXml;
+			BKAudioProcessor dummyAudio;
+
+			Gallery g1(dummyXml, dummyAudio, true);
+			DBG("gallery created");
+			g1.randomize();
+			DBG("randomize done");
+			g1.setName(name);
+
+			ValueTree vt1 = g1.getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			Gallery g2(xml, dummyAudio, true);
+			g2.setStateFromXML(xml);
+			g2.setName(name);
+
+			ValueTree vt2 = g2.getState();
+
+			expect(vt1.isEquivalentTo(vt2),
+				"gallery: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
+
+			//expect(tp2->compare(tp1), tp1->getName() + " and " + tp2->getName() + " did not match.");
+		}
+	}
+};
+
+static GalleryTests galleryTest;
+
+#endif
+*/
