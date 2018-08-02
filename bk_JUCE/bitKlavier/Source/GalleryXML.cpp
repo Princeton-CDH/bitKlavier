@@ -87,8 +87,6 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml, bool firstTime)
                 {
                     String attr = e->getStringAttribute("i"+String(idType));
                     
-                    DBG("id" + String(idType) + " " + attr);
-                    
                     i = attr.getIntValue();
                     
                     idCount.set(idType, i);

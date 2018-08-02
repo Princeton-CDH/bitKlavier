@@ -48,7 +48,12 @@ public:
             
             ScopedPointer<XmlElement> dummyXml;
             
-            DBG("gallery created");
+            String xmlData = CharPointer_UTF8 (BinaryData::Basic_Piano_xml);
+            
+            processor.defaultLoaded = true;
+            processor.defaultName = "Basic_Piano_xml";
+            
+            processor.loadGalleryFromXml(XmlDocument::parse(xmlData), true);
             processor.gallery->randomize();
             DBG("randomize done");
             processor.gallery->setName(name);
@@ -62,17 +67,10 @@ public:
             processor.gallery->setName(name);
             
             ValueTree vt2 =  processor.gallery->getState();
-            
-			DBG(("Gallery 1: \n" + vt1.toXmlString() +
-				"\n=======================\n" +
-				"Gallery 2: \n" + vt2.toXmlString()));
 
-			expect(vt1.isEquivalentTo(vt2), "trees do not match");
-            /*expect(vt1.isEquivalentTo(vt2),
-                   "gallery: value trees do not match\n" +
-                   vt1.toXmlString() +
-                   "\n=======================\n" +
-                   vt2.toXmlString());*/
+            expect(vt1.isEquivalentTo(vt2), "Gallery 1: \n" + vt1.toXmlString() +
+                                             "\n=======================\n" +
+                                             "Gallery 2: \n" + vt2.toXmlString());
             
             //expect(tp2->compare(tp1), tp1->getName() + " and " + tp2->getName() + " did not match.");
         }
@@ -93,7 +91,19 @@ currentSampleType(BKLoadNil),
 loader(*this),
 shouldLoadDefault(true)
 {
-
+#if BK_UNIT_TESTS
+    
+    static GalleryTests galleryTest(*this);
+    
+    UnitTest::getAllTests().add(&galleryTest);
+    
+    BKUnitTestRunner tests;
+    
+    tests.setAssertOnFailure(false);
+    
+    tests.runAllTests();
+    
+#endif
     didLoadHammersAndRes            = false;
     didLoadMainPianoSamples         = false;
     sustainIsDown                   = false;
@@ -230,20 +240,7 @@ shouldLoadDefault(true)
         "NS_7_Systerslaat",
         "NS_8_ItIsEnough"
     });
-    
-#if BK_UNIT_TESTS
-    
-    GalleryTests galleryTest(*this);
-    
-    UnitTest::getAllTests().add(&galleryTest);
-    
-    BKUnitTestRunner tests;
 
-	tests.setAssertOnFailure(false);
-
-    tests.runAllTests();
-    
-#endif
 }
 
 
