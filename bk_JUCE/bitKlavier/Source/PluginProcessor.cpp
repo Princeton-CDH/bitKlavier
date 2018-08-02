@@ -62,16 +62,32 @@ public:
             
             ScopedPointer<XmlElement> xml = vt1.createXml();
             
-            processor.gallery->randomize();
+			processor.loadGalleryFromXml(XmlDocument::parse(xmlData), true);
+
+            //processor.gallery->randomize();
             processor.gallery->setStateFromXML(xml);
             processor.gallery->setName(name);
             
             ValueTree vt2 =  processor.gallery->getState();
 
+#if JUCE_WINDOWS
+			File file1("C:\\Users\\User\\Desktop\\Programming\\output1.txt");
+			File file2("C:\\Users\\User\\Desktop\\Programming\\output2.txt");
+			FileLogger pressFtoPayRespects(file1, "blah", 128*1024*8);
+			FileLogger pressFtoPayRespects2ElectricBoogaloo(file2, "idk whatever", 128 * 1024 * 8);
+			pressFtoPayRespects.logMessage(vt1.toXmlString() +
+				"\n=======================\n");
+			pressFtoPayRespects2ElectricBoogaloo.logMessage(vt2.toXmlString() +
+				"\n=======================\n");
+
+#else
+
             expect(vt1.isEquivalentTo(vt2), "Gallery 1: \n" + vt1.toXmlString() +
                                              "\n=======================\n" +
                                              "Gallery 2: \n" + vt2.toXmlString());
-            
+
+#endif
+
             //expect(tp2->compare(tp1), tp1->getName() + " and " + tp2->getName() + " did not match.");
         }
     }

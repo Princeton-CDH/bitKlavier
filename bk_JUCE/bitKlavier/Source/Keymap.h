@@ -171,6 +171,7 @@ public:
 		{
 			keymap.add(i, Random::getSystemRandom().nextBool());
 		}
+		setName("random");
 	}
 
 	//sets keymap to a random keyset
