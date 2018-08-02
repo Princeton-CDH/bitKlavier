@@ -15,6 +15,66 @@ int gComponentSingleSliderHeight;
 int gComponentStackedSliderHeight;
 #endif
 
+class BKUnitTestRunner : public UnitTestRunner
+{
+    void logMessage(const String& message) override
+    {
+        Logger::writeToLog(message);
+    }
+};
+
+///unit test currently commented out because it creates infinite loop
+#if BK_UNIT_TESTS
+
+class GalleryTests : public UnitTest
+{
+public:
+    GalleryTests(BKAudioProcessor& p) : UnitTest("Galleries", "Gallery"), processor(p) {}
+    
+    BKAudioProcessor& processor;
+    
+    void runTest() override
+    {
+        beginTest("GalleryXML");
+        
+        for (int i = 0; i < 10; i++)
+        {
+            // create gallery and randomize it
+            // call getState() to convert to ValueTree
+            // call setState() to convert from ValueTree to preparation
+            // compare begin and end states
+            String name = "random gallery " + String(i);
+            DBG("test consistency: " + name);
+            
+            ScopedPointer<XmlElement> dummyXml;
+            
+            DBG("gallery created");
+            processor.gallery->randomize();
+            DBG("randomize done");
+            processor.gallery->setName(name);
+            
+            ValueTree vt1 = processor.gallery->getState();
+            
+            ScopedPointer<XmlElement> xml = vt1.createXml();
+            
+            processor.gallery->randomize();
+            processor.gallery->setStateFromXML(xml);
+            processor.gallery->setName(name);
+            
+            ValueTree vt2 =  processor.gallery->getState();
+            
+            expect(vt1.isEquivalentTo(vt2),
+                   "gallery: value trees do not match\n" +
+                   vt1.toXmlString() +
+                   "\n=======================\n" +
+                   vt2.toXmlString());
+            
+            //expect(tp2->compare(tp1), tp1->getName() + " and " + tp2->getName() + " did not match.");
+        }
+    }
+};
+
+#endif
 
 //==============================================================================
 BKAudioProcessor::BKAudioProcessor(void):
@@ -28,10 +88,7 @@ currentSampleType(BKLoadNil),
 loader(*this),
 shouldLoadDefault(true)
 {
-#if BK_UNIT_TESTS
-	BKUnitTestRunner test;
-	test.runAllTests();
-#endif
+
     didLoadHammersAndRes            = false;
     didLoadMainPianoSamples         = false;
     sustainIsDown                   = false;
@@ -168,6 +225,17 @@ shouldLoadDefault(true)
         "NS_7_Systerslaat",
         "NS_8_ItIsEnough"
     });
+    
+#if BK_UNIT_TESTS
+    
+    GalleryTests galleryTest(*this);
+    
+    UnitTest::getAllTests().add(&galleryTest);
+    
+    BKUnitTestRunner tests;
+    tests.runAllTests();
+    
+#endif
 }
 
 

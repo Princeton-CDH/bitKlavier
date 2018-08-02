@@ -83,14 +83,6 @@
 
 #define SOUNDFONT_ID 1000
 
-class BKUnitTestRunner : public UnitTestRunner
-{
-	void logMessage(const String& message) override
-	{
-		Logger::writeToLog(message);
-	}
-};
-
 inline PopupMenu getNewItemMenu(LookAndFeel* laf)
 {
     PopupMenu newMenu;

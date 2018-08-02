@@ -267,11 +267,16 @@ NostalgicProcessor::Ptr Piano::addNostalgicProcessor(int thisId)
 DirectProcessor::Ptr Piano::addDirectProcessor(int thisId)
 {
     DirectProcessor::Ptr dproc = new DirectProcessor(processor.gallery->getDirect(thisId),
-                                    defaultT,
-                                    &processor.mainPianoSynth,
-                                    &processor.resonanceReleaseSynth,
-                                    &processor.hammerReleaseSynth);
-    dproc->prepareToPlay(sampleRate, &processor.mainPianoSynth, &processor.resonanceReleaseSynth,&processor.hammerReleaseSynth);
+                                                     defaultT,
+                                                     &processor.mainPianoSynth,
+                                                     &processor.resonanceReleaseSynth,
+                                                     &processor.hammerReleaseSynth);
+    
+    dproc->prepareToPlay(sampleRate,
+                         &processor.mainPianoSynth,
+                         &processor.resonanceReleaseSynth,
+                         &processor.hammerReleaseSynth);
+    
     dprocessor.add(dproc);
     
     return dproc;

@@ -130,14 +130,13 @@ void Gallery::resetPreparations(void)
 
 void Gallery::randomize()
 	{
-		BKAudioProcessor dummyAudio;
 		BKSynthesiser* dummySynth;
 		GeneralSettings::Ptr dummyGeneral = new GeneralSettings();
 
 		//each piano
 		for (int h = 0; h < Random::getSystemRandom().nextInt(Range<int>(1, 5)); h++)
 		{
-			Piano::Ptr p = new Piano(dummyAudio, h);
+			Piano::Ptr p = new Piano(processor, h);
 			addPiano(p);
 			//each set of preparations in the piano
 			for (int i = 0; i < Random::getSystemRandom().nextInt(Range<int>(1, 10)); i++)
@@ -149,28 +148,33 @@ void Gallery::randomize()
 
 				Tuning::Ptr t = new Tuning(-1, true);
 				addTuning(t);
+                int tuningId = t->getId();
 				TuningProcessor::Ptr tProc = new TuningProcessor(t);
-				p->addTuningProcessor(tProc->getId());
+				p->addTuningProcessor(tuningId);
 
 				Direct::Ptr d = new Direct(-1, true);
 				addDirect(d);
+                int directId = d->getId();
 				DirectProcessor::Ptr dProc = new DirectProcessor(d, tProc, dummySynth, dummySynth, dummySynth);
-				p->addDirectProcessor(dProc->getId());
+				p->addDirectProcessor(directId);
 
 				Tempo::Ptr m = new Tempo(-1, true);
 				addTempo(m);
+                int tempoId = m->getId();
 				TempoProcessor::Ptr mProc = new TempoProcessor(m);
-				p->addTempoProcessor(mProc->getId());
+				p->addTempoProcessor(tempoId);
 
 				Synchronic::Ptr s = new Synchronic(-1, true);
 				addSynchronic(s);
+                int synchronicId = s->getId();
 				SynchronicProcessor::Ptr sProc = new SynchronicProcessor(s, tProc, mProc, dummySynth, dummyGeneral);
-				p->addSynchronicProcessor(sProc->getId());
+				p->addSynchronicProcessor(synchronicId);
 
 				Nostalgic::Ptr n = new Nostalgic(-1, true);
 				addNostalgic(n);
+                int nostalgicId = n->getId();
 				NostalgicProcessor::Ptr nProc = new NostalgicProcessor(n, tProc, sProc, dummySynth);
-				p->addNostalgicProcessor(nProc->getId());
+				p->addNostalgicProcessor(nostalgicId);
 
 				p->linkPreparationWithKeymap(PreparationTypeDirect, d->getId(), kp->getId());
 
@@ -190,58 +194,5 @@ void Gallery::randomize()
 			}
 		}
 	}
-/* ///unit test currently commented out because it creates infinite loop
-#if BK_UNIT_TESTS
 
-class GalleryTests : public UnitTest
-{
-public:
-	GalleryTests() : UnitTest("Galleries", "Gallery") {}
 
-	void runTest() override
-	{
-		beginTest("GalleryXML");
-
-		for (int i = 0; i < 10; i++)
-		{
-			// create gallery and randomize it
-			// call getState() to convert to ValueTree
-			// call setState() to convert from ValueTree to preparation
-			// compare begin and end states
-			String name = "random gallery " + String(i);
-			DBG("test consistency: " + name);
-
-			ScopedPointer<XmlElement> dummyXml;
-			BKAudioProcessor dummyAudio;
-
-			Gallery g1(dummyXml, dummyAudio, true);
-			DBG("gallery created");
-			g1.randomize();
-			DBG("randomize done");
-			g1.setName(name);
-
-			ValueTree vt1 = g1.getState();
-
-			ScopedPointer<XmlElement> xml = vt1.createXml();
-
-			Gallery g2(xml, dummyAudio, true);
-			g2.setStateFromXML(xml);
-			g2.setName(name);
-
-			ValueTree vt2 = g2.getState();
-
-			expect(vt1.isEquivalentTo(vt2),
-				"gallery: value trees do not match\n" +
-				vt1.toXmlString() +
-				"\n=======================\n" +
-				vt2.toXmlString());
-
-			//expect(tp2->compare(tp1), tp1->getName() + " and " + tp2->getName() + " did not match.");
-		}
-	}
-};
-
-static GalleryTests galleryTest;
-
-#endif
-*/

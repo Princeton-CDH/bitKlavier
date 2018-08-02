@@ -277,7 +277,6 @@ public:
 		clear();
 		sPrep->randomize();
 		aPrep->randomize();
-		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
 		name = "random";
 	}
     
