@@ -77,7 +77,7 @@ public:
     //==============================================================================
     void paint (Graphics& g) override
     {
-        g.fillAll(Colours::transparentBlack);
+        g.fillAll(Colours::black);
     }
     
     void resized() override

@@ -137,7 +137,7 @@ void MainViewController::setSliderLookAndFeel(BKButtonAndMenuLAF *laf)
 
 void MainViewController::paint (Graphics& g)
 {
-    g.fillAll(Colours::transparentBlack);
+    g.fillAll(Colours::black);
     
     g.setColour(Colours::antiquewhite);
     

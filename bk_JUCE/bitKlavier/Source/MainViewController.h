@@ -59,7 +59,7 @@ public:
     
     void paint(Graphics& g)
     {
-        g.fillAll(Colours::transparentBlack);
+        g.fillAll(Colours::black);
         
         g.drawImage (image, getLocalBounds().toFloat(), placement);
     }

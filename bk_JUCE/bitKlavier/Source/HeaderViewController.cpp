@@ -122,6 +122,10 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     
     loadMenu.addSeparator();
     
+    String currentSoundfont = processor.currentSoundfont.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf2", false, true);
+    
+    loadMenu.addItem(LOAD_SOUNDFONT, "Seinbass", currentSoundfont != "Seinbass", currentSoundfont == "Seinbass");
+    
     int i = 0;
     for (auto sf : processor.soundfontNames)
     {
@@ -175,7 +179,9 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     
     galleryMenu.addSeparator();
     galleryMenu.addItem(CLEAN_ID, "Clean");
+    
     galleryMenu.addSeparator();
+    galleryMenu.addSubMenu("Load samples...", getLoadMenu());
     
     // ~ ~ ~ share menu ~ ~ ~
     if (!processor.defaultLoaded)
@@ -358,6 +364,11 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     else if (result == LOAD_HEAVY)
     {
         processor.loadSamples(BKLoadHeavy);
+    }
+    else if (result == LOAD_SOUNDFONT)
+    {
+        File sf2 = 
+        processor.loadSamples(BKLoadSoundfont, )
     }
     else if (result == SAVE_ID)
     {

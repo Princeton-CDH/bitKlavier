@@ -88,8 +88,6 @@ shouldLoadDefault(true)
 #else
     platform = BKOSX;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
-
-
 #endif
     
     noteOn.ensureStorageAllocated(128);

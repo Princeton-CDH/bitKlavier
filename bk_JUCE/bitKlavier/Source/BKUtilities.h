@@ -83,6 +83,8 @@
 
 #define SOUNDFONT_ID 1000
 
+#define LOAD_SOUNDFONT 999
+
 class BKUnitTestRunner : public UnitTestRunner
 {
 	void logMessage(const String& message) override
@@ -110,6 +112,7 @@ inline PopupMenu getNewItemMenu(LookAndFeel* laf)
     newMenu.addItem(RESET_ID, "Reset (R)");
     newMenu.addSeparator();
     newMenu.addItem(COMMENT_ID, "Comment (Q)");
+
     
     return newMenu;
 }
