@@ -136,11 +136,13 @@ void Gallery::randomize()
 		//each piano
 		for (int h = 0; h < Random::getSystemRandom().nextInt(Range<int>(1, 5)); h++)
 		{
+			DBG("new piano " + String(h));
 			Piano::Ptr p = new Piano(processor, h);
 			addPiano(p);
 			//each set of preparations in the piano
 			for (int i = 0; i < Random::getSystemRandom().nextInt(Range<int>(1, 10)); i++)
 			{
+				DBG("new preparations " + String(i));
 				Keymap::Ptr kp = new Keymap();
 				kp->randomize();
 				addKeymap(kp);
@@ -193,6 +195,7 @@ void Gallery::randomize()
 				p->linkSynchronicWithTempo(s, m);
 			}
 		}
+		DBG("done");
 	}
 
 

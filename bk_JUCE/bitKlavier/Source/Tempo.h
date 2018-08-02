@@ -117,11 +117,11 @@ public:
     }
     
     //Adaptive Tempo 1
-    inline void setAdaptiveTempo1Mode(AdaptiveTempo1Mode mode)          {at1Mode = mode; DBG("AT1mode = " + String(mode));}
-    inline void setAdaptiveTempo1History(int hist)                      {at1History = hist; DBG("AT1history = " + String(hist));}
-    inline void setAdaptiveTempo1Subdivisions(float sub)                {at1Subdivisions = sub; DBG("at1Subdivisions = " + String(sub));}
-    inline void setAdaptiveTempo1Min(float min)                         {at1Min = min; DBG("at1Min = " + String(min));}
-    inline void setAdaptiveTempo1Max(float max)                         {at1Max = max; DBG("at1Man = " + String(max));}
+    inline void setAdaptiveTempo1Mode(AdaptiveTempo1Mode mode)          {at1Mode = mode;}
+    inline void setAdaptiveTempo1History(int hist)                      {at1History = hist;}
+    inline void setAdaptiveTempo1Subdivisions(float sub)                {at1Subdivisions = sub;}
+    inline void setAdaptiveTempo1Min(float min)                         {at1Min = min;}
+    inline void setAdaptiveTempo1Max(float max)                         {at1Max = max;}
 
     
     void print(void)

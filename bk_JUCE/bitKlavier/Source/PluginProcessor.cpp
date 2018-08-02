@@ -37,7 +37,7 @@ public:
     {
         beginTest("GalleryXML");
         
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 5; i++)
         {
             // create gallery and randomize it
             // call getState() to convert to ValueTree
@@ -63,11 +63,16 @@ public:
             
             ValueTree vt2 =  processor.gallery->getState();
             
-            expect(vt1.isEquivalentTo(vt2),
+			DBG(("Gallery 1: \n" + vt1.toXmlString() +
+				"\n=======================\n" +
+				"Gallery 2: \n" + vt2.toXmlString()));
+
+			expect(vt1.isEquivalentTo(vt2), "trees do not match");
+            /*expect(vt1.isEquivalentTo(vt2),
                    "gallery: value trees do not match\n" +
                    vt1.toXmlString() +
                    "\n=======================\n" +
-                   vt2.toXmlString());
+                   vt2.toXmlString());*/
             
             //expect(tp2->compare(tp1), tp1->getName() + " and " + tp2->getName() + " did not match.");
         }
@@ -233,6 +238,9 @@ shouldLoadDefault(true)
     UnitTest::getAllTests().add(&galleryTest);
     
     BKUnitTestRunner tests;
+
+	tests.setAssertOnFailure(false);
+
     tests.runAllTests();
     
 #endif

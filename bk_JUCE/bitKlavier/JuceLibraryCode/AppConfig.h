@@ -95,10 +95,6 @@
  //#define JUCE_JACK 0
 #endif
 
-#ifndef    JUCE_BELA
- //#define JUCE_BELA 0
-#endif
-
 #ifndef    JUCE_USE_ANDROID_OBOE
  //#define JUCE_USE_ANDROID_OBOE 0
 #endif
@@ -170,10 +166,6 @@
 
 #ifndef    JUCE_PLUGINHOST_AU
  //#define JUCE_PLUGINHOST_AU 0
-#endif
-
-#ifndef    JUCE_PLUGINHOST_LADSPA
- //#define JUCE_PLUGINHOST_LADSPA 0
 #endif
 
 //==============================================================================
@@ -357,13 +349,13 @@
  #define JucePlugin_EditorRequiresKeyboardFocus  1
 #endif
 #ifndef  JucePlugin_Version
- #define JucePlugin_Version                2.2-beta.1
+ #define JucePlugin_Version                2.2.1
 #endif
 #ifndef  JucePlugin_VersionCode
  #define JucePlugin_VersionCode            0x20201
 #endif
 #ifndef  JucePlugin_VersionString
- #define JucePlugin_VersionString          "2.2-beta.1"
+ #define JucePlugin_VersionString          "2.2.1"
 #endif
 #ifndef  JucePlugin_VSTUniqueID
  #define JucePlugin_VSTUniqueID            JucePlugin_PluginCode
@@ -371,11 +363,8 @@
 #ifndef  JucePlugin_VSTCategory
  #define JucePlugin_VSTCategory            kPlugCategSynth
 #endif
-#ifndef  JucePlugin_Vst3Category
- #define JucePlugin_Vst3Category           "Instrument|Synth"
-#endif
 #ifndef  JucePlugin_AUMainType
- #define JucePlugin_AUMainType             'aumu'
+ #define JucePlugin_AUMainType             kAudioUnitType_MusicDevice
 #endif
 #ifndef  JucePlugin_AUSubType
  #define JucePlugin_AUSubType              JucePlugin_PluginCode
@@ -393,7 +382,7 @@
  #define JucePlugin_CFBundleIdentifier     com.manyarrowsmusic.bitKlavier
 #endif
 #ifndef  JucePlugin_RTASCategory
- #define JucePlugin_RTASCategory           0
+ #define JucePlugin_RTASCategory           ePlugInCategory_SWGenerators
 #endif
 #ifndef  JucePlugin_RTASManufacturerCode
  #define JucePlugin_RTASManufacturerCode   JucePlugin_ManufacturerCode
