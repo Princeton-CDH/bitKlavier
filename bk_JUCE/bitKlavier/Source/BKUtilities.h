@@ -89,6 +89,8 @@ class BKUnitTestRunner : public UnitTestRunner
 	{
 		Logger::writeToLog(message);
 	}
+    
+    
 };
 
 inline PopupMenu getNewItemMenu(LookAndFeel* laf)

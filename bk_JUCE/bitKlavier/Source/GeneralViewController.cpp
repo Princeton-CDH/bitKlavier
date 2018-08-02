@@ -20,6 +20,7 @@ BKViewController(p,theGraph)
     addAndMakeVisible(comment);
     comment.setName("comment");
     comment.setMultiLine(true);
+    comment.setWantsKeyboardFocus(true);
     
     comment.setReturnKeyStartsNewLine(true);
     comment.addListener(this);
@@ -53,6 +54,7 @@ CommentViewController::~CommentViewController()
 void CommentViewController::update(void)
 {
     comment.setText(processor.updateState->comment, dontSendNotification);
+    comment.grabKeyboardFocus();
 }
 
 void CommentViewController::paint (Graphics& g)
