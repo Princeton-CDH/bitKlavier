@@ -134,6 +134,34 @@ public:
                 nUndertowRelease == n->getUndertowRelease() &&
                 nMode == n->getMode());
     }
+
+	inline void randomize()
+	{
+		float r[25];
+
+		for (int i = 0; i < 25; i++)  r[i] = (Random::getSystemRandom().nextFloat());
+		int idx = 0;
+
+		nWaveDistance = (int)(r[idx++] * 20000);
+		nUndertow = (int)(r[idx++] * 20000);
+		nTransposition.clear();
+		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
+		{
+			nTransposition.add(i, (Random::getSystemRandom().nextFloat()) * 48.0f - 24.0f);
+		}
+		nGain = r[idx++] * 10.0f;
+		nLengthMultiplier = r[idx++] * 10.0f;
+		nBeatsToSkip = r[idx++] * 10.0f;
+		nMode = (NostalgicSyncMode)(int)(r[idx++] * NostalgicSyncModeNil);
+		nReverseAttack = (int)(r[idx++] * 1000) + 1;
+		nReverseDecay = (int)(r[idx++] * 1000) + 1;
+		nReverseSustain = r[idx++];
+		nReverseRelease = (int)(r[idx++] * 1000) + 1;
+		nUndertowAttack = (int)(r[idx++] * 1000) + 1;
+		nUndertowDecay = (int)(r[idx++] * 1000) + 1;
+		nUndertowSustain = r[idx++];
+		nUndertowRelease = (int)(r[idx++] * 2000) + 1;
+	}
     
     inline const String getName() const noexcept {return name;}
     inline void setName(String n){name = n;}
@@ -337,12 +365,13 @@ public:
     }
     
     
-    Nostalgic(int Id):
+    Nostalgic(int Id, bool random = false):
     name("Nostalgic"+String(Id)),
     Id(Id)
     {
-        sPrep       = new NostalgicPreparation();
-        aPrep       = new NostalgicPreparation(sPrep);
+		sPrep = new NostalgicPreparation();
+		aPrep = new NostalgicPreparation(sPrep);
+		if (random) randomize();
     }
     
     inline void clear(void)
@@ -518,6 +547,15 @@ public:
     {
         name = newName;
     }
+
+	inline void randomize()
+	{
+		clear();
+		sPrep->randomize();
+		aPrep->randomize();
+		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
+		name = "random";
+	}
     
 private:
     
@@ -773,6 +811,35 @@ public:
         param.set(NostalgicReverseADSR, floatArrayToString(p->getReverseADSRvals()));
         param.set(NostalgicUndertowADSR, floatArrayToString(p->getUndertowADSRvals()));
     }
+
+	inline bool compare(NostalgicModPreparation::Ptr t)
+	{
+		return (getParam(NostalgicWaveDistance) == t->getParam(NostalgicWaveDistance) &&
+			getParam(NostalgicUndertow) == t->getParam(NostalgicUndertow) &&
+			getParam(NostalgicTransposition) == t->getParam(NostalgicTransposition) &&
+			getParam(NostalgicGain) == t->getParam(NostalgicGain) &&
+			getParam(NostalgicLengthMultiplier) == t->getParam(NostalgicLengthMultiplier) &&
+			getParam(NostalgicBeatsToSkip) == t->getParam(NostalgicBeatsToSkip) &&
+			getParam(NostalgicMode) == t->getParam(NostalgicMode) &&
+			getParam(NostalgicReverseADSR) == t->getParam(NostalgicReverseADSR) &&
+			getParam(NostalgicUndertowADSR) == t->getParam(NostalgicUndertowADSR));
+	}
+
+	inline void randomize()
+	{
+		NostalgicPreparation p;
+		p.randomize();
+
+		param.set(NostalgicWaveDistance, String(p.getWavedistance()));
+		param.set(NostalgicUndertow, String(p.getUndertow()));
+		param.set(NostalgicTransposition, floatArrayToString(p.getTransposition()));
+		param.set(NostalgicGain, String(p.getGain()));
+		param.set(NostalgicLengthMultiplier, String(p.getLengthMultiplier()));
+		param.set(NostalgicBeatsToSkip, String(p.getBeatsToSkip()));
+		param.set(NostalgicMode, String(p.getMode()));
+		param.set(NostalgicReverseADSR, floatArrayToString(p.getReverseADSRvals()));
+		param.set(NostalgicUndertowADSR, floatArrayToString(p.getUndertowADSRvals()));
+	}
     
     inline void copy(NostalgicModPreparation::Ptr p)
     {

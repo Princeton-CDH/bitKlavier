@@ -81,7 +81,7 @@ public:
 	{
 		float r[10];
 
-		for (int i = 0; i < 10; i++)  r[i] = ((float)rand() / RAND_MAX);
+		for (int i = 0; i < 10; i++)  r[i] = (Random::getSystemRandom().nextFloat());
 		int idx = 0;
 
 		sTempo = r[idx++];
@@ -170,12 +170,13 @@ public:
         
     }
     
-    Tempo(int Id):
+    Tempo(int Id, bool random = false):
     Id(Id),
     name(String(Id))
     {
-        sPrep = new TempoPreparation();
-        aPrep = new TempoPreparation(sPrep);
+		sPrep = new TempoPreparation();
+		aPrep = new TempoPreparation(sPrep);
+		if (random) randomize();
     }
     
     inline void clear(void)
@@ -270,6 +271,15 @@ public:
         sPrep->copy(from->sPrep);
         aPrep->copy(sPrep);
     }
+
+	inline void randomize()
+	{
+		clear();
+		sPrep->randomize();
+		aPrep->randomize();
+		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
+		name = "random";
+	}
     
     inline String getName(void) const noexcept {return name;}
     
@@ -383,18 +393,16 @@ public:
     
 	inline void randomize(void)
 	{
-		float r[10];
+		TempoPreparation p;
+		p.randomize();
 
-		for (int i = 0; i < 10; i++)  r[i] = ((float)rand() / RAND_MAX);
-		int idx = 0;
-
-		param.set(TempoBPM, String(r[idx++]));
-		param.set(TempoSystem, String(r[idx++]));
-		param.set(AT1History, String(r[idx++]));
-		param.set(AT1Subdivisions, String(r[idx++]));
-		param.set(AT1Min, String(r[idx++]));
-		param.set(AT1Max, String(r[idx++]));
-		param.set(AT1Mode, String(r[idx++]));
+		param.set(TempoBPM, String(p.getTempo()));
+		param.set(TempoSystem, String(p.getTempoSystem()));
+		param.set(AT1History, String(p.getAdaptiveTempo1History()));
+		param.set(AT1Subdivisions, String(p.getAdaptiveTempo1Subdivisions()));
+		param.set(AT1Min, String(p.getAdaptiveTempo1Min()));
+		param.set(AT1Max, String(p.getAdaptiveTempo1Max()));
+		param.set(AT1Mode, String(p.getAdaptiveTempo1Mode()));
 	}
 
     void clearAll()

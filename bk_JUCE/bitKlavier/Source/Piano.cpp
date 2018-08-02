@@ -1237,7 +1237,5 @@ void Piano::setState(XmlElement* e)
         item->setCentrePosition((item->getX() + item->getWidth() / 2) * processor.uiScaleFactor, (item->getY() + item->getHeight() / 2) * processor.uiScaleFactor);
     }
 #endif
+
 }
-
-
-

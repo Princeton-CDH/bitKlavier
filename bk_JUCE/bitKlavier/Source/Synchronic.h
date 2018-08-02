@@ -241,6 +241,81 @@ public:
                 sClusterThreshSec == s->getClusterThreshSEC() &&
                 sReleaseVelocitySetsSynchronic == s->getReleaseVelocitySetsSynchronic());
     }
+
+	inline void randomize()
+	{
+		float r[100];
+
+		for (int i = 0; i < 100; i++)  r[i] = (Random::getSystemRandom().nextFloat());
+		int idx = 0;
+
+		sNumBeats = (int)(r[idx++] * 100);
+		sClusterMin = (int)(r[idx++] * 20);
+		sClusterMax = (int)(r[idx++] * 20);
+		sClusterCap = (int)(r[idx++] * 20);
+		sMode = (SynchronicSyncMode)(int)(r[idx++] * SynchronicSyncModeNil);
+		sBeatsToSkip = (int)(r[idx++] * 2);
+		sBeatMultipliers.clear();
+		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
+		{
+			sBeatMultipliers.add(i, (Random::getSystemRandom().nextFloat() * 2.0f));
+		}
+		sAccentMultipliers.clear();
+		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
+		{
+			sAccentMultipliers.add(i, (Random::getSystemRandom().nextFloat() * 2.0f));
+		}
+		sLengthMultipliers.clear();
+		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
+		{
+			sLengthMultipliers.add(i, (Random::getSystemRandom().nextFloat() * 4.0f - 2.0f));
+		}
+		sGain = r[idx++] * 10;
+		sTransposition.clear();
+		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
+		{
+			Array<float> transposition;
+			for (int j = 0; j < Random::getSystemRandom().nextInt(10); j++)
+			{
+				transposition.add(i, (Random::getSystemRandom().nextFloat()) * 48.0f - 24.0f);
+			}
+			sTransposition.add(transposition);
+		}
+		sClusterThresh = (r[idx++] * 2000) + 1;
+		sClusterThreshSec = sClusterThresh * 0.001f;
+		sReleaseVelocitySetsSynchronic = (bool)((int)(r[idx++] * 2));
+
+		int numEnvelopes = 12;
+
+		sAttacks.clear();
+		for (int i = 0; i < numEnvelopes; ++i)
+		{
+			sAttacks.add(i, Random::getSystemRandom().nextInt(Range<int>(1, 1000)));
+		}
+		sDecays.clear();
+		for (int i = 0; i < numEnvelopes; ++i)
+		{
+			sDecays.add(i, Random::getSystemRandom().nextInt(Range<int>(1, 1000)));
+		}
+		sSustains.clear();
+		for (int i = 0; i < numEnvelopes; ++i)
+		{
+			sSustains.add(i, (Random::getSystemRandom().nextFloat()));
+		}
+		sReleases.clear();
+		for (int i = 0; i < numEnvelopes; ++i)
+		{
+			sReleases.add(i, Random::getSystemRandom().nextInt(Range<int>(1, 1000)));
+		}
+
+		envelopeOn.clear();
+		envelopeOn.add(true); // needed for accurate unit testing - set state always defaults first to be true so there is 1 ADSR
+		for (int i = 1; i < numEnvelopes; ++i)
+		{
+			envelopeOn.add(i, Random::getSystemRandom().nextBool());
+		}
+		
+	}
     
     //inline const float getTempo() const noexcept                       {return sTempo;               }
     inline const int getNumBeats() const noexcept                      {return sNumBeats;              }
@@ -334,8 +409,18 @@ public:
     inline void setSustain(int which, float val)    {sSustains.set(which, val);}
     inline void setRelease(int which, int val)      {sReleases.set(which, val);}
     
+	inline void clearADSRs()
+	{
+		sAttacks.clear();
+		sDecays.clear();
+		sSustains.clear();
+		sReleases.clear();
+		envelopeOn.clear();
+	}
+
     inline void setADSRs(Array<Array<float>> allADSRs)
     {
+		clearADSRs();
         for(int i=0; i<allADSRs.size(); i++)
         {
             setAttack(i, allADSRs[i][0]);
@@ -344,7 +429,7 @@ public:
             setRelease(i, allADSRs[i][3]);
             if(allADSRs[i][4] > 0 || i==0) setEnvelopeOn(i, true);
             else setEnvelopeOn(i, false);
-            DBG("ADSR envelopeOn = " + String(i) + " " + String((int)getEnvelopeOn(i)));
+            //DBG("ADSR envelopeOn = " + String(i) + " " + String((int)getEnvelopeOn(i)));
         }
     }
     
@@ -439,12 +524,13 @@ public:
         
     }
     
-    Synchronic(int Id):
+	Synchronic(int Id, bool random = false) :
     Id(Id),
     name(String(Id))
     {
-        sPrep       = new SynchronicPreparation();
-        aPrep       = new SynchronicPreparation(sPrep);
+		sPrep = new SynchronicPreparation();
+		aPrep = new SynchronicPreparation(sPrep);
+		if (random) randomize();
     }
     
     inline Synchronic::Ptr duplicate()
@@ -469,6 +555,15 @@ public:
         sPrep->copy(from->sPrep);
         aPrep->copy(sPrep);
     }
+
+	inline void randomize()
+	{
+		clear();
+		sPrep->randomize();
+		aPrep->randomize();
+		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
+		name = "random";
+	}
     
     inline ValueTree getState(void)
     {
@@ -563,8 +658,8 @@ public:
         i = e->getStringAttribute(ptagSynchronic_clusterMax).getIntValue();
         sPrep->setClusterMax(i);
         
-        i = e->getStringAttribute(ptagSynchronic_clusterThresh).getIntValue();
-        sPrep->setClusterThresh(i);
+        f = e->getStringAttribute(ptagSynchronic_clusterThresh).getFloatValue();
+        sPrep->setClusterThresh(f);
         
         i = e->getStringAttribute(ptagSynchronic_mode).getIntValue();
         sPrep->setMode((SynchronicSyncMode) i);
@@ -902,6 +997,9 @@ public:
         p = e->getStringAttribute(ptagSynchronic_mode);
         setParam(SynchronicMode, p);
         
+		p = e->getStringAttribute(ptagSynchronic_beatsToSkip);
+		setParam(SynchronicBeatsToSkip, p);
+
         p = e->getStringAttribute(ptagSynchronic_gain);
         setParam(SynchronicGain, p);
         
@@ -1025,6 +1123,22 @@ public:
         
     }
     
+	inline bool compare(SynchronicModPreparation::Ptr t)
+	{
+		return (getParam(SynchronicNumPulses) == t->getParam(SynchronicNumPulses) &&
+			getParam(SynchronicClusterMin) == t->getParam(SynchronicClusterMin) &&
+			getParam(SynchronicClusterMax) == t->getParam(SynchronicClusterMax) &&
+			getParam(SynchronicClusterThresh) == t->getParam(SynchronicClusterThresh) &&
+			getParam(SynchronicGain) == t->getParam(SynchronicGain) &&
+			getParam(SynchronicGain) == t->getParam(SynchronicGain) &&
+			getParam(SynchronicBeatsToSkip) == t->getParam(SynchronicBeatsToSkip) &&
+			getParam(SynchronicBeatMultipliers) == t->getParam(SynchronicBeatMultipliers) &&
+			getParam(SynchronicLengthMultipliers) == t->getParam(SynchronicLengthMultipliers) && 
+			getParam(SynchronicAccentMultipliers) == t->getParam(SynchronicAccentMultipliers) &&
+			getParam(SynchronicTranspOffsets) == t->getParam(SynchronicTranspOffsets) &&
+			getParam(SynchronicADSRs) == t->getParam(SynchronicADSRs));
+	}
+
     inline void copy(SynchronicPreparation::Ptr p)
     {
         param.set(SynchronicNumPulses, String(p->getNumBeats()));
@@ -1048,6 +1162,25 @@ public:
             param.set(i, p->getParam((SynchronicParameterType)i));
         }
     }
+
+	inline void randomize()
+	{
+		SynchronicPreparation p;
+		p.randomize();
+
+		param.set(SynchronicNumPulses, String(p.getNumBeats()));
+		param.set(SynchronicClusterMin, String(p.getClusterMin()));
+		param.set(SynchronicClusterMax, String(p.getClusterMax()));
+		param.set(SynchronicClusterThresh, String(p.getClusterThreshMS()));
+		param.set(SynchronicGain, String(p.getGain()));
+		param.set(SynchronicMode, String(p.getMode()));
+		param.set(SynchronicBeatsToSkip, String(p.getBeatsToSkip()));
+		param.set(SynchronicBeatMultipliers, floatArrayToString(p.getBeatMultipliers()));
+		param.set(SynchronicLengthMultipliers, floatArrayToString(p.getLengthMultipliers()));
+		param.set(SynchronicAccentMultipliers, floatArrayToString(p.getAccentMultipliers()));
+		param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p.getTransposition()));
+		param.set(SynchronicADSRs, arrayFloatArrayToString(p.getADSRs()));
+	}
     
     void clearAll()
     {

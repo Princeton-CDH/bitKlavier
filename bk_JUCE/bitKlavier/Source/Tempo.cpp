@@ -116,7 +116,7 @@ public:
 			// call getState() to convert to ValueTree
 			// call setState() to convert from ValueTree to preparation
 			// compare begin and end states
-			String name = "random tempo " + String(i);
+			String name = "random tempo preparation " + String(i);
 			DBG("test consistency: " + name);
 
 			TempoPreparation::Ptr tp1 = new TempoPreparation();
@@ -137,9 +137,40 @@ public:
 
 			ValueTree vt2 = t2.getState();
 
-			expect(vt1.isEquivalentTo(vt2), "direct value trees don't match");
+			expect(vt1.isEquivalentTo(vt2), "tempo prep value trees don't match");
 
-			expect(tp2->compare(tp1), tp1->getName() + " and " + tp2->getName() + " did not match.");
+			//expect(tp2->compare(tp1), tp1->getName() + " and " + tp2->getName() + " did not match.");
+		}
+
+		//test tuning wrapper class
+		for (int i = 0; i < 10; i++)
+		{
+			// create tempo and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random tempo " + String(i);
+			DBG("test consistency: " + name);
+
+			Tempo m1(-1, true);
+			m1.setName(name);
+
+			ValueTree vt1 = m1.getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			Tempo m2(-1, true);
+
+			m2.setState(xml);
+			m2.setName(name);
+
+			ValueTree vt2 = m2.getState();
+
+			expect(vt1.isEquivalentTo(vt2),
+				"tempo: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
 		}
 
 	}
@@ -158,7 +189,7 @@ public:
 
 		for (int i = 0; i < 10; i++)
 		{
-			// create direct preparation and randomize it
+			// create tempo mod preparation and randomize it
 			// call getState() to convert to ValueTree
 			// call setState() to convert from ValueTree to preparation
 			// compare begin and end states
