@@ -232,7 +232,7 @@ public:
     RectanglePlacement placement;
     
     //void textEditorReturnKeyPressed     (TextEditor&)           override;
-    void bkTextFieldDidChange           (TextEditor&)           override;
+    void bkTextFieldDidChange           (TextEditor&)           override {};
     //void bkTextFieldReturnKeyPressed    (TextEditor&)           override;
     void bkComboBoxDidChange            (ComboBox*)             override;
     void bkButtonClicked                (Button* b)             override {};
@@ -253,15 +253,6 @@ public:
     
     void setCommentText(String text) { comment.setText(text);}
     String getCommentText(void) { return comment.getText();}
-    
-    void exitComment(void);
-    
-    void enterComment(void);
-    
-    void focusLost (FocusChangeType) override
-    {
-        exitComment();
-    }
     
 private:
     

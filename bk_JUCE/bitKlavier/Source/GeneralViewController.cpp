@@ -10,6 +10,90 @@
 
 #include "GeneralViewController.h"
 
+CommentViewController::CommentViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
+BKViewController(p,theGraph)
+{
+    setLookAndFeel(&buttonsAndMenusLAF);
+    
+    removeChildComponent(&hideOrShow);
+    
+    addAndMakeVisible(comment);
+    comment.setName("comment");
+    comment.setMultiLine(true);
+    
+    comment.setReturnKeyStartsNewLine(true);
+    comment.addListener(this);
+    comment.setText("Text here...");
+#if JUCE_IOS
+    comment.setScrollbarsShown(true);
+#endif
+    //comment.setColour(TextEditor::ColourIds::high, )
+    
+    comment.setColour(TextEditor::ColourIds::backgroundColourId, Colours::burlywood.withMultipliedBrightness(0.45f));
+    comment.setColour(TextEditor::ColourIds::textColourId, Colours::antiquewhite);
+    
+    comment.setOpaque(false);
+    
+    addAndMakeVisible(ok);
+    ok.setButtonText("Ok");
+    ok.addListener(this);
+    ok.setColour(TextEditor::ColourIds::backgroundColourId, Colours::black.withAlpha(0.5f));
+    
+    addAndMakeVisible(cancel);
+    cancel.setButtonText("Cancel");
+    cancel.addListener(this);
+    cancel.setColour(TextEditor::ColourIds::backgroundColourId, Colours::red.withAlpha(0.2f));
+}
+
+CommentViewController::~CommentViewController()
+{
+    setLookAndFeel(nullptr);
+}
+
+void CommentViewController::update(void)
+{
+    comment.setText(processor.updateState->comment, dontSendNotification);
+}
+
+void CommentViewController::paint (Graphics& g)
+{
+    g.fillAll(Colours::transparentBlack);
+}
+
+void CommentViewController::resized(void)
+{
+    float heightUnit = (getHeight() - hideOrShow.getHeight()) * 0.1;
+    
+#if JUCE_IOS
+    cancel.setBounds    (0,                 hideOrShow.getBottom(), getWidth()*0.5,         2*heightUnit);
+    ok.setBounds        (getWidth()*0.5,    cancel.getY(),          getWidth()*0.5,     2*heightUnit);
+    comment.setBounds   (0,                 cancel.getBottom(),     getWidth(),     8*heightUnit);
+#else
+    comment.setBounds   (0,                 hideOrShow.getBottom(), getWidth(),         9*heightUnit);
+    cancel.setBounds    (comment.getX(),    comment.getBottom(),    getWidth()*0.5,     1*heightUnit);
+    ok.setBounds        (cancel.getRight(), cancel.getY(),          getWidth()*0.5,     1*heightUnit);
+#endif
+}
+
+void CommentViewController::bkTextFieldDidChange (TextEditor& tf)
+{
+
+}
+
+void CommentViewController::bkButtonClicked (Button* b)
+{
+    if (b == &ok)
+    {
+        processor.updateState->comment = comment.getText();
+        processor.updateState->commentDidChange = true;
+        processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+    else if (b == &cancel)
+    {
+        processor.updateState->comment = "";
+        processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+}
 
 AboutViewController::AboutViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
 BKViewController(p,theGraph)

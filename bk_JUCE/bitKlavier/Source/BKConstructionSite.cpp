@@ -610,21 +610,23 @@ void BKConstructionSite::mouseHold(Component* frame, bool onItem)
     
     if (onItem)
     {
-        //getItemOptionMenu().showMenuAsync(PopupMenu::Options().withTargetComponent (frame),
-        //                                  ModalCallbackFunction::forComponent (itemOptionMenuCallback, this) );
-        
         if (itemToSelect != nullptr)
         {
             itemSource = itemToSelect;
             
             if (itemSource != nullptr)
             {
-                connect = true;
+                if ((itemSource->getType() != PreparationTypeComment) &&
+                    (itemSource->getType() != PreparationTypePianoMap))
+                {
+                    connect = true;
+                    
+                    lineOX = itemSource->getX() + itemSource->getWidth() * 0.5;
+                    lineOY = itemSource->getY() + itemSource->getHeight() * 0.5;
+                    
+                    DBG("ORIGIN: " + String(lineOX) + " " + String(lineOY));
+                }
                 
-                lineOX = itemSource->getX() + itemSource->getWidth() * 0.5;
-                lineOY = itemSource->getY() + itemSource->getHeight() * 0.5;
-                
-                DBG("ORIGIN: " + String(lineOX) + " " + String(lineOY));
             }
         }
     }
@@ -639,17 +641,6 @@ void BKConstructionSite::mouseHold(Component* frame, bool onItem)
 
 void BKConstructionSite::mouseDown (const MouseEvent& eo)
 {
-    if (edittingComment)
-    {
-        BKItem* anItem = dynamic_cast<BKItem*> (eo.originalComponent->getParentComponent());
-        if (anItem == nullptr)
-        {
-            graph->deselectAll();
-        }
-        edittingComment = false;
-        return;
-    }
-    
     MouseEvent e = eo.getEventRelativeTo(this);
     
 #if JUCE_IOS

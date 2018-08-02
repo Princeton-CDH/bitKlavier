@@ -137,7 +137,7 @@ void MainViewController::setSliderLookAndFeel(BKButtonAndMenuLAF *laf)
 
 void MainViewController::paint (Graphics& g)
 {
-    g.fillAll(Colours::black);
+    g.fillAll(Colours::transparentBlack);
     
     g.setColour(Colours::antiquewhite);
     
@@ -640,6 +640,12 @@ void MainViewController::timerCallback()
         construction.redraw();
         
         header.fillPianoCB();
+    }
+    
+    if (state->commentDidChange)
+    {
+        state->commentDidChange = false;
+        construction.getCurrentItem()->setCommentText(state->comment);
     }
     
     

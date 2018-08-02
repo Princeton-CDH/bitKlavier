@@ -12,6 +12,33 @@
 
 #include "BKViewController.h"
 
+class CommentViewController :
+public BKViewController
+{
+public:
+    CommentViewController(BKAudioProcessor&, BKItemGraph* theGraph);
+    ~CommentViewController();
+    
+    void paint (Graphics&) override;
+    
+    void resized() override;
+    
+    void update();
+    
+private:
+    
+    TextEditor comment;
+    TextButton ok, cancel;
+    
+    void bkTextFieldDidChange       (TextEditor&)               override;
+    
+    void bkComboBoxDidChange        (ComboBox* box)             override {};
+    void bkButtonClicked            (Button* b)                 override;
+    void bkMessageReceived          (const String& message)     override {};
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CommentViewController)
+};
+
 class AboutViewController :
 public BKViewController
 {

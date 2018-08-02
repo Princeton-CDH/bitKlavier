@@ -78,7 +78,6 @@ public:
         DBG("\n");
     }
     
-    
     ValueTree  getState(void);
     void setStateFromXML(ScopedPointer<XmlElement> xml, bool firstTime = false);
     void setStateFromJson(var myJson);
@@ -108,6 +107,8 @@ public:
     inline const int getNumDirectMod(void) const noexcept {return modDirect.size();}
     inline const int getNumTempoMod(void) const noexcept {return modTempo.size();}
     inline const int getNumTuningMod(void) const noexcept {return modTuning.size();}
+    
+    
     
     inline const void setKeymap(int Id, Array<int> keys) const noexcept
     {

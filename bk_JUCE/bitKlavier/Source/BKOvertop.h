@@ -46,12 +46,14 @@ public:
     nvcm(p, theGraph),
     dvcm(p, theGraph),
     avc(p,theGraph),
+    cvc(p,theGraph),
     processor(p)
     {
         
         addChildComponent(gvc);
         addChildComponent(avc);
         addChildComponent(kvc);
+        addChildComponent(cvc);
 
         addChildComponent(tvc);
         addChildComponent(ovc);
@@ -75,6 +77,7 @@ public:
     //==============================================================================
     void paint (Graphics& g) override
     {
+        g.fillAll(Colours::transparentBlack);
     }
     
     void resized() override
@@ -106,6 +109,15 @@ public:
         nvcm.setBounds(area);
         
         dvcm.setBounds(area);
+        
+#if JUCE_IOS
+        cvc.setBounds(5, 5, area.getWidth()-10, area.getHeight() * 0.5f);
+#else
+        cvc.setBounds(area.getWidth() * 0.2,
+                      area.getHeight() * 0.2,
+                      area.getWidth() * 0.6,
+                      area.getHeight() * 0.6);
+#endif
 
     }
     
@@ -130,6 +142,7 @@ public:
         removeChildComponent(&kvc);
         removeChildComponent(&gvc);
         removeChildComponent(&avc);
+        removeChildComponent(&cvc);
         
         removeChildComponent(&tvc);
         removeChildComponent(&dvc);
@@ -157,6 +170,12 @@ public:
         else if (type == DisplayAbout)
         {
             addAndMakeVisible(&avc);
+        }
+        else if (type == DisplayComment)
+        {
+            addAndMakeVisible(&cvc);
+            cvc.grabKeyboardFocus();
+            cvc.update();
         }
         else if (type == DisplayTuning)
         {
@@ -230,8 +249,10 @@ public:
     
     GeneralViewController gvc;
     AboutViewController avc;
-    
+    CommentViewController cvc;
     KeymapViewController kvc;
+    
+    
     
     TuningPreparationEditor tvc;
     TempoPreparationEditor ovc;

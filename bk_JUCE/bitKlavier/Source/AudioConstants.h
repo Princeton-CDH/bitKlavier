@@ -272,6 +272,7 @@ typedef enum BKPreparationDisplay {
     DisplayTempoMod,
     DisplayGeneral,
     DisplayAbout,
+    DisplayComment,
     DisplayNil,
 } BKPreparationDisplay;
 

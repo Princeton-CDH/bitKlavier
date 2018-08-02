@@ -31,17 +31,14 @@ resizer(new ResizableCornerComponent (this, constrain))
     comment.setColour(TextEditor::ColourIds::textColourId, Colours::antiquewhite);
     
     comment.setText("Text here...");
-    comment.addListener(this);
     comment.setMultiLine(true);
     comment.setName("comment");
     comment.setSize(150, 75);
-    comment.setSelectAllWhenFocused(true);
-    comment.addMouseListener(this,true);
-    comment.setReturnKeyStartsNewLine(true);
     comment.setScrollbarsShown(false);
+    comment.setEnabled(false);
     
-#if JUCE_IOS
-    comment.removeMouseListener(this);
+#if !JUCE_IOS
+    comment.addMouseListener(this, true);
 #endif
     
     setPianoTarget(0);
@@ -104,7 +101,6 @@ resizer(new ResizableCornerComponent (this, constrain))
     }
     else if (type == PreparationTypeComment)
     {
-
         setSize(150*processor.uiScaleFactor,75*processor.uiScaleFactor);
         comment.setSize(150*processor.uiScaleFactor,75*processor.uiScaleFactor);
         constrain->setSizeLimits(50,25,500,500);
@@ -114,12 +110,12 @@ resizer(new ResizableCornerComponent (this, constrain))
         
         comment.setName("Comment");
     }
-    startTimerHz(10);
+    startTimerHz(20);
 }
 
 BKItem::~BKItem()
 {
-    exitComment();
+
 }
 
 BKItem* BKItem::duplicate(void)
@@ -150,25 +146,11 @@ void BKItem::bkTextFieldReturnKeyPressed(TextEditor& tf)
     if (name == comment.getName())
     {
         DBG(text);
-        
-        exitComment();
+ 
         unfocusAllComponents();
     }
 }
  */
-
-void BKItem::bkTextFieldDidChange(TextEditor& tf)
-{
-    String text = tf.getText();
-    String name = tf.getName();
-    
-    if (name == comment.getName())
-    {
-        DBG(text);
-        unfocusAllComponents();
-        exitComment();
-    }
-}
 
 void BKItem::configureComment(void)
 {
@@ -316,6 +298,7 @@ void BKItem::paint(Graphics& g)
     
 }
 
+
 void BKItem::resized(void)
 {
 #if JUCE_IOS
@@ -375,48 +358,22 @@ void BKItem::itemIsBeingDragged(const MouseEvent& e)
 
 void BKItem::mouseDoubleClick(const MouseEvent& e)
 {
-#if JUCE_IOS
-    if (type == PreparationTypeComment)
-    {
-        enterComment();
-    }
-#else
+#if !JUCE_IOS
     if (type == PreparationTypePianoMap)
     {
         menu.showPopup();
     }
     else
     {
+        processor.updateState->comment = getCommentText();
         processor.updateState->setCurrentDisplay(type, Id);
     }
 #endif
     
 }
 
-void BKItem::exitComment(void)
-{
-    comment.setWantsKeyboardFocus(false);
-    
-    BKConstructionSite* cs = ((BKConstructionSite*)getParentComponent());
-    if (cs != nullptr) cs->edittingComment = false;
-    
-    comment.toBack();
-    comment.setHighlightedRegion(Range<int>(0,0));
-    //cs->grabKeyboardFocus();
-    
-}
-
-void BKItem::enterComment(void)
-{
-    comment.setWantsKeyboardFocus(true);
-    ((BKConstructionSite*)getParentComponent())->edittingComment = true;
-    comment.grabKeyboardFocus();
-    comment.toFront(true);
-}
-
-
 #define RESET 0
-#define PHATNESS 10
+#define PHATNESS 5
 
 void BKItem::mouseDown(const MouseEvent& e)
 {
@@ -921,8 +878,6 @@ void BKItemGraph::deselectAll(void)
 {
     for (auto item : processor.currentPiano->getItems())
     {
-        if (item->getType() == PreparationTypeComment)
-            item->exitComment();
         item->unfocusAllComponents();
         item->setSelected(false);
     }

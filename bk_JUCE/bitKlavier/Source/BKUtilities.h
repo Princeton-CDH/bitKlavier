@@ -176,13 +176,13 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
     
     if (numItemsSelected == 0)
     {
-        menu.addSubMenu("Add...", getNewItemMenu(laf));
-    }
-    
 #if JUCE_IOS
-    menu.addSeparator();
-    menu.addItem(KEYBOARD_ID, "Show/Hide Keyboard");
+        if (!onGraph) menu.addSubMenu("Add...", getNewItemMenu(laf));
+#else
+        menu.addSubMenu("Add...", getNewItemMenu(laf));
 #endif
+    }
+
     
     menu.addSeparator();
     menu.addItem(OFF_ID, "All Off");
