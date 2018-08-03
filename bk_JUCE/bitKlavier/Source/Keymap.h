@@ -166,6 +166,7 @@ public:
 	//totally randomizes keymap
 	inline void randomize()
 	{
+		Random::getSystemRandom().setSeedRandomly();
 		keymap.clear();
 		for (int i = 0; i < 128; i++)
 		{
@@ -177,6 +178,7 @@ public:
 	//sets keymap to a random keyset
 	inline void randomizeKeyset()
 	{
+		Random::getSystemRandom().setSeedRandomly();
 		KeySet set = (KeySet)(Random::getSystemRandom().nextInt(KeySetNil));
 		PitchClass pitch = (PitchClass)(Random::getSystemRandom().nextInt(PitchClassNil));
 		keymap.clear();

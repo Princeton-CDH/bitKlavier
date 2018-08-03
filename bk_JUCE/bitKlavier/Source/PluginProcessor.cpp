@@ -39,6 +39,7 @@ public:
         
         for (int i = 0; i < 5; i++)
         {
+			Random::getSystemRandom().setSeedRandomly();
             // create gallery and randomize it
             // call getState() to convert to ValueTree
             // call setState() to convert from ValueTree to preparation

@@ -244,6 +244,8 @@ public:
 
 	inline void randomize()
 	{
+		Random::getSystemRandom().setSeedRandomly();
+
 		float r[100];
 
 		for (int i = 0; i < 100; i++)  r[i] = (Random::getSystemRandom().nextFloat());

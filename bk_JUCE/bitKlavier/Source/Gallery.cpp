@@ -101,6 +101,8 @@ void Gallery::resetPreparations(void)
 
 void Gallery::randomize()
 {
+	Random::getSystemRandom().setSeedRandomly();
+
     BKSynthesiser* dummySynth;
     GeneralSettings::Ptr dummyGeneral = new GeneralSettings();
 
