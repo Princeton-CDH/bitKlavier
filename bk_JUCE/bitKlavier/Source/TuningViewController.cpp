@@ -108,11 +108,8 @@ BKViewController(p,theGraph)
     customOffsets.ensureStorageAllocated(12);
     for(int i=0; i<12; i++) customOffsets.add(0.);
 
-    customKeyboard.setName("scale");
-    //customKeyboard.setAvailableRange(60, 71);
+    customKeyboard.setName("offset from ET");
     customKeyboard.setDimensionRatio(2.0);
-    customKeyboard.setAvailableRange(0, 11);
-    customKeyboard.useOrderedPairs(false);
     customKeyboard.setFundamental(0);
     addAndMakeVisible(customKeyboard);
     
@@ -703,9 +700,8 @@ void TuningPreparationEditor::update(void)
         scaleCB.setSelectedItemIndex(prep->getTuning(), dontSendNotification);
         fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
         offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
-        
-        //absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
-        absoluteKeyboard.setValuesAbsolute(prep->getAbsoluteOffsetsCents());
+
+        absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
         Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         customKeyboard.setValues(currentTuning->getCurrentScaleCents());
         
@@ -911,8 +907,7 @@ void TuningModificationEditor::update(void)
         //                       offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
         
         val = mod->getParam(TuningAbsoluteOffsets);
-        //absoluteKeyboard.setValues(stringToFloatArray(val));
-        absoluteKeyboard.setValuesAbsolute(stringToFloatArray(val));
+        absoluteKeyboard.setValues(stringToFloatArray(val));
         //                       absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
         
         val = mod->getParam(TuningCustomScale);

@@ -38,9 +38,9 @@ public:
     
 protected:
     
-    OwnedArray<BKLabel> synchronicL;
-    OwnedArray<BKTextField> synchronicTF;
-    OwnedArray<BKTextField> modSynchronicTF;
+    //OwnedArray<BKLabel> synchronicL;
+    //OwnedArray<BKTextField> synchronicTF;
+    //OwnedArray<BKTextField> modSynchronicTF;
     
     OwnedArray<BKMultiSlider> paramSliders;
     OwnedArray<BKADSRSlider> envelopeSliders;
@@ -67,6 +67,8 @@ protected:
     ScopedPointer<BKSingleSlider> clusterThreshSlider;
     ScopedPointer<BKRangeSlider> clusterMinMaxSlider;
     ScopedPointer<BKSingleSlider> gainSlider;
+    
+    BKLabel modeLabel;
     
     void setShowADSR(String name, bool newval);
     int visibleADSR;

@@ -25,33 +25,40 @@ BKViewController(p, theGraph)
     selectCB.setName("Tempo");
     selectCB.addSeparator();
     selectCB.setSelectedItemIndex(0);
+    selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
     
     modeCB.setName("Mode");
     modeCB.BKSetJustificationType(juce::Justification::centredRight);
+    modeCB.setTooltip("Indicates whether in Constant or Adaptive mode");
     fillModeCB();
     addAndMakeVisible(modeCB);
     
     tempoSlider = new BKSingleSlider("Tempo", 40, 208, 100, 0.01);
+    tempoSlider->setToolTipString("Indicates current BPM");
     addAndMakeVisible(tempoSlider);
     
     AT1HistorySlider = new BKSingleSlider("History", 1, 10, 4, 1);
     AT1HistorySlider->setJustifyRight(false);
+    AT1HistorySlider->setToolTipString("Indicates how many notes Tempo is using to determine and generate an average pulse ");
     addAndMakeVisible(AT1HistorySlider);
     
     AT1SubdivisionsSlider = new BKSingleSlider("Subdivisions", 0., 12, 1, 0.01);
     AT1SubdivisionsSlider->setJustifyRight(false);
+    AT1SubdivisionsSlider->setToolTipString("Multiplies tempo by interpreting rhythmic value of played notes; values less than 1 will result in tempos slower than what is played, values greater than 1 will result in tempos faster than what is played");
     addAndMakeVisible(AT1SubdivisionsSlider);
     
     AT1MinMaxSlider = new BKRangeSlider("Min/Max (ms)", 1, 2000, 100, 500, 10);
     AT1MinMaxSlider->setJustifyRight(false);
     AT1MinMaxSlider->setIsMinAlwaysLessThanMax(true);
+    AT1MinMaxSlider->setToolTipString("Time within which Tempo will consider notes to be part of a constant pulse; any notes played futher apart than Max, or closer together than Min, will be ignored");
     addAndMakeVisible(AT1MinMaxSlider);
     
     A1ModeCB.setName("AT1Mode");
     addAndMakeVisible(A1ModeCB);
     fillA1ModeCB();
     A1ModeLabel.setText("Mode", dontSendNotification);
+    A1ModeCB.setTooltip("Indicates which aspect of performance Tempo is analyzing, using information from connected Keymap");
     addAndMakeVisible(A1ModeLabel);
     
     addAndMakeVisible(A1AdaptedTempo);
@@ -63,6 +70,7 @@ BKViewController(p, theGraph)
     
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
+    actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
     
 #if JUCE_IOS

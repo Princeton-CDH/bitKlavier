@@ -73,8 +73,8 @@ protected:
     
     BKLabel currentFundamental;
     
-    BKKeyboardSlider absoluteKeyboard;
-    BKKeyboardSlider customKeyboard;
+    BKAbsoluteKeyboardSlider absoluteKeyboard;
+    BKCircularKeyboardSlider customKeyboard; 
     
     ImageComponent iconImageComponent;
     BKButtonAndMenuLAF buttonsAndMenusLAF;
@@ -103,7 +103,9 @@ class TuningPreparationEditor :
 public TuningViewController,
 public BKEditableComboBoxListener,
 public BKSingleSlider::Listener,
-public BKKeyboardSlider::Listener,
+//public BKKeyboardSlider::Listener,
+public BKCircularKeyboardSlider::Listener,
+public BKAbsoluteKeyboardSlider::Listener,
 public Timer
 {
 public:
@@ -140,7 +142,9 @@ class TuningModificationEditor :
 public TuningViewController,
 public BKEditableComboBoxListener,
 public BKSingleSlider::Listener,
-public BKKeyboardSlider::Listener
+//public BKKeyboardSlider::Listener,
+public BKCircularKeyboardSlider::Listener,
+public BKAbsoluteKeyboardSlider::Listener
 {
 public:
     

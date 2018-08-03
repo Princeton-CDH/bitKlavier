@@ -47,6 +47,19 @@ BKViewController(p, theGraph)
             {
                 paramSliders[idx]->setAllowSubSlider(true);
                 paramSliders[idx]->setSubSliderName("add transposition");
+                paramSliders[idx]->setToolTipString("Determines pitch of sequenced notes or chords; control-click to add another voice, double-click to edit all or add additional sequence steps");
+            }
+            else if(paramSliders[idx]->getName() == "accents")
+            {
+                paramSliders[idx]->setToolTipString("Determines gain of sequenced pitches; double-click to edit all or add additional sequence steps");
+            }
+            else if(paramSliders[idx]->getName() == "sustain length multipliers")
+            {
+                paramSliders[idx]->setToolTipString("Determines duration of each sequenced note; double-click to edit all or add additional sequence steps");
+            }
+            else if(paramSliders[idx]->getName() == "beat length multipliers")
+            {
+                paramSliders[idx]->setToolTipString("Determines length of each sequenced beat as a factor of Synchronic tempo; double-click to edit all or add additional sequence steps");
             }
             
             /* // need this?
@@ -65,6 +78,7 @@ BKViewController(p, theGraph)
     for(int i=0; i<12; i++)
     {
         envelopeSliders.insert(i, new BKADSRSlider("e"+String(i)));
+        envelopeSliders[i]->setToolTip("Provides ADSR settings for up to 12 sequenced steps");
         envelopeSliders[i]->setButtonText("");
         envelopeSliders[i]->toFront(false);
         //envelopeSliders[i]->setAlpha(0.5);
@@ -79,34 +93,46 @@ BKViewController(p, theGraph)
     selectCB.addSeparator();
     selectCB.addListener(this);
     selectCB.setSelectedId(1, dontSendNotification);
+    selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
     
     modeSelectCB.setName("Mode");
     modeSelectCB.addSeparator();
     modeSelectCB.BKSetJustificationType(juce::Justification::centredRight);
     modeSelectCB.setSelectedItemIndex(0);
+    modeSelectCB.setTooltip("Determines which aspect of MIDI signal triggers the Synchronic sequence");
     fillModeSelectCB();
     addAndMakeVisible(modeSelectCB);
     
+    modeLabel.setText("triggers pulse", dontSendNotification);
+    modeLabel.setTooltip("Determines which aspect of MIDI signal triggers the Synchronic sequence");
+    //modeLabel.setJustificationType(Justification::bottomLeft);
+    addAndMakeVisible(modeLabel);
+    
     //offsetParamStartToggle = new BKSingleSlider("skip first", 0, 1, 0, 1);
     offsetParamStartToggle.setButtonText ("skip first");
+    offsetParamStartToggle.setTooltip("Indicates whether Synchronic will skip first column of sequenced parameters for first cycle");
     buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
     offsetParamStartToggle.setToggleState (true, dontSendNotification);
     addAndMakeVisible(offsetParamStartToggle);
     
     howManySlider = new BKSingleSlider("how many", 1, 100, 20, 1);
+    howManySlider->setToolTipString("Indicates number of steps/repetitions in Synchronic pulse");
     howManySlider->setJustifyRight(false);
     addAndMakeVisible(howManySlider);
         
     clusterThreshSlider = new BKSingleSlider("cluster threshold", 20, 2000, 200, 10);
+    clusterThreshSlider->setToolTipString("Indicates window of time (milliseconds) within which notes are grouped as a cluster");
     clusterThreshSlider->setJustifyRight(false);
     addAndMakeVisible(clusterThreshSlider);
     
     clusterMinMaxSlider = new BKRangeSlider("cluster min/max", 1, 12, 3, 4, 1);
+    clusterMinMaxSlider->setToolTipString("Sets Min and Max numbers of keys pressed to launch pulse; Min can be greater than Max");
     clusterMinMaxSlider->setJustifyRight(false);
     addAndMakeVisible(clusterMinMaxSlider);
     
     gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
+    gainSlider->setToolTipString("Overall volume of Synchronic pulse");
     gainSlider->setJustifyRight(false);
     gainSlider->setSkewFactorFromMidPoint(1.);
     addAndMakeVisible(gainSlider);
@@ -130,9 +156,11 @@ BKViewController(p, theGraph)
     
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
+    actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
     
     envelopeName.setText("envelopes", dontSendNotification);
+    //envelopeName.setTooltip("Provides ADSR settings for up to 12 sequenced steps");
     envelopeName.setJustificationType(Justification::centredRight);
     envelopeName.toBack();
     envelopeName.setInterceptsMouseClicks(false, true);
@@ -176,8 +204,12 @@ void SynchronicViewController::resized()
     {
         Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
         modeSlice.removeFromRight(gXSpacing);
-        modeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
-        offsetParamStartToggle.setBounds(modeSlice);
+        //modeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 3.));
+        //offsetParamStartToggle.setBounds(modeSlice);
+        //modeSlice.removeFromLeft(4 + 2.*gPaddingConst * processor.paddingScalarX);
+        //offsetParamStartToggle.setBounds(modeSlice.removeFromLeft(modeSelectCB.getWidth()));
+        offsetParamStartToggle.setBounds(modeSlice.removeFromRight(modeSlice.getWidth()));
+                                         
         
         Rectangle<float> envelopeSlice = area.removeFromBottom(gComponentComboBoxHeight + gPaddingConst * processor.paddingScalarY).toFloat();
         
@@ -207,30 +239,85 @@ void SynchronicViewController::resized()
         leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
         //leftColumn.removeFromLeft(gXSpacing);
         
+        leftColumn.removeFromTop(gPaddingConst * (1. - processor.paddingScalarY));
+        leftColumn.removeFromBottom(gYSpacing * 2);
+        int sliderHeight = leftColumn.getHeight() / 5;
+        
+        /*
+        Rectangle<int> modeSlice2 = leftColumn.removeFromTop(sliderHeight);
+        modeSlice2.removeFromLeft(gXSpacing * 2);
+        modeSlice2.removeFromTop(gYSpacing * 2);
+        modeSlice2.removeFromRight(modeSlice2.getWidth() / 3);
+        modeSelectCB.setBounds(modeSlice2.removeFromTop(gComponentComboBoxHeight));
+        howManySlider->setBounds(leftColumn.removeFromTop(sliderHeight));
+        clusterThreshSlider->setBounds(leftColumn.removeFromTop(sliderHeight));
+        clusterMinMaxSlider->setBounds(leftColumn.removeFromTop(sliderHeight));
+        gainSlider->setBounds(leftColumn.removeFromTop(sliderHeight));
+         */
+        
+        gainSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
+        leftColumn.removeFromBottom(sliderHeight - gComponentSingleSliderHeight);
+        
+        clusterMinMaxSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
+        leftColumn.removeFromBottom(sliderHeight - gComponentSingleSliderHeight);
+        
+        clusterThreshSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
+        leftColumn.removeFromBottom(sliderHeight - gComponentSingleSliderHeight);
+        
+        howManySlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
+        leftColumn.removeFromBottom(sliderHeight - gComponentSingleSliderHeight);
+        
+        Rectangle<int> modeSlice2 = leftColumn.removeFromBottom(gComponentComboBoxHeight);
+        modeSlice2.removeFromLeft(gXSpacing * 2);
+        int modeSlice2Chunk = modeSlice2.getWidth() / 3;
+        modeSlice2.removeFromRight(modeSlice2Chunk);
+        modeLabel.setBounds(modeSlice2.removeFromRight(modeSlice2Chunk));
+        modeSelectCB.setBounds(modeSlice2);
+        
+        /*
+        int sliderSpacing = leftColumn.getHeight() / 4;
+        
+        modeSelectCB.setBounds(leftColumn.getX() + gXSpacing * 2,
+                               //sliderSpacing * 1 - gComponentComboBoxHeight/2.,
+                               //sliderSpacing * 1,
+                               leftColumn.getY() + gYSpacing * 2,
+                               leftColumn.getWidth() / 3,
+                               gComponentComboBoxHeight);
+        
         int nextCenter = paramSliders[0]->getY() + paramSliders[0]->getHeight()  + gPaddingConst * (1. - processor.paddingScalarY) ;
         howManySlider->setBounds(leftColumn.getX(),
-                                 nextCenter - gComponentSingleSliderHeight/2.,
+                                 //nextCenter - gComponentSingleSliderHeight/2.,
+                                 //sliderSpacing * 2 - gComponentSingleSliderHeight/2.,
+                                 leftColumn.getY() + sliderSpacing * 1,
                                  leftColumn.getWidth(),
                                  gComponentSingleSliderHeight);
 
         nextCenter = paramSliders[1]->getY() + paramSliders[1]->getHeight()  + gPaddingConst * (1. - processor.paddingScalarY);
         clusterThreshSlider->setBounds(leftColumn.getX(),
-                                       nextCenter - gComponentSingleSliderHeight/2.,
+                                       //nextCenter - gComponentSingleSliderHeight/2.,
+                                       //sliderSpacing * 3 - gComponentSingleSliderHeight/2.,
+                                       leftColumn.getY() + sliderSpacing * 2,
                                        leftColumn.getWidth(),
                                        gComponentSingleSliderHeight);
         
         nextCenter = paramSliders[2]->getY() + paramSliders[2]->getHeight()  + gPaddingConst * (1. - processor.paddingScalarY);
         clusterMinMaxSlider->setBounds(leftColumn.getX(),
-                                       nextCenter - gComponentRangeSliderHeight/2.,
+                                       //nextCenter - gComponentRangeSliderHeight/2.,
+                                       //sliderSpacing * 4 - gComponentSingleSliderHeight/2.,
+                                       leftColumn.getY() + sliderSpacing * 3,
                                        leftColumn.getWidth(),
                                        gComponentRangeSliderHeight);
         
         //nextCenter = paramSliders[3]->getY() + paramSliders[3]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
         nextCenter = envelopeSliders[0]->getY() + gPaddingConst * (1. - processor.paddingScalarY);
         gainSlider->setBounds(leftColumn.getX(),
-                              nextCenter - gComponentSingleSliderHeight/2.,
+                              //nextCenter - gComponentSingleSliderHeight/2.,
+                              //sliderSpacing * 5 - gComponentSingleSliderHeight/2.,
+                              leftColumn.getY() + sliderSpacing * 4,
                               leftColumn.getWidth(),
                               gComponentSingleSliderHeight);
+        
+        */
         
         Rectangle<int> releaseToggleSlice = gainSlider->getBounds().removeFromTop(gComponentTextFieldHeight);
         releaseToggleSlice.removeFromRight(gYSpacing);
@@ -275,6 +362,7 @@ void SynchronicViewController::setShowADSR(String name, bool newval)
         clusterMinMaxSlider->setVisible(false);
         offsetParamStartToggle.setVisible(false);
         modeSelectCB.setVisible(false);
+        modeLabel.setVisible(false);
         
         for(int i=0; i<envelopeSliders.size(); i++)
         {
@@ -297,6 +385,7 @@ void SynchronicViewController::setShowADSR(String name, bool newval)
         clusterMinMaxSlider->setVisible(true);
         offsetParamStartToggle.setVisible(true);
         modeSelectCB.setVisible(true);
+        modeLabel.setVisible(true);
         
         for(int i=0; i<envelopeSliders.size(); i++)
         {
@@ -625,6 +714,10 @@ void SynchronicPreparationEditor::BKADSRSliderValueChanged(String name, int atta
     active->setSustain(which, sustain);
     prep->setRelease(which, release);
     active->setRelease(which, release);
+    
+    prep->setEnvelopeOn(which, true);
+    active->setEnvelopeOn(which, true);
+    envelopeSliders[which]->setBright();
     
 }
 

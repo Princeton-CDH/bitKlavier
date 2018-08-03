@@ -299,6 +299,9 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
             }
         }
         
+        for (auto proc : tprocessor)
+            proc->keyPressed(noteNumber);
+        
         for (auto proc : dprocessor)
             proc->keyPressed(noteNumber, velocity, channel);
         
@@ -307,9 +310,6 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
         
         for (auto proc : nprocessor)
             proc->keyPressed(noteNumber, velocity, channel);
-        
-        for (auto proc : tprocessor)
-            proc->keyPressed(noteNumber);
         
         for (auto proc : mprocessor)
             proc->keyPressed(noteNumber, velocity);

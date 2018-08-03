@@ -610,6 +610,24 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
         // always increment length
         lengthTracker += bentRatio;
         
+        //for reverse notes longer than sample length, write 0's, then continue
+        if ((adsr.getState() != stk::ADSR::IDLE) &&
+            (playDirection == Reverse) &&
+            (samplePosition > playingSound->soundLength - 1))
+        {
+            if (outR != nullptr)
+            {
+                *outL++ += 0;
+                *outR++ += 0;
+            }
+            else
+            {
+                *outL++ += 0;
+            }
+            samplePosition -= bentRatio;
+            continue;
+        }
+        
         //==============SAMPLE STUFF=================
         float sampleL, sampleR;
         if (playDirection == Forward)   samplePosition += bentRatio;

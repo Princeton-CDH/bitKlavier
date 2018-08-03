@@ -21,28 +21,32 @@ construction(c)
 
     addAndMakeVisible(galleryB);
     galleryB.setButtonText("Gallery");
+    galleryB.setTooltip("Create, duplicate, rename, share current Gallery. Also access bitKlavier settings");
     galleryB.addListener(this);
     
     addAndMakeVisible(pianoB);
     pianoB.setButtonText("Piano");
+    pianoB.setTooltip("Create, duplicate, rename, or delete current Piano");
     pianoB.addListener(this);
     
     addAndMakeVisible(editB);
     editB.setButtonText("Action");
+    editB.setTooltip("Add a preparation. Also, stop all internal bitKlavier signals");
     editB.addListener(this);
     
     // Gallery CB
     addAndMakeVisible(galleryCB);
     galleryCB.setName("galleryCB");
+    galleryCB.setTooltip("Select and load saved bitKlavier Galleries. Indicates currently loaded Gallery");
     galleryCB.addListener(this);
     //galleryCB.BKSetJustificationType(juce::Justification::centredRight);
-    
     galleryCB.setLookAndFeel(&comboBoxLeftJustifyLAF);
     galleryCB.setSelectedId(0, dontSendNotification);
     
     // Piano CB
     addAndMakeVisible(pianoCB);
     pianoCB.setName("pianoCB");
+    pianoCB.setTooltip("Select and load saved bitKlavier Pianos. Indicates currently loaded Piano");
     pianoCB.addListener(this);
     
 #if JUCE_IOS || JUCE_MAC

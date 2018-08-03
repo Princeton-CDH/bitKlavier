@@ -275,9 +275,8 @@ public:
     
     void setKeyValue(int midiNoteNumber, float val);
     void setValuesRotatedByFundamental(Array<float> vals);
-    Array<float> getValuesRotatedByFundamental();
-    void setValuesDirectly(Array<float> vals);
-    Array<float> getValuesDirectly();
+    void setValues(Array<float> vals);
+    Array<float> getValues();
     float getLastNoteOverValue();
     
     void doKeysToggle(bool tog) { keysToggle = tog; }

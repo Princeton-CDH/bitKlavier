@@ -22,7 +22,9 @@
 #include "BKGraph.h"
 
 #include "BKSlider.h"
-#include "BKKeyboardSlider.h"
+//#include "BKKeyboardSlider.h"
+#include "BKCircularKeyboardSlider.h"
+#include "BKAbsoluteKeyboardSlider.h"
 
 class BigOne : public Component, public BKListener
 {

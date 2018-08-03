@@ -120,6 +120,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     //add note to array of depressed notes
     keysDepressed.addIfNotAlreadyThere(noteNumber);
     
+    //don't need this here? since it's in processBlock()?
     beatThresholdSamples = (tempo->getTempo()->aPrep->getBeatThresh() * sampleRate);
     numSamplesBeat =    beatThresholdSamples *
                         synchronic->aPrep->getBeatMultipliers()[beatMultiplierCounter] *
@@ -185,9 +186,6 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     //remove key from array of pressed keys
     keysDepressed.removeAllInstancesOf(noteNumber);
     
-    //adaptive tempo
-    //atNewNoteOff();
-    
     // If AnyNoteOffSync mode, reset phasor and multiplier indices.
     //only initiate pulses if ALL keys are released
     if ((synchronic->aPrep->getMode() == LastNoteOffSync && keysDepressed.size() == 0) || 
@@ -211,10 +209,9 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
 
 void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoadType type)
 {
-    //need to do this every block?
+    //do this every block, for adaptive tempo updates
     sampleType = type;
     clusterThresholdSamples = (synchronic->aPrep->getClusterThreshSEC() * sampleRate);
-    //beatThresholdSamples = (synchronic->aPrep->getBeatThresh() * sampleRate);
     beatThresholdSamples = (tempo->getTempo()->aPrep->getBeatThresh() * sampleRate);
     
     //cluster management
@@ -251,7 +248,6 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
         
         //remove duplicates from cluster, so we don't play the same note twice in a single pulse
         slimCluster.clearQuick();
-        //for(int i = 0; i< cluster.size(); i++) slimCluster.addIfNotAlreadyThere(cluster.getUnchecked(i));
         for(int i = 0; i< tempCluster.size(); i++) slimCluster.addIfNotAlreadyThere(tempCluster.getUnchecked(i));
         
         //get time until next beat => beat length scaled by beatMultiplier parameter
@@ -313,22 +309,14 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
             //if (cluster.size() >= synchronic->aPrep->getClusterMin() && cluster.size() <= synchronic->aPrep->getClusterMax())
             if(playCluster)
             {
-                //for (int n = slimCluster.size(); --n >= 0;)
-                //for (int n=0; n < cluster.size(); n++)
                 for (int n=0; n < slimCluster.size(); n++)
                 {
-                    
-                    /*playNote(channel,
-                             cluster[n],
-                             velocities.getUnchecked(cluster[n]));*/
-                     
-                   
+
 					playNote(channel,
                              slimCluster[n],
                              velocities.getUnchecked(slimCluster[n]));
 					
                 }
-                
             }
             
             //increment beat and beatMultiplier counters, for next beat; check maxes and adjust

@@ -13,7 +13,8 @@
               maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
               displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Light"
               buildStandalone="1" enableIAA="1" cppLanguageStandard="11" companyCopyright="manyarrowsmusic"
-              pluginFormats="buildVST,buildAU,buildStandalone,enableIAA" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut,pluginEditorRequiresKeys">
+              pluginFormats="buildVST,buildAU,buildStandalone,enableIAA" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut,pluginEditorRequiresKeys"
+              pluginVST3Category="Instrument">
   <MAINGROUP id="s4R02g" name="bitKlavier">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
       <GROUP id="{1E3013D4-6B2A-D996-A5C8-F92AE44A39F2}" name="Resources">
@@ -344,16 +345,20 @@
           <FILE id="SZIe4m" name="BKLevelMeter.h" compile="0" resource="0" file="Source/BKLevelMeter.h"/>
         </GROUP>
         <GROUP id="{CAAFD165-DFE7-A7F9-44CA-A33CEFE40708}" name="BKKeyboard">
+          <FILE id="XMOl2D" name="BKAbsoluteKeyboardSlider.cpp" compile="1" resource="0"
+                file="Source/BKAbsoluteKeyboardSlider.cpp"/>
+          <FILE id="UwvVBT" name="BKAbsoluteKeyboardSlider.h" compile="0" resource="0"
+                file="Source/BKAbsoluteKeyboardSlider.h"/>
+          <FILE id="NhsMzJ" name="BKCircularKeyboardSlider.cpp" compile="1" resource="0"
+                file="Source/BKCircularKeyboardSlider.cpp"/>
+          <FILE id="MNLlJ3" name="BKCircularKeyboardSlider.h" compile="0" resource="0"
+                file="Source/BKCircularKeyboardSlider.h"/>
           <FILE id="oxVQCp" name="BKKeyboard.cpp" compile="1" resource="0" file="Source/BKKeyboard.cpp"/>
           <FILE id="IrRGH7" name="BKKeyboard.h" compile="0" resource="0" file="Source/BKKeyboard.h"/>
           <FILE id="Gzzl3Q" name="BKKeyboardState.cpp" compile="1" resource="0"
                 file="Source/BKKeyboardState.cpp"/>
           <FILE id="whgJO1" name="BKKeyboardState.h" compile="0" resource="0"
                 file="Source/BKKeyboardState.h"/>
-          <FILE id="xFL3Cb" name="BKKeyboardSlider.cpp" compile="1" resource="0"
-                file="Source/BKKeyboardSlider.cpp"/>
-          <FILE id="xXx0sS" name="BKKeyboardSlider.h" compile="0" resource="0"
-                file="Source/BKKeyboardSlider.h"/>
         </GROUP>
         <GROUP id="{4B499D6C-5305-4070-7065-5CC7E1297454}" name="BKMenu">
           <FILE id="iHLTYB" name="BKMenu.h" compile="0" resource="0" file="Source/BKMenu.h"/>
