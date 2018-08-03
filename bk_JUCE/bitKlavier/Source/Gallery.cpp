@@ -132,7 +132,7 @@ void Gallery::randomize()
 	{
 		BKSynthesiser* dummySynth;
 		GeneralSettings::Ptr dummyGeneral = new GeneralSettings();
-        
+
 		//each piano
 		for (int h = 0; h < Random::getSystemRandom().nextInt(Range<int>(1, 5)); h++)
 		{

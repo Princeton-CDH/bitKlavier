@@ -37,6 +37,11 @@ public:
     {
         beginTest("GalleryXML");
         
+        String xmlData = CharPointer_UTF8 (BinaryData::Basic_Piano_xml);
+        
+        processor.defaultLoaded = true;
+        processor.defaultName = "Basic_Piano_xml";
+        
         for (int i = 0; i < 5; i++)
         {
             // create gallery and randomize it
@@ -46,23 +51,17 @@ public:
             String name = "random gallery " + String(i);
             DBG("test consistency: " + name);
             
-            ScopedPointer<XmlElement> dummyXml;
-            
-            String xmlData = CharPointer_UTF8 (BinaryData::Basic_Piano_xml);
-            
-            processor.defaultLoaded = true;
-            processor.defaultName = "Basic_Piano_xml";
-            
+            // GALLERY 1
             processor.loadGalleryFromXml(XmlDocument::parse(xmlData), true);
             processor.gallery->randomize();
-            DBG("randomize done");
             processor.gallery->setName(name);
             
             ValueTree vt1 = processor.gallery->getState();
             
             ScopedPointer<XmlElement> xml = vt1.createXml();
             
-            processor.gallery->randomize();
+            // GALLERY 2
+            processor.loadGalleryFromXml(XmlDocument::parse(xmlData), true);
             processor.gallery->setStateFromXML(xml);
             processor.gallery->setName(name);
             
