@@ -103,7 +103,6 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 newKeymap->setId(e->getStringAttribute("Id").getIntValue());
                 
                 if (n != String::empty)     newKeymap->setName(n);
-                else                        newKeymap->setName(String(newKeymap->getId()));
                 
                 Array<int> keys;
                 for (int k = 0; k < 128; k++)
