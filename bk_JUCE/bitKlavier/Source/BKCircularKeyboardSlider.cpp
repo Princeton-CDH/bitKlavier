@@ -11,9 +11,8 @@
 #include "BKCircularKeyboardSlider.h"
 
 
-BKCircularKeyboardSlider::BKCircularKeyboardSlider(bool nos):
-ratio(1.0),
-needsOctaveSlider(nos)
+BKCircularKeyboardSlider::BKCircularKeyboardSlider(void):
+ratio(1.0)
 {
     
     addAndMakeVisible (keyboardComponent =
@@ -269,8 +268,7 @@ void BKCircularKeyboardSlider::bkButtonClicked (Button* b)
         
 #if JUCE_IOS
         hasBigOne = true;
-        WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, keyboardValsTextField,
-                                    needsOctaveSlider ? "absolute offsets" : "scale offsets");
+        WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, keyboardValsTextField, "scale offsets");
 #else
         
         focusLostByEscapeKey = false;

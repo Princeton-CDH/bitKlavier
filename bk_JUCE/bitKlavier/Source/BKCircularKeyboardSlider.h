@@ -25,15 +25,14 @@ public BKComponent,
 public BKListener,
 public BKKeymapKeyboardStateListener
 #if JUCE_IOS
-, private juce::Slider::Listener,
-public WantsBigOne
+, public WantsBigOne
 #endif
 {
     
 public:
     
-    BKCircularKeyboardSlider(bool needsOctaveSlider = false);
-    ~BKCircularKeyboardSlider()
+    BKCircularKeyboardSlider(void);
+    ~BKCircularKeyboardSlider(void)
     {
         //delete keyboardComponent;
     };
@@ -99,10 +98,7 @@ private:
     String sliderName;
     BKLabel showName;
     
-    bool needsOctaveSlider;
 #if JUCE_IOS
-    Slider octaveSlider;
-    void sliderValueChanged     (Slider* slider)                override;
     BKButtonAndMenuLAF laf;
 #endif
     
