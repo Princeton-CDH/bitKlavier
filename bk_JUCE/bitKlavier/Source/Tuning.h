@@ -99,6 +99,37 @@ public:
                 nToneRoot == p->getNToneRoot() &&
                 (tAdaptiveHistory == p->getAdaptiveHistory()) && custom && absolute);
     }
+
+	inline void randomize()
+	{
+		float r[21];
+
+		for (int i = 0; i < 21; i++)  r[i] = (Random::getSystemRandom().nextFloat());
+		int idx = 0;
+
+
+		tWhichTuning = (TuningSystem)(int)( r[idx++] * TuningSystemNil);
+		tFundamental = (PitchClass)(int)(r[idx++] * PitchClassNil);
+		tFundamentalOffset = r[idx++] * 48.0f - 24.0f;
+		tAdaptiveIntervalScale = (TuningSystem)(int)(r[idx++] * TuningSystemNil);
+		tAdaptiveInversional = (bool)((int) (r[idx++] * 2));
+		tAdaptiveAnchorScale = (TuningSystem)(int)(r[idx++] * TuningSystemNil);
+		tAdaptiveAnchorFundamental = (PitchClass)(int)(r[idx++] * PitchClassNil);
+		tAdaptiveClusterThresh = (uint64) (r[idx++] * 50000);
+		tAdaptiveHistory = (int)(r[idx++] * 100) + 1;
+		tCustom.clear();
+		for (int i = 0; i < 12; ++i)
+		{
+			tCustom.add(i, (Random::getSystemRandom().nextFloat() * 2.0f - 1.0f));
+		}
+		tAbsolute.clear();
+		for (int i = 0; i < 128; ++i)
+		{
+			tAbsolute.add(i, (Random::getSystemRandom().nextFloat() * 2.0f - 1.0f));
+		}
+		nToneSemitoneWidth = r[idx++] * 200.0f;
+		nToneRoot = (int)(r[idx++] * 127) + 1;
+	}
     
     TuningPreparation(TuningSystem whichTuning,
                       PitchClass fundamental,
@@ -312,12 +343,13 @@ public:
         tuningLibrary.set(UtonalTuning, tUtonalTuning);
     }
     
-    Tuning(int Id):
+	Tuning(int Id, bool random = false) :
     Id(Id),
     name(String(Id))
     {
-        sPrep = new TuningPreparation();
-        aPrep = new TuningPreparation(sPrep);
+		sPrep = new TuningPreparation();
+		aPrep = new TuningPreparation(sPrep);
+		if (random) randomize();
         
         tuningLibrary.ensureStorageAllocated((int)cTuningSystemNames.size());
         for(int i=0; i<cTuningSystemNames.size(); i++) tuningLibrary.insert(EqualTemperament, tEqualTuning);
@@ -370,6 +402,15 @@ public:
         sPrep->copy(from->sPrep);
         aPrep->copy(sPrep);
     }
+
+	inline void randomize()
+	{
+		clear();
+		sPrep->randomize();
+		aPrep->randomize();
+		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
+		name = "random";
+	}
     
     
     inline String getName(void) const noexcept {return name;}
@@ -524,6 +565,24 @@ public:
                 getParam(TuningAbsoluteOffsets) == t->getParam(TuningAbsoluteOffsets));
             
     }
+
+	inline void randomize()
+	{
+		TuningPreparation p;
+		p.randomize();
+
+		param.set(TuningScale, String(p.getTuning()));
+		param.set(TuningFundamental, String(p.getFundamental()));
+		param.set(TuningOffset, String(p.getFundamentalOffset()));
+		param.set(TuningA1IntervalScale, String(p.getAdaptiveIntervalScale()));
+		param.set(TuningA1Inversional, String((int)p.getAdaptiveInversional()));
+		param.set(TuningA1AnchorScale, String(p.getAdaptiveAnchorScale()));
+		param.set(TuningA1AnchorFundamental, String(p.getAdaptiveAnchorFundamental()));
+		param.set(TuningA1ClusterThresh, String(p.getAdaptiveClusterThresh()));
+		param.set(TuningA1History, String(p.getAdaptiveHistory()));
+		param.set(TuningCustomScale, floatArrayToString(p.getCustomScale()));
+		param.set(TuningAbsoluteOffsets, offsetArrayToString(p.getAbsoluteOffsets()));
+	}
     
     void clearAll()
     {

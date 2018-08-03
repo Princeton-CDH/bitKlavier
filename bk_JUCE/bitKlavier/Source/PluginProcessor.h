@@ -42,7 +42,7 @@ public:
     void loadGalleryDialog(void);
     void loadJsonGalleryDialog(void);
     void loadGalleryFromPath(String path);
-    void loadGalleryFromXml(ScopedPointer<XmlElement> xml, bool firstTime = false);
+    void loadGalleryFromXml(ScopedPointer<XmlElement> xml);
     void loadJsonGalleryFromPath(String path);
     void saveCurrentGalleryAs(void);
     void saveCurrentGallery(void);

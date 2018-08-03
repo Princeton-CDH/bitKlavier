@@ -162,6 +162,26 @@ public:
     
         return true;
     }
+
+	//totally randomizes keymap
+	inline void randomize()
+	{
+		keymap.clear();
+		for (int i = 0; i < 128; i++)
+		{
+			keymap.add(i, Random::getSystemRandom().nextBool());
+		}
+		setName("random");
+	}
+
+	//sets keymap to a random keyset
+	inline void randomizeKeyset()
+	{
+		KeySet set = (KeySet)(Random::getSystemRandom().nextInt(KeySetNil));
+		PitchClass pitch = (PitchClass)(Random::getSystemRandom().nextInt(PitchClassNil));
+		keymap.clear();
+		setKeys(set, true, pitch);
+	}
     
     inline void setId(int ident) {   Id = ident; }
 
@@ -414,7 +434,5 @@ private:
     
     JUCE_LEAK_DETECTOR (Keymap)
 };
-
-
 
 #endif  // KEYMAP_H_INCLUDED

@@ -683,7 +683,7 @@ public:
 		//test ftom
 		for (int i = 0; i < 10; i++)
 		{
-			double r = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
+			double r = Random::getSystemRandom().nextDouble();
 			double freq1 = r * MAX_FREQ;
 			double freq2 = mtof(ftom(freq1));
 			expect(abs(freq1 - freq2) < 0.005, String(freq1) + " and " + String(freq2) + " do not match");
@@ -694,7 +694,7 @@ public:
 		//test mtof
 		for (int i = 0; i < 10; i++)
 		{
-			double r = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
+			double r = Random::getSystemRandom().nextDouble();
 			double midi1 = r * 128.0;
 			double midi2 = ftom(mtof(midi1));
 			expect(abs(midi1 - midi2) < 0.005, String(midi1) + " and " + String(midi2) + " do not match");

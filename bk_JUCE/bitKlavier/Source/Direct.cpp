@@ -182,7 +182,7 @@ public:
             // call getState() to convert to ValueTree
             // call setState() to convert from ValueTree to preparation
             // compare begin and end states
-            String name = "random direct " + String(i);
+            String name = "random direct preparation " + String(i);
             DBG("test consistency: " + name);
             
             DirectPreparation::Ptr dp1 = new DirectPreparation();
@@ -203,10 +203,41 @@ public:
             
             ValueTree vt2 = d2.getState();
             
-            expect(vt1.isEquivalentTo(vt2), "direct value trees don't match");
+            expect(vt1.isEquivalentTo(vt2), "direct preparation value trees don't match");
             
             expect(dp2->compare(dp1), dp1->getName() + " and " + dp2->getName() + " did not match.");
         }
+
+		//test direct wrapper class
+		for (int i = 0; i < 10; i++)
+		{
+			// create direct and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random direct " + String(i);
+			DBG("test consistency: " + name);
+
+			Direct d1(-1, true);
+			d1.setName(name);
+
+			ValueTree vt1 = d1.getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			Direct d2(-1, true);
+
+			d2.setState(xml);
+			d2.setName(name);
+
+			ValueTree vt2 = d2.getState();
+
+			expect(vt1.isEquivalentTo(vt2),
+				"direct: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
+		}
         
     }
 };
@@ -224,7 +255,7 @@ public:
         
         for (int i = 0; i < 10; i++)
         {
-            // create direct preparation and randomize it
+            // create direct mod preparation and randomize it
             // call getState() to convert to ValueTree
             // call setState() to convert from ValueTree to preparation
             // compare begin and end states

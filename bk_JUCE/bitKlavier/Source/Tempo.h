@@ -76,6 +76,22 @@ public:
                 at1Subdivisions == s->getAdaptiveTempo1Subdivisions() &&
                 at1Mode == s->getAdaptiveTempo1Mode());
     }
+
+	inline void randomize(void)
+	{
+		float r[10];
+
+		for (int i = 0; i < 10; i++)  r[i] = (Random::getSystemRandom().nextFloat());
+		int idx = 0;
+
+		sTempo = r[idx++];
+		sWhichTempoSystem = (TempoType)(int)(r[idx++] * TempoSystemNil);
+		at1History = r[idx++];
+		at1Min = r[idx++];
+		at1Max = r[idx++];
+		at1Subdivisions = r[idx++];
+		at1Mode = (AdaptiveTempo1Mode)(int)(r[idx++] * AdaptiveTempo1ModeNil);
+	}
     
     inline const TempoType getTempoSystem() const noexcept      {return sWhichTempoSystem; }
     inline const float getTempo() const noexcept                {return sTempo; }
@@ -101,11 +117,11 @@ public:
     }
     
     //Adaptive Tempo 1
-    inline void setAdaptiveTempo1Mode(AdaptiveTempo1Mode mode)          {at1Mode = mode; DBG("AT1mode = " + String(mode));}
-    inline void setAdaptiveTempo1History(int hist)                      {at1History = hist; DBG("AT1history = " + String(hist));}
-    inline void setAdaptiveTempo1Subdivisions(float sub)                {at1Subdivisions = sub; DBG("at1Subdivisions = " + String(sub));}
-    inline void setAdaptiveTempo1Min(float min)                         {at1Min = min; DBG("at1Min = " + String(min));}
-    inline void setAdaptiveTempo1Max(float max)                         {at1Max = max; DBG("at1Man = " + String(max));}
+    inline void setAdaptiveTempo1Mode(AdaptiveTempo1Mode mode)          {at1Mode = mode;}
+    inline void setAdaptiveTempo1History(int hist)                      {at1History = hist;}
+    inline void setAdaptiveTempo1Subdivisions(float sub)                {at1Subdivisions = sub;}
+    inline void setAdaptiveTempo1Min(float min)                         {at1Min = min;}
+    inline void setAdaptiveTempo1Max(float max)                         {at1Max = max;}
 
     
     void print(void)
@@ -154,12 +170,13 @@ public:
         
     }
     
-    Tempo(int Id):
+    Tempo(int Id, bool random = false):
     Id(Id),
     name(String(Id))
     {
-        sPrep = new TempoPreparation();
-        aPrep = new TempoPreparation(sPrep);
+		sPrep = new TempoPreparation();
+		aPrep = new TempoPreparation(sPrep);
+		if (random) randomize();
     }
     
     inline void clear(void)
@@ -254,6 +271,14 @@ public:
         sPrep->copy(from->sPrep);
         aPrep->copy(sPrep);
     }
+
+	inline void randomize()
+	{
+		clear();
+		sPrep->randomize();
+		aPrep->randomize();
+		name = "random";
+	}
     
     inline String getName(void) const noexcept {return name;}
     
@@ -365,6 +390,20 @@ public:
                 getParam(AT1Mode)           == t->getParam(AT1Mode));
     }
     
+	inline void randomize(void)
+	{
+		TempoPreparation p;
+		p.randomize();
+
+		param.set(TempoBPM, String(p.getTempo()));
+		param.set(TempoSystem, String(p.getTempoSystem()));
+		param.set(AT1History, String(p.getAdaptiveTempo1History()));
+		param.set(AT1Subdivisions, String(p.getAdaptiveTempo1Subdivisions()));
+		param.set(AT1Min, String(p.getAdaptiveTempo1Min()));
+		param.set(AT1Max, String(p.getAdaptiveTempo1Max()));
+		param.set(AT1Mode, String(p.getAdaptiveTempo1Mode()));
+	}
+
     void clearAll()
     {
         for (int i = TempoId+1; i < TempoParameterTypeNil; i++)

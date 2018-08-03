@@ -122,16 +122,17 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     
     loadMenu.addSeparator();
     
-    String currentSoundfont = processor.currentSoundfont.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf2", false, true);
+    //String currentSoundfont = processor.currentSoundfont.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf2", false, true);
+    //loadMenu.addItem(LOAD_SOUNDFONT, "Seinbass", currentSoundfont != "Seinbass", currentSoundfont == "Seinbass");
     
-    loadMenu.addItem(LOAD_SOUNDFONT, "Seinbass", currentSoundfont != "Seinbass", currentSoundfont == "Seinbass");
-    
+#if !JUCE_IOS
     int i = 0;
     for (auto sf : processor.soundfontNames)
     {
         String sfName = sf.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf", false, true);
         loadMenu.addItem(SOUNDFONT_ID + (i++), sfName);
     }
+#endif
     
     return loadMenu;
 }
@@ -367,8 +368,12 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     }
     else if (result == LOAD_SOUNDFONT)
     {
-        File sf2 = 
+        /*
+        File sf2;
+        sf2 = sf2.getSpecialLocation(File::userDocumentsDirectory).getChildFile("Seinbass.sf2");
+    
         processor.loadSamples(BKLoadSoundfont, )
+         */
     }
     else if (result == SAVE_ID)
     {

@@ -34,8 +34,9 @@ public:
     
 
  
-    Gallery(ScopedPointer<XmlElement> xml, BKAudioProcessor&, bool firstTime=false);
+    Gallery(ScopedPointer<XmlElement> xml, BKAudioProcessor&);
     Gallery(var json, BKAudioProcessor&);
+    Gallery(BKAudioProcessor& p);
     ~Gallery();
     
     inline void print(void)
@@ -79,10 +80,39 @@ public:
     }
     
     ValueTree  getState(void);
-    void setStateFromXML(ScopedPointer<XmlElement> xml, bool firstTime = false);
+    void setStateFromXML(ScopedPointer<XmlElement> xml);
     void setStateFromJson(var myJson);
     
     void resetPreparations(void);
+
+	void randomize();
+	
+    inline void addDefaultPrepIfNotThere(void)
+    {
+        bool add = true;
+        for (auto p : tempo) { if (p->getId() == -1) { add = false; break;} }
+        if (add) addTempoWithId(-1);
+        
+        add = true;
+        for (auto p : tuning) { if (p->getId() == -1) { add = false; break;} }
+        if (add) addTuningWithId(-1);
+        
+        add = true;
+        for (auto p : synchronic) { if (p->getId() == -1) { add = false; break;} }
+        if (add) addSynchronicWithId(-1);
+        
+        add = true;
+        for (auto p : nostalgic) { if (p->getId() == -1) { add = false; break;} }
+        if (add) addNostalgicWithId(-1);
+        
+        add = true;
+        for (auto p : direct) { if (p->getId() == -1) { add = false; break;} }
+        if (add) addDirectWithId(-1);
+        
+        add = true;
+        for (auto p : bkKeymaps) { if (p->getId() == -1) { add = false; break;} }
+        if (add) addKeymapWithId(-1);
+    }
     
     inline const int getNumPianos(void) const noexcept {return bkPianos.size();}
     
@@ -616,13 +646,13 @@ public:
     {
         int oldId = idCount[type];
         
-        DBG("OLD: " + String(oldId));
+        //DBG("OLD: " + String(oldId));
         
         int newId = oldId + 1;
         
         idCount.set(type, newId);
         
-        DBG("NEW: " + String(newId));
+        //DBG("NEW: " + String(newId));
         
         return newId;
     }
@@ -667,7 +697,7 @@ public:
     
     inline void setName(String n) { name = n;}
     
-    
+    Array<Array<int>> used;
     
 private:
     BKAudioProcessor& processor;
@@ -757,7 +787,7 @@ private:
     void removeTuningModPreparation(int Id);
     void removeTempoModPreparation(int Id);
     
-    Array<Array<int>> used;
+    
     
     JUCE_LEAK_DETECTOR(Gallery);
 };

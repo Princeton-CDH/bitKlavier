@@ -15,6 +15,82 @@ int gComponentSingleSliderHeight;
 int gComponentStackedSliderHeight;
 #endif
 
+class BKUnitTestRunner : public UnitTestRunner
+{
+    void logMessage(const String& message) override
+    {
+        Logger::writeToLog(message);
+    }
+};
+
+///unit test currently commented out because it creates infinite loop
+#if BK_UNIT_TESTS
+
+class GalleryTests : public UnitTest
+{
+public:
+    GalleryTests(BKAudioProcessor& p) : UnitTest("Galleries", "Gallery"), processor(p) {}
+    
+    BKAudioProcessor& processor;
+    
+    void runTest() override
+    {
+        beginTest("GalleryXML");
+        
+        for (int i = 0; i < 5; i++)
+        {
+            // create gallery and randomize it
+            // call getState() to convert to ValueTree
+            // call setState() to convert from ValueTree to preparation
+            // compare begin and end states
+            String name = "random gallery " + String(i);
+            DBG("test consistency: " + name);
+            
+            // GALLERY 1
+            processor.gallery = new Gallery(processor);
+            processor.gallery->randomize();
+            processor.gallery->setName(name);
+            
+            ValueTree vt1 = processor.gallery->getState();
+            
+            ScopedPointer<XmlElement> xml = vt1.createXml();
+            
+            // GALLERY 2
+            processor.gallery = new Gallery(xml, processor);
+            processor.gallery->setName(name);
+            
+            ValueTree vt2 =  processor.gallery->getState();
+
+#if JUCE_WINDOWS
+			File file1("C:\\Users\\User\\Desktop\\Programming\\output1.txt");
+			File file2("C:\\Users\\User\\Desktop\\Programming\\output2.txt");
+			FileLogger pressFtoPayRespects(file1, "blah", 128*1024*8);
+			FileLogger pressFtoPayRespects2ElectricBoogaloo(file2, "idk whatever", 128 * 1024 * 8);
+			pressFtoPayRespects.logMessage(vt1.toXmlString() +
+				"\n=======================\n");
+			pressFtoPayRespects2ElectricBoogaloo.logMessage(vt2.toXmlString() +
+				"\n=======================\n");
+
+#else
+            File file1("~/Desktop/bk_unittest/gal1");
+            File file2("~/Desktop/bk_unittest/gal2");
+            FileLogger pressFtoPayRespects(file1, "gallery1", 128 * 1024 *16);
+            FileLogger pressFtoPayRespects2ElectricBoogaloo(file2, "gallery2", 128 * 1024 * 16);
+            pressFtoPayRespects.logMessage(vt1.toXmlString() +
+                                           "\n=======================\n");
+            pressFtoPayRespects2ElectricBoogaloo.logMessage(vt2.toXmlString() +
+                                                            "\n=======================\n");
+            
+            expect(vt1.isEquivalentTo(vt2), "GALLERIES DO NOT MATCH");
+
+#endif
+
+            //expect(tp2->compare(tp1), tp1->getName() + " and " + tp2->getName() + " did not match.");
+        }
+    }
+};
+
+#endif
 
 //==============================================================================
 BKAudioProcessor::BKAudioProcessor(void):
@@ -29,8 +105,17 @@ loader(*this),
 shouldLoadDefault(true)
 {
 #if BK_UNIT_TESTS
-	BKUnitTestRunner test;
-	test.runAllTests();
+    
+    static GalleryTests galleryTest(*this);
+    
+    UnitTest::getAllTests().add(&galleryTest);
+    
+    BKUnitTestRunner tests;
+    
+    tests.setAssertOnFailure(false);
+    
+    tests.runAllTests();
+    
 #endif
     didLoadHammersAndRes            = false;
     didLoadMainPianoSamples         = false;
@@ -80,7 +165,7 @@ shouldLoadDefault(true)
     defaultLoaded = true;
     defaultName = "Basic_Piano_xml";
     
-    loadGalleryFromXml(XmlDocument::parse(xmlData), true);
+    loadGalleryFromXml(XmlDocument::parse(xmlData));
 
 #if JUCE_IOS
     platform = BKIOS;
@@ -166,6 +251,7 @@ shouldLoadDefault(true)
         "NS_7_Systerslaat",
         "NS_8_ItIsEnough"
     });
+
 }
 
 
@@ -910,7 +996,6 @@ void BKAudioProcessor::importCurrentGallery(void)
                                  
                                  DBG("url file name: " + url.getFileName().replace("%20", " "));
                                  createNewGallery(url.getFileName().replace("%20", " "), xml);
-                                 
                              }
                          }
                      });
@@ -1070,11 +1155,11 @@ void BKAudioProcessor::loadGalleryDialog(void)
     
 }
 
-void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml, bool firstTime)
+void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
 {
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
-        gallery = new Gallery(xml, *this, firstTime);
+        gallery = new Gallery(xml, *this);
         
         currentGallery = gallery->getName() + ".xml";
         

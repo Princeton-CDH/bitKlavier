@@ -12,40 +12,33 @@
 
 #include "PluginProcessor.h"
 
-Gallery::Gallery(ScopedPointer<XmlElement> xml, BKAudioProcessor& p, bool firstTime):
+Gallery::Gallery(BKAudioProcessor& p):
 processor(p)
-{    
+{
     general = new GeneralSettings();
-
-    setStateFromXML(xml, firstTime);
     
-    bool add = true;
-    for (auto p : tempo) { if (p->getId() == -1) { add = false; break;} }
-    if (add) addTempoWithId(-1);
-    
-    add = true;
-    for (auto p : tuning) { if (p->getId() == -1) { add = false; break;} }
-    if (add) addTuningWithId(-1);
-    
-    add = true;
-    for (auto p : synchronic) { if (p->getId() == -1) { add = false; break;} }
-    if (add) addSynchronicWithId(-1);
-    
-    add = true;
-    for (auto p : nostalgic) { if (p->getId() == -1) { add = false; break;} }
-    if (add) addNostalgicWithId(-1);
-    
-    add = true;
-    for (auto p : direct) { if (p->getId() == -1) { add = false; break;} }
-    if (add) addDirectWithId(-1);
-    
-    add = true;
-    for (auto p : bkKeymaps) { if (p->getId() == -1) { add = false; break;} }
-    if (add) addKeymapWithId(-1);
+    addDefaultPrepIfNotThere();
     
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
         used.add(Array<int>({-1}));
+    }
+    
+    isDirty = false;
+}
+
+Gallery::Gallery(ScopedPointer<XmlElement> xml, BKAudioProcessor& p):
+processor(p)
+{    
+    general = new GeneralSettings();
+
+    setStateFromXML(xml);
+    
+    addDefaultPrepIfNotThere();
+    
+    for (int i = 0; i < BKPreparationTypeNil; i++)
+    {
+        used.add( Array<int>( {-1} ) );
     }
     
     isDirty = false;
@@ -62,31 +55,9 @@ url(String::empty)
     
     general = new GeneralSettings();
 
+    addDefaultPrepIfNotThere();
+    
     setStateFromJson(myJson);
-    
-    bool add = true;
-    for (auto p : tempo) { if (p->getId() == -1) { add = false; break;} }
-    if (add) addTempoWithId(-1);
-    
-    add = true;
-    for (auto p : tuning) { if (p->getId() == -1) { add = false; break;} }
-    if (add) addTuningWithId(-1);
-    
-    add = true;
-    for (auto p : synchronic) { if (p->getId() == -1) { add = false; break;} }
-    if (add) addSynchronicWithId(-1);
-    
-    add = true;
-    for (auto p : nostalgic) { if (p->getId() == -1) { add = false; break;} }
-    if (add) addNostalgicWithId(-1);
-    
-    add = true;
-    for (auto p : direct) { if (p->getId() == -1) { add = false; break;} }
-    if (add) addDirectWithId(-1);
-    
-    add = true;
-    for (auto p : bkKeymaps) { if (p->getId() == -1) { add = false; break;} }
-    if (add) addKeymapWithId(-1);
     
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
@@ -127,4 +98,72 @@ void Gallery::resetPreparations(void)
     for (int i = tempo.size(); --i >= 0; )
         tempo[i]->aPrep->copy(tempo[i]->sPrep);
 }
+
+void Gallery::randomize()
+{
+    BKSynthesiser* dummySynth;
+    GeneralSettings::Ptr dummyGeneral = new GeneralSettings();
+
+    //each piano
+    for (int h = 0; h < Random::getSystemRandom().nextInt(Range<int>(1, 5)); h++)
+    {
+        Piano::Ptr p = new Piano(processor, h);
+        addPiano(p);
+        //each set of preparations in the piano
+        for (int i = 0; i < Random::getSystemRandom().nextInt(Range<int>(1, 10)); i++)
+        {
+            Keymap::Ptr kp = new Keymap();
+            kp->randomize();
+            addKeymap(kp);
+            p->addPreparationMap(kp);
+
+            Tuning::Ptr t = new Tuning(-1, true);
+            addTuning(t);
+            int tuningId = t->getId();
+            TuningProcessor::Ptr tProc = new TuningProcessor(t);
+            p->addTuningProcessor(tuningId);
+
+            Direct::Ptr d = new Direct(-1, true);
+            addDirect(d);
+            int directId = d->getId();
+            DirectProcessor::Ptr dProc = new DirectProcessor(d, tProc, dummySynth, dummySynth, dummySynth);
+            p->addDirectProcessor(directId);
+
+            Tempo::Ptr m = new Tempo(-1, true);
+            addTempo(m);
+            int tempoId = m->getId();
+            TempoProcessor::Ptr mProc = new TempoProcessor(m);
+            p->addTempoProcessor(tempoId);
+
+            Synchronic::Ptr s = new Synchronic(-1, true);
+            addSynchronic(s);
+            int synchronicId = s->getId();
+            SynchronicProcessor::Ptr sProc = new SynchronicProcessor(s, tProc, mProc, dummySynth, dummyGeneral);
+            p->addSynchronicProcessor(synchronicId);
+
+            Nostalgic::Ptr n = new Nostalgic(-1, true);
+            addNostalgic(n);
+            int nostalgicId = n->getId();
+            NostalgicProcessor::Ptr nProc = new NostalgicProcessor(n, tProc, sProc, dummySynth);
+            p->addNostalgicProcessor(nostalgicId);
+
+            p->linkPreparationWithKeymap(PreparationTypeDirect, d->getId(), kp->getId());
+
+            p->linkPreparationWithTuning(PreparationTypeDirect, d->getId(), t);
+
+            //randomly chooses whether to link nostalgic with keymap or tuning
+            if (Random::getSystemRandom().nextFloat() > 0.5) p->linkPreparationWithKeymap(PreparationTypeNostalgic, nProc->getId(), kp->getId());
+            else p->linkPreparationWithTuning(PreparationTypeNostalgic, nProc->getId(), t);
+
+            //randomly chooses whether to link synchronic with keymap, tuning, or nostalgic
+            float linkType = Random::getSystemRandom().nextFloat();
+            if (linkType > 0.66) p->linkPreparationWithKeymap(PreparationTypeSynchronic, sProc->getId(), kp->getId());
+            else if (linkType > 0.33) p->linkPreparationWithTuning(PreparationTypeSynchronic, sProc->getId(), t);
+            else p->linkNostalgicWithSynchronic(n, s);
+
+            p->linkSynchronicWithTempo(s, m);
+        }
+    }
+}
+
 

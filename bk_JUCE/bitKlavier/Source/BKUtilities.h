@@ -85,16 +85,6 @@
 
 #define LOAD_SOUNDFONT 999
 
-class BKUnitTestRunner : public UnitTestRunner
-{
-	void logMessage(const String& message) override
-	{
-		Logger::writeToLog(message);
-	}
-    
-    
-};
-
 inline PopupMenu getNewItemMenu(LookAndFeel* laf)
 {
     PopupMenu newMenu;
