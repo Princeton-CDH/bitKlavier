@@ -63,7 +63,7 @@ ValueTree  Gallery::getState(void)
     return galleryVT;
 }
 
-void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml, bool firstTime)
+void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
 {
     int i;
     Array<float> fa;
@@ -197,44 +197,6 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml, bool firstTime)
                 thisPiano->setState(e);
             }
         }
-      
-        if (firstTime) return;
-        
-#if LOAD_SAMPLES_IN_GALLERY
-        String st = xml->getStringAttribute("sampleType");
-        
-        String soundfontURL = xml->getStringAttribute("soundfontURL");
-        
-        String soundfontInst = xml->getStringAttribute("soundfontInst");
-        
-        if (st != String::empty)
-        {
-            BKSampleLoadType type = (BKSampleLoadType) st.getIntValue();
-            
-            if (type < BKLoadSoundfont)
-            {
-#if JUCE_DEBUG
-                processor.loadSamples(BKLoadLite);
-#else
-                processor.loadSamples(type);
-#endif
-            }
-            else if ((type == BKLoadSoundfont) &&
-                     (soundfontURL != String::empty) &&
-                     (soundfontInst != String::empty))
-            {
-                processor.loadSamples(BKLoadSoundfont, soundfontURL, soundfontInst.getIntValue());
-            }
-        }
-        else
-        {
-#if JUCE_IOS
-            processor.loadSamples(BKLoadMedium);
-#else
-            processor.loadSamples(BKLoadHeavy);
-#endif
-        }
-#endif
     }
 }
 

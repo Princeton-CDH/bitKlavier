@@ -37,11 +37,6 @@ public:
     {
         beginTest("GalleryXML");
         
-        String xmlData = CharPointer_UTF8 (BinaryData::Basic_Piano_xml);
-        
-        processor.defaultLoaded = true;
-        processor.defaultName = "Basic_Piano_xml";
-        
         for (int i = 0; i < 5; i++)
         {
             // create gallery and randomize it
@@ -52,7 +47,7 @@ public:
             DBG("test consistency: " + name);
             
             // GALLERY 1
-            processor.loadGalleryFromXml(XmlDocument::parse(xmlData), true);
+            processor.gallery = new Gallery(processor);
             processor.gallery->randomize();
             processor.gallery->setName(name);
             
@@ -61,16 +56,35 @@ public:
             ScopedPointer<XmlElement> xml = vt1.createXml();
             
             // GALLERY 2
-            processor.loadGalleryFromXml(XmlDocument::parse(xmlData), true);
-            processor.gallery->setStateFromXML(xml);
+            processor.gallery = new Gallery(xml, processor);
             processor.gallery->setName(name);
             
             ValueTree vt2 =  processor.gallery->getState();
 
-            expect(vt1.isEquivalentTo(vt2), "Gallery 1: \n" + vt1.toXmlString() +
-                                             "\n=======================\n" +
-                                             "Gallery 2: \n" + vt2.toXmlString());
+#if JUCE_WINDOWS
+			File file1("C:\\Users\\User\\Desktop\\Programming\\output1.txt");
+			File file2("C:\\Users\\User\\Desktop\\Programming\\output2.txt");
+			FileLogger pressFtoPayRespects(file1, "blah", 128*1024*8);
+			FileLogger pressFtoPayRespects2ElectricBoogaloo(file2, "idk whatever", 128 * 1024 * 8);
+			pressFtoPayRespects.logMessage(vt1.toXmlString() +
+				"\n=======================\n");
+			pressFtoPayRespects2ElectricBoogaloo.logMessage(vt2.toXmlString() +
+				"\n=======================\n");
+
+#else
+            File file1("~/Desktop/bk_unittest/gal1");
+            File file2("~/Desktop/bk_unittest/gal2");
+            FileLogger pressFtoPayRespects(file1, "gallery1", 128 * 1024 *16);
+            FileLogger pressFtoPayRespects2ElectricBoogaloo(file2, "gallery2", 128 * 1024 * 16);
+            pressFtoPayRespects.logMessage(vt1.toXmlString() +
+                                           "\n=======================\n");
+            pressFtoPayRespects2ElectricBoogaloo.logMessage(vt2.toXmlString() +
+                                                            "\n=======================\n");
             
+            expect(vt1.isEquivalentTo(vt2), "GALLERIES DO NOT MATCH");
+
+#endif
+
             //expect(tp2->compare(tp1), tp1->getName() + " and " + tp2->getName() + " did not match.");
         }
     }
@@ -151,7 +165,7 @@ shouldLoadDefault(true)
     defaultLoaded = true;
     defaultName = "Basic_Piano_xml";
     
-    loadGalleryFromXml(XmlDocument::parse(xmlData), true);
+    loadGalleryFromXml(XmlDocument::parse(xmlData));
 
 #if JUCE_IOS
     platform = BKIOS;
@@ -1144,11 +1158,11 @@ void BKAudioProcessor::loadGalleryDialog(void)
     
 }
 
-void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml, bool firstTime)
+void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
 {
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
-        gallery = new Gallery(xml, *this, firstTime);
+        gallery = new Gallery(xml, *this);
         
         currentGallery = gallery->getName() + ".xml";
         
