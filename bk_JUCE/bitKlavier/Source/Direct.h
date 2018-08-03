@@ -95,6 +95,8 @@ public:
     
     inline void randomize(void)
     {
+		Random::getSystemRandom().setSeedRandomly();
+
         float r[20];
         
         for (int i = 0; i < 20; i++)    r[i] = (Random::getSystemRandom().nextFloat());
@@ -326,6 +328,7 @@ public:
 	inline void randomize()
 	{
 		clear();
+		Random::getSystemRandom().setSeedRandomly();
 		sPrep->randomize();
 		aPrep->randomize();
 		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));

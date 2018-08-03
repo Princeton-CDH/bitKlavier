@@ -102,6 +102,8 @@ public:
 
 	inline void randomize()
 	{
+		Random::getSystemRandom().setSeedRandomly();
+
 		float r[21];
 
 		for (int i = 0; i < 21; i++)  r[i] = (Random::getSystemRandom().nextFloat());

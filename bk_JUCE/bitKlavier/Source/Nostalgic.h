@@ -137,6 +137,8 @@ public:
 
 	inline void randomize()
 	{
+		Random::getSystemRandom().setSeedRandomly();
+
 		float r[25];
 
 		for (int i = 0; i < 25; i++)  r[i] = (Random::getSystemRandom().nextFloat());
