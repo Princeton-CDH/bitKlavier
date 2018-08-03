@@ -493,7 +493,13 @@ void MainViewController::fillSampleCB()
     int id = 5;
     for (auto sf : processor.soundfontNames)
     {
-        String name = sf.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf", false, true);
+		//windows paths
+		String name;
+#if JUCE_WINDOWS
+		name = sf.fromLastOccurrenceOf("\\", false, true).upToFirstOccurrenceOf(".sf", false, true);
+#else
+        name = sf.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf", false, true);
+#endif
         sampleCB.addItem(name, id);
         
         if ((processor.currentSampleType == BKLoadSoundfont) && (name == processor.getCurrentSoundfontName()))
