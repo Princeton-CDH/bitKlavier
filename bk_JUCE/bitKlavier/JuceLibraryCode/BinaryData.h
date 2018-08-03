@@ -8,9 +8,6 @@
 
 namespace BinaryData
 {
-    extern const char*   Seinbass_sf2;
-    const int            Seinbass_sf2Size = 71712;
-
     extern const char*   _1__Synchronic_1_xml;
     const int            _1__Synchronic_1_xmlSize = 25058;
 
@@ -267,7 +264,7 @@ namespace BinaryData
     const int            tuning_icon_pngSize = 12404;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 86;
+    const int namedResourceListSize = 85;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

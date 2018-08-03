@@ -17,9 +17,6 @@
   <MAINGROUP id="s4R02g" name="bitKlavier">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
       <GROUP id="{1E3013D4-6B2A-D996-A5C8-F92AE44A39F2}" name="Resources">
-        <GROUP id="{7F0BF645-3E7B-170B-9D26-4D950F9268C2}" name="soundfonts">
-          <FILE id="c3MKU1" name="Seinbass.sf2" compile="0" resource="1" file="Source/Seinbass.sf2"/>
-        </GROUP>
         <GROUP id="{9410D6F7-7039-77FB-F92B-3580A2A099FE}" name="galleries">
           <GROUP id="{B6FA1321-FBCA-C3B2-8ADC-1F597F69E3E5}" name="Examples">
             <FILE id="QvZSwW" name="1. Synchronic 1.xml" compile="0" resource="1"
