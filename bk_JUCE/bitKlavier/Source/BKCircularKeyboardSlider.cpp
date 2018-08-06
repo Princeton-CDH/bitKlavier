@@ -42,6 +42,7 @@ ratio(1.0)
 
     keyboardValueTF.setText(String(0.0, 1));
     keyboardValueTF.setName("KSLIDERTXT");
+    keyboardValueTF.setTooltip("offset from ET in cents for last key pressed; can enter values here as well");
     keyboardValueTF.addListener(this);
 #if JUCE_IOS
     keyboardValueTF.setReadOnly(true);
@@ -59,6 +60,7 @@ ratio(1.0)
     keyboardValsTextFieldOpen.setName("KSLIDERTXTEDITALLBUTTON");
     keyboardValsTextFieldOpen.addListener(this);
     keyboardValsTextFieldOpen.setButtonText("edit all");
+    keyboardValsTextFieldOpen.setTooltip("click drag on keys to set offsets in cents by key, or press 'edit all' to edit as text");
     addAndMakeVisible(keyboardValsTextFieldOpen);
 
 }

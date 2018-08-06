@@ -34,24 +34,26 @@ BKViewController(p, theGraph)
     selectCB.addListener(this);
     selectCB.addMyListener(this);
     selectCB.setSelectedItemIndex(0);
+    selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
     
     clearButton.setName("ClearButton");
     clearButton.setButtonText("Clear");
+    clearButton.setTooltip("Deselect all keys");
     clearButton.addListener(this);
     addAndMakeVisible(clearButton);
     
     keysButton.setName("KeysButton");
     keysButton.setButtonText("Keys");
+    keysButton.setTooltip("A collection of preset notes to be selected or deselected");
     keysButton.addListener(this);
     addAndMakeVisible(keysButton);
     
     keysCB.setName("keysCB");
     keysCB.addListener(this);
-    
+    keysCB.setTooltip("Choose between 'select' or 'deselect' for batch operations (under Keys)");
     keysCB.addItem("Select", SELECT_ID);
     keysCB.addItem("Deselect", DESELECT_ID);
-    
     keysCB.setSelectedId(SELECT_ID);
     
     addAndMakeVisible(keysCB);
@@ -59,6 +61,7 @@ BKViewController(p, theGraph)
     addAndMakeVisible(keymapTF);
     keymapTF.addListener(this);
     keymapTF.setName("KeymapMidi");
+    keymapTF.setTooltip("Select or deselect all keys by individually clicking or click-dragging, or press 'edit all' to type or copy/paste MIDI notes to be selected in Keymap");
     keymapTF.setMultiLine(true);
     
     // Keyboard
@@ -101,6 +104,7 @@ BKViewController(p, theGraph)
     
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
+    actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
     
     fillSelectCB(-1,-1);
