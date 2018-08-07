@@ -28,15 +28,18 @@ BKViewController(p,theGraph)
     selectCB.addSeparator();
     selectCB.addListener(this);
     selectCB.setSelectedItemIndex(0);
+    selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
     
     scaleCB.setName("Scale");
+    scaleCB.setTooltip("Select from a range of preset temperaments; open the Adaptive Tuning settings");
     addAndMakeVisible(scaleCB);
     
     scaleLabel.setText("Scale", dontSendNotification);
     //addAndMakeVisible(scaleLabel);
     
     fundamentalCB.setName("Fundamental");
+    fundamentalCB.setTooltip("Select root around which your temperament will be generated");
     addAndMakeVisible(fundamentalCB);
     
     fundamentalLabel.setText("Fundamental", dontSendNotification);
@@ -45,6 +48,7 @@ BKViewController(p,theGraph)
     A1IntervalScaleCB.setName("A1IntervalScale");
     //A1IntervalScaleCB.BKSetJustificationType(juce::Justification::centredRight);
     A1IntervalScaleCB.addListener(this);
+    A1IntervalScaleCB.setTooltip("scale the sets how successive intervals are tuned");
     addAndMakeVisible(A1IntervalScaleCB);
     
     A1IntervalScaleLabel.setText("Adaptive:", dontSendNotification);
@@ -57,9 +61,11 @@ BKViewController(p,theGraph)
     A1Inversional.setColour(ToggleButton::textColourId, Colours::antiquewhite);
     A1Inversional.setColour(ToggleButton::tickColourId, Colours::antiquewhite);
     A1Inversional.setColour(ToggleButton::tickDisabledColourId, Colours::antiquewhite);
+    A1Inversional.setTooltip("when selected, intervals will be tuned the same whether they ascend or descend; e.g. C-D will always be the same interval as C-Bb");
     addAndMakeVisible(A1Inversional);
     
     A1AnchorScaleCB.setName("A1AnchorScale");
+    A1AnchorScaleCB.setTooltip("determines where the moving fundamental will be tuned to");
     addAndMakeVisible(A1AnchorScaleCB);
     
     A1AnchorScaleLabel.setText("Anchor:", dontSendNotification);
@@ -67,6 +73,7 @@ BKViewController(p,theGraph)
     addAndMakeVisible(A1AnchorScaleLabel);
     
     A1FundamentalCB.setName("A1Fundamental");
+    A1FundamentalCB.setTooltip("sets fundamental for the anchor scale");
     addAndMakeVisible(A1FundamentalCB);
     
     //A1FundamentalLabel.setText("Adaptive 1 Anchor Fundamental", dontSendNotification);
@@ -74,24 +81,29 @@ BKViewController(p,theGraph)
     
     A1ClusterThresh = new BKSingleSlider("Threshold", 1, 1000, 0, 1);
     A1ClusterThresh->setJustifyRight(false);
+    A1ClusterThresh->setToolTipString("if this time (ms) is exceeded, the fundamental will reset");
     addAndMakeVisible(A1ClusterThresh);
     
     A1ClusterMax = new BKSingleSlider("Maximum", 1, 8, 1, 1);
     A1ClusterMax->setJustifyRight(false);
+    A1ClusterMax->setToolTipString("after these many notes are played, the fundamental will reset");
     addAndMakeVisible(A1ClusterMax);
     
     A1reset.setButtonText("reset");
     addAndMakeVisible(A1reset);
     
     nToneRootCB.setName("nToneRoot");
+    nToneRootCB.setTooltip("set root note, when semitone width is not 100");
     addAndMakeVisible(nToneRootCB);
     
     nToneRootOctaveCB.setName("nToneRootOctave");
+    nToneRootOctaveCB.setTooltip("set octave for root note, when semitone width is not 100");
     addAndMakeVisible(nToneRootOctaveCB);
     
     nToneSemitoneWidthSlider = new BKSingleSlider("semitone width and root", 1, 200, 100, 0.001);
     nToneSemitoneWidthSlider->setJustifyRight(false);
     nToneSemitoneWidthSlider->displaySliderVisible(false);
+    nToneSemitoneWidthSlider->setToolTipString("Adjusts half step distance. For example, 50 cents is a quarter-tone keyboard, and -100 cents is an inverted keyboard");
     addAndMakeVisible(nToneSemitoneWidthSlider);
     
     fillTuningCB();
@@ -115,11 +127,14 @@ BKViewController(p,theGraph)
     
     offsetSlider = new BKSingleSlider("offset: ", -100, 100, 0, 0.1);
     offsetSlider->displaySliderVisible(false);
+    offsetSlider->setToolTipString("Raise or lower the entire temperament in cents");
     addAndMakeVisible(offsetSlider);
     
     lastNote.setText("note: ", dontSendNotification);
+    lastNote.setTooltip("last note played as MIDI value");
     lastInterval.setText("interval: ", dontSendNotification);
     lastInterval.setJustificationType(juce::Justification::centredRight);
+    lastInterval.setTooltip("Distance between last two notes played");
     addAndMakeVisible(lastNote);
     addAndMakeVisible(lastInterval);
     
@@ -127,6 +142,7 @@ BKViewController(p,theGraph)
     addAndMakeVisible(currentFundamental);
     
     actionButton.setButtonText("Action");
+    actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
     addAndMakeVisible(actionButton);
     

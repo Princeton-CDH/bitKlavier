@@ -656,6 +656,7 @@ void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
     hasBigOne = true;
     WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, editValsTextField, sliderName);
 #else
+//#endif
     int which = whichSlider(e);
     int whichSave = which;
     
@@ -691,6 +692,7 @@ void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
     
     editValsTextField->setVisible(true);
     editValsTextField->toFront(true);
+    DBG("BKMultiSlider::mouseDoubleClick, about to setText to: " + arrayFloatArrayToString(getAllActiveValues()));
     editValsTextField->setText(arrayFloatArrayToString(getAllActiveValues()));
     editValsTextField->setWantsKeyboardFocus(true);
     editValsTextField->grabKeyboardFocus();
