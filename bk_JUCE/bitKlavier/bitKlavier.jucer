@@ -9,7 +9,7 @@
               pluginWantsMidiIn="1" pluginProducesMidiOut="1" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="1" pluginAUExportPrefix="BKAU" pluginRTASCategory=""
               aaxIdentifier="com.manyarrowsmusic.bitKlavier" pluginAAXCategory="2"
-              jucerVersion="5.3.0" companyName="manyarrowsmusic" companyEmail="dtrueman@princeton.edu"
+              jucerVersion="5.3.2" companyName="manyarrowsmusic" companyEmail="dtrueman@princeton.edu"
               maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
               displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Light"
               buildStandalone="1" enableIAA="1" cppLanguageStandard="11" companyCopyright="manyarrowsmusic"
@@ -286,12 +286,12 @@
           <FILE id="ubAlA4" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
           <FILE id="dgzM9u" name="PluginEditor.cpp" compile="1" resource="0"
                 file="Source/PluginEditor.cpp"/>
-          <FILE id="ePlqOW" name="TempoViewController.h" compile="0" resource="0"
-                file="Source/TempoViewController.h"/>
         </GROUP>
         <GROUP id="{444BC2CA-5FF1-6AEB-00B9-DF5D039DBFFE}" name="PreparationVC">
           <FILE id="Iv0ln2" name="TempoViewController.cpp" compile="1" resource="0"
                 file="Source/TempoViewController.cpp"/>
+          <FILE id="ePlqOW" name="TempoViewController.h" compile="0" resource="0"
+                file="Source/TempoViewController.h"/>
           <FILE id="BIrYkq" name="TuningViewController.cpp" compile="1" resource="0"
                 file="Source/TuningViewController.cpp"/>
           <FILE id="kkg7qA" name="TuningViewController.h" compile="0" resource="0"
