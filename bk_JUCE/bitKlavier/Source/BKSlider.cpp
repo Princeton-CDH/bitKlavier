@@ -293,16 +293,6 @@ void BKMultiSlider::setTo(Array<Array<float>> newvals, NotificationType newnotif
     
     deactivateAll(newnotify);
     
-    /*
-     for(int i=0; i<newvals.size(); i++)
-     {
-     for(int j=0; j<newvals[i].size(); j++)
-     {
-     DBG("new multislider value " + String(i) + " " + String(j) + " " + String(newvals[i].getUnchecked(j)));
-     }
-     }
-     */
-    
     for(int i=0; i<numVisibleSliders; i++)
     {
         if(i >= sliders.size()) addSlider(-1, false, newnotify);
@@ -654,6 +644,7 @@ void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
 {
 #if JUCE_IOS
     hasBigOne = true;
+    editValsTextField->setText(arrayFloatArrayToString(getAllActiveValues()), dontSendNotification);
     WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, editValsTextField, sliderName);
 #else
 //#endif
@@ -692,7 +683,6 @@ void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
     
     editValsTextField->setVisible(true);
     editValsTextField->toFront(true);
-    DBG("BKMultiSlider::mouseDoubleClick, about to setText to: " + arrayFloatArrayToString(getAllActiveValues()));
     editValsTextField->setText(arrayFloatArrayToString(getAllActiveValues()));
     editValsTextField->setWantsKeyboardFocus(true);
     editValsTextField->grabKeyboardFocus();
@@ -2246,6 +2236,7 @@ void BKStackedSlider::mouseDoubleClick (const MouseEvent &e)
     
 #if JUCE_IOS
     hasBigOne = true;
+    editValsTextField->setText(floatArrayToString(getAllActiveValues()), dontSendNotification);
     WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, editValsTextField, sliderName);
 #else
     StringArray tokens;

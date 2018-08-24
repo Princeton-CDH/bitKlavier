@@ -240,6 +240,7 @@ public:
         
         bigOne.toFront(true);
         
+        DBG("target text: " + String(target->getText()));
         setText(target->getText());
         
         bigOne.grabKeyboardFocus();
