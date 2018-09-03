@@ -21,7 +21,6 @@
 
 #define BK_UNIT_TESTS 1
 
-#define TRY_UNDO 0 //enable attempt at undo/redo
 #define NUM_EPOCHS 10
 
 #define SAVE_ID 1
@@ -156,13 +155,7 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
     }
     else
     {
-#if TRY_UNDO
-        menu.addItem(UNDO_ID, "Undo");
-        menu.addSeparator();
-        menu.addItem(REDO_ID, "Redo");
-        menu.addSeparator();
-#endif
-         
+    
     }
     
     if (numItemsSelected)

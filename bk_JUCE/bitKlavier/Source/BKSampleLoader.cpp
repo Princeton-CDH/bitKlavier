@@ -143,18 +143,27 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         region->loop_end        -= region->offset;
         region->offset           = 0;
         
+       
+        
+        
+        if (region->pitch_keycenter < 0) region->pitch_keycenter = region->lokey;
+        
+        if (region->lokey == region->hikey)
+        {
+            if (region->lokey != region->pitch_keycenter)
+            {
+                region->transpose = region->lokey - region->pitch_keycenter;
+            }
+        }
+    
+        
         DBG("transp: " + String(region->transpose) + "   keycenter: " + String(region->pitch_keycenter) + " keytrack: " + String(region->pitch_keytrack));
         
         DBG("end: " + String(region->end) + "   ls: " + String(region->loop_start) + "   le: " + String(region->loop_end) + "   keyrange: " + String(region->lokey) + "-" + String(region->hikey) + "   velrange: " + String(region->lovel) + "-" + String(region->hivel));
-
+        
         DBG("region->trigger: " +String(region->trigger));
         DBG("pedal needed: " + String((int)region->pedal));
         
-        if ((region->lokey == region->hikey) && (region->lokey != region->pitch_keycenter))
-        {
-            region->transpose = region->lokey - region->pitch_keycenter;
-        }
-    
         
         
         int nbits = region->hikey - region->lokey;

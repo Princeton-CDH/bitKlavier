@@ -106,16 +106,7 @@ public:
     
     bool                                defaultLoaded;
     String                              defaultName;
-    
-#if TRY_UNDO
-    Piano::PtrArr                       history;
-    int epoch;
-    
-    void updateHistory(void);
-    
-    void timeTravel(bool forward);
-#endif
-    
+
     void updateGalleries(void);
     
     void collectGalleries(void);

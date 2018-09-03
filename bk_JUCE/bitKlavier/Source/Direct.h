@@ -616,7 +616,7 @@ public:
     void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
 
     void    keyPressed(int noteNumber, float velocity, int channel);
-    void    keyReleased(int noteNumber, float velocity, int channel);
+    void    keyReleased(int noteNumber, float velocity, int channel, bool soundfont = false);
     void    playReleaseSample(int noteNumber, float velocity, int channel, bool soundfont = false);
     
     inline void prepareToPlay(double sr, BKSynthesiser* main, BKSynthesiser* res, BKSynthesiser* hammer)

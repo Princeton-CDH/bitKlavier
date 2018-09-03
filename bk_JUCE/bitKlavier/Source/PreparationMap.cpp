@@ -347,7 +347,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
             {
                 proc->playReleaseSample(noteNumber, velocity, channel, soundfont);
                 
-                proc->keyReleased(noteNumber, velocity, channel);
+                proc->keyReleased(noteNumber, velocity, channel, soundfont);
             }
             
             for (auto proc : nprocessor)

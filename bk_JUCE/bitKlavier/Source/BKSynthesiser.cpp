@@ -373,11 +373,17 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             
             // Check if sound applies to note, velocity, and channel.
             if (sound->appliesToNote (noteNumber) &&
-                sound->appliesToVelocity((int)(velocity*127.0)) &&
-                (sound->trigger != sfzero::Region::release) &&
-                (sound->trigger != sfzero::Region::release_key) &&
-                sustainPedalsDown[midiChannel] == sound->pedal)
+                sound->appliesToVelocity((int)(velocity*127.0)))
             {
+                if (sound->region_ != nullptr)
+                {
+                    if ((sound->trigger == sfzero::Region::release) ||
+                        (sound->trigger == sfzero::Region::release_key) ||
+                        (sustainPedalsDown[midiChannel] != sound->pedal))
+                    {
+                        continue;
+                    }
+                }
                 
                 startVoice (findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes),
                             sound,
@@ -481,13 +487,11 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             voice->currentlyPlayingKey = keyNoteNumber; //keep track of which physical key is associated with this voice
             
             float gain = volume;
-            /*
+            
             if (sound->region_ != nullptr)
             {
                 gain *= Decibels::decibelsToGain(sound->region_->volume);
             }
-             */
-            
 
             voice->startNote ((float)midiNoteNumber+midiNoteNumberOffset,
                               pitchWheelValue,
@@ -569,23 +573,20 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             
             if (appliesToNote && appliesToVel && isRelease && pedalStatesMatch)
             {
-                DBG("release note!!!!!!");
-                float volume = Decibels::decibelsToGain(sound->region_->volume);
-                DBG("volume: " + String(volume));
-                
+                DBG("len: " + String(sound->sampleLength) + " name: " + sound->sampleName);
                 startVoice (findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes),
                             sound,
                             midiChannel,
                             keyNoteNumber,
                             noteNumber,
                             0, // might need to deal with this
-                            velocity * volume,
+                            velocity,
                             Forward,
-                            Normal,
+                            FixedLengthFixedStart,
                             DirectNote,
                             0,
                             0,
-                            0,
+                            sound->sampleLength,
                             0.001f,
                             0.001f,
                             1.0f,

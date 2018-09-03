@@ -73,6 +73,7 @@ public:
     typedef ReferenceCountedObjectPtr<BKSynthesiserSound> Ptr;
     
     sfzero::Region* region_;
+    uint64 sampleLength;
     sfzero::Region::Trigger trigger;
     bool pedal;
     String sampleName;

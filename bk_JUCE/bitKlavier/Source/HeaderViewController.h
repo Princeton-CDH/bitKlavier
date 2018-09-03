@@ -51,7 +51,6 @@ private:
     ShareBot bot;
 #endif
     
-    
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override{};
     void bkComboBoxDidChange        (ComboBox* box)         override;

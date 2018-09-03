@@ -71,7 +71,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 
 #define HAMMER_GAIN_SCALE 0.02f
 #define RES_GAIN_SCALE 0.2f
-void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
+void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel, bool soundfont)
 {
     for (int i = 0; i<keyPlayed[noteNumber].size(); i++)
     {
@@ -82,7 +82,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel)
                       MainNote,
                       direct->getId(),
                       noteNumber,
-                      t,
+                      (soundfont ? noteNumber : t),
                       velocity,
                       true);
     }
@@ -109,11 +109,14 @@ void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int chan
             if (hGain > 0.0f)
             {
                 
+                /*
                 if (soundfont)
                 {
                     synth->keyOff(channel, HammerNote, direct->getId(), noteNumber, noteNumber, velocity, true);
                 }
                 else
+                 */
+                if (!soundfont)
                 {
                     hammerSynth->keyOn  (channel,
                                        noteNumber,
