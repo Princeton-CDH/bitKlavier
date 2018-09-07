@@ -119,7 +119,7 @@
             <FILE id="qDPPdy" name="NS_3_Song.xml" compile="0" resource="1" file="Source/galleries/Nostalgic Synchronic/NS_3_Song.xml"/>
             <FILE id="dMpeFo" name="NS_4_Marbles.xml" compile="0" resource="1"
                   file="Source/galleries/Nostalgic Synchronic/NS_4_Marbles.xml"/>
-            <FILE id="yJI0Jm" name="NS_5_Wallumrod.xml" compile="0" resource="1"
+            <FILE id="E9akwg" name="NS_5_Wallumrod.xml" compile="0" resource="1"
                   file="Source/galleries/Nostalgic Synchronic/NS_5_Wallumrod.xml"/>
             <FILE id="y0LuZ7" name="NS_6_PointsAmongLines.xml" compile="0" resource="1"
                   file="Source/galleries/Nostalgic Synchronic/NS_6_PointsAmongLines.xml"/>
@@ -383,23 +383,23 @@
                        osxCompatibility="10.9 SDK" enablePluginBinaryCopyStep="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_video" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_opengl" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_video" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
-        <MODULEPATH id="stk" path="../../../JUCE/modules"/>
-        <MODULEPATH id="SFZero" path="../../../3p_modules/SFZero/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="stk" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="SFZero" path="../../../../JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="landscape" keepCustomXcodeSchemes="1"
@@ -416,23 +416,23 @@
                        iosCompatibility="8.0" enablePluginBinaryCopyStep="1" codeSigningIdentity="YT6AXURH62"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_video" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_opengl" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_video" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="stk" path="../../../JUCE/modules"/>
-        <MODULEPATH id="SFZero" path="../../../3p_modules/SFZero/modules"/>
+        <MODULEPATH id="stk" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="SFZero" path="../../../../JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
     <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="C:\SDKs\VST3_SDK"

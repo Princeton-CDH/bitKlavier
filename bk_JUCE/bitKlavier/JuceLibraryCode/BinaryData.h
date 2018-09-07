@@ -174,7 +174,7 @@ namespace BinaryData
     const int            NS_4_Marbles_xmlSize = 56590;
 
     extern const char*   NS_5_Wallumrod_xml;
-    const int            NS_5_Wallumrod_xmlSize = 68903;
+    const int            NS_5_Wallumrod_xmlSize = 69940;
 
     extern const char*   NS_6_PointsAmongLines_xml;
     const int            NS_6_PointsAmongLines_xmlSize = 46095;
