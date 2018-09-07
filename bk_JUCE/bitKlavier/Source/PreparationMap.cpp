@@ -319,7 +319,6 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
 
 void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bool soundfont)
 {
-    
     if(sustainPedalIsDepressed && pKeymap->containsNote(noteNumber))
     {
         SustainedNote newNote;
@@ -417,7 +416,7 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
     {
         for (auto proc : dprocessor)
         {
-            proc->keyReleased(noteNumber, velocity, channel);
+            if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber, velocity, channel);
         }
         
         for (auto proc : nprocessor)

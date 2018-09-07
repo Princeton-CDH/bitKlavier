@@ -577,6 +577,9 @@ void BKAudioProcessor::sustainActivate(void)
         for (int p = currentPiano->activePMaps.size(); --p >= 0;)
             currentPiano->activePMaps[p]->sustainPedalPressed();
         
+        for (int p = prevPiano->activePMaps.size(); --p >= 0;)
+            prevPiano->activePMaps[p]->sustainPedalPressed();
+        
         //play pedalDown resonance
         pedalSynth.keyOn(channel,
                            //synthNoteNumber,
