@@ -282,6 +282,18 @@ void PreparationMap::processBlock(int numSamples, int midiChannel, BKSampleLoadT
     }
 }
 
+void PreparationMap::clearKey(int noteNumber) 
+{
+    if(sustainPedalIsDepressed)
+    {
+        for(int i=0; i<sustainedNotes.size(); i++)
+        {
+            if(sustainedNotes.getUnchecked(i).noteNumber == noteNumber)
+                sustainedNotes.remove(i);
+        }
+    }
+}
+
 //not sure why some of these have Channel and some don't; should rectify?
 void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, bool soundfont)
 {

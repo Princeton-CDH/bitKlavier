@@ -46,6 +46,7 @@ public:
     void keyPressed(int noteNumber, float velocity, int channel, bool soundfont = false);
     void keyReleased(int noteNumber, float velocity, int channel, bool soundfont = false);
     void postRelease(int noteNumber, float velocity, int channel);
+    void clearKey(int noteNumber);
     void sustainPedalPressed()  { sustainPedalIsDepressed = true;  }
     void sustainPedalReleased(bool post);
     void sustainPedalReleased() {sustainPedalReleased(false);};

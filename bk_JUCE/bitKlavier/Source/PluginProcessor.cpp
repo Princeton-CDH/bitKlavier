@@ -528,12 +528,16 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
     performModifications(noteNumber);
     
     //tempo
+    for (p = prevPiano->activePMaps.size(); --p >= 0;) {
+        prevPiano->activePMaps[p]->clearKey(noteNumber); //clears key from array of depressed notes in prevPiano so they don't get cutoff by sustain pedal release
+    }
     
     // Send key on to each pmap in current piano
     for (p = currentPiano->activePMaps.size(); --p >= 0;) {
         //DBG("noteon: " +String(noteNumber) + " pmap: " + String(p));
         currentPiano->activePMaps[p]->keyPressed(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont));
     }
+    
 }
 
 void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel)
@@ -599,6 +603,21 @@ void BKAudioProcessor::sustainActivate(void)
     }
     
 }
+
+/*
+ BUG:
+
+ play a note, hold it down
+ change pianos while note is still held
+ press sustain pedal
+ release the note (pedal still down)
+ press the note again
+ while holding the note down still, release the pedal (note will be cut off, even though it is still being held down)
+ 
+ FIXED: through addition of PreparationMap::clearKey(int noteNumber)
+ 
+ BUT, there still seems to be a problem when sometimes a note will be shut off by pedal release even when it is depressed
+ */
 
 void BKAudioProcessor::sustainDeactivate(void)
 {
