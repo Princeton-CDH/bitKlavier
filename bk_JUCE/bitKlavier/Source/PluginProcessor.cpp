@@ -645,7 +645,7 @@ void BKAudioProcessor::sustainActivate(void)
  release both notes (first note cuts off, when it shouldn't because sustain pedal is down)
  next time you play/release notes, they should work ok, so it's only this first time, and it's only if the switch of pianos happens while another note is being held
  
- FIXED (i think!)
+ ALL FIXED (i think!)
  
  */
 
