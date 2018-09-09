@@ -529,7 +529,8 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
     
     //tempo
     for (p = prevPiano->activePMaps.size(); --p >= 0;) {
-        prevPiano->activePMaps[p]->clearKey(noteNumber); //clears key from array of depressed notes in prevPiano so they don't get cutoff by sustain pedal release
+        if (prevPianos[p] != currentPiano)
+            prevPiano->activePMaps[p]->clearKey(noteNumber); //clears key from array of depressed notes in prevPiano so they don't get cutoff by sustain pedal release
     }
     
     // Send key on to each pmap in current piano
@@ -555,7 +556,9 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     for (p = currentPiano->activePMaps.size(); --p >= 0;)
         currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont));
     
+
     // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
+    /*
     if (prevPiano != currentPiano)
     {
         for (p = prevPianos.size(); --p >= 0;) {
@@ -564,6 +567,17 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
             }
         }
     }
+    */
+    
+
+    for (p = prevPianos.size(); --p >= 0;) {
+        if (prevPianos[p] != currentPiano) {
+            for (pm = prevPianos[p]->activePMaps.size(); --pm >= 0;) {
+                prevPianos[p]->activePMaps[pm]->postRelease(noteNumber, velocity, channel);
+            }
+        }
+    }
+
     
     --noteOnCount;
     if(noteOnCount < 0) noteOnCount = 0;
@@ -617,6 +631,22 @@ void BKAudioProcessor::sustainActivate(void)
  FIXED: through addition of PreparationMap::clearKey(int noteNumber)
  
  BUT, there still seems to be a problem when sometimes a note will be shut off by pedal release even when it is depressed
+ this one doesn't seem to require a piano change, but i haven't been able to find a consistent way to reproduce it yet
+ 
+ I think neither of these "fixes" are actually right.
+ 
+ another one that is easy to reproduce:
+ 
+ play a note
+ press sustain pedal
+ release sustain pedal (still holding note)
+ change pianos by playing a different note
+ press sustain pedal
+ release both notes (first note cuts off, when it shouldn't because sustain pedal is down)
+ next time you play/release notes, they should work ok, so it's only this first time, and it's only if the switch of pianos happens while another note is being held
+ 
+ FIXED (i think!)
+ 
  */
 
 void BKAudioProcessor::sustainDeactivate(void)
@@ -628,12 +658,13 @@ void BKAudioProcessor::sustainDeactivate(void)
         DBG("SUSTAIN OFF");
         
         for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-            currentPiano->activePMaps[p]->sustainPedalReleased();
+            currentPiano->activePMaps[p]->sustainPedalReleased(noteOn, false);
         
         if(prevPiano != currentPiano)
         {
             for (int p = prevPiano->activePMaps.size(); --p >= 0;)
-                prevPiano->activePMaps[p]->sustainPedalReleased(true);
+                //prevPiano->activePMaps[p]->sustainPedalReleased(true);
+                prevPiano->activePMaps[p]->sustainPedalReleased(noteOn, true);
         }
         
         //turn off pedal down resonance
