@@ -282,6 +282,18 @@ void PreparationMap::processBlock(int numSamples, int midiChannel, BKSampleLoadT
     }
 }
 
+void PreparationMap::clearKey(int noteNumber)
+{
+    if(sustainPedalIsDepressed)
+    {
+        for(int i=0; i<sustainedNotes.size(); i++)
+        {
+            if(sustainedNotes.getUnchecked(i).noteNumber == noteNumber)
+                sustainedNotes.remove(i);
+        }
+    }
+}
+
 //not sure why some of these have Channel and some don't; should rectify?
 void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, bool soundfont)
 {
@@ -368,6 +380,38 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
     }
 }
 
+void PreparationMap::sustainPedalReleased(Array<bool> keysThatAreDepressed, bool post)
+{
+    sustainPedalIsDepressed = false;
+    
+    //do all keyReleased calls now
+    for(int n=0; n<sustainedNotes.size(); n++)
+    {
+        SustainedNote releaseNote = sustainedNotes.getUnchecked(n);
+        
+        DBG(releaseNote.noteNumber);
+        
+        for (auto proc : dprocessor)
+        {
+            if(!keysThatAreDepressed.getUnchecked(releaseNote.noteNumber)) //don't turn off note if key is down!
+                proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel);
+        }
+        
+        for (auto proc : sprocessor)
+        {
+            proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel);
+        }
+        
+        for (auto proc : nprocessor)
+        {
+            //DBG("nostalgic sustainPedalReleased " + String((int)post));
+            proc->keyReleased(releaseNote.noteNumber, releaseNote.channel, post);
+        }
+    }
+    
+    sustainedNotes.clearQuick();
+}
+
 void PreparationMap::sustainPedalReleased(bool post)
 {
     sustainPedalIsDepressed = false;
@@ -400,7 +444,9 @@ void PreparationMap::sustainPedalReleased(bool post)
 }
 
 void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
-{    
+{
+    DBG("PreparationMap::postRelease " + String(noteNumber));
+    
     if(sustainPedalIsDepressed && pKeymap->containsNote(noteNumber))
     {
         SustainedNote newNote;
@@ -417,6 +463,7 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
         for (auto proc : dprocessor)
         {
             if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber, velocity, channel);
+            //proc->keyReleased(noteNumber, velocity, channel);
         }
         
         for (auto proc : nprocessor)
