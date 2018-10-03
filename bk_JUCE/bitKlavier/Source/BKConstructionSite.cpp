@@ -599,10 +599,6 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     }
 }
 
-void BKConstructionSite::mouseDoubleClick(const MouseEvent& eo)
-{
-}
-
 void BKConstructionSite::mouseHold(Component* frame, bool onItem)
 {
 #if JUCE_IOS

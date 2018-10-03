@@ -20,7 +20,6 @@ BKItem::BKItem(BKPreparationType type, int Id, BKAudioProcessor& p):
 ItemMapper(type, Id),
 BKDraggableComponent(true,false,true, 50, 50, 50, 50),
 processor(p),
-wasJustDragged(false),
 constrain(new ComponentBoundsConstrainer()),
 resizer(new ResizableCornerComponent (this, constrain))
 {
@@ -351,14 +350,13 @@ void BKItem::bkComboBoxDidChange    (ComboBox* cb)
 
 void BKItem::itemIsBeingDragged(const MouseEvent& e)
 {
-    wasJustDragged = true;
 }
 
 
 
 void BKItem::mouseDoubleClick(const MouseEvent& e)
 {
-#if !JUCE_IOS
+//#if !JUCE_IOS
     if (type == PreparationTypePianoMap)
     {
         menu.showPopup();
@@ -368,12 +366,10 @@ void BKItem::mouseDoubleClick(const MouseEvent& e)
         processor.updateState->comment = getCommentText();
         processor.updateState->setCurrentDisplay(type, Id);
     }
-#endif
+//#endif
     
 }
 
-#define RESET 0
-#define PHATNESS 5
 
 void BKItem::mouseDown(const MouseEvent& e)
 {
@@ -382,30 +378,6 @@ void BKItem::mouseDown(const MouseEvent& e)
         
     BKConstructionSite* cs = ((BKConstructionSite*)getParentComponent());
     BKItem* current = cs->getCurrentItem();
-
-    if ((current == this) && !wasJustDragged)
-    {
-        if (time < PHATNESS)
-        {
-            if (type == PreparationTypePianoMap)
-            {
-                menu.showPopup();
-            }
-            else
-            {
-                processor.updateState->setCurrentDisplay(type, Id);
-            }
-        }
-        else
-        {
-            time = RESET;
-        }
-    }
-    else
-    {
-        wasJustDragged = false;
-        time = RESET;
-    }
     
     cs->setCurrentItem(this);
     

@@ -259,8 +259,6 @@ private:
     BKAudioProcessor& processor;
     Label label;
     
-    bool wasJustDragged;
-    
     ScopedPointer<ComponentBoundsConstrainer> constrain;
     
     ScopedPointer<ResizableCornerComponent> resizer;

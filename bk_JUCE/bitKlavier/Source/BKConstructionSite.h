@@ -201,8 +201,6 @@ private:
     
     void mouseDown (const MouseEvent& eo) override;
     
-    void mouseDoubleClick (const MouseEvent& eo) override;
-    
     void mouseUp (const MouseEvent& eo) override;
     
     void mouseDrag (const MouseEvent& e) override;
