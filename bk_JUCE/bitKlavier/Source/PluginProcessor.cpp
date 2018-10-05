@@ -1024,6 +1024,46 @@ void BKAudioProcessor::performModifications(int noteNumber)
     }
 }
 
+void BKAudioProcessor::importSoundfont(void)
+{
+    fc = new FileChooser ("Import your gallery",
+                          File::getCurrentWorkingDirectory(),
+                          "*",
+                          true);
+    
+    fc->launchAsync (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles,
+                     [this] (const FileChooser& chooser)
+                     {
+                         auto results = chooser.getURLResults();
+                         if (results.size() > 0)
+                         {
+                             auto url = results.getReference (0);
+                             
+                             ScopedPointer<InputStream> wi (url.createInputStream (false));
+                             
+                             if (wi != nullptr)
+                             {
+                                 MemoryBlock block(wi->getTotalLength());
+                                 wi->readIntoMemoryBlock(block);
+        
+                                 File file = File::getSpecialLocation (File::userDocumentsDirectory).getChildFile(url.getFileName());
+                                 file.create();
+                                 
+                                 FileOutputStream fos (file);
+                    
+                                 fos.write (&block, block.getSize());
+                                 
+                                 fos.flush();
+                                 
+                                 //if( fos.openedOk())
+                                 {
+                                     loadSamples(BKLoadSoundfont, file.getFullPathName(), 0);
+                                 }
+                             }
+                         }
+                     });
+}
+
 void BKAudioProcessor::importCurrentGallery(void)
 {
     fc = new FileChooser ("Import your gallery",

@@ -55,6 +55,8 @@ public:
     void importCurrentGallery(void);
     void exportCurrentGallery(void);
     
+    void importSoundfont(void);
+    
     void writeCurrentGalleryToURL(String url);
     void deleteGalleryAtURL(String url);
     
