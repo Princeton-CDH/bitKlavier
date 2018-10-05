@@ -816,6 +816,7 @@ typedef enum TuningSystem {
     OtonalTuning,
     UtonalTuning,
     CustomTuning,
+    SpringTuning,
     TuningSystemNil
 
 } TuningSystem;
@@ -829,7 +830,8 @@ static const std::vector<std::string> cTuningSystemNames = {
     "Duodene",
     "Otonal",
     "Utonal",
-    "Custom"
+    "Custom",
+    "Spring"
 };
 
 static const std::vector<std::string> cFundamentalNames = {

@@ -59,7 +59,8 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                      direct->aPrep->getAttack(),
                      direct->aPrep->getDecay(),
                      direct->aPrep->getSustain(),
-                     direct->aPrep->getRelease());
+                     direct->aPrep->getRelease(),
+                     tuner);
         
         
         //store synthNoteNumbers by noteNumber

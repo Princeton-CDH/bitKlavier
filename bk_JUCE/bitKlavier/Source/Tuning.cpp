@@ -17,6 +17,7 @@ tuning(tuning),
 lastNoteTuning(0),
 lastIntervalTuning(0)
 {
+    
 }
 
 TuningProcessor::~TuningProcessor()
@@ -90,10 +91,27 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
 //for keeping track of current cluster size
 void TuningProcessor::processBlock(int numSamples)
 {
-    if(tuning->aPrep->getTuning() == AdaptiveTuning || tuning->aPrep->getTuning() == AdaptiveAnchoredTuning) {
+    TuningSystem currentTuning = tuning->getCurrentTuning();
+    
+    if (currentTuning == SpringTuning)
+    {
+        stuning.simulate();
+    }
+    else if (currentTuning == AdaptiveTuning || currentTuning == AdaptiveAnchoredTuning) {
         
-        if(clusterTime <= tuning->aPrep->getAdaptiveClusterThresh() * sampleRate * 0.001) clusterTime += numSamples;
+        if(clusterTime <= (tuning->aPrep->getAdaptiveClusterThresh() * sampleRate * 0.001))
+            clusterTime += numSamples;
         
+    }
+}
+
+void TuningProcessor::keyReleased(int midiNoteNumber)
+{
+    TuningSystem currentTuning = tuning->getCurrentTuning();
+    
+    if (currentTuning == SpringTuning)
+    {
+        stuning.removeNote(midiNoteNumber % 12);
     }
 }
 
@@ -102,8 +120,10 @@ void TuningProcessor::processBlock(int numSamples)
 void TuningProcessor::keyPressed(int midiNoteNumber)
 {
     adaptiveHistoryCounter++;
+    
+    TuningSystem currentTuning = tuning->getCurrentTuning();
 
-    if(tuning->aPrep->getTuning() == AdaptiveTuning)
+    if (currentTuning == AdaptiveTuning)
     {
         //if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory() - 1)
         if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory())
@@ -115,8 +135,7 @@ void TuningProcessor::keyPressed(int midiNoteNumber)
         //else adaptiveHistoryCounter++;
         
     }
-    
-    else if(tuning->aPrep->getTuning() == AdaptiveAnchoredTuning)
+    else if (currentTuning == AdaptiveAnchoredTuning)
     {
         //if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory() - 1)
         if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory())
@@ -131,6 +150,10 @@ void TuningProcessor::keyPressed(int midiNoteNumber)
 
         }
         //else adaptiveHistoryCounter++;
+    }
+    else if (currentTuning == SpringTuning)
+    {
+        stuning.addNote(midiNoteNumber % 12);
     }
     
     clusterTime = 0;

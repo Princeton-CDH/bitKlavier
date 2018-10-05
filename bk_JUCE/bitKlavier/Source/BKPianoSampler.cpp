@@ -151,6 +151,21 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
 
 #define REVENV 0
 
+void BKPianoSamplerVoice::updatePitch(int midiNoteNumber, int pitchWheelValue, const BKPianoSamplerSound* const sound)
+{
+    pitchbendMultiplier = powf(2.0f, (pitchWheelValue / 8192. - 1.)/12.);
+    
+    pitchRatio = powf(2.0f, (midiNoteNumber - (float)sound->midiRootNote + sound->transpose) / 12.0f)
+    * sound->sourceSampleRate
+    * generalSettings->getTuningRatio()
+    / getSampleRate();
+    
+    
+    DBG("sound->name: " + sound->name);
+        
+    bentRatio = pitchbendMultiplier * pitchRatio;
+}
+
 void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
                                      const int pitchWheelValue,
                                      const float gain,
@@ -168,17 +183,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
     if (const BKPianoSamplerSound* const sound = dynamic_cast<const BKPianoSamplerSound*> (s))
     {
         
-        pitchbendMultiplier = powf(2.0f, (pitchWheelValue / 8192. - 1.)/12.);
-        
-        pitchRatio = powf(2.0f, (midiNoteNumber - (float)sound->midiRootNote + sound->transpose) / 12.0f)
-        * sound->sourceSampleRate
-        * generalSettings->getTuningRatio()
-        / getSampleRate();
-        
-        
-        DBG("sound->name: " + sound->name);
-        
-        bentRatio = pitchbendMultiplier * pitchRatio;
+        updatePitch(midiNoteNumber, pitchWheelValue, sound);
         
         bkType = bktype;
         playType = type;

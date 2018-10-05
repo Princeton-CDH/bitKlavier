@@ -238,6 +238,17 @@
           <FILE id="FXpKMX" name="Synchronic.h" compile="0" resource="0" file="Source/Synchronic.h"/>
           <FILE id="ac8QzA" name="Tuning.cpp" compile="1" resource="0" file="Source/Tuning.cpp"/>
           <FILE id="OrPhKl" name="Tuning.h" compile="0" resource="0" file="Source/Tuning.h"/>
+          <GROUP id="{27D6A86B-9A4E-E13A-49DF-00E35E3972B7}" name="SpringTuning">
+            <FILE id="rAZz0d" name="SpringTuningUtilities.h" compile="0" resource="0"
+                  file="Source/SpringTuningUtilities.h"/>
+            <FILE id="DZP8Fl" name="SpringTuning.h" compile="0" resource="0" file="Source/SpringTuning.h"/>
+            <FILE id="Hvcdj6" name="SpringTuning.cpp" compile="1" resource="0"
+                  file="Source/SpringTuning.cpp"/>
+            <FILE id="voSNPv" name="Spring.h" compile="0" resource="0" file="Source/Spring.h"/>
+            <FILE id="Qi9BHF" name="Spring.cpp" compile="1" resource="0" file="Source/Spring.cpp"/>
+            <FILE id="HIugGx" name="Particle.h" compile="0" resource="0" file="Source/Particle.h"/>
+            <FILE id="J2uhEu" name="Particle.cpp" compile="1" resource="0" file="Source/Particle.cpp"/>
+          </GROUP>
           <FILE id="jeqsaH" name="Tempo.cpp" compile="1" resource="0" file="Source/Tempo.cpp"/>
           <FILE id="o69LuQ" name="Tempo.h" compile="0" resource="0" file="Source/Tempo.h"/>
           <FILE id="gu3W3U" name="General.h" compile="0" resource="0" file="Source/General.h"/>

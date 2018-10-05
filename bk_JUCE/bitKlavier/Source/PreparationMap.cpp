@@ -266,13 +266,19 @@ void PreparationMap::processBlock(int numSamples, int midiChannel, BKSampleLoadT
     else
     {
         for (auto dproc : dprocessor)
+        {
             dproc->processBlock(numSamples, midiChannel, sampleType);
+        }
         
         for (auto sproc : sprocessor)
+        {
             sproc->processBlock(numSamples, midiChannel, sampleType);
+        }
         
         for (auto nproc : nprocessor)
+        {
             nproc->processBlock(numSamples, midiChannel, sampleType);
+        }
         
         for (auto tproc : tprocessor)
             tproc->processBlock(numSamples);
@@ -299,7 +305,6 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
 {
     if (pKeymap->containsNote(noteNumber))
     {
-        
         if(sustainPedalIsDepressed)
         {
             //DBG("removing sustained note " + String(noteNumber));
@@ -359,6 +364,11 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
                 proc->playReleaseSample(noteNumber, velocity, channel, soundfont);
                 
                 proc->keyReleased(noteNumber, velocity, channel, soundfont);
+            }
+            
+            for (auto proc : tprocessor)
+            {
+                proc->keyReleased(noteNumber);
             }
             
             for (auto proc : nprocessor)

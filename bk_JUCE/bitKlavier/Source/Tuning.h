@@ -16,6 +16,8 @@
 
 #include "Keymap.h"
 
+#include "SpringTuning.h"
+
 class TuningPreparation : public ReferenceCountedObject
 {
 public:
@@ -414,6 +416,11 @@ public:
 		name = "random";
 	}
     
+    inline TuningSystem getCurrentTuning(void)
+    {
+        return aPrep->getTuning();
+    }
+    
     
     inline String getName(void) const noexcept {return name;}
     
@@ -646,6 +653,7 @@ public:
     
     //for calculating adaptive tuning
     void keyPressed(int midiNoteNumber);
+    void keyReleased(int midiNoteNumber);
     
     inline int getId(void) const noexcept { return tuning->getId(); }
     
@@ -682,6 +690,8 @@ public:
     
 private:
     Tuning::Ptr tuning;
+    
+    SpringTuningModel stuning;
     
     float   intervalToRatio(float interval) const noexcept { return mtof(interval + 60.) / mtof(60.); }
     float   lastNote[128];
