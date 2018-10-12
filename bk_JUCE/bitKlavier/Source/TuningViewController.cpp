@@ -11,13 +11,31 @@
 #include "TuningViewController.h"
 
 TuningViewController::TuningViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p,theGraph)
+BKViewController(p,theGraph),
+showSprings(false)
 #if JUCE_IOS
 , absoluteKeyboard(true)
 #endif
 {
-    
     setLookAndFeel(&buttonsAndMenusLAF);
+    
+    for (int i = 0; i < 12; i++)
+    {
+        Slider* s = new Slider("t" + String(i));
+        
+        s->setSliderStyle(Slider::SliderStyle::LinearBar);
+        s->setRange(0.0, 1.0);
+        addChildComponent(s);
+        tetherSliders.add(s);
+        
+        s = new Slider("s" + String(i));
+        
+        s->setSliderStyle(Slider::SliderStyle::LinearBar);
+        s->setRange(0.0, 1.0);
+        addChildComponent(s);
+        springSliders.add(s);
+        
+    }
     
     iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::tuning_icon_png, BinaryData::tuning_icon_pngSize));
     iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
@@ -92,6 +110,9 @@ BKViewController(p,theGraph)
     A1reset.setButtonText("reset");
     addAndMakeVisible(A1reset);
     
+    showSpringsButton.setButtonText("Springs");
+    addAndMakeVisible(showSpringsButton);
+    
     nToneRootCB.setName("nToneRoot");
     nToneRootCB.setTooltip("set root note, when semitone width is not 100");
     addAndMakeVisible(nToneRootCB);
@@ -146,6 +167,8 @@ BKViewController(p,theGraph)
     actionButton.addListener(this);
     addAndMakeVisible(actionButton);
     
+    updateComponentVisibility();
+    
 #if JUCE_IOS
     offsetSlider->addWantsBigOneListener(this);
     A1ClusterMax->addWantsBigOneListener(this);
@@ -187,6 +210,11 @@ void TuningViewController::resized()
     comboBoxSlice.removeFromLeft(gXSpacing);
     
     A1reset.setBounds(actionButton.getRight()+gXSpacing,
+                      actionButton.getY(),
+                      actionButton.getWidth(),
+                      actionButton.getHeight());
+    
+    showSpringsButton.setBounds(actionButton.getRight()+gXSpacing,
                       actionButton.getY(),
                       actionButton.getWidth(),
                       actionButton.getHeight());
@@ -279,14 +307,114 @@ void TuningViewController::resized()
     lastNote.setBounds(editAllBounds.getRight() + gXSpacing, editAllBounds.getY(),editAllBounds.getWidth() * 2, editAllBounds.getHeight());
     lastInterval.setBounds(lastNote.getRight() + gXSpacing, lastNote.getY(),lastNote.getWidth(), lastNote.getHeight());
     
+    updateComponentVisibility();
 }
-
 
 void TuningViewController::paint (Graphics& g)
 {
-    //g.fillAll(Colours::lightgrey);
-    //g.fillAll(Colours::transparentWhite);
     g.fillAll(Colours::black);
+    
+    if (processor.updateState->currentDisplay == DisplayTuning)
+    {
+        TuningProcessor::Ptr tuning = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
+        
+        if (!showSprings || (tuning->getTuning()->getCurrentTuning() != SpringTuning)) return;
+        
+        
+        Rectangle<int> b = getBounds();
+        b.removeFromTop(TOP);
+        
+        
+        g.setColour(Colours::antiquewhite);
+        g.fillRect(b);
+
+        g.setColour (Colours::black);
+        g.setFont (40.0f);
+        g.drawFittedText ("Spring Tuning", b, Justification::centredTop, 1);
+        
+        g.setFont(20.0f);
+        g.drawFittedText("Tethers", 10, TOP+50, 150, 40, Justification::centredTop, 1);
+        g.drawFittedText("Springs", 170, TOP+50, 150, 40, Justification::centredTop, 1);
+        
+        g.setFont(12.0f);
+        
+        float midi,scalex,posx,radians,cx,cy;
+        float centerx = b.getWidth() * 0.65f, centery = b.getHeight() * 0.5f, radius = jmin(b.getHeight() * 0.25, b.getWidth() * 0.25);
+        float dimc = jmin(b.getHeight() * 0.05, b.getWidth() * 0.05);
+        int x_offset = 0.075 * b.getWidth();
+        
+        for (auto s : tuning->getSprings())
+        {
+            if (s->getEnabled())
+            {
+                Particle* a = s->getA();
+                midi = Utilities::ftom(Utilities::centsToFreq(a->getX()));
+                scalex = ((midi - 60.0f) / 12.0f);
+                
+                radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
+                
+                float cxa = centerx + cosf(radians) * radius;
+                float cya = centery + sinf(radians) * radius;
+                
+                Particle* b = s->getB();
+                midi = Utilities::ftom(Utilities::centsToFreq(b->getX()));
+                scalex = ((midi - 60.0f) / 12.0f);
+                
+                radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
+                
+                float cxb = centerx + cosf(radians) * radius;
+                float cyb = centery + sinf(radians) * radius;
+                
+                double strength = s->getStrength();
+                g.setColour(Colours::dimgrey);
+                g.drawLine(cxa, cya, cxb, cyb,  (strength > 0.0) ? strength * 5.0 + 1.0 : 0.0);
+            }
+            
+        }
+        
+        for (auto p : tuning->getTetherParticles())
+        {
+            if (p->getEnabled())
+            {
+                // DRAW REST PARTICLE
+                midi = Utilities::ftom(Utilities::centsToFreq(p->getRestX()));
+                scalex = ((midi - 60.0f) / 12.0f);
+                posx = scalex *  (getWidth() - 2*x_offset);
+                
+                radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
+                
+                cx = centerx + cosf(radians) * radius - dimc * 0.5f;
+                cy = centery + sinf(radians) * radius - dimc * 0.5f;
+                
+                g.setColour (Colours::grey);
+                g.fillEllipse(cx, cy, dimc, dimc);
+            }
+        }
+        
+        for (auto p : tuning->getParticles())
+        {
+            if (p->getEnabled())
+            {
+                // DRAW PARTICLE IN MOTION
+                midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(p->getX())), 128);
+                scalex = ((midi - 60.0f) / 12.0f);
+                posx = scalex *  (b.getWidth() - 2*x_offset);
+                
+                radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
+                
+                cx = centerx + cosf(radians) * radius - dimc * 0.5f;
+                cy = centery + sinf(radians) * radius - dimc * 0.5f;
+                
+                g.setColour (Colours::black);
+                g.fillEllipse(cx, cy, dimc, dimc);
+                
+                g.setColour (Colours::black);
+                g.fillEllipse(x_offset + posx, b.getHeight() * 0.9, dimc, dimc);
+            }
+        }
+        
+    }
+    
 }
 
 void TuningViewController::fillTuningCB(void)
@@ -339,7 +467,14 @@ void TuningViewController::fillFundamentalCB(void)
 
 void TuningViewController::updateComponentVisibility()
 {
-        
+    
+    for (auto s : tetherSliders) s->setVisible(false);
+    for (auto s : springSliders) s->setVisible(false);
+    
+    absoluteKeyboard.setVisible(true);
+    customKeyboard.setVisible(true);
+    offsetSlider->setVisible(true);
+    
     if(scaleCB.getText() == "Adaptive Tuning 1")
     {
         A1IntervalScaleCB.setVisible(true);
@@ -356,6 +491,7 @@ void TuningViewController::updateComponentVisibility()
         nToneRootCB.setVisible(false);
         nToneRootOctaveCB.setVisible(false);
         nToneSemitoneWidthSlider->setVisible(false);
+        showSpringsButton.setVisible(false);
 
     }
     else if(scaleCB.getText() == "Adaptive Anchored Tuning 1")
@@ -374,7 +510,58 @@ void TuningViewController::updateComponentVisibility()
         nToneRootCB.setVisible(false);
         nToneRootOctaveCB.setVisible(false);
         nToneSemitoneWidthSlider->setVisible(false);
+        showSpringsButton.setVisible(false);
 
+    }
+    else if (scaleCB.getText() == "Spring")
+    {
+        A1IntervalScaleCB.setVisible(false);
+        A1Inversional.setVisible(false);
+        A1AnchorScaleCB.setVisible(false);
+        A1FundamentalCB.setVisible(false);
+        A1ClusterThresh->setVisible(false);
+        A1ClusterMax->setVisible(false);
+        A1IntervalScaleLabel.setVisible(false);
+        A1AnchorScaleLabel.setVisible(false);
+        A1FundamentalLabel.setVisible(false);
+        A1reset.setVisible(false);
+        currentFundamental.setVisible(false);
+        
+        
+        nToneRootCB.setVisible(true);
+        nToneRootOctaveCB.setVisible(true);
+        nToneSemitoneWidthSlider->setVisible(true);
+        showSpringsButton.setVisible(true);
+        absoluteKeyboard.setVisible(true);
+        customKeyboard.setVisible(true);
+        offsetSlider->setVisible(true);
+        
+        if (showSprings)
+        {
+            TuningProcessor::Ptr tuning = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
+            Spring::PtrArr springs = tuning->getSprings();
+            Spring::PtrArr tetherSprings = tuning->getTetherSprings();
+            
+            nToneRootCB.setVisible(false);
+            nToneRootOctaveCB.setVisible(false);
+            nToneSemitoneWidthSlider->setVisible(false);
+            showSpringsButton.setVisible(true);
+            
+            absoluteKeyboard.setVisible(false);
+            customKeyboard.setVisible(false);
+            offsetSlider->setVisible(false);
+            
+            for (int i = 0; i < 12; i++)
+            {
+                tetherSliders[i]->setVisible(true);
+                tetherSliders[i]->toFront(true);
+                tetherSliders[i]->setValue(tetherSprings[i]->getStrength());
+                
+                springSliders[i]->setVisible(true);
+                springSliders[i]->toFront(true);
+                springSliders[i]->setValue(springs[i]->getStrength());
+            }
+        }
     }
     else
     {
@@ -392,6 +579,7 @@ void TuningViewController::updateComponentVisibility()
         nToneRootCB.setVisible(true);
         nToneRootOctaveCB.setVisible(true);
         nToneSemitoneWidthSlider->setVisible(true);
+        showSpringsButton.setVisible(false);
     }
 }
 
@@ -409,6 +597,13 @@ TuningPreparationEditor::TuningPreparationEditor(BKAudioProcessor& p, BKItemGrap
 TuningViewController(p, theGraph)
 {
     fillSelectCB(-1,-1);
+    
+    for (int i = 0; i < 12; i++)
+    {
+        tetherSliders[i]->addListener(this);
+        
+        springSliders[i]->addListener(this);
+    }
     
     selectCB.addMyListener(this);
     
@@ -432,6 +627,8 @@ TuningViewController(p, theGraph)
     
     A1reset.addListener(this);
     
+    showSpringsButton.addListener(this);
+    
     absoluteKeyboard.addMyListener(this);
     
     customKeyboard.addMyListener(this);
@@ -444,7 +641,7 @@ TuningViewController(p, theGraph)
     
     nToneSemitoneWidthSlider->addMyListener(this);
     
-    startTimer(50);
+    startTimerHz(30);
     
     update();
 }
@@ -477,6 +674,30 @@ void TuningPreparationEditor::timerCallback()
                 {
                     A1ClusterThresh->setDisplayValue(0);
                     A1ClusterMax->setDisplayValue(0);
+                }
+            }
+        }
+        
+        if (tProcessor->getTuning()->getCurrentTuning() == SpringTuning)
+        {
+            for (auto p : tProcessor->getParticles())
+            {
+                const int x_offset = 10;
+                const int y_offset = TOP+75;
+                const int w = 150;
+                const int h = 25;
+                const int yspacing = 5;
+                const int xspacing = 5;
+                
+                repaint();
+                
+                int sx = 0, tx = 0;
+                //DBG("~ ~ ~ ~ ~ ~ ~");
+                for (int i = 0; i < 12; i++)
+                {
+                    tetherSliders[i]->setBounds(x_offset, y_offset + (h + yspacing) * tx++, w, h);
+                    
+                    springSliders[i]->setBounds(x_offset + w + xspacing, y_offset + (h + yspacing) * sx++, w, h);
                 }
             }
         }
@@ -763,6 +984,33 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
     processor.gallery->setGalleryDirty(true);
 }
 
+void TuningPreparationEditor::sliderValueChanged (Slider* slider)
+{
+    double value = slider->getValue();
+    
+    String name = slider->getName();
+    
+    TuningProcessor::Ptr tuning = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
+    
+    Spring::PtrArr tetherSprings = tuning->getTetherSprings();
+    Spring::PtrArr springs = tuning->getSprings();
+    
+    
+    for (int i = 0; i < 12; i++)
+    {
+        if (slider == tetherSliders[i])
+        {
+            tetherSprings[i]->setStrength(value);
+            break;
+        }
+        else if (slider == springSliders[i])
+        {
+            springs[i]->setStrength(value);
+            break;
+        }
+    }
+}
+
 void TuningPreparationEditor::BKSingleSliderValueChanged(String name, double val)
 {
     TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
@@ -805,6 +1053,12 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         active->setAdaptiveInversional(A1Inversional.getToggleState());
         
         processor.gallery->setGalleryDirty(true);
+    }
+    else if (b == &showSpringsButton)
+    {
+        showSprings = !showSprings;
+        
+        updateComponentVisibility();
     }
     else if (b == &A1reset)
     {

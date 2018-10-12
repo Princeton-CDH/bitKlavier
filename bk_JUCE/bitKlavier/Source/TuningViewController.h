@@ -12,6 +12,8 @@
 
 #include "BKViewController.h"
 
+#define TOP 50
+
 class TuningViewController :
 public BKViewController
 #if JUCE_IOS
@@ -63,6 +65,9 @@ protected:
     ScopedPointer<BKSingleSlider> A1ClusterMax;
     
     BKTextButton A1reset;
+    
+    BKTextButton showSpringsButton;
+    bool showSprings;
 
     Array<float> absoluteOffsets;   //for entire keyboard; up to 128 vals
     Array<float> customOffsets;     //for custom tuning; 12 vals
@@ -82,6 +87,11 @@ protected:
     BKComboBox nToneRootCB;
     BKComboBox nToneRootOctaveCB;
     ScopedPointer<BKSingleSlider> nToneSemitoneWidthSlider;
+    
+    OwnedArray<Slider> springSliders;
+    OwnedArray<Slider> tetherSliders;
+    OwnedArray<Label>  springLabels;
+    OwnedArray<Label>  tetherLabels;
 
     //other overrides
     
@@ -106,6 +116,7 @@ public BKSingleSlider::Listener,
 //public BKKeyboardSlider::Listener,
 public BKCircularKeyboardSlider::Listener,
 public BKAbsoluteKeyboardSlider::Listener,
+public Slider::Listener,
 public Timer
 {
 public:
@@ -133,6 +144,7 @@ private:
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(String name, double val) override;
     void keyboardSliderChanged(String name, Array<float> values) override;
+    void sliderValueChanged (Slider* slider) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningPreparationEditor)
     
@@ -144,6 +156,7 @@ public BKEditableComboBoxListener,
 public BKSingleSlider::Listener,
 //public BKKeyboardSlider::Listener,
 public BKCircularKeyboardSlider::Listener,
+public Slider::Listener,
 public BKAbsoluteKeyboardSlider::Listener
 {
 public:
@@ -173,6 +186,7 @@ private:
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(String name, double val) override;
     void keyboardSliderChanged(String name, Array<float> values) override;
+    void sliderValueChanged (Slider* slider) override {};
     
     void greyOutAllComponents();
     void highlightModedComponents();

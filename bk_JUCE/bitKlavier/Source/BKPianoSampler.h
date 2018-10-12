@@ -159,7 +159,7 @@ public:
                     BKSynthesiserSound* sound
                     ) override;
     
-    void updatePitch(int midiNoteNumber, int pitchWheelValue, const BKPianoSamplerSound* const sound);
+    void updatePitch(const BKPianoSamplerSound* const sound);
     
     void stopNote (float velocity, bool allowTailOff) override;
     
@@ -185,6 +185,7 @@ public:
 private:
     //==============================================================================
     int noteNumber;
+    int pitchWheel;
     int layer;
     float noteVelocity;
     uint64 noteStartingPosition, noteEndPosition;

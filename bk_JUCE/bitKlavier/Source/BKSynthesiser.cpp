@@ -319,8 +319,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                const float startingPositionMS,
                                const float lengthMS,
                                const float rampOnMS, //included in lengthMS
-                               const float rampOffMS //included in lengthMS
-                               )
+                               const float rampOffMS, //included in lengthMS
+                               TuningProcessor::Ptr tuner)
     {
                     keyOn   (midiChannel,
                              keyNoteNumber,
@@ -337,7 +337,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                              rampOnMS,
                              3.,
                              1.,
-                             rampOffMS);
+                             rampOffMS,
+                             tuner);
     }
     
     void BKSynthesiser::keyOn (const int midiChannel,
@@ -355,8 +356,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                float adsrAttackMS,
                                float adsrDecayMS,
                                float adsrSustain,
-                               float adsrReleaseMS
-                               )
+                               float adsrReleaseMS,
+                               TuningProcessor::Ptr tuner)
     {
         const ScopedLock sl (lock);
         
@@ -385,6 +386,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                     }
                 }
                 
+                
+                
                 startVoice (findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes),
                             sound,
                             midiChannel,
@@ -401,7 +404,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                             adsrAttackMS*0.001f* getSampleRate(),
                             adsrDecayMS*0.001f* getSampleRate(),
                             adsrSustain,
-                            adsrReleaseMS*0.001f* getSampleRate());
+                            adsrReleaseMS*0.001f* getSampleRate(),
+                            tuner);
                 
                 //break;
  
@@ -425,7 +429,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                     const uint64 startingPosition,
                                     const uint64 length,
                                     uint64 voiceRampOn,
-                                    uint64 voiceRampOff
+                                    uint64 voiceRampOff,
+                                    TuningProcessor::Ptr tuner
                                     )
     {
                     startVoice      (voice,
@@ -444,7 +449,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                      voiceRampOn,
                                      3.*0.001f* getSampleRate(),
                                      1.,
-                                     30.*0.001f* getSampleRate());
+                                     30.*0.001f* getSampleRate(),
+                                     tuner);
     }
     
     
@@ -464,7 +470,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                     uint64 adsrAttack,
                                     uint64 adsrDecay,
                                     float adsrSustain,
-                                    uint64 adsrRelease
+                                    uint64 adsrRelease,
+                                    TuningProcessor::Ptr tuner
                                     )
     {
         if (voice != nullptr && sound != nullptr)
@@ -483,6 +490,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             voice->keyIsDown = true;
             voice->sostenutoPedalDown = false;
             voice->sustainPedalDown = sustainPedalsDown[midiChannel];
+            voice->tuning = tuner;
             
             voice->currentlyPlayingKey = keyNoteNumber; //keep track of which physical key is associated with this voice
             
@@ -589,7 +597,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                             0.001f,                 //  A
                             0.001f,                 //  D
                             1.0f,                   //  S
-                            0.001f);                //  R
+                            0.001f, nullptr);                //  R
                 
                 // break;
                 

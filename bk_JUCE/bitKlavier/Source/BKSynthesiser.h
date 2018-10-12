@@ -17,6 +17,8 @@
 
 #include "General.h"
 
+#include "Tuning.h"
+
 #if 0
 class SFRegion : public ReferenceCountedObject
 {
@@ -77,6 +79,7 @@ public:
     sfzero::Region::Trigger trigger;
     bool pedal;
     String sampleName;
+    
 private:
     
     //==============================================================================
@@ -266,6 +269,8 @@ public:
     GeneralSettings::Ptr generalSettings;
     void setGeneralSettings(GeneralSettings::Ptr gen) {generalSettings = gen;}
     
+    TuningProcessor::Ptr tuning;
+    
 protected:
     /** Resets the state of this voice after a sound has finished playing.
      
@@ -433,7 +438,8 @@ public:
                         float startingPositionMS,
                         float lengthMS,
                         float rampOnMS,
-                        float rampOffMS);
+                        float rampOffMS,
+                        TuningProcessor::Ptr tuner = nullptr);
     
     virtual void keyOn (int midiChannel,
                         int keyNoteNumber,
@@ -450,7 +456,8 @@ public:
                         float adsrAttackMS,
                         float adsrDecayMS,
                         float adsrSustain,
-                        float adsrReleaseMS);
+                        float adsrReleaseMS,
+                        TuningProcessor::Ptr tuner = nullptr);
     
     /** Triggers a note-off event.
      
@@ -686,7 +693,8 @@ protected:
                      uint64 startingPosition,
                      uint64 length,
                      uint64 voiceRampOn,
-                     uint64 voiceRampOff);
+                     uint64 voiceRampOff,
+                     TuningProcessor::Ptr tuner);
     
     void startVoice (BKSynthesiserVoice* voice,
                      BKSynthesiserSound* sound,
@@ -704,7 +712,8 @@ protected:
                      uint64 adsrAttack,
                      uint64 adsrDecay,
                      float adsrSustain,
-                     uint64 adsrRelease);
+                     uint64 adsrRelease,
+                     TuningProcessor::Ptr tuner);
     
     /** Stops a given voice.
      You should never need to call this, it's used internally by noteOff, but is protected

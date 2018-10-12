@@ -151,17 +151,32 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
 
 #define REVENV 0
 
-void BKPianoSamplerVoice::updatePitch(int midiNoteNumber, int pitchWheelValue, const BKPianoSamplerSound* const sound)
+void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
 {
-    pitchbendMultiplier = powf(2.0f, (pitchWheelValue / 8192. - 1.)/12.);
+    pitchbendMultiplier = powf(2.0f, (pitchWheel/ 8192. - 1.)/12.);
     
-    pitchRatio = powf(2.0f, (midiNoteNumber - (float)sound->midiRootNote + sound->transpose) / 12.0f)
-    * sound->sourceSampleRate
-    * generalSettings->getTuningRatio()
-    / getSampleRate();
-    
-    
-    DBG("sound->name: " + sound->name);
+    if (tuning->getTuning()->getCurrentTuning() == SpringTuning)
+    {
+        Particle::PtrArr particles = tuning->getParticles();
+        
+        double x = particles[(noteNumber % 12)]->getX();
+        
+        int octave = (int)(noteNumber / 12);
+        
+        double midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(x)), 128) - 60.0 + (octave * 12.0 + 1.0);
+        
+        pitchRatio =    powf(2.0f, (midi - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
+        sound->sourceSampleRate *
+        generalSettings->getTuningRatio() /
+        getSampleRate();
+    }
+    else
+    {
+        pitchRatio =    powf(2.0f, (noteNumber - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
+        sound->sourceSampleRate *
+        generalSettings->getTuningRatio() /
+        getSampleRate();
+    }
         
     bentRatio = pitchbendMultiplier * pitchRatio;
 }
@@ -183,7 +198,11 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
     if (const BKPianoSamplerSound* const sound = dynamic_cast<const BKPianoSamplerSound*> (s))
     {
         
-        updatePitch(midiNoteNumber, pitchWheelValue, sound);
+        noteNumber = midiNoteNumber;
+        pitchWheel = pitchWheelValue;
+        
+       
+        updatePitch(sound);
         
         bkType = bktype;
         playType = type;
@@ -194,6 +213,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         offset = (offset > 0.0) ? offset : 0.0;
         
         uint64 totalLength = length;
+        
+        
         
         if (bkType != MainNote)
         {
@@ -337,9 +358,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
             sampleEnv.setTime(cfSamples / getSampleRate());
             loopEnv.setTime(cfSamples / getSampleRate());
             
-            DBG("loop mode: " + String(sound->loopMode));
-            DBG("ahdsr: " + String(sound->attack) +" "+ String(sound->hold) +" "+ String (sound->decay) +" "+ String(sound->sustain) +" "+ String(sound->release));
-            
             if (playDirection == Forward)
             {
                 inLoop = false;
@@ -443,7 +461,6 @@ void BKPianoSamplerVoice::pitchWheelMoved (const int newValue)
 {
     pitchbendMultiplier = powf(2.0f, (newValue / 8192. - 1.)/12.);
     bentRatio = pitchRatio * pitchbendMultiplier;
-    DBG("PBW " + String(pitchbendMultiplier) + " " + String(noteNumber));
 }
 
 void BKPianoSamplerVoice::controllerMoved (const int /*controllerNumber*/,
@@ -707,6 +724,8 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
 {
     if (const BKPianoSamplerSound* const playingSound = static_cast<BKPianoSamplerSound*> (getCurrentlyPlayingSound().get()))
     {
+        updatePitch(playingSound);
+        
         if (playingSound->isSoundfont)
         {
             if (playingSound->loopMode <= 2)

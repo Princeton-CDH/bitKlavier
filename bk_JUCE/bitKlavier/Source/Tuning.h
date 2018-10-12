@@ -688,10 +688,19 @@ public:
         tuning->aPrep->copy(tuning->sPrep);
     }
     
+    inline Particle::PtrArr getParticles(void) { return stuning.getParticles(); }
+    inline Particle::PtrArr getTetherParticles(void) { return stuning.getTetherParticles(); }
+    inline Spring::PtrArr getSprings(void) { return stuning.getSprings(); }
+    inline Spring::PtrArr getTetherSprings(void) { return stuning.getTetherSprings(); }
+    
+    
+    
 private:
     Tuning::Ptr tuning;
     
     SpringTuningModel stuning;
+    
+    
     
     float   intervalToRatio(float interval) const noexcept { return mtof(interval + 60.) / mtof(60.); }
     float   lastNote[128];
