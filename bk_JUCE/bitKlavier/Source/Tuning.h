@@ -688,17 +688,17 @@ public:
         tuning->aPrep->copy(tuning->sPrep);
     }
     
-    inline Particle::PtrArr getParticles(void) { return stuning.getParticles(); }
-    inline Particle::PtrArr getTetherParticles(void) { return stuning.getTetherParticles(); }
-    inline Spring::PtrArr getSprings(void) { return stuning.getSprings(); }
-    inline Spring::PtrArr getTetherSprings(void) { return stuning.getTetherSprings(); }
+    inline Particle::PtrArr getParticles(void) { return stuning->getParticles(); }
+    inline Particle::PtrArr getTetherParticles(void) { return stuning->getTetherParticles(); }
+    inline Spring::PtrArr getSprings(void) { return stuning->getSprings(); }
+    inline Spring::PtrArr getTetherSprings(void) { return stuning->getTetherSprings(); }
     
     
     
 private:
     Tuning::Ptr tuning;
     
-    SpringTuningModel stuning;
+    SpringTuningModel::Ptr stuning;
     
     
     

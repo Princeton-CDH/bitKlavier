@@ -324,7 +324,6 @@ void TuningViewController::paint (Graphics& g)
         Rectangle<int> b = getBounds();
         b.removeFromTop(TOP);
         
-        
         g.setColour(Colours::antiquewhite);
         g.fillRect(b);
 
@@ -409,7 +408,7 @@ void TuningViewController::paint (Graphics& g)
                 g.fillEllipse(cx, cy, dimc, dimc);
                 
                 g.setColour (Colours::black);
-                g.fillEllipse(x_offset + posx, b.getHeight() * 0.9, dimc, dimc);
+                g.fillEllipse(springSliders[0]->getRight() + posx, b.getHeight() * 0.9, dimc, dimc);
             }
         }
         

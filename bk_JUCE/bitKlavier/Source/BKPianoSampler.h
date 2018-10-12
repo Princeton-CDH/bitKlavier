@@ -124,6 +124,8 @@ public:
     /** Destructor. */
     ~BKPianoSamplerVoice();
     
+    int counter;
+    
     //==============================================================================
     
     //GeneralSettings::Ptr generalSettings;

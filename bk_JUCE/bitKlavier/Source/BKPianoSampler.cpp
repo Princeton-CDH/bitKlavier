@@ -151,6 +151,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
 
 #define REVENV 0
 
+#define PRINT 500
+
 void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
 {
     pitchbendMultiplier = powf(2.0f, (pitchWheel/ 8192. - 1.)/12.);
@@ -164,6 +166,12 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
         int octave = (int)(noteNumber / 12);
         
         double midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(x)), 128) - 60.0 + (octave * 12.0 + 1.0);
+        
+        if (++counter > PRINT)
+        {
+            counter = 0;
+            DBG("midi: " + String(noteNumber) + " x: " + String(x) + " particle midi: " + String(midi) );
+        }
         
         pitchRatio =    powf(2.0f, (midi - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
         sound->sourceSampleRate *
