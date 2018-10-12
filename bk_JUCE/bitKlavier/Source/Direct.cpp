@@ -95,13 +95,15 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel, b
 void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int channel, bool soundfont)
 {
     // CHECK THIS OUT WITH DAN (dont need loop right? can just do keyPlayed[noteNumber].getUnchecked(0);
-    for (int i = 0; i<keyPlayed[noteNumber].size(); i++)
+    //for (int i = 0; i<keyPlayed[noteNumber].size(); i++)
     {
-        int t = keyPlayed[noteNumber].getUnchecked(i);
-        float t_offset = keyPlayedOffset[noteNumber].getUnchecked(i);
+        //int t = keyPlayed[noteNumber].getUnchecked(i);
+        //float t_offset = keyPlayedOffset[noteNumber].getUnchecked(i);
+        int t = keyPlayed[noteNumber].getUnchecked(0);
+        float t_offset = keyPlayedOffset[noteNumber].getUnchecked(0);
         
         //only play hammers/resonance for first note in layers of transpositions
-        if(i==0)
+        //if(i==0)
         {
             float hGain = direct->aPrep->getHammerGain();
             float rGain = direct->aPrep->getResonanceGain();
