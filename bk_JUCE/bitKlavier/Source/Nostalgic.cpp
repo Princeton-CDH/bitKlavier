@@ -110,7 +110,8 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                                  nostalgic->aPrep->getReverseAttack(),
                                  nostalgic->aPrep->getReverseDecay(),
                                  nostalgic->aPrep->getReverseSustain(),
-                                 nostalgic->aPrep->getReverseRelease() );
+                                 nostalgic->aPrep->getReverseRelease(),
+                                 tuner);
                 }
                 
                 activeNotes.removeFirstMatchingValue(midiNoteNumber);
@@ -168,7 +169,8 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                              nostalgic->aPrep->getReverseAttack(),
                              nostalgic->aPrep->getReverseDecay(),
                              nostalgic->aPrep->getReverseSustain(),
-                             nostalgic->aPrep->getReverseRelease() );
+                             nostalgic->aPrep->getReverseRelease(),
+                             tuner);
             }
             
             // turn note length timers off
@@ -223,7 +225,8 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                              nostalgic->aPrep->getReverseAttack(),
                              nostalgic->aPrep->getReverseDecay(),
                              nostalgic->aPrep->getReverseSustain(),
-                             nostalgic->aPrep->getReverseRelease() );
+                             nostalgic->aPrep->getReverseRelease(),
+                             tuner);
             }
             
             reverseNotes.insert(0, new NostalgicNoteStuff(midiNoteNumber));
@@ -291,7 +294,8 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
                              nostalgic->aPrep->getReverseAttack(),
                              nostalgic->aPrep->getReverseDecay(),
                              nostalgic->aPrep->getReverseSustain(),
-                             nostalgic->aPrep->getReverseRelease() );
+                             nostalgic->aPrep->getReverseRelease(),
+                             tuner);
             }
             
             reverseNotes.insert(0, new NostalgicNoteStuff(midiNoteNumber));
@@ -373,7 +377,8 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
                                  nostalgic->aPrep->getUndertowAttack(),
                                  nostalgic->aPrep->getUndertowDecay(),
                                  nostalgic->aPrep->getUndertowSustain(),
-                                 nostalgic->aPrep->getUndertowRelease() );
+                                 nostalgic->aPrep->getUndertowRelease(),
+                                 tuner);
                 }
 
                 undertowNotes.insert(0, new NostalgicNoteStuff(thisNote->getNoteNumber()));

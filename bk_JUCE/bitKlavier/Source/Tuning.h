@@ -693,7 +693,8 @@ public:
     inline Spring::PtrArr getSprings(void) { return stuning->getSprings(); }
     inline Spring::PtrArr getTetherSprings(void) { return stuning->getTetherSprings(); }
     
-    
+    inline void setSpringWeight(int which, double weight) { stuning->setSpringWeight(which, weight);}
+    inline void setTetherSpringWeight(int which, double weight) { stuning->setTetherSpringWeight(which, weight);}
     
 private:
     Tuning::Ptr tuning;

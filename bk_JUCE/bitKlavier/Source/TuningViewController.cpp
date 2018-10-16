@@ -999,12 +999,12 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
     {
         if (slider == tetherSliders[i])
         {
-            tetherSprings[i]->setStrength(value);
+            tuning->setTetherSpringWeight(i, value);
             break;
         }
         else if (slider == springSliders[i])
         {
-            springs[i]->setStrength(value);
+            tuning->setSpringWeight(i, value);
             break;
         }
     }

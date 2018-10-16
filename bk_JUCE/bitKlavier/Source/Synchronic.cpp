@@ -94,8 +94,8 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
                      synchronic->aPrep->getAttack(envelopeCounter),
                      synchronic->aPrep->getDecay(envelopeCounter),
                      synchronic->aPrep->getSustain(envelopeCounter),
-                     synchronic->aPrep->getRelease(envelopeCounter)
-                     );
+                     synchronic->aPrep->getRelease(envelopeCounter),
+                     tuner);
     }
     
 }
