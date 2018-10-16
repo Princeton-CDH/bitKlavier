@@ -155,7 +155,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
 
 void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
 {
-    pitchbendMultiplier = powf(2.0f, (pitchWheel/ 8192. - 1.)/12.);
+    pitchbendMultiplier = powf(2.0f, (pitchWheel/ 8192.0f - 1.0f)/12.0f);
     
     if (tuning->getTuning()->getCurrentTuning() == SpringTuning)
     {
@@ -165,7 +165,7 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
         
         int octave = (int)(noteNumber / 12);
         
-        double midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(x)), 128) - 60.0 + (octave * 12.0 + 1.0);
+        double midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(x)), 128) - 60.0 + (octave * 12.0 + 1);
         
         if (++counter > PRINT)
         {
@@ -209,7 +209,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
         noteNumber = midiNoteNumber;
         pitchWheel = pitchWheelValue;
         
-       
         updatePitch(sound);
         
         bkType = bktype;

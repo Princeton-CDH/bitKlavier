@@ -132,7 +132,8 @@ void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int chan
                                        0,
                                        2000,
                                        3,
-                                       3 );
+                                       3,
+                                       tuner);
                 }
                 
             }
@@ -152,7 +153,8 @@ void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int chan
                                       0,
                                       2000,
                                       3,
-                                      3 );
+                                      3,
+                                      tuner);
                 
             }
         }
