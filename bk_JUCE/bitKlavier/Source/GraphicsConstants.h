@@ -64,6 +64,8 @@ static const int gVCWidth = 375;
 static const int gXSpacing = 4;
 static const int gYSpacing = 4;
 
+static const std::vector<std::string> intervalNames = {"U", "m2", "M2", "m3", "M3", "P4", "d5", "P5", "m6", "M6", "m7", "M7", "O" };
+
 static const int gPaddingConst = 10;
 static const float gModAlpha = 0.4;
 

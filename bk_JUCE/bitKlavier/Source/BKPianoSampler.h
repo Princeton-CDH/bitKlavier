@@ -186,7 +186,7 @@ public:
     
 private:
     //==============================================================================
-    int noteNumber;
+    double noteNumber;
     int pitchWheel;
     int layer;
     float noteVelocity;

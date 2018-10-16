@@ -161,7 +161,7 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
     {
         Particle::PtrArr particles = tuning->getParticles();
         
-        double x = particles[(noteNumber % 12)]->getX();
+        double x = particles[(((int)noteNumber) % 12)]->getX();
         
         int octave = (int)(noteNumber / 12);
         

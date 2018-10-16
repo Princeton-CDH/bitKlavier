@@ -18,6 +18,7 @@ showSprings(false)
 #endif
 {
     setLookAndFeel(&buttonsAndMenusLAF);
+
     
     for (int i = 0; i < 12; i++)
     {
@@ -28,7 +29,7 @@ showSprings(false)
         addChildComponent(s);
         tetherSliders.add(s);
         
-        s = new Slider("s" + String(i));
+        s = new Slider(intervalNames[i]);
         
         s->setSliderStyle(Slider::SliderStyle::LinearBar);
         s->setRange(0.0, 1.0);
