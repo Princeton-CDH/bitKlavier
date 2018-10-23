@@ -159,13 +159,13 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
     
     if (tuning->getTuning()->getCurrentTuning() == SpringTuning)
     {
-        Particle::PtrArr particles = tuning->getParticles();
+        Particle::PtrArr particles = tuning->getTuning()->getParticles();
         
         double x = particles[(((int)noteNumber) % 12)]->getX();
         
         int octave = (int)(noteNumber / 12);
         
-        double midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(x)), 128) - 60.0 + (octave * 12.0 + 1);
+        double midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(x)), 128) - 60.0 + (octave * 12.0);
         
         if (++counter > PRINT)
         {

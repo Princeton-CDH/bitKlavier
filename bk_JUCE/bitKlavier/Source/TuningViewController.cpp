@@ -343,7 +343,7 @@ void TuningViewController::paint (Graphics& g)
         float dimc = jmin(b.getHeight() * 0.05, b.getWidth() * 0.05);
         int x_offset = 0.075 * b.getWidth();
         
-        for (auto s : tuning->getSprings())
+        for (auto s : tuning->getTuning()->getSprings())
         {
             if (s->getEnabled())
             {
@@ -372,7 +372,7 @@ void TuningViewController::paint (Graphics& g)
             
         }
         
-        for (auto p : tuning->getTetherParticles())
+        for (auto p : tuning->getTuning()->getTetherParticles())
         {
             if (p->getEnabled())
             {
@@ -391,7 +391,7 @@ void TuningViewController::paint (Graphics& g)
             }
         }
         
-        for (auto p : tuning->getParticles())
+        for (auto p : tuning->getTuning()->getParticles())
         {
             if (p->getEnabled())
             {
@@ -538,7 +538,7 @@ void TuningViewController::updateComponentVisibility()
         
         if (showSprings)
         {
-            TuningProcessor::Ptr tuning = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
+            Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
             Spring::PtrArr springs = tuning->getSprings();
             Spring::PtrArr tetherSprings = tuning->getTetherSprings();
             
@@ -555,11 +555,11 @@ void TuningViewController::updateComponentVisibility()
             {
                 tetherSliders[i]->setVisible(true);
                 tetherSliders[i]->toFront(true);
-                tetherSliders[i]->setValue(tetherSprings[i]->getStrength());
+                tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
                 
                 springSliders[i]->setVisible(true);
                 springSliders[i]->toFront(true);
-                springSliders[i]->setValue(springs[i]->getStrength());
+                springSliders[i]->setValue(springs[i]->getStrength(), dontSendNotification);
             }
         }
     }
@@ -680,7 +680,7 @@ void TuningPreparationEditor::timerCallback()
         
         if (tProcessor->getTuning()->getCurrentTuning() == SpringTuning)
         {
-            for (auto p : tProcessor->getParticles())
+            for (auto p : tProcessor->getTuning()->getParticles())
             {
                 const int x_offset = 10;
                 const int y_offset = TOP+75;
@@ -990,7 +990,7 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
     
     String name = slider->getName();
     
-    TuningProcessor::Ptr tuning = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
+    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
     
     Spring::PtrArr tetherSprings = tuning->getTetherSprings();
     Spring::PtrArr springs = tuning->getSprings();
@@ -1000,7 +1000,7 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
     {
         if (slider == tetherSliders[i])
         {
-            tuning->setTetherSpringWeight(i, value);
+            tuning->setTetherWeight(i, value);
             break;
         }
         else if (slider == springSliders[i])

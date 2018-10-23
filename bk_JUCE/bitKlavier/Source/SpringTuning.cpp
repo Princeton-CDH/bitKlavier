@@ -13,11 +13,19 @@
 
 using namespace std;
 
-SpringTuningModel::SpringTuningModel(void):
+void SpringTuningModel::copy(SpringTuningModel::Ptr st)
+{
+    for (int i = 0; i < 12; i++)
+    {
+        setSpringWeight(i, st->getSpringWeight(i));
+        setTetherWeight(i, st->getTetherWeight(i));
+    }
+}
+
+SpringTuningModel::SpringTuningModel(SpringTuningModel::Ptr st):
 tetherTuning(1),
 intervalTuning(0)
 {
-    
     particleArray.ensureStorageAllocated(12);
 
 	//double xValue = cFreq;
@@ -62,6 +70,8 @@ intervalTuning(0)
 	}
 
 	numNotes = 0;
+    
+    if (st != nullptr) copy(st);
 }
 
 void SpringTuningModel::setTetherTuning(int tuning)
@@ -139,7 +149,7 @@ double SpringTuningModel::getSpringWeight(int which)
     return 0.0;
 }
 
-void SpringTuningModel::setTetherSpringWeight(int which, double weight)
+void SpringTuningModel::setTetherWeight(int which, double weight)
 {
     Spring* spring = tetherSpringArray[which];
     
@@ -171,7 +181,7 @@ void SpringTuningModel::setTetherSpringWeight(int which, double weight)
 
 }
 
-double SpringTuningModel::getTetherSpringWeight(int which)
+double SpringTuningModel::getTetherWeight(int which)
 {
     return tetherSpringArray[which]->getStrength();
 }

@@ -57,9 +57,9 @@ int Spring::getIntervalIndex()
 	return intervalIndex;
 }
 
-Spring Spring::copy()
+Spring::Ptr Spring::copy(void)
 {
-	Spring copySpring(a, b, restingLength, strength, baseInterval, intervalIndex);
+    Spring::Ptr copySpring = new Spring(a, b, restingLength, strength, baseInterval, intervalIndex);
 	return copySpring;
 }
 

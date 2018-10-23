@@ -60,6 +60,7 @@ public:
         tAbsolute = p->getAbsoluteOffsets();
         nToneSemitoneWidth = p->getNToneSemitoneWidth();
         nToneRoot = p->getNToneRoot();
+        
         //resetMap->copy(p->resetMap);
         
     }
@@ -330,9 +331,11 @@ public:
     
     
     Tuning(TuningPreparation::Ptr prep,
-           int Id):
+           int Id,
+           SpringTuningModel::Ptr st = nullptr):
     sPrep(new TuningPreparation(prep)),
     aPrep(new TuningPreparation(sPrep)),
+    stuning(new SpringTuningModel(st)),
     Id(Id),
     name(String(Id))
     {
@@ -353,6 +356,8 @@ public:
     {
 		sPrep = new TuningPreparation();
 		aPrep = new TuningPreparation(sPrep);
+        stuning = new SpringTuningModel();
+        
 		if (random) randomize();
         
         tuningLibrary.ensureStorageAllocated((int)cTuningSystemNames.size());
@@ -364,13 +369,15 @@ public:
         tuningLibrary.set(DuodeneTuning, tDuodeneTuning);
         tuningLibrary.set(OtonalTuning, tOtonalTuning);
         tuningLibrary.set(UtonalTuning, tUtonalTuning);
+        
+        
     }
     
     inline Tuning::Ptr duplicate()
     {
         TuningPreparation::Ptr copyPrep = new TuningPreparation(sPrep);
         
-        Tuning::Ptr copy = new Tuning(copyPrep, -1);
+        Tuning::Ptr copy = new Tuning(copyPrep, -1, stuning);
         
         copy->setName(name );
         
@@ -453,6 +460,23 @@ public:
         return cScale;
     }
     
+    inline Particle::PtrArr getParticles(void) { return stuning->getParticles(); }
+    inline Particle::PtrArr getTetherParticles(void) { return stuning->getTetherParticles(); }
+    inline Spring::PtrArr getSprings(void) { return stuning->getSprings(); }
+    inline Spring::PtrArr getTetherSprings(void) { return stuning->getTetherSprings(); }
+    
+    inline void setSpringWeight(int which, double weight)
+    {
+        stuning->setSpringWeight(which, weight);
+    }
+    
+    inline void setTetherWeight(int which, double weight)
+    {
+        stuning->setTetherWeight(which, weight);
+    }
+    
+    inline SpringTuningModel::Ptr getSpringTuning(void) { return stuning; }
+    
     Array<Array<float>> tuningLibrary;
     
 private:
@@ -460,6 +484,8 @@ private:
     String name;
     
     Array<float> getTuningOffsets(TuningSystem which) {return tuningLibrary.getUnchecked(which); }
+    
+    SpringTuningModel::Ptr stuning;
     
     const Array<float> tEqualTuning = Array<float>( {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.} );
 	const Array<float> tJustTuning = Array<float>({ 0., .117313, .039101, .156414, -.13686, -.019547, -.174873, .019547, .136864, -.15641, -.311745, -.11731 });
@@ -688,21 +714,9 @@ public:
         tuning->aPrep->copy(tuning->sPrep);
     }
     
-    inline Particle::PtrArr getParticles(void) { return stuning->getParticles(); }
-    inline Particle::PtrArr getTetherParticles(void) { return stuning->getTetherParticles(); }
-    inline Spring::PtrArr getSprings(void) { return stuning->getSprings(); }
-    inline Spring::PtrArr getTetherSprings(void) { return stuning->getTetherSprings(); }
-    
-    inline void setSpringWeight(int which, double weight) { stuning->setSpringWeight(which, weight);}
-    inline void setTetherSpringWeight(int which, double weight) { stuning->setTetherSpringWeight(which, weight);}
-    
 private:
     Tuning::Ptr tuning;
-    
-    SpringTuningModel::Ptr stuning;
-    
-    
-    
+
     float   intervalToRatio(float interval) const noexcept { return mtof(interval + 60.) / mtof(60.); }
     float   lastNote[128];
     float   globalTuningReference = 440.; //A440

@@ -21,6 +21,7 @@ public:
     
 	Particle(double xVal, int n, String s);
     
+    
     void setRestX(double);
     double getRestX();
     
@@ -29,7 +30,7 @@ public:
 	double getX();
     
 
-	Particle* copy();
+    Particle::Ptr copy();
 	bool compare(Particle* that);
 	void print();
 	void addX(double that);

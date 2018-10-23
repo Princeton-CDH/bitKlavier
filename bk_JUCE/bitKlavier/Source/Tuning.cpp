@@ -17,7 +17,6 @@ tuning(tuning),
 lastNoteTuning(0),
 lastIntervalTuning(0)
 {
-    stuning = new SpringTuningModel();
 }
 
 TuningProcessor::~TuningProcessor()
@@ -95,7 +94,7 @@ void TuningProcessor::processBlock(int numSamples)
     
     if (currentTuning == SpringTuning)
     {
-        stuning->simulate();
+        tuning->getSpringTuning()->simulate();
     }
     else if (currentTuning == AdaptiveTuning || currentTuning == AdaptiveAnchoredTuning) {
         
@@ -111,7 +110,7 @@ void TuningProcessor::keyReleased(int midiNoteNumber)
     
     if (currentTuning == SpringTuning)
     {
-        stuning->removeNote(midiNoteNumber % 12);
+        tuning->getSpringTuning()->removeNote(midiNoteNumber % 12);
     }
 }
 
@@ -153,7 +152,7 @@ void TuningProcessor::keyPressed(int midiNoteNumber)
     }
     else if (currentTuning == SpringTuning)
     {
-        stuning->addNote(midiNoteNumber % 12);
+        tuning->getSpringTuning()->addNote(midiNoteNumber % 12);
     }
     
     clusterTime = 0;

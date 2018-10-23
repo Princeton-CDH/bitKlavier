@@ -19,9 +19,11 @@ class SpringTuningModel : public ReferenceCountedObject
 public:
     typedef ReferenceCountedObjectPtr<SpringTuningModel> Ptr;
     
-	SpringTuningModel();
+    SpringTuningModel(SpringTuningModel::Ptr st = nullptr);
     ~SpringTuningModel(){};
 	void simulate();
+    
+    void copy(SpringTuningModel::Ptr st);
     
     float tetherWeight, springWeight;
 
@@ -52,8 +54,8 @@ public:
     void setSpringWeight(int which, double weight);
     double getSpringWeight(int which);
     
-    void setTetherSpringWeight(int which, double weight);
-    double getTetherSpringWeight(int which);
+    void setTetherWeight(int which, double weight);
+    double getTetherWeight(int which);
 
 	double getFrequency(int index);
 	bool pitchEnabled(int index);

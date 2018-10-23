@@ -27,7 +27,7 @@ public:
     void setBaseInterval(double interval);
     
 	int getIntervalIndex();
-	Spring copy();
+    Spring::Ptr copy();
 	bool compare(Spring* that);
 	void print();
     

@@ -43,7 +43,7 @@ double Particle::getX()
 	return x;
 }
 
-Particle* Particle::copy()
+Particle::Ptr Particle::copy()
 {
 	Particle* p = new Particle(x, note, name);
 	p->setEnabled(enabled);
