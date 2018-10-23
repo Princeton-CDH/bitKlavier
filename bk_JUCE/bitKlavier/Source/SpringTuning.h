@@ -14,7 +14,7 @@
 #include "Particle.h"
 #include "Spring.h"
 
-class SpringTuningModel : public ReferenceCountedObject
+class SpringTuningModel : public ReferenceCountedObject, private Timer
 {
 public:
     typedef ReferenceCountedObjectPtr<SpringTuningModel> Ptr;
@@ -56,6 +56,17 @@ public:
     
     void setTetherWeight(int which, double weight);
     double getTetherWeight(int which);
+    
+    inline void setRate(double r)
+    {
+        rate = r;
+        startTimerHz(rate);
+    }
+    
+    inline double getRate(void)
+    {
+        return rate;
+    }
 
 	double getFrequency(int index);
 	bool pitchEnabled(int index);
@@ -91,12 +102,18 @@ private:
     
     int tetherTuning;
     int intervalTuning;
+    double rate;
 
     Particle::PtrArr    particleArray;
     Spring::PtrArr      springArray; // efficiency fix: make this ordered by spring interval 
     
     Particle::PtrArr    tetherParticleArray;
     Spring::PtrArr      tetherSpringArray;
+    
+    void timerCallback(void) override
+    {
+        simulate();
+    }
     
     
     

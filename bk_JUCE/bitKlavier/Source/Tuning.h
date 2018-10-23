@@ -475,6 +475,9 @@ public:
         stuning->setTetherWeight(which, weight);
     }
     
+    inline void setSpringRate(double rate) { stuning->setRate(rate);}
+    inline double getSpringRate(void) { return stuning->getRate();}
+    
     inline SpringTuningModel::Ptr getSpringTuning(void) { return stuning; }
     
     Array<Array<float>> tuningLibrary;

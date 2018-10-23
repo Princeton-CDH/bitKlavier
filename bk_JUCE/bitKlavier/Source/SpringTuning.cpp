@@ -24,7 +24,8 @@ void SpringTuningModel::copy(SpringTuningModel::Ptr st)
 
 SpringTuningModel::SpringTuningModel(SpringTuningModel::Ptr st):
 tetherTuning(1),
-intervalTuning(0)
+intervalTuning(0),
+rate(100)
 {
     particleArray.ensureStorageAllocated(12);
 
@@ -59,12 +60,12 @@ intervalTuning(0)
 			//will add in a better length calculation method once mapping is figured out
             Spring* spring = new Spring(particleArray[j],
                                         particleArray[i],
-				centLengths[0][i - j], (i == 2) ? 1.0 : 0.5, tunings[intervalTuning][i - j], i - j);
+				centLengths[0][(i - j)], 0.5 , tunings[intervalTuning][(i - j)], (i - j));
             
             //DBG("spring: " + String(i) + " interval: " + String(i-j));
             
             spring->setEnabled(false);
-            spring->setName(intervalLabels[i-j]);
+            spring->setName(intervalLabels[(i - j)]);
             springArray.add(spring);
 		}
 	}
@@ -72,6 +73,8 @@ intervalTuning(0)
 	numNotes = 0;
     
     if (st != nullptr) copy(st);
+    
+    startTimerHz(rate);
 }
 
 void SpringTuningModel::setTetherTuning(int tuning)

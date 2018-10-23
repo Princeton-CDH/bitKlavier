@@ -38,6 +38,10 @@ showSprings(false)
         
     }
     
+    rateSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
+    rateSlider.setRange(1.0, 2000.0);
+    addChildComponent(rateSlider);
+    
     iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::tuning_icon_png, BinaryData::tuning_icon_pngSize));
     iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
     iconImageComponent.setAlpha(0.095);
@@ -308,6 +312,22 @@ void TuningViewController::resized()
     lastNote.setBounds(editAllBounds.getRight() + gXSpacing, editAllBounds.getY(),editAllBounds.getWidth() * 2, editAllBounds.getHeight());
     lastInterval.setBounds(lastNote.getRight() + gXSpacing, lastNote.getY(),lastNote.getWidth(), lastNote.getHeight());
     
+    const int x_offset = 10;
+    const int y_offset = TOP+75;
+    const int w = 150;
+    const int h = 25;
+    const int yspacing = 3;
+    const int xspacing = 5;
+
+    for (int i = 0; i < 12; i++)
+    {
+        tetherSliders[i]->setBounds(x_offset, y_offset + (h + yspacing) * i, w, h);
+        
+        springSliders[i]->setBounds(x_offset + w + xspacing, y_offset + (h + yspacing) * i, w, h);
+    }
+    
+    rateSlider.setBounds(getWidth() * 0.75, TOP + 15, getWidth() * 0.24, h);
+    
     updateComponentVisibility();
 }
 
@@ -551,6 +571,10 @@ void TuningViewController::updateComponentVisibility()
             customKeyboard.setVisible(false);
             offsetSlider->setVisible(false);
             
+            rateSlider.setVisible(true);
+            rateSlider.toFront(true);
+            rateSlider.setValue(tuning->getSpringRate(), dontSendNotification);
+            
             for (int i = 0; i < 12; i++)
             {
                 tetherSliders[i]->setVisible(true);
@@ -604,6 +628,8 @@ TuningViewController(p, theGraph)
         
         springSliders[i]->addListener(this);
     }
+    
+    rateSlider.addListener(this);
     
     selectCB.addMyListener(this);
     
@@ -680,26 +706,7 @@ void TuningPreparationEditor::timerCallback()
         
         if (tProcessor->getTuning()->getCurrentTuning() == SpringTuning)
         {
-            for (auto p : tProcessor->getTuning()->getParticles())
-            {
-                const int x_offset = 10;
-                const int y_offset = TOP+75;
-                const int w = 150;
-                const int h = 25;
-                const int yspacing = 5;
-                const int xspacing = 5;
-                
-                repaint();
-                
-                int sx = 0, tx = 0;
-                //DBG("~ ~ ~ ~ ~ ~ ~");
-                for (int i = 0; i < 12; i++)
-                {
-                    tetherSliders[i]->setBounds(x_offset, y_offset + (h + yspacing) * tx++, w, h);
-                    
-                    springSliders[i]->setBounds(x_offset + w + xspacing, y_offset + (h + yspacing) * sx++, w, h);
-                }
-            }
+            repaint();
         }
     }
 }
@@ -995,20 +1002,27 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
     Spring::PtrArr tetherSprings = tuning->getTetherSprings();
     Spring::PtrArr springs = tuning->getSprings();
     
-    
-    for (int i = 0; i < 12; i++)
+    if (slider == &rateSlider)
     {
-        if (slider == tetherSliders[i])
+        tuning->setSpringRate(value);
+    }
+    else
+    {
+        for (int i = 0; i < 12; i++)
         {
-            tuning->setTetherWeight(i, value);
-            break;
-        }
-        else if (slider == springSliders[i])
-        {
-            tuning->setSpringWeight(i, value);
-            break;
+            if (slider == tetherSliders[i])
+            {
+                tuning->setTetherWeight(i, value);
+                break;
+            }
+            else if (slider == springSliders[i])
+            {
+                tuning->setSpringWeight(i, value);
+                break;
+            }
         }
     }
+    
 }
 
 void TuningPreparationEditor::BKSingleSliderValueChanged(String name, double val)

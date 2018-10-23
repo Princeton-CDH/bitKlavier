@@ -94,6 +94,8 @@ protected:
     OwnedArray<Slider> tetherSliders;
     OwnedArray<Label>  springLabels;
     OwnedArray<Label>  tetherLabels;
+    
+    Slider rateSlider;
 
     //other overrides
     

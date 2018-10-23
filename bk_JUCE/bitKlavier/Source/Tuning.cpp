@@ -92,11 +92,7 @@ void TuningProcessor::processBlock(int numSamples)
 {
     TuningSystem currentTuning = tuning->getCurrentTuning();
     
-    if (currentTuning == SpringTuning)
-    {
-        tuning->getSpringTuning()->simulate();
-    }
-    else if (currentTuning == AdaptiveTuning || currentTuning == AdaptiveAnchoredTuning) {
+    if (currentTuning == AdaptiveTuning || currentTuning == AdaptiveAnchoredTuning) {
         
         if(clusterTime <= (tuning->aPrep->getAdaptiveClusterThresh() * sampleRate * 0.001))
             clusterTime += numSamples;

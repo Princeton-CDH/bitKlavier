@@ -167,12 +167,6 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
         
         double midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(x)), 128) - 60.0 + (octave * 12.0);
         
-        if (++counter > PRINT)
-        {
-            counter = 0;
-            DBG("midi: " + String(noteNumber) + " x: " + String(x) + " particle midi: " + String(midi) );
-        }
-        
         pitchRatio =    powf(2.0f, (midi - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
         sound->sourceSampleRate *
         generalSettings->getTuningRatio() /
@@ -205,7 +199,6 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
 {
     if (const BKPianoSamplerSound* const sound = dynamic_cast<const BKPianoSamplerSound*> (s))
     {
-        
         noteNumber = midiNoteNumber;
         pitchWheel = pitchWheelValue;
         
@@ -731,8 +724,6 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
 {
     if (const BKPianoSamplerSound* const playingSound = static_cast<BKPianoSamplerSound*> (getCurrentlyPlayingSound().get()))
     {
-        updatePitch(playingSound);
-        
         if (playingSound->isSoundfont)
         {
             if (playingSound->loopMode <= 2)
@@ -749,6 +740,7 @@ void BKPianoSamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int 
             processPiano(outputBuffer, startSample, numSamples, playingSound);
         }
         
+        updatePitch(playingSound);
     }
 }
 
