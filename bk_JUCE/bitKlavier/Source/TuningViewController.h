@@ -96,6 +96,7 @@ protected:
     OwnedArray<Label>  tetherLabels;
     
     Slider rateSlider;
+    Slider stiffnessSlider;
 
     //other overrides
     

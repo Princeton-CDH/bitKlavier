@@ -478,6 +478,9 @@ public:
     inline void setSpringRate(double rate) { stuning->setRate(rate);}
     inline double getSpringRate(void) { return stuning->getRate();}
     
+    inline void setSpringStiffness(double stiff) { stuning->setStiffness(stiff);}
+    inline double getSpringStiffness(void) {return stuning->getStiffness();}
+    
     inline SpringTuningModel::Ptr getSpringTuning(void) { return stuning; }
     
     Array<Array<float>> tuningLibrary;

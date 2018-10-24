@@ -471,6 +471,8 @@ void BKAudioProcessor::createNewGallery(String name, ScopedPointer<XmlElement> x
         
         defaultLoaded = false;
     }
+    
+    
 }
 
 void BKAudioProcessor::duplicateGallery(String newName)
@@ -695,10 +697,13 @@ void BKAudioProcessor::sustainDeactivate(void)
     }
 }
 
+#define LITTLE_NOTE_MACHINE 0
+#define NOTE 500
 
 void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
     buffer.clear();
+    
     
     if (!didLoadMainPianoSamples) return;
     
@@ -732,6 +737,32 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         handleNoteOff(notesOffUI.getUnchecked(i), 0.6, channel);
         notesOffUI.remove(i);
     }
+    
+#if LITTLE_NOTE_MACHINE
+    // LITTLE NOTE MACHINE
+    count++;
+    if (count > NOTE)
+    {
+        count = 0;
+
+        for (int i = 0; i < 3; i++)
+        {
+            times[i]++;
+            
+            if (times[i] > 3)
+            {
+                handleNoteOff(notes[i], 0.5, 1);
+                times[i] = 0;
+            }
+        }
+        
+        notes[note] = 48 + Random::getSystemRandom().nextInt(Range<int>(0, 24));
+        
+        handleNoteOn(notes[note], 0.8, 1);
+        
+        note++;
+    }
+#endif
     
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {

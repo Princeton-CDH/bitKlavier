@@ -155,36 +155,21 @@ void Spring::satisfyConstraints(void)
 	double diff = b->getX() - a->getX();
 	if (diff == 0.0) return;
     
-	//DBG("Satisfying constraints for " + getA()->getName() + " to " + getB()->getName());
-	//DBG("Initial diff: " + String(diff));
-
-    const double maxStiffness = 0.5;
-    const double meanStiffness = 0.05;
+    double maxStiffness = 0.5 * stiffness;
+    double meanStiffness = 0.05 * stiffness;
 
 	double actualStrength = Utilities::clip(0.0, (meanStiffness * strength) / (1.0 - strength), maxStiffness);
 
-	/*
-	DBG("Variables: ");
-	DBG("Weight = " + String(strength));
-	DBG("Strength = " + String(actualStrength));
-	DBG("Diff - RestingLength = " + String(diff - restingLength));
-	DBG("/Diff = " + String((diff - restingLength) / diff));
-	DBG("* strength = " + String((diff - restingLength) / diff * actualStrength));
-	*/
-
     diff *= ((diff - restingLength) / diff) * actualStrength;
-	//DBG("Final diff: " + String(diff));
 
     if (!a->getLocked())
     {
         a->addX(diff);
-		//DBG("New A = " + String(a->getX()));
     }
 
     if (!b->getLocked())
     {
         b->subX(diff);
-		//DBG("New B = " + String(b->getX()));
     }
 
 }

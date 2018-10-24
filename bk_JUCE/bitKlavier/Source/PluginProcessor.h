@@ -127,6 +127,12 @@ public:
     
     int                                 noteOnCount;
     bool                                allNotesOff;
+    
+    int count;
+    
+    int note;
+    int notes[3];
+    int times[3];
 
     int channel;
 

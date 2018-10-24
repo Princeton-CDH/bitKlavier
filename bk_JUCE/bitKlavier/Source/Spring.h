@@ -33,8 +33,17 @@ public:
     
     void setStrength(double newStrength);
     double getStrength();
-	void setLength(double newLength);
-	//String getStringBaseInterval();
+    void setLength(double newLength);
+    
+    inline void setStiffness(double stiff)
+    {
+        stiffness = stiff;
+    }
+    
+    inline double getStiffness(void)
+    {
+        return stiffness;
+    }
 
 	void satisfyConstraints(void);
 
@@ -49,7 +58,10 @@ public:
 private:
 	Particle* a;
 	Particle* b;
+    
 	double strength;
+    double stiffness;
+    
 	double restingLength;
 	double baseInterval;
     bool enabled;

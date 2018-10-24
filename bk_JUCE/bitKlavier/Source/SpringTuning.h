@@ -20,7 +20,7 @@ public:
     typedef ReferenceCountedObjectPtr<SpringTuningModel> Ptr;
     
     SpringTuningModel(SpringTuningModel::Ptr st = nullptr);
-    ~SpringTuningModel(){};
+    ~SpringTuningModel(){stopTimer();};
 	void simulate();
     
     void copy(SpringTuningModel::Ptr st);
@@ -50,13 +50,7 @@ public:
 	void addSpringsByInterval(double interval);
 	void removeSpringsByInterval(double interval);
 	void adjustSpringsByInterval(double interval, double stiffness);
-    
-    void setSpringWeight(int which, double weight);
-    double getSpringWeight(int which);
-    
-    void setTetherWeight(int which, double weight);
-    double getTetherWeight(int which);
-    
+
     inline void setRate(double r)
     {
         rate = r;
@@ -66,6 +60,26 @@ public:
     inline double getRate(void)
     {
         return rate;
+    }
+    
+    inline void setStiffness(double stiff)
+    {
+        stiffness = stiff;
+        
+        for (auto spring : springArray)
+        {
+            spring->setStiffness(stiffness);
+        }
+        
+        for (auto spring : tetherSpringArray)
+        {
+            spring->setStiffness(stiffness);
+        }
+    }
+    
+    inline double getStiffness(void)
+    {
+        return stiffness;
     }
 
 	double getFrequency(int index);
@@ -96,13 +110,87 @@ public:
     
     void setIntervalTuning(int tuning);
     int getIntervalTuning(void){return intervalTuning;}
+    
+    void setSpringWeight(int which, double weight);
+    double getSpringWeight(int which);
+    
+    void setTetherWeight(int which, double weight);
+    double getTetherWeight(int which);
+    
+    ValueTree getState(void)
+    {
+        ValueTree prep("springtuning");
+        
+        prep.setProperty( "rate", rate, 0);
+        prep.setProperty( "stiffness", stiffness, 0);
+
+        ValueTree tethers( "tethers");
+        ValueTree springs( "springs");
+        
+        for (int i = 0; i < 12; i++)
+        {
+            tethers.setProperty( "t"+String(i), getTetherWeight(i), 0 );
+            springs.setProperty( "s"+String(i), getSpringWeight(i), 0 );
+        }
+        prep.addChild(tethers, -1, 0);
+        prep.addChild(springs, -1, 0);
+
+        return prep;
+    }
+    
+    void setState(XmlElement* e)
+    {
+        rate = e->getStringAttribute("rate").getDoubleValue();
+        stiffness = e->getStringAttribute("stiffness").getDoubleValue();
+        
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName("tethers"))
+            {
+                Array<float> scale;
+                for (int i = 0; i < 12; i++)
+                {
+                    String attr = sub->getStringAttribute("t" + String(i));
+                    
+                    if (attr == "")
+                    {
+                        setTetherWeight(i, 0.2);
+                    }
+                    else
+                    {
+                        setTetherWeight(i, attr.getDoubleValue());
+                    }
+                }
+            }
+            else if (sub->hasTagName("springs"))
+            {
+                Array<float> scale;
+                for (int i = 0; i < 12; i++)
+                {
+                    String attr = sub->getStringAttribute("s" + String(i));
+                    
+                    if (attr == "")
+                    {
+                        setSpringWeight(i, 0.5);
+                    }
+                    else
+                    {
+                        setSpringWeight(i, attr.getDoubleValue());
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    
 
 private:
 	const int octaves[1] = { 4 }; //will return to when adding more octaves
     
     int tetherTuning;
     int intervalTuning;
-    double rate;
+    double rate, stiffness;
 
     Particle::PtrArr    particleArray;
     Spring::PtrArr      springArray; // efficiency fix: make this ordered by spring interval 

@@ -15,6 +15,8 @@ using namespace std;
 
 void SpringTuningModel::copy(SpringTuningModel::Ptr st)
 {
+    rate = st->getRate();
+    stiffness = st->getStiffness();
     for (int i = 0; i < 12; i++)
     {
         setSpringWeight(i, st->getSpringWeight(i));
@@ -69,6 +71,8 @@ rate(100)
             springArray.add(spring);
 		}
 	}
+    
+    setStiffness(1.0);
 
 	numNotes = 0;
     

@@ -39,8 +39,12 @@ showSprings(false)
     }
     
     rateSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
-    rateSlider.setRange(1.0, 2000.0);
+    rateSlider.setRange(5.0, 150.0);
     addChildComponent(rateSlider);
+    
+    stiffnessSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
+    stiffnessSlider.setRange(0.05, 1000.0);
+    addChildComponent(stiffnessSlider);
     
     iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::tuning_icon_png, BinaryData::tuning_icon_pngSize));
     iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
@@ -327,6 +331,7 @@ void TuningViewController::resized()
     }
     
     rateSlider.setBounds(getWidth() * 0.75, TOP + 15, getWidth() * 0.24, h);
+    stiffnessSlider.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, rateSlider.getWidth(), rateSlider.getHeight());
     
     updateComponentVisibility();
 }
@@ -575,6 +580,10 @@ void TuningViewController::updateComponentVisibility()
             rateSlider.toFront(true);
             rateSlider.setValue(tuning->getSpringRate(), dontSendNotification);
             
+            stiffnessSlider.setVisible(true);
+            stiffnessSlider.toFront(true);
+            stiffnessSlider.setValue(tuning->getSpringStiffness(), dontSendNotification);
+            
             for (int i = 0; i < 12; i++)
             {
                 tetherSliders[i]->setVisible(true);
@@ -630,6 +639,8 @@ TuningViewController(p, theGraph)
     }
     
     rateSlider.addListener(this);
+    
+    stiffnessSlider.addListener(this);
     
     selectCB.addMyListener(this);
     
@@ -1005,6 +1016,10 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
     if (slider == &rateSlider)
     {
         tuning->setSpringRate(value);
+    }
+    else if (slider == &stiffnessSlider)
+    {
+        tuning->setSpringStiffness(value);
     }
     else
     {

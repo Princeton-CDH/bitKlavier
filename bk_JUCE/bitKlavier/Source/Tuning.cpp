@@ -230,6 +230,8 @@ ValueTree Tuning::getState(void)
     }
     prep.addChild(absolute, -1, 0);
     
+    prep.addChild(stuning->getState(), -1, 0);
+    
     return prep;
     
 }
@@ -443,7 +445,11 @@ void Tuning::setState(XmlElement* e)
     // custom scale
     forEachXmlChildElement (*e, sub)
     {
-        if (sub->hasTagName(vtagTuning_customScale))
+        if (sub->hasTagName("springtuning"))
+        {
+            stuning->setState(sub);
+        }
+        else if (sub->hasTagName(vtagTuning_customScale))
         {
             Array<float> scale;
             for (int k = 0; k < 128; k++)
