@@ -39,11 +39,11 @@ showSprings(false)
     }
     
     rateSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
-    rateSlider.setRange(5.0, 150.0);
+    rateSlider.setRange(5.0, 400.0);
     addChildComponent(rateSlider);
     
     stiffnessSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
-    stiffnessSlider.setRange(0.05, 1000.0);
+    stiffnessSlider.setRange(0.05, 4.0);
     addChildComponent(stiffnessSlider);
     
     iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::tuning_icon_png, BinaryData::tuning_icon_pngSize));
@@ -423,7 +423,7 @@ void TuningViewController::paint (Graphics& g)
                 // DRAW PARTICLE IN MOTION
                 midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(p->getX())), 128);
                 scalex = ((midi - 60.0f) / 12.0f);
-                posx = scalex *  (b.getWidth() - 2*x_offset);
+                posx = scalex *  ((b.getWidth() - springSliders[0]->getRight()) - 2*x_offset);
                 
                 radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
                 
@@ -434,7 +434,7 @@ void TuningViewController::paint (Graphics& g)
                 g.fillEllipse(cx, cy, dimc, dimc);
                 
                 g.setColour (Colours::black);
-                g.fillEllipse(springSliders[0]->getRight() + posx, b.getHeight() * 0.9, dimc, dimc);
+                g.fillEllipse(springSliders[0]->getRight() + 20 + posx, b.getHeight() * 0.9, dimc, dimc);
             }
         }
         

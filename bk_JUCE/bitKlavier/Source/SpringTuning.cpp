@@ -52,6 +52,7 @@ rate(100)
         s->setName(intervalLabels[i]);
         tetherSpringArray.add(s);
         
+        notes[i] = 0;
 	}
 
     springArray.ensureStorageAllocated(100);
@@ -78,7 +79,7 @@ rate(100)
     
     if (st != nullptr) copy(st);
     
-    startTimerHz(rate);
+    setRate(rate);
 }
 
 void SpringTuningModel::setTetherTuning(int tuning)
@@ -227,26 +228,37 @@ void SpringTuningModel::toggleSpring()
 }
 
 void SpringTuningModel::addParticle(int index)
-{
+{;
     particleArray[index]->setEnabled(true);
     tetherParticleArray[index]->setEnabled(true);
-	numNotes++;
 }
 void SpringTuningModel::removeParticle(int index)
 {
-    particleArray[index]->setEnabled(false);
+    Particle* p = particleArray[index];
+    p->setEnabled(false);
+    p->setX(index * 100); // DO WE WANT THIS?
     tetherParticleArray[index]->setEnabled(false);
-	numNotes--;
 }
 void SpringTuningModel::addNote(int noteIndex)
 {
-	addParticle(noteIndex);
-	addSpringsByNote(noteIndex);
+    notes[noteIndex]++;
+    
+    if (!particleArray[noteIndex]->getEnabled() && !tetherParticleArray[noteIndex]->getEnabled())
+    {
+        addParticle(noteIndex);
+        addSpringsByNote(noteIndex);
+    }
 }
 void SpringTuningModel::removeNote(int noteIndex)
 {
-	removeParticle(noteIndex);
-	removeSpringsByNote(noteIndex);
+    notes[noteIndex]--;
+    notes[noteIndex] = (notes[noteIndex] < 0) ? 0 : notes[noteIndex];
+    
+    if (notes[noteIndex] == 0)
+    {
+        removeParticle(noteIndex);
+        removeSpringsByNote(noteIndex);
+    }
 }
 
 void SpringTuningModel::removeAllNotes(void)
@@ -351,13 +363,13 @@ void SpringTuningModel::removeSpringsByInterval(double interval)
         }
 	}
 }
-void SpringTuningModel::adjustSpringsByInterval(double interval, double stiffness)
+void SpringTuningModel::adjustSpringsByInterval(double interval, double weight)
 {
 	for (auto spring : springArray)
 	{
 		if ((abs(spring->getBaseInterval() - interval) <= 0.001))
         {
-            spring->setStrength(stiffness);
+            spring->setStrength(weight);
         }
 	}
 }
