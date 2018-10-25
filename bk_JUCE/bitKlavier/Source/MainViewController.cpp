@@ -40,20 +40,22 @@ timerCallbackCount(0)
     levelMeterComponentL = new BKLevelMeterComponent;
     addAndMakeVisible(levelMeterComponentL);
     
-    mainSlider = new Slider();
-    mainSlider->setLookAndFeel(&laf);
+    mainSlider.setLookAndFeel(&laf);
     
-    mainSlider->setRange (-90, 12.0, 0.1);
-    mainSlider->setSkewFactor (2.5, false);
-    mainSlider->setPopupMenuEnabled (true);
-    mainSlider->setValue (0);
-    mainSlider->setSliderStyle (Slider::LinearBarVertical);
-    mainSlider->setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
-    mainSlider->setPopupDisplayEnabled (true, true, this);
-    mainSlider->setDoubleClickReturnValue (true, 0.0); // double-clicking this slider will set it to 50.0
-    mainSlider->setTextValueSuffix (" dB");
-    mainSlider->setTooltip("Controls dB output of bitKlavier audio");
-    mainSlider->addListener(this);
+    mainSlider.setRange (-90, 12.0, 0.1);
+    mainSlider.setSkewFactor (2.5, false);
+    mainSlider.setValue (0);
+    mainSlider.setSliderStyle (Slider::LinearBarVertical);
+    mainSlider.setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
+    mainSlider.setDoubleClickReturnValue (true, 0.0); // double-clicking this slider will set it to 50.0
+    mainSlider.setTextValueSuffix (" dB");
+    mainSlider.addListener(this);
+    
+#if !JUCE_IOS
+    mainSlider.setPopupMenuEnabled (true);
+    mainSlider.setPopupDisplayEnabled (true, true, this);
+    mainSlider.setTooltip("Controls dB output of bitKlavier audio");
+#endif
     
     addAndMakeVisible (mainSlider);
     
@@ -126,7 +128,7 @@ MainViewController::~MainViewController()
     sampleCB.setLookAndFeel(nullptr);
     instrumentCB.setLookAndFeel(nullptr);
     octaveSlider.setLookAndFeel(nullptr);
-    mainSlider->setLookAndFeel(nullptr);
+    mainSlider.setLookAndFeel(nullptr);
     removeKeyListener(this);
 }
 
@@ -134,7 +136,7 @@ MainViewController::~MainViewController()
 void MainViewController::setSliderLookAndFeel(BKButtonAndMenuLAF *laf)
 {
     octaveSlider.setLookAndFeel(laf);
-    mainSlider->setLookAndFeel(laf);
+    mainSlider.setLookAndFeel(laf);
 }
  */
 
@@ -149,7 +151,7 @@ void MainViewController::paint (Graphics& g)
     bounds.expand(2.0f,2.0f);
     g.drawRoundedRectangle(bounds, 2.0f, 0.5f);
     
-    bounds = mainSlider->getBounds().toFloat();
+    bounds = mainSlider.getBounds().toFloat();
     g.drawRoundedRectangle(bounds, 2.0, 0.5f);
     
     bounds = levelMeterComponentL->getBounds().toFloat();
@@ -226,7 +228,7 @@ void MainViewController::resized()
     Rectangle<int> gainSliderSlice = area.removeFromRight(sidebarWidth+gXSpacing);
     
     gainSliderSlice.removeFromLeft(gXSpacing);
-    mainSlider->setBounds(gainSliderSlice.getX(), gainSliderSlice.getY(),
+    mainSlider.setBounds(gainSliderSlice.getX(), gainSliderSlice.getY(),
                           header.getRight() - gainSliderSlice.getX() - gXSpacing,
                           area.getHeight());
     
@@ -234,7 +236,7 @@ void MainViewController::resized()
     levelMeterSlice.removeFromRight(gXSpacing);
     levelMeterSlice.reduce(1, 1);
     levelMeterComponentL->setBounds(header.getX()+gXSpacing, levelMeterSlice.getY()+5,
-                          mainSlider->getWidth(),
+                          mainSlider.getWidth(),
                           levelMeterSlice.getHeight());
     
     area.reduce(2, 2);
@@ -326,9 +328,9 @@ void MainViewController::bkButtonClicked (Button* b)
 void MainViewController::sliderValueChanged (Slider* slider)
 {
     
-    if (slider == mainSlider)
+    if (slider == &mainSlider)
     {
-        processor.gallery->getGeneralSettings()->setGlobalGain(Decibels::decibelsToGain(mainSlider->getValue()));
+        processor.gallery->getGeneralSettings()->setGlobalGain(Decibels::decibelsToGain(mainSlider.getValue()));
         overtop.gvc.update();
     }
     else if (display == DisplayKeyboard && slider == &octaveSlider)
@@ -586,8 +588,8 @@ void MainViewController::timerCallback()
     //check to see if General Settings globalGain has changed, update slider accordingly
     float globalGain = processor.gallery->getGeneralSettings()->getGlobalGain();
     float genGain = Decibels::gainToDecibels(globalGain);
-    if(genGain != mainSlider->getValue())
-        mainSlider->setValue(Decibels::gainToDecibels(globalGain), dontSendNotification);
+    if(genGain != mainSlider.getValue())
+        mainSlider.setValue(Decibels::gainToDecibels(globalGain), dontSendNotification);
     
     if (state->modificationDidChange)
     {
