@@ -239,25 +239,30 @@ void SpringTuningModel::removeParticle(int index)
     p->setX(index * 100); // DO WE WANT THIS?
     tetherParticleArray[index]->setEnabled(false);
 }
-void SpringTuningModel::addNote(int noteIndex)
+void SpringTuningModel::addNote(int note)
 {
-    notes[noteIndex]++;
+    int pc = (note % 12);
     
-    if (!particleArray[noteIndex]->getEnabled() && !tetherParticleArray[noteIndex]->getEnabled())
+    notes[pc]++;
+    
+    if (!particleArray[pc]->getEnabled() && !tetherParticleArray[pc]->getEnabled())
     {
-        addParticle(noteIndex);
-        addSpringsByNote(noteIndex);
+        addParticle(pc);
+        addSpringsByNote(pc);
     }
 }
+
 void SpringTuningModel::removeNote(int noteIndex)
 {
-    notes[noteIndex]--;
-    notes[noteIndex] = (notes[noteIndex] < 0) ? 0 : notes[noteIndex];
+    int pc = noteIndex % 12;
     
-    if (notes[noteIndex] == 0)
+    notes[pc]--;
+    notes[pc] = (notes[pc] < 0) ? 0 : notes[pc];
+    
+    if (notes[pc] == 0)
     {
-        removeParticle(noteIndex);
-        removeSpringsByNote(noteIndex);
+        removeParticle(pc);
+        removeSpringsByNote(pc);
     }
 }
 
@@ -265,6 +270,7 @@ void SpringTuningModel::removeAllNotes(void)
 {
     for (int i = 0; i < 12; i++) removeNote(i);
 }
+
 void SpringTuningModel::toggleNote(int noteIndex)
 {
 	int convertedIndex = noteIndex % 12; // just in case a midi value is passed accidentally

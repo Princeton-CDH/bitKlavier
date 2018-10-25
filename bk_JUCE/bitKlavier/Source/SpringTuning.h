@@ -29,8 +29,8 @@ public:
 
 	void toggleSpring();
 
-	void addParticle(int noteIndex);
-	void removeParticle(int removeIndex);
+	void addParticle(int pc);
+	void removeParticle(int pc);
     
     Particle* getParticle(int note) { return particleArray[note];}
     
@@ -45,7 +45,7 @@ public:
 	void addSpring(Spring* s);
 	void removeSpring(Spring* s);
     
-	void addSpringsByNote(int addIndex);
+	void addSpringsByNote(int pc);
 	void removeSpringsByNote(int removeIndex);
 	void addSpringsByInterval(double interval);
 	void removeSpringsByInterval(double interval);
