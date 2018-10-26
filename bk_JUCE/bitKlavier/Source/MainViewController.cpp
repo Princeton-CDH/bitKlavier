@@ -41,27 +41,25 @@ timerCallbackCount(0)
     addAndMakeVisible(levelMeterComponentL);
     
     mainSlider.setLookAndFeel(&laf);
+
     mainSlider.setRange (-90, 12.0, 0.1);
     mainSlider.setSkewFactor (2.5, false);
-    
-    mainSlider.setPopupMenuEnabled (true);
-    mainSlider.setPopupDisplayEnabled (true, true, this);
-    
     mainSlider.setValue (0);
     mainSlider.setSliderStyle (Slider::LinearBarVertical);
     mainSlider.setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
     mainSlider.setDoubleClickReturnValue (true, 0.0); // double-clicking this slider will set it to 50.0
     mainSlider.setTextValueSuffix (" dB");
     
+    mainSlider.addListener(this);
+    
 #if !JUCE_IOS
+    mainSlider.setPopupMenuEnabled (true);
+    mainSlider.setPopupDisplayEnabled (true, true, this);
     mainSlider.setTooltip("Controls dB output of bitKlavier audio");
 #endif
     
-    mainSlider.addListener(this);
-    
     addAndMakeVisible (mainSlider);
     
-
     addAndMakeVisible (keyboardComponent =
                        new BKKeymapKeyboardComponent (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard));
     

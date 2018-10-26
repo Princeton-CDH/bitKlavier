@@ -410,7 +410,7 @@
         <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
         <MODULEPATH id="stk" path="../../../JUCE/modules"/>
-        <MODULEPATH id="SFZero" path="../../../3p_modules/SFZero/modules"/>
+        <MODULEPATH id="SFZero" path="../../../JUCE/modules/SFZero/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="landscape" keepCustomXcodeSchemes="1"
@@ -443,7 +443,7 @@
         <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
         <MODULEPATH id="stk" path="../../../JUCE/modules"/>
-        <MODULEPATH id="SFZero" path="../../../3p_modules/SFZero/modules"/>
+        <MODULEPATH id="SFZero" path="../../../JUCE/modules/SFZero/modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
     <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="C:\SDKs\VST3_SDK"
@@ -473,7 +473,7 @@
         <MODULEPATH id="juce_audio_devices" path="..\..\..\JUCE\modules"/>
         <MODULEPATH id="juce_audio_basics" path="..\..\..\JUCE\modules"/>
         <MODULEPATH id="stk" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="SFZero" path="..\..\..\JUCE\modules"/>
+        <MODULEPATH id="SFZero" path="..\..\..\JUCE\modules\SFZero\modules"/>
       </MODULEPATHS>
     </VS2017>
   </EXPORTFORMATS>

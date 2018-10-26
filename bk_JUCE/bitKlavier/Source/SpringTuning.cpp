@@ -242,28 +242,18 @@ void SpringTuningModel::removeParticle(int index)
 void SpringTuningModel::addNote(int note)
 {
     int pc = (note % 12);
-    
-    notes[pc]++;
-    
-    if (!particleArray[pc]->getEnabled() && !tetherParticleArray[pc]->getEnabled())
-    {
-        addParticle(pc);
-        addSpringsByNote(pc);
-    }
+
+    addParticle(pc);
+    addSpringsByNote(pc);
 }
 
-void SpringTuningModel::removeNote(int noteIndex)
+void SpringTuningModel::removeNote(int note)
 {
-    int pc = noteIndex % 12;
+    int pc = (note % 12);
     
-    notes[pc]--;
-    notes[pc] = (notes[pc] < 0) ? 0 : notes[pc];
-    
-    if (notes[pc] == 0)
-    {
-        removeParticle(pc);
-        removeSpringsByNote(pc);
-    }
+    removeParticle(pc);
+    removeSpringsByNote(pc);
+
 }
 
 void SpringTuningModel::removeAllNotes(void)
