@@ -127,9 +127,13 @@ public:
         ValueTree tethers( "tethers");
         ValueTree springs( "springs");
         
-        for (int i = 0; i < 12; i++)
+        for (int i = 0; i < 128; i++)
         {
             tethers.setProperty( "t"+String(i), getTetherWeight(i), 0 );
+        }
+        
+        for (int i = 0; i < 12; i++)
+        {
             springs.setProperty( "s"+String(i), getSpringWeight(i), 0 );
         }
         prep.addChild(tethers, -1, 0);
@@ -148,7 +152,7 @@ public:
             if (sub->hasTagName("tethers"))
             {
                 Array<float> scale;
-                for (int i = 0; i < 12; i++)
+                for (int i = 0; i < 128; i++)
                 {
                     String attr = sub->getStringAttribute("t" + String(i));
                     
@@ -191,8 +195,6 @@ private:
     int tetherTuning;
     int intervalTuning;
     double rate, stiffness;
-    
-    int notes[12];
 
     Particle::PtrArr    particleArray;
     Spring::PtrArr      springArray; // efficiency fix: make this ordered by spring interval 
@@ -200,6 +202,11 @@ private:
     Particle::PtrArr    tetherParticleArray;
     Spring::PtrArr      tetherSpringArray;
     
+    /*
+    Spring::PtrArr activeTetherSprings;
+    Spring::PtrArr activeSprings;
+    Particle::PtrArr activeParticles;
+    */
     void hiResTimerCallback(void) override
     {
         simulate();

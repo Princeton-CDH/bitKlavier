@@ -152,15 +152,18 @@ String Spring::getStringBaseInterval()
 
 void Spring::satisfyConstraints(void)
 {
-	double diff = b->getX() - a->getX();
+    int ao = a->getOctave(), bo = b->getOctave();
+    
+    double diff = (b->getX() - a->getX());;
+
 	if (diff == 0.0) return;
     
-    double maxStiffness = 0.5 ;//* stiffness;
-    double meanStiffness = 0.05; //* stiffness;
+    double maxStiffness = 0.5 * stiffness;
+    double meanStiffness = 0.05 * stiffness;
 
 	double actualStrength = Utilities::clip(0.0, (meanStiffness * strength) / (1.0 - strength), maxStiffness);
 
-    diff *= ((diff - restingLength) / diff) * actualStrength;
+    diff *= ( (diff - restingLength) / diff ) * actualStrength;
 
     if (!a->getLocked())
     {

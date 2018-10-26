@@ -94,14 +94,6 @@ void Particle::integrate(double drag)
     x = newX;
     
     if (x < 0.0) x = 0.0;
-    else if (x > 10000.0f) x = 10000.0f;
+    else if (x > 13000.0f) x = 13000.0f;
 	
-
-	//Aatish's function:
-	/*
-	var newPos = diff.subVectors( this.position, this.previous );
-	newPos.multiplyScalar( DRAG ).add( this.position );
-	this.previous = this.position;
-	this.position = newPos;
-	*/
 }

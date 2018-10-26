@@ -109,7 +109,7 @@ public:
 	{
 		return (int)(ratioToCents(whichFreq / cFreq));
 	}
-	static double centsToFreq(int centsFromC)
+	static double centsToFreq(double centsFromC)
 	{
 		return cFreq * pow(2, centsFromC / 1200.0);
 	}

@@ -20,7 +20,7 @@ showSprings(false)
     setLookAndFeel(&buttonsAndMenusLAF);
 
     
-    for (int i = 0; i < 12; i++)
+    for (int i = 0; i < 128; i++)
     {
         Slider* s = new Slider("t" + String(i));
         
@@ -29,13 +29,25 @@ showSprings(false)
         addChildComponent(s);
         tetherSliders.add(s);
         
-        s = new Slider(intervalNames[i]);
+        Label* l = new Label(s->getName(), String(i));
+        l->setColour(juce::Label::ColourIds::textColourId, Colours::black);
+        addChildComponent(l);
+        tetherLabels.add(l);
+    }
+    
+    for (int i = 0; i < 12; i++)
+    {
+        Slider* s = new Slider(intervalNames[i]);
         
         s->setSliderStyle(Slider::SliderStyle::LinearBar);
         s->setRange(0.0, 1.0);
         addChildComponent(s);
         springSliders.add(s);
         
+        Label* l = new Label(s->getName(), s->getName());
+        l->setColour(juce::Label::ColourIds::textColourId, Colours::black);
+        addChildComponent(l);
+        springLabels.add(l);
     }
     
     rateSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
@@ -318,16 +330,15 @@ void TuningViewController::resized()
     
     const int x_offset = 10;
     const int y_offset = TOP+75;
-    const int w = 150;
+    const int w = 125;
     const int h = 25;
     const int yspacing = 3;
-    const int xspacing = 5;
+    const int xspacing = 3;
 
     for (int i = 0; i < 12; i++)
     {
-        tetherSliders[i]->setBounds(x_offset, y_offset + (h + yspacing) * i, w, h);
-        
-        springSliders[i]->setBounds(x_offset + w + xspacing, y_offset + (h + yspacing) * i, w, h);
+        springSliders[i]->setBounds(x_offset, y_offset + (h + yspacing) * i, w, h);
+        springLabels[i]->setBounds(springSliders[i]->getRight() + xspacing, springSliders[i]->getY(), 40, h);
     }
     
     rateSlider.setBounds(getWidth() * 0.75, TOP + 15, getWidth() * 0.24, h);
@@ -358,8 +369,8 @@ void TuningViewController::paint (Graphics& g)
         g.drawFittedText ("Spring Tuning", b, Justification::centredTop, 1);
         
         g.setFont(20.0f);
-        g.drawFittedText("Tethers", 10, TOP+50, 150, 40, Justification::centredTop, 1);
-        g.drawFittedText("Springs", 170, TOP+50, 150, 40, Justification::centredTop, 1);
+        g.drawFittedText("Springs", 10, TOP+50, 150, 40, Justification::centredTop, 1);
+        g.drawFittedText("Tethers", 170, TOP+50, 150, 40, Justification::centredTop, 1);
         
         g.setFont(12.0f);
         
@@ -373,7 +384,7 @@ void TuningViewController::paint (Graphics& g)
             if (s->getEnabled())
             {
                 Particle* a = s->getA();
-                midi = Utilities::ftom(Utilities::centsToFreq(a->getX()));
+                midi = Utilities::ftom(Utilities::centsToFreq(fmod(a->getX(),1200.0)));
                 scalex = ((midi - 60.0f) / 12.0f);
                 
                 radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
@@ -382,7 +393,7 @@ void TuningViewController::paint (Graphics& g)
                 float cya = centery + sinf(radians) * radius;
                 
                 Particle* b = s->getB();
-                midi = Utilities::ftom(Utilities::centsToFreq(b->getX()));
+                midi = Utilities::ftom(Utilities::centsToFreq(fmod(b->getX(),1200.0)));
                 scalex = ((midi - 60.0f) / 12.0f);
                 
                 radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
@@ -421,7 +432,7 @@ void TuningViewController::paint (Graphics& g)
             if (p->getEnabled())
             {
                 // DRAW PARTICLE IN MOTION
-                midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(p->getX())), 128);
+                midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(fmod(p->getX(),1200.0))), 128);
                 scalex = ((midi - 60.0f) / 12.0f);
                 posx = scalex *  ((b.getWidth() - springSliders[0]->getRight()) - 2*x_offset);
                 
@@ -495,6 +506,7 @@ void TuningViewController::updateComponentVisibility()
     
     for (auto s : tetherSliders) s->setVisible(false);
     for (auto s : springSliders) s->setVisible(false);
+    for (auto l : springLabels) l->setVisible(false);
     
     absoluteKeyboard.setVisible(true);
     customKeyboard.setVisible(true);
@@ -586,13 +598,17 @@ void TuningViewController::updateComponentVisibility()
             
             for (int i = 0; i < 12; i++)
             {
-                tetherSliders[i]->setVisible(true);
-                tetherSliders[i]->toFront(true);
-                tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
-                
                 springSliders[i]->setVisible(true);
                 springSliders[i]->toFront(true);
                 springSliders[i]->setValue(springs[i]->getStrength(), dontSendNotification);
+                
+                springLabels[i]->setVisible(true);
+            }
+            
+            for (int i = 0; i < 128; i++)
+            {
+                tetherSliders[i]->toFront(true);
+                tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
             }
         }
     }
@@ -613,6 +629,8 @@ void TuningViewController::updateComponentVisibility()
         nToneRootOctaveCB.setVisible(true);
         nToneSemitoneWidthSlider->setVisible(true);
         showSpringsButton.setVisible(false);
+        stiffnessSlider.setVisible(false);
+        rateSlider.setVisible(false);
     }
 }
 
@@ -633,9 +651,12 @@ TuningViewController(p, theGraph)
     
     for (int i = 0; i < 12; i++)
     {
-        tetherSliders[i]->addListener(this);
-        
         springSliders[i]->addListener(this);
+    }
+    
+    for (int i = 0; i < 128; i++)
+    {
+        tetherSliders[i]->addListener(this);
     }
     
     rateSlider.addListener(this);
@@ -715,8 +736,37 @@ void TuningPreparationEditor::timerCallback()
             }
         }
         
-        if (tProcessor->getTuning()->getCurrentTuning() == SpringTuning)
+        if (showSprings && tProcessor->getTuning()->getCurrentTuning() == SpringTuning)
         {
+            const int x_offset = 10;
+            const int y_offset = TOP+75;
+            const int w = 125;
+            const int h = 25;
+            const int yspacing = 3;
+            const int xspacing = 3;
+            
+            Spring::PtrArr tetherSprings = tProcessor->getTuning()->getTetherSprings();
+            
+            int count = 0;
+            for (int i = 0; i < 128; i++)
+            {
+                if (tetherSprings[i]->getEnabled())
+                {
+                    tetherSliders[i]->setBounds(x_offset + w + 40 + 2*xspacing, y_offset + (h + yspacing) * count, w, h);
+                    tetherSliders[i]->setVisible(true);
+                    
+                    tetherLabels[i]->setBounds(tetherSliders[i]->getRight() + xspacing, tetherSliders[i]->getY(), 40, h);
+                    tetherLabels[i]->setVisible(true);
+                    
+                    count++;
+                }
+                else
+                {
+                    tetherSliders[i]->setVisible(false);
+                    tetherLabels[i]->setVisible(false);
+                }
+            }
+            
             repaint();
         }
     }
@@ -1023,7 +1073,7 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
     }
     else
     {
-        for (int i = 0; i < 12; i++)
+        for (int i = 0; i < 128; i++)
         {
             if (slider == tetherSliders[i])
             {

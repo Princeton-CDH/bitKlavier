@@ -50,8 +50,13 @@ public:
     
     void setName(String s) { name = s;}
     String getName(void) { return name;}
+    
+    void setOctave(int o) { octave = o;}
+    int getOctave(void) { return octave;}
+    
 private:
 	double x;
+    int octave;
     double restX;
 	double prevX;
     bool enabled;
