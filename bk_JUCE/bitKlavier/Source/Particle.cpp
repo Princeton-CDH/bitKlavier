@@ -45,7 +45,7 @@ double Particle::getX()
 
 Particle::Ptr Particle::copy()
 {
-	Particle* p = new Particle(x, note, name);
+	Particle* p = new Particle(x, note * 100, name);
 	p->setEnabled(enabled);
 	p->setLocked(locked);
 

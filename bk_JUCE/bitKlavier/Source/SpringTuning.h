@@ -190,8 +190,6 @@ public:
     
 
 private:
-	const int octaves[1] = { 4 }; //will return to when adding more octaves
-    
     int tetherTuning;
     int intervalTuning;
     double rate, stiffness;

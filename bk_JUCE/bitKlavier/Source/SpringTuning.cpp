@@ -42,7 +42,7 @@ rate(100)
 	{
         // Active particle
         int pc = (i % 12);
-        int octave = (int)(i / 12) - 1;
+        int octave = (int)(i / 12);
         
         Particle* p1 = new Particle(i * 100, i, notesInAnOctave[pc]);
         p1->setOctave(octave);

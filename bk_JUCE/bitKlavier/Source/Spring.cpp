@@ -152,9 +152,11 @@ String Spring::getStringBaseInterval()
 
 void Spring::satisfyConstraints(void)
 {
-    int ao = a->getOctave(), bo = b->getOctave();
+    //int ao = a->getOctave(), bo = b->getOctave();
     
-    double diff = (b->getX() - a->getX());;
+    double diff = fmod((b->getX() - a->getX()), 1200.0);
+    
+    //double diff = (b->getX() - 1200.0 * ao) - (a->getX() - 1200.0 * bo);
 
 	if (diff == 0.0) return;
     

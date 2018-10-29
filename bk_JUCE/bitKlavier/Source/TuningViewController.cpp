@@ -384,7 +384,7 @@ void TuningViewController::paint (Graphics& g)
             if (s->getEnabled())
             {
                 Particle* a = s->getA();
-                midi = Utilities::ftom(Utilities::centsToFreq(fmod(a->getX(),1200.0)));
+                midi = Utilities::ftom(Utilities::centsToFreq(a->getX() - (1200.0 * a->getOctave())));
                 scalex = ((midi - 60.0f) / 12.0f);
                 
                 radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
@@ -393,7 +393,7 @@ void TuningViewController::paint (Graphics& g)
                 float cya = centery + sinf(radians) * radius;
                 
                 Particle* b = s->getB();
-                midi = Utilities::ftom(Utilities::centsToFreq(fmod(b->getX(),1200.0)));
+                midi = Utilities::ftom(Utilities::centsToFreq(b->getX() - (1200.0 * b->getOctave())));
                 scalex = ((midi - 60.0f) / 12.0f);
                 
                 radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
@@ -432,7 +432,7 @@ void TuningViewController::paint (Graphics& g)
             if (p->getEnabled())
             {
                 // DRAW PARTICLE IN MOTION
-                midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(fmod(p->getX(),1200.0))), 128);
+                midi = Utilities::clip(0, midi = Utilities::ftom(Utilities::centsToFreq(p->getX() - (1200.0 * p->getOctave()))), 128);
                 
                 scalex = ((midi - 60.0f) / 12.0f);
                 DBG("midi: " + String(midi) + " scalex: " + String(scalex));
