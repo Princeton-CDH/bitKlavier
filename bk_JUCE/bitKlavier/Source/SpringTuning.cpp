@@ -57,7 +57,7 @@ rate(100)
         p2->setLocked(true);
         tetherParticleArray.add(p2);
         
-        Spring* s = new Spring(p1, p2, 0.0, 0.2, 1.0, 0);
+        Spring* s = new Spring(p1, p2, 0.0, 0.5, 1.0, 0);
         s->setEnabled(false);
         s->setName(intervalLabels[0]);
         tetherSpringArray.add(s);
@@ -243,7 +243,7 @@ void SpringTuningModel::removeParticle(int note)
 {
     Particle* p = particleArray[note];
     p->setEnabled(false);
-    p->setX(note * 100); // DO WE WANT THIS?
+    //p->setX(note * 100); // DO WE WANT THIS?
     tetherParticleArray[note]->setEnabled(false);
 }
 void SpringTuningModel::addNote(int note)

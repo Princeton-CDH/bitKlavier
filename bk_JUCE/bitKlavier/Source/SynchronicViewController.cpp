@@ -62,12 +62,6 @@ BKViewController(p, theGraph)
                 paramSliders[idx]->setToolTipString("Determines length of each sequenced beat as a factor of Synchronic tempo; double-click to edit all or add additional sequence steps");
             }
             
-            /* // need this?
-            if(paramSliders[0]->getName() == "sustain length multipliers")
-            {
-                paramSliders[0]->setSkewFromMidpoint(false);
-            }
-            */
             idx++;
         }
         

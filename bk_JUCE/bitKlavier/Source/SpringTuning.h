@@ -144,8 +144,9 @@ public:
     
     void setState(XmlElement* e)
     {
-        rate = e->getStringAttribute("rate").getDoubleValue();
-        stiffness = e->getStringAttribute("stiffness").getDoubleValue();
+        setRate(e->getStringAttribute("rate").getDoubleValue());
+        
+        setStiffness(e->getStringAttribute("stiffness").getDoubleValue());
         
         forEachXmlChildElement (*e, sub)
         {
