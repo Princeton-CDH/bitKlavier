@@ -165,7 +165,10 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
         
         int octave = particles[noteNumber]->getOctave();
         
-        double midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(fmod(x,1200.0))), 128) - 60.0 + ((octave+1) * 12.0);
+        
+        
+        //double midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(x)), 128) - 60.0 + ((octave+1) * 12.0);
+        double midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(x - 1200.0 * octave)), 128) - 60.0 + (octave * 12.0);
         
         pitchRatio =    powf(2.0f, (midi - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
         sound->sourceSampleRate *

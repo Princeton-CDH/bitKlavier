@@ -433,7 +433,9 @@ void TuningViewController::paint (Graphics& g)
             {
                 // DRAW PARTICLE IN MOTION
                 midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(fmod(p->getX(),1200.0))), 128);
+                
                 scalex = ((midi - 60.0f) / 12.0f);
+                DBG("midi: " + String(midi) + " scalex: " + String(scalex));
                 posx = scalex *  ((b.getWidth() - springSliders[0]->getRight()) - 2*x_offset);
                 
                 radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
