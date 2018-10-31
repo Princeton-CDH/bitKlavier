@@ -138,7 +138,7 @@ private:
     
     //ImageComponent backgroundImageComponent;
     
-    ScopedPointer<Slider> mainSlider;
+    Slider mainSlider;
     ScopedPointer<BKLevelMeterComponent> levelMeterComponentL;
     ScopedPointer<BKLevelMeterComponent> levelMeterComponentR;
     
