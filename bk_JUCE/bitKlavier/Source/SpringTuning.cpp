@@ -71,7 +71,14 @@ rate(100)
 		{
 			//will add in a better length calculation method once mapping is figured out
             
-            int interval = ((i-j) % 12);
+            int diff = i - j;
+            
+            int interval = (diff % 12);
+            
+            if (diff != 0 && interval == 0)
+            {
+                interval = 12;
+            }
             
             Spring* spring = new Spring(particleArray[j],
                                         particleArray[i],

@@ -29,7 +29,7 @@ showSprings(false)
         addChildComponent(s);
         tetherSliders.add(s);
         
-        Label* l = new Label(s->getName(), String(notesInAnOctave[i%12]) + String(i / 12));
+        Label* l = new Label(s->getName(), String(notesInAnOctave[i%12]) + String((i / 12) - 1));
         l->setColour(juce::Label::ColourIds::textColourId, Colours::black);
         addChildComponent(l);
         tetherLabels.add(l);
@@ -37,7 +37,7 @@ showSprings(false)
     
     for (int i = 0; i < 12; i++)
     {
-        Slider* s = new Slider(intervalNames[i]);
+        Slider* s = new Slider(intervalNames[i+1]);
         
         s->setSliderStyle(Slider::SliderStyle::LinearBar);
         s->setRange(0.0, 1.0);
@@ -49,14 +49,19 @@ showSprings(false)
         addChildComponent(l);
         springLabels.add(l);
         
-        ToggleButton* t = new ToggleButton(notesInAnOctave[i]);
+        ToggleButton* t = new ToggleButton("");
         //buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
         t->setColour(ToggleButton::textColourId, Colours::black);
         t->setColour(ToggleButton::tickColourId, Colours::black);
         t->setColour(ToggleButton::tickDisabledColourId, Colours::grey);
         t->setTooltip("When selected, all " + notesInAnOctave[i] + " springs will have same weight." );
         addChildComponent(t);
-        tetherToggles.add(t);
+        toggles.add(t);
+        
+        l = new Label(notesInAnOctave[i], notesInAnOctave[i]);
+        l->setColour(juce::Label::ColourIds::textColourId, Colours::black);
+        addChildComponent(l);
+        toggleLabels.add(l);
         
     }
     
@@ -351,7 +356,9 @@ void TuningViewController::resized()
     {
         springLabels[i]->setBounds(x_offset, y_offset + (h + yspacing) * i, 30, h);
         springSliders[i]->setBounds(springLabels[i]->getRight() + xspacing, springLabels[i]->getY(), w, h);
-        tetherToggles[i]->setBounds(springSliders[i]->getRight() + xspacing, springSliders[i]->getY(), 30, h);
+        
+        toggleLabels[i]->setBounds(springSliders[i]->getRight() + xspacing, springSliders[i]->getY(), 30, h);
+        toggles[i]->setBounds(toggleLabels[i]->getRight() + xspacing, toggleLabels[i]->getY(), 30, h);
     }
     
     rateSlider.setBounds(getWidth() * 0.75, TOP + 15, getWidth() * 0.24, h);
@@ -522,7 +529,8 @@ void TuningViewController::updateComponentVisibility()
     for (auto s : tetherSliders)    s->setVisible(false);
     for (auto s : springSliders)    s->setVisible(false);
     for (auto l : springLabels)     l->setVisible(false);
-    for (auto t : tetherToggles)    t->setVisible(false);
+    for (auto t : toggles)          t->setVisible(false);
+    for (auto l : toggleLabels)     l->setVisible(false);
     
     absoluteKeyboard.setVisible(true);
     customKeyboard.setVisible(true);
@@ -620,9 +628,11 @@ void TuningViewController::updateComponentVisibility()
                 
                 springLabels[i]->setVisible(true);
                 
-                tetherToggles[i]->setVisible(true);
-                tetherToggles[i]->toFront(true);
-                tetherToggles[i]->setToggleState(tuning->getTetherLock(i), dontSendNotification);
+                toggles[i]->setVisible(true);
+                toggles[i]->toFront(true);
+                toggles[i]->setToggleState(tuning->getTetherLock(i), dontSendNotification);
+                
+                toggleLabels[i]->setVisible(true);
                 
             }
             
@@ -673,7 +683,7 @@ TuningViewController(p, theGraph)
     for (int i = 0; i < 12; i++)
     {
         springSliders[i]->addListener(this);
-        tetherToggles[i]->addListener(this);
+        toggles[i]->addListener(this);
     }
     
     for (int i = 0; i < 128; i++)
@@ -774,7 +784,7 @@ void TuningPreparationEditor::timerCallback()
             {
                 if (tetherSprings[i]->getEnabled())
                 {
-                    tetherLabels[i]->setBounds(tetherToggles[0]->getRight() + xspacing, y_offset + (h + yspacing) * count, 30, h);
+                    tetherLabels[i]->setBounds(toggles[0]->getRight() + xspacing, y_offset + (h + yspacing) * count, 30, h);
                     tetherLabels[i]->setVisible(true);
                     
                     tetherSliders[i]->setBounds(tetherLabels[i]->getRight() + xspacing, tetherLabels[i]->getY(), w, h);
@@ -1105,7 +1115,7 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
             }
             else if (slider == springSliders[i])
             {
-                tuning->setSpringWeight(i, value);
+                tuning->setSpringWeight((i+1), value);
                 break;
             }
         }
@@ -1181,7 +1191,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
     {
         for (int i = 0; i < 12; i++)
         {
-            if (b == tetherToggles[i])
+            if (b == toggles[i])
             {
                 Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
                 tuning->setTetherLock(i, b->getToggleState());
