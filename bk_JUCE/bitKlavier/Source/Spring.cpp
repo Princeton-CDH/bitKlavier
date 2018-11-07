@@ -154,8 +154,9 @@ void Spring::satisfyConstraints(void)
 {
     //int ao = a->getOctave(), bo = b->getOctave();
     
-    double diff = b->getX() - a->getX(); //dope
-    //double diff = fmod((b->getX() - a->getX()), 1200.0);
+    double diff = b->getX() - a->getX();
+    
+    if (intervalIndex != 12) diff = fmod(diff, 1200.0);
     
 	if (diff == 0.0) return;
     
