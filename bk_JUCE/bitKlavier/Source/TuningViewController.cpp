@@ -29,7 +29,7 @@ showSprings(false)
         addChildComponent(s);
         tetherSliders.add(s);
         
-        Label* l = new Label(s->getName(), String(i));
+        Label* l = new Label(s->getName(), String(notesInAnOctave[i%12]) + String(i / 12));
         l->setColour(juce::Label::ColourIds::textColourId, Colours::black);
         addChildComponent(l);
         tetherLabels.add(l);
@@ -48,6 +48,16 @@ showSprings(false)
         l->setColour(juce::Label::ColourIds::textColourId, Colours::black);
         addChildComponent(l);
         springLabels.add(l);
+        
+        ToggleButton* t = new ToggleButton(notesInAnOctave[i]);
+        //buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
+        t->setColour(ToggleButton::textColourId, Colours::black);
+        t->setColour(ToggleButton::tickColourId, Colours::black);
+        t->setColour(ToggleButton::tickDisabledColourId, Colours::grey);
+        t->setTooltip("When selected, all " + notesInAnOctave[i] + " springs will have same weight." );
+        addChildComponent(t);
+        tetherToggles.add(t);
+        
     }
     
     rateSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
@@ -102,6 +112,8 @@ showSprings(false)
     A1Inversional.setColour(ToggleButton::tickDisabledColourId, Colours::antiquewhite);
     A1Inversional.setTooltip("when selected, intervals will be tuned the same whether they ascend or descend; e.g. C-D will always be the same interval as C-Bb");
     addAndMakeVisible(A1Inversional);
+    
+    
     
     A1AnchorScaleCB.setName("A1AnchorScale");
     A1AnchorScaleCB.setTooltip("determines where the moving fundamental will be tuned to");
@@ -337,8 +349,9 @@ void TuningViewController::resized()
 
     for (int i = 0; i < 12; i++)
     {
-        springSliders[i]->setBounds(x_offset, y_offset + (h + yspacing) * i, w, h);
-        springLabels[i]->setBounds(springSliders[i]->getRight() + xspacing, springSliders[i]->getY(), 40, h);
+        springLabels[i]->setBounds(x_offset, y_offset + (h + yspacing) * i, 30, h);
+        springSliders[i]->setBounds(springLabels[i]->getRight() + xspacing, springLabels[i]->getY(), w, h);
+        tetherToggles[i]->setBounds(springSliders[i]->getRight() + xspacing, springSliders[i]->getY(), 30, h);
     }
     
     rateSlider.setBounds(getWidth() * 0.75, TOP + 15, getWidth() * 0.24, h);
@@ -506,9 +519,10 @@ void TuningViewController::fillFundamentalCB(void)
 void TuningViewController::updateComponentVisibility()
 {
     
-    for (auto s : tetherSliders) s->setVisible(false);
-    for (auto s : springSliders) s->setVisible(false);
-    for (auto l : springLabels) l->setVisible(false);
+    for (auto s : tetherSliders)    s->setVisible(false);
+    for (auto s : springSliders)    s->setVisible(false);
+    for (auto l : springLabels)     l->setVisible(false);
+    for (auto t : tetherToggles)    t->setVisible(false);
     
     absoluteKeyboard.setVisible(true);
     customKeyboard.setVisible(true);
@@ -605,6 +619,11 @@ void TuningViewController::updateComponentVisibility()
                 springSliders[i]->setValue(springs[i]->getStrength(), dontSendNotification);
                 
                 springLabels[i]->setVisible(true);
+                
+                tetherToggles[i]->setVisible(true);
+                tetherToggles[i]->toFront(true);
+                tetherToggles[i]->setToggleState(tuning->getTetherLock(i), dontSendNotification);
+                
             }
             
             for (int i = 0; i < 128; i++)
@@ -654,6 +673,7 @@ TuningViewController(p, theGraph)
     for (int i = 0; i < 12; i++)
     {
         springSliders[i]->addListener(this);
+        tetherToggles[i]->addListener(this);
     }
     
     for (int i = 0; i < 128; i++)
@@ -754,11 +774,12 @@ void TuningPreparationEditor::timerCallback()
             {
                 if (tetherSprings[i]->getEnabled())
                 {
-                    tetherSliders[i]->setBounds(x_offset + w + 40 + 2*xspacing, y_offset + (h + yspacing) * count, w, h);
-                    tetherSliders[i]->setVisible(true);
-                    
-                    tetherLabels[i]->setBounds(tetherSliders[i]->getRight() + xspacing, tetherSliders[i]->getY(), 40, h);
+                    tetherLabels[i]->setBounds(tetherToggles[0]->getRight() + xspacing, y_offset + (h + yspacing) * count, 30, h);
                     tetherLabels[i]->setVisible(true);
+                    
+                    tetherSliders[i]->setBounds(tetherLabels[i]->getRight() + xspacing, tetherLabels[i]->getY(), w, h);
+                    tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
+                    tetherSliders[i]->setVisible(true);
                     
                     count++;
                 }
@@ -1155,6 +1176,18 @@ void TuningPreparationEditor::buttonClicked (Button* b)
     else if (b == &actionButton)
     {
         getPrepOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+    }
+    else
+    {
+        for (int i = 0; i < 12; i++)
+        {
+            if (b == tetherToggles[i])
+            {
+                Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+                tuning->setTetherLock(i, b->getToggleState());
+                break;
+            }
+        }
     }
 }
 

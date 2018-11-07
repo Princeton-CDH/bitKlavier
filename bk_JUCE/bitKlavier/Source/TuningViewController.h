@@ -95,6 +95,8 @@ protected:
     OwnedArray<Label>  springLabels;
     OwnedArray<Label>  tetherLabels;
     
+    OwnedArray<ToggleButton> tetherToggles; 
+    
     Slider rateSlider;
     Slider stiffnessSlider;
 

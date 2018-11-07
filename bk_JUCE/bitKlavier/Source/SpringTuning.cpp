@@ -20,6 +20,7 @@ void SpringTuningModel::copy(SpringTuningModel::Ptr st)
     for (int i = 0; i < 12; i++)
     {
         setSpringWeight(i, st->getSpringWeight(i));
+        setTetherLock(i, st->getTetherLock(i));
     }
     
     for (int i = 0; i < 128; i++)
@@ -35,8 +36,8 @@ rate(100)
 {
     particleArray.ensureStorageAllocated(128);
     tetherParticleArray.ensureStorageAllocated(128);
-
-	//double xValue = cFreq;
+    
+    for (int i = 0; i < 12; i++) tetherLocked[i] = false;
     
 	for (int i = 0; i < 128; i++)
 	{
@@ -169,31 +170,68 @@ double SpringTuningModel::getSpringWeight(int which)
 
 void SpringTuningModel::setTetherWeight(int which, double weight)
 {
-    Spring* spring = tetherSpringArray[which];
-    
-    spring->setStrength(weight);
-    
-    Particle* a = spring->getA();
-    Particle* b = spring->getB();
-    Particle* use = nullptr;
-    Particle* tethered = tetherParticleArray[which];
-    
-    if (a != tethered)  use = a;
-    else                use = b;
-
-    if (use != nullptr)
+    int pc = which % 12;
+    if (tetherLocked[pc])
     {
-        if (weight == 1.0)
+        for (int t = pc; t < 128; t += 12)
         {
-            use->setX(use->getRestX());
-            use->setLocked(true);
+            Spring* spring = tetherSpringArray[t];
+            
+            spring->setStrength(weight);
+            
+            Particle* a = spring->getA();
+            Particle* b = spring->getB();
+            Particle* use = nullptr;
+            Particle* tethered = tetherParticleArray[t];
+            
+            if (a != tethered)  use = a;
+            else                use = b;
+            
+            if (use != nullptr)
+            {
+                if (weight == 1.0)
+                {
+                    use->setX(use->getRestX());
+                    use->setLocked(true);
+                }
+                else
+                {
+                    use->setLocked(false);
+                    if (weight == 0.0) tethered->setEnabled(false);
+                }
+            }
         }
-        else
+        
+    }
+    else
+    {
+        Spring* spring = tetherSpringArray[which];
+        
+        spring->setStrength(weight);
+        
+        Particle* a = spring->getA();
+        Particle* b = spring->getB();
+        Particle* use = nullptr;
+        Particle* tethered = tetherParticleArray[which];
+        
+        if (a != tethered)  use = a;
+        else                use = b;
+        
+        if (use != nullptr)
         {
-            use->setLocked(false);
-			if (weight == 0.0) tethered->setEnabled(false);
+            if (weight == 1.0)
+            {
+                use->setX(use->getRestX());
+                use->setLocked(true);
+            }
+            else
+            {
+                use->setLocked(false);
+                if (weight == 0.0) tethered->setEnabled(false);
+            }
         }
     }
+    
 }
 
 double SpringTuningModel::getTetherWeight(int which)
@@ -243,7 +281,6 @@ void SpringTuningModel::removeParticle(int note)
 {
     Particle* p = particleArray[note];
     p->setEnabled(false);
-    //p->setX(note * 100); // DO WE WANT THIS?
     tetherParticleArray[note]->setEnabled(false);
 }
 void SpringTuningModel::addNote(int note)

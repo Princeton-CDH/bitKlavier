@@ -475,6 +475,16 @@ public:
         stuning->setTetherWeight(which, weight);
     }
     
+    inline void setTetherLock(int which, bool lock)
+    {
+        stuning->setTetherLock(which, lock);
+    }
+    
+    inline bool getTetherLock(int which)
+    {
+        return stuning->getTetherLock(which);
+    }
+    
     inline void setSpringRate(double rate) { stuning->setRate(rate);}
     inline double getSpringRate(void) { return stuning->getRate();}
     

@@ -126,6 +126,7 @@ public:
 
         ValueTree tethers( "tethers");
         ValueTree springs( "springs");
+        ValueTree tetherLocks( "locks");
         
         for (int i = 0; i < 128; i++)
         {
@@ -135,9 +136,12 @@ public:
         for (int i = 0; i < 12; i++)
         {
             springs.setProperty( "s"+String(i), getSpringWeight(i), 0 );
+            tetherLocks.setProperty("tl"+String(i), getTetherLock(i) ? 1 : 0, 0);
+            
         }
         prep.addChild(tethers, -1, 0);
         prep.addChild(springs, -1, 0);
+        prep.addChild(tetherLocks, -1, 0);
 
         return prep;
     }
@@ -184,11 +188,29 @@ public:
                     }
                 }
             }
+            else if (sub->hasTagName("locks"))
+            {
+                Array<float> scale;
+                for (int i = 0; i < 12; i++)
+                {
+                    String attr = sub->getStringAttribute("tl" + String(i));
+                    
+                    if (attr == "")
+                    {
+                        setTetherLock(i, false);
+                    }
+                    else
+                    {
+                        setTetherLock(i, (bool)attr.getIntValue());
+                    }
+                }
+            }
         }
     }
     
     
-    
+    inline void setTetherLock(int pc, bool tl) { tetherLocked[pc] = tl;}
+    inline bool getTetherLock(int pc) { return tetherLocked[pc];}
 
 private:
     int tetherTuning;
@@ -200,6 +222,8 @@ private:
     
     Particle::PtrArr    tetherParticleArray;
     Spring::PtrArr      tetherSpringArray;
+    
+    bool tetherLocked[12];
     
     /*
     Spring::PtrArr activeTetherSprings;
