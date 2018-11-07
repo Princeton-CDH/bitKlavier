@@ -70,7 +70,7 @@ showSprings(false)
     addChildComponent(rateSlider);
     
     stiffnessSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
-    stiffnessSlider.setRange(0.05, 4.0);
+    stiffnessSlider.setRange(1.0, 10.0);
     addChildComponent(stiffnessSlider);
     
     iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::tuning_icon_png, BinaryData::tuning_icon_pngSize));
@@ -531,6 +531,9 @@ void TuningViewController::updateComponentVisibility()
     for (auto l : springLabels)     l->setVisible(false);
     for (auto t : toggles)          t->setVisible(false);
     for (auto l : toggleLabels)     l->setVisible(false);
+    
+    rateSlider.setVisible(false);
+    stiffnessSlider.setVisible(false);
     
     absoluteKeyboard.setVisible(true);
     customKeyboard.setVisible(true);
@@ -1102,7 +1105,11 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
     }
     else if (slider == &stiffnessSlider)
     {
-        tuning->setSpringStiffness(value);
+        double val = log10(value);
+        val = val * val * val;
+        tuning->setSpringStiffness(val);
+        DBG(String(val));
+        
     }
     else
     {

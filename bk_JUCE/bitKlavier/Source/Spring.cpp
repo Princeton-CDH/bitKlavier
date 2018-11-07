@@ -160,10 +160,11 @@ void Spring::satisfyConstraints(void)
     
 	if (diff == 0.0) return;
     
-    double maxStiffness = 0.5 * stiffness;
-    double meanStiffness = 0.05 * stiffness;
+    double maxStiffness = 0.1;
+    double minStiffness = 0.0001;
+    double meanStiffness = 0.0001 + 0.0999 * stiffness;
 
-	double actualStrength = Utilities::clip(0.0, (meanStiffness * strength) / (1.0 - strength), maxStiffness);
+	double actualStrength = Utilities::clip(minStiffness, (meanStiffness * strength) / (1.0 - strength), maxStiffness);
 
     diff *= ( (diff - restingLength) / diff ) * actualStrength;
 
