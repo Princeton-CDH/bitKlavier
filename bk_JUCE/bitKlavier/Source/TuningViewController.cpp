@@ -70,7 +70,7 @@ showSprings(false)
     addChildComponent(rateSlider);
     
     stiffnessSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
-    stiffnessSlider.setRange(1.0, 10.0);
+    stiffnessSlider.setRange(0.0, 1.0);
     addChildComponent(stiffnessSlider);
     
     iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::tuning_icon_png, BinaryData::tuning_icon_pngSize));
@@ -369,10 +369,10 @@ void TuningViewController::resized()
 
 void TuningViewController::paint (Graphics& g)
 {
-    g.fillAll(Colours::black);
-    
     if (processor.updateState->currentDisplay == DisplayTuning)
     {
+        g.fillAll(Colours::black);
+        
         TuningProcessor::Ptr tuning = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
         
         if (!showSprings || (tuning->getTuning()->getCurrentTuning() != SpringTuning)) return;
@@ -382,6 +382,7 @@ void TuningViewController::paint (Graphics& g)
         b.removeFromTop(TOP);
         
         g.setColour(Colours::antiquewhite);
+        g.setOpacity(1.0);
         g.fillRect(b);
 
         g.setColour (Colours::black);
@@ -537,6 +538,7 @@ void TuningViewController::updateComponentVisibility()
     
     absoluteKeyboard.setVisible(true);
     customKeyboard.setVisible(true);
+    lastInterval.setVisible(true);
     offsetSlider->setVisible(true);
     
     if(scaleCB.getText() == "Adaptive Tuning 1")
@@ -579,6 +581,7 @@ void TuningViewController::updateComponentVisibility()
     }
     else if (scaleCB.getText() == "Spring")
     {
+        lastInterval.setVisible(false);
         A1IntervalScaleCB.setVisible(false);
         A1Inversional.setVisible(false);
         A1AnchorScaleCB.setVisible(false);
@@ -1056,10 +1059,9 @@ void TuningPreparationEditor::update(void)
         nToneRootCB.setSelectedItemIndex(prep->getNToneRootPC(), dontSendNotification);
         nToneRootOctaveCB.setSelectedItemIndex(prep->getNToneRootOctave(), dontSendNotification);
         nToneSemitoneWidthSlider->setValue(prep->getNToneSemitoneWidth(), dontSendNotification);
-        
-        updateComponentVisibility();
     }
     
+    updateComponentVisibility();
 }
 
 void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> values)
@@ -1105,7 +1107,7 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
     }
     else if (slider == &stiffnessSlider)
     {
-        double val = log10(value);
+        double val = log10(value * 9.0 + 1.0);
         val = val * val * val;
         tuning->setSpringStiffness(val);
         DBG(String(val));
