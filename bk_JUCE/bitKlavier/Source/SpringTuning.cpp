@@ -32,10 +32,15 @@ void SpringTuningModel::copy(SpringTuningModel::Ptr st)
 SpringTuningModel::SpringTuningModel(SpringTuningModel::Ptr st):
 tetherTuning(1),
 intervalTuning(0),
-rate(100)
+rate(100),
+active(false)
 {
     particleArray.ensureStorageAllocated(128);
     tetherParticleArray.ensureStorageAllocated(128);
+    
+    tetherTuning = Array<float>({0,0,0,0,0,0,0,0,0,0,0,0});
+    intervalTuning = Array<float>({0.0, 0.117313, 0.039101, 0.156414, -0.13686, -0.019547,
+        -0.174873, 0.019547, 0.136864, -0.15641, -0.311745, -0.11731});
     
     for (int i = 0; i < 12; i++) tetherLocked[i] = false;
     
@@ -58,7 +63,7 @@ rate(100)
         p2->setLocked(true);
         tetherParticleArray.add(p2);
         
-        Spring* s = new Spring(p1, p2, 0.0, 0.5, 1.0, 0);
+        Spring* s = new Spring(p1, p2, 0.0, 0.5, 0);
         s->setEnabled(false);
         s->setName(intervalLabels[0]);
         tetherSpringArray.add(s);
@@ -69,8 +74,6 @@ rate(100)
 	{
 		for (int j = 0; j < i; j++)
 		{
-			//will add in a better length calculation method once mapping is figured out
-            
             int diff = i - j;
             
             int interval = (diff % 12);
@@ -80,11 +83,12 @@ rate(100)
                 interval = 12;
             }
             
+            DBG("spring: " + String(interval * 100 + intervalTuning[interval]));
+            
             Spring* spring = new Spring(particleArray[j],
                                         particleArray[i],
-                                        centLengths[0][interval],
+                                        interval * 100 + intervalTuning[interval] * 100,
                                         0.5,
-                                        tunings[intervalTuning][interval],
                                         interval);
             
             spring->setEnabled(false);
@@ -102,33 +106,31 @@ rate(100)
     setRate(rate);
 }
 
-void SpringTuningModel::setTetherTuning(int tuning)
+void SpringTuningModel::setTetherTuning(Array<float> tuning)
 {
     tetherTuning = tuning;
     
     for (int i = 0; i < 128; i++)
     {
-        tetherParticleArray[i]->setX(Utilities::cFreq * tunings[tetherTuning][(i%12)]);
+        tetherParticleArray[i]->setX( (i * 100.0) + tetherTuning[i] );
+        tetherParticleArray[i]->setRestX( (i * 100.0) + tetherTuning[i] );
     }
 }
 
-void SpringTuningModel::setIntervalTuning(int tuning)
+void SpringTuningModel::setIntervalTuning(Array<float> tuning)
 {
     intervalTuning = tuning;
-    int which = 0;
-    for (int i = 0; i < 12; i++)
+
+    for (auto spring : springArray)
     {
-        for (int j = 0; j < i; j++)
-        {
-            springArray[which++]->setBaseInterval(Utilities::cFreq * tunings[intervalTuning][i-j]);
-        }
+        int interval = spring->getIntervalIndex();
+        spring->setRestingLength(interval * 100 + intervalTuning[interval]);
     }
 }
 
 #define DRAG 1.0f
 void SpringTuningModel::simulate()
 {
-
     for (auto particle : particleArray)
     {
 		if (particle->getEnabled() && !particle->getLocked())
@@ -371,45 +373,10 @@ void SpringTuningModel::removeSpringsByNote(int note)
     
     tetherSpringArray[note]->setEnabled(false);
 }
-void SpringTuningModel::addSpringsByInterval(double interval)
-{
-	for (auto spring : springArray)
-	{
-        if (!spring->getEnabled() && (abs(spring->getBaseInterval() - interval) <= 0.001))
-        {
-            spring->setEnabled(true);
-        }
-	}
-}
-void SpringTuningModel::removeSpringsByInterval(double interval)
-{
-    for (auto spring : springArray)
-	{
-        if (spring->getEnabled() && (abs(spring->getBaseInterval() - interval) <= 0.001))
-        {
-            spring->setEnabled(false);
-        }
-	}
-}
-void SpringTuningModel::adjustSpringsByInterval(double interval, double weight)
-{
-	for (auto spring : springArray)
-	{
-		if ((abs(spring->getBaseInterval() - interval) <= 0.001))
-        {
-            spring->setStrength(weight);
-        }
-	}
-}
 
 double SpringTuningModel::getFrequency(int note)
 {
 	return Utilities::centsToFreq((int) particleArray[note]->getX());
-}
-
-bool SpringTuningModel::pitchEnabled(int index)
-{
-	return particleArray[index]->getEnabled();
 }
 
 void SpringTuningModel::print()

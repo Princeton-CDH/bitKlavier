@@ -18,13 +18,11 @@ public:
     typedef ReferenceCountedObjectPtr<Spring> Ptr;
     typedef Array<Spring::Ptr> PtrArr;
     
-	Spring(Particle* firstPoint, Particle* secondPoint, double length, double str, double interval, int index);
+	Spring(Particle* firstPoint, Particle* secondPoint, double length, double str, int index);
 	Particle* getA(void);
 	Particle* getB(void);
 	double getLength();
-    
-	double getBaseInterval();
-    void setBaseInterval(double interval);
+
     
 	int getIntervalIndex();
     Spring::Ptr copy();
@@ -33,7 +31,9 @@ public:
     
     void setStrength(double newStrength);
     double getStrength();
-    void setLength(double newLength);
+    
+    void setRestingLength(double len) { restingLength = len; }
+    double getRestingLength(void) { return restingLength; }
     
     inline void setStiffness(double stiff)
     {
@@ -63,7 +63,6 @@ private:
     double stiffness;
     
 	double restingLength;
-	double baseInterval;
     bool enabled;
 	int intervalIndex; //will probably replace base interval
     String name;

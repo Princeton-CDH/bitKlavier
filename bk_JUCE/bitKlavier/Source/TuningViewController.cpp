@@ -65,6 +65,20 @@ showSprings(false)
         
     }
     
+    
+    springTuningToggle.setColour(ToggleButton::textColourId, Colours::antiquewhite);
+    springTuningToggle.setColour(ToggleButton::tickColourId, Colours::antiquewhite);
+    springTuningToggle.setColour(ToggleButton::tickDisabledColourId, Colours::antiquewhite);
+    springTuningToggle.setTooltip("Turns on/off Spring Tuning.");
+    springTuningToggle.setAlwaysOnTop(true);
+    springTuningToggle.setButtonText("");
+    springTuningToggle.changeWidthToFitText();
+    addChildComponent(springTuningToggle);
+    
+    springTuningLabel.setText("Springs", dontSendNotification);
+    springTuningLabel.setColour(Label::ColourIds::textColourId, Colours::antiquewhite);
+    addChildComponent(springTuningLabel);
+    
     rateSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
     rateSlider.setRange(5.0, 400.0);
     addChildComponent(rateSlider);
@@ -148,7 +162,7 @@ showSprings(false)
     A1reset.setButtonText("reset");
     addAndMakeVisible(A1reset);
     
-    showSpringsButton.setButtonText("Springs");
+    showSpringsButton.setButtonText("Graph");
     addAndMakeVisible(showSpringsButton);
     
     nToneRootCB.setName("nToneRoot");
@@ -252,10 +266,6 @@ void TuningViewController::resized()
                       actionButton.getWidth(),
                       actionButton.getHeight());
     
-    showSpringsButton.setBounds(actionButton.getRight()+gXSpacing,
-                      actionButton.getY(),
-                      actionButton.getWidth(),
-                      actionButton.getHeight());
     
     /* *** above here should be generic (mostly) to all prep layouts *** */
     /* ***         below here will be specific to each prep          *** */
@@ -364,6 +374,20 @@ void TuningViewController::resized()
     rateSlider.setBounds(getWidth() * 0.75, TOP + 15, getWidth() * 0.24, h);
     stiffnessSlider.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, rateSlider.getWidth(), rateSlider.getHeight());
     
+    int labelWidth = 60;
+    
+    springTuningLabel.setBounds(scaleCB.getX(), scaleCB.getBottom() + gYSpacing, labelWidth, scaleCB.getHeight());
+    
+    
+    springTuningToggle.setBounds(springTuningLabel.getRight() + gXSpacing, springTuningLabel.getY() - 6, 35, 35);
+    
+    
+    showSpringsButton.setBounds(springTuningToggle.getRight()+gXSpacing,
+                                springTuningLabel.getY(),
+                                springTuningLabel.getWidth(),
+                                scaleCB.getHeight());
+    
+    
     updateComponentVisibility();
 }
 
@@ -375,7 +399,7 @@ void TuningViewController::paint (Graphics& g)
         
         TuningProcessor::Ptr tuning = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
         
-        if (!showSprings || (tuning->getTuning()->getCurrentTuning() != SpringTuning)) return;
+        if (!showSprings) return;
         
         
         Rectangle<int> b = getBounds();
@@ -526,7 +550,6 @@ void TuningViewController::fillFundamentalCB(void)
 
 void TuningViewController::updateComponentVisibility()
 {
-    
     for (auto s : tetherSliders)    s->setVisible(false);
     for (auto s : springSliders)    s->setVisible(false);
     for (auto l : springLabels)     l->setVisible(false);
@@ -540,6 +563,9 @@ void TuningViewController::updateComponentVisibility()
     customKeyboard.setVisible(true);
     lastInterval.setVisible(true);
     offsetSlider->setVisible(true);
+    springTuningToggle.setVisible(true);
+    springTuningLabel.setVisible(true);
+    showSpringsButton.setVisible(true);
     
     if(scaleCB.getText() == "Adaptive Tuning 1")
     {
@@ -557,7 +583,6 @@ void TuningViewController::updateComponentVisibility()
         nToneRootCB.setVisible(false);
         nToneRootOctaveCB.setVisible(false);
         nToneSemitoneWidthSlider->setVisible(false);
-        showSpringsButton.setVisible(false);
 
     }
     else if(scaleCB.getText() == "Adaptive Anchored Tuning 1")
@@ -576,78 +601,6 @@ void TuningViewController::updateComponentVisibility()
         nToneRootCB.setVisible(false);
         nToneRootOctaveCB.setVisible(false);
         nToneSemitoneWidthSlider->setVisible(false);
-        showSpringsButton.setVisible(false);
-
-    }
-    else if (scaleCB.getText() == "Spring")
-    {
-        lastInterval.setVisible(false);
-        A1IntervalScaleCB.setVisible(false);
-        A1Inversional.setVisible(false);
-        A1AnchorScaleCB.setVisible(false);
-        A1FundamentalCB.setVisible(false);
-        A1ClusterThresh->setVisible(false);
-        A1ClusterMax->setVisible(false);
-        A1IntervalScaleLabel.setVisible(false);
-        A1AnchorScaleLabel.setVisible(false);
-        A1FundamentalLabel.setVisible(false);
-        A1reset.setVisible(false);
-        currentFundamental.setVisible(false);
-        
-        
-        nToneRootCB.setVisible(true);
-        nToneRootOctaveCB.setVisible(true);
-        nToneSemitoneWidthSlider->setVisible(true);
-        showSpringsButton.setVisible(true);
-        absoluteKeyboard.setVisible(true);
-        customKeyboard.setVisible(true);
-        offsetSlider->setVisible(true);
-        
-        if (showSprings)
-        {
-            Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-            Spring::PtrArr springs = tuning->getSprings();
-            Spring::PtrArr tetherSprings = tuning->getTetherSprings();
-            
-            nToneRootCB.setVisible(false);
-            nToneRootOctaveCB.setVisible(false);
-            nToneSemitoneWidthSlider->setVisible(false);
-            showSpringsButton.setVisible(true);
-            
-            absoluteKeyboard.setVisible(false);
-            customKeyboard.setVisible(false);
-            offsetSlider->setVisible(false);
-            
-            rateSlider.setVisible(true);
-            rateSlider.toFront(true);
-            rateSlider.setValue(tuning->getSpringRate(), dontSendNotification);
-            
-            stiffnessSlider.setVisible(true);
-            stiffnessSlider.toFront(true);
-            stiffnessSlider.setValue(tuning->getSpringStiffness(), dontSendNotification);
-            
-            for (int i = 0; i < 12; i++)
-            {
-                springSliders[i]->setVisible(true);
-                springSliders[i]->toFront(true);
-                springSliders[i]->setValue(springs[i]->getStrength(), dontSendNotification);
-                
-                springLabels[i]->setVisible(true);
-                
-                toggles[i]->setVisible(true);
-                toggles[i]->toFront(true);
-                toggles[i]->setToggleState(tuning->getTetherLock(i), dontSendNotification);
-                
-                toggleLabels[i]->setVisible(true);
-                
-            }
-            
-            for (int i = 0; i < 128; i++)
-            {
-                tetherSliders[i]->toFront(true);
-                tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
-            }
-        }
     }
     else
     {
@@ -665,9 +618,54 @@ void TuningViewController::updateComponentVisibility()
         nToneRootCB.setVisible(true);
         nToneRootOctaveCB.setVisible(true);
         nToneSemitoneWidthSlider->setVisible(true);
-        showSpringsButton.setVisible(false);
         stiffnessSlider.setVisible(false);
         rateSlider.setVisible(false);
+    }
+    
+    if (showSprings)
+    {
+        Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+        Spring::PtrArr springs = tuning->getSprings();
+        Spring::PtrArr tetherSprings = tuning->getTetherSprings();
+        
+        nToneRootCB.setVisible(false);
+        nToneRootOctaveCB.setVisible(false);
+        nToneSemitoneWidthSlider->setVisible(false);
+        
+        absoluteKeyboard.setVisible(false);
+        customKeyboard.setVisible(false);
+        offsetSlider->setVisible(false);
+        
+        rateSlider.setVisible(true);
+        rateSlider.toFront(true);
+        rateSlider.setValue(tuning->getSpringRate(), dontSendNotification);
+        
+        stiffnessSlider.setVisible(true);
+        stiffnessSlider.toFront(true);
+        stiffnessSlider.setValue(tuning->getSpringStiffness(), dontSendNotification);
+        
+        for (int i = 0; i < 12; i++)
+        {
+            springSliders[i]->setVisible(true);
+            springSliders[i]->toFront(true);
+            springSliders[i]->setValue(springs[i]->getStrength(), dontSendNotification);
+            
+            springLabels[i]->setVisible(true);
+            
+            toggles[i]->setVisible(true);
+            toggles[i]->toFront(true);
+            toggles[i]->setToggleState(tuning->getTetherLock(i), dontSendNotification);
+            
+            toggleLabels[i]->setVisible(true);
+            
+        }
+        
+        for (int i = 0; i < 128; i++)
+        {
+            tetherSliders[i]->toFront(true);
+            tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
+        }
+        
     }
 }
 
@@ -696,6 +694,8 @@ TuningViewController(p, theGraph)
     {
         tetherSliders[i]->addListener(this);
     }
+    
+    springTuningToggle.addListener(this);
     
     rateSlider.addListener(this);
     
@@ -774,7 +774,7 @@ void TuningPreparationEditor::timerCallback()
             }
         }
         
-        if (showSprings && tProcessor->getTuning()->getCurrentTuning() == SpringTuning)
+        if (showSprings)
         {
             const int x_offset = 10;
             const int y_offset = TOP+75;
@@ -933,6 +933,8 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         DBG("current tuning from processor = " + String(processor.updateState->currentTuningId));
         customKeyboard.setValues(currentTuning->getCurrentScaleCents());
+        
+        currentTuning->getSpringTuning()->setTetherTuning(currentTuning->getCurrentScaleCents());
         
         updateComponentVisibility();
         
@@ -1195,6 +1197,13 @@ void TuningPreparationEditor::buttonClicked (Button* b)
     else if (b == &actionButton)
     {
         getPrepOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+    }
+    else if (b == &springTuningToggle)
+    {
+        bool state = b->getToggleState();
+        
+        Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+        tuning->setSpringsActive(state);
     }
     else
     {

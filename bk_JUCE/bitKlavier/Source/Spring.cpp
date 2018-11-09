@@ -11,12 +11,11 @@
 #include "Spring.h"
 #include "../JuceLibraryCode/JuceHeader.h"
 
-Spring::Spring(Particle* firstPoint, Particle* secondPoint, double length, double str, double interval, int index) :
+Spring::Spring(Particle* firstPoint, Particle* secondPoint, double length, double str, int index) :
 	a(firstPoint),
 	b(secondPoint),
 	restingLength(length),
 	strength(str),
-	baseInterval(interval),
 	intervalIndex(index)
 {
 
@@ -42,16 +41,6 @@ double Spring::getStrength()
 	return strength;
 }
 
-double Spring::getBaseInterval()
-{
-	return baseInterval;
-}
-
-void Spring::setBaseInterval(double interval)
-{
-    baseInterval = interval;
-}
-
 int Spring::getIntervalIndex()
 {
 	return intervalIndex;
@@ -59,7 +48,7 @@ int Spring::getIntervalIndex()
 
 Spring::Ptr Spring::copy(void)
 {
-    Spring::Ptr copySpring = new Spring(a, b, restingLength, strength, baseInterval, intervalIndex);
+    Spring::Ptr copySpring = new Spring(a, b, restingLength, strength, intervalIndex);
 	return copySpring;
 }
 
@@ -67,8 +56,7 @@ bool Spring::compare(Spring* that)
 {
 	return (a->compare(that->getA()) &&
 		b->compare(that->getB()) &&
-		strength == that->getStrength() &&
-		baseInterval == that->getBaseInterval());
+		strength == that->getStrength());
 }
 
 void Spring::print()
@@ -78,77 +66,12 @@ void Spring::print()
 	DBG("\nPoint B:");
 	b->print();
 	DBG("Strength: " + String(strength));
-	DBG("Base Interval: " + String(baseInterval));
-}
-
-//we probably don't want to be messing around with this but it can't hurt to have the method
-void Spring::setLength(double newLength)
-{
-	restingLength = newLength;
 }
 
 void Spring::setStrength(double newStrength)
 {
 	strength = newStrength;
 }
-
-/*
-String Spring::getStringBaseInterval()
-{
-	String result = "";
-	switch (baseInterval) 
-	{
-	case (double)(25.0 / 24.0) :
-		result = "Minor 2nd";
-		break;
-
-	case 9.0/8.0:
-		result = "Major 2nd";
-		break;
-
-	case 6.0/5.0:
-		result = "Minor 3rd";
-		break;
-
-	case 5.0/4.0:
-		result = "Major 3rd";
-		break;
-
-	case 4.0/3.0:
-		result = "Perfect 4th";
-		break;
-
-	case 45.0/32.0:
-		result = "Diminished 5th";
-		break;
-
-	case 3.0/2.0:
-		result = "Perfect 5th";
-		break;
-	
-	case 8.0/5.0:
-		result = "Minor 6th";
-		break;
-
-	case 5.0/3.0:
-		result = "Major 6th";
-		break;
-
-	case 9.0/5.0:
-		result = "Minor 7th";
-		break;
-
-	case 15.0/8.0:
-		result = "Major 7th";
-		break;
-
-	case 2.0:
-		result = "Octave";
-		break;
-	}
-	return result;
-}
-*/
 
 void Spring::satisfyConstraints(void)
 {

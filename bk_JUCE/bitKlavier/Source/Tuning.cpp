@@ -104,10 +104,7 @@ void TuningProcessor::keyReleased(int midiNoteNumber)
 {
     TuningSystem currentTuning = tuning->getCurrentTuning();
     
-    if (currentTuning == SpringTuning)
-    {
-        tuning->getSpringTuning()->removeNote(midiNoteNumber);
-    }
+    tuning->getSpringTuning()->removeNote(midiNoteNumber);
 }
 
 
@@ -146,10 +143,8 @@ void TuningProcessor::keyPressed(int midiNoteNumber)
         }
         //else adaptiveHistoryCounter++;
     }
-    else if (currentTuning == SpringTuning)
-    {
-        tuning->getSpringTuning()->addNote(midiNoteNumber);
-    }
+    
+    tuning->getSpringTuning()->addNote(midiNoteNumber);
     
     clusterTime = 0;
     

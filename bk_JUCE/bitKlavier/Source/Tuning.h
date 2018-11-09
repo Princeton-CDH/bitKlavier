@@ -452,9 +452,10 @@ public:
     {
         Array<float> mScale = getCurrentScale();
         Array<float> cScale;
+        
         for(int i=0; i<12; i++)
         {
-            cScale.insert(i, mScale.getUnchecked(i) * 100.);
+            cScale.insert(i, mScale.getUnchecked(i) * 100.0);
         }
         
         return cScale;
@@ -485,6 +486,9 @@ public:
         return stuning->getTetherLock(which);
     }
     
+    inline void setSpringsActive(bool status) { stuning->setActive(status); }
+    inline bool getSpringsActive(void) { return stuning->getActive(); }
+    
     inline void setSpringRate(double rate) { stuning->setRate(rate);}
     inline double getSpringRate(void) { return stuning->getRate();}
     
@@ -493,11 +497,14 @@ public:
     
     inline SpringTuningModel::Ptr getSpringTuning(void) { return stuning; }
     
+    
+    
     Array<Array<float>> tuningLibrary;
     
 private:
     int Id;
     String name;
+
     
     Array<float> getTuningOffsets(TuningSystem which) {return tuningLibrary.getUnchecked(which); }
     

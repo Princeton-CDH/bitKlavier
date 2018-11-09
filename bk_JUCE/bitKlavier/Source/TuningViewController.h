@@ -12,7 +12,7 @@
 
 #include "BKViewController.h"
 
-#define TOP 50
+#define TOP 70
 
 //std::vector<std::string> intervalNames = {"U", "m2", "M2", "m3", "M3", "P4", "d5", "P5", "m6", "M6", "m7", "M7", "O"};
 
@@ -100,8 +100,9 @@ protected:
     
     Slider rateSlider;
     Slider stiffnessSlider;
-
-    //other overrides
+    
+    ToggleButton springTuningToggle;
+    Label springTuningLabel;
     
     void fillTuningCB(void);
     void fillFundamentalCB(void);

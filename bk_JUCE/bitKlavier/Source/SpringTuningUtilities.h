@@ -160,7 +160,9 @@ public:
     
     constexpr static const float pi = 3.14159265359f;
     constexpr static const float twopi = 6.28318530718f;
+    
 	constexpr static const double cFreq = 261.6255653;
+    
 	constexpr static const double halfStepRatio = 1.0595;
 	constexpr static const int octaves[1] = { 4 }; //will return to when adding more octaves
     

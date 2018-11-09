@@ -24,8 +24,6 @@ public:
 	void simulate();
     
     void copy(SpringTuningModel::Ptr st);
-    
-    float tetherWeight, springWeight;
 
 	void toggleSpring();
 
@@ -105,11 +103,11 @@ public:
     
     String getSpringName(int which);
     
-    void setTetherTuning(int tuning);
-    int getTetherTuning(void){return tetherTuning;}
+    void setTetherTuning(Array<float> tuning);
+    Array<float> getTetherTuning(void){return tetherTuning;}
     
-    void setIntervalTuning(int tuning);
-    int getIntervalTuning(void){return intervalTuning;}
+    void setIntervalTuning(Array<float> tuning);
+    Array<float> getIntervalTuning(void){return intervalTuning;}
     
     void setSpringWeight(int which, double weight);
     double getSpringWeight(int which);
@@ -211,11 +209,14 @@ public:
     
     inline void setTetherLock(int pc, bool tl) { tetherLocked[pc] = tl;}
     inline bool getTetherLock(int pc) { return tetherLocked[pc];}
+    
+    inline void setActive(bool status) { active = status; }
+    inline bool getActive(void) { return active; }
 
 private:
-    int tetherTuning;
-    int intervalTuning;
     double rate, stiffness;
+    
+    bool active;
 
     Particle::PtrArr    particleArray;
     Spring::PtrArr      springArray; // efficiency fix: make this ordered by spring interval 
@@ -225,6 +226,9 @@ private:
     
     bool tetherLocked[12];
     
+    Array<float> tetherTuning;
+    Array<float> intervalTuning;
+    
     /*
     Spring::PtrArr activeTetherSprings;
     Spring::PtrArr activeSprings;
@@ -232,7 +236,10 @@ private:
     */
     void hiResTimerCallback(void) override
     {
-        simulate();
+        if (active)
+        {
+            simulate();
+        }
     }
     
     
