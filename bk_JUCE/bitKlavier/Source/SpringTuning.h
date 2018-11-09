@@ -11,6 +11,8 @@
 #pragma once
 #include "SpringTuningUtilities.h"
 
+#include "AudioConstants.h"
+
 #include "Particle.h"
 #include "Spring.h"
 
@@ -121,6 +123,8 @@ public:
         
         prep.setProperty( "rate", rate, 0);
         prep.setProperty( "stiffness", stiffness, 0);
+        prep.setProperty( "active", active ? 1 : 0, 0);
+        prep.setProperty( "scaleId", scaleId, 0);
 
         ValueTree tethers( "tethers");
         ValueTree springs( "springs");
@@ -149,6 +153,10 @@ public:
         setRate(e->getStringAttribute("rate").getDoubleValue());
         
         setStiffness(e->getStringAttribute("stiffness").getDoubleValue());
+        
+        active = (bool) e->getStringAttribute("active").getIntValue();
+        
+        scaleId = (TuningSystem) e->getStringAttribute("scaleId").getIntValue();
         
         forEachXmlChildElement (*e, sub)
         {
@@ -212,11 +220,16 @@ public:
     
     inline void setActive(bool status) { active = status; }
     inline bool getActive(void) { return active; }
+    
+    inline void setScaleId(TuningSystem which) { scaleId = which; }
+    inline TuningSystem getScaleId(void) { return scaleId; }
 
 private:
     double rate, stiffness;
     
     bool active;
+    
+    TuningSystem scaleId;
 
     Particle::PtrArr    particleArray;
     Spring::PtrArr      springArray; // efficiency fix: make this ordered by spring interval 

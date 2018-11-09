@@ -30,8 +30,7 @@ void SpringTuningModel::copy(SpringTuningModel::Ptr st)
 }
 
 SpringTuningModel::SpringTuningModel(SpringTuningModel::Ptr st):
-tetherTuning(1),
-intervalTuning(0),
+scaleId(JustTuning),
 rate(100),
 active(false)
 {
@@ -112,8 +111,8 @@ void SpringTuningModel::setTetherTuning(Array<float> tuning)
     
     for (int i = 0; i < 128; i++)
     {
-        tetherParticleArray[i]->setX( (i * 100.0) + tetherTuning[i] );
-        tetherParticleArray[i]->setRestX( (i * 100.0) + tetherTuning[i] );
+        tetherParticleArray[i]->setX( (i * 100.0) + tetherTuning[i % 12] );
+        tetherParticleArray[i]->setRestX( (i * 100.0) + tetherTuning[i % 12] );
     }
 }
 

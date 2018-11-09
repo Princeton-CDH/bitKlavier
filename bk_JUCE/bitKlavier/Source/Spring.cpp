@@ -31,11 +31,6 @@ Particle* Spring::getB()
 	return b;
 }
 
-double Spring::getLength()
-{
-	return restingLength;
-}
-
 double Spring::getStrength()
 {
 	return strength;
@@ -78,6 +73,7 @@ void Spring::satisfyConstraints(void)
     //int ao = a->getOctave(), bo = b->getOctave();
     
     double diff = b->getX() - a->getX();
+    length = abs(diff);
     
     if (intervalIndex != 12) diff = fmod(diff, 1200.0);
     

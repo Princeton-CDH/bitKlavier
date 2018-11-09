@@ -103,6 +103,10 @@ showSprings(false)
     scaleCB.setTooltip("Select from a range of preset temperaments; open the Adaptive Tuning settings");
     addAndMakeVisible(scaleCB);
     
+    springScaleCB.setName("SpringTuning Scale");
+    springScaleCB.setTooltip("Select a temperament for the spring intervals.");
+    addChildComponent(springScaleCB);
+    
     scaleLabel.setText("Scale", dontSendNotification);
     //addAndMakeVisible(scaleLabel);
     
@@ -371,8 +375,11 @@ void TuningViewController::resized()
         toggles[i]->setBounds(toggleLabels[i]->getRight() + xspacing, toggleLabels[i]->getY(), 30, h);
     }
     
-    rateSlider.setBounds(getWidth() * 0.75, TOP + 15, getWidth() * 0.24, h);
-    stiffnessSlider.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, rateSlider.getWidth(), rateSlider.getHeight());
+    
+    int width = getWidth() * 0.24, height = h;
+    rateSlider.setBounds(getWidth() * 0.75, TOP + 15, width, height);
+    stiffnessSlider.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, width, height);
+    springScaleCB.setBounds(stiffnessSlider.getX(), stiffnessSlider.getBottom() + gYSpacing, width, height);
     
     int labelWidth = 60;
     
@@ -401,7 +408,6 @@ void TuningViewController::paint (Graphics& g)
         
         if (!showSprings) return;
         
-        
         Rectangle<int> b = getBounds();
         b.removeFromTop(TOP);
         
@@ -416,13 +422,34 @@ void TuningViewController::paint (Graphics& g)
         g.setFont(20.0f);
         g.drawFittedText("Springs", 10, TOP+50, 150, 40, Justification::centredTop, 1);
         g.drawFittedText("Tethers", 170, TOP+50, 150, 40, Justification::centredTop, 1);
-        
-        g.setFont(12.0f);
+
         
         float midi,scalex,posx,radians,cx,cy;
-        float centerx = b.getWidth() * 0.65f, centery = b.getHeight() * 0.5f, radius = jmin(b.getHeight() * 0.25, b.getWidth() * 0.25);
-        float dimc = jmin(b.getHeight() * 0.05, b.getWidth() * 0.05);
+        float centerx = b.getWidth() * 0.7f,
+        centery = b.getHeight() * 0.75f,
+        radius = jmin(b.getHeight() * 0.32, b.getWidth() * 0.32);
+        float dimc = jmin(b.getHeight() * 0.06, b.getWidth() * 0.06);
         int x_offset = 0.075 * b.getWidth();
+        
+        
+        Particle::PtrArr particles = tuning->getTuning()->getTetherParticles();
+        for (int i = 0; i < 12; i++)
+        {
+            // DRAW REST PARTICLE
+            
+            midi = Utilities::ftom(Utilities::centsToFreq(particles[i]->getRestX()));
+            scalex = ((midi - 60.0f) / 12.0f);
+            posx = scalex *  (getWidth() - 2*x_offset);
+            
+            radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
+            
+            cx = centerx + cosf(radians) * radius - dimc * 0.5f;
+            cy = centery + sinf(radians) * radius - dimc * 0.5f;
+            
+            g.setColour (Colours::grey);
+            g.fillEllipse(cx, cy, dimc, dimc);
+            
+        }
         
         for (auto s : tuning->getTuning()->getSprings())
         {
@@ -447,29 +474,34 @@ void TuningViewController::paint (Graphics& g)
                 float cyb = centery + sinf(radians) * radius;
                 
                 double strength = s->getStrength();
-                g.setColour(Colours::dimgrey);
+                g.setColour(Colours::lightgrey);
                 g.drawLine(cxa, cya, cxb, cyb,  (strength > 0.0) ? strength * 5.0 + 1.0 : 0.0);
+                
+                /*
+                float slope = (cyb - cya) / (cxb - cxa);
+                slope = isnan(slope) ? 100.0 : slope;
+                
+                float radians = (isnan(slope)) ? Utilities::pi * 0.5 : atan(slope);
+            
+                float xoff = Utilities::clip(0.0, 20.0 - (20.0 - slope), 20.0);
+                float yoff = Utilities::clip(0.0, 20.0 - slope, 20.0);
+                */
+                
+                int h = 10, w = 35;
+                
+                int midX = (cxa + cxb) / 2.0; //+ xoff;
+                int midY = (cya + cyb) / 2.0; //+ yoff;
+                
+                //g.saveState();
+                
+                //g.addTransform(AffineTransform::identity.rotated(radians, midX, midY));
+                g.setColour(Colours::black);
+                g.setFont(15.0f);
+                g.drawText(String((int)round(s->getLength())), midX, midY, w, h, Justification::topLeft);
+                //g.restoreState();
+            
             }
             
-        }
-        
-        for (auto p : tuning->getTuning()->getTetherParticles())
-        {
-            if (p->getEnabled())
-            {
-                // DRAW REST PARTICLE
-                midi = Utilities::ftom(Utilities::centsToFreq(p->getRestX()));
-                scalex = ((midi - 60.0f) / 12.0f);
-                posx = scalex *  (getWidth() - 2*x_offset);
-                
-                radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
-                
-                cx = centerx + cosf(radians) * radius - dimc * 0.5f;
-                cy = centery + sinf(radians) * radius - dimc * 0.5f;
-                
-                g.setColour (Colours::grey);
-                g.fillEllipse(cx, cy, dimc, dimc);
-            }
         }
         
         for (auto p : tuning->getTuning()->getParticles())
@@ -477,11 +509,16 @@ void TuningViewController::paint (Graphics& g)
             if (p->getEnabled())
             {
                 // DRAW PARTICLE IN MOTION
-                midi = Utilities::clip(0, midi = Utilities::ftom(Utilities::centsToFreq(p->getX() - (1200.0 * p->getOctave()))), 128);
+                
+                midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(p->getX() - (1200.0 * p->getOctave()))), 128);
+                
+                midi += ((p->getOctave() - 5) * 12.0);
+                
+                int cents = (int)(((midi - (float)p->getNote())) * 100.0);
                 
                 scalex = ((midi - 60.0f) / 12.0f);
-                DBG("midi: " + String(midi) + " scalex: " + String(scalex));
-                posx = scalex *  ((b.getWidth() - springSliders[0]->getRight()) - 2*x_offset);
+                
+                posx = scalex *  (b.getWidth() - tetherSliders[0]->getRight());
                 
                 radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
                 
@@ -491,8 +528,9 @@ void TuningViewController::paint (Graphics& g)
                 g.setColour (Colours::black);
                 g.fillEllipse(cx, cy, dimc, dimc);
                 
-                g.setColour (Colours::black);
-                g.fillEllipse(springSliders[0]->getRight() + 20 + posx, b.getHeight() * 0.9, dimc, dimc);
+                g.setColour(Colours::dimgrey);
+                g.setFont(15.0f);
+                g.drawText(String(cents), cx + dimc * 0.25, cy-dimc*0.7, 40, 10, Justification::topLeft);
             }
         }
         
@@ -502,12 +540,12 @@ void TuningViewController::paint (Graphics& g)
 
 void TuningViewController::fillTuningCB(void)
 {
-    //cTuningSystemNames
-    
     scaleCB.clear(dontSendNotification);
+    springScaleCB.clear(dontSendNotification);
     A1IntervalScaleCB.clear(dontSendNotification);
     A1AnchorScaleCB.clear(dontSendNotification);
     
+    int count =0;
     for (int i = 0; i < cTuningSystemNames.size(); i++)
     {
         String name = cTuningSystemNames[i];
@@ -520,10 +558,16 @@ void TuningViewController::fillTuningCB(void)
             A1IntervalScaleCB.setItemEnabled(i+1, false);
             A1AnchorScaleCB.setItemEnabled(i+1, false);
         }
+        else
+        {
+            springScaleCB.addItem(name, ++count);
+            
+        }
                 
         if(name == "Custom") {
             customIndex = i;
         }
+
     }
 }
 
@@ -558,6 +602,7 @@ void TuningViewController::updateComponentVisibility()
     
     rateSlider.setVisible(false);
     stiffnessSlider.setVisible(false);
+    springScaleCB.setVisible(false);
     
     absoluteKeyboard.setVisible(true);
     customKeyboard.setVisible(true);
@@ -624,6 +669,8 @@ void TuningViewController::updateComponentVisibility()
     
     if (showSprings)
     {
+        lastInterval.setVisible(false);
+        
         Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         Spring::PtrArr springs = tuning->getSprings();
         Spring::PtrArr tetherSprings = tuning->getTetherSprings();
@@ -643,6 +690,9 @@ void TuningViewController::updateComponentVisibility()
         stiffnessSlider.setVisible(true);
         stiffnessSlider.toFront(true);
         stiffnessSlider.setValue(tuning->getSpringStiffness(), dontSendNotification);
+        
+        springScaleCB.setVisible(true);
+        springScaleCB.toFront(true);
         
         for (int i = 0; i < 12; i++)
         {
@@ -707,6 +757,8 @@ TuningViewController(p, theGraph)
 
     scaleCB.addListener(this);
     
+    springScaleCB.addListener(this);
+    
     fundamentalCB.addListener(this);
 
     A1IntervalScaleCB.addListener(this);
@@ -760,7 +812,7 @@ void TuningPreparationEditor::timerCallback()
                 currentFundamental.setText("current fundamental: " + String(ftom(tProcessor->getAdaptiveFundamentalFreq()), 3), dontSendNotification);
             }
             
-            if(active->getTuning() == AdaptiveTuning || active->getTuning() == AdaptiveAnchoredTuning )
+            if(active->getScale() == AdaptiveTuning || active->getScale() == AdaptiveAnchoredTuning )
             {
                 A1ClusterMax->setDisplayValue(tProcessor->getAdaptiveHistoryCounter() + 1);
                 
@@ -919,14 +971,14 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
     TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
     
-    if (name == selectCB.getName())
+    if (box == &selectCB)
     {
         setCurrentId(Id);
     }
-    else if (name == scaleCB.getName())
+    else if (box == &scaleCB)
     {
-        prep->setTuning((TuningSystem) index);
-        active->setTuning((TuningSystem) index);
+        prep->setScale((TuningSystem) index);
+        active->setScale((TuningSystem) index);
         
         DBG("setting tungin to :" + String(index));
         
@@ -939,7 +991,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         updateComponentVisibility();
         
     }
-    else if (name == fundamentalCB.getName())
+    else if (box == &fundamentalCB)
     {
         prep->setFundamental((PitchClass) index);
         active->setFundamental((PitchClass) index);
@@ -949,21 +1001,21 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         updateComponentVisibility();
         
     }
-    else if (name == A1IntervalScaleCB.getName())
+    else if (box == &A1IntervalScaleCB)
     {
         prep->setAdaptiveIntervalScale((TuningSystem) index);
         active->setAdaptiveIntervalScale((TuningSystem) index);
         
         updateComponentVisibility();
     }
-    else if (name == A1AnchorScaleCB.getName())
+    else if (box == &A1AnchorScaleCB)
     {
         prep->setAdaptiveAnchorScale((TuningSystem) index);
         active->setAdaptiveAnchorScale((TuningSystem) index);
         
         updateComponentVisibility();
     }
-    else if (name == A1FundamentalCB.getName())
+    else if (box == &A1FundamentalCB)
     {
         prep->setAdaptiveAnchorFundamental((PitchClass) index);
         active->setAdaptiveAnchorFundamental((PitchClass) index);
@@ -971,21 +1023,33 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         updateComponentVisibility();
         
     }
-    else if (name == nToneRootCB.getName())
+    else if (box == &nToneRootCB)
     {
         prep->setNToneRootPC(index);
         active->setNToneRootPC(index);
         
         updateComponentVisibility();
     }
-    
-    else if (name == nToneRootOctaveCB.getName())
+    else if (box == &nToneRootOctaveCB)
     {
         prep->setNToneRootOctave(index);
         active->setNToneRootOctave(index);
         
         updateComponentVisibility();
     }
+    else if (box == &springScaleCB)
+    {
+        Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+     
+        TuningSystem springScaleId = (TuningSystem) index;
+        
+        tuning->getSpringTuning()->setScaleId(springScaleId);
+        
+        Array<float> scale = tuning->getScaleCents(springScaleId);
+        
+        tuning->getSpringTuning()->setIntervalTuning(scale);
+    }
+    
     
     processor.gallery->setGalleryDirty(true);
 }
@@ -1038,12 +1102,14 @@ void TuningPreparationEditor::update(void)
 {
     if (processor.updateState->currentTuningId < 0) return;
     
+    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
     TuningPreparation::Ptr prep = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
     
     if (prep != nullptr)
     {
         selectCB.setSelectedId(processor.updateState->currentTuningId, dontSendNotification);
-        scaleCB.setSelectedItemIndex(prep->getTuning(), dontSendNotification);
+        scaleCB.setSelectedItemIndex(prep->getScale(), dontSendNotification);
+        springScaleCB.setSelectedItemIndex(tuning->getCurrentSpringScaleId(), dontSendNotification);
         fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
         offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
 
@@ -1068,6 +1134,7 @@ void TuningPreparationEditor::update(void)
 
 void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> values)
 {
+    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
     TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
     TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
  
@@ -1082,12 +1149,15 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
         //DBG("updating custom tuning vals");
         scaleCB.setSelectedItemIndex(customIndex, dontSendNotification);
         
-        prep->setTuning((TuningSystem)customIndex);
-        active->setTuning((TuningSystem)customIndex);
+        prep->setScale((TuningSystem)customIndex);
+        active->setScale((TuningSystem)customIndex);
         
         //DBG("keyboardSliderChanged values.size() = " + String(values.size()));
         prep->setCustomScaleCents(values);
         active->setCustomScaleCents(values);
+        
+        tuning->getSpringTuning()->setIntervalTuning(values);
+        
     }
     processor.gallery->setGalleryDirty(true);
 }

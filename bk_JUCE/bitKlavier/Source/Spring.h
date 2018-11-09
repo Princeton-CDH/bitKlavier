@@ -21,8 +21,6 @@ public:
 	Spring(Particle* firstPoint, Particle* secondPoint, double length, double str, int index);
 	Particle* getA(void);
 	Particle* getB(void);
-	double getLength();
-
     
 	int getIntervalIndex();
     Spring::Ptr copy();
@@ -34,6 +32,9 @@ public:
     
     void setRestingLength(double len) { restingLength = len; }
     double getRestingLength(void) { return restingLength; }
+    
+    void setLength(double len) { length = len; }
+    double getLength(void) { return length; }
     
     inline void setStiffness(double stiff)
     {
@@ -62,7 +63,7 @@ private:
 	double strength;
     double stiffness;
     
-	double restingLength;
+	double restingLength, length;
     bool enabled;
 	int intervalIndex; //will probably replace base interval
     String name;

@@ -28,7 +28,7 @@ public:
     typedef OwnedArray<TuningPreparation, CriticalSection>       CSArr;
     
     TuningPreparation(TuningPreparation::Ptr p):
-    tWhichTuning(p->getTuning()),
+    tScale(p->getScale()),
     tFundamental(p->getFundamental()),
     tFundamentalOffset(p->getFundamentalOffset()),
     tAdaptiveIntervalScale(p->getAdaptiveIntervalScale()),
@@ -47,7 +47,7 @@ public:
     
     inline void copy(TuningPreparation::Ptr p)
     {
-        tWhichTuning = p->getTuning();
+        tScale = p->getScale();
         tFundamental = p->getFundamental();
         tFundamentalOffset = p->getFundamentalOffset();
         tAdaptiveIntervalScale = p->getAdaptiveIntervalScale();
@@ -60,9 +60,6 @@ public:
         tAbsolute = p->getAbsoluteOffsets();
         nToneSemitoneWidth = p->getNToneSemitoneWidth();
         nToneRoot = p->getNToneRoot();
-        
-        //resetMap->copy(p->resetMap);
-        
     }
     
     inline bool compare (TuningPreparation::Ptr p)
@@ -90,7 +87,7 @@ public:
             }
         }
         
-        return (tWhichTuning == p->getTuning() &&
+        return (tScale == p->getScale() &&
                 tFundamental == p->getFundamental() &&
                 tFundamentalOffset == p->getFundamentalOffset() &&
                 tAdaptiveIntervalScale == p->getAdaptiveIntervalScale() &&
@@ -113,7 +110,7 @@ public:
 		int idx = 0;
 
 
-		tWhichTuning = (TuningSystem)(int)( r[idx++] * TuningSystemNil);
+		tScale = (TuningSystem)(int)( r[idx++] * TuningSystemNil);
 		tFundamental = (PitchClass)(int)(r[idx++] * PitchClassNil);
 		tFundamentalOffset = r[idx++] * 48.0f - 24.0f;
 		tAdaptiveIntervalScale = (TuningSystem)(int)(r[idx++] * TuningSystemNil);
@@ -148,7 +145,7 @@ public:
                       Array<float> customScale,
                       float semitoneWidth,
                       int semitoneRoot):
-    tWhichTuning(whichTuning),
+    tScale(whichTuning),
     tFundamental(fundamental),
     tFundamentalOffset(fundamentalOffset),
     tAdaptiveIntervalScale(adaptiveIntervalScale),
@@ -166,7 +163,7 @@ public:
     }
     
     TuningPreparation(void):
-    tWhichTuning(EqualTemperament),
+    tScale(EqualTemperament),
     tFundamental(C),
     tFundamentalOffset(0.),
     tAdaptiveIntervalScale(JustTuning),
@@ -190,7 +187,7 @@ public:
     }
     
     inline const String getName() const noexcept {return name;}
-    inline const TuningSystem getTuning() const noexcept                    {return tWhichTuning;               }
+    inline const TuningSystem getScale() const noexcept                    {return tScale;               }
     inline const PitchClass getFundamental() const noexcept                 {return tFundamental;               }
     inline const float getFundamentalOffset() const noexcept                {return tFundamentalOffset;         }
     inline const TuningSystem getAdaptiveIntervalScale() const noexcept     {return tAdaptiveIntervalScale;     }
@@ -222,26 +219,25 @@ public:
         tCustomCents.ensureStorageAllocated(12);
         for(int i=0; i<tCustom.size(); i++)
         {
-            tCustomCents.set(i, tCustom.getUnchecked(i) * 100.);
+            tCustomCents.set(i, tCustom.getUnchecked(i) * 100.0);
         }
         return tCustomCents;
     }
     
-    
     inline void setName(String n){name = n; DBG("set tuning name " + name);}
-    inline void setTuning(TuningSystem tuning)                                      {tWhichTuning = tuning;                                 }
-    inline void setFundamental(PitchClass fundamental)                              {tFundamental = fundamental;                            }
-    inline void setFundamentalOffset(float offset)                                  {tFundamentalOffset = offset;                           }
-    inline void setAdaptiveIntervalScale(TuningSystem adaptiveIntervalScale)        {tAdaptiveIntervalScale = adaptiveIntervalScale;        }
-    inline void setAdaptiveInversional(bool adaptiveInversional)                    {tAdaptiveInversional = adaptiveInversional;            }
-    inline void setAdaptiveAnchorScale(TuningSystem adaptiveAnchorScale)            {tAdaptiveAnchorScale = adaptiveAnchorScale;            }
+    inline void setScale(TuningSystem tuning)                                      {tScale = tuning;}
+    inline void setFundamental(PitchClass fundamental)                              {tFundamental = fundamental; }
+    inline void setFundamentalOffset(float offset)                                  {tFundamentalOffset = offset; }
+    inline void setAdaptiveIntervalScale(TuningSystem adaptiveIntervalScale)        {tAdaptiveIntervalScale = adaptiveIntervalScale;}
+    inline void setAdaptiveInversional(bool adaptiveInversional)                    {tAdaptiveInversional = adaptiveInversional; }
+    inline void setAdaptiveAnchorScale(TuningSystem adaptiveAnchorScale)            {tAdaptiveAnchorScale = adaptiveAnchorScale;  }
     inline void setAdaptiveAnchorFundamental(PitchClass adaptiveAnchorFundamental)  {tAdaptiveAnchorFundamental = adaptiveAnchorFundamental;}
-    inline void setAdaptiveClusterThresh(uint64 adaptiveClusterThresh)              {tAdaptiveClusterThresh = adaptiveClusterThresh;        }
-    inline void setAdaptiveHistory(int adaptiveHistory)                             {tAdaptiveHistory = adaptiveHistory;                    }
-    inline void setCustomScale(Array<float> tuning)                                 {tCustom = tuning;                                      }
-    inline void setAbsoluteOffsets(Array<float> abs)                                {tAbsolute = abs;                                       }
-    void setAbsoluteOffset(int which, float val)                                    {tAbsolute.set(which, val);                             }
-    inline void setNToneSemitoneWidth(float width)                                  {nToneSemitoneWidth = width;                            }
+    inline void setAdaptiveClusterThresh(uint64 adaptiveClusterThresh)              {tAdaptiveClusterThresh = adaptiveClusterThresh; }
+    inline void setAdaptiveHistory(int adaptiveHistory)                             {tAdaptiveHistory = adaptiveHistory; }
+    inline void setCustomScale(Array<float> tuning)                                 {tCustom = tuning;      }
+    inline void setAbsoluteOffsets(Array<float> abs)                                {tAbsolute = abs;   }
+    void setAbsoluteOffset(int which, float val)                                    {tAbsolute.set(which, val);  }
+    inline void setNToneSemitoneWidth(float width)                                  {nToneSemitoneWidth = width; }
     inline void setNToneRoot(int root)
     {
         nToneRoot = root;
@@ -274,7 +270,7 @@ public:
     
     void print(void)
     {
-        DBG("tWhichTuning: " +                  String(tWhichTuning));
+        DBG("tScale: " +                  String(tScale));
         DBG("tFundamental: " +                  String(tFundamental));
         DBG("tFundamentalOffset: " +            String(tFundamentalOffset));
         DBG("tAdaptiveIntervalScale: " +        String(tAdaptiveIntervalScale));
@@ -292,7 +288,7 @@ public:
 private:
     String name;
     // basic tuning settings, for static tuning
-    TuningSystem    tWhichTuning;               //which tuning system to use
+    TuningSystem    tScale;               //which tuning system to use
     PitchClass      tFundamental;               //fundamental for tuning system
     float           tFundamentalOffset;         //offset
     
@@ -423,9 +419,14 @@ public:
 		name = "random";
 	}
     
-    inline TuningSystem getCurrentTuning(void)
+    inline TuningSystem getCurrentScaleId(void)
     {
-        return aPrep->getTuning();
+        return aPrep->getScale();
+    }
+    
+    inline TuningSystem getCurrentSpringScaleId(void)
+    {
+        return stuning->getScaleId();
     }
     
     
@@ -434,18 +435,41 @@ public:
     inline void setName(String newName)
     {
         name = newName;
-        DBG("tuning name = " + name);
     }
     
     Array<float> getCurrentScale()
     {
-        if(aPrep->getTuning() == CustomTuning)
+        if(aPrep->getScale() == CustomTuning)
         {
             return aPrep->getCustomScale();
         }
-        DBG("current tuning " + String(aPrep->getTuning()));
         
-        return getTuningOffsets(aPrep->getTuning());
+        return getTuningOffsets(aPrep->getScale());
+    }
+    
+    Array<float> getScale(int which)
+    {
+        TuningSystem tuning = (TuningSystem) which;
+        
+        if (tuning == CustomTuning)
+        {
+            return aPrep->getCustomScale();
+        }
+        
+        return getTuningOffsets(tuning);
+    }
+    
+    Array<float> getScaleCents(int which)
+    {
+        Array<float> mScale = getScale(which);
+        Array<float> cScale;
+        
+        for(int i=0; i<12; i++)
+        {
+            cScale.insert(i, mScale.getUnchecked(i) * 100.0);
+        }
+        
+        return cScale;
     }
     
     Array<float> getCurrentScaleCents()
@@ -535,7 +559,7 @@ public:
     {
         param.ensureStorageAllocated((int)cTuningParameterTypes.size());
         
-        param.set(TuningScale, String(p->getTuning()));
+        param.set(TuningScale, String(p->getScale()));
         param.set(TuningFundamental, String(p->getFundamental()));
         param.set(TuningOffset, String(p->getFundamentalOffset()));
         param.set(TuningA1IntervalScale, String(p->getAdaptiveIntervalScale()));
@@ -587,7 +611,7 @@ public:
     
     inline void copy(TuningPreparation::Ptr p)
     {
-        param.set(TuningScale, String(p->getTuning()));
+        param.set(TuningScale, String(p->getScale()));
         param.set(TuningFundamental, String(p->getFundamental()));
         param.set(TuningOffset, String(p->getFundamentalOffset()));
         param.set(TuningA1IntervalScale, String(p->getAdaptiveIntervalScale()));
@@ -629,7 +653,7 @@ public:
 		TuningPreparation p;
 		p.randomize();
 
-		param.set(TuningScale, String(p.getTuning()));
+		param.set(TuningScale, String(p.getScale()));
 		param.set(TuningFundamental, String(p.getFundamental()));
 		param.set(TuningOffset, String(p.getFundamentalOffset()));
 		param.set(TuningA1IntervalScale, String(p.getAdaptiveIntervalScale()));

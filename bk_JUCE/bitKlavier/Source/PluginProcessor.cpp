@@ -934,7 +934,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modfa = tMod[i]->getModFloatArr();
         modia = tMod[i]->getModIntArr();
         
-        if (type == TuningScale)                    active->setTuning((TuningSystem)modi);
+        if (type == TuningScale)                    active->setScale((TuningSystem)modi);
         else if (type == TuningFundamental)         active->setFundamental((PitchClass)modi);
         else if (type == TuningOffset)              active->setFundamentalOffset(modf);
         else if (type == TuningA1IntervalScale)     active->setAdaptiveIntervalScale((TuningSystem)modi);
@@ -948,7 +948,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == TuningNToneSemitoneWidth)  active->setNToneSemitoneWidth(modi);
         else if (type == TuningCustomScale)
         {
-            active->setTuning(CustomTuning);
+            active->setScale(CustomTuning);
             active->setCustomScaleCents(modfa);
         }
         else if (type == TuningAbsoluteOffsets)

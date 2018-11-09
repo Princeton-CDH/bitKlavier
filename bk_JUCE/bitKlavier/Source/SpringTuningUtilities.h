@@ -145,18 +145,7 @@ public:
         }
     }
 
-    
-    static float   clip(float min, float val, float max)
-    {
-        
-        if (val < min) {
-            return min;
-        } else if (val > max) {
-            return max;
-        } else {
-            return val;
-        }
-    }
+
     
     constexpr static const float pi = 3.14159265359f;
     constexpr static const float twopi = 6.28318530718f;

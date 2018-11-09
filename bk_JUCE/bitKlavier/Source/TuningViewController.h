@@ -98,11 +98,14 @@ protected:
     OwnedArray<ToggleButton> toggles;
     OwnedArray<Label>  toggleLabels;
     
+    BKComboBox springScaleCB;
+    
     Slider rateSlider;
     Slider stiffnessSlider;
     
     ToggleButton springTuningToggle;
     Label springTuningLabel;
+    
     
     void fillTuningCB(void);
     void fillFundamentalCB(void);
