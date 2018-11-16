@@ -357,7 +357,7 @@ void Piano::addProcessor(BKPreparationType thisType, int thisId)
 
 bool Piano::contains(BKItem::Ptr thisItem)
 {
-    for (auto item : items) if (item == thisItem) return true;
+    for (auto item : items) if (item == (BKItem *)thisItem) return true;
     
     return false;
 }
