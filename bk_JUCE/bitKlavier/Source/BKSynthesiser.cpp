@@ -524,7 +524,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
         voice->stopNote (velocity, allowTailOff);
         
         // the subclass MUST call clearCurrentNote() if it's not tailing off! RTFM for stopNote()!
-        jassert (allowTailOff || (voice->getCurrentlyPlayingNote() < 0 && voice->getCurrentlyPlayingSound() == 0));
+        //jassert (allowTailOff || (voice->getCurrentlyPlayingNote() < 0 && voice->getCurrentlyPlayingSound() == 0));
+        jassert (allowTailOff || (voice->getCurrentlyPlayingNote() < 0 && voice->getCurrentlyPlayingSound() == nullptr));
     }
     
     void BKSynthesiser::keyOff (const int midiChannel,
