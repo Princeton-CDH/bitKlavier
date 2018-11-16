@@ -145,7 +145,14 @@ public:
         }
     }
 
-
+    static String getNoteString(int note, bool octave = true)
+    {
+        String str = String(notesInAnOctave[note % 12]);
+        
+        if (octave) str += String((note / 12) - 1);
+        
+        return str;
+    }
     
     constexpr static const float pi = 3.14159265359f;
     constexpr static const float twopi = 6.28318530718f;

@@ -218,6 +218,18 @@ public:
     inline void setTetherLock(int pc, bool tl) { tetherLocked[pc] = tl;}
     inline bool getTetherLock(int pc) { return tetherLocked[pc];}
     
+    inline Array<bool> getTethersLocked(void)
+    {
+        Array<bool> locked;
+        
+        for (int i = 0; i < 12; i++)
+        {
+            locked.add(tetherLocked[i]);
+        }
+        
+        return locked;
+    }
+    
     inline void setActive(bool status) { active = status; }
     inline bool getActive(void) { return active; }
     

@@ -29,7 +29,7 @@ showSprings(false)
         addChildComponent(s);
         tetherSliders.add(s);
         
-        Label* l = new Label(s->getName(), String(notesInAnOctave[i%12]) + String((i / 12) - 1));
+        Label* l = new Label(s->getName(), Utilities::getNoteString(i));
         l->setColour(juce::Label::ColourIds::textColourId, Colours::black);
         addChildComponent(l);
         tetherLabels.add(l);
@@ -835,27 +835,64 @@ void TuningPreparationEditor::timerCallback()
             const int yspacing = 3;
             const int xspacing = 3;
             
-            Spring::PtrArr tetherSprings = tProcessor->getTuning()->getTetherSprings();
+            Tuning::Ptr tuning = tProcessor->getTuning();
+            Spring::PtrArr tetherSprings =  tuning->getTetherSprings();
+            Array<bool> locked = tuning->getSpringTuning()->getTethersLocked();
             
-            int count = 0;
-            for (int i = 0; i < 128; i++)
+            // Place locked tethers first
+            for (int i = 0; i < 12; i++)
             {
-                if (tetherSprings[i]->getEnabled())
+                if (locked[i])
                 {
-                    tetherLabels[i]->setBounds(toggles[0]->getRight() + xspacing, y_offset + (h + yspacing) * count, 30, h);
+                    tetherLabels[i]->setBounds(toggles[0]->getRight() + xspacing, y_offset + (h + yspacing) * i, 30, h);
+                    tetherLabels[i]->setText(Utilities::getNoteString(i, false), dontSendNotification);
                     tetherLabels[i]->setVisible(true);
                     
                     tetherSliders[i]->setBounds(tetherLabels[i]->getRight() + xspacing, tetherLabels[i]->getY(), w, h);
                     tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
                     tetherSliders[i]->setVisible(true);
-                    
-                    count++;
                 }
-                else
+                
+            }
+            
+            int count = 0;
+            for (int i = 0; i < 128; i++)
+            {
+                int pc = i % 12;
+                
+                if (!locked[pc])
                 {
-                    tetherSliders[i]->setVisible(false);
-                    tetherLabels[i]->setVisible(false);
+                    if (tetherSprings[i]->getEnabled())
+                    {
+                        tetherLabels[i]->setBounds(toggles[0]->getRight() + xspacing, y_offset + (h + yspacing) * count, 30, h);
+                        tetherLabels[i]->setText(Utilities::getNoteString(i), dontSendNotification);
+                        tetherLabels[i]->setVisible(true);
+                        
+                        tetherSliders[i]->setBounds(tetherLabels[i]->getRight() + xspacing, tetherLabels[i]->getY(), w, h);
+                        tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
+                        tetherSliders[i]->setVisible(true);
+                        
+                        // Clever little counter
+                        count++;
+                        // check if count is index of locked tether.
+                        // increment until it is not an index of a locked tether.
+                        for (int i = count; i < 12; i++)
+                        {
+                            if (locked[count])
+                            {
+                                count++;
+                            }
+                            else break;
+                        }
+                        
+                    }
+                    else
+                    {
+                        tetherSliders[i]->setVisible(false);
+                        tetherLabels[i]->setVisible(false);
+                    }
                 }
+               
             }
             
             repaint();
