@@ -94,7 +94,7 @@ public:
         int index = 0;
         for (auto item : connections)
         {
-            if (item == thisItem) connections.remove(index);
+            if (item == (BKItem *)thisItem) connections.remove(index);
             
             index++;
         }
