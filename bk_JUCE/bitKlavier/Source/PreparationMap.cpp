@@ -407,6 +407,11 @@ void PreparationMap::sustainPedalReleased(Array<bool> keysThatAreDepressed, bool
                 proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel);
         }
         
+        for (auto proc : tprocessor)
+        {
+            proc->keyReleased(releaseNote.noteNumber);
+        }
+        
         for (auto proc : sprocessor)
         {
             proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel);
@@ -430,12 +435,15 @@ void PreparationMap::sustainPedalReleased(bool post)
     for(int n=0; n<sustainedNotes.size(); n++)
     {
         SustainedNote releaseNote = sustainedNotes.getUnchecked(n);
-        
-        DBG(releaseNote.noteNumber);
-        
+
         for (auto proc : dprocessor)
         {
             proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel);
+        }
+        
+        for (auto proc : tprocessor)
+        {
+            proc->keyReleased(releaseNote.noteNumber);
         }
         
         for (auto proc : sprocessor)
@@ -474,6 +482,11 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
         {
             if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber, velocity, channel);
             //proc->keyReleased(noteNumber, velocity, channel);
+        }
+        
+        for (auto proc : tprocessor)
+        {
+            if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber);
         }
         
         for (auto proc : nprocessor)

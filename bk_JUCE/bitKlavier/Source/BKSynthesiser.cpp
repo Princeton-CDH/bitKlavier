@@ -379,14 +379,12 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                 if (sound->region_ != nullptr)
                 {
                     if ((sound->trigger == sfzero::Region::release) ||
-                        (sound->trigger == sfzero::Region::release_key) ||
-                        (sustainPedalsDown[midiChannel] != sound->pedal))
+                        (sound->trigger == sfzero::Region::release_key) /*||
+                        (sustainPedalsDown[midiChannel] != sound->pedal)*/)
                     {
                         continue;
                     }
                 }
-                
-                
                 
                 startVoice (findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes),
                             sound,

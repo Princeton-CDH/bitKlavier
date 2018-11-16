@@ -642,7 +642,6 @@ void BKAudioProcessor::sustainActivate(void)
 
 void BKAudioProcessor::sustainDeactivate(void)
 {
-    
     if(sustainIsDown)
     {
         sustainIsDown = false;
