@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="2.2"
+<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="2.2.1"
               bundleIdentifier="com.manyarrowsmusic.bitKlavier" includeBinaryInAppConfig="1"
               buildVST="1" buildVST3="0" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
@@ -9,7 +9,7 @@
               pluginWantsMidiIn="1" pluginProducesMidiOut="1" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="1" pluginAUExportPrefix="BKAU" pluginRTASCategory=""
               aaxIdentifier="com.manyarrowsmusic.bitKlavier" pluginAAXCategory="2"
-              jucerVersion="5.2.1" companyName="manyarrowsmusic" companyEmail="dtrueman@princeton.edu"
+              jucerVersion="5.4.1" companyName="manyarrowsmusic" companyEmail="dtrueman@princeton.edu"
               maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
               displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Light"
               buildStandalone="1" enableIAA="1" cppLanguageStandard="11" companyCopyright="manyarrowsmusic"
@@ -384,9 +384,8 @@
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX" vst3Folder="~/STKs/VST3 SDK" aaxFolder=""
-               customXcodeResourceFolders="" customPList="" rtasFolder="" smallIcon="smHM8h"
-               bigIcon="iHGLGD">
+    <XCODE_MAC targetFolder="Builds/MacOSX" vst3Folder="~/STKs/VST3 SDK" customXcodeResourceFolders=""
+               customPList="" smallIcon="smHM8h" bigIcon="iHGLGD">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        cppLibType="" enablePluginBinaryCopyStep="1"/>
@@ -409,8 +408,8 @@
         <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
-        <MODULEPATH id="stk" path="../../../3p_modules/stk"/>
         <MODULEPATH id="SFZero" path="../../../3p_modules/SFZero/modules"/>
+        <MODULEPATH id="stk" path="../../../3p_modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="landscape" keepCustomXcodeSchemes="1"
@@ -442,8 +441,8 @@
         <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="stk" path="../../../3p_modules/stk"/>
         <MODULEPATH id="SFZero" path="../../../3p_modules/SFZero/modules"/>
+        <MODULEPATH id="stk" path="../../../3p_modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
     <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="C:\SDKs\VST3_SDK"
@@ -472,8 +471,8 @@
         <MODULEPATH id="juce_audio_formats" path="..\..\..\JUCE\modules"/>
         <MODULEPATH id="juce_audio_devices" path="..\..\..\JUCE\modules"/>
         <MODULEPATH id="juce_audio_basics" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="stk" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="SFZero" path="..\..\..\JUCE\modules\SFZero\modules"/>
+        <MODULEPATH id="SFZero" path="../../../modules"/>
+        <MODULEPATH id="stk" path="../../../3p_modules"/>
       </MODULEPATHS>
     </VS2017>
   </EXPORTFORMATS>
@@ -494,8 +493,8 @@
     <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_video" showAllCode="1" useLocalCopy="0"/>
-    <MODULE id="stk" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="SFZero" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="stk" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
   </MODULES>
   <JUCEOPTIONS JUCE_QUICKTIME="disabled"/>
   <LIVE_SETTINGS>

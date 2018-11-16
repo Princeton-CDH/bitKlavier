@@ -43,7 +43,6 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
             synthNoteNumber += (int)offset;
             synthOffset     -= (int)offset;
         }
-
         synth->keyOn(channel,
                      noteNumber,
                      synthNoteNumber,
@@ -61,7 +60,6 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                      direct->aPrep->getSustain(),
                      direct->aPrep->getRelease(),
                      tuner);
-        
         
         //store synthNoteNumbers by noteNumber
         keyPlayed[noteNumber].add(synthNoteNumber);
