@@ -113,6 +113,7 @@ void SpringTuningModel::setTetherTuning(Array<float> tuning)
     {
         tetherParticleArray[i]->setX( (i * 100.0) + tetherTuning[i % 12] );
         tetherParticleArray[i]->setRestX( (i * 100.0) + tetherTuning[i % 12] );
+        particleArray[i]->setRestX( (i * 100.0) + tetherTuning[i % 12] );
     }
 }
 
