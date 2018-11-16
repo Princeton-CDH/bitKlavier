@@ -132,8 +132,8 @@ public:
     
     bool canPlaySound (BKSynthesiserSound*) override;
     
-    void startNote (
-                    float midiNoteNumber,
+    void startNote (int midiNoteNumber,
+                    float offset,
                     float velocity,
                     PianoSamplerNoteDirection direction,
                     PianoSamplerNoteType type,
@@ -145,8 +145,8 @@ public:
                     BKSynthesiserSound* sound
                     ) override;
     
-    void startNote (
-                    float midiNoteNumber,
+    void startNote (int midiNoteNumber,
+                    float offset,
                     int pitchWheelValue,
                     float velocity,
                     PianoSamplerNoteDirection direction,
@@ -186,7 +186,8 @@ public:
     
 private:
     //==============================================================================
-    double noteNumber;
+    double cookedNote;
+    int midiNoteNumber;
     int pitchWheel;
     int layer;
     float noteVelocity;

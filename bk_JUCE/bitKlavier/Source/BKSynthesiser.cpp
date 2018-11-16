@@ -499,7 +499,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                 gain *= Decibels::decibelsToGain(sound->region_->volume);
             }
 
-            voice->startNote ((float)midiNoteNumber+midiNoteNumberOffset,
+            voice->startNote (midiNoteNumber,
+                              midiNoteNumberOffset,
                               pitchWheelValue,
                               gain,
                               direction,

@@ -115,6 +115,8 @@ void SpringTuningModel::setTetherTuning(Array<float> tuning)
     {
         tetherParticleArray[i]->setX( (i * 100.0) + tetherTuning[i % 12] );
         tetherParticleArray[i]->setRestX( (i * 100.0) + tetherTuning[i % 12] );
+        
+        //DBG("rest X: " + String((i * 100.0) + tetherTuning[i % 12]));
         particleArray[i]->setRestX( (i * 100.0) + tetherTuning[i % 12] );
     }
 }
@@ -126,7 +128,7 @@ void SpringTuningModel::setIntervalTuning(Array<float> tuning)
     for (auto spring : springArray)
     {
         int interval = spring->getIntervalIndex();
-        spring->setRestingLength(interval * 100 + intervalTuning[interval]);
+        spring->setRestingLength(interval * 100.0 + intervalTuning[interval]);
     }
 }
 

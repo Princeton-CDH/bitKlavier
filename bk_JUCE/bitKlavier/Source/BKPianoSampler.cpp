@@ -121,7 +121,8 @@ bool BKPianoSamplerVoice::canPlaySound (BKSynthesiserSound* sound)
 }
 
 
-void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
+void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
+                                     const float offset,
                                      const float gain,
                                      PianoSamplerNoteDirection direction,
                                      PianoSamplerNoteType type,
@@ -135,6 +136,7 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
     
     
                         startNote   (midiNoteNumber,
+                                     offset,
                                      64,
                                      gain,
                                      direction,
@@ -161,9 +163,9 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
     {
         Particle::PtrArr particles = tuning->getTuning()->getParticles();
         
-        double x = particles[noteNumber]->getX();
+        double x = particles[midiNoteNumber]->getX();
         
-        int octave = particles[noteNumber]->getOctave();
+        int octave = particles[midiNoteNumber]->getOctave();
         
         double midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(x - 1200.0 * octave)), 128) - 60.0 + (octave * 12.0);
         
@@ -174,7 +176,7 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
     }
     else
     {
-        pitchRatio =    powf(2.0f, (noteNumber - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
+        pitchRatio =    powf(2.0f, (cookedNote - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
         sound->sourceSampleRate *
         generalSettings->getTuningRatio() /
         getSampleRate();
@@ -183,7 +185,8 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
     bentRatio = pitchbendMultiplier * pitchRatio;
 }
 
-void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
+void BKPianoSamplerVoice::startNote (const int midi,
+                                     const float pitchoffset,
                                      const int pitchWheelValue,
                                      const float gain,
                                      PianoSamplerNoteDirection direction,
@@ -199,7 +202,8 @@ void BKPianoSamplerVoice::startNote (const float midiNoteNumber,
 {
     if (const BKPianoSamplerSound* const sound = dynamic_cast<const BKPianoSamplerSound*> (s))
     {
-        noteNumber = midiNoteNumber;
+        midiNoteNumber = midi;
+        cookedNote = ((float)midi + pitchoffset);
         pitchWheel = pitchWheelValue;
         
         updatePitch(sound);

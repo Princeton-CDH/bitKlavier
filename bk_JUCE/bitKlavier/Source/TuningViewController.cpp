@@ -1054,8 +1054,6 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         prep->setScale((TuningSystem) index);
         active->setScale((TuningSystem) index);
         
-        DBG("setting tungin to :" + String(index));
-        
         Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         DBG("current tuning from processor = " + String(processor.updateState->currentTuningId));
         customKeyboard.setValues(currentTuning->getCurrentScaleCents());
