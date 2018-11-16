@@ -235,9 +235,17 @@ public:
     
     inline void setScaleId(TuningSystem which) { scaleId = which; }
     inline TuningSystem getScaleId(void) { return scaleId; }
-
+    
+    void setTetherStrength(double strength);
+    double getTetherStrength(void);
+    
+    void setIntervalStrength(double strength);
+    double getIntervalStrength(void);
+    
 private:
     double rate, stiffness;
+    
+    double tetherStrength, intervalStrength;
     
     bool active;
     

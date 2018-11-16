@@ -31,6 +31,8 @@ void SpringTuningModel::copy(SpringTuningModel::Ptr st)
 
 SpringTuningModel::SpringTuningModel(SpringTuningModel::Ptr st):
 scaleId(JustTuning),
+tetherStrength(0.0),
+intervalStrength(0.0),
 rate(100),
 active(false)
 {
@@ -154,6 +156,30 @@ void SpringTuningModel::simulate()
             spring->satisfyConstraints();
 		}
 	}
+}
+
+void SpringTuningModel::setTetherStrength(double strength)
+{
+    tetherStrength = strength;
+    
+    // DO SCALING + NORMALIZATION HERE
+}
+
+double SpringTuningModel::getTetherStrength(void)
+{
+    return tetherStrength;
+}
+
+void SpringTuningModel::setIntervalStrength(double strength)
+{
+    intervalStrength = strength;
+    
+    // DO SCALING + NORMALIZATION HERE
+}
+
+double SpringTuningModel::getIntervalStrength(void)
+{
+    return intervalStrength;
 }
 
 void SpringTuningModel::setSpringWeight(int which, double weight)

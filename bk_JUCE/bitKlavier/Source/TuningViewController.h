@@ -103,6 +103,12 @@ protected:
     Slider rateSlider;
     Slider stiffnessSlider;
     
+    Label tetherStrengthLabel;
+    Slider tetherStrengthSlider;
+    
+    Label intervalStrengthLabel;
+    Slider intervalStrengthSlider;
+    
     ToggleButton springTuningToggle;
     Label springTuningLabel;
     

@@ -30,6 +30,9 @@ public:
     void setStrength(double newStrength);
     double getStrength();
     
+    inline void setAdjustedStrength(double strength) { adjustedStrength = strength; }
+    inline double getAdjustedStrength() { return adjustedStrength; }
+    
     void setRestingLength(double len) { restingLength = len; }
     double getRestingLength(void) { return restingLength; }
     
@@ -61,6 +64,7 @@ private:
 	Particle* b;
     
 	double strength;
+    double adjustedStrength;
     double stiffness;
     
 	double restingLength, length;
