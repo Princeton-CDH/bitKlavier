@@ -125,7 +125,7 @@ BKViewController(p, theGraph)
     clusterMinMaxSlider->setJustifyRight(false);
     addAndMakeVisible(clusterMinMaxSlider);
     
-    gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
+    gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.0001);
     gainSlider->setToolTipString("Overall volume of Synchronic pulse");
     gainSlider->setJustifyRight(false);
     gainSlider->setSkewFactorFromMidPoint(1.);

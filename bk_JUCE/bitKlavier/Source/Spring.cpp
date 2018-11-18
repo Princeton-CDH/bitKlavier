@@ -66,6 +66,12 @@ void Spring::print()
 void Spring::setStrength(double newStrength)
 {
 	strength = newStrength;
+    double meanStiffness = 0.0001 + 0.0999 * stiffness;
+
+    double warpCoeff = 100.;
+    adjustedStrength = meanStiffness * (pow(warpCoeff, strength) - 1.) / (warpCoeff - 1.);
+    DBG("Strength: " + String(strength) + " AdjustedStrength = " + String(adjustedStrength));
+
 }
 
 void Spring::satisfyConstraints(void)
@@ -79,13 +85,20 @@ void Spring::satisfyConstraints(void)
     
 	if (diff == 0.0) return;
     
+    /*
     double maxStiffness = 0.1;
     double minStiffness = 0.0001;
     double meanStiffness = 0.0001 + 0.0999 * stiffness;
 
 	double actualStrength = Utilities::clip(minStiffness, (meanStiffness * strength) / (1.0 - strength), maxStiffness);
-
-    diff *= ( (diff - restingLength) / diff ) * actualStrength;
+    double warpCoeff = 10.;
+    //actualStrength = 0.1 * (pow(warpCoeff, strength) - 1.) / (warpCoeff - 1.);
+    actualStrength = 0.1 * strength;
+    DBG("Strength: " + String(strength) + " ActualStrength = " + String(actualStrength));
+    */
+    
+    //diff *= ( (diff - restingLength) / diff ) * actualStrength;
+    diff *= ( (diff - restingLength) / diff ) * adjustedStrength;
 
     if (!a->getLocked())
     {
