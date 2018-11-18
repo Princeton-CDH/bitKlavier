@@ -498,16 +498,6 @@ void TuningViewController::paint (Graphics& g)
                 g.setColour(Colours::lightgrey);
                 g.drawLine(cxa, cya, cxb, cyb,  (strength > 0.0) ? strength * 5.0 + 1.0 : 0.0);
                 
-                /*
-                float slope = (cyb - cya) / (cxb - cxa);
-                slope = isnan(slope) ? 100.0 : slope;
-                
-                float radians = (isnan(slope)) ? Utilities::pi * 0.5 : atan(slope);
-            
-                float xoff = Utilities::clip(0.0, 20.0 - (20.0 - slope), 20.0);
-                float yoff = Utilities::clip(0.0, 20.0 - slope, 20.0);
-                */
-                
                 int h = 10, w = 35;
                 
                 int midX = (cxa + cxb) / 2.0; //+ xoff;
@@ -551,7 +541,7 @@ void TuningViewController::paint (Graphics& g)
                 
                 g.setColour(Colours::dimgrey);
                 g.setFont(15.0f);
-                g.drawText(String(cents), cx + dimc * 0.25, cy-dimc*0.7, 40, 10, Justification::topLeft);
+                g.drawText(String(round(cents)), cx + dimc * 0.25, cy-dimc*0.7, 40, 10, Justification::topLeft);
             }
         }
         
@@ -866,7 +856,7 @@ void TuningPreparationEditor::timerCallback()
         if (showSprings)
         {
             const int x_offset = 10;
-            const int y_offset = TOP+75;
+            const int y_offset = tetherStrengthSlider.getBottom()+3;
             const int w = 125;
             const int h = 25;
             const int yspacing = 3;
@@ -881,7 +871,7 @@ void TuningPreparationEditor::timerCallback()
             {
                 if (locked[i])
                 {
-                    tetherLabels[i]->setBounds(toggles[0]->getRight() + xspacing, y_offset + (h + yspacing) * (i + 1), 30, h);
+                    tetherLabels[i]->setBounds(toggles[0]->getRight() + xspacing, y_offset + (h + yspacing) * i, 30, h);
                     tetherLabels[i]->setText(Utilities::getNoteString(i, false), dontSendNotification);
                     tetherLabels[i]->setVisible(true);
                     
@@ -892,7 +882,7 @@ void TuningPreparationEditor::timerCallback()
                 
             }
             
-            int count = 1;
+            int count = 0;
             for (int i = 0; i < 128; i++)
             {
                 int pc = i % 12;
@@ -901,7 +891,7 @@ void TuningPreparationEditor::timerCallback()
                 {
                     if (tetherSprings[i]->getEnabled())
                     {
-                        tetherLabels[i]->setBounds(toggles[0]->getRight() + xspacing, y_offset + (h + yspacing) * count, 30, h);
+                        tetherLabels[i]->setBounds(toggles[0]->getRight() + xspacing, y_offset + (h + yspacing) * (count + 1), 30, h);
                         tetherLabels[i]->setText(Utilities::getNoteString(i), dontSendNotification);
                         tetherLabels[i]->setVisible(true);
                         
