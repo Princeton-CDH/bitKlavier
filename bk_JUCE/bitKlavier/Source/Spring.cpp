@@ -68,7 +68,7 @@ void Spring::setStrength(double newStrength)
 	strength = newStrength;
 
     double warpCoeff = 100.;
-    adjustedStrength = 0.5 * stiffness * (pow(warpCoeff, strength) - 1.) / (warpCoeff - 1.);
+    adjustedStrength = 1.0 * stiffness * (pow(warpCoeff, strength) - 1.) / (warpCoeff - 1.);
     DBG("Strength: " + String(strength) + " AdjustedStrength = " + String(adjustedStrength));
 
 }
@@ -104,7 +104,9 @@ void Spring::satisfyConstraints(void)
     
     //diff *= ( (diff - restingLength) / diff ) * actualStrength;
     diff *= ( (diff - restingLength) / diff ) * adjustedStrength;
-
+    
+    diff = Utilities::clip(-1., diff, 1.); //what the best contraint here is not clear....
+    
     if (!a->getLocked())
     {
         a->addX(diff);
