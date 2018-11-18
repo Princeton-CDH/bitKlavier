@@ -26,6 +26,7 @@ showSprings(false)
         
         s->setSliderStyle(Slider::SliderStyle::LinearBar);
         s->setRange(0.0, 1.0);
+        //s->setSkewFactor(100., false);
         addChildComponent(s);
         tetherSliders.add(s);
         
@@ -41,6 +42,7 @@ showSprings(false)
         
         s->setSliderStyle(Slider::SliderStyle::LinearBar);
         s->setRange(0.0, 1.0);
+        //s->setSkewFactor(100., false);
         addChildComponent(s);
         springSliders.add(s);
         
