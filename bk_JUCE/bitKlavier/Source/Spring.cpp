@@ -68,7 +68,7 @@ void Spring::setStrength(double newStrength)
 	strength = newStrength;
 
     double warpCoeff = 100.;
-    adjustedStrength = 1.0 * stiffness * (pow(warpCoeff, strength) - 1.) / (warpCoeff - 1.);
+    adjustedStrength = 0.5 * stiffness * (pow(warpCoeff, strength) - 1.) / (warpCoeff - 1.);
     DBG("Strength: " + String(strength) + " AdjustedStrength = " + String(adjustedStrength));
 
 }
