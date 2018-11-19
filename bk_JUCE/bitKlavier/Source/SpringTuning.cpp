@@ -78,12 +78,12 @@ active(false)
             int diff = i - j;
             
             int interval = diff % 12;
-             /*
+            
             if (diff != 0 && interval == 0)
             {
                 interval = 12;
             }
-             */
+             
             
             DBG("spring: " + String(i) + " " + String(j) + " " + String(diff * 100 + intervalTuning[interval] * 100));
             

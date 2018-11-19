@@ -75,13 +75,9 @@ void Spring::setStrength(double newStrength)
 
 void Spring::satisfyConstraints(void)
 {
-    //int ao = a->getOctave(), bo = b->getOctave();
-    
     double diff = b->getX() - a->getX();
     
     length = abs(diff);
-    
-    //DBG("DIFF = " + String(diff));
     
 	if (diff == 0.0) return;
     
@@ -91,26 +87,7 @@ void Spring::satisfyConstraints(void)
         setStrength(strength);
     }
     
-    /*
-    double maxStiffness = 0.1;
-    double minStiffness = 0.0001;
-    double meanStiffness = 0.0001 + 0.0999 * stiffness;
-
-	double actualStrength = Utilities::clip(minStiffness, (meanStiffness * strength) / (1.0 - strength), maxStiffness);
-    double warpCoeff = 10.;
-    //actualStrength = 0.1 * (pow(warpCoeff, strength) - 1.) / (warpCoeff - 1.);
-    actualStrength = 0.1 * strength;
-    DBG("Strength: " + String(strength) + " ActualStrength = " + String(actualStrength));
-    */
-    
-    //diff *= ( (diff - restingLength) / diff ) * actualStrength;
     diff *= ( (diff - restingLength) / diff ) * adjustedStrength;
-    
-    //DBG("diff = " + String(diff) + " restingLength = " + String(restingLength));
-    //print();
-    
-    //diff = Utilities::clip(-restingLength * 0.01, diff, restingLength * 0.01); //what the best contraint here is not clear....
-    //diff = Utilities::clip(-2., diff, 2.);
     
     if (!a->getLocked())
     {
