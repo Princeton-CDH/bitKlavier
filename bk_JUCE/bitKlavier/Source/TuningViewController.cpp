@@ -57,12 +57,12 @@ showSprings(false)
         t->setColour(ToggleButton::tickColourId, Colours::black);
         t->setColour(ToggleButton::tickDisabledColourId, Colours::grey);
         t->setTooltip("When selected, all " + notesInAnOctave[i] + " springs will have same weight." );
-        addChildComponent(t);
+        //addChildComponent(t);
         toggles.add(t);
         
         l = new Label(notesInAnOctave[i], notesInAnOctave[i]);
         l->setColour(juce::Label::ColourIds::textColourId, Colours::black);
-        addChildComponent(l);
+        //addChildComponent(l);
         toggleLabels.add(l);
         
     }
@@ -79,31 +79,31 @@ showSprings(false)
     
     springTuningLabel.setText("Springs", dontSendNotification);
     springTuningLabel.setColour(Label::ColourIds::textColourId, Colours::antiquewhite);
-    addChildComponent(springTuningLabel);
+    //addChildComponent(springTuningLabel);
     
     rateSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
     rateSlider.setRange(5.0, 400.0);
     addChildComponent(rateSlider);
     
-    stiffnessSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
-    stiffnessSlider.setRange(0.0, 1.0);
-    addChildComponent(stiffnessSlider);
+    dragSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
+    dragSlider.setRange(0.0, 1.0);
+    addChildComponent(dragSlider);
     
-    tetherStrengthLabel.setText("TS", dontSendNotification);
-    tetherStrengthLabel.setColour(juce::Label::ColourIds::textColourId, Colours::black);
-    addChildComponent(tetherStrengthLabel);
+    tetherStiffnessLabel.setText("stf", dontSendNotification);
+    tetherStiffnessLabel.setColour(juce::Label::ColourIds::textColourId, Colours::black);
+    addChildComponent(tetherStiffnessLabel);
     
-    tetherStrengthSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
-    tetherStrengthSlider.setRange(-1.0, 1.0);
-    addChildComponent(tetherStrengthSlider);
+    tetherStiffnessSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
+    tetherStiffnessSlider.setRange(0., 1.0);
+    addChildComponent(tetherStiffnessSlider);
     
-    intervalStrengthLabel.setText("IS", dontSendNotification);
-    intervalStrengthLabel.setColour(juce::Label::ColourIds::textColourId, Colours::black);
-    addChildComponent(intervalStrengthLabel);
+    intervalStiffnessLabel.setText("stf", dontSendNotification);
+    intervalStiffnessLabel.setColour(juce::Label::ColourIds::textColourId, Colours::black);
+    addChildComponent(intervalStiffnessLabel);
     
-    intervalStrengthSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
-    intervalStrengthSlider.setRange(-1.0, 1.0);
-    addChildComponent(intervalStrengthSlider);
+    intervalStiffnessSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
+    intervalStiffnessSlider.setRange(0., 1.0);
+    addChildComponent(intervalStiffnessSlider);
     
     iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::tuning_icon_png, BinaryData::tuning_icon_pngSize));
     iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
@@ -394,16 +394,17 @@ void TuningViewController::resized()
         toggles[i]->setBounds(toggleLabels[i]->getRight() + xspacing, toggleLabels[i]->getY(), 30, h);
     }
     
-    intervalStrengthLabel.setBounds(springLabels[0]->getX(), y_offset, 30, h);
-    intervalStrengthSlider.setBounds(springSliders[0]->getX(), y_offset, w, h);
+    intervalStiffnessLabel.setBounds(springLabels[0]->getX(), y_offset, 30, h);
+    intervalStiffnessSlider.setBounds(springSliders[0]->getX(), y_offset, w, h);
     
-    tetherStrengthLabel.setBounds(toggles[0]->getRight() + xspacing, y_offset, 30, h);
-    tetherStrengthSlider.setBounds(tetherStrengthLabel.getRight() + xspacing, tetherStrengthLabel.getY(), w, h);
+    tetherStiffnessLabel.setBounds(toggles[0]->getRight() + xspacing, y_offset, 30, h);
+    tetherStiffnessSlider.setBounds(tetherStiffnessLabel.getRight() + xspacing, tetherStiffnessLabel.getY(), w, h);
     
     int width = getWidth() * 0.24, height = h;
     rateSlider.setBounds(getWidth() * 0.75, TOP + 15, width, height);
-    stiffnessSlider.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, width, height);
-    springScaleCB.setBounds(stiffnessSlider.getX(), stiffnessSlider.getBottom() + gYSpacing, width, height);
+    dragSlider.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, width, height);
+    springScaleCB.setBounds(dragSlider.getX(), dragSlider.getBottom() + gYSpacing, width, height);
+    //springScaleCB.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, width, height);
     
     int labelWidth = 60;
     
@@ -443,8 +444,8 @@ void TuningViewController::paint (Graphics& g)
         g.drawFittedText ("Spring Tuning", b, Justification::centredTop, 1);
         
         g.setFont(20.0f);
-        g.drawFittedText("Springs", 10, TOP+50, 150, 40, Justification::centredTop, 1);
-        g.drawFittedText("Tethers", 170, TOP+50, 150, 40, Justification::centredTop, 1);
+        g.drawFittedText("Intervals", 10, TOP+20, 150, 40, Justification::centredTop, 1);
+        g.drawFittedText("Tethers", 170, TOP+20, 150, 40, Justification::centredTop, 1);
 
         
         float midi,scalex,posx,radians,cx,cy;
@@ -614,14 +615,14 @@ void TuningViewController::updateComponentVisibility()
     for (auto l : toggleLabels)     l->setVisible(false);
     
     rateSlider.setVisible(false);
-    stiffnessSlider.setVisible(false);
+    dragSlider.setVisible(false);
     springScaleCB.setVisible(false);
     
-    tetherStrengthLabel.setVisible(false);
-    tetherStrengthSlider.setVisible(false);
+    tetherStiffnessLabel.setVisible(false);
+    tetherStiffnessSlider.setVisible(false);
     
-    intervalStrengthLabel.setVisible(false);
-    intervalStrengthSlider.setVisible(false);
+    intervalStiffnessLabel.setVisible(false);
+    intervalStiffnessSlider.setVisible(false);
     
     absoluteKeyboard.setVisible(true);
     customKeyboard.setVisible(true);
@@ -704,21 +705,19 @@ void TuningViewController::updateComponentVisibility()
         rateSlider.toFront(true);
         rateSlider.setValue(tuning->getSpringRate(), dontSendNotification);
         
-        stiffnessSlider.setVisible(true);
-        stiffnessSlider.toFront(true);
-        stiffnessSlider.setValue(tuning->getSpringStiffness(), dontSendNotification);
+        dragSlider.setVisible(true);
+        dragSlider.toFront(true);
+        dragSlider.setValue(tuning->getSpringTuning()->getDrag(), dontSendNotification);
         
-        tetherStrengthLabel.setVisible(true);
+        tetherStiffnessLabel.setVisible(true);
+        tetherStiffnessSlider.setVisible(true);
+        tetherStiffnessSlider.toFront(true);
+        tetherStiffnessSlider.setValue(tuning->getSpringTuning()->getTetherStiffness(), dontSendNotification);
         
-        tetherStrengthSlider.setVisible(true);
-        tetherStrengthSlider.toFront(true);
-        tetherStrengthSlider.setValue(tuning->getSpringTuning()->getTetherStrength(), dontSendNotification);
-        
-        intervalStrengthLabel.setVisible(true);
-        
-        intervalStrengthSlider.setVisible(true);
-        intervalStrengthSlider.toFront(true);
-        intervalStrengthSlider.setValue(tuning->getSpringTuning()->getIntervalStrength(), dontSendNotification);
+        intervalStiffnessLabel.setVisible(true);
+        intervalStiffnessSlider.setVisible(true);
+        intervalStiffnessSlider.toFront(true);
+        intervalStiffnessSlider.setValue(tuning->getSpringTuning()->getIntervalStiffness(), dontSendNotification);
         
         springScaleCB.setVisible(true);
         springScaleCB.toFront(true);
@@ -778,7 +777,11 @@ TuningViewController(p, theGraph)
     
     rateSlider.addListener(this);
     
-    stiffnessSlider.addListener(this);
+    dragSlider.addListener(this);
+    
+    intervalStiffnessSlider.addListener(this);
+    
+    tetherStiffnessSlider.addListener(this);
     
     selectCB.addMyListener(this);
     
@@ -858,7 +861,7 @@ void TuningPreparationEditor::timerCallback()
         if (showSprings)
         {
             const int x_offset = 10;
-            const int y_offset = tetherStrengthSlider.getBottom()+3;
+            const int y_offset = tetherStiffnessSlider.getBottom()+3;
             const int w = 125;
             const int h = 25;
             const int yspacing = 3;
@@ -1191,6 +1194,10 @@ void TuningPreparationEditor::update(void)
         nToneRootCB.setSelectedItemIndex(prep->getNToneRootPC(), dontSendNotification);
         nToneRootOctaveCB.setSelectedItemIndex(prep->getNToneRootOctave(), dontSendNotification);
         nToneSemitoneWidthSlider->setValue(prep->getNToneSemitoneWidth(), dontSendNotification);
+        
+        //NEED TO CHANGE THE FOLLOWING AFTER SPRING TUNING IS FULLY INTEGRATED
+        tetherStiffnessSlider.setValue(tuning->getSpringTuning()->getTetherStiffness());
+        intervalStiffnessSlider.setValue(tuning->getSpringTuning()->getIntervalStiffness());
     }
     
     updateComponentVisibility();
@@ -1241,25 +1248,19 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
     {
         tuning->setSpringRate(value);
     }
-    else if (slider == &stiffnessSlider)
+    
+    else if (slider == &dragSlider)
     {
-        /*
-        double val = log10(value * 9.0 + 1.0);
-        val = val * val * val;
-        tuning->setSpringStiffness(val);
-        DBG(String(val));
-        */
-        
-        tuning->setSpringStiffness(value);
-        
+        tuning->getSpringTuning()->setDrag(value);
     }
-    else if (slider == &tetherStrengthSlider)
+    
+    else if (slider == &tetherStiffnessSlider)
     {
-        tuning->getSpringTuning()->setTetherStrength(value);
+        tuning->getSpringTuning()->setTetherStiffness(value);
     }
-    else if (slider == &intervalStrengthSlider)
+    else if (slider == &intervalStiffnessSlider)
     {
-        tuning->getSpringTuning()->setIntervalStrength(value);
+        tuning->getSpringTuning()->setIntervalStiffness(value);
     }
     else
     {

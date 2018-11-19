@@ -101,13 +101,13 @@ protected:
     BKComboBox springScaleCB;
     
     Slider rateSlider;
-    Slider stiffnessSlider;
+    Slider dragSlider;
     
-    Label tetherStrengthLabel;
-    Slider tetherStrengthSlider;
+    Label tetherStiffnessLabel;
+    Slider tetherStiffnessSlider;
     
-    Label intervalStrengthLabel;
-    Slider intervalStrengthSlider;
+    Label intervalStiffnessLabel;
+    Slider intervalStiffnessSlider;
     
     ToggleButton springTuningToggle;
     Label springTuningLabel;

@@ -31,8 +31,9 @@ void SpringTuningModel::copy(SpringTuningModel::Ptr st)
 
 SpringTuningModel::SpringTuningModel(SpringTuningModel::Ptr st):
 scaleId(JustTuning),
-tetherStrength(0.0),
-intervalStrength(0.0),
+tetherStiffness(0.5),
+intervalStiffness(0.5),
+drag(1.),
 rate(100),
 active(false)
 {
@@ -134,14 +135,14 @@ void SpringTuningModel::setIntervalTuning(Array<float> tuning)
     }
 }
 
-#define DRAG 1.0f //expose this!!
+//#define DRAG 1.0f //expose this!!
 void SpringTuningModel::simulate()
 {
     for (auto particle : particleArray)
     {
 		if (particle->getEnabled() && !particle->getLocked())
         {
-            particle->integrate(DRAG);
+            particle->integrate(drag);
         }
 	}
     
@@ -160,30 +161,6 @@ void SpringTuningModel::simulate()
             spring->satisfyConstraints();
 		}
 	}
-}
-
-void SpringTuningModel::setTetherStrength(double strength)
-{
-    tetherStrength = strength;
-    
-    // DO SCALING + NORMALIZATION HERE
-}
-
-double SpringTuningModel::getTetherStrength(void)
-{
-    return tetherStrength;
-}
-
-void SpringTuningModel::setIntervalStrength(double strength)
-{
-    intervalStrength = strength;
-    
-    // DO SCALING + NORMALIZATION HERE
-}
-
-double SpringTuningModel::getIntervalStrength(void)
-{
-    return intervalStrength;
 }
 
 void SpringTuningModel::setSpringWeight(int which, double weight)
