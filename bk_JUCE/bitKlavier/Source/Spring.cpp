@@ -82,6 +82,7 @@ void Spring::satisfyConstraints(void)
     
     if (intervalIndex != 12) diff = fmod(diff, 1200.0);
     else diff = fmod(diff, 1200.0) + 1200.;
+    if(diff > 2000) diff -= 1200.;
 
     //DBG("DIFF = " + String(diff));
     
