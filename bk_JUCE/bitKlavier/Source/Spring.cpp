@@ -78,11 +78,9 @@ void Spring::satisfyConstraints(void)
     //int ao = a->getOctave(), bo = b->getOctave();
     
     double diff = b->getX() - a->getX();
+    
     length = abs(diff);
     
-    if (intervalIndex != 12) diff = fmod(diff, 1200.0);
-    else diff = fmod(diff, 1200.0) + 1200.;
-
     //DBG("DIFF = " + String(diff));
     
 	if (diff == 0.0) return;
