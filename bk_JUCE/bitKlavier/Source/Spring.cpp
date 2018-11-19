@@ -69,7 +69,7 @@ void Spring::setStrength(double newStrength)
 
     double warpCoeff = 100.;
     adjustedStrength = 0.6 * stiffness * (pow(warpCoeff, strength) - 1.) / (warpCoeff - 1.);
-    DBG("Strength: " + String(strength) + " AdjustedStrength = " + String(adjustedStrength));
+    //DBG("Strength: " + String(strength) + " AdjustedStrength = " + String(adjustedStrength));
 
 }
 
@@ -81,6 +81,9 @@ void Spring::satisfyConstraints(void)
     length = abs(diff);
     
     if (intervalIndex != 12) diff = fmod(diff, 1200.0);
+    else diff = fmod(diff, 1200.0) + 1200.;
+
+    //DBG("DIFF = " + String(diff));
     
 	if (diff == 0.0) return;
     
@@ -105,7 +108,8 @@ void Spring::satisfyConstraints(void)
     //diff *= ( (diff - restingLength) / diff ) * actualStrength;
     diff *= ( (diff - restingLength) / diff ) * adjustedStrength;
     
-    DBG("diff = " + String(diff) + " restingLength = " + String(restingLength));
+    //DBG("diff = " + String(diff) + " restingLength = " + String(restingLength));
+    //print();
     
     //diff = Utilities::clip(-restingLength * 0.01, diff, restingLength * 0.01); //what the best contraint here is not clear....
     //diff = Utilities::clip(-2., diff, 2.);

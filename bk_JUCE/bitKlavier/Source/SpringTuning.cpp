@@ -84,7 +84,7 @@ active(false)
                 interval = 12;
             }
             
-            DBG("spring: " + String(interval * 100 + intervalTuning[interval]));
+            DBG("spring: " + String(i) + " " + String(j) + " " + String(interval * 100 + intervalTuning[interval]));
             
             Spring* spring = new Spring(particleArray[j],
                                         particleArray[i],
@@ -129,10 +129,11 @@ void SpringTuningModel::setIntervalTuning(Array<float> tuning)
     {
         int interval = spring->getIntervalIndex();
         spring->setRestingLength(interval * 100.0 + intervalTuning[interval]);
+        //DBG("setIntervalTuning " + String(interval) + " " + String(spring->getRestingLength()));
     }
 }
 
-#define DRAG 1.0f
+#define DRAG 1.0f //expose this!!
 void SpringTuningModel::simulate()
 {
     for (auto particle : particleArray)
@@ -313,6 +314,7 @@ void SpringTuningModel::addParticle(int note)
 {;
     particleArray[note]->setEnabled(true);
     tetherParticleArray[note]->setEnabled(true);
+    DBG("addedParticle " + String(note));
 }
 void SpringTuningModel::removeParticle(int note)
 {
@@ -384,6 +386,8 @@ void SpringTuningModel::addSpringsByNote(int note)
 	}
     
     tetherSpringArray[note]->setEnabled(true);
+    
+    DBG("addedSpring " + String(note));
 }
 void SpringTuningModel::removeSpringsByNote(int note)
 {
