@@ -42,6 +42,7 @@ public:
     inline void setStiffness(double stiff)
     {
         stiffness = stiff;
+        //DBG("stiffness = " + String(stiffness));
     }
     
     inline double getStiffness(void)
@@ -66,6 +67,7 @@ private:
 	double strength;
     double adjustedStrength;
     double stiffness;
+    double oldStiffness;
     
 	double restingLength, length;
     bool enabled;

@@ -1243,10 +1243,14 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
     }
     else if (slider == &stiffnessSlider)
     {
+        /*
         double val = log10(value * 9.0 + 1.0);
         val = val * val * val;
         tuning->setSpringStiffness(val);
         DBG(String(val));
+        */
+        
+        tuning->setSpringStiffness(value);
         
     }
     else if (slider == &tetherStrengthSlider)
