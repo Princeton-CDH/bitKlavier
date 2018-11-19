@@ -18,7 +18,7 @@ Spring::Spring(Particle* firstPoint, Particle* secondPoint, double length, doubl
 	strength(str),
 	intervalIndex(index)
 {
-
+    
 }
 
 Particle* Spring::getA()

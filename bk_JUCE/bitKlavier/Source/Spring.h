@@ -59,7 +59,7 @@ public:
 
     void setName(String s) { name = s;}
     String getName(void) { return name;}
-
+    
 private:
 	Particle* a;
 	Particle* b;
@@ -71,7 +71,7 @@ private:
     
 	double restingLength, length;
     bool enabled;
-	int intervalIndex; //will probably replace base interval
+	int intervalIndex;
     String name;
 };
 

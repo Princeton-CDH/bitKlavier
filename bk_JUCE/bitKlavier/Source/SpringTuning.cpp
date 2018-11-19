@@ -83,9 +83,6 @@ active(false)
             {
                 interval = 12;
             }
-             
-            
-            DBG("spring: " + String(i) + " " + String(j) + " " + String(diff * 100 + intervalTuning[interval] * 100));
             
             Spring* spring = new Spring(particleArray[j],
                                         particleArray[i],
@@ -191,22 +188,10 @@ void SpringTuningModel::setSpringWeight(int which, double weight)
     for (auto spring : springArray)
     {
         int interval = spring->getIntervalIndex();
-        
-        if (which == 12)
+
+        if (which == interval)
         {
-            if ((interval != 0) && ((interval % 12) == 0))
-            {
-                spring->setStrength(weight);
-            }
-        }
-        else
-        {
-            interval = interval % 12;
-            
-            if (which == interval)
-            {
-                spring->setStrength(weight);
-            }
+            spring->setStrength(weight);
         }
     }
 }

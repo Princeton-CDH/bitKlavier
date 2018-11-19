@@ -473,7 +473,7 @@ void TuningViewController::paint (Graphics& g)
             g.fillEllipse(cx, cy, dimc, dimc);
             
         }
-        
+
         for (auto s : tuning->getTuning()->getSprings())
         {
             if (s->getEnabled())
@@ -504,14 +504,14 @@ void TuningViewController::paint (Graphics& g)
                 
                 int midX = (cxa + cxb) / 2.0; //+ xoff;
                 int midY = (cya + cyb) / 2.0; //+ yoff;
+            
                 
-                //g.saveState();
-                
-                //g.addTransform(AffineTransform::identity.rotated(radians, midX, midY));
+                int interval = s->getIntervalIndex();
+
                 g.setColour(Colours::black);
                 g.setFont(15.0f);
-                g.drawText(String((int)round(s->getLength())), midX, midY, w, h, Justification::topLeft);
-                //g.restoreState();
+                double len = s->getLength();
+                g.drawText(String((int)round(len > 1400 ? fmod(len, 1200.0) : len)), midX, midY, w, h, Justification::topLeft);
             
             }
             
