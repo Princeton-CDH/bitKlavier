@@ -77,11 +77,51 @@ public:
         }
     }
     
+    inline void setTetherStiffness(double stiff)
+    {
+        tetherStiffness = stiff;
+        DBG("setTetherStiffness: " + String(stiff));
+        for (auto spring : tetherSpringArray)
+        {
+            spring->setStiffness(tetherStiffness);
+        }
+    }
+    
+    inline void setIntervalStiffness(double stiff)
+    {
+        intervalStiffness = stiff;
+        DBG("setIntervalStiffness: " + String(stiff));
+        for (auto spring : springArray)
+        {
+            spring->setStiffness(intervalStiffness);
+        }
+    }
+    
     inline double getStiffness(void)
     {
         return stiffness;
     }
+    
+    inline double getTetherStiffness(void)
+    {
+        return tetherStiffness;
+    }
+    
+    inline double getIntervalStiffness(void)
+    {
+        return intervalStiffness;
+    }
+    
+    inline void setDrag(double newdrag)
+    {
+        drag = newdrag;
+    }
 
+    inline double getDrag(void)
+    {
+        return drag;
+    }
+    
 	double getFrequency(int index);
 	bool pitchEnabled(int index);
 
@@ -122,6 +162,9 @@ public:
         ValueTree prep("springtuning");
         
         prep.setProperty( "rate", rate, 0);
+        prep.setProperty( "tetherStiffness", tetherStiffness, 0);
+        prep.setProperty( "intervalStiffness", intervalStiffness, 0);
+        prep.setProperty( "stiffness", stiffness, 0);
         prep.setProperty( "stiffness", stiffness, 0);
         prep.setProperty( "active", active ? 1 : 0, 0);
         prep.setProperty( "scaleId", scaleId, 0);
@@ -153,6 +196,8 @@ public:
         setRate(e->getStringAttribute("rate").getDoubleValue());
         
         setStiffness(e->getStringAttribute("stiffness").getDoubleValue());
+        setTetherStiffness(e->getStringAttribute("tetherStiffness").getDoubleValue());
+        setIntervalStiffness(e->getStringAttribute("intervalStiffness").getDoubleValue());
         
         active = (bool) e->getStringAttribute("active").getIntValue();
         
@@ -236,16 +281,18 @@ public:
     inline void setScaleId(TuningSystem which) { scaleId = which; }
     inline TuningSystem getScaleId(void) { return scaleId; }
     
-    void setTetherStrength(double strength);
-    double getTetherStrength(void);
+    //void setTetherStrength(double strength);
+    //double getTetherStrength(void);
     
-    void setIntervalStrength(double strength);
-    double getIntervalStrength(void);
+    //void setIntervalStrength(double strength);
+    //double getIntervalStrength(void);
     
 private:
     double rate, stiffness;
     
-    double tetherStrength, intervalStrength;
+    //double tetherStrength, intervalStrength;
+    double tetherStiffness, intervalStiffness;
+    double drag;
     
     bool active;
     

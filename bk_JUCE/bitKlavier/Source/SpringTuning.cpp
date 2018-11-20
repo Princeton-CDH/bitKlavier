@@ -31,8 +31,9 @@ void SpringTuningModel::copy(SpringTuningModel::Ptr st)
 
 SpringTuningModel::SpringTuningModel(SpringTuningModel::Ptr st):
 scaleId(JustTuning),
-tetherStrength(0.0),
-intervalStrength(0.0),
+tetherStiffness(0.5),
+intervalStiffness(0.5),
+drag(1.),
 rate(100),
 active(false)
 {
@@ -83,7 +84,7 @@ active(false)
             {
                 interval = 12;
             }
-            
+
             Spring* spring = new Spring(particleArray[j],
                                         particleArray[i],
                                         diff * 100 + intervalTuning[interval] * 100,
@@ -131,14 +132,14 @@ void SpringTuningModel::setIntervalTuning(Array<float> tuning)
     }
 }
 
-#define DRAG 1.0f //expose this!!
+//#define DRAG 1.0f //expose this!!
 void SpringTuningModel::simulate()
 {
     for (auto particle : particleArray)
     {
 		if (particle->getEnabled() && !particle->getLocked())
         {
-            particle->integrate(DRAG);
+            particle->integrate(drag);
         }
 	}
     
@@ -157,30 +158,6 @@ void SpringTuningModel::simulate()
             spring->satisfyConstraints();
 		}
 	}
-}
-
-void SpringTuningModel::setTetherStrength(double strength)
-{
-    tetherStrength = strength;
-    
-    // DO SCALING + NORMALIZATION HERE
-}
-
-double SpringTuningModel::getTetherStrength(void)
-{
-    return tetherStrength;
-}
-
-void SpringTuningModel::setIntervalStrength(double strength)
-{
-    intervalStrength = strength;
-    
-    // DO SCALING + NORMALIZATION HERE
-}
-
-double SpringTuningModel::getIntervalStrength(void)
-{
-    return intervalStrength;
 }
 
 void SpringTuningModel::setSpringWeight(int which, double weight)
@@ -219,22 +196,22 @@ void SpringTuningModel::setTetherWeight(int which, double weight)
             
             Particle* a = spring->getA();
             Particle* b = spring->getB();
-            Particle* use = nullptr;
+            Particle* particle = nullptr;
             Particle* tethered = tetherParticleArray[t];
             
-            if (a != tethered)  use = a;
-            else                use = b;
+            if (a != tethered)  particle = a;
+            else                particle = b;
             
-            if (use != nullptr)
+            if (particle != nullptr)
             {
                 if (weight == 1.0)
                 {
-                    use->setX(use->getRestX());
-                    use->setLocked(true);
+                    particle->setX(particle->getRestX());
+                    particle->setLocked(true);
                 }
                 else
                 {
-                    use->setLocked(false);
+                    particle->setLocked(false);
                     if (weight == 0.0) tethered->setEnabled(false);
                 }
             }
