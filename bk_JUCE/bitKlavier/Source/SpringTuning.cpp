@@ -84,9 +84,8 @@ active(false)
             {
                 interval = 12;
             }
-             
             
-            DBG("spring: " + String(i) + " " + String(j) + " " + String(diff * 100 + intervalTuning[interval] * 100));
+            //DBG("spring: " + String(i) + " " + String(j) + " " + String(diff * 100 + intervalTuning[interval] * 100));
             
             Spring* spring = new Spring(particleArray[j],
                                         particleArray[i],
@@ -130,7 +129,9 @@ void SpringTuningModel::setIntervalTuning(Array<float> tuning)
     for (auto spring : springArray)
     {
         int interval = spring->getIntervalIndex();
-        spring->setRestingLength(interval * 100.0 + intervalTuning[interval]);
+        int diff = spring->getA()->getRestX() - spring->getB()->getRestX();
+        //spring->setRestingLength(interval * 100.0 + intervalTuning[interval]);
+        spring->setRestingLength(fabs(diff) + intervalTuning[interval]);
         //DBG("setIntervalTuning " + String(interval) + " " + String(spring->getRestingLength()));
     }
 }
