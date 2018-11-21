@@ -455,6 +455,7 @@ void TuningViewController::paint (Graphics& g)
         float dimc = jmin(b.getHeight() * 0.06, b.getWidth() * 0.06);
         int x_offset = 0.075 * b.getWidth();
         
+        float midiScale;
         
         Particle::PtrArr particles = tuning->getTuning()->getTetherParticles();
         for (int i = 0; i < 12; i++)
@@ -470,7 +471,8 @@ void TuningViewController::paint (Graphics& g)
             cx = centerx + cosf(radians) * radius - dimc * 0.5f;
             cy = centery + sinf(radians) * radius - dimc * 0.5f;
             
-            g.setColour (Colours::grey);
+            g.setColour (Colours::dimgrey);
+            g.setOpacity(0.25);
             g.fillEllipse(cx, cy, dimc, dimc);
             
         }
@@ -483,22 +485,37 @@ void TuningViewController::paint (Graphics& g)
                 midi = Utilities::ftom(Utilities::centsToFreq(a->getX() - (1200.0 * a->getOctave())));
                 scalex = ((midi - 60.0f) / 12.0f);
                 
+                int midiSave = midi;
+                
+                midiScale = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(a->getX() - (1200.0 * a->getOctave()))), 128);
+                midiScale += ((a->getOctave() - 5) * 12.0);
+                midiScale /= 60.;
+                
                 radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
                 
-                float cxa = centerx + cosf(radians) * radius;
-                float cya = centery + sinf(radians) * radius;
+                float cxa = centerx + cosf(radians) * radius * midiScale;
+                float cya = centery + sinf(radians) * radius * midiScale;
                 
                 Particle* b = s->getB();
                 midi = Utilities::ftom(Utilities::centsToFreq(b->getX() - (1200.0 * b->getOctave())));
                 scalex = ((midi - 60.0f) / 12.0f);
                 
+                midiScale = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(b->getX() - (1200.0 * b->getOctave()))), 128);
+                midiScale += ((b->getOctave() - 5) * 12.0);
+                midiScale /= 60.;
+                
                 radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
                 
-                float cxb = centerx + cosf(radians) * radius;
-                float cyb = centery + sinf(radians) * radius;
+                float cxb = centerx + cosf(radians) * radius * midiScale;
+                float cyb = centery + sinf(radians) * radius * midiScale;
                 
                 double strength = s->getStrength();
-                g.setColour(Colours::lightgrey);
+                
+                float hue = fmod((midi + midiSave)/2., 12.) / 12.;
+                Colour colour (hue, 0.5f, 0.5f, 0.25f);
+                
+                //g.setColour(Colours::lightgrey);
+                g.setColour(colour);
                 g.drawLine(cxa, cya, cxb, cyb,  (strength > 0.0) ? strength * 5.0 + 1.0 : 0.0);
                 
                 int h = 10, w = 35;
@@ -509,9 +526,11 @@ void TuningViewController::paint (Graphics& g)
                 //g.saveState();
                 
                 //g.addTransform(AffineTransform::identity.rotated(radians, midX, midY));
+                
                 g.setColour(Colours::black);
-                g.setFont(15.0f);
-                g.drawText(String((int)round(s->getLength())), midX, midY, w, h, Justification::topLeft);
+                //g.setColour(colour);
+                g.setFont(12.0f);
+                g.drawText(String((int)round(s->getLength())), midX-dimc*0.25, midY, w, h, Justification::topLeft);
                 //g.restoreState();
             
             }
@@ -525,8 +544,8 @@ void TuningViewController::paint (Graphics& g)
                 // DRAW PARTICLE IN MOTION
                 
                 midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(p->getX() - (1200.0 * p->getOctave()))), 128);
-                
                 midi += ((p->getOctave() - 5) * 12.0);
+                midiScale = midi / 60.;
                 
                 int cents = (int)(((midi - (float)p->getNote())) * 100.0);
                 
@@ -535,16 +554,21 @@ void TuningViewController::paint (Graphics& g)
                 posx = scalex *  (b.getWidth() - tetherSliders[0]->getRight());
                 
                 radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
+
+                cx = centerx + cosf(radians) * radius * midiScale - dimc * 0.5f;
+                cy = centery + sinf(radians) * radius * midiScale - dimc * 0.5f;
                 
-                cx = centerx + cosf(radians) * radius - dimc * 0.5f;
-                cy = centery + sinf(radians) * radius - dimc * 0.5f;
+                float hue = fmod(midi, 12.) / 12.;
+                Colour colour (hue, 0.5f, 0.5f, 0.9f);
                 
-                g.setColour (Colours::black);
+                //g.setColour (Colours::black);
+                g.setColour (colour);
                 g.fillEllipse(cx, cy, dimc, dimc);
                 
-                g.setColour(Colours::dimgrey);
-                g.setFont(15.0f);
-                g.drawText(String(round(cents)), cx + dimc * 0.25, cy-dimc*0.7, 40, 10, Justification::topLeft);
+                g.setColour(Colours::white);
+                g.setFont(14.0f);
+                //g.drawText(String(round(cents)), cx + dimc * 0.25, cy-dimc*0.7, 40, 10, Justification::topLeft);
+                g.drawText(String(round(cents)), cx-dimc*0.25, cy+dimc*0.25, dimc * 1.5, dimc * 0.5, Justification::centred);
             }
         }
         
