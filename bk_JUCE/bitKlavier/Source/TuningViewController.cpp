@@ -579,18 +579,11 @@ void TuningViewController::paint (Graphics& g)
                 
                 if(midi > 20 && midi < 109) {
                     midiScale = midi / 60.;
-                    
-                    int cents = (int)(((midi - (float)p->getNote())) * 100.0);
-                    
                     scalex = ((midi - 60.0f) / 12.0f);
-                    
-                    posx = scalex *  (b.getWidth() - tetherSliders[0]->getRight());
-                    
+                    //posx = scalex *  (b.getWidth() - tetherSliders[0]->getRight());
                     radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
-                    
                     cx = centerx + cosf(radians) * radius * midiScale - dimc * 0.5f;
                     cy = centery + sinf(radians) * radius * midiScale - dimc * 0.5f;
-                    
                     g.setColour (Colours::dimgrey);
                     g.setOpacity(0.25);
                     g.fillEllipse(cx, cy, dimc, dimc);

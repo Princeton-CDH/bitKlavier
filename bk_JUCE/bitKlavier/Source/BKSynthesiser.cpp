@@ -596,7 +596,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                             0.001f,                 //  A
                             0.001f,                 //  D
                             1.0f,                   //  S
-                            0.001f, nullptr);                //  R
+                            0.001f,                 // R
+                            nullptr);
                 
                 // break;
                 
