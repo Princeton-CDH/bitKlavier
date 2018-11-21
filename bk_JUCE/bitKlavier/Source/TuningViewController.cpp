@@ -458,13 +458,14 @@ void TuningViewController::paint (Graphics& g)
         float midiScale;
         
         Particle::PtrArr particles = tuning->getTuning()->getTetherParticles();
+        /*
         for (int i = 0; i < 12; i++)
         {
             // DRAW REST PARTICLE
             
             midi = Utilities::ftom(Utilities::centsToFreq(particles[i]->getRestX()));
             scalex = ((midi - 60.0f) / 12.0f);
-            posx = scalex *  (getWidth() - 2*x_offset);
+            posx = scalex * (getWidth() - 2*x_offset);
             
             radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
             
@@ -476,7 +477,7 @@ void TuningViewController::paint (Graphics& g)
             g.fillEllipse(cx, cy, dimc, dimc);
             
         }
-        
+        */
         for (auto s : tuning->getTuning()->getSprings())
         {
             if (s->getEnabled())
@@ -569,6 +570,31 @@ void TuningViewController::paint (Graphics& g)
                 g.setFont(14.0f);
                 //g.drawText(String(round(cents)), cx + dimc * 0.25, cy-dimc*0.7, 40, 10, Justification::topLeft);
                 g.drawText(String(round(cents)), cx-dimc*0.25, cy+dimc*0.25, dimc * 1.5, dimc * 0.5, Justification::centred);
+            }
+            {
+                //DRAW REST PARTICLE
+                
+                midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(p->getRestX() - (1200.0 * p->getOctave()))), 128);
+                midi += ((p->getOctave() - 5) * 12.0);
+                
+                if(midi > 20 && midi < 109) {
+                    midiScale = midi / 60.;
+                    
+                    int cents = (int)(((midi - (float)p->getNote())) * 100.0);
+                    
+                    scalex = ((midi - 60.0f) / 12.0f);
+                    
+                    posx = scalex *  (b.getWidth() - tetherSliders[0]->getRight());
+                    
+                    radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
+                    
+                    cx = centerx + cosf(radians) * radius * midiScale - dimc * 0.5f;
+                    cy = centery + sinf(radians) * radius * midiScale - dimc * 0.5f;
+                    
+                    g.setColour (Colours::dimgrey);
+                    g.setOpacity(0.25);
+                    g.fillEllipse(cx, cy, dimc, dimc);
+                }
             }
         }
         
