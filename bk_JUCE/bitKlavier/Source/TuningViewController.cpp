@@ -79,7 +79,7 @@ showSprings(false)
     
     springTuningLabel.setText("Springs", dontSendNotification);
     springTuningLabel.setColour(Label::ColourIds::textColourId, Colours::antiquewhite);
-    //addChildComponent(springTuningLabel);
+    addChildComponent(springTuningLabel);
     
     rateSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
     rateSlider.setRange(5.0, 400.0);
@@ -429,6 +429,8 @@ void TuningViewController::paint (Graphics& g)
         g.fillAll(Colours::black);
         
         TuningProcessor::Ptr tuning = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
+        Tuning::Ptr currenttuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+        bool springsOn = currenttuning->getSpringsActive();
         
         if (!showSprings) return;
         
@@ -482,11 +484,28 @@ void TuningViewController::paint (Graphics& g)
         {
             if (s->getEnabled())
             {
+                /*
+                 if(springsOn) {
+                 midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(p->getX() - (1200.0 * p->getOctave()))), 128);
+                 midi += ((p->getOctave() - 5) * 12.0);
+                 }
+                 else {
+                 midi = .01 * currenttuning->getCurrentScaleCents()[p->getNote() % 12];
+                 midi += p->getNote();
+                 }
+                 */
+                
                 Particle* a = s->getA();
-                midi = Utilities::ftom(Utilities::centsToFreq(a->getX() - (1200.0 * a->getOctave())));
+                if(springsOn) midi = Utilities::ftom(Utilities::centsToFreq(a->getX() - (1200.0 * a->getOctave())));
+                else {
+                    //midi = .01 * currenttuning->getCurrentScaleCents()[a->getNote() % 12];
+                    midi = tuning->getOffset(a->getNote(), false);
+                    midi += a->getNote();
+                }
+                
                 scalex = ((midi - 60.0f) / 12.0f);
                 
-                int midiSave = midi;
+                float midiSave = midi;
                 
                 midiScale = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(a->getX() - (1200.0 * a->getOctave()))), 128);
                 midiScale += ((a->getOctave() - 5) * 12.0);
@@ -498,7 +517,13 @@ void TuningViewController::paint (Graphics& g)
                 float cya = centery + sinf(radians) * radius * midiScale;
                 
                 Particle* b = s->getB();
-                midi = Utilities::ftom(Utilities::centsToFreq(b->getX() - (1200.0 * b->getOctave())));
+                if(springsOn) midi = Utilities::ftom(Utilities::centsToFreq(b->getX() - (1200.0 * b->getOctave())));
+                else {
+                    //midi = .01 * currenttuning->getCurrentScaleCents()[b->getNote() % 12];
+                    midi = tuning->getOffset(b->getNote(), false);
+                    midi += b->getNote();
+                }
+                
                 scalex = ((midi - 60.0f) / 12.0f);
                 
                 midiScale = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(b->getX() - (1200.0 * b->getOctave()))), 128);
@@ -531,7 +556,8 @@ void TuningViewController::paint (Graphics& g)
                 g.setColour(Colours::black);
                 //g.setColour(colour);
                 g.setFont(12.0f);
-                g.drawText(String((int)round(s->getLength())), midX-dimc*0.25, midY, w, h, Justification::topLeft);
+                if(springsOn) g.drawText(String((int)round(s->getLength())), midX-dimc*0.25, midY, w, h, Justification::topLeft);
+                else g.drawText(String((int)round(100.*(midi - midiSave))), midX-dimc*0.25, midY, w, h, Justification::topLeft);
                 //g.restoreState();
             
             }
@@ -543,12 +569,21 @@ void TuningViewController::paint (Graphics& g)
             if (p->getEnabled())
             {
                 // DRAW PARTICLE IN MOTION
+                if(springsOn) {
+                    midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(p->getX() - (1200.0 * p->getOctave()))), 128);
+                    midi += ((p->getOctave() - 5) * 12.0);
+                }
+                else {
+                    //midi = .01 * currenttuning->getCurrentScaleCents()[p->getNote() % 12];
+                    midi = tuning->getOffset(p->getNote(), false);
+                    //DBG("midiOffset = " + String(midi) + " for note: " + String(p->getNote() % 12));
+                    midi += p->getNote();
+                }
                 
-                midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(p->getX() - (1200.0 * p->getOctave()))), 128);
-                midi += ((p->getOctave() - 5) * 12.0);
+                //DBG("midi = " + String(midi));
                 midiScale = midi / 60.;
                 
-                int cents = (int)(((midi - (float)p->getNote())) * 100.0);
+                int cents = roundToInt(((midi - (float)p->getNote())) * 100.0);
                 
                 scalex = ((midi - 60.0f) / 12.0f);
                 
@@ -571,23 +606,21 @@ void TuningViewController::paint (Graphics& g)
                 //g.drawText(String(round(cents)), cx + dimc * 0.25, cy-dimc*0.7, 40, 10, Justification::topLeft);
                 g.drawText(String(round(cents)), cx-dimc*0.25, cy+dimc*0.25, dimc * 1.5, dimc * 0.5, Justification::centred);
             }
-            {
-                //DRAW REST PARTICLE
-                
-                midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(p->getRestX() - (1200.0 * p->getOctave()))), 128);
-                midi += ((p->getOctave() - 5) * 12.0);
-                
-                if(midi > 20 && midi < 109) {
-                    midiScale = midi / 60.;
-                    scalex = ((midi - 60.0f) / 12.0f);
-                    //posx = scalex *  (b.getWidth() - tetherSliders[0]->getRight());
-                    radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
-                    cx = centerx + cosf(radians) * radius * midiScale - dimc * 0.5f;
-                    cy = centery + sinf(radians) * radius * midiScale - dimc * 0.5f;
-                    g.setColour (Colours::dimgrey);
-                    g.setOpacity(0.25);
-                    g.fillEllipse(cx, cy, dimc, dimc);
-                }
+            
+            //DRAW REST PARTICLE
+            midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(p->getRestX() - (1200.0 * p->getOctave()))), 128);
+            midi += ((p->getOctave() - 5) * 12.0);
+            
+            if(midi > 20 && midi < 109) {
+                midiScale = midi / 60.;
+                scalex = ((midi - 60.0f) / 12.0f);
+                //posx = scalex *  (b.getWidth() - tetherSliders[0]->getRight());
+                radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
+                cx = centerx + cosf(radians) * radius * midiScale - dimc * 0.5f;
+                cy = centery + sinf(radians) * radius * midiScale - dimc * 0.5f;
+                g.setColour (Colours::dimgrey);
+                g.setOpacity(0.25);
+                g.fillEllipse(cx, cy, dimc, dimc);
             }
         }
         
@@ -1096,7 +1129,10 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         DBG("current tuning from processor = " + String(processor.updateState->currentTuningId));
         customKeyboard.setValues(currentTuning->getCurrentScaleCents());
         
-        currentTuning->getSpringTuning()->setTetherTuning(currentTuning->getCurrentScaleCents());
+        if(currentTuning->getSpringsActive())
+            currentTuning->getSpringTuning()->setTetherTuning(currentTuning->getCurrentScaleCents());
+        else
+            currentTuning->getSpringTuning()->setTetherTuning(EqualTemperament); //use ET as background when not in Spring Tuning
         
         updateComponentVisibility();
         

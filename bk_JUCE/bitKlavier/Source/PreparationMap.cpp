@@ -315,7 +315,7 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
                     sustainedNotes.remove(i);
             }
         }
-        
+
         for (auto proc : tprocessor)
             proc->keyPressed(noteNumber);
         
