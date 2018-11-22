@@ -185,6 +185,7 @@ showSprings(false)
     addAndMakeVisible(A1reset);
     
     showSpringsButton.setButtonText("Graph");
+    showSpringsButton.setClickingTogglesState(true);
     addAndMakeVisible(showSpringsButton);
     
     nToneRootCB.setName("nToneRoot");
@@ -439,7 +440,7 @@ void TuningViewController::paint (Graphics& g)
         
         g.setColour(Colours::antiquewhite);
         g.setOpacity(1.0);
-        g.fillRect(b);
+        //g.fillRect(b);
 
         g.setColour (Colours::black);
         g.setFont (40.0f);
@@ -451,10 +452,12 @@ void TuningViewController::paint (Graphics& g)
 
         
         float midi,scalex,posx,radians,cx,cy;
-        float centerx = b.getWidth() * 0.7f,
-        centery = b.getHeight() * 0.75f,
-        radius = jmin(b.getHeight() * 0.32, b.getWidth() * 0.32);
-        float dimc = jmin(b.getHeight() * 0.06, b.getWidth() * 0.06);
+        float centerx = b.getWidth() * 0.5f, centery = b.getHeight() * 0.65f;
+        
+        float radius_scale = 0.25;
+        float radius = jmin(b.getHeight() * radius_scale, b.getWidth() * radius_scale);
+        float dimc_scale = 0.05;
+        float dimc = jmin(b.getHeight() * dimc_scale, b.getWidth() * dimc_scale);
         int x_offset = 0.075 * b.getWidth();
         
         float midiScale;
@@ -553,9 +556,10 @@ void TuningViewController::paint (Graphics& g)
                 
                 //g.addTransform(AffineTransform::identity.rotated(radians, midX, midY));
                 
-                g.setColour(Colours::black);
+                g.setColour(Colours::ghostwhite);
                 //g.setColour(colour);
                 g.setFont(12.0f);
+                g.setOpacity(0.7);
                 if(springsOn) g.drawText(String((int)round(s->getLength())), midX-dimc*0.25, midY, w, h, Justification::topLeft);
                 else g.drawText(String((int)round(100.*(midi - midiSave))), midX-dimc*0.25, midY, w, h, Justification::topLeft);
                 //g.restoreState();
@@ -703,6 +707,7 @@ void TuningViewController::updateComponentVisibility()
     absoluteKeyboard.setVisible(true);
     customKeyboard.setVisible(true);
     lastInterval.setVisible(true);
+    lastNote.setVisible(true);
     offsetSlider->setVisible(true);
     springTuningToggle.setVisible(true);
     springTuningLabel.setVisible(true);
@@ -764,6 +769,7 @@ void TuningViewController::updateComponentVisibility()
     if (showSprings)
     {
         lastInterval.setVisible(false);
+        lastNote.setVisible(false);
         
         Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         Spring::PtrArr springs = tuning->getSprings();
