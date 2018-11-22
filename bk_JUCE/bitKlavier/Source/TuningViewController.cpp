@@ -31,7 +31,7 @@ showSprings(false)
         tetherSliders.add(s);
         
         Label* l = new Label(s->getName(), Utilities::getNoteString(i));
-        l->setColour(juce::Label::ColourIds::textColourId, Colours::black);
+        l->setColour(juce::Label::ColourIds::textColourId, Colours::white);
         addChildComponent(l);
         tetherLabels.add(l);
     }
@@ -47,9 +47,10 @@ showSprings(false)
         springSliders.add(s);
         
         Label* l = new Label(s->getName(), s->getName());
-        l->setColour(juce::Label::ColourIds::textColourId, Colours::black);
+        l->setColour(juce::Label::ColourIds::textColourId, Colours::white);
         addChildComponent(l);
         springLabels.add(l);
+        
         
         ToggleButton* t = new ToggleButton("");
         //buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
@@ -61,9 +62,10 @@ showSprings(false)
         toggles.add(t);
         
         l = new Label(notesInAnOctave[i], notesInAnOctave[i]);
-        l->setColour(juce::Label::ColourIds::textColourId, Colours::black);
+        l->setColour(juce::Label::ColourIds::textColourId, Colours::transparentWhite);
         //addChildComponent(l);
         toggleLabels.add(l);
+        
         
     }
     
@@ -98,7 +100,7 @@ showSprings(false)
     addChildComponent(tetherStiffnessSlider);
     
     intervalStiffnessLabel.setText("stf", dontSendNotification);
-    intervalStiffnessLabel.setColour(juce::Label::ColourIds::textColourId, Colours::black);
+    intervalStiffnessLabel.setColour(juce::Label::ColourIds::textColourId, Colours::white);
     addChildComponent(intervalStiffnessLabel);
     
     intervalStiffnessSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
@@ -378,47 +380,59 @@ void TuningViewController::resized()
     lastNote.setBounds(editAllBounds.getRight() + gXSpacing, editAllBounds.getY(),editAllBounds.getWidth() * 2, editAllBounds.getHeight());
     lastInterval.setBounds(lastNote.getRight() + gXSpacing, lastNote.getY(),lastNote.getWidth(), lastNote.getHeight());
     
+    // ********* spring/graph view
+    
     const int x_offset = 10;
     const int y_offset = TOP+75;
     const int w = 125;
-    const int h = 25;
+    const int h = 20;
     const int yspacing = 3;
     const int xspacing = 3;
     
-    
+    /*
     for (int i = 0; i < 12; i++)
     {
         springLabels[i]->setBounds(x_offset, y_offset + (h + yspacing) * (i + 1), 30, h);
         springSliders[i]->setBounds(springLabels[i]->getRight() + xspacing, springLabels[i]->getY(), w, h);
         
-        toggleLabels[i]->setBounds(springSliders[i]->getRight() + xspacing, springSliders[i]->getY(), 30, h);
-        toggles[i]->setBounds(toggleLabels[i]->getRight() + xspacing, toggleLabels[i]->getY(), 30, h);
+        //toggleLabels[i]->setBounds(springSliders[i]->getRight() + xspacing, springSliders[i]->getY(), 30, h);
+        //toggles[i]->setBounds(toggleLabels[i]->getRight() + xspacing, toggleLabels[i]->getY(), 30, h);
     }
-    
-    intervalStiffnessLabel.setBounds(springLabels[0]->getX(), y_offset, 30, h);
-    intervalStiffnessSlider.setBounds(springSliders[0]->getX(), y_offset, w, h);
-    
-    tetherStiffnessLabel.setBounds(toggles[0]->getRight() + xspacing, y_offset, 30, h);
-    tetherStiffnessSlider.setBounds(tetherStiffnessLabel.getRight() + xspacing, tetherStiffnessLabel.getY(), w, h);
+     */
     
     int width = getWidth() * 0.24, height = h;
-    rateSlider.setBounds(getWidth() * 0.75, TOP + 15, width, height);
-    dragSlider.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, width, height);
-    springScaleCB.setBounds(dragSlider.getX(), dragSlider.getBottom() + gYSpacing, width, height);
+    //rateSlider.setBounds(getWidth() * 0.75, TOP + 15, width, height);
+    rateSlider.setBounds(fundamentalCB.getX(), fundamentalCB.getBottom() + gYSpacing, fundamentalCB.getWidth(), gComponentComboBoxHeight);
+    //dragSlider.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, width, height);
+    dragSlider.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, rateSlider.getWidth(), gComponentComboBoxHeight);
+    //springScaleCB.setBounds(dragSlider.getX(), dragSlider.getBottom() + gYSpacing, width, height);
     //springScaleCB.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, width, height);
+    
+    //tetherStiffnessLabel.setBounds(toggles[0]->getRight() + xspacing, y_offset, 30, h);
+    tetherStiffnessSlider.setBounds(dragSlider.getX(), dragSlider.getBottom() + gYSpacing, dragSlider.getWidth(), gComponentComboBoxHeight);
     
     int labelWidth = 60;
     
-    springTuningLabel.setBounds(scaleCB.getX(), scaleCB.getBottom() + gYSpacing, labelWidth, scaleCB.getHeight());
+    //springTuningLabel.setBounds(selectCB.getX(), selectCB.getBottom() + gYSpacing, labelWidth, gComponentComboBoxHeight);
+    //springTuningToggle.setBounds(springTuningLabel.getRight(), springTuningLabel.getY() - 6, 35, 35);
+    //springTuningToggle.setBounds(selectCB.getRight() - 35, selectCB.getBottom(), 35, 35);
+    //springTuningToggle.setTopRightPosition(selectCB.getRight(), selectCB.getBottom());
+    //springTuningToggle.setSize(35, 35);
+    //springTuningLabel.setBounds(springTuningToggle.getX() - labelWidth, selectCB.getBottom() + gYSpacing, labelWidth, gComponentComboBoxHeight);
     
-    springTuningToggle.setBounds(springTuningLabel.getRight() + gXSpacing, springTuningLabel.getY() - 6, 35, 35);
+    showSpringsButton.setBounds(actionButton.getX(),actionButton.getBottom() + gYSpacing, actionButton.getWidth(), gComponentComboBoxHeight);
+    springTuningToggle.setBounds(showSpringsButton.getX() - 35, showSpringsButton.getY() - 6, 35, 35);
+    springTuningLabel.setBounds(springTuningToggle.getX() - labelWidth, selectCB.getBottom() + gYSpacing, labelWidth, gComponentComboBoxHeight);
+    springScaleCB.setBounds(selectCB.getX(), springTuningLabel.getBottom() + 4*gYSpacing, selectCB.getWidth() * 0.75, gComponentComboBoxHeight);
     
+    intervalStiffnessLabel.setBounds(hideOrShow.getX(), springScaleCB.getBottom() + gYSpacing, hideOrShow.getWidth(), h);
+    intervalStiffnessSlider.setBounds(springScaleCB.getX(), springScaleCB.getBottom() + gYSpacing, springScaleCB.getWidth(), h);
     
-    showSpringsButton.setBounds(springTuningToggle.getRight()+gXSpacing,
-                                springTuningLabel.getY(),
-                                springTuningLabel.getWidth(),
-                                scaleCB.getHeight());
-    
+    for (int i = 0; i < 12; i++)
+    {
+        springLabels[i]->setBounds(intervalStiffnessLabel.getX(), intervalStiffnessLabel.getBottom() + (h + yspacing) * (11 - i + 1), hideOrShow.getWidth(), h);
+        springSliders[i]->setBounds(intervalStiffnessSlider.getX(), springLabels[i]->getY(), intervalStiffnessSlider.getWidth(), h);
+    }
     
     updateComponentVisibility();
 }
@@ -945,7 +959,7 @@ void TuningPreparationEditor::timerCallback()
             const int x_offset = 10;
             const int y_offset = tetherStiffnessSlider.getBottom()+3;
             const int w = 125;
-            const int h = 25;
+            const int h = 20;
             const int yspacing = 3;
             const int xspacing = 3;
             
@@ -978,13 +992,26 @@ void TuningPreparationEditor::timerCallback()
                 {
                     if (tetherSprings[i]->getEnabled())
                     {
-                        tetherLabels[i]->setBounds(toggles[0]->getRight() + xspacing, y_offset + (h + yspacing) * (count + 1), 30, h);
+                        /*
+                        //tetherLabels[i]->setBounds(toggles[0]->getRight() + xspacing, y_offset + (h + yspacing) * (count + 1), 30, h);
+                        tetherLabels[i]->setBounds(tetherStiffnessSlider.getX(), tetherStiffnessSlider.getBottom() + (h + yspacing) * (count + 1), 30, h);
                         tetherLabels[i]->setText(Utilities::getNoteString(i), dontSendNotification);
                         tetherLabels[i]->setVisible(true);
                         
                         tetherSliders[i]->setBounds(tetherLabels[i]->getRight() + xspacing, tetherLabels[i]->getY(), w, h);
                         tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
                         tetherSliders[i]->setVisible(true);
+                         */
+                        
+                        tetherSliders[i]->setBounds(tetherStiffnessSlider.getX(), tetherStiffnessSlider.getBottom() + (h + yspacing) * (count + 1), tetherStiffnessSlider.getWidth() * 0.75, h);
+                        tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
+                        tetherSliders[i]->setVisible(true);
+                        
+                        tetherLabels[i]->setBounds(tetherSliders[i]->getRight() + xspacing, tetherSliders[i]->getY(), 30, h);
+                        tetherLabels[i]->setText(Utilities::getNoteString(i), dontSendNotification);
+                        tetherLabels[i]->setVisible(true);
+                        
+                        
                         
                         // Clever little counter
                         count++;
