@@ -1430,6 +1430,11 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         
         Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         tuning->setSpringsActive(state);
+        
+        if(tuning->getSpringsActive())
+            tuning->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
+        else
+            tuning->getSpringTuning()->setTetherTuning(EqualTemperament);
     }
     else
     {
