@@ -410,11 +410,11 @@ void TuningViewController::resized()
     
     int width = getWidth() * 0.24, height = h;
     //rateSlider.setBounds(getWidth() * 0.75, TOP + 15, width, height);
-    rateSlider.setBounds(scaleCB.getX(), scaleCB.getBottom() + gYSpacing, scaleCB.getWidth() * 0.75, h);
-    rateSliderLabel.setBounds(rateSlider.getRight() + gXSpacing, rateSlider.getY(), 120, h);
+    rateSlider.setBounds(scaleCB.getX(), scaleCB.getBottom() + gYSpacing, scaleCB.getWidth(), h);
+    rateSliderLabel.setBounds(rateSlider.getRight() + gXSpacing + gPaddingConst*processor.paddingScalarX, rateSlider.getY(), 120, h);
     //dragSlider.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, width, height);
     dragSlider.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, rateSlider.getWidth(), h);
-    dragSliderLabel.setBounds(dragSlider.getRight() + gXSpacing, dragSlider.getY(), 60, h);
+    dragSliderLabel.setBounds(rateSliderLabel.getX(), dragSlider.getY(), 60, h);
     //springScaleCB.setBounds(dragSlider.getX(), dragSlider.getBottom() + gYSpacing, width, height);
     //springScaleCB.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, width, height);
     
@@ -435,7 +435,7 @@ void TuningViewController::resized()
     intervalStiffnessLabel.setBounds(hideOrShow.getX(), springScaleCB.getBottom() + gYSpacing, hideOrShow.getWidth(), h);
     intervalStiffnessSlider.setBounds(springScaleCB.getX(), springScaleCB.getBottom() + gYSpacing, springScaleCB.getWidth(), h);
     
-    tetherStiffnessSlider.setBounds(fundamentalCB.getX(), intervalStiffnessSlider.getY(), dragSlider.getWidth(), h);
+    tetherStiffnessSlider.setBounds(fundamentalCB.getX(), intervalStiffnessSlider.getY(), fundamentalCB.getWidth() * 0.75, h);
     tetherStiffnessLabel.setBounds(tetherStiffnessSlider.getRight() + xspacing, tetherStiffnessSlider.getY(), 30, h);
     
     for (int i = 0; i < 12; i++)
@@ -817,7 +817,7 @@ void TuningViewController::updateComponentVisibility()
         
         dragSlider.setVisible(true);
         dragSlider.toFront(true);
-        dragSlider.setValue(tuning->getSpringTuning()->getDrag(), dontSendNotification);
+        dragSlider.setValue(1. - tuning->getSpringTuning()->getDrag(), dontSendNotification);
         
         rateSliderLabel.setVisible(true);
         dragSliderLabel.setVisible(true);
@@ -1380,7 +1380,7 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
     
     else if (slider == &dragSlider)
     {
-        tuning->getSpringTuning()->setDrag(value);
+        tuning->getSpringTuning()->setDrag(1. - value);
     }
     
     else if (slider == &tetherStiffnessSlider)
