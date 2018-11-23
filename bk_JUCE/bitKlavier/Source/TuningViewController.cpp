@@ -405,13 +405,14 @@ void TuningViewController::resized()
     
     // ********* spring/graph view
     
+    /*
     const int x_offset = 10;
     const int y_offset = TOP+75;
     const int w = 125;
     const int h = 20;
     const int yspacing = 3;
     const int xspacing = 3;
-    
+    */
     /*
     for (int i = 0; i < 12; i++)
     {
@@ -423,10 +424,10 @@ void TuningViewController::resized()
     }
      */
     
-    int width = getWidth() * 0.24, height = h;
+    //int width = getWidth() * 0.24;//, height = h;
     //rateSlider.setBounds(getWidth() * 0.75, TOP + 15, width, height);
     //rateSlider.setBounds(scaleCB.getX(), scaleCB.getBottom() + gYSpacing + 2.*gPaddingConst*processor.paddingScalarX, scaleCB.getWidth(), h);
-    rateSlider->setBounds(selectCB.getX()-gComponentSingleSliderXOffset, selectCB.getBottom() + gPaddingConst*processor.paddingScalarY, selectCB.getWidth()+gComponentSingleSliderXOffset*2., gComponentSingleSliderHeight);
+    rateSlider->setBounds(selectCB.getX()-gComponentSingleSliderXOffset, selectCB.getBottom() + gYSpacing, selectCB.getWidth()+gComponentSingleSliderXOffset*2., gComponentSingleSliderHeight);
     //rateSliderLabel.setBounds(rateSlider->getRight() + xspacing, rateSlider->getY(), 120, h);
     //dragSlider.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, width, height);
     dragSlider->setBounds(fundamentalCB.getX()-gComponentSingleSliderXOffset, rateSlider->getY(), fundamentalCB.getWidth()+gComponentSingleSliderXOffset*2., gComponentSingleSliderHeight);
@@ -434,7 +435,7 @@ void TuningViewController::resized()
     //springScaleCB.setBounds(dragSlider.getX(), dragSlider.getBottom() + gYSpacing, width, height);
     //springScaleCB.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, width, height);
     
-    int labelWidth = 60;
+    //int labelWidth = 60;
     
     //springTuningLabel.setBounds(selectCB.getX(), selectCB.getBottom() + gYSpacing, labelWidth, gComponentComboBoxHeight);
     //springTuningToggle.setBounds(springTuningLabel.getRight(), springTuningLabel.getY() - 6, 35, 35);
