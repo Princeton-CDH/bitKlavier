@@ -83,16 +83,24 @@ showSprings(false)
     springTuningLabel.setColour(Label::ColourIds::textColourId, Colours::antiquewhite);
     addChildComponent(springTuningLabel);
     
+    rateSliderLabel.setText("update rate", dontSendNotification);
+    rateSliderLabel.setColour(Label::ColourIds::textColourId, Colours::antiquewhite);
+    addChildComponent(rateSliderLabel);
+    
     rateSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
     rateSlider.setRange(5.0, 400.0);
     addChildComponent(rateSlider);
+    
+    dragSliderLabel.setText("drag", dontSendNotification);
+    dragSliderLabel.setColour(Label::ColourIds::textColourId, Colours::antiquewhite);
+    addChildComponent(dragSliderLabel);
     
     dragSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
     dragSlider.setRange(0.0, 1.0);
     addChildComponent(dragSlider);
     
     tetherStiffnessLabel.setText("stf", dontSendNotification);
-    tetherStiffnessLabel.setColour(juce::Label::ColourIds::textColourId, Colours::black);
+    tetherStiffnessLabel.setColour(juce::Label::ColourIds::textColourId, Colours::white);
     addChildComponent(tetherStiffnessLabel);
     
     tetherStiffnessSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
@@ -402,14 +410,13 @@ void TuningViewController::resized()
     
     int width = getWidth() * 0.24, height = h;
     //rateSlider.setBounds(getWidth() * 0.75, TOP + 15, width, height);
-    rateSlider.setBounds(fundamentalCB.getX(), fundamentalCB.getBottom() + gYSpacing, fundamentalCB.getWidth(), gComponentComboBoxHeight);
+    rateSlider.setBounds(scaleCB.getX(), scaleCB.getBottom() + gYSpacing, scaleCB.getWidth() * 0.75, h);
+    rateSliderLabel.setBounds(rateSlider.getRight() + gXSpacing, rateSlider.getY(), 120, h);
     //dragSlider.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, width, height);
-    dragSlider.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, rateSlider.getWidth(), gComponentComboBoxHeight);
+    dragSlider.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, rateSlider.getWidth(), h);
+    dragSliderLabel.setBounds(dragSlider.getRight() + gXSpacing, dragSlider.getY(), 60, h);
     //springScaleCB.setBounds(dragSlider.getX(), dragSlider.getBottom() + gYSpacing, width, height);
     //springScaleCB.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, width, height);
-    
-    //tetherStiffnessLabel.setBounds(toggles[0]->getRight() + xspacing, y_offset, 30, h);
-    tetherStiffnessSlider.setBounds(dragSlider.getX(), dragSlider.getBottom() + gYSpacing, dragSlider.getWidth(), gComponentComboBoxHeight);
     
     int labelWidth = 60;
     
@@ -427,6 +434,9 @@ void TuningViewController::resized()
     
     intervalStiffnessLabel.setBounds(hideOrShow.getX(), springScaleCB.getBottom() + gYSpacing, hideOrShow.getWidth(), h);
     intervalStiffnessSlider.setBounds(springScaleCB.getX(), springScaleCB.getBottom() + gYSpacing, springScaleCB.getWidth(), h);
+    
+    tetherStiffnessSlider.setBounds(fundamentalCB.getX(), intervalStiffnessSlider.getY(), dragSlider.getWidth(), h);
+    tetherStiffnessLabel.setBounds(tetherStiffnessSlider.getRight() + xspacing, tetherStiffnessSlider.getY(), 30, h);
     
     for (int i = 0; i < 12; i++)
     {
@@ -452,6 +462,7 @@ void TuningViewController::paint (Graphics& g)
         Rectangle<int> b = getBounds();
         b.removeFromTop(TOP);
         
+        /*
         g.setColour(Colours::antiquewhite);
         g.setOpacity(1.0);
         //g.fillRect(b);
@@ -463,7 +474,7 @@ void TuningViewController::paint (Graphics& g)
         g.setFont(20.0f);
         g.drawFittedText("Intervals", 10, TOP+20, 150, 40, Justification::centredTop, 1);
         g.drawFittedText("Tethers", 170, TOP+20, 150, 40, Justification::centredTop, 1);
-
+        */
         
         float midi,scalex,posx,radians,cx,cy;
         float centerx = b.getWidth() * 0.5f, centery = b.getHeight() * 0.65f;
@@ -718,6 +729,9 @@ void TuningViewController::updateComponentVisibility()
     intervalStiffnessLabel.setVisible(false);
     intervalStiffnessSlider.setVisible(false);
     
+    rateSliderLabel.setVisible(false);
+    dragSliderLabel.setVisible(false);
+    
     absoluteKeyboard.setVisible(true);
     customKeyboard.setVisible(true);
     lastInterval.setVisible(true);
@@ -804,6 +818,9 @@ void TuningViewController::updateComponentVisibility()
         dragSlider.setVisible(true);
         dragSlider.toFront(true);
         dragSlider.setValue(tuning->getSpringTuning()->getDrag(), dontSendNotification);
+        
+        rateSliderLabel.setVisible(true);
+        dragSliderLabel.setVisible(true);
         
         tetherStiffnessLabel.setVisible(true);
         tetherStiffnessSlider.setVisible(true);
@@ -1003,7 +1020,7 @@ void TuningPreparationEditor::timerCallback()
                         tetherSliders[i]->setVisible(true);
                          */
                         
-                        tetherSliders[i]->setBounds(tetherStiffnessSlider.getX(), tetherStiffnessSlider.getBottom() + (h + yspacing) * (count + 1), tetherStiffnessSlider.getWidth() * 0.75, h);
+                        tetherSliders[i]->setBounds(tetherStiffnessSlider.getX(), tetherStiffnessSlider.getBottom() + (h + yspacing) * (count + 1), tetherStiffnessSlider.getWidth(), h);
                         tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
                         tetherSliders[i]->setVisible(true);
                         

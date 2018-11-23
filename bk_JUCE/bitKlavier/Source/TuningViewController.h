@@ -100,7 +100,10 @@ protected:
     
     BKComboBox springScaleCB;
     
+    Label rateSliderLabel;
     Slider rateSlider;
+    
+    Label dragSliderLabel;
     Slider dragSlider;
     
     Label tetherStiffnessLabel;
