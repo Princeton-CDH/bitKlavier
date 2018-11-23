@@ -1335,8 +1335,8 @@ void BKSingleSlider::resized()
         thisSlider.setBounds(area.removeFromTop(gComponentSingleSliderHeight - gComponentTextFieldHeight));
         
         Rectangle<int> displaySliderArea = thisSlider.getBounds();
-        displaySliderArea.reduce(8, 0);
-        displaySlider->setBounds(displaySliderArea.removeFromBottom(8));
+        displaySliderArea.reduce(gComponentSingleSliderXOffset, 0);
+        displaySlider->setBounds(displaySliderArea.removeFromBottom(gComponentSingleSliderXOffset));
         
         
     }

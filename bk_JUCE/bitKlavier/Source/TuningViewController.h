@@ -101,18 +101,18 @@ protected:
     BKComboBox springScaleCB;
     
     Label rateSliderLabel;
-    Slider rateSlider;
+    ScopedPointer<BKSingleSlider> rateSlider;
     
     Label dragSliderLabel;
-    Slider dragSlider;
+    ScopedPointer<BKSingleSlider> dragSlider;
     
     Label tetherStiffnessLabel;
-    Slider tetherStiffnessSlider;
+    ScopedPointer<BKSingleSlider> tetherStiffnessSlider;
     
     Label intervalStiffnessLabel;
-    Slider intervalStiffnessSlider;
+    ScopedPointer<BKSingleSlider> intervalStiffnessSlider;
     
-    ToggleButton springTuningToggle;
+    BKTextButton springTuningToggle;
     Label springTuningLabel;
     
     

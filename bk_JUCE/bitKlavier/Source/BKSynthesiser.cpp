@@ -581,7 +581,9 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             
             bool appliesToNote = sound->appliesToNote (noteNumber);
             bool appliesToVel = sound->appliesToVelocity((int)(velocity*127.0));
-            bool isRelease = (sound->trigger == sfzero::Region::release) || (sound->trigger == sfzero::Region::release_key);
+            bool isRelease = false;
+            //DT: TESTING TO SEE IF THIS IS WHAT IS CAUSING GHOST RELEASE NOTES
+            //bool isRelease = (sound->trigger == sfzero::Region::release) || (sound->trigger == sfzero::Region::release_key);
             bool pedalStatesMatch = (sustainPedalsDown[midiChannel] == sound->pedal);
             
             if (appliesToNote && appliesToVel && isRelease && pedalStatesMatch)
