@@ -446,18 +446,34 @@ void TuningViewController::resized()
     //springScaleCB.setBounds(actionButton.getX(), showSpringsButton.getY(), actionButton.getWidth(), gComponentComboBoxHeight);
     springScaleCB.setBounds(selectCB.getX(), dragSlider.getY(), selectCB.getWidth() * 0.75, h);
     
+    float sliderHeight = (absoluteKeyboard.getBottom() - springScaleCB.getBottom()) / 13.;
+    
     //intervalStiffnessLabel.setBounds(hideOrShow.getX(), springScaleCB.getBottom() + gYSpacing, hideOrShow.getWidth(), h);
     //intervalStiffnessSlider.setBounds(springScaleCB.getX(), springScaleCB.getBottom() + gYSpacing, springScaleCB.getWidth(), h);
-    intervalStiffnessLabel.setBounds(hideOrShow.getX(), dragSlider.getBottom() + gYSpacing, hideOrShow.getWidth(), h);
-    intervalStiffnessSlider.setBounds(springScaleCB.getX(), intervalStiffnessLabel.getY(), springScaleCB.getWidth(), h);
+    //intervalStiffnessLabel.setBounds(hideOrShow.getX(), dragSlider.getBottom() + gYSpacing, hideOrShow.getWidth(), h);
+    //intervalStiffnessSlider.setBounds(springScaleCB.getX(), intervalStiffnessLabel.getY(), springScaleCB.getWidth(), h);
     
-    tetherStiffnessSlider.setBounds(fundamentalCB.getX(), intervalStiffnessSlider.getY(), fundamentalCB.getWidth() * 0.75, h);
-    tetherStiffnessLabel.setBounds(tetherStiffnessSlider.getRight() + xspacing, tetherStiffnessSlider.getY(), 30, h);
+    intervalStiffnessLabel.setBounds(hideOrShow.getX(), dragSlider.getBottom() + gYSpacing, hideOrShow.getWidth(), sliderHeight);
+    intervalStiffnessSlider.setBounds(springScaleCB.getX(), intervalStiffnessLabel.getY(), springScaleCB.getWidth(), sliderHeight);
+    
+    tetherStiffnessSlider.setBounds(fundamentalCB.getX(), intervalStiffnessSlider.getY(), fundamentalCB.getWidth() * 0.75, sliderHeight);
+    tetherStiffnessLabel.setBounds(tetherStiffnessSlider.getRight() + xspacing, tetherStiffnessSlider.getY(), 30, sliderHeight);
     
     for (int i = 0; i < 12; i++)
     {
-        springLabels[i]->setBounds(intervalStiffnessLabel.getX(), intervalStiffnessLabel.getBottom() + (h + yspacing) * (11 - i + 1*processor.paddingScalarX), hideOrShow.getWidth(), h);
+        /*
+        springLabels[i]->setBounds(intervalStiffnessLabel.getX(), intervalStiffnessLabel.getBottom() + (h + yspacing) * (11 - i + 1*processor.paddingScalarY), hideOrShow.getWidth(), h);
         springSliders[i]->setBounds(intervalStiffnessSlider.getX(), springLabels[i]->getY(), intervalStiffnessSlider.getWidth(), h);
+         */
+        
+        springLabels[i]->setBounds(intervalStiffnessLabel.getX(),
+                                   intervalStiffnessLabel.getBottom() + (sliderHeight) * (11 - i),
+                                   hideOrShow.getWidth(),
+                                   sliderHeight);
+        springSliders[i]->setBounds(intervalStiffnessSlider.getX(),
+                                    springLabels[i]->getY(),
+                                    intervalStiffnessSlider.getWidth(),
+                                    sliderHeight);
     }
     
     updateComponentVisibility();
@@ -475,9 +491,11 @@ void TuningViewController::paint (Graphics& g)
         
         if (!showSprings) return;
         
-        Rectangle<int> b = getBounds();
-        b.removeFromTop(TOP);
-        
+        Rectangle<int> b = getLocalBounds();
+        //Rectangle<int> b(selectCB.getX(), selectCB.getBottom(), absoluteKeyboard.getRight() - selectCB.getX(), absoluteKeyboard.getBottom() - selectCB.getBottom());
+        //b.removeFromTop(TOP);
+        b.removeFromTop(selectCB.getBottom());
+
         /*
         g.setColour(Colours::antiquewhite);
         g.setOpacity(1.0);
@@ -493,7 +511,9 @@ void TuningViewController::paint (Graphics& g)
         */
         
         float midi,scalex,posx,radians,cx,cy;
-        float centerx = b.getWidth() * 0.5f, centery = b.getHeight() * 0.65f;
+        float centerx = b.getWidth() * 0.5f;
+        //float centery = b.getHeight() * 0.5f;
+        float centery = b.getCentreY();
         
         float radius_scale = 0.25;
         float radius = jmin(b.getHeight() * radius_scale, b.getWidth() * radius_scale);
@@ -996,6 +1016,8 @@ void TuningPreparationEditor::timerCallback()
             const int yspacing = 3;
             const int xspacing = 3;
             
+            float sliderHeight = tetherStiffnessSlider.getHeight();
+            
             Tuning::Ptr tuning = tProcessor->getTuning();
             Spring::PtrArr tetherSprings =  tuning->getTetherSprings();
             Array<bool> locked = tuning->getSpringTuning()->getTethersLocked();
@@ -1036,11 +1058,31 @@ void TuningPreparationEditor::timerCallback()
                         tetherSliders[i]->setVisible(true);
                          */
                         
-                        tetherSliders[i]->setBounds(tetherStiffnessSlider.getX(), tetherStiffnessSlider.getBottom() + (h + yspacing) * (count + 1*processor.paddingScalarY), tetherStiffnessSlider.getWidth(), h);
+                        /*
+                        tetherSliders[i]->setBounds(tetherStiffnessSlider.getX(),
+                                                    tetherStiffnessSlider.getBottom() + (h + yspacing) * (count + 1*processor.paddingScalarY),
+                                                    tetherStiffnessSlider.getWidth(),
+                                                    h);
+                        */
+                        tetherSliders[i]->setBounds(tetherStiffnessSlider.getX(),
+                                                    tetherStiffnessSlider.getBottom() + sliderHeight * (count),
+                                                    tetherStiffnessSlider.getWidth(),
+                                                    sliderHeight);
+                        
                         tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
                         tetherSliders[i]->setVisible(true);
                         
-                        tetherLabels[i]->setBounds(tetherSliders[i]->getRight() + xspacing, tetherSliders[i]->getY(), 30, h);
+                        /*
+                        tetherLabels[i]->setBounds(tetherSliders[i]->getRight() + xspacing,
+                                                   tetherSliders[i]->getY(),
+                                                   30,
+                                                   h);
+                        */
+                        tetherLabels[i]->setBounds(tetherSliders[i]->getRight() + xspacing,
+                                                   tetherSliders[i]->getY(),
+                                                   30,
+                                                   sliderHeight);
+                        
                         tetherLabels[i]->setText(Utilities::getNoteString(i), dontSendNotification);
                         tetherLabels[i]->setVisible(true);
                         
