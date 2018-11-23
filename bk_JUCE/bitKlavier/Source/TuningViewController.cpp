@@ -80,10 +80,11 @@ showSprings(false)
     addChildComponent(springTuningToggle);
     
     springTuningLabel.setText("Springs", dontSendNotification);
+    springTuningLabel.setJustificationType(Justification::left);
     springTuningLabel.setColour(Label::ColourIds::textColourId, Colours::antiquewhite);
     addChildComponent(springTuningLabel);
     
-    rateSliderLabel.setText("update rate", dontSendNotification);
+    rateSliderLabel.setText("rate", dontSendNotification);
     rateSliderLabel.setColour(Label::ColourIds::textColourId, Colours::antiquewhite);
     addChildComponent(rateSliderLabel);
     
@@ -294,6 +295,12 @@ void TuningViewController::resized()
     
     comboBoxSlice.removeFromLeft(gXSpacing);
     
+    showSpringsButton.setBounds(actionButton.getRight()+gXSpacing,
+                                actionButton.getY(),
+                                actionButton.getWidth(),
+                                actionButton.getHeight());
+    
+    //move this one lower
     A1reset.setBounds(actionButton.getRight()+gXSpacing,
                       actionButton.getY(),
                       actionButton.getWidth(),
@@ -410,8 +417,9 @@ void TuningViewController::resized()
     
     int width = getWidth() * 0.24, height = h;
     //rateSlider.setBounds(getWidth() * 0.75, TOP + 15, width, height);
-    rateSlider.setBounds(scaleCB.getX(), scaleCB.getBottom() + gYSpacing, scaleCB.getWidth(), h);
-    rateSliderLabel.setBounds(rateSlider.getRight() + gXSpacing + gPaddingConst*processor.paddingScalarX, rateSlider.getY(), 120, h);
+    //rateSlider.setBounds(scaleCB.getX(), scaleCB.getBottom() + gYSpacing + 2.*gPaddingConst*processor.paddingScalarX, scaleCB.getWidth(), h);
+    rateSlider.setBounds(fundamentalCB.getX(), fundamentalCB.getBottom() + gYSpacing + 2.*gPaddingConst*processor.paddingScalarX, fundamentalCB.getWidth() * 0.75, h);
+    rateSliderLabel.setBounds(rateSlider.getRight() + xspacing, rateSlider.getY(), 120, h);
     //dragSlider.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, width, height);
     dragSlider.setBounds(rateSlider.getX(), rateSlider.getBottom() + gYSpacing, rateSlider.getWidth(), h);
     dragSliderLabel.setBounds(rateSliderLabel.getX(), dragSlider.getY(), 60, h);
@@ -427,20 +435,28 @@ void TuningViewController::resized()
     //springTuningToggle.setSize(35, 35);
     //springTuningLabel.setBounds(springTuningToggle.getX() - labelWidth, selectCB.getBottom() + gYSpacing, labelWidth, gComponentComboBoxHeight);
     
-    showSpringsButton.setBounds(actionButton.getX(),actionButton.getBottom() + gYSpacing, actionButton.getWidth(), gComponentComboBoxHeight);
-    springTuningToggle.setBounds(showSpringsButton.getX() - 35, showSpringsButton.getY() - 6, 35, 35);
-    springTuningLabel.setBounds(springTuningToggle.getX() - labelWidth, selectCB.getBottom() + gYSpacing, labelWidth, gComponentComboBoxHeight);
-    springScaleCB.setBounds(selectCB.getX(), springTuningLabel.getBottom() + 4*gYSpacing, selectCB.getWidth() * 0.75, gComponentComboBoxHeight);
+    springTuningLabel.setBounds(selectCB.getX(), rateSlider.getY(), labelWidth, gComponentComboBoxHeight);
+    springTuningToggle.setBounds(springTuningLabel.getRight(), springTuningLabel.getY() - 6, 35, 35);
     
-    intervalStiffnessLabel.setBounds(hideOrShow.getX(), springScaleCB.getBottom() + gYSpacing, hideOrShow.getWidth(), h);
-    intervalStiffnessSlider.setBounds(springScaleCB.getX(), springScaleCB.getBottom() + gYSpacing, springScaleCB.getWidth(), h);
+    //showSpringsButton.setBounds(selectCB.getX(), rateSlider.getY(), actionButton.getWidth(), gComponentComboBoxHeight);
+    //springTuningToggle.setBounds(showSpringsButton.getRight() + gYSpacing, showSpringsButton.getY() - 6, 35, 35);
+    //springTuningLabel.setBounds(springTuningToggle.getX() - labelWidth, springTuningToggle.getY() + gYSpacing, labelWidth, gComponentComboBoxHeight);
+    //springTuningLabel.setBounds(springTuningToggle.getRight(), springTuningToggle.getY() + gYSpacing, labelWidth, gComponentComboBoxHeight);
+    //springScaleCB.setBounds(selectCB.getX(), springTuningLabel.getBottom() + 4*gYSpacing, selectCB.getWidth() * 0.75, gComponentComboBoxHeight);
+    //springScaleCB.setBounds(actionButton.getX(), showSpringsButton.getY(), actionButton.getWidth(), gComponentComboBoxHeight);
+    springScaleCB.setBounds(selectCB.getX(), dragSlider.getY(), selectCB.getWidth() * 0.75, h);
+    
+    //intervalStiffnessLabel.setBounds(hideOrShow.getX(), springScaleCB.getBottom() + gYSpacing, hideOrShow.getWidth(), h);
+    //intervalStiffnessSlider.setBounds(springScaleCB.getX(), springScaleCB.getBottom() + gYSpacing, springScaleCB.getWidth(), h);
+    intervalStiffnessLabel.setBounds(hideOrShow.getX(), dragSlider.getBottom() + gYSpacing, hideOrShow.getWidth(), h);
+    intervalStiffnessSlider.setBounds(springScaleCB.getX(), intervalStiffnessLabel.getY(), springScaleCB.getWidth(), h);
     
     tetherStiffnessSlider.setBounds(fundamentalCB.getX(), intervalStiffnessSlider.getY(), fundamentalCB.getWidth() * 0.75, h);
     tetherStiffnessLabel.setBounds(tetherStiffnessSlider.getRight() + xspacing, tetherStiffnessSlider.getY(), 30, h);
     
     for (int i = 0; i < 12; i++)
     {
-        springLabels[i]->setBounds(intervalStiffnessLabel.getX(), intervalStiffnessLabel.getBottom() + (h + yspacing) * (11 - i + 1), hideOrShow.getWidth(), h);
+        springLabels[i]->setBounds(intervalStiffnessLabel.getX(), intervalStiffnessLabel.getBottom() + (h + yspacing) * (11 - i + 1*processor.paddingScalarX), hideOrShow.getWidth(), h);
         springSliders[i]->setBounds(intervalStiffnessSlider.getX(), springLabels[i]->getY(), intervalStiffnessSlider.getWidth(), h);
     }
     
@@ -1020,7 +1036,7 @@ void TuningPreparationEditor::timerCallback()
                         tetherSliders[i]->setVisible(true);
                          */
                         
-                        tetherSliders[i]->setBounds(tetherStiffnessSlider.getX(), tetherStiffnessSlider.getBottom() + (h + yspacing) * (count + 1), tetherStiffnessSlider.getWidth(), h);
+                        tetherSliders[i]->setBounds(tetherStiffnessSlider.getX(), tetherStiffnessSlider.getBottom() + (h + yspacing) * (count + 1*processor.paddingScalarY), tetherStiffnessSlider.getWidth(), h);
                         tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
                         tetherSliders[i]->setVisible(true);
                         
