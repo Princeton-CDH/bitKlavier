@@ -69,7 +69,7 @@ showSprings(false)
     
     
     springTuningToggle.setColour(ToggleButton::textColourId, Colours::antiquewhite);
-    springTuningToggle.setColour(ToggleButton::tickColourId, Colours::antiquewhite);
+    springTuningToggle.setColour(TextButton::buttonOnColourId, Colours::red.withMultipliedAlpha(0.5));
     springTuningToggle.setColour(ToggleButton::tickDisabledColourId, Colours::antiquewhite);
     springTuningToggle.setClickingTogglesState(true);
     springTuningToggle.setTooltip("Turns on/off Spring Tuning.");
@@ -107,7 +107,7 @@ showSprings(false)
     //addChildComponent(tetherStiffnessLabel);
     
     //tetherStiffnessSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
-    tetherStiffnessSlider = new BKSingleSlider("anchor stf", 0., 1., 0.5, 0.0001);
+    tetherStiffnessSlider = new BKSingleSlider("anchor stiff", 0., 1., 0.5, 0.0001);
     //tetherStiffnessSlider.setRange(0., 1.0);
     //tetherStiffnessSlider.setColour(Slider::thumbColourId, Colours::goldenrod.withMultipliedAlpha(0.75));
     addChildComponent(tetherStiffnessSlider);
@@ -118,7 +118,7 @@ showSprings(false)
     
     //intervalStiffnessSlider.setSliderStyle(Slider::SliderStyle::LinearBar);
     //intervalStiffnessSlider.setRange(0., 1.0);
-    intervalStiffnessSlider = new BKSingleSlider("interval stf", 0., 1., 0.5, 0.0001);
+    intervalStiffnessSlider = new BKSingleSlider("interval stiff", 0., 1., 0.5, 0.0001);
     intervalStiffnessSlider->setJustifyRight(false);
     //intervalStiffnessSlider.setColour(Slider::thumbColourId, Colours::goldenrod.withMultipliedAlpha(0.75));
     addChildComponent(intervalStiffnessSlider);
@@ -204,6 +204,7 @@ showSprings(false)
     
     showSpringsButton.setButtonText("Spiral");
     showSpringsButton.setClickingTogglesState(true);
+    showSpringsButton.setColour(TextButton::buttonOnColourId, Colours::red.withMultipliedAlpha(0.5));
     addAndMakeVisible(showSpringsButton);
     
     nToneRootCB.setName("nToneRoot");
@@ -463,7 +464,7 @@ void TuningViewController::resized()
     //intervalStiffnessLabel.setBounds(hideOrShow.getX(), rateSlider->getBottom() + gYSpacing, hideOrShow.getWidth(), sliderHeight);
     intervalStiffnessSlider->setBounds(selectCB.getX() - gComponentSingleSliderXOffset,
                                        rateSlider->getBottom() + gYSpacing,
-                                       rateSlider->getWidth() + 2.*gComponentSingleSliderXOffset,
+                                       rateSlider->getWidth(),
                                        gComponentSingleSliderHeight);
     
     tetherStiffnessSlider->setBounds(fundamentalCB.getX() - gComponentSingleSliderXOffset,
@@ -860,50 +861,54 @@ void TuningViewController::updateComponentVisibility()
         customKeyboard.setVisible(false);
         offsetSlider->setVisible(false);
         
-        rateSlider->setVisible(true);
-        rateSlider->toFront(true);
-        rateSlider->setValue(tuning->getSpringRate(), dontSendNotification);
-        
-        dragSlider->setVisible(true);
-        dragSlider->toFront(true);
-        dragSlider->setValue(1. - tuning->getSpringTuning()->getDrag(), dontSendNotification);
-        
         //rateSliderLabel.setVisible(true);
         //dragSliderLabel.setVisible(true);
         
         //tetherStiffnessLabel.setVisible(true);
-        tetherStiffnessSlider->setVisible(true);
-        tetherStiffnessSlider->toFront(true);
-        tetherStiffnessSlider->setValue(tuning->getSpringTuning()->getTetherStiffness(), dontSendNotification);
         
-        //intervalStiffnessLabel.setVisible(true);
-        intervalStiffnessSlider->setVisible(true);
-        intervalStiffnessSlider->toFront(true);
-        intervalStiffnessSlider->setValue(tuning->getSpringTuning()->getIntervalStiffness(), dontSendNotification);
-        
-        springScaleCB.setVisible(true);
-        springScaleCB.toFront(true);
-        
-        for (int i = 0; i < 12; i++)
+        if(tuning->getSpringsActive())
         {
-            springSliders[i]->setVisible(true);
-            springSliders[i]->toFront(true);
-            springSliders[i]->setValue(springs[i]->getStrength(), dontSendNotification);
+            rateSlider->setVisible(true);
+            rateSlider->toFront(true);
+            rateSlider->setValue(tuning->getSpringRate(), dontSendNotification);
             
-            springLabels[i]->setVisible(true);
+            dragSlider->setVisible(true);
+            dragSlider->toFront(true);
+            dragSlider->setValue(1. - tuning->getSpringTuning()->getDrag(), dontSendNotification);
             
-            toggles[i]->setVisible(true);
-            toggles[i]->toFront(true);
-            toggles[i]->setToggleState(tuning->getTetherLock(i), dontSendNotification);
+            tetherStiffnessSlider->setVisible(true);
+            tetherStiffnessSlider->toFront(true);
+            tetherStiffnessSlider->setValue(tuning->getSpringTuning()->getTetherStiffness(), dontSendNotification);
             
-            toggleLabels[i]->setVisible(true);
+            //intervalStiffnessLabel.setVisible(true);
+            intervalStiffnessSlider->setVisible(true);
+            intervalStiffnessSlider->toFront(true);
+            intervalStiffnessSlider->setValue(tuning->getSpringTuning()->getIntervalStiffness(), dontSendNotification);
             
-        }
-        
-        for (int i = 0; i < 128; i++)
-        {
-            tetherSliders[i]->toFront(true);
-            tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
+            springScaleCB.setVisible(true);
+            springScaleCB.toFront(true);
+            
+            for (int i = 0; i < 12; i++)
+            {
+                springSliders[i]->setVisible(true);
+                springSliders[i]->toFront(true);
+                springSliders[i]->setValue(springs[i]->getStrength(), dontSendNotification);
+                
+                springLabels[i]->setVisible(true);
+                
+                toggles[i]->setVisible(true);
+                toggles[i]->toFront(true);
+                toggles[i]->setToggleState(tuning->getTetherLock(i), dontSendNotification);
+                
+                toggleLabels[i]->setVisible(true);
+                
+            }
+            
+            for (int i = 0; i < 128; i++)
+            {
+                tetherSliders[i]->toFront(true);
+                tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
+            }
         }
         
     }
@@ -994,6 +999,7 @@ void TuningPreparationEditor::timerCallback()
     {
         TuningProcessor::Ptr tProcessor = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
         TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+        Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         
         if (tProcessor != nullptr)
         {
@@ -1020,6 +1026,7 @@ void TuningPreparationEditor::timerCallback()
             }
         }
         
+        //if (showSprings && tuning->getSpringsActive())
         if (showSprings)
         {
             /*
@@ -1087,7 +1094,7 @@ void TuningPreparationEditor::timerCallback()
                                                     sliderHeight);
                         
                         tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
-                        tetherSliders[i]->setVisible(true);
+                        if(tuning->getSpringsActive())tetherSliders[i]->setVisible(true);
                         
                         /*
                         tetherLabels[i]->setBounds(tetherSliders[i]->getRight() + xspacing,
@@ -1101,7 +1108,7 @@ void TuningPreparationEditor::timerCallback()
                                                    sliderHeight);
                         
                         tetherLabels[i]->setText(Utilities::getNoteString(i), dontSendNotification);
-                        tetherLabels[i]->setVisible(true);
+                        if(tuning->getSpringsActive()) tetherLabels[i]->setVisible(true);
                         
                         
                         
@@ -1555,6 +1562,8 @@ void TuningPreparationEditor::buttonClicked (Button* b)
             tuning->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
         else
             tuning->getSpringTuning()->setTetherTuning(EqualTemperament);
+        
+        updateComponentVisibility();
     }
     else
     {
