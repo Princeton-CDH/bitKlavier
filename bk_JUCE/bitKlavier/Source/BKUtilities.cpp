@@ -665,6 +665,21 @@ double ftom( double f )
     return (f > 0 ? (log(f / 440.0) / LOGTWO) * 12.0 + 69 : -1500);
 }
 
+
+
+//these require inval to be between 0 and 1, and k != 1
+double dt_asymwarp(double inval, double k)
+{
+    return (pow(k, inval) - 1.) / (k - 1.);
+}
+
+double dt_asymwarp_inverse(double inval, double k)
+{
+    return log(inval*(k-1) + 1) / log(k);
+}
+
+
+
 #if BK_UNIT_TESTS
 
 #define	MAX_FREQ 20000.f

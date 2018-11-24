@@ -1410,6 +1410,8 @@ void TuningPreparationEditor::update(void)
         //NEED TO CHANGE THE FOLLOWING AFTER SPRING TUNING IS FULLY INTEGRATED
         tetherStiffnessSlider->setValue(tuning->getSpringTuning()->getTetherStiffness(), dontSendNotification);
         intervalStiffnessSlider->setValue(tuning->getSpringTuning()->getIntervalStiffness(), dontSendNotification);
+        
+        //dragSlider->setValue(  //must remember to use dt_asym_inversion on 1 - val)
     }
     
     updateComponentVisibility();
@@ -1503,7 +1505,9 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(String name, double val
     }
     else if (name == dragSlider->getName())
     {
-        tuning->getSpringTuning()->setDrag(1. - val);
+        double newval = dt_asymwarp(val, 100.);
+        //DBG("warped = " + String(newval) + " inverted = " + String(dt_asymwarp_inverse(newval, 100.)));
+        tuning->getSpringTuning()->setDrag(1. - newval);
     }
     else if (name == tetherStiffnessSlider->getName())
     {
