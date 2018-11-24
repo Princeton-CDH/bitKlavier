@@ -143,6 +143,7 @@ void BKAudioProcessor::updateGalleries()
     mainPianoSynth.updateGeneralSettings(gallery->getGeneralSettings());
     hammerReleaseSynth.updateGeneralSettings(gallery->getGeneralSettings());
     resonanceReleaseSynth.updateGeneralSettings(gallery->getGeneralSettings());
+    pedalSynth.updateGeneralSettings(gallery->getGeneralSettings());
     
     clipboard.clear();
     
