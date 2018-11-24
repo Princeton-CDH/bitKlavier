@@ -161,7 +161,7 @@ showSprings(false)
     
     A1IntervalScaleLabel.setText("Adaptive:", dontSendNotification);
     //A1IntervalScaleLabel.setJustificationType(juce::Justification::centredRight);
-    addAndMakeVisible(A1IntervalScaleLabel);
+    //addAndMakeVisible(A1IntervalScaleLabel);
     
     A1Inversional.setButtonText ("invert");
     A1Inversional.setToggleState (true, dontSendNotification);
@@ -291,28 +291,35 @@ void TuningViewController::resized()
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    comboBoxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
+    //comboBoxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
+    comboBoxSlice.removeFromRight(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
-    
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    actionButton.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    /*
     actionButton.setBounds(selectCB.getRight()+gXSpacing,
                            selectCB.getY(),
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
-    
+    */
     comboBoxSlice.removeFromLeft(gXSpacing);
-    
+    showSpringsButton.setBounds(comboBoxSlice);
+    /*
     showSpringsButton.setBounds(actionButton.getRight()+gXSpacing,
                                 actionButton.getY(),
                                 actionButton.getWidth(),
                                 actionButton.getHeight());
+     */
     
     //move this one lower
+    /*
     A1reset.setBounds(actionButton.getRight()+gXSpacing,
                       actionButton.getY(),
                       actionButton.getWidth(),
                       actionButton.getHeight());
+    */
     
     
     /* *** above here should be generic (mostly) to all prep layouts *** */
@@ -321,11 +328,15 @@ void TuningViewController::resized()
     // ********* right column
     
     Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
-    modeSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
+    //modeSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
+    modeSlice.removeFromLeft(gXSpacing);
     modeSlice.removeFromRight(gXSpacing);
+    springTuningToggle.setBounds(modeSlice.removeFromLeft(showSpringsButton.getWidth()));
+    modeSlice.removeFromLeft(gXSpacing);
     scaleCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
     
-    modeSlice.removeFromLeft(gXSpacing + gPaddingConst * processor.paddingScalarX);
+    //modeSlice.removeFromLeft(gXSpacing + gPaddingConst * processor.paddingScalarX);
+    modeSlice.removeFromLeft(gXSpacing);
     fundamentalCB.setBounds(modeSlice);
     
     int customKeyboardHeight = 80 + 70. * processor.paddingScalarY;
@@ -363,7 +374,9 @@ void TuningViewController::resized()
     int tempwidth = A1IntervalScaleCBSlice.getWidth() / 3.;
     A1Inversional.setBounds(A1IntervalScaleCBSlice.removeFromRight(tempwidth));
     A1IntervalScaleCB.setBounds(A1IntervalScaleCBSlice.removeFromRight(tempwidth));
-    A1IntervalScaleLabel.setBounds(A1IntervalScaleCBSlice);
+    //A1IntervalScaleLabel.setBounds(A1IntervalScaleCBSlice);
+    A1IntervalScaleCBSlice.removeFromRight(gXSpacing);
+    A1reset.setBounds(A1IntervalScaleCBSlice);
     
     leftColumn.removeFromTop(extraY + gYSpacing);
     Rectangle<int> A1ClusterMaxSlice = leftColumn.removeFromTop(gComponentSingleSliderHeight);
@@ -445,7 +458,7 @@ void TuningViewController::resized()
     //springTuningLabel.setBounds(springTuningToggle.getX() - labelWidth, selectCB.getBottom() + gYSpacing, labelWidth, gComponentComboBoxHeight);
     
     //springTuningLabel.setBounds(selectCB.getX(), rateSlider->getY(), labelWidth, gComponentComboBoxHeight);
-    springTuningToggle.setBounds(showSpringsButton.getX(), dragSlider->getY(), showSpringsButton.getWidth(), showSpringsButton.getHeight());
+    //springTuningToggle.setBounds(showSpringsButton.getX(), dragSlider->getY(), showSpringsButton.getWidth(), showSpringsButton.getHeight());
     
     //showSpringsButton.setBounds(selectCB.getX(), rateSlider.getY(), actionButton.getWidth(), gComponentComboBoxHeight);
     //springTuningToggle.setBounds(showSpringsButton.getRight() + gYSpacing, showSpringsButton.getY() - 6, 35, 35);
