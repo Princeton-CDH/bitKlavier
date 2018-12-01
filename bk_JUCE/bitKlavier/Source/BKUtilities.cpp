@@ -672,11 +672,13 @@ double ftom( double f )
 //help focus one extreme or another of a slider range
 double dt_asymwarp(double inval, double k)
 {
+    if(k==1) return inval;
     return (pow(k, inval) - 1.) / (k - 1.);
 }
 
 double dt_asymwarp_inverse(double inval, double k)
 {
+    if(k==1) return inval;
     return log(inval*(k-1) + 1) / log(k);
 }
 

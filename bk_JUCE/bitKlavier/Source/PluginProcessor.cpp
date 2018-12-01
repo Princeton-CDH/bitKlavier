@@ -711,9 +711,15 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
 {
     buffer.clear();
     
-    
     if (!didLoadMainPianoSamples) return;
     
+    if(wrapperType == wrapperType_AudioUnit || wrapperType == wrapperType_VST || wrapperType ==wrapperType_VST3)
+    {
+        playHead = this->getPlayHead();
+        playHead->getCurrentPosition (currentPositionInfo);
+        //DBG("DAW bpm = " + String(currentPositionInfo.bpm));
+    }
+ 
     int time;
     MidiMessage m;
     bool didNoteOffs = false;
