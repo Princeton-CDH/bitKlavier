@@ -679,7 +679,8 @@ void TuningViewController::paint (Graphics& g)
                 //DBG("midi = " + String(midi));
                 midiScale = midi / 60.;
                 
-                int cents = roundToInt(((midi - (float)p->getNote())) * 100.0);
+                //int cents = roundToInt(((midi - (float)p->getNote())) * 100.0);
+                int cents = round(((midi - (float)p->getNote())) * 100.0);
                 
                 scalex = ((midi - 60.0f) / 12.0f);
                 

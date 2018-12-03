@@ -321,6 +321,10 @@ private:
     Array<int> notesOffUI;
     
     File lastGalleryPath;
+    
+    AudioPlayHead* playHead;
+    AudioPlayHead::CurrentPositionInfo currentPositionInfo;
+    double hostTempo;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)
