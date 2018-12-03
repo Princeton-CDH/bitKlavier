@@ -370,6 +370,8 @@ void SpringTuningModel::addSpringsByNote(int note)
     
     DBG("addedSpring " + String(note));
 }
+
+//DT: wondering if there is a more efficient way to do this, rather than reading throug the whole spring array?
 void SpringTuningModel::removeSpringsByNote(int note)
 {
 	Particle* p = particleArray[note];

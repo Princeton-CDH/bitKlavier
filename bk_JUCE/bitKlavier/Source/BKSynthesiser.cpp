@@ -359,6 +359,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                float adsrReleaseMS,
                                TuningProcessor::Ptr tuner)
     {
+        DBG("BKSynthesiser::keyOn " + String(keyNoteNumber) + " " + String(midiNoteNumber));
+        
         const ScopedLock sl (lock);
         
         int noteNumber = midiNoteNumber;
@@ -472,6 +474,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                     TuningProcessor::Ptr tuner
                                     )
     {
+        DBG("BKSynthesiser::startVoice " + String(keyNoteNumber) + " " + String(midiNoteNumber));
+        
         if (voice != nullptr && sound != nullptr)
         {
             if (voice->currentlyPlayingSound != nullptr)
@@ -534,6 +538,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                 const float velocity,
                                 bool allowTailOff)
     {
+        
+        DBG("BKSynthesiser::keyOff " + String(keyNoteNumber) + " " + String(midiNoteNumber));
         const ScopedLock sl (lock);
         
         for (int i = voices.size(); --i >= 0;)
@@ -575,7 +581,9 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             
             bool appliesToNote = sound->appliesToNote (noteNumber);
             bool appliesToVel = sound->appliesToVelocity((int)(velocity*127.0));
-            bool isRelease = (sound->trigger == sfzero::Region::release) || (sound->trigger == sfzero::Region::release_key);
+            bool isRelease = false;
+            //DT: TESTING TO SEE IF THIS IS WHAT IS CAUSING GHOST RELEASE NOTES; seems to be, so we need to find another fix....
+            //bool isRelease = (sound->trigger == sfzero::Region::release) || (sound->trigger == sfzero::Region::release_key);
             bool pedalStatesMatch = (sustainPedalsDown[midiChannel] == sound->pedal);
             
             if (appliesToNote && appliesToVel && isRelease && pedalStatesMatch)
@@ -596,7 +604,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                             0.001f,                 //  A
                             0.001f,                 //  D
                             1.0f,                   //  S
-                            0.001f, nullptr);                //  R
+                            0.001f,                 // R
+                            nullptr);
                 
                 // break;
                 

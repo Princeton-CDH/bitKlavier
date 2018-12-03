@@ -230,6 +230,11 @@ Array<float>    stringOrderedPairsToFloatArray(String s, int size);
 double          mtof(double f);
 double          ftom(double f);
 
+
+//these require inval to be between 0 and 1, and k != 1
+double          dt_asymwarp(double inval, double k);
+double          dt_asymwarp_inverse(double inval, double k);
+
 String rectangleToString(Rectangle<int> rect);
 String rectangleToString(Rectangle<float> rect);
 

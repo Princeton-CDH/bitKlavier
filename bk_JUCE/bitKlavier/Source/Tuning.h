@@ -256,14 +256,14 @@ public:
     }
 
     inline void setCustomScaleCents(Array<float> tuning) {
-        for(int i=0; i<tCustom.size(); i++)
+        for(int i=0; i<tCustom.size() && i<tuning.size(); i++)
         {
             tCustom.setUnchecked(i, tuning.getUnchecked(i) * 0.01f);
         }
     }
     
     inline void setAbsoluteOffsetCents(Array<float> abs) {
-        for(int i=tAbsolute.size(); --i >= 0;)
+        for(int i=0; i<tAbsolute.size() && i<abs.size(); i++)
             tAbsolute.setUnchecked(i, abs.getUnchecked(i) * 0.01f);
     }
     

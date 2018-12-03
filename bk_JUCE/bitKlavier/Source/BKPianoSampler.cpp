@@ -170,16 +170,16 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
         double midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(x - 1200.0 * octave)), 128) - 60.0 + (octave * 12.0);
         
         pitchRatio =    powf(2.0f, (midi - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
-        sound->sourceSampleRate *
-        generalSettings->getTuningRatio() /
-        getSampleRate();
+                            sound->sourceSampleRate *
+                            generalSettings->getTuningRatio() /
+                            getSampleRate();
     }
     else
     {
         pitchRatio =    powf(2.0f, (cookedNote - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
-        sound->sourceSampleRate *
-        generalSettings->getTuningRatio() /
-        getSampleRate();
+                            sound->sourceSampleRate *
+                            generalSettings->getTuningRatio() /
+                            getSampleRate();
     }
         
     bentRatio = pitchbendMultiplier * pitchRatio;
@@ -202,6 +202,8 @@ void BKPianoSamplerVoice::startNote (const int midi,
 {
     if (const BKPianoSamplerSound* const sound = dynamic_cast<const BKPianoSamplerSound*> (s))
     {
+        DBG("BKPianoSamplerVoice::startNote " + String(midi));
+        
         midiNoteNumber = midi;
         cookedNote = ((float)midi + pitchoffset);
         pitchWheel = pitchWheelValue;
@@ -754,8 +756,8 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
 {
     const float* const inL = playingSound->data->getAudioSampleBuffer()->getReadPointer (0);
     const float* const inR = playingSound->data->getAudioSampleBuffer()->getNumChannels() > 1
-    ? playingSound->data->getAudioSampleBuffer()->getReadPointer (1)
-    : nullptr;
+                                ? playingSound->data->getAudioSampleBuffer()->getReadPointer (1)
+                                : nullptr;
     
     float* outL = outputBuffer.getWritePointer (0, startSample);
     float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
