@@ -16,16 +16,16 @@
 #include "Particle.h"
 #include "Spring.h"
 
-class SpringTuningModel : public ReferenceCountedObject, private HighResolutionTimer
+class SpringProcessor : public ReferenceCountedObject, private HighResolutionTimer
 {
 public:
-    typedef ReferenceCountedObjectPtr<SpringTuningModel> Ptr;
+    typedef ReferenceCountedObjectPtr<SpringProcessor> Ptr;
     
-    SpringTuningModel(SpringTuningModel::Ptr st = nullptr);
-    ~SpringTuningModel(){stopTimer();};
+    SpringProcessor(SpringProcessor::Ptr st = nullptr);
+    ~SpringProcessor(){stopTimer();};
 	void simulate();
     
-    void copy(SpringTuningModel::Ptr st);
+    void copy(SpringProcessor::Ptr st);
 
 	void toggleSpring();
 

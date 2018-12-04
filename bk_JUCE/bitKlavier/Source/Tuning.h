@@ -328,10 +328,10 @@ public:
     
     Tuning(TuningPreparation::Ptr prep,
            int Id,
-           SpringTuningModel::Ptr st = nullptr):
+           SpringProcessor::Ptr st = nullptr):
     sPrep(new TuningPreparation(prep)),
     aPrep(new TuningPreparation(sPrep)),
-    stuning(new SpringTuningModel(st)),
+    stuning(new SpringProcessor(st)),
     Id(Id),
     name(String(Id))
     {
@@ -352,7 +352,7 @@ public:
     {
 		sPrep = new TuningPreparation();
 		aPrep = new TuningPreparation(sPrep);
-        stuning = new SpringTuningModel();
+        stuning = new SpringProcessor();
         
 		if (random) randomize();
         
@@ -519,7 +519,7 @@ public:
     inline void setSpringStiffness(double stiff) { stuning->setStiffness(stiff);}
     inline double getSpringStiffness(void) {return stuning->getStiffness();}
     
-    inline SpringTuningModel::Ptr getSpringTuning(void) { return stuning; }
+    inline SpringProcessor::Ptr getSpringTuning(void) { return stuning; }
     
     
     
@@ -532,7 +532,7 @@ private:
     
     Array<float> getTuningOffsets(TuningSystem which) {return tuningLibrary.getUnchecked(which); }
     
-    SpringTuningModel::Ptr stuning;
+    SpringProcessor::Ptr stuning;
     
     const Array<float> tEqualTuning = Array<float>( {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.} );
 	const Array<float> tJustTuning = Array<float>({ 0., .117313, .039101, .156414, -.13686, -.019547, -.174873, .019547, .136864, -.15641, -.311745, -.11731 });

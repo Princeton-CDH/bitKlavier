@@ -13,7 +13,7 @@
 
 using namespace std;
 
-void SpringTuningModel::copy(SpringTuningModel::Ptr st)
+void SpringProcessor::copy(SpringProcessor::Ptr st)
 {
     rate = st->getRate();
     stiffness = st->getStiffness();
@@ -29,7 +29,7 @@ void SpringTuningModel::copy(SpringTuningModel::Ptr st)
     }
 }
 
-SpringTuningModel::SpringTuningModel(SpringTuningModel::Ptr st):
+SpringProcessor::SpringProcessor(SpringProcessor::Ptr st):
 scaleId(JustTuning),
 tetherStiffness(0.5),
 intervalStiffness(0.5),
@@ -108,7 +108,7 @@ active(false)
     setRate(rate);
 }
 
-void SpringTuningModel::setTetherTuning(Array<float> tuning)
+void SpringProcessor::setTetherTuning(Array<float> tuning)
 {
     tetherTuning = tuning;
     
@@ -122,7 +122,7 @@ void SpringTuningModel::setTetherTuning(Array<float> tuning)
     }
 }
 
-void SpringTuningModel::setIntervalTuning(Array<float> tuning)
+void SpringProcessor::setIntervalTuning(Array<float> tuning)
 {
     intervalTuning = tuning;
 
@@ -137,7 +137,7 @@ void SpringTuningModel::setIntervalTuning(Array<float> tuning)
 }
 
 //#define DRAG 1.0f //expose this!!
-void SpringTuningModel::simulate()
+void SpringProcessor::simulate()
 {
     for (auto particle : particleArray)
     {
@@ -164,7 +164,7 @@ void SpringTuningModel::simulate()
 	}
 }
 
-void SpringTuningModel::setSpringWeight(int which, double weight)
+void SpringProcessor::setSpringWeight(int which, double weight)
 {
     for (auto spring : springArray)
     {
@@ -177,7 +177,7 @@ void SpringTuningModel::setSpringWeight(int which, double weight)
     }
 }
 
-double SpringTuningModel::getSpringWeight(int which)
+double SpringProcessor::getSpringWeight(int which)
 {
     // find first spring with interval that matches which and return its weight
     for (auto spring : springArray)
@@ -187,7 +187,7 @@ double SpringTuningModel::getSpringWeight(int which)
     return 0.0;
 }
 
-void SpringTuningModel::setTetherWeight(int which, double weight)
+void SpringProcessor::setTetherWeight(int which, double weight)
 {
     int pc = which % 12;
     if (tetherLocked[pc])
@@ -253,17 +253,17 @@ void SpringTuningModel::setTetherWeight(int which, double weight)
     
 }
 
-double SpringTuningModel::getTetherWeight(int which)
+double SpringProcessor::getTetherWeight(int which)
 {
     return tetherSpringArray[which]->getStrength();
 }
 
-bool SpringTuningModel::getTetherSpringEnabled(int which)
+bool SpringProcessor::getTetherSpringEnabled(int which)
 {
     return tetherSpringArray[which]->getEnabled();
 }
 
-bool SpringTuningModel::getSpringEnabled(int which)
+bool SpringProcessor::getSpringEnabled(int which)
 {
     for (auto spring : springArray)
     {
@@ -272,12 +272,12 @@ bool SpringTuningModel::getSpringEnabled(int which)
     return false;
 }
 
-String SpringTuningModel::getTetherSpringName(int which)
+String SpringProcessor::getTetherSpringName(int which)
 {
     return tetherSpringArray[which]->getName();
 }
 
-String SpringTuningModel::getSpringName(int which)
+String SpringProcessor::getSpringName(int which)
 {
     for (auto spring : springArray)
     {
@@ -286,41 +286,41 @@ String SpringTuningModel::getSpringName(int which)
     return "";
 }
 
-void SpringTuningModel::toggleSpring()
+void SpringProcessor::toggleSpring()
 {
 	//tbd
 }
 
-void SpringTuningModel::addParticle(int note)
+void SpringProcessor::addParticle(int note)
 {;
     particleArray[note]->setEnabled(true);
     tetherParticleArray[note]->setEnabled(true);
     DBG("addedParticle " + String(note));
 }
-void SpringTuningModel::removeParticle(int note)
+void SpringProcessor::removeParticle(int note)
 {
     Particle* p = particleArray[note];
     p->setEnabled(false);
     tetherParticleArray[note]->setEnabled(false);
 }
-void SpringTuningModel::addNote(int note)
+void SpringProcessor::addNote(int note)
 {
     addParticle(note);
     addSpringsByNote(note);
 }
 
-void SpringTuningModel::removeNote(int note)
+void SpringProcessor::removeNote(int note)
 {
     removeParticle(note);
     removeSpringsByNote(note);
 }
 
-void SpringTuningModel::removeAllNotes(void)
+void SpringProcessor::removeAllNotes(void)
 {
     for (int i = 0; i < 128; i++) removeNote(i);
 }
 
-void SpringTuningModel::toggleNote(int noteIndex)
+void SpringProcessor::toggleNote(int noteIndex)
 {
 	int convertedIndex = noteIndex; // just in case a midi value is passed accidentally
 
@@ -334,17 +334,17 @@ void SpringTuningModel::toggleNote(int noteIndex)
 	}
 }
 
-void SpringTuningModel::addSpring(Spring* s)
+void SpringProcessor::addSpring(Spring* s)
 {
     s->setEnabled(true);
 }
 
-void SpringTuningModel::removeSpring(Spring* s)
+void SpringProcessor::removeSpring(Spring* s)
 {
     s->setEnabled(false);
     
 }
-void SpringTuningModel::addSpringsByNote(int note)
+void SpringProcessor::addSpringsByNote(int note)
 {
     Particle* p = particleArray[note];
     for (auto spring : springArray)
@@ -372,7 +372,7 @@ void SpringTuningModel::addSpringsByNote(int note)
 }
 
 //DT: wondering if there is a more efficient way to do this, rather than reading throug the whole spring array?
-void SpringTuningModel::removeSpringsByNote(int note)
+void SpringProcessor::removeSpringsByNote(int note)
 {
 	Particle* p = particleArray[note];
 	for (auto spring : springArray)
@@ -389,12 +389,12 @@ void SpringTuningModel::removeSpringsByNote(int note)
     tetherSpringArray[note]->setEnabled(false);
 }
 
-double SpringTuningModel::getFrequency(int note)
+double SpringProcessor::getFrequency(int note)
 {
 	return Utilities::centsToFreq((int) particleArray[note]->getX());
 }
 
-void SpringTuningModel::print()
+void SpringProcessor::print()
 {
     DBG("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
 	for (int i = 0; i < 128; i++)
@@ -407,7 +407,7 @@ void SpringTuningModel::print()
 	}
 }
 
-void SpringTuningModel::printParticles()
+void SpringProcessor::printParticles()
 {
 	for (int i = 0; i < 128; i++)
 	{
@@ -415,7 +415,7 @@ void SpringTuningModel::printParticles()
 	}
 }
 
-void SpringTuningModel::printActiveParticles()
+void SpringProcessor::printActiveParticles()
 {
 	for (int i = 0; i < 128; i++)
 	{
@@ -423,7 +423,7 @@ void SpringTuningModel::printActiveParticles()
 	}
 }
 
-void SpringTuningModel::printActiveSprings()
+void SpringProcessor::printActiveSprings()
 {
 	for (auto spring : springArray)
 	{
@@ -431,7 +431,7 @@ void SpringTuningModel::printActiveSprings()
 	}
 }
 
-bool SpringTuningModel::checkEnabledParticle(int index)
+bool SpringProcessor::checkEnabledParticle(int index)
 {
 	return particleArray[index]->getEnabled();
 }
