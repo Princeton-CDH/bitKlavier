@@ -3,7 +3,7 @@
 
     SpringTuning.cpp
     Created: 3 Aug 2018 3:43:46pm
-    Author:  Theo
+    Author:  Theo, Mike, Dan
 
   ==============================================================================
 */
@@ -17,6 +17,14 @@ void SpringTuning::copy(SpringTuning::Ptr st)
 {
     rate = st->getRate();
     stiffness = st->getStiffness();
+    active = st->getActive();
+    
+    intervalStiffness = st->getIntervalStiffness();
+    tetherStiffness = st->getTetherStiffness();
+    
+    setIntervalTuning(st->getIntervalTuning());
+    setTetherTuning(st->getTetherTuning());
+    
     for (int i = 0; i < 12; i++)
     {
         setSpringWeight(i, st->getSpringWeight(i));
@@ -139,6 +147,11 @@ void SpringTuning::simulate()
 {
     for (auto particle : particleArray)
     {
+        if (particle->getNote() == 60)
+        {
+            printf("simulate pointer: %p\n", (void*)this);
+            //DBG("p: " + String(particle->getNote()) + " enabled: " + String((int)particle->getEnabled()) + " locked: " + String((int)particle->getLocked()));
+        }
 		if (particle->getEnabled() && !particle->getLocked())
         {
             particle->integrate(drag);
@@ -290,10 +303,11 @@ void SpringTuning::toggleSpring()
 }
 
 void SpringTuning::addParticle(int note)
-{;
+{
     particleArray[note]->setEnabled(true);
     tetherParticleArray[note]->setEnabled(true);
-    DBG("addedParticle " + String(note));
+    printf("add particle pointer: %p\n", (void*)this);
+    //DBG("particle " + String(note) + " enabled? " + String((int)particleArray[note]->getEnabled()) );
 }
 void SpringTuning::removeParticle(int note)
 {
@@ -355,18 +369,24 @@ void SpringTuning::addSpringsByNote(int note)
 			// sets the spring to enabled if one spring matches the index and the other is enabled
 			if (a == p)
 			{
-				if (b->getEnabled()) spring->setEnabled(true);
+				if (b->getEnabled())
+                {
+                    DBG("added spring: " + String(a->getNote()) + " " + String(b->getNote()));
+                    spring->setEnabled(true);
+                }
 			}
 			else if (b == p)
 			{
-				if (a->getEnabled()) spring->setEnabled(true);
+				if (a->getEnabled())
+                {
+                    DBG("added spring: " + String(a->getNote()) + " " + String(b->getNote()));
+                    spring->setEnabled(true);
+                }
 			}
         }
 	}
     
     tetherSpringArray[note]->setEnabled(true);
-    
-    DBG("addedSpring " + String(note));
 }
 
 //DT: wondering if there is a more efficient way to do this, rather than reading throug the whole spring array?

@@ -202,7 +202,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
 {
     if (const BKPianoSamplerSound* const sound = dynamic_cast<const BKPianoSamplerSound*> (s))
     {
-        DBG("BKPianoSamplerVoice::startNote " + String(midi));
+        //DBG("BKPianoSamplerVoice::startNote " + String(midi));
         
         midiNoteNumber = midi;
         cookedNote = ((float)midi + pitchoffset);

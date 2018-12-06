@@ -178,6 +178,7 @@ public:
         ValueTree tethers( "tethers");
         ValueTree springs( "springs");
         ValueTree tetherLocks( "locks");
+        ValueTree intervalScale("intervalScale");
         
         for (int i = 0; i < 128; i++)
         {
@@ -188,30 +189,44 @@ public:
         {
             springs.setProperty( "s"+String(i), getSpringWeight(i), 0 );
             tetherLocks.setProperty("tl"+String(i), getTetherLock(i) ? 1 : 0, 0);
-            
+            intervalScale.setProperty("s"+String(i), intervalTuning[i], 0);
         }
         prep.addChild(tethers, -1, 0);
         prep.addChild(springs, -1, 0);
         prep.addChild(tetherLocks, -1, 0);
+        prep.addChild(intervalScale, -1, 0);
 
         return prep;
     }
     
     void setState(XmlElement* e)
     {
+        active = (bool) e->getStringAttribute("active").getIntValue();
+        
         setRate(e->getStringAttribute("rate").getDoubleValue());
         
         setStiffness(e->getStringAttribute("stiffness").getDoubleValue());
         setTetherStiffness(e->getStringAttribute("tetherStiffness").getDoubleValue());
         setIntervalStiffness(e->getStringAttribute("intervalStiffness").getDoubleValue());
         
-        active = (bool) e->getStringAttribute("active").getIntValue();
-        
         scaleId = (TuningSystem) e->getStringAttribute("scaleId").getIntValue();
         
         forEachXmlChildElement (*e, sub)
         {
-            if (sub->hasTagName("tethers"))
+            if (sub->hasTagName("intervalScale"))
+            {
+                Array<float> scale;
+                for (int i = 0; i < 12; i++)
+                {
+                    String attr = sub->getStringAttribute("s" + String(i));
+                    
+                    if (attr == "") scale.add(0.0);
+                    else            scale.add(attr.getFloatValue());
+                }
+                
+                setIntervalTuning(scale);
+            }
+            else if (sub->hasTagName("tethers"))
             {
                 Array<float> scale;
                 for (int i = 0; i < 128; i++)
@@ -230,7 +245,6 @@ public:
             }
             else if (sub->hasTagName("springs"))
             {
-                Array<float> scale;
                 for (int i = 0; i < 12; i++)
                 {
                     String attr = sub->getStringAttribute("s" + String(i));
@@ -247,7 +261,6 @@ public:
             }
             else if (sub->hasTagName("locks"))
             {
-                Array<float> scale;
                 for (int i = 0; i < 12; i++)
                 {
                     String attr = sub->getStringAttribute("tl" + String(i));

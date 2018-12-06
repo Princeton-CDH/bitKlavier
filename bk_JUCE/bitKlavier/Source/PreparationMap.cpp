@@ -337,7 +337,7 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
 void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bool soundfont)
 {
     
-    DBG("PreparationMap::keyReleased : " + String(noteNumber));
+    //DBG("PreparationMap::keyReleased : " + String(noteNumber));
     
     if(sustainPedalIsDepressed && pKeymap->containsNote(noteNumber))
     {

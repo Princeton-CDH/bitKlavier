@@ -359,7 +359,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                float adsrReleaseMS,
                                TuningProcessor::Ptr tuner)
     {
-        DBG("BKSynthesiser::keyOn " + String(keyNoteNumber) + " " + String(midiNoteNumber));
+        //DBG("BKSynthesiser::keyOn " + String(keyNoteNumber) + " " + String(midiNoteNumber));
         
         const ScopedLock sl (lock);
         
@@ -474,7 +474,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                     TuningProcessor::Ptr tuner
                                     )
     {
-        DBG("BKSynthesiser::startVoice " + String(keyNoteNumber) + " " + String(midiNoteNumber));
+        //DBG("BKSynthesiser::startVoice " + String(keyNoteNumber) + " " + String(midiNoteNumber));
         
         if (voice != nullptr && sound != nullptr)
         {
@@ -539,7 +539,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                 bool allowTailOff)
     {
         
-        DBG("BKSynthesiser::keyOff " + String(keyNoteNumber) + " " + String(midiNoteNumber));
+        //DBG("BKSynthesiser::keyOff " + String(keyNoteNumber) + " " + String(midiNoteNumber));
         const ScopedLock sl (lock);
         
         for (int i = voices.size(); --i >= 0;)

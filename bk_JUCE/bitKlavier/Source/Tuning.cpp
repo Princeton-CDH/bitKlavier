@@ -476,8 +476,12 @@ void Tuning::setState(XmlElement* e)
         }
     }
     
+    sPrep->getSpringTuning()->setTetherTuning(getStaticScale());
+    
     // copy static to active
     aPrep->copy( sPrep);
+    
+    
 }
 
 #if BK_UNIT_TESTS

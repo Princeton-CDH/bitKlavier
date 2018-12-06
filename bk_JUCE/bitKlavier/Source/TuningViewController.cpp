@@ -1295,6 +1295,8 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         TuningSystem springScaleId = (TuningSystem) index;
         
+        if (springScaleId >= AdaptiveTuning) springScaleId = (TuningSystem)((int)springScaleId + 2);
+        
         prep->getSpringTuning()->setScaleId(springScaleId);
         active->getSpringTuning()->setScaleId(springScaleId);
         
@@ -1303,7 +1305,6 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         prep->getSpringTuning()->setIntervalTuning(scale);
         active->getSpringTuning()->setIntervalTuning(scale);
     }
-    
     
     processor.gallery->setGalleryDirty(true);
 }
@@ -1382,10 +1383,13 @@ void TuningPreparationEditor::update(void)
         nToneRootOctaveCB.setSelectedItemIndex(prep->getNToneRootOctave(), dontSendNotification);
         nToneSemitoneWidthSlider->setValue(prep->getNToneSemitoneWidth(), dontSendNotification);
         
-        //NEED TO CHANGE THE FOLLOWING AFTER SPRING TUNING IS FULLY INTEGRATED
+        rateSlider->setValue(prep->getSpringTuning()->getRate(), dontSendNotification);
+        
         tetherStiffnessSlider->setValue(prep->getSpringTuning()->getTetherStiffness(), dontSendNotification);
         intervalStiffnessSlider->setValue(prep->getSpringTuning()->getIntervalStiffness(), dontSendNotification);
-        
+
+        springTuningToggle.setToggleState(prep->getSpringsActive(), dontSendNotification);
+
         //dragSlider->setValue(  //must remember to use dt_asym_inversion on 1 - val)
     }
     

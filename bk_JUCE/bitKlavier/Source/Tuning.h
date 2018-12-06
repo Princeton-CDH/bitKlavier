@@ -61,7 +61,8 @@ public:
         tAbsolute = p->getAbsoluteOffsets();
         nToneSemitoneWidth = p->getNToneSemitoneWidth();
         nToneRoot = p->getNToneRoot();
-        stuning = new SpringTuning(p->getSpringTuning());
+        stuning->copy(p->getSpringTuning());
+        //stuning = new SpringTuning(p->getSpringTuning());
     }
     
     inline bool compare (TuningPreparation::Ptr p)
@@ -496,6 +497,16 @@ public:
         }
         
         return getTuningOffsets(aPrep->getScale());
+    }
+    
+    Array<float> getStaticScale()
+    {
+        if(sPrep->getScale() == CustomTuning)
+        {
+            return sPrep->getCustomScale();
+        }
+        
+        return getTuningOffsets(sPrep->getScale());
     }
     
     Array<float> getScale(int which)
