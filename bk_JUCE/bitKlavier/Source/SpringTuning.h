@@ -16,16 +16,16 @@
 #include "Particle.h"
 #include "Spring.h"
 
-class SpringProcessor : public ReferenceCountedObject, private HighResolutionTimer
+class SpringTuning : public ReferenceCountedObject, private HighResolutionTimer
 {
 public:
-    typedef ReferenceCountedObjectPtr<SpringProcessor> Ptr;
+    typedef ReferenceCountedObjectPtr<SpringTuning> Ptr;
     
-    SpringProcessor(SpringProcessor::Ptr st = nullptr);
-    ~SpringProcessor(){stopTimer();};
+    SpringTuning(SpringTuning::Ptr st = nullptr);
+    ~SpringTuning(){stopTimer();};
 	void simulate();
     
-    void copy(SpringProcessor::Ptr st);
+    void copy(SpringTuning::Ptr st);
 
 	void toggleSpring();
 
@@ -50,16 +50,22 @@ public:
 	void addSpringsByInterval(double interval);
 	void removeSpringsByInterval(double interval);
 	void adjustSpringsByInterval(double interval, double stiffness);
-
-    inline void setRate(double r)
+    
+    inline void setRate(double r, bool start = true)
     {
         rate = r;
-        startTimer(1000 / rate);
+        if (start)  startTimer(1000 / rate);
+        else        stopTimer();
     }
     
     inline double getRate(void)
     {
         return rate;
+    }
+    
+    inline void stop(void)
+    {
+        stopTimer();
     }
     
     inline void setStiffness(double stiff)

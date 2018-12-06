@@ -104,7 +104,7 @@ void TuningProcessor::keyReleased(int midiNoteNumber)
 {
     TuningSystem currentTuning = tuning->getCurrentScaleId();
     
-    tuning->getSpringTuning()->removeNote(midiNoteNumber);
+    tuning->aPrep->getSpringTuning()->removeNote(midiNoteNumber);
 }
 
 
@@ -144,7 +144,7 @@ void TuningProcessor::keyPressed(int midiNoteNumber)
         //else adaptiveHistoryCounter++;
     }
     
-    tuning->getSpringTuning()->addNote(midiNoteNumber);
+    tuning->aPrep->getSpringTuning()->addNote(midiNoteNumber);
     
     clusterTime = 0;
     
@@ -225,7 +225,7 @@ ValueTree Tuning::getState(void)
     }
     prep.addChild(absolute, -1, 0);
     
-    prep.addChild(stuning->getState(), -1, 0);
+    prep.addChild(sPrep->getSpringTuning()->getState(), -1, 0);
     
     return prep;
     
@@ -442,7 +442,7 @@ void Tuning::setState(XmlElement* e)
     {
         if (sub->hasTagName("springtuning"))
         {
-            stuning->setState(sub);
+            sPrep->getSpringTuning()->setState(sub);
         }
         else if (sub->hasTagName(vtagTuning_customScale))
         {
@@ -458,7 +458,6 @@ void Tuning::setState(XmlElement* e)
                     scale.add(f);
                 }
             }
-            
             sPrep->setCustomScale(scale);
         }
         else if (sub->hasTagName(vTagTuning_absoluteOffsets))

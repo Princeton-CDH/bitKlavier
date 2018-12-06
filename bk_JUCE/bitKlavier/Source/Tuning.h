@@ -40,7 +40,8 @@ public:
     tCustom(p->getCustomScale()),
     tAbsolute(p->getAbsoluteOffsets()),
     nToneSemitoneWidth(p->getNToneSemitoneWidth()),
-    nToneRoot(p->getNToneRoot())
+    nToneRoot(p->getNToneRoot()),
+    stuning(new SpringTuning(p->getSpringTuning()))
     {
 
     }
@@ -60,6 +61,7 @@ public:
         tAbsolute = p->getAbsoluteOffsets();
         nToneSemitoneWidth = p->getNToneSemitoneWidth();
         nToneRoot = p->getNToneRoot();
+        stuning = new SpringTuning(p->getSpringTuning());
     }
     
     inline bool compare (TuningPreparation::Ptr p)
@@ -144,7 +146,8 @@ public:
                       int adaptiveHistory,
                       Array<float> customScale,
                       float semitoneWidth,
-                      int semitoneRoot):
+                      int semitoneRoot,
+                      SpringTuning::Ptr st):
     tScale(whichTuning),
     tFundamental(fundamental),
     tFundamentalOffset(fundamentalOffset),
@@ -156,7 +159,8 @@ public:
     tAdaptiveHistory(adaptiveHistory),
     tCustom(customScale),
     nToneSemitoneWidth(semitoneWidth),
-    nToneRoot(semitoneRoot)
+    nToneRoot(semitoneRoot),
+    stuning(new SpringTuning(st))
     {
         tAbsolute.ensureStorageAllocated(128);
         for(int i=0; i<128; i++) tAbsolute.set(i, 0.);
@@ -178,6 +182,8 @@ public:
     {
         tAbsolute.ensureStorageAllocated(128);
         for(int i=0; i<128; i++) tAbsolute.set(i, 0.);
+        
+        stuning = new SpringTuning();
 
     }
     
@@ -285,6 +291,47 @@ public:
         DBG("nToneRoot: " +                     String(nToneRoot));
     }
     
+    // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ SPRING TUNING ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    inline SpringTuning::Ptr getSpringTuning(void) { return stuning; }
+    inline void setSpringTuning(SpringTuning::Ptr st) { stuning = st;}
+    
+    inline Particle::PtrArr getParticles(void) { return getSpringTuning()->getParticles(); }
+    inline Particle::PtrArr getTetherParticles(void) { return getSpringTuning()->getTetherParticles(); }
+    inline Spring::PtrArr getSprings(void) { return getSpringTuning()->getSprings(); }
+    inline Spring::PtrArr getTetherSprings(void) { return getSpringTuning()->getTetherSprings(); }
+    
+    inline void setSpringWeight(int which, double weight)
+    {
+        getSpringTuning()->setSpringWeight(which, weight);
+    }
+    
+    inline void setTetherWeight(int which, double weight)
+    {
+        getSpringTuning()->setTetherWeight(which, weight);
+    }
+    
+    inline void setTetherLock(int which, bool lock)
+    {
+        getSpringTuning()->setTetherLock(which, lock);
+    }
+    
+    inline bool getTetherLock(int which)
+    {
+        return getSpringTuning()->getTetherLock(which);
+    }
+    
+    inline void setSpringsActive(bool status) { getSpringTuning()->setActive(status); }
+    inline bool getSpringsActive(void) { return getSpringTuning()->getActive(); }
+    
+    inline void setSpringRate(double rate) { getSpringTuning()->setRate(rate);}
+    inline double getSpringRate(void) { return getSpringTuning()->getRate();}
+    
+    inline void setSpringStiffness(double stiff) { getSpringTuning()->setStiffness(stiff);}
+    inline double getSpringStiffness(void) {return getSpringTuning()->getStiffness();}
+    
+    inline TuningSystem getCurrentSpringScaleId(void) { return getSpringTuning()->getScaleId(); }
+    // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    
 private:
     String name;
     // basic tuning settings, for static tuning
@@ -311,6 +358,9 @@ private:
     int nToneRootPC = 0;        //which pitch class; 0 by default
     int nToneRootOctave = 4;    //which octave; 4 by default, so C4
     
+    // SPRING TUNING STUFF
+    SpringTuning::Ptr stuning;
+    
     JUCE_LEAK_DETECTOR(TuningPreparation);
 };
 
@@ -328,10 +378,9 @@ public:
     
     Tuning(TuningPreparation::Ptr prep,
            int Id,
-           SpringProcessor::Ptr st = nullptr):
+           SpringTuning::Ptr st = nullptr):
     sPrep(new TuningPreparation(prep)),
     aPrep(new TuningPreparation(sPrep)),
-    stuning(new SpringProcessor(st)),
     Id(Id),
     name(String(Id))
     {
@@ -344,6 +393,8 @@ public:
         tuningLibrary.set(DuodeneTuning, tDuodeneTuning);
         tuningLibrary.set(OtonalTuning, tOtonalTuning);
         tuningLibrary.set(UtonalTuning, tUtonalTuning);
+        
+        sPrep->getSpringTuning()->stop();
     }
     
 	Tuning(int Id, bool random = false) :
@@ -352,7 +403,6 @@ public:
     {
 		sPrep = new TuningPreparation();
 		aPrep = new TuningPreparation(sPrep);
-        stuning = new SpringProcessor();
         
 		if (random) randomize();
         
@@ -366,14 +416,16 @@ public:
         tuningLibrary.set(OtonalTuning, tOtonalTuning);
         tuningLibrary.set(UtonalTuning, tUtonalTuning);
         
-        
+        sPrep->getSpringTuning()->stop();
     }
     
     inline Tuning::Ptr duplicate()
     {
         TuningPreparation::Ptr copyPrep = new TuningPreparation(sPrep);
         
-        Tuning::Ptr copy = new Tuning(copyPrep, -1, stuning);
+        Tuning::Ptr copy = new Tuning(copyPrep, -1);
+        
+        copy->sPrep->getSpringTuning()->stop();
         
         copy->setName(name );
         
@@ -424,11 +476,10 @@ public:
         return aPrep->getScale();
     }
     
-    inline TuningSystem getCurrentSpringScaleId(void)
+    inline SpringTuning::Ptr getCurrentSpringTuning(void)
     {
-        return stuning->getScaleId();
+        return aPrep->getSpringTuning();
     }
-    
     
     inline String getName(void) const noexcept {return name;}
     
@@ -485,43 +536,6 @@ public:
         return cScale;
     }
     
-    inline Particle::PtrArr getParticles(void) { return stuning->getParticles(); }
-    inline Particle::PtrArr getTetherParticles(void) { return stuning->getTetherParticles(); }
-    inline Spring::PtrArr getSprings(void) { return stuning->getSprings(); }
-    inline Spring::PtrArr getTetherSprings(void) { return stuning->getTetherSprings(); }
-    
-    inline void setSpringWeight(int which, double weight)
-    {
-        stuning->setSpringWeight(which, weight);
-    }
-    
-    inline void setTetherWeight(int which, double weight)
-    {
-        stuning->setTetherWeight(which, weight);
-    }
-    
-    inline void setTetherLock(int which, bool lock)
-    {
-        stuning->setTetherLock(which, lock);
-    }
-    
-    inline bool getTetherLock(int which)
-    {
-        return stuning->getTetherLock(which);
-    }
-    
-    inline void setSpringsActive(bool status) { stuning->setActive(status); }
-    inline bool getSpringsActive(void) { return stuning->getActive(); }
-    
-    inline void setSpringRate(double rate) { stuning->setRate(rate);}
-    inline double getSpringRate(void) { return stuning->getRate();}
-    
-    inline void setSpringStiffness(double stiff) { stuning->setStiffness(stiff);}
-    inline double getSpringStiffness(void) {return stuning->getStiffness();}
-    
-    inline SpringProcessor::Ptr getSpringTuning(void) { return stuning; }
-    
-    
     
     Array<Array<float>> tuningLibrary;
     
@@ -532,7 +546,6 @@ private:
     
     Array<float> getTuningOffsets(TuningSystem which) {return tuningLibrary.getUnchecked(which); }
     
-    SpringProcessor::Ptr stuning;
     
     const Array<float> tEqualTuning = Array<float>( {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.} );
 	const Array<float> tJustTuning = Array<float>({ 0., .117313, .039101, .156414, -.13686, -.019547, -.174873, .019547, .136864, -.15641, -.311745, -.11731 });

@@ -159,9 +159,9 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
 {
     pitchbendMultiplier = powf(2.0f, (pitchWheel/ 8192.0f - 1.0f)/12.0f);
     
-    if (tuning != nullptr && tuning->getTuning()->getSpringsActive())
+    if (tuning != nullptr && tuning->getTuning()->aPrep->getSpringsActive())
     {
-        Particle::PtrArr particles = tuning->getTuning()->getParticles();
+        Particle::PtrArr particles = tuning->getTuning()->aPrep->getParticles();
         
         double x = particles[midiNoteNumber]->getX();
         
