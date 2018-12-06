@@ -113,6 +113,7 @@ active(false)
     
     if (st != nullptr) copy(st);
     
+    setDrag(drag);
     setRate(rate);
 }
 
@@ -147,11 +148,6 @@ void SpringTuning::simulate()
 {
     for (auto particle : particleArray)
     {
-        if (particle->getNote() == 60)
-        {
-            printf("simulate pointer: %p\n", (void*)this);
-            //DBG("p: " + String(particle->getNote()) + " enabled: " + String((int)particle->getEnabled()) + " locked: " + String((int)particle->getLocked()));
-        }
 		if (particle->getEnabled() && !particle->getLocked())
         {
             particle->integrate(drag);
@@ -306,7 +302,6 @@ void SpringTuning::addParticle(int note)
 {
     particleArray[note]->setEnabled(true);
     tetherParticleArray[note]->setEnabled(true);
-    printf("add particle pointer: %p\n", (void*)this);
     //DBG("particle " + String(note) + " enabled? " + String((int)particleArray[note]->getEnabled()) );
 }
 void SpringTuning::removeParticle(int note)

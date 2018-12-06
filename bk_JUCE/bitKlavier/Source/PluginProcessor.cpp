@@ -940,7 +940,8 @@ void BKAudioProcessor::performModifications(int noteNumber)
     TuningModification::PtrArr tMod = currentPiano->modificationMap[noteNumber]->getTuningModifications();
     for (int i = tMod.size(); --i >= 0;)
     {
-        TuningPreparation::Ptr active = gallery->getTuning(tMod[i]->getPrepId())->aPrep;
+        Tuning::Ptr tuning = gallery->getTuning(tMod[i]->getPrepId());
+        TuningPreparation::Ptr active = tuning->aPrep;
         TuningParameterType type = tMod[i]->getParameterType();
         modf = tMod[i]->getModFloat();
         modi = tMod[i]->getModInt();
@@ -948,7 +949,11 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modfa = tMod[i]->getModFloatArr();
         modia = tMod[i]->getModIntArr();
         
-        if (type == TuningScale)                    active->setScale((TuningSystem)modi);
+        if (type == TuningScale)
+        {
+            active->setScale((TuningSystem)modi);
+            active->getSpringTuning()->setTetherTuning(tuning->getCurrentScale());
+        }
         else if (type == TuningFundamental)         active->setFundamental((PitchClass)modi);
         else if (type == TuningOffset)              active->setFundamentalOffset(modf);
         else if (type == TuningA1IntervalScale)     active->setAdaptiveIntervalScale((TuningSystem)modi);
@@ -964,6 +969,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         {
             active->setScale(CustomTuning);
             active->setCustomScaleCents(modfa);
+            active->getSpringTuning()->setTetherTuning(tuning->getCurrentScale());
         }
         else if (type == TuningAbsoluteOffsets)
         {
@@ -971,7 +977,38 @@ void BKAudioProcessor::performModifications(int noteNumber)
                 active->setAbsoluteOffset(modfa[i], modfa[i+1] * .01);
             }
         }
-        
+        else if (type == TuningSpringTetherStiffness)
+        {
+            active->getSpringTuning()->setTetherStiffness(modf);
+        }
+        else if (type == TuningSpringIntervalStiffness)
+        {
+            active->getSpringTuning()->setIntervalStiffness(modf);
+        }
+        else if (type == TuningSpringRate)
+        {
+            active->getSpringTuning()->setRate(modf);
+        }
+        else if (type == TuningSpringDrag)
+        {
+            active->getSpringTuning()->setDrag(modf);
+        }
+        else if (type == TuningSpringActive)
+        {
+            active->getSpringTuning()->setActive(modb);
+        }
+        else if (type == TuningSpringTetherWeights)
+        {
+            active->getSpringTuning()->setTetherWeights(modfa);
+        }
+        else if (type == TuningSpringIntervalWeights)
+        {
+            active->getSpringTuning()->setSpringWeights(modfa);
+        }
+        else if (type == TuningSpringIntervalScale)
+        {
+            active->getSpringTuning()->setIntervalTuning(modfa);
+        }
         
         updateState->tuningPreparationDidChange = true;
     }

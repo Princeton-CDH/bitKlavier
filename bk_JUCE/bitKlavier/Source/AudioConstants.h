@@ -596,6 +596,15 @@ typedef enum TuningParameterType
     TuningNToneSemitoneWidth,
     TuningCustomScale,
     TuningAbsoluteOffsets,
+    TuningSpringStiffness,
+    TuningSpringTetherStiffness,
+    TuningSpringIntervalStiffness,
+    TuningSpringRate,
+    TuningSpringDrag,
+    TuningSpringActive,
+    TuningSpringTetherWeights,
+    TuningSpringIntervalWeights,
+    TuningSpringIntervalScale,
     TuningParameterTypeNil
     
 } TuningParameterType;
@@ -616,6 +625,15 @@ static const std::vector<BKParameterDataType> cTuningDataTypes = {
     BKInt,
     BKFloat,
     BKFloatArr,
+    BKFloatArr,
+    BKFloat,
+    BKFloat,
+    BKFloat,
+    BKFloat,
+    BKFloat,
+    BKBool,
+    BKFloatArr,
+    BKFloatArr,
     BKFloatArr
 };
 
@@ -635,7 +653,16 @@ static const std::vector<std::string> cTuningParameterTypes = {
     "NToneRootOctave",
     "NToneSemitoneWidth",
     "CustomScale",
-    "AbsoluteOffsets"
+    "AbsoluteOffsets",
+    "SpringStiffness",
+    "SpringTetherStiffness",
+    "SpringIntervalStiffness",
+    "SpringRate",
+    "SpringDrag",
+    "SpringActive",
+    "SpringTetherWeights",
+    "SpringIntervalWeights",
+    "SpringIntervalScale"
 };
 
 

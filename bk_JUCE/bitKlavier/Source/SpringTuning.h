@@ -128,6 +128,41 @@ public:
         return drag;
     }
     
+    inline Array<float> getTetherWeights(void)
+    {
+        Array<float> weights;
+        for (auto spring : getTetherSprings())
+        {
+            weights.add(spring->getStrength());
+        }
+    }
+    
+    inline void setTetherWeights(Array<float> weights)
+    {
+        int i = 0;
+        for (auto spring : tetherSpringArray)
+        {
+            spring->setStrength(weights[i]);
+        }
+    }
+    
+    inline Array<float> getSpringWeights(void)
+    {
+        Array<float> weights;
+        for (auto spring : getSprings())
+        {
+            weights.add(spring->getStrength());
+        }
+    }
+    
+    inline void setSpringWeights(Array<float> weights)
+    {
+        int i = 0;
+        for (auto spring : springArray)
+        {
+            spring->setStrength(weights[i]);
+        }
+    }
 	double getFrequency(int index);
 	bool pitchEnabled(int index);
 
@@ -168,9 +203,9 @@ public:
         ValueTree prep("springtuning");
         
         prep.setProperty( "rate", rate, 0);
+        prep.setProperty( "drag", drag, 0);
         prep.setProperty( "tetherStiffness", tetherStiffness, 0);
         prep.setProperty( "intervalStiffness", intervalStiffness, 0);
-        prep.setProperty( "stiffness", stiffness, 0);
         prep.setProperty( "stiffness", stiffness, 0);
         prep.setProperty( "active", active ? 1 : 0, 0);
         prep.setProperty( "scaleId", scaleId, 0);
@@ -204,6 +239,7 @@ public:
         active = (bool) e->getStringAttribute("active").getIntValue();
         
         setRate(e->getStringAttribute("rate").getDoubleValue());
+        setDrag(e->getStringAttribute("drag").getDoubleValue());
         
         setStiffness(e->getStringAttribute("stiffness").getDoubleValue());
         setTetherStiffness(e->getStringAttribute("tetherStiffness").getDoubleValue());

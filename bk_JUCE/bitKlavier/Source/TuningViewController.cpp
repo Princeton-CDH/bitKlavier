@@ -920,13 +920,13 @@ TuningViewController(p, theGraph)
     
     tetherStiffnessSlider->addMyListener(this);
     
+    springScaleCB.addListener(this);
+    
     selectCB.addMyListener(this);
     
     selectCB.addListener(this);
 
     scaleCB.addListener(this);
-    
-    springScaleCB.addListener(this);
     
     fundamentalCB.addListener(this);
 
@@ -1611,6 +1611,32 @@ TuningViewController(p, theGraph)
     nToneRootCB.addListener(this);
     nToneRootOctaveCB.addListener(this);
     nToneSemitoneWidthSlider->addMyListener(this);
+    
+    
+    // ~ ~ ~ ~ ~ SPRING TUNING STUFF ~ ~ ~ ~ ~
+    for (int i = 0; i < 12; i++)
+    {
+        springSliders[i]->addListener(this);
+        toggles[i]->addListener(this);
+    }
+    
+    for (int i = 0; i < 128; i++)
+    {
+        tetherSliders[i]->addListener(this);
+    }
+    
+    springTuningToggle.addListener(this);
+    
+    rateSlider->addMyListener(this);
+    
+    dragSlider->addMyListener(this);
+    
+    intervalStiffnessSlider->addMyListener(this);
+    
+    tetherStiffnessSlider->addMyListener(this);
+    
+    springScaleCB.addListener(this);
+    // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     update();
 }
@@ -1634,6 +1660,29 @@ void TuningModificationEditor::greyOutAllComponents()
     nToneRootCB.setAlpha(gModAlpha);
     nToneRootOctaveCB.setAlpha(gModAlpha);
     nToneSemitoneWidthSlider->setDim(gModAlpha);
+    
+    for (int i = 0; i < 12; i++)
+    {
+        springSliders[i]->setAlpha(gModAlpha);
+        toggles[i]->setAlpha(gModAlpha);
+    }
+    
+    for (int i = 0; i < 128; i++)
+    {
+        tetherSliders[i]->setAlpha(gModAlpha);
+    }
+    
+    springTuningToggle.setAlpha(gModAlpha);
+    
+    rateSlider->setAlpha(gModAlpha);
+    
+    dragSlider->setAlpha(gModAlpha);
+    
+    intervalStiffnessSlider->setAlpha(gModAlpha);
+    
+    tetherStiffnessSlider->setAlpha(gModAlpha);
+    
+    springScaleCB.setAlpha(gModAlpha);
 }
 
 void TuningModificationEditor::highlightModedComponents()
@@ -1654,6 +1703,42 @@ void TuningModificationEditor::highlightModedComponents()
     if(mod->getParam(TuningNToneRootCB) != "")          nToneRootCB.setAlpha(1);
     if(mod->getParam(TuningNToneRootOctaveCB) != "")    nToneRootOctaveCB.setAlpha(1);
     if(mod->getParam(TuningNToneSemitoneWidth) != "")   nToneSemitoneWidthSlider->setBright();
+    if (mod->getParam(TuningSpringTetherStiffness) != "")
+    {
+        tetherStiffnessSlider->setAlpha(1);
+        tetherStiffnessLabel.setAlpha(1);
+    }
+    if (mod->getParam(TuningSpringIntervalStiffness) != "")
+    {
+        tetherStiffnessSlider->setAlpha(1);
+        tetherStiffnessLabel.setAlpha(1);
+    }
+    if (mod->getParam(TuningSpringRate) != "")
+    {
+        rateSlider->setAlpha(1);
+        rateSliderLabel.setAlpha(1);
+    }
+    if (mod->getParam(TuningSpringDrag) != "")
+    {
+        dragSlider->setAlpha(1);
+        dragSliderLabel.setAlpha(1);
+    }
+    if (mod->getParam(TuningSpringActive) != "")
+    {
+        springTuningToggle.setAlpha(1);
+    }
+    if (mod->getParam(TuningSpringTetherWeights) != "")
+    {
+        for (auto slider : tetherSliders) slider->setAlpha(1);
+    }
+    if (mod->getParam(TuningSpringIntervalWeights) != "")
+    {
+        for (auto slider : springSliders) slider->setAlpha(1);
+    }
+    if (mod->getParam(TuningSpringIntervalScale) != "")
+    {
+        springScaleCB.setAlpha(1);
+    }
 }
 
 void TuningModificationEditor::update(void)
@@ -1723,6 +1808,35 @@ void TuningModificationEditor::update(void)
         nToneSemitoneWidthSlider->setValue(val.getFloatValue(), dontSendNotification);
         //                       offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
         
+        
+        val = mod->getParam(TuningSpringTetherStiffness);
+        tetherStiffnessSlider->setValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(TuningSpringIntervalStiffness);
+        intervalStiffnessSlider->setValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(TuningSpringRate);
+        rateSlider->setValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(TuningSpringDrag);
+        dragSlider->setValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(TuningSpringActive);
+        springTuningToggle.setToggleState((bool)val.getIntValue(), dontSendNotification);
+        
+        Array<float> vals;
+        
+        val = mod->getParam(TuningSpringTetherWeights);
+        vals = stringToFloatArray(val);
+        for (int i = 0; i < 128; i++) tetherSliders[i]->setValue(vals[i], dontSendNotification);
+        
+        val = mod->getParam(TuningSpringIntervalWeights);
+        vals = stringToFloatArray(val);
+        for (int i = 0; i < 12; i++) springSliders[i]->setValue(vals[i], dontSendNotification);
+        
+        val = mod->getParam(TuningSpringIntervalScale);
+        springScaleCB.setSelectedItemIndex(val.getIntValue());
+    
         updateComponentVisibility();
         A1reset.setVisible(false);
     }
