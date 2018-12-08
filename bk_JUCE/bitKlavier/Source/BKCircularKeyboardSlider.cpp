@@ -23,7 +23,7 @@ ratio(1.0)
     // need slider or other interface for octave change
 
     minKey = 0;
-    maxKey = 11;
+    maxKey = 11; //make this variable, for non 12-tet systems
 
     keyboard->setScrollButtonsVisible(false);
     keyboard->setAvailableRange(minKey, maxKey);
@@ -81,8 +81,8 @@ void BKCircularKeyboardSlider::resized()
     Rectangle<int> keymapRow = area.removeFromBottom(10 * heightUnit);
     
     //absolute keymap
-    //float keyWidth = keymapRow.getWidth() / round((maxKey - minKey) * 7./12 + 1); //num white keys
-    float keyWidth = keymapRow.getWidth() / 7; //num white keys
+    float keyWidth = keymapRow.getWidth() / round((maxKey - minKey) * 7./12 + 1); //num white keys
+    //float keyWidth = keymapRow.getWidth() / 7; //num white keys
     keyboard->setKeyWidth(keyWidth);
     keyboard->setBlackNoteLengthProportion(0.65);
     
@@ -188,7 +188,8 @@ void BKCircularKeyboardSlider::textEditorReturnKeyPressed(TextEditor& textEditor
 
         Array<float> tempVals = stringToFloatArray(keyboardValsTextField->getText());
         
-        if(tempVals.size() == 12) {
+        //if(tempVals.size() == 12) {
+        if(tempVals.size() == (maxKey + 1)) {
             keyboard->setValuesRotatedByFundamental(tempVals);
             
             //DBG("textEditorReturnKeyPressed keyboardValsTextField");
