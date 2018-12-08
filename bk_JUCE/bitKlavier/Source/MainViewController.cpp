@@ -129,6 +129,7 @@ MainViewController::~MainViewController()
     instrumentCB.setLookAndFeel(nullptr);
     octaveSlider.setLookAndFeel(nullptr);
     mainSlider.setLookAndFeel(nullptr);
+    keyboardComponent = nullptr;
     removeKeyListener(this);
 }
 

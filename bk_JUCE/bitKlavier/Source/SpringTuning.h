@@ -16,16 +16,16 @@
 #include "Particle.h"
 #include "Spring.h"
 
-class SpringTuningModel : public ReferenceCountedObject, private HighResolutionTimer
+class SpringTuning : public ReferenceCountedObject, private HighResolutionTimer
 {
 public:
-    typedef ReferenceCountedObjectPtr<SpringTuningModel> Ptr;
+    typedef ReferenceCountedObjectPtr<SpringTuning> Ptr;
     
-    SpringTuningModel(SpringTuningModel::Ptr st = nullptr);
-    ~SpringTuningModel(){stopTimer();};
+    SpringTuning(SpringTuning::Ptr st = nullptr);
+    ~SpringTuning(){stopTimer();};
 	void simulate();
     
-    void copy(SpringTuningModel::Ptr st);
+    void copy(SpringTuning::Ptr st);
 
 	void toggleSpring();
 
@@ -50,16 +50,22 @@ public:
 	void addSpringsByInterval(double interval);
 	void removeSpringsByInterval(double interval);
 	void adjustSpringsByInterval(double interval, double stiffness);
-
-    inline void setRate(double r)
+    
+    inline void setRate(double r, bool start = true)
     {
         rate = r;
-        startTimer(1000 / rate);
+        if (start)  startTimer(1000 / rate);
+        else        stopTimer();
     }
     
     inline double getRate(void)
     {
         return rate;
+    }
+    
+    inline void stop(void)
+    {
+        stopTimer();
     }
     
     inline void setStiffness(double stiff)
@@ -172,6 +178,7 @@ public:
         ValueTree tethers( "tethers");
         ValueTree springs( "springs");
         ValueTree tetherLocks( "locks");
+        ValueTree intervalScale("intervalScale");
         
         for (int i = 0; i < 128; i++)
         {
@@ -182,30 +189,44 @@ public:
         {
             springs.setProperty( "s"+String(i), getSpringWeight(i), 0 );
             tetherLocks.setProperty("tl"+String(i), getTetherLock(i) ? 1 : 0, 0);
-            
+            intervalScale.setProperty("s"+String(i), intervalTuning[i], 0);
         }
         prep.addChild(tethers, -1, 0);
         prep.addChild(springs, -1, 0);
         prep.addChild(tetherLocks, -1, 0);
+        prep.addChild(intervalScale, -1, 0);
 
         return prep;
     }
     
     void setState(XmlElement* e)
     {
+        active = (bool) e->getStringAttribute("active").getIntValue();
+        
         setRate(e->getStringAttribute("rate").getDoubleValue());
         
         setStiffness(e->getStringAttribute("stiffness").getDoubleValue());
         setTetherStiffness(e->getStringAttribute("tetherStiffness").getDoubleValue());
         setIntervalStiffness(e->getStringAttribute("intervalStiffness").getDoubleValue());
         
-        active = (bool) e->getStringAttribute("active").getIntValue();
-        
         scaleId = (TuningSystem) e->getStringAttribute("scaleId").getIntValue();
         
         forEachXmlChildElement (*e, sub)
         {
-            if (sub->hasTagName("tethers"))
+            if (sub->hasTagName("intervalScale"))
+            {
+                Array<float> scale;
+                for (int i = 0; i < 12; i++)
+                {
+                    String attr = sub->getStringAttribute("s" + String(i));
+                    
+                    if (attr == "") scale.add(0.0);
+                    else            scale.add(attr.getFloatValue());
+                }
+                
+                setIntervalTuning(scale);
+            }
+            else if (sub->hasTagName("tethers"))
             {
                 Array<float> scale;
                 for (int i = 0; i < 128; i++)
@@ -224,7 +245,6 @@ public:
             }
             else if (sub->hasTagName("springs"))
             {
-                Array<float> scale;
                 for (int i = 0; i < 12; i++)
                 {
                     String attr = sub->getStringAttribute("s" + String(i));
@@ -241,7 +261,6 @@ public:
             }
             else if (sub->hasTagName("locks"))
             {
-                Array<float> scale;
                 for (int i = 0; i < 12; i++)
                 {
                     String attr = sub->getStringAttribute("tl" + String(i));

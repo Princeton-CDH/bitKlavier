@@ -3,7 +3,7 @@
 
     SpringTuning.cpp
     Created: 3 Aug 2018 3:43:46pm
-    Author:  Theo
+    Author:  Theo, Mike, Dan
 
   ==============================================================================
 */
@@ -13,10 +13,18 @@
 
 using namespace std;
 
-void SpringTuningModel::copy(SpringTuningModel::Ptr st)
+void SpringTuning::copy(SpringTuning::Ptr st)
 {
     rate = st->getRate();
     stiffness = st->getStiffness();
+    active = st->getActive();
+    
+    intervalStiffness = st->getIntervalStiffness();
+    tetherStiffness = st->getTetherStiffness();
+    
+    setIntervalTuning(st->getIntervalTuning());
+    setTetherTuning(st->getTetherTuning());
+    
     for (int i = 0; i < 12; i++)
     {
         setSpringWeight(i, st->getSpringWeight(i));
@@ -29,7 +37,7 @@ void SpringTuningModel::copy(SpringTuningModel::Ptr st)
     }
 }
 
-SpringTuningModel::SpringTuningModel(SpringTuningModel::Ptr st):
+SpringTuning::SpringTuning(SpringTuning::Ptr st):
 scaleId(JustTuning),
 tetherStiffness(0.5),
 intervalStiffness(0.5),
@@ -84,9 +92,9 @@ active(false)
             {
                 interval = 12;
             }
-            
+
             //DBG("spring: " + String(i) + " " + String(j) + " " + String(diff * 100 + intervalTuning[interval] * 100));
-            
+
             Spring* spring = new Spring(particleArray[j],
                                         particleArray[i],
                                         diff * 100 + intervalTuning[interval] * 100,
@@ -108,7 +116,7 @@ active(false)
     setRate(rate);
 }
 
-void SpringTuningModel::setTetherTuning(Array<float> tuning)
+void SpringTuning::setTetherTuning(Array<float> tuning)
 {
     tetherTuning = tuning;
     
@@ -122,7 +130,7 @@ void SpringTuningModel::setTetherTuning(Array<float> tuning)
     }
 }
 
-void SpringTuningModel::setIntervalTuning(Array<float> tuning)
+void SpringTuning::setIntervalTuning(Array<float> tuning)
 {
     intervalTuning = tuning;
 
@@ -130,14 +138,12 @@ void SpringTuningModel::setIntervalTuning(Array<float> tuning)
     {
         int interval = spring->getIntervalIndex();
         int diff = spring->getA()->getRestX() - spring->getB()->getRestX();
-        //spring->setRestingLength(interval * 100.0 + intervalTuning[interval]);
         spring->setRestingLength(fabs(diff) + intervalTuning[interval]);
-        //DBG("setIntervalTuning " + String(interval) + " " + String(spring->getRestingLength()));
     }
 }
 
 //#define DRAG 1.0f //expose this!!
-void SpringTuningModel::simulate()
+void SpringTuning::simulate()
 {
     for (auto particle : particleArray)
     {
@@ -164,32 +170,20 @@ void SpringTuningModel::simulate()
 	}
 }
 
-void SpringTuningModel::setSpringWeight(int which, double weight)
+void SpringTuning::setSpringWeight(int which, double weight)
 {
     for (auto spring : springArray)
     {
         int interval = spring->getIntervalIndex();
-        
-        if (which == 12)
+
+        if (which == interval)
         {
-            if ((interval != 0) && ((interval % 12) == 0))
-            {
-                spring->setStrength(weight);
-            }
-        }
-        else
-        {
-            interval = interval % 12;
-            
-            if (which == interval)
-            {
-                spring->setStrength(weight);
-            }
+            spring->setStrength(weight);
         }
     }
 }
 
-double SpringTuningModel::getSpringWeight(int which)
+double SpringTuning::getSpringWeight(int which)
 {
     // find first spring with interval that matches which and return its weight
     for (auto spring : springArray)
@@ -199,7 +193,7 @@ double SpringTuningModel::getSpringWeight(int which)
     return 0.0;
 }
 
-void SpringTuningModel::setTetherWeight(int which, double weight)
+void SpringTuning::setTetherWeight(int which, double weight)
 {
     int pc = which % 12;
     if (tetherLocked[pc])
@@ -212,23 +206,23 @@ void SpringTuningModel::setTetherWeight(int which, double weight)
             
             Particle* a = spring->getA();
             Particle* b = spring->getB();
-            Particle* use = nullptr;
+            Particle* particle = nullptr;
             Particle* tethered = tetherParticleArray[t];
             
-            if (a != tethered)  use = a;
-            else                use = b;
+            if (a != tethered)  particle = a;
+            else                particle = b;
             
-            if (use != nullptr)
+            if (particle != nullptr)
             {
                 if (weight == 1.0)
                 {
-                    use->setX(use->getRestX());
-                    use->setLocked(true);
+                    particle->setX(particle->getRestX());
+                    particle->setLocked(true);
                 }
                 else
                 {
-                    use->setLocked(false);
-                    if (weight == 0.0) tethered->setEnabled(false);
+                    particle->setLocked(false);
+                    //if (weight == 0.0) tethered->setEnabled(false);
                 }
             }
         }
@@ -265,17 +259,17 @@ void SpringTuningModel::setTetherWeight(int which, double weight)
     
 }
 
-double SpringTuningModel::getTetherWeight(int which)
+double SpringTuning::getTetherWeight(int which)
 {
     return tetherSpringArray[which]->getStrength();
 }
 
-bool SpringTuningModel::getTetherSpringEnabled(int which)
+bool SpringTuning::getTetherSpringEnabled(int which)
 {
     return tetherSpringArray[which]->getEnabled();
 }
 
-bool SpringTuningModel::getSpringEnabled(int which)
+bool SpringTuning::getSpringEnabled(int which)
 {
     for (auto spring : springArray)
     {
@@ -284,12 +278,12 @@ bool SpringTuningModel::getSpringEnabled(int which)
     return false;
 }
 
-String SpringTuningModel::getTetherSpringName(int which)
+String SpringTuning::getTetherSpringName(int which)
 {
     return tetherSpringArray[which]->getName();
 }
 
-String SpringTuningModel::getSpringName(int which)
+String SpringTuning::getSpringName(int which)
 {
     for (auto spring : springArray)
     {
@@ -298,41 +292,40 @@ String SpringTuningModel::getSpringName(int which)
     return "";
 }
 
-void SpringTuningModel::toggleSpring()
+void SpringTuning::toggleSpring()
 {
 	//tbd
 }
 
-void SpringTuningModel::addParticle(int note)
-{;
+void SpringTuning::addParticle(int note)
+{
     particleArray[note]->setEnabled(true);
     tetherParticleArray[note]->setEnabled(true);
-    DBG("addedParticle " + String(note));
 }
-void SpringTuningModel::removeParticle(int note)
+void SpringTuning::removeParticle(int note)
 {
     Particle* p = particleArray[note];
     p->setEnabled(false);
     tetherParticleArray[note]->setEnabled(false);
 }
-void SpringTuningModel::addNote(int note)
+void SpringTuning::addNote(int note)
 {
     addParticle(note);
     addSpringsByNote(note);
 }
 
-void SpringTuningModel::removeNote(int note)
+void SpringTuning::removeNote(int note)
 {
     removeParticle(note);
     removeSpringsByNote(note);
 }
 
-void SpringTuningModel::removeAllNotes(void)
+void SpringTuning::removeAllNotes(void)
 {
     for (int i = 0; i < 128; i++) removeNote(i);
 }
 
-void SpringTuningModel::toggleNote(int noteIndex)
+void SpringTuning::toggleNote(int noteIndex)
 {
 	int convertedIndex = noteIndex; // just in case a midi value is passed accidentally
 
@@ -346,17 +339,17 @@ void SpringTuningModel::toggleNote(int noteIndex)
 	}
 }
 
-void SpringTuningModel::addSpring(Spring* s)
+void SpringTuning::addSpring(Spring* s)
 {
     s->setEnabled(true);
 }
 
-void SpringTuningModel::removeSpring(Spring* s)
+void SpringTuning::removeSpring(Spring* s)
 {
     s->setEnabled(false);
     
 }
-void SpringTuningModel::addSpringsByNote(int note)
+void SpringTuning::addSpringsByNote(int note)
 {
     Particle* p = particleArray[note];
     for (auto spring : springArray)
@@ -369,22 +362,28 @@ void SpringTuningModel::addSpringsByNote(int note)
 			// sets the spring to enabled if one spring matches the index and the other is enabled
 			if (a == p)
 			{
-				if (b->getEnabled()) spring->setEnabled(true);
+				if (b->getEnabled())
+                {
+                    DBG("added spring: " + String(a->getNote()) + " " + String(b->getNote()));
+                    spring->setEnabled(true);
+                }
 			}
 			else if (b == p)
 			{
-				if (a->getEnabled()) spring->setEnabled(true);
+				if (a->getEnabled())
+                {
+                    DBG("added spring: " + String(a->getNote()) + " " + String(b->getNote()));
+                    spring->setEnabled(true);
+                }
 			}
         }
 	}
     
     tetherSpringArray[note]->setEnabled(true);
-    
-    DBG("addedSpring " + String(note));
 }
 
 //DT: wondering if there is a more efficient way to do this, rather than reading throug the whole spring array?
-void SpringTuningModel::removeSpringsByNote(int note)
+void SpringTuning::removeSpringsByNote(int note)
 {
 	Particle* p = particleArray[note];
 	for (auto spring : springArray)
@@ -401,12 +400,12 @@ void SpringTuningModel::removeSpringsByNote(int note)
     tetherSpringArray[note]->setEnabled(false);
 }
 
-double SpringTuningModel::getFrequency(int note)
+double SpringTuning::getFrequency(int note)
 {
 	return Utilities::centsToFreq((int) particleArray[note]->getX());
 }
 
-void SpringTuningModel::print()
+void SpringTuning::print()
 {
     DBG("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
 	for (int i = 0; i < 128; i++)
@@ -419,7 +418,7 @@ void SpringTuningModel::print()
 	}
 }
 
-void SpringTuningModel::printParticles()
+void SpringTuning::printParticles()
 {
 	for (int i = 0; i < 128; i++)
 	{
@@ -427,7 +426,7 @@ void SpringTuningModel::printParticles()
 	}
 }
 
-void SpringTuningModel::printActiveParticles()
+void SpringTuning::printActiveParticles()
 {
 	for (int i = 0; i < 128; i++)
 	{
@@ -435,7 +434,7 @@ void SpringTuningModel::printActiveParticles()
 	}
 }
 
-void SpringTuningModel::printActiveSprings()
+void SpringTuning::printActiveSprings()
 {
 	for (auto spring : springArray)
 	{
@@ -443,7 +442,7 @@ void SpringTuningModel::printActiveSprings()
 	}
 }
 
-bool SpringTuningModel::checkEnabledParticle(int index)
+bool SpringTuning::checkEnabledParticle(int index)
 {
 	return particleArray[index]->getEnabled();
 }
