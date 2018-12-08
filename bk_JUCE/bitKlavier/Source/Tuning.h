@@ -482,6 +482,11 @@ public:
         return aPrep->getSpringTuning();
     }
     
+    inline SpringTuning::Ptr getStaticSpringTuning(void)
+    {
+        return sPrep->getSpringTuning();
+    }
+    
     inline String getName(void) const noexcept {return name;}
     
     inline void setName(String newName)
@@ -602,9 +607,9 @@ public:
         param.set(TuningSpringActive,               String((int)p->getSpringTuning()->getActive()));
         param.set(TuningSpringTetherWeights,        floatArrayToString(p->getSpringTuning()->getTetherWeights()));
         param.set(TuningSpringTetherWeights,        floatArrayToString(p->getSpringTuning()->getSpringWeights()));
-        param.set(TuningSpringTetherStiffness,      floatArrayToString(p->getSpringTuning()->getIntervalTuning()));
+        param.set(TuningSpringIntervalWeights,      floatArrayToString(p->getSpringTuning()->getIntervalTuning()));
         
-        
+        DBG(floatArrayToString(p->getSpringTuning()->getIntervalTuning()));
     }
     
     
@@ -628,12 +633,13 @@ public:
         param.set(TuningSpringRate,                 "");
         param.set(TuningSpringActive,               "");
         param.set(TuningSpringTetherWeights,        "");
+                
         param.set(TuningSpringTetherWeights,        "");
         param.set(TuningSpringTetherStiffness,      "");
     }
     
     inline TuningModPreparation::Ptr duplicate(void)
-    {
+    {   
         TuningModPreparation::Ptr copyPrep = new TuningModPreparation(-1);
        
         copyPrep->copy(this);
@@ -672,6 +678,8 @@ public:
         param.set(TuningSpringTetherWeights,        floatArrayToString(p->getSpringTuning()->getTetherWeights()));
         param.set(TuningSpringTetherWeights,        floatArrayToString(p->getSpringTuning()->getSpringWeights()));
         param.set(TuningSpringTetherStiffness,      floatArrayToString(p->getSpringTuning()->getIntervalTuning()));
+        
+        DBG(floatArrayToString(p->getSpringTuning()->getIntervalTuning()));
         
     }
     

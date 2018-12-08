@@ -69,9 +69,6 @@ void Spring::setStrength(double newStrength)
     double warpCoeff = 100.;
     adjustedStrength = 0.6 * stiffness * (pow(warpCoeff, strength) - 1.) / (warpCoeff - 1.);
     // > ~0.6 and the system can become unstable...
-    
-    DBG("Strength: " + String(strength) + " AdjustedStrength = " + String(adjustedStrength));
-
 }
 
 void Spring::satisfyConstraints(void)

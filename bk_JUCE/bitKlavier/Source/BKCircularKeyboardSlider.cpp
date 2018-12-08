@@ -14,7 +14,6 @@
 BKCircularKeyboardSlider::BKCircularKeyboardSlider(void):
 ratio(1.0)
 {
-    
     addAndMakeVisible (keyboardComponent =
                        new BKKeymapKeyboardComponent (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard));
 
@@ -25,6 +24,7 @@ ratio(1.0)
     minKey = 0;
     maxKey = 11;
 
+    keyboard->setRepaintsOnMouseActivity(false);
     keyboard->setScrollButtonsVisible(false);
     keyboard->setAvailableRange(minKey, maxKey);
     keyboard->setAvailableRange(minKey, maxKey);
@@ -62,7 +62,6 @@ ratio(1.0)
     keyboardValsTextFieldOpen.setButtonText("edit all");
     keyboardValsTextFieldOpen.setTooltip("click drag on keys to set offsets in cents by key, or press 'edit all' to edit as text");
     addAndMakeVisible(keyboardValsTextFieldOpen);
-
 }
 
 void BKCircularKeyboardSlider::paint (Graphics& g)

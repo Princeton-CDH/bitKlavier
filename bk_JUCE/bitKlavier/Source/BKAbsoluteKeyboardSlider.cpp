@@ -40,6 +40,7 @@ needsOctaveSlider(nos)
     minKey = 21; // 21
     maxKey = 108; // 108
 #endif
+    keyboard->setRepaintsOnMouseActivity(false);
     keyboard->setScrollButtonsVisible(false);
     keyboard->setAvailableRange(minKey, maxKey);
     keyboard->setOctaveForMiddleC(4);
@@ -76,7 +77,6 @@ needsOctaveSlider(nos)
     keyboardValsTextFieldOpen.setButtonText("edit all");
     keyboardValsTextFieldOpen.setTooltip("click drag on keys to set offsets in cents by key, or press 'edit all' to edit as text");
     addAndMakeVisible(keyboardValsTextFieldOpen);
-
 }
 
 #if JUCE_IOS
@@ -94,7 +94,6 @@ void BKAbsoluteKeyboardSlider::sliderValueChanged     (Slider* slider)
 
 void BKAbsoluteKeyboardSlider::paint (Graphics& g)
 {
-    //g.fillAll(Colours::lightgrey);
     keyboardComponent.release();
 }
 

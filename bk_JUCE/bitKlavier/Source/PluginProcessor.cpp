@@ -987,6 +987,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         }
         else if (type == TuningSpringRate)
         {
+            printf(" PRE pointer to active %p\n", (void *)active);
             active->getSpringTuning()->setRate(modf);
         }
         else if (type == TuningSpringDrag)
@@ -1003,6 +1004,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         }
         else if (type == TuningSpringIntervalWeights)
         {
+            DBG("modfa: " + floatArrayToString(modfa));
             active->getSpringTuning()->setSpringWeights(modfa);
         }
         else if (type == TuningSpringIntervalScale)

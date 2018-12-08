@@ -17,7 +17,8 @@
 //std::vector<std::string> intervalNames = {"U", "m2", "M2", "m3", "M3", "P4", "d5", "P5", "m6", "M6", "m7", "M7", "O"};
 
 class TuningViewController :
-public BKViewController
+public BKViewController,
+public Timer
 #if JUCE_IOS
 , public WantsBigOne::Listener
 #endif
@@ -29,6 +30,8 @@ public:
     {
         setLookAndFeel(nullptr);
     };
+    
+    void timerCallback(void) override;
     
     void paint (Graphics&) override;
     void resized() override;
@@ -95,9 +98,6 @@ protected:
     OwnedArray<Label>  springLabels;
     OwnedArray<Label>  tetherLabels;
     
-    OwnedArray<ToggleButton> toggles;
-    OwnedArray<Label>  toggleLabels;
-    
     BKComboBox springScaleCB;
     
     Label rateSliderLabel;
@@ -137,15 +137,12 @@ public BKSingleSlider::Listener,
 //public BKKeyboardSlider::Listener,
 public BKCircularKeyboardSlider::Listener,
 public BKAbsoluteKeyboardSlider::Listener,
-public Slider::Listener,
-public Timer
+public Slider::Listener
 {
 public:
     
     TuningPreparationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
     ~TuningPreparationEditor() {setLookAndFeel(nullptr);};
-    
-    void timerCallback() override;
     
     void update(void) override;
     
@@ -200,6 +197,9 @@ public:
     void setCurrentId(int Id);
     void deleteCurrent(void);
     
+    void greyOutAllComponents();
+    void highlightModedComponents();
+    
 private:
     
     void bkComboBoxDidChange (ComboBox* box) override;
@@ -207,10 +207,9 @@ private:
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(String name, double val) override;
     void keyboardSliderChanged(String name, Array<float> values) override;
-    void sliderValueChanged (Slider* slider) override {};
+    void sliderValueChanged (Slider* slider) override;
     
-    void greyOutAllComponents();
-    void highlightModedComponents();
+    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningModificationEditor)
     

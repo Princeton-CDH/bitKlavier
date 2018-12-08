@@ -135,6 +135,8 @@ public:
         {
             weights.add(spring->getStrength());
         }
+        
+        return weights;
     }
     
     inline void setTetherWeights(Array<float> weights)
@@ -149,20 +151,24 @@ public:
     inline Array<float> getSpringWeights(void)
     {
         Array<float> weights;
-        for (auto spring : getSprings())
+        
+        for (int i = 0; i < 12; i++)
         {
-            weights.add(spring->getStrength());
+            weights.add(getSpringWeight(i));
         }
+        
+        return weights;
     }
     
     inline void setSpringWeights(Array<float> weights)
     {
         int i = 0;
-        for (auto spring : springArray)
+        for (int i = 0; i < 12; i++)
         {
-            spring->setStrength(weights[i]);
+            setSpringWeight(i, weights[i]);
         }
     }
+    
 	double getFrequency(int index);
 	bool pitchEnabled(int index);
 
