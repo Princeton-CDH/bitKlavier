@@ -235,7 +235,11 @@ void BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
     
 #if JUCE_IOS
     bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
-#else
+#endif
+#if JUCE_MAC
+    bkSamples = bkSamples.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("samples");
+#endif
+#if JUCE_LINUX || JUCE_WINDOWS
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
 #endif
     
@@ -385,7 +389,11 @@ void BKSampleLoader::loadResonanceReleaseSamples(void)
     
 #if JUCE_IOS
     bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
-#else
+#endif
+#if JUCE_MAC
+    bkSamples = bkSamples.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("samples");
+#endif
+#if JUCE_LINUX || JUCE_WINDOWS
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
 #endif
     
@@ -493,7 +501,11 @@ void BKSampleLoader::loadHammerReleaseSamples(void)
     
 #if JUCE_IOS
     bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
-#else
+#endif
+#if JUCE_MAC
+    bkSamples = bkSamples.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("samples");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
 #endif
     
@@ -565,7 +577,11 @@ void BKSampleLoader::loadPedalSamples(void)
     
 #if JUCE_IOS
     bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
-#else
+#endif
+#if JUCE_MAC
+    bkSamples = bkSamples.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("samples");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
 #endif
     
