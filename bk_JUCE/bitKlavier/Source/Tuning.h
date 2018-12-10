@@ -443,12 +443,15 @@ public:
     
     void setupTuningLibrary()
     {
+        //bK originals
         tuningLibrary.set(PartialTuning, tPartialTuning);
         tuningLibrary.set(JustTuning, tJustTuning);
         tuningLibrary.set(EqualTemperament, tEqualTuning);
         tuningLibrary.set(DuodeneTuning, tDuodeneTuning);
         tuningLibrary.set(OtonalTuning, tOtonalTuning);
         tuningLibrary.set(UtonalTuning, tUtonalTuning);
+        
+        //historical
         tuningLibrary.set(Pythagorean, tPythagorean);
         tuningLibrary.set(Grammateus, tGrammateus);
         tuningLibrary.set(KirnbergerII, tKirnbergerII);
@@ -476,6 +479,14 @@ public:
         tuningLibrary.set(Lambert, tLambert);
         tuningLibrary.set(EighthCommaWT, tEighthCommaWT);
         tuningLibrary.set(PinnockModern, tPinnockModern);
+        
+        //others
+        tuningLibrary.set(CommonJust, tCommonJust);
+        tuningLibrary.set(Symmetric, tSymmetric);
+        tuningLibrary.set(Overtone, tOvertone);
+        tuningLibrary.set(WellTunedPiano, tWellTunedPiano);
+        tuningLibrary.set(HarrisonStrict, tHarrisonStrict);
+
     }
     
     
@@ -621,10 +632,10 @@ private:
     const Array<float> tThirdCommaMeantone       = Array<float>({0, -0.365049, -0.1043, 0.175951, -0.2086, 0.0716508, -0.3129, -0.0521499, -0.417199, -0.15645, 0.123801, -0.26075 });
     const Array<float> tDAlembertRousseau        = Array<float>({0, -0.132025, -0.06845, -0.0943036, -0.1369, -0.0221113, -0.13365, -0.034225, -0.1304, -0.102675, -0.0582074, -0.135275 });
     const Array<float> tKellner                  = Array<float>({0, -0.09775, -0.05474, -0.05865, -0.10948, -0.01955, -0.1173, -0.02737, -0.0782, -0.08211, -0.0391, -0.08993 });
-    const Array<float> tVallotti                 = Array<float>({0, -0.0586504, -0.0391002, -0.0195504, -0.0782003, 0.0195496, -0.0782004, -0.0195501, -0.0391004, -0.0586502, -3.9e-07, -0.0977504 });
+    const Array<float> tVallotti                 = Array<float>({0, -0.0586504, -0.0391002, -0.0195504, -0.0782003, 0.0195496, -0.0782004, -0.0195501, -0.0391004, -0.0586502, 0, -0.0977504 });
     const Array<float> tYoungII                  = Array<float>({0, -0.0977505, -0.0391002, -0.0586505, -0.0782003, -0.0195505, -0.1173, -0.0195501, -0.0782005, -0.0586502, -0.0391005, -0.0977504 });
     const Array<float> tSixthCommaMeantone       = Array<float>({0, -0.136851, -0.0391002, 0.0586493, -0.0782003, 0.0195491, -0.1173, -0.0195501, -0.156401, -0.0586502, 0.0390992, -0.0977504 });
-    const Array<float> tBachBarnes               = Array<float>({0, -0.0586504, -0.0391002, -0.0195504, -0.0782003, 0.0195496, -0.0782004, -0.0195501, -0.0391004, -0.0586502, -3.9e-07, -0.0586503});
+    const Array<float> tBachBarnes               = Array<float>({0, -0.0586504, -0.0391002, -0.0195504, -0.0782003, 0.0195496, -0.0782004, -0.0195501, -0.0391004, -0.0586502, 0, -0.0586503});
     const Array<float> tNeidhardt                = Array<float>({0, -0.0391, -0.0391002, -0.0195499, -0.0586502, -0.0195498, -0.0391001, -0.0195501, -0.0390999, -0.0586502, -0.0195498, -0.0391002 });
     const Array<float> tBachLehman               = Array<float>({0, -0.0195503, -0.0391002, -0.0195502, -0.0782003, 0.0180461, -0.0391003, -0.0195501, -0.0195502, -0.0586502, -0.0195501, -0.0586503 });
     const Array<float> tBachODonnell             = Array<float>({0, -0.0391002, -0.0391002, -0.0391001, -0.0391002, -0.01955, -0.0391003, -0.0195501, -0.0391002, -0.0586502, -0.0391, -0.0586503 });
@@ -632,7 +643,23 @@ private:
     const Array<float> tBachSwich                = Array<float>({0, -0.0703799, -0.05474, -0.0182465, -0.10948, 0.0273702, -0.0899299, -0.02737, -0.0443132, -0.08211, 0.00782023, -0.08993 });
     const Array<float> tLambert                  = Array<float>({0, -0.0642355, -0.0279285, -0.0251355, -0.055857, 0.0139645, -0.0837855, -0.0139642, -0.0446855, -0.0418928, -0.00558551, -0.0698213 });
     const Array<float> tEighthCommaWT            = Array<float>({0, -0.0391, -0.01955, 0, -0.0391, 0.009775, -0.05865, -0.009775, -0.01955, -0.029325, 0.01955, -0.048875 });
-    const Array<float> tPinnockModern            = Array<float>({0, -0.0390998, -0.01955, 2.3e-07, -0.0391, 0.0195503, -0.0390998, -0.009775, -0.0195498, -0.029325, 3.1e-07, -0.0390999 });
+    const Array<float> tPinnockModern            = Array<float>({0, -0.0390998, -0.01955, 0, -0.0391, 0.0195503, -0.0390998, -0.009775, -0.0195498, -0.029325, 0, -0.0390999 });
+    
+    /*
+     also add:
+     'common just': [1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 9/5, 15/8, 2/1],
+     'symmetric': [1/1, 16/15, 9/8, 6/5, 5/4, 4/3, Math.sqrt(2), 3/2, 8/5, 5/3, 16/9,  15/8,  2/1],
+     'overtone': [1/1, 17/16, 9/8, 19/16, 5/4, 21/16, 11/8, 3/2, 13/8, 27/16, 7/4, 15/8, 2/1],
+     'well tuned piano': [1/1, 567/512, 9/8, 147/128, 21/16, 1323/1024, 189/128, 3/2, 49/32, 7/4, 441/256, 63/32, 2/1],
+     'harrison' : 1/1, 28/27, 9/8, 32/27, 5/4, 4/3, 112/81, 3/2, 128/81, 5/3, 16/9, 15/8 //from Strict Songs
+    */
+    
+    const Array<float> tCommonJust              = Array<float>({0, 0.11731285269777758, 0.039100017307748376, 0.15641287000552553, -0.13686286135165177, -0.019550008653875465, -0.09776284404390367, 0.019550008653873192, 0.13686286135165232, -0.15641287000552553, 0.175962878659401, -0.117312852697778});
+    const Array<float> tSymmetric               = Array<float>({0, 0.11731285269777758, 0.039100017307748376, 0.15641287000552553, -0.13686286135165177, -0.019550008653875465, 0., 0.019550008653873192, 0.13686286135165232, -0.15641287000552553, -0.03910001730774866, -0.117312852697778 });
+    const Array<float> tOvertone                = Array<float>({0, 0.04955409500407299, 0.039100017307748376, -0.02486983867697404, -0.13686286135165177, -0.29219092665487667, -0.4868205763524327, 0.019550008653873192, 0.40527661769310613, 0.05865002596162299, -0.31174093530874986, -0.11731285269777 });
+    const Array<float> tWellTunedPiano          = Array<float>({0, 0.7664590993067458, 0.039100017307748376, -0.603931861963627, 0.7078090733451233, -0.564831844655879, 0.746909090652872, 0.019550008653873192, -0.6234818706175008, 0.6882590646912502, -0.5843818533097533, 0.727359081999 });
+    const Array<float> tHarrisonStrict          = Array<float>({0, -0.3703909612703742, 0.039100017307748376, -0.05865002596162355, -0.13686286135165177, -0.019550008653875465, -0.3899409699242483, 0.019550008653873192, -0.07820003461549846, -0.15641287000552553, -0.03910001730774866, -0.117312852697778 });
+    
     
     JUCE_LEAK_DETECTOR(Tuning)
 };

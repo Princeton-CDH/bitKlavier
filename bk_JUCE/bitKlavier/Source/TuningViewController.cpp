@@ -681,8 +681,9 @@ void TuningViewController::fillTuningCB(void)
     A1AnchorScaleCB.clear(dontSendNotification);
     
     //create submenu of historical temperaments
-    PopupMenu* historicalTemperamentsCBPopUp = scaleCB.getRootMenu();
+    PopupMenu* additionalTuningsPopUp = scaleCB.getRootMenu();
     OwnedArray<PopupMenu> submenus;
+    submenus.add(new PopupMenu());
     submenus.add(new PopupMenu());
     
     int count =0;
@@ -711,17 +712,24 @@ void TuningViewController::fillTuningCB(void)
             customIndex = i;
         }
         
-        if(i>8)
+        if(i>8 && i<=35) //historical
         {
             //add to Historical Temperaments popup
             DBG("adding historical temperament: " + name);
-            PopupMenu* existingMenu = submenus.getLast();
-            //existingMenu->addItem(i-8, name);
-            existingMenu->addItem(i+1, name);
+            PopupMenu* historicalMenu = submenus.getUnchecked(0);
+            historicalMenu->addItem(i+1, name);
+        }
+        else if (i>35) //various
+        {
+            //add to Various popup
+            DBG("adding various tunings: " + name);
+            PopupMenu* variousMenu = submenus.getUnchecked(1);
+            variousMenu->addItem(i+1, name);
         }
     }
     scaleCB.addSeparator();
-    historicalTemperamentsCBPopUp->addSubMenu("Historical", *submenus.getLast());
+    additionalTuningsPopUp->addSubMenu("Historical", *submenus.getUnchecked(0));
+    additionalTuningsPopUp->addSubMenu("Various", *submenus.getUnchecked(1));
     
 }
 
