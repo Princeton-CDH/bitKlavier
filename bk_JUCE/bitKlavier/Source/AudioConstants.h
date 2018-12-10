@@ -846,7 +846,6 @@ typedef enum TuningSystem {
     PinnockModern,   //35
     CommonJust,
     Symmetric,
-    Overtone,
     WellTunedPiano,
     HarrisonStrict,
     TuningSystemNil
@@ -892,7 +891,6 @@ static const std::vector<std::string> cTuningSystemNames = {
     "Pinnock Modern",
     "Common Just",
     "Symmetric Just",
-    "Overtone",
     "Riley Well Tuned Piano",
     "Harrison Strict Songs"
 };
