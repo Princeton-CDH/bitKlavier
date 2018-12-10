@@ -198,6 +198,7 @@ ValueTree Tuning::getState(void)
     prep.setProperty( "Id",Id, 0);
     prep.setProperty( "name",                           name, 0);
     prep.setProperty( ptagTuning_scale,                 sPrep->getScale(), 0);
+    prep.setProperty( ptagTuning_scaleName,             sPrep->getScaleName(), 0);
     prep.setProperty( ptagTuning_fundamental,           sPrep->getFundamental(), 0);
     prep.setProperty( ptagTuning_offset,                sPrep->getFundamentalOffset(), 0 );
     prep.setProperty( ptagTuning_adaptiveIntervalScale, sPrep->getAdaptiveIntervalScale(), 0 );
@@ -239,6 +240,8 @@ ValueTree TuningModPreparation::getState(void)
     
     String p = getParam(TuningScale);
     if (p != String::empty) prep.setProperty( ptagTuning_scale, p.getIntValue(), 0);
+    
+    //add getScaleName()
     
     p = getParam(TuningFundamental);
     if (p != String::empty) prep.setProperty( ptagTuning_fundamental,           p.getIntValue(), 0);
@@ -404,6 +407,9 @@ void Tuning::setState(XmlElement* e)
     
     i = e->getStringAttribute( ptagTuning_scale).getIntValue();
     sPrep->setScale((TuningSystem)i);
+
+    //if a tuning has been saved by name, use that instead of the index value; need to resave all built-in galleries to do this, eventually
+    sPrep->setScaleByName(e->getStringAttribute(ptagTuning_scaleName));
     
     i = e->getStringAttribute( ptagTuning_fundamental).getIntValue();
     sPrep->setFundamental((PitchClass)i);
