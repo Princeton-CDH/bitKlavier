@@ -891,7 +891,7 @@ static const std::vector<std::string> cTuningSystemNames = {
     "Pinnock Modern",
     "Common Just",
     "Symmetric Just",
-    "Riley Well Tuned Piano",
+    "Young Well Tuned Piano",
     "Harrison Strict Songs"
 };
 
