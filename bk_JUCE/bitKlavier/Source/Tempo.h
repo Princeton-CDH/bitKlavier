@@ -106,7 +106,7 @@ public:
     inline float getAdaptiveTempo1Subdivisions(void)            {return at1Subdivisions;}
     inline float getAdaptiveTempo1Min(void)                     {return at1Min;}
     inline float getAdaptiveTempo1Max(void)                     {return at1Max;}
-    
+
     inline const String getName() const noexcept                {return name;}
     inline void setName(String n)                               {name = n;}
     inline void setTempoSystem(TempoType ts)                    {sWhichTempoSystem = ts;}
@@ -118,13 +118,22 @@ public:
         //DBG("tempo = " + String(sTempo));
     }
     
+    inline void setHostTempo(float tempo)
+    {
+        if(sWhichTempoSystem == HostTempo){
+            sTempo = tempo;
+            sBeatThreshSec = (60.0/sTempo);
+            sBeatThreshMS = sBeatThreshSec * 1000.;
+            //DBG("tempo = " + String(sTempo));
+        }
+    }
+    
     //Adaptive Tempo 1
     inline void setAdaptiveTempo1Mode(AdaptiveTempo1Mode mode)          {at1Mode = mode;}
     inline void setAdaptiveTempo1History(int hist)                      {at1History = hist;}
     inline void setAdaptiveTempo1Subdivisions(float sub)                {at1Subdivisions = sub;}
     inline void setAdaptiveTempo1Min(float min)                         {at1Min = min;}
     inline void setAdaptiveTempo1Max(float max)                         {at1Max = max;}
-
     
     void print(void)
     {

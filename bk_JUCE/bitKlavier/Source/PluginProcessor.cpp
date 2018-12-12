@@ -726,12 +726,20 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     if (!didLoadMainPianoSamples) return;
     
-    if(wrapperType == wrapperType_AudioUnit || wrapperType == wrapperType_VST || wrapperType ==wrapperType_VST3) //check this on setup; if(isPlugIn) {...
+    if(wrapperType == wrapperType_AudioUnit ||
+       wrapperType == wrapperType_VST
+       || wrapperType ==wrapperType_VST3) //check this on setup; if(isPlugIn) {...
     {
         playHead = this->getPlayHead();
         playHead->getCurrentPosition (currentPositionInfo);
         hostTempo = currentPositionInfo.bpm;
-        //DBG("DAW bpm = " + String(currentPositionInfo.bpm));
+        currentPiano->getPreparationMaps();
+        Tempo::PtrArr allTempoPreps = gallery->getAllTempo();
+        for (auto p : allTempoPreps)
+        {
+            p->aPrep->setHostTempo(hostTempo);
+        }
+        DBG("DAW bpm = " + String(currentPositionInfo.bpm));
     }
  
     int time;
