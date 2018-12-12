@@ -152,7 +152,7 @@ public:
     {
         Array<float> weights;
         
-        for (int i = 0; i < 12; i++)
+        for (int i = 1; i < 13; i++)
         {
             weights.add(getSpringWeight(i));
         }

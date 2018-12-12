@@ -98,7 +98,7 @@ private:
     void bkComboBoxDidChange (ComboBox* box) override;
     void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
-    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TempoPreparationEditor)
@@ -141,7 +141,7 @@ private:
     void bkComboBoxDidChange (ComboBox* box) override;
     void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
-    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
     
     void greyOutAllComponents();

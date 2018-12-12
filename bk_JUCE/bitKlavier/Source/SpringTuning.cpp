@@ -18,9 +18,12 @@ void SpringTuning::copy(SpringTuning::Ptr st)
     rate = st->getRate();
     stiffness = st->getStiffness();
     active = st->getActive();
+    drag = st->getDrag();
     
     intervalStiffness = st->getIntervalStiffness();
     tetherStiffness = st->getTetherStiffness();
+    
+    scaleId = st->getScaleId();
     
     setIntervalTuning(st->getIntervalTuning());
     setTetherTuning(st->getTetherTuning());
@@ -112,7 +115,7 @@ active(false)
 	numNotes = 0;
     
     if (st != nullptr) copy(st);
-    
+
     setDrag(drag);
     setRate(rate);
 }
@@ -365,7 +368,6 @@ void SpringTuning::addSpringsByNote(int note)
 			{
 				if (b->getEnabled())
                 {
-                    DBG("added spring: " + String(a->getNote()) + " " + String(b->getNote()));
                     spring->setEnabled(true);
                 }
 			}
@@ -373,7 +375,6 @@ void SpringTuning::addSpringsByNote(int note)
 			{
 				if (a->getEnabled())
                 {
-                    DBG("added spring: " + String(a->getNote()) + " " + String(b->getNote()));
                     spring->setEnabled(true);
                 }
 			}

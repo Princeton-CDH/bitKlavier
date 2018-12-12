@@ -1167,7 +1167,7 @@ sliderIncrement(increment)
     showName.setTooltip("tooltip text");
     addAndMakeVisible(showName);
     
-    valueTF.setText(String(sliderDefault));
+    valueTF.setText(String(sliderDefault), dontSendNotification);
     valueTF.addListener(this);
     valueTF.setSelectAllWhenFocused(true);
 #if JUCE_IOS
@@ -1206,6 +1206,7 @@ void BKSingleSlider::sliderValueChanged (Slider *slider)
     if(slider == &thisSlider)
     {
         listeners.call(&BKSingleSlider::Listener::BKSingleSliderValueChanged,
+                       this,
                        getName(),
                        thisSlider.getValue());
         
@@ -1222,6 +1223,7 @@ void BKSingleSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
     unfocusAllComponents();
     
     listeners.call(&BKSingleSlider::Listener::BKSingleSliderValueChanged,
+                   this,
                    getName(),
                    thisSlider.getValue());
 }
@@ -2545,7 +2547,7 @@ void BKADSRSlider::setBright()
 }
 
 
-void BKADSRSlider::BKSingleSliderValueChanged(String name, double val)
+void BKADSRSlider::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     float sustainVal = sustainSlider->getValue();
     if (sustainVal > 1.) { sustainVal = 1.; sustainSlider->setValue(1., dontSendNotification); }

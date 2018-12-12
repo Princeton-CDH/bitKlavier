@@ -118,7 +118,7 @@ private:
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;
     void bkComboBoxDidChange        (ComboBox* box)         override;
-    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
@@ -170,7 +170,7 @@ private:
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;
     void bkComboBoxDidChange        (ComboBox* box)         override;
-    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;

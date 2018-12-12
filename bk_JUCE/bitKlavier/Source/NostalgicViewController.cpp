@@ -483,7 +483,7 @@ void NostalgicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     }
 }
 
-void NostalgicPreparationEditor::BKSingleSliderValueChanged(String name, double val)
+void NostalgicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
     NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
@@ -952,7 +952,7 @@ void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
 }
 
-void NostalgicModificationEditor::BKSingleSliderValueChanged(String name, double val)
+void NostalgicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
     

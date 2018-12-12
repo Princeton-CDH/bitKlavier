@@ -591,7 +591,7 @@ void SynchronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
     //processor.updateState->synchronicPreparationDidChange = true;
 }
 
-void SynchronicPreparationEditor::BKSingleSliderValueChanged(String name, double val)
+void SynchronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
@@ -1324,7 +1324,7 @@ void SynchronicModificationEditor::multiSlidersDidChange(String name, Array<Arra
     updateModification();
 }
 
-void SynchronicModificationEditor::BKSingleSliderValueChanged(String name, double val)
+void SynchronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
     

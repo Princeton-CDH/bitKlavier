@@ -297,7 +297,7 @@ void GeneralViewController::update(void)
     invertSustainB.setToggleState(gen->getInvertSustain(), dontSendNotification);
 }
 
-void GeneralViewController::BKSingleSliderValueChanged(String name, double val)
+void GeneralViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
 

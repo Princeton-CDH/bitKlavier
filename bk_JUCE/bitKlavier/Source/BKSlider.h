@@ -294,7 +294,7 @@ public:
         //BKSingleSlider::Listener() {}
         virtual ~Listener() {};
         
-        virtual void BKSingleSliderValueChanged(String name, double val) = 0;
+        virtual void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) = 0;
     };
     
     ListenerList<Listener> listeners;
@@ -809,7 +809,7 @@ public:
         else showName.setJustificationType(Justification::bottomLeft);
     }
     
-    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void buttonStateChanged (Button*) override;
     void buttonClicked (Button*) override;
     void mouseDown (const MouseEvent &event) override {};

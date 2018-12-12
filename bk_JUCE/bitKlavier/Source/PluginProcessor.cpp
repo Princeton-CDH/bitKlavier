@@ -963,12 +963,16 @@ void BKAudioProcessor::performModifications(int noteNumber)
     {
         Tuning::Ptr tuning = gallery->getTuning(tMod[i]->getPrepId());
         TuningPreparation::Ptr active = tuning->aPrep;
+        TuningModPreparation::Ptr mod = gallery->getTuningModPreparation(tMod[i]->getId());
         TuningParameterType type = tMod[i]->getParameterType();
         modf = tMod[i]->getModFloat();
         modi = tMod[i]->getModInt();
         modb = tMod[i]->getModBool();
         modfa = tMod[i]->getModFloatArr();
         modia = tMod[i]->getModIntArr();
+        
+        
+        DBG("p" + String(i) + " " + mod->getParam((TuningParameterType)i));
         
         if (type == TuningScale)
         {
@@ -1008,7 +1012,6 @@ void BKAudioProcessor::performModifications(int noteNumber)
         }
         else if (type == TuningSpringRate)
         {
-            printf(" PRE pointer to active %p\n", (void *)active);
             active->getSpringTuning()->setRate(modf);
         }
         else if (type == TuningSpringDrag)
@@ -1025,12 +1028,17 @@ void BKAudioProcessor::performModifications(int noteNumber)
         }
         else if (type == TuningSpringIntervalWeights)
         {
-            DBG("modfa: " + floatArrayToString(modfa));
+            DBG("interval weights: " + floatArrayToString(modfa));
             active->getSpringTuning()->setSpringWeights(modfa);
         }
         else if (type == TuningSpringIntervalScale)
         {
-            active->getSpringTuning()->setIntervalTuning(modfa);
+            int springScaleId = modi;
+            active->getSpringTuning()->setScaleId((TuningSystem) springScaleId);
+            
+            Array<float> scale = tuning->getScaleCents(springScaleId);
+            
+            active->getSpringTuning()->setIntervalTuning(scale);
         }
         
         updateState->tuningPreparationDidChange = true;

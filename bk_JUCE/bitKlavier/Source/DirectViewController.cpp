@@ -385,7 +385,7 @@ void DirectPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableC
     fillSelectCB(0, processor.updateState->currentDirectId);
 }
 
-void DirectPreparationEditor::BKSingleSliderValueChanged(String name, double val)
+void DirectPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
     DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
@@ -727,7 +727,7 @@ void DirectModificationEditor::BKEditableComboBoxChanged(String name, BKEditable
 }
 
 
-void DirectModificationEditor::BKSingleSliderValueChanged(String name, double val)
+void DirectModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
     

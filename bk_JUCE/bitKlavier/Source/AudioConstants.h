@@ -635,7 +635,7 @@ static const std::vector<BKParameterDataType> cTuningDataTypes = {
     BKBool,
     BKFloatArr,
     BKFloatArr,
-    BKFloatArr
+    BKInt
 };
 
 static const std::vector<std::string> cTuningParameterTypes = {

@@ -680,6 +680,11 @@ public:
     TuningModPreparation(TuningPreparation::Ptr p, int Id):
     Id(Id)
     {
+        for (int i = 0; i < TuningParameterTypeNil; i++)
+        {
+            param.set(i, "");
+        }
+        
         param.ensureStorageAllocated((int)cTuningParameterTypes.size());
         
         param.set(TuningScale, String(p->getScale()));
@@ -710,26 +715,10 @@ public:
     TuningModPreparation(int Id):
     Id(Id)
     {
-        param.set(TuningScale, "");
-        param.set(TuningFundamental, "");
-        param.set(TuningOffset, "");
-        param.set(TuningA1IntervalScale, "");
-        param.set(TuningA1Inversional, "");
-        param.set(TuningA1AnchorScale, "");
-        param.set(TuningA1AnchorFundamental, "");
-        param.set(TuningA1ClusterThresh, "");
-        param.set(TuningA1History, "");
-        param.set(TuningCustomScale, "");
-        param.set(TuningAbsoluteOffsets, "");
-        
-        param.set(TuningSpringTetherStiffness,      "");
-        param.set(TuningSpringIntervalStiffness,    "");
-        param.set(TuningSpringRate,                 "");
-        param.set(TuningSpringActive,               "");
-        param.set(TuningSpringTetherWeights,        "");
-                
-        param.set(TuningSpringTetherWeights,        "");
-        param.set(TuningSpringTetherStiffness,      "");
+        for (int i = 0; i < TuningParameterTypeNil; i++)
+        {
+            param.set(i, "");
+        }
     }
     
     inline TuningModPreparation::Ptr duplicate(void)
@@ -773,12 +762,15 @@ public:
         param.set(TuningSpringTetherWeights,        floatArrayToString(p->getSpringTuning()->getSpringWeights()));
         param.set(TuningSpringTetherStiffness,      floatArrayToString(p->getSpringTuning()->getIntervalTuning()));
         
-        DBG(floatArrayToString(p->getSpringTuning()->getIntervalTuning()));
-        
     }
     
     inline void copy(TuningModPreparation::Ptr p)
     {
+        for (int i = 0; i < TuningParameterTypeNil; i++)
+        {
+            param.set(i, "");
+        }
+        
         for (int i = TuningId+1; i < TuningParameterTypeNil; i++)
         {
             param.set(i, p->getParam((TuningParameterType)i));
@@ -855,6 +847,7 @@ public:
     
     inline void setParam(TuningParameterType type, String val)
     {
+        DBG("set param " + String(type) + " of " + String(param.size()));
         param.set(type, val);
     }
     
@@ -865,11 +858,16 @@ public:
     
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
+    
+    inline void setPreps(Array<int> ps) { preps = ps; }
+    inline Array<int> getPreps(void) { return preps; }
 
 private:
     int Id; 
     String name;
     StringArray          param;
+    
+    Array<int> preps;
     
     JUCE_LEAK_DETECTOR(TuningModPreparation);
 };

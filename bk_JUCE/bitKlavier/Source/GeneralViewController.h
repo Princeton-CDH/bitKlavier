@@ -107,7 +107,7 @@ private:
     void bkComboBoxDidChange        (ComboBox* box)             override { };
     void bkButtonClicked            (Button* b)                 override;
     void bkMessageReceived          (const String& message)     override { };
-    void BKSingleSliderValueChanged (String name, double val)   override;
+    void BKSingleSliderValueChanged (BKSingleSlider* slider, String name, double val)   override;
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GeneralViewController)

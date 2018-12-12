@@ -823,17 +823,17 @@ void Piano::deconfigureTempoModificationForKeys(TempoModPreparation::Ptr mod, Ar
     }
 }
 
-void Piano::configureTuningModification(int key, TuningModPreparation::Ptr dmod, Array<int> whichPreps)
+void Piano::configureTuningModification(int key, TuningModPreparation::Ptr mod, Array<int> whichPreps)
 {
     
     //DBG("TUNINGMOD key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
     
-    int whichMod = dmod->getId();
+    int whichMod = mod->getId();
 
     // Add Modifications
     for (int n = (int)cTuningParameterTypes.size(); --n >= 0; )
     {
-        String param = dmod->getParam((TuningParameterType)n);
+        String param = mod->getParam((TuningParameterType)n);
         
         if (param != "")
         {
@@ -859,6 +859,8 @@ void Piano::configureTuningModification(TuningModPreparation::Ptr mod, Array<int
             otherKeys.remove(key);
         }
     }
+    
+    mod->setPreps(whichPreps);
     
     deconfigureTuningModificationForKeys(mod, otherKeys);
 }

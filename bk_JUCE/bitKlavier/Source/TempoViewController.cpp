@@ -490,7 +490,7 @@ void TempoPreparationEditor::update(void)
 }
 
 
-void TempoPreparationEditor::BKSingleSliderValueChanged(String name, double val)
+void TempoPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
     TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);;
@@ -804,7 +804,7 @@ void TempoModificationEditor::BKRangeSliderValueChanged(String name, double minv
 
 
 
-void TempoModificationEditor::BKSingleSliderValueChanged(String name, double val)
+void TempoModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
     
