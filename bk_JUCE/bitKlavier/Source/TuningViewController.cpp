@@ -1345,6 +1345,8 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         prep->getSpringTuning()->setScaleId(springScaleId);
         active->getSpringTuning()->setScaleId(springScaleId);
         
+        //TuningSystem springScaleId = prep->getSpringTuning()->getScaleId();
+        
         Array<float> scale = tuning->getScaleCents(springScaleId);
         
         prep->getSpringTuning()->setIntervalTuning(scale);
@@ -1609,6 +1611,12 @@ void TuningPreparationEditor::buttonClicked (Button* b)
             prep->getSpringTuning()->setTetherTuning(EqualTemperament);
             active->getSpringTuning()->setTetherTuning(EqualTemperament);
         }
+        
+        //need to make sure the interval scale is also set; i'm finding that sometimes i have to manually change away from just and back to get the system to work
+        TuningSystem springScaleId = prep->getSpringTuning()->getScaleId();
+        Array<float> scale = tuning->getScaleCents(springScaleId);
+        prep->getSpringTuning()->setIntervalTuning(scale);
+        active->getSpringTuning()->setIntervalTuning(scale);
         
         updateComponentVisibility();
     }
