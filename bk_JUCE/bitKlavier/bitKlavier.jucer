@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="2.2.2"
               bundleIdentifier="com.manyarrowsmusic.bitKlavier" includeBinaryInAppConfig="1"
-              buildVST="1" buildVST3="0" buildAU="1" buildAUv3="0" buildRTAS="0"
+              buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
               pluginManufacturer="manyarrowsmusic" pluginManufacturerCode="Manu"
               pluginCode="bK2m" pluginChannelConfigs="{0,2}" pluginIsSynth="1"
@@ -13,7 +13,8 @@
               maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
               displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Light"
               buildStandalone="1" enableIAA="1" cppLanguageStandard="11" companyCopyright="manyarrowsmusic"
-              pluginFormats="buildVST,buildAU,buildStandalone,enableIAA" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut,pluginEditorRequiresKeys"
+              pluginFormats="buildAU,buildStandalone,buildVST,buildVST3,enableIAA"
+              pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut,pluginEditorRequiresKeys"
               pluginVST3Category="Instrument">
   <MAINGROUP id="s4R02g" name="bitKlavier">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
@@ -384,8 +385,9 @@
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX" vst3Folder="~/STKs/VST3 SDK" customXcodeResourceFolders=""
-               customPList="" smallIcon="smHM8h" bigIcon="iHGLGD">
+    <XCODE_MAC targetFolder="Builds/MacOSX" vst3Folder="/Users/dan/JUCE/modules/juce_audio_processors/format_types/VST3_SDK"
+               customXcodeResourceFolders="" customPList="" smallIcon="smHM8h"
+               bigIcon="iHGLGD" vstLegacyFolder="/Users/dan/JUCE_projects/modules/VST_SDK/VST2_SDK">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        cppLibType="" enablePluginBinaryCopyStep="1"/>
@@ -408,7 +410,7 @@
         <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
-        <MODULEPATH id="stk" path="../../../3p_modules/"/>
+        <MODULEPATH id="stk" path="../../../3p_modules"/>
         <MODULEPATH id="SFZero" path="../../../3p_modules/SFZero/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
@@ -441,7 +443,7 @@
         <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="stk" path="../../../3p_modules/"/>
+        <MODULEPATH id="stk" path="../../../3p_modules"/>
         <MODULEPATH id="SFZero" path="../../../3p_modules/SFZero/modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
@@ -471,8 +473,8 @@
         <MODULEPATH id="juce_audio_formats" path="..\..\..\JUCE\modules"/>
         <MODULEPATH id="juce_audio_devices" path="..\..\..\JUCE\modules"/>
         <MODULEPATH id="juce_audio_basics" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="stk" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="SFZero" path="..\..\..\JUCE\modules"/>
+        <MODULEPATH id="stk" path="../../../3p_modules"/>
+        <MODULEPATH id="SFZero" path="../../../3p_modules/SFZero/modules"/>
       </MODULEPATHS>
     </VS2017>
   </EXPORTFORMATS>

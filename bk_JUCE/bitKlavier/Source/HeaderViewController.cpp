@@ -568,7 +568,10 @@ void HeaderViewController::fillGalleryCB(void)
         
         File moreGalleries = File::getSpecialLocation(File::userDocumentsDirectory);
         
-#if (JUCE_MAC || JUCE_WINDOWS || JUCE_LINUX)
+#if (JUCE_MAC)
+        bkGalleries = bkGalleries.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+#endif
+#if (JUCE_WINDOWS || JUCE_LINUX)
         bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
         
@@ -744,9 +747,14 @@ bool HeaderViewController::handleGalleryChange(void)
             {
 #if JUCE_IOS
                 File newFile = File::getSpecialLocation(File::userDocumentsDirectory);
-#else
+#endif
+#if JUCE_MAC
+                File newFile = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
                 File newFile = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
+                
                 String newURL = newFile.getFullPathName() + name + ".xml";
                 processor.writeCurrentGalleryToURL(newURL);
             }

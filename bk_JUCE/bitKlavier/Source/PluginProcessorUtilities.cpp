@@ -27,11 +27,22 @@ void BKAudioProcessor::updateUI(void)
 
 void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsound)
 {
-    didLoadMainPianoSamples = false;    
+    didLoadMainPianoSamples = false;
+    
+    // Check if path isn't valid and load BKLoadLite if it is not
     if (type == BKLoadSoundfont)
     {
-        if (path == "") return;
-
+        File file(path);
+        
+        if (!file.exists())
+        {
+            type = BKLoadLite;
+        }
+    }
+    
+    
+    if (type == BKLoadSoundfont)
+    {
         shouldLoadDefault = false;
         
         currentSampleType = BKLoadSoundfont;
@@ -101,7 +112,11 @@ void BKAudioProcessor::collectGalleries(void)
     
 #if JUCE_IOS
     bkGalleries = File::getSpecialLocation (File::userDocumentsDirectory);
-#else
+#endif
+#if JUCE_MAC
+    bkGalleries = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
     bkGalleries = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
@@ -116,7 +131,11 @@ void BKAudioProcessor::collectSoundfonts(void)
     
 #if JUCE_IOS
     bkSoundfonts = File::getSpecialLocation (File::userDocumentsDirectory);
-#else
+#endif
+#if JUCE_MAC
+    bkSoundfonts = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
     bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("soundfonts");
 #endif
     

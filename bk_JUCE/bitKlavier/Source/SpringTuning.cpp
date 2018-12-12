@@ -302,7 +302,6 @@ void SpringTuning::addParticle(int note)
 {
     particleArray[note]->setEnabled(true);
     tetherParticleArray[note]->setEnabled(true);
-    //DBG("particle " + String(note) + " enabled? " + String((int)particleArray[note]->getEnabled()) );
 }
 void SpringTuning::removeParticle(int note)
 {

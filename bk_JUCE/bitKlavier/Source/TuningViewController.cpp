@@ -578,14 +578,24 @@ void TuningViewController::fillTuningCB(void)
     A1IntervalScaleCB.clear(dontSendNotification);
     A1AnchorScaleCB.clear(dontSendNotification);
     
+    //create submenu of historical temperaments
+    PopupMenu* additionalTuningsPopUp = scaleCB.getRootMenu();
+    OwnedArray<PopupMenu> submenus;
+    submenus.add(new PopupMenu());
+    submenus.add(new PopupMenu());
+    
     int count =0;
-    for (int i = 0; i < cTuningSystemNames.size(); i++)
+    for (int i = 0; i < cTuningSystemNames.size(); i++) //&& if(i<=8), for original systems; otherwise add to submenu of historical temperaments
     {
         String name = cTuningSystemNames[i];
-        scaleCB.addItem(name, i+1);
-        A1IntervalScaleCB.addItem(name, i+1);
-        A1AnchorScaleCB.addItem(name, i+1);
         
+        if(i<=8) //original bK scales
+        {
+            scaleCB.addItem(name, i+1);
+            A1IntervalScaleCB.addItem(name, i+1);
+            A1AnchorScaleCB.addItem(name, i+1);
+        }
+
         if(name == "Adaptive Tuning 1" || name == "Adaptive Anchored Tuning 1")
         {
             A1IntervalScaleCB.setItemEnabled(i+1, false);
@@ -594,14 +604,31 @@ void TuningViewController::fillTuningCB(void)
         else
         {
             springScaleCB.addItem(name, ++count);
-            
         }
                 
         if(name == "Custom") {
             customIndex = i;
         }
-
+        
+        if(i>8 && i<=35) //historical
+        {
+            //add to Historical Temperaments popup
+            DBG("adding historical temperament: " + name);
+            PopupMenu* historicalMenu = submenus.getUnchecked(0);
+            historicalMenu->addItem(i+1, name);
+        }
+        else if (i>35) //various
+        {
+            //add to Various popup
+            DBG("adding various tunings: " + name);
+            PopupMenu* variousMenu = submenus.getUnchecked(1);
+            variousMenu->addItem(i+1, name);
+        }
     }
+    scaleCB.addSeparator();
+    additionalTuningsPopUp->addSubMenu("Historical", *submenus.getUnchecked(0));
+    additionalTuningsPopUp->addSubMenu("Various", *submenus.getUnchecked(1));
+    
 }
 
 void TuningViewController::fillFundamentalCB(void)
@@ -1052,11 +1079,29 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (box == &scaleCB)
     {
-        prep->setScale((TuningSystem) index);
-        active->setScale((TuningSystem) index);
+
+        DBG("name of scale chosen: " + box->getItemText(index));
+        //prep->setScale((TuningSystem) index);
+        //active->setScale((TuningSystem) index);
         
-        DBG("current tuning from processor = " + String(processor.updateState->currentTuningId));
+        //redoing this so we index by tuning name, rather than index, so we don't lock the menu structure down
+        prep->setScaleByName(box->getItemText(index));
+        active->setScaleByName(box->getItemText(index));
+        
+        //DBG("current tuning from processor = " + String(processor.updateState->currentTuningId));
+        //DBG("current TuningSystem " + cTuningSystemNames[index]);
+        DBG("current TuningSystem " + prep->getScaleName());
         customKeyboard.setValues(tuning->getCurrentScaleCents());
+        
+        //just for printing offsets out; temporary
+        Array<float> tuningOffsets = tuning->getCurrentScale();
+        String offsetString = " ";
+        for(int i=0; i<tuningOffsets.size(); i++)
+        {
+            offsetString += (String(tuningOffsets.getUnchecked(i)) + ", ");
+        }
+        DBG("scale offsets: " + offsetString);
+
         
         if(active->getSpringsActive())
         {
@@ -1126,6 +1171,8 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         
         prep->getSpringTuning()->setScaleId(springScaleId);
         active->getSpringTuning()->setScaleId(springScaleId);
+        
+        //TuningSystem springScaleId = prep->getSpringTuning()->getScaleId();
         
         Array<float> scale = tuning->getScaleCents(springScaleId);
         
@@ -1391,6 +1438,12 @@ void TuningPreparationEditor::buttonClicked (Button* b)
             prep->getSpringTuning()->setTetherTuning(EqualTemperament);
             active->getSpringTuning()->setTetherTuning(EqualTemperament);
         }
+        
+        //need to make sure the interval scale is also set; i'm finding that sometimes i have to manually change away from just and back to get the system to work
+        TuningSystem springScaleId = prep->getSpringTuning()->getScaleId();
+        Array<float> scale = tuning->getScaleCents(springScaleId);
+        prep->getSpringTuning()->setIntervalTuning(scale);
+        active->getSpringTuning()->setIntervalTuning(scale);
         
         updateComponentVisibility();
     }

@@ -137,6 +137,7 @@ const String vtagTuning = "tuning";
 const String vtagModTuning = "modTuning";
 const String ptagTuning_Id = "Id";
 const String ptagTuning_scale = "scale";
+const String ptagTuning_scaleName = "scaleName";
 const String ptagTuning_fundamental = "fundamental";
 const String ptagTuning_offset = "offset";
 const String ptagTuning_adaptiveIntervalScale = "adaptiveIntervalScale";
@@ -668,9 +669,18 @@ static const std::vector<std::string> cTuningParameterTypes = {
 
 #pragma mark - Tempo
 
+typedef enum TempoType {
+    ConstantTempo = 0,
+    AdaptiveTempo1,
+    HostTempo,
+    TempoSystemNil
+    
+} TempoType;
+
 static const std::vector<std::string> cTempoModeTypes = {
     "Constant Tempo",
-    "Adaptive Tempo 1"
+    "Adaptive Tempo 1",
+    "Host Tempo"
 };
 
 typedef enum AdaptiveTempo1Mode {
@@ -843,6 +853,37 @@ typedef enum TuningSystem {
     OtonalTuning,
     UtonalTuning,
     CustomTuning,
+    Pythagorean,
+    Grammateus,
+    KirnbergerII,
+    KirnbergerIII,
+    WerkmeisterIII,
+    QuarterCommaMeantone,
+    SplitWolfQCMeantone,
+    TransposingQCMeantone,
+    Corrette,
+    Rameau,
+    Marpourg,
+    EggarsEnglishOrd,
+    ThirdCommaMeantone,
+    DAlembertRousseau,
+    Kellner,
+    Vallotti,
+    YoungII,
+    SixthCommaMeantone,
+    BachBarnes,
+    Neidhardt,
+    BachLehman,
+    BachODonnell,
+    BachHill,
+    BachSwich,
+    Lambert,
+    EighthCommaWT,
+    PinnockModern,   //35
+    CommonJust,
+    Symmetric,
+    WellTunedPiano,
+    HarrisonStrict,
     TuningSystemNil
 
 } TuningSystem;
@@ -856,7 +897,38 @@ static const std::vector<std::string> cTuningSystemNames = {
     "Duodene",
     "Otonal",
     "Utonal",
-    "Custom"
+    "Custom",
+    "Pythagorean",
+    "Grammateus",
+    "Kirnberger II",
+    "Kirnberger III",
+    "Werkmeister III",
+    "Quarter-Comma Meantone",
+    "Split-Wolf QC Meantone",
+    "Transposing QC Meantone",
+    "Corrette",
+    "Rameau",
+    "Marpourg",
+    "Eggar's English Ord",
+    "Third-Comma Meantone",
+    "D'Alembert/Rousseau",
+    "Kellner",
+    "Vallotti",
+    "Young II",
+    "Sixth-Comma Meantone",
+    "Bach/Barnes",
+    "Neidhardt Große Stadt",
+    "Bach/Lehman",
+    "Bach/O'Donnell",
+    "Bach/Hill",
+    "Bach/Swich",
+    "Lambert",
+    "Eighth-Comma WT",
+    "Pinnock Modern",
+    "Common Just",
+    "Symmetric Just",
+    "Young Well Tuned Piano",
+    "Harrison Strict Songs"
 };
 
 static const std::vector<std::string> cFundamentalNames = {
@@ -874,11 +946,5 @@ static const std::vector<std::string> cFundamentalNames = {
     "11: B"
 };
 
-typedef enum TempoType {
-    ConstantTempo = 0,
-    AdaptiveTempo1,
-    TempoSystemNil
-    
-} TempoType;
 
 #endif  // AUDIOCONSTANTS_H_INCLUDED

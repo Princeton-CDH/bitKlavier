@@ -171,8 +171,17 @@ shouldLoadDefault(true)
 #if JUCE_IOS
     platform = BKIOS;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory);
-#else
+#endif
+#if JUCE_MAC
     platform = BKOSX;
+    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+#endif
+#if JUCE_WINDOWS
+    platform = BKWindows;
+    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+#endif
+#if JUCE_LINUX
+    platform = BKLinux;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
@@ -419,7 +428,11 @@ void BKAudioProcessor::createNewGallery(String name, ScopedPointer<XmlElement> x
 
 #if JUCE_IOS
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory);
-#else
+#endif
+#if JUCE_MAC
+    bkGalleries = bkGalleries.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
@@ -713,12 +726,20 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     if (!didLoadMainPianoSamples) return;
     
-    if(wrapperType == wrapperType_AudioUnit || wrapperType == wrapperType_VST || wrapperType ==wrapperType_VST3) //check this on setup; if(isPlugIn) {...
+    if(wrapperType == wrapperType_AudioUnit ||
+       wrapperType == wrapperType_VST
+       || wrapperType ==wrapperType_VST3) //check this on setup; if(isPlugIn) {...
     {
         playHead = this->getPlayHead();
         playHead->getCurrentPosition (currentPositionInfo);
         hostTempo = currentPositionInfo.bpm;
-        //DBG("DAW bpm = " + String(currentPositionInfo.bpm));
+        currentPiano->getPreparationMaps();
+        Tempo::PtrArr allTempoPreps = gallery->getAllTempo();
+        for (auto p : allTempoPreps)
+        {
+            p->aPrep->setHostTempo(hostTempo);
+        }
+        DBG("DAW bpm = " + String(currentPositionInfo.bpm));
     }
  
     int time;
@@ -1250,7 +1271,11 @@ void BKAudioProcessor::saveCurrentGallery(void)
     {
 #if JUCE_IOS
         writeCurrentGalleryToURL( File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + gallery->getName());
-#else
+#endif
+#if JUCE_MAC
+        writeCurrentGalleryToURL( File::getSpecialLocation(File::globalApplicationsDirectory).getFullPathName() + "/bitKlavier/galleries/" + gallery->getName());
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
         writeCurrentGalleryToURL( File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/bitKlavier resources/galleries/" + gallery->getName());
 #endif
     }
@@ -1303,9 +1328,11 @@ void BKAudioProcessor::loadGalleryDialog(void)
     {
         File myFile (myChooser.getResult());
 
-        File user   (File::getSpecialLocation(File::userDocumentsDirectory));
-        user = user.getChildFile("bitKlavier resources/galleries/");
-
+        //File user   (File::getSpecialLocation(File::userDocumentsDirectory));
+        //user = user.getChildFile("bitKlavier resources/galleries/");
+        File user   (File::getSpecialLocation(File::globalApplicationsDirectory));
+        user = user.getChildFile("bitKlavier/galleries/");
+        
         user = user.getChildFile(myFile.getFileName());
         
         if (myFile.getFullPathName() != user.getFullPathName())
@@ -1404,8 +1431,10 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
         
         File myFile (myChooser.getResult());
         
-        File user   (File::getSpecialLocation(File::userDocumentsDirectory));
-        user = user.getChildFile("bitKlavier resources/galleries/");
+        //File user   (File::getSpecialLocation(File::userDocumentsDirectory));
+        //user = user.getChildFile("bitKlavier resources/galleries/");
+        File user   (File::getSpecialLocation(File::globalApplicationsDirectory));
+        user = user.getChildFile("bitKlavier/galleries/");
         
         user = user.getChildFile(myFile.getFileName());
         

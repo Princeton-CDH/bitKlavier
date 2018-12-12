@@ -194,8 +194,9 @@ public:
     }
     
     inline const String getName() const noexcept {return name;}
-    inline const TuningSystem getScale() const noexcept                    {return tScale;               }
+    inline const TuningSystem getScale() const noexcept                     {return tScale;                     }
     inline const PitchClass getFundamental() const noexcept                 {return tFundamental;               }
+    inline const String getScaleName() const noexcept                       {return cTuningSystemNames[(int)tScale];}
     inline const float getFundamentalOffset() const noexcept                {return tFundamentalOffset;         }
     inline const TuningSystem getAdaptiveIntervalScale() const noexcept     {return tAdaptiveIntervalScale;     }
     inline const bool getAdaptiveInversional() const noexcept               {return tAdaptiveInversional;       }
@@ -231,8 +232,19 @@ public:
         return tCustomCents;
     }
     
-    inline void setName(String n){name = n; DBG("set tuning name " + name);}
-    inline void setScale(TuningSystem tuning)                                      {tScale = tuning;}
+    inline void setName(String n)                                           {name = n; DBG("set tuning name " + name);}
+    inline void setScale(TuningSystem tuning)                               {tScale = tuning;}
+    inline void setScaleByName(String tuningName)
+    {
+        //DBG("set tuning system by name: " + tuningName);
+        for(int i=0; i<cTuningSystemNames.size(); i++)
+        {
+            if(cTuningSystemNames[i] == tuningName) {
+                setScale((TuningSystem)i);
+                DBG("scale set to: " + getScaleName());
+            }
+        }
+    }
     inline void setFundamental(PitchClass fundamental)                              {tFundamental = fundamental; }
     inline void setFundamentalOffset(float offset)                                  {tFundamentalOffset = offset; }
     inline void setAdaptiveIntervalScale(TuningSystem adaptiveIntervalScale)        {tAdaptiveIntervalScale = adaptiveIntervalScale;}
@@ -388,12 +400,7 @@ public:
         tuningLibrary.ensureStorageAllocated((int)cTuningSystemNames.size());
         for(int i=0; i<cTuningSystemNames.size(); i++) tuningLibrary.insert(EqualTemperament, tEqualTuning);
         
-        tuningLibrary.set(PartialTuning, tPartialTuning);
-        tuningLibrary.set(JustTuning, tJustTuning);
-        tuningLibrary.set(EqualTemperament, tEqualTuning);
-        tuningLibrary.set(DuodeneTuning, tDuodeneTuning);
-        tuningLibrary.set(OtonalTuning, tOtonalTuning);
-        tuningLibrary.set(UtonalTuning, tUtonalTuning);
+        setupTuningLibrary();
         
         sPrep->getSpringTuning()->stop();
     }
@@ -410,12 +417,7 @@ public:
         tuningLibrary.ensureStorageAllocated((int)cTuningSystemNames.size());
         for(int i=0; i<cTuningSystemNames.size(); i++) tuningLibrary.insert(EqualTemperament, tEqualTuning);
         
-        tuningLibrary.set(PartialTuning, tPartialTuning);
-        tuningLibrary.set(JustTuning, tJustTuning);
-        tuningLibrary.set(EqualTemperament, tEqualTuning);
-        tuningLibrary.set(DuodeneTuning, tDuodeneTuning);
-        tuningLibrary.set(OtonalTuning, tOtonalTuning);
-        tuningLibrary.set(UtonalTuning, tUtonalTuning);
+        setupTuningLibrary();
         
         sPrep->getSpringTuning()->stop();
     }
@@ -437,6 +439,53 @@ public:
     {
         sPrep       = new TuningPreparation();
         aPrep       = new TuningPreparation(sPrep);
+    }
+    
+    void setupTuningLibrary()
+    {
+        //bK originals
+        tuningLibrary.set(PartialTuning, tPartialTuning);
+        tuningLibrary.set(JustTuning, tJustTuning);
+        tuningLibrary.set(EqualTemperament, tEqualTuning);
+        tuningLibrary.set(DuodeneTuning, tDuodeneTuning);
+        tuningLibrary.set(OtonalTuning, tOtonalTuning);
+        tuningLibrary.set(UtonalTuning, tUtonalTuning);
+        
+        //historical
+        tuningLibrary.set(Pythagorean, tPythagorean);
+        tuningLibrary.set(Grammateus, tGrammateus);
+        tuningLibrary.set(KirnbergerII, tKirnbergerII);
+        tuningLibrary.set(KirnbergerIII, tKirnbergerIII);
+        tuningLibrary.set(WerkmeisterIII, tWerkmeisterIII);
+        tuningLibrary.set(QuarterCommaMeantone, tQuarterCommaMeantone);
+        tuningLibrary.set(SplitWolfQCMeantone, tSplitWolfQCMeantone);
+        tuningLibrary.set(TransposingQCMeantone, tTransposingQCMeantone);
+        tuningLibrary.set(Corrette, tCorrette);
+        tuningLibrary.set(Rameau, tRameau);
+        tuningLibrary.set(Marpourg, tMarpourg);
+        tuningLibrary.set(EggarsEnglishOrd, tEggarsEnglishOrd);
+        tuningLibrary.set(ThirdCommaMeantone, tThirdCommaMeantone);
+        tuningLibrary.set(DAlembertRousseau, tDAlembertRousseau);
+        tuningLibrary.set(Kellner, tKellner);
+        tuningLibrary.set(Vallotti, tVallotti);
+        tuningLibrary.set(YoungII, tYoungII);
+        tuningLibrary.set(SixthCommaMeantone, tSixthCommaMeantone);
+        tuningLibrary.set(BachBarnes, tBachBarnes);
+        tuningLibrary.set(Neidhardt, tNeidhardt);
+        tuningLibrary.set(BachLehman, tBachLehman);
+        tuningLibrary.set(BachODonnell, tBachODonnell);
+        tuningLibrary.set(BachHill, tBachHill);
+        tuningLibrary.set(BachSwich, tBachSwich);
+        tuningLibrary.set(Lambert, tLambert);
+        tuningLibrary.set(EighthCommaWT, tEighthCommaWT);
+        tuningLibrary.set(PinnockModern, tPinnockModern);
+        
+        //others
+        tuningLibrary.set(CommonJust, tCommonJust);
+        tuningLibrary.set(Symmetric, tSymmetric);
+        tuningLibrary.set(WellTunedPiano, tWellTunedPiano);
+        tuningLibrary.set(HarrisonStrict, tHarrisonStrict);
+
     }
     
     
@@ -486,6 +535,7 @@ public:
     {
         return sPrep->getSpringTuning();
     }
+
     
     inline String getName(void) const noexcept {return name;}
     
@@ -563,12 +613,56 @@ private:
     Array<float> getTuningOffsets(TuningSystem which) {return tuningLibrary.getUnchecked(which); }
     
     
-    const Array<float> tEqualTuning = Array<float>( {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.} );
-	const Array<float> tJustTuning = Array<float>({ 0., .117313, .039101, .156414, -.13686, -.019547, -.174873, .019547, .136864, -.15641, -.311745, -.11731 });
-	const Array<float> tPartialTuning = Array<float>({ 0., .117313, .039101, -.331291, -.13686, -.019547, -.486824, .019547, .405273, -.15641, -.311745, -.506371 });
-	const Array<float> tDuodeneTuning = Array<float>({ 0., .117313, .039101, .156414, -.13686, -.019547, -.097763, .019547, .136864, -.15641, -.039101, -.11731 });
-	const Array<float> tOtonalTuning = Array<float>({ 0., .049553, .039101, -.02872, -.13686, -.292191, -.486824, .019547, .405273, .058647, -.311745, -.11731 } );
-	const Array<float> tUtonalTuning = Array<float>({ 0., .117313, .311745, .156414, -.405273, -.019547, .486824, .292191, .136864, .024847, -.039101, -.049553 } );
+    const Array<float> tEqualTuning     = Array<float>( {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.} );
+	const Array<float> tJustTuning      = Array<float>({ 0., .117313, .039101, .156414, -.13686, -.019547, -.174873, .019547, .136864, -.15641, -.311745, -.11731 });
+	const Array<float> tPartialTuning   = Array<float>({ 0., .117313, .039101, -.331291, -.13686, -.019547, -.486824, .019547, .405273, -.15641, -.311745, -.506371 });
+	const Array<float> tDuodeneTuning   = Array<float>({ 0., .117313, .039101, .156414, -.13686, -.019547, -.097763, .019547, .136864, -.15641, -.039101, -.11731 });
+	const Array<float> tOtonalTuning    = Array<float>({ 0., .049553, .039101, -.02872, -.13686, -.292191, -.486824, .019547, .405273, .058647, -.311745, -.11731 } );
+	const Array<float> tUtonalTuning    = Array<float>({ 0., .117313, .311745, .156414, -.405273, -.019547, .486824, .292191, .136864, .024847, -.039101, -.049553 } );
+    
+    //historical temperaments
+    const Array<float> tPythagorean     = Array<float>({ 0., 0.13685, 0.0391, -0.05865, 0.0782, -0.01955, 0.1173, 0.01955, 0.1564, 0.05865, -0.0391, 0.09775} );
+    const Array<float> tGrammateus      = Array<float>({ 0., 0.01955, 0.0391, 0.05865, 0.0782, -0.01955, 0, 0.01955, 0.0391, 0.05865, 0.0782, 0.09775 });
+    const Array<float> tKirnbergerII    = Array<float>({ 0., -0.0977871, 0.0391, -0.0586871, -0.1369, -0.0195871, -0.0978, 0.01955, -0.0782371, -0.0489, -0.0391371, -0.11735 });
+    const Array<float> tKirnbergerIII   = Array<float>({ 0., -0.0977871, -0.06845, -0.0586871, -0.1369, -0.0195871, -0.0978, -0.034225, -0.0782371, -0.102675, -0.0391371, -0.11735 });
+    
+    const Array<float> tWerkmeisterIII           = Array<float>({0, -0.0977871, -0.06845, -0.0586871, -0.083125, -0.0195871, -0.0978, -0.034225, -0.0782371, -0.102675, -0.0391371, -0.063575 });
+    const Array<float> tQuarterCommaMeantone     = Array<float>({0, -0.239575, -0.06845, 0.122175, -0.1369, 0.053725, -0.20535, -0.034225, -0.2738, -0.102675, 0.08795, -0.171125 });
+    const Array<float> tSplitWolfQCMeantone      = Array<float>({0, -0.239575, -0.06845, -0.092925, -0.1369, 0.053725, -0.20535, -0.034225, -0.2738, -0.102675, 0.08795, -0.171125 });
+    const Array<float> tTransposingQCMeantone    = Array<float>({0, -0.239575, -0.06845, 0.122175, -0.1369, 0.053725, -0.20535, -0.034225, 0.1564, -0.102675, 0.08795, -0.171125 });
+    const Array<float> tCorrette                 = Array<float>({0, -0.239575, -0.06845, -0.0212249, -0.1369, 0.0509674, -0.20535, -0.034225, -0.23795, -0.102675, 0.0148713, -0.171125 });
+    const Array<float> tRameau                   = Array<float>({0, -0.132025, -0.06845, -0.0301876, -0.1369, 0.0537248, -0.151575, -0.034225, -0.148325, -0.102675, 0.0879498, -0.171125 });
+    const Array<float> tMarpourg                 = Array<float>({0, -0.14995, -0.06845, -0.0391498, -0.1369, 0.0716504, -0.20535, -0.034225, -0.0945499, -0.102675, 0.0162503, -0.171125 });
+    const Array<float> tEggarsEnglishOrd         = Array<float>({0, -0.1858, -0.06845, -0.092925, -0.1369, 0.053725, -0.178463, -0.034225, -0.16625, -0.102675, -0.0196, -0.171125 });
+    const Array<float> tThirdCommaMeantone       = Array<float>({0, -0.365049, -0.1043, 0.175951, -0.2086, 0.0716508, -0.3129, -0.0521499, -0.417199, -0.15645, 0.123801, -0.26075 });
+    const Array<float> tDAlembertRousseau        = Array<float>({0, -0.132025, -0.06845, -0.0943036, -0.1369, -0.0221113, -0.13365, -0.034225, -0.1304, -0.102675, -0.0582074, -0.135275 });
+    const Array<float> tKellner                  = Array<float>({0, -0.09775, -0.05474, -0.05865, -0.10948, -0.01955, -0.1173, -0.02737, -0.0782, -0.08211, -0.0391, -0.08993 });
+    const Array<float> tVallotti                 = Array<float>({0, -0.0586504, -0.0391002, -0.0195504, -0.0782003, 0.0195496, -0.0782004, -0.0195501, -0.0391004, -0.0586502, 0, -0.0977504 });
+    const Array<float> tYoungII                  = Array<float>({0, -0.0977505, -0.0391002, -0.0586505, -0.0782003, -0.0195505, -0.1173, -0.0195501, -0.0782005, -0.0586502, -0.0391005, -0.0977504 });
+    const Array<float> tSixthCommaMeantone       = Array<float>({0, -0.136851, -0.0391002, 0.0586493, -0.0782003, 0.0195491, -0.1173, -0.0195501, -0.156401, -0.0586502, 0.0390992, -0.0977504 });
+    const Array<float> tBachBarnes               = Array<float>({0, -0.0586504, -0.0391002, -0.0195504, -0.0782003, 0.0195496, -0.0782004, -0.0195501, -0.0391004, -0.0586502, 0, -0.0586503});
+    const Array<float> tNeidhardt                = Array<float>({0, -0.0391, -0.0391002, -0.0195499, -0.0586502, -0.0195498, -0.0391001, -0.0195501, -0.0390999, -0.0586502, -0.0195498, -0.0391002 });
+    const Array<float> tBachLehman               = Array<float>({0, -0.0195503, -0.0391002, -0.0195502, -0.0782003, 0.0180461, -0.0391003, -0.0195501, -0.0195502, -0.0586502, -0.0195501, -0.0586503 });
+    const Array<float> tBachODonnell             = Array<float>({0, -0.0391002, -0.0391002, -0.0391001, -0.0391002, -0.01955, -0.0391003, -0.0195501, -0.0391002, -0.0586502, -0.0391, -0.0586503 });
+    const Array<float> tBachHill                 = Array<float>({0, -0.0436113, -0.0330845, -0.0225575, -0.0661691, 0.0165425, -0.0451152, -0.0165423, -0.0421075, -0.0496268, -0.00300749, -0.0466191 });
+    const Array<float> tBachSwich                = Array<float>({0, -0.0703799, -0.05474, -0.0182465, -0.10948, 0.0273702, -0.0899299, -0.02737, -0.0443132, -0.08211, 0.00782023, -0.08993 });
+    const Array<float> tLambert                  = Array<float>({0, -0.0642355, -0.0279285, -0.0251355, -0.055857, 0.0139645, -0.0837855, -0.0139642, -0.0446855, -0.0418928, -0.00558551, -0.0698213 });
+    const Array<float> tEighthCommaWT            = Array<float>({0, -0.0391, -0.01955, 0, -0.0391, 0.009775, -0.05865, -0.009775, -0.01955, -0.029325, 0.01955, -0.048875 });
+    const Array<float> tPinnockModern            = Array<float>({0, -0.0390998, -0.01955, 0, -0.0391, 0.0195503, -0.0390998, -0.009775, -0.0195498, -0.029325, 0, -0.0390999 });
+    
+    /*
+     also add:
+     'common just': [1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 9/5, 15/8, 2/1],
+     'symmetric': [1/1, 16/15, 9/8, 6/5, 5/4, 4/3, Math.sqrt(2), 3/2, 8/5, 5/3, 16/9,  15/8,  2/1],
+     'well tuned piano': [1/1, 567/512, 9/8, 147/128, 21/16, 1323/1024, 189/128, 3/2, 49/32, 7/4, 441/256, 63/32, 2/1],
+     'harrison' : 1/1, 28/27, 9/8, 32/27, 5/4, 4/3, 112/81, 3/2, 128/81, 5/3, 16/9, 15/8 //from Strict Songs
+    */
+    
+    const Array<float> tCommonJust              = Array<float>({0, 0.11731285269777758, 0.039100017307748376, 0.15641287000552553, -0.13686286135165177, -0.019550008653875465, -0.09776284404390367, 0.019550008653873192, 0.13686286135165232, -0.15641287000552553, 0.175962878659401, -0.117312852697778});
+    const Array<float> tSymmetric               = Array<float>({0, 0.11731285269777758, 0.039100017307748376, 0.15641287000552553, -0.13686286135165177, -0.019550008653875465, 0., 0.019550008653873192, 0.13686286135165232, -0.15641287000552553, -0.03910001730774866, -0.117312852697778 });
+    const Array<float> tWellTunedPiano          = Array<float>({0, 0.7664590993067458, 0.039100017307748376, -0.603931861963627, 0.7078090733451233, -0.564831844655879, 0.746909090652872, 0.019550008653873192, -0.6234818706175008, 0.6882590646912502, -0.5843818533097533, 0.727359081999 });
+    const Array<float> tHarrisonStrict          = Array<float>({0, -0.3703909612703742, 0.039100017307748376, -0.05865002596162355, -0.13686286135165177, -0.019550008653875465, -0.3899409699242483, 0.019550008653873192, -0.07820003461549846, -0.15641287000552553, -0.03910001730774866, -0.117312852697778 });
+    
     
     JUCE_LEAK_DETECTOR(Tuning)
 };

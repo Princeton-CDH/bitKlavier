@@ -26,6 +26,8 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     processor.progress = 0.0;
     processor.currentSoundfont = sfzFile.getFullPathName();
     
+    
+    
     AudioFormatManager formatManager;
     formatManager.registerBasicFormats();
     
@@ -50,6 +52,7 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     {
         isSF2 = true;
         sf2sound   = new sfzero::SF2Sound(sfzFile);
+        
     
         DBG("sfz file size: " + String(sfzFile.getSize()));
         sf2sound->loadRegions(processor.currentInstrument);
@@ -196,14 +199,21 @@ void BKSampleLoader::run(void)
     
     EXIT_CHECK;
     
-    if (type == BKLoadSoundfont)
+    File file (processor.currentSoundfont);
+    
+    if (type == BKLoadSoundfont && file.exists())
     {
-        File file (processor.currentSoundfont);
-        
         loadSoundfontFromFile(file);
     }
     else
     {
+    
+        if (processor.currentSampleType == BKLoadSoundfont)
+        {
+            processor.currentSampleType = BKLoadLite;
+            type = BKLoadLite;
+        }
+        
         loadMainPianoSamples(type);
         
         EXIT_CHECK;
@@ -235,7 +245,11 @@ void BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
     
 #if JUCE_IOS
     bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
-#else
+#endif
+#if JUCE_MAC
+    bkSamples = bkSamples.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("samples");
+#endif
+#if JUCE_LINUX || JUCE_WINDOWS
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
 #endif
     
@@ -385,7 +399,11 @@ void BKSampleLoader::loadResonanceReleaseSamples(void)
     
 #if JUCE_IOS
     bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
-#else
+#endif
+#if JUCE_MAC
+    bkSamples = bkSamples.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("samples");
+#endif
+#if JUCE_LINUX || JUCE_WINDOWS
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
 #endif
     
@@ -493,7 +511,11 @@ void BKSampleLoader::loadHammerReleaseSamples(void)
     
 #if JUCE_IOS
     bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
-#else
+#endif
+#if JUCE_MAC
+    bkSamples = bkSamples.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("samples");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
 #endif
     
@@ -565,7 +587,11 @@ void BKSampleLoader::loadPedalSamples(void)
     
 #if JUCE_IOS
     bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
-#else
+#endif
+#if JUCE_MAC
+    bkSamples = bkSamples.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("samples");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("samples");
 #endif
     
