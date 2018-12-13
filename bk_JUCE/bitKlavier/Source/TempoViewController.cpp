@@ -269,6 +269,8 @@ void TempoPreparationEditor::timerCallback()
 
         if (mProcessor != nullptr)
         {
+            tempoSlider->setValue(active->getTempo(), dontSendNotification);
+            
             if(mProcessor->getPeriodMultiplier() != lastPeriodMultiplier)
             {
                 lastPeriodMultiplier = mProcessor->getPeriodMultiplier();
