@@ -727,13 +727,14 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     if (!didLoadMainPianoSamples) return;
     
     if(wrapperType == wrapperType_AudioUnit ||
-       wrapperType == wrapperType_VST
-       || wrapperType ==wrapperType_VST3) //check this on setup; if(isPlugIn) {...
+       wrapperType == wrapperType_VST ||
+       wrapperType == wrapperType_VST3) //check this on setup; if(isPlugIn) {...
     {
         playHead = this->getPlayHead();
         playHead->getCurrentPosition (currentPositionInfo);
         hostTempo = currentPositionInfo.bpm;
-        currentPiano->getPreparationMaps();
+
+        //hostTempo = 113; //confirmed that the following is working...
         Tempo::PtrArr allTempoPreps = gallery->getAllTempo();
         for (auto p : allTempoPreps)
         {
