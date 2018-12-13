@@ -831,15 +831,15 @@ void Piano::configureTuningModification(int key, TuningModPreparation::Ptr mod, 
     int whichMod = mod->getId();
 
     // Add Modifications
-    for (int n = (int)cTuningParameterTypes.size(); --n >= 0; )
+    for (int i = 0; i < TuningParameterTypeNil; i++)
     {
-        String param = mod->getParam((TuningParameterType)n);
+        String param = mod->getParam((TuningParameterType)i);
         
         if (param != "")
         {
             for (auto prep : whichPreps)
             {
-                modificationMap[key]->addTuningModification(new TuningModification(key, prep, (TuningParameterType)n, param, whichMod));
+                modificationMap[key]->addTuningModification(new TuningModification(key, prep, (TuningParameterType)i, param, whichMod));
             }
         }
     }

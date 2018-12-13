@@ -972,7 +972,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modia = tMod[i]->getModIntArr();
         
         
-        DBG("p" + String(i) + " " + mod->getParam((TuningParameterType)i));
+        //DBG("p" + String(i) + " " + mod->getParam((TuningParameterType)i));
         
         if (type == TuningScale)
         {

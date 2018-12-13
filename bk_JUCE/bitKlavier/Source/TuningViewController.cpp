@@ -65,29 +65,25 @@ showSprings(false)
     springTuningLabel.setText("Springs", dontSendNotification);
     springTuningLabel.setJustificationType(Justification::left);
     springTuningLabel.setColour(Label::ColourIds::textColourId, Colours::antiquewhite);
-    
-    rateSliderLabel.setText("rate", dontSendNotification);
-    rateSliderLabel.setColour(Label::ColourIds::textColourId, Colours::antiquewhite);
-    
+
     rateSlider = new BKSingleSlider("rate", 5., 400., 100., 1);
-    rateSlider->displaySliderVisible(false);
     rateSlider->setJustifyRight(false);
+    rateSlider->displaySliderVisible(false);
     addChildComponent(rateSlider);
     
-    dragSliderLabel.setText("drag", dontSendNotification);
-    dragSliderLabel.setColour(Label::ColourIds::textColourId, Colours::antiquewhite);
-    
     dragSlider = new BKSingleSlider("drag", 0., 1., 0.5, 0.0001);
+    dragSlider->setJustifyRight(false);
     dragSlider->displaySliderVisible(false);
     addChildComponent(dragSlider);
     
     tetherStiffnessSlider = new BKSingleSlider("anchor stiff", 0., 1., 0.5, 0.0001);
+    tetherStiffnessSlider->setJustifyRight(false);
     tetherStiffnessSlider->displaySliderVisible(false);
     addChildComponent(tetherStiffnessSlider);
     
     intervalStiffnessSlider = new BKSingleSlider("interval stiff", 0., 1., 0.5, 0.0001);
-    intervalStiffnessSlider->displaySliderVisible(false);
     intervalStiffnessSlider->setJustifyRight(false);
+    intervalStiffnessSlider->displaySliderVisible(false);
     addChildComponent(intervalStiffnessSlider);
     
     iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::tuning_icon_png, BinaryData::tuning_icon_pngSize));
@@ -648,6 +644,7 @@ void TuningViewController::updateComponentVisibility()
     TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
     
     bool set = true;
+    
     if (processor.updateState->currentDisplay == DisplayTuningMod) set = false;
     
     for (auto s : tetherSliders)    s->setVisible(false);
@@ -660,9 +657,7 @@ void TuningViewController::updateComponentVisibility()
     
     tetherStiffnessSlider->setVisible(false);
     intervalStiffnessSlider->setVisible(false);
-    
-    rateSliderLabel.setVisible(false);
-    dragSliderLabel.setVisible(false);
+
     
     absoluteKeyboard.setVisible(true);
     customKeyboard.setVisible(true);
@@ -747,12 +742,13 @@ void TuningViewController::updateComponentVisibility()
         if(active->getSpringsActive() || tuningMod)
         {
             rateSlider->setVisible(true);
-            rateSlider->toFront(true);
+            rateSlider->toFront(false);
             if (set) rateSlider->setValue(active->getSpringRate(), dontSendNotification);
             
             
             dragSlider->setVisible(true);
-            dragSlider->toFront(true);
+            dragSlider->toFront(false);
+            
             if (set)
             {
                 double newval = dt_asymwarp_inverse(1.0f - active->getSpringTuning()->getDrag(), 100.);
@@ -760,21 +756,21 @@ void TuningViewController::updateComponentVisibility()
             }
             
             tetherStiffnessSlider->setVisible(true);
-            tetherStiffnessSlider->toFront(true);
+            tetherStiffnessSlider->toFront(false);
             if (set) tetherStiffnessSlider->setValue(active->getSpringTuning()->getTetherStiffness(), dontSendNotification);
             
             //intervalStiffnessLabel.setVisible(true);
             intervalStiffnessSlider->setVisible(true);
-            intervalStiffnessSlider->toFront(true);
+            intervalStiffnessSlider->toFront(false);
             if (set) intervalStiffnessSlider->setValue(active->getSpringTuning()->getIntervalStiffness(), dontSendNotification);
             
             springScaleCB.setVisible(true);
-            springScaleCB.toFront(true);
+            springScaleCB.toFront(false);
             
             for (int i = 0; i < 12; i++)
             {
                 springSliders[i]->setVisible(true);
-                springSliders[i]->toFront(true);
+                springSliders[i]->toFront(false);
                 if (set) springSliders[i]->setValue(springs[i]->getStrength(), dontSendNotification);
                 
                 springLabels[i]->setVisible(true);
@@ -782,8 +778,8 @@ void TuningViewController::updateComponentVisibility()
             
             for (int i = 0; i < 128; i++)
             {
-                tetherSliders[i]->toFront(true);
-                tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
+                tetherSliders[i]->toFront(false);
+                if (set) tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
             }
         }
         
@@ -1546,13 +1542,13 @@ void TuningModificationEditor::greyOutAllComponents()
     
     springTuningToggle.setAlpha(gModAlpha);
     
-    rateSlider->setAlpha(gModAlpha);
+    rateSlider->setDim(gModAlpha);
     
-    dragSlider->setAlpha(gModAlpha);
+    dragSlider->setDim(gModAlpha);
     
-    intervalStiffnessSlider->setAlpha(gModAlpha);
+    intervalStiffnessSlider->setDim(gModAlpha);
     
-    tetherStiffnessSlider->setAlpha(gModAlpha);
+    tetherStiffnessSlider->setDim(gModAlpha);
     
     springScaleCB.setAlpha(gModAlpha);
 }
@@ -1577,24 +1573,19 @@ void TuningModificationEditor::highlightModedComponents()
     if(mod->getParam(TuningNToneSemitoneWidth) != "")   nToneSemitoneWidthSlider->setBright();
     if (mod->getParam(TuningSpringTetherStiffness) != "")
     {
-        tetherStiffnessSlider->setAlpha(1);
-        tetherStiffnessLabel.setAlpha(1);
+        tetherStiffnessSlider->setBright();
     }
     if (mod->getParam(TuningSpringIntervalStiffness) != "")
     {
-        intervalStiffnessSlider->setAlpha(1);
-        intervalStiffnessLabel.setAlpha(1);
+        intervalStiffnessSlider->setBright();
     }
     if (mod->getParam(TuningSpringRate) != "")
     {
-        DBG("mod rate: " + String(mod->getParam(TuningSpringRate)));
-        rateSlider->setAlpha(1);
-        rateSliderLabel.setAlpha(1);
+        rateSlider->setBright();
     }
     if (mod->getParam(TuningSpringDrag) != "")
     {
-        dragSlider->setAlpha(1);
-        dragSliderLabel.setAlpha(1);
+        dragSlider->setBright();
     }
     if (mod->getParam(TuningSpringActive) != "")
     {

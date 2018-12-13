@@ -307,6 +307,13 @@ ValueTree TuningModPreparation::getState(void)
 
 void TuningModPreparation::setState(XmlElement* e)
 {
+    param.ensureStorageAllocated((int)TuningParameterTypeNil);
+    
+    for (int i = 0; i < TuningParameterTypeNil; i++)
+    {
+        param.set(i, "");
+    }
+    
     String p = "";
     
     float f;
