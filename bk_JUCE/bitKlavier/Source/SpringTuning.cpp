@@ -28,16 +28,8 @@ void SpringTuning::copy(SpringTuning::Ptr st)
     setIntervalTuning(st->getIntervalTuning());
     setTetherTuning(st->getTetherTuning());
     
-    for (int i = 0; i < 12; i++)
-    {
-        setSpringWeight(i, st->getSpringWeight(i));
-        setTetherLock(i, st->getTetherLock(i));
-    }
-    
-    for (int i = 0; i < 128; i++)
-    {
-        setTetherWeight(i, st->getTetherWeight(i));
-    }
+    setSpringWeights(st->getSpringWeights());
+    setTetherWeights(st->getTetherWeights());
 }
 
 SpringTuning::SpringTuning(SpringTuning::Ptr st):
@@ -176,6 +168,7 @@ void SpringTuning::simulate()
 
 void SpringTuning::setSpringWeight(int which, double weight)
 {
+    which += 1;
     for (auto spring : springArray)
     {
         int interval = spring->getIntervalIndex();
@@ -189,6 +182,7 @@ void SpringTuning::setSpringWeight(int which, double weight)
 
 double SpringTuning::getSpringWeight(int which)
 {
+    which += 1;
     // find first spring with interval that matches which and return its weight
     for (auto spring : springArray)
     {

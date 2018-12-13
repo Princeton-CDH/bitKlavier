@@ -727,8 +727,8 @@ void TuningViewController::updateComponentVisibility()
         lastInterval.setVisible(false);
         lastNote.setVisible(false);
         
-        Spring::PtrArr springs = active->getSprings();
-        Spring::PtrArr tetherSprings = active->getTetherSprings();
+        Array<float> springWeights = tuning->getCurrentSpringTuning()->getSpringWeights();
+        Array<float> tetherWeights = tuning->getCurrentSpringTuning()->getTetherWeights();
         
         nToneRootCB.setVisible(false);
         nToneRootOctaveCB.setVisible(false);
@@ -771,7 +771,7 @@ void TuningViewController::updateComponentVisibility()
             {
                 springSliders[i]->setVisible(true);
                 springSliders[i]->toFront(false);
-                if (set) springSliders[i]->setValue(springs[i]->getStrength(), dontSendNotification);
+                if (set) springSliders[i]->setValue(springWeights[i], dontSendNotification);
                 
                 springLabels[i]->setVisible(true);
             }
@@ -779,7 +779,7 @@ void TuningViewController::updateComponentVisibility()
             for (int i = 0; i < 128; i++)
             {
                 tetherSliders[i]->toFront(false);
-                if (set) tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
+                if (set) tetherSliders[i]->setValue(tetherWeights[i], dontSendNotification);
             }
         }
         
@@ -1593,11 +1593,19 @@ void TuningModificationEditor::highlightModedComponents()
     }
     if (mod->getParam(TuningSpringTetherWeights) != "")
     {
-        for (auto slider : tetherSliders) slider->setAlpha(1);
+        for (int i = 0; i < 128; i++)
+        {
+            if (mod->getTetherWeightActive(i))  tetherSliders[i]->setAlpha(1);
+            else                                tetherSliders[i]->setAlpha(gModAlpha);
+        }
     }
     if (mod->getParam(TuningSpringIntervalWeights) != "")
     {
-        for (auto slider : springSliders) slider->setAlpha(1);
+        for (int i = 0; i < 12; i++)
+        {
+            if (mod->getSpringWeightActive(i))  springSliders[i]->setAlpha(1);
+            else                                springSliders[i]->setAlpha(gModAlpha);
+        }
     }
     if (mod->getParam(TuningSpringIntervalScale) != "")
     {
@@ -1678,13 +1686,18 @@ void TuningModificationEditor::update(void)
         
         Array<float> vals;
         
+        /*
         val = mod->getParam(TuningSpringTetherWeights);
         vals = stringToFloatArray(val);
-        for (int i = 0; i < 128; i++) tetherSliders[i]->setValue(vals[i], dontSendNotification);
+        for (int i = 0; i < 128; i++)
+        {
+            tetherSliders[i]->setValue(vals[i], dontSendNotification);
+        }
         
         val = mod->getParam(TuningSpringIntervalWeights);
         vals = stringToFloatArray(val);
         for (int i = 0; i < 12; i++) springSliders[i]->setValue(vals[i], dontSendNotification);
+        */
         
         val = mod->getParam(TuningSpringIntervalScale);
         
@@ -1989,9 +2002,9 @@ void TuningModificationEditor::sliderValueChanged (Slider* slider)
     
     if (intervalWeights.size() < 12)
     {
+        
         intervalWeights = tuning->getStaticSpringTuning()->getSpringWeights();
     }
-    
     
     for (int i = 0; i < 128; i++)
     {
@@ -1999,14 +2012,15 @@ void TuningModificationEditor::sliderValueChanged (Slider* slider)
         {
             tetherWeights.setUnchecked(i, value);
             mod->setParam(TuningSpringTetherWeights, floatArrayToString(tetherWeights));
+            mod->setTetherWeightActive(i, true);
             break;
         }
         else if (slider == springSliders[i])
         {
             intervalWeights.setUnchecked(i, value);
             String thing = floatArrayToString(intervalWeights);
-            DBG("spring slider: " + thing);
             mod->setParam(TuningSpringIntervalWeights, floatArrayToString(intervalWeights));
+            mod->setSpringWeightActive(i, true);
             break;
         }
     }
@@ -2052,7 +2066,6 @@ void TuningModificationEditor::buttonClicked (Button* b)
     else if (b == &springTuningToggle)
     {
         bool state = b->getToggleState();
-        DBG("springTuningToggle " + String((int)state));
         
         mod->setParam(TuningSpringActive, String((int) state));
         

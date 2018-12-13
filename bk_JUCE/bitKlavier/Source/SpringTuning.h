@@ -141,10 +141,9 @@ public:
     
     inline void setTetherWeights(Array<float> weights)
     {
-        int i = 0;
-        for (auto spring : tetherSpringArray)
+        for (int i = 0; i < 128; i++)
         {
-            spring->setStrength(weights[i]);
+            tetherSpringArray[i]->setStrength(weights[i]);
         }
     }
     
@@ -152,7 +151,7 @@ public:
     {
         Array<float> weights;
         
-        for (int i = 1; i < 13; i++)
+        for (int i = 0; i < 12; i++)
         {
             weights.add(getSpringWeight(i));
         }
@@ -162,7 +161,6 @@ public:
     
     inline void setSpringWeights(Array<float> weights)
     {
-        int i = 0;
         for (int i = 0; i < 12; i++)
         {
             setSpringWeight(i, weights[i]);

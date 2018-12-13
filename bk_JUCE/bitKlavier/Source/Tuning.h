@@ -687,6 +687,9 @@ public:
             param.set(i, "");
         }
         
+        for (int i = 0; i < 128; i++)   tetherWeightsActive.add(false);
+        for (int i = 0; i < 12; i++)    springWeightsActive.add(false);
+        
         param.set(TuningScale, String(p->getScale()));
         param.set(TuningFundamental, String(p->getFundamental()));
         param.set(TuningOffset, String(p->getFundamentalOffset()));
@@ -704,11 +707,10 @@ public:
         param.set(TuningSpringIntervalStiffness,    String(p->getSpringTuning()->getIntervalStiffness()));
         param.set(TuningSpringRate,                 String(p->getSpringTuning()->getRate()));
         param.set(TuningSpringDrag,                 String(p->getSpringTuning()->getDrag()));
-        param.set(TuningSpringIntervalScale,        String(p->getSpringTuning()->getScaleId()));
         param.set(TuningSpringActive,               String((int)p->getSpringTuning()->getActive()));
         param.set(TuningSpringTetherWeights,        floatArrayToString(p->getSpringTuning()->getTetherWeights()));
-        param.set(TuningSpringTetherWeights,        floatArrayToString(p->getSpringTuning()->getSpringWeights()));
-        param.set(TuningSpringIntervalWeights,      floatArrayToString(p->getSpringTuning()->getIntervalTuning()));
+        param.set(TuningSpringIntervalWeights,      floatArrayToString(p->getSpringTuning()->getSpringWeights()));
+        param.set(TuningSpringIntervalScale,        String(p->getSpringTuning()->getScaleId()));
         
     }
     
@@ -722,6 +724,9 @@ public:
         {
             param.set(i, "");
         }
+        
+        for (int i = 0; i < 128; i++)   tetherWeightsActive.add(false);
+        for (int i = 0; i < 12; i++)    springWeightsActive.add(false);
     }
     
     inline TuningModPreparation::Ptr duplicate(void)
@@ -751,6 +756,9 @@ public:
         {
             param.set(i, "");
         }
+        
+        for (int i = 0; i < 128; i++)   tetherWeightsActive.add(false);
+        for (int i = 0; i < 12; i++)    springWeightsActive.add(false);
         
         param.set(TuningScale, String(p->getScale()));
         param.set(TuningFundamental, String(p->getFundamental()));
@@ -785,10 +793,13 @@ public:
             param.set(i, "");
         }
         
-        for (int i = TuningId+1; i < TuningParameterTypeNil; i++)
+        for (int i = 0; i < TuningParameterTypeNil; i++)
         {
             param.set(i, p->getParam((TuningParameterType)i));
         }
+        
+        setTetherWeightsActive(p->getTetherWeightsActive());
+        setSpringWeightsActive(p->getSpringWeightsActive());
     }
     
     inline bool compare(TuningModPreparation::Ptr t)
@@ -836,11 +847,12 @@ public:
         param.set(TuningSpringIntervalStiffness,    String(p.getSpringTuning()->getIntervalStiffness()));
         param.set(TuningSpringRate,                 String(p.getSpringTuning()->getRate()));
         param.set(TuningSpringDrag,                 String(p.getSpringTuning()->getDrag()));
-        param.set(TuningSpringIntervalScale,                 String(p.getSpringTuning()->getScaleId()));
+        param.set(TuningSpringIntervalScale,        String(p.getSpringTuning()->getScaleId()));
         param.set(TuningSpringActive,               String((int)p.getSpringTuning()->getActive()));
         param.set(TuningSpringTetherWeights,        floatArrayToString(p.getSpringTuning()->getTetherWeights()));
         param.set(TuningSpringTetherWeights,        floatArrayToString(p.getSpringTuning()->getSpringWeights()));
         param.set(TuningSpringTetherStiffness,      floatArrayToString(p.getSpringTuning()->getIntervalTuning()));
+        
 	}
     
     void clearAll()
@@ -879,6 +891,20 @@ public:
     
     inline void setPreps(Array<int> ps) { preps = ps; }
     inline Array<int> getPreps(void) { return preps; }
+    
+    
+    
+    inline void setTetherWeightsActive(Array<bool> a) { tetherWeightsActive = a; }
+    inline Array<bool> getTetherWeightsActive(void) { return tetherWeightsActive; }
+    
+    inline void setSpringWeightsActive(Array<bool> a) { springWeightsActive = a; }
+    inline Array<bool> getSpringWeightsActive(void) { return springWeightsActive; }
+    
+    inline bool getTetherWeightActive(int i) { return tetherWeightsActive[i]; }
+    inline void setTetherWeightActive(int i, bool a) { tetherWeightsActive.setUnchecked(i, a); }
+    
+    inline bool getSpringWeightActive(int i) { return springWeightsActive[i]; }
+    inline void setSpringWeightActive(int i, bool a) { springWeightsActive.setUnchecked(i, a); }
 
 private:
     int Id; 
@@ -886,6 +912,9 @@ private:
     StringArray          param;
     
     Array<int> preps;
+    
+    Array<bool> tetherWeightsActive;
+    Array<bool> springWeightsActive;
     
     JUCE_LEAK_DETECTOR(TuningModPreparation);
 };
