@@ -241,8 +241,6 @@ ValueTree TuningModPreparation::getState(void)
     String p = getParam(TuningScale);
     if (p != String::empty) prep.setProperty( ptagTuning_scale, p.getIntValue(), 0);
     
-    //add getScaleName()
-    
     p = getParam(TuningFundamental);
     if (p != String::empty) prep.setProperty( ptagTuning_fundamental,           p.getIntValue(), 0);
     
@@ -276,6 +274,59 @@ ValueTree TuningModPreparation::getState(void)
     p = getParam(TuningNToneSemitoneWidth);
     if (p != String::empty) prep.setProperty( ptagTuning_nToneSemitoneWidth,    p.getFloatValue(), 0 );
 
+    
+    p = getParam(TuningSpringTetherStiffness);
+    if (p != String::empty) prep.setProperty( ptagTuning_tetherStiffness,    p.getFloatValue(), 0 );
+    
+    p = getParam(TuningSpringIntervalStiffness);
+    if (p != String::empty) prep.setProperty( ptagTuning_intervalStiffness,    p.getFloatValue(), 0 );
+    
+    p = getParam(TuningSpringRate);
+    if (p != String::empty) prep.setProperty( ptagTuning_rate,    p.getFloatValue(), 0 );
+    
+    p = getParam(TuningSpringDrag);
+    if (p != String::empty) prep.setProperty( ptagTuning_drag,    p.getFloatValue(), 0 );
+    
+    p = getParam(TuningSpringActive);
+    if (p != String::empty) prep.setProperty( ptagTuning_active,    p.getIntValue(), 0 );
+    
+    p = getParam(TuningSpringIntervalScale);
+    if (p != String::empty) prep.setProperty( ptagTuning_intervalScale,  p.getIntValue(), 0 );
+    
+    
+    p = getParam(TuningSpringTetherWeights);
+    ValueTree tw ("tw");
+    Array<float> tetherWeights = stringToFloatArray(p);
+    for (int i = 0; i < 128; i++)
+    {
+        tw.setProperty("w"+String(i), tetherWeights[i], 0);
+    }
+    prep.addChild(tw, -1, 0);
+    
+    p = getParam(TuningSpringIntervalWeights);
+    ValueTree sw ("sw");
+    Array<float> springWeights = stringToFloatArray(p);
+    for (int i = 0; i < 12; i++)
+    {
+        sw.setProperty("w"+String(i), springWeights[i], 0);
+    }
+    prep.addChild(sw, -1, 0);
+    
+    
+    ValueTree twa ("twa");
+    for (int i = 0; i < 128; i++)
+    {
+        twa.setProperty("w"+String(i), (int)getTetherWeightActive(i), 0);
+    }
+    prep.addChild(twa, -1, 0);
+    
+    ValueTree swa ("swa");
+    for (int i = 0; i < 12; i++)
+    {
+        swa.setProperty("w"+String(i), (int)getSpringWeightActive(i), 0);
+    }
+    prep.addChild(swa, -1, 0);
+    
     
     ValueTree scale( vtagTuning_customScale);
     int count = 0;
@@ -361,10 +412,91 @@ void TuningModPreparation::setState(XmlElement* e)
     p = e->getStringAttribute( ptagTuning_nToneSemitoneWidth);
     setParam(TuningNToneSemitoneWidth, p);
     
+    /*TuningSpringTetherStiffness,
+    TuningSpringIntervalStiffness,
+    TuningSpringRate,
+    TuningSpringDrag,
+    TuningSpringActive,
+    TuningSpringTetherWeights,
+    TuningSpringIntervalWeights,
+    TuningSpringIntervalScale,*/
+    
+    p = e->getStringAttribute( ptagTuning_tetherStiffness);
+    setParam(TuningSpringTetherStiffness, p);
+    
+    p = e->getStringAttribute( ptagTuning_intervalStiffness);
+    setParam(TuningSpringIntervalStiffness, p);
+    
+    p = e->getStringAttribute( ptagTuning_rate);
+    setParam(TuningSpringRate, p);
+    
+    p = e->getStringAttribute( ptagTuning_drag);
+    setParam(TuningSpringDrag, p);
+    
+    p = e->getStringAttribute( ptagTuning_active);
+    setParam(TuningSpringActive, p);
+    
+    p = e->getStringAttribute( ptagTuning_intervalScale);
+    setParam(TuningSpringIntervalScale, p);
+    
     // custom scale
     forEachXmlChildElement (*e, sub)
     {
-        if (sub->hasTagName(vtagTuning_customScale))
+        if (sub->hasTagName("twa"))
+        {
+            Array<bool> twa;
+            for (int i = 0; i < 128; i++)
+            {
+                String attr = sub->getStringAttribute("w"+String(i));
+                if (attr == String::empty)  twa.add(false);
+                else                        twa.add((bool)attr.getIntValue());
+            }
+           
+            setTetherWeightsActive(twa);
+        }
+        else if (sub->hasTagName("swa"))
+        {
+            Array<bool> swa;
+            for (int k = 0; k < 128; k++)
+            {
+                String attr = sub->getStringAttribute("w"+String(k));
+                if (attr == String::empty)  swa.add(false);
+                else                        swa.add((bool)attr.getIntValue());
+            }
+            
+            setSpringWeightsActive(swa);
+        }
+        else if (sub->hasTagName("tw"))
+        {
+            Array<bool> tw;
+            String weights = "";
+            for (int k = 0; k < 128; k++)
+            {
+                String attr = sub->getStringAttribute("w"+String(k));
+                float val = attr.getFloatValue();
+                
+                weights += String(val);
+                weights += " ";
+            }
+            
+            setParam(TuningSpringTetherWeights, weights);
+        }
+        else if (sub->hasTagName("sw"))
+        {
+            Array<bool> sw;
+            String weights = "";
+            for (int k = 0; k < 128; k++)
+            {
+                String attr = sub->getStringAttribute("w"+String(k));
+                float val = attr.getFloatValue();
+                
+                weights += String(val);
+                weights += " ";
+            }
+            
+            setParam(TuningSpringIntervalWeights, weights);
+        }
+        else if (sub->hasTagName(vtagTuning_customScale))
         {
             Array<float> scale;
             for (int k = 0; k < 128; k++)

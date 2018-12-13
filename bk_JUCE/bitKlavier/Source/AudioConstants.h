@@ -158,6 +158,15 @@ const String ptagTuning_customScaleDegree = "scaleDegree";
 const String vTagTuning_absoluteOffsets = "absoluteOffsets";
 const String ptagTuning_resetPrep = "tuningReset";
 
+const String ptagTuning_tetherStiffness = "tstiff";
+const String ptagTuning_intervalStiffness = "istiff";
+const String ptagTuning_rate = "srate";
+const String ptagTuning_drag = "drag";
+const String ptagTuning_active = "active";
+const String ptagTuning_tetherWeights = "tweights";
+const String ptagTuning_springWeights = "sweights";
+const String ptagTuning_intervalScale = "iscale";
+
 const String vtagKeymaps = "keymaps";
 const String vtagKeymap =  "keymap";
 const String ptagKeymap_key = "k";
