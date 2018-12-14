@@ -266,10 +266,10 @@ void TempoPreparationEditor::timerCallback()
     {
         TempoProcessor::Ptr mProcessor = processor.currentPiano->getTempoProcessor(processor.updateState->currentTempoId);
         TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
-
+        
         if (mProcessor != nullptr)
         {
-            tempoSlider->setValue(active->getTempo(), dontSendNotification);
+            if(active->getHostTempo()) tempoSlider->setValue(active->getTempo(), dontSendNotification);
             
             if(mProcessor->getPeriodMultiplier() != lastPeriodMultiplier)
             {

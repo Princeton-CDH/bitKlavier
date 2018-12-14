@@ -128,6 +128,12 @@ public:
         }
     }
     
+    bool getHostTempo()
+    {
+        if(sWhichTempoSystem == HostTempo) return true;
+        return false;
+    }
+    
     //Adaptive Tempo 1
     inline void setAdaptiveTempo1Mode(AdaptiveTempo1Mode mode)          {at1Mode = mode;}
     inline void setAdaptiveTempo1History(int hist)                      {at1History = hist;}
