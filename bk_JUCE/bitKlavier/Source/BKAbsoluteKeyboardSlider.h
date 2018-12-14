@@ -35,7 +35,8 @@ public:
     BKAbsoluteKeyboardSlider(bool needsOctaveSlider = false);
     ~BKAbsoluteKeyboardSlider()
     {
-        //delete keyboardComponent;
+        keyboard = nullptr;
+        setLookAndFeel(nullptr);
     };
     
     void resized() override;

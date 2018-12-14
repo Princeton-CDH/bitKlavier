@@ -73,6 +73,7 @@ transpose(transp)
 
 BKPianoSamplerSound::~BKPianoSamplerSound()
 {
+    
 }
 
 bool BKPianoSamplerSound::isSoundfontSound(void)

@@ -77,7 +77,7 @@ public:
     
     void openSoundfont(void);
     
-    juce::Array<sfzero::Region*> regions;
+    Array<sfzero::Region*> regions;
     
     AudioFormatManager formatManager;
     ScopedPointer<AudioFormatReader> sampleReader;

@@ -457,7 +457,7 @@ void TuningModPreparation::setState(XmlElement* e)
         else if (sub->hasTagName("swa"))
         {
             Array<bool> swa;
-            for (int k = 0; k < 128; k++)
+            for (int k = 0; k < 12; k++)
             {
                 String attr = sub->getStringAttribute("w"+String(k));
                 if (attr == String::empty)  swa.add(false);
@@ -485,7 +485,7 @@ void TuningModPreparation::setState(XmlElement* e)
         {
             Array<bool> sw;
             String weights = "";
-            for (int k = 0; k < 128; k++)
+            for (int k = 0; k < 12; k++)
             {
                 String attr = sub->getStringAttribute("w"+String(k));
                 float val = attr.getFloatValue();

@@ -94,7 +94,7 @@ void BKAbsoluteKeyboardSlider::sliderValueChanged     (Slider* slider)
 
 void BKAbsoluteKeyboardSlider::paint (Graphics& g)
 {
-    keyboardComponent.release();
+    
 }
 
 void BKAbsoluteKeyboardSlider::resized()

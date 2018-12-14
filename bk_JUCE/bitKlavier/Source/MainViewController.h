@@ -155,6 +155,7 @@ private:
     
     bool initial;
     int initialWidth, initialHeight;
+    
     /*
     void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override;

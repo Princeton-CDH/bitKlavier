@@ -116,6 +116,7 @@ BKViewController(p, theGraph)
 
 KeymapViewController::~KeymapViewController()
 {
+    keyboard = nullptr;
     setLookAndFeel(nullptr);
 }
 

@@ -66,8 +66,7 @@ ratio(1.0)
 
 void BKCircularKeyboardSlider::paint (Graphics& g)
 {
-    //g.fillAll(Colours::lightgrey);
-    keyboardComponent.release();
+    
 }
 
 void BKCircularKeyboardSlider::resized()

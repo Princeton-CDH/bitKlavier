@@ -26,8 +26,6 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     processor.progress = 0.0;
     processor.currentSoundfont = sfzFile.getFullPathName();
     
-    
-    
     AudioFormatManager formatManager;
     formatManager.registerBasicFormats();
     
@@ -117,8 +115,6 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
    
         double sourceSampleRate = region->sample->getSampleRate();
 
-        
-        // check out fluidsynth as alternative
         AudioSampleBuffer* sourceBuffer = region->sample->getBuffer();
         
         BKReferenceCountedBuffer::Ptr buffer = new BKReferenceCountedBuffer(region->sample->getShortName(), 1, (int)sampleLength);
@@ -147,9 +143,6 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         region->loop_end        -= region->offset;
         region->offset           = 0;
         
-       
-        
-        
         if (region->pitch_keycenter < 0) region->pitch_keycenter = region->lokey;
         
         if (region->lokey == region->hikey)
@@ -165,7 +158,7 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         
         DBG("end: " + String(region->end) + "   ls: " + String(region->loop_start) + "   le: " + String(region->loop_end) + "   keyrange: " + String(region->lokey) + "-" + String(region->hikey) + "   velrange: " + String(region->lovel) + "-" + String(region->hivel));
         
-        DBG("region->trigger: " +String(region->trigger));
+        DBG("trigger: " +String(region->trigger));
         DBG("pedal needed: " + String((int)region->pedal));
         
         
@@ -184,7 +177,11 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
                                                         region->transpose,
                                                         vrange,
                                                         region,isSF2));
+        
     }
+    
+   
+    
 
     processor.didLoadMainPianoSamples = true;
 }

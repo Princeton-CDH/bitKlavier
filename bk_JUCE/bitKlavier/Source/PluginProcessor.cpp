@@ -1030,11 +1030,12 @@ void BKAudioProcessor::performModifications(int noteNumber)
         }
         else if (type == TuningSpringTetherWeights)
         {
-            DBG("modfa: " + floatArrayToString(modfa));
+            DBG("tethers: " + floatArrayToString(modfa));
             active->getSpringTuning()->setTetherWeights(modfa);
         }
         else if (type == TuningSpringIntervalWeights)
         {
+            DBG("springs: " + floatArrayToString(modfa));
             active->getSpringTuning()->setSpringWeights(modfa);
         }
         else if (type == TuningSpringIntervalScale)

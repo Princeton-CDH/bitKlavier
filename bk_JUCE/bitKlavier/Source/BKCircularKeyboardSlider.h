@@ -34,7 +34,8 @@ public:
     BKCircularKeyboardSlider(void);
     ~BKCircularKeyboardSlider(void)
     {
-        //delete keyboardComponent;
+        keyboard = nullptr;
+        setLookAndFeel(nullptr);
     };
     
     void resized() override;
