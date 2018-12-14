@@ -1325,8 +1325,8 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
         }
         else if (slider == springSliders[i])
         {
-            prep->getSpringTuning()->setSpringWeight((i+1), value);
-            active->getSpringTuning()->setSpringWeight((i+1), value);
+            prep->getSpringTuning()->setSpringWeight(i, value);
+            active->getSpringTuning()->setSpringWeight(i, value);
             break;
         }
     }
