@@ -1265,6 +1265,8 @@ void TuningPreparationEditor::update(void)
         springTuningToggle.setToggleState(prep->getSpringsActive(), dontSendNotification);
 
         //dragSlider->setValue(  //must remember to use dt_asym_inversion on 1 - val)
+        double newval = dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->getDrag(), 100.);
+        dragSlider->setValue(newval, dontSendNotification);
     }
     
     updateComponentVisibility();

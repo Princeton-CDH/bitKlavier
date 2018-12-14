@@ -36,7 +36,7 @@ SpringTuning::SpringTuning(SpringTuning::Ptr st):
 scaleId(JustTuning),
 tetherStiffness(0.5),
 intervalStiffness(0.5),
-drag(1.),
+drag(0.1),
 rate(100),
 active(false)
 {
