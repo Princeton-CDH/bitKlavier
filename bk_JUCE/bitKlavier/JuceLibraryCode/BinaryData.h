@@ -89,6 +89,21 @@ namespace BinaryData
     extern const char*   _27__PianoMapGallery_xml;
     const int            _27__PianoMapGallery_xmlSize = 32187;
 
+    extern const char*   _28__Spring_Tuning_1_xml;
+    const int            _28__Spring_Tuning_1_xmlSize = 10710;
+
+    extern const char*   _29__Spring_Tuning_2_xml;
+    const int            _29__Spring_Tuning_2_xmlSize = 10904;
+
+    extern const char*   _30__Spring_Tuning_3_xml;
+    const int            _30__Spring_Tuning_3_xmlSize = 10922;
+
+    extern const char*   _31__Spring_Tuning_4_xml;
+    const int            _31__Spring_Tuning_4_xmlSize = 10748;
+
+    extern const char*   _32__Spring_Tuning_5_xml;
+    const int            _32__Spring_Tuning_5_xmlSize = 10710;
+
     extern const char*   And_So_xml;
     const int            And_So_xmlSize = 7254;
 
@@ -264,7 +279,7 @@ namespace BinaryData
     const int            tuning_icon_pngSize = 12404;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 85;
+    const int namedResourceListSize = 90;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

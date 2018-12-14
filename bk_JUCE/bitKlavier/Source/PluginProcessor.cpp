@@ -220,7 +220,12 @@ shouldLoadDefault(true)
         "24. Adaptive Tempo 2",
         "25. Adaptive Tempo 3",
         "26. Adaptive Tempo 4",
-        "27. PianoMapGallery"
+        "27. PianoMapGallery",
+        "28. Spring Tuning 1",
+        "29. Spring Tuning 2",
+        "30. Spring Tuning 3",
+        "31. Spring Tuning 4",
+        "32. Spring Tuning 5",
         
     });
     
