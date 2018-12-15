@@ -389,7 +389,11 @@ void TuningViewController::paint (Graphics& g)
         {
             mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
 
-            int tuningId = mod->getPreps().size() ? mod->getPreps().getUnchecked(0) : 0;
+            Array<int> preps = mod->getPreps();
+            
+            int tuningId;
+            if (preps.size())   tuningId = preps[0];
+            else                tuningId = -1;
             
             tuning = processor.currentPiano->getTuningProcessor(tuningId);
             active = processor.gallery->getActiveTuningPreparation(tuningId);
@@ -829,14 +833,20 @@ void TuningViewController::timerCallback(void)
             isMod = true;
             mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
             
-            tuningId = mod->getPreps().size() ? mod->getPreps().getUnchecked(0) : 0;
-        }
+            Array<int> preps = mod->getPreps();
             
+            if (preps.size())   tuningId = preps[0];
+            else                tuningId = -1;
+            
+        }
+        
         tProcessor = processor.currentPiano->getTuningProcessor(tuningId);
         active = processor.gallery->getActiveTuningPreparation(tuningId);
         tuning = processor.gallery->getTuning(tuningId);
         
-        if (tProcessor != nullptr)
+        if ((tProcessor != nullptr) &&
+            (active != nullptr) &&
+            (tuning != nullptr))
         {
             if (tProcessor->getLastNoteTuning() != lastNoteTuningSave)
             {
