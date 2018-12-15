@@ -744,62 +744,63 @@ void TuningViewController::updateComponentVisibility()
         customKeyboard.setVisible(false);
         offsetSlider->setVisible(false);
         
-        double val;
-        
-        rateSlider->setVisible(true);
-        rateSlider->toFront(false);
-        
-        if (tuningMod)  val = mod->getParam(TuningSpringRate).getFloatValue();
-        else            val = active->getSpringTuning()->getRate();
-        
-        rateSlider->setValue(val, dontSendNotification);
-        
-        dragSlider->setVisible(true);
-        dragSlider->toFront(false);
-        
-        if (tuningMod)  val = mod->getParam(TuningSpringDrag).getFloatValue();
-        else            val = active->getSpringTuning()->getDrag();
-        
-        val = dt_asymwarp_inverse(1.0f - val, 100.);
-        dragSlider->setValue(val, dontSendNotification);
-        
-        tetherStiffnessSlider->setVisible(true);
-        tetherStiffnessSlider->toFront(false);
-        
-        if (tuningMod)  val = mod->getParam(TuningSpringTetherStiffness).getFloatValue();
-        else            val = active->getSpringTuning()->getTetherStiffness();
-        
-        tetherStiffnessSlider->setValue(val, dontSendNotification);
-        
-        intervalStiffnessSlider->setVisible(true);
-        intervalStiffnessSlider->toFront(false);
-        
-        if (tuningMod)  val = mod->getParam(TuningSpringIntervalStiffness).getFloatValue();
-        else            val = active->getSpringTuning()->getIntervalStiffness();
-        
-        intervalStiffnessSlider->setValue(val, dontSendNotification);
-        
-        springScaleCB.setVisible(true);
-        springScaleCB.toFront(false);
-        
-        for (int i = 0; i < 12; i++)
+        if (tuning->getCurrentSpringTuning()->getActive() || tuningMod)
         {
-            springSliders[i]->setVisible(true);
-            springSliders[i]->toFront(false);
+            double val;
             
-            springSliders[i]->setValue(springWeights[i], dontSendNotification);
+            rateSlider->setVisible(true);
+            rateSlider->toFront(false);
             
-            springLabels[i]->setVisible(true);
+            if (tuningMod)  val = mod->getParam(TuningSpringRate).getFloatValue();
+            else            val = active->getSpringTuning()->getRate();
+            
+            rateSlider->setValue(val, dontSendNotification);
+            
+            dragSlider->setVisible(true);
+            dragSlider->toFront(false);
+            
+            if (tuningMod)  val = mod->getParam(TuningSpringDrag).getFloatValue();
+            else            val = active->getSpringTuning()->getDrag();
+            
+            val = dt_asymwarp_inverse(1.0f - val, 100.);
+            dragSlider->setValue(val, dontSendNotification);
+            
+            tetherStiffnessSlider->setVisible(true);
+            tetherStiffnessSlider->toFront(false);
+            
+            if (tuningMod)  val = mod->getParam(TuningSpringTetherStiffness).getFloatValue();
+            else            val = active->getSpringTuning()->getTetherStiffness();
+            
+            tetherStiffnessSlider->setValue(val, dontSendNotification);
+            
+            intervalStiffnessSlider->setVisible(true);
+            intervalStiffnessSlider->toFront(false);
+            
+            if (tuningMod)  val = mod->getParam(TuningSpringIntervalStiffness).getFloatValue();
+            else            val = active->getSpringTuning()->getIntervalStiffness();
+            
+            intervalStiffnessSlider->setValue(val, dontSendNotification);
+            
+            springScaleCB.setVisible(true);
+            springScaleCB.toFront(false);
+            
+            for (int i = 0; i < 12; i++)
+            {
+                springSliders[i]->setVisible(true);
+                springSliders[i]->toFront(false);
+                
+                springSliders[i]->setValue(springWeights[i], dontSendNotification);
+                
+                springLabels[i]->setVisible(true);
+            }
+            
+            for (int i = 0; i < 128; i++)
+            {
+                tetherSliders[i]->toFront(false);
+                
+                tetherSliders[i]->setValue(tetherWeights[i], dontSendNotification);
+            }
         }
-        
-        for (int i = 0; i < 128; i++)
-        {
-            tetherSliders[i]->toFront(false);
-            
-            tetherSliders[i]->setValue(tetherWeights[i], dontSendNotification);
-        }
-        
-        
     }
     
 }
