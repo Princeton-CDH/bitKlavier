@@ -69,21 +69,25 @@ showSprings(false)
     rateSlider = new BKSingleSlider("rate", 5., 400., 100., 1);
     rateSlider->setJustifyRight(false);
     rateSlider->displaySliderVisible(false);
+    rateSlider->setToolTipString("rate that spring model runs at (Hz)");
     addChildComponent(rateSlider);
     
     dragSlider = new BKSingleSlider("drag", 0., 1., 0.5, 0.0001);
     dragSlider->setJustifyRight(false);
     dragSlider->displaySliderVisible(false);
+    dragSlider->setToolTipString("frictional component in spring model");
     addChildComponent(dragSlider);
     
     tetherStiffnessSlider = new BKSingleSlider("anchor stiff", 0., 1., 0.5, 0.0001);
     tetherStiffnessSlider->setJustifyRight(false);
     tetherStiffnessSlider->displaySliderVisible(false);
+    tetherStiffnessSlider->setToolTipString("overall stiffness of anchor sliders");
     addChildComponent(tetherStiffnessSlider);
     
     intervalStiffnessSlider = new BKSingleSlider("interval stiff", 0., 1., 0.5, 0.0001);
     intervalStiffnessSlider->setJustifyRight(false);
     intervalStiffnessSlider->displaySliderVisible(false);
+    intervalStiffnessSlider->setToolTipString("overall stiffness of interval sliders");
     addChildComponent(intervalStiffnessSlider);
     
     iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::tuning_icon_png, BinaryData::tuning_icon_pngSize));
@@ -129,8 +133,6 @@ showSprings(false)
     A1Inversional.setTooltip("when selected, intervals will be tuned the same whether they ascend or descend; e.g. C-D will always be the same interval as C-Bb");
     addAndMakeVisible(A1Inversional);
     
-    
-    
     A1AnchorScaleCB.setName("A1AnchorScale");
     A1AnchorScaleCB.setTooltip("determines where the moving fundamental will be tuned to");
     addAndMakeVisible(A1AnchorScaleCB);
@@ -157,6 +159,7 @@ showSprings(false)
     
     showSpringsButton.setButtonText("Spiral");
     showSpringsButton.setClickingTogglesState(true);
+    showSpringsButton.setTooltip("show spiral view of tuning relationships");
     showSpringsButton.setColour(TextButton::buttonOnColourId, Colours::red.withMultipliedAlpha(0.5));
     addAndMakeVisible(showSpringsButton);
     
