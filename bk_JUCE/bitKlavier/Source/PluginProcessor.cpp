@@ -101,7 +101,7 @@ mainPianoSynth(),
 hammerReleaseSynth(),
 resonanceReleaseSynth(),
 pedalSynth(),
-currentSampleType(BKLoadNil),
+currentSampleType(BKLoadLite),
 loader(*this),
 shouldLoadDefault(true)
 {

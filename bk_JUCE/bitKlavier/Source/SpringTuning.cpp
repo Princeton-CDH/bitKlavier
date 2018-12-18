@@ -59,6 +59,7 @@ active(false)
         p1->setOctave(octave);
         p1->setEnabled(false);
 		p1->setLocked(false);
+        p1->setNote(i);
         particleArray.add(p1);
         
         // Tether particle
@@ -90,6 +91,25 @@ active(false)
 
             //DBG("spring: " + String(i) + " " + String(j) + " " + String(diff * 100 + intervalTuning[interval] * 100));
 
+            /*
+             to make this dependent on scale degree (so the interval springs have a fundamental), we need something like
+             
+             diff = (scaledegree1 + intervalTuning[(scaledegree1 - fundamental) % 12]) -
+                    (scaledegree2 + intervalTuning[(scaledegree2 - fundamental) % 12]])
+             
+             where  scaledegree1 = particleArray[i]->getNote() = i
+             and    scaledegree2 = particleArray[j]->getNote() = j
+             
+             so, if i = 64, and j = 62, and fundamental is C (0)
+             diff = (64 + intervalTuning[64 % 12 = 4]) -
+                    (62 + intervalTuning[62 % 12 = 2])
+             
+             or, if i = 66, and j = 64, and fundamental is D (2)
+             diff = (66 + intervalTuning[64 % 12 = 4]) -
+             (64 + intervalTuning[62 % 12 = 2])
+            */
+            
+            
             Spring* spring = new Spring(particleArray[j],
                                         particleArray[i],
                                         diff * 100 + intervalTuning[interval] * 100,
@@ -135,6 +155,19 @@ void SpringTuning::setIntervalTuning(Array<float> tuning)
         int interval = spring->getIntervalIndex();
         int diff = spring->getA()->getRestX() - spring->getB()->getRestX();
         spring->setRestingLength(fabs(diff) + intervalTuning[interval]);
+        
+        /*
+         would need to implement alternative here as well, for when the intervalSprings have a fundamental
+         
+         int scaledegree1 = spring->getA()->getNote();
+         int scaledegree2 = spring->getB()->getNote();
+         
+         diff = (scaledegree1 + intervalTuning[(scaledegree1 - fundamental) % 12]) -
+         (scaledegree2 + intervalTuning[(scaledegree2 - fundamental) % 12]])
+         
+         diff *= 100.;
+         
+        */
     }
 }
 

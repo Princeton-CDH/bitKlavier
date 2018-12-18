@@ -778,7 +778,7 @@ static const std::vector<std::string> cKeymapParameterTypes = {
 
 typedef enum BKSampleLoadType
 {
-    BKLoadLitest,
+    BKLoadLitest = 0,
     BKLoadLite,
     BKLoadMedium,
     BKLoadHeavy,
