@@ -36,9 +36,10 @@ SpringTuning::SpringTuning(SpringTuning::Ptr st):
 scaleId(JustTuning),
 tetherStiffness(0.5),
 intervalStiffness(0.5),
-drag(0.1),
 rate(100),
-active(false)
+drag(0.1),
+active(false),
+usingFundamentalForIntervalSprings(false) //should be false by default
 {
     particleArray.ensureStorageAllocated(128);
     tetherParticleArray.ensureStorageAllocated(128);
@@ -67,6 +68,7 @@ active(false)
         p2->setOctave(octave);
         p2->setEnabled(false);
         p2->setLocked(true);
+        p2->setNote(i);
         tetherParticleArray.add(p2);
         
         Spring* s = new Spring(p1, p2, 0.0, 0.5, 0);
@@ -76,58 +78,93 @@ active(false)
 	}
 
     springArray.ensureStorageAllocated(1000);
-	for (int i = 0; i < 128; i++)
-	{
-		for (int j = 0; j < i; j++)
-		{
-            int diff = i - j;
-            
-            int interval = diff % 12;
-            
-            if (diff != 0 && interval == 0)
+    
+    if(!usingFundamentalForIntervalSprings)
+    {
+        for (int i = 0; i < 128; i++)
+        {
+            for (int j = 0; j < i; j++)
             {
-                interval = 12;
+                int diff = i - j;
+                
+                int interval = diff % 12;
+                
+                if (diff != 0 && interval == 0)
+                {
+                    interval = 12;
+                }
+                
+                //DBG("spring: " + String(i) + " " + String(j) + " " + String(diff * 100 + intervalTuning[interval] * 100));
+                Spring* spring = new Spring(particleArray[j],
+                                            particleArray[i],
+                                            diff * 100 + intervalTuning[interval] * 100, //rest length in cents
+                                            0.5,
+                                            interval);
+                
+                spring->setEnabled(false);
+                spring->setName(intervalLabels[interval]);
+                springArray.add(spring);
             }
+        }
+    }
+    else
+    {
+        //usingFundamentalForIntervalSprings
 
-            //DBG("spring: " + String(i) + " " + String(j) + " " + String(diff * 100 + intervalTuning[interval] * 100));
-
+        for (int i = 0; i < 128; i++)
+        {
+            for (int j = 0; j < i; j++)
+            {
+                float diff = i - j;
+                int interval = (int)diff % 12;
+                if (diff != 0 && interval == 0)
+                {
+                    interval = 12;
+                }
+                
+                int scaleDegree1 = particleArray[i]->getNote();
+                int scaleDegree2 = particleArray[j]->getNote();;
+                int intervalFundamental = 0; //temporary, will set in preparation
+                
+                diff =  100. * ((scaleDegree1 + intervalTuning[(scaleDegree1 - intervalFundamental) % 12]) -
+                                (scaleDegree2 + intervalTuning[(scaleDegree2 - intervalFundamental) % 12]));
+                
+                //DBG("setting new spring " + String(scaleDegree1) + " " + String(scaleDegree2) + " length = " + String(fabs(diff)));
+                Spring* spring = new Spring(particleArray[j],
+                                            particleArray[i],
+                                            fabs(diff), //rest length in cents
+                                            0.5,
+                                            interval);
+                
+                spring->setEnabled(false);
+                spring->setName(intervalLabels[interval]);
+                springArray.add(spring);
+            }
+            
             /*
              to make this dependent on scale degree (so the interval springs have a fundamental), we need something like
              
              diff = (scaledegree1 + intervalTuning[(scaledegree1 - fundamental) % 12]) -
-                    (scaledegree2 + intervalTuning[(scaledegree2 - fundamental) % 12]])
+             (scaledegree2 + intervalTuning[(scaledegree2 - fundamental) % 12]])
              
              where  scaledegree1 = particleArray[i]->getNote() = i
              and    scaledegree2 = particleArray[j]->getNote() = j
              
              so, if i = 64, and j = 62, and fundamental is C (0)
              diff = (64 + intervalTuning[64 % 12 = 4]) -
-                    (62 + intervalTuning[62 % 12 = 2])
+             (62 + intervalTuning[62 % 12 = 2]);
              
              or, if i = 66, and j = 64, and fundamental is D (2)
              diff = (66 + intervalTuning[64 % 12 = 4]) -
              (64 + intervalTuning[62 % 12 = 2])
-            */
-            
-            
-            Spring* spring = new Spring(particleArray[j],
-                                        particleArray[i],
-                                        diff * 100 + intervalTuning[interval] * 100,
-                                        0.5,
-                                        interval);
-            
-            spring->setEnabled(false);
-            spring->setName(intervalLabels[interval]);
-            springArray.add(spring);
-		}
-	}
+             */
+        }
+    }
+	
     
     setStiffness(1.0);
-
 	numNotes = 0;
-    
     if (st != nullptr) copy(st);
-
     setDrag(drag);
     setRate(rate);
 }
@@ -150,28 +187,32 @@ void SpringTuning::setIntervalTuning(Array<float> tuning)
 {
     intervalTuning = tuning;
 
-    for (auto spring : springArray)
+    if(!usingFundamentalForIntervalSprings)
     {
-        int interval = spring->getIntervalIndex();
-        int diff = spring->getA()->getRestX() - spring->getB()->getRestX();
-        spring->setRestingLength(fabs(diff) + intervalTuning[interval]);
-        
-        /*
-         would need to implement alternative here as well, for when the intervalSprings have a fundamental
-         
-         int scaledegree1 = spring->getA()->getNote();
-         int scaledegree2 = spring->getB()->getNote();
-         
-         diff = (scaledegree1 + intervalTuning[(scaledegree1 - fundamental) % 12]) -
-         (scaledegree2 + intervalTuning[(scaledegree2 - fundamental) % 12]])
-         
-         diff *= 100.;
-         
-        */
+        for (auto spring : springArray)
+        {
+            int interval = spring->getIntervalIndex();
+            int diff = spring->getA()->getRestX() - spring->getB()->getRestX();
+
+            spring->setRestingLength(fabs(diff) + intervalTuning[interval]);
+        }
+    }
+    else
+    {
+        for (auto spring : springArray)
+        {
+            int scaleDegree1 = spring->getA()->getNote();
+            int scaleDegree2 = spring->getB()->getNote();
+            int intervalFundamental = 0; //temporary, will set in preparation
+            
+            float diff = (100. * scaleDegree2 + intervalTuning[(scaleDegree2 - intervalFundamental) % 12]) -
+                         (100. * scaleDegree1 + intervalTuning[(scaleDegree1 - intervalFundamental) % 12]);
+
+            spring->setRestingLength(fabs(diff));
+        }
     }
 }
 
-//#define DRAG 1.0f //expose this!!
 void SpringTuning::simulate()
 {
     for (auto particle : particleArray)

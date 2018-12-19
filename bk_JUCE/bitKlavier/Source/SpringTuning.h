@@ -202,6 +202,9 @@ public:
     void setTetherWeight(int which, double weight);
     double getTetherWeight(int which);
     
+    void setUsingFundamentalForIntervalSprings(bool use) { usingFundamentalForIntervalSprings = use; }
+    bool getUsingFundamentalForIntervalSprings(void) { return usingFundamentalForIntervalSprings; }
+    
     ValueTree getState(void)
     {
         ValueTree prep("springtuning");
@@ -354,6 +357,7 @@ private:
     double drag;
     
     bool active;
+    bool usingFundamentalForIntervalSprings;
     
     TuningSystem scaleId;
 
