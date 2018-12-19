@@ -196,6 +196,8 @@ public:
     void setIntervalTuning(Array<float> tuning);
     Array<float> getIntervalTuning(void){return intervalTuning;}
     
+    void retuneIndividualSpring(Spring::Ptr spring);
+    
     void setSpringWeight(int which, double weight);
     double getSpringWeight(int which);
     

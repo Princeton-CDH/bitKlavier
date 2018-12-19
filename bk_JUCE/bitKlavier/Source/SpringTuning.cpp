@@ -33,20 +33,19 @@ void SpringTuning::copy(SpringTuning::Ptr st)
 }
 
 SpringTuning::SpringTuning(SpringTuning::Ptr st):
-scaleId(JustTuning),
+rate(100),
 tetherStiffness(0.5),
 intervalStiffness(0.5),
-rate(100),
 drag(0.1),
 active(false),
-usingFundamentalForIntervalSprings(false) //should be false by default
+usingFundamentalForIntervalSprings(false), //should be false by default
+scaleId(JustTuning)
 {
     particleArray.ensureStorageAllocated(128);
     tetherParticleArray.ensureStorageAllocated(128);
     
     tetherTuning = Array<float>({0,0,0,0,0,0,0,0,0,0,0,0});
-    intervalTuning = Array<float>({0.0, 0.117313, 0.039101, 0.156414, -0.13686, -0.019547,
-        -0.174873, 0.019547, 0.136864, -0.15641, -0.311745, -0.11731});
+    intervalTuning = Array<float>({0.0, 0.117313, 0.039101, 0.156414, -0.13686, -0.019547, -0.174873, 0.019547, 0.136864, -0.15641, -0.311745, -0.11731});
     
     for (int i = 0; i < 12; i++) tetherLocked[i] = false;
     
@@ -201,6 +200,7 @@ void SpringTuning::setIntervalTuning(Array<float> tuning)
     {
         for (auto spring : springArray)
         {
+            /*
             int scaleDegree1 = spring->getA()->getNote();
             int scaleDegree2 = spring->getB()->getNote();
             int intervalFundamental = 0; //temporary, will set in preparation
@@ -209,6 +209,9 @@ void SpringTuning::setIntervalTuning(Array<float> tuning)
                          (100. * scaleDegree1 + intervalTuning[(scaleDegree1 - intervalFundamental) % 12]);
 
             spring->setRestingLength(fabs(diff));
+            */
+            
+            retuneIndividualSpring(spring);
         }
     }
 }
@@ -382,6 +385,7 @@ void SpringTuning::removeParticle(int note)
 }
 void SpringTuning::addNote(int note)
 {
+    //change interval fundamental here, depending on mode?
     addParticle(note);
     addSpringsByNote(note);
 }
@@ -436,7 +440,8 @@ void SpringTuning::addSpringsByNote(int note)
 			{
 				if (b->getEnabled())
                 {
-                    spring->setEnabled(true);
+                    spring->setEnabled(true); //can retune individual springs here as well, if moving fundamental of interval springs
+                    //if(usingFundamentalForIntervalSprings) retuneIndividualSpring(spring);
                 }
 			}
 			else if (b == p)
@@ -444,12 +449,25 @@ void SpringTuning::addSpringsByNote(int note)
 				if (a->getEnabled())
                 {
                     spring->setEnabled(true);
+                    //if(usingFundamentalForIntervalSprings) retuneIndividualSpring(spring);
                 }
 			}
         }
 	}
     
     tetherSpringArray[note]->setEnabled(true);
+}
+
+void SpringTuning::retuneIndividualSpring(Spring::Ptr spring)
+{
+    int scaleDegree1 = spring->getA()->getNote();
+    int scaleDegree2 = spring->getB()->getNote();
+    int intervalFundamental = 0; //temporary, will set in preparation
+    
+    float diff = (100. * scaleDegree2 + intervalTuning[(scaleDegree2 - intervalFundamental) % 12]) -
+    (100. * scaleDegree1 + intervalTuning[(scaleDegree1 - intervalFundamental) % 12]);
+    
+    spring->setRestingLength(fabs(diff));
 }
 
 //DT: wondering if there is a more efficient way to do this, rather than reading throug the whole spring array?
