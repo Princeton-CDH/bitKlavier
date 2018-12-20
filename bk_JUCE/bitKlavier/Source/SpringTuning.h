@@ -42,6 +42,7 @@ public:
 	void updateNotes();
     void updateFreq();
     
+   
 	void addSpringsByNote(int pc);
 	void removeSpringsByNote(int removeIndex);
 	void addSpringsByInterval(double interval);
@@ -69,7 +70,7 @@ public:
     {
         stiffness = stiff;
         
-        for (auto spring : springArray)
+        for (auto spring : enabledSpringArray)
         {
             spring->setStiffness(stiffness);
         }
@@ -93,9 +94,8 @@ public:
     inline void setIntervalStiffness(double stiff)
     {
         intervalStiffness = stiff;
-        DBG("setIntervalStiffness: " + String(stiff));
         
-        for (auto spring : springArray)
+        for (auto spring : enabledSpringArray)
         {
             spring->setStiffness(intervalStiffness);
         }
@@ -373,6 +373,10 @@ private:
     
     Array<float> tetherTuning;
     Array<float> intervalTuning;
+    
+    float springWeights[13];
+    
+    void addSpring(Spring::Ptr spring);
     
     /*
     Spring::PtrArr activeTetherSprings;

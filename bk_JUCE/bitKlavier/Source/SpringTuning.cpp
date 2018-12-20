@@ -23,6 +23,11 @@ void SpringTuning::copy(SpringTuning::Ptr st)
     intervalStiffness = st->getIntervalStiffness();
     tetherStiffness = st->getTetherStiffness();
     
+    for (int i = 0; i < 13; i++)
+    {
+        springWeights[i] = st->springWeights[i];
+    }
+    
     scaleId = st->getScaleId();
     
     setIntervalTuning(st->getIntervalTuning());
@@ -50,6 +55,8 @@ scaleId(JustTuning)
     intervalTuning = Array<float>({0.0, 0.117313, 0.039101, 0.156414, -0.13686, -0.019547, -0.174873, 0.019547, 0.136864, -0.15641, -0.311745, -0.11731});
     
     for (int i = 0; i < 12; i++) tetherLocked[i] = false;
+    
+    for (int i = 0; i < 13; i++) springWeights[i] = 0.5;
     
 	for (int i = 0; i < 128; i++)
 	{
@@ -187,7 +194,16 @@ void SpringTuning::setTetherTuning(Array<float> tuning)
 void SpringTuning::setIntervalTuning(Array<float> tuning)
 {
     intervalTuning = tuning;
+    
+    for (auto spring : enabledSpringArray)
+    {
+        int interval = spring->getIntervalIndex();
+        int diff = spring->getA()->getRestX() - spring->getB()->getRestX();
+        
+        spring->setRestingLength(fabs(diff) + intervalTuning[interval]);
+    }
 
+#if 0
     if(!usingFundamentalForIntervalSprings)
     {
         for (auto spring : springArray)
@@ -216,6 +232,7 @@ void SpringTuning::setIntervalTuning(Array<float> tuning)
             retuneIndividualSpring(spring);
         }
     }
+#endif
 }
 
 void SpringTuning::simulate()
@@ -245,11 +262,12 @@ void SpringTuning::simulate()
 void SpringTuning::setSpringWeight(int which, double weight)
 {
     which += 1;
-    for (auto spring : springArray)
+    
+    springWeights[which] = weight;
+    
+    for (auto spring : enabledSpringArray)
     {
-        int interval = spring->getIntervalIndex();
-
-        if (which == interval)
+        if (spring->getIntervalIndex() == which)
         {
             spring->setStrength(weight);
         }
@@ -259,12 +277,8 @@ void SpringTuning::setSpringWeight(int which, double weight)
 double SpringTuning::getSpringWeight(int which)
 {
     which += 1;
-    // find first spring with interval that matches which and return its weight
-    for (auto spring : springArray)
-    {
-        if (spring->getIntervalIndex() == which) return spring->getStrength();
-    }
-    return 0.0;
+    
+    return springWeights[which];
 }
 
 void SpringTuning::setTetherWeight(int which, double weight)
@@ -400,6 +414,22 @@ void SpringTuning::toggleNote(int noteIndex)
 	}
 }
 
+void SpringTuning::addSpring(Spring::Ptr spring)
+{
+    int interval = spring->getIntervalIndex();
+    
+    spring->setEnabled(true);
+    spring->setStiffness(intervalStiffness);
+    spring->setStrength(springWeights[interval]);
+    enabledSpringArray.add(spring);
+    
+    //if(usingFundamentalForIntervalSprings) retuneIndividualSpring(spring);
+    
+    int diff = spring->getA()->getRestX() - spring->getB()->getRestX();
+    
+    spring->setRestingLength(fabs(diff) + intervalTuning[interval]);
+}
+
 void SpringTuning::addSpringsByNote(int note)
 {
     Particle* p = particleArray[note];
@@ -415,21 +445,14 @@ void SpringTuning::addSpringsByNote(int note)
 			{
 				if (b->getEnabled())
                 {
-                    spring->setEnabled(true); //can retune individual springs here as well, if moving fundamental of interval springs
-                    spring->setStiffness(intervalStiffness);
-                    //spring->setRestingLength
-                    //spring->setStrength
-                    enabledSpringArray.add(spring);
-                    //if(usingFundamentalForIntervalSprings) retuneIndividualSpring(spring);
+                    addSpring(spring);
                 }
 			}
 			else if (b == p)
 			{
 				if (a->getEnabled())
                 {
-                    spring->setEnabled(true);
-                    enabledSpringArray.add(spring);
-                    //if(usingFundamentalForIntervalSprings) retuneIndividualSpring(spring);
+                    addSpring(spring);
                 }
 			}
         }

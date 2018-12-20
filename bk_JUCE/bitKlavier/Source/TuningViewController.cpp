@@ -1342,8 +1342,6 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
     double value = slider->getValue();
     
     String name = slider->getName();
-    
-    Spring::PtrArr tetherSprings = active->getTetherSprings();
 
     for (int i = 0; i < 128; i++)
     {
@@ -2104,9 +2102,3 @@ void TuningModificationEditor::buttonClicked (Button* b)
     
     updateModification();
 }
-
-
-
-
-
-
