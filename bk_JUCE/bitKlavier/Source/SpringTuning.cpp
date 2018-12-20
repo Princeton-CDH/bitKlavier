@@ -44,6 +44,8 @@ scaleId(JustTuning)
     particleArray.ensureStorageAllocated(128);
     tetherParticleArray.ensureStorageAllocated(128);
     
+    enabledSpringArray.clear();
+    
     tetherTuning = Array<float>({0,0,0,0,0,0,0,0,0,0,0,0});
     intervalTuning = Array<float>({0.0, 0.117313, 0.039101, 0.156414, -0.13686, -0.019547, -0.174873, 0.019547, 0.136864, -0.15641, -0.311745, -0.11731});
     
@@ -234,12 +236,9 @@ void SpringTuning::simulate()
         }
     }
 
-	for (auto spring : springArray)
+	for (auto spring : enabledSpringArray)
 	{
-		if (spring->getEnabled())
-		{
-            spring->satisfyConstraints();
-		}
+        spring->satisfyConstraints();
 	}
 }
 
@@ -339,20 +338,6 @@ double SpringTuning::getTetherWeight(int which)
     return tetherSpringArray[which]->getStrength();
 }
 
-bool SpringTuning::getTetherSpringEnabled(int which)
-{
-    return tetherSpringArray[which]->getEnabled();
-}
-
-bool SpringTuning::getSpringEnabled(int which)
-{
-    for (auto spring : springArray)
-    {
-        if (spring->getIntervalIndex() == which) return spring->getEnabled();
-    }
-    return false;
-}
-
 String SpringTuning::getTetherSpringName(int which)
 {
     return tetherSpringArray[which]->getName();
@@ -415,16 +400,6 @@ void SpringTuning::toggleNote(int noteIndex)
 	}
 }
 
-void SpringTuning::addSpring(Spring* s)
-{
-    s->setEnabled(true);
-}
-
-void SpringTuning::removeSpring(Spring* s)
-{
-    s->setEnabled(false);
-    
-}
 void SpringTuning::addSpringsByNote(int note)
 {
     Particle* p = particleArray[note];
@@ -441,6 +416,10 @@ void SpringTuning::addSpringsByNote(int note)
 				if (b->getEnabled())
                 {
                     spring->setEnabled(true); //can retune individual springs here as well, if moving fundamental of interval springs
+                    spring->setStiffness(intervalStiffness);
+                    //spring->setRestingLength
+                    //spring->setStrength
+                    enabledSpringArray.add(spring);
                     //if(usingFundamentalForIntervalSprings) retuneIndividualSpring(spring);
                 }
 			}
@@ -449,13 +428,15 @@ void SpringTuning::addSpringsByNote(int note)
 				if (a->getEnabled())
                 {
                     spring->setEnabled(true);
+                    enabledSpringArray.add(spring);
                     //if(usingFundamentalForIntervalSprings) retuneIndividualSpring(spring);
                 }
 			}
         }
 	}
-    
+
     tetherSpringArray[note]->setEnabled(true);
+    
 }
 
 void SpringTuning::retuneIndividualSpring(Spring::Ptr spring)
@@ -474,14 +455,20 @@ void SpringTuning::retuneIndividualSpring(Spring::Ptr spring)
 void SpringTuning::removeSpringsByNote(int note)
 {
 	Particle* p = particleArray[note];
-	for (auto spring : springArray)
+    
+    int size = enabledSpringArray.size();
+    for (int i = (size-1); i >= 0; i--)
 	{
+        Spring* spring = enabledSpringArray[i];
         Particle* a = spring->getA();
         Particle* b = spring->getB();
+        
+        DBG("spring: " + spring->getName());
         
 		if (spring->getEnabled() && ((a == p) || (b == p)))
         {
             spring->setEnabled(false);
+            enabledSpringArray.remove(i);
         }
 	}
     

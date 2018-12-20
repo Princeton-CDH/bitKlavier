@@ -40,10 +40,7 @@ public:
 	void toggleNote(int noteIndex);
     
 	void updateNotes();
-	void updateFreq();
-
-	void addSpring(Spring* s);
-	void removeSpring(Spring* s);
+    void updateFreq();
     
 	void addSpringsByNote(int pc);
 	void removeSpringsByNote(int removeIndex);
@@ -97,6 +94,7 @@ public:
     {
         intervalStiffness = stiff;
         DBG("setIntervalStiffness: " + String(stiff));
+        
         for (auto spring : springArray)
         {
             spring->setStiffness(intervalStiffness);
@@ -183,8 +181,7 @@ public:
     Particle::PtrArr& getParticles(void) { return particleArray;}
     Spring::PtrArr& getSprings(void) { return springArray;}
     
-    bool getTetherSpringEnabled(int which);
-    bool getSpringEnabled(int which);
+    Spring::PtrArr& getEnabledSprings(void) { return enabledSpringArray;}
     
     String getTetherSpringName(int which);
     
@@ -364,10 +361,13 @@ private:
     TuningSystem scaleId;
 
     Particle::PtrArr    particleArray;
-    Spring::PtrArr      springArray; // efficiency fix: make this ordered by spring interval 
+    Spring::PtrArr      springArray; // efficiency fix: make this ordered by spring interval
     
     Particle::PtrArr    tetherParticleArray;
     Spring::PtrArr      tetherSpringArray;
+    
+    Spring::PtrArr      enabledSpringArray;
+    Spring::PtrArr      enabledParticleArray;
     
     bool tetherLocked[12];
     

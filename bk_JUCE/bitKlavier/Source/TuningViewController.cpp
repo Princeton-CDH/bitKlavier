@@ -407,8 +407,6 @@ void TuningViewController::paint (Graphics& g)
             active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
         }
         
-    
-        
         bool springsOn = active->getSpringsActive();
         
         Rectangle<int> b = getLocalBounds();
@@ -428,7 +426,7 @@ void TuningViewController::paint (Graphics& g)
         
         Particle::PtrArr particles = active->getTetherParticles();
 
-        for (auto s : active->getSprings())
+        for (auto s : active->getEnabledSprings())
         {
             if (s->getEnabled())
             {
@@ -1346,7 +1344,6 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
     String name = slider->getName();
     
     Spring::PtrArr tetherSprings = active->getTetherSprings();
-    Spring::PtrArr springs = active->getSprings();
 
     for (int i = 0; i < 128; i++)
     {
