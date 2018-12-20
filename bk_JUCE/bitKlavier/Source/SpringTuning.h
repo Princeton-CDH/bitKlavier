@@ -360,6 +360,7 @@ private:
     
     bool active;
     bool usingFundamentalForIntervalSprings;
+    int intervalSpringsFundamental;
     
     TuningSystem scaleId;
 
