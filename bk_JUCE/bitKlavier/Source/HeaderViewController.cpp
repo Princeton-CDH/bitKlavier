@@ -124,19 +124,22 @@ PopupMenu HeaderViewController::getLoadMenu(void)
    
     loadMenu.addItem(LOAD_HEAVY,    "Heavy", processor.currentSampleType != BKLoadHeavy, processor.currentSampleType == BKLoadHeavy);
     
-    //String currentSoundfont = processor.currentSoundfont.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf2", false, true);
-    loadMenu.addItem(LOAD_SOUNDFONT, "Load soundfont...");
+    loadMenu.addSeparator();
     
-#if !JUCE_IOS
+    loadMenu.addItem(SOUNDFONT_DEFAULT_0, "Rhodes", true, false);
+    loadMenu.addItem(SOUNDFONT_DEFAULT_1, "Harpsichord", true, false);
+    loadMenu.addItem(SOUNDFONT_DEFAULT_2, "Drums", true, false);
+    loadMenu.addItem(SOUNDFONT_DEFAULT_3, "Saw", true, false);
+    
     loadMenu.addSeparator();
     
     int i = 0;
     for (auto sf : processor.soundfontNames)
     {
         String sfName = sf.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf", false, true);
+        sfName = sfName.replace("%20", " ");
         loadMenu.addItem(SOUNDFONT_ID + (i++), sfName);
     }
-#endif
     
     return loadMenu;
 }
@@ -370,9 +373,9 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     {
         processor.loadSamples(BKLoadHeavy);
     }
-    else if (result == LOAD_SOUNDFONT)
+    else if (result >= SOUNDFONT_DEFAULT_0 && result <= SOUNDFONT_DEFAULT_3)
     {
-        processor.importSoundfont();
+        processor.loadSamples(BKLoadSoundfont, "default.sf2" + String(result - SOUNDFONT_DEFAULT_0), 0);
     }
     else if (result == SAVE_ID)
     {
@@ -380,8 +383,7 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         
         //processor.createGalleryWithName(processor.gallery->getName());
     }
-
-    if (result >= SOUNDFONT_ID)
+    else if (result >= SOUNDFONT_ID)
     {
         processor.loadSamples(BKLoadSoundfont, processor.soundfontNames[result-SOUNDFONT_ID], 0);
     }

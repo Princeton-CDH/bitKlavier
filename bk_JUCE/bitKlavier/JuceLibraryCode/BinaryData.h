@@ -8,6 +8,18 @@
 
 namespace BinaryData
 {
+    extern const char*   harpsichord_sf2;
+    const int            harpsichord_sf2Size = 67468;
+
+    extern const char*   kikazdrums_sf2;
+    const int            kikazdrums_sf2Size = 8725068;
+
+    extern const char*   rhodes_sf2;
+    const int            rhodes_sf2Size = 31618020;
+
+    extern const char*   saw_sf2;
+    const int            saw_sf2Size = 363250;
+
     extern const char*   _1__Synchronic_1_xml;
     const int            _1__Synchronic_1_xmlSize = 25058;
 
@@ -279,7 +291,7 @@ namespace BinaryData
     const int            tuning_icon_pngSize = 12404;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 90;
+    const int namedResourceListSize = 94;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

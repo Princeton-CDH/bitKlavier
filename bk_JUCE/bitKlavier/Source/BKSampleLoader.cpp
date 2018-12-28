@@ -51,8 +51,6 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         isSF2 = true;
         sf2sound   = new sfzero::SF2Sound(sfzFile);
         
-    
-        DBG("sfz file size: " + String(sfzFile.getSize()));
         sf2sound->loadRegions(processor.currentInstrument);
         sf2sound->loadSamples(&formatManager);
         
@@ -194,13 +192,42 @@ void BKSampleLoader::run(void)
     
     processor.updateState->pianoSamplesAreLoading = true;
     
+    String soundfont = processor.currentSoundfont;
+    
     EXIT_CHECK;
     
-    File file (processor.currentSoundfont);
-    
-    if (type == BKLoadSoundfont && file.exists())
+    if (type == BKLoadSoundfont)
     {
-        loadSoundfontFromFile(file);
+        if (soundfont.startsWith("default.sf2"))
+        {
+            int which = soundfont.fromLastOccurrenceOf("default.sf2", false, false).getIntValue();
+            
+            File file = file.createTempFile("default.sf2");
+            
+            switch (which)
+            {
+                case 0:
+                    file.replaceWithData(BinaryData::rhodes_sf2, BinaryData::rhodes_sf2Size); break;
+                case 1:
+                    file.replaceWithData(BinaryData::harpsichord_sf2, BinaryData::harpsichord_sf2Size); break;
+                case 2:
+                    file.replaceWithData(BinaryData::kikazdrums_sf2, BinaryData::kikazdrums_sf2Size); break;
+                case 3:
+                    file.replaceWithData(BinaryData::saw_sf2, BinaryData::saw_sf2Size); break;
+                default:
+                    file.replaceWithData(BinaryData::saw_sf2, BinaryData::saw_sf2Size); break;
+            }
+            
+            loadSoundfontFromFile(file);
+            
+            file.deleteFile();
+        }
+        else
+        {
+            File file (processor.currentSoundfont);
+            
+            loadSoundfontFromFile(file);
+        }
     }
     else
     {

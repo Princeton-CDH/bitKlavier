@@ -32,11 +32,14 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
     // Check if path isn't valid and load BKLoadLite if it is not
     if (type == BKLoadSoundfont)
     {
-        File file(path);
-        
-        if (!file.exists())
+        if (!path.startsWith("default.sf2"))
         {
-            type = BKLoadLite;
+            File file(path);
+            
+            if (!file.exists())
+            {
+                type = BKLoadLite;
+            }
         }
     }
     

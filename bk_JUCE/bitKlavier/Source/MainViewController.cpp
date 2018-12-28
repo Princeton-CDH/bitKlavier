@@ -71,10 +71,10 @@ timerCallbackCount(0)
 
     //~~~~~~~~~~~MENUS~~~~~~~~
     sampleCB.setLookAndFeel(&laf);
-    sampleCB.setTooltip("Choose and load sample set from bitKlavier resources/soundfonts/");
+    sampleCB.setTooltip("Choose and load sample set from your soundfonts folder");
     
     instrumentCB.setLookAndFeel(&laf);
-    instrumentCB.setTooltip("Load specific instrument from selected sample set (if available)");
+    instrumentCB.setTooltip("Load specific instrument from selected soundfont (if available)");
     
     sampleCB.addListener(this);
     instrumentCB.addListener(this);

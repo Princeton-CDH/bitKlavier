@@ -81,9 +81,16 @@
 #define EXPORT_ID 50
 #define IMPORT_ID 51
 
+#define LOAD_SOUNDFONT 999
+
 #define SOUNDFONT_ID 1000
 
-#define LOAD_SOUNDFONT 999
+#define SOUNDFONT_DEFAULT_0 990
+#define SOUNDFONT_DEFAULT_1 991
+#define SOUNDFONT_DEFAULT_2 992
+#define SOUNDFONT_DEFAULT_3 993
+
+
 
 inline PopupMenu getNewItemMenu(LookAndFeel* laf)
 {

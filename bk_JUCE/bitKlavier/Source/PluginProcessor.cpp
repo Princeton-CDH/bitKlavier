@@ -343,6 +343,9 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 #endif
     }
     
+#if JUCE_IOS
+    stk::Stk::setSampleRate(sampleRate);
+#endif
     //stk::Stk::setSampleRate(sampleRate); //crashes Logic Audio Unit Validation Tool
     
     mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
@@ -1347,8 +1350,6 @@ void BKAudioProcessor::loadGalleryDialog(void)
     {
         File myFile (myChooser.getResult());
 
-        //File user   (File::getSpecialLocation(File::userDocumentsDirectory));
-        //user = user.getChildFile("bitKlavier resources/galleries/");
         File user   (File::getSpecialLocation(File::globalApplicationsDirectory));
         user = user.getChildFile("bitKlavier/galleries/");
         
@@ -1450,8 +1451,6 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
         
         File myFile (myChooser.getResult());
         
-        //File user   (File::getSpecialLocation(File::userDocumentsDirectory));
-        //user = user.getChildFile("bitKlavier resources/galleries/");
         File user   (File::getSpecialLocation(File::globalApplicationsDirectory));
         user = user.getChildFile("bitKlavier/galleries/");
         

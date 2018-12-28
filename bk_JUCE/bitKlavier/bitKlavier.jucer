@@ -19,6 +19,12 @@
   <MAINGROUP id="s4R02g" name="bitKlavier">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
       <GROUP id="{1E3013D4-6B2A-D996-A5C8-F92AE44A39F2}" name="Resources">
+        <GROUP id="{7F0BF645-3E7B-170B-9D26-4D950F9268C2}" name="soundfonts">
+          <FILE id="mPollJ" name="harpsichord.sf2" compile="0" resource="1" file="Source/soundfonts/harpsichord.sf2"/>
+          <FILE id="xPBB4D" name="kikazdrums.sf2" compile="0" resource="1" file="Source/soundfonts/kikazdrums.sf2"/>
+          <FILE id="CSEuYh" name="rhodes.sf2" compile="0" resource="1" file="Source/soundfonts/rhodes.sf2"/>
+          <FILE id="gWgkR8" name="saw.sf2" compile="0" resource="1" file="Source/soundfonts/saw.sf2"/>
+        </GROUP>
         <GROUP id="{9410D6F7-7039-77FB-F92B-3580A2A099FE}" name="galleries">
           <GROUP id="{B6FA1321-FBCA-C3B2-8ADC-1F597F69E3E5}" name="Examples">
             <FILE id="QvZSwW" name="1. Synchronic 1.xml" compile="0" resource="1"
@@ -425,7 +431,7 @@
       </MODULEPATHS>
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="landscape" keepCustomXcodeSchemes="1"
-                  customXcodeResourceFolders="~/Documents/bitKlavier resources/samples/"
+                  customXcodeResourceFolders="/Applications/bitKlavier/samples/"
                   iosBackgroundAudio="1" iosDevelopmentTeamID="" UIFileSharingEnabled="1"
                   smallIcon="A1o3FE" bigIcon="iHGLGD" customPList="&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&#10;&lt;plist&gt;&#10;&#9;&lt;dict&gt;&#10;&#9;&#9;&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&lt;dict&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;CFBundleTypeName&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;XML&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSHandlerRank&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;Alternate&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSItemContentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;public.xml&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&#9;&#9;&#9;&lt;/dict&gt;&#10;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
                   iPadScreenOrientation="landscape" iosDeviceFamily="1,2" PListPreprocess="1"
