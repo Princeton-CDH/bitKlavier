@@ -589,16 +589,15 @@ void TuningViewController::fillTuningCB(void)
             A1IntervalScaleCB.addItem(name, i+1);
             A1AnchorScaleCB.addItem(name, i+1);
         
-
-        if(name == "Adaptive Tuning 1" || name == "Adaptive Anchored Tuning 1")
-        {
-            A1IntervalScaleCB.setItemEnabled(i+1, false);
-            A1AnchorScaleCB.setItemEnabled(i+1, false);
-        }
-        else
-        {
-            springScaleCB.addItem(name, ++count);
-        }
+            if(name == "Adaptive Tuning 1" || name == "Adaptive Anchored Tuning 1")
+            {
+                A1IntervalScaleCB.setItemEnabled(i+1, false);
+                A1AnchorScaleCB.setItemEnabled(i+1, false);
+            }
+            else
+            {
+                springScaleCB.addItem(name, ++count);
+            }
         }
                 
         if(name == "Custom") {
