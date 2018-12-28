@@ -573,6 +573,11 @@ void TuningViewController::fillTuningCB(void)
     submenus.add(new PopupMenu());
     submenus.add(new PopupMenu());
     
+    PopupMenu* additionalTuningsPopUp2 = springScaleCB.getRootMenu();
+    OwnedArray<PopupMenu> submenus2;
+    submenus2.add(new PopupMenu());
+    submenus2.add(new PopupMenu());
+    
     int count =0;
     for (int i = 0; i < cTuningSystemNames.size(); i++) //&& if(i<=8), for original systems; otherwise add to submenu of historical temperaments
     {
@@ -583,7 +588,7 @@ void TuningViewController::fillTuningCB(void)
             scaleCB.addItem(name, i+1);
             A1IntervalScaleCB.addItem(name, i+1);
             A1AnchorScaleCB.addItem(name, i+1);
-        }
+        
 
         if(name == "Adaptive Tuning 1" || name == "Adaptive Anchored Tuning 1")
         {
@@ -593,6 +598,7 @@ void TuningViewController::fillTuningCB(void)
         else
         {
             springScaleCB.addItem(name, ++count);
+        }
         }
                 
         if(name == "Custom") {
@@ -605,6 +611,9 @@ void TuningViewController::fillTuningCB(void)
             DBG("adding historical temperament: " + name);
             PopupMenu* historicalMenu = submenus.getUnchecked(0);
             historicalMenu->addItem(i+1, name);
+            
+            PopupMenu* historicalMenu2 = submenus2.getUnchecked(0);
+            historicalMenu2->addItem(i+1, name);
         }
         else if (i>35) //various
         {
@@ -612,11 +621,18 @@ void TuningViewController::fillTuningCB(void)
             DBG("adding various tunings: " + name);
             PopupMenu* variousMenu = submenus.getUnchecked(1);
             variousMenu->addItem(i+1, name);
+            
+            PopupMenu* variousMenu2 = submenus2.getUnchecked(1);
+            variousMenu2->addItem(i+1, name);
         }
     }
     scaleCB.addSeparator();
     additionalTuningsPopUp->addSubMenu("Historical", *submenus.getUnchecked(0));
     additionalTuningsPopUp->addSubMenu("Various", *submenus.getUnchecked(1));
+    
+    springScaleCB.addSeparator();
+    additionalTuningsPopUp2->addSubMenu("Historical", *submenus2.getUnchecked(0));
+    additionalTuningsPopUp2->addSubMenu("Various", *submenus2.getUnchecked(1));
     
 }
 
