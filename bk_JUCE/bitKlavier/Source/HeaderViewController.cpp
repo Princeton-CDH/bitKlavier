@@ -126,10 +126,12 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     
     loadMenu.addSeparator();
     
-    loadMenu.addItem(SOUNDFONT_DEFAULT_0, "Rhodes", true, false);
-    loadMenu.addItem(SOUNDFONT_DEFAULT_1, "Harpsichord", true, false);
-    loadMenu.addItem(SOUNDFONT_DEFAULT_2, "Drums", true, false);
-    loadMenu.addItem(SOUNDFONT_DEFAULT_3, "Saw", true, false);
+    loadMenu.addItem(SF2_DEFAULT_0, "Rhodes", true, false);
+    loadMenu.addItem(SF2_DEFAULT_1, "Harpsichord", true, false);
+    loadMenu.addItem(SF2_DEFAULT_2, "Drums", true, false);
+    loadMenu.addItem(SF2_DEFAULT_3, "Saw", true, false);
+    
+    // loadMenu.addItem(SFZ_DEFAULT_0, "Electric Bass", true, false);
     
     loadMenu.addSeparator();
     
@@ -373,9 +375,13 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     {
         processor.loadSamples(BKLoadHeavy);
     }
-    else if (result >= SOUNDFONT_DEFAULT_0 && result <= SOUNDFONT_DEFAULT_3)
+    else if (result >= SF2_DEFAULT_0 && result < SFZ_DEFAULT_0)
     {
-        processor.loadSamples(BKLoadSoundfont, "default.sf2" + String(result - SOUNDFONT_DEFAULT_0), 0);
+        processor.loadSamples(BKLoadSoundfont, "default.sf2" + String(result - SF2_DEFAULT_0), 0);
+    }
+    else if (result >= SFZ_DEFAULT_0 && result < SOUNDFONT_ID)
+    {
+        processor.loadSamples(BKLoadSoundfont, "default.sfz" + String(result - SFZ_DEFAULT_0), 0);
     }
     else if (result == SAVE_ID)
     {
