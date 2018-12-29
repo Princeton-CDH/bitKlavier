@@ -117,23 +117,23 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     
     
     loadMenu.addItem(LOAD_LITEST,   "Lightest", processor.currentSampleType != BKLoadLitest, processor.currentSampleType == BKLoadLitest);
-
     loadMenu.addItem(LOAD_LITE,     "Light", processor.currentSampleType != BKLoadLite, processor.currentSampleType == BKLoadLite);
-    
     loadMenu.addItem(LOAD_MEDIUM,   "Medium", processor.currentSampleType != BKLoadMedium, processor.currentSampleType == BKLoadMedium);
-   
     loadMenu.addItem(LOAD_HEAVY,    "Heavy", processor.currentSampleType != BKLoadHeavy, processor.currentSampleType == BKLoadHeavy);
     
     loadMenu.addSeparator();
     
-    loadMenu.addItem(SF2_DEFAULT_0, "Rhodes", true, false);
-    loadMenu.addItem(SF2_DEFAULT_1, "Harpsichord", true, false);
-    loadMenu.addItem(SF2_DEFAULT_2, "Drums", true, false);
-    loadMenu.addItem(SF2_DEFAULT_3, "Saw", true, false);
+#if JUCE_IOS
     
-    // loadMenu.addItem(SFZ_DEFAULT_0, "Electric Bass", true, false);
+    loadMenu.addItem(SF_DEFAULT_0, "Rhodes", true, false);
+    loadMenu.addItem(SF_DEFAULT_1, "Harpsichord", true, false);
+    loadMenu.addItem(SF_DEFAULT_2, "Drums", true, false);
+    loadMenu.addItem(SF_DEFAULT_3, "Saw", true, false);
+    loadMenu.addItem(SF_DEFAULT_4, "Electric Bass", true, false);
     
     loadMenu.addSeparator();
+    
+#endif
     
     int i = 0;
     for (auto sf : processor.soundfontNames)
@@ -375,13 +375,9 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     {
         processor.loadSamples(BKLoadHeavy);
     }
-    else if (result >= SF2_DEFAULT_0 && result < SFZ_DEFAULT_0)
+    else if (result >= SF_DEFAULT_0 && result < SOUNDFONT_ID)
     {
-        processor.loadSamples(BKLoadSoundfont, "default.sf2" + String(result - SF2_DEFAULT_0), 0);
-    }
-    else if (result >= SFZ_DEFAULT_0 && result < SOUNDFONT_ID)
-    {
-        processor.loadSamples(BKLoadSoundfont, "default.sfz" + String(result - SFZ_DEFAULT_0), 0);
+        processor.loadSamples(BKLoadSoundfont, "default.sf" + String(result - SF_DEFAULT_0), 0);
     }
     else if (result == SAVE_ID)
     {

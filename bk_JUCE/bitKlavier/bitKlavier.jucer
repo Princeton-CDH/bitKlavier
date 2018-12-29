@@ -19,38 +19,6 @@
   <MAINGROUP id="s4R02g" name="bitKlavier">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
       <GROUP id="{1E3013D4-6B2A-D996-A5C8-F92AE44A39F2}" name="Resources">
-        <GROUP id="{7F0BF645-3E7B-170B-9D26-4D950F9268C2}" name="soundfonts">
-          <GROUP id="{09709986-16F5-2614-8C1F-2746D7B2C612}" name="ebass">
-            <GROUP id="{6A2E1FBD-BE5A-438E-3E54-CBCDE8FC87F3}" name="Samples">
-              <GROUP id="{85E0945D-A160-7472-AE7D-FAC1C8DDEBCA}" name="TX81Z_JB1STBass_-_01">
-                <FILE id="Q2d2IM" name="JB1STBass_-_ C1.wav" compile="0" resource="1"
-                      file="Source/soundfonts/ebass/Samples/TX81Z_JB1STBass_-_01/JB1STBass_-_ C1.wav"/>
-                <FILE id="z98NyH" name="JB1STBass_-_ C2.wav" compile="0" resource="1"
-                      file="Source/soundfonts/ebass/Samples/TX81Z_JB1STBass_-_01/JB1STBass_-_ C2.wav"/>
-                <FILE id="zAALor" name="JB1STBass_-_ C3.wav" compile="0" resource="1"
-                      file="Source/soundfonts/ebass/Samples/TX81Z_JB1STBass_-_01/JB1STBass_-_ C3.wav"/>
-                <FILE id="ylwqkj" name="JB1STBass_-_ C4.wav" compile="0" resource="1"
-                      file="Source/soundfonts/ebass/Samples/TX81Z_JB1STBass_-_01/JB1STBass_-_ C4.wav"/>
-                <FILE id="TkBobN" name="JB1STBass_-_ C5.wav" compile="0" resource="1"
-                      file="Source/soundfonts/ebass/Samples/TX81Z_JB1STBass_-_01/JB1STBass_-_ C5.wav"/>
-                <FILE id="aEMRtt" name="JB1STBass_-_ G1.wav" compile="0" resource="1"
-                      file="Source/soundfonts/ebass/Samples/TX81Z_JB1STBass_-_01/JB1STBass_-_ G1.wav"/>
-                <FILE id="Tsg4XJ" name="JB1STBass_-_ G2.wav" compile="0" resource="1"
-                      file="Source/soundfonts/ebass/Samples/TX81Z_JB1STBass_-_01/JB1STBass_-_ G2.wav"/>
-                <FILE id="SLoTH4" name="JB1STBass_-_ G3.wav" compile="0" resource="1"
-                      file="Source/soundfonts/ebass/Samples/TX81Z_JB1STBass_-_01/JB1STBass_-_ G3.wav"/>
-                <FILE id="H3NBUB" name="JB1STBass_-_ G4.wav" compile="0" resource="1"
-                      file="Source/soundfonts/ebass/Samples/TX81Z_JB1STBass_-_01/JB1STBass_-_ G4.wav"/>
-              </GROUP>
-            </GROUP>
-            <FILE id="GrkbEC" name="Electric Bass.sfz" compile="0" resource="1"
-                  file="Source/soundfonts/ebass/Electric Bass.sfz"/>
-          </GROUP>
-          <FILE id="mPollJ" name="harpsichord.sf2" compile="0" resource="1" file="Source/soundfonts/harpsichord.sf2"/>
-          <FILE id="xPBB4D" name="kikazdrums.sf2" compile="0" resource="1" file="Source/soundfonts/kikazdrums.sf2"/>
-          <FILE id="CSEuYh" name="rhodes.sf2" compile="0" resource="1" file="Source/soundfonts/rhodes.sf2"/>
-          <FILE id="gWgkR8" name="saw.sf2" compile="0" resource="1" file="Source/soundfonts/saw.sf2"/>
-        </GROUP>
         <GROUP id="{9410D6F7-7039-77FB-F92B-3580A2A099FE}" name="galleries">
           <GROUP id="{B6FA1321-FBCA-C3B2-8ADC-1F597F69E3E5}" name="Examples">
             <FILE id="QvZSwW" name="1. Synchronic 1.xml" compile="0" resource="1"
@@ -457,7 +425,7 @@
       </MODULEPATHS>
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="landscape" keepCustomXcodeSchemes="1"
-                  customXcodeResourceFolders="/Applications/bitKlavier/samples/"
+                  customXcodeResourceFolders="/Applications/bitKlavier/samples/&#10;./Source/soundfonts/&#10;&#10;"
                   iosBackgroundAudio="1" iosDevelopmentTeamID="" UIFileSharingEnabled="1"
                   smallIcon="A1o3FE" bigIcon="iHGLGD" customPList="&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&#10;&lt;plist&gt;&#10;&#9;&lt;dict&gt;&#10;&#9;&#9;&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&lt;dict&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;CFBundleTypeName&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;XML&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSHandlerRank&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;Alternate&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSItemContentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;public.xml&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&#9;&#9;&#9;&lt;/dict&gt;&#10;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
                   iPadScreenOrientation="landscape" iosDeviceFamily="1,2" PListPreprocess="1"

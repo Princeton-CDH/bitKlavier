@@ -198,24 +198,28 @@ void BKSampleLoader::run(void)
     
     if (type == BKLoadSoundfont)
     {
-        if (soundfont.startsWith("default.sf2"))
+        if (soundfont.startsWith("default.sf"))
         {
-            int which = soundfont.fromLastOccurrenceOf("default.sf2", false, false).getIntValue();
+            int which = soundfont.fromLastOccurrenceOf("default.sf", false, false).getIntValue();
             
-            File file = file.createTempFile("default.sf2");
+            File file;
             
+            file = file.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("soundfonts");
+
             switch (which)
             {
                 case 0:
-                    file.replaceWithData(BinaryData::rhodes_sf2, BinaryData::rhodes_sf2Size); break;
+                    file = file.getChildFile("rhodes.sf2"); break;
                 case 1:
-                    file.replaceWithData(BinaryData::harpsichord_sf2, BinaryData::harpsichord_sf2Size); break;
+                    file = file.getChildFile("harpsichord.sf2"); break;
                 case 2:
-                    file.replaceWithData(BinaryData::kikazdrums_sf2, BinaryData::kikazdrums_sf2Size); break;
+                    file = file.getChildFile("kikazdrums.sf2"); break;
                 case 3:
-                    file.replaceWithData(BinaryData::saw_sf2, BinaryData::saw_sf2Size); break;
+                    file = file.getChildFile("saw.sf2"); break;
+                case 4:
+                    file = file.getChildFile("ebass").getChildFile("Electric Bass.sfz"); break;
                 default:
-                    file.replaceWithData(BinaryData::saw_sf2, BinaryData::saw_sf2Size); break;
+                    file = file.getChildFile("saw.sf2"); break;
             }
             
             loadSoundfontFromFile(file);
@@ -224,7 +228,7 @@ void BKSampleLoader::run(void)
         }
         else
         {
-            File file (processor.currentSoundfont);
+            File file (soundfont);
             
             loadSoundfontFromFile(file);
         }

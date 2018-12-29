@@ -83,12 +83,11 @@
 
 #define SOUNDFONT_ID 1000
 
-#define SF2_DEFAULT_0 800
-#define SF2_DEFAULT_1 801
-#define SF2_DEFAULT_2 802
-#define SF2_DEFAULT_3 803
-
-#define SFZ_DEFAULT_0 900
+#define SF_DEFAULT_0 800
+#define SF_DEFAULT_1 801
+#define SF_DEFAULT_2 802
+#define SF_DEFAULT_3 803
+#define SF_DEFAULT_4 804
 
 
 
