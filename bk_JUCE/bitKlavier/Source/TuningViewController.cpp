@@ -1134,6 +1134,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         customKeyboard.setValues(tuning->getCurrentScaleCents());
         
         //just for printing offsets out; temporary
+        /*
         Array<float> tuningOffsets = tuning->getCurrentScale();
         String offsetString = " ";
         for(int i=0; i<tuningOffsets.size(); i++)
@@ -1141,7 +1142,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
             offsetString += (String(tuningOffsets.getUnchecked(i)) + ", ");
         }
         DBG("scale offsets: " + offsetString);
-
+        */
         
         if(active->getSpringsActive())
         {
@@ -1161,6 +1162,9 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         prep->setFundamental((PitchClass) index);
         active->setFundamental((PitchClass) index);
+        
+        prep->getSpringTuning()->setTetherFundamental((PitchClass) index);
+        active->getSpringTuning()->setTetherFundamental((PitchClass) index);
         
         customKeyboard.setFundamental(index);
         
@@ -1218,6 +1222,8 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         
         prep->getSpringTuning()->setIntervalTuning(scale);
         active->getSpringTuning()->setIntervalTuning(scale);
+        
+        DBG("current springTuningSystem " + String(prep->getSpringTuning()->getScaleId()));
     }
     
     processor.gallery->setGalleryDirty(true);

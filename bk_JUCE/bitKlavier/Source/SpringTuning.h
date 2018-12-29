@@ -188,7 +188,10 @@ public:
     String getSpringName(int which);
     
     void setTetherTuning(Array<float> tuning);
-    Array<float> getTetherTuning(void){return tetherTuning;}
+    Array<float> getTetherTuning(void) {return tetherTuning;}
+    
+    void setTetherFundamental(PitchClass  newfundamental);
+    int getTetherFundamental(void) {return tetherFundamental;}
     
     void setIntervalTuning(Array<float> tuning);
     Array<float> getIntervalTuning(void){return intervalTuning;}
@@ -372,6 +375,8 @@ private:
     bool tetherLocked[12];
     
     Array<float> tetherTuning;
+    PitchClass tetherFundamental;
+    
     Array<float> intervalTuning;
     
     float springWeights[13];

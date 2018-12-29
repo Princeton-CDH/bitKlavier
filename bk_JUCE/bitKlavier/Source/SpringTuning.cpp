@@ -52,6 +52,8 @@ scaleId(JustTuning)
     enabledSpringArray.clear();
     
     tetherTuning = Array<float>({0,0,0,0,0,0,0,0,0,0,0,0});
+    tetherFundamental = PitchClass(C);
+    
     intervalTuning = Array<float>({0.0, 0.117313, 0.039101, 0.156414, -0.13686, -0.019547, -0.174873, 0.019547, 0.136864, -0.15641, -0.311745, -0.11731});
     
     for (int i = 0; i < 12; i++) tetherLocked[i] = false;
@@ -183,12 +185,19 @@ void SpringTuning::setTetherTuning(Array<float> tuning)
     
     for (int i = 0; i < 128; i++)
     {
-        tetherParticleArray[i]->setX( (i * 100.0) + tetherTuning[i % 12] );
-        tetherParticleArray[i]->setRestX( (i * 100.0) + tetherTuning[i % 12] );
+        tetherParticleArray[i]->setX( (i * 100.0) + tetherTuning[(i-tetherFundamental) % 12] );
+        tetherParticleArray[i]->setRestX( (i * 100.0) + tetherTuning[(i-tetherFundamental) % 12] );
         
         //DBG("rest X: " + String((i * 100.0) + tetherTuning[i % 12]));
-        particleArray[i]->setRestX( (i * 100.0) + tetherTuning[i % 12] );
+        particleArray[i]->setRestX( (i * 100.0) + tetherTuning[(i-tetherFundamental) % 12] );
     }
+}
+
+void SpringTuning::setTetherFundamental(PitchClass newfundamental)
+{
+    tetherFundamental = newfundamental;
+    
+    setTetherTuning(getTetherTuning());
 }
 
 void SpringTuning::setIntervalTuning(Array<float> tuning)
