@@ -196,6 +196,9 @@ public:
     void setIntervalTuning(Array<float> tuning);
     Array<float> getIntervalTuning(void){return intervalTuning;}
     
+    void setIntervalFundamental(PitchClass  newfundamental) { intervalFundamental = newfundamental; }
+    int getIntervalFundamental(void) {return intervalFundamental;}
+    
     void retuneIndividualSpring(Spring::Ptr spring);
     
     void setSpringWeight(int which, double weight);
@@ -378,6 +381,7 @@ private:
     PitchClass tetherFundamental;
     
     Array<float> intervalTuning;
+    PitchClass intervalFundamental;
     
     float springWeights[13];
     

@@ -55,6 +55,7 @@ scaleId(JustTuning)
     tetherFundamental = PitchClass(C);
     
     intervalTuning = Array<float>({0.0, 0.117313, 0.039101, 0.156414, -0.13686, -0.019547, -0.174873, 0.019547, 0.136864, -0.15641, -0.311745, -0.11731});
+    intervalFundamental = PitchClass(C);
     
     for (int i = 0; i < 12; i++) tetherLocked[i] = false;
     
@@ -134,10 +135,10 @@ scaleId(JustTuning)
                 
                 int scaleDegree1 = particleArray[i]->getNote();
                 int scaleDegree2 = particleArray[j]->getNote();;
-                int intervalFundamental = 0; //temporary, will set in preparation
+                //int intervalFundamental = 0; //temporary, will set in preparation
                 
-                diff =  100. * ((scaleDegree1 + intervalTuning[(scaleDegree1 - intervalFundamental) % 12]) -
-                                (scaleDegree2 + intervalTuning[(scaleDegree2 - intervalFundamental) % 12]));
+                diff =  100. * ((scaleDegree1 + intervalTuning[(scaleDegree1 - (int)intervalFundamental) % 12]) -
+                                (scaleDegree2 + intervalTuning[(scaleDegree2 - (int)intervalFundamental) % 12]));
                 
                 //DBG("setting new spring " + String(scaleDegree1) + " " + String(scaleDegree2) + " length = " + String(fabs(diff)));
                 Spring* spring = new Spring(particleArray[j],
@@ -204,6 +205,8 @@ void SpringTuning::setIntervalTuning(Array<float> tuning)
 {
     intervalTuning = tuning;
     
+    //shouldn't need any of the below, now that we're tuning with noteOn
+/*
     for (auto spring : enabledSpringArray)
     {
         int interval = spring->getIntervalIndex();
@@ -212,7 +215,6 @@ void SpringTuning::setIntervalTuning(Array<float> tuning)
         spring->setRestingLength(fabs(diff) + intervalTuning[interval]);
     }
 
-#if 0
     if(!usingFundamentalForIntervalSprings)
     {
         for (auto spring : springArray)
@@ -227,21 +229,10 @@ void SpringTuning::setIntervalTuning(Array<float> tuning)
     {
         for (auto spring : springArray)
         {
-            /*
-            int scaleDegree1 = spring->getA()->getNote();
-            int scaleDegree2 = spring->getB()->getNote();
-            int intervalFundamental = 0; //temporary, will set in preparation
-            
-            float diff = (100. * scaleDegree2 + intervalTuning[(scaleDegree2 - intervalFundamental) % 12]) -
-                         (100. * scaleDegree1 + intervalTuning[(scaleDegree1 - intervalFundamental) % 12]);
-
-            spring->setRestingLength(fabs(diff));
-            */
-            
             retuneIndividualSpring(spring);
         }
     }
-#endif
+*/
 }
 
 void SpringTuning::simulate()
@@ -431,12 +422,14 @@ void SpringTuning::addSpring(Spring::Ptr spring)
     spring->setStiffness(intervalStiffness);
     spring->setStrength(springWeights[interval]);
     enabledSpringArray.add(spring);
-    
-    //if(usingFundamentalForIntervalSprings) retuneIndividualSpring(spring);
-    
-    int diff = spring->getA()->getRestX() - spring->getB()->getRestX();
-    
-    spring->setRestingLength(fabs(diff) + intervalTuning[interval]);
+
+    if(!usingFundamentalForIntervalSprings)
+    {
+        int diff = spring->getA()->getRestX() - spring->getB()->getRestX();
+        spring->setRestingLength(fabs(diff) + intervalTuning[interval]);
+    }
+    else retuneIndividualSpring(spring);
+
 }
 
 void SpringTuning::addSpringsByNote(int note)
@@ -475,10 +468,10 @@ void SpringTuning::retuneIndividualSpring(Spring::Ptr spring)
 {
     int scaleDegree1 = spring->getA()->getNote();
     int scaleDegree2 = spring->getB()->getNote();
-    int intervalFundamental = 0; //temporary, will set in preparation
+    //int intervalFundamental = 0; //temporary, will set in preparation
     
-    float diff = (100. * scaleDegree2 + intervalTuning[(scaleDegree2 - intervalFundamental) % 12]) -
-    (100. * scaleDegree1 + intervalTuning[(scaleDegree1 - intervalFundamental) % 12]);
+    float diff = (100. * scaleDegree2 + intervalTuning[(scaleDegree2 - (int)intervalFundamental) % 12]) -
+    (100. * scaleDegree1 + intervalTuning[(scaleDegree1 - (int)intervalFundamental) % 12]);
     
     spring->setRestingLength(fabs(diff));
 }
