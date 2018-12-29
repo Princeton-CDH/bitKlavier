@@ -110,6 +110,10 @@ showSprings(false)
     springScaleCB.setTooltip("Select a temperament for the spring intervals.");
     addChildComponent(springScaleCB);
     
+    springScaleFundamentalCB.setName("SpringTuning Fundamental");
+    springScaleFundamentalCB.setTooltip("Set the fundamental for the interval scale");
+    addChildComponent(springScaleFundamentalCB);
+    
     scaleLabel.setText("Scale", dontSendNotification);
     
     fundamentalCB.setName("Fundamental");
@@ -344,13 +348,11 @@ void TuningViewController::resized()
     lastNote.setBounds(editAllBounds.getRight() + gXSpacing, editAllBounds.getY(),editAllBounds.getWidth() * 2, editAllBounds.getHeight());
     lastInterval.setBounds(lastNote.getRight() + gXSpacing, lastNote.getY(),lastNote.getWidth(), lastNote.getHeight());
     
-
-    rateSlider->setBounds(selectCB.getX()-gComponentSingleSliderXOffset, selectCB.getBottom() + gYSpacing, selectCB.getWidth()+gComponentSingleSliderXOffset*2., gComponentSingleSliderHeight);
-    dragSlider->setBounds(fundamentalCB.getX()-gComponentSingleSliderXOffset, rateSlider->getY(), fundamentalCB.getWidth()+gComponentSingleSliderXOffset*2., gComponentSingleSliderHeight);
+    rateSlider->setBounds(selectCB.getX()-gComponentSingleSliderXOffset, selectCB.getBottom() + gYSpacing, selectCB.getWidth()+gComponentSingleSliderXOffset, gComponentSingleSliderHeight);
+    dragSlider->setBounds(actionButton.getX()-gComponentSingleSliderXOffset, rateSlider->getY(), showSpringsButton.getWidth() + actionButton.getWidth(), gComponentSingleSliderHeight);
     
-    springScaleCB.setBounds(scaleCB.getX(), dragSlider->getY(), scaleCB.getWidth(), gComponentComboBoxHeight);
-    
-    float sliderHeight = (absoluteKeyboard.getBottom() - (rateSlider->getBottom() + gYSpacing)) / 13.;
+    springScaleCB.setBounds(scaleCB.getX(), rateSlider->getY(), scaleCB.getWidth(), gComponentComboBoxHeight);
+    springScaleFundamentalCB.setBounds(fundamentalCB.getX(), springScaleCB.getY(), fundamentalCB.getWidth(), gComponentComboBoxHeight);
     
     intervalStiffnessSlider->setBounds(selectCB.getX() - gComponentSingleSliderXOffset,
                                        rateSlider->getBottom() + gYSpacing,
@@ -361,6 +363,11 @@ void TuningViewController::resized()
                                      intervalStiffnessSlider->getY(),
                                      fundamentalCB.getWidth() + 2.*gComponentSingleSliderXOffset,
                                      gComponentSingleSliderHeight);
+    
+    //dragSlider->setBounds(fundamentalCB.getX()-gComponentSingleSliderXOffset, intervalStiffnessSlider->getY(), fundamentalCB.getWidth()+gComponentSingleSliderXOffset*2., gComponentSingleSliderHeight);
+    
+    
+    float sliderHeight = (absoluteKeyboard.getBottom() - (rateSlider->getBottom() + gYSpacing)) / 13.;
     
     for (int i = 0; i < 12; i++)
     {
@@ -641,6 +648,7 @@ void TuningViewController::fillFundamentalCB(void)
     A1FundamentalCB.clear(dontSendNotification);
     nToneRootCB.clear(dontSendNotification);
     nToneRootOctaveCB.clear(dontSendNotification);
+    springScaleFundamentalCB.clear(dontSendNotification);
     
     for (int i = 0; i < cFundamentalNames.size(); i++)
     {
@@ -648,12 +656,15 @@ void TuningViewController::fillFundamentalCB(void)
         fundamentalCB.addItem(name, i+1);
         A1FundamentalCB.addItem(name, i+1);
         nToneRootCB.addItem(name, i+1);
+        springScaleFundamentalCB.addItem(name, i+1);
     }
     
     for (int i = 0; i < 9; i++)
     {
         nToneRootOctaveCB.addItem(String(i), i+1);
     }
+    
+    springScaleFundamentalCB.addItem("none", (int)cFundamentalNames.size()+1);
 }
 
 void TuningViewController::updateComponentVisibility()
@@ -670,6 +681,7 @@ void TuningViewController::updateComponentVisibility()
     rateSlider->setVisible(false);
     dragSlider->setVisible(false);
     springScaleCB.setVisible(false);
+    springScaleFundamentalCB.setVisible(false);
     
     tetherStiffnessSlider->setVisible(false);
     intervalStiffnessSlider->setVisible(false);
@@ -803,6 +815,9 @@ void TuningViewController::updateComponentVisibility()
             
             springScaleCB.setVisible(true);
             springScaleCB.toFront(false);
+            
+            springScaleFundamentalCB.setVisible(true);
+            springScaleFundamentalCB.toFront(false);
             
             for (int i = 0; i < 12; i++)
             {
