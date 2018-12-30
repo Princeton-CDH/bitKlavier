@@ -1332,6 +1332,11 @@ void TuningPreparationEditor::update(void)
         //dragSlider->setValue(  //must remember to use dt_asym_inversion on 1 - val)
         double newval = dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->getDrag(), 100.);
         dragSlider->setValue(newval, dontSendNotification);
+        
+        if(!prep->getSpringTuning()->getUsingFundamentalForIntervalSprings())
+            springScaleFundamentalCB.setSelectedItemIndex(12);
+        else
+            springScaleFundamentalCB.setSelectedItemIndex(prep->getSpringTuning()->getTetherFundamental());
     }
     
     updateComponentVisibility();

@@ -198,6 +198,9 @@ void SpringTuning::setTetherFundamental(PitchClass newfundamental)
 {
     tetherFundamental = newfundamental;
     
+    if(newfundamental == 12) usingFundamentalForIntervalSprings = false;
+    else usingFundamentalForIntervalSprings = true;
+    
     setTetherTuning(getTetherTuning());
 }
 
