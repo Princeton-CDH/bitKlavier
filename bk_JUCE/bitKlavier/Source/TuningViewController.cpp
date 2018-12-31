@@ -665,6 +665,7 @@ void TuningViewController::fillFundamentalCB(void)
     }
     
     springScaleFundamentalCB.addItem("none", (int)cFundamentalNames.size()+1);
+    springScaleFundamentalCB.addItem("lowest", (int)cFundamentalNames.size()+2);
 }
 
 void TuningViewController::updateComponentVisibility()
@@ -968,52 +969,30 @@ TuningViewController(p, theGraph)
     }
     
     springTuningToggle.addListener(this);
-    
     rateSlider->addMyListener(this);
-    
     dragSlider->addMyListener(this);
-    
     intervalStiffnessSlider->addMyListener(this);
-    
     tetherStiffnessSlider->addMyListener(this);
-    
     springScaleCB.addListener(this);
-    
+    springScaleFundamentalCB.addListener(this);
     showSpringsButton.addListener(this);
-    
     selectCB.addMyListener(this);
-    
     selectCB.addListener(this);
-
     scaleCB.addListener(this);
-    
     fundamentalCB.addListener(this);
-
     A1IntervalScaleCB.addListener(this);
-    
     A1Inversional.addListener(this);
-    
     A1AnchorScaleCB.addListener(this);
-    
     A1FundamentalCB.addListener(this);
-    
     A1ClusterThresh->addMyListener(this);
-    
     A1ClusterMax->addMyListener(this);
-    
     A1reset.addListener(this);
     
-    
     absoluteKeyboard.addMyListener(this);
-    
     customKeyboard.addMyListener(this);
-    
     offsetSlider->addMyListener(this);
-    
     nToneRootCB.addListener(this);
-    
     nToneRootOctaveCB.addListener(this);
-    
     nToneSemitoneWidthSlider->addMyListener(this);
     
     update();
@@ -1239,6 +1218,13 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         active->getSpringTuning()->setIntervalTuning(scale);
         
         DBG("current springTuningSystem " + String(prep->getSpringTuning()->getScaleId()));
+    }
+    else if (box == &springScaleFundamentalCB)
+    {
+        prep->getSpringTuning()->setIntervalFundamental((PitchClass)index);
+        active->getSpringTuning()->setIntervalFundamental((PitchClass)index);
+        
+        DBG("current springtuning interval Fundamental = " + String(index));
     }
     
     processor.gallery->setGalleryDirty(true);
@@ -1562,17 +1548,12 @@ TuningViewController(p, theGraph)
     }
     
     springTuningToggle.addListener(this);
-    
     rateSlider->addMyListener(this);
-    
     dragSlider->addMyListener(this);
-    
     intervalStiffnessSlider->addMyListener(this);
-    
     tetherStiffnessSlider->addMyListener(this);
-    
     springScaleCB.addListener(this);
-    
+    springScaleFundamentalCB.addListener(this);
     showSpringsButton.addListener(this);
     // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

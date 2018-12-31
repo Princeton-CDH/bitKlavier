@@ -49,6 +49,7 @@ scaleId(JustTuning)
     particleArray.ensureStorageAllocated(128);
     tetherParticleArray.ensureStorageAllocated(128);
     
+    enabledSpringArray.ensureStorageAllocated(128);
     enabledSpringArray.clear();
     
     tetherTuning = Array<float>({0,0,0,0,0,0,0,0,0,0,0,0});
@@ -56,6 +57,8 @@ scaleId(JustTuning)
     
     intervalTuning = Array<float>({0.0, 0.117313, 0.039101, 0.156414, -0.13686, -0.019547, -0.174873, 0.019547, 0.136864, -0.15641, -0.311745, -0.11731});
     intervalFundamental = PitchClass(C);
+    
+    useLastNoteForFundamental = false;
     
     for (int i = 0; i < 12; i++) tetherLocked[i] = false;
     
@@ -197,9 +200,6 @@ void SpringTuning::setTetherTuning(Array<float> tuning)
 void SpringTuning::setTetherFundamental(PitchClass newfundamental)
 {
     tetherFundamental = newfundamental;
-    
-    if(newfundamental == 12) usingFundamentalForIntervalSprings = false;
-    else usingFundamentalForIntervalSprings = true;
     
     setTetherTuning(getTetherTuning());
 }
@@ -387,15 +387,32 @@ void SpringTuning::removeParticle(int note)
 }
 void SpringTuning::addNote(int note)
 {
-    //change interval fundamental here, depending on mode?
     addParticle(note);
+    
+    if(useLastNoteForFundamental)
+    {
+        DBG("lowest current note = " + String(getLowestActiveParticle()));
+        intervalFundamental = (PitchClass)getLowestActiveParticle();
+    }
+    
     addSpringsByNote(note);
+    
+    if(useLastNoteForFundamental) retuneAllActiveSprings();
 }
 
 void SpringTuning::removeNote(int note)
 {
     removeParticle(note);
+    
+    if(useLastNoteForFundamental)
+    {
+        DBG("lowest current note = " + String(getLowestActiveParticle()));
+        intervalFundamental = (PitchClass)getLowestActiveParticle();
+    }
+    
     removeSpringsByNote(note);
+    
+    if(useLastNoteForFundamental) retuneAllActiveSprings();
 }
 
 void SpringTuning::removeAllNotes(void)
@@ -473,13 +490,19 @@ void SpringTuning::retuneIndividualSpring(Spring::Ptr spring)
     int scaleDegree2 = spring->getB()->getNote();
     //int intervalFundamental = 0; //temporary, will set in preparation
     
-    float diff = (100. * scaleDegree2 + intervalTuning[(scaleDegree2 - (int)intervalFundamental) % 12]) -
-    (100. * scaleDegree1 + intervalTuning[(scaleDegree1 - (int)intervalFundamental) % 12]);
+    float diff =    (100. * scaleDegree2 + intervalTuning[(scaleDegree2 - (int)intervalFundamental) % 12]) -
+                    (100. * scaleDegree1 + intervalTuning[(scaleDegree1 - (int)intervalFundamental) % 12]);
     
     spring->setRestingLength(fabs(diff));
 }
 
-//DT: wondering if there is a more efficient way to do this, rather than reading throug the whole spring array?
+void SpringTuning::retuneAllActiveSprings(void)
+{
+    for (auto spring : enabledSpringArray)
+    {
+        retuneIndividualSpring(spring);
+    }
+}
 void SpringTuning::removeSpringsByNote(int note)
 {
 	Particle* p = particleArray[note];
@@ -527,6 +550,20 @@ void SpringTuning::printParticles()
 	{
 		particleArray[i]->print();
 	}
+}
+
+int SpringTuning::getLowestActiveParticle()
+{
+    int lowest = 0;
+    
+    while(lowest < particleArray.size())
+    {
+        if(particleArray[lowest]->getEnabled()) return lowest;
+        
+        lowest++;
+    }
+    
+    return lowest;
 }
 
 void SpringTuning::printActiveParticles()

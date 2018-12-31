@@ -196,10 +196,19 @@ public:
     void setIntervalTuning(Array<float> tuning);
     Array<float> getIntervalTuning(void){return intervalTuning;}
     
-    void setIntervalFundamental(PitchClass  newfundamental) { intervalFundamental = newfundamental; }
+    void setIntervalFundamental(PitchClass  newfundamental)
+    {
+        intervalFundamental = newfundamental;
+        if(newfundamental == 12) setUsingFundamentalForIntervalSprings(false);
+        else setUsingFundamentalForIntervalSprings(true);
+        
+        if(newfundamental == 13) useLastNoteForFundamental = true;
+        else useLastNoteForFundamental = false;
+    }
     int getIntervalFundamental(void) {return intervalFundamental;}
     
     void retuneIndividualSpring(Spring::Ptr spring);
+    void retuneAllActiveSprings(void);
     
     void setSpringWeight(int which, double weight);
     double getSpringWeight(int which);
@@ -209,6 +218,8 @@ public:
     
     void setUsingFundamentalForIntervalSprings(bool use) { usingFundamentalForIntervalSprings = use; }
     bool getUsingFundamentalForIntervalSprings(void) { return usingFundamentalForIntervalSprings; }
+    
+    int getLowestActiveParticle();
     
     ValueTree getState(void)
     {
@@ -363,6 +374,7 @@ private:
     
     bool active;
     bool usingFundamentalForIntervalSprings;
+    bool useLastNoteForFundamental;
     int intervalSpringsFundamental;
     
     TuningSystem scaleId;
