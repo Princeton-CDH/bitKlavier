@@ -40,11 +40,9 @@ public:
 	void toggleNote(int noteIndex);
     
 	void updateNotes();
-	void updateFreq();
-
-	void addSpring(Spring* s);
-	void removeSpring(Spring* s);
+    void updateFreq();
     
+   
 	void addSpringsByNote(int pc);
 	void removeSpringsByNote(int removeIndex);
 	void addSpringsByInterval(double interval);
@@ -72,7 +70,7 @@ public:
     {
         stiffness = stiff;
         
-        for (auto spring : springArray)
+        for (auto spring : enabledSpringArray)
         {
             spring->setStiffness(stiffness);
         }
@@ -96,8 +94,8 @@ public:
     inline void setIntervalStiffness(double stiff)
     {
         intervalStiffness = stiff;
-        DBG("setIntervalStiffness: " + String(stiff));
-        for (auto spring : springArray)
+        
+        for (auto spring : enabledSpringArray)
         {
             spring->setStiffness(intervalStiffness);
         }
@@ -183,18 +181,23 @@ public:
     Particle::PtrArr& getParticles(void) { return particleArray;}
     Spring::PtrArr& getSprings(void) { return springArray;}
     
-    bool getTetherSpringEnabled(int which);
-    bool getSpringEnabled(int which);
+    Spring::PtrArr& getEnabledSprings(void) { return enabledSpringArray;}
     
     String getTetherSpringName(int which);
     
     String getSpringName(int which);
     
     void setTetherTuning(Array<float> tuning);
-    Array<float> getTetherTuning(void){return tetherTuning;}
+    Array<float> getTetherTuning(void) {return tetherTuning;}
+    
+    void setTetherFundamental(PitchClass  newfundamental);
+    int getTetherFundamental(void) {return tetherFundamental;}
     
     void setIntervalTuning(Array<float> tuning);
     Array<float> getIntervalTuning(void){return intervalTuning;}
+    
+    void setIntervalFundamental(PitchClass  newfundamental) { intervalFundamental = newfundamental; }
+    int getIntervalFundamental(void) {return intervalFundamental;}
     
     void retuneIndividualSpring(Spring::Ptr spring);
     
@@ -365,15 +368,25 @@ private:
     TuningSystem scaleId;
 
     Particle::PtrArr    particleArray;
-    Spring::PtrArr      springArray; // efficiency fix: make this ordered by spring interval 
+    Spring::PtrArr      springArray; // efficiency fix: make this ordered by spring interval
     
     Particle::PtrArr    tetherParticleArray;
     Spring::PtrArr      tetherSpringArray;
     
+    Spring::PtrArr      enabledSpringArray;
+    Spring::PtrArr      enabledParticleArray;
+    
     bool tetherLocked[12];
     
     Array<float> tetherTuning;
+    PitchClass tetherFundamental;
+    
     Array<float> intervalTuning;
+    PitchClass intervalFundamental;
+    
+    float springWeights[13];
+    
+    void addSpring(Spring::Ptr spring);
     
     /*
     Spring::PtrArr activeTetherSprings;

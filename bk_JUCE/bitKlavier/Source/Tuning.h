@@ -313,6 +313,8 @@ public:
     inline Spring::PtrArr getSprings(void) { return getSpringTuning()->getSprings(); }
     inline Spring::PtrArr getTetherSprings(void) { return getSpringTuning()->getTetherSprings(); }
     
+    inline Spring::PtrArr getEnabledSprings(void) { return getSpringTuning()->getEnabledSprings(); }
+    
     inline void setSpringWeight(int which, double weight)
     {
         getSpringTuning()->setSpringWeight(which, weight);

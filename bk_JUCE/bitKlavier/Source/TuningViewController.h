@@ -99,7 +99,7 @@ protected:
     OwnedArray<Label>  tetherLabels;
     
     BKComboBox springScaleCB;
-    
+    BKComboBox springScaleFundamentalCB;
 
     ScopedPointer<BKSingleSlider> rateSlider;
     

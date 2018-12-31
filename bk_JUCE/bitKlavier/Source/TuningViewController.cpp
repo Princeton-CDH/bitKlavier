@@ -110,6 +110,10 @@ showSprings(false)
     springScaleCB.setTooltip("Select a temperament for the spring intervals.");
     addChildComponent(springScaleCB);
     
+    springScaleFundamentalCB.setName("SpringTuning Fundamental");
+    springScaleFundamentalCB.setTooltip("Set the fundamental for the interval scale");
+    addChildComponent(springScaleFundamentalCB);
+    
     scaleLabel.setText("Scale", dontSendNotification);
     
     fundamentalCB.setName("Fundamental");
@@ -344,13 +348,11 @@ void TuningViewController::resized()
     lastNote.setBounds(editAllBounds.getRight() + gXSpacing, editAllBounds.getY(),editAllBounds.getWidth() * 2, editAllBounds.getHeight());
     lastInterval.setBounds(lastNote.getRight() + gXSpacing, lastNote.getY(),lastNote.getWidth(), lastNote.getHeight());
     
-
-    rateSlider->setBounds(selectCB.getX()-gComponentSingleSliderXOffset, selectCB.getBottom() + gYSpacing, selectCB.getWidth()+gComponentSingleSliderXOffset*2., gComponentSingleSliderHeight);
-    dragSlider->setBounds(fundamentalCB.getX()-gComponentSingleSliderXOffset, rateSlider->getY(), fundamentalCB.getWidth()+gComponentSingleSliderXOffset*2., gComponentSingleSliderHeight);
+    rateSlider->setBounds(selectCB.getX()-gComponentSingleSliderXOffset, selectCB.getBottom() + gYSpacing, selectCB.getWidth()+gComponentSingleSliderXOffset, gComponentSingleSliderHeight);
+    dragSlider->setBounds(actionButton.getX()-gComponentSingleSliderXOffset, rateSlider->getY(), showSpringsButton.getWidth() + actionButton.getWidth(), gComponentSingleSliderHeight);
     
-    springScaleCB.setBounds(scaleCB.getX(), dragSlider->getY(), scaleCB.getWidth(), gComponentComboBoxHeight);
-    
-    float sliderHeight = (absoluteKeyboard.getBottom() - (rateSlider->getBottom() + gYSpacing)) / 13.;
+    springScaleCB.setBounds(scaleCB.getX(), rateSlider->getY(), scaleCB.getWidth(), gComponentComboBoxHeight);
+    springScaleFundamentalCB.setBounds(fundamentalCB.getX(), springScaleCB.getY(), fundamentalCB.getWidth(), gComponentComboBoxHeight);
     
     intervalStiffnessSlider->setBounds(selectCB.getX() - gComponentSingleSliderXOffset,
                                        rateSlider->getBottom() + gYSpacing,
@@ -361,6 +363,11 @@ void TuningViewController::resized()
                                      intervalStiffnessSlider->getY(),
                                      fundamentalCB.getWidth() + 2.*gComponentSingleSliderXOffset,
                                      gComponentSingleSliderHeight);
+    
+    //dragSlider->setBounds(fundamentalCB.getX()-gComponentSingleSliderXOffset, intervalStiffnessSlider->getY(), fundamentalCB.getWidth()+gComponentSingleSliderXOffset*2., gComponentSingleSliderHeight);
+    
+    
+    float sliderHeight = (absoluteKeyboard.getBottom() - (rateSlider->getBottom() + gYSpacing)) / 13.;
     
     for (int i = 0; i < 12; i++)
     {
@@ -407,8 +414,6 @@ void TuningViewController::paint (Graphics& g)
             active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
         }
         
-    
-        
         bool springsOn = active->getSpringsActive();
         
         Rectangle<int> b = getLocalBounds();
@@ -428,7 +433,7 @@ void TuningViewController::paint (Graphics& g)
         
         Particle::PtrArr particles = active->getTetherParticles();
 
-        for (auto s : active->getSprings())
+        for (auto s : active->getEnabledSprings())
         {
             if (s->getEnabled())
             {
@@ -575,6 +580,11 @@ void TuningViewController::fillTuningCB(void)
     submenus.add(new PopupMenu());
     submenus.add(new PopupMenu());
     
+    PopupMenu* additionalTuningsPopUp2 = springScaleCB.getRootMenu();
+    OwnedArray<PopupMenu> submenus2;
+    submenus2.add(new PopupMenu());
+    submenus2.add(new PopupMenu());
+    
     int count =0;
     for (int i = 0; i < cTuningSystemNames.size(); i++) //&& if(i<=8), for original systems; otherwise add to submenu of historical temperaments
     {
@@ -585,16 +595,16 @@ void TuningViewController::fillTuningCB(void)
             scaleCB.addItem(name, i+1);
             A1IntervalScaleCB.addItem(name, i+1);
             A1AnchorScaleCB.addItem(name, i+1);
-        }
-
-        if(name == "Adaptive Tuning 1" || name == "Adaptive Anchored Tuning 1")
-        {
-            A1IntervalScaleCB.setItemEnabled(i+1, false);
-            A1AnchorScaleCB.setItemEnabled(i+1, false);
-        }
-        else
-        {
-            springScaleCB.addItem(name, ++count);
+        
+            if(name == "Adaptive Tuning 1" || name == "Adaptive Anchored Tuning 1")
+            {
+                A1IntervalScaleCB.setItemEnabled(i+1, false);
+                A1AnchorScaleCB.setItemEnabled(i+1, false);
+            }
+            else
+            {
+                springScaleCB.addItem(name, ++count);
+            }
         }
                 
         if(name == "Custom") {
@@ -607,6 +617,9 @@ void TuningViewController::fillTuningCB(void)
             DBG("adding historical temperament: " + name);
             PopupMenu* historicalMenu = submenus.getUnchecked(0);
             historicalMenu->addItem(i+1, name);
+            
+            PopupMenu* historicalMenu2 = submenus2.getUnchecked(0);
+            historicalMenu2->addItem(i+1, name);
         }
         else if (i>35) //various
         {
@@ -614,11 +627,18 @@ void TuningViewController::fillTuningCB(void)
             DBG("adding various tunings: " + name);
             PopupMenu* variousMenu = submenus.getUnchecked(1);
             variousMenu->addItem(i+1, name);
+            
+            PopupMenu* variousMenu2 = submenus2.getUnchecked(1);
+            variousMenu2->addItem(i+1, name);
         }
     }
     scaleCB.addSeparator();
     additionalTuningsPopUp->addSubMenu("Historical", *submenus.getUnchecked(0));
     additionalTuningsPopUp->addSubMenu("Various", *submenus.getUnchecked(1));
+    
+    springScaleCB.addSeparator();
+    additionalTuningsPopUp2->addSubMenu("Historical", *submenus2.getUnchecked(0));
+    additionalTuningsPopUp2->addSubMenu("Various", *submenus2.getUnchecked(1));
     
 }
 
@@ -628,6 +648,7 @@ void TuningViewController::fillFundamentalCB(void)
     A1FundamentalCB.clear(dontSendNotification);
     nToneRootCB.clear(dontSendNotification);
     nToneRootOctaveCB.clear(dontSendNotification);
+    springScaleFundamentalCB.clear(dontSendNotification);
     
     for (int i = 0; i < cFundamentalNames.size(); i++)
     {
@@ -635,12 +656,15 @@ void TuningViewController::fillFundamentalCB(void)
         fundamentalCB.addItem(name, i+1);
         A1FundamentalCB.addItem(name, i+1);
         nToneRootCB.addItem(name, i+1);
+        springScaleFundamentalCB.addItem(name, i+1);
     }
     
     for (int i = 0; i < 9; i++)
     {
         nToneRootOctaveCB.addItem(String(i), i+1);
     }
+    
+    springScaleFundamentalCB.addItem("none", (int)cFundamentalNames.size()+1);
 }
 
 void TuningViewController::updateComponentVisibility()
@@ -657,6 +681,7 @@ void TuningViewController::updateComponentVisibility()
     rateSlider->setVisible(false);
     dragSlider->setVisible(false);
     springScaleCB.setVisible(false);
+    springScaleFundamentalCB.setVisible(false);
     
     tetherStiffnessSlider->setVisible(false);
     intervalStiffnessSlider->setVisible(false);
@@ -790,6 +815,9 @@ void TuningViewController::updateComponentVisibility()
             
             springScaleCB.setVisible(true);
             springScaleCB.toFront(false);
+            
+            springScaleFundamentalCB.setVisible(true);
+            springScaleFundamentalCB.toFront(false);
             
             for (int i = 0; i < 12; i++)
             {
@@ -1121,6 +1149,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         customKeyboard.setValues(tuning->getCurrentScaleCents());
         
         //just for printing offsets out; temporary
+        /*
         Array<float> tuningOffsets = tuning->getCurrentScale();
         String offsetString = " ";
         for(int i=0; i<tuningOffsets.size(); i++)
@@ -1128,7 +1157,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
             offsetString += (String(tuningOffsets.getUnchecked(i)) + ", ");
         }
         DBG("scale offsets: " + offsetString);
-
+        */
         
         if(active->getSpringsActive())
         {
@@ -1148,6 +1177,9 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         prep->setFundamental((PitchClass) index);
         active->setFundamental((PitchClass) index);
+        
+        prep->getSpringTuning()->setTetherFundamental((PitchClass) index);
+        active->getSpringTuning()->setTetherFundamental((PitchClass) index);
         
         customKeyboard.setFundamental(index);
         
@@ -1205,6 +1237,8 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         
         prep->getSpringTuning()->setIntervalTuning(scale);
         active->getSpringTuning()->setIntervalTuning(scale);
+        
+        DBG("current springTuningSystem " + String(prep->getSpringTuning()->getScaleId()));
     }
     
     processor.gallery->setGalleryDirty(true);
@@ -1298,6 +1332,11 @@ void TuningPreparationEditor::update(void)
         //dragSlider->setValue(  //must remember to use dt_asym_inversion on 1 - val)
         double newval = dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->getDrag(), 100.);
         dragSlider->setValue(newval, dontSendNotification);
+        
+        if(!prep->getSpringTuning()->getUsingFundamentalForIntervalSprings())
+            springScaleFundamentalCB.setSelectedItemIndex(12);
+        else
+            springScaleFundamentalCB.setSelectedItemIndex(prep->getSpringTuning()->getTetherFundamental());
     }
     
     updateComponentVisibility();
@@ -1344,9 +1383,6 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
     double value = slider->getValue();
     
     String name = slider->getName();
-    
-    Spring::PtrArr tetherSprings = active->getTetherSprings();
-    Spring::PtrArr springs = active->getSprings();
 
     for (int i = 0; i < 128; i++)
     {
@@ -2107,9 +2143,3 @@ void TuningModificationEditor::buttonClicked (Button* b)
     
     updateModification();
 }
-
-
-
-
-
-
