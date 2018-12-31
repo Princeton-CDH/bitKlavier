@@ -325,10 +325,12 @@ public:
         getSpringTuning()->setTetherWeight(which, weight);
     }
     
+    /*
     inline void setTetherLock(int which, bool lock)
     {
         getSpringTuning()->setTetherLock(which, lock);
     }
+     */
     
     inline bool getTetherLock(int which)
     {

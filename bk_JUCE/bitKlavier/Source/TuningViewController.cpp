@@ -507,7 +507,7 @@ void TuningViewController::paint (Graphics& g)
         
         for (auto p : active->getParticles())
         {
-            if (p->getEnabled())
+            if (p != nullptr && p->getEnabled())
             {
                 // DRAW PARTICLE IN MOTION
                 if(springsOn) {
@@ -913,7 +913,7 @@ void TuningViewController::timerCallback(void)
             
             Tuning::Ptr tuning = tProcessor->getTuning();
             Spring::PtrArr tetherSprings =  active->getTetherSprings();
-            Array<bool> locked = active->getSpringTuning()->getTethersLocked();
+            //Array<bool> locked = active->getSpringTuning()->getTethersLocked();
     
             int count = 0;
             for (int i = 0; i < 128; i++)
@@ -1321,10 +1321,15 @@ void TuningPreparationEditor::update(void)
         double newval = dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->getDrag(), 100.);
         dragSlider->setValue(newval, dontSendNotification);
         
+        /*
         if(!prep->getSpringTuning()->getUsingFundamentalForIntervalSprings())
-            springScaleFundamentalCB.setSelectedItemIndex(12);
+            springScaleFundamentalCB.setSelectedItemIndex(12, dontSendNotification);
         else
-            springScaleFundamentalCB.setSelectedItemIndex(prep->getSpringTuning()->getIntervalFundamental());
+            springScaleFundamentalCB.setSelectedItemIndex(prep->getSpringTuning()->getIntervalFundamental(), dontSendNotification);
+        */
+        
+        DBG("springScaleFundamentalCB.setSelectedItemIndex " + String(prep->getSpringTuning()->getIntervalFundamental()));
+        springScaleFundamentalCB.setSelectedItemIndex((int)prep->getSpringTuning()->getIntervalFundamental(), dontSendNotification);
     }
     
     updateComponentVisibility();

@@ -35,6 +35,8 @@ void SpringTuning::copy(SpringTuning::Ptr st)
     
     setSpringWeights(st->getSpringWeights());
     setTetherWeights(st->getTetherWeights());
+    
+    setIntervalFundamental(st->getIntervalFundamental());
 }
 
 SpringTuning::SpringTuning(SpringTuning::Ptr st):

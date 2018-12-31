@@ -84,7 +84,6 @@ public:
     inline void setTetherStiffness(double stiff)
     {
         tetherStiffness = stiff;
-        DBG("setTetherStiffness: " + String(stiff));
         for (auto spring : tetherSpringArray)
         {
             spring->setStiffness(tetherStiffness);
@@ -94,6 +93,7 @@ public:
     inline void setIntervalStiffness(double stiff)
     {
         intervalStiffness = stiff;
+        DBG("setIntervalStiffness"  + String(stiff));
         
         for (auto spring : enabledSpringArray)
         {
@@ -199,6 +199,8 @@ public:
     void setIntervalFundamental(PitchClass  newfundamental)
     {
         intervalFundamental = newfundamental;
+        DBG("setIntervalFundamental " + String(intervalFundamental));
+        
         if(newfundamental == 12) setUsingFundamentalForIntervalSprings(false);
         else setUsingFundamentalForIntervalSprings(true);
         
@@ -211,7 +213,7 @@ public:
         if(newfundamental == 15) useLastNoteForFundamental = true;
         else useLastNoteForFundamental = false;
     }
-    int getIntervalFundamental(void) {return intervalFundamental;}
+    PitchClass getIntervalFundamental(void) {DBG("getIntervalFundamental " + String(intervalFundamental)); return intervalFundamental;}
     
     void retuneIndividualSpring(Spring::Ptr spring);
     void retuneAllActiveSprings(void);
@@ -238,8 +240,10 @@ public:
         prep.setProperty( "intervalStiffness", intervalStiffness, 0);
         prep.setProperty( "stiffness", stiffness, 0);
         prep.setProperty( "active", active ? 1 : 0, 0);
-        prep.setProperty( "scaleId", scaleId, 0);
-
+        prep.setProperty( "intervalTuningId", scaleId, 0);
+        prep.setProperty( "intervalFundamental", (int)intervalFundamental, 0);
+        //prep.setProperty( "usingFundamentalForIntervalSprings", (int)usingFundamentalForIntervalSprings, 0);
+    
         ValueTree tethers( "tethers");
         ValueTree springs( "springs");
         ValueTree tetherLocks( "locks");
@@ -249,7 +253,7 @@ public:
         {
             tethers.setProperty( "t"+String(i), getTetherWeight(i), 0 );
         }
-        
+
         for (int i = 0; i < 12; i++)
         {
             springs.setProperty( "s"+String(i), getSpringWeight(i), 0 );
@@ -275,7 +279,10 @@ public:
         setTetherStiffness(e->getStringAttribute("tetherStiffness").getDoubleValue());
         setIntervalStiffness(e->getStringAttribute("intervalStiffness").getDoubleValue());
         
-        scaleId = (TuningSystem) e->getStringAttribute("scaleId").getIntValue();
+        scaleId = (TuningSystem) e->getStringAttribute("intervalTuningId").getIntValue();
+        setIntervalFundamental((PitchClass) e->getStringAttribute("intervalFundamental").getIntValue());
+        DBG("getIntervalFundamental = " + String(getIntervalFundamental()));
+        //usingFundamentalForIntervalSprings = (bool) e->getStringAttribute("usingFundamentalForIntervalSprings").getIntValue();
         
         forEachXmlChildElement (*e, sub)
         {
@@ -325,6 +332,7 @@ public:
                     }
                 }
             }
+            
             else if (sub->hasTagName("locks"))
             {
                 for (int i = 0; i < 12; i++)
@@ -348,6 +356,7 @@ public:
     inline void setTetherLock(int pc, bool tl) { tetherLocked[pc] = tl;}
     inline bool getTetherLock(int pc) { return tetherLocked[pc];}
     
+    
     inline Array<bool> getTethersLocked(void)
     {
         Array<bool> locked;
@@ -359,6 +368,7 @@ public:
         
         return locked;
     }
+    
     
     inline void setActive(bool status) { active = status; }
     inline bool getActive(void) { return active; }
@@ -384,9 +394,15 @@ private:
     bool useLowestNoteForFundamental;
     bool useHighestNoteForFundamental;
     bool useLastNoteForFundamental;
-    int intervalSpringsFundamental;
+    //int intervalSpringsFundamental;
     
     TuningSystem scaleId;
+    Array<float> intervalTuning;
+    PitchClass intervalFundamental;
+    
+    Array<float> tetherTuning;
+    TuningSystem tetherTuningId;
+    PitchClass tetherFundamental;
 
     Particle::PtrArr    particleArray;
     Spring::PtrArr      springArray; // efficiency fix: make this ordered by spring interval
@@ -398,12 +414,6 @@ private:
     Spring::PtrArr      enabledParticleArray;
     
     bool tetherLocked[12];
-    
-    Array<float> tetherTuning;
-    PitchClass tetherFundamental;
-    
-    Array<float> intervalTuning;
-    PitchClass intervalFundamental;
     
     float springWeights[13];
     
