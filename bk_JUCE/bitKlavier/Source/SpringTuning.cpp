@@ -58,6 +58,8 @@ scaleId(JustTuning)
     intervalTuning = Array<float>({0.0, 0.117313, 0.039101, 0.156414, -0.13686, -0.019547, -0.174873, 0.019547, 0.136864, -0.15641, -0.311745, -0.11731});
     intervalFundamental = PitchClass(C);
     
+    useLowestNoteForFundamental = false;
+    useHighestNoteForFundamental = false;
     useLastNoteForFundamental = false;
     
     for (int i = 0; i < 12; i++) tetherLocked[i] = false;
@@ -273,6 +275,8 @@ void SpringTuning::setSpringWeight(int which, double weight)
         if (spring->getIntervalIndex() == which)
         {
             spring->setStrength(weight);
+            
+            DBG("reweighting interval " + String(which) +  " to " + String(weight));
         }
     }
 }
@@ -389,30 +393,45 @@ void SpringTuning::addNote(int note)
 {
     addParticle(note);
     
-    if(useLastNoteForFundamental)
+    if(useLowestNoteForFundamental)
     {
         DBG("lowest current note = " + String(getLowestActiveParticle()));
-        intervalFundamental = (PitchClass)getLowestActiveParticle();
+        intervalFundamental = (PitchClass)(getLowestActiveParticle() % 12);
+    }
+    else if(useHighestNoteForFundamental)
+    {
+        DBG("highest current note = " + String(getHighestActiveParticle()));
+        intervalFundamental = (PitchClass)(getHighestActiveParticle() % 12);
+    }
+    else if(useLastNoteForFundamental)
+    {
+        DBG("last note = " + String(note));
+        intervalFundamental = (PitchClass)(note % 12);
     }
     
     addSpringsByNote(note);
     
-    if(useLastNoteForFundamental) retuneAllActiveSprings();
+    if(useLowestNoteForFundamental || useHighestNoteForFundamental || useLastNoteForFundamental) retuneAllActiveSprings();
 }
 
 void SpringTuning::removeNote(int note)
 {
     removeParticle(note);
     
-    if(useLastNoteForFundamental)
+    if(useLowestNoteForFundamental)
     {
         DBG("lowest current note = " + String(getLowestActiveParticle()));
-        intervalFundamental = (PitchClass)getLowestActiveParticle();
+        intervalFundamental = (PitchClass)(getLowestActiveParticle() % 12);
+    }
+    else if(useHighestNoteForFundamental)
+    {
+        DBG("highest current note = " + String(getHighestActiveParticle()));
+        intervalFundamental = (PitchClass)(getHighestActiveParticle() % 12);
     }
     
     removeSpringsByNote(note);
     
-    if(useLastNoteForFundamental) retuneAllActiveSprings();
+    if(useLowestNoteForFundamental || useHighestNoteForFundamental) retuneAllActiveSprings();
 }
 
 void SpringTuning::removeAllNotes(void)
@@ -493,6 +512,7 @@ void SpringTuning::retuneIndividualSpring(Spring::Ptr spring)
     float diff =    (100. * scaleDegree2 + intervalTuning[(scaleDegree2 - (int)intervalFundamental) % 12]) -
                     (100. * scaleDegree1 + intervalTuning[(scaleDegree1 - (int)intervalFundamental) % 12]);
     
+    DBG("retuneIndividualSpring: " + String(fabs(diff)));
     spring->setRestingLength(fabs(diff));
 }
 
@@ -564,6 +584,20 @@ int SpringTuning::getLowestActiveParticle()
     }
     
     return lowest;
+}
+
+int SpringTuning::getHighestActiveParticle()
+{
+    int highest = particleArray.size() - 1;
+    
+    while(highest >= 0)
+    {
+        if(particleArray[highest]->getEnabled()) return highest;
+        
+        highest--;
+    }
+    
+    return highest;
 }
 
 void SpringTuning::printActiveParticles()

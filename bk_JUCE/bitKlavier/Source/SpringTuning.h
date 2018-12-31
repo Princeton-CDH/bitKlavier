@@ -202,7 +202,13 @@ public:
         if(newfundamental == 12) setUsingFundamentalForIntervalSprings(false);
         else setUsingFundamentalForIntervalSprings(true);
         
-        if(newfundamental == 13) useLastNoteForFundamental = true;
+        if(newfundamental == 13) useLowestNoteForFundamental = true;
+        else useLowestNoteForFundamental = false;
+        
+        if(newfundamental == 14) useHighestNoteForFundamental = true;
+        else useHighestNoteForFundamental = false;
+        
+        if(newfundamental == 15) useLastNoteForFundamental = true;
         else useLastNoteForFundamental = false;
     }
     int getIntervalFundamental(void) {return intervalFundamental;}
@@ -220,6 +226,7 @@ public:
     bool getUsingFundamentalForIntervalSprings(void) { return usingFundamentalForIntervalSprings; }
     
     int getLowestActiveParticle();
+    int getHighestActiveParticle();
     
     ValueTree getState(void)
     {
@@ -374,6 +381,8 @@ private:
     
     bool active;
     bool usingFundamentalForIntervalSprings;
+    bool useLowestNoteForFundamental;
+    bool useHighestNoteForFundamental;
     bool useLastNoteForFundamental;
     int intervalSpringsFundamental;
     

@@ -666,6 +666,8 @@ void TuningViewController::fillFundamentalCB(void)
     
     springScaleFundamentalCB.addItem("none", (int)cFundamentalNames.size()+1);
     springScaleFundamentalCB.addItem("lowest", (int)cFundamentalNames.size()+2);
+    springScaleFundamentalCB.addItem("highest", (int)cFundamentalNames.size()+3);
+    springScaleFundamentalCB.addItem("last", (int)cFundamentalNames.size()+4);
 }
 
 void TuningViewController::updateComponentVisibility()
