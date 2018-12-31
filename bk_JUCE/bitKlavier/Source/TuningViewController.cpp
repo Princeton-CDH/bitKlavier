@@ -435,7 +435,7 @@ void TuningViewController::paint (Graphics& g)
 
         for (auto s : active->getEnabledSprings())
         {
-            if (s->getEnabled())
+            if (s != nullptr && s->getEnabled())
             {
                 Particle* a = s->getA();
                 if(springsOn) midi = Utilities::ftom(Utilities::centsToFreq(a->getX() - (1200.0 * a->getOctave())));
@@ -1324,7 +1324,7 @@ void TuningPreparationEditor::update(void)
         if(!prep->getSpringTuning()->getUsingFundamentalForIntervalSprings())
             springScaleFundamentalCB.setSelectedItemIndex(12);
         else
-            springScaleFundamentalCB.setSelectedItemIndex(prep->getSpringTuning()->getTetherFundamental());
+            springScaleFundamentalCB.setSelectedItemIndex(prep->getSpringTuning()->getIntervalFundamental());
     }
     
     updateComponentVisibility();
