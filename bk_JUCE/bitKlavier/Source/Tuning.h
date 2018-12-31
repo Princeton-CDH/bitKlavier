@@ -354,7 +354,7 @@ private:
     // basic tuning settings, for static tuning
     TuningSystem    tScale;               //which tuning system to use
     PitchClass      tFundamental;               //fundamental for tuning system
-    float           tFundamentalOffset;         //offset
+    float           tFundamentalOffset;         //offset, in MIDI fractional offset
     
     // adaptive tuning params
     TuningSystem    tAdaptiveIntervalScale;     //scale to use to determine successive interval tuning
