@@ -464,12 +464,7 @@ void SpringTuning::addSpring(Spring::Ptr spring)
     spring->setStrength(springWeights[interval]);
     enabledSpringArray.add(spring);
 
-    if(!usingFundamentalForIntervalSprings)
-    {
-        int diff = spring->getA()->getRestX() - spring->getB()->getRestX();
-        spring->setRestingLength(fabs(diff) + intervalTuning[interval]);
-    }
-    else retuneIndividualSpring(spring);
+    retuneIndividualSpring(spring);
 
 }
 
@@ -507,15 +502,31 @@ void SpringTuning::addSpringsByNote(int note)
 
 void SpringTuning::retuneIndividualSpring(Spring::Ptr spring)
 {
-    int scaleDegree1 = spring->getA()->getNote();
-    int scaleDegree2 = spring->getB()->getNote();
-    //int intervalFundamental = 0; //temporary, will set in preparation
+    int interval = spring->getIntervalIndex();
     
-    float diff =    (100. * scaleDegree2 + intervalTuning[(scaleDegree2 - (int)intervalFundamental) % 12]) -
-                    (100. * scaleDegree1 + intervalTuning[(scaleDegree1 - (int)intervalFundamental) % 12]);
-    
-    DBG("retuneIndividualSpring: " + String(fabs(diff)));
-    spring->setRestingLength(fabs(diff));
+    //when every note is its own fundamental, or when the interval is a P5, P4, or M3,
+    //set resting length to interval scale without regard to intervalFundamental
+    if(!usingFundamentalForIntervalSprings ||
+       interval == 7 ||
+       interval == 5 ||
+       interval == 4)
+    {
+        int diff = spring->getA()->getRestX() - spring->getB()->getRestX();
+        spring->setRestingLength(fabs(diff) + intervalTuning[interval]);
+    }
+    //otherwise, set resting length to interval scale relative to intervalFundamental
+    else
+    {
+        int scaleDegree1 = spring->getA()->getNote();
+        int scaleDegree2 = spring->getB()->getNote();
+        //int intervalFundamental = 0; //temporary, will set in preparation
+        
+        float diff =    (100. * scaleDegree2 + intervalTuning[(scaleDegree2 - (int)intervalFundamental) % 12]) -
+        (100. * scaleDegree1 + intervalTuning[(scaleDegree1 - (int)intervalFundamental) % 12]);
+        
+        DBG("retuneIndividualSpring: " + String(fabs(diff)));
+        spring->setRestingLength(fabs(diff));
+    }
 }
 
 void SpringTuning::retuneAllActiveSprings(void)
