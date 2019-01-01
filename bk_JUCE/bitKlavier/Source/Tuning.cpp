@@ -293,6 +293,9 @@ ValueTree TuningModPreparation::getState(void)
     p = getParam(TuningSpringIntervalScale);
     if (p != String::empty) prep.setProperty( ptagTuning_intervalScale,  p.getIntValue(), 0 );
     
+    //TuningSpringIntervalFundamental
+    p = getParam(TuningSpringIntervalFundamental);
+    if (p != String::empty) prep.setProperty( ptagTuning_intervalScaleFundamental,  p.getIntValue(), 0 );
     
     p = getParam(TuningSpringTetherWeights);
     ValueTree tw ("tw");
@@ -438,6 +441,9 @@ void TuningModPreparation::setState(XmlElement* e)
     
     p = e->getStringAttribute( ptagTuning_intervalScale);
     setParam(TuningSpringIntervalScale, p);
+    
+    p = e->getStringAttribute( ptagTuning_intervalScaleFundamental);
+    setParam(TuningSpringIntervalFundamental, p);
     
     // custom scale
     forEachXmlChildElement (*e, sub)
