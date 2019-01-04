@@ -16,13 +16,12 @@
 
 #define DRAW_MULTITOUCH 0
 
-BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, /*Viewport* vp,*/ BKItemGraph* theGraph):
+BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
 altDown(false),
 processor(p),
 graph(theGraph),
 connect(false),
-lastX(10),
-lastY(10),
+lastX(10), lastY(10),
 held(false),
 edittingComment(false)
 {
@@ -30,7 +29,6 @@ edittingComment(false)
     clickFrame.setSize(5,5);
     
     setWantsKeyboardFocus(false);
-    graph->deselectAll();
     
     addMouseListener(this, true);
 }
@@ -88,6 +86,7 @@ void BKConstructionSite::redraw(void)
 {
     removeAllChildren();
     
+    graph->deselectAll();
     graph->reconstruct();
     
     draw();
@@ -323,9 +322,7 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
     
 #if JUCE_IOS
     toAdd->setTopLeftPosition(lastX, lastY);
-#endif
-    
-#if JUCE_MAC || JUCE_WINDOWS
+#else 
     if (center)
     {
         toAdd->setTopLeftPosition(300, 250);
@@ -460,18 +457,6 @@ void BKConstructionSite::cut(void)
     getParentComponent()->grabKeyboardFocus();
 }
 
-#if TRY_UNDO
-void BKConstructionSite::undo(void)
-{
-    processor.timeTravel(false);
-}
-
-void BKConstructionSite::redo(void)
-{
-    processor.timeTravel(true);
-}
-#endif
-
 void BKConstructionSite::mouseMove (const MouseEvent& eo)
 {
     MouseEvent e = eo.getEventRelativeTo(this);
@@ -487,28 +472,6 @@ void BKConstructionSite::mouseMove (const MouseEvent& eo)
 void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
 {
     BKAudioProcessor& processor = vc->processor;
-    
-#if TRY_UNDO
-    if (result == CUT_ID ||
-        result == PASTE_ID ||
-        result == ALIGN_VERTICAL ||
-        result == ALIGN_HORIZONTAL ||
-        result == DELETE_ID ||
-        result == KEYMAP_ID ||
-        result == DIRECT_ID ||
-        result == NOSTALGIC_ID ||
-        result == SYNCHRONIC_ID ||
-        result == TEMPO_ID ||
-        result == TUNING_ID||
-        result == MODIFICATION_ID||
-        result == PIANOMAP_ID||
-        result == RESET_ID)
-    {
-        processor.updateHistory();
-    }
-    
-#endif
-    
     
     if (result == OFF_ID)
     {
@@ -535,16 +498,6 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     {
         vc->paste();
     }
-#if TRY_UNDO
-    else if (result == UNDO_ID)
-    {
-        vc->undo();
-    }
-    else if (result == REDO_ID)
-    {
-        vc->redo();
-    }
-#endif
     else if (result == ALIGN_VERTICAL)
     {
         vc->align(0);
@@ -646,21 +599,6 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     }
 }
 
-void BKConstructionSite::mouseDoubleClick(const MouseEvent& eo)
-{
-    /*
-    BKItem* item = dynamic_cast<BKItem*> (eo.originalComponent->getParentComponent());
-
-    if (item != nullptr)
-    {
-        if (item->getType() == PreparationTypeComment)
-        {
-            //item->
-        }
-    }
-     */
-}
-
 void BKConstructionSite::mouseHold(Component* frame, bool onItem)
 {
 #if JUCE_IOS
@@ -668,21 +606,23 @@ void BKConstructionSite::mouseHold(Component* frame, bool onItem)
     
     if (onItem)
     {
-        //getItemOptionMenu().showMenuAsync(PopupMenu::Options().withTargetComponent (frame),
-        //                                  ModalCallbackFunction::forComponent (itemOptionMenuCallback, this) );
-        
         if (itemToSelect != nullptr)
         {
             itemSource = itemToSelect;
             
             if (itemSource != nullptr)
             {
-                connect = true;
+                if ((itemSource->getType() != PreparationTypeComment) &&
+                    (itemSource->getType() != PreparationTypePianoMap))
+                {
+                    connect = true;
+                    
+                    lineOX = itemSource->getX() + itemSource->getWidth() * 0.5;
+                    lineOY = itemSource->getY() + itemSource->getHeight() * 0.5;
+                    
+                    DBG("ORIGIN: " + String(lineOX) + " " + String(lineOY));
+                }
                 
-                lineOX = itemSource->getX() + itemSource->getWidth() * 0.5;
-                lineOY = itemSource->getY() + itemSource->getHeight() * 0.5;
-                
-                DBG("ORIGIN: " + String(lineOX) + " " + String(lineOY));
             }
         }
     }
@@ -697,17 +637,7 @@ void BKConstructionSite::mouseHold(Component* frame, bool onItem)
 
 void BKConstructionSite::mouseDown (const MouseEvent& eo)
 {
-    if (edittingComment)
-    {
-        BKItem* anItem = dynamic_cast<BKItem*> (eo.originalComponent->getParentComponent());
-        if (anItem == nullptr)
-        {
-            graph->deselectAll();
-        }
-        edittingComment = false;
-        return;
-    }
-    
+    DBG("mousedown");
     MouseEvent e = eo.getEventRelativeTo(this);
     
 #if JUCE_IOS
@@ -724,7 +654,6 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     
     repaint();
 #endif
-
     
     itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
     

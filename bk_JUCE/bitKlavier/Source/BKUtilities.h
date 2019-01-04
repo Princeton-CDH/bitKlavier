@@ -19,7 +19,8 @@
 
 #include "AudioConstants.h"
 
-#define TRY_UNDO 0 //enable attempt at undo/redo
+#define BK_UNIT_TESTS 0
+
 #define NUM_EPOCHS 10
 
 #define SAVE_ID 1
@@ -76,6 +77,20 @@
 #define OFF_ID 47
 #define KEYBOARD_ID 48
 
+#define ABOUT_ID 49
+#define EXPORT_ID 50
+#define IMPORT_ID 51
+
+#define SOUNDFONT_ID 1000
+
+#define SF_DEFAULT_0 800
+#define SF_DEFAULT_1 801
+#define SF_DEFAULT_2 802
+#define SF_DEFAULT_3 803
+#define SF_DEFAULT_4 804
+
+
+
 inline PopupMenu getNewItemMenu(LookAndFeel* laf)
 {
     PopupMenu newMenu;
@@ -93,6 +108,7 @@ inline PopupMenu getNewItemMenu(LookAndFeel* laf)
     newMenu.addItem(RESET_ID, "Reset (R)");
     newMenu.addSeparator();
     newMenu.addItem(COMMENT_ID, "Comment (Q)");
+
     
     return newMenu;
 }
@@ -140,13 +156,7 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
     }
     else
     {
-#if TRY_UNDO
-        menu.addItem(UNDO_ID, "Undo");
-        menu.addSeparator();
-        menu.addItem(REDO_ID, "Redo");
-        menu.addSeparator();
-#endif
-         
+    
     }
     
     if (numItemsSelected)
@@ -167,13 +177,13 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
     
     if (numItemsSelected == 0)
     {
-        menu.addSubMenu("Add...", getNewItemMenu(laf));
-    }
-    
 #if JUCE_IOS
-    menu.addSeparator();
-    menu.addItem(KEYBOARD_ID, "Show/Hide Keyboard");
+        if (!onGraph) menu.addSubMenu("Add...", getNewItemMenu(laf));
+#else
+        menu.addSubMenu("Add...", getNewItemMenu(laf));
 #endif
+    }
+
     
     menu.addSeparator();
     menu.addItem(OFF_ID, "All Off");
@@ -201,6 +211,8 @@ typedef enum DisplayType
     DisplayTypeNil
 }DisplayType;
 
+String midiToPitchClass(int midi);
+
 PitchClass      letterNoteToPitchClass(String note);
 TuningSystem    tuningStringToTuningSystem(String tuning);
 
@@ -223,6 +235,11 @@ Array<float>    stringOrderedPairsToFloatArray(String s, int size);
 
 double          mtof(double f);
 double          ftom(double f);
+
+
+//these require inval to be between 0 and 1, and k != 1
+double          dt_asymwarp(double inval, double k);
+double          dt_asymwarp_inverse(double inval, double k);
 
 String rectangleToString(Rectangle<int> rect);
 String rectangleToString(Rectangle<float> rect);

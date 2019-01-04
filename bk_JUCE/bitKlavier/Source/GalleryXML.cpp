@@ -16,7 +16,9 @@ ValueTree  Gallery::getState(void)
     
     galleryVT.setProperty("name", name, 0);
     
-    galleryVT.setProperty("sampleType", sampleType, 0);
+    galleryVT.setProperty("sampleType", processor.currentSampleType, 0);
+    galleryVT.setProperty("soundfontURL", processor.currentSoundfont, 0);
+    galleryVT.setProperty("soundfontInst", processor.currentInstrument, 0);
     
     ValueTree idCountVT( "idCount");
     
@@ -59,8 +61,6 @@ ValueTree  Gallery::getState(void)
     galleryVT.setProperty("defaultPiano", getDefaultPiano(), 0);
     
     return galleryVT;
-    
-    
 }
 
 void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
@@ -77,18 +77,6 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
         
         setDefaultPiano(xml->getStringAttribute("defaultPiano").getIntValue());
         
-        String st = xml->getStringAttribute("sampleType");
-        
-        if (st != String::empty)    sampleType = (BKSampleLoadType) st.getIntValue();
-        else
-        {
-#if JUCE_IOS
-            sampleType = BKLoadMedium;
-#else
-            sampleType = BKLoadHeavy;
-#endif
-        }
-
         // iterate through its sub-elements
         forEachXmlChildElement (*xml, e)
         {
@@ -98,8 +86,6 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 for (int idType = 0; idType < BKPreparationTypeNil; idType++)
                 {
                     String attr = e->getStringAttribute("i"+String(idType));
-                    
-                    DBG("id" + String(idType) + " " + attr);
                     
                     i = attr.getIntValue();
                     
@@ -117,7 +103,6 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 newKeymap->setId(e->getStringAttribute("Id").getIntValue());
                 
                 if (n != String::empty)     newKeymap->setName(n);
-                else                        newKeymap->setName(String(newKeymap->getId()));
                 
                 Array<int> keys;
                 for (int k = 0; k < 128; k++)
@@ -154,7 +139,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
             {
                 addDirectWithId(0);
                 
-                direct.getLast()->setState(e, tuning);
+                direct.getLast()->setState(e);
             }
             else if (e->hasTagName( vtagModDirect))
             {
@@ -212,7 +197,5 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
             }
         }
     }
-    
-    
 }
 

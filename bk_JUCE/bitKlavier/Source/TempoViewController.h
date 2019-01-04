@@ -13,6 +13,9 @@
 #include "BKViewController.h"
 
 class TempoViewController : public BKViewController
+#if JUCE_IOS
+, public WantsBigOne::Listener
+#endif
 {
 public:
     
@@ -26,6 +29,10 @@ public:
     void resized() override;
     
     virtual void update(void){};
+    
+#if JUCE_IOS
+    void iWantTheBigOne(TextEditor*, String name) override;
+#endif
     
 protected:
     BKLabel selectLabel;
@@ -91,7 +98,7 @@ private:
     void bkComboBoxDidChange (ComboBox* box) override;
     void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
-    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TempoPreparationEditor)
@@ -134,7 +141,7 @@ private:
     void bkComboBoxDidChange (ComboBox* box) override;
     void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
-    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
     
     void greyOutAllComponents();

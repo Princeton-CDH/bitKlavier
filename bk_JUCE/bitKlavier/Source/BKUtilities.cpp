@@ -28,8 +28,7 @@ String rectangleToString(Rectangle<float> rect)
 
 BKParameterDataType getBKDataType ( SynchronicParameterType type)
 {
-    if ((type == SynchronicTuning) ||
-        (type == SynchronicNumPulses) ||
+    if ((type == SynchronicNumPulses) ||
         (type == SynchronicClusterMin) ||
         (type == SynchronicClusterMax) ||
         (type == SynchronicClusterThresh) ||
@@ -114,6 +113,16 @@ TuningSystem tuningStringToTuningSystem(String tuning)
     else if (tuning == "custom")            return CustomTuning;
     else                                    return TuningSystemNil;
 
+}
+
+String pitch_classes[12] = {"C","C#","D","D#","E","F","F#","G","G#","A","A#","B",};
+
+String midiToPitchClass(int midi)
+{
+    int pc = midi % 12;
+    int octave = (midi / 12) - 1;
+    
+    return String(pitch_classes[pc]) + String(octave);
 }
 
 PitchClass      letterNoteToPitchClass(String note)
@@ -622,6 +631,8 @@ Array<float> stringOrderedPairsToFloatArray(String s, int size)
     return newarray;
 }
 
+
+
 // the following 2 functions are
 // lifted from  PD source
 // specifically x_acoustics.c
@@ -654,3 +665,85 @@ double ftom( double f )
     return (f > 0 ? (log(f / 440.0) / LOGTWO) * 12.0 + 69 : -1500);
 }
 
+
+
+//these require inval to be between 0 and 1, and k != 1
+//they warp the input asymmetrically, mostly to
+//help focus one extreme or another of a slider range
+double dt_asymwarp(double inval, double k)
+{
+    if(k==1) return inval;
+    return (pow(k, inval) - 1.) / (k - 1.);
+}
+
+double dt_asymwarp_inverse(double inval, double k)
+{
+    if(k==1) return inval;
+    return log(inval*(k-1) + 1) / log(k);
+}
+
+//could add this as well, if it would be useful:
+//symmetrical:
+//y = 0.5*((2x-1)^(1/k) - 1)
+//k = 3 is typical. otherwise have to correct for x<0.5 (mirror)
+
+/*
+fun float dt_symwarp(float inval, float k, int symwarp_type)
+{
+    float sym_warped;
+    if(inval >= 0.5) {
+        Math.pow(2.*inval - 1., 1./k) => sym_warped;
+        if (symwarp_type == 1) return (sym_warped + 1.) * 0.5;
+        if (symwarp_type == 2) return 2. * (sym_warped - 0.5);
+        if (symwarp_type == 3) return 2. * (1. - sym_warped);
+    }
+    1. - inval => inval; // for S curve
+    Math.pow(2.*inval - 1., 1./k) => sym_warped;
+    (sym_warped + 1.) * 0.5 => sym_warped;
+    if (symwarp_type == 1) return 1. - sym_warped;
+    if (symwarp_type == 2) return 2. * (sym_warped - 0.5);
+    if (symwarp_type == 3) return 2. * (1. - sym_warped);
+}
+*/
+
+
+#if BK_UNIT_TESTS
+
+#define	MAX_FREQ 20000.f
+
+class UtilitiesTests : public UnitTest
+{
+public:
+	UtilitiesTests() : UnitTest("Utilities", "Utilities") {}
+
+	void runTest() override
+	{
+		beginTest("Utilities");
+		
+		DBG("====== testing freq to midi ======");
+
+		//test ftom
+		for (int i = 0; i < 10; i++)
+		{
+			double r = Random::getSystemRandom().nextDouble();
+			double freq1 = r * MAX_FREQ;
+			double freq2 = mtof(ftom(freq1));
+			expect(abs(freq1 - freq2) < 0.005, String(freq1) + " and " + String(freq2) + " do not match");
+		}
+
+		DBG("====== testing midi to freq ======");
+
+		//test mtof
+		for (int i = 0; i < 10; i++)
+		{
+			double r = Random::getSystemRandom().nextDouble();
+			double midi1 = r * 128.0;
+			double midi2 = ftom(mtof(midi1));
+			expect(abs(midi1 - midi2) < 0.005, String(midi1) + " and " + String(midi2) + " do not match");
+		}
+	}
+};
+
+static UtilitiesTests utilitiesTests;
+
+#endif

@@ -108,7 +108,7 @@ void Gallery::setStateFromJson(var myJson)
         
             TuningPreparation::Ptr defaultTuning = new TuningPreparation();
             
-            defaultTuning->setTuning((TuningSystem)scale);
+            defaultTuning->setScale((TuningSystem)scale);
             
             defaultTuning->setFundamental((PitchClass)((12-fund)%12));
             
@@ -225,7 +225,7 @@ void Gallery::setStateFromJson(var myJson)
                     TuningSystem metroTuning = (TuningSystem)int(jsonGetValue("synchronic::metroTuningMenu"));
                     
                     TuningPreparation::Ptr tuningPrep = new TuningPreparation(defaultTuning);
-                    tuningPrep->setTuning(metroTuning);
+                    tuningPrep->setScale(metroTuning);
                     tuningPrep->setFundamental((PitchClass)((12-metroFundamental)%12));
                     
                     
@@ -473,7 +473,7 @@ void Gallery::setStateFromJson(var myJson)
                     TuningSystem revTuning = (TuningSystem)int(jsonGetValue("nostalgic::reverseTuningMenu"));
                     
                     TuningPreparation::Ptr tunePrep = new TuningPreparation(defaultTuning);
-                    tunePrep->setTuning(revTuning);
+                    tunePrep->setScale(revTuning);
                     tunePrep->setFundamental((PitchClass)((12-revFundamental)%12));
                     
                     nostalgicTuning = matches(tunePrep);

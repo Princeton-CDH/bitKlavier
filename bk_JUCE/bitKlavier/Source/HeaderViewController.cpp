@@ -21,28 +21,32 @@ construction(c)
 
     addAndMakeVisible(galleryB);
     galleryB.setButtonText("Gallery");
+    galleryB.setTooltip("Create, duplicate, rename, share current Gallery. Also access bitKlavier settings");
     galleryB.addListener(this);
     
     addAndMakeVisible(pianoB);
     pianoB.setButtonText("Piano");
+    pianoB.setTooltip("Create, duplicate, rename, or delete current Piano");
     pianoB.addListener(this);
     
     addAndMakeVisible(editB);
     editB.setButtonText("Action");
+    editB.setTooltip("Add a preparation. Also, stop all internal bitKlavier signals");
     editB.addListener(this);
     
     // Gallery CB
     addAndMakeVisible(galleryCB);
     galleryCB.setName("galleryCB");
+    galleryCB.setTooltip("Select and load saved bitKlavier Galleries. Indicates currently loaded Gallery");
     galleryCB.addListener(this);
     //galleryCB.BKSetJustificationType(juce::Justification::centredRight);
-    
     galleryCB.setLookAndFeel(&comboBoxLeftJustifyLAF);
     galleryCB.setSelectedId(0, dontSendNotification);
     
     // Piano CB
     addAndMakeVisible(pianoCB);
     pianoCB.setName("pianoCB");
+    pianoCB.setTooltip("Select and load saved bitKlavier Pianos. Indicates currently loaded Piano");
     pianoCB.addListener(this);
     
 #if JUCE_IOS || JUCE_MAC
@@ -69,7 +73,11 @@ HeaderViewController::~HeaderViewController()
 {
     galleryCB.setLookAndFeel(nullptr);
     pianoCB.setLookAndFeel(nullptr);
-
+    
+    pianoB.setLookAndFeel(nullptr);
+    galleryB.setLookAndFeel(nullptr);
+    editB.setLookAndFeel(nullptr);
+    
     setLookAndFeel(nullptr);
 }
 
@@ -107,13 +115,33 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     PopupMenu loadMenu;
     loadMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
-    loadMenu.addItem(LOAD_LITEST,   "Lightest", processor.currentSampleType != BKLoadLitest, processor.currentSampleType == BKLoadLitest);
-
-    loadMenu.addItem(LOAD_LITE,     "Light", processor.currentSampleType != BKLoadLite, processor.currentSampleType == BKLoadLite);
     
+    loadMenu.addItem(LOAD_LITEST,   "Lightest", processor.currentSampleType != BKLoadLitest, processor.currentSampleType == BKLoadLitest);
+    loadMenu.addItem(LOAD_LITE,     "Light", processor.currentSampleType != BKLoadLite, processor.currentSampleType == BKLoadLite);
     loadMenu.addItem(LOAD_MEDIUM,   "Medium", processor.currentSampleType != BKLoadMedium, processor.currentSampleType == BKLoadMedium);
-   
     loadMenu.addItem(LOAD_HEAVY,    "Heavy", processor.currentSampleType != BKLoadHeavy, processor.currentSampleType == BKLoadHeavy);
+    
+    loadMenu.addSeparator();
+    
+#if JUCE_IOS
+    
+    loadMenu.addItem(SF_DEFAULT_0, "Rhodes", true, false);
+    loadMenu.addItem(SF_DEFAULT_1, "Harpsichord", true, false);
+    loadMenu.addItem(SF_DEFAULT_2, "Drums", true, false);
+    loadMenu.addItem(SF_DEFAULT_3, "Saw", true, false);
+    loadMenu.addItem(SF_DEFAULT_4, "Electric Bass", true, false);
+    
+    loadMenu.addSeparator();
+    
+#endif
+    
+    int i = 0;
+    for (auto sf : processor.soundfontNames)
+    {
+        String sfName = sf.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf", false, true);
+        sfName = sfName.replace("%20", " ");
+        loadMenu.addItem(SOUNDFONT_ID + (i++), sfName);
+    }
     
     return loadMenu;
 }
@@ -139,36 +167,37 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     PopupMenu galleryMenu;
     galleryMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
-    galleryMenu.addSeparator();
     galleryMenu.addItem(NEWGALLERY_ID, "New");
-    
-    if (!processor.defaultLoaded)
-    {
-        galleryMenu.addSeparator();
-        galleryMenu.addItem(RENAME_ID, "Rename");
-        galleryMenu.addSeparator();
-        galleryMenu.addItem(DELETE_ID, "Remove");
-    }
-    
-    galleryMenu.addSeparator();
     
     if (!processor.defaultLoaded)   galleryMenu.addItem(SAVE_ID, "Save " );
     galleryMenu.addItem(SAVEAS_ID, "Save as");
     
-#if !JUCE_IOS
+    if (!processor.defaultLoaded)
+    {
+        galleryMenu.addItem(RENAME_ID, "Rename");
+        galleryMenu.addItem(DELETE_ID, "Remove");
+    }
+    
+#if JUCE_IOS
     galleryMenu.addSeparator();
+    galleryMenu.addItem(EXPORT_ID, "Export");
+    galleryMenu.addItem(IMPORT_ID, "Import");
+#else
     galleryMenu.addItem(OPEN_ID, "Open");
     galleryMenu.addItem(OPENOLD_ID, "Open (legacy)");
 #endif
     
     galleryMenu.addSeparator();
     galleryMenu.addItem(CLEAN_ID, "Clean");
+    
+#if JUCE_IOS
     galleryMenu.addSeparator();
-    galleryMenu.addSubMenu("Load Samples", getLoadMenu());
-    galleryMenu.addSeparator();
-    galleryMenu.addItem(SETTINGS_ID, "Settings");
+    galleryMenu.addSubMenu("Load samples...", getLoadMenu());
+#endif
     
     // ~ ~ ~ share menu ~ ~ ~
+    if (!processor.defaultLoaded)
+    {
 #if JUCE_MAC
     PopupMenu shareMenu;
     
@@ -184,7 +213,13 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     galleryMenu.addItem(SHARE_MESSAGE_ID, "Share");
 #endif
+    }
     
+    galleryMenu.addSeparator();
+    galleryMenu.addItem(SETTINGS_ID, "Settings");
+    
+    galleryMenu.addSeparator();
+    galleryMenu.addItem(ABOUT_ID, "About bitKlavier...");
     
     
     return galleryMenu;
@@ -290,61 +325,61 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
 
 void HeaderViewController::galleryMenuCallback(int result, HeaderViewController* gvc)
 {
-    BKAudioProcessor& processor = gvc->processor;
-    
-    if (result == RENAME_ID)
-    {
-        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
-        
-        prompt.addTextEditor("name", processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, false));
-        
-        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
-        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
-        
-        int result = prompt.runModalLoop();
-        
-        String name = prompt.getTextEditorContents("name");
-        
-        if (result == 1)
-        {
-            processor.renameGallery(name);
-        }
-        
-        gvc->fillGalleryCB();
-    }
-#if !JUCE_WINDOWS
-    else if (result == SHARE_EMAIL_ID)
-    {
-        gvc->bot.share(processor.gallery->getURL(), 0);
-    }
-    else if (result == SHARE_MESSAGE_ID)
-    {
-        gvc->bot.share(processor.gallery->getURL(), 1);
-    }
-    else if (result == SHARE_FACEBOOK_ID)
-    {
-        gvc->bot.share(processor.gallery->getURL(), 2);
-    }
+	BKAudioProcessor& processor = gvc->processor;
+
+	if (result == RENAME_ID)
+	{
+		AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+
+		prompt.addTextEditor("name", processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, false));
+
+		prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+		prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+
+		int result = prompt.runModalLoop();
+
+		String name = prompt.getTextEditorContents("name");
+
+		if (result == 1)
+		{
+			processor.renameGallery(name);
+		}
+
+		gvc->fillGalleryCB();
+	}
+#if (JUCE_MAC || JUCE_IOS)
+	else if (result == SHARE_EMAIL_ID)
+	{
+		gvc->bot.share(processor.gallery->getURL(), 0);
+	}
+	else if (result == SHARE_MESSAGE_ID)
+	{
+		gvc->bot.share(processor.gallery->getURL(), 1);
+	}
+	else if (result == SHARE_FACEBOOK_ID)
+	{
+		gvc->bot.share(processor.gallery->getURL(), 2);
+	}
 #endif
     else if (result == LOAD_LITEST)
     {
-        processor.gallery->sampleType = BKLoadLitest;
-        processor.loadPianoSamples(BKLoadLitest);
+        processor.loadSamples(BKLoadLitest);
     }
     else if (result == LOAD_LITE)
     {
-        processor.gallery->sampleType = BKLoadLite;
-        processor.loadPianoSamples(BKLoadLite);
+        processor.loadSamples(BKLoadLite);
     }
     else if (result == LOAD_MEDIUM)
     {
-        processor.gallery->sampleType = BKLoadMedium;
-        processor.loadPianoSamples(BKLoadMedium);
+        processor.loadSamples(BKLoadMedium);
     }
     else if (result == LOAD_HEAVY)
     {
-        processor.gallery->sampleType = BKLoadHeavy;
-        processor.loadPianoSamples(BKLoadHeavy);
+        processor.loadSamples(BKLoadHeavy);
+    }
+    else if (result >= SF_DEFAULT_0 && result < SOUNDFONT_ID)
+    {
+        processor.loadSamples(BKLoadSoundfont, "default.sf" + String(result - SF_DEFAULT_0), 0);
     }
     else if (result == SAVE_ID)
     {
@@ -352,19 +387,24 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         
         //processor.createGalleryWithName(processor.gallery->getName());
     }
-    if (result == SAVEAS_ID)
+    else if (result >= SOUNDFONT_ID)
+    {
+        processor.loadSamples(BKLoadSoundfont, processor.soundfontNames[result-SOUNDFONT_ID], 0);
+    }
+    else if (result == SAVEAS_ID)
     {
 #if JUCE_IOS
-        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon, gvc);
         
         prompt.addTextEditor("name", processor.gallery->getName());
         
         prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
         prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
         
-        int result = prompt.runModalLoop();
         
         prompt.setTopLeftPosition(gvc->getWidth() / 2, gvc->getBottom() + gYSpacing);
+        
+        int result = prompt.runModalLoop();
         
         String name = prompt.getTextEditorContents("name");
         
@@ -377,6 +417,18 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         gvc->fillGalleryCB();
 #else
         processor.saveCurrentGalleryAs();
+#endif
+    }
+    else if (result == EXPORT_ID)
+    {
+#if JUCE_IOS
+        processor.exportCurrentGallery();
+#endif
+    }
+    else if (result == IMPORT_ID)
+    {
+#if JUCE_IOS
+        processor.importCurrentGallery();
 #endif
     }
     else if (result == OPEN_ID) // Load
@@ -393,7 +445,19 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     }
     else if (result == DELETE_ID) // Delete
     {
-        processor.deleteGallery();
+        AlertWindow prompt("", "Are you sure you want to delete this gallery?", AlertWindow::AlertIconType::QuestionIcon);
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            processor.deleteGallery();
+        }
     }
     else if (result == OPENOLD_ID) // Load (old)
     {
@@ -420,6 +484,10 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         {
             processor.createNewGallery(name);
         }
+    }
+    else if (result == ABOUT_ID)
+    {
+        processor.updateState->setCurrentDisplay(DisplayAbout);
     }
 }
 
@@ -496,6 +564,7 @@ void HeaderViewController::loadDefaultGalleries(void)
 
 void HeaderViewController::fillGalleryCB(void)
 {
+    if (processor.gallery == nullptr) return;
     
     if(!galleryModalCallBackIsOpen)
     {
@@ -505,7 +574,10 @@ void HeaderViewController::fillGalleryCB(void)
         
         File moreGalleries = File::getSpecialLocation(File::userDocumentsDirectory);
         
-#if JUCE_MAC || JUCE_WINDOWS
+#if (JUCE_MAC)
+        bkGalleries = bkGalleries.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+#endif
+#if (JUCE_WINDOWS || JUCE_LINUX)
         bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
         
@@ -582,7 +654,22 @@ void HeaderViewController::fillGalleryCB(void)
 
 void HeaderViewController::update(void)
 {
-    
+    if (processor.updateState->currentDisplay == DisplayNil)
+    {
+        editB.setEnabled(true);
+        pianoB.setEnabled(true);
+        galleryB.setEnabled(true);
+        pianoCB.setEnabled(true);
+        galleryCB.setEnabled(true);
+    }
+    else
+    {
+        editB.setEnabled(false);
+        pianoB.setEnabled(false);
+        galleryB.setEnabled(false);
+        pianoCB.setEnabled(false);
+        galleryCB.setEnabled(false);
+    }
 }
 
 void HeaderViewController::switchGallery()
@@ -593,6 +680,8 @@ void HeaderViewController::switchGallery()
 
 void HeaderViewController::fillPianoCB(void)
 {
+    if (processor.gallery == nullptr) return;
+    
     pianoCB.clear(dontSendNotification);
 
     for (auto piano : processor.gallery->getPianos())
@@ -664,9 +753,14 @@ bool HeaderViewController::handleGalleryChange(void)
             {
 #if JUCE_IOS
                 File newFile = File::getSpecialLocation(File::userDocumentsDirectory);
-#else
+#endif
+#if JUCE_MAC
+                File newFile = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
                 File newFile = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
+                
                 String newURL = newFile.getFullPathName() + name + ".xml";
                 processor.writeCurrentGalleryToURL(newURL);
             }

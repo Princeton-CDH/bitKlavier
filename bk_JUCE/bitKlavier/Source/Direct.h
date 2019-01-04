@@ -34,11 +34,19 @@ public:
                       float gain,
                       bool resAndHammer,
                       float resGain,
-                      float hamGain):
+                      float hamGain,
+                      int atk,
+                      int dca,
+                      float sust,
+                      int rel):
     dTransposition(transp),
     dGain(gain),
     dResonanceGain(resGain),
-    dHammerGain(hamGain)
+    dHammerGain(hamGain),
+    dAttack(atk),
+    dDecay(dca),
+    dRelease(rel),
+    dSustain(sust)
     {
         
     }
@@ -46,8 +54,12 @@ public:
     DirectPreparation(void):
     dTransposition(Array<float>({0.0})),
     dGain(1.0),
-    dResonanceGain(1.0),
-    dHammerGain(1.0)
+    dResonanceGain(0.5),
+    dHammerGain(0.5),
+    dAttack(3),
+    dDecay(3),
+    dRelease(30),
+    dSustain(1.)
     {
         
     }
@@ -63,30 +75,76 @@ public:
         dGain = d->getGain();
         dResonanceGain = d->getResonanceGain();
         dHammerGain = d->getHammerGain();
+        dAttack = d->getAttack();
+        dDecay = d->getDecay();
+        dSustain = d->getSustain();
+        dRelease = d->getRelease();
     }
     
     inline bool compare(DirectPreparation::Ptr d)
     {
-        return (dTransposition == d->getTransposition() &&
-                dGain == d->getGain() &&
-                dResonanceGain == d->getResonanceGain() &&
-                dHammerGain == d->getHammerGain());
+        return  (dTransposition     ==      d->getTransposition()   )   &&
+                (dGain              ==      d->getGain()            )   &&
+                (dResonanceGain     ==      d->getResonanceGain()   )   &&
+                (dHammerGain        ==      d->getHammerGain()      )   &&
+                (dAttack            ==      d->getAttack()          )   &&
+                (dDecay             ==      d->getDecay()           )   &&
+                (dSustain           ==      d->getSustain()         )   &&
+                (dRelease           ==      d->getRelease()         )   ;
     }
     
-    
+    inline void randomize(void)
+    {
+		Random::getSystemRandom().setSeedRandomly();
+
+        float r[20];
+        
+        for (int i = 0; i < 20; i++)    r[i] = (Random::getSystemRandom().nextFloat());
+        int idx = 0;
+        
+        dTransposition.clear();
+        for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
+        {
+			dTransposition.add(i, (Random::getSystemRandom().nextFloat() * 48.0f - 24.0f));
+        }
+        
+        dGain = r[idx++];
+        dResonanceGain = r[idx++];
+        dHammerGain = r[idx++];
+        dAttack = r[idx++] * 2000.0f + 1.0f;
+        dDecay = r[idx++] * 2000.0f + 1.0f;
+        dSustain = r[idx++];
+        dRelease = r[idx++] * 2000.0f + 1.0f;
+    }
     
     inline const String getName() const noexcept {return name;}
     inline void setName(String n){name = n;}
     
-    inline Array<float> getTransposition() const noexcept         {return dTransposition; }
+    inline Array<float> getTransposition() const noexcept               {return dTransposition; }
     inline const float getGain() const noexcept                         {return dGain;          }
     inline const float getResonanceGain() const noexcept                {return dResonanceGain; }
     inline const float getHammerGain() const noexcept                   {return dHammerGain;    }
+    inline const int getAttack() const noexcept                         {return dAttack;        }
+    inline const int getDecay() const noexcept                          {return dDecay;         }
+    inline const float getSustain() const noexcept                      {return dSustain;       }
+    inline const int getRelease() const noexcept                        {return dRelease;       }
+    inline const Array<float> getADSRvals() const noexcept              {return {(float) dAttack, (float) dDecay,(float) dSustain, (float)dRelease}; }
     
     inline void setTransposition(Array<float> val)                      {dTransposition = val;  }
     inline void setGain(float val)                                      {dGain = val;           }
     inline void setResonanceGain(float val)                             {dResonanceGain = val;  }
     inline void setHammerGain(float val)                                {dHammerGain = val;     }
+    inline void setAttack(int val)                                      {dAttack = val;         }
+    inline void setDecay(int val)                                       {dDecay = val;          }
+    inline void setSustain(float val)                                   {dSustain = val;        }
+    inline void setRelease(int val)                                     {dRelease = val;        }
+    inline void setADSRvals(Array<float> vals)
+    {
+        dAttack = vals[0];
+        dDecay = vals[1];
+        dSustain = vals[2];
+        dRelease = vals[3];
+    }
     
     
     void print(void)
@@ -95,18 +153,21 @@ public:
         DBG("dGain: "           + String(dGain));
         DBG("dResGain: "        + String(dResonanceGain));
         DBG("dHammerGain: "     + String(dHammerGain));
+        DBG("dAttack: "         + String(dAttack));
+        DBG("dDecay: "          + String(dDecay));
+        DBG("dSustain: "        + String(dSustain));
+        DBG("dRelease: "        + String(dRelease));
     }
     
     
 
 private:
     String  name;
-    Array<float>   dTransposition;       //transposition, in half steps
-    float   dGain;                //gain multiplier
+    Array<float>   dTransposition;          //transposition, in half steps
+    float   dGain;                          //gain multiplier
     float   dResonanceGain, dHammerGain;
-    
-    //internal keymap for resetting internal values to static
-    //Keymap::Ptr resetMap = new Keymap(0);
+    int     dAttack, dDecay, dRelease;      //ADSR, in ms
+    float   dSustain;
     
     JUCE_LEAK_DETECTOR(DirectPreparation);
 };
@@ -135,12 +196,13 @@ public:
         
     }
     
-    Direct(int Id):
+    Direct(int Id, bool random = false):
     Id(Id),
     name(String(Id))
     {
-        sPrep       = new DirectPreparation();
-        aPrep       = new DirectPreparation(sPrep);
+		sPrep = new DirectPreparation();
+		aPrep = new DirectPreparation(sPrep);
+		if (random) randomize();
     };
     
     inline void clear(void)
@@ -167,20 +229,26 @@ public:
         prep.setProperty( "Id",Id, 0);
         prep.setProperty( "name", name, 0);
         
+        prep.setProperty( ptagDirect_gain,              sPrep->getGain(), 0);
+        prep.setProperty( ptagDirect_resGain,           sPrep->getResonanceGain(), 0);
+        prep.setProperty( ptagDirect_hammerGain,        sPrep->getHammerGain(), 0);
+        
         ValueTree transp( vtagDirect_transposition);
         Array<float> m = sPrep->getTransposition();
         int count = 0;
         for (auto f : m)    transp.setProperty( ptagFloat + String(count++), f, 0);
         prep.addChild(transp, -1, 0);
         
-        prep.setProperty( ptagDirect_gain,              sPrep->getGain(), 0);
-        prep.setProperty( ptagDirect_resGain,           sPrep->getResonanceGain(), 0);
-        prep.setProperty( ptagDirect_hammerGain,        sPrep->getHammerGain(), 0);
+        ValueTree ADSRvals( vtagDirect_ADSR);
+        m = sPrep->getADSRvals();
+        count = 0;
+        for (auto f : m) ADSRvals.setProperty( ptagFloat + String(count++), f, 0);
+        prep.addChild(ADSRvals, -1, 0);
         
         return prep;
     }
     
-    inline void setState(XmlElement* e, Tuning::PtrArr tuning)
+    inline void setState(XmlElement* e)
     {
         float f;
         
@@ -220,6 +288,24 @@ public:
                 sPrep->setTransposition(transp);
                 
             }
+            else  if (sub->hasTagName(vtagDirect_ADSR))
+            {
+                Array<float> envVals;
+                for (int k = 0; k < 4; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        envVals.add(f);
+                    }
+                }
+                
+                sPrep->setADSRvals(envVals);
+                
+            }
         }
         // copy static to active
         aPrep->copy(sPrep);
@@ -238,6 +324,16 @@ public:
         sPrep->copy(from->sPrep);
         aPrep->copy(sPrep);
     }
+
+	inline void randomize()
+	{
+		clear();
+		Random::getSystemRandom().setSeedRandomly();
+		sPrep->randomize();
+		aPrep->randomize();
+		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
+		name = "random";
+	}
     
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName)
@@ -247,7 +343,7 @@ public:
     
 private:
     int Id;
-    String name;
+    String name;;
     
     JUCE_LEAK_DETECTOR(Direct)
 };
@@ -261,37 +357,62 @@ public:
     typedef Array<DirectModPreparation::Ptr, CriticalSection> CSPtrArr;
     typedef OwnedArray<DirectModPreparation>                  Arr;
     typedef OwnedArray<DirectModPreparation, CriticalSection> CSArr;
-    
-    /*
-     DirectId = 0,
-     DirectTuning,
-     DirectTransposition,
-     DirectGain,
-     DirectResGain,
-     DirectHammerGain,
-     DirectParameterTypeNil,
-     */
-    
+
     DirectModPreparation(DirectPreparation::Ptr p, int Id):
     Id(Id)
     {
-        param.ensureStorageAllocated((int)cDirectParameterTypes.size());
-        
+        init();
         param.set(DirectTransposition, floatArrayToString(p->getTransposition()));
         param.set(DirectGain, String(p->getGain()));
         param.set(DirectResGain, String(p->getResonanceGain()));
         param.set(DirectHammerGain, String(p->getHammerGain()));
+        param.set(DirectADSR, floatArrayToString(p->getADSRvals()));
     }
     
     
     DirectModPreparation(int Id):
     Id(Id)
     {
-        param.add("");
-        param.add("");
-        param.add("");
-        param.add("");
-        //param.add("");
+        init();
+    }
+    
+    inline void init(void)
+    {
+        param.clear();
+        param.ensureStorageAllocated((int)DirectParameterTypeNil);
+        for (int i = 0; i < DirectParameterTypeNil; i++) param.add({});
+        param.set(DirectTransposition, {});
+        param.set(DirectGain, {});
+        param.set(DirectResGain, {});
+        param.set(DirectHammerGain, {});
+        param.set(DirectTuning, "blah");
+        param.set(DirectADSR, {});
+    }
+    
+    inline void randomize (void)
+    {
+		DirectPreparation p;
+		p.randomize();
+        
+        param.set(DirectTransposition, floatArrayToString(p.getTransposition()));
+        param.set(DirectGain, String(p.getGain()));
+        param.set(DirectResGain, String(p.getResonanceGain()));
+        param.set(DirectTuning, "blah");
+        param.set(DirectHammerGain, String(p.getHammerGain()));
+        param.set(DirectADSR, floatArrayToString(p.getADSRvals()));
+    }
+    
+    inline bool compare(DirectModPreparation::Ptr dm)
+    {
+        for (int i = 0; i < param.size(); ++i)
+        {
+            DBG("param" + String(i) + "A " + param[i]);
+            DBG("param" + String(i) + "B " + dm->param[i]);
+            
+            if (param[i] != dm->param[i]) return false;
+        }
+        
+        return true;
     }
     
     inline DirectModPreparation::Ptr duplicate(void)
@@ -316,7 +437,7 @@ public:
         ValueTree transp( vtagDirect_transposition);
         int count = 0;
         p = getParam(DirectTransposition);
-        if (p != String::empty)
+        if (p != "")
         {
             Array<float> m = stringToFloatArray(p);
             for (auto f : m)
@@ -326,14 +447,27 @@ public:
         }
         prep.addChild(transp, -1, 0);
         
+        ValueTree envelope( vtagDirect_ADSR);
+        count = 0;
+        p = getParam(DirectADSR);
+        if (p != "")
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                envelope.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(envelope, -1, 0);
+        
         p = getParam(DirectGain);
-        if (p != String::empty) prep.setProperty( ptagDirect_gain,              p.getFloatValue(), 0);
+        if (p != "") prep.setProperty( ptagDirect_gain,              p.getFloatValue(), 0);
         
         p = getParam(DirectResGain);
-        if (p != String::empty) prep.setProperty( ptagDirect_resGain,           p.getFloatValue(), 0);
+        if (p != "") prep.setProperty( ptagDirect_resGain,           p.getFloatValue(), 0);
         
         p = getParam(DirectHammerGain);
-        if (p != String::empty) prep.setProperty( ptagDirect_hammerGain,        p.getFloatValue(), 0);
+        if (p != "") prep.setProperty( ptagDirect_hammerGain,        p.getFloatValue(), 0);
         
         
         return prep;
@@ -359,6 +493,7 @@ public:
             if (sub->hasTagName(vtagDirect_transposition))
             {
                 Array<float> transp;
+                
                 for (int k = 0; k < 128; k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
@@ -374,6 +509,23 @@ public:
                 setParam(DirectTransposition, floatArrayToString(transp));
                 
             }
+            else if (sub->hasTagName(vtagDirect_ADSR))
+            {
+                Array<float> envelope;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        envelope.add(f);
+                    }
+                }
+                
+                setParam(DirectADSR, floatArrayToString(envelope));
+            }
         }
     }
     
@@ -388,6 +540,7 @@ public:
         param.set(DirectGain, String(d->getGain()));
         param.set(DirectResGain, String(d->getResonanceGain()));
         param.set(DirectHammerGain, String(d->getHammerGain()));
+        param.set(DirectADSR, floatArrayToString(d->getADSRvals()));
     }
     
     inline void copy(DirectModPreparation::Ptr p)
@@ -402,23 +555,27 @@ public:
     {
         for (int i = DirectId+1; i < DirectParameterTypeNil; i++)
         {
-            param.set(i, "");
+            param.set(i, " ");
         }
     }
     
     inline const String getParam(DirectParameterType type)
     {
-        if (type != DirectId)   return param[type];
-        else                    return "";
+        if (type != DirectId)   { return param[type]; }
+        else                    return " ";
     }
     
-    inline void setParam(DirectParameterType type, String val) { param.set(type, val);}
+    inline void setParam(DirectParameterType type, String val)
+    {
+        param.set((int)type, val);
+    }
+
     
     inline const StringArray getStringArray(void) { return param; }
     
     void print(void)
     {
-        
+        DBG("hey");
     }
     
     inline void setId(int newId) { Id = newId; }
@@ -445,17 +602,19 @@ public:
     typedef OwnedArray<DirectProcessor>                  Arr;
     typedef OwnedArray<DirectProcessor, CriticalSection> CSArr;
     
+    
     DirectProcessor(Direct::Ptr direct,
                     TuningProcessor::Ptr tuning,
                     BKSynthesiser *s, BKSynthesiser *res, BKSynthesiser *ham);
     
     ~DirectProcessor();
     
-    void processBlock(int numSamples, int midiChannel);
-    
-    
+    BKSampleLoadType sampleType;
+    void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
+
     void    keyPressed(int noteNumber, float velocity, int channel);
-    void    keyReleased(int noteNumber, float velocity, int channel);
+    void    keyReleased(int noteNumber, float velocity, int channel, bool soundfont = false);
+    void    playReleaseSample(int noteNumber, float velocity, int channel, bool soundfont = false);
     
     inline void prepareToPlay(double sr, BKSynthesiser* main, BKSynthesiser* res, BKSynthesiser* hammer)
     {

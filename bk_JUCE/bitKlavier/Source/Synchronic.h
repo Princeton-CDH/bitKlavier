@@ -40,6 +40,11 @@ public:
     sAccentMultipliers(p->getAccentMultipliers()),
     sLengthMultipliers(p->getLengthMultipliers()),
     sTransposition(p->getTransposition()),
+    sAttacks(p->getAttacks()),
+    sDecays(p->getDecays()),
+    sSustains(p->getSustains()),
+    sReleases(p->getReleases()),
+    envelopeOn(p->getEnvelopesOn()),
     sGain(p->getGain()),
     sClusterThresh(p->getClusterThreshMS()),
     sClusterThreshSec(p->getClusterThreshSEC()),
@@ -86,6 +91,11 @@ public:
     sBeatMultipliers(Array<float>({1.0})),
     sAccentMultipliers(Array<float>({1.0})),
     sLengthMultipliers(Array<float>({1.0})),
+    sAttacks(Array<int>({3,3,3,3,3,3,3,3,3,3,3,3})),
+    sDecays(Array<int>({3,3,3,3,3,3,3,3,3,3,3,3})),
+    sSustains(Array<float>({1.,1,1,1,1,1,1,1,1,1,1,1})),
+    sReleases(Array<int>({30,30,30,30,30,30,30,30,30,30,30,30})),
+    envelopeOn(Array<bool>({true,false,false,false,false,false,false,false,false,false,false,false})),
     sGain(1.0),
     sClusterThresh(500),
     sClusterThreshSec(.001 * sClusterThresh)
@@ -110,6 +120,13 @@ public:
         sClusterThresh = s->getClusterThreshMS();
         sClusterThreshSec = s->getClusterThreshSEC();
         sReleaseVelocitySetsSynchronic = s->getReleaseVelocitySetsSynchronic();
+        
+        sAttacks = s->getAttacks();
+        sDecays = s->getDecays();
+        sSustains = s->getSustains();
+        sReleases = s->getReleases();
+        
+        envelopeOn = s->getEnvelopesOn();
     }
     
     bool compare(SynchronicPreparation::Ptr s)
@@ -118,6 +135,11 @@ public:
         bool accents = true;
         bool beats = true;
         bool transp = true;
+        bool attack = true;
+        bool decay = true;
+        bool sustain = true;
+        bool release = true;
+        bool envelope = true;
         
         for (int i = s->getLengthMultipliers().size(); --i>=0;)
         {
@@ -163,17 +185,139 @@ public:
             }
         }
         
+        for (int i = s->getAttacks().size(); --i>=0;)
+        {
+            if (s->getAttacks()[i] != sAttacks[i])
+            {
+                attack = false;
+                break;
+            }
+        }
+        
+        for (int i = s->getDecays().size(); --i>=0;)
+        {
+            if (s->getDecays()[i] != sDecays[i])
+            {
+                decay = false;
+                break;
+            }
+        }
+        
+        for (int i = s->getSustains().size(); --i>=0;)
+        {
+            if (s->getSustains()[i] != sSustains[i])
+            {
+                sustain = false;
+                break;
+            }
+        }
+        
+        for (int i = s->getReleases().size(); --i>=0;)
+        {
+            if (s->getReleases()[i] != sReleases[i])
+            {
+                release = false;
+                break;
+            }
+        }
+        
+        for (int i = s->getEnvelopesOn().size(); --i>=0;)
+        {
+            if (s->getEnvelopesOn()[i] != envelopeOn[i])
+            {
+                envelope = false;
+                break;
+            }
+        }
+        
         return (sNumBeats == s->getNumBeats() &&
                 sClusterMin == s->getClusterMin() &&
                 sClusterMax == s->getClusterMax() &&
                 sClusterCap == s->getClusterCap() &&
                 (sMode == s->getMode()) &&
-                transp && lens && accents && beats &&
+                transp && lens && accents && beats && attack && decay && sustain && release &&
                 sGain == s->getGain() &&
                 sClusterThresh == s->getClusterThreshMS() &&
                 sClusterThreshSec == s->getClusterThreshSEC() &&
                 sReleaseVelocitySetsSynchronic == s->getReleaseVelocitySetsSynchronic());
     }
+
+	inline void randomize()
+	{
+		Random::getSystemRandom().setSeedRandomly();
+
+		float r[100];
+
+		for (int i = 0; i < 100; i++)  r[i] = (Random::getSystemRandom().nextFloat());
+		int idx = 0;
+
+		sNumBeats = (int)(r[idx++] * 100);
+		sClusterMin = (int)(r[idx++] * 20);
+		sClusterMax = (int)(r[idx++] * 20);
+		sClusterCap = (int)(r[idx++] * 20);
+		sMode = (SynchronicSyncMode)(int)(r[idx++] * SynchronicSyncModeNil);
+		sBeatsToSkip = (int)(r[idx++] * 2);
+		sBeatMultipliers.clear();
+		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
+		{
+			sBeatMultipliers.add(i, (Random::getSystemRandom().nextFloat() * 2.0f));
+		}
+		sAccentMultipliers.clear();
+		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
+		{
+			sAccentMultipliers.add(i, (Random::getSystemRandom().nextFloat() * 2.0f));
+		}
+		sLengthMultipliers.clear();
+		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
+		{
+			sLengthMultipliers.add(i, (Random::getSystemRandom().nextFloat() * 4.0f - 2.0f));
+		}
+		sGain = r[idx++] * 10;
+		sTransposition.clear();
+		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
+		{
+			Array<float> transposition;
+			for (int j = 0; j < Random::getSystemRandom().nextInt(10); j++)
+			{
+				transposition.add(i, (Random::getSystemRandom().nextFloat()) * 48.0f - 24.0f);
+			}
+			sTransposition.add(transposition);
+		}
+		sClusterThresh = (r[idx++] * 2000) + 1;
+		sClusterThreshSec = sClusterThresh * 0.001f;
+		sReleaseVelocitySetsSynchronic = (bool)((int)(r[idx++] * 2));
+
+		int numEnvelopes = 12;
+
+		sAttacks.clear();
+		for (int i = 0; i < numEnvelopes; ++i)
+		{
+			sAttacks.add(i, Random::getSystemRandom().nextInt(Range<int>(1, 1000)));
+		}
+		sDecays.clear();
+		for (int i = 0; i < numEnvelopes; ++i)
+		{
+			sDecays.add(i, Random::getSystemRandom().nextInt(Range<int>(1, 1000)));
+		}
+		sSustains.clear();
+		for (int i = 0; i < numEnvelopes; ++i)
+		{
+			sSustains.add(i, (Random::getSystemRandom().nextFloat()));
+		}
+		sReleases.clear();
+		for (int i = 0; i < numEnvelopes; ++i)
+		{
+			sReleases.add(i, Random::getSystemRandom().nextInt(Range<int>(1, 1000)));
+		}
+
+		envelopeOn.clear();
+		envelopeOn.add(true); // needed for accurate unit testing - set state always defaults first to be true so there is 1 ADSR
+		for (int i = 1; i < numEnvelopes; ++i)
+		{
+			envelopeOn.add(i, Random::getSystemRandom().nextBool());
+		}
+		
+	}
     
     //inline const float getTempo() const noexcept                       {return sTempo;               }
     inline const int getNumBeats() const noexcept                      {return sNumBeats;              }
@@ -197,7 +341,38 @@ public:
     inline const bool getReleaseVelocitySetsSynchronic() const noexcept{return sReleaseVelocitySetsSynchronic; }
     inline const float getGain() const noexcept                        {return sGain;                   }
     
-
+    inline const Array<int> getAttacks() const noexcept         {return sAttacks;   }
+    inline const Array<int> getDecays() const noexcept          {return sDecays;    }
+    inline const Array<float> getSustains() const noexcept      {return sSustains;  }
+    inline const Array<int> getReleases() const noexcept        {return sReleases;  }
+    inline const Array<bool> getEnvelopesOn() const noexcept    {return envelopeOn; }
+    
+    inline const int getAttack(int which) const noexcept    {return sAttacks[which];}
+    inline const int getDecay(int which) const noexcept     {return sDecays[which];}
+    inline const float getSustain(int which) const noexcept {return sSustains[which];}
+    inline const int getRelease(int which) const noexcept   {return sReleases[which];}
+    
+    inline const Array<Array<float>> getADSRs() const noexcept
+    {
+        Array<Array<float>> allADSRs;
+        for(int i=0; i<sAttacks.size(); i++)
+        {
+            Array<float> singleADSR;
+            singleADSR.insert(0, sAttacks[i]);
+            singleADSR.insert(1, sDecays[i]);
+            singleADSR.insert(2, sSustains[i]);
+            singleADSR.insert(3, sReleases[i]);
+            if(envelopeOn[i])singleADSR.insert(4, 1);
+            else singleADSR.insert(4, 0);
+            
+            allADSRs.insert(i, singleADSR);
+        }
+        
+        return allADSRs;
+    }
+    
+    inline const bool getEnvelopeOn(int which) const noexcept   {return envelopeOn[which];}
+    
     inline void setClusterThresh(float clusterThresh)
     {
         sClusterThresh = clusterThresh;
@@ -225,6 +400,54 @@ public:
     inline void setSingleTransposition(int whichSlider, Array<float> values) {sTransposition.set(whichSlider, values); }
     inline void setReleaseVelocitySetsSynchronic(bool rvss)            {sReleaseVelocitySetsSynchronic = rvss;          }
     inline void setGain(float gain)                                    {sGain = gain;                          }
+    
+    inline void setAttacks(Array<int> attacks)      {sAttacks.swapWith(attacks);    }
+    inline void setDecays(Array<int> decays)        {sDecays.swapWith(decays);      }
+    inline void setSustains(Array<float> sustains)  {sSustains.swapWith(sustains);  }
+    inline void setReleases(Array<int> releases)    {sReleases.swapWith(releases);  }
+    
+    inline void setAttack(int which, int val)       {sAttacks.set(which, val);}
+    inline void setDecay(int which, int val)        {sDecays.set(which, val);}
+    inline void setSustain(int which, float val)    {sSustains.set(which, val);}
+    inline void setRelease(int which, int val)      {sReleases.set(which, val);}
+    
+	inline void clearADSRs()
+	{
+		sAttacks.clear();
+		sDecays.clear();
+		sSustains.clear();
+		sReleases.clear();
+		envelopeOn.clear();
+	}
+
+    inline void setADSRs(Array<Array<float>> allADSRs)
+    {
+		clearADSRs();
+        for(int i=0; i<allADSRs.size(); i++)
+        {
+            setAttack(i, allADSRs[i][0]);
+            setDecay(i, allADSRs[i][1]);
+            setSustain(i, allADSRs[i][2]);
+            setRelease(i, allADSRs[i][3]);
+            if(allADSRs[i][4] > 0 || i==0) setEnvelopeOn(i, true);
+            else setEnvelopeOn(i, false);
+            //DBG("ADSR envelopeOn = " + String(i) + " " + String((int)getEnvelopeOn(i)));
+        }
+    }
+    
+    inline void setADSR(int which, Array<float> oneADSR)
+    {
+        setAttack(which, oneADSR[0]);
+        setDecay(which, oneADSR[1]);
+        setSustain(which, oneADSR[2]);
+        setRelease(which, oneADSR[3]);
+        if(oneADSR[4] > 0 || which==0) setEnvelopeOn(which, true);
+        else setEnvelopeOn(which, false);
+        DBG("ADSR envelopeOn = " + String(which) + " " + String((int)getEnvelopeOn(which)));
+        
+    }
+    
+    inline void setEnvelopeOn(int which, bool val)  {envelopeOn.set(which, val);}
     
     void print(void)
     {
@@ -263,9 +486,16 @@ private:
     Array<float> sBeatMultipliers;      //multiply pulse lengths by these
     Array<float> sAccentMultipliers;    //multiply velocities by these
     Array<float> sLengthMultipliers;    //multiply note duration by these
-    Array<Array<float>> sTransposition;        //transpose by these
+    Array<Array<float>> sTransposition; //transpose by these
+    
+    Array<int> sAttacks;
+    Array<int> sDecays;
+    Array<float> sSustains;
+    Array<int> sReleases;
+    Array<bool> envelopeOn;
+    
 
-    float sGain;                //gain multiplier
+    float sGain;               //gain multiplier
     float sClusterThresh;      //max time between played notes before new cluster is started, in MS
     float sClusterThreshSec;
     
@@ -296,12 +526,13 @@ public:
         
     }
     
-    Synchronic(int Id):
+	Synchronic(int Id, bool random = false) :
     Id(Id),
     name(String(Id))
     {
-        sPrep       = new SynchronicPreparation();
-        aPrep       = new SynchronicPreparation(sPrep);
+		sPrep = new SynchronicPreparation();
+		aPrep = new SynchronicPreparation(sPrep);
+		if (random) randomize();
     }
     
     inline Synchronic::Ptr duplicate()
@@ -326,6 +557,15 @@ public:
         sPrep->copy(from->sPrep);
         aPrep->copy(sPrep);
     }
+
+	inline void randomize()
+	{
+		clear();
+		sPrep->randomize();
+		aPrep->randomize();
+		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
+		name = "random";
+	}
     
     inline ValueTree getState(void)
     {
@@ -380,6 +620,18 @@ public:
         }
         prep.addChild(transposition, -1, 0);
         
+        ValueTree ADSRs( vtagSynchronic_ADSRs);
+        
+        tcount = 0;
+        for (auto arr : sPrep->getADSRs())
+        {
+            ValueTree e("e"+String(tcount++));
+            count = 0;
+            for (auto f : arr)  e.setProperty( ptagFloat + String(count++), f, 0);
+            ADSRs.addChild(e,-1,0);
+        }
+        prep.addChild(ADSRs, -1, 0);
+        
         return prep;
         
     }
@@ -408,8 +660,8 @@ public:
         i = e->getStringAttribute(ptagSynchronic_clusterMax).getIntValue();
         sPrep->setClusterMax(i);
         
-        i = e->getStringAttribute(ptagSynchronic_clusterThresh).getIntValue();
-        sPrep->setClusterThresh(i);
+        f = e->getStringAttribute(ptagSynchronic_clusterThresh).getFloatValue();
+        sPrep->setClusterThresh(f);
         
         i = e->getStringAttribute(ptagSynchronic_mode).getIntValue();
         sPrep->setMode((SynchronicSyncMode) i);
@@ -499,6 +751,32 @@ public:
                 
                 sPrep->setTransposition(atransp);
             }
+            else  if (sub->hasTagName(vtagSynchronic_ADSRs))
+            {
+                Array<Array<float>> aADSRs;
+                int tcount = 0;
+                forEachXmlChildElement (*sub, asub)
+                {
+                    if (asub->hasTagName("e"+String(tcount++)))
+                    {
+                        Array<float> singleADSR;
+                        for (int k = 0; k < 5; k++)
+                        {
+                            String attr = asub->getStringAttribute(ptagFloat + String(k));
+                            
+                            if (attr == String::empty) break;
+                            else
+                            {
+                                f = attr.getFloatValue();
+                                singleADSR.add(f);
+                            }
+                        }
+                        aADSRs.set(tcount-1, singleADSR);
+                    }
+                }
+                
+                sPrep->setADSRs(aADSRs);
+            }
         }
         
         aPrep->copy(sPrep);
@@ -538,27 +816,6 @@ public:
     typedef OwnedArray<SynchronicModPreparation>                  Arr;
     typedef OwnedArray<SynchronicModPreparation, CriticalSection> CSArr;
     
-    /*
-     SynchronicId = 0,
-     SynchronicTuning,
-     SynchronicTempo,
-     SynchronicNumPulses,
-     SynchronicClusterMin,
-     SynchronicClusterMax,
-     SynchronicClusterThresh,
-     SynchronicMode,
-     SynchronicBeatsToSkip,
-     SynchronicBeatMultipliers,
-     SynchronicLengthMultipliers,
-     SynchronicAccentMultipliers,
-     SynchronicTranspOffsets,
-     AT1Mode,
-     AT1History,
-     AT1Subdivisions,
-     AT1Min,
-     AT1Max,
-     */
-    
     SynchronicModPreparation(SynchronicPreparation::Ptr p, int Id):
     Id(Id)
     {
@@ -570,10 +827,12 @@ public:
         param.set(SynchronicClusterThresh, String(p->getClusterThreshMS()));
         param.set(SynchronicMode, String(p->getMode()));
         param.set(SynchronicBeatsToSkip, String(p->getBeatsToSkip()));
-        param.set(SynchronicBeatMultipliers, floatArrayToString(p->getBeatMultipliers()));
-        param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
-        param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
         param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p->getTransposition()));
+        param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
+        param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
+        param.set(SynchronicBeatMultipliers, floatArrayToString(p->getBeatMultipliers()));
+        param.set(SynchronicGain, String(p->getGain()));
+        param.set(SynchronicADSRs, arrayFloatArrayToString(p->getADSRs()));
         
     }
     
@@ -587,10 +846,13 @@ public:
         param.set(SynchronicClusterThresh, "");
         param.set(SynchronicMode, "");
         param.set(SynchronicBeatsToSkip, "");
-        param.set(SynchronicBeatMultipliers, "");
-        param.set(SynchronicLengthMultipliers, "");
-        param.set(SynchronicAccentMultipliers, "");
         param.set(SynchronicTranspOffsets, "");
+        param.set(SynchronicAccentMultipliers, "");
+        param.set(SynchronicLengthMultipliers, "");
+        param.set(SynchronicBeatMultipliers, "");
+        param.set(SynchronicGain, "");
+        param.set(SynchronicADSRs, "");
+
     }
     
     inline SynchronicModPreparation::Ptr duplicate(void)
@@ -633,6 +895,9 @@ public:
         p = getParam(SynchronicBeatsToSkip);
         if (p != String::empty) prep.setProperty( ptagSynchronic_beatsToSkip,         p.getIntValue(), 0);
         
+        p = getParam(SynchronicGain);
+        if (p != String::empty) prep.setProperty( ptagSynchronic_gain,                p.getFloatValue(), 0);
+        
         ValueTree beatMults( vtagSynchronic_beatMults);
         int count = 0;
         p = getParam(SynchronicBeatMultipliers);
@@ -673,20 +938,40 @@ public:
             }
         }
         prep.addChild(accentMults, -1, 0);
-        
+ 
         
         ValueTree transpOffsets( vtagSynchronic_transpOffsets);
-        count = 0;
+        int tcount = 0;
         p = getParam(SynchronicTranspOffsets);
         if (p != String::empty)
         {
-            Array<float> m = stringToFloatArray(p);
+            Array<Array<float>> m = stringToArrayFloatArray(p);
             for (auto f : m)
             {
-                transpOffsets.      setProperty( ptagFloat + String(count++), f, 0);
+                ValueTree t("t"+String(tcount++));
+                count = 0;
+                for (auto nf : f) t.setProperty( ptagFloat + String(count++), nf, 0);
+                transpOffsets.addChild(t,-1,0);
             }
         }
         prep.addChild(transpOffsets, -1, 0);
+        
+        
+        ValueTree envelopes( vtagSynchronic_ADSRs);
+        tcount = 0;
+        p = getParam(SynchronicADSRs);
+        if (p != String::empty)
+        {
+            Array<Array<float>> m = stringToArrayFloatArray(p);
+            for (auto f : m)
+            {
+                ValueTree e("e"+String(tcount++));
+                count = 0;
+                for (auto nf : f) e.setProperty( ptagFloat + String(count++), nf, 0);
+                envelopes.addChild(e,-1,0);
+            }
+        }
+        prep.addChild(envelopes, -1, 0);
         
         
         return prep;
@@ -713,6 +998,12 @@ public:
         
         p = e->getStringAttribute(ptagSynchronic_mode);
         setParam(SynchronicMode, p);
+        
+		p = e->getStringAttribute(ptagSynchronic_beatsToSkip);
+		setParam(SynchronicBeatsToSkip, p);
+
+        p = e->getStringAttribute(ptagSynchronic_gain);
+        setParam(SynchronicGain, p);
         
         forEachXmlChildElement (*e, sub)
         {
@@ -773,20 +1064,56 @@ public:
             }
             else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
             {
-                Array<float> transp;
-                for (int k = 0; k < 128; k++)
+                Array<Array<float>> atransp;
+                int tcount = 0;
+                forEachXmlChildElement (*sub, asub)
                 {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
+                    if (asub->hasTagName("t"+String(tcount++)))
                     {
-                        f = attr.getFloatValue();
-                        transp.add(f);
+                        Array<float> transp;
+                        for (int k = 0; k < 128; k++)
+                        {
+                            String attr = asub->getStringAttribute(ptagFloat + String(k));
+                            
+                            if (attr == String::empty) break;
+                            else
+                            {
+                                f = attr.getFloatValue();
+                                transp.add(f);
+                            }
+                        }
+                        atransp.set(tcount-1, transp);
                     }
                 }
                 
-                setParam(SynchronicTranspOffsets, floatArrayToString(transp));
+                setParam(SynchronicTranspOffsets, arrayFloatArrayToString(atransp));
+                
+            }
+            else  if (sub->hasTagName(vtagSynchronic_ADSRs))
+            {
+                Array<Array<float>> aenvs;
+                int tcount = 0;
+                forEachXmlChildElement (*sub, asub)
+                {
+                    if (asub->hasTagName("e"+String(tcount++)))
+                    {
+                        Array<float> envs;
+                        for (int k = 0; k < 128; k++)
+                        {
+                            String attr = asub->getStringAttribute(ptagFloat + String(k));
+                            
+                            if (attr == String::empty) break;
+                            else
+                            {
+                                f = attr.getFloatValue();
+                                envs.add(f);
+                            }
+                        }
+                        aenvs.set(tcount-1, envs);
+                    }
+                }
+                
+                setParam(SynchronicADSRs, arrayFloatArrayToString(aenvs));
             }
         }
         
@@ -798,18 +1125,36 @@ public:
         
     }
     
+	inline bool compare(SynchronicModPreparation::Ptr t)
+	{
+		return (getParam(SynchronicNumPulses) == t->getParam(SynchronicNumPulses) &&
+			getParam(SynchronicClusterMin) == t->getParam(SynchronicClusterMin) &&
+			getParam(SynchronicClusterMax) == t->getParam(SynchronicClusterMax) &&
+			getParam(SynchronicClusterThresh) == t->getParam(SynchronicClusterThresh) &&
+			getParam(SynchronicGain) == t->getParam(SynchronicGain) &&
+			getParam(SynchronicGain) == t->getParam(SynchronicGain) &&
+			getParam(SynchronicBeatsToSkip) == t->getParam(SynchronicBeatsToSkip) &&
+			getParam(SynchronicBeatMultipliers) == t->getParam(SynchronicBeatMultipliers) &&
+			getParam(SynchronicLengthMultipliers) == t->getParam(SynchronicLengthMultipliers) && 
+			getParam(SynchronicAccentMultipliers) == t->getParam(SynchronicAccentMultipliers) &&
+			getParam(SynchronicTranspOffsets) == t->getParam(SynchronicTranspOffsets) &&
+			getParam(SynchronicADSRs) == t->getParam(SynchronicADSRs));
+	}
+
     inline void copy(SynchronicPreparation::Ptr p)
     {
         param.set(SynchronicNumPulses, String(p->getNumBeats()));
         param.set(SynchronicClusterMin, String(p->getClusterMin()));
         param.set(SynchronicClusterMax, String(p->getClusterMax()));
         param.set(SynchronicClusterThresh, String(p->getClusterThreshMS()));
+        param.set(SynchronicGain, String(p->getGain()));
         param.set(SynchronicMode, String(p->getMode()));
         param.set(SynchronicBeatsToSkip, String(p->getBeatsToSkip()));
         param.set(SynchronicBeatMultipliers, floatArrayToString(p->getBeatMultipliers()));
         param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
         param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
         param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p->getTransposition()));
+        param.set(SynchronicADSRs, arrayFloatArrayToString(p->getADSRs()));
     }
     
     inline void copy(SynchronicModPreparation::Ptr p)
@@ -819,6 +1164,25 @@ public:
             param.set(i, p->getParam((SynchronicParameterType)i));
         }
     }
+
+	inline void randomize()
+	{
+		SynchronicPreparation p;
+		p.randomize();
+
+		param.set(SynchronicNumPulses, String(p.getNumBeats()));
+		param.set(SynchronicClusterMin, String(p.getClusterMin()));
+		param.set(SynchronicClusterMax, String(p.getClusterMax()));
+		param.set(SynchronicClusterThresh, String(p.getClusterThreshMS()));
+		param.set(SynchronicGain, String(p.getGain()));
+		param.set(SynchronicMode, String(p.getMode()));
+		param.set(SynchronicBeatsToSkip, String(p.getBeatsToSkip()));
+		param.set(SynchronicBeatMultipliers, floatArrayToString(p.getBeatMultipliers()));
+		param.set(SynchronicLengthMultipliers, floatArrayToString(p.getLengthMultipliers()));
+		param.set(SynchronicAccentMultipliers, floatArrayToString(p.getAccentMultipliers()));
+		param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p.getTransposition()));
+		param.set(SynchronicADSRs, arrayFloatArrayToString(p.getADSRs()));
+	}
     
     void clearAll()
     {
@@ -885,7 +1249,8 @@ public:
     inline const uint64 getCurrentNumSamplesBeat(void) const noexcept   { return numSamplesBeat;    }
     inline const uint64 getCurrentPhasor(void) const noexcept           { return phasor;            }
     
-    void processBlock(int numSamples, int channel);
+    BKSampleLoadType sampleType;
+    void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
     void keyPressed(int noteNumber, float velocity);
     void keyReleased(int noteNumber, float velocity, int channel);
     float getTimeToBeatMS(float beatsToSkip);
@@ -894,6 +1259,14 @@ public:
     inline const int getAccentMultiplierCounter() const noexcept { return accentMultiplierCounter; }
     inline const int getLengthMultiplierCounter() const noexcept { return lengthMultiplierCounter; }
     inline const int getTranspCounter() const noexcept { return transpCounter; }
+    inline const int getEnvelopeCounter() const noexcept { return envelopeCounter; }
+    inline const int getBeatCounter() const noexcept { return beatCounter; }
+    inline const float getClusterThresholdTimer() const noexcept { return 1000. * clusterThresholdTimer / sampleRate ;}
+    inline const float getClusterThreshold() const noexcept { return 1000. * clusterThresholdSamples / sampleRate ;}
+    inline const int getClusterSize() const noexcept {return cluster.size(); }
+    inline const int getNumKeysDepressed() const noexcept {return keysDepressed.size(); }
+    inline const bool getPlayCluster() const noexcept { return playCluster; }
+    
     inline const SynchronicSyncMode getMode() const noexcept {return synchronic->aPrep->getMode(); }
 
     inline int getId(void) const noexcept { return synchronic->getId(); }
@@ -950,6 +1323,12 @@ public:
         synchronic->aPrep->copy(synchronic->sPrep);
     }
     
+    void clearOldNotes()
+    {
+        keysDepressed.clearQuick();
+        cluster.clearQuick();
+    }
+    
 private:
     BKSynthesiser* synth;
     GeneralSettings::Ptr general;
@@ -971,6 +1350,7 @@ private:
     int accentMultiplierCounter; //accent multipliers
     int lengthMultiplierCounter; //note length (sounding length) multipliers (multiples of 50ms, at least for now)
     int transpCounter;     //transposition offsets
+    int envelopeCounter;
     
     //reset the phase, including of all the parameter fields
     void resetPhase(int skipBeats);
@@ -980,6 +1360,7 @@ private:
     void playNote(int channel, int note, float velocity);
     Array<float> velocities;    //record of velocities
     Array<int> keysDepressed;   //current keys that are depressed
+    bool playCluster;
     
     bool inCluster;
     uint64 clusterThresholdSamples;

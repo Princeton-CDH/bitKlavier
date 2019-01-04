@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="1.9"
-              bundleIdentifier="com.manyarrowsmusic.bitKlavier1" includeBinaryInAppConfig="1"
-              buildVST="1" buildVST3="0" buildAU="1" buildAUv3="0" buildRTAS="0"
+<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="2.3-beta3"
+              bundleIdentifier="com.manyarrowsmusic.bitKlavier" includeBinaryInAppConfig="1"
+              buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
               pluginManufacturer="manyarrowsmusic" pluginManufacturerCode="Manu"
               pluginCode="bK2m" pluginChannelConfigs="{0,2}" pluginIsSynth="1"
               pluginWantsMidiIn="1" pluginProducesMidiOut="1" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="1" pluginAUExportPrefix="BKAU" pluginRTASCategory=""
-              aaxIdentifier="com.manyarrowsmusic.bitKlavier" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
-              jucerVersion="5.2.0" companyName="manyarrowsmusic" companyEmail="dtrueman@princeton.edu"
+              aaxIdentifier="com.manyarrowsmusic.bitKlavier" pluginAAXCategory="2"
+              jucerVersion="5.4.1" companyName="manyarrowsmusic" companyEmail="dtrueman@princeton.edu"
               maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
               displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Light"
-              buildStandalone="1" enableIAA="1" cppLanguageStandard="11" companyCopyright="manyarrowsmusic">
+              buildStandalone="1" enableIAA="1" cppLanguageStandard="11" companyCopyright="manyarrowsmusic"
+              pluginFormats="buildAU,buildStandalone,buildVST,buildVST3,enableIAA"
+              pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut,pluginEditorRequiresKeys"
+              pluginVST3Category="Instrument">
   <MAINGROUP id="s4R02g" name="bitKlavier">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
       <GROUP id="{1E3013D4-6B2A-D996-A5C8-F92AE44A39F2}" name="Resources">
@@ -72,6 +75,16 @@
                   file="Source/galleries/Examples/26. Adaptive Tempo 4.xml"/>
             <FILE id="rH1HKW" name="27. PianoMapGallery.xml" compile="0" resource="1"
                   file="Source/galleries/Examples/27. PianoMapGallery.xml"/>
+            <FILE id="RrZA6s" name="28. Spring Tuning 1.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/28. Spring Tuning 1.xml"/>
+            <FILE id="BekVz7" name="29. Spring Tuning 2.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/29. Spring Tuning 2.xml"/>
+            <FILE id="bsXQpI" name="30. Spring Tuning 3.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/30. Spring Tuning 3.xml"/>
+            <FILE id="yHtTTV" name="31. Spring Tuning 4.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/31. Spring Tuning 4.xml"/>
+            <FILE id="fYaJDx" name="32. Spring Tuning 5.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/32. Spring Tuning 5.xml"/>
           </GROUP>
           <GROUP id="{DC95ED57-B0B0-DFDE-4EA4-2AEDDF41B82F}" name="Mikroetudes">
             <FILE id="o6aLKt" name="And So.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/And So.xml"/>
@@ -117,7 +130,7 @@
             <FILE id="qDPPdy" name="NS_3_Song.xml" compile="0" resource="1" file="Source/galleries/Nostalgic Synchronic/NS_3_Song.xml"/>
             <FILE id="dMpeFo" name="NS_4_Marbles.xml" compile="0" resource="1"
                   file="Source/galleries/Nostalgic Synchronic/NS_4_Marbles.xml"/>
-            <FILE id="yJI0Jm" name="NS_5_Wallumrod.xml" compile="0" resource="1"
+            <FILE id="E9akwg" name="NS_5_Wallumrod.xml" compile="0" resource="1"
                   file="Source/galleries/Nostalgic Synchronic/NS_5_Wallumrod.xml"/>
             <FILE id="y0LuZ7" name="NS_6_PointsAmongLines.xml" compile="0" resource="1"
                   file="Source/galleries/Nostalgic Synchronic/NS_6_PointsAmongLines.xml"/>
@@ -236,6 +249,17 @@
           <FILE id="FXpKMX" name="Synchronic.h" compile="0" resource="0" file="Source/Synchronic.h"/>
           <FILE id="ac8QzA" name="Tuning.cpp" compile="1" resource="0" file="Source/Tuning.cpp"/>
           <FILE id="OrPhKl" name="Tuning.h" compile="0" resource="0" file="Source/Tuning.h"/>
+          <GROUP id="{27D6A86B-9A4E-E13A-49DF-00E35E3972B7}" name="SpringTuning">
+            <FILE id="rAZz0d" name="SpringTuningUtilities.h" compile="0" resource="0"
+                  file="Source/SpringTuningUtilities.h"/>
+            <FILE id="DZP8Fl" name="SpringTuning.h" compile="0" resource="0" file="Source/SpringTuning.h"/>
+            <FILE id="Hvcdj6" name="SpringTuning.cpp" compile="1" resource="0"
+                  file="Source/SpringTuning.cpp"/>
+            <FILE id="voSNPv" name="Spring.h" compile="0" resource="0" file="Source/Spring.h"/>
+            <FILE id="Qi9BHF" name="Spring.cpp" compile="1" resource="0" file="Source/Spring.cpp"/>
+            <FILE id="HIugGx" name="Particle.h" compile="0" resource="0" file="Source/Particle.h"/>
+            <FILE id="J2uhEu" name="Particle.cpp" compile="1" resource="0" file="Source/Particle.cpp"/>
+          </GROUP>
           <FILE id="jeqsaH" name="Tempo.cpp" compile="1" resource="0" file="Source/Tempo.cpp"/>
           <FILE id="o69LuQ" name="Tempo.h" compile="0" resource="0" file="Source/Tempo.h"/>
           <FILE id="gu3W3U" name="General.h" compile="0" resource="0" file="Source/General.h"/>
@@ -327,8 +351,6 @@
       <GROUP id="{E98AFB64-DE96-83A1-81DC-1FA2D8D37DB8}" name="View">
         <FILE id="sM6zCj" name="BKUIComponents.h" compile="0" resource="0"
               file="Source/BKUIComponents.h"/>
-        <FILE id="Rorw4u" name="BKNumberPad.cpp" compile="1" resource="0" file="Source/BKNumberPad.cpp"/>
-        <FILE id="wjhX6E" name="BKNumberPad.h" compile="0" resource="0" file="Source/BKNumberPad.h"/>
         <GROUP id="{312ACC06-200C-E792-F54F-FC9ABB97A738}" name="BKSlider">
           <FILE id="mqhm7K" name="BKSlider.cpp" compile="1" resource="0" file="Source/BKSlider.cpp"/>
           <FILE id="NyvzY3" name="BKSlider.h" compile="0" resource="0" file="Source/BKSlider.h"/>
@@ -345,16 +367,20 @@
           <FILE id="SZIe4m" name="BKLevelMeter.h" compile="0" resource="0" file="Source/BKLevelMeter.h"/>
         </GROUP>
         <GROUP id="{CAAFD165-DFE7-A7F9-44CA-A33CEFE40708}" name="BKKeyboard">
+          <FILE id="XMOl2D" name="BKAbsoluteKeyboardSlider.cpp" compile="1" resource="0"
+                file="Source/BKAbsoluteKeyboardSlider.cpp"/>
+          <FILE id="UwvVBT" name="BKAbsoluteKeyboardSlider.h" compile="0" resource="0"
+                file="Source/BKAbsoluteKeyboardSlider.h"/>
+          <FILE id="NhsMzJ" name="BKCircularKeyboardSlider.cpp" compile="1" resource="0"
+                file="Source/BKCircularKeyboardSlider.cpp"/>
+          <FILE id="MNLlJ3" name="BKCircularKeyboardSlider.h" compile="0" resource="0"
+                file="Source/BKCircularKeyboardSlider.h"/>
           <FILE id="oxVQCp" name="BKKeyboard.cpp" compile="1" resource="0" file="Source/BKKeyboard.cpp"/>
           <FILE id="IrRGH7" name="BKKeyboard.h" compile="0" resource="0" file="Source/BKKeyboard.h"/>
           <FILE id="Gzzl3Q" name="BKKeyboardState.cpp" compile="1" resource="0"
                 file="Source/BKKeyboardState.cpp"/>
           <FILE id="whgJO1" name="BKKeyboardState.h" compile="0" resource="0"
                 file="Source/BKKeyboardState.h"/>
-          <FILE id="xFL3Cb" name="BKKeyboardSlider.cpp" compile="1" resource="0"
-                file="Source/BKKeyboardSlider.cpp"/>
-          <FILE id="xXx0sS" name="BKKeyboardSlider.h" compile="0" resource="0"
-                file="Source/BKKeyboardSlider.h"/>
         </GROUP>
         <GROUP id="{4B499D6C-5305-4070-7065-5CC7E1297454}" name="BKMenu">
           <FILE id="iHLTYB" name="BKMenu.h" compile="0" resource="0" file="Source/BKMenu.h"/>
@@ -369,40 +395,41 @@
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX" vst3Folder="~/STKs/VST3 SDK" aaxFolder=""
-               customXcodeResourceFolders="" customPList="" rtasFolder="" smallIcon="smHM8h"
-               bigIcon="iHGLGD">
+    <XCODE_MAC targetFolder="Builds/MacOSX" vst3Folder="/Users/dan/JUCE/modules/juce_audio_processors/format_types/VST3_SDK"
+               customXcodeResourceFolders="" customPList="" smallIcon="smHM8h"
+               bigIcon="iHGLGD" vstLegacyFolder="/Users/dan/JUCE_projects/modules/VST_SDK/VST2_SDK">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
-                       osxArchitecture="default" cppLibType="" osxCompatibility="default"
-                       osxSDK="default" enablePluginBinaryCopyStep="1"/>
+                       cppLibType="" enablePluginBinaryCopyStep="1"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="bitKlavier"
-                       osxCompatibility="10.9 SDK" osxSDK="default" enablePluginBinaryCopyStep="1"/>
+                       osxCompatibility="10.9 SDK" enablePluginBinaryCopyStep="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_video" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_opengl" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_video" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="stk" path="../../../JUCE/3p_modules"/>
+        <MODULEPATH id="SFZero" path="../../../JUCE/3p_modules/SFZero/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="landscape" keepCustomXcodeSchemes="1"
-                  customXcodeResourceFolders="~/Documents/bitKlavier resources/samples/"
+                  customXcodeResourceFolders="/Applications/bitKlavier/samples/&#10;./Source/soundfonts/&#10;&#10;"
                   iosBackgroundAudio="1" iosDevelopmentTeamID="" UIFileSharingEnabled="1"
-                  smallIcon="smHM8h" bigIcon="iHGLGD" customPList="&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&#10;&lt;plist&gt;&#10;&#9;&lt;dict&gt;&#10;&#9;&#9;&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&lt;dict&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;CFBundleTypeName&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;XML&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSHandlerRank&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;Alternate&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSItemContentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;public.xml&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&#9;&#9;&#9;&lt;/dict&gt;&#10;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
+                  smallIcon="A1o3FE" bigIcon="iHGLGD" customPList="&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&#10;&lt;plist&gt;&#10;&#9;&lt;dict&gt;&#10;&#9;&#9;&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&lt;dict&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;CFBundleTypeName&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;XML&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSHandlerRank&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;Alternate&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSItemContentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;public.xml&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&#9;&#9;&#9;&lt;/dict&gt;&#10;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
                   iPadScreenOrientation="landscape" iosDeviceFamily="1,2" PListPreprocess="1"
-                  iosBackgroundBle="1">
+                  iosBackgroundBle="1" iCloudPermissions="1">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        plistPreprocessorDefinitions="" iosCompatibility="8.0" enablePluginBinaryCopyStep="1"
@@ -411,25 +438,28 @@
                        iosCompatibility="8.0" enablePluginBinaryCopyStep="1" codeSigningIdentity="YT6AXURH62"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_video" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_opengl" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_video" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="stk" path="../../../JUCE/3p_modules"/>
+        <MODULEPATH id="SFZero" path="../../../JUCE/3p_modules/SFZero/modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
-    <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="C:\SDKs\VST3_SDK"
-            bigIcon="iHGLGD" smallIcon="smHM8h" windowsTargetPlatformVersion="10.0.16299.0">
+    <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="C:\Users\plork\Documents\SDKs\VST3_SDK"
+            bigIcon="iHGLGD" smallIcon="smHM8h" windowsTargetPlatformVersion="10.0.16299.0"
+            vstLegacyFolder="C:\Users\plork\Documents\SDKs\VST2_SDK">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="1" optimisation="1" targetName="bitKlavier" debugInformationFormat="ProgramDatabase"
@@ -454,6 +484,8 @@
         <MODULEPATH id="juce_audio_formats" path="..\..\..\JUCE\modules"/>
         <MODULEPATH id="juce_audio_devices" path="..\..\..\JUCE\modules"/>
         <MODULEPATH id="juce_audio_basics" path="..\..\..\JUCE\modules"/>
+        <MODULEPATH id="stk" path="../../../JUCE/3p_modules"/>
+        <MODULEPATH id="SFZero" path="../../../JUCE/3p_modules/SFZero/modules"/>
       </MODULEPATHS>
     </VS2017>
   </EXPORTFORMATS>
@@ -474,9 +506,12 @@
     <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_video" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="SFZero" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="stk" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
   </MODULES>
   <JUCEOPTIONS JUCE_QUICKTIME="disabled"/>
   <LIVE_SETTINGS>
     <OSX/>
+    <WINDOWS/>
   </LIVE_SETTINGS>
 </JUCERPROJECT>

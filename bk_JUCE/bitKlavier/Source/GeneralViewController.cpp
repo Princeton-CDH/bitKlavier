@@ -10,9 +10,150 @@
 
 #include "GeneralViewController.h"
 
+CommentViewController::CommentViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
+BKViewController(p,theGraph)
+{
+    setLookAndFeel(&buttonsAndMenusLAF);
+    
+    removeChildComponent(&hideOrShow);
+    
+    addAndMakeVisible(comment);
+    comment.setName("comment");
+    comment.setMultiLine(true);
+    comment.setWantsKeyboardFocus(true);
+    
+    comment.setReturnKeyStartsNewLine(true);
+    comment.addListener(this);
+    comment.setText("Text here...");
+#if JUCE_IOS
+    comment.setScrollbarsShown(true);
+#endif
+    //comment.setColour(TextEditor::ColourIds::high, )
+    
+    comment.setColour(TextEditor::ColourIds::backgroundColourId, Colours::burlywood.withMultipliedBrightness(0.45f));
+    comment.setColour(TextEditor::ColourIds::textColourId, Colours::antiquewhite);
+    
+    comment.setOpaque(false);
+    
+    addAndMakeVisible(ok);
+    ok.setButtonText("Ok");
+    ok.addListener(this);
+    ok.setColour(TextEditor::ColourIds::backgroundColourId, Colours::black.withAlpha(0.5f));
+    
+    addAndMakeVisible(cancel);
+    cancel.setButtonText("Cancel");
+    cancel.addListener(this);
+    cancel.setColour(TextEditor::ColourIds::backgroundColourId, Colours::red.withAlpha(0.2f));
+}
+
+CommentViewController::~CommentViewController()
+{
+    setLookAndFeel(nullptr);
+}
+
+void CommentViewController::update(void)
+{
+    comment.setText(processor.updateState->comment, dontSendNotification);
+    comment.grabKeyboardFocus();
+}
+
+void CommentViewController::paint (Graphics& g)
+{
+    g.fillAll(Colours::transparentBlack);
+}
+
+void CommentViewController::resized(void)
+{
+    float heightUnit = (getHeight() - hideOrShow.getHeight()) * 0.1;
+    
+#if JUCE_IOS
+    cancel.setBounds    (0,                 hideOrShow.getBottom(), getWidth()*0.5,         2*heightUnit);
+    ok.setBounds        (getWidth()*0.5,    cancel.getY(),          getWidth()*0.5,     2*heightUnit);
+    comment.setBounds   (0,                 cancel.getBottom(),     getWidth(),     8*heightUnit);
+#else
+    comment.setBounds   (0,                 hideOrShow.getBottom(), getWidth(),         9*heightUnit);
+    cancel.setBounds    (comment.getX(),    comment.getBottom(),    getWidth()*0.5,     1*heightUnit);
+    ok.setBounds        (cancel.getRight(), cancel.getY(),          getWidth()*0.5,     1*heightUnit);
+#endif
+}
+
+void CommentViewController::bkTextFieldDidChange (TextEditor& tf)
+{
+
+}
+
+void CommentViewController::bkButtonClicked (Button* b)
+{
+    if (b == &ok)
+    {
+        processor.updateState->comment = comment.getText();
+        processor.updateState->commentDidChange = true;
+        processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+    else if (b == &cancel)
+    {
+        processor.updateState->comment = "";
+        processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+}
+
+AboutViewController::AboutViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
+BKViewController(p,theGraph)
+{
+    setLookAndFeel(&buttonsAndMenusLAF);
+    
+    addAndMakeVisible(about);
+    about.setEnabled(false);
+    about.setJustification(Justification::centredTop);
+    about.setMultiLine(true);
+    about.setText("Welcome to bitKlavier!\n\n\n\n   bitKlavier was created by Dan Trueman and Mike Mulshine at Princeton University.\n\n\n\n   For more information, visit www.bitKlavier.com.");
+    
+    image = ImageCache::getFromMemory(BinaryData::icon_png, BinaryData::icon_pngSize);
+    
+    placement = RectanglePlacement::centred;
+}
+
+AboutViewController::~AboutViewController()
+{
+    setLookAndFeel(nullptr);
+}
+
+void AboutViewController::paint (Graphics& g)
+{
+    g.fillAll(Colours::black);
+    
+    g.setOpacity (1.0f);
+    
+    g.drawImage (image, imageRect, placement);
+}
+
+void AboutViewController::resized(void)
+{
+    hideOrShow.setBounds(10,10,gComponentComboBoxHeight,gComponentComboBoxHeight);
+    
+    float imageZ = getHeight() * 0.5;
+    float imageX = getWidth() * 0.5 - imageZ * 0.5;
+    float imageY = 50;
+    
+    imageRect.setBounds(imageX, imageY, imageZ, imageZ);
+    
+    about.setBounds(10, imageRect.getBottom() + 20, getWidth() - 20, getBottom() - (imageRect.getBottom() + 20));
+    
+    repaint();
+}
+
+void AboutViewController::bkButtonClicked (Button* b)
+{
+    if (b == &hideOrShow)
+    {
+        processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+}
+
+
 //==============================================================================
 GeneralViewController::GeneralViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph) 
+BKViewController(p, theGraph)
 {
     
     setLookAndFeel(&buttonsAndMenusLAF);
@@ -23,7 +164,6 @@ BKViewController(p, theGraph)
     addAndMakeVisible(iconImageComponent);
     
     A4tuningReferenceFrequencySlider = new BKSingleSlider("A4 reference frequency", 415., 450., 440., 0.1);
-    //A4tuningReferenceFrequencySlider->setSkewFactorFromMidPoint(1.);
     A4tuningReferenceFrequencySlider->setJustifyRight(false);
     A4tuningReferenceFrequencySlider->addMyListener(this);
     addAndMakeVisible(A4tuningReferenceFrequencySlider);
@@ -33,36 +173,40 @@ BKViewController(p, theGraph)
     tempoMultiplierSlider->setJustifyRight(false);
     tempoMultiplierSlider->addMyListener(this);
     addAndMakeVisible(tempoMultiplierSlider);
+    
+    GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
+    
+    invertSustainB.addListener(this);
+    invertSustainB.setToggleState(gen->getInvertSustain(), dontSendNotification);
+    processor.setSustainInversion(gen->getInvertSustain());
+    addAndMakeVisible(invertSustainB);
+    
+    noteOnSetsNoteOffVelocityB.addListener(this);
+    noteOnSetsNoteOffVelocityB.setToggleState(gen->getNoteOnSetsNoteOffVelocity(), dontSendNotification);
+    addAndMakeVisible(noteOnSetsNoteOffVelocityB);
+    
+    invertSustainL.setText("invert sustain", dontSendNotification);
+    addAndMakeVisible(invertSustainL);
+    
+    noteOnSetsNoteOffVelocityL.setText("noteOn velocity sets noteOff velocity", dontSendNotification);
+    addAndMakeVisible(noteOnSetsNoteOffVelocityL);
 
-    /*
-    // Labels
-    generalL = OwnedArray<BKLabel>();
-    generalL.ensureStorageAllocated(cGeneralParameterTypes.size());
-    
-    for (int i = 0; i < cGeneralParameterTypes.size(); i++)
-    {
-        generalL.set(i, new BKLabel());
-        addAndMakeVisible(generalL[i]);
-        generalL[i]->setName(cGeneralParameterTypes[i]);
-        generalL[i]->setText(cGeneralParameterTypes[i], NotificationType::dontSendNotification);
-    }
-    
-    // Text Fields
-    generalTF = OwnedArray<BKTextField>();
-    generalTF.ensureStorageAllocated(cGeneralParameterTypes.size());
-    
-    for (int i = 0; i < cGeneralParameterTypes.size(); i++)
-    {
-        generalTF.set(i, new BKTextField());
-        addAndMakeVisible(generalTF[i]);
-        generalTF[i]->addListener(this);
-        generalTF[i]->setName(cGeneralParameterTypes[i]);
-    }
-     */
+#if JUCE_IOS
+    tempoMultiplierSlider->addWantsBigOneListener(this);
+    A4tuningReferenceFrequencySlider->addWantsBigOneListener(this);
+#endif
     
     update();
     
 }
+
+#if JUCE_IOS
+void GeneralViewController::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
+}
+#endif
 
 GeneralViewController::~GeneralViewController()
 {
@@ -77,10 +221,6 @@ void GeneralViewController::paint (Graphics& g)
 void GeneralViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
-    
-    float numberPadHeight = getHeight() - 2 * gYSpacing;
-    float numberPadWidth = getWidth() / 2 - 2 * gXSpacing;
-    numberPad.setSize(numberPadWidth, numberPadHeight);
 
     iconImageComponent.setBounds(area);
     area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
@@ -91,9 +231,33 @@ void GeneralViewController::resized()
     comboBoxSlice.removeFromLeft(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     
+   
+    
+    A4tuningReferenceFrequencySlider->setBounds(hideOrShow.getX()+gXSpacing, hideOrShow.getBottom()+100,
+                                                getWidth()/2.-10, gComponentSingleSliderHeight);
+    
+    tempoMultiplierSlider->setBounds(A4tuningReferenceFrequencySlider->getX(), A4tuningReferenceFrequencySlider->getBottom()+10,
+                                                A4tuningReferenceFrequencySlider->getWidth(), A4tuningReferenceFrequencySlider->getHeight());
+    
+    invertSustainB.setBounds(tempoMultiplierSlider->getX()+5, tempoMultiplierSlider->getBottom() + 10,
+                             tempoMultiplierSlider->getWidth() * 0.25, 30);
+    invertSustainB.changeWidthToFitText();
+    invertSustainL.setBounds(invertSustainB.getRight() +gXSpacing, invertSustainB.getY(),
+                             150, 30);
+    
+    noteOnSetsNoteOffVelocityB.setBounds(tempoMultiplierSlider->getX()+5, invertSustainL.getBottom() + 10,
+                             tempoMultiplierSlider->getWidth() * 0.25, 30);
+    noteOnSetsNoteOffVelocityB.changeWidthToFitText();
+    noteOnSetsNoteOffVelocityL.setBounds(noteOnSetsNoteOffVelocityB.getRight() +gXSpacing, noteOnSetsNoteOffVelocityB.getY(),
+                             250, 30);
+    
+   
+    
+    
+    /*
     Rectangle<int> sliderSlice = leftColumn;
     sliderSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
-    
+     
     int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 4.;
     A4tuningReferenceFrequencySlider->setBounds(sliderSlice.getX(),
                                    nextCenter - gComponentSingleSliderHeight/2 + 8,
@@ -105,112 +269,35 @@ void GeneralViewController::resized()
                                           nextCenter - gComponentSingleSliderHeight/2 + 8,
                                           sliderSlice.getWidth(),
                                           gComponentSingleSliderHeight);
+     
     
-    /*
-    // Labels
-    int i = 0;
-    int lX = 0;
-    int lY = gComponentLabelHeight + gYSpacing;
-
-    for (int n = 0; n < cGeneralParameterTypes.size(); n++)
-    {
-        generalL[n]->setTopLeftPosition(lX, gYSpacing + n * lY);
-    }
+    nextCenter = sliderSlice.getY() + sliderSlice.getHeight();
+    invertSustainL.setBounds(sliderSlice.getX(),
+                            nextCenter - gComponentSingleSliderHeight/2 + 8,
+                            sliderSlice.getWidth()/2,
+                            gComponentSingleSliderHeight*2);
     
-    // Text fields
-    i = 0;
-    int tfX = gComponentLabelWidth + gXSpacing;
-    int tfY = gComponentTextFieldHeight + gYSpacing;
-
-    for (int n = 0; n < cGeneralParameterTypes.size(); n++)
-    {
-        generalTF[n]->setTopLeftPosition(tfX, gYSpacing + n * tfY);
-    }
+    invertSustainB.setBounds(invertSustainL.getRight()+gXSpacing,
+                             invertSustainL.getY(), invertSustainL.getHeight(), invertSustainL.getHeight());
      */
-    
 }
+
 
 void GeneralViewController::bkTextFieldDidChange(TextEditor& tf)
 {
-    /*
-    String text = tf.getText();
-    String name = tf.getName();
-    
-    DBG(name + ": |" + text + "|");
-    
-    float f = text.getFloatValue();
-    int i = text.getIntValue();
-    
-    GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
-    
-    if (name == cGeneralParameterTypes[GeneralTuningFundamental])
-    {
-        gen->setTuningFundamental(f);
-    }
-    else if (name == cGeneralParameterTypes[GeneralGlobalGain])
-    {
-        gen->setGlobalGain(f);
-    }
-    else if (name == cGeneralParameterTypes[GeneralSynchronicGain])
-    {
-        gen->setSynchronicGain(f);
-    }
-    else if (name == cGeneralParameterTypes[GeneralNostalgicGain])
-    {
-        gen->setNostalgicGain(f);
-    }
-    else if (name == cGeneralParameterTypes[GeneralDirectGain])
-    {
-        gen->setDirectGain(f);
-    }
-    else if (name == cGeneralParameterTypes[GeneralResonanceGain])
-    {
-        gen->setResonanceGain(f);
-    }
-    else if (name == cGeneralParameterTypes[GeneralHammerGain])
-    {
-        gen->setHammerGain(f);
-    }
-    else if (name == cGeneralParameterTypes[GeneralTempoMultiplier])
-    {
-        gen->setTempoMultiplier(f);
-    }
-    else if (name == cGeneralParameterTypes[GeneralResAndHammer])
-    {
-        gen->setResonanceAndHammer((bool)i);
-    }
-    else if (name == cGeneralParameterTypes[GeneralInvertSustain])
-    {
-        gen->setInvertSustain((bool)i);
-    }
-    else
-    {
-        // No other text field.
-    }
-     */
+
 }
 
 void GeneralViewController::update(void)
 {
     GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
     
-    //generalTF[GeneralTuningFundamental] ->setText(   String( gen->getTuningFundamental()));
-    //generalTF[GeneralGlobalGain]        ->setText(   String( gen->getGlobalGain()));
-    //generalTF[GeneralSynchronicGain]    ->setText(   String( gen->getSynchronicGain()));
-    //generalTF[GeneralNostalgicGain]     ->setText(   String( gen->getNostalgicGain()));
-    //generalTF[GeneralDirectGain]        ->setText(   String( gen->getDirectGain()));
-    //generalTF[GeneralResonanceGain]     ->setText(   String( gen->getResonanceGain()));
-    //generalTF[GeneralHammerGain]        ->setText(   String( gen->getHammerGain()));
-    //generalTF[GeneralTempoMultiplier]   ->setText(   String( gen->getTempoMultiplier()));
-    //generalTF[GeneralResAndHammer]      ->setText(   String( gen->getResonanceAndHammer()));
-    //generalTF[GeneralInvertSustain]     ->setText(   String( gen->getInvertSustain()));
-    
     A4tuningReferenceFrequencySlider->setValue(gen->getTuningFundamental(), dontSendNotification);
     tempoMultiplierSlider->setValue(gen->getTempoMultiplier(), dontSendNotification);
-    
+    invertSustainB.setToggleState(gen->getInvertSustain(), dontSendNotification);
 }
 
-void GeneralViewController::BKSingleSliderValueChanged(String name, double val)
+void GeneralViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
 
@@ -226,52 +313,26 @@ void GeneralViewController::BKSingleSliderValueChanged(String name, double val)
     }
 }
 
-void GeneralViewController::bkSingleSliderWantsKeyboard(BKSingleSlider* slider)
-{
-    DBG("BEGIN: " + String(slider->getValue()));
-    
-    //numberPadDismissed(&numberPad);
-    
-    latched_BKSingleSlider = slider;
-    
-    numberPad.setTopLeftPosition((slider->getX() > getWidth()) ? gXSpacing : (0.5 * getWidth() + gXSpacing), gYSpacing);
-    
-    numberPad.setEnabled(NumberLBracket, false);
-    numberPad.setEnabled(NumberRBracket, false);
-    numberPad.setEnabled(NumberNegative, false);
-    numberPad.setEnabled(NumberColon, false);
-    numberPad.setEnabled(NumberSpace, false);
-    
-    numberPad.setText(String(slider->getValue()));
-    
-    numberPad.setVisible(true);
-}
-
-void GeneralViewController::numberPadChanged(BKNumberPad*)
-{
-    String text = numberPad.getText();
-    
-    DBG("CHANGED: " + text);
-    
-    latched_BKSingleSlider->setText(text);
-}
-
-void GeneralViewController::numberPadDismissed(BKNumberPad*)
-{
-    String text = numberPad.getText();
-    
-    DBG("DISMISSED: " + text);
-    
-    if (latched_BKSingleSlider != nullptr)
-        latched_BKSingleSlider->setValue(text.getDoubleValue(), sendNotification);
-    
-    numberPad.setVisible(false);
-}
-
 void GeneralViewController::bkButtonClicked (Button* b)
 {
+    GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
+    
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+    }
+    else if (b == &invertSustainB)
+    {
+        //bool inversion =  (bool) b->getToggleStateValue().toString().getIntValue();
+        bool inversion =  b->getToggleState();
+        DBG("invert sustain button = " + String((int)inversion));
+        processor.setSustainInversion(inversion);
+        gen->setInvertSustain(inversion);
+    }
+    else if (b == &noteOnSetsNoteOffVelocityB)
+    {
+        bool newstate =  b->getToggleState();
+        DBG("invert noteOnSetsNoteOffVelocity = " + String((int)newstate));
+        gen->setNoteOnSetsNoteOffVelocity(newstate);
     }
 }

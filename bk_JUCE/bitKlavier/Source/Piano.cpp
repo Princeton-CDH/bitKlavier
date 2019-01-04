@@ -93,8 +93,8 @@ void Piano::configure(void)
         BKPreparationType thisType = item->getType();
         int thisId = item->getId();
         
-        DBG("type: " + cPreparationTypes[thisType] + " Id: " + String(thisId));
-        DBG("bounds: " + rectangleToString(item->getBounds()));
+        //DBG("type: " + cPreparationTypes[thisType] + " Id: " + String(thisId));
+        //DBG("bounds: " + rectangleToString(item->getBounds()));
         
         if (thisId > processor.gallery->getIdCount(thisType)) processor.gallery->setIdCount(thisType, thisId);
         
@@ -185,7 +185,7 @@ void Piano::configure(void)
         }
     }
     
-    processor.updateState->pianoDidChangeForGraph = true;
+    //processor.updateState->pianoDidChangeForGraph = true;
 }
 
 SynchronicProcessor::Ptr Piano::addSynchronicProcessor(int thisId)
@@ -267,11 +267,16 @@ NostalgicProcessor::Ptr Piano::addNostalgicProcessor(int thisId)
 DirectProcessor::Ptr Piano::addDirectProcessor(int thisId)
 {
     DirectProcessor::Ptr dproc = new DirectProcessor(processor.gallery->getDirect(thisId),
-                                    defaultT,
-                                    &processor.mainPianoSynth,
-                                    &processor.resonanceReleaseSynth,
-                                    &processor.hammerReleaseSynth);
-    dproc->prepareToPlay(sampleRate, &processor.mainPianoSynth, &processor.resonanceReleaseSynth,&processor.hammerReleaseSynth);
+                                                     defaultT,
+                                                     &processor.mainPianoSynth,
+                                                     &processor.resonanceReleaseSynth,
+                                                     &processor.hammerReleaseSynth);
+    
+    dproc->prepareToPlay(sampleRate,
+                         &processor.mainPianoSynth,
+                         &processor.resonanceReleaseSynth,
+                         &processor.hammerReleaseSynth);
+    
     dprocessor.add(dproc);
     
     return dproc;
@@ -352,7 +357,7 @@ void Piano::addProcessor(BKPreparationType thisType, int thisId)
 
 bool Piano::contains(BKItem::Ptr thisItem)
 {
-    for (auto item : items) if (item == thisItem) return true;
+    for (auto item : items) if (item == (BKItem *)thisItem) return true;
     
     return false;
 }
@@ -645,8 +650,6 @@ void Piano::configurePianoMap(BKItem::Ptr map)
         for (auto key : thisKeymap->keys())
         {
             pianoMap.set(key, pianoTarget);
-            
-            DBG("PIANOMAP key: " + String(key) + " piano: " + String(pianoTarget));
         }
     }
 }
@@ -820,23 +823,23 @@ void Piano::deconfigureTempoModificationForKeys(TempoModPreparation::Ptr mod, Ar
     }
 }
 
-void Piano::configureTuningModification(int key, TuningModPreparation::Ptr dmod, Array<int> whichPreps)
+void Piano::configureTuningModification(int key, TuningModPreparation::Ptr mod, Array<int> whichPreps)
 {
     
     //DBG("TUNINGMOD key: " + String(key) + " mod: " + String(dmod->getId()) + " preps: " + intArrayToString(whichPreps));
     
-    int whichMod = dmod->getId();
+    int whichMod = mod->getId();
 
     // Add Modifications
-    for (int n = (int)cTuningParameterTypes.size(); --n >= 0; )
+    for (int i = 0; i < TuningParameterTypeNil; i++)
     {
-        String param = dmod->getParam((TuningParameterType)n);
+        String param = mod->getParam((TuningParameterType)i);
         
         if (param != "")
         {
             for (auto prep : whichPreps)
             {
-                modificationMap[key]->addTuningModification(new TuningModification(key, prep, (TuningParameterType)n, param, whichMod));
+                modificationMap[key]->addTuningModification(new TuningModification(key, prep, (TuningParameterType)i, param, whichMod));
             }
         }
     }
@@ -856,6 +859,9 @@ void Piano::configureTuningModification(TuningModPreparation::Ptr mod, Array<int
             otherKeys.remove(key);
         }
     }
+    
+    DBG("whicpreps: " + intArrayToString(whichPreps));
+    mod->setPreps(whichPreps);
     
     deconfigureTuningModificationForKeys(mod, otherKeys);
 }
@@ -1239,7 +1245,5 @@ void Piano::setState(XmlElement* e)
         item->setCentrePosition((item->getX() + item->getWidth() / 2) * processor.uiScaleFactor, (item->getY() + item->getHeight() / 2) * processor.uiScaleFactor);
     }
 #endif
+
 }
-
-
-

@@ -24,21 +24,18 @@ resizer(new ResizableCornerComponent (this, constrain))
     viewPort.setViewPosition(0, 0);
     addAndMakeVisible(viewPort);
     
-#if !JUCE_IOS
-    addAndMakeVisible (resizer);
-    
-    resizer->setAlwaysOnTop(true);
-#endif
-    
 #if JUCE_IOS
     setSize(processor.screenWidth, processor.screenHeight);
-    
-    constrain->setSizeLimits(processor.screenWidth, processor.screenHeight, processor.screenWidth, processor.screenHeight);
 #else
     setSize((processor.screenWidth < DEFAULT_WIDTH) ? processor.screenWidth : DEFAULT_WIDTH,
             (processor.screenHeight < DEFAULT_HEIGHT) ? processor.screenHeight : DEFAULT_HEIGHT);
+
+#endif
+    constrain->setSizeLimits(DEFAULT_MIN_WIDTH, DEFAULT_MIN_HEIGHT, processor.screenWidth, processor.screenHeight);
     
-    constrain->setSizeLimits(DEFAULT_MIN_WIDTH, DEFAULT_MIN_HEIGHT, DEFAULT_MIN_WIDTH * 8, DEFAULT_MIN_HEIGHT * 8);
+#if !JUCE_IOS
+    addAndMakeVisible(resizer);
+    resizer->setAlwaysOnTop(true);
 #endif
     
     //processor.updateState->pianoDidChangeForGraph = true;
@@ -62,13 +59,13 @@ void BKAudioProcessorEditor::resized()
     
     viewPort.setBoundsRelative(0.0f,0.0f,1.0f,1.0f);
     
-#if !JUCE_IOS
-    resizer->setBounds(getWidth()-16, getHeight()-16, 16, 16);
-#endif
-    
     mvc.setSize(getWidth(), getHeight());
     mvc.resized();
     
+#if !JUCE_IOS
+    resizer->setBounds(getWidth()-16, getHeight()-16, 16, 16);
+#endif
+
 }
 
 

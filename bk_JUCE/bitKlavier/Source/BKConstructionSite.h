@@ -20,6 +20,8 @@
 
 #include "BKGraph.h"
 
+#include "BKViewController.h"
+
 class BKConstructionSite : public LassoSource<BKItem*>, public MouseHoldListener
 {
 public:
@@ -44,12 +46,6 @@ public:
     void paste(void);
     void cut(void);
     void selectAll(void);
-    
-    
-#if TRY_UNDO
-    void undo(void);
-    void redo(void);
-#endif
     
     inline int getNumSelected(void) { return graph->getSelectedItems().size(); }
     
@@ -204,8 +200,6 @@ private:
     void resized() override;
     
     void mouseDown (const MouseEvent& eo) override;
-    
-    void mouseDoubleClick (const MouseEvent& eo) override;
     
     void mouseUp (const MouseEvent& eo) override;
     

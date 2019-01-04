@@ -94,7 +94,7 @@ public:
         int index = 0;
         for (auto item : connections)
         {
-            if (item == thisItem) connections.remove(index);
+            if (item == (BKItem *)thisItem) connections.remove(index);
             
             index++;
         }
@@ -196,7 +196,7 @@ public:
         {
             BKItem::PtrArr connex = getConnectionsOfType((BKPreparationType)type);
             
-            s += cPreparationTypes[type]+":";
+            s = s + cPreparationTypes[type]+":";
             
             for (auto item : connex)
             {
@@ -232,7 +232,7 @@ public:
     RectanglePlacement placement;
     
     //void textEditorReturnKeyPressed     (TextEditor&)           override;
-    void bkTextFieldDidChange           (TextEditor&)           override;
+    void bkTextFieldDidChange           (TextEditor&)           override {};
     //void bkTextFieldReturnKeyPressed    (TextEditor&)           override;
     void bkComboBoxDidChange            (ComboBox*)             override;
     void bkButtonClicked                (Button* b)             override {};
@@ -254,21 +254,10 @@ public:
     void setCommentText(String text) { comment.setText(text);}
     String getCommentText(void) { return comment.getText();}
     
-    void exitComment(void);
-    
-    void enterComment(void);
-    
-    void focusLost (FocusChangeType) override
-    {
-        exitComment();
-    }
-    
 private:
     
     BKAudioProcessor& processor;
     Label label;
-    
-    bool wasJustDragged;
     
     ScopedPointer<ComponentBoundsConstrainer> constrain;
     
@@ -338,7 +327,6 @@ public:
     
 private:
     BKAudioProcessor& processor;
-
     
     JUCE_LEAK_DETECTOR(BKItemGraph)
 };

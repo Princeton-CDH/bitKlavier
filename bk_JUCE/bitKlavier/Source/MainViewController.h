@@ -84,7 +84,6 @@ private:
     Image image;
     RectanglePlacement placement;
     
-    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSplashScreen)
 };
 
@@ -139,7 +138,7 @@ private:
     
     //ImageComponent backgroundImageComponent;
     
-    ScopedPointer<Slider> mainSlider;
+    Slider mainSlider;
     ScopedPointer<BKLevelMeterComponent> levelMeterComponentL;
     ScopedPointer<BKLevelMeterComponent> levelMeterComponentR;
     
@@ -149,10 +148,14 @@ private:
     BKKeymapKeyboardState keyboardState;
     Component *keyboardComponent;
     
+    BKComboBox sampleCB;
+    BKComboBox instrumentCB;
+    
     DisplayType display;
     
     bool initial;
     int initialWidth, initialHeight;
+    
     /*
     void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override;
@@ -168,6 +171,11 @@ private:
     void sliderValueChanged     (Slider* slider)                override;
     void mouseDown (const MouseEvent &event) override;
     
+    void bkComboBoxDidChange(ComboBox* cb) override;
+    
+    void fillSampleCB();
+    void fillInstrumentCB();
+    
     void drawPreparationPanel(void);
 
     int timerCallbackCount;
@@ -177,6 +185,9 @@ private:
     bool isAddingFromMidiInput;
     
     BKButtonAndMenuLAF laf;
+    BKButtonAndMenuLAF comboBoxRightJustifyLAF;
+    
+    TooltipWindow tipwindow;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainViewController)
 };

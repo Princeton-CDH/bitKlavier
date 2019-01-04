@@ -16,6 +16,9 @@
 class SynchronicViewController :
 public BKMultiSlider::Listener,
 public BKViewController
+#if JUCE_IOS
+, public WantsBigOne::Listener
+#endif
 {
 public:
     SynchronicViewController(BKAudioProcessor&, BKItemGraph* theGraph);
@@ -29,13 +32,18 @@ public:
     
     virtual void update(void) {};
     
+#if JUCE_IOS
+    void iWantTheBigOne(TextEditor*, String name) override;
+#endif
+    
 protected:
     
-    OwnedArray<BKLabel> synchronicL;
-    OwnedArray<BKTextField> synchronicTF;
-    OwnedArray<BKTextField> modSynchronicTF;
+    //OwnedArray<BKLabel> synchronicL;
+    //OwnedArray<BKTextField> synchronicTF;
+    //OwnedArray<BKTextField> modSynchronicTF;
     
     OwnedArray<BKMultiSlider> paramSliders;
+    OwnedArray<BKADSRSlider> envelopeSliders;
     
     virtual void multiSliderDidChange(String name, int whichSlider, Array<float> values) = 0;
     virtual void multiSlidersDidChange(String name, Array<Array<float>> values) = 0;
@@ -60,9 +68,18 @@ protected:
     ScopedPointer<BKRangeSlider> clusterMinMaxSlider;
     ScopedPointer<BKSingleSlider> gainSlider;
     
+    BKLabel modeLabel;
+    
+    void setShowADSR(String name, bool newval);
+    int visibleADSR;
+    
+    BKLabel envelopeName;
+    
     void fillModeSelectCB(void);
     
 private:
+    
+    bool showADSR;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicViewController)
 };
@@ -72,6 +89,7 @@ public SynchronicViewController,
 public BKSingleSlider::Listener,
 public BKRangeSlider::Listener,
 public BKEditableComboBoxListener,
+public BKADSRSlider::Listener,
 public Timer
 {
 public:
@@ -88,6 +106,8 @@ public:
     
     static void actionButtonCallback(int action, SynchronicPreparationEditor*);
     
+    void closeSubWindow();
+    
     int addPreparation(void);
     int duplicatePreparation(void);
     void setCurrentId(int Id);
@@ -98,9 +118,12 @@ private:
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;
     void bkComboBoxDidChange        (ComboBox* box)         override;
-    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
+    void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
+    void BKADSRButtonStateChanged(String name, bool shift, bool state) override;
+    
     void buttonClicked (Button* b) override;
     
     void multiSliderDidChange(String name, int whichSlider, Array<float> values) override;
@@ -116,6 +139,7 @@ public SynchronicViewController,
 public BKSingleSlider::Listener,
 public BKRangeSlider::Listener,
 public BKEditableComboBoxListener,
+public BKADSRSlider::Listener,
 public Timer
 {
 public:
@@ -146,9 +170,11 @@ private:
     void bkTextFieldDidChange       (TextEditor&)           override;
     void bkMessageReceived          (const String& message) override;
     void bkComboBoxDidChange        (ComboBox* box)         override;
-    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
+    void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
+    void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
     void buttonClicked (Button* b) override;
     
     void multiSliderDidChange(String name, int whichSlider, Array<float> values) override;

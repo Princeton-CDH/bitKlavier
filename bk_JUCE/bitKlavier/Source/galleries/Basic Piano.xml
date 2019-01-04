@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<gallery name="Basic Piano" defaultPiano="1">
-  <idCount i0="15" i1="28" i2="24" i3="20" i4="16" i5="1527" i6="10" i7="10"
-           i8="10" i9="12" i10="10" i11="10" i12="10" i13="11" i14="30"/>
+<gallery name="Basic Piano" sampleType="3" defaultPiano="1">
+  <idCount i0="16" i1="28" i2="24" i3="20" i4="16" i5="1533" i6="10" i7="10"
+           i8="10" i9="12" i10="10" i11="10" i12="10" i13="12" i14="30"
+           i15="0"/>
   <general globalGain="1" directGain="1" synchronicGain="1" nostalgicGain="1"
            resonanceGain="1" hammerGain="0.0099999997764825820923" tempoMultiplier="1"
            resAndHammer="1" invertSustain="0" tuningFund="440"/>
@@ -28,7 +29,10 @@
   <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
     <transposition f0="0"/>
   </direct>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
+  <direct Id="16" name="16" gain="1" resGain="1" hammerGain="1">
+    <transposition f0="0"/>
+  </direct>
+  <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"
               clusterThresh="500" mode="0" beatsToSkip="0">
     <beatMultipliers f0="1"/>
     <lengthMultipliers f0="1"/>
@@ -63,19 +67,19 @@
   <keymap Id="-1" name="-1"/>
   <piano name="Basic Piano" Id="1">
     <item>
-      <item name="Tuning12" type="3" Id="11" piano="-1" active="1" X="412"
-            Y="86"/>
+      <item name="Tuning12" type="3" Id="11" piano="-1" active="1" X="430.5"
+            Y="78.5" W="57" H="129"/>
       <connections>
-        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="372"
-              Y="219"/>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="430"
+              Y="211" W="144" H="64"/>
       </connections>
     </item>
     <item>
-      <item name="Keymap11" type="5" Id="11" piano="-1" active="1" X="388"
-            Y="328"/>
+      <item name="Keymap11" type="5" Id="11" piano="-1" active="1" X="430"
+            Y="320" W="106" H="72"/>
       <connections>
-        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="372"
-              Y="219"/>
+        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="430"
+              Y="211" W="144" H="64"/>
       </connections>
     </item>
   </piano>

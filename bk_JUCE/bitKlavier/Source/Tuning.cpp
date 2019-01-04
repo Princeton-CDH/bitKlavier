@@ -9,6 +9,7 @@
  */
 
 #include "Tuning.h"
+#define ABSOLUTE_OFFSET_SIZE 256
 
 
 TuningProcessor::TuningProcessor(Tuning::Ptr tuning):
@@ -23,33 +24,63 @@ TuningProcessor::~TuningProcessor()
 }
 
 //returns offsets; main callback
-float TuningProcessor::getOffset(int midiNoteNumber)
+float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
 {
     float lastNoteTuningTemp = lastNoteTuning;
     float lastNoteOffset;
-    
+ 
     //do adaptive tunings if using
-    if(tuning->aPrep->getTuning() == AdaptiveTuning || tuning->aPrep->getTuning() == AdaptiveAnchoredTuning)
+    if(tuning->aPrep->getScale() == AdaptiveTuning || tuning->aPrep->getScale() == AdaptiveAnchoredTuning)
     {
         float lastNoteOffset = adaptiveCalculate(midiNoteNumber);
-        lastNoteTuning = midiNoteNumber + lastNoteOffset;
-        lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
+        
+        if(updateLastInterval)
+        {
+            lastNoteTuning = midiNoteNumber + lastNoteOffset;
+            lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
+        }
+
         return lastNoteOffset;
     }
     
+    
+    //do nTone tuning if nToneSemitoneWidth != 100cents
+    if(tuning->aPrep->getNToneSemitoneWidth() != 100)
+    {
+        lastNoteOffset = .01 * (midiNoteNumber - tuning->aPrep->getNToneRoot()) * (tuning->aPrep->getNToneSemitoneWidth() - 100);
+        int midiNoteNumberTemp = round(midiNoteNumber + lastNoteOffset);
+        
+        Array<float> currentTuning;
+        if(tuning->aPrep->getScale() == CustomTuning) currentTuning = tuning->aPrep->getCustomScale();
+        else currentTuning = tuning->tuningLibrary.getUnchecked(tuning->aPrep->getScale());
+        
+        lastNoteOffset += (currentTuning[(midiNoteNumberTemp - tuning->aPrep->getFundamental()) % currentTuning.size()] +
+                          + tuning->aPrep->getAbsoluteOffsets().getUnchecked(midiNoteNumber) +
+                          tuning->aPrep->getFundamentalOffset());
+        
+        if(updateLastInterval)
+        {
+            lastNoteTuning = midiNoteNumber + lastNoteOffset;
+            lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
+        }
+        
+        return lastNoteOffset;
+    }
 
     //else do regular tunings
     Array<float> currentTuning;
-    if(tuning->aPrep->getTuning() == CustomTuning) currentTuning = tuning->aPrep->getCustomScale();
-    else currentTuning = tuning->tuningLibrary.getUnchecked(tuning->aPrep->getTuning());
+    if(tuning->aPrep->getScale() == CustomTuning) currentTuning = tuning->aPrep->getCustomScale();
+    else currentTuning = tuning->tuningLibrary.getUnchecked(tuning->aPrep->getScale());
     
     lastNoteOffset = (currentTuning[(midiNoteNumber - tuning->aPrep->getFundamental()) % currentTuning.size()] +
                       + tuning->aPrep->getAbsoluteOffsets().getUnchecked(midiNoteNumber) +
                       tuning->aPrep->getFundamentalOffset());
     
-    
-    lastNoteTuning = midiNoteNumber + lastNoteOffset;
-    lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
+    if(updateLastInterval)
+    {
+        lastNoteTuning = midiNoteNumber + lastNoteOffset;
+        lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
+    }
     
     return lastNoteOffset;
     
@@ -59,33 +90,47 @@ float TuningProcessor::getOffset(int midiNoteNumber)
 //for keeping track of current cluster size
 void TuningProcessor::processBlock(int numSamples)
 {
-    if(tuning->aPrep->getTuning() == AdaptiveTuning || tuning->aPrep->getTuning() == AdaptiveAnchoredTuning) {
+    TuningSystem currentTuning = tuning->getCurrentScaleId();
+    
+    if (currentTuning == AdaptiveTuning || currentTuning == AdaptiveAnchoredTuning) {
         
-        if(clusterTime <= tuning->aPrep->getAdaptiveClusterThresh() * sampleRate * 0.001) clusterTime += numSamples;
+        if(clusterTime <= (tuning->aPrep->getAdaptiveClusterThresh() * sampleRate * 0.001))
+            clusterTime += numSamples;
         
     }
+}
+
+void TuningProcessor::keyReleased(int midiNoteNumber)
+{
+    TuningSystem currentTuning = tuning->getCurrentScaleId();
+    
+    tuning->aPrep->getSpringTuning()->removeNote(midiNoteNumber);
 }
 
 
 //add note to the adaptive tuning history, update adaptive fundamental
 void TuningProcessor::keyPressed(int midiNoteNumber)
 {
+    adaptiveHistoryCounter++;
+    
+    TuningSystem currentTuning = tuning->getCurrentScaleId();
 
-    if(tuning->aPrep->getTuning() == AdaptiveTuning)
+    if (currentTuning == AdaptiveTuning)
     {
-        if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory() - 1)
+        //if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory() - 1)
+        if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory())
         {
             adaptiveHistoryCounter = 0;
             adaptiveFundamentalFreq = adaptiveFundamentalFreq * adaptiveCalculateRatio(midiNoteNumber);
             adaptiveFundamentalNote = midiNoteNumber;
         }
-        else adaptiveHistoryCounter++;
+        //else adaptiveHistoryCounter++;
         
     }
-    
-    else if(tuning->aPrep->getTuning() == AdaptiveAnchoredTuning)
+    else if (currentTuning == AdaptiveAnchoredTuning)
     {
-        if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory() - 1)
+        //if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory() - 1)
+        if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory())
         {
             adaptiveHistoryCounter = 0;
             
@@ -94,9 +139,12 @@ void TuningProcessor::keyPressed(int midiNoteNumber)
                                            anchorTuning[(midiNoteNumber + tuning->aPrep->getAdaptiveAnchorFundamental()) % anchorTuning.size()]
                                            );
             adaptiveFundamentalNote = midiNoteNumber;
+
         }
-        else adaptiveHistoryCounter++;
+        //else adaptiveHistoryCounter++;
     }
+    
+    tuning->aPrep->getSpringTuning()->addNote(midiNoteNumber);
     
     clusterTime = 0;
     
@@ -149,7 +197,8 @@ ValueTree Tuning::getState(void)
     
     prep.setProperty( "Id",Id, 0);
     prep.setProperty( "name",                           name, 0);
-    prep.setProperty( ptagTuning_scale,                 sPrep->getTuning(), 0);
+    prep.setProperty( ptagTuning_scale,                 sPrep->getScale(), 0);
+    prep.setProperty( ptagTuning_scaleName,             sPrep->getScaleName(), 0);
     prep.setProperty( ptagTuning_fundamental,           sPrep->getFundamental(), 0);
     prep.setProperty( ptagTuning_offset,                sPrep->getFundamentalOffset(), 0 );
     prep.setProperty( ptagTuning_adaptiveIntervalScale, sPrep->getAdaptiveIntervalScale(), 0 );
@@ -158,6 +207,9 @@ ValueTree Tuning::getState(void)
     prep.setProperty( ptagTuning_adaptiveAnchorFund,    sPrep->getAdaptiveAnchorFundamental(), 0 );
     prep.setProperty( ptagTuning_adaptiveClusterThresh, (int)sPrep->getAdaptiveClusterThresh(), 0 );
     prep.setProperty( ptagTuning_adaptiveHistory,       sPrep->getAdaptiveHistory(), 0 );
+    
+    prep.setProperty( ptagTuning_nToneRoot,             sPrep->getNToneRoot(), 0);
+    prep.setProperty( ptagTuning_nToneSemitoneWidth,    sPrep->getNToneSemitoneWidth(), 0 );
     
     ValueTree scale( vtagTuning_customScale);
     int count = 0;
@@ -173,6 +225,8 @@ ValueTree Tuning::getState(void)
         count++;
     }
     prep.addChild(absolute, -1, 0);
+    
+    prep.addChild(sPrep->getSpringTuning()->getState(), -1, 0);
     
     return prep;
     
@@ -211,6 +265,72 @@ ValueTree TuningModPreparation::getState(void)
     p = getParam(TuningA1History);
     if (p != String::empty) prep.setProperty( ptagTuning_adaptiveHistory,       p.getIntValue(), 0 );
     
+    p = getParam(TuningNToneRootCB);
+    if (p != String::empty) prep.setProperty( ptagTuning_nToneRootCB,           p.getIntValue(), 0 );
+    
+    p = getParam(TuningNToneRootOctaveCB);
+    if (p != String::empty) prep.setProperty( ptagTuning_nToneRootOctaveCB,     p.getIntValue(), 0 );
+    
+    p = getParam(TuningNToneSemitoneWidth);
+    if (p != String::empty) prep.setProperty( ptagTuning_nToneSemitoneWidth,    p.getFloatValue(), 0 );
+
+    
+    p = getParam(TuningSpringTetherStiffness);
+    if (p != String::empty) prep.setProperty( ptagTuning_tetherStiffness,    p.getFloatValue(), 0 );
+    
+    p = getParam(TuningSpringIntervalStiffness);
+    if (p != String::empty) prep.setProperty( ptagTuning_intervalStiffness,    p.getFloatValue(), 0 );
+    
+    p = getParam(TuningSpringRate);
+    if (p != String::empty) prep.setProperty( ptagTuning_rate,    p.getFloatValue(), 0 );
+    
+    p = getParam(TuningSpringDrag);
+    if (p != String::empty) prep.setProperty( ptagTuning_drag,    p.getFloatValue(), 0 );
+    
+    p = getParam(TuningSpringActive);
+    if (p != String::empty) prep.setProperty( ptagTuning_active,    p.getIntValue(), 0 );
+    
+    p = getParam(TuningSpringIntervalScale);
+    if (p != String::empty) prep.setProperty( ptagTuning_intervalScale,  p.getIntValue(), 0 );
+    
+    //TuningSpringIntervalFundamental
+    p = getParam(TuningSpringIntervalFundamental);
+    if (p != String::empty) prep.setProperty( ptagTuning_intervalScaleFundamental,  p.getIntValue(), 0 );
+    
+    p = getParam(TuningSpringTetherWeights);
+    ValueTree tw ("tw");
+    Array<float> tetherWeights = stringToFloatArray(p);
+    for (int i = 0; i < 128; i++)
+    {
+        tw.setProperty("w"+String(i), tetherWeights[i], 0);
+    }
+    prep.addChild(tw, -1, 0);
+    
+    p = getParam(TuningSpringIntervalWeights);
+    ValueTree sw ("sw");
+    Array<float> springWeights = stringToFloatArray(p);
+    for (int i = 0; i < 12; i++)
+    {
+        sw.setProperty("w"+String(i), springWeights[i], 0);
+    }
+    prep.addChild(sw, -1, 0);
+    
+    
+    ValueTree twa ("twa");
+    for (int i = 0; i < 128; i++)
+    {
+        twa.setProperty("w"+String(i), (int)getTetherWeightActive(i), 0);
+    }
+    prep.addChild(twa, -1, 0);
+    
+    ValueTree swa ("swa");
+    for (int i = 0; i < 12; i++)
+    {
+        swa.setProperty("w"+String(i), (int)getSpringWeightActive(i), 0);
+    }
+    prep.addChild(swa, -1, 0);
+    
+    
     ValueTree scale( vtagTuning_customScale);
     int count = 0;
     p = getParam(TuningCustomScale);
@@ -241,6 +361,13 @@ ValueTree TuningModPreparation::getState(void)
 
 void TuningModPreparation::setState(XmlElement* e)
 {
+    param.ensureStorageAllocated((int)TuningParameterTypeNil);
+    
+    for (int i = 0; i < TuningParameterTypeNil; i++)
+    {
+        param.set(i, "");
+    }
+    
     String p = "";
     
     float f;
@@ -279,10 +406,103 @@ void TuningModPreparation::setState(XmlElement* e)
     p = e->getStringAttribute( ptagTuning_adaptiveAnchorFund);
     setParam(TuningA1AnchorFundamental, p);
     
+    p = e->getStringAttribute( ptagTuning_nToneRootCB);
+    setParam(TuningNToneRootCB, p);
+    
+    p = e->getStringAttribute( ptagTuning_nToneRootOctaveCB);
+    setParam(TuningNToneRootOctaveCB, p);
+    
+    p = e->getStringAttribute( ptagTuning_nToneSemitoneWidth);
+    setParam(TuningNToneSemitoneWidth, p);
+    
+    /*TuningSpringTetherStiffness,
+    TuningSpringIntervalStiffness,
+    TuningSpringRate,
+    TuningSpringDrag,
+    TuningSpringActive,
+    TuningSpringTetherWeights,
+    TuningSpringIntervalWeights,
+    TuningSpringIntervalScale,*/
+    
+    p = e->getStringAttribute( ptagTuning_tetherStiffness);
+    setParam(TuningSpringTetherStiffness, p);
+    
+    p = e->getStringAttribute( ptagTuning_intervalStiffness);
+    setParam(TuningSpringIntervalStiffness, p);
+    
+    p = e->getStringAttribute( ptagTuning_rate);
+    setParam(TuningSpringRate, p);
+    
+    p = e->getStringAttribute( ptagTuning_drag);
+    setParam(TuningSpringDrag, p);
+    
+    p = e->getStringAttribute( ptagTuning_active);
+    setParam(TuningSpringActive, p);
+    
+    p = e->getStringAttribute( ptagTuning_intervalScale);
+    setParam(TuningSpringIntervalScale, p);
+    
+    p = e->getStringAttribute( ptagTuning_intervalScaleFundamental);
+    setParam(TuningSpringIntervalFundamental, p);
+    
     // custom scale
     forEachXmlChildElement (*e, sub)
     {
-        if (sub->hasTagName(vtagTuning_customScale))
+        if (sub->hasTagName("twa"))
+        {
+            Array<bool> twa;
+            for (int i = 0; i < 128; i++)
+            {
+                String attr = sub->getStringAttribute("w"+String(i));
+                if (attr == String::empty)  twa.add(false);
+                else                        twa.add((bool)attr.getIntValue());
+            }
+           
+            setTetherWeightsActive(twa);
+        }
+        else if (sub->hasTagName("swa"))
+        {
+            Array<bool> swa;
+            for (int k = 0; k < 12; k++)
+            {
+                String attr = sub->getStringAttribute("w"+String(k));
+                if (attr == String::empty)  swa.add(false);
+                else                        swa.add((bool)attr.getIntValue());
+            }
+            
+            setSpringWeightsActive(swa);
+        }
+        else if (sub->hasTagName("tw"))
+        {
+            Array<bool> tw;
+            String weights = "";
+            for (int k = 0; k < 128; k++)
+            {
+                String attr = sub->getStringAttribute("w"+String(k));
+                float val = attr.getFloatValue();
+                
+                weights += String(val);
+                weights += " ";
+            }
+            
+            setParam(TuningSpringTetherWeights, weights);
+        }
+        else if (sub->hasTagName("sw"))
+        {
+            Array<bool> sw;
+            String weights = "";
+            for (int k = 0; k < 12; k++)
+            {
+                String attr = sub->getStringAttribute("w"+String(k));
+                float val = attr.getFloatValue();
+                
+                weights += String(val);
+                weights += " ";
+            }
+            
+            setParam(TuningSpringIntervalWeights, weights);
+        }
+        else if (sub->hasTagName(vtagTuning_customScale))
         {
             Array<float> scale;
             for (int k = 0; k < 128; k++)
@@ -302,10 +522,10 @@ void TuningModPreparation::setState(XmlElement* e)
         else if (sub->hasTagName(vTagTuning_absoluteOffsets))
         {
             Array<float> absolute;
-            absolute.ensureStorageAllocated(128);
+            absolute.ensureStorageAllocated(ABSOLUTE_OFFSET_SIZE);
             String abs = "";
             
-            for (int k = 0; k < 128; k++)
+            for (int k = 0; k < ABSOLUTE_OFFSET_SIZE; k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 f = attr.getFloatValue() * 100.;
@@ -331,7 +551,10 @@ void Tuning::setState(XmlElement* e)
     Id = e->getStringAttribute("Id").getIntValue();
     
     i = e->getStringAttribute( ptagTuning_scale).getIntValue();
-    sPrep->setTuning((TuningSystem)i);
+    sPrep->setScale((TuningSystem)i);
+
+    //if a tuning has been saved by name, use that instead of the index value; need to resave all built-in galleries to do this, eventually
+    sPrep->setScaleByName(e->getStringAttribute(ptagTuning_scaleName));
     
     i = e->getStringAttribute( ptagTuning_fundamental).getIntValue();
     sPrep->setFundamental((PitchClass)i);
@@ -357,10 +580,22 @@ void Tuning::setState(XmlElement* e)
     i = e->getStringAttribute( ptagTuning_adaptiveAnchorFund).getIntValue();
     sPrep->setAdaptiveAnchorFundamental((PitchClass)i);
     
+    i = e->getStringAttribute( ptagTuning_nToneRoot).getIntValue();
+    if(i > 0) sPrep->setNToneRoot(i);
+    else sPrep->setNToneRoot(60);
+    
+    f = e->getStringAttribute( ptagTuning_nToneSemitoneWidth).getFloatValue();
+    if(f > 0) sPrep->setNToneSemitoneWidth(f);
+    else sPrep->setNToneSemitoneWidth(100);
+    
     // custom scale
     forEachXmlChildElement (*e, sub)
     {
-        if (sub->hasTagName(vtagTuning_customScale))
+        if (sub->hasTagName("springtuning"))
+        {
+            sPrep->getSpringTuning()->setState(sub);
+        }
+        else if (sub->hasTagName(vtagTuning_customScale))
         {
             Array<float> scale;
             for (int k = 0; k < 128; k++)
@@ -374,14 +609,13 @@ void Tuning::setState(XmlElement* e)
                     scale.add(f);
                 }
             }
-            
             sPrep->setCustomScale(scale);
         }
         else if (sub->hasTagName(vTagTuning_absoluteOffsets))
         {
             Array<float> absolute;
-            absolute.ensureStorageAllocated(128);
-            for (int k = 0; k < 128; k++)
+            absolute.ensureStorageAllocated(ABSOLUTE_OFFSET_SIZE);
+            for (int k = 0; k < ABSOLUTE_OFFSET_SIZE; k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 f = attr.getFloatValue();
@@ -393,8 +627,144 @@ void Tuning::setState(XmlElement* e)
         }
     }
     
+    sPrep->getSpringTuning()->setTetherTuning(getStaticScale());
+    
     // copy static to active
     aPrep->copy( sPrep);
+    
+    
 }
 
+#if BK_UNIT_TESTS
 
+class TuningTests : public UnitTest
+{
+public:
+	TuningTests() : UnitTest("Tunings", "Tuning") {}
+
+	void runTest() override
+	{
+		beginTest("Tuning");
+
+		for (int i = 0; i < 10; i++)
+		{
+			// create tuning preparation and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random tuning prep " + String(i);
+			DBG("test consistency: " + name);
+
+			TuningPreparation::Ptr tp1 = new TuningPreparation();
+
+			tp1->randomize();
+
+			Tuning t1(tp1, 1);
+			t1.setName(name);
+
+			ValueTree vt1 = t1.getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			TuningPreparation::Ptr tp2 = new TuningPreparation();
+
+			Tuning t2(tp2, 1);
+
+			t2.setState(xml);
+			t2.setName(name);
+
+			ValueTree vt2 = t2.getState();
+
+			expect(vt1.isEquivalentTo(vt2),
+				"tuning prep: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
+		}
+
+		for (int i = 0; i < 10; i++)
+		{
+			// create tuning and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random tuning " + String(i);
+			DBG("test consistency: " + name);
+
+			Tuning t1(-1, true);
+			t1.setName(name);
+
+			ValueTree vt1 = t1.getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			Tuning t2(-1, true);
+
+			t2.setState(xml);
+			t2.setName(name);
+
+			ValueTree vt2 = t2.getState();
+
+			expect(vt1.isEquivalentTo(vt2),
+				"tuning: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
+		}
+	}
+};
+
+static TuningTests directTests;
+
+class TuningModTests : public UnitTest
+{
+public:
+	TuningModTests() : UnitTest("TuningMod", "TuningMod") {}
+
+	void runTest() override
+	{
+		beginTest("TuningMod");
+
+		for (int i = 0; i < 10; i++)
+		{
+			// create tuning mod preparation and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random direct mod " + String(i);
+			DBG("test consistency: " + name);
+
+			TuningPreparation::Ptr tp1 = new TuningPreparation();
+			TuningModPreparation::Ptr tm1 = new TuningModPreparation(tp1, 1);
+
+
+			tm1->randomize();
+			tm1->setName(name);
+
+			ValueTree vt1 = tm1->getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			TuningPreparation::Ptr tp2 = new TuningPreparation();
+			TuningModPreparation::Ptr tm2 = new TuningModPreparation(tp2, 1);
+
+			tm2->setState(xml);
+
+			ValueTree vt2 = tm2->getState();
+
+			expect(vt1.isEquivalentTo(vt2),
+				"tuning mod: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
+
+
+			//expect(tm1->compare(tm2), "tuning mod: preparations do not match");
+		}
+
+	}
+};
+
+static TuningModTests tuningModTests;
+
+#endif

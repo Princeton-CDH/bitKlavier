@@ -12,9 +12,13 @@
 
 #include "BKViewController.h"
 
+//==============================================================================
 
 class DirectViewController :
 public BKViewController
+#if JUCE_IOS
+, public WantsBigOne::Listener
+#endif
 {
 public:
     
@@ -31,21 +35,32 @@ public:
     ScopedPointer<BKSingleSlider> resonanceGainSlider;
     ScopedPointer<BKSingleSlider> hammerGainSlider;
     
+    ScopedPointer<BKADSRSlider> ADSRSlider;
+    
     void paint (Graphics&) override;
     void resized() override;
     
+    void setShowADSR(bool newval);
+    
     virtual void update(void) {};
     
+#if JUCE_IOS
+    void iWantTheBigOne(TextEditor*, String name) override;
+#endif
+    
 private:
+    
+    bool showADSR;
 
-
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DirectViewController)
 };
 
 class DirectPreparationEditor :
 public DirectViewController,
 public BKEditableComboBoxListener,
 public BKSingleSlider::Listener,
-public BKStackedSlider::Listener
+public BKStackedSlider::Listener,
+public BKADSRSlider::Listener
 {
 public:
     
@@ -56,17 +71,20 @@ public:
     
     void bkMessageReceived (const String& message) override;
     void bkComboBoxDidChange (ComboBox* box) override;
-    void bkTextFieldDidChange (TextEditor&) override {};
+    
     void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
-    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
+    void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
+    void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
+    
+    void closeSubWindow();
     
     void fillSelectCB(int last, int current);
-    
-    static void actionButtonCallback(int action, DirectPreparationEditor*);
 
+    static void actionButtonCallback(int action, DirectPreparationEditor*);
     
     int addPreparation(void);
     int duplicatePreparation(void);
@@ -74,8 +92,7 @@ public:
     void deleteCurrent(void);
     
 private:
-    
-    
+
     
 };
 
@@ -83,7 +100,8 @@ class DirectModificationEditor :
 public DirectViewController,
 public BKEditableComboBoxListener,
 public BKSingleSlider::Listener,
-public BKStackedSlider::Listener
+public BKStackedSlider::Listener,
+public BKADSRSlider::Listener
 {
 public:
     
@@ -101,8 +119,10 @@ public:
     void bkTextFieldDidChange (TextEditor&) override {};
     void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
-    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
+    void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
+    void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
     
     void greyOutAllComponents();
     void highlightModedComponents();

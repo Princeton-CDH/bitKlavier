@@ -25,33 +25,40 @@ BKViewController(p, theGraph)
     selectCB.setName("Tempo");
     selectCB.addSeparator();
     selectCB.setSelectedItemIndex(0);
+    selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
     
     modeCB.setName("Mode");
     modeCB.BKSetJustificationType(juce::Justification::centredRight);
+    modeCB.setTooltip("Indicates whether in Constant or Adaptive mode");
     fillModeCB();
     addAndMakeVisible(modeCB);
     
     tempoSlider = new BKSingleSlider("Tempo", 40, 208, 100, 0.01);
+    tempoSlider->setToolTipString("Indicates current BPM");
     addAndMakeVisible(tempoSlider);
     
     AT1HistorySlider = new BKSingleSlider("History", 1, 10, 4, 1);
     AT1HistorySlider->setJustifyRight(false);
+    AT1HistorySlider->setToolTipString("Indicates how many notes Tempo is using to determine and generate an average pulse ");
     addAndMakeVisible(AT1HistorySlider);
     
     AT1SubdivisionsSlider = new BKSingleSlider("Subdivisions", 0., 12, 1, 0.01);
     AT1SubdivisionsSlider->setJustifyRight(false);
+    AT1SubdivisionsSlider->setToolTipString("Multiplies tempo by interpreting rhythmic value of played notes; values less than 1 will result in tempos slower than what is played, values greater than 1 will result in tempos faster than what is played");
     addAndMakeVisible(AT1SubdivisionsSlider);
     
     AT1MinMaxSlider = new BKRangeSlider("Min/Max (ms)", 1, 2000, 100, 500, 10);
     AT1MinMaxSlider->setJustifyRight(false);
     AT1MinMaxSlider->setIsMinAlwaysLessThanMax(true);
+    AT1MinMaxSlider->setToolTipString("Time within which Tempo will consider notes to be part of a constant pulse; any notes played futher apart than Max, or closer together than Min, will be ignored");
     addAndMakeVisible(AT1MinMaxSlider);
     
-    A1ModeCB.setName("Mode");
+    A1ModeCB.setName("AT1Mode");
     addAndMakeVisible(A1ModeCB);
     fillA1ModeCB();
     A1ModeLabel.setText("Mode", dontSendNotification);
+    A1ModeCB.setTooltip("Indicates which aspect of performance Tempo is analyzing, using information from connected Keymap");
     addAndMakeVisible(A1ModeLabel);
     
     addAndMakeVisible(A1AdaptedTempo);
@@ -63,16 +70,17 @@ BKViewController(p, theGraph)
     
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
+    actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
-
-    updateComponentVisibility();
     
 #if JUCE_IOS
-    AT1MinMaxSlider->addWantsKeyboardListener(this);
-    AT1HistorySlider->addWantsKeyboardListener(this);
-    AT1SubdivisionsSlider->addWantsKeyboardListener(this);
-    tempoSlider->addWantsKeyboardListener(this);
+    AT1MinMaxSlider->addWantsBigOneListener(this);
+    AT1HistorySlider->addWantsBigOneListener(this);
+    AT1SubdivisionsSlider->addWantsBigOneListener(this);
+    tempoSlider->addWantsBigOneListener(this);
 #endif
+
+    updateComponentVisibility();
 }
 
 
@@ -219,6 +227,15 @@ void TempoViewController::updateComponentVisibility()
     
 }
 
+#if JUCE_IOS
+void TempoViewController::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
+}
+#endif
+
+
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ TempoPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~//
 
@@ -238,7 +255,6 @@ TempoViewController(p, theGraph)
     AT1SubdivisionsSlider->addMyListener(this);
     AT1MinMaxSlider->addMyListener(this);
     
-    
     startTimer(50);
     
     update();
@@ -249,9 +265,12 @@ void TempoPreparationEditor::timerCallback()
     if (processor.updateState->currentDisplay == DisplayTempo)
     {
         TempoProcessor::Ptr mProcessor = processor.currentPiano->getTempoProcessor(processor.updateState->currentTempoId);
-
+        TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
+        
         if (mProcessor != nullptr)
         {
+            if(active->getHostTempo()) tempoSlider->setValue(active->getTempo(), dontSendNotification);
+            
             if(mProcessor->getPeriodMultiplier() != lastPeriodMultiplier)
             {
                 lastPeriodMultiplier = mProcessor->getPeriodMultiplier();
@@ -259,12 +278,16 @@ void TempoPreparationEditor::timerCallback()
                 A1AdaptedTempo.setText("Tempo = " + String(mProcessor->getAdaptedTempo()), dontSendNotification);
                 A1AdaptedPeriodMultiplier.setText("Period Multiplier = " + String(mProcessor->getPeriodMultiplier()), dontSendNotification);
             }
+            
+            if(mProcessor->getAtDelta() < active->getAdaptiveTempo1Max())
+                AT1MinMaxSlider->setDisplayValue(mProcessor->getAtDelta());
+            else
+                AT1MinMaxSlider->setDisplayValue(0);
         }
         
     }
     
 }
-
 
 void TempoPreparationEditor::fillSelectCB(int last, int current)
 {
@@ -370,6 +393,30 @@ void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEd
         processor.clear(PreparationTypeTempo, processor.updateState->currentTempoId);
         vc->update();
     }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentTempoId;
+        Tempo::Ptr prep = processor.gallery->getTempo(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
+    }
 }
 
 
@@ -394,6 +441,7 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (name == A1ModeCB.getName())
     {
+        DBG("A1ModeCB = " + String(index));
         prep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
         active->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
     }
@@ -444,7 +492,7 @@ void TempoPreparationEditor::update(void)
 }
 
 
-void TempoPreparationEditor::BKSingleSliderValueChanged(String name, double val)
+void TempoPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
     TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);;
@@ -679,6 +727,30 @@ void TempoModificationEditor::actionButtonCallback(int action, TempoModification
         vc->update();
         vc->updateModification();
     }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentModTempoId;
+        TempoModPreparation::Ptr prep = processor.gallery->getTempoModPreparation(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
+    }
 }
 
 void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
@@ -734,7 +806,7 @@ void TempoModificationEditor::BKRangeSliderValueChanged(String name, double minv
 
 
 
-void TempoModificationEditor::BKSingleSliderValueChanged(String name, double val)
+void TempoModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
     

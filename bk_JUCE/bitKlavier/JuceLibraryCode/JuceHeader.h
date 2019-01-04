@@ -29,6 +29,8 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <juce_opengl/juce_opengl.h>
 #include <juce_video/juce_video.h>
+#include <SFZero/SFZero.h>
+#include <stk/stk.h>
 
 #include "BinaryData.h"
 
@@ -42,7 +44,8 @@
 namespace ProjectInfo
 {
     const char* const  projectName    = "bitKlavier";
-    const char* const  versionString  = "1.9";
-    const int          versionNumber  = 0x10900;
+    const char* const  companyName    = "manyarrowsmusic";
+    const char* const  versionString  = "2.3-beta3";
+    const int          versionNumber  = 0x20300;
 }
 #endif

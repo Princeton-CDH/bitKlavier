@@ -59,7 +59,12 @@ public:
     bool generalSettingsDidChange = false;
     bool keymapDidChange = false;
     bool modificationDidChange = false;
+    
+    String comment;
+    bool commentDidChange = false;
+    
     bool pianoSamplesAreLoading = false;
+    bool needsExtraKeys = true;
     
     
     BKPreparationDisplay currentDisplay = DisplayNil;
@@ -139,6 +144,10 @@ public:
             currentModTempoId = (Id == -1) ? currentModTempoId : Id;
             tempoPreparationDidChange = true;
             setCurrentDisplay(DisplayTempoMod);
+        }
+        else if (type == PreparationTypeComment)
+        {
+            setCurrentDisplay(DisplayComment);
         }
     }
     

@@ -28,6 +28,7 @@ public:
     ~BKReferenceCountedBuffer();
     
     AudioSampleBuffer* getAudioSampleBuffer();
+    void setAudioSampleBuffer(AudioSampleBuffer* from);
 
     int position;
     String name;

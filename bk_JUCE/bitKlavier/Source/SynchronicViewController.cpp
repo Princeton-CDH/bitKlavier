@@ -32,66 +32,114 @@ BKViewController(p, theGraph)
     int idx = 0;
     for (int i = 0; i < cSynchronicParameterTypes.size(); i++)
     {
-        if (cSynchronicDataTypes[i] == BKFloatArr || cSynchronicDataTypes[i] == BKArrFloatArr)
+        if ((cSynchronicDataTypes[i] == BKFloatArr || cSynchronicDataTypes[i] == BKArrFloatArr) && cSynchronicParameterTypes[i] != "ADSRs")
         {
             paramSliders.insert(idx, new BKMultiSlider(HorizontalMultiBarSlider));
             addAndMakeVisible(paramSliders[idx]);
-            paramSliders[idx]->addMyListener(this);
             paramSliders[idx]->setName(cSynchronicParameterTypes[idx+SynchronicTranspOffsets]);
+            paramSliders[idx]->addMyListener(this);
+#if JUCE_IOS
+            paramSliders[idx]->addWantsBigOneListener(this);
+#endif
             paramSliders[idx]->setMinMaxDefaultInc(cSynchronicDefaultRangeValuesAndInc[i]);
             
             if(paramSliders[idx]->getName() == "transpositions")
             {
                 paramSliders[idx]->setAllowSubSlider(true);
                 paramSliders[idx]->setSubSliderName("add transposition");
+                paramSliders[idx]->setToolTipString("Determines pitch of sequenced notes or chords; control-click to add another voice, double-click to edit all or add additional sequence steps");
+            }
+            else if(paramSliders[idx]->getName() == "accents")
+            {
+                paramSliders[idx]->setToolTipString("Determines gain of sequenced pitches; double-click to edit all or add additional sequence steps");
+            }
+            else if(paramSliders[idx]->getName() == "sustain length multipliers")
+            {
+                paramSliders[idx]->setToolTipString("Determines duration of each sequenced note; double-click to edit all or add additional sequence steps");
+            }
+            else if(paramSliders[idx]->getName() == "beat length multipliers")
+            {
+                paramSliders[idx]->setToolTipString("Determines length of each sequenced beat as a factor of Synchronic tempo; double-click to edit all or add additional sequence steps");
             }
             
-            /* // need this?
-            if(paramSliders[0]->getName() == "sustain length multipliers")
-            {
-                paramSliders[0]->setSkewFromMidpoint(false);
-            }
-            */
             idx++;
         }
         
     }
     
+    //Envelope Sliders
+    envelopeSliders = OwnedArray<BKADSRSlider>();
+    for(int i=0; i<12; i++)
+    {
+        envelopeSliders.insert(i, new BKADSRSlider("e"+String(i)));
+        envelopeSliders[i]->setToolTip("Provides ADSR settings for up to 12 sequenced steps");
+        envelopeSliders[i]->setButtonText("");
+        envelopeSliders[i]->toFront(false);
+        //envelopeSliders[i]->setAlpha(0.5);
+        envelopeSliders[i]->setDim(0.5);
+        addAndMakeVisible(envelopeSliders[i]);
+    }
+    envelopeSliders[0]->setBright();
+    showADSR = false;
+    visibleADSR = 0;
+    
     selectCB.setName("Synchronic");
     selectCB.addSeparator();
     selectCB.addListener(this);
     selectCB.setSelectedId(1, dontSendNotification);
+    selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
     
     modeSelectCB.setName("Mode");
     modeSelectCB.addSeparator();
     modeSelectCB.BKSetJustificationType(juce::Justification::centredRight);
     modeSelectCB.setSelectedItemIndex(0);
+    modeSelectCB.setTooltip("Determines which aspect of MIDI signal triggers the Synchronic sequence");
     fillModeSelectCB();
     addAndMakeVisible(modeSelectCB);
     
+    modeLabel.setText("triggers pulse", dontSendNotification);
+    modeLabel.setTooltip("Determines which aspect of MIDI signal triggers the Synchronic sequence");
+    //modeLabel.setJustificationType(Justification::bottomLeft);
+    addAndMakeVisible(modeLabel);
+    
     //offsetParamStartToggle = new BKSingleSlider("skip first", 0, 1, 0, 1);
     offsetParamStartToggle.setButtonText ("skip first");
+    offsetParamStartToggle.setTooltip("Indicates whether Synchronic will skip first column of sequenced parameters for first cycle");
     buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
     offsetParamStartToggle.setToggleState (true, dontSendNotification);
     addAndMakeVisible(offsetParamStartToggle);
     
     howManySlider = new BKSingleSlider("how many", 1, 100, 20, 1);
+    howManySlider->setToolTipString("Indicates number of steps/repetitions in Synchronic pulse");
     howManySlider->setJustifyRight(false);
     addAndMakeVisible(howManySlider);
-    
+        
     clusterThreshSlider = new BKSingleSlider("cluster threshold", 20, 2000, 200, 10);
+    clusterThreshSlider->setToolTipString("Indicates window of time (milliseconds) within which notes are grouped as a cluster");
     clusterThreshSlider->setJustifyRight(false);
     addAndMakeVisible(clusterThreshSlider);
     
     clusterMinMaxSlider = new BKRangeSlider("cluster min/max", 1, 12, 3, 4, 1);
+    clusterMinMaxSlider->setToolTipString("Sets Min and Max numbers of keys pressed to launch pulse; Min can be greater than Max");
     clusterMinMaxSlider->setJustifyRight(false);
     addAndMakeVisible(clusterMinMaxSlider);
     
-    gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
+    gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.0001);
+    gainSlider->setToolTipString("Overall volume of Synchronic pulse");
     gainSlider->setJustifyRight(false);
     gainSlider->setSkewFactorFromMidPoint(1.);
     addAndMakeVisible(gainSlider);
+    
+#if JUCE_IOS
+    howManySlider->addWantsBigOneListener(this);
+
+    clusterThreshSlider->addWantsBigOneListener(this);
+
+    gainSlider->addWantsBigOneListener(this);
+    
+    clusterMinMaxSlider->addWantsBigOneListener(this);
+#endif
     
     releaseVelocitySetsSynchronicToggle.addListener(this);
     releaseVelocitySetsSynchronicToggle.setLookAndFeel(&buttonsAndMenusLAF2); //need different one so toggle text can be on other side
@@ -102,15 +150,16 @@ BKViewController(p, theGraph)
     
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
+    actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
     
-#if JUCE_IOS
-    for (auto mslider : paramSliders) mslider->addWantsKeyboardListener(this);
-    howManySlider->addWantsKeyboardListener(this);
-    clusterThreshSlider->addWantsKeyboardListener(this);
-    clusterMinMaxSlider->addWantsKeyboardListener(this);
-    gainSlider->addWantsKeyboardListener(this);
-#endif
+    envelopeName.setText("envelopes", dontSendNotification);
+    //envelopeName.setTooltip("Provides ADSR settings for up to 12 sequenced steps");
+    envelopeName.setJustificationType(Justification::centredRight);
+    envelopeName.toBack();
+    envelopeName.setInterceptsMouseClicks(false, true);
+    addAndMakeVisible(envelopeName);
+
 }
 
 void SynchronicViewController::paint (Graphics& g)
@@ -124,6 +173,8 @@ void SynchronicViewController::resized()
 
     iconImageComponent.setBounds(area);
     area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+    
+    Rectangle<int> areaSave = area;
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
@@ -143,53 +194,207 @@ void SynchronicViewController::resized()
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
     
-    Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
-    modeSlice.removeFromRight(gXSpacing);
-    modeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
-    offsetParamStartToggle.setBounds(modeSlice);
-    
-    int tempHeight = (area.getHeight() - paramSliders.size() * (gYSpacing + gPaddingConst * processor.paddingScalarY)) / paramSliders.size();
-    area.removeFromLeft(4 + 2.*gPaddingConst * processor.paddingScalarX);
-    area.removeFromRight(gXSpacing);
-    for(int i = 0; i < paramSliders.size(); i++)
+    if(!showADSR)
     {
-        area.removeFromTop(gYSpacing + gPaddingConst * processor.paddingScalarY);
-        paramSliders[i]->setBounds(area.removeFromTop(tempHeight));
+        Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
+        modeSlice.removeFromRight(gXSpacing);
+        //modeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 3.));
+        //offsetParamStartToggle.setBounds(modeSlice);
+        //modeSlice.removeFromLeft(4 + 2.*gPaddingConst * processor.paddingScalarX);
+        //offsetParamStartToggle.setBounds(modeSlice.removeFromLeft(modeSelectCB.getWidth()));
+        offsetParamStartToggle.setBounds(modeSlice.removeFromRight(modeSlice.getWidth()));
+                                         
+        
+        Rectangle<float> envelopeSlice = area.removeFromBottom(gComponentComboBoxHeight + gPaddingConst * processor.paddingScalarY).toFloat();
+        
+        int tempHeight = (area.getHeight() - paramSliders.size() * (gYSpacing + gPaddingConst * processor.paddingScalarY)) / paramSliders.size();
+        area.removeFromLeft(4 + 2.*gPaddingConst * processor.paddingScalarX);
+        area.removeFromRight(gXSpacing);
+        for(int i = 0; i < paramSliders.size(); i++)
+        {
+            area.removeFromTop(gYSpacing + gPaddingConst * processor.paddingScalarY);
+            paramSliders[i]->setBounds(area.removeFromTop(tempHeight));
+        }
+        
+        
+        // envelopeSlice.removeFromTop(gPaddingConst * (1. - processor.paddingScalarY));
+        envelopeSlice.removeFromTop(gPaddingConst * processor.paddingScalarY);
+        envelopeSlice.removeFromRight(gXSpacing);
+        envelopeName.setBounds(envelopeSlice.toNearestInt());
+        
+        float envWidth = (float)(paramSliders[0]->getWidth() - 50) / 12.;
+        for(int i=envelopeSliders.size() - 1; i>=0; i--)
+        {
+            Rectangle<float> envArea (envelopeSlice.removeFromRight(envWidth));
+            envelopeSliders[i]->setBounds(envArea.toNearestInt());
+        }
+        
+        //leftColumn.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
+        leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
+        //leftColumn.removeFromLeft(gXSpacing);
+        
+        leftColumn.removeFromTop(gPaddingConst * (1. - processor.paddingScalarY));
+        leftColumn.removeFromBottom(gYSpacing * 2);
+        int sliderHeight = leftColumn.getHeight() / 5;
+        
+        /*
+        Rectangle<int> modeSlice2 = leftColumn.removeFromTop(sliderHeight);
+        modeSlice2.removeFromLeft(gXSpacing * 2);
+        modeSlice2.removeFromTop(gYSpacing * 2);
+        modeSlice2.removeFromRight(modeSlice2.getWidth() / 3);
+        modeSelectCB.setBounds(modeSlice2.removeFromTop(gComponentComboBoxHeight));
+        howManySlider->setBounds(leftColumn.removeFromTop(sliderHeight));
+        clusterThreshSlider->setBounds(leftColumn.removeFromTop(sliderHeight));
+        clusterMinMaxSlider->setBounds(leftColumn.removeFromTop(sliderHeight));
+        gainSlider->setBounds(leftColumn.removeFromTop(sliderHeight));
+         */
+        
+        gainSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
+        leftColumn.removeFromBottom(sliderHeight - gComponentSingleSliderHeight);
+        
+        clusterMinMaxSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
+        leftColumn.removeFromBottom(sliderHeight - gComponentSingleSliderHeight);
+        
+        clusterThreshSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
+        leftColumn.removeFromBottom(sliderHeight - gComponentSingleSliderHeight);
+        
+        howManySlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
+        leftColumn.removeFromBottom(sliderHeight - gComponentSingleSliderHeight);
+        
+        Rectangle<int> modeSlice2 = leftColumn.removeFromBottom(gComponentComboBoxHeight);
+        modeSlice2.removeFromLeft(gXSpacing * 2);
+        int modeSlice2Chunk = modeSlice2.getWidth() / 3;
+        modeSlice2.removeFromRight(modeSlice2Chunk);
+        modeLabel.setBounds(modeSlice2.removeFromRight(modeSlice2Chunk));
+        modeSelectCB.setBounds(modeSlice2);
+        
+        /*
+        int sliderSpacing = leftColumn.getHeight() / 4;
+        
+        modeSelectCB.setBounds(leftColumn.getX() + gXSpacing * 2,
+                               //sliderSpacing * 1 - gComponentComboBoxHeight/2.,
+                               //sliderSpacing * 1,
+                               leftColumn.getY() + gYSpacing * 2,
+                               leftColumn.getWidth() / 3,
+                               gComponentComboBoxHeight);
+        
+        int nextCenter = paramSliders[0]->getY() + paramSliders[0]->getHeight()  + gPaddingConst * (1. - processor.paddingScalarY) ;
+        howManySlider->setBounds(leftColumn.getX(),
+                                 //nextCenter - gComponentSingleSliderHeight/2.,
+                                 //sliderSpacing * 2 - gComponentSingleSliderHeight/2.,
+                                 leftColumn.getY() + sliderSpacing * 1,
+                                 leftColumn.getWidth(),
+                                 gComponentSingleSliderHeight);
+
+        nextCenter = paramSliders[1]->getY() + paramSliders[1]->getHeight()  + gPaddingConst * (1. - processor.paddingScalarY);
+        clusterThreshSlider->setBounds(leftColumn.getX(),
+                                       //nextCenter - gComponentSingleSliderHeight/2.,
+                                       //sliderSpacing * 3 - gComponentSingleSliderHeight/2.,
+                                       leftColumn.getY() + sliderSpacing * 2,
+                                       leftColumn.getWidth(),
+                                       gComponentSingleSliderHeight);
+        
+        nextCenter = paramSliders[2]->getY() + paramSliders[2]->getHeight()  + gPaddingConst * (1. - processor.paddingScalarY);
+        clusterMinMaxSlider->setBounds(leftColumn.getX(),
+                                       //nextCenter - gComponentRangeSliderHeight/2.,
+                                       //sliderSpacing * 4 - gComponentSingleSliderHeight/2.,
+                                       leftColumn.getY() + sliderSpacing * 3,
+                                       leftColumn.getWidth(),
+                                       gComponentRangeSliderHeight);
+        
+        //nextCenter = paramSliders[3]->getY() + paramSliders[3]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
+        nextCenter = envelopeSliders[0]->getY() + gPaddingConst * (1. - processor.paddingScalarY);
+        gainSlider->setBounds(leftColumn.getX(),
+                              //nextCenter - gComponentSingleSliderHeight/2.,
+                              //sliderSpacing * 5 - gComponentSingleSliderHeight/2.,
+                              leftColumn.getY() + sliderSpacing * 4,
+                              leftColumn.getWidth(),
+                              gComponentSingleSliderHeight);
+        
+        */
+        
+        Rectangle<int> releaseToggleSlice = gainSlider->getBounds().removeFromTop(gComponentTextFieldHeight);
+        releaseToggleSlice.removeFromRight(gYSpacing);
+        releaseVelocitySetsSynchronicToggle.setBounds(releaseToggleSlice.removeFromRight(releaseToggleSlice.getWidth() * 0.5));
+
+    }
+    else
+    {
+        areaSave.removeFromTop(gYSpacing * 2 + 8.*gPaddingConst * processor.paddingScalarY);
+        Rectangle<int> adsrSliderSlice = areaSave.removeFromTop(gComponentComboBoxHeight * 2 + gComponentSingleSliderHeight * 2 + gYSpacing * 3);
+        envelopeSliders[visibleADSR]->setBounds(adsrSliderSlice);
+        
+        //areaSave.removeFromTop(gComponentComboBoxHeight * 2 + gYSpacing + 8.*gPaddingConst * processor.paddingScalarY);
+        //ADSRSlider->setBounds(areaSave);
+        
+        selectCB.toFront(false);
     }
     
-    //leftColumn.reduce(4 + 2.*gPaddingConst * paddingScalarX, 0);
-    leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
-    //leftColumn.removeFromLeft(gXSpacing);
-    
-    int nextCenter = paramSliders[0]->getY() + paramSliders[0]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY) ;
-    howManySlider->setBounds(leftColumn.getX(),
-                             nextCenter - gComponentSingleSliderHeight/2.,
-                             leftColumn.getWidth(),
-                             gComponentSingleSliderHeight);
-    
-    nextCenter = paramSliders[1]->getY() + paramSliders[1]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
-    clusterThreshSlider->setBounds(leftColumn.getX(),
-                                   nextCenter - gComponentSingleSliderHeight/2.,
-                                   leftColumn.getWidth(),
-                                   gComponentSingleSliderHeight);
-    
-    nextCenter = paramSliders[2]->getY() + paramSliders[2]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
-    clusterMinMaxSlider->setBounds(leftColumn.getX(),
-                                   nextCenter - gComponentRangeSliderHeight/2.,
-                                   leftColumn.getWidth(),
-                                   gComponentRangeSliderHeight);
-    
-    nextCenter = paramSliders[3]->getY() + paramSliders[3]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
-    gainSlider->setBounds(leftColumn.getX(),
-                          nextCenter - gComponentSingleSliderHeight/2.,
-                          leftColumn.getWidth(),
-                          gComponentSingleSliderHeight);
-    
-    Rectangle<int> releaseToggleSlice = gainSlider->getBounds().removeFromTop(gComponentTextFieldHeight);
-    releaseToggleSlice.removeFromRight(gYSpacing);
-    releaseVelocitySetsSynchronicToggle.setBounds(releaseToggleSlice.removeFromRight(releaseToggleSlice.getWidth() * 0.5));
-    
     repaint();
+    
+}
+
+void SynchronicViewController::setShowADSR(String name, bool newval)
+{
+    showADSR = newval;
+    
+    for(int i=0; i<envelopeSliders.size(); i++)
+    {
+        if(envelopeSliders[i]->getName() == name) visibleADSR = i;
+    }
+    
+    if(showADSR)
+    {
+        for(int i = 0; i < paramSliders.size(); i++)
+        {
+            paramSliders[i]->setVisible(false);
+        }
+        howManySlider->setVisible(false);
+        clusterThreshSlider->setVisible(false);
+        gainSlider->setVisible(false);
+        clusterThreshSlider->setVisible(false);
+        clusterMinMaxSlider->setVisible(false);
+        offsetParamStartToggle.setVisible(false);
+        modeSelectCB.setVisible(false);
+        modeLabel.setVisible(false);
+        
+        for(int i=0; i<envelopeSliders.size(); i++)
+        {
+            if(i != visibleADSR) envelopeSliders[i]->setVisible(false);
+            envelopeSliders[i]->setAlpha(1.);
+        }
+        envelopeName.setVisible(false);
+        envelopeSliders[visibleADSR]->setButtonText("close");
+    }
+    else
+    {
+        for(int i = 0; i < paramSliders.size(); i++)
+        {
+            paramSliders[i]->setVisible(true);
+        }
+        howManySlider->setVisible(true);
+        clusterThreshSlider->setVisible(true);
+        gainSlider->setVisible(true);
+        clusterThreshSlider->setVisible(true);
+        clusterMinMaxSlider->setVisible(true);
+        offsetParamStartToggle.setVisible(true);
+        modeSelectCB.setVisible(true);
+        modeLabel.setVisible(true);
+        
+        for(int i=0; i<envelopeSliders.size(); i++)
+        {
+            envelopeSliders[i]->setVisible(true);
+            envelopeSliders[i]->setAlpha(0.5);
+            envelopeSliders[i]->setButtonText(String(""));
+            envelopeSliders[i]->resized();
+        }
+        envelopeName.setVisible(true);
+        
+        if(envelopeSliders[visibleADSR]->isEnabled()) envelopeSliders[visibleADSR]->setActive();
+        
+    }
+    
+    resized();
     
 }
 
@@ -208,6 +413,13 @@ void SynchronicViewController::fillModeSelectCB(void)
     modeSelectCB.setSelectedItemIndex(0, NotificationType::dontSendNotification);
 }
 
+#if JUCE_IOS
+void SynchronicViewController::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
+}
+#endif
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ SynchronicPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
 
@@ -217,6 +429,7 @@ SynchronicViewController(p, theGraph)
     fillSelectCB(-1,-1);
     
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+    SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
     selectCB.addListener(this);
     selectCB.addMyListener(this);
@@ -228,6 +441,13 @@ SynchronicViewController(p, theGraph)
 
     gainSlider->addMyListener(this);
     
+    for(int i=0; i<envelopeSliders.size(); i++)
+    {
+        envelopeSliders[i]->addMyListener(this);
+    }
+    
+    envelopeSliders[0]->adsrButton.triggerClick(); //initialize first envelope, since it is always active
+    
     startTimer(30);
     
 }
@@ -237,7 +457,22 @@ void SynchronicPreparationEditor::timerCallback()
     if (processor.updateState->currentDisplay == DisplaySynchronic)
     {
         SynchronicProcessor::Ptr sProcessor = processor.currentPiano->getSynchronicProcessor(processor.updateState->currentSynchronicId);
-
+        SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+        
+        if(sProcessor->getBeatCounter() < active->getNumBeats() && sProcessor->getPlayCluster())
+            howManySlider->setDisplayValue(sProcessor->getBeatCounter());
+        else howManySlider->setDisplayValue(0);
+        
+        if(sProcessor->getClusterThresholdTimer() < active->getClusterThreshMS())
+             clusterThreshSlider->setDisplayValue(sProcessor->getClusterThresholdTimer());
+        else clusterThreshSlider->setDisplayValue(0);
+        
+        int maxTemp = 12; //arbitrary
+        if(active->getClusterMax() > active->getClusterMin()) maxTemp = active->getClusterMax();
+        if(sProcessor->getNumKeysDepressed() <= maxTemp && sProcessor->getClusterThresholdTimer() < active->getClusterThreshMS())
+            clusterMinMaxSlider->setDisplayValue(sProcessor->getNumKeysDepressed());
+        else clusterMinMaxSlider->setDisplayValue(0);
+        
         int counter = 0, size = 0;
         
         if (sProcessor != nullptr)
@@ -269,8 +504,24 @@ void SynchronicPreparationEditor::timerCallback()
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
             }
+            
+            SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+            for(int i = 0; i < envelopeSliders.size(); i++)
+            {
+                if(i == sProcessor->getEnvelopeCounter()) envelopeSliders[i]->setHighlighted();
+                
+                else if(active->getEnvelopeOn(i))
+                {
+                    envelopeSliders[i]->setActive();
+                    envelopeSliders[i]->setBright();
+                }
+                else
+                {
+                    envelopeSliders[i]->setPassive();
+                    envelopeSliders[i]->setDim(gModAlpha);
+                }
+            }
         }
-        
     }
 }
 
@@ -313,24 +564,25 @@ void SynchronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
     //only transposition allows multiple simultaneous vals, so trim down to 1D array
     Array<float> newvals = Array<float>();
     for(int i=0; i<values.size(); i++) newvals.add(values[i][0]);
-    
-    if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+
+    //if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+    if (!name.compare(cSynchronicParameterTypes[SynchronicAccentMultipliers]))
     {
         prep    ->setAccentMultipliers(newvals);
         active  ->setAccentMultipliers(newvals);
     }
-    else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+    else if (!name.compare(cSynchronicParameterTypes[SynchronicBeatMultipliers]))
     {
         prep    ->setBeatMultipliers(newvals);
         active  ->setBeatMultipliers(newvals);
     }
-    else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+    else if (!name.compare(cSynchronicParameterTypes[SynchronicLengthMultipliers]))
     {
         prep    ->setLengthMultipliers(newvals);
         active  ->setLengthMultipliers(newvals);
     }
     //pass original 2D array for transpositions
-    else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
+    else if (!name.compare(cSynchronicParameterTypes[SynchronicTranspOffsets]))
     {
         prep    ->setTransposition(values);
         active  ->setTransposition(values);
@@ -339,7 +591,7 @@ void SynchronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
     //processor.updateState->synchronicPreparationDidChange = true;
 }
 
-void SynchronicPreparationEditor::BKSingleSliderValueChanged(String name, double val)
+void SynchronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
@@ -398,27 +650,34 @@ void SynchronicPreparationEditor::update(NotificationType notify)
         
         for(int i = 0; i < paramSliders.size(); i++)
         {
-            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+            if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicAccentMultipliers]))
             {
                 paramSliders[i]->setTo(prep->getAccentMultipliers(), notify);
             }
             
-            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+            if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicBeatMultipliers]))
             {
                 paramSliders[i]->setTo(prep->getBeatMultipliers(), notify);
             }
             
-            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+            if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicLengthMultipliers]))
             {
                 paramSliders[i]->setTo(prep->getLengthMultipliers(), notify);
             }
             
-            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicTranspOffsets])
+            if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicTranspOffsets]))
             {
                 paramSliders[i]->setTo(prep->getTransposition(), notify);
             }
         }
         
+        for(int i=0; i<envelopeSliders.size(); i++)
+        {
+            envelopeSliders[i]->setAttackValue(prep->getAttack(i), notify);
+            envelopeSliders[i]->setDecayValue(prep->getDecay(i), notify);
+            envelopeSliders[i]->setSustainValue(prep->getSustain(i), notify);
+            envelopeSliders[i]->setReleaseValue(prep->getRelease(i), notify);
+        }
     }
     
 }
@@ -426,6 +685,82 @@ void SynchronicPreparationEditor::update(NotificationType notify)
 void SynchronicPreparationEditor::update()
 {
     update(dontSendNotification);
+}
+
+void SynchronicPreparationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
+{
+    DBG("BKADSRSliderValueChanged received " + name);
+    
+    int which = 0;
+    for(int i=0; i<envelopeSliders.size(); i++)
+    {
+        if(envelopeSliders[i]->getName() == name) which = i;
+    }
+    
+    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+    SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
+    prep->setAttack(which, attack);
+    active->setAttack(which, attack);
+    prep->setDecay(which, decay);
+    active->setDecay(which, decay);
+    prep->setSustain(which, sustain);
+    active->setSustain(which, sustain);
+    prep->setRelease(which, release);
+    active->setRelease(which, release);
+    
+    prep->setEnvelopeOn(which, true);
+    active->setEnvelopeOn(which, true);
+    envelopeSliders[which]->setBright();
+    
+}
+
+void SynchronicPreparationEditor::BKADSRButtonStateChanged(String name, bool shift, bool state)
+{
+    //DBG("BKADSRButtonStateChanged + " + String((int)state));
+    
+    int which = 0;
+    for(int i=0; i<envelopeSliders.size(); i++)
+    {
+        if(envelopeSliders[i]->getName() == name) which = i;
+    }
+    
+    if(shift)
+    {
+        SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+        SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+        
+        if(which != 0) //first envelope is always on...
+        {
+            //DBG("toggling " + String(which) + " " + String((int)state));
+            prep->setEnvelopeOn(which, state);
+            active->setEnvelopeOn(which, state);
+            if(state) envelopeSliders[which]->setBright();
+            else envelopeSliders[which]->setDim(gModAlpha);
+            
+        }
+        else
+        {
+            envelopeSliders[0]->setButtonToggle(true);
+            envelopeSliders[0]->setBright();
+        }
+    }
+    else
+    {
+        setShowADSR(name, !state);
+        setSubWindowInFront(!state);
+    }
+}
+
+void SynchronicPreparationEditor::closeSubWindow()
+{
+    for(int i=0; i<envelopeSliders.size(); i++)
+    {
+        envelopeSliders[i]->setIsButtonOnly(true);
+        setShowADSR(envelopeSliders[i]->getName(), false);
+    }
+    DBG("SynchronicPreparationEditor::closeSubWindow()");
+    setSubWindowInFront(false);
 }
 
 void SynchronicPreparationEditor::fillSelectCB(int last, int current)
@@ -532,6 +867,30 @@ void SynchronicPreparationEditor::actionButtonCallback(int action, SynchronicPre
     else if (action == 5)
     {
         processor.clear(PreparationTypeSynchronic, processor.updateState->currentSynchronicId);
+        vc->update();
+    }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentSynchronicId;
+        Synchronic::Ptr prep = processor.gallery->getSynchronic(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
         vc->update();
     }
 }
@@ -641,6 +1000,13 @@ void SynchronicPreparationEditor::buttonClicked (Button* b)
     else if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
+        for(int i=0; i<envelopeSliders.size(); i++)
+        {
+            envelopeSliders[i]->setIsButtonOnly(true);
+            setShowADSR(envelopeSliders[i]->getName(), false);
+        }
+        setSubWindowInFront(false);
     }
     else if (b == &actionButton)
     {
@@ -666,13 +1032,13 @@ SynchronicViewController(p, theGraph)
     clusterThreshSlider->addMyListener(this);
     clusterMinMaxSlider->addMyListener(this);
     gainSlider->addMyListener(this);
-    for(int i = 0; i < paramSliders.size(); i++)
-    {
-        paramSliders[i]->addMyListener(this);
-    }
     
-    //startTimer(20);
+    howManySlider->displaySliderVisible(false);
+    clusterThreshSlider->displaySliderVisible(false);
+    clusterMinMaxSlider->displaySliderVisible(false);
     
+    for(int i = 0; i < envelopeSliders.size(); i++) envelopeSliders[i]->addMyListener(this);
+
 }
 
 void SynchronicModificationEditor::greyOutAllComponents()
@@ -696,6 +1062,13 @@ void SynchronicModificationEditor::greyOutAllComponents()
     {
         paramSliders[i]->setAlpha(gModAlpha);
     }
+    
+    for(int i=0; i<envelopeSliders.size(); i++)
+    {
+        envelopeSliders[i]->setDim(gModAlpha);
+    }
+    envelopeName.setAlpha(gModAlpha);
+    
 }
 
 void SynchronicModificationEditor::highlightModedComponents()
@@ -714,7 +1087,7 @@ void SynchronicModificationEditor::highlightModedComponents()
     {
         for(int i = 0; i < paramSliders.size(); i++)
         {
-            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+            if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicBeatMultipliers]))
                 paramSliders[i]->setAlpha(1.);
         }
     }
@@ -722,7 +1095,7 @@ void SynchronicModificationEditor::highlightModedComponents()
     {
         for(int i = 0; i < paramSliders.size(); i++)
         {
-            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+            if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicLengthMultipliers]))
                 paramSliders[i]->setAlpha(1.);
         }
     }
@@ -730,7 +1103,7 @@ void SynchronicModificationEditor::highlightModedComponents()
     {
         for(int i = 0; i < paramSliders.size(); i++)
         {
-            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+            if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicAccentMultipliers]))
                 paramSliders[i]->setAlpha(1.);
         }
     }
@@ -738,9 +1111,19 @@ void SynchronicModificationEditor::highlightModedComponents()
     {
         for(int i = 0; i < paramSliders.size(); i++)
         {
-            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicTranspOffsets])
+            if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicTranspOffsets]))
                 paramSliders[i]->setAlpha(1.);
         }
+    }
+    if(mod->getParam(SynchronicADSRs) != "")
+    {
+        Array<Array<float>> envs = stringToArrayFloatArray(mod->getParam(SynchronicADSRs));
+        for(int i = 0; i < envelopeSliders.size(); i++)
+        {
+            if(envs[i][4]) envelopeSliders[i]->setBright();
+            else envelopeSliders[i]->setDim(gModAlpha);
+        }
+        envelopeName.setAlpha(1.);
     }
 }
 
@@ -787,25 +1170,45 @@ void SynchronicModificationEditor::update(NotificationType notify)
         
         for (int i = 0; i < paramSliders.size(); i++)
         {
-            if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+            if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicAccentMultipliers]))
             {
                 val = mod->getParam(SynchronicAccentMultipliers);
                 paramSliders[i]->setTo(stringToFloatArray(val), notify);
             }
-            else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+            else if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicBeatMultipliers]))
             {
                 val = mod->getParam(SynchronicBeatMultipliers);
                 paramSliders[i]->setTo(stringToFloatArray(val), notify);
             }
-            else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+            else if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicLengthMultipliers]))
             {
                 val = mod->getParam(SynchronicLengthMultipliers);
                 paramSliders[i]->setTo(stringToFloatArray(val), notify);
             }
-            else if(paramSliders[i]->getName() == cSynchronicParameterTypes[SynchronicTranspOffsets])
+            else if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicTranspOffsets]))
             {
                 val = mod->getParam(SynchronicTranspOffsets);
                 paramSliders[i]->setTo(stringToArrayFloatArray(val), notify);
+            }
+        }
+        
+        if(mod->getParam(SynchronicADSRs) != "")
+        {
+            Array<Array<float>> fvals = stringToArrayFloatArray(mod->getParam(SynchronicADSRs));
+            for(int i=0; i<envelopeSliders.size(); i++)
+            {
+                if(fvals[i][4] > 0)
+                {
+                    envelopeSliders[fvals[i][5]]->setValue(fvals[i], notify);
+                }
+                envelopeSliders[i]->setValue(fvals[i], notify);
+            }
+        }
+        else
+        {
+            for(int i=0; i<envelopeSliders.size(); i++)
+            {
+                envelopeSliders[i]->setPassive();
             }
         }
     }
@@ -851,25 +1254,25 @@ void SynchronicModificationEditor::multiSliderDidChange(String name, int whichSl
 {
     SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
     
-    if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+    if (!name.compare(cSynchronicParameterTypes[SynchronicAccentMultipliers]))
     {
         Array<float> accents = stringToFloatArray(mod->getParam(SynchronicAccentMultipliers));
         accents.set(whichSlider, values[0]);
         mod->setParam(SynchronicAccentMultipliers, floatArrayToString(accents));
     }
-    else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+    else if (!name.compare(cSynchronicParameterTypes[SynchronicBeatMultipliers]))
     {
         Array<float> beats = stringToFloatArray(mod->getParam(SynchronicBeatMultipliers));
         beats.set(whichSlider, values[0]);
         mod->setParam(SynchronicBeatMultipliers, floatArrayToString(beats));
     }
-    else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+    else if (!name.compare(cSynchronicParameterTypes[SynchronicLengthMultipliers]))
     {
         Array<float> lens = stringToFloatArray(mod->getParam(SynchronicLengthMultipliers));
         lens.set(whichSlider, values[0]);
         mod->setParam(SynchronicLengthMultipliers, floatArrayToString(lens));
     }
-    else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
+    else if (!name.compare(cSynchronicParameterTypes[SynchronicTranspOffsets]))
     {
         //paramSliders
         Array<Array<float>> transps = stringToArrayFloatArray(mod->getParam(SynchronicTranspOffsets));
@@ -894,20 +1297,20 @@ void SynchronicModificationEditor::multiSlidersDidChange(String name, Array<Arra
     Array<float> newvals = Array<float>();
     for(int i=0; i<values.size(); i++) newvals.add(values[i][0]);
     
-    if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
+    if (!name.compare(cSynchronicParameterTypes[SynchronicAccentMultipliers]))
     {
         mod->setParam(SynchronicAccentMultipliers, floatArrayToString(newvals));
     }
-    else if (name == cSynchronicParameterTypes[SynchronicBeatMultipliers])
+    else if (!name.compare(cSynchronicParameterTypes[SynchronicBeatMultipliers]))
     {
         mod->setParam(SynchronicBeatMultipliers, floatArrayToString(newvals));
     }
-    else if (name == cSynchronicParameterTypes[SynchronicLengthMultipliers])
+    else if (!name.compare(cSynchronicParameterTypes[SynchronicLengthMultipliers]))
     {
         mod->setParam(SynchronicLengthMultipliers, floatArrayToString(newvals));
     }
     //pass original 2D array for transpositions
-    else if (name == cSynchronicParameterTypes[SynchronicTranspOffsets])
+    else if (!name.compare(cSynchronicParameterTypes[SynchronicTranspOffsets]))
     {
         DBG("set mod: " + arrayFloatArrayToString(values));
         mod->setParam(SynchronicTranspOffsets, arrayFloatArrayToString(values));
@@ -921,7 +1324,7 @@ void SynchronicModificationEditor::multiSlidersDidChange(String name, Array<Arra
     updateModification();
 }
 
-void SynchronicModificationEditor::BKSingleSliderValueChanged(String name, double val)
+void SynchronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
     
@@ -1033,6 +1436,30 @@ void SynchronicModificationEditor::actionButtonCallback(int action, SynchronicMo
         processor.clear(PreparationTypeSynchronicMod, processor.updateState->currentModSynchronicId);
         vc->update();
         vc->updateModification();
+    }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentModSynchronicId;
+        SynchronicModPreparation::Ptr prep = processor.gallery->getSynchronicModPreparation(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
     }
 }
 
@@ -1155,6 +1582,37 @@ void SynchronicModificationEditor::updateModification(void)
 {
     processor.updateState->modificationDidChange = true;
 }
+
+void SynchronicModificationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
+{
+    SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
+
+    Array<Array<float>> envs = stringToArrayFloatArray(mod->getParam(SynchronicADSRs));
+    for(int i=0; i<envelopeSliders.size(); i++)
+    {
+        if(envelopeSliders[i]->getName() == name)
+        {
+            envs.set(i, {(float)attack, decay, sustain, release, 1, i});
+            envelopeSliders[i]->setActive();
+            envelopeSliders[i]->setBright();
+        }
+        else
+        {                              //A, D, S,  R,  inactive, which
+            if(!envs[i][4]) envs.set(i, {3, 3, 1., 30, 0,        i}); //create inactive default
+        }
+    }
+    mod->setParam(SynchronicADSRs, arrayFloatArrayToString(envs));
+    
+    updateModification();
+}
+
+void SynchronicModificationEditor::BKADSRButtonStateChanged(String name, bool mod, bool state)
+{
+    DBG("SynchronicModificationEditor::BKADSRButtonStateChanged " + String((int)state));
+    setShowADSR(name, !state);
+    setSubWindowInFront(!state);
+}
+
 
 
 

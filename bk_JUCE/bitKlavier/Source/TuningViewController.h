@@ -12,8 +12,16 @@
 
 #include "BKViewController.h"
 
+#define TOP 70
+
+//std::vector<std::string> intervalNames = {"U", "m2", "M2", "m3", "M3", "P4", "d5", "P5", "m6", "M6", "m7", "M7", "O"};
+
 class TuningViewController :
-public BKViewController
+public BKViewController,
+public Timer
+#if JUCE_IOS
+, public WantsBigOne::Listener
+#endif
 {
 public:
     
@@ -23,10 +31,16 @@ public:
         setLookAndFeel(nullptr);
     };
     
+    void timerCallback(void) override;
+    
     void paint (Graphics&) override;
     void resized() override;
     
     virtual void update(void) {};
+    
+#if JUCE_IOS
+    void iWantTheBigOne(TextEditor*, String name) override;
+#endif
     
 protected:
     //basics
@@ -56,6 +70,9 @@ protected:
     ScopedPointer<BKSingleSlider> A1ClusterMax;
     
     BKTextButton A1reset;
+    
+    BKTextButton showSpringsButton;
+    bool showSprings;
 
     Array<float> absoluteOffsets;   //for entire keyboard; up to 128 vals
     Array<float> customOffsets;     //for custom tuning; 12 vals
@@ -64,13 +81,37 @@ protected:
     BKLabel lastInterval;
     float lastNoteTuningSave = -.1;
     
-    BKKeyboardSlider absoluteKeyboard;
-    BKKeyboardSlider customKeyboard;
+    BKLabel currentFundamental;
+    
+    BKAbsoluteKeyboardSlider absoluteKeyboard;
+    BKCircularKeyboardSlider customKeyboard; 
     
     ImageComponent iconImageComponent;
     BKButtonAndMenuLAF buttonsAndMenusLAF;
+    
+    BKComboBox nToneRootCB;
+    BKComboBox nToneRootOctaveCB;
+    ScopedPointer<BKSingleSlider> nToneSemitoneWidthSlider;
+    
+    OwnedArray<Slider> springSliders;
+    OwnedArray<Slider> tetherSliders;
+    OwnedArray<Label>  springLabels;
+    OwnedArray<Label>  tetherLabels;
+    
+    BKComboBox springScaleCB;
+    BKComboBox springScaleFundamentalCB;
 
-    //other overrides
+    ScopedPointer<BKSingleSlider> rateSlider;
+    
+    ScopedPointer<BKSingleSlider> dragSlider;
+    
+    ScopedPointer<BKSingleSlider> tetherStiffnessSlider;
+
+    ScopedPointer<BKSingleSlider> intervalStiffnessSlider;
+    
+    BKTextButton springTuningToggle;
+    Label springTuningLabel;
+    
     
     void fillTuningCB(void);
     void fillFundamentalCB(void);
@@ -90,15 +131,15 @@ class TuningPreparationEditor :
 public TuningViewController,
 public BKEditableComboBoxListener,
 public BKSingleSlider::Listener,
-public BKKeyboardSlider::Listener,
-public Timer
+//public BKKeyboardSlider::Listener,
+public BKCircularKeyboardSlider::Listener,
+public BKAbsoluteKeyboardSlider::Listener,
+public Slider::Listener
 {
 public:
     
     TuningPreparationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
     ~TuningPreparationEditor() {setLookAndFeel(nullptr);};
-    
-    void timerCallback() override;
     
     void update(void) override;
     
@@ -116,8 +157,9 @@ private:
     void bkComboBoxDidChange (ComboBox* box) override;
     void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
-    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void keyboardSliderChanged(String name, Array<float> values) override;
+    void sliderValueChanged (Slider* slider) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningPreparationEditor)
     
@@ -127,7 +169,10 @@ class TuningModificationEditor :
 public TuningViewController,
 public BKEditableComboBoxListener,
 public BKSingleSlider::Listener,
-public BKKeyboardSlider::Listener
+//public BKKeyboardSlider::Listener,
+public BKCircularKeyboardSlider::Listener,
+public Slider::Listener,
+public BKAbsoluteKeyboardSlider::Listener
 {
 public:
     
@@ -149,16 +194,19 @@ public:
     void setCurrentId(int Id);
     void deleteCurrent(void);
     
+    void greyOutAllComponents();
+    void highlightModedComponents();
+    
 private:
     
     void bkComboBoxDidChange (ComboBox* box) override;
     void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
-    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void keyboardSliderChanged(String name, Array<float> values) override;
+    void sliderValueChanged (Slider* slider) override;
     
-    void greyOutAllComponents();
-    void highlightModedComponents();
+    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningModificationEditor)
     

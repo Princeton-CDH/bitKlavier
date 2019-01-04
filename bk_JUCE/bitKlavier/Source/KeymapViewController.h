@@ -25,7 +25,8 @@ public BKViewController,
 public BKKeymapKeyboardStateListener,
 public BKEditableComboBoxListener
 #if JUCE_IOS
-, public Slider::Listener
+, public Slider::Listener,
+public WantsBigOne::Listener
 #endif
 {
 public:
@@ -42,6 +43,7 @@ public:
     void fillSelectCB(int last, int current);
     
     static void actionButtonCallback(int action, KeymapViewController*);
+    static void keysMenuCallback(int result, KeymapViewController* vc);
     
     int addKeymap(void);
     int duplicateKeymap(void);
@@ -52,7 +54,13 @@ public:
     
     void bkTextFieldDidChange       (TextEditor&)           override;
 
+#if JUCE_IOS
+    void iWantTheBigOne(TextEditor*, String name) override;
+#endif
+    
 private:
+    
+    bool hasBigOne;
     
     BKLabel     keymapSelectL;
     BKEditableComboBox  selectCB;
@@ -65,13 +73,23 @@ private:
     BKKeymapKeyboardComponent* keyboard;
     BKTextButton keyboardValsTextFieldOpen;
     
+    TextButton      keysButton;
+    TextButton      clearButton;
+    BKComboBox      keysCB;
+    
+    bool selectType;
+    
+    PopupMenu getKeysMenu(void);
+    PopupMenu getPitchClassMenu(int offset);
+    
     void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void textEditorFocusLost(TextEditor& textEditor) override;
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
-    
+    void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+    void textEditorTextChanged(TextEditor& tf) override;
     
     void bkMessageReceived          (const String& message) override;
     

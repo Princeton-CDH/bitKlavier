@@ -13,12 +13,6 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-#define TEXT_CHANGE_INTERNAL 0
-
-#define USE_SYNTH_INTERNAL 0
-#define CRAY_COOL_MUSIC_MAKER 0
-#define CRAY_COOL_MUSIC_MAKER_2 0
-
 const String posX = "X";
 const String posY = "Y";
 
@@ -42,6 +36,7 @@ const String ptagGeneral_hammerGain = "hammerGain";
 const String ptagGeneral_tempoMultiplier = "tempoMultiplier";
 const String ptagGeneral_resAndHammer = "resAndHammer";
 const String ptagGeneral_invertSustain = "invertSustain";
+const String ptagGeneral_noteOnSetsNoteOffVelocity = "noteOnSetsNoteOffVelocity";
 const String ptagGeneral_tuningFund = "tuningFund";
 
 const String vtagPiano = "piano";
@@ -88,6 +83,7 @@ const String ptagSynchronic_clusterMax = "clusterMax";
 const String ptagSynchronic_clusterThresh = "clusterThresh";
 const String ptagSynchronic_mode = "mode";
 const String ptagSynchronic_beatsToSkip = "beatsToSkip";
+const String ptagSynchronic_gain = "gain";
 
 const String vtagTempo= "tempo";
 const String vtagModTempo = "modTempo";
@@ -105,6 +101,7 @@ const String vtagSynchronic_lengthMults = "lengthMultipliers";
 const String vtagSynchronic_accentMults = "accentMultipliers";
 const String vtagSynchronic_transpOffsets = "transpOffsets";
 const String ptagSynchronic_reset = "synchronicReset";
+const String vtagSynchronic_ADSRs = "ADSRs";
 
 
 const String vtagNostalgic = "nostalgic";
@@ -120,6 +117,8 @@ const String ptagNostalgic_mode = "mode";
 const String ptagNostalgic_beatsToSkip = "beatsToSkip";
 const String ptagNostalgic_syncTarget = "syncTarget";
 const String ptagNostalgic_reset = "nostalgicReset";
+const String vtagNostalgic_reverseADSR = "reverseADSR";
+const String vtagNostalgic_undertowADSR = "undertowADSR";
 
 
 const String vtagDirect = "direct";
@@ -131,12 +130,14 @@ const String ptagDirect_gain = "gain";
 const String ptagDirect_resGain = "resGain";
 const String ptagDirect_hammerGain = "hammerGain";
 const String ptagDirect_reset = "directReset";
+const String vtagDirect_ADSR = "ADSR";
 
 
 const String vtagTuning = "tuning";
 const String vtagModTuning = "modTuning";
 const String ptagTuning_Id = "Id";
 const String ptagTuning_scale = "scale";
+const String ptagTuning_scaleName = "scaleName";
 const String ptagTuning_fundamental = "fundamental";
 const String ptagTuning_offset = "offset";
 const String ptagTuning_adaptiveIntervalScale = "adaptiveIntervalScale";
@@ -146,11 +147,26 @@ const String ptagTuning_adaptiveAnchorFund = "adaptiveAnchorFund";
 const String ptagTuning_adaptiveClusterThresh = "adaptiveClusterThresh";
 const String ptagTuning_adaptiveHistory = "adaptiveHistory";
 
+const String ptagTuning_nToneRoot = "nToneRoot";
+const String ptagTuning_nToneRootCB = "nToneRootCB";
+const String ptagTuning_nToneRootOctaveCB = "nToneRootOctaveCB";
+const String ptagTuning_nToneSemitoneWidth = "nToneSemitoneWidth";
+
 const String vtagTuning_customScale = "customScale";
 const String ptagTuning_customScaleLength = "customScaleLength";
 const String ptagTuning_customScaleDegree = "scaleDegree";
 const String vTagTuning_absoluteOffsets = "absoluteOffsets";
 const String ptagTuning_resetPrep = "tuningReset";
+
+const String ptagTuning_tetherStiffness = "tstiff";
+const String ptagTuning_intervalStiffness = "istiff";
+const String ptagTuning_rate = "srate";
+const String ptagTuning_drag = "drag";
+const String ptagTuning_active = "active";
+const String ptagTuning_tetherWeights = "tweights";
+const String ptagTuning_springWeights = "sweights";
+const String ptagTuning_intervalScale = "iscale";
+const String ptagTuning_intervalScaleFundamental = "iscalefundamental";
 
 const String vtagKeymaps = "keymaps";
 const String vtagKeymap =  "keymap";
@@ -199,6 +215,7 @@ typedef enum BKNoteType {
     MainNote,
     HammerNote,
     ResonanceNote,
+    PedalNote,
     BKNoteTypeNil,
 } BKNoteType;
 
@@ -265,6 +282,8 @@ typedef enum BKPreparationDisplay {
     DisplayTuningMod,
     DisplayTempoMod,
     DisplayGeneral,
+    DisplayAbout,
+    DisplayComment,
     DisplayNil,
 } BKPreparationDisplay;
 
@@ -419,8 +438,7 @@ typedef enum SynchronicParameterType {
     SynchronicLengthMultipliers,
     SynchronicBeatMultipliers,
     SynchronicGain,
-    SynchronicTuning,
-    SynchronicTempo,
+    SynchronicADSRs,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
@@ -438,8 +456,7 @@ static const std::vector<BKParameterDataType> cSynchronicDataTypes = {
     BKFloatArr,
     BKFloatArr,
     BKFloat,
-    BKInt,
-    BKInt,
+    BKArrFloatArr
 };
 
 static const std::vector<std::string> cSynchronicParameterTypes = {
@@ -455,8 +472,7 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "sustain length multipliers",
     "beat length multipliers",
     "gain",
-    "Tuning Id",
-    "Tempo Id"
+    "ADSRs"
 };
 
 static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc = {
@@ -472,7 +488,7 @@ static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc
 	{ -2.0f, 2.0f, 1.0f, 0.001f },
 	{ 0.0f, 2.0f, 1.0f, 0.001f },
 	{ 0.0f, 0.0f, 0.0f, 0.0f },
-	{ 0.0f, 0.0f, 0.0f, 0.0f },
+	{ 0.0f, 0.0f, 0.0f, 0.0f }
 };
 
 #pragma mark - Nostalgic
@@ -500,6 +516,8 @@ typedef enum NostalgicParameterType {
     NostalgicMode,
     NostalgicSyncTarget,
     NostalgicTuning,
+    NostalgicReverseADSR,
+    NostalgicUndertowADSR,
     NostalgicParameterTypeNil
     
 } NostalgicParameterType;
@@ -515,7 +533,9 @@ static const std::vector<BKParameterDataType> cNostalgicDataTypes =
     BKInt,
     BKInt,
     BKInt,
-    BKInt
+    BKInt,
+    BKFloatArr,
+    BKFloatArr
 };
 
 static const std::vector<std::string> cNostalgicParameterTypes = {
@@ -528,6 +548,8 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
     "BeatsToSkip",
     "Length Mode",
     "SyncTarget",
+    "ReverseADSR",
+    "UndertowADSR",
     "Tuning Id"
 };
 
@@ -540,6 +562,7 @@ typedef enum DirectParameterType
     DirectResGain,
     DirectHammerGain,
     DirectTuning,
+    DirectADSR,
     DirectParameterTypeNil,
     
 } DirectParameterType;
@@ -551,7 +574,8 @@ static const std::vector<BKParameterDataType> cDirectDataTypes = {
     BKFloat,
     BKFloat,
     BKFloat,
-    BKInt
+    BKInt,
+    BKFloatArr
 };
 
 static const std::vector<std::string> cDirectParameterTypes = {
@@ -560,7 +584,8 @@ static const std::vector<std::string> cDirectParameterTypes = {
     "Gain",
     "ResGain",
     "HammerGain",
-    "Tuning Id"
+    "Tuning Id",
+    "ADSR"
 };
 
 #pragma mark - Tuning
@@ -576,8 +601,22 @@ typedef enum TuningParameterType
     TuningA1AnchorFundamental,
     TuningA1ClusterThresh,
     TuningA1History,
+    TuningNToneRoot,
+    TuningNToneRootCB,
+    TuningNToneRootOctaveCB,
+    TuningNToneSemitoneWidth,
     TuningCustomScale,
     TuningAbsoluteOffsets,
+    TuningSpringStiffness,
+    TuningSpringTetherStiffness,
+    TuningSpringIntervalStiffness,
+    TuningSpringRate,
+    TuningSpringDrag,
+    TuningSpringActive,
+    TuningSpringTetherWeights,
+    TuningSpringIntervalWeights,
+    TuningSpringIntervalScale,
+    TuningSpringIntervalFundamental,
     TuningParameterTypeNil
     
 } TuningParameterType;
@@ -593,8 +632,22 @@ static const std::vector<BKParameterDataType> cTuningDataTypes = {
     BKInt,
     BKInt,
     BKInt,
+    BKInt,
+    BKInt,
+    BKInt,
+    BKFloat,
     BKFloatArr,
-    BKFloatArr
+    BKFloatArr,
+    BKFloat,
+    BKFloat,
+    BKFloat,
+    BKFloat,
+    BKFloat,
+    BKBool,
+    BKFloatArr,
+    BKFloatArr,
+    BKInt,
+    BKInt
 };
 
 static const std::vector<std::string> cTuningParameterTypes = {
@@ -608,16 +661,39 @@ static const std::vector<std::string> cTuningParameterTypes = {
     "A1AnchorFund",
     "A1ClusterThresh",
     "A1History",
+    "NToneRoot",
+    "NToneRootCB",
+    "NToneRootOctave",
+    "NToneSemitoneWidth",
     "CustomScale",
-    "AbsoluteOffsets"
+    "AbsoluteOffsets",
+    "SpringStiffness",
+    "SpringTetherStiffness",
+    "SpringIntervalStiffness",
+    "SpringRate",
+    "SpringDrag",
+    "SpringActive",
+    "SpringTetherWeights",
+    "SpringIntervalWeights",
+    "SpringIntervalScale",
+    "SpringIntervalFundamental"
 };
 
 
 #pragma mark - Tempo
 
+typedef enum TempoType {
+    ConstantTempo = 0,
+    AdaptiveTempo1,
+    HostTempo,
+    TempoSystemNil
+    
+} TempoType;
+
 static const std::vector<std::string> cTempoModeTypes = {
     "Constant Tempo",
-    "Adaptive Tempo 1"
+    "Adaptive Tempo 1",
+    "Host Tempo"
 };
 
 typedef enum AdaptiveTempo1Mode {
@@ -706,10 +782,11 @@ static const std::vector<std::string> cKeymapParameterTypes = {
 
 typedef enum BKSampleLoadType
 {
-    BKLoadLitest,
+    BKLoadLitest = 0,
     BKLoadLite,
     BKLoadMedium,
     BKLoadHeavy,
+    BKLoadSoundfont,
     BKLoadNil
     
 }BKSampleLoadType;
@@ -789,6 +866,37 @@ typedef enum TuningSystem {
     OtonalTuning,
     UtonalTuning,
     CustomTuning,
+    Pythagorean,
+    Grammateus,
+    KirnbergerII,
+    KirnbergerIII,
+    WerkmeisterIII,
+    QuarterCommaMeantone,
+    SplitWolfQCMeantone,
+    TransposingQCMeantone,
+    Corrette,
+    Rameau,
+    Marpourg,
+    EggarsEnglishOrd,
+    ThirdCommaMeantone,
+    DAlembertRousseau,
+    Kellner,
+    Vallotti,
+    YoungII,
+    SixthCommaMeantone,
+    BachBarnes,
+    Neidhardt,
+    BachLehman,
+    BachODonnell,
+    BachHill,
+    BachSwich,
+    Lambert,
+    EighthCommaWT,
+    PinnockModern,   //35
+    CommonJust,
+    Symmetric,
+    WellTunedPiano,
+    HarrisonStrict,
     TuningSystemNil
 
 } TuningSystem;
@@ -802,7 +910,38 @@ static const std::vector<std::string> cTuningSystemNames = {
     "Duodene",
     "Otonal",
     "Utonal",
-    "Custom"
+    "Custom",
+    "Pythagorean",
+    "Grammateus",
+    "Kirnberger II",
+    "Kirnberger III",
+    "Werkmeister III",
+    "Quarter-Comma Meantone",
+    "Split-Wolf QC Meantone",
+    "Transposing QC Meantone",
+    "Corrette",
+    "Rameau",
+    "Marpourg",
+    "Eggar's English Ord",
+    "Third-Comma Meantone",
+    "D'Alembert/Rousseau",
+    "Kellner",
+    "Vallotti",
+    "Young II",
+    "Sixth-Comma Meantone",
+    "Bach/Barnes",
+    "Neidhardt Große Stadt",
+    "Bach/Lehman",
+    "Bach/O'Donnell",
+    "Bach/Hill",
+    "Bach/Swich",
+    "Lambert",
+    "Eighth-Comma WT",
+    "Pinnock Modern",
+    "Common Just",
+    "Symmetric Just",
+    "Young Well Tuned Piano",
+    "Harrison Strict Songs"
 };
 
 static const std::vector<std::string> cFundamentalNames = {
@@ -820,11 +959,5 @@ static const std::vector<std::string> cFundamentalNames = {
     "11: B"
 };
 
-typedef enum TempoType {
-    ConstantTempo = 0,
-    AdaptiveTempo1,
-    TempoSystemNil
-    
-} TempoType;
 
 #endif  // AUDIOCONSTANTS_H_INCLUDED

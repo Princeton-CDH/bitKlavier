@@ -98,3 +98,135 @@ void TempoProcessor::adaptiveReset()
     }
     adaptiveTempoPeriodMultiplier = 1.;
 }
+
+#if BK_UNIT_TESTS
+
+class TempoTests : public UnitTest
+{
+public:
+	TempoTests() : UnitTest("Tempos", "Tempo") {}
+
+	void runTest() override
+	{
+		beginTest("Tempo");
+
+		for (int i = 0; i < 10; i++)
+		{
+			// create tempo preparation and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random tempo preparation " + String(i);
+			DBG("test consistency: " + name);
+
+			TempoPreparation::Ptr tp1 = new TempoPreparation();
+
+			Tempo t1(tp1, 1);
+			t1.setName(name);
+
+			ValueTree vt1 = t1.getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			TempoPreparation::Ptr tp2 = new TempoPreparation();
+
+			Tempo t2(tp2, 1);
+
+			t2.setState(xml);
+			t2.setName(name);
+
+			ValueTree vt2 = t2.getState();
+
+			expect(vt1.isEquivalentTo(vt2), "tempo prep value trees don't match");
+
+			//expect(tp2->compare(tp1), tp1->getName() + " and " + tp2->getName() + " did not match.");
+		}
+
+		//test tuning wrapper class
+		for (int i = 0; i < 10; i++)
+		{
+			// create tempo and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random tempo " + String(i);
+			DBG("test consistency: " + name);
+
+			Tempo m1(-1, true);
+			m1.setName(name);
+
+			ValueTree vt1 = m1.getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			Tempo m2(-1, true);
+
+			m2.setState(xml);
+			m2.setName(name);
+
+			ValueTree vt2 = m2.getState();
+
+			expect(vt1.isEquivalentTo(vt2),
+				"tempo: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
+		}
+
+	}
+};
+
+static TempoTests directTests;
+
+class TempoModTests : public UnitTest
+{
+public:
+	TempoModTests() : UnitTest("TempoMod", "TempoMod") {}
+
+	void runTest() override
+	{
+		beginTest("TempoMod");
+
+		for (int i = 0; i < 10; i++)
+		{
+			// create tempo mod preparation and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random direct mod " + String(i);
+			DBG("test consistency: " + name);
+
+			TempoPreparation::Ptr tp1 = new TempoPreparation();
+			TempoModPreparation::Ptr tm1 = new TempoModPreparation(tp1, 1);
+			
+
+			tm1->randomize();
+			tm1->setName(name);
+
+			ValueTree vt1 = tm1->getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			TempoPreparation::Ptr tp2 = new TempoPreparation();
+			TempoModPreparation::Ptr tm2 = new TempoModPreparation(tp2, 1);
+
+			tm2->setState(xml);
+
+			ValueTree vt2 = tm2->getState();
+
+			expect(vt1.isEquivalentTo(vt2),
+				"tempo mod: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
+
+
+			//expect(tm1->compare(tm2), "tempo mod: preparations do not match");
+		}
+
+	}
+};
+
+static TempoModTests tempoModTests;
+
+#endif

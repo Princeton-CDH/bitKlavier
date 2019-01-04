@@ -17,25 +17,33 @@
 
 #include "General.h"
 
+#include "Tuning.h"
 
-//==============================================================================
-/**
- Describes one of the sounds that a BKSynthesiser can play.
- 
- A BKSynthesiser can contain one or more sounds, and a sound can choose which
- midi notes and channels can trigger it.
- 
- The BKSynthesiserSound is a passive class that just describes what the sound is -
- the actual audio rendering for a sound is done by a BKSynthesiserVoice. This allows
- more than one BKSynthesiserVoice to play the same sound at the same time.
- 
- @see BKSynthesiser, BKSynthesiserVoice
- */
-class BKSynthesiserSound    : public ReferenceCountedObject
+#if 0
+class SFRegion : public ReferenceCountedObject
 {
+public:
+    typedef ReferenceCountedObjectPtr<SFRegion>   Ptr;
+    typedef Array<SFRegion::Ptr>                  PtrArr;
+    SFRegion(sfzero::Region* r):
+    region(r){}
+    
+    ~SFRegion(){}
+    
+    sfzero::Region* region;
+    
+private:
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SFRegion)
+};
+#endif
+
+class JUCE_API  BKSynthesiserSound    : public ReferenceCountedObject
+{
+ 
 protected:
     //==============================================================================
-    BKSynthesiserSound();
+    BKSynthesiserSound(void);
     
 public:
     /** Destructor. */
@@ -44,31 +52,36 @@ public:
     //==============================================================================
     /** Returns true if this sound should be played when a given midi note is pressed.
      
-     The BKSynthesiser will use this information when deciding which sounds to trigger
+     The Synthesiser will use this information when deciding which sounds to trigger
      for a given note.
      */
     virtual bool appliesToNote (int midiNoteNumber) = 0;
     
-    /** Returns true if this sound should be played when a given midi velocity is played.
-     
-     The BKSynthesiser will use this information when deciding which sounds to trigger
-     for a given velocity.
-     */
-    virtual bool appliesToVelocity (int midiNoteVelocity) = 0;
-    
     /** Returns true if the sound should be triggered by midi events on a given channel.
      
-     The BKSynthesiser will use this information when deciding which sounds to trigger
+     The Synthesiser will use this information when deciding which sounds to trigger
      for a given note.
      */
     virtual bool appliesToChannel (int midiChannel) = 0;
     
+    /** Returns true if the sound should be triggered by midi veloctity.
+     
+     The Synthesiser will use this information when deciding which sounds to trigger
+     for a given note.
+     */
+    virtual bool appliesToVelocity (int midiVelocity) = 0;
     
     /** The class is reference-counted, so this is a handy pointer class for it. */
     typedef ReferenceCountedObjectPtr<BKSynthesiserSound> Ptr;
     
+    sfzero::Region* region_;
+    uint64 sampleLength;
+    sfzero::Region::Trigger trigger;
+    bool pedal;
+    String sampleName;
     
 private:
+    
     //==============================================================================
     JUCE_LEAK_DETECTOR (BKSynthesiserSound)
 };
@@ -119,15 +132,31 @@ public:
     /** Called to start a new note.
      This will be called during the rendering callback, so must be fast and thread-safe.
      */
-    virtual void startNote (float midiNoteNumber,
+    virtual void startNote (int midiNoteNumber,
+                            float offset,
                             float gain,
                             PianoSamplerNoteDirection direction,
                             PianoSamplerNoteType type,
                             BKNoteType bktype,
                             uint64 startingPosition,
                             uint64 length,
-                            int voiceRampOn,
-                            int voiceRampOff,
+                            uint64 voiceRampOn,
+                            uint64 voiceRampOff,
+                            BKSynthesiserSound* sound) = 0;
+    
+    virtual void startNote (int midiNoteNumber,
+                            float offset,
+                            int pitchWheelValue,
+                            float gain,
+                            PianoSamplerNoteDirection direction,
+                            PianoSamplerNoteType type,
+                            BKNoteType bktype,
+                            uint64 startingPosition,
+                            uint64 length,
+                            uint64 adsrAttack,
+                            uint64 adsrDecay,
+                            float adsrSustain,
+                            uint64 adsrRelease,
                             BKSynthesiserSound* sound) = 0;
     
     /** Called to stop a note.
@@ -241,6 +270,8 @@ public:
     
     GeneralSettings::Ptr generalSettings;
     void setGeneralSettings(GeneralSettings::Ptr gen) {generalSettings = gen;}
+    
+    TuningProcessor::Ptr tuning;
     
 protected:
     /** Resets the state of this voice after a sound has finished playing.
@@ -409,7 +440,26 @@ public:
                         float startingPositionMS,
                         float lengthMS,
                         float rampOnMS,
-                        float rampOffMS);
+                        float rampOffMS,
+                        TuningProcessor::Ptr tuner = nullptr);
+    
+    virtual void keyOn (int midiChannel,
+                        int keyNoteNumber,
+                        int midiNoteNumber,
+                        float transp,
+                        float velocity,
+                        float gain,
+                        PianoSamplerNoteDirection direction,
+                        PianoSamplerNoteType type,
+                        BKNoteType bktype,
+                        int layer,
+                        float startingPositionMS,
+                        float lengthMS,
+                        float adsrAttackMS,
+                        float adsrDecayMS,
+                        float adsrSustain,
+                        float adsrReleaseMS,
+                        TuningProcessor::Ptr tuner = nullptr);
     
     /** Triggers a note-off event.
      
@@ -644,8 +694,28 @@ protected:
                      int layer,
                      uint64 startingPosition,
                      uint64 length,
-                     int voiceRampOn,
-                     int voiceRampOff);
+                     uint64 voiceRampOn,
+                     uint64 voiceRampOff,
+                     TuningProcessor::Ptr tuner);
+    
+    void startVoice (BKSynthesiserVoice* voice,
+                     BKSynthesiserSound* sound,
+                     int midiChannel,
+                     int keyNoteNumber,
+                     int midiNoteNumber,
+                     float midiNoteNumberOffset,
+                     float gain,
+                     PianoSamplerNoteDirection direction,
+                     PianoSamplerNoteType type,
+                     BKNoteType bktype,
+                     int layer,
+                     uint64 startingPosition,
+                     uint64 length,
+                     uint64 adsrAttack,
+                     uint64 adsrDecay,
+                     float adsrSustain,
+                     uint64 adsrRelease,
+                     TuningProcessor::Ptr tuner);
     
     /** Stops a given voice.
      You should never need to call this, it's used internally by noteOff, but is protected
@@ -656,6 +726,8 @@ protected:
     
     /** Can be overridden to do custom handling of incoming midi events. */
     virtual void handleMidiEvent (const MidiMessage&);
+    
+    juce::Array<sfzero::Region *> regions_;
     
 private:
     
@@ -668,13 +740,14 @@ private:
                            int numSamples);
     //==============================================================================
     
-    
+    int pitchWheelValue;
     double sampleRate;
     uint32 lastNoteOnCounter;
     int minimumSubBlockSize;
     bool subBlockSubdivisionIsStrict;
     bool shouldStealNotes;
     BigInteger sustainPedalsDown;
+
     
 #if JUCE_CATCH_DEPRECATED_CODE_MISUSE
     // Note the new parameters for these methods.

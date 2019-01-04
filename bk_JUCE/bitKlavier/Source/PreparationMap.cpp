@@ -255,23 +255,30 @@ void PreparationMap::deactivateIfNecessary()
 }
 
 
-void PreparationMap::processBlock(int numSamples, int midiChannel, bool onlyNostalgic)
+void PreparationMap::processBlock(int numSamples, int midiChannel, BKSampleLoadType type, bool onlyNostalgic)
 {
+    sampleType = type;
     if(onlyNostalgic) {
         for (auto nproc : nprocessor)
-            nproc->processBlock(numSamples, midiChannel);
+            nproc->processBlock(numSamples, midiChannel, sampleType);
     }
 
     else
     {
         for (auto dproc : dprocessor)
-            dproc->processBlock(numSamples, midiChannel);
+        {
+            dproc->processBlock(numSamples, midiChannel, sampleType);
+        }
         
         for (auto sproc : sprocessor)
-            sproc->processBlock(numSamples, midiChannel);
+        {
+            sproc->processBlock(numSamples, midiChannel, sampleType);
+        }
         
         for (auto nproc : nprocessor)
-            nproc->processBlock(numSamples, midiChannel);
+        {
+            nproc->processBlock(numSamples, midiChannel, sampleType);
+        }
         
         for (auto tproc : tprocessor)
             tproc->processBlock(numSamples);
@@ -281,15 +288,26 @@ void PreparationMap::processBlock(int numSamples, int midiChannel, bool onlyNost
     }
 }
 
+void PreparationMap::clearKey(int noteNumber)
+{
+    if(sustainPedalIsDepressed)
+    {
+        for(int i=0; i<sustainedNotes.size(); i++)
+        {
+            if(sustainedNotes.getUnchecked(i).noteNumber == noteNumber)
+                sustainedNotes.remove(i);
+        }
+    }
+}
+
 //not sure why some of these have Channel and some don't; should rectify?
-void PreparationMap::keyPressed(int noteNumber, float velocity, int channel)
+void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, bool soundfont)
 {
     if (pKeymap->containsNote(noteNumber))
     {
-        
         if(sustainPedalIsDepressed)
         {
-            DBG("removing sustained note " + String(noteNumber));
+            //DBG("removing sustained note " + String(noteNumber));
             
             for(int i=0; i<sustainedNotes.size(); i++)
             {
@@ -297,6 +315,9 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel)
                     sustainedNotes.remove(i);
             }
         }
+
+        for (auto proc : tprocessor)
+            proc->keyPressed(noteNumber);
         
         for (auto proc : dprocessor)
             proc->keyPressed(noteNumber, velocity, channel);
@@ -307,17 +328,16 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel)
         for (auto proc : nprocessor)
             proc->keyPressed(noteNumber, velocity, channel);
         
-        for (auto proc : tprocessor)
-            proc->keyPressed(noteNumber);
-        
         for (auto proc : mprocessor)
             proc->keyPressed(noteNumber, velocity);
     }
 }
 
 
-void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
+void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bool soundfont)
 {
+    
+    //DBG("PreparationMap::keyReleased : " + String(noteNumber));
     
     if(sustainPedalIsDepressed && pKeymap->containsNote(noteNumber))
     {
@@ -325,9 +345,18 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
         newNote.noteNumber = noteNumber;
         newNote.velocity = velocity;
         newNote.channel = channel;
-        DBG("storing sustained note " + String(noteNumber));
+        //DBG("storing sustained note " + String(noteNumber));
         
         sustainedNotes.add(newNote);
+        
+        if (!soundfont)
+        {
+            //play hammers and resonance when keys are released, even with pedal down
+            for (auto proc : dprocessor)
+            {
+                proc->playReleaseSample(noteNumber, velocity, channel);
+            }
+        }
     }
     else
     {
@@ -335,12 +364,19 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
         {
             for (auto proc : dprocessor)
             {
-                proc->keyReleased(noteNumber, velocity, channel);
+                proc->playReleaseSample(noteNumber, velocity, channel, soundfont);
+                
+                proc->keyReleased(noteNumber, velocity, channel, soundfont);
+            }
+            
+            for (auto proc : tprocessor)
+            {
+                proc->keyReleased(noteNumber);
             }
             
             for (auto proc : nprocessor)
             {
-                proc->keyReleased(noteNumber, velocity);
+                proc->keyReleased(noteNumber, velocity, channel);
             }
             
             for (auto proc : sprocessor)
@@ -352,26 +388,16 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel)
             {
                 proc->keyReleased(noteNumber, velocity);
             }
-            
-            /* // need this ???
-             for (int i = tuning.size(); --i >= 0; )
-             {
-             if (pKeymap->containsNote(noteNumber))
-             tuning[i]->processor->keyReleased(noteNumber, channel);
-             }
-             */
+
         }
     }
 }
 
-void PreparationMap::sustainPedalReleased(bool post)
+void PreparationMap::sustainPedalReleased(Array<bool> keysThatAreDepressed, bool post)
 {
     sustainPedalIsDepressed = false;
     
     //do all keyReleased calls now
-    
-
-    
     for(int n=0; n<sustainedNotes.size(); n++)
     {
         SustainedNote releaseNote = sustainedNotes.getUnchecked(n);
@@ -380,7 +406,13 @@ void PreparationMap::sustainPedalReleased(bool post)
         
         for (auto proc : dprocessor)
         {
-            proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel);
+            if(!keysThatAreDepressed.getUnchecked(releaseNote.noteNumber)) //don't turn off note if key is down!
+                proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel);
+        }
+        
+        for (auto proc : tprocessor)
+        {
+            proc->keyReleased(releaseNote.noteNumber);
         }
         
         for (auto proc : sprocessor)
@@ -390,7 +422,41 @@ void PreparationMap::sustainPedalReleased(bool post)
         
         for (auto proc : nprocessor)
         {
-            DBG("nostalgic sustainPedalReleased " + String((int)post));
+            //DBG("nostalgic sustainPedalReleased " + String((int)post));
+            proc->keyReleased(releaseNote.noteNumber, releaseNote.channel, post);
+        }
+    }
+    
+    sustainedNotes.clearQuick();
+}
+
+void PreparationMap::sustainPedalReleased(bool post)
+{
+    sustainPedalIsDepressed = false;
+    
+    //do all keyReleased calls now
+    for(int n=0; n<sustainedNotes.size(); n++)
+    {
+        SustainedNote releaseNote = sustainedNotes.getUnchecked(n);
+
+        for (auto proc : dprocessor)
+        {
+            proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel);
+        }
+        
+        for (auto proc : tprocessor)
+        {
+            proc->keyReleased(releaseNote.noteNumber);
+        }
+        
+        for (auto proc : sprocessor)
+        {
+            proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel);
+        }
+        
+        for (auto proc : nprocessor)
+        {
+            //DBG("nostalgic sustainPedalReleased " + String((int)post));
             proc->keyReleased(releaseNote.noteNumber, releaseNote.channel, post);
         }
     }
@@ -400,7 +466,7 @@ void PreparationMap::sustainPedalReleased(bool post)
 
 void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
 {
-    DBG("PreparationMap::postRelease");
+    DBG("PreparationMap::postRelease " + String(noteNumber));
     
     if(sustainPedalIsDepressed && pKeymap->containsNote(noteNumber))
     {
@@ -417,7 +483,13 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
     {
         for (auto proc : dprocessor)
         {
-            proc->keyReleased(noteNumber, velocity, channel);
+            if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber, velocity, channel);
+            //proc->keyReleased(noteNumber, velocity, channel);
+        }
+        
+        for (auto proc : tprocessor)
+        {
+            if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber);
         }
         
         for (auto proc : nprocessor)

@@ -80,36 +80,25 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
         galleryVT.setProperty("defaultLoaded", (int)defaultLoaded, 0);
         galleryVT.setProperty("defaultName", defaultName, 0);
         
+        galleryVT.setProperty("sampleType", (int)currentSampleType, 0);
+        galleryVT.setProperty("soundfontURL", currentSoundfont, 0);
+        galleryVT.setProperty("soundfontInst", currentInstrument, 0);
+        
         galleryVT.setProperty("galleryPath", gallery->getURL(), 0);
         
         galleryVT.setProperty("defaultPiano", currentPiano->getId(), 0);
         
-        DBG("saving gallery and piano to plugin state: getStateInformation() "
-            +  gallery->getURL() + " "
-            + String(currentPiano->getId()));
+        galleryVT.setProperty("invertSustain", getSustainInversion(), 0);
+        
+        DBG("sustain inversion saved: " + String((int)getSustainInversion()));
         
         ScopedPointer<XmlElement> galleryXML = galleryVT.createXml();
         copyXmlToBinary (*galleryXML, destData);
-        
-        
-        /* //this will save entire state, rather than just which Gallery/Piano is being used
-        ValueTree galleryVT = gallery->getState();
-    
-        ScopedPointer<XmlElement> galleryXML = galleryVT.createXml();
-        
-        copyXmlToBinary (*galleryXML, destData);
-         */
-        
     }
 }
 
 void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
-    
-    //loadGallery
     if (galleryDidLoad)
     {
         DBG("BKAudioProcessor::setStateInformation");
@@ -117,6 +106,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
         ScopedPointer<XmlElement> galleryXML (getXmlFromBinary (data, sizeInBytes));
         if (galleryXML != nullptr)
         {
+            DBG(galleryXML->createDocument("haha"));
             defaultLoaded = (bool) galleryXML->getStringAttribute("defaultLoaded").getIntValue();
             
             if (defaultLoaded)
@@ -141,25 +131,33 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
                 loadGalleryFromPath(currentGalleryPath);
             }
             
+            bool invertSustain = (bool)galleryXML->getStringAttribute("invertSustain").getIntValue();
+            
+            setSustainInversion(invertSustain);
+
             
             //override gallery-saved defaultPiano with pluginHost-saved defaultPiano
             setCurrentPiano(galleryXML->getStringAttribute("defaultPiano").getIntValue());
             
             initializeGallery();
+#if !LOAD_SAMPLES_IN_GALLERY
+            BKSampleLoadType toLoadType = (BKSampleLoadType)(galleryXML->getStringAttribute("sampleType").getIntValue());
             
-        }
-    
-        
-        /* //will load entire state rather than just galleryPath, assuming it has been saved
-        ScopedPointer<XmlElement> galleryXML (getXmlFromBinary (data, sizeInBytes));
-        if (galleryXML != nullptr)
-        {
-            gallery = new Gallery(galleryXML, *this);
-            
-            initializeGallery();
+            if (toLoadType == BKLoadSoundfont)
+            {
+                currentSoundfont = galleryXML->getStringAttribute("soundfontURL");
+                currentInstrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
+                loadSamples(BKLoadSoundfont, currentSoundfont, currentInstrument);
+            }
+            else
+            {
+                currentSoundfont = "";
 
+                loadSamples(toLoadType);
+            }
+#endif
+            
         }
-         */
     }
 }
 

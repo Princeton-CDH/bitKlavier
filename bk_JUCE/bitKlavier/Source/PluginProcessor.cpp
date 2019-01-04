@@ -3,25 +3,125 @@
 #include "PluginEditor.h"
 #include "BKPianoSampler.h"
 
+#if JUCE_IOS
+int fontHeight;
+
+int gComponentComboBoxHeight;
+int gComponentLabelHeight;
+int gComponentTextFieldHeight;
+
+int gComponentRangeSliderHeight;
+int gComponentSingleSliderHeight;
+int gComponentStackedSliderHeight;
+#endif
+
+class BKUnitTestRunner : public UnitTestRunner
+{
+    void logMessage(const String& message) override
+    {
+        Logger::writeToLog(message);
+    }
+};
+
+///unit test currently commented out because it creates infinite loop
+#if BK_UNIT_TESTS
+
+class GalleryTests : public UnitTest
+{
+public:
+    GalleryTests(BKAudioProcessor& p) : UnitTest("Galleries", "Gallery"), processor(p) {}
+    
+    BKAudioProcessor& processor;
+    
+    void runTest() override
+    {
+        beginTest("GalleryXML");
+        
+        for (int i = 0; i < 5; i++)
+        {
+			Random::getSystemRandom().setSeedRandomly();
+            // create gallery and randomize it
+            // call getState() to convert to ValueTree
+            // call setState() to convert from ValueTree to preparation
+            // compare begin and end states
+            String name = "random gallery " + String(i);
+            DBG("test consistency: " + name);
+            
+            // GALLERY 1
+            processor.gallery = new Gallery(processor);
+            processor.gallery->randomize();
+            processor.gallery->setName(name);
+            
+            ValueTree vt1 = processor.gallery->getState();
+            
+            ScopedPointer<XmlElement> xml = vt1.createXml();
+            
+            // GALLERY 2
+            processor.gallery = new Gallery(xml, processor);
+            processor.gallery->setName(name);
+            
+            ValueTree vt2 =  processor.gallery->getState();
+
+#if JUCE_WINDOWS
+			File file1("C:\\Users\\User\\Desktop\\Programming\\output1.txt");
+			File file2("C:\\Users\\User\\Desktop\\Programming\\output2.txt");
+			FileLogger pressFtoPayRespects(file1, "blah", 128*1024*8);
+			FileLogger pressFtoPayRespects2ElectricBoogaloo(file2, "idk whatever", 128 * 1024 * 8);
+			pressFtoPayRespects.logMessage(vt1.toXmlString() +
+				"\n=======================\n");
+			pressFtoPayRespects2ElectricBoogaloo.logMessage(vt2.toXmlString() +
+				"\n=======================\n");
+
+#else
+            File file1("~/Desktop/bk_unittest/gal1");
+            File file2("~/Desktop/bk_unittest/gal2");
+            FileLogger pressFtoPayRespects(file1, "gallery1", 128 * 1024 *16);
+            FileLogger pressFtoPayRespects2ElectricBoogaloo(file2, "gallery2", 128 * 1024 * 16);
+            pressFtoPayRespects.logMessage(vt1.toXmlString() +
+                                           "\n=======================\n");
+            pressFtoPayRespects2ElectricBoogaloo.logMessage(vt2.toXmlString() +
+                                                            "\n=======================\n");
+            
+            expect(vt1.isEquivalentTo(vt2), "GALLERIES DO NOT MATCH");
+
+#endif
+
+            //expect(tp2->compare(tp1), tp1->getName() + " and " + tp2->getName() + " did not match.");
+        }
+    }
+};
+
+#endif
+
 //==============================================================================
 BKAudioProcessor::BKAudioProcessor(void):
+firstTime(true),
 updateState(new BKUpdateState()),
 mainPianoSynth(),
 hammerReleaseSynth(),
 resonanceReleaseSynth(),
-sustainIsDown(false),
-currentSampleType(BKLoadNil),
-loader(*this)
-#if TRY_UNDO
-,epoch(0),
-#endif
+pedalSynth(),
+currentSampleType(BKLoadLite),
+loader(*this),
+shouldLoadDefault(true)
 {
+#if BK_UNIT_TESTS
+    
+    static GalleryTests galleryTest(*this);
+    
+    UnitTest::getAllTests().add(&galleryTest);
+    
+    BKUnitTestRunner tests;
+    
+    tests.setAssertOnFailure(false);
+    
+    tests.runAllTests();
+    
+#endif
     didLoadHammersAndRes            = false;
     didLoadMainPianoSamples         = false;
-    
-#if TRY_UNDO
-    history.ensureStorageAllocated(10);
-#endif
+    sustainIsDown                   = false;
+    noteOnCount                     = 0;
     
     Process::setPriority(juce::Process::RealtimePriority);
     
@@ -57,6 +157,7 @@ loader(*this)
     uiScaleFactor = (uiScaleFactor > 1.0f) ? 1.0f : uiScaleFactor;
     
     collectGalleries();
+    collectSoundfonts();
     
     updateUI();
     
@@ -71,19 +172,25 @@ loader(*this)
     platform = BKIOS;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory);
 #endif
- 
-
-#if JUCE_MAC || JUCE_WINDOWS
+#if JUCE_MAC
     platform = BKOSX;
+    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+#endif
+#if JUCE_WINDOWS
+    platform = BKWindows;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
-
-
+#endif
+#if JUCE_LINUX
+    platform = BKLinux;
+    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
     noteOn.ensureStorageAllocated(128);
+    noteVelocity.ensureStorageAllocated(128);
     for(int i=0; i< 128; i++)
     {
         noteOn.set(i, false);
+        noteVelocity.set(i, 0.);
     }
     
     bk_examples = StringArray({
@@ -113,7 +220,12 @@ loader(*this)
         "24. Adaptive Tempo 2",
         "25. Adaptive Tempo 3",
         "26. Adaptive Tempo 4",
-        "27. PianoMapGallery"
+        "27. PianoMapGallery",
+        "28. Spring Tuning 1",
+        "29. Spring Tuning 2",
+        "30. Spring Tuning 3",
+        "31. Spring Tuning 4",
+        "32. Spring Tuning 5",
         
     });
     
@@ -154,50 +266,110 @@ loader(*this)
         "NS_7_Systerslaat",
         "NS_8_ItIsEnough"
     });
+
+}
+
+
+void BKAudioProcessor::openSoundfont(void)
+{
+#if JUCE_IOS
+#if JUCE_DEBUG
+    fc = new FileChooser ("Import a soundfont",
+                          File::getCurrentWorkingDirectory(),
+                          "*",
+                          true);
     
+    fc->launchAsync (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles,
+                     [this] (const FileChooser& chooser)
+                     {
+                         auto results = chooser.getURLResults();
+                         if (results.size() > 0)
+                         {
+                             auto url = results.getReference (0);
+                             
+                             ScopedPointer<InputStream> wi (url.createInputStream (false));
+                             
+                             if (wi != nullptr)
+                             {
+                                 MemoryBlock block(wi->getTotalLength());
+                                 wi->readIntoMemoryBlock(block);
+                                 
+                                 String name = url.getFileName();
+                                 String path = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + name.upToFirstOccurrenceOf(".sf2", false, false) + ".sf2";
+                                 
+                                 DBG("path: " + String(path));
+                                 
+                                 File sfzFile = File(path);
+                                 
+                                 FileOutputStream fos (sfzFile);
+                                 if (fos.write (block.getData(), block.getSize()))
+                                 {
+                                     fos.flush();
+               
+                                 }
+
+                                
+                             }
+                         }
+                     });
+#endif
+#else
+    FileChooser myChooser ("Load soundfont file...",
+                           //File::getSpecialLocation (File::userHomeDirectory),
+                           lastGalleryPath,
+                           "*.sf2;*.sfz;");
+    
+    if (myChooser.browseForFileToOpen())
+    {
+        File sfzFile (myChooser.getResult());
+        
+        currentSoundfont = sfzFile.getFullPathName();
+        
+        loadSamples(BKLoadSoundfont, sfzFile.getFullPathName());
+    }
+#endif
     
 }
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    bkSampleRate = sampleRate;
+    if (shouldLoadDefault)
+    {
+#if JUCE_IOS
+        loadSamples(BKLoadMedium);
+#else
+        if(wrapperType == wrapperType_AudioUnit) loadSamples(BKLoadLitest);
+        else loadSamples(BKLoadHeavy);
+#endif
+    }
+    
+#if JUCE_IOS
+    stk::Stk::setSampleRate(sampleRate);
+#endif
+    //stk::Stk::setSampleRate(sampleRate); //crashes Logic Audio Unit Validation Tool
     
     mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
     hammerReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
     resonanceReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
+    pedalSynth.setCurrentPlaybackSampleRate(sampleRate);
     
-    mainPianoSynth.setGeneralSettings(gallery->getGeneralSettings());
+    //mainPianoSynth.setGeneralSettings(gallery->getGeneralSettings());
     resonanceReleaseSynth.setGeneralSettings(gallery->getGeneralSettings());
     hammerReleaseSynth.setGeneralSettings(gallery->getGeneralSettings());
+    pedalSynth.setGeneralSettings(gallery->getGeneralSettings());
     
     levelBuf.setSize(2, 25);
     
     gallery->prepareToPlay(sampleRate);
-
-
-#if JUCE_IOS
-    String osname = SystemStats::getOperatingSystemName();
-    float iosVersion = osname.fromLastOccurrenceOf("iOS ", false, true).getFloatValue();
     
-    if (iosVersion <= 9.3)  loadPianoSamples(BKLoadLitest);
-    else                    loadPianoSamples(BKLoadMedium);
-#else
-    loadPianoSamples(BKLoadLite); // CHANGE THIS BACK TO HEAVY
-#endif
-    
-    
-#if TRY_UNDO
-    for (int i = 0; i < NUM_EPOCHS; i++)
-    {
-        history.set(i, currentPiano);
-    }
-#endif
 
+    sustainIsDown = false;
 }
 
 BKAudioProcessor::~BKAudioProcessor()
 {
     clipboard.clear();
+    //loader.stopThread(1000);
 }
 
 void BKAudioProcessor::deleteGallery(void)
@@ -211,6 +383,7 @@ void BKAudioProcessor::deleteGallery(void)
 // Duplicates current gallery and gives it name
 void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
 {
+
     File myFile(newURL);
     
     ValueTree galleryVT = gallery->getState();
@@ -237,7 +410,9 @@ void BKAudioProcessor::clearBitKlavier(void)
         hammerReleaseSynth.allNotesOff(i, true);
         resonanceReleaseSynth.allNotesOff(i, true);
         mainPianoSynth.allNotesOff(i, true);
+        pedalSynth.allNotesOff(i, true);
     }
+    sustainDeactivate();
     
     for (auto piano : gallery->getPianos())
     {
@@ -252,7 +427,8 @@ void BKAudioProcessor::deleteGalleryAtURL(String path)
     galleryPath.deleteFile();
 }
 
-void BKAudioProcessor::createNewGallery(String name)
+
+void BKAudioProcessor::createNewGallery(String name, ScopedPointer<XmlElement> xml)
 {
     updateState->loadedJson = false;
     
@@ -261,24 +437,45 @@ void BKAudioProcessor::createNewGallery(String name)
 #if JUCE_IOS
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory);
 #endif
-    
-#if JUCE_MAC || JUCE_WINDOWS
+#if JUCE_MAC
+    bkGalleries = bkGalleries.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
     bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
     
     File myFile(bkGalleries);
-    myFile = myFile.getNonexistentChildFile(name.upToFirstOccurrenceOf(".xml",false,false)+".xml", ".xml", true);
-    myFile.appendData(BinaryData::Basic_Piano_xml, BinaryData::Basic_Piano_xmlSize);
-    galleryNames.add(myFile.getFullPathName());
+    String galleryName = name.upToFirstOccurrenceOf(".xml",false,false);
+    DBG("new file name: " + galleryName);
+    myFile = myFile.getNonexistentChildFile(name.upToFirstOccurrenceOf(".xml",false,false), ".xml", true);
+    if (xml == nullptr)
+    {
+        myFile.appendData(BinaryData::Basic_Piano_xml, BinaryData::Basic_Piano_xmlSize);
+        xml = XmlDocument::parse(myFile);
+        xml->setAttribute("name", galleryName);
+        xml->writeToFile(myFile, "");
+    }
+    else
+    {
+        xml->setAttribute("name", galleryName);
+        xml->writeToFile(myFile, "");
+    }
     
-    ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
+    
+    
+    
+    
+    xml->writeToFile(myFile, "");
+    
+    
+    galleryNames.add(myFile.getFullPathName());
     
     if (xml != nullptr)
     {
         currentGallery = myFile.getFileName();
         
-        xml->setAttribute("name", currentGallery.upToFirstOccurrenceOf(".xml", false, false));
+        DBG("new gallery: " + currentGallery);
 
         gallery = new Gallery(xml, *this);
         
@@ -295,6 +492,8 @@ void BKAudioProcessor::createNewGallery(String name)
         
         defaultLoaded = false;
     }
+    
+    
 }
 
 void BKAudioProcessor::duplicateGallery(String newName)
@@ -335,6 +534,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
     
     ++noteOnCount;
     noteOn.set(noteNumber, true);
+    noteVelocity.set(noteNumber, velocity);
     
     if (allNotesOff)   allNotesOff = false;
     
@@ -344,13 +544,6 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
     {
         DBG("change piano to " + String(whichPiano));
         setCurrentPiano(whichPiano);
-        
-        if (sustainIsDown)
-        {
-            for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                currentPiano->activePMaps[p]->sustainPedalPressed();
-        }
-        
     }
     
     // modifications
@@ -358,12 +551,29 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
     performModifications(noteNumber);
     
     //tempo
+    for (p = prevPiano->activePMaps.size(); --p >= 0;) {
+        if (prevPianos[p] != currentPiano)
+            prevPiano->activePMaps[p]->clearKey(noteNumber); //clears key from array of depressed notes in prevPiano so they don't get cutoff by sustain pedal release
+    }
     
     // Send key on to each pmap in current piano
     for (p = currentPiano->activePMaps.size(); --p >= 0;) {
         //DBG("noteon: " +String(noteNumber) + " pmap: " + String(p));
-        currentPiano->activePMaps[p]->keyPressed(noteNumber, velocity, channel);
+        currentPiano->activePMaps[p]->keyPressed(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont));
     }
+    
+    //add note to springTuning, if only for Graph display
+    //this could be a bad idea, in that a user may want to have only some keys (via a keymap) go to Spring tuning
+    /*
+    for ( auto t : currentPiano->getTuningProcessors())
+    {
+        t->getTuning()->getSpringTuning()->addNote(noteNumber);
+    }
+     */
+    //keeping out for now; I just think it's better to be consistent, and even though it can be easy to forget
+    //that you need to connect a Keymap to Tuning to get adaptive/spring tunings, it also allows you
+    //control over which keys are going to spring tuning, which i can imagine being useful sometimes.
+    
 }
 
 void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel)
@@ -373,23 +583,150 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     noteOn.set(noteNumber, false);
     //DBG("noteoff velocity = " + String(velocity));
     
+    noteOnSetsNoteOffVelocity = gallery->getGeneralSettings()->getNoteOnSetsNoteOffVelocity();
+    if(noteOnSetsNoteOffVelocity) velocity = noteVelocity.getUnchecked(noteNumber);
+    else if(velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
+    
     // Send key off to each pmap in current piano
     for (p = currentPiano->activePMaps.size(); --p >= 0;)
-        currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel);
+        currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont));
     
+
     // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
-    if (prevPiano != currentPiano)
-    {
-        for (p = prevPianos.size(); --p >= 0;) {
+
+    for (p = prevPianos.size(); --p >= 0;) {
+        if (prevPianos[p] != currentPiano) {
             for (pm = prevPianos[p]->activePMaps.size(); --pm >= 0;) {
                 prevPianos[p]->activePMaps[pm]->postRelease(noteNumber, velocity, channel);
             }
         }
     }
+
+    /*
+     //do this in the PreparationMap, not here; springs should be turned on/off by Keymap
+    for ( auto t : currentPiano->getTuningProcessors())
+    {
+        t->getTuning()->getSpringTuning()->removeNote(noteNumber);
+    }
+     */
     
     --noteOnCount;
+    if(noteOnCount < 0) noteOnCount = 0;
     
 }
+
+void BKAudioProcessor::sustainActivate(void)
+{
+    DBG("BKAudioProcessor::sustainActivate");
+    if(!sustainIsDown)
+    {
+        sustainIsDown = true;
+        DBG("SUSTAIN ON");
+        
+        for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+            currentPiano->activePMaps[p]->sustainPedalPressed();
+        
+        for (int p = prevPiano->activePMaps.size(); --p >= 0;)
+            prevPiano->activePMaps[p]->sustainPedalPressed();
+        
+        //play pedalDown resonance
+        pedalSynth.keyOn(channel,
+                           //synthNoteNumber,
+                           21,
+                           21,
+                           0,
+                           0.1, //gain
+                           1.,
+                           Forward,
+                           Normal, //FixedLength,
+                           PedalNote,
+                           0,
+                           0,
+                           20000,
+                           3,
+                           3 );
+    }
+    
+}
+
+/*
+ BUG:
+
+ play a note, hold it down
+ change pianos while note is still held
+ press sustain pedal
+ release the note (pedal still down)
+ press the note again
+ while holding the note down still, release the pedal (note will be cut off, even though it is still being held down)
+ 
+ FIXED: through addition of PreparationMap::clearKey(int noteNumber)
+ 
+ BUT, there still seems to be a problem when sometimes a note will be shut off by pedal release even when it is depressed
+ this one doesn't seem to require a piano change, but i haven't been able to find a consistent way to reproduce it yet
+ 
+ I think neither of these "fixes" are actually right.
+ 
+ another one that is easy to reproduce:
+ 
+ play a note
+ press sustain pedal
+ release sustain pedal (still holding note)
+ change pianos by playing a different note
+ press sustain pedal
+ release both notes (first note cuts off, when it shouldn't because sustain pedal is down)
+ next time you play/release notes, they should work ok, so it's only this first time, and it's only if the switch of pianos happens while another note is being held
+ 
+ ALL FIXED (i think!)
+ 
+ */
+
+void BKAudioProcessor::sustainDeactivate(void)
+{
+    if(sustainIsDown)
+    {
+        sustainIsDown = false;
+        DBG("SUSTAIN OFF");
+        
+        for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+            currentPiano->activePMaps[p]->sustainPedalReleased(noteOn, false);
+        
+        if(prevPiano != currentPiano)
+        {
+            for (int p = prevPiano->activePMaps.size(); --p >= 0;)
+                //prevPiano->activePMaps[p]->sustainPedalReleased(true);
+                prevPiano->activePMaps[p]->sustainPedalReleased(noteOn, true);
+        }
+        
+        //turn off pedal down resonance
+        pedalSynth.keyOff(channel,
+                      PedalNote,
+                      0,
+                      21,
+                      21,
+                      1.,
+                      true);
+        
+        //play pedalUp sample
+        pedalSynth.keyOn(channel,
+                         //synthNoteNumber,
+                         22,
+                         22,
+                         0,
+                         0.1, //gain
+                         1.,
+                         Forward,
+                         Normal, //FixedLength,
+                         PedalNote,
+                         0,
+                         0,
+                         2000,
+                         3,
+                         3 );
+    }
+}
+
+#define LITTLE_NOTE_MACHINE 0
+#define NOTE 500
 
 void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
@@ -397,21 +734,39 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     if (!didLoadMainPianoSamples) return;
     
+    if(wrapperType == wrapperType_AudioUnit ||
+       wrapperType == wrapperType_VST ||
+       wrapperType == wrapperType_VST3) //check this on setup; if(isPlugIn) {...
+    {
+        playHead = this->getPlayHead();
+        playHead->getCurrentPosition (currentPositionInfo);
+        hostTempo = currentPositionInfo.bpm;
+
+        //hostTempo = 113; //confirmed that the following is working...
+        Tempo::PtrArr allTempoPreps = gallery->getAllTempo();
+        for (auto p : allTempoPreps)
+        {
+            p->aPrep->setHostTempo(hostTempo);
+        }
+        DBG("DAW bpm = " + String(currentPositionInfo.bpm));
+    }
+ 
     int time;
     MidiMessage m;
+    bool didNoteOffs = false;
     
     int numSamples = buffer.getNumSamples();
     if(numSamples != levelBuf.getNumSamples()) levelBuf.setSize(buffer.getNumChannels(), numSamples);
     
     // Process all active prep maps in current piano
     for (auto pmap : currentPiano->activePMaps)
-        pmap->processBlock(numSamples, m.getChannel(), false);
+        pmap->processBlock(numSamples, m.getChannel(), currentSampleType, false);
     
     // OLAGON: Process all active nostalgic preps in previous piano
     if(prevPiano != currentPiano)
     {
         for (auto pmap : prevPiano->activePMaps)
-            pmap->processBlock(numSamples, m.getChannel(), true); // true for onlyNostalgic
+            pmap->processBlock(numSamples, m.getChannel(), currentSampleType, true); // true for onlyNostalgic
     }
 
     
@@ -427,10 +782,35 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         notesOffUI.remove(i);
     }
     
+#if LITTLE_NOTE_MACHINE
+    // LITTLE NOTE MACHINE
+    count++;
+    if (count > NOTE)
+    {
+        count = 0;
+
+        for (int i = 0; i < 3; i++)
+        {
+            times[i]++;
+            
+            if (times[i] > 3)
+            {
+                handleNoteOff(notes[i], 0.5, 1);
+                times[i] = 0;
+            }
+        }
+        
+        notes[note] = 48 + Random::getSystemRandom().nextInt(Range<int>(0, 24));
+        
+        handleNoteOn(notes[note], 0.8, 1);
+        
+        note++;
+    }
+#endif
+    
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
         int noteNumber = m.getNoteNumber();
-        //DBG("note: " + String(noteNumber) + " " + String(m.getVelocity()));
         float velocity = m.getFloatVelocity();
          
         channel = m.getChannel();
@@ -442,37 +822,28 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         else if (m.isNoteOff())
         {
             handleNoteOff(noteNumber, velocity, channel);
+            didNoteOffs = true;
         }
         
+        // NEED WAY TO TRIGGER RELEASE PEDAL SAMPLE FOR SFZ
         if (m.isSustainPedalOn())
         {
-            if(!sustainIsDown)
-            {
-                sustainIsDown = true;
-                DBG("sustainPedalIsDown");
-                
-                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                    currentPiano->activePMaps[p]->sustainPedalPressed();
-            }
+            //DBG("m.isSustainPedalOn()");
+            sustainInverted = gallery->getGeneralSettings()->getInvertSustain();
+            if (sustainInverted)    sustainDeactivate();
+            else                    sustainActivate();
+               
         }
         else if (m.isSustainPedalOff())
         {
-            if(sustainIsDown)
-            {
-                sustainIsDown = false;
-                
-                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                    currentPiano->activePMaps[p]->sustainPedalReleased();
-                
-                if(prevPiano != currentPiano)
-                {
-                    DBG("prev piano sustainPedalReleased() called");
-                    for (int p = prevPiano->activePMaps.size(); --p >= 0;)
-                        prevPiano->activePMaps[p]->sustainPedalReleased(true);
-                }
-            }
+            //DBG("m.isSustainPedalOff()");
+            sustainInverted = gallery->getGeneralSettings()->getInvertSustain();
+            if (sustainInverted)    sustainActivate();
+            else                    sustainDeactivate();
         }
     }
+    
+    //if(didNoteOffs && !sustainIsDown) prevPianos.clearQuick(); //fixes phantom piano, but breaks Nostalgic keyUps over Piano changes. grr...
     
     // Sets some flags to determine whether to send noteoffs to previous pianos.
     if (!allNotesOff && !noteOnCount) {
@@ -481,7 +852,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         // Process all active prep maps in previous piano
         for (auto pmap : prevPiano->activePMaps)
             pmap->processBlock(numSamples, m.getChannel());
-         */
+        */
         
         prevPianos.clearQuick();
         allNotesOff = true;
@@ -490,9 +861,12 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     mainPianoSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
+    pedalSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     
 #if JUCE_IOS
-    buffer.applyGain(0, numSamples, 0.25);
+    buffer.applyGain(0, numSamples, 0.3 * gallery->getGeneralSettings()->getGlobalGain());
+#else
+    buffer.applyGain(0, numSamples, gallery->getGeneralSettings()->getGlobalGain());
 #endif
     
     // store buffer for level calculation when needed
@@ -522,14 +896,16 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     
     updateState->setCurrentDisplay(DisplayNil);
     
-    gallery->resetPreparations();
+    //gallery->resetPreparations(); //modded preps should remain modded across piano changes; user can Reset if desired
     
     if (noteOnCount)  prevPianos.addIfNotAlreadyThere(currentPiano);
     
     prevPiano = currentPiano;
     
     currentPiano = gallery->getPiano(which);
-    currentPiano->copyAdaptiveTuningState(prevPiano); 
+    currentPiano->clearOldNotes(prevPiano); // to clearOldNotes so it doesn't playback shit from before
+    currentPiano->copyAdaptiveTuningState(prevPiano);
+    currentPiano->copyAdaptiveTempoState(prevPiano);
     
     updateState->pianoDidChangeForGraph = true;
     updateState->synchronicPreparationDidChange = true;
@@ -540,6 +916,14 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     
     gallery->setDefaultPiano(which);
     gallery->setGalleryDirty(false);
+    
+    DBG("setting current piano to: " + String(which));
+    
+    if (sustainIsDown)
+    {
+        for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+            currentPiano->activePMaps[p]->sustainPedalPressed();
+    }
 }
 
 // Reset
@@ -586,7 +970,9 @@ void BKAudioProcessor::performModifications(int noteNumber)
     TuningModification::PtrArr tMod = currentPiano->modificationMap[noteNumber]->getTuningModifications();
     for (int i = tMod.size(); --i >= 0;)
     {
-        TuningPreparation::Ptr active = gallery->getTuning(tMod[i]->getPrepId())->aPrep;
+        Tuning::Ptr tuning = gallery->getTuning(tMod[i]->getPrepId());
+        TuningPreparation::Ptr active = tuning->aPrep;
+        TuningModPreparation::Ptr mod = gallery->getTuningModPreparation(tMod[i]->getId());
         TuningParameterType type = tMod[i]->getParameterType();
         modf = tMod[i]->getModFloat();
         modi = tMod[i]->getModInt();
@@ -594,7 +980,14 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modfa = tMod[i]->getModFloatArr();
         modia = tMod[i]->getModIntArr();
         
-        if (type == TuningScale)                    active->setTuning((TuningSystem)modi);
+        
+        //DBG("p" + String(i) + " " + mod->getParam((TuningParameterType)i));
+        
+        if (type == TuningScale)
+        {
+            active->setScale((TuningSystem)modi);
+            active->getSpringTuning()->setTetherTuning(tuning->getCurrentScale());
+        }
         else if (type == TuningFundamental)         active->setFundamental((PitchClass)modi);
         else if (type == TuningOffset)              active->setFundamentalOffset(modf);
         else if (type == TuningA1IntervalScale)     active->setAdaptiveIntervalScale((TuningSystem)modi);
@@ -603,10 +996,14 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == TuningA1ClusterThresh)     active->setAdaptiveClusterThresh(modi);
         else if (type == TuningA1AnchorFundamental) active->setAdaptiveAnchorFundamental((PitchClass) modi);
         else if (type == TuningA1History)           active->setAdaptiveHistory(modi);
+        else if (type == TuningNToneRootCB)         active->setNToneRoot(modi);
+        else if (type == TuningNToneRootOctaveCB)   active->setNToneRootOctave(modi);
+        else if (type == TuningNToneSemitoneWidth)  active->setNToneSemitoneWidth(modi);
         else if (type == TuningCustomScale)
         {
-            active->setTuning(CustomTuning);
+            active->setScale(CustomTuning);
             active->setCustomScaleCents(modfa);
+            active->getSpringTuning()->setTetherTuning(tuning->getCurrentScale());
         }
         else if (type == TuningAbsoluteOffsets)
         {
@@ -614,7 +1011,49 @@ void BKAudioProcessor::performModifications(int noteNumber)
                 active->setAbsoluteOffset(modfa[i], modfa[i+1] * .01);
             }
         }
-        
+        else if (type == TuningSpringTetherStiffness)
+        {
+            active->getSpringTuning()->setTetherStiffness(modf);
+        }
+        else if (type == TuningSpringIntervalStiffness)
+        {
+            active->getSpringTuning()->setIntervalStiffness(modf);
+        }
+        else if (type == TuningSpringRate)
+        {
+            active->getSpringTuning()->setRate(modf);
+        }
+        else if (type == TuningSpringDrag)
+        {
+            active->getSpringTuning()->setDrag(modf);
+        }
+        else if (type == TuningSpringActive)
+        {
+            active->getSpringTuning()->setActive(modb);
+        }
+        else if (type == TuningSpringTetherWeights)
+        {
+            for (int i = 0; i < 128; i++)
+            {
+                if (mod->getTetherWeightActive(i)) active->getSpringTuning()->setTetherWeight(i, modfa[i]);
+            }
+        }
+        else if (type == TuningSpringIntervalWeights)
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                if (mod->getSpringWeightActive(i)) active->getSpringTuning()->setSpringWeight(i, modfa[i]);
+            }
+        }
+        else if (type == TuningSpringIntervalScale)
+        {
+            int springScaleId = modi;
+            active->getSpringTuning()->setScaleId((TuningSystem) springScaleId);
+            
+            Array<float> scale = tuning->getScaleCents(springScaleId);
+            
+            active->getSpringTuning()->setIntervalTuning(scale);
+        }
         
         updateState->tuningPreparationDidChange = true;
     }
@@ -654,7 +1093,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == DirectGain)        active->setGain(modf);
         else if (type == DirectHammerGain)  active->setHammerGain(modf);
         else if (type == DirectResGain)     active->setResonanceGain(modf);
-        
+        else if (type == DirectADSR)        active->setADSRvals(modfa);
         
         updateState->directPreparationDidChange = true;
     }
@@ -673,9 +1112,11 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == NostalgicGain)             active->setGain(modf);
         else if (type == NostalgicMode)             active->setMode((NostalgicSyncMode)modi);
         else if (type == NostalgicUndertow)         active->setUndertow(modi);
-        else if (type == NostalgicBeatsToSkip)      active->setBeatsToSkip(modf);
+        else if (type == NostalgicBeatsToSkip)      active->setBeatsToSkip(modi);
         else if (type == NostalgicWaveDistance)     active->setWaveDistance(modi);
         else if (type == NostalgicLengthMultiplier) active->setLengthMultiplier(modf);
+        else if (type == NostalgicReverseADSR)      active->setReverseADSRvals(modfa);
+        else if (type == NostalgicUndertowADSR)     active->setUndertowADSRvals(modfa);
         
         updateState->nostalgicPreparationDidChange = true;
     }
@@ -699,21 +1140,135 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == SynchronicClusterMax)          active->setClusterMax(modi);
         else if (type == SynchronicClusterThresh)       active->setClusterThresh(modi);
         else if (type == SynchronicNumPulses )          active->setNumBeats(modi);
+        else if (type == SynchronicGain )               active->setGain(modf);
         else if (type == SynchronicBeatsToSkip)         active->setBeatsToSkip(modi);
         else if (type == SynchronicBeatMultipliers)     active->setBeatMultipliers(modfa);
         else if (type == SynchronicLengthMultipliers)   active->setLengthMultipliers(modfa);
         else if (type == SynchronicAccentMultipliers)   active->setAccentMultipliers(modfa);
+        else if (type == SynchronicADSRs)               active->setADSRs(modafa);
         
         updateState->synchronicPreparationDidChange = true;
     }
 }
 
+void BKAudioProcessor::importSoundfont(void)
+{
+    fc = new FileChooser ("Import your gallery",
+                          File::getCurrentWorkingDirectory(),
+                          "*",
+                          true);
+    
+    fc->launchAsync (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles,
+                     [this] (const FileChooser& chooser)
+                     {
+                         auto results = chooser.getURLResults();
+                         if (results.size() > 0)
+                         {
+                             auto url = results.getReference (0);
+                             
+                             ScopedPointer<InputStream> wi (url.createInputStream (false));
+                             
+                             if (wi != nullptr)
+                             {
+                                 MemoryBlock block(wi->getTotalLength());
+                                 wi->readIntoMemoryBlock(block);
+        
+                                 File file = File::getSpecialLocation (File::userDocumentsDirectory).getChildFile(url.getFileName());
+                                 file.create();
+                                 
+                                 FileOutputStream fos (file);
+                    
+                                 fos.write (&block, block.getSize());
+                                 
+                                 fos.flush();
+                                 
+                                 //if( fos.openedOk())
+                                 {
+                                     loadSamples(BKLoadSoundfont, file.getFullPathName(), 0);
+                                 }
+                             }
+                         }
+                     });
+}
+
+void BKAudioProcessor::importCurrentGallery(void)
+{
+    fc = new FileChooser ("Import your gallery",
+                          File::getCurrentWorkingDirectory(),
+                          "*.xml",
+                          true);
+    
+    fc->launchAsync (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles,
+                     [this] (const FileChooser& chooser)
+                     {
+                         auto results = chooser.getURLResults();
+                         if (results.size() > 0)
+                         {
+                             auto url = results.getReference (0);
+                             
+                             ScopedPointer<InputStream> wi (url.createInputStream (false));
+                             
+                             if (wi != nullptr)
+                             {
+                                 MemoryBlock block(wi->getTotalLength());
+                                 wi->readIntoMemoryBlock(block);
+                                 
+                                 XmlDocument doc(block.toString());
+                                 ScopedPointer<XmlElement> xml = doc.getDocumentElement();
+                                 
+                                 DBG("url file name: " + url.getFileName().replace("%20", " "));
+                                 createNewGallery(url.getFileName().replace("%20", " "), xml);
+                             }
+                         }
+                     });
+
+}
+
+void BKAudioProcessor::exportCurrentGallery(void)
+{
+    if (defaultLoaded)
+    {
+        AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
+                                          "Export not available",
+                                          "You cannot export a default gallery.");
+        return;
+    }
+    saveCurrentGallery();
+
+    File fileToSave (gallery->getURL());
+    
+    fc = new FileChooser ("Export your gallery.",
+                          fileToSave,
+                          "*",
+                          true);
+    
+    fc->launchAsync (FileBrowserComponent::saveMode | FileBrowserComponent::canSelectFiles | FileBrowserComponent::canSelectDirectories,
+                     [fileToSave] (const FileChooser& chooser)
+                     {
+                         auto result = chooser.getURLResult();
+                         auto name = result.isEmpty() ? String()
+                         : (result.isLocalFile() ? result.getLocalFile().getFullPathName()
+                            : result.toString (true));
+                         
+                         // Android and iOS file choosers will create placeholder files for chosen
+                         // paths, so we may as well write into those files.
+                         if (! result.isEmpty())
+                         {
+                             ScopedPointer<InputStream> wi (fileToSave.createInputStream());
+                             ScopedPointer<OutputStream> wo (result.createOutputStream());
+                             
+                             if (wi != nullptr && wo != nullptr)
+                             {
+                                 auto numWritten = wo->writeFromInputStream (*wi, -1);
+                                 wo->flush();
+                             }
+                         }
+                     });
+
+}
+
 void BKAudioProcessor::saveCurrentGalleryAs(void)
 {
-#if JUCE_IOS
-    
-#else
-    
     FileChooser myChooser ("Save gallery to file...",
                            lastGalleryPath,
                            "*.xml");
@@ -723,7 +1278,6 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
         writeCurrentGalleryToURL(myChooser.getResult().getFullPathName());
     }
     
-#endif
     
     updateGalleries();
     
@@ -735,7 +1289,22 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
 
 void BKAudioProcessor::saveCurrentGallery(void)
 {
-    writeCurrentGalleryToURL(gallery->getURL());
+    if (gallery->getURL() == "")
+    {
+#if JUCE_IOS
+        writeCurrentGalleryToURL( File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + gallery->getName());
+#endif
+#if JUCE_MAC
+        writeCurrentGalleryToURL( File::getSpecialLocation(File::globalApplicationsDirectory).getFullPathName() + "/bitKlavier/galleries/" + gallery->getName());
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
+        writeCurrentGalleryToURL( File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/bitKlavier resources/galleries/" + gallery->getName());
+#endif
+    }
+    else
+    {
+        writeCurrentGalleryToURL(gallery->getURL());
+    }
 }
 
 
@@ -780,22 +1349,33 @@ void BKAudioProcessor::loadGalleryDialog(void)
     if (myChooser.browseForFileToOpen())
     {
         File myFile (myChooser.getResult());
+
+        File user   (File::getSpecialLocation(File::globalApplicationsDirectory));
+        user = user.getChildFile("bitKlavier/galleries/");
         
-        ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
+        user = user.getChildFile(myFile.getFileName());
+        
+        if (myFile.getFullPathName() != user.getFullPathName())
+        {
+            if (myFile.moveFileTo(user))    DBG("MOVED");
+            else                            DBG("NOT MOVED");
+        }
+        
+        ScopedPointer<XmlElement> xml (XmlDocument::parse (user));
         
         if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
         {
-            currentGallery = myFile.getFileName();
+            currentGallery = user.getFileName();
             
             gallery = new Gallery(xml, *this);
             
-            gallery->setURL(myFile.getFullPathName());
+            gallery->setURL(user.getFullPathName());
             
             initializeGallery();
             
             galleryDidLoad = true;
             
-            lastGalleryPath = myFile;
+            lastGalleryPath = user;
         }
     }
     
@@ -860,8 +1440,6 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
         }
     }
     
-    updateState->loadedJson = true;
-    
     FileChooser myChooser ("Load gallery from json file...",
                            File::getSpecialLocation (File::userHomeDirectory),
                            "*.json");
@@ -869,15 +1447,28 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
     
     if (myChooser.browseForFileToOpen())
     {
+        updateState->loadedJson = true;
+        
         File myFile (myChooser.getResult());
         
-        currentGallery = myFile.getFileName();
+        File user   (File::getSpecialLocation(File::globalApplicationsDirectory));
+        user = user.getChildFile("bitKlavier/galleries/");
         
-        var myJson = JSON::parse(myFile);
+        user = user.getChildFile(myFile.getFileName());
+        
+        if (myFile.getFullPathName() != user.getFullPathName())
+        {
+            if (myFile.moveFileTo(user))    DBG("MOVED");
+            else                            DBG("NOT MOVED");
+        }
+        
+        currentGallery = user.getFileName();
+        
+        var myJson = JSON::parse(user);
         
         gallery = new Gallery(myJson, *this);
         
-        gallery->setURL(myFile.getFullPathName());
+        gallery->setURL(user.getFullPathName());
         
         initializeGallery();
         
@@ -932,7 +1523,7 @@ void BKAudioProcessor::initializeGallery(void)
         if (piano->getId() > gallery->getIdCount(PreparationTypePiano)) gallery->setIdCount(PreparationTypePiano, piano->getId());
     }
     
-    gallery->prepareToPlay(bkSampleRate);
+    gallery->prepareToPlay(getSampleRate());
     
     updateUI();
     
@@ -1067,33 +1658,6 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     }
     
 }
-
-#if TRY_UNDO
-void BKAudioProcessor::updateHistory(void)
-{
-    for (int i = 0; i < NUM_EPOCHS; i++)
-    {
-        history.set(i+1, history.getUnchecked(i));
-    }
-    
-    history.set(0, currentPiano->duplicate(true));
-}
-
-void BKAudioProcessor::timeTravel(bool forward)
-{
-    if (forward)    epoch--;
-    else            epoch++;
-    
-    if (epoch >= NUM_EPOCHS) epoch = NUM_EPOCHS-1;
-    if (epoch <  0 ) epoch = 0;
-    
-    Piano::Ptr newPiano = history.getUnchecked(epoch);
-    
-    if (newPiano != nullptr) currentPiano = newPiano;
-    
-    updateState->pianoDidChangeForGraph = true;
-}
-#endif
 
 
 

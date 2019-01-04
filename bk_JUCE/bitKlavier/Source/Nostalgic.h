@@ -36,7 +36,15 @@ public:
     nGain(p->getGain()),
     nLengthMultiplier(p->getLengthMultiplier()),
     nBeatsToSkip(p->getBeatsToSkip()),
-    nMode(p->getMode())
+    nMode(p->getMode()),
+    nReverseAttack(p->getReverseAttack()),
+    nReverseDecay(p->getReverseDecay()),
+    nReverseRelease(p->getReverseRelease()),
+    nReverseSustain(p->getReverseSustain()),
+    nUndertowAttack(p->getUndertowAttack()),
+    nUndertowDecay(p->getUndertowDecay()),
+    nUndertowRelease(p->getUndertowRelease()),
+    nUndertowSustain(p->getUndertowSustain())
     {
         
     }
@@ -69,7 +77,15 @@ public:
     nGain(1.0),
     nLengthMultiplier(1.0),
     nBeatsToSkip(0.0),
-    nMode(NoteLengthSync)
+    nMode(NoteLengthSync),
+    nReverseAttack(30),
+    nReverseDecay(3),
+    nReverseRelease(50),
+    nReverseSustain(1.),
+    nUndertowAttack(50),
+    nUndertowDecay(3),
+    nUndertowRelease(2000),
+    nUndertowSustain(1.)
     {
 
     }
@@ -90,6 +106,14 @@ public:
         nLengthMultiplier = n->getLengthMultiplier();
         nBeatsToSkip = n->getBeatsToSkip();
         nMode = n->getMode();
+        nReverseAttack = n->getReverseAttack();
+        nReverseDecay = n->getReverseDecay();
+        nReverseSustain = n->getReverseSustain();
+        nReverseRelease = n->getReverseRelease();
+        nUndertowAttack = n->getUndertowAttack();
+        nUndertowDecay = n->getUndertowDecay();
+        nUndertowSustain = n->getUndertowSustain();
+        nUndertowRelease = n->getUndertowRelease();
     }
     
     inline bool compare (NostalgicPreparation::Ptr n)
@@ -100,8 +124,46 @@ public:
                 nGain == n->getGain() &&
                 nLengthMultiplier == n->getLengthMultiplier() &&
                 nBeatsToSkip == n->getBeatsToSkip() &&
+                nReverseAttack == n->getReverseAttack() &&
+                nReverseDecay == n->getReverseDecay() &&
+                nReverseSustain == n->getReverseSustain() &&
+                nReverseRelease == n->getReverseRelease() &&
+                nUndertowAttack == n->getUndertowAttack() &&
+                nUndertowDecay == n->getUndertowDecay() &&
+                nUndertowSustain == n->getUndertowSustain() &&
+                nUndertowRelease == n->getUndertowRelease() &&
                 nMode == n->getMode());
     }
+
+	inline void randomize()
+	{
+		Random::getSystemRandom().setSeedRandomly();
+
+		float r[25];
+
+		for (int i = 0; i < 25; i++)  r[i] = (Random::getSystemRandom().nextFloat());
+		int idx = 0;
+
+		nWaveDistance = (int)(r[idx++] * 20000);
+		nUndertow = (int)(r[idx++] * 20000);
+		nTransposition.clear();
+		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
+		{
+			nTransposition.add(i, (Random::getSystemRandom().nextFloat()) * 48.0f - 24.0f);
+		}
+		nGain = r[idx++] * 10.0f;
+		nLengthMultiplier = r[idx++] * 10.0f;
+		nBeatsToSkip = r[idx++] * 10.0f;
+		nMode = (NostalgicSyncMode)(int)(r[idx++] * NostalgicSyncModeNil);
+		nReverseAttack = (int)(r[idx++] * 1000) + 1;
+		nReverseDecay = (int)(r[idx++] * 1000) + 1;
+		nReverseSustain = r[idx++];
+		nReverseRelease = (int)(r[idx++] * 1000) + 1;
+		nUndertowAttack = (int)(r[idx++] * 1000) + 1;
+		nUndertowDecay = (int)(r[idx++] * 1000) + 1;
+		nUndertowSustain = r[idx++];
+		nUndertowRelease = (int)(r[idx++] * 2000) + 1;
+	}
     
     inline const String getName() const noexcept {return name;}
     inline void setName(String n){name = n;}
@@ -114,6 +176,19 @@ public:
     inline const float getBeatsToSkip() const noexcept                     {return nBeatsToSkip;       }
     inline const NostalgicSyncMode getMode() const noexcept                {return nMode;              }
     
+    inline const int getReverseAttack() const noexcept                     {return nReverseAttack;        }
+    inline const int getReverseDecay() const noexcept                      {return nReverseDecay;         }
+    inline const float getReverseSustain() const noexcept                  {return nReverseSustain;       }
+    inline const int getReverseRelease() const noexcept                    {return nReverseRelease;       }
+    inline const Array<float> getReverseADSRvals() const noexcept         {return { (float) nReverseAttack, (float)nReverseDecay,(float)nReverseSustain, (float)nReverseRelease}; }
+    
+    
+    inline const int getUndertowAttack() const noexcept                    {return nUndertowAttack;        }
+    inline const int getUndertowDecay() const noexcept                     {return nUndertowDecay;         }
+    inline const float getUndertowSustain() const noexcept                 {return nUndertowSustain;       }
+    inline const int getUndertowRelease() const noexcept                   {return nUndertowRelease;       }
+    inline const Array<float> getUndertowADSRvals() const noexcept         {return { (float)nUndertowAttack, (float)nUndertowDecay,(float)nUndertowSustain,(float)nUndertowRelease}; }
+    
     inline void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
     inline void setUndertow(int undertow)                                  {nUndertow = undertow;                  }
     inline void setTransposition(Array<float> transposition)               {nTransposition = transposition;        }
@@ -121,6 +196,32 @@ public:
     inline void setLengthMultiplier(float lengthMultiplier)                {nLengthMultiplier = lengthMultiplier;  }
     inline void setBeatsToSkip(float beatsToSkip)                          {nBeatsToSkip = beatsToSkip;            }
     inline void setMode(NostalgicSyncMode mode)                            {nMode = mode;                          }
+    
+    inline void setReverseAttack(int val)                                  {nReverseAttack = val;         }
+    inline void setReverseDecay(int val)                                   {nReverseDecay = val;          }
+    inline void setReverseSustain(float val)                               {nReverseSustain = val;        }
+    inline void setReverseRelease(int val)                                 {nReverseRelease = val;        }
+    
+    inline void setUndertowAttack(int val)                                 {nUndertowAttack = val;         }
+    inline void setUndertowDecay(int val)                                  {nUndertowDecay = val;          }
+    inline void setUndertowSustain(float val)                              {nUndertowSustain = val;        }
+    inline void setUndertowRelease(int val)                                {nUndertowRelease = val;        }
+    
+    inline void setReverseADSRvals(Array<float> vals)
+    {
+        nReverseAttack = vals[0];
+        nReverseDecay = vals[1];
+        nReverseSustain = vals[2];
+        nReverseRelease = vals[3];
+    }
+    
+    inline void setUndertowADSRvals(Array<float> vals)
+    {
+        nUndertowAttack = vals[0];
+        nUndertowDecay = vals[1];
+        nUndertowSustain = vals[2];
+        nUndertowRelease = vals[3];
+    }
 
     void print(void)
     {
@@ -152,6 +253,12 @@ private:
     float nLengthMultiplier;    //note-length mode: toscale reverse playback time
     float nBeatsToSkip;         //synchronic mode: beats to skip before reverse peak
     NostalgicSyncMode nMode;    //which sync mode to use
+    
+    int     nReverseAttack, nReverseDecay, nReverseRelease;         //reverse ADSR, in ms
+    float   nReverseSustain;
+    
+    int     nUndertowAttack, nUndertowDecay, nUndertowRelease;      //undertow ADSR, in ms
+    float   nUndertowSustain;
     
     //internal keymap for resetting internal values to static
     //Keymap::Ptr resetMap = new Keymap(0);
@@ -260,12 +367,13 @@ public:
     }
     
     
-    Nostalgic(int Id):
+    Nostalgic(int Id, bool random = false):
     name("Nostalgic"+String(Id)),
     Id(Id)
     {
-        sPrep       = new NostalgicPreparation();
-        aPrep       = new NostalgicPreparation(sPrep);
+		sPrep = new NostalgicPreparation();
+		aPrep = new NostalgicPreparation(sPrep);
+		if (random) randomize();
     }
     
     inline void clear(void)
@@ -316,6 +424,22 @@ public:
         prep.setProperty( ptagNostalgic_beatsToSkip,        sPrep->getBeatsToSkip(), 0);
         prep.setProperty( ptagNostalgic_mode,               sPrep->getMode(), 0);
         
+        ValueTree reverseADSRvals( vtagNostalgic_reverseADSR);
+        count = 0;
+        for (auto f : sPrep->getReverseADSRvals())
+        {
+            reverseADSRvals.setProperty( ptagFloat + String(count++), f, 0);
+        }
+        prep.addChild(reverseADSRvals, -1, 0);
+        
+        ValueTree undertowADSRvals( vtagNostalgic_undertowADSR);
+        count = 0;
+        for (auto f : sPrep->getUndertowADSRvals())
+        {
+            undertowADSRvals.setProperty( ptagFloat + String(count++), f, 0);
+        }
+        prep.addChild(undertowADSRvals, -1, 0);
+        
         return prep;
     }
     
@@ -357,6 +481,42 @@ public:
                 sPrep->setTransposition(transp);
                 
             }
+            else  if (sub->hasTagName(vtagNostalgic_reverseADSR))
+            {
+                Array<float> envVals;
+                for (int k = 0; k < 4; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        envVals.add(f);
+                    }
+                }
+                
+                sPrep->setReverseADSRvals(envVals);
+                
+            }
+            else  if (sub->hasTagName(vtagNostalgic_undertowADSR))
+            {
+                Array<float> envVals;
+                for (int k = 0; k < 4; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        envVals.add(f);
+                    }
+                }
+                
+                sPrep->setUndertowADSRvals(envVals);
+                
+            }
         }
         
         
@@ -389,6 +549,15 @@ public:
     {
         name = newName;
     }
+
+	inline void randomize()
+	{
+		clear();
+		sPrep->randomize();
+		aPrep->randomize();
+		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
+		name = "random";
+	}
     
 private:
     
@@ -434,6 +603,8 @@ public:
         param.set(NostalgicGain, String(p->getGain()));
         param.set(NostalgicLengthMultiplier, String(p->getLengthMultiplier()));
         param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
+        param.set(NostalgicReverseADSR, String(floatArrayToString(p->getReverseADSRvals())));
+        param.set(NostalgicUndertowADSR, String(floatArrayToString(p->getUndertowADSRvals())));
         param.set(NostalgicMode, String(p->getMode()));
         
     }
@@ -442,13 +613,18 @@ public:
     NostalgicModPreparation(int Id):
     Id(Id)
     {
+        
+        for(int i=0; i<=cNostalgicDataTypes.size(); i++) param.add("");
         param.set(NostalgicWaveDistance, "");
         param.set(NostalgicUndertow, "");
         param.set(NostalgicTransposition, "");
         param.set(NostalgicGain, "");
         param.set(NostalgicLengthMultiplier, "");
         param.set(NostalgicBeatsToSkip, "");
+        param.set(NostalgicReverseADSR, "");
+        param.set(NostalgicUndertowADSR, "");
         param.set(NostalgicMode, "");
+
     }
     
     inline NostalgicModPreparation::Ptr duplicate(void)
@@ -491,6 +667,32 @@ public:
             }
         }
         prep.addChild(transp, -1, 0);
+        
+        ValueTree revADSR( vtagNostalgic_reverseADSR);
+        count = 0;
+        p = getParam(NostalgicReverseADSR);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                revADSR.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(revADSR, -1, 0);
+        
+        ValueTree undADSR( vtagNostalgic_undertowADSR);
+        count = 0;
+        p = getParam(NostalgicUndertowADSR);
+        if (p != String::empty)
+        {
+            Array<float> m = stringToFloatArray(p);
+            for (auto f : m)
+            {
+                undADSR.      setProperty( ptagFloat + String(count++), f, 0);
+            }
+        }
+        prep.addChild(undADSR, -1, 0);
         
         p = getParam(NostalgicGain);
         if (p != String::empty) prep.setProperty( ptagNostalgic_gain,               p.getFloatValue(), 0);
@@ -540,6 +742,44 @@ public:
                 setParam(NostalgicTransposition, floatArrayToString(transp));
                 
             }
+            
+            if (sub->hasTagName(vtagNostalgic_reverseADSR))
+            {
+                Array<float> revADSR;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        revADSR.add(f);
+                    }
+                }
+                
+                setParam(NostalgicReverseADSR, floatArrayToString(revADSR));
+                
+            }
+            
+            if (sub->hasTagName(vtagNostalgic_undertowADSR))
+            {
+                Array<float> undADSR;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        undADSR.add(f);
+                    }
+                }
+                
+                setParam(NostalgicUndertowADSR, floatArrayToString(undADSR));
+                
+            }
         }
         
         p = e->getStringAttribute(ptagNostalgic_lengthMultiplier);
@@ -570,7 +810,38 @@ public:
         param.set(NostalgicLengthMultiplier, String(p->getLengthMultiplier()));
         param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
         param.set(NostalgicMode, String(p->getMode()));
+        param.set(NostalgicReverseADSR, floatArrayToString(p->getReverseADSRvals()));
+        param.set(NostalgicUndertowADSR, floatArrayToString(p->getUndertowADSRvals()));
     }
+
+	inline bool compare(NostalgicModPreparation::Ptr t)
+	{
+		return (getParam(NostalgicWaveDistance) == t->getParam(NostalgicWaveDistance) &&
+			getParam(NostalgicUndertow) == t->getParam(NostalgicUndertow) &&
+			getParam(NostalgicTransposition) == t->getParam(NostalgicTransposition) &&
+			getParam(NostalgicGain) == t->getParam(NostalgicGain) &&
+			getParam(NostalgicLengthMultiplier) == t->getParam(NostalgicLengthMultiplier) &&
+			getParam(NostalgicBeatsToSkip) == t->getParam(NostalgicBeatsToSkip) &&
+			getParam(NostalgicMode) == t->getParam(NostalgicMode) &&
+			getParam(NostalgicReverseADSR) == t->getParam(NostalgicReverseADSR) &&
+			getParam(NostalgicUndertowADSR) == t->getParam(NostalgicUndertowADSR));
+	}
+
+	inline void randomize()
+	{
+		NostalgicPreparation p;
+		p.randomize();
+
+		param.set(NostalgicWaveDistance, String(p.getWavedistance()));
+		param.set(NostalgicUndertow, String(p.getUndertow()));
+		param.set(NostalgicTransposition, floatArrayToString(p.getTransposition()));
+		param.set(NostalgicGain, String(p.getGain()));
+		param.set(NostalgicLengthMultiplier, String(p.getLengthMultiplier()));
+		param.set(NostalgicBeatsToSkip, String(p.getBeatsToSkip()));
+		param.set(NostalgicMode, String(p.getMode()));
+		param.set(NostalgicReverseADSR, floatArrayToString(p.getReverseADSRvals()));
+		param.set(NostalgicUndertowADSR, floatArrayToString(p.getUndertowADSRvals()));
+	}
     
     inline void copy(NostalgicModPreparation::Ptr p)
     {
@@ -634,13 +905,14 @@ public:
     virtual ~NostalgicProcessor();
     
     //called with every audio vector
-    void processBlock(int numSamples, int midiChannel);
+    BKSampleLoadType sampleType;
+    void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
     
     //begin timing played note length, called with noteOn
     void keyPressed(int midiNoteNumber, float midiNoteVelocity, int midiChannel);
     
     //begin playing reverse note, called with noteOff
-    void keyReleased(int midiNoteNumber, int midiChannel, bool post = false);
+    void keyReleased(int midiNoteNumber, float midiVelocity, int midiChannel, bool post = false);
     
     void postRelease(int midiNoteNumber, int midiChannel);
     
@@ -693,7 +965,6 @@ public:
     inline void reset(void)
     {
         nostalgic->aPrep->copy(nostalgic->sPrep);
-        DBG("nostalgic reset");
     }
     
     inline int getId(void) const noexcept { return nostalgic->getId(); }

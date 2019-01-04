@@ -40,13 +40,18 @@ public:
      @param maxSampleLengthSeconds   a maximum length of audio to read from the audio
      source, in seconds
      */
+    
     BKPianoSamplerSound (const String& name,
                          BKReferenceCountedBuffer::Ptr buffer,
                          uint64 soundLength,
                          double sourceSampleRate,
                          const BigInteger& midiNotes,
                          int rootMidiNote,
-                         const BigInteger& midiVelocities);
+                         int transpose,
+                         const BigInteger& midiVelocities,
+                         sfzero::Region* region = nullptr,
+                         bool isSF2 = true);
+
     
     /** Destructor. */
     ~BKPianoSamplerSound();
@@ -65,6 +70,7 @@ public:
     bool appliesToNote (int midiNoteNumber) override;
     bool appliesToVelocity (int midiNoteVelocity) override;
     bool appliesToChannel (int midiChannel) override;
+    bool isSoundfontSound(void);
     
 private:
     //==============================================================================
@@ -78,8 +84,22 @@ private:
     BigInteger midiNotes;
     BigInteger midiVelocities;
     uint64 soundLength;
-    int midiRootNote;
+    int midiRootNote, transpose;
     int rampOnSamples, rampOffSamples;
+
+    int64 loopStart, loopEnd;
+    int64 delayS, holdS;
+    int64 start, end;
+    float attack,decay,sustain,release, hold, delay; // for sfz
+    int loopMode; // sample_loop = 0, no_loop, one_shot, loop_continuous, loop_sustain
+    /*
+     0
+     1 indicates a sound reproduced with no loop,
+     2 is unused but should be interpreted as indicating no loop, and
+     3 indicates a sound which loops for the duration of key depression then proceeds to play the remainder of the sample
+     */
+    
+    bool isSoundfont;
     
     JUCE_LEAK_DETECTOR (BKPianoSamplerSound)
 };
@@ -104,24 +124,44 @@ public:
     /** Destructor. */
     ~BKPianoSamplerVoice();
     
+    int counter;
+    
     //==============================================================================
     
     //GeneralSettings::Ptr generalSettings;
     
     bool canPlaySound (BKSynthesiserSound*) override;
     
-    void startNote (
-                    float midiNoteNumber,
+    void startNote (int midiNoteNumber,
+                    float offset,
                     float velocity,
                     PianoSamplerNoteDirection direction,
                     PianoSamplerNoteType type,
                     BKNoteType bktype,
                     uint64 startingPosition,
                     uint64 length,
-                    int voiceRampOn,
-                    int voiceRampOff,
+                    uint64 voiceRampOn,
+                    uint64 voiceRampOff,
                     BKSynthesiserSound* sound
                     ) override;
+    
+    void startNote (int midiNoteNumber,
+                    float offset,
+                    int pitchWheelValue,
+                    float velocity,
+                    PianoSamplerNoteDirection direction,
+                    PianoSamplerNoteType type,
+                    BKNoteType bktype,
+                    uint64 startingPosition,
+                    uint64 length,
+                    uint64 adsrAttack,
+                    uint64 adsrDecay,
+                    float adsrSustain,
+                    uint64 adsrRelease,
+                    BKSynthesiserSound* sound
+                    ) override;
+    
+    void updatePitch(const BKPianoSamplerSound* const sound);
     
     void stopNote (float velocity, bool allowTailOff) override;
     
@@ -131,24 +171,66 @@ public:
     void renderNextBlock (AudioSampleBuffer&, int startSample, int numSamples) override;
     
     
+    void processPiano(AudioSampleBuffer& outputBuffer,
+                      int startSample, int numSamples,
+                      const BKPianoSamplerSound* playingSound);
+    
+    void processSoundfontNoLoop(AudioSampleBuffer& outputBuffer,
+                                 int startSample, int numSamples,
+                                 const BKPianoSamplerSound* playingSound);
+    
+    void processSoundfontLoop(AudioSampleBuffer& outputBuffer,
+                                int startSample, int numSamples,
+                                const BKPianoSamplerSound* playingSound);
     
     
 private:
     //==============================================================================
-    int noteNumber;
+    double cookedNote;
+    int midiNoteNumber;
+    int pitchWheel;
     int layer;
     float noteVelocity;
     uint64 noteStartingPosition, noteEndPosition;
+    
     double pitchRatio;
+    double pitchbendMultiplier;
+    double bentRatio;
+    
     double sourceSamplePosition;
+    
+    double fadeTracker,fadeOffset;
+    double lengthTracker, lengthEnv;
+
     double playEndPosition;
-    uint32 playLength;
+    double playLength, playLengthSF2;
     uint64 timer;
     BKNoteType bkType;
     PianoSamplerNoteType playType;
     PianoSamplerNoteDirection playDirection;
+    bool revRamped;
     float lgain, rgain, rampOnOffLevel, rampOnDelta, rampOffDelta;
     bool isInRampOn, isInRampOff;
+    
+    double offset;
+    double cfSamples; // number of samples for crossfade
+    
+    //double beginPosition, loopPosition, endPosition;
+    stk::Envelope sampleEnv, loopEnv;
+
+    bool sfzEnvApplied;
+    
+    double samplePosition, loopPosition;
+    
+    stk::ADSR adsr;
+    stk::AHDSR sfzadsr;
+    
+    bool lastRamp;
+    int numLoops;
+    
+    bool inLoop;
+    stk::ADSR lastIn, lastOut;
+    
     
     JUCE_LEAK_DETECTOR (BKPianoSamplerVoice)
 };

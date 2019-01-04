@@ -32,15 +32,15 @@ static const int gComponentLabelWidth = 160;
 
 
 #if JUCE_IOS
-int fontHeight;
+extern int fontHeight;
 
-int gComponentComboBoxHeight;
-int gComponentLabelHeight;
-int gComponentTextFieldHeight;
+extern int gComponentComboBoxHeight;
+extern int gComponentLabelHeight;
+extern int gComponentTextFieldHeight;
 
-int gComponentRangeSliderHeight;
-int gComponentSingleSliderHeight;
-int gComponentStackedSliderHeight;
+extern int gComponentRangeSliderHeight;
+extern int gComponentSingleSliderHeight;
+extern int gComponentStackedSliderHeight;
 
 #else
 static const int fontHeight = 15;
@@ -63,6 +63,8 @@ static const int gVCWidth = 375;
 
 static const int gXSpacing = 4;
 static const int gYSpacing = 4;
+
+static const std::vector<std::string> intervalNames = {"U", "m2", "M2", "m3", "M3", "P4", "d5", "P5", "m6", "M6", "m7", "M7", "O" };
 
 static const int gPaddingConst = 10;
 static const float gModAlpha = 0.4;

@@ -1,0 +1,49 @@
+<group>
+ampeg_release=0.1
+
+<region> sample=Samples\TX81Z_JB1STBass_-_01\JB1STBass_-_ C1.wav
+lokey=0
+hikey=39
+pitch_keycenter=36
+
+<region> sample=Samples\TX81Z_JB1STBass_-_01\JB1STBass_-_ G1.wav
+lokey=40
+hikey=45
+pitch_keycenter=43
+
+<region> sample=Samples\TX81Z_JB1STBass_-_01\JB1STBass_-_ C2.wav
+lokey=46
+hikey=51
+pitch_keycenter=48
+
+<region> sample=Samples\TX81Z_JB1STBass_-_01\JB1STBass_-_ G2.wav
+lokey=52
+hikey=57
+pitch_keycenter=55
+
+<region> sample=Samples\TX81Z_JB1STBass_-_01\JB1STBass_-_ C3.wav
+lokey=58
+hikey=63
+pitch_keycenter=60
+
+<region> sample=Samples\TX81Z_JB1STBass_-_01\JB1STBass_-_ G3.wav
+lokey=64
+hikey=69
+pitch_keycenter=67
+
+<region> sample=Samples\TX81Z_JB1STBass_-_01\JB1STBass_-_ C4.wav
+lokey=70
+hikey=75
+pitch_keycenter=72
+
+<region> sample=Samples\TX81Z_JB1STBass_-_01\JB1STBass_-_ G4.wav
+lokey=76
+hikey=81
+pitch_keycenter=79
+
+<region> sample=Samples\TX81Z_JB1STBass_-_01\JB1STBass_-_ C5.wav
+lokey=82
+hikey=127
+pitch_keycenter=84
+
+

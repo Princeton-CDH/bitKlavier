@@ -10,7 +10,7 @@
 
 #include "BKSynthesiser.h"
 
-BKSynthesiserSound::BKSynthesiserSound() {}
+BKSynthesiserSound::BKSynthesiserSound(void) {}
 BKSynthesiserSound::~BKSynthesiserSound() {}
 
 //==============================================================================
@@ -74,6 +74,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     
     //==============================================================================
     BKSynthesiser::BKSynthesiser(GeneralSettings::Ptr gen):
+    pitchWheelValue(8192),
     generalSettings(gen),
     sampleRate (0),
     lastNoteOnCounter (0),
@@ -87,6 +88,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     }
     
     BKSynthesiser::BKSynthesiser(void):
+    pitchWheelValue(8192),
     sampleRate (0),
     lastNoteOnCounter (0),
     minimumSubBlockSize (32),
@@ -303,6 +305,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     }
     
     //==============================================================================
+    
     void BKSynthesiser::keyOn (const int midiChannel,
                                const int keyNoteNumber,
                                const int midiNoteNumber,
@@ -316,9 +319,48 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                const float startingPositionMS,
                                const float lengthMS,
                                const float rampOnMS, //included in lengthMS
-                               const float rampOffMS //included in lengthMS
-                               )
+                               const float rampOffMS, //included in lengthMS
+                               TuningProcessor::Ptr tuner)
     {
+                    keyOn   (midiChannel,
+                             keyNoteNumber,
+                             midiNoteNumber,
+                             transp,
+                             velocity,
+                             gain,
+                             direction,
+                             type,
+                             bktype,
+                             layer,
+                             startingPositionMS,
+                             lengthMS,
+                             rampOnMS,
+                             3.,
+                             1.,
+                             rampOffMS,
+                             tuner);
+    }
+    
+    void BKSynthesiser::keyOn (const int midiChannel,
+                               const int keyNoteNumber,
+                               const int midiNoteNumber,
+                               const float transp,
+                               const float velocity,
+                               const float gain,
+                               PianoSamplerNoteDirection direction,
+                               PianoSamplerNoteType type,
+                               BKNoteType bktype,
+                               int layer,
+                               const float startingPositionMS,
+                               const float lengthMS,
+                               float adsrAttackMS,
+                               float adsrDecayMS,
+                               float adsrSustain,
+                               float adsrReleaseMS,
+                               TuningProcessor::Ptr tuner)
+    {
+        //DBG("BKSynthesiser::keyOn " + String(keyNoteNumber) + " " + String(midiNoteNumber));
+        
         const ScopedLock sl (lock);
         
         int noteNumber = midiNoteNumber;
@@ -333,11 +375,19 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             BKSynthesiserSound* const sound = sounds.getUnchecked(i);
             
             // Check if sound applies to note, velocity, and channel.
-            if (sound->appliesToNote (noteNumber)
-                && sound->appliesToVelocity((int)(velocity * 127.0))
-                && sound->appliesToChannel (midiChannel))
+            if (sound->appliesToNote (noteNumber) &&
+                sound->appliesToVelocity((int)(velocity*127.0)))
             {
-                //DBG("BKSynthesiser::keyOn " + String(noteNumber));
+                if (sound->region_ != nullptr)
+                {
+                    if ((sound->trigger == sfzero::Region::release) ||
+                        (sound->trigger == sfzero::Region::release_key) /*||
+                        (sustainPedalsDown[midiChannel] != sound->pedal)*/)
+                    {
+                        continue;
+                    }
+                }
+                
                 startVoice (findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes),
                             sound,
                             midiChannel,
@@ -351,12 +401,19 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                             layer,
                             (uint64)((startingPositionMS * 0.001f) * getSampleRate()),
                             (uint64)(lengthMS*0.001f* getSampleRate()),
-                            rampOnMS*0.001f* getSampleRate(),
-                            rampOffMS*0.001f* getSampleRate());
+                            adsrAttackMS*0.001f* getSampleRate(),
+                            adsrDecayMS*0.001f* getSampleRate(),
+                            adsrSustain,
+                            adsrReleaseMS*0.001f* getSampleRate(),
+                            tuner);
                 
+                //break;
+ 
             }
         }
     }
+    
+    // VELOCITY IN MASTER REGIONS NEEDS TO BE APPLIED APPROPRIATELY
     
     void BKSynthesiser::startVoice (BKSynthesiserVoice* const voice,
                                     BKSynthesiserSound* const sound,
@@ -371,20 +428,60 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                     int layer,
                                     const uint64 startingPosition,
                                     const uint64 length,
-                                    int voiceRampOn,
-                                    int voiceRampOff
+                                    uint64 voiceRampOn,
+                                    uint64 voiceRampOff,
+                                    TuningProcessor::Ptr tuner
                                     )
     {
+                    startVoice      (voice,
+                                     sound,
+                                     midiChannel,
+                                     keyNoteNumber,
+                                     midiNoteNumber,
+                                     midiNoteNumberOffset,
+                                     volume,
+                                     direction,
+                                     type,
+                                     bktype,
+                                     layer,
+                                     startingPosition,
+                                     length,
+                                     voiceRampOn,
+                                     3.*0.001f* getSampleRate(),
+                                     1.,
+                                     30.*0.001f* getSampleRate(),
+                                     tuner);
+    }
+    
+    
+    void BKSynthesiser::startVoice (BKSynthesiserVoice* const voice,
+                                    BKSynthesiserSound* const sound,
+                                    const int midiChannel,
+                                    const int keyNoteNumber,
+                                    const int midiNoteNumber,
+                                    const float midiNoteNumberOffset,
+                                    const float volume,
+                                    PianoSamplerNoteDirection direction,
+                                    PianoSamplerNoteType type,
+                                    BKNoteType bktype,
+                                    int layer,
+                                    const uint64 startingPosition,
+                                    const uint64 length,
+                                    uint64 adsrAttack,
+                                    uint64 adsrDecay,
+                                    float adsrSustain,
+                                    uint64 adsrRelease,
+                                    TuningProcessor::Ptr tuner
+                                    )
+    {
+        //DBG("BKSynthesiser::startVoice " + String(keyNoteNumber) + " " + String(midiNoteNumber));
+        
         if (voice != nullptr && sound != nullptr)
         {
             if (voice->currentlyPlayingSound != nullptr)
                 voice->stopNote (0.0f, false);
             
-#if CRAY_COOL_MUSIC_MAKER
-            voice->currentlyPlayingNote = (float)midiNoteNumber + midiNoteNumberOffset;
-#else
-            voice->currentlyPlayingNote = midiNoteNumber; //midiNoteNumber + (int)midiNoteNumberOffset)
-#endif      
+            voice->currentlyPlayingNote = midiNoteNumber; //midiNoteNumber + (int)midiNoteNumberOffset)  
             voice->layerId = layerToLayerId(bktype, layer);
             voice->length = (int)length;
             voice->type = type;
@@ -395,48 +492,30 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             voice->keyIsDown = true;
             voice->sostenutoPedalDown = false;
             voice->sustainPedalDown = sustainPedalsDown[midiChannel];
+            voice->tuning = tuner;
             
             voice->currentlyPlayingKey = keyNoteNumber; //keep track of which physical key is associated with this voice
             
             float gain = volume;
             
-            if (bktype == MainNote)
+            if (sound->region_ != nullptr)
             {
-                gain *= 1.0f;
+                gain *= Decibels::decibelsToGain(sound->region_->volume);
             }
-            else if (bktype == SynchronicNote)
-            {
-                gain *= generalSettings->getSynchronicGain();
-            }
-            else if (bktype == NostalgicNote)
-            {
-                gain *= generalSettings->getNostalgicGain();
-            }
-            else if (bktype == DirectNote)
-            {
-                gain *= generalSettings->getDirectGain();
-            }
-            else if (bktype == HammerNote)
-            {
-                gain *= generalSettings->getHammerGain();
-            }
-            else if (bktype == ResonanceNote)
-            {
-                gain *= generalSettings->getResonanceGain();
-            }
-            
-            gain *= generalSettings->getGlobalGain();
 
-            voice->startNote (
-                              (float)midiNoteNumber+midiNoteNumberOffset,
+            voice->startNote (midiNoteNumber,
+                              midiNoteNumberOffset,
+                              pitchWheelValue,
                               gain,
                               direction,
                               type,
                               bktype,
                               startingPosition,
                               length,
-                              voiceRampOn,
-                              voiceRampOff,
+                              adsrAttack,
+                              adsrDecay,
+                              adsrSustain,
+                              adsrRelease,
                               sound);
         }
     }
@@ -448,7 +527,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
         voice->stopNote (velocity, allowTailOff);
         
         // the subclass MUST call clearCurrentNote() if it's not tailing off! RTFM for stopNote()!
-        jassert (allowTailOff || (voice->getCurrentlyPlayingNote() < 0 && voice->getCurrentlyPlayingSound() == 0));
+        jassert (allowTailOff || (voice->getCurrentlyPlayingNote() < 0 && voice->getCurrentlyPlayingSound() == nullptr));
     }
     
     void BKSynthesiser::keyOff (const int midiChannel,
@@ -459,6 +538,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                 const float velocity,
                                 bool allowTailOff)
     {
+        
+        //DBG("BKSynthesiser::keyOff " + String(keyNoteNumber) + " " + String(midiNoteNumber));
         const ScopedLock sl (lock);
         
         for (int i = voices.size(); --i >= 0;)
@@ -476,18 +557,58 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                     if (sound->appliesToNote (midiNoteNumber) 
                         && sound->appliesToChannel (midiChannel))
                     {
-                        jassert (! voice->keyIsDown || voice->sustainPedalDown == sustainPedalsDown [midiChannel]);
-                        
                         // Let synthesiser know that key is no longer down,
                         voice->keyIsDown = false;
                         
-                        
-                        if (! ((voice->type == FixedLengthFixedStart) || (voice->type == FixedLength) || voice->sustainPedalDown || voice->sostenutoPedalDown)) {
+                        if (! ((voice->type == FixedLengthFixedStart) || (voice->type == FixedLength) || voice->sostenutoPedalDown)) {
                             //DBG("BKSynthesiser::stopVoice " + String(midiNoteNumber));
                             stopVoice (voice, velocity, allowTailOff);
                         }
                     }
                 }
+            }
+        }
+        
+        int noteNumber = midiNoteNumber;
+        
+        if (noteNumber > 108 || noteNumber < 21) return;
+        
+        for (int i = sounds.size(); --i >= 0;)
+        {
+            BKSynthesiserSound* const sound = sounds.getUnchecked(i);
+            
+            // Check if sound applies to note, velocity, and channel.
+            
+            bool appliesToNote = sound->appliesToNote (noteNumber);
+            bool appliesToVel = sound->appliesToVelocity((int)(velocity*127.0));
+            bool isRelease = false;
+            //DT: TESTING TO SEE IF THIS IS WHAT IS CAUSING GHOST RELEASE NOTES; seems to be, so we need to find another fix....
+            //bool isRelease = (sound->trigger == sfzero::Region::release) || (sound->trigger == sfzero::Region::release_key);
+            bool pedalStatesMatch = (sustainPedalsDown[midiChannel] == sound->pedal);
+            
+            if (appliesToNote && appliesToVel && isRelease && pedalStatesMatch)
+            {
+                startVoice (findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes),
+                            sound,
+                            midiChannel,
+                            keyNoteNumber,
+                            noteNumber,
+                            0, // might need to deal with this
+                            velocity,
+                            Forward,
+                            FixedLengthFixedStart,
+                            DirectNote,             // 
+                            0,                      //
+                            0,                      //
+                            sound->sampleLength,    //  len
+                            0.001f,                 //  A
+                            0.001f,                 //  D
+                            1.0f,                   //  S
+                            0.001f,                 // R
+                            nullptr);
+                
+                // break;
+                
             }
         }
     }
@@ -512,14 +633,33 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
     {
         const ScopedLock sl (lock);
         
+        pitchWheelValue = wheelValue;
+        
         for (int i = voices.size(); --i >= 0;)
         {
             BKSynthesiserVoice* const voice = voices.getUnchecked (i);
             
+            //DBG("midichannel: " + String(midiChannel) + " voice active channel: " + String(voice->currentPlayingMidiChannel));
             if (midiChannel <= 0 || voice->isPlayingChannel (midiChannel))
-                voice->pitchWheelMoved (wheelValue);
+                voice->pitchWheelMoved (pitchWheelValue);
         }
     }
+    
+    /*
+    void BKSynthesiser::updateTuning (int midiChannel, int midiNoteNumber, float offset) //or should it be a multiplier?
+    {
+        const ScopedLock sl (lock);
+        
+        for (int i = voices.size(); --i >= 0;)
+        {
+            BKSynthesiserVoice* const voice = voices.getUnchecked (i);
+            
+            if (voice->getCurrentlyPlayingNote() == midiNoteNumber
+                && (midiChannel <= 0 || voice->isPlayingChannel (midiChannel)))
+                voice->tuningChanged (offset);
+        }
+    }
+     */
     
     void BKSynthesiser::handleController (const int midiChannel,
                                           const int controllerNumber,

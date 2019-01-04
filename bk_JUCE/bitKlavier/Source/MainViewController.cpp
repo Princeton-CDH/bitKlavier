@@ -40,24 +40,26 @@ timerCallbackCount(0)
     levelMeterComponentL = new BKLevelMeterComponent;
     addAndMakeVisible(levelMeterComponentL);
     
-    mainSlider = new Slider();
-    mainSlider->setLookAndFeel(&laf);
-    
-    mainSlider->setRange (-90, 12.0, 0.1);
-    mainSlider->setSkewFactor (2.5, false);
-    mainSlider->setPopupMenuEnabled (true);
-    mainSlider->setValue (0);
-    mainSlider->setSliderStyle (Slider::LinearBarVertical);
-    mainSlider->setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
-    mainSlider->setPopupDisplayEnabled (true, true, this);
-    mainSlider->setDoubleClickReturnValue (true, 0.0); // double-clicking this slider will set it to 50.0
-    mainSlider->setTextValueSuffix (" dB");
-    mainSlider->addListener(this);
+    mainSlider.setLookAndFeel(&laf);
 
+    mainSlider.setRange (-90, 12.0, 0.1);
+    mainSlider.setSkewFactor (2.5, false);
+    mainSlider.setValue (0);
+    mainSlider.setSliderStyle (Slider::LinearBarVertical);
+    mainSlider.setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
+    mainSlider.setDoubleClickReturnValue (true, 0.0); // double-clicking this slider will set it to 50.0
+    mainSlider.setTextValueSuffix (" dB");
+    
+    mainSlider.addListener(this);
+    
+#if !JUCE_IOS
+    mainSlider.setPopupMenuEnabled (true);
+    mainSlider.setPopupDisplayEnabled (true, true, this);
+    mainSlider.setTooltip("Controls dB output of bitKlavier audio");
+#endif
     
     addAndMakeVisible (mainSlider);
     
-
     addAndMakeVisible (keyboardComponent =
                        new BKKeymapKeyboardComponent (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard));
     
@@ -67,6 +69,22 @@ timerCallbackCount(0)
     keyStart = 21;  keyEnd = 108;
 #endif
 
+    //~~~~~~~~~~~MENUS~~~~~~~~
+    sampleCB.setLookAndFeel(&laf);
+    sampleCB.setTooltip("Choose and load sample set from your soundfonts folder");
+    
+    instrumentCB.setLookAndFeel(&laf);
+    instrumentCB.setTooltip("Load specific instrument from selected soundfont (if available)");
+    
+    sampleCB.addListener(this);
+    instrumentCB.addListener(this);
+    
+    instrumentCB.setLookAndFeel(&comboBoxRightJustifyLAF);
+    comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
+    
+    addAndMakeVisible(sampleCB);
+    addAndMakeVisible(instrumentCB);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~`
     
     keyboard =  ((BKKeymapKeyboardComponent*) keyboardComponent);
     keyboard->setScrollButtonsVisible(false);
@@ -95,7 +113,6 @@ timerCallbackCount(0)
     addAndMakeVisible(construction);
     
     addChildComponent(overtop);
-
     
     juce::Point<int> myshadowOffset(2, 2);
     DropShadow myshadow(Colours::darkgrey, 5, myshadowOffset);
@@ -108,8 +125,11 @@ timerCallbackCount(0)
 MainViewController::~MainViewController()
 {
     setLookAndFeel(nullptr);
+    sampleCB.setLookAndFeel(nullptr);
+    instrumentCB.setLookAndFeel(nullptr);
     octaveSlider.setLookAndFeel(nullptr);
-    mainSlider->setLookAndFeel(nullptr);
+    mainSlider.setLookAndFeel(nullptr);
+    keyboardComponent = nullptr;
     removeKeyListener(this);
 }
 
@@ -117,7 +137,7 @@ MainViewController::~MainViewController()
 void MainViewController::setSliderLookAndFeel(BKButtonAndMenuLAF *laf)
 {
     octaveSlider.setLookAndFeel(laf);
-    mainSlider->setLookAndFeel(laf);
+    mainSlider.setLookAndFeel(laf);
 }
  */
 
@@ -132,7 +152,7 @@ void MainViewController::paint (Graphics& g)
     bounds.expand(2.0f,2.0f);
     g.drawRoundedRectangle(bounds, 2.0f, 0.5f);
     
-    bounds = mainSlider->getBounds().toFloat();
+    bounds = mainSlider.getBounds().toFloat();
     g.drawRoundedRectangle(bounds, 2.0, 0.5f);
     
     bounds = levelMeterComponentL->getBounds().toFloat();
@@ -165,7 +185,7 @@ void MainViewController::resized()
     headerHeight = 40;
     sidebarWidth = 30;
 #endif
-    footerHeight = 50;
+    footerHeight = 65;
     
     
     Rectangle<int> area (getLocalBounds());
@@ -191,20 +211,25 @@ void MainViewController::resized()
     if (display == DisplayDefault)
     {
         Rectangle<int> footerSlice = area.removeFromBottom(footerHeight + footerHeight * processor.paddingScalarY + gYSpacing);
+        
         footerSlice.reduce(gXSpacing, gYSpacing);
+        
+        float unit = footerSlice.getWidth() * 0.25;
+        
+        sampleCB.setBounds(unit, footerSlice.getY(), unit-0.5*gXSpacing, 20);
+        instrumentCB.setBounds(2*unit+0.5*gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
+        
         float keyWidth = footerSlice.getWidth() / round((keyEnd - keyStart) * 7./12 + 1); //num white keys
         keyboard->setKeyWidth(keyWidth);
         keyboard->setBlackNoteLengthProportion(0.65);
-        keyboardComponent->setBounds(footerSlice);
+        keyboardComponent->setBounds(footerSlice.getX(), sampleCB.getBottom() + gYSpacing, footerSlice.getWidth(), footerSlice.getHeight() - sampleCB.getHeight());
         keyboardComponent->setVisible(true);
     }
-    
-    
     
     Rectangle<int> gainSliderSlice = area.removeFromRight(sidebarWidth+gXSpacing);
     
     gainSliderSlice.removeFromLeft(gXSpacing);
-    mainSlider->setBounds(gainSliderSlice.getX(), gainSliderSlice.getY(),
+    mainSlider.setBounds(gainSliderSlice.getX(), gainSliderSlice.getY(),
                           header.getRight() - gainSliderSlice.getX() - gXSpacing,
                           area.getHeight());
     
@@ -212,7 +237,7 @@ void MainViewController::resized()
     levelMeterSlice.removeFromRight(gXSpacing);
     levelMeterSlice.reduce(1, 1);
     levelMeterComponentL->setBounds(header.getX()+gXSpacing, levelMeterSlice.getY()+5,
-                          mainSlider->getWidth(),
+                          mainSlider.getWidth(),
                           levelMeterSlice.getHeight());
     
     area.reduce(2, 2);
@@ -270,7 +295,30 @@ void MainViewController::mouseDown(const MouseEvent &event)
     }
 }
 
-
+void MainViewController::bkComboBoxDidChange(ComboBox* cb)
+{
+    if (cb == &sampleCB)
+    {
+        String name = cb->getText();
+        
+        int selectedId = cb->getSelectedId();
+        
+        if (selectedId <= 4)
+        {
+            processor.loadSamples((BKSampleLoadType)(selectedId - 1));
+        }
+        else
+        {
+            int index = selectedId - BKLoadSoundfont - 1;
+            
+            processor.loadSamples(BKLoadSoundfont, processor.soundfontNames[index], 0);
+        }
+    }
+    else if (cb == &instrumentCB)
+    {
+        processor.loadSamples(BKLoadSoundfont, processor.currentSoundfont, cb->getSelectedItemIndex());
+    }
+}
 
 void MainViewController::bkButtonClicked (Button* b)
 {
@@ -280,10 +328,10 @@ void MainViewController::bkButtonClicked (Button* b)
 
 void MainViewController::sliderValueChanged (Slider* slider)
 {
-    
-    if (slider == mainSlider)
+    double value = slider->getValue();
+    if (slider == &mainSlider)
     {
-        gen->setGlobalGain(Decibels::decibelsToGain(mainSlider->getValue()));
+        processor.gallery->getGeneralSettings()->setGlobalGain(Decibels::decibelsToGain(value));
         overtop.gvc.update();
     }
     else if (display == DisplayKeyboard && slider == &octaveSlider)
@@ -313,7 +361,23 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     
     if (code == KeyPress::escapeKey)
     {
-        processor.updateState->setCurrentDisplay(DisplayNil);
+        BKPreparationDisplay currentDisplay = overtop.getCurrentDisplay();
+        if(currentDisplay == DisplayDirect)
+        {
+            if(overtop.dvc.getSubWindowInFront()) overtop.dvc.closeSubWindow();
+            else processor.updateState->setCurrentDisplay(DisplayNil);
+        }
+        else if(currentDisplay == DisplayNostalgic)
+        {
+            if(overtop.nvc.getSubWindowInFront()) overtop.nvc.closeSubWindow();
+            else processor.updateState->setCurrentDisplay(DisplayNil);
+        }
+        else if(currentDisplay == DisplaySynchronic)
+        {
+            if(overtop.svc.getSubWindowInFront()) overtop.svc.closeSubWindow();
+            else processor.updateState->setCurrentDisplay(DisplayNil);
+        }
+        else processor.updateState->setCurrentDisplay(DisplayNil);
     }
     else if (code == KeyPress::deleteKey)
     {
@@ -407,35 +471,91 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     }
     else if (code == 90) // Z
     {
-#if TRY_UNDO
-        if (e.getModifiers().isCommandDown())
-        {
-            if (e.getModifiers().isShiftDown())
-            {
-                construction.redo();
-            }
-            else
-            {
-                construction.undo();
-            }
-        }
-#endif
+
     }
     
     return true;
 }
 
+void MainViewController::fillSampleCB()
+{
+    sampleCB.clear(dontSendNotification);
+
+    sampleCB.addItem("Piano (litest)", 1);
+    sampleCB.addItem("Piano (lite)", 2);
+    sampleCB.addItem("Piano (medium)", 3);
+    sampleCB.addItem("Piano (heavy)", 4);
+    
+    sampleCB.addSeparator();
+    
+    if (processor.currentSampleType <= BKLoadHeavy)
+    {
+        sampleCB.setSelectedItemIndex(processor.currentSampleType, dontSendNotification);
+    }
+    
+    int id = 5;
+    for (auto sf : processor.soundfontNames)
+    {
+		//windows paths
+		String name;
+#if JUCE_WINDOWS
+		name = sf.fromLastOccurrenceOf("\\", false, true).upToFirstOccurrenceOf(".sf", false, true);
+#else
+        name = sf.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf", false, true);
+#endif
+        sampleCB.addItem(name, id);
+        
+        if ((processor.currentSampleType == BKLoadSoundfont) && (name == processor.getCurrentSoundfontName()))
+        {
+            sampleCB.setSelectedId(id, dontSendNotification);
+        }
+        
+        id++;
+    }
+    
+    
+}
+
+void MainViewController::fillInstrumentCB()
+{
+    instrumentCB.clear(dontSendNotification);
+    
+    // If theres only one instrument, dont bother showing name
+    if (processor.currentSampleType < BKLoadSoundfont)
+    {
+        instrumentCB.setEnabled(false);
+    }
+    else
+    {
+        instrumentCB.setEnabled(true);
+        
+        int i = 1;
+        for (auto inst : processor.instrumentNames)
+        {
+            if (inst == "") inst = "Instrument " + String(i);
+            instrumentCB.addItem(inst, i++);
+        }
+        
+        instrumentCB.setSelectedItemIndex(processor.currentInstrument, dontSendNotification);
+    }
+    
+}
 
 
 void MainViewController::timerCallback()
 {
     BKUpdateState::Ptr state = processor.updateState;
     
-    if (++timerCallbackCount >= 50)
+    if (++timerCallbackCount >= 25)
     {
         timerCallbackCount = 0;
         processor.collectGalleries();
+        processor.collectSoundfonts();
+        
         header.fillGalleryCB();
+        
+        fillSampleCB();
+        fillInstrumentCB();
     }
     
     Array<bool> noteOns = processor.getNoteOns();
@@ -467,9 +587,10 @@ void MainViewController::timerCallback()
     }
     
     //check to see if General Settings globalGain has changed, update slider accordingly
-    float genGain = Decibels::gainToDecibels(gen->getGlobalGain());
-    if(genGain != mainSlider->getValue())
-        mainSlider->setValue(Decibels::gainToDecibels(gen->getGlobalGain()), dontSendNotification);
+    float globalGain = processor.gallery->getGeneralSettings()->getGlobalGain();
+    float genGain = Decibels::gainToDecibels(globalGain);
+    if(genGain != mainSlider.getValue())
+        mainSlider.setValue(Decibels::gainToDecibels(globalGain), dontSendNotification);
     
     if (state->modificationDidChange)
     {
@@ -534,6 +655,12 @@ void MainViewController::timerCallback()
         header.fillPianoCB();
     }
     
+    if (state->commentDidChange)
+    {
+        state->commentDidChange = false;
+        construction.getCurrentItem()->setCommentText(state->comment);
+    }
+    
     
     if (state->keymapDidChange)
     {
@@ -547,6 +674,8 @@ void MainViewController::timerCallback()
         state->displayDidChange = false;
         
         overtop.setCurrentDisplay(processor.updateState->currentDisplay);
+        
+        header.update();
     }
     
     levelMeterComponentL->updateLevel(processor.getLevelL());
@@ -554,5 +683,3 @@ void MainViewController::timerCallback()
     
     
 }
-
-

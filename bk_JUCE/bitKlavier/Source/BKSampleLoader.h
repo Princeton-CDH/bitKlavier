@@ -27,23 +27,25 @@ public:
     
     ~BKSampleLoader(void)
     {
-        
     }
 private:
     
     // Sample loading.
     AudioFormatManager formatManager;
+    WavAudioFormat wavFormat;
     ScopedPointer<AudioFormatReader> sampleReader;
     ScopedPointer<AudioSampleBuffer> sampleBuffer;
     
     void run(void) override;
     
+    void loadSoundfontFromFile(File sfzFile);
     void loadMainPianoSamples(BKSampleLoadType type);
     void loadResonanceReleaseSamples(void);
     void loadHammerReleaseSamples(void);
+    void loadPedalSamples(void);
     
     BKAudioProcessor& processor;
-  
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BKSampleLoader)
 };
 

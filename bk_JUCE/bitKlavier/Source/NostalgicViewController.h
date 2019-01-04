@@ -15,6 +15,9 @@
 
 class NostalgicViewController :
 public BKViewController
+#if JUCE_IOS
+, public WantsBigOne::Listener
+#endif
 {
 public:
     NostalgicViewController(BKAudioProcessor&, BKItemGraph* theGraph);
@@ -33,25 +36,28 @@ public:
     ScopedPointer<BKSingleSlider> gainSlider;
     
     ScopedPointer<BKStackedSlider> transpositionSlider;
-    
-    /*
-    void numberPadChanged(BKNumberPad*) override;
-    void numberPadDismissed(BKNumberPad*) override;
-    
-    void bkSingleSliderWantsKeyboard(BKSingleSlider*) override;
-    void bkStackedSliderWantsKeyboard(BKStackedSlider*) override;
-    void bkWaveDistanceUndertowSliderWantsKeyboard(BKWaveDistanceUndertowSlider*)override;
-     
-     */
+
+    ScopedPointer<BKADSRSlider> reverseADSRSlider;
+    ScopedPointer<BKADSRSlider> undertowADSRSlider;
     
     void paint (Graphics&) override;
     void resized() override;
     
+    void setShowADSR(String name, bool newval);
+    
     virtual void update(void) {};
     
     void fillModeSelectCB(void);
+    
+#if JUCE_IOS
+    void iWantTheBigOne(TextEditor*, String name) override;
+#endif
 
 private:
+    
+    bool showADSR;
+    bool showReverseADSR;
+    bool showUndertowADSR;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NostalgicViewController)
     
@@ -64,6 +70,7 @@ public BKWaveDistanceUndertowSlider::Listener,
 public BKEditableComboBoxListener,
 public BKSingleSlider::Listener,
 public BKStackedSlider::Listener,
+public BKADSRSlider::Listener,
 //public SliderListener,
 public Timer
 {
@@ -80,11 +87,12 @@ public:
     
     static void actionButtonCallback(int action, NostalgicPreparationEditor*);
     
+    void closeSubWindow();
+    
     int addPreparation(void);
     int duplicatePreparation(void);
     void setCurrentId(int Id);
     void deleteCurrent(void);
-    
     
 private:
     
@@ -93,9 +101,11 @@ private:
     void bkTextFieldDidChange (TextEditor&) override {};
     void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
-    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow) override;
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
+    void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
+    void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NostalgicPreparationEditor)
     
@@ -107,6 +117,7 @@ public BKWaveDistanceUndertowSlider::Listener,
 public BKEditableComboBoxListener,
 public BKSingleSlider::Listener,
 public BKStackedSlider::Listener,
+public BKADSRSlider::Listener,
 //public SliderListener,
 public Timer
 {
@@ -124,9 +135,11 @@ public:
     void bkTextFieldDidChange (TextEditor&) override {};
     void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
-    void BKSingleSliderValueChanged(String name, double val) override;
+    void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow) override;
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
+    void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
+    void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
     
     void fillSelectCB(int last, int current);
     void greyOutAllComponents();

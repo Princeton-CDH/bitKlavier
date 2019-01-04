@@ -25,16 +25,42 @@ void BKAudioProcessor::updateUI(void)
     updateState->keymapDidChange = true;
 }
 
-void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
+void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsound)
 {
-    // TO IMPLEMENT: Should turn off all notes in the processors/synths before loading new samples.
-    if(type >= 0 && currentSampleType != type)
+    didLoadMainPianoSamples = false;
+    
+    // Check if path isn't valid and load BKLoadLite if it is not
+    if (type == BKLoadSoundfont)
+    {
+        if (!path.startsWith("default.sf"))
+        {
+            File file(path);
+            
+            if (!file.exists())
+            {
+                type = BKLoadLite;
+            }
+        }
+    }
+    
+    
+    if (type == BKLoadSoundfont)
+    {
+        shouldLoadDefault = false;
+        
+        currentSampleType = BKLoadSoundfont;
+        
+        currentSoundfont = path;
+        currentInstrument = subsound;
+        
+        loader.startThread();
+    }
+    else if (type < BKLoadSoundfont && currentSampleType != type)
     {
         currentSampleType = type;
         
-        didLoadMainPianoSamples = false;
+        shouldLoadDefault = false;
         
-        DBG("SAMPLE_SET: " + cBKSampleLoadTypes[type]);\
         int numSamplesPerLayer = 29;
         int numHarmSamples = 69;
         int numResSamples = 88;
@@ -46,11 +72,19 @@ void BKAudioProcessor::loadPianoSamples(BKSampleLoadType type)
                               (type == BKLoadLitest) ? (numSamplesPerLayer * 1) :
                                              1.0);
         
-        DBG("progressInc: " + String(progressInc));
-        
         loader.startThread();
     }
-    
+}
+
+void BKAudioProcessor::collectSoundfontsFromFolder(File folder)
+{
+    DirectoryIterator iter (File (folder), true, "*.sf2;*.sfz");
+    while (iter.next())
+    {
+        File soundfontFile (iter.getFile());
+
+        soundfontNames.add(soundfontFile.getFullPathName());
+    }
 }
 
 void BKAudioProcessor::collectGalleriesFromFolder(File folder)
@@ -81,11 +115,35 @@ void BKAudioProcessor::collectGalleries(void)
     
 #if JUCE_IOS
     bkGalleries = File::getSpecialLocation (File::userDocumentsDirectory);
-#else
+#endif
+#if JUCE_MAC
+    bkGalleries = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
     bkGalleries = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
 #endif
     
     collectGalleriesFromFolder(bkGalleries);
+}
+
+void BKAudioProcessor::collectSoundfonts(void)
+{
+    soundfontNames.clear();
+    
+    File bkSoundfonts;
+    
+#if JUCE_IOS
+    bkSoundfonts = File::getSpecialLocation (File::userDocumentsDirectory);
+#endif
+#if JUCE_MAC
+    bkSoundfonts = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
+    bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("soundfonts");
+#endif
+    
+    collectSoundfontsFromFolder(bkSoundfonts);
+    soundfontNames.sort(true);
 }
 
 String BKAudioProcessor::firstGallery(void)
@@ -107,6 +165,7 @@ void BKAudioProcessor::updateGalleries()
     mainPianoSynth.updateGeneralSettings(gallery->getGeneralSettings());
     hammerReleaseSynth.updateGeneralSettings(gallery->getGeneralSettings());
     resonanceReleaseSynth.updateGeneralSettings(gallery->getGeneralSettings());
+    pedalSynth.updateGeneralSettings(gallery->getGeneralSettings());
     
     clipboard.clear();
     

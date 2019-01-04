@@ -23,42 +23,84 @@ BKViewController(p, theGraph)
     selectCB.setName("Direct");
     selectCB.addSeparator();
     selectCB.setSelectedItemIndex(0);
+    selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
     
     transpositionSlider = new BKStackedSlider("transpositions", -12, 12, -12, 12, 0, 0.01);
-
+    transpositionSlider->setTooltip("Determines pitch (in semitones) of Direct notes; control-click to add another voice, double-click to edit all");
     addAndMakeVisible(transpositionSlider);
     
     gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(false);
+    gainSlider->setToolTipString("Adjusts overall volume of keyboard");
     addAndMakeVisible(gainSlider);
     
     resonanceGainSlider = new BKSingleSlider("resonance gain", 0, 10, 0.2, 0.01);
     resonanceGainSlider->setSkewFactorFromMidPoint(1.);
     resonanceGainSlider->setJustifyRight(false);
+    resonanceGainSlider->setToolTipString("Adjusts overall resonance/reverb based on keyOff velocity; change to keyOn velocity in Gallery>settings");
     addAndMakeVisible(resonanceGainSlider);
     
     hammerGainSlider = new BKSingleSlider("hammer gain", 0, 10, 1, 0.01);
     hammerGainSlider->setSkewFactorFromMidPoint(1.);
     hammerGainSlider->setJustifyRight(false);
+    hammerGainSlider->setToolTipString("Adjusts mechanical noise sample based on keyOff velocity; change to keyOn velocity in Gallery>settings");
     addAndMakeVisible(hammerGainSlider);
     
+    ADSRSlider = new BKADSRSlider("ADSR");
+    ADSRSlider->setButtonText("edit envelope");
+    ADSRSlider->setToolTip("adjust Attack, Decay, Sustain, and Release envelope parameters");
+    addAndMakeVisible(ADSRSlider);
+    setShowADSR(false);
+    
+    
 #if JUCE_IOS
-    transpositionSlider->addWantsKeyboardListener(this);
-    gainSlider->addWantsKeyboardListener(this);
-    resonanceGainSlider->addWantsKeyboardListener(this);
-    hammerGainSlider->addWantsKeyboardListener(this);
+    transpositionSlider->addWantsBigOneListener(this);
+    gainSlider->addWantsBigOneListener(this);
+    resonanceGainSlider->addWantsBigOneListener(this);
+    hammerGainSlider->addWantsBigOneListener(this);
 #endif
     
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
+    actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
+
 }
 
 void DirectViewController::paint (Graphics& g)
 {
     g.fillAll(Colours::black);
+}
+
+void DirectViewController::setShowADSR(bool newval)
+{
+    showADSR = newval;
+    
+    if(showADSR)
+    {
+        resonanceGainSlider->setVisible(false);
+        hammerGainSlider->setVisible(false);
+        gainSlider->setVisible(false);
+        transpositionSlider->setVisible(false);
+        
+        ADSRSlider->setButtonText("close envelope");
+
+        
+    }
+    else
+    {
+        resonanceGainSlider->setVisible(true);
+        hammerGainSlider->setVisible(true);
+        gainSlider->setVisible(true);
+        transpositionSlider->setVisible(true);
+
+        ADSRSlider->setButtonText("edit envelope");
+    }
+    
+    resized();
+    
 }
 
 void DirectViewController::resized()
@@ -68,6 +110,8 @@ void DirectViewController::resized()
     iconImageComponent.setBounds(area);
     area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
     
+    Rectangle<int> areaSave = area;
+
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
     comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * processor.paddingScalarX);
@@ -93,42 +137,81 @@ void DirectViewController::resized()
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
     
-    Rectangle<int> sliderSlice = leftColumn;
-    sliderSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
-    //sliderSlice.removeFromLeft(gXSpacing);
-    /*
-     sliderSlice.reduce(4 + 2.*gPaddingConst * processor.paddingScalarX,
-     4 + 2.*gPaddingConst * processor.paddingScalarY);
-     */
-    
-    int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 5.;
-    resonanceGainSlider->setBounds(sliderSlice.getX(),
-                                   nextCenter - gComponentSingleSliderHeight/2 + 8,
-                                   sliderSlice.getWidth(),
-                                   gComponentSingleSliderHeight);
-    
-    nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 2.;
-    hammerGainSlider->setBounds(sliderSlice.getX(),
-                                nextCenter - gComponentSingleSliderHeight/2 + 8,
-                                sliderSlice.getWidth(),
-                                gComponentSingleSliderHeight);
-    
-    nextCenter = sliderSlice.getY() + 4. * sliderSlice.getHeight() / 5.;
-    gainSlider->setBounds(sliderSlice.getX(),
-                          nextCenter - gComponentSingleSliderHeight/2 + 4,
-                          sliderSlice.getWidth(),
-                          gComponentSingleSliderHeight);
-    
-    //leftColumn.reduce(4, 0);
-    area.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
-    area.removeFromRight(gXSpacing);
-    
-    transpositionSlider->setBounds(area.getX(),
-                                   resonanceGainSlider->getY(),
-                                   area.getWidth(),
-                                   gComponentStackedSliderHeight + processor.paddingScalarY * 30);
-    
+    if(!showADSR)
+    {
+        Rectangle<int> sliderSlice = leftColumn;
+        sliderSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
+        //sliderSlice.removeFromLeft(gXSpacing);
+        /*
+         sliderSlice.reduce(4 + 2.*gPaddingConst * processor.paddingScalarX,
+         4 + 2.*gPaddingConst * processor.paddingScalarY);
+         */
+        
+        int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 5.;
+        resonanceGainSlider->setBounds(sliderSlice.getX(),
+                                       nextCenter - gComponentSingleSliderHeight/2 + 8,
+                                       sliderSlice.getWidth(),
+                                       gComponentSingleSliderHeight);
+        
+        nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 2.;
+        hammerGainSlider->setBounds(sliderSlice.getX(),
+                                    nextCenter - gComponentSingleSliderHeight/2 + 8,
+                                    sliderSlice.getWidth(),
+                                    gComponentSingleSliderHeight);
+        
+        nextCenter = sliderSlice.getY() + 4. * sliderSlice.getHeight() / 5.;
+        gainSlider->setBounds(sliderSlice.getX(),
+                              nextCenter - gComponentSingleSliderHeight/2 + 4,
+                              sliderSlice.getWidth(),
+                              gComponentSingleSliderHeight);
+        
+        
+        
+        //leftColumn.reduce(4, 0);
+        area.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
+        area.removeFromRight(gXSpacing);
+        
+        
+        transpositionSlider->setBounds(area.getX(),
+                                       resonanceGainSlider->getY(),
+                                       area.getWidth(),
+                                       gComponentStackedSliderHeight + processor.paddingScalarY * 30);
+        
+        
+        //area.removeFromTop(gComponentComboBoxHeight);
+        //transpositionSlider->setBounds(area.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 40));
+        
+        //area.removeFromTop(gYSpacing + 6.*gPaddingConst * processor.paddingScalarY);
+        //ADSRSlider->setBounds(area.removeFromTop(5*gComponentSingleSliderHeight));
+        
+        //area.removeFromBottom(gYSpacing + 6.*gPaddingConst * processor.paddingScalarY);
+        //ADSRSlider->setBounds(area.removeFromBottom(gComponentComboBoxHeight));
+        
+        ADSRSlider->setBounds(area.getX(),
+                              gainSlider->getY() + gComponentComboBoxHeight * 0.5,
+                              area.getWidth(),
+                              gComponentComboBoxHeight);
+    }
+    else
+    {
+        areaSave.removeFromTop(gYSpacing * 2 + 8.*gPaddingConst * processor.paddingScalarY);
+        Rectangle<int> adsrSliderSlice = areaSave.removeFromTop(gComponentComboBoxHeight * 2 + gComponentSingleSliderHeight * 2 + gYSpacing * 3);
+        ADSRSlider->setBounds(adsrSliderSlice);
+        
+        //areaSave.removeFromTop(gComponentComboBoxHeight * 2 + gYSpacing + 8.*gPaddingConst * processor.paddingScalarY);
+        //ADSRSlider->setBounds(areaSave);
+        
+        selectCB.toFront(false);
+    }
 }
+
+#if JUCE_IOS
+void DirectViewController::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
+}
+#endif
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ DirectPreparationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~//
 DirectPreparationEditor::DirectPreparationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
@@ -146,11 +229,18 @@ DirectViewController(p, theGraph)
     resonanceGainSlider->addMyListener(this);
     
     hammerGainSlider->addMyListener(this);
+    
+    ADSRSlider->addMyListener(this);
+    
+    
 }
 
 void DirectPreparationEditor::update(void)
 {
     if (processor.updateState->currentDirectId < 0) return;
+    setShowADSR(false);
+    setSubWindowInFront(false);
+    ADSRSlider->setIsButtonOnly(true);
     
     DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
 
@@ -162,6 +252,10 @@ void DirectPreparationEditor::update(void)
         resonanceGainSlider->setValue(prep->getResonanceGain(), dontSendNotification);
         hammerGainSlider->setValue(prep->getHammerGain(), dontSendNotification);
         gainSlider->setValue(prep->getGain(), dontSendNotification);
+        ADSRSlider->setAttackValue(prep->getAttack(), dontSendNotification);
+        ADSRSlider->setDecayValue(prep->getDecay(), dontSendNotification);
+        ADSRSlider->setSustainValue(prep->getSustain(), dontSendNotification);
+        ADSRSlider->setReleaseValue(prep->getRelease(), dontSendNotification);
     }
 }
 
@@ -246,6 +340,30 @@ void DirectPreparationEditor::actionButtonCallback(int action, DirectPreparation
         processor.clear(PreparationTypeDirect, processor.updateState->currentDirectId);
         vc->update();
     }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentDirectId;
+        Direct::Ptr prep = processor.gallery->getDirect(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
+    }
 }
 
 void DirectPreparationEditor::bkComboBoxDidChange (ComboBox* box)
@@ -267,7 +385,7 @@ void DirectPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableC
     fillSelectCB(0, processor.updateState->currentDirectId);
 }
 
-void DirectPreparationEditor::BKSingleSliderValueChanged(String name, double val)
+void DirectPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
     DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
@@ -300,6 +418,37 @@ void DirectPreparationEditor::BKStackedSliderValueChanged(String name, Array<flo
     prep->setTransposition(val);
     active->setTransposition(val);
 }
+
+void DirectPreparationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
+{
+    DBG("BKADSRSliderValueChanged received");
+    
+    DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
+    DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
+    
+    prep->setAttack(attack);
+    active->setAttack(attack);
+    prep->setDecay(decay);
+    active->setDecay(decay);
+    prep->setSustain(sustain);
+    active->setSustain(sustain);
+    prep->setRelease(release);
+    active->setRelease(release);
+}
+
+void DirectPreparationEditor::BKADSRButtonStateChanged(String name, bool mod, bool state)
+{
+    setShowADSR(!state);
+    setSubWindowInFront(!state);
+}
+
+void DirectPreparationEditor::closeSubWindow()
+{
+    ADSRSlider->setIsButtonOnly(true);
+    setShowADSR(false);
+    setSubWindowInFront(false);
+}
+
 
 void DirectPreparationEditor::fillSelectCB(int last, int current)
 {
@@ -339,6 +488,10 @@ void DirectPreparationEditor::buttonClicked (Button* b)
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
+        ADSRSlider->setIsButtonOnly(true);
+        setShowADSR(false);
+        setSubWindowInFront(false);
     }
     else if (b == &actionButton)
     {
@@ -364,6 +517,8 @@ DirectViewController(p, theGraph)
     resonanceGainSlider->addMyListener(this);
     
     hammerGainSlider->addMyListener(this);
+    
+    ADSRSlider->addMyListener(this);
 }
 
 void DirectModificationEditor::greyOutAllComponents()
@@ -372,6 +527,7 @@ void DirectModificationEditor::greyOutAllComponents()
     resonanceGainSlider->setDim(gModAlpha);
     transpositionSlider->setDim(gModAlpha);
     gainSlider->setDim(gModAlpha);
+    ADSRSlider->setDim(gModAlpha);
 }
 
 void DirectModificationEditor::highlightModedComponents()
@@ -382,6 +538,7 @@ void DirectModificationEditor::highlightModedComponents()
     if(mod->getParam(DirectGain) != "")             gainSlider->setBright();
     if(mod->getParam(DirectResGain) != "")          resonanceGainSlider->setBright();
     if(mod->getParam(DirectHammerGain) != "")       hammerGainSlider->setBright();
+    if(mod->getParam(DirectADSR) != "")             ADSRSlider->setBright();
 }
 
 void DirectModificationEditor::update(void)
@@ -408,6 +565,9 @@ void DirectModificationEditor::update(void)
         
         val = mod->getParam(DirectGain);
         gainSlider->setValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(DirectADSR);
+        ADSRSlider->setValue(stringToFloatArray(val), dontSendNotification);
     }
     
     
@@ -520,6 +680,30 @@ void DirectModificationEditor::actionButtonCallback(int action, DirectModificati
         vc->update();
         vc->updateModification();
     }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentModDirectId;
+        DirectModPreparation::Ptr prep = processor.gallery->getDirectModPreparation(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
+    }
 }
 
 void DirectModificationEditor::bkComboBoxDidChange (ComboBox* box)
@@ -543,7 +727,7 @@ void DirectModificationEditor::BKEditableComboBoxChanged(String name, BKEditable
 }
 
 
-void DirectModificationEditor::BKSingleSliderValueChanged(String name, double val)
+void DirectModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
     
@@ -569,12 +753,32 @@ void DirectModificationEditor::BKSingleSliderValueChanged(String name, double va
 
 void DirectModificationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {
+    
     DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
     
     mod->setParam(DirectTransposition, floatArrayToString(val));
+    
     transpositionSlider->setBright();
     
     updateModification();
+    
+}
+
+void DirectModificationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
+{
+    DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
+    
+    Array<float> newvals = {(float)attack, (float)decay, sustain, (float)release};
+    mod->setParam(DirectADSR, floatArrayToString(newvals));
+    ADSRSlider->setBright();
+    
+    updateModification();
+}
+
+void DirectModificationEditor::BKADSRButtonStateChanged(String name, bool mod, bool state)
+{
+    setShowADSR(!state);
+    setSubWindowInFront(!state);
 }
 
 void DirectModificationEditor::updateModification(void)

@@ -11,10 +11,84 @@
 #include "TuningViewController.h"
 
 TuningViewController::TuningViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p,theGraph)
+BKViewController(p,theGraph),
+showSprings(false)
+#if JUCE_IOS
+, absoluteKeyboard(true)
+#endif
 {
-    
     setLookAndFeel(&buttonsAndMenusLAF);
+
+    //setRepaintsOnMouseActivity(false);
+    
+    for (int i = 0; i < 128; i++)
+    {
+        Slider* s = new Slider("t" + String(i));
+        
+        s->setSliderStyle(Slider::SliderStyle::LinearBar);
+        s->setRange(0.0, 1.0);
+        addChildComponent(s);
+        tetherSliders.add(s);
+        
+        Label* l = new Label(s->getName(), Utilities::getNoteString(i));
+        l->setColour(juce::Label::ColourIds::textColourId, Colours::white);
+        addChildComponent(l);
+        tetherLabels.add(l);
+    }
+    
+    for (int i = 0; i < 12; i++)
+    {
+        Slider* s = new Slider(intervalNames[i+1]);
+        
+        s->setSliderStyle(Slider::SliderStyle::LinearBar);
+        s->setRange(0.0, 1.0);
+        addChildComponent(s);
+        springSliders.add(s);
+        
+        Label* l = new Label(s->getName(), s->getName());
+        l->setColour(juce::Label::ColourIds::textColourId, Colours::white);
+        addChildComponent(l);
+        springLabels.add(l);
+    
+    }
+    
+    
+    springTuningToggle.setColour(ToggleButton::textColourId, Colours::antiquewhite);
+    springTuningToggle.setColour(TextButton::buttonOnColourId, Colours::red.withMultipliedAlpha(0.5));
+    springTuningToggle.setColour(ToggleButton::tickDisabledColourId, Colours::antiquewhite);
+    springTuningToggle.setClickingTogglesState(true);
+    springTuningToggle.setTooltip("Turns on/off Spring Tuning.");
+    springTuningToggle.setAlwaysOnTop(true);
+    springTuningToggle.setButtonText("Springs");
+    addChildComponent(springTuningToggle);
+    
+    springTuningLabel.setText("Springs", dontSendNotification);
+    springTuningLabel.setJustificationType(Justification::left);
+    springTuningLabel.setColour(Label::ColourIds::textColourId, Colours::antiquewhite);
+
+    rateSlider = new BKSingleSlider("rate", 5., 400., 100., 1);
+    rateSlider->setJustifyRight(false);
+    rateSlider->displaySliderVisible(false);
+    rateSlider->setToolTipString("rate that spring model runs at (Hz)");
+    addChildComponent(rateSlider);
+    
+    dragSlider = new BKSingleSlider("drag", 0., 1., 0.5, 0.0001);
+    dragSlider->setJustifyRight(false);
+    dragSlider->displaySliderVisible(false);
+    dragSlider->setToolTipString("frictional component in spring model");
+    addChildComponent(dragSlider);
+    
+    tetherStiffnessSlider = new BKSingleSlider("anchor stiff", 0., 1., 0.5, 0.0001);
+    tetherStiffnessSlider->setJustifyRight(false);
+    tetherStiffnessSlider->displaySliderVisible(false);
+    tetherStiffnessSlider->setToolTipString("overall stiffness of anchor sliders");
+    addChildComponent(tetherStiffnessSlider);
+    
+    intervalStiffnessSlider = new BKSingleSlider("interval stiff", 0., 1., 0.5, 0.0001);
+    intervalStiffnessSlider->setJustifyRight(false);
+    intervalStiffnessSlider->displaySliderVisible(false);
+    intervalStiffnessSlider->setToolTipString("overall stiffness of interval sliders");
+    addChildComponent(intervalStiffnessSlider);
     
     iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::tuning_icon_png, BinaryData::tuning_icon_pngSize));
     iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
@@ -25,60 +99,87 @@ BKViewController(p,theGraph)
     selectCB.addSeparator();
     selectCB.addListener(this);
     selectCB.setSelectedItemIndex(0);
+    selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
     
     scaleCB.setName("Scale");
+    scaleCB.setTooltip("Select from a range of preset temperaments; open the Adaptive Tuning settings");
     addAndMakeVisible(scaleCB);
     
+    springScaleCB.setName("SpringTuning Scale");
+    springScaleCB.setTooltip("Select a temperament for the spring intervals.");
+    addChildComponent(springScaleCB);
+    
+    springScaleFundamentalCB.setName("SpringTuning Fundamental");
+    springScaleFundamentalCB.setTooltip("Set the fundamental for the interval scale");
+    addChildComponent(springScaleFundamentalCB);
+    
     scaleLabel.setText("Scale", dontSendNotification);
-    //addAndMakeVisible(scaleLabel);
     
     fundamentalCB.setName("Fundamental");
+    fundamentalCB.setTooltip("Select root around which your temperament will be generated");
     addAndMakeVisible(fundamentalCB);
     
     fundamentalLabel.setText("Fundamental", dontSendNotification);
-    //addAndMakeVisible(fundamentalLabel);
     
     A1IntervalScaleCB.setName("A1IntervalScale");
-    //A1IntervalScaleCB.BKSetJustificationType(juce::Justification::centredRight);
     A1IntervalScaleCB.addListener(this);
+    A1IntervalScaleCB.setTooltip("scale the sets how successive intervals are tuned");
     addAndMakeVisible(A1IntervalScaleCB);
     
     A1IntervalScaleLabel.setText("Adaptive:", dontSendNotification);
-    //A1IntervalScaleLabel.setJustificationType(juce::Justification::centredRight);
-    addAndMakeVisible(A1IntervalScaleLabel);
     
     A1Inversional.setButtonText ("invert");
     A1Inversional.setToggleState (true, dontSendNotification);
-    //buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
     A1Inversional.setColour(ToggleButton::textColourId, Colours::antiquewhite);
     A1Inversional.setColour(ToggleButton::tickColourId, Colours::antiquewhite);
     A1Inversional.setColour(ToggleButton::tickDisabledColourId, Colours::antiquewhite);
+    A1Inversional.setTooltip("when selected, intervals will be tuned the same whether they ascend or descend; e.g. C-D will always be the same interval as C-Bb");
     addAndMakeVisible(A1Inversional);
     
     A1AnchorScaleCB.setName("A1AnchorScale");
+    A1AnchorScaleCB.setTooltip("determines where the moving fundamental will be tuned to");
     addAndMakeVisible(A1AnchorScaleCB);
     
     A1AnchorScaleLabel.setText("Anchor:", dontSendNotification);
-    //A1AnchorScaleLabel.setJustificationType(juce::Justification::centredRight);
     addAndMakeVisible(A1AnchorScaleLabel);
     
     A1FundamentalCB.setName("A1Fundamental");
+    A1FundamentalCB.setTooltip("sets fundamental for the anchor scale");
     addAndMakeVisible(A1FundamentalCB);
-    
-    //A1FundamentalLabel.setText("Adaptive 1 Anchor Fundamental", dontSendNotification);
-    //addAndMakeVisible(A1FundamentalLabel);
     
     A1ClusterThresh = new BKSingleSlider("Threshold", 1, 1000, 0, 1);
     A1ClusterThresh->setJustifyRight(false);
+    A1ClusterThresh->setToolTipString("if this time (ms) is exceeded, the fundamental will reset");
     addAndMakeVisible(A1ClusterThresh);
     
     A1ClusterMax = new BKSingleSlider("Maximum", 1, 8, 1, 1);
     A1ClusterMax->setJustifyRight(false);
+    A1ClusterMax->setToolTipString("after these many notes are played, the fundamental will reset");
     addAndMakeVisible(A1ClusterMax);
     
     A1reset.setButtonText("reset");
     addAndMakeVisible(A1reset);
+    
+    showSpringsButton.setButtonText("Spiral");
+    showSpringsButton.setClickingTogglesState(true);
+    showSpringsButton.setTooltip("show spiral view of tuning relationships");
+    showSpringsButton.setColour(TextButton::buttonOnColourId, Colours::red.withMultipliedAlpha(0.5));
+    addAndMakeVisible(showSpringsButton);
+    
+    nToneRootCB.setName("nToneRoot");
+    nToneRootCB.setTooltip("set root note, when semitone width is not 100");
+    addAndMakeVisible(nToneRootCB);
+    
+    nToneRootOctaveCB.setName("nToneRootOctave");
+    nToneRootOctaveCB.setTooltip("set octave for root note, when semitone width is not 100");
+    addAndMakeVisible(nToneRootOctaveCB);
+    
+    nToneSemitoneWidthSlider = new BKSingleSlider("semitone width and root", 1, 200, 100, 0.001);
+    nToneSemitoneWidthSlider->setJustifyRight(false);
+    nToneSemitoneWidthSlider->displaySliderVisible(false);
+    nToneSemitoneWidthSlider->setToolTipString("Adjusts half step distance. For example, 50 cents is a quarter-tone keyboard, and -100 cents is an inverted keyboard");
+    addAndMakeVisible(nToneSemitoneWidthSlider);
     
     fillTuningCB();
     fillFundamentalCB();
@@ -94,34 +195,46 @@ BKViewController(p,theGraph)
     customOffsets.ensureStorageAllocated(12);
     for(int i=0; i<12; i++) customOffsets.add(0.);
 
-    customKeyboard.setName("scale");
-    //customKeyboard.setAvailableRange(60, 71);
+    customKeyboard.setName("offset from ET");
     customKeyboard.setDimensionRatio(2.0);
-    customKeyboard.setAvailableRange(0, 11);
-    customKeyboard.useOrderedPairs(false);
     customKeyboard.setFundamental(0);
     addAndMakeVisible(customKeyboard);
     
     offsetSlider = new BKSingleSlider("offset: ", -100, 100, 0, 0.1);
+    offsetSlider->displaySliderVisible(false);
+    offsetSlider->setToolTipString("Raise or lower the entire temperament in cents");
     addAndMakeVisible(offsetSlider);
     
     lastNote.setText("note: ", dontSendNotification);
+    lastNote.setTooltip("last note played as MIDI value");
     lastInterval.setText("interval: ", dontSendNotification);
     lastInterval.setJustificationType(juce::Justification::centredRight);
+    lastInterval.setTooltip("Distance between last two notes played");
     addAndMakeVisible(lastNote);
     addAndMakeVisible(lastInterval);
     
+    currentFundamental.setJustificationType(juce::Justification::centredRight);
+    addAndMakeVisible(currentFundamental);
+    
     actionButton.setButtonText("Action");
+    actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
     addAndMakeVisible(actionButton);
     
+    updateComponentVisibility();
+    
 #if JUCE_IOS
-    offsetSlider->addWantsKeyboardListener(this);
-    absoluteKeyboard.addWantsKeyboardListener(this);
-    customKeyboard.addWantsKeyboardListener(this);
-    A1ClusterThresh->addWantsKeyboardListener(this);
-    A1ClusterMax->addWantsKeyboardListener(this);
+    offsetSlider->addWantsBigOneListener(this);
+    A1ClusterMax->addWantsBigOneListener(this);
+    A1ClusterThresh->addWantsBigOneListener(this);
+    
+    absoluteKeyboard.addWantsBigOneListener(this);
+    customKeyboard.addWantsBigOneListener(this);
+    
+    nToneSemitoneWidthSlider->addWantsBigOneListener(this);
 #endif
+    
+    startTimerHz(30);
 }
 
 void TuningViewController::resized()
@@ -139,34 +252,28 @@ void TuningViewController::resized()
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    comboBoxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
+    comboBoxSlice.removeFromRight(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
-    
-    actionButton.setBounds(selectCB.getRight()+gXSpacing,
-                           selectCB.getY(),
-                           selectCB.getWidth() * 0.5,
-                           selectCB.getHeight());
-    
     comboBoxSlice.removeFromLeft(gXSpacing);
-    
-    A1reset.setBounds(actionButton.getRight()+gXSpacing,
-                      actionButton.getY(),
-                      actionButton.getWidth(),
-                      actionButton.getHeight());
-    
+    actionButton.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    showSpringsButton.setBounds(comboBoxSlice);
+
     /* *** above here should be generic (mostly) to all prep layouts *** */
     /* ***         below here will be specific to each prep          *** */
     
     // ********* right column
     
     Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
-    modeSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
+    modeSlice.removeFromLeft(gXSpacing);
     modeSlice.removeFromRight(gXSpacing);
+    springTuningToggle.setBounds(modeSlice.removeFromLeft(showSpringsButton.getWidth()));
+    modeSlice.removeFromLeft(gXSpacing);
     scaleCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
     
-    modeSlice.removeFromLeft(gXSpacing + gPaddingConst * processor.paddingScalarX);
+    modeSlice.removeFromLeft(gXSpacing);
     fundamentalCB.setBounds(modeSlice);
     
     int customKeyboardHeight = 80 + 70. * processor.paddingScalarY;
@@ -184,14 +291,16 @@ void TuningViewController::resized()
     offsetSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
     offsetSlider->setBounds(offsetSliderSlice);
     
+    area.removeFromTop(extraY);
+    Rectangle<int> currentFundamentalSlice = area.removeFromTop(gComponentTextFieldHeight);
+    currentFundamental.setBounds(currentFundamentalSlice);
+    
     // ********* left column
     
     extraY = (leftColumn.getHeight() -
               (gComponentComboBoxHeight * 2 +
                gComponentSingleSliderHeight * 2 +
                gYSpacing * 5)) * 0.25;
-    
-    //DBG("extraY = " + String(extraY));
     
     leftColumn.removeFromTop(extraY + gYSpacing);
     Rectangle<int> A1IntervalScaleCBSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
@@ -200,19 +309,29 @@ void TuningViewController::resized()
     int tempwidth = A1IntervalScaleCBSlice.getWidth() / 3.;
     A1Inversional.setBounds(A1IntervalScaleCBSlice.removeFromRight(tempwidth));
     A1IntervalScaleCB.setBounds(A1IntervalScaleCBSlice.removeFromRight(tempwidth));
-    A1IntervalScaleLabel.setBounds(A1IntervalScaleCBSlice);
+    A1IntervalScaleCBSlice.removeFromRight(gXSpacing);
+    A1reset.setBounds(A1IntervalScaleCBSlice);
     
     leftColumn.removeFromTop(extraY + gYSpacing);
     Rectangle<int> A1ClusterMaxSlice = leftColumn.removeFromTop(gComponentSingleSliderHeight);
     A1ClusterMaxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
-    //A1ClusterMaxSlice.removeFromLeft(gXSpacing);
     A1ClusterMax->setBounds(A1ClusterMaxSlice);
+    nToneSemitoneWidthSlider->setBounds(A1ClusterMaxSlice);
     
     leftColumn.removeFromTop(gYSpacing);
     Rectangle<int> A1ClusterThreshSlice = leftColumn.removeFromTop(gComponentSingleSliderHeight);
     A1ClusterThreshSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
-    //A1ClusterThreshSlice.removeFromLeft(gXSpacing);
     A1ClusterThresh->setBounds(A1ClusterThreshSlice);
+    
+    Rectangle<int> nToneRootCBSlice = A1ClusterThreshSlice.removeFromLeft(tempwidth);
+    nToneRootCBSlice = nToneRootCBSlice.removeFromTop(gComponentComboBoxHeight);
+    nToneRootCBSlice.removeFromLeft(gXSpacing * 2);
+    nToneRootCB.setBounds(nToneRootCBSlice);
+    
+    Rectangle<int> nToneRootOctaveCBSlice = A1ClusterThreshSlice.removeFromLeft(tempwidth);
+    nToneRootOctaveCBSlice = nToneRootOctaveCBSlice.removeFromTop(gComponentComboBoxHeight);
+    nToneRootOctaveCBSlice.removeFromLeft(gXSpacing * 2);
+    nToneRootOctaveCB.setBounds(nToneRootOctaveCBSlice);
     
     leftColumn.removeFromTop(extraY + gYSpacing);
     Rectangle<int> A1AnchorScaleCBSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
@@ -229,59 +348,356 @@ void TuningViewController::resized()
     lastNote.setBounds(editAllBounds.getRight() + gXSpacing, editAllBounds.getY(),editAllBounds.getWidth() * 2, editAllBounds.getHeight());
     lastInterval.setBounds(lastNote.getRight() + gXSpacing, lastNote.getY(),lastNote.getWidth(), lastNote.getHeight());
     
+    rateSlider->setBounds(selectCB.getX()-gComponentSingleSliderXOffset, selectCB.getBottom() + gYSpacing, selectCB.getWidth()+gComponentSingleSliderXOffset, gComponentSingleSliderHeight);
+    dragSlider->setBounds(actionButton.getX()-gComponentSingleSliderXOffset, rateSlider->getY(), showSpringsButton.getWidth() + actionButton.getWidth(), gComponentSingleSliderHeight);
+    
+    springScaleCB.setBounds(scaleCB.getX(), rateSlider->getY(), scaleCB.getWidth(), gComponentComboBoxHeight);
+    springScaleFundamentalCB.setBounds(fundamentalCB.getX(), springScaleCB.getY(), fundamentalCB.getWidth(), gComponentComboBoxHeight);
+    
+    intervalStiffnessSlider->setBounds(selectCB.getX() - gComponentSingleSliderXOffset,
+                                       rateSlider->getBottom() + gYSpacing,
+                                       rateSlider->getWidth(),
+                                       gComponentSingleSliderHeight);
+    
+    tetherStiffnessSlider->setBounds(fundamentalCB.getX() - gComponentSingleSliderXOffset,
+                                     intervalStiffnessSlider->getY(),
+                                     fundamentalCB.getWidth() + 2.*gComponentSingleSliderXOffset,
+                                     gComponentSingleSliderHeight);
+    
+    //dragSlider->setBounds(fundamentalCB.getX()-gComponentSingleSliderXOffset, intervalStiffnessSlider->getY(), fundamentalCB.getWidth()+gComponentSingleSliderXOffset*2., gComponentSingleSliderHeight);
+    
+    
+    float sliderHeight = (absoluteKeyboard.getBottom() - (rateSlider->getBottom() + gYSpacing)) / 13.;
+    
+    for (int i = 0; i < 12; i++)
+    {
+        springLabels[i]->setBounds(hideOrShow.getX(),
+                                   intervalStiffnessSlider->getBottom() + (sliderHeight) * (11 - i),
+                                   hideOrShow.getWidth(),
+                                   sliderHeight);
+        springSliders[i]->setBounds(selectCB.getX(),
+                                    springLabels[i]->getY(),
+                                    intervalStiffnessSlider->getWidth() * 0.75,
+                                    sliderHeight);
+    }
+    
+    updateComponentVisibility();
 }
-
 
 void TuningViewController::paint (Graphics& g)
 {
-    //g.fillAll(Colours::lightgrey);
-    //g.fillAll(Colours::transparentWhite);
-    g.fillAll(Colours::black);
+    {
+        g.fillAll(Colours::black);
+        
+        if (!showSprings) return;
+        
+        TuningProcessor::Ptr tuning;
+        TuningPreparation::Ptr active;
+        TuningModPreparation::Ptr mod;
+        
+        if (processor.updateState->currentDisplay == DisplayTuningMod)
+        {
+            mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
+
+            Array<int> preps = mod->getPreps();
+            
+            int tuningId;
+            if (preps.size())   tuningId = preps[0];
+            else                tuningId = -1;
+            
+            tuning = processor.currentPiano->getTuningProcessor(tuningId);
+            active = processor.gallery->getActiveTuningPreparation(tuningId);
+        }
+        else
+        {
+            tuning = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
+            active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+        }
+        
+        bool springsOn = active->getSpringsActive();
+        
+        Rectangle<int> b = getLocalBounds();
+        b.removeFromTop(selectCB.getBottom());
+        
+        float midi,scalex,posx,radians,cx,cy;
+        float centerx = b.getWidth() * 0.5f;
+        float centery = b.getCentreY();
+        
+        float radius_scale = 0.25;
+        float radius = jmin(b.getHeight() * radius_scale, b.getWidth() * radius_scale);
+        float dimc_scale = 0.05;
+        float dimc = jmin(b.getHeight() * dimc_scale, b.getWidth() * dimc_scale);
+        int x_offset = 0.075 * b.getWidth();
+        
+        float midiScale;
+        
+        Particle::PtrArr particles = active->getTetherParticles();
+
+        for (auto s : active->getEnabledSprings())
+        {
+            if (s != nullptr && s->getEnabled())
+            {
+                Particle* a = s->getA();
+                if(springsOn) midi = Utilities::ftom(Utilities::centsToFreq(a->getX() - (1200.0 * a->getOctave())));
+                else
+                {
+                    midi = tuning->getOffset(a->getNote(), false);
+                    midi += a->getNote();
+                }
+                
+                scalex = ((midi - 60.0f) / 12.0f);
+                
+                float midiSave = midi;
+                
+                midiScale = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(a->getX() - (1200.0 * a->getOctave()))), 128);
+                midiScale += ((a->getOctave() - 5) * 12.0);
+                midiScale /= 60.;
+                
+                radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
+                
+                float cxa = centerx + cosf(radians) * radius * midiScale;
+                float cya = centery + sinf(radians) * radius * midiScale;
+                
+                Particle* b = s->getB();
+                if(springsOn) midi = Utilities::ftom(Utilities::centsToFreq(b->getX() - (1200.0 * b->getOctave())));
+                else {
+                    midi = tuning->getOffset(b->getNote(), false);
+                    midi += b->getNote();
+                }
+                
+                scalex = ((midi - 60.0f) / 12.0f);
+                
+                midiScale = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(b->getX() - (1200.0 * b->getOctave()))), 128);
+                midiScale += ((b->getOctave() - 5) * 12.0);
+                midiScale /= 60.;
+                
+                radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
+                
+                float cxb = centerx + cosf(radians) * radius * midiScale;
+                float cyb = centery + sinf(radians) * radius * midiScale;
+                
+                double strength = s->getStrength();
+                
+                float hue = fmod((midi + midiSave)/2., 12.) / 12.;
+                Colour colour (hue, 0.5f, 0.5f, 0.25f);
+                
+                g.setColour(colour);
+                g.drawLine(cxa, cya, cxb, cyb,  (strength > 0.0) ? strength * 5.0 + 1.0 : 0.0);
+                
+                int h = 10, w = 35;
+                
+                int midX = (cxa + cxb) / 2.0; //+ xoff;
+                int midY = (cya + cyb) / 2.0; //+ yoff;
+            
+                g.setColour(Colours::ghostwhite);
+                g.setFont(12.0f);
+                g.setOpacity(0.7);
+                if(springsOn)
+                {
+                    g.drawText(String((int)round(s->getLength())), midX-dimc*0.25, midY, w, h, Justification::topLeft);
+                }
+                else
+                {
+                    g.drawText(String((int)round(100.*(midi - midiSave))), midX-dimc*0.25, midY, w, h, Justification::topLeft);
+                }
+            
+            }
+            
+        }
+        
+        for (auto p : active->getParticles())
+        {
+            if (p != nullptr && p->getEnabled())
+            {
+                // DRAW PARTICLE IN MOTION
+                if(springsOn) {
+                    midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(p->getX() - (1200.0 * p->getOctave()))), 128);
+                    midi += ((p->getOctave() - 5) * 12.0);
+                }
+                else {
+                    midi = tuning->getOffset(p->getNote(), false);
+                    //DBG("midiOffset = " + String(midi) + " for note: " + String(p->getNote() % 12));
+                    midi += p->getNote();
+                }
+                
+                //DBG("midi = " + String(midi));
+                midiScale = midi / 60.;
+                
+                //int cents = roundToInt(((midi - (float)p->getNote())) * 100.0);
+                int cents = round(((midi - (float)p->getNote())) * 100.0);
+                
+                scalex = ((midi - 60.0f) / 12.0f);
+                
+                posx = scalex *  (b.getWidth() - tetherSliders[0]->getRight());
+                
+                radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
+
+                cx = centerx + cosf(radians) * radius * midiScale - dimc * 0.5f;
+                cy = centery + sinf(radians) * radius * midiScale - dimc * 0.5f;
+                
+                float hue = fmod(midi, 12.) / 12.;
+                Colour colour (hue, 0.5f, 0.5f, 0.9f);
+                
+                //g.setColour (Colours::black);
+                g.setColour (colour);
+                g.fillEllipse(cx, cy, dimc, dimc);
+                
+                g.setColour(Colours::white);
+                g.setFont(14.0f);
+                //g.drawText(String(round(cents)), cx + dimc * 0.25, cy-dimc*0.7, 40, 10, Justification::topLeft);
+                g.drawText(String(round(cents)), cx-dimc*0.25, cy+dimc*0.25, dimc * 1.5, dimc * 0.5, Justification::centred);
+            }
+            
+            //DRAW REST PARTICLE
+            midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(p->getRestX() - (1200.0 * p->getOctave()))), 128);
+            midi += ((p->getOctave() - 5) * 12.0);
+            
+            if(midi > 20 && midi < 109) {
+                midiScale = midi / 60.;
+                scalex = ((midi - 60.0f) / 12.0f);
+                //posx = scalex *  (b.getWidth() - tetherSliders[0]->getRight());
+                radians = scalex * Utilities::twopi - Utilities::pi * 0.5;
+                cx = centerx + cosf(radians) * radius * midiScale - dimc * 0.5f;
+                cy = centery + sinf(radians) * radius * midiScale - dimc * 0.5f;
+                g.setColour (Colours::dimgrey);
+                g.setOpacity(0.25);
+                g.fillEllipse(cx, cy, dimc, dimc);
+            }
+        }
+    }
 }
 
 void TuningViewController::fillTuningCB(void)
 {
-    //cTuningSystemNames
-    
     scaleCB.clear(dontSendNotification);
+    springScaleCB.clear(dontSendNotification);
     A1IntervalScaleCB.clear(dontSendNotification);
     A1AnchorScaleCB.clear(dontSendNotification);
     
-    for (int i = 0; i < cTuningSystemNames.size(); i++)
+    //create submenu of historical temperaments
+    PopupMenu* additionalTuningsPopUp = scaleCB.getRootMenu();
+    OwnedArray<PopupMenu> submenus;
+    submenus.add(new PopupMenu());
+    submenus.add(new PopupMenu());
+    
+    PopupMenu* additionalTuningsPopUp2 = springScaleCB.getRootMenu();
+    OwnedArray<PopupMenu> submenus2;
+    submenus2.add(new PopupMenu());
+    submenus2.add(new PopupMenu());
+    
+    int count =0;
+    for (int i = 0; i < cTuningSystemNames.size(); i++) //&& if(i<=8), for original systems; otherwise add to submenu of historical temperaments
     {
         String name = cTuningSystemNames[i];
-        scaleCB.addItem(name, i+1);
-        A1IntervalScaleCB.addItem(name, i+1);
-        A1AnchorScaleCB.addItem(name, i+1);
         
-        if(name == "Adaptive Tuning 1" || name == "Adaptive Anchored Tuning 1")
+        if(i<=8) //original bK scales
         {
-            A1IntervalScaleCB.setItemEnabled(i+1, false);
-            A1AnchorScaleCB.setItemEnabled(i+1, false);
+            scaleCB.addItem(name, i+1);
+            A1IntervalScaleCB.addItem(name, i+1);
+            A1AnchorScaleCB.addItem(name, i+1);
+        
+            if(name == "Adaptive Tuning 1" || name == "Adaptive Anchored Tuning 1")
+            {
+                A1IntervalScaleCB.setItemEnabled(i+1, false);
+                A1AnchorScaleCB.setItemEnabled(i+1, false);
+            }
+            else
+            {
+                springScaleCB.addItem(name, ++count);
+            }
         }
                 
         if(name == "Custom") {
             customIndex = i;
         }
+        
+        if(i>8 && i<=35) //historical
+        {
+            //add to Historical Temperaments popup
+            DBG("adding historical temperament: " + name);
+            PopupMenu* historicalMenu = submenus.getUnchecked(0);
+            historicalMenu->addItem(i+1, name);
+            
+            PopupMenu* historicalMenu2 = submenus2.getUnchecked(0);
+            historicalMenu2->addItem(i+1, name);
+        }
+        else if (i>35) //various
+        {
+            //add to Various popup
+            DBG("adding various tunings: " + name);
+            PopupMenu* variousMenu = submenus.getUnchecked(1);
+            variousMenu->addItem(i+1, name);
+            
+            PopupMenu* variousMenu2 = submenus2.getUnchecked(1);
+            variousMenu2->addItem(i+1, name);
+        }
     }
+    scaleCB.addSeparator();
+    additionalTuningsPopUp->addSubMenu("Historical", *submenus.getUnchecked(0));
+    additionalTuningsPopUp->addSubMenu("Various", *submenus.getUnchecked(1));
+    
+    springScaleCB.addSeparator();
+    additionalTuningsPopUp2->addSubMenu("Historical", *submenus2.getUnchecked(0));
+    additionalTuningsPopUp2->addSubMenu("Various", *submenus2.getUnchecked(1));
+    
 }
 
 void TuningViewController::fillFundamentalCB(void)
 {
     fundamentalCB.clear(dontSendNotification);
     A1FundamentalCB.clear(dontSendNotification);
+    nToneRootCB.clear(dontSendNotification);
+    nToneRootOctaveCB.clear(dontSendNotification);
+    springScaleFundamentalCB.clear(dontSendNotification);
     
     for (int i = 0; i < cFundamentalNames.size(); i++)
     {
         String name = cFundamentalNames[i];
         fundamentalCB.addItem(name, i+1);
         A1FundamentalCB.addItem(name, i+1);
+        nToneRootCB.addItem(name, i+1);
+        springScaleFundamentalCB.addItem(name, i+1);
     }
+    
+    for (int i = 0; i < 9; i++)
+    {
+        nToneRootOctaveCB.addItem(String(i), i+1);
+    }
+    
+    springScaleFundamentalCB.addItem("none", (int)cFundamentalNames.size()+1);
+    springScaleFundamentalCB.addItem("lowest", (int)cFundamentalNames.size()+2);
+    springScaleFundamentalCB.addItem("highest", (int)cFundamentalNames.size()+3);
+    springScaleFundamentalCB.addItem("last", (int)cFundamentalNames.size()+4);
 }
 
 void TuningViewController::updateComponentVisibility()
 {
-        
+    TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
+    TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+    TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
+    
+    for (auto s : tetherSliders)    s->setVisible(false);
+    for (auto s : springSliders)    s->setVisible(false);
+    for (auto l : springLabels)     l->setVisible(false);
+    
+    rateSlider->setVisible(false);
+    dragSlider->setVisible(false);
+    springScaleCB.setVisible(false);
+    springScaleFundamentalCB.setVisible(false);
+    
+    tetherStiffnessSlider->setVisible(false);
+    intervalStiffnessSlider->setVisible(false);
+    
+    absoluteKeyboard.setVisible(true);
+    customKeyboard.setVisible(true);
+    lastInterval.setVisible(true);
+    lastNote.setVisible(true);
+    offsetSlider->setVisible(true);
+    springTuningToggle.setVisible(true);
+    springTuningLabel.setVisible(true);
+    showSpringsButton.setVisible(true);
+    
     if(scaleCB.getText() == "Adaptive Tuning 1")
     {
         A1IntervalScaleCB.setVisible(true);
@@ -294,6 +710,10 @@ void TuningViewController::updateComponentVisibility()
         A1AnchorScaleLabel.setVisible(false);
         A1FundamentalLabel.setVisible(false);
         A1reset.setVisible(true);
+        currentFundamental.setVisible(true);
+        nToneRootCB.setVisible(false);
+        nToneRootOctaveCB.setVisible(false);
+        nToneSemitoneWidthSlider->setVisible(false);
 
     }
     else if(scaleCB.getText() == "Adaptive Anchored Tuning 1")
@@ -308,7 +728,10 @@ void TuningViewController::updateComponentVisibility()
         A1AnchorScaleLabel.setVisible(true);
         A1FundamentalLabel.setVisible(true);
         A1reset.setVisible(true);
-
+        currentFundamental.setVisible(true);
+        nToneRootCB.setVisible(false);
+        nToneRootOctaveCB.setVisible(false);
+        nToneSemitoneWidthSlider->setVisible(false);
     }
     else
     {
@@ -322,6 +745,211 @@ void TuningViewController::updateComponentVisibility()
         A1AnchorScaleLabel.setVisible(false);
         A1FundamentalLabel.setVisible(false);
         A1reset.setVisible(false);
+        currentFundamental.setVisible(false);
+        nToneRootCB.setVisible(true);
+        nToneRootOctaveCB.setVisible(true);
+        nToneSemitoneWidthSlider->setVisible(true);
+    }
+    
+    bool tuningMod = (processor.updateState->currentDisplay == DisplayTuningMod);
+    if (showSprings)
+    {
+        lastInterval.setVisible(false);
+        lastNote.setVisible(false);
+        
+        Array<float> springWeights;
+        Array<float> tetherWeights;
+        
+        if (tuningMod)
+        {
+            springWeights = stringToFloatArray(mod->getParam(TuningSpringIntervalWeights));
+            tetherWeights = stringToFloatArray(mod->getParam(TuningSpringTetherWeights));
+        }
+        else
+        {
+            springWeights = tuning->getCurrentSpringTuning()->getSpringWeights();
+            tetherWeights = tuning->getCurrentSpringTuning()->getTetherWeights();
+        }
+        
+        nToneRootCB.setVisible(false);
+        nToneRootOctaveCB.setVisible(false);
+        nToneSemitoneWidthSlider->setVisible(false);
+        
+        absoluteKeyboard.setVisible(false);
+        customKeyboard.setVisible(false);
+        offsetSlider->setVisible(false);
+        
+        if (tuning->getCurrentSpringTuning()->getActive() || tuningMod)
+        {
+            double val;
+            
+            rateSlider->setVisible(true);
+            rateSlider->toFront(false);
+            
+            if (tuningMod)  val = mod->getParam(TuningSpringRate).getFloatValue();
+            else            val = active->getSpringTuning()->getRate();
+            
+            rateSlider->setValue(val, dontSendNotification);
+            
+            dragSlider->setVisible(true);
+            dragSlider->toFront(false);
+            
+            if (tuningMod)  val = mod->getParam(TuningSpringDrag).getFloatValue();
+            else            val = active->getSpringTuning()->getDrag();
+            
+            val = dt_asymwarp_inverse(1.0f - val, 100.);
+            dragSlider->setValue(val, dontSendNotification);
+            
+            tetherStiffnessSlider->setVisible(true);
+            tetherStiffnessSlider->toFront(false);
+            
+            if (tuningMod)  val = mod->getParam(TuningSpringTetherStiffness).getFloatValue();
+            else            val = active->getSpringTuning()->getTetherStiffness();
+            
+            tetherStiffnessSlider->setValue(val, dontSendNotification);
+            
+            intervalStiffnessSlider->setVisible(true);
+            intervalStiffnessSlider->toFront(false);
+            
+            if (tuningMod)  val = mod->getParam(TuningSpringIntervalStiffness).getFloatValue();
+            else            val = active->getSpringTuning()->getIntervalStiffness();
+            
+            intervalStiffnessSlider->setValue(val, dontSendNotification);
+            
+            springScaleCB.setVisible(true);
+            springScaleCB.toFront(false);
+            
+            springScaleFundamentalCB.setVisible(true);
+            springScaleFundamentalCB.toFront(false);
+            
+            for (int i = 0; i < 12; i++)
+            {
+                springSliders[i]->setVisible(true);
+                springSliders[i]->toFront(false);
+                
+                springSliders[i]->setValue(springWeights[i], dontSendNotification);
+                
+                springLabels[i]->setVisible(true);
+            }
+            
+            for (int i = 0; i < 128; i++)
+            {
+                tetherSliders[i]->toFront(false);
+                
+                tetherSliders[i]->setValue(tetherWeights[i], dontSendNotification);
+            }
+        }
+    }
+    
+}
+
+#if JUCE_IOS
+void TuningViewController::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
+}
+#endif
+
+void TuningViewController::timerCallback(void)
+{
+    //if (processor.updateState->currentDisplay == DisplayTuning)
+    {
+        TuningProcessor::Ptr tProcessor;
+        TuningPreparation::Ptr active;
+        Tuning::Ptr tuning;
+        TuningModPreparation::Ptr mod;
+        
+        int tuningId = processor.updateState->currentTuningId;
+        bool isMod = false;
+        if (processor.updateState->currentDisplay == DisplayTuningMod)
+        {
+            isMod = true;
+            mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
+            
+            Array<int> preps = mod->getPreps();
+            
+            if (preps.size())   tuningId = preps[0];
+            else                tuningId = -1;
+            
+        }
+        
+        tProcessor = processor.currentPiano->getTuningProcessor(tuningId);
+        active = processor.gallery->getActiveTuningPreparation(tuningId);
+        tuning = processor.gallery->getTuning(tuningId);
+        
+        if ((tProcessor != nullptr) &&
+            (active != nullptr) &&
+            (tuning != nullptr))
+        {
+            if (tProcessor->getLastNoteTuning() != lastNoteTuningSave)
+            {
+                lastNoteTuningSave = tProcessor->getLastNoteTuning();
+                lastNote.setText("note: " + String(lastNoteTuningSave, 3), dontSendNotification);
+                lastInterval.setText("interval: "  + String(tProcessor->getLastIntervalTuning(), 3), dontSendNotification);
+                
+                currentFundamental.setText("current fundamental: " + String(ftom(tProcessor->getAdaptiveFundamentalFreq()), 3), dontSendNotification);
+            }
+            
+            if(active->getScale() == AdaptiveTuning || active->getScale() == AdaptiveAnchoredTuning )
+            {
+                A1ClusterMax->setDisplayValue(tProcessor->getAdaptiveHistoryCounter() + 1);
+                
+                if(tProcessor->getAdaptiveClusterTimer() < active->getAdaptiveClusterThresh())
+                    A1ClusterThresh->setDisplayValue(tProcessor->getAdaptiveClusterTimer());
+                else
+                {
+                    A1ClusterThresh->setDisplayValue(0);
+                    A1ClusterMax->setDisplayValue(0);
+                }
+            }
+        }
+        
+        
+        
+        if (showSprings)
+        {
+            float sliderHeight = springSliders.getUnchecked(0)->getHeight();
+            
+            Tuning::Ptr tuning = tProcessor->getTuning();
+            Spring::PtrArr tetherSprings =  active->getTetherSprings();
+            //Array<bool> locked = active->getSpringTuning()->getTethersLocked();
+    
+            int count = 0;
+            for (int i = 0; i < 128; i++)
+            {
+                int pc = i % 12;
+            
+                if (tetherSprings[i]->getEnabled())
+                {
+                    tetherSliders[i]->setBounds(fundamentalCB.getX(),
+                                                tetherStiffnessSlider->getBottom() + sliderHeight * (count),
+                                                fundamentalCB.getWidth() * 0.75,
+                                                sliderHeight);
+                    
+                    if (!isMod) tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
+                    if(active->getSpringsActive())tetherSliders[i]->setVisible(true);
+                    
+                    tetherLabels[i]->setBounds(tetherSliders[i]->getRight() + gXSpacing,
+                                               tetherSliders[i]->getY(),
+                                               30,
+                                               sliderHeight);
+                    
+                    tetherLabels[i]->setText(Utilities::getNoteString(i), dontSendNotification);
+                    if(active->getSpringsActive()) tetherLabels[i]->setVisible(true);
+                    count++;
+                    
+                }
+                else
+                {
+                    tetherSliders[i]->setVisible(false);
+                    tetherLabels[i]->setVisible(false);
+                }
+                
+            }
+            
+            repaint();
+        }
     }
 }
 
@@ -332,56 +960,44 @@ TuningViewController(p, theGraph)
 {
     fillSelectCB(-1,-1);
     
+    for (int i = 0; i < 12; i++)
+    {
+        springSliders[i]->addListener(this);
+    }
+    
+    for (int i = 0; i < 128; i++)
+    {
+        tetherSliders[i]->addListener(this);
+    }
+    
+    springTuningToggle.addListener(this);
+    rateSlider->addMyListener(this);
+    dragSlider->addMyListener(this);
+    intervalStiffnessSlider->addMyListener(this);
+    tetherStiffnessSlider->addMyListener(this);
+    springScaleCB.addListener(this);
+    springScaleFundamentalCB.addListener(this);
+    showSpringsButton.addListener(this);
     selectCB.addMyListener(this);
-    
     selectCB.addListener(this);
-
     scaleCB.addListener(this);
-    
     fundamentalCB.addListener(this);
-
     A1IntervalScaleCB.addListener(this);
-    
     A1Inversional.addListener(this);
-    
     A1AnchorScaleCB.addListener(this);
-    
     A1FundamentalCB.addListener(this);
-    
     A1ClusterThresh->addMyListener(this);
-    
     A1ClusterMax->addMyListener(this);
-    
     A1reset.addListener(this);
     
     absoluteKeyboard.addMyListener(this);
-    
     customKeyboard.addMyListener(this);
-    
     offsetSlider->addMyListener(this);
-    
-    startTimer(50);
+    nToneRootCB.addListener(this);
+    nToneRootOctaveCB.addListener(this);
+    nToneSemitoneWidthSlider->addMyListener(this);
     
     update();
-}
-
-void TuningPreparationEditor::timerCallback()
-{
-    if (processor.updateState->currentDisplay == DisplayTuning)
-    {
-        TuningProcessor::Ptr tProcessor = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
-        
-        if (tProcessor != nullptr)
-        {
-            if (tProcessor->getLastNoteTuning() != lastNoteTuningSave)
-            {
-                lastNoteTuningSave = tProcessor->getLastNoteTuning();
-                lastNote.setText("note: " + String(lastNoteTuningSave, 3), dontSendNotification);
-                lastInterval.setText("interval: "  + String(tProcessor->getLastIntervalTuning(), 3), dontSendNotification);
-            }
-        }
-        
-    }
 }
 
 int TuningPreparationEditor::addPreparation(void)
@@ -456,6 +1072,30 @@ void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparation
         processor.clear(PreparationTypeTuning, processor.updateState->currentTuningId);
         vc->update();
     }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentTuningId;
+        Tuning::Ptr prep = processor.gallery->getTuning(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
+    }
 }
 
 
@@ -467,56 +1107,126 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     
     TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
     TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
     
-    if (name == selectCB.getName())
+    if (box == &selectCB)
     {
         setCurrentId(Id);
     }
-    else if (name == scaleCB.getName())
+    else if (box == &scaleCB)
     {
-        prep->setTuning((TuningSystem) index);
-        active->setTuning((TuningSystem) index);
+
+        DBG("name of scale chosen: " + box->getItemText(index));
+        //prep->setScale((TuningSystem) index);
+        //active->setScale((TuningSystem) index);
         
-        DBG("setting tungin to :" + String(index));
+        //redoing this so we index by tuning name, rather than index, so we don't lock the menu structure down
+        prep->setScaleByName(box->getItemText(index));
+        active->setScaleByName(box->getItemText(index));
         
-        Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-        DBG("current tuning from processor = " + String(processor.updateState->currentTuningId));
-        customKeyboard.setValues(currentTuning->getCurrentScaleCents());
+        //DBG("current tuning from processor = " + String(processor.updateState->currentTuningId));
+        //DBG("current TuningSystem " + cTuningSystemNames[index]);
+        DBG("current TuningSystem " + prep->getScaleName());
+        customKeyboard.setValues(tuning->getCurrentScaleCents());
+        
+        //just for printing offsets out; temporary
+        /*
+        Array<float> tuningOffsets = tuning->getCurrentScale();
+        String offsetString = " ";
+        for(int i=0; i<tuningOffsets.size(); i++)
+        {
+            offsetString += (String(tuningOffsets.getUnchecked(i)) + ", ");
+        }
+        DBG("scale offsets: " + offsetString);
+        */
+        
+        if(active->getSpringsActive())
+        {
+            prep->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
+            active->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
+        }
+        else
+        {
+            prep->getSpringTuning()->setTetherTuning(EqualTemperament); //use ET as background when not in Spring Tuning
+            active->getSpringTuning()->setTetherTuning(EqualTemperament);
+        }
         
         updateComponentVisibility();
         
     }
-    else if (name == fundamentalCB.getName())
+    else if (box == &fundamentalCB)
     {
         prep->setFundamental((PitchClass) index);
         active->setFundamental((PitchClass) index);
+        
+        prep->getSpringTuning()->setTetherFundamental((PitchClass) index);
+        active->getSpringTuning()->setTetherFundamental((PitchClass) index);
         
         customKeyboard.setFundamental(index);
         
         updateComponentVisibility();
         
     }
-    else if (name == A1IntervalScaleCB.getName())
+    else if (box == &A1IntervalScaleCB)
     {
         prep->setAdaptiveIntervalScale((TuningSystem) index);
         active->setAdaptiveIntervalScale((TuningSystem) index);
         
         updateComponentVisibility();
     }
-    else if (name == A1AnchorScaleCB.getName())
+    else if (box == &A1AnchorScaleCB)
     {
         prep->setAdaptiveAnchorScale((TuningSystem) index);
         active->setAdaptiveAnchorScale((TuningSystem) index);
         
         updateComponentVisibility();
     }
-    else if (name == A1FundamentalCB.getName())
+    else if (box == &A1FundamentalCB)
     {
         prep->setAdaptiveAnchorFundamental((PitchClass) index);
         active->setAdaptiveAnchorFundamental((PitchClass) index);
         
         updateComponentVisibility();
         
+    }
+    else if (box == &nToneRootCB)
+    {
+        prep->setNToneRootPC(index);
+        active->setNToneRootPC(index);
+        
+        updateComponentVisibility();
+    }
+    else if (box == &nToneRootOctaveCB)
+    {
+        prep->setNToneRootOctave(index);
+        active->setNToneRootOctave(index);
+        
+        updateComponentVisibility();
+    }
+    else if (box == &springScaleCB)
+    {
+        TuningSystem springScaleId = (TuningSystem) index;
+        
+        if (springScaleId >= AdaptiveTuning) springScaleId = (TuningSystem)((int)springScaleId + 2);
+        
+        prep->getSpringTuning()->setScaleId(springScaleId);
+        active->getSpringTuning()->setScaleId(springScaleId);
+        
+        //TuningSystem springScaleId = prep->getSpringTuning()->getScaleId();
+        
+        Array<float> scale = tuning->getScaleCents(springScaleId);
+        
+        prep->getSpringTuning()->setIntervalTuning(scale);
+        active->getSpringTuning()->setIntervalTuning(scale);
+        
+        DBG("current springTuningSystem " + String(prep->getSpringTuning()->getScaleId()));
+    }
+    else if (box == &springScaleFundamentalCB)
+    {
+        prep->getSpringTuning()->setIntervalFundamental((PitchClass)index);
+        active->getSpringTuning()->setIntervalFundamental((PitchClass)index);
+        
+        DBG("current springtuning interval Fundamental = " + String(index));
     }
     
     processor.gallery->setGalleryDirty(true);
@@ -570,17 +1280,22 @@ void TuningPreparationEditor::update(void)
 {
     if (processor.updateState->currentTuningId < 0) return;
     
+    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
     TuningPreparation::Ptr prep = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
     
     if (prep != nullptr)
     {
         selectCB.setSelectedId(processor.updateState->currentTuningId, dontSendNotification);
-        scaleCB.setSelectedItemIndex(prep->getTuning(), dontSendNotification);
+        scaleCB.setSelectedItemIndex(prep->getScale(), dontSendNotification);
+        
+        int springScaleId = prep->getCurrentSpringScaleId();
+        if (springScaleId >= AdaptiveTuning) springScaleId = (TuningSystem)((int)springScaleId - 2);
+        springScaleCB.setSelectedItemIndex(springScaleId, dontSendNotification);
+        
         fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
         offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
-        
-        //absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
-        absoluteKeyboard.setValuesAbsolute(prep->getAbsoluteOffsetsCents());
+
+        absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
         Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         customKeyboard.setValues(currentTuning->getCurrentScaleCents());
         
@@ -591,56 +1306,141 @@ void TuningPreparationEditor::update(void)
         A1ClusterThresh->setValue(prep->getAdaptiveClusterThresh(), dontSendNotification);
         A1ClusterMax->setValue(prep->getAdaptiveHistory(), dontSendNotification);
         
-        updateComponentVisibility();
+        nToneRootCB.setSelectedItemIndex(prep->getNToneRootPC(), dontSendNotification);
+        nToneRootOctaveCB.setSelectedItemIndex(prep->getNToneRootOctave(), dontSendNotification);
+        nToneSemitoneWidthSlider->setValue(prep->getNToneSemitoneWidth(), dontSendNotification);
+        
+        rateSlider->setValue(prep->getSpringTuning()->getRate(), dontSendNotification);
+        
+        tetherStiffnessSlider->setValue(prep->getSpringTuning()->getTetherStiffness(), dontSendNotification);
+        intervalStiffnessSlider->setValue(prep->getSpringTuning()->getIntervalStiffness(), dontSendNotification);
+
+        springTuningToggle.setToggleState(prep->getSpringsActive(), dontSendNotification);
+
+        //dragSlider->setValue(  //must remember to use dt_asym_inversion on 1 - val)
+        double newval = dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->getDrag(), 100.);
+        dragSlider->setValue(newval, dontSendNotification);
+        
+        /*
+        if(!prep->getSpringTuning()->getUsingFundamentalForIntervalSprings())
+            springScaleFundamentalCB.setSelectedItemIndex(12, dontSendNotification);
+        else
+            springScaleFundamentalCB.setSelectedItemIndex(prep->getSpringTuning()->getIntervalFundamental(), dontSendNotification);
+        */
+        
+        DBG("springScaleFundamentalCB.setSelectedItemIndex " + String(prep->getSpringTuning()->getIntervalFundamental()));
+        springScaleFundamentalCB.setSelectedItemIndex((int)prep->getSpringTuning()->getIntervalFundamental(), dontSendNotification);
     }
     
+    updateComponentVisibility();
 }
 
 void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> values)
 {
+    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
     TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
     TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
  
     if(name == absoluteKeyboard.getName())
     {
-        DBG("updating absolute tuning vals");
+        //DBG("updating absolute tuning vals");
         prep->setAbsoluteOffsetCents(values);
         active->setAbsoluteOffsetCents(values);
     }
     else if(name == customKeyboard.getName())
     {
-        DBG("updating custom tuning vals");
+        //DBG("updating custom tuning vals");
         scaleCB.setSelectedItemIndex(customIndex, dontSendNotification);
         
-        prep->setTuning((TuningSystem)customIndex);
-        active->setTuning((TuningSystem)customIndex);
+        prep->setScale((TuningSystem)customIndex);
+        active->setScale((TuningSystem)customIndex);
         
-        DBG("keyboardSliderChanged values.size() = " + String(values.size()));
+        //DBG("keyboardSliderChanged values.size() = " + String(values.size()));
         prep->setCustomScaleCents(values);
         active->setCustomScaleCents(values);
+        
+        prep->getSpringTuning()->setIntervalTuning(values);
+        active->getSpringTuning()->setIntervalTuning(values);
+        
     }
     processor.gallery->setGalleryDirty(true);
 }
 
-void TuningPreparationEditor::BKSingleSliderValueChanged(String name, double val)
+void TuningPreparationEditor::sliderValueChanged (Slider* slider)
 {
+    
+    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
     TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
     TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
     
-    if(name == offsetSlider->getName()) {
-        DBG("got offset " + String(val));
+    double value = slider->getValue();
+    
+    String name = slider->getName();
+
+    for (int i = 0; i < 128; i++)
+    {
+        if (slider == tetherSliders[i])
+        {
+            prep->getSpringTuning()->setTetherWeight(i, value);
+            active->getSpringTuning()->setTetherWeight(i, value);
+            break;
+        }
+        else if (slider == springSliders[i])
+        {
+            prep->getSpringTuning()->setSpringWeight(i, value);
+            active->getSpringTuning()->setSpringWeight(i, value);
+            break;
+        }
+    }
+}
+
+void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
+{
+    TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
+    TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+    
+    if(slider == offsetSlider) {
+        //DBG("got offset " + String(val));
         prep->setFundamentalOffset(val * 0.01);
         active->setFundamentalOffset(val * 0.01);
     }
-    else if(name == A1ClusterThresh->getName()) {
-        DBG("got A1ClusterThresh " + String(val));
+    else if(slider == A1ClusterThresh) {
+        //DBG("got A1ClusterThresh " + String(val));
         prep->setAdaptiveClusterThresh(val);
         active->setAdaptiveClusterThresh(val);
     }
-    else if(name == A1ClusterMax->getName()) {
-        DBG("got A1ClusterMax " + String(val));
+    else if(slider == A1ClusterMax) {
+        //DBG("got A1ClusterMax " + String(val));
         prep->setAdaptiveHistory(val);
         active->setAdaptiveHistory(val);
+    }
+    else if(slider == nToneSemitoneWidthSlider) {
+        //DBG("got nToneSemiToneSliderWidth " + String(val));
+        prep->setNToneSemitoneWidth(val);
+        active->setNToneSemitoneWidth(val);
+    }
+    else if (slider == rateSlider)
+    {
+        prep->getSpringTuning()->setRate(val, false);
+        active->getSpringTuning()->setRate(val);
+    }
+    else if (slider == dragSlider)
+    {
+        double newval = dt_asymwarp(val, 100.);
+        //DBG("warped = " + String(newval) + " inverted = " + String(dt_asymwarp_inverse(newval, 100.)));
+        prep->getSpringTuning()->setDrag(1. - newval);
+        active->getSpringTuning()->setDrag(1. - newval);
+    }
+    else if (slider == tetherStiffnessSlider)
+    {
+        prep->getSpringTuning()->setTetherStiffness(val);
+        active->getSpringTuning()->setTetherStiffness(val);
+    }
+    else if (slider == intervalStiffnessSlider)
+    {
+        prep->getSpringTuning()->setIntervalStiffness(val);
+        active->getSpringTuning()->setIntervalStiffness(val);
     }
     
     processor.gallery->setGalleryDirty(true);
@@ -648,17 +1448,24 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(String name, double val
 
 void TuningPreparationEditor::buttonClicked (Button* b)
 {
+    TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
+    TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+    
     if (b == &A1Inversional)
     {
         DBG("setting A1Inversional " + String((int)A1Inversional.getToggleState()));
-        
-        TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
-        TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
 
         prep->setAdaptiveInversional(A1Inversional.getToggleState());
         active->setAdaptiveInversional(A1Inversional.getToggleState());
         
         processor.gallery->setGalleryDirty(true);
+    }
+    else if (b == &showSpringsButton)
+    {
+        showSprings = !showSprings;
+        
+        updateComponentVisibility();
     }
     else if (b == &A1reset)
     {
@@ -674,6 +1481,33 @@ void TuningPreparationEditor::buttonClicked (Button* b)
     else if (b == &actionButton)
     {
         getPrepOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+    }
+    else if (b == &springTuningToggle)
+    {
+        bool state = b->getToggleState();
+        DBG("springTuningToggle " + String((int)state));
+        
+        prep->getSpringTuning()->setActive(state);
+        active->getSpringTuning()->setActive(state);
+        
+        if(state)
+        {
+            prep->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
+            active->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
+        }
+        else
+        {
+            prep->getSpringTuning()->setTetherTuning(EqualTemperament);
+            active->getSpringTuning()->setTetherTuning(EqualTemperament);
+        }
+        
+        //need to make sure the interval scale is also set; i'm finding that sometimes i have to manually change away from just and back to get the system to work
+        TuningSystem springScaleId = prep->getSpringTuning()->getScaleId();
+        Array<float> scale = tuning->getScaleCents(springScaleId);
+        prep->getSpringTuning()->setIntervalTuning(scale);
+        active->getSpringTuning()->setIntervalTuning(scale);
+        
+        updateComponentVisibility();
     }
 }
 
@@ -703,6 +1537,32 @@ TuningViewController(p, theGraph)
     absoluteKeyboard.addMyListener(this);
     customKeyboard.addMyListener(this);
     offsetSlider->addMyListener(this);
+    
+    nToneRootCB.addListener(this);
+    nToneRootOctaveCB.addListener(this);
+    nToneSemitoneWidthSlider->addMyListener(this);
+    
+    
+    // ~ ~ ~ ~ ~ SPRING TUNING STUFF ~ ~ ~ ~ ~
+    for (int i = 0; i < 12; i++)
+    {
+        springSliders[i]->addListener(this);
+    }
+    
+    for (int i = 0; i < 128; i++)
+    {
+        tetherSliders[i]->addListener(this);
+    }
+    
+    springTuningToggle.addListener(this);
+    rateSlider->addMyListener(this);
+    dragSlider->addMyListener(this);
+    intervalStiffnessSlider->addMyListener(this);
+    tetherStiffnessSlider->addMyListener(this);
+    springScaleCB.addListener(this);
+    springScaleFundamentalCB.addListener(this);
+    showSpringsButton.addListener(this);
+    // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     update();
 }
@@ -722,6 +1582,32 @@ void TuningModificationEditor::greyOutAllComponents()
     offsetSlider->setDim(gModAlpha);
     A1IntervalScaleLabel.setAlpha(gModAlpha);
     A1AnchorScaleLabel.setAlpha(gModAlpha);
+    
+    nToneRootCB.setAlpha(gModAlpha);
+    nToneRootOctaveCB.setAlpha(gModAlpha);
+    nToneSemitoneWidthSlider->setDim(gModAlpha);
+    
+    for (int i = 0; i < 12; i++)
+    {
+        springSliders[i]->setAlpha(gModAlpha);
+    }
+    
+    for (int i = 0; i < 128; i++)
+    {
+        tetherSliders[i]->setAlpha(gModAlpha);
+    }
+    
+    springTuningToggle.setAlpha(gModAlpha);
+    
+    rateSlider->setDim(gModAlpha);
+    
+    dragSlider->setDim(gModAlpha);
+    
+    intervalStiffnessSlider->setDim(gModAlpha);
+    
+    tetherStiffnessSlider->setDim(gModAlpha);
+    
+    springScaleCB.setAlpha(gModAlpha);
 }
 
 void TuningModificationEditor::highlightModedComponents()
@@ -739,6 +1625,51 @@ void TuningModificationEditor::highlightModedComponents()
     if(mod->getParam(TuningAbsoluteOffsets) != "")      absoluteKeyboard.setAlpha(1);
     if(mod->getParam(TuningCustomScale) != "")          customKeyboard.setAlpha(1);
     if(mod->getParam(TuningOffset) != "")               offsetSlider->setBright();
+    if(mod->getParam(TuningNToneRootCB) != "")          nToneRootCB.setAlpha(1);
+    if(mod->getParam(TuningNToneRootOctaveCB) != "")    nToneRootOctaveCB.setAlpha(1);
+    if(mod->getParam(TuningNToneSemitoneWidth) != "")   nToneSemitoneWidthSlider->setBright();
+    if (mod->getParam(TuningSpringTetherStiffness) != "")
+    {
+        tetherStiffnessSlider->setBright();
+    }
+    if (mod->getParam(TuningSpringIntervalStiffness) != "")
+    {
+        intervalStiffnessSlider->setBright();
+    }
+    if (mod->getParam(TuningSpringRate) != "")
+    {
+        rateSlider->setBright();
+    }
+    if (mod->getParam(TuningSpringDrag) != "")
+    {
+        dragSlider->setBright();
+    }
+    if (mod->getParam(TuningSpringActive) != "")
+    {
+        springTuningToggle.setAlpha(1);
+    }
+    if (mod->getParam(TuningSpringTetherWeights) != "")
+    {
+        for (int i = 0; i < 128; i++)
+        {
+            if (mod->getTetherWeightActive(i))  tetherSliders[i]->setAlpha(1);
+            else                                tetherSliders[i]->setAlpha(gModAlpha);
+        }
+    }
+    if (mod->getParam(TuningSpringIntervalWeights) != "")
+    {
+        for (int i = 0; i < 12; i++)
+        {
+            if (mod->getSpringWeightActive(i))  springSliders[i]->setAlpha(1);
+            else                                springSliders[i]->setAlpha(gModAlpha);
+        }
+    }
+    if (mod->getParam(TuningSpringIntervalScale) != "")
+    {
+        springScaleCB.setAlpha(1);
+    }
+    
+    repaint();
 }
 
 void TuningModificationEditor::update(void)
@@ -747,7 +1678,6 @@ void TuningModificationEditor::update(void)
     
     if (mod != nullptr)
     {
-        
         greyOutAllComponents();
         highlightModedComponents();
         
@@ -755,48 +1685,83 @@ void TuningModificationEditor::update(void)
         
         String val = mod->getParam(TuningScale);
         scaleCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-        //                       scaleCB.setSelectedItemIndex(prep->getTuning(), dontSendNotification);
         
         val = mod->getParam(TuningFundamental);
         fundamentalCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-        //                       fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
         
         val = mod->getParam(TuningOffset);
         offsetSlider->setValue(val.getFloatValue() * 100., dontSendNotification);
-        //                       offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
         
         val = mod->getParam(TuningAbsoluteOffsets);
-        //absoluteKeyboard.setValues(stringToFloatArray(val));
-        absoluteKeyboard.setValuesAbsolute(stringToFloatArray(val));
-        //                       absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
+        absoluteKeyboard.setValues(stringToFloatArray(val));
         
         val = mod->getParam(TuningCustomScale);
         customKeyboard.setValues(stringToFloatArray(val));
         
         val = mod->getParam(TuningA1IntervalScale);
         A1IntervalScaleCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-        //                       A1IntervalScaleCB.setSelectedItemIndex(prep->getAdaptiveIntervalScale(), dontSendNotification);
         
         val = mod->getParam(TuningA1Inversional);
         A1Inversional.setToggleState((bool)val.getIntValue(), dontSendNotification);
-        //                       A1Inversional.setToggleState(prep->getAdaptiveInversional(), dontSendNotification);
         
         val = mod->getParam(TuningA1AnchorScale);
         A1AnchorScaleCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-        //                       A1AnchorScaleCB.setSelectedItemIndex(prep->getAdaptiveAnchorScale(), dontSendNotification);
         
         val = mod->getParam(TuningA1AnchorFundamental);
         A1FundamentalCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-        //                       A1FundamentalCB.setSelectedItemIndex(prep->getAdaptiveAnchorFundamental(), dontSendNotification);
         
         val = mod->getParam(TuningA1ClusterThresh);
         A1ClusterThresh->setValue(val.getLargeIntValue(), dontSendNotification);
-        //                       A1ClusterThresh->setValue(prep->getAdaptiveClusterThresh(), dontSendNotification);
         
         val = mod->getParam(TuningA1History);
         A1ClusterMax->setValue(val.getIntValue(), dontSendNotification);
-        //                       A1ClusterMax->setValue(prep->getAdaptiveHistory(), dontSendNotification);
         
+        val = mod->getParam(TuningNToneRootCB);
+        nToneRootCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+        
+        val = mod->getParam(TuningNToneRootOctaveCB);
+        nToneRootOctaveCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+        
+        val = mod->getParam(TuningNToneSemitoneWidth);
+        nToneSemitoneWidthSlider->setValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(TuningSpringTetherStiffness);
+        tetherStiffnessSlider->setValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(TuningSpringIntervalStiffness);
+        intervalStiffnessSlider->setValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(TuningSpringRate);
+        rateSlider->setValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(TuningSpringDrag);
+        double newval = dt_asymwarp_inverse(1.0f - val.getFloatValue(), 100.);
+        dragSlider->setValue(newval, dontSendNotification);
+    
+        val = mod->getParam(TuningSpringActive);
+        springTuningToggle.setToggleState((bool)val.getIntValue(), dontSendNotification);
+        
+        Array<float> vals;
+        
+        /*
+        val = mod->getParam(TuningSpringTetherWeights);
+        vals = stringToFloatArray(val);
+        for (int i = 0; i < 128; i++)
+        {
+            tetherSliders[i]->setValue(vals[i], dontSendNotification);
+        }
+        
+        val = mod->getParam(TuningSpringIntervalWeights);
+        vals = stringToFloatArray(val);
+        for (int i = 0; i < 12; i++) springSliders[i]->setValue(vals[i], dontSendNotification);
+        */
+        
+        val = mod->getParam(TuningSpringIntervalScale);
+        
+        int springScaleId = val.getIntValue();
+        if (springScaleId >= AdaptiveTuning) springScaleId = (TuningSystem)((int)springScaleId - 2);
+        springScaleCB.setSelectedItemIndex(springScaleId, dontSendNotification);
+    
         updateComponentVisibility();
         A1reset.setVisible(false);
     }
@@ -901,6 +1866,30 @@ void TuningModificationEditor::actionButtonCallback(int action, TuningModificati
         vc->update();
         vc->updateModification();
     }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentModTuningId;
+        TuningModPreparation::Ptr prep = processor.gallery->getTuningModPreparation(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+        }
+        
+        vc->update();
+    }
 }
 
 void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
@@ -911,11 +1900,11 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
     
-    if (name == selectCB.getName())
+    if (box == &selectCB)
     {
         setCurrentId(Id);
     }
-    else if (name == scaleCB.getName())
+    else if (box == &scaleCB)
     {
         mod->setParam(TuningScale, String(index));
         scaleCB.setAlpha(1.);
@@ -923,31 +1912,49 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
         Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         customKeyboard.setValues(currentTuning->getCurrentScaleCents());
     }
-    else if (name == fundamentalCB.getName())
+    else if (box == &fundamentalCB)
     {
         mod->setParam(TuningFundamental, String(index));
         fundamentalCB.setAlpha(1.);
         
         customKeyboard.setFundamental(index);
     }
-    else if (name == A1IntervalScaleCB.getName())
+    else if (box == &A1IntervalScaleCB)
     {
         mod->setParam(TuningA1IntervalScale, String(index));
         A1IntervalScaleCB.setAlpha(1.);
         A1IntervalScaleLabel.setAlpha(1);
     }
-    else if (name == A1AnchorScaleCB.getName())
+    else if (box == &A1AnchorScaleCB)
     {
         mod->setParam(TuningA1AnchorScale, String(index));
         A1AnchorScaleCB.setAlpha(1.);
         A1AnchorScaleLabel.setAlpha(1);
     }
-    else if (name == A1FundamentalCB.getName())
+    else if (box == &A1FundamentalCB)
     {
         mod->setParam(TuningA1AnchorFundamental, String(index));
         A1FundamentalCB.setAlpha(1.);
     }
-    
+    else if (box == &nToneRootCB)
+    {
+        mod->setParam(TuningNToneRootCB, String(index));
+        nToneRootCB.setAlpha(1.);
+    }
+    else if (box == &nToneRootOctaveCB)
+    {
+        mod->setParam(TuningNToneRootOctaveCB, String(index));
+        nToneRootOctaveCB.setAlpha(1.);
+    }
+    else if (box == &springScaleCB)
+    {
+        TuningSystem springScaleId = (TuningSystem) index;
+        
+        if (springScaleId >= AdaptiveTuning) springScaleId = (TuningSystem)((int)springScaleId + 2);
+        
+        mod->setParam(TuningSpringIntervalScale, String(springScaleId));
+    }
+
     if (name != selectCB.getName()) updateModification();
     
     updateComponentVisibility();
@@ -983,24 +1990,96 @@ void TuningModificationEditor::keyboardSliderChanged(String name, Array<float> v
     updateModification();
 }
 
-void TuningModificationEditor::BKSingleSliderValueChanged(String name, double val)
+void TuningModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
     
-    if(name == offsetSlider->getName())
+    if(slider == offsetSlider)
     {
         mod->setParam(TuningOffset, String(val * 0.01));
         offsetSlider->setBright();
     }
-    else if(name == A1ClusterThresh->getName())
+    else if(slider == A1ClusterThresh)
     {
         mod->setParam(TuningA1ClusterThresh, String(val));
         A1ClusterThresh->setBright();
     }
-    else if(name == A1ClusterMax->getName())
+    else if(slider == A1ClusterMax)
     {
         mod->setParam(TuningA1History, String(val));
         A1ClusterMax->setBright();
+    }
+    else if(slider == nToneSemitoneWidthSlider)
+    {
+        mod->setParam(TuningNToneSemitoneWidth, String(val));
+        nToneSemitoneWidthSlider->setBright();
+    }
+    else if (slider == rateSlider)
+    {
+        mod->setParam(TuningSpringRate, String(val));
+        rateSlider->setBright();
+    }
+    else if (slider == dragSlider)
+    {
+        double newval = dt_asymwarp(val, 100.);
+        mod->setParam(TuningSpringDrag, String(1.-newval));
+        
+        dragSlider->setBright();
+    }
+    else if (slider == tetherStiffnessSlider)
+    {
+        mod->setParam(TuningSpringTetherStiffness, String(val));
+        tetherStiffnessSlider->setBright();
+    }
+    else if (slider == intervalStiffnessSlider)
+    {
+        mod->setParam(TuningSpringIntervalStiffness, String(val));
+        intervalStiffnessSlider->setBright();
+    }
+
+    updateModification();
+}
+
+void TuningModificationEditor::sliderValueChanged (Slider* slider)
+{
+    TuningModPreparation::Ptr mod = processor.gallery->getTuningModPreparation(processor.updateState->currentModTuningId);
+    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+    
+    double value = slider->getValue();
+    
+    String name = slider->getName();
+    
+    Array<float> tetherWeights = stringToFloatArray(mod->getParam(TuningSpringTetherWeights));
+    Array<float> intervalWeights = stringToFloatArray(mod->getParam(TuningSpringIntervalWeights));
+    
+    if (tetherWeights.size() < 128)
+    {
+        tetherWeights = tuning->getStaticSpringTuning()->getTetherWeights();
+    }
+    
+    if (intervalWeights.size() < 12)
+    {
+        
+        intervalWeights = tuning->getStaticSpringTuning()->getSpringWeights();
+    }
+    
+    for (int i = 0; i < 128; i++)
+    {
+        if (slider == tetherSliders[i])
+        {
+            tetherWeights.setUnchecked(i, value);
+            mod->setParam(TuningSpringTetherWeights, floatArrayToString(tetherWeights));
+            mod->setTetherWeightActive(i, true);
+            break;
+        }
+        else if (slider == springSliders[i])
+        {
+            intervalWeights.setUnchecked(i, value);
+            String thing = floatArrayToString(intervalWeights);
+            mod->setParam(TuningSpringIntervalWeights, floatArrayToString(intervalWeights));
+            mod->setSpringWeightActive(i, true);
+            break;
+        }
     }
     
     updateModification();
@@ -1008,6 +2087,9 @@ void TuningModificationEditor::BKSingleSliderValueChanged(String name, double va
 
 void TuningModificationEditor::updateModification(void)
 {
+    greyOutAllComponents();
+    highlightModedComponents();
+    
     processor.updateState->modificationDidChange = true;
 }
 
@@ -1032,12 +2114,20 @@ void TuningModificationEditor::buttonClicked (Button* b)
     {
         getModOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
+    else if (b == &showSpringsButton)
+    {
+        showSprings = !showSprings;
+        
+        updateComponentVisibility();
+    }
+    else if (b == &springTuningToggle)
+    {
+        bool state = b->getToggleState();
+        
+        mod->setParam(TuningSpringActive, String((int) state));
+        
+        updateComponentVisibility();
+    }
     
     updateModification();
 }
-
-
-
-
-
-

@@ -1,12 +1,12 @@
 /*
-  ==============================================================================
-
-    BKSlider.h
-    Created: 6 Apr 2017 9:50:44pm
-    Author:  Daniel Trueman
-
-  ==============================================================================
-*/
+ ==============================================================================
+ 
+ BKSlider.h
+ Created: 6 Apr 2017 9:50:44pm
+ Author:  Daniel Trueman
+ 
+ ==============================================================================
+ */
 
 /* TODO
  
@@ -20,7 +20,7 @@
 #include "BKUtilities.h"
 #include "BKComponent.h"
 #include "BKLookAndFeel.h"
-#include "BKNumberPad.h"
+#include "BKUIComponents.h"
 
 // ******************************************************************************************************************** //
 // **************************************************  BKSubSlider **************************************************** //
@@ -32,13 +32,12 @@ public:
     
     BKSubSlider (SliderStyle sstyle, double min, double max, double def, double increment, int width, int height);
     ~BKSubSlider();
-
-    double getValueFromText	(const String & text ) override;
+    
+    double getValueFromText    (const String & text ) override;
     bool isActive() { return active; }
     void isActive(bool newactive) {active = newactive; }
     void setMinMaxDefaultInc(std::vector<float> newvals);
     void setSkewFromMidpoint(bool sfm);
-        
     
 private:
     
@@ -68,16 +67,19 @@ class BKMultiSlider :
 public Component,
 public Slider::Listener,
 public TextEditor::Listener
+#if JUCE_IOS
+, public WantsBigOne
+#endif
 {
     
 public:
     
     BKMultiSlider(BKMultiSliderType which);
     ~BKMultiSlider();
-
+    
     void addSlider(int where, bool active, NotificationType newnotify);
     void addSubSlider(int where, bool active, NotificationType newnotify);
-
+    
     void deactivateSlider(int where, NotificationType notify);
     void deactivateAll(NotificationType notify);
     void deactivateAllAfter(int where, NotificationType notify);
@@ -141,17 +143,14 @@ public:
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
     
-    ListenerList<WantsKeyboardListener> inputListeners;
-    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
-    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
-    
     void setName(String newName)                            { sliderName = newName; showName.setText(sliderName, dontSendNotification);        }
     String getName()                                        { return sliderName; }
+    void setToolTipString(String newTip) { showName.setTooltip(newTip); bigInvisibleSlider->setTooltip(newTip); }
     
     Array<Array<float>> getAllValues();
     Array<Array<float>> getAllActiveValues();
     Array<float> getOneSliderBank(int which);
-
+    
     inline String getText(void){
         return editValsTextField->getText();
     }
@@ -165,7 +164,7 @@ private:
     
     String sliderName;
     BKLabel showName;
-
+    
     bool dragging;
     bool arrangedHorizontally;
     bool sliderIsVertical;
@@ -205,6 +204,7 @@ private:
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void textEditorFocusLost(TextEditor& textEditor) override;
+    void textEditorTextChanged(TextEditor&) override;
     
     void showModifyPopupMenu(int which);
     static void sliderModifyMenuCallback (const int result, BKMultiSlider* slider, int which);
@@ -229,12 +229,21 @@ class BKSingleSlider :
 public Component,
 public Slider::Listener,
 public TextEditor::Listener
+#if JUCE_IOS
+, public WantsBigOne
+#endif
 {
 public:
     BKSingleSlider(String sliderName, double min, double max, double def, double increment);
-    ~BKSingleSlider() {};
+    ~BKSingleSlider()
+    {
+        displaySlider->setLookAndFeel(nullptr);
+        setLookAndFeel(nullptr);
+        
+    };
     
     Slider thisSlider;
+    ScopedPointer<Slider> displaySlider;
     
     String sliderName;
     BKLabel showName;
@@ -248,6 +257,7 @@ public:
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName()                { return sliderName; }
     void setTextIsAbove(bool nt)    { textIsAbove = nt; }
+    void setToolTipString(String newTip) { showName.setTooltip(newTip); thisSlider.setTooltip(newTip); valueTF.setTooltip(newTip);}
     
     void setJustifyRight(bool jr)
     {
@@ -260,18 +270,22 @@ public:
     void checkValue(double newval);
     double getValue() {return thisSlider.getValue();}
     
+    void setDisplayValue(double newval) { displaySlider->setValue(newval); }
+    void displaySliderVisible(bool vis) { displaySlider->setVisible(vis); }
+    
     void sliderValueChanged (Slider *slider) override;
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void mouseDown(const MouseEvent &event) override;
     void mouseUp(const MouseEvent &event) override;
     void mouseDrag(const MouseEvent &e) override;
+    
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
     void textEditorFocusLost(TextEditor& textEditor) override;
     void textEditorTextChanged(TextEditor& textEditor) override;
     void resized() override;
     
     void setSkewFactor (double factor, bool symmetricSkew) { thisSlider.setSkewFactor(factor, symmetricSkew); }
-    void setSkewFactorFromMidPoint (double sliderValueToShowAtMidPoint	) { thisSlider.setSkewFactorFromMidPoint(sliderValueToShowAtMidPoint); }
+    void setSkewFactorFromMidPoint (double sliderValueToShowAtMidPoint    ) { thisSlider.setSkewFactorFromMidPoint(sliderValueToShowAtMidPoint); }
     
     class Listener
     {
@@ -280,20 +294,17 @@ public:
         //BKSingleSlider::Listener() {}
         virtual ~Listener() {};
         
-        virtual void BKSingleSliderValueChanged(String name, double val) = 0;
+        virtual void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) = 0;
     };
     
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
-    
-    ListenerList<WantsKeyboardListener> inputListeners;
-    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
-    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
+
     
     void setDim(float newAlpha);
     void setBright();
-
+    
 private:
     
     double sliderMin, sliderMax;
@@ -304,8 +315,10 @@ private:
     
     bool justifyRight;
     
+    BKDisplaySliderLookAndFeel displaySliderLookAndFeel;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSingleSlider)
-
+    
 };
 
 
@@ -319,6 +332,9 @@ class BKRangeSlider :
 public Component,
 public Slider::Listener,
 public TextEditor::Listener
+#if JUCE_IOS
+, public WantsBigOne
+#endif
 {
 public:
     BKRangeSlider(String sliderName, double min, double max, double defmin, double defmax, double increment);
@@ -326,6 +342,8 @@ public:
     {
         minSlider.setLookAndFeel(nullptr);
         maxSlider.setLookAndFeel(nullptr);
+        invisibleSlider.setLookAndFeel(nullptr);
+        displaySlider->setLookAndFeel(nullptr);
     };
     
     Slider minSlider;
@@ -334,7 +352,9 @@ public:
     String maxSliderName;
     
     Slider invisibleSlider;
-
+    
+    ScopedPointer<Slider> displaySlider;
+    
     String sliderName;
     BKLabel showName;
     
@@ -343,9 +363,18 @@ public:
     
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName()                { return sliderName; }
+    void setToolTipString(String newTip) {  showName.setTooltip(newTip);
+                                            invisibleSlider.setTooltip(newTip);
+                                            minValueTF.setTooltip(newTip);
+                                            maxValueTF.setTooltip(newTip); }
+    
     void setMinValue(double newval, NotificationType notify);
     void setMaxValue(double newval, NotificationType notify);
     void setIsMinAlwaysLessThanMax(bool im) { isMinAlwaysLessThanMax = im; }
+    
+    void setDisplayValue(double newval) { displaySlider->setValue(newval); }
+    void displaySliderVisible(bool vis) { displaySlider->setVisible(vis); }
+    
     void setJustifyRight(bool jr)
     {
         justifyRight = jr;
@@ -410,9 +439,6 @@ public:
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
     
-    ListenerList<WantsKeyboardListener> inputListeners;
-    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
-    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
     
 private:
     
@@ -428,6 +454,7 @@ private:
     
     BKRangeMinSliderLookAndFeel minSliderLookAndFeel;
     BKRangeMaxSliderLookAndFeel maxSliderLookAndFeel;
+    BKDisplaySliderLookAndFeel displaySliderLookAndFeel;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKRangeSlider)
     
@@ -444,8 +471,9 @@ class BKWaveDistanceUndertowSlider :
 public Component,
 public Slider::Listener,
 public TextEditor::Listener
-//public BKSingleSlider::Listener,
-
+#if JUCE_IOS
+, public WantsBigOne
+#endif
 {
 public:
     BKWaveDistanceUndertowSlider();
@@ -495,6 +523,14 @@ public:
         else if (which == NostalgicWaveDistance)    wavedistanceValueTF.setText(text, false);
     }
     
+    inline void setUndertowTooltip(String tip) {    undertowSlider->setTooltip(tip);
+                                                    undertowName.setTooltip(tip);
+                                                    undertowValueTF.setTooltip(tip); }
+    
+    inline void setWaveDistanceTooltip(String tip) {    wavedistanceSlider->setTooltip(tip);
+                                                        wavedistanceName.setTooltip(tip);
+                                                        wavedistanceValueTF.setTooltip(tip); }
+    
     inline TextEditor* getTextEditor(NostalgicParameterType which)
     {
         if (which == NostalgicUndertow) return &undertowValueTF;
@@ -534,9 +570,6 @@ public:
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
     
-    ListenerList<WantsKeyboardListener> inputListeners;
-    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
-    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
     
     
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
@@ -552,7 +585,7 @@ private:
     
     bool newDrag;
     bool clickedOnMinSlider;
-
+    
     ImageComponent sampleImageComponent;
     
     bool focusLostByEscapeKey;
@@ -575,6 +608,9 @@ class BKStackedSlider :
 public Component,
 public Slider::Listener,
 public TextEditor::Listener
+#if JUCE_IOS
+, public WantsBigOne
+#endif
 {
 public:
     
@@ -598,6 +634,7 @@ public:
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void textEditorFocusLost(TextEditor& textEditor) override;
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
+    void textEditorTextChanged(TextEditor& textEditor) override;
     void mouseDown (const MouseEvent &event) override;
     void mouseDrag(const MouseEvent& e) override;
     void mouseUp(const MouseEvent& e) override;
@@ -627,6 +664,7 @@ public:
     
     void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
     String getName()                { return sliderName; }
+    void setTooltip(String newTip)  { topSlider->setTooltip(newTip); showName.setTooltip(newTip); }
     
     void resized() override;
     
@@ -641,17 +679,12 @@ public:
         virtual ~Listener() {};
         
         virtual void BKStackedSliderValueChanged(String name, Array<float> val) = 0; //rewrite all this to pass "this" and check by slider ref instead of name?
-        
-        virtual void bkStackedSliderValueChanged(BKStackedSlider*) {};
     };
     
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
     
-    ListenerList<WantsKeyboardListener> inputListeners;
-    void addWantsKeyboardListener(WantsKeyboardListener* listener)     { inputListeners.add(listener);      }
-    void removeWantsKeyboardListener(WantsKeyboardListener* listener)  { inputListeners.remove(listener);   }
     
 private:
     
@@ -672,7 +705,7 @@ private:
     
     BKMultiSliderLookAndFeel stackedSliderLookAndFeel;
     BKMultiSliderLookAndFeel topSliderLookAndFeel;
-
+    
     double sliderMin, sliderMax, sliderMinDefault, sliderMaxDefault;
     double sliderDefault;
     double sliderIncrement;
@@ -691,6 +724,142 @@ private:
 };
 
 
+// ******************************************************************************************************************** //
+// **************************************************  BKADSRSlider ************************************************** //
+// ******************************************************************************************************************** //
+
+
+class BKADSRSlider :
+public Component,
+public BKSingleSlider::Listener,
+public BKTextButton::Listener
+#if JUCE_IOS
+, public WantsBigOne
+#endif
+{
+public:
+    BKADSRSlider(String name);
+    BKADSRSlider()
+    {
+        
+    };
+    
+    ~BKADSRSlider()
+    {
+        setLookAndFeel(nullptr);
+    };
+    
+    void setName(String newName)    { sliderName = newName; showName.setText(sliderName, dontSendNotification); }
+    String getName()                { return sliderName; }
+    void setToolTip(String newTip)  { adsrButton.setTooltip(newTip); }
+    
+    void setButtonText(String buttonText)
+    {
+        adsrButton.setButtonText(buttonText);
+    }
+    
+    void setAttackValue(int newval, NotificationType notify)
+    {
+        attackSlider->setValue(newval, notify);
+    }
+    void setDecayValue(int newval, NotificationType notify)
+    {
+        decaySlider->setValue(newval, notify);
+    }
+    void setSustainValue(float newval, NotificationType notify)
+    {
+        sustainSlider->setValue(newval, notify);
+    }
+    void setReleaseValue(int newval, NotificationType notify)
+    {
+        releaseSlider->setValue(newval, notify);
+    }
+    
+    void setValue(Array<float> newvals, NotificationType notify)
+    {
+        setAttackValue(newvals[0], notify);
+        setDecayValue(newvals[1], notify);
+        setSustainValue(newvals[2], notify);
+        setReleaseValue(newvals[3], notify);
+        
+        if(newvals.size() > 4)
+        {
+            if(newvals[4] > 0) setActive();
+            else setPassive();
+        }
+    }
+    
+    int getAttackValue()    { return attackSlider->getValue(); }
+    int getDecayValue()     { return decaySlider->getValue(); }
+    float getSustainValue() { return sustainSlider->getValue(); }
+    int getReleaseValue()   { return releaseSlider->getValue(); }
+    
+    void setIsButtonOnly(bool state) { isButtonOnly = state; }
+    void setButtonToggle(bool state) {adsrButton.setToggleState(state, dontSendNotification);}
+    bool getButtonToggle() { return adsrButton.getToggleState(); }
+    
+    void setHighlighted() { adsrButton.setToggleState(false, dontSendNotification); adsrButton.setLookAndFeel(&highlightedADSRLookAndFeel); }
+    void setActive() { adsrButton.setToggleState(false, dontSendNotification); adsrButton.setLookAndFeel(&activeADSRLookAndFeel);}
+    void setPassive() { adsrButton.setToggleState(true, dontSendNotification); adsrButton.setLookAndFeel(&passiveADSRLookAndFeel); }
+    
+    void setJustifyRight(bool jr)
+    {
+        justifyRight = jr;
+        if (justifyRight) showName.setJustificationType(Justification::bottomRight);
+        else showName.setJustificationType(Justification::bottomLeft);
+    }
+    
+    void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
+    void buttonStateChanged (Button*) override;
+    void buttonClicked (Button*) override;
+    void mouseDown (const MouseEvent &event) override {};
+    void mouseUp (const MouseEvent &event) override;
+
+    
+    void resized() override;
+    
+    void setDim(float newAlpha);
+    void setBright();
+    
+    class Listener
+    {
+    public:
+        virtual ~Listener() {};
+        
+        virtual void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) = 0;
+        virtual void BKADSRButtonStateChanged(String name, bool mod, bool state) = 0;
+    };
+    
+    ListenerList<Listener> listeners;
+    void addMyListener(Listener* listener)     { listeners.add(listener);      }
+    void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
+    
+    BKTextButton adsrButton;
+    
+    
+private:
+    
+    ScopedPointer<BKSingleSlider> attackSlider;
+    ScopedPointer<BKSingleSlider> decaySlider;
+    ScopedPointer<BKSingleSlider> sustainSlider;
+    ScopedPointer<BKSingleSlider> releaseSlider;
+    
+    String sliderName;
+    BKLabel showName;
+    
+    BKButtonAndMenuLAF highlightedADSRLookAndFeel;
+    BKButtonAndMenuLAF activeADSRLookAndFeel;
+    BKButtonAndMenuLAF passiveADSRLookAndFeel;
+
+    bool justifyRight;
+    bool isButtonOnly;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKADSRSlider)
+    
+};
+
+
 
 
 #endif  // BKSLIDER_H_INCLUDED
+

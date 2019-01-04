@@ -29,6 +29,7 @@ tempo(tempo)
     
     clusterTimer = 0;
     phasor = 0;
+    envelopeCounter = 0;
      
     inCluster = false;
     
@@ -68,10 +69,16 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
     
     for (auto t : synchronic->aPrep->getTransposition()[transpCounter])
     {
-        float offset = tuner->getOffset(note) + t;
-        int synthNoteNumber = ((float)note + (int)offset);
-        float synthOffset = offset - (int)offset;
-        DBG("playing synchronic note/vel, sample# " + String(note) +  " " + String(velocity) + " " + String(synthNoteNumber));
+
+        float offset = t + tuner->getOffset(note, false), synthOffset = offset;
+        int synthNoteNumber = (float)note;
+        
+        //if (sampleType < BKLoadSoundfont)
+        {
+            synthNoteNumber += (int)offset;
+            synthOffset     -= (int)offset;
+        }
+
         synth->keyOn(channel,
                      note,
                      synthNoteNumber,
@@ -82,21 +89,25 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity)
                      FixedLengthFixedStart,
                      SynchronicNote,
                      synchronic->getId(),
-                     noteStartPos, // start
+                     noteStartPos,  // start
                      noteLength,
-                     3,
-                     30);
+                     synchronic->aPrep->getAttack(envelopeCounter),
+                     synchronic->aPrep->getDecay(envelopeCounter),
+                     synchronic->aPrep->getSustain(envelopeCounter),
+                     synchronic->aPrep->getRelease(envelopeCounter),
+                     tuner);
     }
     
 }
 
 void SynchronicProcessor::resetPhase(int skipBeats)
 {
-    
+    //DBG("resetting phase");
     beatMultiplierCounter   = skipBeats % synchronic->aPrep->getBeatMultipliers().size();
     lengthMultiplierCounter = skipBeats % synchronic->aPrep->getLengthMultipliers().size();
     accentMultiplierCounter = skipBeats % synchronic->aPrep->getAccentMultipliers().size();
     transpCounter           = skipBeats % synchronic->aPrep->getTransposition().size();
+    envelopeCounter         = skipBeats % synchronic->aPrep->getEnvelopesOn().size();
     
     beatCounter = 0;
 
@@ -108,6 +119,13 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
  
     //add note to array of depressed notes
     keysDepressed.addIfNotAlreadyThere(noteNumber);
+    
+    //don't need this here? since it's in processBlock()?
+    beatThresholdSamples = (tempo->getTempo()->aPrep->getBeatThresh() * sampleRate);
+    numSamplesBeat =    beatThresholdSamples *
+                        synchronic->aPrep->getBeatMultipliers()[beatMultiplierCounter] *
+                        general->getPeriodMultiplier() *
+                        tempo->getPeriodMultiplier();
     
     //add to adaptive tempo history, update adaptive tempo
     //atNewNote();
@@ -153,19 +171,8 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     //later, we remove dupes so we don't inadvertently play the same note twice in a pulse
     
     cluster.insert(0, noteNumber);
-    if(cluster.size() > synchronic->aPrep->getClusterCap()) cluster.resize(synchronic->aPrep->getClusterCap());
-    DBG("cluster size: " + String(cluster.size()) + " " + String(clusterThresholdSamples/sampleRate));
-    
-    //why not use clusterMax for this? the intent is different:
-    //clusterMax: max number of keys pressed within clusterThresh, otherwise shut off pulses
-    //clusterCap: the most number of notes allowed in a cluster when playing pulses
-    //so, let's say we are playing a rapid passage where successive notes are within the clusterThresh
-    //and we want the pulse to emerge when we stop; clusterMax wouldn't allow this to happen
-    //if we had exceeded clusterMax in that passage, which is bad, but we still want clusterCap
-    //to limit the number of notes included in the cluster.
-    //for now, we'll leave clusterCap unexposed, just to avoid confusion for the user. after all,
-    //I used it this way for all of the etudes to date! but might want to expose eventually...
-    //perhaps call beatVoices? since it's essentially the number of "voices" in the pulse chord?
+    //if(cluster.size() > synchronic->aPrep->getClusterCap()) cluster.resize(synchronic->aPrep->getClusterCap());
+    //DBG("cluster size: " + String(cluster.size()) + " " + String(clusterThresholdSamples/sampleRate));
     
     //reset the timer for time between notes
     clusterThresholdTimer = 0;
@@ -178,9 +185,6 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     
     //remove key from array of pressed keys
     keysDepressed.removeAllInstancesOf(noteNumber);
-    
-    //adaptive tempo
-    //atNewNoteOff();
     
     // If AnyNoteOffSync mode, reset phasor and multiplier indices.
     //only initiate pulses if ALL keys are released
@@ -203,11 +207,11 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
 }
 
 
-void SynchronicProcessor::processBlock(int numSamples, int channel)
+void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoadType type)
 {
-    //need to do this every block?
+    //do this every block, for adaptive tempo updates
+    sampleType = type;
     clusterThresholdSamples = (synchronic->aPrep->getClusterThreshSEC() * sampleRate);
-    //beatThresholdSamples = (synchronic->aPrep->getBeatThresh() * sampleRate);
     beatThresholdSamples = (tempo->getTempo()->aPrep->getBeatThresh() * sampleRate);
     
     //cluster management
@@ -227,19 +231,24 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
     
     if(shouldPlay)
     {
+        //cap size of slimCluster, removing oldest notes
+        Array<int> tempCluster;
+        for(int i = 0; i< cluster.size(); i++) tempCluster.set(i, cluster.getUnchecked(i));
+        if(tempCluster.size() > synchronic->aPrep->getClusterCap()) tempCluster.resize(synchronic->aPrep->getClusterCap());
+        
+        //why not use clusterMax for this? the intent is different:
+        //clusterMax: max number of keys pressed within clusterThresh, otherwise shut off pulses
+        //clusterCap: the most number of notes allowed in a cluster when playing pulses
+        //an example: clusterMax=9, clusterCap=8; playing 9 notes simultaneously will result in cluster with 8 notes, but playing 10 notes will shut off pulse
+        //another example: clusterMax=20, clusterCap=8; play a rapid ascending scale more than 8 and less than 20 notes, then stop; only last 8 notes will be in the cluster. If your scale exceeds 20 notes then it won't play.
+        
+        //for now, we'll leave clusterCap unexposed, just to avoid confusion for the user. after all,
+        //I used it this way for all of the etudes to date! but might want to expose eventually...
+        //perhaps call beatVoices? since it's essentially the number of "voices" in the pulse chord?        
         
         //remove duplicates from cluster, so we don't play the same note twice in a single pulse
         slimCluster.clearQuick();
-        for(int i = 0; i< cluster.size(); i++) slimCluster.addIfNotAlreadyThere(cluster.getUnchecked(i));
-        
-        /*
-        String clusterNotes = " ";
-        for(int i=0; i<slimCluster.size(); i++)
-        {
-            clusterNotes = clusterNotes + String(slimCluster.getUnchecked(i)) + " ";
-        }
-        DBG("slimCluster = " + clusterNotes);
-        */
+        for(int i = 0; i< tempCluster.size(); i++) slimCluster.addIfNotAlreadyThere(tempCluster.getUnchecked(i));
         
         //get time until next beat => beat length scaled by beatMultiplier parameter
         numSamplesBeat =    beatThresholdSamples *
@@ -258,7 +267,13 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             if (++lengthMultiplierCounter   >= synchronic->aPrep->getLengthMultipliers().size())     lengthMultiplierCounter = 0;
             if (++accentMultiplierCounter   >= synchronic->aPrep->getAccentMultipliers().size())     accentMultiplierCounter = 0;
             if (++transpCounter             >= synchronic->aPrep->getTransposition().size())         transpCounter = 0;
-            
+            if (++envelopeCounter           >= synchronic->aPrep->getEnvelopesOn().size())           envelopeCounter = 0;
+  
+            while(!synchronic->aPrep->getEnvelopesOn()[envelopeCounter]) //skip untoggled envelopes
+            {
+                envelopeCounter++;
+                if (envelopeCounter >= synchronic->aPrep->getEnvelopesOn().size()) envelopeCounter = 0;
+            }
             
             //update display of counters in UI
             /*
@@ -268,12 +283,15 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
                 " accent: "         + String(synchronic->aPrep->getAccentMultipliers()[accentMultiplierCounter]) +
                 " accent counter: " + String(accentMultiplierCounter) +
                 " transp: "         + "{ "+floatArrayToString(synchronic->aPrep->getTransposition()[transpCounter]) + " }" +
-                " transp counter: " + String(transpCounter)
+                " transp counter: " + String(transpCounter) +
+                " envelope on: "       + String((int)synchronic->aPrep->getEnvelopesOn()[envelopeCounter]) +
+                " envelope counter: " + String(envelopeCounter) +
+                " ADSR :" + String(synchronic->aPrep->getAttack(envelopeCounter)) + " " + String(synchronic->aPrep->getDecay(envelopeCounter)) + " " + String(synchronic->aPrep->getSustain(envelopeCounter)) + " " + String(synchronic->aPrep->getRelease(envelopeCounter))
                 );
             */
             
             //figure out whether to play the cluster
-            bool playCluster = false;
+            playCluster = false;
             
             //in the normal case, where cluster is within a range defined by clusterMin and Max
             if(synchronic->aPrep->getClusterMin() <= synchronic->aPrep->getClusterMax())
@@ -291,34 +309,19 @@ void SynchronicProcessor::processBlock(int numSamples, int channel)
             //if (cluster.size() >= synchronic->aPrep->getClusterMin() && cluster.size() <= synchronic->aPrep->getClusterMax())
             if(playCluster)
             {
-                //for (int n = slimCluster.size(); --n >= 0;)
-                for (int n=0; n < cluster.size(); n++)
+                for (int n=0; n < slimCluster.size(); n++)
                 {
-                    
-                    /*playNote(channel,
-                             cluster[n],
-                             velocities.getUnchecked(cluster[n]));*/
-                     
-                   
+
 					playNote(channel,
                              slimCluster[n],
                              velocities.getUnchecked(slimCluster[n]));
 					
                 }
-                
             }
             
             //increment beat and beatMultiplier counters, for next beat; check maxes and adjust
             if (++beatMultiplierCounter >= synchronic->aPrep->getBeatMultipliers().size()) beatMultiplierCounter = 0;
             if (++beatCounter >= synchronic->aPrep->getNumBeats()) shouldPlay = false; //done with pulses
-            
-            //update display of beat counter in UI
-            /*
-            DBG(" beat length: "    + String(synchronic->aPrep->getBeatMultipliers()[beatMultiplierCounter]) +
-                " beatMultiplier counter: "   + String(beatMultiplierCounter)
-                );
-            DBG(" ");
-              */
 
         }
         
@@ -348,64 +351,151 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
                         //adaptiveTempoPeriodMultiplier;
     }
     
-    //DBG("time in ms to next beat = " + String(timeToReturn * 1000./sampleRate));
+    DBG("time in ms to next beat = " + String(timeToReturn * 1000./sampleRate));
     return timeToReturn * 1000./sampleRate; //optimize later....
 }
 
+#if BK_UNIT_TESTS
 
 
-/*
-//adaptive tempo functions
-void SynchronicProcessor::atNewNote()
+class SynchronicTests : public UnitTest
 {
-    if(synchronic->aPrep->getAdaptiveTempo1Mode() == TimeBetweenNotes) atCalculatePeriodMultiplier();
-    atLastTime = atTimer;
-}
+public:
+	SynchronicTests() : UnitTest("Synchronics", "Synchronic") {}
 
-void SynchronicProcessor::atNewNoteOff()
+	void runTest() override
+	{
+		beginTest("SynchronicPreparation");
+
+		for (int i = 0; i < 10; i++)
+		{
+			// create synchronic preparation and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random SynchronicPreparation " + String(i);
+			DBG("test consistency: " + name);
+
+			SynchronicPreparation::Ptr sp1 = new SynchronicPreparation();
+			sp1->randomize();
+
+			Synchronic s1(sp1, 1);
+			s1.setName(name);
+
+			ValueTree vt1 = s1.getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			SynchronicPreparation::Ptr sp2 = new SynchronicPreparation();
+
+			Synchronic s2(sp2, 1);
+
+			//dummy parameters for setState
+			Tuning::PtrArr t;
+			Tempo::PtrArr m;
+
+			s2.setState(xml, t, m);
+			s2.setName(name);
+
+			ValueTree vt2 = s2.getState();
+
+			expect(vt1.isEquivalentTo(vt2),
+				"synchronic preparation: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
+
+			//expect(sp2->compare(sp1), sp1->getName() + " and " + sp2->getName() + " did not match.");
+		}
+
+		//test synchronic rather than synchronicPreparation
+		for (int i = 0; i < 10; i++)
+		{
+			// create synchronic preparation and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random synchronic " + String(i);
+			DBG("test consistency: " + name);
+
+			Synchronic s1(-1, true);
+			s1.setName(name);
+
+			ValueTree vt1 = s1.getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			Synchronic s2(-1, true);
+
+			//dummy parameters for setState
+			Tuning::PtrArr t;
+			Tempo::PtrArr m;
+
+			s2.setState(xml, t, m);
+			s2.setName(name);
+
+			ValueTree vt2 = s2.getState();
+
+			expect(vt1.isEquivalentTo(vt2),
+				"synchronic: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
+		}
+	}
+};
+
+static SynchronicTests synchronicTests;
+
+
+class SynchronicModTests : public UnitTest
 {
-    if(synchronic->aPrep->getAdaptiveTempo1Mode() == NoteLength) atCalculatePeriodMultiplier();
-}
+public:
+	SynchronicModTests() : UnitTest("SynchronicMods", "SynchronicMod") {}
 
-//really basic, using constrained moving average of time-between-notes (or note-length)
-void SynchronicProcessor::atCalculatePeriodMultiplier()
-{
-    //only do if history val is > 0
-    if(synchronic->aPrep->getAdaptiveTempo1History()) {
-        
-        atDelta = (atTimer - atLastTime) / (0.001 * sampleRate);
-        //DBG("atDelta = " + String(atDelta));
-        
-        //constrain be min and max times between notes
-        if(atDelta > synchronic->aPrep->getAdaptiveTempo1Min() && atDelta < synchronic->aPrep->getAdaptiveTempo1Max()) {
-            
-            //insert delta at beginning of history
-            atDeltaHistory.insert(0, atDelta);
-            
-            //eliminate oldest time difference
-            atDeltaHistory.resize(synchronic->aPrep->getAdaptiveTempo1History());
-            
-            //calculate moving average and then tempo period multiplier
-            int totalDeltas = 0;
-            for(int i = 0; i < atDeltaHistory.size(); i++) totalDeltas += atDeltaHistory.getUnchecked(i);
-            float movingAverage = totalDeltas / synchronic->aPrep->getAdaptiveTempo1History();
-            
-            adaptiveTempoPeriodMultiplier = movingAverage /
-                                            (beatThresholdSamples / (0.001 * sampleRate)) /
-                                            synchronic->aPrep->getAdaptiveTempo1Subdivisions();
-            
-            DBG("adaptiveTempoPeriodMultiplier = " + String(adaptiveTempoPeriodMultiplier));
-        }
-    }
-}
+	void runTest() override
+	{
+		beginTest("SynchronicMod");
 
-void SynchronicProcessor::atReset()
-{
-    for (int i = 0; i < synchronic->aPrep->getAdaptiveTempo1History(); i++)
-    {
-        //atDeltaHistory.insert(0, (60000.0/synchronic->aPrep->getTempo()));
-    }
-    adaptiveTempoPeriodMultiplier = 1.;
-}
- */
+		for (int i = 0; i < 10; i++)
+		{
+			// create synchronic mod preparation and randomize it
+			// call getState() to convert to ValueTree
+			// call setState() to convert from ValueTree to preparation
+			// compare begin and end states
+			String name = "random synchronic mod " + String(i);
+			DBG("test consistency: " + name);
 
+			SynchronicPreparation::Ptr sp1 = new SynchronicPreparation();
+			SynchronicModPreparation::Ptr sm1 = new SynchronicModPreparation(sp1, 1);
+
+
+			sm1->randomize();
+			sm1->setName(name);
+
+			ValueTree vt1 = sm1->getState();
+
+			ScopedPointer<XmlElement> xml = vt1.createXml();
+
+			SynchronicPreparation::Ptr sp2 = new SynchronicPreparation();
+			SynchronicModPreparation::Ptr sm2 = new SynchronicModPreparation(sp2, 1);
+
+			sm2->setState(xml);
+
+			ValueTree vt2 = sm2->getState();
+
+			expect(vt1.isEquivalentTo(vt2),
+				"synchronic mod: value trees do not match\n" +
+				vt1.toXmlString() +
+				"\n=======================\n" +
+				vt2.toXmlString());
+
+		}
+
+	}
+};
+
+static SynchronicModTests synchronicModTests;
+
+
+#endif

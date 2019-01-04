@@ -25,6 +25,8 @@
 #include "Gallery.h"
 
 #include "ItemMapper.h"
+
+#define LOAD_SAMPLES_IN_GALLERY 0
 //==============================================================================
 /**
 */
@@ -44,10 +46,16 @@ public:
     void loadJsonGalleryFromPath(String path);
     void saveCurrentGalleryAs(void);
     void saveCurrentGallery(void);
-    void createNewGallery(String name);
+    void createNewGallery(String name, ScopedPointer<XmlElement> xml = nullptr);
     void renameGallery(String name);
     void duplicateGallery(String name);
     void deleteGallery(void);
+    
+    
+    void importCurrentGallery(void);
+    void exportCurrentGallery(void);
+    
+    void importSoundfont(void);
     
     void writeCurrentGalleryToURL(String url);
     void deleteGalleryAtURL(String url);
@@ -57,14 +65,31 @@ public:
     
     BKSampleLoadType currentSampleType;
     
+    FileChooser* fc;
+    
     Gallery::Ptr                        gallery;
     
     BKUpdateState::Ptr                  updateState;
 
+    void loadSFZ(File sfzFile);
+    
+    void loadSF2(File sfzFile);
+    
+    void openSoundfont(void);
+    
+    Array<sfzero::Region*> regions;
+    
+    AudioFormatManager formatManager;
+    ScopedPointer<AudioFormatReader> sampleReader;
+    ScopedPointer<AudioSampleBuffer> sampleBuffer;
+    
     // Synthesisers.
     BKSynthesiser                       mainPianoSynth;
     BKSynthesiser                       hammerReleaseSynth;
     BKSynthesiser                       resonanceReleaseSynth;
+    BKSynthesiser                       pedalSynth;
+    
+    //sfzero::Synth                       synth;
     
     Piano::Ptr                          prevPiano;
     Piano::Ptr                          currentPiano;
@@ -75,33 +100,39 @@ public:
     StringArray                         galleryNames;
     String                              currentGallery;
     
+    StringArray                         soundfontNames;
+    String                              currentSoundfont;
+    StringArray                         instrumentNames;
+    String                              currentInstrumentName;
+    int                                 currentInstrument;
+    
     bool                                defaultLoaded;
     String                              defaultName;
-    
-#if TRY_UNDO
-    Piano::PtrArr                       history;
-    int epoch;
-    
-    void updateHistory(void);
-    
-    void timeTravel(bool forward);
-#endif
-    
+
     void updateGalleries(void);
     
     void collectGalleries(void);
+    void collectSoundfonts(void);
     void collectGalleriesFromFolder(File folder);
+    void collectSoundfontsFromFolder(File folder);
     
     void updateUI(void);
     
     Array<bool>                         noteOn; //which notes are on, for the UI
     Array<bool>                         getNoteOns() { return noteOn; }
+    Array<float>                        noteVelocity;
     
     void                                noteOnUI (int noteNumber) { if(didLoadMainPianoSamples) notesOnUI.add(noteNumber); }
     void                                noteOffUI(int noteNumber) { if(didLoadMainPianoSamples) notesOffUI.add(noteNumber); }
     
     int                                 noteOnCount;
     bool                                allNotesOff;
+    
+    int count;
+    
+    int note;
+    int notes[3];
+    int times[3];
 
     int channel;
 
@@ -110,7 +141,7 @@ public:
     
     
     //==============================================================================
-    void loadPianoSamples(BKSampleLoadType type);
+    void loadSamples(BKSampleLoadType type, String path ="", int subsound=0);
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
@@ -152,21 +183,6 @@ public:
     double getLevelL();
     double getLevelR();
 
-    /*
-    void saveOnClose() override
-    {
-        DBG("SAVE ON CLOSE CALLED");
-        saveCurrentGallery();
-    }
-    
-
-    bool isDirty() override
-    {
-        return gallery->isGalleryDirty();
-    }
-     */
-
-
     BKItem::PtrArr clipboard;
     
     inline void setClipboard(BKItem::PtrArr items)
@@ -205,17 +221,94 @@ public:
     
     double progress;
     double progressInc;
-    bool didLoadHammersAndRes, didLoadMainPianoSamples;
+    bool didLoadHammersAndRes, didLoadMainPianoSamples, shouldLoadDefault;
     
     void clearBitKlavier(void);
     
+    bool firstTime;
+    inline void setSustainInversion(bool sus)
+    {
+        sustainInverted = sus;
+        
+        if (sustainInverted)
+        {
+            if(sustainIsDown)
+            {
+                sustainIsDown = false;
+                
+                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                    currentPiano->activePMaps[p]->sustainPedalReleased();
+                
+                if(prevPiano != currentPiano)
+                {
+                    DBG("sustain inverted, sustain is now released");
+                    for (int p = prevPiano->activePMaps.size(); --p >= 0;)
+                        prevPiano->activePMaps[p]->sustainPedalReleased(true);
+                }
+            }
+            else
+            {
+                sustainIsDown = true;
+                DBG("sustain inverted, sustain is now pressed");
+                
+                if (firstTime) {firstTime = false; return;}
+                else
+                {
+                    for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                        currentPiano->activePMaps[p]->sustainPedalPressed();
+                }
+            }
+        }
+        else
+        {
+            if(!sustainIsDown)
+            {
+                sustainIsDown = false;
+                
+                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                    currentPiano->activePMaps[p]->sustainPedalReleased();
+                
+                if(prevPiano != currentPiano)
+                {
+                    for (int p = prevPiano->activePMaps.size(); --p >= 0;)
+                        prevPiano->activePMaps[p]->sustainPedalReleased(true);
+                }
+            }
+            else
+            {
+                sustainIsDown = true;
+                
+                if (firstTime) {firstTime = false; return;}
+                else
+                {
+                    for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                        currentPiano->activePMaps[p]->sustainPedalPressed();
+                }
+            }
+        }
+    }
+
+    
+    inline bool getSustainInversion(void) { return sustainInverted; }
+    
+    inline String getCurrentSoundfontName(void)
+    {
+        return (currentSoundfont.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf", false, true));
+    }
+    
 private:
     
+
     int  currentPianoId;
     
-    bool sustainIsDown;
+    bool sustainIsDown = false;
+    bool sustainInverted = false;
+    bool noteOnSetsNoteOffVelocity = true;
+   
+    void sustainActivate(void);
+    void sustainDeactivate(void);
     
-    double bkSampleRate;
+    double pitchbendVal;
     
     BKSampleLoader loader;
     
@@ -228,6 +321,10 @@ private:
     Array<int> notesOffUI;
     
     File lastGalleryPath;
+    
+    AudioPlayHead* playHead;
+    AudioPlayHead::CurrentPositionInfo currentPositionInfo;
+    double hostTempo;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)
