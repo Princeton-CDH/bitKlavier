@@ -683,5 +683,3 @@ void MainViewController::timerCallback()
     
     
 }
-
-

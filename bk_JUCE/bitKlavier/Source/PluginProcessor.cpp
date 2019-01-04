@@ -101,7 +101,7 @@ mainPianoSynth(),
 hammerReleaseSynth(),
 resonanceReleaseSynth(),
 pedalSynth(),
-currentSampleType(BKLoadNil),
+currentSampleType(BKLoadLite),
 loader(*this),
 shouldLoadDefault(true)
 {
@@ -1040,7 +1040,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         }
         else if (type == TuningSpringIntervalWeights)
         {
-            for (int i = 0; i < 128; i++)
+            for (int i = 0; i < 12; i++)
             {
                 if (mod->getSpringWeightActive(i)) active->getSpringTuning()->setSpringWeight(i, modfa[i]);
             }

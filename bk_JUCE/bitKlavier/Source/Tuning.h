@@ -313,6 +313,8 @@ public:
     inline Spring::PtrArr getSprings(void) { return getSpringTuning()->getSprings(); }
     inline Spring::PtrArr getTetherSprings(void) { return getSpringTuning()->getTetherSprings(); }
     
+    inline Spring::PtrArr getEnabledSprings(void) { return getSpringTuning()->getEnabledSprings(); }
+    
     inline void setSpringWeight(int which, double weight)
     {
         getSpringTuning()->setSpringWeight(which, weight);
@@ -323,10 +325,12 @@ public:
         getSpringTuning()->setTetherWeight(which, weight);
     }
     
+    /*
     inline void setTetherLock(int which, bool lock)
     {
         getSpringTuning()->setTetherLock(which, lock);
     }
+     */
     
     inline bool getTetherLock(int which)
     {
@@ -350,7 +354,7 @@ private:
     // basic tuning settings, for static tuning
     TuningSystem    tScale;               //which tuning system to use
     PitchClass      tFundamental;               //fundamental for tuning system
-    float           tFundamentalOffset;         //offset
+    float           tFundamentalOffset;         //offset, in MIDI fractional offset
     
     // adaptive tuning params
     TuningSystem    tAdaptiveIntervalScale;     //scale to use to determine successive interval tuning

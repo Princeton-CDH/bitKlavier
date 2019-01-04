@@ -40,11 +40,9 @@ public:
 	void toggleNote(int noteIndex);
     
 	void updateNotes();
-	void updateFreq();
-
-	void addSpring(Spring* s);
-	void removeSpring(Spring* s);
+    void updateFreq();
     
+   
 	void addSpringsByNote(int pc);
 	void removeSpringsByNote(int removeIndex);
 	void addSpringsByInterval(double interval);
@@ -72,7 +70,7 @@ public:
     {
         stiffness = stiff;
         
-        for (auto spring : springArray)
+        for (auto spring : enabledSpringArray)
         {
             spring->setStiffness(stiffness);
         }
@@ -86,7 +84,6 @@ public:
     inline void setTetherStiffness(double stiff)
     {
         tetherStiffness = stiff;
-        DBG("setTetherStiffness: " + String(stiff));
         for (auto spring : tetherSpringArray)
         {
             spring->setStiffness(tetherStiffness);
@@ -96,8 +93,9 @@ public:
     inline void setIntervalStiffness(double stiff)
     {
         intervalStiffness = stiff;
-        DBG("setIntervalStiffness: " + String(stiff));
-        for (auto spring : springArray)
+        DBG("setIntervalStiffness"  + String(stiff));
+        
+        for (auto spring : enabledSpringArray)
         {
             spring->setStiffness(intervalStiffness);
         }
@@ -183,24 +181,54 @@ public:
     Particle::PtrArr& getParticles(void) { return particleArray;}
     Spring::PtrArr& getSprings(void) { return springArray;}
     
-    bool getTetherSpringEnabled(int which);
-    bool getSpringEnabled(int which);
+    Spring::PtrArr& getEnabledSprings(void) { return enabledSpringArray;}
     
     String getTetherSpringName(int which);
     
     String getSpringName(int which);
     
     void setTetherTuning(Array<float> tuning);
-    Array<float> getTetherTuning(void){return tetherTuning;}
+    Array<float> getTetherTuning(void) {return tetherTuning;}
+    
+    void setTetherFundamental(PitchClass  newfundamental);
+    int getTetherFundamental(void) {return tetherFundamental;}
     
     void setIntervalTuning(Array<float> tuning);
     Array<float> getIntervalTuning(void){return intervalTuning;}
+    
+    void setIntervalFundamental(PitchClass  newfundamental)
+    {
+        intervalFundamental = newfundamental;
+        DBG("setIntervalFundamental " + String(intervalFundamental));
+        
+        if(newfundamental == 12) setUsingFundamentalForIntervalSprings(false);
+        else setUsingFundamentalForIntervalSprings(true);
+        
+        if(newfundamental == 13) useLowestNoteForFundamental = true;
+        else useLowestNoteForFundamental = false;
+        
+        if(newfundamental == 14) useHighestNoteForFundamental = true;
+        else useHighestNoteForFundamental = false;
+        
+        if(newfundamental == 15) useLastNoteForFundamental = true;
+        else useLastNoteForFundamental = false;
+    }
+    PitchClass getIntervalFundamental(void) {DBG("getIntervalFundamental " + String(intervalFundamental)); return intervalFundamental;}
+    
+    void retuneIndividualSpring(Spring::Ptr spring);
+    void retuneAllActiveSprings(void);
     
     void setSpringWeight(int which, double weight);
     double getSpringWeight(int which);
     
     void setTetherWeight(int which, double weight);
     double getTetherWeight(int which);
+    
+    void setUsingFundamentalForIntervalSprings(bool use) { usingFundamentalForIntervalSprings = use; }
+    bool getUsingFundamentalForIntervalSprings(void) { return usingFundamentalForIntervalSprings; }
+    
+    int getLowestActiveParticle();
+    int getHighestActiveParticle();
     
     ValueTree getState(void)
     {
@@ -212,8 +240,10 @@ public:
         prep.setProperty( "intervalStiffness", intervalStiffness, 0);
         prep.setProperty( "stiffness", stiffness, 0);
         prep.setProperty( "active", active ? 1 : 0, 0);
-        prep.setProperty( "scaleId", scaleId, 0);
-
+        prep.setProperty( "intervalTuningId", scaleId, 0);
+        prep.setProperty( "intervalFundamental", (int)intervalFundamental, 0);
+        //prep.setProperty( "usingFundamentalForIntervalSprings", (int)usingFundamentalForIntervalSprings, 0);
+    
         ValueTree tethers( "tethers");
         ValueTree springs( "springs");
         ValueTree tetherLocks( "locks");
@@ -223,7 +253,7 @@ public:
         {
             tethers.setProperty( "t"+String(i), getTetherWeight(i), 0 );
         }
-        
+
         for (int i = 0; i < 12; i++)
         {
             springs.setProperty( "s"+String(i), getSpringWeight(i), 0 );
@@ -249,7 +279,10 @@ public:
         setTetherStiffness(e->getStringAttribute("tetherStiffness").getDoubleValue());
         setIntervalStiffness(e->getStringAttribute("intervalStiffness").getDoubleValue());
         
-        scaleId = (TuningSystem) e->getStringAttribute("scaleId").getIntValue();
+        scaleId = (TuningSystem) e->getStringAttribute("intervalTuningId").getIntValue();
+        setIntervalFundamental((PitchClass) e->getStringAttribute("intervalFundamental").getIntValue());
+        DBG("getIntervalFundamental = " + String(getIntervalFundamental()));
+        //usingFundamentalForIntervalSprings = (bool) e->getStringAttribute("usingFundamentalForIntervalSprings").getIntValue();
         
         forEachXmlChildElement (*e, sub)
         {
@@ -299,6 +332,7 @@ public:
                     }
                 }
             }
+            
             else if (sub->hasTagName("locks"))
             {
                 for (int i = 0; i < 12; i++)
@@ -322,6 +356,7 @@ public:
     inline void setTetherLock(int pc, bool tl) { tetherLocked[pc] = tl;}
     inline bool getTetherLock(int pc) { return tetherLocked[pc];}
     
+    
     inline Array<bool> getTethersLocked(void)
     {
         Array<bool> locked;
@@ -333,6 +368,7 @@ public:
         
         return locked;
     }
+    
     
     inline void setActive(bool status) { active = status; }
     inline bool getActive(void) { return active; }
@@ -354,19 +390,34 @@ private:
     double drag;
     
     bool active;
+    bool usingFundamentalForIntervalSprings;
+    bool useLowestNoteForFundamental;
+    bool useHighestNoteForFundamental;
+    bool useLastNoteForFundamental;
+    //int intervalSpringsFundamental;
     
     TuningSystem scaleId;
+    Array<float> intervalTuning;
+    PitchClass intervalFundamental;
+    
+    Array<float> tetherTuning;
+    TuningSystem tetherTuningId;
+    PitchClass tetherFundamental;
 
     Particle::PtrArr    particleArray;
-    Spring::PtrArr      springArray; // efficiency fix: make this ordered by spring interval 
+    Spring::PtrArr      springArray; // efficiency fix: make this ordered by spring interval
     
     Particle::PtrArr    tetherParticleArray;
     Spring::PtrArr      tetherSpringArray;
     
+    Spring::PtrArr      enabledSpringArray;
+    Spring::PtrArr      enabledParticleArray;
+    
     bool tetherLocked[12];
     
-    Array<float> tetherTuning;
-    Array<float> intervalTuning;
+    float springWeights[13];
+    
+    void addSpring(Spring::Ptr spring);
     
     /*
     Spring::PtrArr activeTetherSprings;

@@ -190,8 +190,10 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     galleryMenu.addItem(CLEAN_ID, "Clean");
     
+#if JUCE_IOs
     galleryMenu.addSeparator();
     galleryMenu.addSubMenu("Load samples...", getLoadMenu());
+#endif
     
     // ~ ~ ~ share menu ~ ~ ~
     if (!processor.defaultLoaded)

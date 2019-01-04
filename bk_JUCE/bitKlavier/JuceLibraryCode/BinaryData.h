@@ -90,19 +90,19 @@ namespace BinaryData
     const int            _27__PianoMapGallery_xmlSize = 32187;
 
     extern const char*   _28__Spring_Tuning_1_xml;
-    const int            _28__Spring_Tuning_1_xmlSize = 10710;
+    const int            _28__Spring_Tuning_1_xmlSize = 10796;
 
     extern const char*   _29__Spring_Tuning_2_xml;
-    const int            _29__Spring_Tuning_2_xmlSize = 10904;
+    const int            _29__Spring_Tuning_2_xmlSize = 10999;
 
     extern const char*   _30__Spring_Tuning_3_xml;
-    const int            _30__Spring_Tuning_3_xmlSize = 10922;
+    const int            _30__Spring_Tuning_3_xmlSize = 11018;
 
     extern const char*   _31__Spring_Tuning_4_xml;
-    const int            _31__Spring_Tuning_4_xmlSize = 10748;
+    const int            _31__Spring_Tuning_4_xmlSize = 10796;
 
     extern const char*   _32__Spring_Tuning_5_xml;
-    const int            _32__Spring_Tuning_5_xmlSize = 10710;
+    const int            _32__Spring_Tuning_5_xmlSize = 10777;
 
     extern const char*   And_So_xml;
     const int            And_So_xmlSize = 7254;

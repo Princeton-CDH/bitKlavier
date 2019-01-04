@@ -114,6 +114,8 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         double sourceSampleRate = region->sample->getSampleRate();
 
         AudioSampleBuffer* sourceBuffer = region->sample->getBuffer();
+    
+        if (sourceBuffer == NULL) continue;
         
         BKReferenceCountedBuffer::Ptr buffer = new BKReferenceCountedBuffer(region->sample->getShortName(), 1, (int)sampleLength);
         

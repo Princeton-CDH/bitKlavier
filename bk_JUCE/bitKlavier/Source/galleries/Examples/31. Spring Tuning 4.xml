@@ -2,7 +2,7 @@
 
 <gallery name="31. Spring Tuning 4" sampleType="3" soundfontURL="" soundfontInst="0"
          defaultPiano="1">
-  <idCount i0="16" i1="28" i2="24" i3="20" i4="16" i5="1549" i6="10" i7="10"
+  <idCount i0="16" i1="28" i2="24" i3="20" i4="16" i5="1551" i6="10" i7="10"
            i8="10" i9="12" i10="10" i11="10" i12="10" i13="12" i14="30"
            i15="0"/>
   <general globalGain="1.0" tempoMultiplier="1.0" tuningFund="440.0" invertSustain="0"
@@ -16,9 +16,9 @@
     <customScale f0="0.0" f1="0.0" f2="0.0" f3="0.0" f4="0.0" f5="0.0" f6="0.0"
                  f7="0.0" f8="0.0" f9="0.0" f10="0.0" f11="0.0"/>
     <absoluteOffsets/>
-    <springtuning rate="100.0" drag="1.0" tetherStiffness="0.03919999999999999873"
-                  intervalStiffness="0.63240000000000007319" stiffness="1.0" active="1"
-                  scaleId="1">
+    <springtuning rate="100.0" drag="0.90909090909090906063" tetherStiffness="0.5"
+                  intervalStiffness="0.5" stiffness="1.0" active="1" intervalTuningId="1"
+                  intervalFundamental="15">
       <tethers t0="0.5" t1="0.5" t2="0.5" t3="0.5" t4="0.5" t5="0.5" t6="0.5"
                t7="0.5" t8="0.5" t9="0.5" t10="0.5" t11="0.5" t12="0.5" t13="0.5"
                t14="0.5" t15="0.5" t16="0.5" t17="0.5" t18="0.5" t19="0.5" t20="0.5"
@@ -56,7 +56,7 @@
                  f7="0.0" f8="0.0" f9="0.0" f10="0.0" f11="0.0"/>
     <absoluteOffsets/>
     <springtuning rate="100.0" drag="0.0" tetherStiffness="0.5" intervalStiffness="0.5"
-                  stiffness="1.0" active="0" scaleId="1">
+                  stiffness="1.0" active="0" intervalTuningId="0" intervalFundamental="0">
       <tethers t0="0.5" t1="0.5" t2="0.5" t3="0.5" t4="0.5" t5="0.5" t6="0.5"
                t7="0.5" t8="0.5" t9="0.5" t10="0.5" t11="0.5" t12="0.5" t13="0.5"
                t14="0.5" t15="0.5" t16="0.5" t17="0.5" t18="0.5" t19="0.5" t20="0.5"

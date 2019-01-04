@@ -166,6 +166,7 @@ const String ptagTuning_active = "active";
 const String ptagTuning_tetherWeights = "tweights";
 const String ptagTuning_springWeights = "sweights";
 const String ptagTuning_intervalScale = "iscale";
+const String ptagTuning_intervalScaleFundamental = "iscalefundamental";
 
 const String vtagKeymaps = "keymaps";
 const String vtagKeymap =  "keymap";
@@ -615,6 +616,7 @@ typedef enum TuningParameterType
     TuningSpringTetherWeights,
     TuningSpringIntervalWeights,
     TuningSpringIntervalScale,
+    TuningSpringIntervalFundamental,
     TuningParameterTypeNil
     
 } TuningParameterType;
@@ -644,6 +646,7 @@ static const std::vector<BKParameterDataType> cTuningDataTypes = {
     BKBool,
     BKFloatArr,
     BKFloatArr,
+    BKInt,
     BKInt
 };
 
@@ -672,7 +675,8 @@ static const std::vector<std::string> cTuningParameterTypes = {
     "SpringActive",
     "SpringTetherWeights",
     "SpringIntervalWeights",
-    "SpringIntervalScale"
+    "SpringIntervalScale",
+    "SpringIntervalFundamental"
 };
 
 
@@ -778,7 +782,7 @@ static const std::vector<std::string> cKeymapParameterTypes = {
 
 typedef enum BKSampleLoadType
 {
-    BKLoadLitest,
+    BKLoadLitest = 0,
     BKLoadLite,
     BKLoadMedium,
     BKLoadHeavy,

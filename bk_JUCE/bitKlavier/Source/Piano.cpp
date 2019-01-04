@@ -860,6 +860,7 @@ void Piano::configureTuningModification(TuningModPreparation::Ptr mod, Array<int
         }
     }
     
+    DBG("whicpreps: " + intArrayToString(whichPreps));
     mod->setPreps(whichPreps);
     
     deconfigureTuningModificationForKeys(mod, otherKeys);
