@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="2.3-beta3"
+<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="2.3"
               bundleIdentifier="com.manyarrowsmusic.bitKlavier" includeBinaryInAppConfig="1"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
@@ -457,9 +457,8 @@
         <MODULEPATH id="SFZero" path="../../../JUCE/3p_modules/SFZero/modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
-    <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="C:\Users\plork\Documents\SDKs\VST3_SDK"
-            bigIcon="iHGLGD" smallIcon="smHM8h" windowsTargetPlatformVersion="10.0.16299.0"
-            vstLegacyFolder="C:\Users\plork\Documents\SDKs\VST2_SDK">
+    <VS2017 targetFolder="Builds/VisualStudio2017" bigIcon="iHGLGD" smallIcon="smHM8h"
+            windowsTargetPlatformVersion="10.0.16299.0" vstLegacyFolder="C:\Users\plork\Documents\SDKs\VST2_SDK">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="1" optimisation="1" targetName="bitKlavier" debugInformationFormat="ProgramDatabase"
