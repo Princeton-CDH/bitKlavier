@@ -980,9 +980,6 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modfa = tMod[i]->getModFloatArr();
         modia = tMod[i]->getModIntArr();
         
-        
-        //DBG("p" + String(i) + " " + mod->getParam((TuningParameterType)i));
-        
         if (type == TuningScale)
         {
             active->setScale((TuningSystem)modi);
@@ -1053,6 +1050,43 @@ void BKAudioProcessor::performModifications(int noteNumber)
             Array<float> scale = tuning->getScaleCents(springScaleId);
             
             active->getSpringTuning()->setIntervalTuning(scale);
+        }
+        else if (type == TuningSpringIntervalFundamental)
+        {
+            active->getSpringTuning()->setIntervalFundamental((PitchClass)modi);
+        }
+        else if (type == TuningAdaptiveSystem)
+        {
+            TuningAdaptiveSystemType atype = (TuningAdaptiveSystemType) modi;
+            
+            if (atype == AdaptiveSpring)
+            {
+                active->getSpringTuning()->setActive(true);
+                
+                active->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
+                
+                TuningSystem springScaleId = active->getSpringTuning()->getScaleId();
+                Array<float> scale = tuning->getScaleCents(springScaleId);
+                active->getSpringTuning()->setIntervalTuning(scale);
+            }
+            else
+            {
+                active->getSpringTuning()->setActive(false);
+            }
+            
+            if (atype == AdaptiveNormal)
+            {
+                active->setScaleByName(cTuningSystemNames[AdaptiveTuning]);
+            }
+            else if (atype == AdaptiveAnchored)
+            {
+                active->setScaleByName(cTuningSystemNames[AdaptiveAnchoredTuning]);
+            }
+            else // AdaptiveNone
+            {
+                active->setScale(active->getScale());
+            }
+            
         }
         
         updateState->tuningPreparationDidChange = true;
@@ -1289,6 +1323,7 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
 
 void BKAudioProcessor::saveCurrentGallery(void)
 {
+    if (defaultLoaded) return;
     if (gallery->getURL() == "")
     {
 #if JUCE_IOS

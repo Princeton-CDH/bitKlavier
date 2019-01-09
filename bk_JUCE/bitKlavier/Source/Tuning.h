@@ -61,6 +61,7 @@ public:
         tAbsolute = p->getAbsoluteOffsets();
         nToneSemitoneWidth = p->getNToneSemitoneWidth();
         nToneRoot = p->getNToneRoot();
+        adaptiveType = p->getAdaptiveType();
         stuning->copy(p->getSpringTuning());
         //stuning = new SpringTuning(p->getSpringTuning());
     }
@@ -233,11 +234,17 @@ public:
     }
     
     inline void setName(String n)                                           {name = n; DBG("set tuning name " + name);}
-    inline void setScale(TuningSystem tuning)                               {tScale = tuning;}
+    inline void setScale(TuningSystem tuning)
+    {
+        if (tuning != AdaptiveTuning && tuning != AdaptiveAnchoredTuning)
+        {
+           tScale = tuning;
+        }
+    }
+    
     inline void setScaleByName(String tuningName)
     {
-        //DBG("set tuning system by name: " + tuningName);
-        for(int i=0; i<cTuningSystemNames.size(); i++)
+        for (int i=0; i<cTuningSystemNames.size(); i++)
         {
             if(cTuningSystemNames[i] == tuningName) {
                 setScale((TuningSystem)i);
@@ -349,6 +356,9 @@ public:
     inline TuningSystem getCurrentSpringScaleId(void) { return getSpringTuning()->getScaleId(); }
     // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     
+    inline void setAdaptiveType (TuningAdaptiveSystemType type) { adaptiveType = type; }
+    inline TuningAdaptiveSystemType getAdaptiveType (void) { return adaptiveType; }
+    
 private:
     String name;
     // basic tuning settings, for static tuning
@@ -366,6 +376,8 @@ private:
     uint64          tAdaptiveClusterThresh;     //ms; max time before fundamental is reset
     int             tAdaptiveHistory;           //cluster max; max number of notes before fundamental is reset
     
+    
+    
     // custom scale and absolute offsets
     Array<float>    tCustom = Array<float>({0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}); //custom scale
     Array<float>    tAbsolute;  //offset (in MIDI fractional offsets, like other tunings) for specific notes; size = 128
@@ -377,6 +389,8 @@ private:
     
     // SPRING TUNING STUFF
     SpringTuning::Ptr stuning;
+    
+    TuningAdaptiveSystemType adaptiveType;
     
     JUCE_LEAK_DETECTOR(TuningPreparation);
 };

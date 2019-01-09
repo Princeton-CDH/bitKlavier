@@ -52,19 +52,16 @@ showSprings(false)
     
     }
     
+    adaptiveSystemsCB.setName("Adaptive");
+    adaptiveSystemsCB.setTooltip("Select an adaptive tuning system.");
+    adaptiveSystemsCB.setEnabled(true);
+    adaptiveSystemsCB.toFront(true);
+    addAndMakeVisible(adaptiveSystemsCB);
     
-    springTuningToggle.setColour(ToggleButton::textColourId, Colours::antiquewhite);
-    springTuningToggle.setColour(TextButton::buttonOnColourId, Colours::red.withMultipliedAlpha(0.5));
-    springTuningToggle.setColour(ToggleButton::tickDisabledColourId, Colours::antiquewhite);
-    springTuningToggle.setClickingTogglesState(true);
-    springTuningToggle.setTooltip("Turns on/off Spring Tuning.");
-    springTuningToggle.setAlwaysOnTop(true);
-    springTuningToggle.setButtonText("Springs");
-    addChildComponent(springTuningToggle);
-    
-    springTuningLabel.setText("Springs", dontSendNotification);
-    springTuningLabel.setJustificationType(Justification::left);
-    springTuningLabel.setColour(Label::ColourIds::textColourId, Colours::antiquewhite);
+    adaptiveSystemsCB.addItem("Non-adaptive", 1);
+    adaptiveSystemsCB.addItem("Adaptive Tuning", 2);
+    adaptiveSystemsCB.addItem("Adaptive Anchored", 3);
+    adaptiveSystemsCB.addItem("Spring", 4);
 
     rateSlider = new BKSingleSlider("rate", 5., 400., 100., 1);
     rateSlider->setJustifyRight(false);
@@ -103,7 +100,7 @@ showSprings(false)
     addAndMakeVisible(selectCB);
     
     scaleCB.setName("Scale");
-    scaleCB.setTooltip("Select from a range of preset temperaments; open the Adaptive Tuning settings");
+    scaleCB.setTooltip("Select from a range of preset temperaments");
     addAndMakeVisible(scaleCB);
     
     springScaleCB.setName("SpringTuning Scale");
@@ -269,7 +266,7 @@ void TuningViewController::resized()
     Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
     modeSlice.removeFromLeft(gXSpacing);
     modeSlice.removeFromRight(gXSpacing);
-    springTuningToggle.setBounds(modeSlice.removeFromLeft(showSpringsButton.getWidth()));
+    adaptiveSystemsCB.setBounds(modeSlice.removeFromLeft(showSpringsButton.getWidth()));
     modeSlice.removeFromLeft(gXSpacing);
     scaleCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
     
@@ -588,6 +585,8 @@ void TuningViewController::fillTuningCB(void)
     int count =0;
     for (int i = 0; i < cTuningSystemNames.size(); i++) //&& if(i<=8), for original systems; otherwise add to submenu of historical temperaments
     {
+        if (i == 3 || i == 4) continue;
+        
         String name = cTuningSystemNames[i];
         
         if(i<=8) //original bK scales
@@ -595,16 +594,7 @@ void TuningViewController::fillTuningCB(void)
             scaleCB.addItem(name, i+1);
             A1IntervalScaleCB.addItem(name, i+1);
             A1AnchorScaleCB.addItem(name, i+1);
-        
-            if(name == "Adaptive Tuning 1" || name == "Adaptive Anchored Tuning 1")
-            {
-                A1IntervalScaleCB.setItemEnabled(i+1, false);
-                A1AnchorScaleCB.setItemEnabled(i+1, false);
-            }
-            else
-            {
-                springScaleCB.addItem(name, ++count);
-            }
+            springScaleCB.addItem(name, ++count);
         }
                 
         if(name == "Custom") {
@@ -632,6 +622,7 @@ void TuningViewController::fillTuningCB(void)
             variousMenu2->addItem(i+1, name);
         }
     }
+    
     scaleCB.addSeparator();
     additionalTuningsPopUp->addSubMenu("Historical", *submenus.getUnchecked(0));
     additionalTuningsPopUp->addSubMenu("Various", *submenus.getUnchecked(1));
@@ -694,11 +685,11 @@ void TuningViewController::updateComponentVisibility()
     lastInterval.setVisible(true);
     lastNote.setVisible(true);
     offsetSlider->setVisible(true);
-    springTuningToggle.setVisible(true);
-    springTuningLabel.setVisible(true);
+    adaptiveSystemsCB.setVisible(true);
+    adaptiveSystemsCB.toFront(true);
     showSpringsButton.setVisible(true);
     
-    if(scaleCB.getText() == "Adaptive Tuning 1")
+    if (adaptiveSystemsCB.getText() == "Adaptive Tuning")
     {
         A1IntervalScaleCB.setVisible(true);
         A1Inversional.setVisible(true);
@@ -716,7 +707,7 @@ void TuningViewController::updateComponentVisibility()
         nToneSemitoneWidthSlider->setVisible(false);
 
     }
-    else if(scaleCB.getText() == "Adaptive Anchored Tuning 1")
+    else if(adaptiveSystemsCB.getText() == "Adaptive Anchored")
     {
         A1IntervalScaleCB.setVisible(true);
         A1Inversional.setVisible(true);
@@ -970,7 +961,7 @@ TuningViewController(p, theGraph)
         tetherSliders[i]->addListener(this);
     }
     
-    springTuningToggle.addListener(this);
+    adaptiveSystemsCB.addListener(this);
     rateSlider->addMyListener(this);
     dragSlider->addMyListener(this);
     intervalStiffnessSlider->addMyListener(this);
@@ -1115,32 +1106,16 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (box == &scaleCB)
     {
-
         DBG("name of scale chosen: " + box->getItemText(index));
-        //prep->setScale((TuningSystem) index);
-        //active->setScale((TuningSystem) index);
         
         //redoing this so we index by tuning name, rather than index, so we don't lock the menu structure down
         prep->setScaleByName(box->getItemText(index));
         active->setScaleByName(box->getItemText(index));
-        
-        //DBG("current tuning from processor = " + String(processor.updateState->currentTuningId));
-        //DBG("current TuningSystem " + cTuningSystemNames[index]);
+
         DBG("current TuningSystem " + prep->getScaleName());
         customKeyboard.setValues(tuning->getCurrentScaleCents());
         
-        //just for printing offsets out; temporary
-        /*
-        Array<float> tuningOffsets = tuning->getCurrentScale();
-        String offsetString = " ";
-        for(int i=0; i<tuningOffsets.size(); i++)
-        {
-            offsetString += (String(tuningOffsets.getUnchecked(i)) + ", ");
-        }
-        DBG("scale offsets: " + offsetString);
-        */
-        
-        if(active->getSpringsActive())
+        if (active->getSpringsActive())
         {
             prep->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
             active->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
@@ -1153,6 +1128,59 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         
         updateComponentVisibility();
         
+    }
+    else if (box == &adaptiveSystemsCB)
+    {
+        TuningAdaptiveSystemType type = (TuningAdaptiveSystemType) index;
+        
+        // SpringTuning selected
+        if (type == AdaptiveSpring)
+        {
+            prep->getSpringTuning()->setActive(true);
+            active->getSpringTuning()->setActive(true);
+            
+            prep->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
+            active->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
+            
+            //need to make sure the interval scale is also set; i'm finding that sometimes i have to manually change away from just and back to get the system to work
+            TuningSystem springScaleId = prep->getSpringTuning()->getScaleId();
+            Array<float> scale = tuning->getScaleCents(springScaleId);
+            prep->getSpringTuning()->setIntervalTuning(scale);
+            active->getSpringTuning()->setIntervalTuning(scale);
+        }
+        else
+        {
+            prep->getSpringTuning()->setActive(false);
+            active->getSpringTuning()->setActive(false);
+            
+            prep->getSpringTuning()->setTetherTuning(EqualTemperament);
+            active->getSpringTuning()->setTetherTuning(EqualTemperament);
+        }
+        
+        
+        if (type == AdaptiveNone) // Non-adaptive
+        {
+            //redoing this so we index by tuning name, rather than index, so we don't lock the menu structure down
+            prep->setScaleByName(scaleCB.getText());
+            active->setScaleByName(scaleCB.getText());
+        }
+        else if (type == AdaptiveNormal) // Adaptive Tuning
+        {
+            //redoing this so we index by tuning name, rather than index, so we don't lock the menu structure down
+            prep->setScaleByName(box->getItemText(AdaptiveTuning));
+            active->setScaleByName(box->getItemText(AdaptiveTuning));
+        }
+        else if (type == AdaptiveAnchored) // Adaptive Anchored
+        {
+            //redoing this so we index by tuning name, rather than index, so we don't lock the menu structure down
+            prep->setScaleByName(box->getItemText(AdaptiveAnchoredTuning));
+            active->setScaleByName(box->getItemText(AdaptiveAnchoredTuning));
+        }
+        
+        DBG("current TuningSystem " + prep->getScaleName());
+        customKeyboard.setValues(tuning->getCurrentScaleCents());
+        
+        updateComponentVisibility();
     }
     else if (box == &fundamentalCB)
     {
@@ -1229,6 +1257,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         DBG("current springtuning interval Fundamental = " + String(index));
     }
     
+    
     processor.gallery->setGalleryDirty(true);
 }
 
@@ -1286,11 +1315,16 @@ void TuningPreparationEditor::update(void)
     if (prep != nullptr)
     {
         selectCB.setSelectedId(processor.updateState->currentTuningId, dontSendNotification);
-        scaleCB.setSelectedItemIndex(prep->getScale(), dontSendNotification);
+        int scaleIndex = prep->getScale();
+        scaleIndex = (scaleIndex >= AdaptiveTuning) ? scaleIndex - 2 : scaleIndex;
+        scaleCB.setSelectedItemIndex(scaleIndex, dontSendNotification);
         
         int springScaleId = prep->getCurrentSpringScaleId();
         if (springScaleId >= AdaptiveTuning) springScaleId = (TuningSystem)((int)springScaleId - 2);
         springScaleCB.setSelectedItemIndex(springScaleId, dontSendNotification);
+        
+        DBG("springScaleFundamentalCB.setSelectedItemIndex " + String(prep->getSpringTuning()->getIntervalFundamental()));
+        springScaleFundamentalCB.setSelectedItemIndex((int)prep->getSpringTuning()->getIntervalFundamental(), dontSendNotification);
         
         fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
         offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
@@ -1315,21 +1349,20 @@ void TuningPreparationEditor::update(void)
         tetherStiffnessSlider->setValue(prep->getSpringTuning()->getTetherStiffness(), dontSendNotification);
         intervalStiffnessSlider->setValue(prep->getSpringTuning()->getIntervalStiffness(), dontSendNotification);
 
-        springTuningToggle.setToggleState(prep->getSpringsActive(), dontSendNotification);
+        // springs active or adaptive tuning
+        adaptiveSystemsCB.setSelectedItemIndex(prep->getAdaptiveType(), dontSendNotification);
 
         //dragSlider->setValue(  //must remember to use dt_asym_inversion on 1 - val)
         double newval = dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->getDrag(), 100.);
         dragSlider->setValue(newval, dontSendNotification);
         
         /*
-        if(!prep->getSpringTuning()->getUsingFundamentalForIntervalSprings())
+        if (!prep->getSpringTuning()->getUsingFundamentalForIntervalSprings())
             springScaleFundamentalCB.setSelectedItemIndex(12, dontSendNotification);
         else
             springScaleFundamentalCB.setSelectedItemIndex(prep->getSpringTuning()->getIntervalFundamental(), dontSendNotification);
         */
-        
-        DBG("springScaleFundamentalCB.setSelectedItemIndex " + String(prep->getSpringTuning()->getIntervalFundamental()));
-        springScaleFundamentalCB.setSelectedItemIndex((int)prep->getSpringTuning()->getIntervalFundamental(), dontSendNotification);
+
     }
     
     updateComponentVisibility();
@@ -1482,33 +1515,6 @@ void TuningPreparationEditor::buttonClicked (Button* b)
     {
         getPrepOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
-    else if (b == &springTuningToggle)
-    {
-        bool state = b->getToggleState();
-        DBG("springTuningToggle " + String((int)state));
-        
-        prep->getSpringTuning()->setActive(state);
-        active->getSpringTuning()->setActive(state);
-        
-        if(state)
-        {
-            prep->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
-            active->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
-        }
-        else
-        {
-            prep->getSpringTuning()->setTetherTuning(EqualTemperament);
-            active->getSpringTuning()->setTetherTuning(EqualTemperament);
-        }
-        
-        //need to make sure the interval scale is also set; i'm finding that sometimes i have to manually change away from just and back to get the system to work
-        TuningSystem springScaleId = prep->getSpringTuning()->getScaleId();
-        Array<float> scale = tuning->getScaleCents(springScaleId);
-        prep->getSpringTuning()->setIntervalTuning(scale);
-        active->getSpringTuning()->setIntervalTuning(scale);
-        
-        updateComponentVisibility();
-    }
 }
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ TuningModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
@@ -1554,7 +1560,7 @@ TuningViewController(p, theGraph)
         tetherSliders[i]->addListener(this);
     }
     
-    springTuningToggle.addListener(this);
+    adaptiveSystemsCB.addListener(this);
     rateSlider->addMyListener(this);
     dragSlider->addMyListener(this);
     intervalStiffnessSlider->addMyListener(this);
@@ -1587,6 +1593,8 @@ void TuningModificationEditor::greyOutAllComponents()
     nToneRootOctaveCB.setAlpha(gModAlpha);
     nToneSemitoneWidthSlider->setDim(gModAlpha);
     
+    springScaleFundamentalCB.setAlpha(gModAlpha);
+    
     for (int i = 0; i < 12; i++)
     {
         springSliders[i]->setAlpha(gModAlpha);
@@ -1597,7 +1605,7 @@ void TuningModificationEditor::greyOutAllComponents()
         tetherSliders[i]->setAlpha(gModAlpha);
     }
     
-    springTuningToggle.setAlpha(gModAlpha);
+    adaptiveSystemsCB.setAlpha(gModAlpha);
     
     rateSlider->setDim(gModAlpha);
     
@@ -1646,7 +1654,7 @@ void TuningModificationEditor::highlightModedComponents()
     }
     if (mod->getParam(TuningSpringActive) != "")
     {
-        springTuningToggle.setAlpha(1);
+        adaptiveSystemsCB.setAlpha(1);
     }
     if (mod->getParam(TuningSpringTetherWeights) != "")
     {
@@ -1667,6 +1675,14 @@ void TuningModificationEditor::highlightModedComponents()
     if (mod->getParam(TuningSpringIntervalScale) != "")
     {
         springScaleCB.setAlpha(1);
+    }
+    if (mod->getParam(TuningSpringIntervalFundamental) != "")
+    {
+        springScaleFundamentalCB.setAlpha(1);
+    }
+    if (mod->getParam(TuningAdaptiveSystem) != "")
+    {
+        adaptiveSystemsCB.setAlpha(1);
     }
     
     repaint();
@@ -1738,8 +1754,9 @@ void TuningModificationEditor::update(void)
         double newval = dt_asymwarp_inverse(1.0f - val.getFloatValue(), 100.);
         dragSlider->setValue(newval, dontSendNotification);
     
-        val = mod->getParam(TuningSpringActive);
-        springTuningToggle.setToggleState((bool)val.getIntValue(), dontSendNotification);
+        val = mod->getParam(TuningAdaptiveSystem);
+        adaptiveSystemsCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
+
         
         Array<float> vals;
         
@@ -1761,6 +1778,11 @@ void TuningModificationEditor::update(void)
         int springScaleId = val.getIntValue();
         if (springScaleId >= AdaptiveTuning) springScaleId = (TuningSystem)((int)springScaleId - 2);
         springScaleCB.setSelectedItemIndex(springScaleId, dontSendNotification);
+        
+        val = mod->getParam(TuningSpringIntervalFundamental);
+        
+        int fund = val.getIntValue();
+        springScaleFundamentalCB.setSelectedItemIndex(fund, dontSendNotification);
     
         updateComponentVisibility();
         A1reset.setVisible(false);
@@ -1906,11 +1928,16 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (box == &scaleCB)
     {
+        int scaleIndex = (index >= AdaptiveTuning) ? index - 2 : index;
         mod->setParam(TuningScale, String(index));
         scaleCB.setAlpha(1.);
         
         Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         customKeyboard.setValues(currentTuning->getCurrentScaleCents());
+    }
+    else if (box == &adaptiveSystemsCB)
+    {
+        mod->setParam(TuningAdaptiveSystem, String(index));
     }
     else if (box == &fundamentalCB)
     {
@@ -1953,6 +1980,12 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
         if (springScaleId >= AdaptiveTuning) springScaleId = (TuningSystem)((int)springScaleId + 2);
         
         mod->setParam(TuningSpringIntervalScale, String(springScaleId));
+    }
+    else if (box == &springScaleFundamentalCB)
+    {
+        int fund = index;
+        
+        mod->setParam(TuningSpringIntervalFundamental, String(fund));
     }
 
     if (name != selectCB.getName()) updateModification();
@@ -2117,14 +2150,6 @@ void TuningModificationEditor::buttonClicked (Button* b)
     else if (b == &showSpringsButton)
     {
         showSprings = !showSprings;
-        
-        updateComponentVisibility();
-    }
-    else if (b == &springTuningToggle)
-    {
-        bool state = b->getToggleState();
-        
-        mod->setParam(TuningSpringActive, String((int) state));
         
         updateComponentVisibility();
     }
