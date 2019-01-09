@@ -377,7 +377,10 @@ void BKAudioProcessor::deleteGallery(void)
     File file(gallery->getURL());
     file.deleteFile();
     
-    loadGalleryFromPath(firstGallery());
+    String first = firstGallery();
+
+    loadGalleryFromPath(first);
+
 }
 
 // Duplicates current gallery and gives it name
@@ -1233,28 +1236,21 @@ void BKAudioProcessor::importCurrentGallery(void)
                           true);
     
     fc->launchAsync (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles,
-                     [this] (const FileChooser& chooser)
-                     {
-                         auto results = chooser.getURLResults();
-                         if (results.size() > 0)
-                         {
-                             auto url = results.getReference (0);
-                             
-                             ScopedPointer<InputStream> wi (url.createInputStream (false));
-                             
-                             if (wi != nullptr)
-                             {
-                                 MemoryBlock block(wi->getTotalLength());
-                                 wi->readIntoMemoryBlock(block);
-                                 
-                                 XmlDocument doc(block.toString());
-                                 ScopedPointer<XmlElement> xml = doc.getDocumentElement();
-                                 
-                                 DBG("url file name: " + url.getFileName().replace("%20", " "));
-                                 createNewGallery(url.getFileName().replace("%20", " "), xml);
-                             }
-                         }
-                     });
+     [this] (const FileChooser& chooser)
+     {
+         auto results = chooser.getURLResults();
+         if (results.size() > 0)
+         {
+             auto url = results.getReference (0);
+            
+             if (url.createInputStream (false) != nullptr)
+             {
+                 ScopedPointer<XmlElement> xml = url.readEntireXmlStream();
+                
+                 createNewGallery(url.getFileName().replace("%20", " "), xml);
+             }
+         }
+     });
 
 }
 
@@ -1436,13 +1432,25 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
 {
     updateState->loadedJson = false;
     
-    File myFile (path);
-    
-    ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
-    
-    loadGalleryFromXml(xml);
-    
-    gallery->setURL(path);
+    if (path == "")
+    {
+        String xmlData = CharPointer_UTF8 (BinaryData::Basic_Piano_xml);
+        
+        defaultLoaded = true;
+        defaultName = "Basic_Piano_xml";
+        
+        loadGalleryFromXml(XmlDocument::parse(xmlData));
+    }
+    else
+    {
+        File myFile (path);
+
+        ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
+
+        loadGalleryFromXml(xml);
+
+        gallery->setURL(path);
+    }
 }
 
 void BKAudioProcessor::loadJsonGalleryDialog(void)

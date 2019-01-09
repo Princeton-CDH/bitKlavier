@@ -350,6 +350,7 @@ void BKItem::bkComboBoxDidChange    (ComboBox* cb)
 
 void BKItem::itemIsBeingDragged(const MouseEvent& e)
 {
+    wasJustDragged = true;
 }
 
 
@@ -370,6 +371,7 @@ void BKItem::mouseDoubleClick(const MouseEvent& e)
     
 }
 
+#define PHATNESS 5
 
 void BKItem::mouseDown(const MouseEvent& e)
 {
@@ -379,12 +381,37 @@ void BKItem::mouseDown(const MouseEvent& e)
     BKConstructionSite* cs = ((BKConstructionSite*)getParentComponent());
     BKItem* current = cs->getCurrentItem();
     
+    if ((current == this) && !wasJustDragged)
+    {
+        if (time < PHATNESS)
+        {
+            if (type == PreparationTypePianoMap)
+            {
+                menu.showPopup();
+            }
+            else
+            {
+                processor.updateState->setCurrentDisplay(type, Id);
+            }
+        }
+        else
+        {
+            time = 0;
+        }
+    }
+    else
+    {
+        wasJustDragged = false;
+        time = 0;
+    }
+    
     cs->setCurrentItem(this);
     
     if (isDraggable)
     {
         prepareDrag(e);
     }
+    
 }
 
 void BKItem::keyPressedWhileSelected(const KeyPress& e)

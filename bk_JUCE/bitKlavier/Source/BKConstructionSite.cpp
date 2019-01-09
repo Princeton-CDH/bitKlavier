@@ -824,7 +824,7 @@ void BKConstructionSite::mouseDrag (const MouseEvent& e)
     repaint();
 #endif
     
-    mouseDragged();
+    if (e.getDistanceFromDragStart() > 50) mouseDragged();
     
     if (itemToSelect == nullptr) lasso->dragLasso(e);
     
