@@ -19,7 +19,7 @@
 
 #include "AudioConstants.h"
 
-#define BK_UNIT_TESTS 0
+#define BK_UNIT_TESTS 1
 
 #define NUM_EPOCHS 10
 

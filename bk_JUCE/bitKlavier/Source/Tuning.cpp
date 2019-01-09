@@ -822,7 +822,7 @@ public:
 	}
 };
 
-static TuningTests directTests;
+static TuningTests tuningTests;
 
 class TuningModTests : public UnitTest
 {

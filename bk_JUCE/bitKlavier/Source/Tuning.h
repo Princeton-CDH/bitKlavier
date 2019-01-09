@@ -112,9 +112,10 @@ public:
 
 		for (int i = 0; i < 21; i++)  r[i] = (Random::getSystemRandom().nextFloat());
 		int idx = 0;
-
-
+        
 		tScale = (TuningSystem)(int)( r[idx++] * TuningSystemNil);
+        if ((tScale == AdaptiveTuning) || (tScale == AdaptiveAnchoredTuning)) tScale = (TuningSystem)((int)tScale +  2);
+        
 		tFundamental = (PitchClass)(int)(r[idx++] * PitchClassNil);
 		tFundamentalOffset = r[idx++] * 48.0f - 24.0f;
 		tAdaptiveIntervalScale = (TuningSystem)(int)(r[idx++] * TuningSystemNil);
@@ -135,6 +136,8 @@ public:
 		}
 		nToneSemitoneWidth = r[idx++] * 200.0f;
 		nToneRoot = (int)(r[idx++] * 127) + 1;
+        
+        stuning->randomize();
 	}
     
     TuningPreparation(TuningSystem whichTuning,
@@ -248,7 +251,6 @@ public:
         {
             if(cTuningSystemNames[i] == tuningName) {
                 setScale((TuningSystem)i);
-                DBG("scale set to: " + getScaleName());
             }
         }
     }
@@ -330,18 +332,6 @@ public:
     inline void setTetherWeight(int which, double weight)
     {
         getSpringTuning()->setTetherWeight(which, weight);
-    }
-    
-    /*
-    inline void setTetherLock(int which, bool lock)
-    {
-        getSpringTuning()->setTetherLock(which, lock);
-    }
-     */
-    
-    inline bool getTetherLock(int which)
-    {
-        return getSpringTuning()->getTetherLock(which);
     }
     
     inline void setSpringsActive(bool status) { getSpringTuning()->setActive(status); }
@@ -535,6 +525,7 @@ public:
 		clear();
 		sPrep->randomize();
 		aPrep->randomize();
+        
 		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
 		name = "random";
 	}

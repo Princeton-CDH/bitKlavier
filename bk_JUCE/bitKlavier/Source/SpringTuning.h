@@ -93,7 +93,6 @@ public:
     inline void setIntervalStiffness(double stiff)
     {
         intervalStiffness = stiff;
-        DBG("setIntervalStiffness"  + String(stiff));
         
         for (auto spring : enabledSpringArray)
         {
@@ -199,7 +198,6 @@ public:
     void setIntervalFundamental(PitchClass  newfundamental)
     {
         intervalFundamental = newfundamental;
-        DBG("setIntervalFundamental " + String(intervalFundamental));
         
         if(newfundamental == 12) setUsingFundamentalForIntervalSprings(false);
         else setUsingFundamentalForIntervalSprings(true);
@@ -213,6 +211,7 @@ public:
         if(newfundamental == 15) useLastNoteForFundamental = true;
         else useLastNoteForFundamental = false;
     }
+    
     PitchClass getIntervalFundamental(void) {DBG("getIntervalFundamental " + String(intervalFundamental)); return intervalFundamental;}
     
     void retuneIndividualSpring(Spring::Ptr spring);
@@ -246,7 +245,6 @@ public:
     
         ValueTree tethers( "tethers");
         ValueTree springs( "springs");
-        ValueTree tetherLocks( "locks");
         ValueTree intervalScale("intervalScale");
         
         for (int i = 0; i < 128; i++)
@@ -257,15 +255,43 @@ public:
         for (int i = 0; i < 12; i++)
         {
             springs.setProperty( "s"+String(i), getSpringWeight(i), 0 );
-            tetherLocks.setProperty("tl"+String(i), getTetherLock(i) ? 1 : 0, 0);
             intervalScale.setProperty("s"+String(i), intervalTuning[i], 0);
         }
         prep.addChild(tethers, -1, 0);
         prep.addChild(springs, -1, 0);
-        prep.addChild(tetherLocks, -1, 0);
         prep.addChild(intervalScale, -1, 0);
 
         return prep;
+    }
+    
+    inline void randomize()
+    {
+        Random::getSystemRandom().setSeedRandomly();
+        
+        double r[200];
+        
+        for (int i = 0; i < 200; i++)  r[i] = (Random::getSystemRandom().nextDouble());
+        int idx = 0;
+        
+        rate = r[idx++];
+        drag = r[idx++];
+        tetherStiffness = r[idx++];
+        intervalStiffness = r[idx++];
+        stiffness = r[idx++];
+        active = r[idx++];
+        scaleId = (TuningSystem) (r[idx++] * TuningSystemNil);
+        intervalFundamental = (PitchClass)(r[idx++] * PitchClassNil);
+        
+        for (int i = 0; i < 128; i++)
+        {
+            setTetherWeight(i, r[idx++]);
+        }
+        
+        for (int i = 0; i < 12; i++)
+        {
+            setSpringWeight(i, r[idx++]);
+            intervalTuning.setUnchecked(i, r[idx++] - 0.5);
+        }
     }
     
     void setState(XmlElement* e)
@@ -332,43 +358,10 @@ public:
                     }
                 }
             }
-            
-            else if (sub->hasTagName("locks"))
-            {
-                for (int i = 0; i < 12; i++)
-                {
-                    String attr = sub->getStringAttribute("tl" + String(i));
-                    
-                    if (attr == "")
-                    {
-                        setTetherLock(i, false);
-                    }
-                    else
-                    {
-                        setTetherLock(i, (bool)attr.getIntValue());
-                    }
-                }
-            }
         }
     }
     
-    
-    inline void setTetherLock(int pc, bool tl) { tetherLocked[pc] = tl;}
-    inline bool getTetherLock(int pc) { return tetherLocked[pc];}
-    
-    
-    inline Array<bool> getTethersLocked(void)
-    {
-        Array<bool> locked;
-        
-        for (int i = 0; i < 12; i++)
-        {
-            locked.add(tetherLocked[i]);
-        }
-        
-        return locked;
-    }
-    
+
     
     inline void setActive(bool status) { active = status; }
     inline bool getActive(void) { return active; }
@@ -412,8 +405,6 @@ private:
     
     Spring::PtrArr      enabledSpringArray;
     Spring::PtrArr      enabledParticleArray;
-    
-    bool tetherLocked[12];
     
     float springWeights[13];
     
