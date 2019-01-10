@@ -208,21 +208,7 @@ ValueTree Tuning::getState(void)
     prep.setProperty( ptagTuning_nToneRoot,             sPrep->getNToneRoot(), 0);
     prep.setProperty( ptagTuning_nToneSemitoneWidth,    sPrep->getNToneSemitoneWidth(), 0 );
     
-    TuningAdaptiveSystemType type;
-    if (sPrep->getSpringsActive())
-    {
-        type = AdaptiveSpring;
-    }
-    else
-    {
-        TuningSystem scale = sPrep->getScale();
-        
-        if (scale == AdaptiveTuning)                type = AdaptiveNormal;
-        else if (scale == AdaptiveAnchoredTuning)   type = AdaptiveAnchored;
-        else                                        type = AdaptiveNone;
-            
-    }
-    prep.setProperty( "adaptiveSystem", type, 0);
+    prep.setProperty( "adaptiveSystem", sPrep->getAdaptiveType(), 0);
     
     ValueTree scale( vtagTuning_customScale);
     int count = 0;
@@ -310,23 +296,9 @@ ValueTree TuningModPreparation::getState(void)
         prep.setProperty( ptagTuning_active,    springs, 0 );
     }
     
-    if ((bool)springs)
-    {
-        prep.setProperty( "adaptiveSystem", AdaptiveSpring, 0);
-    }
-    else
-    {
-        prep.setProperty( "adaptiveSystem", AdaptiveNone, 0);
-    }
-    
-    if (scaleType == AdaptiveTuning)
-    {
-        prep.setProperty( "adaptiveSystem", AdaptiveNormal, 0);
-    }
-    else if (scaleType == AdaptiveAnchoredTuning)
-    {
-        prep.setProperty( "adaptiveSystem", AdaptiveAnchored, 0);
-    }
+    p = getParam(TuningAdaptiveSystem);
+    prep.setProperty( "adaptiveSystem", p.getIntValue(), 0);
+
     
     p = getParam(TuningSpringIntervalScale);
     if (p != String::empty) prep.setProperty( ptagTuning_intervalScale,  p.getIntValue(), 0 );
@@ -422,21 +394,6 @@ void TuningModPreparation::setState(XmlElement* e)
     
     p = e->getStringAttribute( ptagTuning_scale);
     setParam(TuningScale, p);
-    
-    TuningSystem scale = (TuningSystem) p.getIntValue();
-    
-    if (scale == AdaptiveTuning)
-    {
-        setParam(TuningAdaptiveSystem, String(AdaptiveNormal));
-    }
-    else if (scale == AdaptiveAnchoredTuning)
-    {
-        setParam(TuningAdaptiveSystem, String(AdaptiveAnchored));
-    }
-    else
-    {
-        setParam(TuningAdaptiveSystem, String(AdaptiveNone));
-    }
     
     p = e->getStringAttribute( ptagTuning_fundamental);
     setParam(TuningFundamental, p);
@@ -675,20 +632,11 @@ void Tuning::setState(XmlElement* e)
     
     TuningAdaptiveSystemType type = (TuningAdaptiveSystemType) i;
     
+    sPrep->setAdaptiveType(type);
+    
     if (type == AdaptiveSpring)
     {
         sPrep->setSpringsActive(true);
-    }
-    else
-    {
-        if (type == AdaptiveNormal)
-        {
-            sPrep->setScaleByName(cTuningSystemNames[AdaptiveTuning]);
-        }
-        else if (type == AdaptiveAnchored)
-        {
-            sPrep->setScaleByName(cTuningSystemNames[AdaptiveAnchoredTuning]);
-        }
     }
     
     // custom scale
