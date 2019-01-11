@@ -358,9 +358,11 @@ void TuningViewController::resized()
                                        rateSlider->getWidth(),
                                        gComponentSingleSliderHeight);
     
-    tetherStiffnessSlider->setBounds(fundamentalCB.getX() - gComponentSingleSliderXOffset,
+    tetherStiffnessSlider->setBounds(//fundamentalCB.getX() - gComponentSingleSliderXOffset,
+                                     fundamentalCB.getRight() - intervalStiffnessSlider->getWidth(),
                                      intervalStiffnessSlider->getY(),
-                                     fundamentalCB.getWidth() + 2.*gComponentSingleSliderXOffset,
+                                     //fundamentalCB.getWidth() + 2.*gComponentSingleSliderXOffset,
+                                     intervalStiffnessSlider->getWidth(),
                                      gComponentSingleSliderHeight);
     
     //dragSlider->setBounds(fundamentalCB.getX()-gComponentSingleSliderXOffset, intervalStiffnessSlider->getY(), fundamentalCB.getWidth()+gComponentSingleSliderXOffset*2., gComponentSingleSliderHeight);
@@ -920,9 +922,12 @@ void TuningViewController::timerCallback(void)
             
                 if (tetherSprings[i]->getEnabled())
                 {
-                    tetherSliders[i]->setBounds(fundamentalCB.getX(),
+                    tetherSliders[i]->setBounds(//fundamentalCB.getX(),
+                                                tetherStiffnessSlider->getRight() - springSliders[0]->getWidth() - hideOrShow.getWidth(),
                                                 tetherStiffnessSlider->getBottom() + sliderHeight * (count),
-                                                fundamentalCB.getWidth() * 0.75,
+                                                //fundamentalCB.getWidth() * 0.75,
+                                                //(tetherStiffnessSlider->getWidth() - gComponentSingleSliderXOffset) * 0.85,
+                                                springSliders[0]->getWidth(),
                                                 sliderHeight);
                     
                     if (!isMod) tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
