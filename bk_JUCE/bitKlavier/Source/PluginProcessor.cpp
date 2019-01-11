@@ -23,7 +23,6 @@ class BKUnitTestRunner : public UnitTestRunner
     }
 };
 
-///unit test currently commented out because it creates infinite loop
 #if BK_UNIT_TESTS
 
 class GalleryTests : public UnitTest
