@@ -59,8 +59,8 @@ showSprings(false)
     addAndMakeVisible(adaptiveSystemsCB);
     
     adaptiveSystemsCB.addItem("None", 1);
-    adaptiveSystemsCB.addItem("A Tun", 2);
-    adaptiveSystemsCB.addItem("A Anc", 3);
+    adaptiveSystemsCB.addItem("Adaptive 1", 2);
+    adaptiveSystemsCB.addItem("Adaptive Anchored 1", 3);
     adaptiveSystemsCB.addItem("Spring", 4);
 
     rateSlider = new BKSingleSlider("rate", 5., 400., 100., 1);
@@ -266,9 +266,11 @@ void TuningViewController::resized()
     Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
     modeSlice.removeFromLeft(gXSpacing);
     modeSlice.removeFromRight(gXSpacing);
-    adaptiveSystemsCB.setBounds(modeSlice.removeFromLeft(showSpringsButton.getWidth()));
+    //adaptiveSystemsCB.setBounds(modeSlice.removeFromLeft(showSpringsButton.getWidth()));
+    adaptiveSystemsCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 3.));
     modeSlice.removeFromLeft(gXSpacing);
-    scaleCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
+    //scaleCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
+    scaleCB.setBounds(modeSlice.removeFromLeft(2. * modeSlice.getWidth() / 3.));
     
     modeSlice.removeFromLeft(gXSpacing);
     fundamentalCB.setBounds(modeSlice);
@@ -691,7 +693,7 @@ void TuningViewController::updateComponentVisibility()
     adaptiveSystemsCB.toFront(true);
     showSpringsButton.setVisible(true);
     
-    if (adaptiveType == AdaptiveNone)
+    if (adaptiveType == AdaptiveNone || showSprings || AdaptiveSpring)
     {
         A1IntervalScaleCB.setVisible(false);
         A1Inversional.setVisible(false);
