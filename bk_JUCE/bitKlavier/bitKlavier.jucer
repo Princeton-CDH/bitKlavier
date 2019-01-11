@@ -9,10 +9,10 @@
               pluginWantsMidiIn="1" pluginProducesMidiOut="1" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="1" pluginAUExportPrefix="BKAU" pluginRTASCategory=""
               aaxIdentifier="com.manyarrowsmusic.bitKlavier" pluginAAXCategory="2"
-              jucerVersion="5.4.1" companyName="manyarrowsmusic" companyEmail="dtrueman@princeton.edu"
+              jucerVersion="5.4.1" companyName="Many Arrows Music" companyEmail="dtrueman@princeton.edu"
               maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
               displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Light"
-              buildStandalone="1" enableIAA="1" cppLanguageStandard="11" companyCopyright="manyarrowsmusic"
+              buildStandalone="1" enableIAA="1" cppLanguageStandard="11" companyCopyright="Many Arrows Music"
               pluginFormats="buildAU,buildStandalone,buildVST,buildVST3,enableIAA"
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut,pluginEditorRequiresKeys"
               pluginVST3Category="Instrument">
