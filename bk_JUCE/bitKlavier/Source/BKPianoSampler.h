@@ -187,7 +187,7 @@ public:
 private:
     //==============================================================================
     double cookedNote;
-    int midiNoteNumber;
+    int currentMidiNoteNumber;
     int pitchWheel;
     int layer;
     float noteVelocity;

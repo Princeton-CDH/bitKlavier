@@ -481,6 +481,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             if (voice->currentlyPlayingSound != nullptr)
                 voice->stopNote (0.0f, false);
             
+            voice->currentlyPlayingKey = keyNoteNumber; //keep track of which physical key is associated with this voice
             voice->currentlyPlayingNote = midiNoteNumber; //midiNoteNumber + (int)midiNoteNumberOffset)  
             voice->layerId = layerToLayerId(bktype, layer);
             voice->length = (int)length;
@@ -494,7 +495,6 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             voice->sustainPedalDown = sustainPedalsDown[midiChannel];
             voice->tuning = tuner;
             
-            voice->currentlyPlayingKey = keyNoteNumber; //keep track of which physical key is associated with this voice
             
             float gain = volume;
             
@@ -545,6 +545,14 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
         for (int i = voices.size(); --i >= 0;)
         {
             BKSynthesiserVoice* const voice = voices.getUnchecked (i);
+            
+            /*
+            DBG(" ~ ~ ~ ~ ~ ~ ~ ~ ");
+            DBG(String((int)(voice->getCurrentlyPlayingNote() == midiNoteNumber)));
+            DBG(String((int)(voice->getCurrentlyPlayingKey() == keyNoteNumber)));
+            DBG(String((int)(voice->isPlayingChannel (midiChannel))));
+            DBG(String((int)(voice->layerId == layerToLayerId(type, layerId))));
+             */
             
             if (voice->getCurrentlyPlayingNote() == midiNoteNumber
                 && voice->getCurrentlyPlayingKey() == keyNoteNumber
