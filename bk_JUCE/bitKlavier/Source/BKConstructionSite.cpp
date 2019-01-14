@@ -133,6 +133,8 @@ void BKConstructionSite::deleteSelected(void)
     selected.deselectAll();
     
     selectedItems.clear();
+    
+    redraw();
 }
 
 void BKConstructionSite::align(int which)
