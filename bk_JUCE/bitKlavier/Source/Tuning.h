@@ -715,6 +715,7 @@ public:
         param.set(TuningSpringTetherWeights,        floatArrayToString(p->getSpringTuning()->getTetherWeights()));
         param.set(TuningSpringIntervalWeights,      floatArrayToString(p->getSpringTuning()->getSpringWeights()));
         param.set(TuningSpringIntervalScale,        String(p->getSpringTuning()->getScaleId()));
+        param.set(TuningSpringIntervalFundamental,  String(p->getSpringTuning()->getIntervalFundamental()));
         
     }
     
@@ -785,6 +786,7 @@ public:
         param.set(TuningSpringTetherWeights,        floatArrayToString(p->getSpringTuning()->getTetherWeights()));
         param.set(TuningSpringTetherWeights,        floatArrayToString(p->getSpringTuning()->getSpringWeights()));
         param.set(TuningSpringTetherStiffness,      floatArrayToString(p->getSpringTuning()->getIntervalTuning()));
+        param.set(TuningSpringIntervalFundamental,  String(p->getSpringTuning()->getIntervalFundamental()));
         
     }
     
@@ -826,7 +828,9 @@ public:
                 getParam(TuningSpringIntervalScale) == t->getParam(TuningSpringIntervalScale) &&
                 getParam(TuningSpringTetherWeights) == t->getParam(TuningSpringTetherWeights) &&
                 getParam(TuningSpringIntervalWeights) == t->getParam(TuningSpringIntervalWeights) &&
-                getParam(TuningSpringIntervalScale) == t->getParam(TuningSpringIntervalScale) );
+                getParam(TuningSpringIntervalScale) == t->getParam(TuningSpringIntervalScale) &&
+                getParam(TuningSpringActive) == t->getParam(TuningSpringActive) &&
+                getParam(TuningSpringIntervalFundamental) == t->getParam(TuningSpringIntervalFundamental) );
             
     }
 
@@ -836,6 +840,7 @@ public:
 		p.randomize();
 
 		param.set(TuningScale, String(p.getScale()));
+        //scaleName
 		param.set(TuningFundamental, String(p.getFundamental()));
 		param.set(TuningOffset, String(p.getFundamentalOffset()));
 		param.set(TuningA1IntervalScale, String(p.getAdaptiveIntervalScale()));
@@ -854,8 +859,22 @@ public:
         param.set(TuningSpringIntervalScale,        String(p.getSpringTuning()->getScaleId()));
         param.set(TuningSpringActive,               String((int)p.getSpringTuning()->getActive()));
         param.set(TuningSpringTetherWeights,        floatArrayToString(p.getSpringTuning()->getTetherWeights()));
-        param.set(TuningSpringTetherWeights,        floatArrayToString(p.getSpringTuning()->getSpringWeights()));
+        param.set(TuningSpringIntervalWeights,      floatArrayToString(p.getSpringTuning()->getSpringWeights()));
         param.set(TuningSpringTetherStiffness,      floatArrayToString(p.getSpringTuning()->getIntervalTuning()));
+        param.set(TuningSpringIntervalFundamental,  String(p.getSpringTuning()->getIntervalFundamental()));
+        
+        /*
+         TuningSpringStiffness,
+         TuningSpringTetherStiffness,
+         TuningSpringIntervalStiffness,
+         TuningSpringRate,
+         TuningSpringDrag,
+         TuningSpringActive,
+         TuningSpringTetherWeights,
+         TuningSpringIntervalWeights,
+         TuningSpringIntervalScale,
+         TuningSpringIntervalFundamental,
+         */
         
 	}
     
