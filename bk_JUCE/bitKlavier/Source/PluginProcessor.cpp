@@ -332,7 +332,7 @@ void BKAudioProcessor::openSoundfont(void)
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    if(wrapperType == wrapperType_AudioUnit) loadSamples(BKLoadLitest);
+    if (wrapperType == wrapperType_AudioUnit) loadSamples(BKLoadLitest);
     
 #if JUCE_IOS
     stk::Stk::setSampleRate(sampleRate);
