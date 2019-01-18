@@ -106,7 +106,6 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
         ScopedPointer<XmlElement> galleryXML (getXmlFromBinary (data, sizeInBytes));
         if (galleryXML != nullptr)
         {
-            DBG(galleryXML->createDocument("haha"));
             defaultLoaded = (bool) galleryXML->getStringAttribute("defaultLoaded").getIntValue();
             
             if (defaultLoaded)
@@ -139,23 +138,46 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             //override gallery-saved defaultPiano with pluginHost-saved defaultPiano
             setCurrentPiano(galleryXML->getStringAttribute("defaultPiano").getIntValue());
             
-            initializeGallery();
-#if !LOAD_SAMPLES_IN_GALLERY
-            BKSampleLoadType toLoadType = (BKSampleLoadType)(galleryXML->getStringAttribute("sampleType").getIntValue());
-            
-            if (toLoadType == BKLoadSoundfont)
+            if (currentPiano == nullptr)
             {
-                currentSoundfont = galleryXML->getStringAttribute("soundfontURL");
-                currentInstrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
-                loadSamples(BKLoadSoundfont, currentSoundfont, currentInstrument);
+                String xmlData = CharPointer_UTF8 (BinaryData::Basic_Piano_xml);
+                
+                defaultLoaded = true;
+                defaultName = "Basic_Piano_xml";
+                
+                loadGalleryFromXml(XmlDocument::parse(xmlData));
+            }
+            else initializeGallery();
+            
+            BKSampleLoadType sampleType = (BKSampleLoadType) galleryXML->getStringAttribute("sampleType").getIntValue();
+            String soundfontURL = galleryXML->getStringAttribute("soundfontURL");
+            int instrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
+            
+            if (sampleType < BKLoadSoundfont)
+            {
+                loadSamples(sampleType);
+            }
+            else if (sampleType == BKLoadSoundfont)
+            {
+                File file (soundfontURL);
+                if (file.existsAsFile())
+                {
+                    loadSamples(BKLoadSoundfont, soundfontURL, instrument);
+                }
+                else
+                {
+                    sampleType = BKLoadLite;
+                    loadSamples(BKLoadLite);
+                }
             }
             else
             {
-                currentSoundfont = "";
-
-                loadSamples(toLoadType);
+                loadSamples(BKLoadLite);
             }
-#endif
+            
+            currentSampleType = sampleType;
+            currentSoundfont = soundfontURL;
+            currentInstrument = instrument;
             
         }
     }
