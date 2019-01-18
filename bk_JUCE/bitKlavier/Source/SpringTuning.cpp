@@ -64,8 +64,6 @@ scaleId(JustTuning)
     useHighestNoteForFundamental = false;
     useLastNoteForFundamental = false;
     
-    for (int i = 0; i < 12; i++) tetherLocked[i] = false;
-    
     for (int i = 0; i < 13; i++) springWeights[i] = 0.5;
     
 	for (int i = 0; i < 128; i++)
@@ -293,66 +291,33 @@ double SpringTuning::getSpringWeight(int which)
 void SpringTuning::setTetherWeight(int which, double weight)
 {
     int pc = which % 12;
-    if (tetherLocked[pc])
+
+    Spring* spring = tetherSpringArray[which];
+    
+    spring->setStrength(weight);
+    
+    Particle* a = spring->getA();
+    Particle* b = spring->getB();
+    Particle* use = nullptr;
+    Particle* tethered = tetherParticleArray[which];
+    
+    if (a != tethered)  use = a;
+    else                use = b;
+    
+    if (use != nullptr)
     {
-        for (int t = pc; t < 128; t += 12)
+        if (weight == 1.0)
         {
-            Spring* spring = tetherSpringArray[t];
-            
-            spring->setStrength(weight);
-            
-            Particle* a = spring->getA();
-            Particle* b = spring->getB();
-            Particle* particle = nullptr;
-            Particle* tethered = tetherParticleArray[t];
-            
-            if (a != tethered)  particle = a;
-            else                particle = b;
-            
-            if (particle != nullptr)
-            {
-                if (weight == 1.0)
-                {
-                    particle->setX(particle->getRestX());
-                    particle->setLocked(true);
-                }
-                else
-                {
-                    particle->setLocked(false);
-                    //if (weight == 0.0) tethered->setEnabled(false);
-                }
-            }
+            use->setX(use->getRestX());
+            use->setLocked(true);
         }
-        
-    }
-    else
-    {
-        Spring* spring = tetherSpringArray[which];
-        
-        spring->setStrength(weight);
-        
-        Particle* a = spring->getA();
-        Particle* b = spring->getB();
-        Particle* use = nullptr;
-        Particle* tethered = tetherParticleArray[which];
-        
-        if (a != tethered)  use = a;
-        else                use = b;
-        
-        if (use != nullptr)
+        else
         {
-            if (weight == 1.0)
-            {
-                use->setX(use->getRestX());
-                use->setLocked(true);
-            }
-            else
-            {
-                use->setLocked(false);
-                if (weight == 0.0) tethered->setEnabled(false);
-            }
+            use->setLocked(false);
+            if (weight == 0.0) tethered->setEnabled(false);
         }
     }
+    
     
 }
 

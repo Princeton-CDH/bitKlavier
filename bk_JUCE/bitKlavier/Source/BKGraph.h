@@ -249,7 +249,7 @@ public:
 
     BKItem::PtrArr connections;
     
-    bool resizing;
+    bool resizing, wasJustDragged;
     
     void setCommentText(String text) { comment.setText(text);}
     String getCommentText(void) { return comment.getText();}

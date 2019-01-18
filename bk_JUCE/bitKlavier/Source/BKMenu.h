@@ -33,6 +33,7 @@ public:
     
     ~BKComboBox()
     {
+        setLookAndFeel(nullptr);
     }
     
     void BKSetJustificationType (Justification justification)

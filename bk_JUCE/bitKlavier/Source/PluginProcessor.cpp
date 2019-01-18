@@ -23,7 +23,6 @@ class BKUnitTestRunner : public UnitTestRunner
     }
 };
 
-///unit test currently commented out because it creates infinite loop
 #if BK_UNIT_TESTS
 
 class GalleryTests : public UnitTest
@@ -333,15 +332,7 @@ void BKAudioProcessor::openSoundfont(void)
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    if (shouldLoadDefault)
-    {
-#if JUCE_IOS
-        loadSamples(BKLoadMedium);
-#else
-        if(wrapperType == wrapperType_AudioUnit) loadSamples(BKLoadLitest);
-        else loadSamples(BKLoadHeavy);
-#endif
-    }
+    if (wrapperType == wrapperType_AudioUnit) loadSamples(BKLoadLitest);
     
 #if JUCE_IOS
     stk::Stk::setSampleRate(sampleRate);
@@ -377,7 +368,10 @@ void BKAudioProcessor::deleteGallery(void)
     File file(gallery->getURL());
     file.deleteFile();
     
-    loadGalleryFromPath(firstGallery());
+    String first = firstGallery();
+
+    loadGalleryFromPath(first);
+
 }
 
 // Duplicates current gallery and gives it name
@@ -893,15 +887,14 @@ double BKAudioProcessor::getLevelR()
 // Piano
 void  BKAudioProcessor::setCurrentPiano(int which)
 {
-    
     updateState->setCurrentDisplay(DisplayNil);
     
     //gallery->resetPreparations(); //modded preps should remain modded across piano changes; user can Reset if desired
-    
+
     if (noteOnCount)  prevPianos.addIfNotAlreadyThere(currentPiano);
-    
+
     prevPiano = currentPiano;
-    
+
     currentPiano = gallery->getPiano(which);
     currentPiano->clearOldNotes(prevPiano); // to clearOldNotes so it doesn't playback shit from before
     currentPiano->copyAdaptiveTuningState(prevPiano);
@@ -980,9 +973,6 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modfa = tMod[i]->getModFloatArr();
         modia = tMod[i]->getModIntArr();
         
-        
-        //DBG("p" + String(i) + " " + mod->getParam((TuningParameterType)i));
-        
         if (type == TuningScale)
         {
             active->setScale((TuningSystem)modi);
@@ -1053,6 +1043,43 @@ void BKAudioProcessor::performModifications(int noteNumber)
             Array<float> scale = tuning->getScaleCents(springScaleId);
             
             active->getSpringTuning()->setIntervalTuning(scale);
+        }
+        else if (type == TuningSpringIntervalFundamental)
+        {
+            active->getSpringTuning()->setIntervalFundamental((PitchClass)modi);
+        }
+        else if (type == TuningAdaptiveSystem)
+        {
+            TuningAdaptiveSystemType atype = (TuningAdaptiveSystemType) modi;
+            
+            if (atype == AdaptiveSpring)
+            {
+                active->getSpringTuning()->setActive(true);
+                
+                active->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
+                
+                TuningSystem springScaleId = active->getSpringTuning()->getScaleId();
+                Array<float> scale = tuning->getScaleCents(springScaleId);
+                active->getSpringTuning()->setIntervalTuning(scale);
+            }
+            else
+            {
+                active->getSpringTuning()->setActive(false);
+            }
+            
+            if (atype == AdaptiveNormal)
+            {
+                active->setScaleByName(cTuningSystemNames[AdaptiveTuning]);
+            }
+            else if (atype == AdaptiveAnchored)
+            {
+                active->setScaleByName(cTuningSystemNames[AdaptiveAnchoredTuning]);
+            }
+            else // AdaptiveNone
+            {
+                active->setScale(active->getScale());
+            }
+            
         }
         
         updateState->tuningPreparationDidChange = true;
@@ -1199,28 +1226,21 @@ void BKAudioProcessor::importCurrentGallery(void)
                           true);
     
     fc->launchAsync (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles,
-                     [this] (const FileChooser& chooser)
-                     {
-                         auto results = chooser.getURLResults();
-                         if (results.size() > 0)
-                         {
-                             auto url = results.getReference (0);
-                             
-                             ScopedPointer<InputStream> wi (url.createInputStream (false));
-                             
-                             if (wi != nullptr)
-                             {
-                                 MemoryBlock block(wi->getTotalLength());
-                                 wi->readIntoMemoryBlock(block);
-                                 
-                                 XmlDocument doc(block.toString());
-                                 ScopedPointer<XmlElement> xml = doc.getDocumentElement();
-                                 
-                                 DBG("url file name: " + url.getFileName().replace("%20", " "));
-                                 createNewGallery(url.getFileName().replace("%20", " "), xml);
-                             }
-                         }
-                     });
+     [this] (const FileChooser& chooser)
+     {
+         auto results = chooser.getURLResults();
+         if (results.size() > 0)
+         {
+             auto url = results.getReference (0);
+            
+             if (url.createInputStream (false) != nullptr)
+             {
+                 ScopedPointer<XmlElement> xml = url.readEntireXmlStream();
+                
+                 createNewGallery(url.getFileName().replace("%20", " "), xml);
+             }
+         }
+     });
 
 }
 
@@ -1289,6 +1309,7 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
 
 void BKAudioProcessor::saveCurrentGallery(void)
 {
+    if (defaultLoaded) return;
     if (gallery->getURL() == "")
     {
 #if JUCE_IOS
@@ -1401,13 +1422,25 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
 {
     updateState->loadedJson = false;
     
-    File myFile (path);
-    
-    ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
-    
-    loadGalleryFromXml(xml);
-    
-    gallery->setURL(path);
+    if (path == "")
+    {
+        String xmlData = CharPointer_UTF8 (BinaryData::Basic_Piano_xml);
+        
+        defaultLoaded = true;
+        defaultName = "Basic_Piano_xml";
+        
+        loadGalleryFromXml(XmlDocument::parse(xmlData));
+    }
+    else
+    {
+        File myFile (path);
+
+        ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
+
+        loadGalleryFromXml(xml);
+
+        gallery->setURL(path);
+    }
 }
 
 void BKAudioProcessor::loadJsonGalleryDialog(void)

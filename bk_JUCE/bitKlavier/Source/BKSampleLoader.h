@@ -27,6 +27,7 @@ public:
     
     ~BKSampleLoader(void)
     {
+        stopThread(500);
     }
 private:
     

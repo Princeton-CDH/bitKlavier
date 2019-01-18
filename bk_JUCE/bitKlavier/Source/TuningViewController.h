@@ -109,8 +109,7 @@ protected:
 
     ScopedPointer<BKSingleSlider> intervalStiffnessSlider;
     
-    BKTextButton springTuningToggle;
-    Label springTuningLabel;
+    BKComboBox adaptiveSystemsCB;
     
     
     void fillTuningCB(void);

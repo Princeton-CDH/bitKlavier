@@ -81,7 +81,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel, b
                       MainNote,
                       direct->getId(),
                       noteNumber,
-                      (soundfont ? noteNumber : t),
+                      t,
                       velocity,
                       true);
     }

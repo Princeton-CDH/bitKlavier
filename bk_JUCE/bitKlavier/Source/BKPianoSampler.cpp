@@ -62,7 +62,6 @@ transpose(transp)
         
         sampleName = soundName;
         sampleLength = region_->sample->getSampleLength();
-        //if (!isSF2 && (loopMode == 0)) loopMode = 3;
     }
     else
     {
@@ -164,10 +163,10 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
     {
         Particle::PtrArr particles = tuning->getTuning()->aPrep->getParticles();
  
-        double x = particles[midiNoteNumber]->getX();
-        int octave = particles[midiNoteNumber]->getOctave();
+        double x = particles[currentMidiNoteNumber]->getX();
+        int octave = particles[currentMidiNoteNumber]->getOctave();
         double midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(x - 1200.0 * octave)), 128) - 60.0 + (octave * 12.0);
-        midi += (tuning->getTuning()->aPrep->getAbsoluteOffsets().getUnchecked(midiNoteNumber) +
+        midi += (tuning->getTuning()->aPrep->getAbsoluteOffsets().getUnchecked(currentMidiNoteNumber) +
                  tuning->getTuning()->aPrep->getFundamentalOffset());
         
         pitchRatio =    powf(2.0f, (midi - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
@@ -205,7 +204,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
     {
         //DBG("BKPianoSamplerVoice::startNote " + String(midi));
         
-        midiNoteNumber = midi;
+        currentMidiNoteNumber = midi;
         cookedNote = ((float)midi + pitchoffset);
         pitchWheel = pitchWheelValue;
         

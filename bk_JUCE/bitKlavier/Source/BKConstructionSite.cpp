@@ -133,6 +133,8 @@ void BKConstructionSite::deleteSelected(void)
     selected.deselectAll();
     
     selectedItems.clear();
+    
+    redraw();
 }
 
 void BKConstructionSite::align(int which)
@@ -824,7 +826,7 @@ void BKConstructionSite::mouseDrag (const MouseEvent& e)
     repaint();
 #endif
     
-    mouseDragged();
+    if (e.getDistanceFromDragStart() > 50) mouseDragged();
     
     if (itemToSelect == nullptr) lasso->dragLasso(e);
     

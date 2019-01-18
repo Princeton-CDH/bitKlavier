@@ -588,6 +588,23 @@ static const std::vector<std::string> cDirectParameterTypes = {
     "ADSR"
 };
 
+typedef enum TuningAdaptiveSystemType
+{
+    AdaptiveNone = 0,
+    AdaptiveNormal,
+    AdaptiveAnchored,
+    AdaptiveSpring,
+    AdaptiveNil
+    
+} TuningAdaptiveSystemType;
+
+static const std::vector<std::string> cTuningAdaptiveTypes = {
+    "Nonadaptive",
+    "Adaptive Tuning",
+    "Adaptive Anchored",
+    "Spring Tuning"
+};
+
 #pragma mark - Tuning
 typedef enum TuningParameterType
 {
@@ -617,6 +634,7 @@ typedef enum TuningParameterType
     TuningSpringIntervalWeights,
     TuningSpringIntervalScale,
     TuningSpringIntervalFundamental,
+    TuningAdaptiveSystem,
     TuningParameterTypeNil
     
 } TuningParameterType;
@@ -647,7 +665,8 @@ static const std::vector<BKParameterDataType> cTuningDataTypes = {
     BKFloatArr,
     BKFloatArr,
     BKInt,
-    BKInt
+    BKInt,
+    BKInt,
 };
 
 static const std::vector<std::string> cTuningParameterTypes = {
@@ -676,7 +695,8 @@ static const std::vector<std::string> cTuningParameterTypes = {
     "SpringTetherWeights",
     "SpringIntervalWeights",
     "SpringIntervalScale",
-    "SpringIntervalFundamental"
+    "SpringIntervalFundamental",
+    "SpringAdaptiveSystem"
 };
 
 

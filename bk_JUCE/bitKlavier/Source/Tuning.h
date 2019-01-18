@@ -61,6 +61,7 @@ public:
         tAbsolute = p->getAbsoluteOffsets();
         nToneSemitoneWidth = p->getNToneSemitoneWidth();
         nToneRoot = p->getNToneRoot();
+        adaptiveType = p->getAdaptiveType();
         stuning->copy(p->getSpringTuning());
         //stuning = new SpringTuning(p->getSpringTuning());
     }
@@ -111,9 +112,10 @@ public:
 
 		for (int i = 0; i < 21; i++)  r[i] = (Random::getSystemRandom().nextFloat());
 		int idx = 0;
-
-
+        
 		tScale = (TuningSystem)(int)( r[idx++] * TuningSystemNil);
+        if ((tScale == AdaptiveTuning) || (tScale == AdaptiveAnchoredTuning)) tScale = (TuningSystem)((int)tScale +  2);
+        
 		tFundamental = (PitchClass)(int)(r[idx++] * PitchClassNil);
 		tFundamentalOffset = r[idx++] * 48.0f - 24.0f;
 		tAdaptiveIntervalScale = (TuningSystem)(int)(r[idx++] * TuningSystemNil);
@@ -134,6 +136,8 @@ public:
 		}
 		nToneSemitoneWidth = r[idx++] * 200.0f;
 		nToneRoot = (int)(r[idx++] * 127) + 1;
+        
+        stuning->randomize();
 	}
     
     TuningPreparation(TuningSystem whichTuning,
@@ -233,15 +237,20 @@ public:
     }
     
     inline void setName(String n)                                           {name = n; DBG("set tuning name " + name);}
-    inline void setScale(TuningSystem tuning)                               {tScale = tuning;}
+    inline void setScale(TuningSystem tuning)
+    {
+        if (tuning != AdaptiveTuning && tuning != AdaptiveAnchoredTuning)
+        {
+           tScale = tuning;
+        }
+    }
+    
     inline void setScaleByName(String tuningName)
     {
-        //DBG("set tuning system by name: " + tuningName);
-        for(int i=0; i<cTuningSystemNames.size(); i++)
+        for (int i=0; i<cTuningSystemNames.size(); i++)
         {
             if(cTuningSystemNames[i] == tuningName) {
                 setScale((TuningSystem)i);
-                DBG("scale set to: " + getScaleName());
             }
         }
     }
@@ -325,18 +334,6 @@ public:
         getSpringTuning()->setTetherWeight(which, weight);
     }
     
-    /*
-    inline void setTetherLock(int which, bool lock)
-    {
-        getSpringTuning()->setTetherLock(which, lock);
-    }
-     */
-    
-    inline bool getTetherLock(int which)
-    {
-        return getSpringTuning()->getTetherLock(which);
-    }
-    
     inline void setSpringsActive(bool status) { getSpringTuning()->setActive(status); }
     inline bool getSpringsActive(void) { return getSpringTuning()->getActive(); }
     
@@ -348,6 +345,9 @@ public:
     
     inline TuningSystem getCurrentSpringScaleId(void) { return getSpringTuning()->getScaleId(); }
     // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    
+    inline void setAdaptiveType (TuningAdaptiveSystemType type) { adaptiveType = type; }
+    inline TuningAdaptiveSystemType getAdaptiveType (void) { return adaptiveType; }
     
 private:
     String name;
@@ -366,6 +366,8 @@ private:
     uint64          tAdaptiveClusterThresh;     //ms; max time before fundamental is reset
     int             tAdaptiveHistory;           //cluster max; max number of notes before fundamental is reset
     
+    
+    
     // custom scale and absolute offsets
     Array<float>    tCustom = Array<float>({0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}); //custom scale
     Array<float>    tAbsolute;  //offset (in MIDI fractional offsets, like other tunings) for specific notes; size = 128
@@ -377,6 +379,8 @@ private:
     
     // SPRING TUNING STUFF
     SpringTuning::Ptr stuning;
+    
+    TuningAdaptiveSystemType adaptiveType;
     
     JUCE_LEAK_DETECTOR(TuningPreparation);
 };
@@ -521,6 +525,7 @@ public:
 		clear();
 		sPrep->randomize();
 		aPrep->randomize();
+        
 		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
 		name = "random";
 	}

@@ -48,7 +48,6 @@ public:
     
     bool idDidChange = false;
     bool galleriesUpdated = false;
-    bool galleryLoaded = false;
     bool directDidChange = false;
     bool pianoDidChangeForGraph = false;
     bool directPreparationDidChange = false;
