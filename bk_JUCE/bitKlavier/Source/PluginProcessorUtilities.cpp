@@ -55,7 +55,7 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
         
         loader.startThread();
     }
-    else if (type < BKLoadSoundfont && currentSampleType != type)
+    else if (type < BKLoadSoundfont)
     {
         currentSampleType = type;
         
