@@ -123,7 +123,8 @@ currentInstrument(0)
     tests.runAllTests();
     
 #endif
-
+    didLoadMainPianoSamples = false;
+    didLoadHammersAndRes = false;
     sustainIsDown                   = false;
     noteOnCount                     = 0;
     
@@ -319,33 +320,35 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     sustainIsDown = false;
     
-    // LOAD SAMPLES
-    if (currentSampleType < BKLoadSoundfont)
+    if (!didLoadMainPianoSamples)
     {
-        loadSamples(currentSampleType);
-    }
-    else if (currentSampleType == BKLoadSoundfont)
-    {
-        File file (currentSoundfont);
-        if (file.existsAsFile())
+        // LOAD SAMPLES
+        if (currentSampleType < BKLoadSoundfont)
         {
-            loadSamples(BKLoadSoundfont, currentSoundfont, currentInstrument);
+            loadSamples(currentSampleType);
+        }
+        else if (currentSampleType == BKLoadSoundfont)
+        {
+            File file (currentSoundfont);
+            if (file.existsAsFile())
+            {
+                loadSamples(BKLoadSoundfont, currentSoundfont, currentInstrument);
+            }
+            else
+            {
+                currentSampleType = BKLoadLite;
+                loadSamples(BKLoadLite);
+            }
         }
         else
         {
-            currentSampleType = BKLoadLite;
+#if JUCE_IOS
             loadSamples(BKLoadLite);
+#else
+            loadSamples(BKLoadHeavy);
+#endif
         }
     }
-    else
-    {
-#if JUCE_IOS
-        loadSamples(BKLoadLite);
-#else
-        loadSamples(BKLoadHeavy);
-#endif
-    }
-    
 }
 
 BKAudioProcessor::~BKAudioProcessor()
