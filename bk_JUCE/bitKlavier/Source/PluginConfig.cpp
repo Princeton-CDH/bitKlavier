@@ -149,36 +149,22 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             }
             else initializeGallery();
             
-            BKSampleLoadType sampleType = (BKSampleLoadType) galleryXML->getStringAttribute("sampleType").getIntValue();
-            String soundfontURL = galleryXML->getStringAttribute("soundfontURL");
-            int instrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
+#if JUCE_IOS
+            BKSampleLoadType sampleType = BKLoadLite;
+#else
+            BKSampleLoadType sampleType = BKLoadHeavy;
+#endif
             
-            if (sampleType < BKLoadSoundfont)
+            String sampleString = galleryXML->getStringAttribute("sampleType");
+            
+            if (sampleString != "")
             {
-                loadSamples(sampleType);
-            }
-            else if (sampleType == BKLoadSoundfont)
-            {
-                File file (soundfontURL);
-                if (file.existsAsFile())
-                {
-                    loadSamples(BKLoadSoundfont, soundfontURL, instrument);
-                }
-                else
-                {
-                    sampleType = BKLoadLite;
-                    loadSamples(BKLoadLite);
-                }
-            }
-            else
-            {
-                loadSamples(BKLoadLite);
+                sampleType = (BKSampleLoadType) sampleString.getIntValue();
             }
             
             currentSampleType = sampleType;
-            currentSoundfont = soundfontURL;
-            currentInstrument = instrument;
-            
+            currentSoundfont = galleryXML->getStringAttribute("soundfontURL");
+            currentInstrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
         }
     }
 }

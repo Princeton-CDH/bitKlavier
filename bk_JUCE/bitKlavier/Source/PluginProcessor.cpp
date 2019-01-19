@@ -100,9 +100,15 @@ mainPianoSynth(),
 hammerReleaseSynth(),
 resonanceReleaseSynth(),
 pedalSynth(),
-currentSampleType(BKLoadLite),
 loader(*this),
-shouldLoadDefault(true)
+shouldLoadDefault(true),
+#if JUCE_IOS
+currentSampleType(BKLoadLite),
+#else
+currentSampleType(BKLoadHeavy),
+#endif
+currentSoundfont(""),
+currentInstrument(0)
 {
 #if BK_UNIT_TESTS
     
@@ -117,8 +123,7 @@ shouldLoadDefault(true)
     tests.runAllTests();
     
 #endif
-    didLoadHammersAndRes            = false;
-    didLoadMainPianoSamples         = false;
+
     sustainIsDown                   = false;
     noteOnCount                     = 0;
     
@@ -268,50 +273,9 @@ shouldLoadDefault(true)
 
 }
 
-
 void BKAudioProcessor::openSoundfont(void)
 {
 #if JUCE_IOS
-#if JUCE_DEBUG
-    fc = new FileChooser ("Import a soundfont",
-                          File::getCurrentWorkingDirectory(),
-                          "*",
-                          true);
-    
-    fc->launchAsync (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles,
-                     [this] (const FileChooser& chooser)
-                     {
-                         auto results = chooser.getURLResults();
-                         if (results.size() > 0)
-                         {
-                             auto url = results.getReference (0);
-                             
-                             ScopedPointer<InputStream> wi (url.createInputStream (false));
-                             
-                             if (wi != nullptr)
-                             {
-                                 MemoryBlock block(wi->getTotalLength());
-                                 wi->readIntoMemoryBlock(block);
-                                 
-                                 String name = url.getFileName();
-                                 String path = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + name.upToFirstOccurrenceOf(".sf2", false, false) + ".sf2";
-                                 
-                                 DBG("path: " + String(path));
-                                 
-                                 File sfzFile = File(path);
-                                 
-                                 FileOutputStream fos (sfzFile);
-                                 if (fos.write (block.getData(), block.getSize()))
-                                 {
-                                     fos.flush();
-               
-                                 }
-
-                                
-                             }
-                         }
-                     });
-#endif
 #else
     FileChooser myChooser ("Load soundfont file...",
                            //File::getSpecialLocation (File::userHomeDirectory),
@@ -353,8 +317,35 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     gallery->prepareToPlay(sampleRate);
     
-
     sustainIsDown = false;
+    
+    // LOAD SAMPLES
+    if (currentSampleType < BKLoadSoundfont)
+    {
+        loadSamples(currentSampleType);
+    }
+    else if (currentSampleType == BKLoadSoundfont)
+    {
+        File file (currentSoundfont);
+        if (file.existsAsFile())
+        {
+            loadSamples(BKLoadSoundfont, currentSoundfont, currentInstrument);
+        }
+        else
+        {
+            currentSampleType = BKLoadLite;
+            loadSamples(BKLoadLite);
+        }
+    }
+    else
+    {
+#if JUCE_IOS
+        loadSamples(BKLoadLite);
+#else
+        loadSamples(BKLoadHeavy);
+#endif
+    }
+    
 }
 
 BKAudioProcessor::~BKAudioProcessor()
