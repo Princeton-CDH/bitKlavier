@@ -120,7 +120,7 @@ void BKAudioProcessor::collectGalleries(void)
     bkGalleries = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
 #if JUCE_WINDOWS || JUCE_LINUX
-    bkGalleries = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+    bkGalleries = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
     
     collectGalleriesFromFolder(bkGalleries);
@@ -139,7 +139,7 @@ void BKAudioProcessor::collectSoundfonts(void)
     bkSoundfonts = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
 #endif
 #if JUCE_WINDOWS || JUCE_LINUX
-    bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("soundfonts");
+    bkSoundfonts = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
 #endif
     
     collectSoundfontsFromFolder(bkSoundfonts);

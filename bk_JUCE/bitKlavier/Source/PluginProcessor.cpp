@@ -177,11 +177,11 @@ shouldLoadDefault(true)
 #endif
 #if JUCE_WINDOWS
     platform = BKWindows;
-    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
 #if JUCE_LINUX
     platform = BKLinux;
-    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
     
     noteOn.ensureStorageAllocated(128);
@@ -435,7 +435,7 @@ void BKAudioProcessor::createNewGallery(String name, ScopedPointer<XmlElement> x
     bkGalleries = bkGalleries.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
 #if JUCE_WINDOWS || JUCE_LINUX
-    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+    bkGalleries = bkGalleries.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
     
     
@@ -1319,7 +1319,7 @@ void BKAudioProcessor::saveCurrentGallery(void)
         writeCurrentGalleryToURL( File::getSpecialLocation(File::globalApplicationsDirectory).getFullPathName() + "/bitKlavier/galleries/" + gallery->getName());
 #endif
 #if JUCE_WINDOWS || JUCE_LINUX
-        writeCurrentGalleryToURL( File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/bitKlavier resources/galleries/" + gallery->getName());
+        writeCurrentGalleryToURL( File::getSpecialLocation(File::globalApplicationsDirectory).getFullPathName() + "\\bitKlavier\\galleries\\" + gallery->getName());
 #endif
     }
     else

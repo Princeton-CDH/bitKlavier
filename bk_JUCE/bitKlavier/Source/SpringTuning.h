@@ -279,8 +279,8 @@ public:
         intervalStiffness = r[idx++];
         stiffness = r[idx++];
         active = r[idx++];
-        scaleId = (TuningSystem) (r[idx++] * TuningSystemNil);
-        intervalFundamental = (PitchClass)(r[idx++] * PitchClassNil);
+        scaleId = (TuningSystem) (int) (r[idx++] * TuningSystemNil);
+        intervalFundamental = (PitchClass) (int) (r[idx++] * PitchClassNil);
         
         for (int i = 0; i < 128; i++)
         {
