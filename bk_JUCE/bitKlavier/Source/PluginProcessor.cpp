@@ -100,15 +100,7 @@ mainPianoSynth(),
 hammerReleaseSynth(),
 resonanceReleaseSynth(),
 pedalSynth(),
-loader(*this),
-shouldLoadDefault(true),
-#if JUCE_IOS
-currentSampleType(BKLoadLite),
-#else
-currentSampleType(BKLoadHeavy),
-#endif
-currentSoundfont(""),
-currentInstrument(0)
+loader(*this)
 {
 #if BK_UNIT_TESTS
     
@@ -320,35 +312,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     sustainIsDown = false;
     
-    if (!didLoadMainPianoSamples)
-    {
-        // LOAD SAMPLES
-        if (currentSampleType < BKLoadSoundfont)
-        {
-            loadSamples(currentSampleType);
-        }
-        else if (currentSampleType == BKLoadSoundfont)
-        {
-            File file (currentSoundfont);
-            if (file.existsAsFile())
-            {
-                loadSamples(BKLoadSoundfont, currentSoundfont, currentInstrument);
-            }
-            else
-            {
-                currentSampleType = BKLoadLite;
-                loadSamples(BKLoadLite);
-            }
-        }
-        else
-        {
-#if JUCE_IOS
-            loadSamples(BKLoadLite);
-#else
-            loadSamples(BKLoadHeavy);
-#endif
-        }
-    }
+    loadSamplesStartup();
 }
 
 BKAudioProcessor::~BKAudioProcessor()
@@ -450,12 +414,7 @@ void BKAudioProcessor::createNewGallery(String name, ScopedPointer<XmlElement> x
         xml->writeToFile(myFile, "");
     }
     
-    
-    
-    
-    
     xml->writeToFile(myFile, "");
-    
     
     galleryNames.add(myFile.getFullPathName());
     

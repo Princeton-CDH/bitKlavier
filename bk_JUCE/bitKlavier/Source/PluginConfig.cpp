@@ -97,6 +97,39 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
     }
 }
 
+void BKAudioProcessor::loadSamplesStartup(void)
+{
+    if (!didLoadMainPianoSamples)
+    {
+        // LOAD SAMPLES
+        if (currentSampleType < BKLoadSoundfont)
+        {
+            loadSamples(currentSampleType);
+        }
+        else if (currentSampleType == BKLoadSoundfont)
+        {
+            File file (currentSoundfont);
+            if (file.existsAsFile())
+            {
+                loadSamples(BKLoadSoundfont, currentSoundfont, currentInstrument);
+            }
+            else
+            {
+                currentSampleType = BKLoadLite;
+                loadSamples(BKLoadLite);
+            }
+        }
+        else
+        {
+#if JUCE_IOS
+            loadSamples(BKLoadLite);
+#else
+            loadSamples(BKLoadHeavy);
+#endif
+        }
+    }
+}
+
 void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     if (galleryDidLoad)
@@ -162,9 +195,14 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
                 sampleType = (BKSampleLoadType) sampleString.getIntValue();
             }
             
+            lastSampleType = BKLoadNil;
+            lastSoundfont = "nil";
+            
             currentSampleType = sampleType;
             currentSoundfont = galleryXML->getStringAttribute("soundfontURL");
             currentInstrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
+            
+            loadSamplesStartup();
         }
     }
 }
@@ -201,7 +239,8 @@ int BKAudioProcessor::getCurrentProgram() {
     return 0;
 }
 
-void BKAudioProcessor::setCurrentProgram (int index) {
+void BKAudioProcessor::setCurrentProgram (int index)
+{
     
 }
 
