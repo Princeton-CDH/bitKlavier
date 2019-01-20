@@ -413,6 +413,8 @@ void BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
             
         }
     }
+    
+    processor.didLoadMainPianoSamples = true;
 }
 
 void BKSampleLoader::loadResonanceReleaseSamples(void)

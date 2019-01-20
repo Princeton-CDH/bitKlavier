@@ -311,16 +311,22 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     sustainIsDown = false;
     
-    if (wrapperType == wrapperType_AudioUnit)   loadSamples(BKLoadLite);
-    else
+    if (!didLoadMainPianoSamples)
     {
         if (!loader.isThreadRunning())
         {
-#if JUCE_IOS
-        loadSamples(BKLoadLite);
-#else
-        loadSamples(BKLoadHeavy);
-#endif
+    #if JUCE_IOS
+            loadSamples(BKLoadLite);
+    #else
+            if (wrapperType == wrapperType_AudioUnit)
+            {
+                loadSamples(BKLoadLite);
+            }
+            else
+            {
+                loadSamples(BKLoadHeavy);
+            }
+    #endif
         }
     }
 }
