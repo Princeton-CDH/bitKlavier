@@ -83,13 +83,11 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         {
             processor.instrumentNames.add(sfzsound->subsoundName(i));
         }
-        
-        
+    
         processor.regions.clear();
         processor.regions = sfzsound->getRegions();
         processor.progress = 0.0;
         processor.progressInc = 1.0 / processor.regions.size();
-
     }
     else    return;
 
@@ -180,9 +178,6 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         
     }
     
-   
-    
-
     processor.didLoadMainPianoSamples = true;
 }
 

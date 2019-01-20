@@ -319,10 +319,11 @@ private:
     
     BKSampleLoader loader;
     
+    bool doneWithSetStateInfo;
+    
     AudioSampleBuffer levelBuf; //for storing samples for metering/RMS calculation
     
     Array<float> tempoAlreadyLoaded;
-    bool galleryDidLoad;
     
     Array<int> notesOnUI;
     Array<int> notesOffUI;

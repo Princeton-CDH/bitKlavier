@@ -100,6 +100,7 @@ mainPianoSynth(),
 hammerReleaseSynth(),
 resonanceReleaseSynth(),
 pedalSynth(),
+doneWithSetStateInfo(false),
 loader(*this)
 {
 #if BK_UNIT_TESTS
@@ -311,14 +312,11 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     gallery->prepareToPlay(sampleRate);
     
     sustainIsDown = false;
-    
-    loadSamplesStartup();
 }
 
 BKAudioProcessor::~BKAudioProcessor()
 {
     clipboard.clear();
-    //loader.stopThread(1000);
 }
 
 void BKAudioProcessor::deleteGallery(void)
@@ -432,8 +430,6 @@ void BKAudioProcessor::createNewGallery(String name, ScopedPointer<XmlElement> x
         gallery->print();
         
         initializeGallery();
-        
-        galleryDidLoad = true;
         
         gallery->setGalleryDirty(false);
         
@@ -1251,11 +1247,7 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
         writeCurrentGalleryToURL(myChooser.getResult().getFullPathName());
     }
     
-    
     updateGalleries();
-    
-    galleryDidLoad = true;
-    
 }
 
 
@@ -1347,8 +1339,6 @@ void BKAudioProcessor::loadGalleryDialog(void)
             
             initializeGallery();
             
-            galleryDidLoad = true;
-            
             lastGalleryPath = user;
         }
     }
@@ -1364,8 +1354,6 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
         currentGallery = gallery->getName() + ".xml";
         
         initializeGallery();
-        
-        galleryDidLoad = true;
         
         gallery->setGalleryDirty(false);
     }
@@ -1458,8 +1446,6 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
         
         initializeGallery();
         
-        galleryDidLoad = true;
-        
         gallery->setGalleryDirty(false);
     }
 }
@@ -1477,8 +1463,6 @@ void BKAudioProcessor::loadJsonGalleryFromPath(String path)
     gallery = new Gallery(myJson, *this);
     
     initializeGallery();
-    
-    galleryDidLoad = true;
     
 }
 

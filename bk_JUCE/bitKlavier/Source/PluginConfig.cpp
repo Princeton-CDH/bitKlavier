@@ -71,140 +71,132 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+    ValueTree galleryVT(vtagGalleryPath);
     
-    if (galleryDidLoad)
-    {
-        
-        ValueTree galleryVT(vtagGalleryPath);
-        
-        galleryVT.setProperty("defaultLoaded", (int)defaultLoaded, 0);
-        galleryVT.setProperty("defaultName", defaultName, 0);
-        
-        galleryVT.setProperty("sampleType", (int)currentSampleType, 0);
-        galleryVT.setProperty("soundfontURL", currentSoundfont, 0);
-        galleryVT.setProperty("soundfontInst", currentInstrument, 0);
-        
-        galleryVT.setProperty("galleryPath", gallery->getURL(), 0);
-        
-        galleryVT.setProperty("defaultPiano", currentPiano->getId(), 0);
-        
-        galleryVT.setProperty("invertSustain", getSustainInversion(), 0);
-        
-        DBG("sustain inversion saved: " + String((int)getSustainInversion()));
-        
-        ScopedPointer<XmlElement> galleryXML = galleryVT.createXml();
-        copyXmlToBinary (*galleryXML, destData);
-    }
+    galleryVT.setProperty("defaultLoaded", (int)defaultLoaded, 0);
+    galleryVT.setProperty("defaultName", defaultName, 0);
+    
+    galleryVT.setProperty("sampleType", (int)currentSampleType, 0);
+    galleryVT.setProperty("soundfontURL", currentSoundfont, 0);
+    galleryVT.setProperty("soundfontInst", currentInstrument, 0);
+    
+    galleryVT.setProperty("galleryPath", gallery->getURL(), 0);
+    
+    galleryVT.setProperty("defaultPiano", currentPiano->getId(), 0);
+    
+    galleryVT.setProperty("invertSustain", getSustainInversion(), 0);
+    
+    DBG("sustain inversion saved: " + String((int)getSustainInversion()));
+    
+    ScopedPointer<XmlElement> galleryXML = galleryVT.createXml();
+    copyXmlToBinary (*galleryXML, destData);
 }
 
 void BKAudioProcessor::loadSamplesStartup(void)
 {
-    if (!didLoadMainPianoSamples)
+    // LOAD SAMPLES
+    if (currentSampleType < BKLoadSoundfont)
     {
-        // LOAD SAMPLES
-        if (currentSampleType < BKLoadSoundfont)
+        loadSamples(currentSampleType);
+    }
+    else if (currentSampleType == BKLoadSoundfont)
+    {
+        File file (currentSoundfont);
+        if (file.existsAsFile())
         {
-            loadSamples(currentSampleType);
-        }
-        else if (currentSampleType == BKLoadSoundfont)
-        {
-            File file (currentSoundfont);
-            if (file.existsAsFile())
-            {
-                loadSamples(BKLoadSoundfont, currentSoundfont, currentInstrument);
-            }
-            else
-            {
-                currentSampleType = BKLoadLite;
-                loadSamples(BKLoadLite);
-            }
+            loadSamples(BKLoadSoundfont, currentSoundfont, currentInstrument);
         }
         else
         {
-#if JUCE_IOS
+            currentSampleType = BKLoadLite;
             loadSamples(BKLoadLite);
-#else
-            loadSamples(BKLoadHeavy);
-#endif
         }
+    }
+    else
+    {
+#if JUCE_IOS
+        loadSamples(BKLoadLite);
+#else
+        loadSamples(BKLoadHeavy);
+#endif
     }
 }
 
 void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    if (galleryDidLoad)
+    DBG("BKAudioProcessor::setStateInformation");
+    
+    ScopedPointer<XmlElement> galleryXML (getXmlFromBinary (data, sizeInBytes));
+    
+    DBG("galleryXML: " + galleryXML->createDocument(""));
+    if (galleryXML != nullptr)
     {
-        DBG("BKAudioProcessor::setStateInformation");
+        defaultLoaded = (bool) galleryXML->getStringAttribute("defaultLoaded").getIntValue();
         
-        ScopedPointer<XmlElement> galleryXML (getXmlFromBinary (data, sizeInBytes));
-        if (galleryXML != nullptr)
+        if (defaultLoaded)
         {
-            defaultLoaded = (bool) galleryXML->getStringAttribute("defaultLoaded").getIntValue();
+            defaultName = galleryXML->getStringAttribute("defaultName");
             
-            if (defaultLoaded)
-            {
-                defaultName = galleryXML->getStringAttribute("defaultName");
-                
-                int size;
-                
-                String xmlData = BinaryData::getNamedResource(defaultName.toUTF8(), size);
-                
-                loadGalleryFromXml(XmlDocument::parse(xmlData));
-            }
-            else
-            {
-                String currentGalleryPath = galleryXML->getStringAttribute("galleryPath");
-                currentGallery = galleryXML->getStringAttribute("name");
-                
-                DBG("loading gallery and piano from plugin state: setStateInformation() "
-                    + currentGalleryPath + " "
-                    + String(galleryXML->getStringAttribute("defaultPiano").getIntValue()));
-                
-                loadGalleryFromPath(currentGalleryPath);
-            }
+            int size;
             
-            bool invertSustain = (bool)galleryXML->getStringAttribute("invertSustain").getIntValue();
+            String xmlData = BinaryData::getNamedResource(defaultName.toUTF8(), size);
             
-            setSustainInversion(invertSustain);
-
-            
-            //override gallery-saved defaultPiano with pluginHost-saved defaultPiano
-            setCurrentPiano(galleryXML->getStringAttribute("defaultPiano").getIntValue());
-            
-            if (currentPiano == nullptr)
-            {
-                String xmlData = CharPointer_UTF8 (BinaryData::Basic_Piano_xml);
-                
-                defaultLoaded = true;
-                defaultName = "Basic_Piano_xml";
-                
-                loadGalleryFromXml(XmlDocument::parse(xmlData));
-            }
-            else initializeGallery();
-            
-#if JUCE_IOS
-            BKSampleLoadType sampleType = BKLoadLite;
-#else
-            BKSampleLoadType sampleType = BKLoadHeavy;
-#endif
-            
-            String sampleString = galleryXML->getStringAttribute("sampleType");
-            
-            if (sampleString != "")
-            {
-                sampleType = (BKSampleLoadType) sampleString.getIntValue();
-            }
-            
-            lastSampleType = BKLoadNil;
-            lastSoundfont = "nil";
-            
-            currentSampleType = sampleType;
-            currentSoundfont = galleryXML->getStringAttribute("soundfontURL");
-            currentInstrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
-            
-            loadSamplesStartup();
+            loadGalleryFromXml(XmlDocument::parse(xmlData));
         }
+        else
+        {
+            String currentGalleryPath = galleryXML->getStringAttribute("galleryPath");
+            currentGallery = galleryXML->getStringAttribute("name");
+            
+            DBG("loading gallery and piano from plugin state: setStateInformation() "
+                + currentGalleryPath + " "
+                + String(galleryXML->getStringAttribute("defaultPiano").getIntValue()));
+            
+            loadGalleryFromPath(currentGalleryPath);
+        }
+        
+        bool invertSustain = (bool)galleryXML->getStringAttribute("invertSustain").getIntValue();
+        
+        setSustainInversion(invertSustain);
+
+        
+        //override gallery-saved defaultPiano with pluginHost-saved defaultPiano
+        setCurrentPiano(galleryXML->getStringAttribute("defaultPiano").getIntValue());
+        
+        if (currentPiano == nullptr)
+        {
+            String xmlData = CharPointer_UTF8 (BinaryData::Basic_Piano_xml);
+            
+            defaultLoaded = true;
+            defaultName = "Basic_Piano_xml";
+            
+            loadGalleryFromXml(XmlDocument::parse(xmlData));
+        }
+        else initializeGallery();
+        
+#if JUCE_IOS
+        BKSampleLoadType sampleType = BKLoadLite;
+#else
+        BKSampleLoadType sampleType = BKLoadHeavy;
+#endif
+        
+        String sampleString = galleryXML->getStringAttribute("sampleType");
+        
+        if (sampleString != "")
+        {
+            sampleType = (BKSampleLoadType) sampleString.getIntValue();
+        }
+        
+        lastSampleType = BKLoadNil;
+        lastSoundfont = "nil";
+        
+        currentSampleType = sampleType;
+        currentSoundfont = galleryXML->getStringAttribute("soundfontURL");
+        currentInstrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
+        
+        loadSamplesStartup();
     }
+    
 }
 
 //==============================================================================
