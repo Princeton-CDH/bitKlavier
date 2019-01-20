@@ -32,6 +32,8 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
     // Check if path isn't valid and load BKLoadLite if it is not
     if (type == BKLoadSoundfont)
     {
+        if ((lastSoundfont == path) && (lastInstrument == subsound)) return;
+        
         if (!path.startsWith("default.sf"))
         {
             File file(path);
@@ -46,8 +48,6 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
     
     if (type == BKLoadSoundfont)
     {
-        shouldLoadDefault = false;
-        
         currentSampleType = BKLoadSoundfont;
         
         currentSoundfont = path;
@@ -57,9 +57,9 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
     }
     else if (type < BKLoadSoundfont)
     {
-        currentSampleType = type;
+        if (lastSampleType == type) return;
         
-        shouldLoadDefault = false;
+        currentSampleType = type;
         
         int numSamplesPerLayer = 29;
         int numHarmSamples = 69;
@@ -69,12 +69,16 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
         progressInc = 1.0f / ((type == BKLoadHeavy)  ? (numSamplesPerLayer * 8 + (numResSamples + numHarmSamples)) :
                               (type == BKLoadMedium) ? (numSamplesPerLayer * 4) :
                               (type == BKLoadLite)   ? (numSamplesPerLayer * 2) :
-                              (type == BKLoadLitest) ? (numSamplesPerLayer * 1) :
-                                             1.0);
+                              (type == BKLoadLitest) ? (numSamplesPerLayer * 1) : 1.0);
         
         loader.startThread();
     }
+    
+    lastSampleType = currentSampleType;
+    lastSoundfont = currentSoundfont;
+    lastInstrument = currentInstrument;
 }
+
 
 void BKAudioProcessor::collectSoundfontsFromFolder(File folder)
 {

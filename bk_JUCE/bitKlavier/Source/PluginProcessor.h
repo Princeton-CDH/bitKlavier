@@ -63,7 +63,6 @@ public:
     String firstGallery(void);
     void initializeGallery(void);
     
-    BKSampleLoadType currentSampleType;
     
     FileChooser* fc;
     
@@ -101,10 +100,19 @@ public:
     String                              currentGallery;
     
     StringArray                         soundfontNames;
-    String                              currentSoundfont;
     StringArray                         instrumentNames;
     String                              currentInstrumentName;
+    
+    
+    BKSampleLoadType                    currentSampleType;
+    String                              currentSoundfont;
     int                                 currentInstrument;
+    
+    bool firstTime;
+    
+    BKSampleLoadType                    lastSampleType;
+    String                              lastSoundfont;
+    int                                 lastInstrument;
     
     bool                                defaultLoaded;
     String                              defaultName;
@@ -221,11 +229,12 @@ public:
     
     double progress;
     double progressInc;
-    bool didLoadHammersAndRes, didLoadMainPianoSamples, shouldLoadDefault;
+    bool didLoadHammersAndRes, didLoadMainPianoSamples;
     
     void clearBitKlavier(void);
     
-    bool firstTime;
+    void loadSamplesStartup(void);
+
     inline void setSustainInversion(bool sus)
     {
         sustainInverted = sus;
@@ -316,10 +325,11 @@ private:
     
     BKSampleLoader loader;
     
+    bool doneWithSetStateInfo;
+    
     AudioSampleBuffer levelBuf; //for storing samples for metering/RMS calculation
     
     Array<float> tempoAlreadyLoaded;
-    bool galleryDidLoad;
     
     Array<int> notesOnUI;
     Array<int> notesOffUI;

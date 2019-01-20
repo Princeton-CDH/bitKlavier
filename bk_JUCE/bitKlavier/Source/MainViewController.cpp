@@ -316,7 +316,8 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
     }
     else if (cb == &instrumentCB)
     {
-        processor.loadSamples(BKLoadSoundfont, processor.currentSoundfont, cb->getSelectedItemIndex());
+        processor.currentInstrument = cb->getSelectedItemIndex();
+        processor.loadSamples(BKLoadSoundfont, processor.currentSoundfont, processor.currentInstrument);
     }
 }
 

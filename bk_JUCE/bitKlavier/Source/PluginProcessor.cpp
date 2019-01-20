@@ -100,15 +100,8 @@ mainPianoSynth(),
 hammerReleaseSynth(),
 resonanceReleaseSynth(),
 pedalSynth(),
-loader(*this),
-shouldLoadDefault(true),
-#if JUCE_IOS
-currentSampleType(BKLoadLite),
-#else
-currentSampleType(BKLoadHeavy),
-#endif
-currentSoundfont(""),
-currentInstrument(0)
+doneWithSetStateInfo(false),
+loader(*this)
 {
 #if BK_UNIT_TESTS
     
@@ -297,8 +290,6 @@ void BKAudioProcessor::openSoundfont(void)
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    if (wrapperType == wrapperType_AudioUnit) loadSamples(BKLoadLitest);
-    
 #if JUCE_IOS
     stk::Stk::setSampleRate(sampleRate);
 #endif
@@ -322,31 +313,20 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     if (!didLoadMainPianoSamples)
     {
-        // LOAD SAMPLES
-        if (currentSampleType < BKLoadSoundfont)
+        if (!loader.isThreadRunning())
         {
-            loadSamples(currentSampleType);
-        }
-        else if (currentSampleType == BKLoadSoundfont)
-        {
-            File file (currentSoundfont);
-            if (file.existsAsFile())
+    #if JUCE_IOS
+            loadSamples(BKLoadLite);
+    #else
+            if (wrapperType == wrapperType_AudioUnit)
             {
-                loadSamples(BKLoadSoundfont, currentSoundfont, currentInstrument);
+                loadSamples(BKLoadLite);
             }
             else
             {
-                currentSampleType = BKLoadLite;
-                loadSamples(BKLoadLite);
+                loadSamples(BKLoadHeavy);
             }
-        }
-        else
-        {
-#if JUCE_IOS
-            loadSamples(BKLoadLite);
-#else
-            loadSamples(BKLoadHeavy);
-#endif
+    #endif
         }
     }
 }
@@ -354,7 +334,6 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 BKAudioProcessor::~BKAudioProcessor()
 {
     clipboard.clear();
-    //loader.stopThread(1000);
 }
 
 void BKAudioProcessor::deleteGallery(void)
@@ -365,13 +344,11 @@ void BKAudioProcessor::deleteGallery(void)
     String first = firstGallery();
 
     loadGalleryFromPath(first);
-
 }
 
 // Duplicates current gallery and gives it name
 void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
 {
-
     File myFile(newURL);
     
     ValueTree galleryVT = gallery->getState();
@@ -450,12 +427,7 @@ void BKAudioProcessor::createNewGallery(String name, ScopedPointer<XmlElement> x
         xml->writeToFile(myFile, "");
     }
     
-    
-    
-    
-    
     xml->writeToFile(myFile, "");
-    
     
     galleryNames.add(myFile.getFullPathName());
     
@@ -473,8 +445,6 @@ void BKAudioProcessor::createNewGallery(String name, ScopedPointer<XmlElement> x
         gallery->print();
         
         initializeGallery();
-        
-        galleryDidLoad = true;
         
         gallery->setGalleryDirty(false);
         
@@ -1292,11 +1262,7 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
         writeCurrentGalleryToURL(myChooser.getResult().getFullPathName());
     }
     
-    
     updateGalleries();
-    
-    galleryDidLoad = true;
-    
 }
 
 
@@ -1388,8 +1354,6 @@ void BKAudioProcessor::loadGalleryDialog(void)
             
             initializeGallery();
             
-            galleryDidLoad = true;
-            
             lastGalleryPath = user;
         }
     }
@@ -1405,8 +1369,6 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
         currentGallery = gallery->getName() + ".xml";
         
         initializeGallery();
-        
-        galleryDidLoad = true;
         
         gallery->setGalleryDirty(false);
     }
@@ -1499,8 +1461,6 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
         
         initializeGallery();
         
-        galleryDidLoad = true;
-        
         gallery->setGalleryDirty(false);
     }
 }
@@ -1518,8 +1478,6 @@ void BKAudioProcessor::loadJsonGalleryFromPath(String path)
     gallery = new Gallery(myJson, *this);
     
     initializeGallery();
-    
-    galleryDidLoad = true;
     
 }
 
