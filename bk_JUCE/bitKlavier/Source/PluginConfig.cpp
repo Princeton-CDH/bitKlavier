@@ -189,11 +189,13 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
         
         lastSampleType = BKLoadNil;
         lastSoundfont = "nil";
+        lastInstrument = -1;
         
         currentSampleType = sampleType;
         currentSoundfont = galleryXML->getStringAttribute("soundfontURL");
         currentInstrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
         
+        loader.stopThread(1000);
         loadSamplesStartup();
     }
     

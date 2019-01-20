@@ -108,8 +108,11 @@ public:
     String                              currentSoundfont;
     int                                 currentInstrument;
     
+    bool firstTime;
+    
     BKSampleLoadType                    lastSampleType;
     String                              lastSoundfont;
+    int                                 lastInstrument;
     
     bool                                defaultLoaded;
     String                              defaultName;
@@ -231,8 +234,7 @@ public:
     void clearBitKlavier(void);
     
     void loadSamplesStartup(void);
-    
-    bool firstTime;
+
     inline void setSustainInversion(bool sus)
     {
         sustainInverted = sus;

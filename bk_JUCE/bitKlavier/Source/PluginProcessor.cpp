@@ -290,8 +290,6 @@ void BKAudioProcessor::openSoundfont(void)
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    if (wrapperType == wrapperType_AudioUnit) loadSamples(BKLoadLitest);
-    
 #if JUCE_IOS
     stk::Stk::setSampleRate(sampleRate);
 #endif
@@ -312,6 +310,19 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     gallery->prepareToPlay(sampleRate);
     
     sustainIsDown = false;
+    
+    if (wrapperType == wrapperType_AudioUnit)   loadSamples(BKLoadLite);
+    else
+    {
+        if (!loader.isThreadRunning())
+        {
+#if JUCE_IOS
+        loadSamples(BKLoadLite);
+#else
+        loadSamples(BKLoadHeavy);
+#endif
+        }
+    }
 }
 
 BKAudioProcessor::~BKAudioProcessor()
@@ -327,13 +338,11 @@ void BKAudioProcessor::deleteGallery(void)
     String first = firstGallery();
 
     loadGalleryFromPath(first);
-
 }
 
 // Duplicates current gallery and gives it name
 void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
 {
-
     File myFile(newURL);
     
     ValueTree galleryVT = gallery->getState();
