@@ -32,6 +32,8 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
     // Check if path isn't valid and load BKLoadLite if it is not
     if (type == BKLoadSoundfont)
     {
+        if ((lastSoundfont == path) && (lastInstrument == subsound)) return;
+        
         if (!path.startsWith("default.sf"))
         {
             File file(path);
@@ -46,8 +48,6 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
     
     if (type == BKLoadSoundfont)
     {
-        shouldLoadDefault = false;
-        
         currentSampleType = BKLoadSoundfont;
         
         currentSoundfont = path;
@@ -55,11 +55,11 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
         
         loader.startThread();
     }
-    else if (type < BKLoadSoundfont && currentSampleType != type)
+    else if (type < BKLoadSoundfont)
     {
-        currentSampleType = type;
+        if (lastSampleType == type) return;
         
-        shouldLoadDefault = false;
+        currentSampleType = type;
         
         int numSamplesPerLayer = 29;
         int numHarmSamples = 69;
@@ -69,12 +69,16 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
         progressInc = 1.0f / ((type == BKLoadHeavy)  ? (numSamplesPerLayer * 8 + (numResSamples + numHarmSamples)) :
                               (type == BKLoadMedium) ? (numSamplesPerLayer * 4) :
                               (type == BKLoadLite)   ? (numSamplesPerLayer * 2) :
-                              (type == BKLoadLitest) ? (numSamplesPerLayer * 1) :
-                                             1.0);
+                              (type == BKLoadLitest) ? (numSamplesPerLayer * 1) : 1.0);
         
         loader.startThread();
     }
+    
+    lastSampleType = currentSampleType;
+    lastSoundfont = currentSoundfont;
+    lastInstrument = currentInstrument;
 }
+
 
 void BKAudioProcessor::collectSoundfontsFromFolder(File folder)
 {
@@ -120,7 +124,7 @@ void BKAudioProcessor::collectGalleries(void)
     bkGalleries = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
 #if JUCE_WINDOWS || JUCE_LINUX
-    bkGalleries = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+    bkGalleries = File::getSpecialLocation(File::currentExecutableFile).getParentDirectory().getChildFile("galleries");
 #endif
     
     collectGalleriesFromFolder(bkGalleries);
@@ -139,7 +143,7 @@ void BKAudioProcessor::collectSoundfonts(void)
     bkSoundfonts = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
 #endif
 #if JUCE_WINDOWS || JUCE_LINUX
-    bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("soundfonts");
+    bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
 #endif
     
     collectSoundfontsFromFolder(bkSoundfonts);

@@ -578,7 +578,7 @@ void HeaderViewController::fillGalleryCB(void)
         bkGalleries = bkGalleries.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
 #if (JUCE_WINDOWS || JUCE_LINUX)
-        bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+        bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
         
         PopupMenu* galleryCBPopUp = galleryCB.getRootMenu();
@@ -758,7 +758,7 @@ bool HeaderViewController::handleGalleryChange(void)
                 File newFile = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
 #if JUCE_WINDOWS || JUCE_LINUX
-                File newFile = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+                File newFile = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
                 
                 String newURL = newFile.getFullPathName() + name + ".xml";

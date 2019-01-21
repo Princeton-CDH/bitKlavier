@@ -405,6 +405,7 @@
                        osxCompatibility="10.9 SDK" enablePluginBinaryCopyStep="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
+
         <MODULEPATH id="juce_core" path="../../../modules"/>
         <MODULEPATH id="juce_events" path="../../../modules"/>
         <MODULEPATH id="juce_graphics" path="../../../modules"/>

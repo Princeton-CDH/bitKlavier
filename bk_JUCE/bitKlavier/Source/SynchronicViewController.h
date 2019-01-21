@@ -94,7 +94,7 @@ public Timer
 {
 public:
     SynchronicPreparationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~SynchronicPreparationEditor() {};
+    ~SynchronicPreparationEditor() {setLookAndFeel(nullptr);}
     
     void update(void) override;
     

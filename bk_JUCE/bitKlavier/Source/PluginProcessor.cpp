@@ -100,9 +100,8 @@ mainPianoSynth(),
 hammerReleaseSynth(),
 resonanceReleaseSynth(),
 pedalSynth(),
-currentSampleType(BKLoadLite),
-loader(*this),
-shouldLoadDefault(true)
+doneWithSetStateInfo(false),
+loader(*this)
 {
 #if BK_UNIT_TESTS
     
@@ -117,8 +116,8 @@ shouldLoadDefault(true)
     tests.runAllTests();
     
 #endif
-    didLoadHammersAndRes            = false;
-    didLoadMainPianoSamples         = false;
+    didLoadMainPianoSamples = false;
+    didLoadHammersAndRes = false;
     sustainIsDown                   = false;
     noteOnCount                     = 0;
     
@@ -177,11 +176,11 @@ shouldLoadDefault(true)
 #endif
 #if JUCE_WINDOWS
     platform = BKWindows;
-    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
 #if JUCE_LINUX
     platform = BKLinux;
-    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
     
     noteOn.ensureStorageAllocated(128);
@@ -268,50 +267,9 @@ shouldLoadDefault(true)
 
 }
 
-
 void BKAudioProcessor::openSoundfont(void)
 {
 #if JUCE_IOS
-#if JUCE_DEBUG
-    fc = new FileChooser ("Import a soundfont",
-                          File::getCurrentWorkingDirectory(),
-                          "*",
-                          true);
-    
-    fc->launchAsync (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles,
-                     [this] (const FileChooser& chooser)
-                     {
-                         auto results = chooser.getURLResults();
-                         if (results.size() > 0)
-                         {
-                             auto url = results.getReference (0);
-                             
-                             ScopedPointer<InputStream> wi (url.createInputStream (false));
-                             
-                             if (wi != nullptr)
-                             {
-                                 MemoryBlock block(wi->getTotalLength());
-                                 wi->readIntoMemoryBlock(block);
-                                 
-                                 String name = url.getFileName();
-                                 String path = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + name.upToFirstOccurrenceOf(".sf2", false, false) + ".sf2";
-                                 
-                                 DBG("path: " + String(path));
-                                 
-                                 File sfzFile = File(path);
-                                 
-                                 FileOutputStream fos (sfzFile);
-                                 if (fos.write (block.getData(), block.getSize()))
-                                 {
-                                     fos.flush();
-               
-                                 }
-
-                                
-                             }
-                         }
-                     });
-#endif
 #else
     FileChooser myChooser ("Load soundfont file...",
                            //File::getSpecialLocation (File::userHomeDirectory),
@@ -332,16 +290,6 @@ void BKAudioProcessor::openSoundfont(void)
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    if (shouldLoadDefault)
-    {
-#if JUCE_IOS
-        loadSamples(BKLoadMedium);
-#else
-        if(wrapperType == wrapperType_AudioUnit) loadSamples(BKLoadLitest);
-        else loadSamples(BKLoadHeavy);
-#endif
-    }
-    
 #if JUCE_IOS
     stk::Stk::setSampleRate(sampleRate);
 #endif
@@ -361,14 +309,31 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     gallery->prepareToPlay(sampleRate);
     
-
     sustainIsDown = false;
+    
+    if (!didLoadMainPianoSamples)
+    {
+        if (!loader.isThreadRunning())
+        {
+    #if JUCE_IOS
+            loadSamples(BKLoadLite);
+    #else
+            if (wrapperType == wrapperType_AudioUnit)
+            {
+                loadSamples(BKLoadLite);
+            }
+            else
+            {
+                loadSamples(BKLoadHeavy);
+            }
+    #endif
+        }
+    }
 }
 
 BKAudioProcessor::~BKAudioProcessor()
 {
     clipboard.clear();
-    //loader.stopThread(1000);
 }
 
 void BKAudioProcessor::deleteGallery(void)
@@ -379,13 +344,11 @@ void BKAudioProcessor::deleteGallery(void)
     String first = firstGallery();
 
     loadGalleryFromPath(first);
-
 }
 
 // Duplicates current gallery and gives it name
 void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
 {
-
     File myFile(newURL);
     
     ValueTree galleryVT = gallery->getState();
@@ -443,7 +406,7 @@ void BKAudioProcessor::createNewGallery(String name, ScopedPointer<XmlElement> x
     bkGalleries = bkGalleries.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
 #if JUCE_WINDOWS || JUCE_LINUX
-    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier resources").getChildFile("galleries");
+    bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
     
     
@@ -464,12 +427,7 @@ void BKAudioProcessor::createNewGallery(String name, ScopedPointer<XmlElement> x
         xml->writeToFile(myFile, "");
     }
     
-    
-    
-    
-    
     xml->writeToFile(myFile, "");
-    
     
     galleryNames.add(myFile.getFullPathName());
     
@@ -487,8 +445,6 @@ void BKAudioProcessor::createNewGallery(String name, ScopedPointer<XmlElement> x
         gallery->print();
         
         initializeGallery();
-        
-        galleryDidLoad = true;
         
         gallery->setGalleryDirty(false);
         
@@ -1306,11 +1262,7 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
         writeCurrentGalleryToURL(myChooser.getResult().getFullPathName());
     }
     
-    
     updateGalleries();
-    
-    galleryDidLoad = true;
-    
 }
 
 
@@ -1327,7 +1279,7 @@ void BKAudioProcessor::saveCurrentGallery(void)
         writeCurrentGalleryToURL( File::getSpecialLocation(File::globalApplicationsDirectory).getFullPathName() + "/bitKlavier/galleries/" + gallery->getName());
 #endif
 #if JUCE_WINDOWS || JUCE_LINUX
-        writeCurrentGalleryToURL( File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/bitKlavier resources/galleries/" + gallery->getName());
+        writeCurrentGalleryToURL( File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getFullPathName() + "\\bitKlavier\\galleries\\" + gallery->getName());
 #endif
     }
     else
@@ -1402,8 +1354,6 @@ void BKAudioProcessor::loadGalleryDialog(void)
             
             initializeGallery();
             
-            galleryDidLoad = true;
-            
             lastGalleryPath = user;
         }
     }
@@ -1419,8 +1369,6 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
         currentGallery = gallery->getName() + ".xml";
         
         initializeGallery();
-        
-        galleryDidLoad = true;
         
         gallery->setGalleryDirty(false);
     }
@@ -1513,8 +1461,6 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
         
         initializeGallery();
         
-        galleryDidLoad = true;
-        
         gallery->setGalleryDirty(false);
     }
 }
@@ -1532,8 +1478,6 @@ void BKAudioProcessor::loadJsonGalleryFromPath(String path)
     gallery = new Gallery(myJson, *this);
     
     initializeGallery();
-    
-    galleryDidLoad = true;
     
 }
 
