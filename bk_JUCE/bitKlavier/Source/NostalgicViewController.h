@@ -40,6 +40,9 @@ public:
     ScopedPointer<BKADSRSlider> reverseADSRSlider;
     ScopedPointer<BKADSRSlider> undertowADSRSlider;
     
+    ScopedPointer<BKRangeSlider> clusterSizeMinMaxSlider;
+    ScopedPointer<BKRangeSlider> holdTimeMinMaxSlider;
+    
     void paint (Graphics&) override;
     void resized() override;
     
@@ -71,6 +74,7 @@ public BKEditableComboBoxListener,
 public BKSingleSlider::Listener,
 public BKStackedSlider::Listener,
 public BKADSRSlider::Listener,
+public BKRangeSlider::Listener,
 //public SliderListener,
 public Timer
 {
@@ -106,6 +110,7 @@ private:
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
     void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
     void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
+    void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NostalgicPreparationEditor)
     
@@ -118,6 +123,7 @@ public BKEditableComboBoxListener,
 public BKSingleSlider::Listener,
 public BKStackedSlider::Listener,
 public BKADSRSlider::Listener,
+public BKRangeSlider::Listener,
 //public SliderListener,
 public Timer
 {
@@ -140,6 +146,7 @@ public:
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
     void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
     void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
+    void BKRangeSliderValueChanged(String name, double minval, double maxval) override{};
     
     void fillSelectCB(int last, int current);
     void greyOutAllComponents();

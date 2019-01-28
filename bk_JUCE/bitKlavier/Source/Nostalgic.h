@@ -44,7 +44,9 @@ public:
     nUndertowAttack(p->getUndertowAttack()),
     nUndertowDecay(p->getUndertowDecay()),
     nUndertowRelease(p->getUndertowRelease()),
-    nUndertowSustain(p->getUndertowSustain())
+    nUndertowSustain(p->getUndertowSustain()),
+    holdMin(p->getHoldMin()),
+    holdMax(p->getHoldMax())
     {
         
     }
@@ -67,7 +69,8 @@ public:
     nBeatsToSkip(beatsToSkip),
     nMode(mode)
     {
-        
+        holdMin = 0;
+        holdMax = 12000;
     }
     
     NostalgicPreparation(void):
@@ -85,7 +88,9 @@ public:
     nUndertowAttack(50),
     nUndertowDecay(3),
     nUndertowRelease(2000),
-    nUndertowSustain(1.)
+    nUndertowSustain(1.),
+    holdMin(0),
+    holdMax(12000)
     {
 
     }
@@ -114,6 +119,8 @@ public:
         nUndertowDecay = n->getUndertowDecay();
         nUndertowSustain = n->getUndertowSustain();
         nUndertowRelease = n->getUndertowRelease();
+        holdMin = n->getHoldMin();
+        holdMax = n->getHoldMax();
     }
     
     inline bool compare (NostalgicPreparation::Ptr n)
@@ -132,7 +139,9 @@ public:
                 nUndertowDecay == n->getUndertowDecay() &&
                 nUndertowSustain == n->getUndertowSustain() &&
                 nUndertowRelease == n->getUndertowRelease() &&
-                nMode == n->getMode());
+                nMode == n->getMode() &&
+                holdMin == n->getHoldMin() &&
+                holdMax == n->getHoldMax());
     }
 
 	inline void randomize()
@@ -175,6 +184,12 @@ public:
     inline const float getLengthMultiplier() const noexcept                {return nLengthMultiplier;  }
     inline const float getBeatsToSkip() const noexcept                     {return nBeatsToSkip;       }
     inline const NostalgicSyncMode getMode() const noexcept                {return nMode;              }
+    
+    inline const float getHoldMin() const noexcept { return holdMin; }
+    inline const float getHoldMax() const noexcept { return holdMax; }
+    
+    inline const void setHoldMin(float min)  { holdMin = min; }
+    inline const void setHoldMax(float max)  { holdMax = max; }
     
     inline const int getReverseAttack() const noexcept                     {return nReverseAttack;        }
     inline const int getReverseDecay() const noexcept                      {return nReverseDecay;         }
@@ -259,6 +274,8 @@ private:
     
     int     nUndertowAttack, nUndertowDecay, nUndertowRelease;      //undertow ADSR, in ms
     float   nUndertowSustain;
+    
+    float holdMin, holdMax;
     
     //internal keymap for resetting internal values to static
     //Keymap::Ptr resetMap = new Keymap(0);

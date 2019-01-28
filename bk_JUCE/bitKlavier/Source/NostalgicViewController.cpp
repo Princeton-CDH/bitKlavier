@@ -45,6 +45,11 @@ BKViewController(p, theGraph)
     lengthMultiplierSlider->setSkewFactorFromMidPoint(1.);
     addAndMakeVisible(lengthMultiplierSlider);
     
+    holdTimeMinMaxSlider = new BKRangeSlider("hold time", 0., 12000., 0.0, 12000., 1);
+    holdTimeMinMaxSlider->setToolTipString("Sets Min and Max time held to trigger swell; Min can be greater than Max");
+    holdTimeMinMaxSlider->setJustifyRight(true);
+    addAndMakeVisible(holdTimeMinMaxSlider);
+    
     beatsToSkipSlider = new BKSingleSlider("beats to skip", 0, 10, 0, 1);
     beatsToSkipSlider->setToolTipString("Indicates how long Nostalgic wave lasts with respect to linked Synchronic sequence");
     addAndMakeVisible(beatsToSkipSlider);
@@ -75,6 +80,7 @@ BKViewController(p, theGraph)
     addAndMakeVisible(undertowADSRSlider);
     
 #if JUCE_IOS
+    holdTimeMinMaxSlider->addWantsBigOneListener(this);
     beatsToSkipSlider->addWantsBigOneListener(this);
     gainSlider->addWantsBigOneListener(this);
     lengthMultiplierSlider->addWantsBigOneListener(this);
@@ -195,7 +201,13 @@ void NostalgicViewController::resized()
                                           gComponentSingleSliderHeight);
         beatsToSkipSlider->setBounds(lengthMultiplierSlider->getBounds());
         
-        nextCenter = sliderSlice.getY() + 3. * sliderSlice.getHeight() / 4.;
+        nextCenter = sliderSlice.getY() + sliderSlice.getHeight() * 0.5f;
+        holdTimeMinMaxSlider->setBounds(sliderSlice.getX(),
+                              nextCenter - gComponentSingleSliderHeight/2 + 4,
+                              sliderSlice.getWidth(),
+                              gComponentSingleSliderHeight);
+        
+        nextCenter = sliderSlice.getY() + sliderSlice.getHeight() * 0.75f;
         gainSlider->setBounds(sliderSlice.getX(),
                               nextCenter - gComponentSingleSliderHeight/2 + 4,
                               sliderSlice.getWidth(),
@@ -265,6 +277,7 @@ NostalgicViewController(p, theGraph)
     lengthModeSelectCB.addListener(this);
     transpositionSlider->addMyListener(this);
     lengthMultiplierSlider->addMyListener(this);
+    holdTimeMinMaxSlider->addMyListener(this);
     beatsToSkipSlider->addMyListener(this);
     
     gainSlider->addMyListener(this);
@@ -316,6 +329,10 @@ void NostalgicPreparationEditor::update(void)
         //transpositionSlider->setValue(prep->getTransposition(), dontSendNotification);
         transpositionSlider->setTo(prep->getTransposition(), dontSendNotification);
         lengthMultiplierSlider->setValue(prep->getLengthMultiplier(), dontSendNotification);
+        
+        holdTimeMinMaxSlider->setMinValue(prep->getHoldMin(), dontSendNotification);
+        holdTimeMinMaxSlider->setMaxValue(prep->getHoldMax(), dontSendNotification);
+        
         beatsToSkipSlider->setValue(prep->getBeatsToSkip(), dontSendNotification);
         gainSlider->setValue(prep->getGain(), dontSendNotification);
         
@@ -635,6 +652,22 @@ void NostalgicPreparationEditor::buttonClicked (Button* b)
     }
 }
 
+
+void NostalgicPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
+{
+    NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
+    NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
+
+    if (name == "hold time")
+    {
+        prep->setHoldMin(minval);
+        active->setHoldMin(minval);
+        
+        prep->setHoldMax(maxval);
+        active->setHoldMax(maxval);
+    }
+}
+
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ NostalgicModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
 
 NostalgicModificationEditor::NostalgicModificationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
@@ -648,6 +681,7 @@ NostalgicViewController(p, theGraph)
     lengthModeSelectCB.addListener(this);
     transpositionSlider->addMyListener(this);
     lengthMultiplierSlider->addMyListener(this);
+    holdTimeMinMaxSlider->addMyListener(this);
     beatsToSkipSlider->addMyListener(this);
     
     gainSlider->addMyListener(this);

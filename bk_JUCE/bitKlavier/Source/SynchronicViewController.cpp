@@ -1046,16 +1046,11 @@ void SynchronicModificationEditor::greyOutAllComponents()
     modeSelectCB.setAlpha(gModAlpha);
     offsetParamStartToggle.setAlpha(gModAlpha);
     
-    //howManySlider->setAlpha(gModAlpha);
     howManySlider->setDim(gModAlpha);
-    //clusterThreshSlider->setAlpha(gModAlpha);
     clusterThreshSlider->setDim(gModAlpha);
-    //clusterMinMaxSlider->setAlpha(gModAlpha);
     clusterThreshSlider->setDim(gModAlpha);
-    //gainSlider->setAlpha(gModAlpha);
     gainSlider->setDim(gModAlpha);
     
-    //clusterMinMaxSlider->setAlpha(gModAlpha);
     clusterMinMaxSlider->setDim(gModAlpha);
     
     for(int i = 0; i < paramSliders.size(); i++)

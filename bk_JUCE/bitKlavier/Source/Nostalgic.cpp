@@ -131,46 +131,79 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
         }
         else if (nostalgic->aPrep->getMode() == NoteLengthSync)
         {
+            float held = noteLengthTimers.getUnchecked(midiNoteNumber) * (1000.0 / sampleRate);
+    
+            bool playNote = false;
+
+            if(nostalgic->aPrep->getHoldMin() <= nostalgic->aPrep->getHoldMax())
+            {
+                if (held >= nostalgic->aPrep->getHoldMin() && held <= nostalgic->aPrep->getHoldMax())
+                {
+                    playNote = true;
+                }
+            }
+            else
+            {
+                if (held >= nostalgic->aPrep->getHoldMin() || held <= nostalgic->aPrep->getHoldMax())
+                {
+                    playNote = true;
+                }
+            }
+            
             //get length of played notes, subtract wave distance to set nostalgic reverse note length
             duration =  (noteLengthTimers.getUnchecked(midiNoteNumber) *
-                        nostalgic->aPrep->getLengthMultiplier() +
-                        (offRamp + 30)) *          //offRamp + onRamp
+                         nostalgic->aPrep->getLengthMultiplier() +
+                         (offRamp + 30)) *     
                         (1000.0 / sampleRate);
             
-            for (auto t : nostalgic->aPrep->getTransposition())
+            if (playNote)
             {
-                float offset = t + tuner->getOffset(midiNoteNumber, false), synthOffset = offset;
-                int synthNoteNumber = midiNoteNumber;
-                
-                //if (sampleType < BKLoadSoundfont)
+                for (auto t : nostalgic->aPrep->getTransposition())
                 {
-                    synthNoteNumber += (int)offset;
-                    synthOffset     -= (int)offset;
+                    float offset = t + tuner->getOffset(midiNoteNumber, false), synthOffset = offset;
+                    int synthNoteNumber = midiNoteNumber;
+                    
+                    //if (sampleType < BKLoadSoundfont)
+                    {
+                        synthNoteNumber += (int)offset;
+                        synthOffset     -= (int)offset;
+                    }
+                    
+                    //play nostalgic note
+                    DBG("reverse note on noteNum/offset " +
+                        String(synthNoteNumber) + " " +
+                        String(synthOffset));
+                    
+                    synth->keyOn(
+                                 midiChannel,
+                                 midiNoteNumber,
+                                 synthNoteNumber,
+                                 synthOffset,
+                                 velocities.getUnchecked(midiNoteNumber),
+                                 nostalgic->aPrep->getGain() * aGlobalGain,
+                                 Reverse,
+                                 FixedLengthFixedStart,
+                                 NostalgicNote,
+                                 nostalgic->getId(),
+                                 duration + nostalgic->aPrep->getWavedistance(),
+                                 duration,  // length
+                                 nostalgic->aPrep->getReverseAttack(),
+                                 nostalgic->aPrep->getReverseDecay(),
+                                 nostalgic->aPrep->getReverseSustain(),
+                                 nostalgic->aPrep->getReverseRelease(),
+                                 tuner);
                 }
                 
-                //play nostalgic note
-                DBG("reverse note on noteNum/offset " +
-                    String(synthNoteNumber) + " " +
-                    String(synthOffset));
-                
-                synth->keyOn(
-                             midiChannel,
-                             midiNoteNumber,
-                             synthNoteNumber,
-                             synthOffset,
-                             velocities.getUnchecked(midiNoteNumber),
-                             nostalgic->aPrep->getGain() * aGlobalGain,
-                             Reverse,
-                             FixedLengthFixedStart,
-                             NostalgicNote,
-                             nostalgic->getId(),
-                             duration + nostalgic->aPrep->getWavedistance(),
-                             duration,  // length
-                             nostalgic->aPrep->getReverseAttack(),
-                             nostalgic->aPrep->getReverseDecay(),
-                             nostalgic->aPrep->getReverseSustain(),
-                             nostalgic->aPrep->getReverseRelease(),
-                             tuner);
+                reverseNotes.insert(0, new NostalgicNoteStuff(midiNoteNumber));
+                NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
+                currentNote->setPrepAtKeyOn(nostalgic->aPrep);
+                currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber, false));
+                currentNote->setVelocityAtKeyOn(velocities.getUnchecked(midiNoteNumber));
+                currentNote->setReverseStartPosition((duration + nostalgic->aPrep->getWavedistance()) * sampleRate/1000.);
+                //currentNote->setReverseTargetLength((duration - (aRampUndertowCrossMS + 30)) * sampleRate/1000.);
+                //currentNote->setReverseTargetLength((duration - (aRampUndertowCrossMS)) * sampleRate/1000.);
+                currentNote->setReverseTargetLength((duration - nostalgic->aPrep->getReverseRelease()) * sampleRate/1000.);
+                currentNote->setUndertowTargetLength(nostalgic->aPrep->getUndertow() * sampleRate/1000.);
             }
             
             // turn note length timers off
@@ -178,17 +211,6 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
             noteOn.set(midiNoteNumber, false);
             noteLengthTimers.set(midiNoteNumber, 0);
             //DBG("nostalgic removed active note " + String(midiNoteNumber));
-            
-            reverseNotes.insert(0, new NostalgicNoteStuff(midiNoteNumber));
-            NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
-            currentNote->setPrepAtKeyOn(nostalgic->aPrep);
-            currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber, false));
-            currentNote->setVelocityAtKeyOn(velocities.getUnchecked(midiNoteNumber));
-            currentNote->setReverseStartPosition((duration + nostalgic->aPrep->getWavedistance()) * sampleRate/1000.);
-            //currentNote->setReverseTargetLength((duration - (aRampUndertowCrossMS + 30)) * sampleRate/1000.);
-            //currentNote->setReverseTargetLength((duration - (aRampUndertowCrossMS)) * sampleRate/1000.);
-            currentNote->setReverseTargetLength((duration - nostalgic->aPrep->getReverseRelease()) * sampleRate/1000.);
-            currentNote->setUndertowTargetLength(nostalgic->aPrep->getUndertow() * sampleRate/1000.);
         }
         else if(syncTargetMode == LastNoteOffSync || syncTargetMode == AnyNoteOffSync)
         {
@@ -419,9 +441,10 @@ Array<int> NostalgicProcessor::getPlayPositions() //return playback positions in
 {
     Array<int> newpositions;
     
-    for(int i = 0; i<reverseNotes.size(); i++)
+    for(auto note : reverseNotes)
     {
-        newpositions.set(i, reverseNotes.getUnchecked(i)->getReversePlayPosition() * 1000./sampleRate);
+        if (note->isActive())
+            newpositions.add(note->getReversePlayPosition() * 1000./sampleRate);
     }
     
     return newpositions;
@@ -431,9 +454,10 @@ Array<int> NostalgicProcessor::getUndertowPositions() //return playback position
 {
     Array<int> newpositions;
 
-    for(int i = 0; i<undertowNotes.size(); i++)
+    for(auto note : undertowNotes)
     {
-        newpositions.set(i, undertowNotes.getUnchecked(i)->getUndertowPlayPosition() * 1000./sampleRate);
+        if (note->isActive())
+            newpositions.add(note->getUndertowPlayPosition() * 1000./sampleRate);
     }
     
     return newpositions;
