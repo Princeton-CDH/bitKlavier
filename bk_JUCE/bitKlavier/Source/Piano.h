@@ -309,7 +309,7 @@ public:
     void deconfigurePianoMap(BKItem::Ptr map);
     
     void configureReset(BKItem::Ptr item);
-    void deconfigureResetForKeys(BKItem::Ptr item, Array<int> otherKeys);
+    void deconfigureResetForKeys(BKItem::Ptr item, Array<bool> otherKeys);
 
     void configureModification(BKItem::Ptr map);
     void deconfigureModification(BKItem::Ptr map);
@@ -394,27 +394,27 @@ private:
     void configureDirectModification(DirectModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
     void configureDirectModification(int key, DirectModPreparation::Ptr, Array<int>);
     void deconfigureDirectModification(DirectModPreparation::Ptr, Array<int> whichKeymaps);
-    void deconfigureDirectModificationForKeys(DirectModPreparation::Ptr, Array<int>);
+    void deconfigureDirectModificationForKeys(DirectModPreparation::Ptr, Array<bool>);
     
     void configureSynchronicModification(SynchronicModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
     void configureSynchronicModification(int key, SynchronicModPreparation::Ptr, Array<int>);
     void deconfigureSynchronicModification(SynchronicModPreparation::Ptr, Array<int> whichKeymaps);
-    void deconfigureSynchronicModificationForKeys(SynchronicModPreparation::Ptr, Array<int>);
+    void deconfigureSynchronicModificationForKeys(SynchronicModPreparation::Ptr, Array<bool>);
     
     void configureNostalgicModification(NostalgicModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps);
     void configureNostalgicModification(int key, NostalgicModPreparation::Ptr, Array<int>);
     void deconfigureNostalgicModification(NostalgicModPreparation::Ptr, Array<int> whichKeymaps);
-    void deconfigureNostalgicModificationForKeys(NostalgicModPreparation::Ptr, Array<int>);
+    void deconfigureNostalgicModificationForKeys(NostalgicModPreparation::Ptr, Array<bool>);
     
     void configureTuningModification(TuningModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
     void configureTuningModification(int key, TuningModPreparation::Ptr, Array<int>);
     void deconfigureTuningModification(TuningModPreparation::Ptr, Array<int> whichKeymaps);
-    void deconfigureTuningModificationForKeys(TuningModPreparation::Ptr, Array<int>);
+    void deconfigureTuningModificationForKeys(TuningModPreparation::Ptr, Array<bool>);
     
     void configureTempoModification(TempoModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
     void configureTempoModification(int key, TempoModPreparation::Ptr, Array<int>);
     void deconfigureTempoModification(TempoModPreparation::Ptr, Array<int> whichKeymaps);
-    void deconfigureTempoModificationForKeys(TempoModPreparation::Ptr, Array<int>);
+    void deconfigureTempoModificationForKeys(TempoModPreparation::Ptr, Array<bool>);
     
     JUCE_LEAK_DETECTOR(Piano)
 };
