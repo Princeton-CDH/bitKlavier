@@ -1108,6 +1108,8 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == NostalgicLengthMultiplier) active->setLengthMultiplier(modf);
         else if (type == NostalgicReverseADSR)      active->setReverseADSRvals(modfa);
         else if (type == NostalgicUndertowADSR)     active->setUndertowADSRvals(modfa);
+        else if (type == NostalgicHoldMin)          active->setHoldMin(modf);
+        else if (type == NostalgicHoldMax)          active->setHoldMax(modf);
         
         updateState->nostalgicPreparationDidChange = true;
     }

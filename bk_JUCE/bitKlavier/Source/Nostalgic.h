@@ -148,9 +148,9 @@ public:
 	{
 		Random::getSystemRandom().setSeedRandomly();
 
-		float r[25];
+		float r[30];
 
-		for (int i = 0; i < 25; i++)  r[i] = (Random::getSystemRandom().nextFloat());
+		for (int i = 0; i < 30; i++)  r[i] = (Random::getSystemRandom().nextFloat());
 		int idx = 0;
 
 		nWaveDistance = (int)(r[idx++] * 20000);
@@ -172,6 +172,8 @@ public:
 		nUndertowDecay = (int)(r[idx++] * 1000) + 1;
 		nUndertowSustain = r[idx++];
 		nUndertowRelease = (int)(r[idx++] * 2000) + 1;
+        holdMin = (float)(r[idx++] * 12000.);
+        holdMax = (float)(r[idx++] * 12000.);
 	}
     
     inline const String getName() const noexcept {return name;}
@@ -441,6 +443,9 @@ public:
         prep.setProperty( ptagNostalgic_beatsToSkip,        sPrep->getBeatsToSkip(), 0);
         prep.setProperty( ptagNostalgic_mode,               sPrep->getMode(), 0);
         
+        prep.setProperty( "holdMin", sPrep->getHoldMin(), 0);
+        prep.setProperty( "holdMax", sPrep->getHoldMax(), 0);
+        
         ValueTree reverseADSRvals( vtagNostalgic_reverseADSR);
         count = 0;
         for (auto f : sPrep->getReverseADSRvals())
@@ -549,6 +554,30 @@ public:
         i = e->getStringAttribute(ptagNostalgic_mode).getIntValue();
         sPrep->setMode((NostalgicSyncMode)i);
         
+        String str = e->getStringAttribute("holdMin");
+        
+        if (str != "")
+        {
+            f = e->getStringAttribute("holdMin").getFloatValue();
+            sPrep->setHoldMin(f);
+        }
+        else
+        {
+            sPrep->setHoldMin(0);
+        }
+        
+        str = e->getStringAttribute("holdMax");
+        
+        if (str != "")
+        {
+            f = e->getStringAttribute("holdMax").getFloatValue();
+            sPrep->setHoldMax(f);
+        }
+        else
+        {
+            sPrep->setHoldMax(12000);
+        }
+        
         aPrep->copy(sPrep);
         
     }
@@ -623,6 +652,8 @@ public:
         param.set(NostalgicReverseADSR, String(floatArrayToString(p->getReverseADSRvals())));
         param.set(NostalgicUndertowADSR, String(floatArrayToString(p->getUndertowADSRvals())));
         param.set(NostalgicMode, String(p->getMode()));
+        param.set(NostalgicHoldMin, String(p->getHoldMin()));
+        param.set(NostalgicHoldMax, String(p->getHoldMax()));
         
     }
     
@@ -641,6 +672,8 @@ public:
         param.set(NostalgicReverseADSR, "");
         param.set(NostalgicUndertowADSR, "");
         param.set(NostalgicMode, "");
+        param.set(NostalgicHoldMin, "");
+        param.set(NostalgicHoldMax, "");
 
     }
     
@@ -723,6 +756,11 @@ public:
         p = getParam(NostalgicMode);
         if (p != String::empty) prep.setProperty( ptagNostalgic_mode,               p.getIntValue(), 0);
         
+        p = getParam(NostalgicHoldMin);
+        if (p != String::empty) prep.setProperty( "holdMin", p.getFloatValue(), 0);
+        
+        p = getParam(NostalgicHoldMax);
+        if (p != String::empty) prep.setProperty( "holdMax", p.getFloatValue(), 0);
         
         return prep;
     }
@@ -810,6 +848,13 @@ public:
         
         p = e->getStringAttribute(ptagNostalgic_mode);
         setParam(NostalgicMode, p);
+        
+        p = e->getStringAttribute("holdMin");
+        setParam(NostalgicHoldMin, p);
+                                  
+        p = e->getStringAttribute("holdMax");
+        setParam(NostalgicHoldMax, p);
+
     }
     
     
@@ -829,6 +874,8 @@ public:
         param.set(NostalgicMode, String(p->getMode()));
         param.set(NostalgicReverseADSR, floatArrayToString(p->getReverseADSRvals()));
         param.set(NostalgicUndertowADSR, floatArrayToString(p->getUndertowADSRvals()));
+        param.set(NostalgicHoldMin, String(p->getHoldMin()));
+        param.set(NostalgicHoldMax, String(p->getHoldMax()));
     }
 
 	inline bool compare(NostalgicModPreparation::Ptr t)
@@ -841,7 +888,9 @@ public:
 			getParam(NostalgicBeatsToSkip) == t->getParam(NostalgicBeatsToSkip) &&
 			getParam(NostalgicMode) == t->getParam(NostalgicMode) &&
 			getParam(NostalgicReverseADSR) == t->getParam(NostalgicReverseADSR) &&
-			getParam(NostalgicUndertowADSR) == t->getParam(NostalgicUndertowADSR));
+			getParam(NostalgicUndertowADSR) == t->getParam(NostalgicUndertowADSR) &&
+                getParam(NostalgicHoldMin) == t->getParam(NostalgicHoldMin) &&
+                getParam(NostalgicHoldMax) == t->getParam(NostalgicHoldMax));
 	}
 
 	inline void randomize()
@@ -858,6 +907,8 @@ public:
 		param.set(NostalgicMode, String(p.getMode()));
 		param.set(NostalgicReverseADSR, floatArrayToString(p.getReverseADSRvals()));
 		param.set(NostalgicUndertowADSR, floatArrayToString(p.getUndertowADSRvals()));
+        param.set(NostalgicHoldMin, String(p.getHoldMin()));
+        param.set(NostalgicHoldMax, String(p.getHoldMax()));
 	}
     
     inline void copy(NostalgicModPreparation::Ptr p)

@@ -702,6 +702,7 @@ void NostalgicModificationEditor::greyOutAllComponents()
     gainSlider->setDim(gModAlpha);
     reverseADSRSlider->setDim(gModAlpha);
     undertowADSRSlider->setDim(gModAlpha);
+    holdTimeMinMaxSlider->setDim(gModAlpha);
 }
 
 void NostalgicModificationEditor::highlightModedComponents()
@@ -717,6 +718,8 @@ void NostalgicModificationEditor::highlightModedComponents()
     if(mod->getParam(NostalgicGain) != "")              gainSlider->setBright();
     if(mod->getParam(NostalgicReverseADSR) != "")       reverseADSRSlider->setBright();
     if(mod->getParam(NostalgicUndertowADSR) != "")      undertowADSRSlider->setBright();
+    if(mod->getParam(NostalgicHoldMin) != "")           holdTimeMinMaxSlider->setBright();
+    if(mod->getParam(NostalgicHoldMax) != "")           holdTimeMinMaxSlider->setBright();
 }
 
 void NostalgicModificationEditor::update(void)
@@ -773,6 +776,12 @@ void NostalgicModificationEditor::update(void)
         
         val = mod->getParam(NostalgicUndertowADSR);
         undertowADSRSlider->setValue(stringToFloatArray(val), dontSendNotification);
+        
+        val = mod->getParam(NostalgicHoldMin);
+        holdTimeMinMaxSlider->setMinValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(NostalgicHoldMax);
+        holdTimeMinMaxSlider->setMaxValue(val.getFloatValue(), dontSendNotification);
     }
     
     
@@ -1060,4 +1069,16 @@ void NostalgicModificationEditor::BKADSRButtonStateChanged(String name, bool mod
 {
     setShowADSR(name, !state);
     setSubWindowInFront(!state);
+}
+
+void NostalgicModificationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
+{
+    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
+    
+    if (name == "hold time")
+    {
+        mod->setParam(NostalgicHoldMin, String(minval));
+        mod->setParam(NostalgicHoldMax, String(maxval));
+        holdTimeMinMaxSlider->setBright();
+    }
 }

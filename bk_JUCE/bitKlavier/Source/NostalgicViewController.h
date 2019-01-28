@@ -146,7 +146,7 @@ public:
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
     void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
     void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
-    void BKRangeSliderValueChanged(String name, double minval, double maxval) override{};
+    void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
     
     void fillSelectCB(int last, int current);
     void greyOutAllComponents();
