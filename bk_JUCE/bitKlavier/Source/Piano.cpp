@@ -490,9 +490,9 @@ void Piano::configureDirectModification(int key, DirectModPreparation::Ptr dmod,
 
 void Piano::configureDirectModification(DirectModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
 {
-    Array<int> otherKeys;
+    Array<bool> otherKeys;
     
-    for (int i = 0; i < 128; i++) otherKeys.add(i);
+    for (int i = 0; i < 128; i++) otherKeys.add(true);
     
     for (auto keymap : whichKeymaps)
     {
@@ -500,24 +500,24 @@ void Piano::configureDirectModification(DirectModPreparation::Ptr mod, Array<int
         {
             configureDirectModification(key, mod, whichPreps);
             
-            for (int i = otherKeys.size(); --i>=0;)
-            {
-                if (otherKeys[i] == key) otherKeys.remove(i);
-            }
+            otherKeys.set(key, false);
         }
     }
     
     deconfigureDirectModificationForKeys(mod, otherKeys);
 }
 
-void Piano::deconfigureDirectModificationForKeys(DirectModPreparation::Ptr mod, Array<int> keys)
+void Piano::deconfigureDirectModificationForKeys(DirectModPreparation::Ptr mod, Array<bool> keys)
 {
     int whichMod = mod->getId();
 
-    for (auto key : keys)
+    for (int key = 0; key < 128; key++)
     {
-        // Remove Modification from Key
-        modificationMap[key]->removeDirectModification(whichMod);
+        if (keys[key])
+        {
+            // Remove Modification from Key
+            modificationMap[key]->removeDirectModification(whichMod);
+        }
         
     }
 }
@@ -544,7 +544,7 @@ void Piano::configureNostalgicModification(int key, NostalgicModPreparation::Ptr
 
 void Piano::configureReset(BKItem::Ptr item)
 {
-    Array<int> otherKeys;
+    Array<bool> otherKeys;
     
     Array<int> whichKeymaps = item->getConnectionIdsOfType(PreparationTypeKeymap);
     
@@ -554,7 +554,7 @@ void Piano::configureReset(BKItem::Ptr item)
     Array<int> tempo = item->getConnectionIdsOfType(PreparationTypeTempo);
     Array<int> tuning = item->getConnectionIdsOfType(PreparationTypeTuning);
     
-    for (int i = 0; i < 128; i++) otherKeys.add(i);
+    for (int i = 0; i < 128; i++) otherKeys.add(true);
     
     for (auto keymap : whichKeymaps)
     {
@@ -570,10 +570,7 @@ void Piano::configureReset(BKItem::Ptr item)
             
             for (auto id : tempo) modificationMap[key]->tempoReset.add(id);
             
-            for (int i = otherKeys.size(); --i>=0;)
-            {
-                if (otherKeys[i] == key) otherKeys.remove(i);
-            }
+            otherKeys.set(key, false);
         }
     }
     
@@ -582,7 +579,7 @@ void Piano::configureReset(BKItem::Ptr item)
     
 }
 
-void Piano::deconfigureResetForKeys(BKItem::Ptr item, Array<int> otherKeys)
+void Piano::deconfigureResetForKeys(BKItem::Ptr item, Array<bool> otherKeys)
 {
     Array<int> direct = item->getConnectionIdsOfType(PreparationTypeDirect);
     Array<int> nostalgic = item->getConnectionIdsOfType(PreparationTypeNostalgic);
@@ -590,45 +587,48 @@ void Piano::deconfigureResetForKeys(BKItem::Ptr item, Array<int> otherKeys)
     Array<int> tempo = item->getConnectionIdsOfType(PreparationTypeTempo);
     Array<int> tuning = item->getConnectionIdsOfType(PreparationTypeTuning);
     
-    for (auto key : otherKeys)
+    for (int key = 0; key < 128; key++)
     {
-        for (auto id : direct)
+        if (otherKeys[key])
         {
-            for (int i = modificationMap[key]->directReset.size(); --i>=0;)
+            for (auto id : direct)
             {
-                if (modificationMap[key]->directReset[i] == id) modificationMap[key]->directReset.remove(i);
+                for (int i = modificationMap[key]->directReset.size(); --i>=0;)
+                {
+                    if (modificationMap[key]->directReset[i] == id) modificationMap[key]->directReset.remove(i);
+                }
             }
-        }
-        
-        for (auto id : synchronic)
-        {
-            for (int i = modificationMap[key]->synchronicReset.size(); --i>=0;)
+            
+            for (auto id : synchronic)
             {
-                if (modificationMap[key]->synchronicReset[i] == id) modificationMap[key]->synchronicReset.remove(i);
+                for (int i = modificationMap[key]->synchronicReset.size(); --i>=0;)
+                {
+                    if (modificationMap[key]->synchronicReset[i] == id) modificationMap[key]->synchronicReset.remove(i);
+                }
             }
-        }
-        
-        for (auto id : nostalgic)
-        {
-            for (int i = modificationMap[key]->nostalgicReset.size(); --i>=0;)
+            
+            for (auto id : nostalgic)
             {
-                if (modificationMap[key]->nostalgicReset[i] == id) modificationMap[key]->nostalgicReset.remove(i);
+                for (int i = modificationMap[key]->nostalgicReset.size(); --i>=0;)
+                {
+                    if (modificationMap[key]->nostalgicReset[i] == id) modificationMap[key]->nostalgicReset.remove(i);
+                }
             }
-        }
-        
-        for (auto id : tuning)
-        {
-            for (int i = modificationMap[key]->tuningReset.size(); --i>=0;)
+            
+            for (auto id : tuning)
             {
-                if (modificationMap[key]->tuningReset[i] == id) modificationMap[key]->tuningReset.remove(i);
+                for (int i = modificationMap[key]->tuningReset.size(); --i>=0;)
+                {
+                    if (modificationMap[key]->tuningReset[i] == id) modificationMap[key]->tuningReset.remove(i);
+                }
             }
-        }
-        
-        for (auto id : tempo)
-        {
-            for (int i = modificationMap[key]->tempoReset.size(); --i>=0;)
+            
+            for (auto id : tempo)
             {
-                if (modificationMap[key]->tempoReset[i] == id) modificationMap[key]->tempoReset.remove(i);
+                for (int i = modificationMap[key]->tempoReset.size(); --i>=0;)
+                {
+                    if (modificationMap[key]->tempoReset[i] == id) modificationMap[key]->tempoReset.remove(i);
+                }
             }
         }
         
@@ -694,30 +694,33 @@ void Piano::configureModification(BKItem::Ptr map)
 
 void Piano::configureNostalgicModification(NostalgicModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
 {
-    Array<int> otherKeys;
+    Array<bool> otherKeys;
     
-    for (int i = 0; i < 128; i++) otherKeys.add(i);
+    for (int i = 0; i < 128; i++) otherKeys.add(true);
     
     for (auto keymap : whichKeymaps)
     {
         for (auto key : processor.gallery->getKeymap(keymap)->keys())
         {
             configureNostalgicModification(key, mod, whichPreps);
-            otherKeys.remove(key);
+            otherKeys.set(key,false);
         }
     }
     
     deconfigureNostalgicModificationForKeys(mod, otherKeys);
 }
 
-void Piano::deconfigureNostalgicModificationForKeys(NostalgicModPreparation::Ptr mod, Array<int> keys)
+void Piano::deconfigureNostalgicModificationForKeys(NostalgicModPreparation::Ptr mod, Array<bool> keys)
 {
     int whichMod = mod->getId();
     
-    for (auto key : keys)
+    for (int key = 0; key < 128; key++)
     {
-        // Remove Modification from Key
-        modificationMap[key]->removeNostalgicModification(whichMod);
+        if (keys[key])
+        {
+            // Remove Modification from Key
+            modificationMap[key]->removeNostalgicModification(whichMod);
+        }
     }
 }
 
@@ -743,30 +746,33 @@ void Piano::configureSynchronicModification(int key, SynchronicModPreparation::P
 
 void Piano::configureSynchronicModification(SynchronicModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
 {
-    Array<int> otherKeys;
+    Array<bool> otherKeys;
     
-    for (int i = 0; i < 128; i++) otherKeys.add(i);
+    for (int i = 0; i < 128; i++) otherKeys.add(true);
     
     for (auto keymap : whichKeymaps)
     {
         for (auto key : processor.gallery->getKeymap(keymap)->keys())
         {
             configureSynchronicModification(key, mod, whichPreps);
-            otherKeys.remove(key);
+            otherKeys.set(key,false);
         }
     }
     
     deconfigureSynchronicModificationForKeys(mod, otherKeys);
 }
 
-void Piano::deconfigureSynchronicModificationForKeys(SynchronicModPreparation::Ptr mod, Array<int> keys)
+void Piano::deconfigureSynchronicModificationForKeys(SynchronicModPreparation::Ptr mod, Array<bool> keys)
 {
     int whichMod = mod->getId();
 
-    for (auto key : keys)
+    for (int key = 0; key < 128; key++)
     {
-        // Remove Modification from Key
-        modificationMap[key]->removeSynchronicModification(whichMod);
+        if (keys[key])
+        {
+            // Remove Modification from Key
+            modificationMap[key]->removeSynchronicModification(whichMod);
+        }
     }
 }
 
@@ -794,32 +800,35 @@ void Piano::configureTempoModification(int key, TempoModPreparation::Ptr dmod, A
 
 void Piano::configureTempoModification(TempoModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
 {
-    Array<int> otherKeys;
+    Array<bool> otherKeys;
     
-    for (int i = 0; i < 128; i++) otherKeys.add(i);
+    for (int i = 0; i < 128; i++) otherKeys.add(true);
     
     for (auto keymap : whichKeymaps)
     {
         for (auto key : processor.gallery->getKeymap(keymap)->keys())
         {
             configureTempoModification(key, mod, whichPreps);
-            otherKeys.remove(key);
+            otherKeys.set(key, false);
         }
     }
     
     deconfigureTempoModificationForKeys(mod, otherKeys);
 }
 
-void Piano::deconfigureTempoModificationForKeys(TempoModPreparation::Ptr mod, Array<int> keys)
+void Piano::deconfigureTempoModificationForKeys(TempoModPreparation::Ptr mod, Array<bool> keys)
 {
     int whichMod = mod->getId();
     
-    for (auto key : keys)
+    for (int key = 0; key < 128; key++)
     {
-        // Remove Modification from Key
-        modificationMap[key]->removeTempoModification(whichMod);
+        if (keys[key])
+        {
+            // Remove Modification from Key
+            modificationMap[key]->removeTempoModification(whichMod);
         
-        //DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
+            //DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
+        }
     }
 }
 
@@ -847,35 +856,39 @@ void Piano::configureTuningModification(int key, TuningModPreparation::Ptr mod, 
 
 void Piano::configureTuningModification(TuningModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
 {
-    Array<int> otherKeys;
+    Array<bool> otherKeys;
     
-    for (int i = 0; i < 128; i++) otherKeys.add(i);
+    for (int i = 0; i < 128; i++) otherKeys.add(true);
     
     for (auto keymap : whichKeymaps)
     {
         for (auto key : processor.gallery->getKeymap(keymap)->keys())
         {
+            DBG("ADDING whichmod: " + String(mod->getId()) + " TO key: " + String(key));
             configureTuningModification(key, mod, whichPreps);
-            otherKeys.remove(key);
+            otherKeys.set(key, false);
         }
     }
     
-    DBG("whicpreps: " + intArrayToString(whichPreps));
     mod->setPreps(whichPreps);
     
     deconfigureTuningModificationForKeys(mod, otherKeys);
 }
 
-void Piano::deconfigureTuningModificationForKeys(TuningModPreparation::Ptr mod, Array<int> keys)
+void Piano::deconfigureTuningModificationForKeys(TuningModPreparation::Ptr mod, Array<bool> keys)
 {
     int whichMod = mod->getId();
     
-    for (auto key : keys)
+    for (int key = 0; key < 128; key++)
     {
-        // Remove Modification from Key
-        modificationMap[key]->removeTuningModification(whichMod);
+        if (keys[key])
+        {
+            // Remove Modification from Key
+            modificationMap[key]->removeTuningModification(whichMod);
+            
+            DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " + String(key));
+        }
         
-        //DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
     }
 }
 
