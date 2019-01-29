@@ -520,6 +520,8 @@ typedef enum NostalgicParameterType {
     NostalgicUndertowADSR,
     NostalgicHoldMin,
     NostalgicHoldMax,
+    NostalgicClusterMin,
+    NostalgicClusterMax,
     NostalgicParameterTypeNil
     
 } NostalgicParameterType;
@@ -539,7 +541,9 @@ static const std::vector<BKParameterDataType> cNostalgicDataTypes =
     BKFloatArr,
     BKFloatArr,
     BKFloat,
-    BKFloat
+    BKFloat,
+    BKInt,
+    BKInt
 };
 
 static const std::vector<std::string> cNostalgicParameterTypes = {
@@ -556,6 +560,8 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
     "UndertowADSR",
     "HoldMin",
     "HoldMax",
+    "ClusterMin",
+    "ClusterMax",
     "Tuning Id"
 };
 

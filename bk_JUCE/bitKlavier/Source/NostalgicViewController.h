@@ -40,7 +40,7 @@ public:
     ScopedPointer<BKADSRSlider> reverseADSRSlider;
     ScopedPointer<BKADSRSlider> undertowADSRSlider;
     
-    ScopedPointer<BKRangeSlider> clusterSizeMinMaxSlider;
+    ScopedPointer<BKRangeSlider> clusterMinMaxSlider;
     ScopedPointer<BKRangeSlider> holdTimeMinMaxSlider;
     
     void paint (Graphics&) override;

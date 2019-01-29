@@ -46,7 +46,9 @@ public:
     nUndertowRelease(p->getUndertowRelease()),
     nUndertowSustain(p->getUndertowSustain()),
     holdMin(p->getHoldMin()),
-    holdMax(p->getHoldMax())
+    holdMax(p->getHoldMax()),
+    clusterMin(p->getClusterMin()),
+    clusterMax(p->getClusterMax())
     {
         
     }
@@ -71,6 +73,9 @@ public:
     {
         holdMin = 0;
         holdMax = 12000;
+        
+        clusterMin = 1;
+        clusterMax = 12;
     }
     
     NostalgicPreparation(void):
@@ -90,7 +95,9 @@ public:
     nUndertowRelease(2000),
     nUndertowSustain(1.),
     holdMin(0),
-    holdMax(12000)
+    holdMax(12000),
+    clusterMin(1),
+    clusterMax(12)
     {
 
     }
@@ -121,6 +128,8 @@ public:
         nUndertowRelease = n->getUndertowRelease();
         holdMin = n->getHoldMin();
         holdMax = n->getHoldMax();
+        clusterMin = n->getClusterMin();
+        clusterMax = n->getClusterMax();
     }
     
     inline bool compare (NostalgicPreparation::Ptr n)
@@ -141,7 +150,9 @@ public:
                 nUndertowRelease == n->getUndertowRelease() &&
                 nMode == n->getMode() &&
                 holdMin == n->getHoldMin() &&
-                holdMax == n->getHoldMax());
+                holdMax == n->getHoldMax() &&
+                clusterMin == n->getClusterMin() &&
+                clusterMax == n->getClusterMax());
     }
 
 	inline void randomize()
@@ -174,6 +185,8 @@ public:
 		nUndertowRelease = (int)(r[idx++] * 2000) + 1;
         holdMin = (float)(r[idx++] * 12000.);
         holdMax = (float)(r[idx++] * 12000.);
+        clusterMin = (int)(r[idx++] * 12) + 1;
+        clusterMax = (int)(r[idx++] * 12) + 1;
 	}
     
     inline const String getName() const noexcept {return name;}
@@ -186,12 +199,6 @@ public:
     inline const float getLengthMultiplier() const noexcept                {return nLengthMultiplier;  }
     inline const float getBeatsToSkip() const noexcept                     {return nBeatsToSkip;       }
     inline const NostalgicSyncMode getMode() const noexcept                {return nMode;              }
-    
-    inline const float getHoldMin() const noexcept { return holdMin; }
-    inline const float getHoldMax() const noexcept { return holdMax; }
-    
-    inline const void setHoldMin(float min)  { holdMin = min; }
-    inline const void setHoldMax(float max)  { holdMax = max; }
     
     inline const int getReverseAttack() const noexcept                     {return nReverseAttack;        }
     inline const int getReverseDecay() const noexcept                      {return nReverseDecay;         }
@@ -223,6 +230,18 @@ public:
     inline void setUndertowDecay(int val)                                  {nUndertowDecay = val;          }
     inline void setUndertowSustain(float val)                              {nUndertowSustain = val;        }
     inline void setUndertowRelease(int val)                                {nUndertowRelease = val;        }
+    
+    inline const float getHoldMin() const noexcept { return holdMin; }
+    inline const float getHoldMax() const noexcept { return holdMax; }
+    
+    inline const void setHoldMin(float min)  { holdMin = min; }
+    inline const void setHoldMax(float max)  { holdMax = max; }
+    
+    inline const float getClusterMin() const noexcept { return clusterMin; }
+    inline const float getClusterMax() const noexcept { return clusterMax; }
+    
+    inline const void setClusterMin(float min)  { clusterMin = min; }
+    inline const void setClusterMax(float max)  { clusterMax = max; }
     
     inline void setReverseADSRvals(Array<float> vals)
     {
@@ -278,6 +297,7 @@ private:
     float   nUndertowSustain;
     
     float holdMin, holdMax;
+    int clusterMin, clusterMax;
     
     //internal keymap for resetting internal values to static
     //Keymap::Ptr resetMap = new Keymap(0);
@@ -446,6 +466,9 @@ public:
         prep.setProperty( "holdMin", sPrep->getHoldMin(), 0);
         prep.setProperty( "holdMax", sPrep->getHoldMax(), 0);
         
+        prep.setProperty( "clusterMin", sPrep->getClusterMin(), 0);
+        prep.setProperty( "clusterMax", sPrep->getClusterMax(), 0);
+        
         ValueTree reverseADSRvals( vtagNostalgic_reverseADSR);
         count = 0;
         for (auto f : sPrep->getReverseADSRvals())
@@ -554,6 +577,8 @@ public:
         i = e->getStringAttribute(ptagNostalgic_mode).getIntValue();
         sPrep->setMode((NostalgicSyncMode)i);
         
+        
+        // HOLD MIN / MAX
         String str = e->getStringAttribute("holdMin");
         
         if (str != "")
@@ -576,6 +601,32 @@ public:
         else
         {
             sPrep->setHoldMax(12000);
+        }
+        
+        
+        // CLUSTER MIN / MAX
+        str = e->getStringAttribute("clusterMin");
+        
+        if (str != "")
+        {
+            i = e->getStringAttribute("clusterMin").getIntValue();
+            sPrep->setClusterMin(i);
+        }
+        else
+        {
+            sPrep->setClusterMin(1);
+        }
+        
+        str = e->getStringAttribute("clusterMax");
+        
+        if (str != "")
+        {
+            i = e->getStringAttribute("clusterMax").getIntValue();
+            sPrep->setClusterMax(i);
+        }
+        else
+        {
+            sPrep->setClusterMax(12);
         }
         
         aPrep->copy(sPrep);
@@ -654,6 +705,8 @@ public:
         param.set(NostalgicMode, String(p->getMode()));
         param.set(NostalgicHoldMin, String(p->getHoldMin()));
         param.set(NostalgicHoldMax, String(p->getHoldMax()));
+        param.set(NostalgicClusterMin, String(p->getClusterMin()));
+        param.set(NostalgicClusterMax, String(p->getClusterMax()));
         
     }
     
@@ -674,6 +727,8 @@ public:
         param.set(NostalgicMode, "");
         param.set(NostalgicHoldMin, "");
         param.set(NostalgicHoldMax, "");
+        param.set(NostalgicClusterMin, "");
+        param.set(NostalgicClusterMax, "");
 
     }
     
@@ -761,6 +816,13 @@ public:
         
         p = getParam(NostalgicHoldMax);
         if (p != String::empty) prep.setProperty( "holdMax", p.getFloatValue(), 0);
+        
+        p = getParam(NostalgicClusterMin);
+        if (p != String::empty) prep.setProperty( "clusterMin", p.getFloatValue(), 0);
+        
+        p = getParam(NostalgicClusterMax);
+        if (p != String::empty) prep.setProperty( "clusterMax", p.getFloatValue(), 0);
+        
         
         return prep;
     }
@@ -854,6 +916,12 @@ public:
                                   
         p = e->getStringAttribute("holdMax");
         setParam(NostalgicHoldMax, p);
+        
+        p = e->getStringAttribute("clusterMin");
+        setParam(NostalgicClusterMin, p);
+        
+        p = e->getStringAttribute("clusterMax");
+        setParam(NostalgicClusterMax, p);
 
     }
     
@@ -876,6 +944,8 @@ public:
         param.set(NostalgicUndertowADSR, floatArrayToString(p->getUndertowADSRvals()));
         param.set(NostalgicHoldMin, String(p->getHoldMin()));
         param.set(NostalgicHoldMax, String(p->getHoldMax()));
+        param.set(NostalgicClusterMin, String(p->getClusterMin()));
+        param.set(NostalgicClusterMax, String(p->getClusterMax()));
     }
 
 	inline bool compare(NostalgicModPreparation::Ptr t)
@@ -890,7 +960,9 @@ public:
 			getParam(NostalgicReverseADSR) == t->getParam(NostalgicReverseADSR) &&
 			getParam(NostalgicUndertowADSR) == t->getParam(NostalgicUndertowADSR) &&
                 getParam(NostalgicHoldMin) == t->getParam(NostalgicHoldMin) &&
-                getParam(NostalgicHoldMax) == t->getParam(NostalgicHoldMax));
+                getParam(NostalgicHoldMax) == t->getParam(NostalgicHoldMax) &&
+                getParam(NostalgicClusterMin) == t->getParam(NostalgicClusterMin) &&
+                getParam(NostalgicClusterMax) == t->getParam(NostalgicClusterMax));
 	}
 
 	inline void randomize()
@@ -909,6 +981,8 @@ public:
 		param.set(NostalgicUndertowADSR, floatArrayToString(p.getUndertowADSRvals()));
         param.set(NostalgicHoldMin, String(p.getHoldMin()));
         param.set(NostalgicHoldMax, String(p.getHoldMax()));
+        param.set(NostalgicClusterMin, String(p.getClusterMin()));
+        param.set(NostalgicClusterMax, String(p.getClusterMax()));
 	}
     
     inline void copy(NostalgicModPreparation::Ptr p)
@@ -1047,10 +1121,17 @@ private:
     TuningProcessor::Ptr            tuner;
     SynchronicProcessor::Ptr        synchronic;
     
-    Array<uint64> noteLengthTimers;     //store current length of played notes here
-    Array<int> activeNotes;             //table of notes currently being played by player
+    Array<uint64> noteLengthTimers;     // store current length of played notes here
+    Array<int> activeNotes;             // table of notes currently being played by player
     Array<bool> noteOn;                 // table of booleans representing state of each note
-    Array<float> velocities;            //table of velocities played
+    Array<float> velocities;            // table of velocities played
+    
+    // CLUSTER STUFF
+    bool inCluster;
+    Array<int> cluster;
+    bool playCluster;
+    uint64 clusterThresholdTimer;
+    Array<int> clusterNotesPlayed;
     
     OwnedArray<NostalgicNoteStuff> reverseNotes;
     OwnedArray<NostalgicNoteStuff> undertowNotes;
