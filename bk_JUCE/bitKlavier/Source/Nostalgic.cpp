@@ -146,7 +146,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
             
             playCluster = false;
             
-            if (inCluster && !playCluster)
+            if (inCluster)
             {
                 if (prep->getClusterMin() <= prep->getClusterMax())
                 {
@@ -235,7 +235,6 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                         currentNote->setReverseStartPosition((duration + prep->getWavedistance()) * sampleRate/1000.);
                         currentNote->setReverseTargetLength((duration - prep->getReverseRelease()) * sampleRate/1000.);
                         currentNote->setUndertowTargetLength(prep->getUndertow() * sampleRate/1000.);
-                        
                         
                         noteLengthTimers.set(note, 0);
                     }
