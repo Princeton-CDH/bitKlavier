@@ -247,8 +247,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                              nostalgic->aPrep->getReverseAttack(),
                              nostalgic->aPrep->getReverseDecay(),
                              nostalgic->aPrep->getReverseSustain(),
-                             nostalgic->aPrep->getReverseRelease(),
-                             tuner);
+                             nostalgic->aPrep->getReverseRelease(), tuner);
             }
             
             reverseNotes.insert(0, new NostalgicNoteStuff(midiNoteNumber));
@@ -257,7 +256,6 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
             currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber, false));
             currentNote->setVelocityAtKeyOn(velocities.getUnchecked(midiNoteNumber) * nostalgic->aPrep->getGain());
             currentNote->setReverseStartPosition((duration + nostalgic->aPrep->getWavedistance()) * sampleRate/1000.);
-            //currentNote->setReverseTargetLength((duration - aRampUndertowCrossMS) * sampleRate/1000.);
             currentNote->setReverseTargetLength((duration - nostalgic->aPrep->getReverseRelease()) * sampleRate/1000.);
             currentNote->setUndertowTargetLength(nostalgic->aPrep->getUndertow() * sampleRate/1000.);
         }

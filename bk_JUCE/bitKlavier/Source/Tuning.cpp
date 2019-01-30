@@ -628,15 +628,20 @@ void Tuning::setState(XmlElement* e)
     if(f > 0) sPrep->setNToneSemitoneWidth(f);
     else sPrep->setNToneSemitoneWidth(100);
     
-    i = e->getStringAttribute("adaptiveSystem").getIntValue();
+    String str = e->getStringAttribute("adaptiveSystem");
     
-    TuningAdaptiveSystemType type = (TuningAdaptiveSystemType) i;
-    
-    sPrep->setAdaptiveType(type);
-    
-    if (type == AdaptiveSpring)
+    if (str != "")
     {
-        sPrep->setSpringsActive(true);
+        i = str.getIntValue();
+        
+        TuningAdaptiveSystemType type = (TuningAdaptiveSystemType) i;
+        
+        sPrep->setAdaptiveType(type);
+        
+        if (type == AdaptiveSpring)
+        {
+            sPrep->setSpringsActive(true);
+        }
     }
     
     // custom scale

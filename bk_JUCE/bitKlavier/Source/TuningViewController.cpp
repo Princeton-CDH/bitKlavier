@@ -270,7 +270,7 @@ void TuningViewController::resized()
     adaptiveSystemsCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 3.));
     modeSlice.removeFromLeft(gXSpacing);
     //scaleCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
-    scaleCB.setBounds(modeSlice.removeFromLeft(2. * modeSlice.getWidth() / 3.));
+    scaleCB.setBounds(modeSlice.removeFromLeft(2. * modeSlice.getWidth() / 3. - 2.*gXSpacing));
     
     modeSlice.removeFromLeft(gXSpacing);
     fundamentalCB.setBounds(modeSlice);
