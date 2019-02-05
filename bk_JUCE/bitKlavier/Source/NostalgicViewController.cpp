@@ -696,7 +696,7 @@ void NostalgicPreparationEditor::buttonClicked (Button* b)
     {
         bool state = b->getToggleState();
         prep->setKeyOnReset(state);
-        prep->setKeyOnReset(state);
+        active->setKeyOnReset(state);
     }
 }
 
