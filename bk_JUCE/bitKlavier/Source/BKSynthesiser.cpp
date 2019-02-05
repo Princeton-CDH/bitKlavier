@@ -536,7 +536,8 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                                 const int keyNoteNumber,
                                 const int midiNoteNumber,
                                 const float velocity,
-                                bool allowTailOff)
+                                bool allowTailOff,
+                                bool nostalgicOff)
     {
         
         //DBG("BKSynthesiser::keyOff " + String(keyNoteNumber) + " " + String(midiNoteNumber));
@@ -568,8 +569,10 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                         // Let synthesiser know that key is no longer down,
                         voice->keyIsDown = false;
                         
-                        if (! ((voice->type == FixedLengthFixedStart) || (voice->type == FixedLength) || voice->sostenutoPedalDown)) {
-                            //DBG("BKSynthesiser::stopVoice " + String(midiNoteNumber));
+                        if (nostalgicOff || (! ((voice->type == FixedLengthFixedStart) ||
+                                                (voice->type == FixedLength) ||
+                                                voice->sostenutoPedalDown)))
+                        {
                             stopVoice (voice, velocity, allowTailOff);
                         }
                     }

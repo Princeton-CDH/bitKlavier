@@ -375,6 +375,36 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
     {
         activeNotes.addIfNotAlreadyThere(midiNoteNumber);
         noteLengthTimers.set(midiNoteNumber, 0);
+        
+        // KEY ON RESET STUFF
+        if (prep->getKeyOnReset())
+        {
+            Array<int> toRemove;
+            int i = 0;
+            for (auto note : reverseNotes)
+            {
+                if ((note->getNoteNumber() == midiNoteNumber) && note->isActive())
+                {
+                    toRemove.add(i);
+                }
+                i++;
+            }
+            
+            for (auto idx : toRemove)
+            {
+                reverseNotes.remove(idx);
+                
+                synth->keyOff (midiChannel,
+                               NostalgicNote,
+                               nostalgic->getId(),
+                               midiNoteNumber,
+                               midiNoteNumber,
+                               64,
+                               true,
+                               true); // true for nostalgicOff
+            }
+        }
+        
     }
     
     noteOn.set(midiNoteNumber, true);

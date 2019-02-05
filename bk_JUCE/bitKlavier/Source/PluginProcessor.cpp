@@ -1098,6 +1098,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modf = nMod[i]->getModFloat();
         modi = nMod[i]->getModInt();
         modia = nMod[i]->getModIntArr();
+        modb = nMod[i]->getModBool();
         
         if (type == NostalgicTransposition)         active->setTransposition(modfa);
         else if (type == NostalgicGain)             active->setGain(modf);
@@ -1112,6 +1113,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == NostalgicHoldMax)          active->setHoldMax(modf);
         else if (type == NostalgicClusterMin)       active->setClusterMin(modi);
         else if (type == NostalgicClusterMax)       active->setClusterMax(modi);
+        else if (type == NostalgicKeyOnReset)       active->setKeyOnReset((bool)modi);
         
         updateState->nostalgicPreparationDidChange = true;
     }

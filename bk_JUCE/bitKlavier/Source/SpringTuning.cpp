@@ -511,9 +511,7 @@ void SpringTuning::removeSpringsByNote(int note)
         Spring* spring = enabledSpringArray[i];
         Particle* a = spring->getA();
         Particle* b = spring->getB();
-        
-        DBG("spring: " + spring->getName());
-        
+    
 		if (spring->getEnabled() && ((a == p) || (b == p)))
         {
             spring->setEnabled(false);

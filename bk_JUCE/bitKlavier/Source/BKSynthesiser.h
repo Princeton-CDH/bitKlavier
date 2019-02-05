@@ -479,7 +479,8 @@ public:
                          int keyNoteNumber,
                          int midiNoteNumber,
                          float velocity,
-                         bool allowTailOff);
+                         bool allowTailOff,
+                         bool nostalgicOff = false);
     
     /** Turns off all notes.
      

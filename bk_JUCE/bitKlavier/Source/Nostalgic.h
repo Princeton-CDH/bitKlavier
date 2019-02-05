@@ -48,7 +48,8 @@ public:
     holdMin(p->getHoldMin()),
     holdMax(p->getHoldMax()),
     clusterMin(p->getClusterMin()),
-    clusterMax(p->getClusterMax())
+    clusterMax(p->getClusterMax()),
+    keyOnReset(p->getKeyOnReset())
     {
         
     }
@@ -76,6 +77,8 @@ public:
         
         clusterMin = 1;
         clusterMax = 12;
+        
+        keyOnReset = false;
     }
     
     NostalgicPreparation(void):
@@ -97,7 +100,8 @@ public:
     holdMin(0),
     holdMax(12000),
     clusterMin(1),
-    clusterMax(12)
+    clusterMax(12),
+    keyOnReset(false)
     {
 
     }
@@ -130,6 +134,7 @@ public:
         holdMax = n->getHoldMax();
         clusterMin = n->getClusterMin();
         clusterMax = n->getClusterMax();
+        keyOnReset = n->getKeyOnReset();
     }
     
     inline bool compare (NostalgicPreparation::Ptr n)
@@ -152,7 +157,8 @@ public:
                 holdMin == n->getHoldMin() &&
                 holdMax == n->getHoldMax() &&
                 clusterMin == n->getClusterMin() &&
-                clusterMax == n->getClusterMax());
+                clusterMax == n->getClusterMax() &&
+                keyOnReset == n->getKeyOnReset());
     }
 
 	inline void randomize()
@@ -187,6 +193,7 @@ public:
         holdMax = (float)(r[idx++] * 12000.);
         clusterMin = (int)(r[idx++] * 12) + 1;
         clusterMax = (int)(r[idx++] * 12) + 1;
+        keyOnReset = (r[idx++] < 0.5) ? true : false;
 	}
     
     inline const String getName() const noexcept {return name;}
@@ -243,6 +250,10 @@ public:
     inline const void setClusterMin(float min)  { clusterMin = min; }
     inline const void setClusterMax(float max)  { clusterMax = max; }
     
+    inline const bool getKeyOnReset() const noexcept { return keyOnReset; }
+    
+    inline const void setKeyOnReset(bool reset)  { keyOnReset = reset; }
+    
     inline void setReverseADSRvals(Array<float> vals)
     {
         nReverseAttack = vals[0];
@@ -298,6 +309,8 @@ private:
     
     float holdMin, holdMax;
     int clusterMin, clusterMax;
+    
+    bool keyOnReset;
     
     //internal keymap for resetting internal values to static
     //Keymap::Ptr resetMap = new Keymap(0);
@@ -469,6 +482,8 @@ public:
         prep.setProperty( "clusterMin", sPrep->getClusterMin(), 0);
         prep.setProperty( "clusterMax", sPrep->getClusterMax(), 0);
         
+        prep.setProperty( "keyOnReset", sPrep->getKeyOnReset() ? 1 : 0, 0);
+        
         ValueTree reverseADSRvals( vtagNostalgic_reverseADSR);
         count = 0;
         for (auto f : sPrep->getReverseADSRvals())
@@ -583,7 +598,7 @@ public:
         
         if (str != "")
         {
-            f = e->getStringAttribute("holdMin").getFloatValue();
+            f = str.getFloatValue();
             sPrep->setHoldMin(f);
         }
         else
@@ -595,7 +610,7 @@ public:
         
         if (str != "")
         {
-            f = e->getStringAttribute("holdMax").getFloatValue();
+            f = str.getFloatValue();
             sPrep->setHoldMax(f);
         }
         else
@@ -609,7 +624,7 @@ public:
         
         if (str != "")
         {
-            i = e->getStringAttribute("clusterMin").getIntValue();
+            i = str.getIntValue();
             sPrep->setClusterMin(i);
         }
         else
@@ -621,12 +636,24 @@ public:
         
         if (str != "")
         {
-            i = e->getStringAttribute("clusterMax").getIntValue();
+            i = str.getIntValue();
             sPrep->setClusterMax(i);
         }
         else
         {
             sPrep->setClusterMax(12);
+        }
+        
+        str = e->getStringAttribute("keyOnReset");
+        
+        if (str != "")
+        {
+            i = str.getIntValue();
+            sPrep->setKeyOnReset((bool) i);
+        }
+        else
+        {
+            sPrep->setKeyOnReset(false);
         }
         
         aPrep->copy(sPrep);
@@ -707,6 +734,7 @@ public:
         param.set(NostalgicHoldMax, String(p->getHoldMax()));
         param.set(NostalgicClusterMin, String(p->getClusterMin()));
         param.set(NostalgicClusterMax, String(p->getClusterMax()));
+        param.set(NostalgicKeyOnReset, String((int)p->getKeyOnReset()));
         
     }
     
@@ -729,6 +757,7 @@ public:
         param.set(NostalgicHoldMax, "");
         param.set(NostalgicClusterMin, "");
         param.set(NostalgicClusterMax, "");
+        param.set(NostalgicKeyOnReset, "");
 
     }
     
@@ -823,6 +852,8 @@ public:
         p = getParam(NostalgicClusterMax);
         if (p != String::empty) prep.setProperty( "clusterMax", p.getFloatValue(), 0);
         
+        p = getParam(NostalgicKeyOnReset);
+        if (p != String::empty) prep.setProperty( "keyOnReset", p.getIntValue(), 0);
         
         return prep;
     }
@@ -922,6 +953,9 @@ public:
         
         p = e->getStringAttribute("clusterMax");
         setParam(NostalgicClusterMax, p);
+        
+        p = e->getStringAttribute("keyOnReset");
+        setParam(NostalgicKeyOnReset, p);
 
     }
     
@@ -946,6 +980,7 @@ public:
         param.set(NostalgicHoldMax, String(p->getHoldMax()));
         param.set(NostalgicClusterMin, String(p->getClusterMin()));
         param.set(NostalgicClusterMax, String(p->getClusterMax()));
+        param.set(NostalgicKeyOnReset, String((int)p->getKeyOnReset()));
     }
 
 	inline bool compare(NostalgicModPreparation::Ptr t)
@@ -962,7 +997,8 @@ public:
                 getParam(NostalgicHoldMin) == t->getParam(NostalgicHoldMin) &&
                 getParam(NostalgicHoldMax) == t->getParam(NostalgicHoldMax) &&
                 getParam(NostalgicClusterMin) == t->getParam(NostalgicClusterMin) &&
-                getParam(NostalgicClusterMax) == t->getParam(NostalgicClusterMax));
+                getParam(NostalgicClusterMax) == t->getParam(NostalgicClusterMax) &&
+                getParam(NostalgicKeyOnReset) == t->getParam(NostalgicKeyOnReset));
 	}
 
 	inline void randomize()
@@ -983,6 +1019,7 @@ public:
         param.set(NostalgicHoldMax, String(p.getHoldMax()));
         param.set(NostalgicClusterMin, String(p.getClusterMin()));
         param.set(NostalgicClusterMax, String(p.getClusterMax()));
+        param.set(NostalgicKeyOnReset, String((int)p.getKeyOnReset()));
 	}
     
     inline void copy(NostalgicModPreparation::Ptr p)

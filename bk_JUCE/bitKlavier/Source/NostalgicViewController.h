@@ -43,6 +43,9 @@ public:
     ScopedPointer<BKRangeSlider> clusterMinMaxSlider;
     ScopedPointer<BKRangeSlider> holdTimeMinMaxSlider;
     
+    ToggleButton    keyOnResetToggle;
+    BKLabel           keyOnResetLabel;
+    
     void paint (Graphics&) override;
     void resized() override;
     
