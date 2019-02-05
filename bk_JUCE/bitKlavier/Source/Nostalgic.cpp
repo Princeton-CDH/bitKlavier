@@ -121,7 +121,6 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
             currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber, false));
             currentNote->setVelocityAtKeyOn(velocities.getUnchecked(midiNoteNumber));
             currentNote->setReverseStartPosition((duration + prep->getWavedistance()) * sampleRate/1000.);
-            //currentNote->setReverseTargetLength((duration - aRampUndertowCrossMS) * sampleRate/1000.);
             currentNote->setReverseTargetLength((duration - prep->getReverseRelease()) * sampleRate/1000.);
             currentNote->setUndertowTargetLength(prep->getUndertow() * sampleRate/1000.);
             
@@ -131,11 +130,11 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
             //===========CLUSTER MANAGEMENT===========
             if(!inCluster) //we have a new cluster
             {
-                //clear cluster
+                // clear cluster
                 cluster.clearQuick();
                 clusterNotesPlayed.clearQuick();
                 
-                //now we are in a cluster!
+                // now we are in a cluster!
                 inCluster = true;
             }
             
@@ -389,19 +388,27 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
                 }
                 i++;
             }
-            
+
             for (auto idx : toRemove)
             {
+                // DO ALL TRANSPOSITIONS OR JUST MIDINOTENUMBER ???
+                if (prep != nullptr)
+                {
+                    for (auto transp : prep->getTransposition())
+                    {
+                        DBG("transp: " + String(transp));
+                        synth->keyOff (midiChannel,
+                                       NostalgicNote,
+                                       nostalgic->getId(),
+                                       midiNoteNumber,
+                                       midiNoteNumber+transp,
+                                       64,
+                                       true,
+                                       true); // true for nostalgicOff
+                    }
+                }
+
                 reverseNotes.remove(idx);
-                
-                synth->keyOff (midiChannel,
-                               NostalgicNote,
-                               nostalgic->getId(),
-                               midiNoteNumber,
-                               midiNoteNumber,
-                               64,
-                               true,
-                               true); // true for nostalgicOff
             }
         }
         
