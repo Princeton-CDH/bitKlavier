@@ -710,7 +710,6 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     }
  
     int time;
-    MidiMessage m;
     bool didNoteOffs = false;
     
     int numSamples = buffer.getNumSamples();
@@ -718,13 +717,13 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     // Process all active prep maps in current piano
     for (auto pmap : currentPiano->activePMaps)
-        pmap->processBlock(numSamples, m.getChannel(), currentSampleType, false);
+        pmap->processBlock(numSamples, channel, currentSampleType, false);
     
     // OLAGON: Process all active nostalgic preps in previous piano
     if(prevPiano != currentPiano)
     {
         for (auto pmap : prevPiano->activePMaps)
-            pmap->processBlock(numSamples, m.getChannel(), currentSampleType, true); // true for onlyNostalgic
+            pmap->processBlock(numSamples, channel, currentSampleType, true); // true for onlyNostalgic
     }
 
     
@@ -740,32 +739,8 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         notesOffUI.remove(i);
     }
     
-#if LITTLE_NOTE_MACHINE
-    // LITTLE NOTE MACHINE
-    count++;
-    if (count > NOTE)
-    {
-        count = 0;
-
-        for (int i = 0; i < 3; i++)
-        {
-            times[i]++;
-            
-            if (times[i] > 3)
-            {
-                handleNoteOff(notes[i], 0.5, 1);
-                times[i] = 0;
-            }
-        }
-        
-        notes[note] = 48 + Random::getSystemRandom().nextInt(Range<int>(0, 24));
-        
-        handleNoteOn(notes[note], 0.8, 1);
-        
-        note++;
-    }
-#endif
     
+    MidiMessage m;
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
         int noteNumber = m.getNoteNumber();

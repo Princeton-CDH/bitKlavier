@@ -378,37 +378,56 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
         // KEY ON RESET STUFF
         if (prep->getKeyOnReset())
         {
-            Array<int> toRemove;
-            int i = 0;
-            for (auto note : reverseNotes)
+            // REMOVE REVERSE NOTES
+            for (int i = reverseNotes.size(); --i >= 0;)
             {
+                NostalgicNoteStuff* note = reverseNotes[i];
+                
                 if ((note->getNoteNumber() == midiNoteNumber) && note->isActive())
                 {
-                    toRemove.add(i);
-                }
-                i++;
-            }
-
-            for (auto idx : toRemove)
-            {
-                // DO ALL TRANSPOSITIONS OR JUST MIDINOTENUMBER ???
-                if (prep != nullptr)
-                {
-                    for (auto transp : prep->getTransposition())
+                    if (prep != nullptr)
                     {
-                        DBG("transp: " + String(transp));
-                        synth->keyOff (midiChannel,
-                                       NostalgicNote,
-                                       nostalgic->getId(),
-                                       midiNoteNumber,
-                                       midiNoteNumber+transp,
-                                       64,
-                                       true,
-                                       true); // true for nostalgicOff
+                        for (auto transp : prep->getTransposition())
+                        {
+                            DBG("reverse remove: " + String(midiNoteNumber + transp));
+                            synth->keyOff (midiChannel,
+                                           NostalgicNote,
+                                           nostalgic->getId(),
+                                           midiNoteNumber,
+                                           midiNoteNumber+transp,
+                                           64,
+                                           true,
+                                           true); // true for nostalgicOff
+                        }
                     }
+                    reverseNotes.remove(i);
                 }
-
-                reverseNotes.remove(idx);
+            }
+            
+            // REMOVE UNDERTOW NOTES
+            for (int i = undertowNotes.size(); --i >= 0;)
+            {
+                NostalgicNoteStuff* note = undertowNotes[i];
+                
+                if ((note->getNoteNumber() == midiNoteNumber))
+                {
+                    if (prep != nullptr)
+                    {
+                        for (auto transp : prep->getTransposition())
+                        {
+                            DBG("undertow remove: " + String(midiNoteNumber + transp));
+                            synth->keyOff (midiChannel,
+                                           NostalgicNote,
+                                           nostalgic->getId(),
+                                           midiNoteNumber,
+                                           midiNoteNumber+transp,
+                                           64,
+                                           true,
+                                           true); // true for nostalgicOff
+                        }
+                    }
+                    undertowNotes.remove(i);
+                }
             }
         }
         
