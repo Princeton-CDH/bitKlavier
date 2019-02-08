@@ -147,19 +147,9 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
             
             if (inCluster)
             {
-                if (prep->getClusterMin() <= prep->getClusterMax())
+                if (cluster.size() >= prep->getClusterMin())
                 {
-                    if (cluster.size() >= prep->getClusterMin() && cluster.size() <= prep->getClusterMax())
-                    {
-                        playCluster = true;
-                    }
-                }
-                else
-                {
-                    if (cluster.size() >= prep->getClusterMin() || cluster.size() <= prep->getClusterMax())
-                    {
-                        playCluster = true;
-                    }
+                    playCluster = true;
                 }
             }
             //=========================================

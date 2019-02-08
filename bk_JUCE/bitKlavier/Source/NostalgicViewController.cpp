@@ -50,10 +50,10 @@ BKViewController(p, theGraph)
     holdTimeMinMaxSlider->setJustifyRight(true);
     addAndMakeVisible(holdTimeMinMaxSlider);
     
-    clusterMinMaxSlider = new BKRangeSlider("cluster min / max", 1, 12, 1, 12, 1);
-    clusterMinMaxSlider->setToolTipString("Sets Min and Max cluster size needed to trigger swell; Min can be greater than Max");
-    clusterMinMaxSlider->setJustifyRight(true);
-    addAndMakeVisible(clusterMinMaxSlider);
+    clusterMinSlider = new BKSingleSlider("cluster min", 1, 10, 1, 1);
+    clusterMinSlider->setToolTipString("Sets Min cluster size needed to trigger swell");
+    clusterMinSlider->setJustifyRight(true);
+    addAndMakeVisible(clusterMinSlider);
     
     beatsToSkipSlider = new BKSingleSlider("beats to skip", 0, 10, 0, 1);
     beatsToSkipSlider->setToolTipString("Indicates how long Nostalgic wave lasts with respect to linked Synchronic sequence");
@@ -93,7 +93,7 @@ BKViewController(p, theGraph)
     
 #if JUCE_IOS
     holdTimeMinMaxSlider->addWantsBigOneListener(this);
-    clusterMinMaxSlider->addWantsBigOneListener(this);
+    clusterMinSlider->addWantsBigOneListener(this);
     beatsToSkipSlider->addWantsBigOneListener(this);
     gainSlider->addWantsBigOneListener(this);
     lengthMultiplierSlider->addWantsBigOneListener(this);
@@ -230,7 +230,7 @@ void NostalgicViewController::resized()
                               gComponentSingleSliderHeight);
         
         nextCenter = sliderSlice.getY() + sliderSlice.getHeight() * 0.65f;
-        clusterMinMaxSlider->setBounds(sliderSlice.getX(),
+        clusterMinSlider->setBounds(sliderSlice.getX(),
                                         nextCenter - gComponentSingleSliderHeight/2 + 4,
                                         sliderSlice.getWidth(),
                                         gComponentSingleSliderHeight);
@@ -309,7 +309,7 @@ NostalgicViewController(p, theGraph)
     transpositionSlider->addMyListener(this);
     lengthMultiplierSlider->addMyListener(this);
     holdTimeMinMaxSlider->addMyListener(this);
-    clusterMinMaxSlider->addMyListener(this);
+    clusterMinSlider->addMyListener(this);
     beatsToSkipSlider->addMyListener(this);
     
     keyOnResetToggle.addListener(this);
@@ -367,8 +367,7 @@ void NostalgicPreparationEditor::update(void)
         holdTimeMinMaxSlider->setMinValue(prep->getHoldMin(), dontSendNotification);
         holdTimeMinMaxSlider->setMaxValue(prep->getHoldMax(), dontSendNotification);
         
-        clusterMinMaxSlider->setMinValue(prep->getClusterMin(), dontSendNotification);
-        clusterMinMaxSlider->setMaxValue(prep->getClusterMax(), dontSendNotification);
+        clusterMinSlider->setValue(prep->getClusterMin(), dontSendNotification);
         
         keyOnResetToggle.setToggleState(prep->getKeyOnReset(), dontSendNotification);
         
@@ -562,6 +561,11 @@ void NostalgicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slid
         prep->setGain(val);
         active->setGain(val);
     }
+    else if (name == "cluster min")
+    {
+        prep->setClusterMin(val);
+        active->setClusterMin(val);
+    }
 }
 
 void NostalgicPreparationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
@@ -713,14 +717,6 @@ void NostalgicPreparationEditor::BKRangeSliderValueChanged(String name, double m
         prep->setHoldMax(maxval);
         active->setHoldMax(maxval);
     }
-    else if (name == "cluster min / max")
-    {
-        prep->setClusterMin(minval);
-        active->setClusterMin(minval);
-        
-        prep->setClusterMax(maxval);
-        active->setClusterMax(maxval);
-    }
 }
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ NostalgicModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
@@ -737,7 +733,7 @@ NostalgicViewController(p, theGraph)
     transpositionSlider->addMyListener(this);
     lengthMultiplierSlider->addMyListener(this);
     holdTimeMinMaxSlider->addMyListener(this);
-    clusterMinMaxSlider->addMyListener(this);
+    clusterMinSlider->addMyListener(this);
     beatsToSkipSlider->addMyListener(this);
     
     keyOnResetToggle.addListener(this);
@@ -761,7 +757,7 @@ void NostalgicModificationEditor::greyOutAllComponents()
     reverseADSRSlider->setDim(gModAlpha);
     undertowADSRSlider->setDim(gModAlpha);
     holdTimeMinMaxSlider->setDim(gModAlpha);
-    clusterMinMaxSlider->setDim(gModAlpha);
+    clusterMinSlider->setDim(gModAlpha);
     
     keyOnResetToggle.setAlpha(gModAlpha);
     keyOnResetLabel.setAlpha(gModAlpha);
@@ -782,8 +778,7 @@ void NostalgicModificationEditor::highlightModedComponents()
     if(mod->getParam(NostalgicUndertowADSR) != "")      undertowADSRSlider->setBright();
     if(mod->getParam(NostalgicHoldMin) != "")           holdTimeMinMaxSlider->setBright();
     if(mod->getParam(NostalgicHoldMax) != "")           holdTimeMinMaxSlider->setBright();
-    if(mod->getParam(NostalgicClusterMin) != "")        clusterMinMaxSlider->setBright();
-    if(mod->getParam(NostalgicClusterMax) != "")        clusterMinMaxSlider->setBright();
+    if(mod->getParam(NostalgicClusterMin) != "")        clusterMinSlider->setBright();
     if(mod->getParam(NostalgicKeyOnReset) != "")        { keyOnResetToggle.setAlpha(1.); keyOnResetLabel.setAlpha(1.); }
 }
 
@@ -849,11 +844,8 @@ void NostalgicModificationEditor::update(void)
         holdTimeMinMaxSlider->setMaxValue(val.getFloatValue(), dontSendNotification);
         
         val = mod->getParam(NostalgicClusterMin);
-        clusterMinMaxSlider->setMinValue(val.getFloatValue(), dontSendNotification);
-        
-        val = mod->getParam(NostalgicClusterMax);
-        clusterMinMaxSlider->setMaxValue(val.getFloatValue(), dontSendNotification);
-        
+        clusterMinSlider->setValue(val.getFloatValue(), dontSendNotification);
+    
         val = mod->getParam(NostalgicKeyOnReset);
         keyOnResetToggle.setToggleState((bool)val.getIntValue(), dontSendNotification);
     }
@@ -1088,6 +1080,11 @@ void NostalgicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
         mod->setParam(NostalgicGain, String(val));
         gainSlider->setBright();
     }
+    else if (name == "cluster min")
+    {
+        mod->setParam(NostalgicClusterMin, String(val));
+        clusterMinSlider->setBright();
+    }
     
     updateModification();
 }
@@ -1164,11 +1161,5 @@ void NostalgicModificationEditor::BKRangeSliderValueChanged(String name, double 
         mod->setParam(NostalgicHoldMin, String(minval));
         mod->setParam(NostalgicHoldMax, String(maxval));
         holdTimeMinMaxSlider->setBright();
-    }
-    else if (name == "cluster min / max")
-    {
-        mod->setParam(NostalgicClusterMin, String(minval));
-        mod->setParam(NostalgicClusterMax, String(maxval));
-        clusterMinMaxSlider->setBright();
     }
 }

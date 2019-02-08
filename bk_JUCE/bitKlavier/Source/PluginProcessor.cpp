@@ -1087,7 +1087,6 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == NostalgicHoldMin)          active->setHoldMin(modf);
         else if (type == NostalgicHoldMax)          active->setHoldMax(modf);
         else if (type == NostalgicClusterMin)       active->setClusterMin(modi);
-        else if (type == NostalgicClusterMax)       active->setClusterMax(modi);
         else if (type == NostalgicKeyOnReset)       active->setKeyOnReset((bool)modi);
         
         updateState->nostalgicPreparationDidChange = true;

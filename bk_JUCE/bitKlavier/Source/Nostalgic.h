@@ -248,7 +248,6 @@ public:
     inline const float getClusterMax() const noexcept { return clusterMax; }
     
     inline const void setClusterMin(float min)  { clusterMin = min; }
-    inline const void setClusterMax(float max)  { clusterMax = max; }
     
     inline const bool getKeyOnReset() const noexcept { return keyOnReset; }
     
@@ -619,7 +618,7 @@ public:
         }
         
         
-        // CLUSTER MIN / MAX
+        // CLUSTER MIN
         str = e->getStringAttribute("clusterMin");
         
         if (str != "")
@@ -630,18 +629,6 @@ public:
         else
         {
             sPrep->setClusterMin(1);
-        }
-        
-        str = e->getStringAttribute("clusterMax");
-        
-        if (str != "")
-        {
-            i = str.getIntValue();
-            sPrep->setClusterMax(i);
-        }
-        else
-        {
-            sPrep->setClusterMax(12);
         }
         
         str = e->getStringAttribute("keyOnReset");
@@ -733,7 +720,6 @@ public:
         param.set(NostalgicHoldMin, String(p->getHoldMin()));
         param.set(NostalgicHoldMax, String(p->getHoldMax()));
         param.set(NostalgicClusterMin, String(p->getClusterMin()));
-        param.set(NostalgicClusterMax, String(p->getClusterMax()));
         param.set(NostalgicKeyOnReset, String((int)p->getKeyOnReset()));
         
     }
@@ -756,7 +742,6 @@ public:
         param.set(NostalgicHoldMin, "");
         param.set(NostalgicHoldMax, "");
         param.set(NostalgicClusterMin, "");
-        param.set(NostalgicClusterMax, "");
         param.set(NostalgicKeyOnReset, "");
 
     }
@@ -848,9 +833,6 @@ public:
         
         p = getParam(NostalgicClusterMin);
         if (p != String::empty) prep.setProperty( "clusterMin", p.getFloatValue(), 0);
-        
-        p = getParam(NostalgicClusterMax);
-        if (p != String::empty) prep.setProperty( "clusterMax", p.getFloatValue(), 0);
         
         p = getParam(NostalgicKeyOnReset);
         if (p != String::empty) prep.setProperty( "keyOnReset", p.getIntValue(), 0);
@@ -951,9 +933,6 @@ public:
         p = e->getStringAttribute("clusterMin");
         setParam(NostalgicClusterMin, p);
         
-        p = e->getStringAttribute("clusterMax");
-        setParam(NostalgicClusterMax, p);
-        
         p = e->getStringAttribute("keyOnReset");
         setParam(NostalgicKeyOnReset, p);
 
@@ -979,7 +958,6 @@ public:
         param.set(NostalgicHoldMin, String(p->getHoldMin()));
         param.set(NostalgicHoldMax, String(p->getHoldMax()));
         param.set(NostalgicClusterMin, String(p->getClusterMin()));
-        param.set(NostalgicClusterMax, String(p->getClusterMax()));
         param.set(NostalgicKeyOnReset, String((int)p->getKeyOnReset()));
     }
 
@@ -997,7 +975,6 @@ public:
                 getParam(NostalgicHoldMin) == t->getParam(NostalgicHoldMin) &&
                 getParam(NostalgicHoldMax) == t->getParam(NostalgicHoldMax) &&
                 getParam(NostalgicClusterMin) == t->getParam(NostalgicClusterMin) &&
-                getParam(NostalgicClusterMax) == t->getParam(NostalgicClusterMax) &&
                 getParam(NostalgicKeyOnReset) == t->getParam(NostalgicKeyOnReset));
 	}
 
@@ -1018,7 +995,6 @@ public:
         param.set(NostalgicHoldMin, String(p.getHoldMin()));
         param.set(NostalgicHoldMax, String(p.getHoldMax()));
         param.set(NostalgicClusterMin, String(p.getClusterMin()));
-        param.set(NostalgicClusterMax, String(p.getClusterMax()));
         param.set(NostalgicKeyOnReset, String((int)p.getKeyOnReset()));
 	}
     

@@ -40,7 +40,7 @@ public:
     ScopedPointer<BKADSRSlider> reverseADSRSlider;
     ScopedPointer<BKADSRSlider> undertowADSRSlider;
     
-    ScopedPointer<BKRangeSlider> clusterMinMaxSlider;
+    ScopedPointer<BKSingleSlider> clusterMinSlider;
     ScopedPointer<BKRangeSlider> holdTimeMinMaxSlider;
     
     ToggleButton    keyOnResetToggle;
