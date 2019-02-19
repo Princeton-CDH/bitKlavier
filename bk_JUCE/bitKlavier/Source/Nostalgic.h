@@ -49,7 +49,9 @@ public:
     holdMax(p->getHoldMax()),
     clusterMin(p->getClusterMin()),
     clusterMax(p->getClusterMax()),
-    keyOnReset(p->getKeyOnReset())
+    keyOnReset(p->getKeyOnReset()),
+    velocityMin(p->getVelocityMin()),
+    velocityMax(p->getVelocityMax())
     {
         
     }
@@ -78,6 +80,9 @@ public:
         clusterMin = 1;
         clusterMax = 12;
         
+        velocityMin = 0;
+        velocityMax = 127;
+        
         keyOnReset = false;
     }
     
@@ -101,7 +106,9 @@ public:
     holdMax(12000),
     clusterMin(1),
     clusterMax(12),
-    keyOnReset(false)
+    keyOnReset(false),
+    velocityMin(0),
+    velocityMax(127)
     {
 
     }
@@ -135,6 +142,8 @@ public:
         clusterMin = n->getClusterMin();
         clusterMax = n->getClusterMax();
         keyOnReset = n->getKeyOnReset();
+        velocityMin = n->getVelocityMin();
+        velocityMax = n->getVelocityMax();
     }
     
     inline bool compare (NostalgicPreparation::Ptr n)
@@ -158,7 +167,9 @@ public:
                 holdMax == n->getHoldMax() &&
                 clusterMin == n->getClusterMin() &&
                 clusterMax == n->getClusterMax() &&
-                keyOnReset == n->getKeyOnReset());
+                keyOnReset == n->getKeyOnReset() &&
+                velocityMin == n->getVelocityMin() &&
+                velocityMax == n->getVelocityMax());
     }
 
 	inline void randomize()
@@ -194,6 +205,8 @@ public:
         clusterMin = (int)(r[idx++] * 12) + 1;
         clusterMax = (int)(r[idx++] * 12) + 1;
         keyOnReset = (r[idx++] < 0.5) ? true : false;
+        velocityMin = (int)(r[idx++] * 127) + 1;
+        velocityMax = (int)(r[idx++] * 127) + 1;
 	}
     
     inline const String getName() const noexcept {return name;}
@@ -243,6 +256,12 @@ public:
     
     inline const void setHoldMin(float min)  { holdMin = min; }
     inline const void setHoldMax(float max)  { holdMax = max; }
+    
+    inline const float getVelocityMin() const noexcept { return velocityMin; }
+    inline const float getVelocityMax() const noexcept { return velocityMax; }
+    
+    inline const void setVelocityMin(float min)  { velocityMin = min; }
+    inline const void setVelocityMax(float max)  { velocityMax = max; }
     
     inline const float getClusterMin() const noexcept { return clusterMin; }
     inline const float getClusterMax() const noexcept { return clusterMax; }
@@ -308,6 +327,7 @@ private:
     
     float holdMin, holdMax;
     int clusterMin, clusterMax;
+    int velocityMin, velocityMax;
     
     bool keyOnReset;
     
@@ -481,6 +501,9 @@ public:
         prep.setProperty( "clusterMin", sPrep->getClusterMin(), 0);
         prep.setProperty( "clusterMax", sPrep->getClusterMax(), 0);
         
+        prep.setProperty( "velocityMin", sPrep->getVelocityMin(), 0);
+        prep.setProperty( "velocityMax", sPrep->getVelocityMax(), 0);
+        
         prep.setProperty( "keyOnReset", sPrep->getKeyOnReset() ? 1 : 0, 0);
         
         ValueTree reverseADSRvals( vtagNostalgic_reverseADSR);
@@ -631,6 +654,32 @@ public:
             sPrep->setClusterMin(1);
         }
         
+        // VELOCITY MIN
+        str = e->getStringAttribute("velocityMin");
+        
+        if (str != "")
+        {
+            i = str.getIntValue();
+            sPrep->setVelocityMin(i);
+        }
+        else
+        {
+            sPrep->setVelocityMin(0);
+        }
+        
+        // VELOCITY MAX
+        str = e->getStringAttribute("velocityMax");
+        
+        if (str != "")
+        {
+            i = str.getIntValue();
+            sPrep->setVelocityMax(i);
+        }
+        else
+        {
+            sPrep->setVelocityMax(127);
+        }
+        
         str = e->getStringAttribute("keyOnReset");
         
         if (str != "")
@@ -721,6 +770,8 @@ public:
         param.set(NostalgicHoldMax, String(p->getHoldMax()));
         param.set(NostalgicClusterMin, String(p->getClusterMin()));
         param.set(NostalgicKeyOnReset, String((int)p->getKeyOnReset()));
+        param.set(NostalgicVelocityMin, String(p->getVelocityMin()));
+        param.set(NostalgicVelocityMax, String(p->getVelocityMax()));
         
     }
     
@@ -743,6 +794,8 @@ public:
         param.set(NostalgicHoldMax, "");
         param.set(NostalgicClusterMin, "");
         param.set(NostalgicKeyOnReset, "");
+        param.set(NostalgicVelocityMin, "");
+        param.set(NostalgicVelocityMax, "");
 
     }
     
@@ -836,6 +889,12 @@ public:
         
         p = getParam(NostalgicKeyOnReset);
         if (p != String::empty) prep.setProperty( "keyOnReset", p.getIntValue(), 0);
+        
+        p = getParam(NostalgicVelocityMin);
+        if (p != String::empty) prep.setProperty( "velocityMin", p.getIntValue(), 0);
+        
+        p = getParam(NostalgicVelocityMax);
+        if (p != String::empty) prep.setProperty( "velocityMax", p.getIntValue(), 0);
         
         return prep;
     }
@@ -935,6 +994,12 @@ public:
         
         p = e->getStringAttribute("keyOnReset");
         setParam(NostalgicKeyOnReset, p);
+        
+        p = e->getStringAttribute("velocityMin");
+        setParam(NostalgicVelocityMin, p);
+        
+        p = e->getStringAttribute("velocityMax");
+        setParam(NostalgicVelocityMax, p);
 
     }
     
@@ -959,6 +1024,8 @@ public:
         param.set(NostalgicHoldMax, String(p->getHoldMax()));
         param.set(NostalgicClusterMin, String(p->getClusterMin()));
         param.set(NostalgicKeyOnReset, String((int)p->getKeyOnReset()));
+        param.set(NostalgicVelocityMin, String(p->getVelocityMin()));
+        param.set(NostalgicVelocityMax, String(p->getVelocityMax()));
     }
 
 	inline bool compare(NostalgicModPreparation::Ptr t)
@@ -975,7 +1042,9 @@ public:
                 getParam(NostalgicHoldMin) == t->getParam(NostalgicHoldMin) &&
                 getParam(NostalgicHoldMax) == t->getParam(NostalgicHoldMax) &&
                 getParam(NostalgicClusterMin) == t->getParam(NostalgicClusterMin) &&
-                getParam(NostalgicKeyOnReset) == t->getParam(NostalgicKeyOnReset));
+                getParam(NostalgicKeyOnReset) == t->getParam(NostalgicKeyOnReset) &&
+                getParam(NostalgicVelocityMin) == t->getParam(NostalgicVelocityMin) &&
+                getParam(NostalgicVelocityMax) == t->getParam(NostalgicVelocityMax) );
 	}
 
 	inline void randomize()
@@ -996,6 +1065,8 @@ public:
         param.set(NostalgicHoldMax, String(p.getHoldMax()));
         param.set(NostalgicClusterMin, String(p.getClusterMin()));
         param.set(NostalgicKeyOnReset, String((int)p.getKeyOnReset()));
+        param.set(NostalgicVelocityMin, String(p.getVelocityMin()));
+        param.set(NostalgicVelocityMax, String(p.getVelocityMax()));
 	}
     
     inline void copy(NostalgicModPreparation::Ptr p)

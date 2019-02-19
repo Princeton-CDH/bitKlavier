@@ -548,12 +548,16 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
             BKSynthesiserVoice* const voice = voices.getUnchecked (i);
             
             /*
-            DBG(" ~ ~ ~ ~ ~ ~ ~ ~ ");
-            DBG(String((int)(voice->getCurrentlyPlayingNote() == midiNoteNumber)));
-            DBG(String((int)(voice->getCurrentlyPlayingKey() == keyNoteNumber)));
-            DBG(String((int)(voice->isPlayingChannel (midiChannel))));
-            DBG(String((int)(voice->layerId == layerToLayerId(type, layerId))));
+            if (nostalgicOff)
+            {
+                DBG(" ~ ~ ~ ~ ~ ~ ~ ~ ");
+                DBG(String((int)(voice->getCurrentlyPlayingNote() == midiNoteNumber)));
+                DBG(String((int)(voice->getCurrentlyPlayingKey() == keyNoteNumber)));
+                DBG(String((int)(voice->isPlayingChannel (midiChannel))));
+                DBG(String((int)(voice->layerId == layerToLayerId(type, layerId))));
+            }
              */
+             
             
             if (voice->getCurrentlyPlayingNote() == midiNoteNumber
                 && voice->getCurrentlyPlayingKey() == keyNoteNumber
@@ -569,9 +573,9 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                         // Let synthesiser know that key is no longer down,
                         voice->keyIsDown = false;
                         
-                        if (nostalgicOff || (! ((voice->type == FixedLengthFixedStart) ||
-                                                (voice->type == FixedLength) ||
-                                                voice->sostenutoPedalDown)))
+                        if (nostalgicOff || (! ( (voice->type == FixedLengthFixedStart) ||
+                                                 (voice->type == FixedLength) ||
+                                                  voice->sostenutoPedalDown )))
                         {
                             stopVoice (voice, velocity, allowTailOff);
                         }

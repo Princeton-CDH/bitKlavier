@@ -42,6 +42,7 @@ public:
     
     ScopedPointer<BKSingleSlider> clusterMinSlider;
     ScopedPointer<BKRangeSlider> holdTimeMinMaxSlider;
+    ScopedPointer<BKRangeSlider> velocityMinMaxSlider;
     
     ToggleButton    keyOnResetToggle;
     BKLabel           keyOnResetLabel;

@@ -158,24 +158,42 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
             {
                 for (auto note : cluster)
                 {
-                    bool playNote = false;
+                    bool passHoldTest = false, passVelocityTest = false;
                     
                     float held = noteLengthTimers.getUnchecked(note) * (1000.0 / sampleRate);
+                    int velocity = (int) (velocities.getUnchecked(note) * 128);
                     
-                    if( prep->getHoldMin() <= prep->getHoldMax())
+                    if (prep->getHoldMin() <= prep->getHoldMax())
                     {
                         if (held >= prep->getHoldMin() && held <= prep->getHoldMax())
                         {
-                            playNote = true;
+                            passHoldTest = true;
                         }
                     }
                     else
                     {
                         if (held >= prep->getHoldMin() || held <= prep->getHoldMax())
                         {
-                            playNote = true;
+                            passHoldTest = true;
                         }
                     }
+                    
+                    if (prep->getVelocityMin() <= prep->getVelocityMax())
+                    {
+                        if (velocity >= prep->getVelocityMin() && velocity <= prep->getVelocityMax())
+                        {
+                            passVelocityTest = true;
+                        }
+                    }
+                    else
+                    {
+                        if (velocity >= prep->getVelocityMin() || velocity <= prep->getVelocityMax())
+                        {
+                            passVelocityTest = true;
+                        }
+                    }
+                    
+                    bool playNote = (passHoldTest && passVelocityTest);
                     
                     if (clusterNotesPlayed.contains(note) || !playNote) continue;
 
@@ -405,14 +423,14 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
                     {
                         for (auto transp : prep->getTransposition())
                         {
-                            DBG("undertow remove: " + String(midiNoteNumber + transp));
+                            //DBG("undertow remove: " + String(midiNoteNumber + transp));
                             synth->keyOff (midiChannel,
                                            NostalgicNote,
                                            nostalgic->getId(),
                                            midiNoteNumber,
                                            midiNoteNumber+transp,
                                            64,
-                                           true,
+                                           false, // THIS NEEDS TO BE FALSE ATM TO GET RID OF UNDERTOW NOTES : because our processsPiano doesn't distinguish between true keyOn/Offs from keyboard and these under the hood keyOn/Offs (which don't correspond with Off/On from keyboard)
                                            true); // true for nostalgicOff
                         }
                     }
@@ -452,7 +470,9 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
 
     for(int i = undertowNotes.size() - 1; i >= 0; --i)
     {
-        if(undertowNotes.getUnchecked(i)->undertowTimerExceedsTarget())
+        NostalgicNoteStuff* thisNote = undertowNotes.getUnchecked(i);
+        
+        if(thisNote->undertowTimerExceedsTarget() || !thisNote->isActive())
             undertowNotes.remove(i);
     }
     
@@ -478,10 +498,13 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
                         synthOffset     -= (int)offset;
                     }
                     
-                    DBG("undertow note on noteNum/offset/duration " +
+                    /*
+                     DBG("undertow note on note/noteNum/offset/duration " +
+                        String(thisNote->getNoteNumber()) + " " +
                         String(synthNoteNumber) + " " +
                         String(synthOffset) + " " +
                         String(noteOnPrep->getUndertow()));
+                     */
                     
                     synth->keyOn(midiChannel,
                                  thisNote->getNoteNumber(),

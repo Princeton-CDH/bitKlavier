@@ -50,6 +50,11 @@ BKViewController(p, theGraph)
     holdTimeMinMaxSlider->setJustifyRight(true);
     addAndMakeVisible(holdTimeMinMaxSlider);
     
+    velocityMinMaxSlider = new BKRangeSlider("velocity min/max (0-127)", 0, 127, 0, 127, 1);
+    velocityMinMaxSlider->setToolTipString("Sets Min and Max velocity (0-127) to trigger swell; Min can be greater than Max");
+    velocityMinMaxSlider->setJustifyRight(true);
+    addAndMakeVisible(velocityMinMaxSlider);
+    
     clusterMinSlider = new BKSingleSlider("cluster min", 1, 10, 1, 1);
     clusterMinSlider->setToolTipString("Sets Min cluster size needed to trigger swell");
     clusterMinSlider->setJustifyRight(true);
@@ -93,6 +98,7 @@ BKViewController(p, theGraph)
     
 #if JUCE_IOS
     holdTimeMinMaxSlider->addWantsBigOneListener(this);
+    velocityMinMaxSlider->addWantsBigOneListener(this);
     clusterMinSlider->addWantsBigOneListener(this);
     beatsToSkipSlider->addWantsBigOneListener(this);
     gainSlider->addWantsBigOneListener(this);
@@ -238,7 +244,7 @@ void NostalgicViewController::resized()
         
         
         nextCenter = sliderSlice.getY() + sliderSlice.getHeight() * 0.9f;
-        gainSlider->setBounds(sliderSlice.getX(),
+        velocityMinMaxSlider->setBounds(sliderSlice.getX(),
                               nextCenter - gComponentSingleSliderHeight/2 + 4,
                               sliderSlice.getWidth(),
                               gComponentSingleSliderHeight);
@@ -261,6 +267,11 @@ void NostalgicViewController::resized()
                                      gainSlider->getY() + gComponentComboBoxHeight * 0.5,
                                      leftColumn.getWidth() * 0.5 - gYSpacing,
                                      gComponentComboBoxHeight);
+        
+        gainSlider->setBounds(leftColumn.getX(),
+                              reverseADSRSlider->getBottom() + gYSpacing,
+                              leftColumn.getWidth(),
+                              gComponentStackedSliderHeight + processor.paddingScalarY * 30);
     }
     else
     {
@@ -309,6 +320,7 @@ NostalgicViewController(p, theGraph)
     transpositionSlider->addMyListener(this);
     lengthMultiplierSlider->addMyListener(this);
     holdTimeMinMaxSlider->addMyListener(this);
+    velocityMinMaxSlider->addMyListener(this);
     clusterMinSlider->addMyListener(this);
     beatsToSkipSlider->addMyListener(this);
     
@@ -366,6 +378,9 @@ void NostalgicPreparationEditor::update(void)
         
         holdTimeMinMaxSlider->setMinValue(prep->getHoldMin(), dontSendNotification);
         holdTimeMinMaxSlider->setMaxValue(prep->getHoldMax(), dontSendNotification);
+        
+        velocityMinMaxSlider->setMinValue(prep->getVelocityMin(), dontSendNotification);
+        velocityMinMaxSlider->setMaxValue(prep->getVelocityMax(), dontSendNotification);
         
         clusterMinSlider->setValue(prep->getClusterMin(), dontSendNotification);
         
@@ -717,6 +732,14 @@ void NostalgicPreparationEditor::BKRangeSliderValueChanged(String name, double m
         prep->setHoldMax(maxval);
         active->setHoldMax(maxval);
     }
+    else if (name == "velocity min/max (0-127)")
+    {
+        prep->setVelocityMin(minval);
+        active->setVelocityMin(minval);
+        
+        prep->setVelocityMax(maxval);
+        active->setVelocityMax(maxval);
+    }
 }
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ NostalgicModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
@@ -733,6 +756,7 @@ NostalgicViewController(p, theGraph)
     transpositionSlider->addMyListener(this);
     lengthMultiplierSlider->addMyListener(this);
     holdTimeMinMaxSlider->addMyListener(this);
+    velocityMinMaxSlider->addMyListener(this);
     clusterMinSlider->addMyListener(this);
     beatsToSkipSlider->addMyListener(this);
     
@@ -757,6 +781,7 @@ void NostalgicModificationEditor::greyOutAllComponents()
     reverseADSRSlider->setDim(gModAlpha);
     undertowADSRSlider->setDim(gModAlpha);
     holdTimeMinMaxSlider->setDim(gModAlpha);
+    velocityMinMaxSlider->setDim(gModAlpha);
     clusterMinSlider->setDim(gModAlpha);
     
     keyOnResetToggle.setAlpha(gModAlpha);
@@ -778,6 +803,8 @@ void NostalgicModificationEditor::highlightModedComponents()
     if(mod->getParam(NostalgicUndertowADSR) != "")      undertowADSRSlider->setBright();
     if(mod->getParam(NostalgicHoldMin) != "")           holdTimeMinMaxSlider->setBright();
     if(mod->getParam(NostalgicHoldMax) != "")           holdTimeMinMaxSlider->setBright();
+    if(mod->getParam(NostalgicVelocityMin) != "")       velocityMinMaxSlider->setBright();
+    if(mod->getParam(NostalgicVelocityMax) != "")       velocityMinMaxSlider->setBright();
     if(mod->getParam(NostalgicClusterMin) != "")        clusterMinSlider->setBright();
     if(mod->getParam(NostalgicKeyOnReset) != "")        { keyOnResetToggle.setAlpha(1.); keyOnResetLabel.setAlpha(1.); }
 }
@@ -842,6 +869,12 @@ void NostalgicModificationEditor::update(void)
         
         val = mod->getParam(NostalgicHoldMax);
         holdTimeMinMaxSlider->setMaxValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(NostalgicVelocityMin);
+        velocityMinMaxSlider->setMinValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(NostalgicVelocityMax);
+        velocityMinMaxSlider->setMaxValue(val.getFloatValue(), dontSendNotification);
         
         val = mod->getParam(NostalgicClusterMin);
         clusterMinSlider->setValue(val.getFloatValue(), dontSendNotification);
@@ -1161,5 +1194,11 @@ void NostalgicModificationEditor::BKRangeSliderValueChanged(String name, double 
         mod->setParam(NostalgicHoldMin, String(minval));
         mod->setParam(NostalgicHoldMax, String(maxval));
         holdTimeMinMaxSlider->setBright();
+    }
+    else if (name == "velocity min/max (0-127)")
+    {
+        mod->setParam(NostalgicVelocityMin, String(minval));
+        mod->setParam(NostalgicVelocityMax, String(maxval));
+        velocityMinMaxSlider->setBright();
     }
 }
