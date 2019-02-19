@@ -259,17 +259,17 @@ void NostalgicViewController::resized()
                                        gComponentStackedSliderHeight + processor.paddingScalarY * 30);
         
         reverseADSRSlider->setBounds(leftColumn.getX(),
-                                      gainSlider->getY() + gComponentComboBoxHeight * 0.5,
+                                      transpositionSlider->getBottom() + gComponentComboBoxHeight * 0.5,
                                       leftColumn.getWidth() * 0.5 - gYSpacing,
                                       gComponentComboBoxHeight);
         
         undertowADSRSlider->setBounds(leftColumn.getX() + leftColumn.getWidth() * 0.5 + gYSpacing,
-                                     gainSlider->getY() + gComponentComboBoxHeight * 0.5,
+                                     transpositionSlider->getBottom() + gComponentComboBoxHeight * 0.5,
                                      leftColumn.getWidth() * 0.5 - gYSpacing,
                                      gComponentComboBoxHeight);
         
         gainSlider->setBounds(leftColumn.getX(),
-                              reverseADSRSlider->getBottom() + gYSpacing,
+                              reverseADSRSlider->getBottom() + gComponentComboBoxHeight * 0.5,
                               leftColumn.getWidth(),
                               gComponentStackedSliderHeight + processor.paddingScalarY * 30);
     }
