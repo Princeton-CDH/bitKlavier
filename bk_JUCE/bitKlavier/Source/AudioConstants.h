@@ -410,6 +410,12 @@ static const std::vector<std::string> cGeneralParameterTypes = {
 
 #pragma mark - Synchronic
 
+typedef enum SynchronicOnOffMode {
+    KeyOn,
+    KeyOff,
+    OnOffModeNil
+};
+
 typedef enum SynchronicSyncMode {
     FirstNoteOnSync = 0,
     AnyNoteOnSync,
@@ -439,6 +445,7 @@ typedef enum SynchronicParameterType {
     SynchronicBeatMultipliers,
     SynchronicGain,
     SynchronicADSRs,
+    SynchronicOnOff,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
@@ -456,7 +463,8 @@ static const std::vector<BKParameterDataType> cSynchronicDataTypes = {
     BKFloatArr,
     BKFloatArr,
     BKFloat,
-    BKArrFloatArr
+    BKArrFloatArr,
+    BKInt
 };
 
 static const std::vector<std::string> cSynchronicParameterTypes = {
@@ -472,7 +480,8 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "sustain length multipliers",
     "beat length multipliers",
     "gain",
-    "ADSRs"
+    "ADSRs",
+    "SynchronicOnOff"
 };
 
 static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc = {

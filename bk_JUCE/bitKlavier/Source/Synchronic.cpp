@@ -120,63 +120,61 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     //add note to array of depressed notes
     keysDepressed.addIfNotAlreadyThere(noteNumber);
     
-    //don't need this here? since it's in processBlock()?
-    beatThresholdSamples = (tempo->getTempo()->aPrep->getBeatThresh() * sampleRate);
-    numSamplesBeat =    beatThresholdSamples *
-                        synchronic->aPrep->getBeatMultipliers()[beatMultiplierCounter] *
-                        general->getPeriodMultiplier() *
-                        tempo->getPeriodMultiplier();
-    
-    //add to adaptive tempo history, update adaptive tempo
-    //atNewNote();
-    
-    //silence pulses if in NoteOffSync
-    if(    (synchronic->aPrep->getMode() == LastNoteOffSync)
-        || (synchronic->aPrep->getMode() == AnyNoteOffSync))
-            shouldPlay = false;
-    
-    else shouldPlay = true;
-    
     //cluster management
-    if(!inCluster) //we have a new cluster
+    if (synchronic->aPrep->getOnOffMode() == KeyOn)
     {
+        //don't need this here? since it's in processBlock()?
+        beatThresholdSamples = (tempo->getTempo()->aPrep->getBeatThresh() * sampleRate);
+        numSamplesBeat =    beatThresholdSamples *
+        synchronic->aPrep->getBeatMultipliers()[beatMultiplierCounter] *
+        general->getPeriodMultiplier() *
+        tempo->getPeriodMultiplier();
         
-        //reset phasor
-        phasor = 0;
+        //silence pulses if in NoteOffSync
+        if(    (synchronic->aPrep->getMode() == LastNoteOffSync)
+           || (synchronic->aPrep->getMode() == AnyNoteOffSync))
+            shouldPlay = false;
         
-        //clear cluster
-        cluster.clearQuick();
+        else shouldPlay = true;
         
-        //reset parameter counters; need to account for skipBeats
-        resetPhase(synchronic->aPrep->getBeatsToSkip());
-
-        //now we are in a cluster!
-        inCluster = true;
+        if(!inCluster) //we have a new cluster
+        {
+            //reset phasor
+            phasor = 0;
+            
+            //clear cluster
+            cluster.clearQuick();
+            
+            //reset parameter counters; need to account for skipBeats
+            resetPhase(synchronic->aPrep->getBeatsToSkip());
+            
+            //now we are in a cluster!
+            inCluster = true;
+            
+        }
+        else if (synchronic->aPrep->getMode() == AnyNoteOnSync)
+        {
+            
+            //reset phasor if in AnyNoteOnSync
+            phasor = 0;
+            resetPhase(synchronic->aPrep->getBeatsToSkip());
+            
+        }
         
+        //at this point, we are in cluster one way or another!
+        
+        //save note in the cluster, even if it's already there. then cap the cluster to a hard cap (8 for now)
+        //this is different than avoiding dupes at this stage (with "addIfNotAlreadyThere") because it allows
+        //repeated notes to push older notes out the back.
+        //later, we remove dupes so we don't inadvertently play the same note twice in a pulse
+        
+        cluster.insert(0, noteNumber);
+        //if(cluster.size() > synchronic->aPrep->getClusterCap()) cluster.resize(synchronic->aPrep->getClusterCap());
+        //DBG("cluster size: " + String(cluster.size()) + " " + String(clusterThresholdSamples/sampleRate));
+        
+        //reset the timer for time between notes
+        clusterThresholdTimer = 0;
     }
-    else if (synchronic->aPrep->getMode() == AnyNoteOnSync)
-    {
-        
-        //reset phasor if in AnyNoteOnSync
-        phasor = 0;
-        resetPhase(synchronic->aPrep->getBeatsToSkip());
-
-    }
-    
-    //at this point, we are in cluster one way or another!
-    
-    //save note in the cluster, even if it's already there. then cap the cluster to a hard cap (8 for now)
-    //this is different than avoiding dupes at this stage (with "addIfNotAlreadyThere") because it allows
-    //repeated notes to push older notes out the back.
-    //later, we remove dupes so we don't inadvertently play the same note twice in a pulse
-    
-    cluster.insert(0, noteNumber);
-    //if(cluster.size() > synchronic->aPrep->getClusterCap()) cluster.resize(synchronic->aPrep->getClusterCap());
-    //DBG("cluster size: " + String(cluster.size()) + " " + String(clusterThresholdSamples/sampleRate));
-    
-    //reset the timer for time between notes
-    clusterThresholdTimer = 0;
-
 }
 
 
@@ -185,6 +183,61 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     
     //remove key from array of pressed keys
     keysDepressed.removeAllInstancesOf(noteNumber);
+    
+    //cluster management
+    if (synchronic->aPrep->getOnOffMode() == KeyOff)
+    {
+        //don't need this here? since it's in processBlock()?
+        beatThresholdSamples = (tempo->getTempo()->aPrep->getBeatThresh() * sampleRate);
+        numSamplesBeat =    beatThresholdSamples *
+        synchronic->aPrep->getBeatMultipliers()[beatMultiplierCounter] *
+        general->getPeriodMultiplier() *
+        tempo->getPeriodMultiplier();
+        
+        //silence pulses if in NoteOffSync
+        if((synchronic->aPrep->getMode() == LastNoteOffSync) || (synchronic->aPrep->getMode() == AnyNoteOffSync))
+            shouldPlay = false;
+        else
+            shouldPlay = true;
+        
+        if(!inCluster) //we have a new cluster
+        {
+            //reset phasor
+            phasor = 0;
+            
+            //clear cluster
+            cluster.clearQuick();
+            
+            //reset parameter counters; need to account for skipBeats
+            resetPhase(synchronic->aPrep->getBeatsToSkip());
+            
+            //now we are in a cluster!
+            inCluster = true;
+            
+        }
+        else if (synchronic->aPrep->getMode() == AnyNoteOnSync)
+        {
+            
+            //reset phasor if in AnyNoteOnSync
+            phasor = 0;
+            resetPhase(synchronic->aPrep->getBeatsToSkip());
+            
+        }
+        
+        //at this point, we are in cluster one way or another!
+        
+        //save note in the cluster, even if it's already there. then cap the cluster to a hard cap (8 for now)
+        //this is different than avoiding dupes at this stage (with "addIfNotAlreadyThere") because it allows
+        //repeated notes to push older notes out the back.
+        //later, we remove dupes so we don't inadvertently play the same note twice in a pulse
+        
+        cluster.insert(0, noteNumber);
+        //if(cluster.size() > synchronic->aPrep->getClusterCap()) cluster.resize(synchronic->aPrep->getClusterCap());
+        //DBG("cluster size: " + String(cluster.size()) + " " + String(clusterThresholdSamples/sampleRate));
+        
+        //reset the timer for time between notes
+        clusterThresholdTimer = 0;
+    }
     
     // If AnyNoteOffSync mode, reset phasor and multiplier indices.
     //only initiate pulses if ALL keys are released

@@ -60,6 +60,8 @@ protected:
     
     BKEditableComboBox selectCB;
     BKComboBox modeSelectCB;
+    
+    BKComboBox onOffSelectCB;
 
     ToggleButton offsetParamStartToggle;
     ToggleButton releaseVelocitySetsSynchronicToggle;
@@ -69,6 +71,7 @@ protected:
     ScopedPointer<BKSingleSlider> gainSlider;
     
     BKLabel modeLabel;
+    BKLabel onOffLabel;
     
     void setShowADSR(String name, bool newval);
     int visibleADSR;

@@ -419,6 +419,16 @@ public:
 		sReleases.clear();
 		envelopeOn.clear();
 	}
+    
+    inline void setOnOffMode(SynchronicOnOffMode oo)
+    {
+        onOffMode = oo;
+    }
+    
+    inline SynchronicOnOffMode getOnOffMode(void)
+    {
+        return onOffMode;
+    }
 
     inline void setADSRs(Array<Array<float>> allADSRs)
     {
@@ -482,6 +492,7 @@ private:
     
     SynchronicSyncMode sMode;
     int sBeatsToSkip;
+    SynchronicOnOffMode onOffMode;
     
     Array<float> sBeatMultipliers;      //multiply pulse lengths by these
     Array<float> sAccentMultipliers;    //multiply velocities by these

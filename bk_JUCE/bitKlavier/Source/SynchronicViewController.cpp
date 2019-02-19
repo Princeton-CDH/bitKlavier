@@ -100,8 +100,24 @@ BKViewController(p, theGraph)
     
     modeLabel.setText("triggers pulse", dontSendNotification);
     modeLabel.setTooltip("Determines which aspect of MIDI signal triggers the Synchronic sequence");
-    //modeLabel.setJustificationType(Justification::bottomLeft);
     addAndMakeVisible(modeLabel);
+    
+    onOffSelectCB.setName("OnOff");
+    onOffSelectCB.addSeparator();
+    onOffSelectCB.BKSetJustificationType(juce::Justification::centredRight);
+    onOffSelectCB.setSelectedItemIndex(0);
+    onOffSelectCB.setTooltip("Determines whether MIDI note-on or note-off is used to measure cluster");
+    
+    onOffSelectCB.addItem("Key On", 1);
+    onOffSelectCB.addItem("Key Off", 2);
+    
+    addAndMakeVisible(onOffSelectCB);
+    
+    onOffLabel.setText("determines cluster", dontSendNotification);
+    onOffLabel.setTooltip("Determines whether MIDI note On or note Off is used to measure cluster");
+    addAndMakeVisible(onOffLabel);
+    
+    
     
     //offsetParamStartToggle = new BKSingleSlider("skip first", 0, 1, 0, 1);
     offsetParamStartToggle.setButtonText ("skip first");
@@ -198,10 +214,6 @@ void SynchronicViewController::resized()
     {
         Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
         modeSlice.removeFromRight(gXSpacing);
-        //modeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 3.));
-        //offsetParamStartToggle.setBounds(modeSlice);
-        //modeSlice.removeFromLeft(4 + 2.*gPaddingConst * processor.paddingScalarX);
-        //offsetParamStartToggle.setBounds(modeSlice.removeFromLeft(modeSelectCB.getWidth()));
         offsetParamStartToggle.setBounds(modeSlice.removeFromRight(modeSlice.getWidth()));
                                          
         
@@ -237,18 +249,6 @@ void SynchronicViewController::resized()
         leftColumn.removeFromBottom(gYSpacing * 2);
         int sliderHeight = leftColumn.getHeight() / 5;
         
-        /*
-        Rectangle<int> modeSlice2 = leftColumn.removeFromTop(sliderHeight);
-        modeSlice2.removeFromLeft(gXSpacing * 2);
-        modeSlice2.removeFromTop(gYSpacing * 2);
-        modeSlice2.removeFromRight(modeSlice2.getWidth() / 3);
-        modeSelectCB.setBounds(modeSlice2.removeFromTop(gComponentComboBoxHeight));
-        howManySlider->setBounds(leftColumn.removeFromTop(sliderHeight));
-        clusterThreshSlider->setBounds(leftColumn.removeFromTop(sliderHeight));
-        clusterMinMaxSlider->setBounds(leftColumn.removeFromTop(sliderHeight));
-        gainSlider->setBounds(leftColumn.removeFromTop(sliderHeight));
-         */
-        
         gainSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
         leftColumn.removeFromBottom(sliderHeight - gComponentSingleSliderHeight);
         
@@ -268,50 +268,16 @@ void SynchronicViewController::resized()
         modeLabel.setBounds(modeSlice2.removeFromRight(modeSlice2Chunk));
         modeSelectCB.setBounds(modeSlice2);
         
-        /*
-        int sliderSpacing = leftColumn.getHeight() / 4;
         
-        modeSelectCB.setBounds(leftColumn.getX() + gXSpacing * 2,
-                               //sliderSpacing * 1 - gComponentComboBoxHeight/2.,
-                               //sliderSpacing * 1,
-                               leftColumn.getY() + gYSpacing * 2,
-                               leftColumn.getWidth() / 3,
-                               gComponentComboBoxHeight);
         
-        int nextCenter = paramSliders[0]->getY() + paramSliders[0]->getHeight()  + gPaddingConst * (1. - processor.paddingScalarY) ;
-        howManySlider->setBounds(leftColumn.getX(),
-                                 //nextCenter - gComponentSingleSliderHeight/2.,
-                                 //sliderSpacing * 2 - gComponentSingleSliderHeight/2.,
-                                 leftColumn.getY() + sliderSpacing * 1,
-                                 leftColumn.getWidth(),
-                                 gComponentSingleSliderHeight);
-
-        nextCenter = paramSliders[1]->getY() + paramSliders[1]->getHeight()  + gPaddingConst * (1. - processor.paddingScalarY);
-        clusterThreshSlider->setBounds(leftColumn.getX(),
-                                       //nextCenter - gComponentSingleSliderHeight/2.,
-                                       //sliderSpacing * 3 - gComponentSingleSliderHeight/2.,
-                                       leftColumn.getY() + sliderSpacing * 2,
-                                       leftColumn.getWidth(),
-                                       gComponentSingleSliderHeight);
+        Rectangle<int> slice3 = leftColumn.removeFromBottom(2*gComponentComboBoxHeight);
+        slice3 = slice3.removeFromTop(gComponentComboBoxHeight);
+        slice3.removeFromLeft(gXSpacing * 2);
+        int slice3Chunk = slice3.getWidth() / 3;
+        slice3.removeFromRight(slice3Chunk);
+        onOffLabel.setBounds(slice3.removeFromRight(slice3Chunk));
+        onOffSelectCB.setBounds(slice3);
         
-        nextCenter = paramSliders[2]->getY() + paramSliders[2]->getHeight()  + gPaddingConst * (1. - processor.paddingScalarY);
-        clusterMinMaxSlider->setBounds(leftColumn.getX(),
-                                       //nextCenter - gComponentRangeSliderHeight/2.,
-                                       //sliderSpacing * 4 - gComponentSingleSliderHeight/2.,
-                                       leftColumn.getY() + sliderSpacing * 3,
-                                       leftColumn.getWidth(),
-                                       gComponentRangeSliderHeight);
-        
-        //nextCenter = paramSliders[3]->getY() + paramSliders[3]->getHeight() / 2 + gPaddingConst * (1. - processor.paddingScalarY);
-        nextCenter = envelopeSliders[0]->getY() + gPaddingConst * (1. - processor.paddingScalarY);
-        gainSlider->setBounds(leftColumn.getX(),
-                              //nextCenter - gComponentSingleSliderHeight/2.,
-                              //sliderSpacing * 5 - gComponentSingleSliderHeight/2.,
-                              leftColumn.getY() + sliderSpacing * 4,
-                              leftColumn.getWidth(),
-                              gComponentSingleSliderHeight);
-        
-        */
         
         Rectangle<int> releaseToggleSlice = gainSlider->getBounds().removeFromTop(gComponentTextFieldHeight);
         releaseToggleSlice.removeFromRight(gYSpacing);
@@ -357,6 +323,8 @@ void SynchronicViewController::setShowADSR(String name, bool newval)
         offsetParamStartToggle.setVisible(false);
         modeSelectCB.setVisible(false);
         modeLabel.setVisible(false);
+        onOffSelectCB.setVisible(false);
+        onOffLabel.setVisible(false);
         
         for(int i=0; i<envelopeSliders.size(); i++)
         {
@@ -380,6 +348,8 @@ void SynchronicViewController::setShowADSR(String name, bool newval)
         offsetParamStartToggle.setVisible(true);
         modeSelectCB.setVisible(true);
         modeLabel.setVisible(true);
+        onOffSelectCB.setVisible(true);
+        onOffLabel.setVisible(true);
         
         for(int i=0; i<envelopeSliders.size(); i++)
         {
@@ -434,6 +404,7 @@ SynchronicViewController(p, theGraph)
     selectCB.addListener(this);
     selectCB.addMyListener(this);
     modeSelectCB.addListener(this);
+    onOffSelectCB.addListener(this);
     offsetParamStartToggle.addListener(this);
     howManySlider->addMyListener(this);
     clusterThreshSlider->addMyListener(this);
@@ -640,6 +611,7 @@ void SynchronicPreparationEditor::update(NotificationType notify)
         
         selectCB.setSelectedId(processor.updateState->currentSynchronicId, notify);
         modeSelectCB.setSelectedItemIndex(prep->getMode(), notify);
+        onOffSelectCB.setSelectedItemIndex(prep->getOnOffMode(), notify);
         offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
         releaseVelocitySetsSynchronicToggle.setToggleState(prep->getReleaseVelocitySetsSynchronic(), notify);
         howManySlider->setValue(prep->getNumBeats(), notify);
@@ -929,6 +901,14 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
             active->setBeatsToSkip(toggleVal);
         }
     }
+    else if (name == "OnOff")
+    {
+        SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+        SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+        
+        prep    ->setOnOffMode( (SynchronicOnOffMode) index);
+        active  ->setOnOffMode( (SynchronicOnOffMode) index);
+    }
 }
 
 void SynchronicPreparationEditor::bkTextFieldDidChange(TextEditor& tf)
@@ -1027,6 +1007,7 @@ SynchronicViewController(p, theGraph)
     selectCB.addListener(this);
     selectCB.addMyListener(this);
     modeSelectCB.addListener(this);
+    onOffSelectCB.addListener(this);
     offsetParamStartToggle.addListener(this);
     howManySlider->addMyListener(this);
     clusterThreshSlider->addMyListener(this);
@@ -1044,6 +1025,7 @@ SynchronicViewController(p, theGraph)
 void SynchronicModificationEditor::greyOutAllComponents()
 {
     modeSelectCB.setAlpha(gModAlpha);
+    onOffSelectCB.setAlpha(gModAlpha);
     offsetParamStartToggle.setAlpha(gModAlpha);
     
     howManySlider->setDim(gModAlpha);
@@ -1071,6 +1053,7 @@ void SynchronicModificationEditor::highlightModedComponents()
     SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
     
     if(mod->getParam(SynchronicMode) != "")             modeSelectCB.setAlpha(1.);
+    if(mod->getParam(SynchronicOnOff) != "")             onOffSelectCB.setAlpha(1.);
     if(mod->getParam(SynchronicNumPulses) != "")        howManySlider->setBright(); //howManySlider->setAlpha(1);
     if(mod->getParam(SynchronicClusterThresh) != "")    clusterThreshSlider->setBright(); //clusterThreshSlider->setAlpha(1);
     if(mod->getParam(SynchronicClusterMin) != "")       clusterMinMaxSlider->setBright(); //clusterMinMaxSlider->setAlpha(1);
@@ -1142,6 +1125,9 @@ void SynchronicModificationEditor::update(NotificationType notify)
     {
         String val = mod->getParam(SynchronicMode);
         modeSelectCB.setSelectedItemIndex(val.getIntValue(), notify);
+        
+        val = mod->getParam(SynchronicOnOff);
+        onOffSelectCB.setSelectedItemIndex(val.getIntValue(), notify);
         
         //FIXIT offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
         //SynchronicBeatsToSkip determines whether to set this toggle
@@ -1491,6 +1477,16 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
         
         updateModification();
         modeSelectCB.setAlpha(1.);
+        
+    }
+    else if (name == "OnOff")
+    {
+        SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
+        
+        mod->setParam(SynchronicOnOff, String(index));
+        
+        updateModification();
+        onOffSelectCB.setAlpha(1.);
     }
     
     
