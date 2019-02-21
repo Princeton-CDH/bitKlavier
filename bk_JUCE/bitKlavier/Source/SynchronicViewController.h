@@ -69,6 +69,7 @@ protected:
     ScopedPointer<BKSingleSlider> clusterThreshSlider;
     ScopedPointer<BKRangeSlider> clusterMinMaxSlider;
     ScopedPointer<BKSingleSlider> gainSlider;
+    ScopedPointer<BKSingleSlider> numClusterSlider;
     
     BKLabel modeLabel;
     BKLabel onOffLabel;

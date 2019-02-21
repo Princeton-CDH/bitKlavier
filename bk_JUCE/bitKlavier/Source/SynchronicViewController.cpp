@@ -126,7 +126,7 @@ BKViewController(p, theGraph)
     offsetParamStartToggle.setToggleState (true, dontSendNotification);
     addAndMakeVisible(offsetParamStartToggle);
     
-    howManySlider = new BKSingleSlider("how many", 1, 100, 20, 1);
+    howManySlider = new BKSingleSlider("num pulses", 1, 100, 20, 1);
     howManySlider->setToolTipString("Indicates number of steps/repetitions in Synchronic pulse");
     howManySlider->setJustifyRight(false);
     addAndMakeVisible(howManySlider);
@@ -147,7 +147,14 @@ BKViewController(p, theGraph)
     gainSlider->setSkewFactorFromMidPoint(1.);
     addAndMakeVisible(gainSlider);
     
+    numClusterSlider = new BKSingleSlider("num clusters", 1, 10, 1, 1);
+    numClusterSlider->setToolTipString("Number of clusters.");
+    numClusterSlider->setJustifyRight(false);
+    addAndMakeVisible(numClusterSlider);
+    
 #if JUCE_IOS
+    numClusterSlider->addWantsBigOneListener(this);
+    
     howManySlider->addWantsBigOneListener(this);
 
     clusterThreshSlider->addWantsBigOneListener(this);
@@ -248,18 +255,22 @@ void SynchronicViewController::resized()
         leftColumn.removeFromTop(gPaddingConst * (1. - processor.paddingScalarY));
         leftColumn.removeFromBottom(gYSpacing * 2);
         int sliderHeight = leftColumn.getHeight() / 5;
+        int sliderSpacing = (sliderHeight - gComponentSingleSliderHeight) * 0.5;
         
         gainSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
-        leftColumn.removeFromBottom(sliderHeight - gComponentSingleSliderHeight);
+        leftColumn.removeFromBottom(sliderSpacing);
         
         clusterMinMaxSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
-        leftColumn.removeFromBottom(sliderHeight - gComponentSingleSliderHeight);
+        leftColumn.removeFromBottom(sliderSpacing);
         
-        clusterThreshSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
-        leftColumn.removeFromBottom(sliderHeight - gComponentSingleSliderHeight);
+        numClusterSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
+        leftColumn.removeFromBottom(sliderSpacing);
         
         howManySlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
-        leftColumn.removeFromBottom(sliderHeight - gComponentSingleSliderHeight);
+        leftColumn.removeFromBottom(sliderSpacing);
+        
+        clusterThreshSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
+        leftColumn.removeFromBottom(sliderSpacing);
         
         Rectangle<int> modeSlice2 = leftColumn.removeFromBottom(gComponentComboBoxHeight);
         modeSlice2.removeFromLeft(gXSpacing * 2);
@@ -270,7 +281,7 @@ void SynchronicViewController::resized()
         
         
         
-        Rectangle<int> slice3 = leftColumn.removeFromBottom(2*gComponentComboBoxHeight);
+        Rectangle<int> slice3 = leftColumn.removeFromBottom(1.5*gComponentComboBoxHeight);
         slice3 = slice3.removeFromTop(gComponentComboBoxHeight);
         slice3.removeFromLeft(gXSpacing * 2);
         int slice3Chunk = slice3.getWidth() / 3;
@@ -318,6 +329,7 @@ void SynchronicViewController::setShowADSR(String name, bool newval)
         howManySlider->setVisible(false);
         clusterThreshSlider->setVisible(false);
         gainSlider->setVisible(false);
+        numClusterSlider->setVisible(false);
         clusterThreshSlider->setVisible(false);
         clusterMinMaxSlider->setVisible(false);
         offsetParamStartToggle.setVisible(false);
@@ -343,6 +355,7 @@ void SynchronicViewController::setShowADSR(String name, bool newval)
         howManySlider->setVisible(true);
         clusterThreshSlider->setVisible(true);
         gainSlider->setVisible(true);
+        numClusterSlider->setVisible(true);
         clusterThreshSlider->setVisible(true);
         clusterMinMaxSlider->setVisible(true);
         offsetParamStartToggle.setVisible(true);
@@ -411,6 +424,7 @@ SynchronicViewController(p, theGraph)
     clusterMinMaxSlider->addMyListener(this);
 
     gainSlider->addMyListener(this);
+    numClusterSlider->addMyListener(this);
     
     for(int i=0; i<envelopeSliders.size(); i++)
     {
@@ -430,8 +444,12 @@ void SynchronicPreparationEditor::timerCallback()
         SynchronicProcessor::Ptr sProcessor = processor.currentPiano->getSynchronicProcessor(processor.updateState->currentSynchronicId);
         SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
         
-        if(sProcessor->getBeatCounter() < active->getNumBeats() && sProcessor->getPlayCluster())
-            howManySlider->setDisplayValue(sProcessor->getBeatCounter());
+        SynchronicCluster::Ptr cluster = sProcessor->getCluster(0);
+        
+        if (cluster == nullptr) return;
+        
+        if(cluster->getBeatCounter() < active->getNumBeats() && sProcessor->getPlayCluster())
+            howManySlider->setDisplayValue(cluster->getBeatCounter());
         else howManySlider->setDisplayValue(0);
         
         if(sProcessor->getClusterThresholdTimer() < active->getClusterThreshMS())
@@ -453,25 +471,25 @@ void SynchronicPreparationEditor::timerCallback()
                 if(paramSliders[i]->getName() == "beat length multipliers")
                 {
                     size = paramSliders[i]->getNumVisible();
-                    counter = sProcessor->getBeatMultiplierCounter();
+                    counter = cluster->getBeatMultiplierCounter();
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
                 else if(paramSliders[i]->getName() == "sustain length multipliers")
                 {
                     size = paramSliders[i]->getNumVisible();
-                    counter = sProcessor->getLengthMultiplierCounter();
+                    counter = cluster->getLengthMultiplierCounter();
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
                 else if(paramSliders[i]->getName() == "accents")
                 {
                     size = paramSliders[i]->getNumVisible();
-                    counter = sProcessor->getAccentMultiplierCounter();
+                    counter = cluster->getAccentMultiplierCounter();
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
                 else if(paramSliders[i]->getName() == "transpositions")
                 {
                     size = paramSliders[i]->getNumVisible();
-                    counter = sProcessor->getTranspCounter();
+                    counter = cluster->getTranspCounter();
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
             }
@@ -479,7 +497,7 @@ void SynchronicPreparationEditor::timerCallback()
             SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
             for(int i = 0; i < envelopeSliders.size(); i++)
             {
-                if(i == sProcessor->getEnvelopeCounter()) envelopeSliders[i]->setHighlighted();
+                if(i == cluster->getEnvelopeCounter()) envelopeSliders[i]->setHighlighted();
                 
                 else if(active->getEnvelopeOn(i))
                 {
@@ -567,7 +585,7 @@ void SynchronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
-    if(name == "how many") {
+    if(name == "num pulses") {
         DBG("got new how many " + String(val));
         prep->setNumBeats(val);
         active->setNumBeats(val);
@@ -583,6 +601,12 @@ void SynchronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
         DBG("gain " + String(val));
         prep->setGain(val);
         active->setGain(val);
+    }
+    else if(name == "num clusters")
+    {
+        DBG("num clusters " + String(val));
+        prep->setNumClusters(val);
+        active->setNumClusters(val);
     }
 }
 
@@ -619,6 +643,7 @@ void SynchronicPreparationEditor::update(NotificationType notify)
         clusterMinMaxSlider->setMinValue(prep->getClusterMin(), notify);
         clusterMinMaxSlider->setMaxValue(prep->getClusterMax(), notify);
         gainSlider->setValue(prep->getGain(), notify);
+        numClusterSlider->setValue(prep->getNumClusters(), notify);
         
         for(int i = 0; i < paramSliders.size(); i++)
         {
@@ -1013,6 +1038,7 @@ SynchronicViewController(p, theGraph)
     clusterThreshSlider->addMyListener(this);
     clusterMinMaxSlider->addMyListener(this);
     gainSlider->addMyListener(this);
+    numClusterSlider->addMyListener(this);
     
     howManySlider->displaySliderVisible(false);
     clusterThreshSlider->displaySliderVisible(false);
@@ -1032,6 +1058,7 @@ void SynchronicModificationEditor::greyOutAllComponents()
     clusterThreshSlider->setDim(gModAlpha);
     clusterThreshSlider->setDim(gModAlpha);
     gainSlider->setDim(gModAlpha);
+    numClusterSlider->setDim(gModAlpha);
     
     clusterMinMaxSlider->setDim(gModAlpha);
     
@@ -1053,13 +1080,14 @@ void SynchronicModificationEditor::highlightModedComponents()
     SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
     
     if(mod->getParam(SynchronicMode) != "")             modeSelectCB.setAlpha(1.);
-    if(mod->getParam(SynchronicOnOff) != "")             onOffSelectCB.setAlpha(1.);
-    if(mod->getParam(SynchronicNumPulses) != "")        howManySlider->setBright(); //howManySlider->setAlpha(1);
-    if(mod->getParam(SynchronicClusterThresh) != "")    clusterThreshSlider->setBright(); //clusterThreshSlider->setAlpha(1);
-    if(mod->getParam(SynchronicClusterMin) != "")       clusterMinMaxSlider->setBright(); //clusterMinMaxSlider->setAlpha(1);
-    if(mod->getParam(SynchronicClusterMax) != "")       clusterMinMaxSlider->setBright(); //clusterMinMaxSlider->setAlpha(1);
+    if(mod->getParam(SynchronicOnOff) != "")            onOffSelectCB.setAlpha(1.);
+    if(mod->getParam(SynchronicNumPulses) != "")        howManySlider->setBright();
+    if(mod->getParam(SynchronicClusterThresh) != "")    clusterThreshSlider->setBright();
+    if(mod->getParam(SynchronicClusterMin) != "")       clusterMinMaxSlider->setBright();
+    if(mod->getParam(SynchronicClusterMax) != "")       clusterMinMaxSlider->setBright();
     if(mod->getParam(SynchronicBeatsToSkip) != "")      offsetParamStartToggle.setAlpha(1.);
-    if(mod->getParam(SynchronicGain) != "")             gainSlider->setBright(); //gainSlider->setAlpha(1);
+    if(mod->getParam(SynchronicGain) != "")             gainSlider->setBright();
+    if(mod->getParam(SynchronicNumClusters) != "")      numClusterSlider->setBright();
 
     if(mod->getParam(SynchronicBeatMultipliers) != "")
     {
@@ -1148,6 +1176,9 @@ void SynchronicModificationEditor::update(NotificationType notify)
         
         val = mod->getParam(SynchronicGain);
         gainSlider->setValue(val.getFloatValue(), notify);
+        
+        val = mod->getParam(SynchronicNumClusters);
+        numClusterSlider->setValue(val.getIntValue(), notify);
         
         for (int i = 0; i < paramSliders.size(); i++)
         {
@@ -1311,7 +1342,7 @@ void SynchronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sl
     
     GeneralSettings::Ptr genmod = processor.gallery->getGeneralSettings();
     
-    if(name == "how many")
+    if(name == "num pulses")
     {
         mod->setParam(SynchronicNumPulses, String(val));
         //howManySlider->setAlpha(1.);
@@ -1326,8 +1357,12 @@ void SynchronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sl
     else if(name == "gain")
     {
         mod->setParam(SynchronicGain, String(val));
-        //gainSlider->setAlpha(1.);
         gainSlider->setBright();
+    }
+    else if(name == "num clusters")
+    {
+        mod->setParam(SynchronicNumClusters, String(val));
+        numClusterSlider->setBright();
     }
     
     updateModification();

@@ -48,7 +48,8 @@ public:
     sGain(p->getGain()),
     sClusterThresh(p->getClusterThreshMS()),
     sClusterThreshSec(p->getClusterThreshSEC()),
-    sReleaseVelocitySetsSynchronic(p->getReleaseVelocitySetsSynchronic())
+    sReleaseVelocitySetsSynchronic(p->getReleaseVelocitySetsSynchronic()),
+    numClusters(1)
     {
         
     }
@@ -98,7 +99,8 @@ public:
     envelopeOn(Array<bool>({true,false,false,false,false,false,false,false,false,false,false,false})),
     sGain(1.0),
     sClusterThresh(500),
-    sClusterThreshSec(.001 * sClusterThresh)
+    sClusterThreshSec(.001 * sClusterThresh),
+    numClusters(1)
     {
         sTransposition.ensureStorageAllocated(1);
         sTransposition.add(Array<float>({0.0}));
@@ -127,6 +129,8 @@ public:
         sReleases = s->getReleases();
         
         envelopeOn = s->getEnvelopesOn();
+        
+        numClusters = s->getNumClusters();
     }
     
     bool compare(SynchronicPreparation::Ptr s)
@@ -239,7 +243,8 @@ public:
                 sGain == s->getGain() &&
                 sClusterThresh == s->getClusterThreshMS() &&
                 sClusterThreshSec == s->getClusterThreshSEC() &&
-                sReleaseVelocitySetsSynchronic == s->getReleaseVelocitySetsSynchronic());
+                sReleaseVelocitySetsSynchronic == s->getReleaseVelocitySetsSynchronic() &&
+                numClusters == s->getNumClusters());
     }
 
 	inline void randomize()
@@ -257,6 +262,10 @@ public:
 		sClusterCap = (int)(r[idx++] * 20);
 		sMode = (SynchronicSyncMode)(int)(r[idx++] * SynchronicSyncModeNil);
 		sBeatsToSkip = (int)(r[idx++] * 2);
+        
+        
+        numClusters = (int)(r[idx++] * 20) + 1;
+        
 		sBeatMultipliers.clear();
 		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
 		{
@@ -429,6 +438,16 @@ public:
     {
         return onOffMode;
     }
+    
+    inline void setNumClusters(int c)
+    {
+        numClusters = c;
+    }
+    
+    inline int getNumClusters(void)
+    {
+        return numClusters;
+    }
 
     inline void setADSRs(Array<Array<float>> allADSRs)
     {
@@ -489,6 +508,8 @@ private:
     float sTempo;
     int sNumBeats,sClusterMin,sClusterMax;
     int sClusterCap = 8; //max in cluster; 8 in original bK. pulseDepth?
+    
+    int numClusters;
     
     SynchronicSyncMode sMode;
     int sBeatsToSkip;
@@ -592,6 +613,8 @@ public:
         prep.setProperty( ptagSynchronic_mode,                sPrep->getMode(), 0);
         prep.setProperty( ptagSynchronic_beatsToSkip,         sPrep->getBeatsToSkip(), 0);
         
+        prep.setProperty( "numClusters", sPrep->getNumClusters(), 0);
+        
         ValueTree beatMults( vtagSynchronic_beatMults);
         int count = 0;
         for (auto f : sPrep->getBeatMultipliers())
@@ -679,6 +702,11 @@ public:
         
         i = e->getStringAttribute(ptagSynchronic_beatsToSkip).getIntValue();
         sPrep->setBeatsToSkip(i);
+        
+        n = e->getStringAttribute("numClusters");
+        
+        if (n != String::empty)     sPrep->setNumClusters(n.getIntValue());
+        else                        sPrep->setNumClusters(1);
         
         forEachXmlChildElement (*e, sub)
         {
@@ -844,6 +872,7 @@ public:
         param.set(SynchronicBeatMultipliers, floatArrayToString(p->getBeatMultipliers()));
         param.set(SynchronicGain, String(p->getGain()));
         param.set(SynchronicADSRs, arrayFloatArrayToString(p->getADSRs()));
+        param.set(SynchronicNumClusters, String(p->getNumClusters()));
         
     }
     
@@ -851,18 +880,12 @@ public:
     SynchronicModPreparation(int Id):
     Id(Id)
     {
-        param.set(SynchronicNumPulses, "");
-        param.set(SynchronicClusterMin, "");
-        param.set(SynchronicClusterMax, "");
-        param.set(SynchronicClusterThresh, "");
-        param.set(SynchronicMode, "");
-        param.set(SynchronicBeatsToSkip, "");
-        param.set(SynchronicTranspOffsets, "");
-        param.set(SynchronicAccentMultipliers, "");
-        param.set(SynchronicLengthMultipliers, "");
-        param.set(SynchronicBeatMultipliers, "");
-        param.set(SynchronicGain, "");
-        param.set(SynchronicADSRs, "");
+        param.clear();
+        
+        for (int i = 0; i < SynchronicParameterTypeNil; i ++)
+        {
+            param.add("");
+        }
 
     }
     
@@ -905,6 +928,9 @@ public:
         
         p = getParam(SynchronicBeatsToSkip);
         if (p != String::empty) prep.setProperty( ptagSynchronic_beatsToSkip,         p.getIntValue(), 0);
+        
+        p = getParam(SynchronicNumClusters);
+        if (p != String::empty) prep.setProperty( "numClusters", p.getIntValue(), 0);
         
         p = getParam(SynchronicGain);
         if (p != String::empty) prep.setProperty( ptagSynchronic_gain,                p.getFloatValue(), 0);
@@ -1012,6 +1038,9 @@ public:
         
 		p = e->getStringAttribute(ptagSynchronic_beatsToSkip);
 		setParam(SynchronicBeatsToSkip, p);
+        
+        p = e->getStringAttribute("numClusters");
+        setParam(SynchronicNumClusters, p);
 
         p = e->getStringAttribute(ptagSynchronic_gain);
         setParam(SynchronicGain, p);
@@ -1237,6 +1266,147 @@ private:
     JUCE_LEAK_DETECTOR(SynchronicModPreparation);
 };
 
+class SynchronicCluster : public ReferenceCountedObject
+{
+public:
+    
+    typedef ReferenceCountedObjectPtr<SynchronicCluster>   Ptr;
+    typedef Array<SynchronicCluster::Ptr>                  PtrArr;
+    
+    SynchronicCluster(SynchronicPreparation::Ptr prep) :
+    prep(prep)
+    {
+        phasor = 0;
+        envelopeCounter = 0;
+        shouldPlay = false;
+        over = false;
+        
+        SynchronicSyncMode mode = prep->getMode();
+        
+        if (mode == AnyNoteOnSync || mode == FirstNoteOnSync)
+        {
+            shouldPlay = true;
+        }
+    }
+    
+    ~SynchronicCluster() {}
+    
+    inline const uint64 getPhasor(void) const noexcept   { return phasor;            }
+    inline const int getBeatMultiplierCounter() const noexcept { return beatMultiplierCounter; }
+    inline const int getAccentMultiplierCounter() const noexcept { return accentMultiplierCounter; }
+    inline const int getLengthMultiplierCounter() const noexcept { return lengthMultiplierCounter; }
+    inline const int getTranspCounter() const noexcept { return transpCounter; }
+    inline const int getEnvelopeCounter() const noexcept { return envelopeCounter; }
+    inline const int getBeatCounter() const noexcept { return beatCounter; }
+    
+    inline void setPhasor(uint64 c)  { phasor = c; }
+    inline void setBeatMultiplierCounter(int c) {  beatMultiplierCounter = c; }
+    inline void setAccentMultiplierCounter(int c)  { accentMultiplierCounter = c; }
+    inline void setLengthMultiplierCounter(int c)  { lengthMultiplierCounter = c; }
+    inline void setTranspCounter(int c)  { transpCounter = c; }
+    inline void setEnvelopeCounter(int c)  { envelopeCounter = c; }
+    inline void setBeatCounter(int c)  { beatCounter = c; }
+    
+    inline bool getOver(void) { return over; }
+    inline void setOver(bool o) { over = o; }
+    
+    inline void incrementPhasor (int numSamples)
+    {
+        phasor += numSamples;
+    }
+    
+    inline void step (uint64 numSamplesBeat)
+    {
+        phasor -= numSamplesBeat;
+        
+        //increment parameter counters
+        if (++lengthMultiplierCounter   >= prep->getLengthMultipliers().size())     lengthMultiplierCounter = 0;
+        if (++accentMultiplierCounter   >= prep->getAccentMultipliers().size())     accentMultiplierCounter = 0;
+        if (++transpCounter             >= prep->getTransposition().size())         transpCounter = 0;
+        if (++envelopeCounter           >= prep->getEnvelopesOn().size())           envelopeCounter = 0;
+        
+        while(!prep->getEnvelopesOn()[envelopeCounter]) //skip untoggled envelopes
+        {
+            envelopeCounter++;
+            if (envelopeCounter >= prep->getEnvelopesOn().size()) envelopeCounter = 0;
+        }
+        
+        //increment beat and beatMultiplier counters, for next beat; check maxes and adjust
+        if (++beatMultiplierCounter >= prep->getBeatMultipliers().size()) beatMultiplierCounter = 0;
+        if (++beatCounter >= prep->getNumBeats()) { over = true; shouldPlay = false; } //done with pulses
+    }
+    
+    inline void resetPhase()
+    {
+        int skipBeats = prep->getBeatsToSkip();
+        
+        beatMultiplierCounter   = skipBeats % prep->getBeatMultipliers().size();
+        lengthMultiplierCounter = skipBeats % prep->getLengthMultipliers().size();
+        accentMultiplierCounter = skipBeats % prep->getAccentMultipliers().size();
+        transpCounter           = skipBeats % prep->getTransposition().size();
+        envelopeCounter         = skipBeats % prep->getEnvelopesOn().size();
+        
+        beatCounter = 0;
+    }
+    
+    inline Array<int> getCluster() {return cluster;}
+    
+    inline void setCluster(Array<int> c) { cluster = c; }
+    
+    inline void addNote(int note)
+    {
+        DBG("adding note: " + String(note));
+        cluster.add(note);
+    }
+    
+    inline void removeNote(int note)
+    {
+        int idx = 0;
+        
+        for (auto n : cluster)
+        {
+            if (n == note)
+            {
+                break;
+            }
+            idx++;
+        }
+        
+        cluster.remove(idx);
+    }
+    
+    inline void setShouldPlay(bool play)
+    {
+        shouldPlay = play;
+    }
+    
+    inline bool getShouldPlay(void)
+    {
+        return shouldPlay;
+        
+    }
+    
+private:
+    
+    Array<int> cluster;
+    
+    int beatCounter;  //beat (or pulse) counter; max set by users -- sNumBeats
+    
+    SynchronicPreparation::Ptr prep;
+    
+    //parameter field counters
+    int beatMultiplierCounter;   //beat length (time between beats) multipliers
+    int accentMultiplierCounter; //accent multipliers
+    int lengthMultiplierCounter; //note length (sounding length) multipliers (multiples of 50ms, at least for now)
+    int transpCounter;     //transposition offsets
+    int envelopeCounter;
+    
+    uint64 phasor;
+    bool shouldPlay, over;
+    
+    JUCE_LEAK_DETECTOR(SynchronicCluster);
+};
+
 class SynchronicProcessor  : public ReferenceCountedObject
 {
     
@@ -1258,7 +1428,7 @@ public:
     
     void         setCurrentPlaybackSampleRate(double sr);
     inline const uint64 getCurrentNumSamplesBeat(void) const noexcept   { return numSamplesBeat;    }
-    inline const uint64 getCurrentPhasor(void) const noexcept           { return phasor;            }
+    
     
     BKSampleLoadType sampleType;
     void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
@@ -1266,15 +1436,9 @@ public:
     void keyReleased(int noteNumber, float velocity, int channel);
     float getTimeToBeatMS(float beatsToSkip);
     
-    inline const int getBeatMultiplierCounter() const noexcept { return beatMultiplierCounter; }
-    inline const int getAccentMultiplierCounter() const noexcept { return accentMultiplierCounter; }
-    inline const int getLengthMultiplierCounter() const noexcept { return lengthMultiplierCounter; }
-    inline const int getTranspCounter() const noexcept { return transpCounter; }
-    inline const int getEnvelopeCounter() const noexcept { return envelopeCounter; }
-    inline const int getBeatCounter() const noexcept { return beatCounter; }
+    
     inline const float getClusterThresholdTimer() const noexcept { return 1000. * clusterThresholdTimer / sampleRate ;}
     inline const float getClusterThreshold() const noexcept { return 1000. * clusterThresholdSamples / sampleRate ;}
-    inline const int getClusterSize() const noexcept {return cluster.size(); }
     inline const int getNumKeysDepressed() const noexcept {return keysDepressed.size(); }
     inline const bool getPlayCluster() const noexcept { return playCluster; }
     
@@ -1337,7 +1501,12 @@ public:
     void clearOldNotes()
     {
         keysDepressed.clearQuick();
-        cluster.clearQuick();
+        clusters.clearQuick();
+    }
+    
+    inline SynchronicCluster* getCluster(int which)
+    {
+        return clusters[which];
     }
     
 private:
@@ -1354,21 +1523,7 @@ private:
     Array<float> tuningOffsets;
     PitchClass tuningBasePitch;
     
-    int beatCounter;  //beat (or pulse) counter; max set by users -- sNumBeats
-    
-    //parameter field counters
-    int beatMultiplierCounter;   //beat length (time between beats) multipliers
-    int accentMultiplierCounter; //accent multipliers
-    int lengthMultiplierCounter; //note length (sounding length) multipliers (multiples of 50ms, at least for now)
-    int transpCounter;     //transposition offsets
-    int envelopeCounter;
-    
-    //reset the phase, including of all the parameter fields
-    void resetPhase(int skipBeats);
-    
-    
-    
-    void playNote(int channel, int note, float velocity);
+    void playNote(int channel, int note, float velocity, SynchronicCluster::Ptr cluster);
     Array<float> velocities;    //record of velocities
     Array<int> keysDepressed;   //current keys that are depressed
     bool playCluster;
@@ -1377,10 +1532,10 @@ private:
     uint64 clusterThresholdSamples;
     uint64 clusterThresholdTimer;
     uint64 clusterTimer;
-    Array<int> cluster;         //cluster of notes played, with repetitions, limited to totalClusters (8?)
     Array<int> slimCluster;     //cluster without repetitions
     
-    uint64 phasor;
+    SynchronicCluster::PtrArr clusters;
+
     uint64 numSamplesBeat;          // = beatThresholdSamples * beatMultiplier
     uint64 beatThresholdSamples;    // # samples in a beat, as set by tempo
     
@@ -1394,8 +1549,6 @@ private:
      void atCalculatePeriodMultiplier();
      float adaptiveTempoPeriodMultiplier;
      */
-    
-    bool shouldPlay;
     
     JUCE_LEAK_DETECTOR(SynchronicProcessor);
 };
