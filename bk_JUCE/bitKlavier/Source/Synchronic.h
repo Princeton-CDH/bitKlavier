@@ -614,6 +614,7 @@ public:
         prep.setProperty( ptagSynchronic_beatsToSkip,         sPrep->getBeatsToSkip(), 0);
         
         prep.setProperty( "numClusters", sPrep->getNumClusters(), 0);
+        prep.setProperty( "onOffMode", sPrep->getOnOffMode(), 0);
         
         ValueTree beatMults( vtagSynchronic_beatMults);
         int count = 0;
@@ -707,6 +708,11 @@ public:
         
         if (n != String::empty)     sPrep->setNumClusters(n.getIntValue());
         else                        sPrep->setNumClusters(1);
+        
+        n = e->getStringAttribute("onOffMode");
+        
+        if (n != String::empty)     sPrep->setOnOffMode((SynchronicOnOffMode) n.getIntValue());
+        else                        sPrep->setOnOffMode(KeyOn);
         
         forEachXmlChildElement (*e, sub)
         {
@@ -932,6 +938,9 @@ public:
         p = getParam(SynchronicNumClusters);
         if (p != String::empty) prep.setProperty( "numClusters", p.getIntValue(), 0);
         
+        p = getParam(SynchronicOnOff);
+        if (p != String::empty) prep.setProperty( "onOffMode", p.getIntValue(), 0);
+        
         p = getParam(SynchronicGain);
         if (p != String::empty) prep.setProperty( ptagSynchronic_gain,                p.getFloatValue(), 0);
         
@@ -1041,6 +1050,9 @@ public:
         
         p = e->getStringAttribute("numClusters");
         setParam(SynchronicNumClusters, p);
+        
+        p = e->getStringAttribute("onOffMode");
+        setParam(SynchronicOnOff, p);
 
         p = e->getStringAttribute(ptagSynchronic_gain);
         setParam(SynchronicGain, p);

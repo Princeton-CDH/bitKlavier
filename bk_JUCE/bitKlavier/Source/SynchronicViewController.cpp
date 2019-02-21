@@ -90,18 +90,21 @@ BKViewController(p, theGraph)
     selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
     
+    // MODE
     modeSelectCB.setName("Mode");
     modeSelectCB.addSeparator();
     modeSelectCB.BKSetJustificationType(juce::Justification::centredRight);
     modeSelectCB.setSelectedItemIndex(0);
     modeSelectCB.setTooltip("Determines which aspect of MIDI signal triggers the Synchronic sequence");
-    fillModeSelectCB();
+    
+    
     addAndMakeVisible(modeSelectCB);
     
     modeLabel.setText("triggers pulse", dontSendNotification);
     modeLabel.setTooltip("Determines which aspect of MIDI signal triggers the Synchronic sequence");
     addAndMakeVisible(modeLabel);
     
+    // ON OFF
     onOffSelectCB.setName("OnOff");
     onOffSelectCB.addSeparator();
     onOffSelectCB.BKSetJustificationType(juce::Justification::centredRight);
@@ -184,7 +187,6 @@ BKViewController(p, theGraph)
     addAndMakeVisible(envelopeName);
 
 }
-
 void SynchronicViewController::paint (Graphics& g)
 {
     g.fillAll(Colours::black);
@@ -279,8 +281,7 @@ void SynchronicViewController::resized()
         modeLabel.setBounds(modeSlice2.removeFromRight(modeSlice2Chunk));
         modeSelectCB.setBounds(modeSlice2);
         
-        
-        
+
         Rectangle<int> slice3 = leftColumn.removeFromBottom(1.5*gComponentComboBoxHeight);
         slice3 = slice3.removeFromTop(gComponentComboBoxHeight);
         slice3.removeFromLeft(gXSpacing * 2);
@@ -381,20 +382,6 @@ void SynchronicViewController::setShowADSR(String name, bool newval)
     
 }
 
-//SynchronicSyncMode
-void SynchronicViewController::fillModeSelectCB(void)
-{
-    
-    modeSelectCB.clear(dontSendNotification);
-    for (int i = 0; i < cSynchronicSyncModes.size(); i++)
-    {
-        String name = cSynchronicSyncModes[i];
-        if (name != String::empty)  modeSelectCB.addItem(name, i+1);
-        else                        modeSelectCB.addItem(String(i+1), i+1);
-    }
-    
-    modeSelectCB.setSelectedItemIndex(0, NotificationType::dontSendNotification);
-}
 
 #if JUCE_IOS
 void SynchronicViewController::iWantTheBigOne(TextEditor* tf, String name)
@@ -437,6 +424,30 @@ SynchronicViewController(p, theGraph)
     
 }
 
+void SynchronicPreparationEditor::fillModeSelectCB()
+{
+    SynchronicPreparation::Ptr prep = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
+    modeSelectCB.clear();
+    
+    if (prep->getOnOffMode() == KeyOn)
+    {
+        modeSelectCB.addItem("First Note-On", 1);
+        modeSelectCB.addItem("Any Note-On", 2);
+        modeSelectCB.addItem("Last Note-Off", 3);
+        modeSelectCB.addItem("Any Note-Off", 4);
+    }
+    else
+    {
+        modeSelectCB.addItem("First Note-Off", 1);
+        modeSelectCB.addItem("Any Note-Off", 2);
+        modeSelectCB.addItem("Last Note-Off", 3);
+    }
+    
+    modeSelectCB.setSelectedItemIndex(prep->getMode(), dontSendNotification);
+}
+
+
 void SynchronicPreparationEditor::timerCallback()
 {
     if (processor.updateState->currentDisplay == DisplaySynchronic)
@@ -445,6 +456,8 @@ void SynchronicPreparationEditor::timerCallback()
         SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
         
         SynchronicCluster::Ptr cluster = sProcessor->getCluster(0);
+        
+        fillModeSelectCB();
         
         if (cluster == nullptr) return;
         
@@ -933,6 +946,9 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         
         prep    ->setOnOffMode( (SynchronicOnOffMode) index);
         active  ->setOnOffMode( (SynchronicOnOffMode) index);
+        
+        fillModeSelectCB();
+        
     }
 }
 
@@ -1142,6 +1158,8 @@ void SynchronicModificationEditor::update(NotificationType notify)
 {
     if (processor.updateState->currentModSynchronicId < 0) return;
     
+    fillModeSelectCB();
+    
     greyOutAllComponents();
     highlightModedComponents();
     
@@ -1227,9 +1245,33 @@ void SynchronicModificationEditor::update(NotificationType notify)
 
 }
 
+void SynchronicModificationEditor::fillModeSelectCB()
+{
+    SynchronicModPreparation::Ptr mod = processor.gallery->getSynchronicModPreparation(processor.updateState->currentModSynchronicId);
+    
+    modeSelectCB.clear();
+    
+    if (mod->getParam(SynchronicOnOff) == String(KeyOn))
+    {
+        modeSelectCB.addItem("First Note-On", 1);
+        modeSelectCB.addItem("Any Note-On", 2);
+        modeSelectCB.addItem("Last Note-Off", 3);
+        modeSelectCB.addItem("Any Note-Off", 4);
+    }
+    else
+    {
+        modeSelectCB.addItem("First Note-Off", 1);
+        modeSelectCB.addItem("Any Note-Off", 2);
+        modeSelectCB.addItem("Last Note-Off", 3);
+    }
+    
+    modeSelectCB.setSelectedItemIndex(mod->getParam(SynchronicMode).getIntValue(), dontSendNotification);
+}
+
 void SynchronicModificationEditor::update()
 {
     update(dontSendNotification);
+    
 }
 
 
@@ -1522,6 +1564,8 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
         
         updateModification();
         onOffSelectCB.setAlpha(1.);
+        
+        fillModeSelectCB();
     }
     
     

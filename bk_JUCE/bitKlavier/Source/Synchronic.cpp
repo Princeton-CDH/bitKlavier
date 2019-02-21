@@ -108,33 +108,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     //cluster management
     if (prep->getOnOffMode() == KeyOn)
     {
-        // [OLD]
-        //don't need this here? since it's in processBlock()?
-        /*
-         beatThresholdSamples = (tempo->getTempo()->aPrep->getBeatThresh() * sampleRate);
-         numSamplesBeat =    beatThresholdSamples *
-         synchronic->aPrep->getBeatMultipliers()[beatMultiplierCounter] *
-         general->getPeriodMultiplier() *
-         tempo->getPeriodMultiplier();
-         */
-        
         SynchronicCluster::Ptr cluster = clusters.getLast();
-        
-        //silence pulses if in NoteOffSync
-        if (cluster != nullptr)
-        {
-            if((prep->getMode() == LastNoteOffSync) || (prep->getMode() == AnyNoteOffSync))
-            {
-                if (clusters.size() >= prep->getNumClusters())
-                {
-                    cluster->setShouldPlay(false);
-                }
-            }
-            else
-            {
-                cluster->setShouldPlay(true);
-            }
-        }
         
         if(!inCluster) //we have a new cluster
         {
@@ -195,30 +169,6 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     //cluster management
     if (synchronic->aPrep->getOnOffMode() == KeyOff)
     {
-        // [OLD]
-        //don't need this here? since it's in processBlock()?
-        /*
-         beatThresholdSamples = (tempo->getTempo()->aPrep->getBeatThresh() * sampleRate);
-         numSamplesBeat =    beatThresholdSamples *
-         synchronic->aPrep->getBeatMultipliers()[beatMultiplierCounter] *
-         general->getPeriodMultiplier() *
-         tempo->getPeriodMultiplier();
-         */
-        
-        //silence pulses if in NoteOffSync
-        if (cluster != nullptr)
-        {
-            // [UNCLEAR]
-            if((synchronic->aPrep->getMode() == LastNoteOffSync) || (synchronic->aPrep->getMode() == AnyNoteOffSync))
-            {
-                cluster->setShouldPlay(false);
-            }
-            else
-            {
-                cluster->setShouldPlay(true);
-            }
-        }
-        
         if(!inCluster) //we have a new cluster
         {
             // [OLD]

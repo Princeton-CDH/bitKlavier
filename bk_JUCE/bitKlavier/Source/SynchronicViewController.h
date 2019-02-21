@@ -79,8 +79,6 @@ protected:
     
     BKLabel envelopeName;
     
-    void fillModeSelectCB(void);
-    
 private:
     
     bool showADSR;
@@ -107,6 +105,7 @@ public:
     void timerCallback() override;
     
     void fillSelectCB(int last, int current);
+    void fillModeSelectCB(void);
     
     static void actionButtonCallback(int action, SynchronicPreparationEditor*);
     
@@ -116,6 +115,8 @@ public:
     int duplicatePreparation(void);
     void setCurrentId(int Id);
     void deleteCurrent(void);
+    
+    
     
 private:
 
@@ -161,6 +162,7 @@ public:
     void timerCallback() override;
     
     void fillSelectCB(int last, int current);
+    void fillModeSelectCB(void);
     
     static void actionButtonCallback(int action, SynchronicModificationEditor*);
     
