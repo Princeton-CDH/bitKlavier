@@ -483,6 +483,25 @@ void SynchronicPreparationEditor::timerCallback()
         
         SynchronicCluster::Ptr cluster = sProcessor->getCluster(0);
         
+        if (active->getOnOffMode() == KeyOn)
+        {
+            if (active->getMode() == AnyNoteOffSync || active->getMode() == LastNoteOffSync)
+            {
+                holdTimeMinMaxSlider->setBright();
+                holdTimeMinMaxSlider->setEnabled(true);
+            }
+            else
+            {
+                holdTimeMinMaxSlider->setDim(gModAlpha);
+                holdTimeMinMaxSlider->setEnabled(false);
+            }
+        }
+        else
+        {
+            holdTimeMinMaxSlider->setBright();
+            holdTimeMinMaxSlider->setEnabled(true);
+        }
+        
         fillModeSelectCB();
         
         if (cluster == nullptr) return;
@@ -1340,7 +1359,6 @@ void SynchronicModificationEditor::fillModeSelectCB()
 void SynchronicModificationEditor::update()
 {
     update(dontSendNotification);
-    
 }
 
 

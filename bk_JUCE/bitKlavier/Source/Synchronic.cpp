@@ -347,7 +347,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
             {
                 Array<int> clusterNotes = cluster->getCluster();
                 
-                DBG("cluster " + String(i) + ": " + intArrayToString(clusterNotes));
+                //DBG("cluster " + String(i) + ": " + intArrayToString(clusterNotes));
                 
                 //cap size of slimCluster, removing oldest notes
                 Array<int> tempCluster;
